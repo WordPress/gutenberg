@@ -8,6 +8,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { promisify } from 'node:util';
 import { fileURLToPath } from 'node:url';
+// The repository's own skill-catalog generator, so this cannot drift from it.
+import { setupSkills } from '../../../tools/agents/setup-skills.mjs';
 
 const execFileAsync = promisify( execFile );
 const libDir = path.dirname( fileURLToPath( import.meta.url ) );
@@ -34,24 +36,26 @@ async function git( cwd, args ) {
  * Generates Claude Code's native view of the repository skills.
  *
  * A real checkout gets this from `npm run agents:setup`, which postinstall
- * runs; the generated directory is ignored by Git, so it is absent from the
- * archive and the workspace never runs npm. Without it the repository's skills
- * are inert files that nothing announces to the agent.
+ * runs. The generated directory is ignored by Git, so it is absent from the
+ * archive, and the workspace never runs npm — without it the repository's
+ * skills are inert files that nothing announces to the agent.
+ *
+ * This calls the repository's own implementation rather than copying what it
+ * does, so the workspace cannot drift from what a contributor actually gets.
  *
  * @param {string} workspace Workspace directory.
  */
 async function generateNativeSkills( workspace ) {
-	const source = path.join( workspace, '.agents/skills' );
-
 	try {
-		await fs.access( source );
-	} catch {
-		return;
+		await setupSkills( { repositoryRoot: workspace } );
+	} catch ( error ) {
+		// Failing loudly matters here: a workspace without the generated view
+		// still runs, and every suite would report an agent ignoring guidance
+		// it was never offered.
+		throw new Error(
+			`Could not generate .claude/skills from .agents/skills in the workspace.\n${ error.message }`
+		);
 	}
-
-	const target = path.join( workspace, '.claude/skills' );
-	await fs.mkdir( path.dirname( target ), { recursive: true } );
-	await fs.cp( source, target, { recursive: true } );
 }
 
 async function createWorkspace() {
