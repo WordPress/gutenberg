@@ -8,11 +8,11 @@
 
 // The following is a temporary override until flex layout supports
 // an align items setting of normal.
-figure.wp-block-gallery.has-nested-images.is-layout-flex {
+figure.wp-block-gallery.has-nested-images:where(.is-layout-flex) {
 	align-items: normal;
 }
 // Styles for the current Gallery block's custom Flex layout.
-.wp-block-gallery.has-nested-images.is-layout-flex {
+.wp-block-gallery.has-nested-images:where(.is-layout-flex) {
 	// Need bogus :not(#individual-image) to override long :not()
 	// specificity chain on default image block on front end.
 	figure.wp-block-image:not(#individual-image) {
@@ -195,6 +195,6 @@ figure.wp-block-gallery.has-nested-images.is-layout-flex {
 	}
 }
 
-.wp-block-gallery.has-nested-images.is-layout-grid > .blocks-gallery-caption {
+:where(.wp-block-gallery.has-nested-images.is-layout-grid) > .blocks-gallery-caption {
 	grid-column: 1 / -1;
 }
