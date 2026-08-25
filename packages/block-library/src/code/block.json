@@ -62,5 +62,13 @@
 			"clientNavigation": true
 		}
 	},
+	"transforms": {
+		"from": [
+			{
+				"type": "raw",
+				"selector": "pre:has(> code)"
+			}
+		]
+	},
 	"style": "wp-block-code"
 }

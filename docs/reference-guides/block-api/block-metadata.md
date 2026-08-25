@@ -498,6 +498,44 @@ return array(
 
 See [the variations documentation](/docs/reference-guides/block-api/block-variations.md) for more details.
 
+### Transforms
+
+-   Type: `object`
+-   Optional
+-   Localized: No
+-   Property: `transforms`
+-   Since: Experimental, Gutenberg plugin only
+
+```json
+{
+	"transforms": {
+		"from": [
+			{
+				"type": "raw",
+				"selector": "h1,h2,h3,h4,h5,h6"
+			}
+		]
+	}
+}
+```
+
+Transforms describe how a block converts to and from other content. They have always been declared in JavaScript, where the editor uses them for pasting, for the "Convert to blocks" command, and for switching one block into another.
+
+Declaring the `raw` transforms in `block.json` makes the same information available to PHP, so HTML can be converted to blocks on the server: during an import, in WP-CLI, or from any code that has HTML and wants block markup. The transforms declared here are read by every registered block type, including third-party ones, so a plugin's blocks take part in server-side conversion without shipping any conversion code.
+
+Each entry under `from` supports:
+
+-   `type` (`string`, required): the kind of content the transform matches. Only `raw` is read on the server.
+-   `selector` (`string`): a CSS selector matched against each top-level element of the source markup. Type, universal, class, ID and attribute selectors are supported, along with the descendant and child combinators and the `:has()` and `:not()` pseudo-classes.
+-   `priority` (`integer`, default `10`): match order, lowest first. A block that should only match when nothing more specific does, such as the Paragraph block, uses a higher number.
+-   `sourceAttributes` (`boolean`, default `true`): whether to derive the block's attributes from the matched markup using the block's own attribute sources.
+-   `attributes` (`object`): attribute values to set on the resulting block, applied over any sourced attributes. A value is used as given, unless it is an object declaring a `source`, in which case it is read from the matched markup the same way a block attribute would be.
+-   `innerBlocks` (`boolean|string`, default `false`): which of the matched element's content becomes inner blocks. `true` converts all of it; a CSS selector converts only the matching child elements and leaves the rest with the block.
+
+Markup that no block claims becomes a Custom HTML block rather than being guessed at.
+
+Transforms that need to match or build attributes imperatively cannot be expressed in JSON. Those keep their JavaScript definitions, and can additionally register `isMatch` and `transform` callbacks from PHP through the `register_block_type_args` filter.
+
 ### Block Hooks
 
 -   Type: `object`

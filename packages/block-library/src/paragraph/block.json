@@ -83,6 +83,15 @@
 			"textIndent": ".wp-block-paragraph + .wp-block-paragraph"
 		}
 	},
+	"transforms": {
+		"from": [
+			{
+				"type": "raw",
+				"selector": "p",
+				"priority": 20
+			}
+		]
+	},
 	"editorStyle": "wp-block-paragraph-editor",
 	"style": "wp-block-paragraph"
 }

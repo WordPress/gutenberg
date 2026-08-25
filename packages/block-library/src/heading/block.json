@@ -74,6 +74,52 @@
 			"clientNavigation": true
 		}
 	},
+	"transforms": {
+		"from": [
+			{
+				"type": "raw",
+				"selector": "h1",
+				"attributes": {
+					"level": 1
+				}
+			},
+			{
+				"type": "raw",
+				"selector": "h2",
+				"attributes": {
+					"level": 2
+				}
+			},
+			{
+				"type": "raw",
+				"selector": "h3",
+				"attributes": {
+					"level": 3
+				}
+			},
+			{
+				"type": "raw",
+				"selector": "h4",
+				"attributes": {
+					"level": 4
+				}
+			},
+			{
+				"type": "raw",
+				"selector": "h5",
+				"attributes": {
+					"level": 5
+				}
+			},
+			{
+				"type": "raw",
+				"selector": "h6",
+				"attributes": {
+					"level": 6
+				}
+			}
+		]
+	},
 	"editorStyle": "wp-block-heading-editor",
 	"style": "wp-block-heading"
 }

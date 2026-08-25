@@ -43,6 +43,14 @@
 		{ "name": "wide", "label": "Wide Line" },
 		{ "name": "dots", "label": "Dots" }
 	],
+	"transforms": {
+		"from": [
+			{
+				"type": "raw",
+				"selector": "hr"
+			}
+		]
+	},
 	"editorStyle": "wp-block-separator-editor",
 	"style": "wp-block-separator"
 }

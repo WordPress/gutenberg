@@ -156,6 +156,14 @@
 		},
 		{ "name": "rounded", "label": "Rounded" }
 	],
+	"transforms": {
+		"from": [
+			{
+				"type": "raw",
+				"selector": "figure:has(img)"
+			}
+		]
+	},
 	"editorStyle": "wp-block-image-editor",
 	"style": "wp-block-image"
 }

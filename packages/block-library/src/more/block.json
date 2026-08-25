@@ -29,5 +29,21 @@
 		},
 		"customCSS": false
 	},
+	"transforms": {
+		"from": [
+			{
+				"type": "raw",
+				"selector": "wp-block[data-block=\"core/more\"]",
+				"sourceAttributes": false,
+				"attributes": {
+					"customText": {
+						"type": "string",
+						"source": "attribute",
+						"attribute": "data-custom-text"
+					}
+				}
+			}
+		]
+	},
 	"editorStyle": "wp-block-more-editor"
 }

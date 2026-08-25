@@ -994,6 +994,55 @@
 				}
 			]
 		},
+		"transforms": {
+			"description": "Transforms describe how a block converts to and from other content. Server-side conversion, such as the raw HTML to blocks handler, reads the transforms declared here.\n\nOnly `from` transforms of type `raw` are read on the server today. Transforms that need imperative matching or attribute logic still have to be registered from PHP or JavaScript.",
+			"type": "object",
+			"properties": {
+				"from": {
+					"description": "Transforms that produce this block from other content.",
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"type": {
+								"description": "The kind of content the transform matches.",
+								"type": "string",
+								"enum": [ "raw" ]
+							},
+							"selector": {
+								"description": "A CSS selector matched against each top-level element of the source markup.\n\nThe server supports type, universal, class, ID and attribute selectors, the descendant and child combinators, and the `:has()` and `:not()` pseudo-classes.",
+								"type": "string"
+							},
+							"priority": {
+								"description": "Match order, lowest first. A block that should only match when nothing more specific does, such as the paragraph block, uses a higher number.",
+								"type": "integer",
+								"default": 10
+							},
+							"sourceAttributes": {
+								"description": "Whether to derive the block's attributes from the matched markup using the block's own attribute sources.",
+								"type": "boolean",
+								"default": true
+							},
+							"attributes": {
+								"description": "Attribute values to set on the resulting block, applied over any sourced attributes.\n\nA value is used as given, unless it is an object declaring a `source`, in which case it is read from the matched markup the same way a block attribute would be.",
+								"type": "object"
+							},
+							"innerBlocks": {
+								"description": "Which of the matched element's content becomes inner blocks: `true` for all of it, or a CSS selector matching the child elements to convert. Content that does not become an inner block stays with the block.",
+								"anyOf": [
+									{ "type": "boolean" },
+									{ "type": "string" }
+								],
+								"default": false
+							}
+						},
+						"required": [ "type" ],
+						"additionalProperties": false
+					}
+				}
+			},
+			"additionalProperties": false
+		},
 		"variations": {
 			"description": "Block Variations is the API that allows a block to have similar versions of it, but all these versions share some common functionality.",
 			"oneOf": [

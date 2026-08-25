@@ -102,6 +102,16 @@
 		},
 		{ "name": "plain", "label": "Plain" }
 	],
+	"transforms": {
+		"from": [
+			{
+				"type": "raw",
+				"selector": "blockquote",
+				"sourceAttributes": false,
+				"innerBlocks": true
+			}
+		]
+	},
 	"editorStyle": "wp-block-quote-editor",
 	"style": "wp-block-quote"
 }

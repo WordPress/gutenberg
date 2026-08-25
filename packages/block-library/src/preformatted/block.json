@@ -57,5 +57,13 @@
 			}
 		}
 	},
+	"transforms": {
+		"from": [
+			{
+				"type": "raw",
+				"selector": "pre:not(:has(> code))"
+			}
+		]
+	},
 	"style": "wp-block-preformatted"
 }
