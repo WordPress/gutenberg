@@ -291,6 +291,11 @@
 			}
 		}
 
+		/* Do not render the preview outline over selected range endpoints. */
+		.preview.selected:not(.range-middle) svg {
+			display: none;
+		}
+
 		.root[dir="rtl"] .preview svg {
 			transform: scaleX(-1);
 		}
