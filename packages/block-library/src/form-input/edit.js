@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	InspectorControls,
@@ -21,10 +14,6 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 function InputFieldBlock( { attributes, setAttributes, className } ) {
@@ -68,7 +57,6 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 								isShownByDefault
 							>
 								<CheckboxControl
-									__nextHasNoMarginBottom
 									label={ __( 'Inline label' ) }
 									checked={ inlineLabel }
 									onChange={ ( newVal ) => {
@@ -89,7 +77,6 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 							isShownByDefault
 						>
 							<CheckboxControl
-								__nextHasNoMarginBottom
 								label={ __( 'Required' ) }
 								checked={ required }
 								onChange={ ( newVal ) => {
@@ -104,8 +91,6 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 			) }
 			<InspectorControls group="advanced">
 				<TextControl
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					autoComplete="off"
 					label={ __( 'Name' ) }
 					value={ name }
@@ -118,6 +103,19 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 						'Affects the "name" attribute of the input element, and is used as a name for the form submission results.'
 					) }
 				/>
+				{ 'hidden' === type && (
+					<TextControl
+						autoComplete="off"
+						label={ __( 'Value' ) }
+						value={ value }
+						onChange={ ( newVal ) =>
+							setAttributes( { value: newVal } )
+						}
+						help={ __(
+							'Sets the stored value for this hidden field.'
+						) }
+					/>
+				) }
 			</InspectorControls>
 		</>
 	);
@@ -136,23 +134,13 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 
 	if ( 'hidden' === type ) {
 		return (
-			<>
+			<div { ...blockProps }>
 				{ controls }
-				<input
-					type="hidden"
-					className={ clsx(
-						className,
-						'wp-block-form-input__input',
-						colorProps.className,
-						borderProps.className
-					) }
-					aria-label={ __( 'Value' ) }
-					value={ value }
-					onChange={ ( event ) =>
-						setAttributes( { value: event.target.value } )
-					}
+				<span
+					className="wp-block-form-input__label is-input-hidden"
+					data-message={ __( 'Hidden field' ) }
 				/>
-			</>
+			</div>
 		);
 	}
 

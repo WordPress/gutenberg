@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef, KeyboardEvent, MouseEvent } from 'react';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { speak } from '@wordpress/a11y';
 import {
 	useEffect,
@@ -17,17 +10,13 @@ import {
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import warning from '@wordpress/warning';
-
-/**
- * Internal dependencies
- */
 import Button from '../button';
 import ExternalLink from '../external-link';
 import type { SnackbarProps } from './types';
 import type { NoticeAction } from '../notice/types';
 import type { WordPressComponentProps } from '../context';
 
-const NOTICE_TIMEOUT = 10000;
+const NOTICE_TIMEOUT = 6000;
 
 /**
  * Custom hook which announces the message with the given politeness, if a
@@ -206,5 +195,6 @@ function UnforwardedSnackbar(
  * ```
  */
 export const Snackbar = forwardRef( UnforwardedSnackbar );
+Snackbar.displayName = 'Snackbar';
 
 export default Snackbar;

@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo, useEffect } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useSetAsHomepageAction } from './set-as-homepage';
@@ -24,34 +17,55 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		[ postType ]
 	);
 
-	const { canManageOptions, hasFrontPageTemplate } = useSelect(
+	const shouldShowHomepageActions = useSelect(
 		( select ) => {
-			const { getEntityRecords, canUser } = select( coreStore );
+			if ( postType !== 'page' ) {
+				return false;
+			}
+
+			const { getDefaultTemplateId, getEntityRecord, canUser } =
+				select( coreStore );
 			const canUpdateSettings = canUser( 'update', {
 				kind: 'root',
 				name: 'site',
 			} );
-			const templates =
-				'page' === postType && canUpdateSettings
-					? getEntityRecords( 'postType', 'wp_template', {
-							per_page: -1,
-					  } )
-					: [];
 
-			return {
-				canManageOptions: canUpdateSettings,
-				hasFrontPageTemplate: !! templates?.find(
-					( template ) => template?.slug === 'front-page'
-				),
-			};
+			if ( ! canUpdateSettings ) {
+				return false;
+			}
+
+			// Note that resolved template for `front-page` is not necessarily a
+			// `front-page` template.
+			const frontPageTemplateId = getDefaultTemplateId( {
+				slug: 'front-page',
+			} );
+
+			if ( ! frontPageTemplateId ) {
+				return true;
+			}
+
+			// This won't trigger a second network request, getDefaultTemplateId
+			// will have received the whole template from the REST API.
+			const frontPageTemplate = getEntityRecord(
+				'postType',
+				'wp_template',
+				frontPageTemplateId
+			);
+
+			if ( ! frontPageTemplate ) {
+				return true;
+			}
+
+			// When there is a front page template, the front page cannot be
+			// changed. See
+			// https://developer.wordpress.org/themes/basics/template-hierarchy/
+			return frontPageTemplate.slug !== 'front-page';
 		},
 		[ postType ]
 	);
 
 	const setAsHomepageAction = useSetAsHomepageAction();
 	const setAsPostsPageAction = useSetAsPostsPageAction();
-	const shouldShowHomepageActions =
-		canManageOptions && ! hasFrontPageTemplate;
 
 	const { registerPostTypeSchema } = unlock( useDispatch( editorStore ) );
 	useEffect( () => {

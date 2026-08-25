@@ -2,6 +2,78 @@
 
 ## Unreleased
 
+### Internal
+
+-   Remove `@wordpress/dataviews` from the list of core modules using private APIs, since importing private APIs is no longer allowed in the package. [#81478](https://github.com/WordPress/gutenberg/pull/81478)
+
+## 1.53.0 (2026-08-12)
+
+### Internal
+
+-   Remove `@wordpress/content-types` from the list of core modules using private APIs, as part of removing the content types experiment. [#81340](https://github.com/WordPress/gutenberg/pull/81340)
+
+## 1.52.0 (2026-07-29)
+
+## 1.51.0 (2026-07-14)
+
+### Enhancements
+
+- Allow `@wordpress/global-styles-engine` to opt in to private APIs. ([#79104](https://github.com/WordPress/gutenberg/pull/79104))
+
+## 1.50.0 (2026-07-01)
+
+## 1.49.0 (2026-06-24)
+
+## 1.48.1 (2026-06-16)
+
+## 1.48.0 (2026-06-10)
+
+### Enhancements
+
+- Allow `@wordpress/storybook` to opt in to private APIs. ([#78814](https://github.com/WordPress/gutenberg/pull/78814))
+
+## 1.47.0 (2026-05-27)
+
+## 1.46.0 (2026-05-14)
+
+## 1.45.0 (2026-04-29)
+
+## 1.44.0 (2026-04-15)
+
+## 1.43.0 (2026-04-01)
+
+## 1.42.0 (2026-03-18)
+
+## 1.41.0 (2026-03-04)
+
+## 1.40.0 (2026-02-18)
+
+## 1.39.0 (2026-01-29)
+
+## 1.38.0 (2026-01-16)
+
+## 1.36.0 (2025-11-26)
+
+## 1.35.0 (2025-11-12)
+
+## 1.34.0 (2025-10-29)
+
+## 1.33.0 (2025-10-17)
+
+## 1.32.0 (2025-10-01)
+
+## 1.31.0 (2025-09-17)
+
+## 1.30.0 (2025-09-03)
+
+## 1.29.0 (2025-08-20)
+
+## 1.28.0 (2025-08-07)
+
+## 1.27.0 (2025-07-23)
+
+## 1.26.0 (2025-06-25)
+
 ## 1.25.0 (2025-06-04)
 
 ## 1.24.0 (2025-05-22)

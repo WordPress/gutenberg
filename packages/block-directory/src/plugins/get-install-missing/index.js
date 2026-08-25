@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
@@ -12,17 +9,11 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import InstallButton from './install-button';
 import { store as blockDirectoryStore } from '../../store';
 
 const getInstallMissing = ( OriginalComponent ) => ( props ) => {
 	const { originalName } = props.attributes;
-	// Disable reason: This is a valid component, but it's mistaken for a callback.
-	// eslint-disable-next-line react-hooks/rules-of-hooks
 	const { block, hasPermission } = useSelect(
 		( select ) => {
 			const { getDownloadableBlocks } = select( blockDirectoryStore );
@@ -55,9 +46,7 @@ const ModifiedWarning = ( { originalBlock, ...props } ) => {
 	const convertToHTML = () => {
 		replaceBlock(
 			props.clientId,
-			createBlock( 'core/html', {
-				content: originalUndelimitedContent,
-			} )
+			createBlock( 'core/html', {}, [], [ originalUndelimitedContent ] )
 		);
 	};
 

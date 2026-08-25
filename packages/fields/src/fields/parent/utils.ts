@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { BasePost } from '../../types';
 
 export function getTitleWithFallbackName( post: BasePost ) {

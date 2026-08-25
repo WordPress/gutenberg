@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { act, fireEvent, render, screen } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
-import _RangeControl from '../';
+import RangeControl from '../';
 
 const getRangeInput = (): HTMLInputElement => screen.getByRole( 'slider' );
 const getNumberInput = (): HTMLInputElement => screen.getByRole( 'spinbutton' );
@@ -14,18 +7,6 @@ const getResetButton = (): HTMLButtonElement => screen.getByRole( 'button' );
 
 const fireChangeEvent = ( input: HTMLInputElement, value?: number | string ) =>
 	fireEvent.change( input, { target: { value } } );
-
-const RangeControl = (
-	props: React.ComponentProps< typeof _RangeControl >
-) => {
-	return (
-		<_RangeControl
-			{ ...props }
-			__nextHasNoMarginBottom
-			__next40pxDefaultSize
-		/>
-	);
-};
 
 describe( 'RangeControl', () => {
 	describe( '#render()', () => {

@@ -1,0 +1,131 @@
+{
+	"wpds-border": {
+		"$type": "dimension",
+		"radius": {
+			"$description": "Border radius scale for elegant hierarchical nesting. Outer surfaces use larger steps; nested elements use smaller ones so concentric corners stay visually harmonious.",
+			"xs": {
+				"$value": { "value": 1, "unit": "px" },
+				"$description": "Buttons and other elements nested inside controls.",
+				"$extensions": {
+					"mode": {
+						"corner-radius-none": { "value": 0, "unit": "px" },
+						"corner-radius-subtle": { "value": 1, "unit": "px" },
+						"corner-radius-moderate": { "value": 6, "unit": "px" },
+						"corner-radius-pronounced": {
+							"value": 18,
+							"unit": "px"
+						}
+					},
+					"com.figma.scopes": [ "CORNER_RADIUS" ]
+				}
+			},
+			"sm": {
+				"$value": { "value": 2, "unit": "px" },
+				"$description": "Standalone buttons, inputs, and compact controls.",
+				"$extensions": {
+					"mode": {
+						"corner-radius-none": { "value": 0, "unit": "px" },
+						"corner-radius-subtle": { "value": 2, "unit": "px" },
+						"corner-radius-moderate": { "value": 8, "unit": "px" },
+						"corner-radius-pronounced": {
+							"value": 20,
+							"unit": "px"
+						}
+					},
+					"com.figma.scopes": [ "CORNER_RADIUS" ]
+				}
+			},
+			"md": {
+				"$value": { "value": 4, "unit": "px" },
+				"$description": "Menus, popovers, and other small portaled overlays.",
+				"$extensions": {
+					"mode": {
+						"corner-radius-none": { "value": 0, "unit": "px" },
+						"corner-radius-subtle": { "value": 4, "unit": "px" },
+						"corner-radius-moderate": { "value": 12, "unit": "px" },
+						"corner-radius-pronounced": {
+							"value": 22,
+							"unit": "px"
+						}
+					},
+					"com.figma.scopes": [ "CORNER_RADIUS" ]
+				}
+			},
+			"lg": {
+				"$value": { "value": 8, "unit": "px" },
+				"$description": "Cards, dialogs, notices, and other larger content containers.",
+				"$extensions": {
+					"mode": {
+						"corner-radius-none": { "value": 0, "unit": "px" },
+						"corner-radius-subtle": { "value": 8, "unit": "px" },
+						"corner-radius-moderate": { "value": 16, "unit": "px" },
+						"corner-radius-pronounced": {
+							"value": 24,
+							"unit": "px"
+						}
+					},
+					"com.figma.scopes": [ "CORNER_RADIUS" ]
+				}
+			},
+			"xl": {
+				"$value": { "value": 12, "unit": "px" },
+				"$description": "Page and app shell surfaces.",
+				"$extensions": {
+					"mode": {
+						"corner-radius-none": { "value": 0, "unit": "px" },
+						"corner-radius-subtle": { "value": 12, "unit": "px" },
+						"corner-radius-moderate": { "value": 20, "unit": "px" },
+						"corner-radius-pronounced": {
+							"value": 26,
+							"unit": "px"
+						}
+					},
+					"com.figma.scopes": [ "CORNER_RADIUS" ]
+				}
+			},
+			"$extensions": {
+				"com.figma.scopes": [ "CORNER_RADIUS" ]
+			}
+		},
+		"width": {
+			"xs": {
+				"$value": { "value": 1, "unit": "px" },
+				"$description": "Extra small width",
+				"$extensions": {
+					"com.figma.scopes": [ "STROKE_FLOAT" ]
+				}
+			},
+			"sm": {
+				"$value": { "value": 2, "unit": "px" },
+				"$description": "Small width",
+				"$extensions": {
+					"com.figma.scopes": [ "STROKE_FLOAT" ]
+				}
+			},
+			"md": {
+				"$value": { "value": 4, "unit": "px" },
+				"$description": "Medium width",
+				"$extensions": {
+					"com.figma.scopes": [ "STROKE_FLOAT" ]
+				}
+			},
+			"lg": {
+				"$value": { "value": 8, "unit": "px" },
+				"$description": "Large width",
+				"$extensions": {
+					"com.figma.scopes": [ "STROKE_FLOAT" ]
+				}
+			},
+			"focus": {
+				"$value": { "value": 2, "unit": "px" },
+				"$description": "Border width for focus ring",
+				"$extensions": {
+					"mode": {
+						"high-dpi": { "value": 1.5, "unit": "px" }
+					},
+					"com.figma.scopes": [ "STROKE_FLOAT" ]
+				}
+			}
+		}
+	}
+}

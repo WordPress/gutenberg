@@ -14,7 +14,8 @@
 			"items": {
 				"type": "object"
 			},
-			"default": []
+			"default": [],
+			"role": "local"
 		},
 		"onlyIncludeCurrentPage": {
 			"type": "boolean",
@@ -22,9 +23,15 @@
 		},
 		"maxLevel": {
 			"type": "number"
+		},
+		"ordered": {
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"supports": {
+		"anchor": true,
+		"ariaLabel": true,
 		"html": false,
 		"color": {
 			"text": true,

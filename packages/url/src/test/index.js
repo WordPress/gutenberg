@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import {
 	addQueryArgs,
 	buildQueryString,
@@ -144,7 +141,7 @@ describe( 'getProtocol', () => {
 	it( 'returns undefined when the provided value does not contain a URL protocol', () => {
 		expect( getProtocol( '' ) ).toBeUndefined();
 		expect( getProtocol( 'https' ) ).toBeUndefined();
-		expect( getProtocol( 'test.com' ) ).toBeUndefined();
+		expect( getProtocol( 'example.com' ) ).toBeUndefined();
 		expect( getProtocol( ' https:// ' ) ).toBeUndefined();
 	} );
 } );
@@ -206,7 +203,7 @@ describe( 'getAuthority', () => {
 		expect( getAuthority( 'https:///' ) ).toBeUndefined();
 		expect( getAuthority( 'https://#' ) ).toBeUndefined();
 		expect( getAuthority( 'https://?' ) ).toBeUndefined();
-		expect( getAuthority( 'test.com' ) ).toBeUndefined();
+		expect( getAuthority( 'example.com' ) ).toBeUndefined();
 		expect( getAuthority( 'https://#?hello' ) ).toBeUndefined();
 	} );
 } );
@@ -274,7 +271,7 @@ describe( 'getPath', () => {
 		expect( getPath( 'https:///test' ) ).toBeUndefined();
 		expect( getPath( 'https://#' ) ).toBeUndefined();
 		expect( getPath( 'https://?' ) ).toBeUndefined();
-		expect( getPath( 'test.com' ) ).toBeUndefined();
+		expect( getPath( 'example.com' ) ).toBeUndefined();
 		expect( getPath( 'https://#?hello' ) ).toBeUndefined();
 		expect( getPath( 'https' ) ).toBeUndefined();
 	} );
@@ -365,11 +362,11 @@ describe( 'getQueryString', () => {
 				'https://andalouses.example/beach?foo[]=bar&foo[]=baz'
 			)
 		).toBe( 'foo[]=bar&foo[]=baz' );
-		expect( getQueryString( 'https://test.com?foo[]=bar&foo[]=baz' ) ).toBe(
-			'foo[]=bar&foo[]=baz'
-		);
 		expect(
-			getQueryString( 'https://test.com?foo=bar&foo=baz?test' )
+			getQueryString( 'https://example.com?foo[]=bar&foo[]=baz' )
+		).toBe( 'foo[]=bar&foo[]=baz' );
+		expect(
+			getQueryString( 'https://example.com?foo=bar&foo=baz?test' )
 		).toBe( 'foo=bar&foo=baz?test' );
 	} );
 
@@ -494,12 +491,12 @@ describe( 'getPathAndQueryString', () => {
 	beforeAll( jest.resetModules );
 	afterAll( jest.resetModules );
 	it( 'combines the results of `getPath` and `getQueryString`', () => {
-		jest.doMock( '../get-path.js', () => ( {
+		jest.doMock( '../get-path', () => ( {
 			getPath( { path } = {} ) {
 				return path;
 			},
 		} ) );
-		jest.doMock( '../get-query-string.js', () => ( {
+		jest.doMock( '../get-query-string', () => ( {
 			getQueryString( { queryString } = {} ) {
 				return queryString;
 			},
@@ -564,7 +561,7 @@ describe( 'getFragment', () => {
 		expect( getFragment( 'https://' ) ).toBeUndefined();
 		expect( getFragment( 'https:///test' ) ).toBeUndefined();
 		expect( getFragment( 'https://?' ) ).toBeUndefined();
-		expect( getFragment( 'test.com' ) ).toBeUndefined();
+		expect( getFragment( 'example.com' ) ).toBeUndefined();
 	} );
 } );
 
@@ -670,6 +667,25 @@ describe( 'addQueryArgs', () => {
 			}
 		);
 	} );
+
+	it( 'should not truncate an existing value containing equals signs', () => {
+		const url =
+			'https://andalouses.example/beach?cursor=eyJvZmZzZXQiOjIwfQ==';
+		const args = { sun: 'true' };
+
+		expect( addQueryArgs( url, args ) ).toBe(
+			'https://andalouses.example/beach?cursor=eyJvZmZzZXQiOjIwfQ%3D%3D&sun=true'
+		);
+	} );
+
+	it( 'should not truncate a nested URL passed as an existing value', () => {
+		const url = 'https://andalouses.example/beach?redirect=/watch?v=abc';
+		const args = { sun: 'true' };
+
+		expect( addQueryArgs( url, args ) ).toBe(
+			'https://andalouses.example/beach?redirect=%2Fwatch%3Fv%3Dabc&sun=true'
+		);
+	} );
 } );
 
 describe( 'getQueryArgs', () => {
@@ -739,6 +755,40 @@ describe( 'getQueryArgs', () => {
 
 		expect( getQueryArgs( url ) ).toEqual( {
 			foo: '',
+		} );
+	} );
+
+	it( 'should only split on the first equals sign', () => {
+		const url = 'https://andalouses.example/beach?a=1&b=x=y';
+
+		expect( getQueryArgs( url ) ).toEqual( {
+			a: '1',
+			b: 'x=y',
+		} );
+	} );
+
+	it( 'should preserve base64 padding in a value', () => {
+		const url =
+			'https://andalouses.example/beach?token=eyJhbGciOiJIUzI1NiJ9==';
+
+		expect( getQueryArgs( url ) ).toEqual( {
+			token: 'eyJhbGciOiJIUzI1NiJ9==',
+		} );
+	} );
+
+	it( 'should preserve an unencoded URL in a value', () => {
+		const url = 'https://andalouses.example/beach?redirect=/watch?v=abc';
+
+		expect( getQueryArgs( url ) ).toEqual( {
+			redirect: '/watch?v=abc',
+		} );
+	} );
+
+	it( 'should ignore a pair with no key', () => {
+		const url = 'https://andalouses.example/beach?=orphan&foo=bar';
+
+		expect( getQueryArgs( url ) ).toEqual( {
+			foo: 'bar',
 		} );
 	} );
 
@@ -1140,6 +1190,13 @@ describe( 'filterURLForDisplay', () => {
 		);
 		expect( url ).toBe( 'superlongti…ion.jpeg' );
 	} );
+	it( 'should not return more than the shortest truncation when maxLength is tiny', () => {
+		const url = filterURLForDisplay(
+			'https://example.com/averylongfilename.png',
+			5
+		);
+		expect( url ).toBe( '…ame.png' );
+	} );
 	it( 'should remove query arguments', () => {
 		const url = filterURLForDisplay(
 			'http://www.wordpress.org/wp-content/uploads/myimage.jpeg?query_args=a',
@@ -1247,5 +1304,25 @@ describe( 'normalizePath', () => {
 	it( 'sorts urldecoded values and returns property urlencoded query string', () => {
 		const ab = normalizePath( '/foo/bar?a%2Ca=5,5&a,b=1,1' );
 		expect( ab ).toBe( '/foo/bar?a%2Ca=5%2C5&a%2Cb=1%2C1' );
+	} );
+
+	it( 'should not blow up on malformed params', () => {
+		const path = '/foo/bar?baz=%E0%A4%A';
+
+		expect( () => normalizePath( path ) ).not.toThrow();
+		expect( normalizePath( path ) ).toBe( '/foo/bar?baz=%25E0%25A4%25A' );
+	} );
+
+	it( 'returns a stable path when a param is malformed', () => {
+		const ab = normalizePath( '/foo/bar?a=5&b=50%off' );
+		const ba = normalizePath( '/foo/bar?b=50%off&a=5' );
+
+		expect( ab ).toBe( ba );
+	} );
+
+	it( 'keeps the query beyond a second question mark', () => {
+		expect( normalizePath( '/foo/bar?redirect=/watch?v=abc' ) ).toBe(
+			'/foo/bar?redirect=%2Fwatch%3Fv=abc'
+		);
 	} );
 } );

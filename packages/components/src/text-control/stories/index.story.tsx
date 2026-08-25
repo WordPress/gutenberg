@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import TextControl from '..';
 
 const meta: Meta< typeof TextControl > = {
@@ -28,6 +17,11 @@ const meta: Meta< typeof TextControl > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Use [`InputControl`](?path=/docs/design-system-components-form-inputcontrol--docs) from `@wordpress/ui` instead. See the [migration guide](?path=/docs/components-inputcontrol--migration-guide).',
+		},
 	},
 };
 export default meta;
@@ -54,8 +48,7 @@ export const Default: StoryFn< typeof TextControl > = DefaultTemplate.bind(
 	{}
 );
 Default.args = {
-	__nextHasNoMarginBottom: true,
-	__next40pxDefaultSize: true,
+	placeholder: 'Placeholder',
 };
 
 export const WithLabelAndHelpText: StoryFn< typeof TextControl > =

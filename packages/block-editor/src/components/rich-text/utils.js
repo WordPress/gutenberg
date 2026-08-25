@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { renderToString } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
 

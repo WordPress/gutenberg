@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * Internal dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { View } from '../../view';
 import { VStack } from '..';
 
@@ -25,8 +18,8 @@ const ALIGNMENTS = {
 
 const meta: Meta< typeof VStack > = {
 	component: VStack,
-	title: 'Components (Experimental)/Layout/VStack',
-	id: 'components-experimental-vstack',
+	title: 'Components/Layout/VStack',
+	id: 'components-vstack',
 	argTypes: {
 		alignment: {
 			control: { type: 'select' },
@@ -38,9 +31,15 @@ const meta: Meta< typeof VStack > = {
 		justify: { control: { type: 'text' } },
 		spacing: { control: { type: 'text' } },
 	},
+	tags: [ 'status-experimental' ],
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Use [`Stack`](?path=/docs/design-system-components-stack--docs) from `@wordpress/ui` instead.',
+		},
 	},
 };
 export default meta;

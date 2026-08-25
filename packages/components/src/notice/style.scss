@@ -1,68 +1,75 @@
-.components-notice {
-	display: flex;
-	font-family: $default-font;
-	font-size: $default-font-size;
-	background-color: $white;
-	border-left: 4px solid $components-color-accent;
-	padding: 8px 12px;
-	align-items: center;
-	color: $gray-900;
+@use "@wordpress/base-styles/variables" as *;
 
-	&.is-dismissible {
-		position: relative;
-	}
+.components-notice {
+	--wp-components-notice-background-color: var(--wpds-color-background-surface-info-weak);
+	--wp-components-notice-border-color: var(--wpds-color-stroke-surface-info);
+	--wp-components-notice-text-color: var(--wpds-color-foreground-content-info);
+
+	box-sizing: border-box;
+	display: grid;
+	grid-template-columns: 1fr auto;
+	align-items: start;
+	padding: var(--wpds-dimension-padding-md);
+	border: var(--wpds-border-width-xs) solid var(--wp-components-notice-border-color);
+	border-radius: var(--wpds-border-radius-lg);
+	background-color: var(--wp-components-notice-background-color);
+	color: var(--wp-components-notice-text-color);
+	font-family: var(--wpds-typography-font-family-body);
+	font-size: var(--wpds-typography-font-size-md);
+	line-height: var(--wpds-typography-line-height-sm);
 
 	&.is-success {
-		border-left-color: $alert-green;
-		background-color: lighten($alert-green, 45%);
+		--wp-components-notice-background-color: var(--wpds-color-background-surface-success-weak);
+		--wp-components-notice-border-color: var(--wpds-color-stroke-surface-success);
+		--wp-components-notice-text-color: var(--wpds-color-foreground-content-success);
 	}
 
 	&.is-warning {
-		border-left-color: $alert-yellow;
-		background-color: lighten($alert-yellow, 35%);
+		--wp-components-notice-background-color: var(--wpds-color-background-surface-warning-weak);
+		--wp-components-notice-border-color: var(--wpds-color-stroke-surface-warning);
+		--wp-components-notice-text-color: var(--wpds-color-foreground-content-warning);
 	}
 
 	&.is-error {
-		border-left-color: $alert-red;
-		background-color: lighten($alert-red, 35%);
+		--wp-components-notice-background-color: var(--wpds-color-background-surface-error-weak);
+		--wp-components-notice-border-color: var(--wpds-color-stroke-surface-error);
+		--wp-components-notice-text-color: var(--wpds-color-foreground-content-error);
 	}
 }
 
 .components-notice__content {
-	flex-grow: 1;
-	margin: $grid-unit-05 #{ $button-size-small + $border-width } $grid-unit-05 0;
+	grid-column: 1;
+	grid-row: 1;
+
+	// Centers single-line copy with the dismiss row when it is present. The same
+	// padding is kept when the notice is not dismissible so block height stays
+	// consistent across variants, matching `@wordpress/ui` Notice (`.title` /
+	// `.description` always use `--text-vertical-padding` whether or not `CloseIcon`
+	// is rendered).
+	padding-block: calc((var(--wpds-dimension-size-sm) - 1lh) / 2);
 }
 
 .components-notice__actions {
+	grid-column: 1;
+	grid-row: 2;
+
 	display: flex;
 	flex-wrap: wrap;
-}
-
-.components-notice__action.components-button {
-	&,
-	&.is-link {
-		margin-left: $grid-unit-15;
-	}
-	&.is-secondary {
-		vertical-align: initial;
-	}
-
-	// When it has better support, this can be replaced
-	// with column-gap since these are flex items.
-	margin-right: $grid-unit-10;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-md);
+	margin-top: var(--wpds-dimension-gap-sm);
 }
 
 .components-notice__dismiss {
-	color: $gray-700;
-
-	// Place the dismiss button at the top of the container, even when text wraps onto two lines.
-	align-self: flex-start;
-	flex-shrink: 0;
+	grid-column: 2;
+	grid-row: 1;
+	color: var(--wpds-color-foreground-interactive-neutral);
+	margin-inline-start: var(--wpds-dimension-gap-xs);
 
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover,
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active,
 	&:not(:disabled):not([aria-disabled="true"]):focus {
-		color: $gray-900;
+		color: var(--wpds-color-foreground-interactive-neutral-active);
 		background-color: transparent;
 	}
 
@@ -72,19 +79,11 @@
 }
 
 .components-notice-list {
+	display: flex;
+	flex-direction: column;
+	gap: var(--wpds-dimension-gap-md);
+
 	// The notice should never be wider than the viewport, or the close button might be hidden. Especially relevant at high zoom levels. Related to https://core.trac.wordpress.org/ticket/47603#ticket.
 	max-width: 100vw;
 	box-sizing: border-box;
-
-	.components-notice__content {
-		margin-top: $grid-unit-15;
-		margin-bottom: $grid-unit-15;
-		line-height: 2;
-	}
-
-	.components-notice__action.components-button {
-		display: block;
-		margin-left: 0;
-		margin-top: $grid-unit-10;
-	}
 }

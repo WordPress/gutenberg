@@ -1,15 +1,11 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-import { ExternalLink, TextareaControl } from '@wordpress/components';
+import {
+	ExternalLink,
+	TextareaControl as WCTextareaControl,
+} from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 
 /**
@@ -65,8 +61,7 @@ export default function PostExcerpt( {
 
 	return (
 		<div className="editor-post-excerpt">
-			<TextareaControl
-				__nextHasNoMarginBottom
+			<WCTextareaControl
 				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
 				className="editor-post-excerpt__textarea"

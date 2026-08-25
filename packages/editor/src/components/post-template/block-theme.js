@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
@@ -10,31 +7,30 @@ import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import { check } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import PostPanelRow from '../post-panel-row';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import SwapTemplateButton from './swap-template-button';
 import ResetDefaultTemplate from './reset-default-template';
 import { unlock } from '../../lock-unlock';
 import CreateNewTemplate from './create-new-template';
 
-export default function BlockThemeControl( { id } ) {
+export default function BlockThemeControl() {
 	const {
 		isTemplateHidden,
 		onNavigateToEntityRecord,
 		getEditorSettings,
 		hasGoBack,
+		hasSpecificTemplate,
+		id,
 	} = useSelect( ( select ) => {
-		const { getRenderingMode, getEditorSettings: _getEditorSettings } =
-			unlock( select( editorStore ) );
+		const {
+			getRenderingMode,
+			getEditorSettings: _getEditorSettings,
+			getCurrentPost,
+			getCurrentTemplateId,
+		} = unlock( select( editorStore ) );
 		const editorSettings = _getEditorSettings();
+		const currentPost = getCurrentPost();
 		return {
 			isTemplateHidden: getRenderingMode() === 'post-only',
 			onNavigateToEntityRecord: editorSettings.onNavigateToEntityRecord,
@@ -42,6 +38,8 @@ export default function BlockThemeControl( { id } ) {
 			hasGoBack: editorSettings.hasOwnProperty(
 				'onNavigateToPreviousEntityRecord'
 			),
+			hasSpecificTemplate: !! currentPost.template,
+			id: getCurrentTemplateId(),
 		};
 	}, [] );
 
@@ -52,6 +50,8 @@ export default function BlockThemeControl( { id } ) {
 		'wp_template',
 		id
 	);
+	const { getEntityRecord } = useSelect( coreStore );
+	const { editEntityRecord } = useDispatch( coreStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { setRenderingMode, setDefaultRenderingMode } = unlock(
 		useDispatch( editorStore )
@@ -126,11 +126,48 @@ export default function BlockThemeControl( { id } ) {
 						<MenuGroup>
 							{ canCreateTemplate && (
 								<MenuItem
-									onClick={ () => {
+									onClick={ async () => {
 										onNavigateToEntityRecord( {
 											postId: template.id,
 											postType: 'wp_template',
 										} );
+										// When editing a global template,
+										// activate the auto-draft. This is not
+										// immediately live (we're not saving
+										// site options), and when nothing is
+										// saved, the setting will be ignored.
+										// In the future, we should make the
+										// duplication explicit, so there
+										// wouldn't be an "edit" button for
+										// static theme templates.
+										if (
+											! hasSpecificTemplate &&
+											window?.__experimentalTemplateActivate
+										) {
+											const activeTemplates =
+												await getEntityRecord(
+													'root',
+													'site'
+												).active_templates;
+											if (
+												activeTemplates[
+													template.slug
+												] !== template.id
+											) {
+												editEntityRecord(
+													'root',
+													'site',
+													undefined,
+													{
+														active_templates: {
+															...activeTemplates,
+															[ template.slug ]:
+																template.id,
+														},
+													}
+												);
+											}
+										}
 										onClose();
 										mayShowTemplateEditNotice();
 									} }

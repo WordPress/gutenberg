@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { CheckboxControl } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import BlockIcon from '../block-icon';
 
 function BlockTypesChecklist( { blockTypes, value, onItemChange } ) {
@@ -17,7 +10,6 @@ function BlockTypesChecklist( { blockTypes, value, onItemChange } ) {
 					className="block-editor-block-manager__checklist-item"
 				>
 					<CheckboxControl
-						__nextHasNoMarginBottom
 						label={ blockType.title }
 						checked={ value.includes( blockType.name ) }
 						onChange={ ( ...args ) =>

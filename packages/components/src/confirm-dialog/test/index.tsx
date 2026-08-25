@@ -1,13 +1,7 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * Internal dependencies
- */
 import { ConfirmDialog } from '..';
+import styles from '../style.module.scss';
 
 const noop = () => {};
 
@@ -25,11 +19,56 @@ describe( 'Confirm', () => {
 				const elementsTexts = [ 'Are you sure?', 'OK', 'Cancel' ];
 
 				expect( dialog ).toBeInTheDocument();
+				expect( dialog ).toHaveClass( 'components-confirm-dialog' );
+				// Disable reason: Semantic queries can't reach the overlay.
+				// eslint-disable-next-line testing-library/no-node-access
+				expect( dialog.parentElement ).toHaveClass( styles.wrapper );
 
 				elementsTexts.forEach( ( txt ) => {
 					const el = screen.getByText( txt );
 					expect( el ).toBeInTheDocument();
 				} );
+			} );
+			it( 'uses title as the dialog accessible name while the default header is hidden', () => {
+				const title = 'Delete item?';
+
+				render(
+					<ConfirmDialog
+						title={ title }
+						onConfirm={ noop }
+						onCancel={ noop }
+					>
+						Are you sure?
+					</ConfirmDialog>
+				);
+
+				expect(
+					screen.getByRole( 'dialog', { name: title } )
+				).toBeInTheDocument();
+				expect(
+					screen.queryByRole( 'heading', { name: title } )
+				).not.toBeInTheDocument();
+			} );
+			it( 'renders the title heading when __experimentalHideHeader is false', () => {
+				const title = 'Delete item?';
+
+				render(
+					<ConfirmDialog
+						title={ title }
+						__experimentalHideHeader={ false }
+						onConfirm={ noop }
+						onCancel={ noop }
+					>
+						Are you sure?
+					</ConfirmDialog>
+				);
+
+				expect(
+					screen.getByRole( 'dialog', { name: title } )
+				).toBeInTheDocument();
+				expect(
+					screen.getByRole( 'heading', { name: title } )
+				).toBeInTheDocument();
 			} );
 			it( 'should render correctly with custom button labels', () => {
 				const cancelButtonText = 'No thanks';
@@ -348,6 +387,72 @@ describe( 'Confirm', () => {
 			await user.keyboard( '[Enter]' );
 
 			expect( onConfirm ).toHaveBeenCalled();
+		} );
+
+		it( 'should handle `isBusy` prop with different combinations', () => {
+			const { rerender } = render(
+				<ConfirmDialog
+					isOpen
+					onConfirm={ noop }
+					onCancel={ noop }
+					isBusy
+				>
+					Are you sure?
+				</ConfirmDialog>
+			);
+
+			let cancelButton = screen.getByRole( 'button', {
+				name: 'Cancel',
+			} );
+			let confirmButton = screen.getByRole( 'button', { name: 'OK' } );
+
+			// Only confirm button shows busy spinner
+			expect( cancelButton ).not.toHaveClass( 'is-busy' );
+			expect( confirmButton ).toHaveClass( 'is-busy' );
+
+			// Both buttons are disabled (exposed via aria-disabled due to accessibleWhenDisabled)
+			// Intentionally rely on aria-disabled rather than disabled attribute
+			expect( cancelButton ).toHaveAttribute( 'aria-disabled', 'true' );
+			expect( confirmButton ).toHaveAttribute( 'aria-disabled', 'true' );
+
+			// Test when isBusy is false
+			rerender(
+				<ConfirmDialog
+					isOpen
+					onConfirm={ noop }
+					onCancel={ noop }
+					isBusy={ false }
+				>
+					Are you sure?
+				</ConfirmDialog>
+			);
+
+			cancelButton = screen.getByRole( 'button', {
+				name: 'Cancel',
+			} );
+			confirmButton = screen.getByRole( 'button', { name: 'OK' } );
+
+			expect( cancelButton ).not.toHaveClass( 'is-busy' );
+			expect( confirmButton ).not.toHaveClass( 'is-busy' );
+			expect( cancelButton ).toBeEnabled();
+			expect( confirmButton ).toBeEnabled();
+
+			// Test when isBusy is undefined
+			rerender(
+				<ConfirmDialog isOpen onConfirm={ noop } onCancel={ noop }>
+					Are you sure?
+				</ConfirmDialog>
+			);
+
+			cancelButton = screen.getByRole( 'button', {
+				name: 'Cancel',
+			} );
+			confirmButton = screen.getByRole( 'button', { name: 'OK' } );
+
+			expect( cancelButton ).not.toHaveClass( 'is-busy' );
+			expect( confirmButton ).not.toHaveClass( 'is-busy' );
+			expect( cancelButton ).toBeEnabled();
+			expect( confirmButton ).toBeEnabled();
 		} );
 	} );
 } );

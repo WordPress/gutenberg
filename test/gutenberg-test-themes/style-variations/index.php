@@ -2,7 +2,7 @@
 /**
  * Theme index.php file.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 
 // Silence is golden.

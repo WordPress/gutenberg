@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	BlockControls,
 	InspectorControls,
@@ -8,31 +5,30 @@ import {
 } from '@wordpress/block-editor';
 import {
 	Button,
-	Disabled,
 	Placeholder,
 	RangeControl,
+	Spinner,
 	ToggleControl,
 	ToolbarGroup,
 	TextControl,
-	__experimentalInputControl as InputControl,
+	ExternalLink,
+	__experimentalInputControl as WCInputControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { useState } from '@wordpress/element';
-import { grid, list, edit, rss } from '@wordpress/icons';
-import { __, _x } from '@wordpress/i18n';
-import { prependHTTP } from '@wordpress/url';
-import ServerSideRender from '@wordpress/server-side-render';
-
-/**
- * Internal dependencies
- */
+import { createInterpolateElement, useState } from '@wordpress/element';
+import { grid, list, pencil, rss } from '@wordpress/icons';
+import { __, _x, sprintf } from '@wordpress/i18n';
+import { prependHTTPS } from '@wordpress/url';
+import { useServerSideRender } from '@wordpress/server-side-render';
+import { useDisabled } from '@wordpress/compose';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import HtmlRenderer from '../utils/html-renderer';
 
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 20;
 
-export default function RSSEdit( { attributes, setAttributes } ) {
+export default function RSSEdit( { attributes, setAttributes, name } ) {
 	const [ isEditing, setIsEditing ] = useState( ! attributes.feedURL );
 
 	const {
@@ -62,12 +58,19 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 		event.preventDefault();
 
 		if ( feedURL ) {
-			setAttributes( { feedURL: prependHTTP( feedURL ) } );
+			setAttributes( { feedURL: prependHTTPS( feedURL ) } );
 			setIsEditing( false );
 		}
 	}
 
-	const blockProps = useBlockProps();
+	const { content, status, error } = useServerSideRender( {
+		attributes,
+		skipBlockSupportAttributes: true,
+		block: name,
+	} );
+
+	const disabledRef = useDisabled();
+	const blockProps = useBlockProps( { ref: isEditing ? null : disabledRef } );
 
 	const label = __( 'RSS URL' );
 
@@ -85,8 +88,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 						onSubmit={ onSubmitURL }
 						className="wp-block-rss__placeholder-form"
 					>
-						<InputControl
-							__next40pxDefaultSize
+						<WCInputControl
 							label={ label }
 							type="url"
 							hideLabelFromVision
@@ -112,7 +114,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 
 	const toolbarControls = [
 		{
-			icon: edit,
+			icon: pencil,
 			title: __( 'Edit RSS URL' ),
 			onClick: () => setIsEditing( true ),
 		},
@@ -130,19 +132,6 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 		},
 	];
 
-	/*
-	 * This function merges the existing attributes with additional style properties.
-	 * The `border` and `spacing` properties are set to `undefined` to ensure that
-	 * these styles are reset and not applied on the server side.
-	 */
-	const serverSideAttributes = {
-		...attributes,
-		style: {
-			...attributes?.style,
-			border: undefined,
-			spacing: undefined,
-		},
-	};
 	return (
 		<>
 			<BlockControls>
@@ -171,8 +160,6 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 						isShownByDefault
 					>
 						<RangeControl
-							__nextHasNoMarginBottom
-							__next40pxDefaultSize
 							label={ __( 'Number of items' ) }
 							value={ itemsToShow }
 							onChange={ ( value ) =>
@@ -193,7 +180,6 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 						isShownByDefault
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Display author' ) }
 							checked={ displayAuthor }
 							onChange={ toggleAttribute( 'displayAuthor' ) }
@@ -209,7 +195,6 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 						isShownByDefault
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Display date' ) }
 							checked={ displayDate }
 							onChange={ toggleAttribute( 'displayDate' ) }
@@ -225,7 +210,6 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 						isShownByDefault
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Display excerpt' ) }
 							checked={ displayExcerpt }
 							onChange={ toggleAttribute( 'displayExcerpt' ) }
@@ -242,8 +226,6 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 							isShownByDefault
 						>
 							<RangeControl
-								__nextHasNoMarginBottom
-								__next40pxDefaultSize
 								label={ __( 'Max number of words in excerpt' ) }
 								value={ excerptLength }
 								onChange={ ( value ) =>
@@ -264,8 +246,6 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 							isShownByDefault
 						>
 							<RangeControl
-								__nextHasNoMarginBottom
-								__next40pxDefaultSize
 								label={ __( 'Columns' ) }
 								value={ columns }
 								onChange={ ( value ) =>
@@ -287,7 +267,6 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 						isShownByDefault
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Open links in new tab' ) }
 							checked={ openInNewTab }
 							onChange={ ( value ) =>
@@ -299,21 +278,40 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 			</InspectorControls>
 			<InspectorControls group="advanced">
 				<TextControl
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
-					label={ __( 'Link rel' ) }
+					label={ __( 'Link relation' ) }
+					help={ createInterpolateElement(
+						__(
+							'The <a>Link Relation</a> attribute defines the relationship between a linked resource and the current document.'
+						),
+						{
+							a: (
+								<ExternalLink href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel" />
+							),
+						}
+					) }
 					value={ rel || '' }
 					onChange={ ( value ) => setAttributes( { rel: value } ) }
 				/>
 			</InspectorControls>
-			<div { ...blockProps }>
-				<Disabled>
-					<ServerSideRender
-						block="core/rss"
-						attributes={ serverSideAttributes }
-					/>
-				</Disabled>
-			</div>
+			{ status === 'loading' && (
+				<div { ...blockProps }>
+					<Spinner />
+				</div>
+			) }
+			{ status === 'error' && (
+				<div { ...blockProps }>
+					<p>
+						{ sprintf(
+							/* translators: %s: error message returned when rendering the block. */
+							__( 'Error: %s' ),
+							error
+						) }
+					</p>
+				</div>
+			) }
+			{ status === 'success' && (
+				<HtmlRenderer wrapperProps={ blockProps } html={ content } />
+			) }
 		</>
 	);
 }

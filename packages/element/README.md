@@ -54,11 +54,11 @@ Concatenate two or more React children objects.
 
 _Parameters_
 
--   _childrenArguments_ `...?Object`: Array of children arguments (array of arrays/strings/objects) to concatenate.
+-   _childrenArguments_ `ReactNode[][]`: - Array of children arguments (array of arrays/strings/objects) to concatenate.
 
 _Returns_
 
--   `Array`: The concatenated value.
+-   `ReactNode[]`: The concatenated value.
 
 ### createContext
 
@@ -109,12 +109,12 @@ You would have something like this as the conversionMap value:
 
 _Parameters_
 
--   _interpolatedString_ `string`: The interpolation string to be parsed.
--   _conversionMap_ `Record<string, Element>`: The map used to convert the string to a react element.
+-   _interpolatedString_ `Input`: The interpolation string to be parsed.
+-   _conversionMap_ `ConversionMap< InterpolationString< Input > >`: The map used to convert the string to a react element.
 
 _Returns_
 
--   `Element`: A wp element.
+-   `ReactElement`: A wp element.
 
 ### createPortal
 
@@ -122,12 +122,7 @@ Creates a portal into which a component can be rendered.
 
 _Related_
 
--   <https://github.com/facebook/react/issues/10309#issuecomment-318433235>
-
-_Parameters_
-
--   _child_ `import('react').ReactElement`: Any renderable child, such as an element, string, or fragment.
--   _container_ `HTMLElement`: DOM node into which element should be rendered.
+-   <https://react.dev/reference/react-dom/createPortal>
 
 ### createRef
 
@@ -155,15 +150,15 @@ Finds the dom node of a React component.
 
 _Parameters_
 
--   _component_ `import('react').ComponentType`: Component's instance.
+-   _component_ `React.ComponentType`: Component's instance.
 
 ### flushSync
 
 Forces React to flush any updates inside the provided callback synchronously.
 
-_Parameters_
+_Related_
 
--   _callback_ `Function`: Callback to run synchronously.
+-   <https://react.dev/reference/react-dom/flushSync>
 
 ### forwardRef
 
@@ -209,7 +204,7 @@ Checks if the provided WP element is empty.
 
 _Parameters_
 
--   _element_ `*`: WP element to check.
+-   _element_ `unknown`: WP element to check.
 
 _Returns_
 
@@ -243,11 +238,7 @@ _Related_
 
 Component used to detect the current Platform being used. Use Platform.OS === 'web' to detect if running on web environment.
 
-This is the same concept as the React Native implementation.
-
-_Related_
-
--   <https://reactnative.dev/docs/platform-specific-code#platform-module> Here is an example of how to use the select method:
+Here is an example of how to use the select method:
 
 _Usage_
 
@@ -255,10 +246,10 @@ _Usage_
 import { Platform } from '@wordpress/element';
 
 const placeholderLabel = Platform.select( {
-	native: __( 'Add media' ),
 	web: __(
 		'Drag images, upload new ones or select files from your library.'
 	),
+	default: __( 'Add media' ),
 } );
 ```
 
@@ -270,7 +261,23 @@ _Related_
 
 ### RawHTML
 
-Component used as equivalent of Fragment with unescaped HTML, in cases where it is desirable to render dangerous HTML without needing a wrapper element. To preserve additional props, a `div` wrapper _will_ be created if any props aside from `children` are passed.
+Component used to render unescaped HTML.
+
+Note: The `renderElement` serializer will remove the `div` wrapper unless non-children props are present; typically when preparing a block for saving.
+
+_Usage_
+
+```jsx
+import { RawHTML } from '@wordpress/element';
+
+const Component = () => (
+	<RawHTML>
+		<h3>Hello world</h3>
+	</RawHTML>
+);
+// Edit: <div><h3>Hello world</h3></div>
+// save: <h3>Hello world</h3>
+```
 
 _Parameters_
 
@@ -278,7 +285,7 @@ _Parameters_
 
 _Returns_
 
--   `JSX.Element`: Dangerously-rendering component.
+-   Dangerously-rendering component.
 
 ### render
 
@@ -296,13 +303,9 @@ Serializes a React element to string.
 
 _Parameters_
 
--   _element_ `import('react').ReactNode`: Element to serialize.
--   _context_ `[Object]`: Context object.
--   _legacyContext_ `[Object]`: Legacy context object.
-
-_Returns_
-
--   `string`: Serialized element.
+-   _element_ `React.ReactNode`:
+-   _context_ `any`:
+-   _legacyContext_ `Record< string, any >`:
 
 ### startTransition
 
@@ -326,12 +329,12 @@ Switches the nodeName of all the elements in the children object.
 
 _Parameters_
 
--   _children_ `?Object`: Children object.
+-   _children_ `ReactNode`: Children object.
 -   _nodeName_ `string`: Node name.
 
 _Returns_
 
--   `?Object`: The updated children object.
+-   `ReactNode`: The updated children object.
 
 ### unmountComponentAtNode
 

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useEffect } from '@wordpress/element';
 import {
 	useInnerBlocksProps,
@@ -26,13 +19,11 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
+import { unlock } from '../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const sizeOptions = [
+	{ label: __( 'Default' ), value: '' },
 	{ label: __( 'Small' ), value: 'has-small-icon-size' },
 	{ label: __( 'Normal' ), value: 'has-normal-icon-size' },
 	{ label: __( 'Large' ), value: 'has-large-icon-size' },
@@ -59,17 +50,23 @@ export function SocialLinksEdit( props ) {
 		size,
 	} = attributes;
 
-	const { hasSocialIcons, hasSelectedChild } = useSelect(
-		( select ) => {
-			const { getBlockCount, hasSelectedInnerBlock } =
-				select( blockEditorStore );
-			return {
-				hasSocialIcons: getBlockCount( clientId ) > 0,
-				hasSelectedChild: hasSelectedInnerBlock( clientId ),
-			};
-		},
-		[ clientId ]
-	);
+	const { hasSocialIcons, hasSelectedChild, hasSelectedStyleState } =
+		useSelect(
+			( select ) => {
+				const {
+					getBlockCount,
+					hasSelectedInnerBlock,
+					hasSelectedStyleState: hasSelectedBlockStyleState,
+				} = unlock( select( blockEditorStore ) );
+				return {
+					hasSocialIcons: getBlockCount( clientId ) > 0,
+					hasSelectedChild: hasSelectedInnerBlock( clientId ),
+					hasSelectedStyleState:
+						hasSelectedBlockStyleState( clientId ),
+				};
+			},
+			[ clientId ]
+		);
 
 	const hasAnySelected = isSelected || hasSelectedChild;
 
@@ -156,6 +153,8 @@ export function SocialLinksEdit( props ) {
 	}
 
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
+	const showColorControls =
+		colorGradientSettings.hasColorsOrGradients && ! hasSelectedStyleState;
 
 	return (
 		<>
@@ -166,31 +165,27 @@ export function SocialLinksEdit( props ) {
 						setAttributes( {
 							openInNewTab: false,
 							showLabels: false,
-							size: 'has-normal-icon-size',
+							size: undefined,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
 					<ToolsPanelItem
 						isShownByDefault
-						hasValue={ () =>
-							!! size && size !== 'has-normal-icon-size'
-						}
+						hasValue={ () => !! size }
 						label={ __( 'Icon size' ) }
 						onDeselect={ () =>
-							setAttributes( { size: 'has-normal-icon-size' } )
+							setAttributes( { size: undefined } )
 						}
 					>
 						<SelectControl
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
-							label={ __( 'Icon Size' ) }
+							label={ __( 'Icon size' ) }
 							onChange={ ( newSize ) => {
 								setAttributes( {
-									size: newSize,
+									size: newSize === '' ? undefined : newSize,
 								} );
 							} }
-							value={ size ?? 'has-normal-icon-size' }
+							value={ size ?? '' }
 							options={ sizeOptions }
 						/>
 					</ToolsPanelItem>
@@ -203,7 +198,6 @@ export function SocialLinksEdit( props ) {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Show text' ) }
 							checked={ showLabels }
 							onChange={ () =>
@@ -220,7 +214,6 @@ export function SocialLinksEdit( props ) {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Open links in new tab' ) }
 							checked={ openInNewTab }
 							onChange={ () =>
@@ -232,7 +225,7 @@ export function SocialLinksEdit( props ) {
 					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
-			{ colorGradientSettings.hasColorsOrGradients && (
+			{ showColorControls && (
 				<InspectorControls group="color">
 					{ colorSettings.map(
 						( { onChange, label, value, resetAllFilter } ) => (

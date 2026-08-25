@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
@@ -13,10 +6,9 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalVStack as VStack,
 	DropZone,
-	FlexItem,
+	FlexBlock,
 	FocalPointPicker,
 	MenuItem,
-	VisuallyHidden,
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
 	Dropdown,
@@ -25,6 +17,8 @@ import {
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	Button,
 } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
+import { reset as resetIcon } from '@wordpress/icons';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { getFilename } from '@wordpress/url';
@@ -32,16 +26,15 @@ import { useRef, useState, useEffect, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
 import { isBlobURL } from '@wordpress/blob';
-
-/**
- * Internal dependencies
- */
-import { getResolvedValue } from '../global-styles/utils';
+import { getResolvedValue } from '@wordpress/global-styles-engine';
 import { hasBackgroundImageValue } from '../global-styles/background-panel';
+import {
+	InheritanceResetButton,
+	isGlobalStylesInheritanceEnabled,
+} from '../global-styles/inheritance';
 import { setImmutably } from '../../utils/object';
 import MediaReplaceFlow from '../media-replace-flow';
 import { store as blockEditorStore } from '../../store';
-
 import {
 	globalStylesDataKey,
 	globalStylesLinksDataKey,
@@ -56,6 +49,24 @@ const BACKGROUND_POPOVER_PROPS = {
 	className: 'block-editor-global-styles-background-panel__popover',
 };
 const noop = () => {};
+
+/**
+ * Focuses the toggle button.
+ * @param {Object} containerRef - ref object containing current element
+ */
+const focusToggleButton = ( containerRef ) => {
+	// Use requestAnimationFrame to ensure DOM updates are complete
+	window.requestAnimationFrame( () => {
+		const [ toggleButton ] = focus.tabbable.find( containerRef?.current );
+		if ( ! toggleButton ) {
+			return;
+		}
+		// Focus the toggle button and close the dropdown menu.
+		// This ensures similar behaviour as to selecting an image, where the dropdown is
+		// closed and focus is redirected to the dropdown toggle button.
+		toggleButton.focus();
+	} );
+};
 
 /**
  * Get the help text for the background size control.
@@ -115,7 +126,6 @@ function InspectorImagePreviewItem( {
 	toggleProps = {},
 	filename,
 	label,
-	className,
 	onToggleCallback = noop,
 } ) {
 	const { isOpen, ...restToggleProps } = toggleProps;
@@ -128,32 +138,23 @@ function InspectorImagePreviewItem( {
 
 	const renderPreviewContent = () => {
 		return (
-			<HStack
-				justify="flex-start"
-				as="span"
-				className="block-editor-global-styles-background-panel__inspector-preview-inner"
-			>
-				{ imgUrl && (
-					<span
-						className="block-editor-global-styles-background-panel__inspector-image-indicator-wrapper"
-						aria-hidden
-					>
-						<span
-							className="block-editor-global-styles-background-panel__inspector-image-indicator"
-							style={ {
-								backgroundImage: `url(${ imgUrl })`,
-							} }
-						/>
-					</span>
-				) }
-				<FlexItem as="span" style={ imgUrl ? {} : { flexGrow: 1 } }>
+			<HStack className="block-editor-global-styles-background-panel__inspector-preview-inner">
+				<span
+					className="block-editor-global-styles-background-panel__inspector-image-indicator"
+					style={ {
+						backgroundImage: imgUrl
+							? `url(${ imgUrl })`
+							: undefined,
+					} }
+				/>
+				<FlexBlock>
 					<Truncate
 						numberOfLines={ 1 }
 						className="block-editor-global-styles-background-panel__inspector-media-replace-title"
 					>
 						{ label }
 					</Truncate>
-					<VisuallyHidden as="span">
+					<VisuallyHidden render={ <span /> }>
 						{ imgUrl
 							? sprintf(
 									/* translators: %s: file name */
@@ -162,18 +163,13 @@ function InspectorImagePreviewItem( {
 							  )
 							: __( 'No background image selected' ) }
 					</VisuallyHidden>
-				</FlexItem>
+				</FlexBlock>
 			</HStack>
 		);
 	};
 
 	return as === 'button' ? (
-		<Button
-			__next40pxDefaultSize
-			className={ className }
-			{ ...restToggleProps }
-			aria-expanded={ isOpen }
-		>
+		<Button __next40pxDefaultSize { ...restToggleProps }>
 			{ renderPreviewContent() }
 		</Button>
 	) : (
@@ -188,13 +184,15 @@ function BackgroundControlsPanel( {
 	children,
 	onToggle: onToggleCallback = noop,
 	hasImageValue,
+	onReset,
+	hasLocalOverride,
+	containerRef,
 } ) {
 	if ( ! hasImageValue ) {
 		return;
 	}
 
-	const imgLabel =
-		label || getFilename( imgUrl ) || __( 'Add background image' );
+	const imgLabel = label || getFilename( imgUrl ) || __( 'Image' );
 
 	return (
 		<Dropdown
@@ -211,14 +209,48 @@ function BackgroundControlsPanel( {
 					isOpen,
 				};
 				return (
-					<InspectorImagePreviewItem
-						imgUrl={ imgUrl }
-						filename={ filename }
-						label={ imgLabel }
-						toggleProps={ toggleProps }
-						as="button"
-						onToggleCallback={ onToggleCallback }
-					/>
+					<>
+						<InspectorImagePreviewItem
+							imgUrl={ imgUrl }
+							filename={ filename }
+							label={ imgLabel }
+							toggleProps={ toggleProps }
+							as="button"
+							onToggleCallback={ onToggleCallback }
+						/>
+						{ onReset &&
+							( hasLocalOverride ? (
+								<InheritanceResetButton
+									className="block-editor-global-styles-background-panel__reset"
+									onResetToInherited={ () => {
+										onReset();
+										// Close the dropdown if open.
+										if ( isOpen ) {
+											onToggle();
+										}
+										// Focus the toggle button.
+										focusToggleButton( containerRef );
+									} }
+								/>
+							) : (
+								<Button
+									__next40pxDefaultSize
+									label={ __( 'Reset' ) }
+									className="block-editor-global-styles-background-panel__reset"
+									size="small"
+									icon={ resetIcon }
+									onClick={ () => {
+										onReset();
+										// Close the dropdown if open.
+										if ( isOpen ) {
+											onToggle();
+										}
+										// Focus the toggle button.
+										focusToggleButton( containerRef );
+									} }
+								/>
+							) ) }
+					</>
 				);
 			} }
 			renderContent={ () => (
@@ -325,7 +357,7 @@ function BackgroundImageControls( {
 		);
 		setIsUploading( false );
 		// Close the dropdown and focus the toggle button.
-		closeAndFocus();
+		focusToggleButton( containerRef );
 	};
 
 	// Drag and drop callback, restricting image to one.
@@ -343,22 +375,6 @@ function BackgroundImageControls( {
 
 	const hasValue = hasBackgroundImageValue( style );
 
-	const closeAndFocus = () => {
-		// Use requestAnimationFrame to ensure DOM updates are complete
-		window.requestAnimationFrame( () => {
-			const [ toggleButton ] = focus.tabbable.find(
-				containerRef?.current
-			);
-			if ( ! toggleButton ) {
-				return;
-			}
-			// Focus the toggle button and close the dropdown menu.
-			// This ensures similar behaviour as to selecting an image, where the dropdown is
-			// closed and focus is redirected to the dropdown toggle button.
-			toggleButton.focus();
-		} );
-	};
-
 	const onRemove = () =>
 		onChange(
 			setImmutably( style, [ 'background' ], {
@@ -366,8 +382,7 @@ function BackgroundImageControls( {
 			} )
 		);
 	const canRemove = ! hasValue && hasBackgroundImageValue( inheritedValue );
-	const imgLabel =
-		title || getFilename( url ) || __( 'Add background image' );
+	const imgLabel = title || getFilename( url ) || __( 'Image' );
 
 	return (
 		<div className="block-editor-global-styles-background-panel__image-tools-panel-item">
@@ -386,7 +401,6 @@ function BackgroundImageControls( {
 				} }
 				name={
 					<InspectorImagePreviewItem
-						className="block-editor-global-styles-background-panel__image-preview"
 						imgUrl={ url }
 						filename={ title }
 						label={ imgLabel }
@@ -397,14 +411,14 @@ function BackgroundImageControls( {
 				) }
 				onError={ onUploadError }
 				onReset={ () => {
-					closeAndFocus();
+					focusToggleButton( containerRef );
 					onResetImage();
 				} }
 			>
 				{ canRemove && (
 					<MenuItem
 						onClick={ () => {
-							closeAndFocus();
+							focusToggleButton( containerRef );
 							onRemove();
 							onRemoveImage();
 						} }
@@ -427,22 +441,29 @@ function BackgroundSizeControls( {
 	inheritedValue,
 	defaultValues,
 } ) {
-	const sizeValue =
-		style?.background?.backgroundSize ||
-		inheritedValue?.background?.backgroundSize;
-	const repeatValue =
-		style?.background?.backgroundRepeat ||
-		inheritedValue?.background?.backgroundRepeat;
+	/*
+	 * Read local and inherited values separately so each sub-control can
+	 * show the inherited value while marking the control as inherited.
+	 */
+	const localSizeValue = style?.background?.backgroundSize;
+	const localRepeatValue = style?.background?.backgroundRepeat;
+	const localPositionValue = style?.background?.backgroundPosition;
+	const localAttachmentValue = style?.background?.backgroundAttachment;
+	const inheritedSizeValue = inheritedValue?.background?.backgroundSize;
+	const inheritedRepeatValue = inheritedValue?.background?.backgroundRepeat;
+	const inheritedPositionValue =
+		inheritedValue?.background?.backgroundPosition;
+	const inheritedAttachmentValue =
+		inheritedValue?.background?.backgroundAttachment;
+
+	const sizeValue = localSizeValue || inheritedSizeValue;
+	const repeatValue = localRepeatValue || inheritedRepeatValue;
 	const imageValue =
 		style?.background?.backgroundImage?.url ||
 		inheritedValue?.background?.backgroundImage?.url;
 	const isUploadedImage = style?.background?.backgroundImage?.id;
-	const positionValue =
-		style?.background?.backgroundPosition ||
-		inheritedValue?.background?.backgroundPosition;
-	const attachmentValue =
-		style?.background?.backgroundAttachment ||
-		inheritedValue?.background?.backgroundAttachment;
+	const positionValue = localPositionValue || inheritedPositionValue;
+	const attachmentValue = localAttachmentValue || inheritedAttachmentValue;
 
 	/*
 	 * Set default values for uploaded images.
@@ -561,21 +582,17 @@ function BackgroundSizeControls( {
 	return (
 		<VStack spacing={ 3 } className="single-column">
 			<FocalPointPicker
-				__nextHasNoMarginBottom
 				label={ __( 'Focal point' ) }
 				url={ imageValue }
 				value={ backgroundPositionToCoords( backgroundPositionValue ) }
 				onChange={ updateBackgroundPosition }
 			/>
 			<ToggleControl
-				__nextHasNoMarginBottom
 				label={ __( 'Fixed background' ) }
 				checked={ attachmentValue === 'fixed' }
 				onChange={ toggleScrollWithPage }
 			/>
 			<ToggleGroupControl
-				__nextHasNoMarginBottom
-				size="__unstable-large"
 				label={ __( 'Size' ) }
 				value={ currentValueForToggle }
 				onChange={ updateBackgroundSize }
@@ -614,7 +631,6 @@ function BackgroundSizeControls( {
 					aria-label={ __( 'Background image width' ) }
 					onChange={ updateBackgroundSize }
 					value={ sizeValue }
-					size="__unstable-large"
 					__unstableInputWidth="100px"
 					min={ 0 }
 					placeholder={ __( 'Auto' ) }
@@ -624,7 +640,6 @@ function BackgroundSizeControls( {
 					}
 				/>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={ __( 'Repeat' ) }
 					checked={ repeatCheckedValue }
 					onChange={ toggleIsRepeated }
@@ -641,12 +656,10 @@ export default function BackgroundImagePanel( {
 	inheritedValue = value,
 	settings,
 	defaultValues = {},
+	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
 } ) {
 	/*
-	 * Resolve any inherited "ref" pointers.
-	 * Should the block editor need resolved, inherited values
-	 * across all controls, this could be abstracted into a hook,
-	 * e.g., useResolveGlobalStyle
+	 * Resolve inherited `ref` pointers for background controls.
 	 */
 	const { globalStyles, _links } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -680,13 +693,25 @@ export default function BackgroundImagePanel( {
 	}, [ globalStyles, _links, inheritedValue ] );
 
 	const resetBackground = () =>
-		onChange( setImmutably( value, [ 'background' ], {} ) );
+		onChange(
+			setImmutably( value, [ 'background' ], {
+				gradient: value?.background?.gradient,
+			} )
+		);
 
 	const { title, url } = value?.background?.backgroundImage || {
 		...resolvedInheritedValue?.background?.backgroundImage,
 	};
+	const localHasImageValue = hasBackgroundImageValue( value );
 	const hasImageValue =
-		hasBackgroundImageValue( value ) ||
+		localHasImageValue || hasBackgroundImageValue( resolvedInheritedValue );
+	// The blue-dot local-override affordance is part of the inherited-value
+	// treatment. When that treatment is disabled (e.g. in the Global Styles
+	// panel, where the edited value *is* the global style rather than a local
+	// override of it), fall back to the plain reset control.
+	const hasLocalOverride =
+		showInheritanceLabelIndicators &&
+		localHasImageValue &&
 		hasBackgroundImageValue( resolvedInheritedValue );
 
 	const imageValue =
@@ -720,6 +745,9 @@ export default function BackgroundImagePanel( {
 					url={ url }
 					onToggle={ setIsDropDownOpen }
 					hasImageValue={ hasImageValue }
+					hasLocalOverride={ hasLocalOverride }
+					onReset={ localHasImageValue ? resetBackground : undefined }
+					containerRef={ containerRef }
 				>
 					<VStack spacing={ 3 } className="single-column">
 						<BackgroundImageControls

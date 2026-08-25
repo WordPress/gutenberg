@@ -1,1 +1,2 @@
-@import "./components/reusable-blocks-menu-items/style.scss"
+@use "@wordpress/base-styles/default-custom-properties";
+@use "./components/reusable-blocks-menu-items/style.scss" as *;

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	InnerBlocks,
@@ -16,45 +13,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-import {
-	formSubmissionNotificationSuccess,
-	formSubmissionNotificationError,
-} from './utils.js';
-
-const TEMPLATE = [
-	formSubmissionNotificationSuccess,
-	formSubmissionNotificationError,
-	[
-		'core/form-input',
-		{
-			type: 'text',
-			label: __( 'Name' ),
-			required: true,
-		},
-	],
-	[
-		'core/form-input',
-		{
-			type: 'email',
-			label: __( 'Email' ),
-			required: true,
-		},
-	],
-	[
-		'core/form-input',
-		{
-			type: 'textarea',
-			label: __( 'Comment' ),
-			required: true,
-		},
-	],
-	[ 'core/form-submit-button', {} ],
-];
 
 const Edit = ( { attributes, setAttributes, clientId } ) => {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -83,7 +42,6 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 	);
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: TEMPLATE,
 		renderAppender: hasInnerBlocks
 			? undefined
 			: InnerBlocks.ButtonBlockAppender,
@@ -108,8 +66,6 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 						isShownByDefault
 					>
 						<SelectControl
-							__nextHasNoMarginBottom
-							__next40pxDefaultSize
 							label={ __( 'Submissions method' ) }
 							options={ [
 								// TODO: Allow plugins to add their own submission methods.
@@ -151,8 +107,6 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 							isShownByDefault
 						>
 							<TextControl
-								__nextHasNoMarginBottom
-								__next40pxDefaultSize
 								autoComplete="off"
 								label={ __( 'Email for form submissions' ) }
 								value={ email || '' }
@@ -176,8 +130,6 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 			{ submissionMethod !== 'email' && (
 				<InspectorControls group="advanced">
 					<SelectControl
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label={ __( 'Method' ) }
 						options={ [
 							{ label: 'Get', value: 'get' },
@@ -192,8 +144,6 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 						) }
 					/>
 					<TextControl
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						autoComplete="off"
 						label={ __( 'Form action' ) }
 						value={ action }
@@ -211,7 +161,6 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 			) }
 			<form
 				{ ...innerBlocksProps }
-				className="wp-block-form"
 				encType={ submissionMethod === 'email' ? 'text/plain' : null }
 			/>
 		</>

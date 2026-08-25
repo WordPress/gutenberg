@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import { edit } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
+import { pencil } from '@wordpress/icons';
 import LinkViewerURL from './link-viewer-url';
 
 export default function LinkViewer( {
@@ -38,7 +27,7 @@ export default function LinkViewer( {
 			/>
 			{ onEditLinkClick && (
 				<Button
-					icon={ edit }
+					icon={ pencil }
 					label={ __( 'Edit' ) }
 					onClick={ onEditLinkClick }
 					size="compact"

@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { MutableRefObject, ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
-import type {
-	NoticeProps,
-	NoticeChildren,
-	NoticeAction,
-} from '../notice/types';
+import type { NoticeProps, NoticeAction } from '../notice/types';
 
 type SnackbarOnlyProps = {
 	/**
@@ -56,10 +45,11 @@ export type SnackbarProps = Pick<
 		 *
 		 * @default []
 		 */
-		actions?: Pick<
-			NoticeAction,
-			'label' | 'url' | 'onClick' | 'openInNewTab'
-		>[];
+		actions?: Array<
+			Pick< NoticeAction, 'label' | 'url' | 'onClick' > & {
+				openInNewTab?: boolean;
+			}
+		>;
 	};
 
 export type SnackbarListProps = {
@@ -70,5 +60,5 @@ export type SnackbarListProps = {
 		}
 	>;
 	onRemove: ( id: string ) => void;
-	children?: NoticeChildren | Array< NoticeChildren >;
+	children?: ReactNode;
 };

@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/variables" as *;
+
 .wp-block-pullquote {
 	text-align: center; // Default text-alignment where the `textAlign` attribute value isn't specified.
 	overflow-wrap: break-word; // Break long strings of text without spaces so they don't overflow the block.

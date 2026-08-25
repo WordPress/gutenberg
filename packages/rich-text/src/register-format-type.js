@@ -1,10 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { select, dispatch } from '@wordpress/data';
-/**
- * Internal dependencies
- */
 import { store as richTextStore } from './store';
 /**
  * @typedef {Object} WPFormat
@@ -14,6 +8,8 @@ import { store as richTextStore } from './store';
  * @property {string}        tagName     The HTML tag this format will wrap the
  *                                       selection with.
  * @property {boolean}       interactive Whether format makes content interactive or not.
+ * @property {boolean}       object      Whether the format represents an object (e.g., `img`, `br`),
+ *                                       an object cannot contain other format types.
  * @property {string | null} [className] A class to match the format.
  * @property {string}        title       Name of the format.
  * @property {Function}      edit        Should return a component for the user to

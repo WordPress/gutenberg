@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	ToolbarButton,
@@ -10,11 +7,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
-import { edit } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
+import { pencil } from '@wordpress/icons';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 function getResponsiveHelp( checked ) {
@@ -45,7 +38,7 @@ const EmbedControls = ( {
 						<ToolbarButton
 							className="components-toolbar__control"
 							label={ __( 'Edit URL' ) }
-							icon={ edit }
+							icon={ pencil }
 							onClick={ switchBackToURLInput }
 						/>
 					) }
@@ -69,7 +62,6 @@ const EmbedControls = ( {
 							} }
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Resize for smaller devices' ) }
 								checked={ allowResponsive }
 								help={ getResponsiveHelp }

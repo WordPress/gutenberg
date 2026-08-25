@@ -1,26 +1,20 @@
-/**
- * WordPress dependencies
- */
 import {
 	ToolbarButton,
 	ToolbarGroup,
-	Icon,
+	Icon as WCIcon,
 	Path,
 	SVG,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import useStylesForBlocks from '../block-styles/use-styles-for-block';
 import { replaceActiveStyle } from '../block-styles/utils';
 import { store as blockEditorStore } from '../../store';
-import { GlobalStylesContext } from '../global-styles';
 import { globalStylesDataKey } from '../../store/private-keys';
-import { getVariationStylesWithRefValues } from '../../hooks/block-style-variation';
+import { unlock } from '../../lock-unlock';
+
+const { getVariationStyle } = unlock( globalStylesEnginePrivateApis );
 
 const styleIcon = (
 	<SVG
@@ -47,7 +41,6 @@ function SwitchSectionStyle( { clientId } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	// Get global styles data
-	const { merged: mergedConfig } = useContext( GlobalStylesContext );
 	const { globalSettings, globalStyles, blockName } = useSelect(
 		( select ) => {
 			const settings = select( blockEditorStore ).getSettings();
@@ -62,10 +55,10 @@ function SwitchSectionStyle( { clientId } ) {
 
 	// Get the background color for the active style
 	const activeStyleBackground = activeStyle?.name
-		? getVariationStylesWithRefValues(
+		? getVariationStyle(
 				{
-					settings: mergedConfig?.settings ?? globalSettings,
-					styles: mergedConfig?.styles ?? globalStyles,
+					settings: globalSettings,
+					styles: globalStyles,
 				},
 				blockName,
 				activeStyle.name
@@ -101,7 +94,7 @@ function SwitchSectionStyle( { clientId } ) {
 				onClick={ handleStyleSwitch }
 				label={ __( 'Shuffle styles' ) }
 			>
-				<Icon
+				<WCIcon
 					icon={ styleIcon }
 					style={ {
 						fill: activeStyleBackground || 'transparent',

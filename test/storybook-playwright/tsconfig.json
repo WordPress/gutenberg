@@ -1,0 +1,20 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"checkJs": false,
+		// Since the workspace import @wordpress/storybook which has noEmit set to true,
+		// we can't set composite to true here, otherwise it will cause an error when building the workspace.
+		// TODO: A better solution could be to extract the shared parts between storybook and storybook-playwright into a separate package, so that both packages can set composite to true.
+		"composite": false,
+		"declaration": false,
+		"declarationDir": null,
+		"declarationMap": false,
+		"emitDeclarationOnly": false,
+		"noEmit": true,
+		"rootDir": ".",
+		"types": [ "node" ]
+	},
+	"include": [ "." ],
+	"exclude": []
+}

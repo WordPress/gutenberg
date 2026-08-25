@@ -1,20 +1,12 @@
-/**
- * WordPress dependencies
- */
 import { applyFilters, hasFilter } from '@wordpress/hooks';
 import {
-	Autocomplete,
+	Autocomplete as WCAutocomplete,
 	__unstableUseAutocompleteProps as useAutocompleteProps,
 } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { getDefaultBlockName, getBlockSupport } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { useBlockEditContext } from '../block-edit/context';
 import blockAutocompleter from '../../autocompleters/block';
-import linkAutocompleter from '../../autocompleters/link';
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -27,7 +19,7 @@ const EMPTY_ARRAY = [];
 function useCompleters( { completers = EMPTY_ARRAY } ) {
 	const { name } = useBlockEditContext();
 	return useMemo( () => {
-		let filteredCompleters = [ ...completers, linkAutocompleter ];
+		let filteredCompleters = [ ...completers ];
 
 		if (
 			name === getDefaultBlockName() ||
@@ -66,10 +58,12 @@ export function useBlockEditorAutocompleteProps( props ) {
  * Wrap the default Autocomplete component with one that supports a filter hook
  * for customizing its list of autocompleters.
  *
- * @type {import('react').FC}
+ * @type {React.FC}
  */
 function BlockEditorAutocomplete( props ) {
-	return <Autocomplete { ...props } completers={ useCompleters( props ) } />;
+	return (
+		<WCAutocomplete { ...props } completers={ useCompleters( props ) } />
+	);
 }
 
 /**
