@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Carry the `subjectDetectionUrl` media upload setting, which turns on subject-aware cropping of hard-cropped image sizes ([#82048](https://github.com/WordPress/gutenberg/pull/82048)).
+-   Carry the `subjectDetectionUrl` media upload setting, which turns on subject-aware cropping of hard-cropped image sizes ([#82049](https://github.com/WordPress/gutenberg/pull/82049)).
 
 ### Breaking Changes
 

@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Accept a `subject` area when resizing, and place a `crop: true` size around it instead of cropping from the centre ([#82048](https://github.com/WordPress/gutenberg/pull/82048)).
+-   Accept a `subject` area when resizing, and place a `crop: true` size around it instead of cropping from the centre ([#82049](https://github.com/WordPress/gutenberg/pull/82049)).
 
 ### Internal
 
