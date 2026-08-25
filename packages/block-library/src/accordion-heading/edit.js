@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
 import {

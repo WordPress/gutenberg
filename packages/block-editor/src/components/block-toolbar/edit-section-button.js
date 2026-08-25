@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import useContentOnlySectionEdit from '../../hooks/use-content-only-section-edit';
 

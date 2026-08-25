@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 const esbuild = require( 'esbuild' );
 
 const wpExternals = {

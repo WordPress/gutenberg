@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	InspectorControls,
 	RichText,
@@ -16,7 +9,7 @@ import {
 	Button,
 	CheckboxControl,
 	TextControl,
-	TextareaControl,
+	TextareaControl as WCTextareaControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -25,10 +18,6 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { external } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const preventDefault = ( event ) => event.preventDefault();
@@ -176,7 +165,7 @@ export default function HomeEdit( { attributes, setAttributes, context } ) {
 						}
 						isShownByDefault
 					>
-						<TextareaControl
+						<WCTextareaControl
 							label={ __( 'Description' ) }
 							value={ description || '' }
 							onChange={ ( descriptionValue ) => {

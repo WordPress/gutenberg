@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { trash, image, Icon, category } from '@wordpress/icons';
 import { Button, __experimentalText as WCText } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type { Field, Action } from '../../types';
 
 export type SpaceObject = {

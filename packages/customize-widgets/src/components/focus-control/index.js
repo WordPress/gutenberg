@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	createContext,
 	useState,
@@ -9,10 +6,6 @@ import {
 	useCallback,
 	useMemo,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { settingIdToWidgetId } from '../../utils';
 
 const FocusControlContext = createContext();

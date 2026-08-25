@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import WordCount from '../word-count';
 import TimeToRead from '../time-to-read';
 import DocumentOutline from '../document-outline';

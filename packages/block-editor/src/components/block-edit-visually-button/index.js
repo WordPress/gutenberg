@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 
 export default function BlockEditVisuallyButton( { clientIds } ) {

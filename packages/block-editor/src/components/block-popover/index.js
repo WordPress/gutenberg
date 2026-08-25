@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useMergeRefs } from '@wordpress/compose';
 import { Popover } from '@wordpress/components';
 import {
@@ -14,10 +7,6 @@ import {
 	useReducer,
 	useLayoutEffect,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import usePopoverScroll from './use-popover-scroll';
 import { rectUnion, getElementBounds } from '../../utils/dom';

@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81516](https://github.com/WordPress/gutenberg/pull/81516))
+
+## 1.17.0 (2026-08-12)
+
+## 1.16.0 (2026-07-29)
+
+## 1.15.0 (2026-07-14)
+
 ### Enhancements
 
 -   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).

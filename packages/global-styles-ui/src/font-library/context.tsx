@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createContext, useState, useEffect } from '@wordpress/element';
 import {
 	useSelect,
@@ -25,10 +22,6 @@ import type {
 	FontFamily,
 	WpFontFamily,
 } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { fetchInstallFontFamily } from './api';
 import {
 	setUIValuesNeeded,

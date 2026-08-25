@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { check, chevronDown, moreVertical } from '@wordpress/icons';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
@@ -88,11 +85,10 @@ export default function StateControl( {
 	const toggleProps = showText
 		? {
 				size: 'compact',
-				variant: 'tertiary',
 				iconPosition: 'right',
 				className: 'show-text',
 		  }
-		: { size: 'small', variant: 'tertiary' };
+		: { size: 'small' };
 
 	return (
 		<Stack

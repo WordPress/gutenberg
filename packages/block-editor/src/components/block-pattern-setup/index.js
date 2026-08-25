@@ -1,18 +1,10 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch } from '@wordpress/data';
 import { cloneBlock } from '@wordpress/blocks';
 import { Composite } from '@wordpress/components';
 import { VisuallyHidden } from '@wordpress/ui';
-
 import { useState } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import BlockPreview from '../block-preview';
 import SetupToolbar from './setup-toolbar';

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	privateApis as blockEditorPrivateApis,
@@ -9,10 +6,6 @@ import {
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { useRegistry, useSelect } from '@wordpress/data';
 import { useCallback, useEffect, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 
 function normalizeImageBlockCaption( caption ) {
@@ -137,6 +130,7 @@ export function useOpenImageMediaEditorModal( {
 	attributes,
 	setAttributes,
 	onClose,
+	onUrlChange,
 } ) {
 	// Keep this hook private to the Image block and pass the block attributes
 	// object so the callsite stays compact. Destructure only the attributes
@@ -246,6 +240,12 @@ export function useOpenImageMediaEditorModal( {
 			if ( newId !== currentBlockAttributes.id ) {
 				nextAttributes.id = newId;
 				nextAttributes.url = newUrl ?? currentBlockAttributes.url;
+				if ( nextAttributes.url !== currentBlockAttributes.url ) {
+					// The block is about to point at a freshly generated file
+					// the browser hasn't loaded yet; let the caller show a
+					// loading state until its <img> fires load/error.
+					onUrlChange?.( nextAttributes.url );
+				}
 				blockAttributesRef.current = {
 					...blockAttributesRef.current,
 					id: nextAttributes.id,
@@ -294,7 +294,7 @@ export function useOpenImageMediaEditorModal( {
 				setAttributes( nextAttributes );
 			}
 		},
-		[ resolveFreshAttachmentRecord, setAttributes ]
+		[ onUrlChange, resolveFreshAttachmentRecord, setAttributes ]
 	);
 
 	const openImageMediaEditorModal = useCallback( async () => {

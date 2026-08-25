@@ -1,22 +1,11 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useMemo, useState, forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Dropdown from '../dropdown';
 import { ColorPicker } from '../color-picker';
 import CircularOptionPicker, {
@@ -24,8 +13,9 @@ import CircularOptionPicker, {
 } from '../circular-option-picker';
 import { VStack } from '../v-stack';
 import { Truncate } from '../truncate';
-import { ColorHeading } from './styles';
+import { Heading } from '../heading';
 import DropdownContentWrapper from '../dropdown/dropdown-content-wrapper';
+import styles from './style.module.scss';
 import type {
 	ColorObject,
 	ColorPaletteProps,
@@ -127,9 +117,13 @@ function MultiplePalettes( {
 				const id = `${ instanceId }-${ index }`;
 				return (
 					<VStack spacing={ 2 } key={ index }>
-						<ColorHeading id={ id } level={ headingLevel }>
+						<Heading
+							className={ styles[ 'color-heading' ] }
+							id={ id }
+							level={ headingLevel }
+						>
 							{ name }
-						</ColorHeading>
+						</Heading>
 						<SinglePalette
 							clearColor={ clearColor }
 							colors={ colorPalette }

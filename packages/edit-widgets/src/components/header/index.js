@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { BlockToolbar } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
@@ -10,10 +7,6 @@ import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { VisuallyHidden } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import DocumentTools from './document-tools';
 import SaveButton from '../save-button';
 import MoreMenu from '../more-menu';

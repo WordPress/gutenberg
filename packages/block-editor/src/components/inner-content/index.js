@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	createPortal,
 	useLayoutEffect,
@@ -10,10 +7,6 @@ import {
 } from '@wordpress/element';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import { safeHTML } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import BlockListBlock from '../block-list/block';
 import { LayoutProvider } from '../block-list/layout';

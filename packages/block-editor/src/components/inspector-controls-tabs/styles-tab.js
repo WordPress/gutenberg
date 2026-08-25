@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import BlockStyles from '../block-styles';
 import InspectorControls from '../inspector-controls';
 import PositionControls from './position-controls-panel';
@@ -29,7 +22,11 @@ import { BackgroundToolsPanel } from '../global-styles/background-panel';
 // - Typography: text color only (font controls disabled).
 // - Background: color + gradient only (image controls disabled).
 // - Elements: link/heading/button/caption colors (unchanged).
-function SectionStyleControls( { blockName, clientId, contentClientIds } ) {
+export function SectionStyleControls( {
+	blockName,
+	clientId,
+	contentClientIds,
+} ) {
 	const settings = useBlockSettings( blockName );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
@@ -106,7 +103,7 @@ const StylesTab = ( {
 	isSectionBlock,
 	contentClientIds,
 } ) => {
-	const borderPanelLabel = useBorderPanelLabel( { blockName } );
+	const borderPanelLabel = useBorderPanelLabel( { clientId } );
 
 	return (
 		<>

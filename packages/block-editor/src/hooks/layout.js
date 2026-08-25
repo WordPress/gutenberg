@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { useCallback } from '@wordpress/element';
@@ -21,13 +14,9 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	ToggleControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
+import { kebabCase } from '@wordpress/kebab-case';
 import { store as blockEditorStore } from '../store';
 import { InspectorControls } from '../components';
 import { useSettings } from '../components/use-settings';
@@ -58,7 +47,6 @@ const CHILD_LAYOUT_KEYS = [
 	'rowStart',
 	'rowSpan',
 ];
-const { kebabCase } = unlock( componentsPrivateApis );
 const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 
 function getDefaultLayout( layoutBlockSupport = {}, blockVariation ) {
@@ -108,6 +96,42 @@ export function getLayoutStateOverrides(
 		...childLayoutValues,
 		...overrides,
 	} );
+}
+
+/**
+ * Checks whether the layout panel has any controls to display.
+ *
+ * @param {Object}  options                                 Options.
+ * @param {Object}  options.layoutType                      Active layout type.
+ * @param {Object}  options.constrainedType                 Constrained layout type.
+ * @param {Object}  options.layoutBlockSupport              Layout support settings.
+ * @param {boolean} options.showInheritToggle               Whether to show the inherit toggle.
+ * @param {boolean} options.showLayoutTypeSwitcher          Whether to show the layout type switcher.
+ * @param {boolean} options.displayControlsForLegacyLayouts Whether to show legacy layout controls.
+ *
+ * @return {boolean} Whether the layout panel has controls.
+ */
+export function hasLayoutPanelControls( {
+	layoutType,
+	constrainedType,
+	layoutBlockSupport,
+	showInheritToggle,
+	showLayoutTypeSwitcher,
+	displayControlsForLegacyLayouts,
+} ) {
+	const hasActiveLayoutControls =
+		layoutType?.name !== 'default' &&
+		layoutType?.hasInspectorControls( layoutBlockSupport );
+	const hasLegacyLayoutControls =
+		displayControlsForLegacyLayouts &&
+		constrainedType?.hasInspectorControls( layoutBlockSupport );
+
+	return !! (
+		showInheritToggle ||
+		showLayoutTypeSwitcher ||
+		hasActiveLayoutControls ||
+		hasLegacyLayoutControls
+	);
 }
 
 function getLayoutContainerValues( layout = {} ) {
@@ -301,29 +325,34 @@ function LayoutPanelPure( {
 	const settings = useBlockSettings( blockName );
 	// Block settings come from theme.json under settings.[blockName].
 	const { layout: layoutSettings } = settings;
-	const { themeSupportsLayout, activeBlockVariation, selectedState } =
-		useSelect(
-			( select ) => {
-				const blockEditorSelect = select( blockEditorStore );
-				const { getBlockAttributes, getSettings } = blockEditorSelect;
-				const { getSelectedBlockStyleState } =
-					unlock( blockEditorSelect );
-				return {
-					activeBlockVariation: select(
-						blocksStore
-					).getActiveBlockVariation(
-						blockName,
-						getBlockAttributes( clientId ) || {},
-						'block'
-					),
-					themeSupportsLayout: getSettings().supportsLayout,
-					selectedState:
-						getSelectedBlockStyleState?.( clientId ) ??
-						DEFAULT_BLOCK_STYLE_STATE,
-				};
-			},
-			[ blockName, clientId ]
-		);
+	const {
+		themeSupportsLayout,
+		activeBlockVariation,
+		selectedState,
+		isResponsiveEditing,
+	} = useSelect(
+		( select ) => {
+			const {
+				getBlockAttributes,
+				getSettings,
+				getSelectedBlockStyleState,
+				isResponsiveEditing: getIsResponsiveEditing,
+			} = unlock( select( blockEditorStore ) );
+			return {
+				activeBlockVariation: select(
+					blocksStore
+				).getActiveBlockVariation(
+					blockName,
+					getBlockAttributes( clientId ) || {},
+					'block'
+				),
+				themeSupportsLayout: getSettings().supportsLayout,
+				selectedState: getSelectedBlockStyleState( clientId ),
+				isResponsiveEditing: getIsResponsiveEditing(),
+			};
+		},
+		[ blockName, clientId ]
+	);
 
 	const blockEditingMode = useBlockEditingMode();
 	const isViewportLayoutState =
@@ -460,6 +489,14 @@ function LayoutPanelPure( {
 		isDefaultBlockStyleState( selectedState ) &&
 		! inherit &&
 		allowSwitching;
+	const showLayoutPanel = hasLayoutPanelControls( {
+		layoutType,
+		constrainedType,
+		layoutBlockSupport: blockSupportAndThemeSettings,
+		showInheritToggle,
+		showLayoutTypeSwitcher,
+		displayControlsForLegacyLayouts,
+	} );
 
 	const onChangeLayout = ( newLayout ) => {
 		if ( isViewportLayoutState ) {
@@ -495,84 +532,93 @@ function LayoutPanelPure( {
 
 	return (
 		<>
-			<InspectorControls
-				group="layout"
-				resetAllFilter={ resetLayoutFilter }
-			>
-				{ showInheritToggle && (
-					<ToolsPanelItem
-						label={ __( 'Use content width' ) }
-						hasValue={ hasInheritToggleValue }
-						onDeselect={ resetInheritToggle }
-						isShownByDefault
-						panelId={ clientId }
-					>
-						<ToggleControl
-							label={ __( 'Inner blocks use content width' ) }
-							checked={ isUsingContentWidth() }
-							onChange={ () =>
-								onChangeLayout( {
-									type: isUsingContentWidth()
-										? 'default'
-										: 'constrained',
-								} )
-							}
-							help={
-								isUsingContentWidth()
-									? __(
-											'Nested blocks use content width with options for full and wide widths.'
-									  )
-									: __(
-											'Nested blocks will fill the width of this container.'
-									  )
-							}
-						/>
-					</ToolsPanelItem>
-				) }
+			{ showLayoutPanel && (
+				<InspectorControls
+					group="layout"
+					resetAllFilter={ resetLayoutFilter }
+				>
+					{ showInheritToggle && (
+						<ToolsPanelItem
+							label={ __( 'Use content width' ) }
+							hasValue={ hasInheritToggleValue }
+							onDeselect={ resetInheritToggle }
+							isShownByDefault
+							panelId={ clientId }
+						>
+							<ToggleControl
+								label={ __( 'Inner blocks use content width' ) }
+								checked={ isUsingContentWidth() }
+								onChange={ () =>
+									onChangeLayout( {
+										type: isUsingContentWidth()
+											? 'default'
+											: 'constrained',
+									} )
+								}
+								help={
+									isUsingContentWidth()
+										? __(
+												'Nested blocks use content width with options for full and wide widths.'
+										  )
+										: __(
+												'Nested blocks will fill the width of this container.'
+										  )
+								}
+							/>
+						</ToolsPanelItem>
+					) }
 
-				{ showLayoutTypeSwitcher && (
-					<ToolsPanelItem
-						label={ __( 'Layout type' ) }
-						hasValue={ hasLayoutTypeValue }
-						onDeselect={ resetLayout }
-						isShownByDefault
-						panelId={ clientId }
-					>
-						<LayoutTypeSwitcher
-							type={ blockLayoutType }
-							onChange={ onChangeType }
-						/>
-					</ToolsPanelItem>
-				) }
+					{ showLayoutTypeSwitcher && (
+						<ToolsPanelItem
+							label={ __( 'Layout type' ) }
+							hasValue={ hasLayoutTypeValue }
+							onDeselect={ resetLayout }
+							isShownByDefault
+							panelId={ clientId }
+						>
+							<LayoutTypeSwitcher
+								type={ blockLayoutType }
+								onChange={ onChangeType }
+							/>
+						</ToolsPanelItem>
+					) }
 
-				{ layoutType && layoutType.name !== 'default' && (
-					<layoutType.inspectorControls
-						layout={ usedLayout }
-						value={ layout }
-						onChange={ onChangeLayout }
-						layoutBlockSupport={ blockSupportAndThemeSettings }
-						resetLayout={ resetLayoutDefaults }
-						name={ blockName }
-						clientId={ clientId }
-					/>
-				) }
-				{ constrainedType && displayControlsForLegacyLayouts && (
-					<constrainedType.inspectorControls
-						layout={ usedLayout }
-						value={ layout }
-						onChange={ onChangeLayout }
-						layoutBlockSupport={ blockSupportAndThemeSettings }
-						resetLayout={ resetLayoutDefaults }
-						name={ blockName }
-						clientId={ clientId }
-					/>
-				) }
-			</InspectorControls>
+					{ layoutType && layoutType.name !== 'default' && (
+						<layoutType.inspectorControls
+							layout={ usedLayout }
+							value={ layout }
+							onChange={ onChangeLayout }
+							layoutBlockSupport={ blockSupportAndThemeSettings }
+							resetLayout={ resetLayoutDefaults }
+							name={ blockName }
+							clientId={ clientId }
+						/>
+					) }
+					{ constrainedType && displayControlsForLegacyLayouts && (
+						<constrainedType.inspectorControls
+							layout={ usedLayout }
+							value={ layout }
+							onChange={ onChangeLayout }
+							layoutBlockSupport={ blockSupportAndThemeSettings }
+							resetLayout={ resetLayoutDefaults }
+							name={ blockName }
+							clientId={ clientId }
+						/>
+					) }
+				</InspectorControls>
+			) }
 			{ ! inherit && layoutType && (
 				<layoutType.toolBarControls
 					layout={ usedLayout }
 					onChange={ onChangeLayout }
 					layoutBlockSupport={ layoutBlockSupport }
+					controlsGroup={
+						isResponsiveEditing &&
+						hasViewportBlockStyleState( selectedState ) &&
+						! hasPseudoBlockStyleState( selectedState )
+							? 'style-state'
+							: 'block'
+					}
 					name={ blockName }
 					clientId={ clientId }
 				/>

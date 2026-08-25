@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Card,
 	__experimentalConfirmDialog as ConfirmDialog,
@@ -10,13 +7,9 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useRef, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import './guideline-actions-section.scss';
 import { exportGuidelines, importGuidelines } from '../import-export';
-import ActionItem from './action-item';
+import ActionItem, { type ActionProps } from './action-item';
 import type {
 	Scope,
 	GuidelineRow,
@@ -103,7 +96,7 @@ export default function GuidelineActionsSection( {
 		}
 	}
 
-	const ACTIONS = [
+	const ACTIONS: ActionProps[] = [
 		{
 			slug: 'import',
 			title: __( 'Import' ),
@@ -126,7 +119,7 @@ export default function GuidelineActionsSection( {
 
 	return (
 		<VStack spacing={ 4 } className="guidelines__actions">
-			<Heading level={ 3 } size={ 15 } weight={ 500 }>
+			<Heading level={ 3 } size={ 15 }>
 				{ __( 'Actions' ) }
 			</Heading>
 			<input

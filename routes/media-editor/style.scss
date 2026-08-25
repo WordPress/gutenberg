@@ -1,8 +1,29 @@
+@use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/media-editor/build-style/style.css" as media-editor;
+
+// Carries the editor's keydown handler around the whole page, including the
+// header. `display: contents` keeps it out of the flex layout entirely.
+.media-editor-route__shortcut-scope {
+	display: contents;
+}
 
 .media-editor-route__content {
 	display: flex;
 	flex: 1;
 	min-height: 0;
 	overflow: hidden;
+}
+
+// Below the sidebar-collapse breakpoint the transform controls have no Crop
+// panel to live in, and History has no room in the header, so both get a bar
+// under the canvas. Centered rather than pushed to the edges: with Cancel/Save
+// staying in the page header, there is no cluster to anchor the inline end.
+.media-editor-route__toolbar {
+	flex-shrink: 0;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: $grid-unit-20;
+	padding: $grid-unit-20 $grid-unit-40 $grid-unit-30;
 }

@@ -8,7 +8,7 @@
 /**
  * Renders the `core/playlist-track` block on server.
  *
- * @since 6.9.0
+ * @since 7.1.0
  *
  * @param array         $attributes The block attributes.
  * @param string        $content    The block content.
@@ -27,11 +27,12 @@ function render_block_core_playlist_track( $attributes, $content = '', $block = 
 		$show_images = $block->context['showImages'];
 	}
 
-	$artist = $attributes['artist'] ?? '';
-	$image  = $attributes['image'] ?? '';
-	$alt    = $attributes['imageAlt'] ?? '';
-	$length = $attributes['length'] ?? '';
-	$title  = isset( $attributes['title'] ) && ! empty( $attributes['title'] ) ? $attributes['title'] : __( 'Unknown title' );
+	$track_image = $attributes['image'] ?? null;
+	$image       = is_string( $track_image ) ? $track_image : '';
+	$artist      = $attributes['artist'] ?? '';
+	$alt         = $attributes['imageAlt'] ?? '';
+	$length      = $attributes['length'] ?? '';
+	$title       = isset( $attributes['title'] ) && ! empty( $attributes['title'] ) ? $attributes['title'] : __( 'Unknown title' );
 
 	$html  = '<li ' . $wrapper_attributes . '>';
 	$html .= '<button data-wp-on--click="actions.changeTrack" data-wp-bind--aria-current="state.isCurrentTrack" class="wp-block-playlist-track__button">';
@@ -68,7 +69,7 @@ function render_block_core_playlist_track( $attributes, $content = '', $block = 
 /**
  * Registers the `core/playlist-track` block on server.
  *
- * @since 6.9.0
+ * @since 7.1.0
  */
 function register_block_core_playlist_track() {
 	register_block_type_from_metadata(

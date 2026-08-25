@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { createInterpolateElement } from '@wordpress/element';
 import { check } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 import { Button, EmptyState, Link, Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import styles from './saved-post.module.css';
 
 type SavedPostProps = {

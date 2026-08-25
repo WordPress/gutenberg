@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalHStack as HStack, Button } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
 import {
@@ -16,10 +13,6 @@ import { select } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { Badge, Link } from '@wordpress/ui';
 import { unlock } from '@wordpress/routes-lock-unlock';
-
-/**
- * Internal dependencies
- */
 import { useConnectorPlugin, type PluginStatus } from './use-connector-plugin';
 import {
 	OpenAILogo,
@@ -101,7 +94,7 @@ const ConnectedBadge = () => (
 			padding: '4px 12px',
 			borderRadius: '2px',
 			fontSize: '13px',
-			fontWeight: 500,
+			fontWeight: 'var(--wpds-typography-font-weight-emphasis)',
 			whiteSpace: 'nowrap',
 		} }
 	>

@@ -1,19 +1,6 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Tabs', () => {
-	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.setGutenbergExperiments( [
-			'gutenberg-block-experiments',
-		] );
-	} );
-
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.setGutenbergExperiments( [] );
-	} );
-
 	test.describe( 'Editor functionality', () => {
 		test.beforeEach( async ( { admin, editor } ) => {
 			await admin.createNewPost();
@@ -172,10 +159,18 @@ test.describe( 'Tabs', () => {
 			await expect(
 				newTab.locator( '[contenteditable="true"]' )
 			).toBeFocused();
+			await expect(
+				newTab.locator( '[data-rich-text-placeholder]' )
+			).toHaveAttribute( 'data-rich-text-placeholder', 'Tab title' );
 
 			// The new tab's panel is the active one and is visible.
+			// Use `exact: true` to avoid matching the parent 'Block: Tab Panels' name.
+			// Use `includeHidden: true` to check the number of hidden panels. getByRole()
+			// only returns visible elements by default.
 			const panels = editor.canvas.getByRole( 'document', {
 				name: 'Block: Tab Panel',
+				exact: true,
+				includeHidden: true,
 			} );
 			await expect( panels ).toHaveCount( 3 );
 			await expect( panels.nth( 2 ) ).toBeVisible();
@@ -213,8 +208,154 @@ test.describe( 'Tabs', () => {
 			await pageUtils.pressKeys( 'primary+z' );
 			await expect( tabs ).toHaveCount( 2 );
 		} );
+
+		test( 'moves the active tab to the previous position with the toolbar mover', async ( {
+			editor,
+			pageUtils,
+		} ) => {
+			const tab2 = editor.canvas.getByRole( 'tab', { name: 'Tab 2' } );
+			await tab2.click();
+
+			await editor.clickBlockToolbarButton( 'Move tab before' );
+
+			// The tab and its panel are reordered together.
+			await expect
+				.poll( async () =>
+					(
+						await editor.getBlocks()
+					)[ 0 ].innerBlocks[ 1 ].innerBlocks.map(
+						( panel ) => panel.attributes.label
+					)
+				)
+				.toEqual( [ 'Tab 2', 'Tab 1' ] );
+			await expect( editor.canvas.getByRole( 'tab' ) ).toHaveText( [
+				'Tab 2',
+				'Tab 1',
+			] );
+
+			// The moved tab stays active.
+			await expect( tab2 ).toHaveAttribute( 'aria-selected', 'true' );
+
+			// Undo restores the original order.
+			await pageUtils.pressKeys( 'primary+z' );
+			await expect( editor.canvas.getByRole( 'tab' ) ).toHaveText( [
+				'Tab 1',
+				'Tab 2',
+			] );
+		} );
+
+		test( 'moves the active tab to the next position with the toolbar mover', async ( {
+			editor,
+			pageUtils,
+		} ) => {
+			const tab1 = editor.canvas.getByRole( 'tab', { name: 'Tab 1' } );
+			await tab1.click();
+
+			await editor.clickBlockToolbarButton( 'Move tab after' );
+
+			await expect
+				.poll( async () =>
+					(
+						await editor.getBlocks()
+					)[ 0 ].innerBlocks[ 1 ].innerBlocks.map(
+						( panel ) => panel.attributes.label
+					)
+				)
+				.toEqual( [ 'Tab 2', 'Tab 1' ] );
+			await expect( editor.canvas.getByRole( 'tab' ) ).toHaveText( [
+				'Tab 2',
+				'Tab 1',
+			] );
+
+			// The moved tab stays active.
+			await expect( tab1 ).toHaveAttribute( 'aria-selected', 'true' );
+
+			// Undo restores the original order.
+			await pageUtils.pressKeys( 'primary+z' );
+			await expect( editor.canvas.getByRole( 'tab' ) ).toHaveText( [
+				'Tab 1',
+				'Tab 2',
+			] );
+		} );
 	} );
 
-	// TODO: Add a `Frontend functionality` describe block for front-end
-	// interaction tests (e.g. switching tabs on the published post).
+	// TODO: Extend this with the remaining front-end interactions
+	// (e.g. switching tabs by click and by keyboard on the published post).
+	test.describe( 'Frontend functionality', () => {
+		test( 'keeps the content of inactive panels available to find-in-page', async ( {
+			admin,
+			editor,
+			page,
+		} ) => {
+			await admin.createNewPost();
+			await editor.insertBlock( {
+				name: 'core/tabs',
+				innerBlocks: [
+					{ name: 'core/tab-list' },
+					{
+						name: 'core/tab-panels',
+						innerBlocks: [
+							{
+								name: 'core/tab-panel',
+								attributes: { label: 'Tab 1' },
+								innerBlocks: [
+									{
+										name: 'core/paragraph',
+										attributes: { content: 'Panel 1' },
+									},
+								],
+							},
+							{
+								name: 'core/tab-panel',
+								attributes: { label: 'Tab 2' },
+								innerBlocks: [
+									{
+										name: 'core/paragraph',
+										attributes: { content: 'Panel 2' },
+									},
+								],
+							},
+						],
+					},
+				],
+			} );
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			const panels = page.locator( '.wp-block-tab-panel' );
+			const activePanel = panels.first();
+			const inactivePanel = panels.last();
+
+			// The inactive panel is hidden with `until-found` rather than
+			// outright, which is what leaves its text searchable.
+			await expect( inactivePanel ).toHaveAttribute(
+				'hidden',
+				'until-found'
+			);
+			await expect( activePanel ).not.toHaveAttribute( 'hidden' );
+
+			// It still occupies no space and stays out of the tab sequence.
+			await expect
+				.poll( () =>
+					inactivePanel.evaluate(
+						( el ) => el.getBoundingClientRect().height
+					)
+				)
+				.toBe( 0 );
+			await expect( inactivePanel ).toHaveAttribute( 'tabindex', '-1' );
+
+			// Revealing the panel, as find-in-page does, activates its tab.
+			await inactivePanel.dispatchEvent( 'beforematch' );
+
+			await expect( inactivePanel ).not.toHaveAttribute( 'hidden' );
+			await expect( activePanel ).toHaveAttribute(
+				'hidden',
+				'until-found'
+			);
+			await expect(
+				page.getByRole( 'tab', { name: 'Tab 2' } )
+			).toHaveAttribute( 'aria-selected', 'true' );
+		} );
+	} );
 } );

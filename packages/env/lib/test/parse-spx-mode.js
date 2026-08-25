@@ -1,8 +1,4 @@
 'use strict';
-
-/**
- * Internal dependencies
- */
 const parseSpxMode = require( '../parse-spx-mode' );
 
 describe( 'parseSpxMode', () => {

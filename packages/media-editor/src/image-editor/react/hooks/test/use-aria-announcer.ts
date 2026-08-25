@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { act, renderHook } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { speak } from '@wordpress/a11y';
-
-/**
- * Internal dependencies
- */
 import { useAriaAnnouncer } from '../use-aria-announcer';
 import { DEFAULT_STATE } from '../../../core/constants';
 import type { CropperState } from '../../../core/types';

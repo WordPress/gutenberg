@@ -1,18 +1,8 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import BaseInputControl from '../';
+import InputControlPrefixWrapper from '../input-prefix-wrapper';
 
 const getInput = () => screen.getByTestId( 'input' );
 
@@ -205,6 +195,33 @@ describe( 'InputControl', () => {
 			await user.click( document.body );
 
 			expect( spyChange ).toHaveBeenLastCalledWith( 'this is meow' );
+		} );
+	} );
+
+	describe( 'Legacy size support', () => {
+		it( 'treats __unstable-large the same as default', () => {
+			const prefix = (
+				<InputControlPrefixWrapper>$</InputControlPrefixWrapper>
+			);
+
+			render( <InputControl label="Test" prefix={ prefix } /> );
+			render(
+				<InputControl
+					label="Test"
+					prefix={ prefix }
+					{ ...{ size: '__unstable-large' } }
+				/>
+			);
+
+			const [ defaultPrefixWrapper, legacyPrefixWrapper ] =
+				screen.getAllByText( '$' );
+			const [ defaultInput, legacyInput ] =
+				screen.getAllByTestId( 'input' );
+
+			expect( legacyPrefixWrapper ).toMatchStyleDiffSnapshot(
+				defaultPrefixWrapper
+			);
+			expect( legacyInput ).toMatchStyleDiffSnapshot( defaultInput );
 		} );
 	} );
 } );

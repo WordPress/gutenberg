@@ -21,7 +21,7 @@
 		flex-direction: column;
 
 		.fields-controls__slug-help-slug {
-			font-weight: 600;
+			font-weight: var(--wpds-typography-font-weight-emphasis);
 		}
 	}
 }

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { isEditingReusableBlock } from '../reducer';
 
 describe( 'isEditingReusableBlock', () => {

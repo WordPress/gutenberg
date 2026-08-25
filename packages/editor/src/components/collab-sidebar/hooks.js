@@ -1,6 +1,4 @@
-/**
- * WordPress dependencies
- */
+import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 import {
 	useState,
@@ -19,10 +17,6 @@ import { getScrollContainer } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as interfaceStore } from '@wordpress/interface';
 import { RichTextData, create } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import { FLOATING_NOTES_SIDEBAR } from './constants';
 import { unlock } from '../../lock-unlock';
@@ -70,9 +64,11 @@ export function useNoteThreads( postId ) {
 			return { notes: [], unresolvedNotes: [] };
 		}
 
-		// Single pass over clientIds builds the forward map and reverse lookup
-		// together. getNoteIdsFromMetadata returns numeric ids, matching the
-		// types returned by the comments REST endpoint.
+		/*
+		 * Single pass over clientIds builds the forward map and reverse lookup
+		 * together. getNoteIdsFromMetadata returns numeric ids, matching the
+		 * types returned by the comments REST endpoint.
+		 */
 		const blocksWithNotes = {};
 		const clientIdByNoteId = new Map();
 		for ( const clientId of clientIds ) {
@@ -297,12 +293,14 @@ export function useNoteActions() {
 
 	const onCreate = async ( { content, parent } ) => {
 		try {
-			// Capture inline selection *before* the async save: focus may shift
-			// during the round-trip and the editor's stored selection can
-			// collapse if the user clicks elsewhere. The selection drives the
-			// in-content marker written below, which is the note's only anchor.
+			// Capture the target block and inline selection *before* the async
+			// save: selection may shift during the round-trip, attaching the
+			// note to the wrong block or collapsing its inline anchor.
 			const inlineSelection = ! parent
 				? readInlineSelection( getSelectionStart, getSelectionEnd )
+				: null;
+			const clientId = ! parent
+				? inlineSelection?.clientId || getSelectedBlockClientId()
 				: null;
 
 			const savedRecord = await saveEntityRecord(
@@ -318,17 +316,15 @@ export function useNoteActions() {
 				{ throwOnError: true }
 			);
 
-			// If it's a top-level note, update the block attributes with the note id.
-			// Read-modify-write on metadata is racy under concurrent edits:
-			// two near-simultaneous adds against the same base will each write
-			// a 2-element array and the later write wins, dropping the other
-			// id. Tracking issue: https://github.com/WordPress/gutenberg/issues/74751.
-			if ( ! parent && savedRecord?.id ) {
-				const clientId =
-					inlineSelection?.clientId || getSelectedBlockClientId();
-				if ( ! clientId ) {
-					return savedRecord;
-				}
+			/*
+			 * If it's a top-level note, update the block attributes with the
+			 * note id. Read-modify-write on metadata is racy under concurrent
+			 * edits: two near-simultaneous adds against the same base will each
+			 * write a 2-element array and the later write wins, dropping the
+			 * other id. Tracking issue:
+			 * https://github.com/WordPress/gutenberg/issues/74751.
+			 */
+			if ( ! parent && savedRecord?.id && clientId ) {
 				const attributes = getBlockAttributes( clientId );
 				const metadata = attributes?.metadata;
 				const updatedMetadata = addNoteIdToMetadata(
@@ -371,13 +367,6 @@ export function useNoteActions() {
 	};
 
 	const onEdit = async ( { id, content, status } ) => {
-		const messageType = status ? status : 'updated';
-		const messages = {
-			approved: __( 'Note marked as resolved.' ),
-			hold: __( 'Note reopened.' ),
-			updated: __( 'Note updated.' ),
-		};
-
 		try {
 			// For resolution or reopen actions, create a new note with metadata.
 			if ( status === 'approved' || status === 'hold' ) {
@@ -407,9 +396,14 @@ export function useNoteActions() {
 					},
 				};
 
-				await saveEntityRecord( 'root', 'comment', newNoteData, {
-					throwOnError: true,
-				} );
+				const savedRecord = await saveEntityRecord(
+					'root',
+					'comment',
+					newNoteData,
+					{
+						throwOnError: true,
+					}
+				);
 
 				// Resolving a note drops its inline highlight: strip the marker
 				// so the note falls back to a block-level note in the content.
@@ -421,26 +415,39 @@ export function useNoteActions() {
 						updateBlockAttributes
 					);
 				}
-			} else {
-				const updateData = {
-					id,
-					content,
-					status,
-				};
 
-				await saveEntityRecord( 'root', 'comment', updateData, {
-					throwOnError: true,
-				} );
+				// The note visibly updates in place, so there is no snackbar,
+				// but screen reader users still need the confirmation.
+				speak(
+					status === 'approved'
+						? __( 'Note marked as resolved.' )
+						: __( 'Note reopened.' )
+				);
+
+				return savedRecord;
 			}
 
-			createNotice(
-				'snackbar',
-				messages[ messageType ] ?? __( 'Note updated.' ),
+			const updateData = {
+				id,
+				content,
+				status,
+			};
+
+			const savedRecord = await saveEntityRecord(
+				'root',
+				'comment',
+				updateData,
 				{
-					type: 'snackbar',
-					isDismissible: true,
+					throwOnError: true,
 				}
 			);
+
+			createNotice( 'snackbar', __( 'Note updated.' ), {
+				type: 'snackbar',
+				isDismissible: true,
+			} );
+
+			return savedRecord;
 		} catch ( error ) {
 			onError( error );
 		}
@@ -448,17 +455,18 @@ export function useNoteActions() {
 
 	const onDelete = async ( note ) => {
 		try {
+			// Capture the target block *before* the async delete: selection may
+			// shift during the round-trip, pointing the attribute cleanup at the
+			// wrong block.
+			const clientId = ! note.parent
+				? note.blockClientId || getSelectedBlockClientId()
+				: null;
+
 			await deleteEntityRecord( 'root', 'comment', note.id, undefined, {
 				throwOnError: true,
 			} );
 
-			if ( ! note.parent ) {
-				// Use blockClientId if available, otherwise fall back to selected block.
-				const clientId =
-					note.blockClientId || getSelectedBlockClientId();
-				if ( ! clientId ) {
-					return;
-				}
+			if ( clientId ) {
 				const attributes = getBlockAttributes( clientId );
 				const newAttributes = {
 					metadata: cleanEmptyObject(
@@ -488,6 +496,8 @@ export function useNoteActions() {
 				type: 'snackbar',
 				isDismissible: true,
 			} );
+
+			return true;
 		} catch ( error ) {
 			onError( error );
 		}
@@ -559,18 +569,31 @@ export function useFloatingBoard( {
 		};
 
 		// Recalc is deferred to a rAF; back-to-back updates collapse into one paint.
-		const rafId = window.requestAnimationFrame( () => {
-			const result = calculateNotePositions( {
-				threads,
-				selectedNoteId,
-				blockRects: store.getBlockRects(),
-				heights,
-				scrollTop: canvas?.scrollTop ?? 0,
-			} );
+		let rafId;
+		const schedule = () => {
+			window.cancelAnimationFrame( rafId );
+			rafId = window.requestAnimationFrame( () => {
+				const result = calculateNotePositions( {
+					threads,
+					selectedNoteId,
+					blockRects: store.getAnchorRects(),
+					heights,
+					scrollTop: canvas?.scrollTop ?? 0,
+				} );
 
-			setNotePositions( result.positions );
-			applyScroll();
-		} );
+				setNotePositions( result.positions );
+				applyScroll();
+			} );
+		};
+
+		schedule();
+
+		// Anchors are read from the DOM, so editing, adding or removing any
+		// block leaves the threads after it stale.
+		const contentObserver = new window.ResizeObserver( schedule );
+		if ( rootEl ) {
+			contentObserver.observe( rootEl );
+		}
 
 		// Root scrolling elements (documentElement/body) don't fire scroll
 		// on themselves; capture on the window catches them in either canvas.
@@ -580,6 +603,7 @@ export function useFloatingBoard( {
 
 		return () => {
 			window.cancelAnimationFrame( rafId );
+			contentObserver.disconnect();
 			view?.removeEventListener( 'scroll', applyScroll, listenerOptions );
 		};
 	}, [ sidebarRef, heights, isFloating, selectedNoteId, store, threads ] );

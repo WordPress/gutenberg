@@ -2,6 +2,88 @@
 
 ## Unreleased
 
+### New Features
+
+-   Widget chrome footer: `relevance: 'high'` actions mount as leading text
+    links (declared icon as prefix) in a persistent strip under the widget
+    body, `'medium'` as trailing compact affordances (icon-only with a
+    declared icon); the "More" menu keeps the rest, and full-bleed widgets
+    keep every action in the menu
+    ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
+-   A link action whose target the host recognizes as one of its own routes
+    (the `links` capability from `useWidgetHost`) mounts the host router's
+    link and navigates client-side; `download` and `openInNewTab` keep the
+    plain anchor ([#81740](https://github.com/WordPress/gutenberg/pull/81740)).
+
+### Documentation
+
+-   Add a `HostLinks` story: a demo host whose `links` capability turns an
+    in-app action target into a client-side route link, beside a plain
+    anchor and a download
+    ([#81740](https://github.com/WordPress/gutenberg/pull/81740)).
+
+### Internal
+
+-   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509), [#81515](https://github.com/WordPress/gutenberg/pull/81515), [#81516](https://github.com/WordPress/gutenberg/pull/81516), [#81518](https://github.com/WordPress/gutenberg/pull/81518))
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 0.5.0 (2026-08-12)
+
+### New Features
+
+-   Tile spacing is host-tunable via `--wp-widget-dashboard-tile-padding` and
+    `--wp-widget-dashboard-tile-header-gap`; the header gap follows the tile
+    padding unless set apart ([#81352](https://github.com/WordPress/gutenberg/pull/81352)).
+-   The actions "More" menu renders each action's resolved icon as the menu
+    item prefix ([#81275](https://github.com/WordPress/gutenberg/pull/81275)).
+
+### Enhancements
+
+-   Widget chrome and picker preview chrome: preserve their flex-column layout
+    when host styles reset semantic elements ([#80570](https://github.com/WordPress/gutenberg/pull/80570)).
+
+### Documentation
+
+-   Describe what the "More" menu mounts for a link fulfillment ([#80974](https://github.com/WordPress/gutenberg/pull/80974)).
+
+### Internal
+
+-   Widget actions menu: render the action icon directly; the widget types
+    contract guarantees a renderable element ([#81381](https://github.com/WordPress/gutenberg/pull/81381)).
+-   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
+
+## 0.4.0 (2026-07-29)
+
+### New Features
+
+-   Surface a widget's declared `actions` in the tile chrome as a "More"
+    menu of links ([#80363](https://github.com/WordPress/gutenberg/pull/80363)).
+
+### Enhancements
+
+-   Widget settings: use the `drawerRight` icon for the per-tile settings
+    trigger instead of `moreVertical` ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
+-   Widget toolbar: when the tile header lacks room for the inline attribute
+    controls, the promoted fields collapse into a dropdown; the settings
+    trigger stays in the toolbar ([#80208](https://github.com/WordPress/gutenberg/pull/80208)) ([#80423](https://github.com/WordPress/gutenberg/pull/80423])).
+
+### Documentation
+
+-   Prefer a static CSV asset over a `data:` URL in the goal-progress story ([#80510](https://github.com/WordPress/gutenberg/pull/80510)).
+-   Add/improve default story and documentation ([#80423](https://github.com/WordPress/gutenberg/pull/80423])).
+-   Document how attribute `relevance` maps to surfaces: the prominent
+    surface, the settings surface, and the measured collapse ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
+
+### Internal
+
+-   Update Jest type definitions to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
+-   Add a Storybook story reproducing the tile header with multiple
+    high-relevance inline attribute controls ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
+-   Mark the default runtime module `import()` with `@vite-ignore` alongside
+    `webpackIgnore`, silencing Vite's import-analysis warning ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
+
+## 0.3.0 (2026-07-14)
+
 -   Remove layout-settings editing: the customize-toolbar button, the
     settings drawer, the layout-model switch commands, and the
     `onGridSettingsChange` prop. `gridSettings` is now read-only rendering

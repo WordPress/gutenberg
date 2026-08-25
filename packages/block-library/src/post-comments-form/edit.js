@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useBlockProps } from '@wordpress/block-editor';
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { VisuallyHidden } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import CommentsForm from './form';
 
 export default function PostCommentsFormEdit( { context } ) {

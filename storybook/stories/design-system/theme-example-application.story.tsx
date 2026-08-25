@@ -16,7 +16,6 @@ import {
 	Tabs,
 	Text,
 } from '@wordpress/ui';
-
 import { withRouter } from '../../decorators/with-router';
 
 type ThemeProviderCornerRadius = React.ComponentProps<
@@ -104,7 +103,7 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 						Background
 						<input
 							type="color"
-							value={ background ?? '#ffffff' }
+							value={ background ?? '#fcfcfc' }
 							onChange={ ( e ) =>
 								setBackground( e.target.value )
 							}

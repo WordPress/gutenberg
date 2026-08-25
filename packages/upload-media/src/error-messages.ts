@@ -4,16 +4,9 @@
  * Provides localized, human-readable messages for all error codes
  * with actionable guidance for users.
  */
-
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { ErrorCode } from './upload-error';
+import { getHeicConversionAdvice } from './heic-support';
 
 /**
  * Configuration for an error message.
@@ -82,7 +75,7 @@ export function getErrorMessage(
 				__( 'Failed to decode HEIC file "%s".' ),
 				fileName
 			),
-			action: __( 'Try converting the image to JPEG or PNG first.' ),
+			action: getHeicConversionAdvice(),
 		},
 		[ ErrorCode.IMAGE_TRANSCODING_ERROR ]: {
 			title: __( 'Image processing failed' ),
@@ -110,6 +103,15 @@ export function getErrorMessage(
 				fileName
 			),
 			action: __( 'The file may be corrupted. Try a different file.' ),
+		},
+		[ ErrorCode.MEDIA_FINALIZE_ERROR ]: {
+			title: __( 'Upload failed' ),
+			description: sprintf(
+				/* translators: %s: file name */
+				__( 'Could not finalize the upload of "%s".' ),
+				fileName
+			),
+			action: __( 'Please try again.' ),
 		},
 		[ ErrorCode.GENERAL ]: {
 			title: __( 'Upload failed' ),

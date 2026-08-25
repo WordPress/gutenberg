@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useSettings } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { privateApis as mediaEditorPrivateApis } from '@wordpress/media-editor';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import usePostFields from '../post-fields';
 

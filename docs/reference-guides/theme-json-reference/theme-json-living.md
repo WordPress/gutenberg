@@ -65,6 +65,16 @@ Settings related to background.
 
 ---
 
+### blockVisibility
+
+Settings related to block visibility.
+
+| Property | Description | Type | Default |
+| -------- | ----------- | ---- | ------- |
+| allowEditing | Whether block visibility can be edited in the editor. Set to `false` to hide the block visibility controls. Saved block visibility attributes are always rendered regardless of this setting. | `boolean` | `true` |
+
+---
+
 ### border
 
 Settings related to borders.

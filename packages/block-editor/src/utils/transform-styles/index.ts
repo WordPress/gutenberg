@@ -1,17 +1,9 @@
 /// <reference path="./postcss-urlrebase.d.ts" />
-
-/**
- * External dependencies
- */
 import * as parsel from 'parsel-js';
 import Processor from 'postcss/lib/processor';
 import CssSyntaxError from 'postcss/lib/css-syntax-error';
 import prefixSelector from 'postcss-prefix-selector';
 import rebaseUrl from 'postcss-urlrebase';
-
-/**
- * Internal dependencies
- */
 import type { EditorStyle, TransformOptions } from './types';
 
 const cacheByWrapperSelector = new Map();

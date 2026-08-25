@@ -1,18 +1,11 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { useRef, useCallback, useState } from '@wordpress/element';
-import { ResizableBox } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
+import {
+	ResizableBox,
+	__unstableMotion as motion,
+} from '@wordpress/components';
+import { useReducedMotion } from '@wordpress/compose';
 import ResizeHandle from './resize-handle';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
@@ -42,19 +35,16 @@ function isAtMaxWidth( currentWidth, containerWidth, tolerance = 0 ) {
 	return containerWidth > 0 && currentWidth >= containerWidth - tolerance;
 }
 
-function ResizableEditor( { className, enableResizing, height, children } ) {
+function ResizableEditor( {
+	className,
+	enableResizing,
+	width = '100%',
+	height = '100%',
+	children,
+} ) {
 	const [ isResizing, setIsResizing ] = useState( false );
+	const disableMotion = useReducedMotion();
 	const { setCanvasWidth } = unlock( useDispatch( editorStore ) );
-	const canvasWidth = useSelect(
-		( select ) => {
-			if ( ! enableResizing ) {
-				return undefined;
-			}
-			const { getCanvasWidth } = unlock( select( editorStore ) );
-			return getCanvasWidth();
-		},
-		[ enableResizing ]
-	);
 
 	const resizableRef = useRef();
 	const resizeWidthBy = useCallback(
@@ -76,11 +66,11 @@ function ResizableEditor( { className, enableResizing, height, children } ) {
 	);
 
 	const updateCanvasWidth = useCallback(
-		( element ) => {
+		( element, isResizeEnd ) => {
 			const currentWidth = element.offsetWidth;
 			const containerWidth = element.parentElement?.offsetWidth ?? 0;
 			setCanvasWidth(
-				isAtMaxWidth( currentWidth, containerWidth, 80 )
+				isResizeEnd && isAtMaxWidth( currentWidth, containerWidth, 80 )
 					? undefined
 					: currentWidth
 			);
@@ -90,6 +80,14 @@ function ResizableEditor( { className, enableResizing, height, children } ) {
 
 	return (
 		<ResizableBox
+			as={ motion.div }
+			initial={ false }
+			animate={ { height } }
+			transition={ {
+				type: 'tween',
+				duration: isResizing || disableMotion ? 0 : 0.2,
+				ease: 'easeOut',
+			} }
 			className={ clsx( 'editor-resizable-editor', className, {
 				'is-resizable': enableResizing,
 				'is-resizing': isResizing,
@@ -98,9 +96,8 @@ function ResizableEditor( { className, enableResizing, height, children } ) {
 				resizableRef.current = api?.resizable;
 			} }
 			size={ {
-				width:
-					enableResizing && canvasWidth ? canvasWidth + 'px' : '100%',
-				height: enableResizing && height ? height : '100%',
+				width,
+				height,
 			} }
 			onResizeStart={ () => {
 				setIsResizing( true );
@@ -109,8 +106,8 @@ function ResizableEditor( { className, enableResizing, height, children } ) {
 				updateCanvasWidth( element );
 			} }
 			onResizeStop={ ( event, direction, element ) => {
+				updateCanvasWidth( element, true );
 				setIsResizing( false );
-				updateCanvasWidth( element );
 			} }
 			minWidth={ 300 }
 			maxWidth="100%"

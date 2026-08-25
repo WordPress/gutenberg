@@ -32,8 +32,21 @@ function gutenberg_normalize_state_preset_vars( $value ) {
 		return $value;
 	}
 
-	$unwrapped_name = str_replace( '|', '--', substr( $value, strlen( 'var:' ) ) );
-	return "var(--wp--$unwrapped_name)";
+	$parts = explode( '|', substr( $value, strlen( 'var:' ) ) );
+
+	/*
+	 * The slug is kebab-cased when the preset's custom property is generated,
+	 * so a reference has to be converted the same way or it points at a
+	 * property that does not exist (`--wp--preset--font-size--3xl` for a preset
+	 * generated as `--wp--preset--font-size--3-xl`). Mirrors
+	 * `WP_Theme_JSON_Gutenberg::convert_custom_properties()` and the JS style
+	 * engine's `getCSSValueFromRawStyle()`.
+	 */
+	if ( 3 === count( $parts ) ) {
+		$parts[2] = _wp_to_kebab_case( $parts[2] );
+	}
+
+	return 'var(--wp--' . implode( '--', $parts ) . ')';
 }
 
 /**
@@ -344,18 +357,24 @@ function gutenberg_add_block_state_style_rule( &$css_rules, $state, $selector, $
 
 	$style = gutenberg_get_state_style_with_fallback_dimension_styles( $style );
 
-	$compiled = gutenberg_style_engine_get_styles(
+	$compiled     = gutenberg_style_engine_get_styles(
 		gutenberg_normalize_state_style_for_css_output( $style )
 	);
+	$declarations = $compiled['declarations'] ?? array();
+	$text_align   = $style['typography']['textAlign'] ?? null;
+	// Base text alignment is class-based, so state styles need a declaration.
+	if ( is_string( $text_align ) && '' !== trim( $text_align ) ) {
+		$declarations['text-align'] = $text_align;
+	}
 
-	if ( empty( $compiled['declarations'] ) ) {
+	if ( empty( $declarations ) ) {
 		return;
 	}
 
 	$css_rules[] = array(
 		'state'        => $state,
 		'selector'     => $selector,
-		'declarations' => $compiled['declarations'],
+		'declarations' => $declarations,
 	);
 	if ( ! empty( $rules_group ) ) {
 		$css_rules[ count( $css_rules ) - 1 ]['rules_group'] = $rules_group;

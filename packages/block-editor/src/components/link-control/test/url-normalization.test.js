@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { SlotFillProvider } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import LinkControl from '../';
 import { fetchFauxEntitySuggestions } from './fixtures';
 

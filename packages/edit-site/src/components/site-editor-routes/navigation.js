@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import Editor from '../editor';
 import SidebarNavigationScreenNavigationMenus from '../sidebar-navigation-screen-navigation-menus';
 import SidebarNavigationScreenUnsupported from '../sidebar-navigation-screen-unsupported';

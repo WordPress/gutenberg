@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { Icon, Link, Stack, Text } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import styles from './feature-highlight.module.css';
 
 type IconType = React.ComponentProps< typeof Icon >[ 'icon' ];

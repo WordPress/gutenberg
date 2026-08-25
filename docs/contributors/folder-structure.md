@@ -9,10 +9,9 @@ The following snippet explains how the Gutenberg repository is structured omitti
     ├── CONTRIBUTING.md
     │
     ├── .editorconfig
-    ├── eslint.config.cjs
-    ├── eslint.config.strict.cjs
+    ├── eslint.config.mjs
     ├── .jshintignore
-    ├── .prettierrc.js
+    ├── prettier.config.mjs
     ├── .stylelintignore
     ├── .stylelintrc.js
     ├── .markdownlintignore

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Button } from '@wordpress/components';
 import { ESCAPE } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
@@ -8,9 +5,6 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { closeSmall } from '@wordpress/icons';
 import { useFocusOnMount, useFocusReturn } from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import StylesCanvasStyleBook from './style-book';
 import StylesCanvasRevisions from './revisions';

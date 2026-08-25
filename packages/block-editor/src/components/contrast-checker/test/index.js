@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { speak } from '@wordpress/a11y';
-
-/**
- * Internal dependencies
- */
 import ContrastChecker from '../';
 
 jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );

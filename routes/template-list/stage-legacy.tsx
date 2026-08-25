@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useParams,
 	useNavigate,
@@ -19,10 +16,6 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { layout } from '@wordpress/icons';
 import { unlock } from '@wordpress/routes-lock-unlock';
-
-/**
- * Internal dependencies
- */
 import {
 	DEFAULT_VIEW_LEGACY,
 	getActiveViewOverridesForTabLegacy,
@@ -33,11 +26,9 @@ import { authorField } from './fields/author';
 import { descriptionField } from './fields/description';
 import { useTemplatesLegacy } from './use-templates-legacy';
 import AddNewTemplate from './add-new-template';
-
 // Unlock WordPress private APIs
 const { usePostActions, templateTitleField } = unlock( editorPrivateApis );
 const { Tabs } = unlock( componentsPrivateApis );
-
 /**
  * Style dependencies
  */

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	hasBlockSupport,
@@ -20,11 +17,8 @@ import {
 	unseen,
 	blockDefault as blockDefaultIcon,
 } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
+import { groupBlocks } from '../../utils/group-blocks';
 import { unlock } from '../../lock-unlock';
 
 const getTransformCommands = () =>
@@ -150,23 +144,29 @@ const getTransformCommands = () =>
 
 const getQuickActionsCommands = () =>
 	function useQuickActionsCommands() {
-		const { clientIds, isUngroupable, isGroupable } = useSelect(
-			( select ) => {
-				const {
-					getSelectedBlockClientIds,
-					isUngroupable: _isUngroupable,
-					isGroupable: _isGroupable,
-				} = select( blockEditorStore );
-				const selectedBlockClientIds = getSelectedBlockClientIds();
+		const {
+			clientIds,
+			isUngroupable,
+			isGroupable,
+			blockVisibilitySetting,
+		} = useSelect( ( select ) => {
+			const {
+				getSelectedBlockClientIds,
+				getSettings,
+				isUngroupable: _isUngroupable,
+				isGroupable: _isGroupable,
+			} = select( blockEditorStore );
+			const selectedBlockClientIds = getSelectedBlockClientIds();
 
-				return {
-					clientIds: selectedBlockClientIds,
-					isUngroupable: _isUngroupable(),
-					isGroupable: _isGroupable(),
-				};
-			},
-			[]
-		);
+			return {
+				clientIds: selectedBlockClientIds,
+				isUngroupable: _isUngroupable(),
+				isGroupable: _isGroupable(),
+				blockVisibilitySetting:
+					getSettings().__experimentalFeatures?.blockVisibility
+						?.allowEditing,
+			};
+		}, [] );
 		const {
 			canInsertBlockType,
 			getBlockRootClientId,
@@ -196,8 +196,7 @@ const getQuickActionsCommands = () =>
 
 			const groupingBlockName = getGroupingBlockName();
 
-			// Activate the `transform` on `core/group` which does the conversion.
-			const newBlocks = switchToBlockType( blocks, groupingBlockName );
+			const newBlocks = groupBlocks( blocks, groupingBlockName );
 
 			if ( ! newBlocks ) {
 				return;
@@ -310,7 +309,11 @@ const getQuickActionsCommands = () =>
 			( id ) => getBlockEditingMode( id ) === 'default'
 		);
 
-		if ( supportsVisibility && allBlocksDefaultMode ) {
+		if (
+			supportsVisibility &&
+			allBlocksDefaultMode &&
+			blockVisibilitySetting !== false
+		) {
 			const hasHiddenBlock = clientIds.some( ( id ) =>
 				isBlockHiddenAnywhere( id )
 			);

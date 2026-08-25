@@ -25,8 +25,11 @@ $z-layers: (
 	".components-drop-zone": 40,
 	".components-drop-zone__content": 50,
 
-	// The floated blocks should be above the other blocks to allow selection.
-	"{core/image aligned left or right} .wp-block": 21,
+	// The floated blocks should be above adjacent blocks (`z-index: auto`) to
+	// allow selection, and above in-block UI like resize handles (2), but below
+	// sticky/fixed blocks (10) so they don't cover them when scrolling, as
+	// happens on the front end where floated blocks have no z-index.
+	"{core/image aligned left or right} .wp-block": 9,
 
 	// Needs to be below media library that has a z-index of 160000.
 	"{core/video track editor popover}": 160000 - 10,
@@ -74,6 +77,7 @@ $z-layers: (
 	".components-popover": 1000000,
 
 	// Should be above the popover (dropdown)
+	".components-confirm-dialog": 1000001,
 	".reusable-blocks-menu-items__convert-modal": 1000001,
 	".patterns-menu-items__convert-modal": 1000001,
 	".fields-create-template-part-modal": 1000001,
@@ -91,9 +95,6 @@ $z-layers: (
 	".editor-sync-connection-error-modal": 1000001,
 	".media-editor-modal__footer": 1000001,
 	".components-snackbar-list.media-editor-modal__snackbar": 1000001,
-
-	// Note: The ConfirmDialog component's z-index is being set to 1000001 in packages/components/src/confirm-dialog/styles.ts
-	// because it uses emotion and not sass. We need it to render on top its parent popover.
 
 	// Show media replace flow and similar popovers beneath the media modal when its open.
 	".components-popover.block-editor-media-replace-flow__options": 99999,

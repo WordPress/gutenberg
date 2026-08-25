@@ -1,9 +1,5 @@
 # Theme
 
-<div class="callout callout-alert">
-This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
-
 A theming package that's part of the WordPress Design System. It has two parts:
 
 -   **Design Tokens**: A comprehensive system of design tokens for colors, spacing, typography, and more.
@@ -106,9 +102,27 @@ function App() {
 The `color` prop accepts an object with the following optional properties:
 
 -   `primary`: The primary/accent seed color (default: `'#3858e9'`).
--   `background`: The background seed color (default: `'#f8f8f8'`).
+-   `background`: The background seed color (default: `'#fcfcfc'`).
 
 Both properties accept a fully opaque sRGB-parseable string: a hex value (e.g. `#3858e9`), an `rgb()`/`rgba()` string, or a CSS named color (e.g. `'blue'`). Non-opaque alpha values, `transparent`, and other CSS color spaces (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted and will throw an error. The theme system automatically generates appropriate color ramps and determines light/dark mode based on these seed colors.
+
+Use `onColorWarnings` to receive structured warnings after the provider calculates its colors. Warnings identify generated ramp steps or semantic foreground/background pairs that do not meet their contrast targets:
+
+```js
+<ThemeProvider
+	color={ {
+		primary: '#608010',
+		background: '#4f386e',
+	} }
+	onColorWarnings={ ( warnings ) => {
+		// Format or display the warnings for your users.
+	} }
+>
+	{ /* Your app content */ }
+</ThemeProvider>
+```
+
+The callback receives an empty array when all checked targets are met. Ramp warnings identify the affected ramp and step. Contrast warnings identify the semantic foreground/background token pair and include the required and achieved contrast values. React may invoke the callback more than once in development under Strict Mode.
 
 The `cursor` prop accepts an object with the following optional properties:
 
@@ -116,7 +130,7 @@ The `cursor` prop accepts an object with the following optional properties:
 
 The `cornerRadius` prop sets the overall roundness preset for the theme subtree. Accepts `'none'` (square corners), `'subtle'`, `'moderate'`, or `'pronounced'` (most rounded) (default: `'subtle'`). This scales the primitive `--wpds-border-radius-*` tokens for the provider subtree. The preset sets the overall amount of roundness, not an individual border-radius token size.
 
-When the `color`, `cursor`, or `cornerRadius` prop is omitted, the theme inherits the value from the closest parent `ThemeProvider`, or uses the default value if none is inherited.
+When a setting is omitted, it inherits from the closest parent `ThemeProvider`. If there is no parent value, the prebuilt defaults from the design-tokens stylesheet apply.
 
 `ThemeProvider` does not accept wrapper customization props such as `className`, `style`, `as`, `render`, or `ref`.
 

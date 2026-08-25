@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * Internal dependencies
- */
 import useDispatch from '../use-dispatch';
 import createReduxStore from '../../../redux-store';
 import { createRegistry } from '../../../registry';

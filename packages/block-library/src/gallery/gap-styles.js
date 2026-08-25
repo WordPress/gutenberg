@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalGetGapCSSValue as getGapCSSValue,
 	privateApis as blockEditorPrivateApis,
@@ -10,10 +7,6 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 
 const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
@@ -27,10 +20,6 @@ import { link as linkIcon, removeSubmenu } from '@wordpress/icons';
 import { speak } from '@wordpress/a11y';
 import { createBlock } from '@wordpress/blocks';
 import { useMergeRefs, usePrevious } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { ItemSubmenuIcon } from './icons';
 import {
 	Controls,

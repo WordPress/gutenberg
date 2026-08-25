@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { lock } from './lock-unlock';
 import subscribeDelegatedListener from './utils/subscribe-delegated-listener';
 

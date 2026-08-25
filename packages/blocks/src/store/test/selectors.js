@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import deepFreeze from 'deep-freeze';
-
-/**
- * WordPress dependencies
- */
 import { RichTextData } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import {
 	getBlockSupport,
 	getChildBlockNames,

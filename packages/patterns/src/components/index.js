@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { BlockSettingsMenuControls } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import PatternConvertButton from './pattern-convert-button';
 import PatternsManageButton from './patterns-manage-button';
 

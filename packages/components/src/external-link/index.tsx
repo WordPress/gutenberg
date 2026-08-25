@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { __, isRTL } from '@wordpress/i18n';
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { ExternalLinkProps } from './types';
 import type { WordPressComponentProps } from '../context';
 

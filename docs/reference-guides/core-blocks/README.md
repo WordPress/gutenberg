@@ -25,7 +25,7 @@ Displays a foldable layout that groups content in collapsible sections.
 -	**Name:** [core/accordion](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-accordion/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Allowed Blocks:** core/accordion-item
--	**Supports:** align (full, wide), anchor, ariaLabel, background (backgroundImage, backgroundSize), color (background, gradients, text), contentRole, interactivity, layout, listView, shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), anchor, ariaLabel, background (backgroundImage, backgroundSize, gradient), color (background, gradients, text), contentRole, interactivity, layout, listView, shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** autoclose, headingLevel, iconPosition, levelOptions, showIcon
 
 ## Accordion Heading
@@ -92,7 +92,7 @@ Reuse this design across your site.
 
 -	**Name:** [core/block](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-reusable/core-block-block/)
 -	**Category:** [reusable](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-reusable/)
--	**Supports:** interactivity (clientNavigation), ~~customCSS~~, ~~customClassName~~, ~~html~~, ~~inserter~~, ~~renaming~~
+-	**Supports:** interactivity (clientNavigation), ~~customCSS~~, ~~customClassName~~, ~~html~~, ~~inserter~~, ~~renaming~~, ~~visibility~~
 -	**Attributes:** content, ref
 
 ## Breadcrumbs
@@ -304,7 +304,7 @@ Add an image or video with a text overlay.
 -	**Name:** [core/cover](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-cover/)
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
 -	**Supports:** align, allowedBlocks, anchor, color (heading, text, ~~background~~, ~~enableContrastChecker~~), dimensions (aspectRatio), filter (duotone), interactivity (clientNavigation), layout (~~allowJustification~~), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** alt, backgroundType, contentPosition, customGradient, customOverlayColor, dimRatio, focalPoint, gradient, hasParallax, id, isDark, isRepeated, isUserOverlayColor, minHeight, minHeightUnit, overlayColor, poster, sizeSlug, tagName, templateLock, url, useFeaturedImage
+-	**Attributes:** allowedVideoProviders, alt, backgroundType, contentPosition, customGradient, customOverlayColor, dimRatio, focalPoint, gradient, hasParallax, id, isDark, isRepeated, isUserOverlayColor, minHeight, minHeightUnit, overlayColor, poster, sizeSlug, tagName, templateLock, url, useFeaturedImage
 
 ## Details
 
@@ -482,7 +482,7 @@ An organized collection of items displayed in a specific order.
 -	**Name:** [core/list](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-list/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
 -	**Allowed Blocks:** core/list-item
--	**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), interactivity (clientNavigation), listView, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), listView, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** ordered, placeholder, reversed, start, type, values
 
 ## List Item
@@ -534,7 +534,7 @@ Your site doesn’t include support for this block.
 
 ## More
 
-Content before this block will be shown in the excerpt on your archives page.
+Content before this block is shown in the excerpt on blog and archive pages. Where a theme shows the full content instead, visitors get a “Read more” link to the rest of the post.
 
 -	**Name:** [core/more](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-more/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -633,18 +633,16 @@ Show a block pattern.
 Embed a simple playlist.
 
 -	**Name:** [core/playlist](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-playlist/)
--	**Experimental:** true
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
 -	**Allowed Blocks:** core/playlist-track
 -	**Supports:** align, anchor, color (background, gradients, link, text), interactivity, spacing (margin, padding), typography (fontSize)
--	**Attributes:** caption, order, showArtists, showImages, showNumbers, showTrackLength, showTracklist, type, waveformStyle
+-	**Attributes:** caption, order, showArtists, showImages, showNumbers, showPlayButtonArtwork, showTrackLength, showTracklist, type, waveformBackgroundColor, waveformBackgroundGradient, waveformColor, waveformGradient, waveformStyle
 
 ## Playlist track
 
 Playlist track.
 
 -	**Name:** [core/playlist-track](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-playlist-track/)
--	**Experimental:** true
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
 -	**Parent:** core/playlist
 -	**Supports:** interactivity (clientNavigation), ~~html~~, ~~reusable~~
@@ -717,7 +715,7 @@ Displays the contents of a post or page.
 
 -	**Name:** [core/post-content](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-content/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
--	**Supports:** align (full, wide), anchor, background (backgroundImage, backgroundSize), color (background, gradients, heading, link, text), dimensions (minHeight), interactivity (clientNavigation), layout, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, heading, link, text), dimensions (minHeight), interactivity (clientNavigation), layout, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** tagName
 
 ## Date
@@ -807,7 +805,7 @@ Give special visual emphasis to a quote from your text.
 
 -	**Name:** [core/pullquote](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-pullquote/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
--	**Supports:** align (full, left, right, wide), anchor, background (backgroundImage, backgroundSize), color (background, gradients, link, text), dimensions (minHeight), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign)
+-	**Supports:** align (full, left, right, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), dimensions (minHeight), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign)
 -	**Attributes:** citation, value
 
 ## Query Loop
@@ -816,7 +814,7 @@ An advanced block that allows displaying post types based on different query par
 
 -	**Name:** [core/query](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-query/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
--	**Supports:** align (full, wide), anchor, interactivity, layout, ~~html~~
+-	**Supports:** align (full, wide), anchor, interactivity, layout, spacing (blockGap), ~~html~~
 -	**Attributes:** enhancedPagination, namespace, query, queryId, tagName
 
 ## No Results
@@ -894,7 +892,7 @@ Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Ju
 
 -	**Name:** [core/quote](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-quote/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
--	**Supports:** align (full, left, right, wide), allowedBlocks, anchor, background (backgroundImage, backgroundSize), color (background, gradients, heading, link, text), dimensions (minHeight), interactivity (clientNavigation), layout (~~allowEditing~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, left, right, wide), allowedBlocks, anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, heading, link, text), dimensions (minHeight), interactivity (clientNavigation), layout (~~allowEditing~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** citation, textAlign, value
 
 ## Read More
@@ -1003,7 +1001,6 @@ Add white space between blocks and customize its height.
 Display the tab buttons for a tabbed interface.
 
 -	**Name:** [core/tab-list](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tab-list/)
--	**Experimental:** true
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Parent:** core/tabs
 -	**Supports:** ariaLabel, color (background, text), layout (default, ~~allowOrientation~~, ~~allowVerticalAlignment~~, ~~allowWrap~~), spacing (blockGap, padding), typography (fontSize), ~~html~~, ~~lock~~, ~~visibility~~
@@ -1014,7 +1011,6 @@ Display the tab buttons for a tabbed interface.
 Content for a tab in a tabbed interface.
 
 -	**Name:** [core/tab-panel](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tab-panel/)
--	**Experimental:** true
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Parent:** core/tab-panels
 -	**Supports:** anchor, color (background, text), layout, spacing (blockGap, padding), typography (fontSize), ~~html~~, ~~visibility~~
@@ -1025,7 +1021,6 @@ Content for a tab in a tabbed interface.
 Container for tab panel content in a tabbed interface.
 
 -	**Name:** [core/tab-panels](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tab-panels/)
--	**Experimental:** true
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Parent:** core/tabs
 -	**Allowed Blocks:** core/tab-panel
@@ -1055,7 +1050,6 @@ Summarize your post with a list of headings. Add HTML anchors to Heading blocks 
 Display content in a tabbed interface to help users navigate detailed content with ease.
 
 -	**Name:** [core/tabs](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tabs/)
--	**Experimental:** true
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Allowed Blocks:** core/tab-list, core/tab-panels
 -	**Supports:** align, anchor, color (background, text), interactivity, layout (~~allowEditing~~), spacing (blockGap, margin, padding), typography (fontSize), ~~html~~
@@ -1102,8 +1096,8 @@ Displays the name of a taxonomy term.
 
 -	**Name:** [core/term-name](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-term-name/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
--	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** isLink, level, levelOptions, textAlign
+-	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (padding), typography (fontSize, lineHeight, textAlign), ~~html~~
+-	**Attributes:** isLink, level, levelOptions
 
 ## Term Template
 
