@@ -1,4 +1,4 @@
-// Prepended to every task, so an agent does not spend its turns trying to build
+// Prepended to every task, so an agent does not waste tokens trying to build
 // or boot an environment the workspace does not have.
 const workspaceNotice = `This task runs in an isolated evaluation workspace and
 npm is not available. Do not try to build. Do not start or try to start wp-env,

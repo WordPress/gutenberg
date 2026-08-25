@@ -1,10 +1,5 @@
 /**
  * Setup shared by every evaluation spec.
- *
- * Promptfoo runs a matrix of prompt x provider x test case, repeated, and
- * grades each result against that case's assertions. The keys below configure
- * everything except what a suite is actually asking for, so a spec spreads this
- * and adds only its own description, prompts and tests.
  */
 import defaultTest from './default-test.js';
 
@@ -12,8 +7,7 @@ import defaultTest from './default-test.js';
 export default {
 	// Promptfoo records an OpenTelemetry trace of each row: the tools the agent
 	// invoked and the shell commands it ran. `trajectory:*` assertions match
-	// against that trace, so without a receiver running they have nothing to
-	// read. The receiver is local and lives only for the run.
+	// against that trace.
 	tracing: {
 		enabled: true,
 		failOnReceiverStartFailure: true,
@@ -49,10 +43,6 @@ export default {
 				// Only project-level instructions, so the developer's own
 				// ~/.claude guidance cannot leak into the subject.
 				setting_sources: [ 'project' ],
-				// Enable every skill the workspace discovers. Omitting this is not
-				// "skills off" — it leaves the SDK unconfigured, and the
-				// repository's skills then go unlisted, which is indistinguishable
-				// from an agent choosing to ignore them.
 				skills: 'all',
 				// Use Bash for reads so Promptfoo represents file access as command
 				// trajectory steps, which assertions can match.
@@ -66,6 +56,7 @@ export default {
 					'Task',
 					'Skill',
 				],
+				// We want to limit the test to only accessing the repo.
 				disallowed_tools: [ 'WebFetch', 'WebSearch' ],
 			},
 		},
@@ -75,8 +66,7 @@ export default {
 	// to each prompt, and the provider that grades `agent-rubric` assertions.
 	defaultTest,
 
-	// Run-level controls. `repeat` matters more than it looks: an agent is
-	// non-deterministic, so a single row is an anecdote rather than a result.
+	// Run-level controls.
 	evaluateOptions: {
 		timeoutMs: 180000,
 		cache: false,

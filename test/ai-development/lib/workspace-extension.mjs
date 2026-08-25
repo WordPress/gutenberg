@@ -58,9 +58,6 @@ async function generateNativeSkills( workspace ) {
 	try {
 		await setupSkills( { repositoryRoot: workspace } );
 	} catch ( error ) {
-		// Failing loudly matters here: a workspace without the generated view
-		// still runs, and every suite would report an agent ignoring guidance
-		// it was never offered.
 		throw new Error(
 			`Could not generate .claude/skills from .agents/skills in the workspace.\n${ error.message }`
 		);
@@ -70,9 +67,7 @@ async function generateNativeSkills( workspace ) {
 /**
  * Resolves what a workspace should be built from.
  *
- * A plain run measures what you are working on, uncommitted edits included —
- * otherwise trying a change to a skill or an `AGENTS.md` would mean committing
- * it first just to find out whether it helped.
+ * A plain run measures what you are working on, uncommitted edits included.
  *
  * Naming a ref means measuring that commit, so a comparison stays a comparison
  * of commits and the working tree cannot leak into a row labelled `trunk`.
