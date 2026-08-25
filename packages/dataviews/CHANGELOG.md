@@ -23,6 +23,7 @@
 
 -   Update `@ariakit/react` to 0.4.37 ([#81080](https://github.com/WordPress/gutenberg/pull/81080)).
 -   DataViews: Replace the private `Menu` from `@wordpress/components` with the `Menu` from `@wordpress/ui` in the item actions, list layout, column header, add-filter, and layout switcher menus. ([#81783](https://github.com/WordPress/gutenberg/pull/81783))
+-   Declare the third-party and `@wordpress/hooks` dependencies imported by the `./wp` bundle (`build-wp/index.js`) so they resolve without relying on hoisting. ([#81843](https://github.com/WordPress/gutenberg/pull/81843))
 -   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509), [#81514](https://github.com/WordPress/gutenberg/pull/81514), [#81516](https://github.com/WordPress/gutenberg/pull/81516))
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81515](https://github.com/WordPress/gutenberg/pull/81515))
 -   DataForm: Narrow the combobox control's `onChange` handler parameter back to `string | null`, following the upstream `ComboboxControl` type fix that removed the accidental `undefined` from the callback type. [#81568](https://github.com/WordPress/gutenberg/pull/81568)
