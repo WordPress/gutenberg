@@ -1,7 +1,7 @@
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
-import { group, row, stack, grid } from '@wordpress/icons';
+import { gallery, group, row, stack, grid } from '@wordpress/icons';
 import { _x } from '@wordpress/i18n';
 import { useConvertToGroupButtonProps } from '../convert-to-group-buttons';
 import { store as blockEditorStore } from '../../store';
@@ -19,12 +19,25 @@ function BlockGroupToolbar() {
 		useConvertToGroupButtonProps();
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 
-	const { canRemove, variations } = useSelect(
+	const { canTransformToGallery, canRemove, variations } = useSelect(
 		( select ) => {
-			const { canRemoveBlocks } = select( blockEditorStore );
+			const {
+				canRemoveBlocks,
+				getBlockRootClientId,
+				getBlockTransformItems,
+			} = select( blockEditorStore );
 			const { getBlockVariations } = select( blocksStore );
 
+			const rootClientId = getBlockRootClientId( blocksSelection[ 0 ] );
+			const possibleBlockTransformations = getBlockTransformItems(
+				blocksSelection,
+				rootClientId
+			);
 			return {
+				canTransformToGallery: possibleBlockTransformations.some(
+					( { name, isDisabled } ) =>
+						name === 'core/gallery' && ! isDisabled
+				),
 				canRemove: canRemoveBlocks( clientIds ),
 				variations: getBlockVariations(
 					groupingBlockName,
@@ -32,8 +45,16 @@ function BlockGroupToolbar() {
 				),
 			};
 		},
-		[ clientIds, groupingBlockName ]
+		[ blocksSelection, clientIds, groupingBlockName ]
 	);
+
+	const onConvertToGallery = () => {
+		const newBlocks = switchToBlockType( blocksSelection, 'core/gallery' );
+
+		if ( newBlocks && newBlocks.length > 0 ) {
+			replaceBlocks( clientIds, newBlocks );
+		}
+	};
 
 	const onConvertToGroup = ( layout ) => {
 		const newBlocks = groupBlocks( blocksSelection, groupingBlockName );
@@ -74,6 +95,16 @@ function BlockGroupToolbar() {
 
 	return (
 		<ToolbarGroup>
+			{ canTransformToGallery && (
+				<ToolbarButton
+					icon={ gallery }
+					label={ _x(
+						'Gallery',
+						'action: convert blocks to gallery'
+					) }
+					onClick={ onConvertToGallery }
+				/>
+			) }
 			<ToolbarButton
 				icon={ group }
 				label={ _x( 'Group', 'action: convert blocks to group' ) }
