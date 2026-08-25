@@ -102,7 +102,7 @@ Display a breadcrumb trail showing the path to the current page.
 -	**Name:** [core/breadcrumbs](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-breadcrumbs/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
 -	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** prefersTaxonomy, separator, showCurrentItem, showHomeItem, showOnHomePage
+-	**Attributes:** prefersTaxonomy, separator, showCurrentItem, showHomeItem, showOnHomePage, showTaxonomy
 
 ## Button
 

@@ -19,6 +19,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `showHomeItem` | `boolean` | `true` | — |
 | `showCurrentItem` | `boolean` | `true` | — |
 | `showOnHomePage` | `boolean` | `false` | — |
+| `showTaxonomy` | `boolean` | `true` | — |
 
 ## Supports
 

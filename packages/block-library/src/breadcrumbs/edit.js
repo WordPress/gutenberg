@@ -30,6 +30,7 @@ export default function BreadcrumbEdit( {
 		showCurrentItem,
 		prefersTaxonomy,
 		showOnHomePage,
+		showTaxonomy,
 	} = attributes;
 	const {
 		post,
@@ -136,7 +137,9 @@ export default function BreadcrumbEdit( {
 	let _showTerms;
 	// Some non-hierarchical post types (e.g., attachments) can have parents.
 	// Use hierarchical breadcrumbs if a parent exists, otherwise use taxonomy breadcrumbs.
-	if ( ! isPostTypeHierarchical && ! post?.parent ) {
+	if ( ! showTaxonomy ) {
+		_showTerms = false;
+	} else if ( ! isPostTypeHierarchical && ! post?.parent ) {
 		_showTerms = true;
 	} else if ( ! postTypeHasTaxonomies ) {
 		// Hierarchical post type without taxonomies can only use ancestors.
@@ -166,7 +169,7 @@ export default function BreadcrumbEdit( {
 			placeholderItems.push( __( 'Page' ) );
 		} else if ( _showTerms ) {
 			placeholderItems.push( __( 'Category' ) );
-		} else {
+		} else if ( isPostTypeHierarchical || post?.parent ) {
 			placeholderItems.push( __( 'Ancestor' ), __( 'Parent' ) );
 		}
 		placeholder = (
@@ -206,6 +209,7 @@ export default function BreadcrumbEdit( {
 							separator: separatorDefaultValue,
 							showHomeItem: true,
 							showCurrentItem: true,
+							showTaxonomy: true,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -244,6 +248,24 @@ export default function BreadcrumbEdit( {
 								setAttributes( { showCurrentItem: value } )
 							}
 							checked={ showCurrentItem }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={ __( 'Show taxonomy breadcrumb' ) }
+						isShownByDefault
+						hasValue={ () => ! showTaxonomy }
+						onDeselect={ () =>
+							setAttributes( {
+								showTaxonomy: true,
+							} )
+						}
+					>
+						<ToggleControl
+							label={ __( 'Show taxonomy breadcrumb' ) }
+							onChange={ ( value ) =>
+								setAttributes( { showTaxonomy: value } )
+							}
+							checked={ showTaxonomy }
 						/>
 					</ToolsPanelItem>
 					<ToolsPanelItem

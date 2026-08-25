@@ -107,12 +107,14 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		// Some non-hierarchical post types (e.g., attachments) can have parents.
 		// Use hierarchical breadcrumbs if a parent exists, otherwise use taxonomy breadcrumbs.
 		$show_terms = false;
-		if ( ! is_post_type_hierarchical( $post_type ) && ! $post_parent ) {
-			$show_terms = true;
-		} elseif ( empty( get_object_taxonomies( $post_type, 'objects' ) ) ) {
-			$show_terms = false;
-		} else {
-			$show_terms = $attributes['prefersTaxonomy'];
+		if ( isset( $attributes['showTaxonomy'] ) ? $attributes['showTaxonomy'] : true ) {
+			if ( ! is_post_type_hierarchical( $post_type ) && ! $post_parent ) {
+				$show_terms = true;
+			} elseif ( empty( get_object_taxonomies( $post_type, 'objects' ) ) ) {
+				$show_terms = false;
+			} else {
+				$show_terms = $attributes['prefersTaxonomy'];
+			}
 		}
 
 		// Add post type archive link if applicable.
