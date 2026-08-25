@@ -206,7 +206,8 @@ export default function TableCellEdit( {
 		);
 	}, [ selectionRectangle ] );
 
-	// Check if merge is possible.
+	// Check if merge is possible. Merged cells in the selection are split
+	// before merging, so any rectangular same-section selection can merge.
 	const canMerge = useMemo( () => {
 		if ( ! isCellSetSelection || ! selectionRectangle ) {
 			return false;
@@ -218,20 +219,8 @@ export default function TableCellEdit( {
 		const sectionTypes = new Set(
 			selectionRectangle.selectedPlacements.map( ( p ) => p.sectionType )
 		);
-		if ( sectionTypes.size > 1 ) {
-			return false;
-		}
-		// No selected cell can already be merged.
-		return ! selectionRectangle.selectedPlacements.some( ( p ) => {
-			const cell = registry
-				.select( blockEditorStore )
-				.getBlock( p.clientId );
-			return (
-				( cell?.attributes?.rowSpan || 1 ) > 1 ||
-				( cell?.attributes?.colSpan || 1 ) > 1
-			);
-		} );
-	}, [ isCellSetSelection, selectionRectangle, registry ] );
+		return sectionTypes.size === 1;
+	}, [ isCellSetSelection, selectionRectangle ] );
 
 	function onSelectRow() {
 		if ( ! selectedCellPlacement ) {
@@ -272,56 +261,73 @@ export default function TableCellEdit( {
 			return;
 		}
 
-		// Find the top-left cell.
-		const mergedPlacement = selectionRectangle.selectedPlacements.find(
-			( p ) =>
-				p.rowIndex === selectionRectangle.startRow &&
-				p.columnIndex === selectionRectangle.startColumn
-		);
-		if ( ! mergedPlacement ) {
-			return;
-		}
+		const { startRow, endRow, startColumn, endColumn } = selectionRectangle;
 
-		const mergedClientId = mergedPlacement.clientId;
-		const nextRowSpan =
-			selectionRectangle.endRow - selectionRectangle.startRow + 1;
-		const nextColSpan =
-			selectionRectangle.endColumn - selectionRectangle.startColumn + 1;
-
-		// Client IDs to remove (all selected except the merged cell).
-		const removedClientIds = new Set(
-			selectedClientIds.filter( ( id ) => id !== mergedClientId )
-		);
-
-		// Remove the other cells from their parent row blocks.
-		const { getBlockRootClientId, getBlocks } =
-			registry.select( blockEditorStore );
-		const rowsToUpdate = new Map();
-
-		for ( const clientIdToRemove of removedClientIds ) {
-			const rowClientId = getBlockRootClientId( clientIdToRemove );
-			if ( rowClientId ) {
-				if ( ! rowsToUpdate.has( rowClientId ) ) {
-					rowsToUpdate.set( rowClientId, [] );
-				}
-				rowsToUpdate.get( rowClientId ).push( clientIdToRemove );
-			}
-		}
-
-		// Batch the span update and cell removals into a single undo level.
+		// Batch the splits, span update, and cell removals into a single
+		// undo level.
 		registry.batch( () => {
-			updateBlockAttributes( mergedClientId, {
-				rowSpan: nextRowSpan,
-				colSpan: nextColSpan,
+			// Split merged cells in the selection first, so the rectangle
+			// contains only single cells.
+			for ( const placement of selectionRectangle.selectedPlacements ) {
+				if ( placement.rowSpan > 1 || placement.colSpan > 1 ) {
+					splitCell( placement.clientId );
+				}
+			}
+
+			// Recompute placements after the splits.
+			const selectors = registry.select( blockEditorStore );
+			const freshPlacements = getCellPlacements(
+				selectors.getBlocks( tableClientId )
+			);
+
+			// The top-left cell becomes the merged cell.
+			const mergedPlacement = freshPlacements.find(
+				( p ) =>
+					p.rowIndex === startRow && p.columnIndex === startColumn
+			);
+			if ( ! mergedPlacement ) {
+				return;
+			}
+
+			// Remove every other cell starting within the rectangle,
+			// including cells created by the splits.
+			const removedClientIds = new Set(
+				freshPlacements
+					.filter(
+						( p ) =>
+							p.rowIndex >= startRow &&
+							p.rowIndex <= endRow &&
+							p.columnIndex >= startColumn &&
+							p.columnIndex <= endColumn &&
+							p.clientId !== mergedPlacement.clientId
+					)
+					.map( ( p ) => p.clientId )
+			);
+
+			const rowsToUpdate = new Map();
+			for ( const clientIdToRemove of removedClientIds ) {
+				const rowClientId =
+					selectors.getBlockRootClientId( clientIdToRemove );
+				if ( rowClientId ) {
+					if ( ! rowsToUpdate.has( rowClientId ) ) {
+						rowsToUpdate.set( rowClientId, [] );
+					}
+					rowsToUpdate.get( rowClientId ).push( clientIdToRemove );
+				}
+			}
+
+			updateBlockAttributes( mergedPlacement.clientId, {
+				rowSpan: endRow - startRow + 1,
+				colSpan: endColumn - startColumn + 1,
 			} );
 			for ( const [ rowClientId, cellsToRemove ] of rowsToUpdate ) {
-				const rowBlock = getBlocks( rowClientId );
-				const nextCells = rowBlock.filter(
+				const rowCells = selectors.getBlocks( rowClientId );
+				const nextCells = rowCells.filter(
 					( cell ) => ! cellsToRemove.includes( cell.clientId )
 				);
 				replaceInnerBlocks( rowClientId, nextCells, false );
 			}
-			selectBlock( mergedClientId );
+			selectBlock( mergedPlacement.clientId );
 		} );
 	}
 
