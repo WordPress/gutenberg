@@ -283,6 +283,7 @@ describe( 'PaletteEdit', () => {
 			expect(
 				within( group ).queryByRole( 'option' )
 			).not.toBeInTheDocument();
+			expect( swatch.tagName ).toBe( 'BUTTON' );
 			expect( swatch ).not.toHaveAttribute( 'aria-pressed' );
 
 			await click( swatch );
@@ -291,6 +292,33 @@ describe( 'PaletteEdit', () => {
 			).toBeVisible();
 		}
 	);
+
+	it( 'tabs between command swatches and opens one with Space', async () => {
+		render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
+
+		const primary = screen.getByRole( 'button', { name: 'Primary' } );
+		const secondary = screen.getByRole( 'button', { name: 'Secondary' } );
+		primary.focus();
+
+		await press.Tab();
+		expect( secondary ).toHaveFocus();
+
+		await press.Space();
+		expect(
+			screen.getByRole( 'textbox', { name: 'Hex color' } )
+		).toBeVisible();
+	} );
+
+	it( 'opens a command swatch with Enter', async () => {
+		render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
+
+		screen.getByRole( 'button', { name: 'Primary' } ).focus();
+		await press.Enter();
+
+		expect(
+			screen.getByRole( 'textbox', { name: 'Hex color' } )
+		).toBeVisible();
+	} );
 
 	it( 'shows empty message', () => {
 		render(

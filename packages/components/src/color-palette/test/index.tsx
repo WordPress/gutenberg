@@ -8,6 +8,10 @@ const EXAMPLE_COLORS = [
 	{ name: 'green', color: '#0f0' },
 	{ name: 'blue', color: '#00f' },
 ];
+const DUPLICATE_COLOR_PALETTE = [
+	{ name: 'Dark Background', slug: 'dark-background', color: '#000' },
+	{ name: 'Dark Text', slug: 'dark-text', color: '#000' },
+];
 const INITIAL_COLOR = EXAMPLE_COLORS[ 0 ].color;
 
 const ControlledColorPalette = ( {
@@ -36,8 +40,9 @@ describe( 'ColorPalette', () => {
 		render(
 			<ColorPalette
 				aria-label="Colors"
-				colors={ EXAMPLE_COLORS }
-				value={ INITIAL_COLOR }
+				colors={ DUPLICATE_COLOR_PALETTE }
+				value="#000"
+				selectedSlug="dark-background"
 				onChange={ onChange }
 				presentation="command-buttons"
 				disableCustomColors
@@ -45,13 +50,15 @@ describe( 'ColorPalette', () => {
 			/>
 		);
 
-		const red = screen.getByRole( 'button', { name: 'red' } );
+		const darkBackground = screen.getByRole( 'button', {
+			name: 'Dark Background',
+		} );
 		expect( screen.getByRole( 'group', { name: 'Colors' } ) ).toBeVisible();
 		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
-		expect( red ).not.toHaveAttribute( 'aria-pressed' );
+		expect( darkBackground ).not.toHaveAttribute( 'aria-pressed' );
 
-		await user.click( red );
-		expect( onChange ).toHaveBeenCalledWith( '#f00', 0, undefined );
+		await user.click( darkBackground );
+		expect( onChange ).toHaveBeenCalledWith( '#000', 0, 'dark-background' );
 	} );
 
 	it( 'should warn for asButtons and prefer an explicit presentation', () => {
@@ -73,6 +80,34 @@ describe( 'ColorPalette', () => {
 		expect( console ).toHaveWarnedWith(
 			'`asButtons` prop in wp.components.ColorPalette is deprecated since version 7.2. Please use `presentation` instead. Note: `asButtons={ true }` maps to `presentation="toggle-buttons"`. Explicit `presentation` takes precedence.'
 		);
+	} );
+
+	it( 'should preserve asButtons as a toggle-button alias', () => {
+		render(
+			<ColorPalette
+				aria-label="Colors"
+				colors={ DUPLICATE_COLOR_PALETTE }
+				value="#000"
+				selectedSlug="dark-background"
+				onChange={ jest.fn() }
+				asButtons
+				disableCustomColors
+				clearable={ false }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Dark Background',
+				pressed: true,
+			} )
+		).toBeVisible();
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Dark Text',
+				pressed: false,
+			} )
+		).toBeVisible();
 	} );
 
 	it( 'should render three color button options', () => {
@@ -334,11 +369,6 @@ describe( 'ColorPalette', () => {
 	} );
 
 	describe( 'duplicate colors in palette', () => {
-		const DUPLICATE_COLOR_PALETTE = [
-			{ name: 'Dark Background', slug: 'dark-background', color: '#000' },
-			{ name: 'Dark Text', slug: 'dark-text', color: '#000' },
-		];
-
 		it( 'should render all swatches even when two entries share the same color value', () => {
 			render(
 				<ColorPalette
