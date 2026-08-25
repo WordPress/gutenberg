@@ -1,9 +1,4 @@
 import { shortestCommonSupersequence } from './scs';
-import {
-	canonicalizeStyleElement,
-	getTargetMedia,
-	isUnmanagedPreloadLink,
-} from './async-styles';
 
 export type StyleElement = HTMLLinkElement | HTMLStyleElement;
 
@@ -39,11 +34,54 @@ export const normalizeMedia = ( element: StyleElement ): StyleElement => {
 };
 
 /**
+ * Compares a style element of the current document with one of a fetched page
+ * to check if they can be considered equivalent.
+ *
+ * Optimization plugins like WP Rocket, Jetpack Boost, Autoptimize, LiteSpeed
+ * Cache or Perfmatters defer style sheets with markup that mutates itself as
+ * soon as the resource has been downloaded:
+ *
+ * ```html
+ * <!-- Print trick. -->
+ * <link rel="stylesheet" href="x.css" media="print" onload="this.onload=null;this.media='all'">
+ * <!-- Media stored in a data attribute. -->
+ * <link rel="stylesheet" href="x.css" media="not all" data-media="all" onload="this.media=this.dataset.media">
+ * <!-- Preload that is turned into a style sheet. -->
+ * <link rel="preload" as="style" href="x.css" onload="this.onload=null;this.rel='stylesheet'">
+ * ```
+ *
+ * The elements of the current document have already mutated, while the markup
+ * of a fetched page has not, so `<link>` elements are compared by the URL they
+ * resolve to, and their `media` is only compared when the element of the
+ * fetched page doesn't carry an inline `onload` handler, i.e., when it is not
+ * going to mutate itself. The `rel` is not compared at all: a preload that
+ * turns itself into a style sheet, or one that has not turned yet, is the same
+ * style sheet.
+ *
+ * Note that the comparison is asymmetric, so the arguments must always be
+ * passed in the documented order.
+ *
+ * @param a Normalized `<style>` or `<link>` element of the current document.
+ * @param b Normalized `<style>` or `<link>` element of the fetched page.
+ * @return Whether they are considered equivalent.
+ */
+const areNodesEquivalent = ( a: StyleElement, b: StyleElement ): boolean => {
+	if ( a.localName === 'link' && b.localName === 'link' ) {
+		return (
+			( a as HTMLLinkElement ).href === ( b as HTMLLinkElement ).href &&
+			( a.media === b.media || b.hasAttribute( 'onload' ) )
+		);
+	}
+	return a.isEqualNode( b );
+};
+
+/**
  * Selector of the style elements handled by the router.
  *
- * Apart from the regular style sheets, it includes the preloads that turn
- * themselves into style sheets once they have been loaded, which are discarded
- * later if they are plain resource hints. Note that `[rel=stylesheet]` doesn't
+ * Apart from the regular style sheets, it includes the preloads that carry an
+ * inline `onload` handler, which is how they turn themselves into style sheets
+ * once they have been loaded. Plain `<link rel="preload">` resource hints are
+ * not style sheets and are left alone. Note that `[rel=stylesheet]` doesn't
  * match `rel="alternate stylesheet"`, which is intentionally excluded.
  */
 const styleElementsSelector =
@@ -86,91 +124,33 @@ const getRouterStyleMarker = (
 const getStyleElements = ( doc: Document ): StyleElement[] =>
 	Array.from(
 		doc.querySelectorAll< StyleElement >( styleElementsSelector )
-	).filter(
-		( element ) =>
-			! isUnmanagedPreloadLink( element ) &&
-			getRouterStyleMarker( element ) !== 'ignore'
-	);
+	).filter( ( element ) => getRouterStyleMarker( element ) !== 'ignore' );
 
 /**
- * Canonical representation of a style element, used to compare elements coming
- * from different documents.
+ * Prepares the passed style element of a fetched page to be inserted in the
+ * current document.
  *
- * `<link>` elements are identified by the URL they point to and the media they
- * end up applying to, so an element that an optimization plugin mutated in the
- * browser still matches its server-rendered markup. The rest of the elements,
- * and the links without a usable URL, fall back to comparing a normalized clone
- * of the node.
- */
-interface StyleDescriptor {
-	/** Canonical key of a `<link>` element, `null` when there is none. */
-	key: string | null;
-	/** Normalized clone, used when there is no canonical key. */
-	node: StyleElement;
-}
-
-/**
- * Returns the canonical key of the passed element, if it can be computed.
+ * A preload that turns itself into a style sheet on load is turned into one
+ * right away: the browser doesn't report a preload with a non-matching `media`
+ * as loaded, so the `media="preload"` sentinel would never resolve otherwise.
+ * The inline handler is kept, and the mutation it performs on load is handled
+ * by {@link prepareStylePromise|`prepareStylePromise`}.
  *
- * @param element `<style>` or `<link>` element.
- * @param baseUrl URL of the document the element belongs to, used to resolve
- *                relative URLs.
- * @return Canonical key, or `null` when the element is not a `<link>` or its
- * URL cannot be resolved.
+ * This function must only be called with the elements that the router adopts
+ * from a page it fetched, never with the elements of the current document,
+ * which are managed by the scripts that inserted them.
+ *
+ * @param element `<style>` or `<link>` element that the router adopts.
  */
-const getLinkKey = (
-	element: StyleElement,
-	baseUrl: string
-): string | null => {
-	if ( element.localName !== 'link' ) {
-		return null;
-	}
-	const href = element.getAttribute( 'href' );
-	if ( ! href ) {
-		return null;
-	}
-	try {
-		return `${ new URL( href, baseUrl ).href }|${ getTargetMedia(
-			element
-		) }`;
-	} catch {
-		return null;
+const adoptStyleElement = ( element: StyleElement ): void => {
+	if (
+		element.localName === 'link' &&
+		! ( element as HTMLLinkElement ).relList.contains( 'stylesheet' )
+	) {
+		element.setAttribute( 'rel', 'stylesheet' );
+		element.removeAttribute( 'as' );
 	}
 };
-
-/**
- * Returns the canonical descriptor of the passed style element.
- *
- * The passed element is never modified.
- *
- * @param element `<style>` or `<link>` element.
- * @param baseUrl URL of the document the element belongs to, used to resolve
- *                relative URLs.
- * @return Descriptor of the passed element.
- */
-const getStyleDescriptor = (
-	element: StyleElement,
-	baseUrl: string
-): StyleDescriptor => ( {
-	key: getLinkKey( element, baseUrl ),
-	node: normalizeMedia( element ),
-} );
-
-/**
- * Compares the passed descriptors to check if they refer to style elements that
- * can be considered equal.
- *
- * @param a Descriptor of a `<style>` or `<link>` element.
- * @param b Descriptor of a `<style>` or `<link>` element.
- * @return Whether they are considered equal.
- */
-const areDescriptorsEqual = (
-	a: StyleDescriptor,
-	b: StyleDescriptor
-): boolean =>
-	a.key !== null && b.key !== null
-		? a.key === b.key
-		: a.node.isEqualNode( b.node );
 
 /**
  * Style elements that are managed by the router.
@@ -229,23 +209,17 @@ const markInitialStylesAsManaged = async (): Promise< void > => {
 		const html = await res.text();
 		const doc = new window.DOMParser().parseFromString( html, 'text/html' );
 
-		// Descriptors of the elements of the server response, consumed as they
-		// are matched so each of them marks at most one element in the
-		// document.
-		const serverDescriptors = getStyleElements( doc ).map( ( element ) =>
-			getStyleDescriptor( element, url.href )
-		);
+		// Normalized elements of the server response, consumed as they are
+		// matched so each of them marks at most one element in the document.
+		const serverElements = getStyleElements( doc ).map( normalizeMedia );
 
 		getStyleElements( window.document ).forEach( ( element ) => {
-			const descriptor = getStyleDescriptor(
-				element,
-				window.document.baseURI
-			);
-			const index = serverDescriptors.findIndex( ( serverDescriptor ) =>
-				areDescriptorsEqual( descriptor, serverDescriptor )
+			const normalized = normalizeMedia( element );
+			const index = serverElements.findIndex( ( serverElement ) =>
+				areNodesEquivalent( normalized, serverElement )
 			);
 			if ( index !== -1 ) {
-				serverDescriptors.splice( index, 1 );
+				serverElements.splice( index, 1 );
 				managedStyles.add( element );
 			}
 		} );
@@ -280,19 +254,16 @@ export const initialStylesMarked: Promise< void > =
  * document (or the passed `parent` element) are in the correct order
  * and they are included in either X or Y.
  *
- * @param X       Base list of style elements, which belong to the current
- *                document.
- * @param Y       List of style elements.
- * @param parent  Optional parent element to append to the new style elements.
- * @param baseUrl Optional URL of the document the elements in Y come from, used
- *                to resolve their relative URLs.
+ * @param X      Base list of style elements, which belong to the current
+ *               document.
+ * @param Y      List of style elements.
+ * @param parent Optional parent element to append to the new style elements.
  * @return List of promises that resolve once the elements in Y are ready.
  */
 export function updateStylesWithSCS(
 	X: StyleElement[],
 	Y: StyleElement[],
-	parent: Element = window.document.head,
-	baseUrl: string = window.document.baseURI
+	parent: Element = window.document.head
 ) {
 	if ( X.length === 0 ) {
 		return Y.map( ( element ) => {
@@ -304,20 +275,17 @@ export function updateStylesWithSCS(
 		} );
 	}
 
-	// Create the descriptors used for comparison, computed only once as the
-	// algorithm below compares every element in X with every element in Y.
-	const xDescriptors = X.map( ( element ) =>
-		getStyleDescriptor( element, window.document.baseURI )
-	);
-	const yDescriptors = Y.map( ( element ) =>
-		getStyleDescriptor( element, baseUrl )
-	);
+	// Create normalized arrays for comparison.
+	const xNormalized = X.map( normalizeMedia );
+	const yNormalized = Y.map( normalizeMedia );
 
-	// The `scs` array contains descriptors.
+	// The `scs` array contains the normalized elements themselves, taken from
+	// `xNormalized` for the matched pairs and for the elements only in X, and
+	// from `yNormalized` for the elements only in Y.
 	const scs = shortestCommonSupersequence(
-		xDescriptors,
-		yDescriptors,
-		areDescriptorsEqual
+		xNormalized,
+		yNormalized,
+		areNodesEquivalent
 	);
 	const xLength = X.length;
 	const yLength = Y.length;
@@ -330,17 +298,11 @@ export function updateStylesWithSCS(
 		// Actual elements that will end up in the DOM.
 		const xElement = X[ xIndex ];
 		const yElement = Y[ yIndex ];
-		// Descriptors for comparison.
-		const xDescriptor = xDescriptors[ xIndex ];
-		const yDescriptor = yDescriptors[ yIndex ];
-		if (
-			xIndex < xLength &&
-			areDescriptorsEqual( xDescriptor, scsElement )
-		) {
-			if (
-				yIndex < yLength &&
-				areDescriptorsEqual( yDescriptor, scsElement )
-			) {
+		// Normalized elements for comparison.
+		const xNormEl = xNormalized[ xIndex ];
+		const yNormEl = yNormalized[ yIndex ];
+		if ( xIndex < xLength && scsElement === xNormEl ) {
+			if ( yIndex < yLength && areNodesEquivalent( xNormEl, yNormEl ) ) {
 				promises.push( prepareStylePromise( xElement ) );
 				yIndex++;
 			}
@@ -384,6 +346,13 @@ const stylePromiseCache = new WeakMap<
  * injects a `media="preload"` attribute to the passed element so the
  * style is loaded without applying any styles to the document.
  *
+ * The inline `onload` handler of an asynchronously loaded style sheet runs
+ * before the listener added here, as it was registered when the markup was
+ * parsed, and no style recalculation happens in between. The `media` it sets
+ * is therefore the media the style sheet is meant to apply to: it is stashed
+ * in `data-original-media`, and the `preload` sentinel is put back before the
+ * change can affect the document.
+ *
  * @param element Style element.
  * @return The associated `Promise` to the passed element.
  */
@@ -416,7 +385,18 @@ const prepareStylePromise = (
 	}
 
 	const promise = new Promise< HTMLLinkElement >( ( resolve, reject ) => {
-		element.addEventListener( 'load', () => resolve( element ) );
+		element.addEventListener( 'load', () => {
+			if ( element.media !== 'preload' ) {
+				// An inline handler has just mutated the media.
+				if ( element.media && element.media !== 'all' ) {
+					element.dataset.originalMedia = element.media;
+				} else {
+					delete element.dataset.originalMedia;
+				}
+				element.media = 'preload';
+			}
+			resolve( element );
+		} );
 		element.addEventListener( 'error', ( event ) => {
 			const { href } = event.target as HTMLLinkElement;
 			reject(
@@ -448,27 +428,19 @@ const prepareStylePromise = (
  * happens with the elements marked with `data-wp-router-style="ignore"`, on both
  * the current document and the new page.
  *
- * Note that this function alters the passed document, as it can transfer
- * nodes from it to the global document, and rewrites the style elements that
- * are loaded asynchronously to the state they end up in once they are loaded.
+ * Relative URLs of the passed document are resolved against the current
+ * document, which is also what the browser does once the elements are inserted
+ * in it.
  *
- * @param doc     Document instance.
- * @param pageUrl Optional URL of the passed document, used to resolve the
- *                relative URLs of its style elements.
+ * Note that this function alters the passed document, as it can transfer
+ * nodes from it to the global document, and turns the preloads that become
+ * style sheets on load into regular style sheets.
+ *
+ * @param doc Document instance.
  * @return A list of promises for each style element in the passed document.
  */
-export const preloadStyles = (
-	doc: Document,
-	pageUrl?: string
-): Promise< StyleElement >[] => {
+export const preloadStyles = ( doc: Document ): Promise< StyleElement >[] => {
 	const isCurrentDocument = doc === window.document;
-	let baseUrl = window.document.baseURI;
-
-	if ( ! isCurrentDocument && pageUrl ) {
-		try {
-			baseUrl = new URL( pageUrl, window.location.href ).href;
-		} catch {}
-	}
 
 	const currentStyleElements = getStyleElements( window.document ).filter(
 		isManaged
@@ -484,15 +456,14 @@ export const preloadStyles = (
 	// Only the elements that the router adopts are rewritten. Those of the
 	// current document are managed by the scripts that inserted them.
 	if ( ! isCurrentDocument ) {
-		newStyleElements.forEach( canonicalizeStyleElement );
+		newStyleElements.forEach( adoptStyleElement );
 	}
 
 	// Set styles in order.
 	return updateStylesWithSCS(
 		currentStyleElements,
 		newStyleElements,
-		window.document.head,
-		baseUrl
+		window.document.head
 	);
 };
 

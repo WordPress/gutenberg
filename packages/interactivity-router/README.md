@@ -115,7 +115,7 @@ Two kinds of style sheets are left alone by default:
 -   Those injected by other client-side scripts once the page has loaded, like the ones added by a dark mode switcher or a lazy-loaded widget.
 -   Plain `<link rel="preload">` resource hints, which are not style sheets.
 
-The asynchronous loading patterns of optimization plugins are handled automatically, so the following style sheets don't need any extra markup to work with client-side navigation:
+The asynchronous loading patterns of optimization plugins are handled automatically: a `<link>` with an inline `onload` handler is matched by its URL, whatever the `rel` and `media` it ends up with, so the following style sheets don't need any extra markup to work with client-side navigation:
 
 ```html
 <link rel="stylesheet" href="x.css" media="print" onload="this.media='all'" />

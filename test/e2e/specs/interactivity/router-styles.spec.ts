@@ -617,14 +617,14 @@ test.describe( 'Router styles', () => {
 		await expect( asyncPrint ).toHaveCSS( 'color', COLOR_ASYNC_PRINT );
 
 		/*
-		 * The router canonicalizes the element to the state it ends up in: the
-		 * inline handler is stripped and the media resolves to `all`, so no
-		 * original media is stashed and the style sheet applies to all media.
+		 * The inline handler of the adopted element runs on load and sets the
+		 * media to `all`, which the router captures: no original media is
+		 * stashed and the style sheet applies to all media.
 		 *
 		 * Note that the router restores the media through the CSSOM, so the
 		 * `media` attribute keeps the `preload` sentinel.
 		 */
-		await expect( asyncPrintLink ).not.toHaveAttribute( 'onload' );
+		await expect( asyncPrintLink ).toHaveAttribute( 'onload' );
 		await expect( asyncPrintLink ).not.toHaveAttribute(
 			'data-original-media'
 		);
@@ -711,10 +711,13 @@ test.describe( 'Router styles', () => {
 			COLOR_ASYNC_DATA_MEDIA
 		);
 
-		// The media of the applied element is the one the inline handler would
-		// have copied from the data attribute, not its `not all` face value.
+		// The media of the applied element is the one the inline handler copied
+		// from the data attribute, not its `not all` face value.
 		await expect( asyncDataMediaLink ).toHaveCount( 1 );
-		await expect( asyncDataMediaLink ).not.toHaveAttribute( 'data-media' );
+		await expect( asyncDataMediaLink ).toHaveAttribute(
+			'data-media',
+			'all'
+		);
 		await expect( asyncDataMediaLink ).not.toHaveAttribute(
 			'data-original-media'
 		);
@@ -757,7 +760,7 @@ test.describe( 'Router styles', () => {
 		await expect( csn ).toBeVisible();
 		await expect( asyncPreload ).toHaveCSS( 'color', COLOR_ASYNC_PRELOAD );
 
-		// The router canonicalizes the preload into a regular style sheet.
+		// The router turns the preload into a regular style sheet.
 		await expect( asyncPreloadLink ).toHaveAttribute( 'rel', 'stylesheet' );
 		await expect( asyncPreloadLink ).not.toHaveAttribute( 'as' );
 

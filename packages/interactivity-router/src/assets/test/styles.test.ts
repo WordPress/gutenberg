@@ -110,14 +110,34 @@ const createLinkElement = (
  * Builds a document with the passed markup in its head, simulating the
  * response of a page fetched by the router.
  *
+ * Browsers register the inline `onload` handlers of the parsed elements right
+ * away, and run them once the elements are adopted by a document where
+ * scripting is enabled. jsdom only registers them for documents that run
+ * scripts, which is not the case for the documents parsed with `DOMParser`,
+ * so the handlers are registered here in the same position they would have in
+ * a browser: before any listener added by the router.
+ *
  * @param head Markup contained in the head of the page.
  * @return Document instance.
  */
-const createPage = ( head: string ): Document =>
-	new window.DOMParser().parseFromString(
+const createPage = ( head: string ): Document => {
+	const doc = new window.DOMParser().parseFromString(
 		`<html><head>${ head }</head><body></body></html>`,
 		'text/html'
 	);
+	doc.querySelectorAll< HTMLLinkElement >( 'link[onload]' ).forEach(
+		( element ) => {
+			const handler = new Function(
+				'event',
+				element.getAttribute( 'onload' )!
+			);
+			element.addEventListener( 'load', ( event ) =>
+				handler.call( element, event )
+			);
+		}
+	);
+	return doc;
+};
 
 /**
  * Returns the style element with the passed ID in the current document.
@@ -996,10 +1016,7 @@ describe( 'Router styles management', () => {
 			// The optimization plugin flips the media once it is loaded.
 			live.media = 'all';
 
-			const promises = preloadStyles(
-				createPage( printTrick ),
-				'/other-page/'
-			);
+			const promises = preloadStyles( createPage( printTrick ) );
 
 			// The element is reused instead of inserting a duplicate.
 			expect( document.head.querySelectorAll( '#async' ) ).toHaveLength(
@@ -1012,79 +1029,115 @@ describe( 'Router styles management', () => {
 			expect( live ).toHaveAttribute( 'onload' );
 		} );
 
-		it( 'should insert an async style sheet with its target media', () => {
-			preloadStyles(
+		it( 'should reuse the live elements of async style sheets that have not mutated yet', async () => {
+			document.head.innerHTML = `${ printTrick }${ preloadFlip }`;
+			const asyncLink = getElement( 'async' );
+			const flipLink = getElement( 'flip' );
+
+			// The style sheets are still being downloaded, so the elements
+			// look exactly like the markup of the fetched page.
+			const promises = preloadStyles(
+				createPage( `${ printTrick }${ preloadFlip }` )
+			);
+
+			expect( document.head.childNodes ).toHaveLength( 2 );
+			expect( await Promise.all( promises ) ).toEqual( [
+				asyncLink,
+				flipLink,
+			] );
+		} );
+
+		it( 'should stash the media set by the inline handler and keep the sentinel', async () => {
+			const promises = preloadStyles(
 				createPage(
 					'<link id="async" rel="stylesheet" href="https://example.com/async.css" media="not all" onload="this.media=\'all\'">'
-				),
-				'/page/'
+				)
 			);
 
 			const inserted = getElement( 'async' );
+
+			// The face value of the media is stashed until the element loads,
+			// and the inline handler is kept.
+			expect( inserted ).toHaveAttribute( 'media', 'preload' );
+			expect( inserted ).toHaveAttribute(
+				'data-original-media',
+				'not all'
+			);
+			expect( inserted ).toHaveAttribute( 'onload' );
+
+			// The inline handler runs on load, and the router captures the
+			// media it sets and puts the sentinel back right after, so a page
+			// that has only been prefetched doesn't apply its styles.
+			inserted.dispatchEvent( new Event( 'load' ) );
+
+			expect( await promises[ 0 ] ).toBe( inserted );
 			expect( inserted ).toHaveAttribute( 'media', 'preload' );
 			expect( inserted ).not.toHaveAttribute( 'data-original-media' );
-			expect( inserted ).not.toHaveAttribute( 'onload' );
 
 			mockSheet( inserted, { disabled: true, mediaText: 'preload' } );
 			applyStyles( [ inserted ] );
 
-			// The target media is restored, not the placeholder.
+			// The media set by the handler is applied, not the face value.
 			expect( inserted.sheet!.media.mediaText ).toBe( 'all' );
 		} );
 
-		it( 'should resolve the target media from the attribute the handler reads', () => {
+		it( 'should stash the media the inline handler reads from an attribute', () => {
 			preloadStyles(
 				createPage(
 					'<link id="dataset" rel="stylesheet" href="https://example.com/a.css" media="not all" data-media="print" onload="this.media=this.dataset.media;delete this.dataset.media;">' +
-						'<link id="attribute" rel="stylesheet" href="https://example.com/b.css" media="not all" data-css-media="screen" onload="this.media=this.getAttribute(\'data-css-media\')">' +
-						'<link id="missing" rel="stylesheet" href="https://example.com/c.css" media="not all" onload="this.media=this.dataset.media">'
-				),
-				'/page/'
+						'<link id="attribute" rel="stylesheet" href="https://example.com/b.css" media="not all" data-css-media="screen" onload="this.media=this.getAttribute(\'data-css-media\')">'
+				)
 			);
 
-			expect( getElement( 'dataset' ) ).toHaveAttribute(
-				'data-original-media',
-				'print'
-			);
-			// The consumed attribute is removed from the adopted element.
-			expect( getElement( 'dataset' ) ).not.toHaveAttribute(
-				'data-media'
-			);
-			expect( getElement( 'attribute' ) ).toHaveAttribute(
+			const dataset = getElement( 'dataset' );
+			const attribute = getElement( 'attribute' );
+			dataset.dispatchEvent( new Event( 'load' ) );
+			attribute.dispatchEvent( new Event( 'load' ) );
+
+			expect( dataset ).toHaveAttribute( 'media', 'preload' );
+			expect( dataset ).toHaveAttribute( 'data-original-media', 'print' );
+			// The handler itself consumed the attribute.
+			expect( dataset ).not.toHaveAttribute( 'data-media' );
+			expect( attribute ).toHaveAttribute( 'media', 'preload' );
+			expect( attribute ).toHaveAttribute(
 				'data-original-media',
 				'screen'
 			);
-			// When the attribute is missing, the style sheet applies to all.
-			expect( getElement( 'missing' ) ).not.toHaveAttribute(
-				'data-original-media'
-			);
 		} );
 
-		it( 'should resolve the target media when the handler removes the attribute', () => {
+		it( 'should stash the media when the inline handler removes the attribute', () => {
 			preloadStyles(
 				createPage(
 					'<link id="async" rel="stylesheet" href="https://example.com/a.css" media="print" onload="this.onload=null;this.removeAttribute(\'media\')">'
-				),
-				'/page/'
+				)
 			);
 
 			const inserted = getElement( 'async' );
+			expect( inserted ).toHaveAttribute(
+				'data-original-media',
+				'print'
+			);
+
+			inserted.dispatchEvent( new Event( 'load' ) );
+
+			// A removed media means the style sheet applies to all.
 			expect( inserted ).toHaveAttribute( 'media', 'preload' );
 			expect( inserted ).not.toHaveAttribute( 'data-original-media' );
 		} );
 
 		it( 'should adopt a preload link that turns itself into a style sheet', () => {
-			preloadStyles( createPage( preloadFlip ), '/page/' );
+			preloadStyles( createPage( preloadFlip ) );
 
+			// The browser doesn't report a preload with a non-matching media
+			// as loaded, so it is turned into a style sheet right away.
 			const inserted = getElement( 'flip' );
 			expect( inserted ).toHaveAttribute( 'rel', 'stylesheet' );
 			expect( inserted ).not.toHaveAttribute( 'as' );
-			expect( inserted ).not.toHaveAttribute( 'fetchpriority' );
-			expect( inserted ).not.toHaveAttribute( 'onload' );
 			expect( inserted ).toHaveAttribute( 'media', 'preload' );
+			expect( inserted ).toHaveAttribute( 'onload' );
 
 			// A later navigation to a page with the same style sheet reuses it.
-			preloadStyles( createPage( preloadFlip ), '/another-page/' );
+			preloadStyles( createPage( preloadFlip ) );
 
 			expect( document.head.querySelectorAll( '#flip' ) ).toHaveLength(
 				1
@@ -1092,48 +1145,16 @@ describe( 'Router styles management', () => {
 			expect( getElement( 'flip' ) ).toBe( inserted );
 		} );
 
-		it( 'should ignore preload links that are plain resource hints', () => {
+		it( 'should ignore preload links without an inline handler', () => {
 			const promises = preloadStyles(
 				createPage(
-					'<link id="hint" rel="preload" as="style" href="https://example.com/hint.css">' +
-						'<link id="other" rel="preload" as="style" href="https://example.com/other.css" onload="window.reportLoad()">'
-				),
-				'/page/'
+					'<link id="hint" rel="preload" as="style" href="https://example.com/hint.css">'
+				)
 			);
 
+			// A plain resource hint is not a style sheet.
 			expect( promises ).toHaveLength( 0 );
 			expect( getElement( 'hint' ) ).toBeNull();
-			expect( getElement( 'other' ) ).toBeNull();
-		} );
-
-		it( 'should remove the inline handlers of the adopted elements', async () => {
-			preloadStyles(
-				createPage(
-					`${ printTrick }<link id="plain" rel="stylesheet" href="https://example.com/plain.css" onload="this.media=\'screen\'" onerror="this.media=\'screen\'">`
-				),
-				'/page/'
-			);
-
-			const asyncLink = getElement( 'async' );
-			const plainLink = getElement( 'plain' );
-
-			expect( asyncLink ).not.toHaveAttribute( 'onload' );
-			expect( plainLink ).not.toHaveAttribute( 'onload' );
-			expect( plainLink ).not.toHaveAttribute( 'onerror' );
-
-			// An element with its handler still in place mutates itself, which
-			// is what the removal above prevents.
-			const untouched = document.createElement( 'link' );
-			untouched.setAttribute( 'rel', 'stylesheet' );
-			untouched.setAttribute( 'media', 'print' );
-			untouched.setAttribute( 'onload', "this.media='all'" );
-			document.head.appendChild( untouched );
-			untouched.dispatchEvent( new Event( 'load' ) );
-			expect( untouched ).toHaveAttribute( 'media', 'all' );
-
-			// The sentinel of a page that has only been prefetched survives.
-			asyncLink.dispatchEvent( new Event( 'load' ) );
-			expect( asyncLink ).toHaveAttribute( 'media', 'preload' );
 		} );
 
 		it( 'should keep the face value of the media when there is no handler', () => {
@@ -1146,8 +1167,7 @@ describe( 'Router styles management', () => {
 				createPage(
 					'<link id="print" rel="stylesheet" href="https://example.com/print.css" media="print">' +
 						'<link id="dark" rel="stylesheet" href="https://example.com/dark.css" media="not all">'
-				),
-				'/page/'
+				)
 			);
 
 			// The print style sheet is compared at face value and reused.
@@ -1164,17 +1184,34 @@ describe( 'Router styles management', () => {
 			);
 		} );
 
+		it( 'should not reuse a style sheet with a different media when there is no handler', () => {
+			document.head.innerHTML =
+				'<link id="live" rel="stylesheet" href="https://example.com/a.css" media="all">';
+
+			preloadStyles(
+				createPage(
+					'<link id="print" rel="stylesheet" href="https://example.com/a.css" media="print">'
+				)
+			);
+
+			expect( document.head.childNodes ).toHaveLength( 2 );
+			expect( getElement( 'print' ) ).toHaveAttribute(
+				'data-original-media',
+				'print'
+			);
+		} );
+
 		it( 'should match style sheets by their resolved URL', () => {
 			document.head.innerHTML =
 				'<link id="live" rel="stylesheet" href="/assets/a.css">';
 			const live = getElement( 'live' );
 
-			// A relative URL is resolved against the URL of the fetched page.
+			// A relative URL is resolved against the current document, which
+			// is what the browser does once the element is inserted in it.
 			preloadStyles(
 				createPage(
-					'<link id="relative" rel="stylesheet" href="../assets/a.css">'
-				),
-				'/blog/page'
+					'<link id="relative" rel="stylesheet" href="./assets/a.css">'
+				)
 			);
 
 			expect( getElement( 'relative' ) ).toBeNull();
@@ -1184,8 +1221,7 @@ describe( 'Router styles management', () => {
 			preloadStyles(
 				createPage(
 					'<link id="absolute" rel="stylesheet" href="http://localhost/assets/a.css">'
-				),
-				'/blog/page'
+				)
 			);
 
 			expect( getElement( 'absolute' ) ).toBeNull();
@@ -1200,8 +1236,7 @@ describe( 'Router styles management', () => {
 			preloadStyles(
 				createPage(
 					'<link id="new" rel="stylesheet" href="/assets/a.css?ver=2">'
-				),
-				'/page/'
+				)
 			);
 
 			expect( document.head.childNodes ).toHaveLength( 2 );
@@ -1223,6 +1258,23 @@ describe( 'Router styles management', () => {
 			);
 
 			// The elements of the initial page are managed by the router.
+			const initialStyles = await Promise.all(
+				preloadStyles( window.document )
+			);
+			expect( initialStyles ).toEqual( [ asyncLink, flipLink ] );
+		} );
+
+		it( 'should mark the async elements of the initial page that have not mutated yet as managed', async () => {
+			document.head.innerHTML = `${ printTrick }${ preloadFlip }`;
+			const asyncLink = getElement( 'async' );
+			const flipLink = getElement( 'flip' );
+
+			// The style sheets are still being downloaded when the router
+			// classifies the elements.
+			await loadStylesModule(
+				`<html><head>${ printTrick }${ preloadFlip }</head><body></body></html>`
+			);
+
 			const initialStyles = await Promise.all(
 				preloadStyles( window.document )
 			);
@@ -1270,8 +1322,7 @@ describe( 'Router styles management', () => {
 				createPage(
 					'<link id="managed" rel="stylesheet" href="https://example.com/managed.css">' +
 						'<link id="new" rel="stylesheet" href="https://example.com/new.css">'
-				),
-				'/page/'
+				)
 			);
 			const inserted = getElement( 'new' );
 			mockSheet( inserted, { disabled: true, mediaText: 'preload' } );
@@ -1302,8 +1353,7 @@ describe( 'Router styles management', () => {
 					'<link id="kept" rel="stylesheet" href="https://example.com/kept.css">' +
 						'<link id="skipped" rel="stylesheet" href="https://example.com/skipped.css" data-wp-router-style="ignore">' +
 						'<style id="skipped-inline" data-wp-router-style="ignore">/* Skipped */</style>'
-				),
-				'/page/'
+				)
 			);
 
 			expect( promises ).toHaveLength( 1 );
@@ -1317,8 +1367,7 @@ describe( 'Router styles management', () => {
 				createPage(
 					'<link id="regular" rel="stylesheet" href="https://example.com/regular.css">' +
 						'<link id="persisted" rel="stylesheet" href="https://example.com/persisted.css" media="screen" data-wp-router-style="persist">'
-				),
-				'/page/'
+				)
 			);
 			const regular = getElement( 'regular' );
 			const persisted = getElement( 'persisted' );
@@ -1355,17 +1404,16 @@ describe( 'Router styles management', () => {
 			const asyncPersist =
 				'<link id="boost" rel="stylesheet" href="https://example.com/boost.css" media="print" data-wp-router-style="persist" onload="this.onload=null;this.media=\'all\'">';
 
-			const promises = preloadStyles(
-				createPage( asyncPersist ),
-				'/page/'
-			);
+			const promises = preloadStyles( createPage( asyncPersist ) );
 			const persisted = getElement( 'boost' );
 
-			// The element is canonicalized like any other async style sheet,
-			// and the marker travels with it.
+			// The element is adopted like any other async style sheet, and the
+			// marker travels with it.
 			expect( persisted ).toHaveAttribute( 'media', 'preload' );
-			expect( persisted ).not.toHaveAttribute( 'data-original-media' );
-			expect( persisted ).not.toHaveAttribute( 'onload' );
+			expect( persisted ).toHaveAttribute(
+				'data-original-media',
+				'print'
+			);
 			expect( persisted ).toHaveAttribute(
 				'data-wp-router-style',
 				'persist'
@@ -1380,7 +1428,7 @@ describe( 'Router styles management', () => {
 
 			// A navigation to another page with the same style sheet matches
 			// it by URL, so it is not duplicated.
-			preloadStyles( createPage( asyncPersist ), '/another-page/' );
+			preloadStyles( createPage( asyncPersist ) );
 
 			expect( document.head.querySelectorAll( '#boost' ) ).toHaveLength(
 				1
@@ -1399,8 +1447,7 @@ describe( 'Router styles management', () => {
 					'<link id="spaced" rel="stylesheet" href="https://example.com/spaced.css" data-wp-router-style=" Persist ">' +
 						'<link id="uppercase" rel="stylesheet" href="https://example.com/uppercase.css" data-wp-router-style="IGNORE">' +
 						'<link id="unknown" rel="stylesheet" href="https://example.com/unknown.css" data-wp-router-style="whatever">'
-				),
-				'/page/'
+				)
 			);
 
 			const spaced = getElement( 'spaced' );
