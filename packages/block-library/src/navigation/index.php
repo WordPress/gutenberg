@@ -797,10 +797,13 @@ class WP_Navigation_Block_Renderer {
 				$toggle_button_icon = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 5v1.5h14V5H5z"></path><path d="M5 12.8h14v-1.5H5v1.5z"></path><path d="M5 19h14v-1.5H5V19z"></path></svg>';
 			}
 		}
-		$toggle_button_content       = $should_display_icon_label ? $toggle_button_icon : __( 'Menu' );
+		$overlay_button_label        = ! empty( $attributes['overlayButtonLabel'] ) ? $attributes['overlayButtonLabel'] : __( 'Menu' );
+		$toggle_button_content       = $should_display_icon_label ? $toggle_button_icon : esc_html( $overlay_button_label );
 		$toggle_close_button_icon    = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="m13.06 12 6.47-6.47-1.06-1.06L12 10.94 5.53 4.47 4.47 5.53 10.94 12l-6.47 6.47 1.06 1.06L12 13.06l6.47 6.47 1.06-1.06L13.06 12Z"></path></svg>';
 		$toggle_close_button_content = $should_display_icon_label ? $toggle_close_button_icon : __( 'Close' );
-		$toggle_aria_label_open      = $should_display_icon_label ? 'aria-label="' . __( 'Open menu' ) . '"' : ''; // Open button label.
+		$toggle_aria_label_open      = $should_display_icon_label
+			? 'aria-label="' . esc_attr( ! empty( $attributes['overlayButtonLabel'] ) ? sprintf( /* translators: %s: Menu name */ __( 'Open %s' ), $attributes['overlayButtonLabel'] ) : __( 'Open menu' ) ) . '"'
+			: ''; // Open button label.
 		$toggle_aria_label_close     = $should_display_icon_label ? 'aria-label="' . __( 'Close menu' ) . '"' : ''; // Close button label.
 
 		// Add Interactivity API directives to the markup if needed.
@@ -920,7 +923,7 @@ class WP_Navigation_Block_Renderer {
 		$wrapper_attributes = get_block_wrapper_attributes( $extra_attributes );
 
 		if ( $is_responsive_menu ) {
-			$nav_element_directives = static::get_nav_element_directives( $is_interactive );
+			$nav_element_directives = static::get_nav_element_directives( $is_interactive, $attributes );
 			$wrapper_attributes    .= ' ' . $nav_element_directives;
 		}
 
@@ -932,13 +935,15 @@ class WP_Navigation_Block_Renderer {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param bool $is_interactive Whether the block is interactive.
+	 * @param bool  $is_interactive Whether the block is interactive.
+	 * @param array $attributes     The block attributes.
 	 * @return string the directives for the navigation element.
 	 */
-	private static function get_nav_element_directives( $is_interactive ) {
+	private static function get_nav_element_directives( $is_interactive, $attributes = array() ) {
 		if ( ! $is_interactive ) {
 			return '';
 		}
+		$overlay_button_label = ! empty( $attributes['overlayButtonLabel'] ) ? $attributes['overlayButtonLabel'] : __( 'Menu' );
 		// When adding to this array be mindful of security concerns.
 		$nav_element_context    = wp_interactivity_data_wp_context(
 			array(
@@ -949,7 +954,7 @@ class WP_Navigation_Block_Renderer {
 				),
 				'type'            => 'overlay',
 				'roleAttribute'   => '',
-				'ariaLabel'       => __( 'Menu' ),
+				'ariaLabel'       => $overlay_button_label,
 			)
 		);
 		$nav_element_directives = '
