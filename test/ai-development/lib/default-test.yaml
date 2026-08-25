@@ -1,6 +1,5 @@
 # Options shared by every evaluation case.
 options:
-    bustCache: true
     prefix: |
         This task runs in an isolated evaluation workspace and npm is not
         available. Do not try to build. Do not start or try to start wp-env,
