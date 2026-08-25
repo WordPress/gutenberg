@@ -27,6 +27,7 @@
 
 ### Enhancements
 
+-   Allow blocks to provide inspector controls specifically for viewport style states.
 -   `BlockStyles`: Use `Button` from `@wordpress/ui`, truncate long labels after three lines, and navigate the variations as a radio group ([#40331](https://github.com/WordPress/gutenberg/issues/40331)).
 -   Patterns explorer: Refactor the category sidebar to use `Tabs` ([#81807](https://github.com/WordPress/gutenberg/pull/81807)).
 -   `PublishDateTimePicker`: Add a `showPopoverHeader` prop so the picker can be rendered inline, without the popover title and close button. Rename the header's reset action from "Now" to "Reset", which reads as an action rather than a status ([#81806](https://github.com/WordPress/gutenberg/pull/81806)).

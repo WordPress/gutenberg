@@ -151,6 +151,9 @@ function StyleStateInspectorSlots( {
 					/>
 				</>
 			) }
+			{ showLayoutControls && (
+				<InspectorControls.Slot group="viewport" />
+			) }
 		</>
 	);
 }

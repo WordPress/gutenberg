@@ -28,6 +28,11 @@ class Tests_Blocks_Render_Gallery extends WP_UnitTestCase {
 	 */
 	private static $attachment_ids = array();
 
+	public function tear_down() {
+		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
+		parent::tear_down();
+	}
+
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
 		self::$post_id = $factory->post->create(
 			array( 'post_title' => 'Gallery dynamic mode test post' )
@@ -335,5 +340,37 @@ class Tests_Blocks_Render_Gallery extends WP_UnitTestCase {
 		// which the gallery then wires up for navigation.
 		$this->assertStringContainsString( 'data-wp-interactive="core/gallery"', $output );
 		$this->assertStringContainsString( 'lightbox-trigger', $output );
+	}
+
+	public function test_static_gallery_outputs_viewport_columns_style() {
+		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
+
+		$output     = do_blocks(
+			'<!-- wp:gallery {"style":{"@mobile":{"layout":{"columns":1}}}} --><figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image --><figure class="wp-block-image"><img alt=""/></figure><!-- /wp:image --></figure><!-- /wp:gallery -->'
+		);
+		$stylesheet = gutenberg_style_engine_get_stylesheet_from_context(
+			'block-supports',
+			array( 'prettify' => false )
+		);
+
+		$this->assertMatchesRegularExpression( '/\bwp-block-gallery-\d+\b/', $output );
+		$this->assertStringContainsString( '@media (width <= 480px)', $stylesheet );
+		$this->assertStringContainsString( 'width:100%', $stylesheet );
+	}
+
+	public function test_static_gallery_outputs_viewport_crop_style() {
+		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
+
+		do_blocks(
+			'<!-- wp:gallery {"style":{"@tablet":{"layout":{"imageCrop":false}}}} --><figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image --><figure class="wp-block-image"><img alt=""/></figure><!-- /wp:image --></figure><!-- /wp:gallery -->'
+		);
+		$stylesheet = gutenberg_style_engine_get_stylesheet_from_context(
+			'block-supports',
+			array( 'prettify' => false )
+		);
+
+		$this->assertStringContainsString( '@media (480px < width <= 782px)', $stylesheet );
+		$this->assertStringContainsString( 'object-fit:fill', $stylesheet );
+		$this->assertStringContainsString( 'display:block', $stylesheet );
 	}
 }

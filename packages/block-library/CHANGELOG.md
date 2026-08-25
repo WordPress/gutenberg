@@ -11,7 +11,8 @@
 
 ### Enhancements
 
-- `List`: Add wide and full alignment support ([#68002](https://github.com/WordPress/gutenberg/pull/68002)).
+-   Gallery: Support viewport-specific column counts and image cropping in the Flex layout.
+-   `List`: Add wide and full alignment support ([#68002](https://github.com/WordPress/gutenberg/pull/68002)).
 
 ### Internal
 

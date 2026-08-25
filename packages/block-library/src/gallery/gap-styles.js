@@ -8,6 +8,7 @@ import {
 import { useSelect } from '@wordpress/data';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import { unlock } from '../lock-unlock';
+import { getGalleryResponsiveLayoutCSS } from './responsive-styles';
 
 const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 const { globalStylesDataKey } = unlock( blockEditorPrivateApis );
@@ -58,8 +59,10 @@ export default function GalleryGapCustomProperties( { style, clientId } ) {
 	const blockGap =
 		styleBlockGap === undefined ? globalGalleryBlockGap : styleBlockGap;
 	let gap = getGalleryGapCustomPropertyStyle( selector, blockGap );
+	const responsiveMediaQueries =
+		getResponsiveMediaQueries( viewportSettings );
 
-	Object.entries( getResponsiveMediaQueries( viewportSettings ) ).forEach(
+	Object.entries( responsiveMediaQueries ).forEach(
 		( [ viewport, mediaQuery ] ) => {
 			const styleViewportBlockGap = getBlockGapValue(
 				style?.[ viewport ]
@@ -83,6 +86,11 @@ export default function GalleryGapCustomProperties( { style, clientId } ) {
 				viewportBlockGap
 			) }}`;
 		}
+	);
+	gap += getGalleryResponsiveLayoutCSS(
+		selector,
+		style,
+		responsiveMediaQueries
 	);
 
 	useStyleOverride( { css: gap } );
