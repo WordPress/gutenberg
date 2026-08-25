@@ -1,3 +1,4 @@
+@use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/media-editor/build-style/style.css" as media-editor;
 
 // Carries the editor's keydown handler around the whole page, including the
@@ -11,4 +12,19 @@
 	flex: 1;
 	min-height: 0;
 	overflow: hidden;
+}
+
+// Below `small` History has no room in the page header, so it gets a bar of
+// its own under the canvas. Centered rather than pushed to the edges: with
+// Cancel/Save staying in the page header, there is no cluster to anchor the
+// inline end. (The transform controls are not here — they sit under the
+// canvas at every width, placed by the editor itself.)
+.media-editor-route__toolbar {
+	flex-shrink: 0;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: $grid-unit-20;
+	padding: $grid-unit-20 $grid-unit-40 $grid-unit-30;
 }

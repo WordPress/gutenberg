@@ -72,6 +72,14 @@ export interface MediaEditorFrameProps {
 	 * all.
 	 */
 	isImage: boolean;
+	/**
+	 * `narrow` below the `small` breakpoint, where the frame's header has no
+	 * room for the history cluster beside its other controls. A frame uses
+	 * this to place that cluster, not to decide whether it renders —
+	 * `HistoryActions` returns nothing on its own when the canvas is off
+	 * screen.
+	 */
+	layout: 'wide' | 'narrow';
 	onRequestClose: () => void;
 	onKeyDown: ( event: ReactKeyboardEvent< HTMLElement > ) => void;
 	shouldCloseOnClickOutside: boolean;
@@ -405,6 +413,11 @@ function MediaEditorContent( {
 		}
 		setActivePanel( isWide ? DETAILS_PANEL : null );
 	}, [ isWide ] );
+	// Below `small` a frame's header cannot fit the history cluster alongside
+	// its own controls, so it moves that cluster elsewhere. Separate from
+	// `isWide`, which is the dock breakpoint (`large`) the panel uses.
+	const isSmall = useViewportMatch( 'small' );
+	const layout: 'wide' | 'narrow' = isSmall ? 'wide' : 'narrow';
 	const { media, hasEdits } = useSelect(
 		( select ) => {
 			const {
@@ -683,6 +696,7 @@ function MediaEditorContent( {
 			{ renderFrame( {
 				children,
 				isImage,
+				layout,
 				onRequestClose: handleRequestClose,
 				onKeyDown: handleKeyDown,
 				shouldCloseOnClickOutside: ! hasChanges && ! isSaving,

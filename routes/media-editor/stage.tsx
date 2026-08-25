@@ -30,6 +30,8 @@ interface SaveResult {
 
 interface FrameProps {
 	children: ReactNode;
+	isImage: boolean;
+	layout: 'wide' | 'narrow';
 	onKeyDown: ( event: KeyboardEvent< HTMLElement > ) => void;
 }
 
@@ -91,52 +93,72 @@ function MediaEditorRoute() {
 					navigate( { to: `/media-editor/${ savedId }` } );
 				}
 			} }
-			renderFrame={ ( { children, onKeyDown }: FrameProps ) => (
-				// The keydown handler covers the whole frame, not just the
-				// canvas: undo/redo live in the header, so after clicking
-				// one, focus sits outside the content region and the
-				// keyboard shortcuts would no longer reach the handler.
-				// `Page` takes no `onKeyDown`, hence the wrapper; it is
-				// `display: contents`, so it adds no box to the layout.
-				// eslint-disable-next-line jsx-a11y/no-static-element-interactions
-				<div
-					className="media-editor-route__shortcut-scope"
-					onKeyDown={ onKeyDown }
-				>
-					<Page
-						className="media-editor-route"
-						ariaLabel={ title }
-						breadcrumbs={
-							<Breadcrumbs
-								items={
-									isStandaloneAdminPage
-										? [ { label: title } ]
-										: [
-												{
-													label: __( 'Media' ),
-													to: MEDIA_LIST_PATH,
-												},
-												{ label: title },
-										  ]
-								}
-							/>
-						}
-						actions={
-							<>
-								<MediaEditor.HistoryActions />
-								<MediaEditor.HeaderActions />
-								{ /* Compact to match the header's other
-								     controls, as elsewhere in wp-admin. */ }
-								<MediaEditor.SaveActions size="compact" />
-							</>
-						}
+			renderFrame={ ( {
+				children,
+				isImage,
+				layout,
+				onKeyDown,
+			}: FrameProps ) => {
+				// Below `small` the page header already carries the
+				// breadcrumbs, Cancel/Save and (under `medium`) the
+				// framework's navigation toggle, in a row that does not wrap.
+				// History moves to a bar under the canvas instead, which is
+				// what the modal's narrow footer does.
+				const isNarrow = layout === 'narrow';
+				return (
+					// The keydown handler covers the whole frame, not just the
+					// canvas: undo/redo live in the header, so after clicking
+					// one, focus sits outside the content region and the
+					// keyboard shortcuts would no longer reach the handler.
+					// `Page` takes no `onKeyDown`, hence the wrapper; it is
+					// `display: contents`, so it adds no box to the layout.
+					// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+					<div
+						className="media-editor-route__shortcut-scope"
+						onKeyDown={ onKeyDown }
 					>
-						<div className="media-editor-route__content">
-							{ children }
-						</div>
-					</Page>
-				</div>
-			) }
+						<Page
+							className="media-editor-route"
+							ariaLabel={ title }
+							breadcrumbs={
+								<Breadcrumbs
+									items={
+										isStandaloneAdminPage
+											? [ { label: title } ]
+											: [
+													{
+														label: __( 'Media' ),
+														to: MEDIA_LIST_PATH,
+													},
+													{ label: title },
+											  ]
+									}
+								/>
+							}
+							actions={
+								<>
+									{ ! isNarrow && (
+										<MediaEditor.HistoryActions />
+									) }
+									<MediaEditor.HeaderActions />
+									{ /* Compact to match the header's other
+									     controls, as elsewhere in wp-admin. */ }
+									<MediaEditor.SaveActions size="compact" />
+								</>
+							}
+						>
+							<div className="media-editor-route__content">
+								{ children }
+							</div>
+							{ isNarrow && isImage && (
+								<div className="media-editor-route__toolbar">
+									<MediaEditor.HistoryActions />
+								</div>
+							) }
+						</Page>
+					</div>
+				);
+			} }
 		/>
 	);
 }
