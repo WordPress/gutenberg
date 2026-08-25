@@ -42,8 +42,17 @@ export const DESIGN_POST_TYPES = [
  * Editor intent values. The intent represents the user's current editing
  * purpose (edit the post directly, suggest changes, or view in read-only).
  *
- * Orthogonal to the `editorMode` preference (visual vs. code): a user can
- * be in `suggest` intent in either visual or code mode.
+ * Mostly orthogonal to the `editorMode` preference (visual vs. code). The
+ * exception is `suggest`, which always reports `visual`: the code editor
+ * hands back raw `post_content` with nowhere to carry an inline marker, so
+ * `getEditorMode` masks the preference rather than changing it, and the
+ * user's stored mode returns with the `edit` intent.
+ *
+ * Because `suggest` is visual-only it also depends on the visual editor
+ * being available at all: `setEditorIntent` refuses it when the
+ * `richEditingEnabled` setting is off (the "Disable the visual editor when
+ * writing" profile option), and the intent menu offers it disabled with a
+ * pointer to that setting.
  *
  * Storage and defaults:
  *   - Session-scoped: held in the editor store's reducer, not the
@@ -72,3 +81,28 @@ export const EDITOR_INTENTS = [
 	EDITOR_INTENT_VIEW,
 ] as const;
 export type EditorIntent = ( typeof EDITOR_INTENTS )[ number ];
+
+/**
+ * Post-level fields the Suggest intent refuses to edit because there is no way
+ * to hold them as a pending proposal: they are not part of the block tree, so
+ * nothing can carry a marker for them and nothing can review them later. Only
+ * `status` is listed for now — it is the field that carries editorial
+ * authority. The rest of the post-level fields (title, excerpt, featured image)
+ * still need a per-field capture-or-disable decision. See issue #73411 (F-15).
+ */
+export const SUGGEST_LOCKED_POST_FIELDS = [ 'status' ] as const;
+
+/**
+ * Class token carried by an inline suggestion marker
+ * (`<mark class="wp-suggestion">`) in serialized block content.
+ *
+ * Mirrors `SUGGESTION_CLASS` in `components/inline-suggestions/format.js`,
+ * duplicated here because the store must not import from the component tree.
+ * A serialization contract: `utils/pending-suggestion-markers.js` reads it back
+ * out of saved content, so the two copies must not drift.
+ *
+ * On its own the token is only a cheap pre-filter, never the answer - it also
+ * appears in block class names and in prose about the feature. See
+ * `hasPendingSuggestionMarkers` for what actually identifies a marker.
+ */
+export const SUGGESTION_MARKER_CLASS = 'wp-suggestion';
