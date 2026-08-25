@@ -128,7 +128,10 @@ const BlockTransformationsMenu = ( {
 				{ ! hasBothContentTransformations && restTransformItems }
 			</MenuGroup>
 			{ !! hasBothContentTransformations && (
-				<MenuGroup className={ className }>
+				<MenuGroup
+					label={ __( 'Advanced Transformations' ) }
+					className={ className }
+				>
 					{ restTransformItems }
 				</MenuGroup>
 			) }
