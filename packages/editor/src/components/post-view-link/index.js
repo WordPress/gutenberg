@@ -23,7 +23,6 @@ export default function PostViewLink() {
 			};
 		}, [] );
 
-	// Only render the view button if the post is published and has a permalink.
 	if ( ! isPublished || ! permalink || ! hasLoaded ) {
 		return null;
 	}

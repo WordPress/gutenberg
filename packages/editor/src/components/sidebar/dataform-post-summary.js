@@ -2,7 +2,7 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { DataForm } from '@wordpress/dataviews';
-import { Link, Stack } from '@wordpress/ui';
+import { Stack } from '@wordpress/ui';
 import { useMemo } from '@wordpress/element';
 import { useViewConfig } from '@wordpress/views';
 import PostCardPanel from '../post-card-panel';
@@ -13,41 +13,7 @@ import PostTrash from '../post-trash';
 import usePostFields from '../post-fields';
 import { usePostTemplatePanelMode } from '../post-template/hooks';
 import revisionsField from '../../dataviews/fields/revisions';
-
-function ReadingSettingsLink() {
-	// The Reading settings screen needs the `manage_options` capability, which
-	// maps onto updating the site settings.
-	const canUpdateSettings = useSelect(
-		( select ) =>
-			!! select( coreDataStore ).canUser( 'update', {
-				kind: 'root',
-				name: 'site',
-			} ),
-		[]
-	);
-
-	if ( ! canUpdateSettings ) {
-		return null;
-	}
-
-	return <Link href="options-reading.php">{ __( 'Reading settings' ) }</Link>;
-}
-
-// Links to the Reading settings screen from the Front Page template summary.
-// That template resolves to the site homepage whether the homepage shows the
-// latest posts or a static page, so it points at where that choice is made.
-const readingSettingsField = {
-	id: 'reading_settings',
-	// The field renders a link rather than a value, but the `regular` form
-	// layout skips any field without an `Edit` control even when it is read
-	// only, and the control is resolved from the type.
-	type: 'text',
-	label: __( 'Reading settings' ),
-	readOnly: true,
-	enableSorting: false,
-	render: ReadingSettingsLink,
-	isVisible: ( item ) => item.slug === 'front-page',
-};
+import readingSettingsField from '../../dataviews/fields/reading-settings';
 
 const EMPTY_FORM = { layout: { type: 'panel' }, fields: [] };
 const VIEW_CONFIG_FIELDS = [ 'form' ];
