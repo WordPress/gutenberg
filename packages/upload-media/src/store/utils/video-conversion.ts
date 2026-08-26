@@ -145,6 +145,11 @@ interface ConvertGifToVideoOptions {
 	 * `@wordpress/video-conversion` package default; `0` disables the check.
 	 */
 	maxTotalPixels?: number;
+	/**
+	 * Optional callback reporting conversion progress as a fraction from 0 to
+	 * 1. Throttled to whole-percent increments in the worker.
+	 */
+	onProgress?: ( progress: number ) => void;
 }
 
 /**
@@ -164,6 +169,8 @@ interface ConvertGifToVideoOptions {
  *                               abandoned. `0` disables the timeout.
  * @param options.maxTotalPixels Budget for total decoded pixels
  *                               (width × height × frame count). `0` disables.
+ * @param options.onProgress     Optional callback reporting conversion progress
+ *                               as a fraction from 0 to 1.
  * @return Converted video file.
  */
 export async function convertGifToVideo(
@@ -174,6 +181,7 @@ export async function convertGifToVideo(
 		maxDimensions,
 		timeout = DEFAULT_CONVERSION_TIMEOUT,
 		maxTotalPixels,
+		onProgress,
 	}: ConvertGifToVideoOptions = {}
 ) {
 	const mod = await loadVideoConversionModule();
@@ -184,7 +192,8 @@ export async function convertGifToVideo(
 		file,
 		outputMimeType,
 		maxDimensions,
-		maxTotalPixels
+		maxTotalPixels,
+		onProgress
 	);
 
 	let buffer: ArrayBuffer;

@@ -720,6 +720,7 @@ describe( 'private actions', () => {
 				finishOperation: jest.fn(),
 				cancelItem: jest.fn(),
 				addSideloadItem: jest.fn(),
+				updateItemProgress: jest.fn(),
 			} );
 			const select = {
 				getItem: jest.fn( () => ( {
@@ -767,7 +768,11 @@ describe( 'private actions', () => {
 				'gif-1',
 				gifFile,
 				'video/mp4',
-				{ timeout: undefined, maxTotalPixels: undefined }
+				{
+					timeout: undefined,
+					maxTotalPixels: undefined,
+					onProgress: expect.any( Function ),
+				}
 			);
 			// Sideload context: no CacheBlobUrl, no attachment URL update -
 			// the parent GIF attachment already owns the block's URL.
@@ -816,6 +821,40 @@ describe( 'private actions', () => {
 			expect( poster.operations[ 1 ] ).toBe( OperationType.Upload );
 		} );
 
+		it( 'reports conversion progress to the store as 0-100', async () => {
+			convertGifToVideo.mockImplementation(
+				async ( id, file, mimeType, { onProgress } ) => {
+					onProgress( 0.01 );
+					/*
+					 * Reports are time-gated to one dispatch per 250ms
+					 * (see transcodeGifItem), so this intermediate report
+					 * arriving "immediately" after the first is dropped.
+					 */
+					onProgress( 0.5 );
+					// A final report (progress = 1) always goes through.
+					onProgress( 1 );
+					return new File( [ 'mp4' ], 'animation.mp4', {
+						type: 'video/mp4',
+					} );
+				}
+			);
+			const { select, dispatch } = buildArgs();
+
+			await transcodeGifItem( 'gif-1' )( { select, dispatch } );
+
+			expect( dispatch.updateItemProgress ).toHaveBeenCalledTimes( 2 );
+			expect( dispatch.updateItemProgress ).toHaveBeenNthCalledWith(
+				1,
+				'gif-1',
+				1
+			);
+			expect( dispatch.updateItemProgress ).toHaveBeenNthCalledWith(
+				2,
+				'gif-1',
+				100
+			);
+		} );
+
 		it( 'defaults to mp4 when no output format is given', async () => {
 			convertGifToVideo.mockResolvedValue(
 				new File( [ 'mp4' ], 'animation.mp4', { type: 'video/mp4' } )
@@ -828,7 +867,11 @@ describe( 'private actions', () => {
 				'gif-1',
 				gifFile,
 				'video/mp4',
-				{ timeout: undefined, maxTotalPixels: undefined }
+				{
+					timeout: undefined,
+					maxTotalPixels: undefined,
+					onProgress: expect.any( Function ),
+				}
 			);
 		} );
 
@@ -850,7 +893,11 @@ describe( 'private actions', () => {
 				'gif-1',
 				gifFile,
 				'video/webm',
-				{ timeout: 5000, maxTotalPixels: 1_000_000 }
+				{
+					timeout: 5000,
+					maxTotalPixels: 1_000_000,
+					onProgress: expect.any( Function ),
+				}
 			);
 		} );
 

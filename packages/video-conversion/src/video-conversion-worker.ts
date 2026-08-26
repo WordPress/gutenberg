@@ -51,6 +51,9 @@ function getWorkerAPI(): Remote< WorkerAPI > {
  * @param maxDimensions  Optional maximum dimension for downscaling.
  * @param maxTotalPixels Optional budget for total decoded pixels
  *                       (width × height × frame count); `0` disables.
+ * @param onProgress     Optional callback reporting conversion progress as a
+ *                       fraction from 0 to 1. Proxied across the worker
+ *                       boundary by the RPC layer.
  * @return Video file buffer.
  */
 export async function convertGifToVideo(
@@ -58,7 +61,8 @@ export async function convertGifToVideo(
 	gifSource: ArrayBuffer | Blob,
 	outputMimeType: string,
 	maxDimensions?: number,
-	maxTotalPixels?: number
+	maxTotalPixels?: number,
+	onProgress?: ( progress: number ) => void
 ): Promise< ArrayBuffer > {
 	const api = getWorkerAPI();
 	return api.convertGifToVideo(
@@ -66,7 +70,8 @@ export async function convertGifToVideo(
 		gifSource,
 		outputMimeType,
 		maxDimensions,
-		maxTotalPixels
+		maxTotalPixels,
+		onProgress
 	);
 }
 

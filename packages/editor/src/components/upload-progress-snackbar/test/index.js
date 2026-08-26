@@ -1,6 +1,6 @@
-import { render, act } from '@testing-library/react';
+import { render, act, screen } from '@testing-library/react';
 import { useSelect } from '@wordpress/data';
-import UploadProgressSnackbar from '../';
+import UploadProgressSnackbar, { UPLOAD_SPINNER } from '../';
 import { addFiles, advance, reset } from '../tracker';
 
 jest.mock( '@wordpress/data/src/components/use-select', () => {
@@ -34,12 +34,13 @@ function mockQueue( items ) {
 	);
 }
 
-function makeItem( id, name, { parentId } = {} ) {
+function makeItem( id, name, { parentId, progress } = {} ) {
 	return {
 		id,
 		sourceFile: { name },
 		status: 'PROCESSING',
 		parentId,
+		progress,
 	};
 }
 
@@ -171,6 +172,47 @@ describe( 'UploadProgressSnackbar', () => {
 		render( <UploadProgressSnackbar /> );
 		expect( mockCreateNotice.mock.calls[ 0 ][ 1 ] ).toBe(
 			'Uploading — photo.jpg'
+		);
+	} );
+
+	it( 'shows a determinate Processing state while an item reports progress', () => {
+		mockQueue( [
+			makeItem( '1', 'dancing.gif' ),
+			// Sideload companion performing the GIF-to-video conversion.
+			makeItem( '1-video', 'dancing.gif', {
+				parentId: '1',
+				progress: 42,
+			} ),
+		] );
+		render( <UploadProgressSnackbar /> );
+		expect( mockCreateNotice.mock.calls[ 0 ][ 1 ] ).toBe(
+			'Processing — dancing.gif'
+		);
+		// The icon slot holds the progress bar rather than the spinner.
+		const { icon } = mockCreateNotice.mock.calls[ 0 ][ 2 ];
+		expect( icon ).not.toBe( UPLOAD_SPINNER );
+		render( icon );
+		// `hidden` because the icon-slot wrapper is aria-hidden.
+		expect(
+			screen.getByRole( 'progressbar', { hidden: true } )
+		).toHaveValue( 42 );
+	} );
+
+	it( 'returns to the uploading state once reported progress reaches 100', () => {
+		mockQueue( [
+			makeItem( '1', 'dancing.gif' ),
+			// Conversion finished; the companion is now uploading its result.
+			makeItem( '1-video', 'dancing.gif', {
+				parentId: '1',
+				progress: 100,
+			} ),
+		] );
+		render( <UploadProgressSnackbar /> );
+		expect( mockCreateNotice.mock.calls[ 0 ][ 1 ] ).toBe(
+			'Uploading — dancing.gif'
+		);
+		expect( mockCreateNotice.mock.calls[ 0 ][ 2 ].icon ).toBe(
+			UPLOAD_SPINNER
 		);
 	} );
 

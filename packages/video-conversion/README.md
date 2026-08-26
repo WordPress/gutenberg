@@ -51,6 +51,7 @@ _Parameters_
 -   _outputMimeType_ `string`: Output MIME type ('video/mp4' or 'video/webm').
 -   _maxDimensions_ `number`: Optional maximum dimension for downscaling.
 -   _maxTotalPixels_ `number`: Optional budget for total decoded pixels (width × height × frame count) beyond which the conversion is rejected with SIZE_LIMIT_ERROR_PREFIX. Defaults to DEFAULT_MAX_TOTAL_PIXELS; `0` disables.
+-   _onProgress_ `( progress: number ) => void`: Optional callback reporting conversion progress as a fraction from 0 to 1. Throttled to whole-percent increments so a thousand-frame GIF does not flood the worker message channel. Must be a top-level argument: the worker RPC layer (comctx) only proxies functions in argument position, not ones nested in objects.
 
 _Returns_
 

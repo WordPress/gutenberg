@@ -23,6 +23,10 @@
 
 -   `vipsResizeImage`, `vipsCompressImage`, and `vipsConvertImageFormat` now accept their optional parameters (`smartCrop`, `addSuffix`, `signal`, `scaledSuffix`, `quality`, `interlaced`, `stripMeta`, `maxBitdepth`) as a single trailing `options` object instead of positional arguments ([#80328](https://github.com/WordPress/gutenberg/issues/80328)).
 
+### New Features
+
+-   GIF-to-video conversion now reports per-item progress to the store (readable off the queue items returned by `getItems()`), so consumers such as the editor's upload progress snackbar can render a determinate progress bar ([#80325](https://github.com/WordPress/gutenberg/issues/80325)).
+
 ### Enhancements
 
 -   Honor the `image_strip_meta` and `image_max_bit_depth` filters for client-side processed images via the new `imageStripMeta` and `imageMaxBitDepth` settings, carried in the REST API root index ([#80216](https://github.com/WordPress/gutenberg/issues/80216)).
