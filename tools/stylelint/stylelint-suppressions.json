@@ -1,19 +1,4 @@
 {
-	"widgets/events/style.module.css": {
-		"selector-class-pattern": {
-			"count": 3
-		}
-	},
-	"widgets/quick-draft/style.module.css": {
-		"selector-class-pattern": {
-			"count": 6
-		}
-	},
-	"widgets/site-preview/style.module.css": {
-		"selector-class-pattern": {
-			"count": 8
-		}
-	},
 	"routes/template-list/add-new-template/style.scss": {
 		"selector-class-pattern": {
 			"count": 1
