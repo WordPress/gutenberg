@@ -21,6 +21,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { parseArgs } from 'node:util';
 import esbuild from 'esbuild';
 
 const ROOT = path.resolve(
@@ -234,14 +235,21 @@ async function checkPackage( name ) {
 }
 
 async function main() {
-	const names = process.argv.slice( 2 );
-	if ( ! names.length ) {
-		names.push(
-			...fs
-				.readdirSync( PACKAGES_DIR )
-				.filter( ( name ) => isBundled( readPackageJson( name ) ) )
+	let positionals;
+	try {
+		( { positionals } = parseArgs( { allowPositionals: true } ) );
+	} catch ( error ) {
+		console.error( error.message );
+		console.error(
+			'Usage: check-private-apis.mjs [package-name ...]   # default: every bundled package'
 		);
+		process.exit( 2 );
 	}
+	const names = positionals.length
+		? positionals
+		: fs
+				.readdirSync( PACKAGES_DIR )
+				.filter( ( name ) => isBundled( readPackageJson( name ) ) );
 
 	let failed = false;
 	for ( const name of names ) {
