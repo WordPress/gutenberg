@@ -35,7 +35,6 @@
 		{ "path": "../kebab-case" },
 		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../primitives" },
-		{ "path": "../private-apis" },
 		{ "path": "../theme/tsconfig.build.json" },
 		{ "path": "../ui/tsconfig.build.json" },
 		{ "path": "../url" },

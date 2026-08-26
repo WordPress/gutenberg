@@ -239,13 +239,16 @@ describe( 'CollapsibleCard', () => {
 	} );
 
 	describe( 'HeaderDescription', () => {
-		it( 'sets aria-describedby on the trigger pointing to the description', () => {
+		it( 'combines multiple descriptions into the trigger accessible description', () => {
 			render(
 				<CollapsibleCard.Root>
 					<CollapsibleCard.Header>
 						<Card.Title>Settings</Card.Title>
-						<CollapsibleCard.HeaderDescription data-testid="desc">
+						<CollapsibleCard.HeaderDescription>
 							3 errors
+						</CollapsibleCard.HeaderDescription>
+						<CollapsibleCard.HeaderDescription>
+							Requires attention
 						</CollapsibleCard.HeaderDescription>
 					</CollapsibleCard.Header>
 					<CollapsibleCard.Content>
@@ -254,38 +257,167 @@ describe( 'CollapsibleCard', () => {
 				</CollapsibleCard.Root>
 			);
 
-			const trigger = screen.getByRole( 'button', {
-				name: 'Settings',
-			} );
-			const descriptionElement = screen.getByTestId( 'desc' );
+			const trigger = screen.getByRole( 'button' );
 
-			expect( descriptionElement ).toHaveAttribute( 'id' );
-			expect( trigger ).toHaveAttribute(
-				'aria-describedby',
-				descriptionElement.id
+			expect( trigger ).toHaveAccessibleName( 'Settings' );
+			expect( trigger ).toHaveAccessibleDescription(
+				'3 errors Requires attention'
 			);
 		} );
 
-		it( 'marks the description content as aria-hidden', () => {
+		it( 'keeps explicit IDs while combining trigger accessible descriptions', () => {
+			const errorsDescriptionId = 'errors-description';
+			const attentionDescriptionId = 'attention-description';
+
 			render(
 				<CollapsibleCard.Root>
 					<CollapsibleCard.Header>
 						<Card.Title>Settings</Card.Title>
-						<CollapsibleCard.HeaderDescription data-testid="desc">
-							<span>Status: OK</span>
+						<CollapsibleCard.HeaderDescription
+							id={ errorsDescriptionId }
+						>
+							3 errors
+						</CollapsibleCard.HeaderDescription>
+						<CollapsibleCard.HeaderDescription
+							id={ attentionDescriptionId }
+						>
+							Requires attention
 						</CollapsibleCard.HeaderDescription>
 					</CollapsibleCard.Header>
 				</CollapsibleCard.Root>
 			);
 
-			const descriptionWrapper = screen.getByTestId( 'desc' );
-			expect( descriptionWrapper ).toHaveAttribute(
-				'aria-hidden',
-				'true'
+			const trigger = screen.getByRole( 'button' );
+			expect( screen.getByText( '3 errors' ) ).toHaveAttribute(
+				'id',
+				errorsDescriptionId
+			);
+			expect( screen.getByText( 'Requires attention' ) ).toHaveAttribute(
+				'id',
+				attentionDescriptionId
+			);
+			expect( trigger ).toHaveAccessibleName( 'Settings' );
+			expect( trigger ).toHaveAccessibleDescription(
+				'3 errors Requires attention'
 			);
 		} );
 
-		it( 'does not set aria-describedby when HeaderDescription is absent', () => {
+		it( 'applies an explicit accessible description only to the header trigger', () => {
+			const existingDescriptionId = 'existing-description';
+
+			render(
+				<>
+					<p id={ existingDescriptionId }>Existing description</p>
+					<CollapsibleCard.Root>
+						<CollapsibleCard.Header
+							render={ <h2 /> }
+							aria-describedby={ existingDescriptionId }
+						>
+							<Card.Title>Settings</Card.Title>
+							<CollapsibleCard.HeaderDescription>
+								3 errors
+							</CollapsibleCard.HeaderDescription>
+							<CollapsibleCard.HeaderDescription>
+								Requires attention
+							</CollapsibleCard.HeaderDescription>
+						</CollapsibleCard.Header>
+					</CollapsibleCard.Root>
+				</>
+			);
+
+			const trigger = screen.getByRole( 'button' );
+			expect( trigger ).toHaveAccessibleName( 'Settings' );
+			expect( trigger ).toHaveAccessibleDescription(
+				'Existing description 3 errors Requires attention'
+			);
+			expect(
+				screen.getByRole( 'heading' )
+			).not.toHaveAccessibleDescription();
+		} );
+
+		it( 'deduplicates explicit and registered accessible-description IDs', () => {
+			const descriptionId = 'status';
+
+			render(
+				<CollapsibleCard.Root>
+					<CollapsibleCard.Header aria-describedby={ descriptionId }>
+						<Card.Title>Settings</Card.Title>
+						<CollapsibleCard.HeaderDescription id={ descriptionId }>
+							3 errors
+						</CollapsibleCard.HeaderDescription>
+					</CollapsibleCard.Header>
+				</CollapsibleCard.Root>
+			);
+
+			const trigger = screen.getByRole( 'button' );
+			expect( trigger ).toHaveAccessibleName( 'Settings' );
+			expect( trigger ).toHaveAccessibleDescription( '3 errors' );
+		} );
+
+		it( 'keeps descriptions in visual order when a conditional description remounts', () => {
+			const getCard = ( showFirstDescription: boolean ) => (
+				<CollapsibleCard.Root>
+					<CollapsibleCard.Header>
+						<Card.Title>Settings</Card.Title>
+						{ showFirstDescription && (
+							<CollapsibleCard.HeaderDescription>
+								3 errors
+							</CollapsibleCard.HeaderDescription>
+						) }
+						<CollapsibleCard.HeaderDescription>
+							Requires attention
+						</CollapsibleCard.HeaderDescription>
+					</CollapsibleCard.Header>
+				</CollapsibleCard.Root>
+			);
+
+			const { rerender } = render( getCard( true ) );
+			const trigger = screen.getByRole( 'button' );
+			expect( trigger ).toHaveAccessibleName( 'Settings' );
+			expect( trigger ).toHaveAccessibleDescription(
+				'3 errors Requires attention'
+			);
+
+			rerender( getCard( false ) );
+
+			expect( trigger ).toHaveAccessibleName( 'Settings' );
+			expect( trigger ).toHaveAccessibleDescription(
+				'Requires attention'
+			);
+
+			rerender( getCard( true ) );
+
+			expect( trigger ).toHaveAccessibleName( 'Settings' );
+			expect( trigger ).toHaveAccessibleDescription(
+				'3 errors Requires attention'
+			);
+		} );
+
+		it( 'throws in development when rendered outside CollapsibleCard.Header', () => {
+			// React logs render errors before rethrowing them.
+			// eslint-disable-next-line no-console
+			const originalConsoleError = console.error;
+			// eslint-disable-next-line no-console
+			console.error = jest.fn();
+
+			try {
+				expect( () =>
+					render(
+						<CollapsibleCard.HeaderDescription>
+							Description
+						</CollapsibleCard.HeaderDescription>
+					)
+				).toThrow(
+					'CollapsibleCard.HeaderDescription: Missing parent <CollapsibleCard.Header>. ' +
+						'Render <CollapsibleCard.HeaderDescription> inside <CollapsibleCard.Header>.'
+				);
+			} finally {
+				// eslint-disable-next-line no-console
+				console.error = originalConsoleError;
+			}
+		} );
+
+		it( 'has no accessible description when HeaderDescription is absent', () => {
 			render(
 				<CollapsibleCard.Root>
 					<CollapsibleCard.Header>
@@ -294,8 +426,9 @@ describe( 'CollapsibleCard', () => {
 				</CollapsibleCard.Root>
 			);
 
-			const trigger = screen.getByRole( 'button', { name: 'Title' } );
-			expect( trigger ).not.toHaveAttribute( 'aria-describedby' );
+			const trigger = screen.getByRole( 'button' );
+			expect( trigger ).toHaveAccessibleName( 'Title' );
+			expect( trigger ).not.toHaveAccessibleDescription();
 		} );
 
 		it( 'forwards ref on HeaderDescription', () => {
