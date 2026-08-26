@@ -173,4 +173,4 @@ jobs:
               run: npm install
 
             - name: Check private API usage in DataViews
-              run: node bin/check-private-apis.mjs
+              run: node tools/validation/check-private-apis.mjs

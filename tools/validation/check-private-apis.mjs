@@ -14,19 +14,18 @@
  * into a consumer bundle.
  *
  * Usage:
- *   node bin/check-private-apis.mjs [package-name ...]  # default: dataviews
- *   node bin/check-private-apis.mjs --all               # every bundled package
+ *   node tools/validation/check-private-apis.mjs [package-name ...]  # default: dataviews
+ *   node tools/validation/check-private-apis.mjs --all               # every bundled package
  */
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-// eslint-disable-next-line import/no-extraneous-dependencies -- Hoisted from the packages that depend on it. A production version of this check would live in a workspace declaring it.
 import esbuild from 'esbuild';
 
 const ROOT = path.resolve(
 	path.dirname( fileURLToPath( import.meta.url ) ),
-	'..'
+	'../..'
 );
 const PACKAGES_DIR = path.join( ROOT, 'packages' );
 const SINGLETONS = new Set( [ 'data', 'hooks', 'i18n', 'date' ] );
