@@ -22,6 +22,10 @@
 -   `useWidgetTypes` holds the icon slot with the stand-in while an action's
     icon reference resolves; an unresolvable reference clears it
     ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
+-   Warn in development when a second instance of the package evaluates:
+    the host context and the registries live at module scope, so two
+    instances split providers and registrations from their consumers
+    ([#82076](https://github.com/WordPress/gutenberg/pull/82076)).
 
 ### Documentation
 
