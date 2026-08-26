@@ -24,6 +24,23 @@ const Example = () => {
 
 ## Props
 
+### `autoFocus`
+
+ - Type: `boolean`
+ - Required: No
+ - Default: `false`
+
+If `true`, focuses the currently active cell receives when mounted.
+
+Intended for cases where the control is revealed in a popover or dialog
+and focus should move to it. AlignmentMatrixControl's initialization is
+asynchronous, and all rendered cells are tabbable until initialization
+is complete. This create race conditions when competing with programmatic
+focus management initiated when popovers are opened, where that focus
+management itself may be asynchronous. To avoid such race conditions,
+disable the external focus management and use this prop instead to focus
+the active cell once initialization is complete.
+
 ### `defaultValue`
 
  - Type: `"center" | "top left" | "top center" | "top right" | "center left" | "center center" | "center right" | "bottom left" | "bottom center" | "bottom right"`
