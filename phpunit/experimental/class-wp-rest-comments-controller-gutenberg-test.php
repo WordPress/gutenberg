@@ -1113,8 +1113,79 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$this->assertSame( 200, $response->get_status() );
 	}
 
+	/**
+	 * `wp_delete_comment()` reparents children rather than deleting them, so
+	 * without a cascade the reactions would outlive their note as orphan rows.
+	 */
+	public function test_permanently_deleting_note_deletes_its_reactions() {
+		wp_set_current_user( self::$editor_id );
+		$post_id     = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$note_id     = $this->create_note( $post_id, self::$editor_id );
+		$reaction_id = $this->create_reaction( $post_id, $note_id, self::$editor_id );
+		$other_id    = $this->create_reaction( $post_id, $note_id, self::$author_id, 'rocket' );
 
+		wp_delete_comment( $note_id, true );
 
+		$this->assertNull( get_comment( $reaction_id ), 'Reaction outlived its note.' );
+		$this->assertNull( get_comment( $other_id ), 'Reaction outlived its note.' );
+		$this->assertEmpty(
+			get_comments(
+				array(
+					'post_id' => $post_id,
+					'type'    => 'reaction',
+					'status'  => 'all',
+				)
+			),
+			'Reaction rows remained after permanent cleanup.'
+		);
+	}
+
+	/**
+	 * Deleting a reply must take that reply's own reactions with it.
+	 */
+	public function test_permanently_deleting_note_reply_deletes_its_reactions() {
+		wp_set_current_user( self::$editor_id );
+		$post_id  = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$note_id  = $this->create_note( $post_id, self::$editor_id );
+		$reply_id = wp_insert_comment(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_parent'   => $note_id,
+				'comment_type'     => 'note',
+				'comment_content'  => 'A reply',
+				'comment_approved' => 0,
+				'user_id'          => self::$editor_id,
+			)
+		);
+
+		$note_reaction_id  = $this->create_reaction( $post_id, $note_id, self::$editor_id );
+		$reply_reaction_id = $this->create_reaction( $post_id, $reply_id, self::$editor_id );
+
+		wp_delete_comment( $reply_id, true );
+
+		$this->assertNull( get_comment( $reply_reaction_id ), 'Reply reaction outlived its reply.' );
+		$this->assertNotNull( get_comment( $note_reaction_id ), 'Root note reaction should be untouched.' );
+	}
+
+	/**
+	 * Core cascades a trashed note to its `note` children only.
+	 */
+	public function test_trashing_note_trashes_and_restores_its_reactions() {
+		if ( ! EMPTY_TRASH_DAYS ) {
+			$this->markTestSkipped( 'Trash is disabled; trashing force-deletes.' );
+		}
+
+		wp_set_current_user( self::$editor_id );
+		$post_id     = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$note_id     = $this->create_note( $post_id, self::$editor_id );
+		$reaction_id = $this->create_reaction( $post_id, $note_id, self::$editor_id );
+
+		wp_trash_comment( $note_id );
+		$this->assertSame( 'trash', wp_get_comment_status( $reaction_id ), 'Reaction stayed approved under a trashed note.' );
+
+		wp_untrash_comment( $note_id );
+		$this->assertSame( 'approved', wp_get_comment_status( $reaction_id ), 'Reaction was not restored with its note.' );
+	}
 
 	/**
 	 * The cleanup in create_item() must repoint to the surviving row even when

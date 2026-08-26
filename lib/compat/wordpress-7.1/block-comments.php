@@ -314,6 +314,99 @@ function gutenberg_add_note_reaction_emojis_setting( $settings ) {
 add_filter( 'block_editor_settings_all', 'gutenberg_add_note_reaction_emojis_setting' );
 
 /**
+ * Returns the reaction children of a note.
+ *
+ * @since 7.1.0
+ *
+ * @param WP_Comment $note   The note whose reactions to fetch.
+ * @param string     $status Comment status to match. Default 'all'.
+ * @return int[] Reaction comment IDs.
+ */
+function gutenberg_get_note_reaction_ids( $note, $status = 'all' ) {
+	return get_comments(
+		array(
+			'parent'  => $note->comment_ID,
+			'type'    => 'reaction',
+			'status'  => $status,
+			'fields'  => 'ids',
+			'orderby' => 'comment_ID',
+		)
+	);
+}
+
+/**
+ * Permanently deletes a note's reactions along with the note.
+ *
+ * `wp_delete_comment()` reparents a deleted comment's children one level up
+ * rather than deleting them, so reactions would otherwise survive their note
+ * as approved, orphaned rows still carrying the reactor's identity. Core
+ * cascades only `note` children (see `wp_trash_comment()`), so reactions need
+ * their own cascade.
+ *
+ * Runs on `delete_comment`, which fires before the reparenting query.
+ *
+ * @since 7.1.0
+ *
+ * @param string     $comment_id The comment ID as a numeric string.
+ * @param WP_Comment $comment    The comment being deleted.
+ */
+function gutenberg_delete_note_reactions( $comment_id, $comment ) {
+	if ( ! $comment instanceof WP_Comment || 'note' !== $comment->comment_type ) {
+		return;
+	}
+
+	foreach ( gutenberg_get_note_reaction_ids( $comment ) as $reaction_id ) {
+		wp_delete_comment( $reaction_id, true );
+	}
+}
+add_action( 'delete_comment', 'gutenberg_delete_note_reactions', 10, 2 );
+
+/**
+ * Trashes a note's reactions along with the note.
+ *
+ * Core cascades a trashed note to its `note` children only, so reactions
+ * would otherwise stay approved under a trashed note. Replies are covered
+ * because core trashes each one, which fires this action again.
+ *
+ * @since 7.1.0
+ *
+ * @param string     $comment_id The comment ID as a numeric string.
+ * @param WP_Comment $comment    The trashed comment.
+ */
+function gutenberg_trash_note_reactions( $comment_id, $comment ) {
+	if ( ! $comment instanceof WP_Comment || 'note' !== $comment->comment_type ) {
+		return;
+	}
+
+	foreach ( gutenberg_get_note_reaction_ids( $comment, 'approve' ) as $reaction_id ) {
+		wp_trash_comment( $reaction_id );
+	}
+}
+add_action( 'trashed_comment', 'gutenberg_trash_note_reactions', 10, 2 );
+
+/**
+ * Restores a note's reactions along with the note.
+ *
+ * The counterpart to gutenberg_trash_note_reactions(), so reopening a note
+ * from the trash brings its reactions back with it.
+ *
+ * @since 7.1.0
+ *
+ * @param string     $comment_id The comment ID as a numeric string.
+ * @param WP_Comment $comment    The untrashed comment.
+ */
+function gutenberg_untrash_note_reactions( $comment_id, $comment ) {
+	if ( ! $comment instanceof WP_Comment || 'note' !== $comment->comment_type ) {
+		return;
+	}
+
+	foreach ( gutenberg_get_note_reaction_ids( $comment, 'trash' ) as $reaction_id ) {
+		wp_untrash_comment( $reaction_id );
+	}
+}
+add_action( 'untrashed_comment', 'gutenberg_untrash_note_reactions', 10, 2 );
+
+/**
  * Allows the note mention chip markup through comment kses.
  *
  * The notes `@` mention completer stores a mention as a chip carrying the
