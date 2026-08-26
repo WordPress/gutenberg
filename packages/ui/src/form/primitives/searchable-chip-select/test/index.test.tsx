@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
 import warning from '@wordpress/warning';
@@ -15,12 +15,22 @@ describe( 'SearchableChipSelect', () => {
 		mockedWarning.mockClear();
 	} );
 
-	it( 'forwards ref', () => {
-		const ref = createRef< HTMLDivElement >();
+	it( 'forwards ref to the search input', () => {
+		const ref = createRef< HTMLInputElement >();
 
-		render( <SearchableChipSelect ref={ ref } /> );
+		render(
+			<SearchableChipSelect ref={ ref } aria-label="Select options" />
+		);
 
-		expect( ref.current ).toBeInstanceOf( HTMLDivElement );
+		const input = screen.getByRole( 'combobox', {
+			name: 'Select options',
+		} );
+
+		expect( ref.current ).toBe( input );
+		act( () => {
+			ref.current?.focus();
+		} );
+		expect( input ).toHaveFocus();
 	} );
 
 	it( 'passes aria-label and aria-describedby props to the appropriate components', () => {

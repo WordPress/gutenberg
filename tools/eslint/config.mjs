@@ -69,6 +69,16 @@ const typedFiles = glob( 'packages/*/package.json', { cwd: rootDir } )
 	.filter( ( fileName ) => require( join( rootDir, fileName ) ).types )
 	.map( ( fileName ) => fileName.replace( 'package.json', '**/*.js' ) );
 
+// All files from bundled packages: packages not registered as WordPress
+// scripts or script modules, which plugins therefore compile into their own
+// bundles when importing them via npm.
+const bundledPackageFiles = glob( 'packages/*/package.json', { cwd: rootDir } )
+	.filter( ( fileName ) => {
+		const pkg = require( join( rootDir, fileName ) );
+		return ! pkg.wpScript && ! pkg.wpScriptModuleExports;
+	} )
+	.map( ( fileName ) => fileName.replace( 'package.json', '**' ) );
+
 const restrictedImports = [
 	{
 		name: 'framer-motion',
@@ -127,6 +137,21 @@ const restrictedImports = [
 	},
 ];
 
+// Restrictions applied to every bundled package: a plugin bundling such a
+// package compiles a second copy of private-apis, which cannot unlock objects
+// locked by the WordPress copy and throws at runtime. Existing usage is
+// grandfathered in `tools/eslint/suppressions.json` and may only shrink.
+const privateApisRestrictedImport = {
+	name: '@wordpress/private-apis',
+	message:
+		'Bundled packages may be compiled into plugin bundles via npm, where a second copy of private-apis cannot unlock objects locked by the WordPress copy and throws at runtime.',
+};
+const lockUnlockRestrictedPattern = {
+	group: [ '**/lock-unlock', '**/lock-unlock.*' ],
+	message:
+		'This module wraps @wordpress/private-apis, which bundled packages must not depend on: a plugin bundling this package compiles a second copy of private-apis that cannot unlock objects locked by the WordPress copy and throws at runtime.',
+};
+
 const useIsomorphicLayoutEffectRestrictedImport = {
 	name: '@wordpress/element',
 	importNames: [ 'useLayoutEffect' ],
@@ -144,8 +169,12 @@ const UI_RESTRICTED_IMPORTS = {
 			( { name } ) => name !== '@base-ui/react'
 		),
 		useIsomorphicLayoutEffectRestrictedImport,
+		// `@wordpress/ui` is a bundled package, but its overrides below would
+		// replace the bundled-packages override, so the restriction is
+		// re-applied here.
+		privateApisRestrictedImport,
 	],
-	patterns: [],
+	patterns: [ lockUnlockRestrictedPattern ],
 };
 
 const restrictedSyntax = [
@@ -357,6 +386,10 @@ export default dedupePlugins( [
 				{
 					definedTags: [ 'jest-environment' ],
 				},
+			],
+			'react/jsx-filename-extension': [
+				'error',
+				{ extensions: [ '.tsx' ] },
 			],
 			'react-hooks/config': [
 				'error',
@@ -641,20 +674,6 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Override: Storybook + components — enforce JSX file extensions.
-	{
-		files: [
-			'**/@(storybook|stories)/**',
-			'packages/components/src/**/*.tsx',
-		],
-		rules: {
-			'react/jsx-filename-extension': [
-				'error',
-				{ extensions: [ '.jsx', '.tsx' ] },
-			],
-		},
-	},
-
 	// Override: Relax JSDoc parameter rules for TypeScript components. A
 	// component always receives props and returns a React element, and its
 	// props should be documented through its TypeScript props types.
@@ -844,21 +863,30 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Override: dataviews — restrict private-apis imports.
+	// Override: bundled packages — restrict private-apis imports, both direct
+	// and via each package's local `lock-unlock` wrapper module.
+	// `packages/ui` is excluded because this entry would replace its more
+	// specific overrides above; it gets the same restriction through
+	// `UI_RESTRICTED_IMPORTS`. `packages/e2e-test-utils-playwright` is
+	// excluded so its own `no-restricted-imports` override above (uuid) keeps
+	// applying; as Node-only test tooling it cannot hit this hazard.
 	{
-		files: [ 'packages/dataviews/**' ],
+		files: bundledPackageFiles.filter(
+			( files ) =>
+				! [
+					'packages/ui/**',
+					'packages/e2e-test-utils-playwright/**',
+				].includes( files )
+		),
 		rules: {
 			'no-restricted-imports': [
 				'error',
 				{
 					paths: [
 						...restrictedImports,
-						{
-							name: '@wordpress/private-apis',
-							message:
-								'dataviews is a bundled package that plugins may import via npm, where a second copy of private-apis cannot unlock objects locked by the WordPress copy and throws at runtime.',
-						},
+						privateApisRestrictedImport,
 					],
+					patterns: [ lockUnlockRestrictedPattern ],
 				},
 			],
 		},
