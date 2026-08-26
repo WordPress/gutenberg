@@ -14,7 +14,6 @@ import { __ } from '@wordpress/i18n';
 import {
 	Button,
 	Placeholder,
-	TextControl,
 	ToggleControl,
 	__experimentalHasSplitBorders as hasSplitBorders,
 	__experimentalToolsPanel as ToolsPanel,
@@ -22,6 +21,7 @@ import {
 } from '@wordpress/components';
 import { blockTable as icon } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
+import { InputControl } from '@wordpress/ui';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 function createTableSection( type, rowCount, columnCount ) {
@@ -233,19 +233,19 @@ export default function TableEdit( { attributes, setAttributes, clientId } ) {
 						className="blocks-table__placeholder-form"
 						onSubmit={ onCreateTable }
 					>
-						<TextControl
+						<InputControl
 							type="number"
 							label={ __( 'Column count' ) }
 							value={ initialColumnCount }
-							onChange={ setInitialColumnCount }
+							onValueChange={ setInitialColumnCount }
 							min="1"
 							className="blocks-table__placeholder-input"
 						/>
-						<TextControl
+						<InputControl
 							type="number"
 							label={ __( 'Row count' ) }
 							value={ initialRowCount }
-							onChange={ setInitialRowCount }
+							onValueChange={ setInitialRowCount }
 							min="1"
 							className="blocks-table__placeholder-input"
 						/>
