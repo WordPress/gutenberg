@@ -31,6 +31,22 @@ describe( 'getDimensionsClassesAndStyles', () => {
 		} );
 	} );
 
+	it( 'should not return has-aspect-ratio className for the default aspect ratio', () => {
+		const attributes = {
+			style: {
+				dimensions: {
+					aspectRatio: 'auto',
+				},
+			},
+		};
+		expect( getDimensionsClassesAndStyles( attributes ) ).toEqual( {
+			className: undefined,
+			style: {
+				aspectRatio: 'auto',
+			},
+		} );
+	} );
+
 	it( 'should return width style', () => {
 		const attributes = {
 			style: {

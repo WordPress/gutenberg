@@ -197,6 +197,7 @@ function MediaTextEdit( {
 		mediaUrl,
 		mediaWidth,
 		mediaSizeSlug,
+		isAspectRatioAware,
 		rel,
 		style: blockStyle,
 		verticalAlignment,
@@ -560,7 +561,10 @@ function MediaTextEdit( {
 			<div { ...blockProps }>
 				{ mediaPosition === 'right' && <div { ...innerBlocksProps } /> }
 				<MediaContainer
-					className="wp-block-media-text__media"
+					className={ clsx( 'wp-block-media-text__media', {
+						'is-aspect-ratio-aware':
+							isAspectRatioAware || hasAspectRatio,
+					} ) }
 					onSelectMedia={ onSelectMedia }
 					onWidthChange={ onWidthChange }
 					commitWidthChange={ commitWidthChange }

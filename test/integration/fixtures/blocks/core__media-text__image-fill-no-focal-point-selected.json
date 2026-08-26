@@ -10,6 +10,7 @@
 			"mediaType": "image",
 			"mediaWidth": 50,
 			"isStackedOnMobile": true,
+			"isAspectRatioAware": true,
 			"imageFill": true,
 			"useFeaturedImage": false
 		},
