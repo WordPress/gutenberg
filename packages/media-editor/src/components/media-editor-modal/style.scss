@@ -30,8 +30,12 @@
 	flex-direction: row;
 	align-items: center;
 	gap: $grid-unit-20;
-	padding: $grid-unit-10 $grid-unit-40 $grid-unit-30;
+	padding: 0 $grid-unit-40 $grid-unit-30;
 	background: $white;
+
+	@include break-large() {
+		padding-top: $grid-unit-20;
+	}
 
 	// `margin-left: auto` pins the actions to the right edge whether or not
 	// History renders (e.g. non-image attachments show only `SaveActions`).

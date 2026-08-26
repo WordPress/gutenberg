@@ -113,7 +113,9 @@
 		flex-direction: column;
 		min-width: 0;
 		min-height: 0;
-		overflow-y: auto;
+		// No scrolling here: the tab strip has to stay put while the fields
+		// move, so the open pane is the scroll container instead.
+		overflow: hidden;
 
 		// The `sm` surface-width token, up from the 280px `$sidebar-width`
 		// this used to inherit: #81121 reports the panel reading as squished
@@ -125,13 +127,40 @@
 		}
 	}
 
-	// The tab strip runs the panel's full width so its underline meets both
-	// edges; the gutter belongs to the pane below it. Equal inline padding so
-	// focus rings (outline + offset) sit inside the pane rather than being
-	// clipped by the scroll container.
+	// The strip and the open pane, stacked. `Tabs.Root` is the only element
+	// between the sidebar and them, so it carries the column that lets the
+	// pane take the leftover height and scroll inside it.
+	.media-editor__tabs {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		min-height: 0;
+		padding: 0 $grid-unit-20;
+	}
+
+	// Wraps `Tabs.List`, which sizes itself to its tabs and so cannot carry a
+	// rule across the sidebar. This box is a block, so the border runs the
+	// full width while the padding lines the tabs up with the fields below.
+	// Sticky, and opaque because a sticky box is transparent by default and
+	// the pane scrolls underneath it.
+	.media-editor__tablist {
+		position: sticky;
+		top: 0;
+		z-index: 1;
+		flex-shrink: 0;
+		background: $white;
+		border-bottom: $border-width solid $gray-300;
+	}
+
+	// The scrolling pane. Equal inline padding so focus rings (outline +
+	// offset) sit inside the pane rather than being clipped by its own
+	// overflow.
 	.media-editor__panel {
-		padding-block: $grid-unit-20 $grid-unit-30;
-		padding-inline: $grid-unit-20;
+		flex: 1;
+		min-height: 0;
+		overflow-y: auto;
+		padding-block: $grid-unit-30;
+		padding-inline: $grid-unit-05 $grid-unit-20;
 	}
 
 	// Below `large` an open panel owns the body, so the canvas steps aside

@@ -146,14 +146,24 @@ function MediaEditorSidebar( {
 			<VisuallyHidden render={ <h2 /> }>
 				{ __( 'Media settings' ) }
 			</VisuallyHidden>
-			<Tabs.Root value={ activeTab } onValueChange={ onSelectTab }>
-				<Tabs.List variant="minimal">
-					{ tabs.map( ( tab ) => (
-						<Tabs.Tab key={ tab.id } value={ tab.id }>
-							{ tab.title }
-						</Tabs.Tab>
-					) ) }
-				</Tabs.List>
+			<Tabs.Root
+				className="media-editor__tabs"
+				value={ activeTab }
+				onValueChange={ onSelectTab }
+			>
+				{ /* `Tabs.List` sizes itself to its tabs (`width: fit-content`),
+				     so the rule under the strip is drawn by this wrapper
+				     instead — it spans the sidebar, while its padding lines the
+				     tabs up with the fields in the pane below. */ }
+				<div className="media-editor__tablist">
+					<Tabs.List variant="minimal">
+						{ tabs.map( ( tab ) => (
+							<Tabs.Tab key={ tab.id } value={ tab.id }>
+								{ tab.title }
+							</Tabs.Tab>
+						) ) }
+					</Tabs.List>
+				</div>
 				{ /* `Tabs.Root` throws in dev when its registered Tab and
 				     Panel counts disagree, so every tab renders a panel. */ }
 				{ tabs.map( ( tab ) => (
@@ -460,14 +470,6 @@ function MediaEditorContent( {
 		hasChosenPanelRef.current = true;
 		setActivePanel( ( open ) => ( open ? null : lastPanelRef.current ) );
 	}, [] );
-	// Until then, follow the breakpoint: dragging a window narrow hands the
-	// canvas the full width instead of leaving a panel wedged beside it.
-	useEffect( () => {
-		if ( hasChosenPanelRef.current ) {
-			return;
-		}
-		setActivePanel( isWide ? DETAILS_PANEL : null );
-	}, [ isWide ] );
 	// Below `small` a frame's header cannot fit the history cluster alongside
 	// its own controls, so it moves that cluster elsewhere. Separate from
 	// `isWide`, which is the dock breakpoint (`large`) the panel uses.
@@ -559,6 +561,26 @@ function MediaEditorContent( {
 
 	const mediaType = getMediaTypeFromMimeType( media?.mime_type ).type;
 	const isImage = !! media && mediaType === 'image';
+
+	// Until the user picks a panel, follow the breakpoint: dragging a window
+	// narrow hands the canvas the full width instead of leaving a panel
+	// wedged beside it.
+	//
+	// Docked, the panel sits beside the canvas, so it opens on Crop: the
+	// canvas is still visible and cropping is what the editor is for. Below
+	// `large` an open panel replaces the canvas, and a crop panel with no
+	// crop in sight is not worth opening on, so Details leads there instead.
+	// Non-image media has no Crop tab at all (see `tabs`), so it always gets
+	// Details. `isImage` is derived from a record that resolves after mount,
+	// which is why this runs here rather than seeding `useState`.
+	useEffect( () => {
+		if ( hasChosenPanelRef.current ) {
+			return;
+		}
+		const defaultPanel = isWide && isImage ? CROP_PANEL : DETAILS_PANEL;
+		lastPanelRef.current = defaultPanel;
+		setActivePanel( isWide ? defaultPanel : null );
+	}, [ isWide, isImage ] );
 	// Only `resetCropOptions` is needed here, for the Reset button; the
 	// aspect-ratio members are read by `MediaEditorImageControls` itself.
 	const {
@@ -643,10 +665,11 @@ function MediaEditorContent( {
 		/>
 	);
 
-	// Below `small` there is no room for a side panel, so the Crop panel's
-	// rotate/flip/zoom fall back to a flat row under the canvas beside the
-	// ruler, with aspect ratio joining them as a dropdown. Above `small` the
-	// Crop panel carries them and this renders nothing.
+	// Below `small` an open panel replaces the canvas, so these and the Crop
+	// panel's copies are never on screen together: this row is what reaches
+	// rotate/flip/zoom while the panel is closed, with aspect ratio joining
+	// them as a dropdown. Above `small` the Crop panel sits beside the canvas
+	// and carries them instead.
 	const imageControls =
 		isImage && ! isSmall ? (
 			<MediaEditorImageControls
@@ -669,10 +692,7 @@ function MediaEditorContent( {
 								aspectRatioValue={ aspectRatioValue }
 								onAspectRatioChange={ setAspectRatioValue }
 								aspectRatioOptions={ aspectRatioOptions }
-								// Above `small` the panel carries
-								// rotate/flip/zoom; below it they have no
-								// panel to live in and sit under the canvas.
-								showTransformControls={ isSmall }
+								showTransformControls
 							/>
 						),
 					},
@@ -740,7 +760,18 @@ function MediaEditorContent( {
 						{ !! activePanel && (
 							<MediaEditorSidebar
 								tabs={ tabs }
-								activeTab={ activePanel }
+								// Swapping the edited media can drop the Crop
+								// tab out from under an open panel — saving a
+								// crop moves the editor to a new id, which may
+								// resolve as non-image. Fall back rather than
+								// hand `Tabs.Root` a value no tab matches.
+								activeTab={
+									tabs.some(
+										( tab ) => tab.id === activePanel
+									)
+										? activePanel
+										: DETAILS_PANEL
+								}
 								onSelectTab={ selectPanel }
 							/>
 						) }
