@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Breadcrumbs, Page } from '@wordpress/admin-ui';
-import { useId, useRef, useState } from '@wordpress/element';
+import { useId, useState } from '@wordpress/element';
 import { wordpress } from '@wordpress/icons';
 import { ThemeProvider } from '@wordpress/theme';
 import {
@@ -136,7 +136,6 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 			useState< SidebarThemeId >( SIDEBAR_THEME_PRESETS[ 0 ].id );
 		const generalSettingsId = useId();
 		const displaySettingsId = useId();
-		const overlayContainerRef = useRef< HTMLDivElement >( null );
 		const rootThemeSettings = getDesignSystemThemeSettings(
 			context.globals
 		);
@@ -149,7 +148,6 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 					onSelectTheme={ setSidebarThemeId }
 				/>
 				<ThemeProvider color={ sidebarTheme.colors }>
-					<div ref={ overlayContainerRef } />
 					<div
 						style={ {
 							display: 'grid',
@@ -229,15 +227,7 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 										>
 											Site actions
 										</Menu.Trigger>
-										<Menu.Popup
-											portal={
-												<Menu.Portal
-													container={
-														overlayContainerRef
-													}
-												/>
-											}
-										>
+										<Menu.Popup>
 											<Menu.LinkItem
 												href={ `#${ generalSettingsId }` }
 											>
@@ -264,16 +254,7 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 											</Menu.Item>
 										</Menu.Popup>
 									</Menu.Root>
-									<Dialog.Popup
-										size="small"
-										portal={
-											<Dialog.Portal
-												container={
-													overlayContainerRef
-												}
-											/>
-										}
-									>
+									<Dialog.Popup size="small">
 										<Dialog.Header>
 											<Dialog.Title>
 												Site details
