@@ -20,6 +20,32 @@ function getAbsolutePath( packageName: string ) {
 	);
 }
 
+/**
+ * Serve the English Emojibase dataset for the Editor/EmojiPicker story,
+ * mirroring the `build/emojibase-data/<locale>/` layout the Gutenberg
+ * plugin exposes via the `noteEmojibaseUrl` editor setting. Only `en` is
+ * mapped (the story pins the document language) to keep the published
+ * Storybook artifact small.
+ *
+ * The path is resolved rather than hardcoded to `node_modules/`, matching
+ * `tools/build-scripts/copy-emojibase-data.mjs`: the package is declared
+ * by the `tools/build-scripts` workspace, so a non-hoisted install would
+ * otherwise leave Storybook pointing at a directory that isn't there.
+ * A missing package costs the story its data, not the whole Storybook.
+ */
+function emojibaseStaticDirs() {
+	try {
+		return [
+			{
+				from: path.join( getAbsolutePath( 'emojibase-data' ), 'en' ),
+				to: '/emojibase-data/en',
+			},
+		];
+	} catch {
+		return [];
+	}
+}
+
 const { NODE_ENV = 'development' } = process.env;
 
 const stories = [
@@ -56,18 +82,7 @@ const config: StorybookConfig = {
 		disableTelemetry: true,
 	},
 	stories,
-	staticDirs: [
-		'./static',
-		// Serve the English Emojibase dataset for the Editor/EmojiPicker
-		// story, mirroring the `build/emojibase-data/<locale>/` layout the
-		// Gutenberg plugin exposes via the `noteEmojibaseUrl` editor
-		// setting. Only `en` is mapped (the story pins the document
-		// language) to keep the published Storybook artifact small.
-		{
-			from: '../node_modules/emojibase-data/en',
-			to: '/emojibase-data/en',
-		},
-	],
+	staticDirs: [ './static', ...emojibaseStaticDirs() ],
 	addons: [
 		{
 			name: getAbsolutePath( '@storybook/addon-docs' ),

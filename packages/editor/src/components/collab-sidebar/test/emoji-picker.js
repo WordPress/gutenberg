@@ -291,6 +291,25 @@ describe( 'EmojiPicker search announcements', () => {
 			expect( speak ).toHaveBeenCalledWith( 'No emoji found.' )
 		);
 	} );
+
+	it( 'drops a queued count when the query is cleared', async () => {
+		const user = userEvent.setup();
+		render( <EmojiPicker onSelect={ () => {} } /> );
+
+		await screen.findAllByRole( 'gridcell' );
+
+		const searchbox = screen.getByRole( 'searchbox', {
+			name: 'Search emoji',
+		} );
+
+		await user.type( searchbox, 'grinning' );
+		await user.clear( searchbox );
+
+		// Well past the 500ms debounce window: clearing restored the full
+		// grid, so the count queued for "grinning" no longer describes it.
+		await new Promise( ( resolve ) => setTimeout( resolve, 800 ) );
+		expect( speak ).not.toHaveBeenCalledWith( '1 emoji found.' );
+	} );
 } );
 
 describe( 'EMOJIBASE_LOCALES drift detection', () => {

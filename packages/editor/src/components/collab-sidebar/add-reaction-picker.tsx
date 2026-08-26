@@ -52,17 +52,25 @@ function loadEmojiPicker() {
 }
 
 /**
- * Lazy-load the full emoji picker. Its bundle is only fetched the first
- * time a user opens (or hovers) the add-reaction trigger in a session;
- * the Emojibase JSON dataset is fetched separately on first open.
+ * Lazy-load the full emoji picker, so its module body runs the first
+ * time a user opens (or hovers) the add-reaction trigger in a session
+ * rather than on every editor load. The Emojibase JSON dataset is
+ * fetched separately on first open.
+ *
+ * Whether this also defers a *download* depends on the bundler. npm
+ * consumers who code-split get a separate chunk; the WordPress plugin
+ * build does not, because `wpScript` packages are bundled as a single
+ * IIFE (`packages/wp-build/lib/build.mjs`) and esbuild cannot split that
+ * format -- there, esbuild inlines the module behind a lazy initializer
+ * inside `wp-editor.js`.
  */
 const FullEmojiPicker = lazy( loadEmojiPicker );
 
 /**
- * Warm the full picker before it opens: start fetching the lazy picker
- * chunk and the Emojibase dataset for the active locale. Both loaders
- * cache, so calling this repeatedly (every hover) is free after the
- * first invocation.
+ * Warm the full picker before it opens: resolve the lazy picker module
+ * and start fetching the Emojibase dataset for the active locale. Both
+ * loaders cache, so calling this repeatedly (every hover) is free after
+ * the first invocation.
  *
  * @param baseUrl Same-origin URL of the Emojibase dataset directory.
  */
@@ -107,7 +115,10 @@ interface PickerErrorBoundaryProps {
 /**
  * Catches render-time failures from the lazy picker — most notably a
  * rejected chunk import, which `Suspense` does not handle — and defers
- * to the parent, which swaps in the curated fallback picker.
+ * to the parent, which swaps in the curated fallback picker. A rejected
+ * import only happens where the picker is a real chunk (see
+ * `FullEmojiPicker`); everywhere else this still guards a throw from the
+ * picker's own render.
  */
 class PickerErrorBoundary extends Component< PickerErrorBoundaryProps > {
 	state = { hasError: false };

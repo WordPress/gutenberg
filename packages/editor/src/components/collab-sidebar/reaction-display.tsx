@@ -170,11 +170,16 @@ function ReactionButton( {
 }: ReactionButtonProps ) {
 	const [ names, setNames ] = useState< string[] | null >( null );
 	const [ isFetching, setIsFetching ] = useState( false );
+	// Whether the user has reached this pill (hover or keyboard focus).
+	// Gates the Emojibase fetch below onto the same moment that fetches
+	// the reactor names, keeping the dataset off the sidebar's first
+	// render.
+	const [ isReached, setIsReached ] = useState( false );
 	// Reactions picked from the full picker are stored as hex keys and
 	// carry no curated label; resolve their name from the Emojibase
 	// dataset so tooltips read "thumbs up" rather than echoing the "👍"
 	// character. Falls back to the emoji character until resolved.
-	const resolvedLabel = useEmojiLabel( slug, ! emojiLabel );
+	const resolvedLabel = useEmojiLabel( slug, ! emojiLabel, isReached );
 	const label = emojiLabel || resolvedLabel || emoji;
 	// Derive the tooltip from the fetched names and the *current* label
 	// rather than storing a formatted string: the names request and the
@@ -184,6 +189,7 @@ function ReactionButton( {
 		names && names.length > 0 ? formatReactionTooltip( names, label ) : '';
 
 	const fetchReactionNames = useCallback( () => {
+		setIsReached( true );
 		const cacheKey = `${ noteId }:${ slug }`;
 		if ( reactionNamesCache[ cacheKey ] ) {
 			setNames( reactionNamesCache[ cacheKey ] );
@@ -194,6 +200,11 @@ function ReactionButton( {
 			return;
 		}
 
+		// A cache miss on a pill that already listed names means the
+		// entry was invalidated -- someone added or removed this
+		// reaction. Drop the old list rather than showing it against the
+		// new count for the length of the refetch.
+		setNames( null );
 		setIsFetching( true );
 		apiFetch< ReactionComment[] >( {
 			path: addQueryArgs( '/wp/v2/comments', {

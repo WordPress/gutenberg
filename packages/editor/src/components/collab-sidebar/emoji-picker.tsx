@@ -288,6 +288,10 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
 	useEffect( () => {
 		if ( ! query.trim() || isLoading ) {
+			// Drop a count still queued from the previous query: clearing
+			// the field restores the full grid, and announcing "1 emoji
+			// found." half a second later describes what is no longer there.
+			debouncedSpeak.cancel();
 			return;
 		}
 		const message = matchCount

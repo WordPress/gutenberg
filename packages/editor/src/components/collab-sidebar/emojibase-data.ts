@@ -438,19 +438,28 @@ export function getCachedEmojiLabel(
 
 /**
  * React hook resolving the user-facing label for a hex-key reaction
- * (a pick from the full emoji picker). Loads the Emojibase dataset on
- * demand — the fetch is shared with the full picker via the module
- * cache — so reaction pill tooltips can show the emoji name just like
- * curated reactions do.
+ * (a pick from the full emoji picker), so reaction pill tooltips can
+ * show the emoji name just like curated reactions do.
+ *
+ * An already-loaded dataset resolves synchronously from the module
+ * cache, shared with the full picker. Fetching one that isn't loaded
+ * waits for `load`: the per-locale dataset is ~775KB of JSON, too much
+ * to pull down and parse just because a note happens to carry a
+ * full-picker reaction. Callers pass the same signal that fetches the
+ * rest of the tooltip, so the cost lands when the tooltip is wanted.
+ * Until then the pill falls back to the emoji character, which assistive
+ * technology announces by its own Unicode name.
  *
  * @param hexKey  Normalized reaction hex key, e.g. `1f44d`.
  * @param enabled Whether resolution should run (false for curated
  *                slugs, which have their own labels).
+ * @param load    Whether to fetch the dataset when it isn't cached.
  * @return The resolved label, or null while unresolved.
  */
 export function useEmojiLabel(
 	hexKey: string,
-	enabled: boolean
+	enabled: boolean,
+	load: boolean
 ): string | null {
 	const { baseUrl, labelOverrides } = useEmojibaseConfig();
 	const [ label, setLabel ] = useState< string | null >( () =>
@@ -458,7 +467,7 @@ export function useEmojiLabel(
 	);
 
 	useEffect( () => {
-		if ( ! enabled || label || ! baseUrl ) {
+		if ( ! enabled || ! load || label || ! baseUrl ) {
 			return;
 		}
 		const locale = detectLocale();
@@ -483,7 +492,7 @@ export function useEmojiLabel(
 		return () => {
 			cancelled = true;
 		};
-	}, [ hexKey, enabled, label, baseUrl, labelOverrides ] );
+	}, [ hexKey, enabled, load, label, baseUrl, labelOverrides ] );
 
 	return label;
 }

@@ -24,9 +24,19 @@ const ROOT_DIR = path.resolve( __dirname, '../..' );
 
 // Resolve emojibase-data via node module resolution so this works whether
 // the dependency is hoisted to the repo root or nested in this workspace.
-const SRC_DIR = path.dirname(
-	require.resolve( 'emojibase-data/package.json' )
-);
+// An unresolvable module is the same "not installed" case the copy step
+// skips over, so it must not escape as a module-resolution throw and take
+// the whole plugin build down with it.
+const SRC_DIR = resolveEmojibaseDir();
+
+function resolveEmojibaseDir() {
+	try {
+		return path.dirname( require.resolve( 'emojibase-data/package.json' ) );
+	} catch {
+		return null;
+	}
+}
+
 const DEST_DIR = path.join( ROOT_DIR, 'build', 'emojibase-data' );
 
 // We only ever fetch data.json and messages.json. Shipping just those
@@ -70,10 +80,10 @@ const LOCALES = [
 ];
 
 async function copyEmojibaseData() {
-	if ( ! existsSync( SRC_DIR ) ) {
+	if ( ! SRC_DIR || ! existsSync( SRC_DIR ) ) {
 		console.warn(
-			'⚠️  emojibase-data not found at',
-			SRC_DIR,
+			'⚠️  emojibase-data not found',
+			SRC_DIR ? `at ${ SRC_DIR }` : '',
 			'— skipping. Run `npm install` to fetch it.'
 		);
 		return;

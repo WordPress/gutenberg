@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import apiFetch from '@wordpress/api-fetch';
 import { dispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import ReactionDisplay from '../reaction-display';
+import ReactionDisplay, { invalidateReactionNames } from '../reaction-display';
 
 jest.mock( '@wordpress/api-fetch', () => jest.fn() );
 
@@ -93,7 +93,7 @@ describe( 'ReactionDisplay', () => {
 		).toHaveTextContent( 'custom' );
 	} );
 
-	it( 'resolves the emoji name from the Emojibase dataset for hex-key reactions', async () => {
+	it( 'resolves the emoji name from the Emojibase dataset once the user reaches the pill', async () => {
 		dispatch( blockEditorStore ).updateSettings( {
 			noteEmojibaseUrl: 'https://example.test/emojibase',
 		} );
@@ -132,9 +132,16 @@ describe( 'ReactionDisplay', () => {
 				/>
 			);
 
-			// Until the dataset resolves, the emoji character stands in
-			// for the label; afterwards the accessible name uses the
-			// Emojibase label.
+			// The dataset is ~775KB, so it stays unfetched while the pill
+			// merely renders; the emoji character stands in for the label.
+			const pill = await screen.findByRole( 'button', {
+				name: '👍, 2 reactions',
+			} );
+			expect( global.fetch ).not.toHaveBeenCalled();
+
+			// Reaching the pill is what asks for the tooltip, and the
+			// accessible name then uses the Emojibase label.
+			await userEvent.hover( pill );
 			expect(
 				await screen.findByRole( 'button', {
 					name: 'thumbs up, 2 reactions',
@@ -225,6 +232,78 @@ describe( 'ReactionDisplay', () => {
 			).toBeVisible()
 		);
 		expect( apiFetch ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'stops showing invalidated reactor names while the refetch runs', async () => {
+		const user = userEvent.setup();
+		const noteId = uniqueNoteId;
+		apiFetch.mockResolvedValue( [
+			{ author_name: 'Alice', content: { raw: 'heart' } },
+		] );
+		const { rerender } = render(
+			<ReactionDisplay
+				noteId={ noteId }
+				reactions={ {
+					heart: { count: 1, reacted: false, my_reaction_id: 0 },
+				} }
+				onToggleReaction={ () => {} }
+			/>
+		);
+
+		const pill = screen.getByRole( 'button', {
+			name: 'Heart, 1 reaction',
+		} );
+		await user.hover( pill );
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Alice reacted with Heart',
+				} )
+			).toBeVisible()
+		);
+
+		// Someone adds the same reaction from the full picker, which
+		// invalidates the cached names but cannot reach this pill's state.
+		invalidateReactionNames( noteId, 'heart' );
+		let resolveRefetch;
+		apiFetch.mockImplementation(
+			() =>
+				new Promise( ( resolve ) => {
+					resolveRefetch = resolve;
+				} )
+		);
+		rerender(
+			<ReactionDisplay
+				noteId={ noteId }
+				reactions={ {
+					heart: { count: 2, reacted: false, my_reaction_id: 0 },
+				} }
+				onToggleReaction={ () => {} }
+			/>
+		);
+
+		await user.unhover( pill );
+		await user.hover( pill );
+
+		// The refetch is still in flight: the label must not claim Alice
+		// is the only reactor against a count of two.
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'button', { name: 'Heart, 2 reactions' } )
+			).toBeVisible()
+		);
+
+		await act( async () => {
+			resolveRefetch( [
+				{ author_name: 'Alice', content: { raw: 'heart' } },
+				{ author_name: 'Bob', content: { raw: 'heart' } },
+			] );
+		} );
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Alice and Bob reacted with Heart',
+			} )
+		).toBeVisible();
 	} );
 
 	it( 'formats two and three-plus reactor names GitHub-style', async () => {
