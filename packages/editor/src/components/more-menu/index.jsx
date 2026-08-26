@@ -57,7 +57,7 @@ export default function MoreMenu( { isRevisionMode = false } ) {
 
 	if ( isRevisionMode ) {
 		return (
-			<Menu.Root>
+			<Menu.Root modal={ false }>
 				{ trigger }
 				<Menu.Popup
 					className="editor-more-menu__popup"
@@ -70,7 +70,7 @@ export default function MoreMenu( { isRevisionMode = false } ) {
 	}
 
 	return (
-		<Menu.Root>
+		<Menu.Root modal={ false }>
 			{ trigger }
 			<Menu.Popup
 				className="editor-more-menu__popup"

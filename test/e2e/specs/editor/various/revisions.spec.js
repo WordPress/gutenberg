@@ -179,11 +179,6 @@ test.describe( 'Post revisions', () => {
 		).toBeVisible();
 		await expect( codeDiff ).not.toContainText( '<p>Updated content</p>' );
 
-		// Picking a mode leaves the menu open, and the menu is modal: dismiss
-		// it before reaching for anything behind it.
-		await page.keyboard.press( 'Escape' );
-		await expect( codeEditorMenuItem ).toBeHidden();
-
 		await page.getByRole( 'button', { name: 'Show changes' } ).click();
 		const revisionCode = page.getByRole( 'region', {
 			name: 'Revision code',
