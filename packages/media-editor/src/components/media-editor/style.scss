@@ -40,15 +40,21 @@
 		min-height: 0;
 		margin: $grid-unit-30 $grid-unit-30 $grid-unit-10 $grid-unit-30;
 
-		// Docked beside the 320px panel, the canvas keeps a workable crop area.
-		// The figure has to close at the dock breakpoint itself: at 960px the
-		// modal is ~920px inside its own margins, less the 320px panel and
-		// this column's 2 x 24px gutters, which leaves ~550px. Asking for more
-		// than that pushes the panel past the modal's right edge instead of
-		// shrinking the canvas.
+		// The panel docks from `small`, so between there and `large` the
+		// canvas takes whatever the 320px panel leaves — about 200px at
+		// 600px, 380px at 782px. Cramped, but a cramped preview beside
+		// reachable controls beats a panel that hides the image outright.
+		@include break-small() {
+			margin: 0 $grid-unit-30;
+		}
+
+		// From `large` the modal is wide enough to promise the canvas a
+		// floor: 960px viewport is a ~928px modal, less the 320px panel and
+		// this column's 2 x 24px gutters, which leaves ~560px. Asking for
+		// more than that pushes the panel past the modal's right edge
+		// instead of shrinking the canvas.
 		@include break-large() {
 			min-width: 520px;
-			margin: 0 $grid-unit-30;
 		}
 	}
 
@@ -102,11 +108,12 @@
 		}
 	}
 
-	// Settings panel. Below `large` it takes the whole body: there is not
-	// enough width for a usable canvas and a usable panel at once, and sharing
-	// leaves the canvas too narrow to crop in — at 782px the panel was clipped
-	// by the modal edge outright. From `large` (960px) up there is room for
-	// both: 320 panel + 600 canvas fits inside the modal's gutters.
+	// Settings panel. Below `small` it takes the whole body: there is no room
+	// to put a 320px column beside a canvas worth looking at, and that is
+	// also where the transform controls fall back to a row under the canvas.
+	// From `small` up it docks as a column, so cropping and previewing happen
+	// together — the canvas is tight at the bottom of that range but present,
+	// where a full-screen panel would have hidden it completely.
 	.media-editor__sidebar {
 		display: flex;
 		flex: 1;
@@ -121,7 +128,7 @@
 		// this used to inherit: #81121 reports the panel reading as squished
 		// at roughly 250px, with four editable fields stacked above six
 		// read-only facts.
-		@include break-large() {
+		@include break-small() {
 			flex: none;
 			width: var(--wpds-dimension-surface-width-sm);
 		}
@@ -163,14 +170,14 @@
 		padding-inline: $grid-unit-05 $grid-unit-20;
 	}
 
-	// Below `large` an open panel owns the body, so the canvas steps aside
+	// Below `small` an open panel owns the body, so the canvas steps aside
 	// rather than being squeezed into an unusable sliver. Keyed on any panel
 	// being open, not on which one; `data-active-panel` on the same element
 	// carries the id when a rule needs to tell them apart.
 	.media-editor__body.has-panel-open .media-editor__content {
 		display: none;
 
-		@include break-large() {
+		@include break-small() {
 			display: flex;
 			margin: 0 $grid-unit-10 0 $grid-unit-30;
 		}

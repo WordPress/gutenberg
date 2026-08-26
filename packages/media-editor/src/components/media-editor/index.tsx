@@ -437,16 +437,21 @@ function MediaEditorContent( {
 	shouldCloseOnEsc = false,
 }: MediaEditorProps ) {
 	const cropper = useMediaEditor();
-	// Width decides whether the Details panel docks beside the canvas or takes
-	// the whole body. The dock needs room for a 400px panel plus a workable
-	// canvas and the modal's gutters, so it starts above `large` (960px). At
-	// `medium` (782px) the panel was clipped by the modal's right edge.
+	// Width decides whether the settings panel docks beside the canvas or
+	// takes the whole body. It docks from `small` (600px): the modal is the
+	// viewport less a 16px margin either side, so a 320px panel and the
+	// canvas column's 2 x 24px gutters still leave the canvas ~200px there
+	// and ~380px by 782px. Tight, but a full-screen panel would have hidden
+	// the image altogether — you could not crop and preview at once.
+	//
+	// The same line moves the transform controls: docked, the Crop panel
+	// carries them; below it they fall back to a row under the canvas.
 	//
 	// The choice is not carried across openings: the modal is transient, and
 	// re-opening with the panel hidden on a wide screen is how #81487 read to
 	// people in the first place. Within one opening it does hold — see
 	// `hasChosenPanelRef` below.
-	const isWide = useViewportMatch( 'large' );
+	const isWide = useViewportMatch( 'small' );
 	// `null` when nothing is open, otherwise the open panel's id.
 	const [ activePanel, setActivePanel ] = useState< string | null >(
 		isWide ? DETAILS_PANEL : null
@@ -471,10 +476,9 @@ function MediaEditorContent( {
 		setActivePanel( ( open ) => ( open ? null : lastPanelRef.current ) );
 	}, [] );
 	// Below `small` a frame's header cannot fit the history cluster alongside
-	// its own controls, so it moves that cluster elsewhere. Separate from
-	// `isWide`, which is the dock breakpoint (`large`) the panel uses.
-	const isSmall = useViewportMatch( 'small' );
-	const layout: 'wide' | 'narrow' = isSmall ? 'wide' : 'narrow';
+	// its own controls, so it moves that cluster elsewhere. The same width
+	// undocks the panel, so this is `isWide` rather than a second query.
+	const layout: 'wide' | 'narrow' = isWide ? 'wide' : 'narrow';
 	const { media, hasEdits } = useSelect(
 		( select ) => {
 			const {
@@ -665,13 +669,13 @@ function MediaEditorContent( {
 		/>
 	);
 
-	// Below `small` an open panel replaces the canvas, so these and the Crop
-	// panel's copies are never on screen together: this row is what reaches
-	// rotate/flip/zoom while the panel is closed, with aspect ratio joining
-	// them as a dropdown. Above `small` the Crop panel sits beside the canvas
-	// and carries them instead.
+	// Below `small` the panel is full screen, so an open one replaces the
+	// canvas and these never share the screen with the Crop panel's copies:
+	// this row is what reaches rotate/flip/zoom while the panel is closed,
+	// with aspect ratio joining them as a dropdown. From `small` up the Crop
+	// panel docks beside the canvas and carries them instead.
 	const imageControls =
-		isImage && ! isSmall ? (
+		isImage && ! isWide ? (
 			<MediaEditorImageControls
 				showAspectRatioControl
 				aspectRatioPresets={ aspectRatioPresets }
