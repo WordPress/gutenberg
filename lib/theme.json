@@ -280,6 +280,18 @@
 			"customFontSize": true,
 			"defaultFontSizes": true,
 			"dropCap": true,
+			"fontFamilies": [
+				{
+					"name": "Sans Serif",
+					"slug": "sans-serif",
+					"fontFamily": "sans-serif"
+				},
+				{
+					"name": "Serif",
+					"slug": "serif",
+					"fontFamily": "serif"
+				}
+			],
 			"fontSizes": [
 				{
 					"name": "Small",

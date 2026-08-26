@@ -21,6 +21,17 @@ export default function FontFamilyControl( {
 		fontFamilies = blockLevelFontFamilies;
 	}
 
+	// Flatten fontFamilies if it's in the object format with default/theme/custom
+	if (
+		fontFamilies &&
+		typeof fontFamilies === 'object' &&
+		! Array.isArray( fontFamilies )
+	) {
+		fontFamilies = [ 'default', 'theme', 'custom' ].flatMap(
+			( key ) => fontFamilies?.[ key ] ?? []
+		);
+	}
+
 	if ( ! fontFamilies || fontFamilies.length === 0 ) {
 		return null;
 	}
