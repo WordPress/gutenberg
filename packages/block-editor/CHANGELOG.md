@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 17.0.0 (2026-08-26)
+
 ### Breaking Changes
 
 -   Remove `src/default-editor-styles.scss`. Consumers importing it should supply their own ([#81793](https://github.com/WordPress/gutenberg/pull/81793)).

@@ -17,6 +17,11 @@
 -   The Add widget button and command show only while the policy lets some
     registered type be inserted
     ([#81967](https://github.com/WordPress/gutenberg/pull/81967)).
+
+## 0.6.0 (2026-08-26)
+
+### New Features
+
 -   Widget chrome footer: `relevance: 'high'` actions mount as leading text
     links (declared icon as prefix) in a persistent strip under the widget
     body, `'medium'` as trailing compact affordances (icon-only with a
