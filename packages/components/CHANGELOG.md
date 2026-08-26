@@ -15,6 +15,7 @@
     -   `TextareaControl` ([#81353](https://github.com/WordPress/gutenberg/pull/81353))
     -   `ZStack` ([#80514](https://github.com/WordPress/gutenberg/pull/80514))
     -   `BoxControl` ([#80715](https://github.com/WordPress/gutenberg/pull/80715))
+    -   `Scrollable` ([#80694](https://github.com/WordPress/gutenberg/pull/80694))
 
 ### Enhancements
 
