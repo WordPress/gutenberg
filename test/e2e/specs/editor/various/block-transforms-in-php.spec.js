@@ -4,9 +4,10 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
  * Markup both runtimes are expected to turn into the same blocks, with the same
  * attributes and the same nesting.
  *
- * Blocks whose `save` rebuilds its markup rather than wrapping the source —
- * Image and Table — decline server conversion and are covered separately, as
- * are the pre-filters PHP does not have (shortcodes, embeds, Markdown).
+ * Table rebuilds its markup on save and declines server conversion outright;
+ * Image converts only the markup it can save back. Both are covered
+ * separately, as are the pre-filters PHP does not have (shortcodes, embeds,
+ * Markdown).
  */
 const AGREED = [
 	// Headings at both ends of the range, and the class a block support reads.
@@ -39,6 +40,10 @@ const AGREED = [
 	// attribute on its inner element.
 	'<pre><code class="language-js">const a = 1;</code></pre>',
 
+	// Media a block can save back unchanged, wrapped and bare.
+	'<figure><img src="https://example.com/a.png" alt="A" /></figure>',
+	'<img src="https://example.com/b.png" alt="B" />',
+
 	// Markup no block claims, at the top level and wrapping blocks.
 	'<div class="widget"><span>Legacy</span></div>',
 	'<div><h2>Inside</h2><p>Also inside.</p></div>',
@@ -56,6 +61,9 @@ const AGREED = [
  */
 const LEGACY = [
 	'<p style="text-align:center">Centered.</p>',
+	'<figure><img src="https://example.com/a.png" alt="A" /><figcaption>A caption</figcaption></figure>',
+	'<figure><a href="https://example.com/page"><img src="https://example.com/a.png" alt="A" /></a></figure>',
+	'<p><img src="https://example.com/a.png" alt="A" /></p>',
 	'<p dir="rtl" title="tip" data-legacy="1">Attributes everywhere.</p>',
 	'<h2 id="ingredients">Anchored</h2>',
 	'<hr class="is-style-dots" />',
@@ -65,11 +73,12 @@ const LEGACY = [
 ];
 
 /**
- * Markup whose block rebuilds it on save, so the server declines to convert it.
+ * Markup the server will not convert: a block that rebuilds its markup on save
+ * whatever the source, and one whose source carries more than it can save back.
  */
 const DECLINED = [
 	'<table><caption>Amounts</caption><tbody><tr><td colspan="2">Flour</td></tr></tbody></table>',
-	'<figure><img src="https://example.com/a.png" alt="A" /></figure>',
+	'<figure><img class="alignnone size-medium wp-image-9" src="https://example.com/a.png" alt="A" width="300" height="200" /></figure>',
 ];
 
 /**
@@ -230,7 +239,10 @@ test.describe( 'Block transforms declared in block.json', () => {
 		} );
 
 		expect( support.declines ).toEqual(
-			expect.arrayContaining( [ 'core/image', 'core/table' ] )
+			expect.arrayContaining( [ 'core/table' ] )
+		);
+		expect( support.conditional ).toEqual(
+			expect.arrayContaining( [ 'core/image' ] )
 		);
 		expect( support.converts ).toEqual(
 			expect.arrayContaining( [ 'core/heading', 'core/paragraph' ] )
@@ -251,8 +263,8 @@ test.describe( 'Block transforms declared in block.json', () => {
 
 		const blocks = await readEditorBlocks( page );
 
-		// Custom HTML rather than a Table or an Image the editor would flag,
-		// and the source markup is still there to convert later.
+		// Custom HTML rather than a block the editor would flag, and the
+		// source markup is still there to convert later.
 		expect( blocks.map( ( block ) => block.name ) ).toEqual( [
 			'core/html',
 			'core/html',
@@ -263,10 +275,10 @@ test.describe( 'Block transforms declared in block.json', () => {
 				.map( ( block ) => block.name )
 		).toEqual( [] );
 		expect( markup ).toContain( '<caption>Amounts</caption>' );
-		expect( markup ).toContain( 'src="https://example.com/a.png"' );
+		expect( markup ).toContain( 'wp-image-9' );
 	} );
 
-	test( 'survive a round trip through the editor', async ( {
+	test( 'settle after a round trip through the editor', async ( {
 		admin,
 		editor,
 		page,
@@ -283,24 +295,52 @@ test.describe( 'Block transforms declared in block.json', () => {
 			status: 'draft',
 		} );
 
+		/**
+		 * Saves the post through the editor and opens it again.
+		 *
+		 * @param {number} title Number to put in the title, so each save has
+		 *                       something to write. The title is not part of
+		 *                       what this test compares.
+		 *
+		 * @return {Promise<Object[]>} The blocks the reopened post holds.
+		 */
+		async function saveAndReopen( title ) {
+			// Nothing has been edited, so the post reads as saved and there is
+			// no Save draft button to press. Editing the title makes it dirty
+			// and still serializes every block.
+			await page.evaluate( ( n ) => {
+				window.wp.data
+					.dispatch( 'core/editor' )
+					.editPost( { title: `Round trip ${ n }` } );
+			}, title );
+
+			await editor.saveDraft();
+			await admin.editPost( post.id );
+
+			return readEditorBlocks( page );
+		}
+
 		await admin.editPost( post.id );
 
-		const before = await readEditorBlocks( page );
+		const converted = await readEditorBlocks( page );
+		const saved = await saveAndReopen( 1 );
 
-		// Nothing has been edited, so the post reads as saved and there is no
-		// Save draft button to press. The title is not part of what this test
-		// compares, and editing it still serializes every block.
-		await page.evaluate( () => {
-			window.wp.data
-				.dispatch( 'core/editor' )
-				.editPost( { title: 'Round trip, saved' } );
-		} );
+		// Saving rewrites every block through its own `save`. Markup that only
+		// matches an older `save` is migrated here rather than kept, so the
+		// blocks are not required to come back identical — but nothing may be
+		// lost, and nothing may be flagged.
+		expect( saved.map( ( block ) => block.name ) ).toEqual(
+			converted.map( ( block ) => block.name )
+		);
+		expect(
+			saved
+				.filter( ( block ) => false === block.isValid )
+				.map( ( block ) => block.name )
+		).toEqual( [] );
 
-		await editor.saveDraft();
-		await admin.editPost( post.id );
-
-		// Saving rewrites every block through its own `save`, so this is where
-		// markup the server only got away with would come apart.
-		expect( await readEditorBlocks( page ) ).toEqual( before );
+		// A second pass must change nothing at all: whatever the first save
+		// migrated has settled, so an importer's output does not keep drifting
+		// every time someone opens the post.
+		expect( await saveAndReopen( 2 ) ).toEqual( saved );
 	} );
 } );

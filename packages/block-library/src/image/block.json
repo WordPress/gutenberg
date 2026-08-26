@@ -162,7 +162,37 @@
 				"name": "from-raw",
 				"type": "raw",
 				"selector": "figure:has(img)",
-				"serverConversion": false
+				"serverConversion": {
+					"requires": {
+						"figure": {
+							"children": {
+								"img": {
+									"attributes": [ "src", "alt", "title" ]
+								},
+								"a": {
+									"attributes": [
+										"href",
+										"rel",
+										"target",
+										"class"
+									],
+									"children": {
+										"img": {
+											"attributes": [
+												"src",
+												"alt",
+												"title"
+											]
+										}
+									}
+								},
+								"figcaption": {
+									"children": "phrasing"
+								}
+							}
+						}
+					}
+				}
 			}
 		]
 	},

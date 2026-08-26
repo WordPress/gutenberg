@@ -65,21 +65,25 @@ add_action( 'enqueue_block_editor_assets', 'gutenberg_bootstrap_block_transforms
  * Reports which blocks a server-side conversion can produce.
  *
  * An importer about to run over a whole site can ask what it will get before
- * it starts, rather than converting everything and reading the wreckage. A
- * block appears under `declines` when its transform sets `serverConversion`
- * to false, meaning its `save` rewrites the markup rather than wrapping it and
- * the server leaves that markup alone.
+ * it starts, rather than converting everything and reading the wreckage.
+ *
+ * A block declines outright when its `save` rewrites the markup rather than
+ * wrapping it, so no source can be reproduced. A block converts conditionally
+ * when it can reproduce some shapes and not others: it declares the content it
+ * is able to save, and markup carrying anything else is left alone.
  *
  * @return array {
  *     Blocks a raw conversion knows about, each list sorted by block name.
  *
- *     @type string[] $converts Blocks it can produce.
- *     @type string[] $declines Blocks it deliberately will not produce.
+ *     @type string[] $converts    Blocks it can produce from any markup it matches.
+ *     @type string[] $conditional Blocks it produces only from markup they can save back.
+ *     @type string[] $declines    Blocks it deliberately will not produce.
  * }
  */
 function gutenberg_get_block_conversion_support() {
-	$converts = array();
-	$declines = array();
+	$converts    = array();
+	$conditional = array();
+	$declines    = array();
 
 	foreach ( WP_Block_Type_Registry::get_instance()->get_all_registered() as $block_type ) {
 		if ( empty( $block_type->transforms['from'] ) || ! is_array( $block_type->transforms['from'] ) ) {
@@ -91,23 +95,30 @@ function gutenberg_get_block_conversion_support() {
 				continue;
 			}
 
-			if ( isset( $transform['serverConversion'] ) && false === $transform['serverConversion'] ) {
+			$declared = isset( $transform['serverConversion'] ) ? $transform['serverConversion'] : true;
+
+			if ( false === $declared ) {
 				$declines[] = $block_type->name;
+			} elseif ( is_array( $declared ) && isset( $declared['requires'] ) ) {
+				$conditional[] = $block_type->name;
 			} else {
 				$converts[] = $block_type->name;
 			}
 		}
 	}
 
-	$converts = array_values( array_unique( $converts ) );
-	$declines = array_values( array_unique( $declines ) );
+	$converts    = array_values( array_unique( $converts ) );
+	$conditional = array_values( array_unique( $conditional ) );
+	$declines    = array_values( array_unique( $declines ) );
 
 	sort( $converts );
+	sort( $conditional );
 	sort( $declines );
 
 	return array(
-		'converts' => $converts,
-		'declines' => $declines,
+		'converts'    => $converts,
+		'conditional' => $conditional,
+		'declines'    => $declines,
 	);
 }
 

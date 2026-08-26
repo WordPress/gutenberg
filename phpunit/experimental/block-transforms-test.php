@@ -767,7 +767,7 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 					'url' => array(
 						'type'      => 'string',
 						'source'    => 'attribute',
-						'selector'  => 'img',
+						'selector'  => 'video',
 						'attribute' => 'src',
 					),
 				),
@@ -775,7 +775,7 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 					'from' => array(
 						array(
 							'type'             => 'raw',
-							'selector'         => 'figure:has(img)',
+							'selector'         => 'figure:has(video)',
 							'serverConversion' => false,
 						),
 					),
@@ -783,19 +783,19 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$blocks = gutenberg_html_to_blocks( '<figure><img src="/a.png" alt="A"/></figure>' );
+		$blocks = gutenberg_html_to_blocks( '<figure><video src="/a.mp4"></video></figure>' );
 
 		$this->assertCount( 1, $blocks );
 		$this->assertSame( 'core/html', $blocks[0]['blockName'] );
-		$this->assertStringContainsString( '<img src="/a.png"', $blocks[0]['innerHTML'] );
+		$this->assertStringContainsString( '<video src="/a.mp4">', $blocks[0]['innerHTML'] );
 	}
 
 	public function test_leaves_media_in_place_when_nothing_converts_it() {
 		$this->register_test_blocks();
 
-		// No registered block claims a figure, so wrapping the image in one
-		// would invent markup the source never had.
-		$blocks = gutenberg_html_to_blocks( '<p><img src="/a.png" alt="A"/></p>' );
+		// No registered block claims a figure holding a video, so wrapping it
+		// in one would invent markup the source never had.
+		$blocks = gutenberg_html_to_blocks( '<p><video src="/a.mp4"></video></p>' );
 
 		$this->assertCount( 1, $blocks );
 		$this->assertStringNotContainsString( '<figure', $blocks[0]['innerHTML'] );
@@ -810,7 +810,7 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 					'url' => array(
 						'type'      => 'string',
 						'source'    => 'attribute',
-						'selector'  => 'img',
+						'selector'  => 'video',
 						'attribute' => 'src',
 					),
 				),
@@ -818,18 +818,18 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 					'from' => array(
 						array(
 							'type'     => 'raw',
-							'selector' => 'figure:has(img)',
+							'selector' => 'figure:has(video)',
 						),
 					),
 				),
 			)
 		);
 
-		$blocks = gutenberg_html_to_blocks( '<p><img src="/a.png" alt="A"/></p>' );
+		$blocks = gutenberg_html_to_blocks( '<p><video src="/a.mp4"></video></p>' );
 
 		$this->assertCount( 1, $blocks );
 		$this->assertSame( 'test/picture', $blocks[0]['blockName'] );
-		$this->assertStringContainsString( '<img src="/a.png"', $blocks[0]['innerHTML'] );
+		$this->assertStringContainsString( '<video src="/a.mp4">', $blocks[0]['innerHTML'] );
 	}
 
 	public function test_keeps_media_that_reads_as_part_of_a_sentence() {
@@ -842,20 +842,20 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 					'from' => array(
 						array(
 							'type'     => 'raw',
-							'selector' => 'figure:has(img)',
+							'selector' => 'figure:has(video)',
 						),
 					),
 				),
 			)
 		);
 
-		$blocks = gutenberg_html_to_blocks( '<p>See <img src="/a.png" alt="A"/> here.</p>' );
+		$blocks = gutenberg_html_to_blocks( '<p>See <video src="/a.mp4"></video> here.</p>' );
 
 		$this->assertCount( 1, $blocks );
 		$this->assertSame( 'test/paragraph', $blocks[0]['blockName'] );
 
-		// An aligned image leaves even when the paragraph carries text.
-		$aligned = gutenberg_html_to_blocks( '<p>See <img class="alignright" src="/a.png" alt="A"/> here.</p>' );
+		// Aligned media leaves even when the paragraph carries text.
+		$aligned = gutenberg_html_to_blocks( '<p>See <video class="alignright" src="/a.mp4"></video> here.</p>' );
 
 		$this->assertSame( 'test/picture', $aligned[0]['blockName'] );
 	}
@@ -1160,5 +1160,86 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 				),
 			)
 		);
+	}
+
+	public function test_converts_media_a_block_can_save_back() {
+		$blocks = gutenberg_html_to_blocks( '<figure><img src="/a.png" alt="A"><figcaption>Cap</figcaption></figure>' );
+
+		$this->assertCount( 1, $blocks );
+		$this->assertSame( 'core/image', $blocks[0]['blockName'] );
+		$this->assertStringContainsString( '<figcaption>Cap</figcaption>', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_leaves_media_carrying_markup_the_block_cannot_save() {
+		// `save` writes the image class from the attachment ID, so source
+		// classes it does not read cannot survive a round trip.
+		$blocks = gutenberg_html_to_blocks( '<figure><img class="alignnone size-medium wp-image-9" src="/a.png" alt="A"></figure>' );
+
+		$this->assertCount( 1, $blocks );
+		$this->assertSame( 'core/html', $blocks[0]['blockName'] );
+		$this->assertStringContainsString( 'wp-image-9', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_converts_only_the_markup_a_conditional_transform_declares() {
+		$this->register(
+			'test/note',
+			array(
+				'attributes' => array(),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'             => 'raw',
+							'selector'         => 'aside',
+							'serverConversion' => array(
+								'requires' => array(
+									'aside' => array(
+										'children' => array(
+											'b' => array(
+												'children' => array( '#text' => array() ),
+											),
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$converted = gutenberg_html_to_blocks( '<aside><b>Kept</b></aside>' );
+		$this->assertSame( 'test/note', $converted[0]['blockName'] );
+
+		// An attribute the schema does not allow means the markup would not
+		// survive being saved back, so it is left as it was.
+		$declined = gutenberg_html_to_blocks( '<aside><b class="x">Kept</b></aside>' );
+		$this->assertSame( 'core/html', $declined[0]['blockName'] );
+		$this->assertStringContainsString( 'class="x"', $declined[0]['innerHTML'] );
+	}
+
+	public function test_reports_a_block_that_converts_only_some_markup() {
+		$this->register(
+			'test/sometimes',
+			array(
+				'attributes' => array(),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'             => 'raw',
+							'selector'         => 'aside',
+							'serverConversion' => array(
+								'requires' => array( 'aside' => array( 'children' => array( 'b' => array( 'children' => array( '#text' => array() ) ) ) ) ),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$support = gutenberg_get_block_conversion_support();
+
+		$this->assertContains( 'test/sometimes', $support['conditional'] );
+		$this->assertNotContains( 'test/sometimes', $support['converts'] );
+		$this->assertNotContains( 'test/sometimes', $support['declines'] );
 	}
 }

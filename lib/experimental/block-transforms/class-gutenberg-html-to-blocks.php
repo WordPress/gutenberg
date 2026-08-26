@@ -631,12 +631,7 @@ class Gutenberg_HTML_To_Blocks {
 	 */
 	private static function find_transform( $element ) {
 		foreach ( self::get_raw_transforms() as $transform ) {
-			/*
-			 * A block whose `save` rewrites the markup rather than wrapping it
-			 * cannot be produced from the source, so the markup is left alone
-			 * instead of being claimed and serialized wrongly.
-			 */
-			if ( isset( $transform['serverConversion'] ) && false === $transform['serverConversion'] ) {
+			if ( self::declines_server_conversion( $transform, $element ) ) {
 				continue;
 			}
 
@@ -654,6 +649,63 @@ class Gutenberg_HTML_To_Blocks {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Determines whether a transform refuses to run outside the editor.
+	 *
+	 * A block whose `save` rewrites the markup rather than wrapping it cannot
+	 * be reproduced from the source at all, and declares `false`. A block that
+	 * can reproduce some shapes and not others declares the content it is able
+	 * to save instead, and markup carrying anything else is left alone rather
+	 * than converted into a block that would not validate.
+	 *
+	 * @param array                  $transform Transform to test.
+	 * @param Gutenberg_HTML_Element $element   Element being converted.
+	 * @return bool Whether the transform declines this markup.
+	 */
+	private static function declines_server_conversion( $transform, $element ) {
+		if ( ! isset( $transform['serverConversion'] ) ) {
+			return false;
+		}
+
+		$declared = $transform['serverConversion'];
+
+		if ( false === $declared ) {
+			return true;
+		}
+
+		if ( ! is_array( $declared ) || ! isset( $declared['requires'] ) || ! is_array( $declared['requires'] ) ) {
+			return false;
+		}
+
+		return ! self::content_already_conforms( $element, $declared['requires'] );
+	}
+
+	/**
+	 * Determines whether an element's content already matches a schema.
+	 *
+	 * Filtering is what tells them apart: markup the schema would rewrite is
+	 * markup the block cannot save back unchanged. The element is copied first,
+	 * so a transform that turns out to decline leaves nothing behind.
+	 *
+	 * @param Gutenberg_HTML_Element $element Element to test.
+	 * @param array                  $schema  Content schema.
+	 * @return bool Whether the content is already what the schema allows.
+	 */
+	private static function content_already_conforms( $element, $schema ) {
+		$probe = Gutenberg_HTML_Element::from_html( $element->get_outer_html() );
+
+		if ( null === $probe || array() === $probe->children ) {
+			return true;
+		}
+
+		$copy   = $probe->children[0];
+		$before = $copy->get_inner_html();
+
+		self::apply_content_schema( $copy, $schema );
+
+		return $before === $copy->get_inner_html();
 	}
 
 	/**
