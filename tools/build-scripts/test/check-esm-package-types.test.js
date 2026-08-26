@@ -1,13 +1,15 @@
-import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { access, mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import {
 	classifyTypeScriptDiagnostics,
-	inspectBuildTypesPublications,
-	publishesBuildTypes,
+	inspectPackagePublications,
+	packPackage,
 } from '../packages/check-esm-package-types-helpers.mjs';
 
 let fixtureDirectory;
+let packageDirectory;
+let packDestination;
 
 afterEach( async () => {
 	if ( fixtureDirectory ) {
@@ -20,40 +22,54 @@ async function createPackageFixture( files ) {
 	fixtureDirectory = await mkdtemp(
 		path.join( tmpdir(), 'gutenberg-esm-package-types-' )
 	);
+	packageDirectory = path.join( fixtureDirectory, 'package' );
+	packDestination = path.join( fixtureDirectory, 'archives' );
+	await mkdir( packageDirectory );
+	await mkdir( packDestination );
 	const packageJson = {
 		name: 'esm-package-types-fixture',
 		version: '1.0.0',
 		files,
 	};
 	await writeFile(
-		path.join( fixtureDirectory, 'package.json' ),
+		path.join( packageDirectory, 'package.json' ),
 		JSON.stringify( packageJson )
 	);
-	await mkdir( path.join( fixtureDirectory, 'build-types' ) );
+	await mkdir( path.join( packageDirectory, 'build-types' ) );
 	await writeFile(
-		path.join( fixtureDirectory, 'build-types', 'index.d.ts' ),
+		path.join( packageDirectory, 'build-types', 'index.d.ts' ),
 		'export {};'
 	);
 	return packageJson;
 }
 
-test( 'detects build-types included through a package files glob', async () => {
+test( 'packs declarations included through a package files glob', async () => {
 	const packageJson = await createPackageFixture( [ '*' ] );
+	const packedPackage = packPackage(
+		{ directory: packageDirectory, packageJson },
+		packDestination
+	);
 
-	expect(
-		publishesBuildTypes( { directory: fixtureDirectory, packageJson } )
-	).toBe( true );
+	expect( packedPackage.declarations ).toEqual( [
+		path.join( packageDirectory, 'build-types', 'index.d.ts' ),
+	] );
+	await expect(
+		access( packedPackage.tarballPath )
+	).resolves.toBeUndefined();
 } );
 
-test( 'skips a package whose packed files omit build-types', async () => {
+test( 'omits declarations excluded from the packed package', async () => {
 	const packageJson = await createPackageFixture( [ 'dist' ] );
 
 	expect(
-		publishesBuildTypes( { directory: fixtureDirectory, packageJson } )
-	).toBe( false );
+		packPackage(
+			{ directory: packageDirectory, packageJson },
+			packDestination
+		).declarations
+	).toEqual( [] );
 } );
 
-test( 'continues package inspection after a failure', () => {
+test( 'continues package packing after a failure', () => {
 	const packages = [
 		{ packageJson: { name: 'first' } },
 		{ packageJson: { name: 'second' } },
@@ -64,19 +80,29 @@ test( 'continues package inspection after a failure', () => {
 		.mockImplementationOnce( () => {
 			throw failure;
 		} )
-		.mockReturnValueOnce( true );
+		.mockReturnValueOnce( {
+			declarations: [ '/packages/second/build-types/index.d.ts' ],
+			tarballPath: '/archives/second.tgz',
+		} );
 
-	expect( inspectBuildTypesPublications( packages, inspectPackage ) ).toEqual(
-		[
-			{ status: 'rejected', packageData: packages[ 0 ], reason: failure },
-			{
-				status: 'fulfilled',
-				packageData: packages[ 1 ],
-				publishesBuildTypes: true,
+	expect(
+		inspectPackagePublications( packages, '/archives', inspectPackage )
+	).toEqual( [
+		{ status: 'rejected', packageData: packages[ 0 ], reason: failure },
+		{
+			status: 'fulfilled',
+			packageData: packages[ 1 ],
+			packedPackage: {
+				declarations: [ '/packages/second/build-types/index.d.ts' ],
+				tarballPath: '/archives/second.tgz',
 			},
-		]
-	);
+		},
+	] );
 	expect( inspectPackage ).toHaveBeenCalledTimes( 2 );
+	expect( inspectPackage ).toHaveBeenLastCalledWith(
+		packages[ 1 ],
+		'/archives'
+	);
 } );
 
 test( 'keeps diagnostics from the generated tsconfig', () => {

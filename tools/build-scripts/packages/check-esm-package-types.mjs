@@ -1,11 +1,11 @@
 import { mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import spawn from 'cross-spawn';
-import fastGlob from 'fast-glob';
 import {
 	classifyTypeScriptDiagnostics,
-	inspectBuildTypesPublications,
+	inspectPackagePublications,
 } from './check-esm-package-types-helpers.mjs';
 
 const rootDirectory = path.resolve(
@@ -74,11 +74,7 @@ function getCssEntrypoints( packageJson ) {
 		.map( ( [ entrypoint ] ) => entrypoint.replace( /^\.\//, '' ) );
 }
 
-async function checkNodeNextTypes( { directory, packageJson } ) {
-	const declarations = await fastGlob( 'build-types/**/*.d.{ts,mts,cts}', {
-		cwd: directory,
-		absolute: true,
-	} );
+async function checkNodeNextTypes( { directory, packageJson }, declarations ) {
 	if ( declarations.length === 0 ) {
 		throw new Error( `No declarations found for ${ packageJson.name }` );
 	}
@@ -153,7 +149,7 @@ async function checkNodeNextTypes( { directory, packageJson } ) {
 	console.log( `${ packageJson.name }: NodeNext declarations valid.` );
 }
 
-async function getPublishedEsmPackages() {
+async function getPublishedEsmPackages( packDestination ) {
 	const packageDirectories = await readdir( packagesDirectory, {
 		withFileTypes: true,
 	} );
@@ -185,36 +181,37 @@ async function getPublishedEsmPackages() {
 			! packageData.packageJson.private &&
 			packageData.packageJson.type === 'module'
 	);
-	const buildTypesPublication = inspectBuildTypesPublications(
+	const packagePublications = inspectPackagePublications(
 		publishedEsmPackages.sort( ( a, b ) =>
 			a.packageJson.name.localeCompare( b.packageJson.name )
-		)
+		),
+		packDestination
 	);
 
-	for ( const publication of buildTypesPublication ) {
+	for ( const publication of packagePublications ) {
 		if (
 			publication.status === 'fulfilled' &&
-			! publication.publishesBuildTypes
+			publication.packedPackage.declarations.length === 0
 		) {
 			console.log(
-				`${ publication.packageData.packageJson.name }: Skipping ESM declaration validation because build-types is not published.`
+				`${ publication.packageData.packageJson.name }: Skipping ESM declaration validation because build-types declarations are not published.`
 			);
 		}
 	}
 
-	return buildTypesPublication.filter(
+	return packagePublications.filter(
 		( publication ) =>
-			publication.status === 'rejected' || publication.publishesBuildTypes
+			publication.status === 'rejected' ||
+			publication.packedPackage.declarations.length > 0
 	);
 }
 
-async function checkPackage( packageData ) {
-	const { directory, packageJson } = packageData;
-	await checkNodeNextTypes( packageData );
+async function checkPackage( { packageData, packedPackage } ) {
+	const { packageJson } = packageData;
+	await checkNodeNextTypes( packageData, packedPackage.declarations );
 
 	const args = [
-		'--pack',
-		directory,
+		packedPackage.tarballPath,
 		'--profile',
 		'esm-only',
 		'--no-summary',
@@ -227,6 +224,8 @@ async function checkPackage( packageData ) {
 		args.push( '--exclude-entrypoints', ...cssEntrypoints );
 	}
 
+	// ATTW uses its bundled TypeScript version for the compatibility matrix.
+	// The NodeNext check above uses Gutenberg's installed compiler.
 	const result = spawn.sync( 'attw', args, {
 		cwd: rootDirectory,
 		stdio: 'inherit',
@@ -241,20 +240,29 @@ async function checkPackage( packageData ) {
 	}
 }
 
+const packageArchivesDirectory = await mkdtemp(
+	path.join( tmpdir(), 'gutenberg-esm-package-archives-' )
+);
 let hasErrors = false;
-for ( const publication of await getPublishedEsmPackages() ) {
-	const { packageData } = publication;
-	try {
-		if ( publication.status === 'rejected' ) {
-			throw publication.reason;
+try {
+	for ( const publication of await getPublishedEsmPackages(
+		packageArchivesDirectory
+	) ) {
+		const { packageData } = publication;
+		try {
+			if ( publication.status === 'rejected' ) {
+				throw publication.reason;
+			}
+			await checkPackage( publication );
+		} catch ( error ) {
+			const message =
+				error instanceof Error ? error.message : String( error );
+			console.error( `${ packageData.packageJson.name }: ${ message }` );
+			hasErrors = true;
 		}
-		await checkPackage( packageData );
-	} catch ( error ) {
-		const message =
-			error instanceof Error ? error.message : String( error );
-		console.error( `${ packageData.packageJson.name }: ${ message }` );
-		hasErrors = true;
 	}
+} finally {
+	await rm( packageArchivesDirectory, { recursive: true, force: true } );
 }
 
 if ( hasErrors ) {
