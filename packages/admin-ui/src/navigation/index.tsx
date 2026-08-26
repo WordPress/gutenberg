@@ -68,7 +68,7 @@ export const Navigation = ( {
 					>
 						<Text
 							variant="body-md"
-							className={ styles.item }
+							className={ clsx( styles.item, defenseStyles.a ) }
 							render={
 								<Link
 									variant="unstyled"

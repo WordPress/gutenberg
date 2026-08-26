@@ -38,3 +38,9 @@
 .li {
 	margin: var(--_gcd-li-margin, 0);
 }
+
+.a,
+.a:is(:hover, :focus, :active) {
+	font-weight: var(--_gcd-a-font-weight, inherit);
+	text-decoration: var(--_gcd-a-text-decoration, inherit);
+}
