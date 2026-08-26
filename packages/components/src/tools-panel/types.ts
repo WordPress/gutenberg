@@ -136,6 +136,29 @@ export type ToolsPanelItem = {
 	 */
 	label: string;
 	/**
+	 * A callback executed when the item is hidden via the `ToolsPanel` menu.
+	 *
+	 * Unlike `onDeselect`, this fires whether or not the item has a value, and
+	 * only in response to an explicit menu action. Visibility changes with
+	 * another cause, such as an item hiding because its value was removed or
+	 * because `Reset all` ran, do not trigger it.
+	 *
+	 * Items flagged with `isShownByDefault` stay visible when toggled off, so
+	 * this is never called for them.
+	 */
+	onHide?: () => void;
+	/**
+	 * A callback executed when the item is shown via the `ToolsPanel` menu.
+	 *
+	 * This fires only in response to an explicit menu action. An item that
+	 * becomes visible because it received a value, or because `defaultShown`
+	 * was set, does not trigger it.
+	 *
+	 * Items flagged with `isShownByDefault` are always visible, so this is
+	 * never called for them.
+	 */
+	onShow?: () => void;
+	/**
 	 * Panel items will ensure they are only registering with their intended panel
 	 * by comparing the `panelId` props set on both the item and the panel itself,
 	 * or if the `panelId` is explicitly `null`. This allows items to be injected

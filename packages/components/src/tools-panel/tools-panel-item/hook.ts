@@ -1,6 +1,11 @@
 import clsx from 'clsx';
 import { usePrevious } from '@wordpress/compose';
-import { useCallback, useEffect, useLayoutEffect } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+} from '@wordpress/element';
 import styles from '../style.module.scss';
 import { useToolsPanelContext } from '../context';
 import type { WordPressComponentProps } from '../../context';
@@ -21,7 +26,9 @@ export function useToolsPanelItem(
 		panelId,
 		resetAllFilter = noop,
 		onDeselect,
+		onHide,
 		onSelect,
+		onShow,
 		...otherProps
 	} = useContextSystem( props, 'ToolsPanelItem' );
 
@@ -47,6 +54,20 @@ export function useToolsPanelItem(
 	// resetAllFilter is a new function on every render, so do not add it as a
 	// dependency to the useCallback hook! If needed, we should use a ref.
 	const resetAllFilterCallback = useCallback( resetAllFilter, [ panelId ] );
+
+	// `onShow` and `onHide` are also new functions on every render. Holding
+	// them in refs lets the item register stable callbacks, so it isn't
+	// re-registered on each render, while the panel still invokes the latest
+	// ones.
+	const onShowRef = useRef( onShow );
+	const onHideRef = useRef( onHide );
+	useEffect( () => {
+		onShowRef.current = onShow;
+		onHideRef.current = onHide;
+	} );
+	const onShowCallback = useCallback( () => onShowRef.current?.(), [] );
+	const onHideCallback = useCallback( () => onHideRef.current?.(), [] );
+
 	const previousPanelId = usePrevious( currentPanelId );
 
 	const hasMatchingPanel =
@@ -65,6 +86,8 @@ export function useToolsPanelItem(
 				hasValue: hasValueCallback,
 				isShownByDefault,
 				label,
+				onHide: onHideCallback,
+				onShow: onShowCallback,
 				panelId,
 			} );
 		}
@@ -84,6 +107,8 @@ export function useToolsPanelItem(
 		isShownByDefault,
 		label,
 		hasValueCallback,
+		onHideCallback,
+		onShowCallback,
 		panelId,
 		previousPanelId,
 		registerPanelItem,

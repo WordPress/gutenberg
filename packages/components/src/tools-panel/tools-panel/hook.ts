@@ -346,9 +346,37 @@ export function useToolsPanel(
 
 	// Toggle the checked state of a menu item which is then used to determine
 	// display of the item within the panel.
-	const toggleItem = useCallback( ( label: string ) => {
-		panelDispatch( { type: 'TOGGLE_VALUE', label } );
-	}, [] );
+	//
+	// The item's `onShow` and `onHide` callbacks are invoked from here rather
+	// than in response to the resulting state change, so that they only ever
+	// report an explicit menu action by the user.
+	const toggleItem = useCallback(
+		( label: string ) => {
+			const currentItem = panelItems.find(
+				( item ) => item.label === label
+			);
+
+			if ( ! currentItem ) {
+				return;
+			}
+
+			panelDispatch( { type: 'TOGGLE_VALUE', label } );
+
+			// Default items remain visible when toggled off, which resets them
+			// instead of hiding them. Only optional items have a show or hide
+			// transition to report.
+			if ( currentItem.isShownByDefault ) {
+				return;
+			}
+
+			if ( menuItems.optional[ label ] ) {
+				currentItem.onHide?.();
+			} else {
+				currentItem.onShow?.();
+			}
+		},
+		[ menuItems, panelItems ]
+	);
 
 	// Resets display of children and executes resetAll callback if available.
 	const resetAllItems = useCallback( () => {

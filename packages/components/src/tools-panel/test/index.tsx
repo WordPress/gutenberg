@@ -37,7 +37,9 @@ const controlProps = {
 	onDeselect: jest.fn().mockImplementation( () => {
 		controlValue = undefined;
 	} ),
+	onHide: jest.fn(),
 	onSelect: jest.fn(),
+	onShow: jest.fn(),
 };
 
 // Default props without a value for an alternate control to be rendered within
@@ -49,7 +51,9 @@ const altControlProps = {
 	} ),
 	label: 'Alt',
 	onDeselect: jest.fn(),
+	onHide: jest.fn(),
 	onSelect: jest.fn(),
+	onShow: jest.fn(),
 };
 
 // Default props for wrapped or grouped panel items.
@@ -922,6 +926,86 @@ describe( 'ToolsPanel', () => {
 			await selectMenuItem( controlProps.label ); // Reset control.
 
 			expect( controlProps.onDeselect ).toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'show and hide callbacks', () => {
+		beforeEach( () => {
+			jest.clearAllMocks();
+		} );
+
+		it( 'should call onShow when an optional item is shown via the menu', async () => {
+			renderPanel();
+
+			await openDropdownMenu();
+			await selectMenuItem( altControlProps.label );
+
+			expect( altControlProps.onShow ).toHaveBeenCalledTimes( 1 );
+			expect( altControlProps.onHide ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should call onHide when an optional item without a value is hidden via the menu', async () => {
+			renderPanel();
+
+			await openDropdownMenu();
+			await selectMenuItem( altControlProps.label );
+			await selectMenuItem( altControlProps.label );
+
+			expect( altControlProps.onHide ).toHaveBeenCalledTimes( 1 );
+			// The item never had a value, so there was nothing to reset.
+			expect( altControlProps.onDeselect ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should call both onHide and onDeselect when an optional item with a value is hidden via the menu', async () => {
+			renderPanel();
+
+			await openDropdownMenu();
+			await selectMenuItem( controlProps.label );
+
+			expect( controlProps.onHide ).toHaveBeenCalledTimes( 1 );
+			expect( controlProps.onDeselect ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'should not call onShow or onHide for default items', async () => {
+			render(
+				<ToolsPanel { ...defaultProps }>
+					<ToolsPanelItem { ...controlProps } isShownByDefault>
+						<div>Example control</div>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			);
+
+			await openDropdownMenu();
+			await selectMenuItem( controlProps.label );
+
+			// Default items stay visible when toggled off; the action resets
+			// them rather than hiding them.
+			expect( controlProps.onDeselect ).toHaveBeenCalledTimes( 1 );
+			expect( controlProps.onShow ).not.toHaveBeenCalled();
+			expect( controlProps.onHide ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should not call onHide when items are hidden by Reset all', async () => {
+			renderPanel();
+
+			await openDropdownMenu();
+			await selectMenuItem( 'Reset all' );
+
+			expect( controlProps.onHide ).not.toHaveBeenCalled();
+			expect( altControlProps.onHide ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should not call onShow when an item is mounted with defaultShown', () => {
+			render(
+				<ToolsPanel { ...defaultProps }>
+					<ToolsPanelItem { ...altControlProps } defaultShown>
+						<div>Alt control</div>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			);
+
+			expect( screen.getByText( 'Alt control' ) ).toBeInTheDocument();
+			expect( altControlProps.onShow ).not.toHaveBeenCalled();
 		} );
 	} );
 

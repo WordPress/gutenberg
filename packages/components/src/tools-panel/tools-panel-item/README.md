@@ -60,9 +60,36 @@ used to reset the panel item control's value.
 
 -   Required: No
 
+### `onHide`: `() => void`
+
+A callback executed when the item is hidden via the panel's menu.
+
+Unlike `onDeselect`, this fires whether or not the item has a value, and only in
+response to an explicit menu action. Visibility changes with another cause, such
+as an item hiding because its value was removed or because `Reset all` ran, do
+not trigger it.
+
+Items flagged with `isShownByDefault` stay visible when toggled off, so this is
+never called for them.
+
+-   Required: No
+
 ### `onSelect`: `() => void`
 
 A callback to take action when this item is selected in the `ToolsPanel` menu.
+
+-   Required: No
+
+### `onShow`: `() => void`
+
+A callback executed when the item is shown via the panel's menu.
+
+This fires only in response to an explicit menu action. An item that becomes
+visible because it received a value, or because `defaultShown` was set, does not
+trigger it.
+
+Items flagged with `isShownByDefault` are always visible, so this is never
+called for them.
 
 -   Required: No
 
