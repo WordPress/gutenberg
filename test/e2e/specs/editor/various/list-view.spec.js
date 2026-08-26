@@ -1444,7 +1444,6 @@ test.describe( 'List View', () => {
 			'The dropdown menu should also be visible'
 		).toBeVisible();
 	} );
-
 } );
 
 /** @typedef {import('@playwright/test').Locator} Locator */
