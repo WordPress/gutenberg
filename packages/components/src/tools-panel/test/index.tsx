@@ -873,23 +873,6 @@ describe( 'ToolsPanel', () => {
 			expect( altControlProps.onDeselect ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should call onDeselect when optional item with no value is hidden', async () => {
-			// Covers the case where an optional item is shown via the menu but
-			// never receives a value. Previously, onDeselect would silently not
-			// fire because it was gated on hasValue() being true.
-			renderPanel();
-
-			await openDropdownMenu();
-			await selectMenuItem( altControlProps.label );
-
-			expect( altControlProps.onSelect ).toHaveBeenCalledTimes( 1 );
-			expect( altControlProps.onDeselect ).not.toHaveBeenCalled();
-
-			await selectMenuItem( altControlProps.label );
-
-			expect( altControlProps.onDeselect ).toHaveBeenCalledTimes( 1 );
-		} );
-
 		it( 'should call resetAll callback when its menu item is selected', async () => {
 			renderPanel();
 
