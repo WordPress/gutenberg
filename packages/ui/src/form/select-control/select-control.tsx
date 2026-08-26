@@ -19,7 +19,7 @@ export const SelectControl = forwardRef<
 		details,
 		hideLabelFromVision,
 		placeholder,
-		popupWidth,
+		popupWidth = 'content',
 		size = 'default',
 		triggerContent,
 		...restProps
