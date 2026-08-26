@@ -2,6 +2,9 @@
 	"vitest": {
 		"files": [
 			"packages/html-entities/src/test/entities.jsdom.test.ts",
+			"test/unit/config/console.vitest.test.js",
+			"test/unit/config/emotion-compiler.vitest.jsdom.test.jsx",
+			"test/unit/config/matchers/test/to-match-diff-snapshot.vitest.jsdom.test.js",
 			"test/unit/config/setup.vitest.jsdom.test.jsx",
 			"test/unit/config/setup.vitest.node.test.js",
 			"test/unit/scripts/test/discover-test-files.test.js"

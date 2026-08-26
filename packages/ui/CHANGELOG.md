@@ -45,6 +45,8 @@
 -   `Select`, `Combobox`, `SelectControl`: Fix the trigger placeholder failing the 4.5:1 text contrast minimum ([#81853](https://github.com/WordPress/gutenberg/pull/81853)).
 -   `Autocomplete.List`: Stop rendering `aria-orientation` in grid mode, where `role="grid"` disallows it ([#81853](https://github.com/WordPress/gutenberg/pull/81853)).
 -   `SearchableChipSelect`, `SearchableChipSelectControl`: Forward ref to the search input instead of the chips container ([#80980](https://github.com/WordPress/gutenberg/pull/80980)).
+-   `InputControl`: Hide the value-like placeholder Safari renders in empty date and time inputs (e.g. `12:30`), which was indistinguishable from a committed value ([#81991](https://github.com/WordPress/gutenberg/pull/81991)).
+-   `Menu`: Close non-modal menus when the user presses inside a same-origin iframe. ([#81952](https://github.com/WordPress/gutenberg/pull/81952))
 
 ### Documentation
 
@@ -52,6 +54,7 @@
 
 ### Internal
 
+-   Restrict `@wordpress/private-apis` imports via lint, with the `ThemeProvider` compatibility fallback as the only exemption. ([#82015](https://github.com/WordPress/gutenberg/pull/82015))
 -   Update `@base-ui/react` from `1.6.0` to `1.7.0`. ([#81390](https://github.com/WordPress/gutenberg/pull/81390))
 -   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509), [#81514](https://github.com/WordPress/gutenberg/pull/81514), [#81516](https://github.com/WordPress/gutenberg/pull/81516), [#81518](https://github.com/WordPress/gutenberg/pull/81518))
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81515](https://github.com/WordPress/gutenberg/pull/81515))
