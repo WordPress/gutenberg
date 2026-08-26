@@ -287,6 +287,15 @@ test.describe( 'Block transforms declared in block.json', () => {
 
 		const before = await readEditorBlocks( page );
 
+		// Nothing has been edited, so the post reads as saved and there is no
+		// Save draft button to press. The title is not part of what this test
+		// compares, and editing it still serializes every block.
+		await page.evaluate( () => {
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.editPost( { title: 'Round trip, saved' } );
+		} );
+
 		await editor.saveDraft();
 		await admin.editPost( post.id );
 
