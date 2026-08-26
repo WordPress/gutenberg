@@ -358,12 +358,14 @@ export function validateVitestPolicy( {
 	const reported = new Set();
 	let hasVitestImport = false;
 
-	const report = ( category, line, message ) => {
+	const report = ( category, message, node ) => {
 		if ( reported.has( category ) ) {
 			return;
 		}
 		reported.add( category );
-		violations.push( `${ file }:${ line } ${ message }` );
+		violations.push(
+			`${ file }:${ node?.loc.start.line ?? 1 } ${ message }`
+		);
 	};
 
 	for ( const node of ast.body ) {
@@ -384,8 +386,8 @@ export function validateVitestPolicy( {
 		) {
 			report(
 				'browser-user-event',
-				node.loc.start.line,
-				"Browser tests must import { userEvent } from 'vitest/browser'"
+				"Browser tests must import { userEvent } from 'vitest/browser'",
+				node
 			);
 		}
 
@@ -401,8 +403,8 @@ export function validateVitestPolicy( {
 		) {
 			report(
 				'browser-fire-event',
-				node.loc.start.line,
-				'Browser tests must use userEvent or locators; allow fireEvent only when the low-level event is the contract'
+				'Browser tests must use userEvent or locators; allow fireEvent only when the low-level event is the contract',
+				node
 			);
 		}
 
@@ -422,8 +424,8 @@ export function validateVitestPolicy( {
 		) {
 			report(
 				'jsdom-rendered-ui',
-				node.loc.start.line,
-				'rendered UI tests default to Browser Mode; use Node for pure logic or add an explicit jsdom baseline entry for low-level DOM semantics'
+				'rendered UI tests default to Browser Mode; use Node for pure logic or add an explicit jsdom baseline entry for low-level DOM semantics',
+				node
 			);
 		}
 	}
@@ -435,11 +437,7 @@ export function validateVitestPolicy( {
 		}
 
 		if ( isVitestTest && moduleSource === 'vitest/globals' ) {
-			report(
-				'vitest-globals',
-				node.loc.start.line,
-				'vitest/globals is not allowed'
-			);
+			report( 'vitest-globals', 'vitest/globals is not allowed', node );
 		}
 
 		if (
@@ -449,8 +447,8 @@ export function validateVitestPolicy( {
 		) {
 			report(
 				'browser-mode-import',
-				node.loc.start.line,
-				'Browser Mode imports require a *.browser.test.* filename'
+				'Browser Mode imports require a *.browser.test.* filename',
+				node
 			);
 		}
 
@@ -462,8 +460,8 @@ export function validateVitestPolicy( {
 		) {
 			report(
 				'browser-node-builtin',
-				node.loc.start.line,
-				'Browser tests cannot import Node built-ins at runtime'
+				'Browser tests cannot import Node built-ins at runtime',
+				node
 			);
 		}
 
@@ -471,7 +469,7 @@ export function validateVitestPolicy( {
 			node.type === 'TSImportEqualsDeclaration' &&
 			node.importKind !== 'type'
 		) {
-			report( 'commonjs-import', node.loc.start.line, 'CommonJS import' );
+			report( 'commonjs-import', 'CommonJS import', node );
 		}
 
 		if (
@@ -479,18 +477,14 @@ export function validateVitestPolicy( {
 			( node.type === 'AssignmentExpression' &&
 				isCommonJsExport( node.left, unboundIdentifiers ) )
 		) {
-			report( 'commonjs-export', node.loc.start.line, 'CommonJS export' );
+			report( 'commonjs-export', 'CommonJS export', node );
 		}
 
 		if (
 			node.type === 'CallExpression' &&
 			isUnboundIdentifier( node.callee, 'require', unboundIdentifiers )
 		) {
-			report(
-				'unbound-require',
-				node.loc.start.line,
-				'unbound require()'
-			);
+			report( 'unbound-require', 'unbound require()', node );
 		}
 
 		if (
@@ -504,8 +498,8 @@ export function validateVitestPolicy( {
 		) {
 			report(
 				'typescript-vi-mock',
-				node.loc.start.line,
-				'TypeScript vi.mock() must use vi.mock(import(...))'
+				'TypeScript vi.mock() must use vi.mock(import(...))',
+				node
 			);
 		}
 
@@ -516,8 +510,8 @@ export function validateVitestPolicy( {
 		) {
 			report(
 				'jsdom-computed-style',
-				node.loc.start.line,
-				'computed style assertions require a *.browser.test.* filename'
+				'computed style assertions require a *.browser.test.* filename',
+				node
 			);
 		}
 
@@ -528,8 +522,8 @@ export function validateVitestPolicy( {
 		) {
 			report(
 				'jsdom-style-matcher',
-				node.loc.start.line,
-				'toHaveStyle() requires a *.browser.test.* filename'
+				'toHaveStyle() requires a *.browser.test.* filename',
+				node
 			);
 		}
 
@@ -541,34 +535,27 @@ export function validateVitestPolicy( {
 		) {
 			report(
 				`unbound-vitest-api-${ node.name }`,
-				node.loc.start.line,
-				`unbound Vitest API: ${ node.name }`
+				`unbound Vitest API: ${ node.name }`,
+				node
 			);
 		}
 
-		if ( project === 'jsdom' && ! allowJsdomBrowserApis ) {
-			if (
-				node.type === 'Identifier' &&
+		if (
+			project === 'jsdom' &&
+			! allowJsdomBrowserApis &&
+			( ( node.type === 'Identifier' &&
 				browserApiIdentifiers.has( node.name ) &&
-				unboundIdentifiers.has( node )
-			) {
-				report(
-					'jsdom-browser-api',
-					node.loc.start.line,
-					'layout, geometry, viewport, observer, animation, and scroll APIs require Browser Mode or an explicit jsdom exception with a concrete reason'
-				);
-			}
-
-			if (
-				node.type === 'MemberExpression' &&
-				browserApiProperties.has( getMemberPropertyName( node ) )
-			) {
-				report(
-					'jsdom-browser-api',
-					node.loc.start.line,
-					'layout, geometry, viewport, observer, animation, and scroll APIs require Browser Mode or an explicit jsdom exception with a concrete reason'
-				);
-			}
+				unboundIdentifiers.has( node ) ) ||
+				( node.type === 'MemberExpression' &&
+					browserApiProperties.has(
+						getMemberPropertyName( node )
+					) ) )
+		) {
+			report(
+				'jsdom-browser-api',
+				'layout, geometry, viewport, observer, animation, and scroll APIs require Browser Mode or an explicit jsdom exception with a concrete reason',
+				node
+			);
 		}
 
 		if (
@@ -582,14 +569,14 @@ export function validateVitestPolicy( {
 		) {
 			report(
 				'browser-namespace-spy',
-				node.loc.start.line,
-				'Browser tests cannot spy on imported ESM namespace objects; mock before import or inject the dependency'
+				'Browser tests cannot spy on imported ESM namespace objects; mock before import or inject the dependency',
+				node
 			);
 		}
 	} );
 
 	if ( isVitestTest && ! hasVitestImport ) {
-		report( 'vitest-import', 1, 'no explicit import from vitest' );
+		report( 'vitest-import', 'no explicit import from vitest' );
 	}
 
 	if (
@@ -600,7 +587,6 @@ export function validateVitestPolicy( {
 	) {
 		report(
 			'test-environment-override',
-			1,
 			'per-file test environment overrides are not allowed; use the filename suffix'
 		);
 	}
@@ -612,7 +598,6 @@ export function validateVitestPolicy( {
 	) {
 		report(
 			'environment-suffix',
-			1,
 			'environment names must use *.jsdom.test.* or *.browser.test.*'
 		);
 	}

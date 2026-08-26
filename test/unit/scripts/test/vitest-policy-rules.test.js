@@ -13,61 +13,60 @@ function validate( source, options = {} ) {
 	} );
 }
 
+function expectViolation( source, message, options ) {
+	expect( validate( source, options ) ).toEqual( [
+		expect.stringContaining( message ),
+	] );
+}
+
+function expectValid( source, options ) {
+	expect( validate( source, options ) ).toEqual( [] );
+}
+
 describe( 'Vitest policy rules', () => {
 	it( 'rejects Browser Testing Library user-event', () => {
-		expect(
-			validate( "import userEvent from '@testing-library/user-event';" )
-		).toEqual( [ expect.stringContaining( 'Browser tests must import' ) ] );
-		expect(
-			validate( "import { userEvent } from 'vitest/browser';" )
-		).toEqual( [] );
+		expectViolation(
+			"import userEvent from '@testing-library/user-event';",
+			'Browser tests must import'
+		);
+		expectValid( "import { userEvent } from 'vitest/browser';" );
 	} );
 
 	it( 'rejects unjustified Browser fireEvent', () => {
 		const source =
 			"import { fireEvent } from '@testing-library/react';\nfireEvent.click( document.body );";
 
-		expect( validate( source ) ).toEqual( [
-			expect.stringContaining( 'allow fireEvent only' ),
-		] );
-		expect( validate( source, { allowBrowserFireEvent: true } ) ).toEqual(
-			[]
-		);
+		expectViolation( source, 'allow fireEvent only' );
+		expectValid( source, {
+			allowBrowserFireEvent: true,
+		} );
 	} );
 
 	it( 'rejects jsdom browser APIs without a reason', () => {
 		const source = 'new ResizeObserver( () => {} );';
 
-		expect( validate( source, { project: 'jsdom' } ) ).toEqual( [
-			expect.stringContaining( 'require Browser Mode' ),
-		] );
-		expect(
-			validate( source, {
-				allowJsdomBrowserApis: true,
-				project: 'jsdom',
-			} )
-		).toEqual( [] );
+		expectViolation( source, 'require Browser Mode', { project: 'jsdom' } );
+		expectValid( source, {
+			allowJsdomBrowserApis: true,
+			project: 'jsdom',
+		} );
 	} );
 
 	it( 'rejects new rendered UI jsdom tests outside the baseline', () => {
 		const source =
 			"import { render } from '@testing-library/react';\nrender( <div /> );";
 
-		expect( validate( source, { project: 'jsdom' } ) ).toEqual( [
-			expect.stringContaining( 'default to Browser Mode' ),
-		] );
-		expect(
-			validate( source, { allowRenderedUi: true, project: 'jsdom' } )
-		).toEqual( [] );
+		expectViolation( source, 'default to Browser Mode', {
+			project: 'jsdom',
+		} );
+		expectValid( source, { allowRenderedUi: true, project: 'jsdom' } );
 	} );
 
 	it( 'rejects Browser spies on imported ESM namespace objects', () => {
 		const source =
 			"import * as selectors from './selectors';\nvi.spyOn( selectors, 'getValue' );";
 
-		expect( validate( source ) ).toEqual( [
-			expect.stringContaining( 'imported ESM namespace objects' ),
-		] );
+		expectViolation( source, 'imported ESM namespace objects' );
 	} );
 
 	it( 'rejects Browser runtime imports of Node built-ins', () => {
@@ -78,36 +77,33 @@ describe( 'Vitest policy rules', () => {
 			'await import( `node:fs` );',
 			"export { readFile } from 'node:fs';",
 		] ) {
-			expect( validate( source ) ).toEqual( [
-				expect.stringContaining(
-					'cannot import Node built-ins at runtime'
-				),
-			] );
+			expectViolation(
+				source,
+				'cannot import Node built-ins at runtime'
+			);
 		}
 	} );
 
 	it( 'allows Browser type-only imports of Node built-ins', () => {
-		expect(
-			validate(
-				"import type { Stats } from 'node:fs';\nimport { type PathLike } from 'fs';\nimport type fs = require( 'node:fs' );",
-				{ file: 'example.browser.test.ts' }
-			)
-		).toEqual( [] );
+		expectValid(
+			"import type { Stats } from 'node:fs';\nimport { type PathLike } from 'fs';\nimport type fs = require( 'node:fs' );",
+			{ file: 'example.browser.test.ts' }
+		);
 	} );
 
 	it( 'rejects TypeScript CommonJS imports and exports', () => {
-		expect(
-			validate( "import fs = require( 'node:fs' );", {
+		expectViolation(
+			"import fs = require( 'node:fs' );",
+			'CommonJS import',
+			{
 				file: 'example.test.ts',
 				project: 'node',
-			} )
-		).toEqual( [ expect.stringContaining( 'CommonJS import' ) ] );
-		expect(
-			validate( 'export = { value: true };', {
-				file: 'example.test.ts',
-				project: 'node',
-			} )
-		).toEqual( [ expect.stringContaining( 'CommonJS export' ) ] );
+			}
+		);
+		expectViolation( 'export = { value: true };', 'CommonJS export', {
+			file: 'example.test.ts',
+			project: 'node',
+		} );
 	} );
 
 	it( 'rejects CommonJS exports', () => {
@@ -117,139 +113,116 @@ describe( 'Vitest policy rules', () => {
 			'module.exports.value = true;',
 			"module[ 'exports' ].value = true;",
 		] ) {
-			expect( validate( source, { project: 'node' } ) ).toEqual( [
-				expect.stringContaining( 'CommonJS export' ),
-			] );
+			expectViolation( source, 'CommonJS export', { project: 'node' } );
 		}
 	} );
 
 	it( 'allows properties on local module-like objects', () => {
-		expect(
-			validate(
-				'const module = { exports: {} };\nmodule.exports.value = true;\nconst exports = {};\nexports.value = true;',
-				{ project: 'node' }
-			)
-		).toEqual( [] );
+		expectValid(
+			'const module = { exports: {} };\nmodule.exports.value = true;\nconst exports = {};\nexports.value = true;',
+			{ project: 'node' }
+		);
 	} );
 
 	it( 'enforces Vitest imports from module references', () => {
-		expect(
-			validate( 'const example = "import { it } from \'vitest\'";', {
+		expectViolation(
+			'const example = "import { it } from \'vitest\'";',
+			'no explicit import from vitest',
+			{
 				isVitestTest: true,
 				project: 'node',
-			} )
-		).toEqual( [
-			expect.stringContaining( 'no explicit import from vitest' ),
-		] );
-		expect(
-			validate( "import { it } from 'vitest';", {
-				isVitestTest: true,
-				project: 'node',
-			} )
-		).toEqual( [] );
-		expect(
-			validate(
-				"import { it } from 'vitest';\nimport { expect } from 'vitest/globals';",
-				{ isVitestTest: true, project: 'node' }
-			)
-		).toEqual( [
-			expect.stringContaining( 'vitest/globals is not allowed' ),
-		] );
+			}
+		);
+		expectValid( "import { it } from 'vitest';", {
+			isVitestTest: true,
+			project: 'node',
+		} );
+		expectViolation(
+			"import { it } from 'vitest';\nimport { expect } from 'vitest/globals';",
+			'vitest/globals is not allowed',
+			{ isVitestTest: true, project: 'node' }
+		);
 	} );
 
 	it( 'matches Browser Mode imports by exact module source', () => {
-		expect(
-			validate(
-				"import { it } from 'vitest';\nimport '@vitest/browser-playwright';\nconst note = \"import '@vitest/browser'\";",
-				{ isVitestTest: true, project: 'jsdom' }
-			)
-		).toEqual( [] );
-		expect(
-			validate(
-				"import { it } from 'vitest';\nimport { page } from '@vitest/browser';",
-				{ isVitestTest: true, project: 'jsdom' }
-			)
-		).toEqual( [
-			expect.stringContaining(
-				'Browser Mode imports require a *.browser.test.* filename'
-			),
-		] );
+		expectValid(
+			"import { it } from 'vitest';\nimport '@vitest/browser-playwright';\nconst note = \"import '@vitest/browser'\";",
+			{ isVitestTest: true, project: 'jsdom' }
+		);
+		expectViolation(
+			"import { it } from 'vitest';\nimport { page } from '@vitest/browser';",
+			'Browser Mode imports require a *.browser.test.* filename',
+			{ isVitestTest: true, project: 'jsdom' }
+		);
 	} );
 
 	it( 'matches only test environment comment directives', () => {
-		expect(
-			validate(
-				"/* @vitest-environment jsdom */\nimport { it } from 'vitest';",
-				{ isVitestTest: true, project: 'node' }
-			)
-		).toEqual( [
-			expect.stringContaining(
-				'per-file test environment overrides are not allowed'
-			),
-		] );
-		expect(
-			validate(
-				"// The @jest-environment docblock was removed.\nimport { it } from 'vitest';\nconst note = '@vitest-environment';",
-				{ isVitestTest: true, project: 'node' }
-			)
-		).toEqual( [] );
+		expectViolation(
+			"/* @vitest-environment jsdom */\nimport { it } from 'vitest';",
+			'per-file test environment overrides are not allowed',
+			{ isVitestTest: true, project: 'node' }
+		);
+		expectValid(
+			"// The @jest-environment docblock was removed.\nimport { it } from 'vitest';\nconst note = '@vitest-environment';",
+			{ isVitestTest: true, project: 'node' }
+		);
 	} );
 
 	it( 'uses canonical project routing for environment suffixes', () => {
-		expect(
-			validate( "import { it } from 'vitest';", {
+		expectViolation(
+			"import { it } from 'vitest';",
+			'environment names must use *.jsdom.test.* or *.browser.test.*',
+			{
 				file: 'example.browser.helper.test.js',
 				isVitestTest: true,
 				project: 'node',
-			} )
-		).toEqual( [
-			expect.stringContaining(
-				'environment names must use *.jsdom.test.* or *.browser.test.*'
-			),
-		] );
-		expect(
-			validate( "import { it } from 'vitest';", {
-				file: 'example.browser.test.js',
-				isVitestTest: true,
-				project: 'browser',
-			} )
-		).toEqual( [] );
+			}
+		);
+		expectValid( "import { it } from 'vitest';", {
+			file: 'example.browser.test.js',
+			isVitestTest: true,
+			project: 'browser',
+		} );
 	} );
 
 	it( 'allows animate methods on unrelated jsdom objects', () => {
-		expect(
-			validate( 'controller.animate();', { project: 'jsdom' } )
-		).toEqual( [] );
+		expectValid( 'controller.animate();', { project: 'jsdom' } );
 	} );
 
 	it( 'rejects the migrated per-file conventions', () => {
-		expect(
-			validate( "require( './module' );", { project: 'node' } )
-		).toEqual( [ expect.stringContaining( 'unbound require()' ) ] );
-		expect(
-			validate( "import { vi } from 'vitest';\nvi.mock( './module' );", {
+		expectViolation( "require( './module' );", 'unbound require()', {
+			project: 'node',
+		} );
+		expectViolation(
+			"import { vi } from 'vitest';\nvi.mock( './module' );",
+			'must use vi.mock(import(...))',
+			{
 				file: 'example.test.ts',
 				project: 'node',
-			} )
-		).toEqual( [
-			expect.stringContaining( 'must use vi.mock(import(...))' ),
-		] );
-		expect(
-			validate( 'getComputedStyle( document.body );', {
+			}
+		);
+		expectViolation(
+			'getComputedStyle( document.body );',
+			'computed style assertions',
+			{
 				project: 'jsdom',
-			} )
-		).toEqual( [ expect.stringContaining( 'computed style assertions' ) ] );
-		expect(
-			validate( 'expect( element ).toHaveStyle( {} );', {
+			}
+		);
+		expectViolation(
+			'expect( element ).toHaveStyle( {} );',
+			'toHaveStyle() requires',
+			{
 				project: 'jsdom',
-			} )
-		).toEqual( [ expect.stringContaining( 'toHaveStyle() requires' ) ] );
-		expect(
-			validate( "import 'vitest';\ntest( 'example', () => {} );", {
+			}
+		);
+		expectViolation(
+			"import 'vitest';\ntest( 'example', () => {} );",
+			'unbound Vitest API: test',
+			{
 				isVitestTest: true,
 				project: 'node',
-			} )
-		).toEqual( [ expect.stringContaining( 'unbound Vitest API: test' ) ] );
+			}
+		);
 	} );
 
 	it( 'validates the policy exception schema', () => {
