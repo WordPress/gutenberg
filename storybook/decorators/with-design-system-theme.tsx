@@ -4,11 +4,39 @@ import {
 	DARK_THEME_COLORS,
 	getColorTheme,
 	getCustomThemeColors,
+	LIGHT_THEME_COLORS,
 } from '../addons/design-system-theme/constants';
 
-type ThemeProviderCornerRadius = React.ComponentProps<
-	typeof ThemeProvider
->[ 'cornerRadius' ];
+type ThemeProviderProps = React.ComponentProps< typeof ThemeProvider >;
+type ThemeProviderSettings = Pick<
+	ThemeProviderProps,
+	'color' | 'cornerRadius' | 'cursor'
+>;
+
+export function getDesignSystemThemeSettings(
+	globals: StoryContext[ 'globals' ]
+): ThemeProviderSettings {
+	const colorTheme = getColorTheme( globals.dsColorTheme );
+	const cursorControl = globals.dsCursorControl || undefined;
+	const cornerRadiusPreset: ThemeProviderProps[ 'cornerRadius' ] =
+		globals.dsCornerRadius || undefined;
+
+	let color: ThemeProviderProps[ 'color' ] = LIGHT_THEME_COLORS;
+	if ( colorTheme === 'dark' ) {
+		color = DARK_THEME_COLORS;
+	} else if ( colorTheme === 'custom' ) {
+		color = getCustomThemeColors(
+			globals.dsPrimaryColor,
+			globals.dsBackgroundColor
+		);
+	}
+
+	return {
+		color,
+		cursor: cursorControl ? { control: cursorControl } : undefined,
+		cornerRadius: cornerRadiusPreset,
+	};
+}
 
 /**
  * Decorator that applies Design System theme based on toolbar selections.
@@ -22,30 +50,17 @@ export function WithDesignSystemTheme(
 	context: StoryContext
 ) {
 	const colorTheme = getColorTheme( context.globals.dsColorTheme );
-	const cursorControl = context.globals.dsCursorControl || undefined;
-	const cornerRadiusPreset: ThemeProviderCornerRadius =
-		context.globals.dsCornerRadius || undefined;
-
-	let color;
-	if ( colorTheme === 'dark' ) {
-		color = DARK_THEME_COLORS;
-	} else if ( colorTheme === 'custom' ) {
-		color = getCustomThemeColors(
-			context.globals.dsPrimaryColor,
-			context.globals.dsBackgroundColor
-		);
-	}
+	const themeSettings = getDesignSystemThemeSettings( context.globals );
+	const hasColorOverride = colorTheme !== 'light';
 
 	return (
 		<ThemeProvider
-			color={ color }
-			cursor={ cursorControl ? { control: cursorControl } : undefined }
-			cornerRadius={ cornerRadiusPreset }
+			{ ...themeSettings }
 			isRoot={ context.viewMode !== 'docs' }
 		>
 			<div
 				style={
-					color?.background
+					hasColorOverride
 						? {
 								background:
 									'var(--wpds-color-background-surface-neutral-strong)',
@@ -59,7 +74,7 @@ export function WithDesignSystemTheme(
 				}
 			>
 				<Story { ...context } />
-				{ color?.background && (
+				{ hasColorOverride && (
 					<small
 						style={ {
 							display: 'block',
