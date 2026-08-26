@@ -277,10 +277,19 @@ export const Input = styled.input< InputProps >`
 		/* Hide Safari's value-like placeholder (e.g. \`12:30\`) in empty
 		   date/time inputs. While the input is focused, the browser's
 		   segment editor must stay visible for typing. */
-		&[type='date'][data-empty-value]:not( :focus ),
-		&[type='time'][data-empty-value]:not( :focus ),
-		&[type='datetime-local'][data-empty-value]:not( :focus ) {
-			color: transparent;
+		@supports ( -webkit-hyphens: none ) and
+			( not ( -moz-appearance: none ) ) {
+			/* Safari only */
+			&[type='date'][data-empty-value]:not( :focus ),
+			&[type='time'][data-empty-value]:not( :focus ),
+			&[type='datetime-local'][data-empty-value]:not( :focus ) {
+				color: transparent;
+
+				/* Hide slashes in date when input is disabled. */
+				&:disabled::-webkit-datetime-edit-text {
+					color: transparent;
+				}
+			}
 		}
 
 		&[type='email'],
