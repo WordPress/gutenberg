@@ -43,7 +43,11 @@ describe( 'recordEmojiUse', () => {
 	it( 'returns the sanitized list unchanged when the key is empty', () => {
 		const entries = [ { key: '2764', count: 3 } ];
 		expect( recordEmojiUse( entries, '' ) ).toEqual( entries );
-		expect( recordEmojiUse( entries, undefined ) ).toEqual( entries );
+		// A caller reaching the guard with no key at all — outside the
+		// declared signature, but the runtime guard covers it.
+		expect(
+			recordEmojiUse( entries, undefined as unknown as string )
+		).toEqual( entries );
 	} );
 
 	it( 'increments an existing entry and reorders by count', () => {

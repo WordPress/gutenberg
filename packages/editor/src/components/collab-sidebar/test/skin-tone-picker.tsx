@@ -1,17 +1,43 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import SkinTonePicker, { SKIN_TONES, applySkinTone } from '../skin-tone-picker';
+import type { EmojibaseEntry } from '../emojibase-data';
 
-const RAISED_HAND = {
+const RAISED_HAND: EmojibaseEntry = {
 	label: 'raised hand',
 	hexcode: '270B',
 	emoji: '✋️',
 	skins: [
-		{ label: 'raised hand: light skin tone', emoji: '✋🏻', tone: 1 },
-		{ label: 'raised hand: medium-light skin tone', emoji: '✋🏼', tone: 2 },
-		{ label: 'raised hand: medium skin tone', emoji: '✋🏽', tone: 3 },
-		{ label: 'raised hand: medium-dark skin tone', emoji: '✋🏾', tone: 4 },
-		{ label: 'raised hand: dark skin tone', emoji: '✋🏿', tone: 5 },
+		{
+			label: 'raised hand: light skin tone',
+			hexcode: '270B-1F3FB',
+			emoji: '✋🏻',
+			tone: 1,
+		},
+		{
+			label: 'raised hand: medium-light skin tone',
+			hexcode: '270B-1F3FC',
+			emoji: '✋🏼',
+			tone: 2,
+		},
+		{
+			label: 'raised hand: medium skin tone',
+			hexcode: '270B-1F3FD',
+			emoji: '✋🏽',
+			tone: 3,
+		},
+		{
+			label: 'raised hand: medium-dark skin tone',
+			hexcode: '270B-1F3FE',
+			emoji: '✋🏾',
+			tone: 4,
+		},
+		{
+			label: 'raised hand: dark skin tone',
+			hexcode: '270B-1F3FF',
+			emoji: '✋🏿',
+			tone: 5,
+		},
 	],
 };
 
@@ -41,18 +67,23 @@ describe( 'applySkinTone', () => {
 	} );
 
 	it( 'returns the base entry for emoji without skin variants', () => {
-		const heart = { label: 'red heart', hexcode: '2764-FE0F', emoji: '❤️' };
+		const heart: EmojibaseEntry = {
+			label: 'red heart',
+			hexcode: '2764-FE0F',
+			emoji: '❤️',
+		};
 		expect( applySkinTone( heart, 3 ) ).toBe( heart );
 	} );
 
 	it( 'ignores mixed-tone combination variants', () => {
-		const handshake = {
+		const handshake: EmojibaseEntry = {
 			label: 'handshake',
 			hexcode: '1F91D',
 			emoji: '🤝',
 			skins: [
 				{
 					label: 'handshake: light, dark',
+					hexcode: '1FAF1-1F3FB-200D-1FAF2-1F3FF',
 					emoji: '🫱🏻‍🫲🏿',
 					tone: [ 1, 5 ],
 				},

@@ -3,11 +3,15 @@ import userEvent from '@testing-library/user-event';
 import apiFetch from '@wordpress/api-fetch';
 import { speak } from '@wordpress/a11y';
 import { dispatch } from '@wordpress/data';
+// @ts-expect-error - No type declarations available for @wordpress/block-editor.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { AddReactionButton } from '../add-reaction-picker';
 
 jest.mock( '@wordpress/api-fetch', () => jest.fn() );
 jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
+
+const mockApiFetch = jest.mocked( apiFetch );
+const mockSpeak = jest.mocked( speak );
 
 /*
  * The tooltip name cache in reaction-display.tsx is module-level and
@@ -19,9 +23,9 @@ let uniqueNoteId = 100;
 describe( 'AddReactionButton', () => {
 	beforeEach( () => {
 		uniqueNoteId += 1;
-		apiFetch.mockReset();
-		apiFetch.mockRejectedValue( new Error( 'not mocked' ) );
-		speak.mockClear();
+		mockApiFetch.mockReset();
+		mockApiFetch.mockRejectedValue( new Error( 'not mocked' ) );
+		mockSpeak.mockClear();
 	} );
 
 	it( 'falls back to the curated quick row when no Emojibase URL is set', async () => {
@@ -68,7 +72,7 @@ describe( 'AddReactionButton', () => {
 		// `1f44d`, so it aggregates into the same reaction_summary bucket
 		// as historical quick-row picks.
 		const originalFetch = global.fetch;
-		global.fetch = jest.fn( ( url ) =>
+		global.fetch = jest.fn( ( url: RequestInfo | URL ) =>
 			Promise.resolve( {
 				ok: true,
 				json: () =>
@@ -84,7 +88,7 @@ describe( 'AddReactionButton', () => {
 							  ]
 							: { groups: [ { order: 0, message: 'Smileys' } ] }
 					),
-			} )
+			} as unknown as Response )
 		);
 		dispatch( blockEditorStore ).updateSettings( {
 			noteEmojibaseUrl: 'https://example.test/emojibase',
@@ -148,7 +152,7 @@ describe( 'AddReactionButton', () => {
 		} );
 		const originalFetch = global.fetch;
 		let failRequests = true;
-		global.fetch = jest.fn( ( url ) =>
+		global.fetch = jest.fn( ( url: RequestInfo | URL ) =>
 			failRequests
 				? Promise.reject( new Error( 'network down' ) )
 				: Promise.resolve( {
@@ -173,7 +177,7 @@ describe( 'AddReactionButton', () => {
 											],
 									  }
 							),
-				  } )
+				  } as unknown as Response )
 		);
 
 		try {

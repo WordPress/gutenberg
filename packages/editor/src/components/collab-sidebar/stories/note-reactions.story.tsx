@@ -1,10 +1,17 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 import { useState } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
 import { dispatch } from '@wordpress/data';
+// @ts-expect-error - No type declarations available for @wordpress/block-editor.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import ReactionDisplay from '../reaction-display';
 import { AddReactionButton } from '../add-reaction-picker';
+
+/**
+ * A reaction summary as the REST API returns it, keyed by reaction slug.
+ */
+type ReactionSummary = Record< string, { count: number; reacted: boolean } >;
 
 /**
  * Sample reaction summary, keyed by reaction slug. Curated reactions are
@@ -12,7 +19,7 @@ import { AddReactionButton } from '../add-reaction-picker';
  * full emoji picker are stored under a hex-codepoint key ("1f338" is 🌸)
  * and have their tooltip label resolved from the Emojibase dataset.
  */
-const INITIAL_REACTIONS = {
+const INITIAL_REACTIONS: ReactionSummary = {
 	heart: { count: 2, reacted: true },
 	'1f338': { count: 1, reacted: false },
 };
@@ -27,11 +34,19 @@ const INITIAL_REACTIONS = {
  * adds/toggles a pill just like it does against a real site. User-name
  * tooltips fall back to plain counts because there is no REST API in
  * Storybook.
+ *
+ * @param props                  Component props.
+ * @param props.onToggleReaction Called with the slug of the toggled reaction.
  */
-function NoteReactions( { onToggleReaction } ) {
-	const [ reactions, setReactions ] = useState( INITIAL_REACTIONS );
+function NoteReactions( {
+	onToggleReaction,
+}: {
+	onToggleReaction?: ( slug: string ) => void;
+} ) {
+	const [ reactions, setReactions ] =
+		useState< ReactionSummary >( INITIAL_REACTIONS );
 
-	const toggleReaction = ( slug ) => {
+	const toggleReaction = ( slug: string ) => {
 		onToggleReaction?.( slug );
 		setReactions( ( previous ) => {
 			const entry = previous[ slug ];
@@ -72,9 +87,9 @@ function NoteReactions( { onToggleReaction } ) {
 	);
 }
 
-const meta = {
+const meta: Meta< typeof NoteReactions > = {
 	title: 'Editor/Notes Reactions',
-	component: ReactionDisplay,
+	component: NoteReactions,
 	decorators: [
 		( Story ) => {
 			dispatch( blockEditorStore ).updateSettings( {
@@ -90,8 +105,7 @@ const meta = {
 	argTypes: {
 		onToggleReaction: { control: false },
 	},
-	render: ( args ) => <NoteReactions { ...args } />,
 };
 export default meta;
 
-export const Default = {};
+export const Default: StoryObj< typeof NoteReactions > = {};

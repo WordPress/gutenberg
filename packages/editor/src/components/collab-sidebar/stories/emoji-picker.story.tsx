@@ -1,5 +1,7 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 import { dispatch } from '@wordpress/data';
+// @ts-expect-error - No type declarations available for @wordpress/block-editor.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import EmojiPicker from '../emoji-picker';
 
@@ -15,7 +17,7 @@ import EmojiPicker from '../emoji-picker';
  * mapped in `storybook/main.ts`, and the document language is pinned
  * to `en` so locale detection is deterministic.
  */
-const meta = {
+const meta: Meta< typeof EmojiPicker > = {
 	title: 'Editor/EmojiPicker',
 	component: EmojiPicker,
 	decorators: [
@@ -36,4 +38,4 @@ const meta = {
 };
 export default meta;
 
-export const Default = {};
+export const Default: StoryObj< typeof EmojiPicker > = {};

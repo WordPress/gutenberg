@@ -4,6 +4,7 @@ import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { speak } from '@wordpress/a11y';
 import { dispatch } from '@wordpress/data';
+// @ts-expect-error - No type declarations available for @wordpress/block-editor.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import EmojiPicker, {
 	chunkRows,
@@ -11,15 +12,22 @@ import EmojiPicker, {
 	searchEmojis,
 } from '../emoji-picker';
 import { EMOJIBASE_LOCALES, resolveEmojibaseLocale } from '../emojibase-data';
+import type { EmojibaseEntry } from '../emojibase-data';
 
 jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
+
+const mockSpeak = jest.mocked( speak );
 
 describe( 'resolveEmojibaseLocale', () => {
 	it( 'falls back to English for empty/invalid input', () => {
 		expect( resolveEmojibaseLocale( '' ) ).toBe( 'en' );
-		expect( resolveEmojibaseLocale( null ) ).toBe( 'en' );
-		expect( resolveEmojibaseLocale( undefined ) ).toBe( 'en' );
-		expect( resolveEmojibaseLocale( 42 ) ).toBe( 'en' );
+		// Values outside the declared signature: `<html lang>` and
+		// `navigator.language` are page data, so the runtime guard has to
+		// hold even when they are missing or not a string.
+		const invalid = [ null, undefined, 42 ] as unknown as string[];
+		for ( const value of invalid ) {
+			expect( resolveEmojibaseLocale( value ) ).toBe( 'en' );
+		}
 	} );
 
 	it( 'returns supported locales unchanged', () => {
@@ -64,7 +72,7 @@ describe( 'groupEmojis', () => {
 	} );
 
 	it( 'skips entries without a numeric group', () => {
-		const data = [
+		const data: EmojibaseEntry[] = [
 			{ hexcode: '1F44B', emoji: '👋', group: 1 },
 			{ hexcode: '1F3FB', emoji: '🏻' }, // Skin-tone component, no group.
 		];
@@ -75,7 +83,7 @@ describe( 'groupEmojis', () => {
 	} );
 
 	it( 'buckets emojis by group and sorts groups numerically', () => {
-		const data = [
+		const data: EmojibaseEntry[] = [
 			{ hexcode: 'B', emoji: '🅱', group: 8 },
 			{ hexcode: 'A', emoji: '😀', group: 0 },
 			{ hexcode: 'C', emoji: '😺', group: 0 },
@@ -90,13 +98,27 @@ describe( 'groupEmojis', () => {
 	} );
 } );
 
+/**
+ * Build a run of placeholder emoji records; only the count matters to
+ * the row chunker.
+ *
+ * @param length How many records to build.
+ * @return Emoji records.
+ */
+function makeEntries( length: number ): EmojibaseEntry[] {
+	return Array.from( { length }, ( _, i ) => ( {
+		hexcode: `${ i }`,
+		emoji: '😀',
+	} ) );
+}
+
 describe( 'chunkRows', () => {
 	it( 'returns empty array for empty input', () => {
 		expect( chunkRows( [] ) ).toEqual( [] );
 	} );
 
 	it( 'splits into rows of 8 with a final partial row', () => {
-		const input = Array.from( { length: 10 }, ( _, i ) => ( { i } ) );
+		const input = makeEntries( 10 );
 		const rows = chunkRows( input );
 		expect( rows ).toHaveLength( 2 );
 		expect( rows[ 0 ] ).toHaveLength( 8 );
@@ -104,13 +126,12 @@ describe( 'chunkRows', () => {
 	} );
 
 	it( 'uses one row when input fits in a single row', () => {
-		const input = Array.from( { length: 5 }, ( _, i ) => ( { i } ) );
-		expect( chunkRows( input ) ).toHaveLength( 1 );
+		expect( chunkRows( makeEntries( 5 ) ) ).toHaveLength( 1 );
 	} );
 } );
 
 describe( 'searchEmojis', () => {
-	const sample = [
+	const sample: EmojibaseEntry[] = [
 		{
 			hexcode: '1F600',
 			emoji: '😀',
@@ -166,7 +187,7 @@ describe( 'searchEmojis', () => {
 		// `gutenberg_emoji_picker_label_overrides` strips U+FE0F and pads
 		// to four digits, so the key never equals the raw Emojibase
 		// hexcode for the ~quarter of entries that keep the selector.
-		const zwj = [
+		const zwj: EmojibaseEntry[] = [
 			{
 				hexcode: '2764-FE0F-200D-1F525',
 				emoji: '❤️‍🔥',
@@ -186,7 +207,7 @@ describe( 'searchEmojis', () => {
 	} );
 
 	it( 'tolerates emoji entries missing labels or tags', () => {
-		const odd = [ { hexcode: 'X', emoji: '?' } ];
+		const odd: EmojibaseEntry[] = [ { hexcode: 'X', emoji: '?' } ];
 		expect( () => searchEmojis( odd, 'foo', null ) ).not.toThrow();
 		expect( searchEmojis( odd, 'foo', null ) ).toEqual( [] );
 	} );
@@ -196,11 +217,11 @@ describe( 'EmojiPicker search announcements', () => {
 	const originalFetch = global.fetch;
 
 	beforeEach( () => {
-		speak.mockClear();
+		mockSpeak.mockClear();
 		dispatch( blockEditorStore ).updateSettings( {
 			noteEmojibaseUrl: 'https://example.test/emojibase',
 		} );
-		global.fetch = jest.fn( ( url ) =>
+		global.fetch = jest.fn( ( url: RequestInfo | URL ) =>
 			Promise.resolve( {
 				ok: true,
 				json: () =>
@@ -222,7 +243,7 @@ describe( 'EmojiPicker search announcements', () => {
 							  ]
 							: { groups: [ { order: 0, message: 'Smileys' } ] }
 					),
-			} )
+			} as unknown as Response )
 		);
 	} );
 
@@ -276,19 +297,19 @@ describe( 'EmojiPicker search announcements', () => {
 		// The announcement is debounced, so it fires once the typing
 		// settles rather than per keystroke.
 		await waitFor( () =>
-			expect( speak ).toHaveBeenCalledWith( '2 emojis found.' )
+			expect( mockSpeak ).toHaveBeenCalledWith( '2 emojis found.' )
 		);
 
 		await user.clear( searchbox );
 		await user.type( searchbox, 'grinning' );
 		await waitFor( () =>
-			expect( speak ).toHaveBeenCalledWith( '1 emoji found.' )
+			expect( mockSpeak ).toHaveBeenCalledWith( '1 emoji found.' )
 		);
 
 		await user.clear( searchbox );
 		await user.type( searchbox, 'zzz' );
 		await waitFor( () =>
-			expect( speak ).toHaveBeenCalledWith( 'No emoji found.' )
+			expect( mockSpeak ).toHaveBeenCalledWith( 'No emoji found.' )
 		);
 	} );
 
@@ -308,7 +329,7 @@ describe( 'EmojiPicker search announcements', () => {
 		// Well past the 500ms debounce window: clearing restored the full
 		// grid, so the count queued for "grinning" no longer describes it.
 		await new Promise( ( resolve ) => setTimeout( resolve, 800 ) );
-		expect( speak ).not.toHaveBeenCalledWith( '1 emoji found.' );
+		expect( mockSpeak ).not.toHaveBeenCalledWith( '1 emoji found.' );
 	} );
 } );
 
@@ -332,7 +353,7 @@ describe( 'EMOJIBASE_LOCALES drift detection', () => {
 		)?.[ 1 ];
 		expect( localesArray ).toBeTruthy();
 		const buildLocales = new Set(
-			[ ...localesArray.matchAll( /'([^']+)'/g ) ].map( ( m ) => m[ 1 ] )
+			[ ...localesArray!.matchAll( /'([^']+)'/g ) ].map( ( m ) => m[ 1 ] )
 		);
 
 		expect( buildLocales ).toEqual( EMOJIBASE_LOCALES );

@@ -2,6 +2,7 @@ import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import apiFetch from '@wordpress/api-fetch';
 import { dispatch } from '@wordpress/data';
+// @ts-expect-error - No type declarations available for @wordpress/block-editor.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import ReactionDisplay, { invalidateReactionNames } from '../reaction-display';
 
@@ -100,7 +101,7 @@ describe( 'ReactionDisplay', () => {
 			noteEmojibaseUrl: 'https://example.test/emojibase',
 		} );
 		const originalFetch = global.fetch;
-		global.fetch = jest.fn( ( url ) =>
+		global.fetch = jest.fn( ( url: RequestInfo | URL ) =>
 			Promise.resolve( {
 				ok: true,
 				json: () =>
@@ -116,7 +117,7 @@ describe( 'ReactionDisplay', () => {
 							  ]
 							: { groups: [] }
 					),
-			} )
+			} as unknown as Response )
 		);
 
 		try {
@@ -239,7 +240,7 @@ describe( 'ReactionDisplay', () => {
 	it( 'stops showing invalidated reactor names while the refetch runs', async () => {
 		const user = userEvent.setup();
 		const noteId = uniqueNoteId;
-		apiFetch.mockResolvedValue( [
+		mockApiFetch.mockResolvedValue( [
 			{ author_name: 'Alice', content: { raw: 'heart' } },
 		] );
 		const { rerender } = render(
@@ -267,8 +268,8 @@ describe( 'ReactionDisplay', () => {
 		// Someone adds the same reaction from the full picker, which
 		// invalidates the cached names but cannot reach this pill's state.
 		invalidateReactionNames( noteId, 'heart' );
-		let resolveRefetch;
-		apiFetch.mockImplementation(
+		let resolveRefetch!: ( names: unknown[] ) => void;
+		mockApiFetch.mockImplementation(
 			() =>
 				new Promise( ( resolve ) => {
 					resolveRefetch = resolve;
@@ -349,29 +350,32 @@ describe( 'ReactionDisplay', () => {
 			noteEmojibaseUrl: 'https://example.test/emojibase-race',
 		} );
 		const originalFetch = global.fetch;
-		let resolveDataset;
-		const datasetGate = new Promise( ( resolve ) => {
+		let resolveDataset!: () => void;
+		const datasetGate = new Promise< void >( ( resolve ) => {
 			resolveDataset = resolve;
 		} );
-		global.fetch = jest.fn( ( url ) =>
-			datasetGate.then( () => ( {
-				ok: true,
-				json: () =>
-					Promise.resolve(
-						String( url ).includes( 'data.json' )
-							? [
-									{
-										hexcode: '1F44D',
-										emoji: '👍',
-										label: 'thumbs up',
-										group: 0,
-									},
-							  ]
-							: { groups: [] }
-					),
-			} ) )
+		global.fetch = jest.fn( ( url: RequestInfo | URL ) =>
+			datasetGate.then(
+				() =>
+					( {
+						ok: true,
+						json: () =>
+							Promise.resolve(
+								String( url ).includes( 'data.json' )
+									? [
+											{
+												hexcode: '1F44D',
+												emoji: '👍',
+												label: 'thumbs up',
+												group: 0,
+											},
+									  ]
+									: { groups: [] }
+							),
+					} ) as unknown as Response
+			)
 		);
-		apiFetch.mockResolvedValue( [
+		mockApiFetch.mockResolvedValue( [
 			{ author_name: 'Alice', content: { raw: '1f44d' } },
 		] );
 
