@@ -3,7 +3,13 @@ import itemPopupStyles from './item-popup.module.css';
 /**
  * Preset width constraints for item popups.
  */
-export type ItemPopupWidth = 'anchor' | 'content' | 'md' | 'lg' | 'available';
+export type ItemPopupWidth =
+	| 'anchor'
+	| 'content'
+	| 'sm'
+	| 'md'
+	| 'lg'
+	| 'available';
 
 export type ItemPopupWidthProps = {
 	/**
@@ -12,6 +18,7 @@ export type ItemPopupWidthProps = {
 	 * - `'anchor'`: Fixed width matching the anchor width.
 	 * - `'content'`: Width grows with item labels between the anchor and available
 	 *   viewport bounds.
+	 * - `'sm'`: Fixed width at the small surface width token (`--wpds-dimension-surface-width-sm`).
 	 * - `'md'`: Fixed width at the medium surface width token (`--wpds-dimension-surface-width-md`).
 	 * - `'lg'`: Fixed width at the large surface width token (`--wpds-dimension-surface-width-lg`).
 	 * - `'available'`: Fixed width at the available viewport width (`--available-width`).
@@ -33,6 +40,8 @@ export function getItemPopupWidthClassName(
 			return itemPopupStyles[ 'is-width-lg' ];
 		case 'md':
 			return itemPopupStyles[ 'is-width-md' ];
+		case 'sm':
+			return itemPopupStyles[ 'is-width-sm' ];
 		case 'anchor':
 			return itemPopupStyles[ 'is-width-anchor' ];
 		default:

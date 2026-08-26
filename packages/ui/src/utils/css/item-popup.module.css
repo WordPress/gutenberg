@@ -31,6 +31,10 @@
 				width: auto;
 			}
 
+			&.is-width-sm {
+				width: min(var(--available-width), var(--wpds-dimension-surface-width-sm));
+			}
+
 			&.is-width-md {
 				width: min(var(--available-width), var(--wpds-dimension-surface-width-md));
 			}
