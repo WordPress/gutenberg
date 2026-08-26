@@ -3,6 +3,7 @@ import { search as icon } from '@wordpress/icons';
 import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
+import deprecated from './deprecated';
 import edit from './edit';
 import variations from './variations';
 import { unlock } from '../lock-unlock';
@@ -21,6 +22,7 @@ export const settings = {
 	},
 	variations,
 	edit,
+	deprecated,
 };
 
 if ( window.__experimentalContentOnlyInspectorFields ) {
