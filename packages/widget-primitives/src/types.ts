@@ -110,9 +110,8 @@ export interface WidgetAction {
 	href: string;
 
 	/**
-	 * Link only. Any value but `false` downloads the destination instead
-	 * of navigating: a string supplies the suggested filename; `true` and
-	 * the empty string keep the original one.
+	 * Link only. Downloads instead of navigating unless `false`; a string
+	 * sets the filename, `true` or `''` keeps the original.
 	 */
 	download?: string | boolean;
 

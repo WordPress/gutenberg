@@ -4,11 +4,9 @@ import type {
 } from '@wordpress/widget-primitives';
 
 /**
- * Resolves the in-app route path of a link action. `download` and
- * `openInNewTab` targets always keep the plain anchor: both mean a new
- * document, which a client-side navigation cannot deliver. Every
- * `download` value but `false` downloads; `true` and the empty string
- * keep the original filename.
+ * Resolves the in-app route path of a link action. `download` (any value
+ * but `false`) and `openInNewTab` keep the plain anchor: both mean a new
+ * document.
  *
  * @param {WidgetHostLinks | undefined} links  The host's `links` capability.
  * @param {WidgetAction}                action The action whose target to resolve.
