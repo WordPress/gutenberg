@@ -3,8 +3,10 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 /**
  * Markup both runtimes are expected to convert the same way.
  *
- * Deliberately limited to what PHP can convert today: media, embeds and
- * shortcodes are left to the editor, and the unit tests cover why.
+ * Deliberately limited to what PHP can convert today. Blocks whose `save`
+ * rebuilds its markup rather than wrapping the source — Image and Table —
+ * decline server conversion, and media, embeds and shortcodes are left to the
+ * editor. The unit tests cover why.
  */
 const FRAGMENTS = [
 	'<h2>Ingredients</h2><p>You will need the following.</p>',
@@ -13,7 +15,6 @@ const FRAGMENTS = [
 	'<blockquote><p>All models are wrong.</p></blockquote>',
 	'<pre><code>echo 1;</code></pre>',
 	'<pre>line one\nline two</pre>',
-	'<table><thead><tr><th>Name</th></tr></thead><tbody><tr><td>Flour</td></tr></tbody></table>',
 	'<p>Before.</p><hr /><p>After.</p>',
 	'<h3>Notes</h3><p>Some <strong>bold</strong> and a <a href="https://example.com/">link</a>.</p>',
 ];
