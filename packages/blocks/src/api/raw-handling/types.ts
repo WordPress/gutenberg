@@ -1,11 +1,10 @@
-import type { BlockRawTransform } from '../../types';
+import type { BlockRawTransform, NormalizedBlockTransform } from '../../types';
 
 /**
- * A raw transform as returned by `getRawTransforms`, where the declaring block
- * name and a matcher are always present.
+ * A raw transform as returned by `getRawTransforms`, where a matcher is always
+ * present: transforms declaring only a `selector` get one built from it.
  */
-export type RawTransform = BlockRawTransform & {
-	blockName: string;
+export type RawTransform = NormalizedBlockTransform< BlockRawTransform > & {
 	isMatch: NonNullable< BlockRawTransform[ 'isMatch' ] >;
 };
 

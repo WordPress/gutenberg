@@ -17,6 +17,7 @@ import type {
 	BlockBlockTransform,
 	BlockTransform,
 	BlockType,
+	NormalizedBlockTransform,
 } from '../types';
 
 type BlockTypeWithTransformMetadata = BlockType & {
@@ -37,9 +38,9 @@ type TemplateBlock = [
  *
  * @return Whether the transform is of type `block`.
  */
-const isBlockTypeTransform = (
-	transform: BlockTransform
-): transform is BlockBlockTransform => transform.type === 'block';
+const isBlockTypeTransform = < Transform extends BlockTransform >(
+	transform: Transform
+): transform is Transform & BlockBlockTransform => transform.type === 'block';
 
 const getBlockTypeWithTransformMetadata = (
 	blockType: BlockType,
@@ -237,10 +238,10 @@ export function cloneBlock(
  * @return Is the transform possible?
  */
 const isPossibleTransformForSource = (
-	transform: BlockTransform,
+	transform: NormalizedBlockTransform,
 	direction: 'from' | 'to',
 	blocks: Block[]
-): transform is BlockBlockTransform => {
+): transform is NormalizedBlockTransform< BlockBlockTransform > => {
 	if ( ! blocks.length ) {
 		return false;
 	}
@@ -288,7 +289,7 @@ const isPossibleTransformForSource = (
 		! isMultiBlock &&
 		direction === 'from' &&
 		isContainerGroupBlock( sourceBlock.name ) &&
-		isContainerGroupBlock( transform.blockName! )
+		isContainerGroupBlock( transform.blockName )
 	) {
 		return false;
 	}
@@ -498,7 +499,7 @@ export function findTransform< T extends BlockTransform >(
 export function getBlockTransforms(
 	direction: 'to' | 'from',
 	blockTypeOrName?: string | BlockType
-): BlockTransform[] {
+): NormalizedBlockTransform[] {
 	// When retrieving transforms for all block types, recurse into self.
 	if ( blockTypeOrName === undefined ) {
 		return getBlockTypes()
@@ -508,9 +509,8 @@ export function getBlockTransforms(
 
 	// Validate that block type exists and has array of direction.
 	const blockType = normalizeBlockType( blockTypeOrName );
-	const { name: blockName, transforms } = blockType || {};
-	const directionTransforms = transforms?.[ direction ];
-	if ( ! transforms || ! Array.isArray( directionTransforms ) ) {
+	const directionTransforms = blockType?.transforms?.[ direction ];
+	if ( ! blockType || ! Array.isArray( directionTransforms ) ) {
 		return [];
 	}
 
@@ -546,7 +546,7 @@ export function getBlockTransforms(
 	// Map transforms to normal form.
 	return filteredTransforms.map( ( transform ) => ( {
 		...transform,
-		blockName,
+		blockName: blockType.name,
 		usingMobileTransformations,
 	} ) );
 }

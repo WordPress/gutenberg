@@ -437,6 +437,14 @@ export type BlockTransform<
 	| BlockShortcodeTransform;
 
 /**
+ * A block transform as returned by `getBlockTransforms`, which stamps the name
+ * of the block type declaring the transform onto it.
+ */
+export type NormalizedBlockTransform<
+	Transform extends BlockTransform = BlockTransform,
+> = Transform & { blockName: string };
+
+/**
  * Internal type for the innerBlocks property inside of the example.
  *
  * @see BlockType.example

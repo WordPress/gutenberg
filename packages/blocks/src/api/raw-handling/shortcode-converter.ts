@@ -6,6 +6,7 @@ import { applyBuiltInValidationFixes } from '../parser/apply-built-in-validation
 import type {
 	Block,
 	BlockShortcodeTransform,
+	NormalizedBlockTransform,
 	ShortcodeTransformAttribute,
 } from '../../types';
 
@@ -22,14 +23,16 @@ function segmentHTMLToShortcodeBlock(
 ): Array< string | Block > {
 	// Get all matches.
 	const transformsFrom = getBlockTransforms( 'from' ).filter(
-		( transform ): transform is BlockShortcodeTransform =>
+		(
+			transform
+		): transform is NormalizedBlockTransform< BlockShortcodeTransform > =>
 			transform.type === 'shortcode'
 	);
 
 	const transformation = findTransform(
 		transformsFrom,
 		( transform ) =>
-			excludedBlockNames.indexOf( transform.blockName! ) === -1 &&
+			excludedBlockNames.indexOf( transform.blockName ) === -1 &&
 			castArray( transform.tag ).some( ( tag ) =>
 				regexp( tag ).test( HTML )
 			)
@@ -84,7 +87,7 @@ function segmentHTMLToShortcodeBlock(
 	) {
 		return segmentHTMLToShortcodeBlock( HTML, previousIndex, [
 			...excludedBlockNames,
-			transformation.blockName!,
+			transformation.blockName,
 		] );
 	}
 
@@ -107,7 +110,7 @@ function segmentHTMLToShortcodeBlock(
 			);
 		} );
 	} else {
-		const blockType = getBlockType( transformation.blockName! );
+		const blockType = getBlockType( transformation.blockName );
 		if ( ! blockType ) {
 			return [ HTML ];
 		}
@@ -138,7 +141,7 @@ function segmentHTMLToShortcodeBlock(
 		};
 
 		let block = createBlock(
-			transformation.blockName!,
+			transformation.blockName,
 			getBlockAttributes(
 				transformationBlockType,
 				match.shortcode.content,

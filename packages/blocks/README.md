@@ -223,7 +223,7 @@ _Parameters_
 
 _Returns_
 
--   `BlockTransform[]`: Block transforms for direction.
+-   `NormalizedBlockTransform[]`: Block transforms for direction.
 
 ### getBlockType
 
