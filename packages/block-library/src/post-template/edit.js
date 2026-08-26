@@ -28,6 +28,7 @@ function PostTemplateInnerBlocks( { classList } ) {
 			layout: INNER_BLOCKS_LAYOUT,
 		}
 	);
+
 	return <li { ...innerBlocksProps } />;
 }
 
@@ -291,10 +292,6 @@ export default function PostTemplateEdit( {
 		);
 	}
 
-	if ( ! posts.length ) {
-		return <p { ...blockProps }> { __( 'No results found.' ) }</p>;
-	}
-
 	const setDisplayLayout = ( newDisplayLayout ) =>
 		setAttributes( {
 			layout: { ...layout, ...newDisplayLayout },
@@ -319,30 +316,48 @@ export default function PostTemplateEdit( {
 		},
 	];
 
-	// To avoid flicker when switching active block contexts, a preview is rendered
-	// for each block context, but the preview for the active block context is hidden.
-	// This ensures that when it is displayed again, the cached rendering of the
-	// block preview is used, instead of having to re-render the preview from scratch.
+	// Create fallback context when no posts exist.
+	const effectiveBlockContexts =
+		blockContexts && blockContexts.length > 0
+			? blockContexts
+			: [
+					{
+						postType: postType || 'post',
+						postId: 'template-placeholder',
+						classList: '',
+					},
+			  ];
+
 	return (
 		<>
+			{ /* Show message when no posts exist. */ }
+			{ posts.length === 0 && (
+				<p>
+					{ __(
+						'No posts found but you can still design your post template below.'
+					) }
+				</p>
+			) }
+
 			<BlockControls>
 				<ToolbarGroup controls={ displayLayoutControls } />
 			</BlockControls>
 
 			<ul { ...blockProps }>
-				{ blockContexts &&
-					blockContexts.map( ( blockContext ) => (
-						<BlockContextProvider
-							key={ blockContext.postId }
-							value={ blockContext }
-						>
-							{ blockContext.postId ===
-							( activeBlockContextId ||
-								blockContexts[ 0 ]?.postId ) ? (
-								<PostTemplateInnerBlocks
-									classList={ blockContext.classList }
-								/>
-							) : null }
+				{ effectiveBlockContexts.map( ( blockContext ) => (
+					<BlockContextProvider
+						key={ blockContext.postId }
+						value={ blockContext }
+					>
+						{ blockContext.postId ===
+						( activeBlockContextId ||
+							effectiveBlockContexts[ 0 ]?.postId ) ? (
+							<PostTemplateInnerBlocks
+								classList={ blockContext.classList }
+							/>
+						) : null }
+						{ /* Only show preview for real posts, not placeholder. */ }
+						{ blockContext.postId !== 'template-placeholder' && (
 							<MemoizedPostTemplateBlockPreview
 								blocks={ blocks }
 								blockContextId={ blockContext.postId }
@@ -353,11 +368,12 @@ export default function PostTemplateEdit( {
 								isHidden={
 									blockContext.postId ===
 									( activeBlockContextId ||
-										blockContexts[ 0 ]?.postId )
+										effectiveBlockContexts[ 0 ]?.postId )
 								}
 							/>
-						</BlockContextProvider>
-					) ) }
+						) }
+					</BlockContextProvider>
+				) ) }
 			</ul>
 		</>
 	);
