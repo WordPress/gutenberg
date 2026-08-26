@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Portaled overlays (`AlertDialog`, `Autocomplete`, `Combobox`, `Dialog`, `Drawer`, `Menu`, `Popover`, and `Select`) now inherit the theme from their portal destination instead of re-emitting the trigger's nearest contextual theme. Default portals use the document root theme; custom portal containers use their DOM ancestry ([#82038](https://github.com/WordPress/gutenberg/pull/82038)).
+
 ## 0.21.0 (2026-08-26)
 
 ### New Features
@@ -18,7 +22,6 @@
 ### Breaking Changes
 
 -   `Calendar`, `RangeCalendar`: Remove the `--wp-ui-calendar-range-middle-background-color` and `--wp-ui-calendar-preview-border-color` CSS custom properties. ([#81438](https://github.com/WordPress/gutenberg/pull/81438))
--   Portaled overlays (`AlertDialog`, `Autocomplete`, `Combobox`, `Dialog`, `Drawer`, `Menu`, `Popover`, and `Select`) now inherit the theme from their portal destination instead of re-emitting the trigger's nearest contextual theme. Default portals use the document root theme; custom portal containers use their DOM ancestry ([#82038](https://github.com/WordPress/gutenberg/pull/82038)).
 -   `SearchableChipSelect`: Remove the `creatableItem` prop. Mark a creatable action with `creatable: true` on an item in `items` instead. The item renders in the list footer and is excluded from the main list automatically. Handle selection in `onValueChange`. See the `Creatable` and `GroupedCreatable` stories for examples ([#80989](https://github.com/WordPress/gutenberg/pull/80989)).
 -   `Select.Item`: Remove `'compact'` from the `size` prop. Use `'default'` instead ([#81354](https://github.com/WordPress/gutenberg/pull/81354)).
 -   `Combobox.Item`, `SelectControl.Item`: The `size` prop is removed ([#81354](https://github.com/WordPress/gutenberg/pull/81354)).
