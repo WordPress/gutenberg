@@ -15,6 +15,8 @@ export type ItemPopupWidthProps = {
 	/**
 	 * Controls how the popup width is constrained relative to its anchor.
 	 *
+	 * For all presets, the popup is never narrower than its anchor.
+	 *
 	 * - `'anchor'`: Fixed width matching the anchor width.
 	 * - `'content'`: Width grows with item labels between the anchor and available
 	 *   viewport bounds.
