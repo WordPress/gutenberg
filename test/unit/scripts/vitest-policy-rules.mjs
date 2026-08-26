@@ -53,6 +53,17 @@ const policyExceptionKeys = new Set( [
 	'browserFireEvent',
 	'jsdomBrowserApis',
 ] );
+const browserGlobalObjectNames = new Set( [
+	'Document',
+	'Element',
+	'HTMLElement',
+	'Node',
+	'Range',
+	'SVGElement',
+	'document',
+	'globalThis',
+	'window',
+] );
 
 function getImportedName( specifier ) {
 	if ( specifier.type === 'ImportDefaultSpecifier' ) {
@@ -94,11 +105,67 @@ function isUnboundIdentifier( node, name, unboundIdentifiers ) {
 	);
 }
 
-function isBrowserGlobalExpression( node, unboundIdentifiers, domIdentifiers ) {
+function createIdentifierVariableMap( scopeManager ) {
+	const identifierVariables = new WeakMap();
+
+	for ( const scope of scopeManager.scopes ) {
+		for ( const variable of scope.variables ) {
+			for ( const identifier of variable.identifiers ) {
+				identifierVariables.set( identifier, variable );
+			}
+			for ( const reference of variable.references ) {
+				identifierVariables.set( reference.identifier, variable );
+			}
+		}
+	}
+
+	return identifierVariables;
+}
+
+function isVariableReference( node, variables, identifierVariables ) {
+	const variable =
+		node?.type === 'Identifier'
+			? identifierVariables.get( node )
+			: undefined;
+	return variable !== undefined && variables.has( variable );
+}
+
+function getPatternIdentifiers( node ) {
+	if ( node?.type === 'Identifier' ) {
+		return [ node ];
+	}
+	if ( node?.type === 'AssignmentPattern' ) {
+		return getPatternIdentifiers( node.left );
+	}
+	if ( node?.type === 'RestElement' ) {
+		return getPatternIdentifiers( node.argument );
+	}
+	if ( node?.type === 'ArrayPattern' ) {
+		return node.elements.flatMap( getPatternIdentifiers );
+	}
+	if ( node?.type === 'ObjectPattern' ) {
+		return node.properties.flatMap( ( property ) =>
+			getPatternIdentifiers(
+				property.type === 'RestElement'
+					? property.argument
+					: property.value
+			)
+		);
+	}
+
+	return [];
+}
+
+function isBrowserGlobalExpression(
+	node,
+	unboundIdentifiers,
+	domVariables,
+	identifierVariables
+) {
 	if ( node?.type === 'Identifier' ) {
 		return (
-			domIdentifiers.has( node.name ) ||
-			( [ 'document', 'globalThis', 'window' ].includes( node.name ) &&
+			domVariables.has( identifierVariables.get( node ) ) ||
+			( browserGlobalObjectNames.has( node.name ) &&
 				unboundIdentifiers.has( node ) )
 		);
 	}
@@ -107,7 +174,8 @@ function isBrowserGlobalExpression( node, unboundIdentifiers, domIdentifiers ) {
 		return isBrowserGlobalExpression(
 			node.callee,
 			unboundIdentifiers,
-			domIdentifiers
+			domVariables,
+			identifierVariables
 		);
 	}
 
@@ -115,43 +183,112 @@ function isBrowserGlobalExpression( node, unboundIdentifiers, domIdentifiers ) {
 		return isBrowserGlobalExpression(
 			node.object,
 			unboundIdentifiers,
-			domIdentifiers
+			domVariables,
+			identifierVariables
+		);
+	}
+
+	if ( node?.type === 'ConditionalExpression' ) {
+		return (
+			isBrowserGlobalExpression(
+				node.consequent,
+				unboundIdentifiers,
+				domVariables,
+				identifierVariables
+			) ||
+			isBrowserGlobalExpression(
+				node.alternate,
+				unboundIdentifiers,
+				domVariables,
+				identifierVariables
+			)
+		);
+	}
+
+	if ( node?.type === 'LogicalExpression' ) {
+		return (
+			isBrowserGlobalExpression(
+				node.left,
+				unboundIdentifiers,
+				domVariables,
+				identifierVariables
+			) ||
+			isBrowserGlobalExpression(
+				node.right,
+				unboundIdentifiers,
+				domVariables,
+				identifierVariables
+			)
 		);
 	}
 
 	if (
-		[ 'ChainExpression', 'TSAsExpression', 'TSNonNullExpression' ].includes(
-			node?.type
-		)
+		[
+			'ChainExpression',
+			'TSAsExpression',
+			'TSNonNullExpression',
+			'TSTypeAssertion',
+		].includes( node?.type )
 	) {
 		return isBrowserGlobalExpression(
 			node.expression,
 			unboundIdentifiers,
-			domIdentifiers
+			domVariables,
+			identifierVariables
 		);
 	}
 
 	return false;
 }
 
-function isVitestExpectCall( node, expectNames, namespaceNames ) {
+function isImportedApiReference(
+	node,
+	apiName,
+	apiVariables,
+	namespaceVariables,
+	identifierVariables
+) {
+	if ( isVariableReference( node, apiVariables, identifierVariables ) ) {
+		return true;
+	}
+
+	return (
+		node?.type === 'MemberExpression' &&
+		getMemberPropertyName( node ) === apiName &&
+		isVariableReference(
+			node.object,
+			namespaceVariables,
+			identifierVariables
+		)
+	);
+}
+
+function isVitestExpectCall(
+	node,
+	expectVariables,
+	namespaceVariables,
+	identifierVariables
+) {
 	if ( node?.type !== 'CallExpression' ) {
 		return false;
 	}
 
-	if ( node.callee?.type === 'Identifier' ) {
-		return expectNames.has( node.callee.name );
-	}
-
-	return (
-		node.callee?.type === 'MemberExpression' &&
-		getMemberPropertyName( node.callee ) === 'expect' &&
-		node.callee.object?.type === 'Identifier' &&
-		namespaceNames.has( node.callee.object.name )
+	return isImportedApiReference(
+		node.callee,
+		'expect',
+		expectVariables,
+		namespaceVariables,
+		identifierVariables
 	);
 }
 
-function isVitestMatcherCall( node, matcherName, expectNames, namespaceNames ) {
+function isVitestMatcherCall(
+	node,
+	matcherName,
+	expectVariables,
+	namespaceVariables,
+	identifierVariables
+) {
 	if (
 		node?.type !== 'CallExpression' ||
 		getMemberPropertyName( node.callee ) !== matcherName
@@ -169,7 +306,12 @@ function isVitestMatcherCall( node, matcherName, expectNames, namespaceNames ) {
 		received = received.object;
 	}
 
-	return isVitestExpectCall( received, expectNames, namespaceNames );
+	return isVitestExpectCall(
+		received,
+		expectVariables,
+		namespaceVariables,
+		identifierVariables
+	);
 }
 
 function isDynamicImport( node ) {
@@ -191,7 +333,8 @@ function isGlobalGetComputedStyleCall( node, unboundIdentifiers ) {
 	return (
 		getMemberPropertyName( node.callee ) === 'getComputedStyle' &&
 		node.callee.object?.type === 'Identifier' &&
-		[ 'globalThis', 'window' ].includes( node.callee.object.name )
+		[ 'globalThis', 'window' ].includes( node.callee.object.name ) &&
+		unboundIdentifiers.has( node.callee.object )
 	);
 }
 
@@ -418,10 +561,13 @@ export function validateVitestPolicy( {
 			( reference ) => reference.identifier
 		) ?? []
 	);
+	const identifierVariables = createIdentifierVariableMap( scopeManager );
 	const importedNamespaces = new Set();
-	const domIdentifiers = new Set();
-	const vitestExpectNames = new Set();
-	const vitestNamespaceNames = new Set();
+	const domVariables = new Set();
+	const testingLibraryNamespaceVariables = new Set();
+	const vitestExpectVariables = new Set();
+	const vitestNamespaceVariables = new Set();
+	const vitestViVariables = new Set();
 	const violations = [];
 	const reported = new Set();
 	let hasVitestImport = false;
@@ -456,14 +602,35 @@ export function validateVitestPolicy( {
 
 		const importSource = node.source.value;
 		for ( const specifier of node.specifiers ) {
+			const variable = identifierVariables.get( specifier.local );
 			if ( specifier.type === 'ImportNamespaceSpecifier' ) {
-				importedNamespaces.add( specifier.local.name );
+				if ( variable ) {
+					importedNamespaces.add( variable );
+				}
+				if (
+					[
+						'@testing-library/dom',
+						'@testing-library/react',
+					].includes( importSource )
+				) {
+					if ( variable ) {
+						testingLibraryNamespaceVariables.add( variable );
+					}
+				}
 			}
 			if ( importSource === 'vitest' ) {
 				if ( specifier.type === 'ImportNamespaceSpecifier' ) {
-					vitestNamespaceNames.add( specifier.local.name );
+					if ( variable ) {
+						vitestNamespaceVariables.add( variable );
+					}
 				} else if ( getImportedName( specifier ) === 'expect' ) {
-					vitestExpectNames.add( specifier.local.name );
+					if ( variable ) {
+						vitestExpectVariables.add( variable );
+					}
+				} else if ( getImportedName( specifier ) === 'vi' ) {
+					if ( variable ) {
+						vitestViVariables.add( variable );
+					}
 				}
 			}
 		}
@@ -496,17 +663,47 @@ export function validateVitestPolicy( {
 		}
 	}
 
+	let previousDomVariableCount = -1;
+	while ( previousDomVariableCount !== domVariables.size ) {
+		previousDomVariableCount = domVariables.size;
+		traverseAst( ast, visitorKeys, ( node ) => {
+			if (
+				node.type !== 'VariableDeclarator' ||
+				! isBrowserGlobalExpression(
+					node.init,
+					unboundIdentifiers,
+					domVariables,
+					identifierVariables
+				)
+			) {
+				return;
+			}
+
+			for ( const identifier of getPatternIdentifiers( node.id ) ) {
+				const variable = identifierVariables.get( identifier );
+				if ( variable ) {
+					domVariables.add( variable );
+				}
+			}
+		} );
+	}
+
 	traverseAst( ast, visitorKeys, ( node ) => {
 		if (
-			node.type === 'VariableDeclarator' &&
-			node.id?.type === 'Identifier' &&
-			isBrowserGlobalExpression(
-				node.init,
-				unboundIdentifiers,
-				domIdentifiers
+			project === 'browser' &&
+			node.type === 'MemberExpression' &&
+			getMemberPropertyName( node ) === 'fireEvent' &&
+			isVariableReference(
+				node.object,
+				testingLibraryNamespaceVariables,
+				identifierVariables
 			)
 		) {
-			domIdentifiers.add( node.id.name );
+			report(
+				'browser-fire-event',
+				'Browser tests must use userEvent or locators; allow fireEvent only when the low-level event is the contract',
+				node
+			);
 		}
 
 		const moduleSource = getModuleSource( node );
@@ -569,8 +766,13 @@ export function validateVitestPolicy( {
 			/\.tsx?$/.test( file ) &&
 			node.type === 'CallExpression' &&
 			node.callee?.type === 'MemberExpression' &&
-			node.callee.object?.type === 'Identifier' &&
-			node.callee.object.name === 'vi' &&
+			isImportedApiReference(
+				node.callee.object,
+				'vi',
+				vitestViVariables,
+				vitestNamespaceVariables,
+				identifierVariables
+			) &&
 			getMemberPropertyName( node.callee ) === 'mock' &&
 			! isDynamicImport( node.arguments[ 0 ] )
 		) {
@@ -598,8 +800,9 @@ export function validateVitestPolicy( {
 			isVitestMatcherCall(
 				node,
 				'toHaveStyle',
-				vitestExpectNames,
-				vitestNamespaceNames
+				vitestExpectVariables,
+				vitestNamespaceVariables,
+				identifierVariables
 			)
 		) {
 			report(
@@ -632,7 +835,8 @@ export function validateVitestPolicy( {
 					isBrowserGlobalExpression(
 						node.object,
 						unboundIdentifiers,
-						domIdentifiers
+						domVariables,
+						identifierVariables
 					) ) )
 		) {
 			report(
@@ -646,10 +850,19 @@ export function validateVitestPolicy( {
 			project === 'browser' &&
 			node.type === 'CallExpression' &&
 			getMemberPropertyName( node.callee ) === 'spyOn' &&
-			node.callee.object?.type === 'Identifier' &&
-			node.callee.object.name === 'vi' &&
+			isImportedApiReference(
+				node.callee.object,
+				'vi',
+				vitestViVariables,
+				vitestNamespaceVariables,
+				identifierVariables
+			) &&
 			node.arguments[ 0 ]?.type === 'Identifier' &&
-			importedNamespaces.has( node.arguments[ 0 ].name )
+			isVariableReference(
+				node.arguments[ 0 ],
+				importedNamespaces,
+				identifierVariables
+			)
 		) {
 			report(
 				'browser-namespace-spy',

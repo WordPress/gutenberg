@@ -53,6 +53,17 @@ describe( 'Vitest policy rules', () => {
 		} );
 	} );
 
+	it( 'rejects Browser fireEvent through a Testing Library namespace', () => {
+		expectViolation(
+			"import * as rtl from '@testing-library/react';\nrtl.fireEvent.click( document.body );",
+			'allow fireEvent only'
+		);
+		expectValid(
+			"import * as rtl from '@testing-library/react';\nfunction example() {\n\tconst rtl = { fireEvent: { click() {} } };\n\trtl.fireEvent.click();\n}",
+			{ project: 'browser' }
+		);
+	} );
+
 	it( 'rejects jsdom browser APIs without a reason', () => {
 		const source = 'new ResizeObserver( () => {} );';
 
@@ -81,6 +92,28 @@ describe( 'Vitest policy rules', () => {
 		} );
 	} );
 
+	it( 'tracks destructured DOM values and DOM prototypes', () => {
+		for ( const source of [
+			'const { body } = document;\nbody.offsetWidth;',
+			'Element.prototype.getBoundingClientRect = () => ( {} );',
+		] ) {
+			expectViolation( source, 'require Browser Mode', {
+				project: 'jsdom',
+			} );
+		}
+	} );
+
+	it( 'allows browser-like properties on shadowed local values', () => {
+		expectValid(
+			"const element = document.createElement( 'div' );\nfunction example() {\n\tconst element = { scrollTop: 0 };\n\treturn element.scrollTop;\n}",
+			{ project: 'jsdom' }
+		);
+		expectValid(
+			'const window = { getComputedStyle() {} };\nwindow.getComputedStyle();',
+			{ project: 'jsdom' }
+		);
+	} );
+
 	it( 'allows rendered UI for deterministic jsdom behavior', () => {
 		const source =
 			"import { render } from '@testing-library/react';\nrender( <div /> );";
@@ -90,9 +123,33 @@ describe( 'Vitest policy rules', () => {
 
 	it( 'rejects Browser spies on imported ESM namespace objects', () => {
 		const source =
-			"import * as selectors from './selectors';\nvi.spyOn( selectors, 'getValue' );";
+			"import { vi } from 'vitest';\nimport * as selectors from './selectors';\nvi.spyOn( selectors, 'getValue' );";
 
 		expectViolation( source, 'imported ESM namespace objects' );
+	} );
+
+	it( 'matches aliased Vitest vi APIs by binding', () => {
+		expectViolation(
+			"import { vi as mocker } from 'vitest';\nmocker.mock( './module' );",
+			'must use vi.mock(import(...))',
+			{ file: 'example.test.ts', project: 'node' }
+		);
+		expectViolation(
+			"import { vi as mocker } from 'vitest';\nimport * as selectors from './selectors';\nmocker.spyOn( selectors, 'getValue' );",
+			'imported ESM namespace objects'
+		);
+		expectViolation(
+			"import * as Vitest from 'vitest';\nVitest.vi.mock( './module' );",
+			'must use vi.mock(import(...))',
+			{ file: 'example.test.ts', project: 'node' }
+		);
+	} );
+
+	it( 'allows methods on shadowed vi objects', () => {
+		expectValid(
+			"import { vi } from 'vitest';\nfunction example() {\n\tconst vi = { mock() {} };\n\tvi.mock( './module' );\n}",
+			{ file: 'example.test.ts', project: 'node' }
+		);
 	} );
 
 	it( 'rejects Browser runtime imports of Node built-ins', () => {
