@@ -34,7 +34,6 @@ EXCLUDED_PACKAGES=(
 	nux
 	postcss-themes
 	preferences-persistence
-	react-native-editor
 	report-flaky-tests
 	reusable-blocks
 	route
