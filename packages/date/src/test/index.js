@@ -108,6 +108,19 @@ describe( 'Function date', () => {
 		}
 	);
 
+	test.each( [
+		[ '\\Y Y', 'Y 2019' ],
+		[ 'Y\\', '2019' ],
+		[ 'Y-m-d\\', '2019-06-18' ],
+	] )(
+		'should treat "%s" the way PHP date() treats an escape',
+		( formatString, expected ) => {
+			expect(
+				dateNoI18n( formatString, '2019-06-18T11:00:00.000Z' )
+			).toBe( expected );
+		}
+	);
+
 	it( 'should format date into a date that uses site’s timezone, if no timezone was provided and there’s a site timezone set', () => {
 		const settings = getSettings();
 
