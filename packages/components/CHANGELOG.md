@@ -15,6 +15,7 @@
     -   `TextareaControl` ([#81353](https://github.com/WordPress/gutenberg/pull/81353))
     -   `ZStack` ([#80514](https://github.com/WordPress/gutenberg/pull/80514))
     -   `BoxControl` ([#80715](https://github.com/WordPress/gutenberg/pull/80715))
+    -   `Scrollable` ([#80694](https://github.com/WordPress/gutenberg/pull/80694))
 
 ### Enhancements
 
@@ -29,6 +30,7 @@
 
 ### Bug Fixes
 
+-   `PaletteEdit`: Expose color, gradient, and duotone swatches as command buttons because activating them opens an editor instead of selecting a value. Add a `presentation` prop to `CircularOptionPicker`, `ColorPalette`, `GradientPicker`, and `DuotonePicker`, and deprecate `asButtons` in favor of `presentation="toggle-buttons"` ([#82023](https://github.com/WordPress/gutenberg/pull/82023)).
 -   `ConfirmDialog`: Preserve `title` as the dialog's accessible name when the header is hidden ([#81847](https://github.com/WordPress/gutenberg/pull/81847)).
 -   `DuotonePicker`: Do not render the custom controls wrapper when `disableCustomDuotone` is set, so a read-only picker no longer adds trailing padding below its swatches ([#81605](https://github.com/WordPress/gutenberg/pull/81605)).
 -   `DuotonePicker`: Stop the duotone bar offering to move its control points. It announced that arrow keys and dragging change the gradient position, but a duotone is two colors with no positions, so the move was discarded. `CustomGradientBar` gains a `disablePositioning` prop for this ([#81850](https://github.com/WordPress/gutenberg/pull/81850)).
