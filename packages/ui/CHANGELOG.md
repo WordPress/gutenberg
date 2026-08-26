@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.21.0 (2026-08-26)
+
 ### New Features
 
 -   Add `Spinner` component ([#81358](https://github.com/WordPress/gutenberg/pull/81358)).

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.9.0 (2026-08-26)
+
 ### Bug Fixes
 
 -   `getAdminThemeColors`: Fix the primary color of the Fresh scheme ([#81618](https://github.com/WordPress/gutenberg/pull/81618)).
