@@ -105,9 +105,16 @@ export type PopoverProps = {
 	 */
 	noArrow?: boolean;
 	/**
-	 * The distance (in px) between the anchor and the popover.
+	 * The distance (in px) between the anchor and the popover. Pass an object to
+	 * also displace the popover along its cross axis.
 	 */
-	offset?: number;
+	offset?:
+		| number
+		| {
+				mainAxis?: number;
+				crossAxis?: number;
+				alignmentAxis?: number | null;
+		  };
 	/**
 	 * A callback invoked when the popover should be closed.
 	 */
