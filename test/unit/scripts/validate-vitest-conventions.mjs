@@ -1,12 +1,6 @@
 import { execFileSync } from 'node:child_process';
-import {
-	existsSync,
-	mkdtempSync,
-	readFileSync,
-	rmSync,
-	writeFileSync,
-} from 'node:fs';
-import os from 'node:os';
+import { randomUUID } from 'node:crypto';
+import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import globPackage from 'glob';
@@ -183,10 +177,11 @@ for ( const projectName of VITEST_PROJECT_NAMES ) {
 	}
 
 	typescriptTestCount += typescriptTests.length;
-	const temporaryDirectory = mkdtempSync(
-		path.join( os.tmpdir(), `gutenberg-vitest-${ projectName }-typecheck-` )
+	const configPath = path.join(
+		ROOT_DIR,
+		'test/unit',
+		`.vitest-${ projectName }-typecheck-${ randomUUID() }.json`
 	);
-	const configPath = path.join( temporaryDirectory, 'tsconfig.json' );
 	const needsNodeTypes =
 		projectName === 'node' ||
 		typescriptTests.some( ( file ) =>
@@ -225,7 +220,7 @@ for ( const projectName of VITEST_PROJECT_NAMES ) {
 			{ cwd: ROOT_DIR, stdio: 'inherit' }
 		);
 	} finally {
-		rmSync( temporaryDirectory, { force: true, recursive: true } );
+		rmSync( configPath, { force: true } );
 	}
 }
 
