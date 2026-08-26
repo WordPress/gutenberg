@@ -75,6 +75,7 @@ export function formatFontFamily( input: string ) {
 	// custom property such as `var(--wp--preset--font-family--body)`. The last
 	// two are CSS function calls rather than names, so quoting either one
 	// would stop it resolving.
+	// TODO: The regex was scoped to `var(--name )` and not things like `var(--name, fallback)`. That'll require more string parsing.
 	const regex =
 		/^(?!generic\([ a-zA-Z\-]+\)$)(?!var\(\s*--[\w-]+\s*\)$)(?!^[a-zA-Z\-]+$).+/;
 	const output = input.trim();
