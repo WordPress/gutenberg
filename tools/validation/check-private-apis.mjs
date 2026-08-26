@@ -52,16 +52,6 @@ function isBundled( pkgJson ) {
 	);
 }
 
-function findEntry( name ) {
-	for ( const candidate of [ 'index.ts', 'index.tsx', 'index.js' ] ) {
-		const entry = path.join( PACKAGES_DIR, name, 'src', candidate );
-		if ( fs.existsSync( entry ) ) {
-			return entry;
-		}
-	}
-	return null;
-}
-
 function resolveSource( base ) {
 	for ( const candidate of [
 		base,
@@ -139,8 +129,8 @@ function wordpressSources( onUnresolved ) {
 }
 
 // Shortest import chain from the entry to a target file. Import edges come
-// from `metafile.inputs` (the visited set); when `kept` is given the chain is
-// restricted to files that survived tree shaking.
+// from `metafile.inputs` (the visited set); the chain is restricted to files
+// that survived tree shaking.
 function findChain( metafile, entry, target, kept ) {
 	const previous = new Map( [ [ entry, null ] ] );
 	const queue = [ entry ];
@@ -161,7 +151,7 @@ function findChain( metafile, entry, target, kept ) {
 			if (
 				! dep.external &&
 				! previous.has( dep.path ) &&
-				( ! kept || kept.has( dep.path ) )
+				kept.has( dep.path )
 			) {
 				previous.set( dep.path, file );
 				queue.push( dep.path );
@@ -172,7 +162,7 @@ function findChain( metafile, entry, target, kept ) {
 }
 
 async function checkPackage( name ) {
-	const entry = findEntry( name );
+	const entry = resolveSource( path.join( PACKAGES_DIR, name, 'src' ) );
 	if ( ! entry ) {
 		return { name, status: 'skipped', reason: 'no src/index entry' };
 	}
