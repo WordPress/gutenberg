@@ -139,10 +139,10 @@ function MediaEditorSidebar( {
 			className="media-editor__sidebar"
 			ariaLabel={ __( 'Media settings' ) }
 		>
-			{ /* No visible heading and no close button: the tab strip below
-			     names the open panel, and the header's pressed toggle
-			     dismisses it at every width. The heading stays for screen
-			     readers, which do not read either as this region's title. */ }
+			{ /* No visible heading and no close button: the strip below names
+			     the open panel and the header's pressed toggle dismisses it.
+			     The heading stays for screen readers, which read neither as
+			     this region's title. */ }
 			<VisuallyHidden render={ <h2 /> }>
 				{ __( 'Media settings' ) }
 			</VisuallyHidden>
@@ -164,8 +164,9 @@ function MediaEditorSidebar( {
 						) ) }
 					</Tabs.List>
 				</div>
-				{ /* `Tabs.Root` throws in dev when its registered Tab and
-				     Panel counts disagree, so every tab renders a panel. */ }
+				{ /* One `Tabs.Panel` per tab: the counts have to match or
+				     `Tabs.Root` throws in dev. Only the active one paints
+				     anything — the rest render nothing. */ }
 				{ tabs.map( ( tab ) => (
 					<Tabs.Panel
 						key={ tab.id }
@@ -461,14 +462,19 @@ function MediaEditorContent( {
 	// and then resizing — or crossing the breakpoint by rotating a tablet —
 	// should not reopen something they just dismissed.
 	const hasChosenPanelRef = useRef( false );
-	// The panel the toggle reopens. Tracks the last one shown so closing and
-	// reopening returns where the user was, rather than to a fixed tab.
+	// The panel the toggle reopens, and the one width picks until the user
+	// picks their own. Tracked separately from `hasChosenPanelRef` because
+	// the two answer different questions: whether the panel should be open,
+	// and which tab it should show.
 	const lastPanelRef = useRef( DETAILS_PANEL );
-	const selectPanel = useCallback( ( panel: string | null ) => {
-		hasChosenPanelRef.current = true;
-		if ( panel ) {
-			lastPanelRef.current = panel;
-		}
+	const hasChosenTabRef = useRef( false );
+	// Switching tabs says nothing about whether the panel should be open, so
+	// it leaves `hasChosenPanelRef` alone: picking Details on a wide screen
+	// and then dragging the window narrow should still hand the canvas the
+	// full width.
+	const selectPanel = useCallback( ( panel: string ) => {
+		hasChosenTabRef.current = true;
+		lastPanelRef.current = panel;
 		setActivePanel( panel );
 	}, [] );
 	const togglePanel = useCallback( () => {
@@ -570,20 +576,24 @@ function MediaEditorContent( {
 	// narrow hands the canvas the full width instead of leaving a panel
 	// wedged beside it.
 	//
-	// Docked, the panel sits beside the canvas, so it opens on Crop: the
-	// canvas is still visible and cropping is what the editor is for. Below
-	// `large` an open panel replaces the canvas, and a crop panel with no
-	// crop in sight is not worth opening on, so Details leads there instead.
-	// Non-image media has no Crop tab at all (see `tabs`), so it always gets
-	// Details. `isImage` is derived from a record that resolves after mount,
-	// which is why this runs here rather than seeding `useState`.
+	// Docked, the panel opens on Crop: the canvas is still beside it and
+	// cropping is what the editor is for. Below `small` an open panel covers
+	// the canvas, and crop controls with no crop in sight are not worth
+	// opening on, so Details leads there. Non-image media has no Crop tab at
+	// all (see `tabs`), so it always gets Details. `isImage` comes from a
+	// record that resolves after mount, which is why this runs in an effect
+	// rather than seeding `useState`.
 	useEffect( () => {
-		if ( hasChosenPanelRef.current ) {
+		if ( hasChosenPanelRef.current && hasChosenTabRef.current ) {
 			return;
 		}
 		const defaultPanel = isWide && isImage ? CROP_PANEL : DETAILS_PANEL;
-		lastPanelRef.current = defaultPanel;
-		setActivePanel( isWide ? defaultPanel : null );
+		if ( ! hasChosenTabRef.current ) {
+			lastPanelRef.current = defaultPanel;
+		}
+		if ( ! hasChosenPanelRef.current ) {
+			setActivePanel( isWide ? lastPanelRef.current : null );
+		}
 	}, [ isWide, isImage ] );
 	// Only `resetCropOptions` is needed here, for the Reset button; the
 	// aspect-ratio members are read by `MediaEditorImageControls` itself.
@@ -682,9 +692,9 @@ function MediaEditorContent( {
 			/>
 		) : null;
 
-	// Crop first, matching the order the controls sit in under the canvas.
-	// Non-image media has nothing to crop, so it gets Details alone — which
-	// is why the sidebar takes the list rather than deriving it.
+	// Crop leads, since it is what the docked panel opens on. Non-image media
+	// has nothing to crop and gets Details alone, which is why the sidebar
+	// takes this list rather than deriving it.
 	const tabs: MediaEditorTab[] = [
 		...( isImage
 			? [
@@ -696,7 +706,6 @@ function MediaEditorContent( {
 								aspectRatioValue={ aspectRatioValue }
 								onAspectRatioChange={ setAspectRatioValue }
 								aspectRatioOptions={ aspectRatioOptions }
-								showTransformControls
 							/>
 						),
 					},

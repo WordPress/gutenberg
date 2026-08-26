@@ -101,9 +101,8 @@ function MediaEditorRoute() {
 			}: FrameProps ) => {
 				// Below `small` the page header already carries the
 				// breadcrumbs, Cancel/Save and (under `medium`) the
-				// framework's navigation toggle, in a row that does not wrap.
-				// History moves to a bar under the canvas instead, which is
-				// what the modal's narrow footer does.
+				// framework's navigation toggle, in a row that does not wrap,
+				// so History moves to a bar under the canvas instead.
 				const isNarrow = layout === 'narrow';
 				return (
 					// The keydown handler covers the whole frame, not just the

@@ -22,8 +22,8 @@
 	// distraction-free mode and admin-bar offsets were all unused here and had
 	// to be reset in CSS.
 	//
-	// Below `large` one view fills it at a time, switched from the header.
-	// From `large` up the canvas and the panel are columns side by side.
+	// Below `small` one view fills it at a time, switched from the header.
+	// From `small` up the canvas and the panel are columns side by side.
 	.media-editor__body {
 		display: flex;
 		flex: 1;
@@ -137,12 +137,14 @@
 	// The strip and the open pane, stacked. `Tabs.Root` is the only element
 	// between the sidebar and them, so it carries the column that lets the
 	// pane take the leftover height and scroll inside it.
+	// No inline padding here: the rule under the tabs has to reach both edges
+	// of the sidebar, so the gutter belongs to the strip and the pane below
+	// it rather than to the column that holds them.
 	.media-editor__tabs {
 		display: flex;
 		flex: 1;
 		flex-direction: column;
 		min-height: 0;
-		padding: 0 $grid-unit-20;
 	}
 
 	// Wraps `Tabs.List`, which sizes itself to its tabs and so cannot carry a
@@ -155,6 +157,7 @@
 		top: 0;
 		z-index: 1;
 		flex-shrink: 0;
+		padding-inline: $grid-unit-20;
 		background: $white;
 		border-bottom: $border-width solid $gray-300;
 	}
@@ -166,8 +169,8 @@
 		flex: 1;
 		min-height: 0;
 		overflow-y: auto;
-		padding-block: $grid-unit-30;
-		padding-inline: $grid-unit-05 $grid-unit-20;
+		padding-block: $grid-unit-20 $grid-unit-30;
+		padding-inline: $grid-unit-20;
 	}
 
 	// Below `small` an open panel owns the body, so the canvas steps aside
