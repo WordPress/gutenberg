@@ -37,11 +37,9 @@ RTL versions of the stylesheets are available in the same paths, but with `-rtl`
 
 ### CSS cascade layers
 
-Components in this package use [CSS cascade layers](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Cascade_layers) when defining their styles. Layered library styles lose to unlayered consumer CSS, which makes `className` overrides predictable. They also lose to unlayered global stylesheets such as wp-admin's `common.css`.
+Components in this package use [CSS cascade layers](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Cascade_layers) when defining their styles, which can conflict in some applications which apply styles on bare element selectors (for example, `input { border-color: #aaa; }`). You should avoid these kinds of bare element selector styling if you can, preferring CSS classes instead where possible.
 
-Avoid bare element selector styling in host apps where possible, preferring classes instead.
-
-If you need to customize cascade layer order relative to your own CSS cascade layers, component styles are scoped under the `wp-admin-ui` layer:
+If you need to customize the cascade layer order relative to your own CSS cascade layers, the component styles are scoped under the `wp-admin-ui` layer, which you can use when defining your own layer order:
 
 ```css
 @layer wp-ui, wp-admin-ui, example-app;
