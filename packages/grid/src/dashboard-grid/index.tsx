@@ -242,15 +242,18 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			rowHeightPx
 		);
 
-		// Stored layouts may sit outside an item's limits; render them
-		// bounded while the stored data stays untouched. Keeps `layout`
-		// identity when no item needs bounding.
-		const boundedLayout = useMemo( () => {
+		// Stored and in-gesture layouts may sit outside an item's limits;
+		// render them bounded while the data stays untouched. Gestures
+		// commit from the stored `layout`, never from this bounded view,
+		// so a bounded span cannot reach `onChangeLayout`. Keeps the
+		// source identity when no item needs bounding.
+		const sourceLayout = temporaryLayout ?? layout;
+		const activeLayout = useMemo( () => {
 			if ( spanBoundsByKey.size === 0 ) {
-				return layout;
+				return sourceLayout;
 			}
 			let changed = false;
-			const bounded = layout.map( ( item ) => {
+			const bounded = sourceLayout.map( ( item ) => {
 				const bounds = spanBoundsByKey.get( item.key );
 				if ( ! bounds ) {
 					return item;
@@ -274,9 +277,8 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				changed = true;
 				return { ...item, width, height };
 			} );
-			return changed ? bounded : layout;
-		}, [ layout, spanBoundsByKey ] );
-		const activeLayout = temporaryLayout ?? boundedLayout;
+			return changed ? bounded : sourceLayout;
+		}, [ sourceLayout, spanBoundsByKey ] );
 
 		const layoutMap = useMemo( () => {
 			const map = new Map< string, DashboardGridLayoutItem >();
@@ -457,10 +459,14 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			}
 
 			const updatedItems = arrayMove( items, currentIndex, newIndex );
-			const updatedLayout = activeLayout.map( ( item ) => ( {
-				...item,
-				order: updatedItems.indexOf( item.key ),
-			} ) );
+			// Commit from the stored layout (or the pending commit), not
+			// the bounded view, so untouched tiles keep their stored spans.
+			const updatedLayout = ( latestLayoutRef.current ?? layout ).map(
+				( item ) => ( {
+					...item,
+					order: updatedItems.indexOf( item.key ),
+				} )
+			);
 
 			lastReorderCursorRef.current = {
 				x: activeCenterX,
@@ -572,10 +578,14 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				return;
 			}
 
-			const updatedLayout = activeLayout.map( ( item ) =>
-				item.key === id
-					? { ...item, width: newWidth, height: newHeight }
-					: item
+			// Commit from the stored layout (or the pending commit), not
+			// the bounded view: the resized tile takes its new span and
+			// every other tile keeps its stored one.
+			const updatedLayout = ( latestLayoutRef.current ?? layout ).map(
+				( item ) =>
+					item.key === id
+						? { ...item, width: newWidth, height: newHeight }
+						: item
 			);
 
 			latestLayoutRef.current = updatedLayout;

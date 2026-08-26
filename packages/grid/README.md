@@ -397,12 +397,14 @@ layout item key:
 Each surface quantizes a limit to whole tracks of its current
 geometry: minimums round up, maximums round down, and a quantized
 minimum wins over a smaller quantized maximum. The result bounds the
-rendered span and the resize gesture, so the committed layout never
-records a span outside it.
+rendered span and the resize gesture, so a resize never commits a
+span outside it.
 
 Limits are not written into the layout. A stored span outside the
 limits renders bounded while the stored data stays untouched, so a
-limit change applies to every existing layout.
+limit change applies to every existing layout. A resize commits the
+resized tile at its new span and a reorder commits only the order;
+every other tile keeps its stored span, even while it renders bounded.
 
 `'full'` and `'fill'` widths respect a maximum: `'full'` renders at the
 capped span and places like a fixed item of that width, and `'fill'`
