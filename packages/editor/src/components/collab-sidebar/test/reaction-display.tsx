@@ -245,7 +245,7 @@ describe( 'AddReactionButton', () => {
 			screen.getByRole( 'button', { name: 'Add reaction' } )
 		);
 		await user.click(
-			await screen.findByRole( 'option', { name: 'Rocket' } )
+			await screen.findByRole( 'button', { name: 'Rocket' } )
 		);
 
 		expect( onToggleReaction ).toHaveBeenCalledTimes( 1 );
@@ -267,7 +267,7 @@ describe( 'AddReactionButton', () => {
 
 		await user.click( button );
 		expect(
-			screen.queryByRole( 'option', { name: 'Rocket' } )
+			screen.queryByRole( 'button', { name: 'Rocket' } )
 		).not.toBeInTheDocument();
 	} );
 } );

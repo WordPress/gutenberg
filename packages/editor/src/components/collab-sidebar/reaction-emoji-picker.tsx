@@ -95,13 +95,18 @@ export default function ReactionEmojiPicker( {
 
 	return (
 		<Composite
-			role="listbox"
 			/*
+			 * A labelled group of buttons, not a listbox: choosing an emoji
+			 * adds the reaction and closes the popover straight away, so there
+			 * is no selected option to expose. `Composite` is here only for the
+			 * roving tab index.
+			 *
 			 * No `orientation`: the list wraps into rows once the emoji set is
 			 * extended past a single row, and a narrow popover can stack it
 			 * into a column, so both axes need to move the roving tab index.
 			 */
-			aria-label={ __( 'Select an emoji reaction' ) }
+			role="group"
+			aria-label={ __( 'Add an emoji reaction' ) }
 			className="editor-collab-sidebar-panel__emoji-picker"
 		>
 			{ emojis.map( ( { emoji, label, value } ) => (
@@ -109,7 +114,6 @@ export default function ReactionEmojiPicker( {
 					key={ value }
 					render={
 						<Button
-							role="option"
 							size="compact"
 							onClick={ () => onSelect( value ) }
 							aria-label={ label }

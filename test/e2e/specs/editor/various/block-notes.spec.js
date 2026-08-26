@@ -1194,9 +1194,9 @@ test.describe( 'Block Notes', () => {
 			);
 			await expect( emojiPicker ).toBeVisible();
 
-			// Navigate with arrow keys and select. The picker is a horizontal
-			// listbox, so ArrowRight moves to the next option.
-			const firstEmoji = emojiPicker.getByRole( 'option' ).first();
+			// Navigate with arrow keys and select. The picker is a group of
+			// buttons on a roving tab index, so ArrowRight moves to the next.
+			const firstEmoji = emojiPicker.getByRole( 'button' ).first();
 			await firstEmoji.focus();
 			await page.keyboard.press( 'ArrowRight' );
 			await page.keyboard.press( 'Enter' );
@@ -1224,19 +1224,19 @@ test.describe( 'Block Notes', () => {
 			await expect( emojiPicker ).toBeVisible();
 
 			// `.components-popover__content` is `width: min-content`,
-			// which used to squeeze the wrapping listbox into a single
-			// column one emoji wide.
+			// which used to squeeze the wrapping button group into a
+			// single column one emoji wide.
 			const box = await emojiPicker.boundingBox();
 			expect( box.width ).toBeGreaterThan( box.height );
 
 			// The roving tab index moves on both axes, so the picker is
 			// navigable however the emoji set happens to wrap.
-			const options = emojiPicker.getByRole( 'option' );
-			await options.first().focus();
+			const buttons = emojiPicker.getByRole( 'button' );
+			await buttons.first().focus();
 			await page.keyboard.press( 'ArrowDown' );
-			await expect( options.nth( 1 ) ).toBeFocused();
+			await expect( buttons.nth( 1 ) ).toBeFocused();
 			await page.keyboard.press( 'ArrowUp' );
-			await expect( options.first() ).toBeFocused();
+			await expect( buttons.first() ).toBeFocused();
 		} );
 
 		test( 'can add multiple different reactions to same note', async ( {
@@ -1354,14 +1354,14 @@ test.describe( 'Block Notes', () => {
 				await expect( emojiPicker ).toBeVisible();
 
 				// The 5 defaults plus the 20 filter-added entries.
-				await expect( emojiPicker.getByRole( 'option' ) ).toHaveCount(
+				await expect( emojiPicker.getByRole( 'button' ) ).toHaveCount(
 					25
 				);
 				await expect(
-					emojiPicker.getByRole( 'option', { name: 'Heart' } )
+					emojiPicker.getByRole( 'button', { name: 'Heart' } )
 				).toBeVisible();
 				await expect(
-					emojiPicker.getByRole( 'option', { name: 'Thumbs up' } )
+					emojiPicker.getByRole( 'button', { name: 'Thumbs up' } )
 				).toBeVisible();
 			} );
 
@@ -1406,8 +1406,8 @@ test.describe( 'Block Notes', () => {
 				);
 				await expect( emojiPicker ).toBeVisible();
 
-				// The listbox wraps instead of growing unbounded, so the
-				// popover stays within the viewport.
+				// The button group wraps instead of growing unbounded, so
+				// the popover stays within the viewport.
 				const viewport = page.viewportSize();
 				const box = await emojiPicker.boundingBox();
 				expect( box.width ).toBeLessThan( viewport.width / 2 );
@@ -1418,7 +1418,7 @@ test.describe( 'Block Notes', () => {
 
 				// The last filter-added entry is reachable (scrolls into
 				// view if needed) and selectable.
-				const lastOption = emojiPicker.getByRole( 'option', {
+				const lastOption = emojiPicker.getByRole( 'button', {
 					name: 'Trophy',
 				} );
 				await lastOption.scrollIntoViewIfNeeded();
@@ -2599,7 +2599,7 @@ class BlockNoteUtils {
 
 		// Click the specific emoji within the picker.
 		await emojiPicker
-			.getByRole( 'option', { name: new RegExp( emoji, 'i' ) } )
+			.getByRole( 'button', { name: new RegExp( emoji, 'i' ) } )
 			.click();
 	}
 }

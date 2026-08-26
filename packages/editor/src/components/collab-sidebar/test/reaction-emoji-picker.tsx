@@ -29,20 +29,20 @@ describe( 'buildEmojiBySlugMap', () => {
 } );
 
 describe( 'ReactionEmojiPicker', () => {
-	it( 'renders a labelled listbox with one option per curated emoji', () => {
+	it( 'renders a labelled group with one button per curated emoji', () => {
 		render( <ReactionEmojiPicker onSelect={ () => {} } /> );
 
 		expect(
-			screen.getByRole( 'listbox', {
-				name: 'Select an emoji reaction',
+			screen.getByRole( 'group', {
+				name: 'Add an emoji reaction',
 			} )
 		).toBeVisible();
 
-		const options = screen.getAllByRole( 'option' );
-		expect( options ).toHaveLength( REACTION_EMOJIS.length );
+		const buttons = screen.getAllByRole( 'button' );
+		expect( buttons ).toHaveLength( REACTION_EMOJIS.length );
 		REACTION_EMOJIS.forEach( ( { label } ) => {
 			expect(
-				screen.getByRole( 'option', { name: label } )
+				screen.getByRole( 'button', { name: label } )
 			).toBeVisible();
 		} );
 	} );
@@ -52,7 +52,7 @@ describe( 'ReactionEmojiPicker', () => {
 		const onSelect = jest.fn();
 		render( <ReactionEmojiPicker onSelect={ onSelect } /> );
 
-		await user.click( screen.getByRole( 'option', { name: 'Smile' } ) );
+		await user.click( screen.getByRole( 'button', { name: 'Smile' } ) );
 
 		expect( onSelect ).toHaveBeenCalledTimes( 1 );
 		expect( onSelect ).toHaveBeenCalledWith( 'smile' );
@@ -78,11 +78,11 @@ describe( 'ReactionEmojiPicker', () => {
 			} );
 			render( <ReactionEmojiPicker onSelect={ () => {} } /> );
 
-			expect( screen.getAllByRole( 'option' ) ).toHaveLength(
+			expect( screen.getAllByRole( 'button' ) ).toHaveLength(
 				REACTION_EMOJIS.length + 1
 			);
 			expect(
-				screen.getByRole( 'option', { name: 'Thumbs up' } )
+				screen.getByRole( 'button', { name: 'Thumbs up' } )
 			).toBeVisible();
 		} );
 
@@ -96,7 +96,7 @@ describe( 'ReactionEmojiPicker', () => {
 			} );
 			render( <ReactionEmojiPicker onSelect={ () => {} } /> );
 
-			expect( screen.getAllByRole( 'option' ) ).toHaveLength(
+			expect( screen.getAllByRole( 'button' ) ).toHaveLength(
 				REACTION_EMOJIS.length
 			);
 		} );
