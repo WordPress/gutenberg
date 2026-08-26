@@ -1,4 +1,4 @@
-import { getTableCellRectangleClientIds } from '../use-selection-observer';
+import { getTableCellNeighbor, getTableCellRectangleClientIds } from '../table';
 
 /**
  * Builds a table element from a spec. Each cell spec is a string used as
@@ -169,6 +169,89 @@ describe( 'getTableCellRectangleClientIds', () => {
 				getCell( tableA, 'A' ),
 				getCell( tableB, 'B' )
 			)
+		).toBeUndefined();
+	} );
+} );
+
+describe( 'getTableCellNeighbor', () => {
+	it( 'returns the adjacent cell in each direction', () => {
+		const table = createTable( [
+			[ 'A', 'B', 'C' ],
+			[ 'D', 'E', 'F' ],
+			[ 'G', 'H', 'I' ],
+		] );
+		const cell = getCell( table, 'E' );
+
+		expect( getTableCellNeighbor( cell, true, true ) ).toBe(
+			getCell( table, 'B' )
+		);
+		expect( getTableCellNeighbor( cell, false, true ) ).toBe(
+			getCell( table, 'H' )
+		);
+		expect( getTableCellNeighbor( cell, true, false ) ).toBe(
+			getCell( table, 'D' )
+		);
+		expect( getTableCellNeighbor( cell, false, false ) ).toBe(
+			getCell( table, 'F' )
+		);
+	} );
+
+	it( 'returns undefined at the table edges', () => {
+		const table = createTable( [
+			[ 'A', 'B' ],
+			[ 'C', 'D' ],
+		] );
+
+		expect(
+			getTableCellNeighbor( getCell( table, 'A' ), true, true )
+		).toBeUndefined();
+		expect(
+			getTableCellNeighbor( getCell( table, 'C' ), false, true )
+		).toBeUndefined();
+		expect(
+			getTableCellNeighbor( getCell( table, 'A' ), true, false )
+		).toBeUndefined();
+		expect(
+			getTableCellNeighbor( getCell( table, 'B' ), false, false )
+		).toBeUndefined();
+	} );
+
+	it( 'returns the cell past a colSpan', () => {
+		const table = createTable( [
+			[ { id: 'A', colSpan: 2 }, 'C' ],
+			[ 'D', 'E', 'F' ],
+		] );
+
+		expect(
+			getTableCellNeighbor( getCell( table, 'A' ), false, false )
+		).toBe( getCell( table, 'C' ) );
+		expect(
+			getTableCellNeighbor( getCell( table, 'C' ), true, false )
+		).toBe( getCell( table, 'A' ) );
+		expect(
+			getTableCellNeighbor( getCell( table, 'A' ), false, true )
+		).toBe( getCell( table, 'D' ) );
+	} );
+
+	it( 'returns a cell spanning into the adjacent slot', () => {
+		const table = createTable( [
+			[ { id: 'A', rowSpan: 2 }, 'B' ],
+			[ 'C' ],
+		] );
+
+		expect(
+			getTableCellNeighbor( getCell( table, 'C' ), true, false )
+		).toBe( getCell( table, 'A' ) );
+		expect(
+			getTableCellNeighbor( getCell( table, 'B' ), false, true )
+		).toBe( getCell( table, 'C' ) );
+	} );
+
+	it( 'returns undefined when the adjacent cell is not a block', () => {
+		const table = createTable( [ [ 'A', { id: 'B', block: false } ] ] );
+
+		expect(
+			getTableCellNeighbor( getCell( table, 'A' ), false, false )
 		).toBeUndefined();
 	} );
 } );

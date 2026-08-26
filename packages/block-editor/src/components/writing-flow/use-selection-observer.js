@@ -8,6 +8,7 @@ import { isSelectionForward } from '@wordpress/dom';
 import { store as blockEditorStore } from '../../store';
 import { getBlockClientId } from '../../utils/dom';
 import { setContentEditableWrapper } from './utils';
+import { getTableCell, getTableCellRectangleClientIds } from './table';
 import { unlock } from '../../lock-unlock';
 
 const { ownsSelection } = unlock( richTextPrivateApis );
@@ -88,108 +89,6 @@ function getRichTextElement( node ) {
 	const element =
 		node.nodeType === node.ELEMENT_NODE ? node : node.parentElement;
 	return element?.closest( '[data-wp-block-attribute-key]' );
-}
-
-/**
- * Returns the block-level table cell containing the node, if any. Only cells
- * that are themselves blocks (carrying a data-block attribute) count, so
- * blocks that output tables without inner blocks (like the legacy table) are
- * ignored.
- *
- * @param {Node} node DOM node.
- *
- * @return {HTMLTableCellElement|undefined} The table cell element.
- */
-function getTableCell( node ) {
-	const element =
-		node.nodeType === node.ELEMENT_NODE ? node : node.parentElement;
-	const cell = element?.closest( 'td, th' );
-	return cell?.hasAttribute( 'data-block' ) ? cell : undefined;
-}
-
-/**
- * Returns the client IDs of all block-level cells in the rectangle between
- * two table cells, in document order.
- *
- * @param {HTMLTableCellElement} startCell Starting cell.
- * @param {HTMLTableCellElement} endCell   Ending cell.
- *
- * @return {string[]|undefined} Client IDs in the rectangle, or undefined if
- *                              the cells are not in the same table.
- */
-export function getTableCellRectangleClientIds( startCell, endCell ) {
-	const table = startCell.closest( 'table' );
-
-	if ( ! table || table !== endCell.closest( 'table' ) ) {
-		return;
-	}
-
-	// Compute the visual rectangle of every cell. `cellIndex` is not
-	// span-aware: a cell covered by a rowSpan from above is absent from the
-	// row's cells collection, and a colSpan'd cell occupies a single slot
-	// in it. Walk the rows tracking occupied slots to derive each cell's
-	// visual column.
-	const grid = [];
-	const rects = new Map();
-
-	for ( let rowIndex = 0; rowIndex < table.rows.length; rowIndex++ ) {
-		let columnIndex = 0;
-		for ( const cell of table.rows[ rowIndex ].cells ) {
-			while ( grid[ rowIndex ]?.[ columnIndex ] ) {
-				columnIndex++;
-			}
-			const rect = {
-				startRow: rowIndex,
-				endRow: rowIndex + cell.rowSpan - 1,
-				startColumn: columnIndex,
-				endColumn: columnIndex + cell.colSpan - 1,
-			};
-			for ( let row = rect.startRow; row <= rect.endRow; row++ ) {
-				if ( ! grid[ row ] ) {
-					grid[ row ] = [];
-				}
-				for (
-					let column = rect.startColumn;
-					column <= rect.endColumn;
-					column++
-				) {
-					grid[ row ][ column ] = cell;
-				}
-			}
-			rects.set( cell, rect );
-			columnIndex += cell.colSpan;
-		}
-	}
-
-	const startRect = rects.get( startCell );
-	const endRect = rects.get( endCell );
-
-	if ( ! startRect || ! endRect ) {
-		return;
-	}
-
-	const startRow = Math.min( startRect.startRow, endRect.startRow );
-	const endRow = Math.max( startRect.endRow, endRect.endRow );
-	const startColumn = Math.min( startRect.startColumn, endRect.startColumn );
-	const endColumn = Math.max( startRect.endColumn, endRect.endColumn );
-
-	const clientIds = [];
-
-	for ( const [ cell, rect ] of rects ) {
-		if ( ! cell.hasAttribute( 'data-block' ) ) {
-			continue;
-		}
-		if (
-			rect.startRow <= endRow &&
-			rect.endRow >= startRow &&
-			rect.startColumn <= endColumn &&
-			rect.endColumn >= startColumn
-		) {
-			clientIds.push( cell.getAttribute( 'data-block' ) );
-		}
-	}
-
-	return clientIds;
 }
 
 /**
