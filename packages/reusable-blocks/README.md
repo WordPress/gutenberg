@@ -4,7 +4,7 @@ The reusable blocks module is deprecated. It remains available as a no-op compat
 
 `ReusableBlocksMenuItems` renders nothing, and the store's selectors and actions (`__experimentalConvertBlockToStatic`, `__experimentalConvertBlocksToReusable`, `__experimentalDeleteReusableBlock`, `__experimentalSetEditingReusableBlock`, `__experimentalIsEditingReusableBlock`) are inert.
 
-Reusable blocks (patterns) are WordPress entities (the `wp_block` post type) managed through `@wordpress/core-data`; new code should work with those entities directly rather than depending on this package.
+Reusable blocks (patterns) are `wp_block` entities, managed through `@wordpress/core-data`. That covers entity operations only; there is no public replacement for the conversion utilities or menu items.
 
 ## Contributing to this package
 
