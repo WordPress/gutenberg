@@ -13,6 +13,53 @@
  * must not bundle their own copy of Yjs. Each provider creator receives the
  * Yjs module used by the editor as the `Y` property of its options, alongside
  * `ydoc` and `awareness`, and must operate on documents through that instance.
+ *
+ * A provider that bundles third-party code importing `yjs` directly (for
+ * example `y-websocket`) can share the editor's Yjs instance through a shim
+ * module. The shim re-exports the Yjs symbols the bundled code uses and fills
+ * them in at runtime from the `Y` option:
+ *
+ * ```ts
+ * // yjs-shim.js
+ * export let Doc;
+ * export let applyUpdate;
+ * export let encodeStateAsUpdate;
+ * export let encodeStateVector;
+ *
+ * export function setYjsModule( Y ) {
+ *   ( { Doc, applyUpdate, encodeStateAsUpdate, encodeStateVector } = Y );
+ * }
+ * ```
+ *
+ * The build then aliases the `yjs` module specifier to the shim, so bundled
+ * dependencies resolve their Yjs imports to it instead of packaging a second
+ * copy. For example, with webpack:
+ *
+ * ```ts
+ * resolve: {
+ *   alias: {
+ *     yjs: path.resolve( __dirname, 'src/yjs-shim.js' ),
+ *   },
+ * },
+ * ```
+ *
+ * Finally, the provider creator initializes the shim before using any of the
+ * bundled code:
+ *
+ * ```ts
+ * import { WebsocketProvider } from 'y-websocket';
+ * import { setYjsModule } from './yjs-shim';
+ *
+ * const createProvider = async ( { awareness, ydoc, Y } ) => {
+ *   setYjsModule( Y );
+ *
+ *   const provider = new WebsocketProvider( url, room, ydoc, { awareness } );
+ *   // ...
+ * };
+ * ```
+ *
+ * See `packages/e2e-tests/plugins/rtc-websocket-provider` for a complete
+ * working example.
  */
 export * as Y from 'yjs';
 
