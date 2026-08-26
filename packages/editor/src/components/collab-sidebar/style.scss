@@ -258,6 +258,20 @@ mark.wp-note {
 // The add-reaction trigger and the reaction pills are standard small
 // Buttons, so sizing, hover, and focus styles all come from the
 // component. Only the pill treatment lives here.
+.editor-collab-sidebar-panel__reaction-button,
+.editor-collab-sidebar-panel__add-reaction-button {
+	// The emoji glyph is set larger than the button's own text size, so
+	// the compact height leaves it tight against the pill edge. A pixel
+	// top and bottom gives it room; the add-reaction trigger grows to
+	// match so the row stays on one baseline.
+	height: calc(var(--wpds-dimension-size-sm) + 2px);
+}
+
+.editor-collab-sidebar-panel__add-reaction-button {
+	// Keep the icon-only trigger square at the taller size.
+	min-width: calc(var(--wpds-dimension-size-sm) + 2px);
+}
+
 .editor-collab-sidebar-panel__reaction-button {
 	gap: $grid-unit-05;
 
@@ -287,6 +301,13 @@ mark.wp-note {
 			color: var(--wp-admin-theme-color-darker-20);
 		}
 	}
+}
+
+// Opening the picker with a pointer leaves DOM focus on the trigger once
+// it closes, parking a focus ring on the note at rest. Keep the ring for
+// keyboard focus and while the picker is open, and drop it otherwise.
+.editor-collab-sidebar-panel__add-reaction-button:focus:not(:focus-visible):not([aria-expanded="true"]) {
+	outline: none;
 }
 
 .editor-collab-sidebar-panel__reaction-button-emoji {
