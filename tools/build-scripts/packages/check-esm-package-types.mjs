@@ -1,11 +1,12 @@
 import { mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
-import { createRequire } from 'node:module';
-import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import spawn from 'cross-spawn';
 import fastGlob from 'fast-glob';
-import { inspectBuildTypesPublications } from './check-esm-package-types-helpers.mjs';
+import {
+	classifyTypeScriptDiagnostics,
+	inspectBuildTypesPublications,
+} from './check-esm-package-types-helpers.mjs';
 
 const rootDirectory = path.resolve(
 	path.dirname( fileURLToPath( import.meta.url ) ),
@@ -13,14 +14,47 @@ const rootDirectory = path.resolve(
 );
 const packagesDirectory = path.join( rootDirectory, 'packages' );
 
-function getPackageTypeRoots( directory ) {
-	const packageRequire = createRequire(
-		path.join( directory, 'package.json' )
+function getPackageTypeOptions( { directory, packageJson } ) {
+	const tsconfigPath = path.join( directory, 'tsconfig.build.json' );
+	const result = spawn.sync(
+		'tsc',
+		[ '--showConfig', '--project', tsconfigPath ],
+		{
+			cwd: rootDirectory,
+			encoding: 'utf8',
+		}
 	);
-	const nodeTypesDirectory = path.dirname(
-		packageRequire.resolve( '@types/node/package.json' )
-	);
-	return path.dirname( nodeTypesDirectory );
+	if ( result.error ) {
+		throw result.error;
+	}
+	if ( result.signal ) {
+		throw new Error(
+			`TypeScript config inspection terminated by ${ result.signal } for ${ packageJson.name }`
+		);
+	}
+	if ( result.status !== 0 ) {
+		const output = `${ result.stdout }\n${ result.stderr }`.trim();
+		throw new Error(
+			`Could not inspect TypeScript config for ${ packageJson.name }:\n${
+				output || `tsc exited with status ${ result.status }.`
+			}`
+		);
+	}
+
+	try {
+		const { typeRoots, types = [] } =
+			JSON.parse( result.stdout ).compilerOptions ?? {};
+		return {
+			typeRoots: typeRoots?.map( ( typeRoot ) =>
+				path.resolve( directory, typeRoot )
+			),
+			types,
+		};
+	} catch {
+		throw new Error(
+			`Could not parse TypeScript config for ${ packageJson.name }.`
+		);
+	}
 }
 
 function pointsOnlyToCss( target ) {
@@ -49,7 +83,7 @@ async function checkNodeNextTypes( { directory, packageJson } ) {
 		throw new Error( `No declarations found for ${ packageJson.name }` );
 	}
 	const temporaryDirectory = await mkdtemp(
-		path.join( tmpdir(), 'gutenberg-esm-types-' )
+		path.join( directory, '.gutenberg-esm-types-' )
 	);
 	const tsconfigPath = path.join( temporaryDirectory, 'tsconfig.json' );
 	let result;
@@ -58,12 +92,12 @@ async function checkNodeNextTypes( { directory, packageJson } ) {
 			tsconfigPath,
 			JSON.stringify( {
 				compilerOptions: {
+					...getPackageTypeOptions( { directory, packageJson } ),
 					target: 'esnext',
 					module: 'nodenext',
 					moduleResolution: 'nodenext',
 					noEmit: true,
 					pretty: false,
-					typeRoots: [ getPackageTypeRoots( directory ) ],
 				},
 				files: declarations,
 			} )
@@ -90,18 +124,17 @@ async function checkNodeNextTypes( { directory, packageJson } ) {
 	const diagnostics = `${ result.stdout }\n${ result.stderr }`.split(
 		/\r?\n/
 	);
-	const hasTypeScriptDiagnostics = diagnostics.some( ( line ) =>
-		/error TS\d+:/.test( line )
-	);
 	// Ignore diagnostics owned by external dependencies. Global compiler errors
-	// and errors in this package's published declarations still fail the check.
-	const relevantDiagnostics = diagnostics.filter( ( line ) => {
-		const normalizedLine = line.replaceAll( '\\', '/' );
-		return (
-			normalizedLine.startsWith( buildTypesPrefix ) ||
-			normalizedLine.startsWith( 'error TS' )
-		);
-	} );
+	// and errors in the generated config or this package's declarations still
+	// fail the check.
+	const { hasTypeScriptDiagnostics, relevantDiagnostics } =
+		classifyTypeScriptDiagnostics( diagnostics, [
+			buildTypesPrefix,
+			path
+				.relative( rootDirectory, tsconfigPath )
+				.replaceAll( path.sep, '/' ),
+			tsconfigPath.replaceAll( path.sep, '/' ),
+		] );
 	if ( relevantDiagnostics.length > 0 ) {
 		throw new Error(
 			`Incorrect NodeNext types for ${

@@ -2,6 +2,7 @@ import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import {
+	classifyTypeScriptDiagnostics,
 	inspectBuildTypesPublications,
 	publishesBuildTypes,
 } from '../packages/check-esm-package-types-helpers.mjs';
@@ -76,4 +77,40 @@ test( 'continues package inspection after a failure', () => {
 		]
 	);
 	expect( inspectPackage ).toHaveBeenCalledTimes( 2 );
+} );
+
+test( 'keeps diagnostics from the generated tsconfig', () => {
+	const diagnostic =
+		'packages/theme/.gutenberg-esm-types-123/tsconfig.json(3,4): error TS6046: Invalid option.';
+
+	expect(
+		classifyTypeScriptDiagnostics(
+			[ diagnostic ],
+			[
+				'packages/theme/build-types/',
+				'packages/theme/.gutenberg-esm-types-123/tsconfig.json',
+			]
+		)
+	).toEqual( {
+		hasTypeScriptDiagnostics: true,
+		relevantDiagnostics: [ diagnostic ],
+	} );
+} );
+
+test( 'ignores diagnostics from external dependencies', () => {
+	const diagnostic =
+		'node_modules/dependency/index.d.ts(1,1): error TS2307: Missing type.';
+
+	expect(
+		classifyTypeScriptDiagnostics(
+			[ diagnostic ],
+			[
+				'packages/theme/build-types/',
+				'packages/theme/.gutenberg-esm-types-123/tsconfig.json',
+			]
+		)
+	).toEqual( {
+		hasTypeScriptDiagnostics: true,
+		relevantDiagnostics: [],
+	} );
 } );

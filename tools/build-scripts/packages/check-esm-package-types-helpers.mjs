@@ -1,5 +1,25 @@
 import spawn from 'cross-spawn';
 
+export function classifyTypeScriptDiagnostics(
+	diagnostics,
+	ownedDiagnosticPrefixes
+) {
+	const hasTypeScriptDiagnostics = diagnostics.some( ( line ) =>
+		/error TS\d+:/.test( line )
+	);
+	const relevantDiagnostics = diagnostics.filter( ( line ) => {
+		const normalizedLine = line.replaceAll( '\\', '/' );
+		return (
+			normalizedLine.startsWith( 'error TS' ) ||
+			ownedDiagnosticPrefixes.some( ( prefix ) =>
+				normalizedLine.startsWith( prefix )
+			)
+		);
+	} );
+
+	return { hasTypeScriptDiagnostics, relevantDiagnostics };
+}
+
 export function publishesBuildTypes( { directory, packageJson } ) {
 	const result = spawn.sync(
 		'npm',
