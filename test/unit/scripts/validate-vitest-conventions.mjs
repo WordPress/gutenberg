@@ -121,26 +121,6 @@ function resolvePackageBin( packageName ) {
 	return path.resolve( path.dirname( packageJsonPath ), binPath );
 }
 
-function isCommonJsExport( node ) {
-	if ( node?.type !== 'MemberExpression' ) {
-		return false;
-	}
-
-	if (
-		node.object?.type === 'Identifier' &&
-		node.object.name === 'exports'
-	) {
-		return true;
-	}
-
-	return (
-		node.object?.type === 'Identifier' &&
-		node.object.name === 'module' &&
-		node.property?.type === 'Identifier' &&
-		node.property.name === 'exports'
-	);
-}
-
 function isDynamicImport( node ) {
 	return (
 		node?.type === 'ImportExpression' ||
@@ -302,13 +282,6 @@ for ( const file of files ) {
 	);
 
 	traverseAst( ast, visitorKeys, {
-		AssignmentExpression( node ) {
-			if ( isCommonJsExport( node.left ) ) {
-				violations.push(
-					`${ file }:${ node.loc.start.line } CommonJS export`
-				);
-			}
-		},
 		CallExpression( node ) {
 			if (
 				node.callee?.type === 'Identifier' &&
@@ -356,17 +329,6 @@ for ( const file of files ) {
 			if ( wpVitestMockName && ! jsdomTests.has( file ) ) {
 				violations.push(
 					`${ file }:${ node.loc.start.line } wpVitest.${ wpVitestMockName }() requires a *.jsdom.test.* filename`
-				);
-			}
-		},
-		ImportDeclaration( node ) {
-			if (
-				browserTests.has( file ) &&
-				node.importKind !== 'type' &&
-				node.source.value.startsWith( 'node:' )
-			) {
-				violations.push(
-					`${ file }:${ node.loc.start.line } Browser tests cannot import Node built-ins`
 				);
 			}
 		},

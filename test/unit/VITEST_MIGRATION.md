@@ -32,8 +32,9 @@ When changing test ownership:
 -   New Jest tests require no migration metadata; runner discovery picks them up
     automatically.
 -   Run `npm test` for the complete lint and unit-test suite. For focused
-    migration validation, run `npm run test:unit:routing`, `npm run test:unit`,
-    and `npm run test:unit:vitest` together.
+    migration validation, run `npm run test:unit:routing`,
+    `npm run test:unit:conventions`, `npm run test:unit`, and
+    `npm run test:unit:vitest` together.
 
 The routing validator fails when a test is missing, owned by both runners, or
 not assigned to the expected Vitest migration entry. It also rejects invalid

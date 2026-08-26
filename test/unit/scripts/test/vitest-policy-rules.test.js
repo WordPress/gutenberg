@@ -67,4 +67,66 @@ describe( 'Vitest environment policy', () => {
 			expect.stringContaining( 'imported ESM namespace objects' ),
 		] );
 	} );
+
+	it( 'rejects Browser runtime imports of Node built-ins', () => {
+		for ( const source of [
+			"import fs from 'fs';",
+			"import 'node:path';",
+			"await import('node:module');",
+			'await import( `node:fs` );',
+			"export { readFile } from 'node:fs';",
+		] ) {
+			expect( validate( source ) ).toEqual( [
+				expect.stringContaining(
+					'cannot import Node built-ins at runtime'
+				),
+			] );
+		}
+	} );
+
+	it( 'allows Browser type-only imports of Node built-ins', () => {
+		expect(
+			validate(
+				"import type { Stats } from 'node:fs';\nimport { type PathLike } from 'fs';\nimport type fs = require( 'node:fs' );",
+				{ file: 'example.browser.test.ts' }
+			)
+		).toEqual( [] );
+	} );
+
+	it( 'rejects TypeScript CommonJS imports and exports', () => {
+		expect(
+			validate( "import fs = require( 'node:fs' );", {
+				file: 'example.test.ts',
+				project: 'node',
+			} )
+		).toEqual( [ expect.stringContaining( 'CommonJS import' ) ] );
+		expect(
+			validate( 'export = { value: true };', {
+				file: 'example.test.ts',
+				project: 'node',
+			} )
+		).toEqual( [ expect.stringContaining( 'CommonJS export' ) ] );
+	} );
+
+	it( 'rejects CommonJS exports', () => {
+		for ( const source of [
+			'exports.value = true;',
+			'module.exports = {};',
+			'module.exports.value = true;',
+			"module[ 'exports' ].value = true;",
+		] ) {
+			expect( validate( source, { project: 'node' } ) ).toEqual( [
+				expect.stringContaining( 'CommonJS export' ),
+			] );
+		}
+	} );
+
+	it( 'allows properties on local module-like objects', () => {
+		expect(
+			validate(
+				'const module = { exports: {} };\nmodule.exports.value = true;\nconst exports = {};\nexports.value = true;',
+				{ project: 'node' }
+			)
+		).toEqual( [] );
+	} );
 } );

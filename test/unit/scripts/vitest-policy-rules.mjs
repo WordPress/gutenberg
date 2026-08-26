@@ -1,3 +1,4 @@
+import { isBuiltin } from 'node:module';
 import typescriptEslintParser from '@typescript-eslint/parser';
 
 const browserApiIdentifiers = new Set( [
@@ -70,6 +71,103 @@ function getMemberPropertyName( node ) {
 	}
 
 	return null;
+}
+
+function isUnboundIdentifier( node, name, unboundIdentifiers ) {
+	return (
+		node?.type === 'Identifier' &&
+		node.name === name &&
+		unboundIdentifiers.has( node )
+	);
+}
+
+function isCommonJsExport( node, unboundIdentifiers ) {
+	let member = node;
+
+	while ( member?.type === 'MemberExpression' ) {
+		if (
+			isUnboundIdentifier(
+				member.object,
+				'exports',
+				unboundIdentifiers
+			) ||
+			( isUnboundIdentifier(
+				member.object,
+				'module',
+				unboundIdentifiers
+			) &&
+				getMemberPropertyName( member ) === 'exports' )
+		) {
+			return true;
+		}
+
+		member = member.object;
+	}
+
+	return false;
+}
+
+function hasRuntimeModuleReference( node ) {
+	if ( node.type === 'ImportExpression' ) {
+		return true;
+	}
+	if ( node.type === 'TSImportEqualsDeclaration' ) {
+		return node.importKind !== 'type';
+	}
+
+	if (
+		node.type !== 'ImportDeclaration' &&
+		node.type !== 'ExportAllDeclaration' &&
+		node.type !== 'ExportNamedDeclaration'
+	) {
+		return false;
+	}
+
+	if ( node.importKind === 'type' || node.exportKind === 'type' ) {
+		return false;
+	}
+
+	return (
+		! node.specifiers?.length ||
+		node.specifiers.some(
+			( specifier ) =>
+				specifier.importKind !== 'type' &&
+				specifier.exportKind !== 'type'
+		)
+	);
+}
+
+function getStaticStringValue( node ) {
+	if ( typeof node?.value === 'string' ) {
+		return node.value;
+	}
+
+	if (
+		node?.type === 'TemplateLiteral' &&
+		node.expressions.length === 0 &&
+		node.quasis.length === 1
+	) {
+		return node.quasis[ 0 ].value.cooked;
+	}
+
+	return null;
+}
+
+function getModuleSource( node ) {
+	if ( node.type === 'TSImportEqualsDeclaration' ) {
+		return getStaticStringValue( node.moduleReference?.expression );
+	}
+
+	if (
+		node.type !== 'ImportExpression' &&
+		node.type !== 'ImportDeclaration' &&
+		node.type !== 'ExportAllDeclaration' &&
+		node.type !== 'ExportNamedDeclaration'
+	) {
+		return null;
+	}
+
+	return getStaticStringValue( node.source );
 }
 
 function traverseAst( node, visitorKeys, visitor ) {
@@ -200,6 +298,35 @@ export function validateVitestPolicy( {
 	}
 
 	traverseAst( ast, visitorKeys, ( node ) => {
+		const moduleSource = getModuleSource( node );
+		if (
+			project === 'browser' &&
+			moduleSource &&
+			isBuiltin( moduleSource ) &&
+			hasRuntimeModuleReference( node )
+		) {
+			report(
+				'browser-node-builtin',
+				node.loc.start.line,
+				'Browser tests cannot import Node built-ins at runtime'
+			);
+		}
+
+		if (
+			node.type === 'TSImportEqualsDeclaration' &&
+			node.importKind !== 'type'
+		) {
+			report( 'commonjs-import', node.loc.start.line, 'CommonJS import' );
+		}
+
+		if (
+			node.type === 'TSExportAssignment' ||
+			( node.type === 'AssignmentExpression' &&
+				isCommonJsExport( node.left, unboundIdentifiers ) )
+		) {
+			report( 'commonjs-export', node.loc.start.line, 'CommonJS export' );
+		}
+
 		if ( project === 'jsdom' && ! allowJsdomBrowserApis ) {
 			if (
 				node.type === 'Identifier' &&
