@@ -61,11 +61,12 @@ const HEIC_MIME_TYPES = [ 'image/heic', 'image/heif' ];
  * @return {boolean} Whether the batch was refused.
  */
 function refuseExtraFiles( filesList, multiple, onError ) {
-	if ( multiple || filesList.length <= 1 ) {
-		return false;
+	if ( ! multiple && filesList.length > 1 ) {
+		onError( __( 'Only one file can be used here.' ) );
+		return true;
 	}
-	onError( __( 'Only one file can be used here.' ) );
-	return true;
+
+	return false;
 }
 
 /**

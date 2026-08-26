@@ -1,5 +1,8 @@
 const path = require( 'path' );
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const {
+	skipIfClientSideMediaInactive,
+} = require( './client-side-media-utils' );
 
 const IMAGES = [
 	path.join( __dirname, '../../../assets/10x10_e2e_test_image_z9T8jK.png' ),
@@ -28,35 +31,6 @@ async function dropTwoImagesOnCoverPlaceholder( editor, pageUtils ) {
 	await dragging.drop();
 
 	return coverBlock;
-}
-
-/**
- * Skips the current test when the editor is not on the client-side media
- * processing path, so it never asserts on server-side fallback behavior.
- *
- * @param {Object} page         Playwright page.
- * @param {Object} testInstance The `test` object to skip through.
- */
-async function skipIfClientSideMediaInactive( page, testInstance ) {
-	const isActive = await page.evaluate( () => {
-		// Prefer the package's own detection so this stays in sync with the
-		// editor's runtime decision.
-		if (
-			typeof window.wp?.uploadMedia?.isClientSideMediaSupported ===
-			'function'
-		) {
-			return window.wp.uploadMedia.isClientSideMediaSupported();
-		}
-		return (
-			window.crossOriginIsolated === true &&
-			typeof SharedArrayBuffer !== 'undefined'
-		);
-	} );
-
-	testInstance.skip(
-		! isActive,
-		'Client-side media processing is not active in this environment'
-	);
 }
 
 test.describe( 'Dropping multiple files on a single-file placeholder', () => {
