@@ -16,7 +16,6 @@
 
 ### Bug Fixes
 
--   Video: Allow access to block settings for the GIF variation so users can enable playback controls or disable autoplay ([#81943](https://github.com/WordPress/gutenberg/issues/81943)).
 -   Columns: Preserve individual Column attributes supported by Group, including styles and layouts, when transforming to Row or Grid.
 -   Icon: Apply only padding to the inner SVG in the editor, so margin is no longer applied twice compared to the front end ([#81292](https://github.com/WordPress/gutenberg/pull/81292)).
 -   Playlist: Attach the inner block drop zone to the track list, so Playlist Track blocks show insertion markers while being reordered.
