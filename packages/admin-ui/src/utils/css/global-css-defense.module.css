@@ -1,0 +1,40 @@
+/*
+ * TODO: Share global CSS defense across packages that use cascade layers
+ * (@wordpress/ui, @wordpress/admin-ui, and others). This is a temporary
+ * copy of the minimum rules needed here until that shared module exists.
+ *
+ * Unlayered defense against wp-admin global CSS (common.css).
+ *
+ * CSS cascade layers always lose to unlayered styles, so @wordpress/admin-ui's
+ * layered component styles get overridden by wp-admin's broad bare-element
+ * selectors. This file provides unlayered, class-scoped defenses that
+ * restore control to the component.
+ *
+ * Mechanism (custom property bridge):
+ *   .ul { margin: var(--_gcd-ul-margin, 0); }
+ *
+ * - The class selector beats admin bare-element selectors in specificity.
+ * - Each property reads a custom property. Component CSS modules define the
+ *   custom properties for the specific properties they want to override.
+ * - Custom property definitions aren't suppressed by cascade layers, so the
+ *   layered value propagates through to the unlayered declaration.
+ *
+ * Usage: apply the element-specific class directly to each element that
+ * needs defense (e.g. defenseStyles.ul on a `<ul>`).
+ */
+
+/*
+ * ==========================================================================
+ * common.css defense - https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-admin/css/common.css
+ * ==========================================================================
+ */
+
+.ul {
+	list-style: var(--_gcd-ul-list-style, none);
+	padding: var(--_gcd-ul-padding, 0);
+	margin: var(--_gcd-ul-margin, 0);
+}
+
+.li {
+	margin: var(--_gcd-li-margin, 0);
+}

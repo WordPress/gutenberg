@@ -1,7 +1,9 @@
 import { Link as RouterLink } from '@wordpress/route';
 import { __ } from '@wordpress/i18n';
 import { Link, Stack, Text } from '@wordpress/ui';
+import clsx from 'clsx';
 import type { BreadcrumbsProps } from './types';
+import defenseStyles from '../utils/css/global-css-defense.module.css';
 import styles from './style.module.css';
 
 /**
@@ -49,10 +51,10 @@ export const Breadcrumbs = ( { items }: BreadcrumbsProps ) => {
 				render={ <ul /> }
 				direction="row"
 				align="center"
-				className={ styles.list }
+				className={ clsx( styles.list, defenseStyles.ul ) }
 			>
 				{ precedingItems.map( ( item, index ) => (
-					<li key={ index }>
+					<li key={ index } className={ defenseStyles.li }>
 						<Text
 							variant="body-lg"
 							render={
@@ -73,7 +75,7 @@ export const Breadcrumbs = ( { items }: BreadcrumbsProps ) => {
 						</Text>
 					</li>
 				) ) }
-				<li>
+				<li className={ defenseStyles.li }>
 					{ lastItem.to ? (
 						<Text
 							variant="body-lg"

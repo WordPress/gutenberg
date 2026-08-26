@@ -1,6 +1,8 @@
 import { __ } from '@wordpress/i18n';
 import { Link, Stack, Text } from '@wordpress/ui';
+import clsx from 'clsx';
 import type { NavigationProps } from './types';
+import defenseStyles from '../utils/css/global-css-defense.module.css';
 import styles from './style.module.css';
 
 /**
@@ -57,10 +59,13 @@ export const Navigation = ( {
 				direction="row"
 				align="center"
 				gap="md"
-				className={ styles.list }
+				className={ clsx( styles.list, defenseStyles.ul ) }
 			>
 				{ items.map( ( item ) => (
-					<li key={ item.href } className={ styles.li }>
+					<li
+						key={ item.href }
+						className={ clsx( styles.li, defenseStyles.li ) }
+					>
 						<Text
 							variant="body-md"
 							className={ styles.item }
