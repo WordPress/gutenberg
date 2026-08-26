@@ -1203,36 +1203,84 @@ test.describe( 'Block Notes', () => {
 			).toBeVisible();
 		} );
 
-		test( 'picker lays out as a row and moves focus on both axes', async ( {
-			page,
-			blockNoteUtils,
-		} ) => {
-			await blockNoteUtils.addBlockWithNote( {
-				type: 'core/paragraph',
-				attributes: { content: 'Testing picker layout' },
-				comment: 'Test comment for picker layout',
+		test.describe( 'Emojibase dataset unavailable', () => {
+			test.beforeAll( async ( { requestUtils } ) => {
+				await requestUtils.activatePlugin(
+					'gutenberg-test-note-emojibase-unavailable'
+				);
 			} );
 
-			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
-			const emojiPicker = page.locator(
-				'.editor-collab-sidebar-panel__emoji-picker'
-			);
-			await expect( emojiPicker ).toBeVisible();
+			test.afterAll( async ( { requestUtils } ) => {
+				await requestUtils.deactivatePlugin(
+					'gutenberg-test-note-emojibase-unavailable'
+				);
+			} );
 
-			// `.components-popover__content` is `width: min-content`,
-			// which used to squeeze the wrapping button group into a
-			// single column one emoji wide.
-			const box = await emojiPicker.boundingBox();
-			expect( box.width ).toBeGreaterThan( box.height );
+			test( 'falls back to the curated quick row, laid out as a row with focus on both axes', async ( {
+				page,
+				blockNoteUtils,
+			} ) => {
+				await blockNoteUtils.addBlockWithNote( {
+					type: 'core/paragraph',
+					attributes: { content: 'Testing picker layout' },
+					comment: 'Test comment for picker layout',
+				} );
 
-			// The roving tab index moves on both axes, so the picker is
-			// navigable however the emoji set happens to wrap.
-			const buttons = emojiPicker.getByRole( 'button' );
-			await buttons.first().focus();
-			await page.keyboard.press( 'ArrowDown' );
-			await expect( buttons.nth( 1 ) ).toBeFocused();
-			await page.keyboard.press( 'ArrowUp' );
-			await expect( buttons.first() ).toBeFocused();
+				await page
+					.getByRole( 'button', { name: 'Add reaction' } )
+					.click();
+
+				// Without a dataset URL the full picker cannot load, so
+				// adding a reaction falls back to the curated quick row.
+				await expect(
+					page.getByPlaceholder( 'Search emoji' )
+				).toBeHidden();
+				const emojiPicker = page.locator(
+					'.editor-collab-sidebar-panel__emoji-picker'
+				);
+				await expect( emojiPicker ).toBeVisible();
+
+				// `.components-popover__content` is `width: min-content`,
+				// which used to squeeze the wrapping button group into a
+				// single column one emoji wide.
+				const box = await emojiPicker.boundingBox();
+				expect( box.width ).toBeGreaterThan( box.height );
+
+				// The roving tab index moves on both axes, so the picker is
+				// navigable however the emoji set happens to wrap.
+				const buttons = emojiPicker.getByRole( 'button' );
+				await buttons.first().focus();
+				await page.keyboard.press( 'ArrowDown' );
+				await expect( buttons.nth( 1 ) ).toBeFocused();
+				await page.keyboard.press( 'ArrowUp' );
+				await expect( buttons.first() ).toBeFocused();
+			} );
+
+			test( 'a curated pick from the fallback row still adds a reaction', async ( {
+				page,
+				blockNoteUtils,
+			} ) => {
+				await blockNoteUtils.addBlockWithNote( {
+					type: 'core/paragraph',
+					attributes: { content: 'Fallback pick' },
+					comment: 'Test comment for fallback pick',
+				} );
+
+				await page
+					.getByRole( 'button', { name: 'Add reaction' } )
+					.click();
+				const emojiPicker = page.locator(
+					'.editor-collab-sidebar-panel__emoji-picker'
+				);
+				await expect( emojiPicker ).toBeVisible();
+				await emojiPicker
+					.getByRole( 'button', { name: /Heart/i } )
+					.click();
+
+				await expect(
+					page.getByRole( 'button', { name: /Heart/ } )
+				).toContainText( '1' );
+			} );
 		} );
 
 		test( 'resolving a thread locks its reactions', async ( {
