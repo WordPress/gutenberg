@@ -13,6 +13,13 @@
  * dataviews `/wp` bundle: they are shared with the platform and never inlined
  * into a consumer bundle.
  *
+ * Known, temporary violations live in `check-private-apis.config.json`, each
+ * keyed on the module the pull passes through. A failing package is rebuilt
+ * with its excepted modules externalized and passes only if that removes
+ * private-apis from the graph entirely, so an exception never hides a new
+ * route. An entry the package no longer needs fails the run as stale, so the
+ * list can only shrink.
+ *
  * Usage:
  *   node tools/validation/check-private-apis.mjs                     # every bundled package
  *   node tools/validation/check-private-apis.mjs [package-name ...]  # specific packages
@@ -30,6 +37,18 @@ const ROOT = path.resolve(
 );
 const PACKAGES_DIR = path.join( ROOT, 'packages' );
 const SINGLETONS = new Set( [ 'data', 'hooks', 'i18n', 'date' ] );
+const CONFIG = 'check-private-apis.config.json';
+
+function readExceptions() {
+	const { exceptions = [] } = JSON.parse(
+		fs.readFileSync( new URL( CONFIG, import.meta.url ), 'utf8' )
+	);
+	const byPackage = new Map();
+	for ( const { package: name, via } of exceptions ) {
+		byPackage.set( name, [ ...( byPackage.get( name ) ?? [] ), via ] );
+	}
+	return byPackage;
+}
 
 function readPackageJson( name ) {
 	try {
@@ -44,12 +63,16 @@ function readPackageJson( name ) {
 	}
 }
 
+// `module` limits the sweep to packages shipping a browser ESM build — the
+// ones that can end up inlined in a consumer bundle. Node tooling packages
+// (env, scripts, docgen, …) deliberately fall outside the gate.
 function isBundled( pkgJson ) {
 	return (
 		pkgJson &&
 		! pkgJson.private &&
 		! pkgJson.wpScript &&
-		! pkgJson.wpScriptModuleExports
+		! pkgJson.wpScriptModuleExports &&
+		pkgJson.module
 	);
 }
 
@@ -72,7 +95,12 @@ function resolveSource( base ) {
 }
 
 // Resolves @wordpress/* to package sources, keeps everything else external.
-function wordpressSources( onUnresolved ) {
+// Files in `exclude` (ROOT-relative) are forced external wherever they are
+// imported from, so a build can answer "would private-apis still be pulled in
+// without this module?".
+function wordpressSources( onUnresolved, exclude ) {
+	const excluded = ( resolved ) =>
+		exclude.has( path.relative( ROOT, resolved ) );
 	return {
 		name: 'wordpress-sources',
 		setup( build ) {
@@ -102,6 +130,9 @@ function wordpressSources( onUnresolved ) {
 					onUnresolved( args.path, args.importer );
 					return { path: args.path, external: true };
 				}
+				if ( excluded( resolved ) ) {
+					return { path: args.path, external: true };
+				}
 				// esbuild does not read package.json for plugin-resolved paths,
 				// so declare what the packages themselves declare: their JS is
 				// side-effect free (only style files are not, and those stay
@@ -121,9 +152,13 @@ function wordpressSources( onUnresolved ) {
 				const resolved = resolveSource(
 					path.resolve( path.dirname( args.importer ), args.path )
 				);
-				return resolved
-					? { path: resolved, sideEffects: false }
-					: undefined;
+				if ( ! resolved ) {
+					return undefined;
+				}
+				if ( excluded( resolved ) ) {
+					return { path: args.path, external: true };
+				}
+				return { path: resolved, sideEffects: false };
 			} );
 		},
 	};
@@ -162,7 +197,7 @@ function findChain( metafile, entry, target, kept ) {
 	return null;
 }
 
-async function checkPackage( name ) {
+async function checkPackage( name, exclude = new Set() ) {
 	const entry = resolveSource( path.join( PACKAGES_DIR, name, 'src' ) );
 	if ( ! entry ) {
 		return { name, status: 'skipped', reason: 'no src/index entry' };
@@ -172,12 +207,18 @@ async function checkPackage( name ) {
 	try {
 		result = await esbuild.build( {
 			entryPoints: [ entry ],
+			// Metafile keys are relative to the working directory; pin it so
+			// the `packages/...` path checks hold regardless of where the
+			// script is invoked from (npm workspace scripts run in tools/).
+			absWorkingDir: ROOT,
 			bundle: true,
 			write: false,
 			metafile: true,
 			plugins: [
-				wordpressSources( ( specifier, importer ) =>
-					unresolved.push( { specifier, importer } )
+				wordpressSources(
+					( specifier, importer ) =>
+						unresolved.push( { specifier, importer } ),
+					exclude
 				),
 			],
 			jsx: 'automatic',
@@ -220,12 +261,22 @@ async function checkPackage( name ) {
 					)
 		  )
 		: [];
-	const chains = culprits.map( ( culprit ) => [
-		...( findChain( result.metafile, entryKey, culprit, kept ) ?? [
-			culprit,
-		] ),
-		'@wordpress/private-apis',
-	] );
+	// A culprit can survive with no live import edge among kept files: its
+	// importer was shaken but its module-level side effects kept it. Fall back
+	// to the unrestricted visited graph so the route that pulled it in is
+	// still shown, labelled as such.
+	const visited = new Set( Object.keys( result.metafile.inputs ) );
+	const chains = culprits.map( ( culprit ) => {
+		const keptChain = findChain( result.metafile, entryKey, culprit, kept );
+		const chain = keptChain ??
+			findChain( result.metafile, entryKey, culprit, visited ) ?? [
+				culprit,
+			];
+		return {
+			revived: ! keptChain,
+			chain: [ ...chain, '@wordpress/private-apis' ],
+		};
+	} );
 	return {
 		name,
 		status: offenders.length ? 'fail' : 'pass',
@@ -251,26 +302,75 @@ async function main() {
 				.readdirSync( PACKAGES_DIR )
 				.filter( ( name ) => isBundled( readPackageJson( name ) ) );
 
+	const exceptions = readExceptions();
 	let failed = false;
 	for ( const name of names ) {
-		const { status, reason, chains, unresolved } =
-			await checkPackage( name );
-		if ( status === 'skipped' ) {
-			console.log( `SKIP @wordpress/${ name } (${ reason })` );
+		const result = await checkPackage( name );
+		if ( result.status === 'skipped' ) {
+			console.log( `SKIP @wordpress/${ name } (${ result.reason })` );
 			continue;
 		}
+		const vias = exceptions.get( name ) ?? [];
+		let { status, chains } = result;
+		const stale = [];
 		if ( status === 'pass' ) {
+			stale.push( ...vias );
+		} else if ( vias.length ) {
+			const retry = await checkPackage( name, new Set( vias ) );
+			if ( retry.status === 'pass' ) {
+				status = 'excepted';
+				// Every entry must still be load-bearing: without it (the
+				// others kept), the package must fail again.
+				for ( const via of vias ) {
+					const others = vias.filter( ( other ) => other !== via );
+					if (
+						others.length &&
+						( await checkPackage( name, new Set( others ) ) )
+							.status === 'pass'
+					) {
+						stale.push( via );
+					}
+				}
+			} else if ( retry.status === 'fail' ) {
+				// Report only the routes the exceptions do not explain.
+				chains = retry.chains;
+			}
+		}
+		if ( stale.length ) {
+			failed = true;
+			console.log(
+				`FAIL @wordpress/${ name } — stale exception${
+					stale.length > 1 ? 's' : ''
+				}, no longer needed, remove from ${ CONFIG }:`
+			);
+			for ( const via of stale ) {
+				console.log( `  ${ via }` );
+			}
+		} else if ( status === 'pass' ) {
 			console.log( `PASS @wordpress/${ name }` );
+		} else if ( status === 'excepted' ) {
+			console.log(
+				`PASS @wordpress/${ name } (excepted via: ${ vias.join(
+					', '
+				) })`
+			);
 		} else {
 			failed = true;
 			console.log(
-				`FAIL @wordpress/${ name } — private-apis is in the module graph:`
+				`FAIL @wordpress/${ name } — private-apis is in the module graph${
+					vias.length ? ' beyond the configured exceptions' : ''
+				}:`
 			);
-			for ( const chain of chains ) {
+			for ( const { revived, chain } of chains ) {
+				if ( revived ) {
+					console.log(
+						'  (kept by module-level side effects — no live import edge; the shaken route that pulled it in:)'
+					);
+				}
 				console.log( `  ${ chain.join( '\n    -> ' ) }` );
 			}
 		}
-		for ( const { specifier, importer } of unresolved ) {
+		for ( const { specifier, importer } of result.unresolved ) {
 			console.log(
 				`  note: could not resolve ${ specifier } to source (from ${ path.relative(
 					ROOT,
