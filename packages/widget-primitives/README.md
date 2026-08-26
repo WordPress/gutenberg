@@ -22,6 +22,12 @@ language features and APIs, you should include [the polyfill shipped in
 `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill)
 in your code._
 
+### One instance per application
+
+The package keeps state at module scope: the host capabilities context and the field type and icon registries. Two instances of the package in one application split them: a provider or a registration in one instance never reaches consumers in the other, and nothing errors. Resolve the package once.
+
+On a WordPress page, code built with `@wordpress/build` imports it as a script module through the import map, so one instance is guaranteed; a widget bundled with another tool must externalize it. On npm, packages that build on this one, such as `@wordpress/widget-dashboard`, declare it as a peer dependency, so the application's copy is the only one. While developing, a second instance logs a console warning.
+
 ## Setup
 
 This package ships no stylesheets; there is nothing to enqueue or import.
