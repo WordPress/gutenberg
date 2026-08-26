@@ -1,0 +1,244 @@
+/**
+ * Feature Comparison Table — frontend styles
+ *
+ * Architecture notes:
+ * - CSS custom properties (--fct-*) let the save function pass per-block
+ *   values (rotation angle, alternate-row colours) without repeating inline
+ *   styles on every element.
+ * - Hover-highlight modes (row / column / both) are implemented entirely with
+ *   CSS so they work on the frontend without JavaScript.
+ * - Sticky first column uses `position: sticky` on both the header <th> and
+ *   every body <th> in the first column.
+ * - Rotated headers use a CSS transform. When rotation is active a fixed
+ *   height is set on the header row so rotated text doesn't overlap the body.
+ */
+
+.wp-block-feature-comparison-table {
+	overflow-x: auto; // Enables responsive horizontal scroll on small screens.
+
+	// -------------------------------------------------------------------
+	// Scrollable wrapper
+	// -------------------------------------------------------------------
+
+	.fct-table-wrapper {
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch; // Smooth momentum scroll on iOS.
+	}
+
+	// -------------------------------------------------------------------
+	// Table base
+	// -------------------------------------------------------------------
+
+	.fct-table {
+		border-collapse: collapse;
+		width: 100%;
+		table-layout: auto;
+
+		th,
+		td {
+			border: 1px solid currentColor;
+			padding: 0.5em 0.75em;
+			text-align: center;
+			vertical-align: middle;
+		}
+
+		thead th {
+			font-weight: 600;
+		}
+
+		// Feature label column is left-aligned.
+		.fct-feature-label,
+		.fct-feature-header {
+			text-align: left;
+		}
+	}
+
+	// -------------------------------------------------------------------
+	// Product column headers
+	// -------------------------------------------------------------------
+
+	.fct-product-header {
+		vertical-align: bottom;
+	}
+
+	.fct-product-header__image {
+		display: block;
+		max-width: 80px;
+		max-height: 80px;
+		margin: 0 auto 0.4em;
+		object-fit: contain;
+	}
+
+	.fct-product-header__title {
+		display: block;
+		font-weight: 600;
+	}
+
+	.fct-product-header__description {
+		display: block;
+		font-size: 0.85em;
+		opacity: 0.75;
+	}
+
+	.fct-product-header__link {
+		text-decoration: none;
+		color: inherit;
+
+		&:hover,
+		&:focus {
+			text-decoration: underline;
+		}
+	}
+
+	// -------------------------------------------------------------------
+	// Cell icons
+	// -------------------------------------------------------------------
+
+	.fct-cell-icon {
+		display: inline-block;
+		font-size: 1.1em;
+		line-height: 1;
+
+		&--tick {
+			color: #1d8348; // Green — accessible against white.
+		}
+
+		&--cross {
+			color: #c0392b; // Red — accessible against white.
+		}
+
+		&--warning {
+			color: #d35400; // Orange — accessible against white.
+		}
+	}
+
+	// -------------------------------------------------------------------
+	// Footnote references inside cells
+	// -------------------------------------------------------------------
+
+	.fct-footnote-ref {
+		font-size: 0.75em;
+		margin-left: 0.1em;
+
+		&__link {
+			text-decoration: none;
+			color: inherit;
+
+			&:hover,
+			&:focus {
+				text-decoration: underline;
+			}
+		}
+
+		&--inline {
+			margin-left: 0.25em;
+		}
+	}
+
+	// -------------------------------------------------------------------
+	// Footnotes section
+	// -------------------------------------------------------------------
+
+	.fct-footnotes {
+		margin-top: 1em;
+		padding-left: 1.5em;
+		font-size: 0.875em;
+	}
+
+	.fct-footnote {
+		margin-bottom: 0.25em;
+
+		&__label {
+			font-weight: 600;
+		}
+	}
+
+	// -------------------------------------------------------------------
+	// Sticky first column
+	// &.has-sticky-first-column targets the block wrapper so the feature-
+	// column cells can be made sticky with sufficient CSS specificity.
+	// -------------------------------------------------------------------
+
+	&.has-sticky-first-column {
+		.fct-feature-label--sticky,
+		thead .fct-feature-header:first-child,
+		tbody tr th:first-child {
+			position: sticky;
+			left: 0;
+			z-index: 1;
+			// Use a solid background to prevent cell content from showing through.
+			background-color: var(--wp--style--color--background, #fff);
+		}
+	}
+
+	// -------------------------------------------------------------------
+	// Alternate row colours
+	// Custom property values are injected by the save/edit functions.
+	// Fallback to a subtle grey when no explicit colour is chosen.
+	// -------------------------------------------------------------------
+
+	&.has-alternate-row-colors {
+		.fct-table tbody tr:nth-child(odd) {
+			background-color: var(--fct-alt-row-odd, #f9f9f9);
+		}
+
+		.fct-table tbody tr:nth-child(even) {
+			background-color: var(--fct-alt-row-even, #fff);
+		}
+	}
+
+	// -------------------------------------------------------------------
+	// Hover highlighting
+	//
+	// Row highlighting is handled by :hover on <tr>.
+	// Column highlighting needs JavaScript to set a data attribute on the
+	// table, because CSS cannot traverse ancestor → sibling relationships.
+	// The JavaScript is lightweight: it just adds/removes data-hover-col.
+	// -------------------------------------------------------------------
+
+	&.has-hover-highlight-row,
+	&.has-hover-highlight-both {
+		.fct-table tbody tr:hover {
+			background-color: rgba(0, 0, 0, 0.05);
+		}
+	}
+
+	// Column highlight cells are tagged via data-hover-col JS in view.js.
+	&.has-hover-highlight-column,
+	&.has-hover-highlight-both {
+		.fct-table td.is-col-hovered,
+		.fct-table th.is-col-hovered {
+			background-color: rgba(0, 0, 0, 0.05);
+		}
+	}
+
+	// -------------------------------------------------------------------
+	// Rotated column headers
+	//
+	// Rotation is applied to the inner content wrapper so the <th> cell
+	// boundary stays in place (preventing layout shifts). A min-height is
+	// set on the <tr> to accommodate rotated text based on the rotation
+	// angle stored in --fct-header-rotation.
+	//
+	// The inner span wraps the header content; rotate() is applied there
+	// so the cell retains its column width while the text appears angled.
+	// -------------------------------------------------------------------
+
+	&.has-rotated-headers {
+		.fct-table thead th.fct-product-header {
+			vertical-align: bottom;
+			white-space: nowrap;
+			// Reserve vertical space for rotated labels.
+			height: 120px;
+			padding-bottom: 0.5em;
+
+			> * {
+				display: block;
+				transform-origin: bottom left;
+				transform: rotate(var(--fct-header-rotation, -45deg)) translateX(50%);
+				width: max-content;
+			}
+		}
+	}
+}
+

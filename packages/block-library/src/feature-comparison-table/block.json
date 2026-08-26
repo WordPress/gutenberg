@@ -1,0 +1,114 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "core/feature-comparison-table",
+	"title": "Feature Comparison Table",
+	"category": "text",
+	"description": "Compare features across products or services in a structured table.",
+	"keywords": [ "comparison", "features", "products", "services", "table" ],
+	"textdomain": "default",
+	"attributes": {
+		"products": {
+			"type": "array",
+			"default": []
+		},
+		"features": {
+			"type": "array",
+			"default": []
+		},
+		"cells": {
+			"type": "object",
+			"default": {}
+		},
+		"footnotes": {
+			"type": "array",
+			"default": []
+		},
+		"headerDisplay": {
+			"type": "string",
+			"default": "title"
+		},
+		"featurePosition": {
+			"type": "string",
+			"default": "left"
+		},
+		"stickyFirstColumn": {
+			"type": "boolean",
+			"default": false
+		},
+		"alternateRowColors": {
+			"type": "boolean",
+			"default": false
+		},
+		"alternateRowColorOdd": {
+			"type": "string",
+			"default": ""
+		},
+		"alternateRowColorEven": {
+			"type": "string",
+			"default": ""
+		},
+		"hoverHighlight": {
+			"type": "string",
+			"default": "none"
+		},
+		"rotateHeaders": {
+			"type": "boolean",
+			"default": false
+		},
+		"headerRotationAngle": {
+			"type": "number",
+			"default": -45
+		},
+		"footnoteStyle": {
+			"type": "string",
+			"default": "numeric"
+		},
+		"footnoteDisplay": {
+			"type": "string",
+			"default": "superscript"
+		}
+	},
+	"supports": {
+		"anchor": true,
+		"align": [ "wide", "full" ],
+		"color": {
+			"gradients": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"margin": false,
+				"padding": false
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"style": true,
+			"width": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"style": true,
+				"width": true
+			}
+		}
+	},
+	"editorStyle": "wp-block-feature-comparison-table-editor",
+	"style": "wp-block-feature-comparison-table"
+}
