@@ -1,5 +1,5 @@
 import { Page } from '@wordpress/admin-ui';
-import { Spinner } from '@wordpress/components';
+import { Notice, Spinner } from '@wordpress/components';
 import { useEntityRecord } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import { DataForm } from '@wordpress/dataviews';
@@ -36,9 +36,24 @@ function ExperimentsPage() {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
+	const storedExperiments = siteSettings?.[ 'gutenberg-experiments' ];
+
+	// `GET /wp/v2/settings` returns `null` for a setting whose stored value
+	// fails its schema. That is not the same as "no experiments are enabled":
+	// the real state is unknown. Rendering the toggles anyway would show every
+	// experiment as off, and saving one would replace whatever is really
+	// stored, so the form is withheld instead.
+	const areExperimentsUnreadable =
+		siteSettings !== undefined &&
+		storedExperiments !== undefined &&
+		( typeof storedExperiments !== 'object' || storedExperiments === null );
+
 	const gutenbergExperiments = useMemo(
-		() => siteSettings?.[ 'gutenberg-experiments' ] || {},
-		[ siteSettings ]
+		() =>
+			typeof storedExperiments === 'object' && storedExperiments !== null
+				? ( storedExperiments as Record< string, unknown > )
+				: {},
+		[ storedExperiments ]
 	);
 
 	const settings = useMemo( () => {
@@ -191,17 +206,25 @@ function ExperimentsPage() {
 						</Stack>
 					</Card.Content>
 				</Card.Root>
-				<DataForm
-					data={ settings }
-					fields={ fields }
-					form={ {
-						layout: { type: 'card' },
-						fields: formFields,
-					} }
-					onChange={ ( values ) => {
-						setSettings( values );
-					} }
-				/>
+				{ areExperimentsUnreadable ? (
+					<Notice status="error" isDismissible={ false }>
+						{ __(
+							'Your saved experiments could not be read, so this screen cannot show which ones are on. The toggles are hidden because changing one would replace the saved settings. To restore the screen, reset the "gutenberg-experiments" option to an empty value.'
+						) }
+					</Notice>
+				) : (
+					<DataForm
+						data={ settings }
+						fields={ fields }
+						form={ {
+							layout: { type: 'card' },
+							fields: formFields,
+						} }
+						onChange={ ( values ) => {
+							setSettings( values );
+						} }
+					/>
+				) }
 			</Stack>
 		</Page>
 	);

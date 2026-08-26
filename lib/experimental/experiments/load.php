@@ -173,16 +173,53 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg-experiments',
 		array(
-			'label'        => __( 'Gutenberg Experiments', 'gutenberg' ),
-			'show_in_rest' => array(
+			'label'             => __( 'Gutenberg Experiments', 'gutenberg' ),
+			'show_in_rest'      => array(
 				'schema' => array(
-					'type'       => 'object',
-					'properties' => $properties,
+					'type'                 => 'object',
+					'properties'           => $properties,
+					/*
+					 * The stored option routinely holds experiments that are no
+					 * longer registered, because switching between branches
+					 * leaves the keys of the other branch behind.
+					 *
+					 * `WP_REST_Settings_Controller` defaults `additionalProperties`
+					 * to false and replaces any value that fails its schema with
+					 * null, so without this a single stale key would blank out the
+					 * whole option in the REST response and make every toggle on
+					 * the Experiments screen read as "off".
+					 */
+					'additionalProperties' => true,
 				),
 			),
-			'default'      => array(),
+			'sanitize_callback' => 'gutenberg_sanitize_experiments_option',
+			'default'           => array(),
 		)
 	);
+}
+
+/**
+ * Normalizes the `gutenberg-experiments` option to a map of experiment id to boolean.
+ *
+ * Unregistered experiments are kept rather than dropped: they usually belong to
+ * a branch the user can switch back to, and discarding them here would silently
+ * lose settings they never asked to change.
+ *
+ * @param mixed $value The value being saved.
+ * @return array<string, bool> The sanitized value.
+ */
+function gutenberg_sanitize_experiments_option( $value ) {
+	if ( ! is_array( $value ) ) {
+		return array();
+	}
+
+	$sanitized = array();
+
+	foreach ( $value as $experiment_id => $enabled ) {
+		$sanitized[ (string) $experiment_id ] = rest_sanitize_boolean( $enabled );
+	}
+
+	return $sanitized;
 }
 
 add_action( 'rest_api_init', 'gutenberg_initialize_experiments_settings' );
