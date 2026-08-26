@@ -167,8 +167,26 @@ export const WithVisualLabel: StoryObj = {
 			<Button aria-label="Select an author" variant="secondary">
 				Select an author
 			</Button>
+		</>
+	),
+};
+
+/**
+ * `Field.VisualDescription` renders a purely visual description with the same
+ * styling as `Field.Description`. Use it outside `Field.Root` when
+ * supplementary text is needed for layout consistency, but should not be
+ * associated with a control using `aria-describedby`.
+ */
+export const WithVisualDescription: StoryObj = {
+	render: () => (
+		<>
+			<input
+				type="text"
+				aria-label="API key"
+				placeholder="Paste your API key"
+			/>
 			<Field.VisualDescription>
-				This button is already accessibly labeled.
+				Find your API key in your account settings.
 			</Field.VisualDescription>
 		</>
 	),
