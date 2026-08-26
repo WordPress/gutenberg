@@ -1,3 +1,5 @@
+@layer wp-ui, wp-admin-ui;
+
 @layer wp-admin-ui {
 	.page {
 		display: flex;
