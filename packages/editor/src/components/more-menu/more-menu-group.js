@@ -1,0 +1,60 @@
+import { Children, isValidElement } from '@wordpress/element';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Menu } from '@wordpress/ui';
+import MoreMenuItem from './more-menu-item';
+
+/**
+ * Renders the fills of an action item slot as a group of the more menu.
+ *
+ * @param {Object}          props          Component properties.
+ * @param {string}          props.label    Label of the group.
+ * @param {React.ReactNode} props.children Fills of the slot.
+ *
+ * @return {React.ReactNode} The rendered component.
+ */
+export default function MoreMenuGroup( { label, children } ) {
+	return (
+		<>
+			<Menu.Separator />
+			<Menu.Group>
+				<Menu.GroupLabel>{ label }</Menu.GroupLabel>
+				{ toMenuItems( children ) }
+			</Menu.Group>
+		</>
+	);
+}
+
+/**
+ * Renders the fills that bring a menu item of their own as menu items.
+ *
+ * A fill takes the component to render from the slot, unless it passes an `as`
+ * prop. The menu knows nothing about such an item, so keyboard navigation
+ * would skip it. The `render` prop makes it part of the menu, while the fill
+ * keeps rendering its own markup.
+ *
+ * @param {React.ReactNode} fills Fills of the slot.
+ *
+ * @return {React.ReactNode} The fills as menu items.
+ */
+function toMenuItems( fills ) {
+	return Children.map( fills, ( fill ) => {
+		if ( ! isValidElement( fill ) || fill.type === MoreMenuItem ) {
+			return fill;
+		}
+
+		// The fill renders the content of the item, so the label element it
+		// requires is never rendered and `aria-labelledby` points at nothing.
+		// Naming falls back to the content of the fill.
+		const label = <Menu.ItemLabel />;
+
+		return fill.props.href ? (
+			<Menu.LinkItem aria-labelledby="" render={ fill }>
+				{ label }
+			</Menu.LinkItem>
+		) : (
+			<Menu.Item nativeButton aria-labelledby="" render={ fill }>
+				{ label }
+			</Menu.Item>
+		);
+	} );
+}
