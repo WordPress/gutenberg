@@ -106,7 +106,11 @@ The `color` prop accepts an object with the following optional properties:
 -   `primary`: The primary/accent seed color (default: `'#3858e9'`).
 -   `background`: The background seed color (default: `'#fcfcfc'`).
 
-Both properties accept a fully opaque sRGB-parseable string: a hex value (e.g. `#3858e9`), an `rgb()`/`rgba()` string, or a CSS named color (e.g. `'blue'`). Non-opaque alpha values, `transparent`, and other CSS color spaces (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted and will throw an error. The theme system automatically generates appropriate color ramps and determines light/dark mode based on these seed colors.
+Both properties accept a fully opaque sRGB-parseable string: a hex value (e.g. `#3858e9`), an `rgb()`/`rgba()` string, or a CSS named color (e.g. `'blue'`). Non-opaque alpha values, `transparent`, and other CSS color spaces (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted and will throw an error. The theme system automatically generates appropriate color ramps from these seed colors.
+
+### Light and dark themes
+
+`ThemeProvider` has no light or dark mode. It accepts color seeds and turns them into semantic design tokens. Consumers define light and dark themes by choosing those seeds: a light background seed makes the generated color ramp favor darker contrasting colors, while a dark background seed makes it favor lighter contrasting colors. The primary seed controls the accent color rather than the overall light or dark appearance.
 
 Use `onColorWarnings` to receive structured warnings after the provider calculates its colors. Warnings identify generated ramp steps or semantic foreground/background pairs that do not meet their contrast targets:
 
