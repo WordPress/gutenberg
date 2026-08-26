@@ -172,4 +172,65 @@ class Render_Block_MediaText_Test extends WP_UnitTestCase {
 		$rendered = gutenberg_render_block_core_media_text( $attributes, $content );
 		$this->assertStringContainsString( '<img alt="" src="' . wp_get_attachment_image_url( self::$attachment_id, 'full' ) . '"', $rendered );
 	}
+	/**
+	 * Test gutenberg_render_block_core_media_text when the media wrapper carries
+	 * the `is-aspect-ratio-aware` class added by the current block version.
+	 */
+	public function test_render_block_core_media_text_featured_image_aspect_ratio_aware() {
+		$this->setup_query();
+
+		$content = '<div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media is-aspect-ratio-aware"></figure><div class="wp-block-media-text__content"><p></p></div></div>';
+
+		$attributes = array(
+			'useFeaturedImage' => true,
+		);
+		$rendered   = gutenberg_render_block_core_media_text( $attributes, $content );
+		$this->assertStringContainsString( '<img alt="" src="' . wp_get_attachment_image_url( self::$attachment_id, 'full' ) . '"', $rendered );
+
+		// The class must survive so the paired `object-fit` still applies.
+		$this->assertStringContainsString( 'is-aspect-ratio-aware', $rendered );
+	}
+	/**
+	 * Test that an aspect ratio set on the block reaches the injected featured image.
+	 */
+	public function test_render_block_core_media_text_featured_image_aspect_ratio() {
+		$this->setup_query();
+
+		$content = '<div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media is-aspect-ratio-aware"></figure><div class="wp-block-media-text__content"><p></p></div></div>';
+
+		$attributes = array(
+			'useFeaturedImage' => true,
+			'style'            => array(
+				'dimensions' => array(
+					'aspectRatio' => '16/9',
+				),
+			),
+		);
+		$rendered   = gutenberg_render_block_core_media_text( $attributes, $content );
+		$this->assertStringContainsString( 'aspect-ratio:16/9', $rendered );
+		$this->assertStringContainsString( 'has-aspect-ratio', $rendered );
+
+		// A focal point is carried alongside the ratio, matching the JS `save`.
+		$attributes['focalPoint'] = array(
+			'x' => 0.25,
+			'y' => 0.75,
+		);
+		$rendered                 = gutenberg_render_block_core_media_text( $attributes, $content );
+		$this->assertStringContainsString( 'object-position:25% 75%', $rendered );
+
+		// The default ratio adds nothing.
+		$attributes = array(
+			'useFeaturedImage' => true,
+			'style'            => array(
+				'dimensions' => array(
+					'aspectRatio' => 'auto',
+				),
+			),
+		);
+		$rendered   = gutenberg_render_block_core_media_text( $attributes, $content );
+		// Note `is-aspect-ratio-aware` on the wrapper contains "aspect-ratio",
+		// so match on the declaration and the media class instead.
+		$this->assertStringNotContainsString( 'aspect-ratio:', $rendered );
+		$this->assertStringNotContainsString( 'has-aspect-ratio', $rendered );
+	}
 }

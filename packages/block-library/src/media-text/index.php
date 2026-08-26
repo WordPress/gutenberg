@@ -38,10 +38,17 @@ function render_block_core_media_text( $attributes, $content ) {
 		$focal_point_x = isset( $focal_point_attr['x'] ) && is_numeric( $focal_point_attr['x'] ) ? $focal_point_attr['x'] : null;
 		$focal_point_y = isset( $focal_point_attr['y'] ) && is_numeric( $focal_point_attr['y'] ) ? $focal_point_attr['y'] : null;
 	}
-	$focal_point = null !== $focal_point_x && null !== $focal_point_y
+	$has_focal_point = null !== $focal_point_x && null !== $focal_point_y;
+	$focal_point     = $has_focal_point
 		? round( $focal_point_x * 100 ) . '% ' . round( $focal_point_y * 100 ) . '%'
 		: '50% 50%';
-	$unique_id   = 'wp-block-media-text__media-' . wp_unique_id();
+
+	// An aspect ratio set on the block is applied to the media rather than the
+	// block wrapper, so it has to be added to the injected featured image here.
+	$aspect_ratio     = $attributes['style']['dimensions']['aspectRatio'] ?? null;
+	$has_aspect_ratio = ! $image_fill && $aspect_ratio && 'auto' !== $aspect_ratio;
+
+	$unique_id = 'wp-block-media-text__media-' . wp_unique_id();
 
 	$block_tag_processor = new WP_HTML_Tag_Processor( $content );
 	$block_query         = array(
@@ -89,7 +96,7 @@ function render_block_core_media_text( $attributes, $content ) {
 	$media_size_slug = $attributes['mediaSizeSlug'] ?? 'full';
 	$image_tag       = '<img class="wp-block-media-text__featured_image">';
 	$content         = preg_replace(
-		'/(<figure\s+id="' . preg_quote( $unique_id, '/' ) . '"\s+class="wp-block-media-text__media"\s*>)/',
+		'/(<figure\s+id="' . preg_quote( $unique_id, '/' ) . '"\s+class="wp-block-media-text__media[^"]*"\s*>)/',
 		'$1' . $image_tag,
 		$content
 	);
@@ -110,11 +117,25 @@ function render_block_core_media_text( $attributes, $content ) {
 				'class_name' => 'wp-block-media-text__featured_image',
 			)
 		) ) {
+			$image_classes = 'wp-image-' . get_post_thumbnail_id() . ' size-' . $media_size_slug;
+			if ( $has_aspect_ratio ) {
+				$image_classes .= ' has-aspect-ratio';
+			}
+
 			$image_tag_processor->set_attribute( 'src', esc_url( $current_featured_image ) );
-			$image_tag_processor->set_attribute( 'class', 'wp-image-' . get_post_thumbnail_id() . ' size-' . $media_size_slug );
+			$image_tag_processor->set_attribute( 'class', $image_classes );
 			$image_tag_processor->set_attribute( 'alt', trim( strip_tags( get_post_meta( get_post_thumbnail_id(), '_wp_attachment_image_alt', true ) ) ) );
 			if ( $image_fill ) {
 				$image_tag_processor->set_attribute( 'style', 'object-position:' . $focal_point . ';' );
+			} elseif ( $has_aspect_ratio ) {
+				$declarations = 'aspect-ratio:' . $aspect_ratio . ';';
+				if ( $has_focal_point ) {
+					$declarations .= 'object-position:' . $focal_point . ';';
+				}
+				// Run the value through the same sanitization used for every other
+				// block inline style, so an unsafe value can't break out of the
+				// style attribute or inject additional markup.
+				$image_tag_processor->set_attribute( 'style', safecss_filter_attr( $declarations ) );
 			}
 
 			$content = $image_tag_processor->get_updated_html();

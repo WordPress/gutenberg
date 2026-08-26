@@ -81,10 +81,12 @@
 		max-width: unset;
 		width: 100%;
 		vertical-align: middle;
+	}
 
-		&.has-aspect-ratio {
-			object-fit: cover;
-		}
+	// Paired with the aspect ratio so media is cropped rather than stretched,
+	// whether the ratio comes from the block or from Global Styles.
+	&.is-aspect-ratio-aware :where(img, video) {
+		object-fit: cover;
 	}
 }
 

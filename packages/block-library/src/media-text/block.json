@@ -81,6 +81,10 @@
 			"type": "boolean",
 			"default": true
 		},
+		"isAspectRatioAware": {
+			"type": "boolean",
+			"default": true
+		},
 		"verticalAlignment": {
 			"type": "string"
 		},
@@ -149,7 +153,7 @@
 	},
 	"selectors": {
 		"dimensions": {
-			"aspectRatio": ".wp-block-media-text__media img, .wp-block-media-text__media video"
+			"aspectRatio": ".wp-block-media-text__media.is-aspect-ratio-aware img, .wp-block-media-text__media.is-aspect-ratio-aware video"
 		}
 	},
 	"editorStyle": "wp-block-media-text-editor",

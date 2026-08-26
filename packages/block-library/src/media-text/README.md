@@ -30,6 +30,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `mediaWidth` | `number` | `50` | — |
 | `mediaSizeSlug` | `string` | — | — |
 | `isStackedOnMobile` | `boolean` | `true` | — |
+| `isAspectRatioAware` | `boolean` | `true` | — |
 | `verticalAlignment` | `string` | — | — |
 | `imageFill` | `boolean` | — | — |
 | `focalPoint` | `object` | — | — |
@@ -72,7 +73,7 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
 
 - **dimensions**:
-  - aspectRatio: `.wp-block-media-text__media img, .wp-block-media-text__media video`
+  - aspectRatio: `.wp-block-media-text__media.is-aspect-ratio-aware img, .wp-block-media-text__media.is-aspect-ratio-aware video`
 
 ## Block Markup
 
@@ -81,7 +82,7 @@ This is a [**hybrid block**](https://developer.wordpress.org/block-editor/gettin
 ```html
 <!-- wp:media-text {"mediaType":"image"} -->
 <div class="wp-block-media-text is-stacked-on-mobile">
-	<figure class="wp-block-media-text__media">
+	<figure class="wp-block-media-text__media is-aspect-ratio-aware">
 		<img src="data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=" alt=""/>
 	</figure>
 	<div class="wp-block-media-text__content">

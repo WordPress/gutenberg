@@ -1,4 +1,5 @@
 import { getInlineStyles } from './style';
+import { isExplicitAspectRatio } from './dimensions';
 
 // This utility is intended to assist where the serialization of the dimensions
 // block support is being skipped for a block but the dimensions related CSS
@@ -19,7 +20,9 @@ export function getDimensionsClassesAndStyles( attributes ) {
 	const styleProp = getInlineStyles( { dimensions: dimensionsStyles } );
 
 	return {
-		className: dimensionsStyles.aspectRatio
+		// Matches the dimensions support: `auto` is the default, not an
+		// explicit ratio, so it does not get the class.
+		className: isExplicitAspectRatio( dimensionsStyles.aspectRatio )
 			? 'has-aspect-ratio'
 			: undefined,
 		style: styleProp,

@@ -12,6 +12,7 @@ const noop = () => {};
 
 export default function save( { attributes } ) {
 	const {
+		isAspectRatioAware,
 		isStackedOnMobile,
 		mediaAlt,
 		mediaPosition,
@@ -101,6 +102,15 @@ export default function save( { attributes } ) {
 		gridTemplateColumns,
 	};
 
+	// Only blocks saved with the aspect ratio support carry this class, so older
+	// markup is left alone and its media keeps the default `object-fit`. A legacy
+	// block that is given a ratio picks the class up too, so the ratio is never
+	// applied without the `object-fit` that goes with it.
+	const mediaClasses = clsx( 'wp-block-media-text__media', {
+		'is-aspect-ratio-aware':
+			isAspectRatioAware || !! dimensionsProps.className,
+	} );
+
 	if ( 'right' === mediaPosition ) {
 		return (
 			<div { ...useBlockProps.save( { className, style } ) }>
@@ -109,7 +119,7 @@ export default function save( { attributes } ) {
 						className: 'wp-block-media-text__content',
 					} ) }
 				/>
-				<figure className="wp-block-media-text__media">
+				<figure className={ mediaClasses }>
 					{ ( mediaTypeRenders[ mediaType ] || noop )() }
 				</figure>
 			</div>
@@ -117,7 +127,7 @@ export default function save( { attributes } ) {
 	}
 	return (
 		<div { ...useBlockProps.save( { className, style } ) }>
-			<figure className="wp-block-media-text__media">
+			<figure className={ mediaClasses }>
 				{ ( mediaTypeRenders[ mediaType ] || noop )() }
 			</figure>
 			<div
