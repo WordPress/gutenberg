@@ -139,6 +139,26 @@ function gutenberg_register_default_icons() {
 			)
 		);
 	}
+
+	// Register block UI icons that are specific to Core block rendering and
+	// not part of the general icon library, so they are available for themes
+	// to override through the Icon Registry. These use inline content because
+	// their SVGs do not conform to the standard 24x24 viewBox or fill pattern
+	// required by the icon library manifest.
+	wp_register_icon(
+		'core/navigation-submenu',
+		array(
+			'label'   => __( 'Navigation Submenu', 'gutenberg' ),
+			'content' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" fill="none"><path d="M1.50002 4L6.00002 8L10.5 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>',
+		)
+	);
+	wp_register_icon(
+		'core/navigation-menu-toggle',
+		array(
+			'label'   => __( 'Navigation Menu Toggle', 'gutenberg' ),
+			'content' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M4 7.5h16v1.5H4z" /><path d="M4 15h16v1.5H4z" /></svg>',
+		)
+	);
 }
 
 $default_icons_priority = has_action( 'init', '_wp_register_default_icons' );

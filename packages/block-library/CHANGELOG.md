@@ -5,6 +5,7 @@
 ### Enhancements
 
 - `List`: Add wide and full alignment support ([#68002](https://github.com/WordPress/gutenberg/pull/68002)).
+- Resolve internal UI icons in the Search, Navigation, Navigation Submenu, Navigation Link, and Image blocks through the WordPress Icon Registry (`wp_get_icon`), so themes can override block UI icons by registering replacement SVGs for `core/search`, `core/navigation-menu-toggle`, `core/menu`, `core/close`, `core/navigation-submenu`, `core/chevron-left`, and `core/chevron-right`. Core retains its existing SVGs as defaults. The same mechanism works in both the editor and the frontend: the editor resolves icons from the registry via the `core-data` store, while the frontend uses `wp_get_icon()`.
 
 ### Internal
 
