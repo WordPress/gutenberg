@@ -79,7 +79,9 @@ export function Option( {
 	tooltipText,
 	...additionalProps
 }: OptionProps ) {
-	const { baseId, presentation = 'listbox' } = useContext(
+	// Preserve the historical toggle-button fallback when this public
+	// subcomponent is rendered without a parent picker.
+	const { baseId, presentation = 'toggle-buttons' } = useContext(
 		CircularOptionPickerContext
 	);
 	const id = useInstanceId(

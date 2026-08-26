@@ -26,6 +26,23 @@ describe( 'CircularOptionPicker', () => {
 		Object.keys( logged ).forEach( ( key ) => delete logged[ key ] );
 	} );
 
+	it( 'should preserve toggle-button semantics when an option is rendered without a picker', () => {
+		render(
+			<CircularOptionPicker.Option
+				isSelected
+				aria-label="Standalone option"
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Standalone option',
+				pressed: true,
+			} )
+		).toBeInTheDocument();
+		expect( screen.queryByRole( 'option' ) ).not.toBeInTheDocument();
+	} );
+
 	describe( 'when `asButtons` is not set', () => {
 		it( 'should render as a listbox', async () => {
 			render( <CircularOptionPicker { ...DEFAULT_PROPS } /> );
