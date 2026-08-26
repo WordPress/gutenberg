@@ -648,6 +648,7 @@ describe( 'publishVersionedPackagesToNpm', () => {
 			.mockResolvedValueOnce( [ '@wordpress/a11y' ] );
 		const pushNpmReleaseGitMetadataFn = vi.fn();
 		const git = {
+			raw: vi.fn().mockResolvedValue( '' ),
 			revparse: vi.fn().mockResolvedValue( 'publish-sha' ),
 		};
 
@@ -707,8 +708,9 @@ describe( 'publishVersionedPackagesToNpm', () => {
 			.mockResolvedValueOnce( [
 				'@wordpress/a11y',
 				'@wordpress/blocks',
-			] );
+		] );
 		const git = {
+			raw: vi.fn().mockResolvedValue( '' ),
 			revparse: vi.fn().mockResolvedValue( 'publish-sha' ),
 			reset: vi.fn(),
 		};
@@ -751,6 +753,7 @@ describe( 'publishVersionedPackagesToNpm', () => {
 	it( 'skips Lerna when all package versions are already published', async () => {
 		const commandFn = vi.fn();
 		const git = {
+			raw: vi.fn().mockResolvedValue( '' ),
 			revparse: vi.fn().mockResolvedValue( 'publish-sha' ),
 		};
 
@@ -788,6 +791,7 @@ describe( 'publishVersionedPackagesToNpm', () => {
 		const runNpmPublishPreflightFn = vi.fn().mockResolvedValue( [] );
 		const runPhase = vi.fn( async ( _label, task ) => task() );
 		const git = {
+			raw: vi.fn().mockResolvedValue( '' ),
 			revparse: vi.fn().mockResolvedValue( 'publish-sha' ),
 		};
 
@@ -822,7 +826,8 @@ describe( 'publishVersionedPackagesToNpm', () => {
 		expect( runNpmPublishPreflightFn ).toHaveBeenCalledTimes( 2 );
 		expect( runPhase ).toHaveBeenCalledWith(
 			'npm publication verification',
-			expect.any( Function )
+			expect.any( Function ),
+			expect.objectContaining( { attempts: 18 } )
 		);
 		expect( pushNpmReleaseGitMetadataFn ).not.toHaveBeenCalled();
 		expect( console ).toHaveLogged();
@@ -840,6 +845,7 @@ describe( 'publishVersionedPackagesToNpm', () => {
 		const runPhase = ( label, task ) =>
 			runNpmReleasePhase( label, task, { wait } );
 		const git = {
+			raw: vi.fn().mockResolvedValue( '' ),
 			revparse: vi.fn().mockResolvedValue( 'publish-sha' ),
 		};
 
@@ -914,6 +920,7 @@ describe( 'publishPackagesToNpm', () => {
 		async ( releaseType, versionCommand, distTag, npmReleaseBranch ) => {
 			const commandFn = vi.fn().mockResolvedValue();
 			const git = {
+				raw: vi.fn().mockResolvedValue( '' ),
 				revparse: vi
 					.fn()
 					.mockResolvedValueOnce( 'before-sha' )
@@ -961,4 +968,277 @@ describe( 'publishPackagesToNpm', () => {
 			expect( console ).toHaveLogged();
 		}
 	);
+} );
+
+describe( 'npm publication verification resumability', () => {
+	it( 'only re-checks packages that are still missing from the registry', async () => {
+		const releasePackages = [
+			{ name: '@wordpress/a11y', version: '4.54.0', tagName: 'a' },
+			{ name: '@wordpress/ui', version: '0.21.0', tagName: 'b' },
+			{ name: '@wordpress/wordcount', version: '4.54.0', tagName: 'c' },
+		];
+		// First sweep confirms a11y only; later sweeps must not re-check it.
+		const runNpmPublishPreflightFn = vi
+			.fn()
+			.mockResolvedValueOnce( [] )
+			.mockResolvedValueOnce( [ '@wordpress/a11y' ] )
+			.mockResolvedValueOnce( [ '@wordpress/wordcount' ] )
+			.mockResolvedValueOnce( [ '@wordpress/ui' ] );
+
+		await publishVersionedPackagesToNpm(
+			{
+				distTag: 'latest',
+				gitWorkingDirectoryPath: '/repo',
+				noVerifyAccessFlag: '--no-verify-access',
+				npmReleaseBranch: 'wp/latest',
+				yesFlag: '--yes',
+			},
+			{
+				commandFn: vi.fn().mockResolvedValue(),
+				getNpmReleasePackagesFn: vi
+					.fn()
+					.mockResolvedValue( releasePackages ),
+				git: {
+					revparse: vi.fn().mockResolvedValue( 'publish-sha' ),
+					raw: vi.fn().mockResolvedValue( '' ),
+				},
+				pushNpmReleaseGitMetadataFn: vi.fn(),
+				runNpmPublishPreflightFn,
+				wait: vi.fn(),
+			}
+		);
+
+		const sweeps = runNpmPublishPreflightFn.mock.calls
+			.slice( 1 )
+			.map( ( [ { releasePackages: pkgs } ] ) =>
+				pkgs.map( ( { name } ) => name )
+			);
+		expect( sweeps[ 0 ] ).toEqual( [
+			'@wordpress/a11y',
+			'@wordpress/ui',
+			'@wordpress/wordcount',
+		] );
+		expect( sweeps[ 1 ] ).toEqual( [
+			'@wordpress/ui',
+			'@wordpress/wordcount',
+		] );
+		expect( sweeps[ 2 ] ).toEqual( [ '@wordpress/ui' ] );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'reports only the packages still missing when the budget is exhausted', async () => {
+		const releasePackages = [
+			{ name: '@wordpress/a11y', version: '4.54.0', tagName: 'a' },
+			{ name: '@wordpress/ui', version: '0.21.0', tagName: 'b' },
+		];
+		const runNpmPublishPreflightFn = vi
+			.fn()
+			.mockResolvedValueOnce( [] )
+			.mockResolvedValue( [ '@wordpress/a11y' ] );
+
+		await expect(
+			publishVersionedPackagesToNpm(
+				{
+					distTag: 'latest',
+					gitWorkingDirectoryPath: '/repo',
+					noVerifyAccessFlag: '--no-verify-access',
+					npmReleaseBranch: 'wp/latest',
+					yesFlag: '--yes',
+				},
+				{
+					commandFn: vi.fn().mockResolvedValue(),
+					getNpmReleasePackagesFn: vi
+						.fn()
+						.mockResolvedValue( releasePackages ),
+					git: {
+						revparse: vi.fn().mockResolvedValue( 'publish-sha' ),
+						raw: vi.fn().mockResolvedValue( '' ),
+					},
+					pushNpmReleaseGitMetadataFn: vi.fn(),
+					runNpmPublishPreflightFn,
+					wait: vi.fn(),
+				}
+			)
+		).rejects.toThrow( '@wordpress/ui@0.21.0' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'backs off exponentially and caps the delay', async () => {
+		const task = vi
+			.fn()
+			.mockRejectedValue( new Error( 'still propagating' ) );
+		const wait = vi.fn();
+
+		await expect(
+			runNpmReleasePhase( 'npm publication verification', task, {
+				attempts: 8,
+				wait,
+			} )
+		).rejects.toThrow( 'still propagating' );
+
+		const delays = wait.mock.calls.map( ( [ ms ] ) => ms );
+		expect( delays ).toEqual( [
+			5000, 10000, 20000, 40000, 80000, 120000, 120000,
+		] );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'persists the prepared commit to a scratch ref before publishing', async () => {
+		const commandFn = vi.fn().mockResolvedValue();
+		const pushPreparedCommitFn = vi.fn();
+
+		await publishVersionedPackagesToNpm(
+			{
+				distTag: 'latest',
+				gitWorkingDirectoryPath: '/repo',
+				noVerifyAccessFlag: '--no-verify-access',
+				npmReleaseBranch: 'wp/latest',
+				yesFlag: '--yes',
+			},
+			{
+				commandFn,
+				getNpmReleasePackagesFn: vi.fn().mockResolvedValue( [
+					{
+						name: '@wordpress/a11y',
+						version: '4.54.0',
+						tagName: 'a',
+					},
+				] ),
+				git: {
+					revparse: vi.fn().mockResolvedValue( 'publish-sha' ),
+					raw: vi.fn().mockResolvedValue( '' ),
+				},
+				pushNpmReleaseGitMetadataFn: vi.fn(),
+				pushPreparedCommitFn,
+				runNpmPublishPreflightFn: vi
+					.fn()
+					.mockResolvedValueOnce( [] )
+					.mockResolvedValueOnce( [ '@wordpress/a11y' ] ),
+				wait: vi.fn(),
+			}
+		);
+
+		expect( pushPreparedCommitFn.mock.calls[ 0 ][ 0 ] ).toEqual(
+			expect.objectContaining( { publishCommit: 'publish-sha' } )
+		);
+		expect(
+			pushPreparedCommitFn.mock.invocationCallOrder[ 0 ]
+		).toBeLessThan( commandFn.mock.invocationCallOrder[ 0 ] );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'removes the scratch ref once git metadata is pushed', async () => {
+		const deletePreparedCommitFn = vi.fn();
+		const pushNpmReleaseGitMetadataFn = vi.fn();
+
+		await publishVersionedPackagesToNpm(
+			{
+				distTag: 'latest',
+				gitWorkingDirectoryPath: '/repo',
+				noVerifyAccessFlag: '--no-verify-access',
+				npmReleaseBranch: 'wp/latest',
+				yesFlag: '--yes',
+			},
+			{
+				commandFn: vi.fn().mockResolvedValue(),
+				deletePreparedCommitFn,
+				getNpmReleasePackagesFn: vi.fn().mockResolvedValue( [
+					{
+						name: '@wordpress/a11y',
+						version: '4.54.0',
+						tagName: 'a',
+					},
+				] ),
+				git: {
+					revparse: vi.fn().mockResolvedValue( 'publish-sha' ),
+					raw: vi.fn().mockResolvedValue( '' ),
+				},
+				pushNpmReleaseGitMetadataFn,
+				pushPreparedCommitFn: vi.fn(),
+				runNpmPublishPreflightFn: vi
+					.fn()
+					.mockResolvedValueOnce( [] )
+					.mockResolvedValueOnce( [ '@wordpress/a11y' ] ),
+				wait: vi.fn(),
+			}
+		);
+
+		expect( deletePreparedCommitFn ).toHaveBeenCalled();
+		expect(
+			pushNpmReleaseGitMetadataFn.mock.invocationCallOrder[ 0 ]
+		).toBeLessThan( deletePreparedCommitFn.mock.invocationCallOrder[ 0 ] );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'ignores a stale prepared commit already merged into the release branch', async () => {
+		const commandFn = vi.fn().mockResolvedValue();
+		const git = {
+			checkout: vi.fn(),
+			fetch: vi.fn(),
+			raw: vi.fn().mockResolvedValue( '' ),
+			revparse: vi.fn().mockResolvedValue( 'sha' ),
+		};
+
+		await publishPackagesToNpm(
+			{
+				distTag: 'latest',
+				gitWorkingDirectoryPath: '/repo',
+				interactive: false,
+				minimumVersionBump: 'minor',
+				npmReleaseBranch: 'wp/latest',
+				releaseType: 'latest',
+			},
+			{
+				commandFn,
+				deletePreparedCommitFn: vi.fn(),
+				getPreparedCommitFn: vi.fn().mockResolvedValue( 'stale-sha' ),
+				// A completed release leaves its commit on the branch.
+				isPreparedCommitStaleFn: vi.fn().mockResolvedValue( true ),
+				git,
+				publishVersionedPackagesToNpmFn: vi.fn(),
+			}
+		);
+
+		const lernaVersionCalls = commandFn.mock.calls.filter( ( [ cmd ] ) =>
+			cmd.includes( 'lerna version' )
+		);
+		expect( lernaVersionCalls ).toHaveLength( 1 );
+		expect( git.checkout ).not.toHaveBeenCalled();
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'resumes from an existing prepared commit instead of re-versioning', async () => {
+		const commandFn = vi.fn().mockResolvedValue();
+		const git = {
+			revparse: vi.fn().mockResolvedValue( 'prepared-sha' ),
+			raw: vi.fn().mockResolvedValue( '' ),
+			checkout: vi.fn(),
+			fetch: vi.fn(),
+		};
+
+		await publishPackagesToNpm(
+			{
+				distTag: 'latest',
+				gitWorkingDirectoryPath: '/repo',
+				interactive: false,
+				minimumVersionBump: 'minor',
+				npmReleaseBranch: 'wp/latest',
+				releaseType: 'latest',
+			},
+			{
+				commandFn,
+				getPreparedCommitFn: vi
+					.fn()
+					.mockResolvedValue( 'prepared-sha' ),
+				git,
+				publishVersionedPackagesToNpmFn: vi.fn(),
+			}
+		);
+
+		const lernaVersionCalls = commandFn.mock.calls.filter( ( [ cmd ] ) =>
+			cmd.includes( 'lerna version' )
+		);
+		expect( lernaVersionCalls ).toHaveLength( 0 );
+		expect( console ).toHaveLogged();
+	} );
 } );

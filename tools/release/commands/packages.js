@@ -21,8 +21,26 @@ const {
 const pluginConfig = require( '../config' );
 
 const NPM_RELEASE_PHASE_ATTEMPTS = 3;
+/*
+ * Registry propagation after a large publish is unbounded in practice: a 121
+ * package release has been observed taking ~25 minutes for the last package to
+ * become visible. Verification retries are cheap because each attempt only
+ * re-checks the packages still missing, so the budget is sized for the tail
+ * rather than the common case.
+ */
+const NPM_RELEASE_VERIFICATION_ATTEMPTS = 18;
+const NPM_RELEASE_PHASE_MAX_DELAY_MS = 120000;
 // Keep tag pushes small enough that GitHub ruleset validation handles each phase predictably.
 const NPM_RELEASE_TAG_PUSH_BATCH_SIZE = 25;
+/*
+ * `lerna version --no-push` leaves the prepared release commit only on the
+ * runner, so any failure before Git metadata is pushed destroys the commit that
+ * every published package records as its `gitHead`. Persist it to a scratch ref
+ * first: it survives the runner, it lets a re-run resume from the same commit,
+ * and unlike pushing the release branch it never advertises versions that are
+ * not on npm yet.
+ */
+const NPM_RELEASE_PREPARED_REF = 'refs/npm-release/prepared';
 
 /**
  * Release type names.
@@ -482,6 +500,7 @@ function getNpmReleaseGitRecoveryCommands( {
  */
 async function runNpmReleasePhase( label, task, deps = {} ) {
 	const {
+		attempts = NPM_RELEASE_PHASE_ATTEMPTS,
 		wait = ( delay ) =>
 			new Promise( ( resolve ) => setTimeout( resolve, delay ) ),
 	} = deps;
@@ -490,15 +509,24 @@ async function runNpmReleasePhase( label, task, deps = {} ) {
 			await task();
 			return;
 		} catch ( err ) {
-			if ( attempt >= NPM_RELEASE_PHASE_ATTEMPTS ) {
+			if ( attempt >= attempts ) {
 				throw err;
 			}
-			log(
-				`>> ${ label } failed (attempt ${ attempt }/${ NPM_RELEASE_PHASE_ATTEMPTS }): ${
-					err.message
-				}, retrying in ${ attempt * 5 }s...`
+			/*
+			 * Back off exponentially rather than linearly. A linear `attempt * 5s`
+			 * schedule spends almost all of a retry budget on the first few
+			 * attempts, which is the wrong shape for registry propagation.
+			 */
+			const delay = Math.min(
+				2 ** ( attempt - 1 ) * 5000,
+				NPM_RELEASE_PHASE_MAX_DELAY_MS
 			);
-			await wait( attempt * 5000 );
+			log(
+				`>> ${ label } failed (attempt ${ attempt }/${ attempts }): ${
+					err.message
+				}, retrying in ${ delay / 1000 }s...`
+			);
+			await wait( delay );
 		}
 	}
 }
@@ -832,6 +860,108 @@ async function pushNpmReleaseGitMetadata(
 }
 
 /**
+ * Pushes the prepared release commit to a durable scratch ref.
+ *
+ * @param {Object} options                         Options.
+ * @param {string} options.gitWorkingDirectoryPath Git working directory path.
+ * @param {string} options.publishCommit           Publish commit SHA.
+ * @param {Object} deps                            Dependencies.
+ * @param {Object} deps.git                        Git client.
+ */
+async function pushNpmReleasePreparedCommit(
+	{ gitWorkingDirectoryPath, publishCommit },
+	deps = {}
+) {
+	const { git = SimpleGit( gitWorkingDirectoryPath ) } = deps;
+	log( '>> Persisting the prepared release commit before publishing.' );
+	await git.raw(
+		'push',
+		'--force',
+		'origin',
+		`${ publishCommit }:${ NPM_RELEASE_PREPARED_REF }`
+	);
+}
+
+/**
+ * Reads the prepared release commit from the scratch ref, if one exists.
+ *
+ * @param {string} gitWorkingDirectoryPath Git working directory path.
+ * @param {Object} deps                    Dependencies.
+ * @param {Object} deps.git                Git client.
+ *
+ * @return {Promise<?string>} The prepared commit SHA, or null when absent.
+ */
+async function getNpmReleasePreparedCommit(
+	gitWorkingDirectoryPath,
+	deps = {}
+) {
+	const { git = SimpleGit( gitWorkingDirectoryPath ) } = deps;
+	const output = await git.raw(
+		'ls-remote',
+		'origin',
+		NPM_RELEASE_PREPARED_REF
+	);
+	const [ sha ] = output.trim().split( /\s+/ );
+	return sha || null;
+}
+
+/**
+ * Reports whether a prepared commit belongs to a release that already finished.
+ *
+ * A completed release leaves its commit on the npm release branch, so a scratch
+ * ref still pointing there was abandoned rather than interrupted mid-flight.
+ *
+ * @param {Object} options                         Options.
+ * @param {string} options.gitWorkingDirectoryPath Git working directory path.
+ * @param {string} options.npmReleaseBranch        Npm release branch.
+ * @param {string} options.preparedCommit          Prepared commit SHA.
+ * @param {Object} deps                            Dependencies.
+ * @param {Object} deps.git                        Git client.
+ *
+ * @return {Promise<boolean>} True when the prepared commit is already released.
+ */
+async function isNpmReleasePreparedCommitStale(
+	{ gitWorkingDirectoryPath, npmReleaseBranch, preparedCommit },
+	deps = {}
+) {
+	const { git = SimpleGit( gitWorkingDirectoryPath ) } = deps;
+	const remoteSha = await getRemoteBranchSha(
+		gitWorkingDirectoryPath,
+		npmReleaseBranch,
+		{ git }
+	);
+	if ( ! remoteSha ) {
+		return false;
+	}
+	try {
+		await git.raw(
+			'merge-base',
+			'--is-ancestor',
+			preparedCommit,
+			remoteSha
+		);
+		return true;
+	} catch {
+		return false;
+	}
+}
+
+/**
+ * Deletes the prepared release scratch ref.
+ *
+ * @param {string} gitWorkingDirectoryPath Git working directory path.
+ * @param {Object} deps                    Dependencies.
+ * @param {Object} deps.git                Git client.
+ */
+async function deleteNpmReleasePreparedCommit(
+	gitWorkingDirectoryPath,
+	deps = {}
+) {
+	const { git = SimpleGit( gitWorkingDirectoryPath ) } = deps;
+	await git.raw( 'push', 'origin', '--delete', NPM_RELEASE_PREPARED_REF );
+}
+
+/**
  * Publishes locally versioned packages, then pushes and verifies Git metadata.
  *
  * @param {Object}   options                          Options.
@@ -860,11 +990,14 @@ async function publishVersionedPackagesToNpm(
 ) {
 	const {
 		commandFn = command,
+		deletePreparedCommitFn = deleteNpmReleasePreparedCommit,
 		git = SimpleGit( gitWorkingDirectoryPath ),
 		getNpmReleasePackagesFn = getNpmReleasePackages,
 		pushNpmReleaseGitMetadataFn = pushNpmReleaseGitMetadata,
+		pushPreparedCommitFn = pushNpmReleasePreparedCommit,
 		runNpmPublishPreflightFn = runNpmPublishPreflight,
 		runPhase = runNpmReleasePhase,
+		wait,
 	} = deps;
 	const releasePackages = await getNpmReleasePackagesFn(
 		gitWorkingDirectoryPath
@@ -891,6 +1024,15 @@ async function publishVersionedPackagesToNpm(
 	};
 
 	const publishedPackageNames = await getPublishedPackageNames();
+	/*
+	 * Persist the prepared commit before anything irreversible. Publishing
+	 * stamps this SHA into every package's `gitHead`, so it must outlive the
+	 * runner even if a later phase fails.
+	 */
+	await pushPreparedCommitFn(
+		{ gitWorkingDirectoryPath, publishCommit },
+		{ git }
+	);
 	try {
 		await publishRemainingPackages( publishedPackageNames );
 	} catch {
@@ -903,23 +1045,41 @@ async function publishVersionedPackagesToNpm(
 		await publishRemainingPackages( await getPublishedPackageNames() );
 	}
 
-	// Lerna treats publish conflicts as successful "already published" results,
-	// so verify registry identity again before attaching Git metadata.
-	await runPhase( 'npm publication verification', async () => {
-		const finalPublishedPackageNames = new Set(
-			await getPublishedPackageNames()
-		);
-		const unpublishedPackageVersions = releasePackages
-			.filter( ( { name } ) => ! finalPublishedPackageNames.has( name ) )
-			.map( ( { name, version } ) => `${ name }@${ version }` );
-		if ( unpublishedPackageVersions.length ) {
-			throw new Error(
-				`npm publication verification failed for ${ unpublishedPackageVersions.join(
-					', '
-				) }.`
+	/*
+	 * Lerna treats publish conflicts as successful "already published" results,
+	 * so verify registry identity again before attaching Git metadata.
+	 *
+	 * Each attempt only re-checks the packages still missing. Confirmed
+	 * packages are never looked up twice, which keeps retries cheap enough to
+	 * outlast slow registry propagation instead of timing out against it.
+	 */
+	let pendingPackages = releasePackages;
+	await runPhase(
+		'npm publication verification',
+		async () => {
+			const confirmedPackageNames = new Set(
+				await runNpmPublishPreflightFn( {
+					distTag,
+					gitWorkingDirectoryPath,
+					publishCommit,
+					releasePackages: pendingPackages,
+				} )
 			);
-		}
-	} );
+			pendingPackages = pendingPackages.filter(
+				( { name } ) => ! confirmedPackageNames.has( name )
+			);
+			if ( pendingPackages.length ) {
+				throw new Error(
+					`npm publication verification failed for ${ pendingPackages
+						.map(
+							( { name, version } ) => `${ name }@${ version }`
+						)
+						.join( ', ' ) }.`
+				);
+			}
+		},
+		{ attempts: NPM_RELEASE_VERIFICATION_ATTEMPTS, wait }
+	);
 
 	await pushNpmReleaseGitMetadataFn( {
 		gitWorkingDirectoryPath,
@@ -927,6 +1087,9 @@ async function publishVersionedPackagesToNpm(
 		packageTags: releasePackages.map( ( { tagName } ) => tagName ),
 		publishCommit,
 	} );
+
+	// The release is durable in Git now, so the scratch ref has served its purpose.
+	await deletePreparedCommitFn( gitWorkingDirectoryPath, { git } );
 }
 
 /**
@@ -950,7 +1113,10 @@ async function publishPackagesToNpm(
 ) {
 	const {
 		commandFn = command,
+		deletePreparedCommitFn = deleteNpmReleasePreparedCommit,
+		getPreparedCommitFn = getNpmReleasePreparedCommit,
 		git = SimpleGit( gitWorkingDirectoryPath ),
+		isPreparedCommitStaleFn = isNpmReleasePreparedCommitStale,
 		publishVersionedPackagesToNpmFn = publishVersionedPackagesToNpm,
 	} = deps;
 	log( '>> Installing npm packages.' );
@@ -966,14 +1132,53 @@ async function publishPackagesToNpm(
 
 	const beforeCommitHash = await git.revparse( [ '--short', 'HEAD' ] );
 
+	const yesFlag = interactive ? '' : '--yes';
+	const noVerifyAccessFlag = interactive ? '' : '--no-verify-access';
+
+	/*
+	 * A previous run may have prepared and published this release but failed
+	 * before Git metadata landed. Re-versioning would mint a new commit that no
+	 * published package references, so resume from the prepared commit instead
+	 * and let the preflight skip whatever already made it to the registry.
+	 */
+	const preparedCommit = await getPreparedCommitFn( gitWorkingDirectoryPath, {
+		git,
+	} );
+	if (
+		preparedCommit &&
+		( await isPreparedCommitStaleFn(
+			{ gitWorkingDirectoryPath, npmReleaseBranch, preparedCommit },
+			{ git }
+		) )
+	) {
+		log(
+			`>> Ignoring the stale prepared commit ${ preparedCommit }; it is already on ${ npmReleaseBranch }.`
+		);
+		await deletePreparedCommitFn( gitWorkingDirectoryPath, { git } );
+	} else if ( preparedCommit ) {
+		log(
+			`>> Resuming the prepared release commit ${ preparedCommit } from a previous run.`
+		);
+		await git.fetch( 'origin', NPM_RELEASE_PREPARED_REF );
+		await git.checkout( preparedCommit );
+
+		await publishVersionedPackagesToNpmFn( {
+			distTag,
+			gitWorkingDirectoryPath,
+			noVerifyAccessFlag,
+			npmReleaseBranch,
+			yesFlag,
+		} );
+
+		return preparedCommit;
+	}
+
 	// Timestamp is the current time in `YYYYMMDDHHMM` format.
 	const timestamp = new Date()
 		.toISOString()
 		.substring( 0, 16 )
 		.replace( /[-:T]/g, '' );
 
-	const yesFlag = interactive ? '' : '--yes';
-	const noVerifyAccessFlag = interactive ? '' : '--no-verify-access';
 	// Keep version commits and package tags local until npm publishing succeeds,
 	// then push and verify Git metadata explicitly.
 	if ( releaseType === 'next' ) {
@@ -1289,7 +1494,9 @@ async function publishNpmNext( options ) {
 }
 
 module.exports = {
+	deleteNpmReleasePreparedCommit,
 	finalizePreparedNpmRelease,
+	getNpmReleasePreparedCommit,
 	getNpmReleasePackages,
 	getNpmReleaseGitRecoveryCommands,
 	getRemoteBranchSha,
@@ -1301,6 +1508,8 @@ module.exports = {
 	publishPreparedPackagesToNpm,
 	publishVersionedPackagesToNpm,
 	pushNpmReleaseGitMetadata,
+	isNpmReleasePreparedCommitStale,
+	pushNpmReleasePreparedCommit,
 	publishNpmGutenbergPlugin,
 	publishNpmBugfixLatest,
 	publishNpmBugfixWordPressCore,
