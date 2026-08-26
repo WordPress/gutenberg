@@ -1,7 +1,5 @@
 import { MAX_COLUMNS } from './constants';
 
-const FALLBACK_GAP = '16px';
-
 function isObject( value ) {
 	return !! value && typeof value === 'object' && ! Array.isArray( value );
 }
@@ -87,10 +85,12 @@ function getImageSelector( selector ) {
 }
 
 function getColumnsCSS( selector, columns ) {
+	// Match the fallback used by the Gallery's existing column-width CSS and
+	// server-rendered responsive styles when the gap custom property is unavailable.
 	const width =
 		columns === 1
 			? '100%'
-			: `calc((100% - (var(--wp--style--unstable-gallery-gap, ${ FALLBACK_GAP }) * ${
+			: `calc((100% - (var(--wp--style--unstable-gallery-gap, 16px) * ${
 					columns - 1
 			  })) / ${ columns })`;
 
