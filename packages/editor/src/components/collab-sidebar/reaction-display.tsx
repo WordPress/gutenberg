@@ -297,7 +297,6 @@ function ReactionButton( {
 
 	return (
 		<Button
-			variant="secondary"
 			size="small"
 			className="editor-collab-sidebar-panel__reaction-button"
 			disabled={ disabled }
