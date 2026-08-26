@@ -4,6 +4,7 @@ import type {
 	SelectRootProps,
 	SelectTriggerProps,
 } from '../primitives/select/types';
+import type { ItemPopupWidthProps } from '../../utils/css/item-popup';
 
 export type SelectItem = {
 	label: string;
@@ -15,7 +16,8 @@ export type SelectControlProps = Omit<
 	SelectRootProps< SelectItem >,
 	'items' | 'inputRef'
 > &
-	ControlProps & {
+	ControlProps &
+	ItemPopupWidthProps & {
 		/**
 		 * CSS class to apply.
 		 */

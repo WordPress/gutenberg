@@ -21,6 +21,7 @@
 
 ### Enhancements
 
+-   `Autocomplete.Popup`, `Combobox.Popup`, `SearchableChipSelect`, `Select.Popup`, and `SelectControl`: Add `popupWidth` prop with preset width constraints for the item popup.
 -   `CollapsibleCard`: Support multiple `CollapsibleCard.HeaderDescription` components ([#81227](https://github.com/WordPress/gutenberg/pull/81227)).
 -   Add `TextareaControl` component ([#81359](https://github.com/WordPress/gutenberg/pull/81359)).
 -   Export shared keyboard shortcut presentation and accessibility utilities. ([#81826](https://github.com/WordPress/gutenberg/pull/81826))
