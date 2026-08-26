@@ -22,6 +22,7 @@
 		{ "path": "../../packages/icons/tsconfig.build.json" },
 		{ "path": "../../packages/notices/tsconfig.build.json" },
 		{ "path": "../../packages/preferences/tsconfig.build.json" },
+		{ "path": "../../packages/route" },
 		{ "path": "../../packages/ui/tsconfig.build.json" },
 		{ "path": "../../packages/viewport" },
 		{ "path": "../../packages/warning" },

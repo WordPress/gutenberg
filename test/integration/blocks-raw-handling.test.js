@@ -121,6 +121,26 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
+	it( 'should preserve spaces inside whitespace-only inline elements', () => {
+		const filtered = pasteHandler( {
+			HTML: 'The<em> </em>quick<span> </span>brown',
+			mode: 'INLINE',
+		} );
+
+		expect( filtered ).toBe( 'The quick brown' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should still remove empty inline elements', () => {
+		const filtered = pasteHandler( {
+			HTML: 'a<em></em>b',
+			mode: 'INLINE',
+		} );
+
+		expect( filtered ).toBe( 'ab' );
+		expect( console ).toHaveLogged();
+	} );
+
 	it( 'should ignore Google Docs UID tag', () => {
 		const filtered = pasteHandler( {
 			HTML: '<b id="docs-internal-guid-0"><em>test</em></b>',

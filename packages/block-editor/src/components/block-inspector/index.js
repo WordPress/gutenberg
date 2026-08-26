@@ -42,12 +42,12 @@ import {
 } from '../../hooks/block-style-state';
 
 function StyleInspectorSlots( {
-	blockName,
+	clientId,
 	showAdvancedControls = true,
 	showPositionControls = true,
 	showBindingsControls = true,
 } ) {
-	const borderPanelLabel = useBorderPanelLabel( { blockName } );
+	const borderPanelLabel = useBorderPanelLabel( { clientId } );
 	return (
 		<>
 			<InspectorControls.Slot />
@@ -97,7 +97,7 @@ function StyleStateInspectorSlots( {
 	isSectionBlock,
 	selectedBlockStyleState,
 } ) {
-	const borderPanelLabel = useBorderPanelLabel( { blockName } );
+	const borderPanelLabel = useBorderPanelLabel( { clientId } );
 	const showLayoutControls =
 		hasViewportBlockStyleState( selectedBlockStyleState ) &&
 		! hasPseudoBlockStyleState( selectedBlockStyleState );
@@ -298,7 +298,6 @@ function BlockInspector() {
 					<InspectorControlsTabs tabs={ availableTabs } />
 				) : (
 					<StyleInspectorSlots
-						blockName={ renderedBlockName }
 						showAdvancedControls={ false }
 						showPositionControls={ false }
 						showBindingsControls={ false }
@@ -501,7 +500,6 @@ const BlockInspectorSingleBlock = ( {
 			<BlockInspectorPreTabsSlot />
 			{ isEditingStyleState && (
 				<StyleStateInspectorSlots
-					blockName={ blockName }
 					clientId={ renderedBlockClientId }
 					contentClientIds={ contentClientIds }
 					isSectionBlock={ isSectionBlock }
@@ -530,7 +528,9 @@ const BlockInspectorSingleBlock = ( {
 					<InspectorControls.Slot group="list" ref={ listViewRef } />
 					<ListViewContentPopover listViewRef={ listViewRef } />
 					{ ! isSectionBlock && (
-						<StyleInspectorSlots blockName={ blockName } />
+						<StyleInspectorSlots
+							clientId={ renderedBlockClientId }
+						/>
 					) }
 				</>
 			) }

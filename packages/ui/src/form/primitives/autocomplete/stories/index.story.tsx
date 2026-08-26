@@ -181,6 +181,17 @@ export const AsyncItems: Story = {
  * The suggestion list can be rendered inline by enabling `inline` and `open`.
  */
 export const Inline: Story = {
+	parameters: {
+		// The input keeps focus and arrow keys move through the options, so
+		// the scrollable list is reachable by keyboard.
+		a11y: {
+			config: {
+				rules: [
+					{ id: 'scrollable-region-focusable', enabled: false },
+				],
+			},
+		},
+	},
 	args: {
 		items: COMMANDS,
 		inline: true,
@@ -522,6 +533,12 @@ function chunkItems< T >( items: T[], size: number ): T[][] {
  * Enable `grid` on `Autocomplete.Root` so the listbox uses grid navigation.
  */
 export const Grid: Story = {
+	parameters: {
+		// `role="grid"` disallows the `role="group"` children that Base UI
+		// renders (aria-required-children, aria-required-parent).
+		// TODO: Remove after updating to Base UI >= 1.8.0
+		a11y: { test: 'todo' },
+	},
 	args: {
 		items: EMOJI_GROUPS,
 		inline: true,

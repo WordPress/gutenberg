@@ -3,15 +3,10 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import {
-	Popover,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { Popover } from '@wordpress/components';
+import { ValidatedTextareaControl } from '@wordpress/ui';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
-import { unlock } from '../lock-unlock';
-
-const { ValidatedTextareaControl } = unlock( componentsPrivateApis );
 
 export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 	const { latex, mathML } = attributes;
@@ -78,14 +73,14 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 						<ValidatedTextareaControl
 							label={ __( 'LaTeX math syntax' ) }
 							hideLabelFromVision
-							value={ latex }
+							value={ latex ?? '' }
 							className="wp-block-math__textarea-control"
 							customValidity={
 								error
 									? { type: 'invalid', message: error }
 									: undefined
 							}
-							onChange={ ( newLatex ) => {
+							onValueChange={ ( newLatex ) => {
 								if ( ! latexToMathML ) {
 									setAttributes( { latex: newLatex } );
 									return;
