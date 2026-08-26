@@ -665,6 +665,10 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			'no parent'                    => array( 'none', 'heart', true, 'rest_comment_invalid_parent', 400 ),
 			'parent is a regular comment'  => array( 'comment', 'heart', true, 'rest_comment_invalid_parent', 400 ),
 			'content is not in emoji list' => array( 'note', 'invalid_emoji', true, 'rest_comment_invalid_reaction', 400 ),
+			// Hex storage keys are the full picker's format; this limited set
+			// cannot render them back, so the API must not accept them yet.
+			'hex codepoint key'            => array( 'note', '1f44d', true, 'rest_comment_invalid_reaction', 400 ),
+			'hex ZWJ sequence key'         => array( 'note', '1f468-200d-1f4bb', true, 'rest_comment_invalid_reaction', 400 ),
 			'anonymous user'               => array( 'none', 'heart', false, 'rest_comment_login_required', 401 ),
 		);
 	}
@@ -1001,5 +1005,250 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			get_post( $post_id )->comment_count,
 			'Only the regular comment should be counted; notes and reactions must be excluded.'
 		);
+	}
+
+	/**
+	 * Creates an approved reaction row directly, bypassing REST validation.
+	 *
+	 * @param int    $post_id Post the parent note belongs to.
+	 * @param int    $note_id Parent note comment ID.
+	 * @param int    $user_id Reacting user ID.
+	 * @param string $slug    Reaction storage slug.
+	 * @return int Reaction comment ID.
+	 */
+	protected function create_reaction( $post_id, $note_id, $user_id, $slug = 'heart' ) {
+		return wp_insert_comment(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_parent'   => $note_id,
+				'comment_type'     => 'reaction',
+				'comment_content'  => $slug,
+				'comment_approved' => 1,
+				'user_id'          => $user_id,
+			)
+		);
+	}
+
+	/**
+	 * Reactions are validated as a set on create and the generic update route
+	 * re-validates none of it, so updating one is not allowed at all.
+	 */
+	public function test_cannot_update_reaction() {
+		wp_set_current_user( self::$editor_id );
+		$post_id     = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$note_id     = $this->create_note( $post_id, self::$editor_id );
+		$reaction_id = $this->create_reaction( $post_id, $note_id, self::$editor_id );
+
+		wp_set_current_user( self::$editor_id );
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $reaction_id );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( array( 'content' => 'rocket' ) ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_comment_update_not_allowed', $response, 403 );
+		$this->assertSame( 'heart', get_comment( $reaction_id )->comment_content );
+	}
+
+	/**
+	 * The reactor's identity must not be reassignable through the update route.
+	 */
+	public function test_cannot_update_reaction_author() {
+		$post_id     = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$note_id     = $this->create_note( $post_id, self::$editor_id );
+		$reaction_id = $this->create_reaction( $post_id, $note_id, self::$author_id );
+
+		wp_set_current_user( self::$editor_id );
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $reaction_id );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( array( 'author' => self::$editor_id ) ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_comment_update_not_allowed', $response, 403 );
+		$this->assertSame( (string) self::$author_id, get_comment( $reaction_id )->user_id );
+	}
+
+	/**
+	 * A reaction must not be movable onto a note on a post the user cannot edit.
+	 */
+	public function test_cannot_move_reaction_to_note_on_other_post() {
+		$editable_post = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$other_post    = self::factory()->post->create( array( 'post_author' => self::$admin_id ) );
+		$note_id       = $this->create_note( $editable_post, self::$editor_id );
+		$other_note_id = $this->create_note( $other_post, self::$admin_id );
+		$reaction_id   = $this->create_reaction( $editable_post, $note_id, self::$editor_id );
+
+		wp_set_current_user( self::$editor_id );
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $reaction_id );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'parent' => $other_note_id,
+					'post'   => $other_post,
+				)
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_comment_update_not_allowed', $response, 403 );
+		$reaction = get_comment( $reaction_id );
+		$this->assertSame( (string) $note_id, $reaction->comment_parent );
+		$this->assertSame( (string) $editable_post, $reaction->comment_post_ID );
+	}
+
+	/**
+	 * Notes remain editable - only reactions are locked down.
+	 */
+	public function test_can_still_update_note() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+
+		wp_set_current_user( self::$editor_id );
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $note_id );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( array( 'content' => 'Edited note' ) ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status() );
+	}
+
+	/**
+	 * `wp_delete_comment()` reparents children rather than deleting them, so
+	 * without a cascade the reactions would outlive their note as orphan rows.
+	 */
+	public function test_permanently_deleting_note_deletes_its_reactions() {
+		wp_set_current_user( self::$editor_id );
+		$post_id     = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$note_id     = $this->create_note( $post_id, self::$editor_id );
+		$reaction_id = $this->create_reaction( $post_id, $note_id, self::$editor_id );
+		$other_id    = $this->create_reaction( $post_id, $note_id, self::$author_id, 'rocket' );
+
+		wp_delete_comment( $note_id, true );
+
+		$this->assertNull( get_comment( $reaction_id ), 'Reaction outlived its note.' );
+		$this->assertNull( get_comment( $other_id ), 'Reaction outlived its note.' );
+		$this->assertEmpty(
+			get_comments(
+				array(
+					'post_id' => $post_id,
+					'type'    => 'reaction',
+					'status'  => 'all',
+				)
+			),
+			'Reaction rows remained after permanent cleanup.'
+		);
+	}
+
+	/**
+	 * Deleting a reply must take that reply's own reactions with it.
+	 */
+	public function test_permanently_deleting_note_reply_deletes_its_reactions() {
+		wp_set_current_user( self::$editor_id );
+		$post_id  = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$note_id  = $this->create_note( $post_id, self::$editor_id );
+		$reply_id = wp_insert_comment(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_parent'   => $note_id,
+				'comment_type'     => 'note',
+				'comment_content'  => 'A reply',
+				'comment_approved' => 0,
+				'user_id'          => self::$editor_id,
+			)
+		);
+
+		$note_reaction_id  = $this->create_reaction( $post_id, $note_id, self::$editor_id );
+		$reply_reaction_id = $this->create_reaction( $post_id, $reply_id, self::$editor_id );
+
+		wp_delete_comment( $reply_id, true );
+
+		$this->assertNull( get_comment( $reply_reaction_id ), 'Reply reaction outlived its reply.' );
+		$this->assertNotNull( get_comment( $note_reaction_id ), 'Root note reaction should be untouched.' );
+	}
+
+	/**
+	 * Core cascades a trashed note to its `note` children only.
+	 */
+	public function test_trashing_note_trashes_and_restores_its_reactions() {
+		if ( ! EMPTY_TRASH_DAYS ) {
+			$this->markTestSkipped( 'Trash is disabled; trashing force-deletes.' );
+		}
+
+		wp_set_current_user( self::$editor_id );
+		$post_id     = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$note_id     = $this->create_note( $post_id, self::$editor_id );
+		$reaction_id = $this->create_reaction( $post_id, $note_id, self::$editor_id );
+
+		wp_trash_comment( $note_id );
+		$this->assertSame( 'trash', wp_get_comment_status( $reaction_id ), 'Reaction stayed approved under a trashed note.' );
+
+		wp_untrash_comment( $note_id );
+		$this->assertSame( 'approved', wp_get_comment_status( $reaction_id ), 'Reaction was not restored with its note.' );
+	}
+
+	/**
+	 * The cleanup in create_item() must repoint to the surviving row even when
+	 * a competing request has already deleted this request's own row - the
+	 * losing side of the same race the sibling test covers from the winner.
+	 */
+	public function test_concurrent_cleanup_deleting_own_row_still_returns_survivor() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+
+		$survivor_id = 0;
+		$deleted     = false;
+
+		// Stand in for the competing request's cleanup: it keeps the earliest
+		// row and deletes this request's later one, which lands first.
+		$race = function ( $comment_id, $comment ) use ( &$survivor_id, &$deleted ) {
+			if ( ! $deleted && 'reaction' === $comment->comment_type && (int) $comment_id !== $survivor_id ) {
+				$deleted = true;
+				wp_delete_comment( $comment_id, true );
+			}
+		};
+
+		// Insert the competing row after this request's pre-insert uniqueness
+		// check has passed, so it takes the earlier ID. Arm the cleanup only
+		// once that row exists, so its own insert does not trigger it.
+		$inject = function ( $prepared ) use ( $note_id, $post_id, $race, &$survivor_id ) {
+			if ( ! $survivor_id && isset( $prepared['comment_type'] ) && 'reaction' === $prepared['comment_type'] ) {
+				$survivor_id = wp_insert_comment(
+					array(
+						'comment_post_ID'  => $post_id,
+						'comment_parent'   => $note_id,
+						'comment_type'     => 'reaction',
+						'comment_content'  => 'heart',
+						'comment_approved' => 1,
+						'user_id'          => self::$editor_id,
+					)
+				);
+				add_action( 'wp_insert_comment', $race, 10, 2 );
+			}
+			return $prepared;
+		};
+		add_filter( 'rest_pre_insert_comment', $inject );
+
+		try {
+			$params  = array(
+				'post'    => $post_id,
+				'type'    => 'reaction',
+				'parent'  => $note_id,
+				'content' => 'heart',
+				'author'  => self::$editor_id,
+			);
+			$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+			$request->add_header( 'Content-Type', 'application/json' );
+			$request->set_body( wp_json_encode( $params ) );
+			$response = rest_get_server()->dispatch( $request );
+		} finally {
+			remove_filter( 'rest_pre_insert_comment', $inject );
+			remove_action( 'wp_insert_comment', $race, 10 );
+		}
+
+		$this->assertTrue( $deleted, 'The race injection did not delete this request\'s row.' );
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertSame( $survivor_id, $response->get_data()['id'], 'Response did not repoint to the surviving row.' );
 	}
 }

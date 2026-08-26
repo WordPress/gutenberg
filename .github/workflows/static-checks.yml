@@ -115,7 +115,15 @@ jobs:
                   npm run lint:css:update-suppressions
 
             - name: Type checking
+              run: npm run typecheck
+
+            - name: Build packages
               run: npm run build
+
+            - name: Check type declaration files
+              # Runs against the final package output, including the built
+              # declarations and runtime files.
+              run: npm run check:type-declarations
 
             - name: Validate package contents
               run: npm run lint:package-contents

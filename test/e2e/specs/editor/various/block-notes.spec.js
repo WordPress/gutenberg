@@ -1220,19 +1220,74 @@ test.describe( 'Block Notes', () => {
 			await expect( emojiPicker ).toBeVisible();
 
 			// `.components-popover__content` is `width: min-content`,
-			// which used to squeeze the wrapping listbox into a single
-			// column one emoji wide.
+			// which used to squeeze the wrapping button group into a
+			// single column one emoji wide.
 			const box = await emojiPicker.boundingBox();
 			expect( box.width ).toBeGreaterThan( box.height );
 
 			// The roving tab index moves on both axes, so the picker is
 			// navigable however the emoji set happens to wrap.
-			const options = emojiPicker.getByRole( 'option' );
-			await options.first().focus();
+			const buttons = emojiPicker.getByRole( 'button' );
+			await buttons.first().focus();
 			await page.keyboard.press( 'ArrowDown' );
-			await expect( options.nth( 1 ) ).toBeFocused();
+			await expect( buttons.nth( 1 ) ).toBeFocused();
 			await page.keyboard.press( 'ArrowUp' );
-			await expect( options.first() ).toBeFocused();
+			await expect( buttons.first() ).toBeFocused();
+		} );
+
+		test( 'resolving a thread locks its reactions', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing resolved reactions' },
+				comment: 'Test comment for resolved reactions',
+			} );
+
+			// The floating overlay hides a resolved thread, so drive this
+			// through the sidebar where it stays reachable.
+			await blockNoteUtils.openBlockNoteSidebar();
+			const sidebar = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			const thread = sidebar.getByRole( 'treeitem', {
+				name: 'Note: Test comment for resolved reactions',
+			} );
+			await thread.click();
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+
+			await blockNoteUtils.addReactionToComment( 'Heart' );
+			const reactionPill = sidebar.getByRole( 'button', {
+				name: /Heart/,
+			} );
+			await expect( reactionPill ).toBeVisible();
+
+			// Resolving posts a "Marked as resolved" reply that carries its
+			// own add trigger, so the root note's is the first of the two.
+			const addReaction = sidebar
+				.getByRole( 'button', { name: 'Add reaction' } )
+				.first();
+			const resolveButton = sidebar.getByRole( 'button', {
+				name: 'Resolve',
+			} );
+
+			// Resolving collapses the thread, so re-select it to reach the
+			// reaction controls again.
+			await resolveButton.click();
+			await thread.click();
+			await expect( resolveButton ).toBeDisabled();
+
+			// A resolved thread is an archived conversation, so neither the
+			// add trigger nor the existing pill may still mutate reactions.
+			await expect( addReaction ).toBeDisabled();
+			await expect( reactionPill ).toBeDisabled();
+
+			// Reopening the thread unlocks them again.
+			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Reopen' );
+			await expect( resolveButton ).toBeEnabled();
+			await expect( addReaction ).toBeEnabled();
+			await expect( reactionPill ).toBeEnabled();
 		} );
 
 		test( 'can add multiple different reactions to same note', async ( {

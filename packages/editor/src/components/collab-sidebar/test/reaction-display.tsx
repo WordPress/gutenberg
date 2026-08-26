@@ -7,6 +7,8 @@ import ReactionDisplay, { invalidateReactionNames } from '../reaction-display';
 
 jest.mock( '@wordpress/api-fetch', () => jest.fn() );
 
+const mockApiFetch = jest.mocked( apiFetch );
+
 /*
  * The tooltip name cache in reaction-display.js is module-level and keyed
  * by `noteId:slug`, so each test uses a distinct noteId to stay isolated.
@@ -16,10 +18,10 @@ let uniqueNoteId = 1;
 describe( 'ReactionDisplay', () => {
 	beforeEach( () => {
 		uniqueNoteId += 1;
-		apiFetch.mockReset();
+		mockApiFetch.mockReset();
 		// Reject by default so tests that never await a tooltip fetch
 		// fall back to the count-based label instead of hanging.
-		apiFetch.mockRejectedValue( new Error( 'not mocked' ) );
+		mockApiFetch.mockRejectedValue( new Error( 'not mocked' ) );
 	} );
 
 	it( 'renders nothing when there are no reactions', () => {
@@ -205,7 +207,7 @@ describe( 'ReactionDisplay', () => {
 
 	it( 'lazy-loads reacting user names into the label on hover', async () => {
 		const user = userEvent.setup();
-		apiFetch.mockResolvedValue( [
+		mockApiFetch.mockResolvedValue( [
 			{ author_name: 'Alice', content: { raw: 'heart' } },
 			// A different emoji on the same note must be filtered out.
 			{ author_name: 'Mallory', content: { raw: 'rocket' } },
@@ -308,7 +310,7 @@ describe( 'ReactionDisplay', () => {
 
 	it( 'formats two and three-plus reactor names GitHub-style', async () => {
 		const user = userEvent.setup();
-		apiFetch.mockResolvedValue( [
+		mockApiFetch.mockResolvedValue( [
 			{ author_name: 'Alice', content: { raw: 'heart' } },
 			{ author_name: 'Bob', content: { raw: 'heart' } },
 			{ author_name: 'Carol', content: { raw: 'heart' } },
@@ -425,9 +427,100 @@ describe( 'ReactionDisplay', () => {
 		}
 	} );
 
+	it( 'walks every page of reactions before naming reactors', async () => {
+		const user = userEvent.setup();
+		// A full first page forces a second request; the target slug's
+		// reactor only appears on that second page.
+		const firstPage = Array.from( { length: 100 }, ( _, i ) => ( {
+			author_name: `Rocketeer ${ i }`,
+			content: { raw: 'rocket' },
+		} ) );
+		mockApiFetch
+			.mockResolvedValueOnce( firstPage )
+			.mockResolvedValueOnce( [
+				{ author_name: 'Alice', content: { raw: 'heart' } },
+			] );
+		render(
+			<ReactionDisplay
+				noteId={ uniqueNoteId }
+				reactions={ {
+					heart: { count: 1, reacted: true, my_reaction_id: 7 },
+				} }
+				onToggleReaction={ () => {} }
+			/>
+		);
+
+		await user.hover(
+			screen.getByRole( 'button', { name: 'Heart, 1 reaction' } )
+		);
+
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Alice reacted with Heart emoji',
+				} )
+			).toBeVisible()
+		);
+		expect( apiFetch ).toHaveBeenCalledTimes( 2 );
+	} );
+
+	it( 'keeps the count-based label when the reaction walk is truncated', async () => {
+		const user = userEvent.setup();
+		// Every page comes back full, so the walk hits its page cap without
+		// ever seeing the end of the list. A partial name list would read as
+		// complete, so the count-based label has to stand.
+		mockApiFetch.mockResolvedValue(
+			Array.from( { length: 100 }, () => ( {
+				author_name: 'Alice',
+				content: { raw: 'heart' },
+			} ) )
+		);
+		render(
+			<ReactionDisplay
+				noteId={ uniqueNoteId }
+				reactions={ {
+					heart: { count: 1200, reacted: true, my_reaction_id: 7 },
+				} }
+				onToggleReaction={ () => {} }
+			/>
+		);
+
+		await user.hover(
+			screen.getByRole( 'button', { name: 'Heart, 1200 reactions' } )
+		);
+
+		await waitFor( () => expect( apiFetch ).toHaveBeenCalledTimes( 10 ) );
+		expect(
+			screen.getByRole( 'button', { name: 'Heart, 1200 reactions' } )
+		).toBeVisible();
+	} );
+
+	it( 'leaves pills focusable but inert on a resolved thread', async () => {
+		const user = userEvent.setup();
+		const onToggleReaction = jest.fn();
+		render(
+			<ReactionDisplay
+				noteId={ uniqueNoteId }
+				reactions={ {
+					heart: { count: 1, reacted: true, my_reaction_id: 7 },
+				} }
+				disabled
+				onToggleReaction={ onToggleReaction }
+			/>
+		);
+
+		const pill = screen.getByRole( 'button', {
+			name: 'Heart, 1 reaction',
+		} );
+		expect( pill ).toHaveAttribute( 'aria-disabled', 'true' );
+
+		await user.click( pill );
+		expect( onToggleReaction ).not.toHaveBeenCalled();
+	} );
+
 	it( 'keeps the count-based label when the names fetch fails', async () => {
 		const user = userEvent.setup();
-		apiFetch.mockRejectedValue( new Error( 'network down' ) );
+		mockApiFetch.mockRejectedValue( new Error( 'network down' ) );
 		render(
 			<ReactionDisplay
 				noteId={ uniqueNoteId }

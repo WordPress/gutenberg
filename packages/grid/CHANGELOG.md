@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 0.6.0 (2026-08-26)
+
+### Internal
+
+-   Rename CSS module class names to kebab-case to satisfy `selector-class-pattern`. ([#82053](https://github.com/WordPress/gutenberg/pull/82053))
+-   Point tsconfig references at split dependencies' build projects. ([#81514](https://github.com/WordPress/gutenberg/pull/81514), [#81518](https://github.com/WordPress/gutenberg/pull/81518))
+-   Split tsconfig into a build project and a default dev project; story and test declarations are no longer published to npm. ([#81509](https://github.com/WordPress/gutenberg/pull/81509))
+
+## 0.5.0 (2026-08-12)
+
 ### Internal
 
 -   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))

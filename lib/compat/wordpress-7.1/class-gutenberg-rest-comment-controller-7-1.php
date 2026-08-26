@@ -242,6 +242,38 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 		return parent::check_read_permission( $comment, $request );
 	}
 
+	/**
+	 * Checks if a given request has access to update a comment.
+	 *
+	 * Reactions are immutable: they carry an author, a parent note and a
+	 * canonical emoji slug that `create_item()` validates as a set, and the
+	 * generic update route re-validates none of it. Allowing updates would
+	 * let anyone who can edit the note's post reattribute a reaction to
+	 * another user, move it to a note on a post they cannot edit, or store a
+	 * duplicate or invalid slug. Toggling a reaction off is a delete.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has access to update the item, error object otherwise.
+	 */
+	public function update_item_permissions_check( $request ) {
+		$comment = $this->get_comment( $request['id'] );
+		if ( is_wp_error( $comment ) ) {
+			return $comment;
+		}
+
+		if ( 'reaction' === $comment->comment_type ) {
+			return new WP_Error(
+				'rest_comment_update_not_allowed',
+				__( 'Reactions cannot be edited. Remove the reaction and add a new one instead.', 'gutenberg' ),
+				array( 'status' => 403 )
+			);
+		}
+
+		return parent::update_item_permissions_check( $request );
+	}
+
 	public function create_item_permissions_check( $request ) {
 		$is_note = ! empty( $request['type'] ) && $this->is_note_or_reaction( $request['type'] );
 
@@ -438,37 +470,17 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 				);
 			}
 
-			// Validate the reaction content. We accept either:
-			// - a curated slug (e.g. "heart"), or
-			// - a lowercase hex-codepoint sequence joined by `-` (e.g.
-			//   "1f44d" for 👍 or "1f468-200d-1f4bb" for 👨‍💻).
-			// Raw emoji bytes are rejected because the comments table is
-			// not guaranteed to be utf8mb4 across all WordPress installs;
-			// clients normalize before submitting.
+			// Validate the reaction content against the allowed emoji list
+			// (filterable via `gutenberg_note_reaction_emojis`). Only a slug
+			// from that list is accepted: it is the one value the picker can
+			// render back as an emoji and label. Raw emoji bytes are rejected
+			// because the comments table is not guaranteed to be utf8mb4
+			// across all WordPress installs; clients submit the slug instead.
 			$emojis      = gutenberg_get_note_reaction_emojis();
 			$valid_slugs = wp_list_pluck( $emojis, 'value' );
 			$emoji_slug  = isset( $request['content'] ) ? wp_strip_all_tags( $request['content'] ) : '';
 
-			$is_curated_slug = in_array( $emoji_slug, $valid_slugs, true );
-			$is_hex_key      = (bool) preg_match(
-				'/^[0-9a-f]{2,6}(-[0-9a-f]{2,6}){0,15}$/',
-				$emoji_slug
-			);
-
-			// A hex-shaped slug must still be made of assignable Unicode code
-			// points: reject anything above U+10FFFF or in the UTF-16 surrogate
-			// range (U+D800–U+DFFF).
-			if ( $is_hex_key ) {
-				foreach ( explode( '-', $emoji_slug ) as $codepoint ) {
-					$value = hexdec( $codepoint );
-					if ( $value > 0x10FFFF || ( $value >= 0xD800 && $value <= 0xDFFF ) ) {
-						$is_hex_key = false;
-						break;
-					}
-				}
-			}
-
-			if ( ! $is_curated_slug && ! $is_hex_key ) {
+			if ( ! in_array( $emoji_slug, $valid_slugs, true ) ) {
 				return new WP_Error(
 					'rest_comment_invalid_reaction',
 					__( 'Invalid reaction emoji.', 'gutenberg' ),
@@ -656,7 +668,11 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 				}
 			}
 
-			if ( count( $duplicates ) > 1 ) {
+			// Repoint whenever any matching row survives, not only when this
+			// request still sees its own duplicate: a competing request may
+			// already have deleted this request's row, leaving a single
+			// survivor that is not `$comment_id`.
+			if ( ! empty( $duplicates ) ) {
 				$survivor_id = array_shift( $duplicates );
 				foreach ( $duplicates as $duplicate_id ) {
 					wp_delete_comment( $duplicate_id, true );

@@ -13,9 +13,16 @@ When changing test ownership:
 
 -   Add individual tests to `vitest.files`, or use `vitest.directories` when an
     entire directory can move as one independently revertible unit.
+-   Vitest tests run in Node by default. Name tests `*.jsdom.test.*` to opt into
+    JSDOM or `*.browser.test.*` to opt into Browser Mode.
+-   Before running Browser Mode tests locally for the first time, install
+    Chromium with
+    `npm exec --workspace @wordpress/unit-tests -- playwright install chromium`.
 -   New Jest tests require no migration metadata; runner discovery picks them up
     automatically.
--   Run `npm run test:unit:routing` together with both active runner partitions.
+-   Run `npm test` for the complete lint and unit-test suite. For focused
+    migration validation, run `npm run test:unit:routing`, `npm run test:unit`,
+    and `npm run test:unit:vitest` together.
 
 The routing validator fails when a test is missing, owned by both runners, or
 not assigned to the expected Vitest migration entry. It also rejects invalid
