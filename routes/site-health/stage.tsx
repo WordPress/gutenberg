@@ -5,6 +5,7 @@ import type { Field, View } from '@wordpress/dataviews';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { Fragment, useEffect, useMemo, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
+import { useSearch } from '@wordpress/route';
 import { Badge, Stack, Text } from '@wordpress/ui';
 import type { ComponentProps } from 'react';
 
@@ -70,6 +71,19 @@ function isHealthCheckStatus( value: unknown ): value is HealthCheckStatus {
 	return (
 		typeof value === 'string' &&
 		( STATUSES as readonly string[] ).includes( value )
+	);
+}
+
+/* The `status` search param seeds the status filter: a comma-separated
+   list, unknown values dropped. The site-health widget links here with the
+   statuses that have items. */
+function statusesFromSearch( value: unknown ): HealthCheckStatus[] {
+	if ( typeof value !== 'string' ) {
+		return [];
+	}
+
+	return Array.from(
+		new Set( value.split( ',' ).filter( isHealthCheckStatus ) )
 	);
 }
 
@@ -147,11 +161,27 @@ const DEFAULT_VIEW: View = {
 	sort: { field: 'status', direction: 'asc' },
 };
 
+function initialView( statuses: HealthCheckStatus[] ): View {
+	if ( statuses.length === 0 ) {
+		return DEFAULT_VIEW;
+	}
+
+	return {
+		...DEFAULT_VIEW,
+		filters: [ { field: 'status', operator: 'isAny', value: statuses } ],
+	};
+}
+
 function SiteHealthPage() {
+	const search = useSearch( { from: '/site-health' } ) as {
+		status?: unknown;
+	};
 	const [ checks, setChecks ] = useState< HealthCheck[] | null >( null );
 	const [ unavailable, setUnavailable ] = useState( 0 );
 	const [ errorMessage, setErrorMessage ] = useState< string | null >( null );
-	const [ view, setView ] = useState< View >( DEFAULT_VIEW );
+	const [ view, setView ] = useState< View >( () =>
+		initialView( statusesFromSearch( search.status ) )
+	);
 
 	useEffect( () => {
 		let cancelled = false;
@@ -211,6 +241,7 @@ function SiteHealthPage() {
 				id: 'status',
 				label: __( 'Status' ),
 				elements: STATUS_ELEMENTS,
+				filterBy: { operators: [ 'isAny', 'isNone' ] },
 				render: ( { item }: { item: HealthCheck } ) => (
 					<Badge intent={ STATUS_INTENTS[ item.status ] }>
 						{ STATUS_LABELS[ item.status ] }
