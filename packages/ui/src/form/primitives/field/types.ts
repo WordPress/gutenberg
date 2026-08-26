@@ -87,3 +87,25 @@ export type FieldDetailsProps = ComponentProps< 'div' > & {
 	 */
 	children?: React.ReactNode;
 };
+
+export type FieldVisualLabelProps = ComponentProps< 'span' > & {
+	/**
+	 * The visual label content.
+	 */
+	children?: React.ReactNode;
+	/**
+	 * The visual variant of the label.
+	 *
+	 * Use 'plain' for controls like checkboxes and radio buttons.
+	 *
+	 * @default 'default'
+	 */
+	variant?: 'default' | 'plain';
+};
+
+export type FieldVisualDescriptionProps = ComponentProps< 'p' > & {
+	/**
+	 * The visual description content.
+	 */
+	children?: React.ReactNode;
+};

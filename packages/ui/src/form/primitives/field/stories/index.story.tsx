@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useId } from '@wordpress/element';
+import { Button } from '../../../../button';
 import * as Field from '../';
 import { DETAILS_EXAMPLE } from '../../../stories/shared';
 
@@ -13,6 +14,8 @@ const meta: Meta< typeof Field.Root > = {
 		'Field.Control': Field.Control,
 		'Field.Description': Field.Description,
 		'Field.Details': Field.Details,
+		'Field.VisualLabel': Field.VisualLabel,
+		'Field.VisualDescription': Field.VisualDescription,
 	},
 	parameters: {
 		componentStatus: {
@@ -149,4 +152,24 @@ export const WithDetails: StoryObj< typeof Field.Root > = {
 			<Field.Details key="details">{ DETAILS_EXAMPLE }</Field.Details>,
 		],
 	},
+};
+
+/**
+ * `Field.VisualLabel` renders a purely visual label with the same styling as
+ * `Field.Label`. Use it outside `Field.Root` when the control is already
+ * accessibly labeled, but a visual label is still needed for layout
+ * consistency.
+ */
+export const WithVisualLabel: StoryObj = {
+	render: () => (
+		<>
+			<Field.VisualLabel>Author</Field.VisualLabel>
+			<Button aria-label="Select an author" variant="secondary">
+				Select an author
+			</Button>
+			<Field.VisualDescription>
+				This button is already accessibly labeled.
+			</Field.VisualDescription>
+		</>
+	),
 };

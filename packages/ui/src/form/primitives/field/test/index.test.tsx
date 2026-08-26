@@ -78,4 +78,42 @@ describe( 'Field', () => {
 
 		expect( screen.getByRole( 'link', { name: 'Details' } ) ).toBeVisible();
 	} );
+
+	it( 'forwards ref on visual subcomponents', () => {
+		const visualLabelRef = createRef< HTMLSpanElement >();
+		const visualDescriptionRef = createRef< HTMLParagraphElement >();
+
+		render(
+			<>
+				<Field.VisualLabel ref={ visualLabelRef }>
+					Visual label
+				</Field.VisualLabel>
+				<Field.VisualDescription ref={ visualDescriptionRef }>
+					Visual description
+				</Field.VisualDescription>
+			</>
+		);
+
+		expect( visualLabelRef.current ).toBeInstanceOf( HTMLSpanElement );
+		expect( visualDescriptionRef.current ).toBeInstanceOf(
+			HTMLParagraphElement
+		);
+	} );
+
+	it( 'does not associate visual subcomponents with controls', () => {
+		render(
+			<>
+				<Field.VisualLabel>Visual label</Field.VisualLabel>
+				<Field.VisualDescription>
+					Visual description
+				</Field.VisualDescription>
+				<input aria-label="Control label" />
+			</>
+		);
+
+		expect(
+			screen.getByRole( 'textbox', { name: 'Control label' } )
+		).not.toHaveAccessibleDescription( 'Visual description' );
+		expect( screen.queryByText( 'Visual label' )?.tagName ).toBe( 'SPAN' );
+	} );
 } );

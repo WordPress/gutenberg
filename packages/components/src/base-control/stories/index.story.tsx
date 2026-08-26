@@ -21,7 +21,7 @@ const meta: Meta< typeof BaseControl > = {
 		componentStatus: {
 			status: 'recommended',
 			whereUsed: 'global',
-			notes: '`BaseControl.VisualLabel` can continue to be used for now. To add labels and descriptions semantically, use [`Field`](?path=/docs/design-system-components-form-primitives-field--docs) in `@wordpress/ui`.',
+			notes: '`BaseControl.VisualLabel` can continue to be used for now. To add labels and descriptions semantically, use [`Field`](?path=/docs/design-system-components-form-primitives-field--docs) in `@wordpress/ui`. For purely visual labels outside `Field.Root`, use `Field.VisualLabel`.',
 		},
 	},
 };
