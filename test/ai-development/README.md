@@ -40,7 +40,7 @@ Promptfoo runs the prompt × provider × test × repeat matrix. Its standard lif
       afterEach: delete workspace
 ```
 
-A plain run measures your working tree, uncommitted edits included. Untracked files are the exception: a new file has to be added before it appears. You can also run an eval against a specific commit or a comparison with HEAD.
+A run measures your working tree, uncommitted edits included. Untracked files are the exception: a new file has to be added before it appears.
 
 The subject workspace excludes `test/ai-development/`, and the sandbox denies this checkout, so the agent can reach neither copy of the assertions it is being graded against.
 
@@ -52,6 +52,16 @@ Promptfoo's built-in trajectory assertions deterministically check tool calls, i
 
 ## Setup
 
+This package is deliberately not one of the root workspaces: Promptfoo's
+dependency tree is large and only needed by people running evals, so it keeps
+its own lockfile and install step.
+
+It also needs a newer Node than the repository — see `.nvmrc`.
+
+```bash
+cd test/ai-development && nvm use && npm install
+```
+
 Claude can use an existing Claude Code login or `ANTHROPIC_API_KEY`. Model calls consume the associated quota or paid usage.
 
 ## Run
@@ -60,7 +70,7 @@ Run from the repository root:
 
 ```bash
 # Validate configuration without model calls.
-npm --workspace @wordpress/agent-skill-evals run validate
+npm --prefix test/ai-development run validate
 
 # Run every spec, each on its own.
 npm run test:agent-evals
@@ -72,7 +82,7 @@ npm run test:agent-evals -- --config specs/SPEC_GROUP/TEST_NAME.eval.js
 npm run test:agent-evals -- --repeat 3
 
 # Open the local results viewer.
-npm --workspace @wordpress/agent-skill-evals run view
+npm --prefix test/ai-development run view
 ```
 
 Results under `results/` are gitignored and may contain source code and tool output.
