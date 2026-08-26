@@ -11,6 +11,7 @@
  * into the standard per-field `Field` properties that DataViews recognizes.
  */
 import type { Field, FieldTypeName } from '@wordpress/dataviews';
+import { claimInstance } from '../instance-guard';
 
 /**
  * One or two lowercase kebab-case segments, each starting with a letter,
@@ -65,6 +66,8 @@ export type ResolvableField< Item = unknown > = Omit<
 };
 
 const fieldTypes = new Map< string, FieldTypeDefinition< any > >();
+
+claimInstance();
 
 /**
  * Registers a field type.

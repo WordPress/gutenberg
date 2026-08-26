@@ -6,6 +6,7 @@
  * `useWidgetTypes` invokes it while assembling each `WidgetType`.
  */
 import type { WidgetIcon, WidgetIconReference } from '../types';
+import { claimInstance } from '../instance-guard';
 
 /**
  * Resolves an icon reference into a renderable icon, or `null` when the
@@ -16,6 +17,8 @@ export type WidgetIconResolver = (
 ) => Promise< WidgetIcon | null >;
 
 let iconResolver: WidgetIconResolver | undefined;
+
+claimInstance();
 
 /**
  * Registers the icon resolver. First registration wins.
