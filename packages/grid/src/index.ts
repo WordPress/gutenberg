@@ -12,6 +12,7 @@ export type {
 export type {
 	DragPreviewRenderProps,
 	GridItemLimits,
+	GridItemWidthLimits,
 	GridOverlayRenderProps,
 	ResizeDelta,
 	ResizeHandleRenderProps,

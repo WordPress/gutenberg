@@ -1,6 +1,6 @@
 import type {
 	DragPreviewRenderProps,
-	GridItemLimits,
+	GridItemWidthLimits,
 	GridOverlayRenderProps,
 	ResizeHandleRenderProps,
 } from '../shared/types';
@@ -173,8 +173,8 @@ export interface DashboardLanesProps
 	minColumnWidth?: number;
 
 	/**
-	 * Per-item width limits in pixels, keyed by layout item key. Height
-	 * limits are ignored; lane heights are content-driven.
+	 * Per-item width limits in pixels, keyed by layout item key. Lane
+	 * heights are content-driven, so there is no height axis.
 	 */
-	itemLimits?: Record< string, GridItemLimits >;
+	itemLimits?: Record< string, GridItemWidthLimits >;
 }

@@ -311,7 +311,7 @@ items flow around them; out-of-range values (negative, or beyond
 | `minColumnWidth`     | `number`                                   | —       | If set, enables responsive mode: lane count derived from container width. Mutually exclusive with `columns`.                                                                                            |
 | `flowTolerance`      | `number`                                   | `16`    | Pixel tolerance for source-order tiebreaking when two candidate lanes have similar baselines. Larger values keep tiles closer to reading order at the cost of bigger empty regions.                     |
 | `rowUnit`            | `number`                                   | `4`     | Snap unit for the polyfill's `grid-row-start` math. Smaller values produce sharper placement at the cost of a larger implicit row count. Ignored on browsers with native `display: grid-lanes` support. |
-| `itemLimits`         | `Record< string, GridItemLimits >`         | —       | Per-item minimum and maximum tile widths in pixels, keyed by layout item key. Height limits are ignored. See [Size limits](#size-limits).                                                               |
+| `itemLimits`         | `Record< string, GridItemWidthLimits >`    | —       | Per-item minimum and maximum tile widths in pixels, keyed by layout item key. See [Size limits](#size-limits).                                                                                          |
 | `editMode`           | `boolean`                                  | `false` | Enables drag-to-reorder and horizontal resize.                                                                                                                                                          |
 | `onChangeLayout`     | `( layout ) => void`                       | —       | Fired when the user commits a drag or resize.                                                                                                                                                           |
 | `onPreviewLayout`    | `( layout ) => void`                       | —       | Fired continuously during a drag or resize.                                                                                                                                                             |
@@ -409,7 +409,7 @@ every other tile keeps its stored span, even while it renders bounded.
 `'full'` and `'fill'` widths respect a maximum: `'full'` renders at the
 capped span and places like a fixed item of that width, and `'fill'`
 reserves at least its minimum and never exceeds its maximum.
-`DashboardLanes` applies the width axis only; heights there are
+`DashboardLanes` takes `GridItemWidthLimits`: lane heights are
 content-driven.
 
 ### Accessibility
