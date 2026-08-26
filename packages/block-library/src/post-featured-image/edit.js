@@ -269,7 +269,10 @@ export default function PostFeaturedImageEdit( {
 					hasSelectedStyleState={ hasSelectedStyleState }
 				/>
 			</InspectorControls>
-			{ ( featuredImage || isDescendentOfQueryLoop || ! postId ) && (
+			{ ( featuredImage ||
+				isDescendentOfQueryLoop ||
+				! postId ||
+				! storedFeaturedImage ) && (
 				<InspectorControls>
 					<ToolsPanel
 						label={ __( 'Settings' ) }
@@ -279,6 +282,7 @@ export default function PostFeaturedImageEdit( {
 								linkTarget: '_self',
 								rel: '',
 								sizeSlug: DEFAULT_MEDIA_SIZE_SLUG,
+								useFirstImageFromPost: false,
 							} );
 						} }
 						dropdownMenuProps={ dropdownMenuProps }
@@ -372,6 +376,36 @@ export default function PostFeaturedImageEdit( {
 									setAttributes( { sizeSlug: nextSizeSlug } )
 								}
 							/>
+						) }
+						{ isDescendentOfQueryLoop && ! storedFeaturedImage && (
+							<ToolsPanelItem
+								label={ __(
+									'Feature the first image'
+								) }
+								isShownByDefault
+								hasValue={ () => !! useFirstImageFromPost }
+								onDeselect={ () =>
+									setAttributes( {
+										useFirstImageFromPost: false,
+									} )
+								}
+							>
+								<ToggleControl
+									label={ __(
+										'Feature the first image'
+									) }
+									help={ __(
+										'Use the first image in the post content as the featured image.'
+									) }
+									onChange={ () =>
+										setAttributes( {
+											useFirstImageFromPost:
+												! useFirstImageFromPost,
+										} )
+									}
+									checked={ useFirstImageFromPost }
+								/>
+							</ToolsPanelItem>
 						) }
 					</ToolsPanel>
 				</InspectorControls>
