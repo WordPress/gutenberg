@@ -7,6 +7,20 @@ import getMediaIdsInBlocks from './media-ids-in-blocks';
 const { invalidateAttachmentResolutions } = unlock( mediaUtilsPrivateApis );
 
 /**
+ * Reports a failure without interpolating it.
+ *
+ * Silent to the user is the design; silent to whoever is debugging it is not.
+ * A rejected `apiFetch` is not reliably an `Error` - a REST error arrives as a
+ * plain `{ code, message }` - so `${ reason }` would print "[object Object]".
+ *
+ * @param {*} reason Whatever the rejection carried.
+ */
+function warnAttachFailed( reason ) {
+	// eslint-disable-next-line no-console
+	console.warn( 'Could not attach media to the post.', reason );
+}
+
+/**
  * Attaches the media a post displays to that post, if it belongs to no post yet.
  *
  * Uploading a file into a post has always parented that attachment to the post;
@@ -30,6 +44,26 @@ const { invalidateAttachmentResolutions } = unlock( mediaUtilsPrivateApis );
  * @param {string} postType Type of the post that was saved.
  */
 export default async function attachMediaInPost( registry, postId, postType ) {
+	try {
+		await attach( registry, postId, postType );
+	} catch ( error ) {
+		// The two lookups in `attach` can reject on their own — `context=edit`
+		// on the media collection is a 403 for a contributor — and the caller
+		// neither awaits this nor attaches a handler, so without this catch a
+		// rejection would surface as an unhandled one.
+		warnAttachFailed( error );
+	}
+}
+
+/**
+ * The work, split out so the entry point above can be the only thing that has
+ * to be careful about rejections.
+ *
+ * @param {Object} registry A `@wordpress/data` registry.
+ * @param {number} postId   ID of the post that was saved.
+ * @param {string} postType Type of the post that was saved.
+ */
+async function attach( registry, postId, postType ) {
 	const mediaIds = getMediaIdsInBlocks(
 		registry.select( blockEditorStore ).getBlocks()
 	);
@@ -75,8 +109,7 @@ export default async function attachMediaInPost( registry, postId, postType ) {
 	const { saveEntityRecord } = registry.dispatch( coreStore );
 
 	// `allSettled` so one file the user turns out not to be able to edit doesn't
-	// strand the rest. Failures stay quiet: nothing was promised, and a file that
-	// fails to attach is left exactly as it already was.
+	// strand the rest, and so a rejection cannot escape this function.
 	const results = await Promise.allSettled(
 		unattached.map( ( item ) =>
 			saveEntityRecord( 'postType', 'attachment', {
@@ -86,18 +119,11 @@ export default async function attachMediaInPost( registry, postId, postType ) {
 		)
 	);
 
-	// Silent to the user, but not to whoever is debugging this. The likeliest
-	// failure is a 403: attaching writes to the attachment, so a contributor
-	// using someone else's media cannot do it. Never interpolate the reason - a
-	// rejected `apiFetch` is not reliably an `Error`, so `${ reason }` can print
-	// "[object Object]".
+	// The likeliest failure is a 403: attaching writes to the attachment, so a
+	// contributor using someone else's media cannot do it.
 	results.forEach( ( result ) => {
 		if ( result.status === 'rejected' ) {
-			// eslint-disable-next-line no-console
-			console.warn(
-				'Could not attach media to the post.',
-				result.reason
-			);
+			warnAttachFailed( result.reason );
 		}
 	} );
 

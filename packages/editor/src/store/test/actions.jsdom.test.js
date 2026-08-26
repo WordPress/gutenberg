@@ -413,6 +413,7 @@ describe( 'Post actions', () => {
 		 * @param {string[]} requests Collects `METHOD path` for every call.
 		 */
 		function setFetchHandler( requests ) {
+			attachedTo = undefined;
 			apiFetch.setFetchHandler( async ( options ) => {
 				const method = getMethod( options );
 				const { path, data } = options;
@@ -422,6 +423,7 @@ describe( 'Post actions', () => {
 					return { ...imagePost, status: 'trash' };
 				}
 				if ( method === 'PUT' && path.startsWith( '/wp/v2/media/' ) ) {
+					attachedTo = data.post;
 					return { id: 12, post: data.post };
 				}
 				if ( method === 'GET' && path.startsWith( '/wp/v2/media' ) ) {
@@ -467,6 +469,9 @@ describe( 'Post actions', () => {
 			requests.some( ( request ) =>
 				request.startsWith( 'PUT /wp/v2/media/12' )
 			);
+
+		// What was written, not just that something was.
+		let attachedTo;
 
 		/**
 		 * The attach is deliberately not awaited by `savePost`, so give its
@@ -520,6 +525,7 @@ describe( 'Post actions', () => {
 			await flush();
 
 			expect( hasAttached( requests ) ).toBe( true );
+			expect( attachedTo ).toBe( postId );
 		} );
 
 		it( 'attaches nothing when the editor setting is off', async () => {

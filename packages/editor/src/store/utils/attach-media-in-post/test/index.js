@@ -142,6 +142,23 @@ describe( 'attachMediaInPost', () => {
 	} );
 
 	/**
+	 * The lookups can reject on their own — `context=edit` on the media
+	 * collection is a 403 for a contributor — and nothing awaits this function,
+	 * so anything escaping it becomes an unhandled rejection.
+	 */
+	it( 'never rejects when a lookup fails', async () => {
+		const { registry, getEntityRecords } = createRegistry( {
+			blocks: [ imageBlock( 12 ) ],
+		} );
+		getEntityRecords.mockRejectedValue( { code: 'rest_forbidden' } );
+
+		await expect(
+			attachMediaInPost( registry, 7, 'post' )
+		).resolves.toBeUndefined();
+		expect( console ).toHaveWarned();
+	} );
+
+	/**
 	 * Silent to the user is the design; silent to whoever is debugging it is
 	 * not. A contributor using someone else's media gets a 403 here.
 	 */
