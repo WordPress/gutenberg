@@ -228,22 +228,18 @@ async function checkPackage( packageData ) {
 	}
 }
 
-const publishedEsmPackages = await getPublishedEsmPackages();
-const results = await Promise.allSettled(
-	publishedEsmPackages.map( checkPackage )
-);
-
-results.forEach( ( result, index ) => {
-	if ( result.status === 'rejected' ) {
-		const packageName = publishedEsmPackages[ index ].packageJson.name;
+let hasErrors = false;
+for ( const packageData of await getPublishedEsmPackages() ) {
+	try {
+		await checkPackage( packageData );
+	} catch ( error ) {
 		const message =
-			result.reason instanceof Error
-				? result.reason.message
-				: String( result.reason );
-		console.error( `${ packageName }: ${ message }` );
+			error instanceof Error ? error.message : String( error );
+		console.error( `${ packageData.packageJson.name }: ${ message }` );
+		hasErrors = true;
 	}
-} );
+}
 
-if ( results.some( ( result ) => result.status === 'rejected' ) ) {
+if ( hasErrors ) {
 	process.exitCode = 1;
 }
