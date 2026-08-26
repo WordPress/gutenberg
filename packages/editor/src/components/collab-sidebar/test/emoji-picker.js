@@ -162,6 +162,25 @@ describe( 'searchEmojis', () => {
 		expect( results.map( ( e ) => e.hexcode ) ).toEqual( [ '2764' ] );
 	} );
 
+	it( 'matches an override keyed the way the server writes it', () => {
+		// `gutenberg_emoji_picker_label_overrides` strips U+FE0F and pads
+		// to four digits, so the key never equals the raw Emojibase
+		// hexcode for the ~quarter of entries that keep the selector.
+		const zwj = [
+			{
+				hexcode: '2764-FE0F-200D-1F525',
+				emoji: '❤️‍🔥',
+				label: 'heart on fire',
+			},
+		];
+		const results = searchEmojis( zwj, 'flamme', {
+			'2764-200D-1F525': 'Flammendes Herz',
+		} );
+		expect( results.map( ( e ) => e.hexcode ) ).toEqual( [
+			'2764-FE0F-200D-1F525',
+		] );
+	} );
+
 	it( 'returns an empty array when nothing matches', () => {
 		expect( searchEmojis( sample, 'submarine', null ) ).toEqual( [] );
 	} );

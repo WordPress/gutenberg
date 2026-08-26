@@ -315,22 +315,52 @@ export function useEmojibaseData(
 
 /**
  * Normalize an Emojibase hexcode (`2764-FE0F`) to the reaction storage
- * key form: lowercase with variation selector U+FE0F segments removed
- * (`2764`), matching `emojiToHexKey()` in `reaction-emoji-picker.tsx`.
+ * key form: lowercase, zero-padded to four digits, with variation
+ * selector U+FE0F segments removed (`2764`). Must agree with
+ * `emojiToHexKey()` in `reaction-emoji-picker.tsx` -- the two meet
+ * whenever a stored reaction is looked up in the dataset.
  *
  * @param hexcode Emojibase hexcode.
  * @return Normalized hex key.
  */
 export function normalizeHexcode( hexcode: string ): string {
 	return hexcode
+		.toLowerCase()
 		.split( '-' )
-		.filter( ( part ) => part.toLowerCase() !== 'fe0f' )
-		.join( '-' )
-		.toLowerCase();
+		.filter( ( part ) => part !== 'fe0f' )
+		.map( ( part ) => part.padStart( 4, '0' ) )
+		.join( '-' );
 }
 
 // One label map per `baseUrl|locale`, built lazily from the dataset.
 const labelMapCache = new Map< string, Map< string, string > >();
+
+/**
+ * Look up a site's label override for an Emojibase entry.
+ *
+ * The server writes override keys in normalized form -- U+FE0F stripped
+ * and zero-padded (see `gutenberg_emoji_picker_label_overrides`) --
+ * while a quarter of Emojibase's own `hexcode` values keep the selector
+ * (`2764-FE0F-200D-1F525` for ❤️‍🔥). Matching the raw hexcode first keeps
+ * an override written against the dataset working; the normalized form
+ * catches the server's.
+ *
+ * @param overrides Map of `hexcode => translated label`, or null.
+ * @param hexcode   The entry's Emojibase hexcode.
+ * @return The override label, or undefined when there is none.
+ */
+export function getOverrideLabel(
+	overrides: Record< string, string > | null,
+	hexcode: string
+): string | undefined {
+	if ( ! overrides ) {
+		return undefined;
+	}
+	return (
+		overrides[ hexcode ] ??
+		overrides[ normalizeHexcode( hexcode ).toUpperCase() ]
+	);
+}
 
 /**
  * Build (and cache) a Map from normalized hex key to user-facing emoji
@@ -353,24 +383,24 @@ function buildLabelMap(
 		return existing;
 	}
 	const map = new Map< string, string >();
+	const indexEntry = ( hexcode: string, label: string ) => {
+		map.set(
+			normalizeHexcode( hexcode ),
+			getOverrideLabel( overrides, hexcode ) || label
+		);
+	};
 	for ( const entry of data ) {
 		if ( ! entry.hexcode || ! entry.label ) {
 			continue;
 		}
-		map.set(
-			normalizeHexcode( entry.hexcode ),
-			overrides?.[ entry.hexcode ] || entry.label
-		);
+		indexEntry( entry.hexcode, entry.label );
 		// Skin-tone variants are stored under their own hex keys when
 		// picked with a non-default skin tone preference, so index them
 		// too for reaction pill tooltips.
 		if ( Array.isArray( entry.skins ) ) {
 			for ( const skin of entry.skins ) {
 				if ( skin.hexcode && skin.label ) {
-					map.set(
-						normalizeHexcode( skin.hexcode ),
-						overrides?.[ skin.hexcode ] || skin.label
-					);
+					indexEntry( skin.hexcode, skin.label );
 				}
 			}
 		}

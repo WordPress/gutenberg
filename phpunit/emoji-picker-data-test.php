@@ -42,6 +42,11 @@ class Emoji_Picker_Data_Test extends WP_UnitTestCase {
 			'1F468-200D-1F4BB',
 			gutenberg_emoji_to_hexcode( '👨‍💻' )
 		);
+		// 0️⃣ = U+0030 + U+FE0F + U+20E3, padded to Emojibase's `0030-20E3`.
+		$this->assertSame(
+			'0030-20E3',
+			gutenberg_emoji_to_hexcode( '0️⃣' )
+		);
 	}
 
 	/**
@@ -72,15 +77,16 @@ class Emoji_Picker_Data_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Code points across the 1-4 byte UTF-8 ranges decode correctly.
+	 * Code points across the 1-4 byte UTF-8 ranges decode correctly, each
+	 * zero-padded to Emojibase's four-digit `hexcode` width.
 	 *
 	 * @covers ::gutenberg_emoji_to_hexcode
 	 */
 	public function test_gutenberg_emoji_to_hexcode_covers_all_byte_lengths() {
 		// 1 byte: U+0023 (#), part of keycap sequences.
-		$this->assertSame( '23', gutenberg_emoji_to_hexcode( '#' ) );
+		$this->assertSame( '0023', gutenberg_emoji_to_hexcode( '#' ) );
 		// 2 bytes: U+00A9 (©).
-		$this->assertSame( 'A9', gutenberg_emoji_to_hexcode( "\u{00A9}" ) );
+		$this->assertSame( '00A9', gutenberg_emoji_to_hexcode( "\u{00A9}" ) );
 		// 3 bytes: U+2764 (❤).
 		$this->assertSame( '2764', gutenberg_emoji_to_hexcode( "\u{2764}" ) );
 		// 4 bytes: U+1F600 (😀) — asserted in the basic test as well.

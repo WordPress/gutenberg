@@ -37,7 +37,8 @@ add_filter( 'block_editor_settings_all', 'gutenberg_add_emojibase_settings' );
  * Convert an emoji character to the uppercase hex code-point sequence
  * Emojibase uses as its `hexcode` key. Strips Variation Selector-16
  * (U+FE0F) so qualified and unqualified presentations collapse to the
- * same key, matching Emojibase's own normalization.
+ * same key, and zero-pads each code point to four digits (`00A9`, not
+ * `A9`), both matching Emojibase's own normalization.
  *
  * Decodes UTF-8 byte-by-byte rather than via `mb_ord()`: the `mbstring`
  * extension is recommended but not required by WordPress, and the
@@ -47,7 +48,8 @@ add_filter( 'block_editor_settings_all', 'gutenberg_add_emojibase_settings' );
  * @since 7.1.0
  *
  * @param string $emoji Emoji character.
- * @return string Uppercase hex code-points joined by `-`, or empty string.
+ * @return string Uppercase four-digit-padded hex code-points joined by
+ *                `-`, or empty string.
  */
 function gutenberg_emoji_to_hexcode( $emoji ) {
 	if ( ! is_string( $emoji ) || '' === $emoji ) {
@@ -84,7 +86,7 @@ function gutenberg_emoji_to_hexcode( $emoji ) {
 		if ( 0xFE0F === $codepoint ) {
 			continue;
 		}
-		$parts[] = strtoupper( dechex( $codepoint ) );
+		$parts[] = str_pad( strtoupper( dechex( $codepoint ) ), 4, '0', STR_PAD_LEFT );
 	}
 	return implode( '-', $parts );
 }
@@ -127,8 +129,9 @@ function gutenberg_get_emoji_picker_label_overrides() {
 	 * Use this to translate emoji labels for locales the upstream
 	 * Emojibase dataset has not translated yet, or to override the
 	 * default label for specific emojis. Map keys are uppercase hex
-	 * code-point sequences with U+FE0F stripped (matching Emojibase's
-	 * own `hexcode` field).
+	 * code-point sequences, each code point zero-padded to four digits
+	 * and U+FE0F stripped (matching Emojibase's own `hexcode` field),
+	 * e.g. `2764` for ❤️ and `00A9` for ©️.
 	 *
 	 * @since 7.1.0
 	 *

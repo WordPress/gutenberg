@@ -41,19 +41,34 @@ export const REACTION_EMOJIS: CuratedEmoji[] = [
  * - Picks from the full searchable picker are stored as a lowercase
  *   hex-codepoint sequence joined by `-`, e.g. `1f44d` for 👍 or
  *   `1f468-200d-1f4bb` for 👨‍💻. Variation selector U+FE0F is stripped
- *   so `2764-fe0f` (❤️) collapses into the curated `heart` slug.
+ *   so `2764-fe0f` (❤️) collapses into the curated `heart` slug, and each
+ *   code point is zero-padded to at least four digits so the key matches
+ *   the Emojibase `hexcode` field it is looked up against.
  *
  * Storing an ASCII slug or hex sidesteps utf8/utf8mb4 charset portability
  * issues on the comments table and gives stable grouping in the
  * `reaction_summary` aggregation.
  */
 
+// Keys written before the padding rule can be two digits wide, so reading
+// stays lenient even though writing always pads.
 const HEX_KEY_RE = /^[0-9a-f]{2,6}(-[0-9a-f]{2,6})*$/;
+
+const VARIATION_SELECTOR = '\u{FE0F}';
+const EMOJI_RE = /^\p{Emoji}$/u;
+const EMOJI_PRESENTATION_RE = /^\p{Emoji_Presentation}$/u;
+const SKIN_TONE_RE = /^[\u{1F3FB}-\u{1F3FF}]$/u;
 
 /**
  * Convert an emoji character to its lowercase hex-codepoint sequence,
  * stripping variation selector U+FE0F so visually equivalent
  * presentations collapse to the same key.
+ *
+ * Each code point is zero-padded to four digits, matching how Emojibase
+ * writes its `hexcode` field (`00a9`, not `a9`). Without the padding the
+ * dozen-odd emoji below U+1000 -- ©, ® and the keycaps -- would never match
+ * a dataset entry, silently losing their label and their place in the
+ * frequently-used row.
  *
  * @param emoji The emoji character.
  * @return Lowercase hex codepoints joined by `-`.
@@ -62,13 +77,40 @@ export function emojiToHexKey( emoji: string ): string {
 	if ( typeof emoji !== 'string' || ! emoji ) {
 		return '';
 	}
-	return Array.from( emoji.replace( /️/g, '' ) )
-		.map( ( c ) => ( c.codePointAt( 0 ) as number ).toString( 16 ) )
+	return Array.from( emoji.replace( /\u{FE0F}/gu, '' ) )
+		.map( ( c ) =>
+			( c.codePointAt( 0 ) as number ).toString( 16 ).padStart( 4, '0' )
+		)
 		.join( '-' );
 }
 
 /**
- * Convert a hex-codepoint sequence back to its emoji character.
+ * Whether a code point needs U+FE0F appended to render as a colour emoji.
+ *
+ * Text-presentation emoji (❤, ☺, the keycap digits) draw as monochrome
+ * glyphs without it, and a ZWJ sequence built from them is only
+ * recognized in its fully-qualified form. A skin-tone modifier already
+ * forces emoji presentation on the base it follows, so inserting the
+ * selector there would instead break the sequence apart.
+ *
+ * @param char The code point.
+ * @param next The code point that follows it, if any.
+ * @return Whether the variation selector is required.
+ */
+function needsVariationSelector(
+	char: string,
+	next: string | undefined
+): boolean {
+	return (
+		EMOJI_RE.test( char ) &&
+		! EMOJI_PRESENTATION_RE.test( char ) &&
+		! ( next !== undefined && SKIN_TONE_RE.test( next ) )
+	);
+}
+
+/**
+ * Convert a hex-codepoint sequence back to its emoji character,
+ * restoring the variation selectors that `emojiToHexKey()` stripped.
  *
  * @param hexKey Lowercase hex codepoints joined by `-`.
  * @return The emoji character, or the input on parse failure.
@@ -78,9 +120,16 @@ export function hexKeyToEmoji( hexKey: string ): string {
 		return hexKey;
 	}
 	try {
-		return String.fromCodePoint(
-			...hexKey.split( '-' ).map( ( p ) => parseInt( p, 16 ) )
-		);
+		const chars = hexKey
+			.split( '-' )
+			.map( ( p ) => String.fromCodePoint( parseInt( p, 16 ) ) );
+		return chars
+			.map( ( char, index ) =>
+				needsVariationSelector( char, chars[ index + 1 ] )
+					? char + VARIATION_SELECTOR
+					: char
+			)
+			.join( '' );
 	} catch {
 		return hexKey;
 	}

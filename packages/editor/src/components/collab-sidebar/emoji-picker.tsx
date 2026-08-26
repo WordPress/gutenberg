@@ -7,6 +7,7 @@ import { speak } from '@wordpress/a11y';
 import { useDebounce } from '@wordpress/compose';
 import {
 	detectLocale,
+	getOverrideLabel,
 	normalizeHexcode,
 	useEmojibaseConfig,
 	useEmojibaseData,
@@ -103,7 +104,7 @@ export function searchEmojis(
 		// still finds the emoji — useful when an English-language user
 		// types "red heart" against a "Heart" override, or a translator
 		// types the local-language label against the English fallback.
-		const override = overrides?.[ entry.hexcode ];
+		const override = getOverrideLabel( overrides, entry.hexcode );
 		if ( override && override.toLowerCase().includes( trimmed ) ) {
 			return true;
 		}
@@ -173,7 +174,7 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 	 * @return The label to render and use as the accessible name.
 	 */
 	const labelFor = ( entry: EmojibaseEntry ): string =>
-		labelOverrides?.[ entry.hexcode ] || entry.label || '';
+		getOverrideLabel( labelOverrides, entry.hexcode ) || entry.label || '';
 
 	const groups = useMemo(
 		() => ( data ? groupEmojis( data ) : [] ),
