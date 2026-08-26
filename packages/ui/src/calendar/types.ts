@@ -164,6 +164,21 @@ export interface BaseProps
 		'onSelect' | 'defaultValue' | 'role'
 	> {
 	/**
+	 * The ARIA role for the calendar's root element.
+	 *
+	 * The default `application` role helps assistive technologies pass calendar
+	 * navigation keys to the component. Its accessible name includes the current
+	 * month.
+	 *
+	 * Changing this role can affect screen-reader keyboard navigation. Only
+	 * override it for a tested composition. Apply roles that require additional
+	 * behavior, such as `dialog`, to a wrapper.
+	 *
+	 * @default 'application'
+	 */
+	role?: ComponentProps< 'div' >[ 'role' ];
+
+	/**
 	 * Whether the selection is required.
 	 * When `true`, there always needs to be a date selected.
 	 * @default false

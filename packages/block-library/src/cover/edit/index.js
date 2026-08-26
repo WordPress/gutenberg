@@ -760,7 +760,7 @@ function CoverEdit( {
 								value={ overlayColor.color }
 								onChange={ onSetOverlayColor }
 								clearable={ false }
-								asButtons
+								presentation="toggle-buttons"
 								aria-label={ __( 'Overlay color' ) }
 							/>
 						</div>

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.17.0 (2026-08-26)
+
 ### Enhancements
 
 -   Add a `scope` prop to `MediaEditor` so each frame can keep its own persisted details-sidebar visibility ([#81559](https://github.com/WordPress/gutenberg/pull/81559)).

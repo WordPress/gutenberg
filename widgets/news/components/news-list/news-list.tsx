@@ -63,7 +63,7 @@ const INITIAL_VIEW: View = {
 
 function FeedIcon( { item }: { item: NewsItem } ) {
 	return (
-		<div className={ styles.feedIcon } aria-hidden="true">
+		<div className={ styles[ 'feed-icon' ] } aria-hidden="true">
 			<Icon icon={ item.feedKey === 'news' ? wordpress : globe } />
 		</div>
 	);
@@ -71,7 +71,11 @@ function FeedIcon( { item }: { item: NewsItem } ) {
 
 function NewsTitle( { item }: { item: NewsItem } ) {
 	return (
-		<Link href={ item.url } openInNewTab className={ styles.titleLink }>
+		<Link
+			href={ item.url }
+			openInNewTab
+			className={ styles[ 'title-link' ] }
+		>
 			{ item.title }
 		</Link>
 	);
