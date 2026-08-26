@@ -68,21 +68,12 @@ async function generateNativeSkills( workspace ) {
 }
 
 /**
- * Resolves what a workspace should be built from.
+ * Resolves what a workspace should be built from: what you are working on,
+ * uncommitted edits included.
  *
- * A plain run measures what you are working on, uncommitted edits included.
- *
- * Naming a ref means measuring that commit, so a comparison stays a comparison
- * of commits and the working tree cannot leak into a row labelled `trunk`.
- *
- * @param {string} [baseRef] Ref to measure, or undefined for the working tree.
  * @return {Promise<string>} A tree-ish `git archive` can write.
  */
-async function resolveTree( baseRef ) {
-	if ( baseRef ) {
-		return baseRef;
-	}
-
+async function resolveTree() {
 	// `git stash create` writes a commit holding the working tree without
 	// touching the stash list or the checkout. It does write the index, so
 	// rows running concurrently would collide; resolving once per run avoids
@@ -94,7 +85,7 @@ async function resolveTree( baseRef ) {
 	return workingTree;
 }
 
-async function createWorkspace( baseRef ) {
+async function createWorkspace() {
 	const temporaryRoot = await fs.mkdtemp(
 		path.join( os.tmpdir(), 'gutenberg-agent-eval-' )
 	);
@@ -107,7 +98,7 @@ async function createWorkspace( baseRef ) {
 			'archive',
 			'--format=tar',
 			`--output=${ archive }`,
-			await resolveTree( baseRef ),
+			await resolveTree(),
 		] );
 		await execFileAsync( 'tar', [ '-xf', archive, '-C', workspace ] );
 		await fs.unlink( archive );
