@@ -2,9 +2,9 @@ import { ThemeProvider } from '@wordpress/theme';
 import type { StoryContext } from 'storybook/internal/types';
 import {
 	DARK_THEME_COLORS,
-	getColorTheme,
 	getCustomThemeColors,
 	LIGHT_THEME_COLORS,
+	normalizeColorTheme,
 } from '../addons/design-system-theme/constants';
 
 type ThemeProviderProps = React.ComponentProps< typeof ThemeProvider >;
@@ -16,7 +16,7 @@ type ThemeProviderSettings = Pick<
 export function getDesignSystemThemeSettings(
 	globals: StoryContext[ 'globals' ]
 ): ThemeProviderSettings {
-	const colorTheme = getColorTheme( globals.dsColorTheme );
+	const colorTheme = normalizeColorTheme( globals.dsColorTheme );
 	const cursorControl = globals.dsCursorControl || undefined;
 	const cornerRadiusPreset: ThemeProviderProps[ 'cornerRadius' ] =
 		globals.dsCornerRadius || undefined;
@@ -49,7 +49,7 @@ export function WithDesignSystemTheme(
 	Story: React.ComponentType< any >,
 	context: StoryContext
 ) {
-	const colorTheme = getColorTheme( context.globals.dsColorTheme );
+	const colorTheme = normalizeColorTheme( context.globals.dsColorTheme );
 	const themeSettings = getDesignSystemThemeSettings( context.globals );
 	const hasColorOverride = colorTheme !== 'light';
 
@@ -64,6 +64,7 @@ export function WithDesignSystemTheme(
 						? {
 								background:
 									'var(--wpds-color-background-surface-neutral-strong)',
+								color: 'var(--wpds-color-foreground-content-neutral)',
 								padding:
 									'var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-sm)',
 								outline:

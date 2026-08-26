@@ -20,12 +20,33 @@ import {
 } from '@wordpress/ui';
 import { withRouter } from '../../decorators/with-router';
 import { getDesignSystemThemeSettings } from '../../decorators/with-design-system-theme';
-import {
-	getSidebarThemePreset,
-	SIDEBAR_THEME_PRESETS,
-} from '../../addons/design-system-theme/constants';
+
+const SIDEBAR_THEME_PRESETS = [
+	{
+		id: 'fresh',
+		title: 'Fresh',
+		colors: { primary: '#3858e9', background: '#25292b' },
+	},
+	{
+		id: 'blue',
+		title: 'Blue',
+		colors: { primary: '#437aa8', background: '#3876a8' },
+	},
+	{
+		id: 'ectoplasm',
+		title: 'Ectoplasm',
+		colors: { primary: '#646c3e', background: '#4f386e' },
+	},
+] as const;
 
 type SidebarThemeId = ( typeof SIDEBAR_THEME_PRESETS )[ number ][ 'id' ];
+
+function getSidebarThemePreset( value: unknown ) {
+	return (
+		SIDEBAR_THEME_PRESETS.find( ( preset ) => preset.id === value ) ??
+		SIDEBAR_THEME_PRESETS[ 0 ]
+	);
+}
 
 function SidebarThemeControls( {
 	selectedTheme,
@@ -160,7 +181,9 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 						} }
 					>
 						{ /* Sidebar */ }
-						<div
+						<Stack
+							direction="column"
+							gap="xl"
 							style={ {
 								backgroundColor:
 									'var(--wpds-color-background-surface-neutral-weak)',
@@ -170,14 +193,7 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 									'var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak)',
 							} }
 						>
-							<Text
-								variant="heading-sm"
-								render={ <h2 /> }
-								style={ {
-									marginBlockEnd:
-										'var(--wpds-dimension-gap-xl)',
-								} }
-							>
+							<Text variant="heading-sm" render={ <h2 /> }>
 								My App
 							</Text>
 							<nav>
@@ -200,12 +216,7 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 									) ) }
 								</Stack>
 							</nav>
-							<div
-								style={ {
-									marginBlockStart:
-										'var(--wpds-dimension-gap-xl)',
-								} }
-							>
+							<div>
 								<Dialog.Root
 									open={ isSiteDetailsOpen }
 									onOpenChange={ setIsSiteDetailsOpen }
@@ -284,7 +295,7 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 									</Dialog.Popup>
 								</Dialog.Root>
 							</div>
-						</div>
+						</Stack>
 
 						<Page
 							ariaLabel="Level 1 breadcrumb"

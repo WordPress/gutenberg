@@ -1,19 +1,25 @@
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
-import { createElement, Fragment, type ChangeEvent } from 'react';
+import {
+	createElement,
+	Fragment,
+	type ChangeEvent,
+	type CSSProperties,
+} from 'react';
 import { addons, types, useGlobals } from 'storybook/manager-api';
 import { MirrorIcon } from '@storybook/icons';
 import {
 	Button,
+	ToggleButton,
 	WithTooltip,
 	TooltipMessage,
 	TooltipLinkList,
 } from 'storybook/internal/components';
-import { styled } from 'storybook/theming';
+import { useTheme } from 'storybook/theming';
 import {
 	DARK_THEME_COLORS,
-	getColorTheme,
 	getCustomThemeColors,
 	LIGHT_THEME_COLORS,
+	normalizeColorTheme,
 	type ColorTheme,
 } from './constants';
 
@@ -49,114 +55,63 @@ const CORNER_RADIUS_OPTIONS: ThemeOption[] = [
 	{ id: 'pronounced', title: 'Pronounced' },
 ];
 
-const ColorSection = styled.div( ( { theme } ) => ( {
-	boxSizing: 'border-box',
-	color: theme.color.defaultText,
-	lineHeight: '18px',
-	padding: 15,
-	width: 280,
-} ) );
-
-const SectionTitle = styled.div( ( { theme } ) => ( {
-	fontWeight: theme.typography.weight.bold,
-} ) );
-
-const ColorPresetGrid = styled.div( {
+const colorPresetGridStyle = {
 	display: 'grid',
 	gap: 6,
 	gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
 	marginTop: 8,
-} );
+} satisfies CSSProperties;
 
-const ColorPresetButton = styled.button< { $active: boolean } >(
-	( { $active, theme } ) => ( {
-		alignItems: 'center',
-		appearance: 'none',
-		background: $active ? theme.background.hoverable : 'transparent',
-		border: `1px solid ${
-			$active ? theme.color.secondary : theme.appBorderColor
-		}`,
-		borderRadius: theme.input.borderRadius,
-		color: theme.color.defaultText,
-		cursor: 'pointer',
-		display: 'grid',
-		font: 'inherit',
-		fontSize: 11,
-		fontWeight: $active
-			? theme.typography.weight.bold
-			: theme.typography.weight.regular,
-		gap: 6,
-		justifyItems: 'center',
-		lineHeight: '14px',
-		minWidth: 0,
-		padding: '8px 6px',
-		'&:hover': {
-			background: theme.background.hoverable,
-		},
-		'&:focus-visible': {
-			outline: `2px solid ${ theme.color.secondary }`,
-			outlineOffset: 2,
-		},
-	} )
-);
+const colorPresetButtonStyle = {
+	display: 'grid',
+	gap: 6,
+	height: 'auto',
+	justifyItems: 'center',
+	lineHeight: '14px',
+	minWidth: 0,
+	padding: '8px 6px',
+} satisfies CSSProperties;
 
-const ColorSwatches = styled.span( {
+const colorSwatchesStyle = {
 	display: 'flex',
 	isolation: 'isolate',
-} );
+} satisfies CSSProperties;
 
-const ColorSwatch = styled.span( ( { theme } ) => ( {
-	border: `1px solid ${ theme.appBorderColor }`,
+const colorSwatchStyle = {
 	borderRadius: '50%',
 	boxSizing: 'border-box',
 	display: 'block',
 	height: 18,
 	width: 18,
-	'& + &': {
-		marginInlineStart: -4,
-		zIndex: -1,
-	},
-} ) );
+} satisfies CSSProperties;
 
-const CustomColorFields = styled.div( ( { theme } ) => ( {
-	borderTop: `1px solid ${ theme.appBorderColor }`,
+const customColorFieldsStyle = {
 	display: 'grid',
 	gap: 8,
 	marginTop: 12,
 	paddingTop: 12,
-} ) );
+} satisfies CSSProperties;
 
-const ColorField = styled.label( {
+const colorFieldStyle = {
 	alignItems: 'center',
 	display: 'grid',
 	fontSize: 11,
 	gap: 8,
 	gridTemplateColumns: '1fr auto auto',
-} );
+} satisfies CSSProperties;
 
-const ColorInput = styled.input( ( { theme } ) => ( {
-	background: theme.input.background,
-	border: `1px solid ${ theme.input.border }`,
-	borderRadius: theme.input.borderRadius,
+const colorInputStyle = {
 	boxSizing: 'border-box',
 	cursor: 'pointer',
 	height: 28,
 	padding: 2,
 	width: 36,
-	'&:focus-visible': {
-		outline: `2px solid ${ theme.color.secondary }`,
-		outlineOffset: 2,
-	},
-} ) );
-
-const ColorValue = styled.code( ( { theme } ) => ( {
-	color: theme.textMutedColor,
-	fontSize: 10,
-} ) );
+} satisfies CSSProperties;
 
 function ThemeColorControls() {
 	const [ globals, updateGlobals ] = useGlobals();
-	const colorTheme = getColorTheme( globals.dsColorTheme );
+	const theme = useTheme();
+	const colorTheme = normalizeColorTheme( globals.dsColorTheme );
 	const customColors = getCustomThemeColors(
 		globals.dsPrimaryColor,
 		globals.dsBackgroundColor
@@ -180,21 +135,40 @@ function ThemeColorControls() {
 			updateGlobals( { [ globalName ]: event.currentTarget.value } );
 
 	return createElement(
-		ColorSection,
-		null,
-		createElement( SectionTitle, null, 'Color' ),
+		'div',
+		{
+			style: {
+				boxSizing: 'border-box',
+				color: theme.color.defaultText,
+				lineHeight: '18px',
+				padding: 15,
+				width: 280,
+			},
+		},
 		createElement(
-			ColorPresetGrid,
-			{ role: 'group', 'aria-label': 'Color theme' },
+			'div',
+			{ style: { fontWeight: theme.typography.weight.bold } },
+			'Color'
+		),
+		createElement(
+			'div',
+			{
+				role: 'group',
+				'aria-label': 'Color theme',
+				style: colorPresetGridStyle,
+			},
 			...COLOR_OPTIONS.map( ( option ) => {
 				const colors = getOptionColors( option.id );
 				return createElement(
-					ColorPresetButton,
+					ToggleButton,
 					{
 						key: option.id,
 						type: 'button',
-						$active: colorTheme === option.id,
-						'aria-pressed': colorTheme === option.id,
+						ariaLabel: false,
+						pressed: colorTheme === option.id,
+						size: 'small',
+						variant: 'outline',
+						style: colorPresetButtonStyle,
 						onClick: () =>
 							updateGlobals( {
 								dsColorTheme:
@@ -204,13 +178,26 @@ function ThemeColorControls() {
 							} ),
 					},
 					createElement(
-						ColorSwatches,
-						{ 'aria-hidden': true },
-						createElement( ColorSwatch, {
-							style: { backgroundColor: colors.primary },
+						'span',
+						{
+							'aria-hidden': true,
+							style: colorSwatchesStyle,
+						},
+						createElement( 'span', {
+							style: {
+								...colorSwatchStyle,
+								backgroundColor: colors.primary,
+								border: `1px solid ${ theme.appBorderColor }`,
+							},
 						} ),
-						createElement( ColorSwatch, {
-							style: { backgroundColor: colors.background },
+						createElement( 'span', {
+							style: {
+								...colorSwatchStyle,
+								backgroundColor: colors.background,
+								border: `1px solid ${ theme.appBorderColor }`,
+								marginInlineStart: -4,
+								zIndex: -1,
+							},
 						} )
 					),
 					option.title
@@ -219,37 +206,66 @@ function ThemeColorControls() {
 		),
 		colorTheme === 'custom' &&
 			createElement(
-				CustomColorFields,
-				null,
+				'div',
+				{
+					style: {
+						...customColorFieldsStyle,
+						borderTop: `1px solid ${ theme.appBorderColor }`,
+					},
+				},
 				createElement(
-					ColorField,
-					null,
+					'label',
+					{ style: colorFieldStyle },
 					'Primary',
-					createElement( ColorInput, {
+					createElement( 'input', {
 						type: 'color',
 						'aria-label': 'Primary',
 						value: customColors.primary,
+						style: {
+							...colorInputStyle,
+							background: theme.input.background,
+							border: `1px solid ${ theme.input.border }`,
+							borderRadius: theme.input.borderRadius,
+						},
 						onChange: updateCustomColor( 'dsPrimaryColor' ),
 					} ),
 					createElement(
-						ColorValue,
-						{ 'aria-hidden': true },
+						'code',
+						{
+							'aria-hidden': true,
+							style: {
+								color: theme.textMutedColor,
+								fontSize: 10,
+							},
+						},
 						customColors.primary
 					)
 				),
 				createElement(
-					ColorField,
-					null,
+					'label',
+					{ style: colorFieldStyle },
 					'Background',
-					createElement( ColorInput, {
+					createElement( 'input', {
 						type: 'color',
 						'aria-label': 'Background',
 						value: customColors.background,
+						style: {
+							...colorInputStyle,
+							background: theme.input.background,
+							border: `1px solid ${ theme.input.border }`,
+							borderRadius: theme.input.borderRadius,
+						},
 						onChange: updateCustomColor( 'dsBackgroundColor' ),
 					} ),
 					createElement(
-						ColorValue,
-						{ 'aria-hidden': true },
+						'code',
+						{
+							'aria-hidden': true,
+							style: {
+								color: theme.textMutedColor,
+								fontSize: 10,
+							},
+						},
 						customColors.background
 					)
 				)
