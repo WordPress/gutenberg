@@ -1,0 +1,19 @@
+@use "@wordpress/base-styles/breakpoints" as *;
+
+.wp-block-slide {
+	scroll-snap-align: start;
+	flex-shrink: 0;
+	width: calc(100% / var(--wp--slider-slides-to-show, 1));
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
+	overflow: hidden;
+}
+
+@media (max-width: #{ ($break-medium - 1) }) {
+	// Responsiveness: Show at most one slide at the time on mobile.
+	.wp-block-slider {
+		--wp--slider-slides-to-show: 1 !important;
+	}
+}

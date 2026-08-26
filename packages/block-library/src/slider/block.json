@@ -1,0 +1,74 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"__experimental": true,
+	"apiVersion": 3,
+	"name": "core/slider",
+	"title": "Slider",
+	"description": "Display content in a scrolling slider.",
+	"category": "design",
+	"textdomain": "default",
+	"allowedBlocks": [ "core/slide" ],
+	"attributes": {
+		"slidesToShow": {
+			"type": "integer",
+			"default": 1
+		},
+		"loop": {
+			"type": "boolean",
+			"default": true
+		},
+		"navigationPosition": {
+			"type": "string",
+			"enum": [ "overlay", "top", "bottom" ],
+			"default": "overlay"
+		},
+		"navigationJustification": {
+			"type": "string",
+			"enum": [ "left", "center", "right", "space-between" ],
+			"default": "space-between"
+		},
+		"arrowIcon": {
+			"type": "string",
+			"enum": [ "chevron", "arrow" ],
+			"default": "chevron"
+		},
+		"displayMode": {
+			"type": "string",
+			"enum": [ "icon", "text", "both" ],
+			"default": "icon"
+		},
+		"showIndicators": {
+			"type": "boolean",
+			"default": true
+		},
+		"indicatorStyle": {
+			"type": "string",
+			"enum": [ "dot", "line" ],
+			"default": "dot"
+		},
+		"navigationColor": {
+			"type": "string"
+		},
+		"navigationBackgroundColor": {
+			"type": "string"
+		}
+	},
+	"supports": {
+		"align": true,
+		"ariaLabel": true,
+		"html": false,
+		"interactivity": true,
+		"dimensions": {
+			"minHeight": true,
+			"__experimentalDefaultControls": {
+				"minHeight": true
+			}
+		},
+		"spacing": {
+			"margin": true
+		}
+	},
+	"editorScript": "file:./index.js",
+	"style": "wp-block-slider",
+	"viewScriptModule": "@wordpress/block-library/slider/view"
+}

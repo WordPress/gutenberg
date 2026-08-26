@@ -1,0 +1,273 @@
+.wp-block-slider {
+	--wp--slider-navigation-color: #1e1e1e;
+	--wp--slider-navigation-background-color: #fff;
+
+	display: flex;
+	flex-direction: column;
+	position: relative;
+	min-height: 430px;
+}
+
+.wp-block-slider-track {
+	display: flex;
+	min-height: inherit;
+	min-width: 100%;
+	flex: 1 1 0%;
+	overflow-x: scroll;
+	overflow-y: hidden;
+	scroll-snap-type: x mandatory;
+	scrollbar-width: none;
+
+	@media (prefers-reduced-motion: no-preference) {
+		scroll-behavior: smooth;
+	}
+	gap: 0;
+	flex-wrap: nowrap;
+	outline: 1px solid transparent;
+	outline-offset: 1px;
+
+	> .wp-block-slide {
+		min-height: inherit;
+	}
+}
+
+.wp-block-slider-track:focus {
+	outline: 1px solid currentColor;
+}
+
+.wp-block-slider-arrows {
+	width: 100%;
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+	padding: 0.25rem 0;
+
+	// Overlay: span the full slider area, arrows centred vertically on each edge.
+	&.is-position-overlay {
+		position: absolute;
+		inset: 0;
+		width: auto;
+		pointer-events: none;
+		z-index: 2;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0;
+
+		> .wp-block-slider-arrows-button {
+			pointer-events: auto;
+			margin: 0 0.5rem;
+		}
+	}
+
+}
+
+.wp-block-slider-arrows-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	min-width: 32px;
+	height: 32px;
+	cursor: pointer;
+	background: var(--wp--slider-navigation-background-color);
+	color: var(--wp--slider-navigation-color);
+	border: none;
+	border-radius: 999px;
+	padding: 4px 12px;
+	line-height: 1;
+	white-space: nowrap;
+
+	&.has-icon:not(.has-text) {
+		padding: 4px;
+	}
+
+	&.has-icon.has-text {
+		justify-content: flex-start;
+		gap: 4px;
+		padding-right: 12px;
+		padding-left: 8px;
+
+		&.has-icon-right {
+			padding-right: 8px;
+			padding-left: 12px;
+		}
+	}
+
+	&:focus-visible {
+		outline: 2px solid currentColor;
+		outline-offset: 2px;
+	}
+
+	&[aria-disabled="true"] {
+		cursor: default;
+		opacity: 0.4;
+		pointer-events: none;
+	}
+
+	.wp-block-slider-arrows-button__icon,
+	svg {
+		width: 24px;
+		height: 24px;
+		fill: currentColor;
+		flex-shrink: 0;
+		display: block;
+	}
+
+	[dir="rtl"] & {
+		.wp-block-slider-arrows-button__icon,
+		svg {
+			transform: scaleX(-1);
+		}
+	}
+}
+
+.wp-block-slider-control-bar {
+	width: 100%;
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+	padding: 0.25rem 0;
+
+	&.is-justify-left {
+		justify-content: flex-start;
+	}
+
+	&.is-justify-center {
+		justify-content: center;
+	}
+
+	&.is-justify-right {
+		justify-content: flex-end;
+	}
+
+	&.is-justify-space-between {
+		justify-content: space-between;
+	}
+
+	&:not(.is-justify-space-between) > .wp-block-slider-indicators__dots {
+		flex: 0 0 auto;
+	}
+}
+
+// Standalone overlay indicator container.
+.wp-block-slider-indicators {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0.25rem 0;
+
+	// Overlay: absolute, centred at the bottom of the slider.
+	&.is-position-overlay {
+		position: absolute;
+		left: 50%;
+		bottom: 0.5rem;
+		transform: translateX(-50%);
+		padding: 0;
+		z-index: 2;
+
+		> .wp-block-slider-indicators__dots {
+			padding: 0;
+		}
+	}
+}
+
+// Dot row — used both inside .wp-block-slider-indicators and inside
+// .wp-block-slider-control-bar.
+.wp-block-slider-indicators__dots {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	gap: 0;
+	padding: 0.35rem 0.5rem;
+	list-style: none;
+	margin: 0;
+	color: var(--wp--slider-navigation-color);
+	background: var(--wp--slider-navigation-background-color);
+	border-radius: 999px;
+	flex: 0 0 auto;
+}
+
+.wp-block-slider-indicators__dot {
+	position: relative;
+	display: block;
+	color: inherit;
+	width: 24px;
+	height: 24px;
+	padding: 0;
+	border: none;
+	border-radius: 50%;
+	background: transparent;
+	cursor: pointer;
+	flex-shrink: 0;
+
+	&::before {
+		content: "";
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 6px;
+		height: 6px;
+		border: 1.5px solid currentColor;
+		border-radius: 50%;
+		background: transparent;
+		transform: translate(-50%, -50%);
+		transition: background 0.2s ease, transform 0.2s ease;
+	}
+
+	&[aria-disabled="true"] {
+		cursor: default;
+	}
+
+	&[aria-current="true"],
+	&.is-active {
+		&::before {
+			background: currentColor;
+			transform: translate(-50%, -50%);
+		}
+	}
+
+	&:focus-visible {
+		outline: 2px solid currentColor;
+		outline-offset: 2px;
+	}
+}
+
+.wp-block-slider-indicators__dots.is-style-line {
+	gap: 0.375rem;
+}
+
+.wp-block-slider-indicators__dots.is-style-line .wp-block-slider-indicators__dot {
+	width: 26px;
+	height: 24px;
+	border-radius: 2px;
+
+	&::before {
+		width: 26px;
+		height: 2px;
+		border: none;
+		border-radius: 0;
+		background: currentColor;
+		opacity: 0.35;
+		transform: translate(-50%, -50%);
+	}
+
+	&[aria-current="true"],
+	&.is-active {
+		&::before {
+			opacity: 1;
+			transform: translate(-50%, -50%);
+		}
+	}
+
+	&:focus-visible {
+		outline: 2px solid currentColor;
+		outline-offset: 2px;
+	}
+}

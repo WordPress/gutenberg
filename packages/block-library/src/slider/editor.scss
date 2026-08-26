@@ -1,0 +1,75 @@
+/*
+ * Editor-only layout for the slider block.
+ *
+ * The outer wrapper is a non-scrolling positioning context. The inner blocks
+ * element is the horizontal scroll container, the control bar is rendered in
+ * flow for top/bottom navigation, and overlay previews are positioned siblings
+ * of the scroll container so they stay fixed while slides scroll.
+ */
+.wp-block-slider {
+	display: flex;
+	flex-direction: column;
+	position: relative;
+
+	> .block-editor-block-list__layout {
+		display: block;
+		overflow-x: auto;
+		overflow-y: hidden;
+		white-space: nowrap;
+		scrollbar-width: none;
+		flex: 1 1 0%;
+		min-height: inherit;
+
+		// Slides: inline-block so they sit side-by-side inside the scroll container.
+		// Width is set by slide/style.scss via --wp--slider-slides-to-show.
+		> .wp-block-slide {
+			display: inline-block;
+			min-height: inherit;
+			vertical-align: top;
+			white-space: normal;
+		}
+	}
+
+	// The control bar is a flex container for the nav buttons and indicators.
+	> .wp-block-slider-control-bar {
+		flex-shrink: 0;
+	}
+
+	// Positioned overlay previews are absolute children of the outer wrapper.
+	// Because the outer wrapper does not scroll, left/top percentages
+	// resolve against clientWidth and stay fixed as slides are scrolled.
+	> .wp-block-slider-arrows.is-position-overlay,
+	> .wp-block-slider-indicators.is-position-overlay {
+		position: absolute;
+		pointer-events: none;
+		z-index: 2;
+
+		> * {
+			pointer-events: none;
+		}
+	}
+
+	// Overlay arrows: span the full slide area, centred vertically.
+	> .wp-block-slider-arrows.is-position-overlay {
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0;
+
+		> .wp-block-slider-arrows-button {
+			margin: 0 0.5rem;
+		}
+	}
+
+	// Overlay indicator: centred at the bottom of the slide area.
+	// Because this is a child of the non-scrolling outer wrapper, left:50%
+	// resolves against clientWidth and the indicator stays centred.
+	> .wp-block-slider-indicators.is-position-overlay {
+		bottom: 0.5rem;
+		left: 50%;
+		transform: translateX(-50%);
+		display: flex;
+		padding: 0;
+	}
+}

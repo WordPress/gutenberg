@@ -967,6 +967,27 @@ Displays the name of this site. Update the block, and the changes apply everywhe
 -	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
 -	**Attributes:** isLink, level, levelOptions, linkTarget
 
+## Slide
+
+A single slide within a slider.
+
+-	**Name:** [core/slide](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-slide/)
+-	**Experimental:** true
+-	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
+-	**Parent:** core/slider
+-	**Supports:** anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, text), ~~html~~, ~~reusable~~
+
+## Slider
+
+Display content in a scrolling slider.
+
+-	**Name:** [core/slider](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-slider/)
+-	**Experimental:** true
+-	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
+-	**Allowed Blocks:** core/slide
+-	**Supports:** align, ariaLabel, dimensions (minHeight), interactivity, spacing (margin), ~~html~~
+-	**Attributes:** arrowIcon, displayMode, indicatorStyle, loop, navigationBackgroundColor, navigationColor, navigationJustification, navigationPosition, showIndicators, slidesToShow
+
 ## Social Icon
 
 Display an icon linking to a social profile or site.

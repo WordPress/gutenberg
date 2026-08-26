@@ -116,6 +116,8 @@ import * as shortcode from './shortcode';
 import * as siteLogo from './site-logo';
 import * as siteTagline from './site-tagline';
 import * as siteTitle from './site-title';
+import * as slide from './slide';
+import * as slider from './slider';
 import * as socialLink from './social-link';
 import * as socialLinks from './social-links';
 import * as spacer from './spacer';
@@ -277,6 +279,8 @@ const getAllBlocks = () => {
 	if ( window?.__experimentalEnableBlockExperiments ) {
 		// Blocks added here are only registered when the "Block experiments"
 		// option is enabled in the Gutenberg > Experiments settings page.
+		blocks.push( slider );
+		blocks.push( slide );
 	}
 
 	blocks.push( classic );
