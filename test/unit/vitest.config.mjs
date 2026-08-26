@@ -3,6 +3,7 @@ import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { playwright } from '@vitest/browser-playwright';
+import react from '@vitejs/plugin-react-swc';
 import globPackage from 'glob';
 import commonjs from 'vite-plugin-commonjs';
 import { defineConfig } from 'vitest/config';
@@ -15,6 +16,8 @@ const ROOT_DIR = path.resolve(
 	path.dirname( fileURLToPath( import.meta.url ) ),
 	'../..'
 );
+const nodeRequire = createRequire( import.meta.url );
+const emotionPlugin = nodeRequire.resolve( '@swc/plugin-emotion' );
 const NORMALIZED_ROOT_DIR = ROOT_DIR.split( path.sep ).join( '/' );
 const gutenbergEnvSetupFile = path.join(
 	ROOT_DIR,
@@ -35,6 +38,27 @@ const styleMockAlias = {
 	find: /^.*\.(?:css|scss)$/,
 	replacement: path.join( ROOT_DIR, 'test/unit/config/style-mock.vitest.js' ),
 };
+const reporters = [ 'default' ];
+
+if ( process.env.GITHUB_ACTIONS === 'true' ) {
+	reporters.push( 'github-actions' );
+}
+if (
+	process.env.CI &&
+	process.env.GITHUB_REPOSITORY === 'WordPress/gutenberg'
+) {
+	reporters.push( [
+		/*
+		 * Resolve to an absolute path so Vitest can load the reporter regardless
+		 * of hoisting layout.
+		 */
+		nodeRequire.resolve( '@flakiness/vitest' ),
+		{
+			duplicates: 'rename',
+			flakinessProject: 'WordPress/gutenberg',
+		},
+	] );
+}
 
 // Preserve Jest's repository-root configuration discovery and default timezone.
 process.chdir( ROOT_DIR );
@@ -55,6 +79,17 @@ export default defineConfig( {
 		},
 	},
 	plugins: [
+		react( {
+			plugins: [
+				[
+					emotionPlugin,
+					{
+						autoLabel: 'always',
+						labelFormat: '[local]',
+					},
+				],
+			],
+		} ),
 		commonjs( {
 			filter: ( id ) =>
 				[
@@ -135,7 +170,13 @@ export default defineConfig( {
 					environment: 'node',
 					pool: 'threads',
 					include: vitestTests.node,
-					setupFiles: [ gutenbergEnvSetupFile ],
+					setupFiles: [
+						gutenbergEnvSetupFile,
+						path.join(
+							ROOT_DIR,
+							'test/unit/config/console.vitest.js'
+						),
+					],
 				},
 			},
 			{
@@ -165,6 +206,10 @@ export default defineConfig( {
 						gutenbergEnvSetupFile,
 						path.join(
 							ROOT_DIR,
+							'test/unit/config/console.vitest.js'
+						),
+						path.join(
+							ROOT_DIR,
 							'test/unit/config/testing-library.vitest.js'
 						),
 					],
@@ -175,6 +220,12 @@ export default defineConfig( {
 				test: {
 					name: 'browser',
 					include: vitestTests.browser,
+					setupFiles: [
+						path.join(
+							ROOT_DIR,
+							'test/unit/config/console.vitest.js'
+						),
+					],
 					browser: {
 						enabled: true,
 						headless: true,
@@ -187,27 +238,7 @@ export default defineConfig( {
 		globals: false,
 		includeTaskLocation: true,
 		passWithNoTests: false,
-		reporters:
-			process.env.CI &&
-			process.env.GITHUB_REPOSITORY === 'WordPress/gutenberg'
-				? [
-						'default',
-						'github-actions',
-						[
-							/*
-							 * Resolve to an absolute path so Vitest can load
-							 * the reporter regardless of hoisting layout.
-							 */
-							createRequire( import.meta.url ).resolve(
-								'@flakiness/vitest'
-							),
-							{
-								duplicates: 'rename',
-								flakinessProject: 'WordPress/gutenberg',
-							},
-						],
-				  ]
-				: [ 'default' ],
+		reporters,
 		sequence: {
 			hooks: 'list',
 			setupFiles: 'list',
