@@ -52,6 +52,7 @@
 
 ### Internal
 
+-   Remove unused `outset-ring--focus-within-visible` CSS module class.
 -   Restrict `@wordpress/private-apis` imports via lint, with the `ThemeProvider` compatibility fallback as the only exemption. ([#82015](https://github.com/WordPress/gutenberg/pull/82015))
 -   Update `@base-ui/react` from `1.6.0` to `1.7.0`. ([#81390](https://github.com/WordPress/gutenberg/pull/81390))
 -   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509), [#81514](https://github.com/WordPress/gutenberg/pull/81514), [#81516](https://github.com/WordPress/gutenberg/pull/81516), [#81518](https://github.com/WordPress/gutenberg/pull/81518))

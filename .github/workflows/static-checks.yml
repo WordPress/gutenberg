@@ -114,6 +114,10 @@ jobs:
                   npm run lint:css -- --formatter compact
                   npm run lint:css:update-suppressions
 
+            - name: Check unused CSS modules
+              if: ${{ matrix.annotations }}
+              run: npm run lint:css:unused
+
             - name: Type checking
               run: npm run typecheck
 

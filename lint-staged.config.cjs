@@ -5,6 +5,7 @@ module.exports = {
 		'node ./tools/eslint/lint-js.cjs',
 	],
 	'*.{css,pcss,scss}': [ 'npm run lint:css' ],
+	'*.module.{css,scss}': [ () => 'npm run lint:css:unused' ],
 	'package-lock.json': [ 'npm run lint:lockfile' ],
 	'packages/*/package.json': [ 'wp-scripts lint-pkg-json' ],
 	'{docs/toc.json,tools/docs/*.cjs,packages/{*/README.md,components/src/*/**/README.md,block-library/src/*/README.md}}':

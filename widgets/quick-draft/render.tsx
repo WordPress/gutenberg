@@ -256,10 +256,7 @@ export default function QuickDraft() {
 		<Stack
 			ref={ ref }
 			direction={ listBeside ? 'row' : 'column' }
-			className={ clsx(
-				styles.body,
-				listBeside ? styles.row : styles.column
-			) }
+			className={ clsx( styles.body, listBeside && styles.row ) }
 		>
 			<Stack direction="column" className={ styles.primaryPane }>
 				{ primary }

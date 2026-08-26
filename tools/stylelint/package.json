@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/stylelint-tools",
 	"version": "1.0.0",
-	"description": "Consolidated Stylelint configuration for the repo.",
+	"description": "Consolidated Stylelint configuration and unused CSS module checks for the repo.",
 	"private": true,
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -22,9 +22,13 @@
 	"exports": {
 		"./config": "./config.js"
 	},
+	"scripts": {
+		"check-unused-css": "node ./check-unused-css.cjs"
+	},
 	"dependencies": {
 		"@wordpress/stylelint-config": "file:../../packages/stylelint-config",
 		"@wordpress/theme": "file:../../packages/theme",
+		"check-unused-css": "^0.5.5",
 		"stylelint": "^16.26.1",
 		"stylelint-plugin-logical-css": "^1.2.3"
 	},
