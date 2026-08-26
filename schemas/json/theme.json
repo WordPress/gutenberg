@@ -489,6 +489,29 @@
 							"type": "boolean",
 							"default": true
 						},
+						"fluid": {
+							"description": "Enables fluid spacing and allows users to set global fluid spacing parameters.",
+							"oneOf": [
+								{
+									"type": "object",
+									"properties": {
+										"maxViewportWidth": {
+											"description": "Allow users to set custom a max viewport width in px, rem or em, used to set the maximum size boundary of a fluid space size.",
+											"type": "string"
+										},
+										"minViewportWidth": {
+											"description": "Allow users to set a custom min viewport width in px, rem or em, used to set the minimum size boundary of a fluid space size.",
+											"type": "string"
+										}
+									},
+									"additionalProperties": false
+								},
+								{
+									"type": "boolean"
+								}
+							],
+							"default": false
+						},
 						"spacingSizes": {
 							"description": "Space size presets for the space size selector.\nGenerates a custom property (`--wp--preset--spacing--{slug}`) per preset value.",
 							"type": "array",
@@ -506,6 +529,28 @@
 									"size": {
 										"description": "CSS space-size value, including units.",
 										"type": "string"
+									},
+									"fluid": {
+										"description": "Specifies the minimum and maximum space size value of a fluid space size. Set to `false` to bypass fluid calculations and use the static `size` value. There is no automatic derivation of `min`/`max`; both must be set explicitly for fluid calculations to apply.",
+										"oneOf": [
+											{
+												"type": "object",
+												"properties": {
+													"min": {
+														"description": "A min space size for fluid space size calculations in px, rem or em.",
+														"type": "string"
+													},
+													"max": {
+														"description": "A max space size for fluid space size calculations in px, rem or em.",
+														"type": "string"
+													}
+												},
+												"additionalProperties": false
+											},
+											{
+												"type": "boolean"
+											}
+										]
 									}
 								},
 								"additionalProperties": false

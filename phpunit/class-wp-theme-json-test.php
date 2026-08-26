@@ -1856,6 +1856,47 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * Unlike fluid typography, spacing presets only become fluid when they
+	 * explicitly declare `fluid.min`/`fluid.max` themselves; there is no
+	 * auto-derivation from a single size (see the discussion in #81864).
+	 */
+	public function test_get_stylesheet_generates_fluid_spacing_values() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'spacing' => array(
+						'fluid'        => true,
+						'spacingSizes' => array(
+							array(
+								'size'  => '1.75rem',
+								'slug'  => 'md',
+								'name'  => 'Medium',
+								'fluid' => array(
+									'min' => '1.5rem',
+									'max' => '1.75rem',
+								),
+							),
+							array(
+								'size'  => '1rem',
+								'slug'  => 'sm',
+								'name'  => 'Small',
+								'fluid' => false,
+							),
+						),
+					),
+				),
+			),
+			'default'
+		);
+
+		$this->assertSameCSS(
+			':root{--wp--preset--spacing--md: clamp(1.5rem, 1.5rem + ((1vw - 0.2rem) * 0.313), 1.75rem);--wp--preset--spacing--sm: 1rem;}',
+			$theme_json->get_stylesheet( array( 'variables', 'presets' ), null, array( 'skip_root_layout_styles' => true ) )
+		);
+	}
+
 	public function test_allow_indirect_properties() {
 		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
 			array(
