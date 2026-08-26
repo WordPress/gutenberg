@@ -108,6 +108,25 @@ describe( 'attachMediaInPost', () => {
 		expect( getEntityRecords ).not.toHaveBeenCalled();
 	} );
 
+	/**
+	 * The query cache keys on `include` as given, so a stable order means
+	 * reordering blocks doesn't refetch a set already in the cache.
+	 */
+	it( 'asks for the media in a stable order regardless of block order', async () => {
+		const { registry, getEntityRecords } = createRegistry( {
+			blocks: [ imageBlock( 13 ), imageBlock( 12 ) ],
+			media: [],
+		} );
+
+		await attachMediaInPost( registry, 7, 'post' );
+
+		expect( getEntityRecords ).toHaveBeenCalledWith(
+			'postType',
+			'attachment',
+			expect.objectContaining( { include: [ 12, 13 ] } )
+		);
+	} );
+
 	it( 'finds images nested inside a gallery', async () => {
 		const { registry, saveEntityRecord } = createRegistry( {
 			blocks: [

@@ -57,8 +57,15 @@ function flattenBlocks( blocks ) {
 /**
  * Collects the attachment IDs a post's blocks display.
  *
+ * Sorted rather than left in block order. The result is a *set* — which media
+ * the post displays — and the only thing consuming it is a `getEntityRecords`
+ * query, whose cache key includes `include` as given. `get-query-parts.js`
+ * normalizes that list but does not sort it, so `[ 12, 13 ]` and `[ 13, 12 ]`
+ * are separate cache entries: without this, reordering two images would refetch
+ * a set already in the cache on the next save.
+ *
  * @param {Object[]} blocks The post's blocks, unflattened.
- * @return {number[]} Attachment IDs, in block order, deduplicated.
+ * @return {number[]} Attachment IDs, ascending, deduplicated.
  */
 export default function getMediaIdsInBlocks( blocks ) {
 	const mediaIds = new Set();
@@ -77,5 +84,5 @@ export default function getMediaIdsInBlocks( blocks ) {
 		}
 	} );
 
-	return [ ...mediaIds ];
+	return [ ...mediaIds ].sort( ( a, b ) => a - b );
 }
