@@ -67,7 +67,11 @@ test.describe( 'Block Locking', () => {
 <!-- /wp:paragraph -->` );
 	} );
 
-	test( 'can unlock from toolbar', async ( { editor, page } ) => {
+	test( 'can unlock from list view', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
 		await editor.canvas
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
@@ -78,14 +82,20 @@ test.describe( 'Block Locking', () => {
 		await page.click( 'role=checkbox[name="Lock all"]' );
 		await page.click( 'role=button[name="Apply"]' );
 
-		await editor.clickBlockToolbarButton( 'Unlock' );
-		await page.click( 'role=checkbox[name="Lock all"]' );
-		await page.click( 'role=button[name="Apply"]' );
+		await pageUtils.pressKeys( 'access+o' );
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		const paragraphRow = listView.getByRole( 'gridcell', {
+			name: 'Paragraph',
+			exact: true,
+			selected: true,
+		} );
+
+		await paragraphRow.getByRole( 'button', { name: 'Unlock' } ).click();
 
 		await expect(
-			page
-				.getByRole( 'toolbar', { name: 'Block tools' } )
-				.getByRole( 'button', { name: 'Lock' } )
+			paragraphRow.getByRole( 'button', { name: 'Lock settings' } )
 		).toBeFocused();
 
 		expect( await editor.getEditedPostContent() )
@@ -122,9 +132,18 @@ test.describe( 'Block Locking', () => {
 		} );
 		await paragraph.click();
 
-		await editor.clickBlockToolbarButton( 'Unlock' );
-		await page.click( 'role=checkbox[name="Lock all"]' );
-		await page.click( 'role=button[name="Apply"]' );
+		await pageUtils.pressKeys( 'access+o' );
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		await listView
+			.getByRole( 'gridcell', {
+				name: 'Paragraph',
+				exact: true,
+				selected: true,
+			} )
+			.getByRole( 'button', { name: 'Unlock' } )
+			.click();
 
 		await expect(
 			page

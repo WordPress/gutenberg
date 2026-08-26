@@ -1696,6 +1696,11 @@
 		"filePath": "library/ungroup.svg"
 	},
 	{
+		"slug": "unlock-small",
+		"label": "Unlock Small",
+		"filePath": "library/unlock-small.svg"
+	},
+	{
 		"slug": "unlock",
 		"label": "Unlock",
 		"filePath": "library/unlock.svg"

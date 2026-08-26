@@ -418,7 +418,6 @@
 	}
 
 	.block-editor-list-view-block-select-button__block-visibility,
-	.block-editor-list-view-block-select-button__lock,
 	.block-editor-list-view-block-select-button__sticky {
 		line-height: 0;
 	}
@@ -462,6 +461,23 @@ $block-navigation-max-indent: 8;
 	.block-editor-list-view-block__contents-container,
 	.block-editor-list-view-appender__container {
 		display: flex;
+		align-items: center;
+	}
+}
+
+// Lock toggle button sits next to the select-button anchor inside the contents cell.
+// Keep it natural-width so it doesn't shrink alongside the flexed anchor.
+// Hidden on idle, revealed on hover/focus/selection, mirroring the options menu.
+.block-editor-list-view-block__lock-toggle {
+	flex: 0 0 auto;
+	opacity: 0;
+
+	margin-right: $grid-unit-05 * 0.5; // 2px.
+
+	&:hover,
+	&:focus-within,
+	&.is-visible {
+		opacity: 1;
 	}
 }
 
