@@ -16,6 +16,15 @@ for how to use `ToolsPanelItem`.
 
 ## Props
 
+### `defaultShown`: `boolean`
+
+For optional items only, this determines whether the item is shown on first
+render even when `hasValue()` is `false`. An item is always shown while it has
+a value, so this only controls the initial state of items without one.
+
+-   Required: No
+-   Default: `false`
+
 ### `hasValue`: `() => boolean`
 
 This is called when building the `ToolsPanel` menu to determine the item's
@@ -31,13 +40,6 @@ panel's menu.
 
 -   Required: No
 -   Default: `false`
-
-### `isShownOnFirstRender`: `boolean`
-
-For optional controls only, this determines whether the item should be visible
-when it first renders, even if `hasValue()` is `false`.
-
--   Required: No
 
 ### `label`: `string`
 

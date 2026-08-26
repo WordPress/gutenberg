@@ -14,9 +14,9 @@ export function useToolsPanelItem(
 ) {
 	const {
 		className,
+		defaultShown,
 		hasValue,
 		isShownByDefault = false,
-		isShownOnFirstRender,
 		label,
 		panelId,
 		resetAllFilter = noop,
@@ -61,9 +61,9 @@ export function useToolsPanelItem(
 	useLayoutEffect( () => {
 		if ( hasMatchingPanel && previousPanelId !== null ) {
 			registerPanelItem( {
+				defaultShown,
 				hasValue: hasValueCallback,
 				isShownByDefault,
-				isShownOnFirstRender,
 				label,
 				panelId,
 			} );
@@ -79,9 +79,9 @@ export function useToolsPanelItem(
 		};
 	}, [
 		currentPanelId,
+		defaultShown,
 		hasMatchingPanel,
 		isShownByDefault,
-		isShownOnFirstRender,
 		label,
 		hasValueCallback,
 		panelId,

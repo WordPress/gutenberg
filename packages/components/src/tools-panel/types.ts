@@ -104,6 +104,16 @@ export type ToolsPanelHeaderProps = {
 
 export type ToolsPanelItem = {
 	/**
+	 * For optional items only, this determines whether the item is shown on
+	 * first render even when `hasValue()` returns `false`.
+	 *
+	 * An item is always shown while it has a value, so this only controls the
+	 * initial state of items without one.
+	 *
+	 * @default false
+	 */
+	defaultShown?: boolean;
+	/**
 	 * This is called when building the `ToolsPanel` menu to determine the
 	 * item's initial checked state.
 	 */
@@ -116,11 +126,6 @@ export type ToolsPanelItem = {
 	 * @default false
 	 */
 	isShownByDefault?: boolean;
-	/**
-	 * For optional items only, determines whether the item should be visible on
-	 * first render even when `hasValue()` is false.
-	 */
-	isShownOnFirstRender?: boolean;
 	/**
 	 * The supplied label is dual purpose. It is used as:
 	 * 1. the human-readable label for the panel's dropdown menu

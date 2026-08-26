@@ -54,17 +54,17 @@ const generateMenuItems = ( {
 	const menuItems: ToolsPanelMenuItems = emptyMenuItems();
 
 	panelItems.forEach(
-		( { hasValue, isShownByDefault, isShownOnFirstRender, label } ) => {
+		( { defaultShown, hasValue, isShownByDefault, label } ) => {
 			const group = isShownByDefault ? 'default' : 'optional';
 
 			// If a menu item for this label has already been flagged as customized
 			// (for default controls), or toggled on (for optional controls), do not
 			// overwrite its value as those controls would lose that state.
 			const existingItemValue = currentMenuItems?.[ group ]?.[ label ];
+			// An item is always shown while it has a value. `defaultShown`
+			// only opts an optional item in when it has none.
 			const initialValue =
-				! isShownByDefault && isShownOnFirstRender !== undefined
-					? isShownOnFirstRender
-					: hasValue();
+				hasValue() || ( ! isShownByDefault && !! defaultShown );
 			const value = existingItemValue ?? initialValue;
 
 			newMenuItems[ group ][ label ] = shouldReset ? false : value;

@@ -488,8 +488,8 @@ describe( 'ToolsPanel', () => {
 			expect( controlRerendered ).toBeInTheDocument();
 		} );
 
-		it( 'should render optional item on first render when isShownOnFirstRender is true', () => {
-			const { rerender } = render(
+		it( 'should not render optional item without a value by default', () => {
+			render(
 				<ToolsPanel { ...defaultProps }>
 					<ToolsPanelItem { ...altControlProps }>
 						<div>Optional control</div>
@@ -500,10 +500,31 @@ describe( 'ToolsPanel', () => {
 			expect(
 				screen.queryByText( 'Optional control' )
 			).not.toBeInTheDocument();
+		} );
 
-			rerender(
+		it( 'should render optional item on first render when defaultShown is true', () => {
+			render(
 				<ToolsPanel { ...defaultProps }>
-					<ToolsPanelItem { ...altControlProps } isShownOnFirstRender>
+					<ToolsPanelItem { ...altControlProps } defaultShown>
+						<div>Optional control</div>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			);
+
+			expect(
+				screen.getByText( 'Optional control' )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should render optional item with a value even when defaultShown is false', () => {
+			altControlValue = true;
+
+			render(
+				<ToolsPanel { ...defaultProps }>
+					<ToolsPanelItem
+						{ ...altControlProps }
+						defaultShown={ false }
+					>
 						<div>Optional control</div>
 					</ToolsPanelItem>
 				</ToolsPanel>
