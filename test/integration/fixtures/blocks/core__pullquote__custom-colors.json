@@ -5,7 +5,7 @@
 		"attributes": {
 			"value": "pullquote",
 			"citation": "citation",
-			"className": "is-style-default",
+			"className": "is-style-default has-text-align-right",
 			"style": {
 				"color": {
 					"background": "#3486aa",
@@ -13,9 +13,6 @@
 				},
 				"border": {
 					"color": "#045679"
-				},
-				"typography": {
-					"textAlign": "right"
 				}
 			}
 		},

@@ -2,7 +2,6 @@ import { __ } from '@wordpress/i18n';
 import { RichText, useBlockProps } from '@wordpress/block-editor';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { Figure } from './figure';
-import { BlockQuote } from './blockquote';
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
 function PullQuoteEdit( props ) {
@@ -15,7 +14,7 @@ function PullQuoteEdit( props ) {
 	return (
 		<>
 			<Figure { ...blockProps }>
-				<BlockQuote>
+				<aside>
 					<RichText
 						identifier="value"
 						tagName="p"
@@ -60,7 +59,7 @@ function PullQuoteEdit( props ) {
 							}
 						/>
 					) }
-				</BlockQuote>
+				</aside>
 			</Figure>
 		</>
 	);
