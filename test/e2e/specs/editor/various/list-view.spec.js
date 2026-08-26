@@ -1444,6 +1444,105 @@ test.describe( 'List View', () => {
 			'The dropdown menu should also be visible'
 		).toBeVisible();
 	} );
+
+	test( 'should place the caret at the end of the block when activating from List View', async ( {
+		editor,
+		page,
+		listViewUtils,
+	} ) => {
+		// Insert a paragraph with some text.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First paragraph' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second paragraph' },
+		} );
+
+		// Open List View.
+		const listView = await listViewUtils.openListView();
+
+		// Click the first paragraph in List View to select it,
+		// then press Enter to activate it (transfer focus to canvas).
+		// Keyboard activation places the caret at the start of the first
+		// field. Mouse click keeps focus in the list view.
+		await listView
+			.getByRole( 'gridcell', { name: 'Paragraph' } )
+			.first()
+			.click();
+		await page.keyboard.press( 'Enter' );
+
+		// Press Enter to split the block at the caret position.
+		// With the caret at the start, this creates a new block before
+		// the first paragraph.
+		await page.keyboard.press( 'Enter' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: '' } },
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'First paragraph' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Second paragraph' },
+			},
+		] );
+	} );
+
+	test( 'should focus the first cell of a Table when activating from List View', async ( {
+		editor,
+		page,
+		listViewUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/table',
+			attributes: {
+				body: [
+					{
+						cells: [
+							{ content: 'R1C1', tag: 'td' },
+							{ content: 'R1C2', tag: 'td' },
+						],
+					},
+					{
+						cells: [
+							{ content: 'R2C1', tag: 'td' },
+							{ content: 'R2C2', tag: 'td' },
+						],
+					},
+				],
+			},
+		} );
+
+		const listView = await listViewUtils.openListView();
+		await listView.getByRole( 'gridcell', { name: 'Table' } ).click();
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'X' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/table',
+				attributes: {
+					body: [
+						{
+							cells: [
+								{ content: 'XR1C1', tag: 'td' },
+								{ content: 'R1C2', tag: 'td' },
+							],
+						},
+						{
+							cells: [
+								{ content: 'R2C1', tag: 'td' },
+								{ content: 'R2C2', tag: 'td' },
+							],
+						},
+					],
+				},
+			},
+		] );
+	} );
 } );
 
 /** @typedef {import('@playwright/test').Locator} Locator */
