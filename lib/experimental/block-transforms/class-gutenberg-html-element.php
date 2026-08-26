@@ -376,6 +376,74 @@ class Gutenberg_HTML_Element {
 	}
 
 	/**
+	 * Replaces this node with its children.
+	 *
+	 * @return void
+	 */
+	public function unwrap() {
+		if ( null === $this->parent ) {
+			return;
+		}
+
+		foreach ( $this->parent->children as $index => $child ) {
+			if ( $child !== $this ) {
+				continue;
+			}
+
+			foreach ( $this->children as $grandchild ) {
+				$grandchild->parent = $this->parent;
+			}
+
+			array_splice( $this->parent->children, $index, 1, $this->children );
+			break;
+		}
+
+		$this->children = array();
+		$this->parent   = null;
+	}
+
+	/**
+	 * Removes every attribute except the named ones.
+	 *
+	 * The opening tag is rebuilt rather than edited in place so no gap is left
+	 * where an attribute used to be.
+	 *
+	 * @param string[] $names Attribute names to keep.
+	 * @return void
+	 */
+	public function keep_attributes( $names ) {
+		if ( self::ELEMENT !== $this->type ) {
+			return;
+		}
+
+		$names = array_map( 'strtolower', $names );
+		$kept  = array();
+
+		foreach ( $this->attributes as $name => $value ) {
+			if ( in_array( $name, $names, true ) ) {
+				$kept[ $name ] = $value;
+			}
+		}
+
+		if ( count( $kept ) === count( $this->attributes ) ) {
+			return;
+		}
+
+		$processor = new WP_HTML_Tag_Processor( '<' . $this->tag_name . '>' );
+
+		if ( ! $processor->next_tag() ) {
+			return;
+		}
+
+		foreach ( $kept as $name => $value ) {
+			$processor->set_attribute( $name, $value );
+		}
+
+		$this->opening_html = $processor->get_updated_html();
+		$this->attributes   = $kept;
+	}
+
+	/**
 	 * Determines whether this node matches a selector list.
 	 *
 	 * @param string $selector Selector list.

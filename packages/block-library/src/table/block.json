@@ -220,7 +220,8 @@
 			{
 				"name": "from-raw",
 				"type": "raw",
-				"selector": "table"
+				"selector": "table",
+				"serverConversion": false
 			}
 		]
 	},

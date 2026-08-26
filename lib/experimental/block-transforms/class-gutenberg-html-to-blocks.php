@@ -154,6 +154,10 @@ class Gutenberg_HTML_To_Blocks {
 			return self::create_fallback_block( $element );
 		}
 
+		if ( isset( $transform['schema'] ) && is_array( $transform['schema'] ) ) {
+			self::apply_content_schema( $element, $transform['schema'] );
+		}
+
 		if ( isset( $transform['transform'] ) && is_callable( $transform['transform'] ) ) {
 			$block = call_user_func( $transform['transform'], $element, array( __CLASS__, 'convert' ) );
 
@@ -182,7 +186,7 @@ class Gutenberg_HTML_To_Blocks {
 
 		$attributes = array_merge( self::get_block_supports_attributes( $block_type, $element ), $attributes );
 
-		return self::create_block( $block_type, $attributes, $element, $inner_blocks );
+		return self::create_block( $block_type, $transform, $attributes, $element, $inner_blocks );
 	}
 
 	/**
@@ -287,14 +291,15 @@ class Gutenberg_HTML_To_Blocks {
 	 * Builds a parsed block array from a block type and its source markup.
 	 *
 	 * @param WP_Block_Type          $block_type   Block type.
+	 * @param array                  $transform    Transform that matched the element.
 	 * @param array                  $attributes   Block attributes.
 	 * @param Gutenberg_HTML_Element $element      Element the block was derived from.
 	 * @param array[]                $inner_blocks Inner blocks.
 	 * @return array Parsed block array.
 	 */
-	private static function create_block( $block_type, $attributes, $element, $inner_blocks ) {
+	private static function create_block( $block_type, $transform, $attributes, $element, $inner_blocks ) {
 		$attributes = self::remove_default_attributes( $block_type, $attributes );
-		$markup     = self::prepare_wrapper_markup( $block_type, $element );
+		$markup     = self::prepare_wrapper_markup( $block_type, $transform, $element );
 
 		if ( array() === $inner_blocks ) {
 			return array(
@@ -377,10 +382,11 @@ class Gutenberg_HTML_To_Blocks {
 	 * implementation of every block's `save()`.
 	 *
 	 * @param WP_Block_Type          $block_type Block type.
+	 * @param array                  $transform  Transform that matched the element.
 	 * @param Gutenberg_HTML_Element $element    Element to add the class to.
 	 * @return array Markup with `opening`, `closing` and `outer` keys.
 	 */
-	private static function prepare_wrapper_markup( $block_type, $element ) {
+	private static function prepare_wrapper_markup( $block_type, $transform, $element ) {
 		$opening  = $element->get_opening_tag();
 		$closing  = $element->get_closing_tag();
 		$supports = (array) $block_type->supports;
@@ -388,35 +394,64 @@ class Gutenberg_HTML_To_Blocks {
 		$keep_classes = ! isset( $supports['customClassName'] ) || false !== $supports['customClassName'];
 		$keep_anchor  = ! empty( $supports['anchor'] );
 
-		$processor = new WP_HTML_Tag_Processor( $opening );
+		$source = new WP_HTML_Tag_Processor( $opening );
 
-		if ( $processor->next_tag() ) {
-			if ( ! $keep_anchor ) {
-				$processor->remove_attribute( 'id' );
-			}
-
-			/*
-			 * The wrapper carries the classes `useBlockProps.save()` would put
-			 * on it, taken from the block supports the editor itself applies
-			 * rather than from a second implementation of the same rule.
-			 *
-			 * A class the source already repeats survives into saved markup
-			 * otherwise, where `save` emits it once and the editor flags the
-			 * block, so the list is reduced to distinct tokens.
-			 */
-			$classes = array_merge(
-				$keep_classes ? $element->get_class_names() : array(),
-				self::get_block_supports_classes( $block_type )
+		if ( ! $source->next_tag() ) {
+			return array(
+				'opening' => $opening,
+				'closing' => $closing,
+				'outer'   => $opening . $element->get_inner_html() . $closing,
 			);
-			$classes = array_values( array_unique( $classes ) );
+		}
 
-			if ( array() === $classes ) {
-				$processor->remove_attribute( 'class' );
-			} else {
-				$processor->set_attribute( 'class', implode( ' ', $classes ) );
+		/*
+		 * The wrapper is rebuilt from the attributes `save` would put back on
+		 * it rather than filtered in place. Anything else survives into saved
+		 * markup, where it makes the block invalid and the deprecation that
+		 * absorbs it can swallow the whole element as the block's content.
+		 */
+		$attributes = array();
+
+		/*
+		 * The classes `useBlockProps.save()` would add, taken from the block
+		 * supports the editor itself applies rather than from a second
+		 * implementation of the same rule. A class the source already repeats
+		 * would otherwise be emitted twice, which the editor flags.
+		 */
+		$classes = array_merge(
+			$keep_classes ? $element->get_class_names() : array(),
+			self::get_block_supports_classes( $block_type )
+		);
+		$classes = array_values( array_unique( $classes ) );
+
+		if ( array() !== $classes ) {
+			$attributes['class'] = implode( ' ', $classes );
+		}
+
+		if ( $keep_anchor ) {
+			$anchor = $source->get_attribute( 'id' );
+
+			if ( is_string( $anchor ) && '' !== $anchor ) {
+				$attributes['id'] = $anchor;
+			}
+		}
+
+		foreach ( self::get_wrapper_attributes( $block_type, $transform, $element ) as $name ) {
+			$value = $source->get_attribute( $name );
+
+			if ( null !== $value ) {
+				$attributes[ $name ] = $value;
+			}
+		}
+
+		$rebuilt = new WP_HTML_Tag_Processor( '<' . $element->tag_name . '>' );
+
+		if ( $rebuilt->next_tag() ) {
+			foreach ( $attributes as $name => $value ) {
+				$rebuilt->set_attribute( $name, $value );
 			}
 
-			$opening = $processor->get_updated_html();
+			$opening = $rebuilt->get_updated_html();
 		}
 
 		return array(
@@ -437,6 +472,155 @@ class Gutenberg_HTML_To_Blocks {
 		$classes = isset( $applied['class'] ) ? trim( (string) $applied['class'] ) : '';
 
 		return '' === $classes ? array() : preg_split( '/\s+/', $classes );
+	}
+
+	/**
+	 * Removes from an element's content what its transform's schema does not allow.
+	 *
+	 * The counterpart of `deepFilterHTML()` in `@wordpress/blocks`, which the
+	 * editor runs over pasted and converted markup before any transform sees
+	 * it. Only the content is filtered: the wrapper's own attributes are
+	 * decided by what the block's `save` puts back on it.
+	 *
+	 * @param Gutenberg_HTML_Element $element Matched element.
+	 * @param array                  $schema  Content schema declared by the transform.
+	 * @return void
+	 */
+	private static function apply_content_schema( $element, $schema ) {
+		if ( ! isset( $schema[ $element->tag_name ] ) || ! is_array( $schema[ $element->tag_name ] ) ) {
+			return;
+		}
+
+		self::filter_children( $element, $schema[ $element->tag_name ] );
+	}
+
+	/**
+	 * Filters an element's children against the schema entry describing it.
+	 *
+	 * @param Gutenberg_HTML_Element $element Element whose children to filter.
+	 * @param array                  $entry   Schema entry for the element.
+	 * @return void
+	 */
+	private static function filter_children( $element, $entry ) {
+		if ( ! array_key_exists( 'children', $entry ) ) {
+			$element->children = array();
+
+			return;
+		}
+
+		$children = $entry['children'];
+
+		/*
+		 * `*` allows anything, and inline content is carried verbatim by the
+		 * rich text and HTML attribute sources, so neither needs filtering.
+		 */
+		if ( ! is_array( $children ) ) {
+			return;
+		}
+
+		foreach ( $element->children as $child ) {
+			self::filter_node( $child, $children );
+		}
+	}
+
+	/**
+	 * Keeps, cleans or unwraps a single node according to a schema.
+	 *
+	 * @param Gutenberg_HTML_Element $node   Node to filter.
+	 * @param array                  $schema Schema the node's parent allows.
+	 * @return void
+	 */
+	private static function filter_node( $node, $schema ) {
+		if ( Gutenberg_HTML_Element::TEXT === $node->type ) {
+			if ( ! isset( $schema['#text'] ) && '' !== trim( $node->text ) ) {
+				$node->remove();
+			}
+
+			return;
+		}
+
+		if ( Gutenberg_HTML_Element::ELEMENT !== $node->type ) {
+			return;
+		}
+
+		if ( ! isset( $schema[ $node->tag_name ] ) || ! is_array( $schema[ $node->tag_name ] ) ) {
+			// An element the schema does not name keeps its content but loses itself.
+			foreach ( $node->children as $child ) {
+				self::filter_node( $child, $schema );
+			}
+
+			$node->unwrap();
+
+			return;
+		}
+
+		$entry = $schema[ $node->tag_name ];
+
+		$node->keep_attributes( self::get_schema_attributes( $entry ) );
+
+		self::filter_children( $node, $entry );
+	}
+
+	/**
+	 * Returns the attributes a schema entry allows.
+	 *
+	 * An entry that varies by context lists them under `default`, which is what
+	 * conversion uses; `paste` is for content coming from another application.
+	 *
+	 * @param array $entry Schema entry.
+	 * @return string[] Attribute names.
+	 */
+	private static function get_schema_attributes( $entry ) {
+		if ( ! isset( $entry['attributes'] ) ) {
+			return array();
+		}
+
+		$attributes = $entry['attributes'];
+
+		if ( isset( $attributes['default'] ) ) {
+			$attributes = $attributes['default'];
+		}
+
+		return is_array( $attributes ) ? array_values( array_filter( $attributes, 'is_string' ) ) : array();
+	}
+
+	/**
+	 * Returns the wrapper attributes a block reads its own values from.
+	 *
+	 * These are the attributes `save` writes back out, so they are the only
+	 * ones besides `class` and `id` that may stay on the wrapper.
+	 *
+	 * @param WP_Block_Type          $block_type Block type.
+	 * @param array                  $transform  Transform that matched the element.
+	 * @param Gutenberg_HTML_Element $element    Matched element.
+	 * @return string[] Attribute names, lowercased.
+	 */
+	private static function get_wrapper_attributes( $block_type, $transform, $element ) {
+		$definitions = (array) $block_type->attributes;
+
+		if ( isset( $transform['attributes'] ) && is_array( $transform['attributes'] ) ) {
+			$definitions = array_merge( $definitions, $transform['attributes'] );
+		}
+
+		$names = array();
+
+		foreach ( $definitions as $definition ) {
+			if ( ! is_array( $definition ) || ! isset( $definition['source'], $definition['attribute'] ) ) {
+				continue;
+			}
+
+			if ( 'attribute' !== $definition['source'] ) {
+				continue;
+			}
+
+			if ( isset( $definition['selector'] ) && ! $element->matches( $definition['selector'] ) ) {
+				continue;
+			}
+
+			$names[] = strtolower( $definition['attribute'] );
+		}
+
+		return array_values( array_unique( $names ) );
 	}
 
 	/**
