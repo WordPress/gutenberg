@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { press } from '@ariakit/test';
+import { logged } from '@wordpress/deprecated';
 import CircularOptionPicker from '..';
 
 const SINGLE_OPTION = [ <CircularOptionPicker.Option key="option" /> ];
@@ -13,12 +14,18 @@ const DEFAULT_PROPS = {
 	'aria-label': 'Circular Option Picker',
 	options: SINGLE_OPTION,
 };
+const AS_BUTTONS_DEPRECATION =
+	'`asButtons` prop in wp.components.CircularOptionPicker is deprecated since version 7.2. Please use `presentation` instead. Note: `asButtons={ true }` maps to `presentation="toggle-buttons"`. Explicit `presentation` takes precedence.';
 
 function getOption( name: string ) {
 	return screen.getByRole( 'option', { name } );
 }
 
 describe( 'CircularOptionPicker', () => {
+	beforeEach( () => {
+		Object.keys( logged ).forEach( ( key ) => delete logged[ key ] );
+	} );
+
 	describe( 'when `asButtons` is not set', () => {
 		it( 'should render as a listbox', async () => {
 			render( <CircularOptionPicker { ...DEFAULT_PROPS } /> );
@@ -41,9 +48,7 @@ describe( 'CircularOptionPicker', () => {
 			expect( screen.getByRole( 'listbox' ) ).toBeInTheDocument();
 			expect( screen.getByRole( 'option' ) ).toBeInTheDocument();
 			expect( screen.queryByRole( 'button' ) ).not.toBeInTheDocument();
-			expect( console ).toHaveWarnedWith(
-				'`asButtons` prop in wp.components.CircularOptionPicker is deprecated since version 7.2. Please use `presentation` instead. Note: `asButtons={ true }` maps to `presentation="toggle-buttons"`. Explicit `presentation` takes precedence.'
-			);
+			expect( console ).toHaveWarnedWith( AS_BUTTONS_DEPRECATION );
 		} );
 	} );
 
@@ -82,6 +87,7 @@ describe( 'CircularOptionPicker', () => {
 					pressed: false,
 				} )
 			).toBeInTheDocument();
+			expect( console ).toHaveWarnedWith( AS_BUTTONS_DEPRECATION );
 		} );
 	} );
 
@@ -177,6 +183,7 @@ describe( 'CircularOptionPicker', () => {
 			expect( screen.getByRole( 'button' ) ).not.toHaveAttribute(
 				'aria-pressed'
 			);
+			expect( console ).toHaveWarnedWith( AS_BUTTONS_DEPRECATION );
 		} );
 	} );
 
