@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`design token fallback build plugin parity keeps esbuild and Vite source-text transforms aligned 1`] = `
 "// Source text is transformed consistently: var(--wpds-border-radius-sm, 2px).

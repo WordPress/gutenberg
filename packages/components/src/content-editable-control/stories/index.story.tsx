@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import ContentEditableControl from '..';
 
 const meta: Meta< typeof ContentEditableControl > = {

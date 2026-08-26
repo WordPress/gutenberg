@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { createBlock, getBlockType, parse } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { store as blockDirectoryStore } from '../../store';
 
 export default function InstallButton( { attributes, block, clientId } ) {

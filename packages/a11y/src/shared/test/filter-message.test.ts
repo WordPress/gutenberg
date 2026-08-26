@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import filterMessage from '../filter-message';
 
 describe( 'filterMessage', () => {

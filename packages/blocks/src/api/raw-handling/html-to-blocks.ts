@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { createBlock, findTransform } from '../factory';
 import { getBlockAttributes } from '../parser/get-block-attributes';
 import { getRawTransforms } from './get-raw-transforms';

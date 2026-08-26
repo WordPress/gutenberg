@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store as blocksStore } from '@wordpress/blocks';
 import {
 	registerCoreBlocks,
@@ -20,10 +17,6 @@ import {
 } from '@wordpress/editor';
 import { store as coreDataStore } from '@wordpress/core-data';
 import apiFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
 import Layout from './components/layout';
 import { unlock } from './lock-unlock';
 
@@ -124,36 +117,6 @@ export function initializeEditor(
 		);
 	}
 
-	// This is a temporary fix for a couple of issues specific to Webkit on iOS.
-	// Without this hack the browser scrolls the mobile toolbar off-screen.
-	// Once supported in Safari we can replace this in favor of preventScroll.
-	// For details see issue #18632 and PR #18686
-	// Specifically, we scroll `interface-interface-skeleton__body` to enable a fixed top toolbar.
-	// But Mobile Safari forces the `html` element to scroll upwards, hiding the toolbar.
-
-	const isIphone = window.navigator.userAgent.indexOf( 'iPhone' ) !== -1;
-	if ( isIphone ) {
-		window.addEventListener( 'scroll', ( event ) => {
-			const editorScrollContainer = document.getElementsByClassName(
-				'interface-interface-skeleton__body'
-			)[ 0 ];
-			if ( event.target === document ) {
-				// Scroll element into view by scrolling the editor container by the same amount
-				// that Mobile Safari tried to scroll the html element upwards.
-				if ( window.scrollY > 100 ) {
-					editorScrollContainer.scrollTop =
-						editorScrollContainer.scrollTop + window.scrollY;
-				}
-				// Undo unwanted scroll on html element, but only in the visual editor.
-				if (
-					document.getElementsByClassName( 'is-mode-visual' )[ 0 ]
-				) {
-					window.scrollTo( 0, 0 );
-				}
-			}
-		} );
-	}
-
 	// Prevent the default browser action for files dropped outside of dropzones.
 	window.addEventListener( 'dragover', ( e ) => e.preventDefault(), false );
 	window.addEventListener( 'drop', ( e ) => e.preventDefault(), false );
@@ -231,7 +194,6 @@ async function preloadResolutions( postType, postId ) {
 			core.__experimentalGetCurrentThemeBaseGlobalStyles(),
 			core.__experimentalGetCurrentThemeGlobalStylesVariations(),
 			core.getEntityRecord( 'root', '__unstableBase' ),
-			core.getEntityRecord( 'root', 'site' ),
 			core.canUser( 'read', { kind: 'root', name: 'site' } ),
 			core.canUser( 'create', { kind: 'postType', name: 'attachment' } ),
 			core.canUser( 'create', { kind: 'postType', name: 'page' } ),
@@ -275,12 +237,16 @@ async function preloadResolutions( postType, postId ) {
 
 		// Phase 2: read derived data out of state.
 		const tasks = [];
+
+		if ( coreSelect.canUser( 'read', { kind: 'root', name: 'site' } ) ) {
+			tasks.push( core.getEntityRecord( 'root', 'site' ) );
+		}
+
 		const globalStylesId =
 			coreSelect.__experimentalGetCurrentGlobalStylesId();
 		if ( globalStylesId ) {
 			tasks.push(
-				core.getEntityRecord( 'root', 'globalStyles', globalStylesId ),
-				core.canUser( 'read', {
+				core.canUser( 'update', {
 					kind: 'root',
 					name: 'globalStyles',
 					id: globalStylesId,
@@ -315,6 +281,31 @@ async function preloadResolutions( postType, postId ) {
 
 		if ( tasks.length ) {
 			await Promise.all( tasks );
+		}
+
+		// Phase 3: requests whose capability check only resolved in phase 2.
+		if ( globalStylesId ) {
+			if (
+				coreSelect.canUser( 'update', {
+					kind: 'root',
+					name: 'globalStyles',
+					id: globalStylesId,
+				} )
+			) {
+				await core.getEntityRecord(
+					'root',
+					'globalStyles',
+					globalStylesId
+				);
+			} else {
+				// Fetch for non-admin users using view context.
+				await core.getEntityRecord(
+					'root',
+					'globalStyles',
+					globalStylesId,
+					{ context: 'view' }
+				);
+			}
 		}
 	} catch {
 		// Resolver failures here would also surface on demand; don't block render.

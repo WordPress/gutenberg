@@ -13,7 +13,6 @@ let configuredDisallowedPath;
 
 try {
 	const { positionals, values } = parseArgs( {
-		args: process.argv.slice( 2 ),
 		allowPositionals: true,
 		options: {
 			'disallow-path': { type: 'string' },

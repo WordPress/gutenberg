@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Popover,
 	ToolbarButton,
@@ -9,10 +6,6 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 
 /**

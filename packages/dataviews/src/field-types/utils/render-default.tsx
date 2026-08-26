@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { DataViewRenderFieldProps } from '../../types';
 import RenderFromElements from './render-from-elements';
 

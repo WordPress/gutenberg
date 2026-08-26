@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { RichText, useBlockProps } from '@wordpress/block-editor';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
@@ -26,8 +23,13 @@ export default function CodeEdit( {
 				aria-label={ __( 'Code' ) }
 				preserveWhiteSpace
 				__unstablePastePlainText
-				__unstableOnSplitAtDoubleLineEnd={ () =>
-					insertBlocksAfter( createBlock( getDefaultBlockName() ) )
+				__unstableOnSplitAtDoubleLineEnd={
+					insertBlocksAfter
+						? () =>
+								insertBlocksAfter(
+									createBlock( getDefaultBlockName() )
+								)
+						: undefined
 				}
 				style={ { whiteSpace: 'break-spaces' } }
 			/>

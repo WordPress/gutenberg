@@ -6,15 +6,7 @@
  * `ResolveWidgetModule`) live in `@wordpress/widget-primitives` and are
  * imported from there directly; this module does not re-export them.
  */
-
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import type {
 	DashboardGridLayoutItem,
 	DashboardLanesLayoutItem,
@@ -50,7 +42,7 @@ export type DashboardTilePlacement = GridTilePlacement | MasonryTilePlacement;
  * Attribute bag of a widget instance, as edited by the dashboard's
  * attribute surfaces.
  */
-export type WidgetAttributes = Record< string, unknown >;
+export type WidgetAttributeValues = Record< string, unknown >;
 
 /**
  * A widget placed on the dashboard.

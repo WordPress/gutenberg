@@ -39,11 +39,6 @@
 			"count": 5
 		}
 	},
-	"widgets/quick-draft/components/saved-post/saved-post.module.css": {
-		"selector-class-pattern": {
-			"count": 1
-		}
-	},
 	"widgets/welcome/components/banner/banner.module.css": {
 		"selector-class-pattern": {
 			"count": 2

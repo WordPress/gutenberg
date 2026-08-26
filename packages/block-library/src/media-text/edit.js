@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useState, useRef } from '@wordpress/element';
@@ -22,7 +15,7 @@ import {
 } from '@wordpress/block-editor';
 import {
 	RangeControl,
-	TextareaControl,
+	TextareaControl as WCTextareaControl,
 	ToggleControl,
 	ToolbarButton,
 	ExternalLink,
@@ -33,10 +26,6 @@ import {
 import { isBlobURL, getBlobTypeByURL } from '@wordpress/blob';
 import { pullLeft, pullRight } from '@wordpress/icons';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import MediaContainer from './media-container';
 import {
 	DEFAULT_MEDIA_SIZE_SLUG,
@@ -44,7 +33,6 @@ import {
 	LINK_DESTINATION_NONE,
 	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_ATTACHMENT,
-	TEMPLATE,
 } from './constants';
 import { unlock } from '../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
@@ -443,7 +431,7 @@ function MediaTextEdit( {
 					hasValue={ () => !! mediaAlt }
 					onDeselect={ () => setAttributes( { mediaAlt: '' } ) }
 				>
-					<TextareaControl
+					<WCTextareaControl
 						label={ __( 'Alternative text' ) }
 						value={ mediaAlt }
 						onChange={ onMediaAltChange }
@@ -485,7 +473,7 @@ function MediaTextEdit( {
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{ className: 'wp-block-media-text__content' },
-		{ template: TEMPLATE, allowedBlocks }
+		{ allowedBlocks }
 	);
 
 	const blockEditingMode = useBlockEditingMode();
@@ -499,6 +487,7 @@ function MediaTextEdit( {
 						<BlockVerticalAlignmentControl
 							onChange={ onVerticalAlignmentChange }
 							value={ verticalAlignment }
+							label={ __( 'Align media and text vertically' ) }
 						/>
 						<ToolbarButton
 							icon={ pullLeft }

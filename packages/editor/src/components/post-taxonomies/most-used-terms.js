@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { BaseControl, Button } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { unescapeTerms } from '../../utils/terms';
 
 const MIN_MOST_USED_TERMS = 3;

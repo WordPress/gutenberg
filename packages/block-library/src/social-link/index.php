@@ -10,29 +10,35 @@
  *
  * @since 5.4.0
  *
- * @param Array    $attributes The block attributes.
- * @param String   $content    InnerBlocks content of the Block.
+ * @param array    $attributes The block attributes.
+ * @param string   $content    InnerBlocks content of the Block.
  * @param WP_Block $block      Block object.
- *
  * @return string Rendered HTML of the referenced block.
  */
 function render_block_core_social_link( $attributes, $content, $block ) {
 	$open_in_new_tab = $block->context['openInNewTab'] ?? false;
 
-	$text = ! empty( $attributes['label'] ) ? trim( $attributes['label'] ) : '';
+	$label_attr = $attributes['label'] ?? null;
+	$text       = is_string( $label_attr ) && '' !== $label_attr ? trim( $label_attr ) : '';
 
-	$service     = $attributes['service'] ?? 'Icon';
-	$url         = $attributes['url'] ?? false;
-	$text        = $text ? $text : block_core_social_link_get_name( $service );
-	$rel         = $attributes['rel'] ?? '';
-	$show_labels = array_key_exists( 'showLabels', $block->context ) ? $block->context['showLabels'] : false;
+	$service_attr = $attributes['service'] ?? null;
+	$service      = is_string( $service_attr ) ? $service_attr : 'Icon';
+	$url          = $attributes['url'] ?? false;
+	$text         = $text ? $text : block_core_social_link_get_name( $service );
+	$rel_attr     = $attributes['rel'] ?? null;
+	$rel          = is_string( $rel_attr ) ? $rel_attr : '';
+	$show_labels  = array_key_exists( 'showLabels', $block->context ) ? $block->context['showLabels'] : false;
 
 	// Don't render a link if there is no URL set.
 	if ( ! $url ) {
 		return '';
 	}
 
-	/**
+	if ( ! is_string( $url ) ) {
+		return '';
+	}
+
+	/*
 	 * Prepend emails with `mailto:` if not set.
 	 * The `is_email` returns false for emails with schema.
 	 */
@@ -40,7 +46,7 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 		$url = 'mailto:' . antispambot( $url );
 	}
 
-	/**
+	/*
 	 * Prepend URL with https:// if it doesn't appear to contain a scheme
 	 * and it's not a relative link or a fragment.
 	 */
@@ -88,19 +94,17 @@ function register_block_core_social_link() {
 }
 add_action( 'init', 'register_block_core_social_link' );
 
-
 /**
  * Returns the SVG for social link.
  *
  * @since 5.4.0
  *
  * @param string $service The service icon.
- *
  * @return string SVG Element for service icon.
  */
 function block_core_social_link_get_icon( $service ) {
 	$services = block_core_social_link_services();
-	if ( isset( $services[ $service ] ) && isset( $services[ $service ]['icon'] ) ) {
+	if ( is_string( $service ) && isset( $services[ $service ] ) && isset( $services[ $service ]['icon'] ) ) {
 		return $services[ $service ]['icon'];
 	}
 
@@ -113,12 +117,11 @@ function block_core_social_link_get_icon( $service ) {
  * @since 5.4.0
  *
  * @param string $service The service icon.
- *
  * @return string Brand label.
  */
 function block_core_social_link_get_name( $service ) {
 	$services = block_core_social_link_services();
-	if ( isset( $services[ $service ] ) && isset( $services[ $service ]['name'] ) ) {
+	if ( is_string( $service ) && isset( $services[ $service ] ) && isset( $services[ $service ]['name'] ) ) {
 		return $services[ $service ]['name'];
 	}
 
@@ -131,11 +134,13 @@ function block_core_social_link_get_name( $service ) {
  * @since 5.4.0
  *
  * @param string $service The service slug to extract data from.
- * @param string $field The field ('name', 'icon', etc) to extract for a service.
- *
+ * @param string $field   The field ('name', 'icon', etc) to extract for a service.
  * @return array|string
  */
 function block_core_social_link_services( $service = '', $field = '' ) {
+	if ( ! is_string( $service ) || ! is_string( $field ) ) {
+		return array();
+	}
 	$services_data = array(
 		'fivehundredpx' => array(
 			'name' => _x( '500px', 'social link block variation name' ),
@@ -336,7 +341,7 @@ function block_core_social_link_services( $service = '', $field = '' ) {
 	);
 
 	/**
-	 * Filter the list of available social service.
+	 * Filters the list of available social service.
 	 *
 	 * This can be used to change icons or add custom icons (additionally to variations in the editor).
 	 * Icons should be directly renderable - therefore SVGs work best.
@@ -367,7 +372,6 @@ function block_core_social_link_services( $service = '', $field = '' ) {
  * @since 5.7.0
  *
  * @param array $context Block context passed to Social Link.
- *
  * @return string Inline CSS styles for link's icon and background colors.
  */
 function block_core_social_link_get_color_styles( $context ) {
@@ -390,7 +394,6 @@ function block_core_social_link_get_color_styles( $context ) {
  * @since 6.3.0
  *
  * @param array $context Block context passed to Social Sharing Link.
- *
  * @return string CSS classes for link's icon and background colors.
  */
 function block_core_social_link_get_color_classes( $context ) {

@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { ToolbarGroup, ToolbarItem } from '@wordpress/components';
 import deprecated from '@wordpress/deprecated';
 import { ImageCropperProvider } from '@wordpress/image-cropper';
-
-/**
- * Internal dependencies
- */
 import AspectRatioDropdown from './aspect-ratio-dropdown';
 import BlockControls from '../block-controls';
 import ImageEditingProvider from './context';

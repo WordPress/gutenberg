@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalText as WCText } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import CharacterCount from '../character-count';
 import WordCount from '../word-count';
 import TimeToRead from '../time-to-read';

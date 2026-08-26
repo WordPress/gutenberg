@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalUnitControl as UnitControl,
@@ -19,10 +16,6 @@ import {
 	justifyRight,
 } from '@wordpress/icons';
 import { getCSSRules } from '@wordpress/style-engine';
-
-/**
- * Internal dependencies
- */
 import { useSettings } from '../components/use-settings';
 import { appendSelectors, getBlockGapCSS, getAlignmentsInfo } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
@@ -36,6 +29,14 @@ const GLOBAL_WIDE_SIZE = 'var(--wp--style--global--wide-size, none)';
 export default {
 	name: 'constrained',
 	label: __( 'Constrained' ),
+	hasInspectorControls( layoutBlockSupport = {} ) {
+		const {
+			allowJustification = true,
+			allowCustomContentAndWideSize = true,
+		} = layoutBlockSupport;
+
+		return allowJustification || allowCustomContentAndWideSize;
+	},
 	inspectorControls: function DefaultLayoutInspectorControls( {
 		layout,
 		onChange,
@@ -254,7 +255,7 @@ export default {
 		const hasViewportOverride = ( key ) =>
 			Object.hasOwn( viewportOverrides || {}, key );
 		const { contentSize, wideSize, justifyContent } = effectiveLayout;
-		const blockGapStyleValue = getGapCSSValue( style?.spacing?.blockGap );
+		const blockGapStyleValue = style?.spacing?.blockGap;
 		const hasBlockGapOverride =
 			! hasViewportOverrides ||
 			Object.hasOwn( style?.spacing || {}, 'blockGap' );

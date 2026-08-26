@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { RichText, useBlockProps } from '@wordpress/block-editor';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { Figure } from './figure';
 import { BlockQuote } from './blockquote';
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
@@ -55,10 +48,15 @@ function PullQuoteEdit( props ) {
 								} )
 							}
 							className="wp-block-pullquote__citation"
-							__unstableOnSplitAtEnd={ () =>
-								insertBlocksAfter(
-									createBlock( getDefaultBlockName() )
-								)
+							__unstableOnSplitAtEnd={
+								insertBlocksAfter
+									? () =>
+											insertBlocksAfter(
+												createBlock(
+													getDefaultBlockName()
+												)
+											)
+									: undefined
 							}
 						/>
 					) }

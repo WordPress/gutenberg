@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { DashboardGridLayoutItem } from './types';
 
 /**

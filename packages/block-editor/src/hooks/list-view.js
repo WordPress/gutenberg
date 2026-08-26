@@ -1,21 +1,13 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { hasBlockSupport, getBlockType } from '@wordpress/blocks';
 import { useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../store';
 import { PrivateListView } from '../components/list-view';
 import InspectorControls from '../components/inspector-controls/fill';
 import { PrivateBlockContext } from '../components/block-list/private-block-context';
 import useListViewPanelState from '../components/use-list-view-panel-state';
-
 import { unlock } from '../lock-unlock';
 
 export const LIST_VIEW_SUPPORT_KEY = 'listView';

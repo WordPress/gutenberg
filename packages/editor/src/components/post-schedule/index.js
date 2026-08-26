@@ -1,22 +1,14 @@
-/**
- * External dependencies
- */
 import { parseISO, endOfMonth, startOfMonth } from 'date-fns';
-
-/**
- * WordPress dependencies
- */
+import { speak } from '@wordpress/a11y';
 import { getSettings } from '@wordpress/date';
-import { _x } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
+import { Button } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useState, useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
+import { getFullPostScheduleLabel } from './label';
 import { unlock } from '../../lock-unlock';
 
 const { PrivatePublishDateTimePicker } = unlock( blockEditorPrivateApis );
@@ -41,19 +33,33 @@ export default function PostSchedule( props ) {
 
 export function PrivatePostSchedule( {
 	onClose,
+	showPopoverHeader = true,
 	showPopoverHeaderActions,
 	isCompact,
 } ) {
-	const { postDate, postType } = useSelect(
+	const { postDate, postType, isDateFloating } = useSelect(
 		( select ) => ( {
 			postDate: select( editorStore ).getEditedPostAttribute( 'date' ),
 			postType: select( editorStore ).getCurrentPostType(),
+			isDateFloating: select( editorStore ).isEditedPostDateFloating(),
 		} ),
 		[]
 	);
 
 	const { editPost } = useDispatch( editorStore );
-	const onUpdateDate = ( date ) => editPost( { date } );
+	const onUpdateDate = ( date ) => {
+		editPost( { date } );
+		speak(
+			date
+				? sprintf(
+						// translators: %s: The new publish date and time, e.g. "June 3, 2025 12:00 pm UTC+0".
+						__( 'Publish date set to %s.' ),
+						getFullPostScheduleLabel( date )
+				  )
+				: __( 'Publish date set to now.' ),
+			'assertive'
+		);
+	};
 
 	const [ previewedMonth, setPreviewedMonth ] = useState(
 		startOfMonth( new Date( postDate ) )
@@ -94,7 +100,7 @@ export function PrivatePostSchedule( {
 			.join( '' ) // Reverse the string and test for "a" not followed by a slash.
 	);
 
-	return (
+	const picker = (
 		<PrivatePublishDateTimePicker
 			currentDate={ postDate }
 			onChange={ onUpdateDate }
@@ -109,7 +115,32 @@ export function PrivatePostSchedule( {
 			}
 			onClose={ onClose }
 			isCompact={ isCompact }
+			showPopoverHeader={ showPopoverHeader }
 			showPopoverHeaderActions={ showPopoverHeaderActions }
 		/>
+	);
+
+	// The popover header carries its own reset action. Rendered inline there is
+	// no header, so the action follows the picker as a button. It stays in place
+	// when there is no date to clear, rather than disappearing under the focus
+	// that just activated it.
+	if ( showPopoverHeader ) {
+		return picker;
+	}
+
+	return (
+		<>
+			{ picker }
+			<Button
+				className="editor-post-schedule__reset"
+				variant="secondary"
+				__next40pxDefaultSize
+				disabled={ isDateFloating }
+				accessibleWhenDisabled
+				onClick={ () => onUpdateDate( null ) }
+			>
+				{ __( 'Reset' ) }
+			</Button>
+		</>
 	);
 }

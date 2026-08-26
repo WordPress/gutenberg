@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { keyedReducer } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import type { Notice, ReducerAction } from './types';
 
 /**

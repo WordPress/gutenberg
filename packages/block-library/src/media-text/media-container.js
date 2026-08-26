@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { ResizableBox, Spinner, Placeholder } from '@wordpress/components';
 import {
 	BlockControls,
@@ -21,10 +14,6 @@ import { forwardRef } from '@wordpress/element';
 import { createBlobURL, isBlobURL } from '@wordpress/blob';
 import { store as noticesStore } from '@wordpress/notices';
 import { media as icon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { imageFillStyles } from './image-fill';
 
 /**

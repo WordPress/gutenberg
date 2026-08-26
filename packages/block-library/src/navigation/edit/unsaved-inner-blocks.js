@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useInnerBlocksProps } from '@wordpress/block-editor';
 import { Disabled } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useContext, useEffect, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { areBlocksDirty } from './are-blocks-dirty';
 import { DEFAULT_BLOCK, SELECT_NAVIGATION_MENUS_ARGS } from '../constants';
 

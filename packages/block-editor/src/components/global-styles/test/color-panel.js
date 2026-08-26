@@ -1,12 +1,6 @@
-/**
- * External dependencies
- */
-import { renderHook } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
-import {
+import { render, renderHook, screen } from '@testing-library/react';
+import { click, render as renderAriakit } from '@ariakit/test/react';
+import ColorPanel, {
 	useHasColorPanel,
 	useHasTextPanel,
 	useHasBackgroundColorPanel,
@@ -15,6 +9,17 @@ import {
 	useHasButtonPanel,
 	useHasCaptionPanel,
 } from '../color-panel';
+
+// The inheritance treatment sits behind the
+// `gutenberg-global-styles-inheritance-ui` experiment. Turn it on so these
+// tests exercise the inheriting path.
+beforeEach( () => {
+	window.__experimentalGlobalStylesInheritanceUI = true;
+} );
+
+afterEach( () => {
+	delete window.__experimentalGlobalStylesInheritanceUI;
+} );
 
 const settingsWithColors = ( overrides = {} ) => ( {
 	color: {
@@ -185,5 +190,197 @@ describe( 'element color hooks', () => {
 			useHasCaptionPanel( settingsWithColors( { caption: true } ) )
 		);
 		expect( result.current ).toBeTruthy();
+	} );
+} );
+
+// Inherited Global Styles label treatment for the controls the Color
+// ("Elements") panel still owns after relocation — i.e. link and
+// element-scoped colors. Top-level text and background color label
+// treatment is covered by the Typography and Background panel tests, which
+// now own those controls.
+const baseSettings = {
+	color: {
+		link: true,
+		heading: false,
+		button: false,
+		caption: false,
+		defaultPalette: true,
+		palette: {
+			default: [
+				{ name: 'Red', slug: 'red', color: '#ff0000' },
+				{ name: 'Blue', slug: 'blue', color: '#0000ff' },
+			],
+		},
+	},
+};
+
+describe( 'ColorPanel — duplicate-hex preset slug identity', () => {
+	const duplicateHexSettings = {
+		color: {
+			link: true,
+			defaultPalette: false,
+			palette: {
+				theme: [
+					{
+						slug: 'dark-background',
+						color: '#000000',
+						name: 'Dark background',
+					},
+					{ slug: 'dark-text', color: '#000000', name: 'Dark text' },
+				],
+			},
+		},
+	};
+
+	it( 'marks only the local link preset as selected when another preset shares its hex', async () => {
+		await renderAriakit(
+			<ColorPanel
+				value={ {
+					elements: {
+						link: {
+							color: { text: 'var:preset|color|dark-text' },
+						},
+					},
+				} }
+				settings={ duplicateHexSettings }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		await click( screen.getByRole( 'button', { name: /^Link/ } ) );
+		const swatches = await screen.findAllByRole( 'option' );
+
+		// swatch[0] = 'Dark background', swatch[1] = 'Dark text'. Selection
+		// must follow the stored slug; matching by hex would mark both.
+		expect( swatches[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
+		expect( swatches[ 0 ] ).toHaveAttribute( 'aria-selected', 'false' );
+	} );
+} );
+
+describe( 'ColorPanel — additional elements', () => {
+	it( 'renders additional element color controls', () => {
+		render(
+			<ColorPanel
+				value={ {} }
+				settings={ settingsWithColors( {
+					text: true,
+					background: true,
+				} ) }
+				onChange={ () => {} }
+				panelId="test-panel"
+				additionalElements={ [
+					{ name: 'textInput', label: 'Inputs' },
+				] }
+				defaultControls={ { textInput: true } }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: /^Inputs/ } )
+		).toBeVisible();
+	} );
+} );
+
+describe( 'ColorPanel — inherited Global Styles label treatment', () => {
+	describe( 'Link color', () => {
+		it( 'exposes an accessible reset when local link.text overrides the inherited value', () => {
+			const inheritedValue = {
+				elements: { link: { color: { text: '#0000ff' } } },
+			};
+			const value = {
+				elements: { link: { color: { text: '#aaaaaa' } } },
+			};
+
+			render(
+				<ColorPanel
+					value={ value }
+					inheritedValue={ inheritedValue }
+					settings={ baseSettings }
+					onChange={ () => {} }
+					panelId="test-panel"
+				/>
+			);
+
+			expect(
+				screen.getAllByRole( 'button', {
+					name: /reset to inherited value/i,
+				} ).length
+			).toBeGreaterThanOrEqual( 1 );
+		} );
+	} );
+
+	// An inherited element colour can be a preset slug that isn't in the
+	// block panel's palette. It must fall back to the preset's CSS custom
+	// property so the swatch paints instead of rendering black.
+	describe( 'inherited preset missing from the palette', () => {
+		function getSwatchStyles( container ) {
+			return Array.from(
+				// eslint-disable-next-line testing-library/no-node-access
+				container.querySelectorAll( '.component-color-indicator' )
+			).map( ( node ) => node.getAttribute( 'style' ) ?? '' );
+		}
+
+		// Palette intentionally lacks `vivid-purple`.
+		const settings = {
+			color: {
+				link: true,
+				heading: true,
+				defaultPalette: true,
+				palette: {
+					default: [ { name: 'Red', slug: 'red', color: '#ff0000' } ],
+				},
+			},
+		};
+
+		it( 'paints an inherited link preset via its CSS custom property', () => {
+			const { container } = render(
+				<ColorPanel
+					value={ {} }
+					inheritedValue={ {
+						elements: {
+							link: {
+								color: {
+									text: 'var:preset|color|vivid-purple',
+								},
+							},
+						},
+					} }
+					settings={ settings }
+					onChange={ () => {} }
+					panelId="test-panel"
+				/>
+			);
+			expect(
+				getSwatchStyles( container ).some( ( s ) =>
+					s.includes( 'var(--wp--preset--color--vivid-purple)' )
+				)
+			).toBe( true );
+		} );
+
+		it( 'paints an inherited element (heading) preset via its CSS custom property', () => {
+			const { container } = render(
+				<ColorPanel
+					value={ {} }
+					inheritedValue={ {
+						elements: {
+							heading: {
+								color: {
+									text: 'var:preset|color|vivid-purple',
+								},
+							},
+						},
+					} }
+					settings={ settings }
+					onChange={ () => {} }
+					panelId="test-panel"
+				/>
+			);
+			expect(
+				getSwatchStyles( container ).some( ( s ) =>
+					s.includes( 'var(--wp--preset--color--vivid-purple)' )
+				)
+			).toBe( true );
+		} );
 	} );
 } );

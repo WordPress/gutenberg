@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	InspectorControls,
@@ -14,18 +11,8 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import { CommentsPaginationArrowControls } from './comments-pagination-arrow-controls';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-
-const TEMPLATE = [
-	[ 'core/comments-pagination-previous' ],
-	[ 'core/comments-pagination-numbers' ],
-	[ 'core/comments-pagination-next' ],
-];
 
 export default function QueryPaginationEdit( {
 	attributes: { paginationArrow },
@@ -50,9 +37,7 @@ export default function QueryPaginationEdit( {
 
 	const blockProps = useBlockProps();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: TEMPLATE,
-	} );
+	const innerBlocksProps = useInnerBlocksProps( blockProps );
 
 	// Get the Discussion settings
 	const pageComments = useSelect( ( select ) => {

@@ -1,7 +1,4 @@
-/**
- * WordPress dependencies
- */
-import { resolveSelect } from '@wordpress/data';
+import { dispatch, resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
@@ -61,11 +58,11 @@ export const route = {
 	},
 	title: async ( { params }: { params: PostEditParams } ) => {
 		const postId = getPostId( params );
-		const post = await resolveSelect( coreStore ).getEntityRecord(
+		const post = ( await resolveSelect( coreStore ).getEntityRecord(
 			'postType',
 			params.type,
 			postId
-		);
+		) ) as { title?: { rendered?: string } } | undefined;
 
 		if ( post?.title?.rendered ) {
 			return decodeEntities( post.title.rendered );
@@ -84,5 +81,33 @@ export const route = {
 			postType: params.type,
 			postId,
 		};
+	},
+	async loader( context: {
+		params: PostEditParams;
+		search: { selectedBlock?: string };
+	} ) {
+		const { params, search } = context;
+
+		/*
+		 * Restore the block the canvas stashed on its way out, so returning to
+		 * an entity lands on the block that was selected when it was left. The
+		 * record is already resolved by `beforeLoad`, and running here rather
+		 * than from the canvas puts the selection in the entity's edits before
+		 * the editor provider renders and resets its blocks.
+		 */
+		if ( search.selectedBlock ) {
+			dispatch( coreStore ).editEntityRecord(
+				'postType',
+				params.type,
+				getPostId( params ),
+				{
+					selection: {
+						selectionStart: { clientId: search.selectedBlock },
+						selectionEnd: { clientId: search.selectedBlock },
+					},
+				},
+				{ undoIgnore: true }
+			);
+		}
 	},
 };

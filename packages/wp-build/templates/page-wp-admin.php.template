@@ -87,9 +87,10 @@ function {{PREFIX}}_get_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_menu_items() {
  */
 function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_preload_data() {
 	// Define paths to preload - same for all pages
-	// Please also change packages/core-data/src/entities.js when changing this.
+	// This must exactly match the _fields list in packages/core-data/src/entities.js,
+	// same fields in the same order, or the preload is never consumed.
 	$preload_paths = array(
-		'/?_fields=description,gmt_offset,home,image_sizes,image_size_threshold,name,site_icon,site_icon_url,site_logo,timezone_string,url,page_for_posts,page_on_front,show_on_front',
+		'/?_fields=description,gmt_offset,home,image_max_bit_depth,image_sizes,image_size_threshold,image_strip_meta,name,site_icon,site_icon_url,site_logo,timezone_string,url,page_for_posts,page_on_front,show_on_front',
 		array( '/wp/v2/settings', 'OPTIONS' ),
 	);
 
@@ -145,8 +146,12 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts( $hook_suf
 	// Get all registered routes
 	$routes = {{PREFIX}}_get_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_routes();
 
-	// Get boot module asset file for dependencies
+	// Get boot module asset file for dependencies. Plugins that build their own
+	// boot module use it; everyone else falls back to the copy bundled with Core.
 	$asset_file = __DIR__ . '/../../modules/boot/index.min.asset.php';
+	if ( ! file_exists( $asset_file ) ) {
+		$asset_file = ABSPATH . WPINC . '/js/dist/script-modules/boot/index.min.asset.php';
+	}
 	if ( file_exists( $asset_file ) ) {
 		$asset = require $asset_file;
 
@@ -269,23 +274,23 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_render_page() {
 		#wpwrap {
 			overflow-y: auto;
 		}
-		body {
+		body.js {
 			background: #fff;
 		}
 
 		/* Reset wp-admin padding */
-		#wpcontent {
+		body.js #wpcontent {
 			padding-inline-start: 0;
 		}
-		#wpbody-content {
+		body.js #wpbody-content {
 			padding-bottom: 0;
 		}
 
 		/* Hide legacy admin elements */
-		#wpbody-content > div:not(.boot-layout-container):not(#screen-meta) {
+		body.js #wpbody-content > div:not(#{{PAGE_SLUG}}-wp-admin-app):not(#screen-meta) {
 			display: none;
 		}
-		#wpfooter {
+		body.js #wpfooter {
 			display: none;
 		}
 
@@ -314,7 +319,16 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_render_page() {
 			}
 		}
 	</style>
-	<div id="{{PAGE_SLUG}}-wp-admin-app" class="boot-layout-container"></div>
+	<div class="wrap hide-if-js">
+		<h1 class="wp-heading-inline"><?php echo esc_html( get_admin_page_title() ); ?></h1>
+		<?php
+		wp_admin_notice(
+			__( 'This screen requires JavaScript. Enable JavaScript in your browser settings and reload the page.' ),
+			array( 'type' => 'error' )
+		);
+		?>
+	</div>
+	<div id="{{PAGE_SLUG}}-wp-admin-app"></div>
 	<?php
 }
 

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	getBlockType,
@@ -14,10 +11,6 @@ import {
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import EditContents from './edit-contents';
 import SkipToSelectedBlock from '../skip-to-selected-block';
 import BlockCard from '../block-card';
@@ -49,12 +42,12 @@ import {
 } from '../../hooks/block-style-state';
 
 function StyleInspectorSlots( {
-	blockName,
+	clientId,
 	showAdvancedControls = true,
 	showPositionControls = true,
 	showBindingsControls = true,
 } ) {
-	const borderPanelLabel = useBorderPanelLabel( { blockName } );
+	const borderPanelLabel = useBorderPanelLabel( { clientId } );
 	return (
 		<>
 			<InspectorControls.Slot />
@@ -104,7 +97,7 @@ function StyleStateInspectorSlots( {
 	isSectionBlock,
 	selectedBlockStyleState,
 } ) {
-	const borderPanelLabel = useBorderPanelLabel( { blockName } );
+	const borderPanelLabel = useBorderPanelLabel( { clientId } );
 	const showLayoutControls =
 		hasViewportBlockStyleState( selectedBlockStyleState ) &&
 		! hasPseudoBlockStyleState( selectedBlockStyleState );
@@ -176,8 +169,10 @@ function BlockInspector() {
 		selectedBlockStyleState,
 		showStateOnCanvas,
 		isResponsiveEditing,
+		blockStatesEditingEnabled,
 	} = useSelect( ( select ) => {
 		const {
+			getSettings,
 			getSelectedBlockClientId,
 			getSelectedBlockClientIds,
 			getSelectedBlockCount,
@@ -229,6 +224,7 @@ function BlockInspector() {
 				_renderedBlockClientId
 			),
 			isResponsiveEditing: _isResponsiveEditing(),
+			blockStatesEditingEnabled: getSettings().blockStatesEditingEnabled,
 		};
 	}, [] );
 
@@ -302,7 +298,6 @@ function BlockInspector() {
 					<InspectorControlsTabs tabs={ availableTabs } />
 				) : (
 					<StyleInspectorSlots
-						blockName={ renderedBlockName }
 						showAdvancedControls={ false }
 						showPositionControls={ false }
 						showBindingsControls={ false }
@@ -364,6 +359,7 @@ function BlockInspector() {
 				selectedBlockStyleState={ selectedBlockStyleState }
 				showStateOnCanvas={ showStateOnCanvas }
 				isResponsiveEditing={ isResponsiveEditing }
+				blockStatesEditingEnabled={ blockStatesEditingEnabled }
 				isBlockStyleStateSelected={ isBlockStyleStateSelected }
 			/>
 		</BlockInspectorSingleBlockWrapper>
@@ -420,6 +416,7 @@ const BlockInspectorSingleBlock = ( {
 	selectedBlockStyleState,
 	showStateOnCanvas,
 	isResponsiveEditing,
+	blockStatesEditingEnabled = true,
 } ) => {
 	const listViewRef = useRef( null );
 	const hasMultipleTabs = availableTabs?.length > 1;
@@ -467,7 +464,8 @@ const BlockInspectorSingleBlock = ( {
 				isChild={ hasParentChildBlockCards }
 				clientId={ renderedBlockClientId }
 				controls={
-					blockEditingMode === 'default' && (
+					blockEditingMode === 'default' &&
+					blockStatesEditingEnabled && (
 						<BlockStatesControl
 							name={ blockName }
 							value={ selectedBlockStyleState }
@@ -502,7 +500,6 @@ const BlockInspectorSingleBlock = ( {
 			<BlockInspectorPreTabsSlot />
 			{ isEditingStyleState && (
 				<StyleStateInspectorSlots
-					blockName={ blockName }
 					clientId={ renderedBlockClientId }
 					contentClientIds={ contentClientIds }
 					isSectionBlock={ isSectionBlock }
@@ -531,7 +528,9 @@ const BlockInspectorSingleBlock = ( {
 					<InspectorControls.Slot group="list" ref={ listViewRef } />
 					<ListViewContentPopover listViewRef={ listViewRef } />
 					{ ! isSectionBlock && (
-						<StyleInspectorSlots blockName={ blockName } />
+						<StyleInspectorSlots
+							clientId={ renderedBlockClientId }
+						/>
 					) }
 				</>
 			) }

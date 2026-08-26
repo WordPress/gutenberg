@@ -1,18 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { RawHTML } from '@wordpress/element';
 import { children as childrenSource } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import RichText from './';
-
-/**
- * Internal dependencies
- */
 import { getMultilineTag } from './utils';
 
 export function valueToHTMLString( value, multiline ) {

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import {
 	createBlock,

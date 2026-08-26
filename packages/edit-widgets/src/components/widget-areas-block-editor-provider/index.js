@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { SlotFillProvider } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { uploadMedia } from '@wordpress/media-utils';
@@ -10,11 +7,6 @@ import { useMemo } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
-
-/**
- * Internal dependencies
- */
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import { buildWidgetAreasPostId, KIND, POST_TYPE } from '../../store/utils';
 import useLastSelectedWidgetArea from '../../hooks/use-last-selected-widget-area';
@@ -24,7 +16,6 @@ import { unlock } from '../../lock-unlock';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
-const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
 const EMPTY_ARRAY = [];
 
@@ -119,7 +110,6 @@ export default function WidgetAreasBlockEditorProvider( {
 	return (
 		<SlotFillProvider>
 			<KeyboardShortcuts.Register />
-			<BlockKeyboardShortcuts />
 			<ExperimentalBlockEditorProvider
 				value={ blocks }
 				onInput={ onInput }

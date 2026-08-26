@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import useEditableRoot from './use-editable-root';
 import useHomeEnd from './use-home-end';
 import useMultiSelection from './use-multi-selection';
@@ -23,6 +12,7 @@ import { usePreviewModeNav } from './use-preview-mode-nav';
 import useSelectAll from './use-select-all';
 import useDragSelection from './use-drag-selection';
 import useSelectionObserver from './use-selection-observer';
+import useEditableRootEventHandlers from './use-editable-root-event-handlers';
 import useClickSelection from './use-click-selection';
 import useInput from './use-input';
 import useClipboardHandler from './use-clipboard-handler';
@@ -39,6 +29,7 @@ export function useWritingFlow() {
 		before,
 		useMergeRefs( [
 			ref,
+			useEditableRootEventHandlers(),
 			useClipboardHandler(),
 			useInput(),
 			useEditableRoot(),

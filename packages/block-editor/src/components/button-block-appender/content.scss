@@ -25,8 +25,12 @@
 }
 
 
-// When the appender shows up in empty container blocks, such as Group and Columns, add an extra click state.
-.block-list-appender:only-child {
+// When a button appender shows up in empty container blocks, such as Group
+// and Columns, add an extra click state: the first click selects the
+// container instead of opening the inserter. Default block appenders don't
+// need this because their first click inserts a paragraph and sets the
+// selection.
+.block-list-appender:only-child:has(.block-editor-button-block-appender) {
 	// One level of nesting
 	.is-layout-constrained.block-editor-block-list__block:not(.is-selected) > &,
 	.is-layout-flow.block-editor-block-list__block:not(.is-selected) > &,

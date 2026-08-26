@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Icon as WCIcon,
 	Button,
@@ -10,15 +7,14 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { close } from '@wordpress/icons';
-import { store as coreStore } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	privateApis as coreDataPrivateApis,
+} from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import {
 	TEMPLATE_POST_TYPE,
@@ -27,8 +23,8 @@ import {
 import { unlock } from '../../lock-unlock';
 import PostActions from '../post-actions';
 import usePageTypeBadge from '../../utils/pageTypeBadge';
-import { getTemplateInfo } from '../../utils/get-template-info';
 const { Badge: WCBadge } = unlock( componentsPrivateApis );
+const { getTemplateInfo } = unlock( coreDataPrivateApis );
 
 /**
  * Renders a title of the post type and the available quick actions available within a 3-dot dropdown.

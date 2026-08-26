@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useEntityRecords } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import NavigationMenuSelector from '../navigation-menu-selector';
 import useNavigationMenu from '../../use-navigation-menu';
 

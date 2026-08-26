@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import { v4 as uuidv4 } from 'uuid';
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
 import { getBlockTypes } from '@wordpress/blocks';
 import { RichTextData } from '@wordpress/rich-text';
 import { Y } from '@wordpress/sync';
-
-/**
- * Internal dependencies
- */
 import {
 	asRichTextOffset,
 	createYMap,

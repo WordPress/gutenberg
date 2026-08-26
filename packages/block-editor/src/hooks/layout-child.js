@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 import { useStyleOverride } from './utils';
@@ -25,6 +18,8 @@ import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/const
 import {
 	DEFAULT_BLOCK_STYLE_STATE,
 	getStyleForState,
+	hasViewportBlockStyleState,
+	setStyleForState,
 } from './block-style-state';
 
 const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
@@ -280,6 +275,40 @@ export function getResponsiveChildLayoutStyles( {
 		.join( '' );
 }
 
+/**
+ * Merges child layout changes into the active layout style state.
+ *
+ * @param {Object|undefined} style         Block style attributes.
+ * @param {Object}           layout        Child layout changes.
+ * @param {Object}           selectedState Selected block style state.
+ * @return {Object|undefined} Updated block style attributes.
+ */
+export function getUpdatedChildLayoutStyle( style, layout, selectedState ) {
+	if ( ! hasViewportBlockStyleState( selectedState ) ) {
+		return {
+			...style,
+			layout: {
+				...style?.layout,
+				...layout,
+			},
+		};
+	}
+
+	const layoutState = {
+		viewport: selectedState.viewport,
+		pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
+	};
+	const stateStyle = getStyleForState( style, layoutState );
+
+	return setStyleForState( style, layoutState, {
+		...stateStyle,
+		layout: {
+			...stateStyle?.layout,
+			...layout,
+		},
+	} );
+}
+
 function useBlockPropsChildLayoutStyles( { style } ) {
 	const { shouldRenderChildLayoutStyles, viewportSettings } = useSelect(
 		( select ) => {
@@ -381,6 +410,7 @@ function GridTools( {
 		deviceType,
 		viewportSettings,
 		isChildBlockAGrid,
+		selectedState,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -389,8 +419,8 @@ function GridTools( {
 				getTemplateLock,
 				getBlockAttributes,
 				getSettings,
-			} = select( blockEditorStore );
-
+				getSelectedBlockStyleState,
+			} = unlock( select( blockEditorStore ) );
 			const _rootClientId = getBlockRootClientId( clientId );
 
 			if (
@@ -421,6 +451,7 @@ function GridTools( {
 				viewportSettings: settings?.__experimentalFeatures?.viewport,
 				// Check if the selected child block is itself a grid.
 				isChildBlockAGrid: blockAttributes?.layout?.type === 'grid',
+				selectedState: getSelectedBlockStyleState( clientId ),
 			};
 		},
 		[ clientId ]
@@ -482,13 +513,7 @@ function GridTools( {
 
 	function updateLayout( layout ) {
 		setAttributes( {
-			style: {
-				...style,
-				layout: {
-					...style?.layout,
-					...layout,
-				},
-			},
+			style: getUpdatedChildLayoutStyle( style, layout, selectedState ),
 		} );
 	}
 

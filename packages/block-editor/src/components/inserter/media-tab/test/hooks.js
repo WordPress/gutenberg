@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { renderHook, act, waitFor } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { useDelayedLoading, useMediaResults } from '../hooks';
 
 describe( 'useDelayedLoading', () => {

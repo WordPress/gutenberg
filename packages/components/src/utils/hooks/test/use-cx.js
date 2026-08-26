@@ -1,16 +1,9 @@
-/**
- * External dependencies
- */
 // eslint-disable-next-line no-restricted-imports
 import { cx as innerCx } from '@emotion/css';
 import { insertStyles } from '@emotion/utils';
 import { render } from '@testing-library/react';
 import { css, CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
-
-/**
- * Internal dependencies
- */
 import { useCx } from '..';
 
 jest.mock( '@emotion/css', () => ( {

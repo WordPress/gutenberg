@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState, useMemo } from '@wordpress/element';
 import { close, justifyStretch, stretchFullWidth } from '@wordpress/icons';
 // eslint-disable-next-line @wordpress/use-recommended-components -- @wordpress/grid consumes @wordpress/ui in story examples only.
 import { Icon, IconButton, Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { DashboardGrid } from '..';
 import type { DashboardGridLayoutItem } from '../types';
 import type {
@@ -494,6 +483,11 @@ export const RowHeight: Story = {
  * to drop.
  */
 export const EditMode: Story = {
+	parameters: {
+		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	args: {
 		columns: 12,
 		rowHeight: 80,
@@ -734,6 +728,11 @@ function CustomDragPreview( { children }: DragPreviewRenderProps ) {
  * respond.
  */
 export const Customization: Story = {
+	parameters: {
+		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	args: {
 		columns: 6,
 		rowHeight: 80,
@@ -877,6 +876,11 @@ function NumberedOverlay( { columns, isActive }: GridOverlayRenderProps ) {
  * on.
  */
 export const CustomGridOverlayStory: Story = {
+	parameters: {
+		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	name: 'Custom Grid Overlay',
 	args: {
 		columns: 12,

@@ -9,6 +9,8 @@ const meta: Meta< typeof SelectControl > = {
 	title: 'Design System/Components/Form/SelectControl',
 	component: SelectControl,
 	subcomponents: {
+		'SelectControl.Group': SelectControl.Group,
+		'SelectControl.GroupLabel': SelectControl.GroupLabel,
 		'SelectControl.Item': SelectControl.Item,
 	},
 	argTypes: {
@@ -123,6 +125,64 @@ export const WithDisabledOption: Story = {
 	},
 };
 
+const groupedItems = [
+	{
+		label: 'Common',
+		items: [
+			{ value: 'apple', label: 'Apple' },
+			{ value: 'banana', label: 'Banana' },
+			{ value: 'orange', label: 'Orange' },
+		],
+	},
+	{
+		label: 'Berries',
+		items: [
+			{ value: 'strawberry', label: 'Strawberry' },
+			{ value: 'blueberry', label: 'Blueberry' },
+			{ value: 'raspberry', label: 'Raspberry' },
+		],
+	},
+	{
+		label: 'Tropical',
+		items: [
+			{ value: 'mango', label: 'Mango' },
+			{ value: 'pineapple', label: 'Pineapple' },
+			{ value: 'papaya', label: 'Papaya' },
+		],
+	},
+];
+
+/**
+ * Options can be organized into labeled groups with `SelectControl.Group`
+ * and `SelectControl.GroupLabel`. Pass a flat `items` array for trigger label
+ * resolution, and use `children` to render the grouped popup content.
+ */
+export const Grouped: Story = {
+	args: {
+		label: 'Fruit',
+		description: 'Choose a fruit.',
+		items: groupedItems.flatMap( ( group ) => group.items ),
+		children: [
+			groupedItems.map( ( group ) => (
+				<SelectControl.Group key={ group.label }>
+					<SelectControl.GroupLabel>
+						{ group.label }
+					</SelectControl.GroupLabel>
+					{ group.items.map( ( item ) => (
+						<SelectControl.Item
+							key={ item.value }
+							value={ item }
+							label={ item.label }
+						>
+							{ item.label }
+						</SelectControl.Item>
+					) ) }
+				</SelectControl.Group>
+			) ),
+		],
+	},
+};
+
 const userOptions: React.ComponentProps< typeof SelectControl >[ 'items' ] = [
 	{
 		value: '1',
@@ -156,6 +216,7 @@ const User = ( { user }: { user: ( typeof userOptions )[ number ] } ) => (
 				borderRadius: '50%',
 			} }
 		/>
+
 		{ user.label }
 	</span>
 );
@@ -175,19 +236,18 @@ export const WithCustomTriggerAndItems: Story = {
 		label: 'Label',
 		description: 'This is the description.',
 		triggerContent: ( item ) => <User user={ item } />,
-		children: (
-			<>
-				{ userOptions.map( ( item ) => (
-					<SelectControl.Item
-						key={ item.value }
-						value={ item }
-						label={ item.label }
-					>
-						<User user={ item } />
-					</SelectControl.Item>
-				) ) }
-			</>
-		),
+		children: [
+			userOptions.map( ( item ) => (
+				<SelectControl.Item
+					key={ item.value }
+					value={ item }
+					label={ item.label }
+				>
+					<User user={ item } />
+				</SelectControl.Item>
+			) ),
+		],
+
 		defaultValue: userOptions[ 0 ],
 	},
 };
@@ -202,19 +262,17 @@ export const WithCustomTriggerAndItems: Story = {
 export const WithItemsArrayAndPartialCustomization: Story = {
 	args: {
 		...Default.args,
-		children: (
-			<>
-				{ Default.args?.items?.map( ( item ) => (
-					<SelectControl.Item
-						key={ item.value ?? 'null' }
-						value={ item }
-						label={ item.label }
-						disabled={ item.disabled }
-					>
-						✨ { item.label }
-					</SelectControl.Item>
-				) ) }
-			</>
-		),
+		children: [
+			Default.args?.items?.map( ( item ) => (
+				<SelectControl.Item
+					key={ item.value ?? 'null' }
+					value={ item }
+					label={ item.label }
+					disabled={ item.disabled }
+				>
+					✨ { item.label }
+				</SelectControl.Item>
+			) ),
+		],
 	},
 };

@@ -1,15 +1,7 @@
 /**
  * @jest-environment node
  */
-
-/**
- * External dependencies
- */
 import { renderToString } from 'react-dom/server';
-
-/**
- * Internal dependencies
- */
 import useMediaQuery from '../';
 import useViewportMatch from '../../use-viewport-match';
 

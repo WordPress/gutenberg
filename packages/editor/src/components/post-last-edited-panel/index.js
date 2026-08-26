@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalText as WCText } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { humanTimeDiff } from '@wordpress/date';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 
 export default function PostLastEditedPanel() {

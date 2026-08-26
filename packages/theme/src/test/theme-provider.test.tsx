@@ -8,11 +8,12 @@ import { join } from 'path';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ThemeProvider } from '../theme-provider';
+import type { ThemeProviderColorWarning } from '../theme-provider-color-warnings';
 
 // Give the wrapper a stable class so tests can locate it and read its
 // computed custom properties.
 jest.mock( '../style.module.css', () => ( {
-	root: 'theme-provider-root',
+	wrapper: 'theme-provider-wrapper',
 } ) );
 
 // The "strong" brand background resolves to the `color.primary` seed itself, and
@@ -27,6 +28,10 @@ const BORDER_RADIUS_SM = '--wpds-border-radius-sm';
 const PRIMARY = '#1e90ff';
 const OTHER_PRIMARY = '#8e44ad';
 const BACKGROUND = '#f8f8f8';
+const INACCESSIBLE_PRIMARY = '#608010';
+const INACCESSIBLE_BACKGROUND = '#4f386e';
+const ACCESSIBLE_PRIMARY = '#3858e9';
+const ACCESSIBLE_BACKGROUND = '#fcfcfc';
 
 function readProp( element: Element, property: string ) {
 	return getComputedStyle( element ).getPropertyValue( property ).trim();
@@ -34,7 +39,7 @@ function readProp( element: Element, property: string ) {
 
 // The `ThemeProvider` wrapper element that scopes the given descendant.
 function getScopingProvider( element: Element ) {
-	return element.closest< HTMLElement >( '.theme-provider-root' )!;
+	return element.closest< HTMLElement >( '.theme-provider-wrapper' )!;
 }
 
 async function withInjectedThemeProviderStyles(
@@ -44,7 +49,7 @@ async function withInjectedThemeProviderStyles(
 	style.textContent = readFileSync(
 		join( import.meta.dirname, '../style.module.css' ),
 		'utf8'
-	).replaceAll( '.root', '.theme-provider-root' );
+	).replaceAll( '.wrapper', '.theme-provider-wrapper' );
 	document.head.appendChild( style );
 
 	try {
@@ -111,6 +116,100 @@ describe( 'ThemeProvider', () => {
 		const provider = getScopingProvider( screen.getByTestId( 'child' ) );
 		expect( readProp( provider, BRAND_BG ) ).toBe( PRIMARY );
 		expect( readProp( provider, SURFACE_BG ) ).toBe( BACKGROUND );
+	} );
+
+	it( 'does not define color tokens if neither customized nor inherited', () => {
+		render(
+			<ThemeProvider>
+				<div data-testid="child">x</div>
+			</ThemeProvider>
+		);
+
+		const provider = getScopingProvider( screen.getByTestId( 'child' ) );
+		expect( readProp( provider, BRAND_BG ) ).toBe( '' );
+		expect( readProp( provider, SURFACE_BG ) ).toBe( '' );
+		expect( readProp( provider, '--wp-admin-theme-color' ) ).toBe( '' );
+	} );
+
+	it( 'does not report color warnings when no colors are calculated', () => {
+		const onColorWarnings = jest.fn();
+
+		render( <ThemeProvider onColorWarnings={ onColorWarnings } /> );
+
+		expect( onColorWarnings ).not.toHaveBeenCalled();
+	} );
+
+	it( 'reports color warnings through the callback', () => {
+		const onColorWarnings = jest.fn<
+			void,
+			[ readonly ThemeProviderColorWarning[] ]
+		>();
+		const { rerender } = render(
+			<ThemeProvider
+				color={ {
+					primary: INACCESSIBLE_PRIMARY,
+					background: INACCESSIBLE_BACKGROUND,
+				} }
+				onColorWarnings={ onColorWarnings }
+			/>
+		);
+
+		const warning = onColorWarnings.mock.calls[ 0 ][ 0 ].find(
+			( item ) =>
+				item.type === 'contrast' &&
+				item.backgroundToken ===
+					'background.interactive.brand-strong-active'
+		);
+
+		expect( warning ).toEqual(
+			expect.objectContaining( {
+				type: 'contrast',
+				backgroundToken: 'background.interactive.brand-strong-active',
+				foregroundToken: 'foreground.interactive.brand-strong-active',
+				requiredContrast: 4.5,
+			} )
+		);
+		expect(
+			warning?.type === 'contrast'
+				? warning.achievedContrast
+				: Number.POSITIVE_INFINITY
+		).toBeLessThan( 4.5 );
+
+		onColorWarnings.mockClear();
+		rerender(
+			<ThemeProvider
+				color={ {
+					primary: ACCESSIBLE_PRIMARY,
+					background: ACCESSIBLE_BACKGROUND,
+				} }
+				onColorWarnings={ onColorWarnings }
+			/>
+		);
+
+		expect( onColorWarnings ).toHaveBeenCalledWith( [] );
+	} );
+
+	it( 'does not report warnings again when only the callback identity changes', () => {
+		const onColorWarnings = jest.fn<
+			void,
+			[ readonly ThemeProviderColorWarning[] ]
+		>();
+		const renderProvider = () => (
+			<ThemeProvider
+				color={ {
+					primary: ACCESSIBLE_PRIMARY,
+					background: ACCESSIBLE_BACKGROUND,
+				} }
+				onColorWarnings={ ( warnings ) => onColorWarnings( warnings ) }
+			/>
+		);
+		const { rerender } = render( renderProvider() );
+
+		expect( onColorWarnings ).toHaveBeenCalledTimes( 1 );
+
+		rerender( renderProvider() );
+
+		expect( onColorWarnings ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'does not define the custom property outside of the provider', () => {
@@ -213,7 +312,11 @@ describe( 'ThemeProvider', () => {
 			iframeDoc.body.appendChild( mount );
 
 			const { unmount } = render(
-				<ThemeProvider isRoot color={ { primary: PRIMARY } }>
+				<ThemeProvider
+					isRoot
+					color={ { primary: PRIMARY } }
+					cornerRadius="moderate"
+				>
 					<div>x</div>
 				</ThemeProvider>,
 				{ container: mount }
@@ -222,7 +325,21 @@ describe( 'ThemeProvider', () => {
 			expect( readProp( iframeDoc.documentElement, BRAND_BG ) ).toBe(
 				PRIMARY
 			);
+			expect( iframeDoc.documentElement ).toHaveAttribute(
+				'data-wpds-root-provider',
+				'true'
+			);
+			expect( iframeDoc.documentElement ).toHaveAttribute(
+				'data-wpds-corner-radius',
+				'moderate'
+			);
 			expect( readProp( document.documentElement, BRAND_BG ) ).toBe( '' );
+			expect( document.documentElement ).not.toHaveAttribute(
+				'data-wpds-root-provider'
+			);
+			expect( document.documentElement ).not.toHaveAttribute(
+				'data-wpds-corner-radius'
+			);
 
 			unmount();
 			iframe.remove();
@@ -267,10 +384,10 @@ describe( 'ThemeProvider', () => {
 			warn.mockRestore();
 		} );
 
-		// `cornerRadius` forwards to `:root` through the prebuilt CSS's
-		// `:root:has( [data-wpds-root-provider='true']… )` rule (not the JS
-		// mirror used for color/cursor), so load that stylesheet to exercise
-		// it. Scoped to this block since it also defines base `:root` tokens.
+		// `cornerRadius` resolves through the prebuilt CSS after the root
+		// provider mirrors its preset attributes to the document element.
+		// Load that stylesheet to exercise the complete forwarding behavior.
+		// It is scoped to this block since it also defines base `:root` tokens.
 		describe( 'cornerRadius forwarding', () => {
 			let prebuiltStyle: HTMLStyleElement;
 
@@ -290,7 +407,7 @@ describe( 'ThemeProvider', () => {
 				prebuiltStyle.remove();
 			} );
 
-			it( 'forwards the preset to the document root when isRoot is set', () => {
+			it( 'forwards the preset attributes and tokens to the document root when isRoot is set', () => {
 				render(
 					<ThemeProvider isRoot cornerRadius="moderate">
 						<div data-testid="child">x</div>
@@ -305,11 +422,83 @@ describe( 'ThemeProvider', () => {
 					BORDER_RADIUS_SM
 				);
 
+				expect( document.documentElement ).toHaveAttribute(
+					'data-wpds-root-provider',
+					'true'
+				);
+				expect( document.documentElement ).toHaveAttribute(
+					'data-wpds-corner-radius',
+					'moderate'
+				);
+
 				// `:root` resolves to the same `moderate` value as the provider.
 				expect( forwarded ).toBeTruthy();
 				expect( forwarded ).toBe(
 					readProp( provider, BORDER_RADIUS_SM )
 				);
+			} );
+
+			it( 'updates the document-root attributes when the preset changes', () => {
+				const { rerender } = render(
+					<ThemeProvider isRoot cornerRadius="moderate">
+						<div>x</div>
+					</ThemeProvider>
+				);
+
+				rerender(
+					<ThemeProvider isRoot cornerRadius="pronounced">
+						<div>x</div>
+					</ThemeProvider>
+				);
+
+				expect( document.documentElement ).toHaveAttribute(
+					'data-wpds-root-provider',
+					'true'
+				);
+				expect( document.documentElement ).toHaveAttribute(
+					'data-wpds-corner-radius',
+					'pronounced'
+				);
+			} );
+
+			it( 'restores previous document-root attributes on unmount', () => {
+				const root = document.documentElement;
+				root.setAttribute( 'data-wpds-root-provider', 'previous' );
+				root.setAttribute( 'data-wpds-corner-radius', 'none' );
+				let unmount: undefined | ( () => void );
+
+				try {
+					( { unmount } = render(
+						<ThemeProvider isRoot cornerRadius="moderate">
+							<div>x</div>
+						</ThemeProvider>
+					) );
+
+					expect( root ).toHaveAttribute(
+						'data-wpds-root-provider',
+						'true'
+					);
+					expect( root ).toHaveAttribute(
+						'data-wpds-corner-radius',
+						'moderate'
+					);
+
+					unmount();
+					unmount = undefined;
+
+					expect( root ).toHaveAttribute(
+						'data-wpds-root-provider',
+						'previous'
+					);
+					expect( root ).toHaveAttribute(
+						'data-wpds-corner-radius',
+						'none'
+					);
+				} finally {
+					unmount?.();
+					root.removeAttribute( 'data-wpds-root-provider' );
+					root.removeAttribute( 'data-wpds-corner-radius' );
+				}
 			} );
 
 			it( 'does not forward the preset to the document root by default', () => {
@@ -328,6 +517,12 @@ describe( 'ThemeProvider', () => {
 				expect(
 					readProp( document.documentElement, BORDER_RADIUS_SM )
 				).not.toBe( readProp( provider, BORDER_RADIUS_SM ) );
+				expect( document.documentElement ).not.toHaveAttribute(
+					'data-wpds-root-provider'
+				);
+				expect( document.documentElement ).not.toHaveAttribute(
+					'data-wpds-corner-radius'
+				);
 			} );
 		} );
 	} );
@@ -356,7 +551,8 @@ describe( 'ThemeProvider', () => {
 				screen.getByTestId( 'overriding' )
 			);
 
-			// A nested provider with no settings of its own inherits everything.
+			// A nested provider with no settings of its own inherits everything
+			// and re-applies color tokens so portaled descendants have them.
 			expect( readProp( inheriting, BRAND_BG ) ).toBe( PRIMARY );
 			expect( readProp( inheriting, SURFACE_BG ) ).toBe( BACKGROUND );
 			expect( readProp( inheriting, CURSOR_CONTROL ) ).toBe( 'pointer' );
