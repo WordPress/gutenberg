@@ -45,15 +45,15 @@ describe( 'AddReactionButton', () => {
 		).toBeVisible();
 		// The curated options wrap into rows once the set grows past one
 		// row, and a narrow popover can stack them into a column, so the
-		// listbox deliberately reports no orientation and both axes move
+		// group deliberately reports no orientation and both axes move
 		// the roving tab index.
 		expect(
-			screen.getByRole( 'listbox', {
-				name: 'Select an emoji reaction',
+			screen.getByRole( 'group', {
+				name: 'Add an emoji reaction',
 			} )
 		).not.toHaveAttribute( 'aria-orientation' );
 		await user.click(
-			await screen.findByRole( 'option', { name: 'Rocket' } )
+			await screen.findByRole( 'button', { name: 'Rocket' } )
 		);
 
 		expect( onToggleReaction ).toHaveBeenCalledTimes( 1 );
@@ -114,7 +114,7 @@ describe( 'AddReactionButton', () => {
 			// The full picker opens directly — no quick row, no
 			// intermediate "More emojis" step.
 			expect(
-				screen.queryByRole( 'option', { name: 'Thumbs up' } )
+				screen.queryByRole( 'button', { name: 'Thumbs up' } )
 			).not.toBeInTheDocument();
 			// The filter-provided emoji is seeded into "Frequently used"
 			// and also appears in its Emojibase category; either cell
@@ -194,7 +194,7 @@ describe( 'AddReactionButton', () => {
 			// adding a reaction keeps working, with a visible retry
 			// affordance…
 			expect(
-				await screen.findByRole( 'option', { name: 'Rocket' } )
+				await screen.findByRole( 'button', { name: 'Rocket' } )
 			).toBeVisible();
 			expect(
 				screen.getByText( 'Couldn’t load the full emoji picker.' )
@@ -209,7 +209,7 @@ describe( 'AddReactionButton', () => {
 
 			// Curated picks work in the fallback state.
 			await user.click(
-				screen.getByRole( 'option', { name: 'Rocket' } )
+				screen.getByRole( 'button', { name: 'Rocket' } )
 			);
 			expect( onToggleReaction ).toHaveBeenCalledWith( 'rocket' );
 
@@ -249,7 +249,7 @@ describe( 'AddReactionButton', () => {
 
 		await user.click( button );
 		expect(
-			screen.queryByRole( 'option', { name: 'Rocket' } )
+			screen.queryByRole( 'button', { name: 'Rocket' } )
 		).not.toBeInTheDocument();
 	} );
 } );
