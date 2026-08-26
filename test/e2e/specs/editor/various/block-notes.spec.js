@@ -1249,31 +1249,48 @@ test.describe( 'Block Notes', () => {
 				comment: 'Test comment for resolved reactions',
 			} );
 
+			// The floating overlay hides a resolved thread, so drive this
+			// through the sidebar where it stays reachable.
+			await blockNoteUtils.openBlockNoteSidebar();
+			const sidebar = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			const thread = sidebar.getByRole( 'treeitem', {
+				name: 'Note: Test comment for resolved reactions',
+			} );
+			await thread.click();
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+
 			await blockNoteUtils.addReactionToComment( 'Heart' );
-			const reactionPill = page.getByRole( 'button', { name: /Heart/ } );
+			const reactionPill = sidebar.getByRole( 'button', {
+				name: /Heart/,
+			} );
 			await expect( reactionPill ).toBeVisible();
+
+			// Resolving posts a "Marked as resolved" reply that carries its
+			// own add trigger, so the root note's is the first of the two.
+			const addReaction = sidebar
+				.getByRole( 'button', { name: 'Add reaction' } )
+				.first();
+			const resolveButton = sidebar.getByRole( 'button', {
+				name: 'Resolve',
+			} );
 
 			// Resolving collapses the thread, so re-select it to reach the
 			// reaction controls again.
-			await page.getByRole( 'button', { name: 'Resolve' } ).click();
-			await page
-				.getByRole( 'treeitem', {
-					name: 'Note: Test comment for resolved reactions',
-				} )
-				.click();
+			await resolveButton.click();
+			await thread.click();
+			await expect( resolveButton ).toBeDisabled();
 
 			// A resolved thread is an archived conversation, so neither the
 			// add trigger nor the existing pill may still mutate reactions.
-			await expect(
-				page.getByRole( 'button', { name: 'Add reaction' } )
-			).toBeDisabled();
+			await expect( addReaction ).toBeDisabled();
 			await expect( reactionPill ).toBeDisabled();
 
 			// Reopening the thread unlocks them again.
 			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Reopen' );
-			await expect(
-				page.getByRole( 'button', { name: 'Add reaction' } )
-			).toBeEnabled();
+			await expect( resolveButton ).toBeEnabled();
+			await expect( addReaction ).toBeEnabled();
 			await expect( reactionPill ).toBeEnabled();
 		} );
 
