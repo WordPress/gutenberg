@@ -2,9 +2,9 @@
 
 ## Unreleased
 
-### Bug Fixes
+### Breaking Changes
 
--   Fix published ESM declaration imports for Node-style TypeScript resolution. ([#82022](https://github.com/WordPress/gutenberg/pull/82022))
+-   Fix published ESM declaration imports for Node-style resolution. TypeScript consumers now require TypeScript 5 or newer. ([#82022](https://github.com/WordPress/gutenberg/pull/82022))
 
 ### Internal
 
