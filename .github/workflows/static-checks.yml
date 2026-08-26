@@ -82,6 +82,10 @@ jobs:
               # See: https://github.com/WordPress/gutenberg/pull/39865
               run: npm install
 
+            - name: Validate labeler config
+              if: ${{ matrix.annotations }}
+              run: npm run lint:labeler-config
+
             - name: Lint package.json files
               run: npm run lint:pkg-json
 
