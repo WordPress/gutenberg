@@ -67,7 +67,6 @@ export { default as __experimentalImageSizeControl } from './image-size-control'
 export {
 	default as InnerBlocks,
 	useInnerBlocksProps,
-	useInnerBlockItems,
 } from './inner-blocks';
 export {
 	default as InspectorControls,

@@ -89,10 +89,6 @@ export default function useNestedSettingsUpdate(
 			: templateLock;
 
 	useLayoutEffect( () => {
-		if ( ! clientId ) {
-			return;
-		}
-
 		const newSettings = {
 			allowedBlocks: _allowedBlocks,
 			prioritizedInserterBlocks: _prioritizedInserterBlocks,
