@@ -103,6 +103,29 @@ describe( 'Vitest policy rules', () => {
 		}
 	} );
 
+	it( 'tracks Testing Library DOM results and later assignments', () => {
+		for ( const source of [
+			"import { screen } from '@testing-library/react';\nscreen.getByRole( 'button' ).getBoundingClientRect();",
+			'let element;\nelement = document.body;\nelement.offsetWidth;',
+		] ) {
+			expectViolation( source, 'require Browser Mode', {
+				project: 'jsdom',
+			} );
+		}
+	} );
+
+	it( 'tracks computed-style aliases and document.defaultView', () => {
+		for ( const source of [
+			'document.defaultView.getComputedStyle( document.body );',
+			'const { getComputedStyle: getStyle } = window;\ngetStyle( document.body );',
+			'const getStyle = window.getComputedStyle;\ngetStyle( document.body );',
+		] ) {
+			expectViolation( source, 'computed style assertions', {
+				project: 'jsdom',
+			} );
+		}
+	} );
+
 	it( 'allows browser-like properties on shadowed local values', () => {
 		expectValid(
 			"const element = document.createElement( 'div' );\nfunction example() {\n\tconst element = { scrollTop: 0 };\n\treturn element.scrollTop;\n}",
@@ -110,6 +133,10 @@ describe( 'Vitest policy rules', () => {
 		);
 		expectValid(
 			'const window = { getComputedStyle() {} };\nwindow.getComputedStyle();',
+			{ project: 'jsdom' }
+		);
+		expectValid(
+			'const controller = window.wp.animations;\ncontroller.animate();',
 			{ project: 'jsdom' }
 		);
 	} );
@@ -126,6 +153,13 @@ describe( 'Vitest policy rules', () => {
 			"import { vi } from 'vitest';\nimport * as selectors from './selectors';\nvi.spyOn( selectors, 'getValue' );";
 
 		expectViolation( source, 'imported ESM namespace objects' );
+		expectViolation(
+			"import { vi } from 'vitest';\nimport * as selectors from './selectors';\nconst alias = selectors;\nvi.spyOn( alias, 'getValue' );",
+			'imported ESM namespace objects'
+		);
+		expectValid(
+			"import { vi } from 'vitest';\nimport * as selectors from './selectors';\nconst { service } = selectors;\nvi.spyOn( service, 'getValue' );"
+		);
 	} );
 
 	it( 'matches aliased Vitest vi APIs by binding', () => {
@@ -279,6 +313,16 @@ describe( 'Vitest policy rules', () => {
 		);
 		expectViolation(
 			"import { expect } from 'vitest';\nexpect( element ).not.toHaveStyle( {} );",
+			'toHaveStyle() requires',
+			{ project: 'jsdom' }
+		);
+		expectViolation(
+			"import { expect } from 'vitest';\nexpect.soft( element ).toHaveStyle( {} );",
+			'toHaveStyle() requires',
+			{ project: 'jsdom' }
+		);
+		expectViolation(
+			"import * as Vitest from 'vitest';\nVitest.expect.soft( element ).toHaveStyle( {} );",
 			'toHaveStyle() requires',
 			{ project: 'jsdom' }
 		);

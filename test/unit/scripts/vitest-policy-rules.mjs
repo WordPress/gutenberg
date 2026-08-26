@@ -61,9 +61,32 @@ const browserGlobalObjectNames = new Set( [
 	'Range',
 	'SVGElement',
 	'document',
-	'globalThis',
-	'window',
 ] );
+const browserGlobalContainerNames = new Set( [ 'globalThis', 'window' ] );
+const domProducingProperties = new Set( [
+	'body',
+	'defaultView',
+	'document',
+	'documentElement',
+	'firstChild',
+	'firstElementChild',
+	'lastChild',
+	'lastElementChild',
+	'nextElementSibling',
+	'parentElement',
+	'parentNode',
+	'previousElementSibling',
+	'prototype',
+] );
+const domProducingMethods = new Set( [
+	'closest',
+	'createElement',
+	'createElementNS',
+	'elementFromPoint',
+	'getElementById',
+	'querySelector',
+] );
+const testingLibraryQueryPattern = /^(?:find|get|query)(?:All)?By/;
 
 function getImportedName( specifier ) {
 	if ( specifier.type === 'ImportDefaultSpecifier' ) {
@@ -156,11 +179,90 @@ function getPatternIdentifiers( node ) {
 	return [];
 }
 
+function getObjectPatternPropertyIdentifiers( node, propertyName ) {
+	if ( node?.type !== 'ObjectPattern' ) {
+		return [];
+	}
+
+	return node.properties.flatMap( ( property ) => {
+		if (
+			property.type === 'Property' &&
+			( property.key?.name ?? property.key?.value ) === propertyName
+		) {
+			return getPatternIdentifiers( property.value );
+		}
+		return [];
+	} );
+}
+
+function isBrowserGlobalContainer( node, unboundIdentifiers ) {
+	return (
+		node?.type === 'Identifier' &&
+		browserGlobalContainerNames.has( node.name ) &&
+		unboundIdentifiers.has( node )
+	);
+}
+
+function isTestingLibraryDomExpression(
+	node,
+	testingLibraryScreenVariables,
+	testingLibraryDomFunctionVariables,
+	testingLibraryNamespaceVariables,
+	identifierVariables
+) {
+	if ( node?.type !== 'CallExpression' ) {
+		return false;
+	}
+
+	if (
+		isVariableReference(
+			node.callee,
+			testingLibraryDomFunctionVariables,
+			identifierVariables
+		)
+	) {
+		return true;
+	}
+
+	if (
+		node.callee?.type !== 'MemberExpression' ||
+		! testingLibraryQueryPattern.test(
+			getMemberPropertyName( node.callee ) ?? ''
+		)
+	) {
+		return false;
+	}
+
+	const receiver = node.callee.object;
+	if (
+		isVariableReference(
+			receiver,
+			testingLibraryScreenVariables,
+			identifierVariables
+		)
+	) {
+		return true;
+	}
+
+	return (
+		receiver?.type === 'MemberExpression' &&
+		getMemberPropertyName( receiver ) === 'screen' &&
+		isVariableReference(
+			receiver.object,
+			testingLibraryNamespaceVariables,
+			identifierVariables
+		)
+	);
+}
+
 function isBrowserGlobalExpression(
 	node,
 	unboundIdentifiers,
 	domVariables,
-	identifierVariables
+	identifierVariables,
+	testingLibraryScreenVariables,
+	testingLibraryDomFunctionVariables,
+	testingLibraryNamespaceVariables
 ) {
 	if ( node?.type === 'Identifier' ) {
 		return (
@@ -171,20 +273,57 @@ function isBrowserGlobalExpression(
 	}
 
 	if ( node?.type === 'CallExpression' ) {
+		if (
+			isTestingLibraryDomExpression(
+				node,
+				testingLibraryScreenVariables,
+				testingLibraryDomFunctionVariables,
+				testingLibraryNamespaceVariables,
+				identifierVariables
+			)
+		) {
+			return true;
+		}
+
+		if (
+			node.callee?.type !== 'MemberExpression' ||
+			! domProducingMethods.has( getMemberPropertyName( node.callee ) )
+		) {
+			return false;
+		}
+
 		return isBrowserGlobalExpression(
-			node.callee,
+			node.callee.object,
 			unboundIdentifiers,
 			domVariables,
-			identifierVariables
+			identifierVariables,
+			testingLibraryScreenVariables,
+			testingLibraryDomFunctionVariables,
+			testingLibraryNamespaceVariables
 		);
 	}
 
 	if ( node?.type === 'MemberExpression' ) {
+		const propertyName = getMemberPropertyName( node );
+		if ( isBrowserGlobalContainer( node.object, unboundIdentifiers ) ) {
+			return (
+				browserGlobalObjectNames.has( propertyName ) ||
+				domProducingProperties.has( propertyName )
+			);
+		}
+
+		if ( ! domProducingProperties.has( propertyName ) ) {
+			return false;
+		}
+
 		return isBrowserGlobalExpression(
 			node.object,
 			unboundIdentifiers,
 			domVariables,
-			identifierVariables
+			identifierVariables,
+			testingLibraryScreenVariables,
+			testingLibraryDomFunctionVariables,
+			testingLibraryNamespaceVariables
 		);
 	}
 
@@ -194,13 +333,19 @@ function isBrowserGlobalExpression(
 				node.consequent,
 				unboundIdentifiers,
 				domVariables,
-				identifierVariables
+				identifierVariables,
+				testingLibraryScreenVariables,
+				testingLibraryDomFunctionVariables,
+				testingLibraryNamespaceVariables
 			) ||
 			isBrowserGlobalExpression(
 				node.alternate,
 				unboundIdentifiers,
 				domVariables,
-				identifierVariables
+				identifierVariables,
+				testingLibraryScreenVariables,
+				testingLibraryDomFunctionVariables,
+				testingLibraryNamespaceVariables
 			)
 		);
 	}
@@ -211,13 +356,19 @@ function isBrowserGlobalExpression(
 				node.left,
 				unboundIdentifiers,
 				domVariables,
-				identifierVariables
+				identifierVariables,
+				testingLibraryScreenVariables,
+				testingLibraryDomFunctionVariables,
+				testingLibraryNamespaceVariables
 			) ||
 			isBrowserGlobalExpression(
 				node.right,
 				unboundIdentifiers,
 				domVariables,
-				identifierVariables
+				identifierVariables,
+				testingLibraryScreenVariables,
+				testingLibraryDomFunctionVariables,
+				testingLibraryNamespaceVariables
 			)
 		);
 	}
@@ -234,7 +385,10 @@ function isBrowserGlobalExpression(
 			node.expression,
 			unboundIdentifiers,
 			domVariables,
-			identifierVariables
+			identifierVariables,
+			testingLibraryScreenVariables,
+			testingLibraryDomFunctionVariables,
+			testingLibraryNamespaceVariables
 		);
 	}
 
@@ -273,8 +427,16 @@ function isVitestExpectCall(
 		return false;
 	}
 
+	let expectReference = node.callee;
+	if (
+		expectReference?.type === 'MemberExpression' &&
+		[ 'poll', 'soft' ].includes( getMemberPropertyName( expectReference ) )
+	) {
+		expectReference = expectReference.object;
+	}
+
 	return isImportedApiReference(
-		node.callee,
+		expectReference,
 		'expect',
 		expectVariables,
 		namespaceVariables,
@@ -321,20 +483,38 @@ function isDynamicImport( node ) {
 	);
 }
 
-function isGlobalGetComputedStyleCall( node, unboundIdentifiers ) {
-	if ( node.callee?.type === 'Identifier' ) {
+function isComputedStyleReference(
+	node,
+	unboundIdentifiers,
+	computedStyleVariables,
+	identifierVariables
+) {
+	if ( node?.type === 'Identifier' ) {
+		if (
+			isVariableReference(
+				node,
+				computedStyleVariables,
+				identifierVariables
+			)
+		) {
+			return true;
+		}
 		return isUnboundIdentifier(
-			node.callee,
+			node,
 			'getComputedStyle',
 			unboundIdentifiers
 		);
 	}
 
 	return (
-		getMemberPropertyName( node.callee ) === 'getComputedStyle' &&
-		node.callee.object?.type === 'Identifier' &&
-		[ 'globalThis', 'window' ].includes( node.callee.object.name ) &&
-		unboundIdentifiers.has( node.callee.object )
+		getMemberPropertyName( node ) === 'getComputedStyle' &&
+		( isBrowserGlobalContainer( node.object, unboundIdentifiers ) ||
+			( getMemberPropertyName( node.object ) === 'defaultView' &&
+				isUnboundIdentifier(
+					node.object.object,
+					'document',
+					unboundIdentifiers
+				) ) )
 	);
 }
 
@@ -444,6 +624,16 @@ function traverseAst( node, visitorKeys, visitor ) {
 			traverseAst( child, visitorKeys, visitor );
 		}
 	}
+}
+
+function getTrackedAssignment( node ) {
+	if ( node.type === 'VariableDeclarator' ) {
+		return { target: node.id, value: node.init };
+	}
+	if ( node.type === 'AssignmentExpression' && node.operator === '=' ) {
+		return { target: node.left, value: node.right };
+	}
+	return { target: null, value: null };
 }
 
 function isRecord( value ) {
@@ -563,8 +753,11 @@ export function validateVitestPolicy( {
 	);
 	const identifierVariables = createIdentifierVariableMap( scopeManager );
 	const importedNamespaces = new Set();
+	const computedStyleVariables = new Set();
 	const domVariables = new Set();
+	const testingLibraryDomFunctionVariables = new Set();
 	const testingLibraryNamespaceVariables = new Set();
+	const testingLibraryScreenVariables = new Set();
 	const vitestExpectVariables = new Set();
 	const vitestNamespaceVariables = new Set();
 	const vitestViVariables = new Set();
@@ -601,21 +794,30 @@ export function validateVitestPolicy( {
 		}
 
 		const importSource = node.source.value;
+		const isTestingLibraryImport = [
+			'@testing-library/dom',
+			'@testing-library/react',
+		].includes( importSource );
 		for ( const specifier of node.specifiers ) {
 			const variable = identifierVariables.get( specifier.local );
 			if ( specifier.type === 'ImportNamespaceSpecifier' ) {
 				if ( variable ) {
 					importedNamespaces.add( variable );
 				}
-				if (
-					[
-						'@testing-library/dom',
-						'@testing-library/react',
-					].includes( importSource )
-				) {
+				if ( isTestingLibraryImport ) {
 					if ( variable ) {
 						testingLibraryNamespaceVariables.add( variable );
 					}
+				}
+			}
+			if ( isTestingLibraryImport && variable ) {
+				const importedName = getImportedName( specifier );
+				if ( importedName === 'screen' ) {
+					testingLibraryScreenVariables.add( variable );
+				} else if (
+					testingLibraryQueryPattern.test( importedName ?? '' )
+				) {
+					testingLibraryDomFunctionVariables.add( variable );
 				}
 			}
 			if ( importSource === 'vitest' ) {
@@ -663,23 +865,76 @@ export function validateVitestPolicy( {
 		}
 	}
 
-	let previousDomVariableCount = -1;
-	while ( previousDomVariableCount !== domVariables.size ) {
-		previousDomVariableCount = domVariables.size;
+	let previousTrackedVariableCount = -1;
+	while (
+		previousTrackedVariableCount !==
+		importedNamespaces.size +
+			computedStyleVariables.size +
+			domVariables.size
+	) {
+		previousTrackedVariableCount =
+			importedNamespaces.size +
+			computedStyleVariables.size +
+			domVariables.size;
 		traverseAst( ast, visitorKeys, ( node ) => {
+			const { target, value } = getTrackedAssignment( node );
+
+			if ( ! value || ! target ) {
+				return;
+			}
+
 			if (
-				node.type !== 'VariableDeclarator' ||
+				target.type === 'Identifier' &&
+				isVariableReference(
+					value,
+					importedNamespaces,
+					identifierVariables
+				)
+			) {
+				const variable = identifierVariables.get( target );
+				if ( variable ) {
+					importedNamespaces.add( variable );
+				}
+			}
+
+			const computedStyleTargets = [
+				...( isComputedStyleReference(
+					value,
+					unboundIdentifiers,
+					computedStyleVariables,
+					identifierVariables
+				)
+					? getPatternIdentifiers( target )
+					: [] ),
+				...( isBrowserGlobalContainer( value, unboundIdentifiers )
+					? getObjectPatternPropertyIdentifiers(
+							target,
+							'getComputedStyle'
+					  )
+					: [] ),
+			];
+			for ( const identifier of computedStyleTargets ) {
+				const variable = identifierVariables.get( identifier );
+				if ( variable ) {
+					computedStyleVariables.add( variable );
+				}
+			}
+
+			if (
 				! isBrowserGlobalExpression(
-					node.init,
+					value,
 					unboundIdentifiers,
 					domVariables,
-					identifierVariables
+					identifierVariables,
+					testingLibraryScreenVariables,
+					testingLibraryDomFunctionVariables,
+					testingLibraryNamespaceVariables
 				)
 			) {
 				return;
 			}
 
-			for ( const identifier of getPatternIdentifiers( node.id ) ) {
+			for ( const identifier of getPatternIdentifiers( target ) ) {
 				const variable = identifierVariables.get( identifier );
 				if ( variable ) {
 					domVariables.add( variable );
@@ -786,7 +1041,12 @@ export function validateVitestPolicy( {
 		if (
 			project === 'jsdom' &&
 			node.type === 'CallExpression' &&
-			isGlobalGetComputedStyleCall( node, unboundIdentifiers )
+			isComputedStyleReference(
+				node.callee,
+				unboundIdentifiers,
+				computedStyleVariables,
+				identifierVariables
+			)
 		) {
 			report(
 				'jsdom-computed-style',
@@ -832,12 +1092,19 @@ export function validateVitestPolicy( {
 				unboundIdentifiers.has( node ) ) ||
 				( node.type === 'MemberExpression' &&
 					browserApiProperties.has( getMemberPropertyName( node ) ) &&
-					isBrowserGlobalExpression(
+					( isBrowserGlobalContainer(
 						node.object,
-						unboundIdentifiers,
-						domVariables,
-						identifierVariables
-					) ) )
+						unboundIdentifiers
+					) ||
+						isBrowserGlobalExpression(
+							node.object,
+							unboundIdentifiers,
+							domVariables,
+							identifierVariables,
+							testingLibraryScreenVariables,
+							testingLibraryDomFunctionVariables,
+							testingLibraryNamespaceVariables
+						) ) ) )
 		) {
 			report(
 				'jsdom-browser-api',
