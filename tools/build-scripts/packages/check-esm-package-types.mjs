@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import spawn from 'cross-spawn';
 import {
 	classifyTypeScriptDiagnostics,
+	getCssEntrypoints,
 	inspectPackagePublications,
 } from './check-esm-package-types-helpers.mjs';
 
@@ -55,23 +56,6 @@ function getPackageTypeOptions( { directory, packageJson } ) {
 			`Could not parse TypeScript config for ${ packageJson.name }.`
 		);
 	}
-}
-
-function pointsOnlyToCss( target ) {
-	if ( typeof target === 'string' ) {
-		return target.endsWith( '.css' );
-	}
-	if ( target && typeof target === 'object' ) {
-		const targets = Object.values( target ).filter( Boolean );
-		return targets.length > 0 && targets.every( pointsOnlyToCss );
-	}
-	return false;
-}
-
-function getCssEntrypoints( packageJson ) {
-	return Object.entries( packageJson.exports ?? {} )
-		.filter( ( [ , target ] ) => pointsOnlyToCss( target ) )
-		.map( ( [ entrypoint ] ) => entrypoint.replace( /^\.\//, '' ) );
 }
 
 async function checkNodeNextTypes( { directory, packageJson }, declarations ) {

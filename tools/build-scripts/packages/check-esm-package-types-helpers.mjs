@@ -21,6 +21,23 @@ export function classifyTypeScriptDiagnostics(
 	return { hasTypeScriptDiagnostics, relevantDiagnostics };
 }
 
+function pointsOnlyToCss( target ) {
+	if ( typeof target === 'string' ) {
+		return target.endsWith( '.css' );
+	}
+	if ( target && typeof target === 'object' ) {
+		const targets = Object.values( target ).filter( Boolean );
+		return targets.length > 0 && targets.every( pointsOnlyToCss );
+	}
+	return false;
+}
+
+export function getCssEntrypoints( packageJson ) {
+	return Object.entries( packageJson.exports ?? {} )
+		.filter( ( [ , target ] ) => pointsOnlyToCss( target ) )
+		.map( ( [ entrypoint ] ) => entrypoint.replace( /^\.\//, '' ) );
+}
+
 export function packPackage( { directory, packageJson }, packDestination ) {
 	const result = spawn.sync(
 		'npm',

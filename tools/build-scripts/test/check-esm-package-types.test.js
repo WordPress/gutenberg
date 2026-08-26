@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import {
 	classifyTypeScriptDiagnostics,
+	getCssEntrypoints,
 	inspectPackagePublications,
 	packPackage,
 } from '../packages/check-esm-package-types-helpers.mjs';
@@ -139,4 +140,27 @@ test( 'ignores diagnostics from external dependencies', () => {
 		hasTypeScriptDiagnostics: true,
 		relevantDiagnostics: [],
 	} );
+} );
+
+test( 'returns only nested CSS-only exports as ATTW exclusions', () => {
+	const packageJson = {
+		exports: {
+			'./design-tokens.css': {
+				browser: './build-style.css',
+				default: {
+					import: './build-style.css',
+					types: null,
+				},
+			},
+			'./plugin': {
+				import: './build-module.js',
+				style: './build-style.css',
+			},
+			'./package.json': './package.json',
+		},
+	};
+
+	expect( getCssEntrypoints( packageJson ) ).toEqual( [
+		'design-tokens.css',
+	] );
 } );
