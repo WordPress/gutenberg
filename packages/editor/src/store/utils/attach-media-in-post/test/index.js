@@ -1,9 +1,9 @@
-import attachMediaInPost from '../attach-media';
+import attachMediaInPost from '..';
 
 const mockInvalidate = jest.fn();
 
 jest.mock( '@wordpress/media-utils', () => ( { privateApis: {} } ) );
-jest.mock( '../../../lock-unlock', () => ( {
+jest.mock( '../../../../lock-unlock', () => ( {
 	unlock: () => ( {
 		invalidateAttachmentResolutions: ( ...args ) =>
 			mockInvalidate( ...args ),

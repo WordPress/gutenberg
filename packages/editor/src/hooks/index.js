@@ -1,6 +1,5 @@
 import './custom-sources-backwards-compatibility';
 import './default-autocompleters';
-import './attach-media-in-post';
 import './media-upload';
 import './pattern-overrides';
 import './navigation-link-view-button';

@@ -26,6 +26,7 @@ import {
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
+import attachMediaInPost from './utils/attach-media-in-post';
 import { unlock } from '../lock-unlock';
 import { setCanvasWidth } from './private-actions';
 import { getCanvasWidthByDeviceType } from '../utils/device-type';
@@ -276,6 +277,27 @@ export const savePost =
 			}
 		}
 		dispatch( { type: 'REQUEST_POST_UPDATE_FINISH', options } );
+
+		// Attach media the post displays but that belongs to no post yet,
+		// matching what uploading into a post has always done. An autosave or a
+		// preview is not the user committing anything, so neither is the moment
+		// to start claiming their media.
+		//
+		// Not awaited: this is bookkeeping, and it must not hold up the editor
+		// reaching "Saved". It swallows its own errors, so nothing can reject
+		// here. `autoAttachMediaEnabled` is the documented way to switch it off.
+		if (
+			! error &&
+			! options.isAutosave &&
+			! options.isPreview &&
+			select.getEditorSettings().autoAttachMediaEnabled
+		) {
+			attachMediaInPost(
+				registry,
+				previousRecord.id,
+				previousRecord.type
+			);
+		}
 
 		if ( error ) {
 			const args = getNotificationArgumentsForSaveFail( {
