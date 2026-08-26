@@ -25,6 +25,9 @@
 
 ### Documentation
 
+-   `WidgetAction`: state the `download` semantics; any value but `false`
+    downloads, and `true` or `''` keep the original filename
+    ([#82073](https://github.com/WordPress/gutenberg/pull/82073)).
 -   Add a Widget host doc page: the capability seam and the `links`
     contract, with the consumption rules link actions follow
     ([#81740](https://github.com/WordPress/gutenberg/pull/81740)).
