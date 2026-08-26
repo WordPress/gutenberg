@@ -1,15 +1,49 @@
+import { Icon as WCIcon } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 // eslint-disable-next-line @wordpress/use-recommended-components
-import { Icon, Menu } from '@wordpress/ui';
+import { Menu } from '@wordpress/ui';
+
+/**
+ * Converts the shortcut shapes the legacy `MenuItem` took, a string or an
+ * object of `display` and `ariaLabel`, to the one the menu takes.
+ *
+ * `ariaKeyShortcut` is left out: it cannot be derived from display text, and
+ * the legacy item never set `aria-keyshortcuts` either.
+ *
+ * @param {string|Object} [shortcut] Shortcut in any accepted shape.
+ *
+ * @return {?Object} Shortcut of a menu item.
+ */
+function adaptShortcut( shortcut ) {
+	if ( ! shortcut ) {
+		return undefined;
+	}
+
+	if ( typeof shortcut === 'string' ) {
+		return { displayShortcut: shortcut, label: shortcut };
+	}
+
+	if ( shortcut.displayShortcut ) {
+		return shortcut;
+	}
+
+	return {
+		displayShortcut: shortcut.display,
+		label: shortcut.ariaLabel ?? shortcut.display,
+	};
+}
 
 function UnforwardedMoreMenuItem(
 	{
 		'aria-checked': ariaChecked,
 		children,
+		href,
 		icon,
 		info,
+		isSelected,
 		onClick,
 		role,
+		shortcut,
 		target,
 		...props
 	},
@@ -19,18 +53,24 @@ function UnforwardedMoreMenuItem(
 	const description = info ? (
 		<Menu.ItemDescription>{ info }</Menu.ItemDescription>
 	) : null;
-	const prefix = icon ? <Icon icon={ icon } /> : undefined;
+	// Not the UI package's icon: only this one renders the Dashicon slugs
+	// `PluginMoreMenuItem` accepts.
+	const prefix = icon ? <WCIcon icon={ icon } /> : undefined;
+	const itemShortcut = adaptShortcut( shortcut );
+	// `MenuItem` documented `isSelected`; `ComplementaryAreaToggle` sets
+	// `aria-checked`.
+	const checked =
+		isSelected ?? ( ariaChecked === true || ariaChecked === 'true' );
 
-	// Items toggling a sidebar of the plugins API describe themselves with the
-	// ARIA props of a checkable item.
 	if ( role === 'menuitemcheckbox' ) {
 		return (
 			<Menu.CheckboxItem
 				ref={ ref }
-				checked={ !! ariaChecked }
+				checked={ checked }
 				closeOnClick
-				onCheckedChange={ () => onClick() }
+				onCheckedChange={ () => onClick?.() }
 				prefix={ prefix }
+				shortcut={ itemShortcut }
 				{ ...props }
 			>
 				{ label }
@@ -39,11 +79,13 @@ function UnforwardedMoreMenuItem(
 		);
 	}
 
-	if ( props.href ) {
+	if ( href !== undefined ) {
 		return (
 			<Menu.LinkItem
 				ref={ ref }
+				href={ href }
 				prefix={ prefix }
+				shortcut={ itemShortcut }
 				openInNewTab={ target === '_blank' }
 				onClick={ onClick }
 				{ ...props }
@@ -54,11 +96,18 @@ function UnforwardedMoreMenuItem(
 		);
 	}
 
+	// `Menu.RadioItem` only works inside a `Menu.RadioGroup`, which a fill
+	// cannot join, so pass the role and state on instead.
+	const radioProps =
+		role === 'menuitemradio' ? { role, 'aria-checked': checked } : {};
+
 	return (
 		<Menu.Item
 			ref={ ref }
 			prefix={ prefix }
+			shortcut={ itemShortcut }
 			onClick={ onClick }
+			{ ...radioProps }
 			{ ...props }
 		>
 			{ label }
