@@ -129,6 +129,10 @@ return array(
 		'label'    => _x( 'Chevron Up Small', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/chevron-up-small.svg',
 	),
+	'close'               => array(
+		'label'    => _x( 'Close', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/close.svg',
+	),
 	'comment'             => array(
 		'label'    => _x( 'Comment', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/comment.svg',

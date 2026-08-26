@@ -323,7 +323,8 @@
 	{
 		"slug": "close",
 		"label": "Close",
-		"filePath": "library/close.svg"
+		"filePath": "library/close.svg",
+		"public": true
 	},
 	{
 		"slug": "close-small",

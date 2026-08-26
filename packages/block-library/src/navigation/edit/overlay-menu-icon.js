@@ -1,7 +1,18 @@
 import { SVG, Rect } from '@wordpress/primitives';
 import { Icon, menu } from '@wordpress/icons';
+import HtmlRenderer from '../../utils/html-renderer';
+import { useIcon } from '../../utils/use-icon';
 
 export default function OverlayMenuIcon( { icon } ) {
+	const iconName =
+		icon === 'menu' ? 'core/menu' : 'core/navigation-menu-toggle';
+	const { content, hasResolved } = useIcon( iconName );
+
+	if ( hasResolved && content ) {
+		return <HtmlRenderer html={ content } />;
+	}
+
+	// Fallback for when the Icon Registry is not available.
 	if ( icon === 'menu' ) {
 		return <Icon icon={ menu } />;
 	}
