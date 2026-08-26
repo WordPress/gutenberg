@@ -282,6 +282,24 @@ describe( 'removeInvalidHTML', () => {
 		const output = '<p>test</p>';
 		expect( removeInvalidHTML( input, schema ) ).toEqual( output );
 	} );
+
+	it( 'should preserve whitespace from inline elements containing only whitespace', () => {
+		const input = 'The following space:<em> </em>should not be removed.';
+		const output = 'The following space: should not be removed.';
+		expect( removeInvalidHTML( input, schema ) ).toBe( output );
+	} );
+
+	it( 'should still remove truly empty inline elements', () => {
+		const input = 'no space:<em></em>here';
+		const output = 'no space:here';
+		expect( removeInvalidHTML( input, schema ) ).toBe( output );
+	} );
+
+	it( 'should still remove empty block-level elements that should have children', () => {
+		const input = '<figure> </figure>';
+		const output = '';
+		expect( removeInvalidHTML( input, schema ) ).toBe( output );
+	} );
 } );
 
 describe( 'isEmpty', () => {
