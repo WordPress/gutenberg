@@ -8,7 +8,6 @@ import { useInstanceId, useDebounce } from '@wordpress/compose';
 import { moreVertical } from '@wordpress/icons';
 import {
 	useCallback,
-	useContext,
 	useMemo,
 	useState,
 	useRef,
@@ -32,9 +31,7 @@ import {
 	getBlockPositionDescription,
 	getBlockPropertiesDescription,
 	focusListItem,
-	getListViewKeyboardFocusPosition,
 } from './utils';
-import { BlockRefs } from '../provider/block-refs-provider';
 import { store as blockEditorStore } from '../../store';
 import { groupBlocks } from '../../utils/group-blocks';
 import { getPositionTypeLabel } from '../use-block-display-information';
@@ -163,7 +160,6 @@ function ListViewBlock( {
 		// since that menu is part of the toolbar in the editor canvas.
 		// List View respects this by also hiding the block settings menu.
 		hasBlockSupport( blockName, '__experimentalToolbar', true );
-	const { refsMap } = useContext( BlockRefs );
 	const instanceId = useInstanceId( ListViewBlock );
 	const descriptionId = `list-view-block-select-button__description-${ instanceId }`;
 
@@ -434,18 +430,10 @@ function ListViewBlock( {
 
 	const selectEditorBlock = useCallback(
 		( event ) => {
-			// For keyboard activation (Enter/Space on a link), transfer focus
-			// to the canvas. For mouse clicks, keep focus in the list view so
-			// that subsequent keyboard operations (arrow navigation, copy/paste)
-			// still work.
-			const isKeyboardActivation = event?.detail === 0;
-			const initialPosition = isKeyboardActivation
-				? getListViewKeyboardFocusPosition( refsMap.get( clientId ) )
-				: null;
-			selectBlock( event, clientId, initialPosition );
+			selectBlock( event, clientId );
 			event.preventDefault();
 		},
-		[ clientId, refsMap, selectBlock ]
+		[ clientId, selectBlock ]
 	);
 
 	const updateFocusAndSelection = useCallback(

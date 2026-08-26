@@ -31,7 +31,7 @@
 -   `useInsertionPoint`: Leave the insertion cue alone when it belongs to the in-between inserter. The cue is shared state and the in-between inserter mounts inside its popover, so the sidebar inserter hiding it tore down the inline inserter that had just been opened ([#76241](https://github.com/WordPress/gutenberg/pull/76241)).
 -   `BorderPanel`: Match a chosen drop shadow against the presets from every origin rather than the first origin that defines any, so theme and default presets keep being stored as `var:preset|shadow|<slug>` once a custom preset exists ([#81346](https://github.com/WordPress/gutenberg/pull/81346)).
 -   `InserterMenu`: Cancel the animation frame that focuses the active tab when the menu unmounts before it runs, so an unmount right after mount no longer throws [#81918](https://github.com/WordPress/gutenberg/pull/81918).
--   `ListView`: On keyboard activation, place the caret at the end of a single text field. Blocks with more than one editable field, such as Table, receive focus on the first field so the last cell is not selected. ([#81964](https://github.com/WordPress/gutenberg/pull/81964)).
+-   `ListView`: Revert placing the caret at the end of a block on keyboard activation ([#76797](https://github.com/WordPress/gutenberg/pull/76797)). Activation again focuses the start of the first field, so a Table no longer focuses its last cell ([#81964](https://github.com/WordPress/gutenberg/pull/81964)).
 
 ### Internal
 
