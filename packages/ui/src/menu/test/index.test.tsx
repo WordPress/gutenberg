@@ -438,6 +438,10 @@ describe( 'Menu', () => {
 			configurable: true,
 			get: () => iframeDocument,
 		} );
+		const firstAddEventListener = jest.spyOn(
+			firstDocument,
+			'addEventListener'
+		);
 		const firstRemoveEventListener = jest.spyOn(
 			firstDocument,
 			'removeEventListener'
@@ -453,6 +457,13 @@ describe( 'Menu', () => {
 
 		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
 		expect( await screen.findByRole( 'menu' ) ).toBeVisible();
+		await waitFor( () => {
+			expect( firstAddEventListener ).toHaveBeenCalledWith(
+				'pointerdown',
+				expect.any( Function ),
+				true
+			);
+		} );
 
 		iframeDocument = reloadedDocument;
 		act( () => iframe.dispatchEvent( new Event( 'load' ) ) );
