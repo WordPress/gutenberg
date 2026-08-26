@@ -155,13 +155,25 @@ export function useToolsPanelItem(
 		isShownByDefault,
 	] );
 
+	// An item has no menu entry until it registers with the panel, so on that
+	// first render its previous checked state is `undefined` rather than `false`.
+	// Items that register already shown — because they have a value, or because
+	// `defaultShown` was set — must not be treated as though the user had just
+	// selected them from the menu.
+	const wasRegistered = wasMenuItemChecked !== undefined;
+
 	// Determine if the panel item's corresponding menu is being toggled and
 	// trigger appropriate callback if it is.
 	useEffect( () => {
 		// We check whether this item is currently registered as items rendered
 		// via fills can persist through the parent panel being remounted.
 		// See: https://github.com/WordPress/gutenberg/pull/45673
-		if ( ! isRegistered || isResetting || ! hasMatchingPanel ) {
+		if (
+			! isRegistered ||
+			! wasRegistered ||
+			isResetting ||
+			! hasMatchingPanel
+		) {
 			return;
 		}
 
@@ -179,6 +191,7 @@ export function useToolsPanelItem(
 		isResetting,
 		isValueSet,
 		wasMenuItemChecked,
+		wasRegistered,
 		onSelect,
 		onDeselect,
 	] );

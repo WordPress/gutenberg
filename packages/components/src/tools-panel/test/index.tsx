@@ -995,7 +995,7 @@ describe( 'ToolsPanel', () => {
 			expect( altControlProps.onHide ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should not call onShow when an item is mounted with defaultShown', () => {
+		it( 'should not call any callback when an item is mounted with defaultShown', () => {
 			render(
 				<ToolsPanel { ...defaultProps }>
 					<ToolsPanelItem { ...altControlProps } defaultShown>
@@ -1004,8 +1004,11 @@ describe( 'ToolsPanel', () => {
 				</ToolsPanel>
 			);
 
+			// Registering an item as shown is not a menu action, so none of
+			// the item's callbacks should fire.
 			expect( screen.getByText( 'Alt control' ) ).toBeInTheDocument();
 			expect( altControlProps.onShow ).not.toHaveBeenCalled();
+			expect( altControlProps.onSelect ).not.toHaveBeenCalled();
 		} );
 	} );
 
