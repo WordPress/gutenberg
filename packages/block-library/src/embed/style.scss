@@ -31,6 +31,9 @@
 .wp-block-embed {
 	overflow-wrap: break-word; // Break long strings of text without spaces so they don't overflow the block.
 
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+
 	// Supply caption styles to embeds, even if the theme hasn't opted in.
 	// Reason being: the new markup, figcaptions, are not likely to be styled in the majority of existing themes,
 	// so we supply the styles so as to not appear broken or unstyled in those.

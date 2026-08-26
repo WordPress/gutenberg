@@ -10,7 +10,7 @@ const attributeMap = {
 	marginwidth: 'marginWidth',
 };
 
-export default function WpEmbedPreview( { html } ) {
+export default function WpEmbedPreview( { html, wrapperProps = {} } ) {
 	const ref = useRef();
 	const props = useMemo( () => {
 		const doc = new window.DOMParser().parseFromString( html, 'text/html' );
@@ -65,7 +65,12 @@ export default function WpEmbedPreview( { html } ) {
 	}, [] );
 
 	return (
-		<div className="wp-block-embed__wrapper">
+		<div
+			className={ `wp-block-embed__wrapper ${
+				wrapperProps.className || ''
+			}` }
+			style={ { ...wrapperProps.style } }
+		>
 			<iframe
 				ref={ useMergeRefs( [ ref, useFocusableIframe() ] ) }
 				title={ props.title }

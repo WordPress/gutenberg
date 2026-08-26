@@ -48,7 +48,21 @@
 		},
 		"interactivity": {
 			"clientNavigation": true
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"width": true,
+			"style": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"width": true,
+				"style": true
+			},
+			"__experimentalSkipSerialization": true
 		}
+	},
+	"selectors": {
+		"border": ".wp-block-embed__wrapper"
 	},
 	"editorStyle": "wp-block-embed-editor",
 	"style": "wp-block-embed"
