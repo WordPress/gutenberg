@@ -292,6 +292,9 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		},
 		rootOnly: true,
 	},
+	'--wp--style--block-background-padding': {
+		value: [ 'spacing', 'blockBackgroundPadding' ],
+	},
 };
 
 export const __EXPERIMENTAL_ELEMENTS: Record< string, string > = {
