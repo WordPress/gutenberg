@@ -4,6 +4,8 @@
 
 ### Bug Fixes
 
+-   Restore bottom-centered snackbar notices after the CSS Modules migration ([#81995](https://github.com/WordPress/gutenberg/pull/81995)).
+-   Mount the plugins registered with `registerPlugin`, so the sidebars, panels and menu items they fill render ([#81754](https://github.com/WordPress/gutenberg/pull/81754)).
 -   Canvas: Show the site's front end where a route names no entity and the theme has no block templates to resolve one from, instead of an editor with nothing open. Was previously handled by the home route alone, leaving `/identity` broken on a classic theme ([#81749](https://github.com/WordPress/gutenberg/pull/81749)).
 -   Canvas: Open an entity at the width its `viewport` param asks for through the editor provider, so the width comes from the theme's breakpoints rather than the defaults ([#81750](https://github.com/WordPress/gutenberg/pull/81750)).
 -   Canvas: Stop writing the current width into the `viewport` search param when leaving an entity. The param says where an entity opens; a width set from the device preview is view state and no longer follows the user between entities ([#81750](https://github.com/WordPress/gutenberg/pull/81750)).
