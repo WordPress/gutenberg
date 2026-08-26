@@ -2,7 +2,6 @@ import { Menu as _Menu } from '@base-ui/react/menu';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { renderSlotWithChildren } from '../utils/render-slot-with-children';
-import { ThemeProvider } from '../utils/theme-provider';
 import styles from './style.module.css';
 import { Portal } from './portal';
 import { Positioner } from './positioner';
@@ -19,27 +18,25 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function MenuPopup(
 	const { isSubmenu } = useMenuContext();
 
 	const popupContent = (
-		<ThemeProvider>
-			<_Menu.Popup
-				ref={ ref }
-				className={ clsx(
-					styles.popup,
-					isSubmenu ? styles[ 'is-submenu' ] : styles[ 'is-root' ],
-					className
-				) }
-				{ ...props }
+		<_Menu.Popup
+			ref={ ref }
+			className={ clsx(
+				styles.popup,
+				isSubmenu ? styles[ 'is-submenu' ] : styles[ 'is-root' ],
+				className
+			) }
+			{ ...props }
+		>
+			<div
+				/*
+				 * `styles.list` provides the alignment scope for items
+				 * that are not inside an explicit Menu.Group.
+				 */
+				className={ styles.list }
 			>
-				<div
-					/*
-					 * `styles.list` provides the alignment scope for items
-					 * that are not inside an explicit Menu.Group.
-					 */
-					className={ styles.list }
-				>
-					{ children }
-				</div>
-			</_Menu.Popup>
-		</ThemeProvider>
+				{ children }
+			</div>
+		</_Menu.Popup>
 	);
 
 	const positionedPopup = renderSlotWithChildren(

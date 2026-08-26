@@ -2,7 +2,6 @@ import { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { renderSlotWithChildren } from '../../../utils/render-slot-with-children';
-import { ThemeProvider } from '../../../utils/theme-provider';
 import itemPopupStyles from '../../../utils/css/item-popup.module.css';
 import { getItemPopupWidthClassName } from '../../../utils/css/item-popup';
 import { Portal } from './portal';
@@ -15,17 +14,15 @@ export const Popup = forwardRef< HTMLDivElement, AutocompletePopupProps >(
 		ref
 	) {
 		const popupContent = (
-			<ThemeProvider>
-				<_Autocomplete.Popup
-					ref={ ref }
-					className={ clsx(
-						itemPopupStyles.popup,
-						getItemPopupWidthClassName( popupWidth ),
-						className
-					) }
-					{ ...restProps }
-				/>
-			</ThemeProvider>
+			<_Autocomplete.Popup
+				ref={ ref }
+				className={ clsx(
+					itemPopupStyles.popup,
+					getItemPopupWidthClassName( popupWidth ),
+					className
+				) }
+				{ ...restProps }
+			/>
 		);
 
 		const positionedPopup = renderSlotWithChildren(

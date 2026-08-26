@@ -4,7 +4,6 @@ import { forwardRef } from '@wordpress/element';
 import { Portal } from './portal';
 import { Positioner } from './positioner';
 import { renderSlotWithChildren } from '../../../utils/render-slot-with-children';
-import { ThemeProvider } from '../../../utils/theme-provider';
 import itemPopupStyles from '../../../utils/css/item-popup.module.css';
 import { getItemPopupWidthClassName } from '../../../utils/css/item-popup';
 import type { ComboboxPopupProps } from './types';
@@ -15,17 +14,15 @@ export const Popup = forwardRef< HTMLDivElement, ComboboxPopupProps >(
 		ref
 	) {
 		const popupContent = (
-			<ThemeProvider>
-				<_Combobox.Popup
-					ref={ ref }
-					className={ clsx(
-						itemPopupStyles.popup,
-						getItemPopupWidthClassName( popupWidth ),
-						className
-					) }
-					{ ...restProps }
-				/>
-			</ThemeProvider>
+			<_Combobox.Popup
+				ref={ ref }
+				className={ clsx(
+					itemPopupStyles.popup,
+					getItemPopupWidthClassName( popupWidth ),
+					className
+				) }
+				{ ...restProps }
+			/>
 		);
 
 		const positionedPopup = renderSlotWithChildren(
