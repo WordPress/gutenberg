@@ -235,4 +235,62 @@ test.describe( 'Accordion', () => {
 		await expect( accordionPanel ).toBeVisible();
 		await expect( targetParagraph ).toBeInViewport();
 	} );
+
+	test( 'should not visually occupy space for a closed panel that has padding', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/accordion',
+			innerBlocks: [
+				{
+					name: 'core/accordion-item',
+					attributes: { openByDefault: false },
+					innerBlocks: [
+						{
+							name: 'core/accordion-heading',
+							attributes: { title: 'Accordion Title' },
+						},
+						{
+							name: 'core/accordion-panel',
+							attributes: {
+								style: {
+									spacing: {
+										padding: {
+											top: '40px',
+											bottom: '40px',
+										},
+									},
+								},
+							},
+							innerBlocks: [
+								{
+									name: 'core/paragraph',
+									attributes: {
+										content: 'Accordion Panel Content',
+									},
+								},
+							],
+						},
+					],
+				},
+			],
+		} );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		const accordionPanel = page.getByRole( 'region', {
+			name: 'Accordion Title',
+			includeHidden: true,
+		} );
+
+		await expect( accordionPanel ).toBeHidden();
+		// A closed panel's padding must not contribute to its rendered box
+		// height, even if the block has padding applied via block supports
+		// (e.g. through theme.json). See
+		// https://github.com/WordPress/gutenberg/issues/80776
+		const boundingBox = await accordionPanel.boundingBox();
+		expect( boundingBox.height ).toBe( 0 );
+	} );
 } );

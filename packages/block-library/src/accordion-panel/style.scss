@@ -1,6 +1,14 @@
 .wp-block-accordion-panel {
 	// Prevent blockGap from Accordion Content block from adding extra margin between accordions.
+	//
+	// Closed panels get `hidden="until-found"` (see accordion-item/index.php),
+	// which browsers implement as `content-visibility: hidden`. That only
+	// collapses the panel's *content*; the panel's own padding and border
+	// still occupy space, so a theme.json padding/border on this block would
+	// otherwise still show as a visible gap while the panel is closed.
 	&[hidden] {
 		margin-block-start: 0;
+		padding: 0;
+		border-width: 0;
 	}
 }
