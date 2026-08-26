@@ -8,6 +8,7 @@ import {
 } from '@wordpress/block-editor';
 import { unlock } from '../../lock-unlock';
 import { NoteThread } from './note-thread';
+import { LintThread } from './lint-thread';
 import {
 	focusNoteThread,
 	getNoteIdsFromMetadata,
@@ -19,7 +20,13 @@ import { store as editorStore } from '../../store';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
-export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
+export function Notes( {
+	notes,
+	lintItems = [],
+	sidebarRef,
+	isFloating = false,
+	styles,
+} ) {
 	const {
 		onCreate: onAddReply,
 		onEdit: onEditNote,
@@ -61,33 +68,39 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 	const relatedBlockElement = useBlockElement( selectedBlockClientId );
 
 	const threads = useMemo( () => {
+		let noteThreads = notes;
 		// In floating mode with a pending new note, splice a placeholder
 		// entry at the selected block's position so the board can float it
 		// alongside regular threads.
-		if ( ! isFloating || selectedNote !== 'new' ) {
-			return notes;
+		if ( isFloating && selectedNote === 'new' ) {
+			const newNoteThread = {
+				id: 'new',
+				blockClientId: selectedBlockClientId,
+				content: { rendered: '' },
+			};
+			const out = [];
+			orderedBlockIds.forEach( ( blockId ) => {
+				// Blocks can carry multiple notes — surface them all.
+				const threadsForBlock = notes.filter(
+					( t ) => t.blockClientId === blockId
+				);
+				out.push( ...threadsForBlock );
+				if ( blockId === selectedBlockClientId ) {
+					// Place the new note placeholder after the block's existing
+					// threads so the form appears alongside them.
+					out.push( newNoteThread );
+				}
+			} );
+			noteThreads = out;
 		}
-		const newNoteThread = {
-			id: 'new',
-			blockClientId: selectedBlockClientId,
-			content: { rendered: '' },
-		};
-		const out = [];
-		orderedBlockIds.forEach( ( blockId ) => {
-			// Blocks can carry multiple notes — surface them all.
-			const threadsForBlock = notes.filter(
-				( t ) => t.blockClientId === blockId
-			);
-			out.push( ...threadsForBlock );
-			if ( blockId === selectedBlockClientId ) {
-				// Place the new note placeholder after the block's existing
-				// threads so the form appears alongside them.
-				out.push( newNoteThread );
-			}
-		} );
-		return out;
+		// Lint findings (tagged `kind: 'lint'`) render as read-only threads
+		// sharing the note thread's canvas chrome. The board positions every
+		// entry by its block rect, so appending them is enough to float each
+		// aligned to its block.
+		return [ ...noteThreads, ...lintItems ];
 	}, [
 		notes,
+		lintItems,
 		isFloating,
 		selectedNote,
 		selectedBlockClientId,
@@ -175,13 +188,42 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 
 	const hasThreads = Array.isArray( threads ) && threads.length > 0;
 
+	// Lint threads track their block's selection; notes track the selected
+	// note id.
+	const isThreadSelected = ( thread ) =>
+		thread.kind === 'lint'
+			? !! thread.blockClientId &&
+			  thread.blockClientId === selectedBlockClientId
+			: selectedNote === thread.id;
+
 	const navigate = ( event, thread, isSelected ) => {
 		if ( event.defaultPrevented ) {
 			return;
 		}
 
-		const currentIndex = threads.findIndex( ( t ) => t.id === thread.id );
 		const isSelfTarget = event.currentTarget === event.target;
+
+		// Lint threads are read-only: Enter / ArrowRight selects the block and
+		// Escape clears its spotlight. Arrow / Home / End navigation falls
+		// through to the shared handling below.
+		if ( thread.kind === 'lint' ) {
+			if (
+				( event.key === 'Enter' || event.key === 'ArrowRight' ) &&
+				isSelfTarget &&
+				thread.blockClientId
+			) {
+				// Pass `null` as the second parameter to prevent focusing the block.
+				selectBlock( thread.blockClientId, null );
+				toggleBlockSpotlight( thread.blockClientId, true );
+				return;
+			}
+			if ( event.key === 'Escape' && thread.blockClientId ) {
+				toggleBlockSpotlight( thread.blockClientId, false );
+				return;
+			}
+		}
+
+		const currentIndex = threads.findIndex( ( t ) => t.id === thread.id );
 
 		if (
 			( event.key === 'Enter' || event.key === 'ArrowRight' ) &&
@@ -276,47 +318,63 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 							sidebarRef={ sidebarRef }
 						/>
 					) }
-					{ threads.map( ( thread, index ) => (
-						<Fragment key={ thread.id }>
-							{ index === firstResolvedIndex && (
-								<Stack
-									direction="row"
-									align="center"
-									justify="center"
-									gap="sm"
-									className="editor-collab-sidebar-panel__status-separator"
-								>
-									<Text variant="heading-sm" render={ <p /> }>
-										{ __( 'Resolved' ) }
-									</Text>
-								</Stack>
-							) }
-							<NoteThread
-								note={ thread }
-								onAddReply={ onAddReply }
-								onDeleteNote={ handleDelete }
-								onEditNote={ onEditNote }
-								isSelected={ selectedNote === thread.id }
-								sidebarRef={ sidebarRef }
-								floating={
-									isFloating
-										? {
-												y: notePositions[ thread.id ],
-												registerThread,
-												unregisterThread,
-										  }
-										: undefined
-								}
-								onKeyDown={ ( event ) =>
-									navigate(
-										event,
-										thread,
-										selectedNote === thread.id
-									)
-								}
-							/>
-						</Fragment>
-					) ) }
+					{ threads.map( ( thread, index ) => {
+						const floating = isFloating
+							? {
+									y: notePositions[ thread.id ],
+									registerThread,
+									unregisterThread,
+							  }
+							: undefined;
+						const isSelected = isThreadSelected( thread );
+
+						if ( thread.kind === 'lint' ) {
+							return (
+								<LintThread
+									key={ thread.id }
+									item={ thread }
+									isSelected={ isSelected }
+									floating={ floating }
+									onKeyDown={ ( event ) =>
+										navigate( event, thread, isSelected )
+									}
+								/>
+							);
+						}
+
+						return (
+							<Fragment key={ thread.id }>
+								{ index === firstResolvedIndex && (
+									<Stack
+										direction="row"
+										align="center"
+										justify="center"
+										gap="sm"
+										className="editor-collab-sidebar-panel__status-separator"
+									>
+										<Text
+											variant="heading-sm"
+											render={ <p /> }
+										>
+											{ __( 'Resolved' ) }
+										</Text>
+									</Stack>
+								) }
+								<NoteThread
+									note={ thread }
+									onAddReply={ onAddReply }
+									onDeleteNote={ handleDelete }
+									onEditNote={ onEditNote }
+									isSelected={ isSelected }
+									sidebarRef={ sidebarRef }
+									floating={ floating }
+									onKeyDown={ ( event ) =>
+										navigate( event, thread, isSelected )
+									}
+								/>
+							</Fragment>
+						);
+					} ) }
 				</>
 			) }
 		</Stack>

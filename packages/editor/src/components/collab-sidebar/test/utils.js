@@ -365,6 +365,30 @@ describe( 'calculateNotePositions', () => {
 		expect( positions ).toEqual( { 1: 84, 2: 284, 3: 484 } );
 	} );
 
+	it( 'falls back to a measurable thread when the default anchor has no rect', () => {
+		// First thread has no blockRect (e.g. its block is hidden / not
+		// yet mounted). Calc should still position the other threads.
+		const threads = [ { id: 1 }, { id: 2 }, { id: 3 } ];
+		const blockRects = {
+			// 1 omitted on purpose.
+			2: makeRect( 300 ),
+			3: makeRect( 500 ),
+		};
+		const heights = { 2: 50, 3: 50 };
+
+		const { positions } = calculateNotePositions( {
+			threads,
+			selectedNoteId: undefined,
+			blockRects,
+			heights,
+			scrollTop: 0,
+		} );
+
+		// Thread 1 stays out of positions (no rect). Threads 2 and 3
+		// position relative to thread 2 (the fallback anchor).
+		expect( positions ).toEqual( { 2: 284, 3: 484 } );
+	} );
+
 	it( 'pushes an overlapping thread above the anchor upward', () => {
 		const threads = [ { id: 1 }, { id: 2 } ];
 		const blockRects = {
