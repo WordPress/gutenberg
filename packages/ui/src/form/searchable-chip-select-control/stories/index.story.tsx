@@ -295,7 +295,7 @@ export const GroupedCreatable: Story = {
  * Use `popupWidth` to control how the popup width is constrained relative to
  * its anchor.
  *
- * This example uses `md`, allowing the popup to extend beyond the narrow anchor width.
+ * This example uses `sm`, allowing the popup to extend beyond the narrow anchor width.
  */
 export const PopupWidth: Story = {
 	...Creatable,
@@ -303,7 +303,7 @@ export const PopupWidth: Story = {
 	args: {
 		...Creatable.args,
 		label: 'Tags',
-		popupWidth: 'md',
+		popupWidth: 'sm',
 		items: longLabelPopupItems,
 		value: [ longLabelPopupItems[ 0 ] ],
 	},
