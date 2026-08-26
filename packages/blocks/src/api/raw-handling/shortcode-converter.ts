@@ -3,7 +3,11 @@ import { createBlock, getBlockTransforms, findTransform } from '../factory';
 import { getBlockType } from '../registration';
 import { getBlockAttributes } from '../parser/get-block-attributes';
 import { applyBuiltInValidationFixes } from '../parser/apply-built-in-validation-fixes';
-import type { Block, BlockShortcodeTransform } from '../../types';
+import type {
+	Block,
+	BlockShortcodeTransform,
+	ShortcodeTransformAttribute,
+} from '../../types';
 
 const castArray = < T >( maybeArray: T | T[] ): T[] =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
@@ -103,8 +107,20 @@ function segmentHTMLToShortcodeBlock(
 			);
 		} );
 	} else {
+		const blockType = getBlockType( transformation.blockName! );
+		if ( ! blockType ) {
+			return [ HTML ];
+		}
+
+		// A shortcode transform without its own attributes sources them from
+		// the block type it produces.
+		const transformAttributes: Record<
+			string,
+			ShortcodeTransformAttribute
+		> = transformation.attributes ?? blockType.attributes;
+
 		const attributes = Object.fromEntries(
-			Object.entries( transformation.attributes ?? {} )
+			Object.entries( transformAttributes )
 				.filter( ( [ , schema ] ) => schema.shortcode )
 				// Passing all of `match` as second argument is intentionally broad
 				// but shouldn't be too relied upon.
@@ -116,14 +132,9 @@ function segmentHTMLToShortcodeBlock(
 				] )
 		);
 
-		const blockType = getBlockType( transformation.blockName! );
-		if ( ! blockType ) {
-			return [ HTML ];
-		}
-
 		const transformationBlockType = {
 			...blockType,
-			attributes: transformation.attributes ?? {},
+			attributes: transformAttributes,
 		};
 
 		let block = createBlock(
