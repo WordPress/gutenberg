@@ -1,72 +1,54 @@
-import { MenuGroup, Button, Slot, Fill } from '@wordpress/components';
+import { MenuGroup, MenuItem, Slot, Fill } from '@wordpress/components';
 import { Children } from '@wordpress/element';
-
-const noop = () => {};
 
 function ActionItemSlot( {
 	name,
 	as: Component = MenuGroup,
 	fillProps = {},
-	bubblesVirtually,
+	children,
 	...props
 } ) {
 	return (
-		<Slot
-			name={ name }
-			bubblesVirtually={ bubblesVirtually }
-			fillProps={ fillProps }
-		>
+		<Slot name={ name } fillProps={ fillProps }>
 			{ ( fills ) => {
-				if ( ! Children.toArray( fills ).length ) {
+				// Each fill renders an array of its own, so flatten them into a
+				// single list before handing them over.
+				const items = Children.toArray( fills );
+
+				if ( ! items.length ) {
 					return null;
 				}
 
-				// Special handling exists for backward compatibility.
-				// It ensures that menu items created by plugin authors aren't
-				// duplicated with automatically injected menu items coming
-				// from pinnable plugin sidebars.
-				// @see https://github.com/WordPress/gutenberg/issues/14457
-				const initializedByPlugins = [];
-				Children.forEach(
-					fills,
-					( {
-						props: { __unstableExplicitMenuItem, __unstableTarget },
-					} ) => {
-						if ( __unstableTarget && __unstableExplicitMenuItem ) {
-							initializedByPlugins.push( __unstableTarget );
-						}
-					}
-				);
-				const children = Children.map( fills, ( child ) => {
-					if (
-						! child.props.__unstableExplicitMenuItem &&
-						initializedByPlugins.includes(
-							child.props.__unstableTarget
-						)
-					) {
-						return null;
-					}
-					return child;
-				} );
+				if ( typeof children === 'function' ) {
+					return children( items );
+				}
 
-				return <Component { ...props }>{ children }</Component>;
+				return <Component { ...props }>{ items }</Component>;
 			} }
 		</Slot>
 	);
 }
 
-function ActionItem( { name, as: Component = Button, onClick, ...props } ) {
+function ActionItem( { name, as, onClick, ...props } ) {
 	return (
 		<Fill name={ name }>
-			{ ( { onClick: fpOnClick } ) => {
+			{ ( { as: slotAs = MenuItem, onClick: slotOnClick } ) => {
+				// The slot provides the component to render the item with, so
+				// that it fits the menu it ends up in, and an onClick handler,
+				// for example one that closes that menu. The `as` prop
+				// replaces the component. The `onClick` prop does not replace
+				// the handler: both run.
+				const Component = as ?? slotAs;
+				const handlers = [ onClick, slotOnClick ].filter( Boolean );
+
 				return (
 					<Component
 						onClick={
-							onClick || fpOnClick
-								? ( ...args ) => {
-										( onClick || noop )( ...args );
-										( fpOnClick || noop )( ...args );
-								  }
+							handlers.length
+								? ( ...args ) =>
+										handlers.forEach( ( handler ) =>
+											handler( ...args )
+										)
 								: undefined
 						}
 						{ ...props }

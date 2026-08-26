@@ -21,6 +21,97 @@ const COLOR_PALETTE = [
 ];
 
 describe( 'DuotonePicker', () => {
+	it( 'should use matching values only for display in command button presentation', async () => {
+		const user = userEvent.setup();
+		const onChange = jest.fn();
+		render(
+			<DuotonePicker
+				aria-label="Duotones"
+				duotonePalette={ DUPLICATE_DUOTONES }
+				colorPalette={ COLOR_PALETTE }
+				value={ COLORS_A }
+				selectedSlug="dark-background"
+				onChange={ onChange }
+				presentation="command-buttons"
+				unsetable={ false }
+				clearable={ false }
+				disableCustomDuotone
+				disableCustomColors
+			/>
+		);
+
+		const duotone = screen.getByRole( 'button', {
+			name: 'Duotone: Dark Background',
+		} );
+		expect(
+			screen.getByRole( 'group', { name: 'Duotones' } )
+		).toBeVisible();
+		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		expect( duotone ).not.toHaveAttribute( 'aria-pressed' );
+
+		await user.click( duotone );
+		expect( onChange ).toHaveBeenCalledWith(
+			COLORS_A,
+			0,
+			'dark-background'
+		);
+	} );
+
+	it( 'should warn for asButtons and prefer an explicit presentation', () => {
+		render(
+			<DuotonePicker
+				aria-label="Duotones"
+				duotonePalette={ DUPLICATE_DUOTONES }
+				colorPalette={ COLOR_PALETTE }
+				onChange={ jest.fn() }
+				asButtons={ false }
+				presentation="command-buttons"
+				disableCustomDuotone
+				disableCustomColors
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Duotone: Dark Background',
+			} )
+		).not.toHaveAttribute( 'aria-pressed' );
+		expect( console ).toHaveWarnedWith(
+			'`asButtons` prop in wp.components.DuotonePicker is deprecated since version 7.2. Please use `presentation` instead. Note: `asButtons={ true }` maps to `presentation="toggle-buttons"`. Explicit `presentation` takes precedence.'
+		);
+	} );
+
+	it( 'should preserve asButtons as a toggle-button alias', () => {
+		render(
+			<DuotonePicker
+				aria-label="Duotones"
+				duotonePalette={ DUPLICATE_DUOTONES }
+				colorPalette={ COLOR_PALETTE }
+				value={ COLORS_A }
+				selectedSlug="dark-background"
+				onChange={ jest.fn() }
+				asButtons
+				unsetable={ false }
+				clearable={ false }
+				disableCustomDuotone
+				disableCustomColors
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Duotone: Dark Background',
+				pressed: true,
+			} )
+		).toBeVisible();
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Duotone: Dark Text',
+				pressed: false,
+			} )
+		).toBeVisible();
+	} );
+
 	describe( 'duplicate duotones in palette', () => {
 		it( 'should render all swatches even when two entries share the same colors', () => {
 			render(
