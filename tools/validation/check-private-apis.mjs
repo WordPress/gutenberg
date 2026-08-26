@@ -227,10 +227,20 @@ async function checkPackage( name, exclude = new Set() ) {
 			logLevel: 'silent',
 		} );
 	} catch ( error ) {
+		// Unlike a missing entry, a build error means a checkable package
+		// could not be checked — fail rather than skip, so a genuine
+		// breakage cannot pass CI silently.
+		const [ first ] = error.errors ?? [];
 		return {
 			name,
-			status: 'skipped',
-			reason: `build error: ${ error.message.split( '\n' )[ 0 ] }`,
+			status: 'error',
+			reason: first
+				? `${ first.text }${
+						first.location
+							? ` (${ first.location.file }:${ first.location.line })`
+							: ''
+				  }`
+				: error.message.split( '\n' )[ 0 ],
 		};
 	}
 
@@ -308,6 +318,13 @@ async function main() {
 		const result = await checkPackage( name );
 		if ( result.status === 'skipped' ) {
 			console.log( `SKIP @wordpress/${ name } (${ result.reason })` );
+			continue;
+		}
+		if ( result.status === 'error' ) {
+			failed = true;
+			console.log(
+				`FAIL @wordpress/${ name } — build error: ${ result.reason }`
+			);
 			continue;
 		}
 		const vias = exceptions.get( name ) ?? [];
