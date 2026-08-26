@@ -19,6 +19,7 @@
 
 ### Bug Fixes
 
+-   Zoom Out mode: Keep the inserter after the selected block reachable by keyboard when the block's lower boundary is scrolled out of view. It previously relied on the same viewport-intersection check used to skip rendering off-screen instances of the default in-between inserter, but Zoom Out mode only ever mounts one, so gating it just removed the only inserter a keyboard user could reach for a tall selected block ([#66346](https://github.com/WordPress/gutenberg/issues/66346)).
 -   Hide the Layout panel when a block has layout editing enabled but all controls for its layout type are disabled ([#81968](https://github.com/WordPress/gutenberg/pull/81968)).
 -   `DuotoneControl`: Keep the picked preset's identity when applying a duotone to a block. Two presets can hold the same pair of colors, and the applied preset was resolved by matching colors, so the first of any duplicate pair was saved and both appeared selected ([#81605](https://github.com/WordPress/gutenberg/pull/81605)).
 -   `InnerBlocks`: Resolve the `default` of a block's `layout` support before providing it to inner blocks. A block that declared its layout only as a support default, such as the Gallery, previously handed its children the raw support config, which has no `type`, so the children resolved to the flow layout instead. As a result an Image nested in a Gallery offered left/center/right alignment, which the flex layout does not permit ([#81606](https://github.com/WordPress/gutenberg/pull/81606)).

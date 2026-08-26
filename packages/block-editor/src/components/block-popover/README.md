@@ -54,3 +54,11 @@ The client ID of the block after the popover.
 
 -   Type: `String`
 -   Required: Yes
+
+#### alwaysVisible
+
+By default, the popover is only rendered while `previousClientId` and `nextClientId` are both scrolled into view, so that mounting many of these at once (e.g. the default in-between inserter) doesn't do unnecessary off-screen work. Pass `true` when a caller only ever mounts a single instance and needs it to stay reachable (e.g. focusable via keyboard) regardless of scroll position, such as the Zoom Out mode inserter.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
