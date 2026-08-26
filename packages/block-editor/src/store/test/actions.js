@@ -276,6 +276,32 @@ describe( 'actions', () => {
 
 			expect( dispatch ).not.toHaveBeenCalled();
 		} );
+
+		it( 'records explicit anchor and focus as the selection ends', () => {
+			const clientIds = [ 'cell-3', 'cell-1' ];
+			const select = {
+				getBlockRootClientId() {
+					return 'parent';
+				},
+				getBlockOrder() {
+					return [ 'cell-1', 'cell-2', 'cell-3' ];
+				},
+			};
+			const dispatch = jest.fn();
+
+			multiSelectSet( clientIds, null, {
+				anchorClientId: 'cell-3',
+				focusClientId: 'cell-1',
+			} )( { select, dispatch } );
+
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'MULTI_SELECT_SET',
+				clientIds: [ 'cell-1', 'cell-3' ],
+				selectionStart: { clientId: 'cell-3' },
+				selectionEnd: { clientId: 'cell-1' },
+				initialPosition: null,
+			} );
+		} );
 	} );
 
 	describe( 'clearSelectedBlock', () => {

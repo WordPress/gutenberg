@@ -356,9 +356,19 @@ export const multiSelect =
  *
  * @param {string[]}    clientIds                     Client IDs to select.
  * @param {number|null} __experimentalInitialPosition Optional initial position. Pass as null to skip focus within editor canvas.
+ * @param {Object}      options                       Optional selection ends. When the selection has a direction
+ *                                                    (e.g. a drag or keyboard extension), pass the anchor and
+ *                                                    focus blocks so they are recorded as the selection start
+ *                                                    and end instead of the set's document-order ends.
+ * @param {string}      options.anchorClientId        Client ID where the selection started.
+ * @param {string}      options.focusClientId         Client ID where the selection ends.
  */
 export const multiSelectSet =
-	( clientIds, __experimentalInitialPosition = null ) =>
+	(
+		clientIds,
+		__experimentalInitialPosition = null,
+		{ anchorClientId, focusClientId } = {}
+	) =>
 	( { select, dispatch } ) => {
 		const uniqueClientIds = [ ...new Set( clientIds ) ];
 
@@ -425,9 +435,13 @@ export const multiSelectSet =
 		dispatch( {
 			type: 'MULTI_SELECT_SET',
 			clientIds: normalizedClientIds,
-			selectionStart: { clientId: uniqueClientIds[ 0 ] },
+			selectionStart: {
+				clientId: anchorClientId ?? uniqueClientIds[ 0 ],
+			},
 			selectionEnd: {
-				clientId: uniqueClientIds[ uniqueClientIds.length - 1 ],
+				clientId:
+					focusClientId ??
+					uniqueClientIds[ uniqueClientIds.length - 1 ],
 			},
 			initialPosition: __experimentalInitialPosition,
 		} );

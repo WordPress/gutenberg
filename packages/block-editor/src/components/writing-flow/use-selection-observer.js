@@ -370,7 +370,12 @@ export default function useSelectionObserver() {
 						);
 
 						if ( clientIds ) {
-							multiSelectSet( clientIds, 0 );
+							multiSelectSet( clientIds, 0, {
+								anchorClientId:
+									startCell.getAttribute( 'data-block' ),
+								focusClientId:
+									endCell.getAttribute( 'data-block' ),
+							} );
 							return;
 						}
 					}
