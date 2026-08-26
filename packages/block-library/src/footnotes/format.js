@@ -115,6 +115,7 @@ export const format = {
 					id = object?.attributes?.[ 'data-fn' ];
 				} else {
 					id = createId();
+					const ariaLabel = __( 'Go to footnote' );
 					const newValue = insertObject(
 						value,
 						{
@@ -122,7 +123,7 @@ export const format = {
 							attributes: {
 								'data-fn': id,
 							},
-							innerHTML: `<a href="#${ id }" id="${ id }-link">*</a>`,
+							innerHTML: `<a href="#${ id }" aria-label="${ ariaLabel }" id="${ id }-link">*</a>`,
 						},
 						value.end,
 						value.end
