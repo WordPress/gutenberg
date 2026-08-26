@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   Update `use-recommended-components` rule to mark `SearchableChipSelect` and `SearchableChipSelectControl` from `@wordpress/ui` as recommended ([#80980](https://github.com/WordPress/gutenberg/pull/80980)).
 -   Update `use-recommended-components` rule to mark `Autocomplete`, `Field`, and `Fieldset` from `@wordpress/ui` as recommended ([#80636](https://github.com/WordPress/gutenberg/pull/80636)).
 -   Allow the public `@wordpress/ui` keyboard shortcut utilities in the `use-recommended-components` rule. ([#81826](https://github.com/WordPress/gutenberg/pull/81826))
 -   Update `use-recommended-components` rule to mark `Input`, `InputControl`, and `InputLayout` from `@wordpress/ui` as recommended, and to prefer `@wordpress/ui` `InputControl` over legacy `@wordpress/components` `InputControl` and `TextControl` ([#81658](https://github.com/WordPress/gutenberg/pull/81658)).

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Fix published ESM declaration imports for Node-style resolution. TypeScript consumers now require TypeScript 5 or newer. ([#82022](https://github.com/WordPress/gutenberg/pull/82022))
+
 ### Enhancements
 
 -   Add an `onColorWarnings` callback for `ThemeProvider` consumers to receive structured color ramp and semantic contrast warnings ([#81185](https://github.com/WordPress/gutenberg/pull/81185)).

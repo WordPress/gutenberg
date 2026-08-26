@@ -49,13 +49,5 @@ import { ComplementaryAreaMoreMenuItem } from '@wordpress/interface';
  * @return {React.ReactNode} The rendered component.
  */
 export default function PluginSidebarMoreMenuItem( props ) {
-	return (
-		<ComplementaryAreaMoreMenuItem
-			// Menu item is marked with unstable prop for backward compatibility.
-			// @see https://github.com/WordPress/gutenberg/issues/14457
-			__unstableExplicitMenuItem
-			scope="core"
-			{ ...props }
-		/>
-	);
+	return <ComplementaryAreaMoreMenuItem scope="core" { ...props } />;
 }
