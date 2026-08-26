@@ -6,8 +6,8 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
  *
  * Table rebuilds its markup on save and declines server conversion outright;
  * Image converts only the markup it can save back. Both are covered
- * separately, as are the pre-filters PHP does not have (shortcodes, embeds,
- * Markdown).
+ * separately, as are the shortcodes only the editor turns into a block of
+ * their own, and the pre-filters PHP does not have (embeds, Markdown).
  */
 const AGREED = [
 	// Headings at both ends of the range, and the class a block support reads.
@@ -44,6 +44,11 @@ const AGREED = [
 	'<figure><img src="https://example.com/a.png" alt="A" /></figure>',
 	'<img src="https://example.com/b.png" alt="B" />',
 
+	// A shortcode standing on its own becomes a block; one reading as part of
+	// a sentence stays in the sentence.
+	'<p>[contact-form-7 id="5" title="Contact"]</p>',
+	'<p>See [myshortcode] here.</p>',
+
 	// Markup no block claims, at the top level and wrapping blocks.
 	'<div class="widget"><span>Legacy</span></div>',
 	'<div><h2>Inside</h2><p>Also inside.</p></div>',
@@ -64,6 +69,7 @@ const LEGACY = [
 	'<figure><img src="https://example.com/a.png" alt="A" /><figcaption>A caption</figcaption></figure>',
 	'<figure><a href="https://example.com/page"><img src="https://example.com/a.png" alt="A" /></a></figure>',
 	'<p><img src="https://example.com/a.png" alt="A" /></p>',
+	'<p>[gallery ids="1,2,3"]</p>',
 	'<p dir="rtl" title="tip" data-legacy="1">Attributes everywhere.</p>',
 	'<h2 id="ingredients">Anchored</h2>',
 	'<hr class="is-style-dots" />',

@@ -214,6 +214,66 @@ function createRawTransform(
  *
  * @return Transform function.
  */
+/**
+ * Builds the attribute readers a `shortcode` transform runs.
+ *
+ * The shortcode converter calls a `shortcode` function per attribute, passing
+ * it the shortcode's parsed attributes and the match it came from. A declared
+ * attribute names where to read the value instead: `shortcodeText` takes the
+ * shortcode as it was written, and `shortcodeAttribute` takes a named
+ * attribute, or the first one present when it names several.
+ *
+ * @param attributes Declared attributes.
+ *
+ * @return Attributes in the shape the shortcode converter expects.
+ */
+function createShortcodeAttributes( attributes: unknown ) {
+	if ( ! attributes || typeof attributes !== 'object' ) {
+		return attributes;
+	}
+
+	return Object.fromEntries(
+		Object.entries( attributes as Record< string, any > ).map(
+			( [ name, definition ] ) => {
+				const { source, attribute, ...rest } = definition ?? {};
+
+				if ( 'shortcodeText' === source ) {
+					return [
+						name,
+						{
+							...rest,
+							shortcode: ( _attrs: unknown, match: any ) =>
+								match?.content,
+						},
+					];
+				}
+
+				if ( 'shortcodeAttribute' === source ) {
+					const names = Array.isArray( attribute )
+						? attribute
+						: [ attribute ];
+
+					return [
+						name,
+						{
+							...rest,
+							shortcode: ( { named = {} }: any = {} ) =>
+								names
+									.map( ( key: string ) => named[ key ] )
+									.find(
+										( value: unknown ) =>
+											undefined !== value
+									),
+						},
+					];
+				}
+
+				return [ name, definition ];
+			}
+		)
+	);
+}
+
 function createBlockTransform( target: string, attributes: unknown ) {
 	return (
 		sourceAttributes: Record< string, unknown >,
@@ -278,6 +338,12 @@ function normalizeTransform(
 		}
 
 		return [ normalized ];
+	}
+
+	if ( 'shortcode' === transform.type ) {
+		return [
+			{ ...rest, attributes: createShortcodeAttributes( attributes ) },
+		];
 	}
 
 	if ( 'block' === transform.type ) {

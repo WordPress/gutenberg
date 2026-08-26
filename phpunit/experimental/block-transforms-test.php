@@ -1242,4 +1242,141 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 		$this->assertNotContains( 'test/sometimes', $support['converts'] );
 		$this->assertNotContains( 'test/sometimes', $support['declines'] );
 	}
+
+	public function test_turns_a_shortcode_standing_on_its_own_into_a_block() {
+		$blocks = gutenberg_html_to_blocks( '<p>[contact-form-7 id="5" title="Contact"]</p>' );
+
+		$this->assertCount( 1, $blocks );
+		$this->assertSame( 'core/shortcode', $blocks[0]['blockName'] );
+		$this->assertSame( '[contact-form-7 id="5" title="Contact"]', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_keeps_a_shortcode_that_reads_as_part_of_a_sentence() {
+		$blocks = gutenberg_html_to_blocks( '<p>See [myshortcode] here.</p>' );
+
+		$this->assertCount( 1, $blocks );
+		$this->assertSame( 'core/paragraph', $blocks[0]['blockName'] );
+	}
+
+	public function test_converts_the_markup_around_a_shortcode() {
+		$blocks = gutenberg_html_to_blocks( '<p>Before.</p><p>[gallery ids="1,2"]</p><h2>After</h2>' );
+
+		$this->assertSame(
+			array( 'core/paragraph', 'core/shortcode', 'core/heading' ),
+			array_column( $blocks, 'blockName' )
+		);
+	}
+
+	public function test_leaves_an_escaped_shortcode_alone() {
+		// `[[tag]]` is how a shortcode is written when it should be read
+		// rather than run.
+		$blocks = gutenberg_html_to_blocks( '<p>[[contact-form-7]]</p>' );
+
+		$this->assertCount( 1, $blocks );
+		$this->assertSame( 'core/paragraph', $blocks[0]['blockName'] );
+	}
+
+	public function test_reads_a_named_shortcode_attribute() {
+		$this->register_shortcode_block(
+			array(
+				'src' => array(
+					'type'      => 'string',
+					'source'    => 'shortcodeAttribute',
+					'attribute' => 'src',
+				),
+			)
+		);
+
+		$blocks = gutenberg_html_to_blocks( '<p>[testmedia src="/a.mp3"]</p>' );
+
+		$this->assertSame( 'test/media', $blocks[0]['blockName'] );
+		$this->assertSame( '/a.mp3', $blocks[0]['attrs']['src'] );
+	}
+
+	public function test_reads_the_first_shortcode_attribute_a_transform_names() {
+		$this->register_shortcode_block(
+			array(
+				'src' => array(
+					'type'      => 'string',
+					'source'    => 'shortcodeAttribute',
+					'attribute' => array( 'src', 'mp3', 'ogg' ),
+				),
+			)
+		);
+
+		// A shortcode carries the value under whichever name it was written
+		// with, so the transform names them in the order they win.
+		$blocks = gutenberg_html_to_blocks( '<p>[testmedia ogg="/a.ogg"]</p>' );
+
+		$this->assertSame( '/a.ogg', $blocks[0]['attrs']['src'] );
+	}
+
+	public function test_leaves_a_shortcode_to_the_shortcode_block_when_a_block_rebuilds_its_markup() {
+		$this->register(
+			'test/player',
+			array(
+				'attributes' => array( 'src' => array( 'type' => 'string' ) ),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'       => 'shortcode',
+							'tag'        => 'testplayer',
+							'attributes' => array(
+								'src' => array(
+									'type'      => 'string',
+									'source'    => 'shortcodeAttribute',
+									'attribute' => 'src',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		// The block saves markup built from its attributes, which the server
+		// cannot write, so the shortcode stays whole.
+		$blocks = gutenberg_html_to_blocks( '<p>[testplayer src="/a.mp3"]</p>' );
+
+		$this->assertSame( 'core/shortcode', $blocks[0]['blockName'] );
+		$this->assertSame( '[testplayer src="/a.mp3"]', $blocks[0]['innerHTML'] );
+	}
+
+	/**
+	 * Registers a block that saves a shortcode's own text.
+	 *
+	 * @param array $attributes Transform attribute definitions.
+	 * @return void
+	 */
+	private function register_shortcode_block( $attributes ) {
+		$this->register(
+			'test/media',
+			array(
+				'attributes' => array(
+					'src'  => array( 'type' => 'string' ),
+					'text' => array(
+						'type'   => 'string',
+						'source' => 'raw',
+					),
+				),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'       => 'shortcode',
+							'tag'        => 'testmedia',
+							'attributes' => array_merge(
+								array(
+									'text' => array(
+										'type'   => 'string',
+										'source' => 'shortcodeText',
+									),
+								),
+								$attributes
+							),
+						),
+					),
+				),
+			)
+		);
+	}
 }

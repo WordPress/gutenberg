@@ -10,9 +10,13 @@
 					"type": "string"
 				},
 				"type": {
-					"description": "The kind of content the transform matches. `raw` matches markup; `block` matches another block type.",
+					"description": "The kind of content the transform matches. `raw` matches markup; `block` matches another block type; `shortcode` matches a shortcode.",
 					"type": "string",
-					"enum": [ "raw", "block" ]
+					"enum": [ "raw", "block", "shortcode" ]
+				},
+				"tag": {
+					"description": "For a `shortcode` transform, the shortcode tag to match, or a pattern matching a family of tags.",
+					"type": "string"
 				},
 				"blocks": {
 					"description": "For a `block` transform, the block types it converts from (under `from`) or to (under `to`).",
@@ -61,7 +65,7 @@
 					]
 				},
 				"attributes": {
-					"description": "Attribute values for the resulting block.\n\nFor a `raw` transform, an object of values applied over any sourced attributes. A value is used as given, unless it is an object declaring a `source`, in which case it is read from the matched markup the way a block attribute would be, optionally passed through a `map` of sourced value to attribute value.\n\nFor a `block` transform, either `\"all\"` to carry every attribute across, or an object mapping each new attribute name to the name it takes its value from.",
+					"description": "Attribute values for the resulting block.\n\nFor a `raw` transform, an object of values applied over any sourced attributes. A value is used as given, unless it is an object declaring a `source`, in which case it is read from the matched markup the way a block attribute would be, optionally passed through a `map` of sourced value to attribute value.\n\nFor a `block` transform, either `\"all\"` to carry every attribute across, or an object mapping each new attribute name to the name it takes its value from.\n\nFor a `shortcode` transform, an object of attributes read out of the matched shortcode: `\"source\": \"shortcodeText\"` takes the shortcode as it was written, and `\"source\": \"shortcodeAttribute\"` takes the named `attribute`, or the first one present when it names several.",
 					"oneOf": [
 						{ "type": "string", "enum": [ "all", "none" ] },
 						{ "type": "object" }

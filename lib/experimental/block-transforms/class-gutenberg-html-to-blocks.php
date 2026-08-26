@@ -112,6 +112,36 @@ class Gutenberg_HTML_To_Blocks {
 			}
 		}
 
+		$blocks = array();
+
+		/*
+		 * Shortcodes are taken out of the markup before it is parsed as HTML,
+		 * the way the editor does: a shortcode standing on its own becomes a
+		 * block, and the markup around it is converted as usual.
+		 */
+		foreach ( Gutenberg_Shortcode_Transforms::segment( $html ) as $segment ) {
+			if ( is_array( $segment ) ) {
+				$blocks[] = $segment;
+				continue;
+			}
+
+			$blocks = array_merge( $blocks, self::convert_markup( $segment ) );
+		}
+
+		return $blocks;
+	}
+
+	/**
+	 * Converts a run of markup holding no shortcodes into blocks.
+	 *
+	 * @param string $html HTML to convert.
+	 * @return array[] Parsed block arrays.
+	 */
+	private static function convert_markup( $html ) {
+		if ( '' === trim( $html ) ) {
+			return array();
+		}
+
 		$root = Gutenberg_HTML_Element::from_html( $html );
 
 		if ( null === $root ) {
