@@ -5,7 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import spawn from 'cross-spawn';
 import fastGlob from 'fast-glob';
-import { publishesBuildTypes } from './check-esm-package-types-helpers.mjs';
+import { inspectBuildTypesPublications } from './check-esm-package-types-helpers.mjs';
 
 const rootDirectory = path.resolve(
 	path.dirname( fileURLToPath( import.meta.url ) ),
@@ -152,30 +152,27 @@ async function getPublishedEsmPackages() {
 			! packageData.packageJson.private &&
 			packageData.packageJson.type === 'module'
 	);
-	const buildTypesPublication = await Promise.all(
-		publishedEsmPackages.map( async ( packageData ) => ( {
-			packageData,
-			publishesBuildTypes: await publishesBuildTypes( packageData ),
-		} ) )
+	const buildTypesPublication = inspectBuildTypesPublications(
+		publishedEsmPackages.sort( ( a, b ) =>
+			a.packageJson.name.localeCompare( b.packageJson.name )
+		)
 	);
 
-	for ( const {
-		packageData,
-		publishesBuildTypes: publishes,
-	} of buildTypesPublication ) {
-		if ( ! publishes ) {
+	for ( const publication of buildTypesPublication ) {
+		if (
+			publication.status === 'fulfilled' &&
+			! publication.publishesBuildTypes
+		) {
 			console.log(
-				`${ packageData.packageJson.name }: Skipping ESM declaration validation because build-types is not published.`
+				`${ publication.packageData.packageJson.name }: Skipping ESM declaration validation because build-types is not published.`
 			);
 		}
 	}
 
-	return buildTypesPublication
-		.filter( ( { publishesBuildTypes: publishes } ) => publishes )
-		.map( ( { packageData } ) => packageData )
-		.sort( ( a, b ) =>
-			a.packageJson.name.localeCompare( b.packageJson.name )
-		);
+	return buildTypesPublication.filter(
+		( publication ) =>
+			publication.status === 'rejected' || publication.publishesBuildTypes
+	);
 }
 
 async function checkPackage( packageData ) {
@@ -212,8 +209,12 @@ async function checkPackage( packageData ) {
 }
 
 let hasErrors = false;
-for ( const packageData of await getPublishedEsmPackages() ) {
+for ( const publication of await getPublishedEsmPackages() ) {
+	const { packageData } = publication;
 	try {
+		if ( publication.status === 'rejected' ) {
+			throw publication.reason;
+		}
 		await checkPackage( packageData );
 	} catch ( error ) {
 		const message =

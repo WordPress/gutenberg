@@ -46,3 +46,20 @@ export function publishesBuildTypes( { directory, packageJson } ) {
 			file.path.startsWith( 'build-types/' )
 	);
 }
+
+export function inspectBuildTypesPublications(
+	packages,
+	inspectPackage = publishesBuildTypes
+) {
+	return packages.map( ( packageData ) => {
+		try {
+			return {
+				status: 'fulfilled',
+				packageData,
+				publishesBuildTypes: inspectPackage( packageData ),
+			};
+		} catch ( reason ) {
+			return { status: 'rejected', packageData, reason };
+		}
+	} );
+}
