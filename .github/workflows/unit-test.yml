@@ -285,7 +285,7 @@ jobs:
             - name: Set up PHP
               uses: shivammathur/setup-php@9e72090525849c5e82e596468b86eb55e9cc5401 # v2.32.0
               with:
-                  php-version: '7.4'
+                  php-version: '7.2'
                   coverage: none
                   tools: cs2pr
 
