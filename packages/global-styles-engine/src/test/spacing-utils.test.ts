@@ -136,10 +136,9 @@ describe( 'spacing utils', () => {
 		testCases.forEach( ( { message, preset, settings, expected } ) => {
 			// eslint-disable-next-line jest/valid-title
 			it( message, () => {
-				expect(
-					// @ts-expect-error -- test fixtures intentionally omit some optional fields.
-					getSpacingSizeValue( preset, settings || {} )
-				).toEqual( expected );
+				expect( getSpacingSizeValue( preset, settings || {} ) ).toEqual(
+					expected
+				);
 			} );
 		} );
 	} );
