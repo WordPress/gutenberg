@@ -267,6 +267,7 @@ function Navigation( {
 		} = {},
 		hasIcon,
 		icon = 'handle',
+		overlayButtonLabel,
 	} = attributes;
 
 	const ref = attributes.ref;
@@ -919,6 +920,7 @@ function Navigation( {
 						setOverlayMenuPreview={ setOverlayMenuPreview }
 						hasIcon={ hasIcon }
 						icon={ icon }
+						overlayButtonLabel={ overlayButtonLabel }
 						overlayMenuPreviewClasses={ overlayMenuPreviewClasses }
 						overlayMenuPreviewId={ overlayMenuPreviewId }
 						isResponsive={ isResponsive }
@@ -991,6 +993,7 @@ function Navigation( {
 						isOpen={ isResponsiveMenuOpen }
 						hasIcon={ hasIcon }
 						icon={ icon }
+						overlayButtonLabel={ overlayButtonLabel }
 						isResponsive={ isResponsive }
 						isHiddenByDefault={ isHiddenByDefault }
 						overlayBackgroundColor={ overlayBackgroundColor }
@@ -1155,6 +1158,7 @@ function Navigation( {
 									onToggle={ setResponsiveMenuVisibility }
 									hasIcon={ hasIcon }
 									icon={ icon }
+									overlayButtonLabel={ overlayButtonLabel }
 									isOpen={ isResponsiveMenuOpen }
 									isResponsive={ isResponsive }
 									isHiddenByDefault={ isHiddenByDefault }

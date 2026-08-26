@@ -13,6 +13,7 @@ import OverlayMenuPreviewControls from './overlay-menu-preview-controls';
  * @param {Function} props.setOverlayMenuPreview     Function to toggle overlay menu preview.
  * @param {boolean}  props.hasIcon                   Whether the overlay menu has an icon.
  * @param {string}   props.icon                      Icon type for overlay menu.
+ * @param {string}   props.overlayButtonLabel        Text label for overlay menu button.
  * @param {Function} props.setAttributes             Function to update block attributes.
  * @param {string}   props.overlayMenuPreviewClasses CSS classes for overlay menu preview button.
  * @param {string}   props.overlayMenuPreviewId      ID for overlay menu preview.
@@ -25,6 +26,7 @@ export default function OverlayMenuPreviewButton( {
 	setOverlayMenuPreview,
 	hasIcon,
 	icon,
+	overlayButtonLabel,
 	setAttributes,
 	overlayMenuPreviewClasses,
 	overlayMenuPreviewId,
@@ -52,7 +54,7 @@ export default function OverlayMenuPreviewButton( {
 				) }
 				{ ! hasIcon && (
 					<>
-						<span>{ __( 'Menu' ) }</span>
+						<span>{ overlayButtonLabel || __( 'Menu' ) }</span>
 						<span>{ __( 'Close' ) }</span>
 					</>
 				) }
@@ -66,6 +68,7 @@ export default function OverlayMenuPreviewButton( {
 					<OverlayMenuPreviewControls
 						hasIcon={ hasIcon }
 						icon={ icon }
+						overlayButtonLabel={ overlayButtonLabel }
 						setAttributes={ setAttributes }
 					/>
 				</VStack>
