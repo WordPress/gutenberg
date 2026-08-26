@@ -215,8 +215,14 @@ for ( const projectName of VITEST_PROJECT_NAMES ) {
 	try {
 		writeFileSync( configPath, JSON.stringify( typecheckConfig ) );
 		execFileSync(
-			resolvePackageBin( 'typescript', 'tsc6' ),
-			[ '--project', configPath, '--pretty', 'false' ],
+			process.execPath,
+			[
+				resolvePackageBin( 'typescript', 'tsc6' ),
+				'--project',
+				configPath,
+				'--pretty',
+				'false',
+			],
 			{ cwd: ROOT_DIR, stdio: 'inherit' }
 		);
 	} finally {
