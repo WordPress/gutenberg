@@ -30,7 +30,7 @@ export const InputLayout = forwardRef< HTMLDivElement, InputLayoutProps >(
 					defenseStyles.div,
 					resetStyles[ 'box-sizing' ],
 					styles[ 'input-layout' ],
-					styles[ `is-size-${ size }` ],
+					size !== 'default' && styles[ `is-size-${ size }` ],
 					visuallyDisabled && styles[ 'is-disabled' ],
 					isBorderless && styles[ 'is-borderless' ],
 					className

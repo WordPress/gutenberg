@@ -15,7 +15,7 @@ export const Label = forwardRef< HTMLLabelElement, FieldLabelProps >(
 				ref={ ref }
 				className={ clsx(
 					fieldStyles.label,
-					variant && fieldStyles[ `is-${ variant }` ],
+					variant === 'plain' && fieldStyles[ 'is-plain' ],
 					className
 				) }
 				{ ...restProps }

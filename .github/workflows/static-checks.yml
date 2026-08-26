@@ -114,6 +114,9 @@ jobs:
                   npm run lint:css -- --formatter compact
                   npm run lint:css:update-suppressions
 
+            - name: Check CSS module type declarations
+              run: npm run css-modules:check
+
             - name: Type checking
               run: npm run typecheck
 

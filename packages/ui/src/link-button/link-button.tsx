@@ -33,7 +33,7 @@ export const LinkButton = forwardRef< HTMLAnchorElement, LinkButtonProps >(
 					variant !== 'unstyled' && buttonStyles.button,
 					buttonStyles[ `is-${ tone }` ],
 					buttonStyles[ `is-${ variant }` ],
-					buttonStyles[ `is-${ size }` ],
+					size !== 'default' && buttonStyles[ `is-${ size }` ],
 					className
 				) }
 				{ ...props }

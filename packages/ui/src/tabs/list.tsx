@@ -132,7 +132,8 @@ export const List = forwardRef< HTMLDivElement, TabListProps >(
 					styles.tablist,
 					overflow.first && styles[ 'is-overflowing-first' ],
 					overflow.last && styles[ 'is-overflowing-last' ],
-					styles[ `is-${ variant }-variant` ],
+					variant !== 'default' &&
+						styles[ `is-${ variant }-variant` ],
 					className
 				) }
 				{ ...otherProps }

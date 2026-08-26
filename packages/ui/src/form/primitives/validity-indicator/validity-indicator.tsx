@@ -30,7 +30,7 @@ export function ValidityIndicator( {
 			className={ clsx(
 				defenseStyles.p,
 				styles.indicator,
-				styles[ `is-${ type }` ]
+				type !== 'validating' && styles[ `is-${ type }` ]
 			) }
 		>
 			{ type === 'validating' ? (

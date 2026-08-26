@@ -48,6 +48,17 @@
 		"typeRoots": [ "./typings", "./node_modules/@types" ],
 		"types": [],
 
+		"plugins": [
+			{
+				"name": "typescript-plugin-css-modules",
+				"options": {
+					"classnameTransform": "asIs",
+					"namedExports": false,
+					"goToDefinition": true
+				}
+			}
+		],
+
 		"rootDir": "${configDir}/src",
 		"declarationDir": "${configDir}/build-types"
 	},

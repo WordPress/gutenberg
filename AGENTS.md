@@ -44,6 +44,8 @@ Read only what your task needs, when it needs it:
 npm run format            # Fix JS formatting
 npm run lint:js          # Check JS linting
 npm run typecheck        # Type check sources, plus TypeScript tests and stories
+npm run css-modules:generate  # Update CSS Modules *.d.ts after class-name changes
+npm run css-modules:check     # Fail if CSS Modules *.d.ts files are stale
 vendor/bin/phpcbf        # Fix PHP standards
 vendor/bin/phpcs         # Check PHP standards
 

@@ -1,0 +1,37 @@
+{
+	"name": "@wordpress/css-modules-tools",
+	"version": "0.0.0",
+	"description": "CSS Modules type generation and editor plugin for the Gutenberg monorepo.",
+	"private": true,
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"css-modules",
+		"typescript"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/tools/css-modules",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/WordPress/gutenberg.git",
+		"directory": "tools/css-modules"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"type": "module",
+	"dependencies": {
+		"fast-glob": "^3.2.7",
+		"sass-embedded": "^1.97.2",
+		"typed-css-modules": "^0.9.1",
+		"typescript-plugin-css-modules": "^5.2.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"generate": "node ./generate.mjs",
+		"check": "node ./generate.mjs --listDifferent"
+	}
+}

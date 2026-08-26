@@ -27,7 +27,8 @@ export const ActionButton = forwardRef< HTMLButtonElement, ActionButtonProps >(
 				variant={ variant }
 				className={ clsx(
 					styles[ 'action-button' ],
-					styles[ `is-action-button-${ variant }` ],
+					( variant === 'outline' || variant === 'minimal' ) &&
+						styles[ `is-action-button-${ variant }` ],
 					className
 				) }
 			/>

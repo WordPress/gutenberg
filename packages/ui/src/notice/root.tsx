@@ -101,7 +101,7 @@ export const Root = forwardRef< HTMLDivElement, RootProps >( function Notice(
 
 	const mergedClassName = clsx(
 		styles.notice,
-		styles[ `is-${ intent }` ],
+		intent !== 'neutral' && styles[ `is-${ intent }` ],
 		resetStyles[ 'box-sizing' ]
 	);
 

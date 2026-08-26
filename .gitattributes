@@ -23,3 +23,7 @@ docs/** linguist-documentation
 
 # TSConfig files use jsonc.
 tsconfig*.json linguist-language=jsonc
+
+# Generated CSS Modules typings.
+*.module.css.d.ts linguist-generated=true
+*.module.scss.d.ts linguist-generated=true

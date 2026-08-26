@@ -38,7 +38,7 @@ export const Button = forwardRef< HTMLButtonElement, ButtonProps >(
 			variant !== 'unstyled' && styles.button,
 			styles[ `is-${ tone }` ],
 			styles[ `is-${ variant }` ],
-			styles[ `is-${ size }` ],
+			size !== 'default' && styles[ `is-${ size }` ],
 			loading && styles[ 'is-loading' ],
 			className
 		);

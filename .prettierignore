@@ -2,6 +2,8 @@
 build
 build-module
 build-types
+**/*.module.css.d.ts
+**/*.module.scss.d.ts
 packages/block-serialization-spec-parser/parser.js
 packages/edit-site/lib
 packages/url/src/test/fixtures
