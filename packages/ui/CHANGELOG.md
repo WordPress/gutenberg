@@ -45,6 +45,8 @@
 -   `Select`, `Combobox`, `SelectControl`: Fix the trigger placeholder failing the 4.5:1 text contrast minimum ([#81853](https://github.com/WordPress/gutenberg/pull/81853)).
 -   `Autocomplete.List`: Stop rendering `aria-orientation` in grid mode, where `role="grid"` disallows it ([#81853](https://github.com/WordPress/gutenberg/pull/81853)).
 -   `SearchableChipSelect`, `SearchableChipSelectControl`: Forward ref to the search input instead of the chips container ([#80980](https://github.com/WordPress/gutenberg/pull/80980)).
+-   `InputControl`: Hide the value-like placeholder Safari renders in empty date and time inputs (e.g. `12:30`), which was indistinguishable from a committed value ([#81991](https://github.com/WordPress/gutenberg/pull/81991)).
+-   `Menu`: Close non-modal menus when the user presses inside a same-origin iframe. ([#81952](https://github.com/WordPress/gutenberg/pull/81952))
 
 ### Documentation
 
