@@ -895,42 +895,4 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 
 		$this->assertTrue( $reversed[0]['attrs']['reversed'] );
 	}
-
-	public function test_stores_no_markup_for_a_block_that_renders_on_the_server() {
-		$this->register(
-			'test/callout',
-			array(
-				'attributes'      => array(
-					'note' => array(
-						'type'     => 'string',
-						'source'   => 'text',
-						'selector' => 'aside',
-					),
-				),
-				'render_callback' => static function () {
-					return 'rendered';
-				},
-				'transforms'      => array(
-					'from' => array(
-						array(
-							'type'     => 'raw',
-							'selector' => 'aside',
-						),
-					),
-				),
-			)
-		);
-
-		$blocks = gutenberg_html_to_blocks( '<aside>Note</aside>' );
-
-		$this->assertSame( 'test/callout', $blocks[0]['blockName'] );
-
-		// `save` returns nothing for a block that renders on the server, so any
-		// stored markup would be markup the editor could never reproduce.
-		$this->assertSame( '', $blocks[0]['innerHTML'] );
-
-		// With no markup left to read it back out of, the value has to travel
-		// in the delimiter even though the attribute declares a source.
-		$this->assertSame( 'Note', $blocks[0]['attrs']['note'] );
-	}
 }

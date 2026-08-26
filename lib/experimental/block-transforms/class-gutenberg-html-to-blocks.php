@@ -293,22 +293,6 @@ class Gutenberg_HTML_To_Blocks {
 	 * @return array Parsed block array.
 	 */
 	private static function create_block( $block_type, $attributes, $element, $inner_blocks ) {
-		/*
-		 * A block that renders on the server saves no markup at all, so storing
-		 * any would not match what its `save` produces and the editor would
-		 * flag it. Its attributes travel in the delimiter instead, since there
-		 * is no markup left to read them back out of.
-		 */
-		if ( $block_type->is_dynamic() ) {
-			return array(
-				'blockName'    => $block_type->name,
-				'attrs'        => self::remove_default_attributes( $block_type, $attributes, false ),
-				'innerBlocks'  => $inner_blocks,
-				'innerHTML'    => '',
-				'innerContent' => array_fill( 0, count( $inner_blocks ), null ),
-			);
-		}
-
 		$attributes = self::remove_default_attributes( $block_type, $attributes );
 		$markup     = self::prepare_wrapper_markup( $block_type, $element );
 
@@ -360,14 +344,11 @@ class Gutenberg_HTML_To_Blocks {
 	/**
 	 * Drops attribute values that match the block type's declared defaults.
 	 *
-	 * @param WP_Block_Type $block_type   Block type.
-	 * @param array         $attributes   Attribute values.
-	 * @param bool          $drop_sourced Optional. Whether to drop the attributes
-	 *                                    that are read back out of the markup.
-	 *                                    Default true.
+	 * @param WP_Block_Type $block_type Block type.
+	 * @param array         $attributes Attribute values.
 	 * @return array Attribute values worth serializing.
 	 */
-	private static function remove_default_attributes( $block_type, $attributes, $drop_sourced = true ) {
+	private static function remove_default_attributes( $block_type, $attributes ) {
 		$definitions = (array) $block_type->attributes;
 
 		foreach ( $attributes as $name => $value ) {
@@ -379,7 +360,7 @@ class Gutenberg_HTML_To_Blocks {
 			}
 
 			// Sourced attributes are read back out of the markup, not the delimiter.
-			if ( $drop_sourced && isset( $definition['source'] ) ) {
+			if ( isset( $definition['source'] ) ) {
 				unset( $attributes[ $name ] );
 			}
 		}
