@@ -1,7 +1,7 @@
 import { createBlock, findTransform } from '../factory';
 import { getBlockAttributes } from '../parser/get-block-attributes';
 import { getRawTransforms } from './get-raw-transforms';
-import type { Block } from '../../types';
+import type { Block, RawHandler } from '../../types';
 
 /**
  * Converts HTML directly to blocks. Looks for a matching transform for each
@@ -14,10 +14,7 @@ import type { Block } from '../../types';
  *
  * @return An array of blocks.
  */
-export function htmlToBlocks(
-	html: string,
-	handler: ( options: { HTML: string } ) => Block[] | string
-): Block[] {
+export function htmlToBlocks( html: string, handler: RawHandler ): Block[] {
 	const doc = document.implementation.createHTMLDocument( '' );
 
 	doc.body.innerHTML = html;

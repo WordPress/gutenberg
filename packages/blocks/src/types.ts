@@ -330,6 +330,39 @@ export interface BlockPrefixTransform extends BlockTransformBase {
 }
 
 /**
+ * Options accepted by the raw handlers, `rawHandler` and `pasteHandler`.
+ */
+export interface RawHandlerOptions {
+	/**
+	 * The HTML to convert.
+	 */
+	HTML?: string;
+	/**
+	 * Plain text version of the content.
+	 */
+	plainText?: string;
+	/**
+	 * Whether to handle the content as blocks or as inline content.
+	 *
+	 * - `AUTO`: decide based on the content passed.
+	 * - `INLINE`: always handle as inline content, and return a string.
+	 * - `BLOCKS`: always handle as blocks, and return an array of blocks.
+	 */
+	mode?: 'AUTO' | 'INLINE' | 'BLOCKS';
+	/**
+	 * The tag into which the content will be inserted.
+	 */
+	tagName?: string;
+}
+
+/**
+ * A raw handler, either `rawHandler` or `pasteHandler`. A `raw` transform
+ * receives one as the second argument of its `transform`, to convert nested
+ * content the same way the surrounding content is converted.
+ */
+export type RawHandler = ( options: RawHandlerOptions ) => Block[] | string;
+
+/**
  * A transform from raw HTML, used when pasting content into the editor.
  */
 export interface BlockRawTransform extends BlockTransformBase {
@@ -350,10 +383,7 @@ export interface BlockRawTransform extends BlockTransformBase {
 				isPaste: boolean;
 		  } ) => Record< string, unknown > );
 	isMatch?: ( node: Element ) => boolean;
-	transform?: (
-		node: Node,
-		handler: ( options: { HTML: string } ) => Block[] | string
-	) => Block | Block[];
+	transform?: ( node: Element, handler: RawHandler ) => Block | Block[];
 }
 
 /**
