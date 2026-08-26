@@ -110,7 +110,7 @@ Returns the block attributes of a registered block node given its type.
 _Parameters_
 
 -   _blockTypeOrName_ `string | BlockType`: Block type or name.
--   _innerHTML_ `string | Node`: Raw block content.
+-   _innerHTML_ `string | Node | undefined`: Raw block content.
 -   _attributes_ `Record< string, unknown >`: Known block attributes (from delimiters).
 
 _Returns_
@@ -488,7 +488,7 @@ Given a block's raw content and an attribute's schema returns the attribute's va
 
 _Parameters_
 
--   _innerHTML_ `string | Node`: Block's raw content.
+-   _innerHTML_ `string | Node | undefined`: Block's raw content.
 -   _attributeSchema_ `BlockAttribute`: Attribute's schema.
 
 _Returns_

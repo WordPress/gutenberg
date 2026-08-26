@@ -130,7 +130,7 @@ function segmentHTMLToShortcodeBlock(
 			transformation.blockName!,
 			getBlockAttributes(
 				transformationBlockType,
-				match.shortcode.content ?? '',
+				match.shortcode.content,
 				attributes
 			)
 		);

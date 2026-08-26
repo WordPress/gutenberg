@@ -2,15 +2,16 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `getBlockAttributes` no longer breaks when a block has no content to parse, such as a self-closing shortcode: missing content is treated as empty markup instead of reaching the attribute matchers ([#81831](https://github.com/WordPress/gutenberg/pull/81831)).
+-   `BlockTransform` is now a discriminated union over its `type`, so that each kind of transform declares its own fields: `shortcode` transforms accept `tag` and `attributes` with `shortcode` matchers, `enter` transforms `regExp`, `prefix` transforms `prefix`, and `raw` transforms `selector` and `schema`. This fixes type errors when registering blocks with documented shortcode transforms ([#81811](https://github.com/WordPress/gutenberg/issues/81811)).
+
 ## 15.27.0 (2026-08-26)
 
 ### New Features
 
 -   Block variations and `block` type block transforms accept a `shortcut` property, declaring a keyboard shortcut that applies the variation or transform to the selected block. See the [block variations](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-variations/) and [block transforms](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-transforms/) documentation ([#81588](https://github.com/WordPress/gutenberg/pull/81588)).
-
-### Bug Fixes
-
--   `BlockTransform` is now a discriminated union over its `type`, so that each kind of transform declares its own fields: `shortcode` transforms accept `tag` and `attributes` with `shortcode` matchers, `enter` transforms `regExp`, `prefix` transforms `prefix`, and `raw` transforms `selector` and `schema`. This fixes type errors when registering blocks with documented shortcode transforms ([#81811](https://github.com/WordPress/gutenberg/issues/81811)).
 
 ## 15.26.0 (2026-08-12)
 
