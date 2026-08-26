@@ -418,6 +418,26 @@ export default function GalleryEdit( props ) {
 				)
 		);
 
+		// Update existing blocks with new attributes from the media library.
+		const updatedExistingBlocks = ! newFileUploads
+			? existingImageBlocks.map( ( block ) => {
+					const updatedImage = processedImages.find(
+						( img ) => img.id === block.attributes.id
+					);
+					if ( updatedImage ) {
+						// Use buildImageAttributes to apply gallery settings and updated media data
+						const updatedAttributes =
+							buildImageAttributes( updatedImage );
+						// Create a new block with updated attributes, preserving the clientId
+						return createBlock( 'core/image', {
+							...block.attributes,
+							...updatedAttributes,
+						} );
+					}
+					return block;
+			  } )
+			: existingImageBlocks;
+
 		const newBlocks = newImageList.map( ( image ) => {
 			return createBlock( 'core/image', {
 				id: image.id,
@@ -430,7 +450,7 @@ export default function GalleryEdit( props ) {
 
 		replaceInnerBlocks(
 			clientId,
-			existingImageBlocks
+			updatedExistingBlocks
 				.concat( newBlocks )
 				.sort(
 					( a, b ) =>
