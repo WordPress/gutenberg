@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 25.10.0 (2026-08-26)
+
 ### Bug Fixes
 
 -   Remove `fixable` option from `i18n-no-flanking-whitespace` rule [#70279](https://github.com/WordPress/gutenberg/pull/70279).
