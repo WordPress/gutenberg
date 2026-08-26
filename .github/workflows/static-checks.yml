@@ -145,10 +145,10 @@ jobs:
             - name: License compatibility
               run: npm run other:check-licenses
 
-    # Fails when a checked bundled package pulls @wordpress/private-apis into
-    # its module graph, including transitively through another package.
+    # Fails when a bundled package pulls @wordpress/private-apis into its
+    # module graph, including transitively through another package.
     check-private-apis:
-        name: Check DataViews private APIs
+        name: Check private API usage in bundled packages
         runs-on: ubuntu-24.04
         permissions:
             contents: read
@@ -172,5 +172,5 @@ jobs:
             - name: npm install
               run: npm install
 
-            - name: Check private API usage in DataViews
-              run: node tools/validation/check-private-apis.mjs
+            - name: Check private API usage in bundled packages
+              run: npm run --workspace @wordpress/validation-tools check-private-apis

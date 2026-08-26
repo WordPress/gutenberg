@@ -14,8 +14,8 @@
  * into a consumer bundle.
  *
  * Usage:
- *   node tools/validation/check-private-apis.mjs [package-name ...]  # default: dataviews
- *   node tools/validation/check-private-apis.mjs --all               # every bundled package
+ *   node tools/validation/check-private-apis.mjs                     # every bundled package
+ *   node tools/validation/check-private-apis.mjs [package-name ...]  # specific packages
  */
 
 import fs from 'node:fs';
@@ -234,14 +234,13 @@ async function checkPackage( name ) {
 }
 
 async function main() {
-	const args = process.argv.slice( 2 );
-	const names = args.includes( '--all' )
-		? fs
+	const names = process.argv.slice( 2 );
+	if ( ! names.length ) {
+		names.push(
+			...fs
 				.readdirSync( PACKAGES_DIR )
 				.filter( ( name ) => isBundled( readPackageJson( name ) ) )
-		: args.filter( ( arg ) => ! arg.startsWith( '--' ) );
-	if ( ! names.length ) {
-		names.push( 'dataviews' );
+		);
 	}
 
 	let failed = false;
