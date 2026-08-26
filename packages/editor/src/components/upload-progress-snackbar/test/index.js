@@ -1,5 +1,6 @@
 import { render, act } from '@testing-library/react';
 import { useSelect } from '@wordpress/data';
+import { speak } from '@wordpress/a11y';
 import UploadProgressSnackbar from '../';
 import { addFiles, advance, advanceFailed, reset } from '../tracker';
 
@@ -154,6 +155,24 @@ describe( 'UploadProgressSnackbar', () => {
 		}
 	} );
 
+	it( 'announces completion when every upload succeeded', () => {
+		mockQueue( [] );
+		act( () => {
+			addFiles( [ 'a.jpg' ] );
+		} );
+		render( <UploadProgressSnackbar /> );
+		speak.mockClear();
+
+		act( () => {
+			advance( 1 );
+		} );
+
+		expect( speak ).toHaveBeenCalledWith(
+			'Media upload complete',
+			'polite'
+		);
+	} );
+
 	it( 'does not show a completion notice when every tracked upload failed', () => {
 		mockQueue( [] );
 		act( () => {
@@ -169,6 +188,12 @@ describe( 'UploadProgressSnackbar', () => {
 		expect( mockCreateNotice ).not.toHaveBeenCalled();
 		// The in-progress notice has to come down, since nothing replaces it.
 		expect( mockRemoveNotice ).toHaveBeenCalledWith( 'upload-progress' );
+		// Claiming completion here is the bug this fixes, for screen readers too.
+		expect( speak ).toHaveBeenCalledWith( 'Media upload failed', 'polite' );
+		expect( speak ).not.toHaveBeenCalledWith(
+			'Media upload complete',
+			'polite'
+		);
 	} );
 
 	it( 'reports how many files uploaded when only some of them failed', () => {
@@ -198,6 +223,15 @@ describe( 'UploadProgressSnackbar', () => {
 				// A checkmark would overstate a batch that partly failed.
 				icon: undefined,
 			} )
+		);
+		// The announcement has to say the same thing the notice says.
+		expect( speak ).toHaveBeenCalledWith(
+			'Uploaded 2 of 3 files',
+			'polite'
+		);
+		expect( speak ).not.toHaveBeenCalledWith(
+			'Media upload complete',
+			'polite'
 		);
 	} );
 

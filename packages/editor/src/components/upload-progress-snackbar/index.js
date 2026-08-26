@@ -168,18 +168,18 @@ export default function UploadProgressSnackbar() {
 				removeNotice( NOTICE_ID );
 				peakRef.current = 0;
 			} else {
-				const content =
-					failed === 0
-						? __( 'Upload complete' )
-						: sprintf(
-								/* translators: 1: number of files uploaded, 2: number of files in the batch. */
-								__( 'Uploaded %1$d of %2$d files' ),
-								uploaded,
-								total
-						  );
+				const isFullSuccess = failed === 0;
+				const content = isFullSuccess
+					? __( 'Upload complete' )
+					: sprintf(
+							/* translators: 1: number of files uploaded, 2: number of files in the batch. */
+							__( 'Uploaded %1$d of %2$d files' ),
+							uploaded,
+							total
+					  );
 
 				speak(
-					failed === 0 ? __( 'Media upload complete' ) : content,
+					isFullSuccess ? __( 'Media upload complete' ) : content,
 					'polite'
 				);
 
@@ -191,7 +191,7 @@ export default function UploadProgressSnackbar() {
 						explicitDismiss: false,
 						speak: false,
 						// No checkmark on a partial batch — some of it failed.
-						icon: failed === 0 ? UPLOAD_DONE : undefined,
+						icon: isFullSuccess ? UPLOAD_DONE : undefined,
 						onDismiss: () => {
 							dismissedRef.current = true;
 						},
