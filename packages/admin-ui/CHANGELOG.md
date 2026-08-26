@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Wrap component styles in a `wp-admin-ui` cascade layer so consumer overrides are not blocked by library specificity.
+-   Wrap component styles in a `wp-admin-ui` cascade layer so consumer overrides are not blocked by library specificity. ([#82080](https://github.com/WordPress/gutenberg/pull/82080)).
 
 ### Bug Fixes
 
