@@ -88,25 +88,24 @@ function block_core_gallery_get_column_gap_value( $gap, $fallback_gap ) {
 }
 
 /**
- * Returns Gallery-specific responsive layout rules for a viewport.
+ * Returns Gallery-specific responsive Flex rules for a viewport.
  *
  * @since 7.1.0
  *
  * @param string $selector       Gallery block selector.
  * @param mixed  $viewport_style Viewport style data.
  * @param string $media_query    Viewport media query.
- * @return array[] Gallery responsive layout rules.
+ * @return array[] Gallery responsive Flex rules.
  */
-function block_core_gallery_get_responsive_layout_style_rules( $selector, $viewport_style, $media_query ) {
+function block_core_gallery_get_responsive_flex_style_rules( $selector, $viewport_style, $media_query ) {
 	if ( ! is_array( $viewport_style ) || ! is_string( $media_query ) ) {
 		return array();
 	}
 
-	$layout           = is_array( $viewport_style['layout'] ?? null ) ? $viewport_style['layout'] : array();
 	$rules            = array();
 	$gallery_selector = "{$selector}.wp-block-gallery.has-nested-images:where(.is-layout-flex)";
 	$image_selector   = "{$gallery_selector} figure.wp-block-image:not(#individual-image)";
-	$columns          = $layout['columns'] ?? null;
+	$columns          = $viewport_style['columns'] ?? null;
 
 	if ( is_int( $columns ) && $columns >= 1 && $columns <= 8 ) {
 		$width   = 1 === $columns
@@ -123,7 +122,7 @@ function block_core_gallery_get_responsive_layout_style_rules( $selector, $viewp
 		);
 	}
 
-	$image_crop = $layout['imageCrop'] ?? null;
+	$image_crop = $viewport_style['imageCrop'] ?? null;
 	if ( ! is_bool( $image_crop ) ) {
 		return $rules;
 	}
@@ -571,7 +570,7 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 
 			$gallery_styles = array_merge(
 				$gallery_styles,
-				block_core_gallery_get_responsive_layout_style_rules(
+				block_core_gallery_get_responsive_flex_style_rules(
 					".{$unique_gallery_classname}",
 					$viewport_style,
 					$media_query

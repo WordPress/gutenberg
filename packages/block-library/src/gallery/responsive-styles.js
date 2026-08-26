@@ -8,13 +8,19 @@ export function isValidGalleryColumns( value ) {
 	return Number.isInteger( value ) && value >= 1 && value <= MAX_COLUMNS;
 }
 
-export function getViewportGalleryLayout( style, viewport ) {
+/**
+ * Returns Gallery styles for a viewport.
+ *
+ * @param {Object} style    Gallery block style attribute.
+ * @param {string} viewport Viewport state.
+ * @return {Object} Gallery viewport styles, or an empty object when unavailable.
+ */
+export function getViewportGalleryStyle( style, viewport ) {
 	if ( ! isObject( style ) || ! isObject( style[ viewport ] ) ) {
 		return {};
 	}
 
-	const layout = style[ viewport ].layout;
-	return isObject( layout ) ? layout : {};
+	return style[ viewport ];
 }
 
 function cleanObject( value ) {
@@ -45,28 +51,22 @@ export function getUpdatedGalleryStyle( {
 	settings,
 } ) {
 	const currentStyle = isObject( style ) ? style : {};
-	const currentViewportStyle = isObject( currentStyle[ viewport ] )
-		? currentStyle[ viewport ]
-		: {};
-	const nextLayout = {
-		...getViewportGalleryLayout( currentStyle, viewport ),
+	const nextViewportStyle = {
+		...getViewportGalleryStyle( currentStyle, viewport ),
 	};
 
 	Object.entries( settings ).forEach( ( [ key, value ] ) => {
 		if ( value === undefined || value === baseSettings[ key ] ) {
-			delete nextLayout[ key ];
+			delete nextViewportStyle[ key ];
 		} else {
-			nextLayout[ key ] = value;
+			nextViewportStyle[ key ] = value;
 		}
 	} );
 
-	const nextViewportStyle = cleanObject( {
-		...currentViewportStyle,
-		layout: cleanObject( nextLayout ),
-	} );
+	const cleanedViewportStyle = cleanObject( nextViewportStyle );
 	const nextStyle = { ...currentStyle };
-	if ( nextViewportStyle ) {
-		nextStyle[ viewport ] = nextViewportStyle;
+	if ( cleanedViewportStyle ) {
+		nextStyle[ viewport ] = cleanedViewportStyle;
 	} else {
 		delete nextStyle[ viewport ];
 	}
@@ -111,14 +111,14 @@ function getImageCropCSS( selector, imageCrop ) {
 }
 
 /**
- * Generates Gallery-specific responsive layout CSS.
+ * Generates Gallery-specific responsive Flex CSS.
  *
  * @param {string} selector     Gallery block selector.
  * @param {Object} style        Gallery block style attribute.
  * @param {Object} mediaQueries Map of viewport keys to media queries.
  * @return {string} Responsive Gallery CSS.
  */
-export function getGalleryResponsiveLayoutCSS( selector, style, mediaQueries ) {
+export function getGalleryResponsiveFlexCSS( selector, style, mediaQueries ) {
 	if ( ! isObject( mediaQueries ) ) {
 		return '';
 	}
@@ -129,15 +129,15 @@ export function getGalleryResponsiveLayoutCSS( selector, style, mediaQueries ) {
 				return '';
 			}
 
-			const layout = getViewportGalleryLayout( style, viewport );
+			const viewportStyle = getViewportGalleryStyle( style, viewport );
 			let css = '';
 
-			if ( isValidGalleryColumns( layout.columns ) ) {
-				css += getColumnsCSS( selector, layout.columns );
+			if ( isValidGalleryColumns( viewportStyle.columns ) ) {
+				css += getColumnsCSS( selector, viewportStyle.columns );
 			}
 
-			if ( typeof layout.imageCrop === 'boolean' ) {
-				css += getImageCropCSS( selector, layout.imageCrop );
+			if ( typeof viewportStyle.imageCrop === 'boolean' ) {
+				css += getImageCropCSS( selector, viewportStyle.imageCrop );
 			}
 
 			return css ? `${ mediaQuery }{${ css }}` : '';

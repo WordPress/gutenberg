@@ -346,7 +346,7 @@ class Tests_Blocks_Render_Gallery extends WP_UnitTestCase {
 		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
 
 		$output     = do_blocks(
-			'<!-- wp:gallery {"style":{"@mobile":{"layout":{"columns":1}}}} --><figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image --><figure class="wp-block-image"><img alt=""/></figure><!-- /wp:image --></figure><!-- /wp:gallery -->'
+			'<!-- wp:gallery {"style":{"@mobile":{"columns":1,"layout":{"columnCount":2}}}} --><figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image --><figure class="wp-block-image"><img alt=""/></figure><!-- /wp:image --></figure><!-- /wp:gallery -->'
 		);
 		$stylesheet = gutenberg_style_engine_get_stylesheet_from_context(
 			'block-supports',
@@ -362,7 +362,7 @@ class Tests_Blocks_Render_Gallery extends WP_UnitTestCase {
 		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
 
 		do_blocks(
-			'<!-- wp:gallery {"style":{"@tablet":{"layout":{"imageCrop":false}}}} --><figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image --><figure class="wp-block-image"><img alt=""/></figure><!-- /wp:image --></figure><!-- /wp:gallery -->'
+			'<!-- wp:gallery {"style":{"@tablet":{"imageCrop":false}}} --><figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image --><figure class="wp-block-image"><img alt=""/></figure><!-- /wp:image --></figure><!-- /wp:gallery -->'
 		);
 		$stylesheet = gutenberg_style_engine_get_stylesheet_from_context(
 			'block-supports',

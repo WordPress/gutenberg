@@ -1,5 +1,5 @@
 import {
-	getGalleryResponsiveLayoutCSS,
+	getGalleryResponsiveFlexCSS,
 	getUpdatedGalleryStyle,
 } from '../responsive-styles';
 
@@ -8,17 +8,22 @@ const MEDIA_QUERIES = {
 	'@mobile': '@media (width <= 480px)',
 };
 
-describe( 'Gallery responsive layout styles', () => {
-	it( 'updates columns for the active viewport', () => {
+describe( 'Gallery responsive Flex styles', () => {
+	it( 'stores columns separately from viewport layout settings', () => {
 		expect(
 			getUpdatedGalleryStyle( {
-				style: undefined,
+				style: {
+					'@mobile': { layout: { columnCount: 2 } },
+				},
 				viewport: '@mobile',
 				baseSettings: { columns: 2, imageCrop: true },
 				settings: { columns: 1 },
 			} )
 		).toEqual( {
-			'@mobile': { layout: { columns: 1 } },
+			'@mobile': {
+				columns: 1,
+				layout: { columnCount: 2 },
+			},
 		} );
 	} );
 
@@ -27,7 +32,7 @@ describe( 'Gallery responsive layout styles', () => {
 			getUpdatedGalleryStyle( {
 				style: {
 					spacing: { blockGap: '10px' },
-					'@mobile': { layout: { columns: 1 } },
+					'@mobile': { columns: 1 },
 				},
 				viewport: '@tablet',
 				baseSettings: { columns: 2, imageCrop: true },
@@ -35,17 +40,19 @@ describe( 'Gallery responsive layout styles', () => {
 			} )
 		).toEqual( {
 			spacing: { blockGap: '10px' },
-			'@mobile': { layout: { columns: 1 } },
-			'@tablet': { layout: { imageCrop: false } },
+			'@mobile': { columns: 1 },
+			'@tablet': { imageCrop: false },
 		} );
 	} );
 
-	it( 'removes a viewport override when it matches the base setting', () => {
+	it( 'removes a Gallery override without removing viewport layout settings', () => {
 		expect(
 			getUpdatedGalleryStyle( {
 				style: {
 					'@mobile': {
-						layout: { columns: 1, imageCrop: false },
+						columns: 1,
+						imageCrop: false,
+						layout: { columnCount: 2 },
 					},
 				},
 				viewport: '@mobile',
@@ -53,16 +60,20 @@ describe( 'Gallery responsive layout styles', () => {
 				settings: { columns: 2 },
 			} )
 		).toEqual( {
-			'@mobile': { layout: { imageCrop: false } },
+			'@mobile': {
+				imageCrop: false,
+				layout: { columnCount: 2 },
+			},
 		} );
 	} );
 
 	it( 'applies a viewport-specific column count', () => {
-		const css = getGalleryResponsiveLayoutCSS(
+		const css = getGalleryResponsiveFlexCSS(
 			'#block-test',
 			{
 				'@mobile': {
-					layout: { columns: 3 },
+					columns: 3,
+					layout: { columnCount: 2 },
 				},
 			},
 			MEDIA_QUERIES
@@ -81,11 +92,11 @@ describe( 'Gallery responsive layout styles', () => {
 	] )(
 		'applies crop to fit set to %s for a viewport',
 		( imageCrop, objectFitRule, wrapperDisplayRule ) => {
-			const css = getGalleryResponsiveLayoutCSS(
+			const css = getGalleryResponsiveFlexCSS(
 				'#block-test',
 				{
 					'@tablet': {
-						layout: { imageCrop },
+						imageCrop,
 					},
 				},
 				MEDIA_QUERIES
@@ -96,14 +107,15 @@ describe( 'Gallery responsive layout styles', () => {
 		}
 	);
 
-	it( 'ignores malformed viewport layout values', () => {
-		const css = getGalleryResponsiveLayoutCSS(
+	it( 'ignores malformed viewport Gallery values', () => {
+		const css = getGalleryResponsiveFlexCSS(
 			'#block-test',
 			{
 				'@tablet': {
-					layout: { columns: '3', imageCrop: 'false' },
+					columns: '3',
+					imageCrop: 'false',
 				},
-				'@mobile': { layout: [] },
+				'@mobile': [],
 			},
 			MEDIA_QUERIES
 		);

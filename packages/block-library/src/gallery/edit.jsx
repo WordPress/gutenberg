@@ -67,7 +67,7 @@ import { GallerySourcePanel, GalleryDynamicView } from './dynamic-gallery';
 import { getDynamicSource, ATTACHED_MEDIA } from './dynamic-source';
 import { unlock } from '../lock-unlock';
 import {
-	getViewportGalleryLayout,
+	getViewportGalleryStyle,
 	getUpdatedGalleryStyle,
 	isValidGalleryColumns,
 } from './responsive-styles';
@@ -232,15 +232,13 @@ export default function GalleryEdit( props ) {
 		selectedStyleState,
 	} = useSelect(
 		( select ) => {
-			const blockEditorSelectors = select( blockEditorStore );
 			const {
 				getBlockName,
 				getMultiSelectedBlockClientIds,
 				getSettings: _getSettings,
 				getBlock: _getBlock,
-			} = blockEditorSelectors;
-			const { getSelectedBlockStyleState } =
-				unlock( blockEditorSelectors );
+				getSelectedBlockStyleState,
+			} = unlock( select( blockEditorStore ) );
 			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
 
 			return {
@@ -261,11 +259,9 @@ export default function GalleryEdit( props ) {
 	);
 	const isViewportStyleState =
 		selectedStyleState?.viewport &&
-		selectedStyleState.viewport !== 'default' &&
-		( ! selectedStyleState.pseudo ||
-			selectedStyleState.pseudo === 'default' );
-	const viewportLayout = isViewportStyleState
-		? getViewportGalleryLayout(
+		selectedStyleState.viewport !== 'default';
+	const viewportStyle = isViewportStyleState
+		? getViewportGalleryStyle(
 				attributes.style,
 				selectedStyleState.viewport
 		  )
@@ -274,17 +270,17 @@ export default function GalleryEdit( props ) {
 	const baseImageCrop = typeof imageCrop === 'boolean' ? imageCrop : true;
 	const hasViewportColumns =
 		isViewportStyleState &&
-		Object.hasOwn( viewportLayout, 'columns' ) &&
-		isValidGalleryColumns( viewportLayout.columns );
+		Object.hasOwn( viewportStyle, 'columns' ) &&
+		isValidGalleryColumns( viewportStyle.columns );
 	const hasViewportImageCrop =
 		isViewportStyleState &&
-		Object.hasOwn( viewportLayout, 'imageCrop' ) &&
-		typeof viewportLayout.imageCrop === 'boolean';
+		Object.hasOwn( viewportStyle, 'imageCrop' ) &&
+		typeof viewportStyle.imageCrop === 'boolean';
 	const activeColumns = hasViewportColumns
-		? viewportLayout.columns
+		? viewportStyle.columns
 		: baseColumns;
 	const activeImageCrop = hasViewportImageCrop
-		? viewportLayout.imageCrop
+		? viewportStyle.imageCrop
 		: baseImageCrop;
 
 	const images = useMemo(

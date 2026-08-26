@@ -8,7 +8,7 @@ import {
 import { useSelect } from '@wordpress/data';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import { unlock } from '../lock-unlock';
-import { getGalleryResponsiveLayoutCSS } from './responsive-styles';
+import { getGalleryResponsiveFlexCSS } from './responsive-styles';
 
 const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 const { globalStylesDataKey } = unlock( blockEditorPrivateApis );
@@ -87,7 +87,7 @@ export default function GalleryGapCustomProperties( { style, clientId } ) {
 			) }}`;
 		}
 	);
-	gap += getGalleryResponsiveLayoutCSS(
+	gap += getGalleryResponsiveFlexCSS(
 		selector,
 		style,
 		responsiveMediaQueries
