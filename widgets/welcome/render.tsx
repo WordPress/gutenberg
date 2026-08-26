@@ -57,13 +57,11 @@ export default function WelcomeBanner() {
 		<Stack className={ styles.root } direction="column" gap="lg">
 			<Banner />
 
-			<Text
-				className={ styles[ 'section-heading' ] }
-				variant="heading-lg"
-				render={ <h2 /> }
-			>
-				{ __( 'Get started with WordPress' ) }
-			</Text>
+			<Stack className={ styles[ 'section-heading' ] }>
+				<Text variant="heading-lg" render={ <h2 /> }>
+					{ __( 'Get started with WordPress' ) }
+				</Text>
+			</Stack>
 
 			<Stack className={ styles.columns } align="start">
 				<FeatureHighlight
