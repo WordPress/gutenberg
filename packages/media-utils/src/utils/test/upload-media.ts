@@ -253,7 +253,7 @@ describe( 'uploadMedia', () => {
 			new UploadError( {
 				code: 'GENERAL',
 				message:
-					'Could not upload "test.jpeg". The server returned an error instead of saving the file. Try again, and contact your site administrator if it keeps happening.',
+					'Couldn’t upload "test.jpeg". Try again, or contact your site administrator if this keeps happening.',
 				file: imageFile,
 			} )
 		);

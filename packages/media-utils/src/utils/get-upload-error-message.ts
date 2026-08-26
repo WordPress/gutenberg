@@ -31,7 +31,7 @@ export function getUploadErrorMessage(
 	const serverError = sprintf(
 		/* translators: %s: file name */
 		__(
-			'Could not upload "%s". The server returned an error instead of saving the file. Try again, and contact your site administrator if it keeps happening.'
+			'Couldn’t upload "%s". Try again, or contact your site administrator if this keeps happening.'
 		),
 		fileName
 	);

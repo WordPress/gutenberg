@@ -868,10 +868,9 @@ test.describe( 'Client-side media processing', () => {
 
 		const snackbars = page.locator( '.components-snackbar' );
 
-		// The message names the file, says the server failed, and offers a
-		// way forward.
+		// The message names the file and offers a way forward.
 		const errorSnackbar = snackbars.filter( {
-			hasText: /the server returned an error instead of saving the file/i,
+			hasText: /couldn’t upload/i,
 		} );
 		await expect( errorSnackbar ).toBeVisible( { timeout: 30_000 } );
 		await expect( errorSnackbar ).toContainText( uniqueName );

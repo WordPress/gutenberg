@@ -1,7 +1,7 @@
 import { getUploadErrorMessage } from '../get-upload-error-message';
 
 const SERVER_ERROR =
-	'Could not upload "kitten.jpeg". The server returned an error instead of saving the file. Try again, and contact your site administrator if it keeps happening.';
+	'Couldn’t upload "kitten.jpeg". Try again, or contact your site administrator if this keeps happening.';
 
 describe( 'getUploadErrorMessage', () => {
 	it( 'keeps the message of a REST error', () => {
