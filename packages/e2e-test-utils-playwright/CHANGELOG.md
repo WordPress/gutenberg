@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `Metrics.getInteractionDuration()`: New method returning the input-to-next-paint duration of the traced interaction, which is what INP measures ([#81623](https://github.com/WordPress/gutenberg/pull/81623)).
+
 ## 1.53.0 (2026-08-12)
 
 ### Bug Fixes

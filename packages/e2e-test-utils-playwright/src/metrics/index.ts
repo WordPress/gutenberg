@@ -37,6 +37,19 @@ type EventDispatch = TraceEvent & {
 	args: { data: { type: EventType } };
 };
 
+// A traced `EventTiming`, once filtered down to the entries that belong to an
+// interaction.
+interface InteractionTiming extends TraceEvent {
+	args: {
+		data: {
+			type: EventType;
+			duration: number;
+			interactionId: number;
+			frame: string;
+		};
+	};
+}
+
 interface Trace {
 	traceEvents: TraceEvent[];
 }
@@ -364,6 +377,68 @@ export class Metrics {
 		return [ ...durations.values() ].filter(
 			( eventDurations ) => eventDurations.length
 		);
+	}
+
+	/**
+	 * Measures from the input timestamp to the paint that follows, so unlike
+	 * `getSelectionEventDurations` it also covers the render and the
+	 * presentation delay. This is the quantity INP aggregates.
+	 *
+	 * Chromium emits one `EventTiming` entry per event of the interaction.
+	 * They all end at the same paint but start at their own event, so the
+	 * longest is the one measured from the first input. Entries outside an
+	 * interaction have an `interactionId` of `0`.
+	 *
+	 * An entry only reaches the trace once the frame it measures has been
+	 * presented, so let the interaction paint before calling `stopTracing()`.
+	 * Stopping right after the input drops the entries, and losing them has to
+	 * fail the test rather than quietly leave a sample out.
+	 *
+	 * @throws If the trace does not hold exactly one interaction.
+	 * @return Input-to-next-paint duration of the traced interaction.
+	 */
+	getInteractionDuration() {
+		if ( this.trace.traceEvents.length === 0 ) {
+			throw new Error(
+				'No trace events found. Did you forget to call stopTracing()?'
+			);
+		}
+
+		const durations = new Map< string, number >();
+
+		for ( const item of this.trace.traceEvents ) {
+			if (
+				item.cat !== 'devtools.timeline' ||
+				item.name !== 'EventTiming'
+			) {
+				continue;
+			}
+
+			const data = ( item as InteractionTiming ).args?.data;
+
+			if ( ! data?.interactionId ) {
+				continue;
+			}
+
+			// Interaction ids are unique within a document, so a trace that
+			// spans several frames can repeat them.
+			const key = `${ data.frame }:${ data.interactionId }`;
+
+			durations.set(
+				key,
+				Math.max( durations.get( key ) ?? 0, data.duration )
+			);
+		}
+
+		if ( durations.size !== 1 ) {
+			throw new Error(
+				`Expected the trace to hold one interaction, found ${ durations.size }. An interaction is only traced once the frame it measures has been presented, so let it paint before calling stopTracing().`
+			);
+		}
+
+		const [ duration ] = durations.values();
+
+		return duration;
 	}
 
 	/**
