@@ -2,12 +2,9 @@ import attachMediaInPost from '..';
 
 const mockInvalidate = jest.fn();
 
-jest.mock( '@wordpress/media-utils', () => ( { privateApis: {} } ) );
-jest.mock( '../../../../lock-unlock', () => ( {
-	unlock: () => ( {
-		invalidateAttachmentResolutions: ( ...args ) =>
-			mockInvalidate( ...args ),
-	} ),
+jest.mock( '../invalidate-attachment-resolutions', () => ( {
+	__esModule: true,
+	default: ( ...args ) => mockInvalidate( ...args ),
 } ) );
 
 const imageBlock = ( id ) => ( {

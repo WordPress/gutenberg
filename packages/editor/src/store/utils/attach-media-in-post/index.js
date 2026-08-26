@@ -1,10 +1,7 @@
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { privateApis as mediaUtilsPrivateApis } from '@wordpress/media-utils';
-import { unlock } from '../../../lock-unlock';
 import getMediaIdsInBlocks from './media-ids-in-blocks';
-
-const { invalidateAttachmentResolutions } = unlock( mediaUtilsPrivateApis );
+import invalidateAttachmentResolutions from './invalidate-attachment-resolutions';
 
 /**
  * Reports a failure without interpolating it.
