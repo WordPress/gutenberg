@@ -44,7 +44,7 @@ import styles from './lanes.module.css';
 
 const dashboardDragDropAnimation = createDashboardDragDropAnimation(
 	styles[ 'drag-preview-frame' ],
-	styles.dragPreviewFrameExiting
+	styles[ 'is-exiting' ]
 );
 
 // Fallback gap in pixels for math that runs before the computed gap
