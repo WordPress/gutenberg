@@ -336,6 +336,7 @@ Spacing styles.
 
 | Property | Description | Type |
 | -------- | ----------- | ---- |
+| blockBackgroundPadding | Sets the `--wp--style--block-background-padding` CSS custom property, used as the default padding by blocks that add padding when they have a background color. | `string`, `{ ref }` |
 | blockGap | Sets the `--wp--style--block-gap` CSS custom property when settings.spacing.blockGap is true. | `string`, `{ ref }` |
 | margin | Margin styles. | `{ top, right, bottom, left }` |
 | padding | Padding styles. | `{ top, right, bottom, left }` |

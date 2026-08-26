@@ -1720,6 +1720,13 @@
 					"description": "Spacing styles.",
 					"type": "object",
 					"properties": {
+						"blockBackgroundPadding": {
+							"description": "Sets the `--wp--style--block-background-padding` CSS custom property, used as the default padding by blocks that add padding when they have a background color.",
+							"oneOf": [
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
+							]
+						},
 						"blockGap": {
 							"description": "Sets the `--wp--style--block-gap` CSS custom property when settings.spacing.blockGap is true.",
 							"oneOf": [

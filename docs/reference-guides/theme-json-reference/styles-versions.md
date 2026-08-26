@@ -53,6 +53,7 @@ New styles options are integrated into theme.json on a regular basis. Knowing th
 | `spacing.margin.left`             |       5.8        |        5.9         |
 | `spacing.margin.bottom`           |       5.8        |        5.9         |
 | `spacing.blockGap`                |       5.9        |        5.9         |
+| `spacing.blockBackgroundPadding`  |       7.2        |        N/A         |
 | `background.backgroundAttachment` |       6.7        |        6.7         |
 | `background.backgroundImage`      |       6.4        |        6.5         |
 | `background.backgroundPosition`   |       6.6        |        6.6         |
