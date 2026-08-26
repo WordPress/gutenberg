@@ -64,10 +64,7 @@ export { default as DimensionControl } from './dimension-control';
 export { default as HeightControl } from './height-control';
 export { default as __experimentalImageEditor } from './image-editor';
 export { default as __experimentalImageSizeControl } from './image-size-control';
-export {
-	default as InnerBlocks,
-	useInnerBlocksProps,
-} from './inner-blocks';
+export { default as InnerBlocks, useInnerBlocksProps } from './inner-blocks';
 export {
 	default as InspectorControls,
 	InspectorAdvancedControls,
