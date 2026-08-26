@@ -17,15 +17,14 @@ When changing test ownership:
     JSDOM or `*.browser.test.*` to opt into Browser Mode.
 -   Use Node for pure JavaScript, data, stores, schemas, build tooling, and
     server-side logic.
--   Use Browser Mode for rendered UI, interaction, focus, keyboard, portals,
-    CSS, layout, geometry, viewport behavior, media queries, observers,
-    animation, scrolling, and native browser APIs. Import `userEvent` from
-    `vitest/browser`, and prefer locators for asynchronous browser state.
--   Use JSDOM only for construction, parsing, serialization, accessibility
-    structure, and deterministic low-level DOM semantics. Existing rendered UI
-    coverage is grandfathered in `vitest-policy-exceptions.json`. New entries
-    must not silently grow this baseline. Browser API exceptions require a
-    concrete reason.
+-   Use Browser Mode for real CSS, layout, geometry, viewport behavior, media
+    queries, observers, animation, scrolling, native browser APIs, and
+    browser-dependent interaction. Import `userEvent` from `vitest/browser`,
+    and prefer locators for asynchronous browser state.
+-   Use JSDOM for construction, parsing, serialization, accessibility
+    structure, and deterministic DOM semantics, events, and state. Browser API
+    exceptions require a concrete reason and must not remain after the
+    exception is no longer needed.
 -   Before running Browser Mode tests locally for the first time, install
     Chromium with
     `npm exec --workspace @wordpress/unit-tests -- playwright install chromium`.

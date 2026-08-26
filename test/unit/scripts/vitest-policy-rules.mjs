@@ -12,12 +12,14 @@ const browserApiIdentifiers = new Set( [
 ] );
 const browserApiProperties = new Set( [
 	...browserApiIdentifiers,
+	'animate',
 	'clientHeight',
 	'clientLeft',
 	'clientTop',
 	'clientWidth',
 	'getBoundingClientRect',
 	'getClientRects',
+	'getAnimations',
 	'innerHeight',
 	'innerWidth',
 	'offsetHeight',
@@ -50,16 +52,6 @@ const browserModeModules = new Set( [ '@vitest/browser', 'vitest/browser' ] );
 const policyExceptionKeys = new Set( [
 	'browserFireEvent',
 	'jsdomBrowserApis',
-	'renderedUi',
-] );
-const renderedUiImports = new Map( [
-	[ '@testing-library/react', new Set( [ 'render', 'renderHook' ] ) ],
-	[
-		'@wordpress/element',
-		new Set( [ 'createRoot', 'hydrate', 'hydrateRoot', 'render' ] ),
-	],
-	[ 'react-dom', new Set( [ 'hydrate', 'render' ] ) ],
-	[ 'react-dom/client', new Set( [ 'createRoot', 'hydrateRoot' ] ) ],
 ] );
 
 function getImportedName( specifier ) {
@@ -100,6 +92,84 @@ function isUnboundIdentifier( node, name, unboundIdentifiers ) {
 		node.name === name &&
 		unboundIdentifiers.has( node )
 	);
+}
+
+function isBrowserGlobalExpression( node, unboundIdentifiers, domIdentifiers ) {
+	if ( node?.type === 'Identifier' ) {
+		return (
+			domIdentifiers.has( node.name ) ||
+			( [ 'document', 'globalThis', 'window' ].includes( node.name ) &&
+				unboundIdentifiers.has( node ) )
+		);
+	}
+
+	if ( node?.type === 'CallExpression' ) {
+		return isBrowserGlobalExpression(
+			node.callee,
+			unboundIdentifiers,
+			domIdentifiers
+		);
+	}
+
+	if ( node?.type === 'MemberExpression' ) {
+		return isBrowserGlobalExpression(
+			node.object,
+			unboundIdentifiers,
+			domIdentifiers
+		);
+	}
+
+	if (
+		[ 'ChainExpression', 'TSAsExpression', 'TSNonNullExpression' ].includes(
+			node?.type
+		)
+	) {
+		return isBrowserGlobalExpression(
+			node.expression,
+			unboundIdentifiers,
+			domIdentifiers
+		);
+	}
+
+	return false;
+}
+
+function isVitestExpectCall( node, expectNames, namespaceNames ) {
+	if ( node?.type !== 'CallExpression' ) {
+		return false;
+	}
+
+	if ( node.callee?.type === 'Identifier' ) {
+		return expectNames.has( node.callee.name );
+	}
+
+	return (
+		node.callee?.type === 'MemberExpression' &&
+		getMemberPropertyName( node.callee ) === 'expect' &&
+		node.callee.object?.type === 'Identifier' &&
+		namespaceNames.has( node.callee.object.name )
+	);
+}
+
+function isVitestMatcherCall( node, matcherName, expectNames, namespaceNames ) {
+	if (
+		node?.type !== 'CallExpression' ||
+		getMemberPropertyName( node.callee ) !== matcherName
+	) {
+		return false;
+	}
+
+	let received = node.callee.object;
+	while (
+		received?.type === 'MemberExpression' &&
+		[ 'not', 'rejects', 'resolves' ].includes(
+			getMemberPropertyName( received )
+		)
+	) {
+		received = received.object;
+	}
+
+	return isVitestExpectCall( received, expectNames, namespaceNames );
 }
 
 function isDynamicImport( node ) {
@@ -246,11 +316,12 @@ function isRecord( value ) {
  * @param {Object}      projects
  * @param {Set<string>} projects.browserTests
  * @param {Set<string>} projects.jsdomTests
+ * @param {Object}      [projects.usedExceptions]
  * @return {string[]} Policy exception violations.
  */
 export function validateVitestPolicyExceptions(
 	options,
-	{ browserTests, jsdomTests }
+	{ browserTests, jsdomTests, usedExceptions }
 ) {
 	if ( ! isRecord( options ) ) {
 		return [ 'Vitest policy exceptions must be an object' ];
@@ -266,27 +337,6 @@ export function validateVitestPolicyExceptions(
 				', '
 			) }`
 		);
-	}
-
-	if ( ! Array.isArray( options.renderedUi ) ) {
-		violations.push( 'renderedUi must be an array of jsdom test paths' );
-	} else {
-		const renderedUiEntries = options.renderedUi.filter(
-			( file ) => typeof file === 'string'
-		);
-		if ( renderedUiEntries.length !== options.renderedUi.length ) {
-			violations.push( 'renderedUi entries must be strings' );
-		}
-		if ( new Set( renderedUiEntries ).size !== renderedUiEntries.length ) {
-			violations.push( 'renderedUi entries must be unique' );
-		}
-		for ( const file of renderedUiEntries ) {
-			if ( ! jsdomTests.has( file ) ) {
-				violations.push(
-					`${ file }: renderedUi entry does not match its Vitest project`
-				);
-			}
-		}
 	}
 
 	for ( const [ exceptionName, projectTests ] of [
@@ -309,6 +359,13 @@ export function validateVitestPolicyExceptions(
 				violations.push(
 					`${ file }: ${ exceptionName } entry does not match its Vitest project`
 				);
+			} else if (
+				usedExceptions?.[ exceptionName ] instanceof Set &&
+				! usedExceptions[ exceptionName ].has( file )
+			) {
+				violations.push(
+					`${ file }: ${ exceptionName } exception is no longer needed`
+				);
 			}
 		}
 	}
@@ -319,14 +376,14 @@ export function validateVitestPolicyExceptions(
 /**
  * Validate policy rules that distinguish Node, jsdom, and Browser Mode tests.
  *
- * @param {Object}  options
- * @param {string}  options.file
- * @param {string}  options.source
- * @param {string}  options.project
- * @param {boolean} [options.allowBrowserFireEvent]
- * @param {boolean} [options.allowJsdomBrowserApis]
- * @param {boolean} [options.allowRenderedUi]
- * @param {boolean} [options.isVitestTest]
+ * @param {Object}      options
+ * @param {string}      options.file
+ * @param {string}      options.source
+ * @param {string}      options.project
+ * @param {boolean}     [options.allowBrowserFireEvent]
+ * @param {boolean}     [options.allowJsdomBrowserApis]
+ * @param {boolean}     [options.isVitestTest]
+ * @param {Set<string>} [options.usedExceptions]
  * @return {string[]} Policy violations.
  */
 export function validateVitestPolicy( {
@@ -335,11 +392,12 @@ export function validateVitestPolicy( {
 	project,
 	allowBrowserFireEvent = false,
 	allowJsdomBrowserApis = false,
-	allowRenderedUi = false,
 	isVitestTest = false,
+	usedExceptions,
 } ) {
-	const { ast, scopeManager, visitorKeys } =
-		typescriptEslintParser.parseForESLint( source, {
+	let parsedSource;
+	try {
+		parsedSource = typescriptEslintParser.parseForESLint( source, {
 			filePath: file,
 			jsxFragmentName: null,
 			jsxPragma: null,
@@ -348,17 +406,40 @@ export function validateVitestPolicy( {
 			comment: true,
 			sourceType: 'module',
 		} );
+	} catch ( error ) {
+		const message =
+			error instanceof Error ? error.message : String( error );
+		return [ `${ file }: unable to parse: ${ message }` ];
+	}
+
+	const { ast, scopeManager, visitorKeys } = parsedSource;
 	const unboundIdentifiers = new Set(
 		scopeManager.globalScope?.through.map(
 			( reference ) => reference.identifier
 		) ?? []
 	);
 	const importedNamespaces = new Set();
+	const domIdentifiers = new Set();
+	const vitestExpectNames = new Set();
+	const vitestNamespaceNames = new Set();
 	const violations = [];
 	const reported = new Set();
 	let hasVitestImport = false;
 
 	const report = ( category, message, node ) => {
+		const exceptionName = {
+			'browser-fire-event': allowBrowserFireEvent
+				? 'browserFireEvent'
+				: null,
+			'jsdom-browser-api': allowJsdomBrowserApis
+				? 'jsdomBrowserApis'
+				: null,
+		}[ category ];
+		if ( exceptionName ) {
+			usedExceptions?.add( exceptionName );
+			return;
+		}
+
 		if ( reported.has( category ) ) {
 			return;
 		}
@@ -377,6 +458,13 @@ export function validateVitestPolicy( {
 		for ( const specifier of node.specifiers ) {
 			if ( specifier.type === 'ImportNamespaceSpecifier' ) {
 				importedNamespaces.add( specifier.local.name );
+			}
+			if ( importSource === 'vitest' ) {
+				if ( specifier.type === 'ImportNamespaceSpecifier' ) {
+					vitestNamespaceNames.add( specifier.local.name );
+				} else if ( getImportedName( specifier ) === 'expect' ) {
+					vitestExpectNames.add( specifier.local.name );
+				}
 			}
 		}
 
@@ -398,8 +486,7 @@ export function validateVitestPolicy( {
 			) &&
 			node.specifiers.some(
 				( specifier ) => getImportedName( specifier ) === 'fireEvent'
-			) &&
-			! allowBrowserFireEvent
+			)
 		) {
 			report(
 				'browser-fire-event',
@@ -407,30 +494,21 @@ export function validateVitestPolicy( {
 				node
 			);
 		}
-
-		const renderedImports = renderedUiImports.get( importSource );
-		if (
-			project === 'jsdom' &&
-			renderedImports &&
-			node.specifiers.some( ( specifier ) => {
-				const importedName = getImportedName( specifier );
-				return (
-					renderedImports.has( importedName ) ||
-					importedName === 'default' ||
-					importedName === '*'
-				);
-			} ) &&
-			! allowRenderedUi
-		) {
-			report(
-				'jsdom-rendered-ui',
-				'rendered UI tests default to Browser Mode; use Node for pure logic or add an explicit jsdom baseline entry for low-level DOM semantics',
-				node
-			);
-		}
 	}
 
 	traverseAst( ast, visitorKeys, ( node ) => {
+		if (
+			node.type === 'VariableDeclarator' &&
+			node.id?.type === 'Identifier' &&
+			isBrowserGlobalExpression(
+				node.init,
+				unboundIdentifiers,
+				domIdentifiers
+			)
+		) {
+			domIdentifiers.add( node.id.name );
+		}
+
 		const moduleSource = getModuleSource( node );
 		if ( isVitestTest && moduleSource === 'vitest' ) {
 			hasVitestImport = true;
@@ -517,8 +595,12 @@ export function validateVitestPolicy( {
 
 		if (
 			project === 'jsdom' &&
-			node.type === 'CallExpression' &&
-			getMemberPropertyName( node.callee ) === 'toHaveStyle'
+			isVitestMatcherCall(
+				node,
+				'toHaveStyle',
+				vitestExpectNames,
+				vitestNamespaceNames
+			)
 		) {
 			report(
 				'jsdom-style-matcher',
@@ -542,13 +624,15 @@ export function validateVitestPolicy( {
 
 		if (
 			project === 'jsdom' &&
-			! allowJsdomBrowserApis &&
 			( ( node.type === 'Identifier' &&
 				browserApiIdentifiers.has( node.name ) &&
 				unboundIdentifiers.has( node ) ) ||
 				( node.type === 'MemberExpression' &&
-					browserApiProperties.has(
-						getMemberPropertyName( node )
+					browserApiProperties.has( getMemberPropertyName( node ) ) &&
+					isBrowserGlobalExpression(
+						node.object,
+						unboundIdentifiers,
+						domIdentifiers
 					) ) )
 		) {
 			report(

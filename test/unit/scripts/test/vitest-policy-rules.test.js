@@ -24,6 +24,17 @@ function expectValid( source, options ) {
 }
 
 describe( 'Vitest policy rules', () => {
+	it( 'reports parser errors with the file path', () => {
+		expect(
+			validate( 'const value = ;', {
+				file: 'packages/example/test/broken.test.js',
+				project: 'node',
+			} )
+		).toEqual( [
+			expect.stringContaining( 'packages/example/test/broken.test.js' ),
+		] );
+	} );
+
 	it( 'rejects Browser Testing Library user-event', () => {
 		expectViolation(
 			"import userEvent from '@testing-library/user-event';",
@@ -52,14 +63,29 @@ describe( 'Vitest policy rules', () => {
 		} );
 	} );
 
-	it( 'rejects new rendered UI jsdom tests outside the baseline', () => {
+	it( 'allows browser API-shaped properties on unrelated jsdom objects', () => {
+		expectValid(
+			'const fake = { scrollTop: 0 };\nfake.scrollTop;\nconst mockLayout = { getBoundingClientRect() {} };\nmockLayout.getBoundingClientRect();',
+			{ project: 'jsdom' }
+		);
+	} );
+
+	it( 'rejects animation APIs on DOM-derived jsdom objects', () => {
+		expectViolation(
+			"const element = document.createElement( 'div' );\nelement.animate( [], {} );",
+			'require Browser Mode',
+			{ project: 'jsdom' }
+		);
+		expectViolation( 'document.getAnimations();', 'require Browser Mode', {
+			project: 'jsdom',
+		} );
+	} );
+
+	it( 'allows rendered UI for deterministic jsdom behavior', () => {
 		const source =
 			"import { render } from '@testing-library/react';\nrender( <div /> );";
 
-		expectViolation( source, 'default to Browser Mode', {
-			project: 'jsdom',
-		} );
-		expectValid( source, { allowRenderedUi: true, project: 'jsdom' } );
+		expectValid( source, { project: 'jsdom' } );
 	} );
 
 	it( 'rejects Browser spies on imported ESM namespace objects', () => {
@@ -189,6 +215,18 @@ describe( 'Vitest policy rules', () => {
 		expectValid( 'controller.animate();', { project: 'jsdom' } );
 	} );
 
+	it( 'matches toHaveStyle only on Vitest expect results', () => {
+		expectValid(
+			"import { expect } from 'vitest';\nreporter.toHaveStyle( 1 );",
+			{ project: 'jsdom' }
+		);
+		expectViolation(
+			"import { expect } from 'vitest';\nexpect( element ).not.toHaveStyle( {} );",
+			'toHaveStyle() requires',
+			{ project: 'jsdom' }
+		);
+	} );
+
 	it( 'rejects the migrated per-file conventions', () => {
 		expectViolation( "require( './module' );", 'unbound require()', {
 			project: 'node',
@@ -209,9 +247,10 @@ describe( 'Vitest policy rules', () => {
 			}
 		);
 		expectViolation(
-			'expect( element ).toHaveStyle( {} );',
+			"import { expect } from 'vitest';\nexpect( element ).toHaveStyle( {} );",
 			'toHaveStyle() requires',
 			{
+				isVitestTest: true,
 				project: 'jsdom',
 			}
 		);
@@ -237,7 +276,6 @@ describe( 'Vitest policy rules', () => {
 						'browser.browser.test.js': 'Tests a raw event.',
 					},
 					jsdomBrowserApis: {},
-					renderedUi: [ 'dom.jsdom.test.js' ],
 				},
 				projects
 			)
@@ -249,7 +287,6 @@ describe( 'Vitest policy rules', () => {
 					jsdomBrowserApis: {
 						'dom.jsdom.test.js': ' ',
 					},
-					renderedUi: [ 'dom.jsdom.test.js', 'dom.jsdom.test.js' ],
 					unexpected: {},
 				},
 				projects
@@ -259,7 +296,33 @@ describe( 'Vitest policy rules', () => {
 				expect.stringContaining( 'contains unsupported keys' ),
 				expect.stringContaining( 'browserFireEvent must be an object' ),
 				expect.stringContaining( 'require a non-empty reason' ),
-				expect.stringContaining( 'renderedUi entries must be unique' ),
+			] )
+		);
+	} );
+
+	it( 'rejects policy exceptions that no longer suppress a violation', () => {
+		const file = 'dom.jsdom.test.js';
+
+		expect(
+			validateVitestPolicyExceptions(
+				{
+					browserFireEvent: {},
+					jsdomBrowserApis: { [ file ]: 'Tests browser APIs.' },
+				},
+				{
+					browserTests: new Set(),
+					jsdomTests: new Set( [ file ] ),
+					usedExceptions: {
+						browserFireEvent: new Set(),
+						jsdomBrowserApis: new Set(),
+					},
+				}
+			)
+		).toEqual(
+			expect.arrayContaining( [
+				expect.stringContaining(
+					`${ file }: jsdomBrowserApis exception is no longer needed`
+				),
 			] )
 		);
 	} );

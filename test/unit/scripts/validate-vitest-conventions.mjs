@@ -61,22 +61,14 @@ const files = [
 	...new Set( [ ...vitestTests, ...vitestInfrastructure ] ),
 ].sort();
 const violations = [];
-const exceptionViolations = validateVitestPolicyExceptions( policyExceptions, {
-	browserTests,
-	jsdomTests,
-} );
-violations.push( ...exceptionViolations );
 const browserFireEventExceptions =
 	policyExceptions?.browserFireEvent ?? Object.create( null );
 const jsdomBrowserApiExceptions =
 	policyExceptions?.jsdomBrowserApis ?? Object.create( null );
-const renderedUiBaseline = new Set(
-	Array.isArray( policyExceptions?.renderedUi )
-		? policyExceptions.renderedUi.filter(
-				( file ) => typeof file === 'string'
-		  )
-		: []
-);
+const usedPolicyExceptions = {
+	browserFireEvent: new Set(),
+	jsdomBrowserApis: new Set(),
+};
 
 function findWorkspacePackage( file ) {
 	let directory = path.dirname( path.join( ROOT_DIR, file ) );
@@ -107,6 +99,7 @@ for ( const file of files ) {
 		project = 'jsdom';
 	}
 
+	const usedExceptions = new Set();
 	violations.push(
 		...validateVitestPolicy( {
 			file,
@@ -117,10 +110,21 @@ for ( const file of files ) {
 				browserFireEventExceptions[ file ]
 			),
 			allowJsdomBrowserApis: Boolean( jsdomBrowserApiExceptions[ file ] ),
-			allowRenderedUi: renderedUiBaseline.has( file ),
+			usedExceptions,
 		} )
 	);
+	for ( const exceptionName of usedExceptions ) {
+		usedPolicyExceptions[ exceptionName ].add( file );
+	}
 }
+
+violations.push(
+	...validateVitestPolicyExceptions( policyExceptions, {
+		browserTests,
+		jsdomTests,
+		usedExceptions: usedPolicyExceptions,
+	} )
+);
 
 const vitestVersions = new Map();
 for ( const file of vitestTests ) {

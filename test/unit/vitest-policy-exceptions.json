@@ -1,8 +1,4 @@
 {
 	"browserFireEvent": {},
-	"jsdomBrowserApis": {},
-	"renderedUi": [
-		"test/unit/config/emotion-compiler.vitest.jsdom.test.jsx",
-		"test/unit/config/setup.vitest.jsdom.test.jsx"
-	]
+	"jsdomBrowserApis": {}
 }
