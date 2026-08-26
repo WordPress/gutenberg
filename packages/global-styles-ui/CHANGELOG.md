@@ -8,7 +8,7 @@
 
 ### Bug Fixes
 
--   Font Library: Keep deactivated theme font variants listed in the font details view so they can be activated again. Deactivating a variant removes it from the user's global styles, so the selected font was previously looked up in the activated fonts only, and an unchecked variant (or a fully deactivated family) vanished from the modal.
+-   Font Library: Keep deactivated theme font variants listed in the font details view so they can be activated again, and count them in the family card's "N of M active" text. Deactivating a variant removes it from the user's global styles, so the modal previously looked fonts up in the activated fonts only, and an unchecked variant (or a fully deactivated family) vanished ([#82091](https://github.com/WordPress/gutenberg/pull/82091)).
 
 ## 1.20.0 (2026-08-12)
 
