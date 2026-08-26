@@ -10,6 +10,10 @@
 		--_gcd-ul-list-style: none;
 		--_gcd-ul-padding: var(--focus-ring-size);
 		--_gcd-ul-margin: calc(-1 * var(--focus-ring-size));
+
+		list-style: none;
+		padding: var(--focus-ring-size);
+		margin: calc(-1 * var(--focus-ring-size));
 		/**
 		 * Scroll horizontally rather than wrap or shrink when items overflow.
 		 */
