@@ -4,7 +4,7 @@ import {
 	Spinner,
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
-import { Stack, VisuallyHidden } from '@wordpress/ui';
+import { Stack, Tabs, VisuallyHidden } from '@wordpress/ui';
 import { useViewportMatch } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -33,6 +33,7 @@ import type { Media } from '../media-editor-provider';
 import MediaPreview from '../media-preview';
 import MediaEditorCanvas from '../media-editor-canvas';
 import MediaEditorFineRotation from '../media-editor-fine-rotation';
+import MediaEditorCropPanel from '../media-editor-crop-panel';
 import MediaEditorImageControls from '../media-editor-image-controls';
 import MediaForm from '../media-form';
 import { getMediaTypeFromMimeType } from '../../utils';
@@ -57,11 +58,21 @@ const ATTACHMENT_EMBED_QUERY = { _embed: 'author,wp:attached-to' } as const;
 const PLACEMENT_CONTROL_IDLE_MS = 300;
 
 /**
- * Identifier for the details panel. The sidebar tracks which panel is open
- * rather than whether one is, so a second panel is a new id here and a new
- * entry wherever panels are rendered — not a change to the state's shape.
+ * Identifier for the details panel, and the panel the sidebar opens on before
+ * the user picks another. The sidebar tracks which panel is open rather than
+ * whether one is, so a further panel is a new id here and a new entry in the
+ * tab list — not a change to the state's shape.
  */
 const DETAILS_PANEL = 'details';
+
+/** Identifier for the crop panel. Images only; other media has nothing to crop. */
+const CROP_PANEL = 'crop';
+
+interface MediaEditorTab {
+	id: string;
+	title: string;
+	render: () => JSX.Element;
+}
 
 export interface MediaEditorFrameProps {
 	children: ReactNode;
@@ -112,23 +123,52 @@ export interface MediaEditorProps {
 }
 
 interface MediaEditorSidebarProps {
-	/** Names the panel's region, and its heading for screen readers. */
-	title: string;
-	children: ReactNode;
+	tabs: MediaEditorTab[];
+	/** The open panel's id. Always one of `tabs`. */
+	activeTab: string;
+	onSelectTab: ( tab: string ) => void;
 }
 
-function MediaEditorSidebar( { title, children }: MediaEditorSidebarProps ) {
+function MediaEditorSidebar( {
+	tabs,
+	activeTab,
+	onSelectTab,
+}: MediaEditorSidebarProps ) {
 	return (
-		<NavigableRegion className="media-editor__sidebar" ariaLabel={ title }>
-			{ /* No visible heading and no close button: the header's pressed
-			     toggle names the open panel and dismisses it at every width, so
-			     a second control inside would be the same job twice. The
-			     heading stays for screen readers, which do not read a pressed
-			     button in the header as this region's title. */ }
-			<VisuallyHidden render={ <h2 /> }>{ title }</VisuallyHidden>
-			<Stack className="media-editor__panel" direction="column" gap="lg">
-				{ children }
-			</Stack>
+		<NavigableRegion
+			className="media-editor__sidebar"
+			ariaLabel={ __( 'Media settings' ) }
+		>
+			{ /* No visible heading and no close button: the tab strip below
+			     names the open panel, and the header's pressed toggle
+			     dismisses it at every width. The heading stays for screen
+			     readers, which do not read either as this region's title. */ }
+			<VisuallyHidden render={ <h2 /> }>
+				{ __( 'Media settings' ) }
+			</VisuallyHidden>
+			<Tabs.Root value={ activeTab } onValueChange={ onSelectTab }>
+				<Tabs.List variant="minimal">
+					{ tabs.map( ( tab ) => (
+						<Tabs.Tab key={ tab.id } value={ tab.id }>
+							{ tab.title }
+						</Tabs.Tab>
+					) ) }
+				</Tabs.List>
+				{ /* `Tabs.Root` throws in dev when its registered Tab and
+				     Panel counts disagree, so every tab renders a panel. */ }
+				{ tabs.map( ( tab ) => (
+					<Tabs.Panel
+						key={ tab.id }
+						value={ tab.id }
+						tabIndex={ -1 }
+						className="media-editor__panel"
+					>
+						<Stack direction="column" gap="lg">
+							{ tab.render() }
+						</Stack>
+					</Tabs.Panel>
+				) ) }
+			</Tabs.Root>
 		</NavigableRegion>
 	);
 }
@@ -150,8 +190,11 @@ interface MediaEditorFrameContextValue {
 	isWide: boolean;
 	/** The open panel's id, or `null` when none is. */
 	activePanel: string | null;
-	/** Opens the given panel, or closes the open one when passed `null`. */
-	onSelectPanel: ( panel: string | null ) => void;
+	/**
+	 * Opens the sidebar on the last-shown panel, or closes it when one is
+	 * already open.
+	 */
+	onTogglePanel: () => void;
 	onCancel: () => void;
 	onSave: () => void;
 	onReset: () => void;
@@ -188,9 +231,9 @@ export interface HeaderActionsProps {
 }
 
 function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
-	const { isImage, isSaving, onCancel, isWide, activePanel, onSelectPanel } =
+	const { isImage, isSaving, onCancel, isWide, activePanel, onTogglePanel } =
 		useMediaEditorFrameContext();
-	const isDetailsOpen = activePanel === DETAILS_PANEL;
+	const isPanelOpen = !! activePanel;
 	const [ isShortcutsModalOpen, setIsShortcutsModalOpen ] = useState( false );
 	return (
 		<Stack
@@ -207,18 +250,20 @@ function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
 					onClick={ () => setIsShortcutsModalOpen( true ) }
 				/>
 			) }
+			{ /* The sidebar holds more than one panel, so this opens and
+			     closes the sidebar rather than naming a panel: reopening
+			     returns to whichever tab was last showing, and the tab strip
+			     inside switches between them. */ }
 			<Button
 				size="compact"
 				icon={ drawerRight }
-				label={ __( 'Details' ) }
-				isPressed={ isDetailsOpen }
+				label={ __( 'Media settings' ) }
+				isPressed={ isPanelOpen }
 				// Only a docked column really expands beside the canvas; below
 				// that the panel replaces the view, which the pressed state
 				// already describes.
-				aria-expanded={ isWide ? isDetailsOpen : undefined }
-				onClick={ () =>
-					onSelectPanel( isDetailsOpen ? null : DETAILS_PANEL )
-				}
+				aria-expanded={ isWide ? isPanelOpen : undefined }
+				onClick={ onTogglePanel }
 			/>
 			{ showCloseButton && (
 				<Button
@@ -401,9 +446,19 @@ function MediaEditorContent( {
 	// and then resizing — or crossing the breakpoint by rotating a tablet —
 	// should not reopen something they just dismissed.
 	const hasChosenPanelRef = useRef( false );
+	// The panel the toggle reopens. Tracks the last one shown so closing and
+	// reopening returns where the user was, rather than to a fixed tab.
+	const lastPanelRef = useRef( DETAILS_PANEL );
 	const selectPanel = useCallback( ( panel: string | null ) => {
 		hasChosenPanelRef.current = true;
+		if ( panel ) {
+			lastPanelRef.current = panel;
+		}
 		setActivePanel( panel );
+	}, [] );
+	const togglePanel = useCallback( () => {
+		hasChosenPanelRef.current = true;
+		setActivePanel( ( open ) => ( open ? null : lastPanelRef.current ) );
 	}, [] );
 	// Until then, follow the breakpoint: dragging a window narrow hands the
 	// canvas the full width instead of leaving a panel wedged beside it.
@@ -506,7 +561,12 @@ function MediaEditorContent( {
 	const isImage = !! media && mediaType === 'image';
 	// Only `resetCropOptions` is needed here, for the Reset button; the
 	// aspect-ratio members are read by `MediaEditorImageControls` itself.
-	const { resetCropOptions } = useCropOptions( { aspectRatioPresets } );
+	const {
+		aspectRatioValue,
+		setAspectRatioValue,
+		aspectRatioOptions,
+		resetCropOptions,
+	} = useCropOptions( { aspectRatioPresets } );
 	const { isSaving, save: saveMediaEditor } = useSaveMediaEditor( {
 		cropper,
 		id,
@@ -583,16 +643,47 @@ function MediaEditorContent( {
 		/>
 	);
 
-	// Rotate, flip, zoom and aspect ratio act on the image, so they sit with
-	// the image: under the canvas next to the fine-rotation ruler, at every
-	// viewport. One layout instead of two, and the controls stay reachable
-	// whether or not the Details panel is open.
-	const imageControls = isImage ? (
-		<MediaEditorImageControls
-			showAspectRatioControl
-			aspectRatioPresets={ aspectRatioPresets }
-		/>
-	) : null;
+	// Below `small` there is no room for a side panel, so the Crop panel's
+	// rotate/flip/zoom fall back to a flat row under the canvas beside the
+	// ruler, with aspect ratio joining them as a dropdown. Above `small` the
+	// Crop panel carries them and this renders nothing.
+	const imageControls =
+		isImage && ! isSmall ? (
+			<MediaEditorImageControls
+				showAspectRatioControl
+				aspectRatioPresets={ aspectRatioPresets }
+			/>
+		) : null;
+
+	// Crop first, matching the order the controls sit in under the canvas.
+	// Non-image media has nothing to crop, so it gets Details alone — which
+	// is why the sidebar takes the list rather than deriving it.
+	const tabs: MediaEditorTab[] = [
+		...( isImage
+			? [
+					{
+						id: CROP_PANEL,
+						title: __( 'Crop' ),
+						render: () => (
+							<MediaEditorCropPanel
+								aspectRatioValue={ aspectRatioValue }
+								onAspectRatioChange={ setAspectRatioValue }
+								aspectRatioOptions={ aspectRatioOptions }
+								// Above `small` the panel carries
+								// rotate/flip/zoom; below it they have no
+								// panel to live in and sit under the canvas.
+								showTransformControls={ isSmall }
+							/>
+						),
+					},
+			  ]
+			: [] ),
+		{
+			id: DETAILS_PANEL,
+			title: __( 'Details' ),
+			render: () => <MediaForm />,
+		},
+	];
 
 	const ruler = isImage ? (
 		<MediaEditorFineRotation
@@ -646,10 +737,12 @@ function MediaEditorContent( {
 								</div>
 							) }
 						</NavigableRegion>
-						{ activePanel === DETAILS_PANEL && (
-							<MediaEditorSidebar title={ __( 'Details' ) }>
-								<MediaForm />
-							</MediaEditorSidebar>
+						{ !! activePanel && (
+							<MediaEditorSidebar
+								tabs={ tabs }
+								activeTab={ activePanel }
+								onSelectTab={ selectPanel }
+							/>
 						) }
 					</div>
 				) }
@@ -685,7 +778,7 @@ function MediaEditorContent( {
 		aspectRatioPresets,
 		isWide,
 		activePanel,
-		onSelectPanel: selectPanel,
+		onTogglePanel: togglePanel,
 		onCancel: handleRequestClose,
 		onSave: saveMediaEditor,
 		onReset: resetCropOptions,

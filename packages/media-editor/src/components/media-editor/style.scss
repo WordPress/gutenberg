@@ -40,14 +40,14 @@
 		min-height: 0;
 		margin: $grid-unit-30 $grid-unit-30 $grid-unit-10 $grid-unit-30;
 
-		// Docked beside the 350px panel, the canvas keeps a workable crop area.
+		// Docked beside the 320px panel, the canvas keeps a workable crop area.
 		// The figure has to close at the dock breakpoint itself: at 960px the
-		// modal is ~920px inside its own margins, less the 350px panel and
-		// this column's 2 x 24px gutters, which leaves ~520px. Asking for more
+		// modal is ~920px inside its own margins, less the 320px panel and
+		// this column's 2 x 24px gutters, which leaves ~550px. Asking for more
 		// than that pushes the panel past the modal's right edge instead of
 		// shrinking the canvas.
 		@include break-large() {
-			min-width: 490px;
+			min-width: 520px;
 			margin: 0 $grid-unit-30;
 		}
 	}
@@ -102,11 +102,11 @@
 		}
 	}
 
-	// Details panel. Below `large` it takes the whole body: there is not
+	// Settings panel. Below `large` it takes the whole body: there is not
 	// enough width for a usable canvas and a usable panel at once, and sharing
 	// leaves the canvas too narrow to crop in — at 782px the panel was clipped
 	// by the modal edge outright. From `large` (960px) up there is room for
-	// both: 400 panel + 600 canvas fits inside the modal's gutters.
+	// both: 320 panel + 600 canvas fits inside the modal's gutters.
 	.media-editor__sidebar {
 		display: flex;
 		flex: 1;
@@ -114,20 +114,24 @@
 		min-width: 0;
 		min-height: 0;
 		overflow-y: auto;
-		// Equal inline gutter so focus rings (outline + offset) sit inside the
-		// panel rather than being clipped by the scroll container.
-		padding-inline: $grid-unit-20;
-		padding-bottom: $grid-unit-30;
 
-		// 350px rather than the 280px `$sidebar-width`: #81121 reports the
-		// panel reading as squished at roughly 250px, with four editable
-		// fields stacked above six read-only facts. No base-styles token sits
-		// between 280px and the full width, so the value is explicit.
+		// The `sm` surface-width token, up from the 280px `$sidebar-width`
+		// this used to inherit: #81121 reports the panel reading as squished
+		// at roughly 250px, with four editable fields stacked above six
+		// read-only facts.
 		@include break-large() {
 			flex: none;
-			width: 350px;
-			padding-inline: $grid-unit-20;
+			width: var(--wpds-dimension-surface-width-sm);
 		}
+	}
+
+	// The tab strip runs the panel's full width so its underline meets both
+	// edges; the gutter belongs to the pane below it. Equal inline padding so
+	// focus rings (outline + offset) sit inside the pane rather than being
+	// clipped by the scroll container.
+	.media-editor__panel {
+		padding-block: $grid-unit-20 $grid-unit-30;
+		padding-inline: $grid-unit-20;
 	}
 
 	// Below `large` an open panel owns the body, so the canvas steps aside
@@ -143,9 +147,6 @@
 		}
 	}
 
-	.media-editor__panel {
-		padding: $grid-unit-20 $grid-unit-10;
-	}
 }
 
 .media-editor__snackbar {
