@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.6.0 (2026-08-26)
+
 ### New Features
 
 -   `WidgetHostProvider` / `useWidgetHost`: the seam through which a host
