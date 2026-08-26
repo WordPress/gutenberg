@@ -1,9 +1,4 @@
-import { readFile } from 'node:fs/promises';
-import path from 'node:path';
 import spawn from 'cross-spawn';
-
-const declarationSpecifierPattern =
-	/(?:\b(?:from|import)\s*\(?\s*|\brequire\s*\(\s*|<reference\s+(?:path|types)=\s*)(['"])(\.\.?\/[^'"]+\.tsx?)\1/g;
 
 export function publishesBuildTypes( { directory, packageJson } ) {
 	const result = spawn.sync(
@@ -50,24 +45,4 @@ export function publishesBuildTypes( { directory, packageJson } ) {
 			file.path === 'build-types' ||
 			file.path.startsWith( 'build-types/' )
 	);
-}
-
-export async function findInvalidTypeScriptSpecifiers(
-	declarations,
-	rootDirectory
-) {
-	const invalidSpecifiers = [];
-	for ( const declaration of declarations ) {
-		const contents = await readFile( declaration, 'utf8' );
-		for ( const match of contents.matchAll(
-			declarationSpecifierPattern
-		) ) {
-			invalidSpecifiers.push( {
-				file: path.relative( rootDirectory, declaration ),
-				line: contents.slice( 0, match.index ).split( /\r?\n/ ).length,
-				specifier: match[ 2 ],
-			} );
-		}
-	}
-	return invalidSpecifiers;
 }

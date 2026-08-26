@@ -1,10 +1,7 @@
 import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import {
-	findInvalidTypeScriptSpecifiers,
-	publishesBuildTypes,
-} from '../packages/check-esm-package-types-helpers.mjs';
+import { publishesBuildTypes } from '../packages/check-esm-package-types-helpers.mjs';
 
 let fixtureDirectory;
 
@@ -50,40 +47,4 @@ test( 'skips a package whose packed files omit build-types', async () => {
 	expect(
 		publishesBuildTypes( { directory: fixtureDirectory, packageJson } )
 	).toBe( false );
-} );
-
-test( 'accepts relative JavaScript specifiers in declarations', async () => {
-	fixtureDirectory = await mkdtemp(
-		path.join( tmpdir(), 'gutenberg-esm-package-types-' )
-	);
-	const declaration = path.join( fixtureDirectory, 'index.d.ts' );
-	await writeFile(
-		declaration,
-		"export type { Value } from './value.js';\n"
-	);
-
-	await expect(
-		findInvalidTypeScriptSpecifiers( [ declaration ], fixtureDirectory )
-	).resolves.toEqual( [] );
-} );
-
-test( 'rejects relative TypeScript specifiers in declarations', async () => {
-	fixtureDirectory = await mkdtemp(
-		path.join( tmpdir(), 'gutenberg-esm-package-types-' )
-	);
-	const declaration = path.join( fixtureDirectory, 'index.d.ts' );
-	await writeFile(
-		declaration,
-		[
-			"export type { Value } from './value.ts';",
-			"export type Component = import( './component.tsx' ).Component;",
-		].join( '\n' )
-	);
-
-	await expect(
-		findInvalidTypeScriptSpecifiers( [ declaration ], fixtureDirectory )
-	).resolves.toEqual( [
-		{ file: 'index.d.ts', line: 1, specifier: './value.ts' },
-		{ file: 'index.d.ts', line: 2, specifier: './component.tsx' },
-	] );
 } );

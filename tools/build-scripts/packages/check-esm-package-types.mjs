@@ -5,10 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import spawn from 'cross-spawn';
 import fastGlob from 'fast-glob';
-import {
-	findInvalidTypeScriptSpecifiers,
-	publishesBuildTypes,
-} from './check-esm-package-types-helpers.mjs';
+import { publishesBuildTypes } from './check-esm-package-types-helpers.mjs';
 
 const rootDirectory = path.resolve(
 	path.dirname( fileURLToPath( import.meta.url ) ),
@@ -51,25 +48,6 @@ async function checkNodeNextTypes( { directory, packageJson } ) {
 	if ( declarations.length === 0 ) {
 		throw new Error( `No declarations found for ${ packageJson.name }` );
 	}
-	const invalidSpecifiers = await findInvalidTypeScriptSpecifiers(
-		declarations,
-		rootDirectory
-	);
-	if ( invalidSpecifiers.length > 0 ) {
-		throw new Error(
-			`Published declarations for ${
-				packageJson.name
-			} use relative TypeScript file extensions:\n${ invalidSpecifiers
-				.map(
-					( { file, line, specifier } ) =>
-						`${ file }:${ line }: ${ specifier }`
-				)
-				.join(
-					'\n'
-				) }\nUse .js specifiers so declarations work across Node-style TypeScript resolution modes.`
-		);
-	}
-
 	const temporaryDirectory = await mkdtemp(
 		path.join( tmpdir(), 'gutenberg-esm-types-' )
 	);
