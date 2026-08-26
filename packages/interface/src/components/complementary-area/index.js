@@ -26,7 +26,10 @@ import {
 } from '@wordpress/compose';
 import { usePluginContext } from '@wordpress/plugins';
 import ComplementaryAreaHeader from '../complementary-area-header';
-import ComplementaryAreaMoreMenuItem from '../complementary-area-more-menu-item';
+import {
+	DefaultComplementaryAreaMoreMenuItem,
+	useHasComplementaryAreaMenuItem,
+} from '../complementary-area-more-menu-item';
 import ComplementaryAreaToggle from '../complementary-area-toggle';
 import PinnedItems from '../pinned-items';
 import { store as interfaceStore } from '../../store';
@@ -232,6 +235,7 @@ function ComplementaryArea( {
 		[ identifier, scope ]
 	);
 
+	const hasMenuItem = useHasComplementaryAreaMenuItem( scope, name );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 
 	useAdjustComplementaryListener(
@@ -294,15 +298,15 @@ function ComplementaryArea( {
 					) }
 				</PinnedItems>
 			) }
-			{ name && isPinnable && (
-				<ComplementaryAreaMoreMenuItem
+			{ name && isPinnable && ! hasMenuItem && (
+				<DefaultComplementaryAreaMoreMenuItem
 					target={ name }
 					scope={ scope }
 					icon={ icon }
 					identifier={ identifier }
 				>
 					{ title }
-				</ComplementaryAreaMoreMenuItem>
+				</DefaultComplementaryAreaMoreMenuItem>
 			) }
 			<ComplementaryAreaFill
 				activeArea={ activeArea }

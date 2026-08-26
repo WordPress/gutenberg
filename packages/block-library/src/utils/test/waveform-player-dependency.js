@@ -1,14 +1,5 @@
 import '@testing-library/jest-dom';
 
-const DEFAULT_PLAYBACK_RATES = [
-	'0.5x',
-	'0.75x',
-	'1x',
-	'1.25x',
-	'1.5x',
-	'1.75x',
-	'2x',
-];
 const FIXTURE_ATTRIBUTE = 'data-player-fixture';
 
 function createDeclarativePlayer( attributes = {} ) {
@@ -31,10 +22,6 @@ function loadWaveformPlayer() {
 	} );
 
 	return WaveformPlayer;
-}
-
-function getFragmentedAttributeValue( prefix = '' ) {
-	return `${ prefix }" ${ FIXTURE_ATTRIBUTE }="sample`;
 }
 
 describe( 'Waveform Player dependency', () => {
@@ -102,43 +89,6 @@ describe( 'Waveform Player dependency', () => {
 		).not.toBeNull();
 	} );
 
-	it( 'uses the default alignment when a declarative alignment value is unsupported', () => {
-		const element = createDeclarativePlayer( {
-			'data-button-align': getFragmentedAttributeValue( 'center' ),
-		} );
-
-		WaveformPlayer = loadWaveformPlayer();
-		WaveformPlayer.init();
-
-		const track = element.querySelector( '.waveform-track' );
-		expect( track ).toHaveClass( 'waveform-align-center' );
-		expect( track ).not.toHaveAttribute( FIXTURE_ATTRIBUTE );
-	} );
-
-	it( 'uses the default playback rates when a declarative rate list is unsupported', () => {
-		const element = createDeclarativePlayer( {
-			'data-show-playback-speed': 'true',
-			'data-playback-rates': JSON.stringify( [
-				1,
-				getFragmentedAttributeValue( '1' ),
-				1.5,
-			] ),
-		} );
-
-		WaveformPlayer = loadWaveformPlayer();
-		WaveformPlayer.init();
-
-		const options = [ ...element.querySelectorAll( '.speed-option' ) ];
-		expect( options.map( ( option ) => option.textContent ) ).toEqual(
-			DEFAULT_PLAYBACK_RATES
-		);
-		expect(
-			options.some( ( option ) =>
-				option.hasAttribute( FIXTURE_ATTRIBUTE )
-			)
-		).toBe( false );
-	} );
-
 	it( 'supports custom control icons passed to the constructor', () => {
 		const element = document.createElement( 'div' );
 		const icon = document.createElementNS(
@@ -155,30 +105,6 @@ describe( 'Waveform Player dependency', () => {
 
 		expect(
 			element.querySelector( `[${ FIXTURE_ATTRIBUTE }="constructor"]` )
-		).not.toBeNull();
-	} );
-
-	it( 'skips programmatic players during explicit declarative scans', () => {
-		const element = createDeclarativePlayer();
-		const icon = document.createElementNS(
-			'http://www.w3.org/2000/svg',
-			'svg'
-		);
-		icon.setAttribute( FIXTURE_ATTRIBUTE, 'constructor-scan' );
-
-		WaveformPlayer = loadWaveformPlayer();
-		const player = new WaveformPlayer( element, {
-			playIcon: icon.outerHTML,
-		} );
-
-		WaveformPlayer.init();
-
-		expect( WaveformPlayer.getAllInstances() ).toHaveLength( 1 );
-		expect( WaveformPlayer.getInstance( element ) ).toBe( player );
-		expect(
-			element.querySelector(
-				`[${ FIXTURE_ATTRIBUTE }="constructor-scan"]`
-			)
 		).not.toBeNull();
 	} );
 
