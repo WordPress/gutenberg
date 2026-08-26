@@ -1197,19 +1197,38 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$post_id = self::factory()->post->create();
 		$note_id = $this->create_note( $post_id, self::$editor_id );
 
-		// The earliest row: the one every request converges on.
-		$survivor_id = $this->create_reaction( $post_id, $note_id, self::$editor_id );
+		$survivor_id = 0;
+		$deleted     = false;
 
-		// Delete this request's freshly inserted row right after it lands, as
-		// a competing request running the same cleanup would.
-		$deleted = false;
-		$race    = function ( $comment_id, $comment ) use ( $survivor_id, &$deleted ) {
+		// Stand in for the competing request's cleanup: it keeps the earliest
+		// row and deletes this request's later one, which lands first.
+		$race = function ( $comment_id, $comment ) use ( &$survivor_id, &$deleted ) {
 			if ( ! $deleted && 'reaction' === $comment->comment_type && (int) $comment_id !== $survivor_id ) {
 				$deleted = true;
 				wp_delete_comment( $comment_id, true );
 			}
 		};
-		add_action( 'wp_insert_comment', $race, 10, 2 );
+
+		// Insert the competing row after this request's pre-insert uniqueness
+		// check has passed, so it takes the earlier ID. Arm the cleanup only
+		// once that row exists, so its own insert does not trigger it.
+		$inject = function ( $prepared ) use ( $note_id, $post_id, $race, &$survivor_id ) {
+			if ( ! $survivor_id && isset( $prepared['comment_type'] ) && 'reaction' === $prepared['comment_type'] ) {
+				$survivor_id = wp_insert_comment(
+					array(
+						'comment_post_ID'  => $post_id,
+						'comment_parent'   => $note_id,
+						'comment_type'     => 'reaction',
+						'comment_content'  => 'heart',
+						'comment_approved' => 1,
+						'user_id'          => self::$editor_id,
+					)
+				);
+				add_action( 'wp_insert_comment', $race, 10, 2 );
+			}
+			return $prepared;
+		};
+		add_filter( 'rest_pre_insert_comment', $inject );
 
 		try {
 			$params  = array(
@@ -1224,10 +1243,11 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			$request->set_body( wp_json_encode( $params ) );
 			$response = rest_get_server()->dispatch( $request );
 		} finally {
+			remove_filter( 'rest_pre_insert_comment', $inject );
 			remove_action( 'wp_insert_comment', $race, 10 );
 		}
 
-		$this->assertTrue( $deleted, 'The race injection did not run.' );
+		$this->assertTrue( $deleted, 'The race injection did not delete this request\'s row.' );
 		$this->assertSame( 201, $response->get_status() );
 		$this->assertSame( $survivor_id, $response->get_data()['id'], 'Response did not repoint to the surviving row.' );
 	}
