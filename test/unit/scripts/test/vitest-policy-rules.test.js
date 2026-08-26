@@ -113,6 +113,10 @@ describe( 'Vitest policy rules', () => {
 			"import { screen } from '@testing-library/react';\nconst button = await screen.findByRole( 'button' );\nbutton.offsetWidth;",
 			"import { findByRole } from '@testing-library/react';\nconst button = await findByRole( document.body, 'button' );\nbutton.offsetWidth;",
 			"import * as RTL from '@testing-library/react';\nconst { screen: ui } = RTL;\nui.getByRole( 'button' ).offsetWidth;",
+			"import { screen } from '@testing-library/react';\nscreen.getAllByRole( 'button' )[ 0 ].offsetWidth;",
+			"import { screen } from '@testing-library/react';\nconst buttons = await screen.findAllByRole( 'button' );\nbuttons[ 0 ].offsetWidth;",
+			"import * as RTL from '@testing-library/react';\nRTL.getByRole( document.body, 'button' ).offsetWidth;",
+			"import * as RTL from '@testing-library/react';\nconst { getByRole } = RTL;\ngetByRole( document.body, 'button' ).offsetWidth;",
 			'let element;\nelement = document.body;\nelement.offsetWidth;',
 		] ) {
 			expectViolation( source, 'require Browser Mode', {

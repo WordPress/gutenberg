@@ -88,6 +88,36 @@ const domProducingMethods = new Set( [
 ] );
 const testingLibraryQueryPattern = /^(?:get|query)By/;
 const testingLibraryAsyncQueryPattern = /^findBy/;
+const testingLibraryCollectionQueryPattern = /^(?:get|query)AllBy/;
+const testingLibraryAsyncCollectionQueryPattern = /^findAllBy/;
+
+function getTestingLibraryQueryVariables(
+	propertyName,
+	{
+		asyncCollectionVariables,
+		asyncDomVariables,
+		collectionVariables,
+		domVariables,
+	}
+) {
+	if ( testingLibraryAsyncCollectionQueryPattern.test( propertyName ) ) {
+		return asyncCollectionVariables;
+	}
+
+	if ( testingLibraryAsyncQueryPattern.test( propertyName ) ) {
+		return asyncDomVariables;
+	}
+
+	if ( testingLibraryCollectionQueryPattern.test( propertyName ) ) {
+		return collectionVariables;
+	}
+
+	if ( testingLibraryQueryPattern.test( propertyName ) ) {
+		return domVariables;
+	}
+
+	return null;
+}
 
 function getImportedName( specifier ) {
 	if ( specifier.type === 'ImportDefaultSpecifier' ) {
@@ -231,14 +261,13 @@ function isWindowReference(
 	);
 }
 
-function isTestingLibraryDomExpression(
+function isTestingLibraryQueryExpression(
 	node,
 	testingLibraryScreenVariables,
-	testingLibraryDomFunctionVariables,
-	testingLibraryAsyncDomFunctionVariables,
+	testingLibraryFunctionVariables,
 	testingLibraryNamespaceVariables,
 	identifierVariables,
-	allowAsync = false
+	queryPattern
 ) {
 	if ( node?.type !== 'CallExpression' ) {
 		return false;
@@ -247,9 +276,7 @@ function isTestingLibraryDomExpression(
 	if (
 		isVariableReference(
 			node.callee,
-			allowAsync
-				? testingLibraryAsyncDomFunctionVariables
-				: testingLibraryDomFunctionVariables,
+			testingLibraryFunctionVariables,
 			identifierVariables
 		)
 	) {
@@ -258,11 +285,7 @@ function isTestingLibraryDomExpression(
 
 	if (
 		node.callee?.type !== 'MemberExpression' ||
-		! (
-			allowAsync
-				? testingLibraryAsyncQueryPattern
-				: testingLibraryQueryPattern
-		).test( getMemberPropertyName( node.callee ) ?? '' )
+		! queryPattern.test( getMemberPropertyName( node.callee ) ?? '' )
 	) {
 		return false;
 	}
@@ -272,6 +295,15 @@ function isTestingLibraryDomExpression(
 		isVariableReference(
 			receiver,
 			testingLibraryScreenVariables,
+			identifierVariables
+		)
+	) {
+		return true;
+	}
+	if (
+		isVariableReference(
+			receiver,
+			testingLibraryNamespaceVariables,
 			identifierVariables
 		)
 	) {
@@ -289,15 +321,64 @@ function isTestingLibraryDomExpression(
 	);
 }
 
+function isTestingLibraryDomExpression(
+	node,
+	testingLibraryScreenVariables,
+	testingLibraryDomFunctionVariables,
+	testingLibraryAsyncDomFunctionVariables,
+	testingLibraryNamespaceVariables,
+	identifierVariables,
+	allowAsync = false
+) {
+	return isTestingLibraryQueryExpression(
+		node,
+		testingLibraryScreenVariables,
+		allowAsync
+			? testingLibraryAsyncDomFunctionVariables
+			: testingLibraryDomFunctionVariables,
+		testingLibraryNamespaceVariables,
+		identifierVariables,
+		allowAsync
+			? testingLibraryAsyncQueryPattern
+			: testingLibraryQueryPattern
+	);
+}
+
+function isTestingLibraryDomCollectionExpression(
+	node,
+	testingLibraryScreenVariables,
+	testingLibraryCollectionFunctionVariables,
+	testingLibraryAsyncCollectionFunctionVariables,
+	testingLibraryNamespaceVariables,
+	identifierVariables,
+	allowAsync = false
+) {
+	return isTestingLibraryQueryExpression(
+		node,
+		testingLibraryScreenVariables,
+		allowAsync
+			? testingLibraryAsyncCollectionFunctionVariables
+			: testingLibraryCollectionFunctionVariables,
+		testingLibraryNamespaceVariables,
+		identifierVariables,
+		allowAsync
+			? testingLibraryAsyncCollectionQueryPattern
+			: testingLibraryCollectionQueryPattern
+	);
+}
+
 function isBrowserGlobalExpression(
 	node,
 	unboundIdentifiers,
 	domVariables,
+	domCollectionVariables,
 	identifierVariables,
 	windowVariables,
 	testingLibraryScreenVariables,
 	testingLibraryDomFunctionVariables,
 	testingLibraryAsyncDomFunctionVariables,
+	testingLibraryCollectionFunctionVariables,
+	testingLibraryAsyncCollectionFunctionVariables,
 	testingLibraryNamespaceVariables
 ) {
 	if ( node?.type === 'Identifier' ) {
@@ -333,17 +414,39 @@ function isBrowserGlobalExpression(
 			node.callee.object,
 			unboundIdentifiers,
 			domVariables,
+			domCollectionVariables,
 			identifierVariables,
 			windowVariables,
 			testingLibraryScreenVariables,
 			testingLibraryDomFunctionVariables,
 			testingLibraryAsyncDomFunctionVariables,
+			testingLibraryCollectionFunctionVariables,
+			testingLibraryAsyncCollectionFunctionVariables,
 			testingLibraryNamespaceVariables
 		);
 	}
 
 	if ( node?.type === 'MemberExpression' ) {
 		const propertyName = getMemberPropertyName( node );
+		if (
+			node.computed &&
+			typeof propertyName === 'number' &&
+			( isVariableReference(
+				node.object,
+				domCollectionVariables,
+				identifierVariables
+			) ||
+				isTestingLibraryDomCollectionExpression(
+					node.object,
+					testingLibraryScreenVariables,
+					testingLibraryCollectionFunctionVariables,
+					testingLibraryAsyncCollectionFunctionVariables,
+					testingLibraryNamespaceVariables,
+					identifierVariables
+				) )
+		) {
+			return true;
+		}
 		if (
 			isWindowReference(
 				node.object,
@@ -366,11 +469,14 @@ function isBrowserGlobalExpression(
 			node.object,
 			unboundIdentifiers,
 			domVariables,
+			domCollectionVariables,
 			identifierVariables,
 			windowVariables,
 			testingLibraryScreenVariables,
 			testingLibraryDomFunctionVariables,
 			testingLibraryAsyncDomFunctionVariables,
+			testingLibraryCollectionFunctionVariables,
+			testingLibraryAsyncCollectionFunctionVariables,
 			testingLibraryNamespaceVariables
 		);
 	}
@@ -381,22 +487,28 @@ function isBrowserGlobalExpression(
 				node.consequent,
 				unboundIdentifiers,
 				domVariables,
+				domCollectionVariables,
 				identifierVariables,
 				windowVariables,
 				testingLibraryScreenVariables,
 				testingLibraryDomFunctionVariables,
 				testingLibraryAsyncDomFunctionVariables,
+				testingLibraryCollectionFunctionVariables,
+				testingLibraryAsyncCollectionFunctionVariables,
 				testingLibraryNamespaceVariables
 			) ||
 			isBrowserGlobalExpression(
 				node.alternate,
 				unboundIdentifiers,
 				domVariables,
+				domCollectionVariables,
 				identifierVariables,
 				windowVariables,
 				testingLibraryScreenVariables,
 				testingLibraryDomFunctionVariables,
 				testingLibraryAsyncDomFunctionVariables,
+				testingLibraryCollectionFunctionVariables,
+				testingLibraryAsyncCollectionFunctionVariables,
 				testingLibraryNamespaceVariables
 			)
 		);
@@ -408,22 +520,28 @@ function isBrowserGlobalExpression(
 				node.left,
 				unboundIdentifiers,
 				domVariables,
+				domCollectionVariables,
 				identifierVariables,
 				windowVariables,
 				testingLibraryScreenVariables,
 				testingLibraryDomFunctionVariables,
 				testingLibraryAsyncDomFunctionVariables,
+				testingLibraryCollectionFunctionVariables,
+				testingLibraryAsyncCollectionFunctionVariables,
 				testingLibraryNamespaceVariables
 			) ||
 			isBrowserGlobalExpression(
 				node.right,
 				unboundIdentifiers,
 				domVariables,
+				domCollectionVariables,
 				identifierVariables,
 				windowVariables,
 				testingLibraryScreenVariables,
 				testingLibraryDomFunctionVariables,
 				testingLibraryAsyncDomFunctionVariables,
+				testingLibraryCollectionFunctionVariables,
+				testingLibraryAsyncCollectionFunctionVariables,
 				testingLibraryNamespaceVariables
 			)
 		);
@@ -444,11 +562,14 @@ function isBrowserGlobalExpression(
 				node.argument,
 				unboundIdentifiers,
 				domVariables,
+				domCollectionVariables,
 				identifierVariables,
 				windowVariables,
 				testingLibraryScreenVariables,
 				testingLibraryDomFunctionVariables,
 				testingLibraryAsyncDomFunctionVariables,
+				testingLibraryCollectionFunctionVariables,
+				testingLibraryAsyncCollectionFunctionVariables,
 				testingLibraryNamespaceVariables
 			)
 		);
@@ -466,11 +587,14 @@ function isBrowserGlobalExpression(
 			node.expression,
 			unboundIdentifiers,
 			domVariables,
+			domCollectionVariables,
 			identifierVariables,
 			windowVariables,
 			testingLibraryScreenVariables,
 			testingLibraryDomFunctionVariables,
 			testingLibraryAsyncDomFunctionVariables,
+			testingLibraryCollectionFunctionVariables,
+			testingLibraryAsyncCollectionFunctionVariables,
 			testingLibraryNamespaceVariables
 		);
 	}
@@ -837,8 +961,11 @@ export function validateVitestPolicy( {
 	const identifierVariables = createIdentifierVariableMap( scopeManager );
 	const importedNamespaces = new Set();
 	const computedStyleVariables = new Set();
+	const domCollectionVariables = new Set();
 	const domVariables = new Set();
+	const testingLibraryAsyncCollectionFunctionVariables = new Set();
 	const testingLibraryAsyncDomFunctionVariables = new Set();
+	const testingLibraryCollectionFunctionVariables = new Set();
 	const testingLibraryDomFunctionVariables = new Set();
 	const testingLibraryFireEventVariables = new Set();
 	const testingLibraryNamespaceVariables = new Set();
@@ -901,9 +1028,23 @@ export function validateVitestPolicy( {
 				if ( importedName === 'screen' ) {
 					testingLibraryScreenVariables.add( variable );
 				} else if (
+					testingLibraryAsyncCollectionQueryPattern.test(
+						importedName ?? ''
+					)
+				) {
+					testingLibraryAsyncCollectionFunctionVariables.add(
+						variable
+					);
+				} else if (
 					testingLibraryAsyncQueryPattern.test( importedName ?? '' )
 				) {
 					testingLibraryAsyncDomFunctionVariables.add( variable );
+				} else if (
+					testingLibraryCollectionQueryPattern.test(
+						importedName ?? ''
+					)
+				) {
+					testingLibraryCollectionFunctionVariables.add( variable );
 				} else if (
 					testingLibraryQueryPattern.test( importedName ?? '' )
 				) {
@@ -962,6 +1103,7 @@ export function validateVitestPolicy( {
 		previousTrackedVariableCount !==
 		importedNamespaces.size +
 			computedStyleVariables.size +
+			domCollectionVariables.size +
 			domVariables.size +
 			testingLibraryFireEventVariables.size +
 			testingLibraryNamespaceVariables.size +
@@ -974,6 +1116,7 @@ export function validateVitestPolicy( {
 		previousTrackedVariableCount =
 			importedNamespaces.size +
 			computedStyleVariables.size +
+			domCollectionVariables.size +
 			domVariables.size +
 			testingLibraryFireEventVariables.size +
 			testingLibraryNamespaceVariables.size +
@@ -1069,6 +1212,37 @@ export function validateVitestPolicy( {
 						}
 					}
 				}
+
+				for ( const property of target.properties ?? [] ) {
+					if ( property.type !== 'Property' ) {
+						continue;
+					}
+					const propertyName =
+						property.key?.name ?? property.key?.value ?? '';
+					const variables = getTestingLibraryQueryVariables(
+						propertyName,
+						{
+							asyncCollectionVariables:
+								testingLibraryAsyncCollectionFunctionVariables,
+							asyncDomVariables:
+								testingLibraryAsyncDomFunctionVariables,
+							collectionVariables:
+								testingLibraryCollectionFunctionVariables,
+							domVariables: testingLibraryDomFunctionVariables,
+						}
+					);
+					if ( ! variables ) {
+						continue;
+					}
+					for ( const identifier of getPatternIdentifiers(
+						property.value
+					) ) {
+						const variable = identifierVariables.get( identifier );
+						if ( variable ) {
+							variables.add( variable );
+						}
+					}
+				}
 			}
 
 			const isWindowValue = isWindowReference(
@@ -1108,16 +1282,52 @@ export function validateVitestPolicy( {
 				}
 			}
 
+			const isDomCollectionValue =
+				isVariableReference(
+					value,
+					domCollectionVariables,
+					identifierVariables
+				) ||
+				isTestingLibraryDomCollectionExpression(
+					value.type === 'AwaitExpression' ? value.argument : value,
+					testingLibraryScreenVariables,
+					testingLibraryCollectionFunctionVariables,
+					testingLibraryAsyncCollectionFunctionVariables,
+					testingLibraryNamespaceVariables,
+					identifierVariables,
+					value.type === 'AwaitExpression'
+				);
+			if ( isDomCollectionValue ) {
+				if ( target.type === 'Identifier' ) {
+					const variable = identifierVariables.get( target );
+					if ( variable ) {
+						domCollectionVariables.add( variable );
+					}
+				} else if ( target.type === 'ArrayPattern' ) {
+					for ( const identifier of getPatternIdentifiers(
+						target
+					) ) {
+						const variable = identifierVariables.get( identifier );
+						if ( variable ) {
+							domVariables.add( variable );
+						}
+					}
+				}
+			}
+
 			if (
 				! isBrowserGlobalExpression(
 					value,
 					unboundIdentifiers,
 					domVariables,
+					domCollectionVariables,
 					identifierVariables,
 					windowVariables,
 					testingLibraryScreenVariables,
 					testingLibraryDomFunctionVariables,
 					testingLibraryAsyncDomFunctionVariables,
+					testingLibraryCollectionFunctionVariables,
+					testingLibraryAsyncCollectionFunctionVariables,
 					testingLibraryNamespaceVariables
 				)
 			) {
@@ -1309,11 +1519,14 @@ export function validateVitestPolicy( {
 							node.object,
 							unboundIdentifiers,
 							domVariables,
+							domCollectionVariables,
 							identifierVariables,
 							windowVariables,
 							testingLibraryScreenVariables,
 							testingLibraryDomFunctionVariables,
 							testingLibraryAsyncDomFunctionVariables,
+							testingLibraryCollectionFunctionVariables,
+							testingLibraryAsyncCollectionFunctionVariables,
 							testingLibraryNamespaceVariables
 						) ) ) )
 		) {
