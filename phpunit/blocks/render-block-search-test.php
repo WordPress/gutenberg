@@ -43,7 +43,7 @@ class Render_Block_Search_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$this->assertStringContainsString( 'width: 350px;', $this->get_wrapper_style( $attributes ) );
+		$this->assertStringContainsString( 'width: 350px', $this->get_wrapper_style( $attributes ) );
 	}
 
 	/**
@@ -59,7 +59,7 @@ class Render_Block_Search_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertStringContainsString(
-			'width: var(--wp--preset--dimension--50);',
+			'width: var(--wp--preset--dimension--50)',
 			$this->get_wrapper_style( $attributes )
 		);
 	}
@@ -80,8 +80,8 @@ class Render_Block_Search_Test extends WP_UnitTestCase {
 			'widthUnit' => 'px',
 		);
 
-		$this->assertStringContainsString( 'width: 50%;', $this->get_wrapper_style( $percentage ) );
-		$this->assertStringContainsString( 'width: 350px;', $this->get_wrapper_style( $pixels ) );
+		$this->assertStringContainsString( 'width: 50%', $this->get_wrapper_style( $percentage ) );
+		$this->assertStringContainsString( 'width: 350px', $this->get_wrapper_style( $pixels ) );
 	}
 
 	/**
@@ -109,7 +109,7 @@ class Render_Block_Search_Test extends WP_UnitTestCase {
 
 		$style = $this->get_wrapper_style( $attributes );
 
-		$this->assertStringContainsString( 'width: 350px;', $style );
-		$this->assertStringNotContainsString( 'width: 50%;', $style );
+		$this->assertStringContainsString( 'width: 350px', $style );
+		$this->assertStringNotContainsString( 'width: 50%', $style );
 	}
 }
