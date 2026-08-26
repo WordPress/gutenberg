@@ -1,14 +1,17 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Breadcrumbs, Page } from '@wordpress/admin-ui';
+import { useId, useState } from '@wordpress/element';
 import { wordpress } from '@wordpress/icons';
 import { ThemeProvider } from '@wordpress/theme';
 import {
 	Badge,
 	Button,
 	Card,
+	Dialog,
 	Icon,
 	InputControl,
 	Link,
+	Menu,
 	Notice,
 	SelectControl,
 	Stack,
@@ -52,6 +55,10 @@ export default meta;
  */
 export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 	render: () => {
+		const [ isSiteDetailsOpen, setIsSiteDetailsOpen ] = useState( false );
+		const generalSettingsId = useId();
+		const displaySettingsId = useId();
+
 		return (
 			<div>
 				<ThemeProvider>
@@ -107,6 +114,90 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 									) ) }
 								</Stack>
 							</nav>
+							<div
+								style={ {
+									marginBlockStart:
+										'var(--wpds-dimension-gap-xl)',
+								} }
+							>
+								<Dialog.Root
+									open={ isSiteDetailsOpen }
+									onOpenChange={ setIsSiteDetailsOpen }
+								>
+									<Menu.Root>
+										<Menu.Trigger
+											render={
+												<Button
+													size="compact"
+													variant="outline"
+													tone="neutral"
+													style={ {
+														justifyContent:
+															'flex-start',
+														width: '100%',
+													} }
+												/>
+											}
+										>
+											Site actions
+										</Menu.Trigger>
+										<Menu.Popup>
+											<Menu.LinkItem
+												href={ `#${ generalSettingsId }` }
+											>
+												<Menu.ItemLabel>
+													General settings
+												</Menu.ItemLabel>
+											</Menu.LinkItem>
+											<Menu.LinkItem
+												href={ `#${ displaySettingsId }` }
+											>
+												<Menu.ItemLabel>
+													Display settings
+												</Menu.ItemLabel>
+											</Menu.LinkItem>
+											<Menu.Separator />
+											<Menu.Item
+												onClick={ () =>
+													setIsSiteDetailsOpen( true )
+												}
+											>
+												<Menu.ItemLabel>
+													View site details…
+												</Menu.ItemLabel>
+											</Menu.Item>
+										</Menu.Popup>
+									</Menu.Root>
+									<Dialog.Popup size="small">
+										<Dialog.Header>
+											<Dialog.Title>
+												Site details
+											</Dialog.Title>
+											<Dialog.CloseIcon />
+										</Dialog.Header>
+										<Dialog.Content>
+											<Stack direction="column" gap="sm">
+												<Dialog.Description>
+													This sample dialog shows
+													information about the
+													current site.
+												</Dialog.Description>
+												<Text>
+													<strong>Site title:</strong>{ ' ' }
+													My WordPress site
+												</Text>
+												<Text>
+													<strong>Language:</strong>{ ' ' }
+													English (United States)
+												</Text>
+											</Stack>
+										</Dialog.Content>
+										<Dialog.Footer>
+											<Dialog.Action>Done</Dialog.Action>
+										</Dialog.Footer>
+									</Dialog.Popup>
+								</Dialog.Root>
+							</div>
 						</div>
 
 						<Page
@@ -157,7 +248,7 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 								</Notice.Root>
 
 								{ /* Card 1: General */ }
-								<Card.Root>
+								<Card.Root id={ generalSettingsId }>
 									<Card.Header>
 										<Card.Title>General</Card.Title>
 									</Card.Header>
@@ -207,7 +298,7 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 								</Card.Root>
 
 								{ /* Card 2: Display */ }
-								<Card.Root>
+								<Card.Root id={ displaySettingsId }>
 									<Card.Header>
 										<Card.Title>Display</Card.Title>
 									</Card.Header>
