@@ -67,10 +67,19 @@ describe( 'matchDashboardHref', () => {
 		).toBeNull();
 	} );
 
-	it( 'rejects a p that carries its own query string', () => {
+	it( 'keeps the query a p carries, for the route to read as search', () => {
 		expect(
 			matchDashboardHref(
-				'admin.php?page=dashboard&p=/reports?period=7d',
+				'admin.php?page=dashboard&p=%2Freports%3Fperiod%3D7d',
+				BASE
+			)
+		).toBe( '/reports?period=7d' );
+	} );
+
+	it( 'rejects a p that is only a query', () => {
+		expect(
+			matchDashboardHref(
+				'admin.php?page=dashboard&p=%3Fperiod%3D7d',
 				BASE
 			)
 		).toBeNull();

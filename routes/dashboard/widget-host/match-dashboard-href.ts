@@ -3,10 +3,10 @@
  *
  * A href belongs here when it targets the same document (origin and
  * pathname) and the same admin `page`; the route is then whatever `p`
- * carries. Anything a route navigation cannot deliver faithfully stays
- * a plain anchor: a hash, search params beyond `page` and `p`, duplicates
- * of either, or a `p` that is not a root-relative path or carries its own
- * query or hash.
+ * carries, its own query included, which the router reads as the route's
+ * search params. Anything a route navigation cannot deliver faithfully
+ * stays a plain anchor: a hash, search params beyond `page` and `p`,
+ * duplicates of either, or a `p` that is not a root-relative path.
  *
  * @param {string} href Action href, absolute or relative.
  * @param {string} base Document URL the href is judged against; defaults
@@ -60,16 +60,14 @@ export function matchDashboardHref(
 	const path = url.searchParams.get( 'p' ) || '/';
 
 	/*
-	 * The router writes a root-relative pathname into `p`. Any other shape
-	 * (`https://…`, `mailto:…`, `//host`, `reports`) the router link would
-	 * resolve as an external URL or a relative path, where the full load
-	 * cannot follow.
+	 * The router writes a root-relative pathname into `p`, the route's query
+	 * behind it. Any other shape (`https://…`, `mailto:…`, `//host`,
+	 * `reports`) the router link would resolve as an external URL or a
+	 * relative path, where the full load cannot follow; a hash never
+	 * survives the round trip.
 	 */
-	if (
-		! /^\/(?!\/)/.test( path ) ||
-		path.includes( '?' ) ||
-		path.includes( '#' )
-	) {
+	const pathname = path.split( '?' )[ 0 ];
+	if ( ! /^\/(?!\/)/.test( pathname ) || path.includes( '#' ) ) {
 		return null;
 	}
 
