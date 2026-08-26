@@ -42,8 +42,9 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
 
 - **border**: `.wp-block-calendar th, .wp-block-calendar td:not(.pad)`
-- **color.text**: `.wp-block-calendar table`
-- **color.background**: `.wp-block-calendar`
+- **color**:
+  - text: `.wp-block-calendar table`
+  - background: `.wp-block-calendar`
 
 ## Block Markup
 
