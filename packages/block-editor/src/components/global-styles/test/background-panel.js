@@ -50,6 +50,65 @@ describe( 'hasBackgroundImageValue', () => {
 			} )
 		).toBe( false );
 	} );
+
+	it( 'should return `true` for an explicit none unset value', () => {
+		expect(
+			hasBackgroundImageValue( {
+				background: { backgroundImage: 'none' },
+			} )
+		).toBe( true );
+	} );
+} );
+
+describe( 'BackgroundPanel — style state background image reset', () => {
+	it( 'writes background-image none when deselecting under a viewport state', async () => {
+		const user = userEvent.setup();
+		const onChange = jest.fn();
+
+		render(
+			<BackgroundPanel
+				value={ {
+					background: {
+						backgroundImage: {
+							id: 2,
+							url: 'http://example.com/mobile.jpg',
+						},
+					},
+				} }
+				inheritedValue={ {
+					background: {
+						backgroundImage: {
+							id: 1,
+							url: 'http://example.com/desktop.jpg',
+						},
+					},
+				} }
+				settings={ {
+					background: {
+						backgroundImage: true,
+					},
+				} }
+				onChange={ onChange }
+				panelId="test-panel"
+				styleState={ { viewport: '@mobile', pseudo: 'default' } }
+			/>
+		);
+
+		await user.click(
+			screen.getByRole( 'button', { name: /Background options/i } )
+		);
+		await user.click(
+			screen.getByRole( 'menuitem', { name: /Reset Image/i } )
+		);
+
+		expect( onChange ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				background: expect.objectContaining( {
+					backgroundImage: 'none',
+				} ),
+			} )
+		);
+	} );
 } );
 
 describe( 'hasBackgroundGradientValue', () => {

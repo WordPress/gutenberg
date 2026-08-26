@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { getBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
+import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import InspectorControls from '../components/inspector-controls';
 import { cleanEmptyObject } from './utils';
@@ -111,8 +112,11 @@ function useBlockProps( { name, style } ) {
  * @return {string} CSS class name.
  */
 export function getBackgroundImageClasses( style ) {
-	return hasBackgroundImageValue( style ) ||
-		hasBackgroundGradientValue( style )
+	const backgroundImage = style?.background?.backgroundImage;
+	const hasImage =
+		hasBackgroundImageValue( style ) && backgroundImage !== 'none';
+
+	return hasImage || hasBackgroundGradientValue( style )
 		? 'has-background'
 		: '';
 }
@@ -146,12 +150,90 @@ export function backgroundResetAllFilter( attributes ) {
 	};
 }
 
-function BackgroundInspectorControl( { children } ) {
+/**
+ * Returns whether a style object still contains viewport/pseudo state keys.
+ *
+ * @param {Object} style Style object.
+ * @return {boolean} Whether the style looks like a full block style object.
+ */
+function styleHasStateKeys( style ) {
 	return (
-		<InspectorControls
-			group="background"
-			resetAllFilter={ backgroundResetAllFilter }
-		>
+		!! style &&
+		Object.keys( style ).some(
+			( key ) => key.startsWith( '@' ) || key.startsWith( ':' )
+		)
+	);
+}
+
+/**
+ * Persists an explicit background-image unset for a style-state style slice.
+ * Used when `scopeResetAllFilterToState` has already scoped the attributes to
+ * the selected viewport/pseudo state.
+ *
+ * @param {Object} attributes Attributes whose `style` is the state slice.
+ * @return {Object} Attribute updates for the scoped reset.
+ */
+export function backgroundStateResetAllFilter( attributes ) {
+	return {
+		style: cleanEmptyObject( {
+			...attributes.style,
+			background: {
+				backgroundImage: 'none',
+			},
+			color: {
+				...attributes.style?.color,
+				background: undefined,
+				gradient: undefined,
+			},
+		} ),
+	};
+}
+
+/**
+ * Resets background values for the selected style state without clearing
+ * default-state background image/color on other viewports.
+ *
+ * @param {Object} attributes    Block attributes (full or already scoped).
+ * @param {Object} selectedState Selected block style state.
+ * @return {Object} Attribute updates.
+ */
+export function backgroundSelectedStateResetAllFilter(
+	attributes,
+	selectedState
+) {
+	const style = attributes?.style;
+	const stateStyle = styleHasStateKeys( style )
+		? getStyleForState( style, selectedState ) || {}
+		: style || {};
+	const nextStateStyle = backgroundStateResetAllFilter( {
+		style: stateStyle,
+	} ).style;
+
+	if ( styleHasStateKeys( style ) ) {
+		return {
+			style: setStyleForState( style, selectedState, nextStateStyle ),
+		};
+	}
+
+	return { style: nextStateStyle };
+}
+
+function BackgroundInspectorControl( { children } ) {
+	const selectedState = useBlockStyleState();
+	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
+	const resetAllFilter = useCallback(
+		( attributes ) =>
+			isStateSelected
+				? backgroundSelectedStateResetAllFilter(
+						attributes,
+						selectedState
+				  )
+				: backgroundResetAllFilter( attributes ),
+		[ isStateSelected, selectedState ]
+	);
+
+	return (
+		<InspectorControls group="background" resetAllFilter={ resetAllFilter }>
 			{ children }
 		</InspectorControls>
 	);
@@ -226,6 +308,32 @@ export function BackgroundImagePanel( {
 	const value = isStateSelected
 		? getStyleForState( style, selectedState )
 		: styleValue;
+
+	// Under a viewport/pseudo state, the block's default-state background is
+	// part of the cascade the control must expose as inherited. Without it,
+	// Remove never appears and clearing the control leaves the desktop image.
+	const panelInheritedValue = useMemo( () => {
+		if ( ! isStateSelected ) {
+			return inheritedValue;
+		}
+
+		return {
+			...inheritedValue,
+			background: {
+				...inheritedValue?.background,
+				...style?.background,
+			},
+			color: {
+				...inheritedValue?.color,
+				...( styleValue?.color?.background !== undefined && {
+					background: styleValue.color.background,
+				} ),
+				...( styleValue?.color?.gradient !== undefined && {
+					gradient: styleValue.color.gradient,
+				} ),
+			},
+		};
+	}, [ inheritedValue, isStateSelected, style?.background, styleValue ] );
 
 	// Skipped for gradients, which can't be reliably evaluated for contrast.
 	const enableContrastChecking =
@@ -376,13 +484,10 @@ export function BackgroundImagePanel( {
 			settings={ updatedSettings }
 			onChange={ onChange }
 			defaultControls={ defaultControls }
-			value={
-				isStateSelected
-					? getStyleForState( style, selectedState )
-					: styleValue
-			}
+			value={ value }
 			contrastWarning={ contrastWarning }
-			inheritedValue={ inheritedValue }
+			inheritedValue={ panelInheritedValue }
+			styleState={ selectedState }
 		/>
 	);
 }

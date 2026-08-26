@@ -5,6 +5,7 @@ import {
 import warning from '@wordpress/warning';
 import deprecated from '@wordpress/deprecated';
 import { useEffect, useContext, useMemo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import {
 	useBlockEditContext,
 	mayDisplayControlsKey,
@@ -13,10 +14,12 @@ import {
 } from '../block-edit/context';
 import groups from './groups';
 import {
+	DEFAULT_BLOCK_STYLE_STATE,
 	scopeResetAllFilterToState,
-	useBlockStyleState,
 } from '../../hooks/block-style-state';
 import { ListViewContentFill } from './list-view-content-popover';
+import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const PATTERN_EDITING_GROUPS = [ 'content', 'list' ];
 
@@ -104,7 +107,19 @@ export default function InspectorControlsFill( {
 function RegisterResetAll( { resetAllFilter, children } ) {
 	const { registerResetAllFilter, deregisterResetAllFilter } =
 		useContext( ToolsPanelContext );
-	const selectedState = useBlockStyleState();
+	// Read from the store rather than BlockStyleState context. Fill content is
+	// portaled into the inspector slot, and relying on context here can miss
+	// the selected viewport — unscoped resets then clear default-state styles.
+	const selectedState = useSelect( ( select ) => {
+		const { getSelectedBlockClientId } = select( blockEditorStore );
+		const { getSelectedBlockStyleState } = unlock(
+			select( blockEditorStore )
+		);
+		const clientId = getSelectedBlockClientId();
+		return clientId
+			? getSelectedBlockStyleState( clientId )
+			: DEFAULT_BLOCK_STYLE_STATE;
+	}, [] );
 	const scopedResetAllFilter = useMemo(
 		() => scopeResetAllFilterToState( selectedState, resetAllFilter ),
 		[ resetAllFilter, selectedState ]

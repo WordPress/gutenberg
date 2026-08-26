@@ -657,6 +657,12 @@ export default function BackgroundImagePanel( {
 	settings,
 	defaultValues = {},
 	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
+	/**
+	 * When true, media Reset writes an explicit `backgroundImage: 'none'`
+	 * instead of clearing the value. Needed for viewport/pseudo style states
+	 * so the default-state image does not return through the cascade.
+	 */
+	persistImageUnsetOnReset = false,
 } ) {
 	/*
 	 * Resolve inherited `ref` pointers for background controls.
@@ -692,19 +698,39 @@ export default function BackgroundImagePanel( {
 		return resolvedValues;
 	}, [ globalStyles, _links, inheritedValue ] );
 
-	const resetBackground = () =>
+	// Clear local override so the inherited/default-state image returns.
+	const clearBackgroundImage = () =>
 		onChange(
 			setImmutably( value, [ 'background' ], {
 				gradient: value?.background?.gradient,
 			} )
 		);
 
-	const { title, url } = value?.background?.backgroundImage || {
-		...resolvedInheritedValue?.background?.backgroundImage,
-	};
+	// Explicitly unset for the current style state.
+	const unsetBackgroundImage = () =>
+		onChange(
+			setImmutably( value, [ 'background' ], {
+				gradient: value?.background?.gradient,
+				backgroundImage: 'none',
+			} )
+		);
+
+	const resetMediaImage = persistImageUnsetOnReset
+		? unsetBackgroundImage
+		: clearBackgroundImage;
+
+	const localBackgroundImage = value?.background?.backgroundImage;
+	const hasExplicitImageUnset = localBackgroundImage === 'none';
+	const { title, url } = hasExplicitImageUnset
+		? {}
+		: localBackgroundImage || {
+				...resolvedInheritedValue?.background?.backgroundImage,
+		  };
 	const localHasImageValue = hasBackgroundImageValue( value );
 	const hasImageValue =
-		localHasImageValue || hasBackgroundImageValue( resolvedInheritedValue );
+		! hasExplicitImageUnset &&
+		( localHasImageValue ||
+			hasBackgroundImageValue( resolvedInheritedValue ) );
 	// The blue-dot local-override affordance is part of the inherited-value
 	// treatment. When that treatment is disabled (e.g. in the Global Styles
 	// panel, where the edited value *is* the global style rather than a local
@@ -714,9 +740,9 @@ export default function BackgroundImagePanel( {
 		localHasImageValue &&
 		hasBackgroundImageValue( resolvedInheritedValue );
 
-	const imageValue =
-		value?.background?.backgroundImage ||
-		inheritedValue?.background?.backgroundImage;
+	const imageValue = hasExplicitImageUnset
+		? 'none'
+		: localBackgroundImage || inheritedValue?.background?.backgroundImage;
 
 	const shouldShowBackgroundImageControls =
 		hasImageValue &&
@@ -746,7 +772,9 @@ export default function BackgroundImagePanel( {
 					onToggle={ setIsDropDownOpen }
 					hasImageValue={ hasImageValue }
 					hasLocalOverride={ hasLocalOverride }
-					onReset={ localHasImageValue ? resetBackground : undefined }
+					onReset={
+						localHasImageValue ? clearBackgroundImage : undefined
+					}
 					containerRef={ containerRef }
 				>
 					<VStack spacing={ 3 } className="single-column">
@@ -757,7 +785,7 @@ export default function BackgroundImagePanel( {
 							displayInPanel
 							onResetImage={ () => {
 								setIsDropDownOpen( false );
-								resetBackground();
+								resetMediaImage();
 							} }
 							onRemoveImage={ () => setIsDropDownOpen( false ) }
 							defaultValues={ defaultValues }
@@ -774,12 +802,24 @@ export default function BackgroundImagePanel( {
 			) : (
 				<BackgroundImageControls
 					onChange={ onChange }
-					style={ value }
-					inheritedValue={ resolvedInheritedValue }
+					style={
+						hasExplicitImageUnset
+							? setImmutably(
+									value,
+									[ 'background', 'backgroundImage' ],
+									undefined
+							  )
+							: value
+					}
+					inheritedValue={
+						hasExplicitImageUnset
+							? undefined
+							: resolvedInheritedValue
+					}
 					defaultValues={ defaultValues }
 					onResetImage={ () => {
 						setIsDropDownOpen( false );
-						resetBackground();
+						resetMediaImage();
 					} }
 					onRemoveImage={ () => setIsDropDownOpen( false ) }
 					containerRef={ containerRef }
