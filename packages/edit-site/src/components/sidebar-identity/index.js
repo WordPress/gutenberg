@@ -75,6 +75,7 @@ export default function SidebarIdentity() {
 
 	return (
 		<Page
+			className="edit-site-sidebar-identity"
 			title={ _x( 'Identity', 'site identity' ) }
 			headingLevel={ 2 }
 			hasPadding

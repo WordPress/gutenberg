@@ -1,6 +1,12 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/media-editor/build-style/style.css" as media-editor;
 
+.media-editor-route {
+	// TODO: Reassess how to handle background color in Page component.
+	// https://github.com/WordPress/gutenberg/pull/81646#discussion_r3846031681
+	background-color: var(--wpds-color-background-surface-neutral-strong);
+}
+
 // Carries the editor's keydown handler around the whole page, including the
 // header. `display: contents` keeps it out of the flex layout entirely.
 .media-editor-route__shortcut-scope {

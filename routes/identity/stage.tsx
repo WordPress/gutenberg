@@ -5,6 +5,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { DataForm, type Field, type Form } from '@wordpress/dataviews';
 import { MediaEdit } from '@wordpress/fields';
 import { decodeEntities } from '@wordpress/html-entities';
+import styles from './style.module.scss';
 
 type SiteSettings = {
 	title?: string;
@@ -93,6 +94,7 @@ function Identity() {
 
 	return (
 		<Page
+			className={ styles.page }
 			title={ _x( 'Identity', 'site identity' ) }
 			headingLevel={ 2 }
 			hasPadding

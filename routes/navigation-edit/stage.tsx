@@ -6,6 +6,7 @@ import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import type { Post } from '@wordpress/core-data';
 import NavigationMenuEditor from './editor';
+import styles from './style.module.scss';
 
 const NAVIGATION_POST_TYPE = 'wp_navigation';
 
@@ -36,6 +37,7 @@ function NavigationEditStage() {
 
 	return (
 		<Page
+			className={ styles.page }
 			ariaLabel={ decodeEntities( menuTitle ) }
 			headingLevel={ 2 }
 			breadcrumbs={

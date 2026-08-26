@@ -30,6 +30,7 @@
 @use "./components/resizable-frame/style.scss" as *;
 @use "./components/pagination/style.scss" as *;
 @use "./components/sidebar-global-styles/style.scss" as *;
+@use "./components/sidebar-identity/style.scss" as *;
 
 ::view-transition-image-pair(root) {
 	isolation: auto;

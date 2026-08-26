@@ -1,6 +1,10 @@
 @use "@wordpress/base-styles/variables" as *;
 
 .edit-site-styles {
+	// TODO: Reassess how to handle background color in Page component.
+	// https://github.com/WordPress/gutenberg/pull/81646#discussion_r3846031681
+	background-color: var(--wpds-color-background-surface-neutral-strong);
+
 	.global-styles-ui-screen-root {
 		box-shadow: none;
 		& > div > hr {
