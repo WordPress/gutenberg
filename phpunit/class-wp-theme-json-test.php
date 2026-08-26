@@ -771,6 +771,29 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
 	}
 
+	public function test_get_stylesheet_outputs_block_background_padding_custom_property() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'spacing' => array(
+						'blockBackgroundPadding' => '0',
+					),
+					'blocks'  => array(
+						'core/group' => array(
+							'spacing' => array(
+								'blockBackgroundPadding' => '1em 2em',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = static::$base_styles . 'body{--wp--style--block-background-padding: 0;}:root :where(.wp-block-group){--wp--style--block-background-padding: 1em 2em;}';
+		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ) ) );
+	}
+
 	public function test_get_stylesheet_preset_classes_work_with_compounded_selectors() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(

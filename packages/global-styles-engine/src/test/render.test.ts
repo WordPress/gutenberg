@@ -24,6 +24,9 @@ jest.mock( '@wordpress/blocks', () => ( {
 			value: [ 'filter', 'duotone' ],
 			support: [ 'filter', 'duotone' ],
 		},
+		'--wp--style--block-background-padding': {
+			value: [ 'spacing', 'blockBackgroundPadding' ],
+		},
 	},
 	__EXPERIMENTAL_ELEMENTS: {
 		link: 'a:where(:not(.wp-element-button))',
@@ -443,6 +446,45 @@ describe( 'global styles renderer', () => {
 			);
 			expect( result ).toContain(
 				':root :where(.wp-block-group-is-layout-grid) { gap: 1em 2em; }'
+			);
+		} );
+
+		it( 'outputs the block background padding custom property for root and block values', () => {
+			const tree: GlobalStylesConfig = {
+				styles: {
+					spacing: {
+						blockBackgroundPadding: '0',
+					},
+					blocks: {
+						'core/group': {
+							spacing: {
+								blockBackgroundPadding: '1em 2em',
+							},
+						},
+					},
+				},
+			};
+			const blockSelectors = {
+				'core/group': {
+					selector: '.wp-block-group',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				true,
+				false,
+				false,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toContain(
+				'body{--wp--style--block-background-padding: 0;}'
+			);
+			expect( result ).toContain(
+				':root :where(.wp-block-group){--wp--style--block-background-padding: 1em 2em;}'
 			);
 		} );
 
