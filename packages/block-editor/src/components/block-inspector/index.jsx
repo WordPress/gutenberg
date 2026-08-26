@@ -98,7 +98,7 @@ function StyleStateInspectorSlots( {
 	selectedBlockStyleState,
 } ) {
 	const borderPanelLabel = useBorderPanelLabel( { clientId } );
-	const showLayoutControls =
+	const isViewportStyleState =
 		hasViewportBlockStyleState( selectedBlockStyleState ) &&
 		! hasPseudoBlockStyleState( selectedBlockStyleState );
 	const showSectionStyleControls =
@@ -130,7 +130,7 @@ function StyleStateInspectorSlots( {
 						label={ __( 'Background' ) }
 						className="background-block-support-panel__inner-wrapper"
 					/>
-					{ showLayoutControls && (
+					{ isViewportStyleState && (
 						<InspectorControls.Slot
 							group="layout"
 							label={ __( 'Layout' ) }
@@ -151,7 +151,7 @@ function StyleStateInspectorSlots( {
 					/>
 				</>
 			) }
-			{ showLayoutControls && (
+			{ isViewportStyleState && (
 				<InspectorControls.Slot group="viewport" />
 			) }
 		</>
