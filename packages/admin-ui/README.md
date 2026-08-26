@@ -45,7 +45,7 @@ If you need to customize the cascade layer order relative to your own CSS cascad
 @layer wp-ui, wp-admin-ui, example-app;
 ```
 
-When using both `@wordpress/ui` and `@wordpress/admin-ui`, declare `wp-ui` before `wp-admin-ui` so UI primitives keep precedence over admin layout components within the layered stack.
+When using both `@wordpress/ui` and `@wordpress/admin-ui`, list `wp-ui` before `wp-admin-ui` (later layers win). Put your own layer last, or use unlayered styles to override either package.
 
 ## API
 
