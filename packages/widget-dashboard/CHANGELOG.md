@@ -15,6 +15,12 @@
     link and navigates client-side; `download` and `openInNewTab` keep the
     plain anchor ([#81740](https://github.com/WordPress/gutenberg/pull/81740)).
 
+### Bug Fixes
+
+-   A link action with `download: ''`, which downloads under the original
+    filename, keeps the plain anchor instead of mounting the host router's
+    link ([#82073](https://github.com/WordPress/gutenberg/pull/82073)).
+
 ### Documentation
 
 -   Add a `HostLinks` story: a demo host whose `links` capability turns an
