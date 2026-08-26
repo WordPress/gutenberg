@@ -683,11 +683,6 @@
 			"count": 2
 		}
 	},
-	"packages/components/src/box-control/styles/box-control-styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/card/card/component.tsx": {
 		"no-restricted-imports": {
 			"count": 1
@@ -844,11 +839,6 @@
 	"packages/components/src/range-control/styles/range-control-styles.ts": {
 		"no-restricted-imports": {
 			"count": 2
-		}
-	},
-	"packages/components/src/scrollable/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
 		}
 	},
 	"packages/components/src/select-control/styles/select-control-styles.ts": {

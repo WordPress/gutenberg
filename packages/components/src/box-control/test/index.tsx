@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
 import BoxControl from '..';
 import type { BoxControlProps, BoxControlValue } from '../types';
+import styles from '../style.module.scss';
 
 // Since `BoxControlProps` is a the result of type unions, we need to use
 // a distributive version of the standard `Omit` utility.
@@ -162,6 +163,37 @@ describe( 'BoxControl', () => {
 			await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
 
 			expect( input ).toHaveValue( '' );
+		} );
+
+		it( 'should expose the reset button as aria-disabled when there are no changes', async () => {
+			render( <UncontrolledBoxControl /> );
+
+			const resetButton = screen.getByRole( 'button', { name: 'Reset' } );
+
+			expect( resetButton ).toHaveAttribute( 'aria-disabled', 'true' );
+			resetButton.focus();
+			expect( resetButton ).toHaveFocus();
+		} );
+
+		it( 'should keep focus on the reset button after it disables itself', async () => {
+			const user = userEvent.setup();
+
+			render( <UncontrolledBoxControl /> );
+
+			await user.type(
+				screen.getByRole( 'textbox', { name: 'All sides' } ),
+				'100'
+			);
+			await user.keyboard( '{Enter}' );
+
+			const resetButton = screen.getByRole( 'button', { name: 'Reset' } );
+
+			expect( resetButton ).not.toHaveAttribute( 'aria-disabled' );
+
+			await user.click( resetButton );
+
+			expect( resetButton ).toHaveAttribute( 'aria-disabled', 'true' );
+			expect( resetButton ).toHaveFocus();
 		} );
 
 		it( 'should persist cleared value when focus changes', async () => {
@@ -501,6 +533,108 @@ describe( 'BoxControl', () => {
 			expect(
 				screen.getByRole( 'textbox', { name: 'All sides' } )
 			).toHaveAttribute( 'placeholder', 'Inherited' );
+		} );
+	} );
+
+	describe( 'Styles', () => {
+		const presets = [
+			{ name: 'Small', slug: 'small', value: '4px' },
+			{ name: 'Medium', slug: 'medium', value: '8px' },
+		];
+
+		it( 'should apply module classes and retained public class names in custom mode', () => {
+			const { container } = render( <UncontrolledBoxControl /> );
+
+			const grid = screen.getByRole( 'group', { name: 'Box Control' } );
+			const allSidesInput = screen.getByRole( 'textbox', {
+				name: 'All sides',
+			} );
+			const innerInputWrapper =
+				// eslint-disable-next-line testing-library/no-node-access
+				allSidesInput.closest( `.${ styles[ 'input-wrapper' ] }` );
+			const linkedRow =
+				// eslint-disable-next-line testing-library/no-node-access
+				Array.from( grid.children ).find( ( child ) =>
+					child.classList.contains( styles[ 'input-wrapper' ] )
+				);
+			const unlinkButton = screen.getByRole( 'button', {
+				name: 'Unlink sides',
+			} );
+			const linkedButtonWrapper =
+				// eslint-disable-next-line testing-library/no-node-access
+				unlinkButton.closest(
+					`.${ styles[ 'linked-button-wrapper' ] }`
+				);
+
+			expect( innerInputWrapper ).toHaveClass(
+				styles[ 'input-wrapper' ]
+			);
+			expect( linkedRow ).toHaveClass( styles[ 'input-wrapper' ] );
+			expect( linkedRow ).not.toBe( innerInputWrapper );
+			expect( linkedButtonWrapper ).toHaveClass(
+				styles[ 'linked-button-wrapper' ]
+			);
+			expect(
+				// eslint-disable-next-line testing-library/no-node-access
+				innerInputWrapper?.querySelector( `.${ styles.icon }` )
+			).toHaveClass( styles.icon );
+			expect(
+				// Class names live on wrappers around the labeled controls.
+				// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+				container.querySelector(
+					'.component-box-control__unit-control'
+				)
+			).toHaveClass( styles[ 'unit-control' ] );
+			expect(
+				screen.getByRole( 'button', { name: 'Reset' } )
+			).toHaveClass(
+				styles[ 'reset-button' ],
+				'component-box-control__reset-button'
+			);
+			expect(
+				// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+				container.querySelector( '.components-range-control' )
+			).toHaveClass( styles[ 'range-control' ] );
+		} );
+
+		it( 'should apply the module input-wrapper class to each side after unlinking', async () => {
+			const user = userEvent.setup();
+
+			render( <UncontrolledBoxControl /> );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Unlink sides' } )
+			);
+
+			for ( const name of [
+				'Top side',
+				'Right side',
+				'Bottom side',
+				'Left side',
+			] ) {
+				const sideInput = screen.getByRole( 'textbox', { name } );
+				expect(
+					// eslint-disable-next-line testing-library/no-node-access
+					sideInput.closest( `.${ styles[ 'input-wrapper' ] }` )
+				).toHaveClass( styles[ 'input-wrapper' ] );
+			}
+		} );
+
+		it( 'should compose the module range class with the public preset class', () => {
+			const { container } = render(
+				<UncontrolledBoxControl
+					presets={ presets }
+					presetKey="padding"
+				/>
+			);
+
+			expect(
+				// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+				container.querySelector( '.components-range-control' )
+			).toHaveClass(
+				styles[ 'range-control' ],
+				'spacing-sizes-control__range-control'
+			);
 		} );
 	} );
 } );

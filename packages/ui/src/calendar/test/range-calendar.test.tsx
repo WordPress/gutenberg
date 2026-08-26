@@ -118,7 +118,7 @@ describe( 'RangeCalendar', () => {
 
 			expect(
 				screen.getByRole( 'application', {
-					name: 'Date range calendar',
+					name: 'Date range calendar, May 2025',
 				} )
 			).toBeVisible();
 
@@ -1506,7 +1506,7 @@ describe( 'RangeCalendar', () => {
 			// Check computed writing direction
 			expect(
 				screen.getByRole( 'application', {
-					name: 'Date range calendar',
+					name: /^Date range calendar,/,
 				} )
 			).toHaveAttribute( 'dir', 'rtl' );
 
