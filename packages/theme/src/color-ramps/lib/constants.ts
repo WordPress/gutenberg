@@ -1,5 +1,5 @@
 import { OKLCH, type PlainColorObject } from 'colorjs.io/fn';
-import type { Ramp } from './types.ts';
+import type { Ramp } from './types.js';
 
 export const WHITE: PlainColorObject = {
 	space: OKLCH,

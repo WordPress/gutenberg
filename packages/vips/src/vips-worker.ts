@@ -4,9 +4,9 @@ import type {
 	ImageSizeCrop,
 	ConvertImageOptions,
 	ResizeImageOptions,
-} from './types.ts';
-import type { WorkerAPI } from './worker.ts';
-import { workerCode } from './worker-code.ts';
+} from './types.js';
+import type { WorkerAPI } from './worker.js';
+import { workerCode } from './worker-code.js';
 
 /**
  * The worker instance, lazily created on first use.

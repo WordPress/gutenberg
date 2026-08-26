@@ -1,5 +1,5 @@
-import type { RampStepConfig, RampConfig, RampDirection } from './types.ts';
-import type { TaperChromaOptions } from './taper-chroma.ts';
+import type { RampStepConfig, RampConfig, RampDirection } from './types.js';
+import type { TaperChromaOptions } from './taper-chroma.js';
 
 const lightnessConstraintForegroundHighContrast = (
 	direction: RampDirection

@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import type { ThemeProviderColorWarning } from './theme-provider-color-warnings.ts';
+import type { ThemeProviderColorWarning } from './theme-provider-color-warnings.js';
 
 export type CornerRadiusPreset = 'none' | 'subtle' | 'moderate' | 'pronounced';
 

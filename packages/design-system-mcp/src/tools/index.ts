@@ -1,7 +1,7 @@
 import type { McpServer } from '@modelcontextprotocol/server';
-import { register as getComponents } from './get-components.ts';
-import { register as getComponentDetails } from './get-component-details.ts';
-import { register as getDesignTokens } from './get-design-tokens.ts';
+import { register as getComponents } from './get-components.js';
+import { register as getComponentDetails } from './get-component-details.js';
+import { register as getDesignTokens } from './get-design-tokens.js';
 
 /**
  * Register all MCP tools on the server.

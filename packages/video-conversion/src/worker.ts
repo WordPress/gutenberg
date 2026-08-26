@@ -6,7 +6,7 @@
  * communication with the main thread.
  */
 import { expose } from '@wordpress/worker-threads';
-import { cancelOperations, convertGifToVideo } from './index.ts';
+import { cancelOperations, convertGifToVideo } from './index.js';
 
 /**
  * The API object that exposes the video conversion functions to the main thread.

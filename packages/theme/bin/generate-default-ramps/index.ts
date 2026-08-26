@@ -5,7 +5,7 @@ import {
 	DEFAULT_SEED_COLORS,
 	buildBgRamp,
 	buildAccentRamp,
-} from '../../src/color-ramps/index.ts';
+} from '../../src/color-ramps/index.js';
 
 const __dirname = dirname( fileURLToPath( import.meta.url ) );
 
@@ -27,8 +27,8 @@ const outputPath = join(
 );
 
 const content = `
-import type { RampResult } from './types.ts';
-import type { DEFAULT_SEED_COLORS } from './constants.ts';
+import type { RampResult } from './types.js';
+import type { DEFAULT_SEED_COLORS } from './constants.js';
 
 export const DEFAULT_RAMPS: Record<
 	keyof typeof DEFAULT_SEED_COLORS,

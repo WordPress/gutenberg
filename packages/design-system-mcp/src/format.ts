@@ -1,4 +1,4 @@
-import type { Component, ComponentDetail } from './types.ts';
+import type { Component, ComponentDetail } from './types.js';
 
 /**
  * Format a component's name, package, and description as markdown.

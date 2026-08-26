@@ -1,7 +1,7 @@
 import { McpServer } from '@modelcontextprotocol/server';
-import { registerTools } from './tools/index.ts';
+import { registerTools } from './tools/index.js';
 
-export { parseComponents, parseComponentDetail } from './parse-components.ts';
+export { parseComponents, parseComponentDetail } from './parse-components.js';
 
 export function createServer() {
 	const server = new McpServer(

@@ -7,9 +7,9 @@ import {
 	ACCENT_SCALE_BASE_LIGHTNESS_THRESHOLDS,
 	MAX_BISECTION_ITERATIONS,
 	CONTRAST_EPSILON,
-} from './constants.ts';
-import type { Ramp, RampConfig, RampDirection } from './types.ts';
-import { getContrast } from './color-utils.ts';
+} from './constants.js';
+import type { Ramp, RampConfig, RampDirection } from './types.js';
+import { getContrast } from './color-utils.js';
 
 /**
  * Build a dependency graph from the steps configuration

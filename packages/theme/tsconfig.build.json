@@ -2,7 +2,6 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"allowImportingTsExtensions": true,
 		"types": [ "node", "style-imports", "react-css-custom-properties" ]
 	},
 	"references": [

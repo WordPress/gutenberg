@@ -8,7 +8,7 @@ import {
 	QUALITY_HIGH,
 	canEncodeVideo,
 } from 'mediabunny';
-import type { ItemId } from './types.ts';
+import type { ItemId } from './types.js';
 
 /**
  * Tracks in-progress operations so they can be cancelled at async boundaries.
