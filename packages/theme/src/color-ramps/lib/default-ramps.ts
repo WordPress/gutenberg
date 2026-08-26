@@ -1,5 +1,5 @@
-import type { RampResult } from './types.js';
-import type { DEFAULT_SEED_COLORS } from './constants.js';
+import type { RampResult } from './types.ts';
+import type { DEFAULT_SEED_COLORS } from './constants.ts';
 
 export const DEFAULT_RAMPS: Record<
 	keyof typeof DEFAULT_SEED_COLORS,

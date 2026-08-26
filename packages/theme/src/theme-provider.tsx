@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { useEvent, useIsomorphicLayoutEffect } from '@wordpress/compose';
-import { ThemeContext } from './context.js';
-import { useThemeProviderStyles } from './use-theme-provider-styles.js';
-import { type ThemeProviderProps } from './types.js';
+import { ThemeContext } from './context.ts';
+import { useThemeProviderStyles } from './use-theme-provider-styles.ts';
+import { type ThemeProviderProps } from './types.ts';
 import styles from './style.module.css';
 
 // Dev-only: count active root providers per document so we can warn when more

@@ -2,8 +2,8 @@ import {
 	packageNameFromPath,
 	parseComponents,
 	parseComponentDetail,
-} from './parse-components.js';
-import type { Component, ComponentDetail, ManifestComponent } from './types.js';
+} from './parse-components.ts';
+import type { Component, ComponentDetail, ManifestComponent } from './types.ts';
 
 const COMPONENTS_MANIFEST_URL =
 	process.env.COMPONENTS_MANIFEST_URL ||

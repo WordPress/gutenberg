@@ -4,23 +4,23 @@ import {
 	clampToGamut,
 	getContrast,
 	getColorString,
-} from './color-utils.js';
-import { findColorMeetingRequirements } from './find-color-with-constraints.js';
+} from './color-utils.ts';
+import { findColorMeetingRequirements } from './find-color-with-constraints.ts';
 import {
 	sortByDependency,
 	computeBetterFgColorDirection,
 	adjustContrastTarget,
 	stepsForStep,
 	solveWithBisect,
-} from './utils.js';
+} from './utils.ts';
 import type {
 	FollowDirection,
 	Ramp,
 	RampDirection,
 	RampConfig,
 	RampResult,
-} from './types.js';
-import { CONTRAST_EPSILON } from './constants.js';
+} from './types.ts';
+import { CONTRAST_EPSILON } from './constants.ts';
 
 /**
  * Calculate a complete color ramp based on the provided configuration.

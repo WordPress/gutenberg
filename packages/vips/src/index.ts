@@ -11,12 +11,12 @@ import type {
 	ThumbnailOptions,
 	ConvertImageOptions,
 	ResizeImageOptions,
-} from './types.js';
+} from './types.ts';
 import {
 	supportsAnimation,
 	supportsInterlace,
 	supportsQuality,
-} from './utils.js';
+} from './utils.ts';
 
 interface EmscriptenModule {
 	setAutoDeleteLater: ( autoDelete: boolean ) => void;

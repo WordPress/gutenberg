@@ -1,7 +1,7 @@
 import type { McpServer } from '@modelcontextprotocol/server';
 import { z } from 'zod';
-import { getComponentDetail } from '../data.js';
-import { formatComponentDetail } from '../format.js';
+import { getComponentDetail } from '../data.ts';
+import { formatComponentDetail } from '../format.ts';
 
 const inputSchema = z.object( {
 	name: z

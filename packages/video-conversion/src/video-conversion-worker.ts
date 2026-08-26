@@ -1,7 +1,7 @@
 import { wrap, terminate, type Remote } from '@wordpress/worker-threads';
-import type { ItemId } from './types.js';
-import type { WorkerAPI } from './worker.js';
-import { workerCode } from './worker-code.js';
+import type { ItemId } from './types.ts';
+import type { WorkerAPI } from './worker.ts';
+import { workerCode } from './worker-code.ts';
 
 /**
  * The worker instance, lazily created on first use.

@@ -1,8 +1,8 @@
 import { get, OKLCH, type PlainColorObject } from 'colorjs.io/fn';
-import { solveWithBisect } from './utils.js';
-import { WHITE, BLACK, CONTRAST_EPSILON } from './constants.js';
-import { clampToGamut, getContrast } from './color-utils.js';
-import { type TaperChromaOptions, taperChroma } from './taper-chroma.js';
+import { solveWithBisect } from './utils.ts';
+import { WHITE, BLACK, CONTRAST_EPSILON } from './constants.ts';
+import { clampToGamut, getContrast } from './color-utils.ts';
+import { type TaperChromaOptions, taperChroma } from './taper-chroma.ts';
 
 /**
  * Difference of contrast values that grows linearly with the Y luminance.

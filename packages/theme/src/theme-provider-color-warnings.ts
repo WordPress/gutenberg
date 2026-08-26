@@ -1,12 +1,12 @@
-import type { DEFAULT_SEED_COLORS } from './color-ramps/lib/constants.js';
-import { getContrast } from './color-ramps/lib/color-utils.js';
-import type { Ramp, RampResult } from './color-ramps/lib/types.js';
+import type { DEFAULT_SEED_COLORS } from './color-ramps/lib/constants.ts';
+import { getContrast } from './color-ramps/lib/color-utils.ts';
+import type { Ramp, RampResult } from './color-ramps/lib/types.ts';
 import {
 	getSemanticColorCustomProperty,
 	MINIMUM_TEXT_CONTRAST,
 	SEMANTIC_COLOR_CONTRAST_PAIRS,
 	type SemanticColorToken,
-} from './semantic-color-contrast-pairs.js';
+} from './semantic-color-contrast-pairs.ts';
 
 export type ThemeProviderColorRampName = keyof typeof DEFAULT_SEED_COLORS;
 
