@@ -31,6 +31,18 @@ environment.`,
 				tools: [ 'Bash' ],
 				custom_allowed_tools: [ 'Bash' ],
 				disallowed_tools: [ 'WebFetch', 'WebSearch' ],
+				// The grader judges the workspace, so it must not be able to
+				// change it: a rubric asking whether a file exists could
+				// otherwise be satisfied by the grader creating it. The
+				// beforeEach extension adds the paths; writes are denied
+				// outright, and Docker and the network are unreachable.
+				sandbox: {
+					enabled: true,
+					autoAllowBashIfSandboxed: true,
+					allowUnsandboxedCommands: false,
+					network: { allowedDomains: [] },
+				},
+				env: { DOCKER_HOST: 'unix:///nonexistent/docker.sock' },
 			},
 		},
 	},

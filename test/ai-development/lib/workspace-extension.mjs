@@ -176,6 +176,13 @@ async function withWorkspace( context ) {
 								config: {
 									...gradingProvider.config,
 									working_dir: workspace,
+									sandbox: {
+										...gradingProvider.config?.sandbox,
+										filesystem: {
+											allowRead: [ workspace ],
+											denyRead: [ sourceRoot ],
+										},
+									},
 								},
 							},
 					  }
