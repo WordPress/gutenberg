@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Client-side media processing: Refuse a batch of more than one file when the caller only takes one, such as a Cover block placeholder, matching what the server-side upload path already did. Every dropped file was uploaded instead, and the block kept whichever one finished last ([#82041](https://github.com/WordPress/gutenberg/issues/82041)).
+
+## 17.0.0 (2026-08-26)
+
 ### Breaking Changes
 
 -   Remove `src/default-editor-styles.scss`. Consumers importing it should supply their own ([#81793](https://github.com/WordPress/gutenberg/pull/81793)).

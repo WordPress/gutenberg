@@ -52,7 +52,7 @@ A link fulfillment carries one obligation: **where the surface allows a link pri
 
 Its accessible role follows the surface rather than the element: mounted inside the dashboard's "More" menu, the anchor is exposed as a menu item, not as a link.
 
-Which link primitive is also the host's call. The widget declares _where_ to go; the host decides _how to get there_. A target inside the host's own routes can use its router's link, which is still an anchor and keeps the same behaviors; anything else is a plain anchor and a full page load. The widget cannot make that call: whether a target is reachable in-page depends on the routes the host registered, which changes per host and over time.
+Which link primitive is also the host's call. The widget declares _where_ to go; the host decides _how to get there_. A target inside the host's own routes can use its router's link, which is still an anchor and keeps the same behaviors; anything else is a plain anchor and a full page load. The widget cannot make that call: whether a target is reachable in-page depends on the routes the host registered, which changes per host and over time. The host supplies that recognition and its link primitive through the widget host seam, as the `links` capability.
 
 Where no link primitive fits, as in a command palette, the host mounts what the surface offers and those semantics degrade. That is a real cost of reaching beyond the widget, not an oversight.
 

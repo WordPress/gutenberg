@@ -439,9 +439,10 @@ describe( 'DateControl', () => {
 				/>
 			);
 
-			expect(
-				screen.getByRole( 'application', { name: 'Date calendar' } )
-			).toHaveAttribute( 'dir', 'rtl' );
+			expect( screen.getByRole( 'application' ) ).toHaveAttribute(
+				'dir',
+				'rtl'
+			);
 		} );
 
 		it( 'should take the site text direction over a supported date locale', () => {
@@ -454,9 +455,10 @@ describe( 'DateControl', () => {
 				/>
 			);
 
-			expect(
-				screen.getByRole( 'application', { name: 'Date calendar' } )
-			).toHaveAttribute( 'dir', 'rtl' );
+			expect( screen.getByRole( 'application' ) ).toHaveAttribute(
+				'dir',
+				'rtl'
+			);
 		} );
 	} );
 } );

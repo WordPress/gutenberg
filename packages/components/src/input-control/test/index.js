@@ -28,6 +28,16 @@ describe( 'InputControl', () => {
 			expect( input ).toHaveAttribute( 'type', 'number' );
 		} );
 
+		it( 'should flag empty inputs with data-empty-value', () => {
+			const { rerender } = render( <InputControl type="time" /> );
+
+			expect( getInput() ).toHaveAttribute( 'data-empty-value' );
+
+			rerender( <InputControl type="time" value="12:30" /> );
+
+			expect( getInput() ).not.toHaveAttribute( 'data-empty-value' );
+		} );
+
 		it( 'should render label', () => {
 			render( <InputControl label="Hello" value="There" /> );
 

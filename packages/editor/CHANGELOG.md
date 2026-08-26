@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `mediaUpload`: Refuse a batch of more than one file before registering it with the upload progress snackbar when the caller only takes one, such as a Cover block placeholder. `uploadMedia()` reported the refusal as a single error, leaving the rest of the batch counted as uploading forever - and every later upload in the session was folded into that stuck notice ([#82041](https://github.com/WordPress/gutenberg/issues/82041)).
+
+## 14.54.0 (2026-08-26)
+
 ### New Features
 
 -   Add a private `SiteExport` menu item, moved from `edit-site`. It offers downloading the theme with the user's changes, only while editing a template or a template part — the entities the exported theme is made of ([#81992](https://github.com/WordPress/gutenberg/pull/81992)).
@@ -18,6 +24,7 @@
 -   Notes: Stop forcing capitalization of the user name in a note byline, so the name is shown as the user set it ([#81788](https://github.com/WordPress/gutenberg/pull/81788)).
 -   Device Preview: Center the editor canvas with the canvas container's own flex alignment rather than the canvas's auto margins, which were conditional on the resize handles being active. Switching from the mobile or tablet preview back to desktop no longer expands the canvas from the left edge ([#81484](https://github.com/WordPress/gutenberg/pull/81484)).
 -   `PostSchedule`: Announce the new publish date to screen readers when the date is changed ([#81629](https://github.com/WordPress/gutenberg/pull/81629)).
+-   Start page/template pattern modals: Align the footer actions with the modal content's padding, so the footer no longer overflows the modal width ([#82021](https://github.com/WordPress/gutenberg/pull/82021)).
 
 ### Internal
 

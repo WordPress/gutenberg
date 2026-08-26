@@ -34,6 +34,8 @@ const ALLOWLIST = {
 			'KeyboardShortcutDisplay',
 			'Link',
 			'RangeCalendar',
+			'SearchableChipSelect',
+			'SearchableChipSelectControl',
 			'Skeleton',
 			'Spinner',
 			'Stack',
