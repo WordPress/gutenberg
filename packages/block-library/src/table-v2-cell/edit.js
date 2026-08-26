@@ -303,18 +303,33 @@ export default function TableCellEdit( {
 				return;
 			}
 
+			const rectanglePlacements = freshPlacements.filter(
+				( p ) =>
+					p.rowIndex >= startRow &&
+					p.rowIndex <= endRow &&
+					p.columnIndex >= startColumn &&
+					p.columnIndex <= endColumn
+			);
+
+			// Retain the contents of every cell in the rectangle, in
+			// document order, one per line.
+			const mergedContent = rectanglePlacements
+				.map(
+					( p ) =>
+						selectors.getBlock( p.clientId )?.attributes?.content
+				)
+				.filter(
+					( cellContent ) =>
+						cellContent &&
+						cellContent.replace( /<[^>]*>/g, '' ).trim()
+				)
+				.join( '<br>' );
+
 			// Remove every other cell starting within the rectangle,
 			// including cells created by the splits.
 			const removedClientIds = new Set(
-				freshPlacements
-					.filter(
-						( p ) =>
-							p.rowIndex >= startRow &&
-							p.rowIndex <= endRow &&
-							p.columnIndex >= startColumn &&
-							p.columnIndex <= endColumn &&
-							p.clientId !== mergedPlacement.clientId
-					)
+				rectanglePlacements
+					.filter( ( p ) => p.clientId !== mergedPlacement.clientId )
 					.map( ( p ) => p.clientId )
 			);
 
@@ -333,6 +348,7 @@ export default function TableCellEdit( {
 			updateBlockAttributes( mergedPlacement.clientId, {
 				rowSpan: endRow - startRow + 1,
 				colSpan: endColumn - startColumn + 1,
+				content: mergedContent,
 			} );
 			for ( const [ rowClientId, cellsToRemove ] of rowsToUpdate ) {
 				const rowCells = selectors.getBlocks( rowClientId );
