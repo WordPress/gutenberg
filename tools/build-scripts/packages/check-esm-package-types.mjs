@@ -1,17 +1,14 @@
-import {
-	access,
-	mkdtemp,
-	readFile,
-	readdir,
-	rm,
-	writeFile,
-} from 'node:fs/promises';
+import { mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import spawn from 'cross-spawn';
 import fastGlob from 'fast-glob';
+import {
+	findInvalidTypeScriptSpecifiers,
+	publishesBuildTypes,
+} from './check-esm-package-types-helpers.mjs';
 
 const rootDirectory = path.resolve(
 	path.dirname( fileURLToPath( import.meta.url ) ),
@@ -27,25 +24,6 @@ function getPackageTypeRoots( directory ) {
 		packageRequire.resolve( '@types/node/package.json' )
 	);
 	return path.dirname( nodeTypesDirectory );
-}
-
-async function publishesBuildTypes( { directory, packageJson } ) {
-	if ( packageJson.files ) {
-		return packageJson.files.some(
-			( file ) =>
-				file === 'build-types' || file.startsWith( 'build-types/' )
-		);
-	}
-
-	try {
-		await access( path.join( directory, 'build-types' ) );
-		return true;
-	} catch ( error ) {
-		if ( error.code !== 'ENOENT' ) {
-			throw error;
-		}
-		return false;
-	}
 }
 
 function pointsOnlyToCss( target ) {
@@ -72,6 +50,24 @@ async function checkNodeNextTypes( { directory, packageJson } ) {
 	} );
 	if ( declarations.length === 0 ) {
 		throw new Error( `No declarations found for ${ packageJson.name }` );
+	}
+	const invalidSpecifiers = await findInvalidTypeScriptSpecifiers(
+		declarations,
+		rootDirectory
+	);
+	if ( invalidSpecifiers.length > 0 ) {
+		throw new Error(
+			`Published declarations for ${
+				packageJson.name
+			} use relative TypeScript file extensions:\n${ invalidSpecifiers
+				.map(
+					( { file, line, specifier } ) =>
+						`${ file }:${ line }: ${ specifier }`
+				)
+				.join(
+					'\n'
+				) }\nUse .js specifiers so declarations work across Node-style TypeScript resolution modes.`
+		);
 	}
 
 	const temporaryDirectory = await mkdtemp(
