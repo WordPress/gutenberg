@@ -186,6 +186,55 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	}
 
 	/**
+	 * Sanitizes icon SVG content.
+	 *
+	 * Extends the base sanitizer to allow additional SVG presentation attributes
+	 * (`stroke`, `stroke-width`, `stroke-linecap`, `stroke-linejoin`, `fill`) that
+	 * are used by Core's existing block UI icons (e.g. the Navigation submenu
+	 * chevron uses `stroke-width` and `fill="none"`).
+	 *
+	 * @param string $icon_content SVG markup to sanitize.
+	 * @return string Sanitized SVG markup.
+	 */
+	protected function sanitize_icon_content( $icon_content ) {
+		$allowed_tags = array(
+			'svg'     => array(
+				'class'       => true,
+				'xmlns'       => true,
+				'width'       => true,
+				'height'      => true,
+				'viewbox'     => true,
+				'fill'        => true,
+				'aria-hidden' => true,
+				'role'        => true,
+				'focusable'   => true,
+			),
+			'path'    => array(
+				'fill'            => true,
+				'fill-rule'       => true,
+				'd'               => true,
+				'transform'       => true,
+				'stroke'          => true,
+				'stroke-width'    => true,
+				'stroke-linecap'  => true,
+				'stroke-linejoin' => true,
+			),
+			'polygon' => array(
+				'fill'            => true,
+				'fill-rule'       => true,
+				'points'          => true,
+				'transform'       => true,
+				'focusable'       => true,
+				'stroke'          => true,
+				'stroke-width'    => true,
+				'stroke-linecap'  => true,
+				'stroke-linejoin' => true,
+			),
+		);
+		return wp_kses( $icon_content, $allowed_tags );
+	}
+
+	/**
 	 * Retrieves the content of a registered icon.
 	 *
 	 * Overridden so that the file validation is applied even when the base
