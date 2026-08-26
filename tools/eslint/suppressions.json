@@ -841,11 +841,6 @@
 			"count": 2
 		}
 	},
-	"packages/components/src/scrollable/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/select-control/styles/select-control-styles.ts": {
 		"no-restricted-imports": {
 			"count": 2
