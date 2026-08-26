@@ -6,7 +6,7 @@
  *
  * Exposes the server-side HTML to blocks conversion over REST, so end-to-end
  * tests can compare what PHP produces with what the editor produces from the
- * same markup.
+ * same markup, along with the report of which blocks a conversion can produce.
  *
  * @package gutenberg-test-block-transforms
  */
@@ -40,6 +40,28 @@ add_action(
 					return array(
 						'markup' => gutenberg_html_to_block_markup( $request['html'] ),
 					);
+				},
+			)
+		);
+
+		register_rest_route(
+			'gutenberg-test/v1',
+			'/conversion-support',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'permission_callback' => static function () {
+					return current_user_can( 'edit_posts' );
+				},
+				'callback'            => static function () {
+					if ( ! function_exists( 'gutenberg_get_block_conversion_support' ) ) {
+						return new WP_Error(
+							'gutenberg_test_conversion_unavailable',
+							'This build of the Gutenberg plugin does not provide gutenberg_get_block_conversion_support().',
+							array( 'status' => 501 )
+						);
+					}
+
+					return gutenberg_get_block_conversion_support();
 				},
 			)
 		);

@@ -969,4 +969,196 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 		$this->assertContains( 'test/picture', $support['declines'] );
 		$this->assertNotContains( 'test/picture', $support['converts'] );
 	}
+
+	public function test_drops_a_wrapper_attribute_the_block_cannot_hold() {
+		$this->register(
+			'test/note',
+			array(
+				'attributes' => array(),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'     => 'raw',
+							'selector' => 'aside',
+						),
+					),
+				),
+			)
+		);
+
+		// `save` would not put these back, so keeping them makes the block
+		// invalid, and a deprecation sourcing content without a selector then
+		// absorbs the whole element as the block's content.
+		$blocks = gutenberg_html_to_blocks( '<aside style="color:red" dir="rtl" data-legacy="1">Text</aside>' );
+
+		$this->assertSame( '<aside class="wp-block-test-note">Text</aside>', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_keeps_a_wrapper_attribute_the_block_sources() {
+		$this->register(
+			'test/counter',
+			array(
+				'attributes' => array(),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'       => 'raw',
+							'selector'   => 'aside',
+							'attributes' => array(
+								'count' => array(
+									'type'      => 'number',
+									'source'    => 'attribute',
+									'attribute' => 'data-count',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		// `save` writes a sourced attribute back out, so this one stays while
+		// the rest of the wrapper is cleared.
+		$blocks = gutenberg_html_to_blocks( '<aside data-count="3" title="tip">Items</aside>' );
+
+		$this->assertSame( '<aside class="wp-block-test-counter" data-count="3">Items</aside>', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_drops_an_attribute_the_content_schema_does_not_allow() {
+		$this->register_schema_block();
+
+		$blocks = gutenberg_html_to_blocks( '<aside><b class="x">Marked</b></aside>' );
+
+		$this->assertSame( '<aside class="wp-block-test-schema"><b>Marked</b></aside>', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_keeps_an_attribute_the_content_schema_allows() {
+		$this->register_schema_block();
+
+		$blocks = gutenberg_html_to_blocks( '<aside><b data-lang="js" id="z">Marked</b></aside>' );
+
+		$this->assertSame( '<aside class="wp-block-test-schema"><b data-lang="js">Marked</b></aside>', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_unwraps_an_element_the_content_schema_does_not_name() {
+		$this->register_schema_block();
+
+		// `deepFilterHTML` keeps the content of an element it does not allow
+		// and drops the element, rather than dropping both.
+		$blocks = gutenberg_html_to_blocks( '<aside><i>Emphasis</i></aside>' );
+
+		$this->assertSame( '<aside class="wp-block-test-schema">Emphasis</aside>', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_removes_content_a_schema_declares_no_children_for() {
+		$this->register(
+			'test/rule',
+			array(
+				'attributes' => array(),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'     => 'raw',
+							'selector' => 'section',
+							'schema'   => array( 'section' => array() ),
+						),
+					),
+				),
+			)
+		);
+
+		$blocks = gutenberg_html_to_blocks( '<section>Dropped<b>too</b></section>' );
+
+		$this->assertSame( '<section class="wp-block-test-rule"></section>', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_reads_the_default_attributes_of_a_schema_that_varies_by_context() {
+		$this->register(
+			'test/varies',
+			array(
+				'attributes' => array(),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'     => 'raw',
+							'selector' => 'article',
+							'schema'   => array(
+								'article' => array(
+									'children' => array(
+										'p' => array(
+											'attributes' => array(
+												'default' => array( 'lang' ),
+												'paste'   => array(),
+											),
+											'children'   => array( '#text' => array() ),
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		// Conversion is not a paste, so `default` is the list that applies.
+		$blocks = gutenberg_html_to_blocks( '<article><p lang="en" dir="rtl">Quoted</p></article>' );
+
+		$this->assertSame( '<article class="wp-block-test-varies"><p lang="en">Quoted</p></article>', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_leaves_content_alone_when_the_schema_allows_anything() {
+		$this->register(
+			'test/anything',
+			array(
+				'attributes' => array(),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'     => 'raw',
+							'selector' => 'nav',
+							'schema'   => array( 'nav' => array( 'children' => '*' ) ),
+						),
+					),
+				),
+			)
+		);
+
+		$blocks = gutenberg_html_to_blocks( '<nav><b class="x">Kept</b></nav>' );
+
+		$this->assertSame( '<nav class="wp-block-test-anything"><b class="x">Kept</b></nav>', $blocks[0]['innerHTML'] );
+	}
+
+	/**
+	 * Registers a block whose transform declares a content schema.
+	 *
+	 * @return void
+	 */
+	private function register_schema_block() {
+		$this->register(
+			'test/schema',
+			array(
+				'attributes' => array(),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'     => 'raw',
+							'selector' => 'aside',
+							'schema'   => array(
+								'aside' => array(
+									'children' => array(
+										'#text' => array(),
+										'b'     => array(
+											'attributes' => array( 'data-lang' ),
+											'children'   => array( '#text' => array() ),
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+	}
 }
