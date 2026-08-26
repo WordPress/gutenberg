@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Add `spacing.blockBackgroundPadding` to the styles types.
+-   Add `spacing.blockBackgroundPadding` to the styles types ([#82057](https://github.com/WordPress/gutenberg/pull/82057)).
 
 ### Bug Fixes
 

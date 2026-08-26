@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   Add `spacing.blockBackgroundPadding` to the style properties, so a `theme.json` value is emitted as the `--wp--style--block-background-padding` custom property.
+-   Add `spacing.blockBackgroundPadding` to the style properties, so a `theme.json` value is emitted as the `--wp--style--block-background-padding` custom property ([#82057](https://github.com/WordPress/gutenberg/pull/82057)).
 
 ## 15.26.0 (2026-08-12)
 
