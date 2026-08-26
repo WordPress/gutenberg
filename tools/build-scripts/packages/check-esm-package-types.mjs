@@ -6,6 +6,7 @@ import {
 	rm,
 	writeFile,
 } from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -17,6 +18,16 @@ const rootDirectory = path.resolve(
 	'../../..'
 );
 const packagesDirectory = path.join( rootDirectory, 'packages' );
+
+function getPackageTypeRoots( directory ) {
+	const packageRequire = createRequire(
+		path.join( directory, 'package.json' )
+	);
+	const nodeTypesDirectory = path.dirname(
+		packageRequire.resolve( '@types/node/package.json' )
+	);
+	return path.dirname( nodeTypesDirectory );
+}
 
 async function publishesBuildTypes( { directory, packageJson } ) {
 	if ( packageJson.files ) {
@@ -78,9 +89,7 @@ async function checkNodeNextTypes( { directory, packageJson } ) {
 					moduleResolution: 'nodenext',
 					noEmit: true,
 					pretty: false,
-					typeRoots: [
-						path.join( rootDirectory, 'node_modules', '@types' ),
-					],
+					typeRoots: [ getPackageTypeRoots( directory ) ],
 				},
 				files: declarations,
 			} )
