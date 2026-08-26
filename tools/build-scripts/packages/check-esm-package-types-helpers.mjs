@@ -85,13 +85,14 @@ export function packPackage( { directory, packageJson }, packDestination ) {
 	}
 
 	const packResult = packResults[ 0 ];
+	const files = packResult.files.map( ( file ) =>
+		path.join( directory, file.path )
+	);
 	return {
-		declarations: packResult.files
-			.map( ( file ) => file.path )
-			.filter( ( filePath ) =>
-				/^build-types\/.*\.d\.(?:ts|mts|cts)$/.test( filePath )
-			)
-			.map( ( filePath ) => path.join( directory, filePath ) ),
+		declarations: files.filter( ( filePath ) =>
+			/[/\\]build-types[/\\].*\.d\.(?:ts|mts|cts)$/.test( filePath )
+		),
+		files,
 		tarballPath: path.join( packDestination, packResult.filename ),
 	};
 }

@@ -7,6 +7,7 @@ import {
 	inspectPackagePublications,
 	packPackage,
 } from '../packages/check-esm-package-types-helpers.mjs';
+import { checkNodeNextTypes } from '../packages/check-esm-package-types.mjs';
 
 let fixtureDirectory;
 let packageDirectory;
@@ -30,6 +31,7 @@ async function createPackageFixture( files ) {
 	const packageJson = {
 		name: 'esm-package-types-fixture',
 		version: '1.0.0',
+		type: 'module',
 		files,
 	};
 	await writeFile(
@@ -40,6 +42,13 @@ async function createPackageFixture( files ) {
 	await writeFile(
 		path.join( packageDirectory, 'build-types', 'index.d.ts' ),
 		'export {};'
+	);
+	await writeFile(
+		path.join( packageDirectory, 'tsconfig.build.json' ),
+		JSON.stringify( {
+			compilerOptions: { types: [] },
+			include: [ 'build-types' ],
+		} )
 	);
 	return packageJson;
 }
@@ -83,6 +92,7 @@ test( 'continues package packing after a failure', () => {
 		} )
 		.mockReturnValueOnce( {
 			declarations: [ '/packages/second/build-types/index.d.ts' ],
+			files: [ '/packages/second/build-types/index.d.ts' ],
 			tarballPath: '/archives/second.tgz',
 		} );
 
@@ -95,6 +105,7 @@ test( 'continues package packing after a failure', () => {
 			packageData: packages[ 1 ],
 			packedPackage: {
 				declarations: [ '/packages/second/build-types/index.d.ts' ],
+				files: [ '/packages/second/build-types/index.d.ts' ],
 				tarballPath: '/archives/second.tgz',
 			},
 		},
@@ -163,4 +174,29 @@ test( 'returns only nested CSS-only exports as ATTW exclusions', () => {
 	expect( getCssEntrypoints( packageJson ) ).toEqual( [
 		'design-tokens.css',
 	] );
+} );
+
+test( 'fails when a published declaration imports an omitted sibling declaration', async () => {
+	const packageJson = await createPackageFixture( [
+		'build-types/extra.d.ts',
+	] );
+	await writeFile(
+		path.join( packageDirectory, 'build-types', 'extra.d.ts' ),
+		"export type { Hidden } from './hidden.ts';"
+	);
+	await writeFile(
+		path.join( packageDirectory, 'build-types', 'hidden.d.ts' ),
+		'export interface Hidden {}'
+	);
+	const packedPackage = packPackage(
+		{ directory: packageDirectory, packageJson },
+		packDestination
+	);
+
+	await expect(
+		checkNodeNextTypes(
+			{ directory: packageDirectory, packageJson },
+			packedPackage
+		)
+	).rejects.toThrow( "Cannot find module './hidden.ts'" );
 } );

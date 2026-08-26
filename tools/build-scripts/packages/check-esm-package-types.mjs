@@ -1,4 +1,12 @@
-import { mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
+import {
+	copyFile,
+	mkdir,
+	mkdtemp,
+	readFile,
+	readdir,
+	rm,
+	writeFile,
+} from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -58,16 +66,36 @@ function getPackageTypeOptions( { directory, packageJson } ) {
 	}
 }
 
-async function checkNodeNextTypes( { directory, packageJson }, declarations ) {
+export async function checkNodeNextTypes(
+	{ directory, packageJson },
+	packedPackage
+) {
+	const { declarations, files } = packedPackage;
 	if ( declarations.length === 0 ) {
 		throw new Error( `No declarations found for ${ packageJson.name }` );
 	}
 	const temporaryDirectory = await mkdtemp(
 		path.join( directory, '.gutenberg-esm-types-' )
 	);
+	const mirroredPackageDirectory = path.join( temporaryDirectory, 'package' );
+	const getMirroredPath = ( filePath ) =>
+		path.join(
+			mirroredPackageDirectory,
+			path.relative( directory, filePath )
+		);
+	const mirroredDeclarations = declarations.map( getMirroredPath );
 	const tsconfigPath = path.join( temporaryDirectory, 'tsconfig.json' );
 	let result;
 	try {
+		await Promise.all(
+			files.map( async ( filePath ) => {
+				const mirroredPath = getMirroredPath( filePath );
+				await mkdir( path.dirname( mirroredPath ), {
+					recursive: true,
+				} );
+				await copyFile( filePath, mirroredPath );
+			} )
+		);
 		await writeFile(
 			tsconfigPath,
 			JSON.stringify( {
@@ -79,7 +107,7 @@ async function checkNodeNextTypes( { directory, packageJson }, declarations ) {
 					noEmit: true,
 					pretty: false,
 				},
-				files: declarations,
+				files: mirroredDeclarations,
 			} )
 		);
 		result = spawn.sync( 'tsc', [ '--project', tsconfigPath ], {
@@ -98,8 +126,12 @@ async function checkNodeNextTypes( { directory, packageJson }, declarations ) {
 		);
 	}
 
+	const buildTypesDirectory = path.join(
+		mirroredPackageDirectory,
+		'build-types'
+	);
 	const buildTypesPrefix = `${ path
-		.relative( rootDirectory, path.join( directory, 'build-types' ) )
+		.relative( rootDirectory, buildTypesDirectory )
 		.replaceAll( path.sep, '/' ) }/`;
 	const diagnostics = `${ result.stdout }\n${ result.stderr }`.split(
 		/\r?\n/
@@ -110,6 +142,7 @@ async function checkNodeNextTypes( { directory, packageJson }, declarations ) {
 	const { hasTypeScriptDiagnostics, relevantDiagnostics } =
 		classifyTypeScriptDiagnostics( diagnostics, [
 			buildTypesPrefix,
+			`${ buildTypesDirectory.replaceAll( path.sep, '/' ) }/`,
 			path
 				.relative( rootDirectory, tsconfigPath )
 				.replaceAll( path.sep, '/' ),
@@ -192,7 +225,7 @@ async function getPublishedEsmPackages( packDestination ) {
 
 async function checkPackage( { packageData, packedPackage } ) {
 	const { packageJson } = packageData;
-	await checkNodeNextTypes( packageData, packedPackage.declarations );
+	await checkNodeNextTypes( packageData, packedPackage );
 
 	const args = [
 		packedPackage.tarballPath,
@@ -224,31 +257,45 @@ async function checkPackage( { packageData, packedPackage } ) {
 	}
 }
 
-const packageArchivesDirectory = await mkdtemp(
-	path.join( tmpdir(), 'gutenberg-esm-package-archives-' )
-);
-let hasErrors = false;
-try {
-	for ( const publication of await getPublishedEsmPackages(
-		packageArchivesDirectory
-	) ) {
-		const { packageData } = publication;
-		try {
-			if ( publication.status === 'rejected' ) {
-				throw publication.reason;
+async function run() {
+	const packageArchivesDirectory = await mkdtemp(
+		path.join( tmpdir(), 'gutenberg-esm-package-archives-' )
+	);
+	let hasErrors = false;
+	try {
+		for ( const publication of await getPublishedEsmPackages(
+			packageArchivesDirectory
+		) ) {
+			const { packageData } = publication;
+			try {
+				if ( publication.status === 'rejected' ) {
+					throw publication.reason;
+				}
+				await checkPackage( publication );
+			} catch ( error ) {
+				const message =
+					error instanceof Error ? error.message : String( error );
+				console.error(
+					`${ packageData.packageJson.name }: ${ message }`
+				);
+				hasErrors = true;
 			}
-			await checkPackage( publication );
-		} catch ( error ) {
-			const message =
-				error instanceof Error ? error.message : String( error );
-			console.error( `${ packageData.packageJson.name }: ${ message }` );
-			hasErrors = true;
 		}
+	} finally {
+		await rm( packageArchivesDirectory, { recursive: true, force: true } );
 	}
-} finally {
-	await rm( packageArchivesDirectory, { recursive: true, force: true } );
+
+	if ( hasErrors ) {
+		process.exitCode = 1;
+	}
 }
 
-if ( hasErrors ) {
-	process.exitCode = 1;
+if (
+	process.argv[ 1 ] &&
+	path.resolve( process.argv[ 1 ] ) === fileURLToPath( import.meta.url )
+) {
+	run().catch( ( error ) => {
+		console.error( error );
+		process.exitCode = 1;
+	} );
 }
