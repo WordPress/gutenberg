@@ -3,6 +3,7 @@ import { useDispatch } from '@wordpress/data';
 import { SelectControl } from '@wordpress/components';
 import { store as editorStore } from '../../store';
 import { useAuthorsQuery } from './hook';
+import AuthorHelpText from './help-text';
 
 export default function PostAuthorSelect() {
 	const { editPost } = useDispatch( editorStore );
@@ -21,6 +22,7 @@ export default function PostAuthorSelect() {
 			onChange={ setAuthorId }
 			value={ authorId }
 			hideLabelFromVision
+			help={ <AuthorHelpText /> }
 		/>
 	);
 }

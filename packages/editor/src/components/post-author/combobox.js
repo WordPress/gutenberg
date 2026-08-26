@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { ComboboxControl } from '@wordpress/components';
 import { store as editorStore } from '../../store';
 import { useAuthorsQuery } from './hook';
+import AuthorHelpText from './help-text';
 
 export default function PostAuthorCombobox() {
 	const [ fieldValue, setFieldValue ] = useState();
@@ -35,6 +36,7 @@ export default function PostAuthorCombobox() {
 			allowReset={ false }
 			hideLabelFromVision
 			isLoading={ isLoading }
+			help={ <AuthorHelpText /> }
 		/>
 	);
 }
