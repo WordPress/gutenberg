@@ -82,11 +82,24 @@ function statusMessage( counts: IssueCounts ): string {
 	);
 }
 
-/*
- * The dashboard's Site Health page: the same target as the Details action.
- * The host upgrades the review link to a route link when it owns the page.
+/**
+ * Builds the href of the dashboard's Site Health page, the same target as
+ * the Details action, filtered to the statuses that have items. The query
+ * travels inside `p`, so a full load and the host's route link read the
+ * same filter.
+ *
+ * @param {IssueCounts} counts Aggregated issue counts.
  */
-const DETAILS_HREF = 'admin.php?page=dashboard-wp-admin&p=/site-health';
+function reviewHref( counts: IssueCounts ): string {
+	const statuses = ( [ 'critical', 'recommended' ] as const ).filter(
+		( status ) => counts[ status ] > 0
+	);
+	const route = `/site-health?status=${ statuses.join( ',' ) }`;
+
+	return `admin.php?page=dashboard-wp-admin&p=${ encodeURIComponent(
+		route
+	) }`;
+}
 
 export default function SiteHealth() {
 	const [ counts, setCounts ] = useState< IssueCounts | null >( null );
@@ -148,7 +161,8 @@ export default function SiteHealth() {
 		total > 0 ? Math.round( ( counts.good / total ) * 100 ) : 0;
 	const issuesTotal = counts.recommended + counts.critical;
 	const tone = toneForPercentage( percentage );
-	const path = links?.match( DETAILS_HREF ) ?? null;
+	const href = reviewHref( counts );
+	const path = links?.match( href ) ?? null;
 	const HostLink = links?.Link;
 	const reviewLabel = sprintf(
 		/* translators: %d: Number of issues to address. */
@@ -172,7 +186,7 @@ export default function SiteHealth() {
 						{ reviewLabel }
 					</Link>
 				) : (
-					<Link href={ DETAILS_HREF }>{ reviewLabel }</Link>
+					<Link href={ href }>{ reviewLabel }</Link>
 				) ) }
 		</Stack>
 	);
