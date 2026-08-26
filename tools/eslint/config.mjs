@@ -147,7 +147,7 @@ const privateApisRestrictedImport = {
 		'Bundled packages may be compiled into plugin bundles via npm, where a second copy of private-apis cannot unlock objects locked by the WordPress copy and throws at runtime.',
 };
 const lockUnlockRestrictedPattern = {
-	group: [ '**/lock-unlock' ],
+	group: [ '**/lock-unlock', '**/lock-unlock.*' ],
 	message:
 		'This module wraps @wordpress/private-apis, which bundled packages must not depend on: a plugin bundling this package compiles a second copy of private-apis that cannot unlock objects locked by the WordPress copy and throws at runtime.',
 };
