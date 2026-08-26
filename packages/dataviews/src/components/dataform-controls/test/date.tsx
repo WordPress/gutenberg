@@ -439,9 +439,26 @@ describe( 'DateControl', () => {
 				/>
 			);
 
-			expect(
-				screen.getByRole( 'application', { name: 'Date calendar' } )
-			).toHaveAttribute( 'dir', 'rtl' );
+			expect( screen.getByRole( 'application' ) ).toHaveAttribute(
+				'dir',
+				'rtl'
+			);
+		} );
+
+		it( 'should take the site text direction over a supported date locale', () => {
+			setLocale( 'en', true );
+			render(
+				<DateControl
+					data={ { published: '2026-01-15' } as TestItem }
+					field={ field }
+					onChange={ noop }
+				/>
+			);
+
+			expect( screen.getByRole( 'application' ) ).toHaveAttribute(
+				'dir',
+				'rtl'
+			);
 		} );
 	} );
 } );

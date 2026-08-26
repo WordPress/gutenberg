@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 14.54.0 (2026-08-26)
+
+### New Features
+
+-   Add a private `SiteExport` menu item, moved from `edit-site`. It offers downloading the theme with the user's changes, only while editing a template or a template part — the entities the exported theme is made of ([#81992](https://github.com/WordPress/gutenberg/pull/81992)).
+
 ### Enhancements
 
 -   Commands: Add a command palette entry that opens the current post on the front end once it is published, labelled with the post type's `view_item` label ([#66720](https://github.com/WordPress/gutenberg/pull/66720)).
@@ -14,6 +20,7 @@
 -   Notes: Stop forcing capitalization of the user name in a note byline, so the name is shown as the user set it ([#81788](https://github.com/WordPress/gutenberg/pull/81788)).
 -   Device Preview: Center the editor canvas with the canvas container's own flex alignment rather than the canvas's auto margins, which were conditional on the resize handles being active. Switching from the mobile or tablet preview back to desktop no longer expands the canvas from the left edge ([#81484](https://github.com/WordPress/gutenberg/pull/81484)).
 -   `PostSchedule`: Announce the new publish date to screen readers when the date is changed ([#81629](https://github.com/WordPress/gutenberg/pull/81629)).
+-   Start page/template pattern modals: Align the footer actions with the modal content's padding, so the footer no longer overflows the modal width ([#82021](https://github.com/WordPress/gutenberg/pull/82021)).
 
 ### Internal
 

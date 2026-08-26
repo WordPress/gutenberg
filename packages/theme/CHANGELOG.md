@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 2.0.0 (2026-08-26)
+
+### Breaking Changes
+
+-   Fix published ESM declaration imports for Node-style resolution. TypeScript consumers now require TypeScript 5 or newer. ([#82022](https://github.com/WordPress/gutenberg/pull/82022))
+
 ### Enhancements
 
 -   Add an `onColorWarnings` callback for `ThemeProvider` consumers to receive structured color ramp and semantic contrast warnings ([#81185](https://github.com/WordPress/gutenberg/pull/81185)).
@@ -13,10 +19,12 @@
 
 ### Documentation
 
+-   Explain how consumers define light and dark themes through `ThemeProvider` color seeds ([#82039](https://github.com/WordPress/gutenberg/pull/82039)).
 -   Route contributors and coding agents to the canonical Design System package guidance ([#80597](https://github.com/WordPress/gutenberg/pull/80597)).
 
 ### Internal
 
+-   Rename `ThemeProvider` wrapper CSS module class from `root` to `wrapper` for clearer DevTools inspection ([#81996](https://github.com/WordPress/gutenberg/pull/81996)).
 -   Update Terrazzo packages to 2.7.1 ([#81978](https://github.com/WordPress/gutenberg/pull/81978)).
 -   Point tsconfig references at split dependencies' build projects. ([#81514](https://github.com/WordPress/gutenberg/pull/81514), [#81518](https://github.com/WordPress/gutenberg/pull/81518))
 -   Collapse the `tsconfig.src.json`/`tsconfig.bin.json`/`tsconfig.test.json` projects into the repository-standard split of `tsconfig.build.json` and a default dev `tsconfig.json`. ([#81509](https://github.com/WordPress/gutenberg/pull/81509))

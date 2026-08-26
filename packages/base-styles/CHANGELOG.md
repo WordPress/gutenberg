@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 13.0.0 (2026-08-26)
+
 ### Breaking Changes
 
 -   Remove the `input-style__focus` mixin. Use `outset-ring__focus` instead ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
