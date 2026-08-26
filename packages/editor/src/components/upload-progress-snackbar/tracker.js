@@ -21,14 +21,15 @@ import { useSyncExternalStore } from '@wordpress/element';
 let state = null;
 
 /**
- * Running tally of files that finished by failing. Kept outside `state` because
- * `state` is cleared once a session finishes - which is exactly the moment a
- * consumer needs to know whether anything actually uploaded. It only ever
- * grows; see `getFailureCount`.
+ * Running tally of files that finished by failing, counted since the editor
+ * loaded rather than per session. Deliberately not a sibling of `total`,
+ * `completed` and `pending` inside `state`: `state` is cleared the moment a
+ * session finishes, which is exactly when a consumer needs to know whether
+ * anything actually uploaded. It only ever grows; see `getFailureCount`.
  *
  * @type {number}
  */
-let failureCount = 0;
+let cumulativeFailures = 0;
 
 const listeners = new Set();
 
@@ -88,7 +89,7 @@ function finish( count, failed ) {
 	if ( ! state || count <= 0 ) {
 		return;
 	}
-	failureCount += failed;
+	cumulativeFailures += failed;
 	const completed = Math.min( state.total, state.completed + count );
 	const pending = state.pending.slice( count );
 	if ( completed >= state.total ) {
@@ -107,7 +108,7 @@ function finish( count, failed ) {
  * `advance` clears the state on its own once every file in a batch finishes.
  */
 export function reset() {
-	failureCount = 0;
+	cumulativeFailures = 0;
 	if ( state === null ) {
 		return;
 	}
@@ -126,7 +127,7 @@ export function reset() {
  * @return {number} Number of failed uploads since the editor loaded.
  */
 export function getFailureCount() {
-	return failureCount;
+	return cumulativeFailures;
 }
 
 /**
