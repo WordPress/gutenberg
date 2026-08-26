@@ -13,6 +13,7 @@
 
 -   Gallery: Support viewport-specific column counts and image cropping in the Flex layout.
 -   `List`: Add wide and full alignment support ([#68002](https://github.com/WordPress/gutenberg/pull/68002)).
+-   Site Title: Add Fit text support, so the title can resize to fill its container as it already can in the Heading and Paragraph blocks.
 
 ### Internal
 

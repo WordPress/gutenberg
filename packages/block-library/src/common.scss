@@ -52,7 +52,15 @@
 
 // Fit Text
 .has-fit-text {
-	white-space: nowrap !important;
+	// Descendants are included because rich text applies an inline
+	// `white-space: pre-wrap` to its editable element. When that element is a
+	// child of the block wrapper rather than the wrapper itself, as in the Site
+	// Title block, the text would otherwise still wrap and the fit calculation
+	// would never detect an overflow.
+	&,
+	:where(*) {
+		white-space: nowrap !important;
+	}
 }
 
 // This tag marks the end of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
