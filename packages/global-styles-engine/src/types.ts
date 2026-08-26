@@ -254,6 +254,7 @@ export interface GlobalStylesStyles {
 		padding?: UnresolvedValue | Record< string, UnresolvedValue >;
 		margin?: UnresolvedValue | Record< string, UnresolvedValue >;
 		blockGap?: string | { top: string; left: string };
+		blockBackgroundPadding?: UnresolvedValue;
 	};
 	background?: BackgroundStyle;
 	border?: {
