@@ -286,10 +286,46 @@ function clearInlineNoteMarker(
 	}
 }
 
+/**
+ * Folds a completed reaction toggle into a cached note record.
+ *
+ * Used to keep `reaction_summary` usable when the refetch that would
+ * normally replace it fails: without it, the next toggle reads a stale
+ * `reacted` / `my_reaction_id` pair and takes the wrong branch.
+ *
+ * @param {Object} note              The cached note record.
+ * @param {string} emoji             The reaction storage slug that changed.
+ * @param {number} [addedReactionId] The new reaction's comment ID when one was
+ *                                   added; omitted when one was removed.
+ * @return {Object} The note with an updated `reaction_summary`.
+ */
+function applyReactionDelta( note, emoji, addedReactionId ) {
+	const summary = { ...( note.reaction_summary || {} ) };
+	const entry = summary[ emoji ];
+
+	if ( addedReactionId ) {
+		summary[ emoji ] = {
+			count: ( entry?.count || 0 ) + 1,
+			reacted: true,
+			my_reaction_id: addedReactionId,
+		};
+	} else if ( entry ) {
+		const count = entry.count - 1;
+		if ( count > 0 ) {
+			summary[ emoji ] = { count, reacted: false };
+		} else {
+			delete summary[ emoji ];
+		}
+	}
+
+	return { ...note, reaction_summary: summary };
+}
+
 export function useNoteActions( reactionsMap = {} ) {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord, receiveEntityRecords } =
 		useDispatch( coreStore );
+	const { getEntityRecord } = useSelect( coreStore );
 	const { getCurrentPostId } = useSelect( editorStore );
 	const {
 		getBlockAttributes,
@@ -525,12 +561,16 @@ export function useNoteActions( reactionsMap = {} ) {
 
 	const onToggleReaction = useCallback(
 		async ( { commentId, emoji } ) => {
-			try {
-				// Check if the user already reacted via reaction_summary.
-				const noteReactions = reactionsMap[ commentId ] || {};
-				const emojiData = noteReactions[ emoji ];
+			// Check if the user already reacted via reaction_summary.
+			const noteReactions = reactionsMap[ commentId ] || {};
+			const emojiData = noteReactions[ emoji ];
+			const isRemoving = !! (
+				emojiData?.reacted && emojiData?.my_reaction_id
+			);
+			let addedReactionId;
 
-				if ( emojiData?.reacted && emojiData?.my_reaction_id ) {
+			try {
+				if ( isRemoving ) {
 					// Force-delete the reaction comment rather than
 					// trashing it (the WP REST default). Reactions
 					// don't have a trash workflow, and a trashed
@@ -545,7 +585,7 @@ export function useNoteActions( reactionsMap = {} ) {
 					);
 				} else {
 					// Add a new reaction as a comment record.
-					await saveEntityRecord(
+					const saved = await saveEntityRecord(
 						'root',
 						'comment',
 						{
@@ -557,27 +597,48 @@ export function useNoteActions( reactionsMap = {} ) {
 						},
 						{ throwOnError: true }
 					);
+					addedReactionId = saved?.id;
 				}
+			} catch ( error ) {
+				onError( error );
+				return;
+			}
 
-				// `reaction_summary` is computed server-side and
-				// cached on the parent note's entity record. Mutating
-				// a reaction comment doesn't invalidate that field, so
-				// a subsequent toggle would read stale `reacted` /
-				// `my_reaction_id` data and route into the wrong
-				// branch (deleting an already-removed comment).
-				//
-				// Refetch only the parent note (1 record) and merge it
-				// into the entity store. `receiveEntityRecords` with
-				// no `query` arg updates the per-record cache, which
-				// the list selector reads through by ID — so the LIST
-				// view picks up the fresh `reaction_summary` without
-				// re-fetching every other note on the post.
+			// `reaction_summary` is computed server-side and cached on the
+			// parent note's entity record. Mutating a reaction comment
+			// doesn't invalidate that field, so a subsequent toggle would
+			// read stale `reacted` / `my_reaction_id` data and route into
+			// the wrong branch (deleting an already-removed comment).
+			//
+			// The mutation has landed, so fold its known effect into the
+			// cached record first. That keeps the next toggle correct even
+			// if the refetch below never succeeds.
+			const cached = getEntityRecord( 'root', 'comment', commentId );
+			if ( cached ) {
+				receiveEntityRecords( 'root', 'comment', [
+					applyReactionDelta(
+						cached,
+						emoji,
+						isRemoving ? undefined : addedReactionId
+					),
+				] );
+			}
+
+			// Then refetch the parent note (1 record) for the authoritative
+			// summary, which also picks up other users' reactions.
+			// `receiveEntityRecords` with no `query` arg updates the
+			// per-record cache, which the list selector reads through by ID
+			// — so the LIST view picks up the fresh `reaction_summary`
+			// without re-fetching every other note on the post.
+			try {
 				const refreshed = await apiFetch( {
 					path: `/wp/v2/comments/${ commentId }`,
 				} );
 				receiveEntityRecords( 'root', 'comment', [ refreshed ] );
-			} catch ( error ) {
-				onError( error );
+			} catch {
+				// The toggle itself succeeded and the local delta above
+				// already keeps this note's reactions consistent, so there
+				// is nothing to report; the next load reconciles the rest.
 			}
 		},
 		[
@@ -585,6 +646,7 @@ export function useNoteActions( reactionsMap = {} ) {
 			deleteEntityRecord,
 			saveEntityRecord,
 			getCurrentPostId,
+			getEntityRecord,
 			receiveEntityRecords,
 		]
 	);
