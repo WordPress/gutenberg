@@ -10,7 +10,7 @@ import { TEMPLATE_POST_TYPE } from '../../store/constants';
  * That template resolves to the site homepage whether the homepage shows the
  * latest posts or a static page, so it points at where that choice is made.
  *
- * @return {React.ReactNode} The rendered component.
+ * @return The rendered component.
  */
 export default function ReadingSettingsLink() {
 	const isVisible = useSelect( ( select ) => {
