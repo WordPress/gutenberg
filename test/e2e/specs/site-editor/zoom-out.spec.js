@@ -288,4 +288,26 @@ test.describe( 'Zoom Out', () => {
 
 		await expect( page.locator( '.is-zoomed-out' ) ).toBeHidden();
 	} );
+
+	test( 'Zoom Out inserter for the selected block stays reachable when the next section is scrolled out of view', async ( {
+		page,
+		editor,
+	} ) => {
+		// Each section is 100vh tall, so at the top of the scroll
+		// container the gap (and inserter) after the first section is
+		// positioned below the viewport.
+		await editor.setContent( EDITOR_ZOOM_OUT_CONTENT );
+		await page.getByRole( 'button', { name: 'Zoom Out' } ).click();
+
+		// In Zoom Out mode, clicking anywhere in a section selects the
+		// section itself rather than entering it.
+		await editor.canvas.locator( 'text=First Section Start' ).click();
+
+		// See https://github.com/WordPress/gutenberg/issues/66346: the
+		// inserter used to be removed from the DOM entirely whenever the
+		// gap it belongs to was scrolled out of view, which made it
+		// unreachable by keyboard. It must stay attached (and therefore
+		// focusable) regardless of scroll position.
+		await expect( page.getByLabel( 'Add pattern' ) ).toBeAttached();
+	} );
 } );

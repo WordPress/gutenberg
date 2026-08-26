@@ -17,6 +17,16 @@ function BlockPopoverInbetween( {
 	__unstableContentRef,
 	operation = 'insert',
 	nearestSide = 'right',
+	// Callers that only ever mount a single instance of this popover (e.g.
+	// the Zoom Out mode inserter, which tracks the current block selection
+	// rather than a hover position) don't need it hidden while its anchor
+	// blocks are scrolled out of view: unlike the default in-between
+	// inserter, there isn't a large number of these mounted at once whose
+	// off-screen instances need skipping for performance, and gating on
+	// intersection removes the only keyboard-reachable inserter for a tall,
+	// selected block whenever its lower boundary is off-screen. See
+	// https://github.com/WordPress/gutenberg/issues/66346.
+	alwaysVisible = false,
 	...props
 } ) {
 	// This is a temporary hack to get the inbetween inserter to recompute properly.
@@ -43,11 +53,12 @@ function BlockPopoverInbetween( {
 					'vertical',
 				rootClientId: _rootClientId,
 				isVisible:
-					isBlockVisible( previousClientId ) &&
-					isBlockVisible( nextClientId ),
+					alwaysVisible ||
+					( isBlockVisible( previousClientId ) &&
+						isBlockVisible( nextClientId ) ),
 			};
 		},
-		[ previousClientId, nextClientId ]
+		[ previousClientId, nextClientId, alwaysVisible ]
 	);
 	const previousElement = useBlockElement( previousClientId );
 	const nextElement = useBlockElement( nextClientId );

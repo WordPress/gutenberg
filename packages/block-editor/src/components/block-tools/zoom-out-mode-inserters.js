@@ -79,6 +79,13 @@ function ZoomOutModeInserters() {
 		<BlockPopoverInbetween
 			previousClientId={ previousClientId }
 			nextClientId={ nextClientId }
+			// Only one of these is ever mounted at a time here (it tracks
+			// the current block selection, not hover), so there's no
+			// performance need to hide it while off-screen — and doing so
+			// made the inserter for a tall selected block unreachable by
+			// keyboard whenever its lower boundary was scrolled out of
+			// view. See https://github.com/WordPress/gutenberg/issues/66346.
+			alwaysVisible
 		>
 			<ZoomOutModeInserterButton
 				onClick={ () => {
