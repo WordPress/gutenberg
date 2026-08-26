@@ -85,22 +85,6 @@ export function getBlockProps(
 }
 
 /**
- * Returns the inner blocks array from the current save context.
- *
- * Unlike the `innerBlocks` parameter received by save functions, this reads
- * from the same module-level provider used by `getInnerBlocksProps`, which is
- * set by `getSaveElement` before calling save. This makes it available during
- * block validation, where the `innerBlocks` function parameter is not passed.
- *
- * @return Inner blocks array (empty if not in a save context).
- */
-export function getInnerBlocks(): Block[] {
-	return Array.isArray( innerBlocksPropsProvider.innerBlocks )
-		? ( innerBlocksPropsProvider.innerBlocks as Block[] )
-		: [];
-}
-
-/**
  * Call within a save function to get the props for the inner blocks wrapper.
  *
  * @param props Optional. Props to pass to the element.
