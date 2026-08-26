@@ -12,7 +12,6 @@ const browserApiIdentifiers = new Set( [
 ] );
 const browserApiProperties = new Set( [
 	...browserApiIdentifiers,
-	'animate',
 	'clientHeight',
 	'clientLeft',
 	'clientTop',
@@ -30,6 +29,28 @@ const browserApiProperties = new Set( [
 	'scrollLeft',
 	'scrollTop',
 	'scrollWidth',
+] );
+const vitestApiNames = new Set( [
+	'afterAll',
+	'afterEach',
+	'assert',
+	'beforeAll',
+	'beforeEach',
+	'describe',
+	'expect',
+	'expectTypeOf',
+	'it',
+	'onTestFailed',
+	'onTestFinished',
+	'suite',
+	'test',
+	'vi',
+] );
+const browserModeModules = new Set( [ '@vitest/browser', 'vitest/browser' ] );
+const policyExceptionKeys = new Set( [
+	'browserFireEvent',
+	'jsdomBrowserApis',
+	'renderedUi',
 ] );
 const renderedUiImports = new Map( [
 	[ '@testing-library/react', new Set( [ 'render', 'renderHook' ] ) ],
@@ -78,6 +99,29 @@ function isUnboundIdentifier( node, name, unboundIdentifiers ) {
 		node?.type === 'Identifier' &&
 		node.name === name &&
 		unboundIdentifiers.has( node )
+	);
+}
+
+function isDynamicImport( node ) {
+	return (
+		node?.type === 'ImportExpression' ||
+		( node?.type === 'CallExpression' && node.callee?.type === 'Import' )
+	);
+}
+
+function isGlobalGetComputedStyleCall( node, unboundIdentifiers ) {
+	if ( node.callee?.type === 'Identifier' ) {
+		return isUnboundIdentifier(
+			node.callee,
+			'getComputedStyle',
+			unboundIdentifiers
+		);
+	}
+
+	return (
+		getMemberPropertyName( node.callee ) === 'getComputedStyle' &&
+		node.callee.object?.type === 'Identifier' &&
+		[ 'globalThis', 'window' ].includes( node.callee.object.name )
 	);
 }
 
@@ -189,6 +233,89 @@ function traverseAst( node, visitorKeys, visitor ) {
 	}
 }
 
+function isRecord( value ) {
+	return (
+		value !== null && typeof value === 'object' && ! Array.isArray( value )
+	);
+}
+
+/**
+ * Validate the shape and project ownership of Vitest policy exceptions.
+ *
+ * @param {unknown}     options
+ * @param {Object}      projects
+ * @param {Set<string>} projects.browserTests
+ * @param {Set<string>} projects.jsdomTests
+ * @return {string[]} Policy exception violations.
+ */
+export function validateVitestPolicyExceptions(
+	options,
+	{ browserTests, jsdomTests }
+) {
+	if ( ! isRecord( options ) ) {
+		return [ 'Vitest policy exceptions must be an object' ];
+	}
+
+	const violations = [];
+	const unsupportedKeys = Object.keys( options ).filter(
+		( key ) => ! policyExceptionKeys.has( key )
+	);
+	if ( unsupportedKeys.length ) {
+		violations.push(
+			`Vitest policy exception file contains unsupported keys: ${ unsupportedKeys.join(
+				', '
+			) }`
+		);
+	}
+
+	if ( ! Array.isArray( options.renderedUi ) ) {
+		violations.push( 'renderedUi must be an array of jsdom test paths' );
+	} else {
+		const renderedUiEntries = options.renderedUi.filter(
+			( file ) => typeof file === 'string'
+		);
+		if ( renderedUiEntries.length !== options.renderedUi.length ) {
+			violations.push( 'renderedUi entries must be strings' );
+		}
+		if ( new Set( renderedUiEntries ).size !== renderedUiEntries.length ) {
+			violations.push( 'renderedUi entries must be unique' );
+		}
+		for ( const file of renderedUiEntries ) {
+			if ( ! jsdomTests.has( file ) ) {
+				violations.push(
+					`${ file }: renderedUi entry does not match its Vitest project`
+				);
+			}
+		}
+	}
+
+	for ( const [ exceptionName, projectTests ] of [
+		[ 'browserFireEvent', browserTests ],
+		[ 'jsdomBrowserApis', jsdomTests ],
+	] ) {
+		const exceptions = options[ exceptionName ];
+		if ( ! isRecord( exceptions ) ) {
+			violations.push( `${ exceptionName } must be an object` );
+			continue;
+		}
+
+		for ( const [ file, reason ] of Object.entries( exceptions ) ) {
+			if ( typeof reason !== 'string' || reason.trim() === '' ) {
+				violations.push(
+					`${ file }: ${ exceptionName } exceptions require a non-empty reason`
+				);
+			}
+			if ( ! projectTests.has( file ) ) {
+				violations.push(
+					`${ file }: ${ exceptionName } entry does not match its Vitest project`
+				);
+			}
+		}
+	}
+
+	return violations;
+}
+
 /**
  * Validate policy rules that distinguish Node, jsdom, and Browser Mode tests.
  *
@@ -199,6 +326,7 @@ function traverseAst( node, visitorKeys, visitor ) {
  * @param {boolean} [options.allowBrowserFireEvent]
  * @param {boolean} [options.allowJsdomBrowserApis]
  * @param {boolean} [options.allowRenderedUi]
+ * @param {boolean} [options.isVitestTest]
  * @return {string[]} Policy violations.
  */
 export function validateVitestPolicy( {
@@ -208,6 +336,7 @@ export function validateVitestPolicy( {
 	allowBrowserFireEvent = false,
 	allowJsdomBrowserApis = false,
 	allowRenderedUi = false,
+	isVitestTest = false,
 } ) {
 	const { ast, scopeManager, visitorKeys } =
 		typescriptEslintParser.parseForESLint( source, {
@@ -216,6 +345,7 @@ export function validateVitestPolicy( {
 			jsxPragma: null,
 			loc: true,
 			range: true,
+			comment: true,
 			sourceType: 'module',
 		} );
 	const unboundIdentifiers = new Set(
@@ -226,6 +356,7 @@ export function validateVitestPolicy( {
 	const importedNamespaces = new Set();
 	const violations = [];
 	const reported = new Set();
+	let hasVitestImport = false;
 
 	const report = ( category, line, message ) => {
 		if ( reported.has( category ) ) {
@@ -299,6 +430,30 @@ export function validateVitestPolicy( {
 
 	traverseAst( ast, visitorKeys, ( node ) => {
 		const moduleSource = getModuleSource( node );
+		if ( isVitestTest && moduleSource === 'vitest' ) {
+			hasVitestImport = true;
+		}
+
+		if ( isVitestTest && moduleSource === 'vitest/globals' ) {
+			report(
+				'vitest-globals',
+				node.loc.start.line,
+				'vitest/globals is not allowed'
+			);
+		}
+
+		if (
+			isVitestTest &&
+			project !== 'browser' &&
+			browserModeModules.has( moduleSource )
+		) {
+			report(
+				'browser-mode-import',
+				node.loc.start.line,
+				'Browser Mode imports require a *.browser.test.* filename'
+			);
+		}
+
 		if (
 			project === 'browser' &&
 			moduleSource &&
@@ -325,6 +480,70 @@ export function validateVitestPolicy( {
 				isCommonJsExport( node.left, unboundIdentifiers ) )
 		) {
 			report( 'commonjs-export', node.loc.start.line, 'CommonJS export' );
+		}
+
+		if (
+			node.type === 'CallExpression' &&
+			isUnboundIdentifier( node.callee, 'require', unboundIdentifiers )
+		) {
+			report(
+				'unbound-require',
+				node.loc.start.line,
+				'unbound require()'
+			);
+		}
+
+		if (
+			/\.tsx?$/.test( file ) &&
+			node.type === 'CallExpression' &&
+			node.callee?.type === 'MemberExpression' &&
+			node.callee.object?.type === 'Identifier' &&
+			node.callee.object.name === 'vi' &&
+			getMemberPropertyName( node.callee ) === 'mock' &&
+			! isDynamicImport( node.arguments[ 0 ] )
+		) {
+			report(
+				'typescript-vi-mock',
+				node.loc.start.line,
+				'TypeScript vi.mock() must use vi.mock(import(...))'
+			);
+		}
+
+		if (
+			project === 'jsdom' &&
+			node.type === 'CallExpression' &&
+			isGlobalGetComputedStyleCall( node, unboundIdentifiers )
+		) {
+			report(
+				'jsdom-computed-style',
+				node.loc.start.line,
+				'computed style assertions require a *.browser.test.* filename'
+			);
+		}
+
+		if (
+			project === 'jsdom' &&
+			node.type === 'CallExpression' &&
+			getMemberPropertyName( node.callee ) === 'toHaveStyle'
+		) {
+			report(
+				'jsdom-style-matcher',
+				node.loc.start.line,
+				'toHaveStyle() requires a *.browser.test.* filename'
+			);
+		}
+
+		if (
+			isVitestTest &&
+			node.type === 'Identifier' &&
+			vitestApiNames.has( node.name ) &&
+			unboundIdentifiers.has( node )
+		) {
+			report(
+				`unbound-vitest-api-${ node.name }`,
+				node.loc.start.line,
+				`unbound Vitest API: ${ node.name }`
+			);
 		}
 
 		if ( project === 'jsdom' && ! allowJsdomBrowserApis ) {
@@ -368,6 +587,35 @@ export function validateVitestPolicy( {
 			);
 		}
 	} );
+
+	if ( isVitestTest && ! hasVitestImport ) {
+		report( 'vitest-import', 1, 'no explicit import from vitest' );
+	}
+
+	if (
+		isVitestTest &&
+		ast.comments?.some( ( comment ) =>
+			/^\s*\*?\s*@(jest|vitest)-environment\b/m.test( comment.value )
+		)
+	) {
+		report(
+			'test-environment-override',
+			1,
+			'per-file test environment overrides are not allowed; use the filename suffix'
+		);
+	}
+
+	if (
+		isVitestTest &&
+		project === 'node' &&
+		/\.(?:browser|jsdom)\./.test( file.split( '/' ).at( -1 ) )
+	) {
+		report(
+			'environment-suffix',
+			1,
+			'environment names must use *.jsdom.test.* or *.browser.test.*'
+		);
+	}
 
 	return violations;
 }

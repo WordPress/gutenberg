@@ -6,21 +6,22 @@ import {
 	rmSync,
 	writeFileSync,
 } from 'node:fs';
-import { createRequire } from 'node:module';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import typescriptEslintParser from '@typescript-eslint/parser';
 import globPackage from 'glob';
 import {
 	discoverTestFiles,
 	getVitestTestsByProject,
 	VITEST_PROJECT_NAMES,
 } from './discover-test-files.mjs';
-import { validateVitestPolicy } from './vitest-policy-rules.mjs';
+import { resolvePackageBin } from './resolve-package-bin.mjs';
+import {
+	validateVitestPolicy,
+	validateVitestPolicyExceptions,
+} from './vitest-policy-rules.mjs';
 
 const { sync: glob } = globPackage;
-const require = createRequire( import.meta.url );
 const ROOT_DIR = path.resolve(
 	path.dirname( fileURLToPath( import.meta.url ) ),
 	'../../..'
@@ -37,17 +38,17 @@ const policyExceptions = JSON.parse(
 		'utf8'
 	)
 );
-const renderedUiBaseline = new Set( policyExceptions.renderedUi );
 const vitestTestsByProject = getVitestTestsByProject(
 	discoverTestFiles( ROOT_DIR ),
 	migration
 );
 const vitestTests = Object.values( vitestTestsByProject ).flat().sort();
+const vitestTestSet = new Set( vitestTests );
 const jsdomTests = new Set( vitestTestsByProject.jsdom );
 const browserTests = new Set( vitestTestsByProject.browser );
 const vitestInfrastructure = [
 	'test/unit/vitest.config.mjs',
-	...glob( 'test/unit/config/**/*.vitest*.{js,mjs,ts,tsx}', {
+	...glob( 'test/unit/config/**/*.vitest*.{js,jsx,mjs,ts,tsx}', {
 		cwd: ROOT_DIR,
 		nodir: true,
 	} ),
@@ -59,159 +60,23 @@ const vitestInfrastructure = [
 const files = [
 	...new Set( [ ...vitestTests, ...vitestInfrastructure ] ),
 ].sort();
-const vitestApiNames = new Set( [
-	'afterAll',
-	'afterEach',
-	'assert',
-	'beforeAll',
-	'beforeEach',
-	'describe',
-	'expect',
-	'expectTypeOf',
-	'it',
-	'onTestFailed',
-	'onTestFinished',
-	'suite',
-	'test',
-	'vi',
-] );
-const environmentTokenPattern = /\.(?:browser|jsdom)\./;
-const validEnvironmentSuffixPattern =
-	/\.(?:browser|jsdom)\.test\.[cm]?[jt]sx?$/;
 const violations = [];
-
-if ( renderedUiBaseline.size !== policyExceptions.renderedUi.length ) {
-	violations.push( 'Rendered UI jsdom baseline entries must be unique' );
-}
-for ( const file of renderedUiBaseline ) {
-	if ( ! jsdomTests.has( file ) ) {
-		violations.push(
-			`${ file }: rendered UI baseline entries must be jsdom tests`
-		);
-	}
-}
-for ( const [ exceptionName, projectTests ] of [
-	[ 'browserFireEvent', browserTests ],
-	[ 'jsdomBrowserApis', jsdomTests ],
-] ) {
-	for ( const [ file, reason ] of Object.entries(
-		policyExceptions[ exceptionName ]
-	) ) {
-		if ( typeof reason !== 'string' || reason.trim().length < 12 ) {
-			violations.push(
-				`${ file }: ${ exceptionName } exceptions require a concrete reason`
-			);
-		}
-		if ( ! projectTests.has( file ) ) {
-			violations.push(
-				`${ file }: ${ exceptionName } entry does not match its Vitest project`
-			);
-		}
-	}
-}
-
-function resolvePackageBin( packageName ) {
-	const packageJsonPath = require.resolve( `${ packageName }/package.json` );
-	const packageJson = JSON.parse( readFileSync( packageJsonPath, 'utf8' ) );
-	const binPath =
-		typeof packageJson.bin === 'string'
-			? packageJson.bin
-			: Object.values( packageJson.bin )[ 0 ];
-
-	return path.resolve( path.dirname( packageJsonPath ), binPath );
-}
-
-function isDynamicImport( node ) {
-	return (
-		node?.type === 'ImportExpression' ||
-		( node?.type === 'CallExpression' && node.callee?.type === 'Import' )
-	);
-}
-
-function getMemberPropertyName( node ) {
-	if ( node?.type !== 'MemberExpression' ) {
-		return null;
-	}
-
-	if ( ! node.computed && node.property?.type === 'Identifier' ) {
-		return node.property.name;
-	}
-
-	if (
-		node.computed &&
-		( node.property?.type === 'Literal' ||
-			node.property?.type === 'StringLiteral' )
-	) {
-		return node.property.value;
-	}
-
-	return null;
-}
-
-function isGlobalGetComputedStyleCall( node, unboundIdentifiers ) {
-	if ( node.callee?.type === 'Identifier' ) {
-		return (
-			node.callee.name === 'getComputedStyle' &&
-			unboundIdentifiers.has( node.callee )
-		);
-	}
-
-	return (
-		getMemberPropertyName( node.callee ) === 'getComputedStyle' &&
-		node.callee.object?.type === 'Identifier' &&
-		[ 'globalThis', 'window' ].includes( node.callee.object.name )
-	);
-}
-
-function getWpVitestMockName( node ) {
-	if ( node.callee?.type !== 'MemberExpression' ) {
-		return null;
-	}
-
-	const namespace = node.callee.object;
-	if (
-		namespace?.type !== 'MemberExpression' ||
-		getMemberPropertyName( namespace ) !== 'wpVitest' ||
-		namespace.object?.type !== 'Identifier' ||
-		namespace.object.name !== 'globalThis'
-	) {
-		return null;
-	}
-
-	const mockName = getMemberPropertyName( node.callee );
-	return typeof mockName === 'string' && mockName.startsWith( 'mock' )
-		? mockName
-		: null;
-}
-
-function hasTestEnvironmentOverride( source ) {
-	return /@(?:jest|vitest)-environment\b/.test( source );
-}
-
-function hasBrowserModeImport( source ) {
-	return /(?:from\s+|import\s*)[('"](?:@vitest\/browser|vitest\/browser)/.test(
-		source
-	);
-}
-
-function traverseAst( node, visitorKeys, visitors ) {
-	if ( ! node?.type ) {
-		return;
-	}
-
-	visitors[ node.type ]?.( node );
-
-	for ( const key of visitorKeys[ node.type ] ?? [] ) {
-		const child = node[ key ];
-		if ( Array.isArray( child ) ) {
-			child.forEach( ( item ) =>
-				traverseAst( item, visitorKeys, visitors )
-			);
-		} else if ( child?.type ) {
-			traverseAst( child, visitorKeys, visitors );
-		}
-	}
-}
+const exceptionViolations = validateVitestPolicyExceptions( policyExceptions, {
+	browserTests,
+	jsdomTests,
+} );
+violations.push( ...exceptionViolations );
+const browserFireEventExceptions =
+	policyExceptions?.browserFireEvent ?? Object.create( null );
+const jsdomBrowserApiExceptions =
+	policyExceptions?.jsdomBrowserApis ?? Object.create( null );
+const renderedUiBaseline = new Set(
+	Array.isArray( policyExceptions?.renderedUi )
+		? policyExceptions.renderedUi.filter(
+				( file ) => typeof file === 'string'
+		  )
+		: []
+);
 
 function findWorkspacePackage( file ) {
 	let directory = path.dirname( path.join( ROOT_DIR, file ) );
@@ -230,35 +95,11 @@ function findWorkspacePackage( file ) {
 	return null;
 }
 
-for ( const file of vitestTests ) {
-	const basename = path.basename( file );
-	if (
-		environmentTokenPattern.test( basename ) &&
-		! validEnvironmentSuffixPattern.test( basename )
-	) {
-		violations.push(
-			`${ file }: environment names must use *.jsdom.test.* or *.browser.test.*`
-		);
-	}
-}
-
+const sourcesByFile = new Map();
 for ( const file of files ) {
 	const filename = path.join( ROOT_DIR, file );
 	const source = readFileSync( filename, 'utf8' );
-	const { ast, scopeManager, visitorKeys } =
-		typescriptEslintParser.parseForESLint( source, {
-			filePath: filename,
-			jsxFragmentName: null,
-			jsxPragma: null,
-			loc: true,
-			range: true,
-			sourceType: 'module',
-		} );
-	const unboundIdentifiers = new Set(
-		scopeManager.globalScope?.through.map(
-			( reference ) => reference.identifier
-		) ?? []
-	);
+	sourcesByFile.set( file, source );
 	let project = 'node';
 	if ( browserTests.has( file ) ) {
 		project = 'browser';
@@ -269,117 +110,20 @@ for ( const file of files ) {
 	violations.push(
 		...validateVitestPolicy( {
 			file,
+			isVitestTest: vitestTestSet.has( file ),
 			source,
 			project,
 			allowBrowserFireEvent: Boolean(
-				policyExceptions.browserFireEvent[ file ]
+				browserFireEventExceptions[ file ]
 			),
-			allowJsdomBrowserApis: Boolean(
-				policyExceptions.jsdomBrowserApis[ file ]
-			),
+			allowJsdomBrowserApis: Boolean( jsdomBrowserApiExceptions[ file ] ),
 			allowRenderedUi: renderedUiBaseline.has( file ),
 		} )
 	);
-
-	traverseAst( ast, visitorKeys, {
-		CallExpression( node ) {
-			if (
-				node.callee?.type === 'Identifier' &&
-				node.callee.name === 'require' &&
-				unboundIdentifiers.has( node.callee )
-			) {
-				violations.push(
-					`${ file }:${ node.loc.start.line } unbound require()`
-				);
-			}
-
-			if (
-				/\.tsx?$/.test( file ) &&
-				node.callee?.type === 'MemberExpression' &&
-				node.callee.object?.type === 'Identifier' &&
-				node.callee.object.name === 'vi' &&
-				node.callee.property?.type === 'Identifier' &&
-				node.callee.property.name === 'mock' &&
-				! isDynamicImport( node.arguments[ 0 ] )
-			) {
-				violations.push(
-					`${ file }:${ node.loc.start.line } TypeScript vi.mock() must use vi.mock(import(...))`
-				);
-			}
-
-			if (
-				jsdomTests.has( file ) &&
-				isGlobalGetComputedStyleCall( node, unboundIdentifiers )
-			) {
-				violations.push(
-					`${ file }:${ node.loc.start.line } computed style assertions require a *.browser.test.* filename`
-				);
-			}
-
-			if (
-				jsdomTests.has( file ) &&
-				getMemberPropertyName( node.callee ) === 'toHaveStyle'
-			) {
-				violations.push(
-					`${ file }:${ node.loc.start.line } toHaveStyle() requires a *.browser.test.* filename`
-				);
-			}
-
-			const wpVitestMockName = getWpVitestMockName( node );
-			if ( wpVitestMockName && ! jsdomTests.has( file ) ) {
-				violations.push(
-					`${ file }:${ node.loc.start.line } wpVitest.${ wpVitestMockName }() requires a *.jsdom.test.* filename`
-				);
-			}
-		},
-		Identifier( node ) {
-			if (
-				vitestTests.includes( file ) &&
-				vitestApiNames.has( node.name ) &&
-				unboundIdentifiers.has( node )
-			) {
-				violations.push(
-					`${ file }:${ node.loc.start.line } unbound Vitest API: ${ node.name }`
-				);
-			}
-		},
-	} );
-
-	if (
-		vitestTests.includes( file ) &&
-		/(?:from\s+|import\s*)[('"]vitest\/globals/.test( source )
-	) {
-		violations.push( `${ file }: vitest/globals is not allowed` );
-	}
-
-	if (
-		vitestTests.includes( file ) &&
-		hasTestEnvironmentOverride( source )
-	) {
-		violations.push(
-			`${ file }: per-file test environment overrides are not allowed; use the filename suffix`
-		);
-	}
-
-	if (
-		vitestTests.includes( file ) &&
-		hasBrowserModeImport( source ) &&
-		! browserTests.has( file )
-	) {
-		violations.push(
-			`${ file }: Browser Mode imports require a *.browser.test.* filename`
-		);
-	}
 }
 
 const vitestVersions = new Map();
 for ( const file of vitestTests ) {
-	const source = readFileSync( path.join( ROOT_DIR, file ), 'utf8' );
-	if ( ! /(?:from\s+|import\s*)[('"]vitest[)'"]/.test( source ) ) {
-		violations.push( `${ file }: no explicit import from vitest` );
-		continue;
-	}
-
 	const packagePath = findWorkspacePackage( file );
 	if ( ! packagePath ) {
 		violations.push( `${ file }: no owning package.json` );
@@ -439,16 +183,10 @@ for ( const projectName of VITEST_PROJECT_NAMES ) {
 		path.join( os.tmpdir(), `gutenberg-vitest-${ projectName }-typecheck-` )
 	);
 	const configPath = path.join( temporaryDirectory, 'tsconfig.json' );
-	const compatibilityTypesPath = path.join(
-		temporaryDirectory,
-		'compatibility.d.ts'
-	);
 	const needsNodeTypes =
 		projectName === 'node' ||
 		typescriptTests.some( ( file ) =>
-			/[('"]node:/.test(
-				readFileSync( path.join( ROOT_DIR, file ), 'utf8' )
-			)
+			/[('"]node:/.test( sourcesByFile.get( file ) )
 		);
 	const setupTypeFiles =
 		projectName === 'jsdom'
@@ -462,37 +200,23 @@ for ( const projectName of VITEST_PROJECT_NAMES ) {
 	const typecheckConfig = {
 		extends: path.join( ROOT_DIR, 'tsconfig.base.json' ),
 		compilerOptions: {
-			allowJs: true,
 			checkJs: false,
 			composite: false,
-			declaration: true,
-			declarationMap: false,
 			emitDeclarationOnly: false,
 			noEmit: true,
 			rootDir: ROOT_DIR,
-			typeRoots: [
-				path.join( ROOT_DIR, 'typings' ),
-				path.join( ROOT_DIR, 'node_modules/@types' ),
-			],
 			types: [ ...commonTypes, ...( needsNodeTypes ? [ 'node' ] : [] ) ],
 		},
 		files: [
-			compatibilityTypesPath,
 			...setupTypeFiles,
 			...typescriptTests.map( ( file ) => path.join( ROOT_DIR, file ) ),
 		],
 	};
 
 	try {
-		// @wordpress/commands is a JavaScript package without published types.
-		// Keep this exception explicit until that package gains declarations.
-		writeFileSync(
-			compatibilityTypesPath,
-			"declare module '@wordpress/commands';"
-		);
 		writeFileSync( configPath, JSON.stringify( typecheckConfig ) );
 		execFileSync(
-			resolvePackageBin( 'typescript' ),
+			resolvePackageBin( 'typescript', 'tsc6' ),
 			[ '--project', configPath, '--pretty', 'false' ],
 			{ cwd: ROOT_DIR, stdio: 'inherit' }
 		);
