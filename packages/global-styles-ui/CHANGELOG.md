@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.21.0 (2026-08-26)
+
 ### Bug Fixes
 
 -   Revisions: close the screen on the first click of the back arrow after a revision has been selected, instead of requiring a second click ([#81897](https://github.com/WordPress/gutenberg/pull/81897)).

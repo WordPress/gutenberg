@@ -387,6 +387,10 @@ export default dedupePlugins( [
 					definedTags: [ 'jest-environment' ],
 				},
 			],
+			'react/jsx-filename-extension': [
+				'error',
+				{ extensions: [ '.tsx' ] },
+			],
 			'react-hooks/config': [
 				'error',
 				{
@@ -667,20 +671,6 @@ export default dedupePlugins( [
 		rules: {
 			'react-hooks/rules-of-hooks': 'off',
 			'react-hooks/static-components': 'off',
-		},
-	},
-
-	// Override: Storybook + components — enforce JSX file extensions.
-	{
-		files: [
-			'**/@(storybook|stories)/**',
-			'packages/components/src/**/*.tsx',
-		],
-		rules: {
-			'react/jsx-filename-extension': [
-				'error',
-				{ extensions: [ '.jsx', '.tsx' ] },
-			],
 		},
 	},
 
