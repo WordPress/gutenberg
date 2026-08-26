@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Client-side media processing: Refuse a batch of more than one file when the caller only takes one, such as a Cover block placeholder, matching what the server-side upload path already did. Every dropped file was uploaded instead, and the block kept whichever one finished last ([#82041](https://github.com/WordPress/gutenberg/issues/82041)).
+
 ### Enhancements
 
 -   Inspector controls in the standard block-supports panels (Typography, Dimensions, Border, Color, Background, Filters) now reflect the value a block inherits from Global Styles when no local override is set. Inherited controls show that value at rest (as a placeholder, preselected option, or resolved value) and mark the label with a dotted underline; setting a local override reveals a reset affordance that clears the override back to the inherited value ([#77894](https://github.com/WordPress/gutenberg/pull/77894)).
