@@ -283,6 +283,12 @@ export const savePost =
 		// preview is not the user committing anything, so neither is the moment
 		// to start claiming their media.
 		//
+		// `isDeletingPost` covers trashing: `trashPost` deletes the post and
+		// then calls this action, and `isEditedPostSaveable` has no status check
+		// to stop it, so without this a post on its way to the bin would take
+		// ownership of media on the way out. The store still holds the pre-trash
+		// record at that point, so the delete flag is the signal, not the status.
+		//
 		// Not awaited: this is bookkeeping, and it must not hold up the editor
 		// reaching "Saved". It swallows its own errors, so nothing can reject
 		// here. `autoAttachMediaEnabled` is the documented way to switch it off.
@@ -290,6 +296,8 @@ export const savePost =
 			! error &&
 			! options.isAutosave &&
 			! options.isPreview &&
+			! select.isDeletingPost() &&
+			previousRecord.status !== 'trash' &&
 			select.getEditorSettings().autoAttachMediaEnabled
 		) {
 			attachMediaInPost(

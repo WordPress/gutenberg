@@ -86,6 +86,21 @@ export default async function attachMediaInPost( registry, postId, postType ) {
 		)
 	);
 
+	// Silent to the user, but not to whoever is debugging this. The likeliest
+	// failure is a 403: attaching writes to the attachment, so a contributor
+	// using someone else's media cannot do it. Never interpolate the reason - a
+	// rejected `apiFetch` is not reliably an `Error`, so `${ reason }` can print
+	// "[object Object]".
+	results.forEach( ( result ) => {
+		if ( result.status === 'rejected' ) {
+			// eslint-disable-next-line no-console
+			console.warn(
+				'Could not attach media to the post.',
+				result.reason
+			);
+		}
+	} );
+
 	if ( ! results.some( ( { status } ) => status === 'fulfilled' ) ) {
 		return;
 	}

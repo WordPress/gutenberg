@@ -395,6 +395,183 @@ describe( 'Post actions', () => {
 		} );
 	} );
 
+	describe( 'savePost() attaching media', () => {
+		const imagePost = {
+			id: postId,
+			type: 'post',
+			title: 'bar',
+			content:
+				'<!-- wp:image {"id":12} --><figure><img src="i.jpg"/></figure><!-- /wp:image -->',
+			excerpt: 'crackers',
+			status: 'draft',
+		};
+
+		/**
+		 * Answers everything `savePost` and the attach need, recording each
+		 * request so the test can assert on what was and wasn't issued.
+		 *
+		 * @param {string[]} requests Collects `METHOD path` for every call.
+		 */
+		function setFetchHandler( requests ) {
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path, data } = options;
+				requests.push( `${ method } ${ path }` );
+
+				if ( method === 'DELETE' ) {
+					return { ...imagePost, status: 'trash' };
+				}
+				if ( method === 'PUT' && path.startsWith( '/wp/v2/media/' ) ) {
+					return { id: 12, post: data.post };
+				}
+				if ( method === 'GET' && path.startsWith( '/wp/v2/media' ) ) {
+					// Also resolved with `parse: false`, so the totals headers
+					// can be read. `link` must be absent or the fetch-all
+					// middleware follows a next page.
+					return {
+						json: async () => [ { id: 12, post: null } ],
+						headers: {
+							get: ( name ) =>
+								name.toLowerCase() === 'link' ? null : '1',
+						},
+					};
+				}
+				if (
+					method === 'PUT' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					return { ...imagePost, ...data };
+				}
+				if (
+					method === 'GET' &&
+					path.startsWith( '/wp/v2/types/post' )
+				) {
+					// Resolved with `parse: false`, so this has to look like a
+					// Response rather than the record itself.
+					return {
+						json: async () => ( {
+							...postTypeEntity,
+							viewable: true,
+						} ),
+					};
+				}
+
+				throw {
+					code: 'unknown_path',
+					message: `Unknown path: ${ method } ${ path }`,
+				};
+			} );
+		}
+
+		const hasAttached = ( requests ) =>
+			requests.some( ( request ) =>
+				request.startsWith( 'PUT /wp/v2/media/12' )
+			);
+
+		/**
+		 * The attach is deliberately not awaited by `savePost`, so give its
+		 * requests a chance to land before asserting they did not.
+		 */
+		async function flush() {
+			for ( let i = 0; i < 20; i++ ) {
+				await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+			}
+		}
+
+		function setUpEditor( registry ) {
+			// Only the `post` entity is registered by default, and without a
+			// config for attachments the records lookup cannot resolve.
+			registry.dispatch( coreStore ).addEntities( [
+				{
+					kind: 'postType',
+					name: 'attachment',
+					baseURL: '/wp/v2/media',
+					rawAttributes: [ 'title', 'excerpt', 'content' ],
+				},
+			] );
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', imagePost );
+			registry.dispatch( editorStore ).setupEditor( imagePost, {
+				content: imagePost.content,
+			} );
+			// The block editor store is populated by the editor provider, which
+			// isn't mounted here — and without blocks there is no media to find,
+			// so every assertion below would pass whether the guards work or not.
+			registry.dispatch( blockEditorStore ).resetBlocks( [
+				{
+					clientId: 'image-1',
+					name: 'core/image',
+					isValid: true,
+					attributes: { id: 12 },
+					innerBlocks: [],
+				},
+			] );
+		}
+
+		it( 'attaches media the post displays', async () => {
+			const requests = [];
+			setFetchHandler( requests );
+
+			const registry = createRegistryWithStores();
+			setUpEditor( registry );
+
+			await registry.dispatch( editorStore ).savePost();
+			await flush();
+
+			expect( hasAttached( requests ) ).toBe( true );
+		} );
+
+		it( 'attaches nothing when the editor setting is off', async () => {
+			const requests = [];
+			setFetchHandler( requests );
+
+			const registry = createRegistryWithStores();
+			registry
+				.dispatch( editorStore )
+				.updateEditorSettings( { autoAttachMediaEnabled: false } );
+			setUpEditor( registry );
+
+			await registry.dispatch( editorStore ).savePost();
+			await flush();
+
+			expect( hasAttached( requests ) ).toBe( false );
+		} );
+
+		/**
+		 * `trashPost` deletes the post and then calls `savePost`, and
+		 * `isEditedPostSaveable` has no status check to stop it — so without a
+		 * guard a post on its way to the bin would claim media on the way out.
+		 */
+		it( 'attaches nothing while the post is being trashed', async () => {
+			const requests = [];
+			setFetchHandler( requests );
+
+			const registry = createRegistryWithStores();
+			setUpEditor( registry );
+
+			await registry.dispatch( editorStore ).trashPost();
+			await flush();
+
+			expect( hasAttached( requests ) ).toBe( false );
+		} );
+
+		it( 'attaches nothing on an autosave', async () => {
+			const requests = [];
+			setFetchHandler( requests );
+
+			const registry = createRegistryWithStores();
+			setUpEditor( registry );
+
+			await registry
+				.dispatch( editorStore )
+				.savePost( { isAutosave: true } );
+			await flush();
+
+			expect( hasAttached( requests ) ).toBe( false );
+		} );
+	} );
+
 	describe( 'autosave()', () => {
 		it( 'autosaves a modified post', async () => {
 			const post = {

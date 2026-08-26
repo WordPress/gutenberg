@@ -138,6 +138,28 @@ describe( 'attachMediaInPost', () => {
 		await attachMediaInPost( registry, 7, 'post' );
 
 		expect( mockInvalidate ).not.toHaveBeenCalled();
+		expect( console ).toHaveWarned();
+	} );
+
+	/**
+	 * Silent to the user is the design; silent to whoever is debugging it is
+	 * not. A contributor using someone else's media gets a 403 here.
+	 */
+	it( 'logs a failed write without interpolating the reason', async () => {
+		const { registry, saveEntityRecord } = createRegistry( {
+			blocks: [ imageBlock( 12 ) ],
+			media: [ { id: 12, post: null } ],
+		} );
+		// A rejected `apiFetch` is often a plain object, not an `Error`.
+		const reason = { code: 'rest_forbidden', message: 'Sorry.' };
+		saveEntityRecord.mockRejectedValue( reason );
+
+		await attachMediaInPost( registry, 7, 'post' );
+
+		expect( console ).toHaveWarnedWith(
+			'Could not attach media to the post.',
+			reason
+		);
 	} );
 	/**
 	 * `savePost` handles templates as well as posts. A template has no front end
