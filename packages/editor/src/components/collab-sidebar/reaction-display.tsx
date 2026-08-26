@@ -141,6 +141,50 @@ function formatReactionTooltip( names: string[], emojiLabel: string ): string {
 	);
 }
 
+const REACTIONS_PER_PAGE = 100;
+
+// A note with more reactions than this is not worth walking page by page just
+// to name them; the pill falls back to its count-based label instead.
+const MAX_REACTION_PAGES = 10;
+
+/**
+ * Fetches every reaction on a note, across every emoji.
+ *
+ * The REST collection cannot be filtered by reaction slug, so the whole set
+ * has to come back before it can be grouped. Walks the pages rather than
+ * reading only the first one, which would drop reactors on a busy note.
+ *
+ * @param noteId The parent note comment ID.
+ * @return All reactions on the note, or `null` if there are more than the
+ *         walk is willing to fetch.
+ */
+async function fetchNoteReactions(
+	noteId: number
+): Promise< ReactionComment[] | null > {
+	const reactions: ReactionComment[] = [];
+
+	for ( let page = 1; page <= MAX_REACTION_PAGES; page++ ) {
+		const batch = await apiFetch< ReactionComment[] >( {
+			path: addQueryArgs( '/wp/v2/comments', {
+				parent: noteId,
+				type: 'reaction',
+				status: 'all',
+				page,
+				per_page: REACTIONS_PER_PAGE,
+				_fields: 'author_name,content',
+			} ),
+		} );
+
+		reactions.push( ...batch );
+
+		if ( batch.length < REACTIONS_PER_PAGE ) {
+			return reactions;
+		}
+	}
+
+	return null;
+}
+
 // Module-level cache for reaction details: { "noteId:slug": string[] }
 const reactionNamesCache: Record< string, string[] > = {};
 
@@ -199,16 +243,14 @@ function ReactionButton( {
 		}
 
 		setIsFetching( true );
-		apiFetch< ReactionComment[] >( {
-			path: addQueryArgs( '/wp/v2/comments', {
-				parent: noteId,
-				type: 'reaction',
-				status: 'all',
-				per_page: 100,
-				_fields: 'author_name,content',
-			} ),
-		} )
+		fetchNoteReactions( noteId )
 			.then( ( reactions ) => {
+				// A truncated walk would drop reactors, and a partial name
+				// list reads as complete. Keep the count-based label instead.
+				if ( ! reactions ) {
+					return;
+				}
+
 				const names = reactions
 					.filter( ( r ) => {
 						const content =

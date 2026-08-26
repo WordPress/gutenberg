@@ -200,6 +200,74 @@ describe( 'ReactionDisplay', () => {
 		);
 	} );
 
+	it( 'walks every page of reactions before naming reactors', async () => {
+		const user = userEvent.setup();
+		// A full first page forces a second request; the target slug's
+		// reactor only appears on that second page.
+		const firstPage = Array.from( { length: 100 }, ( _, i ) => ( {
+			author_name: `Rocketeer ${ i }`,
+			content: { raw: 'rocket' },
+		} ) );
+		mockApiFetch
+			.mockResolvedValueOnce( firstPage )
+			.mockResolvedValueOnce( [
+				{ author_name: 'Alice', content: { raw: 'heart' } },
+			] );
+		render(
+			<ReactionDisplay
+				noteId={ uniqueNoteId }
+				reactions={ {
+					heart: { count: 1, reacted: true, my_reaction_id: 7 },
+				} }
+				onToggleReaction={ () => {} }
+			/>
+		);
+
+		await user.hover(
+			screen.getByRole( 'button', { name: 'Heart, 1 reaction' } )
+		);
+
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Alice reacted with Heart emoji',
+				} )
+			).toBeVisible()
+		);
+		expect( apiFetch ).toHaveBeenCalledTimes( 2 );
+	} );
+
+	it( 'keeps the count-based label when the reaction walk is truncated', async () => {
+		const user = userEvent.setup();
+		// Every page comes back full, so the walk hits its page cap without
+		// ever seeing the end of the list. A partial name list would read as
+		// complete, so the count-based label has to stand.
+		mockApiFetch.mockResolvedValue(
+			Array.from( { length: 100 }, () => ( {
+				author_name: 'Alice',
+				content: { raw: 'heart' },
+			} ) )
+		);
+		render(
+			<ReactionDisplay
+				noteId={ uniqueNoteId }
+				reactions={ {
+					heart: { count: 1200, reacted: true, my_reaction_id: 7 },
+				} }
+				onToggleReaction={ () => {} }
+			/>
+		);
+
+		await user.hover(
+			screen.getByRole( 'button', { name: 'Heart, 1200 reactions' } )
+		);
+
+		await waitFor( () => expect( apiFetch ).toHaveBeenCalledTimes( 10 ) );
+		expect(
+			screen.getByRole( 'button', { name: 'Heart, 1200 reactions' } )
+		).toBeVisible();
+	} );
+
 	it( 'leaves pills focusable but inert on a resolved thread', async () => {
 		const user = userEvent.setup();
 		const onToggleReaction = jest.fn();
