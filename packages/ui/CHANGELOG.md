@@ -18,10 +18,11 @@
 -   `SearchableChipSelect`: Remove the `creatableItem` prop. Mark a creatable action with `creatable: true` on an item in `items` instead. The item renders in the list footer and is excluded from the main list automatically. Handle selection in `onValueChange`. See the `Creatable` and `GroupedCreatable` stories for examples ([#80989](https://github.com/WordPress/gutenberg/pull/80989)).
 -   `Select.Item`: Remove `'compact'` from the `size` prop. Use `'default'` instead ([#81354](https://github.com/WordPress/gutenberg/pull/81354)).
 -   `Combobox.Item`, `SelectControl.Item`: The `size` prop is removed ([#81354](https://github.com/WordPress/gutenberg/pull/81354)).
+-   `Autocomplete.Popup`, `Combobox.Popup`, `Select.Popup`, `SelectControl`, `SearchableChipSelect`, and `SearchableChipSelectControl`: The popup now defaults to a fixed anchor width. Use `popupWidth="content"` to restore content-sized width between the anchor and available viewport bounds.
 
 ### Enhancements
 
--   `Autocomplete.Popup`, `Combobox.Popup`, `SearchableChipSelect`, `Select.Popup`, and `SelectControl`: Add `popupWidth` prop with preset width constraints for the item popup.
+-   `Autocomplete.Popup`, `Combobox.Popup`, `SearchableChipSelect`, `SearchableChipSelectControl`, `Select.Popup`, and `SelectControl`: Add `popupWidth` prop with preset width constraints for the item popup.
 -   `CollapsibleCard`: Support multiple `CollapsibleCard.HeaderDescription` components ([#81227](https://github.com/WordPress/gutenberg/pull/81227)).
 -   Add `TextareaControl` component ([#81359](https://github.com/WordPress/gutenberg/pull/81359)).
 -   Export shared keyboard shortcut presentation and accessibility utilities. ([#81826](https://github.com/WordPress/gutenberg/pull/81826))
