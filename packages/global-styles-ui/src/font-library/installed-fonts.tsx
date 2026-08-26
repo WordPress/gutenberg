@@ -28,6 +28,7 @@ import FontCard from './font-card';
 import LibraryFontVariant from './library-font-variant';
 import { sortFontFaces } from './utils/sort-font-faces';
 import {
+	mergeFontFamilies,
 	setUIValuesNeeded,
 	loadFontFaceInBrowser,
 	unloadFontFaceInBrowser,
@@ -119,15 +120,18 @@ function InstalledFonts() {
 				.map( ( f ) => setUIValuesNeeded( f, { source: 'theme' } ) )
 				.sort( ( a, b ) => a.name.localeCompare( b.name ) )
 		: [];
-	const themeFontsSlugs = new Set( themeFonts.map( ( f ) => f.slug ) );
+	// Merge at the variant level, not just the family level: a family with some
+	// variants deactivated exists in both lists, and only the union of both
+	// describes everything the theme offers, so the card can report
+	// "2 of 3 active" rather than counting the activated variants twice.
 	const baseThemeFonts = baseFontFamilies?.theme
-		? themeFonts.concat(
-				baseFontFamilies.theme
-					.filter( ( f ) => ! themeFontsSlugs.has( f.slug ) )
-					.map( ( f ) => setUIValuesNeeded( f, { source: 'theme' } ) )
-					.sort( ( a, b ) => a.name.localeCompare( b.name ) )
-		  )
-		: [];
+		? mergeFontFamilies(
+				baseFontFamilies.theme.map( ( f ) =>
+					setUIValuesNeeded( f, { source: 'theme' } )
+				),
+				themeFonts
+		  ).sort( ( a, b ) => a.name.localeCompare( b.name ) )
+		: themeFonts;
 
 	const customFontFamilyId =
 		libraryFontSelected?.source === 'custom' && libraryFontSelected?.id;
