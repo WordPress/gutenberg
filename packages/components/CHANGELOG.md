@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+<!-- TEMP — delete before merge. Testing that a CHANGELOG-only PR skips this check rather than failing it; deliberately no PR link here. -->
+
 ### Breaking Changes
 
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
