@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { InspectorControls } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../../../utils/hooks';
 import { usePublicTaxonomies } from '../../utils';
 import TaxonomyControl from './taxonomy-control';

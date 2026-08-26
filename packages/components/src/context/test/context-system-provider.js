@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import styled from '@emotion/styled';
-
-/**
- * WordPress dependencies
- */
 import { cloneElement } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { contextConnect } from '../context-connect';
 import { ContextSystemProvider } from '../context-system-provider';
 import { useContextSystem } from '../use-context-system';

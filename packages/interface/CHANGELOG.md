@@ -2,6 +2,60 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `ActionItem`: `as` now defaults to `MenuItem` instead of `Button` ([#81507](https://github.com/WordPress/gutenberg/pull/81507)).
+-   `ActionItem.Slot`: Remove the `bubblesVirtually` prop ([#81507](https://github.com/WordPress/gutenberg/pull/81507)).
+
+## 9.38.0 (2026-08-12)
+
+### Enhancements
+
+-   `ComplementaryArea`: Add a `render` prop to replace the default container element with a given React element ([#81054](https://github.com/WordPress/gutenberg/pull/81054)).
+
+### Bug Fixes
+
+-   `ComplementaryArea`: Remove incorrect `aria-expanded` attribute from the "Pin to toolbar" toggle button, which already exposes its state via `aria-pressed` ([#79874](https://github.com/WordPress/gutenberg/pull/79874)).
+-   `InterfaceSkeleton`: Increase the footer height from 24px to 32px to prevent the focus ring from being clipped ([#81145](https://github.com/WordPress/gutenberg/pull/81145)).
+-   `InterfaceSkeleton`: Stop the secondary sidebar from animating itself into place on page load when it is already open, for example with the "Always open List View" preference enabled ([#81362](https://github.com/WordPress/gutenberg/pull/81362)).
+
+### Internal
+
+-   `ComplementaryArea`: Take the panel width from the stylesheet instead of a hardcoded inline style, and resolve the exit transition through `AnimatePresence`'s `custom` prop instead of a forced re-render ([#81363](https://github.com/WordPress/gutenberg/pull/81363)).
+-   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
+
+## 9.37.0 (2026-07-29)
+
+### Internal
+
+-   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).
+
+## 9.36.0 (2026-07-14)
+
+### Enhancements
+
+-   `ComplementaryArea`: Use the emphasis font-weight token for headings ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 9.35.0 (2026-07-01)
+
+## 9.34.0 (2026-06-24)
+
+## 9.33.1 (2026-06-16)
+
+## 9.33.0 (2026-06-10)
+
+### Documentation
+
+-   Fix documentation typos ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
+
+## 9.32.0 (2026-05-27)
+
+## 9.31.0 (2026-05-14)
+
+## 9.30.0 (2026-04-29)
+
 ## 9.29.0 (2026-04-15)
 
 ## 9.28.0 (2026-04-01)

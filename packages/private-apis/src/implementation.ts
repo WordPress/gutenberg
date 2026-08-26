@@ -11,12 +11,14 @@
  */
 const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/admin-ui',
+	'@wordpress/api-fetch',
 	'@wordpress/block-directory',
 	'@wordpress/block-editor',
 	'@wordpress/block-library',
 	'@wordpress/blocks',
 	'@wordpress/boot',
 	'@wordpress/commands',
+	'@wordpress/compose',
 	'@wordpress/connectors',
 	'@wordpress/workflows',
 	'@wordpress/components',
@@ -37,16 +39,19 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/route',
 	'@wordpress/router',
 	'@wordpress/routes',
+	'@wordpress/storybook',
 	'@wordpress/sync',
 	'@wordpress/theme',
-	'@wordpress/dataviews',
 	'@wordpress/fields',
 	'@wordpress/lazy-editor',
+	'@wordpress/media-editor',
 	'@wordpress/media-utils',
 	'@wordpress/upload-media',
+	'@wordpress/global-styles-engine',
 	'@wordpress/global-styles-ui',
 	'@wordpress/ui',
 	'@wordpress/views',
+	'@wordpress/widget-dashboard',
 ];
 
 /*

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { sideloadMedia } from '../sideload-media';
 import { sideloadToServer } from '../sideload-to-server';
 
@@ -17,17 +14,27 @@ describe( 'sideloadMedia', () => {
 		jest.clearAllMocks();
 	} );
 
-	it( 'should sideload to server', async () => {
+	it( 'should sideload to server and call onSuccess with sub-size data', async () => {
+		const mockSubSizeData = {
+			image_size: 'thumbnail',
+			width: 150,
+			height: 150,
+			file: 'test-150x150.jpeg',
+			mime_type: 'image/jpeg',
+			filesize: 5000,
+		};
+		( sideloadToServer as jest.Mock ).mockResolvedValue( mockSubSizeData );
+
 		const onError = jest.fn();
-		const onFileChange = jest.fn();
+		const onSuccess = jest.fn();
 		await sideloadMedia( {
 			file: imageFile,
 			attachmentId: 1,
 			onError,
-			onFileChange,
+			onSuccess,
 		} );
 
 		expect( sideloadToServer ).toHaveBeenCalled();
-		expect( onFileChange ).toHaveBeenCalled();
+		expect( onSuccess ).toHaveBeenCalledWith( mockSubSizeData );
 	} );
 } );

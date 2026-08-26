@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { DropdownMenu, MenuGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import AddNewPattern from '../add-new-pattern';
 import RenameCategoryMenuItem from './rename-category-menu-item';
 import DeleteCategoryMenuItem from './delete-category-menu-item';

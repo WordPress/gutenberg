@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Path, SVG } from '@wordpress/components';
 
 export const titleDate = (

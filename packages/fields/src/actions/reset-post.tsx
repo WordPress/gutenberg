@@ -1,27 +1,19 @@
-/**
- * WordPress dependencies
- */
 import { backup } from '@wordpress/icons';
 import { dispatch, select, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useState } from '@wordpress/element';
-// @ts-ignore
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 import {
 	Button,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import type { Action } from '@wordpress/dataviews';
 import { addQueryArgs } from '@wordpress/url';
 import apiFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
 import { getItemTitle, isTemplateOrTemplatePart } from './utils';
 import type { CoreDataError, Template, TemplatePart } from '../types';
 
@@ -273,9 +265,9 @@ const resetPostAction: Action< Template | TemplatePart > = {
 		};
 		return (
 			<VStack spacing="5">
-				<Text>
+				<WCText>
 					{ __( 'Reset to default and clear all customizations?' ) }
-				</Text>
+				</WCText>
 				<HStack justify="right">
 					<Button
 						__next40pxDefaultSize

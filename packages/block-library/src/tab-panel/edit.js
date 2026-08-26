@@ -1,42 +1,108 @@
-/**
- * WordPress dependencies
- */
 import {
 	useBlockProps,
 	useInnerBlocksProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
+import Controls from './controls';
 
-/**
- * Internal dependencies
- */
-import AddTabToolbarControl from '../tab/add-tab-toolbar-control';
-import RemoveTabToolbarControl from '../tab/remove-tab-toolbar-control';
+export default function Edit( { clientId, isSelected } ) {
+	const {
+		activeTabIndex,
+		editorActiveTabIndex,
+		blockIndex,
+		hasInnerBlocksSelected,
+		tabsClientId,
+	} = useSelect(
+		( select ) => {
+			const {
+				getBlockRootClientId,
+				getBlockIndex,
+				hasSelectedInnerBlock,
+				getBlockAttributes,
+			} = select( blockEditorStore );
 
-const TAB_PANELS_TEMPLATE = [ [ 'core/tab', {} ] ];
+			// Get the tab-panel parent first
+			const tabPanelsClientId = getBlockRootClientId( clientId );
+			// Then get the tabs parent
+			const _tabsClientId = getBlockRootClientId( tabPanelsClientId );
 
-export default function Edit( { clientId } ) {
-	const blockProps = useBlockProps();
+			// Read the active tab indices directly from the tabs block.
+			const tabsAttributes = getBlockAttributes( _tabsClientId ) ?? {};
 
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: TAB_PANELS_TEMPLATE,
-		templateLock: false,
-		renderAppender: false, // Appender handled by individual tab blocks
-	} );
+			// Get data about this instance of core/tab.
+			const _blockIndex = getBlockIndex( clientId );
+			const _hasInnerBlocksSelected = hasSelectedInnerBlock(
+				clientId,
+				true
+			);
 
-	// Get the parent tabs block clientId
-	const tabsClientId = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getBlockRootClientId( clientId ),
+			return {
+				activeTabIndex: tabsAttributes.activeTabIndex,
+				editorActiveTabIndex: tabsAttributes.editorActiveTabIndex,
+				blockIndex: _blockIndex,
+				hasInnerBlocksSelected: _hasInnerBlocksSelected,
+				tabsClientId: _tabsClientId,
+			};
+		},
 		[ clientId ]
 	);
 
+	const effectiveActiveIndex = editorActiveTabIndex ?? activeTabIndex;
+
+	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
+
+	// Sync editorActiveTabIndex when this tab is selected directly
+	useEffect( () => {
+		// Only update if this tab is selected and not already the active index
+		const isTabSelected = isSelected || hasInnerBlocksSelected;
+		if (
+			isTabSelected &&
+			tabsClientId &&
+			effectiveActiveIndex !== blockIndex
+		) {
+			// Mark as non-persistent so it doesn't add to undo history
+			__unstableMarkNextChangeAsNotPersistent();
+			updateBlockAttributes( tabsClientId, {
+				editorActiveTabIndex: blockIndex,
+			} );
+		}
+	}, [
+		isSelected,
+		hasInnerBlocksSelected,
+		tabsClientId,
+		effectiveActiveIndex,
+		blockIndex,
+		updateBlockAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
+
+	// Determine if this is the currently active tab (for editor visibility)
+	const isActiveTab = effectiveActiveIndex === blockIndex;
+
+	// Determine if this is the default tab (for the "Default Tab" toggle in controls)
+	const isDefaultTab = activeTabIndex === blockIndex;
+
+	// Visible when selected, containing the selection, or the active tab.
+	const isSelectedTab = isSelected || hasInnerBlocksSelected || isActiveTab;
+
+	const blockProps = useBlockProps( {
+		hidden: ! isSelectedTab,
+		tabIndex: isSelectedTab ? 0 : -1,
+	} );
+
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {} );
+
 	return (
-		<>
-			<AddTabToolbarControl tabsClientId={ tabsClientId } />
-			<RemoveTabToolbarControl tabsClientId={ tabsClientId } />
-			<div { ...innerBlocksProps } />
-		</>
+		<section { ...innerBlocksProps }>
+			<Controls
+				tabsClientId={ tabsClientId }
+				blockIndex={ blockIndex }
+				isDefaultTab={ isDefaultTab }
+			/>
+			{ isSelectedTab && innerBlocksProps.children }
+		</section>
 	);
 }

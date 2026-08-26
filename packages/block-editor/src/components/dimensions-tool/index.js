@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
-import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import { useEffect, useRef } from '@wordpress/element';
 import AspectRatioTool from './aspect-ratio-tool';
 import ScaleTool from './scale-tool';
 import WidthHeightTool from './width-height-tool';
@@ -56,7 +49,7 @@ function DimensionsTool( {
 	aspectRatioOptions, // Default options handled by AspectRatioTool.
 	defaultAspectRatio = 'auto', // Match CSS default value for aspect-ratio.
 	scaleOptions, // Default options handled by ScaleTool.
-	defaultScale = 'fill', // Match CSS default value for object-fit.
+	defaultScale = 'cover',
 	unitsOptions, // Default options handled by UnitControl.
 	tools = [ 'aspectRatio', 'widthHeight', 'scale' ],
 } ) {
@@ -73,21 +66,39 @@ function DimensionsTool( {
 		value.aspectRatio === undefined || value.aspectRatio === 'auto'
 			? null
 			: value.aspectRatio;
-	const scale =
-		value.scale === undefined || value.scale === 'fill'
-			? null
-			: value.scale;
+	const scale = value.scale === undefined ? null : value.scale;
 
-	// Keep track of state internally, so when the value is cleared by means
-	// other than directly editing that field, it's easier to restore the
-	// previous value.
-	const [ lastScale, setLastScale ] = useState( scale );
-	const [ lastAspectRatio, setLastAspectRatio ] = useState( aspectRatio );
+	const hasCustomAspectRatio = !! ( width && height );
+
+	// Keep track of the previous values, so when a value is cleared by means
+	// other than directly editing that field, it's easier to restore it. These
+	// are only ever read while handling a change, so they're kept in refs and
+	// synced from the value to stay correct when it is updated externally, e.g.
+	// by undo or by another client.
+	const lastScaleRef = useRef( scale );
+	const lastAspectRatioRef = useRef( aspectRatio );
+
+	useEffect( () => {
+		// Scale is cleared alongside the aspect ratio, so only remember the
+		// values it is actually set to.
+		if ( scale ) {
+			lastScaleRef.current = scale;
+		}
+	}, [ scale ] );
+
+	useEffect( () => {
+		// A custom aspect ratio, i.e. both a width and a height, clears the
+		// aspect ratio value. Keep the remembered one so it can be restored
+		// once the custom aspect ratio is removed.
+		if ( ! hasCustomAspectRatio ) {
+			lastAspectRatioRef.current = aspectRatio;
+		}
+	}, [ aspectRatio, hasCustomAspectRatio ] );
 
 	// 'custom' is not a valid value for CSS aspect-ratio, but it is used in the
 	// dropdown to indicate that setting both the width and height is the same
 	// as a custom aspect ratio.
-	const aspectRatioValue = width && height ? 'custom' : lastAspectRatio;
+	const aspectRatioValue = hasCustomAspectRatio ? 'custom' : aspectRatio;
 
 	const showScaleControl = aspectRatio || ( width && height );
 
@@ -106,8 +117,6 @@ function DimensionsTool( {
 						nextAspectRatio =
 							nextAspectRatio === 'auto' ? null : nextAspectRatio;
 
-						setLastAspectRatio( nextAspectRatio );
-
 						// Update aspectRatio.
 						if ( ! nextAspectRatio ) {
 							delete nextValue.aspectRatio;
@@ -118,11 +127,9 @@ function DimensionsTool( {
 						// Auto-update scale.
 						if ( ! nextAspectRatio ) {
 							delete nextValue.scale;
-						} else if ( lastScale ) {
-							nextValue.scale = lastScale;
 						} else {
-							nextValue.scale = defaultScale;
-							setLastScale( defaultScale );
+							nextValue.scale =
+								lastScaleRef.current ?? defaultScale;
 						}
 
 						// Auto-update width and height.
@@ -163,8 +170,8 @@ function DimensionsTool( {
 						// Auto-update aspectRatio.
 						if ( nextWidth && nextHeight ) {
 							delete nextValue.aspectRatio;
-						} else if ( lastAspectRatio ) {
-							nextValue.aspectRatio = lastAspectRatio;
+						} else if ( lastAspectRatioRef.current ) {
+							nextValue.aspectRatio = lastAspectRatioRef.current;
 						} else {
 							// No setting defaultAspectRatio here, because
 							// aspectRatio is optional in this scenario,
@@ -173,15 +180,13 @@ function DimensionsTool( {
 
 						// Auto-update scale.
 						if (
-							! lastAspectRatio &&
+							! lastAspectRatioRef.current &&
 							!! nextWidth !== !! nextHeight
 						) {
 							delete nextValue.scale;
-						} else if ( lastScale ) {
-							nextValue.scale = lastScale;
 						} else {
-							nextValue.scale = defaultScale;
-							setLastScale( defaultScale );
+							nextValue.scale =
+								lastScaleRef.current ?? defaultScale;
 						}
 
 						onChange( nextValue );
@@ -193,14 +198,9 @@ function DimensionsTool( {
 					panelId={ panelId }
 					options={ scaleOptions }
 					defaultValue={ defaultScale }
-					value={ lastScale }
+					value={ scale }
 					onChange={ ( nextScale ) => {
 						const nextValue = { ...value };
-
-						// 'fill' is CSS default, so it gets treated as null.
-						nextScale = nextScale === 'fill' ? null : nextScale;
-
-						setLastScale( nextScale );
 
 						// Update scale.
 						if ( ! nextScale ) {

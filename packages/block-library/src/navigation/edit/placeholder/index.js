@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { Placeholder, Button, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { navigation, Icon } from '@wordpress/icons';
 import { speak } from '@wordpress/a11y';
 import { useEffect } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import PlaceholderPreview from './placeholder-preview';
 import NavigationMenuSelector from '../navigation-menu-selector';
 

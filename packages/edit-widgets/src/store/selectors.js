@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import { getWidgetIdFromBlock } from '@wordpress/widgets';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import {
 	buildWidgetsQuery,
 	buildWidgetAreasQuery,

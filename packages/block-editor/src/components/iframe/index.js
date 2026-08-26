@@ -1,20 +1,10 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
+import { version as reactVersion } from 'react';
 import { useState, createPortal, forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs, useRefEffect, useDisabled } from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { useWritingFlow } from '../writing-flow';
 import { getCompatibilityStyles } from './get-compatibility-styles';
 import { useScaleCanvas } from './use-scale-canvas';
@@ -102,6 +92,12 @@ function getIframeSrc( resolvedAssets ) {
 		return src;
 	}
 
+	let body = '';
+	if ( reactVersion.split( '.' )[ 0 ] === '18' ) {
+		body =
+			'<body><script>document.currentScript.parentElement.remove()</script></body>';
+	}
+
 	// Correct doctype is required to enable rendering in standards mode.
 	// Also preload the styles to avoid a flash of unstyled content.
 	const html = `<!doctype html>
@@ -125,9 +121,7 @@ function getIframeSrc( resolvedAssets ) {
 		${ resolvedAssets.styles ?? '' }
 		${ resolvedAssets.scripts ?? '' }
 	</head>
-	<body>
-		<script>document.currentScript.parentElement.remove()</script>
-	</body>
+	${ body }
 </html>`;
 
 	src = URL.createObjectURL( new Blob( [ html ], { type: 'text/html' } ) );
@@ -262,8 +256,8 @@ function Iframe( {
 	}, [] );
 
 	const {
-		contentResizeListener,
-		containerResizeListener,
+		contentRef: scaleContentRef,
+		containerRef,
 		isZoomedOut,
 		scaleContainerWidth,
 	} = useScaleCanvas( {
@@ -279,6 +273,7 @@ function Iframe( {
 		contentRef,
 		writingFlowRef,
 		disabledRef,
+		scaleContentRef,
 	] );
 
 	// Attach the body ref only when the iframe document and window are available.
@@ -358,7 +353,6 @@ function Iframe( {
 								...bodyClasses
 							) }
 						>
-							{ contentResizeListener }
 							<StyleProvider document={ iframeDocument }>
 								{ children }
 							</StyleProvider>
@@ -371,8 +365,7 @@ function Iframe( {
 	);
 
 	return (
-		<div className="block-editor-iframe__container">
-			{ containerResizeListener }
+		<div className="block-editor-iframe__container" ref={ containerRef }>
 			<div
 				className={ clsx(
 					'block-editor-iframe__scale-container',

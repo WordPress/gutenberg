@@ -3,12 +3,15 @@ const BUNDLED_PACKAGES = [
 	'@wordpress/admin-ui',
 	'@wordpress/dataviews',
 	'@wordpress/dataviews/wp',
+	'@wordpress/fields',
+	'@wordpress/grid',
 	'@wordpress/icons',
 	'@wordpress/interface',
-	'@wordpress/undo-manager',
-	'@wordpress/fields',
-	'@wordpress/views',
+	'@wordpress/kebab-case',
+	'@wordpress/style-runtime',
 	'@wordpress/ui',
+	'@wordpress/undo-manager',
+	'@wordpress/views',
 ];
 
 /**

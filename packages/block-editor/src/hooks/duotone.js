@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
-
-/**
- * WordPress dependencies
- */
 import {
 	getBlockSupport,
 	getBlockType,
@@ -15,11 +8,11 @@ import {
 import { useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { useMemo, useEffect } from '@wordpress/element';
-import { getBlockSelector } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
+import { useSelect } from '@wordpress/data';
+import {
+	getBlockSelector,
+	privateApis as globalStylesEnginePrivateApis,
+} from '@wordpress/global-styles-engine';
 import {
 	BlockControls,
 	InspectorControls,
@@ -27,19 +20,23 @@ import {
 	useSettings,
 } from '../components';
 import {
-	getDuotoneFilter,
-	getDuotoneStylesheet,
-	getDuotoneUnsetStylesheet,
-} from '../components/duotone/utils';
-import { scopeSelector } from '../components/global-styles/utils';
+	scopeSelector,
+	getDuotoneSlugFromPreset,
+} from '../components/global-styles/utils';
 import {
 	cleanEmptyObject,
 	useBlockSettings,
 	usePrivateStyleOverride,
 } from './utils';
+import { unlock } from '../lock-unlock';
 import { default as StylesFiltersPanel } from '../components/global-styles/filters-panel';
+import { useResolvedStyle } from '../components/global-styles/inherited-value-context';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
+import { store as blockEditorStore } from '../store';
+
+const { getDuotoneFilter, getDuotoneStylesheet, getDuotoneUnsetStylesheet } =
+	unlock( globalStylesEnginePrivateApis );
 
 const EMPTY_ARRAY = [];
 
@@ -98,10 +95,20 @@ export function getDuotonePresetFromColors( colors, duotonePalette ) {
 	return preset ? `var:preset|duotone|${ preset.slug }` : undefined;
 }
 
-function DuotonePanelPure( { style, setAttributes, name } ) {
+function DuotonePanelPure( { style, setAttributes, name, clientId } ) {
 	const duotoneStyle = style?.color?.duotone;
 	const settings = useBlockSettings( name );
 	const blockEditingMode = useBlockEditingMode();
+
+	const className = useSelect(
+		( select ) =>
+			clientId
+				? select( blockEditorStore ).getBlockAttributes( clientId )
+						?.className
+				: undefined,
+		[ clientId ]
+	);
+	const { value: inheritedValue } = useResolvedStyle( name, className );
 
 	const duotonePalette = useMultiOriginPresets( {
 		presetSetting: 'color.duotone',
@@ -137,7 +144,14 @@ function DuotonePanelPure( { style, setAttributes, name } ) {
 		<>
 			<InspectorControls group="filter">
 				<StylesFiltersPanel
-					value={ { filter: { duotone: duotonePresetOrColors } } }
+					// The raw value, not the resolved colors. The panel
+					// decodes it for display, but needs the preset reference
+					// to know which preset is applied: two presets can hold
+					// the same pair of colors, and resolving first throws the
+					// slug away.
+					value={ {
+						filter: { duotone: duotoneStyle },
+					} }
 					onChange={ ( newDuotone ) => {
 						const newStyle = {
 							...style,
@@ -150,6 +164,7 @@ function DuotonePanelPure( { style, setAttributes, name } ) {
 						} );
 					} }
 					settings={ settings }
+					inheritedValue={ inheritedValue }
 				/>
 			</InspectorControls>
 			<BlockControls group="block" __experimentalShareWithChildBlocks>
@@ -159,11 +174,19 @@ function DuotonePanelPure( { style, setAttributes, name } ) {
 					disableCustomDuotone={ disableCustomDuotone }
 					disableCustomColors={ disableCustomColors }
 					value={ duotonePresetOrColors }
-					onChange={ ( newDuotone ) => {
-						const maybePreset = getDuotonePresetFromColors(
-							newDuotone,
-							duotonePalette
-						);
+					selectedSlug={ getDuotoneSlugFromPreset( duotoneStyle ) }
+					onChange={ ( newDuotone, index, slug ) => {
+						// A slug means a preset was picked out of the palette,
+						// so it identifies the choice exactly. Matching back by
+						// color would resolve to whichever preset holding those
+						// colors comes first, which is the wrong one whenever
+						// two presets share a pair.
+						const maybePreset = slug
+							? `var:preset|duotone|${ slug }`
+							: getDuotonePresetFromColors(
+									newDuotone,
+									duotonePalette
+							  );
 
 						const newStyle = {
 							...style,

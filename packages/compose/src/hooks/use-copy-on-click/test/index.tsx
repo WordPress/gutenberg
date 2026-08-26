@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { render, screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
 import { useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import useCopyOnClick from '../';
 
 jest.mock( '@wordpress/deprecated' );

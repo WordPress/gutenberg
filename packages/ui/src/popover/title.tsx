@@ -3,6 +3,7 @@ import { useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useEffect, useRef } from '@wordpress/element';
 import { Text } from '../text';
 import { usePopoverValidationContext } from './context';
+import styles from './style.module.css';
 import type { TitleProps } from './types';
 
 /**
@@ -22,7 +23,7 @@ import type { TitleProps } from './types';
  * ```
  */
 const Title = forwardRef< HTMLHeadingElement, TitleProps >(
-	function PopoverTitle( { className, children, ...props }, forwardedRef ) {
+	function PopoverTitle( { children, ...props }, forwardedRef ) {
 		const validationContext = usePopoverValidationContext();
 		const internalRef = useRef< HTMLHeadingElement >( null );
 		const mergedRef = useMergeRefs( [ internalRef, forwardedRef ] );
@@ -39,7 +40,7 @@ const Title = forwardRef< HTMLHeadingElement, TitleProps >(
 				ref={ mergedRef }
 				variant="heading-xl"
 				render={ <_Popover.Title { ...props } /> }
-				className={ className }
+				className={ styles.title }
 			>
 				{ children }
 			</Text>

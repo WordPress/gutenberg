@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
 import { useBlockProps } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
 function Edit( props ) {
@@ -20,7 +13,10 @@ function Edit( props ) {
 					href="#comment-reply-pseudo-link"
 					onClick={ ( event ) => event.preventDefault() }
 				>
-					{ __( 'Reply' ) }
+					{
+						/* translators: Comment reply button text. */
+						_x( 'Reply', 'verb' )
+					}
 				</a>
 			</div>
 		</>

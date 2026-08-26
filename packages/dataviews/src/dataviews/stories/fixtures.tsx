@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { trash, image, Icon, category } from '@wordpress/icons';
-import { Button, __experimentalText as Text } from '@wordpress/components';
+import { Button, __experimentalText as WCText } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type { Field, Action } from '../../types';
 
 export type SpaceObject = {
@@ -642,7 +635,7 @@ export const actions: Action< SpaceObject >[] = [
 					: `Are you sure you want to delete "${ items[ 0 ].name.title }"?`;
 			return (
 				<Stack direction="column" gap="xl">
-					<Text>{ label }</Text>
+					<WCText>{ label }</WCText>
 					<Stack direction="row" gap="sm" justify="right">
 						<Button
 							__next40pxDefaultSize

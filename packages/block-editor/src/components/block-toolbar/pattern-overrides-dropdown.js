@@ -1,18 +1,11 @@
-/**
- * WordPress dependencies
- */
 import {
 	Popover,
 	ToolbarButton,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 
 /**
@@ -48,7 +41,7 @@ function PatternOverridesPopoverContent( { clientIds, blockTitle } ) {
 		description = __( 'These blocks are editable using overrides.' );
 	}
 
-	return <Text>{ description }</Text>;
+	return <WCText>{ description }</WCText>;
 }
 
 /**

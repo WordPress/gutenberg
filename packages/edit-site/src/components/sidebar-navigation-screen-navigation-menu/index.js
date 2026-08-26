@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-
-/**
- * Internal dependencies
- */
 import { SidebarNavigationScreenWrapper } from '../sidebar-navigation-screen-navigation-menus';
 import ScreenNavigationMoreMenu from './more-menu';
 import SingleNavigationMenu from './single-navigation-menu';

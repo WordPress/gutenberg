@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalUseSlotFills as useSlotFills } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 import warning from '@wordpress/warning';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import BlockSupportToolsPanel from './block-support-tools-panel';
 import BlockSupportSlotContainer from './block-support-slot-container';
 import groups from './groups';

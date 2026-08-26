@@ -1,7 +1,4 @@
-/**
- * WordPress dependencies
- */
-import { Icon } from '@wordpress/components';
+import { Icon as WCIcon } from '@wordpress/components';
 
 function InserterPanel( { title, icon, children } ) {
 	return (
@@ -10,7 +7,7 @@ function InserterPanel( { title, icon, children } ) {
 				<h2 className="block-editor-inserter__panel-title">
 					{ title }
 				</h2>
-				<Icon icon={ icon } />
+				<WCIcon icon={ icon } />
 			</div>
 			<div className="block-editor-inserter__panel-content">
 				{ children }

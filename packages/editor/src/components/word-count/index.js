@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { _x } from '@wordpress/i18n';
 import { count as wordCount } from '@wordpress/wordcount';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 
 /**

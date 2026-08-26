@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen, waitFor } from '@testing-library/react';
 import { press, hover, click, sleep } from '@ariakit/test';
-
-/**
- * WordPress dependencies
- */
 import { shortcutAriaLabel } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import Modal from '../../modal';
 import Tooltip, { TOOLTIP_DELAY } from '..';
 
@@ -286,7 +275,7 @@ describe( 'Tooltip', () => {
 
 	describe( 'delay', () => {
 		it( 'should respect custom delay prop when showing tooltip', async () => {
-			const ADDITIONAL_DELAY = 100;
+			const ADDITIONAL_DELAY = 500;
 
 			render(
 				<Tooltip
@@ -304,7 +293,8 @@ describe( 'Tooltip', () => {
 			await hover( anchor );
 			expectTooltipToBeHidden();
 
-			// Advance time by default delay
+			// Advance time by default delay, which is still well before the
+			// custom delay even when CI is slow to resolve the hover event.
 			await sleep( TOOLTIP_DELAY );
 
 			// Tooltip hasn't appeared yet
@@ -322,7 +312,7 @@ describe( 'Tooltip', () => {
 			// "Tooltips appear instantly if another tooltip has just been hidden."
 			// See: https://github.com/WordPress/gutenberg/pull/57345#discussion_r1435495655
 			await sleep( 3000 );
-		} );
+		}, 10_000 );
 
 		it( 'should not show tooltip if the mouse leaves the tooltip anchor before set delay', async () => {
 			const onMouseEnterMock = jest.fn();

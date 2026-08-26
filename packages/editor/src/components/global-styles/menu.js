@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { moreVertical } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { useGlobalStyles } from './hooks';
 
 /**
