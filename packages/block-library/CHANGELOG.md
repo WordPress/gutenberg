@@ -5,6 +5,11 @@
 ### Enhancements
 
 - `List`: Add wide and full alignment support ([#68002](https://github.com/WordPress/gutenberg/pull/68002)).
+- `Video`: Respect `prefers-reduced-motion` in the editor for GIF-behaving video blocks, disabling autoplay/looping and showing playback controls.
+
+### Bug Fixes
+
+- `Video`: Strictly check `controls === false` in `isGifVariation` to prevent video blocks with missing controls attributes from being treated as GIF variations.
 
 ### Internal
 
