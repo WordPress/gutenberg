@@ -3,6 +3,25 @@
 
 const nodePath = require( 'node:path' );
 
+function resolveWithTypeScriptSourceFallback( request, options ) {
+	try {
+		return options.defaultResolver( request, options );
+	} catch ( error ) {
+		const isSourceFile =
+			request.startsWith( './' ) ||
+			request.startsWith( '../' ) ||
+			nodePath.isAbsolute( request );
+
+		if ( ! isSourceFile || ! request.endsWith( '.js' ) ) {
+			throw error;
+		}
+
+		// TypeScript resolves a relative `.js` specifier to its `.ts` or `.tsx`
+		// source file. Jest needs the extension removed to do the same.
+		return options.defaultResolver( request.slice( 0, -3 ), options );
+	}
+}
+
 module.exports = ( request, options ) => {
 	// Jest 30's resolver enforces package exports before applying packageFilter.
 	// Resolve workspace source imports explicitly so unit-test mocks keep using source files.
@@ -11,7 +30,7 @@ module.exports = ( request, options ) => {
 	if ( sourceImport ) {
 		const [ , packageName, sourcePath ] = sourceImport;
 
-		return options.defaultResolver(
+		return resolveWithTypeScriptSourceFallback(
 			nodePath.join(
 				options.rootDir,
 				'packages',
@@ -24,7 +43,7 @@ module.exports = ( request, options ) => {
 	}
 
 	// Call the defaultResolver, so we leverage its cache, error handling, etc.
-	return options.defaultResolver( request, {
+	return resolveWithTypeScriptSourceFallback( request, {
 		...options,
 		// Use packageFilter to process parsed `package.json` before the resolution (see https://www.npmjs.com/package/resolve#resolveid-opts-cb)
 		packageFilter: ( pkg ) => {

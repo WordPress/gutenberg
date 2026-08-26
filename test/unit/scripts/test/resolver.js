@@ -21,4 +21,31 @@ describe( 'unit test resolver', () => {
 			expect.any( Object )
 		);
 	} );
+
+	it( 'falls back from a JavaScript specifier to a TypeScript source file', () => {
+		const defaultResolver = jest.fn( ( request ) => {
+			if ( request.endsWith( '.js' ) ) {
+				throw new Error( 'Module not found' );
+			}
+
+			return `${ request }.ts`;
+		} );
+
+		expect(
+			resolver( './module.js', {
+				defaultResolver,
+				rootDir: process.cwd(),
+			} )
+		).toBe( './module.ts' );
+		expect( defaultResolver ).toHaveBeenNthCalledWith(
+			1,
+			'./module.js',
+			expect.any( Object )
+		);
+		expect( defaultResolver ).toHaveBeenNthCalledWith(
+			2,
+			'./module',
+			expect.any( Object )
+		);
+	} );
 } );
