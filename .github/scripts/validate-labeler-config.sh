@@ -82,6 +82,16 @@ for pkg_dir in "$REPO_ROOT"/packages/*/; do
 	fi
 done
 
+stale=()
+
+for excluded_package in "${EXCLUDED_PACKAGES[@]}"; do
+	if [ ! -f "$REPO_ROOT/packages/$excluded_package/package.json" ]; then
+		stale+=("$excluded_package")
+	fi
+done
+
+status=0
+
 if [ ${#missing[@]} -gt 0 ]; then
 	echo "The following packages are missing from .github/labeler.yml:"
 	for pkg in "${missing[@]}"; do
@@ -89,6 +99,20 @@ if [ ${#missing[@]} -gt 0 ]; then
 	done
 	echo ""
 	echo "Add a labeling rule for each missing package to .github/labeler.yml."
+	status=1
+fi
+
+if [ ${#stale[@]} -gt 0 ]; then
+	echo "The following excluded packages no longer exist:"
+	for pkg in "${stale[@]}"; do
+		echo "  - packages/$pkg"
+	done
+	echo ""
+	echo "Remove each one from EXCLUDED_PACKAGES in this script."
+	status=1
+fi
+
+if [ "$status" -ne 0 ]; then
 	exit 1
 fi
 
