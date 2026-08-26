@@ -58,34 +58,41 @@
 		}
 	}
 
-	// The fine-rotation ruler and the rotate/flip/zoom/aspect-ratio controls,
-	// between the stage and the footer: ruler on top, controls below, centred.
-	// They sit on the modal's own background rather than on the stage, so the
-	// grey reads as the surface the image sits on and nothing else. Sized to
-	// its content (`flex: 0 0 auto`) so the stage above keeps every pixel the
-	// toolbar doesn't need.
+	// The fine-rotation ruler and, below `small`, the rotate/flip/zoom
+	// controls: ruler on top, controls below, centred. Sized to its content
+	// (`flex: 0 0 auto`) so the stage above keeps every pixel the toolbar
+	// doesn't need. Transparent itself — only the ruler takes the grey.
 	.media-editor__canvas-toolbar {
 		display: flex;
 		flex: 0 0 auto;
 		flex-direction: column;
 		align-items: center;
 		gap: $grid-unit-15;
-		padding: $grid-unit-10 $grid-unit-20 $grid-unit-05 $grid-unit-20;
-		// The ruler masks the ticks behind its active number; tell it which
-		// surface to paint that mask in, now that it is off the grey stage.
-		--rotation-ruler-surface: #{$white};
 
+		// The ruler strip carries the canvas grey, as on trunk, so it reads as
+		// the same surface the image sits on: the band spans the column while
+		// the ruler itself is capped and centred within it. The controls
+		// below stay on the modal's own background — they act on the image
+		// but are not part of it.
 		.media-editor-fine-rotation {
-			// A column item stretches to the container's width by default;
-			// cap it at the ruler's measure and let it shrink below that on
-			// narrow canvases.
-			width: 100%;
-			max-width: 360px;
-			min-width: 0;
+			display: flex;
+			justify-content: center;
+			align-self: stretch;
+			background: $gray-200;
+			border-radius: 0 0 $radius-large $radius-large;
+			padding: $grid-unit-10 $grid-unit-20;
+
+			// Trunk's measure for the ruler itself (`flex: 0 1 360px` there,
+			// where the strip was a row); the grey band around it spans.
+			.rotation-ruler {
+				flex: 0 1 360px;
+				min-width: 0;
+			}
 		}
 	}
 
-	// The stage: the surface the image sits on, and the only grey area.
+	// The stage: the surface the image sits on. Fully rounded on its own —
+	// non-image media has no ruler band beneath it (see `:has` below).
 	.media-editor__canvas-area {
 		display: flex;
 		align-items: center;
@@ -137,40 +144,44 @@
 	// The strip and the open pane, stacked. `Tabs.Root` is the only element
 	// between the sidebar and them, so it carries the column that lets the
 	// pane take the leftover height and scroll inside it.
-	// No inline padding here: the rule under the tabs has to reach both edges
-	// of the sidebar, so the gutter belongs to the strip and the pane below
-	// it rather than to the column that holds them.
 	.media-editor__tabs {
 		display: flex;
 		flex: 1;
 		flex-direction: column;
 		min-height: 0;
+		padding: 0 $grid-unit-20;
 	}
 
 	// Wraps `Tabs.List`, which sizes itself to its tabs and so cannot carry a
-	// rule across the sidebar. This box is a block, so the border runs the
-	// full width while the padding lines the tabs up with the fields below.
-	// Sticky, and opaque because a sticky box is transparent by default and
-	// the pane scrolls underneath it.
+	// rule across the strip. This box is a block, so the border runs the full
+	// width of the column above the pane. Sticky, and opaque because a sticky
+	// box is transparent by default and the pane scrolls underneath it.
 	.media-editor__tablist {
 		position: sticky;
 		top: 0;
 		z-index: 1;
 		flex-shrink: 0;
-		padding-inline: $grid-unit-20;
 		background: $white;
 		border-bottom: $border-width solid $gray-300;
 	}
 
-	// The scrolling pane. Equal inline padding so focus rings (outline +
-	// offset) sit inside the pane rather than being clipped by its own
-	// overflow.
+	// The scrolling pane.
 	.media-editor__panel {
 		flex: 1;
 		min-height: 0;
 		overflow-y: auto;
-		padding-block: $grid-unit-20 $grid-unit-30;
-		padding-inline: $grid-unit-20;
+		padding-block: $grid-unit-30;
+		padding-inline: $grid-unit-05 $grid-unit-20;
+	}
+
+	// The ruler band shares the canvas grey and sits flush under it, so the
+	// two are one panel with four rounded corners rather than two stacked
+	// cards: the canvas gives up its bottom corners and the band takes them.
+	// Keyed on the band actually being there — non-image media has no ruler,
+	// and its canvas stays rounded all round.
+	.media-editor__content:has(.media-editor-fine-rotation) .media-editor__canvas-area {
+		border-end-start-radius: 0;
+		border-end-end-radius: 0;
 	}
 
 	// Below `small` an open panel owns the body, so the canvas steps aside

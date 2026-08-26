@@ -12,6 +12,13 @@
 	flex: 1;
 	min-height: 0;
 	overflow: hidden;
+
+	// The page has no footer under the editor, so the body would otherwise
+	// run to the bottom edge. Scoped to the route: the modal has its own
+	// footer supplying this gap.
+	.media-editor__body {
+		margin-bottom: $grid-unit-30;
+	}
 }
 
 // Below `small` History has no room in the page header, so it gets a bar of
