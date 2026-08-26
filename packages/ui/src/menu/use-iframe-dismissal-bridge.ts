@@ -68,73 +68,82 @@ function useCloseOnIframePointerDown( {
 			return;
 		}
 
-		const iframeCleanups = new Map< HTMLIFrameElement, () => void >();
-		const addIframe = ( iframe: HTMLIFrameElement ) => {
-			if ( iframeCleanups.has( iframe ) ) {
-				return;
+		const observeDocument = (
+			document: Document,
+			listenForPointerDown: boolean
+		): ( () => void ) => {
+			if ( listenForPointerDown ) {
+				document.addEventListener( 'pointerdown', onPointerDown, true );
 			}
 
-			let iframeDocument: Document | null = null;
-			const updateIframeDocument = () => {
-				const nextIframeDocument = getIframeDocument( iframe );
-				if ( nextIframeDocument === iframeDocument ) {
+			const iframeCleanups = new Map< HTMLIFrameElement, () => void >();
+			const addIframe = ( iframe: HTMLIFrameElement ) => {
+				if ( iframeCleanups.has( iframe ) ) {
 					return;
 				}
 
-				iframeDocument?.removeEventListener(
-					'pointerdown',
-					onPointerDown,
-					true
-				);
-				iframeDocument = nextIframeDocument;
-				iframeDocument?.addEventListener(
-					'pointerdown',
-					onPointerDown,
-					true
-				);
+				let iframeDocument: Document | null = null;
+				let iframeDocumentCleanup: ( () => void ) | undefined;
+				const updateIframeDocument = () => {
+					const nextIframeDocument = getIframeDocument( iframe );
+					if ( nextIframeDocument === iframeDocument ) {
+						return;
+					}
+
+					iframeDocumentCleanup?.();
+					iframeDocument = nextIframeDocument;
+					iframeDocumentCleanup = iframeDocument
+						? observeDocument( iframeDocument, true )
+						: undefined;
+				};
+
+				iframe.addEventListener( 'load', updateIframeDocument );
+				updateIframeDocument();
+				iframeCleanups.set( iframe, () => {
+					iframe.removeEventListener( 'load', updateIframeDocument );
+					iframeDocumentCleanup?.();
+				} );
+			};
+			const removeIframe = ( iframe: HTMLIFrameElement ) => {
+				iframeCleanups.get( iframe )?.();
+				iframeCleanups.delete( iframe );
 			};
 
-			iframe.addEventListener( 'load', updateIframeDocument );
-			updateIframeDocument();
-			iframeCleanups.set( iframe, () => {
-				iframe.removeEventListener( 'load', updateIframeDocument );
-				iframeDocument?.removeEventListener(
-					'pointerdown',
-					onPointerDown,
-					true
-				);
+			document.querySelectorAll( 'iframe' ).forEach( addIframe );
+
+			const MutationObserverConstructor =
+				document.defaultView?.MutationObserver;
+			const observer = MutationObserverConstructor
+				? new MutationObserverConstructor( ( records ) => {
+						records.forEach( ( record ) => {
+							record.removedNodes.forEach( ( node ) =>
+								forEachIframe( node, removeIframe )
+							);
+							record.addedNodes.forEach( ( node ) =>
+								forEachIframe( node, addIframe )
+							);
+						} );
+				  } )
+				: null;
+			observer?.observe( document.documentElement, {
+				childList: true,
+				subtree: true,
 			} );
-		};
-		const removeIframe = ( iframe: HTMLIFrameElement ) => {
-			iframeCleanups.get( iframe )?.();
-			iframeCleanups.delete( iframe );
+
+			return () => {
+				observer?.disconnect();
+				iframeCleanups.forEach( ( cleanup ) => cleanup() );
+				if ( listenForPointerDown ) {
+					document.removeEventListener(
+						'pointerdown',
+						onPointerDown,
+						true
+					);
+				}
+			};
 		};
 
-		ownerDocument.querySelectorAll( 'iframe' ).forEach( addIframe );
-
-		const MutationObserverConstructor =
-			ownerDocument.defaultView?.MutationObserver;
-		const observer = MutationObserverConstructor
-			? new MutationObserverConstructor( ( records ) => {
-					records.forEach( ( record ) => {
-						record.removedNodes.forEach( ( node ) =>
-							forEachIframe( node, removeIframe )
-						);
-						record.addedNodes.forEach( ( node ) =>
-							forEachIframe( node, addIframe )
-						);
-					} );
-			  } )
-			: null;
-		observer?.observe( ownerDocument.documentElement, {
-			childList: true,
-			subtree: true,
-		} );
-
-		return () => {
-			observer?.disconnect();
-			iframeCleanups.forEach( ( cleanup ) => cleanup() );
-		};
+		return observeDocument( ownerDocument, false );
 	}, [ enabled, onPointerDown, ownerDocument ] );
 }
 

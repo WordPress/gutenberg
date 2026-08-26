@@ -250,6 +250,65 @@ describe( 'Menu', () => {
 		expect( onCanvasClick ).toHaveBeenCalledTimes( 1 );
 	} );
 
+	it( 'closes a non-modal menu on a nested same-origin iframe pointer interaction', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<>
+				<Menu.Root modal={ false }>
+					<Menu.Trigger>Actions</Menu.Trigger>
+					<Menu.Popup>
+						<Menu.Item>
+							<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+						</Menu.Item>
+					</Menu.Popup>
+				</Menu.Root>
+				<iframe title="Editor canvas" />
+			</>
+		);
+
+		const editorIframe =
+			screen.getByTitle< HTMLIFrameElement >( 'Editor canvas' );
+		const editorDocument = editorIframe.contentDocument;
+
+		if ( ! editorDocument ) {
+			throw new Error( 'Expected a same-origin iframe document.' );
+		}
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+		expect( await screen.findByRole( 'menu' ) ).toBeVisible();
+
+		const nestedIframe = editorDocument.createElement( 'iframe' );
+		editorDocument.body.appendChild( nestedIframe );
+		const nestedDocument = nestedIframe.contentDocument;
+
+		if ( ! nestedDocument ) {
+			throw new Error( 'Expected a nested same-origin iframe document.' );
+		}
+
+		const nestedAddEventListener = jest.spyOn(
+			nestedDocument,
+			'addEventListener'
+		);
+		await waitFor( () => {
+			expect( nestedAddEventListener ).toHaveBeenCalledWith(
+				'pointerdown',
+				expect.any( Function ),
+				true
+			);
+		} );
+
+		act( () => {
+			nestedDocument.dispatchEvent(
+				new MouseEvent( 'pointerdown', { bubbles: true } )
+			);
+		} );
+
+		await waitFor( () => {
+			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+		} );
+	} );
+
 	it( 'does not close for pointer interactions inside a menu portaled to an iframe', async () => {
 		const user = userEvent.setup();
 		const iframe = document.createElement( 'iframe' );
