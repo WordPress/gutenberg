@@ -62,6 +62,10 @@ describe( 'Vitest policy rules', () => {
 			"import * as rtl from '@testing-library/react';\nfunction example() {\n\tconst rtl = { fireEvent: { click() {} } };\n\trtl.fireEvent.click();\n}",
 			{ project: 'browser' }
 		);
+		expectViolation(
+			"import * as RTL from '@testing-library/react';\nconst R = RTL;\nR.fireEvent.click( document.body );",
+			'allow fireEvent only'
+		);
 	} );
 
 	it( 'rejects jsdom browser APIs without a reason', () => {
@@ -106,6 +110,9 @@ describe( 'Vitest policy rules', () => {
 	it( 'tracks Testing Library DOM results and later assignments', () => {
 		for ( const source of [
 			"import { screen } from '@testing-library/react';\nscreen.getByRole( 'button' ).getBoundingClientRect();",
+			"import { screen } from '@testing-library/react';\nconst button = await screen.findByRole( 'button' );\nbutton.offsetWidth;",
+			"import { findByRole } from '@testing-library/react';\nconst button = await findByRole( document.body, 'button' );\nbutton.offsetWidth;",
+			"import * as RTL from '@testing-library/react';\nconst { screen: ui } = RTL;\nui.getByRole( 'button' ).offsetWidth;",
 			'let element;\nelement = document.body;\nelement.offsetWidth;',
 		] ) {
 			expectViolation( source, 'require Browser Mode', {
@@ -119,6 +126,9 @@ describe( 'Vitest policy rules', () => {
 			'document.defaultView.getComputedStyle( document.body );',
 			'const { getComputedStyle: getStyle } = window;\ngetStyle( document.body );',
 			'const getStyle = window.getComputedStyle;\ngetStyle( document.body );',
+			'const view = document.defaultView;\nview.getComputedStyle( document.body );',
+			'const { getComputedStyle } = document.defaultView;\ngetComputedStyle( document.body );',
+			'const view = window;\nview.getComputedStyle( document.body );',
 		] ) {
 			expectViolation( source, 'computed style assertions', {
 				project: 'jsdom',
@@ -139,6 +149,9 @@ describe( 'Vitest policy rules', () => {
 			'const controller = window.wp.animations;\ncontroller.animate();',
 			{ project: 'jsdom' }
 		);
+		expectValid( 'const { dataset } = document.body;\ndataset.scrollTop;', {
+			project: 'jsdom',
+		} );
 	} );
 
 	it( 'allows rendered UI for deterministic jsdom behavior', () => {
@@ -174,6 +187,11 @@ describe( 'Vitest policy rules', () => {
 		);
 		expectViolation(
 			"import * as Vitest from 'vitest';\nVitest.vi.mock( './module' );",
+			'must use vi.mock(import(...))',
+			{ file: 'example.test.ts', project: 'node' }
+		);
+		expectViolation(
+			"import * as Vitest from 'vitest';\nconst V = Vitest;\nV.vi.mock( './module' );",
 			'must use vi.mock(import(...))',
 			{ file: 'example.test.ts', project: 'node' }
 		);
@@ -323,6 +341,11 @@ describe( 'Vitest policy rules', () => {
 		);
 		expectViolation(
 			"import * as Vitest from 'vitest';\nVitest.expect.soft( element ).toHaveStyle( {} );",
+			'toHaveStyle() requires',
+			{ project: 'jsdom' }
+		);
+		expectViolation(
+			"import * as Vitest from 'vitest';\nconst { expect: check } = Vitest;\ncheck.poll( () => element ).toHaveStyle( {} );",
 			'toHaveStyle() requires',
 			{ project: 'jsdom' }
 		);
