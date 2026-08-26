@@ -10,6 +10,7 @@
 
 -   Icon: Apply only padding to the inner SVG in the editor, so margin is no longer applied twice compared to the front end ([#81292](https://github.com/WordPress/gutenberg/pull/81292)).
 -   Playlist Track: Mark track media fields as content so toolbar inserters add an empty track instead of duplicating the selected track.
+-   Synced Pattern: Expand shortcodes in the pattern's saved markup before its blocks render when the pattern is used outside `the_content` and `widget_block_content`, so a Shortcode block inside a synced pattern works in templates instead of printing the raw shortcode.
 -   Term Description: Apply the term description display filters when rendering with term context inside a Terms Query loop, so multi-paragraph descriptions keep their paragraphs and match the taxonomy archive rendering ([#81290](https://github.com/WordPress/gutenberg/pull/81290)).
 
 ## 10.4.0 (2026-08-12)

@@ -9,6 +9,8 @@
  * Renders the `core/block` block on server.
  *
  * @since 5.0.0
+ * @since 7.0.0 Shortcodes in the pattern's saved markup are expanded when the
+ *              pattern is rendered outside `the_content` and `widget_block_content`.
  *
  * @global WP_Embed $wp_embed
  *
@@ -49,6 +51,26 @@ function render_block_core_block( $attributes, $content, $block_instance ) {
 	global $wp_embed;
 	$content = $wp_embed->run_shortcode( $reusable_block->post_content );
 	$content = $wp_embed->autoembed( $content );
+
+	/*
+	 * The Shortcode block leaves its shortcode in the markup for `the_content`
+	 * to expand. A synced pattern rendered outside that filter -- in a
+	 * template, for example -- never gets that pass, so expand shortcodes
+	 * here, on the pattern's saved markup and before its blocks are rendered,
+	 * mirroring how `get_the_block_template_html()` processes templates.
+	 * Expanding before block rendering keeps shortcodes confined to what the
+	 * pattern author saved: content that dynamic blocks inject during
+	 * rendering (comment text, post content, pattern overrides) is never
+	 * treated as shortcodes.
+	 *
+	 * Inside `the_content` and `widget_block_content`, which run
+	 * `do_shortcode` after blocks, the extra pass is skipped so escaped
+	 * shortcodes are not expanded twice.
+	 */
+	if ( ! doing_filter( 'the_content' ) && ! doing_filter( 'widget_block_content' ) ) {
+		$content = shortcode_unautop( $content );
+		$content = do_shortcode( $content );
+	}
 
 	// Back compat.
 	// For blocks that have not been migrated in the editor, add some back compat
