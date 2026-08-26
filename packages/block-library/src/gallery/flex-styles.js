@@ -41,7 +41,7 @@ function getBlockGapValue( style ) {
 	return style.spacing.blockGap;
 }
 
-export default function GalleryGapCustomProperties( { style, clientId } ) {
+export default function GalleryFlexStyles( { style, clientId } ) {
 	const selector = `#block-${ clientId }`;
 	const [ viewportSettings ] = useSettings( 'viewport' );
 	const globalStyles = useSelect(
@@ -58,7 +58,7 @@ export default function GalleryGapCustomProperties( { style, clientId } ) {
 	// values fall back to the Gallery blockGap default.
 	const blockGap =
 		styleBlockGap === undefined ? globalGalleryBlockGap : styleBlockGap;
-	let gap = getGalleryGapCustomPropertyStyle( selector, blockGap );
+	let css = getGalleryGapCustomPropertyStyle( selector, blockGap );
 	const responsiveMediaQueries =
 		getResponsiveMediaQueries( viewportSettings );
 
@@ -81,19 +81,19 @@ export default function GalleryGapCustomProperties( { style, clientId } ) {
 				return;
 			}
 
-			gap += `${ mediaQuery }{${ getGalleryGapCustomPropertyStyle(
+			css += `${ mediaQuery }{${ getGalleryGapCustomPropertyStyle(
 				selector,
 				viewportBlockGap
 			) }}`;
 		}
 	);
-	gap += getGalleryResponsiveFlexCSS(
+	css += getGalleryResponsiveFlexCSS(
 		selector,
 		style,
 		responsiveMediaQueries
 	);
 
-	useStyleOverride( { css: gap } );
+	useStyleOverride( { css } );
 
 	return null;
 }

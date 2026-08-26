@@ -61,7 +61,7 @@ import {
 import useImageSizes from './use-image-sizes';
 import useGetNewImages from './use-get-new-images';
 import useGetMedia from './use-get-media';
-import GalleryGapCustomProperties from './gap-styles';
+import GalleryFlexStyles from './flex-styles';
 import useDynamicGallery from './use-dynamic-gallery';
 import { GallerySourcePanel, GalleryDynamicView } from './dynamic-gallery';
 import { getDynamicSource, ATTACHED_MEDIA } from './dynamic-source';
@@ -574,7 +574,7 @@ export default function GalleryEdit( props ) {
 		);
 	}
 
-	function setGalleryLayoutSettings( settings ) {
+	function setGalleryFlexSettings( settings ) {
 		if ( ! isViewportStyleState ) {
 			setAttributes( settings );
 			return;
@@ -594,11 +594,11 @@ export default function GalleryEdit( props ) {
 	}
 
 	function setColumnsNumber( value ) {
-		setGalleryLayoutSettings( { columns: value } );
+		setGalleryFlexSettings( { columns: value } );
 	}
 
 	function toggleImageCrop() {
-		setGalleryLayoutSettings( { imageCrop: ! activeImageCrop } );
+		setGalleryFlexSettings( { imageCrop: ! activeImageCrop } );
 	}
 
 	function toggleRandomOrder() {
@@ -825,7 +825,7 @@ export default function GalleryEdit( props ) {
 					label={ __( 'Settings' ) }
 					resetAll={ () => {
 						if ( isViewportStyleState ) {
-							setGalleryLayoutSettings( {
+							setGalleryFlexSettings( {
 								columns: undefined,
 								imageCrop: undefined,
 							} );
@@ -918,7 +918,7 @@ export default function GalleryEdit( props ) {
 									: ! activeImageCrop
 							}
 							onDeselect={ () =>
-								setGalleryLayoutSettings( {
+								setGalleryFlexSettings( {
 									imageCrop: isViewportStyleState
 										? undefined
 										: true,
@@ -1077,7 +1077,7 @@ export default function GalleryEdit( props ) {
 					</BlockControls>
 				) }
 				{ isFlexLayout && (
-					<GalleryGapCustomProperties
+					<GalleryFlexStyles
 						style={ attributes.style }
 						clientId={ clientId }
 					/>

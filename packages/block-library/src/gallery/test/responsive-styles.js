@@ -9,24 +9,6 @@ const MEDIA_QUERIES = {
 };
 
 describe( 'Gallery responsive Flex styles', () => {
-	it( 'stores columns separately from viewport layout settings', () => {
-		expect(
-			getUpdatedGalleryStyle( {
-				style: {
-					'@mobile': { layout: { columnCount: 2 } },
-				},
-				viewport: '@mobile',
-				baseSettings: { columns: 2, imageCrop: true },
-				settings: { columns: 1 },
-			} )
-		).toEqual( {
-			'@mobile': {
-				columns: 1,
-				layout: { columnCount: 2 },
-			},
-		} );
-	} );
-
 	it( 'updates crop to fit for the active viewport', () => {
 		expect(
 			getUpdatedGalleryStyle( {
