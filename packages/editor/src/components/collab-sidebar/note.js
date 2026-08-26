@@ -56,6 +56,7 @@ export function Note( {
 	onResolve,
 	onToggleReaction,
 	reactions,
+	isThreadResolved = false,
 } ) {
 	const [ actionState, setActionState ] = useState( null );
 	const actionButtonRef = useRef( null );
@@ -218,7 +219,7 @@ export function Note( {
 				<Stack direction="row" gap="xs" justify="flex-start">
 					<AddReactionButton
 						noteId={ note.id }
-						disabled={ note.status === 'approved' }
+						disabled={ isThreadResolved }
 						onToggleReaction={ ( emoji ) =>
 							onToggleReaction?.( {
 								commentId: note.id,
@@ -229,6 +230,7 @@ export function Note( {
 					<ReactionDisplay
 						noteId={ note.id }
 						reactions={ reactions }
+						disabled={ isThreadResolved }
 						onToggleReaction={ ( emoji ) =>
 							onToggleReaction?.( {
 								commentId: note.id,

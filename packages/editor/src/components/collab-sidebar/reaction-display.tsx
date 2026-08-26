@@ -151,6 +151,7 @@ interface ReactionButtonProps {
 	isActive: boolean;
 	emoji: string;
 	emojiLabel: string;
+	disabled?: boolean;
 	onToggleReaction: ( slug: string ) => void;
 }
 
@@ -164,6 +165,8 @@ interface ReactionButtonProps {
  * @param props.isActive         Whether the current user reacted.
  * @param props.emoji            The emoji character.
  * @param props.emojiLabel       The emoji label.
+ * @param props.disabled         Whether the reaction can no longer be toggled
+ *                               (the thread is resolved).
  * @param props.onToggleReaction Callback to toggle a reaction.
  */
 function ReactionButton( {
@@ -173,6 +176,7 @@ function ReactionButton( {
 	isActive,
 	emoji,
 	emojiLabel,
+	disabled = false,
 	onToggleReaction,
 }: ReactionButtonProps ) {
 	const [ tooltipText, setTooltipText ] = useState( '' );
@@ -245,6 +249,8 @@ function ReactionButton( {
 			variant="secondary"
 			size="small"
 			className="editor-collab-sidebar-panel__reaction-button"
+			disabled={ disabled }
+			accessibleWhenDisabled
 			onClick={ ( event: MouseEvent< HTMLElement > ) => {
 				event.stopPropagation();
 				// When removing the last reaction for this emoji,
@@ -278,6 +284,7 @@ function ReactionButton( {
 interface ReactionDisplayProps {
 	noteId: number;
 	reactions: ReactionSummary | null | undefined;
+	disabled?: boolean;
 	onToggleReaction: ( slug: string ) => void;
 }
 
@@ -287,11 +294,14 @@ interface ReactionDisplayProps {
  * @param props                  Component props.
  * @param props.noteId           The parent note comment ID.
  * @param props.reactions        The reaction summary (keyed by slug).
+ * @param props.disabled         Whether reactions can no longer be toggled
+ *                               (the thread is resolved).
  * @param props.onToggleReaction Callback to toggle a reaction.
  */
 export default function ReactionDisplay( {
 	noteId,
 	reactions,
+	disabled = false,
 	onToggleReaction,
 }: ReactionDisplayProps ) {
 	// The list is filterable server-side (and static per page load),
@@ -323,6 +333,7 @@ export default function ReactionDisplay( {
 						isActive={ isActive }
 						emoji={ entry?.emoji ?? slug }
 						emojiLabel={ entry?.label ?? slug }
+						disabled={ disabled }
 						onToggleReaction={ onToggleReaction }
 					/>
 				);

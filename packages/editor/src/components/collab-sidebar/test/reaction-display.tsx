@@ -200,6 +200,29 @@ describe( 'ReactionDisplay', () => {
 		);
 	} );
 
+	it( 'leaves pills focusable but inert on a resolved thread', async () => {
+		const user = userEvent.setup();
+		const onToggleReaction = jest.fn();
+		render(
+			<ReactionDisplay
+				noteId={ uniqueNoteId }
+				reactions={ {
+					heart: { count: 1, reacted: true, my_reaction_id: 7 },
+				} }
+				disabled
+				onToggleReaction={ onToggleReaction }
+			/>
+		);
+
+		const pill = screen.getByRole( 'button', {
+			name: 'Heart, 1 reaction',
+		} );
+		expect( pill ).toHaveAttribute( 'aria-disabled', 'true' );
+
+		await user.click( pill );
+		expect( onToggleReaction ).not.toHaveBeenCalled();
+	} );
+
 	it( 'keeps the count-based label when the names fetch fails', async () => {
 		const user = userEvent.setup();
 		mockApiFetch.mockRejectedValue( new Error( 'network down' ) );

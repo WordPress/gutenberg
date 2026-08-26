@@ -1239,6 +1239,44 @@ test.describe( 'Block Notes', () => {
 			await expect( buttons.first() ).toBeFocused();
 		} );
 
+		test( 'resolving a thread locks its reactions', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing resolved reactions' },
+				comment: 'Test comment for resolved reactions',
+			} );
+
+			await blockNoteUtils.addReactionToComment( 'Heart' );
+			const reactionPill = page.getByRole( 'button', { name: /Heart/ } );
+			await expect( reactionPill ).toBeVisible();
+
+			// Resolving collapses the thread, so re-select it to reach the
+			// reaction controls again.
+			await page.getByRole( 'button', { name: 'Resolve' } ).click();
+			await page
+				.getByRole( 'treeitem', {
+					name: 'Note: Test comment for resolved reactions',
+				} )
+				.click();
+
+			// A resolved thread is an archived conversation, so neither the
+			// add trigger nor the existing pill may still mutate reactions.
+			await expect(
+				page.getByRole( 'button', { name: 'Add reaction' } )
+			).toBeDisabled();
+			await expect( reactionPill ).toBeDisabled();
+
+			// Reopening the thread unlocks them again.
+			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Reopen' );
+			await expect(
+				page.getByRole( 'button', { name: 'Add reaction' } )
+			).toBeEnabled();
+			await expect( reactionPill ).toBeEnabled();
+		} );
+
 		test( 'can add multiple different reactions to same note', async ( {
 			page,
 			blockNoteUtils,
