@@ -91,17 +91,41 @@ function UnforwardedSnackbar(
 		callbacksRef.current = { onDismiss, onRemove };
 	} );
 
-	useEffect( () => {
-		// Only set up the timeout dismiss if we're not explicitly dismissing.
-		const timeoutHandle = setTimeout( () => {
-			if ( ! explicitDismiss ) {
-				callbacksRef.current.onDismiss?.();
-				callbacksRef.current.onRemove?.();
-			}
-		}, NOTICE_TIMEOUT );
+	const timeoutRef = useRef< ReturnType< typeof setTimeout > | undefined >(
+		undefined
+	);
 
-		return () => clearTimeout( timeoutHandle );
-	}, [ explicitDismiss ] );
+	// Check after every render so that a snackbar which survives its removal
+	// gets a fresh timeout without resetting an active timeout on rerenders.
+	useEffect( () => {
+		if ( explicitDismiss ) {
+			if ( timeoutRef.current !== undefined ) {
+				clearTimeout( timeoutRef.current );
+				timeoutRef.current = undefined;
+			}
+			return;
+		}
+
+		if ( timeoutRef.current !== undefined ) {
+			return;
+		}
+
+		timeoutRef.current = setTimeout( () => {
+			timeoutRef.current = undefined;
+			callbacksRef.current.onDismiss?.();
+			callbacksRef.current.onRemove?.();
+		}, NOTICE_TIMEOUT );
+	} );
+
+	useEffect(
+		() => () => {
+			if ( timeoutRef.current !== undefined ) {
+				clearTimeout( timeoutRef.current );
+				timeoutRef.current = undefined;
+			}
+		},
+		[]
+	);
 
 	const classes = clsx( className, 'components-snackbar', {
 		'components-snackbar-explicit-dismiss': !! explicitDismiss,

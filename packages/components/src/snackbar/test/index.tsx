@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 import { click } from '@ariakit/test';
 import { speak } from '@wordpress/a11y';
 import { SVG, Path } from '@wordpress/primitives';
@@ -12,6 +12,10 @@ describe( 'Snackbar', () => {
 
 	beforeEach( () => {
 		mockedSpeak.mockReset();
+	} );
+
+	afterEach( () => {
+		jest.useRealTimers();
 	} );
 
 	it( 'should render correctly', () => {
@@ -42,6 +46,22 @@ describe( 'Snackbar', () => {
 		const icon = within( snackbar ).getByTestId( 'icon' );
 
 		expect( icon ).toBeVisible();
+	} );
+
+	it( 'should not restart auto-dismissal after an unrelated rerender', async () => {
+		jest.useFakeTimers();
+		const removeNotice = jest.fn();
+		const { rerender } = render(
+			<Snackbar onRemove={ () => removeNotice() }>Message</Snackbar>
+		);
+
+		await act( async () => jest.advanceTimersByTime( 5000 ) );
+		rerender(
+			<Snackbar onRemove={ () => removeNotice() }>Message</Snackbar>
+		);
+		await act( async () => jest.advanceTimersByTime( 1000 ) );
+
+		expect( removeNotice ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'should be dismissible by clicking the snackbar', async () => {
