@@ -159,16 +159,25 @@ function ThemeColorControls() {
 			},
 			...COLOR_OPTIONS.map( ( option ) => {
 				const colors = getOptionColors( option.id );
+				const isSelected = colorTheme === option.id;
 				return createElement(
 					ToggleButton,
 					{
 						key: option.id,
 						type: 'button',
 						ariaLabel: false,
-						pressed: colorTheme === option.id,
+						pressed: isSelected,
 						size: 'small',
 						variant: 'outline',
-						style: colorPresetButtonStyle,
+						style: {
+							...colorPresetButtonStyle,
+							background: isSelected
+								? theme.background.hoverable
+								: undefined,
+							boxShadow: isSelected
+								? `${ theme.barSelectedColor } 0 0 0 2px inset`
+								: undefined,
+						},
 						onClick: () =>
 							updateGlobals( {
 								dsColorTheme:
