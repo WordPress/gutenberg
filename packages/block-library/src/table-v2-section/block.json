@@ -26,7 +26,5 @@
 		"interactivity": {
 			"clientNavigation": true
 		}
-	},
-	"style": "wp-block-table-v2-section",
-	"editorStyle": "wp-block-table-v2-section-editor"
+	}
 }

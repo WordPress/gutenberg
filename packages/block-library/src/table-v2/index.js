@@ -1,4 +1,3 @@
-import { __ } from '@wordpress/i18n';
 import { blockTable as icon } from '@wordpress/icons';
 import initBlock from '../utils/init-block';
 import edit from './edit';
