@@ -2031,19 +2031,9 @@
 			"count": 2
 		}
 	},
-	"packages/ui/src/lock-unlock.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/ui/src/utils/test/use-deprioritized-initial-focus.test.tsx": {
 		"react-hooks/refs": {
 			"count": 2
-		}
-	},
-	"packages/ui/src/utils/theme-provider.ts": {
-		"no-restricted-imports": {
-			"count": 1
 		}
 	},
 	"packages/ui/src/utils/use-schedule-validation.ts": {
