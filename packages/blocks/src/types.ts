@@ -222,29 +222,6 @@ export interface BlockAttribute {
  */
 interface BlockTransformBase {
 	/**
-	 * The names of the block types the transform applies to (`from`) or
-	 * produces (`to`). A single entry of `*` makes it a wildcard transform,
-	 * matching any block type. Only meaningful on transforms of type `block`.
-	 */
-	blocks?: string[];
-	/**
-	 * The target block variation name for block transforms that produce a
-	 * variation of the transformed block type.
-	 */
-	variationName?: string;
-	/**
-	 * Keyboard shortcuts that apply this transform to the selected block. Only
-	 * supported on transforms of type `block`.
-	 *
-	 * On a `to` transform they apply to the block declaring it, and produce the
-	 * first entry of `blocks`. On a `from` transform they apply to any block
-	 * listed in `blocks`, and produce the block declaring it. Each shortcut may
-	 * target a different variation of the produced block through its own
-	 * `variationName`, which is what lets one transform carry a shortcut per
-	 * variation without appearing more than once in the block switcher.
-	 */
-	shortcuts?: BlockShortcut[];
-	/**
 	 * The transform's priority. A lower number means a higher priority.
 	 * Defaults to `10`.
 	 */
@@ -274,6 +251,28 @@ export interface BlockBlockTransform<
 	Attributes extends Record< string, unknown > = Record< string, unknown >,
 > extends BlockTransformBase {
 	type: 'block';
+	/**
+	 * The names of the block types the transform applies to (`from`) or
+	 * produces (`to`). A single entry of `*` makes it a wildcard transform,
+	 * matching any block type.
+	 */
+	blocks: string[];
+	/**
+	 * The target block variation name for transforms that produce a variation
+	 * of the transformed block type.
+	 */
+	variationName?: string;
+	/**
+	 * Keyboard shortcuts that apply this transform to the selected block.
+	 *
+	 * On a `to` transform they apply to the block declaring it, and produce the
+	 * first entry of `blocks`. On a `from` transform they apply to any block
+	 * listed in `blocks`, and produce the block declaring it. Each shortcut may
+	 * target a different variation of the produced block through its own
+	 * `variationName`, which is what lets one transform carry a shortcut per
+	 * variation without appearing more than once in the block switcher.
+	 */
+	shortcuts?: BlockShortcut[];
 	/**
 	 * Whether the transform applies to a selection of multiple blocks, in which
 	 * case `isMatch` and `transform` receive arrays.

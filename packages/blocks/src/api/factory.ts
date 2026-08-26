@@ -43,7 +43,7 @@ const isBlockTypeTransform = (
 
 const getBlockTypeWithTransformMetadata = (
 	blockType: BlockType,
-	transform: BlockTransform
+	transform: BlockBlockTransform
 ): BlockTypeWithTransformMetadata =>
 	transform.variationName
 		? { ...blockType, variationName: transform.variationName }
@@ -240,7 +240,7 @@ const isPossibleTransformForSource = (
 	transform: BlockTransform,
 	direction: 'from' | 'to',
 	blocks: Block[]
-): boolean => {
+): transform is BlockBlockTransform => {
 	if ( ! blocks.length ) {
 		return false;
 	}
@@ -276,7 +276,7 @@ const isPossibleTransformForSource = (
 	const sourceBlock = blocks[ 0 ];
 	const hasMatchingName =
 		direction !== 'from' ||
-		transform.blocks!.indexOf( sourceBlock.name ) !== -1 ||
+		transform.blocks.indexOf( sourceBlock.name ) !== -1 ||
 		isWildcardBlockTransform( transform );
 	if ( ! hasMatchingName ) {
 		return false;
@@ -366,7 +366,7 @@ const getBlockTypesForPossibleToTransforms = (
 	// Map block names to block types.
 	return possibleTransforms
 		.flatMap( ( transformation ) => {
-			return ( transformation.blocks || [] ).map( ( name ) => {
+			return ( transformation.blocks ?? [] ).map( ( name ) => {
 				const transformedBlockType = getBlockType( name );
 				return transformedBlockType
 					? getBlockTypeWithTransformMetadata(
@@ -611,7 +611,7 @@ export function switchToBlockType(
 			( t ) =>
 				isMatchingVariation( t ) &&
 				( isWildcardBlockTransform( t ) ||
-					t.blocks!.indexOf( name ) !== -1 ) &&
+					t.blocks.indexOf( name ) !== -1 ) &&
 				( ! isMultiBlock || !! t.isMultiBlock ) &&
 				maybeCheckTransformIsMatch( t, blocksArray )
 		) ||
@@ -620,7 +620,7 @@ export function switchToBlockType(
 			( t ) =>
 				isMatchingVariation( t ) &&
 				( isWildcardBlockTransform( t ) ||
-					t.blocks!.indexOf( sourceName ) !== -1 ) &&
+					t.blocks.indexOf( sourceName ) !== -1 ) &&
 				( ! isMultiBlock || !! t.isMultiBlock ) &&
 				maybeCheckTransformIsMatch( t, blocksArray )
 		);
