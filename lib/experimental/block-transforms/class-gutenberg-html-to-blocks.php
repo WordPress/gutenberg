@@ -385,23 +385,35 @@ class Gutenberg_HTML_To_Blocks {
 		$closing  = $element->get_closing_tag();
 		$supports = (array) $block_type->supports;
 
-		$add_class    = ! isset( $supports['className'] ) || false !== $supports['className'];
 		$keep_classes = ! isset( $supports['customClassName'] ) || false !== $supports['customClassName'];
 		$keep_anchor  = ! empty( $supports['anchor'] );
 
 		$processor = new WP_HTML_Tag_Processor( $opening );
 
 		if ( $processor->next_tag() ) {
-			if ( ! $keep_classes ) {
-				$processor->remove_attribute( 'class' );
-			}
-
 			if ( ! $keep_anchor ) {
 				$processor->remove_attribute( 'id' );
 			}
 
-			if ( $add_class ) {
-				$processor->add_class( self::get_default_class_name( $block_type->name ) );
+			/*
+			 * The wrapper carries the classes `useBlockProps.save()` would put
+			 * on it, taken from the block supports the editor itself applies
+			 * rather than from a second implementation of the same rule.
+			 *
+			 * A class the source already repeats survives into saved markup
+			 * otherwise, where `save` emits it once and the editor flags the
+			 * block, so the list is reduced to distinct tokens.
+			 */
+			$classes = array_merge(
+				$keep_classes ? $element->get_class_names() : array(),
+				self::get_block_supports_classes( $block_type )
+			);
+			$classes = array_values( array_unique( $classes ) );
+
+			if ( array() === $classes ) {
+				$processor->remove_attribute( 'class' );
+			} else {
+				$processor->set_attribute( 'class', implode( ' ', $classes ) );
 			}
 
 			$opening = $processor->get_updated_html();
@@ -415,15 +427,16 @@ class Gutenberg_HTML_To_Blocks {
 	}
 
 	/**
-	 * Returns the generated class name for a block.
+	 * Returns the classes a block's supports put on its wrapper.
 	 *
-	 * @see getBlockDefaultClassName() in `@wordpress/blocks`.
-	 *
-	 * @param string $block_name Block name.
-	 * @return string Generated class name.
+	 * @param WP_Block_Type $block_type Block type.
+	 * @return string[] Class names.
 	 */
-	private static function get_default_class_name( $block_name ) {
-		return 'wp-block-' . preg_replace( '#^core-#', '', str_replace( '/', '-', $block_name ) );
+	private static function get_block_supports_classes( $block_type ) {
+		$applied = wp_apply_generated_classname_support( $block_type );
+		$classes = isset( $applied['class'] ) ? trim( (string) $applied['class'] ) : '';
+
+		return '' === $classes ? array() : preg_split( '/\s+/', $classes );
 	}
 
 	/**

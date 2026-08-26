@@ -62,6 +62,56 @@ function gutenberg_bootstrap_block_transforms() {
 add_action( 'enqueue_block_editor_assets', 'gutenberg_bootstrap_block_transforms' );
 
 /**
+ * Reports which blocks a server-side conversion can produce.
+ *
+ * An importer about to run over a whole site can ask what it will get before
+ * it starts, rather than converting everything and reading the wreckage. A
+ * block appears under `declines` when its transform sets `serverConversion`
+ * to false, meaning its `save` rewrites the markup rather than wrapping it and
+ * the server leaves that markup alone.
+ *
+ * @return array {
+ *     Blocks a raw conversion knows about, each list sorted by block name.
+ *
+ *     @type string[] $converts Blocks it can produce.
+ *     @type string[] $declines Blocks it deliberately will not produce.
+ * }
+ */
+function gutenberg_get_block_conversion_support() {
+	$converts = array();
+	$declines = array();
+
+	foreach ( WP_Block_Type_Registry::get_instance()->get_all_registered() as $block_type ) {
+		if ( empty( $block_type->transforms['from'] ) || ! is_array( $block_type->transforms['from'] ) ) {
+			continue;
+		}
+
+		foreach ( $block_type->transforms['from'] as $transform ) {
+			if ( ! isset( $transform['type'] ) || 'raw' !== $transform['type'] ) {
+				continue;
+			}
+
+			if ( isset( $transform['serverConversion'] ) && false === $transform['serverConversion'] ) {
+				$declines[] = $block_type->name;
+			} else {
+				$converts[] = $block_type->name;
+			}
+		}
+	}
+
+	$converts = array_values( array_unique( $converts ) );
+	$declines = array_values( array_unique( $declines ) );
+
+	sort( $converts );
+	sort( $declines );
+
+	return array(
+		'converts' => $converts,
+		'declines' => $declines,
+	);
+}
+
+/**
  * Converts HTML into blocks using the transforms registered block types declare.
  *
  * Blocks are matched against the `transforms.from` entries of type `raw` on

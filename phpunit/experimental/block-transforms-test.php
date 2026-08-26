@@ -895,4 +895,78 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 
 		$this->assertTrue( $reversed[0]['attrs']['reversed'] );
 	}
+
+	public function test_takes_the_generated_class_from_block_supports() {
+		$this->register(
+			'test/plain',
+			array(
+				'attributes' => array(),
+				'supports'   => array( 'className' => false ),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'     => 'raw',
+							'selector' => 'aside',
+						),
+					),
+				),
+			)
+		);
+
+		// `wp_apply_generated_classname_support()` is what decides this, the
+		// same call the editor's wrapper goes through.
+		$blocks = gutenberg_html_to_blocks( '<aside>Note</aside>' );
+
+		$this->assertSame( '<aside>Note</aside>', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_reduces_a_repeated_class_to_one() {
+		$this->register_test_blocks();
+
+		// `save` emits each class once, so markup repeating one would not match
+		// it and the editor would flag the block.
+		$blocks = gutenberg_html_to_blocks( '<p class="intro intro">Text</p>' );
+
+		$this->assertSame( '<p class="intro">Text</p>', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_reports_which_blocks_a_conversion_can_produce() {
+		$this->register(
+			'test/aside',
+			array(
+				'attributes' => array(),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'     => 'raw',
+							'selector' => 'aside',
+						),
+					),
+				),
+			)
+		);
+		$this->register(
+			'test/picture',
+			array(
+				'attributes' => array(),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'             => 'raw',
+							'selector'         => 'figure:has(img)',
+							'serverConversion' => false,
+						),
+					),
+				),
+			)
+		);
+
+		$support = gutenberg_get_block_conversion_support();
+
+		$this->assertContains( 'test/aside', $support['converts'] );
+		$this->assertNotContains( 'test/aside', $support['declines'] );
+
+		$this->assertContains( 'test/picture', $support['declines'] );
+		$this->assertNotContains( 'test/picture', $support['converts'] );
+	}
 }
