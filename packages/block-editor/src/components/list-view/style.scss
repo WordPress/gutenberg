@@ -253,12 +253,8 @@
 		}
 	}
 
+	.block-editor-list-view-block-contents:focus,
 	&.is-nesting .block-editor-list-view-block-contents {
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wpds-color-stroke-focus);
-		z-index: 1;
-	}
-
-	.block-editor-list-view-block-contents:focus {
 		box-shadow: none;
 		outline: none;
 
