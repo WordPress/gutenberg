@@ -1593,6 +1593,11 @@
 		"public": true
 	},
 	{
+		"slug": "table-cell",
+		"label": "Table Cell",
+		"filePath": "library/table-cell.svg"
+	},
+	{
 		"slug": "table-column-after",
 		"label": "Table Column After",
 		"filePath": "library/table-column-after.svg"

@@ -27,6 +27,8 @@ const {
 	hasSelectedBlock,
 	getSelectedBlock,
 	getSelectedBlockClientId,
+	getSelectionType,
+	isSelectionRange,
 	getBlockRootClientId,
 	getBlockHierarchyRootClientId,
 	getGlobalBlockCount,
@@ -42,6 +44,7 @@ const {
 	isBlockSelected,
 	hasSelectedInnerBlock,
 	isBlockWithinSelection,
+	isSelectionContiguous,
 	hasMultiSelection,
 	isBlockMultiSelected,
 	isFirstMultiSelectedBlock,
@@ -201,6 +204,18 @@ describe( 'selectors', () => {
 			},
 		} );
 
+		registerBlockType( 'core/test-structural-block', {
+			apiVersion: 3,
+			save: () => null,
+			category: 'text',
+			title: 'Test Structural Block',
+			supports: {
+				inserter: false,
+				movable: false,
+				removable: false,
+			},
+		} );
+
 		setFreeformContentHandlerName( 'core/freeform' );
 
 		cachedSelectors.forEach( ( { clear } ) => clear() );
@@ -218,6 +233,7 @@ describe( 'selectors', () => {
 		unregisterBlockType( 'core/test-block-requires-ancestor' );
 		unregisterBlockType( 'core/test-block-requires-ancestor-parent' );
 		unregisterBlockType( 'core/test-content-block' );
+		unregisterBlockType( 'core/test-structural-block' );
 
 		setFreeformContentHandlerName( undefined );
 	} );
@@ -1470,6 +1486,39 @@ describe( 'selectors', () => {
 				'7',
 			] );
 		} );
+
+		it( 'returns explicit set selection client IDs', () => {
+			const state = {
+				blocks: {
+					order: new Map(
+						Object.entries( {
+							'': [ '5', '4', '3', '2', '1' ],
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							1: '',
+							2: '',
+							3: '',
+							4: '',
+							5: '',
+						} )
+					),
+				},
+				selection: {
+					type: 'set',
+					selectionStart: { clientId: '4' },
+					selectionEnd: { clientId: '1' },
+					selectionClientIds: [ '4', '2', '1' ],
+				},
+			};
+
+			expect( getSelectedBlockClientIds( state ) ).toEqual( [
+				'4',
+				'2',
+				'1',
+			] );
+		} );
 	} );
 
 	describe( 'getMultiSelectedBlockClientIds', () => {
@@ -1583,6 +1632,105 @@ describe( 'selectors', () => {
 			expect( getMultiSelectedBlocks( state ) ).toBe(
 				getMultiSelectedBlocks( state )
 			);
+		} );
+	} );
+
+	describe( 'getSelectionType', () => {
+		it( 'defaults to range selection', () => {
+			const state = {
+				selection: {
+					selectionStart: {},
+					selectionEnd: {},
+				},
+			};
+
+			expect( getSelectionType( state ) ).toBe( 'range' );
+			expect( isSelectionRange( state ) ).toBe( true );
+		} );
+
+		it( 'returns set selection type', () => {
+			const state = {
+				selection: {
+					type: 'set',
+					selectionStart: { clientId: '2' },
+					selectionEnd: { clientId: '4' },
+					selectionClientIds: [ '2', '4' ],
+				},
+			};
+
+			expect( getSelectionType( state ) ).toBe( 'set' );
+			expect( isSelectionRange( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isSelectionContiguous', () => {
+		it( 'returns true for range selections', () => {
+			const state = {
+				selection: {
+					selectionStart: { clientId: '2' },
+					selectionEnd: { clientId: '4' },
+				},
+			};
+
+			expect( isSelectionContiguous( state ) ).toBe( true );
+		} );
+
+		it( 'returns false for non-contiguous set selections', () => {
+			const state = {
+				blocks: {
+					order: new Map(
+						Object.entries( {
+							'': [ '5', '4', '3', '2', '1' ],
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							1: '',
+							2: '',
+							3: '',
+							4: '',
+							5: '',
+						} )
+					),
+				},
+				selection: {
+					type: 'set',
+					selectionStart: { clientId: '4' },
+					selectionEnd: { clientId: '1' },
+					selectionClientIds: [ '4', '2', '1' ],
+				},
+			};
+
+			expect( isSelectionContiguous( state ) ).toBe( false );
+		} );
+
+		it( 'returns true for contiguous set selections', () => {
+			const state = {
+				blocks: {
+					order: new Map(
+						Object.entries( {
+							'': [ '5', '4', '3', '2', '1' ],
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							1: '',
+							2: '',
+							3: '',
+							4: '',
+							5: '',
+						} )
+					),
+				},
+				selection: {
+					type: 'set',
+					selectionStart: { clientId: '4' },
+					selectionEnd: { clientId: '2' },
+					selectionClientIds: [ '4', '3', '2' ],
+				},
+			};
+
+			expect( isSelectionContiguous( state ) ).toBe( true );
 		} );
 	} );
 
@@ -4779,6 +4927,31 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'canRemoveBlock', () => {
+		it( 'prevents removal when the block does not support removal', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							block: { name: 'core/test-structural-block' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							block: {},
+						} )
+					),
+					parents: new Map( [ [ 'block', '' ] ] ),
+					order: new Map( [ [ '', [ 'block' ] ] ] ),
+					blockEditingModes: new Map(),
+				},
+				blockListSettings: new Map(),
+				settings: {},
+				derivedBlockEditingModes: new Map(),
+			};
+
+			expect( canRemoveBlock( state, 'block' ) ).toBe( false );
+		} );
+
 		it( 'allows removal from a non-section contentOnly container', () => {
 			// When the parent has contentOnly editing mode but is NOT
 			// within a section, the contentOnly removal restriction
@@ -5072,6 +5245,31 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'canMoveBlock', () => {
+		it( 'prevents moving when the block does not support moving', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							block: { name: 'core/test-structural-block' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							block: {},
+						} )
+					),
+					parents: new Map( [ [ 'block', '' ] ] ),
+					order: new Map( [ [ '', [ 'block' ] ] ] ),
+					blockEditingModes: new Map(),
+				},
+				blockListSettings: new Map(),
+				settings: {},
+				derivedBlockEditingModes: new Map(),
+			};
+
+			expect( canMoveBlock( state, 'block' ) ).toBe( false );
+		} );
+
 		it( 'allows moving within a non-section contentOnly container', () => {
 			// When the parent has contentOnly editing mode but is NOT
 			// within a section, the contentOnly move restriction does

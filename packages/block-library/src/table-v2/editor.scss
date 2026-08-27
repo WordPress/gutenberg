@@ -1,0 +1,19 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+// Placeholder form (same pattern as existing table block).
+.blocks-table__placeholder-form.blocks-table__placeholder-form {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: $grid-unit-10;
+
+	@include break-medium() {
+		flex-direction: row;
+		align-items: flex-end;
+	}
+}
+
+.blocks-table__placeholder-input {
+	width: $grid-unit-10 * 14;
+}

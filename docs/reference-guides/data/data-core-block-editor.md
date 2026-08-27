@@ -854,6 +854,18 @@ _Returns_
 
 -   `WPBlockSelection`: Selection start information.
 
+### getSelectionType
+
+Returns the current block selection type.
+
+_Parameters_
+
+-   _state_ `Object`: Block editor state.
+
+_Returns_
+
+-   `string`: Selection type.
+
 ### getSettings
 
 Returns the editor settings.
@@ -1169,6 +1181,18 @@ _Returns_
 
 -   `boolean`: True if multi-selecting, false if not.
 
+### isSelectionContiguous
+
+Returns true if the selected blocks are contiguous in block order.
+
+_Parameters_
+
+-   _state_ `Object`: Block editor state.
+
+_Returns_
+
+-   `boolean`: Whether the selection is contiguous.
+
 ### isSelectionEnabled
 
 Selector that returns if multi-selection is enabled or not.
@@ -1180,6 +1204,18 @@ _Parameters_
 _Returns_
 
 -   `boolean`: True if it should be possible to multi-select blocks, false if multi-selection is disabled.
+
+### isSelectionRange
+
+Returns true if the current selection is a range selection.
+
+_Parameters_
+
+-   _state_ `Object`: Block editor state.
+
+_Returns_
+
+-   `boolean`: Whether the selection is a range.
 
 ### isTyping
 
@@ -1405,6 +1441,15 @@ _Parameters_
 
 -   _start_ `string`: First block of the multi selection.
 -   _end_ `string`: Last block of the multiselection.
+-   _\_\_experimentalInitialPosition_ `number|null`: Optional initial position. Pass as null to skip focus within editor canvas.
+
+### multiSelectSet
+
+Action that changes block multi-selection to an explicit set of blocks.
+
+_Parameters_
+
+-   _clientIds_ `string[]`: Client IDs to select.
 -   _\_\_experimentalInitialPosition_ `number|null`: Optional initial position. Pass as null to skip focus within editor canvas.
 
 ### receiveBlocks

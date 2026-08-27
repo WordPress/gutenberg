@@ -19,6 +19,11 @@ import {
 } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
 import { setContentEditableWrapper } from './utils';
+import {
+	getTableCell,
+	getTableCellNeighbor,
+	getTableCellRectangleClientIds,
+} from './table';
 
 /**
  * Returns true if the element should consider edge navigation upon a keyboard
@@ -191,7 +196,8 @@ export default function useArrowNav() {
 		hasMultiSelection,
 		__unstableIsFullySelected,
 	} = useSelect( blockEditorStore );
-	const { selectBlock, multiSelect } = useDispatch( blockEditorStore );
+	const { selectBlock, multiSelect, multiSelectSet } =
+		useDispatch( blockEditorStore );
 	return useRefEffect( ( node ) => {
 		// Here a DOMRect is stored while moving the caret vertically so
 		// vertical position of the start position can be restored. This is to
@@ -200,6 +206,18 @@ export default function useArrowNav() {
 
 		function onMouseDown() {
 			verticalRect = null;
+		}
+
+		// Returns the block-level table cell element for a client ID, if the
+		// block is one.
+		function getTableCellByClientId( clientId ) {
+			if ( ! clientId ) {
+				return;
+			}
+			const element = node.querySelector(
+				`[data-block="${ clientId }"]`
+			);
+			return element?.matches( 'td, th' ) ? element : undefined;
 		}
 
 		function isClosestTabbableABlock( target, isReverse ) {
@@ -272,6 +290,47 @@ export default function useArrowNav() {
 							getMultiSelectedBlocksStartClientId();
 						const focusClientId =
 							getMultiSelectedBlocksEndClientId();
+
+						// Table cell selections extend along the table grid
+						// rather than block document order.
+						const anchorCell =
+							getTableCellByClientId( anchorClientId );
+						const focusCell =
+							getTableCellByClientId( focusClientId );
+
+						if (
+							anchorCell &&
+							focusCell &&
+							anchorCell.closest( 'table' ) ===
+								focusCell.closest( 'table' )
+						) {
+							const nextCell = getTableCellNeighbor(
+								focusCell,
+								isReverse,
+								isVertical
+							);
+
+							if ( nextCell ) {
+								const clientIds =
+									getTableCellRectangleClientIds(
+										anchorCell,
+										nextCell
+									);
+
+								if ( clientIds ) {
+									multiSelectSet( clientIds, 0, {
+										anchorClientId,
+										focusClientId:
+											nextCell.getAttribute(
+												'data-block'
+											),
+									} );
+									event.preventDefault();
+								}
+							}
+							return;
+						}
+
 						const nextClientId = isReverse
 							? getPreviousBlockClientId( focusClientId )
 							: getNextBlockClientId( focusClientId );
@@ -310,6 +369,35 @@ export default function useArrowNav() {
 				! getSelectionStart().attributeKey
 			) {
 				const selectedClientId = getSelectedBlockClientId();
+
+				// A table cell starts a selection along the table grid.
+				const cell = getTableCellByClientId( selectedClientId );
+
+				if ( cell ) {
+					const nextCell = getTableCellNeighbor(
+						cell,
+						isReverse,
+						isVertical
+					);
+
+					if ( nextCell ) {
+						const clientIds = getTableCellRectangleClientIds(
+							cell,
+							nextCell
+						);
+
+						if ( clientIds ) {
+							multiSelectSet( clientIds, 0, {
+								anchorClientId: selectedClientId,
+								focusClientId:
+									nextCell.getAttribute( 'data-block' ),
+							} );
+							event.preventDefault();
+						}
+					}
+					return;
+				}
+
 				const nextClientId = isReverse
 					? getPreviousBlockClientId( selectedClientId )
 					: getNextBlockClientId( selectedClientId );
@@ -340,13 +428,41 @@ export default function useArrowNav() {
 				verticalRect = computeCaretRect( defaultView );
 			}
 
-			// In the case of RTL scripts, right means previous and left means
-			// next, which is the exact reverse of LTR.
-			const isReverseDir = isRTL( target ) ? ! isReverse : isReverse;
-			const { keepCaretInsideBlock } = getSettings();
-
 			if ( shiftKey ) {
 				if ( isNavEdge( target, isReverse ) ) {
+					// Within a block-level table cell, extend the selection
+					// along the table grid: the browser extends across cells
+					// in document order, not visually.
+					const cell = getTableCell( target );
+
+					if ( cell ) {
+						const nextCell = getTableCellNeighbor(
+							cell,
+							isReverse,
+							isVertical
+						);
+
+						if ( nextCell ) {
+							const clientIds = getTableCellRectangleClientIds(
+								cell,
+								nextCell
+							);
+
+							if ( clientIds ) {
+								multiSelectSet( clientIds, 0, {
+									anchorClientId:
+										cell.getAttribute( 'data-block' ),
+									focusClientId:
+										nextCell.getAttribute( 'data-block' ),
+								} );
+								event.preventDefault();
+							}
+							return;
+						}
+						// At the table's edge, fall through to extend the
+						// selection out of the table natively.
+					}
+
 					if ( isClosestTabbableABlock( target, isReverse ) ) {
 						setContentEditableWrapper( node, true );
 					} else if ( node.contentEditable === 'true' ) {
@@ -363,7 +479,15 @@ export default function useArrowNav() {
 						event.preventDefault();
 					}
 				}
-			} else if (
+				return;
+			}
+
+			// In the case of RTL scripts, right means previous and left means
+			// next, which is the exact reverse of LTR.
+			const isReverseDir = isRTL( target ) ? ! isReverse : isReverse;
+			const { keepCaretInsideBlock } = getSettings();
+
+			if (
 				isVertical &&
 				isVerticalEdge( target, isReverse ) &&
 				// When Alt is pressed, only intercept if the caret is also at

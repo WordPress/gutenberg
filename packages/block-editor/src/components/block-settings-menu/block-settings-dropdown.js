@@ -202,6 +202,7 @@ export function BlockSettingsDropdown( {
 			__experimentalUpdateSelection={ ! __experimentalSelectBlock }
 		>
 			{ ( {
+				canCopy,
 				canCopyStyles,
 				canDuplicate,
 				canInsertBlock,
@@ -285,7 +286,7 @@ export function BlockSettingsDropdown( {
 											clientId={ firstBlockClientId }
 										/>
 									) }
-									{ ! isContentOnly && (
+									{ canCopy && ! isContentOnly && (
 										<CopyMenuItem
 											clientIds={ clientIds }
 											onCopy={ onCopy }

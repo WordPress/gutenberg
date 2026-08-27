@@ -2877,6 +2877,24 @@ describe( 'state', () => {
 
 			expect( state ).toBe( null );
 		} );
+
+		it( 'returns the initial position for a multi selection set', () => {
+			const state = initialPosition( undefined, {
+				type: 'MULTI_SELECT_SET',
+				initialPosition: 0,
+			} );
+
+			expect( state ).toBe( 0 );
+		} );
+
+		it( 'clears a previous initial position when a multi selection set omits one', () => {
+			const state = initialPosition( 0, {
+				type: 'MULTI_SELECT_SET',
+				initialPosition: null,
+			} );
+
+			expect( state ).toBe( null );
+		} );
 	} );
 
 	describe( 'isMultiSelecting()', () => {
@@ -4279,6 +4297,61 @@ describe( 'state', () => {
 			it( 'returns no block editing modes when zoomed out is not active and there are no synced patterns', () => {
 				expect( initialState.derivedBlockEditingModes ).toEqual(
 					new Map()
+				);
+			} );
+		} );
+
+		describe( 'editingMode support', () => {
+			beforeAll( () => {
+				registerBlockType( 'core/test-ephemeral-block', {
+					apiVersion: 3,
+					save: noop,
+					edit: noop,
+					category: 'text',
+					title: 'test ephemeral block',
+					supports: {
+						editingMode: 'disabled',
+					},
+				} );
+			} );
+
+			afterAll( () => {
+				unregisterBlockType( 'core/test-ephemeral-block' );
+			} );
+
+			it( 'sets the derived editing mode to disabled for blocks with editingMode support, without inheriting to children', () => {
+				const state = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								[ sectionRootClientIdKey ]: '',
+							},
+						},
+						{
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									name: 'core/test-ephemeral-block',
+									clientId: 'ephemeral-1',
+									attributes: {},
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											clientId: 'paragraph-1',
+											attributes: {},
+											innerBlocks: [],
+										},
+									],
+								},
+							],
+						},
+					],
+					testReducer
+				);
+
+				expect( state.derivedBlockEditingModes ).toEqual(
+					new Map( [ [ 'ephemeral-1', 'disabled' ] ] )
 				);
 			} );
 		} );

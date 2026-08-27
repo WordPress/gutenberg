@@ -352,6 +352,115 @@ export const multiSelect =
 	};
 
 /**
+ * Action that changes block multi-selection to an explicit set of blocks.
+ *
+ * @param {string[]}    clientIds                     Client IDs to select.
+ * @param {number|null} __experimentalInitialPosition Optional initial position. Pass as null to skip focus within editor canvas.
+ * @param {Object}      options                       Optional selection ends. When the selection has a direction
+ *                                                    (e.g. a drag or keyboard extension), pass the anchor and
+ *                                                    focus blocks so they are recorded as the selection start
+ *                                                    and end instead of the set's document-order ends.
+ * @param {string}      options.anchorClientId        Client ID where the selection started.
+ * @param {string}      options.focusClientId         Client ID where the selection ends.
+ */
+export const multiSelectSet =
+	(
+		clientIds,
+		__experimentalInitialPosition = null,
+		{ anchorClientId, focusClientId } = {}
+	) =>
+	( { select, dispatch } ) => {
+		const uniqueClientIds = [ ...new Set( clientIds ) ];
+
+		if ( ! uniqueClientIds.length ) {
+			return;
+		}
+
+		const rootClientId = select.getBlockRootClientId(
+			uniqueClientIds[ 0 ]
+		);
+		if ( rootClientId === null ) {
+			return;
+		}
+
+		const allSameRoot = uniqueClientIds.every(
+			( clientId ) =>
+				select.getBlockRootClientId( clientId ) === rootClientId
+		);
+
+		let normalizedClientIds;
+
+		if ( allSameRoot ) {
+			const blockOrder = select.getBlockOrder( rootClientId );
+			normalizedClientIds = uniqueClientIds
+				.filter( ( clientId ) => blockOrder.includes( clientId ) )
+				.sort(
+					( a, b ) =>
+						blockOrder.indexOf( a ) - blockOrder.indexOf( b )
+				);
+		} else {
+			// Cross-root sets are only allowed when all blocks share a
+			// common ancestor (e.g. table cells in different rows of the
+			// same table).
+			const chains = uniqueClientIds.map( ( clientId ) => [
+				clientId,
+				...select.getBlockParents( clientId, true ),
+			] );
+			const [ firstChain, ...restChains ] = chains;
+			const commonAncestor = firstChain.find( ( clientId ) =>
+				restChains.every( ( chain ) => chain.includes( clientId ) )
+			);
+
+			if ( ! commonAncestor ) {
+				return;
+			}
+
+			const documentOrder = select.getClientIdsWithDescendants();
+			const orderMap = new Map(
+				documentOrder.map( ( clientId, index ) => [ clientId, index ] )
+			);
+			normalizedClientIds = uniqueClientIds
+				.filter( ( clientId ) => orderMap.has( clientId ) )
+				.sort( ( a, b ) => orderMap.get( a ) - orderMap.get( b ) );
+		}
+
+		if ( normalizedClientIds.length < 2 ) {
+			dispatch.selectBlock(
+				normalizedClientIds[ 0 ],
+				__experimentalInitialPosition
+			);
+			return;
+		}
+
+		dispatch( {
+			type: 'MULTI_SELECT_SET',
+			clientIds: normalizedClientIds,
+			selectionStart: {
+				clientId: anchorClientId ?? uniqueClientIds[ 0 ],
+			},
+			selectionEnd: {
+				clientId:
+					focusClientId ??
+					uniqueClientIds[ uniqueClientIds.length - 1 ],
+			},
+			initialPosition: __experimentalInitialPosition,
+		} );
+
+		speak(
+			sprintf(
+				/* translators: %s: number of selected blocks */
+				_n(
+					'%s block selected.',
+					'%s blocks selected.',
+					normalizedClientIds.length
+				),
+				normalizedClientIds.length
+			),
+			'assertive'
+		);
+	};
+
+/**
  * Action that clears the block selection.
  *
  * @return {Object} Action object.

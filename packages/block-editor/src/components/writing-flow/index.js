@@ -20,8 +20,20 @@ import { store as blockEditorStore } from '../../store';
 
 export function useWritingFlow() {
 	const [ before, ref, after ] = useTabNav();
-	const hasMultiSelection = useSelect(
-		( select ) => select( blockEditorStore ).hasMultiSelection(),
+	const { hasMultiSelection, isSetMultiSelecting } = useSelect(
+		( select ) => {
+			const {
+				getSelectionType,
+				hasMultiSelection: _hasMultiSelection,
+				isMultiSelecting,
+			} = select( blockEditorStore );
+
+			return {
+				hasMultiSelection: _hasMultiSelection(),
+				isSetMultiSelecting:
+					isMultiSelecting() && getSelectionType() === 'set',
+			};
+		},
 		[]
 	);
 
@@ -45,10 +57,12 @@ export function useWritingFlow() {
 				( node ) => {
 					node.tabIndex = 0;
 					node.dataset.hasMultiSelection = hasMultiSelection;
+					node.dataset.isSetMultiSelecting = isSetMultiSelecting;
 
 					if ( ! hasMultiSelection ) {
 						return () => {
 							delete node.dataset.hasMultiSelection;
+							delete node.dataset.isSetMultiSelecting;
 						};
 					}
 
@@ -58,6 +72,7 @@ export function useWritingFlow() {
 					);
 
 					return () => {
+						delete node.dataset.isSetMultiSelecting;
 						delete node.dataset.hasMultiSelection;
 						// The wrapper may remain the editing host (the
 						// collapsed block supports `editableRoot`): keep it
@@ -72,7 +87,7 @@ export function useWritingFlow() {
 						}
 					};
 				},
-				[ hasMultiSelection ]
+				[ hasMultiSelection, isSetMultiSelecting ]
 			),
 		] ),
 		after,

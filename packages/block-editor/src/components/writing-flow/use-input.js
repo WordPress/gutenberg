@@ -18,6 +18,7 @@ import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
 export default function useInput() {
 	const {
 		__unstableIsFullySelected,
+		isSelectionContiguous,
 		getSelectedBlockClientIds,
 		getSelectedBlockClientId,
 		__unstableIsSelectionMergeable,
@@ -229,7 +230,7 @@ export default function useInput() {
 			if ( event.keyCode === ENTER ) {
 				setContentEditableWrapper( node, false );
 				event.preventDefault();
-				if ( __unstableIsFullySelected() ) {
+				if ( __unstableIsFullySelected() && isSelectionContiguous() ) {
 					replaceBlocks(
 						getSelectedBlockClientIds(),
 						createBlock( getDefaultBlockName() )

@@ -146,7 +146,12 @@ export default function BlockTools( {
 			}
 		} else if ( isMatch( 'core/block-editor/duplicate', event ) ) {
 			const clientIds = getSelectedBlockClientIds();
-			if ( clientIds.length ) {
+			if (
+				clientIds.length &&
+				clientIds.every( ( id ) =>
+					hasBlockSupport( getBlockName( id ), 'duplicate', true )
+				)
+			) {
 				event.preventDefault();
 				duplicateBlocks( clientIds );
 			}

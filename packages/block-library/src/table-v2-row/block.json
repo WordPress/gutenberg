@@ -1,0 +1,24 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "core/table-v2-row",
+	"title": "Table Row",
+	"category": "text",
+	"parent": [ "core/table-v2-section" ],
+	"description": "A row of cells within a table.",
+	"textdomain": "default",
+	"allowedBlocks": [ "core/table-v2-cell" ],
+	"supports": {
+		"anchor": false,
+		"html": false,
+		"listView": false,
+		"movable": false,
+		"removable": false,
+		"reusable": false,
+		"inserter": false,
+		"editingMode": "disabled",
+		"interactivity": {
+			"clientNavigation": true
+		}
+	}
+}

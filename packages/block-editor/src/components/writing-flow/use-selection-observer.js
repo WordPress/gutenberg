@@ -8,6 +8,7 @@ import { isSelectionForward } from '@wordpress/dom';
 import { store as blockEditorStore } from '../../store';
 import { getBlockClientId } from '../../utils/dom';
 import { setContentEditableWrapper } from './utils';
+import { getTableCell, getTableCellRectangleClientIds } from './table';
 import { unlock } from '../../lock-unlock';
 
 const { ownsSelection } = unlock( richTextPrivateApis );
@@ -96,6 +97,7 @@ function getRichTextElement( node ) {
 export default function useSelectionObserver() {
 	const {
 		multiSelect,
+		multiSelectSet,
 		selectBlock,
 		selectionChange,
 		startMultiSelect,
@@ -103,6 +105,7 @@ export default function useSelectionObserver() {
 	} = useDispatch( blockEditorStore );
 	const {
 		getBlockParents,
+		getBlockRootClientId,
 		getBlockSelectionStart,
 		isMultiSelecting,
 		getSelectionStart,
@@ -352,6 +355,31 @@ export default function useSelectionObserver() {
 						multiSelect( startClientId, startClientId );
 					}
 				} else {
+					// When the selection spans block-level table cells in the
+					// same table, select the rectangle of cells. Pass an
+					// initial position so the native selection is cleared once
+					// the block selection is established, as with a regular
+					// block multi-selection.
+					const startCell = getTableCell( startNode );
+					const endCell = getTableCell( endNode );
+
+					if ( startCell && endCell ) {
+						const clientIds = getTableCellRectangleClientIds(
+							startCell,
+							endCell
+						);
+
+						if ( clientIds ) {
+							multiSelectSet( clientIds, 0, {
+								anchorClientId:
+									startCell.getAttribute( 'data-block' ),
+								focusClientId:
+									endCell.getAttribute( 'data-block' ),
+							} );
+							return;
+						}
+					}
+
 					const startPath = [
 						...getBlockParents( startClientId ),
 						startClientId,
@@ -500,6 +528,13 @@ export default function useSelectionObserver() {
 				);
 			};
 		},
-		[ multiSelect, selectBlock, selectionChange, getBlockParents ]
+		[
+			multiSelect,
+			multiSelectSet,
+			selectBlock,
+			selectionChange,
+			getBlockParents,
+			getBlockRootClientId,
+		]
 	);
 }
