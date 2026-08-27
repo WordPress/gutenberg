@@ -19,7 +19,7 @@
 # Duotone
 /lib/block-supports/duotone.php									@sgomes
 /packages/block-editor/src/components/duotone-control	@sgomes
-/packages/block-editor/src/hooks/duotone.js			@sgomes
+/packages/block-editor/src/hooks/duotone.jsx			@sgomes
 /packages/components/src/duotone-picker					@sgomes
 
 # Editor
