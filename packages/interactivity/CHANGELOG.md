@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Internal
-
--   Remove unused dependency `@preact/signals-core` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
-
 ## 6.54.0 (2026-08-26)
 
 ### Internal
