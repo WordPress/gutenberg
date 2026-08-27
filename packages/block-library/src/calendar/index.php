@@ -65,7 +65,7 @@ function render_block_core_calendar( $attributes ) {
 	$background_block_styles = array(
 		'background' => $preset_background_color ? $preset_background_color : $custom_background_color,
 	);
-	$background_engine        = wp_style_engine_get_styles(
+	$background_engine       = wp_style_engine_get_styles(
 		array( 'color' => $background_block_styles ),
 		array( 'convert_vars_to_classnames' => true )
 	);
