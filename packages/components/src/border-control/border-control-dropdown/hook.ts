@@ -22,7 +22,9 @@ export function useBorderControlDropdown(
 	} = useContextSystem( props, 'BorderControlDropdown' );
 
 	const [ widthValue ] = parseQuantityAndUnitFromRawValue( border?.width );
-	const hasZeroWidth = widthValue === 0;
+	// If widthValue is 0, or on initial render we have width undefined.
+	// Need to set width to `1px`, if we change color first before adding border width.
+	const hasZeroWidth = 0 === widthValue || undefined === widthValue;
 
 	const onColorChange = ( color?: string ) => {
 		const style =
