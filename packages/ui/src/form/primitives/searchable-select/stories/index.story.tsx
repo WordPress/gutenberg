@@ -34,6 +34,7 @@ type Story = StoryObj< typeof SearchableSelect >;
 
 export const Default: Story = {
 	args: {
+		'aria-label': 'Fruit',
 		defaultValue: ITEMS[ 0 ],
 		items: ITEMS,
 	},
