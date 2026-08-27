@@ -82,8 +82,9 @@
 			color: var(--wp-block-synced-color);
 		}
 
-		&:focus::after {
-			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-synced-color);
+		&:focus {
+			--focus-color: var(--wp-block-synced-color);
+			@include outset-ring__focus();
 		}
 	}
 	&.is-selected .block-editor-list-view-block-contents,
@@ -91,23 +92,23 @@
 		color: $white;
 	}
 	&.is-selected .block-editor-list-view-block-contents:focus {
-		&::after {
-			box-shadow:
-				inset 0 0 0 1px $white,
-				0 0 0 var(--wp-admin-border-width-focus)
-				var(--wpds-color-stroke-focus);
-		}
+		box-shadow: inset 0 0 0 1px $white;
+		@include outset-ring__focus();
 	}
 	&.is-selected.is-synced .block-editor-list-view-block-contents:focus {
-		&::after {
-			box-shadow:
-				inset 0 0 0 1px $white,
-				0 0 0 var(--wp-admin-border-width-focus)
-				var(--wp-block-synced-color);
-		}
+		box-shadow: inset 0 0 0 1px $white;
+		--focus-color: var(--wp-block-synced-color);
+		@include outset-ring__focus();
 	}
 	&.is-selected .block-editor-list-view-block__menu:focus {
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $white;
+		--focus-color: #{$white};
+		@include outset-ring__focus();
+		outline-offset: -2px;
+	}
+	&.is-selected.is-synced .block-editor-list-view-block__menu:focus {
+		--focus-color: #{$white};
+		@include outset-ring__focus();
+		outline-offset: -2px;
 	}
 
 	// Border radius for corners of the selected item.
@@ -258,35 +259,20 @@
 		}
 	}
 
-	&.is-nesting .block-editor-list-view-block-contents,
+	&.is-nesting .block-editor-list-view-block-contents {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wpds-color-stroke-focus);
+	}
+
 	.block-editor-list-view-block-contents:focus {
 		box-shadow: none;
-
-		&::after {
-			content: "";
-			position: absolute;
-			top: 0;
-			right: -(24px + 5px); // Icon size + padding.
-			bottom: 0;
-			left: 0;
-			border-radius: inherit;
-			box-shadow:
-				inset 0 0 0 var(--wp-admin-border-width-focus)
-				var(--wpds-color-stroke-focus);
-			z-index: 2;
-			pointer-events: none;
-		}
 	}
 
-	// Fix focus styling width when one row has fewer cells.
-	&.has-single-cell .block-editor-list-view-block-contents:focus::after {
-		right: 0;
+	.block-editor-list-view-block-contents:focus-visible {
+		@include outset-ring__focus();
 	}
 
-	&.is-nesting .block-editor-list-view__menu {
-		box-shadow:
-			inset 0 0 0 var(--wp-admin-border-width-focus)
-			var(--wpds-color-stroke-focus);
+	&.is-nesting .block-editor-list-view__menu:focus-visible {
+		@include outset-ring__focus();
 		z-index: 1;
 	}
 
