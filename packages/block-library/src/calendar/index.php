@@ -46,22 +46,34 @@ function render_block_core_calendar( $attributes ) {
 	// Text stays on the table so cell content inherits it. Background serializes
 	// on the wrapper so padding is filled (see #64345). Skip-serializing text
 	// still matches #42029 for the text color path.
+	$style_attributes = ( isset( $attributes['style'] ) && is_array( $attributes['style'] ) )
+		? $attributes['style']
+		: array();
+
 	$color_block_styles = array();
 
+	$color_styles               = ( isset( $style_attributes['color'] ) && is_array( $style_attributes['color'] ) )
+		? $style_attributes['color']
+		: array();
 	$preset_text_color          = array_key_exists( 'textColor', $attributes ) ? "var:preset|color|{$attributes['textColor']}" : null;
-	$custom_text_color          = $attributes['style']['color']['text'] ?? null;
+	$custom_text_color          = $color_styles['text'] ?? null;
 	$color_block_styles['text'] = $preset_text_color ? $preset_text_color : $custom_text_color;
 
 	$styles        = wp_style_engine_get_styles( array( 'color' => $color_block_styles ), array( 'convert_vars_to_classnames' => true ) );
 	$inline_styles = $styles['css'] ?? '';
 	$classnames    = empty( $styles['classnames'] ) ? array() : explode( ' ', $styles['classnames'] );
-	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
+	$elements      = ( isset( $style_attributes['elements'] ) && is_array( $style_attributes['elements'] ) )
+		? $style_attributes['elements']
+		: array();
+	if ( isset( $elements['link']['color']['text'] ) ) {
 		$classnames[] = 'has-link-color';
 	}
 
 	$block_gap_css = block_core_calendar_get_block_gap_css( $attributes );
 
-	$border_block_styles = $attributes['style']['border'] ?? array();
+	$border_block_styles = ( isset( $style_attributes['border'] ) && is_array( $style_attributes['border'] ) )
+		? $style_attributes['border']
+		: array();
 
 	if ( isset( $attributes['borderColor'] ) ) {
 		$border_block_styles['color'] = "var:preset|color|{$attributes['borderColor']}";
@@ -73,9 +85,8 @@ function render_block_core_calendar( $attributes ) {
 	$border_classes = empty( $border_engine['classnames'] ) ? array() : explode( ' ', $border_engine['classnames'] );
 	$calendar       = get_calendar( true, false );
 
-	// Fallback to ensure the calendar renders if get_calendar returns false or empty.
 	if ( empty( $calendar ) ) {
-		$calendar = '   ';
+		$calendar = '';
 	}
 
 	$processor = new WP_HTML_Tag_Processor( $calendar );
@@ -85,9 +96,7 @@ function render_block_core_calendar( $attributes ) {
 
 		// Apply text color classes and styles to the main table.
 		if ( 'TABLE' === $tag_name ) {
-			if ( ! empty( $inline_styles ) ) {
-				$processor->set_attribute( 'style', $inline_styles );
-			}
+			block_core_calendar_merge_style_attribute( $processor, $inline_styles );
 
 			foreach ( $classnames as $classname ) {
 				if ( ! empty( $classname ) ) {
@@ -97,36 +106,19 @@ function render_block_core_calendar( $attributes ) {
 		}
 
 		if ( 'CAPTION' === $tag_name && '' !== $block_gap_css ) {
-			$current_style  = $processor->get_attribute( 'style' ) ?? '';
-			$combined_style = trim( $current_style, ';' );
-			$combined_style = $combined_style ? $combined_style . ';' : '';
-			$processor->set_attribute( 'style', $combined_style . 'margin-bottom:' . $block_gap_css );
+			block_core_calendar_merge_style_attribute( $processor, 'margin-bottom:' . $block_gap_css );
 		}
 
-		// Add border classes and inline styles to all table header th and data td cells.
+		// Default CSS outlines every cell. A chosen border applies to all cells,
+		// including leading/trailing pad cells.
 		if ( 'TH' === $tag_name || 'TD' === $tag_name ) {
-			$is_empty_calendar_cell = 'TD' === $tag_name && $processor->has_class( 'pad' );
-
-			if ( $is_empty_calendar_cell ) {
-				continue;
-			}
-
 			foreach ( $border_classes as $border_class ) {
 				if ( ! empty( $border_class ) ) {
 					$processor->add_class( $border_class );
 				}
 			}
 
-			$current_style  = $processor->get_attribute( 'style' ) ?? '';
-			$combined_style = trim( $current_style, ';' );
-
-			if ( ! empty( $border_styles ) ) {
-				$combined_style .= ';' . trim( $border_styles, ';' );
-			}
-
-			if ( ! empty( $combined_style ) ) {
-				$processor->set_attribute( 'style', trim( $combined_style, ';' ) );
-			}
+			block_core_calendar_merge_style_attribute( $processor, $border_styles );
 		}
 	}
 
@@ -162,16 +154,56 @@ function register_block_core_calendar() {
 add_action( 'init', 'register_block_core_calendar' );
 
 /**
+ * Merges CSS declarations into a tag's existing style attribute.
+ *
+ * @since 7.1.0
+ *
+ * @param WP_HTML_Tag_Processor $processor      Tag processor positioned on a tag.
+ * @param string                $additional_css CSS declarations to append.
+ */
+function block_core_calendar_merge_style_attribute( $processor, $additional_css ) {
+	if ( ! is_string( $additional_css ) || '' === $additional_css ) {
+		return;
+	}
+
+	$current_style  = $processor->get_attribute( 'style' ) ?? '';
+	$combined_style = trim( (string) $current_style, ';' );
+
+	if ( '' !== $combined_style ) {
+		$combined_style .= ';';
+	}
+
+	$processor->set_attribute( 'style', $combined_style . trim( $additional_css, ';' ) );
+}
+
+/**
  * Returns a CSS value for the Calendar block's blockGap, used as space between
  * the month/year caption and the date grid.
  *
- * @since 6.9.0
+ * Instance styles win over Global Styles. Block-level blockGap is not emitted
+ * by layout styles (Calendar has no layout support), so Global Styles are read
+ * here and applied as caption margin-bottom.
+ *
+ * @since 7.1.0
  *
  * @param array $attributes Block attributes.
  * @return string CSS gap value, or an empty string when unset or unsafe.
  */
 function block_core_calendar_get_block_gap_css( $attributes ) {
-	$gap = $attributes['style']['spacing']['blockGap'] ?? null;
+	$style   = ( isset( $attributes['style'] ) && is_array( $attributes['style'] ) )
+		? $attributes['style']
+		: array();
+	$spacing = ( isset( $style['spacing'] ) && is_array( $style['spacing'] ) )
+		? $style['spacing']
+		: array();
+	$gap     = $spacing['blockGap'] ?? null;
+
+	if ( ( null === $gap || '' === $gap ) && function_exists( 'wp_get_global_styles' ) ) {
+		$gap = wp_get_global_styles(
+			array( 'spacing', 'blockGap' ),
+			array( 'block_name' => 'core/calendar' )
+		);
+	}
 
 	if ( is_array( $gap ) ) {
 		$gap = $gap['top'] ?? $gap['left'] ?? '';

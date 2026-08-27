@@ -31,7 +31,6 @@
 			"margin": true,
 			"padding": true,
 			"blockGap": true,
-			"__experimentalSkipSerialization": [ "blockGap" ],
 			"__experimentalDefaultControls": {
 				"margin": false,
 				"padding": false,
@@ -62,10 +61,10 @@
 	},
 	"style": "wp-block-calendar",
 	"selectors": {
-		"border": ".wp-block-calendar th, .wp-block-calendar td:not(.pad)",
+		"border": ".wp-block-calendar th, .wp-block-calendar td",
 		"color": {
 			"text": ".wp-block-calendar table",
-			"background": ".wp-block-calendar"
+			"background": ".wp-block-calendar, .wp-block-calendar th"
 		}
 	}
 }

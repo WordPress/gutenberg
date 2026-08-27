@@ -10,7 +10,7 @@
 		border-collapse: collapse;
 
 		&.has-background th {
-			background-color: inherit;
+			background-color: transparent;
 		}
 
 		&.has-text-color th {
@@ -18,8 +18,9 @@
 		}
 	}
 
+	// Instance background is on the wrapper; let it show through header cells.
 	&.has-background th {
-		background-color: inherit;
+		background-color: transparent;
 	}
 
 	th {
@@ -30,10 +31,9 @@
 		background-color: inherit;
 	}
 
-	.has-border-color {
-		border-style: solid;
-	}
-
+	// Default text color only. Do not pin border-color here: Global Styles
+	// text color targets the table and does not add `has-text-color`, so a
+	// `$gray-300` border would stay grey instead of following the text.
 	:where(table:not(.has-text-color)) {
 		color: #40464d;
 	}
@@ -41,14 +41,15 @@
 
 // Zero specificity so Global Styles (`:root :where(...)`) always wins, even
 // when block-library CSS loads after the global stylesheet (editor + Playground).
-:where(.wp-block-calendar th, .wp-block-calendar td:not(.pad)) {
+// Default `border: 1px solid` uses currentColor so borders follow text color
+// (instance `has-text-color` and Global Styles on the table).
+:where(.wp-block-calendar th, .wp-block-calendar td) {
 	padding: 0.25em;
-	border-color: $gray-300;
-	border-style: solid;
-	border-width: 1px;
+	border: 1px solid;
 }
 
 // Keep the hard-coded header background color for backward compatibility.
+// Global Styles also targets `th` (see block.json selectors.color.background).
 :where(.wp-block-calendar:not(.has-background) table:not(.has-background) th) {
 	background: $gray-300;
 }

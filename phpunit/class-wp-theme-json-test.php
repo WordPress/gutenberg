@@ -1990,6 +1990,57 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles', 'presets', 'variables' ), null, array( 'skip_root_layout_styles' => true ) ) );
 	}
 
+	/**
+	 * Calendar Global Styles background must reach the wrapper (for padding) and
+	 * header cells (the grey th fallback does not see a has-background class).
+	 */
+	public function test_get_stylesheet_calendar_background_targets_wrapper_and_header_cells() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/calendar' => array(
+							'color' => array(
+								'background' => 'green',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+		$this->assertStringContainsString( '.wp-block-calendar', $stylesheet );
+		$this->assertStringContainsString( '.wp-block-calendar th', $stylesheet );
+		$this->assertStringContainsString( 'background-color: green', $stylesheet );
+	}
+
+	/**
+	 * Custom Calendar borders from Global Styles target every cell, including pad cells.
+	 */
+	public function test_get_stylesheet_calendar_border_targets_all_cells() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/calendar' => array(
+							'border' => array(
+								'color' => 'green',
+								'width' => '2px',
+								'style' => 'solid',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+		$this->assertStringContainsString( '.wp-block-calendar td', $stylesheet );
+		$this->assertStringNotContainsString( 'td:not(.pad)', $stylesheet );
+	}
 
 	/**
 	 * This test checks that feature selectors defined in the stable `selectors`
