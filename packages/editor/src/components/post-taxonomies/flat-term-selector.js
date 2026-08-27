@@ -74,8 +74,16 @@ export function FlatTermSelector( { slug } ) {
 				select( coreStore );
 			const post = getCurrentPost();
 			const _taxonomy = getEntityRecord( 'root', 'taxonomy', slug );
-			const _termIds = _taxonomy
-				? getEditedPostAttribute( _taxonomy.rest_base )
+			const _hasAssignAction = _taxonomy
+				? post._links?.[ 'wp:action-assign-' + _taxonomy.rest_base ] ??
+				  false
+				: false;
+			const editedTermIds =
+				_taxonomy && _hasAssignAction
+					? getEditedPostAttribute( _taxonomy.rest_base )
+					: EMPTY_ARRAY;
+			const _termIds = Array.isArray( editedTermIds )
+				? editedTermIds
 				: EMPTY_ARRAY;
 
 			const query = {
@@ -93,11 +101,7 @@ export function FlatTermSelector( { slug } ) {
 							'wp:action-create-' + _taxonomy.rest_base
 					  ] ?? false
 					: false,
-				hasAssignAction: _taxonomy
-					? post._links?.[
-							'wp:action-assign-' + _taxonomy.rest_base
-					  ] ?? false
-					: false,
+				hasAssignAction: _hasAssignAction,
 				taxonomy: _taxonomy,
 				termIds: _termIds,
 				terms: _termIds?.length

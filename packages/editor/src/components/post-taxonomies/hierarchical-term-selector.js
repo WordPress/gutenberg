@@ -229,6 +229,16 @@ export function HierarchicalTermSelector( { slug } ) {
 				select( coreStore );
 			const _taxonomy = getEntityRecord( 'root', 'taxonomy', slug );
 			const post = getCurrentPost();
+			const _hasAssignAction = _taxonomy
+				? !! post._links?.[ 'wp:action-assign-' + _taxonomy.rest_base ]
+				: false;
+			const editedTerms =
+				_taxonomy && _hasAssignAction
+					? getEditedPostAttribute( _taxonomy.rest_base )
+					: EMPTY_ARRAY;
+			const _terms = Array.isArray( editedTerms )
+				? editedTerms
+				: EMPTY_ARRAY;
 
 			return {
 				hasCreateAction: _taxonomy
@@ -236,14 +246,8 @@ export function HierarchicalTermSelector( { slug } ) {
 							'wp:action-create-' + _taxonomy.rest_base
 					  ]
 					: false,
-				hasAssignAction: _taxonomy
-					? !! post._links?.[
-							'wp:action-assign-' + _taxonomy.rest_base
-					  ]
-					: false,
-				terms: _taxonomy
-					? getEditedPostAttribute( _taxonomy.rest_base )
-					: EMPTY_ARRAY,
+				hasAssignAction: _hasAssignAction,
+				terms: _terms,
 				loading: isResolving( 'getEntityRecords', [
 					'taxonomy',
 					slug,

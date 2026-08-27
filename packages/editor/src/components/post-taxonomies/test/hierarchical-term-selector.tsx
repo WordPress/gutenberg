@@ -1,4 +1,9 @@
+import { render } from '@testing-library/react';
+import { select } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
 import {
+	HierarchicalTermSelector,
 	sortBySelected,
 	getFilterMatcher,
 	findTerm,
@@ -158,5 +163,33 @@ describe( 'getFilterMatcher', () => {
 		};
 		const matcher = getFilterMatcher( 'parent' );
 		expect( matcher( input ) ).toEqual( output );
+	} );
+} );
+
+describe( 'HierarchicalTermSelector', () => {
+	it( 'should not read the taxonomy post attribute without an assign action', () => {
+		jest.spyOn( select( coreStore ), 'getEntityRecord' ).mockReturnValue( {
+			name: 'Types',
+			slug: 'type',
+			rest_base: 'type',
+			hierarchical: true,
+		} );
+		jest.spyOn( select( coreStore ), 'getEntityRecords' ).mockReturnValue(
+			[]
+		);
+		jest.spyOn( select( coreStore ), 'isResolving' ).mockReturnValue(
+			false
+		);
+		jest.spyOn( select( editorStore ), 'getCurrentPost' ).mockReturnValue( {
+			_links: {},
+		} );
+
+		const getEditedPostAttribute = jest
+			.spyOn( select( editorStore ), 'getEditedPostAttribute' )
+			.mockReturnValue( 'post' );
+
+		render( <HierarchicalTermSelector slug="type" /> );
+
+		expect( getEditedPostAttribute ).not.toHaveBeenCalled();
 	} );
 } );
