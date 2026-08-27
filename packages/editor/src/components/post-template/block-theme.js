@@ -66,6 +66,14 @@ export default function BlockThemeControl() {
 		[]
 	);
 
+	const canEditTemplate = useSelect(
+		( select ) =>
+			!! select( coreStore ).canUser( 'update', {
+				kind: 'postType',
+				name: 'wp_template',
+			} )
+	);
+
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
 	// Memoize popoverProps to avoid returning a new object every time.
 	const popoverProps = useMemo(
@@ -124,7 +132,7 @@ export default function BlockThemeControl() {
 				{ ( { onClose } ) => (
 					<>
 						<MenuGroup>
-							{ canCreateTemplate && (
+							{ canEditTemplate && (
 								<MenuItem
 									onClick={ async () => {
 										onNavigateToEntityRecord( {
