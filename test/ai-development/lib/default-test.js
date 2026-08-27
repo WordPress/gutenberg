@@ -1,3 +1,5 @@
+import { minimalEnvironment } from './environment.js';
+
 /**
  * Options shared by every evaluation case.
  */
@@ -42,7 +44,10 @@ environment.`,
 					allowUnsandboxedCommands: false,
 					network: { allowedDomains: [] },
 				},
-				env: { DOCKER_HOST: 'unix:///nonexistent/docker.sock' },
+				env: {
+					...minimalEnvironment,
+					DOCKER_HOST: 'unix:///nonexistent/docker.sock',
+				},
 			},
 		},
 	},

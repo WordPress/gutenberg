@@ -3,6 +3,7 @@
  */
 import { fileURLToPath } from 'node:url';
 import defaultTest from './default-test.js';
+import { minimalEnvironment } from './environment.js';
 
 // Resolved from this file rather than written relative to a spec, so it does
 // not depend on which config file pulled the setup in.
@@ -68,7 +69,14 @@ export default {
 				// Points Docker at a socket that does not exist, so `docker`
 				// and `wp-env` fail instead of starting containers, which the
 				// sandbox cannot reach to clean up.
-				env: { DOCKER_HOST: 'unix:///nonexistent/docker.sock' },
+				env: {
+					...minimalEnvironment,
+					// Docker reaches its daemon over a unix socket, which the
+					// sandbox does not cover; a socket that does not exist
+					// makes `docker` and `wp-env` fail rather than start
+					// containers.
+					DOCKER_HOST: 'unix:///nonexistent/docker.sock',
+				},
 			},
 		},
 	],

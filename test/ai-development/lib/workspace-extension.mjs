@@ -24,9 +24,12 @@ const execFileAsync = promisify( execFile );
 const libDir = path.dirname( fileURLToPath( import.meta.url ) );
 const sourceRoot = path.resolve( libDir, '../../..' );
 // Denied alongside the checkout: credential stores and SSH keys live under the
-// home directory, and an agent working in a temporary workspace has no reason
-// to read it. Restricting reads to the workspace alone is not an option — the
-// agent cannot start without reading its own installation.
+// home directory, and the temp root holds every other row's workspace. The
+// row's own workspace is re-allowed, which takes precedence over these.
+//
+// Restricting reads to the workspace alone is not an option — the agent cannot
+// start without reading its own installation — so this is a denylist of what an
+// agent has reason to reach for, not a complete boundary.
 const homeDirectory = os.homedir();
 const activeWorkspaces = new Map();
 
@@ -188,6 +191,7 @@ async function withWorkspace( context ) {
 											denyRead: [
 												sourceRoot,
 												homeDirectory,
+												os.tmpdir(),
 											],
 										},
 									},
@@ -207,7 +211,11 @@ async function withWorkspace( context ) {
 									// source checkout — which still holds this
 									// eval's assertions — has to be denied
 									// explicitly.
-									denyRead: [ sourceRoot, homeDirectory ],
+									denyRead: [
+										sourceRoot,
+										homeDirectory,
+										os.tmpdir(),
+									],
 								},
 							},
 					  }
