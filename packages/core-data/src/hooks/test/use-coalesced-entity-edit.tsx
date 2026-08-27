@@ -2,9 +2,11 @@ import { act, render } from '@testing-library/react';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import useCoalescedEntityEdit from '../use-coalesced-entity-edit';
 
+type Edit = { record: unknown; options: { isCached: boolean } };
+
 describe( 'useCoalescedEntityEdit', () => {
-	let registry;
-	let edits;
+	let registry: ReturnType< typeof createRegistry >;
+	let edits: Edit[];
 
 	beforeEach( () => {
 		jest.useFakeTimers();
@@ -15,7 +17,13 @@ describe( 'useCoalescedEntityEdit', () => {
 		registry.registerStore( 'core', {
 			reducer: ( state = {} ) => state,
 			actions: {
-				editEntityRecord: ( kind, name, recordId, record, options ) => {
+				editEntityRecord: (
+					kind: string,
+					name: string,
+					recordId: number | string | undefined,
+					record: unknown,
+					options: Edit[ 'options' ]
+				) => {
 					edits.push( { record, options } );
 					return { type: 'NOOP' };
 				},
@@ -28,7 +36,7 @@ describe( 'useCoalescedEntityEdit', () => {
 	} );
 
 	function getEditFunction() {
-		let edit;
+		let edit: ReturnType< typeof useCoalescedEntityEdit >;
 		const TestComponent = () => {
 			edit = useCoalescedEntityEdit( 'root', 'site' );
 			return <div />;
@@ -38,7 +46,10 @@ describe( 'useCoalescedEntityEdit', () => {
 				<TestComponent />
 			</RegistryProvider>
 		);
-		return ( ...args ) => act( () => edit( ...args ) );
+		return ( ...args: unknown[] ) =>
+			act( () => {
+				edit( ...args );
+			} );
 	}
 
 	it( 'opens an undo level on the first edit and stages the rest', () => {
