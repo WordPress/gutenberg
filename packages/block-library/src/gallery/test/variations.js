@@ -17,7 +17,7 @@ describe( 'Gallery layout variations', () => {
 		expect( gridVariation.isActive( {} ) ).toBe( false );
 	} );
 
-	it( 'activates only the Grid variation for a Grid Gallery', () => {
+	it( 'activates only the Grid variation for a Gallery Grid', () => {
 		const attributes = { layout: { type: 'grid' } };
 
 		expect( flexVariation.isActive( attributes ) ).toBe( false );

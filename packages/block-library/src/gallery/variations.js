@@ -43,7 +43,7 @@ const variations = [
 	},
 	{
 		name: 'gallery-grid',
-		title: __( 'Grid Gallery' ),
+		title: __( 'Gallery Grid' ),
 		description: __( 'Arrange images in a grid.' ),
 		icon: grid,
 		attributes: {

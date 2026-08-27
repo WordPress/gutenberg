@@ -189,11 +189,11 @@ test.describe( 'Gallery', () => {
 		await editor.selectBlocks( gallery );
 		await editor.openDocumentSettingsSidebar();
 		await page
-			.getByRole( 'radio', { name: 'Transform to Grid Gallery' } )
+			.getByRole( 'radio', { name: 'Transform to Gallery Grid' } )
 			.click();
 
 		await expect(
-			page.getByRole( 'radio', { name: 'Grid Gallery' } )
+			page.getByRole( 'radio', { name: 'Gallery Grid' } )
 		).toBeChecked();
 		await page.getByRole( 'tab', { name: 'Settings' } ).click();
 		await expect( page.getByLabel( 'Crop images to fit' ) ).toHaveCount(

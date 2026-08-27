@@ -93,7 +93,7 @@ describe( 'Gallery block', () => {
 					},
 				} )
 			);
-			await selectBlock( 'Block: Grid Gallery' );
+			await selectBlock( 'Block: Gallery Grid' );
 
 			expect(
 				screen.queryByLabelText( 'Crop images to fit' )
@@ -102,7 +102,7 @@ describe( 'Gallery block', () => {
 				screen.queryByRole( 'slider', { name: 'Columns' } )
 			).not.toBeInTheDocument();
 			expect(
-				screen.getByRole( 'radio', { name: 'Grid Gallery' } )
+				screen.getByRole( 'radio', { name: 'Gallery Grid' } )
 			).toBeChecked();
 
 			await userEvent.click(
@@ -122,7 +122,7 @@ describe( 'Gallery block', () => {
 
 			await userEvent.click(
 				screen.getByRole( 'radio', {
-					name: 'Transform to Grid Gallery',
+					name: 'Transform to Gallery Grid',
 				} )
 			);
 			await userEvent.click(
