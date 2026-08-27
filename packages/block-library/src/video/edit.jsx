@@ -3,6 +3,7 @@ import { isBlobURL } from '@wordpress/blob';
 import {
 	Spinner,
 	Placeholder,
+	ToolbarButton,
 	__experimentalToolsPanel as ToolsPanel,
 } from '@wordpress/components';
 import {
@@ -11,14 +12,17 @@ import {
 	InspectorControls,
 	MediaPlaceholder,
 	MediaReplaceFlow,
+	store as blockEditorStore,
 	useBlockProps,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { useRef, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { useDispatch } from '@wordpress/data';
-import { video as icon } from '@wordpress/icons';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { image as imageIcon, video as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
+import { createBlock } from '@wordpress/blocks';
 import { prependHTTPS } from '@wordpress/url';
 import { createUpgradedEmbedBlock } from '../embed/util';
 import {
@@ -30,7 +34,8 @@ import TracksEditor from './tracks-editor';
 import Tracks from './tracks';
 import { Caption } from '../utils/caption';
 import PosterImage from '../utils/poster-image';
-import { isGifVariation } from './variations';
+import { isGifVariation, isLivePhotoVariation } from './variations';
+import { getCarriedMotionConversionAttributes } from '../utils/motion-companion';
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
 
@@ -38,6 +43,7 @@ function VideoEdit( {
 	isSelected: isSingleSelected,
 	attributes,
 	className,
+	clientId,
 	setAttributes,
 	insertBlocksAfter,
 	onReplace,
@@ -45,6 +51,9 @@ function VideoEdit( {
 	const videoPlayer = useRef();
 	const { id, controls, poster, src, tracks, width, height } = attributes;
 	const isGif = isGifVariation( attributes );
+	const isLivePhoto = isLivePhotoVariation( attributes );
+	// Both variations play with the same attributes; only autoplay differs.
+	const playsLikeMotion = isGif || isLivePhoto;
 	// Give the <video> an explicit (non-`auto`) aspect ratio derived from the
 	// stored dimensions. The width/height attributes alone only yield
 	// `aspect-ratio: auto W/H`, whose `auto` keyword defers to the element's
@@ -83,6 +92,22 @@ function VideoEdit( {
 			videoPlayer.current?.play().catch( () => {} );
 		}
 	}, [ isGif, src, poster ] );
+
+	// A Live photo rests on its still frame and plays only while the pointer
+	// is over it (or it holds focus, so the motion is reachable without a
+	// pointer). Rewinding on the way out returns it to that still frame.
+	// These read the element from the event rather than the ref, matching the
+	// front-end module, which has only the event's element to work with.
+	function playLivePhoto( event ) {
+		// Browsers allow muted videos to be played programmatically.
+		event.currentTarget.play().catch( () => {} );
+	}
+
+	function pauseLivePhoto( event ) {
+		const player = event.currentTarget;
+		player.pause();
+		player.currentTime = 0;
+	}
 
 	// TODO: Whether the video was obtained from the media library or was provided by URL, obtain the `videoWidth` and `videoHeight` of the video once its metadata has loaded and persist in the block attributes.
 	function onSelectVideo( media ) {
@@ -145,6 +170,46 @@ function VideoEdit( {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
 
+	/*
+	 * A Live photo plays a companion video of an image attachment, so this
+	 * block can be turned back into the still image it was converted from.
+	 * That needs the attachment record, which only resolves asynchronously —
+	 * hence a dedicated control rather than a block-switcher transform, which
+	 * has to decide synchronously whether it applies.
+	 */
+	const stillImage = useSelect(
+		( select ) =>
+			isLivePhoto && id && isSingleSelected
+				? select( coreStore ).getEntityRecord(
+						'postType',
+						'attachment',
+						id,
+						{ context: 'view' }
+				  )
+				: null,
+		[ isLivePhoto, id, isSingleSelected ]
+	);
+
+	const { replaceBlocks } = useDispatch( blockEditorStore );
+
+	function convertToStillImage() {
+		replaceBlocks(
+			clientId,
+			createBlock( 'core/image', {
+				...getCarriedMotionConversionAttributes( attributes ),
+				id,
+				url: stillImage.source_url,
+				alt: stillImage.alt_text,
+				caption: attributes.caption,
+				/*
+				 * Without this the Image block would convert straight back to
+				 * a Live photo, since its companion video is still there.
+				 */
+				preserveStillImage: true,
+			} )
+		);
+	}
+
 	// Much of this description is duplicated from MediaPlaceholder.
 	const placeholder = ( content ) => {
 		return (
@@ -200,6 +265,13 @@ function VideoEdit( {
 						/>
 					</BlockControls>
 					<BlockControls group="other">
+						{ isLivePhoto && !! stillImage && (
+							<ToolbarButton
+								icon={ imageIcon }
+								label={ __( 'Display as still image' ) }
+								onClick={ convertToStillImage }
+							/>
+						) }
 						<MediaReplaceFlow
 							mediaId={ id }
 							mediaURL={ src }
@@ -214,7 +286,7 @@ function VideoEdit( {
 					</BlockControls>
 				</>
 			) }
-			{ ! isGif && (
+			{ ! playsLikeMotion && (
 				<InspectorControls>
 					<ToolsPanel
 						label={ __( 'Settings' ) }
@@ -254,9 +326,13 @@ function VideoEdit( {
 					src={ src || temporaryURL }
 					ref={ videoPlayer }
 					autoPlay={ isGif }
-					loop={ isGif }
-					muted={ isGif }
-					playsInline={ isGif }
+					loop={ playsLikeMotion }
+					muted={ playsLikeMotion }
+					playsInline={ playsLikeMotion }
+					onPointerEnter={ isLivePhoto ? playLivePhoto : undefined }
+					onPointerLeave={ isLivePhoto ? pauseLivePhoto : undefined }
+					onFocus={ isLivePhoto ? playLivePhoto : undefined }
+					onBlur={ isLivePhoto ? pauseLivePhoto : undefined }
 					width={ width }
 					height={ height }
 					style={ aspectRatio ? { aspectRatio } : undefined }

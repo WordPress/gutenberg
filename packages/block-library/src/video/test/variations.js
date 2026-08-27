@@ -1,9 +1,20 @@
-import variations, { isGifVariation } from '../variations';
+import variations, {
+	isGifVariation,
+	isLivePhotoVariation,
+} from '../variations';
 
 const GIF_ATTRIBUTES = {
 	controls: false,
 	loop: true,
 	autoplay: true,
+	muted: true,
+	playsInline: true,
+};
+
+const LIVE_PHOTO_ATTRIBUTES = {
+	controls: false,
+	loop: true,
+	autoplay: false,
 	muted: true,
 	playsInline: true,
 };
@@ -32,31 +43,77 @@ describe( 'isGifVariation', () => {
 		expect( isGifVariation( { controls: true } ) ).toBe( false );
 	} );
 
+	it( 'does not match a Live photo, which does not autoplay', () => {
+		expect( isGifVariation( LIVE_PHOTO_ATTRIBUTES ) ).toBe( false );
+	} );
+
 	it( 'handles missing attributes', () => {
 		expect( isGifVariation() ).toBe( false );
 		expect( isGifVariation( {} ) ).toBe( false );
 	} );
 } );
 
+describe( 'isLivePhotoVariation', () => {
+	it( 'matches a muted, looping, inline video that neither autoplays nor shows controls', () => {
+		expect( isLivePhotoVariation( LIVE_PHOTO_ATTRIBUTES ) ).toBe( true );
+	} );
+
+	it( 'does not match when controls are shown', () => {
+		expect(
+			isLivePhotoVariation( {
+				...LIVE_PHOTO_ATTRIBUTES,
+				controls: true,
+			} )
+		).toBe( false );
+	} );
+
+	it.each( [ 'loop', 'muted', 'playsInline' ] )(
+		'does not match when %s is missing',
+		( attribute ) => {
+			expect(
+				isLivePhotoVariation( {
+					...LIVE_PHOTO_ATTRIBUTES,
+					[ attribute ]: false,
+				} )
+			).toBe( false );
+		}
+	);
+
+	it( 'does not match a GIF, which autoplays', () => {
+		expect( isLivePhotoVariation( GIF_ATTRIBUTES ) ).toBe( false );
+	} );
+
+	it( 'does not match a default video block', () => {
+		expect( isLivePhotoVariation( { controls: true } ) ).toBe( false );
+	} );
+
+	it( 'handles missing attributes', () => {
+		expect( isLivePhotoVariation() ).toBe( false );
+		expect( isLivePhotoVariation( {} ) ).toBe( false );
+	} );
+} );
+
 describe( 'video variations', () => {
-	it( 'registers exactly one active variation for any attributes', () => {
+	it.each( [
+		[ 'gif', GIF_ATTRIBUTES ],
+		[ 'live-photo', LIVE_PHOTO_ATTRIBUTES ],
+		[ 'video', { controls: true } ],
+	] )( 'activates only the %s variation', ( name, attributes ) => {
 		const active = variations.filter( ( variation ) =>
-			variation.isActive( GIF_ATTRIBUTES )
+			variation.isActive( attributes )
 		);
+
 		expect( active ).toHaveLength( 1 );
-		expect( active[ 0 ].name ).toBe( 'gif' );
-
-		const activeForVideo = variations.filter( ( variation ) =>
-			variation.isActive( { controls: true } )
-		);
-		expect( activeForVideo ).toHaveLength( 1 );
-		expect( activeForVideo[ 0 ].name ).toBe( 'video' );
+		expect( active[ 0 ].name ).toBe( name );
 	} );
 
-	it( 'keeps the GIF variation out of the inserter', () => {
-		const gif = variations.find(
-			( variation ) => variation.name === 'gif'
-		);
-		expect( gif.scope ).not.toContain( 'inserter' );
-	} );
+	it.each( [ 'gif', 'live-photo' ] )(
+		'keeps the %s variation out of the inserter',
+		( name ) => {
+			const variation = variations.find(
+				( candidate ) => candidate.name === name
+			);
+			expect( variation.scope ).not.toContain( 'inserter' );
+		}
+	);
 } );

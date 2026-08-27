@@ -1,5 +1,6 @@
 import { getFileBasename } from './utils';
 import { parseHeic } from './heic-parser';
+import type { HeicSequenceData } from './heic-parser';
 import { getHeicUnsupportedMessage } from './heic-support';
 
 /**
@@ -164,6 +165,73 @@ export async function canvasConvertToJpeg(
 	}
 
 	throw new Error( getHeicUnsupportedMessage() );
+}
+
+/**
+ * Decodes the still image of a HEIC/HEIF image sequence (Live Photo, burst)
+ * to a JPEG.
+ *
+ * A sequence has no primary still item to read, so the still is the sequence's
+ * first sync sample — the frame a Live Photo shows when it is not playing.
+ * That frame is decoded with the same platform HEVC decoder the still-HEIC
+ * path uses, and the sequence's display rotation is baked in so the JPEG is
+ * upright (matching the converted video, which bakes the same rotation).
+ *
+ * @param sequence Demuxed sequence from `parseHeicSequence`.
+ * @param fileName Source file name; the JPEG keeps its basename.
+ * @param quality  JPEG quality (0-1). Default 0.82.
+ * @return JPEG File object.
+ */
+export async function convertHeicSequenceToStillJpeg(
+	sequence: HeicSequenceData,
+	fileName: string,
+	quality = 0.82
+): Promise< File > {
+	const sample =
+		sequence.samples.find( ( { isSync } ) => isSync ) ??
+		sequence.samples[ 0 ];
+
+	if ( ! sample ) {
+		throw new Error( 'Image sequence contains no frames' );
+	}
+
+	const frame = await decodeHevcFrame(
+		sequence.codecString,
+		sequence.description,
+		sequence.codedWidth,
+		sequence.codedHeight,
+		sample.data
+	);
+
+	let canvas: OffscreenCanvas;
+	try {
+		canvas = new OffscreenCanvas( frame.displayWidth, frame.displayHeight );
+		const ctx = canvas.getContext( '2d' );
+
+		if ( ! ctx ) {
+			throw new Error( 'Could not get canvas 2d context' );
+		}
+
+		ctx.drawImage( frame, 0, 0 );
+	} finally {
+		frame.close();
+	}
+
+	/*
+	 * A track matrix records rotation clockwise, while applyRotation takes the
+	 * counter-clockwise angle of an `irot` transform.
+	 */
+	const counterClockwise = ( 360 - ( sequence.rotation % 360 ) ) % 360;
+	const outputCanvas = applyRotation( canvas, counterClockwise );
+
+	const jpegBlob = await outputCanvas.convertToBlob( {
+		type: 'image/jpeg',
+		quality,
+	} );
+
+	return new File( [ jpegBlob ], `${ getFileBasename( fileName ) }.jpg`, {
+		type: 'image/jpeg',
+	} );
 }
 
 /**

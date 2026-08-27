@@ -56,6 +56,26 @@ _Returns_
 
 -   `Promise< ArrayBuffer >`: Encoded video buffer.
 
+### convertHeicSequenceToVideo
+
+Converts a demuxed HEIC/HEIF image sequence to a video file (MP4 or WebM).
+
+The sequence is demuxed on the main thread (so the heic-parser stays within the upload-media package); this worker decodes its HEVC frames and re-encodes them with mediabunny, exactly like the GIF path but sourced from a VideoDecoder instead of an ImageDecoder.
+
+Any display rotation carried by the sequence is baked into the encoded frames, so the resulting video is upright in every player.
+
+_Parameters_
+
+-   _id_ `ItemId`: Item ID.
+-   _sequence_ `HeicSequenceInput`: Demuxed sequence (codec config + samples).
+-   _outputMimeType_ `string`: Output MIME type ('video/mp4' or 'video/webm').
+-   _maxDimensions_ `number`: Optional maximum dimension for downscaling.
+-   _maxTotalPixels_ `number`: Optional budget for total decoded pixels (width × height × frame count) beyond which the conversion is rejected with SIZE_LIMIT_ERROR_PREFIX. Defaults to DEFAULT_MAX_TOTAL_PIXELS; `0` disables.
+
+_Returns_
+
+-   `Promise< ArrayBuffer >`: Encoded video buffer.
+
 ### DEFAULT_MAX_TOTAL_PIXELS
 
 Default budget for total decoded pixels (width × height × frame count) beyond which conversion is not attempted.
@@ -64,9 +84,9 @@ Conversion cost is roughly proportional to the total number of decoded pixels. 3
 
 ### SIZE_LIMIT_ERROR_PREFIX
 
-Message prefix for GIFs skipped because they exceed the total-pixel budget.
+Message prefix for sources skipped because they exceed the total-pixel budget. Shared by the GIF and image-sequence paths, which append their own dimensions and frame count after it.
 
-Starts with UNSUPPORTED_ERROR_PREFIX so existing consumers treat the skip as a graceful fallback (keep the uploaded GIF, no companion video); the longer prefix lets consumers distinguish it, e.g. to log a warning. Like UNSUPPORTED_ERROR_PREFIX, the contract is the message prefix because only the message string survives the worker boundary.
+Starts with UNSUPPORTED_ERROR_PREFIX so existing consumers treat the skip as a graceful fallback (keep the uploaded original, no companion video); the longer prefix lets consumers distinguish it, e.g. to log a warning. Like UNSUPPORTED_ERROR_PREFIX, the contract is the message prefix because only the message string survives the worker boundary.
 
 ### UNSUPPORTED_ERROR_PREFIX
 

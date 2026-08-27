@@ -37,6 +37,11 @@ export interface QueueItem {
 	// (recorded in attachment metadata as `animated_video`). Not set for
 	// non-animated-GIF items.
 	animatedGifFile?: File;
+	// Original HEIC/HEIF image sequence (Live Photo, burst), kept separately
+	// so its frames can be re-encoded to a video and sideloaded as a companion
+	// of the still image attachment, exactly like animatedGifFile above. Not
+	// set for single-frame HEIC items.
+	heicSequenceFile?: File;
 	poster?: File;
 	attachment?: Partial< Attachment >;
 	status: ItemStatus;
@@ -321,10 +326,29 @@ export enum OperationType {
 	Rotate = 'ROTATE',
 	TranscodeImage = 'TRANSCODE_IMAGE',
 	TranscodeGif = 'TRANSCODE_GIF',
+	TranscodeHeicSequence = 'TRANSCODE_HEIC_SEQUENCE',
 	ThumbnailGeneration = 'THUMBNAIL_GENERATION',
 	Finalize = 'FINALIZE',
 	// UltraHDR operations
 	DetectUltraHdr = 'DETECT_ULTRAHDR',
+}
+
+/**
+ * Whether an operation drives the WebCodecs video encoder.
+ *
+ * These operations are memory-intensive and share a concurrency limit of one,
+ * so every throttle, kick, and pending-work check treats them alike.
+ *
+ * @param operation Operation to test.
+ * @return Whether the operation encodes video.
+ */
+export function isVideoProcessingOperation(
+	operation: OperationType | undefined
+): boolean {
+	return (
+		operation === OperationType.TranscodeGif ||
+		operation === OperationType.TranscodeHeicSequence
+	);
 }
 
 /**
@@ -384,6 +408,22 @@ export interface OperationArgs {
 		/**
 		 * Time in milliseconds before the conversion is abandoned and only
 		 * the original GIF is kept. `0` disables the timeout. Defaults to
+		 * 30 seconds.
+		 */
+		timeout?: number;
+		/**
+		 * Budget for total decoded pixels (width × height × frame count)
+		 * beyond which conversion is not attempted. `0` disables the check.
+		 * Defaults to the `@wordpress/video-conversion` package default.
+		 */
+		maxTotalPixels?: number;
+	};
+	[ OperationType.TranscodeHeicSequence ]: {
+		/** Video output format: 'mp4' or 'webm'. */
+		outputFormat: 'mp4' | 'webm';
+		/**
+		 * Time in milliseconds before the conversion is abandoned and only
+		 * the still image is kept. `0` disables the timeout. Defaults to
 		 * 30 seconds.
 		 */
 		timeout?: number;

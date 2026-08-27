@@ -9,15 +9,26 @@ import {
 	isAnimatedGif,
 	renameFile,
 } from '../utils';
-import { canvasConvertToJpeg } from '../canvas-utils';
+import {
+	canvasConvertToJpeg,
+	convertHeicSequenceToStillJpeg,
+} from '../canvas-utils';
 import { getHeicUnsupportedMessage } from '../heic-support';
-import { getUnappliedExifOrientation } from '../heic-parser';
+import {
+	getUnappliedExifOrientation,
+	isHeicSequence,
+	parseHeicSequence,
+} from '../heic-parser';
 import {
 	isClientSideMediaSupported,
 	exceedsClientProcessingMemory,
 } from '../feature-detection';
 import { getImageDimensions } from '../get-image-dimensions';
-import { CLIENT_SIDE_SUPPORTED_MIME_TYPES, HEIC_MIME_TYPES } from './constants';
+import {
+	CLIENT_SIDE_SUPPORTED_MIME_TYPES,
+	HEIC_MIME_TYPES,
+	HEIC_SEQUENCE_MIME_TYPES,
+} from './constants';
 import { StubFile } from '../stub-file';
 import { ErrorCode, UploadError } from '../upload-error';
 import { debug, measure } from './utils/debug-logger';
@@ -32,6 +43,7 @@ import {
 } from './utils';
 import {
 	convertGifToVideo,
+	convertHeicSequenceToVideo,
 	isConversionTimeoutError,
 	isSizeLimitConversionError,
 	isUnsupportedConversionError,
@@ -67,7 +79,12 @@ import type {
 	UpdateProgressAction,
 	UpdateSettingsAction,
 } from './types';
-import { ItemStatus, OperationType, Type } from './types';
+import {
+	isVideoProcessingOperation,
+	ItemStatus,
+	OperationType,
+	Type,
+} from './types';
 import type { cancelItem, executeRetry } from './actions';
 import { clearRetryTimer } from './utils/retry';
 
@@ -98,6 +115,7 @@ type ActionCreators = {
 	rotateItem: typeof rotateItem;
 	transcodeImageItem: typeof transcodeImageItem;
 	transcodeGifItem: typeof transcodeGifItem;
+	transcodeHeicSequenceItem: typeof transcodeHeicSequenceItem;
 	generateThumbnails: typeof generateThumbnails;
 	finalizeItem: typeof finalizeItem;
 	updateItemProgress: typeof updateItemProgress;
@@ -337,10 +355,10 @@ export function processItem( id: QueueItemId ) {
 		}
 
 		/*
-		 * GIF-to-video conversion is memory-intensive (WebCodecs encode).
+		 * Video conversion is memory-intensive (WebCodecs encode).
 		 * Limit to 1 concurrent transcoding operation.
 		 */
-		if ( operation === OperationType.TranscodeGif ) {
+		if ( isVideoProcessingOperation( operation ) ) {
 			const activeCount = select.getActiveVideoProcessingCount();
 			if ( activeCount >= 1 ) {
 				return;
@@ -352,7 +370,7 @@ export function processItem( id: QueueItemId ) {
 			// display it.  The scaled JPEG sideload will call onChange
 			// with a usable URL once the client-side conversion completes.
 			const isHeicUrl =
-				attachment.url && /\.hei[cf]$/i.test( attachment.url );
+				attachment.url && /\.hei[cf]s?$/i.test( attachment.url );
 			if ( ! isHeicUrl ) {
 				onChange?.( [ attachment ] );
 			}
@@ -468,6 +486,13 @@ export function processItem( id: QueueItemId ) {
 				dispatch.transcodeGifItem(
 					item.id,
 					operationArgs as OperationArgs[ OperationType.TranscodeGif ]
+				);
+				break;
+
+			case OperationType.TranscodeHeicSequence:
+				dispatch.transcodeHeicSequenceItem(
+					item.id,
+					operationArgs as OperationArgs[ OperationType.TranscodeHeicSequence ]
 				);
 				break;
 
@@ -635,7 +660,7 @@ export function finishOperation(
 		 * If a video processing operation just finished, there may be items
 		 * waiting due to the video processing concurrency limit.
 		 */
-		if ( previousOperation === OperationType.TranscodeGif ) {
+		if ( isVideoProcessingOperation( previousOperation ) ) {
 			const pendingItems = select.getPendingVideoProcessing();
 			for ( const pendingItem of pendingItems ) {
 				dispatch.processItem( pendingItem.id );
@@ -818,6 +843,128 @@ export function prepareItem( id: QueueItemId ) {
 					} );
 					return;
 				}
+			}
+		}
+
+		/*
+		 * HEIC/HEIF image sequence (Apple Live Photo, Android burst) → still
+		 * image + companion video. These multi-frame HEVC sequences cannot be
+		 * decoded server-side at all (GD/Imagick read only one frame), so the
+		 * motion is only preserved if the browser re-encodes it.
+		 *
+		 * The still frame uploads through the normal image pipeline, exactly
+		 * as an animated GIF does, so the attachment stays an image and the
+		 * block starts as a valid core/image. The converted video is sideloaded
+		 * as a companion of that same attachment after upload (see
+		 * generateThumbnails), and the editor swaps the block to the Video
+		 * block's Live photo variation playing it.
+		 *
+		 * The file type cannot be trusted for detection: exported Live Photos
+		 * routinely arrive as `.heic`/`image/heic` while carrying a movie
+		 * track, so any HEIC is sniffed for sequence structure.
+		 */
+		const mayBeSequence =
+			HEIC_SEQUENCE_MIME_TYPES.includes( file.type ) ||
+			HEIC_MIME_TYPES.includes( file.type );
+
+		let isSequence = false;
+		if ( mayBeSequence ) {
+			let stillJpeg: File | undefined;
+			try {
+				const buffer = await file.arrayBuffer();
+				isSequence = isHeicSequence( buffer );
+				if (
+					isSequence &&
+					typeof VideoDecoder !== 'undefined' &&
+					typeof VideoEncoder !== 'undefined'
+				) {
+					const sequence = parseHeicSequence( buffer );
+					/*
+					 * A single-frame "sequence" has no motion worth a companion
+					 * video, so it is treated as an ordinary still.
+					 */
+					if ( sequence.samples.length > 1 ) {
+						const support = await VideoDecoder.isConfigSupported( {
+							codec: sequence.codecString,
+							description: sequence.description,
+							codedWidth: sequence.codedWidth,
+							codedHeight: sequence.codedHeight,
+						} );
+						if ( support.supported ) {
+							stillJpeg = await convertHeicSequenceToStillJpeg(
+								sequence,
+								file.name,
+								settings.imageQuality ?? DEFAULT_OUTPUT_QUALITY
+							);
+						}
+					}
+				}
+			} catch {
+				/*
+				 * Demuxing or the still decode failed. Handled below by
+				 * uploading the original file unchanged, which WordPress
+				 * stores and relabels as an ordinary still `.heic` — a better
+				 * outcome than a failed upload.
+				 */
+			}
+
+			if ( stillJpeg ) {
+				operations.push(
+					OperationType.Upload,
+					OperationType.ThumbnailGeneration,
+					OperationType.Finalize
+				);
+
+				dispatch< AddOperationsAction >( {
+					type: Type.AddOperations,
+					id,
+					operations,
+				} );
+
+				/*
+				 * Keep the original sequence twice over: `heicSequenceFile` so
+				 * generateThumbnails can transcode and sideload the companion
+				 * video, and `originalHeicFile` so the user's own file is
+				 * preserved as the attachment's `source_original`.
+				 */
+				const vipsAvailable = isClientSideMediaSupported();
+				dispatch.finishOperation( id, {
+					file: stillJpeg,
+					sourceFile: stillJpeg,
+					heicSequenceFile: item.file,
+					originalHeicFile: item.file,
+					additionalData: {
+						...item.additionalData,
+						generate_sub_sizes: ! vipsAvailable,
+						convert_format: true,
+					},
+				} );
+				return;
+			}
+
+			if ( isSequence ) {
+				/*
+				 * A sequence we cannot decode here (no WebCodecs, no platform
+				 * HEVC codec, or a demux failure). Upload it untouched: the
+				 * still-image decoder below would only fail on it, whereas
+				 * WordPress stores it and relabels it as an ordinary still
+				 * `.heic`. The motion is not converted, which is the same
+				 * outcome as uploading the file outside the editor.
+				 */
+				operations.push( OperationType.Upload );
+				dispatch< AddOperationsAction >( {
+					type: Type.AddOperations,
+					id,
+					operations,
+				} );
+				dispatch.finishOperation( id, {
+					additionalData: {
+						...item.additionalData,
+						generate_sub_sizes: true,
+						convert_format: true,
+					},
+				} );
+				return;
 			}
 		}
 
@@ -1517,6 +1664,108 @@ export function transcodeGifItem(
 	};
 }
 
+type TranscodeHeicSequenceItemArgs =
+	OperationArgs[ OperationType.TranscodeHeicSequence ];
+
+/**
+ * Converts a HEIC/HEIF image sequence to a video file (MP4 or WebM).
+ *
+ * Runs inside a sideload item whose parent is the sequence's still image
+ * attachment (see generateThumbnails). The next Upload op then sideloads the
+ * video as a companion of that attachment under the `animated_video` image
+ * size; the still stays the primary attachment.
+ *
+ * Every failure is graceful. The still attachment already exists and is a
+ * perfectly good photo of what the user uploaded, so a sequence that cannot
+ * be re-encoded simply has no companion video — never a failed upload or a
+ * user-facing error on what they think of as an image.
+ *
+ * @param id     Item ID.
+ * @param [args] Transcode arguments including output format.
+ */
+export function transcodeHeicSequenceItem(
+	id: QueueItemId,
+	args?: TranscodeHeicSequenceItemArgs
+) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+		if ( ! item ) {
+			return;
+		}
+
+		const outputFormat = args?.outputFormat ?? 'mp4';
+
+		try {
+			const file = await convertHeicSequenceToVideo(
+				item.id,
+				item.file,
+				`video/${ outputFormat }`,
+				{
+					timeout: args?.timeout,
+					maxTotalPixels: args?.maxTotalPixels,
+				}
+			);
+
+			// Hand the video to the next Upload op as the sideload's payload.
+			dispatch.finishOperation( id, { file } );
+		} catch ( error ) {
+			if ( isUnsupportedConversionError( error ) ) {
+				/*
+				 * A sequence skipped for exceeding the total-pixel budget is a
+				 * graceful outcome like any other unsupported conversion, but
+				 * worth a SCRIPT_DEBUG diagnostic so developers testing long
+				 * Live Photos understand why no companion video was produced.
+				 */
+				if ( isSizeLimitConversionError( error ) ) {
+					debug(
+						`Skipping image sequence to video conversion: ${
+							error instanceof Error ? error.message : error
+						}`
+					);
+				}
+				dispatch.cancelItem(
+					id,
+					new Error( 'Image sequence conversion unsupported' ),
+					true
+				);
+				return;
+			}
+
+			if ( isConversionTimeoutError( error ) ) {
+				debug(
+					`Image sequence to video conversion timed out; keeping the still image only: ${
+						error instanceof Error ? error.message : error
+					}`
+				);
+				dispatch.cancelItem(
+					id,
+					new Error( 'Image sequence conversion timed out' ),
+					true
+				);
+				return;
+			}
+
+			// Real engine failure. Log the cause for debuggability and
+			// silently cancel the sideload.
+			// eslint-disable-next-line no-console
+			console.error(
+				'[video-conversion] Image sequence to video conversion failed:',
+				error
+			);
+			dispatch.cancelItem(
+				id,
+				new UploadError( {
+					code: ErrorCode.MEDIA_TRANSCODING_ERROR,
+					message: 'Image sequence could not be converted to video',
+					file: item.file,
+					cause: error instanceof Error ? error : undefined,
+				} ),
+				true
+			);
+		}
+	};
+}
+
 /**
  * Adds thumbnail versions to the queue for sideloading.
  *
@@ -1597,6 +1846,36 @@ export function generateThumbnails( id: QueueItemId ) {
 			 * transcodeGifItem), so a failed conversion leaves no orphaned
 			 * poster.
 			 */
+		}
+
+		// HEIC/HEIF image sequence: re-encode the original to a video and
+		// sideload it as a companion of the still attachment, exactly like the
+		// animated GIF flow above. No separate poster companion is needed —
+		// the uploaded still is itself the first frame of the sequence, so the
+		// editor uses it as the video's poster.
+		if ( item.heicSequenceFile && attachment.id ) {
+			const outputFormat =
+				settings.videoOutputFormat === 'video/webm' ? 'webm' : 'mp4';
+
+			dispatch.addSideloadItem( {
+				file: item.heicSequenceFile,
+				batchId: uuidv4(),
+				parentId: item.id,
+				additionalData: {
+					post: attachment.id,
+					image_size: 'animated_video',
+					convert_format: false,
+				},
+				operations: [
+					[
+						OperationType.TranscodeHeicSequence,
+						{
+							outputFormat,
+						} as OperationArgs[ OperationType.TranscodeHeicSequence ],
+					],
+					OperationType.Upload,
+				],
+			} );
 		}
 
 		// Determine the EXIF orientation. For JPEG/TIFF the server reads it and

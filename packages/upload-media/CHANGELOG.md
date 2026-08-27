@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Support HEIC/HEIF image sequences (Apple Live Photos, Android bursts). The sequence's first frame is decoded to a JPEG and uploaded as the attachment, and its motion is re-encoded to a web-safe video (MP4/WebM) sideloaded as an `animated_video` companion — the same model animated GIFs use. Sequences are detected by sniffing the container, since exported Live Photos routinely arrive typed as ordinary `image/heic` stills. Falls back to uploading the original untouched when the platform cannot decode HEVC ([#79642](https://github.com/WordPress/gutenberg/issues/79642)).
+
 ### Internal
 
 -   Remove unused dependency `@wordpress/preferences` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).

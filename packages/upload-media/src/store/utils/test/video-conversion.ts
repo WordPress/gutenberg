@@ -14,7 +14,7 @@ describe( 'isUnsupportedConversionError', () => {
 	it.each( [
 		'Unsupported: WebCodecs unavailable',
 		'Unsupported: encoder codec not supported',
-		'Unsupported: GIF exceeds maximum conversion size (5000x5000 x 100 frames = 2500000000 pixels; limit is 300000000)',
+		'Unsupported: exceeds maximum conversion size (GIF is 5000x5000 x 100 frames = 2500000000 pixels; limit is 300000000)',
 	] )( 'recognizes graceful outcome: %s', ( message ) => {
 		expect( isUnsupportedConversionError( new Error( message ) ) ).toBe(
 			true
@@ -41,7 +41,7 @@ describe( 'isSizeLimitConversionError', () => {
 		// total-pixel budget is exceeded; duplicated here because the worker
 		// boundary only carries the message string.
 		const error = new Error(
-			'Unsupported: GIF exceeds maximum conversion size (5000x5000 x 100 frames = 2500000000 pixels; limit is 300000000)'
+			'Unsupported: exceeds maximum conversion size (GIF is 5000x5000 x 100 frames = 2500000000 pixels; limit is 300000000)'
 		);
 		expect( isSizeLimitConversionError( error ) ).toBe( true );
 		// A size-limit skip is also a graceful "unsupported" outcome.

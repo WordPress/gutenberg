@@ -51,7 +51,8 @@
 		"./playlist/view": "./build-module/playlist/view.mjs",
 		"./query/view": "./build-module/query/view.mjs",
 		"./search/view": "./build-module/search/view.mjs",
-		"./tabs/view": "./build-module/tabs/view.mjs"
+		"./tabs/view": "./build-module/tabs/view.mjs",
+		"./video/view": "./build-module/video/view.mjs"
 	},
 	"wpStyleEntryPoints": [
 		"src/*.scss",
