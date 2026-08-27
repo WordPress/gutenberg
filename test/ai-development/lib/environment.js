@@ -1,10 +1,18 @@
 /**
- * Promptfoo hands an agent a copy of this process's environment, so anything
- * exported in the shell that started the run — API keys, tokens — is readable
- * from Bash and can reach a model request or saved results.
+ * The environment an evaluated agent is allowed to keep.
  *
- * A provider's `env` can only override names, never start from nothing, so a
- * minimal environment is built by blanking everything outside this list.
+ * Promptfoo copies this process's whole environment into the agent with no way
+ * to opt out, so an `ANTHROPIC_API_KEY` or `GITHUB_TOKEN` exported in the shell
+ * that started the run is readable with `echo $VAR`, and reaches the model and
+ * `results/` from there. The sandbox does not help: it bounds what the agent
+ * can open, not what it was handed.
+ *
+ * A provider's `env` can only overwrite a name, never remove one, so
+ * withholding a variable means blanking it. The names below are kept because a
+ * shell needs them — blank `PATH` and nothing runs.
+ *
+ * The list is snapshotted on first import, so `specs/sandbox` sets its probe
+ * variable in a module imported ahead of the configuration.
  */
 export const KEPT = [
 	'HOME',
@@ -29,15 +37,12 @@ const minimalEnvironment = Object.fromEntries(
 export const agentEnvironment = {
 	...minimalEnvironment,
 
-	// Docker reaches its daemon over a unix socket, which the sandbox does not
-	// cover; a socket that does not exist makes `docker` and `wp-env` fail
-	// rather than start containers the sandbox cannot reach to clean up.
+	// Force docker to fail fast if the agent tries to start an environment
 	DOCKER_HOST: 'unix:///nonexistent/docker.sock',
 
-	// Git reads the global config on every invocation, and it lives in the home
-	// directory, which the sandbox denies. Without this every `git` command in
-	// the workspace fails with `Operation not permitted`, and the agent is
-	// expected to inspect history. Pointing it at an empty file also keeps the
-	// developer's identity and aliases out of the workspace.
+	// Git reads its global config on every invocation, and that config lives
+	// in the home directory, which the sandbox denies. Git itself runs fine;
+	// `~/.gitconfig` is what it cannot read, so every `git` command fails with
+	// `Operation not permitted`.
 	GIT_CONFIG_GLOBAL: '/dev/null',
 };

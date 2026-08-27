@@ -2,31 +2,16 @@
  * Appends the agent's actual changes to its response, so assertions grade the
  * workspace rather than the agent's account of it.
  *
- * Promptfoo's coding-agent guide is explicit that an agent's output "is its
- * final text response describing what it did, not the file contents", and that
- * file-level verification means reading the files after the eval. This is that
- * read, at the one moment it is safe to take.
- *
- * The timing is the point. Promptfoo applies a transform in
- * `transformRunEvalResponse`, immediately after the provider returns and before
- * any assertion is graded or queued — so this reads the workspace while it
- * still holds the agent's work, whatever a model-graded assertion later does
- * with its grading queue, and whenever `afterEach` rolls the workspace back.
- *
- * Running git here rather than inside an agent also keeps it out of the
+ * Running git here rather than inside an agent also keeps git out of the
  * sandbox, where it would need tool permissions and a readable global config.
  *
  * @see https://www.promptfoo.dev/docs/guides/evaluate-coding-agents/
  */
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
-import { workspace } from './paths.js';
+import { baseTag, workspace } from './paths.js';
 
 const execFileAsync = promisify( execFile );
-
-// Enough for a focused change, and short of what would crowd out the rubric.
-// A run that blows past this has usually gone wrong in a way worth seeing.
-const MAXIMUM_DIFF_LENGTH = 60000;
 
 async function git( args ) {
 	const { stdout } = await execFileAsync( 'git', args, {
@@ -44,28 +29,26 @@ async function git( args ) {
  */
 export default async function withWorkspaceChanges( output ) {
 	// Stage everything first, so files the agent created appear in the diff.
-	// Untracked files are invisible to `git diff` alone, and a new test file is
-	// exactly what these evaluations are usually grading. The index is
-	// disposable: `afterEach` rolls the whole workspace back.
 	await git( [ 'add', '--all' ] );
 
-	const status = await git( [ 'status', '--porcelain' ] );
-	let diff = await git( [ 'diff', '--cached' ] );
-
-	if ( diff.length > MAXIMUM_DIFF_LENGTH ) {
-		diff =
-			diff.slice( 0, MAXIMUM_DIFF_LENGTH ) +
-			`\n\n[Diff truncated at ${ MAXIMUM_DIFF_LENGTH } characters.]`;
-	}
+	// All changed filenames against the starting point
+	const status = await git( [
+		'diff',
+		'--cached',
+		'--name-status',
+		baseTag,
+	] );
+	// Full diff of the agent's work against the base tag
+	const diff = await git( [ 'diff', '--cached', baseTag ] );
 
 	return `${ output }
 
 ---
 
 The following is the state of the workspace after the agent finished. It was
-read from the repository itself, not reported by the agent, so it is what
-actually happened rather than what the agent claims happened. Where the two
-disagree, this is the evidence.
+read from the repository itself using git, not reported by the agent. Where the agent 
+and the following report disagree, the following evidence is the source of truth to 
+be trusted.
 
 ## Changed files
 

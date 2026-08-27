@@ -6,8 +6,8 @@ import { workspace } from './paths.js';
  */
 export default {
 	options: {
-		// Prevent agent from wasting tokens trying to build
-		// or boot an environment the workspace does not have.
+		// Prepended to every task to revent agent from wasting tokens
+		// trying to boot an environment the workspace does not have.
 		prefix: `This task runs in an isolated evaluation workspace and
 npm is not available. Do not try to build. Do not start or try to start wp-env,
 wp-env-test, Docker, development servers, or other long-running services.
@@ -19,16 +19,8 @@ environment.`,
 		transform: withWorkspaceChanges,
 
 		// Grades `agent-rubric` assertions. Naming `working_dir` and nothing
-		// else is Promptfoo's documented grader: it applies its default
-		// allowlist of Read, Grep, Glob and LS, which is read-only, and the
-		// SDK refuses any path outside the working directory. So the grader is
-		// confined without a sandbox — the sandbox only wraps Bash, and a
-		// grader with no Bash has nothing for it to wrap.
-		//
-		// Having no shell is also why the transform above matters: the grader
-		// cannot run `git diff` for itself, so the transform shows it what
-		// changed, and its read-only tools let it check that against the
-		// repository's own references.
+		// else is Promptfoo's documented grader. The grader is
+		// confined without a sandbox and has no shell access.
 		provider: {
 			id: 'anthropic:claude-agent-sdk',
 			config: {

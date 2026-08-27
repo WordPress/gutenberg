@@ -37,3 +37,13 @@ export const workspace = path.join(
 	fs.realpathSync( os.tmpdir() ),
 	'gutenberg-agent-eval'
 );
+
+/**
+ * Names the workspace's first commit.
+ *
+ * The diff and the rollback both compare against it, and neither can use HEAD:
+ * an agent may commit its own work, on request or as a checkpoint of its own,
+ * and HEAD would move with it. The diff would then come back empty and the
+ * rollback would leave the commit in place for every later row.
+ */
+export const baseTag = 'eval-base';

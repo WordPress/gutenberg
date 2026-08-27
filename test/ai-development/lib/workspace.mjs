@@ -27,7 +27,7 @@ import path from 'node:path';
 import { promisify } from 'node:util';
 // The repository's own skill-catalog generator, so this cannot drift from it.
 import { setupSkills } from '../../../tools/agents/setup-skills.mjs';
-import { sourceRoot, workspace } from './paths.js';
+import { baseTag, sourceRoot, workspace } from './paths.js';
 
 const execFileAsync = promisify( execFile );
 
@@ -106,6 +106,9 @@ async function createWorkspace() {
 		'--message',
 		'Eval workspace',
 	] );
+	// Both the diff and the rollback compare against this tag rather than HEAD;
+	// see `baseTag` in `paths.js`.
+	await git( workspace, [ 'tag', baseTag ] );
 }
 
 /**
@@ -116,7 +119,7 @@ async function createWorkspace() {
  * skills.
  */
 async function resetWorkspace() {
-	await git( workspace, [ 'reset', '--quiet', '--hard' ] );
+	await git( workspace, [ 'reset', '--quiet', '--hard', baseTag ] );
 	await git( workspace, [ 'clean', '--quiet', '-fd' ] );
 }
 

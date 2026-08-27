@@ -86,6 +86,7 @@ export default {
 	evaluateOptions: {
 		timeoutMs: 180000,
 		cache: false,
+		// TODO: Allow parallel runs.
 		// One row at a time. Every row shares the one workspace, and each starts
 		// from the state `afterEach` rolled the last one back to; overlapping
 		// rows would reset each other's work mid-run.

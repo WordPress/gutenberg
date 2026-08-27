@@ -73,14 +73,10 @@ the block's serialized markup.`,
 				// rest of the workspace.
 				{
 					type: 'agent-rubric',
-					value: `Judge the diff in the "Diff" section, not the agent's summary
-above it. Where the two disagree, the diff is what happened.
-
-Score 1.0 only if every one of these holds:
+					value: `Score 1.0 only if every one of these holds:
 - it adds a Gutenberg Playwright E2E test, and changes nothing beyond the
   paragraph block spec it belongs in;
-- the test inserts a \`core/paragraph\` and types its text through the editor
-  UI, not by setting block attributes directly;
+- the test inserts a \`core/paragraph\`;
 - it applies center alignment through the editor UI, not by setting block
   attributes directly;
 - it reads the serialized post content with \`editor.getEditedPostContent()\`;
