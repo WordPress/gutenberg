@@ -272,7 +272,7 @@ async function runPerformanceTests( branches, options ) {
 		log(
 			formats.warning(
 				'\nIn order to run the tests, the tool is going to load a WordPress environment on port 8889.' +
-					'\nMake sure these ports are not used before continuing.\n'
+					'\nMake sure this port is not in use before continuing.\n'
 			)
 		);
 
