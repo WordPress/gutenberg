@@ -38,6 +38,10 @@ export function htmlToBlocks( html: string, handler: RawHandler ): Block[] {
 		const { transform, blockName } = rawTransform;
 
 		if ( transform ) {
+			// A raw transform may return several blocks, in which case it is
+			// unclear which of them the node's class belongs on, so only the
+			// single-block case is handled. No core raw transform returns an
+			// array today; one that did would already have thrown here.
 			const block = transform( node, handler ) as Block;
 			if ( node.hasAttribute( 'class' ) ) {
 				block.attributes.className = node.getAttribute( 'class' );
