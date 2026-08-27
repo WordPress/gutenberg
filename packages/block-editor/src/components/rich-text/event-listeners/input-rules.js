@@ -84,8 +84,11 @@ export default ( props ) => ( element ) => {
 		} );
 		const block = transformation.transform( content );
 
-		selectionChange( ...findSelection( [ block ] ) );
-		onReplace( [ block ] );
+		registry.batch( () => {
+			selectionChange( ...findSelection( [ block ] ) );
+			onReplace( [ block ] );
+		} );
+
 		registry.dispatch( blockEditorStore ).__unstableMarkAutomaticChange();
 
 		return true;
