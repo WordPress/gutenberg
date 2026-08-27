@@ -45,7 +45,16 @@ function BlockVariationPicker( {
 							iconSize={ 48 }
 							onClick={ () => onSelect( variation ) }
 							className="block-editor-block-variation-picker__variation"
-							label={ variation.description || variation.title }
+							label={
+								variation.description
+									? `${ variation.title }: ${ variation.description }`
+									: variation.title
+							}
+							aria-describedby={
+								variation.description
+									? `${ variation.title }: ${ variation.description }`
+									: variation.title
+							}
 						/>
 						<span className="block-editor-block-variation-picker__variation-label">
 							{ variation.title }
