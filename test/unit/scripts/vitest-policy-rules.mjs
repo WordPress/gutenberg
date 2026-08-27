@@ -909,6 +909,25 @@ function traverseAst( node, visitorKeys, visitor ) {
 	}
 }
 
+function createParentNodeMap( ast, visitorKeys ) {
+	const parentNodes = new WeakMap();
+	const visit = ( node ) => {
+		for ( const key of visitorKeys[ node.type ] ?? [] ) {
+			const children = Array.isArray( node[ key ] )
+				? node[ key ]
+				: [ node[ key ] ];
+			for ( const child of children ) {
+				if ( child?.type ) {
+					parentNodes.set( child, node );
+					visit( child );
+				}
+			}
+		}
+	};
+	visit( ast );
+	return parentNodes;
+}
+
 function getTrackedAssignment( node ) {
 	if ( node.type === 'VariableDeclarator' ) {
 		return {
@@ -934,22 +953,119 @@ function getTrackedAssignment( node ) {
 	return { target: null, value: null, isCollectionElement: false };
 }
 
-function getLocalFunctions(
+function getBranchPath( node, useNode, parentNodes ) {
+	const useAncestors = new Set();
+	for (
+		let ancestor = useNode;
+		ancestor;
+		ancestor = parentNodes.get( ancestor )
+	) {
+		useAncestors.add( ancestor );
+	}
+
+	const branches = [];
+	for ( let child = node; parentNodes.has( child );  ) {
+		const parent = parentNodes.get( child );
+		if ( useAncestors.has( parent ) ) {
+			break;
+		}
+		let branch = null;
+		if ( parent.type === 'IfStatement' ) {
+			branch = child === parent.consequent ? 'then' : 'else';
+		} else if ( parent.type === 'ConditionalExpression' ) {
+			branch = child === parent.consequent ? 'then' : 'else';
+		} else if (
+			parent.type === 'LogicalExpression' &&
+			child === parent.right
+		) {
+			branch = 'right';
+		} else if ( parent.type === 'SwitchCase' ) {
+			branch = parent.range.join( ':' );
+		} else if (
+			[
+				'DoWhileStatement',
+				'ForInStatement',
+				'ForOfStatement',
+				'ForStatement',
+				'WhileStatement',
+			].includes( parent.type ) &&
+			child === parent.body
+		) {
+			branch = 'body';
+		}
+		if ( branch ) {
+			branches.push( `${ parent.range.join( ':' ) }:${ branch }` );
+		}
+		child = parent;
+	}
+	return branches.reverse().join( '/' );
+}
+
+function getReachableWrites( variable, useNode, parentNodes ) {
+	const usePosition = useNode.range[ 0 ];
+	const writes = variable.references
+		.filter(
+			( reference ) =>
+				reference.isWrite() &&
+				reference.writeExpr &&
+				reference.identifier.range[ 0 ] < usePosition
+		)
+		.map( ( reference ) => ( {
+			expression: reference.writeExpr,
+			node: reference.identifier,
+			position: reference.identifier.range[ 0 ],
+			branchPath: getBranchPath(
+				reference.identifier,
+				useNode,
+				parentNodes
+			),
+		} ) )
+		.sort( ( first, second ) => first.position - second.position );
+	const lastUnconditionalWrite = writes
+		.filter( ( write ) => ! write.branchPath )
+		.at( -1 );
+	const conditionalWrites = new Map();
+	for ( const write of writes ) {
+		if (
+			write.branchPath &&
+			write.position > ( lastUnconditionalWrite?.position ?? -1 )
+		) {
+			conditionalWrites.set( write.branchPath, write );
+		}
+	}
+	const conditionalPaths = new Set( conditionalWrites.keys() );
+	const hasExhaustiveReplacement = [ ...conditionalPaths ].some(
+		( branchPath ) =>
+			branchPath.endsWith( ':then' ) &&
+			conditionalPaths.has(
+				`${ branchPath.slice( 0, -':then'.length ) }:else`
+			)
+	);
+	const reachableWrites =
+		lastUnconditionalWrite && ! hasExhaustiveReplacement
+			? [ lastUnconditionalWrite ]
+			: [];
+	return reachableWrites.concat( [ ...conditionalWrites.values() ] );
+}
+
+function getReachableLocalValues(
 	node,
+	useNode,
 	identifierVariables,
-	localFunctionVariables = new Map(),
+	parentNodes,
 	seenVariables = new Set()
 ) {
-	const localFunctions = new Set();
+	const localValues = new Set();
 	if (
 		[
 			'ArrowFunctionExpression',
 			'FunctionDeclaration',
 			'FunctionExpression',
+			'ObjectExpression',
 		].includes( node?.type )
 	) {
-		localFunctions.add( node );
-		return localFunctions;
+		localValues.add( node );
+		return localValues;
 	}
 	if (
 		[ 'ConditionalExpression', 'LogicalExpression' ].includes( node?.type )
@@ -959,16 +1075,17 @@ function getLocalFunctions(
 				? [ node.consequent, node.alternate ]
 				: [ node.left, node.right ];
 		for ( const branch of branches ) {
-			for ( const localFunction of getLocalFunctions(
+			for ( const value of getReachableLocalValues(
 				branch,
+				useNode,
 				identifierVariables,
-				localFunctionVariables,
+				parentNodes,
 				seenVariables
 			) ) {
-				localFunctions.add( localFunction );
+				localValues.add( value );
 			}
 		}
-		return localFunctions;
+		return localValues;
 	}
 	if (
 		[
@@ -979,58 +1096,119 @@ function getLocalFunctions(
 			'TSTypeAssertion',
 		].includes( node?.type )
 	) {
-		return getLocalFunctions(
+		return getReachableLocalValues(
 			node.type === 'AssignmentExpression' ? node.right : node.expression,
+			useNode,
 			identifierVariables,
-			localFunctionVariables,
+			parentNodes,
 			seenVariables
 		);
 	}
 	if ( node?.type === 'SequenceExpression' ) {
-		return getLocalFunctions(
+		return getReachableLocalValues(
 			node.expressions.at( -1 ),
+			useNode,
 			identifierVariables,
-			localFunctionVariables,
+			parentNodes,
 			seenVariables
 		);
 	}
+	if (
+		node?.type === 'CallExpression' &&
+		node.callee?.type === 'MemberExpression' &&
+		getMemberPropertyName( node.callee ) === 'bind'
+	) {
+		return getReachableLocalValues(
+			node.callee.object,
+			useNode,
+			identifierVariables,
+			parentNodes,
+			seenVariables
+		);
+	}
+	if ( node?.type === 'MemberExpression' ) {
+		const propertyName = getMemberPropertyName( node );
+		for ( const object of getReachableLocalValues(
+			node.object,
+			useNode,
+			identifierVariables,
+			parentNodes,
+			seenVariables
+		) ) {
+			if ( object.type !== 'ObjectExpression' ) {
+				continue;
+			}
+			for ( const property of object.properties ) {
+				if (
+					property.type === 'Property' &&
+					( property.key?.name ?? property.key?.value ) ===
+						propertyName
+				) {
+					for ( const value of getReachableLocalValues(
+						property.value,
+						useNode,
+						identifierVariables,
+						parentNodes,
+						seenVariables
+					) ) {
+						localValues.add( value );
+					}
+				}
+			}
+		}
+		return localValues;
+	}
 	if ( node?.type !== 'Identifier' ) {
-		return localFunctions;
+		return localValues;
 	}
 
 	const variable = identifierVariables.get( node );
 	if ( ! variable || seenVariables.has( variable ) ) {
-		return localFunctions;
+		return localValues;
 	}
 	const nextSeenVariables = new Set( seenVariables ).add( variable );
-	for ( const localFunction of localFunctionVariables.get( variable ) ??
-		[] ) {
-		localFunctions.add( localFunction );
-	}
-	for ( const definition of variable.defs ?? [] ) {
-		const candidate =
-			definition.node.type === 'VariableDeclarator'
-				? definition.node.init
-				: definition.node;
-		for ( const localFunction of getLocalFunctions(
-			candidate,
+	for ( const write of getReachableWrites(
+		variable,
+		useNode,
+		parentNodes
+	) ) {
+		for ( const value of getReachableLocalValues(
+			write.expression,
+			write.node,
 			identifierVariables,
-			localFunctionVariables,
+			parentNodes,
 			nextSeenVariables
 		) ) {
-			localFunctions.add( localFunction );
+			localValues.add( value );
 		}
 	}
-
-	return localFunctions;
+	if ( ! localValues.size ) {
+		for ( const definition of variable.defs ?? [] ) {
+			if ( definition.node.type === 'FunctionDeclaration' ) {
+				localValues.add( definition.node );
+			}
+		}
+	}
+	return localValues;
 }
 
-function countLocalFunctions( localFunctionVariables ) {
-	let count = 0;
-	for ( const localFunctions of localFunctionVariables.values() ) {
-		count += localFunctions.size;
-	}
-	return count;
+function getReachableLocalFunctions( node, identifierVariables, parentNodes ) {
+	return new Set(
+		[
+			...getReachableLocalValues(
+				node,
+				node,
+				identifierVariables,
+				parentNodes
+			),
+		].filter( ( value ) =>
+			[
+				'ArrowFunctionExpression',
+				'FunctionDeclaration',
+				'FunctionExpression',
+			].includes( value.type )
+		)
+	);
 }
 
 function isRecord( value ) {
@@ -1143,6 +1321,7 @@ export function validateVitestPolicy( {
 	}
 
 	const { ast, scopeManager, visitorKeys } = parsedSource;
+	const parentNodes = createParentNodeMap( ast, visitorKeys );
 	const unboundIdentifiers = new Set(
 		scopeManager.globalScope?.through.map(
 			( reference ) => reference.identifier
@@ -1361,7 +1540,6 @@ export function validateVitestPolicy( {
 	}
 
 	let previousTrackedVariableCount = -1;
-	const localFunctionVariables = new Map();
 	while (
 		previousTrackedVariableCount !==
 		importedNamespaces.size +
@@ -1377,7 +1555,6 @@ export function validateVitestPolicy( {
 			testingLibraryQueryContainerFunctionVariables.size +
 			testingLibraryScreenVariables.size +
 			vitestExpectVariables.size +
-			countLocalFunctions( localFunctionVariables ) +
 			vitestNamespaceVariables.size +
 			vitestViVariables.size +
 			windowVariables.size
@@ -1396,7 +1573,6 @@ export function validateVitestPolicy( {
 			testingLibraryQueryContainerFunctionVariables.size +
 			testingLibraryScreenVariables.size +
 			vitestExpectVariables.size +
-			countLocalFunctions( localFunctionVariables ) +
 			vitestNamespaceVariables.size +
 			vitestViVariables.size +
 			windowVariables.size;
@@ -1413,10 +1589,10 @@ export function validateVitestPolicy( {
 			}
 			const callbacks =
 				node.type === 'CallExpression'
-					? getLocalFunctions(
+					? getReachableLocalFunctions(
 							node.arguments[ 0 ],
 							identifierVariables,
-							localFunctionVariables
+							parentNodes
 					  )
 					: new Set();
 			if (
@@ -1474,23 +1650,6 @@ export function validateVitestPolicy( {
 
 			if ( target.type === 'Identifier' ) {
 				const targetVariable = identifierVariables.get( target );
-				const localFunctions = getLocalFunctions(
-					value,
-					identifierVariables,
-					localFunctionVariables
-				);
-				if ( targetVariable && localFunctions.size ) {
-					const targetFunctions =
-						localFunctionVariables.get( targetVariable ) ??
-						new Set();
-					for ( const localFunction of localFunctions ) {
-						targetFunctions.add( localFunction );
-					}
-					localFunctionVariables.set(
-						targetVariable,
-						targetFunctions
-					);
-				}
 				for ( const variables of [
 					testingLibraryQueryContainerFunctionVariables,
 					testingLibraryNamespaceVariables,

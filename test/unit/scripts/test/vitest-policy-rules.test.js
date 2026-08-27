@@ -185,6 +185,8 @@ describe( 'Vitest policy rules', () => {
 			"import { screen } from '@testing-library/react';\nlet width;\nwidth = ( button ) => button.offsetWidth;\nscreen.getAllByRole( 'button' ).map( width );",
 			"import { screen } from '@testing-library/react';\nlet callback;\nif ( condition ) { callback = ( button ) => button.offsetWidth; } else { callback = ( item ) => item.value; }\nscreen.getAllByRole( 'button' ).map( callback );",
 			"import { screen } from '@testing-library/react';\nscreen.getAllByRole( 'button' ).map( condition ? ( button ) => button.offsetWidth : ( item ) => item.value );",
+			"import { screen } from '@testing-library/react';\nconst callbacks = { width: ( button ) => button.offsetWidth };\nscreen.getAllByRole( 'button' ).map( callbacks.width );",
+			"import { screen } from '@testing-library/react';\nconst width = ( button ) => button.offsetWidth;\nscreen.getAllByRole( 'button' ).map( width.bind( null ) );",
 			"import { screen } from '@testing-library/react';\nscreen.getAllByRole( 'button' ).map( ( { firstElementChild: { offsetWidth } } ) => offsetWidth );",
 		] ) {
 			expectViolation( source, 'require Browser Mode', {
@@ -204,6 +206,18 @@ describe( 'Vitest policy rules', () => {
 		);
 		expectValid(
 			"import { screen } from '@testing-library/react';\nscreen.getAllByRole( 'button' ).map( ( { firstElementChild: { dataset } } ) => dataset.scrollTop );",
+			{ project: 'jsdom' }
+		);
+		expectValid(
+			"import { screen } from '@testing-library/react';\nlet callback = ( button ) => button.offsetWidth;\ncallback = ( item ) => item.value;\nscreen.getAllByRole( 'button' ).map( callback );",
+			{ project: 'jsdom' }
+		);
+		expectValid(
+			"import { screen } from '@testing-library/react';\nlet callback = ( item ) => item.value;\nscreen.getAllByRole( 'button' ).map( callback );\ncallback = ( button ) => button.offsetWidth;",
+			{ project: 'jsdom' }
+		);
+		expectValid(
+			"import { screen } from '@testing-library/react';\nlet callback = ( button ) => button.offsetWidth;\nif ( condition ) { callback = ( item ) => item.value; } else { callback = ( item ) => item.dataset; }\nscreen.getAllByRole( 'button' ).map( callback );",
 			{ project: 'jsdom' }
 		);
 	} );
