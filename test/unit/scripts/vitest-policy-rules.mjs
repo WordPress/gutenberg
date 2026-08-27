@@ -97,7 +97,9 @@ const domCollectionCallbackElementParameterIndexes = new Map( [
 	[ 'every', 0 ],
 	[ 'filter', 0 ],
 	[ 'find', 0 ],
+	[ 'findIndex', 0 ],
 	[ 'findLast', 0 ],
+	[ 'findLastIndex', 0 ],
 	[ 'flatMap', 0 ],
 	[ 'forEach', 0 ],
 	[ 'map', 0 ],
@@ -246,19 +248,6 @@ function getObjectPatternPropertyIdentifiers( node, propertyName ) {
 			return getPatternIdentifiers( property.value );
 		}
 		return [];
-	} );
-}
-
-function getDomPatternIdentifiers( node ) {
-	if ( node?.type !== 'ObjectPattern' ) {
-		return node?.type === 'Identifier' ? [ node ] : [];
-	}
-
-	return node.properties.flatMap( ( property ) => {
-		const propertyName = property.key?.name ?? property.key?.value;
-		return domProducingProperties.has( propertyName )
-			? getPatternIdentifiers( property.value )
-			: [];
 	} );
 }
 
@@ -945,6 +934,38 @@ function getTrackedAssignment( node ) {
 	return { target: null, value: null, isCollectionElement: false };
 }
 
+function getLocalFunction( node, identifierVariables ) {
+	if (
+		[ 'ArrowFunctionExpression', 'FunctionExpression' ].includes(
+			node?.type
+		)
+	) {
+		return node;
+	}
+	if ( node?.type !== 'Identifier' ) {
+		return null;
+	}
+
+	const variable = identifierVariables.get( node );
+	for ( const definition of variable?.defs ?? [] ) {
+		const candidate =
+			definition.node.type === 'VariableDeclarator'
+				? definition.node.init
+				: definition.node;
+		if (
+			[
+				'ArrowFunctionExpression',
+				'FunctionDeclaration',
+				'FunctionExpression',
+			].includes( candidate?.type )
+		) {
+			return candidate;
+		}
+	}
+
+	return null;
+}
+
 function isRecord( value ) {
 	return (
 		value !== null && typeof value === 'object' && ! Array.isArray( value )
@@ -1130,22 +1151,28 @@ export function validateVitestPolicy( {
 		if ( ! target ) {
 			return;
 		}
-		if ( target.type === 'ObjectPattern' ) {
-			for ( const property of target.properties ) {
-				if (
-					property.type === 'Property' &&
-					browserApiProperties.has(
-						property.key?.name ?? property.key?.value
-					)
-				) {
-					reportJsdomBrowserApi( property );
-				}
-			}
-		}
-		for ( const identifier of getDomPatternIdentifiers( target ) ) {
-			const variable = identifierVariables.get( identifier );
+		if ( target.type === 'Identifier' ) {
+			const variable = identifierVariables.get( target );
 			if ( variable ) {
 				domVariables.add( variable );
+			}
+			return;
+		}
+		if ( target.type === 'AssignmentPattern' ) {
+			trackDomValuePattern( target.left );
+			return;
+		}
+		if ( target.type === 'ObjectPattern' ) {
+			for ( const property of target.properties ) {
+				if ( property.type !== 'Property' ) {
+					continue;
+				}
+				const propertyName = property.key?.name ?? property.key?.value;
+				if ( browserApiProperties.has( propertyName ) ) {
+					reportJsdomBrowserApi( property );
+				} else if ( domProducingProperties.has( propertyName ) ) {
+					trackDomValuePattern( property.value );
+				}
 			}
 		}
 	};
@@ -1314,6 +1341,13 @@ export function validateVitestPolicy( {
 			) {
 				testingLibraryScreenVariables.add( node );
 			}
+			const callback =
+				node.type === 'CallExpression'
+					? getLocalFunction(
+							node.arguments[ 0 ],
+							identifierVariables
+					  )
+					: null;
 			if (
 				node.type === 'CallExpression' &&
 				node.callee?.type === 'MemberExpression' &&
@@ -1333,16 +1367,14 @@ export function validateVitestPolicy( {
 						testingLibraryNamespaceVariables,
 						identifierVariables
 					) ) &&
-				[ 'ArrowFunctionExpression', 'FunctionExpression' ].includes(
-					node.arguments[ 0 ]?.type
-				)
+				callback
 			) {
 				const elementParameterIndex =
 					domCollectionCallbackElementParameterIndexes.get(
 						getMemberPropertyName( node.callee )
 					);
 				trackDomValuePattern(
-					node.arguments[ 0 ].params[ elementParameterIndex ]
+					callback.params[ elementParameterIndex ]
 				);
 			}
 

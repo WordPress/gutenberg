@@ -178,6 +178,10 @@ describe( 'Vitest policy rules', () => {
 			"import { screen } from '@testing-library/react';\nscreen.getAllByRole( 'button' ).reduce( ( total, button ) => total + button.offsetWidth, 0 );",
 			"import { screen } from '@testing-library/react';\nscreen.getAllByRole( 'button' ).reduceRight( ( total, button ) => total + button.offsetWidth, 0 );",
 			"import { screen } from '@testing-library/react';\nscreen.getAllByRole( 'button' ).map( ( { offsetWidth } ) => offsetWidth );",
+			"import { screen } from '@testing-library/react';\nscreen.getAllByRole( 'button' ).findIndex( ( button ) => button.offsetWidth );",
+			"import { screen } from '@testing-library/react';\nscreen.getAllByRole( 'button' ).findLastIndex( ( button ) => button.offsetWidth );",
+			"import { screen } from '@testing-library/react';\nconst width = ( button ) => button.offsetWidth;\nscreen.getAllByRole( 'button' ).map( width );",
+			"import { screen } from '@testing-library/react';\nscreen.getAllByRole( 'button' ).map( ( { firstElementChild: { offsetWidth } } ) => offsetWidth );",
 		] ) {
 			expectViolation( source, 'require Browser Mode', {
 				project: 'jsdom',
@@ -192,6 +196,10 @@ describe( 'Vitest policy rules', () => {
 		);
 		expectValid(
 			"import { screen } from '@testing-library/react';\nscreen.getAllByRole( 'button' ).map( ( { dataset } ) => dataset.scrollTop );",
+			{ project: 'jsdom' }
+		);
+		expectValid(
+			"import { screen } from '@testing-library/react';\nscreen.getAllByRole( 'button' ).map( ( { firstElementChild: { dataset } } ) => dataset.scrollTop );",
 			{ project: 'jsdom' }
 		);
 	} );
