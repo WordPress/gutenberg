@@ -67,7 +67,7 @@ class Tests_Blocks_Render_Calendar extends WP_UnitTestCase {
 	 * @param string $calendar_output Calendar HTML.
 	 * @return string
 	 */
-	public function filter_get_calendar( $calendar_output ) {
+	public function filter_get_calendar( $calendar_output ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		return $this->calendar_markup;
 	}
 
@@ -135,7 +135,7 @@ class Tests_Blocks_Render_Calendar extends WP_UnitTestCase {
 
 		$processor = new WP_HTML_Tag_Processor( $html );
 		$processor->next_tag( 'TABLE' );
-		$style     = (string) $processor->get_attribute( 'style' );
+		$style = (string) $processor->get_attribute( 'style' );
 
 		$this->assertStringContainsString( 'display:table', $style );
 		$this->assertStringContainsString( 'color:#111111', $style );
