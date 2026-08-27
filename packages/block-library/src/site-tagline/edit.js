@@ -1,5 +1,8 @@
-import { useDispatch, useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+import {
+	store as coreStore,
+	useCoalescedEntityEdit,
+} from '@wordpress/core-data';
 import {
 	useBlockProps,
 	BlockControls,
@@ -34,12 +37,10 @@ export default function SiteTaglineEdit( props ) {
 	}, [] );
 
 	const TagName = level === 0 ? 'p' : `h${ level }`;
-	const { editEntityRecord } = useDispatch( coreStore );
+	const editSite = useCoalescedEntityEdit( 'root', 'site' );
 
 	function setTagline( newTagline ) {
-		editEntityRecord( 'root', 'site', undefined, {
-			description: newTagline,
-		} );
+		editSite( { description: newTagline } );
 	}
 
 	const blockProps = useBlockProps( {

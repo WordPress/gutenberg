@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Site Title, Site Tagline: Undo a run of typing in a single step, rather than reverting the text one character at a time ([#37171](https://github.com/WordPress/gutenberg/issues/37171)).
+
 ## 10.5.0 (2026-08-26)
 
 ### Enhancements
