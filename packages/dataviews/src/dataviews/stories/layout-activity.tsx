@@ -524,7 +524,6 @@ export const orderEventActions: Action< OrderEvent >[] = [
 	{
 		id: 'delete-note',
 		label: 'Delete',
-		isPrimary: false,
 		icon: trash,
 		isEligible: ( item ) => item.type === 'note',
 		modalHeader: ( items ) =>

@@ -620,7 +620,6 @@ export const actions: Action< SpaceObject >[] = [
 	{
 		id: 'delete',
 		label: 'Delete',
-		isPrimary: true,
 		icon: trash,
 		modalHeader: ( items ) =>
 			items.length > 1
@@ -657,11 +656,15 @@ export const actions: Action< SpaceObject >[] = [
 		},
 	},
 	{
-		id: 'secondary',
-		label: 'Secondary',
-		callback() {
-			// eslint-disable-next-line no-console
-			console.log( 'Perform secondary action.' );
+		id: 'view',
+		label: 'View',
+		isPrimary: true,
+		callback: ( items ) => {
+			const item = items[ 0 ];
+			// eslint-disable-next-line no-alert
+			alert(
+				`View item: "${ item.name.title }"\n\n${ item.name.description }`
+			);
 		},
 	},
 ];
