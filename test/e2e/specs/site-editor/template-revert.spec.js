@@ -107,9 +107,12 @@ test.describe( 'Template Revert', () => {
 		await templateRevertUtils.revertTemplate();
 		await admin.visitSiteEditor();
 
-		const contentAfter =
-			await templateRevertUtils.getCurrentSiteEditorContent();
-		expect( contentAfter ).toEqual( contentBefore );
+		// Poll: right after a load, the content selector can still return the
+		// raw stored string until it is derived from the parsed blocks, which
+		// serialize registered attributes differently.
+		await expect
+			.poll( () => templateRevertUtils.getCurrentSiteEditorContent() )
+			.toEqual( contentBefore );
 	} );
 
 	test( 'should show the edited content after revert and clicking undo in the header toolbar', async ( {
@@ -209,9 +212,12 @@ test.describe( 'Template Revert', () => {
 		} );
 		await admin.visitSiteEditor();
 
-		const contentAfter =
-			await templateRevertUtils.getCurrentSiteEditorContent();
-		expect( contentAfter ).toEqual( contentBefore );
+		// Poll: right after a load, the content selector can still return the
+		// raw stored string until it is derived from the parsed blocks, which
+		// serialize registered attributes differently.
+		await expect
+			.poll( () => templateRevertUtils.getCurrentSiteEditorContent() )
+			.toEqual( contentBefore );
 	} );
 } );
 
