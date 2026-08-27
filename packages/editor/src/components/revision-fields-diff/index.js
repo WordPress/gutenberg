@@ -5,7 +5,7 @@
  */
 import { diffWordsWithSpace } from 'diff';
 import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import RevisionDiffPanel from '../revision-diff-panel';
 import { store as editorStore } from '../../store';
@@ -38,58 +38,106 @@ function isEmptyMeta( str ) {
 }
 
 /**
- * Panel that shows meta field diffs between the current revision and
- * the previous revision in the document sidebar during revision mode.
+ * Builds the field diffs shown in the sidebar.
+ *
+ * Title and excerpt only appear when they changed. Meta fields keep their
+ * existing behavior and appear when either revision has a non-empty value.
+ *
+ * @param {Object}      revision         The current revision record.
+ * @param {Object|null} previousRevision The previous revision record.
+ * @return {Object} Field diff entries and whether the title or excerpt changed.
+ */
+export function getFieldsDiffEntries( revision, previousRevision ) {
+	if ( ! revision ) {
+		return { entries: null, hasChangedPostFields: false };
+	}
+
+	const entries = {};
+	let hasChangedPostFields = false;
+
+	for ( const [ label, field ] of [
+		[ __( 'Title' ), 'title' ],
+		[ __( 'Excerpt' ), 'excerpt' ],
+	] ) {
+		const revStr = revision[ field ]?.raw ?? '';
+		const prevStr = previousRevision?.[ field ]?.raw ?? '';
+
+		if ( revStr !== prevStr ) {
+			entries[ label ] = diffWordsWithSpace( prevStr, revStr );
+			hasChangedPostFields = true;
+		}
+	}
+
+	const revisionMeta = revision.meta ?? {};
+	const previousMeta = previousRevision?.meta ?? {};
+	const allMetaKeys = new Set( [
+		...Object.keys( revisionMeta ),
+		...Object.keys( previousMeta ),
+	] );
+
+	for ( const key of allMetaKeys ) {
+		const revStr = stringifyValue( revisionMeta[ key ] );
+		const prevStr = stringifyValue( previousMeta[ key ] );
+
+		if ( isEmptyMeta( revStr ) && isEmptyMeta( prevStr ) ) {
+			continue;
+		}
+
+		entries[ key ] = diffWordsWithSpace( prevStr, revStr );
+	}
+
+	if ( Object.keys( entries ).length === 0 ) {
+		return { entries: null, hasChangedPostFields: false };
+	}
+
+	return { entries, hasChangedPostFields };
+}
+
+/**
+ * Shows title, excerpt, and meta field changes in the revisions sidebar.
  */
 export default function RevisionFieldsDiffPanel() {
-	const { revision, previousRevision } = useSelect( ( select ) => {
-		const { getCurrentRevision, getPreviousRevision } = unlock(
-			select( editorStore )
-		);
+	const { revision, previousRevision, revisionId } = useSelect(
+		( select ) => {
+			const {
+				getCurrentRevision,
+				getPreviousRevision,
+				getCurrentRevisionId,
+			} = unlock( select( editorStore ) );
 
-		return {
-			revision: getCurrentRevision(),
-			previousRevision: getPreviousRevision(),
-		};
-	}, [] );
+			return {
+				revision: getCurrentRevision(),
+				previousRevision: getPreviousRevision(),
+				revisionId: getCurrentRevisionId(),
+			};
+		},
+		[]
+	);
 
-	const entries = useMemo( () => {
-		if ( ! revision ) {
-			return null;
+	const { entries, hasChangedPostFields } = useMemo(
+		() => getFieldsDiffEntries( revision, previousRevision ),
+		[ revision, previousRevision ]
+	);
+
+	const [ isOpen, setIsOpen ] = useState( hasChangedPostFields );
+
+	/*
+	 * `PanelBody` only reads `initialOpen` when it mounts, but this panel stays
+	 * mounted while the selected revision changes. Open it for title or excerpt
+	 * changes. Once open, leave it open until the user closes it.
+	 */
+	useEffect( () => {
+		if ( hasChangedPostFields ) {
+			setIsOpen( true );
 		}
-
-		const revisionMeta = revision.meta ?? {};
-		const previousMeta = previousRevision?.meta ?? {};
-		const allMetaKeys = new Set( [
-			...Object.keys( revisionMeta ),
-			...Object.keys( previousMeta ),
-		] );
-
-		const result = {};
-
-		for ( const key of allMetaKeys ) {
-			const revStr = stringifyValue( revisionMeta[ key ] );
-			const prevStr = stringifyValue( previousMeta[ key ] );
-
-			if ( isEmptyMeta( revStr ) && isEmptyMeta( prevStr ) ) {
-				continue;
-			}
-
-			result[ key ] = diffWordsWithSpace( prevStr, revStr );
-		}
-
-		if ( Object.keys( result ).length === 0 ) {
-			return null;
-		}
-
-		return result;
-	}, [ revision, previousRevision ] );
+	}, [ revisionId, hasChangedPostFields ] );
 
 	return (
 		<RevisionDiffPanel
-			title={ __( 'Meta' ) }
+			title={ __( 'Fields' ) }
 			entries={ entries }
-			initialOpen={ false }
+			opened={ isOpen }
+			onToggle={ setIsOpen }
 			className="editor-revision-meta-diff__content"
 		/>
 	);

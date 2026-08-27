@@ -49,6 +49,7 @@
 
 ### Enhancements
 
+-   Revisions: Rename the Meta panel to Fields and show title and excerpt changes alongside post meta ([#81281](https://github.com/WordPress/gutenberg/pull/81281)).
 -   Add a read-only code diff to the revisions screen ([#80314](https://github.com/WordPress/gutenberg/pull/80314)).
 
 ### New Features

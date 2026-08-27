@@ -4,16 +4,20 @@ import PostPanelRow from '../post-panel-row';
 /**
  * Renders a panel of word-level diffs.
  *
- * @param {Object}  props
- * @param {string}  props.title       Panel title.
- * @param {Object}  props.entries     Map of key → diffWords parts arrays.
- * @param {boolean} props.initialOpen Whether the panel starts open.
- * @param {string}  [props.className] Optional class for the content wrapper.
+ * @param {Object}   props
+ * @param {string}   props.title       Panel title.
+ * @param {Object}   props.entries     Map of key → diffWords parts arrays.
+ * @param {boolean}  props.initialOpen Whether the panel starts open.
+ * @param {boolean}  [props.opened]    Current open state in controlled mode.
+ * @param {Function} [props.onToggle]  Receives the next open state.
+ * @param {string}   [props.className] Optional class for the content wrapper.
  */
 export default function RevisionDiffPanel( {
 	title,
 	entries,
 	initialOpen,
+	opened,
+	onToggle,
 	className,
 } ) {
 	if ( ! entries ) {
@@ -51,7 +55,12 @@ export default function RevisionDiffPanel( {
 	) );
 
 	return (
-		<PanelBody title={ title } initialOpen={ initialOpen }>
+		<PanelBody
+			title={ title }
+			initialOpen={ initialOpen }
+			opened={ opened }
+			onToggle={ onToggle }
+		>
 			<div className={ className }>{ fields }</div>
 		</PanelBody>
 	);
