@@ -159,14 +159,21 @@ function Iframe( {
 		function preventFileDropDefault( event ) {
 			event.preventDefault();
 		}
-		// Prevent clicks on link fragments from navigating away. Note that links
-		// inside `contenteditable` are already disabled by the browser, so
-		// this is for links in blocks outside of `contenteditable`.
+		// Prevent clicks on links from navigating away and crashing the editor iframe.
+		// Note that links inside `contenteditable` are already disabled by the browser,
+		// so this is for links in blocks outside of `contenteditable`.
 		function interceptLinkClicks( event ) {
-			if (
-				event.target.tagName === 'A' &&
-				event.target.getAttribute( 'href' )?.startsWith( '#' )
-			) {
+			const anchor = event.target.closest( 'a' );
+			if ( ! anchor ) {
+				return;
+			}
+
+			const href = anchor.getAttribute( 'href' );
+			if ( ! href ) {
+				return;
+			}
+
+			if ( href.startsWith( '#' ) ) {
 				event.preventDefault();
 				// Manually handle link fragment navigation within the iframe. The iframe's
 				// location is a blob URL, which can't be used to resolve relative links like
@@ -177,9 +184,14 @@ function Iframe( {
 				//
 				// Links with fragments are used for example with footnotes. Clicking on these
 				// links will scroll smoothly to the anchors in the editor canvas.
-				iFrameDocument.defaultView.location.hash = event.target
-					.getAttribute( 'href' )
-					.slice( 1 );
+				iFrameDocument.defaultView.location.hash = href.slice( 1 );
+				return;
+			}
+
+			// If the link does not open in a new window/tab, prevent navigation to avoid crashing the editor.
+			const target = anchor.getAttribute( 'target' );
+			if ( ! target || target.toLowerCase() === '_self' ) {
+				event.preventDefault();
 			}
 		}
 
