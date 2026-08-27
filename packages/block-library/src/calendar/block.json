@@ -31,6 +31,7 @@
 			"margin": true,
 			"padding": true,
 			"blockGap": true,
+			"__experimentalSkipSerialization": [ "blockGap" ],
 			"__experimentalDefaultControls": {
 				"margin": false,
 				"padding": false,

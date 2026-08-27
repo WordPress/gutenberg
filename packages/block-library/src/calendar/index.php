@@ -43,9 +43,8 @@ function render_block_core_calendar( $attributes ) {
 		}
 	}
 
-	// Text stays on the table so cell content inherits it. Background serializes
-	// on the wrapper so padding is filled (see #64345). Skip-serializing text
-	// still matches #42029 for the text color path.
+	// Text is skip-serialized onto the table (#42029). Background is
+	// skip-serialized too, then applied on the wrapper so padding is filled.
 	$style_attributes = ( isset( $attributes['style'] ) && is_array( $attributes['style'] ) )
 		? $attributes['style']
 		: array();
@@ -58,6 +57,18 @@ function render_block_core_calendar( $attributes ) {
 	$preset_text_color          = array_key_exists( 'textColor', $attributes ) ? "var:preset|color|{$attributes['textColor']}" : null;
 	$custom_text_color          = $color_styles['text'] ?? null;
 	$color_block_styles['text'] = $preset_text_color ? $preset_text_color : $custom_text_color;
+
+	$preset_background_color = array_key_exists( 'backgroundColor', $attributes )
+		? "var:preset|color|{$attributes['backgroundColor']}"
+		: null;
+	$custom_background_color = $color_styles['background'] ?? null;
+	$background_block_styles = array(
+		'background' => $preset_background_color ? $preset_background_color : $custom_background_color,
+	);
+	$background_engine        = wp_style_engine_get_styles(
+		array( 'color' => $background_block_styles ),
+		array( 'convert_vars_to_classnames' => true )
+	);
 
 	$styles        = wp_style_engine_get_styles( array( 'color' => $color_block_styles ), array( 'convert_vars_to_classnames' => true ) );
 	$inline_styles = $styles['css'] ?? '';
@@ -124,7 +135,14 @@ function render_block_core_calendar( $attributes ) {
 
 	$calendar = $processor->get_updated_html();
 
-	$wrapper_attributes = get_block_wrapper_attributes();
+	$wrapper_extra = array();
+	if ( ! empty( $background_engine['classnames'] ) ) {
+		$wrapper_extra['class'] = $background_engine['classnames'];
+	}
+	if ( ! empty( $background_engine['css'] ) ) {
+		$wrapper_extra['style'] = $background_engine['css'];
+	}
+	$wrapper_attributes = get_block_wrapper_attributes( $wrapper_extra );
 	$output             = sprintf(
 		'<div %1$s>%2$s</div>',
 		$wrapper_attributes,
