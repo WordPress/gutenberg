@@ -4,6 +4,24 @@
 
 ### New Features
 
+-   `WidgetDashboard.Policy`: a provider that governs the dashboards below
+    it through `canPerform( request )`. Operations: `customize` (the
+    Customize button and the matching commands), `insert` (what the
+    inserter offers; a rejected type keeps rendering where already
+    placed), and per instance `remove`, `move`, `resize`, and `edit`
+    (the tile controls and gestures; a widget denied `edit` receives no
+    `setAttributes`). Nested policies compose restrictively. Exports the
+    `DashboardOperationRequest`, `DashboardInstanceOperation`,
+    `DashboardInstanceOperationRequest`, and `CanPerformDashboardOperation`
+    types ([#81967](https://github.com/WordPress/gutenberg/pull/81967)).
+-   The Add widget button and command show only while the policy lets some
+    registered type be inserted
+    ([#81967](https://github.com/WordPress/gutenberg/pull/81967)).
+
+## 0.6.0 (2026-08-26)
+
+### New Features
+
 -   Widget chrome footer: `relevance: 'high'` actions mount as leading text
     links (declared icon as prefix) in a persistent strip under the widget
     body, `'medium'` as trailing compact affordances (icon-only with a

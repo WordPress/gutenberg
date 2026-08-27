@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Pages: preserve the Core Boot layout compatibility class in generated wp-admin page templates so short pages fill the viewport when using Core's bundled Boot module ([#82112](https://github.com/WordPress/gutenberg/pull/82112)).
+
+## 0.22.0 (2026-08-26)
+
 ### Internal
 
 -   Identify generated wp-admin page mount elements by their page-specific ID instead of a Boot class ([#81756](https://github.com/WordPress/gutenberg/pull/81756)).

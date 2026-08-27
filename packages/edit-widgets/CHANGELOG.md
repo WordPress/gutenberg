@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Prevent an error in `canInsertBlockInWidgetArea` when no widget area blocks are present.
+
+## 6.54.0 (2026-08-26)
+
 ## 6.53.0 (2026-08-12)
 
 ### Enhancements
