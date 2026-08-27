@@ -76,7 +76,7 @@ function _gutenberg_add_reading_settings_to_wp_template_view_config( $data ) {
  */
 function _gutenberg_get_entity_view_config_posttype_wp_navigation( $data ) {
 	$default_layouts = array(
-		'list'  => array(),
+		'list' => array(),
 	);
 
 	$default_view = array(

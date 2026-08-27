@@ -321,7 +321,7 @@ class Tests_REST_View_Config_Controller extends WP_Test_REST_TestCase {
 			$data['default_view']['sort']
 		);
 		$this->assertSame( 'title', $data['default_view']['titleField'] );
-		$this->assertSame( array( 'table', 'grid', 'list' ), array_keys( $data['default_layouts'] ) );
+		$this->assertSame( array( 'list' ), array_keys( $data['default_layouts'] ) );
 		$this->assertCount( 1, $data['view_list'] );
 		$this->assertSame( 'all', $data['view_list'][0]['slug'] );
 	}
