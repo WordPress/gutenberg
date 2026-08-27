@@ -1598,7 +1598,7 @@ describe( 'actions', () => {
 					mediaType: 'b',
 				} )( {} );
 				expect( console ).toHaveErroredWith(
-					'Category should have `mediaType` property that is one of `image|audio|video`.'
+					'Category should have `mediaType` property that is one of `image|audio|video|application|text`.'
 				);
 			} );
 			it( 'has fetch function', () => {
