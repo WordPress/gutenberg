@@ -1,5 +1,7 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
+
 test.use( {
 	userGlobalStylesRevisions: async (
 		{ editor, page, requestUtils },
@@ -126,34 +128,46 @@ test.describe( 'Style Revisions', () => {
 		).toBeVisible();
 	} );
 
-	// v2 gap: the extensible site editor's Styles route offers no Revisions
-	// entry point outside the editor (its More menu has only Additional CSS
-	// and Reset styles).
-	test( 'should access from the site editor sidebar @site-editor-v1-only', async ( {
+	test( 'should access from the site editor sidebar', async ( {
 		admin,
 		editor,
 		page,
+		userGlobalStylesRevisions,
 	} ) => {
-		// This flow starts from the browse-mode sidebar, not the edit mode
-		// the shared `beforeEach` opens.
-		await admin.visitSiteEditor();
-
-		const navigationContainer = page.getByRole( 'region', {
-			name: 'Navigation',
+		// The Revisions entry is only offered once revisions exist, so create
+		// one first — the shared `beforeEach` already opened the editor this
+		// helper saves through.
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			color: { background: 'blue' },
 		} );
 
-		await navigationContainer
-			.getByRole( 'button', { name: 'Styles' } )
-			.click();
+		if ( isSiteEditorV2 ) {
+			await admin.visitSiteEditor();
+			await page.getByRole( 'link', { name: 'Styles' } ).click();
+			await page
+				.getByRole( 'region', { name: 'Styles' } )
+				.getByRole( 'button', { name: 'Revisions' } )
+				.click();
+		} else {
+			// This flow starts from the browse-mode sidebar, not the edit
+			// mode the shared `beforeEach` opens.
+			await admin.visitSiteEditor();
 
-		// wait for the editor canvas to be ready (to contain a block)
-		await expect(
-			editor.canvas.locator( '.wp-block' ).nth( 0 )
-		).toBeVisible();
+			const navigationContainer = page.getByRole( 'region', {
+				name: 'Navigation',
+			} );
 
-		await navigationContainer
-			.getByRole( 'button', { name: 'Revisions' } )
-			.click();
+			await navigationContainer
+				.getByRole( 'button', { name: 'Styles' } )
+				.click();
+
+			// wait for the editor canvas to be ready (to contain a block)
+			await editor.canvas.locator( '.wp-block' ).first().waitFor();
+
+			await navigationContainer
+				.getByRole( 'button', { name: 'Revisions' } )
+				.click();
+		}
 
 		await expect(
 			page.getByLabel( 'Global styles revisions list' )
