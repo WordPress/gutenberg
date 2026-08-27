@@ -76,13 +76,7 @@ test.describe( 'Patterns', () => {
 			.fill( 'My pattern' );
 		await page.keyboard.press( 'Enter' );
 
-		// The extensible editor's document title falls back to the post type
-		// label ("Edit Block Pattern") for an entity created in the same
-		// session; the in-editor heading below still verifies the right
-		// pattern loaded.
-		if ( ! isSiteEditorV2 ) {
-			await expect( page ).toHaveTitle( /^My pattern/ );
-		}
+		await expect( page ).toHaveTitle( /^My pattern/ );
 		await expect(
 			page
 				.getByRole( 'region', { name: 'Editor top bar' } )
