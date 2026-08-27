@@ -6,4 +6,8 @@ describe( '@wordpress/jest-preset-default', () => {
 			testEnvironment: 'jsdom',
 		} );
 	} );
+
+	it( 'disables wp-build style injection in jsdom', () => {
+		expect( process.env.WP_TESTS_SKIP_STYLE_INJECTION ).toBe( 'true' );
+	} );
 } );

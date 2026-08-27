@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Use `WP_TESTS_SKIP_STYLE_INJECTION=true` instead of `NODE_ENV=test` to
+    disable generated style injection in Node and jsdom tests. Browser Mode
+    keeps style injection enabled ([#82154](https://github.com/WordPress/gutenberg/pull/82154)).
+
 ## 0.21.0 (2026-08-12)
 
 ### Enhancements

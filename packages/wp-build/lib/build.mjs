@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import { readFile, writeFile, copyFile, mkdir, unlink } from 'fs/promises';
 import path from 'path';
-import { createHash } from 'node:crypto';
 import { createRequire as createNodeRequire } from 'node:module';
 import { parseArgs } from 'node:util';
 import esbuild from 'esbuild';
@@ -10,7 +9,6 @@ import chokidar from 'chokidar';
 import browserslistToEsbuild from 'browserslist-to-esbuild';
 import { sassPlugin } from 'esbuild-sass-plugin';
 import postcss from 'postcss';
-import postcssModules from 'postcss-modules';
 import autoprefixer from 'autoprefixer';
 import rtlcss from 'rtlcss';
 import cssnano from 'cssnano';
@@ -46,6 +44,7 @@ import {
 	buildWorkers,
 	generateWorkerCode,
 } from './worker-build.mjs';
+import { compileInlineStyle } from './compile-inline-style.mjs';
 
 // Optional dependency: @wordpress/theme provides plugins that inject fallback
 // values for design system tokens. Fails gracefully when the package is not
@@ -195,66 +194,6 @@ function getSassOptions( workingDir ) {
 	};
 }
 
-function compileInlineStyle( { cssModules = false, minify = true } = {} ) {
-	return async function styleType( cssText, _dirname, filePath ) {
-		let moduleExports = null;
-
-		// Transform the code: token fallbacks, CSS modules and minification.
-		const plugins = [
-			dsTokenFallbacks,
-			cssModules &&
-				postcssModules( {
-					generateScopedName: '[contenthash]__[local]',
-					getJSON: ( _, json ) => {
-						moduleExports = json;
-					},
-				} ),
-			minify &&
-				cssnano( {
-					preset: [
-						'default',
-						{ discardComments: { removeAll: true } },
-					],
-				} ),
-		].filter( Boolean );
-
-		const { css } = await postcss( plugins ).process( cssText, {
-			from: filePath,
-			map: false,
-		} );
-
-		// Hash the transformed CSS so that the dedup key reflects the actual
-		// injected content, including mangled CSS module class names.
-		const hash = createHash( 'sha1' )
-			.update( css )
-			.digest( 'hex' )
-			.slice( 0, 10 );
-
-		// Skip automatic style injection in Node-based test environments, where DOM
-		// implementations do not reliably support modern CSS features like @layer.
-		let cssModule = cssModules
-			? `import { registerStyle } from '@wordpress/style-runtime';
-if (typeof process === 'undefined' || process.env.NODE_ENV !== 'test') {
-	registerStyle("${ hash }", ${ JSON.stringify( css ) });
-}
-`
-			: `if (typeof document !== 'undefined' && process.env.NODE_ENV !== 'test' && !document.head.querySelector("style[data-wp-hash='${ hash }']")) {
-	const style = document.createElement("style");
-	style.setAttribute("data-wp-hash", "${ hash }");
-	style.appendChild(document.createTextNode(${ JSON.stringify( css ) }));
-	document.head.appendChild(style);
-}
-`;
-
-		// The CSS modules transform produces an `exports` object with class name mappings.
-		if ( moduleExports ) {
-			const exportsString = JSON.stringify( moduleExports );
-			cssModule += `export default ${ exportsString };\n`;
-		}
-		return cssModule;
-	};
-}
-
 function inlineStyle( contents ) {
 	// The `contents` is already a JS code created by `compileInlineStyle`.
 	return contents;
@@ -275,7 +214,10 @@ function createStyleBundlingPlugins( workingDir ) {
 			embedded: true,
 			sourceMap: false,
 			filter: /\.module\.(css|scss)$/,
-			transform: compileInlineStyle( { cssModules: true } ),
+			transform: compileInlineStyle( {
+				cssModules: true,
+				plugins: [ dsTokenFallbacks ].filter( Boolean ),
+			} ),
 			type: inlineStyle,
 			...sassOptions,
 		} ),
@@ -285,7 +227,9 @@ function createStyleBundlingPlugins( workingDir ) {
 			embedded: true,
 			sourceMap: false,
 			filter: /\.(css|scss)$/,
-			transform: compileInlineStyle(),
+			transform: compileInlineStyle( {
+				plugins: [ dsTokenFallbacks ].filter( Boolean ),
+			} ),
 			type: inlineStyle,
 			...sassOptions,
 		} ),
