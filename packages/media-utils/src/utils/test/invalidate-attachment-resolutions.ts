@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { invalidateAttachmentResolutions } from '../invalidate-attachment-resolutions';
 
 type Registry = Parameters< typeof invalidateAttachmentResolutions >[ 0 ];

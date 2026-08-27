@@ -142,11 +142,15 @@ Renders its children only when `layout` is empty. Pair it with `<WidgetDashboard
 
 #### `<WidgetDashboard.Actions />`
 
-Edit-mode toggle: a "Customize" button while `editMode` is off, and "Add widget", "Cancel", "Done" while it is on. The buttons and the more-actions menu are triggers: "Customize" and "Done" fire `onEditChange`, "Add widget" opens the inserter, and "Reset to default" opens the reset confirmation. Returns `null` when the dashboard is mounted without `onEditChange`, so surfaces that don't expose edit mode can keep `Actions` in their tree unconditionally.
+Edit-mode toggle: a "Customize" button while `editMode` is off, and "Add widget", "Cancel", "Done" while it is on. The buttons and the more-actions menu are triggers: "Customize" and "Done" fire `onEditChange`, "Add widget" opens the inserter, and "Reset to default" opens the reset confirmation. Returns `null` when the dashboard is mounted without `onEditChange`, so surfaces that don't expose edit mode can keep `Actions` in their tree unconditionally. The Customize button also needs the policy to allow `customize`; Done and Cancel stay available while already customizing.
 
 #### `<WidgetDashboard.Commands />`
 
-Command palette integration. It registers the dashboard's commands through `@wordpress/commands` (customize, add widgets, reset to default) and sets the active command context. It renders nothing, and surfaces wherever the host application mounts the command palette. Ships in the default arrangement; when passing custom children, compose it to keep the integration.
+Command palette integration. It registers the dashboard's commands through `@wordpress/commands` (customize, add widgets, reset to default) and sets the active command context. It renders nothing, and surfaces wherever the host application mounts the command palette. Ships in the default arrangement; when passing custom children, compose it to keep the integration. The customize command, and the add-widgets command outside edit mode, follow the policy's `customize` answer.
+
+#### `<WidgetDashboard.Policy>`
+
+Governs what users may do on the dashboards below it: whether Customize is offered, which widget types the inserter lists, and which instances can be removed, moved, resized, or edited. Unlike the other compound components, it mounts around `<WidgetDashboard>`. See [Governance](#governance).
 
 `<Page>` from `@wordpress/admin-ui` exposes an `actions` slot used across admin screens (DataViews, WidgetDashboard, …). Plug `Actions` straight into it:
 
@@ -174,9 +178,69 @@ import { Page } from '@wordpress/admin-ui';
 
 ## Inserting widgets
 
-The "Add widget" button in `<WidgetDashboard.Actions />` opens a modal inserter. It lists every entry in the `widgetTypes` prop as a grid of live previews (each preview renders the type's `example` attributes through its own render module), supports search, and exposes a "Select" action with bulk support so users can insert one or several widgets in a single layout change.
+The "Add widget" button in `<WidgetDashboard.Actions />` opens a modal inserter. It lists the `widgetTypes` prop as a grid of live previews (each preview renders the type's `example` attributes through its own render module), supports search, and exposes a "Select" action with bulk support so users can insert one or several widgets in a single layout change. A `<WidgetDashboard.Policy>` above the dashboard narrows the listing through the `insert` operation; without one, every entry is offered.
 
 On confirmation, the inserter creates instances (using each type's `example.attributes` as the initial values) and appends them to the staged layout. The dialog closes after a successful insertion or when the user dismisses it.
+
+## Governance
+
+The engine knows which operations a user can perform on it. It does not know who the user is or what the application allows. `<WidgetDashboard.Policy>` is the seam through which the application answers, with a single callback:
+
+```ts
+type CanPerformDashboardOperation = (
+	request: DashboardOperationRequest
+) => boolean;
+
+type DashboardOperationRequest =
+	| { operation: 'customize' }
+	| { operation: 'insert'; widgetType: WidgetType }
+	| {
+			operation: 'remove' | 'move' | 'resize' | 'edit';
+			widget: DashboardWidget;
+			widgetType?: WidgetType;
+	  };
+```
+
+Each request names the operation and carries its subject, so a branch on `request.operation` narrows the rest of the object. Instance requests carry the placed widget and its type, absent when the type is not registered:
+
+```tsx
+<WidgetDashboard.Policy
+	canPerform={ ( request ) => {
+		switch ( request.operation ) {
+			case 'customize':
+				return canEditLayout;
+			case 'insert':
+				return request.widgetType.category === activeSection;
+			case 'remove':
+				return ! request.widget.attributes?.pinned;
+			default:
+				return true;
+		}
+	} }
+>
+	<WidgetDashboard { ...props } />
+</WidgetDashboard.Policy>
+```
+
+| Operation   | Subject                 | What it gates                                                                                                                                                                                     |
+| ----------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `customize` | none                    | The Customize button, the `core/dashboard/customize` command, the `core/dashboard/add-widgets` command outside edit mode, and the automatic entry into customize mode on an empty layout.         |
+| `insert`    | `widgetType`            | Whether the inserter offers the type; a rejected type keeps rendering where already placed. The Add widget button and command show only while some registered type is insertable.                 |
+| `remove`    | `widget`, `widgetType?` | The Remove control in customize mode. The staging layer re-asserts, in place, a locked instance dropped by any trigger.                                                                           |
+| `move`      | `widget`, `widgetType?` | Dragging the tile in customize mode. A denied tile is pinned: it holds its index while the other tiles reorder around it; a change ahead of it can still reflow the cell it lands in.             |
+| `resize`    | `widget`, `widgetType?` | The resize handle and the width menu.                                                                                                                                                             |
+| `edit`      | `widget`, `widgetType?` | Attribute editing: the inline fields and the settings trigger in the header, the settings surface, and the widget's `setAttributes`, which is absent when denied so the widget renders read-only. |
+
+The engine resolves the policy once, in its provider, and every surface asks that resolved answer, so further sources join at the same point without touching the surfaces.
+
+Rules of the contract:
+
+-   **Return `true` for operations you do not govern.** Policies compose restrictively, so a default `false` would deny every operation added later.
+-   **Mount it around `<WidgetDashboard>`, not inside.** The engine mounts the inserter outside the `children` subtree, so a policy placed inside `children` has no effect. One provider can cover several dashboards.
+-   **Nested policies only narrow.** An operation is allowed when every enclosing policy allows it; an inner policy cannot re-grant what an outer one denied. Without a policy, every operation is allowed.
+-   **The callback is called during render.** Keep it synchronous, and memoize it when it derives from state; a new function re-evaluates the dashboard, even with the inserter open.
+
+The policy governs the interface: it decides what the dashboard offers, not what the server accepts. A host that must enforce permissions does so where the layout persists. And it never reaches widget bodies: a widget asks the server about its own entities, and reads the application's decisions only as the presence or absence of what the host lends it.
 
 ## Grid settings
 
@@ -199,6 +263,20 @@ The exported kit for handling them:
 />
 ```
 
+## Tile spacing
+
+The tile chrome is a `Card` at the Card's default density. Hosts can tighten or relax it by setting two custom properties at `:root`:
+
+```css
+:root {
+	--wp-widget-dashboard-tile-padding: var( --wpds-dimension-padding-lg );
+}
+```
+
+`--wp-widget-dashboard-tile-padding` controls the padding of the tile surface. `--wp-widget-dashboard-tile-header-gap` controls the space between the tile header and the body; it follows the tile padding unless set apart. Use `--wpds-*` spacing tokens as values. The floating header of full-bleed tiles and the picker previews follow the same properties.
+
+`:root` rather than a dashboard wrapper matters for the picker: it mounts in a dialog under `document.body`, which a wrapper's custom properties never reach.
+
 ## How this host translates the contract
 
 This engine is one host implementation of `@wordpress/widget-primitives`. It maps contract fields to host-owned UI as follows.
@@ -209,7 +287,7 @@ When a widget type declares `help`, the tile chrome surfaces its `content` and o
 
 ### Attribute editing
 
-A widget declares importance per attribute through `relevance` (`'high' | 'low'`, absent means `'low'`). The declaration states importance, not placement; this host maps it to two surfaces:
+A widget declares importance per attribute through `relevance` (`'high' | 'medium' | 'low'`, absent means `'low'`). The declaration states importance, not placement; this host maps it to two surfaces:
 
 -   **Prominent surface**: `relevance: 'high'` fields render as bare inline controls in the tile header, for in-context edits.
 -   **Settings surface**: the full schema, opened from the settings trigger. The trigger shows only when some attribute is not promoted; otherwise it would repeat the prominent surface.
@@ -217,6 +295,16 @@ A widget declares importance per attribute through `relevance` (`'high' | 'low'`
 The prominent surface holds only while it fits. The header measures the space it can grant its toolbar; when the promoted fields' natural width exceeds it, they collapse into a dropdown holding them as a form. The settings trigger is not part of the collapse: it stays in the toolbar whenever non-promoted attributes exist. The presentation follows the measurement both ways: widen the tile and the fields return inline.
 
 Edits on any surface stage through the engine's internal layer and reach `onLayoutChange` on commit. Prominent-surface and dropdown edits publish on a shared auto-save debounce; the settings surface publishes on Save.
+
+### Actions
+
+Actions carry the same `relevance` scale, mapped to surfaces of decreasing prominence:
+
+-   **Footer, leading**: `relevance: 'high'` actions render as text links in a persistent strip under the widget body, a declared icon riding as prefix.
+-   **Footer, trailing**: `relevance: 'medium'` actions render as compact affordances: icon-only links when the action declares an icon, text links otherwise.
+-   **More menu**: the rest collapse into the three-dots menu in the tile header.
+
+Every affordance is a real anchor. Full-bleed widgets have no footer, so all of their actions stay in the menu.
 
 ## Authoring widgets
 
@@ -235,6 +323,7 @@ interface WidgetRenderProps< Item = unknown > {
 
 -   `DashboardWidget` — a placement of a widget on the dashboard. Carries `uuid`, `type`, `attributes`, `placement`.
 -   `WidgetGridSettings` — grid model configuration; see [Grid settings](#grid-settings).
+-   `DashboardOperationRequest` / `CanPerformDashboardOperation` — the policy contract; see [Governance](#governance). `DashboardInstanceOperation` and `DashboardInstanceOperationRequest` name the per-instance half.
 
 The widget contract types (`WidgetName`, `WidgetType`, `WidgetRenderProps`, `ResolveWidgetModule`) are defined in `@wordpress/widget-primitives` and imported from there directly; this engine does not re-export them.
 

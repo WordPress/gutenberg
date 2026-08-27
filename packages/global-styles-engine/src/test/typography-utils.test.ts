@@ -2,10 +2,6 @@
  * Tests for typography utility functions
  * Ported from Gutenberg's typography-utils.js tests
  */
-
-/**
- * Internal dependencies
- */
 import {
 	getTypographyFontSizeValue,
 	getFluidTypographyOptionsFromSettings,

@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const fs = require( 'fs' );
 const readline = require( 'readline' );
@@ -10,10 +7,6 @@ const glob = require( 'fast-glob' );
 const { inc: semverInc } = require( 'semver' );
 const { rimraf } = require( 'rimraf' );
 const SimpleGit = require( 'simple-git' );
-
-/**
- * Internal dependencies
- */
 const { log, formats } = require( '../lib/logger' );
 const {
 	askForConfirmation,

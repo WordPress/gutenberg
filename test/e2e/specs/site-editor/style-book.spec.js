@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -56,7 +53,7 @@ test.describe( 'Style Book', () => {
 			} )
 		).toBeVisible();
 
-		await page.click( 'role=tab[name="Media"i]' );
+		await page.getByRole( 'tab', { name: 'Media' } ).click();
 
 		await expect(
 			styleBookIframe.getByRole( 'button', {
@@ -90,8 +87,12 @@ test.describe( 'Style Book', () => {
 	test( 'should allow to return Global Styles root when example is clicked', async ( {
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Blocks"]' );
-		await page.click( 'role=button[name="Heading"]' );
+		await page
+			.getByRole( 'button', { name: 'Blocks', exact: true } )
+			.click();
+		await page
+			.getByRole( 'button', { name: 'Heading', exact: true } )
+			.click();
 
 		await page
 			.frameLocator( '[name="style-book-canvas"]' )
@@ -100,8 +101,8 @@ test.describe( 'Style Book', () => {
 			} )
 			.click();
 
-		await page.click( 'role=button[name="Back"]' );
-		await page.click( 'role=button[name="Back"]' );
+		await page.getByRole( 'button', { name: 'Back', exact: true } ).click();
+		await page.getByRole( 'button', { name: 'Back', exact: true } ).click();
 
 		await expect(
 			page.locator( 'role=button[name="Blocks"]' )
@@ -154,7 +155,7 @@ test.describe( 'Style Book', () => {
 			'style book should be visible'
 		).toBeVisible();
 
-		await page.click( 'role=button[name="Back"]' );
+		await page.getByRole( 'button', { name: 'Back', exact: true } ).click();
 
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )

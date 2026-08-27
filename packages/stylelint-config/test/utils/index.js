@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 const util = require( 'node:util' ),
 	path = require( 'node:path' ),
 	childProcess = require( 'node:child_process' );

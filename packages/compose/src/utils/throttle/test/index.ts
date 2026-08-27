@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { throttle } from '../index';
 
 const identity = ( value ) => value;

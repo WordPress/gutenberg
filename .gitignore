@@ -19,6 +19,7 @@ coverage
 yarn.lock
 /artifacts
 /test/e2e/artifacts
+/test/performance/artifacts
 /test/e2e/flakiness-report
 /perf-envs
 /composer.lock
@@ -33,6 +34,7 @@ yarn.lock
 
 .eslintcache
 *.tsbuildinfo
+/test/unit/.vitest-*-typecheck.json
 
 # Generated native views of repository agent skills
 /.claude/skills/

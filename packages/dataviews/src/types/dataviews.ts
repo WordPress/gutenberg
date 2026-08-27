@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { ReactElement, ReactNode, ComponentProps } from 'react';
-
-/**
- * WordPress dependencies
- */
 import type { useFocusOnMount } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import type {
 	NormalizedField,
 	Operator,
@@ -18,6 +7,7 @@ import type {
 	SortDirection,
 } from './field-api';
 import type { SetSelection } from './private';
+import type { MEDIA_ASPECT_RATIOS } from '../constants';
 
 /**
  * The filters applied to the dataset.
@@ -236,6 +226,23 @@ export interface ColumnStyle {
 
 export type Density = 'compact' | 'balanced' | 'comfortable';
 
+/**
+ * The preset aspect ratios available for item media previews, mirroring
+ * Core's default `aspect-ratio` presets. Derived from the
+ * `MEDIA_ASPECT_RATIOS` constant, which layouts also use to validate the
+ * configured value at runtime, so the two can't drift apart.
+ */
+export type MediaAspectRatio = ( typeof MEDIA_ASPECT_RATIOS )[ number ];
+
+/**
+ * How the media field fills its preview box. `cover` crops it to fill,
+ * `contain` fits the whole media inside, letterboxing it so its own aspect
+ * ratio stays visible. Unlike `MediaAspectRatio` there is no matching runtime
+ * constant: layouts style the fit from a class they add for `contain` alone,
+ * so any other value simply leaves previews cropped.
+ */
+export type MediaFit = 'cover' | 'contain';
+
 export interface ViewTable extends ViewBase {
 	type: 'table';
 
@@ -254,6 +261,13 @@ export interface ViewTable extends ViewBase {
 		 * Whether the view allows column moving.
 		 */
 		enableMoving?: boolean;
+
+		/**
+		 * A fixed aspect ratio for the primary column's media preview, one of
+		 * the preset ratios. Applied uniformly to every row. Defaults to
+		 * `'1/1'`.
+		 */
+		aspectRatio?: MediaAspectRatio;
 	};
 }
 
@@ -297,6 +311,21 @@ export interface ViewGrid extends ViewBase {
 		 * The density of the grid layout.
 		 */
 		density?: Density;
+
+		/**
+		 * A fixed aspect ratio for the grid item previews (the media field),
+		 * one of the preset ratios. Applied uniformly to every item so rows
+		 * stay aligned. Defaults to `'1/1'`.
+		 */
+		aspectRatio?: MediaAspectRatio;
+
+		/**
+		 * How the media field fills the preview box. `'cover'` crops it to
+		 * fill, `'contain'` fits the whole media inside so its own aspect
+		 * ratio stays visible. The box keeps the shape set by `aspectRatio`
+		 * either way, so rows stay aligned. Defaults to `'cover'`.
+		 */
+		mediaFit?: MediaFit;
 	};
 }
 
@@ -318,6 +347,14 @@ export interface ViewPickerGrid extends ViewBase {
 		 * The density of the grid layout.
 		 */
 		density?: Density;
+
+		/**
+		 * How the media field fills the preview box. `'cover'` crops it to
+		 * fill, `'contain'` fits the whole media inside so its own aspect
+		 * ratio stays visible. The box stays square either way, so rows stay
+		 * aligned. Defaults to `'cover'`.
+		 */
+		mediaFit?: MediaFit;
 	};
 }
 

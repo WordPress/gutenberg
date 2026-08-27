@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import PublishButtonLabel from '../label';
 
 jest.mock( '@wordpress/data/src/components/use-select', () => {

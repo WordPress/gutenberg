@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getSourceQuery } from '../dynamic-source';
 
 describe( 'getSourceQuery', () => {

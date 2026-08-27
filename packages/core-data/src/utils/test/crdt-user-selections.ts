@@ -1,19 +1,11 @@
-/**
- * External dependencies
- */
 import { Y } from '@wordpress/sync';
 import { select } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import {
 	areSelectionsStatesEqual,
 	getSelectionState,
 	SelectionType,
 } from '../crdt-user-selections';
 import { CRDT_RECORD_MAP_KEY } from '../../sync';
-
 jest.mock( '@wordpress/data', () => ( {
 	select: jest.fn(),
 	// Needed because @wordpress/rich-text initialises its store at import time.
@@ -22,7 +14,6 @@ jest.mock( '@wordpress/data', () => ( {
 	register: jest.fn(),
 	createSelector: ( selector: Function ) => selector,
 } ) );
-
 jest.mock( '@wordpress/block-editor', () => ( {
 	store: 'core/block-editor',
 } ) );
@@ -269,21 +260,24 @@ describe( 'areSelectionsStatesEqual', () => {
 	} );
 
 	describe( 'SelectionType.SelectionInMultipleBlocks', () => {
-		test( 'returns true when selections in multiple blocks are identical', () => {
-			const cursorStartPosition = createCursorPosition(
-				'first block',
-				5
-			);
-			const cursorEndPosition = createCursorPosition( 'second block', 3 );
+		test( 'returns true when both endpoints are identical cursor endpoints', () => {
+			const startEndpoint: SelectionCursor = {
+				type: SelectionType.Cursor,
+				cursorPosition: createCursorPosition( 'first block', 5 ),
+			};
+			const endEndpoint: SelectionCursor = {
+				type: SelectionType.Cursor,
+				cursorPosition: createCursorPosition( 'second block', 3 ),
+			};
 			const selection1: SelectionInMultipleBlocks = {
 				type: SelectionType.SelectionInMultipleBlocks,
-				cursorStartPosition,
-				cursorEndPosition,
+				startEndpoint,
+				endEndpoint,
 			};
 			const selection2: SelectionInMultipleBlocks = {
 				type: SelectionType.SelectionInMultipleBlocks,
-				cursorStartPosition,
-				cursorEndPosition,
+				startEndpoint,
+				endEndpoint,
 			};
 
 			expect( areSelectionsStatesEqual( selection1, selection2 ) ).toBe(
@@ -291,16 +285,53 @@ describe( 'areSelectionsStatesEqual', () => {
 			);
 		} );
 
-		test( 'returns false when start cursor position differs', () => {
+		test( 'returns true when both endpoints are identical whole-block endpoints', () => {
+			const startEndpoint: SelectionWholeBlock = {
+				type: SelectionType.WholeBlock,
+				blockPosition: createBlockPosition( 0 ),
+			};
+			const endEndpoint: SelectionWholeBlock = {
+				type: SelectionType.WholeBlock,
+				blockPosition: createBlockPosition( 1 ),
+			};
 			const selection1: SelectionInMultipleBlocks = {
 				type: SelectionType.SelectionInMultipleBlocks,
-				cursorStartPosition: createCursorPosition( 'first block', 5 ),
-				cursorEndPosition: createCursorPosition( 'second block', 3 ),
+				startEndpoint,
+				endEndpoint,
 			};
 			const selection2: SelectionInMultipleBlocks = {
 				type: SelectionType.SelectionInMultipleBlocks,
-				cursorStartPosition: createCursorPosition( 'first block', 6 ),
-				cursorEndPosition: createCursorPosition( 'second block', 3 ),
+				startEndpoint,
+				endEndpoint,
+			};
+
+			expect( areSelectionsStatesEqual( selection1, selection2 ) ).toBe(
+				true
+			);
+		} );
+
+		test( 'returns false when start cursor endpoint position differs', () => {
+			const selection1: SelectionInMultipleBlocks = {
+				type: SelectionType.SelectionInMultipleBlocks,
+				startEndpoint: {
+					type: SelectionType.Cursor,
+					cursorPosition: createCursorPosition( 'first block', 5 ),
+				},
+				endEndpoint: {
+					type: SelectionType.Cursor,
+					cursorPosition: createCursorPosition( 'second block', 3 ),
+				},
+			};
+			const selection2: SelectionInMultipleBlocks = {
+				type: SelectionType.SelectionInMultipleBlocks,
+				startEndpoint: {
+					type: SelectionType.Cursor,
+					cursorPosition: createCursorPosition( 'first block', 6 ),
+				},
+				endEndpoint: {
+					type: SelectionType.Cursor,
+					cursorPosition: createCursorPosition( 'second block', 3 ),
+				},
 			};
 
 			expect( areSelectionsStatesEqual( selection1, selection2 ) ).toBe(
@@ -308,16 +339,57 @@ describe( 'areSelectionsStatesEqual', () => {
 			);
 		} );
 
-		test( 'returns false when end cursor position differs', () => {
+		test( 'returns false when end cursor endpoint position differs', () => {
 			const selection1: SelectionInMultipleBlocks = {
 				type: SelectionType.SelectionInMultipleBlocks,
-				cursorStartPosition: createCursorPosition( 'first block', 5 ),
-				cursorEndPosition: createCursorPosition( 'second block', 3 ),
+				startEndpoint: {
+					type: SelectionType.Cursor,
+					cursorPosition: createCursorPosition( 'first block', 5 ),
+				},
+				endEndpoint: {
+					type: SelectionType.Cursor,
+					cursorPosition: createCursorPosition( 'second block', 3 ),
+				},
 			};
 			const selection2: SelectionInMultipleBlocks = {
 				type: SelectionType.SelectionInMultipleBlocks,
-				cursorStartPosition: createCursorPosition( 'first block', 5 ),
-				cursorEndPosition: createCursorPosition( 'second block', 4 ),
+				startEndpoint: {
+					type: SelectionType.Cursor,
+					cursorPosition: createCursorPosition( 'first block', 5 ),
+				},
+				endEndpoint: {
+					type: SelectionType.Cursor,
+					cursorPosition: createCursorPosition( 'second block', 4 ),
+				},
+			};
+
+			expect( areSelectionsStatesEqual( selection1, selection2 ) ).toBe(
+				false
+			);
+		} );
+
+		test( 'returns false when endpoint types differ (text vs block)', () => {
+			const selection1: SelectionInMultipleBlocks = {
+				type: SelectionType.SelectionInMultipleBlocks,
+				startEndpoint: {
+					type: SelectionType.Cursor,
+					cursorPosition: createCursorPosition( 'first block', 5 ),
+				},
+				endEndpoint: {
+					type: SelectionType.Cursor,
+					cursorPosition: createCursorPosition( 'second block', 3 ),
+				},
+			};
+			const selection2: SelectionInMultipleBlocks = {
+				type: SelectionType.SelectionInMultipleBlocks,
+				startEndpoint: {
+					type: SelectionType.WholeBlock,
+					blockPosition: createBlockPosition( 0 ),
+				},
+				endEndpoint: {
+					type: SelectionType.Cursor,
+					cursorPosition: createCursorPosition( 'second block', 3 ),
+				},
 			};
 
 			expect( areSelectionsStatesEqual( selection1, selection2 ) ).toBe(
@@ -732,12 +804,17 @@ describe( 'getSelectionState', () => {
 			expect( result.type ).toBe(
 				SelectionType.SelectionInMultipleBlocks
 			);
+			const multiBlock = result as SelectionInMultipleBlocks;
+			expect( multiBlock.startEndpoint.type ).toBe(
+				SelectionType.Cursor
+			);
+			expect( multiBlock.endEndpoint.type ).toBe( SelectionType.Cursor );
 			expect(
-				( result as SelectionInMultipleBlocks ).cursorStartPosition
+				( multiBlock.startEndpoint as SelectionCursor ).cursorPosition
 					.absoluteOffset
 			).toBe( 5 );
 			expect(
-				( result as SelectionInMultipleBlocks ).cursorEndPosition
+				( multiBlock.endEndpoint as SelectionCursor ).cursorPosition
 					.absoluteOffset
 			).toBe( 3 );
 		} );

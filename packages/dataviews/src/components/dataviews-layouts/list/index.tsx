@@ -1,18 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId, usePrevious } from '@wordpress/compose';
-import {
-	Button,
-	privateApis as componentsPrivateApis,
-	Spinner,
-	Composite,
-} from '@wordpress/components';
+import { Button, Spinner, Composite } from '@wordpress/components';
 import {
 	useCallback,
 	useEffect,
@@ -24,12 +12,8 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
-import { Stack, VisuallyHidden } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../../../lock-unlock';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+import { Menu, Stack, VisuallyHidden } from '@wordpress/ui';
 import { ActionsMenuGroup, ActionModal } from '../../dataviews-item-actions';
 import DataViewsContext from '../../dataviews-context';
 import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
@@ -58,8 +42,6 @@ interface ListViewItemProps< Item > {
 	onDropdownTriggerKeyDown: React.KeyboardEventHandler< HTMLButtonElement >;
 	posinset?: number;
 }
-
-const { Menu } = unlock( componentsPrivateApis );
 
 function generateItemWrapperCompositeId( idPrefix: string ) {
 	return `${ idPrefix }-item-wrapper`;
@@ -237,13 +219,18 @@ function ListItem< Item >( {
 			) }
 			{ ! hasOnlyOnePrimaryAction && (
 				<div role="gridcell">
-					<Menu placement="bottom-end">
-						<Menu.TriggerButton
+					{ /* The `disabled` prop on `Menu.Root` (rather than on
+					     the trigger) keeps the menu from opening while
+					     letting the trigger button stay focusable via its
+					     own `accessibleWhenDisabled`. */ }
+					<Menu.Root disabled={ ! actions.length }>
+						<Menu.Trigger
 							render={
 								<Composite.Item
 									id={ generateDropdownTriggerCompositeId(
 										idPrefix
 									) }
+									accessibleWhenDisabled
 									render={
 										<Button
 											size="small"
@@ -251,7 +238,7 @@ function ListItem< Item >( {
 											label={ __( 'Actions' ) }
 											accessibleWhenDisabled
 											disabled={ ! actions.length }
-											onKeyDown={
+											onKeyDownCapture={
 												onDropdownTriggerKeyDown
 											}
 										/>
@@ -259,15 +246,17 @@ function ListItem< Item >( {
 								/>
 							}
 						/>
-						<Menu.Popover>
+						<Menu.Popup
+							positioner={ <Menu.Positioner align="end" /> }
+						>
 							<ActionsMenuGroup
 								actions={ eligibleActions }
 								item={ item }
 								registry={ registry }
 								setActiveModalAction={ setActiveModalAction }
 							/>
-						</Menu.Popover>
-					</Menu>
+						</Menu.Popup>
+					</Menu.Root>
 					{ !! activeModalAction && (
 						<ActionModal
 							action={ activeModalAction }
@@ -514,13 +503,15 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	}, [ isActiveIdInList, selectCompositeItem, previousActiveItemIndex ] );
 
 	// Prevent the default behavior (open dropdown menu) and instead select the
-	// dropdown menu trigger on the previous/next row.
-	// https://github.com/ariakit/ariakit/issues/3768
+	// dropdown menu trigger on the previous/next row. Runs in the capture
+	// phase and stops propagation because the menu's open-on-arrow-key
+	// behavior doesn't check whether the event's default was prevented.
 	const onDropdownTriggerKeyDown = useCallback(
 		( event: React.KeyboardEvent< HTMLButtonElement > ) => {
 			if ( event.key === 'ArrowDown' ) {
 				// Select the dropdown menu trigger item in the next row.
 				event.preventDefault();
+				event.stopPropagation();
 				selectCompositeItem(
 					activeItemIndex + 1,
 					generateDropdownTriggerCompositeId
@@ -529,6 +520,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 			if ( event.key === 'ArrowUp' ) {
 				// Select the dropdown menu trigger item in the previous row.
 				event.preventDefault();
+				event.stopPropagation();
 				selectCompositeItem(
 					activeItemIndex - 1,
 					generateDropdownTriggerCompositeId

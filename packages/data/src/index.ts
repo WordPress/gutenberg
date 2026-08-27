@@ -1,10 +1,6 @@
-/**
- * Internal dependencies
- */
 import defaultRegistry from './default-registry';
 import * as plugins from './plugins';
 import { combineReducers as combineReducersModule } from './redux-store';
-
 import type {
 	StoreDescriptor,
 	ReduxStoreConfig,

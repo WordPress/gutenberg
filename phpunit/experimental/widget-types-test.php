@@ -7,6 +7,7 @@
  * @covers ::gutenberg_translate_widget_metadata
  * @covers ::gutenberg_get_widget_metadata_i18n_schema
  * @covers ::gutenberg_sanitize_widget_help
+ * @covers ::gutenberg_sanitize_widget_icon
  * @covers ::gutenberg_sanitize_widget_actions
  * @covers ::gutenberg_resolve_widget_action_href
  */
@@ -110,6 +111,25 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 	public function test_sanitize_widget_help_requires_content() {
 		$this->assertNull( gutenberg_sanitize_widget_help( null ) );
 		$this->assertNull( gutenberg_sanitize_widget_help( array( 'links' => array() ) ) );
+	}
+
+	/**
+	 * Only names shaped `collection/icon-name` pass; markup, files, and
+	 * anything malformed normalize to null.
+	 */
+	public function test_sanitize_widget_icon_requires_a_registered_name_shape() {
+		$this->assertSame( 'core/calendar', gutenberg_sanitize_widget_icon( 'core/calendar' ) );
+		$this->assertSame( 'my-plugin/arrow-left', gutenberg_sanitize_widget_icon( 'my-plugin/arrow-left' ) );
+
+		$this->assertNull( gutenberg_sanitize_widget_icon( null ) );
+		$this->assertNull( gutenberg_sanitize_widget_icon( '' ) );
+		$this->assertNull( gutenberg_sanitize_widget_icon( 'calendar' ) );
+		$this->assertNull( gutenberg_sanitize_widget_icon( 'core/a/b' ) );
+		$this->assertNull( gutenberg_sanitize_widget_icon( 'Core/Calendar' ) );
+		$this->assertNull( gutenberg_sanitize_widget_icon( 'core/-calendar' ) );
+		$this->assertNull( gutenberg_sanitize_widget_icon( 'core/calendar-' ) );
+		$this->assertNull( gutenberg_sanitize_widget_icon( 'icon.svg' ) );
+		$this->assertNull( gutenberg_sanitize_widget_icon( '<svg viewBox="0 0 24 24"></svg>' ) );
 	}
 
 	/**
@@ -245,10 +265,10 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 		$actions = gutenberg_sanitize_widget_actions(
 			array(
 				array(
-					'id'       => 'download-lyrics',
-					'label'    => 'Download lyrics',
-					'href'     => 'hello-dolly-lyrics.txt',
-					'download' => 'hello-dolly-lyrics.txt',
+					'id'       => 'export-metadata',
+					'label'    => 'Export metadata',
+					'href'     => 'widget.json',
+					'download' => 'hello-dolly.json',
 				),
 				array(
 					'id'    => 'health',
@@ -265,10 +285,10 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertCount( 2, $actions );
-		$this->assertSame( 'download-lyrics', $actions[0]['id'] );
-		$this->assertSame( 'hello-dolly-lyrics.txt', $actions[0]['download'] );
+		$this->assertSame( 'export-metadata', $actions[0]['id'] );
+		$this->assertSame( 'hello-dolly.json', $actions[0]['download'] );
 		$this->assertMatchesRegularExpression(
-			'#/widgets/hello-dolly/hello-dolly-lyrics\.txt$#',
+			'#/widgets/hello-dolly/widget\.json$#',
 			$actions[0]['href']
 		);
 		$this->assertSame(
@@ -314,6 +334,61 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 					'id'    => 'health',
 					'label' => 'Site Health',
 					'href'  => 'site-health.php',
+				),
+			),
+			$actions
+		);
+	}
+
+	/**
+	 * Envelope extras: a well-formed icon name and a known relevance ride
+	 * along; malformed values drop the key, never the action.
+	 */
+	public function test_sanitize_widget_actions_envelope_extras() {
+		$actions = gutenberg_sanitize_widget_actions(
+			array(
+				array(
+					'id'        => 'report',
+					'label'     => 'Open report',
+					'href'      => 'https://example.com/report',
+					'icon'      => 'core/chart-bar',
+					'relevance' => 'high',
+				),
+				array(
+					'id'        => 'export',
+					'label'     => 'Export',
+					'href'      => 'https://example.com/export',
+					'relevance' => 'medium',
+				),
+				array(
+					'id'        => 'about',
+					'label'     => 'About',
+					'href'      => 'https://example.com/about',
+					'icon'      => 'Not A Name',
+					'relevance' => 'primary',
+				),
+			)
+		);
+
+		$this->assertSame(
+			array(
+				array(
+					'id'        => 'report',
+					'label'     => 'Open report',
+					'href'      => 'https://example.com/report',
+					'icon'      => 'core/chart-bar',
+					'relevance' => 'high',
+				),
+				array(
+					'id'        => 'export',
+					'label'     => 'Export',
+					'href'      => 'https://example.com/export',
+					'relevance' => 'medium',
+				),
+				array(
+					'id'    => 'about',
+					'label' => 'About',
+					'href'  => 'https://example.com/about',
 				),
 			),
 			$actions

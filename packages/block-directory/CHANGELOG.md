@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Internal
+
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+## 5.54.0 (2026-08-26)
+
+## 5.53.0 (2026-08-12)
+
+### Bug Fixes
+
+-   Wrap the downloadable block item labels in `__()` so they can be translated ([#81237](https://github.com/WordPress/gutenberg/pull/81237)).
+
+## 5.52.0 (2026-07-29)
+
 ## 5.51.0 (2026-07-14)
 
 ### Enhancements

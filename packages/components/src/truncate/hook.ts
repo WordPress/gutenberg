@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import { useContextSystem } from '../context';
 import { TRUNCATE_ELLIPSIS, TRUNCATE_TYPE, truncateContent } from './utils';

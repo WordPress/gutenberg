@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { rendererPath, removeBlockSupportAttributes } from '../hook';
 
 describe( 'rendererPath', () => {

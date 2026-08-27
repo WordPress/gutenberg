@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 const TEST_PAGE_TITLE = 'Test Page for Block Style Variations';
 
@@ -9,22 +6,22 @@ async function selectBlockStyleVariation( page, variationName ) {
 		name: 'Editor settings',
 	} );
 	const stylesTab = editorSettings.getByRole( 'tab', { name: 'Styles' } );
-	const variationButton = editorSettings.getByRole( 'button', {
+	const variationRadio = editorSettings.getByRole( 'radio', {
 		name: variationName,
 	} );
 
 	const visibleControl = await Promise.any( [
 		stylesTab.waitFor( { state: 'visible' } ).then( () => 'styles-tab' ),
-		variationButton
+		variationRadio
 			.waitFor( { state: 'visible' } )
-			.then( () => 'variation-button' ),
+			.then( () => 'variation-radio' ),
 	] );
 
 	if ( visibleControl === 'styles-tab' ) {
 		await stylesTab.click();
 	}
 
-	await variationButton.click();
+	await variationRadio.click();
 }
 
 test.use( {
@@ -339,17 +336,19 @@ async function addPageContent( editor, page ) {
 		'role=button[name="Block Inserter"i]'
 	);
 	await inserterButton.click();
-	await page.type( 'role=searchbox[name="Search"i]', 'Group' );
-	await page.click(
-		'role=listbox[name="Blocks"i] >> role=option[name="Group"i]'
-	);
+	await page.getByRole( 'searchbox', { name: 'Search' } ).type( 'Group' );
+	await page
+		.getByRole( 'listbox', { name: 'Blocks' } )
+		.getByRole( 'option', { name: 'Group' } )
+		.click();
 	await editor.canvas
 		.locator( 'role=button[name="Group: Gather blocks in a container."i]' )
 		.click();
 	await editor.canvas.locator( 'role=button[name="Add block"i]' ).click();
-	await page.click(
-		'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
-	);
+	await page
+		.getByRole( 'listbox', { name: 'Blocks' } )
+		.getByRole( 'option', { name: 'Paragraph' } )
+		.click();
 	await page.keyboard.type( 'Parent Group Block with a Paragraph' );
 	await page.keyboard.press( 'Enter' );
 	await page.keyboard.type( '/group' );
@@ -361,9 +360,10 @@ async function addPageContent( editor, page ) {
 		.locator( 'role=button[name="Group: Gather blocks in a container."i]' )
 		.click();
 	await editor.canvas.locator( 'role=button[name="Add block"i]' ).click();
-	await page.click(
-		'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
-	);
+	await page
+		.getByRole( 'listbox', { name: 'Blocks' } )
+		.getByRole( 'option', { name: 'Paragraph' } )
+		.click();
 	await page.keyboard.type( 'Child Group Block with a Paragraph' );
 	await page.keyboard.press( 'Enter' );
 	await page.keyboard.type( '/group' );
@@ -375,9 +375,10 @@ async function addPageContent( editor, page ) {
 		.locator( 'role=button[name="Group: Gather blocks in a container."i]' )
 		.click();
 	await editor.canvas.locator( 'role=button[name="Add block"i]' ).click();
-	await page.click(
-		'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
-	);
+	await page
+		.getByRole( 'listbox', { name: 'Blocks' } )
+		.getByRole( 'option', { name: 'Paragraph' } )
+		.click();
 	await page.keyboard.type( 'Grandchild Group Block with a Paragraph' );
 	await page.getByRole( 'button', { name: 'Publish', exact: true } ).click();
 }

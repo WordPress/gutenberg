@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import {
 	Output,
 	BufferTarget,
@@ -11,11 +8,7 @@ import {
 	QUALITY_HIGH,
 	canEncodeVideo,
 } from 'mediabunny';
-
-/**
- * Internal dependencies
- */
-import type { ItemId } from './types';
+import type { ItemId } from './types.ts';
 
 /**
  * Tracks in-progress operations so they can be cancelled at async boundaries.

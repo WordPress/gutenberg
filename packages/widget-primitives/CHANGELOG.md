@@ -2,6 +2,72 @@
 
 ## Unreleased
 
+## 0.6.0 (2026-08-26)
+
+### New Features
+
+-   `WidgetHostProvider` / `useWidgetHost`: the seam through which a host
+    provides capabilities to the widgets it renders, merged over the
+    inherited value. First capability: `links`, in-app route recognition
+    (`match`) plus the host router's link primitive
+    ([#81740](https://github.com/WordPress/gutenberg/pull/81740)).
+-   `WidgetRelevance` gains a `'medium'` tier between `'high'` and `'low'`,
+    for persistent but compact visibility
+    ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
+
+### Enhancements
+
+-   `useWidgetTypes` resolves a record without a metadata module from its
+    own fields, so a widget declared entirely by its manifest needs no
+    module stub; `apiVersion` defaults to `1` on both resolution paths
+    ([#81738](https://github.com/WordPress/gutenberg/pull/81738)).
+-   `useWidgetTypes` holds the icon slot with the stand-in while an action's
+    icon reference resolves; an unresolvable reference clears it
+    ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
+
+### Documentation
+
+-   Add a Widget host doc page: the capability seam and the `links`
+    contract, with the consumption rules link actions follow
+    ([#81740](https://github.com/WordPress/gutenberg/pull/81740)).
+
+### Internal
+
+-   Point tsconfig references at split dependencies' build projects. ([#81515](https://github.com/WordPress/gutenberg/pull/81515))
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 0.5.0 (2026-08-12)
+
+### New Features
+
+-   `WidgetAction` gains envelope fields: `icon`, a registered icon name
+    resolved by `useWidgetTypes` into a renderable element, and `relevance`
+    (`'high' | 'low'`) ([#81275](https://github.com/WordPress/gutenberg/pull/81275)).
+-   Widgets can reference their icon declaratively: `WidgetModuleRecord`
+    carries a registered icon name and `useWidgetTypes` resolves it through
+    the application-registered resolver (`registerIconResolver`), so
+    `WidgetType.icon` always reaches hosts renderable
+    ([#80969](https://github.com/WordPress/gutenberg/pull/80969)).
+
+### Enhancements
+
+-   Name the two forms of an action icon: `WidgetActionRecord` carries the
+    registered icon name on the wire, and `WidgetAction.icon` narrows to the
+    rendered element hosts receive ([#81381](https://github.com/WordPress/gutenberg/pull/81381)).
+
+### Documentation
+
+-   Simplify the actions doc: the accepted `href` forms in one statement and
+    an absolute-URL download example ([#81272](https://github.com/WordPress/gutenberg/pull/81272)).
+-   Add an Icons doc page and a `WithIconReference` story ([#80969](https://github.com/WordPress/gutenberg/pull/80969)).
+-   Describe actions as verbs ([#80974](https://github.com/WordPress/gutenberg/pull/80974)).
+
+### Internal
+
+-   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
+
+## 0.4.0 (2026-07-29)
+
 ### New Features
 
 -   `WidgetTypeMetadata`: add optional `actions`, a declarative list of

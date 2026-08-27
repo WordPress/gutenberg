@@ -1,18 +1,11 @@
-/**
- * External dependencies
- */
 import Ajv from 'ajv';
 import glob from 'fast-glob';
-
-/**
- * Internal dependencies
- */
 import themeSchema from '../../schemas/json/theme.json';
 
 describe( 'theme.json schema', () => {
 	const jsonFiles = glob.sync(
 		[ 'packages/*/src/**/theme.json', '{lib,phpunit,test}/**/theme.json' ],
-		{ onlyFiles: true }
+		{ onlyFiles: true, ignore: [ '**/node_modules/**' ] }
 	);
 	const invalidFiles = glob.sync(
 		[ 'test/integration/fixtures/schemas/*.json' ],

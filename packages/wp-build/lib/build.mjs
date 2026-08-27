@@ -1,8 +1,4 @@
 #!/usr/bin/env node
-
-/**
- * External dependencies
- */
 import { readFile, writeFile, copyFile, mkdir, unlink } from 'fs/promises';
 import path from 'path';
 import { createHash } from 'node:crypto';
@@ -21,30 +17,6 @@ import cssnano from 'cssnano';
 import babel from 'esbuild-plugin-babel';
 import { camelCase } from 'change-case';
 import { NodePackageImporter } from 'sass-embedded';
-
-// Optional dependency: @wordpress/theme provides plugins that inject fallback
-// values for design system tokens. Fails gracefully when the package is not
-// installed (it is an optional peerDependency).
-let dsTokenFallbacks;
-let dsTokenFallbacksJs;
-try {
-	const { default: postcssPlugin } = await import(
-		// eslint-disable-next-line import/no-unresolved
-		'@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks'
-	);
-	const { default: esbuildPlugin } = await import(
-		// eslint-disable-next-line import/no-unresolved
-		'@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks'
-	);
-	dsTokenFallbacks = postcssPlugin;
-	dsTokenFallbacksJs = esbuildPlugin;
-} catch {
-	// @wordpress/theme is optional; skip token fallbacks if not available.
-}
-
-/**
- * Internal dependencies
- */
 import {
 	groupByDepth,
 	findScriptsToRebundle,
@@ -56,6 +28,7 @@ import {
 	renderTemplateToString,
 } from './php-generator.mjs';
 import { getPackageInfo, getPackageInfoFromFile } from './package-utils.mjs';
+import { getSourceFileGlob, isTestSourceFile } from './source-files.mjs';
 import { createWordpressExternalsPlugin } from './wordpress-externals-plugin.mjs';
 import {
 	getAllRoutes,
@@ -74,21 +47,34 @@ import {
 	generateWorkerCode,
 } from './worker-build.mjs';
 
+// Optional dependency: @wordpress/theme provides plugins that inject fallback
+// values for design system tokens. Fails gracefully when the package is not
+// installed (it is an optional peerDependency).
+let dsTokenFallbacks;
+let dsTokenFallbacksJs;
+try {
+	const { default: postcssPlugin } = await import(
+		'@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks'
+	);
+	const { default: esbuildPlugin } = await import(
+		'@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks'
+	);
+	dsTokenFallbacks = postcssPlugin;
+	dsTokenFallbacksJs = esbuildPlugin;
+} catch {
+	// @wordpress/theme is optional; skip token fallbacks if not available.
+}
+
 const ROOT_DIR = process.cwd();
 const PACKAGES_DIR = path.join( ROOT_DIR, 'packages' );
 const BUILD_DIR = path.join( ROOT_DIR, 'build' );
 
-const SOURCE_EXTENSIONS = '{js,mjs,ts,tsx}';
 const ASSET_EXTENSIONS = 'json';
 const IGNORE_PATTERNS = [
 	'**/benchmark/**',
 	'**/{__mocks__,__tests__,test}/**',
 	'**/{storybook,stories}/**',
 	'**/*.{spec,test}.*',
-];
-const TEST_FILE_PATTERNS = [
-	/\/(benchmark|__mocks__|__tests__|test|storybook|stories)\/.+/,
-	/\.(spec|test)\.(js|ts|tsx)$/,
 ];
 
 /**
@@ -624,12 +610,33 @@ async function bundlePackage( packageName, options = {} ) {
 			globalName,
 		};
 
-		// For packages with default exports, add a footer to properly expose the default
-		if ( packageJson.wpScriptDefaultExport && globalName ) {
-			baseConfig.footer = {
-				js: `if (typeof ${ globalName } === 'object' && ${ globalName }.default) { ${ globalName } = ${ globalName }.default; }`,
-			};
+		/*
+		 * Wrap the bundle in an IIFE so the `'use strict'` directive esbuild emits for the
+		 * (strict) ES module output stays at the function level. Left at the top of the
+		 * file it is a *file-level* directive, which — because load-scripts.php
+		 * concatenates raw file contents — forces strict mode onto any sloppy-mode script
+		 * bundled after it, throwing on e.g. implicit globals. Wrapping confines the
+		 * directive to this bundle. See https://core.trac.wordpress.org/ticket/65515.
+		 */
+		baseConfig.banner = { js: '(function() {' };
+
+		/*
+		 * esbuild's `globalName` assigns onto a locally-declared `var` root (using a
+		 * `window.…` global name would emit `var window`, shadowing the real global), so
+		 * that assignment is trapped inside the wrapper. Re-expose it on the real global
+		 * object in the footer, then close the IIFE.
+		 */
+		let footerJs = '';
+		if ( shouldExposeGlobal ) {
+			const globalMember = camelCase( packageName );
+			// For packages with default exports, expose the default, not the namespace.
+			if ( packageJson.wpScriptDefaultExport ) {
+				footerJs += `if (typeof ${ globalName } === 'object' && ${ globalName }.default) { ${ globalName } = ${ globalName }.default; }\n`;
+			}
+			footerJs += `(window.${ scriptGlobal } ||= {}).${ globalMember } = ${ scriptGlobal }.${ globalMember };\n`;
 		}
+		footerJs += '})();';
+		baseConfig.footer = { js: footerJs };
 
 		const baseBundlePlugins = [
 			momentTimezoneAliasPlugin(),
@@ -1346,7 +1353,7 @@ async function transpilePackage( packageName ) {
 		);
 	}
 
-	const srcFiles = await glob( `src/**/*.${ SOURCE_EXTENSIONS }`, {
+	const srcFiles = await glob( getSourceFileGlob( 'src/**/*' ), {
 		cwd: packageDir,
 		ignore: IGNORE_PATTERNS,
 		absolute: true,
@@ -1667,7 +1674,7 @@ function isPackageSourceFile( filename ) {
 		return false;
 	}
 
-	if ( TEST_FILE_PATTERNS.some( ( regex ) => regex.test( relativePath ) ) ) {
+	if ( isTestSourceFile( relativePath ) ) {
 		return false;
 	}
 
@@ -1724,7 +1731,7 @@ async function buildRoute( routeName ) {
 
 	// Build route.js if it exists
 	if ( files.hasRoute ) {
-		const routeEntryPoints = await glob( `route.${ SOURCE_EXTENSIONS }`, {
+		const routeEntryPoints = await glob( getSourceFileGlob( 'route' ), {
 			cwd: routeDir,
 			absolute: true,
 		} );
@@ -1887,7 +1894,7 @@ async function buildWidget( widgetName ) {
 
 	// Build render.js if it exists
 	if ( files.hasRender ) {
-		const renderEntryPoints = await glob( `render.${ SOURCE_EXTENSIONS }`, {
+		const renderEntryPoints = await glob( getSourceFileGlob( 'render' ), {
 			cwd: widgetDir,
 			absolute: true,
 		} );
@@ -1937,7 +1944,7 @@ async function buildWidget( widgetName ) {
 
 	// Build widget.js if it exists
 	if ( files.hasWidget ) {
-		const widgetEntryPoints = await glob( `widget.${ SOURCE_EXTENSIONS }`, {
+		const widgetEntryPoints = await glob( getSourceFileGlob( 'widget' ), {
 			cwd: widgetDir,
 			absolute: true,
 		} );
@@ -2021,7 +2028,7 @@ async function buildAllWidgets() {
  * Discover all widgets and collect their registry-facing data.
  * Widgets without a valid widget.json are skipped.
  *
- * @return {Array<{ name: string, dirName: string, title: string | null, description: string | null, help: import('./widget-utils.mjs').WidgetHelpMetadata | null, actions: import('./widget-utils.mjs').WidgetActionMetadata[] | null, hasRender: boolean, hasWidget: boolean, presentation: string | null, category: string | null, keywords: string[] | null, textdomain: string | null }>} Array of widget objects.
+ * @return {Array<{ name: string, dirName: string, title: string | null, description: string | null, help: import('./widget-utils.mjs').WidgetHelpMetadata | null, icon: string | null, actions: import('./widget-utils.mjs').WidgetActionMetadata[] | null, hasRender: boolean, hasWidget: boolean, presentation: string | null, category: string | null, keywords: string[] | null, textdomain: string | null }>} Array of widget objects.
  */
 function collectWidgets() {
 	return getAllWidgets( ROOT_DIR ).flatMap( ( widgetName ) => {
@@ -2043,6 +2050,7 @@ function collectWidgets() {
 				title: metadata.title ?? null,
 				description: metadata.description ?? null,
 				help: metadata.help ?? null,
+				icon: metadata.icon ?? null,
 				actions: metadata.actions ?? null,
 				hasRender: widgetFiles.hasRender,
 				hasWidget: widgetFiles.hasWidget,
@@ -2164,6 +2172,18 @@ function toPhpActionsLiteral( actions ) {
 				);
 			}
 
+			if ( action.icon !== undefined ) {
+				parts.push(
+					`'icon' => ${ toPhpStringLiteral( action.icon ) }`
+				);
+			}
+
+			if ( action.relevance !== undefined ) {
+				parts.push(
+					`'relevance' => ${ toPhpStringLiteral( action.relevance ) }`
+				);
+			}
+
 			return `array( ${ parts.join( ', ' ) } )`;
 		} );
 
@@ -2199,6 +2219,7 @@ async function generateWidgetRegistry( widgets, replacements ) {
 			const titleStr = toPhpStringLiteral( widget.title );
 			const descriptionStr = toPhpStringLiteral( widget.description );
 			const helpStr = toPhpHelpLiteral( widget.help );
+			const iconStr = toPhpStringLiteral( widget.icon );
 			const actionsStr = toPhpActionsLiteral( widget.actions );
 			const keywordsStr = toPhpStringArrayLiteral( widget.keywords );
 			const textdomainStr = toPhpStringLiteral( widget.textdomain );
@@ -2208,6 +2229,7 @@ async function generateWidgetRegistry( widgets, replacements ) {
 		'title'        => ${ titleStr },
 		'description'  => ${ descriptionStr },
 		'help'         => ${ helpStr },
+		'icon'         => ${ iconStr },
 		'actions'      => ${ actionsStr },
 		'has_render'   => ${ hasRenderStr },
 		'has_widget'   => ${ hasWidgetStr },
@@ -2373,7 +2395,12 @@ async function buildAll( baseUrlExpression ) {
 				path: metadata.path,
 				page,
 				hasRoute: routeFiles.hasRoute,
-				hasContent: routeFiles.hasStage || routeFiles.hasInspector,
+				// Must match the condition that builds `content.js`, which
+				// bundles the canvas alongside the stage and inspector.
+				hasContent:
+					routeFiles.hasStage ||
+					routeFiles.hasInspector ||
+					routeFiles.hasCanvas,
 			};
 		} );
 	} );
@@ -2596,7 +2623,7 @@ async function watchMode() {
 	const watcher = chokidar.watch( watchPaths, {
 		ignored: [
 			'**/{__mocks__,__tests__,test,storybook,stories}/**',
-			'**/*.{spec,test}.{js,ts,tsx}',
+			getSourceFileGlob( '**/*.{spec,test}' ),
 			// Avoid rebuild loops: worker packages write bundled WASM/JS back
 			// into src/worker-code.ts during each build (e.g. @wordpress/vips).
 			'**/worker-code.ts',

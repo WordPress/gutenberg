@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { capitalCase, pascalCase } from 'change-case';
-
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 import { __unstableSerializeAndClean, parse } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { PostEditorAwareness } from './awareness/post-editor-awareness';
 import { getSyncManager } from './sync';
 import {
@@ -146,7 +135,9 @@ export const rootEntitiesConfig = [
 		plural: 'comments',
 		label: __( 'Comment' ),
 		supportsPagination: true,
-		syncConfig: defaultCollectionSyncConfig,
+		...( globalThis.window?.__experimentalEnableRealTimeCollaboration
+			? { syncConfig: defaultCollectionSyncConfig }
+			: {} ),
 	},
 	{
 		name: 'menu',
@@ -322,7 +313,7 @@ export const prePersistPostType = async (
 	// saved post and CRDT snapshot are committed in the same request. We don't
 	// want a post save to fail but a CRDT update to succeed or vice versa.
 	// CRDT repair uses /wp-sync/v1/save to avoid post-save side effects.
-	if ( persistedRecord ) {
+	if ( window.__experimentalEnableRealTimeCollaboration && persistedRecord ) {
 		const objectType = `postType/${ name }`;
 		const objectId = persistedRecord.id;
 		const serializedDoc = await getSyncManager()?.createPersistedCRDTDoc(
@@ -348,7 +339,7 @@ export const prePersistPostType = async (
  */
 async function loadPostTypeEntities() {
 	const postTypesPromise = apiFetch( { path: '/wp/v2/types?context=view' } );
-	const taxonomiesPromise = window._wpCollaborationEnabled
+	const taxonomiesPromise = window.__experimentalEnableRealTimeCollaboration
 		? apiFetch( { path: '/wp/v2/taxonomies?context=view' } )
 		: Promise.resolve( {} );
 	const [ postTypes, taxonomies ] = await Promise.all( [
@@ -404,7 +395,13 @@ async function loadPostTypeEntities() {
 			__unstablePrePersist: ( persistedRecord, edits ) =>
 				prePersistPostType( persistedRecord, edits, name, isTemplate ),
 			__unstable_rest_base: postType.rest_base,
-			supportsPagination: true,
+			// The templates controller returns the whole collection and never
+			// paginates. It serves `wp_template_part` always, and `wp_template`
+			// until the template activate experiment moves it to a posts
+			// controller.
+			supportsPagination: window?.__experimentalTemplateActivate
+				? name !== 'wp_template_part'
+				: ! isTemplate,
 			getRevisionsUrl: ( parentId, revisionId ) =>
 				`/${ namespace }/${
 					postType.rest_base
@@ -416,6 +413,10 @@ async function loadPostTypeEntities() {
 					? 'wp_id'
 					: DEFAULT_ENTITY_KEY,
 		};
+
+		if ( ! window.__experimentalEnableRealTimeCollaboration ) {
+			return entity;
+		}
 
 		/**
 		 * @type {import('@wordpress/sync').SyncConfig}
@@ -508,7 +509,9 @@ async function loadTaxonomyEntities() {
 			supportsPagination: true,
 		};
 
-		entity.syncConfig = defaultSyncConfig;
+		if ( window.__experimentalEnableRealTimeCollaboration ) {
+			entity.syncConfig = defaultSyncConfig;
+		}
 
 		return entity;
 	} );

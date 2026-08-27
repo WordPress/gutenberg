@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### Internal
+
+-   Remove unused dependency `@octokit/types` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+
+## 2.54.0 (2026-08-26)
+
+## 2.53.0 (2026-08-12)
+
+
+## 2.52.0 (2026-07-29)
+
 ## 2.51.0 (2026-07-14)
 
 ### Bug Fixes

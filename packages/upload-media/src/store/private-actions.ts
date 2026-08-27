@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import { v4 as uuidv4 } from 'uuid';
-
-/**
- * WordPress dependencies
- */
 import { createBlobURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import type { createRegistry } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 type WPDataRegistry = ReturnType< typeof createRegistry >;
-
-/**
- * Internal dependencies
- */
 import {
 	cloneFile,
 	convertBlobToFile,
@@ -21,6 +10,7 @@ import {
 	renameFile,
 } from '../utils';
 import { canvasConvertToJpeg } from '../canvas-utils';
+import { getHeicUnsupportedMessage } from '../heic-support';
 import { getUnappliedExifOrientation } from '../heic-parser';
 import {
 	isClientSideMediaSupported,
@@ -898,8 +888,7 @@ export function prepareItem( id: QueueItemId ) {
 					id,
 					new UploadError( {
 						code: ErrorCode.HEIC_DECODE_ERROR,
-						message:
-							'This browser cannot decode HEIC images and the server does not support them either. Please convert to JPEG before uploading.',
+						message: getHeicUnsupportedMessage(),
 						file,
 					} )
 				);

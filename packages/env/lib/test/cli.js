@@ -1,7 +1,4 @@
 'use strict';
-/**
- * Internal dependencies
- */
 const cli = require( '../cli' );
 const env = require( '../env' );
 

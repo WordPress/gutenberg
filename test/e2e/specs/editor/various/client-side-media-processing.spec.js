@@ -1,13 +1,9 @@
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const fs = require( 'fs/promises' );
 const os = require( 'os' );
 const { randomUUID } = require( 'crypto' );
 const { createRequire } = require( 'node:module' );
 const { pathToFileURL } = require( 'node:url' );
-
 /**
  * Resolves the `wasm-vips` entry point from the `@wordpress/vips` package,
  * which declares it as a direct dependency. This works whether or not
@@ -21,11 +17,10 @@ const wasmVipsEntry = pathToFileURL(
 		'wasm-vips'
 	)
 ).href;
-
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const {
+	skipIfClientSideMediaInactive,
+} = require( './client-side-media-utils' );
 
 /**
  * Probes a remote JPEG for an embedded UltraHDR gain map.
@@ -113,41 +108,12 @@ class MediaProcessingUtils {
 
 	/**
 	 * Skip the test unless the client-side media processing pipeline is the
-	 * active upload path. This mirrors the gate used in the editor's
-	 * media-upload util: the global flag must be set AND the browser must
-	 * meet the feature detection requirements (cross-origin isolation,
-	 * SharedArrayBuffer, Web Workers, WebAssembly).
+	 * active upload path.
 	 *
-	 * @param {import('@playwright/test').TestInfo} testInstance The test object for skipping.
+	 * @param {import('@playwright/test').TestType} testInstance The test object for skipping.
 	 */
 	async skipIfClientSideMediaInactive( testInstance ) {
-		const isActive = await this.page.evaluate( () => {
-			if ( ! window.__clientSideMediaProcessing ) {
-				return false;
-			}
-			// Prefer the package's own detection when available so the
-			// gate stays in sync with the editor's runtime decision.
-			if (
-				window.wp?.uploadMedia &&
-				typeof window.wp.uploadMedia.isClientSideMediaSupported ===
-					'function'
-			) {
-				return window.wp.uploadMedia.isClientSideMediaSupported();
-			}
-			// Fall back to the core preconditions for CSM. These are the
-			// signals the package's feature detection inspects first.
-			return (
-				window.crossOriginIsolated === true &&
-				typeof SharedArrayBuffer !== 'undefined' &&
-				typeof WebAssembly !== 'undefined' &&
-				typeof Worker !== 'undefined'
-			);
-		} );
-
-		testInstance.skip(
-			! isActive,
-			'Client-side media processing is not active in this environment'
-		);
+		await skipIfClientSideMediaInactive( this.page, testInstance );
 	}
 
 	/**

@@ -279,8 +279,14 @@ class WP_Navigation_Block_Renderer {
 
 		foreach ( $inner_blocks as $inner_block ) {
 			$inner_block_markup = static::get_markup_for_inner_block( $inner_block );
-			$p                  = new WP_HTML_Tag_Processor( $inner_block_markup );
-			$is_list_item       = $p->next_tag( 'LI' );
+			// Skip hidden blocks (e.g. hidden via block visibility) that render
+			// as an empty string. Without this check, empty markup is mistaken
+			// for a non-list-item and incorrectly closes the open <ul>.
+			if ( '' === $inner_block_markup ) {
+				continue;
+			}
+			$p            = new WP_HTML_Tag_Processor( $inner_block_markup );
+			$is_list_item = $p->next_tag( 'LI' );
 
 			if ( $is_list_item && ! $is_list_open ) {
 				$is_list_open       = true;
@@ -683,9 +689,14 @@ class WP_Navigation_Block_Renderer {
 	 * @since 7.0.0
 	 *
 	 * @param bool  $is_hidden_by_default Whether the responsive menu is hidden by default.
-	 * @param bool  $has_custom_overlay Whether a custom overlay is used.
-	 * @param array $colors The colors array.
+	 * @param bool  $has_custom_overlay   Whether a custom overlay is used.
+	 * @param array $colors               The colors array.
 	 * @return array Returns the responsive container classes.
+	 *
+	 * @phpstan-param array{
+	 *     overlay_css_classes: list<string>,
+	 *     ...
+	 * } $colors
 	 */
 	private static function get_responsive_container_classes( $is_hidden_by_default, $has_custom_overlay, $colors ) {
 		$responsive_container_classes = array( 'wp-block-navigation__responsive-container' );
@@ -710,8 +721,14 @@ class WP_Navigation_Block_Renderer {
 	 *
 	 * @since 7.0.0
 	 *
-	 * @param array $colors The colors array.
+	 * @param bool  $has_custom_overlay Whether a custom overlay is used.
+	 * @param array $colors             The colors array.
 	 * @return string Returns the overlay inline styles.
+	 *
+	 * @phpstan-param array{
+	 *     overlay_inline_styles: string,
+	 *     ...
+	 * } $colors
 	 */
 	private static function get_overlay_inline_styles( $has_custom_overlay, $colors ) {
 		$overlay_inline_styles = $has_custom_overlay ? '' : esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) );

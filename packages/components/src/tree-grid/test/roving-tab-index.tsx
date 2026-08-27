@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import RovingTabIndex from '../roving-tab-index';
 
 describe( 'RovingTabIndex', () => {

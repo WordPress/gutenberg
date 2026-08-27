@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { triggerGuide, dismissTip, disableTips, enableTips } from '../actions';
 
 describe( 'actions', () => {

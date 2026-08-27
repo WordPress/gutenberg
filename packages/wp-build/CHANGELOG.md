@@ -4,6 +4,51 @@
 
 ### Enhancements
 
+-   Transpile `.jsx` package, route, and widget source files alongside the existing JavaScript and TypeScript extensions, and ignore JSX tests during watch rebuilds ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+### Bug Fixes
+
+-   Pages: preserve the Core Boot layout compatibility class in generated wp-admin page templates so short pages fill the viewport when using Core's bundled Boot module ([#82112](https://github.com/WordPress/gutenberg/pull/82112)).
+
+## 0.22.0 (2026-08-26)
+
+### Internal
+
+-   Identify generated wp-admin page mount elements by their page-specific ID instead of a Boot class ([#81756](https://github.com/WordPress/gutenberg/pull/81756)).
+
+### Bug Fixes
+
+-   Register the content module for routes that only export a `canvas`, so a route without a stage or inspector can render a custom canvas ([#81578](https://github.com/WordPress/gutenberg/pull/81578)).
+-   Pages: use the boot module that ships with Core when the plugin has no local one, so plugin pages are no longer empty ([#81761](https://github.com/WordPress/gutenberg/pull/81761)).
+
+### Documentation
+
+-   Widget attributes: the `relevance` hint documents the `'medium'` tier
+    ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
+
+## 0.21.0 (2026-08-12)
+
+### Enhancements
+
+-   Widgets: carry an action's `icon` and `relevance` from `widget.json`
+    into the generated PHP registry ([#81275](https://github.com/WordPress/gutenberg/pull/81275)).
+-   Widgets: carry a widget's declarative `icon` reference from `widget.json`
+    into the generated PHP registry ([#80969](https://github.com/WordPress/gutenberg/pull/80969)).
+-   Render a no-JavaScript heading and notice from the generated page templates ([#81365](https://github.com/WordPress/gutenberg/pull/81365)).
+
+### Bug Fixes
+
+-   Scope the generated page template's critical styles to `body.js` so the no-JS notice stays visible ([#80628](https://github.com/WordPress/gutenberg/pull/80628)).
+-   Wrap script bundles in an IIFE to avoid `use strict` affecting external code in concatenated JavaScript files ([#79792](https://github.com/WordPress/gutenberg/pull/79792).
+
+### Internal
+
+-   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
+
+## 0.20.0 (2026-07-29)
+
+### Enhancements
+
 -   Widgets: carry a widget's declarative `actions` from `widget.json` into
     the generated PHP registry ([#80363](https://github.com/WordPress/gutenberg/pull/80363)).
 
@@ -12,8 +57,6 @@
 -   Ignore generated `src/worker-code.ts` in watch mode to stop rebuild loops for worker packages like `@wordpress/vips` ([#80361](https://github.com/WordPress/gutenberg/pull/80361)).
 -   Pass the current `$hook_suffix` to the `admin_footer` action in the generated single-page admin template instead of an empty string ([#75985](https://github.com/WordPress/gutenberg/pull/75985)).
 -   Sync the page template `/?_fields=` preload path with the `_fields` list in `@wordpress/core-data` so the preload is consumed instead of the page issuing a duplicate request ([#80648](https://github.com/WordPress/gutenberg/pull/80648)).
--   Scope the generated page template's critical styles to `body.js` so the no-JS notice stays visible ([#80628](https://github.com/WordPress/gutenberg/pull/80628)).
-
 
 ## 0.19.0 (2026-07-14)
 

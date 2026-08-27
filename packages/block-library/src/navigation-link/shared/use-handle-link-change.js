@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useCallback } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { escapeHTML } from '@wordpress/escape-html';
-
-/**
- * Internal dependencies
- */
 import { updateAttributes } from './update-attributes';
 import { useEntityBinding } from './use-entity-binding';
 

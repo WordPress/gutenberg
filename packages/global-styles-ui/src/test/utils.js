@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getNewIndexFromPresets } from '../utils';
 
 const validPresets = {
