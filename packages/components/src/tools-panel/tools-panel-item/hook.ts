@@ -54,6 +54,13 @@ export function useToolsPanelItem(
 	// dependency to the useCallback hook! If needed, we should use a ref.
 	const resetAllFilterCallback = useCallback( resetAllFilter, [ panelId ] );
 
+	// `defaultShown` seeds the item's initial visibility and is deliberately
+	// not reactive. Holding it in a ref keeps it out of the registration
+	// effect below, so a change after mount cannot deregister and re-register
+	// the item, which would discard the visibility the user chose from the
+	// menu. To change visibility after mount, toggle the item from the menu.
+	const defaultShownRef = useRef( defaultShown );
+
 	// `onShownChange` is also a new function on every render. Holding it in a
 	// ref lets the item register a stable callback, so it isn't re-registered
 	// on each render, while the panel still invokes the latest one.
@@ -80,7 +87,7 @@ export function useToolsPanelItem(
 	useLayoutEffect( () => {
 		if ( hasMatchingPanel && previousPanelId !== null ) {
 			registerPanelItem( {
-				defaultShown,
+				defaultShown: defaultShownRef.current,
 				hasValue: hasValueCallback,
 				isShownByDefault,
 				label,
@@ -99,7 +106,6 @@ export function useToolsPanelItem(
 		};
 	}, [
 		currentPanelId,
-		defaultShown,
 		hasMatchingPanel,
 		isShownByDefault,
 		label,

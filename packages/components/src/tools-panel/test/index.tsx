@@ -537,6 +537,68 @@ describe( 'ToolsPanel', () => {
 			).toBeInTheDocument();
 		} );
 
+		// `defaultShown` only seeds the item's initial visibility. A change
+		// after mount must leave the item as it is, and must not be reported
+		// as though the user had used the menu.
+		describe( 'changing defaultShown after mount', () => {
+			const onDeselect = jest.fn();
+			const onSelect = jest.fn();
+			const onShownChange = jest.fn();
+
+			const ToolsPanelOptional = ( {
+				defaultShown,
+			}: {
+				defaultShown: boolean;
+			} ) => (
+				<ToolsPanel { ...defaultProps }>
+					<ToolsPanelItem
+						defaultShown={ defaultShown }
+						hasValue={ () => false }
+						label="Alt"
+						onDeselect={ onDeselect }
+						onSelect={ onSelect }
+						onShownChange={ onShownChange }
+					>
+						<div>Optional control</div>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			);
+
+			beforeEach( () => {
+				jest.clearAllMocks();
+			} );
+
+			it( 'should keep a hidden item hidden when it changes to true', () => {
+				const { rerender } = render(
+					<ToolsPanelOptional defaultShown={ false } />
+				);
+
+				rerender( <ToolsPanelOptional defaultShown /> );
+
+				expect(
+					screen.queryByText( 'Optional control' )
+				).not.toBeInTheDocument();
+				expect( onShownChange ).not.toHaveBeenCalled();
+				expect( onSelect ).not.toHaveBeenCalled();
+				expect( onDeselect ).not.toHaveBeenCalled();
+			} );
+
+			it( 'should keep a shown item visible when it changes to false', () => {
+				const { rerender } = render(
+					<ToolsPanelOptional defaultShown />
+				);
+
+				rerender( <ToolsPanelOptional defaultShown={ false } /> );
+
+				expect(
+					screen.getByText( 'Optional control' )
+				).toBeInTheDocument();
+				expect( onShownChange ).not.toHaveBeenCalled();
+				expect( onSelect ).not.toHaveBeenCalled();
+				expect( onDeselect ).not.toHaveBeenCalled();
+			} );
+		} );
+
 		it( 'should continue to render shown by default item after it is toggled off via menu item', async () => {
 			render(
 				<ToolsPanel { ...defaultProps }>
@@ -996,6 +1058,38 @@ describe( 'ToolsPanel', () => {
 
 			expect( controlProps.onShownChange ).not.toHaveBeenCalled();
 			expect( altControlProps.onShownChange ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should not call onShownChange when the value changes programmatically', () => {
+			const onShownChange = jest.fn();
+			const ToolsPanelOptional = ( { value }: { value?: number } ) => (
+				<ToolsPanel { ...defaultProps } panelId="1234">
+					<ToolsPanelItem
+						hasValue={ () => !! value }
+						label="Alt"
+						onShownChange={ onShownChange }
+						panelId="1234"
+					>
+						<div>Optional control</div>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			);
+
+			const { rerender } = render( <ToolsPanelOptional /> );
+			expect(
+				screen.queryByText( 'Optional control' )
+			).not.toBeInTheDocument();
+
+			// Gaining a value shows the item, but that is not a menu action.
+			rerender( <ToolsPanelOptional value={ 100 } /> );
+			expect(
+				screen.getByText( 'Optional control' )
+			).toBeInTheDocument();
+
+			// Losing it again is not a menu action either.
+			rerender( <ToolsPanelOptional /> );
+
+			expect( onShownChange ).not.toHaveBeenCalled();
 		} );
 
 		it( 'should not call any callback when an item is mounted with defaultShown', () => {
