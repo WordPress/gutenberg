@@ -3,6 +3,11 @@ import { click } from '@ariakit/test';
 import { useEffect, useState } from '@wordpress/element';
 import SnackbarList from '../list';
 
+jest.mock( '@wordpress/compose', () => ( {
+	...jest.requireActual( '@wordpress/compose' ),
+	useReducedMotion: () => false,
+} ) );
+
 window.scrollTo = jest.fn();
 
 describe( 'SnackbarList', () => {
