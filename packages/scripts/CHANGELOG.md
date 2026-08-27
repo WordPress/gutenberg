@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Remove unused dependency `jest-environment-node` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+
 ## 34.2.0 (2026-08-26)
 
 ## 34.1.0 (2026-08-12)
