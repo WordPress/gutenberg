@@ -24,7 +24,14 @@
 	//
 	// Below `small` one view fills it at a time, switched from the header.
 	// From `small` up the canvas and the panel are columns side by side.
+	//
+	// A containment context, so the canvas can size itself against the room
+	// it actually has rather than the viewport. The two differ by whatever
+	// chrome the host puts beside the editor: none in the modal, but 160px
+	// of wp-admin menu in the route until it folds at 960px.
 	.media-editor__body {
+		container-type: inline-size;
+		container-name: media-editor-body;
 		display: flex;
 		flex: 1;
 		min-height: 0;
@@ -48,12 +55,13 @@
 			margin: 0 $grid-unit-30;
 		}
 
-		// From `large` the modal is wide enough to promise the canvas a
-		// floor: 960px viewport is a ~928px modal, less the 320px panel and
-		// this column's 2 x 24px gutters, which leaves ~560px. Asking for
-		// more than that pushes the panel past the modal's right edge
-		// instead of shrinking the canvas.
-		@include break-large() {
+		// Promise the canvas a floor only where the body is wide enough to
+		// keep it: 520px canvas + 320px panel + this column's 24px gutter.
+		// Asking for it below that pushes the layout past its container
+		// instead of shrinking the canvas, which is what put a scrollbar on
+		// the route between 961px and 1024px — wide enough for the floor by
+		// viewport, but not once the wp-admin menu had taken its 160px.
+		@container media-editor-body (min-width: #{520px + 320px + $grid-unit-30}) {
 			min-width: 520px;
 		}
 	}
