@@ -636,6 +636,10 @@ class Gutenberg_HTML_Element {
 			}
 		}
 
+		if ( in_array( 'only-child', $compound['pseudo'], true ) && ! $this->is_only_child() ) {
+			return false;
+		}
+
 		foreach ( $compound['not'] as $selector ) {
 			if ( '' !== $selector['scope'] ) {
 				if ( $this->has_matching_descendant( $selector ) ) {
@@ -650,6 +654,19 @@ class Gutenberg_HTML_Element {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Determines whether this element is its parent's only child element.
+	 *
+	 * @return bool Whether the element has no element siblings.
+	 */
+	private function is_only_child() {
+		if ( ! $this->parent instanceof self ) {
+			return false;
+		}
+
+		return array( $this ) === $this->parent->child_elements();
 	}
 
 	/**
@@ -677,8 +694,8 @@ class Gutenberg_HTML_Element {
 	 *
 	 * Supports the subset of CSS needed by block attribute sources and raw block
 	 * transforms: type, universal, class, ID and attribute selectors, the
-	 * descendant and child combinators, and the `:has()` and `:not()`
-	 * pseudo-classes.
+	 * descendant and child combinators, and the `:has()`, `:not()` and
+	 * `:only-child` pseudo-classes.
 	 *
 	 * @param string $selector Selector list.
 	 * @return array[] Parsed complex selectors.
@@ -805,6 +822,7 @@ class Gutenberg_HTML_Element {
 			'attributes' => array(),
 			'has'        => array(),
 			'not'        => array(),
+			'pseudo'     => array(),
 		);
 
 		$at = 0;
@@ -846,6 +864,12 @@ class Gutenberg_HTML_Element {
 			}
 
 			if ( ':' === $character ) {
+				if ( preg_match( '/^:only-child/', substr( $selector, $at ), $matches ) ) {
+					$compound['pseudo'][] = 'only-child';
+					$at                  += strlen( $matches[0] );
+					continue;
+				}
+
 				if ( ! preg_match( '/^:(has|not)\(/', substr( $selector, $at ), $matches ) ) {
 					break;
 				}

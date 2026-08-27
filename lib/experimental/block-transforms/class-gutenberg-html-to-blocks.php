@@ -106,7 +106,10 @@ class Gutenberg_HTML_To_Blocks {
 		if ( false !== strpos( $html, '<!-- wp:' ) ) {
 			$blocks = parse_blocks( $html );
 
-			$is_single_freeform = 1 === count( $blocks ) && 'core/freeform' === $blocks[0]['blockName'];
+			// `parse_blocks()` names a run of markup that is not a block at
+			// all with a null name, where the editor's parser calls it
+			// `core/freeform`.
+			$is_single_freeform = 1 === count( $blocks ) && null === $blocks[0]['blockName'];
 			if ( ! $is_single_freeform ) {
 				return $blocks;
 			}
@@ -144,8 +147,14 @@ class Gutenberg_HTML_To_Blocks {
 
 		$root = Gutenberg_HTML_Element::from_html( $html );
 
+		/*
+		 * The HTML API gives up on markup it cannot represent — foster
+		 * parenting, misnested formatting, a few legacy tags — all of which
+		 * classic content is full of. Markup that cannot be read is markup
+		 * no block claims, so it is kept whole rather than dropped.
+		 */
 		if ( null === $root ) {
-			return array();
+			return array( self::create_fallback_block_from_html( $html ) );
 		}
 
 		self::convert_special_comments( $root );
@@ -378,8 +387,16 @@ class Gutenberg_HTML_To_Blocks {
 	 * @return array Parsed block array.
 	 */
 	private static function create_fallback_block( $element ) {
-		$html = $element->get_outer_html();
+		return self::create_fallback_block_from_html( $element->get_outer_html() );
+	}
 
+	/**
+	 * Builds the block that holds markup no block claims.
+	 *
+	 * @param string $html Markup to keep.
+	 * @return array Parsed block array.
+	 */
+	private static function create_fallback_block_from_html( $html ) {
 		return array(
 			'blockName'    => self::FALLBACK_BLOCK,
 			'attrs'        => array(),
@@ -597,9 +614,12 @@ class Gutenberg_HTML_To_Blocks {
 			return;
 		}
 
-		$entry = $schema[ $node->tag_name ];
+		$entry      = $schema[ $node->tag_name ];
+		$attributes = self::get_schema_attributes( $entry );
 
-		$node->keep_attributes( self::get_schema_attributes( $entry ) );
+		if ( null !== $attributes ) {
+			$node->keep_attributes( $attributes );
+		}
 
 		self::filter_children( $node, $entry );
 	}
@@ -611,7 +631,7 @@ class Gutenberg_HTML_To_Blocks {
 	 * conversion uses; `paste` is for content coming from another application.
 	 *
 	 * @param array $entry Schema entry.
-	 * @return string[] Attribute names.
+	 * @return string[]|null Attribute names, or null when the entry keeps them all.
 	 */
 	private static function get_schema_attributes( $entry ) {
 		if ( ! isset( $entry['attributes'] ) ) {
@@ -619,6 +639,13 @@ class Gutenberg_HTML_To_Blocks {
 		}
 
 		$attributes = $entry['attributes'];
+
+		// `*` says the attributes here do not matter, which is what a block
+		// declaring what it can save back writes when its own schema strips
+		// them anyway.
+		if ( '*' === $attributes ) {
+			return null;
+		}
 
 		if ( isset( $attributes['default'] ) ) {
 			$attributes = $attributes['default'];
@@ -674,21 +701,21 @@ class Gutenberg_HTML_To_Blocks {
 	 */
 	private static function find_transform( $element ) {
 		foreach ( self::get_raw_transforms() as $transform ) {
+			if ( isset( $transform['isMatch'] ) && is_callable( $transform['isMatch'] ) ) {
+				if ( ! call_user_func( $transform['isMatch'], $element ) ) {
+					continue;
+				}
+			} elseif ( ! isset( $transform['selector'] ) || ! $element->matches( $transform['selector'] ) ) {
+				continue;
+			}
+
+			// Only once the transform wants the element, since this filters a
+			// copy of it to find out.
 			if ( self::declines_server_conversion( $transform, $element ) ) {
 				continue;
 			}
 
-			if ( isset( $transform['isMatch'] ) && is_callable( $transform['isMatch'] ) ) {
-				if ( call_user_func( $transform['isMatch'], $element ) ) {
-					return $transform;
-				}
-
-				continue;
-			}
-
-			if ( isset( $transform['selector'] ) && $element->matches( $transform['selector'] ) ) {
-				return $transform;
-			}
+			return $transform;
 		}
 
 		return null;
@@ -739,8 +766,9 @@ class Gutenberg_HTML_To_Blocks {
 	private static function content_already_conforms( $element, $schema ) {
 		$probe = Gutenberg_HTML_Element::from_html( $element->get_outer_html() );
 
+		// Content that cannot be read back is content this cannot vouch for.
 		if ( null === $probe || array() === $probe->children ) {
-			return true;
+			return false;
 		}
 
 		$copy   = $probe->children[0];
@@ -758,21 +786,31 @@ class Gutenberg_HTML_To_Blocks {
 	 */
 	private static function get_raw_transforms() {
 		$transforms = array();
+		$order      = 0;
 
 		foreach ( WP_Block_Type_Registry::get_instance()->get_all_registered() as $block_type ) {
 			if ( ! isset( $block_type->transforms['from'] ) || ! is_array( $block_type->transforms['from'] ) ) {
 				continue;
 			}
 
-			foreach ( $block_type->transforms['from'] as $index => $transform ) {
+			foreach ( $block_type->transforms['from'] as $transform ) {
 				if ( ! is_array( $transform ) || ! isset( $transform['type'] ) || 'raw' !== $transform['type'] ) {
 					continue;
 				}
 
 				$transform['blockName'] = $block_type->name;
 				$transform['priority']  = isset( $transform['priority'] ) ? (int) $transform['priority'] : 10;
-				$transform['order']     = $index;
-				$transforms[]           = $transform;
+
+				/*
+				 * Registration order across every block, not the index within
+				 * one block's own list: `usort` is only stable from PHP 8.0,
+				 * so transforms of equal priority would otherwise resolve
+				 * differently on the versions below it.
+				 */
+				$transform['order'] = $order;
+				++$order;
+
+				$transforms[] = $transform;
 			}
 		}
 

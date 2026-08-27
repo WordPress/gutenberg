@@ -67,7 +67,21 @@
 			{
 				"name": "from-raw",
 				"type": "raw",
-				"selector": "pre:has(> code)",
+				"selector": "pre:has(> code:only-child)",
+				"serverConversion": {
+					"requires": {
+						"pre": {
+							"children": {
+								"code": {
+									"attributes": "*",
+									"children": {
+										"#text": {}
+									}
+								}
+							}
+						}
+					}
+				},
 				"schema": {
 					"pre": {
 						"children": {

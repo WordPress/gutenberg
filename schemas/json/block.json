@@ -19,14 +19,9 @@
 					"type": "string"
 				},
 				"blocks": {
-					"description": "For a `block` transform, the block types it converts from (under `from`) or to (under `to`).",
+					"description": "For a `block` transform, the block types it converts from (under `from`) or to (under `to`). Under `from`, `*` matches any block.",
 					"type": "array",
 					"items": { "type": "string" }
-				},
-				"isMultiBlock": {
-					"description": "Whether a `block` transform accepts a multi-block selection.",
-					"type": "boolean",
-					"default": false
 				},
 				"selector": {
 					"description": "For a `raw` transform, a CSS selector matched against each top-level element of the source markup.\n\nType, universal, class, ID and attribute selectors are supported, along with the descendant and child combinators and the `:has()` and `:not()` pseudo-classes.",
@@ -38,7 +33,7 @@
 					"default": 10
 				},
 				"schema": {
-					"description": "For a `raw` transform, the content schema describing which markup survives conversion.\n\nWrite `\"phrasing\"` where the phrasing content schema belongs, and `{ \"default\": [], \"paste\": [] }` where the allowed attributes differ when pasting.",
+					"description": "For a `raw` transform, the content schema describing which markup survives conversion.\n\nWrite `\"phrasing\"` where the phrasing content schema belongs, `{ \"default\": [], \"paste\": [] }` where the allowed attributes differ when pasting, and `\"attributes\": \"*\"` where they do not matter.",
 					"type": "object"
 				},
 				"sourceAttributes": {

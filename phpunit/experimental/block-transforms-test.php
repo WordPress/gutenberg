@@ -716,7 +716,7 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_refuses_a_multi_block_selection_unless_declared() {
+	public function test_refuses_a_multi_block_selection() {
 		$this->register_dynamic( 'test/source', array() );
 		$this->register_dynamic(
 			'test/target',
@@ -740,6 +740,8 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 			'innerContent' => array(),
 		);
 
+		// A declared transform maps one block's attributes onto another's and
+		// has no way to say how several blocks' attributes combine.
 		$this->assertNull( gutenberg_switch_block_type( array( $block, $block ), 'test/target' ) );
 		$this->assertNotNull( gutenberg_switch_block_type( array( $block ), 'test/target' ) );
 	}
@@ -1341,6 +1343,99 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 
 		$this->assertSame( 'core/shortcode', $blocks[0]['blockName'] );
 		$this->assertSame( '[testplayer src="/a.mp3"]', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_keeps_markup_the_html_parser_will_not_read() {
+		// The HTML API gives up on foster parenting, among other shapes
+		// classic content is full of, and the markup has to survive that.
+		$blocks = gutenberg_html_to_blocks( '<p>Intro</p><table>text<tr><td>c</td></tr></table>' );
+
+		$this->assertCount( 1, $blocks );
+		$this->assertSame( 'core/html', $blocks[0]['blockName'] );
+		$this->assertStringContainsString( '<p>Intro</p>', $blocks[0]['innerHTML'] );
+		$this->assertStringContainsString( 'text', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_converts_markup_holding_a_comment_that_is_not_a_block() {
+		// `parse_blocks()` reads this as one nameless block rather than as
+		// block markup, which means it still has to go through conversion.
+		$blocks = gutenberg_html_to_blocks( '<p>See <!-- wp: unterminated</p>' );
+
+		$this->assertSame( 'core/paragraph', $blocks[0]['blockName'] );
+	}
+
+	public function test_tells_a_code_block_from_a_preformatted_one_by_what_the_pre_holds() {
+		$cases = array(
+			'<pre><code>echo 1;</code></pre>'            => 'core/code',
+			'<pre>plain</pre>'                           => 'core/preformatted',
+
+			// The <code> is not the whole of the <pre>, so nothing may be
+			// dropped to make it one.
+			'<pre>Intro <code>echo 1;</code> tail</pre>' => 'core/preformatted',
+			'<pre><code>a</code><code>b</code></pre>'    => 'core/preformatted',
+		);
+
+		foreach ( $cases as $html => $expected ) {
+			$this->assertSame( $expected, gutenberg_html_to_blocks( $html )[0]['blockName'], $html );
+		}
+	}
+
+	public function test_leaves_a_list_item_standing_outside_a_list_alone() {
+		// The List Item block declares `core/list` as its parent, so one at
+		// the top level would be a block with nowhere to live.
+		$blocks = gutenberg_html_to_blocks( '<li>Stray</li>' );
+
+		$this->assertSame( 'core/html', $blocks[0]['blockName'] );
+		$this->assertSame( '<li>Stray</li>', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_reads_a_value_whose_declared_type_names_null_first() {
+		$this->register(
+			'test/nullable',
+			array(
+				'attributes' => array(
+					'label' => array(
+						'type'      => array( 'null', 'string' ),
+						'source'    => 'attribute',
+						'attribute' => 'data-label',
+						'selector'  => 'aside',
+					),
+				),
+			)
+		);
+
+		$this->assertSame(
+			array( 'label' => 'Note' ),
+			gutenberg_get_block_attributes_from_html( 'test/nullable', '<aside data-label="Note"></aside>' )
+		);
+	}
+
+	public function test_ignores_a_wildcard_naming_the_target_of_a_transform() {
+		$this->register_dynamic( 'test/source', array() );
+		$this->register_dynamic(
+			'test/other',
+			array(
+				'transforms' => array(
+					'to' => array(
+						array(
+							'type'   => 'block',
+							// Every block, which names no block to build.
+							'blocks' => array( '*' ),
+						),
+					),
+				),
+			)
+		);
+
+		$block = array(
+			'blockName'    => 'test/other',
+			'attrs'        => array(),
+			'innerBlocks'  => array(),
+			'innerHTML'    => '',
+			'innerContent' => array(),
+		);
+
+		$this->assertNull( gutenberg_switch_block_type( array( $block ), 'test/source' ) );
 	}
 
 	public function test_turns_a_url_standing_on_its_own_into_an_embed() {

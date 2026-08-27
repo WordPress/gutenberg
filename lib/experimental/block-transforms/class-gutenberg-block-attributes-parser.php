@@ -287,7 +287,9 @@ class Gutenberg_Block_Attributes_Parser {
 					break;
 
 				case 'null':
-					return false;
+					// A null value was accepted above, so this type says
+					// nothing about the value in hand: try the next one.
+					break;
 
 				case 'integer':
 				case 'number':

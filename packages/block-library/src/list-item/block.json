@@ -72,7 +72,7 @@
 			{
 				"name": "from-raw",
 				"type": "raw",
-				"selector": "li",
+				"selector": "ol > li, ul > li",
 				"innerBlocks": "ol,ul"
 			}
 		]

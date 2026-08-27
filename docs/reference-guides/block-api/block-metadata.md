@@ -532,21 +532,22 @@ Transforms describe how a block converts to and from other content. They have al
 
 Declaring them here instead means the editor and PHP read the same definition. That makes server-side conversion possible — during an import, in WP-CLI, or from any code holding HTML that wants block markup — and it works for every registered block, including third-party ones, without their shipping any conversion code.
 
-Two kinds of transform are read: `raw`, which matches markup, and `block`, which matches another block type.
+Three kinds of transform are read: `raw`, which matches markup, `block`, which matches another block type, and `shortcode`, which matches a shortcode.
 
 Common keys:
 
 -   `name` (`string`): identifies the transform. A transform registered in JavaScript under the same name is merged over the one declared here, which is how a block declares what PHP needs while keeping behaviour that can only be written as a function.
--   `type` (`string`, required): `raw` or `block`.
+-   `type` (`string`, required): `raw`, `block` or `shortcode`.
 -   `priority` (`integer`, default `10`): match order, lowest first. A block that should only match when nothing more specific does, such as the Paragraph block, uses a higher number.
 -   `attributes`: attribute values for the resulting block. For a `raw` transform, an object applied over any sourced attributes; for a `block` transform, either `"all"` to carry every attribute across, or an object mapping each new attribute name to the name it takes its value from.
 
 Keys for a `raw` transform:
 
--   `selector` (`string`): a CSS selector matched against each top-level element of the source markup. Type, universal, class, ID and attribute selectors are supported, along with the descendant and child combinators and the `:has()` and `:not()` pseudo-classes.
--   `schema` (`object`): the content schema describing which markup survives conversion. Write `"phrasing"` where the phrasing content schema belongs, and `{ "default": [], "paste": [] }` where the allowed attributes differ when pasting.
+-   `selector` (`string`): a CSS selector matched against each top-level element of the source markup. Type, universal, class, ID and attribute selectors are supported, along with the descendant and child combinators and the `:has()`, `:not()` and `:only-child` pseudo-classes.
+-   `schema` (`object`): the content schema describing which markup survives conversion. Write `"phrasing"` where the phrasing content schema belongs, `{ "default": [], "paste": [] }` where the allowed attributes differ when pasting, and `"attributes": "*"` where they do not matter — which is what a `serverConversion` schema writes for an element whose attributes the transform strips anyway.
 -   `sourceAttributes` (`boolean`, default `true`): whether to derive the block's attributes from the matched markup using the block's own attribute sources.
 -   `innerBlocks` (`boolean|string`, default `false`): which of the matched element's content becomes inner blocks. `true` converts all of it; a CSS selector converts only the matching child elements and leaves the rest with the block.
+-   `serverConversion` (`false|object`): what the server may build from the matched markup. A block whose `save` rebuilds its markup rather than wrapping the source cannot be produced outside the editor at all and declares `false`. One that can reproduce some shapes and not others declares `{ "requires": <content schema> }`, naming the content it is able to save back; markup carrying anything else is left alone instead of converted into a block the editor would flag.
 
 An `attributes` value is used as given, unless it is an object declaring a `source`, in which case it is read from the matched markup the way a block attribute would be. Such a value may also carry a `map` of sourced value to attribute value, which is how the Heading block turns a tag name into a level:
 
@@ -565,8 +566,15 @@ An `attributes` value is used as given, unless it is an object declaring a `sour
 
 Keys for a `block` transform:
 
--   `blocks` (`string[]`): the block types the transform converts from (under `from`) or to (under `to`). `"*"` matches any block.
--   `isMultiBlock` (`boolean`, default `false`): whether the transform accepts a multi-block selection.
+-   `blocks` (`string[]`): the block types the transform converts from (under `from`) or to (under `to`). Under `from`, `"*"` matches any block; under `to` it does not, because a declared transform builds the block it names and `"*"` names none.
+
+A declared `block` transform converts one block at a time. Combining a multi-block selection means deciding how several blocks' attributes merge, which only a JavaScript transform can express.
+
+Keys for a `shortcode` transform:
+
+-   `tag` (`string`, required): the shortcode tag to match, or a pattern matching a family of tags.
+
+Its `attributes` are read from the matched shortcode: `{ "source": "shortcodeText" }` takes the shortcode's own text, and `{ "source": "shortcodeAttribute", "attribute": "id" }` takes one of its attributes. `attribute` may be a list, naming the attributes a shortcode might carry the value under in the order they win.
 
 Markup that no block claims becomes a Custom HTML block rather than being guessed at.
 

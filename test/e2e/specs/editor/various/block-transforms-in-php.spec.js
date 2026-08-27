@@ -40,6 +40,14 @@ const AGREED = [
 	// attribute on its inner element.
 	'<pre><code class="language-js">const a = 1;</code></pre>',
 
+	// A <pre> is only a Code block when the <code> is the whole of it, which
+	// is the one thing the declared selector cannot say.
+	'<pre>Intro <code>const a = 1;</code> tail</pre>',
+	'<pre><code>a</code><code>b</code></pre>',
+
+	// A list item outside a list is not a block: it would have nowhere to live.
+	'<li>Stray</li>',
+
 	// Media a block can save back unchanged, wrapped and bare.
 	'<figure><img src="https://example.com/a.png" alt="A" /></figure>',
 	'<img src="https://example.com/b.png" alt="B" />',
@@ -79,7 +87,19 @@ const LEGACY = [
 	'<p dir="rtl" title="tip" data-legacy="1">Attributes everywhere.</p>',
 	'<h2 id="ingredients">Anchored</h2>',
 	'<hr class="is-style-dots" />',
+
+	// A block whose declared transform is only a selector has no place to put
+	// the class the editor copies off the wrapper, so only the server keeps it.
+	'<pre class="brush: php"><code>echo 1;</code></pre>',
 	'<p>Teaser.</p><!--more--><p>Rest.</p>',
+
+	// Markup the HTML API refuses to parse, which is kept whole rather than
+	// dropped. The browser fosters the stray text out of the table instead,
+	// so the two read it differently without either losing it.
+	'<p>Intro</p><table>text<tr><td>c</td></tr></table>',
+
+	// Only the editor splits a paragraph around the marker it holds.
+	'<p>Teaser<!--more-->Rest.</p>',
 	'<p>Page one.</p><!--nextpage--><p>Page two.</p>',
 	'<h1>Title</h1><p class="intro">Intro.</p><div class="ad">Ad</div><h2 id="s1">Section</h2><ul><li>a</li></ul><blockquote><p>Q</p></blockquote><pre><code>x</code></pre><hr /><table><tbody><tr><td>t</td></tr></tbody></table><p>Bye.</p>',
 ];

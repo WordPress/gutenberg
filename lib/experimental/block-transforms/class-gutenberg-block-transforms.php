@@ -99,11 +99,17 @@ class Gutenberg_Block_Transforms {
 			self::get_block_transforms( $target_type, 'from', $source_type->name )
 		);
 
-		foreach ( $candidates as $transform ) {
-			if ( $is_multi_block && empty( $transform['isMultiBlock'] ) ) {
-				continue;
-			}
+		/*
+		 * A declared transform maps one block's attributes onto another's. It
+		 * has no way to say how several blocks' attributes combine, which only
+		 * a JavaScript transform can express, so a multi-block selection is
+		 * refused rather than silently converted from the first block alone.
+		 */
+		if ( $is_multi_block ) {
+			return null;
+		}
 
+		foreach ( $candidates as $transform ) {
 			return $transform;
 		}
 
@@ -132,7 +138,15 @@ class Gutenberg_Block_Transforms {
 
 			$blocks = isset( $transform['blocks'] ) ? (array) $transform['blocks'] : array();
 
-			if ( ! in_array( '*', $blocks, true ) && ! in_array( $other_name, $blocks, true ) ) {
+			/*
+			 * `*` says a transform accepts any source block. It cannot name a
+			 * target, because a declared transform builds the block it names
+			 * and there is no such block, so it only counts under `from` —
+			 * the same as in the editor, which has to enumerate its targets.
+			 */
+			$matches_any = 'from' === $direction && in_array( '*', $blocks, true );
+
+			if ( ! $matches_any && ! in_array( $other_name, $blocks, true ) ) {
 				continue;
 			}
 

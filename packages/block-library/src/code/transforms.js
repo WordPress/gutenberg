@@ -37,6 +37,16 @@ const transforms = {
 				} );
 			},
 		},
+		{
+			// The declared selector cannot say that the <code> is the whole of
+			// the <pre>: CSS has no way to require that nothing precedes it.
+			name: 'from-raw',
+			type: 'raw',
+			isMatch: ( node ) =>
+				node.nodeName === 'PRE' &&
+				node.children.length === 1 &&
+				node.firstChild.nodeName === 'CODE',
+		},
 	],
 	to: [
 		{

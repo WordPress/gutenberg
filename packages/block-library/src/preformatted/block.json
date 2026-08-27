@@ -62,7 +62,8 @@
 			{
 				"name": "from-raw",
 				"type": "raw",
-				"selector": "pre:not(:has(> code))",
+				"selector": "pre",
+				"priority": 20,
 				"schema": {
 					"pre": {
 						"children": "phrasing"
