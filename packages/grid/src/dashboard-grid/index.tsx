@@ -7,7 +7,6 @@ import {
 	useSensors,
 } from '@dnd-kit/core';
 import {
-	arrayMove,
 	SortableContext,
 	sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
@@ -25,6 +24,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { GridItem } from './grid-item';
+import { arrayMoveWithPinned } from '../shared/array-move-with-pinned';
 import { GridOverlay } from '../shared/grid-overlay';
 import { clampSpan, gridSpanToPixelSize } from '../shared/resize-snap';
 import { useResizePixelLimits, useSpanBounds } from '../shared/use-span-bounds';
@@ -44,7 +44,7 @@ import styles from './grid.module.css';
 
 const dashboardDragDropAnimation = createDashboardDragDropAnimation(
 	styles[ 'drag-preview-frame' ],
-	styles.dragPreviewFrameExiting
+	styles[ 'is-exiting' ]
 );
 
 // Fallback gap in pixels for math that runs before the computed gap
@@ -458,7 +458,19 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				return;
 			}
 
-			const updatedItems = arrayMove( items, currentIndex, newIndex );
+			// Non-draggable items are pinned: they hold their index while
+			// the others reorder around them.
+			const updatedItems = arrayMoveWithPinned(
+				items,
+				currentIndex,
+				newIndex,
+				( key ) => layoutMap.get( key )?.draggable === false
+			);
+			if (
+				updatedItems.every( ( key, index ) => key === items[ index ] )
+			) {
+				return;
+			}
 			// Commit from the stored layout (or the pending commit), not
 			// the bounded view, so untouched tiles keep their stored spans.
 			const updatedLayout = ( latestLayoutRef.current ?? layout ).map(
@@ -727,6 +739,12 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 										effectiveColumns
 									}
 									disabled={ ! editMode }
+									draggable={
+										layoutMap.get( id )?.draggable !== false
+									}
+									resizable={
+										layoutMap.get( id )?.resizable !== false
+									}
 									verticalResizable={ rowHeight !== 'auto' }
 									interacting={
 										activeId !== null || isResizing
