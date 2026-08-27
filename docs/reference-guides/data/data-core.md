@@ -653,6 +653,25 @@ _Returns_
 
 -   `boolean`: Whether entity records have been received.
 
+### hasFetchedAutosave
+
+Returns true if the REST request for a single author's autosave has completed.
+
+`getAutosave` requests one author's autosave rather than the whole collection, so it resolves under its own key. Callers that read `getAutosave` should check this rather than `hasFetchedAutosaves`, which only reports on the collection.
+
+Without an author there is nothing to request, and the resolver returns early rather than fetching. That still counts as a finished resolution, so an undefined author is reported as not fetched: the caller does not yet know whether an autosave exists.
+
+_Parameters_
+
+-   _state_ `State`: State tree.
+-   _postType_ `string`: The type of the parent post.
+-   _postId_ `EntityRecordKey`: The id of the parent post.
+-   _authorId_ `EntityRecordKey`: The id of the author.
+
+_Returns_
+
+-   `boolean`: True if the REST request was completed. False otherwise.
+
 ### hasFetchedAutosaves
 
 Returns true if the REST request for autosaves has completed.

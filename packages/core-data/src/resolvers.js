@@ -801,18 +801,49 @@ export const getAutosaves =
 	};
 
 /**
- * Request autosave data from the REST API.
+ * Requests a single author's autosave from the REST API.
  *
- * This resolver exists to ensure the underlying autosaves are fetched via
- * `getAutosaves` when a call to the `getAutosave` selector is made.
+ * WordPress stores at most one autosave per author, and the `getAutosave`
+ * selector only ever returns the one belonging to the given author, so this
+ * requests that single record instead of every autosave for the post. On a
+ * long-lived post with many editors, the difference is the entire collection
+ * versus one row.
+ *
+ * The `getAutosaves` resolver is left alone: it still fetches the whole
+ * collection for callers that want it. Use `hasFetchedAutosave` to tell when
+ * this request has completed.
  *
  * @param {string} postType The type of the parent post.
  * @param {number} postId   The id of the parent post.
+ * @param {number} authorId The id of the autosave author.
  */
 export const getAutosave =
-	( postType, postId ) =>
-	async ( { resolveSelect } ) => {
-		await resolveSelect.getAutosaves( postType, postId );
+	( postType, postId, authorId ) =>
+	async ( { dispatch, resolveSelect } ) => {
+		if ( authorId === undefined ) {
+			return;
+		}
+
+		const {
+			rest_base: restBase,
+			rest_namespace: restNamespace = 'wp/v2',
+			supports,
+		} = await resolveSelect.getPostType( postType );
+
+		if ( ! supports?.autosave ) {
+			return;
+		}
+
+		const autosaves = await apiFetch( {
+			path: addQueryArgs(
+				`/${ restNamespace }/${ restBase }/${ postId }/autosaves`,
+				{ context: 'edit', author: authorId }
+			),
+		} );
+
+		if ( autosaves && autosaves.length ) {
+			dispatch.receiveAutosaves( postId, autosaves );
+		}
 	};
 
 export const __experimentalGetCurrentGlobalStylesId =

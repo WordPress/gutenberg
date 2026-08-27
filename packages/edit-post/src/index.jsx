@@ -213,7 +213,6 @@ async function preloadResolutions( postType, postId ) {
 							postType,
 							postId
 						),
-						core.getAutosaves( postType, postId ),
 						core.getDefaultTemplateId( { slug: 'front-page' } ),
 						core.canUser( 'create', {
 							kind: 'postType',
@@ -243,6 +242,17 @@ async function preloadResolutions( postType, postId ) {
 		}
 
 		if ( postType && postId ) {
+			// The autosave request is scoped to the current user, so it can
+			// only be kicked once `getCurrentUser` has resolved above. The args
+			// must match `isEditedPostAutosaveable` in `@wordpress/editor`
+			// exactly, or the resolution is not shared and the editor refetches.
+			const currentUserId = coreSelect.getCurrentUser()?.id;
+			if ( currentUserId !== undefined ) {
+				tasks.push(
+					core.getAutosave( postType, postId, currentUserId )
+				);
+			}
+
 			const post = coreSelect.getEntityRecord(
 				'postType',
 				postType,

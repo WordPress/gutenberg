@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `getAutosave`: Request the given author's autosave rather than resolving the whole collection through `getAutosaves`. WordPress stores one autosave per author and the selector only ever returns that author's, so on a post with many editors this fetches one record instead of all of them ([#71367](https://github.com/WordPress/gutenberg/pull/71367)).
+-   Add a `hasFetchedAutosave` selector reporting whether `getAutosave` has resolved for an author. `hasFetchedAutosaves` continues to report on the `getAutosaves` collection ([#71367](https://github.com/WordPress/gutenberg/pull/71367)).
+
+### Bug Fixes
+
+-   `receiveAutosaves`: Merge incoming autosaves by author instead of replacing the stored collection, so an author-scoped response does not truncate a collection fetched by `getAutosaves` ([#71367](https://github.com/WordPress/gutenberg/pull/71367)).
+
 ### Internal
 
 -   Remove unused dependency `@wordpress/is-shallow-equal` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).

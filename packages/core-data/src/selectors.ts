@@ -1383,6 +1383,47 @@ export const hasFetchedAutosaves = createRegistrySelector(
 );
 
 /**
+ * Returns true if the REST request for a single author's autosave has
+ * completed.
+ *
+ * `getAutosave` requests one author's autosave rather than the whole
+ * collection, so it resolves under its own key. Callers that read
+ * `getAutosave` should check this rather than `hasFetchedAutosaves`, which
+ * only reports on the collection.
+ *
+ * Without an author there is nothing to request, and the resolver returns
+ * early rather than fetching. That still counts as a finished resolution, so
+ * an undefined author is reported as not fetched: the caller does not yet know
+ * whether an autosave exists.
+ *
+ * @param state    State tree.
+ * @param postType The type of the parent post.
+ * @param postId   The id of the parent post.
+ * @param authorId The id of the author.
+ *
+ * @return True if the REST request was completed. False otherwise.
+ */
+export const hasFetchedAutosave = createRegistrySelector(
+	( select ) =>
+		(
+			state: State,
+			postType: string,
+			postId: EntityRecordKey,
+			authorId: EntityRecordKey
+		): boolean => {
+			if ( authorId === undefined ) {
+				return false;
+			}
+
+			return select( STORE_NAME ).hasFinishedResolution( 'getAutosave', [
+				postType,
+				postId,
+				authorId,
+			] );
+		}
+);
+
+/**
  * Returns a new reference when edited values have changed. This is useful in
  * inferring where an edit has been made between states by comparison of the
  * return values using strict equality.
