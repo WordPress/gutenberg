@@ -956,6 +956,88 @@ describe( 'DataViews component', () => {
 			expect( previewSizeSlider ).toBeInTheDocument();
 			expect( previewSizeSlider ).toHaveValue( '0' ); // Falls back to the smallest size, which is the first one.
 		} );
+
+		describe( 'media fit', () => {
+			// `layout` is loosely typed so the invalid-value case below can
+			// pass something the `mediaFit` union rejects.
+			const renderGrid = (
+				layout: Record< string, unknown > = {},
+				props = {},
+				view: Record< string, unknown > = {}
+			) =>
+				render(
+					<DataViewWrapper
+						view={
+							{
+								type: 'grid',
+								mediaField: 'image',
+								layout,
+								...view,
+							} as unknown as View
+						}
+						{ ...props }
+					/>
+				);
+
+			const optedIn = {
+				config: {
+					perPageSizes: [ 10, 20 ],
+					mediaFitControl: true,
+				},
+			};
+
+			const queryControl = async () => {
+				const user = userEvent.setup();
+				await user.click(
+					screen.getByRole( 'button', { name: 'View options' } )
+				);
+				return screen.queryByRole( 'checkbox', {
+					name: 'Original aspect ratio',
+				} );
+			};
+
+			// The standard (non-infinite-scroll) grid root, which carries the
+			// class the previews are styled from.
+			const getGrid = () => screen.getByRole( 'grid' );
+
+			it( 'crops previews by default', () => {
+				renderGrid();
+				expect( getGrid() ).not.toHaveClass( 'has-media-fit-contain' );
+			} );
+
+			it( 'fits previews when configured to contain', () => {
+				renderGrid( { mediaFit: 'contain' } );
+				expect( getGrid() ).toHaveClass( 'has-media-fit-contain' );
+			} );
+
+			it( 'ignores an unsupported value and falls back to cropping', () => {
+				renderGrid( { mediaFit: 'fill' } );
+				expect( getGrid() ).not.toHaveClass( 'has-media-fit-contain' );
+			} );
+
+			it( 'hides the control unless the consumer opts in', async () => {
+				renderGrid();
+				expect( await queryControl() ).not.toBeInTheDocument();
+			} );
+
+			it( 'hides the control when the view is not showing media', async () => {
+				renderGrid( {}, optedIn, { showMedia: false } );
+				expect( await queryControl() ).not.toBeInTheDocument();
+			} );
+
+			it( 'hides the control when the media field is not one of the fields', async () => {
+				renderGrid( {}, optedIn, { mediaField: 'not-a-field' } );
+				expect( await queryControl() ).not.toBeInTheDocument();
+			} );
+
+			it( 'toggles the fit from the view options when opted in', async () => {
+				renderGrid( {}, optedIn );
+				const control = await queryControl();
+				const user = userEvent.setup();
+				await user.click( control as HTMLElement );
+				expect( getGrid() ).toHaveClass( 'has-media-fit-contain' );
+			} );
+		} );
 	} );
 
 	describe( 'in list view', () => {
@@ -1130,7 +1212,7 @@ describe( 'DataViews component', () => {
 
 			// Table, Grid, and List options must all appear.
 			expect(
-				screen.getByRole( 'menuitemradio', { name: 'Table' } )
+				await screen.findByRole( 'menuitemradio', { name: 'Table' } )
 			).toBeInTheDocument();
 			expect(
 				screen.getByRole( 'menuitemradio', { name: 'Grid' } )

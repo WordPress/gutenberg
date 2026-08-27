@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
 import type { WidgetType } from '@wordpress/widget-primitives';
 import { WidgetDashboard } from '../widget-dashboard';
-import type { DashboardWidget } from '../types';
+import type { CanPerformDashboardOperation, DashboardWidget } from '../types';
 
 const widgetTypes: WidgetType[] = [];
 
@@ -18,18 +18,22 @@ interface HarnessProps {
 	initialEditMode?: boolean;
 	onEditChange?: ( next: boolean ) => void;
 	onLayoutChange?: ( next: DashboardWidget[] ) => void;
+	canPerform?: CanPerformDashboardOperation;
+	layout?: DashboardWidget[];
 }
 
 function Harness( {
 	initialEditMode = false,
 	onEditChange,
 	onLayoutChange = () => {},
+	canPerform,
+	layout: initialLayout = layout,
 }: HarnessProps ) {
 	const [ editMode, setEditMode ] = useState( initialEditMode );
 
-	return (
+	const dashboard = (
 		<WidgetDashboard
-			layout={ layout }
+			layout={ initialLayout }
 			onLayoutChange={ onLayoutChange }
 			widgetTypes={ widgetTypes }
 			editMode={ editMode }
@@ -41,7 +45,18 @@ function Harness( {
 			<WidgetDashboard.Actions />
 		</WidgetDashboard>
 	);
+
+	return canPerform ? (
+		<WidgetDashboard.Policy canPerform={ canPerform }>
+			{ dashboard }
+		</WidgetDashboard.Policy>
+	) : (
+		dashboard
+	);
 }
+
+const denyCustomize: CanPerformDashboardOperation = ( request ) =>
+	request.operation !== 'customize';
 
 describe( 'WidgetDashboard.Actions', () => {
 	let user: ReturnType< typeof userEvent.setup >;
@@ -131,6 +146,47 @@ describe( 'WidgetDashboard.Actions', () => {
 		expect(
 			screen.queryByRole( 'button', { name: 'Layout settings' } )
 		).not.toBeInTheDocument();
+	} );
+
+	it( 'hides Customize when the policy denies it', () => {
+		render( <Harness canPerform={ denyCustomize } /> );
+
+		expect(
+			screen.queryByRole( 'button', { name: 'Customize' } )
+		).not.toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: 'More options' } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'keeps Done and Cancel while in edit mode when customize is denied', () => {
+		render( <Harness initialEditMode canPerform={ denyCustomize } /> );
+
+		expect(
+			screen.getByRole( 'button', { name: 'Done' } )
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: 'Cancel' } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'enters edit mode on an empty layout only when customize is allowed', () => {
+		const onEditChange = jest.fn();
+		const { unmount } = render(
+			<Harness layout={ [] } onEditChange={ onEditChange } />
+		);
+		expect( onEditChange ).toHaveBeenCalledWith( true );
+		unmount();
+
+		onEditChange.mockClear();
+		render(
+			<Harness
+				layout={ [] }
+				onEditChange={ onEditChange }
+				canPerform={ denyCustomize }
+			/>
+		);
+		expect( onEditChange ).not.toHaveBeenCalled();
 	} );
 
 	it( 'throws when used outside a WidgetDashboard subtree', () => {

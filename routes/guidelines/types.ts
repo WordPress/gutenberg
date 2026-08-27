@@ -41,10 +41,19 @@ export interface ContentBlock {
  * `editEntityRecord`/`getRawEntityRecord` (which read the `default` bucket)
  * can't find them — breaking edits of rows loaded after a page refresh.
  */
-export interface GuidelineQuery {
+export type GuidelineQuery = {
 	slug: string[];
 	status: string[];
 	per_page: number;
+};
+
+/**
+ * The raw `wp_knowledge` row shape the guidelines page reads.
+ */
+export interface KnowledgeRow {
+	id: number;
+	slug: string;
+	content?: { raw?: string };
 }
 
 export interface GuidelineAccordionProps {

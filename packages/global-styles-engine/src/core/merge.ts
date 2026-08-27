@@ -1,5 +1,4 @@
 import deepmerge from 'deepmerge';
-// @ts-expect-error Its declaration file is not exposed through the `exports` map.
 import { isPlainObject } from 'is-plain-object';
 import type { GlobalStylesConfig } from '../types';
 import { normalizeStyleStateAliases } from '../style-state-back-compat';
