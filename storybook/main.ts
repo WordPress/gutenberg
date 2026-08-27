@@ -232,6 +232,10 @@ const config: StorybookConfig = {
 				},
 			],
 			build: {
+				// Let the browser discover JavaScript dependencies as it
+				// evaluates each module. Preloading the complete dependency
+				// graph creates hundreds of concurrent requests on first load.
+				modulePreload: false,
 				// Storybook's preview includes its shared runtime and all stories.
 				// Automatic chunk splitting is already enabled; 3.5 MB leaves a
 				// meaningful budget above the current 3.15 MB largest chunk.

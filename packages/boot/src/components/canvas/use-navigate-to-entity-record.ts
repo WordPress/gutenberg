@@ -11,7 +11,7 @@ import {
 	privateApis as routePrivateApis,
 } from '@wordpress/route';
 import { store as bootStore } from '../../store';
-import { DEFAULT_DEVICE_TYPE } from './use-viewport-sync';
+import { isValidViewport } from './viewport';
 import { unlock } from '../../lock-unlock';
 
 const { useCanGoBack, useRouter } = unlock( routePrivateApis );
@@ -34,8 +34,6 @@ interface NavigateParams {
 	postId: string;
 	viewport?: string;
 }
-
-const VALID_VIEWPORTS = [ 'desktop', 'tablet', 'mobile' ];
 
 /**
  * Builds the editor's entity navigation callbacks.
@@ -81,37 +79,25 @@ export default function useNavigateToEntityRecord() {
 				) as { selection?: { selectionStart?: { clientId?: string } } };
 			const selectedBlock = edits?.selection?.selectionStart?.clientId;
 
-			/*
-			 * An entity can ask to be edited at a particular width — a
-			 * navigation overlay meant for mobile. Leave the width this entity
-			 * is being viewed at behind, so returning restores it.
-			 */
-			const requestedViewport = params.viewport?.toLowerCase();
-			const hasRequestedViewport =
-				!! requestedViewport &&
-				VALID_VIEWPORTS.includes( requestedViewport );
-			const currentViewport = hasRequestedViewport
-				? (
-						(
-							registry.select( editorStore ) as any
-						 ).getDeviceType() ?? DEFAULT_DEVICE_TYPE
-				  ).toLowerCase()
-				: undefined;
-
-			if ( selectedBlock || currentViewport ) {
+			if ( selectedBlock ) {
 				navigate( {
 					search: ( previous: Record< string, unknown > ) => ( {
 						...previous,
-						...( selectedBlock ? { selectedBlock } : {} ),
-						// The default needs no entry; its absence means it.
-						...( currentViewport &&
-						currentViewport !== DEFAULT_DEVICE_TYPE.toLowerCase()
-							? { viewport: currentViewport }
-							: {} ),
+						selectedBlock,
 					} ),
 					replace: true,
 				} );
 			}
+
+			/*
+			 * An entity can ask to be edited at a particular width — a
+			 * navigation overlay meant for mobile. The width is where the entity
+			 * opens, not something the entity being left carries away: a width
+			 * set from the device preview is view state, and an entity that asks
+			 * for none opens at the default.
+			 */
+			const requestedViewport = params.viewport?.toLowerCase();
+			const hasRequestedViewport = isValidViewport( requestedViewport );
 
 			/*
 			 * `focusMode` marks the entity as one navigated into rather than

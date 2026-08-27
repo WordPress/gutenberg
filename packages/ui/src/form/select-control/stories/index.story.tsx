@@ -3,6 +3,8 @@ import { SelectControl } from '../';
 import {
 	WITH_DETAILS_DESCRIPTION,
 	DETAILS_EXAMPLE,
+	longLabelPopupItems,
+	narrowContainerDecorator,
 } from '../../stories/shared';
 
 const meta: Meta< typeof SelectControl > = {
@@ -274,5 +276,19 @@ export const WithItemsArrayAndPartialCustomization: Story = {
 				</SelectControl.Item>
 			) ),
 		],
+	},
+};
+
+/**
+ * Use `popupWidth` to control how the popup width is constrained relative to
+ * its anchor. Defaults to `content` so static option lists can grow with their
+ * labels.
+ */
+export const PopupWidth: Story = {
+	decorators: [ narrowContainerDecorator ],
+	args: {
+		label: 'Label',
+		items: longLabelPopupItems,
+		popupWidth: 'content',
 	},
 };

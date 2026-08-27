@@ -1,5 +1,11 @@
 import { redirect } from '@wordpress/route';
 
+declare global {
+	interface Window {
+		__experimentalTemplateActivate?: boolean;
+	}
+}
+
 /**
  * Route configuration for template redirect.
  */
