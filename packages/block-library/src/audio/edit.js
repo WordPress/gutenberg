@@ -5,10 +5,9 @@ import {
 	Spinner,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalText as WCText,
+	__experimentalToolsPanelItem as ToolsPanelItem
 } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Stack, Text } from '@wordpress/ui';
 import {
 	BlockControls,
 	BlockIcon,
@@ -178,11 +177,11 @@ function AudioEdit( {
 					dropdownMenuProps={ dropdownMenuProps }
 				>
 					<Stack className="wp-block-audio__autoplay-help-text-wrapper">
-						<WCText variant="muted">
+						<Text className="wp-block-audio__autoplay-help-text">
 							{ __(
 								'Most browsers block audio until a visitor interacts with the page, so autoplay often won’t work, especially on mobile. Unexpected sound can also be disruptive for screen reader users.'
 							) }
-						</WCText>
+						</Text>
 					</Stack>
 					<ToolsPanelItem
 						label={ __( 'Autoplay' ) }

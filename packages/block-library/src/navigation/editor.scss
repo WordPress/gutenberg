@@ -724,3 +724,7 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 .wp-block-audio__autoplay-help-text-wrapper {
 	grid-column: 1/-1;
 }
+
+.wp-block-audio__autoplay-help-text {
+	color: $gray-700;
+}
