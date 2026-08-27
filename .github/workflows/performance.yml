@@ -30,13 +30,26 @@ permissions: {}
 jobs:
     performance:
         timeout-minutes: 60
-        name: Run performance tests
+        name: Run performance tests (${{ matrix.shard }})
         runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
         permissions:
             contents: read
         if: ${{ github.repository == 'WordPress/gutenberg' }}
+        strategy:
+            fail-fast: false
+            # Shards run in parallel to cut the wall clock time. Every shard still
+            # measures all branches on the same runner, so results stay comparable.
+            matrix:
+                include:
+                    - shard: post-editor
+                      suites: post-editor
+                    - shard: site-editor
+                      suites: site-editor
+                    - shard: media-and-front-end
+                      suites: front-end-block-theme,front-end-classic-theme,media-processing,media-upload
         env:
             WP_ARTIFACTS_PATH: ${{ github.workspace }}/artifacts
+            PERF_SUITES: ${{ matrix.suites }}
 
         steps:
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -56,7 +69,7 @@ jobs:
 
             - name: Compare performance with base branch
               if: github.event_name == 'pull_request'
-              run: npm exec --no release-cli -- perf "$GITHUB_SHA" "$GITHUB_BASE_REF" --tests-branch "$GITHUB_SHA"
+              run: npm exec --no release-cli -- perf "$GITHUB_SHA" "$GITHUB_BASE_REF" --tests-branch "$GITHUB_SHA" --suites "$PERF_SUITES"
 
             - name: Compare performance with current WordPress Core and previous Gutenberg versions
               if: github.event_name == 'release'
@@ -90,7 +103,7 @@ jobs:
                   WP_VERSION="$(awk -F ': ' '/^Tested up to/{print $2}' readme.txt)"
                   IFS=. read -ra WP_VERSION_ARRAY <<< "$WP_VERSION"
                   WP_MAJOR="${WP_VERSION_ARRAY[0]}.${WP_VERSION_ARRAY[1]}"
-                  npm exec --no release-cli -- perf "wp/$WP_MAJOR" "$PREVIOUS_RELEASE_BRANCH" "$CURRENT_RELEASE_BRANCH" --tests-branch "$GITHUB_SHA" --wp-version "$WP_MAJOR"
+                  npm exec --no release-cli -- perf "wp/$WP_MAJOR" "$PREVIOUS_RELEASE_BRANCH" "$CURRENT_RELEASE_BRANCH" --tests-branch "$GITHUB_SHA" --wp-version "$WP_MAJOR" --suites "$PERF_SUITES"
 
             - name: Compare performance with base branch
               if: github.event_name == 'push'
@@ -102,7 +115,7 @@ jobs:
                   WP_VERSION="$(awk -F ': ' '/^Tested up to/{print $2}' readme.txt)"
                   IFS=. read -ra WP_VERSION_ARRAY <<< "$WP_VERSION"
                   WP_MAJOR="${WP_VERSION_ARRAY[0]}.${WP_VERSION_ARRAY[1]}"
-                  npm exec --no release-cli -- perf "$GITHUB_SHA" 28d414f1327652e2b49e784ddc12098768991c62 --tests-branch "$GITHUB_SHA" --wp-version "$WP_MAJOR"
+                  npm exec --no release-cli -- perf "$GITHUB_SHA" 28d414f1327652e2b49e784ddc12098768991c62 --tests-branch "$GITHUB_SHA" --wp-version "$WP_MAJOR" --suites "$PERF_SUITES"
 
             - name: Compare performance with custom branches
               if: github.event_name == 'workflow_dispatch'
@@ -110,7 +123,8 @@ jobs:
                   BRANCHES: ${{ github.event.inputs.branches }}
                   WP_VERSION: ${{ github.event.inputs.wpversion }}
               run: |
-                  npm exec --no release-cli -- perf "$(echo "$BRANCHES" | tr ',' ' ')" --tests-branch "$GITHUB_SHA" --wp-version "$WP_VERSION"
+                  IFS=, read -ra BRANCH_ARGS <<< "$BRANCHES"
+                  npm exec --no release-cli -- perf "${BRANCH_ARGS[@]}" --tests-branch "$GITHUB_SHA" --wp-version "$WP_VERSION" --suites "$PERF_SUITES"
 
             - name: Add workflow summary
               run: cat "${WP_ARTIFACTS_PATH}/summary.md" >> "$GITHUB_STEP_SUMMARY"
@@ -119,18 +133,99 @@ jobs:
               if: success()
               uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               with:
-                  name: performance-results
+                  name: performance-results-${{ matrix.shard }}
                   path: ${{ env.WP_ARTIFACTS_PATH }}/*.performance-results*.json
+
+            - name: Archive performance summary
+              if: success()
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              with:
+                  name: performance-summary-${{ matrix.shard }}
+                  path: ${{ env.WP_ARTIFACTS_PATH }}/summary.md
 
             - name: Archive performance traces
               if: always()
               uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               with:
-                  name: performance-traces
+                  name: performance-traces-${{ matrix.shard }}
                   path: |
                       ${{ env.WP_ARTIFACTS_PATH }}/traces
                       ${{ env.WP_ARTIFACTS_PATH }}/build
                   if-no-files-found: ignore
+
+            - name: Archive debug artifacts (screenshots, HTML snapshots)
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              if: failure()
+              with:
+                  name: failures-artifacts-${{ matrix.shard }}
+                  path: ${{ env.WP_ARTIFACTS_PATH }}
+                  if-no-files-found: ignore
+
+    results:
+        timeout-minutes: 10
+        name: Merge performance results
+        runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
+        needs: performance
+        if: ${{ github.repository == 'WordPress/gutenberg' }}
+        permissions:
+            contents: read
+        env:
+            WP_ARTIFACTS_PATH: ${{ github.workspace }}/artifacts
+
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Use desired version of Node.js
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version-file: '.nvmrc'
+
+            - name: Download shard results
+              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+              with:
+                  pattern: performance-results-*
+                  path: ${{ env.WP_ARTIFACTS_PATH }}
+                  merge-multiple: true
+
+            - name: Download shard summaries
+              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+              with:
+                  pattern: performance-summary-*
+                  path: ${{ env.WP_ARTIFACTS_PATH }}/summaries
+
+            # Fails when a suite is missing from every shard of the matrix above.
+            - name: Check that every suite ran
+              run: |
+                  for spec in test/performance/specs/*.spec.js; do
+                    suite="$(basename "$spec" .spec.js)"
+                    if [[ ! -f "${WP_ARTIFACTS_PATH}/${suite}.performance-results.json" ]]; then
+                      echo "::error::No results for the '${suite}' suite. Add it to a shard in performance.yml."
+                      exit 1
+                    fi
+                  done
+
+            - name: Add workflow summary
+              run: |
+                  {
+                    echo "## Performance Test Results"
+                    echo
+                    echo "Please note that client side metrics **exclude** the server response time."
+                    echo
+                    for shard in post-editor site-editor media-and-front-end; do
+                      # Skip the header the shard summary repeats.
+                      tail -n +5 "${WP_ARTIFACTS_PATH}/summaries/performance-summary-${shard}/summary.md"
+                    done
+                  } >> "$GITHUB_STEP_SUMMARY"
+
+            # Keep the single artifact that existed before the tests were sharded.
+            - name: Archive merged performance results
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              with:
+                  name: performance-results
+                  path: ${{ env.WP_ARTIFACTS_PATH }}/*.performance-results*.json
 
             - name: Publish performance results
               if: github.event_name == 'push'
@@ -138,12 +233,4 @@ jobs:
                   CODEHEALTH_PROJECT_TOKEN: ${{ secrets.CODEHEALTH_PROJECT_TOKEN }}
               run: |
                   COMMITTED_AT="$(git show -s "$GITHUB_SHA" --format="%cI")"
-                  npm run --workspace=tools/release log-performance-results -- "$CODEHEALTH_PROJECT_TOKEN" trunk "$GITHUB_SHA" 28d414f1327652e2b49e784ddc12098768991c62 "$COMMITTED_AT"
-
-            - name: Archive debug artifacts (screenshots, HTML snapshots)
-              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-              if: failure()
-              with:
-                  name: failures-artifacts
-                  path: ${{ env.WP_ARTIFACTS_PATH }}
-                  if-no-files-found: ignore
+                  node tools/release/log-performance-results.js "$CODEHEALTH_PROJECT_TOKEN" trunk "$GITHUB_SHA" 28d414f1327652e2b49e784ddc12098768991c62 "$COMMITTED_AT"

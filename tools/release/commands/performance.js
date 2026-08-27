@@ -21,6 +21,7 @@ const RESULTS_FILE_SUFFIX = '.performance-results.json';
  *
  * @property {boolean=} ci          Run on CI.
  * @property {number=}  rounds      Run each test suite this many times for each branch.
+ * @property {string=}  suites      Comma separated names of the test suites to run (default: all).
  * @property {string=}  testsBranch The branch whose performance test files will be used for testing.
  * @property {string=}  wpVersion   The WordPress version to be used as the base install for testing.
  */
@@ -355,6 +356,32 @@ async function runPerformanceTests( branches, options ) {
 	// @ts-expect-error The `simple-git` module namespace has no call signatures.
 	await SimpleGit( testRunnerDir ).raw( 'checkout', testRunnerBranch );
 
+	logAtIndent( 2, 'Looking for test files' );
+	const availableSuites = getFilesFromDir(
+		path.join( testRunnerDir, 'test/performance/specs' )
+	).map( ( file ) => path.basename( file, '.spec.js' ) );
+	const requestedSuites = ( options.suites || '' )
+		.split( ',' )
+		.map( ( suite ) => suite.trim() )
+		.filter( Boolean );
+	const unknownSuites = requestedSuites.filter(
+		( suite ) => ! availableSuites.includes( suite )
+	);
+	if ( unknownSuites.length ) {
+		throw new Error(
+			`Unknown test suite(s): ${ unknownSuites.join(
+				', '
+			) }. Available: ${ availableSuites.join( ', ' ) }`
+		);
+	}
+	const testSuites = availableSuites.filter(
+		( suite ) =>
+			requestedSuites.length === 0 || requestedSuites.includes( suite )
+	);
+	for ( const suite of testSuites ) {
+		logAtIndent( 3, 'Found:', formats.success( suite ) );
+	}
+
 	logAtIndent( 2, 'Installing dependencies and building' );
 	await runShellScript(
 		`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm install --global npm@10 && npm ci && npm run build --workspace @wordpress/e2e-test-utils-playwright && npx playwright install chromium --with-deps"`,
@@ -454,15 +481,6 @@ async function runPerformanceTests( branches, options ) {
 			'utf8'
 		);
 	}
-
-	logAtIndent( 0, 'Looking for test files' );
-
-	const testSuites = getFilesFromDir(
-		path.join( testRunnerDir, 'test/performance/specs' )
-	).map( ( file ) => {
-		logAtIndent( 1, 'Found:', formats.success( file ) );
-		return path.basename( file, '.spec.js' );
-	} );
 
 	logAtIndent( 0, 'Running tests' );
 
