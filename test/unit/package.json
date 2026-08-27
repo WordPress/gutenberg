@@ -28,6 +28,8 @@
 		"@testing-library/jest-dom": "^6.9.1",
 		"@testing-library/react": "^16.3.2",
 		"@testing-library/user-event": "^14.6.1",
+		"@types/node": "^20.19.39",
+		"@typescript-eslint/parser": "^8.68.0",
 		"@vitejs/plugin-react-swc": "^4.3.3",
 		"@vitest/browser-playwright": "^4.1.10",
 		"@wordpress/babel-preset-default": "file:../../packages/babel-preset-default",
@@ -53,6 +55,7 @@
 		"resize-observer-polyfill": "^1.5.1",
 		"snapshot-diff": "^0.10.0",
 		"timezone-mock": "^1.3.6",
+		"typescript": "npm:@typescript/typescript6@^6.0.2",
 		"vite-plugin-commonjs": "^0.10.4",
 		"vitest": "^4.1.10",
 		"yargs": "^17.3.0"
@@ -62,6 +65,7 @@
 	},
 	"scripts": {
 		"test:unit": "wp-scripts test-unit-js --config jest.config.js",
+		"test:unit:conventions": "node scripts/validate-vitest-conventions.mjs",
 		"test:unit:vitest": "vitest run --config vitest.config.mjs",
 		"test:unit:profile": "wp-scripts --cpu-prof test-unit-js --runInBand --no-cache --verbose --config jest.config.js",
 		"test:unit:watch": "npm run test:unit -- --watch",
