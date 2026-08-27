@@ -22,6 +22,55 @@ import { restoreSelection, getSelectionHistory } from './utils/crdt-selection';
 import { setCachedBlocks } from './parsed-blocks-cache';
 
 /**
+ * Sequence number handed to each record request, and the highest sequence
+ * number whose response has already been written to the store, per registry
+ * and per resolution.
+ */
+let responseSequence = 0;
+const lastReceivedResponse = new WeakMap();
+
+/**
+ * Reserves a slot in the response order for a record request that is about to
+ * be made, and returns a predicate telling whether that request's response is
+ * still the freshest one for the same resolution.
+ *
+ * `invalidateResolution` starts a second request for a record while the first
+ * one may still be in flight, and the store keeps whichever response is
+ * *delivered* last - even when its body was read from the database before the
+ * newer one. Client-side media uploads hit this: the record fetched while
+ * sub-sizes are still being generated carries an empty `media_details.sizes`,
+ * and when it lands after the post-upload refetch it hides the sizes again.
+ * See https://github.com/WordPress/gutenberg/issues/81844.
+ *
+ * Only responses to an identical request are compared, so a request for a
+ * different set of `_fields` never discards another one's data.
+ *
+ * @param {Object} registry A `@wordpress/data` registry.
+ * @param {string} orderKey Identifies the resolution the request belongs to.
+ *
+ * @return {Function} Predicate returning `false` when a newer response for the
+ *                    same resolution has already been received.
+ */
+function claimResponseOrder( registry, orderKey ) {
+	const sequence = ++responseSequence;
+
+	return () => {
+		let received = lastReceivedResponse.get( registry );
+		if ( ! received ) {
+			received = new Map();
+			lastReceivedResponse.set( registry, received );
+		}
+
+		if ( received.get( orderKey ) > sequence ) {
+			return false;
+		}
+
+		received.set( orderKey, sequence );
+		return true;
+	};
+}
+
+/**
  * Requests authors from the REST API.
  *
  * @param {Object|undefined} query Optional object of query parameters to
@@ -125,8 +174,19 @@ export const getEntityRecord =
 				...entityConfig.baseURLParams,
 				...query,
 			} );
+			const isFreshestResponse = claimResponseOrder(
+				registry,
+				JSON.stringify( [ kind, name, key, query ?? null ] )
+			);
 			const response = await apiFetch( { path, parse: false } );
 			const record = await response.json();
+
+			// A response to the same request has already been received since
+			// this one was made, so this record is known to be out of date.
+			if ( ! isFreshestResponse() ) {
+				return;
+			}
+
 			const permissions = getUserPermissionsFromAllowHeader(
 				response.headers?.get( 'allow' )
 			);

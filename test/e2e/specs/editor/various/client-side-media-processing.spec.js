@@ -899,4 +899,132 @@ test.describe( 'Client-side media processing', () => {
 		);
 		expect( media.mime_type ).toBe( 'image/jpeg' );
 	} );
+
+	test( 'shows the Resolution control when a stale attachment fetch resolves after the upload', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+	} ) => {
+		/*
+		 * Regression test for https://github.com/WordPress/gutenberg/issues/81844.
+		 *
+		 * During a client-side upload the attachment is created first and its
+		 * sub-sizes are written only by the final `finalize` request, so any
+		 * attachment GET issued in between returns `media_details.sizes: {}`.
+		 * core-data keeps whichever response arrives last, so on a busy server
+		 * a stale mid-upload response delivered late can clobber the finalized
+		 * record and permanently hide the Image block's Resolution control.
+		 *
+		 * Simulate that worst-case ordering: hold the response of the first
+		 * attachment GET issued before `finalize` starts (reading its stale
+		 * body immediately), and deliver it only after the upload queue has
+		 * emptied and the finalized record has been fetched.
+		 */
+		let finalizeStarted = false;
+		let holding = false;
+		let releaseStaleResponse = () => {};
+		const staleResponseGate = new Promise( ( resolve ) => {
+			releaseStaleResponse = resolve;
+		} );
+		let staleResponseDelivered = Promise.resolve();
+
+		page.on( 'request', ( request ) => {
+			if ( /\/wp\/v2\/media\/\d+\/finalize/.test( request.url() ) ) {
+				finalizeStarted = true;
+			}
+		} );
+
+		await page.route( /\/wp\/v2\/media\/\d+\?/, async ( route ) => {
+			if (
+				route.request().method() !== 'GET' ||
+				finalizeStarted ||
+				holding
+			) {
+				await route.continue();
+				return;
+			}
+			holding = true;
+			// Read the (stale) body now, deliver it later.
+			const response = await route.fetch();
+			const body = await response.body();
+			staleResponseDelivered = ( async () => {
+				await staleResponseGate;
+				await route.fulfill( { response, body } );
+			} )();
+			await staleResponseDelivered;
+		} );
+
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		await mediaProcessingUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			'1024x768_e2e_test_image_size.jpeg'
+		);
+
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
+		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
+			timeout: 30_000,
+		} );
+
+		await mediaProcessingUtils.waitForUploadQueueEmpty();
+
+		const imageId = await mediaProcessingUtils.getSelectedBlockImageId();
+		expect( imageId ).toBeDefined();
+
+		// Wait until the editor has received the finalized attachment record
+		// (its generated sub-sizes present) before delivering the stale one.
+		await page.waitForFunction(
+			( id ) => {
+				const record = window.wp.data
+					.select( 'core' )
+					.getEntityRecord( 'postType', 'attachment', id, {
+						context: 'view',
+					} );
+				return (
+					!! record &&
+					Object.keys( record.media_details?.sizes || {} ).length > 0
+				);
+			},
+			imageId,
+			{ timeout: 30_000 }
+		);
+
+		// Deliver the stale response last and wait until the page has
+		// fully received it. The bounded wait lets the page finish
+		// processing the late response; the assertions below then check
+		// that it had no lasting effect.
+		releaseStaleResponse();
+		await staleResponseDelivered;
+		await new Promise( ( resolve ) => setTimeout( resolve, 1500 ) );
+
+		// The stale response must not clobber the finalized record…
+		const cachedSizes = await page.evaluate( ( id ) => {
+			const record = window.wp.data
+				.select( 'core' )
+				.getEntityRecord( 'postType', 'attachment', id, {
+					context: 'view',
+				} );
+			return Object.keys( record?.media_details?.sizes || {} );
+		}, imageId );
+		expect( cachedSizes ).not.toHaveLength( 0 );
+
+		// …and the Resolution control keeps offering the generated sizes.
+		await editor.openDocumentSettingsSidebar();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'tab', { name: 'Settings' } )
+			.click();
+		await expect(
+			page.getByRole( 'combobox', { name: 'Resolution' } )
+		).toBeVisible();
+
+		await page.unroute( /\/wp\/v2\/media\/\d+\?/ );
+	} );
 } );
