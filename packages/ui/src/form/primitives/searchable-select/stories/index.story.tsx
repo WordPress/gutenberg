@@ -2,6 +2,11 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
 import { fn } from 'storybook/test';
 import { SearchableSelect } from '../';
+import {
+	GROUPED_ITEMS,
+	type FixtureGroup,
+	type FixtureItem,
+} from '../../combobox/stories/fixtures';
 import { ITEMS } from './fixtures';
 
 const meta: Meta< typeof SearchableSelect > = {
@@ -14,7 +19,10 @@ const meta: Meta< typeof SearchableSelect > = {
 	// See: https://github.com/storybookjs/storybook/issues/34877
 	render: ( args ) => <SearchableSelect { ...args } />,
 	subcomponents: {
+		'SearchableSelect.Group': SearchableSelect.Group,
+		'SearchableSelect.GroupLabel': SearchableSelect.GroupLabel,
 		'SearchableSelect.Item': SearchableSelect.Item,
+		'SearchableSelect.Collection': SearchableSelect.Collection,
 	},
 	argTypes: {
 		items: { control: false },
@@ -140,5 +148,36 @@ export const WithCustomEmptyContent: Story = {
 	args: {
 		...Default.args,
 		emptyContent: 'No fruits found 🥺',
+	},
+};
+
+/**
+ * To render grouped items, pass an array of groups to `items` (each with
+ * `label` and `items` properties) and provide `children` that renders each
+ * group using `SearchableSelect.Group`, `SearchableSelect.GroupLabel`,
+ * and `SearchableSelect.Collection`. Grouped items have no default
+ * renderer, so `children` is required.
+ */
+export const Grouped: Story = {
+	args: {
+		...Default.args,
+		items: GROUPED_ITEMS,
+		children: ( group: FixtureGroup ) => (
+			<SearchableSelect.Group key={ group.label } items={ group.items }>
+				<SearchableSelect.GroupLabel>
+					{ group.label }
+				</SearchableSelect.GroupLabel>
+				<SearchableSelect.Collection>
+					{ ( item: FixtureItem ) => (
+						<SearchableSelect.Item
+							key={ item.value }
+							value={ item }
+						>
+							{ item.label }
+						</SearchableSelect.Item>
+					) }
+				</SearchableSelect.Collection>
+			</SearchableSelect.Group>
+		),
 	},
 };

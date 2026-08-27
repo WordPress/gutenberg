@@ -1289,6 +1289,22 @@
       - value
       - virtualized
   subcomponents:
+      - name: SearchableSelect.Collection
+        props:
+            - children
+      - name: SearchableSelect.Group
+        props:
+            - children
+            - className
+            - items
+            - render
+            - style
+      - name: SearchableSelect.GroupLabel
+        props:
+            - children
+            - className
+            - render
+            - style
       - name: SearchableSelect.Item
         props:
             - children

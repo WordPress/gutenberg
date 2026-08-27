@@ -2,23 +2,39 @@ import { forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import warning from '@wordpress/warning';
 import * as Combobox from '../combobox';
+import type { ComboboxCollectionProps } from '../combobox/types';
 import styles from './style.module.css';
 import {
 	findCreatableItem,
-	isCreatableItem,
+	findCreatableItems,
+	hasGroupedItems,
+	isItem,
 	normalizeRootItems,
+	shouldSkipCollectionEntry,
 	type Item,
+	type ItemGroup,
 	type SearchableSelectProps,
 } from './types';
 
-function warnSearchableSelectProps( items: Item[] | undefined ): void {
+function warnSearchableSelectProps(
+	items: Item[] | ItemGroup[] | undefined,
+	children: ComboboxCollectionProps[ 'children' ] | undefined
+): void {
 	if ( ! items?.length ) {
 		return;
 	}
 
-	if ( items.filter( isCreatableItem ).length > 1 ) {
+	const creatableItems = findCreatableItems( items );
+
+	if ( creatableItems.length > 1 ) {
 		warning(
 			'SearchableSelect: expected at most one item with `creatable: true` in `items`.'
+		);
+	}
+
+	if ( hasGroupedItems( items ) && ! children ) {
+		warning(
+			'SearchableSelect: grouped `items` require a `children` renderer. See the `Grouped` story for an example.'
 		);
 	}
 }
@@ -45,7 +61,7 @@ export const SearchableSelect = forwardRef<
 	},
 	ref
 ) {
-	warnSearchableSelectProps( items );
+	warnSearchableSelectProps( items, children );
 
 	const creatableItem = findCreatableItem( items );
 	const comboboxItems = normalizeRootItems( items );
@@ -69,20 +85,31 @@ export const SearchableSelect = forwardRef<
 				<Combobox.List>
 					<Combobox.ListBody>
 						<Combobox.Collection>
-							{ ( item: Item, ...args ) => {
-								if ( isCreatableItem( item ) ) {
+							{ ( entry: Item | ItemGroup, ...args ) => {
+								if (
+									shouldSkipCollectionEntry(
+										entry,
+										creatableItem
+									)
+								) {
 									return null;
 								}
+
 								if ( children ) {
-									return children( item, ...args );
+									return children( entry, ...args );
 								}
+
+								if ( ! isItem( entry ) ) {
+									return null;
+								}
+
 								return (
 									<Combobox.Item
-										key={ item.value }
-										value={ item }
-										disabled={ item.disabled }
+										key={ entry.value }
+										value={ entry }
+										disabled={ entry.disabled }
 									>
-										{ item.label }
+										{ entry.label }
 									</Combobox.Item>
 								);
 							} }
