@@ -1,5 +1,6 @@
 import { Button, SelectControl } from '@wordpress/components';
-import { Stack, VisuallyHidden } from '@wordpress/ui';
+import { Stack, Text, VisuallyHidden } from '@wordpress/ui';
+import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
 import MediaEditorImageControls from '../media-editor-image-controls';
@@ -50,6 +51,10 @@ export default function MediaEditorCropPanel( {
 	isOriginalRestored = false,
 	onRestoreOriginal,
 }: MediaEditorCropPanelProps ) {
+	const restoreHelpId = useInstanceId(
+		MediaEditorCropPanel,
+		'media-editor-crop-panel__restore-help'
+	);
 	return (
 		// Tag the whole panel as a crop-control region so the modal's
 		// Cmd+Z handler doesn't mistake the SelectControl input for a
@@ -73,15 +78,26 @@ export default function MediaEditorCropPanel( {
 				} ) ) }
 			/>
 			{ canRestoreOriginal && onRestoreOriginal && (
-				<Button
-					__next40pxDefaultSize
-					variant="secondary"
-					onClick={ onRestoreOriginal }
-					disabled={ isOriginalRestored }
-					accessibleWhenDisabled
-				>
-					{ __( 'Restore original image' ) }
-				</Button>
+				<Stack direction="column" gap="sm">
+					<Button
+						__next40pxDefaultSize
+						className="media-editor-crop-panel__restore-button"
+						variant="secondary"
+						onClick={ onRestoreOriginal }
+						disabled={ isOriginalRestored }
+						accessibleWhenDisabled
+						aria-describedby={ restoreHelpId }
+					>
+						{ __( 'Restore original image' ) }
+					</Button>
+					<Text
+						id={ restoreHelpId }
+						className="media-editor-crop-panel__restore-help"
+						variant="body-sm"
+					>
+						{ __( 'Loads the original, unedited image.' ) }
+					</Text>
+				</Stack>
 			) }
 		</Stack>
 	);
