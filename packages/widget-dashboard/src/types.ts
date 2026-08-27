@@ -201,12 +201,13 @@ export interface DashboardInstanceOperationRequest {
 
 /**
  * An operation the dashboard asks permission for, with its subject.
- * `customize` is entering customize mode; `insert` is offering a widget
- * type in the inserter; `remove`, `move`, `resize`, and `edit` act on a
- * placed widget.
+ * `customize` is entering customize mode; `reset` is restoring the default
+ * layout; `insert` is offering a widget type in the inserter; `remove`,
+ * `move`, `resize`, and `edit` act on a placed widget.
  */
 export type DashboardOperationRequest =
 	| { operation: 'customize' }
+	| { operation: 'reset' }
 	| { operation: 'insert'; widgetType: WidgetType }
 	| DashboardInstanceOperationRequest;
 

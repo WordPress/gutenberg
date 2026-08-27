@@ -653,7 +653,7 @@ const PROFILES = {
 	arranger: {
 		label: 'Arranger',
 		summary:
-			'may customize, move, and resize; never adds, removes, or edits',
+			'may customize, move, and resize; never adds, removes, edits, or resets',
 		operations: [ 'customize', 'move', 'resize' ] as readonly string[],
 	},
 	owner: {
@@ -728,6 +728,7 @@ function PolicyStory( { profile }: PolicyStoryProps ) {
 				] }
 				layout={ layout }
 				onLayoutChange={ setLayout }
+				onLayoutReset={ () => setLayout( INITIAL_LAYOUT ) }
 				editMode={ editMode }
 				onEditChange={ setEditMode }
 				resolveWidgetModule={ resolveDemoModule }
@@ -768,7 +769,7 @@ export const Policy: StoryObj< PolicyStoryProps > = {
 			control: 'select',
 			options: Object.keys( PROFILES ),
 			description:
-				'The user profile the application maps to a policy. Viewer: nothing. Arranger: customize, move, resize. Owner: everything.',
+				'The user profile the application maps to a policy. Viewer: nothing. Arranger: customize, move, resize. Owner: everything, including reset.',
 		},
 	},
 	parameters: {
@@ -777,7 +778,7 @@ export const Policy: StoryObj< PolicyStoryProps > = {
 				story: `
 The application governs the dashboard; the widget types stay untouched. This story mounts \`WidgetDashboard.Policy\` around the dashboard with a \`canPerform\` closing over the signed-in profile and the active section, and composes the dashboard inside an admin \`Page\`: the section links in its navigation, the dashboard actions in its actions slot.
 
-Switch the \`profile\` control. A Viewer gets no Customize button, no attribute controls, and read-only widgets (no \`setAttributes\`). An Arranger enters customize mode and drags or resizes tiles, but has no Add widget trigger, no Remove control, and no attribute editing. An Owner does everything.
+Switch the \`profile\` control. A Viewer gets no Customize button, no Reset to default entry, no attribute controls, and read-only widgets (no \`setAttributes\`). An Arranger enters customize mode and drags or resizes tiles, but has no Add widget trigger, no Reset to default entry, no Remove control, and no attribute editing. An Owner does everything.
 
 Switch the section, then open "Add widget": the listing follows the section, even while open; the excluded types keep rendering where already placed because the \`widgetTypes\` registry never changes.
 
