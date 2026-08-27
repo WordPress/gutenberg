@@ -9,6 +9,10 @@
     other items reorder; a non-resizable item keeps its size
     ([#81967](https://github.com/WordPress/gutenberg/pull/81967)).
 
+### Internal
+
+-   Remove unused dependency `@dnd-kit/utilities` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+
 ## 0.6.0 (2026-08-26)
 
 ### Internal

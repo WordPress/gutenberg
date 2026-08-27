@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Remove unused dependencies `@wordpress/block-editor` and `@wordpress/notices` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+
 ## 1.54.0 (2026-08-26)
 
 ## 1.53.0 (2026-08-12)
