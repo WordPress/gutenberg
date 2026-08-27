@@ -56,8 +56,7 @@
 		"is-plain-object": "^5.1.0",
 		"is-promise": "^4.0.0",
 		"redux": "^5.0.1",
-		"rememo": "^4.0.2",
-		"use-memo-one": "^1.1.1"
+		"rememo": "^4.0.2"
 	},
 	"devDependencies": {
 		"@testing-library/dom": "^10.4.1",
