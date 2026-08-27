@@ -2,7 +2,7 @@ import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { notFound } from '@wordpress/route';
-import { loadEntityViewConfig } from '@wordpress/routes-view-config';
+import { loadNavigationViewConfig } from './view-utils';
 
 const NAVIGATION_POST_TYPE = 'wp_navigation';
 
@@ -56,7 +56,7 @@ export const route = {
 	loader: async () => {
 		await Promise.all( [
 			// Preload the view configuration the stage resolves its view from.
-			loadEntityViewConfig( 'postType', NAVIGATION_POST_TYPE ),
+			loadNavigationViewConfig(),
 			// Preload navigation menus
 			resolveSelect( coreStore ).getEntityRecords(
 				'postType',

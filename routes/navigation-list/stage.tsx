@@ -10,10 +10,7 @@ import { DataViews } from '@wordpress/dataviews';
 import { Button } from '@wordpress/components';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { unlock } from '@wordpress/routes-lock-unlock';
-import {
-	getActiveViewOverrides,
-	type ViewOverrides,
-} from '@wordpress/routes-view-config';
+import { getActiveViewOverrides, type ViewOverrides } from './view-utils';
 import { useEditNavigationAction } from './actions/edit-navigation';
 import { AddNavigationModal } from './add-navigation';
 import './style.scss';
