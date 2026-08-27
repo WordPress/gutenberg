@@ -7348,6 +7348,11 @@
 			"count": 1
 		}
 	},
+	"packages/editor/src/hooks/optimize-media.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/editor/src/hooks/pattern-overrides.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
