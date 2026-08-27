@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import {
 	getBlockVisibilityViewportEntries,
 	getViewportCheckboxState,

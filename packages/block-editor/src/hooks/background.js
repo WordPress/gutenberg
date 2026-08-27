@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { getBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import InspectorControls from '../components/inspector-controls';
 import { cleanEmptyObject } from './utils';
 import { extractPresetSlug } from '../utils/color-values';

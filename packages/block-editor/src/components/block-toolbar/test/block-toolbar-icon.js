@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { paragraph } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import BlockToolbarIcon from '../block-toolbar-icon';
 
 jest.mock( '@wordpress/blocks', () => {

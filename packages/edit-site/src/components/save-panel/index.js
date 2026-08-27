@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { NavigableRegion } from '@wordpress/admin-ui';
 import { Button, Modal } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -16,10 +9,6 @@ import {
 } from '@wordpress/core-data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useActivateTheme } from '../../utils/use-activate-theme';

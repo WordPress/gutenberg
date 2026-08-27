@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useContext, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import {
 	globalStylesDataKey,

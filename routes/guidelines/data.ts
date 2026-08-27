@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { useSelect, dispatch, resolveSelect } from '@wordpress/data';
 import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
@@ -8,16 +5,13 @@ import {
 	store as blocksStore,
 	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '@wordpress/routes-lock-unlock';
 import type {
 	Scope,
 	GuidelineRow,
 	ContentBlock,
 	GuidelineQuery,
+	KnowledgeRow,
 } from './types';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
@@ -136,11 +130,12 @@ export function useGuidelineData(): GuidelineData {
 		[ slugs ]
 	);
 
-	const { records: rowRecords, hasResolved: rowsResolved } = useEntityRecords(
-		KNOWLEDGE_KIND,
-		KNOWLEDGE_NAME,
-		query
-	);
+	const { records: rowRecords, hasResolved: rowsResolved } =
+		useEntityRecords< KnowledgeRow >(
+			KNOWLEDGE_KIND,
+			KNOWLEDGE_NAME,
+			query
+		);
 
 	const bySlug = useMemo( () => {
 		const map: Record< string, GuidelineRow > = {};

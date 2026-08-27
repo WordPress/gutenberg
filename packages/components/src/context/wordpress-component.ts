@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type * as React from 'react';
 
 /**

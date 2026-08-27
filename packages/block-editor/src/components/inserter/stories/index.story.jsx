@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { registerCoreBlocks } from '@wordpress/block-library';
-
-/**
- * Internal dependencies
- */
 import BlockLibrary from '../library';
 import { ExperimentalBlockEditorProvider } from '../../provider';
 import { patternCategories, patterns, reusableBlocks } from './utils/fixtures';

@@ -1,15 +1,8 @@
-/**
- * External dependencies
- */
-import docgen from 'react-docgen-typescript';
-import glob from 'glob';
 import fs from 'node:fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'node:url';
-
-/**
- * Internal dependencies
- */
+import docgen from 'react-docgen-typescript';
+import glob from 'glob';
 import { generateMarkdownDocs } from './markdown/index.mjs';
 import { getDescriptionsForSubcomponents } from './get-subcomponent-descriptions.mjs';
 import { getTagsFromStorybook } from './get-tags-from-storybook.mjs';

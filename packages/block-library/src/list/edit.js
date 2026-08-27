@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	BlockControls,
 	useBlockProps,
@@ -21,10 +18,6 @@ import {
 import { createBlock } from '@wordpress/blocks';
 import { useCallback, useEffect } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import OrderedListSettings from './ordered-list-settings';
 import { migrateToListV2 } from './utils';
 import TagName from './tag-name';

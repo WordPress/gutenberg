@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	BorderBoxControl,
 	__experimentalHasSplitBorders as hasSplitBorders,
@@ -11,10 +8,6 @@ import {
 import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getValueFromVariable } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import BorderRadiusControl from '../border-radius-control';
 import { useColorsPerOrigin } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';
@@ -105,7 +98,6 @@ export default function BorderPanel( {
 	inheritedValue = value,
 	settings,
 	panelId,
-	name,
 	defaultControls = DEFAULT_CONTROLS,
 	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
 } ) {
@@ -269,14 +261,18 @@ export default function BorderPanel( {
 		inheritedShadow !== undefined &&
 		inheritedShadow !== '';
 	const shadow = isShadowPlaceholder ? inheritedShadow : localShadow;
-	const shadowPresets = settings?.shadow?.presets ?? {};
-	const mergedShadowPresets =
-		shadowPresets.custom ??
-		shadowPresets.theme ??
-		shadowPresets.default ??
-		[];
+	// The presets the popover offers, from every origin. A preset the user
+	// picked has to be stored as a reference to its CSS variable rather than as
+	// the value it resolves to today, otherwise it stops tracking later edits
+	// to the preset. Reading the same list the popover renders is what keeps
+	// the two in step.
+	const shadowPresets = useShadowPresets( settings );
 	const setShadow = ( newValue ) => {
-		const slug = mergedShadowPresets?.find(
+		// The list runs default, theme, custom, so searching backwards picks
+		// the most specific origin when more than one defines the same shadow
+		// value — a newly added custom preset starts out identical to the
+		// `natural` default one, and it is the custom slug the user means.
+		const slug = shadowPresets.findLast(
 			( { shadow: shadowName } ) => shadowName === newValue
 		)?.slug;
 
@@ -376,7 +372,6 @@ export default function BorderPanel( {
 		showBorderRadius;
 
 	const label = useBorderPanelLabel( {
-		blockName: name,
 		hasShadowControl,
 		hasBorderControl,
 	} );

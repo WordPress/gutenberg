@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import {
 	NavigableMenu,
@@ -28,10 +25,6 @@ import { upload, media } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { useState, useRef, useEffect } from '@wordpress/element';
 import { getFilename } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 
 const { Badge: WCBadge } = unlock( componentsPrivateApis );

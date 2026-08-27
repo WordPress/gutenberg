@@ -1,10 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { forwardRef, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -19,15 +13,10 @@ import {
 } from '@wordpress/rich-text';
 import { useMergeRefs } from '@wordpress/compose';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import { DEFAULT_CLASSNAMES, REGEXP_NEWLINES } from './constants';
 import usePostTitleFocus from './use-post-title-focus';
 import usePostTitle from './use-post-title';
 import PostTypeSupportCheck from '../post-type-support-check';
-
 import { unlock } from '../../lock-unlock';
 
 const { useRichText } = unlock( richTextPrivateApis );

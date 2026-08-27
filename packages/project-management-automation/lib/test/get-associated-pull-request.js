@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import getAssociatedPullRequest from '../get-associated-pull-request';
 
 /** @typedef {import('../get-associated-pull-request').WebhookPayloadPushCommit} WebhookPayloadPushCommit */

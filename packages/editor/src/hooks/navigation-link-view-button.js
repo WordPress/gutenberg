@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { addFilter } from '@wordpress/hooks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useCallback } from '@wordpress/element';

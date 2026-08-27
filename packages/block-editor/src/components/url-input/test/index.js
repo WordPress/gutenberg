@@ -1,22 +1,12 @@
-/**
- * External dependencies
- */
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { speak } from '@wordpress/a11y';
 import { useState } from '@wordpress/element';
 import { dispatch } from '@wordpress/data';
 import { UP, DOWN, ENTER, TAB } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import URLInput from '../';
 import { store as blockEditorStore } from '../../../store';
+import { expectValidatedInputControlDeprecationIfCalled } from './fixtures/validated-input-control-deprecation';
 
 jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
 
@@ -647,6 +637,10 @@ describe( 'URLInput', () => {
 	} );
 
 	describe( 'validation', () => {
+		afterEach( () => {
+			expectValidatedInputControlDeprecationIfCalled();
+		} );
+
 		it( 'should not remount the input when a custom validity is cleared', async () => {
 			const user = userEvent.setup();
 			const props = {

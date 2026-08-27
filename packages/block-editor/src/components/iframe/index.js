@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import { version as reactVersion } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useState, createPortal, forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs, useRefEffect, useDisabled } from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { useWritingFlow } from '../writing-flow';
 import { getCompatibilityStyles } from './get-compatibility-styles';
 import { useScaleCanvas } from './use-scale-canvas';

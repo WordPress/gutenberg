@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	getBlockType,
 	serialize,
@@ -13,10 +10,6 @@ import { Children, cloneElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { pipe, useCopyToClipboard } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import BlockActions from '../block-actions';
 import NoteIconSlotFill from '../../components/collab/note-icon-slot';
 import BlockHTMLConvertButton from './block-html-convert-button';

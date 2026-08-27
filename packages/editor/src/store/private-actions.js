@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -11,10 +8,6 @@ import apiFetch from '@wordpress/api-fetch';
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
 import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
-
-/**
- * Internal dependencies
- */
 import isTemplateRevertable from './utils/is-template-revertable';
 import { buildRevisionsPageQuery } from './private-selectors';
 import {

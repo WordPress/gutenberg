@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { createBlock } from '@wordpress/blocks';
 import {
 	InspectorControls,
@@ -30,10 +23,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useState, useEffect } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { useConvertToNavigationLinks } from './use-convert-to-navigation-links';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 

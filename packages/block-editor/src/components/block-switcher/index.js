@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, _n, sprintf, _x } from '@wordpress/i18n';
 import {
 	DropdownMenu,
@@ -16,10 +13,6 @@ import {
 	isTemplatePart,
 } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import BlockTransformationsMenu from './block-transformations-menu';
 import { useBlockVariationTransforms } from './block-variation-transformations';

@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen, within } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { createRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { createSlotFill, Provider as SlotFillProvider } from '../';
 
 describe( 'createSlotFill', () => {

@@ -14,7 +14,7 @@ The widget names the intent and, through the key it writes, how the action is fu
 
 ## Envelope and fulfillment
 
-Every action carries an **envelope**, an `id` and a `label`, and exactly one **fulfillment**, which says what triggering it means.
+Every action carries an **envelope** and exactly one **fulfillment**, which says what triggering it means. The envelope is the action's identity: an `id`, a `label`, and optionally an `icon` (a registered icon name) and a `relevance` hint.
 
 The fulfillment is named by the key that carries it, not by a separate discriminator. Today the only key is `href`, so the only fulfillment is a link: triggering the action goes to a target.
 
@@ -52,7 +52,7 @@ A link fulfillment carries one obligation: **where the surface allows a link pri
 
 Its accessible role follows the surface rather than the element: mounted inside the dashboard's "More" menu, the anchor is exposed as a menu item, not as a link.
 
-Which link primitive is also the host's call. The widget declares _where_ to go; the host decides _how to get there_. A target inside the host's own routes can use its router's link, which is still an anchor and keeps the same behaviors; anything else is a plain anchor and a full page load. The widget cannot make that call: whether a target is reachable in-page depends on the routes the host registered, which changes per host and over time.
+Which link primitive is also the host's call. The widget declares _where_ to go; the host decides _how to get there_. A target inside the host's own routes can use its router's link, which is still an anchor and keeps the same behaviors; anything else is a plain anchor and a full page load. The widget cannot make that call: whether a target is reachable in-page depends on the routes the host registered, which changes per host and over time. The host supplies that recognition and its link primitive through the widget host seam, as the `links` capability.
 
 Where no link primitive fits, as in a command palette, the host mounts what the surface offers and those semantics degrade. That is a real cost of reaching beyond the widget, not an oversight.
 
@@ -60,4 +60,6 @@ Where no link primitive fits, as in a command palette, the host mounts what the 
 
 The widget lists its actions; it never specifies where they go. The host maps them to its surfaces: a dashboard might gather them in a "More" menu, a footer, or a command palette.
 
-This is the contract that the `relevance` attribute already uses: the widget declares intent, and the host owns the surface.
+`relevance` carries the widget's side of that decision: `'high'` marks an action worth the most prominent surface, `'medium'` one worth persistent but compact visibility, and `'low'` (the default) the rest. Attributes use the same vocabulary: the widget declares intent, and the host owns the surface.
+
+The dashboard maps it as: `'high'` as text links in a persistent footer, `'medium'` beside them as compact icon affordances, the rest in the "More" menu. Full-bleed widgets keep every action in the menu.

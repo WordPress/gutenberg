@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	registerBlockType,
 	unregisterBlockType,
@@ -13,10 +10,6 @@ import {
 import { RawHTML } from '@wordpress/element';
 import { symbol } from '@wordpress/icons';
 import { select, dispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import * as selectors from '../selectors';
 import { store } from '../';
 import { lock } from '../../lock-unlock';

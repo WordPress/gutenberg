@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -9,10 +6,6 @@ import {
 	getBlockSelectors,
 	privateApis as globalStylesEnginePrivateApis,
 } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { usePrivateStyleOverride } from './utils';
 import { store as blockEditorStore } from '../store';
 import { globalStylesDataKey } from '../store/private-keys';

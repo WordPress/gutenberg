@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import { dequal } from 'dequal';
-
-/**
- * WordPress dependencies
- */
 import { useCallback, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import type { View } from '@wordpress/dataviews';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import { generatePreferenceKey } from './preference-keys';
 import { getUserModifications, resolveView } from './resolve-view';
 import type { ViewConfig, ViewOverrides } from './types';

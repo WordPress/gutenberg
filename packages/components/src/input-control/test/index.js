@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import BaseInputControl from '../';
 import InputControlPrefixWrapper from '../input-prefix-wrapper';
 
@@ -37,6 +26,16 @@ describe( 'InputControl', () => {
 			const input = getInput();
 
 			expect( input ).toHaveAttribute( 'type', 'number' );
+		} );
+
+		it( 'should flag empty inputs with data-empty-value', () => {
+			const { rerender } = render( <InputControl type="time" /> );
+
+			expect( getInput() ).toHaveAttribute( 'data-empty-value' );
+
+			rerender( <InputControl type="time" value="12:30" /> );
+
+			expect( getInput() ).not.toHaveAttribute( 'data-empty-value' );
 		} );
 
 		it( 'should render label', () => {

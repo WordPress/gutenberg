@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { TextDecoder, TextEncoder } from 'node:util';
 import { Blob as BlobPolyfill, File as FilePolyfill } from 'node:buffer';
 import timezoneMock from 'timezone-mock';
@@ -127,6 +124,18 @@ if ( typeof window !== 'undefined' ) {
 	// jsdom lacks Element.getAnimations (needed by Base UI ScrollArea ≥1.3)
 	if ( ! global.HTMLElement.prototype.getAnimations ) {
 		global.HTMLElement.prototype.getAnimations = () => [];
+	}
+
+	// jsdom lacks PointerEvent (needed by Base UI keyboard activation ≥1.7).
+	if ( ! global.PointerEvent ) {
+		global.PointerEvent = class PointerEvent extends global.MouseEvent {
+			constructor( type, init = {} ) {
+				super( type, init );
+				this.pointerId = init.pointerId ?? 0;
+				this.pointerType = init.pointerType ?? '';
+				this.isPrimary = init.isPrimary ?? false;
+			}
+		};
 	}
 
 	// jsdom lacks CSS.supports (needed by Ariakit's modal scroll locking).

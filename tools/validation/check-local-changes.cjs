@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 const SimpleGit = require( 'simple-git' );
 
 SimpleGit()

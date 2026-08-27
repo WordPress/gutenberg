@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import postDataBindings from '../post-data';
 
 describe( 'post-data bindings', () => {

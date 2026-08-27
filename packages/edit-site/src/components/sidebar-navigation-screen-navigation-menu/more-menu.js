@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-
-/**
- * Internal dependencies
- */
 import RenameModal from './rename-modal';
 import DeleteConfirmDialog from './delete-confirm-dialog';
 import { unlock } from '../../lock-unlock';

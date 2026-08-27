@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 import { useEffect, useCallback } from '@wordpress/element';
@@ -13,10 +10,6 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import EnhancedPaginationControl from './inspector-controls/enhanced-pagination-control';
 import { unlock } from '../../lock-unlock';
 import QueryInspectorControls from './inspector-controls';

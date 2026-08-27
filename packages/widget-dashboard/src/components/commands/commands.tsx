@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
@@ -8,10 +5,6 @@ import {
 	privateApis as commandsPrivateApis,
 } from '@wordpress/commands';
 import { layout as layoutIcon, plus, trash } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardUIContext } from '../../context/ui-context';
@@ -28,8 +21,17 @@ type CommandCallback = ( options: { close: () => void } ) => void;
  * active command context so they surface under Suggestions by default.
  */
 export function Commands() {
-	const { editMode, onEditChange, onLayoutReset } =
+	const { editMode, onEditChange, onLayoutReset, canPerform, widgetTypes } =
 		useDashboardInternalContext();
+
+	const canCustomize = canPerform( { operation: 'customize' } );
+	const canInsertAny = useMemo(
+		() =>
+			widgetTypes.some( ( widgetType ) =>
+				canPerform( { operation: 'insert', widgetType } )
+			),
+		[ widgetTypes, canPerform ]
+	);
 
 	const { setInserterOpen, setResetDialogOpen } = useDashboardUIContext();
 
@@ -75,7 +77,7 @@ export function Commands() {
 				category: 'command',
 				context: DASHBOARD_COMMAND_CONTEXT,
 				keywords: [ __( 'edit' ), __( 'widgets' ), __( 'layout' ) ],
-				disabled: ! onEditChange || editMode,
+				disabled: ! onEditChange || editMode || ! canCustomize,
 				callback: customize,
 			},
 			{
@@ -85,7 +87,11 @@ export function Commands() {
 				category: 'command',
 				context: DASHBOARD_COMMAND_CONTEXT,
 				keywords: [ __( 'widgets' ), __( 'inserter' ) ],
-				disabled: ! onEditChange,
+				// Outside edit mode the command enters it first.
+				disabled:
+					! onEditChange ||
+					! canInsertAny ||
+					( ! editMode && ! canCustomize ),
 				callback: addWidgets,
 			},
 			{
@@ -102,6 +108,8 @@ export function Commands() {
 		[
 			onEditChange,
 			editMode,
+			canCustomize,
+			canInsertAny,
 			customize,
 			addWidgets,
 			onLayoutReset,

@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import { act, renderHook } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 import { dispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import type { DashboardWidget } from '@wordpress/widget-dashboard';
-
-/**
- * Internal dependencies
- */
 import { useDashboardLayout } from '../';
 
 jest.mock( '@wordpress/api-fetch' );

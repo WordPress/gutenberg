@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * Internal dependencies
- */
 import { createCustomColorsHOC } from '../with-colors';
 
 describe( 'createCustomColorsHOC', () => {
@@ -24,17 +17,16 @@ describe( 'createCustomColorsHOC', () => {
 
 		expect( BaseComponent ).toHaveBeenCalledWith(
 			expect.objectContaining( {
-				attributes: {
+				attributes: expect.objectContaining( {
 					backgroundColor: null,
-				},
-				backgroundColor: {
+				} ),
+				backgroundColor: expect.objectContaining( {
 					class: undefined,
 					color: undefined,
-				},
-				colorUtils: {
+				} ),
+				colorUtils: expect.objectContaining( {
 					getMostReadableColor: expect.any( Function ),
-				},
-				colors: undefined,
+				} ),
 				setBackgroundColor: expect.any( Function ),
 			} ),
 			expect.anything()

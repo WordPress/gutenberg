@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { ReactElement, ReactNode, ComponentProps } from 'react';
-
-/**
- * WordPress dependencies
- */
 import type { useFocusOnMount } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import type {
 	NormalizedField,
 	Operator,
@@ -245,6 +234,15 @@ export type Density = 'compact' | 'balanced' | 'comfortable';
  */
 export type MediaAspectRatio = ( typeof MEDIA_ASPECT_RATIOS )[ number ];
 
+/**
+ * How the media field fills its preview box. `cover` crops it to fill,
+ * `contain` fits the whole media inside, letterboxing it so its own aspect
+ * ratio stays visible. Unlike `MediaAspectRatio` there is no matching runtime
+ * constant: layouts style the fit from a class they add for `contain` alone,
+ * so any other value simply leaves previews cropped.
+ */
+export type MediaFit = 'cover' | 'contain';
+
 export interface ViewTable extends ViewBase {
 	type: 'table';
 
@@ -320,6 +318,14 @@ export interface ViewGrid extends ViewBase {
 		 * stay aligned. Defaults to `'1/1'`.
 		 */
 		aspectRatio?: MediaAspectRatio;
+
+		/**
+		 * How the media field fills the preview box. `'cover'` crops it to
+		 * fill, `'contain'` fits the whole media inside so its own aspect
+		 * ratio stays visible. The box keeps the shape set by `aspectRatio`
+		 * either way, so rows stay aligned. Defaults to `'cover'`.
+		 */
+		mediaFit?: MediaFit;
 	};
 }
 
@@ -341,6 +347,14 @@ export interface ViewPickerGrid extends ViewBase {
 		 * The density of the grid layout.
 		 */
 		density?: Density;
+
+		/**
+		 * How the media field fills the preview box. `'cover'` crops it to
+		 * fill, `'contain'` fits the whole media inside so its own aspect
+		 * ratio stays visible. The box stays square either way, so rows stay
+		 * aligned. Defaults to `'cover'`.
+		 */
+		mediaFit?: MediaFit;
 	};
 }
 

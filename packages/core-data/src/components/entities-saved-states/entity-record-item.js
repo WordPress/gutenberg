@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { CheckboxControl, PanelRow } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
 import { STORE_NAME } from '../../name';
 import { getTemplateInfo } from '../../utils/get-template-info';
 

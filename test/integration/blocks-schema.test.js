@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import Ajv from 'ajv';
 import glob from 'fast-glob';
-
-/**
- * Internal dependencies
- */
 import blockSchema from '../../schemas/json/block.json';
 
 describe( 'block.json schema', () => {

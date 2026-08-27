@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import * as Y from 'yjs';
 import type { Awareness } from 'y-protocols/awareness';
-
-/**
- * Internal dependencies
- */
 import {
 	CRDT_RECORD_MAP_KEY,
 	CRDT_STATE_MAP_KEY,

@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { GlobalStylesUI } from '@wordpress/global-styles-ui';
 import { uploadMedia } from '@wordpress/media-utils';
-
-/**
- * Internal dependencies
- */
 import { GlobalStylesBlockLink } from './block-link';
 import { useGlobalStyles } from './hooks';
 

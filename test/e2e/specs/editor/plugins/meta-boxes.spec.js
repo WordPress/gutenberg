@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Meta boxes', () => {
@@ -44,7 +41,7 @@ test.describe( 'Meta boxes', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'canvas text' );
 
@@ -112,7 +109,7 @@ test.describe( 'Meta boxes', () => {
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( 'A published post' );
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'Excerpt from content.' );
 
@@ -130,7 +127,7 @@ test.describe( 'Meta boxes', () => {
 	} ) => {
 		await editor.openDocumentSettingsSidebar();
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'Excerpt from content.' );
 		await editor.canvas

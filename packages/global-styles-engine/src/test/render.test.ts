@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import {
 	getNodesWithStyles,
 	getNodesWithSettings,
@@ -30,6 +27,7 @@ jest.mock( '@wordpress/blocks', () => ( {
 	},
 	__EXPERIMENTAL_ELEMENTS: {
 		link: 'a:where(:not(.wp-element-button))',
+		heading: 'h1, h2, h3, h4, h5, h6',
 		h1: 'h1',
 		h2: 'h2',
 		h3: 'h3',
@@ -404,6 +402,49 @@ describe( 'global styles renderer', () => {
 			presets: false,
 			rootPadding: false,
 		};
+
+		it( 'uses the row value for Flow and Constrained layouts and both values for Flex and Grid layouts when block spacing is axial', () => {
+			const tree: GlobalStylesConfig = {
+				styles: {
+					blocks: {
+						'core/group': {
+							spacing: {
+								blockGap: { top: '1em', left: '2em' },
+							},
+						},
+					},
+				},
+			};
+			const blockSelectors = {
+				'core/group': {
+					selector: '.wp-block-group',
+					hasLayoutSupport: true,
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				true,
+				false,
+				false,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toContain(
+				':root :where(.wp-block-group-is-layout-flow) > * { margin-block-start: 1em; margin-block-end: 0; }'
+			);
+			expect( result ).toContain(
+				':root :where(.wp-block-group-is-layout-constrained) > * { margin-block-start: 1em; margin-block-end: 0; }'
+			);
+			expect( result ).toContain(
+				':root :where(.wp-block-group-is-layout-flex) { gap: 1em 2em; }'
+			);
+			expect( result ).toContain(
+				':root :where(.wp-block-group-is-layout-grid) { gap: 1em 2em; }'
+			);
+		} );
 
 		it( 'should return a ruleset', () => {
 			const tree = {
@@ -1391,6 +1432,137 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'renders block element styles defined only in a viewport', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/group': {
+							'@mobile': {
+								elements: {
+									heading: {
+										color: {
+											text: 'red',
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/group': {
+					selector: '.wp-block-group',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				'@media (width <= 480px){:root :where(.wp-block-group h1,.wp-block-group  h2,.wp-block-group  h3,.wp-block-group  h4,.wp-block-group  h5,.wp-block-group  h6){color: red;}}'
+			);
+		} );
+
+		it( 'renders block element pseudo styles defined only in a viewport', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/group': {
+							'@mobile': {
+								elements: {
+									link: {
+										':hover': {
+											color: {
+												text: 'red',
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/group': {
+					selector: '.wp-block-group',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				'@media (width <= 480px){:root :where(.wp-block-group a:where(:not(.wp-element-button)):hover){color: red;}}'
+			);
+		} );
+
+		it( 'renders block element styles defined in separate viewports', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/group': {
+							'@mobile': {
+								elements: {
+									link: {
+										color: {
+											text: 'red',
+										},
+									},
+								},
+							},
+							'@tablet': {
+								elements: {
+									link: {
+										color: {
+											text: 'blue',
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/group': {
+					selector: '.wp-block-group',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				'@media (width <= 480px){:root :where(.wp-block-group a:where(:not(.wp-element-button))){color: red;}}@media (480px < width <= 782px){:root :where(.wp-block-group a:where(:not(.wp-element-button))){color: blue;}}'
+			);
+		} );
+
 		it( 'handles responsive style variation styles', () => {
 			const tree = {
 				styles: {
@@ -1615,6 +1787,23 @@ describe( 'global styles renderer', () => {
 									colors: [ '#263135', '#69a8a7' ],
 								},
 							],
+							default: [
+								{
+									slug: 'grayscale',
+									name: 'Grayscale',
+									colors: [ '#000000', '#ffffff' ],
+								},
+							],
+							// User-created duotones need a filter in the
+							// editor too, or they render on the front end but
+							// not on the canvas.
+							custom: [
+								{
+									slug: 'custom-duotone-1',
+									name: 'Duotone 1',
+									colors: [ '#0000ff', '#1a4548' ],
+								},
+							],
 						},
 					},
 				},
@@ -1639,9 +1828,11 @@ describe( 'global styles renderer', () => {
 
 			expect( svgStyle ).toBeDefined();
 			expect( svgStyle.__unstableType ).toBe( 'svgs' );
-			expect( svgStyle.assets.join( '' ) ).toContain(
-				'wp-duotone-midnight'
-			);
+
+			const assets = svgStyle.assets.join( '' );
+			expect( assets ).toContain( 'wp-duotone-midnight' );
+			expect( assets ).toContain( 'wp-duotone-grayscale' );
+			expect( assets ).toContain( 'wp-duotone-custom-duotone-1' );
 		} );
 	} );
 

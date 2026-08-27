@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useState, useLayoutEffect, useRef } from '@wordpress/element';
 import { getScrollContainer } from '@wordpress/dom';
 import { PAGEUP, PAGEDOWN, HOME, END } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import useEvent from '../use-event';
 
 const DEFAULT_INIT_WINDOW_SIZE = 30;

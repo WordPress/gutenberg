@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useBlockProps,
 	useInnerBlocksProps,
@@ -8,10 +5,6 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Controls from './controls';
 
 export default function Edit( { clientId, isSelected } ) {

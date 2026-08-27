@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { addFormatTypes, removeFormatTypes } from '../actions';
 
 describe( 'actions', () => {

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { validateFileSize } from '../validate-file-size';
 import { UploadError } from '../upload-error';
 

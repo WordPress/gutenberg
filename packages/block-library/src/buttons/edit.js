@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 
 const DEFAULT_BLOCK = {

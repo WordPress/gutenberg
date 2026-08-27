@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	InspectorControls,
@@ -23,10 +16,6 @@ import {
 } from '@wordpress/components';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { useEffect, useMemo, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import TabToolbarControls from '../tabs/tab-toolbar-controls';
 import TabMovers from './tab-movers';
 import useTabActions from '../tabs/use-tab-actions';

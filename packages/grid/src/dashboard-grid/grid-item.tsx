@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { useSortable } from '@dnd-kit/sortable';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useState, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import actionableAreaStyles from '../shared/actionable-area-slot.module.css';
 import { GRID_ITEM_DATA_KEY } from '../shared/grid-item-key';
 import ResizeHandle from '../shared/resize-handle';
@@ -40,6 +29,8 @@ export function GridItem( {
 	item,
 	maxColumns,
 	disabled = false,
+	draggable = true,
+	resizable = true,
 	verticalResizable = true,
 	interacting = false,
 	dragging = false,
@@ -61,6 +52,8 @@ export function GridItem( {
 	} | null >( null );
 	const itemRef = useRef< HTMLDivElement >( null );
 	const contentRef = useRef< HTMLDivElement >( null );
+	const dragDisabled = disabled || ! draggable;
+	const resizeDisabled = disabled || ! resizable;
 	const {
 		attributes,
 		listeners,
@@ -69,7 +62,7 @@ export function GridItem( {
 		isDragging,
 	} = useSortable( {
 		id: item.key,
-		disabled,
+		disabled: dragDisabled,
 	} );
 	const mergedRef = useMergeRefs( [ itemRef, setNodeRef ] );
 	const contentMergedRef = useMergeRefs( [ contentRef ] );
@@ -167,7 +160,7 @@ export function GridItem( {
 				{ ...listeners }
 				style={ {
 					height: '100%',
-					cursor: getItemCursor( disabled, interacting ),
+					cursor: getItemCursor( dragDisabled, interacting ),
 				} }
 			>
 				<div
@@ -176,7 +169,7 @@ export function GridItem( {
 					style={ continuousContentStyle }
 				>
 					{ children }
-					{ ! disabled && (
+					{ ! resizeDisabled && (
 						<ResizeHandle
 							itemId={ item.key }
 							verticalResizable={ verticalResizable }

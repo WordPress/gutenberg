@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { createBlock } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { pickRelevantMediaFiles } from './shared';
 import { getHrefAndDestination } from './utils';
 import { getUpdatedLinkTargetSettings } from '../image/utils';

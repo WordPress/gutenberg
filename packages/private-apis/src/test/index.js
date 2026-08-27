@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '../';
 import { resetAllowedCoreModules, allowCoreModule } from '../implementation';
 

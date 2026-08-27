@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import initBlock from '../utils/init-block';
 import edit from './edit';
 import metadata from './block.json';

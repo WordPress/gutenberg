@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useRef, useEffect } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { store as editPostStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 

@@ -41,10 +41,6 @@ import {
 } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Link } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
 import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
 import removeAnchorTag from '../utils/remove-anchor-tag';

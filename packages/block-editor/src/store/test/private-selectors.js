@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import {
 	registerBlockType,
 	unregisterBlockType,
 	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import {
 	isBlockInterfaceHidden,
 	getLastInsertedBlocksClientIds,

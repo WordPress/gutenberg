@@ -6,17 +6,9 @@
  * machinery the WS suite needs. Activated by playwright.rtc-websocket.config.ts
  * via the GUTENBERG_RTC_TEST_WS_PROVIDER env var.
  */
-
-/**
- * External dependencies
- */
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { build as esbuildBuild } from 'esbuild';
-
-/**
- * WordPress dependencies
- */
 import type { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 
 const PROVIDER_PLUGIN = 'gutenberg-test-plugin-rtc-websocket-provider';

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
@@ -11,10 +8,6 @@ import { __ } from '@wordpress/i18n';
 import { useContext } from '@wordpress/element';
 import { check } from '@wordpress/icons';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type { NormalizedField } from '../../types';
 import DataViewsContext from '../dataviews-context';
 import getHideableFields from '../../utils/get-hideable-fields';

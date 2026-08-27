@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { useSelect } from '@wordpress/data';
 import { forwardRef, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import { useInsertedBlockClientId, useListViewContext } from './context';

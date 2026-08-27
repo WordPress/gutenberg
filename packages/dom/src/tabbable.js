@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { find as findFocusable } from './focusable';
 
 /**

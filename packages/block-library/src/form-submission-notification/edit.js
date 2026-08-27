@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	InnerBlocks,
@@ -9,10 +6,6 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 
 const Edit = ( { attributes, clientId } ) => {

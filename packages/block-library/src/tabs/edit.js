@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import TabToolbarControls from './tab-toolbar-controls';
 import useTabListItemsSync from './use-tab-list-items-sync';
 

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Button, TextControl, Modal } from '@wordpress/components';
 import { Stack, Text } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';

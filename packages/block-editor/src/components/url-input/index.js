@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { speak } from '@wordpress/a11y';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { useEffect, useRef, useState } from '@wordpress/element';
@@ -13,7 +6,7 @@ import { UP, DOWN, ENTER, TAB } from '@wordpress/keycodes';
 import {
 	BaseControl,
 	Button,
-	__experimentalInputControl as InputControl,
+	__experimentalInputControl as WCInputControl,
 	Spinner,
 	Popover,
 	privateApis as componentsPrivateApis,
@@ -21,10 +14,6 @@ import {
 import { useDebounce, useEvent, useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { isURL } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
@@ -447,7 +436,7 @@ function Control( {
 
 	const MaybeValidatedInputControl = isValidated
 		? ValidatedInputControl
-		: InputControl;
+		: WCInputControl;
 
 	return (
 		<BaseControl { ...controlProps }>

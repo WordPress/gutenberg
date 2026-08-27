@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	forwardRef,
 	useState,
@@ -19,11 +12,7 @@ import { SearchControl, Popover } from '@wordpress/components';
 import { VisuallyHidden } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useDebouncedInput, useViewportMatch } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
+import { useDispatch, useSelect } from '@wordpress/data';
 import Tips from './tips';
 import InserterPreviewPanel from './preview-panel';
 import BlockTypesTab from './block-types-tab';
@@ -107,10 +96,14 @@ function InserterMenu(
 			insertionIndex: __experimentalInsertionIndex,
 			shouldFocusBlock,
 		} );
+	const { hideInsertionPoint } = useDispatch( blockEditorStore );
 	const blockTypesTabRef = useRef();
 
 	const onInsert = useCallback(
 		( blocks, meta, shouldForceFocusBlock, _rootClientId ) => {
+			// The cue points at a position that no longer exists once the
+			// blocks are inserted, so clear it regardless of what showed it.
+			hideInsertionPoint();
 			onInsertBlocks(
 				blocks,
 				meta,
@@ -133,17 +126,24 @@ function InserterMenu(
 				}
 			} );
 		},
-		[ onInsertBlocks, maybeCloseInserter, onSelect, ref, shouldFocusBlock ]
+		[
+			hideInsertionPoint,
+			onInsertBlocks,
+			maybeCloseInserter,
+			onSelect,
+			ref,
+			shouldFocusBlock,
+		]
 	);
 
 	const onInsertPattern = useCallback(
 		( blocks, patternName, ...args ) => {
-			onToggleInsertionPoint( false );
+			hideInsertionPoint();
 			onInsertBlocks( blocks, { patternName }, ...args );
 			onSelect();
 			maybeCloseInserter();
 		},
-		[ onInsertBlocks, maybeCloseInserter, onSelect, onToggleInsertionPoint ]
+		[ hideInsertionPoint, onInsertBlocks, maybeCloseInserter, onSelect ]
 	);
 
 	const onHover = useCallback(
@@ -344,13 +344,15 @@ function InserterMenu(
 	// Focus first active tab, if any
 	const tabsRef = useRef();
 	useLayoutEffect( () => {
-		if ( tabsRef.current ) {
-			window.requestAnimationFrame( () => {
-				tabsRef.current
-					.querySelector( '[role="tab"][aria-selected="true"]' )
-					?.focus();
-			} );
+		if ( ! tabsRef.current ) {
+			return;
 		}
+		const frame = window.requestAnimationFrame( () => {
+			tabsRef.current
+				?.querySelector( '[role="tab"][aria-selected="true"]' )
+				?.focus();
+		} );
+		return () => window.cancelAnimationFrame( frame );
 	}, [] );
 
 	return (
@@ -413,7 +415,7 @@ function InserterMenu(
 				<Popover
 					className="block-editor-inserter__preview-container__popover"
 					placement="right-start"
-					offset={ 16 }
+					offset={ { mainAxis: 16, crossAxis: 16 } }
 					focusOnMount={ false }
 					animate={ false }
 				>

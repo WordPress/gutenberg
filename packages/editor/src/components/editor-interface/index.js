@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { InterfaceSkeleton, ComplementaryArea } from '@wordpress/interface';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
@@ -16,14 +9,10 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
-import { useState, useCallback } from '@wordpress/element';
+import { useState, useCallback, useLayoutEffect } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { InlineNotices } from '@wordpress/notices';
 import { ThemeProvider } from '@wordpress/theme';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import TemplateValidationNotice from '../template-validation-notice';
@@ -139,6 +128,27 @@ export default function EditorInterface( {
 		};
 	}, [] );
 	const { setShowRevisionDiff } = unlock( useDispatch( editorStore ) );
+	const { setIsListViewOpened } = useDispatch( editorStore );
+	const registry = useRegistry();
+
+	// Apply the `showListViewByDefault` preference whenever the editor enters
+	// edit mode: on mount for editors that are always editable (the post
+	// editor), and on the preview → edit transition for the site editors,
+	// which keep this component mounted across it. The preferences are read at
+	// transition time only, so toggling the list view or the preferences
+	// mid-session is never overridden. Disabled for small viewports, and by
+	// `distractionFree` mode, which has no room for the list view.
+	useLayoutEffect( () => {
+		const isMediumOrBigger =
+			window.matchMedia( '(min-width: 782px)' ).matches;
+		const { get } = registry.select( preferencesStore );
+		setIsListViewOpened(
+			! isPreviewMode &&
+				isMediumOrBigger &&
+				!! get( 'core', 'showListViewByDefault' ) &&
+				! get( 'core', 'distractionFree' )
+		);
+	}, [ isPreviewMode, registry, setIsListViewOpened ] );
 
 	// Runs unconditionally so join/leave/save notifications are dispatched
 	// regardless of viewport width or whether the header centre area is visible.

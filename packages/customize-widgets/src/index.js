@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createRoot, StrictMode } from '@wordpress/element';
 import {
 	registerCoreBlocks,
@@ -18,10 +15,6 @@ import {
 } from '@wordpress/blocks';
 import { dispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import CustomizeWidgets from './components/customize-widgets';
 import getSidebarSection from './controls/sidebar-section';
 import getSidebarControl from './controls/sidebar-control';

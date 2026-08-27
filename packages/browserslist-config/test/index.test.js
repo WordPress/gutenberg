@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import browserslist from 'browserslist';
-
-/**
- * Internal dependencies
- */
 import config from '../';
 
 it( 'should export an array', () => {

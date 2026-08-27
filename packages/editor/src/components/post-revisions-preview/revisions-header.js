@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { store as interfaceStore } from '@wordpress/interface';
 import { __, _x, isRTL } from '@wordpress/i18n';
 import { drawerLeft, drawerRight, seen } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import HeaderSkeleton from '../header/header-skeleton';
 import MoreMenu from '../more-menu';
 import PostPreviewButton from '../post-preview-button';

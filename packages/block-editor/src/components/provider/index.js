@@ -1,25 +1,20 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch } from '@wordpress/data';
 import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 import {
 	MediaUploadProvider,
 	store as uploadStore,
 	detectClientSideMediaSupport,
 	isHeicCanvasSupported,
 } from '@wordpress/upload-media';
-
-/**
- * Internal dependencies
- */
 import withRegistryProvider from './with-registry-provider';
 import useBlockSync from './use-block-sync';
 import { store as blockEditorStore } from '../../store';
 import { BlockRefsProvider } from './block-refs-provider';
 import { unlock } from '../../lock-unlock';
 import KeyboardShortcuts from '../keyboard-shortcuts';
+import BlockKeyboardShortcuts from '../block-keyboard-shortcuts';
 import useMediaUploadSettings from './use-media-upload-settings';
 import { mediaUploadOnSuccessKey } from '../../store/private-keys';
 import { SelectionContext } from './selection-context';
@@ -49,6 +44,30 @@ let isHeicCanvasEnabledCache = null;
  * when in HEIC-only mode.
  */
 const HEIC_MIME_TYPES = [ 'image/heic', 'image/heif' ];
+
+/**
+ * Refuses a batch of more than one file on behalf of a caller that only takes
+ * one - a Cover block's placeholder, say.
+ *
+ * `uploadMedia()` in `@wordpress/media-utils` refuses such a batch with the
+ * same wording, but the `@wordpress/upload-media` pipeline below is a separate
+ * transport that never reaches that function. Without this check every dropped
+ * file uploads and the caller keeps whichever one lands last (gutenberg#82041).
+ *
+ * @param {Array<File>} filesList List of files.
+ * @param {boolean}     multiple  Whether the caller accepts more than one file.
+ * @param {Function}    onError   Function called when an error happens.
+ *
+ * @return {boolean} Whether the batch was refused.
+ */
+function refuseExtraFiles( filesList, multiple, onError ) {
+	if ( ! multiple && filesList.length > 1 ) {
+		onError( __( 'Only one file can be used here.' ) );
+		return true;
+	}
+
+	return false;
+}
 
 /**
  * Checks if client-side media processing should be enabled.
@@ -149,6 +168,7 @@ function shouldEnableHeicCanvasProcessing() {
  * @param {Function}       $3.onFileChange   Function called each time a file or a temporary representation of the file is available.
  * @param {Function}       $3.onSuccess      Function called once a file has completely finished uploading, including thumbnails.
  * @param {Function}       $3.onBatchSuccess Function called once all files in a group have completely finished uploading, including thumbnails.
+ * @param {boolean}        $3.multiple       Whether the caller accepts more than one file.
  */
 function mediaUpload(
 	registry,
@@ -161,8 +181,13 @@ function mediaUpload(
 		onFileChange,
 		onSuccess,
 		onBatchSuccess,
+		multiple = true,
 	}
 ) {
+	if ( refuseExtraFiles( filesList, multiple, onError ) ) {
+		return;
+	}
+
 	void registry.dispatch( uploadStore ).addItems( {
 		files: Array.from( filesList ),
 		onChange: onFileChange,
@@ -195,6 +220,7 @@ function mediaUpload(
  * @param {Function}       $3.onFileChange   Function called each time a file or a temporary representation of the file is available.
  * @param {Function}       $3.onSuccess      Function called once a file has completely finished uploading, including thumbnails.
  * @param {Function}       $3.onBatchSuccess Function called once all files in a group have completely finished uploading, including thumbnails.
+ * @param {boolean}        $3.multiple       Whether the caller accepts more than one file.
  */
 function heicMediaUpload(
 	registry,
@@ -207,8 +233,13 @@ function heicMediaUpload(
 		onFileChange,
 		onSuccess,
 		onBatchSuccess,
+		multiple = true,
 	}
 ) {
+	if ( refuseExtraFiles( filesList, multiple, onError ) ) {
+		return;
+	}
+
 	const files = Array.from( filesList );
 	const heicFiles = files.filter( ( file ) =>
 		HEIC_MIME_TYPES.includes( file.type )
@@ -260,6 +291,7 @@ function heicMediaUpload(
 			onFileChange,
 			onSuccess,
 			onBatchSuccess: coordinatedBatchSuccess,
+			multiple,
 		} );
 	}
 }
@@ -368,7 +400,12 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 
 		const children = (
 			<SlotFillProvider passthrough>
-				{ ! settings?.isPreviewMode && <KeyboardShortcuts.Register /> }
+				{ ! settings?.isPreviewMode && (
+					<>
+						<KeyboardShortcuts.Register />
+						<BlockKeyboardShortcuts />
+					</>
+				) }
 				<BlockRefsProvider>{ props.children }</BlockRefsProvider>
 			</SlotFillProvider>
 		);

@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalSpacer as Spacer,
 	__experimentalToolsPanel as ToolsPanel,
 } from '@wordpress/components';
 import { useRegistry } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import ColorGradientSettingsDropdown from './dropdown';
 import useColorsAndGradientsPalettes from './use-multiple-origin-colors-and-gradients';
 

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useState, memo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -13,10 +10,6 @@ import {
 } from '@wordpress/block-editor';
 import { Spinner } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { useCommentQueryArgs, useCommentTree } from './hooks';
 
 /**

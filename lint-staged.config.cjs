@@ -2,7 +2,7 @@ module.exports = {
 	'*.{cjs,js,json,jsx,mjs,ts,tsx,yml,yaml}': [ 'wp-scripts format' ],
 	'**/*.{cjs,js,jsx,mjs,ts,tsx}': [
 		() => 'npm run prelint:js',
-		'node ./tools/eslint/lint-js.cjs --config eslint.config.strict.cjs',
+		'node ./tools/eslint/lint-js.cjs',
 	],
 	'*.{css,pcss,scss}': [ 'npm run lint:css' ],
 	'package-lock.json': [ 'npm run lint:lockfile' ],
@@ -17,5 +17,6 @@ module.exports = {
 		'npm run docs:check-api-docs-unstaged',
 	],
 	'packages/icons/src/library/*': [ 'npm run -w packages/icons build' ],
-	'**/tsconfig.json': [ 'npm run lint:tsconfig' ],
+	// The validator takes the repository root, so staged paths are not passed.
+	'**/tsconfig*.json': [ () => 'npm run lint:tsconfig' ],
 };

@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { Composite } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import { useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import DownloadableBlockListItem from '../downloadable-block-list-item';
 import { store as blockDirectoryStore } from '../../store';
 

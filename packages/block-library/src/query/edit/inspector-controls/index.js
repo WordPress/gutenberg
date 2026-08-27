@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	TextControl,
 	SelectControl,
@@ -17,10 +14,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { debounce } from '@wordpress/compose';
 import { useState, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import OrderControl from './order-control';
 import AuthorControl from './author-control';
 import ParentControl from './parent-control';

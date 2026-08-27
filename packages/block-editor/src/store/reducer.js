@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
 import { pipe } from '@wordpress/compose';
 import { combineReducers, select } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
@@ -13,10 +6,6 @@ import {
 	store as blocksStore,
 	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS } from './defaults';
 import { insertAt, moveTo } from './array';
 import { sectionRootClientIdKey, isIsolatedEditorKey } from './private-keys';
@@ -2339,7 +2328,14 @@ export function selectedBlockStyleState( state = undefined, action ) {
 
 		case 'SELECT_BLOCK':
 		case 'SELECTION_CHANGE': {
-			if ( state?.clientId && state.clientId !== action.clientId ) {
+			const startClientId = action.clientId ?? action.start?.clientId;
+			const endClientId = action.clientId ?? action.end?.clientId;
+
+			if (
+				state?.clientId &&
+				( startClientId !== endClientId ||
+					state.clientId !== startClientId )
+			) {
 				return undefined;
 			}
 

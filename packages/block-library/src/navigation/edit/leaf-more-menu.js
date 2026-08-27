@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	createBlock,
 	hasBlockSupport,
@@ -16,10 +13,6 @@ import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { DEFAULT_BLOCK } from '../constants';
 
 const POPOVER_PROPS = {

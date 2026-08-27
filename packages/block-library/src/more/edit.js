@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalToolsPanel as ToolsPanel,
@@ -13,10 +10,6 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { getDefaultBlockName, createBlock } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const DEFAULT_TEXT = __( 'Read more' );

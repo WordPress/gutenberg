@@ -1,7 +1,4 @@
 /* eslint no-console: [ 'error', { allow: [ 'error', 'warn' ] } ] */
-/**
- * WordPress dependencies
- */
 import {
 	cloneBlock,
 	cloneSanitizedBlock,
@@ -22,10 +19,6 @@ import { store as noticesStore } from '@wordpress/notices';
 import { create, insert, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import {
 	retrieveSelectedAttribute,
 	findRichTextAttributeKey,
@@ -329,13 +322,31 @@ export const multiSelect =
 		} );
 
 		const blockCount = select.getSelectedBlockCount();
+		const nestedBlockCount = select.getClientIdsOfDescendants(
+			select.getMultiSelectedBlockClientIds()
+		).length;
 
 		speak(
-			sprintf(
-				/* translators: %s: number of selected blocks */
-				_n( '%s block selected.', '%s blocks selected.', blockCount ),
-				blockCount
-			),
+			nestedBlockCount
+				? sprintf(
+						/* translators: 1: number of selected blocks. 2: number of blocks including nested blocks. */
+						_n(
+							'%1$s block selected, %2$s including nested blocks.',
+							'%1$s blocks selected, %2$s including nested blocks.',
+							blockCount
+						),
+						blockCount,
+						blockCount + nestedBlockCount
+				  )
+				: sprintf(
+						/* translators: %s: number of selected blocks */
+						_n(
+							'%s block selected.',
+							'%s blocks selected.',
+							blockCount
+						),
+						blockCount
+				  ),
 			'assertive'
 		);
 	};
@@ -1360,7 +1371,20 @@ export const mergeBlocks =
 			return;
 		}
 
-		if ( isUnmodifiedDefaultBlock( blockA ) ) {
+		// An unmodified default block adds nothing to the merge. Neither
+		// does an empty text block of a different type, where merging would
+		// transform blockB into blockA's type instead (a paragraph deleted
+		// into an empty heading became a heading), so remove blockA in both
+		// cases. The merge function requirement keeps containers out: a
+		// columns block has no content attributes, so it would otherwise
+		// always count as empty and be removed on Backspace instead of
+		// selected.
+		if (
+			isUnmodifiedDefaultBlock( blockA ) ||
+			( !! blockAType.merge &&
+				blockA.name !== blockB.name &&
+				isUnmodifiedBlock( blockA, 'content' ) )
+		) {
 			const isASelected = select.isBlockSelected( clientIdA );
 
 			if ( isASelected ) {

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { SETTINGS_DEFAULTS } from '@wordpress/block-editor';
 
 /**

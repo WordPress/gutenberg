@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { __experimentalNumberControl as NumberControl } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import {
 	BASE_DEFAULT_VALUE,
 	RESET_VALUE,

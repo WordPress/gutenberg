@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useEffect, useState } from '@wordpress/element';
 import {
@@ -22,10 +19,6 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { code } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 import HTMLEditModal from './modal';
 

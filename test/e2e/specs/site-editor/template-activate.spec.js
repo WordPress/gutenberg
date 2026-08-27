@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Template Activate', () => {
@@ -18,6 +15,12 @@ test.describe( 'Template Activate', () => {
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
+		// The templates endpoint lists templates for the active theme, and
+		// the last test switches to twentytwentyfive. Switch back first so
+		// the home template created under emptytheme is found and deleted;
+		// left behind, it replaces the front page of every later emptytheme
+		// suite on the same site.
+		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
 		await requestUtils.activateTheme( 'twentytwentyone' );

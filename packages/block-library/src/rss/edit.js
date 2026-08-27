@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	BlockControls,
 	InspectorControls,
@@ -15,7 +12,7 @@ import {
 	ToolbarGroup,
 	TextControl,
 	ExternalLink,
-	__experimentalInputControl as InputControl,
+	__experimentalInputControl as WCInputControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -25,10 +22,6 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { prependHTTPS } from '@wordpress/url';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { useDisabled } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
 
@@ -95,7 +88,7 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 						onSubmit={ onSubmitURL }
 						className="wp-block-rss__placeholder-form"
 					>
-						<InputControl
+						<WCInputControl
 							label={ label }
 							type="url"
 							hideLabelFromVision

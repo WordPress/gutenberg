@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { type ConnectionError } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { speak } from '@wordpress/a11y';
 import apiFetch from '@wordpress/api-fetch';
 import { escapeHTML } from '@wordpress/escape-html';
@@ -23,10 +20,6 @@ import {
 } from '@wordpress/hooks';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { localAutosaveSet } from './local-autosave';
 import {
 	getNotificationArgumentsForSaveSuccess,

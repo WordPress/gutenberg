@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import { act, render, renderHook, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { click, render as renderAriakit } from '@ariakit/test/react';
-
-/**
- * Internal dependencies
- */
 import TypographyPanel, { useHasTypographyPanel } from '../typography-panel';
 
 // The inheritance treatment sits behind the

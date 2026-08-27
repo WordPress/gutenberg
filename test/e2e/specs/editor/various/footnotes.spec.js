@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 async function getFootnotes( page, withoutSave = false ) {
@@ -28,7 +25,7 @@ test.describe( 'Footnotes', () => {
 
 	test( 'can be inserted', async ( { editor, page } ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'first paragraph' );
 		await page.keyboard.press( 'Enter' );
@@ -192,7 +189,7 @@ test.describe( 'Footnotes', () => {
 
 	test( 'can be inserted in a list', async ( { editor, page } ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* 1' );
 		await editor.clickBlockToolbarButton( 'More' );
@@ -292,7 +289,7 @@ test.describe( 'Footnotes', () => {
 
 	test( 'works with revisions', async ( { editor, page } ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'first paragraph' );
 		await page.keyboard.press( 'Enter' );
@@ -397,7 +394,7 @@ test.describe( 'Footnotes', () => {
 
 	test( 'can be previewed when published', async ( { editor, page } ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'a' );
 
@@ -522,7 +519,7 @@ test.describe( 'Footnotes meta written by something else', () => {
 
 		await admin.editPost( post.id );
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'a paragraph' );
 

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	AlignmentControl,
@@ -19,10 +12,6 @@ import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 import { verse } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { migrateToQuoteV2 } from './deprecated';
 import { Caption } from '../utils/caption';
 

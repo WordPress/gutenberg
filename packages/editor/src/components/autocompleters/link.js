@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { Icon, page, post } from '@wordpress/icons';

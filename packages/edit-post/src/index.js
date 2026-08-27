@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store as blocksStore } from '@wordpress/blocks';
 import {
 	registerCoreBlocks,
@@ -20,10 +17,6 @@ import {
 } from '@wordpress/editor';
 import { store as coreDataStore } from '@wordpress/core-data';
 import apiFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
 import Layout from './components/layout';
 import { unlock } from './lock-unlock';
 
@@ -54,7 +47,6 @@ export function initializeEditor(
 	settings,
 	initialEdits
 ) {
-	const isMediumOrBigger = window.matchMedia( '(min-width: 782px)' ).matches;
 	const target = document.getElementById( id );
 	const root = createRoot( target );
 
@@ -92,17 +84,6 @@ export function initializeEditor(
 	}
 
 	dispatch( blocksStore ).reapplyBlockTypeFilters();
-
-	// Check if the block list view should be open by default.
-	// If `distractionFree` mode is enabled, the block list view should not be open.
-	// This behavior is disabled for small viewports.
-	if (
-		isMediumOrBigger &&
-		select( preferencesStore ).get( 'core', 'showListViewByDefault' ) &&
-		! select( preferencesStore ).get( 'core', 'distractionFree' )
-	) {
-		dispatch( editorStore ).setIsListViewOpened( true );
-	}
 
 	registerCoreBlocks();
 	registerCoreBlockBindingsSources();
@@ -201,7 +182,6 @@ async function preloadResolutions( postType, postId ) {
 			core.__experimentalGetCurrentThemeBaseGlobalStyles(),
 			core.__experimentalGetCurrentThemeGlobalStylesVariations(),
 			core.getEntityRecord( 'root', '__unstableBase' ),
-			core.getEntityRecord( 'root', 'site' ),
 			core.canUser( 'read', { kind: 'root', name: 'site' } ),
 			core.canUser( 'create', { kind: 'postType', name: 'attachment' } ),
 			core.canUser( 'create', { kind: 'postType', name: 'page' } ),
@@ -245,12 +225,16 @@ async function preloadResolutions( postType, postId ) {
 
 		// Phase 2: read derived data out of state.
 		const tasks = [];
+
+		if ( coreSelect.canUser( 'read', { kind: 'root', name: 'site' } ) ) {
+			tasks.push( core.getEntityRecord( 'root', 'site' ) );
+		}
+
 		const globalStylesId =
 			coreSelect.__experimentalGetCurrentGlobalStylesId();
 		if ( globalStylesId ) {
 			tasks.push(
-				core.getEntityRecord( 'root', 'globalStyles', globalStylesId ),
-				core.canUser( 'read', {
+				core.canUser( 'update', {
 					kind: 'root',
 					name: 'globalStyles',
 					id: globalStylesId,
@@ -285,6 +269,31 @@ async function preloadResolutions( postType, postId ) {
 
 		if ( tasks.length ) {
 			await Promise.all( tasks );
+		}
+
+		// Phase 3: requests whose capability check only resolved in phase 2.
+		if ( globalStylesId ) {
+			if (
+				coreSelect.canUser( 'update', {
+					kind: 'root',
+					name: 'globalStyles',
+					id: globalStylesId,
+				} )
+			) {
+				await core.getEntityRecord(
+					'root',
+					'globalStyles',
+					globalStylesId
+				);
+			} else {
+				// Fetch for non-admin users using view context.
+				await core.getEntityRecord(
+					'root',
+					'globalStyles',
+					globalStylesId,
+					{ context: 'view' }
+				);
+			}
 		}
 	} catch {
 		// Resolver failures here would also surface on demand; don't block render.

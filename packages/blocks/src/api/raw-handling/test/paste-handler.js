@@ -1,10 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { pasteHandler, serialize } from '@wordpress/blocks';
-/**
- * Internal dependencies
- */
 import { init as initAndRegisterImageBlock } from '../../../../../block-library/src/image';
 import { init as initAndRegisterTableBlock } from '../../../../../block-library/src/table';
 import { init as initAndRegisterVideoBlock } from '../../../../../block-library/src/video';

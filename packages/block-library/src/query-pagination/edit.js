@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	InspectorControls,
@@ -14,10 +11,6 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { QueryPaginationArrowControls } from './query-pagination-arrow-controls';
 import { QueryPaginationLabelControl } from './query-pagination-label-control';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';

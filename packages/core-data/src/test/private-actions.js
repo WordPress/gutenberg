@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createRegistry } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import { store as coreStore } from '..';
 import { editMediaEntity, setCollaborationSupported } from '../private-actions';
 import { getSyncManager, hasSyncManager } from '../sync';

@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import BlockStyles from '../block-styles';
 import InspectorControls from '../inspector-controls';
 import PositionControls from './position-controls-panel';
@@ -110,7 +103,7 @@ const StylesTab = ( {
 	isSectionBlock,
 	contentClientIds,
 } ) => {
-	const borderPanelLabel = useBorderPanelLabel( { blockName } );
+	const borderPanelLabel = useBorderPanelLabel( { clientId } );
 
 	return (
 		<>
