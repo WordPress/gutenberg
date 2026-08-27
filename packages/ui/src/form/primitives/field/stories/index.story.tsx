@@ -16,7 +16,6 @@ const meta: Meta< typeof Field.Root > = {
 		'Field.Description': Field.Description,
 		'Field.Details': Field.Details,
 		'Field.VisualLabel': Field.VisualLabel,
-		'Field.VisualDescription': Field.VisualDescription,
 	},
 	parameters: {
 		componentStatus: {
@@ -168,27 +167,6 @@ export const WithVisualLabel: StoryObj = {
 			<Button aria-label="Select an author" variant="outline">
 				Select an author
 			</Button>
-		</Stack>
-	),
-};
-
-/**
- * `Field.VisualDescription` renders a purely visual description with the same
- * styling as `Field.Description`. It can be used outside `Field.Root` when
- * supplementary text is needed for layout consistency, but should not be
- * associated with a control using `aria-describedby`.
- */
-export const WithVisualDescription: StoryObj = {
-	render: () => (
-		<Stack direction="column" gap="sm" align="flex-start">
-			<input
-				type="text"
-				aria-label="API key"
-				placeholder="Paste your API key"
-			/>
-			<Field.VisualDescription>
-				Find your API key in your account settings.
-			</Field.VisualDescription>
 		</Stack>
 	),
 };

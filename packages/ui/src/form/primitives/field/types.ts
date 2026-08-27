@@ -102,10 +102,3 @@ export type FieldVisualLabelProps = ComponentProps< 'span' > & {
 	 */
 	variant?: 'default' | 'plain';
 };
-
-export type FieldVisualDescriptionProps = ComponentProps< 'p' > & {
-	/**
-	 * The visual description content.
-	 */
-	children?: React.ReactNode;
-};

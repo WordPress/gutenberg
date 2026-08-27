@@ -618,12 +618,6 @@
             - render
             - style
             - variant
-      - name: Field.VisualDescription
-        props:
-            - children
-            - className
-            - render
-            - style
       - name: Field.VisualLabel
         props:
             - children

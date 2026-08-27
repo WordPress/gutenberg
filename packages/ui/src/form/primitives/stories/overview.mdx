@@ -20,4 +20,4 @@ Form primitives do not provide labels or descriptions on their own. When you com
 
 For standard labels and descriptions, use [Field](?path=/docs/design-system-components-form-primitives-field--docs) for individual controls and [Fieldset](?path=/docs/design-system-components-form-primitives-fieldset--docs) for groups of related controls.
 
-When a control is already accessibly labeled but still needs a visual label or description for layout consistency, use `Field.VisualLabel` and `Field.VisualDescription` outside `Field.Root`. These components do not carry semantics and are not associated with a control.
+When a control is already accessibly labeled but still needs a visual label for layout consistency, use `Field.VisualLabel` outside `Field.Root`. It does not carry semantics and is not associated with a control. Helper text under a field or fieldset should use `Field.Description` or `Fieldset.Description` so it is associated.
