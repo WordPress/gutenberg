@@ -48,7 +48,6 @@ const PLUGIN_NAMESPACE_TO_ESLINTRC_NAME = {
  * they are strings resolved via require().
  */
 const PARSER_NAME_TO_ESLINTRC = {
-	'@wordpress/babel-eslint-parser-compat': '@babel/eslint-parser',
 	'typescript-eslint/parser': '@typescript-eslint/parser',
 };
 

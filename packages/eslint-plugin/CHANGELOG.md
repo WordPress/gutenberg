@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The `esnext` ruleset no longer configures a parser, so JavaScript and JSX files are parsed by ESLint's default parser instead of `@babel/eslint-parser`.
+
 ### Enhancements
 
 -   Update `use-recommended-components` rule to prefer `@wordpress/ui` `Field` and `Fieldset` over legacy `@wordpress/components` `BaseControl` ([#82095](https://github.com/WordPress/gutenberg/pull/82095)).
