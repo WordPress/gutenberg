@@ -34,7 +34,9 @@ The filename selects the environment:
 
 Node.js and jsdom tests use a deterministic stylesheet mock. Browser Mode
 loads real CSS so tests can inspect computed styles and layout. Browser Mode
-also preserves native browser APIs such as `matchMedia`.
+also preserves native browser APIs such as `matchMedia`. The Node.js and jsdom
+projects set `WP_TESTS_SKIP_STYLE_INJECTION=true` so CSS already compiled into
+a package by `wp-build` follows the same environment boundary.
 
 The preset does not add browser behavior to jsdom. Use a local, restored mock
 when a nonvisual test needs a browser signal as controlled input. Use Browser

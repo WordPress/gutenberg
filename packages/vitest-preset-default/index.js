@@ -47,6 +47,9 @@ export default defineConfig( {
 				},
 				test: {
 					name: 'node',
+					env: {
+						WP_TESTS_SKIP_STYLE_INJECTION: 'true',
+					},
 					environment: 'node',
 					exclude: [
 						...exclude,
@@ -64,6 +67,9 @@ export default defineConfig( {
 				},
 				test: {
 					name: 'jsdom',
+					env: {
+						WP_TESTS_SKIP_STYLE_INJECTION: 'true',
+					},
 					environment: 'jsdom',
 					environmentOptions: {
 						jsdom: {

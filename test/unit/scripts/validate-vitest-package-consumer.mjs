@@ -21,7 +21,13 @@ const ROOT_DIR = path.resolve(
 	path.dirname( fileURLToPath( import.meta.url ) ),
 	'../../..'
 );
-const PACKAGES = [ 'vitest-console', 'vitest-preset-default', 'scripts' ];
+const PACKAGES = [
+	'wp-build',
+	'style-runtime',
+	'vitest-console',
+	'vitest-preset-default',
+	'scripts',
+];
 const tempDirectory = realpathSync(
 	mkdtempSync( path.join( tmpdir(), 'wordpress-vitest-consumer-' ) )
 );
@@ -284,6 +290,56 @@ function runWpScripts( fixture, args, options = {} ) {
 	);
 }
 
+function createBuiltStylePackage() {
+	const packageDirectory = path.join(
+		tempDirectory,
+		'packages/test-style-fixture'
+	);
+	const sourceDirectory = path.join( packageDirectory, 'src' );
+
+	mkdirSync( sourceDirectory, { recursive: true } );
+	writeJson( path.join( packageDirectory, 'package.json' ), {
+		name: '@wordpress/test-style-fixture',
+		version: '1.0.0',
+		type: 'module',
+		main: 'build/index.cjs',
+		module: 'build-module/index.mjs',
+	} );
+	writeFileSync(
+		path.join( sourceDirectory, 'index.js' ),
+		`import styles from './style.module.css';
+
+export default styles;
+`
+	);
+	writeFileSync(
+		path.join( sourceDirectory, 'style.module.css' ),
+		`@layer wp-build-test {
+	.fixture {
+		--wp-build-style-injection-test: true;
+		color: rgb(1, 2, 3);
+	}
+}
+`
+	);
+
+	run(
+		process.execPath,
+		[ path.join( installedPackages, '@wordpress/build/lib/build.mjs' ) ],
+		{ cwd: tempDirectory }
+	);
+
+	const installedFixture = path.join(
+		installedPackages,
+		'@wordpress/test-style-fixture'
+	);
+	cpSync( packageDirectory, installedFixture, { recursive: true } );
+	assert.ok(
+		existsSync( path.join( installedFixture, 'build-module/index.mjs' ) ),
+		'wp-build did not create the style fixture module.'
+	);
+}
+
 function createDefaultConsumer() {
 	const fixture = tempDirectory;
 	writeFileSync(
@@ -307,42 +363,35 @@ test( 'uses Node and native transforms by default', () => {
 	);
 	writeFileSync( path.join( fixture, 'styles.module.scss' ), '' );
 	writeFileSync(
-		path.join( fixture, 'environment.jsdom.test.jsx' ),
+		path.join( fixture, 'environment.jsdom.test.js' ),
 		`import { expect, test } from 'vitest';
+import builtStyles from '@wordpress/test-style-fixture';
 import styles from './styles.module.scss';
 
 test( 'selects jsdom and the stylesheet mock by filename', () => {
-\tconst element = <button className={ styles.primaryAction }>Save</button>;
-
-\texpect( element.props.className ).toBe( 'style-primary-action' );
+\texpect( styles.primaryAction ).toBe( 'style-primary-action' );
 \texpect( document ).toBeDefined();
 \texpect( window.matchMedia ).toBeUndefined();
 \texpect( window.requestIdleCallback ).toBeUndefined();
+\texpect( builtStyles.fixture ).toBeTruthy();
+\texpect( document.head.textContent ).not.toContain(
+\t\t'--wp-build-style-injection-test'
+\t);
 } );
-`
-	);
-	writeFileSync(
-		path.join( fixture, 'browser-values.css' ),
-		`.browser-value {
-\tbox-sizing: border-box;
-\twidth: 120px;
-\theight: 20px;
-}
 `
 	);
 	writeFileSync(
 		path.join( fixture, 'values.browser.test.js' ),
 		`import { expect, test } from 'vitest';
-import './browser-values.css';
+import styles from '@wordpress/test-style-fixture';
 
 test( 'uses real CSS and native browser values', async () => {
 \tconst element = document.createElement( 'div' );
-\telement.className = 'browser-value';
+\telement.className = styles.fixture;
 \tdocument.body.append( element );
 \tawait new Promise( requestAnimationFrame );
 
-\texpect( getComputedStyle( element ).width ).toBe( '120px' );
-\texpect( element.getBoundingClientRect().width ).toBe( 120 );
+\texpect( getComputedStyle( element ).color ).toBe( 'rgb(1, 2, 3)' );
 \texpect( window.matchMedia( '(min-width: 1px)' ).matches ).toBe( true );
 \telement.remove();
 } );
@@ -491,12 +540,13 @@ try {
 	);
 
 	installPackedPackages( packedPackages );
+	createBuiltStylePackage();
 
 	createDefaultConsumer();
 	createConfiguredConsumer();
 
 	console.log(
-		'Validated packed @wordpress/vitest-console, @wordpress/vitest-preset-default, and @wordpress/scripts consumer fixtures.'
+		'Validated packed @wordpress/build, @wordpress/style-runtime, @wordpress/vitest-console, @wordpress/vitest-preset-default, and @wordpress/scripts consumer fixtures.'
 	);
 } finally {
 	rmSync( tempDirectory, { force: true, recursive: true } );
