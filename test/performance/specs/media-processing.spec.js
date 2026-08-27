@@ -172,6 +172,16 @@ async function measureCrossFormatProcessing( buffer, srcType, dstType, sizes ) {
 }
 
 test.describe( 'Media Processing Performance', () => {
+	/*
+	 * This suite benchmarks the wasm-vips build installed with the test runner,
+	 * which is the same for every branch under comparison.
+	 */
+	// eslint-disable-next-line playwright/no-skipped-test
+	test.skip(
+		!! process.env.WP_PERF_COMPARISON_BRANCH,
+		'Only measured once, on the first branch.'
+	);
+
 	// Read test images once at module level.
 	const jpegBuffer = readFileSync(
 		path.join( ASSETS_PATH, 'test-image-3000x2000.jpeg' )

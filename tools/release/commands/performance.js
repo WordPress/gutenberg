@@ -173,10 +173,11 @@ function printStats( m, s ) {
  * @param {string}  testSuite     Name of the tests set.
  * @param {string}  testRunnerDir Path to the performance tests' clone.
  * @param {string}  runKey        Unique identifier for the test run.
- * @param {boolean} saveTraces    Whether the test runner should save Chromium
- *                                traces as artifacts (only the head branch).
+ * @param {boolean} isHeadBranch  Whether this is the first branch. Only it saves
+ *                                Chromium traces and runs the suites that measure
+ *                                the test runner itself.
  */
-async function runTestSuite( testSuite, testRunnerDir, runKey, saveTraces ) {
+async function runTestSuite( testSuite, testRunnerDir, runKey, isHeadBranch ) {
 	await runShellScript(
 		`npm run test:performance -- ${ testSuite }`,
 		testRunnerDir,
@@ -188,7 +189,8 @@ async function runTestSuite( testSuite, testRunnerDir, runKey, saveTraces ) {
 			RESULTS_ID: runKey,
 			// Suppress trace writes on comparison branches so they don't
 			// overwrite the head branch's traces in the shared artifacts dir.
-			WP_PERF_NO_TRACE: saveTraces ? '' : '1',
+			WP_PERF_NO_TRACE: isHeadBranch ? '' : '1',
+			WP_PERF_COMPARISON_BRANCH: isHeadBranch ? '' : '1',
 		}
 	);
 }
@@ -694,7 +696,11 @@ async function runPerformanceTests( branches, options ) {
 				);
 			}
 
-			if ( branches.length === 2 ) {
+			// A metric can be missing on comparison branches, see `WP_PERF_COMPARISON_BRANCH`.
+			if (
+				branches.length === 2 &&
+				branches.every( ( branchName ) => branch[ branchName ] )
+			) {
 				const [ branch1, branch2 ] = branches;
 				const value1 = branch[ branch1 ].q50;
 				const value2 = branch[ branch2 ].q50;
