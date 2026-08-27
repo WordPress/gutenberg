@@ -3,12 +3,6 @@
 @use "@wordpress/base-styles/breakpoints" as *;
 @use "@wordpress/base-styles/mixins" as *;
 
-.media-editor-route {
-	// TODO: Reassess how to handle background color in Page component.
-	// https://github.com/WordPress/gutenberg/pull/81646#discussion_r3846031681
-	background-color: var(--wpds-color-background-surface-neutral-strong);
-}
-
 // Carries the editor's keydown handler around the whole page, including the
 // header. `display: contents` keeps it out of the flex layout entirely.
 .media-editor-route__shortcut-scope {
@@ -20,6 +14,7 @@
 	flex: 1;
 	min-height: 0;
 	overflow: hidden;
+	background-color: var(--wpds-color-background-surface-neutral-strong);
 
 	// The page has no footer under the editor, so the body would otherwise
 	// run to the bottom edge. Scoped to the route: the modal has its own
