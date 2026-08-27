@@ -96,12 +96,12 @@ Given an array of transforms, returns the highest-priority transform where the p
 
 _Parameters_
 
--   _transforms_ `BlockTransform[]`: Transforms to search.
--   _predicate_ `( transform: BlockTransform ) => boolean`: Function returning true on matching transform.
+-   _transforms_ `T[]`: Transforms to search.
+-   _predicate_ `( transform: T ) => boolean`: Function returning true on matching transform.
 
 _Returns_
 
--   `BlockTransform | null`: Highest-priority transform candidate.
+-   `T | null`: Highest-priority transform candidate.
 
 ### getBlockAttributes
 
@@ -110,7 +110,7 @@ Returns the block attributes of a registered block node given its type.
 _Parameters_
 
 -   _blockTypeOrName_ `string | BlockType`: Block type or name.
--   _innerHTML_ `string | Node`: Raw block content.
+-   _innerHTML_ `string | Node | undefined`: Raw block content.
 -   _attributes_ `Record< string, unknown >`: Known block attributes (from delimiters).
 
 _Returns_
@@ -223,7 +223,7 @@ _Parameters_
 
 _Returns_
 
--   `BlockTransform[]`: Block transforms for direction.
+-   `NormalizedBlockTransform[]`: Block transforms for direction.
 
 ### getBlockType
 
@@ -488,7 +488,7 @@ Given a block's raw content and an attribute's schema returns the attribute's va
 
 _Parameters_
 
--   _innerHTML_ `string | Node`: Block's raw content.
+-   _innerHTML_ `string | Node | undefined`: Block's raw content.
 -   _attributeSchema_ `BlockAttribute`: Attribute's schema.
 
 _Returns_
@@ -501,11 +501,11 @@ Converts an HTML string to known blocks. Strips everything else.
 
 _Parameters_
 
--   _options_ `{ HTML?: string; plainText?: string; mode?: 'AUTO' | 'INLINE' | 'BLOCKS'; tagName?: string; }`:
--   _options.HTML_ `string`: The HTML to convert.
--   _options.plainText_ `string`: Plain text version.
--   _options.mode_ `'AUTO' | 'INLINE' | 'BLOCKS'`: Handle content as blocks or inline content. _ 'AUTO': Decide based on the content passed. _ 'INLINE': Always handle as inline content, and return string. \* 'BLOCKS': Always handle as blocks, and return array of blocks.
--   _options.tagName_ `string`: The tag into which content will be inserted.
+-   _options_ `RawHandlerOptions`:
+-   _options.HTML_ `RawHandlerOptions[ 'HTML' ]`: The HTML to convert.
+-   _options.plainText_ `RawHandlerOptions[ 'plainText' ]`: Plain text version.
+-   _options.mode_ `RawHandlerOptions[ 'mode' ]`: Handle content as blocks or inline content. _ 'AUTO': Decide based on the content passed. _ 'INLINE': Always handle as inline content, and return string. \* 'BLOCKS': Always handle as blocks, and return array of blocks.
+-   _options.tagName_ `RawHandlerOptions[ 'tagName' ]`: The tag into which content will be inserted.
 
 _Returns_
 

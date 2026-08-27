@@ -4,12 +4,45 @@
 
 ### New Features
 
+-   `WidgetDashboard.Policy`: a provider that governs the dashboards below
+    it through `canPerform( request )`. Operations: `customize` (the
+    Customize button and the matching commands), `insert` (what the
+    inserter offers; a rejected type keeps rendering where already
+    placed), and per instance `remove`, `move`, `resize`, and `edit`
+    (the tile controls and gestures; a widget denied `edit` receives no
+    `setAttributes`). Nested policies compose restrictively. Exports the
+    `DashboardOperationRequest`, `DashboardInstanceOperation`,
+    `DashboardInstanceOperationRequest`, and `CanPerformDashboardOperation`
+    types ([#81967](https://github.com/WordPress/gutenberg/pull/81967)).
+-   The Add widget button and command show only while the policy lets some
+    registered type be inserted
+    ([#81967](https://github.com/WordPress/gutenberg/pull/81967)).
+
+### Internal
+
+-   Remove unused dependency `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+
+## 0.6.0 (2026-08-26)
+
+### New Features
+
 -   Widget chrome footer: `relevance: 'high'` actions mount as leading text
     links (declared icon as prefix) in a persistent strip under the widget
     body, `'medium'` as trailing compact affordances (icon-only with a
     declared icon); the "More" menu keeps the rest, and full-bleed widgets
     keep every action in the menu
     ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
+-   A link action whose target the host recognizes as one of its own routes
+    (the `links` capability from `useWidgetHost`) mounts the host router's
+    link and navigates client-side; `download` and `openInNewTab` keep the
+    plain anchor ([#81740](https://github.com/WordPress/gutenberg/pull/81740)).
+
+### Documentation
+
+-   Add a `HostLinks` story: a demo host whose `links` capability turns an
+    in-app action target into a client-side route link, beside a plain
+    anchor and a download
+    ([#81740](https://github.com/WordPress/gutenberg/pull/81740)).
 
 ### Internal
 
