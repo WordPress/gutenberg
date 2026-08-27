@@ -173,11 +173,20 @@ describe( 'Vitest policy rules', () => {
 		for ( const source of [
 			"import { screen } from '@testing-library/react';\nscreen.getAllByRole( 'button' ).at( 0 ).offsetWidth;",
 			"import { screen } from '@testing-library/react';\nfor ( const button of screen.getAllByRole( 'button' ) ) { button.offsetWidth; }",
+			"import { screen } from '@testing-library/react';\nscreen.getAllByRole( 'button' ).map( ( button ) => button.offsetWidth );",
+			"import { screen } from '@testing-library/react';\nscreen.getAllByRole( 'button' ).forEach( function ( button ) { button.offsetWidth; } );",
 		] ) {
 			expectViolation( source, 'require Browser Mode', {
 				project: 'jsdom',
 			} );
 		}
+	} );
+
+	it( 'allows browser API-shaped values in unrelated collection callbacks', () => {
+		expectValid(
+			'[ { offsetWidth: 10 } ].map( ( item ) => item.offsetWidth );',
+			{ project: 'jsdom' }
+		);
 	} );
 
 	it( 'tracks computed-style aliases and document.defaultView', () => {

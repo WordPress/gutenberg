@@ -93,6 +93,16 @@ const domProducingMethods = new Set( [
 	'getElementById',
 	'querySelector',
 ] );
+const domCollectionCallbackMethods = new Set( [
+	'every',
+	'filter',
+	'find',
+	'findLast',
+	'flatMap',
+	'forEach',
+	'map',
+	'some',
+] );
 const testingLibraryQueryPattern = /^(?:get|query)By/;
 const testingLibraryAsyncQueryPattern = /^findBy/;
 const testingLibraryCollectionQueryPattern = /^(?:get|query)AllBy/;
@@ -1283,6 +1293,38 @@ export function validateVitestPolicy( {
 				)
 			) {
 				testingLibraryScreenVariables.add( node );
+			}
+			if (
+				node.type === 'CallExpression' &&
+				node.callee?.type === 'MemberExpression' &&
+				domCollectionCallbackMethods.has(
+					getMemberPropertyName( node.callee )
+				) &&
+				( isVariableReference(
+					node.callee.object,
+					domCollectionVariables,
+					identifierVariables
+				) ||
+					isTestingLibraryDomCollectionExpression(
+						node.callee.object,
+						testingLibraryScreenVariables,
+						testingLibraryCollectionFunctionVariables,
+						testingLibraryAsyncCollectionFunctionVariables,
+						testingLibraryNamespaceVariables,
+						identifierVariables
+					) ) &&
+				[ 'ArrowFunctionExpression', 'FunctionExpression' ].includes(
+					node.arguments[ 0 ]?.type
+				)
+			) {
+				for ( const identifier of getPatternIdentifiers(
+					node.arguments[ 0 ].params[ 0 ]
+				) ) {
+					const variable = identifierVariables.get( identifier );
+					if ( variable ) {
+						domVariables.add( variable );
+					}
+				}
 			}
 
 			const { target, value, isCollectionElement } =
