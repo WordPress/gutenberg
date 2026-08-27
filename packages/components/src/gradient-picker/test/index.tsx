@@ -13,6 +13,90 @@ const DUPLICATE_GRADIENTS = [
 ];
 
 describe( 'GradientPicker', () => {
+	it( 'should use matching values only for display in command button presentation', async () => {
+		const user = userEvent.setup();
+		const onChange = jest.fn();
+		render(
+			<GradientPicker
+				aria-label="Gradients"
+				gradients={ DUPLICATE_GRADIENTS }
+				value={ GRADIENT_A }
+				selectedSlug="dark-background"
+				onChange={ onChange }
+				presentation="command-buttons"
+				disableCustomGradients
+				clearable={ false }
+			/>
+		);
+
+		const gradient = screen.getByRole( 'button', {
+			name: 'Gradient: Dark Background',
+		} );
+		expect(
+			screen.getByRole( 'group', { name: 'Gradients' } )
+		).toBeVisible();
+		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		expect( gradient ).not.toHaveAttribute( 'aria-pressed' );
+
+		await user.click( gradient );
+		expect( onChange ).toHaveBeenCalledWith(
+			GRADIENT_A,
+			0,
+			'dark-background'
+		);
+	} );
+
+	it( 'should warn for asButtons and prefer an explicit presentation', () => {
+		render(
+			<GradientPicker
+				aria-label="Gradients"
+				gradients={ DUPLICATE_GRADIENTS }
+				onChange={ jest.fn() }
+				asButtons={ false }
+				presentation="command-buttons"
+				disableCustomGradients
+				clearable={ false }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Gradient: Dark Background',
+			} )
+		).not.toHaveAttribute( 'aria-pressed' );
+		expect( console ).toHaveWarnedWith(
+			'`asButtons` prop in wp.components.GradientPicker is deprecated since version 7.2. Please use `presentation` instead. Note: `asButtons={ true }` maps to `presentation="toggle-buttons"`. Explicit `presentation` takes precedence.'
+		);
+	} );
+
+	it( 'should preserve asButtons as a toggle-button alias', () => {
+		render(
+			<GradientPicker
+				aria-label="Gradients"
+				gradients={ DUPLICATE_GRADIENTS }
+				value={ GRADIENT_A }
+				selectedSlug="dark-background"
+				onChange={ jest.fn() }
+				asButtons
+				disableCustomGradients
+				clearable={ false }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Gradient: Dark Background',
+				pressed: true,
+			} )
+		).toBeVisible();
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Gradient: Dark Text',
+				pressed: false,
+			} )
+		).toBeVisible();
+	} );
+
 	describe( 'duplicate gradients in palette', () => {
 		it( 'should render all swatches even when two entries share the same gradient value', () => {
 			render(
