@@ -22,6 +22,7 @@ import { store, stores, universalUnlock } from './store';
 import { warn, type SyncAwareFunction } from './utils';
 import { getScope, setScope, resetScope, type Scope } from './scopes';
 import { PENDING_GETTER } from './proxies/state';
+import { compileExpression } from './csp';
 export interface DirectiveEntry {
 	value: string | object;
 	namespace: string;
@@ -323,9 +324,11 @@ export const getEvaluate: GetEvaluate =
 		}
 
 		// Full-expression path:
-		// Compiles arbitrary JavaScript expressions via new Function(),
-		// passing state, context, actions, callbacks, current element and triggering event as named
-		// parameters to be used in expressions.
+		// Compiles arbitrary JavaScript expressions via compileExpression()
+		// (Function() fallback or nonced <script> when <html data-nonce> is
+		// present — see csp.ts, mirrors Datastar's csp.ts). Passes state,
+		// context, actions, callbacks, current element and triggering event
+		// as named parameters to be used in expressions.
 		//
 		// Supports ;-delimited multiple statements: the
 		// last statement's value is what the directive receives
@@ -362,13 +365,15 @@ export const getEvaluate: GetEvaluate =
 			const el = scope.ref?.current ?? null;
 			let fn = fnCache.get( expression );
 			if ( ! fn ) {
-				fn = new Function(
-					'state',
-					'context',
-					'actions',
-					'callbacks',
-					'el',
-					'evt',
+				fn = compileExpression(
+					[
+						'state',
+						'context',
+						'actions',
+						'callbacks',
+						'el',
+						'evt',
+					],
 					expression
 				);
 				fnCache.set( expression, fn );
