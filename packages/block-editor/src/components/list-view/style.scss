@@ -266,13 +266,13 @@
 			content: "";
 			position: absolute;
 			top: 0;
-			right: -(24px + 5px);
+			right: -(24px + 5px); // Icon size + padding.
 			bottom: 0;
 			left: 0;
 			border-radius: inherit;
 			@include outset-ring__focus();
-			pointer-events: none;
 			z-index: 2;
+			pointer-events: none;
 		}
 	}
 
