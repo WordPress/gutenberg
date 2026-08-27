@@ -1003,6 +1003,8 @@
 			"packages/worker-threads/src/test/main-thread.test.ts",
 			"packages/worker-threads/src/test/worker-thread.test.ts",
 			"packages/wp-build/lib/test/package-utils.js",
+			"packages/wp-build/lib/test/style-injection.browser.test.js",
+			"packages/wp-build/lib/test/style-injection.jsdom.test.js",
 			"packages/wp-build/lib/test/source-files.js",
 			"routes/connectors-home/test/ai-plugin-callout.jsdom.test.tsx",
 			"routes/dashboard/hooks/use-dashboard-layout/test/use-dashboard-layout.jsdom.test.ts",

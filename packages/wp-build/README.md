@@ -54,10 +54,14 @@ or via npm script:
 
 ### Testing Generated Styles
 
-Generated CSS module output skips automatic style injection when `NODE_ENV` is
-`test`. Node-based DOM implementations such as jsdom do not reliably support
-modern CSS features, so tests that need actual styles in the DOM should
-run in a browser environment.
+Generated CSS module output skips automatic style injection when
+`WP_TESTS_SKIP_STYLE_INJECTION` is `true`. The default WordPress Jest setup and
+the Node and jsdom Vitest projects set this environment variable because
+Node-based DOM implementations do not reliably support modern CSS features.
+Browser Mode leaves style injection enabled so tests can use the actual CSS.
+
+Set `WP_TESTS_SKIP_STYLE_INJECTION` to `true` in custom Node or jsdom test
+configurations that import packages built by `wp-build`.
 
 ## Package Configuration
 
