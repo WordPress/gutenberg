@@ -1,14 +1,14 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-// Whether the run targets the extensible site editor (v2). Its pages screen
-// defaults to the table layout (the classic editor's to the list layout) and
-// renders its views as tabs named after statuses.
+// Whether the run targets the extensible site editor (v2). Both editors
+// default the pages screen to the list layout; v2 renders its views as tabs
+// where the classic editor uses sidebar buttons.
 const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
 
 // A layout that differs from the default one, to make the view modified.
-const modifiedLayout = isSiteEditorV2 ? 'List' : 'Table';
-const modifiedLayoutRole = isSiteEditorV2 ? 'grid' : 'table';
-const defaultLayoutRole = isSiteEditorV2 ? 'table' : 'grid';
+const modifiedLayout = 'Table';
+const modifiedLayoutRole = 'table';
+const defaultLayoutRole = 'grid';
 
 test.describe( 'Pages View Persistence', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
@@ -64,7 +64,7 @@ test.describe( 'Pages View Persistence', () => {
 
 		// Navigate to Drafts view
 		await ( isSiteEditorV2
-			? page.getByRole( 'tab', { name: 'Draft', exact: true } )
+			? page.getByRole( 'tab', { name: 'Drafts', exact: true } )
 			: page.getByRole( 'button', { name: 'Drafts', exact: true } )
 		).click();
 
@@ -77,7 +77,7 @@ test.describe( 'Pages View Persistence', () => {
 
 		// Navigate back to All Pages
 		await ( isSiteEditorV2
-			? page.getByRole( 'tab', { name: 'All', exact: true } )
+			? page.getByRole( 'tab', { name: 'All Pages' } )
 			: page.getByRole( 'button', { name: 'All Pages' } )
 		).click();
 
@@ -99,12 +99,9 @@ test.describe( 'Pages View Persistence', () => {
 		// Verify view returns to the default layout
 		await expect( page.getByRole( defaultLayoutRole ) ).toBeVisible();
 
-		// Verify canvas is still visible in the classic editor's default list
-		// layout. The extensible editor's default table layout has no canvas.
-		if ( ! isSiteEditorV2 ) {
-			await expect(
-				page.getByRole( 'region', { name: 'Editor content' } )
-			).toBeVisible();
-		}
+		// Verify the canvas is still visible in the default list layout.
+		await expect(
+			page.getByRole( 'region', { name: 'Editor content' } )
+		).toBeVisible();
 	} );
 } );

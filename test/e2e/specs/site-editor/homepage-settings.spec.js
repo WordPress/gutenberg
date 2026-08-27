@@ -1,15 +1,10 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-// Whether the run targets the extensible site editor (v2). Its pages screen
-// defaults to a plain table (title rendered as a link), the classic one to
-// the list layout (a grid whose cells label the items).
-const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
-
+// Both site editors default the pages screen to the list layout, a grid
+// whose items are buttons labelled by the page title.
 const getPageRow = ( page, title ) =>
 	page.getByRole( 'row' ).filter( {
-		has: isSiteEditorV2
-			? page.getByRole( 'link', { name: title, exact: true } )
-			: page.getByRole( 'gridcell' ).getByLabel( title ),
+		has: page.getByRole( 'gridcell' ).getByLabel( title ),
 	} );
 
 test.describe( 'Homepage Settings via Editor', () => {

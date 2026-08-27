@@ -62,10 +62,7 @@ test.describe( 'View config extensibility', () => {
 		] );
 	} );
 
-	// v2 gap: the extensible site editor's Pages screen renders a hardcoded
-	// tab set (`DEFAULT_VIEWS` in `routes/post-list/view-utils.ts`) instead
-	// of consuming the entity view config API this test exercises.
-	test( 'applies the filtered configuration throughout the Pages UI @site-editor-v1-only', async ( {
+	test( 'applies the filtered configuration throughout the Pages UI', async ( {
 		admin,
 		page,
 	} ) => {
@@ -159,8 +156,18 @@ test.describe( 'View config extensibility', () => {
 				name: new RegExp( MATCHING_PAGE_TITLE ),
 			} )
 		).toBeVisible();
+	} );
 
-		// The filtered form reaches the Quick Edit DataForm.
+	// v2 gap: the extensible site editor's Pages screen consumes the view
+	// config for its views and layouts, but its Quick Edit form does not
+	// consume the form section yet.
+	test( 'applies the filtered form to the Quick Edit DataForm @site-editor-v1-only', async ( {
+		admin,
+		page,
+	} ) => {
+		await admin.visitSiteEditor( { postType: 'page' } );
+
+		const table = page.getByRole( 'table' );
 		const matchingPageRow = table.getByRole( 'row', {
 			name: new RegExp( MATCHING_PAGE_TITLE ),
 		} );
