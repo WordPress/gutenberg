@@ -18,6 +18,10 @@
     registered type be inserted
     ([#81967](https://github.com/WordPress/gutenberg/pull/81967)).
 
+### Internal
+
+-   Remove unused dependency `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+
 ## 0.6.0 (2026-08-26)
 
 ### New Features

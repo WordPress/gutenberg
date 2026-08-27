@@ -54,11 +54,9 @@
 		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
 		"@wordpress/dataviews": "file:../dataviews",
-		"@wordpress/date": "file:../date",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
-		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/ui": "file:../ui",
 		"@wordpress/url": "file:../url",
 		"clsx": "^2.1.1"
