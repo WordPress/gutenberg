@@ -1,5 +1,4 @@
 import { execFileSync } from 'node:child_process';
-import { randomUUID } from 'node:crypto';
 import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -180,7 +179,7 @@ for ( const projectName of VITEST_PROJECT_NAMES ) {
 	const configPath = path.join(
 		ROOT_DIR,
 		'test/unit',
-		`.vitest-${ projectName }-typecheck-${ randomUUID() }.json`
+		`.vitest-${ projectName }-typecheck.json`
 	);
 	const needsNodeTypes =
 		projectName === 'node' ||
