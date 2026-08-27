@@ -5,6 +5,7 @@
 ### Internal
 
 -   Remove unused dependencies `@wordpress/keyboard-shortcuts`, `@wordpress/reusable-blocks` and `@wordpress/viewport` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
 
 ## 10.5.0 (2026-08-26)
 
