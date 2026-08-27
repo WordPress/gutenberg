@@ -32,7 +32,9 @@ const vitestTests = getVitestTestsByProject(
 const { sync: glob } = globPackage;
 const styleMockAlias = {
 	find: /^.*\.(?:css|scss)$/,
-	replacement: path.join( ROOT_DIR, 'test/unit/config/style-mock.vitest.js' ),
+	replacement: fileURLToPath(
+		import.meta.resolve( '@wordpress/vitest-preset-default/style-mock' )
+	),
 };
 const WP_BUILD_STYLE_FIXTURE_ID = 'virtual:wp-build-style-injection';
 const wpBuildStyleFixtureSource = await compileInlineStyle( {

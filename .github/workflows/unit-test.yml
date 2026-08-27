@@ -88,10 +88,9 @@ jobs:
                   node-version: ${{ matrix.node }}
 
             - name: Run build scripts
-              # It's not necessary to run the full build, since Jest can interpret
-              # source files with `babel-jest`. Some packages have their own custom
-              # build tasks, however. These must be run.
-              run: npx lerna run build
+              # Native Vite transforms do not require the full Gutenberg build.
+              # Some packages have custom build tasks that their tests consume.
+              run: npm exec -- lerna run build
 
             - name: Run the remaining Jest partition
               env:
@@ -148,10 +147,12 @@ jobs:
                   browsers: chromium
 
             - name: Run build scripts
-              # It's not necessary to run the full build, since Vitest uses
-              # native Vite transforms. Some packages have their own custom
-              # build tasks, however. These must be run.
-              run: npx lerna run build
+              # Native Vite transforms do not require the full Gutenberg build.
+              # Some packages have custom build tasks that their tests consume.
+              run: npm exec -- lerna run build
+
+            - name: Validate packed Vitest package consumers
+              run: npm run test:unit:packages
 
             - name: Run the Vitest Browser project
               env:

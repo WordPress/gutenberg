@@ -2904,6 +2904,18 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/vitest-console",
+		"slug": "packages-vitest-console",
+		"markdown_source": "../packages/vitest-console/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/vitest-preset-default",
+		"slug": "packages-vitest-preset-default",
+		"markdown_source": "../packages/vitest-preset-default/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/warning",
 		"slug": "packages-warning",
 		"markdown_source": "../packages/warning/README.md",

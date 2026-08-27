@@ -520,64 +520,47 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Override: Jest test files (unit tests).
+	// Override: Vitest test files.
 	...wpPlugin.configs[ 'test-unit' ].map( ( config ) => ( {
 		...config,
-		files: [
-			'packages/jest*/**/*.{js,jsx}',
-			'**/test/**/*.{js,jsx}',
-			'**/__tests__/**/*.{js,jsx}',
-		],
-		ignores: [
-			'test/e2e/**/*.{js,jsx}',
-			'test/performance/**/*.{js,jsx}',
-			...vitestTestPatterns,
-		],
+		files: vitestTestPatterns,
+		rules: {
+			...config.rules,
+			/*
+			 * These rules report valid Gutenberg patterns such as static type
+			 * tests, assertion helpers, data-driven titles, and callbacks that
+			 * register shared parser tests. Keep the rest of Vitest's
+			 * recommended configuration enabled.
+			 */
+			'vitest/expect-expect': 'off',
+			'vitest/no-conditional-expect': 'off',
+			'vitest/valid-describe-callback': 'off',
+			'vitest/valid-expect-in-promise': 'off',
+			'vitest/valid-title': 'off',
+		},
 	} ) ),
 
-	// Override: Test files — jest-dom, testing-library, jest recommended.
-	{
-		...jestDomPlugin.configs[ 'flat/recommended' ],
-		files: [ '**/test/**/*.[tj]s?(x)', '**/__tests__/**/*.[tj]s?(x)' ],
-		ignores: [
-			'test/e2e/**/*.[tj]s?(x)',
-			'test/performance/**/*.[tj]s?(x)',
-			'test/storybook-playwright/**/*.[tj]s?(x)',
-			...vitestTestPatterns,
-		],
-	},
-	{
-		...testingLibraryPlugin.configs[ 'flat/react' ],
-		files: [ '**/test/**/*.[tj]s?(x)', '**/__tests__/**/*.[tj]s?(x)' ],
-		ignores: [
-			'test/e2e/**/*.[tj]s?(x)',
-			'test/performance/**/*.[tj]s?(x)',
-			'test/storybook-playwright/**/*.[tj]s?(x)',
-			...vitestTestPatterns,
-		],
-	},
+	// Override: Remaining Jest tooling tests. Removed with the legacy packages
+	// in the final migration cleanup.
 	{
 		...jestPlugin.configs[ 'flat/recommended' ],
-		files: [ '**/test/**/*.[tj]s?(x)', '**/__tests__/**/*.[tj]s?(x)' ],
-		ignores: [
-			'test/e2e/**/*.[tj]s?(x)',
-			'test/performance/**/*.[tj]s?(x)',
-			'test/storybook-playwright/**/*.[tj]s?(x)',
-			...vitestTestPatterns,
+		files: [
+			'packages/jest-console/**/*.[tj]s?(x)',
+			'packages/jest-preset-default/**/*.[tj]s?(x)',
 		],
-		rules: {
-			...jestPlugin.configs[ 'flat/recommended' ].rules,
-			/*
-			 * `jsdom` is already the default test environment in `@wordpress/jest-preset-default`,
-			 * so the docblock pragma is redundant.
-			 */
-			'no-warning-comments': [
-				'error',
-				{
-					terms: [ '@jest-environment jsdom' ],
-					location: 'anywhere',
-				},
-			],
+	},
+	{
+		files: [
+			'packages/babel-preset-default/test/fixtures/input.js',
+			'test/unit/config/global-mocks.js',
+			'test/unit/config/matchers/to-be-positioned-popover.js',
+			'test/unit/config/matchers/to-match-style-diff-snapshot.js',
+			'test/unit/config/video-conversion-worker-code-stub.js',
+			'test/unit/config/vips-worker-code-stub.js',
+			'test/unit/mocks/match-media.js',
+		],
+		languageOptions: {
+			globals: jestPlugin.environments.globals.globals,
 		},
 	},
 

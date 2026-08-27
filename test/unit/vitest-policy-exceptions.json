@@ -17,7 +17,8 @@
 		"packages/editor/src/components/collab-sidebar/test/board-store.jsdom.test.js": "Uses supplied DOMRect fixtures to test deterministic range-to-anchor calculations without relying on rendered layout.",
 		"packages/grid/src/dashboard-grid/test/keyboard-activation.jsdom.test.tsx": "The ResizeObserver stub satisfies component setup; assertions cover keyboard activator attribute placement, not resize behavior.",
 		"packages/grid/src/dashboard-lanes/test/keyboard-activation.jsdom.test.tsx": "The ResizeObserver stub satisfies component setup; assertions cover keyboard activator attribute placement, not resize behavior.",
-		"packages/grid/src/dashboard-lanes/test/use-lane-placement.jsdom.test.tsx": "Injects ResizeObserver, CSS.supports, and requestAnimationFrame to unit-test native-support and polyfill branches deterministically."
+		"packages/grid/src/dashboard-lanes/test/use-lane-placement.jsdom.test.tsx": "Injects ResizeObserver, CSS.supports, and requestAnimationFrame to unit-test native-support and polyfill branches deterministically.",
+		"test/unit/config/setup.vitest.jsdom.test.jsx": "Verifies that the jsdom setup leaves browser layout APIs unimplemented; it asserts their absence rather than emulating browser behavior."
 	},
 	"renderedUi": [
 		"packages/admin-ui/src/breadcrumbs/test/index.jsdom.test.tsx",
