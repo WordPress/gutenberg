@@ -3,12 +3,14 @@
  */
 import { fileURLToPath } from 'node:url';
 import defaultTest from './default-test.js';
-import { minimalEnvironment } from './environment.js';
+import { agentEnvironment } from './environment.js';
+import { workspace } from './paths.js';
+import { permissions, sandbox } from './sandbox.js';
 
 // Resolved from this file rather than written relative to a spec, so it does
 // not depend on which config file pulled the setup in.
 const workspaceExtension = fileURLToPath(
-	new URL( './workspace-extension.mjs', import.meta.url )
+	new URL( './workspace.mjs', import.meta.url )
 );
 
 /** @type {Partial<import('promptfoo').UnifiedConfig>} */
@@ -33,8 +35,8 @@ export default {
 	},
 
 	// Lifecycle hooks, as `file://path:exportName`. Promptfoo calls the named
-	// export for beforeAll, beforeEach, afterEach and afterAll; ours builds a
-	// disposable repository for each row and deletes it afterwards.
+	// export for beforeAll, beforeEach, afterEach and afterAll; ours builds the
+	// workspace once, rolls it back between rows, and removes it at the end.
 	extensions: [ `file://${ workspaceExtension }:extensionHook` ],
 
 	// The agents under test. Every provider runs every case, so adding one
@@ -48,8 +50,10 @@ export default {
 				apiKeyRequired: false,
 				model: 'opus',
 				max_turns: 30,
+				working_dir: workspace,
 				// Only project-level instructions, so the developer's own
-				// ~/.claude guidance cannot leak into the subject.
+				// ~/.claude guidance cannot leak into the subject. Project here
+				// means the workspace, not this checkout.
 				setting_sources: [ 'project' ],
 				skills: 'all',
 				// Use Bash for reads so Promptfoo represents file access as command
@@ -66,30 +70,25 @@ export default {
 				],
 				// We want to limit the test to only accessing the repo.
 				disallowed_tools: [ 'WebFetch', 'WebSearch' ],
-				// Points Docker at a socket that does not exist, so `docker`
-				// and `wp-env` fail instead of starting containers, which the
-				// sandbox cannot reach to clean up.
-				env: {
-					...minimalEnvironment,
-					// Docker reaches its daemon over a unix socket, which the
-					// sandbox does not cover; a socket that does not exist
-					// makes `docker` and `wp-env` fail rather than start
-					// containers.
-					DOCKER_HOST: 'unix:///nonexistent/docker.sock',
-				},
+				sandbox,
+				settings: { permissions },
+				env: agentEnvironment,
 			},
 		},
 	],
 
-	// Merged into every case: the sandbox the agent runs in, the preamble added
-	// to each prompt, and the provider that grades `agent-rubric` assertions.
+	// Merged into every case: the preamble added to each prompt, and the
+	// provider that grades `agent-rubric` assertions.
 	defaultTest,
 
 	// Run-level controls.
 	evaluateOptions: {
 		timeoutMs: 180000,
 		cache: false,
-		maxConcurrency: 2,
+		// One row at a time. Every row shares the one workspace, and each starts
+		// from the state `afterEach` rolled the last one back to; overlapping
+		// rows would reset each other's work mid-run.
+		maxConcurrency: 1,
 		repeat: 2,
 	},
 

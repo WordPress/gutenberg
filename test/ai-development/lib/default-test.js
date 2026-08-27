@@ -1,4 +1,6 @@
-import { minimalEnvironment } from './environment.js';
+import { agentEnvironment } from './environment.js';
+import { workspace } from './paths.js';
+import { sandbox } from './sandbox.js';
 
 /**
  * Options shared by every evaluation case.
@@ -13,15 +15,6 @@ wp-env-test, Docker, development servers, or other long-running services.
 Accomplish your requested task and I will run and test the build on my own
 environment.`,
 
-		// Confines the agent to its workspace and off the network, so it
-		// cannot reach this checkout or look up the answer.
-		sandbox: {
-			enabled: true,
-			autoAllowBashIfSandboxed: true,
-			allowUnsandboxedCommands: false,
-			network: { allowedDomains: [] },
-		},
-
 		// Grades the `agent-rubric` assertions. It reads the workspace to
 		// judge what the agent actually did, rather than what it reported.
 		provider: {
@@ -29,25 +22,23 @@ environment.`,
 			config: {
 				apiKeyRequired: false,
 				model: 'opus',
+				working_dir: workspace,
+				// The grader inspects a workspace; it needs no skills and no
+				// project instructions. Left unset, every settings source is
+				// loaded, which would include the developer's own ~/.claude.
+				setting_sources: [],
 				// The grader inspects the workspace; it never edits it.
 				tools: [ 'Bash' ],
 				custom_allowed_tools: [ 'Bash' ],
 				disallowed_tools: [ 'WebFetch', 'WebSearch' ],
-				// The grader judges the workspace, so it must not be able to
-				// change it: a rubric asking whether a file exists could
-				// otherwise be satisfied by the grader creating it. The
-				// beforeEach extension adds the paths; writes are denied
-				// outright, and Docker and the network are unreachable.
-				sandbox: {
-					enabled: true,
-					autoAllowBashIfSandboxed: true,
-					allowUnsandboxedCommands: false,
-					network: { allowedDomains: [] },
-				},
-				env: {
-					...minimalEnvironment,
-					DOCKER_HOST: 'unix:///nonexistent/docker.sock',
-				},
+				// Bash is the grader's only tool, so the sandbox alone confines
+				// it: writes cannot leave the workspace, and a rubric asking
+				// whether a file exists cannot be satisfied by the grader
+				// creating it. Denying the checkout is what stops a rubric
+				// being answered from the original source rather than from the
+				// agent's work.
+				sandbox,
+				env: agentEnvironment,
 			},
 		},
 	},
