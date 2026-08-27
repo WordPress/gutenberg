@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 8.54.0 (2026-08-26)
+
+### Internal
+
+-   Stop rendering `EditorKeyboardShortcutsRegister`, which the editor provider now renders itself ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).
+
 ## 8.53.0 (2026-08-12)
 
 ### Enhancements
