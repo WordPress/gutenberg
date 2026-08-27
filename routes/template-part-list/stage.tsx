@@ -6,7 +6,7 @@ import {
 	useInvalidate,
 } from '@wordpress/route';
 import { useView } from '@wordpress/views';
-import { DataViews } from '@wordpress/dataviews';
+import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { Page } from '@wordpress/admin-ui';
 import type { View, Action } from '@wordpress/dataviews';
 import {
@@ -114,12 +114,7 @@ function TemplatePartList() {
 	};
 
 	const postTypeQuery = useMemo( () => viewToQuery( view ), [ view ] );
-	const {
-		records: posts,
-		totalItems,
-		totalPages,
-		isResolving,
-	} = useEntityRecordsWithPermissions(
+	const { records, isResolving } = useEntityRecordsWithPermissions(
 		'postType',
 		'wp_template_part',
 		postTypeQuery
@@ -153,6 +148,10 @@ function TemplatePartList() {
 				} )
 		);
 	}, [ allFields, area ] );
+
+	const { data: posts, paginationInfo } = useMemo( () => {
+		return filterSortAndPaginate( records, view, fields );
+	}, [ records, view, fields ] );
 
 	// Helper function to clean up postIds from URL after deletion
 	const cleanupDeletedPostIdsFromUrl = useCallback(
@@ -285,10 +284,7 @@ function TemplatePartList() {
 				onChangeView={ onChangeView }
 				actions={ actions }
 				isLoading={ isResolving }
-				paginationInfo={ {
-					totalItems,
-					totalPages,
-				} }
+				paginationInfo={ paginationInfo }
 				getItemId={ getItemId }
 				selection={ selection }
 				onReset={ isModified ? onReset : false }

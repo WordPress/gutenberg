@@ -2,13 +2,17 @@
 
 ## Unreleased
 
+## 0.17.0 (2026-08-26)
+
 ### Enhancements
 
--   Add a `scope` prop to `MediaEditor` so each frame can keep its own persisted details-sidebar visibility ([#81559](https://github.com/WordPress/gutenberg/pull/81559)).
+-   `MediaEditor`: replace `ComplementaryArea` and `InterfaceSkeleton` with a layout the media editor owns, and widen the settings panel so its controls and fields are not so cramped ([#81840](https://github.com/WordPress/gutenberg/pull/81840)).
+-   `MediaEditor.ImageControls` is removed, and `renderFrame` drops `hasCanvas`. Both were added in the same unreleased cycle: the transform controls belong to the Crop panel, and `HistoryActions` already renders nothing when a panel covers the canvas, so a frame gating on it repeated that check from the outside. The `scope` prop is removed too: it named an `@wordpress/interface` scope that persisted the panel's open state, which went with `ComplementaryArea` ([#81840](https://github.com/WordPress/gutenberg/pull/81840)).
 -   Expose the header, history (reset/undo/redo), save (cancel/save) and image control clusters as `MediaEditor` sub-components, so each frame imports and arranges them to suit its own chrome. `renderFrame` now passes data only: `footerActions` is gone, `footerLayout` is now `layout`, and `isImage` is new. `showCloseButton` moves from `MediaEditor` to `MediaEditor.HeaderActions` ([#81563](https://github.com/WordPress/gutenberg/pull/81563)).
 
 ### Bug Fixes
 
+-   `MediaEditor`: make the Details fields reachable below the `small` breakpoint. `ComplementaryArea` closed the sidebar on small viewports and offered no way to re-open it, so the fields could not be edited on a phone at all ([#81840](https://github.com/WordPress/gutenberg/pull/81840)).
 -   Keep the Details sidebar from clipping focus outlines, with balanced horizontal padding ([#81703](https://github.com/WordPress/gutenberg/pull/81703)).
 -   Keep initial focus on the modal dialog frame instead of moving it to the crop area once the image loads ([#81541](https://github.com/WordPress/gutenberg/pull/81541)).
 

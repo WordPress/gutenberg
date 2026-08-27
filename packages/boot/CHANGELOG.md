@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.21.0 (2026-08-26)
+
 ### Bug Fixes
 
 -   Restore bottom-centered snackbar notices after the CSS Modules migration ([#81995](https://github.com/WordPress/gutenberg/pull/81995)).
