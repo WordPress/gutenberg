@@ -8210,24 +8210,6 @@
 			"count": 1
 		}
 	},
-	"packages/reusable-blocks/src/components/reusable-blocks-menu-items/index.js": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-blocks-manage-button.js": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/rich-text/src/hook/index.js": {
 		"react-hooks/refs": {
 			"count": 12
