@@ -161,7 +161,7 @@ function useHasTextIndentControl( settings ) {
 	return settings?.typography?.textIndent;
 }
 
-export function useHasTextShadowControl( settings ) {
+function useHasTextShadowControl( settings ) {
 	return settings?.typography?.textShadow;
 }
 

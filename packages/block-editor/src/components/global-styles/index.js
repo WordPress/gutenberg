@@ -2,7 +2,6 @@ export { useSettingsForBlockElement } from './hooks';
 export {
 	default as TypographyPanel,
 	useHasTypographyPanel,
-	useHasTextShadowControl,
 } from './typography-panel';
 export {
 	default as DimensionsPanel,
