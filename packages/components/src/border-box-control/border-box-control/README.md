@@ -130,9 +130,9 @@ The available base placements are 'top', 'right', 'bottom', 'left'. Each of thes
 
 -   Required: No
 
-### `popoverOffset`: `number`
+### `popoverOffset`: `number | { mainAxis?: number; crossAxis?: number }`
 
-The space between the popover and the control wrapper.
+The space between the popover and the control wrapper. A number displaces the popover along its main axis; pass an object to also displace it along its cross axis.
 
 -   Required: No
 
