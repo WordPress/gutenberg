@@ -30,7 +30,12 @@ test.use( {
 	},
 } );
 
-test.describe( 'Block Style Variations', () => {
+// v2 gap: block style variations registered server-side (e.g. from this test
+// theme's `styles/block-style-variation-*.json` partials) never reach the
+// extensible site editor — `enqueue_block_editor_assets`-driven inline
+// `registerBlockStyle` calls don't run on its page, so
+// `core/blocks.getBlockStyles()` only contains block-provided styles there.
+test.describe( 'Block Style Variations @site-editor-v1-only', () => {
 	let stylesPostId;
 
 	test.beforeAll( async ( { requestUtils } ) => {

@@ -22,7 +22,6 @@ test.describe( 'Template hierarchy', () => {
 
 	test( 'shows correct template with page on front option', async ( {
 		admin,
-		editor,
 		page,
 		requestUtils,
 	} ) => {
@@ -37,8 +36,7 @@ test.describe( 'Template hierarchy', () => {
 			page_on_front: newPage.id,
 			page_for_posts: 0,
 		} );
-		await admin.visitSiteEditor();
-		await editor.canvas.locator( 'body' ).click();
+		await admin.visitSiteEditor( { canvas: 'edit' } );
 
 		// Title block should contain "Page on Front"
 		await expect(

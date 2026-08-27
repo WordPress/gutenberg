@@ -249,6 +249,78 @@ jobs:
                   path: test/e2e/flaky-tests
                   if-no-files-found: ignore
 
+    e2e-playwright-site-editor-v2:
+        name: Playwright - Site Editor v2
+        runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
+        needs: build
+        timeout-minutes: 45
+        # A skipped check counts as passing for required status checks, so a
+        # broken build must not skip these jobs — they have to start and go red
+        # (see the guard step below). `!cancelled()` is what drops the implicit
+        # `success()`; `!= 'skipped'` keeps the fork/repository filter that now
+        # lives on the build job.
+        if: ${{ !cancelled() && needs.build.result != 'skipped' }}
+        permissions:
+            contents: read
+            id-token: write
+
+        steps:
+            # Bail out before checkout and `npm ci` rather than after.
+            - name: Fail if the build job failed
+              if: ${{ needs.build.result != 'success' }}
+              run: exit 1
+
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
+            - name: Download build output
+              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+              with:
+                  name: build-output
+
+            # The site editor v2 config only defines a chromium project.
+            - name: Install Playwright dependencies
+              uses: ./.github/setup-playwright
+              with:
+                  workspace: '@wordpress/e2e-tests-playwright'
+                  browsers: chromium
+
+            - name: Install WordPress and start the server
+              run: |
+                  npm run wp-env-test start
+
+            - name: Run the tests
+              env:
+                  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+                  # Label flaky reports so this job's diagnostics don't collide
+                  # with the default suite's when artifacts are merged, and so
+                  # extensible-site-editor flakes are reported as their own
+                  # issues.
+                  FLAKY_TESTS_REPORT_LABEL: 'Site Editor v2'
+              run: |
+                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run --workspace @wordpress/e2e-tests-playwright test:e2e:site-editor-v2
+
+            - name: Archive blob reports (HTML)
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              if: ${{ !cancelled() }}
+              with:
+                  name: blob-reports--site-editor-v2
+                  path: test/e2e/blob-report
+                  if-no-files-found: ignore
+
+            - name: Archive flaky tests report
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              if: ${{ !cancelled() }}
+              with:
+                  name: flaky-tests-report--site-editor-v2
+                  path: test/e2e/flaky-tests
+                  if-no-files-found: ignore
+
     merge-artifacts:
         name: Merge Artifacts
         if: ${{ ! cancelled() && ( github.event_name != 'pull_request' || needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
@@ -257,6 +329,7 @@ jobs:
                 detect-relevant-changes,
                 e2e-playwright,
                 e2e-playwright-rtc-websocket,
+                e2e-playwright-site-editor-v2,
             ]
         runs-on: 'ubuntu-24.04'
         permissions:
@@ -400,6 +473,7 @@ jobs:
                 detect-relevant-changes,
                 e2e-playwright,
                 e2e-playwright-rtc-websocket,
+                e2e-playwright-site-editor-v2,
             ]
         if: ${{ ! cancelled() && ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) }}
         steps:

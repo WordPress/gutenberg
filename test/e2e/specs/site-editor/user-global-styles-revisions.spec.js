@@ -24,7 +24,7 @@ test.describe( 'Style Revisions', () => {
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
-		await admin.visitSiteEditor();
+		await admin.visitSiteEditor( { canvas: 'edit' } );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -33,10 +33,8 @@ test.describe( 'Style Revisions', () => {
 
 	test( 'should display revisions UI when there is 1 revision', async ( {
 		page,
-		editor,
 		userGlobalStylesRevisions,
 	} ) => {
-		await editor.canvas.locator( 'body' ).click();
 		const currentRevisions =
 			await userGlobalStylesRevisions.getGlobalStylesRevisions();
 		// Create a revision: change a style and save it.
@@ -71,7 +69,6 @@ test.describe( 'Style Revisions', () => {
 		editor,
 		userGlobalStylesRevisions,
 	} ) => {
-		await editor.canvas.locator( 'body' ).click();
 		await userGlobalStylesRevisions.openStylesPanel();
 		await page.getByRole( 'button', { name: 'Background styles' } ).click();
 		await page
@@ -112,10 +109,8 @@ test.describe( 'Style Revisions', () => {
 
 	test( 'should have a reset to defaults button', async ( {
 		page,
-		editor,
 		userGlobalStylesRevisions,
 	} ) => {
-		await editor.canvas.locator( 'body' ).click();
 		await userGlobalStylesRevisions.openStylesPanel();
 		await page.getByRole( 'button', { name: 'Revisions' } ).click();
 		const lastRevisionItem = page
@@ -131,10 +126,18 @@ test.describe( 'Style Revisions', () => {
 		).toBeVisible();
 	} );
 
-	test( 'should access from the site editor sidebar', async ( {
+	// v2 gap: the extensible site editor's Styles route offers no Revisions
+	// entry point outside the editor (its More menu has only Additional CSS
+	// and Reset styles).
+	test( 'should access from the site editor sidebar @site-editor-v1-only', async ( {
+		admin,
 		editor,
 		page,
 	} ) => {
+		// This flow starts from the browse-mode sidebar, not the edit mode
+		// the shared `beforeEach` opens.
+		await admin.visitSiteEditor();
+
 		const navigationContainer = page.getByRole( 'region', {
 			name: 'Navigation',
 		} );
@@ -159,10 +162,8 @@ test.describe( 'Style Revisions', () => {
 
 	test( 'should allow switching to style book view', async ( {
 		page,
-		editor,
 		userGlobalStylesRevisions,
 	} ) => {
-		await editor.canvas.locator( 'body' ).click();
 		await userGlobalStylesRevisions.openStylesPanel();
 		// Search for exact names to avoid selecting the command bar button in the header.
 		const revisionsButton = page.getByRole( 'button', {
@@ -254,10 +255,8 @@ test.describe( 'Style Revisions', () => {
 
 	test( 'should close revisions panel and leave style book open if activated', async ( {
 		page,
-		editor,
 		userGlobalStylesRevisions,
 	} ) => {
-		await editor.canvas.locator( 'body' ).click();
 		await userGlobalStylesRevisions.openStylesPanel();
 		const revisionsButton = page.getByRole( 'button', {
 			name: 'Revisions',
@@ -286,10 +285,8 @@ test.describe( 'Style Revisions', () => {
 
 	test( 'should allow opening the command menu from the header when open', async ( {
 		page,
-		editor,
 		userGlobalStylesRevisions,
 	} ) => {
-		await editor.canvas.locator( 'body' ).click();
 		await userGlobalStylesRevisions.openStylesPanel();
 		await page
 			.getByRole( 'button', {
@@ -310,12 +307,7 @@ test.describe( 'Style Revisions', () => {
 		).toBeVisible();
 	} );
 
-	test( 'should paginate', async ( {
-		page,
-		editor,
-		userGlobalStylesRevisions,
-	} ) => {
-		await editor.canvas.locator( 'body' ).click();
+	test( 'should paginate', async ( { page, userGlobalStylesRevisions } ) => {
 		// Create > 10 revisions to display pagination navigation component.
 		for ( let i = 9; i < 21; i++ ) {
 			await userGlobalStylesRevisions.saveRevision( stylesPostId, {

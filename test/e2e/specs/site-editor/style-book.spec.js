@@ -11,9 +11,8 @@ test.describe( 'Style Book', () => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
 
-	test.beforeEach( async ( { admin, editor, styleBook, page } ) => {
-		await admin.visitSiteEditor();
-		await editor.canvas.locator( 'body' ).click();
+	test.beforeEach( async ( { admin, styleBook, page } ) => {
+		await admin.visitSiteEditor( { canvas: 'edit' } );
 		await styleBook.open();
 		await expect(
 			page.locator( 'role=region[name="Style Book"i]' )

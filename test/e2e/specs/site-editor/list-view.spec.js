@@ -1,5 +1,8 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+// Whether the run targets the extensible site editor (v2).
+const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
+
 test.describe( 'Site Editor List View', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
@@ -18,7 +21,11 @@ test.describe( 'Site Editor List View', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test( 'should open by default when preference is enabled', async ( {
+	// v2 gap: opening the list view from the `showListViewByDefault`
+	// preference is implemented by `edit-site`'s `useAdaptEditorToCanvas`,
+	// not by the `editor` package, so the extensible site editor does not
+	// honor the preference yet.
+	test( 'should open by default when preference is enabled @site-editor-v1-only', async ( {
 		page,
 		editor,
 	} ) => {
@@ -51,9 +58,11 @@ test.describe( 'Site Editor List View', () => {
 		page,
 		pageUtils,
 	} ) => {
-		// Current starting focus should be at Open Navigation button.
+		// Current starting focus should be at the button leaving the editor:
+		// "Open Navigation" in the classic site editor, "Go back" in the
+		// extensible one.
 		const openNavigationButton = page.getByRole( 'button', {
-			name: 'Open Navigation',
+			name: isSiteEditorV2 ? 'Go back' : 'Open Navigation',
 			exact: true,
 		} );
 		await openNavigationButton.focus();

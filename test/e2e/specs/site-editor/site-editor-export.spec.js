@@ -13,7 +13,10 @@ test.describe( 'Site Editor Templates Export', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test( 'clicking export should download emptytheme.zip file', async ( {
+	// v2 gap: the theme export action is registered by `edit-site`'s more
+	// menu (`site-export.js`), which the extensible site editor does not
+	// render, so there is no Export menu item there yet.
+	test( 'clicking export should download emptytheme.zip file @site-editor-v1-only', async ( {
 		admin,
 		page,
 	} ) => {

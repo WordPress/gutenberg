@@ -293,8 +293,7 @@ test.describe( 'Template Part', () => {
 		} );
 
 		// Visit the index.
-		await admin.visitSiteEditor();
-		await editor.canvas.locator( 'body' ).click();
+		await admin.visitSiteEditor( { canvas: 'edit' } );
 		const paragraph = editor.canvas.locator(
 			`p >> text="${ paragraphText }"`
 		);

@@ -1,5 +1,17 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+// Whether the run targets the extensible site editor (v2). Its pages screen
+// defaults to a plain table (title rendered as a link), the classic one to
+// the list layout (a grid whose cells label the items).
+const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
+
+const getPageRow = ( page, title ) =>
+	page.getByRole( 'row' ).filter( {
+		has: isSiteEditorV2
+			? page.getByRole( 'link', { name: title, exact: true } )
+			: page.getByRole( 'gridcell' ).getByLabel( title ),
+	} );
+
 test.describe( 'Homepage Settings via Editor', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [ requestUtils.activateTheme( 'emptytheme' ) ] );
@@ -17,9 +29,8 @@ test.describe( 'Homepage Settings via Editor', () => {
 		} );
 	} );
 
-	test.beforeEach( async ( { admin, page } ) => {
-		await admin.visitSiteEditor();
-		await page.getByRole( 'button', { name: 'Pages' } ).click();
+	test.beforeEach( async ( { admin } ) => {
+		await admin.visitSiteEditor( { postType: 'page' } );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -36,12 +47,7 @@ test.describe( 'Homepage Settings via Editor', () => {
 	test( 'should not show "Set as homepage" and "Set as posts page" action on pages with `draft` status', async ( {
 		page,
 	} ) => {
-		const draftPage = page
-			.getByRole( 'gridcell' )
-			.getByLabel( 'Draft page' );
-		const draftPageRow = page
-			.getByRole( 'row' )
-			.filter( { has: draftPage } );
+		const draftPageRow = getPageRow( page, 'Draft page' );
 		await draftPageRow.hover();
 		await draftPageRow
 			.getByRole( 'button', {
@@ -59,8 +65,7 @@ test.describe( 'Homepage Settings via Editor', () => {
 	test( 'should show correct homepage actions based on current homepage or posts page', async ( {
 		page,
 	} ) => {
-		const homePage = page.getByRole( 'gridcell' ).getByLabel( 'Homepage' );
-		const homePageRow = page.getByRole( 'row' ).filter( { has: homePage } );
+		const homePageRow = getPageRow( page, 'Homepage' );
 		await homePageRow.click();
 		await homePageRow
 			.getByRole( 'button', {
@@ -86,12 +91,7 @@ test.describe( 'Homepage Settings via Editor', () => {
 			page.getByRole( 'menu', { name: 'Actions' } )
 		).toBeHidden();
 
-		const postsPage = page
-			.getByRole( 'gridcell' )
-			.getByLabel( 'Posts page' );
-		const postsPageRow = page
-			.getByRole( 'row' )
-			.filter( { has: postsPage } );
+		const postsPageRow = getPageRow( page, 'Posts page' );
 		await postsPageRow.click();
 		await postsPageRow
 			.getByRole( 'button', {

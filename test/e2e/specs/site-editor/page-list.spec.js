@@ -19,10 +19,9 @@ test.describe( 'Page List', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
-	test.beforeEach( async ( { admin, page } ) => {
+	test.beforeEach( async ( { admin } ) => {
 		// Go to the pages page, as it has the list layout enabled by default.
-		await admin.visitSiteEditor();
-		await page.getByRole( 'button', { name: 'Pages' } ).click();
+		await admin.visitSiteEditor( { postType: 'page' } );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -249,7 +248,9 @@ test.describe( 'Page List', () => {
 					await editButton.click();
 					await expect(
 						page.getByRole( 'link', {
-							name: /http:\/\/localhost:8889\//,
+							// The permalink preview, on whatever host the
+							// test site runs.
+							name: /^https?:\/\/[^/]+\//,
 						} )
 					).toBeVisible();
 				},
@@ -350,8 +351,7 @@ test.describe( 'Page List', () => {
 		} );
 
 		test.beforeEach( async ( { admin, page } ) => {
-			await admin.visitSiteEditor();
-			await page.getByRole( 'button', { name: 'Pages' } ).click();
+			await admin.visitSiteEditor( { postType: 'page' } );
 			await page.getByRole( 'button', { name: 'Layout' } ).click();
 			await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
 
@@ -378,9 +378,12 @@ test.describe( 'Page List', () => {
 			] ) => {
 				// Asserts are done in the individual functions
 				// eslint-disable-next-line playwright/expect-expect
-				test( `should initialize, edit, and update ${ key } field correctly`, async ( {
-					page,
-				} ) => {
+				test( `should initialize, edit, and update ${ key } field correctly${
+					// v2 gap: `wp.media` is only loaded once the editor canvas
+					// mounts, so the featured image quick edit crashes the
+					// extensible site editor's Pages screen.
+					key === 'featuredImage' ? ' @site-editor-v1-only' : ''
+				}`, async ( { page } ) => {
 					await assertInitialState( page );
 					await performEdit( page );
 					await assertEditedState( page );
@@ -388,7 +391,10 @@ test.describe( 'Page List', () => {
 			}
 		);
 
-		test( 'should save multiple field changes and update Data Views UI', async ( {
+		// v2 gap: `wp.media` is only loaded once the editor canvas mounts, so
+		// the featured image quick edit crashes the extensible site editor's
+		// Pages screen.
+		test( 'should save multiple field changes and update Data Views UI @site-editor-v1-only', async ( {
 			page,
 			requestUtils,
 		} ) => {
@@ -597,8 +603,7 @@ test.describe( 'Page List', () => {
 			admin,
 			page,
 		} ) => {
-			await admin.visitSiteEditor();
-			await page.getByRole( 'button', { name: 'Pages' } ).click();
+			await admin.visitSiteEditor( { postType: 'page' } );
 			await page.getByRole( 'button', { name: 'Layout' } ).click();
 			await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
 
