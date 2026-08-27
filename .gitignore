@@ -42,7 +42,7 @@ yarn.lock
 .DS_Store
 Thumbs.db
 
-# Report generated from jest-junit
+# JUnit test report
 junit.xml
 
 # Local overrides

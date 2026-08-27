@@ -36,41 +36,6 @@ const hasCssnanoConfig = () =>
 	hasProjectFile( 'cssnano.config.js' ) ||
 	hasPackageProp( 'cssnano' );
 
-/**
- * Returns path to a Jest configuration which should be provided as the explicit
- * configuration when there is none available for discovery by Jest in the
- * project environment. Returns undefined if Jest should be allowed to discover
- * an available configuration.
- *
- * This can be used in cases where multiple possible configurations are
- * supported. Since Jest will only discover `jest.config.js`, or `jest` package
- * directive, such custom configurations must be specified explicitly.
- *
- * @param {"e2e"|"unit"} suffix Suffix of configuration file to accept.
- *
- * @return {string= | undefined} Override or fallback configuration file path.
- */
-function getJestOverrideConfigFile( suffix ) {
-	if ( hasArgInCLI( '-c' ) || hasArgInCLI( '--config' ) ) {
-		return;
-	}
-
-	if ( hasProjectFile( `jest-${ suffix }.config.js` ) ) {
-		return fromProjectRoot( `jest-${ suffix }.config.js` );
-	}
-
-	if ( ! hasJestConfig() ) {
-		return fromConfigRoot( `jest-${ suffix }.config.js` );
-	}
-}
-
-// See https://jestjs.io/docs/configuration.
-const hasJestConfig = () =>
-	hasProjectFile( 'jest.config.js' ) ||
-	hasProjectFile( 'jest.config.json' ) ||
-	hasProjectFile( 'jest.config.ts' ) ||
-	hasPackageProp( 'jest' );
-
 const VITE_CONFIG_EXTENSIONS = [ 'js', 'mjs', 'cjs', 'ts', 'mts', 'cts' ];
 
 const hasConfigFile = ( name ) =>
@@ -477,7 +442,6 @@ function getPhpFilePaths( context, props ) {
 }
 
 module.exports = {
-	getJestOverrideConfigFile,
 	getVitestOverrideConfigFile,
 	getPhpFilePaths,
 	getProjectSourcePath,
@@ -485,7 +449,6 @@ module.exports = {
 	getWebpackEntryPoints,
 	hasBabelConfig,
 	hasCssnanoConfig,
-	hasJestConfig,
 	hasVitestConfig,
 	hasPostCSSConfig,
 	hasPrettierConfig,

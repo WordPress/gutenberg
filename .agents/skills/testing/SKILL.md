@@ -1,6 +1,6 @@
 ---
 name: testing
-description: Use when writing, running, or debugging tests in the Gutenberg repository — JavaScript unit tests (Jest), PHP tests (PHPUnit), or end-to-end tests (Playwright).
+description: Use when writing, running, or debugging tests in the Gutenberg repository — JavaScript unit tests (Vitest), PHP tests (PHPUnit), or end-to-end tests (Playwright).
 ---
 
 # Testing
@@ -19,6 +19,6 @@ The e2e test passing is not the final task success criteria. The core goal is to
 
 ## By test type
 
--   **JavaScript unit and integration tests (Jest)**: read [references/jest.md](references/jest.md).
+-   **JavaScript unit and integration tests (Vitest)**: read [references/vitest.md](references/vitest.md).
 -   **PHP tests (PHPUnit)**: read [references/php.md](references/php.md).
 -   **E2e tests (Playwright)**: read [references/e2e.md](references/e2e.md).

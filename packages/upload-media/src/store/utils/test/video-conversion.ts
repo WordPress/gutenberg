@@ -80,8 +80,8 @@ describe( 'isConversionTimeoutError', () => {
 
 /*
  * The remaining functions wrap the lazily-imported
- * @wordpress/video-conversion/worker module (mapped to a jest stub via
- * moduleNameMapper). Each test starts from a fresh module registry so the
+ * @wordpress/video-conversion/worker module (mapped to a test stub by the
+ * Vitest configuration). Each test starts from a fresh module registry so the
  * module-level "has the worker loaded yet?" state is deterministic.
  */
 describe( 'convertGifToVideo', () => {

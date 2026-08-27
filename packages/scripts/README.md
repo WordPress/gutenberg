@@ -448,9 +448,6 @@ This script uses [webpack](https://webpack.js.org/) behind the scenes. It’ll l
 
 _Alias_: `test-unit-vitest`
 
-The explicit `test-unit-jest` command remains available for projects that
-need a temporary migration path. `test-unit-js` no longer selects Jest.
-
 Launches the unit test runner with [Vitest](https://vitest.dev/). Tests should
 import the APIs they use from `vitest`; globals are disabled by default.
 

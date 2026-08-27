@@ -26,7 +26,8 @@ The extended Playwright's [test](https://playwright.dev/docs/api/class-test) mod
 
 ### expect
 
-The Playwright/Jest's [expect](https://jestjs.io/docs/expect) function.
+The extended Playwright [expect](https://playwright.dev/docs/test-assertions)
+function.
 
 ### Admin
 

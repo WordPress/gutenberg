@@ -34,8 +34,6 @@ const PLUGIN_NAMESPACE_TO_ESLINTRC_NAME = {
 	import: 'import',
 	jsdoc: 'jsdoc',
 	'jsx-a11y': 'jsx-a11y',
-	jest: 'jest',
-	'jest-dom': 'jest-dom',
 	'testing-library': 'testing-library',
 	prettier: 'prettier',
 	playwright: 'playwright',

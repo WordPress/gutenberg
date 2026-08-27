@@ -2598,18 +2598,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/jest-console",
-		"slug": "packages-jest-console",
-		"markdown_source": "../packages/jest-console/README.md",
-		"parent": "packages"
-	},
-	{
-		"title": "@wordpress/jest-preset-default",
-		"slug": "packages-jest-preset-default",
-		"markdown_source": "../packages/jest-preset-default/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/kebab-case",
 		"slug": "packages-kebab-case",
 		"markdown_source": "../packages/kebab-case/README.md",

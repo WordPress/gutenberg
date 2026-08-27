@@ -9,7 +9,8 @@ const currentDirectory = path.dirname( fileURLToPath( import.meta.url ) );
 const cliPath = path.resolve( currentDirectory, '../cli.js' );
 /*
  * Resolve from this file: an `-e` script resolves requires from the cwd,
- * which is the repo root under Jest and has no `commander` installed.
+ * which is the repo root under the unit-test runner and has no `commander`
+ * installed.
  */
 const commanderPath = require.resolve( 'commander' );
 const script = `

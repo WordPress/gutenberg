@@ -6,6 +6,9 @@
 
 -   Update the `test-unit` configuration to lint Vitest tests instead of Jest
     tests ([#80998](https://github.com/WordPress/gutenberg/pull/80998)).
+-   Remove Jest rules from the legacy `test-e2e` configuration. Use
+    `test-playwright` for Playwright end-to-end tests
+    ([#80999](https://github.com/WordPress/gutenberg/pull/80999)).
 
 ## 25.9.0 (2026-08-12)
 
