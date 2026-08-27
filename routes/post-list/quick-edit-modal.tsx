@@ -6,7 +6,6 @@ import type { Form } from '@wordpress/dataviews';
 import {
 	Button,
 	Modal,
-	Spinner,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { useEffect, useMemo, useState } from '@wordpress/element';
@@ -39,10 +38,18 @@ function withEditorAssets( FieldEdit: any ) {
 			}
 		}, [ isReady ] );
 
-		if ( ! isReady ) {
-			return <Spinner />;
-		}
-		return <FieldEdit { ...props } />;
+		// Render the field right away — only opening the modal needs the
+		// assets — and keep it inert until they have loaded.
+		return (
+			<div
+				aria-busy={ ! isReady || undefined }
+				style={ ! isReady ? { opacity: 0.6 } : undefined }
+				// @ts-expect-error inert not typed properly
+				inert={ ! isReady ? 'true' : undefined }
+			>
+				<FieldEdit { ...props } />
+			</div>
+		);
 	};
 }
 

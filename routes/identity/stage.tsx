@@ -5,7 +5,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { DataForm, type Field, type Form } from '@wordpress/dataviews';
 import { MediaEdit } from '@wordpress/fields';
 import { loadEditorAssets } from '@wordpress/lazy-editor';
-import { Spinner } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 
@@ -37,10 +36,18 @@ function MediaEditWithEditorAssets( props: any ) {
 		}
 	}, [ isReady ] );
 
-	if ( ! isReady ) {
-		return <Spinner />;
-	}
-	return <MediaEdit { ...props } />;
+	// Render the field right away — only opening the modal needs the
+	// assets — and keep it inert until they have loaded.
+	return (
+		<div
+			aria-busy={ ! isReady || undefined }
+			style={ ! isReady ? { opacity: 0.6 } : undefined }
+			// @ts-expect-error inert not typed properly
+			inert={ ! isReady ? 'true' : undefined }
+		>
+			<MediaEdit { ...props } />
+		</div>
+	);
 }
 
 const fields: Field< SiteSettings >[] = [
