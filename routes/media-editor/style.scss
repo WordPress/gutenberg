@@ -1,5 +1,7 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/media-editor/build-style/style.css" as media-editor;
+@use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/mixins" as *;
 
 // Carries the editor's keydown handler around the whole page, including the
 // header. `display: contents` keeps it out of the flex layout entirely.
@@ -12,12 +14,24 @@
 	flex: 1;
 	min-height: 0;
 	overflow: hidden;
+
+	// The page has no footer under the editor, so the body would otherwise
+	// run to the bottom edge. Scoped to the route: the modal has its own
+	// footer supplying this gap.
+	.media-editor__body {
+		margin-bottom: 0;
+
+		@include break-small() {
+			margin-bottom: $grid-unit-30;
+		}
+	}
 }
 
-// Below the sidebar-collapse breakpoint the transform controls have no Crop
-// panel to live in, and History has no room in the header, so both get a bar
-// under the canvas. Centered rather than pushed to the edges: with Cancel/Save
-// staying in the page header, there is no cluster to anchor the inline end.
+// Below `small` History has no room in the page header, so it gets a bar of
+// its own under the canvas. Centered rather than pushed to the edges: with
+// Cancel/Save staying in the page header, there is no cluster to anchor the
+// inline end. (The transform controls are not here — they sit under the
+// canvas at every width, placed by the editor itself.)
 .media-editor-route__toolbar {
 	flex-shrink: 0;
 	display: flex;
@@ -25,5 +39,15 @@
 	align-items: center;
 	justify-content: center;
 	gap: $grid-unit-20;
-	padding: $grid-unit-20 $grid-unit-40 $grid-unit-30;
+	padding: $grid-unit-20 $grid-unit-40;
+
+	// `HistoryActions` is the only child, and it renders nothing when the
+	// canvas is off screen — below `large` an open Details panel replaces it.
+	// The bar would otherwise keep its padding around no content, leaving a
+	// blank strip under the panel on the narrowest viewports. Collapsing on
+	// `:empty` keeps that knowledge out of the frame, which is why
+	// `renderFrame` has no `hasCanvas` prop.
+	&:empty {
+		display: none;
+	}
 }

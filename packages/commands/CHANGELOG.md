@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Internal
+
+-   Remove unused dependency `@wordpress/warning` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+## 1.54.0 (2026-08-26)
+
 ### Enhancements
 
 -   Command Palette: Treat the per-category icon as a fallback used only when a command passes no `icon`, instead of an override that discards the command's own icon ([#81787](https://github.com/WordPress/gutenberg/pull/81787)).

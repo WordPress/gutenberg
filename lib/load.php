@@ -80,6 +80,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.1/block-comments.php';
 
 	// WordPress 7.2 compat.
+	require __DIR__ . '/compat/wordpress-7.2/view-config-api.php';
 	require __DIR__ . '/compat/wordpress-7.2/global-styles-notes.php';
 
 	// Real-time collaboration.
