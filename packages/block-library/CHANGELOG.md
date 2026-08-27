@@ -41,7 +41,6 @@
 -   Accordion: Resolve the URL fragment with the `:target` pseudo-class instead of decoding `window.location.hash`, so a hash containing malformed percent-encoding no longer throws a `URIError` when a panel is opened ([#81780](https://github.com/WordPress/gutenberg/pull/81780)).
 -   Post Template: Pass an explicit default layout to the inner blocks of the Post Template and Term Template blocks, so the movers, inserters, and child controls of the template's blocks no longer follow the grid used to arrange the post/term items ([#81120](https://github.com/WordPress/gutenberg/pull/81120)).
 -   Accordion Heading: Declare the spacing selector in the block's `selectors` map, so padding set in `theme.json` or Global Styles applies to the toggle button the block writes its own padding to, rather than to the heading wrapper where it could not lower the default ([#81976](https://github.com/WordPress/gutenberg/pull/81976)).
--   Fit text: Apply the non-wrapping style to the descendants of a block using Fit text as well as the block itself, so blocks whose editable element is a child of the block wrapper, such as Site Title, no longer keep wrapping in the editor and grow far beyond their container ([#82074](https://github.com/WordPress/gutenberg/pull/82074)).
 
 ## 10.4.0 (2026-08-12)
 
