@@ -1,11 +1,22 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import type { ComponentPropsWithoutRef, ComponentType } from 'react';
+import type {
+	ComponentProps,
+	ComponentPropsWithoutRef,
+	ComponentType,
+} from 'react';
 // Form controls read these stylesheets, normally enqueued by WordPress.
 // eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '@wordpress/components/build-style/style.css';
 // eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '@wordpress/dataviews/build-style/style.css';
-import { forwardRef, useEffect, useState } from '@wordpress/element';
+import { Page } from '@wordpress/admin-ui';
+import {
+	forwardRef,
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 import { chartBar, download, trendingUp } from '@wordpress/icons';
 import { WidgetHostProvider } from '@wordpress/widget-primitives';
 import type {
@@ -17,7 +28,7 @@ import type {
 	WidgetType,
 } from '@wordpress/widget-primitives';
 import { WidgetDashboard } from '../widget-dashboard';
-import type { DashboardWidget } from '../types';
+import type { CanPerformDashboardOperation, DashboardWidget } from '../types';
 
 /*
  * Stories run without WordPress, so both halves of the demo widget are
@@ -340,7 +351,7 @@ const meta: Meta< typeof WidgetDashboard > = {
 		docs: {
 			description: {
 				component: `
-\`WidgetDashboard\` is the stateless rendering engine for widget dashboards: the consumer owns the \`layout\` state, every mutation flows back through \`onLayoutChange\`, and widget types arrive through the \`widgetTypes\` prop.
+\`WidgetDashboard\` is the stateless rendering engine for widget dashboards: the consumer owns the \`layout\` state, every mutation flows back through \`onLayoutChange\`, and widget types arrive through the \`widgetTypes\` prop. What users may do on it is the application's answer, given through \`WidgetDashboard.Policy\`.
 `,
 			},
 		},
@@ -610,6 +621,167 @@ The footer shows the three materializations side by side:
 - "Export progress" is a download: downloads always keep the plain anchor.
 
 Without the provider the same declarations still work; every action falls back to a plain anchor. Real hosts implement the capability at their route layer with their actual router.
+`,
+			},
+		},
+	},
+};
+
+/*
+ * The policy demo: an application with user profiles and sections. The
+ * profile decides which operations the user may perform; the active section
+ * decides what the inserter offers. The widget types never change.
+ */
+const POLICY_SECTIONS = [
+	{ label: 'All', href: '/analytics', type: null },
+	{
+		label: 'Traffic',
+		href: '/analytics/traffic',
+		type: 'demo/traffic-snapshot',
+	},
+	{ label: 'Goals', href: '/analytics/goals', type: 'demo/goal-progress' },
+] as const;
+
+type PolicySectionHref = ( typeof POLICY_SECTIONS )[ number ][ 'href' ];
+
+const PROFILES = {
+	viewer: {
+		label: 'Viewer',
+		summary: 'reads the dashboard and edits nothing',
+		operations: [] as readonly string[],
+	},
+	arranger: {
+		label: 'Arranger',
+		summary:
+			'may customize, move, and resize; never adds, removes, or edits',
+		operations: [ 'customize', 'move', 'resize' ] as readonly string[],
+	},
+	owner: {
+		label: 'Owner',
+		summary: 'may do everything',
+		operations: 'all' as const,
+	},
+};
+
+type Profile = keyof typeof PROFILES;
+
+type PageLink = NonNullable<
+	NonNullable< ComponentProps< typeof Page >[ 'components' ] >[ 'link' ]
+>;
+
+interface PolicyStoryProps {
+	profile: Profile;
+}
+
+function PolicyStory( { profile }: PolicyStoryProps ) {
+	const [ layout, setLayout ] =
+		useState< DashboardWidget[] >( INITIAL_LAYOUT );
+	const [ editMode, setEditMode ] = useState( false );
+	const [ currentHref, setCurrentHref ] =
+		useState< PolicySectionHref >( '/analytics' );
+
+	const canPerform = useMemo< CanPerformDashboardOperation >( () => {
+		const { operations } = PROFILES[ profile ];
+		const sectionType = POLICY_SECTIONS.find(
+			( section ) => section.href === currentHref
+		)?.type;
+		return ( request ) => {
+			if (
+				operations !== 'all' &&
+				! operations.includes( request.operation )
+			) {
+				return false;
+			}
+			if ( request.operation === 'insert' ) {
+				return ! sectionType || request.widgetType.name === sectionType;
+			}
+			return true;
+		};
+	}, [ profile, currentHref ] );
+
+	// Section links drive local state instead of a router.
+	const link = useCallback< PageLink >(
+		( { href, onClick, children, ...props } ) => (
+			<a
+				{ ...props }
+				href={ href }
+				onClick={ ( event ) => {
+					event.preventDefault();
+					setCurrentHref( href as PolicySectionHref );
+					onClick?.( event );
+				} }
+			>
+				{ children }
+			</a>
+		),
+		[]
+	);
+
+	const { label, summary } = PROFILES[ profile ];
+
+	return (
+		<WidgetDashboard.Policy canPerform={ canPerform }>
+			<WidgetDashboard
+				widgetTypes={ [
+					trafficSnapshotWidgetType,
+					goalProgressWidgetType,
+				] }
+				layout={ layout }
+				onLayoutChange={ setLayout }
+				editMode={ editMode }
+				onEditChange={ setEditMode }
+				resolveWidgetModule={ resolveDemoModule }
+				gridSettings={ { model: 'grid', rowHeight: 200 } }
+			>
+				<Page
+					title="Analytics"
+					subTitle={ `Signed in as ${ label }: ${ summary }. The section scopes what "Add widget" offers.` }
+					actions={ <WidgetDashboard.Actions /> }
+					navigation={ {
+						items: POLICY_SECTIONS.map(
+							( { label: text, href } ) => ( {
+								label: text,
+								href,
+							} )
+						),
+						currentHref,
+						ariaLabel: 'Sections',
+					} }
+					components={ { link } }
+					showSidebarToggle={ false }
+					hasPadding
+				>
+					<WidgetDashboard.Widgets />
+				</Page>
+			</WidgetDashboard>
+		</WidgetDashboard.Policy>
+	);
+}
+
+export const Policy: StoryObj< PolicyStoryProps > = {
+	render: ( args ) => <PolicyStory { ...args } />,
+	args: {
+		profile: 'owner',
+	},
+	argTypes: {
+		profile: {
+			control: 'select',
+			options: Object.keys( PROFILES ),
+			description:
+				'The user profile the application maps to a policy. Viewer: nothing. Arranger: customize, move, resize. Owner: everything.',
+		},
+	},
+	parameters: {
+		docs: {
+			description: {
+				story: `
+The application governs the dashboard; the widget types stay untouched. This story mounts \`WidgetDashboard.Policy\` around the dashboard with a \`canPerform\` closing over the signed-in profile and the active section, and composes the dashboard inside an admin \`Page\`: the section links in its navigation, the dashboard actions in its actions slot.
+
+Switch the \`profile\` control. A Viewer gets no Customize button, no attribute controls, and read-only widgets (no \`setAttributes\`). An Arranger enters customize mode and drags or resizes tiles, but has no Add widget trigger, no Remove control, and no attribute editing. An Owner does everything.
+
+Switch the section, then open "Add widget": the listing follows the section, even while open; the excluded types keep rendering where already placed because the \`widgetTypes\` registry never changes.
+
+Nested policies compose restrictively; without a policy, every operation is allowed. See the **Policy** page for the contract.
 `,
 			},
 		},

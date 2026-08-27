@@ -1,4 +1,3 @@
-import { MenuItem } from '@wordpress/components';
 import { usePluginContext } from '@wordpress/plugins';
 import { ActionItem } from '@wordpress/interface';
 
@@ -43,7 +42,6 @@ export default function PluginPreviewMenuItem( props ) {
 	return (
 		<ActionItem
 			name="core/plugin-preview-menu"
-			as={ props.as ?? MenuItem }
 			icon={ props.icon || context.icon }
 			{ ...props }
 		/>

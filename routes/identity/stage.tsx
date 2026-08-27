@@ -75,7 +75,7 @@ function Identity() {
 				'root',
 				'site',
 				// The site entity is a singleton and has no record key.
-				undefined as unknown as string
+				undefined
 			) as SiteSettings,
 		[]
 	);
@@ -83,12 +83,7 @@ function Identity() {
 
 	const onChange = ( edits: Record< string, any > ) => {
 		// The site entity is a singleton and has no record key.
-		editEntityRecord(
-			'root',
-			'site',
-			undefined as unknown as string,
-			edits
-		);
+		editEntityRecord( 'root', 'site', undefined, edits );
 	};
 
 	return (
