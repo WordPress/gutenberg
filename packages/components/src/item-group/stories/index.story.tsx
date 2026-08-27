@@ -8,6 +8,7 @@ const meta: Meta< typeof ItemGroup > = {
 	component: ItemGroup,
 	subcomponents: { Item },
 	title: 'Components/ItemGroup',
+	id: 'components-itemgroup',
 	argTypes: {
 		as: { control: false },
 		children: { control: false },

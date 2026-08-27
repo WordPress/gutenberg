@@ -5,6 +5,7 @@ import { DuotonePicker } from '..';
 
 const meta: Meta< typeof DuotonePicker > = {
 	title: 'Components/DuotonePicker',
+	id: 'components-duotonepicker',
 	component: DuotonePicker,
 	args: {
 		onChange: fn(),

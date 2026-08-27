@@ -9,6 +9,7 @@ const wpdsColorTokens = wpdsTokens.filter( ( name ) =>
 
 const meta: Meta< typeof ThemeProvider > = {
 	title: 'Design System/Theme/Theme Provider',
+	id: 'design-system-theme-theme-provider',
 	component: ThemeProvider,
 	args: {
 		isRoot: true,

@@ -4,6 +4,7 @@ import { Icon } from '../index';
 
 const meta: Meta< typeof Icon > = {
 	title: 'Design System/Components/Icon',
+	id: 'design-system-components-icon',
 	component: Icon,
 	tags: [ 'manifest' ],
 	decorators: [

@@ -6,6 +6,7 @@ import * as Tooltip from '../../tooltip';
 
 const meta: Meta< typeof Tabs.Root > = {
 	title: 'Design System/Components/Tabs',
+	id: 'design-system-components-tabs',
 	component: Tabs.Root,
 	tags: [ 'manifest' ],
 	subcomponents: {

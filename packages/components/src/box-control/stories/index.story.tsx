@@ -5,6 +5,7 @@ import BoxControl from '../';
 
 const meta: Meta< typeof BoxControl > = {
 	title: 'Components/BoxControl',
+	id: 'components-boxcontrol',
 	component: BoxControl,
 	argTypes: {
 		values: { control: false },

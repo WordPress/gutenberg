@@ -25,6 +25,7 @@ const controls = [
 const meta: Meta< typeof Spacer > = {
 	component: Spacer,
 	title: 'Components/Spacer',
+	id: 'components-spacer',
 	argTypes: {
 		as: { control: { type: 'text' } },
 		children: {

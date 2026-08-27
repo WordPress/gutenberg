@@ -60,6 +60,7 @@ function nameToSlug( name: string ): string {
 const meta: Meta = {
 	component: Icon,
 	title: 'Icons/Icon',
+	id: 'icons-icon',
 	tags: [ '!autodocs' ],
 	parameters: {
 		controls: { hideNoControlsWarning: true },

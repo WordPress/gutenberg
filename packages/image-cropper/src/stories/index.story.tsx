@@ -14,6 +14,7 @@ import './style.css';
 
 export default {
 	title: 'ImageCropper/ImageCropper',
+	id: 'imagecropper-imagecropper',
 	component: ImageCropper,
 };
 

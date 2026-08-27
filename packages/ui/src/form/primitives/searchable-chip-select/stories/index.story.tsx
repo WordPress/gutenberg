@@ -11,6 +11,7 @@ import { ITEMS } from './fixtures';
 const meta: Meta< typeof SearchableChipSelect > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/Primitives/SearchableChipSelect',
+	id: 'design-system-components-form-primitives-searchablechipselect',
 	component: SearchableChipSelect,
 	subcomponents: {
 		'SearchableChipSelect.Group': SearchableChipSelect.Group,

@@ -19,6 +19,7 @@ const meta = {
 	},
 
 	title: 'DataViews/FieldTypes',
+	id: 'dataviews-fieldtypes',
 	component: DataForm,
 	argTypes: {
 		type: {

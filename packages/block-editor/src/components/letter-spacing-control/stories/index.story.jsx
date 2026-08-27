@@ -3,6 +3,7 @@ import LetterSpacingControl from '../';
 
 const meta = {
 	title: 'BlockEditor/LetterSpacingControl',
+	id: 'blockeditor-letterspacingcontrol',
 	component: LetterSpacingControl,
 	parameters: {
 		docs: {

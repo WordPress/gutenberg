@@ -8,6 +8,7 @@ import type { AlignmentMatrixControlProps } from '../types';
 
 const meta: Meta< typeof AlignmentMatrixControl > = {
 	title: 'Components/AlignmentMatrixControl',
+	id: 'components-alignmentmatrixcontrol',
 	component: AlignmentMatrixControl,
 	subcomponents: {
 		'AlignmentMatrixControl.Icon': AlignmentMatrixControl.Icon,

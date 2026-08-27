@@ -6,6 +6,7 @@ import * as EmptyState from '../';
 const meta: Meta< typeof EmptyState.Root > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/EmptyState',
+	id: 'design-system-components-emptystate',
 	component: EmptyState.Root,
 	subcomponents: {
 		'EmptyState.Visual': EmptyState.Visual,

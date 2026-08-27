@@ -3,6 +3,7 @@ import ColorPaletteControl from '../control';
 
 export default {
 	title: 'BlockEditor/ColorPaletteControl',
+	id: 'blockeditor-colorpalettecontrol',
 	component: ColorPaletteControl,
 	parameters: {
 		controls: { expanded: true },

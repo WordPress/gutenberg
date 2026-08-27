@@ -3,6 +3,7 @@ import DateFormatPicker from '../';
 
 export default {
 	title: 'BlockEditor/DateFormatPicker',
+	id: 'blockeditor-dateformatpicker',
 	component: DateFormatPicker,
 	parameters: {
 		docs: {

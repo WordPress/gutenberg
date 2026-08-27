@@ -7,6 +7,7 @@ import type { Field, Form } from '../../types';
 
 const meta: Meta< typeof DataForm > = {
 	title: 'DataViews/DataForm/Content',
+	id: 'dataviews-dataform-content',
 	component: DataForm,
 	parameters: {
 		controls: { disable: true },

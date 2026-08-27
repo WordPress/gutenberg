@@ -6,6 +6,7 @@ import * as Menu from '../';
 
 const meta: Meta = {
 	title: 'Design System/Components/Menu/Usage Guidelines',
+	id: 'design-system-components-menu-usage-guidelines',
 	parameters: {
 		controls: { disable: true },
 	},

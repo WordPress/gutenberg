@@ -6,6 +6,7 @@ import * as Drawer from '../index';
 
 const meta: Meta< typeof Drawer.Root > = {
 	title: 'Design System/Components/Drawer',
+	id: 'design-system-components-drawer',
 	component: Drawer.Root,
 	subcomponents: {
 		'Drawer.Trigger': Drawer.Trigger,

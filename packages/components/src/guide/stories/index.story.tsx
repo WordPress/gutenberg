@@ -5,6 +5,7 @@ import Guide from '..';
 
 const meta: Meta< typeof Guide > = {
 	title: 'Components/Guide',
+	id: 'components-guide',
 	component: Guide,
 	argTypes: {
 		contentLabel: { control: 'text' },

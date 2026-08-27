@@ -6,6 +6,7 @@ import { BorderBoxControl } from '../';
 
 const meta: Meta< typeof BorderBoxControl > = {
 	title: 'Components/BorderBoxControl',
+	id: 'components-borderboxcontrol',
 	component: BorderBoxControl,
 	argTypes: {
 		onChange: { action: 'onChange' },

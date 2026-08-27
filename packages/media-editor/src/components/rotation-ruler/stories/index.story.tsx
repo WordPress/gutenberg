@@ -6,6 +6,7 @@ import '../style.scss';
 
 const meta: Meta< typeof RotationRuler > = {
 	title: 'MediaEditor/RotationRuler',
+	id: 'mediaeditor-rotationruler',
 	component: RotationRuler,
 	args: {
 		label: __( 'Fine rotation' ),

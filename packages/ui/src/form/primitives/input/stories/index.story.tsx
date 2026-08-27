@@ -6,6 +6,7 @@ import { WithSuffixControl as InputLayoutWithSuffixControl } from '../../input-l
 const meta: Meta< typeof Input > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/Primitives/Input',
+	id: 'design-system-components-form-primitives-input',
 	component: Input,
 	argTypes: {
 		defaultValue: { control: false },

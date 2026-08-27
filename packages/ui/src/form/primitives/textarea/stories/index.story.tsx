@@ -4,6 +4,7 @@ import { Textarea } from '../index';
 const meta: Meta< typeof Textarea > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/Primitives/Textarea',
+	id: 'design-system-components-form-primitives-textarea',
 	component: Textarea,
 	parameters: {
 		componentStatus: {

@@ -5,6 +5,7 @@ import { formDecorator } from '../../../stories/shared';
 
 const meta: Meta< typeof ValidatedTextareaControl > = {
 	title: 'Design System/Components/Form/With Validation/ValidatedTextareaControl',
+	id: 'design-system-components-form-with-validation-validatedtextareacontrol',
 	component: ValidatedTextareaControl,
 	argTypes: {
 		customValidity: { control: false },

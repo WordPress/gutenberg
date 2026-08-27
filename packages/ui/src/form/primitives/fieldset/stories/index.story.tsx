@@ -5,6 +5,7 @@ import { DETAILS_EXAMPLE } from '../../../stories/shared';
 const meta: Meta< typeof Fieldset.Root > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/Primitives/Fieldset',
+	id: 'design-system-components-form-primitives-fieldset',
 	component: Fieldset.Root,
 	subcomponents: {
 		'Fieldset.Legend': Fieldset.Legend,

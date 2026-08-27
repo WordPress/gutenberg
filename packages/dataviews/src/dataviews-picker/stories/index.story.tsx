@@ -11,6 +11,7 @@ import { data, fields, type SpaceObject } from './fixtures';
 const meta = {
 	tags: [ 'manifest' ],
 	title: 'DataViews/DataViewsPicker',
+	id: 'dataviews-dataviewspicker',
 	component: DataViewsPicker,
 } as Meta< typeof DataViewsPicker >;
 

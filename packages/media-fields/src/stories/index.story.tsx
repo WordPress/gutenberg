@@ -19,6 +19,7 @@ import {
 
 export default {
 	title: 'Fields/Media Fields',
+	id: 'fields-media-fields',
 	component: DataForm,
 };
 

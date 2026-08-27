@@ -5,6 +5,7 @@ import { VisuallyHidden } from '../';
 const meta: Meta< typeof VisuallyHidden > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/VisuallyHidden',
+	id: 'design-system-components-visuallyhidden',
 	component: VisuallyHidden,
 	parameters: {
 		componentStatus: {

@@ -7,6 +7,7 @@ import { Text } from '../../text';
 
 const meta: Meta< typeof Badge > = {
 	title: 'Design System/Components/Badge/Usage Guidelines',
+	id: 'design-system-components-badge-usage-guidelines',
 	component: Badge,
 	decorators: [
 		( Story ) => (

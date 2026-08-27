@@ -7,6 +7,7 @@ import * as CollapsibleCard from '../index';
 const meta: Meta< typeof CollapsibleCard.Root > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/CollapsibleCard',
+	id: 'design-system-components-collapsiblecard',
 	component: CollapsibleCard.Root,
 	subcomponents: {
 		'CollapsibleCard.Header': CollapsibleCard.Header,

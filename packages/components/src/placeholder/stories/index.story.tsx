@@ -9,6 +9,7 @@ const ICONS = { starEmpty, starFilled, styles, wordpress };
 const meta: Meta< typeof Placeholder > = {
 	component: Placeholder,
 	title: 'Components/Placeholder',
+	id: 'components-placeholder',
 	argTypes: {
 		children: { control: false },
 		notices: { control: false },

@@ -17,6 +17,7 @@ import {
 const meta: Meta< typeof InputControl > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/InputControl',
+	id: 'design-system-components-form-inputcontrol',
 	component: InputControl,
 	argTypes: {
 		defaultValue: { control: false },

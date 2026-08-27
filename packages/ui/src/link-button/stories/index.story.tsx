@@ -5,6 +5,7 @@ import { LinkButton } from '../index';
 
 const meta: Meta< typeof LinkButton > = {
 	title: 'Design System/Components/LinkButton',
+	id: 'design-system-components-linkbutton',
 	component: LinkButton,
 	subcomponents: {
 		'LinkButton.Icon': LinkButton.Icon,

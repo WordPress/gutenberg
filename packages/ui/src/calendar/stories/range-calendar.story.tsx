@@ -14,6 +14,7 @@ import {
 const meta: Meta< typeof RangeCalendar > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/Calendar/RangeCalendar',
+	id: 'design-system-components-calendar-rangecalendar',
 	component: RangeCalendar,
 	parameters: {
 		componentStatus: {

@@ -29,6 +29,7 @@ const blocks = [
  */
 const meta = {
 	title: 'BlockEditor/BlockMover',
+	id: 'blockeditor-blockmover',
 	component: BlockMover,
 	parameters: {
 		docs: { canvas: { sourceState: 'shown' } },

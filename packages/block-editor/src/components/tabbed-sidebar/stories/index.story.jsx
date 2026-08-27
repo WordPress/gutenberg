@@ -3,6 +3,7 @@ import TabbedSidebar from '../';
 
 const meta = {
 	title: 'BlockEditor/TabbedSidebar',
+	id: 'blockeditor-tabbedsidebar',
 	component: TabbedSidebar,
 	tags: [ 'status-private' ],
 	parameters: {

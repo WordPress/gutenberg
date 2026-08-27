@@ -3,6 +3,7 @@ import WritingModeControl from '../';
 
 const meta = {
 	title: 'BlockEditor/WritingModeControl',
+	id: 'blockeditor-writingmodecontrol',
 	component: WritingModeControl,
 	parameters: {
 		docs: {

@@ -3,6 +3,7 @@ import { DuotoneSwatch } from '..';
 
 const meta: Meta< typeof DuotoneSwatch > = {
 	title: 'Components/DuotoneSwatch',
+	id: 'components-duotoneswatch',
 	component: DuotoneSwatch,
 	parameters: {
 		controls: { expanded: true },

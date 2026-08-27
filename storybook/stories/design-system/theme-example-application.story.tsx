@@ -140,6 +140,7 @@ const siteLanguageOptions = [
 
 const meta: Meta< ExampleApplicationArgs > = {
 	title: 'Design System/Theme/Theme Provider/Example Application',
+	id: 'design-system-theme-theme-provider-example-application',
 	component: ThemeProvider,
 	parameters: {
 		controls: { expanded: true },

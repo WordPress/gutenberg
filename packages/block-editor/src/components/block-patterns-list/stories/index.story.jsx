@@ -11,6 +11,7 @@ const blockEditorSettings = {
 export default {
 	component: BlockPatternsList,
 	title: 'BlockEditor/BlockPatternsList',
+	id: 'blockeditor-blockpatternslist',
 };
 
 export const Default = {

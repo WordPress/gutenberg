@@ -4,6 +4,7 @@ import { Spinner } from '../index';
 const meta: Meta< typeof Spinner > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/Spinner',
+	id: 'design-system-components-spinner',
 	component: Spinner,
 	parameters: {
 		componentStatus: {

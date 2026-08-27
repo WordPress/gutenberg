@@ -3,6 +3,7 @@ import { Checkbox } from '../';
 
 const meta: Meta< typeof Checkbox > = {
 	title: 'Design System/Components/Form/Primitives/Checkbox',
+	id: 'design-system-components-form-primitives-checkbox',
 	component: Checkbox,
 	parameters: {
 		componentStatus: {

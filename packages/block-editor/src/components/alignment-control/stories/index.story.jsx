@@ -10,6 +10,7 @@ import { AlignmentControl } from '../';
  */
 const meta = {
 	title: 'BlockEditor/AlignmentControl',
+	id: 'blockeditor-alignmentcontrol',
 	component: AlignmentControl,
 	argTypes: {
 		value: {
