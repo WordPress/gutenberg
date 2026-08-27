@@ -141,37 +141,42 @@
 		}
 	}
 
-	// The strip and the open pane, stacked. `Tabs.Root` is the only element
-	// between the sidebar and them, so it carries the column that lets the
-	// pane take the leftover height and scroll inside it.
+	// The strip and the open pane, stacked. No inline padding: the pane below
+	// scrolls, and a gutter here would inset its scrollbar from the sidebar
+	// edge. The strip and the pane carry their own instead.
 	.media-editor__tabs {
 		display: flex;
 		flex: 1;
 		flex-direction: column;
 		min-height: 0;
-		padding: 0 $grid-unit-20;
 	}
 
 	// Wraps `Tabs.List`, which sizes itself to its tabs and so cannot carry a
-	// rule across the strip. This box is a block, so the border runs the full
-	// width of the column above the pane. Sticky, and opaque because a sticky
-	// box is transparent by default and the pane scrolls underneath it.
+	// rule across the strip. A sibling of the scrolling pane rather than a
+	// sticky box inside it, so it holds its place without joining the scroll
+	// container — which is what lets the pane's scrollbar reach the edge.
+	//
+	// Margin, not padding: the rule below is drawn on this box's edge, so an
+	// inset from inside would still run the sidebar's full width. The margin
+	// pulls the box in instead, ending the rule where the tabs and the fields
+	// below it start.
 	.media-editor__tablist {
-		position: sticky;
-		top: 0;
-		z-index: 1;
 		flex-shrink: 0;
+		margin-inline: $grid-unit-30;
 		background: $white;
 		border-bottom: $border-width solid $gray-300;
 	}
 
-	// The scrolling pane.
+	// The scrolling pane. Full width so its scrollbar sits against the
+	// sidebar edge; the gutter is padding here rather than margin so the
+	// scrollbar stays outside it. Matches the canvas column's inline margin,
+	// so the fields line up with the image when the panel is closed.
 	.media-editor__panel {
 		flex: 1;
 		min-height: 0;
 		overflow-y: auto;
 		padding-block: $grid-unit-30;
-		padding-inline: $grid-unit-05 $grid-unit-20;
+		padding-inline: $grid-unit-30;
 	}
 
 	// The ruler band shares the canvas grey and sits flush under it, so the
@@ -192,7 +197,7 @@
 
 		@include break-small() {
 			display: flex;
-			margin: 0 $grid-unit-10 0 $grid-unit-30;
+			margin: 0 0 0 $grid-unit-30;
 		}
 	}
 
