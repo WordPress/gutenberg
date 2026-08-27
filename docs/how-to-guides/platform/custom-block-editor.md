@@ -19,7 +19,7 @@ This guide will walk you through building a fully functioning, custom block edit
 By the end of this article, you will have a solid understanding of the block editor's inner workings and be well on your way to creating your own block editor instances.
 
 <div class="callout callout-tip">
-	The code used throughout this guide is available for download in the <a href="https://github.com/getdave/standalone-block-editor">accompanying WordPress plugin</a>. The demo code in this plugin as an essential resource.
+	The code used throughout this guide is available for download in the <a href="https://github.com/getdave/standalone-block-editor">accompanying WordPress plugin</a>. The demo code in this plugin is an essential resource.
 </div>
 
 ## Code syntax

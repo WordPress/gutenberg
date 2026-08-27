@@ -79,6 +79,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.1/query-block.php';
 	require __DIR__ . '/compat/wordpress-7.1/block-comments.php';
 
+	// WordPress 7.2 compat.
+	require __DIR__ . '/compat/wordpress-7.2/view-config-api.php';
+
 	// Real-time collaboration.
 	require __DIR__ . '/experimental/collaboration/class-gutenberg-rest-autosaves-controller.php';
 	require __DIR__ . '/experimental/collaboration/rest-api.php';
