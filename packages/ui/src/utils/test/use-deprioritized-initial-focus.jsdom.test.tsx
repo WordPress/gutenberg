@@ -15,17 +15,17 @@ function TestHarness( {
 		result: ReturnType< typeof useDeprioritizedInitialFocus >
 	) => void;
 } ) {
-	const result = useDeprioritizedInitialFocus( {
+	const { resolvedInitialFocus, popupRef } = useDeprioritizedInitialFocus( {
 		initialFocus,
 		deprioritizedAttributes: [ ATTR ],
 	} );
 
 	useEffect( () => {
-		onResolved( result );
+		onResolved( { resolvedInitialFocus, popupRef } );
 	} );
 
 	return (
-		<div ref={ result.popupRef } data-testid="popup">
+		<div ref={ popupRef } data-testid="popup">
 			<button { ...{ [ ATTR ]: '' } }>Close</button>
 			<button>Action</button>
 			<input type="text" />
@@ -154,17 +154,18 @@ describe( 'useDeprioritizedInitialFocus', () => {
 					r: ReturnType< typeof useDeprioritizedInitialFocus >
 				) => void;
 			} ) {
-				const result = useDeprioritizedInitialFocus( {
-					initialFocus: undefined,
-					deprioritizedAttributes: [ ATTR ],
-				} );
+				const { resolvedInitialFocus, popupRef } =
+					useDeprioritizedInitialFocus( {
+						initialFocus: undefined,
+						deprioritizedAttributes: [ ATTR ],
+					} );
 
 				useEffect( () => {
-					onResolvedProp( result );
+					onResolvedProp( { resolvedInitialFocus, popupRef } );
 				} );
 
 				return (
-					<div ref={ result.popupRef } data-testid="popup">
+					<div ref={ popupRef } data-testid="popup">
 						<button { ...{ [ ATTR ]: '' } }>Close</button>
 						<p>No other tabbable elements</p>
 					</div>

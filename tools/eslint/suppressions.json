@@ -8024,21 +8024,6 @@
 			"count": 12
 		}
 	},
-	"packages/ui/src/alert-dialog/root.tsx": {
-		"react-hooks/refs": {
-			"count": 2
-		}
-	},
-	"packages/ui/src/utils/test/use-deprioritized-initial-focus.jsdom.test.tsx": {
-		"react-hooks/refs": {
-			"count": 2
-		}
-	},
-	"packages/ui/src/utils/use-schedule-validation.ts": {
-		"react-hooks/refs": {
-			"count": 1
-		}
-	},
 	"packages/viewport/src/test/if-viewport-matches.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1

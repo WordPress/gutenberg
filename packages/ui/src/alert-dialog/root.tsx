@@ -1,5 +1,6 @@
 import { AlertDialog as _AlertDialog } from '@base-ui/react/alert-dialog';
 import { speak } from '@wordpress/a11y';
+import { useEvent } from '@wordpress/compose';
 import {
 	useCallback,
 	useEffect,
@@ -76,13 +77,11 @@ function Root( {
 
 	const actionsRef = useRef< _AlertDialog.Root.Actions | null >( null );
 
-	const onConfirmRef = useRef( onConfirm );
-	onConfirmRef.current = onConfirm;
+	const onConfirmEvent = useEvent( onConfirm );
 
 	// Ref keeps phase accessible synchronously from callbacks that may
 	// run between a setState call and the subsequent React re-render.
 	const phaseRef = useRef( phase );
-	phaseRef.current = phase;
 
 	// Generation counter — safety net for the edge case where the component
 	// unmounts while an async confirm is in flight. Also incremented when
@@ -136,7 +135,7 @@ function Root( {
 		const id = ++confirmIdRef.current;
 
 		try {
-			const rawResult = onConfirmRef.current?.();
+			const rawResult = onConfirmEvent?.();
 
 			// Show spinner only for async handlers (Promises).
 			// Sync handlers resolve in the same tick — no spinner needed.
@@ -183,7 +182,7 @@ function Root( {
 			// eslint-disable-next-line no-console
 			console.error( error );
 		}
-	}, [] );
+	}, [ onConfirmEvent ] );
 
 	const handleOpenChangeComplete = useCallback( ( open: boolean ) => {
 		if ( ! open ) {
