@@ -57,17 +57,25 @@ jobs:
                   BASE_SHA: ${{ github.event.pull_request.base.sha }}
               run: |
                   git fetch --no-tags --depth=1 origin "$BASE_SHA"
-                  CHANGED="$(git diff --name-only "$BASE_SHA" HEAD)"
-                  # Everything that is not documentation, changelogs, Storybook or an unrelated workflow.
-                  RELEVANT="$(echo "$CHANGED" | grep -Ev '^(docs/|storybook/|changelog\.txt$|\.github/)|\.md$' || true)"
-                  RELEVANT="$RELEVANT$(echo "$CHANGED" | grep -E '^\.github/(workflows/performance\.yml|setup-node/)' || true)"
-                  if [[ -n "$CHANGED" && -z "$RELEVANT" ]]; then
+                  COUNT=0
+                  RELEVANT=0
+                  # Renames are listed as a deletion and an addition, so both paths are classified.
+                  while IFS= read -r -d '' file; do
+                    COUNT=$(( COUNT + 1 ))
+                    echo "changed: $file"
+                    case "$file" in
+                      .github/workflows/performance.yml|.github/setup-node/*) RELEVANT=1 ;;
+                      # Documentation, changelogs, Storybook and other workflows cannot change the results.
+                      docs/*|storybook/*|changelog.txt|.github/*|*.md) ;;
+                      *) RELEVANT=1 ;;
+                    esac
+                  done < <(git diff --no-renames --name-only -z "$BASE_SHA" HEAD)
+                  if [[ "$COUNT" -gt 0 && "$RELEVANT" -eq 0 ]]; then
                     echo "skip=true" >> "$GITHUB_OUTPUT"
                     echo "Skipping the performance tests: only documentation or unrelated files changed."
                   else
                     echo "skip=false" >> "$GITHUB_OUTPUT"
                   fi
-                  echo "$CHANGED"
 
             - name: Resolve branches
               id: branches
