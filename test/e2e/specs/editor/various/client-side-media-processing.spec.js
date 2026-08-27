@@ -870,7 +870,7 @@ test.describe( 'Client-side media processing', () => {
 
 		// The message names the file and offers a way forward.
 		const errorSnackbar = snackbars.filter( {
-			hasText: /couldn’t upload/i,
+			hasText: /failed to upload/i,
 		} );
 		await expect( errorSnackbar ).toBeVisible( { timeout: 30_000 } );
 		await expect( errorSnackbar ).toContainText( uniqueName );

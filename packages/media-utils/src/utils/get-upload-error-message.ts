@@ -28,11 +28,14 @@ export function getUploadErrorMessage(
 	error: unknown,
 	fileName: string
 ): string {
+	/*
+	 * Kept identical to the `GENERAL` entry of `getErrorMessage()` in
+	 * `@wordpress/upload-media`, so the same failure reads the same way
+	 * wherever it surfaces.
+	 */
 	const serverError = sprintf(
 		/* translators: %s: file name */
-		__(
-			'Couldn’t upload "%s". Try again, or contact your site administrator if this keeps happening.'
-		),
+		__( 'Failed to upload "%s". Please try again.' ),
 		fileName
 	);
 

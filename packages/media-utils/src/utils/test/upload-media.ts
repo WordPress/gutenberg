@@ -252,8 +252,7 @@ describe( 'uploadMedia', () => {
 		expect( onError ).toHaveBeenCalledWith(
 			new UploadError( {
 				code: 'GENERAL',
-				message:
-					'Couldn’t upload "test.jpeg". Try again, or contact your site administrator if this keeps happening.',
+				message: 'Failed to upload "test.jpeg". Please try again.',
 				file: imageFile,
 			} )
 		);
