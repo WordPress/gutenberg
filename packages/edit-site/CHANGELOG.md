@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.3.0 (2026-08-26)
+
 ### Enhancements
 
 -   Offer the Export tool only while editing a template or a template part, the entities the exported theme is made of. The menu item now lives in the editor package ([#81992](https://github.com/WordPress/gutenberg/pull/81992)).

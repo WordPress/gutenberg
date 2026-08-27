@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 10.0.0 (2026-08-26)
+
 ### Breaking Changes
 
 -   `ActionItem`: `as` now defaults to `MenuItem` instead of `Button` ([#81507](https://github.com/WordPress/gutenberg/pull/81507)).
