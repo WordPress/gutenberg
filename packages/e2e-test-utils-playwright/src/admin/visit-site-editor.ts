@@ -75,13 +75,9 @@ export async function visitSiteEditor(
  * Maps the classic site editor's query args onto an extensible site editor
  * route path (the `p` query param of `admin.php?page=site-editor-v2`).
  *
- * Returns `null` for `canvas: 'edit'` without an explicit entity: the classic
- * editor resolves the home template itself in that case, so the caller has to
- * resolve it before it can build an edit route.
- *
  * @param options Options passed to `visitSiteEditor`.
  */
-function getSiteEditorV2Route( options: SiteEditorOptions ): string | null {
+function getSiteEditorV2Route( options: SiteEditorOptions ): string {
 	const { postId, postType, path, canvas, activeView } = options;
 
 	if ( postType && postId ) {
@@ -123,7 +119,13 @@ function getSiteEditorV2Route( options: SiteEditorOptions ): string | null {
 	}
 
 	if ( canvas === 'edit' ) {
-		return null;
+		// The classic editor resolves the front page itself in this case.
+		// The extensible editor has no equivalent edit route, so tests must
+		// say what they want to edit — the resolution behavior itself is
+		// covered through the home screen's preview.
+		throw new Error(
+			"visitSiteEditor: `canvas: 'edit'` needs an explicit `postType`/`postId` when targeting the extensible site editor."
+		);
 	}
 
 	return '/';
@@ -137,42 +139,11 @@ function getSiteEditorV2Route( options: SiteEditorOptions ): string | null {
  * @param options Options to visit the site editor.
  */
 async function visitSiteEditorV2( this: Admin, options: SiteEditorOptions ) {
-	let route = getSiteEditorV2Route( options );
+	const route = getSiteEditorV2Route( options );
 
-	const gotoRoute = async ( p: string ) => {
-		const query = new URLSearchParams( { page: 'site-editor-v2' } );
-		query.set( 'p', p );
-		await this.visitAdminPage( 'admin.php', query.toString() );
-	};
-
-	if ( route === null ) {
-		// `canvas: 'edit'` with no explicit entity. Load the home screen,
-		// whose preview resolves the same template the classic editor would
-		// open, read the resolution, and jump to that template's edit route.
-		await gotoRoute( '/' );
-		const resolved = ( await this.page
-			.waitForFunction( () => {
-				const editorSelect = window.wp?.data?.select( 'core/editor' );
-				const currentPostId = editorSelect?.getCurrentPostId();
-				if ( ! currentPostId ) {
-					return null;
-				}
-				return {
-					postId: String( currentPostId ),
-					postType: editorSelect.getCurrentPostType() as string,
-				};
-			} )
-			.then( ( handle ) => handle.jsonValue() ) ) as {
-			postId: string;
-			postType: string;
-		};
-		route = `/types/${ resolved.postType }/edit/${ encodeURIComponent(
-			resolved.postId
-		) }`;
-		await gotoRoute( route );
-	} else {
-		await gotoRoute( route );
-	}
+	const query = new URLSearchParams( { page: 'site-editor-v2' } );
+	query.set( 'p', route );
+	await this.visitAdminPage( 'admin.php', query.toString() );
 
 	if ( ! options.showWelcomeGuide ) {
 		await this.editor.setPreferences( 'core/edit-site', {

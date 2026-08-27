@@ -12,7 +12,11 @@ test.describe( 'Style Book', () => {
 	} );
 
 	test.beforeEach( async ( { admin, styleBook, page } ) => {
-		await admin.visitSiteEditor( { canvas: 'edit' } );
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
 		await styleBook.open();
 		await expect(
 			page.locator( 'role=region[name="Style Book"i]' )

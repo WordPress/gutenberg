@@ -22,7 +22,7 @@ test.describe( 'Template hierarchy', () => {
 
 	test( 'shows correct template with page on front option', async ( {
 		admin,
-		page,
+		editor,
 		requestUtils,
 	} ) => {
 		const newPage = await requestUtils.createPage( {
@@ -36,13 +36,12 @@ test.describe( 'Template hierarchy', () => {
 			page_on_front: newPage.id,
 			page_for_posts: 0,
 		} );
-		await admin.visitSiteEditor( { canvas: 'edit' } );
 
-		// Title block should contain "Page on Front"
+		// Both site editors preview the resolved front page on their home
+		// screen, so the resolution is verified without opening the editor.
+		await admin.visitSiteEditor();
 		await expect(
-			page
-				.getByRole( 'region', { name: 'Editor top bar' } )
-				.getByRole( 'button', { name: 'Page on Front · Homepage' } )
+			editor.canvas.getByText( 'This is a page on front' )
 		).toBeVisible();
 	} );
 } );

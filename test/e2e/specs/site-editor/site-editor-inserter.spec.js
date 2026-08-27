@@ -11,7 +11,11 @@ test.describe( 'Site Editor Inserter', () => {
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
-		await admin.visitSiteEditor( { canvas: 'edit' } );
+		await admin.visitSiteEditor( {
+			postId: 'twentytwentyfour//home',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {

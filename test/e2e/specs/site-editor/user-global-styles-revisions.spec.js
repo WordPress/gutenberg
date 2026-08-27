@@ -26,7 +26,11 @@ test.describe( 'Style Revisions', () => {
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
-		await admin.visitSiteEditor( { canvas: 'edit' } );
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
