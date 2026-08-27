@@ -184,6 +184,8 @@ const { actions, state } = store(
 					}
 				}
 			},
+		},
+		callbacks: {
 			activateTabByHash: () => {
 				const { tabsList } = state;
 
@@ -207,13 +209,13 @@ const { actions, state } = store(
 				// Walk up the panels containing the target rather than taking
 				// the nearest one, so that nested tabs resolve to the panel
 				// belonging to this block.
-				let panel = targetElement.closest( '[role="tabpanel"]' );
+				let panel = targetElement.closest( '.wp-block-tab-panel' );
 				let tabIndex = -1;
 
 				while ( panel && tabIndex < 0 ) {
 					tabIndex = tabsList.findIndex( ( t ) => t === panel.id );
 					panel =
-						panel.parentElement?.closest( '[role="tabpanel"]' ) ??
+						panel.parentElement?.closest( '.wp-block-tab-panel' ) ??
 						null;
 				}
 
@@ -225,18 +227,6 @@ const { actions, state } = store(
 				window.setTimeout( () => {
 					targetElement.scrollIntoView();
 				}, 0 );
-			},
-		},
-		callbacks: {
-			/**
-			 * When the tabs are initialized, activate the tab that the URL hash
-			 * points into, if any.
-			 */
-			onTabsInit: () => {
-				actions.activateTabByHash();
-			},
-			onHashChange: () => {
-				actions.activateTabByHash();
 			},
 		},
 	},
