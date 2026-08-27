@@ -934,43 +934,103 @@ function getTrackedAssignment( node ) {
 	return { target: null, value: null, isCollectionElement: false };
 }
 
-function getLocalFunction(
+function getLocalFunctions(
 	node,
 	identifierVariables,
-	localFunctionVariables = new Map()
+	localFunctionVariables = new Map(),
+	seenVariables = new Set()
 ) {
+	const localFunctions = new Set();
 	if (
-		[ 'ArrowFunctionExpression', 'FunctionExpression' ].includes(
-			node?.type
-		)
+		[
+			'ArrowFunctionExpression',
+			'FunctionDeclaration',
+			'FunctionExpression',
+		].includes( node?.type )
 	) {
-		return node;
+		localFunctions.add( node );
+		return localFunctions;
+	}
+	if (
+		[ 'ConditionalExpression', 'LogicalExpression' ].includes( node?.type )
+	) {
+		const branches =
+			node.type === 'ConditionalExpression'
+				? [ node.consequent, node.alternate ]
+				: [ node.left, node.right ];
+		for ( const branch of branches ) {
+			for ( const localFunction of getLocalFunctions(
+				branch,
+				identifierVariables,
+				localFunctionVariables,
+				seenVariables
+			) ) {
+				localFunctions.add( localFunction );
+			}
+		}
+		return localFunctions;
+	}
+	if (
+		[
+			'AssignmentExpression',
+			'ChainExpression',
+			'TSAsExpression',
+			'TSNonNullExpression',
+			'TSTypeAssertion',
+		].includes( node?.type )
+	) {
+		return getLocalFunctions(
+			node.type === 'AssignmentExpression' ? node.right : node.expression,
+			identifierVariables,
+			localFunctionVariables,
+			seenVariables
+		);
+	}
+	if ( node?.type === 'SequenceExpression' ) {
+		return getLocalFunctions(
+			node.expressions.at( -1 ),
+			identifierVariables,
+			localFunctionVariables,
+			seenVariables
+		);
 	}
 	if ( node?.type !== 'Identifier' ) {
-		return null;
+		return localFunctions;
 	}
 
 	const variable = identifierVariables.get( node );
-	if ( localFunctionVariables.has( variable ) ) {
-		return localFunctionVariables.get( variable );
+	if ( ! variable || seenVariables.has( variable ) ) {
+		return localFunctions;
 	}
-	for ( const definition of variable?.defs ?? [] ) {
+	const nextSeenVariables = new Set( seenVariables ).add( variable );
+	for ( const localFunction of localFunctionVariables.get( variable ) ??
+		[] ) {
+		localFunctions.add( localFunction );
+	}
+	for ( const definition of variable.defs ?? [] ) {
 		const candidate =
 			definition.node.type === 'VariableDeclarator'
 				? definition.node.init
 				: definition.node;
-		if (
-			[
-				'ArrowFunctionExpression',
-				'FunctionDeclaration',
-				'FunctionExpression',
-			].includes( candidate?.type )
-		) {
-			return candidate;
+		for ( const localFunction of getLocalFunctions(
+			candidate,
+			identifierVariables,
+			localFunctionVariables,
+			nextSeenVariables
+		) ) {
+			localFunctions.add( localFunction );
 		}
 	}
 
-	return null;
+	return localFunctions;
+}
+
+function countLocalFunctions( localFunctionVariables ) {
+	let count = 0;
+	for ( const localFunctions of localFunctionVariables.values() ) {
+		count += localFunctions.size;
+	}
+	return count;
 }
 
 function isRecord( value ) {
@@ -1317,7 +1377,7 @@ export function validateVitestPolicy( {
 			testingLibraryQueryContainerFunctionVariables.size +
 			testingLibraryScreenVariables.size +
 			vitestExpectVariables.size +
-			localFunctionVariables.size +
+			countLocalFunctions( localFunctionVariables ) +
 			vitestNamespaceVariables.size +
 			vitestViVariables.size +
 			windowVariables.size
@@ -1336,7 +1396,7 @@ export function validateVitestPolicy( {
 			testingLibraryQueryContainerFunctionVariables.size +
 			testingLibraryScreenVariables.size +
 			vitestExpectVariables.size +
-			localFunctionVariables.size +
+			countLocalFunctions( localFunctionVariables ) +
 			vitestNamespaceVariables.size +
 			vitestViVariables.size +
 			windowVariables.size;
@@ -1351,14 +1411,14 @@ export function validateVitestPolicy( {
 			) {
 				testingLibraryScreenVariables.add( node );
 			}
-			const callback =
+			const callbacks =
 				node.type === 'CallExpression'
-					? getLocalFunction(
+					? getLocalFunctions(
 							node.arguments[ 0 ],
 							identifierVariables,
 							localFunctionVariables
 					  )
-					: null;
+					: new Set();
 			if (
 				node.type === 'CallExpression' &&
 				node.callee?.type === 'MemberExpression' &&
@@ -1378,15 +1438,17 @@ export function validateVitestPolicy( {
 						testingLibraryNamespaceVariables,
 						identifierVariables
 					) ) &&
-				callback
+				callbacks.size
 			) {
 				const elementParameterIndex =
 					domCollectionCallbackElementParameterIndexes.get(
 						getMemberPropertyName( node.callee )
 					);
-				trackDomValuePattern(
-					callback.params[ elementParameterIndex ]
-				);
+				for ( const callback of callbacks ) {
+					trackDomValuePattern(
+						callback.params[ elementParameterIndex ]
+					);
+				}
 			}
 
 			const { target, value, isCollectionElement } =
@@ -1412,13 +1474,22 @@ export function validateVitestPolicy( {
 
 			if ( target.type === 'Identifier' ) {
 				const targetVariable = identifierVariables.get( target );
-				const localFunction = getLocalFunction(
+				const localFunctions = getLocalFunctions(
 					value,
 					identifierVariables,
 					localFunctionVariables
 				);
-				if ( targetVariable && localFunction ) {
-					localFunctionVariables.set( targetVariable, localFunction );
+				if ( targetVariable && localFunctions.size ) {
+					const targetFunctions =
+						localFunctionVariables.get( targetVariable ) ??
+						new Set();
+					for ( const localFunction of localFunctions ) {
+						targetFunctions.add( localFunction );
+					}
+					localFunctionVariables.set(
+						targetVariable,
+						targetFunctions
+					);
 				}
 				for ( const variables of [
 					testingLibraryQueryContainerFunctionVariables,
