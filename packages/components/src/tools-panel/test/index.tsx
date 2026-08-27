@@ -37,9 +37,8 @@ const controlProps = {
 	onDeselect: jest.fn().mockImplementation( () => {
 		controlValue = undefined;
 	} ),
-	onHide: jest.fn(),
 	onSelect: jest.fn(),
-	onShow: jest.fn(),
+	onShownChange: jest.fn(),
 };
 
 // Default props without a value for an alternate control to be rendered within
@@ -51,9 +50,8 @@ const altControlProps = {
 	} ),
 	label: 'Alt',
 	onDeselect: jest.fn(),
-	onHide: jest.fn(),
 	onSelect: jest.fn(),
-	onShow: jest.fn(),
+	onShownChange: jest.fn(),
 };
 
 // Default props for wrapped or grouped panel items.
@@ -929,44 +927,50 @@ describe( 'ToolsPanel', () => {
 		} );
 	} );
 
-	describe( 'show and hide callbacks', () => {
+	describe( 'shown change callback', () => {
 		beforeEach( () => {
 			jest.clearAllMocks();
 		} );
 
-		it( 'should call onShow when an optional item is shown via the menu', async () => {
+		it( 'should call onShownChange with true when an optional item is shown via the menu', async () => {
 			renderPanel();
 
 			await openDropdownMenu();
 			await selectMenuItem( altControlProps.label );
 
-			expect( altControlProps.onShow ).toHaveBeenCalledTimes( 1 );
-			expect( altControlProps.onHide ).not.toHaveBeenCalled();
+			expect( altControlProps.onShownChange ).toHaveBeenCalledTimes( 1 );
+			expect( altControlProps.onShownChange ).toHaveBeenCalledWith(
+				true
+			);
 		} );
 
-		it( 'should call onHide when an optional item without a value is hidden via the menu', async () => {
+		it( 'should call onShownChange with false when an optional item without a value is hidden via the menu', async () => {
 			renderPanel();
 
 			await openDropdownMenu();
 			await selectMenuItem( altControlProps.label );
 			await selectMenuItem( altControlProps.label );
 
-			expect( altControlProps.onHide ).toHaveBeenCalledTimes( 1 );
+			expect( altControlProps.onShownChange ).toHaveBeenCalledTimes( 2 );
+			expect( altControlProps.onShownChange ).toHaveBeenLastCalledWith(
+				false
+			);
 			// The item never had a value, so there was nothing to reset.
 			expect( altControlProps.onDeselect ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should call both onHide and onDeselect when an optional item with a value is hidden via the menu', async () => {
+		it( 'should call both onShownChange and onDeselect when an optional item with a value is hidden via the menu', async () => {
 			renderPanel();
 
 			await openDropdownMenu();
 			await selectMenuItem( controlProps.label );
 
-			expect( controlProps.onHide ).toHaveBeenCalledTimes( 1 );
+			expect( controlProps.onShownChange ).toHaveBeenCalledTimes( 1 );
+			expect( controlProps.onShownChange ).toHaveBeenCalledWith( false );
 			expect( controlProps.onDeselect ).toHaveBeenCalledTimes( 1 );
 		} );
 
-		it( 'should not call onShow or onHide for default items', async () => {
+		it( 'should not call onShownChange for default items', async () => {
 			render(
 				<ToolsPanel { ...defaultProps }>
 					<ToolsPanelItem { ...controlProps } isShownByDefault>
@@ -981,18 +985,17 @@ describe( 'ToolsPanel', () => {
 			// Default items stay visible when toggled off; the action resets
 			// them rather than hiding them.
 			expect( controlProps.onDeselect ).toHaveBeenCalledTimes( 1 );
-			expect( controlProps.onShow ).not.toHaveBeenCalled();
-			expect( controlProps.onHide ).not.toHaveBeenCalled();
+			expect( controlProps.onShownChange ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should not call onHide when items are hidden by Reset all', async () => {
+		it( 'should not call onShownChange when items are hidden by Reset all', async () => {
 			renderPanel();
 
 			await openDropdownMenu();
 			await selectMenuItem( 'Reset all' );
 
-			expect( controlProps.onHide ).not.toHaveBeenCalled();
-			expect( altControlProps.onHide ).not.toHaveBeenCalled();
+			expect( controlProps.onShownChange ).not.toHaveBeenCalled();
+			expect( altControlProps.onShownChange ).not.toHaveBeenCalled();
 		} );
 
 		it( 'should not call any callback when an item is mounted with defaultShown', () => {
@@ -1007,7 +1010,7 @@ describe( 'ToolsPanel', () => {
 			// Registering an item as shown is not a menu action, so none of
 			// the item's callbacks should fire.
 			expect( screen.getByText( 'Alt control' ) ).toBeInTheDocument();
-			expect( altControlProps.onShow ).not.toHaveBeenCalled();
+			expect( altControlProps.onShownChange ).not.toHaveBeenCalled();
 			expect( altControlProps.onSelect ).not.toHaveBeenCalled();
 		} );
 	} );

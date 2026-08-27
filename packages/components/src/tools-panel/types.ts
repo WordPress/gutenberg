@@ -136,28 +136,26 @@ export type ToolsPanelItem = {
 	 */
 	label: string;
 	/**
-	 * A callback executed when the item is hidden via the `ToolsPanel` menu.
+	 * A callback executed when the user shows or hides the item via the
+	 * `ToolsPanel` menu, passed `true` when it was shown and `false` when it
+	 * was hidden.
 	 *
 	 * Unlike `onDeselect`, this fires whether or not the item has a value, and
 	 * only in response to an explicit menu action. Visibility changes with
-	 * another cause, such as an item hiding because its value was removed or
-	 * because `Reset all` ran, do not trigger it.
+	 * another cause do not trigger it, including an item becoming visible
+	 * because it received a value or because `defaultShown` was set, and an
+	 * item hiding because its value was removed or because `Reset all` ran.
 	 *
-	 * Items flagged with `isShownByDefault` stay visible when toggled off, so
-	 * this is never called for them.
+	 * Items flagged with `isShownByDefault` are always visible and stay so when
+	 * toggled off, so this is never called for them.
+	 *
+	 * A single menu action may also call `onSelect` or `onDeselect`, which are
+	 * unchanged. Showing an item without a value calls this with `true` and
+	 * `onSelect`; hiding an item that has a value calls this with `false` and
+	 * `onDeselect`. Use this callback to track visibility and `onDeselect` to
+	 * reset a value, rather than treating them as interchangeable.
 	 */
-	onHide?: () => void;
-	/**
-	 * A callback executed when the item is shown via the `ToolsPanel` menu.
-	 *
-	 * This fires only in response to an explicit menu action. An item that
-	 * becomes visible because it received a value, or because `defaultShown`
-	 * was set, does not trigger it.
-	 *
-	 * Items flagged with `isShownByDefault` are always visible, so this is
-	 * never called for them.
-	 */
-	onShow?: () => void;
+	onShownChange?: ( isShown: boolean ) => void;
 	/**
 	 * Panel items will ensure they are only registering with their intended panel
 	 * by comparing the `panelId` props set on both the item and the panel itself,

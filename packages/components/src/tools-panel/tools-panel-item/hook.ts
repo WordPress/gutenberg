@@ -26,9 +26,8 @@ export function useToolsPanelItem(
 		panelId,
 		resetAllFilter = noop,
 		onDeselect,
-		onHide,
 		onSelect,
-		onShow,
+		onShownChange,
 		...otherProps
 	} = useContextSystem( props, 'ToolsPanelItem' );
 
@@ -55,18 +54,17 @@ export function useToolsPanelItem(
 	// dependency to the useCallback hook! If needed, we should use a ref.
 	const resetAllFilterCallback = useCallback( resetAllFilter, [ panelId ] );
 
-	// `onShow` and `onHide` are also new functions on every render. Holding
-	// them in refs lets the item register stable callbacks, so it isn't
-	// re-registered on each render, while the panel still invokes the latest
-	// ones.
-	const onShowRef = useRef( onShow );
-	const onHideRef = useRef( onHide );
+	// `onShownChange` is also a new function on every render. Holding it in a
+	// ref lets the item register a stable callback, so it isn't re-registered
+	// on each render, while the panel still invokes the latest one.
+	const onShownChangeRef = useRef( onShownChange );
 	useEffect( () => {
-		onShowRef.current = onShow;
-		onHideRef.current = onHide;
+		onShownChangeRef.current = onShownChange;
 	} );
-	const onShowCallback = useCallback( () => onShowRef.current?.(), [] );
-	const onHideCallback = useCallback( () => onHideRef.current?.(), [] );
+	const onShownChangeCallback = useCallback(
+		( isShown: boolean ) => onShownChangeRef.current?.( isShown ),
+		[]
+	);
 
 	const previousPanelId = usePrevious( currentPanelId );
 
@@ -86,8 +84,7 @@ export function useToolsPanelItem(
 				hasValue: hasValueCallback,
 				isShownByDefault,
 				label,
-				onHide: onHideCallback,
-				onShow: onShowCallback,
+				onShownChange: onShownChangeCallback,
 				panelId,
 			} );
 		}
@@ -107,8 +104,7 @@ export function useToolsPanelItem(
 		isShownByDefault,
 		label,
 		hasValueCallback,
-		onHideCallback,
-		onShowCallback,
+		onShownChangeCallback,
 		panelId,
 		previousPanelId,
 		registerPanelItem,

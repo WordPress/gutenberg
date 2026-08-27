@@ -347,9 +347,9 @@ export function useToolsPanel(
 	// Toggle the checked state of a menu item which is then used to determine
 	// display of the item within the panel.
 	//
-	// The item's `onShow` and `onHide` callbacks are invoked from here rather
-	// than in response to the resulting state change, so that they only ever
-	// report an explicit menu action by the user.
+	// The item's `onShownChange` callback is invoked from here rather than in
+	// response to the resulting state change, so that it only ever reports an
+	// explicit menu action by the user.
 	const toggleItem = useCallback(
 		( label: string ) => {
 			const currentItem = panelItems.find(
@@ -369,11 +369,7 @@ export function useToolsPanel(
 				return;
 			}
 
-			if ( menuItems.optional[ label ] ) {
-				currentItem.onHide?.();
-			} else {
-				currentItem.onShow?.();
-			}
+			currentItem.onShownChange?.( ! menuItems.optional[ label ] );
 		},
 		[ menuItems, panelItems ]
 	);
