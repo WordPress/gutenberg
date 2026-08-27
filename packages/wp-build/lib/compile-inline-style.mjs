@@ -6,10 +6,10 @@ import postcssModules from 'postcss-modules';
 /**
  * Compile CSS into the JavaScript module emitted by wp-build.
  *
- * @param {Object}   options
- * @param {boolean}  [options.cssModules=false] Whether to emit CSS Module exports.
- * @param {boolean}  [options.minify=true]      Whether to minify the CSS.
- * @param {Object[]} [options.plugins=[]]       PostCSS plugins to run first.
+ * @param {Object}                             options
+ * @param {boolean}                            [options.cssModules=false] Whether to emit CSS Module exports.
+ * @param {boolean}                            [options.minify=true]      Whether to minify the CSS.
+ * @param {import('postcss').AcceptedPlugin[]} [options.plugins=[]]       PostCSS plugins to run first.
  * @return {Function} esbuild-sass-plugin transform callback.
  */
 export function compileInlineStyle( {
@@ -17,26 +17,36 @@ export function compileInlineStyle( {
 	minify = true,
 	plugins: additionalPlugins = [],
 } = {} ) {
+	/**
+	 * @param {string} cssText  CSS source to compile.
+	 * @param {string} _dirname Directory containing the source file.
+	 * @param {string} filePath Source file path.
+	 * @return {Promise<string>} Compiled JavaScript module.
+	 */
 	return async function styleType( cssText, _dirname, filePath ) {
 		let moduleExports = null;
 
-		const plugins = [
-			...additionalPlugins,
-			cssModules &&
+		const plugins = [ ...additionalPlugins ];
+		if ( cssModules ) {
+			plugins.push(
 				postcssModules( {
 					generateScopedName: '[contenthash]__[local]',
 					getJSON: ( _, json ) => {
 						moduleExports = json;
 					},
-				} ),
-			minify &&
+				} )
+			);
+		}
+		if ( minify ) {
+			plugins.push(
 				cssnano( {
 					preset: [
 						'default',
 						{ discardComments: { removeAll: true } },
 					],
-				} ),
-		].filter( Boolean );
+				} )
+			);
+		}
 
 		const { css } = await postcss( plugins ).process( cssText, {
 			from: filePath,
