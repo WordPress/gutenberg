@@ -363,10 +363,9 @@ test.describe( 'Block template registration', () => {
 		const resetNotice = page
 			.getByLabel( 'Dismiss this notice' )
 			.getByText( `"Author: Admin" moved to the trash.` );
-		await page.getByPlaceholder( 'Search' ).fill( 'Author: admin' );
-		await page
-			.locator( '.fields-field__title', { hasText: 'Author: Admin' } )
-			.click();
+		await blockTemplateRegistrationUtils.searchForTemplate(
+			'Author: admin'
+		);
 		const actions = page.getByLabel( 'Actions' );
 		await actions.first().click();
 		await page.getByRole( 'menuitem', { name: 'Trash' } ).click();

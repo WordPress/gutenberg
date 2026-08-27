@@ -66,10 +66,10 @@ To find out more about contributing to this package or Gutenberg as a whole, ple
 
 ⚠️ Adding new blocks to this package **requires** additional steps!
 
-1.  Do not forget to register a new core block in the [`index.js`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/index.js) file of this package. For example, if you were to add the new core block called `core/blinking-paragraph`, you would have to add something like:
+1.  Do not forget to register a new core block in the [`index.jsx`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/index.jsx) file of this package. For example, if you were to add the new core block called `core/blinking-paragraph`, you would have to add something like:
 
     ```js
-    // packages/block-library/src/index.js
+    // packages/block-library/src/index.jsx
     import * as blinkingParagraph from './blinking-paragraph';
     ```
 
