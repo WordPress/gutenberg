@@ -3447,7 +3447,7 @@
 	},
 	"packages/block-library/src/navigation/edit/overlay-template-part-selector.js": {
 		"@wordpress/use-recommended-components": {
-			"count": 4
+			"count": 3
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -8206,24 +8206,6 @@
 		}
 	},
 	"packages/private-apis/src/test/index.js": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/reusable-blocks/src/components/reusable-blocks-menu-items/index.js": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-blocks-manage-button.js": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}

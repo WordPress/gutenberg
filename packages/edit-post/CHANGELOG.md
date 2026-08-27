@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Remove the `showListViewByDefault` handling from `initializeEditor`; the `editor` package now applies the preference itself.
+
 ## 8.54.0 (2026-08-26)
 
 ### Internal
