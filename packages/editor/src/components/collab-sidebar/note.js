@@ -3,22 +3,23 @@ import { useRef, useState, useLayoutEffect } from '@wordpress/element';
 import {
 	__experimentalConfirmDialog as ConfirmDialog,
 	Button,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Button as UIButton } from '@wordpress/ui';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+import { Button as UIButton, Menu } from '@wordpress/ui';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { moreVertical, published } from '@wordpress/icons';
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
-import { unlock } from '../../lock-unlock';
-
-const { Menu } = unlock( componentsPrivateApis );
 
 function NoteActionsMenu( { items, buttonRef } ) {
 	return (
-		<Menu placement="bottom-end">
-			<Menu.TriggerButton
+		<Menu.Root
+			// Let outside interactions reach the note thread's focus-out
+			// handling so it can clear the selection.
+			modal={ false }
+			disabled={ ! items.length }
+		>
+			<Menu.Trigger
 				render={
 					<Button
 						ref={ buttonRef }
@@ -30,19 +31,16 @@ function NoteActionsMenu( { items, buttonRef } ) {
 					/>
 				}
 			/>
-			<Menu.Popover
-				// The menu popover is rendered in a portal, which causes focus to be
-				// lost and the note to be collapsed unintentionally. To prevent this,
-				// the popover should be rendered as an inline.
-				modal={ false }
+			<Menu.Popup
+				positioner={ <Menu.Positioner side="bottom" align="end" /> }
 			>
 				{ items.map( ( item ) => (
 					<Menu.Item key={ item.id } onClick={ item.onClick }>
 						<Menu.ItemLabel>{ item.title }</Menu.ItemLabel>
 					</Menu.Item>
 				) ) }
-			</Menu.Popover>
-		</Menu>
+			</Menu.Popup>
+		</Menu.Root>
 	);
 }
 

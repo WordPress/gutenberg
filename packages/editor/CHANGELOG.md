@@ -29,6 +29,7 @@
 ### Internal
 
 -   Check the `window.__experimentalEnableRealTimeCollaboration` flag set by the Real-Time Collaboration experiment, instead of `window._wpCollaborationEnabled`, when determining whether collaboration is enabled for the current post ([#80658](https://github.com/WordPress/gutenberg/pull/80658)).
+-   Notes: Use the public `@wordpress/ui` Menu for note actions instead of the private Components API ([#81930](https://github.com/WordPress/gutenberg/pull/81930)).
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81515](https://github.com/WordPress/gutenberg/pull/81515))
 
 ### Enhancements
