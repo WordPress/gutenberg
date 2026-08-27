@@ -20,9 +20,11 @@ const RESULTS_FILE_SUFFIX = '.performance-results.json';
  * @typedef WPPerformanceCommandOptions
  *
  * @property {boolean=} ci          Run on CI.
+ * @property {string=}  pluginsDir  Directory holding a prebuilt plugin per branch, in `<sanitized branch>/`.
  * @property {number=}  rounds      Run each test suite this many times for each branch.
  * @property {string=}  suites      Comma separated names of the test suites to run (default: all).
  * @property {string=}  testsBranch The branch whose performance test files will be used for testing.
+ * @property {string=}  testsDir    Existing checkout (with installed dependencies) to use as the test runner.
  * @property {string=}  wpVersion   The WordPress version to be used as the base install for testing.
  */
 
@@ -294,67 +296,89 @@ async function runPerformanceTests( branches, options ) {
 	logAtIndent( 1, 'Creating base directory:', formats.success( baseDir ) );
 	fs.mkdirSync( baseDir );
 
-	logAtIndent( 1, 'Setting up repository' );
+	const pluginsDir = options.pluginsDir
+		? path.resolve( options.pluginsDir )
+		: null;
+	const testsDir = options.testsDir ? path.resolve( options.testsDir ) : null;
+
 	const sourceDir = path.join( baseDir, 'source' );
+	let sourceGit = null;
+	if ( ! pluginsDir || ! testsDir ) {
+		logAtIndent( 1, 'Setting up repository' );
 
-	logAtIndent( 2, 'Creating directory:', formats.success( sourceDir ) );
-	fs.mkdirSync( sourceDir );
+		logAtIndent( 2, 'Creating directory:', formats.success( sourceDir ) );
+		fs.mkdirSync( sourceDir );
 
-	// @ts-expect-error The `simple-git` module namespace has no call signatures.
-	const sourceGit = SimpleGit( sourceDir );
-	logAtIndent(
-		2,
-		'Initializing:',
-		formats.success( config.gitRepositoryURL )
-	);
-	await sourceGit
-		.raw( 'init' )
-		.raw( 'remote', 'add', 'origin', config.gitRepositoryURL );
-
-	for ( const [ i, branch ] of branches.entries() ) {
+		// @ts-expect-error The `simple-git` module namespace has no call signatures.
+		sourceGit = SimpleGit( sourceDir );
 		logAtIndent(
 			2,
-			`Fetching environment branch (${ i + 1 } of ${ branches.length }):`,
-			formats.success( branch )
+			'Initializing:',
+			formats.success( config.gitRepositoryURL )
 		);
-		await sourceGit.raw( 'fetch', '--depth=1', 'origin', branch );
+		await sourceGit
+			.raw( 'init' )
+			.raw( 'remote', 'add', 'origin', config.gitRepositoryURL );
+	}
+
+	if ( sourceGit && ! pluginsDir ) {
+		for ( const [ i, branch ] of branches.entries() ) {
+			logAtIndent(
+				2,
+				`Fetching environment branch (${ i + 1 } of ${
+					branches.length
+				}):`,
+				formats.success( branch )
+			);
+			await sourceGit.raw( 'fetch', '--depth=1', 'origin', branch );
+		}
 	}
 
 	const testRunnerBranch = options.testsBranch || branches[ 0 ];
-	if ( options.testsBranch && ! branches.includes( options.testsBranch ) ) {
-		logAtIndent(
-			2,
-			'Fetching test runner branch:',
-			formats.success( options.testsBranch )
-		);
-		await sourceGit.raw(
-			'fetch',
-			'--depth=1',
-			'origin',
-			options.testsBranch
-		);
-	} else {
-		logAtIndent(
-			2,
-			'Using test runner branch:',
-			formats.success( testRunnerBranch )
-		);
+	if ( sourceGit && ! testsDir ) {
+		if ( pluginsDir || ! branches.includes( testRunnerBranch ) ) {
+			logAtIndent(
+				2,
+				'Fetching test runner branch:',
+				formats.success( testRunnerBranch )
+			);
+			await sourceGit.raw(
+				'fetch',
+				'--depth=1',
+				'origin',
+				testRunnerBranch
+			);
+		} else {
+			logAtIndent(
+				2,
+				'Using test runner branch:',
+				formats.success( testRunnerBranch )
+			);
+		}
 	}
 
 	logAtIndent( 1, 'Setting up test runner' );
 
-	const testRunnerDir = path.join( baseDir + '/tests' );
+	const testRunnerDir = testsDir || path.join( baseDir + '/tests' );
 
-	logAtIndent( 2, 'Copying source to:', formats.success( testRunnerDir ) );
-	await runShellScript( `cp -R  ${ sourceDir } ${ testRunnerDir }` );
+	if ( testsDir ) {
+		logAtIndent( 2, 'Using checkout:', formats.success( testRunnerDir ) );
+	} else {
+		logAtIndent(
+			2,
+			'Copying source to:',
+			formats.success( testRunnerDir )
+		);
+		await runShellScript( `cp -R  ${ sourceDir } ${ testRunnerDir }` );
 
-	logAtIndent(
-		2,
-		'Checking out branch:',
-		formats.success( testRunnerBranch )
-	);
-	// @ts-expect-error The `simple-git` module namespace has no call signatures.
-	await SimpleGit( testRunnerDir ).raw( 'checkout', testRunnerBranch );
+		logAtIndent(
+			2,
+			'Checking out branch:',
+			formats.success( testRunnerBranch )
+		);
+		// @ts-expect-error The `simple-git` module namespace has no call signatures.
+		await SimpleGit( testRunnerDir ).raw( 'checkout', testRunnerBranch );
+	}
 
 	logAtIndent( 2, 'Looking for test files' );
 	const availableSuites = getFilesFromDir(
@@ -382,11 +406,12 @@ async function runPerformanceTests( branches, options ) {
 		logAtIndent( 3, 'Found:', formats.success( suite ) );
 	}
 
+	// An existing checkout already has its dependencies installed.
+	const testRunnerSetup = testsDir
+		? 'npm run build --workspace @wordpress/e2e-test-utils-playwright && npx playwright install chromium --with-deps'
+		: 'source $HOME/.nvm/nvm.sh && nvm install && npm install --global npm@10 && npm ci && npm run build --workspace @wordpress/e2e-test-utils-playwright && npx playwright install chromium --with-deps';
 	logAtIndent( 2, 'Installing dependencies and building' );
-	await runShellScript(
-		`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm install --global npm@10 && npm ci && npm run build --workspace @wordpress/e2e-test-utils-playwright && npx playwright install chromium --with-deps"`,
-		testRunnerDir
-	);
+	await runShellScript( `bash -c "${ testRunnerSetup }"`, testRunnerDir );
 
 	logAtIndent( 1, 'Setting up test environments' );
 
@@ -406,7 +431,10 @@ async function runPerformanceTests( branches, options ) {
 		wpZipUrl = `https://wordpress.org/wordpress-${ zipVersion }.zip`;
 	}
 
+	/** @type {Record<string, string>} */
 	const branchDirs = {};
+	/** @type {Record<string, string>} */
+	const pluginDirs = {};
 	for ( const branch of branches ) {
 		logAtIndent( 2, 'Branch:', formats.success( branch ) );
 		const sanitizedBranchName = sanitizeBranchName( branch );
@@ -414,22 +442,38 @@ async function runPerformanceTests( branches, options ) {
 
 		logAtIndent( 3, 'Creating directory:', formats.success( envDir ) );
 		fs.mkdirSync( envDir );
-		// @ts-expect-error `branchDirs` is inferred as `{}`, which has no string index signature.
 		branchDirs[ branch ] = envDir;
-		const buildDir = path.join( envDir, 'plugin' );
 
-		logAtIndent( 3, 'Copying source to:', formats.success( buildDir ) );
-		await runShellScript( `cp -R ${ sourceDir } ${ buildDir }` );
+		let buildDir;
+		if ( pluginsDir ) {
+			buildDir = path.join( pluginsDir, sanitizedBranchName );
+			if ( ! fs.existsSync( path.join( buildDir, 'gutenberg.php' ) ) ) {
+				throw new Error(
+					`No prebuilt plugin for "${ branch }" in ${ buildDir }`
+				);
+			}
+			logAtIndent(
+				3,
+				'Using prebuilt plugin:',
+				formats.success( buildDir )
+			);
+		} else {
+			buildDir = path.join( envDir, 'plugin' );
 
-		logAtIndent( 3, 'Checking out:', formats.success( branch ) );
-		// @ts-expect-error The `simple-git` module namespace has no call signatures.
-		await SimpleGit( buildDir ).raw( 'checkout', branch );
+			logAtIndent( 3, 'Copying source to:', formats.success( buildDir ) );
+			await runShellScript( `cp -R ${ sourceDir } ${ buildDir }` );
 
-		logAtIndent( 3, 'Installing dependencies and building' );
-		await runShellScript(
-			`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm install --global npm@10 && npm ci && (npm run build -- --skip-types || npm run build)"`,
-			buildDir
-		);
+			logAtIndent( 3, 'Checking out:', formats.success( branch ) );
+			// @ts-expect-error The `simple-git` module namespace has no call signatures.
+			await SimpleGit( buildDir ).raw( 'checkout', branch );
+
+			logAtIndent( 3, 'Installing dependencies and building' );
+			await runShellScript(
+				`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm install --global npm@10 && npm ci && (npm run build -- --skip-types || npm run build)"`,
+				buildDir
+			);
+		}
+		pluginDirs[ branch ] = buildDir;
 
 		const wpEnvConfigPath = path.join( envDir, '.wp-env.json' );
 
@@ -505,7 +549,6 @@ async function runPerformanceTests( branches, options ) {
 			);
 
 			const sanitizedBranchName = sanitizeBranchName( branch );
-			// @ts-expect-error `branchDirs` is inferred as `{}`, which has no string index signature.
 			const envDir = branchDirs[ branch ];
 
 			logAtIndent( 2, 'Starting environment' );
@@ -541,9 +584,7 @@ async function runPerformanceTests( branches, options ) {
 	//   npm run --workspace @wordpress/build-scripts resolve-trace-source-maps -- <trace> --build-dir <build-dir>
 	const headBranch = branches[ 0 ];
 	const headBuildScriptsDir = path.join(
-		// @ts-expect-error `branchDirs` is inferred as `{}`, which has no string index signature.
-		branchDirs[ headBranch ],
-		'plugin',
+		pluginDirs[ headBranch ],
 		'build',
 		'scripts'
 	);

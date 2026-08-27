@@ -36,6 +36,8 @@ npm exec release-cli -- perf trunk v8.1.0 v8.0.0
 
 Pass `--suites` with a comma separated list of spec names (`test/performance/specs/*.spec.js` without the extension) to run a subset of the suites. The CI workflow uses it to split the suites into shards that run in parallel, each shard measuring all branches on the same runner.
 
+By default the command clones and builds every branch. In CI the plugins are built once in a separate job, and each shard passes `--plugins-dir <dir>` (a prebuilt plugin per branch in `<dir>/<sanitized branch name>`) and `--tests-dir <checkout>` (an existing checkout with installed dependencies to use as the test runner) to skip that work.
+
 To get the most accurate results, it's is important to use the exact same version of the tests and environment (theme...) when running the tests, the only thing that need to be different between the branches is the Gutenberg plugin version (or branch used to build the plugin).
 
 To achieve that the command first prepares the following folder structure:

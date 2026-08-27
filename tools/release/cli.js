@@ -80,6 +80,14 @@ program
 		'Run each test suite this many times for each branch; results are summarized, default = 1'
 	)
 	.option(
+		'--plugins-dir <dir>',
+		'Use prebuilt plugins from <dir>/<branch> instead of building each branch'
+	)
+	.option(
+		'--tests-dir <dir>',
+		'Use an existing checkout with installed dependencies as the test runner'
+	)
+	.option(
 		'--suites <suites>',
 		'Comma separated names of the test suites to run, default = all'
 	)
