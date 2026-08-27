@@ -319,14 +319,17 @@ describe( 'Vitest policy rules', () => {
 	} );
 
 	it( 'enforces Vitest imports from module references', () => {
-		expectViolation(
+		for ( const source of [
 			'const example = "import { it } from \'vitest\'";',
-			'no explicit import from vitest',
-			{
+			"void import( 'vitest' );",
+			"import 'vitest';",
+			"import type { it } from 'vitest';",
+		] ) {
+			expectViolation( source, 'no explicit import from vitest', {
 				isVitestTest: true,
 				project: 'node',
-			}
-		);
+			} );
+		}
 		expectValid( "import { it } from 'vitest';", {
 			isVitestTest: true,
 			project: 'node',
@@ -334,6 +337,14 @@ describe( 'Vitest policy rules', () => {
 		expectViolation(
 			"import { it } from 'vitest';\nimport { expect } from 'vitest/globals';",
 			'vitest/globals is not allowed',
+			{ isVitestTest: true, project: 'node' }
+		);
+	} );
+
+	it( 'rejects Vitest APIs imported from other modules', () => {
+		expectViolation(
+			"import test from 'node:test';\nimport { expect } from 'vitest';\ntest( 'example', () => {} );",
+			'must be imported from vitest',
 			{ isVitestTest: true, project: 'node' }
 		);
 	} );
@@ -438,7 +449,7 @@ describe( 'Vitest policy rules', () => {
 			}
 		);
 		expectViolation(
-			"import 'vitest';\ntest( 'example', () => {} );",
+			"import { expect } from 'vitest';\ntest( 'example', () => {} );",
 			'unbound Vitest API: test',
 			{
 				isVitestTest: true,

@@ -1112,6 +1112,35 @@ export function validateVitestPolicy( {
 			'@testing-library/dom',
 			'@testing-library/react',
 		].includes( importSource );
+		const runtimeSpecifiers = node.specifiers.filter(
+			( specifier ) =>
+				node.importKind !== 'type' && specifier.importKind !== 'type'
+		);
+		if (
+			isVitestTest &&
+			importSource === 'vitest' &&
+			runtimeSpecifiers.length
+		) {
+			hasVitestImport = true;
+		}
+		if (
+			isVitestTest &&
+			! [ 'vitest', 'vitest/globals' ].includes( importSource )
+		) {
+			for ( const specifier of runtimeSpecifiers ) {
+				const importedName = getImportedName( specifier );
+				const apiName = vitestApiNames.has( importedName )
+					? importedName
+					: specifier.local.name;
+				if ( vitestApiNames.has( apiName ) ) {
+					report(
+						`non-vitest-api-import-${ specifier.local.name }`,
+						`Vitest API ${ apiName } must be imported from vitest`,
+						specifier
+					);
+				}
+			}
+		}
 		for ( const specifier of node.specifiers ) {
 			const variable = identifierVariables.get( specifier.local );
 			if ( specifier.type === 'ImportNamespaceSpecifier' ) {
@@ -1584,9 +1613,6 @@ export function validateVitestPolicy( {
 		}
 
 		const moduleSource = getModuleSource( node );
-		if ( isVitestTest && moduleSource === 'vitest' ) {
-			hasVitestImport = true;
-		}
 
 		if ( isVitestTest && moduleSource === 'vitest/globals' ) {
 			report( 'vitest-globals', 'vitest/globals is not allowed', node );
