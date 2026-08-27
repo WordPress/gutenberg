@@ -299,6 +299,34 @@ class Tests_REST_View_Config_Controller extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * The `wp_navigation` post type provides its own list-based default view.
+	 *
+	 * @covers ::get_items
+	 */
+	public function test_get_items_wp_navigation_default_view() {
+		// Admin: reading wp_navigation config requires `edit_theme_options`.
+		wp_set_current_user( self::$admin_id );
+
+		$response = $this->dispatch_request( 'postType', 'wp_navigation' );
+		$this->assertSame( 200, $response->get_status() );
+
+		$data = json_decode( wp_json_encode( $response->get_data() ), true );
+
+		$this->assertSame( 'list', $data['default_view']['type'] );
+		$this->assertSame(
+			array(
+				'field'     => 'date',
+				'direction' => 'desc',
+			),
+			$data['default_view']['sort']
+		);
+		$this->assertSame( 'title', $data['default_view']['titleField'] );
+		$this->assertSame( array( 'list' ), array_keys( $data['default_layouts'] ) );
+		$this->assertCount( 1, $data['view_list'] );
+		$this->assertSame( 'all', $data['view_list'][0]['slug'] );
+	}
+
+	/**
 	 * Empty object-typed config values serialize as JSON objects ({}), not arrays ([]).
 	 *
 	 * @covers ::get_items

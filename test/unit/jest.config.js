@@ -24,7 +24,7 @@ process.chdir( ROOT_DIR );
 
 // Finds all packages which are transpiled with Babel to force Jest to use their source code.
 const transpiledPackageNames = glob(
-	path.join( ROOT_DIR, 'packages/*/src/index.{js,ts,tsx}' )
+	path.join( ROOT_DIR, 'packages/*/src/index.{js,jsx,ts,tsx}' )
 ).map( ( fileName ) => {
 	const relative = path.relative( ROOT_DIR, fileName );
 	return relative.split( path.sep )[ 1 ];
@@ -86,7 +86,7 @@ module.exports = {
 		'@wordpress/theme/design-tokens.js':
 			'<rootDir>/packages/theme/prebuilt/js/design-tokens.mjs',
 		'@wordpress/block-library/build-module/(.*).mjs':
-			'<rootDir>/packages/block-library/src/$1.js',
+			'<rootDir>/packages/block-library/src/$1',
 		'.+\\.wasm$': '<rootDir>/test/unit/config/wasm-stub.js',
 		// Map deep paths (e.g., @wordpress/block-editor/src/hooks/list-view)
 		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })\\/(.+)$` ]:
