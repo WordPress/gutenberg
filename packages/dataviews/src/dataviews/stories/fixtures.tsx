@@ -619,7 +619,7 @@ export const data: SpaceObject[] = [
 export const actions: Action< SpaceObject >[] = [
 	{
 		id: 'delete',
-		label: 'Delete item',
+		label: 'Delete',
 		isPrimary: true,
 		icon: trash,
 		modalHeader: ( items ) =>
@@ -658,7 +658,7 @@ export const actions: Action< SpaceObject >[] = [
 	},
 	{
 		id: 'secondary',
-		label: 'Secondary action',
+		label: 'Secondary',
 		callback() {
 			// eslint-disable-next-line no-console
 			console.log( 'Perform secondary action.' );
