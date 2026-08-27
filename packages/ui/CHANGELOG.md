@@ -37,6 +37,10 @@
 
 -   Add a Form best practices Storybook page for labeling composed controls ([#82197](https://github.com/WordPress/gutenberg/pull/82197)).
 
+### Internal
+
+-   Remove the remaining `react-hooks/refs` ESLint suppressions. ([#82131](https://github.com/WordPress/gutenberg/pull/82131))
+
 ## 0.21.0 (2026-08-26)
 
 ### New Features
