@@ -153,8 +153,7 @@ function MediaEditorSidebar( {
 			>
 				{ /* `Tabs.List` sizes itself to its tabs (`width: fit-content`),
 				     so the rule under the strip is drawn by this wrapper
-				     instead — it spans the sidebar, while its padding lines the
-				     tabs up with the fields in the pane below. */ }
+				     instead, which spans the column. */ }
 				<div className="media-editor__tablist">
 					<Tabs.List variant="minimal">
 						{ tabs.map( ( tab ) => (
@@ -740,7 +739,6 @@ function MediaEditorContent( {
 						className={ clsx( 'media-editor__body', {
 							'has-panel-open': !! activePanel,
 						} ) }
-						data-active-panel={ activePanel ?? undefined }
 					>
 						<NavigableRegion
 							className="media-editor__content"
