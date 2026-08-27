@@ -102,7 +102,11 @@ jobs:
                       ;;
                   esac
                   # Artifact names are derived from sanitized branch names and must be unique.
-                  DUPLICATES="$(echo "$BRANCHES" | jq -r '[.[].name | gsub("[^a-zA-Z0-9-]"; "-")] | group_by(.) | map(select(length > 1) | .[0]) | .[]')"
+                  # Same replacement as `sanitizeBranchName()` in tools/release/commands/performance.js.
+                  DUPLICATES="$(echo "$BRANCHES" | node -e '
+                    const names = JSON.parse( require( "fs" ).readFileSync( 0, "utf8" ) ).map( ( branch ) => branch.name.replace( /[^a-zA-Z0-9-]/g, "-" ) );
+                    process.stdout.write( [ ...new Set( names.filter( ( name, i ) => names.indexOf( name ) !== i ) ) ].join( " " ) );
+                  ')"
                   if [[ -n "$DUPLICATES" ]]; then
                     echo "::error::Branches must not share a sanitized name: $DUPLICATES"
                     exit 1
