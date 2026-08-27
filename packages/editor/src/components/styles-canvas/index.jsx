@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { Button } from '@wordpress/components';
 import { ESCAPE } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
@@ -35,8 +36,8 @@ export function getStylesCanvasTitle( path, showStylebook ) {
  * @return {React.JSX.Element} The styles canvas or null if nothing to render.
  */
 export default function StylesCanvas() {
-	const { stylesPath, showStylebook, showListViewByDefault } = useSelect(
-		( select ) => {
+	const { stylesPath, showStylebook, showListViewByDefault, isPreviewMode } =
+		useSelect( ( select ) => {
 			const { getStylesPath, getShowStylebook } = unlock(
 				select( editorStore )
 			);
@@ -50,10 +51,10 @@ export default function StylesCanvas() {
 				stylesPath: getStylesPath(),
 				showStylebook: getShowStylebook(),
 				showListViewByDefault: _showListViewByDefault,
+				isPreviewMode:
+					select( editorStore ).getEditorSettings().isPreviewMode,
 			};
-		},
-		[]
-	);
+		}, [] );
 	const { resetStylesNavigation, setStylesPath } = unlock(
 		useDispatch( editorStore )
 	);
@@ -95,23 +96,31 @@ export default function StylesCanvas() {
 		}
 	};
 
+	// In preview mode (e.g. the styles route of the extensible site editor),
+	// the canvas is not opened over an editing session: whatever opened it
+	// owns closing it, so the close affordances would only desync that owner.
 	return (
-		<div className="editor-styles-canvas">
+		<div
+			className={ clsx( 'editor-styles-canvas', {
+				'is-preview-mode': isPreviewMode,
+			} ) }
+		>
 			<ResizableEditor enableResizing={ false }>
-				{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
 				<section
 					className="editor-styles-canvas__section"
-					ref={ focusOnMountRef }
-					onKeyDown={ closeOnEscape }
+					ref={ isPreviewMode ? undefined : focusOnMountRef }
+					onKeyDown={ isPreviewMode ? undefined : closeOnEscape }
 					aria-label={ title }
 				>
-					<Button
-						size="compact"
-						className="editor-styles-canvas__close-button"
-						icon={ closeSmall }
-						label={ __( 'Close' ) }
-						onClick={ onCloseCanvas }
-					/>
+					{ ! isPreviewMode && (
+						<Button
+							size="compact"
+							className="editor-styles-canvas__close-button"
+							icon={ closeSmall }
+							label={ __( 'Close' ) }
+							onClick={ onCloseCanvas }
+						/>
+					) }
 					{ content }
 				</section>
 			</ResizableEditor>
