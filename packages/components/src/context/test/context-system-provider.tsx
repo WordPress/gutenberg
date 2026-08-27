@@ -1,5 +1,11 @@
 import { render, screen } from '@testing-library/react';
 import styled from '@emotion/styled';
+import type {
+	ComponentPropsWithoutRef,
+	ForwardedRef,
+	ReactElement,
+	ReactNode,
+} from 'react';
 import { cloneElement } from '@wordpress/element';
 import { contextConnect } from '../context-connect';
 import { ContextSystemProvider } from '../context-system-provider';
@@ -7,12 +13,32 @@ import { useContextSystem } from '../use-context-system';
 
 const View = styled.div``;
 
+type TestComponentProps = ComponentPropsWithoutRef< 'div' > & {
+	quote?: ReactNode;
+};
+
+function TestComponent(
+	props: TestComponentProps,
+	ref: ForwardedRef< HTMLDivElement >
+) {
+	return <View { ...useContextSystem( props, 'Component' ) } ref={ ref } />;
+}
+
+function TestComponentWithQuote(
+	props: TestComponentProps,
+	ref: ForwardedRef< HTMLDivElement >
+) {
+	const { quote, ...otherProps } = useContextSystem( props, 'Component' );
+	return (
+		<View { ...otherProps } ref={ ref }>
+			{ quote }
+		</View>
+	);
+}
+
 describe( 'props', () => {
 	test( 'should render correctly', () => {
-		const Component = ( props, ref ) => (
-			<View { ...useContextSystem( props, 'Component' ) } ref={ ref } />
-		);
-		const ConnectedComponent = contextConnect( Component, 'Component' );
+		const ConnectedComponent = contextConnect( TestComponent, 'Component' );
 		const { container } = render(
 			<ContextSystemProvider>
 				<ConnectedComponent />
@@ -23,19 +49,10 @@ describe( 'props', () => {
 	} );
 
 	test( 'should render context props', () => {
-		const Component = ( props, ref ) => {
-			const { quote, ...otherProps } = useContextSystem(
-				props,
-				'Component'
-			);
-			return (
-				<View { ...otherProps } ref={ ref }>
-					{ quote }
-				</View>
-			);
-		};
-
-		const ConnectedComponent = contextConnect( Component, 'Component' );
+		const ConnectedComponent = contextConnect(
+			TestComponentWithQuote,
+			'Component'
+		);
 
 		const contextValue = {
 			Component: {
@@ -54,19 +71,10 @@ describe( 'props', () => {
 	} );
 
 	test( 'should render _override props', () => {
-		const Component = ( props, ref ) => {
-			const { quote, ...otherProps } = useContextSystem(
-				props,
-				'Component'
-			);
-			return (
-				<View { ...otherProps } ref={ ref }>
-					{ quote }
-				</View>
-			);
-		};
-
-		const ConnectedComponent = contextConnect( Component, 'Component' );
+		const ConnectedComponent = contextConnect(
+			TestComponentWithQuote,
+			'Component'
+		);
 
 		const contextValue = {
 			Component: {
@@ -99,10 +107,7 @@ describe( 'props', () => {
 
 describe( 'children', () => {
 	test( 'should pass through children', () => {
-		const Component = ( props, ref ) => (
-			<View { ...useContextSystem( props, 'Component' ) } ref={ ref } />
-		);
-		const ConnectedComponent = contextConnect( Component, 'Component' );
+		const ConnectedComponent = contextConnect( TestComponent, 'Component' );
 
 		render(
 			<ContextSystemProvider>
@@ -114,13 +119,11 @@ describe( 'children', () => {
 	} );
 
 	test( 'should not accept children via `context`', () => {
-		const Component = ( props, ref ) => (
-			<View { ...useContextSystem( props, 'Component' ) } ref={ ref } />
-		);
-		const ConnectedComponent = contextConnect( Component, 'Component' );
+		const ConnectedComponent = contextConnect( TestComponent, 'Component' );
 
 		render(
 			<ContextSystemProvider
+				// @ts-expect-error Verify that the unsupported `context` prop is ignored.
 				context={ { Component: { children: 'Override' } } }
 			>
 				<ConnectedComponent />
@@ -132,13 +135,18 @@ describe( 'children', () => {
 
 	// This matches the behavior for normal, non-context-connected components.
 	test( 'should not override inherent children', () => {
-		const Component = ( props, ref ) => (
+		const Component = (
+			props: TestComponentProps,
+			ref: ForwardedRef< HTMLDivElement >
+		) => (
 			<View { ...useContextSystem( props, 'Component' ) } ref={ ref }>
 				Inherent
 			</View>
 		);
 		const ConnectedComponent = contextConnect( Component, 'Component' );
-		const NormalComponent = ( props ) => <div { ...props }>Inherent</div>;
+		const NormalComponent = (
+			props: ComponentPropsWithoutRef< 'div' >
+		) => <div { ...props }>Inherent</div>;
 
 		render(
 			<ContextSystemProvider>
@@ -153,12 +161,21 @@ describe( 'children', () => {
 	} );
 
 	describe( 'when connected component does a `cloneElement()`', () => {
-		// eslint-disable-next-line no-unused-vars
-		const ComponentThatClones = ( { content, ...props }, _ref ) =>
-			cloneElement(
+		type CloneComponentProps = {
+			content: ReactElement;
+			children?: ReactNode;
+			className?: string;
+		};
+		const ComponentThatClones = (
+			{ content, ...props }: CloneComponentProps,
+			ref: ForwardedRef< HTMLElement >
+		) => {
+			void ref;
+			return cloneElement(
 				content,
 				useContextSystem( props, 'ComponentThatClones' )
 			);
+		};
 		const ConnectedComponentThatClones = contextConnect(
 			ComponentThatClones,
 			'ComponentThatClones'

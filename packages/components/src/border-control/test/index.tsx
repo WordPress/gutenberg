@@ -7,6 +7,7 @@ import {
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BorderControl } from '../';
+import type { Border, BorderControlProps } from '../types';
 import { COLORS } from '../../utils';
 
 const colors = [
@@ -23,11 +24,13 @@ const defaultBorder = {
 	width: '1px',
 };
 
-function createProps( customProps ) {
-	const props = {
+function createProps(
+	customProps: Partial< BorderControlProps > = {}
+): BorderControlProps {
+	const props: BorderControlProps = {
 		colors,
 		label: 'Border',
-		onChange: jest.fn().mockImplementation( ( newValue ) => {
+		onChange: jest.fn().mockImplementation( ( newValue?: Border ) => {
 			props.value = newValue;
 		} ),
 		value: defaultBorder,
@@ -38,7 +41,7 @@ function createProps( customProps ) {
 
 const toggleLabelRegex = /Border color( and style)* picker/;
 
-const openPopover = async ( user ) => {
+const openPopover = async ( user: ReturnType< typeof userEvent.setup > ) => {
 	const toggleButton = screen.getByLabelText( toggleLabelRegex );
 	await user.click( toggleButton );
 
@@ -50,27 +53,31 @@ const openPopover = async ( user ) => {
 	await waitFor( () => expect( pickerButton ).toBePositionedPopover() );
 };
 
-const getButton = ( name ) => {
+const getButton = ( name: string | RegExp ) => {
 	return screen.getByRole( 'button', { name } );
 };
 
-const getColorOption = ( color ) => {
+const getColorOption = ( color: string ) => {
 	return screen.getByRole( 'option', { name: `${ color }` } );
 };
 
-const queryButton = ( name ) => {
+const queryButton = ( name: string | RegExp ) => {
 	return screen.queryByRole( 'button', { name } );
 };
 
 const getSliderInput = () => {
-	return screen.getByRole( 'slider', { name: 'Border width' } );
+	return screen.getByRole< HTMLInputElement >( 'slider', {
+		name: 'Border width',
+	} );
 };
 
 const getWidthInput = () => {
-	return screen.getByRole( 'spinbutton', { name: 'Border width' } );
+	return screen.getByRole< HTMLInputElement >( 'spinbutton', {
+		name: 'Border width',
+	} );
 };
 
-function TestBorderControl( restProps ) {
+function TestBorderControl( restProps: BorderControlProps ) {
 	return <BorderControl { ...restProps } />;
 }
 
@@ -80,7 +87,7 @@ describe( 'BorderControl', () => {
 			const props = createProps();
 			render( <TestBorderControl { ...props } /> );
 
-			const label = screen.getByText( props.label );
+			const label = screen.getByText( props.label! );
 			const colorButton = screen.getByLabelText( toggleLabelRegex );
 			const widthInput = getWidthInput();
 			const unitSelect = screen.getByRole( 'combobox', {
@@ -100,7 +107,7 @@ describe( 'BorderControl', () => {
 		it( 'should hide label', () => {
 			const props = createProps( { hideLabelFromVision: true } );
 			render( <TestBorderControl { ...props } /> );
-			const label = screen.getByText( props.label );
+			const label = screen.getByText( props.label! );
 
 			// As visually hidden labels are still included in the document
 			// and do not have `display: none` styling, we can't rely on
@@ -128,7 +135,7 @@ describe( 'BorderControl', () => {
 		} );
 
 		describe( 'color indicator inline styles', () => {
-			const getIndicatorWrapper = ( border ) => {
+			const getIndicatorWrapper = ( border: Border ) => {
 				render(
 					<TestBorderControl
 						{ ...createProps( { value: border } ) }
