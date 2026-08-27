@@ -3,7 +3,12 @@ import { version as reactVersion } from 'react';
 import { useState, createPortal, forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs, useRefEffect, useDisabled } from '@wordpress/compose';
-import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
+import {
+	__experimentalStyleProvider as StyleProvider,
+	Popover,
+} from '@wordpress/components';
+import { Link, Stack, Text } from '@wordpress/ui';
+import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
 import { useSelect } from '@wordpress/data';
 import { useWritingFlow } from '../writing-flow';
 import { getCompatibilityStyles } from './get-compatibility-styles';
@@ -130,6 +135,41 @@ function getIframeSrc( resolvedAssets ) {
 	return src;
 }
 
+/**
+ * Popover shown when a link click in the editor canvas has been intercepted to
+ * keep it from navigating the canvas away. It surfaces the link target so that
+ * the user can decide whether to follow it in a new tab.
+ *
+ * @param {Object}      props
+ * @param {HTMLElement} props.anchor  The link element that was clicked.
+ * @param {Function}    props.onClose Called when the popover should be dismissed.
+ */
+function InterceptedLinkPopover( { anchor, onClose } ) {
+	// `href` is the resolved URL, which is what the click would have navigated to.
+	const { href } = anchor;
+
+	return (
+		<Popover
+			className="block-editor-iframe__intercepted-link-popover"
+			anchor={ anchor }
+			placement="bottom"
+			shift
+			focusOnMount="firstElement"
+			onClose={ onClose }
+			onFocusOutside={ onClose }
+		>
+			<Stack direction="column" gap="xs" align="flex-start">
+				<Text variant="body-sm">
+					{ __( 'Links are disabled in the editor.' ) }
+				</Text>
+				<Link href={ href } openInNewTab>
+					{ filterURLForDisplay( safeDecodeURI( href ) ) }
+				</Link>
+			</Stack>
+		</Popover>
+	);
+}
+
 function Iframe( {
 	contentRef,
 	children,
@@ -151,6 +191,9 @@ function Iframe( {
 	/** @type {[Document, React.Dispatch<Document>]} */
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
+	// The link element whose click was intercepted, if any, anchoring the
+	// popover that offers to open it in a new tab.
+	const [ interceptedLinkAnchor, setInterceptedLinkAnchor ] = useState();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
 
 	const setRef = useRefEffect( ( node ) => {
@@ -159,14 +202,21 @@ function Iframe( {
 		function preventFileDropDefault( event ) {
 			event.preventDefault();
 		}
-		// Prevent clicks on link fragments from navigating away. Note that links
-		// inside `contenteditable` are already disabled by the browser, so
-		// this is for links in blocks outside of `contenteditable`.
+		// Prevent clicks on links from navigating the iframe away, which would
+		// unmount the editor. Note that links inside `contenteditable` are
+		// already disabled by the browser, so this mostly concerns links in
+		// blocks outside of `contenteditable`.
 		function interceptLinkClicks( event ) {
-			if (
-				event.target.tagName === 'A' &&
-				event.target.getAttribute( 'href' )?.startsWith( '#' )
-			) {
+			// A block may handle the click itself, e.g. to show a notice.
+			if ( event.defaultPrevented ) {
+				return;
+			}
+
+			const anchor = event.target?.closest?.( 'a[href]' );
+			const href = anchor?.getAttribute( 'href' );
+			let interceptedAnchor;
+
+			if ( href?.startsWith( '#' ) ) {
 				event.preventDefault();
 				// Manually handle link fragment navigation within the iframe. The iframe's
 				// location is a blob URL, which can't be used to resolve relative links like
@@ -177,10 +227,26 @@ function Iframe( {
 				//
 				// Links with fragments are used for example with footnotes. Clicking on these
 				// links will scroll smoothly to the anchors in the editor canvas.
-				iFrameDocument.defaultView.location.hash = event.target
-					.getAttribute( 'href' )
-					.slice( 1 );
+				iFrameDocument.defaultView.location.hash = href.slice( 1 );
+			} else if (
+				href &&
+				! anchor.isContentEditable &&
+				anchor.target !== '_blank' &&
+				// A modified click opens the link in a new tab or window, which
+				// leaves the canvas alone.
+				! event.metaKey &&
+				! event.ctrlKey &&
+				! event.shiftKey
+			) {
+				// Links that open in a new tab leave the canvas alone, so they can be
+				// followed as they are. Any other link would navigate the iframe, or
+				// even the whole window, away from the editor. Prevent that, and let
+				// the user decide whether to open it in a new tab instead.
+				event.preventDefault();
+				interceptedAnchor = anchor;
 			}
+
+			setInterceptedLinkAnchor( interceptedAnchor );
 		}
 
 		const { ownerDocument } = node;
@@ -242,6 +308,7 @@ function Iframe( {
 
 		return () => {
 			setIframeDocument( undefined );
+			setInterceptedLinkAnchor( undefined );
 			node.removeEventListener( 'load', onLoad );
 			iFrameDocument?.removeEventListener(
 				'dragover',
@@ -378,6 +445,12 @@ function Iframe( {
 			>
 				{ iframe }
 			</div>
+			{ ! isPreviewMode && interceptedLinkAnchor && (
+				<InterceptedLinkPopover
+					anchor={ interceptedLinkAnchor }
+					onClose={ () => setInterceptedLinkAnchor( undefined ) }
+				/>
+			) }
 		</div>
 	);
 }
