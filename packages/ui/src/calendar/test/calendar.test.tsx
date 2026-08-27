@@ -105,12 +105,19 @@ describe( 'Calendar', () => {
 		jest.useRealTimers();
 	} );
 
+	afterEach( async () => {
+		// Let tooltip positioning updates caused by focus finish before cleanup.
+		await act( () => Promise.resolve() );
+	} );
+
 	describe( 'Semantics and basic behavior', () => {
 		it( 'should apply the correct roles, semantics and attributes', async () => {
 			render( <Calendar /> );
 
 			expect(
-				screen.getByRole( 'application', { name: 'Date calendar' } )
+				screen.getByRole( 'application', {
+					name: 'Date calendar, May 2025',
+				} )
 			).toBeVisible();
 
 			const tableGrid = screen.getByRole( 'grid', {
@@ -1038,7 +1045,9 @@ describe( 'Calendar', () => {
 
 			// Check computed writing direction
 			expect(
-				screen.getByRole( 'application', { name: 'Date calendar' } )
+				screen.getByRole( 'application', {
+					name: /^Date calendar,/,
+				} )
 			).toHaveAttribute( 'dir', 'rtl' );
 
 			// Check month name

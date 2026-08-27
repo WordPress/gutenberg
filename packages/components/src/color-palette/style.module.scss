@@ -1,0 +1,12 @@
+.color-heading {
+	text-transform: uppercase;
+
+	// Triple specificity to override the base Heading styles, matching the
+	// pre-migration Emotion `&&&` behavior. Dart Sass disallows `&&&`, so the
+	// selector is repeated via interpolation to produce the same specificity.
+	&#{&}#{&} {
+		font-size: 11px;
+		line-height: 24px;
+		margin-bottom: 0;
+	}
+}
