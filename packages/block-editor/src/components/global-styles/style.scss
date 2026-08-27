@@ -1,5 +1,6 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins";
 
 .block-editor-global-styles__toggle-icon {
 	fill: currentColor;
@@ -136,6 +137,73 @@
 	}
 
 	.block-editor-global-styles-filters-panel__dropdown:hover &,
+	&:focus,
+	&:hover {
+		opacity: 1;
+	}
+
+	@media (hover: none) {
+		// Show reset button on devices that do not support hover.
+		opacity: 1;
+	}
+}
+
+.block-editor-global-styles__text-shadow {
+	width: 260px;
+	padding: $grid-unit-10;
+}
+
+.block-editor-global-styles__text-shadow-preview {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 80px;
+	border: $gray-300 1px solid;
+	border-radius: $radius-small;
+	font-size: 24px;
+	margin-bottom: $grid-unit-20;
+	@include mixins.checkerboard-background( 8px );
+}
+
+.block-editor-global-styles__text-shadow-list-item {
+	justify-content: space-between;
+	gap: $grid-unit-10;
+	width: 100%;
+	// The checkmark is always rendered so that its height is reserved and the
+	// list doesn't shift when the selection changes.
+	&:not(.is-active) svg {
+		opacity: 0;
+	}
+}
+
+.block-editor-global-styles__text-shadow-dropdown {
+	display: block;
+	padding: 0;
+	position: relative;
+	border: 1px solid $gray-300;
+	border-radius: $radius-small;
+}
+
+.block-editor-global-styles__text-shadow-dropdown-toggle {
+	width: 100%;
+	padding: $grid-unit-10;
+
+	&.is-open {
+		background-color: $gray-100;
+	}
+}
+
+.block-editor-global-styles__text-shadow-remove-button {
+	position: absolute;
+	right: $grid-unit;
+	top: $grid-unit;
+	opacity: 0;
+
+	@media not (prefers-reduced-motion) {
+		transition: opacity 0.1s ease-in-out;
+	}
+
+	.block-editor-global-styles__text-shadow-dropdown:hover &,
 	&:focus,
 	&:hover {
 		opacity: 1;

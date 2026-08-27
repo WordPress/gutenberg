@@ -344,6 +344,7 @@ The following presets can be defined via `theme.json`:
 - `spacing.spacingSizes`/`spacing.spacingScale`: generates a single custom property per preset value.
 - `typography.fontSizes`: generates a single class and custom property per preset value.
 - `typography.fontFamilies`: generates a single custom property per preset value.
+- `typography.textShadowPresets`: generates a single class and custom property per preset value.
 
 The naming schema for the classes and the custom properties is as follows:
 

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a text shadow presets screen under Typography ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
+
 ## 1.21.0 (2026-08-26)
 
 ### Bug Fixes

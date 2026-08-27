@@ -340,7 +340,13 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 					'property_keys' => array(
 						'default' => 'text-shadow',
 					),
+					'css_vars'      => array(
+						'text-shadow' => '--wp--preset--text-shadow--$slug',
+					),
 					'path'          => array( 'typography', 'textShadow' ),
+					'classnames'    => array(
+						'has-$slug-text-shadow' => 'text-shadow',
+					),
 				),
 				'textTransform'  => array(
 					'property_keys' => array(
