@@ -25,21 +25,7 @@ export type FieldItemProps = ComponentProps< typeof Field.Item > & {
 	children?: React.ReactNode;
 };
 
-export type FieldLabelProps = ComponentProps< typeof Field.Label > & {
-	/**
-	 * The label string, or the string and the element to associate it with.
-	 *
-	 * To keep things accessible, do not include other interactive
-	 * elements such as links or buttons.
-	 */
-	children?: Field.Label.Props[ 'children' ];
-	/**
-	 * Whether to visually hide the label while keeping it accessible
-	 * to screen readers.
-	 *
-	 * @default false
-	 */
-	hideFromVision?: boolean;
+type FieldLabelVariantProps = {
 	/**
 	 * The visual variant of the label.
 	 *
@@ -49,6 +35,24 @@ export type FieldLabelProps = ComponentProps< typeof Field.Label > & {
 	 */
 	variant?: 'default' | 'plain';
 };
+
+export type FieldLabelProps = ComponentProps< typeof Field.Label > &
+	FieldLabelVariantProps & {
+		/**
+		 * The label string, or the string and the element to associate it with.
+		 *
+		 * To keep things accessible, do not include other interactive
+		 * elements such as links or buttons.
+		 */
+		children?: Field.Label.Props[ 'children' ];
+		/**
+		 * Whether to visually hide the label while keeping it accessible
+		 * to screen readers.
+		 *
+		 * @default false
+		 */
+		hideFromVision?: boolean;
+	};
 
 export type FieldControlProps = Omit<
 	ComponentProps< typeof Field.Control >,
@@ -88,17 +92,10 @@ export type FieldDetailsProps = ComponentProps< 'div' > & {
 	children?: React.ReactNode;
 };
 
-export type FieldVisualLabelProps = ComponentProps< 'span' > & {
-	/**
-	 * The visual label content.
-	 */
-	children?: React.ReactNode;
-	/**
-	 * The visual variant of the label.
-	 *
-	 * Use 'plain' for controls like checkboxes and radio buttons.
-	 *
-	 * @default 'default'
-	 */
-	variant?: 'default' | 'plain';
-};
+export type FieldVisualLabelProps = ComponentProps< 'span' > &
+	FieldLabelVariantProps & {
+		/**
+		 * The visual label content.
+		 */
+		children?: React.ReactNode;
+	};

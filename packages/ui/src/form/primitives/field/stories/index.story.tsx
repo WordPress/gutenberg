@@ -164,9 +164,7 @@ export const WithVisualLabel: StoryObj = {
 	render: () => (
 		<Stack direction="column" gap="sm" align="flex-start">
 			<Field.VisualLabel>Author</Field.VisualLabel>
-			<Button aria-label="Select an author" variant="outline">
-				Select an author
-			</Button>
+			<Button variant="outline">Select an author</Button>
 		</Stack>
 	),
 };
