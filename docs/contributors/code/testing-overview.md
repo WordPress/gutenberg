@@ -39,7 +39,7 @@ During the Jest-to-Vitest migration, run both `npm run test:unit` and `npm run t
 
 Keep your tests in a `test` folder in your working directory. The test file should have the same name as the test subject file.
 
-Use `*.jsdom.test.*` for tests that require a DOM. Use `*.browser.test.*` for tests that require Vitest Browser Mode. Leave Node-compatible test names without an environment suffix. During the Jest-to-Vitest migration, the filename selects the Vitest project after the migration manifest assigns the test to Vitest.
+Use `*.jsdom.test.*` for tests that require a DOM. Use `*.browser.test.*` for tests that require Vitest Browser Mode. Leave Node-compatible test names without an environment suffix. The filename selects the test environment in both Jest and Vitest. During the migration, the manifest only selects the runner. Do not use per-file environment overrides.
 
 ```
 +-- test

@@ -6,11 +6,13 @@ import { fileURLToPath } from 'node:url';
 import {
 	discoverTestFiles,
 	findOverlappingVitestProjectTests,
+	getTestEnvironmentName,
 	getVitestTests,
 	getVitestTestsByProject,
 	VITEST_PROJECT_NAMES,
 } from './discover-test-files.mjs';
 import { resolvePackageBin } from './resolve-package-bin.mjs';
+import { sourceHasTestEnvironmentOverride } from './test-environment-overrides.mjs';
 
 const ROOT_DIR = path.resolve(
 	path.dirname( fileURLToPath( import.meta.url ) ),
@@ -60,6 +62,9 @@ function listTests( packageName, args ) {
 			.split( /\r?\n/ )
 			.filter( Boolean )
 			.map( ( testPath ) => testPath.replace( /^\[[^\]]+\]\s+/, '' ) )
+			.filter( ( testPath ) =>
+				existsSync( path.resolve( ROOT_DIR, testPath ) )
+			)
 			.map( normalizeTestPath )
 	);
 }
@@ -102,15 +107,61 @@ function isValidManifestPath( testPath, expectedType ) {
 	);
 }
 
-const jestTests = listTests( 'jest', [
-	'--config',
-	JEST_CONFIG,
-	'--listTests',
-] );
 const staticInventory = discoverTestFiles( ROOT_DIR );
+const testsWithEnvironmentOverrides = staticInventory.filter( ( testPath ) =>
+	sourceHasTestEnvironmentOverride(
+		readFileSync( path.join( ROOT_DIR, testPath ), 'utf8' ),
+		testPath
+	)
+);
+assert.deepEqual(
+	testsWithEnvironmentOverrides,
+	[],
+	`Per-file test environment overrides are not allowed; use the filename suffix:\n${ testsWithEnvironmentOverrides.join(
+		'\n'
+	) }`
+);
 const expectedVitestTestsByProject = getVitestTestsByProject(
 	staticInventory,
 	manifest
+);
+const expectedVitestTests = getVitestTests( staticInventory, manifest );
+const expectedVitestTestSet = new Set( expectedVitestTests );
+const expectedJestTestsByProject = Object.fromEntries(
+	[ 'node', 'jsdom' ].map( ( projectName ) => [
+		projectName,
+		staticInventory.filter(
+			( testPath ) =>
+				! expectedVitestTestSet.has( testPath ) &&
+				getTestEnvironmentName( testPath ) === projectName
+		),
+	] )
+);
+const jestTestsByProject = Object.fromEntries(
+	Object.keys( expectedJestTestsByProject ).map( ( projectName ) => [
+		projectName,
+		listTests( 'jest', [
+			'--config',
+			JEST_CONFIG,
+			'--selectProjects',
+			projectName,
+			'--listTests',
+		] ),
+	] )
+);
+for ( const [ projectName, projectTests ] of Object.entries(
+	jestTestsByProject
+) ) {
+	assert.deepEqual(
+		[ ...projectTests ].sort(),
+		expectedJestTestsByProject[ projectName ],
+		`Jest ${ projectName } project discovery does not match filename-based ownership.`
+	);
+}
+const jestTests = new Set(
+	Object.values( jestTestsByProject ).flatMap( ( projectTests ) => [
+		...projectTests,
+	] )
 );
 const vitestTestsByProject = Object.fromEntries(
 	VITEST_PROJECT_NAMES.map( ( projectName ) => [
@@ -222,7 +273,6 @@ assert.deepEqual(
 	) }`
 );
 
-const expectedVitestTests = getVitestTests( staticInventory, manifest );
 assert.deepEqual(
 	[ ...vitestTests ].sort(),
 	expectedVitestTests,
