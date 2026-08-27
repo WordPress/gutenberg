@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useId } from '@wordpress/element';
 import { Button } from '../../../../button';
+import { Stack } from '../../../../stack';
 import * as Field from '../';
 import { DETAILS_EXAMPLE } from '../../../stories/shared';
 
@@ -156,30 +157,30 @@ export const WithDetails: StoryObj< typeof Field.Root > = {
 
 /**
  * `Field.VisualLabel` renders a purely visual label with the same styling as
- * `Field.Label`. Use it outside `Field.Root` when the control is already
- * accessibly labeled, but a visual label is still needed for layout
+ * `Field.Label`. It can be used outside `Field.Root` when the control is
+ * already accessibly labeled, but a visual label is still needed for layout
  * consistency.
  */
 export const WithVisualLabel: StoryObj = {
 	render: () => (
-		<>
+		<Stack direction="column" gap="sm">
 			<Field.VisualLabel>Author</Field.VisualLabel>
 			<Button aria-label="Select an author" variant="secondary">
 				Select an author
 			</Button>
-		</>
+		</Stack>
 	),
 };
 
 /**
  * `Field.VisualDescription` renders a purely visual description with the same
- * styling as `Field.Description`. Use it outside `Field.Root` when
+ * styling as `Field.Description`. It can be used outside `Field.Root` when
  * supplementary text is needed for layout consistency, but should not be
  * associated with a control using `aria-describedby`.
  */
 export const WithVisualDescription: StoryObj = {
 	render: () => (
-		<>
+		<Stack direction="column" gap="sm">
 			<input
 				type="text"
 				aria-label="API key"
@@ -188,6 +189,6 @@ export const WithVisualDescription: StoryObj = {
 			<Field.VisualDescription>
 				Find your API key in your account settings.
 			</Field.VisualDescription>
-		</>
+		</Stack>
 	),
 };
