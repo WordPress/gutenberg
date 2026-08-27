@@ -100,7 +100,7 @@
 	}
 	&.is-selected .block-editor-list-view-block__menu:focus,
 	&.is-selected.is-synced .block-editor-list-view-block__menu:focus {
-		--focus-color: #{$white};
+		--focus-color: #{ $white };
 		@include outset-ring__focus();
 		outline-offset: -2px;
 	}
