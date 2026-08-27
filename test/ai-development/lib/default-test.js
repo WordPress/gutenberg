@@ -1,6 +1,5 @@
-import { agentEnvironment } from './environment.js';
+import withWorkspaceChanges from './diff.js';
 import { workspace } from './paths.js';
-import { sandbox } from './sandbox.js';
 
 /**
  * Options shared by every evaluation case.
@@ -15,30 +14,31 @@ wp-env-test, Docker, development servers, or other long-running services.
 Accomplish your requested task and I will run and test the build on my own
 environment.`,
 
-		// Grades the `agent-rubric` assertions. It reads the workspace to
-		// judge what the agent actually did, rather than what it reported.
+		// Hands every assertion the agent's changes alongside its response, so
+		// a rubric can judge the diff instead of the agent's summary of it.
+		transform: withWorkspaceChanges,
+
+		// Grades `agent-rubric` assertions. Naming `working_dir` and nothing
+		// else is Promptfoo's documented grader: it applies its default
+		// allowlist of Read, Grep, Glob and LS, which is read-only, and the
+		// SDK refuses any path outside the working directory. So the grader is
+		// confined without a sandbox — the sandbox only wraps Bash, and a
+		// grader with no Bash has nothing for it to wrap.
+		//
+		// That also makes the transform above load-bearing rather than
+		// redundant: with no shell the grader cannot run `git diff` itself, so
+		// the transform shows it what changed and its read-only tools let it
+		// check that against the repository's own references.
 		provider: {
 			id: 'anthropic:claude-agent-sdk',
 			config: {
 				apiKeyRequired: false,
 				model: 'opus',
 				working_dir: workspace,
-				// The grader inspects a workspace; it needs no skills and no
-				// project instructions. Left unset, every settings source is
-				// loaded, which would include the developer's own ~/.claude.
+				// Left unset, every settings source is loaded, which would put
+				// the developer's own ~/.claude instructions into the grader's
+				// context and make a grade depend on whose machine it ran on.
 				setting_sources: [],
-				// The grader inspects the workspace; it never edits it.
-				tools: [ 'Bash' ],
-				custom_allowed_tools: [ 'Bash' ],
-				disallowed_tools: [ 'WebFetch', 'WebSearch' ],
-				// Bash is the grader's only tool, so the sandbox alone confines
-				// it: writes cannot leave the workspace, and a rubric asking
-				// whether a file exists cannot be satisfied by the grader
-				// creating it. Denying the checkout is what stops a rubric
-				// being answered from the original source rather than from the
-				// agent's work.
-				sandbox,
-				env: agentEnvironment,
 			},
 		},
 	},

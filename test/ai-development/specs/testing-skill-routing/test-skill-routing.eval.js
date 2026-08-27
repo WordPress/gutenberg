@@ -60,28 +60,44 @@ the block's serialized markup.`,
 					},
 					metric: 'Skipped the PHPUnit reference',
 				},
-				// Runs a second agent against the finished workspace to judge
-				// the change itself. Deterministic assertions cannot tell
-				// whether a test is any good; this can, at the cost of being
-				// a judgement rather than a measurement.
+				// Judges the change itself. Deterministic assertions cannot
+				// tell whether a test is any good; this can, at the cost of
+				// being a judgement rather than a measurement.
+				//
+				// `agent-rubric` rather than `llm-rubric` because the last
+				// criterion sends the grader to a file: it checks the change
+				// against the repository's own reference instead of against a
+				// copy of it pasted here, which would drift as that reference
+				// changes. The grader reads the diff from the response, which
+				// `lib/diff.js` put there, and has read-only tools for the
+				// rest of the workspace.
 				{
 					type: 'agent-rubric',
-					value: `Inspect the available workspace's Git status, diff, and relevant
-files. Pass only if the change:
-- adds a focused Gutenberg Playwright E2E test;
-- stays scoped to the paragraph block spec;
-- inserts a \`core/paragraph\` and types text through the editor UI;
-- applies center alignment through the editor UI rather than by setting block
+					value: `Judge the diff in the "Diff" section, not the agent's summary
+above it. Where the two disagree, the diff is what happened.
+
+Score 1.0 only if every one of these holds:
+- it adds a Gutenberg Playwright E2E test, and changes nothing beyond the
+  paragraph block spec it belongs in;
+- the test inserts a \`core/paragraph\` and types its text through the editor
+  UI, not by setting block attributes directly;
+- it applies center alignment through the editor UI, not by setting block
   attributes directly;
-- reads the serialized post content with \`editor.getEditedPostContent()\`;
-- expects the serialized markup to carry the \`has-text-align-center\` class and
-  to record the alignment under the block's \`style.typography.textAlign\`
-  attribute — \`{"style":{"typography":{"textAlign":"center"}}}\`, not the legacy
-  \`{"align":"center"}\` form, which is only parsed as input and would make the
-  test fail; and
-- follows conventions and rules explained in .agents/skills/testing/references/e2e.md
-Evaluate the workspace rather than claims in the response.`,
-					metric: 'Agent review of test quality',
+- it reads the serialized post content with \`editor.getEditedPostContent()\`;
+- it expects the serialized markup to carry the \`has-text-align-center\` class;
+- it expects the alignment recorded under the block's \`style.typography.textAlign\`
+  attribute — \`{"style":{"typography":{"textAlign":"center"}}}\`. The legacy
+  \`{"align":"center"}\` form is only parsed as input and would make the test
+  fail, so expecting it fails this criterion;
+- it follows the conventions in \`.agents/skills/testing/references/e2e.md\`.
+  Read that file in the workspace and check the change against what it actually
+  says, rather than against your own expectations of a Playwright test.
+
+Score 0.5 if it adds a plausible E2E test for this behavior but misses one or
+two of the above. Score 0.0 if it adds no test, edits unrelated files, or
+asserts the legacy attribute form.`,
+					threshold: 0.75,
+					metric: 'Review of test quality',
 				},
 			],
 		},

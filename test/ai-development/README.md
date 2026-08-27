@@ -22,8 +22,8 @@ Promptfoo runs the prompt × provider × test × repeat matrix. Its standard lif
                  │                        │
        ┌─────────┴─────────┐              │
        ▼                   ▼              │
-  tool calls          live workspace      │
-                      + agent response    │
+  tool calls        agent response        │
+                    + captured diff       │
        │                   │              │
        └─────────┬─────────┘              │
                  ▼                        │
@@ -74,9 +74,19 @@ See [Claude Code sandboxing](https://code.claude.com/docs/en/sandboxing) and [pe
 
 ### Grading code changes
 
-Promptfoo's built-in trajectory assertions deterministically check tool calls, including which testing references the agent read or skipped. Its built-in `agent-rubric` receives read-only access to the live workspace, where the grading agent inspects Git status, the diff, relevant documentation, and changed files against the spec's rubric. This keeps code review inside Promptfoo without relying on the subject agent's final message or custom diff processing.
+An agent's response is its account of what it did, not what it did. Promptfoo's coding-agent guide puts it plainly: the output "is its final text response describing what it did, not the file contents", and file-level verification means reading the files after the eval.
 
-The grader runs under the same confinement, with `Bash` as its only tool. Denying it the checkout is what stops a rubric being answered from the original source rather than from the agent's work.
+So the harness reads them. `lib/diff.js` is a Promptfoo transform that stages the workspace and appends `git status` and the diff to the response before any assertion runs. Rubrics then judge that diff, and are told to prefer it wherever it contradicts the agent's summary.
+
+Taking the diff here rather than having a grading agent go and find it matters for two reasons. A model-graded assertion defers grading onto a queue, so a grader inspecting the workspace itself would be racing the `afterEach` rollback for the state it is judging. And running Git from the harness keeps it out of the sandbox, where it would need tool permissions and a readable global config.
+
+Judgement that the diff alone cannot support — whether a change follows the repository's own references — stays with `agent-rubric`, which Promptfoo documents for exactly this: verifying a claimed code change against the artifact rather than the response.
+
+Its grading provider names `working_dir` and nothing else, which is Promptfoo's documented form. That gives it the default allowlist of `Read`, `Grep`, `Glob` and `LS` — read-only, and the SDK refuses any path outside the working directory. It needs no sandbox, because the sandbox wraps Bash and this grader has none. Giving a grader a shell is what would drag in a sandbox, a readable global Git config, and the write access Promptfoo's safety guidance tells you to avoid.
+
+That is also why the transform is not redundant: with no shell the grader cannot run `git diff` itself. The transform shows it what changed; its read-only tools let it check that against `.agents/skills/`.
+
+Use `llm-rubric` instead wherever a rubric only needs the response and the diff — Promptfoo's rule is that a judge needing to inspect an artifact takes `agent-rubric`, and one that doesn't takes `llm-rubric`.
 
 ## Setup
 
