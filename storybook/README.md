@@ -8,6 +8,46 @@ View online at: https://wordpress.github.io/gutenberg/
 
 Run locally in your development environment running: `npm run storybook:dev` from the top-level Gutenberg directory.
 
+## Stable story URLs
+
+Every story and doc declares an explicit `id`. The `id` is the story's URL; the `title` is only its position in the sidebar:
+
+```
+wordpress.github.io/gutenberg/?path=/docs/components-card--docs
+                                          ^ the id
+```
+
+Without an `id`, Storybook derives one from the `title` on every build, so moving a story to another sidebar folder silently changes its URL and breaks every existing link to it. Declaring the `id` decouples the two: the sidebar can be reorganized freely, and published URLs stay put.
+
+Set it next to the `title`, in CSF:
+
+```ts
+const meta: Meta< typeof Card > = {
+	title: 'Components/Containers/Card', // Sidebar position, free to change.
+	id: 'components-card', // URL, frozen.
+};
+```
+
+And in MDX:
+
+```mdx
+<Meta
+	title="Design System/Components/Introduction"
+	id="design-system-components-introduction"
+/>
+```
+
+For a new story, use the ID Storybook would have derived anyway: the lowercased `title` with each non-alphanumeric run replaced by a single hyphen (`Components/Containers/Card` becomes `components-containers-card`). For an existing one, never change the `id` — that is the link everyone already has.
+
+An MDX doc attached to a CSF file with `of={ … }` inherits that file's `id` and declares nothing of its own.
+
+Two checks keep this from eroding:
+
+-   `storybook/test/story-ids.test.ts` fails when a story or doc is missing an `id`.
+-   `storybook/story-ids.txt` is a committed list of every story and doc URL. CI regenerates it and fails when an ID it used to contain has disappeared, so losing a published URL has to be deliberate rather than a side effect of a rename. Regenerate it with `npm run storybook:story-id-snapshot` and commit the result. It reads the story index from source, so no Storybook build is needed.
+
+Documentation for a deprecated component is meant to stay reachable, so the usual answer for an outdated page is to mark it deprecated and point at its replacement rather than delete it.
+
 ## Manifest snapshot regression testing
 
 Storybook upgrades and inocuous code refactoring have been a frequent source of accidental documentation regressions, resulting in component or prop descriptions being accidentally removed.
