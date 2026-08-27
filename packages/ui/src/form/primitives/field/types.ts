@@ -94,8 +94,5 @@ export type FieldDetailsProps = ComponentProps< 'div' > & {
 
 export type FieldVisualLabelProps = ComponentProps< 'span' > &
 	FieldLabelVariantProps & {
-		/**
-		 * The visual label content.
-		 */
 		children?: React.ReactNode;
 	};
