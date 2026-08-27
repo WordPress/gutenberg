@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Prevent the block editor from crashing when links that do not open in a new tab are clicked within the editor canvas (such as in a Custom HTML block) ([#82012](https://github.com/WordPress/gutenberg/issues/82012)).
 -   Inserter: Keep the hovered block preview inside the viewport, so a tall preview in a short window is no longer clipped ([#82060](https://github.com/WordPress/gutenberg/pull/82060)).
 -   Client-side media processing: Refuse a batch of more than one file when the caller only takes one, such as a Cover block placeholder, matching what the server-side upload path already did. Every dropped file was uploaded instead, and the block kept whichever one finished last ([#82041](https://github.com/WordPress/gutenberg/issues/82041)).
 
