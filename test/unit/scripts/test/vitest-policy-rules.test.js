@@ -147,6 +147,7 @@ describe( 'Vitest policy rules', () => {
 
 	it( 'tracks Testing Library render results', () => {
 		for ( const source of [
+			"import { render } from '@testing-library/react';\nrender( <button /> ).getByRole( 'button' ).offsetWidth;",
 			"import { render } from '@testing-library/react';\nconst { getByRole } = render( <button /> );\ngetByRole( 'button' ).offsetWidth;",
 			"import { render } from '@testing-library/react';\nconst { container } = render( <button /> );\ncontainer.offsetWidth;",
 			"import { render } from '@testing-library/react';\nconst result = render( <button /> );\nresult.container.offsetWidth;",
@@ -158,11 +159,14 @@ describe( 'Vitest policy rules', () => {
 	} );
 
 	it( 'tracks Testing Library within results', () => {
-		expectViolation(
+		for ( const source of [
+			"import { within } from '@testing-library/react';\nwithin( document.body ).getByRole( 'button' ).offsetWidth;",
 			"import { within } from '@testing-library/react';\nconst { getByRole } = within( document.body );\ngetByRole( 'button' ).offsetWidth;",
-			'require Browser Mode',
-			{ project: 'jsdom' }
-		);
+		] ) {
+			expectViolation( source, 'require Browser Mode', {
+				project: 'jsdom',
+			} );
+		}
 	} );
 
 	it( 'tracks computed-style aliases and document.defaultView', () => {

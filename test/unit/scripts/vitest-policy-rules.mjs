@@ -296,6 +296,7 @@ function isTestingLibraryQueryExpression(
 
 	const receiver = node.callee.object;
 	if (
+		testingLibraryScreenVariables.has( receiver ) ||
 		isVariableReference(
 			receiver,
 			testingLibraryScreenVariables,
@@ -1032,8 +1033,8 @@ export function validateVitestPolicy( {
 	const testingLibraryFireEventVariables = new Set();
 	const testingLibraryNamespaceVariables = new Set();
 	const testingLibraryQueryContainerFunctionVariables = new Set();
-	// This set contains `screen` and query containers returned by `render` or
-	// `within`.
+	// This set contains `screen` bindings and query container expressions or
+	// bindings returned by `render` and `within`.
 	const testingLibraryScreenVariables = new Set();
 	const vitestExpectVariables = new Set();
 	const vitestNamespaceVariables = new Set();
@@ -1205,6 +1206,17 @@ export function validateVitestPolicy( {
 			vitestViVariables.size +
 			windowVariables.size;
 		traverseAst( ast, visitorKeys, ( node ) => {
+			if (
+				isTestingLibraryQueryContainerExpression(
+					node,
+					testingLibraryQueryContainerFunctionVariables,
+					testingLibraryNamespaceVariables,
+					identifierVariables
+				)
+			) {
+				testingLibraryScreenVariables.add( node );
+			}
+
 			const { target, value } = getTrackedAssignment( node );
 
 			if ( ! value || ! target ) {
