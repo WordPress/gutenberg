@@ -1249,6 +1249,7 @@ function getReachableLocalValues(
 		node.callee?.type === 'MemberExpression' &&
 		getMemberPropertyName( node.callee ) === 'bind'
 	) {
+		const boundArgumentCount = Math.max( 0, node.arguments.length - 1 );
 		for ( const value of getReachableLocalValues(
 			node.callee.object,
 			useNode,
@@ -1260,7 +1261,7 @@ function getReachableLocalValues(
 				localValues.add( {
 					...value,
 					boundArgumentCount:
-						value.boundArgumentCount + node.arguments.length - 1,
+						value.boundArgumentCount + boundArgumentCount,
 				} );
 			} else if (
 				[
@@ -1272,7 +1273,7 @@ function getReachableLocalValues(
 				localValues.add( {
 					type: 'BoundFunction',
 					functionNode: value,
-					boundArgumentCount: node.arguments.length - 1,
+					boundArgumentCount,
 				} );
 			}
 		}

@@ -187,6 +187,7 @@ describe( 'Vitest policy rules', () => {
 			"import { screen } from '@testing-library/react';\nscreen.getAllByRole( 'button' ).map( condition ? ( button ) => button.offsetWidth : ( item ) => item.value );",
 			"import { screen } from '@testing-library/react';\nconst callbacks = { width: ( button ) => button.offsetWidth };\nscreen.getAllByRole( 'button' ).map( callbacks.width );",
 			"import { screen } from '@testing-library/react';\nconst width = ( button ) => button.offsetWidth;\nscreen.getAllByRole( 'button' ).map( width.bind( null ) );",
+			"import { screen } from '@testing-library/react';\nconst width = ( button ) => button.offsetWidth;\nscreen.getAllByRole( 'button' ).map( width.bind() );",
 			"import { screen } from '@testing-library/react';\nconst width = ( label, button ) => button.offsetWidth;\nscreen.getAllByRole( 'button' ).map( width.bind( null, 'width' ) );",
 			"import { screen } from '@testing-library/react';\nconst width = ( label, button ) => button.offsetWidth;\nscreen.getAllByRole( 'button' ).findIndex( width.bind( null, 'width' ) );",
 			"import { screen } from '@testing-library/react';\nconst width = ( label, button ) => button.offsetWidth;\nscreen.getAllByRole( 'button' ).findLastIndex( width.bind( null, 'width' ) );",
