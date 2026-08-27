@@ -14,7 +14,6 @@ import postcssModules from 'postcss-modules';
 import autoprefixer from 'autoprefixer';
 import rtlcss from 'rtlcss';
 import cssnano from 'cssnano';
-import babel from 'esbuild-plugin-babel';
 import { camelCase } from 'change-case';
 import { NodePackageImporter } from 'sass-embedded';
 import {
@@ -28,6 +27,7 @@ import {
 	renderTemplateToString,
 } from './php-generator.mjs';
 import { getPackageInfo, getPackageInfoFromFile } from './package-utils.mjs';
+import { createBabelPlugin } from './babel-plugin.mjs';
 import { createWordpressExternalsPlugin } from './wordpress-externals-plugin.mjs';
 import {
 	getAllRoutes,
@@ -1386,7 +1386,7 @@ async function transpilePackage( packageName ) {
 	// Check if this is the components package that needs emotion babel plugin.
 	// Ideally we should remove this exception and move away from emotion.
 	const needsEmotionPlugin = packageName === 'components';
-	const emotionPlugin = babel( {
+	const emotionPlugin = createBabelPlugin( {
 		filter: /\.[jt]sx?$/,
 		config: {
 			plugins: [ styleRuntimeRequire.resolve( '@emotion/babel-plugin' ) ],
