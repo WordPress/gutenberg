@@ -1161,6 +1161,263 @@ test.describe( 'List (@firefox)', () => {
 		);
 	} );
 
+	test( 'should try to preserve the indentation level of nested items as their parent gets merged', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+
+		await page.keyboard.type( '* a' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( ' b' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( ' c' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'd' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( 'e' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'a' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'b' },
+										innerBlocks: [
+											{
+												name: 'core/list',
+												innerBlocks: [
+													{
+														name: 'core/list-item',
+														attributes: {
+															content: 'c',
+														},
+													},
+													{
+														name: 'core/list-item',
+														attributes: {
+															content: 'd',
+														},
+													},
+												],
+											},
+										],
+									},
+								],
+							},
+						],
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'e' },
+					},
+				],
+			},
+		] );
+
+		// Place caret to the right of list-item "c"
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowRight' );
+
+		// Backspace should empty the text of that list-item, and nothing else
+		await page.keyboard.press( 'Backspace' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'a' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'b' },
+										innerBlocks: [
+											{
+												name: 'core/list',
+												innerBlocks: [
+													{
+														name: 'core/list-item',
+														attributes: {
+															content: '',
+														},
+													},
+													{
+														name: 'core/list-item',
+														attributes: {
+															content: 'd',
+														},
+													},
+												],
+											},
+										],
+									},
+								],
+							},
+						],
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'e' },
+					},
+				],
+			},
+		] );
+
+		// Now that the item is empty, backspace should outdent it by one level
+		await page.keyboard.press( 'Backspace' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'a' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'b' },
+									},
+									{
+										name: 'core/list-item',
+										attributes: { content: '' },
+										innerBlocks: [
+											{
+												name: 'core/list',
+												innerBlocks: [
+													{
+														name: 'core/list-item',
+														attributes: {
+															content: 'd',
+														},
+													},
+												],
+											},
+										],
+									},
+								],
+							},
+						],
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'e' },
+					},
+				],
+			},
+		] );
+
+		// Another backspace outdents the item to the root of the list
+		await page.keyboard.press( 'Backspace' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'a' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'b' },
+									},
+								],
+							},
+						],
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: '' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: {
+											content: 'd',
+										},
+									},
+								],
+							},
+						],
+					},
+
+					{
+						name: 'core/list-item',
+						attributes: { content: 'e' },
+					},
+				],
+			},
+		] );
+
+		// Finally, backspace at the list root should merge into "b", BUT NOW
+		// IT WOULD BE GREAT IF "d" WENT BACK TO ITS ORIGINAL INDENTATION
+		// LEVEL, I.E. IT SHOULD BECOME A CHILD OF "b", NOT ITS SIBLING.
+		await page.keyboard.press( 'Backspace' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'a' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'b' },
+										innerBlocks: [
+											{
+												name: 'core/list',
+												innerBlocks: [
+													{
+														name: 'core/list-item',
+														attributes: {
+															content: 'd',
+														},
+													},
+												],
+											},
+										],
+									},
+								],
+							},
+						],
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'e' },
+					},
+				],
+			},
+		] );
+	} );
+
 	test( 'should place the caret in the right place with nested list', async ( {
 		editor,
 		page,
