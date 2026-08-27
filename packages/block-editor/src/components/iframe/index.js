@@ -3,14 +3,10 @@ import { version as reactVersion } from 'react';
 import { useState, createPortal, forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs, useRefEffect, useDisabled } from '@wordpress/compose';
-import {
-	__experimentalStyleProvider as StyleProvider,
-	Popover,
-} from '@wordpress/components';
-import { Link, Stack, Text } from '@wordpress/ui';
-import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
+import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useWritingFlow } from '../writing-flow';
+import InterceptedLinkPopover from '../intercepted-link-popover';
 import { getCompatibilityStyles } from './get-compatibility-styles';
 import { useScaleCanvas } from './use-scale-canvas';
 import { store as blockEditorStore } from '../../store';
@@ -133,41 +129,6 @@ function getIframeSrc( resolvedAssets ) {
 	iframeSrcCache.set( resolvedAssets, src );
 	iframeSrcCleanup?.register( resolvedAssets, src );
 	return src;
-}
-
-/**
- * Popover shown when a link click in the editor canvas has been intercepted to
- * keep it from navigating the canvas away. It surfaces the link target so that
- * the user can decide whether to follow it in a new tab.
- *
- * @param {Object}      props
- * @param {HTMLElement} props.anchor  The link element that was clicked.
- * @param {Function}    props.onClose Called when the popover should be dismissed.
- */
-function InterceptedLinkPopover( { anchor, onClose } ) {
-	// `href` is the resolved URL, which is what the click would have navigated to.
-	const { href } = anchor;
-
-	return (
-		<Popover
-			className="block-editor-iframe__intercepted-link-popover"
-			anchor={ anchor }
-			placement="bottom"
-			shift
-			focusOnMount="firstElement"
-			onClose={ onClose }
-			onFocusOutside={ onClose }
-		>
-			<Stack direction="column" gap="xs" align="flex-start">
-				<Text variant="body-sm">
-					{ __( 'Links are disabled in the editor.' ) }
-				</Text>
-				<Link href={ href } openInNewTab>
-					{ filterURLForDisplay( safeDecodeURI( href ) ) }
-				</Link>
-			</Stack>
-		</Popover>
-	);
 }
 
 function Iframe( {
@@ -447,6 +408,9 @@ function Iframe( {
 			</div>
 			{ ! isPreviewMode && interceptedLinkAnchor && (
 				<InterceptedLinkPopover
+					// `href` is the resolved URL, which is what the click
+					// would have navigated to.
+					href={ interceptedLinkAnchor.href }
 					anchor={ interceptedLinkAnchor }
 					onClose={ () => setInterceptedLinkAnchor( undefined ) }
 				/>

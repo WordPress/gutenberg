@@ -18,12 +18,8 @@ test.describe( 'Links in the editor canvas', () => {
 		await editor.canvas.getByRole( 'link', { name: 'Contact Us' } ).click();
 
 		const popover = page.locator(
-			'.block-editor-iframe__intercepted-link-popover'
+			'.block-editor-intercepted-link-popover'
 		);
-		await expect(
-			popover.getByText( 'Links are disabled in the editor.' )
-		).toBeVisible();
-
 		const link = popover.getByRole( 'link', {
 			name: 'wordpress.org/support',
 		} );
@@ -61,7 +57,49 @@ test.describe( 'Links in the editor canvas', () => {
 		await newTab.close();
 
 		await expect(
-			page.locator( '.block-editor-iframe__intercepted-link-popover' )
+			page.locator( '.block-editor-intercepted-link-popover' )
 		).toBeHidden();
+	} );
+
+	test( 'shows a popover for links inside the Custom HTML preview', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.setContent(
+			`<!-- wp:html -->
+<div><a href="https://wordpress.org/support/">Contact Us</a></div>
+<!-- /wp:html -->`
+		);
+
+		await editor.canvas.locator( '[data-type="core/html"]' ).click();
+		await editor.showBlockToolbar();
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Edit code' } )
+			.click();
+
+		// The preview renders the content in a sandboxed iframe, which the
+		// canvas' own click handling cannot reach.
+		const preview = page.frameLocator(
+			'.block-library-html__preview iframe'
+		);
+		await preview.getByRole( 'link', { name: 'Contact Us' } ).click();
+
+		const popover = page.locator(
+			'.block-editor-intercepted-link-popover'
+		);
+		const link = popover.getByRole( 'link', {
+			name: 'wordpress.org/support',
+		} );
+		await expect( link ).toHaveAttribute(
+			'href',
+			'https://wordpress.org/support/'
+		);
+		await expect( link ).toHaveAttribute( 'target', '_blank' );
+
+		// The preview still shows the sandboxed content, not the linked page.
+		await expect(
+			preview.getByRole( 'link', { name: 'Contact Us' } )
+		).toBeVisible();
 	} );
 } );

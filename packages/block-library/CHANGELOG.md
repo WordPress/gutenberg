@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   HTML: Intercept clicks on links in the Custom HTML preview, which would otherwise replace the preview with the linked page. The link target is shown in a popover instead, from where it can be opened in a new tab ([#82012](https://github.com/WordPress/gutenberg/issues/82012)).
+
 ## 10.5.0 (2026-08-26)
 
 ### Enhancements

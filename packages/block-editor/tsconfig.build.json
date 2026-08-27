@@ -45,6 +45,7 @@
 	"files": [
 		"src/lock-unlock.ts",
 		"src/components/block-context/index.js",
+		"src/components/intercepted-link-popover/index.tsx",
 		"src/components/block-visibility/constants.ts",
 		"src/components/block-visibility/use-block-visibility.ts"
 	],

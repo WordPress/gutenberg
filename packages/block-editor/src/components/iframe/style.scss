@@ -22,11 +22,3 @@
 	position: absolute;
 	right: 0;
 }
-
-.block-editor-iframe__intercepted-link-popover .components-popover__content {
-	padding: $grid-unit-15;
-	// A fixed width, because the URL is unpredictably long and `overflow-wrap`
-	// would otherwise shrink the popover down to a single character.
-	width: 280px;
-	overflow-wrap: break-word;
-}

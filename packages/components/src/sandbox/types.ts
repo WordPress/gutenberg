@@ -69,4 +69,30 @@ export type SandBoxProps = {
 	 * @default 0
 	 */
 	tabIndex?: HTMLElement[ 'tabIndex' ];
+	/**
+	 * Called when a link inside the sandboxed content is clicked.
+	 *
+	 * Passing this handler also stops such a click from navigating the sandbox
+	 * away. The iframe has no `allow-top-navigation`, so a link can only
+	 * replace the sandboxed content itself with the linked page, which is
+	 * rarely what a preview wants. Use this to offer the link to the user
+	 * instead, for example in a popover anchored to it.
+	 */
+	onLinkClick?: ( link: SandBoxLink ) => void;
+};
+
+export type SandBoxLink = {
+	/**
+	 * The URL of the clicked link.
+	 */
+	href: string;
+	/**
+	 * Virtual element tracking the clicked link's position, in the coordinate
+	 * space of the document containing the sandbox. Suitable as a `Popover`
+	 * `anchor`.
+	 */
+	anchor: {
+		getBoundingClientRect: () => DOMRect;
+		contextElement: HTMLIFrameElement;
+	};
 };

@@ -1,0 +1,6 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.block-editor-intercepted-link-popover .components-popover__content {
+	padding: $grid-unit-20;
+	white-space: nowrap;
+}

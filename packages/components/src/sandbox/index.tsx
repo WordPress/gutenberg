@@ -6,8 +6,8 @@ import {
 	useEffect,
 	useMemo,
 } from '@wordpress/element';
-import { useFocusableIframe, useMergeRefs } from '@wordpress/compose';
-import type { SandBoxProps } from './types';
+import { useEvent, useFocusableIframe, useMergeRefs } from '@wordpress/compose';
+import type { SandBoxLink, SandBoxProps } from './types';
 
 type SandBoxContentProps = Omit< SandBoxProps, 'allowSameOrigin' >;
 
@@ -138,6 +138,56 @@ const observeAndResizeJS = function () {
 	}
 };
 
+/**
+ * Injected into the sandbox document to stop link clicks from replacing the
+ * sandboxed content with the linked page, and to report the click to the
+ * containing document instead. Serialized with `.toString()`, so it must not
+ * reference anything outside its own body.
+ */
+const interceptLinkClicksJS = function () {
+	// Registered on the document, which exists while this runs in the <head>,
+	// unlike the body.
+	document.addEventListener( 'click', function ( event ) {
+		// The sandboxed content may handle the click itself.
+		if ( event.defaultPrevented ) {
+			return;
+		}
+
+		const target = event.target as Element | null;
+		const anchor = target?.closest?.( 'a[href]' ) as HTMLAnchorElement;
+
+		if ( ! anchor ) {
+			return;
+		}
+
+		// A fragment link scrolls within the sandbox, which leaves the
+		// preview intact.
+		if ( anchor.getAttribute( 'href' )?.startsWith( '#' ) ) {
+			return;
+		}
+
+		event.preventDefault();
+
+		const rect = anchor.getBoundingClientRect();
+
+		window.parent.postMessage(
+			{
+				action: 'linkclick',
+				// `href` is the resolved URL, which is what the click would
+				// have navigated to.
+				href: anchor.href,
+				rect: {
+					x: rect.x,
+					y: rect.y,
+					width: rect.width,
+					height: rect.height,
+				},
+			},
+			'*'
+		);
+	} );
+};
+
 // TODO: These styles shouldn't be coupled with WordPress.
 const style = `
 	body {
@@ -179,13 +229,15 @@ const style = `
  * Exported for tests.
  *
  * @param props
- * @param props.html    User-supplied HTML for the iframe body.
- * @param props.title   Document title.
- * @param props.type    Optional class name for the `<html>`/`<body>` elements.
- * @param props.styles  CSS rule strings, injected as `<style>` tags in the head.
- * @param props.scripts External script URLs, injected as `<script src>` in the
- *                      body (embeds expect their scripts there).
- * @param props.lang    Language for the `<html lang>` attribute.
+ * @param props.html           User-supplied HTML for the iframe body.
+ * @param props.title          Document title.
+ * @param props.type           Optional class name for the `<html>`/`<body>` elements.
+ * @param props.styles         CSS rule strings, injected as `<style>` tags in the head.
+ * @param props.scripts        External script URLs, injected as `<script src>` in the
+ *                             body (embeds expect their scripts there).
+ * @param props.lang           Language for the `<html lang>` attribute.
+ * @param props.interceptLinks Whether to also inject the script that stops link
+ *                             clicks from navigating the sandbox away.
  * @return The full `<!DOCTYPE html>…` document string.
  */
 export function buildSandBoxDocument( {
@@ -195,6 +247,7 @@ export function buildSandBoxDocument( {
 	styles,
 	scripts,
 	lang,
+	interceptLinks = false,
 }: {
 	html: string;
 	title: string;
@@ -202,6 +255,7 @@ export function buildSandBoxDocument( {
 	styles: string[];
 	scripts: string[];
 	lang: string;
+	interceptLinks?: boolean;
 } ): string {
 	const htmlDoc = (
 		<html lang={ lang } className={ type }>
@@ -220,6 +274,14 @@ export function buildSandBoxDocument( {
 						__html: `(${ observeAndResizeJS.toString() })();`,
 					} }
 				/>
+				{ interceptLinks && (
+					<script
+						type="text/javascript"
+						dangerouslySetInnerHTML={ {
+							__html: `(${ interceptLinkClicksJS.toString() })();`,
+						} }
+					/>
+				) }
 			</head>
 			<body
 				data-resizable-iframe-connected="data-resizable-iframe-connected"
@@ -234,6 +296,56 @@ export function buildSandBoxDocument( {
 	);
 
 	return '<!DOCTYPE html>' + renderToString( htmlDoc );
+}
+
+type SandBoxMessage = {
+	action?: string;
+	href?: string;
+	rect?: DOMRectInit;
+};
+
+/**
+ * Turns a `linkclick` message from the sandbox document into a `SandBoxLink`,
+ * resolving the reported rect against the iframe's own position so the anchor
+ * lives in the containing document's coordinate space. The rect is resolved on
+ * each call rather than captured, so the anchor keeps up with scrolling and
+ * resizing.
+ *
+ * @param iframe      The sandbox iframe.
+ * @param onLinkClick Consumer handler.
+ * @param data        The message payload, as posted by `interceptLinkClicksJS`.
+ * @return Whether the message was a link click and has been handled.
+ */
+function handleLinkClickMessage(
+	iframe: HTMLIFrameElement,
+	onLinkClick: ( ( link: SandBoxLink ) => void ) | undefined,
+	data: SandBoxMessage
+): boolean {
+	if ( data.action !== 'linkclick' ) {
+		return false;
+	}
+
+	const { href, rect } = data;
+
+	if ( onLinkClick && href && rect ) {
+		onLinkClick( {
+			href,
+			anchor: {
+				getBoundingClientRect() {
+					const frameRect = iframe.getBoundingClientRect();
+					return new window.DOMRect(
+						frameRect.left + ( rect.x ?? 0 ),
+						frameRect.top + ( rect.y ?? 0 ),
+						rect.width,
+						rect.height
+					);
+				},
+				contextElement: iframe,
+			},
+		} );
+	}
+
+	return true;
 }
 
 /**
@@ -258,10 +370,15 @@ function IsolatedSandBox( {
 	tabIndex,
 	allowPopups = false,
 	allowForms = false,
+	onLinkClick,
 }: SandBoxContentProps ) {
 	const ref = useRef< HTMLIFrameElement >( null );
 	const [ width, setWidth ] = useState( 0 );
 	const [ height, setHeight ] = useState( 0 );
+	const interceptLinks = !! onLinkClick;
+	const onLinkClickEvent = useEvent(
+		( link: SandBoxLink ) => onLinkClick?.( link )
+	);
 
 	const sandbox = clsx( 'allow-scripts', 'allow-presentation', {
 		'allow-popups': allowPopups,
@@ -276,12 +393,13 @@ function IsolatedSandBox( {
 				type,
 				styles,
 				scripts,
+				interceptLinks,
 				// Read inside the memo: the `no-dom-globals-in-react-fc` lint
 				// rule forbids DOM globals in the render body. `lang` rarely
 				// changes after load, so leaving it out of the deps is fine.
 				lang: document.documentElement.lang,
 			} ),
-		[ html, title, type, styles, scripts ]
+		[ html, title, type, styles, scripts, interceptLinks ]
 	);
 
 	useEffect( () => {
@@ -306,6 +424,10 @@ function IsolatedSandBox( {
 				try {
 					data = JSON.parse( data );
 				} catch {}
+			}
+
+			if ( handleLinkClickMessage( iframe, onLinkClickEvent, data ) ) {
+				return;
 			}
 
 			// Update the state only if the message is formatted as we expect,
@@ -385,10 +507,15 @@ function SameOriginSandBox( {
 	tabIndex,
 	allowPopups = false,
 	allowForms = false,
+	onLinkClick,
 }: SandBoxContentProps ) {
 	const ref = useRef< HTMLIFrameElement >( null );
 	const [ width, setWidth ] = useState( 0 );
 	const [ height, setHeight ] = useState( 0 );
+	const interceptLinks = !! onLinkClick;
+	const onLinkClickEvent = useEvent(
+		( link: SandBoxLink ) => onLinkClick?.( link )
+	);
 
 	const sandbox = clsx(
 		'allow-scripts',
@@ -444,6 +571,7 @@ function SameOriginSandBox( {
 				type,
 				styles,
 				scripts,
+				interceptLinks,
 				lang: ownerDocument.documentElement.lang,
 			} )
 		);
@@ -472,6 +600,10 @@ function SameOriginSandBox( {
 				try {
 					data = JSON.parse( data );
 				} catch {}
+			}
+
+			if ( handleLinkClickMessage( iframe, onLinkClickEvent, data ) ) {
+				return;
 			}
 
 			// Update the state only if the message is formatted as we expect,
@@ -515,7 +647,7 @@ function SameOriginSandBox( {
 		trySandBox( true );
 		// Passing `exhaustive-deps` will likely involve a more detailed refactor.
 		// See https://github.com/WordPress/gutenberg/pull/44378
-	}, [ html, type ] );
+	}, [ html, type, interceptLinks ] );
 
 	return (
 		<iframe

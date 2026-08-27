@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   `SandBox`: Add an `onLinkClick` prop. Passing it stops a link click inside the sandboxed content from replacing that content with the linked page, and reports the link's URL and position to the consumer instead ([#82012](https://github.com/WordPress/gutenberg/issues/82012)).
 -   `Popover`: Widen `offset` to also accept an object with separate main and cross axis offsets. The same applies to `BorderBoxControl`'s `popoverOffset` prop ([#82060](https://github.com/WordPress/gutenberg/pull/82060)).
 
 ## 40.0.0 (2026-08-26)
