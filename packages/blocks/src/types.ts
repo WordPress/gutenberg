@@ -219,6 +219,9 @@ export interface BlockAttribute {
 
 /**
  * The properties shared by every kind of block transform.
+ *
+ * Internal: consumers narrow a `BlockTransform` on its `type` and get one of the
+ * variants below, or write helpers generic over `BlockTransform` itself.
  */
 interface BlockTransformBase {
 	/**
@@ -226,12 +229,6 @@ interface BlockTransformBase {
 	 * Defaults to `10`.
 	 */
 	priority?: number;
-	/**
-	 * The name of the block type declaring the transform. Added by
-	 * `getBlockTransforms` when normalizing a transform, not declared by the
-	 * block type itself.
-	 */
-	blockName?: string;
 }
 
 /**
