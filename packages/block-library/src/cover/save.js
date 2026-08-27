@@ -97,6 +97,13 @@ export default function save( { attributes } ) {
 
 	const gradientValue = gradient || customGradient;
 
+	const shouldShowBackgroundOverlay = !! (
+		customOverlayColor ||
+		overlayColor ||
+		gradientValue ||
+		( url && dimRatio !== undefined )
+	);
+
 	return (
 		<Tag { ...useBlockProps.save( { className: classes, style } ) }>
 			{ ! useFeaturedImage &&
@@ -154,25 +161,27 @@ export default function save( { attributes } ) {
 			works properly. If it needs to be changed in the future, the
 			selector for the backward compatibility for v14 deprecation also
 			needs change. */ }
-			<span
-				aria-hidden="true"
-				className={ clsx(
-					'wp-block-cover__background',
-					overlayColorClass,
-					dimRatioToClass( dimRatio ),
-					{
-						'has-background-dim': dimRatio !== undefined,
-						// For backwards compatibility. Former versions of the Cover Block applied
-						// `.wp-block-cover__gradient-background` in the presence of
-						// media, a gradient and a dim.
-						'wp-block-cover__gradient-background':
-							url && gradientValue && dimRatio !== 0,
-						'has-background-gradient': gradientValue,
-						[ gradientClass ]: gradientClass,
-					}
-				) }
-				style={ bgStyle }
-			/>
+			{ shouldShowBackgroundOverlay && (
+				<span
+					aria-hidden="true"
+					className={ clsx(
+						'wp-block-cover__background',
+						overlayColorClass,
+						dimRatioToClass( dimRatio ),
+						{
+							'has-background-dim': dimRatio !== undefined,
+							// For backwards compatibility. Former versions of the Cover Block applied
+							// `.wp-block-cover__gradient-background` in the presence of
+							// media, a gradient and a dim.
+							'wp-block-cover__gradient-background':
+								url && gradientValue && dimRatio !== 0,
+							'has-background-gradient': gradientValue,
+							[ gradientClass ]: gradientClass,
+						}
+					) }
+					style={ bgStyle }
+				/>
+			) }
 
 			<div
 				{ ...useInnerBlocksProps.save( {
