@@ -204,6 +204,41 @@ test.describe( 'Guidelines', () => {
 		await expect( getSectionCard( page, 'Additional' ) ).toBeVisible();
 	} );
 
+	test( 'renders the Actions heading at level 2', async ( {
+		page,
+		admin,
+	} ) => {
+		await visitGuidelinesPage( page, admin );
+		const app = page.locator( '#guidelines-wp-admin-app' );
+
+		await expect(
+			app.getByRole( 'heading', { name: 'Actions', level: 2 } )
+		).toBeVisible();
+
+		await expect(
+			app.getByRole( 'heading', { name: 'Actions', level: 3 } )
+		).toHaveCount( 0 );
+	} );
+
+	test( 'renders a visible label for a section guideline field', async ( {
+		page,
+		admin,
+	} ) => {
+		await visitGuidelinesPage( page, admin );
+
+		const card = getSectionCard( page, 'Copy' );
+		await card.getByRole( 'button', { name: 'Copy', exact: true } ).click();
+
+		const textarea = card.getByRole( 'textbox', {
+			name: 'Copy guidelines',
+		} );
+		await expect( textarea ).toBeVisible();
+
+		const label = card.locator( 'label', { hasText: 'Copy guidelines' } );
+		await expect( label ).toHaveText( 'Copy guidelines' );
+		await expect( label ).not.toHaveAttribute( 'data-visually-hidden' );
+	} );
+
 	test( 'does not expose revision history', async ( { page, admin } ) => {
 		await visitGuidelinesPage( page, admin );
 
