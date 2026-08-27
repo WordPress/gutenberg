@@ -328,6 +328,11 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_render_page() {
 		);
 		?>
 	</div>
+	<?php
+	// Core's pre-CSS Modules Boot layout uses this class for viewport sizing.
+	// Remove it when the minimum supported WordPress version includes the Boot
+	// changes from Gutenberg #81756.
+	?>
 	<div id="{{PAGE_SLUG}}-wp-admin-app" class="boot-layout-container"></div>
 	<?php
 }
