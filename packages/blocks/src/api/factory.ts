@@ -39,8 +39,8 @@ type TemplateBlock = [
  * @return Whether the transform is of type `block`.
  */
 const isBlockTypeTransform = < Transform extends BlockTransform >(
-	transform: Transform
-): transform is Transform & BlockBlockTransform => transform.type === 'block';
+	transform: Transform | null | undefined
+): transform is Transform & BlockBlockTransform => transform?.type === 'block';
 
 const getBlockTypeWithTransformMetadata = (
 	blockType: BlockType,
@@ -238,16 +238,11 @@ export function cloneBlock(
  * @return Is the transform possible?
  */
 const isPossibleTransformForSource = (
-	transform: NormalizedBlockTransform,
+	transform: NormalizedBlockTransform< BlockBlockTransform >,
 	direction: 'from' | 'to',
 	blocks: Block[]
-): transform is NormalizedBlockTransform< BlockBlockTransform > => {
+): boolean => {
 	if ( ! blocks.length ) {
-		return false;
-	}
-
-	// Only consider 'block' type transforms as valid.
-	if ( ! isBlockTypeTransform( transform ) ) {
 		return false;
 	}
 
@@ -324,6 +319,7 @@ const getBlockTypesForPossibleFromTransforms = (
 		( blockType ) => {
 			const fromTransforms = getBlockTransforms( 'from', blockType.name );
 			return fromTransforms
+				.filter( isBlockTypeTransform )
 				.filter( ( transform ) =>
 					isPossibleTransformForSource( transform, 'from', blocks )
 				)
@@ -358,11 +354,11 @@ const getBlockTypesForPossibleToTransforms = (
 		: [];
 
 	// filter all 'to' transforms to find those that are possible.
-	const possibleTransforms = transformsTo.filter( ( transform ) => {
-		return (
-			transform && isPossibleTransformForSource( transform, 'to', blocks )
+	const possibleTransforms = transformsTo
+		.filter( isBlockTypeTransform )
+		.filter( ( transform ) =>
+			isPossibleTransformForSource( transform, 'to', blocks )
 		);
-	} );
 
 	// Map block names to block types.
 	return possibleTransforms
@@ -392,7 +388,6 @@ const getBlockTypesForPossibleToTransforms = (
 export const isWildcardBlockTransform = (
 	t: BlockTransform | null | undefined
 ): boolean =>
-	!! t &&
 	isBlockTypeTransform( t ) &&
 	Array.isArray( t.blocks ) &&
 	t.blocks.includes( '*' );
