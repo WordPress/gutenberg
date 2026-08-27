@@ -2,6 +2,7 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
+		"allowImportingTsExtensions": true,
 		"types": [ "node", "style-imports", "react-css-custom-properties" ]
 	},
 	"references": [
@@ -9,6 +10,6 @@
 		{ "path": "../deprecated/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../private-apis" },
-		{ "path": "../style-runtime" }
+		{ "path": "../style-runtime/tsconfig.build.json" }
 	]
 }

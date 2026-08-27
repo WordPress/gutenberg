@@ -2,13 +2,34 @@
 
 ## Unreleased
 
+### Documentation
+
+-   Explain how consumers define light and dark themes through `ThemeProvider` color seeds ([#82039](https://github.com/WordPress/gutenberg/pull/82039)).
+
+## 2.0.0 (2026-08-26)
+
+### Breaking Changes
+
+-   Fix published ESM declaration imports for Node-style resolution. TypeScript consumers now require TypeScript 5 or newer. ([#82022](https://github.com/WordPress/gutenberg/pull/82022))
+
+### Enhancements
+
+-   Add an `onColorWarnings` callback for `ThemeProvider` consumers to receive structured color ramp and semantic contrast warnings ([#81185](https://github.com/WordPress/gutenberg/pull/81185)).
+
 ### Bug Fixes
 
+-   Check normal and active fill color contrast, and return warnings for the final generated ramp ([#81185](https://github.com/WordPress/gutenberg/pull/81185)).
 -   `ThemeProvider`: Avoid root-level relational selectors when forwarding `cornerRadius` presets to reduce style recalculation work. ([#81457](https://github.com/WordPress/gutenberg/pull/81457))
+
+### Documentation
+
+-   Route contributors and coding agents to the canonical Design System package guidance ([#80597](https://github.com/WordPress/gutenberg/pull/80597)).
 
 ### Internal
 
--   Point tsconfig references at split dependencies' build projects. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+-   Rename `ThemeProvider` wrapper CSS module class from `root` to `wrapper` for clearer DevTools inspection ([#81996](https://github.com/WordPress/gutenberg/pull/81996)).
+-   Update Terrazzo packages to 2.7.1 ([#81978](https://github.com/WordPress/gutenberg/pull/81978)).
+-   Point tsconfig references at split dependencies' build projects. ([#81514](https://github.com/WordPress/gutenberg/pull/81514), [#81518](https://github.com/WordPress/gutenberg/pull/81518))
 -   Collapse the `tsconfig.src.json`/`tsconfig.bin.json`/`tsconfig.test.json` projects into the repository-standard split of `tsconfig.build.json` and a default dev `tsconfig.json`. ([#81509](https://github.com/WordPress/gutenberg/pull/81509))
 -   Update Terrazzo packages to 2.5.0, use its resolver for mode overrides, and restore token linting with semantic WCAG AA contrast checks ([#81082](https://github.com/WordPress/gutenberg/pull/81082)).
 

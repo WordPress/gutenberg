@@ -40,6 +40,7 @@ import PatternRenameModal from '../pattern-rename-modal';
 import PatternDuplicateModal from '../pattern-duplicate-modal';
 import TemplatePartMenuItems from '../template-part-menu-items';
 import MediaEditorModalMount from '../media/media-editor-modal';
+import { getCanvasWidthByDeviceType } from '../../utils/device-type';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
@@ -143,6 +144,7 @@ function useBlockEditorProps( post, template, mode ) {
  * @param {Object}  props.settings                       The editor settings.
  * @param {boolean} props.recovery                       Indicates if the editor is in recovery mode.
  * @param {Array}   props.initialEdits                   The initial edits for the editor.
+ * @param {string}  [props.initialViewport]              The device type an entity opens at, one of those `setDeviceType` accepts. Each entity opens at the width it names, so a width set from the device preview is view state that does not follow the user into the next one. The current width is left alone when omitted.
  * @param {Object}  props.children                       The child components.
  * @param {Object}  [props.BlockEditorProviderComponent] The block editor provider component to use. Defaults to ExperimentalBlockEditorProvider.
  * @param {Object}  [props.__unstableTemplate]           The template object.
@@ -167,6 +169,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		settings,
 		recovery,
 		initialEdits,
+		initialViewport,
 		children,
 		BlockEditorProviderComponent = ExperimentalBlockEditorProvider,
 		__unstableTemplate: template,
@@ -296,6 +299,16 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			mode
 		);
 
+		/*
+		 * Resolved here rather than by dispatching `setDeviceType`, which reads
+		 * the theme's breakpoints from the block editor store — the store this
+		 * provider is the one to fill, and has not yet when it mounts.
+		 */
+		const initialCanvasWidth = getCanvasWidthByDeviceType(
+			initialViewport,
+			blockEditorSettings.__experimentalFeatures?.viewport
+		);
+
 		const {
 			updatePostLock,
 			setupEditor,
@@ -303,6 +316,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			setCurrentTemplateId,
 			setEditedPost,
 			setRenderingMode,
+			setCanvasWidth,
 		} = unlock( useDispatch( editorStore ) );
 		const { editEntityRecord } = useDispatch( coreStore );
 		const registry = useRegistry();
@@ -360,6 +374,21 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 
 			return () => setEditedPost( null, null );
 		}, [ post.type, post.id, setEditedPost, removeNotice ] );
+
+		// Opens the entity at the width it asks for. Keyed on the entity as well
+		// as the width, so that moving to another one leaves a width set from
+		// the device preview behind.
+		useEffect( () => {
+			if ( initialViewport ) {
+				setCanvasWidth( initialCanvasWidth );
+			}
+		}, [
+			post.type,
+			post.id,
+			initialViewport,
+			initialCanvasWidth,
+			setCanvasWidth,
+		] );
 
 		// Synchronize the editor settings as they change.
 		// Do it as a layout effect so that rendered UI with outdated settings is not painted.
