@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Internal
+
+-   Remove the `showListViewByDefault` handling from `useAdaptEditorToCanvas`; the `editor` package now applies the preference on the preview ↔ edit transition itself.
+-   Remove unused dependencies `@wordpress/blob`, `@wordpress/date`, `@wordpress/escape-html`, etc. ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+## 7.3.0 (2026-08-26)
+
 ### Enhancements
 
 -   Offer the Export tool only while editing a template or a template part, the entities the exported theme is made of. The menu item now lives in the editor package ([#81992](https://github.com/WordPress/gutenberg/pull/81992)).

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.54.0 (2026-08-26)
+
 ### Enhancements
 
 -   Media upload modal: Show thumbnails at their original aspect ratio inside the grid cell rather than cropping them to a square, so a media item's orientation is visible before it is inserted. Adds an "Original aspect ratio" toggle to the view options for switching back to cropped previews ([#81604](https://github.com/WordPress/gutenberg/pull/81604)).
