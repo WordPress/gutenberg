@@ -22,7 +22,8 @@ export const isGifVariation = ( {
 	autoplay,
 	muted,
 	playsInline,
-} = {} ) => ! controls && !! loop && !! autoplay && !! muted && !! playsInline;
+} = {} ) =>
+	controls === false && !! loop && !! autoplay && !! muted && !! playsInline;
 
 const variations = [
 	{

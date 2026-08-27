@@ -19,6 +19,7 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { video as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
+import { useReducedMotion } from '@wordpress/compose';
 import { prependHTTPS } from '@wordpress/url';
 import { createUpgradedEmbedBlock } from '../embed/util';
 import {
@@ -45,6 +46,7 @@ function VideoEdit( {
 	const videoPlayer = useRef();
 	const { id, controls, poster, src, tracks, width, height } = attributes;
 	const isGif = isGifVariation( attributes );
+	const isReducedMotion = useReducedMotion();
 	// Give the <video> an explicit (non-`auto`) aspect ratio derived from the
 	// stored dimensions. The width/height attributes alone only yield
 	// `aspect-ratio: auto W/H`, whose `auto` keyword defers to the element's
@@ -78,11 +80,11 @@ function VideoEdit( {
 	// not autoplay in the editor, so only nudge GIFs into playing after a
 	// source change in case the muted autoplay did not start on its own.
 	useEffect( () => {
-		if ( isGif ) {
+		if ( isGif && ! isReducedMotion ) {
 			// Browsers allow muted videos to be played programmatically.
 			videoPlayer.current?.play().catch( () => {} );
 		}
-	}, [ isGif, src, poster ] );
+	}, [ isGif, isReducedMotion, src, poster ] );
 
 	// TODO: Whether the video was obtained from the media library or was provided by URL, obtain the `videoWidth` and `videoHeight` of the video once its metadata has loaded and persist in the block attributes.
 	function onSelectVideo( media ) {
@@ -248,13 +250,13 @@ function VideoEdit( {
 			) }
 			<figure { ...blockProps }>
 				<video
-					controls={ controls }
+					controls={ isReducedMotion ? true : controls }
 					inert={ ! isSingleSelected ? 'true' : undefined }
 					poster={ poster }
 					src={ src || temporaryURL }
 					ref={ videoPlayer }
-					autoPlay={ isGif }
-					loop={ isGif }
+					autoPlay={ isReducedMotion ? false : isGif }
+					loop={ isReducedMotion ? false : isGif }
 					muted={ isGif }
 					playsInline={ isGif }
 					width={ width }
