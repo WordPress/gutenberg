@@ -5,7 +5,7 @@ import {
 	Spinner,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { Stack, Text } from '@wordpress/ui';
 import {
