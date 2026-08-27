@@ -41,12 +41,33 @@ jobs:
             branches: ${{ steps.branches.outputs.branches }}
             wp-version: ${{ steps.branches.outputs.wp-version }}
             wp-source: ${{ steps.branches.outputs.wp-source }}
+            # 'true' when a pull request only touches files that cannot change the results.
+            skip: ${{ steps.changes.outputs.skip }}
 
         steps:
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
+
+            - name: Check whether the changes can affect performance
+              id: changes
+              if: github.event_name == 'pull_request'
+              env:
+                  BASE_SHA: ${{ github.event.pull_request.base.sha }}
+              run: |
+                  git fetch --no-tags --depth=1 origin "$BASE_SHA"
+                  CHANGED="$(git diff --name-only "$BASE_SHA" HEAD)"
+                  # Everything that is not documentation, changelogs, Storybook or an unrelated workflow.
+                  RELEVANT="$(echo "$CHANGED" | grep -Ev '^(docs/|storybook/|changelog\.txt$|\.github/)|\.md$' || true)"
+                  RELEVANT="$RELEVANT$(echo "$CHANGED" | grep -E '^\.github/(workflows/performance\.yml|setup-node/)' || true)"
+                  if [[ -n "$CHANGED" && -z "$RELEVANT" ]]; then
+                    echo "skip=true" >> "$GITHUB_OUTPUT"
+                    echo "Skipping the performance tests: only documentation or unrelated files changed."
+                  else
+                    echo "skip=false" >> "$GITHUB_OUTPUT"
+                  fi
+                  echo "$CHANGED"
 
             - name: Resolve branches
               id: branches
@@ -126,6 +147,7 @@ jobs:
         name: Build plugin (${{ matrix.branch.name }})
         runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
         needs: prepare
+        if: needs.prepare.outputs.skip != 'true'
         permissions:
             contents: read
         strategy:
@@ -186,6 +208,7 @@ jobs:
         name: Run performance tests (${{ matrix.shard }})
         runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
         needs: [prepare, build]
+        if: needs.prepare.outputs.skip != 'true'
         permissions:
             contents: read
         strategy:
