@@ -6,6 +6,10 @@
 
 -   Explain how consumers define light and dark themes through `ThemeProvider` color seeds ([#82039](https://github.com/WordPress/gutenberg/pull/82039)).
 
+### Enhancements
+
+-   Add a Lightning CSS visitor plugin that injects design system token fallbacks, available as `@wordpress/theme/lightningcss-plugins/lightningcss-ds-token-fallbacks`, with an optional peer range of `>=1.33.0 <2.0.0`. ([#80401](https://github.com/WordPress/gutenberg/pull/80401))
+
 ## 2.0.0 (2026-08-26)
 
 ### Breaking Changes
@@ -15,7 +19,6 @@
 ### Enhancements
 
 -   Add an `onColorWarnings` callback for `ThemeProvider` consumers to receive structured color ramp and semantic contrast warnings ([#81185](https://github.com/WordPress/gutenberg/pull/81185)).
--   Add a Lightning CSS visitor plugin that injects design system token fallbacks, available as `@wordpress/theme/lightningcss-plugins/lightningcss-ds-token-fallbacks`, with an optional peer range of `>=1.33.0 <2.0.0`. ([#80401](https://github.com/WordPress/gutenberg/pull/80401))
 
 ### Bug Fixes
 
