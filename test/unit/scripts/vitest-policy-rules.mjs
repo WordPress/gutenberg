@@ -93,15 +93,17 @@ const domProducingMethods = new Set( [
 	'getElementById',
 	'querySelector',
 ] );
-const domCollectionCallbackMethods = new Set( [
-	'every',
-	'filter',
-	'find',
-	'findLast',
-	'flatMap',
-	'forEach',
-	'map',
-	'some',
+const domCollectionCallbackElementParameterIndexes = new Map( [
+	[ 'every', 0 ],
+	[ 'filter', 0 ],
+	[ 'find', 0 ],
+	[ 'findLast', 0 ],
+	[ 'flatMap', 0 ],
+	[ 'forEach', 0 ],
+	[ 'map', 0 ],
+	[ 'reduce', 1 ],
+	[ 'reduceRight', 1 ],
+	[ 'some', 0 ],
 ] );
 const testingLibraryQueryPattern = /^(?:get|query)By/;
 const testingLibraryAsyncQueryPattern = /^findBy/;
@@ -1118,6 +1120,35 @@ export function validateVitestPolicy( {
 			`${ file }:${ node?.loc.start.line ?? 1 } ${ message }`
 		);
 	};
+	const reportJsdomBrowserApi = ( node ) =>
+		report(
+			'jsdom-browser-api',
+			'layout, geometry, viewport, observer, animation, and scroll APIs require Browser Mode or an explicit jsdom exception with a concrete reason',
+			node
+		);
+	const trackDomValuePattern = ( target ) => {
+		if ( ! target ) {
+			return;
+		}
+		if ( target.type === 'ObjectPattern' ) {
+			for ( const property of target.properties ) {
+				if (
+					property.type === 'Property' &&
+					browserApiProperties.has(
+						property.key?.name ?? property.key?.value
+					)
+				) {
+					reportJsdomBrowserApi( property );
+				}
+			}
+		}
+		for ( const identifier of getDomPatternIdentifiers( target ) ) {
+			const variable = identifierVariables.get( identifier );
+			if ( variable ) {
+				domVariables.add( variable );
+			}
+		}
+	};
 
 	for ( const node of ast.body ) {
 		if ( node.type !== 'ImportDeclaration' ) {
@@ -1143,17 +1174,6 @@ export function validateVitestPolicy( {
 			)
 		) {
 			hasVitestCollectorImport = true;
-		}
-		if (
-			isVitestTest &&
-			competingTestRunnerModules.has( importSource ) &&
-			runtimeSpecifiers.length
-		) {
-			report(
-				'competing-test-runner-import',
-				`test APIs must come from vitest, not ${ importSource }`,
-				node
-			);
 		}
 		for ( const specifier of node.specifiers ) {
 			const variable = identifierVariables.get( specifier.local );
@@ -1297,7 +1317,7 @@ export function validateVitestPolicy( {
 			if (
 				node.type === 'CallExpression' &&
 				node.callee?.type === 'MemberExpression' &&
-				domCollectionCallbackMethods.has(
+				domCollectionCallbackElementParameterIndexes.has(
 					getMemberPropertyName( node.callee )
 				) &&
 				( isVariableReference(
@@ -1317,14 +1337,13 @@ export function validateVitestPolicy( {
 					node.arguments[ 0 ]?.type
 				)
 			) {
-				for ( const identifier of getPatternIdentifiers(
-					node.arguments[ 0 ].params[ 0 ]
-				) ) {
-					const variable = identifierVariables.get( identifier );
-					if ( variable ) {
-						domVariables.add( variable );
-					}
-				}
+				const elementParameterIndex =
+					domCollectionCallbackElementParameterIndexes.get(
+						getMemberPropertyName( node.callee )
+					);
+				trackDomValuePattern(
+					node.arguments[ 0 ].params[ elementParameterIndex ]
+				);
 			}
 
 			const { target, value, isCollectionElement } =
@@ -1571,14 +1590,7 @@ export function validateVitestPolicy( {
 				);
 			if ( isDomCollectionValue ) {
 				if ( isCollectionElement ) {
-					for ( const identifier of getPatternIdentifiers(
-						target
-					) ) {
-						const variable = identifierVariables.get( identifier );
-						if ( variable ) {
-							domVariables.add( variable );
-						}
-					}
+					trackDomValuePattern( target );
 				} else if ( target.type === 'Identifier' ) {
 					const variable = identifierVariables.get( target );
 					if ( variable ) {
@@ -1615,12 +1627,7 @@ export function validateVitestPolicy( {
 				return;
 			}
 
-			for ( const identifier of getDomPatternIdentifiers( target ) ) {
-				const variable = identifierVariables.get( identifier );
-				if ( variable ) {
-					domVariables.add( variable );
-				}
-			}
+			trackDomValuePattern( target );
 		} );
 	}
 
@@ -1659,6 +1666,17 @@ export function validateVitestPolicy( {
 		}
 
 		const moduleSource = getModuleSource( node );
+		if (
+			isVitestTest &&
+			competingTestRunnerModules.has( moduleSource ) &&
+			hasRuntimeModuleReference( node )
+		) {
+			report(
+				'competing-test-runner-import',
+				`test APIs must come from vitest, not ${ moduleSource }`,
+				node
+			);
+		}
 
 		if ( isVitestTest && moduleSource === 'vitest/globals' ) {
 			report( 'vitest-globals', 'vitest/globals is not allowed', node );
@@ -1809,11 +1827,7 @@ export function validateVitestPolicy( {
 							testingLibraryNamespaceVariables
 						) ) ) )
 		) {
-			report(
-				'jsdom-browser-api',
-				'layout, geometry, viewport, observer, animation, and scroll APIs require Browser Mode or an explicit jsdom exception with a concrete reason',
-				node
-			);
+			reportJsdomBrowserApi( node );
 		}
 
 		if (

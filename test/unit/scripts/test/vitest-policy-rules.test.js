@@ -175,6 +175,9 @@ describe( 'Vitest policy rules', () => {
 			"import { screen } from '@testing-library/react';\nfor ( const button of screen.getAllByRole( 'button' ) ) { button.offsetWidth; }",
 			"import { screen } from '@testing-library/react';\nscreen.getAllByRole( 'button' ).map( ( button ) => button.offsetWidth );",
 			"import { screen } from '@testing-library/react';\nscreen.getAllByRole( 'button' ).forEach( function ( button ) { button.offsetWidth; } );",
+			"import { screen } from '@testing-library/react';\nscreen.getAllByRole( 'button' ).reduce( ( total, button ) => total + button.offsetWidth, 0 );",
+			"import { screen } from '@testing-library/react';\nscreen.getAllByRole( 'button' ).reduceRight( ( total, button ) => total + button.offsetWidth, 0 );",
+			"import { screen } from '@testing-library/react';\nscreen.getAllByRole( 'button' ).map( ( { offsetWidth } ) => offsetWidth );",
 		] ) {
 			expectViolation( source, 'require Browser Mode', {
 				project: 'jsdom',
@@ -185,6 +188,10 @@ describe( 'Vitest policy rules', () => {
 	it( 'allows browser API-shaped values in unrelated collection callbacks', () => {
 		expectValid(
 			'[ { offsetWidth: 10 } ].map( ( item ) => item.offsetWidth );',
+			{ project: 'jsdom' }
+		);
+		expectValid(
+			"import { screen } from '@testing-library/react';\nscreen.getAllByRole( 'button' ).map( ( { dataset } ) => dataset.scrollTop );",
 			{ project: 'jsdom' }
 		);
 	} );
@@ -352,11 +359,15 @@ describe( 'Vitest policy rules', () => {
 	} );
 
 	it( 'rejects competing test runner imports', () => {
-		expectViolation(
+		for ( const source of [
 			"import nodeTest from 'node:test';\nimport { it } from 'vitest';\nnodeTest( 'example', () => {} );",
-			'test APIs must come from vitest',
-			{ isVitestTest: true, project: 'node' }
-		);
+			"import { it } from 'vitest';\nconst { test: nodeTest } = await import( 'node:test' );\nnodeTest( 'example', () => {} );",
+		] ) {
+			expectViolation( source, 'test APIs must come from vitest', {
+				isVitestTest: true,
+				project: 'node',
+			} );
+		}
 		expectValid(
 			"import assert from 'node:assert/strict';\nimport { it } from 'vitest';\nit( 'example', () => assert.ok( true ) );",
 			{ isVitestTest: true, project: 'node' }
