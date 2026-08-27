@@ -1,5 +1,4 @@
 import { store as coreStore } from '@wordpress/core-data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import getMediaIdsInBlocks from './media-ids-in-blocks';
 import invalidateAttachmentResolutions from './invalidate-attachment-resolutions';
 
@@ -36,13 +35,22 @@ function warnAttachFailed( reason ) {
  * The affordance for undoing it already exists and is better than a prompt — the
  * inserter's attached-media tab has a persistent per-item "Detach from post".
  *
- * @param {Object} registry A `@wordpress/data` registry.
- * @param {number} postId   ID of the post that was saved.
- * @param {string} postType Type of the post that was saved.
+ * Takes the post's blocks rather than reading the canvas, and the distinction is
+ * load-bearing. With "Show template" on, the block editor holds the *template's*
+ * tree with the post nested inside a `core/post-content` block, so the canvas
+ * includes media belonging to the template — which this post has no claim on.
+ * One save writes one entity, so the media considered has to come from that
+ * entity.
+ *
+ * @param {Object}   registry    A `@wordpress/data` registry.
+ * @param {Object}   post        The post that was saved.
+ * @param {number}   post.id     Its ID.
+ * @param {string}   post.type   Its post type.
+ * @param {Object[]} post.blocks Its own blocks, not the canvas's.
  */
-export default async function attachMediaInPost( registry, postId, postType ) {
+export default async function attachMediaInPost( registry, post ) {
 	try {
-		await attach( registry, postId, postType );
+		await attach( registry, post );
 	} catch ( error ) {
 		// The two lookups in `attach` can reject on their own — `context=edit`
 		// on the media collection is a 403 for a contributor — and the caller
@@ -56,14 +64,14 @@ export default async function attachMediaInPost( registry, postId, postType ) {
  * The work, split out so the entry point above can be the only thing that has
  * to be careful about rejections.
  *
- * @param {Object} registry A `@wordpress/data` registry.
- * @param {number} postId   ID of the post that was saved.
- * @param {string} postType Type of the post that was saved.
+ * @param {Object}   registry    A `@wordpress/data` registry.
+ * @param {Object}   post        The post that was saved.
+ * @param {number}   post.id     Its ID.
+ * @param {string}   post.type   Its post type.
+ * @param {Object[]} post.blocks Its own blocks.
  */
-async function attach( registry, postId, postType ) {
-	const mediaIds = getMediaIdsInBlocks(
-		registry.select( blockEditorStore ).getBlocks()
-	);
+async function attach( registry, { id: postId, type: postType, blocks } ) {
+	const mediaIds = getMediaIdsInBlocks( blocks );
 
 	if ( ! mediaIds.length ) {
 		return;

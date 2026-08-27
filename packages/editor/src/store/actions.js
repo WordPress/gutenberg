@@ -300,11 +300,16 @@ export const savePost =
 			previousRecord.status !== 'trash' &&
 			select.getEditorSettings().autoAttachMediaEnabled
 		) {
-			attachMediaInPost(
-				registry,
-				previousRecord.id,
-				previousRecord.type
-			);
+			attachMediaInPost( registry, {
+				id: previousRecord.id,
+				type: previousRecord.type,
+				// The post's own blocks, not the canvas's: in template mode the
+				// block editor holds the template's tree with this post nested
+				// inside it. Same source `getEditedPostContent` serialized
+				// above, so the media considered and the content written cannot
+				// disagree.
+				blocks: select.getEditorBlocks(),
+			} );
 		}
 
 		if ( error ) {

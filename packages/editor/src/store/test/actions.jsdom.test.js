@@ -1,6 +1,7 @@
 import { speak } from '@wordpress/a11y';
 import apiFetch from '@wordpress/api-fetch';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { createRegistry } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -396,12 +397,30 @@ describe( 'Post actions', () => {
 	} );
 
 	describe( 'savePost() attaching media', () => {
+		// `getEditorBlocks` parses the post's content when there is no `blocks`
+		// edit, so the block type has to exist for an image to be recognisable.
+		beforeEach( () => {
+			registerBlockType( 'core/image', {
+				title: 'Image',
+				category: 'media',
+				// Anything below 3 warns about iframe compatibility.
+				apiVersion: 3,
+				attributes: { id: { type: 'number' } },
+				save: () => null,
+			} );
+		} );
+
+		afterEach( () => {
+			unregisterBlockType( 'core/image' );
+		} );
+
 		const imagePost = {
 			id: postId,
 			type: 'post',
 			title: 'bar',
-			content:
-				'<!-- wp:image {"id":12} --><figure><img src="i.jpg"/></figure><!-- /wp:image -->',
+			// Void form, so it validates against the minimal `save` registered
+			// above — the markup is incidental, the `id` attribute is the point.
+			content: '<!-- wp:image {"id":12} /-->',
 			excerpt: 'crackers',
 			status: 'draft',
 		};
@@ -427,11 +446,20 @@ describe( 'Post actions', () => {
 					return { id: 12, post: data.post };
 				}
 				if ( method === 'GET' && path.startsWith( '/wp/v2/media' ) ) {
+					// Answer what was actually asked for. Returning a fixed
+					// record instead would mask the whole bug: a request that
+					// wrongly includes the template's image would still come
+					// back with only the post's.
+					const requested = [
+						...path.matchAll( /include(?:%5B\d+%5D)?=(\d+)/g ),
+					].map( ( match ) => Number( match[ 1 ] ) );
+
 					// Also resolved with `parse: false`, so the totals headers
 					// can be read. `link` must be absent or the fetch-all
 					// middleware follows a next page.
 					return {
-						json: async () => [ { id: 12, post: null } ],
+						json: async () =>
+							requested.map( ( id ) => ( { id, post: null } ) ),
 						headers: {
 							get: ( name ) =>
 								name.toLowerCase() === 'link' ? null : '1',
@@ -526,6 +554,58 @@ describe( 'Post actions', () => {
 
 			expect( hasAttached( requests ) ).toBe( true );
 			expect( attachedTo ).toBe( postId );
+		} );
+
+		/**
+		 * The bug a contributor found: with "Show template" on, the block editor
+		 * holds the *template's* tree with the post nested inside a
+		 * `core/post-content` block, so reading the canvas picked up the
+		 * template's media and attached it to the post.
+		 */
+		it( "ignores media in the canvas that is not the post's own", async () => {
+			const requests = [];
+			setFetchHandler( requests );
+
+			const registry = createRegistryWithStores();
+			setUpEditor( registry );
+
+			// The canvas as template mode leaves it: an image belonging to the
+			// template, alongside the post's content.
+			registry.dispatch( blockEditorStore ).resetBlocks( [
+				{
+					clientId: 'template-image',
+					name: 'core/image',
+					isValid: true,
+					attributes: { id: 99 },
+					innerBlocks: [],
+				},
+				{
+					clientId: 'post-content',
+					name: 'core/post-content',
+					isValid: true,
+					attributes: {},
+					innerBlocks: [
+						{
+							clientId: 'image-1',
+							name: 'core/image',
+							isValid: true,
+							attributes: { id: 12 },
+							innerBlocks: [],
+						},
+					],
+				},
+			] );
+
+			await registry.dispatch( editorStore ).savePost();
+			await flush();
+
+			// The post's own image, and only that.
+			expect( hasAttached( requests ) ).toBe( true );
+			expect(
+				requests.some( ( request ) =>
+					request.startsWith( 'PUT /wp/v2/media/99' )
+				)
+			).toBe( false );
 		} );
 
 		it( 'attaches nothing when the editor setting is off', async () => {
