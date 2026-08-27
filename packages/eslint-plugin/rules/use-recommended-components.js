@@ -85,6 +85,7 @@ const DENYLIST = {
 			'{{ name }} is planned for deprecation. Write your own CSS instead.',
 		Animate:
 			'Write your own CSS animations instead, preferably using the motion tokens available in `@wordpress/theme`.',
+		BaseControl: 'Use `Field` from `@wordpress/ui` instead.',
 		Card: 'Use `Card.Root` from `@wordpress/ui` instead.',
 		CardBody: 'Use `Card.Content` from `@wordpress/ui` instead.',
 		CardDivider: 'A divider is no longer a standard pattern for cards.',

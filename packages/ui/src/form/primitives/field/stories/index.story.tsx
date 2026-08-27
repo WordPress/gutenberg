@@ -163,9 +163,9 @@ export const WithDetails: StoryObj< typeof Field.Root > = {
  */
 export const WithVisualLabel: StoryObj = {
 	render: () => (
-		<Stack direction="column" gap="sm">
+		<Stack direction="column" gap="sm" align="flex-start">
 			<Field.VisualLabel>Author</Field.VisualLabel>
-			<Button aria-label="Select an author" variant="secondary">
+			<Button aria-label="Select an author" variant="outline">
 				Select an author
 			</Button>
 		</Stack>
@@ -180,7 +180,7 @@ export const WithVisualLabel: StoryObj = {
  */
 export const WithVisualDescription: StoryObj = {
 	render: () => (
-		<Stack direction="column" gap="sm">
+		<Stack direction="column" gap="sm" align="flex-start">
 			<input
 				type="text"
 				aria-label="API key"

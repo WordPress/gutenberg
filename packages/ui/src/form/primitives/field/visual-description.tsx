@@ -9,9 +9,9 @@ import type { FieldVisualDescriptionProps } from './types';
  * Renders a purely visual description with the same styling as
  * `Field.Description`.
  *
- * Use it outside `Field.Root` when supplementary text is needed for layout
- * consistency, but should not be associated with a control using
- * `aria-describedby`.
+ * It can be used outside `Field.Root` when supplementary text is needed
+ * for layout consistency, but should not be associated with a control
+ * using `aria-describedby`.
  *
  * Unlike `Field.Description`, this component does not carry semantics and is
  * not associated with a control.

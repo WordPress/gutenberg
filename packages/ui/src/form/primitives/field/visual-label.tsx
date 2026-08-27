@@ -7,8 +7,9 @@ import type { FieldVisualLabelProps } from './types';
 /**
  * Renders a purely visual label with the same styling as `Field.Label`.
  *
- * Use it outside `Field.Root` when the control is already accessibly labeled,
- * but a visual label is still needed for layout consistency.
+ * It can be used outside `Field.Root` when the control is already
+ * accessibly labeled, but a visual label is still needed for layout
+ * consistency.
  *
  * Unlike `Field.Label`, this component does not carry semantics and is not
  * associated with a control.

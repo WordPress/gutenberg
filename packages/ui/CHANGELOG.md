@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Add `Field.VisualLabel` and `Field.VisualDescription` for purely visual labels and descriptions outside `Field.Root`.
+-   Add `Field.VisualLabel` and `Field.VisualDescription` for purely visual labels and descriptions outside `Field.Root` ([#82095](https://github.com/WordPress/gutenberg/pull/82095)).
 
 ### Breaking Changes
 

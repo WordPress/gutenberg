@@ -127,6 +127,14 @@ ruleTester.run( 'use-recommended-components', rule, {
 				},
 			],
 		},
+		{
+			code: "import { BaseControl } from '@wordpress/components';",
+			errors: [
+				{
+					message: 'Use `Field` from `@wordpress/ui` instead.',
+				},
+			],
+		},
 	],
 } );
 

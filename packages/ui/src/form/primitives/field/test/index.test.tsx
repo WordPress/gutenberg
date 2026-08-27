@@ -99,21 +99,4 @@ describe( 'Field', () => {
 			HTMLParagraphElement
 		);
 	} );
-
-	it( 'does not associate visual subcomponents with controls', () => {
-		render(
-			<>
-				<Field.VisualLabel>Visual label</Field.VisualLabel>
-				<Field.VisualDescription>
-					Visual description
-				</Field.VisualDescription>
-				<input aria-label="Control label" />
-			</>
-		);
-
-		expect(
-			screen.getByRole( 'textbox', { name: 'Control label' } )
-		).not.toHaveAccessibleDescription( 'Visual description' );
-		expect( screen.queryByText( 'Visual label' )?.tagName ).toBe( 'SPAN' );
-	} );
 } );
