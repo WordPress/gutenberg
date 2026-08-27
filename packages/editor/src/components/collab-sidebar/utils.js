@@ -447,6 +447,70 @@ export function removeNoteIdFromMetadata( metadata, noteId ) {
 }
 
 /**
+ * Derives a stand-in anchor rect for a block that has no rendered element,
+ * which happens when the block is hidden at the current viewport: `block.js`
+ * renders nothing for it once it is deselected.
+ *
+ * The rect marks the gap the block leaves between its rendered neighbours,
+ * so its threads keep their place in the notes column instead of collapsing
+ * to the top of the panel. Centring it in the gap matches where the block
+ * itself sits while it is selected - still hidden, but back in the DOM
+ * collapsed to zero height between two block gaps - so selecting a thread
+ * does not shift it.
+ *
+ * The element lookup is injected to keep this testable without a DOM.
+ *
+ * @param {string}   clientId         Client ID of the block with no element.
+ * @param {string[]} orderedClientIds Client IDs in document order.
+ * @param {Function} getBlockElement  Resolves a client ID to its element, or null.
+ * @return {?{top: number, left: number, width: number, height: number}} Zero-height
+ *         boundary rect, or `null` when no block in the document is rendered.
+ */
+export function getHiddenBlockAnchorRect(
+	clientId,
+	orderedClientIds,
+	getBlockElement
+) {
+	const index = orderedClientIds?.indexOf( clientId ) ?? -1;
+	if ( index === -1 ) {
+		return null;
+	}
+
+	// Blocks nested inside a hidden block have no element either, so both
+	// walks skip whole hidden subtrees on their way to a rendered block.
+	const findRect = ( from, step ) => {
+		for ( let i = from; i >= 0 && i < orderedClientIds.length; i += step ) {
+			const rect = getBlockElement(
+				orderedClientIds[ i ]
+			)?.getBoundingClientRect();
+			if ( rect ) {
+				return rect;
+			}
+		}
+		return null;
+	};
+
+	const next = findRect( index + 1, 1 );
+	const previous = findRect( index - 1, -1 );
+
+	if ( ! next && ! previous ) {
+		return null;
+	}
+
+	let top;
+	if ( next && previous ) {
+		top = ( previous.top + previous.height + next.top ) / 2;
+	} else if ( next ) {
+		top = next.top;
+	} else {
+		top = previous.top + previous.height;
+	}
+
+	const { left, width } = next ?? previous;
+	return { top, left, width, height: 0 };
+}
+
+/**
  * Calculate final top positions for all floating note threads in the
  * editor's content coordinate space. Adjusts positions to prevent overlapping
  * by pushing threads above the selected one upward and threads below it downward.
@@ -475,7 +539,10 @@ export function calculateNotePositions( {
 	// above notes that precede it in the list. Sort by measured top so the
 	// sweep's assumption holds and cards never displace past their markers.
 	// Threads without a rect keep their relative order; they are skipped
-	// below and never receive a position.
+	// below and never receive a position. Threads sharing a top - two hidden
+	// blocks resolving to the same boundary rect, say (see
+	// `getHiddenBlockAnchorRect`) - keep document order too, because the sort
+	// is stable, and the sweep below spaces them out.
 	const orderedThreads = [ ...threads ].sort(
 		( a, b ) =>
 			( blockRects[ a.id ]?.top ?? Number.MAX_VALUE ) -

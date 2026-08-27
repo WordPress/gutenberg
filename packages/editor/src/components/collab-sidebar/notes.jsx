@@ -171,6 +171,7 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 			selectedNoteId: selectedNote,
 			isFloating,
 			sidebarRef,
+			orderedBlockIds,
 		} );
 
 	const hasThreads = Array.isArray( threads ) && threads.length > 0;

@@ -32,6 +32,7 @@
 
 ### Bug Fixes
 
+-   Notes: Keep a floating note thread at its block's place in the document when the block is hidden at the current viewport, and label the thread as hidden, instead of collapsing it to the top of the notes panel ([#81549](https://github.com/WordPress/gutenberg/pull/81549)).
 -   Register the editor and block editor keyboard shortcuts from the editor provider, so shortcuts work for consumers that mount the editor without rendering `EditorKeyboardShortcutsRegister` themselves ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).
 -   Header: Allow the Back button column to grow when "Show button text labels" is enabled so the label is not obscured by the following controls ([#81701](https://github.com/WordPress/gutenberg/pull/81701)).
 -   Notes: Stop forcing capitalization of the user name in a note byline, so the name is shown as the user set it ([#81788](https://github.com/WordPress/gutenberg/pull/81788)).

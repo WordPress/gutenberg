@@ -146,7 +146,8 @@
 	font-weight: var(--wpds-typography-font-weight-emphasis);
 }
 
-.editor-collab-sidebar-panel__deleted-block-notice {
+.editor-collab-sidebar-panel__deleted-block-notice,
+.editor-collab-sidebar-panel__hidden-block-notice {
 	font-weight: var(--wpds-typography-font-weight-emphasis);
 	color: $gray-700;
 }

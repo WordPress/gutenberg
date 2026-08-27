@@ -1838,6 +1838,305 @@ test.describe( 'Block Notes', () => {
 					} )
 					.toBeLessThan( 12 );
 			} );
+
+			// A block hidden at the current viewport unmounts as soon as it is
+			// deselected, leaving its thread without an anchor element. The
+			// thread has to hold the place the block would occupy rather than
+			// collapse to the top of the notes panel (#73565).
+			const FILLER_TEXT =
+				'Filler paragraph. ' +
+				'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. '.repeat(
+					3
+				);
+
+			/**
+			 * Sets the selected block's Desktop visibility through the block
+			 * options menu. 'Hide' and 'Show' open the same dialog.
+			 *
+			 * @param {Object}  utils
+			 * @param {Object}  utils.editor Editor utils.
+			 * @param {Object}  utils.page   Playwright page.
+			 * @param {string}  utils.item   Options menu item to click.
+			 * @param {boolean} utils.hide   Whether the block ends up hidden.
+			 */
+			async function setDesktopVisibility( {
+				editor,
+				page,
+				item,
+				hide,
+			} ) {
+				await editor.clickBlockOptionsMenuItem( item );
+				const dialog = page.getByRole( 'dialog', {
+					name: 'Hide block',
+				} );
+				const checkbox = dialog.getByRole( 'checkbox', {
+					name: 'Hide on Desktop',
+				} );
+				if ( hide ) {
+					await checkbox.check();
+				} else {
+					await checkbox.uncheck();
+				}
+				await dialog.getByRole( 'button', { name: 'Apply' } ).click();
+				// Applying leaves the options dropdown open, where it would
+				// swallow the next click on the canvas.
+				await page.keyboard.press( 'Escape' );
+			}
+
+			/**
+			 * Distance between a thread's top and the centre of the gap its
+			 * hidden block left between its neighbours - which is also where
+			 * the block itself sits while selected, collapsed to zero height.
+			 *
+			 * @param {Object} locators
+			 * @param {Object} locators.thread   Floating thread.
+			 * @param {Object} locators.filler   Block before the hidden one.
+			 * @param {Object} locators.trailing Block after the hidden one.
+			 */
+			async function distanceFromGapCentre( {
+				thread,
+				filler,
+				trailing,
+			} ) {
+				const threadBox = await thread.boundingBox();
+				const fillerBox = await filler.boundingBox();
+				const trailingBox = await trailing.boundingBox();
+				const centre =
+					( fillerBox.y + fillerBox.height + trailingBox.y ) / 2;
+				return Math.abs( threadBox.y - centre );
+			}
+
+			/**
+			 * Builds a filler / noted / trailing paragraph stack with a block
+			 * note on the middle paragraph. The noted block is deliberately
+			 * not the first one: a thread that lost its anchor parks at the
+			 * top of the panel, which is coincidentally the right answer for
+			 * a first block.
+			 *
+			 * @param {Object} utils
+			 * @param {Object} utils.editor         Editor utils.
+			 * @param {Object} utils.page           Playwright page.
+			 * @param {Object} utils.blockNoteUtils Block note utils.
+			 * @param {string} utils.comment        Note content.
+			 */
+			async function setUpNotedMiddleBlock( {
+				editor,
+				page,
+				blockNoteUtils,
+				comment,
+			} ) {
+				for ( const content of [
+					FILLER_TEXT,
+					'Noted paragraph',
+					'Trailing paragraph',
+				] ) {
+					await editor.insertBlock( {
+						name: 'core/paragraph',
+						attributes: { content },
+					} );
+				}
+
+				// Text locators rather than positional ones: the noted block
+				// unmounts when hidden, which would shift an `nth()` index
+				// onto the trailing paragraph.
+				const filler = editor.canvas.getByText( 'Filler paragraph.' );
+				const noted = editor.canvas.getByText( 'Noted paragraph' );
+				const trailing =
+					editor.canvas.getByText( 'Trailing paragraph' );
+
+				await editor.selectBlocks( noted );
+				await blockNoteUtils.addNote( comment );
+
+				// Located by content, not by accessible name: the name gains a
+				// hidden-block prefix partway through these tests.
+				const thread = page
+					.getByRole( 'treeitem' )
+					.filter( { hasText: comment } );
+				await expect( thread ).toHaveClass( /is-floating/ );
+
+				// Baseline: the thread lines up with its block.
+				await expect
+					.poll( async () => {
+						const threadBox = await thread.boundingBox();
+						const notedBox = await noted.boundingBox();
+						return Math.abs( threadBox.y - notedBox.y );
+					} )
+					.toBeLessThan( 12 );
+
+				return { filler, noted, trailing, thread };
+			}
+
+			test( "anchors a hidden block's thread where the block would be", async ( {
+				editor,
+				page,
+				blockNoteUtils,
+			} ) => {
+				const { filler, noted, trailing, thread } =
+					await setUpNotedMiddleBlock( {
+						editor,
+						page,
+						blockNoteUtils,
+						comment: 'Hidden host note',
+					} );
+
+				await editor.selectBlocks( noted );
+				await setDesktopVisibility( {
+					editor,
+					page,
+					item: 'Hide',
+					hide: true,
+				} );
+
+				// A hidden block stays rendered while it is selected; clicking
+				// away unmounts it and forces the board to recalculate.
+				await editor.selectBlocks( filler );
+				await expect( noted ).toBeHidden();
+
+				// The thread holds the gap the hidden block left behind. Boxes
+				// are re-read each round, since the canvas reflows as the
+				// block unmounts.
+				await expect
+					.poll( () =>
+						distanceFromGapCentre( { thread, filler, trailing } )
+					)
+					.toBeLessThan( 12 );
+
+				const fillerBox = await filler.boundingBox();
+				const panelBox = await page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.boundingBox();
+				const threadBox = await thread.boundingBox();
+				expect( threadBox.y ).toBeGreaterThan(
+					fillerBox.y + fillerBox.height
+				);
+				// The regression signature: parked at the top of the panel.
+				expect( threadBox.y ).toBeGreaterThan( panelBox.y + 200 );
+
+				// The thread explains why nothing is highlighted.
+				await expect(
+					thread.getByText( 'Block is hidden.' )
+				).toBeVisible();
+				await expect(
+					page.getByRole( 'treeitem', {
+						name: 'Note on hidden block: Hidden host note',
+					} )
+				).toBeVisible();
+			} );
+
+			test( 'keeps a hidden thread in place while selected, and realigns on unhide', async ( {
+				editor,
+				page,
+				blockNoteUtils,
+			} ) => {
+				const { filler, noted, trailing, thread } =
+					await setUpNotedMiddleBlock( {
+						editor,
+						page,
+						blockNoteUtils,
+						comment: 'Reveal me',
+					} );
+
+				await editor.selectBlocks( noted );
+				await setDesktopVisibility( {
+					editor,
+					page,
+					item: 'Hide',
+					hide: true,
+				} );
+				await editor.selectBlocks( filler );
+				await expect( noted ).toBeHidden();
+
+				/*
+				 * Selecting the thread selects the block, which puts it back
+				 * in the DOM collapsed to zero height so the block toolbar
+				 * works - it is still invisible. The thread expands in place
+				 * and keeps saying so.
+				 */
+				await thread.click();
+				await expect( thread ).toHaveAttribute(
+					'aria-expanded',
+					'true'
+				);
+				await expect( noted ).toBeHidden();
+				await expect(
+					thread.getByText( 'Block is hidden.' )
+				).toBeVisible();
+				await expect
+					.poll( () =>
+						distanceFromGapCentre( { thread, filler, trailing } )
+					)
+					.toBeLessThan( 12 );
+
+				// Unhiding restores alignment for good: the block keeps
+				// rendering once it is deselected.
+				await editor.selectBlocks( noted );
+				await setDesktopVisibility( {
+					editor,
+					page,
+					item: 'Show',
+					hide: false,
+				} );
+				await editor.selectBlocks( filler );
+				await expect( noted ).toBeVisible();
+				await expect(
+					thread.getByText( 'Block is hidden.' )
+				).toBeHidden();
+				await expect
+					.poll( async () => {
+						const threadBox = await thread.boundingBox();
+						const notedBox = await noted.boundingBox();
+						return Math.abs( threadBox.y - notedBox.y );
+					} )
+					.toBeLessThan( 12 );
+			} );
+
+			test( "anchors a hidden last block's thread below the previous block", async ( {
+				editor,
+				page,
+				blockNoteUtils,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: { content: FILLER_TEXT },
+				} );
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: { content: 'Last paragraph' },
+				} );
+
+				const filler = editor.canvas.getByText( 'Filler paragraph.' );
+				const last = editor.canvas.getByText( 'Last paragraph' );
+
+				await editor.selectBlocks( last );
+				await blockNoteUtils.addNote( 'Last block note' );
+
+				const thread = page
+					.getByRole( 'treeitem' )
+					.filter( { hasText: 'Last block note' } );
+				await expect( thread ).toHaveClass( /is-floating/ );
+
+				await editor.selectBlocks( last );
+				await setDesktopVisibility( {
+					editor,
+					page,
+					item: 'Hide',
+					hide: true,
+				} );
+				await editor.selectBlocks( filler );
+				await expect( last ).toBeHidden();
+
+				// Nothing follows the hidden block, so the thread falls back
+				// to the bottom of the preceding block.
+				await expect
+					.poll( async () => {
+						const threadBox = await thread.boundingBox();
+						const fillerBox = await filler.boundingBox();
+						return Math.abs(
+							threadBox.y - ( fillerBox.y + fillerBox.height )
+						);
+					} )
+					.toBeLessThan( 24 );
+			} );
 		} );
 	} );
 

@@ -52,6 +52,38 @@ export function NoteThread( {
 	const floatingRef = useRef( null );
 	const isKeyboardTabbingRef = useRef( false );
 
+	/*
+	 * A block hidden at the current viewport has nothing for its thread to
+	 * point at and nothing to highlight, so say so. Whether the metadata
+	 * covers the viewport in view is left to the block-editor package: the
+	 * block either drops out of the DOM (deselected) or stays in it collapsed
+	 * and invisible (selected, so the block toolbar still works). Requiring
+	 * metadata that hides the block somewhere keeps the frame before a freshly
+	 * mounted block registers from reading as hidden.
+	 */
+	const canBlockBeHidden = useSelect(
+		( select ) => {
+			if ( ! note.blockClientId ) {
+				return false;
+			}
+			const blockVisibility = select(
+				blockEditorStore
+			).getBlockAttributes( note.blockClientId )?.metadata
+				?.blockVisibility;
+			return (
+				blockVisibility === false ||
+				Object.values( blockVisibility?.viewport ?? {} ).includes(
+					false
+				)
+			);
+		},
+		[ note.blockClientId ]
+	);
+	const isBlockHidden =
+		canBlockBeHidden &&
+		( ! relatedBlockElement ||
+			relatedBlockElement.classList.contains( 'is-block-hidden' ) );
+
 	const registerThread = floating?.registerThread;
 	const unregisterThread = floating?.unregisterThread;
 
@@ -160,17 +192,26 @@ export function NoteThread( {
 		stripHTML( note.content?.rendered ),
 		10
 	);
-	const ariaLabel = !! note.blockClientId
-		? sprintf(
-				// translators: %s: note excerpt
-				__( 'Note: %s' ),
-				noteExcerpt
-		  )
-		: sprintf(
-				// translators: %s: note excerpt
-				__( 'Original block deleted. Note: %s' ),
-				noteExcerpt
-		  );
+	let ariaLabel;
+	if ( ! note.blockClientId ) {
+		ariaLabel = sprintf(
+			// translators: %s: note excerpt
+			__( 'Original block deleted. Note: %s' ),
+			noteExcerpt
+		);
+	} else if ( isBlockHidden ) {
+		ariaLabel = sprintf(
+			// translators: %s: note excerpt
+			__( 'Note on hidden block: %s' ),
+			noteExcerpt
+		);
+	} else {
+		ariaLabel = sprintf(
+			// translators: %s: note excerpt
+			__( 'Note: %s' ),
+			noteExcerpt
+		);
+	}
 
 	if ( isFloating && note.id === 'new' ) {
 		return (
@@ -231,6 +272,11 @@ export function NoteThread( {
 			{ ! note.blockClientId && (
 				<p className="editor-collab-sidebar-panel__deleted-block-notice">
 					{ __( 'Original block deleted.' ) }
+				</p>
+			) }
+			{ isBlockHidden && (
+				<p className="editor-collab-sidebar-panel__hidden-block-notice">
+					{ __( 'Block is hidden.' ) }
 				</p>
 			) }
 			<Note

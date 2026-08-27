@@ -26,6 +26,7 @@ import {
 	applyNoteFormat,
 	calculateNotePositions,
 	findNoteInBlock,
+	getHiddenBlockAnchorRect,
 	getInlineMarkerStart,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
@@ -541,6 +542,7 @@ export function useFloatingBoard( {
 	selectedNoteId,
 	isFloating,
 	sidebarRef,
+	orderedBlockIds,
 } ) {
 	const [ notePositions, setNotePositions ] = useState( {} );
 	const [ store ] = useState( createBoardStore );
@@ -573,10 +575,48 @@ export function useFloatingBoard( {
 		const schedule = () => {
 			window.cancelAnimationFrame( rafId );
 			rafId = window.requestAnimationFrame( () => {
+				const blockRects = store.getAnchorRects();
+
+				/*
+				 * A block hidden at the current viewport renders nothing once
+				 * it is deselected, so its threads register a null element and
+				 * come back without a rect. Stand in a boundary rect at the
+				 * place the block would occupy, so the threads hold their spot
+				 * in the column instead of collapsing to the panel top.
+				 * These reads join the batch above, before any writes.
+				 */
+				const unanchored = threads.filter(
+					( thread ) =>
+						!! thread.blockClientId && ! blockRects[ thread.id ]
+				);
+				if ( unanchored.length > 0 ) {
+					// The canvas is iframed unless something (e.g. metaboxes)
+					// forces same-document rendering; with every noted block
+					// hidden there is no registered element to read it from.
+					const doc =
+						store.getFirstBlockElement()?.ownerDocument ??
+						panel.ownerDocument.querySelector(
+							'iframe[name="editor-canvas"]'
+						)?.contentDocument ??
+						panel.ownerDocument;
+
+					for ( const thread of unanchored ) {
+						const rect = getHiddenBlockAnchorRect(
+							thread.blockClientId,
+							orderedBlockIds,
+							( id ) =>
+								doc?.getElementById( `block-${ id }` ) ?? null
+						);
+						if ( rect ) {
+							blockRects[ thread.id ] = rect;
+						}
+					}
+				}
+
 				const result = calculateNotePositions( {
 					threads,
 					selectedNoteId,
-					blockRects: store.getAnchorRects(),
+					blockRects,
 					heights,
 					scrollTop: canvas?.scrollTop ?? 0,
 				} );
@@ -606,7 +646,15 @@ export function useFloatingBoard( {
 			contentObserver.disconnect();
 			view?.removeEventListener( 'scroll', applyScroll, listenerOptions );
 		};
-	}, [ sidebarRef, heights, isFloating, selectedNoteId, store, threads ] );
+	}, [
+		sidebarRef,
+		heights,
+		isFloating,
+		orderedBlockIds,
+		selectedNoteId,
+		store,
+		threads,
+	] );
 
 	return {
 		notePositions,
