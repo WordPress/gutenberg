@@ -1240,6 +1240,67 @@
             - style
             - value
             - variant
+- name: SearchableSelect
+  props:
+      - actionsRef
+      - aria-describedby
+      - aria-label
+      - aria-labelledby
+      - autoComplete
+      - autoHighlight
+      - children
+      - defaultInputValue
+      - defaultOpen
+      - defaultValue
+      - disabled
+      - emptyContent
+      - filter
+      - filteredItems
+      - form
+      - grid
+      - highlightItemOnHover
+      - id
+      - inline
+      - inputRef
+      - inputValue
+      - isItemEqualToValue
+      - items
+      - itemToStringLabel
+      - itemToStringValue
+      - key
+      - limit
+      - locale
+      - loopFocus
+      - modal
+      - name
+      - onInputValueChange
+      - onItemHighlighted
+      - onOpenChange
+      - onOpenChangeComplete
+      - onValueChange
+      - open
+      - openOnInputClick
+      - popupWidth
+      - readOnly
+      - ref
+      - required
+      - searchPlaceholder
+      - triggerContent
+      - value
+      - virtualized
+  subcomponents:
+      - name: SearchableSelect.Item
+        props:
+            - children
+            - className
+            - disabled
+            - index
+            - nativeButton
+            - onClick
+            - render
+            - style
+            - value
+            - variant
 - name: SearchControl
   props:
       - __next40pxDefaultSize

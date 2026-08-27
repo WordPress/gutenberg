@@ -1,9 +1,27 @@
 import { forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import warning from '@wordpress/warning';
 import * as Combobox from '../combobox';
 import styles from './style.module.css';
-import type { SearchableSelectProps } from './types';
-import type { SelectItem } from '../../select-control/types';
+import {
+	findCreatableItem,
+	isCreatableItem,
+	normalizeRootItems,
+	type Item,
+	type SearchableSelectProps,
+} from './types';
+
+function warnSearchableSelectProps( items: Item[] | undefined ): void {
+	if ( ! items?.length ) {
+		return;
+	}
+
+	if ( items.filter( isCreatableItem ).length > 1 ) {
+		warning(
+			'SearchableSelect: expected at most one item with `creatable: true` in `items`.'
+		);
+	}
+}
 
 /**
  * A searchable single-selection component, with support for
@@ -15,11 +33,11 @@ export const SearchableSelect = forwardRef<
 >( function SearchableSelect(
 	{
 		children,
-		creatableItem,
 		emptyContent = __( 'No results found.' ),
 		items,
 		triggerContent,
 		searchPlaceholder = __( 'Search' ),
+		popupWidth,
 		'aria-label': ariaLabel,
 		'aria-labelledby': ariaLabelledby,
 		'aria-describedby': ariaDescribedby,
@@ -27,13 +45,13 @@ export const SearchableSelect = forwardRef<
 	},
 	ref
 ) {
+	warnSearchableSelectProps( items );
+
+	const creatableItem = findCreatableItem( items );
+	const comboboxItems = normalizeRootItems( items );
+
 	return (
-		<Combobox.Root< SelectItem, false >
-			items={
-				! creatableItem ? items : [ ...( items ?? [] ), creatableItem ]
-			}
-			{ ...restProps }
-		>
+		<Combobox.Root< Item, false > items={ comboboxItems } { ...restProps }>
 			<Combobox.Trigger
 				ref={ ref }
 				aria-label={ ariaLabel }
@@ -43,7 +61,7 @@ export const SearchableSelect = forwardRef<
 				{ triggerContent }
 			</Combobox.Trigger>
 
-			<Combobox.Popup>
+			<Combobox.Popup popupWidth={ popupWidth }>
 				<div className={ styles[ 'input-wrapper' ] }>
 					<Combobox.Input placeholder={ searchPlaceholder } />
 				</div>
@@ -51,8 +69,8 @@ export const SearchableSelect = forwardRef<
 				<Combobox.List>
 					<Combobox.ListBody>
 						<Combobox.Collection>
-							{ ( item: SelectItem, ...args ) => {
-								if ( item.value === creatableItem?.value ) {
+							{ ( item: Item, ...args ) => {
+								if ( isCreatableItem( item ) ) {
 									return null;
 								}
 								if ( children ) {
