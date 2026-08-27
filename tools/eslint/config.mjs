@@ -55,7 +55,7 @@ function dedupePlugins( configs ) {
  * @type {string[]}
  */
 const developmentFiles = [
-	'**/benchmark/**/*.{js,jsx}',
+	'**/benchmark/**/*.js',
 	'**/@(__mocks__|__tests__|test)/**/*.[tj]s?(x)',
 	'**/@(storybook|stories)/**/*.[tj]s?(x)',
 	'packages/babel-preset-default/bin/**/*.js',
@@ -272,6 +272,8 @@ export default dedupePlugins( [
 			'example-*/',
 		],
 	},
+	// ESLint's default file discovery does not include JSX files.
+	{ files: [ '**/*.jsx' ] },
 
 	// Base recommended config from @wordpress/eslint-plugin.
 	...wpPlugin.configs.recommended,
@@ -500,11 +502,11 @@ export default dedupePlugins( [
 	...wpPlugin.configs[ 'test-unit' ].map( ( config ) => ( {
 		...config,
 		files: [
-			'packages/jest*/**/*.{js,jsx}',
+			'packages/jest*/**/*.js',
 			'**/test/**/*.{js,jsx}',
 			'**/__tests__/**/*.{js,jsx}',
 		],
-		ignores: [ 'test/e2e/**/*.{js,jsx}', 'test/performance/**/*.{js,jsx}' ],
+		ignores: [ 'test/e2e/**/*.js', 'test/performance/**/*.js' ],
 	} ) ),
 
 	// Override: Test files — jest-dom, testing-library, jest recommended.
