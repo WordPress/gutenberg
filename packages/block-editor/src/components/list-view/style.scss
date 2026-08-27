@@ -269,19 +269,19 @@
 	.block-editor-list-view-block-contents:focus {
 		box-shadow: none;
 		outline: none;
-	}
 
-	.block-editor-list-view-block-contents:focus::after {
-		content: "";
-		position: absolute;
-		top: 0;
-		right: -(24px + 5px);
-		bottom: 0;
-		left: 0;
-		border-radius: inherit;
-		@include outset-ring__focus();
-		pointer-events: none;
-		z-index: 2;
+		&::after {
+			content: "";
+			position: absolute;
+			top: 0;
+			right: -(24px + 5px);
+			bottom: 0;
+			left: 0;
+			border-radius: inherit;
+			@include outset-ring__focus();
+			pointer-events: none;
+			z-index: 2;
+		}
 	}
 
 	// Fix focus styling width when one row has fewer cells.
