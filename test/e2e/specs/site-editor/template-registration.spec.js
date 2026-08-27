@@ -378,8 +378,12 @@ class BlockTemplateRegistrationUtils {
 
 	async searchForTemplate( searchTerm ) {
 		const searchResults = this.page.getByLabel( 'Actions' );
+		// The list is fetched client-side after the route loads, which can
+		// take a while on slower CI runners.
 		await expect
-			.poll( async () => await searchResults.count() )
+			.poll( async () => await searchResults.count(), {
+				timeout: 15_000,
+			} )
 			.toBeGreaterThan( 0 );
 		const initialSearchResultsCount = await searchResults.count();
 		await this.page.getByPlaceholder( 'Search' ).fill( searchTerm );

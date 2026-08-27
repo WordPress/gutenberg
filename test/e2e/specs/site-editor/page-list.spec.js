@@ -75,9 +75,11 @@ test.describe( 'Page List', () => {
 						.getByRole( 'tab', { name: 'Upload files' } )
 						.click();
 
+					const selectFiles =
+						mediaLibrary.getByText( 'Select files' );
 					const fileChooserPromise =
 						page.waitForEvent( 'filechooser' );
-					await mediaLibrary.getByText( 'Select files' ).click();
+					await selectFiles.click();
 					const fileChooser = await fileChooserPromise;
 					await fileChooser.setFiles( TEST_IMAGE_FILE_PATH );
 					await mediaLibrary
@@ -489,17 +491,22 @@ test.describe( 'Page List', () => {
 		// } );
 
 		test.describe( 'Field trigger', () => {
-			const getStatusField = ( page ) => {
+			const getStatusField = async ( page ) => {
 				const editButton = page.getByRole( 'button', {
 					name: 'Edit Status',
 				} );
-				return { editButton, row: editButton.locator( '..' ) };
+				const row = editButton.locator( '..' );
+				// The raw mouse clicks below use the row's bounding box, so
+				// wait for it to stop moving first — the extensible site
+				// editor's quick edit surface animates in.
+				await row.hover();
+				return { editButton, row };
 			};
 
 			test( 'opens the flyout when clicking anywhere on the row', async ( {
 				page,
 			} ) => {
-				const { editButton, row } = getStatusField( page );
+				const { editButton, row } = await getStatusField( page );
 				const box = await row.boundingBox();
 
 				// Click the value area, away from the edit button.
@@ -520,7 +527,7 @@ test.describe( 'Page List', () => {
 			test( 'returns focus to the edit button when the flyout is dismissed', async ( {
 				page,
 			} ) => {
-				const { editButton, row } = getStatusField( page );
+				const { editButton, row } = await getStatusField( page );
 				const box = await row.boundingBox();
 				await page.mouse.click(
 					box.x + box.width * 0.5,
@@ -548,7 +555,7 @@ test.describe( 'Page List', () => {
 			test( 'keeps the flyout usable after double-clicking a field row', async ( {
 				page,
 			} ) => {
-				const { row } = getStatusField( page );
+				const { row } = await getStatusField( page );
 				const box = await row.boundingBox();
 				const x = box.x + box.width * 0.5;
 				const y = box.y + box.height / 2;

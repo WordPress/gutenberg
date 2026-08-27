@@ -197,4 +197,18 @@ async function visitSiteEditorV2( this: Admin, options: SiteEditorOptions ) {
 					?.__unstableIsEditorReady()
 		);
 	}
+
+	// The home screen previews the resolved home template through the same
+	// lazily loaded editor, so wait until it holds a post before tests read
+	// editor state. Classic themes render a plain site preview instead, which
+	// counts as ready as soon as its frame exists.
+	if ( route === '/' ) {
+		await this.page.waitForFunction(
+			() =>
+				!! window.wp?.data
+					?.select( 'core/editor' )
+					?.getCurrentPostId() ||
+				!! document.querySelector( 'iframe[title="Site Preview"]' )
+		);
+	}
 }
