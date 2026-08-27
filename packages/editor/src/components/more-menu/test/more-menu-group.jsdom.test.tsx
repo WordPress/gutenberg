@@ -1,5 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { UserEvent } from '@testing-library/user-event';
+import type { ComponentProps, ComponentType, ReactNode } from 'react';
 import { MenuItem } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 // eslint-disable-next-line @wordpress/use-recommended-components
@@ -7,7 +9,13 @@ import { Menu } from '@wordpress/ui';
 import MoreMenuItem from '../more-menu-item';
 import MoreMenuGroup from '../more-menu-group';
 
-function renderMenu( children ) {
+// `MenuItem` renders a `Button`, which turns into a link given an address.
+// Neither of them declares `href` among its props.
+const LinkMenuItem = MenuItem as ComponentType<
+	ComponentProps< typeof MenuItem > & { href: string }
+>;
+
+function renderMenu( children: ReactNode ) {
 	return render(
 		<Menu.Root>
 			<Menu.Trigger>Options</Menu.Trigger>
@@ -18,7 +26,7 @@ function renderMenu( children ) {
 	);
 }
 
-async function openMenu( user ) {
+async function openMenu( user: UserEvent ) {
 	await user.click( screen.getByRole( 'button', { name: 'Options' } ) );
 	await screen.findByRole( 'menu' );
 }
@@ -59,7 +67,9 @@ describe( 'MoreMenuGroup', () => {
 		const user = userEvent.setup();
 
 		renderMenu(
-			<MenuItem href="https://wordpress.org">Legacy link</MenuItem>
+			<LinkMenuItem href="https://wordpress.org">
+				Legacy link
+			</LinkMenuItem>
 		);
 		await openMenu( user );
 

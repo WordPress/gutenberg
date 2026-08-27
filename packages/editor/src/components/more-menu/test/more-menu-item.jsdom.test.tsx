@@ -1,10 +1,12 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { UserEvent } from '@testing-library/user-event';
+import type { ReactNode } from 'react';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Menu } from '@wordpress/ui';
 import MoreMenuItem from '../more-menu-item';
 
-function renderMenu( children ) {
+function renderMenu( children: ReactNode ) {
 	return render(
 		<Menu.Root>
 			<Menu.Trigger>Options</Menu.Trigger>
@@ -13,7 +15,7 @@ function renderMenu( children ) {
 	);
 }
 
-async function openMenu( user ) {
+async function openMenu( user: UserEvent ) {
 	await user.click( screen.getByRole( 'button', { name: 'Options' } ) );
 	await screen.findByRole( 'menu' );
 }

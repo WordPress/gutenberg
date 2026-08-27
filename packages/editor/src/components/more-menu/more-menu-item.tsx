@@ -2,6 +2,70 @@ import { Icon as WCIcon } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Menu } from '@wordpress/ui';
+import type {
+	ComponentProps,
+	ForwardedRef,
+	HTMLAttributes,
+	MouseEvent,
+	ReactNode,
+} from 'react';
+
+type MenuShortcut = NonNullable<
+	ComponentProps< typeof Menu.Item >[ 'shortcut' ]
+>;
+
+/**
+ * Shortcut in any of the shapes the legacy `MenuItem` took.
+ */
+type LegacyShortcut =
+	| string
+	| MenuShortcut
+	| { display: string; ariaLabel?: string };
+
+type MoreMenuItemProps = Omit<
+	HTMLAttributes< HTMLElement >,
+	'children' | 'onClick'
+> & {
+	/**
+	 * Label of the item.
+	 */
+	children?: ReactNode;
+
+	/**
+	 * Address the item navigates to, which turns it into a link.
+	 */
+	href?: string;
+
+	/**
+	 * Icon rendered before the label, as an element or a Dashicon slug.
+	 */
+	icon?: ComponentProps< typeof WCIcon >[ 'icon' ];
+
+	/**
+	 * Description rendered below the label.
+	 */
+	info?: ReactNode;
+
+	/**
+	 * Whether a checkable item is checked.
+	 */
+	isSelected?: boolean;
+
+	/**
+	 * Callback invoked when the item is selected.
+	 */
+	onClick?: ( event?: MouseEvent< HTMLElement > ) => void;
+
+	/**
+	 * Keyboard shortcut of the item.
+	 */
+	shortcut?: LegacyShortcut;
+
+	/**
+	 * Target of a link item.
+	 */
+	target?: string;
+};
 
 /**
  * Converts the shortcut shapes the legacy `MenuItem` took, a string or an
@@ -10,27 +74,27 @@ import { Menu } from '@wordpress/ui';
  * `ariaKeyShortcut` is left out: it cannot be derived from display text, and
  * the legacy item never set `aria-keyshortcuts` either.
  *
- * @param {string|Object} [shortcut] Shortcut in any accepted shape.
+ * @param shortcut Shortcut in any accepted shape.
  *
- * @return {?Object} Shortcut of a menu item.
+ * @return Shortcut of a menu item.
  */
-function adaptShortcut( shortcut ) {
+function adaptShortcut( shortcut?: LegacyShortcut ) {
 	if ( ! shortcut ) {
 		return undefined;
 	}
 
 	if ( typeof shortcut === 'string' ) {
-		return { displayShortcut: shortcut, label: shortcut };
+		return { displayShortcut: shortcut, label: shortcut } as MenuShortcut;
 	}
 
-	if ( shortcut.displayShortcut ) {
+	if ( 'displayShortcut' in shortcut ) {
 		return shortcut;
 	}
 
 	return {
 		displayShortcut: shortcut.display,
 		label: shortcut.ariaLabel ?? shortcut.display,
-	};
+	} as MenuShortcut;
 }
 
 function UnforwardedMoreMenuItem(
@@ -46,8 +110,8 @@ function UnforwardedMoreMenuItem(
 		shortcut,
 		target,
 		...props
-	},
-	ref
+	}: MoreMenuItemProps,
+	ref: ForwardedRef< HTMLDivElement >
 ) {
 	const label = <Menu.ItemLabel>{ children }</Menu.ItemLabel>;
 	const description = info ? (

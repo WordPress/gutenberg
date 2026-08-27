@@ -1,18 +1,28 @@
 import { Children, isValidElement } from '@wordpress/element';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Menu } from '@wordpress/ui';
+import type { ComponentProps, ReactNode } from 'react';
 import MoreMenuItem from './more-menu-item';
+
+type MoreMenuGroupProps = {
+	/**
+	 * Label of the group.
+	 */
+	label: string;
+
+	/**
+	 * Fills of the slot.
+	 */
+	children: ReactNode;
+};
 
 /**
  * Renders the fills of an action item slot as a group of the more menu.
- *
- * @param {Object}          props          Component properties.
- * @param {string}          props.label    Label of the group.
- * @param {React.ReactNode} props.children Fills of the slot.
- *
- * @return {React.ReactNode} The rendered component.
  */
-export default function MoreMenuGroup( { label, children } ) {
+export default function MoreMenuGroup( {
+	label,
+	children,
+}: MoreMenuGroupProps ) {
 	return (
 		<>
 			<Menu.Separator />
@@ -32,27 +42,31 @@ export default function MoreMenuGroup( { label, children } ) {
  * would skip it. The `render` prop makes it part of the menu, while the fill
  * keeps rendering its own markup.
  *
- * @param {React.ReactNode} fills Fills of the slot.
+ * @param fills Fills of the slot.
  *
- * @return {React.ReactNode} The fills as menu items.
+ * @return The fills as menu items.
  */
-function toMenuItems( fills ) {
+function toMenuItems( fills: ReactNode ) {
 	return Children.map( fills, ( fill ) => {
-		if ( ! isValidElement( fill ) || fill.type === MoreMenuItem ) {
+		if (
+			! isValidElement< { href?: string } >( fill ) ||
+			fill.type === MoreMenuItem
+		) {
 			return fill;
 		}
 
 		// The fill renders the content of the item, so the label element it
 		// requires is never rendered and `aria-labelledby` points at nothing.
 		// Naming falls back to the content of the fill.
-		const label = <Menu.ItemLabel />;
+		const label = <Menu.ItemLabel>{ null }</Menu.ItemLabel>;
+		const render = fill as ComponentProps< typeof Menu.Item >[ 'render' ];
 
 		return fill.props.href ? (
-			<Menu.LinkItem aria-labelledby="" render={ fill }>
+			<Menu.LinkItem aria-labelledby="" render={ render }>
 				{ label }
 			</Menu.LinkItem>
 		) : (
-			<Menu.Item nativeButton aria-labelledby="" render={ fill }>
+			<Menu.Item nativeButton aria-labelledby="" render={ render }>
 				{ label }
 			</Menu.Item>
 		);
