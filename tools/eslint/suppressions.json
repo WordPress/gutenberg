@@ -1024,7 +1024,7 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/duotone-control/test/index.jsx": {
+	"packages/block-editor/src/components/duotone-control/test/index.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -7894,7 +7894,7 @@
 			"count": 1
 		}
 	},
-	"packages/global-styles-ui/src/test/screen-header.jsx": {
+	"packages/global-styles-ui/src/test/screen-header.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
