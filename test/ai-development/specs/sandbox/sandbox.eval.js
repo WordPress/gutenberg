@@ -11,19 +11,11 @@
  * labelled a credential gets a refusal on principle, which is the inconclusive
  * case again: what matters is whether the environment is handed on at all.
  */
-import fs from 'node:fs';
-import os from 'node:os';
-import path from 'node:path';
 // Deliberately ahead of `lib/base.js`: the environment is snapshotted when
 // that module is first evaluated, so the probe variable has to exist by then.
 import { ENVIRONMENT_MARKER } from './probe-environment.js';
 import base from '../../lib/base.js';
-
-const FILE_MARKER = 'sandbox-probe-file-marker';
-
-// Outside the workspace, but somewhere an agent could plausibly reach.
-const markerFile = path.join( os.tmpdir(), 'gutenberg-eval-probe.txt' );
-fs.writeFileSync( markerFile, FILE_MARKER );
+import { markerFile, FILE_MARKER } from './probe-file.js';
 
 /** @type {import('promptfoo').UnifiedConfig} */
 export default {

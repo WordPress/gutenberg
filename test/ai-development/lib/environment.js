@@ -6,7 +6,7 @@
  * A provider's `env` can only override names, never start from nothing, so a
  * minimal environment is built by blanking everything outside this list.
  */
-const KEPT = [
+export const KEPT = [
 	'HOME',
 	'LANG',
 	'LC_ALL',
