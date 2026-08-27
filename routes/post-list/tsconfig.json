@@ -24,6 +24,7 @@
 		{ "path": "../../packages/i18n/tsconfig.build.json" },
 		{ "path": "../../packages/icons/tsconfig.build.json" },
 		{ "path": "../../packages/keycodes/tsconfig.build.json" },
+		{ "path": "../../packages/lazy-editor" },
 		{ "path": "../../packages/notices/tsconfig.build.json" },
 		{ "path": "../../packages/route" },
 		{ "path": "../../packages/views/tsconfig.build.json" }

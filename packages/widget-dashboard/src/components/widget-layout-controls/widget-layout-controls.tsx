@@ -19,15 +19,32 @@ export interface WidgetLayoutControlsProps {
 	 * The instance these controls manage within the layout.
 	 */
 	widget: DashboardWidget< unknown >;
+
+	/**
+	 * Whether the policy allows removing the instance.
+	 *
+	 * @default true
+	 */
+	canRemove?: boolean;
+
+	/**
+	 * Whether the policy allows resizing the instance.
+	 *
+	 * @default true
+	 */
+	canResize?: boolean;
 }
 
 /**
- * Customize-mode controls: width menu and removal.
+ * Customize-mode controls: width menu and removal, each following the
+ * policy's answer for its operation.
  *
  * @param {WidgetLayoutControlsProps} props Component props.
  */
 export function WidgetLayoutControls( {
 	widget,
+	canRemove = true,
+	canResize = true,
 }: WidgetLayoutControlsProps ): React.ReactNode {
 	const { layout, onLayoutChange } = useDashboardInternalContext();
 	const width = widget.placement?.width;
@@ -61,50 +78,54 @@ export function WidgetLayoutControls( {
 
 	return (
 		<>
-			<Menu>
-				<Menu.TriggerButton
-					render={
-						<IconButton
-							icon={ moreVertical }
-							label={ __( 'Widget options' ) }
-							size="compact"
-							variant="minimal"
-							tone="neutral"
-						/>
-					}
+			{ canResize && (
+				<Menu>
+					<Menu.TriggerButton
+						render={
+							<IconButton
+								icon={ moreVertical }
+								label={ __( 'Widget options' ) }
+								size="compact"
+								variant="minimal"
+								tone="neutral"
+							/>
+						}
+					/>
+
+					<Menu.Popover>
+						<Menu.Group>
+							<Menu.GroupLabel>{ __( 'Width' ) }</Menu.GroupLabel>
+							<Menu.Item
+								disabled={ width === 'fill' }
+								onClick={ () => onNamedWidthChange( 'fill' ) }
+							>
+								<Menu.ItemLabel>
+									{ __( 'Use available width' ) }
+								</Menu.ItemLabel>
+							</Menu.Item>
+							<Menu.Item
+								disabled={ width === 'full' }
+								onClick={ () => onNamedWidthChange( 'full' ) }
+							>
+								<Menu.ItemLabel>
+									{ __( 'Make full width' ) }
+								</Menu.ItemLabel>
+							</Menu.Item>
+						</Menu.Group>
+					</Menu.Popover>
+				</Menu>
+			) }
+
+			{ canRemove && (
+				<IconButton
+					icon={ trash }
+					label={ __( 'Remove' ) }
+					size="compact"
+					variant="minimal"
+					tone="neutral"
+					onClick={ onRemove }
 				/>
-
-				<Menu.Popover>
-					<Menu.Group>
-						<Menu.GroupLabel>{ __( 'Width' ) }</Menu.GroupLabel>
-						<Menu.Item
-							disabled={ width === 'fill' }
-							onClick={ () => onNamedWidthChange( 'fill' ) }
-						>
-							<Menu.ItemLabel>
-								{ __( 'Use available width' ) }
-							</Menu.ItemLabel>
-						</Menu.Item>
-						<Menu.Item
-							disabled={ width === 'full' }
-							onClick={ () => onNamedWidthChange( 'full' ) }
-						>
-							<Menu.ItemLabel>
-								{ __( 'Make full width' ) }
-							</Menu.ItemLabel>
-						</Menu.Item>
-					</Menu.Group>
-				</Menu.Popover>
-			</Menu>
-
-			<IconButton
-				icon={ trash }
-				label={ __( 'Remove' ) }
-				size="compact"
-				variant="minimal"
-				tone="neutral"
-				onClick={ onRemove }
-			/>
+			) }
 		</>
 	);
 }
