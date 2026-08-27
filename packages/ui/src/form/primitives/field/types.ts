@@ -94,5 +94,8 @@ export type FieldDetailsProps = ComponentProps< 'div' > & {
 
 export type FieldVisualLabelProps = ComponentProps< 'span' > &
 	FieldLabelVariantProps & {
+		/**
+		 * Visible label text. Not associated with a control.
+		 */
 		children?: React.ReactNode;
 	};
