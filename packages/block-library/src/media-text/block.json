@@ -100,6 +100,10 @@
 		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,
+		"dimensions": {
+			"aspectRatio": true,
+			"__experimentalSkipSerialization": [ "aspectRatio" ]
+		},
 		"__experimentalBorder": {
 			"color": true,
 			"radius": true,
@@ -142,6 +146,11 @@
 			"clientNavigation": true
 		},
 		"allowedBlocks": true
+	},
+	"selectors": {
+		"dimensions": {
+			"aspectRatio": ".wp-block-media-text__media img, .wp-block-media-text__media video"
+		}
 	},
 	"editorStyle": "wp-block-media-text-editor",
 	"style": "wp-block-media-text"

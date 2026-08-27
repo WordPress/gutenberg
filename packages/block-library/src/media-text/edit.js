@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
-import { useState, useRef } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useState, useRef, useEffect } from '@wordpress/element';
 import {
 	BlockControls,
 	BlockVerticalAlignmentControl,
@@ -9,6 +9,7 @@ import {
 	InspectorControls,
 	useBlockProps,
 	__experimentalImageURLInputUI as ImageURLInputUI,
+	getDimensionsClassesAndStyles,
 	store as blockEditorStore,
 	useBlockEditingMode,
 	privateApis as blockEditorPrivateApis,
@@ -37,7 +38,7 @@ import {
 import { unlock } from '../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
-const { ResolutionTool } = unlock( blockEditorPrivateApis );
+const { ResolutionTool, cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 // this limits the resize to a safe zone to avoid making broken layouts
 const applyWidthConstraints = ( width ) =>
@@ -197,10 +198,31 @@ function MediaTextEdit( {
 		mediaWidth,
 		mediaSizeSlug,
 		rel,
+		style: blockStyle,
 		verticalAlignment,
 		allowedBlocks,
 		useFeaturedImage,
 	} = attributes;
+
+	const dimensionsProps = getDimensionsClassesAndStyles( attributes );
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
+
+	// The aspect ratio and "Crop image to fill" are mutually exclusive, so
+	// applying an aspect ratio disables fill.
+	const hasAspectRatio = !! dimensionsProps.className;
+
+	useEffect( () => {
+		if ( imageFill && hasAspectRatio ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { imageFill: false } );
+		}
+	}, [
+		__unstableMarkNextChangeAsNotPersistent,
+		imageFill,
+		hasAspectRatio,
+		setAttributes,
+	] );
 
 	const [ featuredImage ] = useEntityProp(
 		'postType',
@@ -389,15 +411,28 @@ function MediaTextEdit( {
 					<ToggleControl
 						label={ __( 'Crop image to fill' ) }
 						checked={ !! imageFill }
-						onChange={ () =>
+						onChange={ () => {
+							const newImageFill = ! imageFill;
+							// Enabling fill clears any aspect ratio, as the two
+							// settings are mutually exclusive.
+							const newStyle = newImageFill
+								? cleanEmptyObject( {
+										...blockStyle,
+										dimensions: {
+											...blockStyle?.dimensions,
+											aspectRatio: undefined,
+										},
+								  } )
+								: blockStyle;
 							setAttributes( {
-								imageFill: ! imageFill,
-							} )
-						}
+								imageFill: newImageFill,
+								style: newStyle,
+							} );
+						} }
 					/>
 				</ToolsPanelItem>
 			) }
-			{ imageFill &&
+			{ ( imageFill || hasAspectRatio ) &&
 				( mediaUrl || featuredImageURL ) &&
 				mediaType === 'image' && (
 					<ToolsPanelItem
@@ -533,6 +568,7 @@ function MediaTextEdit( {
 					enableResize={ blockEditingMode === 'default' }
 					toggleUseFeaturedImage={ toggleUseFeaturedImage }
 					{ ...{
+						dimensionsProps,
 						focalPoint,
 						imageFill,
 						isSelected,

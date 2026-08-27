@@ -1,5 +1,9 @@
 import clsx from 'clsx';
-import { useInnerBlocksProps, useBlockProps } from '@wordpress/block-editor';
+import {
+	useInnerBlocksProps,
+	useBlockProps,
+	getDimensionsClassesAndStyles,
+} from '@wordpress/block-editor';
 import { imageFillStyles } from './image-fill';
 import { DEFAULT_MEDIA_SIZE_SLUG } from './constants';
 
@@ -26,21 +30,32 @@ export default function save( { attributes } ) {
 	const mediaSizeSlug = attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 	const newRel = ! rel ? undefined : rel;
 
-	const imageClasses = clsx( {
-		[ `wp-image-${ mediaId }` ]: mediaId && mediaType === 'image',
-		[ `size-${ mediaSizeSlug }` ]: mediaId && mediaType === 'image',
-	} );
+	const dimensionsProps = getDimensionsClassesAndStyles( attributes );
 
-	const positionStyles = imageFill
+	const imageClasses = clsx(
+		{
+			[ `wp-image-${ mediaId }` ]: mediaId && mediaType === 'image',
+			[ `size-${ mediaSizeSlug }` ]: mediaId && mediaType === 'image',
+		},
+		! imageFill && dimensionsProps.className
+	);
+
+	let mediaStyles = imageFill
 		? imageFillStyles( mediaUrl, focalPoint )
-		: {};
+		: dimensionsProps.style;
+	if ( ! imageFill && dimensionsProps.className && focalPoint ) {
+		mediaStyles = {
+			...dimensionsProps.style,
+			...imageFillStyles( mediaUrl, focalPoint ),
+		};
+	}
 
 	let image = mediaUrl ? (
 		<img
 			src={ mediaUrl }
 			alt={ mediaAlt }
 			className={ imageClasses || null }
-			style={ positionStyles }
+			style={ mediaStyles }
 		/>
 	) : null;
 
@@ -59,7 +74,14 @@ export default function save( { attributes } ) {
 
 	const mediaTypeRenders = {
 		image: () => image,
-		video: () => <video controls src={ mediaUrl } />,
+		video: () => (
+			<video
+				controls
+				src={ mediaUrl }
+				className={ dimensionsProps.className }
+				style={ dimensionsProps.style }
+			/>
+		),
 	};
 	const className = clsx( {
 		'has-media-on-the-right': 'right' === mediaPosition,

@@ -61,6 +61,7 @@ function ToolbarEditButton( {
 
 function PlaceholderContainer( {
 	className,
+	dimensionsProps,
 	mediaUrl,
 	onSelectMedia,
 	toggleUseFeaturedImage,
@@ -83,7 +84,8 @@ function PlaceholderContainer( {
 			labels={ {
 				title: __( 'Media area' ),
 			} }
-			className={ className }
+			className={ clsx( className, dimensionsProps.className ) }
+			style={ dimensionsProps.style }
 			onSelect={ onSelectMedia }
 			onToggleFeaturedImage={ toggleUseFeaturedImage }
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
@@ -96,6 +98,7 @@ function PlaceholderContainer( {
 
 function MediaContainer( props, ref ) {
 	const {
+		dimensionsProps,
 		className,
 		commitWidthChange,
 		focalPoint,
@@ -138,10 +141,22 @@ function MediaContainer( props, ref ) {
 			left: enableResize && mediaPosition === 'right',
 		};
 
-		const positionStyles =
+		const imageFillStyle =
 			mediaType === 'image' && imageFill
 				? imageFillStyles( mediaUrl || featuredImageURL, focalPoint )
 				: {};
+
+		const mediaClassName = ! imageFill
+			? dimensionsProps.className
+			: undefined;
+
+		let mediaStyles = imageFill ? imageFillStyle : dimensionsProps.style;
+		if ( ! imageFill && dimensionsProps.className && focalPoint ) {
+			mediaStyles = {
+				...dimensionsProps.style,
+				...imageFillStyles( mediaUrl || featuredImageURL, focalPoint ),
+			};
+		}
 
 		const mediaTypeRenderers = {
 			image: () =>
@@ -150,7 +165,8 @@ function MediaContainer( props, ref ) {
 						ref={ refMedia }
 						src={ featuredImageURL }
 						alt={ featuredImageAlt }
-						style={ positionStyles }
+						className={ mediaClassName }
+						style={ mediaStyles }
 					/>
 				) : (
 					mediaUrl && (
@@ -158,11 +174,20 @@ function MediaContainer( props, ref ) {
 							ref={ refMedia }
 							src={ mediaUrl }
 							alt={ mediaAlt }
-							style={ positionStyles }
+							className={ mediaClassName }
+							style={ mediaStyles }
 						/>
 					)
 				),
-			video: () => <video controls ref={ refMedia } src={ mediaUrl } />,
+			video: () => (
+				<video
+					controls
+					ref={ refMedia }
+					src={ mediaUrl }
+					className={ dimensionsProps.className }
+					style={ dimensionsProps.style }
+				/>
+			),
 		};
 
 		return (
@@ -201,8 +226,14 @@ function MediaContainer( props, ref ) {
 				{ ! useFeaturedImage && <PlaceholderContainer { ...props } /> }
 				{ ! featuredImageURL && useFeaturedImage && (
 					<Placeholder
-						className="wp-block-media-text--placeholder-image"
-						style={ positionStyles }
+						className={ clsx(
+							'wp-block-media-text--placeholder-image',
+							dimensionsProps.className
+						) }
+						style={ {
+							...imageFillStyle,
+							...dimensionsProps.style,
+						} }
 						withIllustration
 					/>
 				) }
