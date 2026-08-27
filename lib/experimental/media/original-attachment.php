@@ -10,9 +10,11 @@
  * the chain on every read, and so cleanup on parent delete can use
  * an indexed query.
  *
- * No backfill: this is tied to the (unreleased) media editor cropper,
- * so anything edited before this code lands is intentionally out of
- * scope.
+ * This applies to every edit that goes through `/edit` — including
+ * the image block's crop tools in the post editor — on any site
+ * running the plugin. The media editor modal is the first consumer
+ * of the read side. No backfill: edits made before this code lands
+ * are intentionally untracked.
  *
  * @package gutenberg
  */
@@ -93,6 +95,10 @@ add_filter( 'wp_edited_image_metadata', 'gutenberg_record_original_attachment_id
  * disclosing chain relationships to unauthenticated readers and
  * embed consumers.
  *
+ * The `/edit` route registers no `context` argument, so the 201
+ * response from `edit_media_item` itself never carries this field.
+ * Clients must refetch the new attachment with `?context=edit`.
+ *
  * @param WP_REST_Response $response REST response.
  * @param WP_Post          $post     Attachment post.
  * @param WP_REST_Request  $request  REST request.
@@ -141,6 +147,10 @@ add_filter( 'rest_prepare_attachment', 'gutenberg_add_original_attachment_to_res
  * keeps the database accurate and prevents the field from
  * resurrecting if the deleted id is later reused.
  *
+ * Runs on hard delete only: with `MEDIA_TRASH`, trashing fires no
+ * `delete_attachment`, so descendants keep pointing at a trashed
+ * original (whose URL still resolves) until the trash is purged.
+ *
  * @param int $attachment_id Attachment id being deleted.
  */
 function gutenberg_clear_original_attachment_id_on_delete( $attachment_id ) {
@@ -149,8 +159,10 @@ function gutenberg_clear_original_attachment_id_on_delete( $attachment_id ) {
 		return;
 	}
 
-	// Indexed lookup on (meta_key, meta_value) — fast at any library
-	// size, no serialized-blob LIKE.
+	// The meta_key index narrows the scan to the rows carrying this
+	// key (derivative attachments only); the value comparison then
+	// runs on just those rows. Stock postmeta has no meta_value
+	// index, but no serialized-blob LIKE is needed either.
 	delete_metadata(
 		'post',
 		0,
