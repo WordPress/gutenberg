@@ -258,10 +258,6 @@
 		z-index: 1;
 	}
 
-	&.is-nesting .block-editor-list-view-block-contents:focus {
-		box-shadow: none;
-	}
-
 	.block-editor-list-view-block-contents:focus {
 		box-shadow: none;
 		outline: none;
