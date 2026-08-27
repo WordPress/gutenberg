@@ -3,6 +3,7 @@ import {
 	hasArgInCLI,
 	hasProjectFile,
 	getJestOverrideConfigFile,
+	getWebpackArgs,
 	spawnScript,
 } from '../';
 import {
@@ -164,6 +165,37 @@ describe( 'utils', () => {
 				'/c/jest-unit.config.js'
 			);
 		} );
+	} );
+
+	describe( 'getWebpackArgs', () => {
+		beforeEach( () => {
+			hasProjectFileMock.mockReturnValue( false );
+			fromProjectRootMock.mockImplementation( ( path ) => '/p/' + path );
+			fromConfigRootMock.mockImplementation( ( path ) => '/c/' + path );
+		} );
+
+		afterEach( () => {
+			getArgsFromCLIMock.mockReset();
+			hasProjectFileMock.mockReset();
+			fromProjectRootMock.mockReset();
+			fromConfigRootMock.mockReset();
+			delete process.env.WP_ENTRY;
+		} );
+
+		it.each( [ 'js', 'jsx', 'ts', 'tsx' ] )(
+			'removes the .%s extension from direct build entry names',
+			( extension ) => {
+				getArgsFromCLIMock.mockReturnValue( [
+					`entry.${ extension }`,
+				] );
+
+				getWebpackArgs();
+
+				expect( JSON.parse( process.env.WP_ENTRY ) ).toEqual( {
+					entry: `/p/entry.${ extension }`,
+				} );
+			}
+		);
 	} );
 
 	describe( 'spawnScript', () => {

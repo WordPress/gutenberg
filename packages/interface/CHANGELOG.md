@@ -6,6 +6,18 @@
 
 -   `ComplementaryArea`: Add `badge` and `badgeLabel` props, rendering a count over the pinned toolbar toggle ([#81951](https://github.com/WordPress/gutenberg/pull/81951)).
 
+### Internal
+
+-   Remove unused dependency `@wordpress/a11y` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+## 10.0.0 (2026-08-26)
+
+### Breaking Changes
+
+-   `ActionItem`: `as` now defaults to `MenuItem` instead of `Button` ([#81507](https://github.com/WordPress/gutenberg/pull/81507)).
+-   `ActionItem.Slot`: Remove the `bubblesVirtually` prop ([#81507](https://github.com/WordPress/gutenberg/pull/81507)).
+
 ## 9.38.0 (2026-08-12)
 
 ### Enhancements
