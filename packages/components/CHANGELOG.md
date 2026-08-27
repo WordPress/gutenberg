@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `Popover`: Widen `offset` to also accept an object with separate main and cross axis offsets. The same applies to `BorderBoxControl`'s `popoverOffset` prop ([#82060](https://github.com/WordPress/gutenberg/pull/82060)).
+
+### Bug Fixes
+
+-   `Snackbar`: Restart the auto-dismiss timer when a notice is recreated with the same ID during removal ([#81764](https://github.com/WordPress/gutenberg/pull/81764)).
+
+### Internal
+
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+## 40.0.0 (2026-08-26)
+
 ### Breaking Changes
 
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
@@ -30,12 +44,14 @@
 
 ### Bug Fixes
 
+-   `PaletteEdit`: Expose color, gradient, and duotone swatches as command buttons because activating them opens an editor instead of selecting a value. Add a `presentation` prop to `CircularOptionPicker`, `ColorPalette`, `GradientPicker`, and `DuotonePicker`, and deprecate `asButtons` in favor of `presentation="toggle-buttons"` ([#82023](https://github.com/WordPress/gutenberg/pull/82023)).
 -   `ConfirmDialog`: Preserve `title` as the dialog's accessible name when the header is hidden ([#81847](https://github.com/WordPress/gutenberg/pull/81847)).
 -   `DuotonePicker`: Do not render the custom controls wrapper when `disableCustomDuotone` is set, so a read-only picker no longer adds trailing padding below its swatches ([#81605](https://github.com/WordPress/gutenberg/pull/81605)).
 -   `DuotonePicker`: Stop the duotone bar offering to move its control points. It announced that arrow keys and dragging change the gradient position, but a duotone is two colors with no positions, so the move was discarded. `CustomGradientBar` gains a `disablePositioning` prop for this ([#81850](https://github.com/WordPress/gutenberg/pull/81850)).
 -   `Modal`: Prevent an Escape key press that dismisses the modal from propagating to underlying overlays. ([#81785](https://github.com/WordPress/gutenberg/pull/81785))
 -   `BoxControl`: Update the opposite side when ALT is held on the left or right input, which each updated themselves instead ([#81530](https://github.com/WordPress/gutenberg/pull/81530)).
 -   `InputControl`: Vertically center the value of date and time inputs in Safari ([#81361](https://github.com/WordPress/gutenberg/pull/81361)).
+-   `InputControl`: Hide the value-like placeholder Safari renders in empty date and time inputs (e.g. `12:30`), which was indistinguishable from a committed value ([#81991](https://github.com/WordPress/gutenberg/pull/81991)).
 -   `ControlWithError`: Re-read the target's validation message when an `invalid` event is received, so a message that changed without a re-render in between (e.g. a programmatic value change followed by a synthetic `invalid` event) is not revealed stale or empty. While a `validating` custom validity is pending, the message is left untouched so the pending indicator keeps showing ([#81440](https://github.com/WordPress/gutenberg/pull/81440)).
 -   `Button`: Apply the `has-text` class when the children that render the label are conditional, wrapped in an element, or preceded by other children, so that such buttons are no longer styled as icon-only buttons ([#81521](https://github.com/WordPress/gutenberg/pull/81521)).
 
