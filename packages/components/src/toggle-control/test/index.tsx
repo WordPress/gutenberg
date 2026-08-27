@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import ToggleControl from '..';
 
 describe( 'ToggleControl', () => {
@@ -22,10 +15,16 @@ describe( 'ToggleControl', () => {
 
 		render( <ToggleControl label="My toggle" onChange={ onChange } /> );
 
-		screen.getByRole( 'checkbox' ).click();
+		screen
+			.getByRole( 'checkbox' )
+			// eslint-disable-next-line testing-library/no-node-access
+			.click();
 		expect( onChange ).toHaveBeenLastCalledWith( true );
 
-		screen.getByRole( 'checkbox' ).click();
+		screen
+			.getByRole( 'checkbox' )
+			// eslint-disable-next-line testing-library/no-node-access
+			.click();
 		expect( onChange ).toHaveBeenLastCalledWith( false );
 	} );
 

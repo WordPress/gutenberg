@@ -1,20 +1,13 @@
-/**
- * WordPress dependencies
- */
 import { useMergeRefs, useViewportMatch } from '@wordpress/compose';
 import { useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { createSlotFill } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import BlockList from '../block-list';
 import BlockTools from '../block-tools';
 import EditorStyles from '../editor-styles';
 import Iframe from '../iframe';
 import WritingFlow from '../writing-flow';
-import { useMouseMoveTypingReset } from '../observe-typing';
+import { useMouseMoveTypingReset, useTypingObserver } from '../observe-typing';
 import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useBlockCommands } from '../use-block-commands';
 import { store as blockEditorStore } from '../../store';
@@ -60,7 +53,14 @@ export function ExperimentalBlockCanvas( {
 	const resetTypingRef = useMouseMoveTypingReset();
 	const clearerRef = useBlockSelectionClearer();
 	const localRef = useRef();
-	const contentRef = useMergeRefs( [ contentRefProp, clearerRef, localRef ] );
+	// Attached to the same node as the writing flow ref: the iframe body,
+	// or the WritingFlow element when the canvas is not iframed.
+	const contentRef = useMergeRefs( [
+		contentRefProp,
+		clearerRef,
+		localRef,
+		useTypingObserver(),
+	] );
 	const zoomLevel = useSelect(
 		( select ) => unlock( select( blockEditorStore ) ).getZoomLevel(),
 		[]

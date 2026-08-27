@@ -1,14 +1,7 @@
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const fs = require( 'fs/promises' );
 const os = require( 'os' );
-const { v4: uuid } = require( 'uuid' );
-
-/**
- * WordPress dependencies
- */
+const { randomUUID } = require( 'crypto' );
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -24,10 +17,7 @@ test.describe( 'Gallery', () => {
 		await requestUtils.deleteAllMedia();
 
 		uploadedMedia = await requestUtils.uploadMedia(
-			path.resolve(
-				process.cwd(),
-				'test/e2e/assets/10x10_e2e_test_image_z9T8jK.png'
-			)
+			'./assets/10x10_e2e_test_image_z9T8jK.png'
 		);
 	} );
 
@@ -52,7 +42,7 @@ test.describe( 'Gallery', () => {
 		} );
 
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await pageUtils.pressKeys( 'primary+v' );
 
@@ -71,15 +61,17 @@ test.describe( 'Gallery', () => {
 <!-- /wp:image --></figure>
 <!-- /wp:gallery -->` );
 
-		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Undo"i]'
-		);
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Undo' } )
+			.click();
 
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 
-		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Redo"i]'
-		);
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Redo' } )
+			.click();
 
 		await expect
 			.poll( editor.getEditedPostContent )
@@ -291,21 +283,14 @@ class GalleryBlockUtils {
 	constructor( { page } ) {
 		this.page = page;
 
-		this.TEST_IMAGE_FILE_PATH = path.join(
-			__dirname,
-			'..',
-			'..',
-			'..',
-			'assets',
-			'10x10_e2e_test_image_z9T8jK.png'
-		);
+		this.TEST_IMAGE_FILE_PATH = './assets/10x10_e2e_test_image_z9T8jK.png';
 	}
 
 	async upload( inputElement ) {
 		const tmpDirectory = await fs.mkdtemp(
 			path.join( os.tmpdir(), 'gutenberg-test-image-' )
 		);
-		const fileName = uuid();
+		const fileName = randomUUID();
 		const tmpFileName = path.join( tmpDirectory, fileName + '.png' );
 		await fs.copyFile( this.TEST_IMAGE_FILE_PATH, tmpFileName );
 

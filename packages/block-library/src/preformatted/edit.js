@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { RichText, useBlockProps } from '@wordpress/block-editor';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
@@ -33,8 +30,13 @@ export default function PreformattedEdit( {
 			onMerge={ mergeBlocks }
 			{ ...blockProps }
 			__unstablePastePlainText
-			__unstableOnSplitAtDoubleLineEnd={ () =>
-				insertBlocksAfter( createBlock( getDefaultBlockName() ) )
+			__unstableOnSplitAtDoubleLineEnd={
+				insertBlocksAfter
+					? () =>
+							insertBlocksAfter(
+								createBlock( getDefaultBlockName() )
+							)
+					: undefined
 			}
 		/>
 	);

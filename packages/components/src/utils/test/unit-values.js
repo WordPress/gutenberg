@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { createCSSUnitValue, parseCSSUnitValue } from '../unit-values';
 
 describe( 'unit-values', () => {

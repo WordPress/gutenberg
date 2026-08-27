@@ -1,7 +1,3 @@
-/**
- * Internal dependencies
- */
-
 import useBlockDisplayTitle from './use-block-display-title';
 
 /**

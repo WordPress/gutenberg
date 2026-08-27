@@ -1,19 +1,7 @@
-/**
- * WordPress dependencies
- */
 import triggerFetch from '@wordpress/api-fetch';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
-
 jest.mock( '@wordpress/api-fetch' );
-
-/**
- * External dependencies
- */
 import { render, waitFor } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { store as coreDataStore } from '../../index';
 import useEntityRecords, {
 	useEntityRecordsWithPermissions,
@@ -55,7 +43,7 @@ describe( 'useEntityRecords', () => {
 			isResolving: false,
 			status: 'IDLE',
 			totalItems: null,
-			totalPages: null,
+			totalPages: 1,
 		} );
 
 		// Fetch request should have been issued

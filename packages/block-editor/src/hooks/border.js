@@ -1,38 +1,33 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { hasBlockSupport, getBlockSupport } from '@wordpress/blocks';
 import { __experimentalHasSplitBorders as hasSplitBorders } from '@wordpress/components';
-import { Platform, useCallback, useMemo } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
+import { __ } from '@wordpress/i18n';
 import { getColorClassName } from '../components/colors';
 import InspectorControls from '../components/inspector-controls';
 import useMultipleOriginColorsAndGradients from '../components/colors-gradients/use-multiple-origin-colors-and-gradients';
-import {
-	cleanEmptyObject,
-	shouldSkipSerialization,
-	useBlockSettings,
-} from './utils';
+import { cleanEmptyObject, shouldSkipSerialization } from './utils';
 import {
 	useHasBorderPanel,
 	useHasBorderPanelControls,
 	BorderPanel as StylesBorderPanel,
 } from '../components/global-styles';
+import { useResolvedStyle } from '../components/global-styles/inherited-value-context';
 import { store as blockEditorStore } from '../store';
-import { __ } from '@wordpress/i18n';
+import {
+	getStyleForState,
+	isDefaultBlockStyleState,
+	setStyleForState,
+	useBlockStyleState,
+} from './block-style-state';
+import { unlock } from '../lock-unlock';
 
 export const BORDER_SUPPORT_KEY = '__experimentalBorder';
 export const SHADOW_SUPPORT_KEY = 'shadow';
+
+const EMPTY_ARRAY = [];
 
 const getColorByProperty = ( colors, property, value ) => {
 	let matchedColor;
@@ -141,26 +136,52 @@ function BordersInspectorControl( { label, children, resetAllFilter } ) {
 }
 
 export function BorderPanel( { clientId, name, setAttributes, settings } ) {
+	const selectedState = useBlockStyleState();
 	const isEnabled = useHasBorderPanel( settings );
-	const { style, borderColor } = useSelect(
+	const { style, borderColor, className } = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled
 			if ( ! isEnabled ) {
 				return {};
 			}
-			const { style: _style, borderColor: _borderColor } =
-				select( blockEditorStore ).getBlockAttributes( clientId ) || {};
-			return { style: _style, borderColor: _borderColor };
+			const {
+				style: _style,
+				borderColor: _borderColor,
+				className: _className,
+			} = select( blockEditorStore ).getBlockAttributes( clientId ) || {};
+			return {
+				style: _style,
+				borderColor: _borderColor,
+				className: _className,
+			};
 		},
 		[ clientId, isEnabled ]
 	);
-	const value = useMemo( () => {
-		return attributesToStyle( { style, borderColor } );
-	}, [ style, borderColor ] );
 
-	const onChange = ( newStyle ) => {
-		setAttributes( styleToAttributes( newStyle ) );
-	};
+	const { value: inheritedValue } = useResolvedStyle(
+		name,
+		className,
+		selectedState
+	);
+
+	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
+
+	const value = useMemo( () => {
+		if ( isStateSelected ) {
+			return getStyleForState( style, selectedState );
+		}
+		return attributesToStyle( { style, borderColor } );
+	}, [ isStateSelected, selectedState, style, borderColor ] );
+
+	const onChange = isStateSelected
+		? ( newStyle ) => {
+				setAttributes( {
+					style: setStyleForState( style, selectedState, newStyle ),
+				} );
+		  }
+		: ( newStyle ) => {
+				setAttributes( styleToAttributes( newStyle ) );
+		  };
 
 	if ( ! isEnabled ) {
 		return null;
@@ -185,6 +206,7 @@ export function BorderPanel( { clientId, name, setAttributes, settings } ) {
 			value={ value }
 			onChange={ onChange }
 			defaultControls={ defaultControls }
+			inheritedValue={ inheritedValue }
 		/>
 	);
 }
@@ -198,10 +220,6 @@ export function BorderPanel( { clientId, name, setAttributes, settings } ) {
  * @return {boolean} Whether there is support.
  */
 export function hasBorderSupport( blockName, feature = 'any' ) {
-	if ( Platform.OS !== 'web' ) {
-		return false;
-	}
-
 	const support = getBlockSupport( blockName, BORDER_SUPPORT_KEY );
 
 	if ( support === true ) {
@@ -232,14 +250,34 @@ export function hasShadowSupport( blockName ) {
 }
 
 export function useBorderPanelLabel( {
-	blockName,
+	clientId,
 	hasBorderControl,
 	hasShadowControl,
 } = {} ) {
-	const settings = useBlockSettings( blockName );
+	const [ color, radius, style, width, shadow ] = useSelect(
+		( select ) => {
+			if ( ! clientId ) {
+				return EMPTY_ARRAY;
+			}
+			const { getBlockSettings } = unlock( select( blockEditorStore ) );
+			return getBlockSettings(
+				clientId,
+				'border.color',
+				'border.radius',
+				'border.style',
+				'border.width',
+				'shadow'
+			);
+		},
+		[ clientId ]
+	);
+	const settings = useMemo(
+		() => ( { border: { color, radius, style, width }, shadow } ),
+		[ color, radius, style, width, shadow ]
+	);
 	const controls = useHasBorderPanelControls( settings );
 
-	if ( ! hasBorderControl && ! hasShadowControl && blockName ) {
+	if ( ! hasBorderControl && ! hasShadowControl && clientId ) {
 		hasBorderControl =
 			controls?.hasBorderColor ||
 			controls?.hasBorderStyle ||

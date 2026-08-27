@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { addBlockVariations, removeBlockVariations } from '../actions';
 
 describe( 'actions', () => {

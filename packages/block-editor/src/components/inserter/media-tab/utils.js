@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createBlock } from '@wordpress/blocks';
 
 const mediaTypeTag = { image: 'img', video: 'video', audio: 'audio' };

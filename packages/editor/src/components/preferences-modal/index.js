@@ -1,7 +1,3 @@
-/**
- * WordPress dependencies
- */
-
 import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -11,10 +7,6 @@ import {
 	privateApis as preferencesPrivateApis,
 } from '@wordpress/preferences';
 import { store as interfaceStore } from '@wordpress/interface';
-
-/**
- * Internal dependencies
- */
 import EnablePanelOption from './enable-panel';
 import EnablePluginDocumentSettingPanelOption from './enable-plugin-document-setting-panel';
 import EnablePublishSidebarOption from './enable-publish-sidebar';
@@ -55,20 +47,25 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 
 function PreferencesModalContents( { extraSections = {} } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const showBlockBreadcrumbsOption = useSelect(
+	const { showBlockBreadcrumbsOption, showCollaborationOptions } = useSelect(
 		( select ) => {
-			const { getEditorSettings } = select( editorStore );
+			const { getEditorSettings, isCollaborationEnabledForCurrentPost } =
+				unlock( select( editorStore ) );
 			const { get } = select( preferencesStore );
 			const isRichEditingEnabled = getEditorSettings().richEditingEnabled;
 			const isDistractionFreeEnabled = get( 'core', 'distractionFree' );
-			return (
-				! isDistractionFreeEnabled &&
-				isLargeViewport &&
-				isRichEditingEnabled
-			);
+			return {
+				showBlockBreadcrumbsOption:
+					! isDistractionFreeEnabled &&
+					isLargeViewport &&
+					isRichEditingEnabled,
+				showCollaborationOptions:
+					isCollaborationEnabledForCurrentPost(),
+			};
 		},
 		[ isLargeViewport ]
 	);
+
 	const { setIsListViewOpened, setIsInserterOpened } =
 		useDispatch( editorStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
@@ -120,7 +117,49 @@ function PreferencesModalContents( { extraSections = {} } ) {
 									) }
 									label={ __( 'Show starter patterns' ) }
 								/>
+								{ showCollaborationOptions && (
+									<PreferenceToggleControl
+										scope="core"
+										featureName="showCollaborationCursor"
+										help={ __(
+											'Show your own avatar inside blocks during collaborative editing sessions.'
+										) }
+										label={ __( 'Show avatar in blocks' ) }
+									/>
+								) }
 							</PreferencesModalSection>
+							{ showCollaborationOptions && (
+								<PreferencesModalSection
+									title={ __(
+										'Collaboration notifications'
+									) }
+								>
+									<PreferenceToggleControl
+										scope="core"
+										featureName="showCollaborationJoinNotifications"
+										help={ __(
+											'Show notifications when collaborators join the post.'
+										) }
+										label={ __( 'Collaborator joined' ) }
+									/>
+									<PreferenceToggleControl
+										scope="core"
+										featureName="showCollaborationLeaveNotifications"
+										help={ __(
+											'Show notifications when collaborators leave the post.'
+										) }
+										label={ __( 'Collaborator left' ) }
+									/>
+									<PreferenceToggleControl
+										scope="core"
+										featureName="showCollaborationPostSaveNotifications"
+										help={ __(
+											'Show notifications when collaborators save, update, or publish the post.'
+										) }
+										label={ __( 'Post updated' ) }
+									/>
+								</PreferencesModalSection>
+							) }
 							<PreferencesModalSection
 								title={ __( 'Document settings' ) }
 								description={ __(
@@ -332,6 +371,7 @@ function PreferencesModalContents( { extraSections = {} } ) {
 			].filter( Boolean ),
 		[
 			showBlockBreadcrumbsOption,
+			showCollaborationOptions,
 			extraSections,
 			setIsInserterOpened,
 			setIsListViewOpened,

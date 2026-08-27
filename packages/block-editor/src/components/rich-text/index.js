@@ -1,19 +1,12 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
 import {
 	useRef,
 	useState,
 	useCallback,
+	useEffect,
 	useMemo,
 	forwardRef,
-	createContext,
 	useContext,
 } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
@@ -23,13 +16,13 @@ import { Popover } from '@wordpress/components';
 import { getBlockBindingsSource } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { useBlockEditorAutocompleteProps } from '../autocomplete';
 import { useBlockEditContext } from '../block-edit';
-import { blockBindingsKey, isPreviewModeKey } from '../block-edit/context';
+import {
+	blockBindingsKey,
+	blockEditingModeKey,
+	isPreviewModeKey,
+} from '../block-edit/context';
 import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
 import { useMarkPersistent } from './use-mark-persistent';
@@ -40,48 +33,23 @@ import { Content, valueToHTMLString } from './content';
 import { withDeprecations } from './with-deprecations';
 import BlockContext from '../block-context';
 import { unlock } from '../../lock-unlock';
+import { PrivateBlockContext } from '../block-list/private-block-context';
 
-const { useRichText } = unlock( richTextPrivateApis );
-
-export const keyboardShortcutContext = createContext();
-keyboardShortcutContext.displayName = 'keyboardShortcutContext';
-
-export const inputEventContext = createContext();
-inputEventContext.displayName = 'inputEventContext';
+// `RichTextShortcut` and `RichTextInputEvent` now live in
+// `@wordpress/rich-text` so they share the shortcut and input-event contexts
+// with standalone rich text fields. Re-exported below for back-compat (e.g.
+// `@wordpress/format-library` imports them from `@wordpress/block-editor`).
+const {
+	useRichText,
+	KeyboardShortcutContext,
+	InputEventContext,
+	RichTextShortcut,
+	RichTextInputEvent,
+} = unlock( richTextPrivateApis );
 
 const instanceIdKey = Symbol( 'instanceId' );
 
-/**
- * Removes props used for the native version of RichText so that they are not
- * passed to the DOM element and log warnings.
- *
- * @param {Object} props Props to filter.
- *
- * @return {Object} Filtered props.
- */
-function removeNativeProps( props ) {
-	const {
-		__unstableMobileNoFocusOnMount,
-		deleteEnter,
-		placeholderTextColor,
-		textAlign,
-		selectionColor,
-		tagsToEliminate,
-		disableEditingMenu,
-		fontSize,
-		fontFamily,
-		fontWeight,
-		fontStyle,
-		minWidth,
-		maxWidth,
-		disableSuggestions,
-		disableAutocorrection,
-		...restProps
-	} = props;
-	return restProps;
-}
-
-export function RichTextWrapper(
+function RichTextWrapper(
 	{
 		children,
 		tagName = 'div',
@@ -113,8 +81,6 @@ export function RichTextWrapper(
 	},
 	forwardedRef
 ) {
-	props = removeNativeProps( props );
-
 	if ( onSplit ) {
 		deprecated( 'wp.blockEditor.RichText onSplit prop', {
 			since: '6.4',
@@ -122,12 +88,14 @@ export function RichTextWrapper(
 		} );
 	}
 
+	const { supportsSplitting } = useContext( PrivateBlockContext );
 	const instanceId = useInstanceId( RichTextWrapper );
 	const anchorRef = useRef();
 	const [ anchorElement, setAnchorElement ] = useState( null );
 	const context = useBlockEditContext();
 	const { clientId, isSelected: isBlockSelected, name: blockName } = context;
 	const blockBindings = context[ blockBindingsKey ];
+	const hasDefaultEditingMode = context[ blockEditingModeKey ] === 'default';
 	const blockContext = useContext( BlockContext );
 	const registry = useRegistry();
 	const selector = ( select ) => {
@@ -270,6 +238,27 @@ export function RichTextWrapper(
 	const shouldDisableEditing =
 		readOnly || disableBoundBlock || shouldDisableForPattern;
 
+	// Whether the wrapper is the editing host, which depends on the selected
+	// block, not necessarily this one. Only the selected, default-mode block
+	// can be it, so others skip the subscription entirely.
+	const isEditingHost = useSelect(
+		( select ) => {
+			if (
+				shouldDisableEditing ||
+				! hasDefaultEditingMode ||
+				! isBlockSelected
+			) {
+				return false;
+			}
+
+			const { getSelectedBlockClientId, canHostEditableRoot } = unlock(
+				select( blockEditorStore )
+			);
+			return canHostEditableRoot( getSelectedBlockClientId() );
+		},
+		[ shouldDisableEditing, hasDefaultEditingMode, isBlockSelected ]
+	);
+
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
 	const { selectionChange } = useDispatch( blockEditorStore );
@@ -373,6 +362,60 @@ export function RichTextWrapper(
 		onChange,
 	} );
 
+	// While a focused editing host owns the selection (the block supports
+	// `editableRoot`), ARIA attributes describing the autocomplete state must
+	// be mirrored onto the host: assistive technology resolves them relative
+	// to the focused element.
+	const {
+		'aria-autocomplete': ariaAutocomplete,
+		'aria-haspopup': ariaHasPopup,
+		'aria-controls': ariaControls,
+		'aria-owns': ariaOwns,
+		'aria-activedescendant': ariaActiveDescendant,
+	} = autocompleteProps;
+	useEffect( () => {
+		if ( ! isSelected ) {
+			return;
+		}
+
+		const host = anchorRef.current?.parentElement?.closest(
+			'[contenteditable="true"]'
+		);
+
+		if ( ! host ) {
+			return;
+		}
+
+		const attributes = {
+			'aria-autocomplete': ariaAutocomplete,
+			'aria-haspopup': ariaHasPopup,
+			'aria-controls': ariaControls,
+			'aria-owns': ariaOwns,
+			'aria-activedescendant': ariaActiveDescendant,
+		};
+
+		for ( const [ key, value_ ] of Object.entries( attributes ) ) {
+			if ( value_ === undefined ) {
+				host.removeAttribute( key );
+			} else {
+				host.setAttribute( key, value_ );
+			}
+		}
+
+		return () => {
+			for ( const key of Object.keys( attributes ) ) {
+				host.removeAttribute( key );
+			}
+		};
+	}, [
+		isSelected,
+		ariaAutocomplete,
+		ariaHasPopup,
+		ariaControls,
+		ariaOwns,
+		ariaActiveDescendant,
+	] );
+
 	useMarkPersistent( { html: adjustedValue, value } );
 
 	const keyboardShortcuts = useRef( new Set() );
@@ -382,12 +425,28 @@ export function RichTextWrapper(
 		anchorRef.current?.focus();
 	}
 
+	// Setting tabIndex to 0 is unnecessary, the element is already focusable
+	// because it's contentEditable. This also fixes a Safari bug where it's
+	// not possible to Shift+Click multi select blocks when Shift Clicking
+	// into an element with tabIndex because Safari will focus the element.
+	// However, Safari will correctly ignore nested contentEditable elements.
+	// While the writing flow wrapper is contentEditable (the selected block
+	// supports `editableRoot`), nested editable elements are no longer
+	// focusable areas on their own, so an explicit tabIndex restores their
+	// focusability.
+	let tabIndex = props.tabIndex;
+	if ( isEditingHost ) {
+		tabIndex = props.tabIndex ?? 0;
+	} else if ( ! shouldDisableEditing && props.tabIndex === 0 ) {
+		tabIndex = null;
+	}
+
 	const TagName = tagName;
 	return (
 		<>
 			{ isSelected && (
-				<keyboardShortcutContext.Provider value={ keyboardShortcuts }>
-					<inputEventContext.Provider value={ inputEvents }>
+				<KeyboardShortcutContext.Provider value={ keyboardShortcuts }>
+					<InputEventContext.Provider value={ inputEvents }>
 						<Popover.__unstableSlotNameProvider value="__unstable-block-tools-after">
 							{ children &&
 								children( { value, onChange, onFocus } ) }
@@ -400,8 +459,8 @@ export function RichTextWrapper(
 								forwardedRef={ anchorRef }
 							/>
 						</Popover.__unstableSlotNameProvider>
-					</inputEventContext.Provider>
-				</keyboardShortcutContext.Provider>
+					</InputEventContext.Provider>
+				</KeyboardShortcutContext.Provider>
 			) }
 			{ isSelected && hasFormats && (
 				<FormatToolbarContainer
@@ -454,6 +513,7 @@ export function RichTextWrapper(
 						onSplitAtDoubleLineEnd,
 						keyboardShortcuts,
 						inputEvents,
+						supportsSplitting,
 					} ),
 					anchorRef,
 					setAnchorElement,
@@ -465,28 +525,20 @@ export function RichTextWrapper(
 					props.className,
 					'rich-text'
 				) }
-				// Setting tabIndex to 0 is unnecessary, the element is already
-				// focusable because it's contentEditable. This also fixes a
-				// Safari bug where it's not possible to Shift+Click multi
-				// select blocks when Shift Clicking into an element with
-				// tabIndex because Safari will focus the element. However,
-				// Safari will correctly ignore nested contentEditable elements.
-				tabIndex={
-					props.tabIndex === 0 && ! shouldDisableEditing
-						? null
-						: props.tabIndex
-				}
+				tabIndex={ tabIndex }
 				data-wp-block-attribute-key={ identifier }
 			/>
 		</>
 	);
 }
 
+const ForwardedRichTextWrapper = forwardRef( RichTextWrapper );
+
+export { ForwardedRichTextWrapper as RichTextWrapper };
+
 // This is the private API for the RichText component.
 // It allows access to all props, not just the public ones.
-export const PrivateRichText = withDeprecations(
-	forwardRef( RichTextWrapper )
-);
+export const PrivateRichText = withDeprecations( ForwardedRichTextWrapper );
 
 PrivateRichText.Content = Content;
 PrivateRichText.isEmpty = ( value ) => {
@@ -532,7 +584,7 @@ const PublicForwardedRichTextContainer = forwardRef( ( props, ref ) => {
 			__unstableAllowPrefixTransformations,
 			readOnly,
 			...contentProps
-		} = removeNativeProps( props );
+		} = props;
 		return (
 			<Tag
 				ref={ ref }
@@ -553,6 +605,6 @@ PublicForwardedRichTextContainer.isEmpty = ( value ) => {
 };
 
 export default PublicForwardedRichTextContainer;
-export { RichTextShortcut } from './shortcut';
+export { RichTextShortcut };
 export { RichTextToolbarButton } from './toolbar-button';
-export { __unstableRichTextInputEvent } from './input-event';
+export { RichTextInputEvent as __unstableRichTextInputEvent };

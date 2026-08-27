@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { SlotFillProvider } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import PluginPostExcerptPanel from '../plugin';
 
 describe( 'PluginPostExcerptPanel', () => {

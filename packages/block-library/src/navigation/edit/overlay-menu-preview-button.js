@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { Button, __experimentalVStack as VStack } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Icon, close } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import OverlayMenuIcon from './overlay-menu-icon';
 import OverlayMenuPreviewControls from './overlay-menu-preview-controls';
 

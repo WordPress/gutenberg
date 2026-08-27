@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import InspectorControlsFill from './fill';
 import InspectorControlsSlot from './slot';
 

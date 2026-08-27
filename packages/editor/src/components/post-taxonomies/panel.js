@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { PanelBody } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import PostTaxonomiesForm from './index';
 import PostTaxonomiesCheck from './check';

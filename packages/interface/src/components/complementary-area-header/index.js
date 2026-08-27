@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { closeSmall } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import ComplementaryAreaToggle from '../complementary-area-toggle';
 
 const ComplementaryAreaHeader = ( {

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	createSlotFill,
 	Popover,
@@ -9,10 +6,6 @@ import {
 import { useState, useLayoutEffect } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 

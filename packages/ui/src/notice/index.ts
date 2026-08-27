@@ -15,5 +15,3 @@ export {
 	ActionButton,
 	ActionLink,
 };
-
-export type { NoticeIntent } from './types';

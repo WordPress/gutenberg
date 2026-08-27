@@ -1,8 +1,29 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 const TEST_PAGE_TITLE = 'Test Page for Block Style Variations';
+
+async function selectBlockStyleVariation( page, variationName ) {
+	const editorSettings = page.getByRole( 'region', {
+		name: 'Editor settings',
+	} );
+	const stylesTab = editorSettings.getByRole( 'tab', { name: 'Styles' } );
+	const variationRadio = editorSettings.getByRole( 'radio', {
+		name: variationName,
+	} );
+
+	const visibleControl = await Promise.any( [
+		stylesTab.waitFor( { state: 'visible' } ).then( () => 'styles-tab' ),
+		variationRadio
+			.waitFor( { state: 'visible' } )
+			.then( () => 'variation-radio' ),
+	] );
+
+	if ( visibleControl === 'styles-tab' ) {
+		await stylesTab.click();
+	}
+
+	await variationRadio.click();
+}
+
 test.use( {
 	siteEditorBlockStyleVariations: async ( { page, editor }, use ) => {
 		await use( new SiteEditorBlockStyleVariations( { page, editor } ) );
@@ -11,6 +32,7 @@ test.use( {
 
 test.describe( 'Block Style Variations', () => {
 	let stylesPostId;
+
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.activateTheme(
@@ -18,13 +40,6 @@ test.describe( 'Block Style Variations', () => {
 			),
 		] );
 		stylesPostId = await requestUtils.getCurrentThemeGlobalStylesPostId();
-	} );
-
-	test.afterAll( async ( { requestUtils } ) => {
-		await Promise.all( [
-			requestUtils.activateTheme( 'twentytwentyone' ),
-			requestUtils.deleteAllPages(),
-		] );
 	} );
 
 	test.beforeEach( async ( { requestUtils, admin } ) => {
@@ -40,6 +55,16 @@ test.describe( 'Block Style Variations', () => {
 				.dispatch( 'core/editor' )
 				.setRenderingMode( 'post-only' );
 		}, [] );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		// Reset the global styles saved by these tests so they don't leak
+		// into other specs that share this theme's global styles.
+		await requestUtils.resetThemeGlobalStyles();
+		await Promise.all( [
+			requestUtils.activateTheme( 'twentytwentyone' ),
+			requestUtils.deleteAllPages(),
+		] );
 	} );
 
 	test( 'apply block styles variations to nested blocks', async ( {
@@ -61,10 +86,7 @@ test.describe( 'Block Style Variations', () => {
 		// Apply a block style to the parent Group block.
 		await editor.selectBlocks( firstGroup );
 		await editor.openDocumentSettingsSidebar();
-		await page.getByRole( 'tab', { name: 'Styles' } ).click();
-		await page
-			.getByRole( 'button', { name: 'Block Style Variation A' } )
-			.click();
+		await selectBlockStyleVariation( page, 'Block Style Variation A' );
 
 		// Check parent styles have variation A styles.
 		await expect( firstGroup ).toHaveCSS( 'border-style', 'dotted' );
@@ -78,10 +100,7 @@ test.describe( 'Block Style Variations', () => {
 
 		// Apply a block style to the nested child Group block.
 		await editor.selectBlocks( secondGroup );
-		await page.getByRole( 'tab', { name: 'Styles' } ).click();
-		await page
-			.getByRole( 'button', { name: 'Block Style Variation B' } )
-			.click();
+		await selectBlockStyleVariation( page, 'Block Style Variation B' );
 
 		// Check nested child styles have variation B styles.
 		await expect( secondGroup ).toHaveCSS( 'border-style', 'dashed' );
@@ -93,10 +112,7 @@ test.describe( 'Block Style Variations', () => {
 
 		// Apply a block style to the nested grandchild Group block.
 		await editor.selectBlocks( thirdGroup );
-		await page.getByRole( 'tab', { name: 'Styles' } ).click();
-		await page
-			.getByRole( 'button', { name: 'Block Style Variation A' } )
-			.click();
+		await selectBlockStyleVariation( page, 'Block Style Variation A' );
 
 		// Check that the child's inner block styles from variation B are overridden by the grandchild's block style variation A.
 		await expect( thirdGroup ).toHaveCSS( 'border-style', 'dotted' );
@@ -129,17 +145,11 @@ test.describe( 'Block Style Variations', () => {
 		// Apply a block style to the parent Group block.
 		await editor.selectBlocks( firstGroup );
 		await editor.openDocumentSettingsSidebar();
-		await page.getByRole( 'tab', { name: 'Styles' } ).click();
-		await page
-			.getByRole( 'button', { name: 'Block Style Variation A' } )
-			.click();
+		await selectBlockStyleVariation( page, 'Block Style Variation A' );
 
 		// Apply a block style to the first, nested Group block.
 		await editor.selectBlocks( secondGroup );
-		await page.getByRole( 'tab', { name: 'Styles' } ).click();
-		await page
-			.getByRole( 'button', { name: 'Block Style Variation B' } )
-			.click();
+		await selectBlockStyleVariation( page, 'Block Style Variation B' );
 
 		// Update user global styles with new block style variation values.
 		// First revision.
@@ -326,17 +336,19 @@ async function addPageContent( editor, page ) {
 		'role=button[name="Block Inserter"i]'
 	);
 	await inserterButton.click();
-	await page.type( 'role=searchbox[name="Search"i]', 'Group' );
-	await page.click(
-		'role=listbox[name="Blocks"i] >> role=option[name="Group"i]'
-	);
+	await page.getByRole( 'searchbox', { name: 'Search' } ).type( 'Group' );
+	await page
+		.getByRole( 'listbox', { name: 'Blocks' } )
+		.getByRole( 'option', { name: 'Group' } )
+		.click();
 	await editor.canvas
 		.locator( 'role=button[name="Group: Gather blocks in a container."i]' )
 		.click();
 	await editor.canvas.locator( 'role=button[name="Add block"i]' ).click();
-	await page.click(
-		'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
-	);
+	await page
+		.getByRole( 'listbox', { name: 'Blocks' } )
+		.getByRole( 'option', { name: 'Paragraph' } )
+		.click();
 	await page.keyboard.type( 'Parent Group Block with a Paragraph' );
 	await page.keyboard.press( 'Enter' );
 	await page.keyboard.type( '/group' );
@@ -348,9 +360,10 @@ async function addPageContent( editor, page ) {
 		.locator( 'role=button[name="Group: Gather blocks in a container."i]' )
 		.click();
 	await editor.canvas.locator( 'role=button[name="Add block"i]' ).click();
-	await page.click(
-		'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
-	);
+	await page
+		.getByRole( 'listbox', { name: 'Blocks' } )
+		.getByRole( 'option', { name: 'Paragraph' } )
+		.click();
 	await page.keyboard.type( 'Child Group Block with a Paragraph' );
 	await page.keyboard.press( 'Enter' );
 	await page.keyboard.type( '/group' );
@@ -362,9 +375,10 @@ async function addPageContent( editor, page ) {
 		.locator( 'role=button[name="Group: Gather blocks in a container."i]' )
 		.click();
 	await editor.canvas.locator( 'role=button[name="Add block"i]' ).click();
-	await page.click(
-		'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
-	);
+	await page
+		.getByRole( 'listbox', { name: 'Blocks' } )
+		.getByRole( 'option', { name: 'Paragraph' } )
+		.click();
 	await page.keyboard.type( 'Grandchild Group Block with a Paragraph' );
 	await page.getByRole( 'button', { name: 'Publish', exact: true } ).click();
 }

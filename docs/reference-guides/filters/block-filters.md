@@ -4,7 +4,7 @@ WordPress exposes several APIs that allow you to modify the behavior of existing
 
 ## Registration
 
-Blocks in WordPress are typically registered on both the server and client side using `block.json`` metadata. You can use the following filters to modify or extend block settings during their registration on the server with PHP and on the client with JavaScript. To learn more, refer to the [block registration](https://developer.wordpress.org/block-editor/getting-started/fundamentals/registration-of-a-block/) guide.
+Blocks in WordPress are typically registered on both the server and client side using `block.json` metadata. You can use the following filters to modify or extend block settings during their registration on the server with PHP and on the client with JavaScript. To learn more, refer to the [block registration](https://developer.wordpress.org/block-editor/getting-started/fundamentals/registration-of-a-block/) guide.
 
 ### `block_type_metadata`
 

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const {
 	test: base,
 	expect,
@@ -19,12 +16,12 @@ test.describe( 'Patterns', () => {
 		await requestUtils.deleteAllBlocks();
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-	} );
-
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllBlocks();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test( 'create a new pattern', async ( {
@@ -72,7 +69,7 @@ test.describe( 'Patterns', () => {
 		).toBeVisible();
 
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'My pattern' );
 
@@ -155,7 +152,10 @@ test.describe( 'Patterns', () => {
 		await searchBox.fill( 'footer' );
 		await expect( patterns.item ).toHaveCount( 2 );
 		expect(
-			await patterns.item.getByRole( 'button' ).allInnerTexts()
+			await patterns.item
+				.getByRole( 'button' )
+				// eslint-disable-next-line playwright/prefer-web-first-assertions -- toHaveText doesn't support expect.arrayContaining
+				.allInnerTexts()
 		).toEqual(
 			expect.arrayContaining( [ 'Unsynced footer', 'Synced footer' ] )
 		);
@@ -180,7 +180,10 @@ test.describe( 'Patterns', () => {
 		await page.getByRole( 'option', { name: /^Not synced/ } ).click();
 		await expect( patterns.item ).toHaveCount( 2 );
 		expect(
-			await patterns.item.getByRole( 'button' ).allInnerTexts()
+			await patterns.item
+				.getByRole( 'button' )
+				// eslint-disable-next-line playwright/prefer-web-first-assertions -- toHaveText doesn't support expect.arrayContaining
+				.allInnerTexts()
 		).toEqual(
 			expect.arrayContaining( [ 'Unsynced header', 'Unsynced footer' ] )
 		);
@@ -227,7 +230,7 @@ test.describe( 'Patterns', () => {
 		// Close the view options.
 		await page.keyboard.press( 'Escape' );
 
-		expect( await patterns.itemTitle.allInnerTexts() ).toEqual( [
+		await expect( patterns.itemTitle ).toHaveText( [
 			'Starter',
 			'Berry',
 			'Animal',
@@ -240,7 +243,7 @@ test.describe( 'Patterns', () => {
 		// Close the view options.
 		await page.keyboard.press( 'Escape' );
 
-		expect( await patterns.itemTitle.allInnerTexts() ).toEqual( [
+		await expect( patterns.itemTitle ).toHaveText( [
 			'Animal',
 			'Berry',
 			'Starter',

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import moveFeaturePreferences from '../move-feature-preferences';
 
 describe( 'moveFeaturePreferences', () => {

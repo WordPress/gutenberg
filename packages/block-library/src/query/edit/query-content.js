@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 import { useEffect, useCallback } from '@wordpress/element';
@@ -13,10 +10,6 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import EnhancedPaginationControl from './inspector-controls/enhanced-pagination-control';
 import { unlock } from '../../lock-unlock';
 import QueryInspectorControls from './inspector-controls';
@@ -28,7 +21,6 @@ const { HTMLElementControl } = unlock( blockEditorPrivateApis );
 
 const DEFAULTS_POSTS_PER_PAGE = 3;
 
-const TEMPLATE = [ [ 'core/post-template' ] ];
 export default function QueryContent( {
 	attributes,
 	setAttributes,
@@ -44,15 +36,14 @@ export default function QueryContent( {
 		tagName: TagName = 'div',
 		query: { inherit } = {},
 	} = attributes;
-	const { templateSlug } = context;
-	const { isSingular } = getQueryContextFromTemplate( templateSlug );
+	const { templateSlug, postType } = context;
+	const { isSingular, templateType } =
+		getQueryContextFromTemplate( templateSlug );
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 	const instanceId = useInstanceId( QueryContent );
 	const blockProps = useBlockProps();
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: TEMPLATE,
-	} );
+	const innerBlocksProps = useInnerBlocksProps( blockProps );
 	const { postsPerPage } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const { getEntityRecord, getEntityRecordEdits, canUser } =
@@ -77,6 +68,14 @@ export default function QueryContent( {
 				DEFAULTS_POSTS_PER_PAGE,
 		};
 	}, [] );
+
+	// Whether the "exclude current" filter applies: we're in a singular template
+	// and the post type matches the query.
+	const shouldExcludeCurrentPost =
+		isSingular &&
+		! inherit &&
+		( query.postType === postType || query.postType === templateType );
+
 	// There are some effects running where some initialization logic is
 	// happening and setting some values to some attributes (ex. queryId).
 	// These updates can cause an `undo trap` where undoing will result in
@@ -102,15 +101,21 @@ export default function QueryContent( {
 		} else if ( ! query.perPage && postsPerPage ) {
 			newQuery.perPage = postsPerPage;
 		}
-
+		// Remove the exclusion when it no longer applies, so the filters stay
+		// clean. We never force it on: enabling the exclusion is left to the user.
+		if ( ! shouldExcludeCurrentPost && query.excludeCurrent !== null ) {
+			newQuery.excludeCurrent = null;
+		}
 		if ( !! Object.keys( newQuery ).length ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			updateQuery( newQuery );
 		}
 	}, [
 		query.perPage,
+		query.excludeCurrent,
 		inherit,
 		postsPerPage,
+		shouldExcludeCurrentPost,
 		__unstableMarkNextChangeAsNotPersistent,
 		updateQuery,
 	] );
@@ -150,6 +155,7 @@ export default function QueryContent( {
 					setAttributes={ setAttributes }
 					clientId={ clientId }
 					isSingular={ isSingular }
+					shouldExcludeCurrentPost={ shouldExcludeCurrentPost }
 				/>
 			</InspectorControls>
 			<InspectorControls group="advanced">

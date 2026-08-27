@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Styles', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentythree' );
-	} );
-
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test.afterEach( async ( { page } ) => {
@@ -18,6 +11,10 @@ test.describe( 'Styles', () => {
 				.dispatch( 'core/editor' )
 				.setRenderingMode( 'post-only' );
 		}, [] );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test( 'should override reset styles and library styles', async ( {

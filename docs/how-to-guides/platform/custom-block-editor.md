@@ -19,7 +19,7 @@ This guide will walk you through building a fully functioning, custom block edit
 By the end of this article, you will have a solid understanding of the block editor's inner workings and be well on your way to creating your own block editor instances.
 
 <div class="callout callout-tip">
-	The code used throughout this guide is available for download in the <a href="https://github.com/getdave/standalone-block-editor">accompanying WordPress plugin</a>. The demo code in this plugin as an essential resource.
+	The code used throughout this guide is available for download in the <a href="https://github.com/getdave/standalone-block-editor">accompanying WordPress plugin</a>. The demo code in this plugin is an essential resource.
 </div>
 
 ## Code syntax
@@ -76,7 +76,7 @@ Perfect, this is the main package you will use to create the custom block editor
 Let's begin by creating a custom page within WordPress admin that will house the custom block editor instance.
 
 <div class="callout callout-info">
-	If you're already comfortable with the process of creating custom admin pages in WordPress, you might want to <a href="#registering-and-rendering-our-custom-block-editor">skip ahead</a>.
+	If you're already comfortable with the process of creating custom admin pages in WordPress, you might want to <a href="#registering-and-rendering-the-custom-block-editor">skip ahead</a>.
 </div>
 
 ### Registering the page
@@ -199,15 +199,9 @@ Begin by opening the main `src/index.js` file. Then pull in the required JavaScr
 
 ```js
 // File: src/index.js
-
-// External dependencies.
 import { createRoot } from 'react-dom';
-
-// WordPress dependencies.
 import domReady from '@wordpress/dom-ready';
 import { registerCoreBlocks } from '@wordpress/block-library';
-
-// Internal dependencies.
 import Editor from './editor';
 import './styles.scss';
 ```

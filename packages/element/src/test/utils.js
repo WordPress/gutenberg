@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { createElement } from '../react';
 import { isEmptyElement } from '../utils';
 

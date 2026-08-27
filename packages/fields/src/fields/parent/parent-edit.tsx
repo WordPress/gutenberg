@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import removeAccents from 'remove-accents';
-
-/**
- * WordPress dependencies
- */
 import { ComboboxControl, ExternalLink } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import {
@@ -14,17 +7,12 @@ import {
 	useMemo,
 	useState,
 } from '@wordpress/element';
-// @ts-ignore
 import { store as coreStore } from '@wordpress/core-data';
 import type { DataFormControlProps } from '@wordpress/dataviews';
 import { debounce } from '@wordpress/compose';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __, sprintf } from '@wordpress/i18n';
 import { filterURLForDisplay } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import type { BasePost } from '../../types';
 import { getTitleWithFallbackName } from './utils';
 
@@ -114,7 +102,7 @@ export function PageAttributesParent( {
 	data: BasePost;
 	onChangeControl: ( newValue: number ) => void;
 } ) {
-	const [ fieldValue, setFieldValue ] = useState< null | string >( null );
+	const [ fieldValue, setFieldValue ] = useState< string >( '' );
 
 	const pageId = data.parent;
 	const postId = data.id;
@@ -145,10 +133,11 @@ export function PageAttributesParent( {
 				orderby: 'menu_order',
 				order: 'asc',
 				_fields: 'id,title,parent',
-				...( fieldValue !== null && {
+				...( !! fieldValue && {
 					// Perform a search by relevance when the field is changed.
 					search: fieldValue,
 					orderby: 'relevance',
+					search_columns: [ 'post_title' ],
 				} ),
 			};
 
@@ -192,14 +181,8 @@ export function PageAttributesParent( {
 			] );
 
 			const sortedNodes = mappedNodes.sort( ( [ a ], [ b ] ) => {
-				const priorityA = getItemPriority(
-					a.rawName,
-					fieldValue ?? ''
-				);
-				const priorityB = getItemPriority(
-					b.rawName,
-					fieldValue ?? ''
-				);
+				const priorityA = getItemPriority( a.rawName, fieldValue );
+				const priorityB = getItemPriority( b.rawName, fieldValue );
 				return priorityA >= priorityB ? 1 : -1;
 			} );
 
@@ -256,7 +239,7 @@ export function PageAttributesParent( {
 	 *
 	 * @param {Object} selectedPostId The selected Author.
 	 */
-	const handleChange = ( selectedPostId: string | null | undefined ) => {
+	const handleChange = ( selectedPostId: string | null ) => {
 		if ( selectedPostId ) {
 			return onChangeControl( parseInt( selectedPostId, 10 ) ?? 0 );
 		}
@@ -266,7 +249,6 @@ export function PageAttributesParent( {
 
 	return (
 		<ComboboxControl
-			__next40pxDefaultSize
 			label={ __( 'Parent' ) }
 			help={ __( 'Choose a parent page.' ) }
 			value={ pageId?.toString() }

@@ -1,15 +1,7 @@
-/**
- * WordPress dependencies
- */
-
 import { __, _n } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 
@@ -94,13 +86,6 @@ export default function BlockRemovalWarnings() {
 			),
 		[ currentPostType ]
 	);
-
-	// `BlockRemovalWarnings` is rendered in the editor provider, a shared component
-	// across react native and web. However, `BlockRemovalWarningModal` is web only.
-	// Check it exists before trying to render it.
-	if ( ! BlockRemovalWarningModal ) {
-		return null;
-	}
 
 	if ( ! removalRulesForPostType ) {
 		return null;

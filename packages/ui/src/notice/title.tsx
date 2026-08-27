@@ -1,20 +1,21 @@
 import { forwardRef } from '@wordpress/element';
-import { useRender, mergeProps } from '@base-ui/react';
+import clsx from 'clsx';
 import type { TitleProps } from './types';
+import { Text } from '../text';
 import styles from './style.module.css';
 
 /**
  * A short heading that communicates the main message of the notice.
  */
 export const Title = forwardRef< HTMLSpanElement, TitleProps >(
-	function NoticeTitle( { render, ...props }, ref ) {
-		const element = useRender( {
-			defaultTagName: 'span',
-			render,
-			ref,
-			props: mergeProps< 'span' >( { className: styles.title }, props ),
-		} );
-
-		return element;
+	function NoticeTitle( { className, ...props }, ref ) {
+		return (
+			<Text
+				ref={ ref }
+				variant="heading-md"
+				className={ clsx( styles.title, className ) }
+				{ ...props }
+			/>
+		);
 	}
 );

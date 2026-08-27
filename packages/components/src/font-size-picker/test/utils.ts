@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { isSimpleCssValue } from '../utils';
 
 describe( 'isSimpleCssValue', () => {

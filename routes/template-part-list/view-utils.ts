@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { loadView } from '@wordpress/views';
 import type { View, Filter } from '@wordpress/dataviews';
 
@@ -20,12 +17,6 @@ export const DEFAULT_VIEW: View = {
 	fields: [],
 	titleField: 'title',
 	mediaField: 'preview',
-};
-
-export const DEFAULT_LAYOUTS = {
-	table: {},
-	grid: {},
-	list: {},
 };
 
 export const DEFAULT_VIEWS: {
@@ -95,30 +86,9 @@ export async function ensureView(
 }
 
 export function viewToQuery( view: View ) {
-	const result: Record< string, any > = {};
+	// The endpoint only supports `area`. Everything else is handled client-side.
+	const result: Record< string, any > = { per_page: -1 };
 
-	// Pagination, sorting, search.
-	if ( undefined !== view.perPage ) {
-		result.per_page = view.perPage;
-	}
-
-	if ( undefined !== view.page ) {
-		result.page = view.page;
-	}
-
-	if ( ! [ undefined, '' ].includes( view.search ) ) {
-		result.search = view.search;
-	}
-
-	if ( undefined !== view.sort?.field ) {
-		result.orderby = view.sort.field;
-	}
-
-	if ( undefined !== view.sort?.direction ) {
-		result.order = view.sort.direction;
-	}
-
-	// Area filtering for template parts
 	const areaFilter = view.filters?.find(
 		( filter ) => filter.field === 'area'
 	);

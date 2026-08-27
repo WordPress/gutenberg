@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as blocksStore } from '@wordpress/blocks';
@@ -10,10 +7,6 @@ import {
 } from '@wordpress/block-editor';
 import { PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { TEMPLATE_PART_POST_TYPE } from '../../store/constants';
 import { store as editorStore } from '../../store';

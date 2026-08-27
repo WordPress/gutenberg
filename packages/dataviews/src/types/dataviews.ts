@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { ReactElement, ReactNode, ComponentProps } from 'react';
-
-/**
- * WordPress dependencies
- */
 import type { useFocusOnMount } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import type {
 	NormalizedField,
 	Operator,
@@ -18,6 +7,7 @@ import type {
 	SortDirection,
 } from './field-api';
 import type { SetSelection } from './private';
+import type { MEDIA_ASPECT_RATIOS } from '../constants';
 
 /**
  * The filters applied to the dataset.
@@ -133,7 +123,8 @@ interface ViewBase {
 	page?: number;
 
 	/**
-	 * The number of items per page
+	 * The number of items per page.
+	 * Also used as the batch size when infinite scroll is enabled.
 	 */
 	perPage?: number;
 
@@ -203,6 +194,12 @@ interface ViewBase {
 	 * Whether infinite scroll is enabled.
 	 */
 	infiniteScrollEnabled?: boolean;
+
+	/**
+	 * The start position for infinite scroll (1-indexed).
+	 * Used when infiniteScrollEnabled is true.
+	 */
+	startPosition?: number;
 }
 
 export interface ColumnStyle {
@@ -229,6 +226,23 @@ export interface ColumnStyle {
 
 export type Density = 'compact' | 'balanced' | 'comfortable';
 
+/**
+ * The preset aspect ratios available for item media previews, mirroring
+ * Core's default `aspect-ratio` presets. Derived from the
+ * `MEDIA_ASPECT_RATIOS` constant, which layouts also use to validate the
+ * configured value at runtime, so the two can't drift apart.
+ */
+export type MediaAspectRatio = ( typeof MEDIA_ASPECT_RATIOS )[ number ];
+
+/**
+ * How the media field fills its preview box. `cover` crops it to fill,
+ * `contain` fits the whole media inside, letterboxing it so its own aspect
+ * ratio stays visible. Unlike `MediaAspectRatio` there is no matching runtime
+ * constant: layouts style the fit from a class they add for `contain` alone,
+ * so any other value simply leaves previews cropped.
+ */
+export type MediaFit = 'cover' | 'contain';
+
 export interface ViewTable extends ViewBase {
 	type: 'table';
 
@@ -247,6 +261,13 @@ export interface ViewTable extends ViewBase {
 		 * Whether the view allows column moving.
 		 */
 		enableMoving?: boolean;
+
+		/**
+		 * A fixed aspect ratio for the primary column's media preview, one of
+		 * the preset ratios. Applied uniformly to every row. Defaults to
+		 * `'1/1'`.
+		 */
+		aspectRatio?: MediaAspectRatio;
 	};
 }
 
@@ -285,6 +306,26 @@ export interface ViewGrid extends ViewBase {
 		 * The preview size of the grid.
 		 */
 		previewSize?: number;
+
+		/**
+		 * The density of the grid layout.
+		 */
+		density?: Density;
+
+		/**
+		 * A fixed aspect ratio for the grid item previews (the media field),
+		 * one of the preset ratios. Applied uniformly to every item so rows
+		 * stay aligned. Defaults to `'1/1'`.
+		 */
+		aspectRatio?: MediaAspectRatio;
+
+		/**
+		 * How the media field fills the preview box. `'cover'` crops it to
+		 * fill, `'contain'` fits the whole media inside so its own aspect
+		 * ratio stays visible. The box keeps the shape set by `aspectRatio`
+		 * either way, so rows stay aligned. Defaults to `'cover'`.
+		 */
+		mediaFit?: MediaFit;
 	};
 }
 
@@ -301,6 +342,19 @@ export interface ViewPickerGrid extends ViewBase {
 		 * The preview size of the grid.
 		 */
 		previewSize?: number;
+
+		/**
+		 * The density of the grid layout.
+		 */
+		density?: Density;
+
+		/**
+		 * How the media field fills the preview box. `'cover'` crops it to
+		 * fill, `'contain'` fits the whole media inside so its own aspect
+		 * ratio stays visible. The box stays square either way, so rows stay
+		 * aligned. Defaults to `'cover'`.
+		 */
+		mediaFit?: MediaFit;
 	};
 }
 
@@ -325,12 +379,24 @@ export interface ViewPickerTable extends ViewBase {
 	};
 }
 
+export interface ViewPickerActivity extends ViewBase {
+	type: 'pickerActivity';
+
+	layout?: {
+		/**
+		 * The density of the view.
+		 */
+		density?: Density;
+	};
+}
+
 export type View =
 	| ViewList
 	| ViewGrid
 	| ViewTable
 	| ViewPickerGrid
 	| ViewPickerTable
+	| ViewPickerActivity
 	| ViewActivity;
 
 interface ActionBase< Item > {
@@ -499,6 +565,11 @@ export interface ViewPickerTableProps< Item >
 	view: ViewPickerTable;
 }
 
+export interface ViewPickerActivityProps< Item >
+	extends Omit< ViewPickerBaseProps< Item >, 'view' > {
+	view: ViewPickerActivity;
+}
+
 export type ViewProps< Item > =
 	| ViewTableProps< Item >
 	| ViewGridProps< Item >
@@ -507,13 +578,25 @@ export type ViewProps< Item > =
 
 export type ViewPickerProps< Item > =
 	| ViewPickerGridProps< Item >
-	| ViewPickerTableProps< Item >;
+	| ViewPickerTableProps< Item >
+	| ViewPickerActivityProps< Item >;
 
 export interface SupportedLayouts {
+	list?: Omit< ViewList, 'type' > | true;
+	grid?: Omit< ViewGrid, 'type' > | true;
+	table?: Omit< ViewTable, 'type' > | true;
+	activity?: Omit< ViewActivity, 'type' > | true;
+	pickerGrid?: Omit< ViewPickerGrid, 'type' > | true;
+	pickerTable?: Omit< ViewPickerTable, 'type' > | true;
+	pickerActivity?: Omit< ViewPickerActivity, 'type' > | true;
+}
+
+export interface NormalizedSupportedLayouts {
 	list?: Omit< ViewList, 'type' >;
 	grid?: Omit< ViewGrid, 'type' >;
 	table?: Omit< ViewTable, 'type' >;
 	activity?: Omit< ViewActivity, 'type' >;
 	pickerGrid?: Omit< ViewPickerGrid, 'type' >;
 	pickerTable?: Omit< ViewPickerTable, 'type' >;
+	pickerActivity?: Omit< ViewPickerActivity, 'type' >;
 }

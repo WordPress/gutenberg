@@ -30,6 +30,9 @@
 			"type": "string",
 			"default": "_self",
 			"role": "content"
+		},
+		"placeholder": {
+			"type": "string"
 		}
 	},
 	"example": {
