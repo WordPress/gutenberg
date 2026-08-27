@@ -48,7 +48,8 @@ export default function NavigationMenuContent( {
 	const [ NavigationLinkUI, setNavigationLinkUI ] =
 		useState< ComponentType >();
 	useEffect( () => {
-		import( '@wordpress/block-library' ).then( ( blockLibrary ) => {
+		// @ts-expect-error - No type declarations available for @wordpress/block-library
+		import( '@wordpress/block-library' ).then( ( blockLibrary: any ) => {
 			setNavigationLinkUI(
 				() => unlock( blockLibrary.privateApis ).NavigationLinkUI
 			);
