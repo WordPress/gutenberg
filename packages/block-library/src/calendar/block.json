@@ -21,7 +21,7 @@
 		"html": false,
 		"color": {
 			"link": true,
-			"__experimentalSkipSerialization": [ "text" ],
+			"__experimentalSkipSerialization": [ "text", "background" ],
 			"__experimentalDefaultControls": {
 				"background": true,
 				"text": true
