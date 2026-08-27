@@ -12,6 +12,12 @@ const MemoizedBlockList = memo( BlockList );
 
 const MAX_HEIGHT = 2000;
 const EMPTY_ADDITIONAL_STYLES = [];
+const PREVIEW_STYLES = {
+	css: `body{height:auto;overflow:hidden;border:none;padding:0;}
+		.block-editor-warning,.components-placeholder:not(:has(.components-placeholder__illustration)){display:none;}
+		.is-root-container .block-editor-block-list__block.has-warning:after{background:none;}`,
+	__unstableType: 'presets',
+};
 
 function ScaledBlockPreview( {
 	viewportWidth,
@@ -32,17 +38,10 @@ function ScaledBlockPreview( {
 		};
 	}, [] );
 
-	// Avoid scrollbars for pattern previews.
+	// Avoid scrollbars and hide block editor warnings for pattern previews.
 	const editorStyles = useMemo( () => {
 		if ( styles ) {
-			return [
-				...styles,
-				{
-					css: 'body{height:auto;overflow:hidden;border:none;padding:0;}',
-					__unstableType: 'presets',
-				},
-				...additionalStyles,
-			];
+			return [ ...styles, PREVIEW_STYLES, ...additionalStyles ];
 		}
 
 		return styles;
