@@ -210,4 +210,5 @@ figure.wp-block-gallery.has-nested-images:where(.is-layout-flex) {
 
 :where(.wp-block-gallery.has-nested-images.is-layout-grid) > .blocks-gallery-caption {
 	grid-column: 1 / -1;
+	text-align: center;
 }
