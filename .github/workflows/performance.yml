@@ -101,6 +101,12 @@ jobs:
                       WP_VERSION="$INPUT_WP_VERSION"
                       ;;
                   esac
+                  # Artifact names are derived from sanitized branch names and must be unique.
+                  DUPLICATES="$(echo "$BRANCHES" | jq -r '[.[].name | gsub("[^a-zA-Z0-9-]"; "-")] | group_by(.) | map(select(length > 1) | .[0]) | .[]')"
+                  if [[ -n "$DUPLICATES" ]]; then
+                    echo "::error::Branches must not share a sanitized name: $DUPLICATES"
+                    exit 1
+                  fi
                   echo "branches=$BRANCHES" >> "$GITHUB_OUTPUT"
                   echo "wp-version=$WP_VERSION" >> "$GITHUB_OUTPUT"
                   echo "$BRANCHES" | jq .
@@ -144,6 +150,7 @@ jobs:
                     packages/icons/src/library/*.svg \
                     build \
                     build-module \
+                    post-content.php \
                     readme.txt \
                     changelog.txt \
                     README.md \
@@ -154,8 +161,8 @@ jobs:
               id: artifact
               env:
                   BRANCH_NAME: ${{ matrix.branch.name }}
-              # Must match `sanitizeBranchName()` in tools/release/commands/performance.js.
-              run: echo "name=plugin-$(echo "$BRANCH_NAME" | sed 's/[^a-zA-Z0-9-]/-/g')" >> "$GITHUB_OUTPUT"
+              # Same replacement as `sanitizeBranchName()` in tools/release/commands/performance.js.
+              run: echo "name=plugin-$(node -e 'process.stdout.write( process.env.BRANCH_NAME.replace( /[^a-zA-Z0-9-]/g, "-" ) )')" >> "$GITHUB_OUTPUT"
 
             - name: Upload plugin
               uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
