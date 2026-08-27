@@ -442,6 +442,26 @@ function isBrowserGlobalExpression(
 		}
 
 		if (
+			node.callee?.type === 'MemberExpression' &&
+			getMemberPropertyName( node.callee ) === 'at' &&
+			( isVariableReference(
+				node.callee.object,
+				domCollectionVariables,
+				identifierVariables
+			) ||
+				isTestingLibraryDomCollectionExpression(
+					node.callee.object,
+					testingLibraryScreenVariables,
+					testingLibraryCollectionFunctionVariables,
+					testingLibraryAsyncCollectionFunctionVariables,
+					testingLibraryNamespaceVariables,
+					identifierVariables
+				) )
+		) {
+			return true;
+		}
+
+		if (
 			node.callee?.type !== 'MemberExpression' ||
 			! domProducingMethods.has( getMemberPropertyName( node.callee ) )
 		) {
@@ -883,12 +903,27 @@ function traverseAst( node, visitorKeys, visitor ) {
 
 function getTrackedAssignment( node ) {
 	if ( node.type === 'VariableDeclarator' ) {
-		return { target: node.id, value: node.init };
+		return {
+			target: node.id,
+			value: node.init,
+			isCollectionElement: false,
+		};
 	}
 	if ( node.type === 'AssignmentExpression' && node.operator === '=' ) {
-		return { target: node.left, value: node.right };
+		return {
+			target: node.left,
+			value: node.right,
+			isCollectionElement: false,
+		};
 	}
-	return { target: null, value: null };
+	if ( node.type === 'ForOfStatement' ) {
+		const target =
+			node.left.type === 'VariableDeclaration'
+				? node.left.declarations[ 0 ]?.id
+				: node.left;
+		return { target, value: node.right, isCollectionElement: true };
+	}
+	return { target: null, value: null, isCollectionElement: false };
 }
 
 function isRecord( value ) {
@@ -1217,7 +1252,8 @@ export function validateVitestPolicy( {
 				testingLibraryScreenVariables.add( node );
 			}
 
-			const { target, value } = getTrackedAssignment( node );
+			const { target, value, isCollectionElement } =
+				getTrackedAssignment( node );
 
 			if ( ! value || ! target ) {
 				return;
@@ -1459,7 +1495,16 @@ export function validateVitestPolicy( {
 					value.type === 'AwaitExpression'
 				);
 			if ( isDomCollectionValue ) {
-				if ( target.type === 'Identifier' ) {
+				if ( isCollectionElement ) {
+					for ( const identifier of getPatternIdentifiers(
+						target
+					) ) {
+						const variable = identifierVariables.get( identifier );
+						if ( variable ) {
+							domVariables.add( variable );
+						}
+					}
+				} else if ( target.type === 'Identifier' ) {
 					const variable = identifierVariables.get( target );
 					if ( variable ) {
 						domCollectionVariables.add( variable );

@@ -169,6 +169,17 @@ describe( 'Vitest policy rules', () => {
 		}
 	} );
 
+	it( 'tracks Testing Library collection elements', () => {
+		for ( const source of [
+			"import { screen } from '@testing-library/react';\nscreen.getAllByRole( 'button' ).at( 0 ).offsetWidth;",
+			"import { screen } from '@testing-library/react';\nfor ( const button of screen.getAllByRole( 'button' ) ) { button.offsetWidth; }",
+		] ) {
+			expectViolation( source, 'require Browser Mode', {
+				project: 'jsdom',
+			} );
+		}
+	} );
+
 	it( 'tracks computed-style aliases and document.defaultView', () => {
 		for ( const source of [
 			'document.defaultView.getComputedStyle( document.body );',
