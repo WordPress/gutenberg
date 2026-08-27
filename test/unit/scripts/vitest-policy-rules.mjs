@@ -1006,6 +1006,21 @@ export function validateVitestPolicy( {
 		) ?? []
 	);
 	const identifierVariables = createIdentifierVariableMap( scopeManager );
+	const typeOnlyNodes = new Set(
+		scopeManager.globalScope?.through
+			.filter(
+				( reference ) =>
+					reference.isTypeReference && ! reference.isValueReference
+			)
+			.map( ( reference ) => reference.identifier ) ?? []
+	);
+	traverseAst( ast, visitorKeys, ( node ) => {
+		if ( node.type === 'TSTypeQuery' ) {
+			traverseAst( node, visitorKeys, ( typeNode ) => {
+				typeOnlyNodes.add( typeNode );
+			} );
+		}
+	} );
 	const importedNamespaces = new Set();
 	const computedStyleVariables = new Set();
 	const domCollectionVariables = new Set();
@@ -1638,6 +1653,7 @@ export function validateVitestPolicy( {
 
 		if (
 			project === 'jsdom' &&
+			! typeOnlyNodes.has( node ) &&
 			( ( node.type === 'Identifier' &&
 				browserApiIdentifiers.has( node.name ) &&
 				unboundIdentifiers.has( node ) ) ||

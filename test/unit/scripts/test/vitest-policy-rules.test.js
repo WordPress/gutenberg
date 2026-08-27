@@ -78,6 +78,18 @@ describe( 'Vitest policy rules', () => {
 		} );
 	} );
 
+	it( 'allows type-only jsdom browser API references', () => {
+		for ( const source of [
+			'let observer: ResizeObserver;',
+			'type Observer = typeof ResizeObserver;',
+		] ) {
+			expectValid( source, {
+				file: 'example.jsdom.test.ts',
+				project: 'jsdom',
+			} );
+		}
+	} );
+
 	it( 'allows browser API-shaped properties on unrelated jsdom objects', () => {
 		expectValid(
 			'const fake = { scrollTop: 0 };\nfake.scrollTop;\nconst mockLayout = { getBoundingClientRect() {} };\nmockLayout.getBoundingClientRect();',
