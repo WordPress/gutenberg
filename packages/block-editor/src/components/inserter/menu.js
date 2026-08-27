@@ -415,7 +415,7 @@ function InserterMenu(
 				<Popover
 					className="block-editor-inserter__preview-container__popover"
 					placement="right-start"
-					offset={ 16 }
+					offset={ { mainAxis: 16, crossAxis: 16 } }
 					focusOnMount={ false }
 					animate={ false }
 				>

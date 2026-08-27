@@ -109,7 +109,8 @@ jobs:
                     --ci \
                     --maxWorkers="$(nproc)" \
                     --shard="$SHARD" \
-                    --cacheDirectory="$HOME/.jest-cache"
+                    --cacheDirectory="$HOME/.jest-cache" \
+                    --passWithNoTests
 
             - name: Run the migrated Vitest partition
               env:
