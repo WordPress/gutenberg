@@ -44,7 +44,7 @@
 	// the future, this can be simplified to an `includes` of `src/**/*`.
 	"files": [
 		"src/lock-unlock.ts",
-		"src/components/block-context/index.js",
+		"src/components/block-context/index.jsx",
 		"src/components/block-visibility/constants.ts",
 		"src/components/block-visibility/use-block-visibility.ts"
 	],

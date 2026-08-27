@@ -124,6 +124,9 @@ jobs:
             - name: Build packages
               run: npm run build
 
+            - name: Validate Vitest conventions and TypeScript test graph
+              run: npm run test:unit:conventions
+
             - name: Check type declaration files
               # Runs against the final package output, including the built
               # declarations and runtime files.

@@ -6,6 +6,10 @@
 
 -   Update `use-recommended-components` rule to prefer `@wordpress/ui` `Field` over legacy `@wordpress/components` `BaseControl` ([#82095](https://github.com/WordPress/gutenberg/pull/82095)).
 
+### Bug Fixes
+
+-   Apply test-only DOM global exceptions to both JavaScript and JSX test files ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
 ## 25.10.0 (2026-08-26)
 
 ### Bug Fixes
