@@ -6,7 +6,8 @@ import {
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useEffect, useState } from '@wordpress/element';
+import type { ComponentType } from 'react';
 import { store as coreStore } from '@wordpress/core-data';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import LeafMoreMenu from './leaf-more-menu';
@@ -40,6 +41,20 @@ export default function NavigationMenuContent( {
 }: {
 	rootClientId: string;
 } ) {
+	// Imported dynamically rather than statically: the block library is part
+	// of the lazily loaded editor assets, so its binding is only readable
+	// once they are — a static import would capture `undefined` when this
+	// bundle loads.
+	const [ NavigationLinkUI, setNavigationLinkUI ] =
+		useState< ComponentType >();
+	useEffect( () => {
+		import( '@wordpress/block-library' ).then( ( blockLibrary ) => {
+			setNavigationLinkUI(
+				() => unlock( blockLibrary.privateApis ).NavigationLinkUI
+			);
+		} );
+	}, [] );
+
 	const { listViewRootClientId, isLoading } = useSelect(
 		( select ) => {
 			const {
@@ -105,7 +120,8 @@ export default function NavigationMenuContent( {
 					rootClientId={ listViewRootClientId }
 					onSelect={ offCanvasOnselect }
 					blockSettingsMenu={ LeafMoreMenu }
-					showAppender={ false }
+					showAppender
+					additionalBlockContent={ NavigationLinkUI }
 					isExpanded
 				/>
 			) }
