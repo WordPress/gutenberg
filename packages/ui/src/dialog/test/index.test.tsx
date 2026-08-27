@@ -2,6 +2,7 @@ import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef, useState } from '@wordpress/element';
 import * as Dialog from '../index';
+import { ThemeProvider } from '../../utils/theme-provider';
 
 function collectUncaughtErrors() {
 	const errors: Error[] = [];
@@ -722,6 +723,38 @@ describe( 'Dialog', () => {
 	} );
 
 	describe( 'portal', () => {
+		it( 'uses the root theme when portaled from a nested theme', async () => {
+			const user = userEvent.setup();
+			const popupRef = createRef< HTMLDivElement >();
+
+			render(
+				<ThemeProvider isRoot cornerRadius="subtle">
+					<ThemeProvider cornerRadius="pronounced">
+						<Dialog.Root>
+							<Dialog.Trigger>Open</Dialog.Trigger>
+							<Dialog.Popup ref={ popupRef }>
+								<Dialog.Title>Title</Dialog.Title>
+							</Dialog.Popup>
+						</Dialog.Root>
+					</ThemeProvider>
+				</ThemeProvider>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+			await waitFor( () => {
+				expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
+			} );
+
+			// The popup is portaled next to the app root, so its closest theme
+			// boundary should be the root provider mirrored onto the document.
+			/* eslint-disable testing-library/no-node-access */
+			expect(
+				popupRef.current?.closest( '[data-wpds-corner-radius]' )
+			).toBe( document.documentElement );
+			/* eslint-enable testing-library/no-node-access */
+		} );
+
 		it( 'should render inside the portal container when a custom target is provided', async () => {
 			const user = userEvent.setup();
 			const containerRef = createRef< HTMLDivElement >();
