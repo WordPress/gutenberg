@@ -1001,26 +1001,58 @@ function getBranchPath( node, useNode, parentNodes ) {
 	return branches.reverse().join( '/' );
 }
 
-function getReachableWrites( variable, useNode, parentNodes ) {
-	const usePosition = useNode.range[ 0 ];
-	const writes = variable.references
+function getExecutionContext( node, parentNodes ) {
+	for ( let current = node; current; current = parentNodes.get( current ) ) {
+		if (
+			[
+				'ArrowFunctionExpression',
+				'FunctionDeclaration',
+				'FunctionExpression',
+				'Program',
+			].includes( current.type )
+		) {
+			return current;
+		}
+	}
+	return null;
+}
+
+function getFunctionVariable( functionNode, identifierVariables, parentNodes ) {
+	if ( functionNode.type === 'FunctionDeclaration' ) {
+		return identifierVariables.get( functionNode.id );
+	}
+	const parent = parentNodes.get( functionNode );
+	return parent?.type === 'VariableDeclarator' &&
+		parent.id.type === 'Identifier'
+		? identifierVariables.get( parent.id )
+		: null;
+}
+
+function getDirectFunctionCalls(
+	functionNode,
+	useNode,
+	identifierVariables,
+	parentNodes
+) {
+	const variable = getFunctionVariable(
+		functionNode,
+		identifierVariables,
+		parentNodes
+	);
+	const useContext = getExecutionContext( useNode, parentNodes );
+	return ( variable?.references ?? [] )
+		.map( ( reference ) => reference.identifier )
 		.filter(
-			( reference ) =>
-				reference.isWrite() &&
-				reference.writeExpr &&
-				reference.identifier.range[ 0 ] < usePosition
-		)
-		.map( ( reference ) => ( {
-			expression: reference.writeExpr,
-			node: reference.identifier,
-			position: reference.identifier.range[ 0 ],
-			branchPath: getBranchPath(
-				reference.identifier,
-				useNode,
-				parentNodes
-			),
-		} ) )
-		.sort( ( first, second ) => first.position - second.position );
+			( identifier ) =>
+				identifier.range[ 0 ] < useNode.range[ 0 ] &&
+				getExecutionContext( identifier, parentNodes ) === useContext &&
+				parentNodes.get( identifier )?.type === 'CallExpression' &&
+				parentNodes.get( identifier ).callee === identifier
+		);
+}
+
+function selectReachableWrites( writes ) {
+	writes.sort( ( first, second ) => first.position - second.position );
 	const lastUnconditionalWrite = writes
 		.filter( ( write ) => ! write.branchPath )
 		.at( -1 );
@@ -1045,7 +1077,106 @@ function getReachableWrites( variable, useNode, parentNodes ) {
 		lastUnconditionalWrite && ! hasExhaustiveReplacement
 			? [ lastUnconditionalWrite ]
 			: [];
-	return reachableWrites.concat( [ ...conditionalWrites.values() ] );
+	return {
+		hasExhaustiveReplacement,
+		writes: reachableWrites.concat( [ ...conditionalWrites.values() ] ),
+	};
+}
+
+function getReachableWrites(
+	variable,
+	useNode,
+	identifierVariables,
+	parentNodes
+) {
+	const usePosition = useNode.range[ 0 ];
+	const writes = variable.references
+		.filter( ( reference ) => reference.isWrite() && reference.writeExpr )
+		.flatMap( ( reference ) => {
+			const writeContext = getExecutionContext(
+				reference.identifier,
+				parentNodes
+			);
+			const useContext = getExecutionContext( useNode, parentNodes );
+			const executionNodes =
+				writeContext === useContext
+					? [ reference.identifier ]
+					: getDirectFunctionCalls(
+							writeContext,
+							useNode,
+							identifierVariables,
+							parentNodes
+					  );
+			return executionNodes.map( ( executionNode ) => ( {
+				expression: reference.writeExpr,
+				node: executionNode,
+				position: executionNode.range[ 0 ],
+				branchPath: getBranchPath(
+					executionNode,
+					useNode,
+					parentNodes
+				),
+			} ) );
+		} )
+		.filter( ( write ) => write.position < usePosition );
+	return selectReachableWrites( writes ).writes;
+}
+
+function getReachableMemberWrites(
+	node,
+	useNode,
+	identifierVariables,
+	parentNodes
+) {
+	if ( node.object.type !== 'Identifier' ) {
+		return { hasExhaustiveReplacement: false, writes: [] };
+	}
+	const variable = identifierVariables.get( node.object );
+	const propertyName = getMemberPropertyName( node );
+	const usePosition = useNode.range[ 0 ];
+	const writes = ( variable?.references ?? [] ).flatMap( ( reference ) => {
+		const member = parentNodes.get( reference.identifier );
+		const assignment = parentNodes.get( member );
+		if (
+			member?.type !== 'MemberExpression' ||
+			member.object !== reference.identifier ||
+			getMemberPropertyName( member ) !== propertyName ||
+			assignment?.type !== 'AssignmentExpression' ||
+			assignment.left !== member ||
+			assignment.operator !== '='
+		) {
+			return [];
+		}
+		const writeContext = getExecutionContext(
+			reference.identifier,
+			parentNodes
+		);
+		const useContext = getExecutionContext( useNode, parentNodes );
+		const executionNodes =
+			writeContext === useContext
+				? [ reference.identifier ]
+				: getDirectFunctionCalls(
+						writeContext,
+						useNode,
+						identifierVariables,
+						parentNodes
+				  );
+		return executionNodes
+			.filter(
+				( executionNode ) => executionNode.range[ 0 ] < usePosition
+			)
+			.map( ( executionNode ) => ( {
+				expression: assignment.right,
+				node: executionNode,
+				position: executionNode.range[ 0 ],
+				branchPath: getBranchPath(
+					executionNode,
+					useNode,
+					parentNodes
+				),
+			} ) );
+	} );
+	return selectReachableWrites( writes );
 }
 
 function getReachableLocalValues(
@@ -1118,42 +1249,88 @@ function getReachableLocalValues(
 		node.callee?.type === 'MemberExpression' &&
 		getMemberPropertyName( node.callee ) === 'bind'
 	) {
-		return getReachableLocalValues(
+		for ( const value of getReachableLocalValues(
 			node.callee.object,
 			useNode,
 			identifierVariables,
 			parentNodes,
 			seenVariables
-		);
+		) ) {
+			if ( value.type === 'BoundFunction' ) {
+				localValues.add( {
+					...value,
+					boundArgumentCount:
+						value.boundArgumentCount + node.arguments.length - 1,
+				} );
+			} else if (
+				[
+					'ArrowFunctionExpression',
+					'FunctionDeclaration',
+					'FunctionExpression',
+				].includes( value.type )
+			) {
+				localValues.add( {
+					type: 'BoundFunction',
+					functionNode: value,
+					boundArgumentCount: node.arguments.length - 1,
+				} );
+			}
+		}
+		return localValues;
 	}
 	if ( node?.type === 'MemberExpression' ) {
 		const propertyName = getMemberPropertyName( node );
-		for ( const object of getReachableLocalValues(
-			node.object,
+		const memberWrites = getReachableMemberWrites(
+			node,
 			useNode,
 			identifierVariables,
-			parentNodes,
-			seenVariables
-		) ) {
-			if ( object.type !== 'ObjectExpression' ) {
-				continue;
-			}
-			for ( const property of object.properties ) {
-				if (
-					property.type === 'Property' &&
-					( property.key?.name ?? property.key?.value ) ===
-						propertyName
-				) {
-					for ( const value of getReachableLocalValues(
-						property.value,
-						useNode,
-						identifierVariables,
-						parentNodes,
-						seenVariables
-					) ) {
-						localValues.add( value );
+			parentNodes
+		);
+		const hasUnconditionalMemberWrite = memberWrites.writes.some(
+			( write ) => ! write.branchPath
+		);
+		if (
+			! hasUnconditionalMemberWrite &&
+			! memberWrites.hasExhaustiveReplacement
+		) {
+			for ( const object of getReachableLocalValues(
+				node.object,
+				useNode,
+				identifierVariables,
+				parentNodes,
+				seenVariables
+			) ) {
+				if ( object.type !== 'ObjectExpression' ) {
+					continue;
+				}
+				for ( const property of object.properties ) {
+					if (
+						property.type === 'Property' &&
+						( property.key?.name ?? property.key?.value ) ===
+							propertyName
+					) {
+						for ( const value of getReachableLocalValues(
+							property.value,
+							useNode,
+							identifierVariables,
+							parentNodes,
+							seenVariables
+						) ) {
+							localValues.add( value );
+						}
 					}
 				}
+			}
+		}
+		for ( const write of memberWrites.writes ) {
+			for ( const value of getReachableLocalValues(
+				write.expression,
+				write.node,
+				identifierVariables,
+				parentNodes,
+				seenVariables
+			) ) {
+				localValues.add( value );
 			}
 		}
 		return localValues;
@@ -1170,6 +1347,7 @@ function getReachableLocalValues(
 	for ( const write of getReachableWrites(
 		variable,
 		useNode,
+		identifierVariables,
 		parentNodes
 	) ) {
 		for ( const value of getReachableLocalValues(
@@ -1201,13 +1379,22 @@ function getReachableLocalFunctions( node, identifierVariables, parentNodes ) {
 				identifierVariables,
 				parentNodes
 			),
-		].filter( ( value ) =>
-			[
+		].flatMap( ( value ) => {
+			if ( value.type === 'BoundFunction' ) {
+				return value;
+			}
+			return [
 				'ArrowFunctionExpression',
 				'FunctionDeclaration',
 				'FunctionExpression',
 			].includes( value.type )
-		)
+				? {
+						type: 'BoundFunction',
+						functionNode: value,
+						boundArgumentCount: 0,
+				  }
+				: [];
+		} )
 	);
 }
 
@@ -1622,7 +1809,9 @@ export function validateVitestPolicy( {
 					);
 				for ( const callback of callbacks ) {
 					trackDomValuePattern(
-						callback.params[ elementParameterIndex ]
+						callback.functionNode.params[
+							elementParameterIndex + callback.boundArgumentCount
+						]
 					);
 				}
 			}
