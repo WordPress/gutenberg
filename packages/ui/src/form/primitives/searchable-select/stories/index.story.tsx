@@ -60,11 +60,7 @@ export const Creatable: Story = {
 		value: ITEMS[ 0 ],
 	},
 	render: function Template( args ) {
-		const {
-			items = ITEMS,
-			value: initialValue = ITEMS[ 0 ],
-			...restArgs
-		} = args;
+		const { value: initialValue = ITEMS[ 0 ], ...restArgs } = args;
 		const [ inputValue, setInputValue ] = useState( '' );
 		const [ value, setValue ] = useState( initialValue );
 		const creatableItem = {
@@ -77,7 +73,7 @@ export const Creatable: Story = {
 		return (
 			<SearchableSelect
 				{ ...restArgs }
-				items={ [ ...items, creatableItem ] }
+				items={ [ ...ITEMS, creatableItem ] }
 				inputValue={ inputValue }
 				onInputValueChange={ setInputValue }
 				value={ value }
