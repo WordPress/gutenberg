@@ -40,11 +40,22 @@ const gitEnvironment = {
 };
 
 async function git( cwd, args ) {
-	return execFileAsync( 'git', args, {
-		cwd,
-		env: gitEnvironment,
-		maxBuffer: 10 * 1024 * 1024,
-	} );
+	try {
+		return await execFileAsync( 'git', args, {
+			cwd,
+			env: gitEnvironment,
+			maxBuffer: 10 * 1024 * 1024,
+		} );
+	} catch ( error ) {
+		// `execFile` reports only the command it ran, and Promptfoo then wraps
+		// that again, so a failure arrives with nothing to act on. Say what Git
+		// said, and where.
+		throw new Error(
+			`git ${ args.join( ' ' ) } failed in ${ cwd } (exit ${
+				error.code
+			})\n${ error.stderr || '(no output)' }`
+		);
+	}
 }
 
 /**
@@ -58,6 +69,20 @@ async function git( cwd, args ) {
  * @return {Promise<string>} A tree-ish `git archive` can write.
  */
 async function resolveTree() {
+	// `git stash create` fails, with nothing on either stream, when there is
+	// nothing to stash. Ask first rather than reading that failure as one.
+	// `--untracked-files=no` because `stash create` ignores untracked files, so
+	// a tree holding only those has nothing to stash either.
+	const { stdout: modified } = await git( sourceRoot, [
+		'status',
+		'--porcelain',
+		'--untracked-files=no',
+	] );
+
+	if ( ! modified.trim() ) {
+		return 'HEAD';
+	}
+
 	const { stdout } = await git( sourceRoot, [ 'stash', 'create' ] );
 	return stdout.trim() || 'HEAD';
 }
