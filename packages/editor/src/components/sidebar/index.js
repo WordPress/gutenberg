@@ -20,6 +20,7 @@ import SidebarHeader from './header';
 import TemplateActionsPanel from '../template-actions-panel';
 import TemplateContentPanel from '../template-content-panel';
 import TemplatePartContentPanel from '../template-part-content-panel';
+import ExitTemplatePartPanel from '../exit-template-part-panel';
 import RevisionBlockDiffPanel from '../revision-block-diff';
 import useAutoSwitchEditorSidebars from '../provider/use-auto-switch-editor-sidebars';
 import { sidebars } from './constants';
@@ -86,6 +87,7 @@ function Sidebar( { extraPanels, onActionPerformed } ) {
 				<TemplateContentPanel />
 				{ isDataFormInspectorEnabled && <TemplateActionsPanel /> }
 				<TemplatePartContentPanel />
+				<ExitTemplatePartPanel />
 				<PostTransformPanel />
 				<PostTaxonomiesPanel />
 				<PatternOverridesPanel />

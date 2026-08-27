@@ -44,4 +44,43 @@ test.describe( 'Template Part Focus mode', () => {
 		await expect( page.locator( 'h1' ) ).toContainText( 'Blog Home' );
 		await expect( page.locator( 'h1' ) ).toContainText( 'Template' );
 	} );
+
+	test( 'Should exit template part focus mode via the sidebar button.', async ( {
+		admin,
+		page,
+		editor,
+	} ) => {
+		await admin.visitAdminPage( 'site-editor.php?canvas=edit' );
+		await editor.setPreferences( 'core/edit-site', {
+			welcomeGuide: false,
+		} );
+
+		// Check that we're editing the template
+		await expect( page.locator( 'h1' ) ).toContainText( 'Blog Home' );
+		await expect( page.locator( 'h1' ) ).toContainText( 'Template' );
+
+		// Click Template Part
+		await editor.canvas
+			.getByRole( 'document', {
+				name: 'Header',
+			} )
+			.click();
+
+		// Navigate to Focus mode
+		await editor.clickBlockToolbarButton( 'Edit original' );
+
+		// Check if focus mode is active
+		await expect( page.locator( 'h1' ) ).toContainText( 'Header' );
+		await expect( page.locator( 'h1' ) ).toContainText( 'Template Part' );
+
+		// Exit focus mode using the sidebar button
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Exit original' } )
+			.click();
+
+		// Check that we're editing the template
+		await expect( page.locator( 'h1' ) ).toContainText( 'Blog Home' );
+		await expect( page.locator( 'h1' ) ).toContainText( 'Template' );
+	} );
 } );
