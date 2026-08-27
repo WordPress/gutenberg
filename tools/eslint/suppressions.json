@@ -1,37 +1,393 @@
 {
+	"packages/admin-ui/src/lock-unlock.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/admin-ui/src/stories/with-router.tsx": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/block-directory/src/components/block-ratings/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-directory/src/components/block-ratings/stars.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-directory/src/components/compact-list/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-directory/src/components/downloadable-block-icon/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-directory/src/components/downloadable-block-icon/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-directory/src/components/downloadable-block-list-item/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-directory/src/components/downloadable-block-list-item/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-directory/src/components/downloadable-block-notice/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-directory/src/components/downloadable-blocks-list/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-directory/src/components/downloadable-blocks-list/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-directory/src/components/downloadable-blocks-panel/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-directory/src/components/downloadable-blocks-panel/inserter-panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/block-directory/src/components/downloadable-blocks-panel/no-results.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-directory/src/plugins/get-install-missing/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-directory/src/plugins/get-install-missing/install-button.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-directory/src/plugins/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-directory/src/plugins/inserter-menu-downloadable-blocks-panel/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-directory/src/plugins/installed-blocks-pre-publish-panel/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/autocompleters/block.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/alignment-control/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/alignment-control/stories/aliginment-toolbar.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/alignment-control/stories/index.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/alignment-control/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/alignment-control/ui.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/autocomplete/index.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/background-image-control/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-alignment-control/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-alignment-control/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-alignment-control/ui.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-alignment-matrix-control/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-alignment-matrix-control/stories/index.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-allowed-blocks/allowed-blocks-control.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-allowed-blocks/modal.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-bindings/attribute-control.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-bindings/source-fields-list.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-breadcrumb/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-breadcrumb/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-canvas/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-card/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-compare/block-view.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-compare/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-compare/test/block-view.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-context/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-controls/fill.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-controls/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-controls/slot.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-controls/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-draggable/draggable-chip.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-draggable/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-draggable/stories/index.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-edit-visually-button/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-edit/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-edit/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-edit/multiple-usage-warning.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-edit/test/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-full-height-alignment-control/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-heading-level-dropdown/heading-level-icon.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-heading-level-dropdown/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-heading-level-dropdown/stories/index.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-icon/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-icon/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-inspector/edit-contents.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-inspector/index.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-keyboard-shortcuts/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-list-appender/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-list/block-crash-warning.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-list/block-html.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-list/block-invalid-warning.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-list/block.js": {
 		"react-hooks/immutability": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-list/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-list/layout.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-list/subdirectory-icon.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-list/use-block-props/index.js": {
@@ -39,53 +395,303 @@
 			"count": 2
 		}
 	},
+	"packages/block-editor/src/components/block-list/zoom-out-separator.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-lock/menu-item.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/block-editor/src/components/block-lock/modal.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-lock/toolbar.js": {
 		"react-hooks/refs": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-manager/category.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-manager/checklist.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-manager/index.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-mover/button.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-mover/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-mover/stories/index.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-navigation/dropdown.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-parent-selector/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-pattern-setup/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-pattern-setup/setup-toolbar.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-patterns-list/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-patterns-list/stories/index.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-patterns-paging/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-popover/cover.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-popover/drop-zone.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-popover/inbetween.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-popover/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-popover/stories/index.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-preview/auto.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-preview/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-preview/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-quick-navigation/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-removal-warning-modal/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-rename/modal.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-rename/rename-control.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-selection-clearer/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-selection-clearer/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-settings-menu-controls/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-settings-menu/block-html-convert-button.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-settings-menu/block-mode-toggle.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-settings-menu/block-parent-selector-menu-item.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-settings-menu/block-settings-dropdown.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-settings-menu/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-settings-menu/test/block-mode-toggle.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-styles/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-styles/menu-items.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-switcher/block-styles-menu.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-switcher/block-transformations-menu.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-switcher/block-variation-transformations.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-switcher/index.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-switcher/pattern-transformations-menu.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-switcher/preview-block-popover.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-switcher/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-title/stories/index.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-title/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-toolbar/block-styles-dropdown.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-toolbar/block-toolbar-icon.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-toolbar/change-design.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-toolbar/edit-section-button.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-toolbar/index.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -95,90 +701,539 @@
 		},
 		"react-hooks/refs": {
 			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-toolbar/switch-section-style.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-toolbar/test/block-toolbar-icon.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-tools/block-toolbar-popover.js": {
 		"react-hooks/refs": {
 			"count": 4
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-tools/empty-block-inserter.js": {
 		"react-hooks/refs": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-tools/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-tools/insertion-point.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-tools/zoom-out-mode-inserter-button.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-tools/zoom-out-mode-inserters.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-types-list/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-variation-picker/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-variation-transforms/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-vertical-alignment-control/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-vertical-alignment-control/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-vertical-alignment-control/ui.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-visibility/modal.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/block-visibility/viewport-menu-item.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-visibility/viewport-toolbar.js": {
 		"react-hooks/refs": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-visibility/viewport-visibility-info.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/border-radius-control/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/border-radius-control/linked-button.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/border-radius-control/stories/index.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/border-radius-control/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/button-block-appender/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/child-layout-control/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/child-layout-control/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/color-palette/control.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/color-palette/stories/control.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/color-palette/test/control.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/color-palette/with-color-context.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/color-style-selector/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/colors-gradients/control.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/colors-gradients/dropdown.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/colors-gradients/panel-color-gradient-settings.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/colors-gradients/test/control.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/colors/test/with-colors.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/colors/with-colors.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/contrast-checker/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/contrast-checker/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/convert-to-group-buttons/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/convert-to-group-buttons/toolbar.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/copy-handler/index.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/date-format-picker/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/date-format-picker/stories/index.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/default-block-appender/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/default-block-appender/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/dimension-control/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/dimension-control/stories/index.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/dimensions-tool/aspect-ratio-tool.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/dimensions-tool/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/dimensions-tool/scale-tool.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/dimensions-tool/stories/aspect-ratio-tool.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/dimensions-tool/stories/index.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/dimensions-tool/stories/scale-tool.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/dimensions-tool/stories/width-height-tool.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/dimensions-tool/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/dimensions-tool/width-height-tool.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/duotone-control/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/duotone-control/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/editable-text/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/editor-styles/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/fit-text-size-warning/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/font-appearance-control/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/font-family/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/font-family/stories/index.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/font-sizes/font-size-picker.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/font-sizes/with-font-sizes.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/global-styles/advanced-panel.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/global-styles/background-panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/global-styles/border-panel.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/global-styles/color-gradient-dropdown-item.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 5
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/global-styles/color-panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/global-styles/dimensions-panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/global-styles/filters-panel.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/global-styles/image-settings-panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/global-styles/inheritance/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/global-styles/inheritance/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/global-styles/shadow-panel-components.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/global-styles/state-control-badges.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/global-styles/state-control.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/global-styles/test/background-panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/global-styles/test/border-panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/global-styles/test/color-panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/global-styles/test/dimensions-panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/global-styles/test/filters-panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/global-styles/test/inherited-value-context.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/global-styles/test/state-control-badges.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/global-styles/test/typography-panel-core.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/global-styles/test/typography-panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/global-styles/typography-panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/grid/grid-item-movers.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/grid/grid-item-resizer.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/grid/grid-visualizer.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/height-control/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/height-control/stories/index.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/html-element-control/index.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/iframe/index.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -190,54 +1245,424 @@
 			"count": 1
 		}
 	},
+	"packages/block-editor/src/components/image-editor/aspect-ratio-dropdown.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/image-editor/context.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/image-editor/cropper.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/image-editor/form-controls.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/image-editor/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/image-editor/rotation-button.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/image-editor/zoom-dropdown.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/block-editor/src/components/image-size-control/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/image-size-control/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inner-blocks/button-block-appender.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inner-blocks/default-block-appender.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inner-blocks/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inner-blocks/stories/index.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inner-blocks/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inner-content/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inner-content/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inserter-draggable-blocks/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inserter-list-item/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inserter-listbox/group.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inserter-listbox/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inserter-listbox/item.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inserter-listbox/row.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inserter/block-patterns-explorer/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inserter/block-patterns-explorer/pattern-explorer-sidebar.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inserter/block-patterns-explorer/pattern-list.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inserter/block-patterns-tab/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/inserter/block-patterns-tab/pattern-category-previews.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 5
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/inserter/block-patterns-tab/patterns-filter.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inserter/block-types-tab.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/inserter/category-tabs/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inserter/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inserter/library.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inserter/media-tab/media-list.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inserter/media-tab/media-panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/inserter/media-tab/media-preview.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inserter/media-tab/media-tab.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inserter/media-tab/test/media-panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inserter/media-tab/utils.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inserter/menu.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/inserter/mobile-tab-navigation.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 6
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inserter/no-results.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inserter/panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inserter/preview-panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inserter/quick-inserter.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inserter/search-results.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inserter/stories/index.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inserter/tips.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inspector-controls-tabs/advanced-controls-panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inspector-controls-tabs/content-tab.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/inspector-controls-tabs/index.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inspector-controls-tabs/position-controls-panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inspector-controls-tabs/settings-tab.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inspector-controls-tabs/styles-tab.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inspector-controls/block-support-slot-container.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inspector-controls/block-support-tools-panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inspector-controls/fill.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inspector-controls/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inspector-controls/last-item.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inspector-controls/list-view-content-popover.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/inspector-controls/slot.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/inspector-popover-header/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 5
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/justify-content-control/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/justify-content-control/ui.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/letter-spacing-control/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/letter-spacing-control/stories/index.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/line-height-control/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/line-height-control/stories/index.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/line-height-control/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/link-control/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/link-control/link-preview.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/link-control/search-create-button.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/link-control/search-input.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/link-control/search-item.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/link-control/search-results.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/link-control/settings-drawer.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/link-control/settings.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/link-control/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/link-control/test/url-normalization.test.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/link-control/use-create-page.js": {
@@ -248,45 +1673,402 @@
 	"packages/block-editor/src/components/link-picker/link-picker.js": {
 		"react-hooks/refs": {
 			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/link-picker/link-preview.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/link-picker/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/list-view/appender.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/list-view/aria-referenced-text.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/list-view/block-contents.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/list-view/block-select-button.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/list-view/block.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/list-view/branch.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/list-view/drop-indicator.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/list-view/expander.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/list-view/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/list-view/leaf.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/media-placeholder/index.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/media-placeholder/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/media-replace-flow/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/media-replace-flow/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/multi-selection-inspector/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/navigable-toolbar/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/observe-typing/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/panel-color-settings/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/panel-color-settings/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/plain-text/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/plain-text/stories/index.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/preset-input-control/custom-value-controls.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/preset-input-control/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/preset-input-control/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/provider/block-refs-provider.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/provider/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/provider/test/experimental-provider.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/provider/test/use-block-sync.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/provider/with-registry-provider.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/publish-date-time-picker/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/recursion-provider/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/recursion-provider/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/resizable-box-popover/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/resolution-tool/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/resolution-tool/stories/index.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/responsive-block-control/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/responsive-block-control/label.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/responsive-block-control/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/rich-text/content.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/rich-text/format-edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/rich-text/format-toolbar-container.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/rich-text/format-toolbar/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/rich-text/get-rich-text-values.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/rich-text/index.js": {
 		"react-hooks/refs": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/rich-text/multiline.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/rich-text/toolbar-button.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/rich-text/utils.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/rich-text/with-deprecations.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/skip-to-selected-block/index.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/spacing-sizes-control/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/spacing-sizes-control/input-controls/axial.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/spacing-sizes-control/input-controls/separated.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/spacing-sizes-control/input-controls/single.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/spacing-sizes-control/input-controls/spacing-input-control.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/spacing-sizes-control/linked-button.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/spacing-sizes-control/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/tabbed-sidebar/index.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/tabbed-sidebar/stories/index.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/text-alignment-control/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/text-alignment-control/stories/index.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/text-decoration-control/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/text-decoration-control/stories/index.story.jsx": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/text-indent-control/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/text-transform-control/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/text-transform-control/stories/index.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/typewriter/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/unit-control/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/unit-control/stories/index.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/url-input/button.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/url-input/index.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/url-input/test/button.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/url-input/test/index.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -296,51 +2078,421 @@
 		},
 		"react-hooks/refs": {
 			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/url-popover/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/url-popover/link-editor.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/url-popover/link-viewer-url.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/url-popover/link-viewer.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/url-popover/stories/index.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/use-block-display-information/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/warning/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/warning/stories/index.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/warning/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/writing-flow/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/writing-flow/use-tab-nav.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/writing-mode-control/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/writing-mode-control/stories/index.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/align.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/allowed-blocks.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/hooks/anchor.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/auto-inspector-controls.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/background.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/hooks/block-bindings.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/block-fields/fields-dropdown-menu.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/hooks/block-fields/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/hooks/block-fields/link/index.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/hooks/block-fields/media/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/block-fields/rich-text/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/block-hooks.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/block-style-variation.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/border.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/hooks/custom-class-name.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/custom-css.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/dimensions.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/duotone.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/elements.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/fit-text.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/font-size.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/grid-visualizer.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/layout-child.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/layout.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/line-height.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/list-view.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/position.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/spacing-visualizer.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/states.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/style.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/test/align.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/test/background.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/test/custom-class-name.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/test/inherited-value-wiring.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/test/settings.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/test/style.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/test/text-align.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/text-align.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/typography.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/hooks/utils.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/layouts/constrained.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/layouts/flex.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/layouts/grid.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/layouts/test/constrained.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/layouts/test/flex.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/layouts/test/grid.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/store/test/selectors.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/utils/test/dom.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/accordion-heading/deprecated.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/accordion-heading/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/accordion-heading/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/accordion-item/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/accordion-item/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/accordion-panel/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/accordion-panel/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/accordion/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/accordion/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/archives/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/audio/deprecated.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/audio/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/audio/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/avatar/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/avatar/user-control.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/block/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/breadcrumbs/edit.js": {
@@ -349,40 +2501,354 @@
 		},
 		"react-hooks/refs": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/button/deprecated.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/button/edit.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/button/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/buttons/deprecated.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/buttons/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/buttons/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/calendar/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/categories/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/code/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/code/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/column/deprecated.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/column/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/column/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/columns/deprecated.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-library/src/columns/edit.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/columns/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/columns/variations.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/comment-author-avatar/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/comment-author-name/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/comment-content/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/comment-date/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/comment-edit-link/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/comment-reply-link/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/comment-template/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/comment-template/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/comments-pagination-next/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/comments-pagination-numbers/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/comments-pagination-previous/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/comments-pagination/comments-pagination-arrow-controls.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/comments-pagination/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/comments-pagination/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/comments-title/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/comments/deprecated.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/comments/edit/comments-inspector-controls.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/comments/edit/comments-legacy.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/comments/edit/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/comments/edit/placeholder.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/comments/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/cover/deprecated.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/cover/edit/block-controls.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/cover/edit/cover-placeholder.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/cover/edit/embed-video-url-input.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-library/src/cover/edit/index.js": {
 		"react-hooks/refs": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/cover/edit/inspector-controls.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/cover/edit/resizable-cover-popover.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/cover/save.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-library/src/details/edit.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/details/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/embed/deprecated.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/embed/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/embed/embed-controls.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/embed/embed-loading.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/embed/embed-placeholder.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/embed/embed-preview.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/embed/icons.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/embed/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/embed/util.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/embed/wp-embed-preview.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/file/deprecated.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/file/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/file/inspector.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/file/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/footnotes/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/footnotes/format.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/form-input/deprecated.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -392,55 +2858,328 @@
 		},
 		"react-hooks/refs": {
 			"count": 3
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/form-input/icons.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/form-input/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/form-submission-notification/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/form-submission-notification/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/form-submit-button/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/form-submit-button/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/form/deprecated.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/form/edit.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/form/icons.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/form/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/freeform/convert-to-blocks-button.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/freeform/edit.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-library/src/freeform/modal.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/freeform/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/gallery/deprecated.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/gallery/dynamic-gallery.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/gallery/edit.js": {
 		"react-hooks/immutability": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/gallery/gallery.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/gallery/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/gallery/shared-icon.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/gallery/test/use-get-new-images.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/group/deprecated.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-library/src/group/edit.js": {
 		"react-hooks/refs": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/group/placeholder.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/group/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/group/test/placeholder.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/heading/deprecated.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/heading/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/heading/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/home-link/edit.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/home-link/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/html/edit.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-library/src/html/modal.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/html/preview.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/icon/components/custom-inserter/icon-grid.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/icon/components/custom-inserter/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/icon/edit.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/icon/icon.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/image/deprecated.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/image/edit.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-library/src/image/image.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/image/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/image/use-max-width-observer.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/latest-comments/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/latest-posts/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/list-item/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/list-item/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/list/deprecated.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/list/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/list/ordered-list-settings.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/list/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/list/tag-name.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/loginout/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/math/deprecated.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/math/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/math/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/media-text/deprecated.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -450,11 +3189,67 @@
 		},
 		"react-hooks/immutability": {
 			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/media-text/media-container.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/media-text/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/missing/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/missing/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/more/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/more/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/navigation-link/edit.js": {
 		"react-hooks/immutability": {
 			"count": 6
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation-link/icons.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation-link/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation-link/link-ui/block-inserter.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation-link/link-ui/dialog-wrapper.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/navigation-link/link-ui/index.js": {
@@ -463,60 +3258,281 @@
 		},
 		"react-hooks/refs": {
 			"count": 4
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/navigation-link/link-ui/page-creator.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation-link/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/navigation-link/shared/controls.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation-link/shared/invalid-draft-display.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation-link/shared/test/controls.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation-overlay-close/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation-overlay-close/icon.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation-submenu/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation-submenu/icons.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation-submenu/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation/deprecated.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation/edit/accessible-description.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation/edit/accessible-menu-description.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation/edit/deleted-navigation-warning.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation/edit/deleted-overlay-warning.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/navigation/edit/index.js": {
 		"react-hooks/immutability": {
 			"count": 3
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation/edit/inner-blocks.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation/edit/leaf-more-menu.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation/edit/manage-menus-button.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation/edit/menu-inspector-controls.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation/edit/navigation-link-ui.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/navigation/edit/navigation-list-view-header.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation/edit/navigation-menu-delete-control.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/navigation/edit/navigation-menu-name-control.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-library/src/navigation/edit/navigation-menu-selector.js": {
 		"react-hooks/immutability": {
 			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation/edit/overlay-menu-icon.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/navigation/edit/overlay-menu-preview-button.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-library/src/navigation/edit/overlay-menu-preview-controls.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation/edit/overlay-menu-preview.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/navigation/edit/overlay-panel.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation/edit/overlay-preview.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-library/src/navigation/edit/overlay-template-part-selector.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation/edit/overlay-visibility-control.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation/edit/placeholder/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation/edit/placeholder/placeholder-preview.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation/edit/responsive-wrapper.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation/edit/test/navigation-menu-selector.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation/edit/test/overlay-template-part-selector.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation/edit/test/responsive-wrapper.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/navigation/edit/unsaved-inner-blocks.js": {
 		"react-hooks/refs": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/navigation/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/nextpage/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/nextpage/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/page-list-item/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/page-list/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/paragraph/deprecated.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/paragraph/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/paragraph/save.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -525,114 +3541,1095 @@
 			"count": 1
 		}
 	},
+	"packages/block-library/src/pattern/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/block-library/src/playlist-track/edit.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/playlist-track/test/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/playlist/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/playlist/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/playlist/test/edit-component.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/post-author-biography/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/post-author-name/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/post-author/edit.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/post-comment/edit.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/post-comment/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/post-comments-count/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/post-comments-form/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/post-comments-form/form.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/post-comments-link/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/post-content/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/post-date/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/post-excerpt/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/post-featured-image/dimension-controls.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-library/src/post-featured-image/edit.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/post-featured-image/overlay-controls.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/post-featured-image/overlay.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/post-navigation-link/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/post-template/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/post-template/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/post-terms/edit.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/post-time-to-read/edit.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-library/src/post-title/edit.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/preformatted/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/preformatted/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/pullquote/deprecated.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/pullquote/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/pullquote/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/query-no-results/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/query-no-results/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/query-pagination-next/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/query-pagination-numbers/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/query-pagination-previous/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/query-pagination/deprecated.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/query-pagination/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/query-pagination/query-pagination-arrow-controls.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/query-pagination/query-pagination-label-control.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/query-pagination/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/query-title/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/query-total/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/query-total/icons.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/query/deprecated.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/query/edit/enhanced-pagination-modal.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/query/edit/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/query/edit/inspector-controls/author-control.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/query/edit/inspector-controls/enhanced-pagination-control.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/query/edit/inspector-controls/format-controls.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-library/src/query/edit/inspector-controls/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/query/edit/inspector-controls/offset-controls.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/query/edit/inspector-controls/order-control.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/query/edit/inspector-controls/pages-control.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/query/edit/inspector-controls/parent-control.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/query/edit/inspector-controls/per-page-control.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/query/edit/inspector-controls/sticky-control.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/query/edit/inspector-controls/taxonomy-controls.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/query/edit/pattern-selection.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/query/edit/query-content.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/query/edit/query-placeholder.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/query/edit/query-toolbar.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/query/icons.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/query/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/quote/deprecated.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/quote/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/quote/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/read-more/edit.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-library/src/rss/edit.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/search/edit.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/separator/deprecated.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/separator/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/separator/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/separator/test/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/shortcode/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/shortcode/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/site-logo/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/site-tagline/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/site-tagline/icon.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/site-title/edit.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-library/src/social-link/edit.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/amazon.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/bandcamp.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/behance.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/bluesky.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/chain.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/codepen.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/deviantart.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/discord.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/dribbble.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/dropbox.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/etsy.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/facebook.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/feed.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/fivehundredpx.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/flickr.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/foursquare.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/github.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/goodreads.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/google.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/gravatar.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/instagram.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/lastfm.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/linkedin.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/mail.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/mastodon.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/medium.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/meetup.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/patreon.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/pinterest.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/pocket.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/reddit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/skype.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/snapchat.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/soundcloud.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/spotify.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/telegram.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/threads.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/tiktok.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/tumblr.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/twitch.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/twitter.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/vimeo.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/vk.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/whatsapp.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/wordpress.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/x.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/yelp.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-link/icons/youtube.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-links/deprecated.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-links/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/social-links/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/spacer/controls.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/spacer/deprecated.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/spacer/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/spacer/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/tab-list/edit.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/tab-list/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/tab-list/tab-movers.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/tab-panel/controls.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/tab-panel/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/tab-panel/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/tab-panels/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/tab-panels/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/table-of-contents/deprecated.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/table-of-contents/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/table/deprecated.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-library/src/table/edit.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/table/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/tabs/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/tabs/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/tabs/tab-toolbar-controls.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/tag-cloud/edit.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/template-part/edit/advanced-controls.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-library/src/template-part/edit/import-controls.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/template-part/edit/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/template-part/edit/inner-blocks.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/template-part/edit/placeholder.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/template-part/edit/selection-modal.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-library/src/template-part/edit/title-modal.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/term-count/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/term-count/icons.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/term-description/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/term-name/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/term-template/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/term-template/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/terms-query/edit/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/terms-query/edit/inspector-controls/advanced-controls.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/terms-query/edit/inspector-controls/empty-terms-control.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/terms-query/edit/inspector-controls/include-control.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/terms-query/edit/inspector-controls/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/terms-query/edit/inspector-controls/inherit-control.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/terms-query/edit/inspector-controls/max-terms-control.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/terms-query/edit/inspector-controls/nested-terms-control.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/terms-query/edit/inspector-controls/order-control.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/terms-query/edit/inspector-controls/taxonomy-control.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/terms-query/edit/terms-query-content.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/terms-query/edit/terms-query-placeholder.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/terms-query/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/terms-query/variations.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/text-columns/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/text-columns/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/utils/caption.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/utils/html-renderer.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/utils/media-control.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/block-library/src/utils/poster-image.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/utils/test/waveform-player.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/utils/waveform-player.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/verse/deprecated.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/verse/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/verse/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/video/deprecated.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/video/edit-common-settings.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/video/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/video/save.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/block-library/src/video/tracks-editor.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/video/tracks.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/blocks/src/api/parser/test/apply-block-deprecated-versions.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/blocks/src/api/parser/test/fix-custom-classname.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/blocks/src/api/parser/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/blocks/src/api/test/registration.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/blocks/src/api/test/serializer.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/blocks/src/store/test/selectors.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/boot/src/components/navigation/drilldown-item/index.tsx": {
@@ -661,6 +4658,9 @@
 		},
 		"react-hooks/refs": {
 			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/components/src/autocomplete/autocompleter-ui.tsx": {
@@ -675,6 +4675,11 @@
 	},
 	"packages/components/src/base-control/stories/index.story.tsx": {
 		"react-hooks/immutability": {
+			"count": 1
+		}
+	},
+	"packages/components/src/border-control/test/index.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -703,8 +4708,21 @@
 			"count": 1
 		}
 	},
+	"packages/components/src/context/context-system-provider.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/components/src/context/stories/ComponentsProvider.stories.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/components/src/context/test/context-system-provider.js": {
 		"no-restricted-imports": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -793,6 +4811,21 @@
 			"count": 3
 		}
 	},
+	"packages/components/src/input-control/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/components/src/item-group/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/components/src/menu-item/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/components/src/menu/styles.ts": {
 		"no-restricted-imports": {
 			"count": 2
@@ -848,6 +4881,16 @@
 	},
 	"packages/components/src/slot-fill/slot.tsx": {
 		"react-hooks/refs": {
+			"count": 1
+		}
+	},
+	"packages/components/src/slot-fill/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/components/src/slot-fill/test/slot.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -916,9 +4959,22 @@
 			"count": 1
 		}
 	},
+	"packages/components/src/utils/hooks/test/use-controlled-state.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/components/src/utils/hooks/test/use-controlled-value.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/components/src/utils/hooks/test/use-cx.js": {
 		"no-restricted-imports": {
 			"count": 3
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/components/src/utils/hooks/use-cx.ts": {
@@ -931,8 +4987,48 @@
 			"count": 1
 		}
 	},
+	"packages/components/src/utils/test/get-node-text.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/components/src/utils/test/polymorphic-element.tsx": {
 		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/components/src/view/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/compose/src/higher-order/pure/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/compose/src/higher-order/with-global-events/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/compose/src/higher-order/with-global-events/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/compose/src/higher-order/with-instance-id/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/compose/src/higher-order/with-state/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/compose/src/higher-order/with-state/test/index.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -941,8 +5037,48 @@
 			"count": 1
 		}
 	},
+	"packages/compose/src/hooks/use-disabled/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/compose/src/hooks/use-drop-zone/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/compose/src/hooks/use-focus-outside/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/compose/src/hooks/use-instance-id/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/compose/src/hooks/use-media-query/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/compose/src/hooks/use-media-query/test/ssr.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/compose/src/hooks/use-merge-refs/index.ts": {
 		"react-hooks/refs": {
+			"count": 1
+		}
+	},
+	"packages/compose/src/hooks/use-merge-refs/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/compose/src/hooks/use-observable-value/test/index.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -951,24 +5087,210 @@
 			"count": 1
 		}
 	},
+	"packages/compose/src/hooks/use-state-with-history/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/compose/src/hooks/use-viewport-match/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/compose/src/utils/create-higher-order-component/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/connectors/src/connector-item.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 6
 		}
 	},
+	"packages/core-commands/src/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/core-data/src/components/entities-saved-states/entity-record-item.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/core-data/src/components/entities-saved-states/entity-type-list.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/core-data/src/components/entities-saved-states/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/core-data/src/entity-provider.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/core-data/src/hooks/test/use-entity-record.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/core-data/src/hooks/test/use-entity-records.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/core-data/src/hooks/test/use-query-select.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/core-data/src/hooks/test/use-resource-permissions.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/core-data/src/test/entity-provider.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/core-data/src/test/rtc-rich-text-offset-space.test.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/customize-widgets/src/components/block-appender/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/customize-widgets/src/components/block-inspector-button/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/customize-widgets/src/components/customize-widgets/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/customize-widgets/src/components/error-boundary/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/customize-widgets/src/components/error-boundary/test/error-boundary.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/customize-widgets/src/components/focus-control/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/customize-widgets/src/components/header/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/customize-widgets/src/components/inserter/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/customize-widgets/src/components/keyboard-shortcut-help-modal/dynamic-shortcut.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/customize-widgets/src/components/keyboard-shortcut-help-modal/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/customize-widgets/src/components/keyboard-shortcut-help-modal/shortcut.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/customize-widgets/src/components/more-menu/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/customize-widgets/src/components/sidebar-block-editor/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/customize-widgets/src/components/sidebar-block-editor/sidebar-editor-provider.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/customize-widgets/src/components/sidebar-controls/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/customize-widgets/src/components/welcome-guide/index.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/customize-widgets/src/filters/move-to-sidebar.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/customize-widgets/src/filters/wide-widget-display.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/customize-widgets/src/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/data/src/components/use-dispatch/test/use-dispatch.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/data/src/components/use-select/index.ts": {
 		"react-hooks/refs": {
 			"count": 2
+		}
+	},
+	"packages/data/src/components/use-select/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/data/src/components/use-select/test/suspense.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/data/src/components/with-dispatch/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/data/src/components/with-select/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/dataviews/src/components/dataform-controls/date.tsx": {
@@ -1076,54 +5398,214 @@
 			"count": 2
 		}
 	},
+	"packages/edit-post/src/components/back-button/fullscreen-mode-close.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-post/src/components/back-button/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-post/src/components/browser-url/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-post/src/components/editor-initialization/test/listener-hooks.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/edit-post/src/components/init-pattern-modal/index.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-post/src/components/layout/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-post/src/components/meta-boxes/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-post/src/components/meta-boxes/meta-boxes-area/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-post/src/components/meta-boxes/test/use-meta-box-initialization.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-post/src/components/more-menu/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-post/src/components/more-menu/manage-patterns-menu-item.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-post/src/components/more-menu/welcome-guide-menu-item.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-post/src/components/preferences-modal/enable-custom-fields.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-post/src/components/preferences-modal/enable-panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-post/src/components/preferences-modal/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-post/src/components/preferences-modal/meta-boxes-section.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-post/src/components/preferences-modal/test/enable-custom-fields.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-post/src/components/preferences-modal/test/meta-boxes-section.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/edit-post/src/components/welcome-guide/default.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-post/src/components/welcome-guide/image.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-post/src/components/welcome-guide/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-post/src/components/welcome-guide/template.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-post/src/deprecated.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-post/src/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/edit-site/src/components/add-new-pattern/index.js": {
 		"react-hooks/refs": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/edit-site/src/components/add-new-post/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/edit-site/src/components/add-new-template-legacy/add-custom-generic-template-modal-content.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/edit-site/src/components/add-new-template-legacy/add-custom-template-modal-content.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/edit-site/src/components/add-new-template-legacy/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/edit-site/src/components/add-new-template/add-custom-generic-template-modal-content.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/edit-site/src/components/add-new-template/add-custom-template-modal-content.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/edit-site/src/components/add-new-template/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/app/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/canvas-loader/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/editor/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/editor/site-preview.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/edit-site/src/components/editor/use-resolve-edited-entity.js": {
@@ -1131,73 +5613,630 @@
 			"count": 2
 		}
 	},
+	"packages/edit-site/src/components/layout/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/media/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/more-menu/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/more-menu/welcome-guide-menu-item.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/page-patterns/actions.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/page-patterns/delete-category-menu-item.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/page-patterns/fields.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/page-patterns/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/page-patterns/rename-category-menu-item.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/edit-site/src/components/page-templates/fields.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/page-templates/index-legacy.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/page-templates/index.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/edit-site/src/components/pagination/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/plugin-template-setting-panel/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/post-list/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/edit-site/src/components/post-list/quick-edit-modal.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/edit-site/src/components/resizable-frame/index.js": {
 		"react-hooks/refs": {
 			"count": 4
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/save-button/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/save-hub/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/save-panel/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/sidebar-button/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/sidebar-dataviews/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/edit-site/src/components/sidebar-global-styles/index.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/sidebar-identity/index.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/edit-site/src/components/sidebar-navigation-item/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/sidebar-navigation-screen-details-footer/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/edit-site/src/components/sidebar-navigation-screen-global-styles/content.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/sidebar-navigation-screen-global-styles/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/sidebar-navigation-screen-identity/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/sidebar-navigation-screen-main/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/sidebar-navigation-screen-navigation-menu/delete-confirm-dialog.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/sidebar-navigation-screen-navigation-menu/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/sidebar-navigation-screen-navigation-menu/more-menu.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/sidebar-navigation-screen-navigation-menu/navigation-menu-editor.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/edit-site/src/components/sidebar-navigation-screen-navigation-menu/rename-modal.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/sidebar-navigation-screen-navigation-menu/single-navigation-menu.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/sidebar-navigation-screen-navigation-menus/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/sidebar-navigation-screen-navigation-menus/leaf-more-menu.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/sidebar-navigation-screen-navigation-menus/navigation-menu-content.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/sidebar-navigation-screen-patterns/category-item.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/sidebar-navigation-screen-patterns/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/sidebar-navigation-screen-templates-browse/content-legacy.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/sidebar-navigation-screen-templates-browse/content.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/sidebar-navigation-screen-templates-browse/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/edit-site/src/components/sidebar-navigation-screen-unsupported/index.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/edit-site/src/components/sidebar-navigation-screen/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/sidebar/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/site-editor-routes/home.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/site-editor-routes/identity.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/site-editor-routes/navigation-item.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/site-editor-routes/navigation.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/edit-site/src/components/site-editor-routes/notfound.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/site-editor-routes/page-item.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/site-editor-routes/pages.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/site-editor-routes/pattern-item.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/site-editor-routes/patterns.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/site-editor-routes/stylebook.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/site-editor-routes/styles.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/site-editor-routes/template-item.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/site-editor-routes/template-part-item.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/site-editor-routes/templates.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/site-hub/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/welcome-guide/editor.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/welcome-guide/image.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/welcome-guide/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/welcome-guide/page.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/components/welcome-guide/template.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/deprecated.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-site/src/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-widgets/src/blocks/widget-area/edit/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-widgets/src/blocks/widget-area/edit/inner-blocks.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-widgets/src/components/error-boundary/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-widgets/src/components/error-boundary/test/error-boundary.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-widgets/src/components/header/document-tools/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-widgets/src/components/header/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-widgets/src/components/header/undo-redo/redo.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-widgets/src/components/header/undo-redo/undo.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-widgets/src/components/keyboard-shortcut-help-modal/dynamic-shortcut.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-widgets/src/components/keyboard-shortcut-help-modal/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-widgets/src/components/keyboard-shortcut-help-modal/shortcut.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-widgets/src/components/layout/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-widgets/src/components/layout/interface.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-widgets/src/components/more-menu/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-widgets/src/components/more-menu/tools-more-menu-group.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-widgets/src/components/notices/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-widgets/src/components/save-button/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-widgets/src/components/secondary-sidebar/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-widgets/src/components/secondary-sidebar/inserter-sidebar.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-widgets/src/components/secondary-sidebar/list-view-sidebar.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/edit-widgets/src/components/sidebar/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-widgets/src/components/sidebar/widget-areas.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/edit-widgets/src/components/welcome-guide/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-widgets/src/components/widget-areas-block-editor-content/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-widgets/src/components/widget-areas-block-editor-provider/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-widgets/src/filters/move-to-widget-area.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-widgets/src/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/autocompleters/link.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/autocompleters/test/user.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/autocompleters/user.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/autosave-monitor/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/block-removal-warnings/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/block-settings-menu/plugin-block-settings-menu-item.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/block-visibility/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/editor/src/components/blog-title/index.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/collab-sidebar/add-note-menu-item.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/collab-sidebar/add-note.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/collab-sidebar/floating-container.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/collab-sidebar/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/collab-sidebar/note-byline.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/collab-sidebar/note-card.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/collab-sidebar/note-form.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/collab-sidebar/note-indicator-toolbar.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/collab-sidebar/note-thread.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/collab-sidebar/note.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/collab-sidebar/notes.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/collapsible-block-toolbar/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/deprecated.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -1207,161 +6246,947 @@
 		},
 		"react-hooks/refs": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/editor/src/components/document-outline/index.js": {
 		"react-hooks/refs": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/document-outline/item.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/document-tools/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/editor-history/redo.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/editor-history/undo.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/editor-interface/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/editor-notices/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/editor-snackbars/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/editor/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/error-boundary/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/global-keyboard-shortcuts/register-shortcuts.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/global-styles-sidebar/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/global-styles-sidebar/welcome-guide-image.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/editor/src/components/global-styles-sidebar/welcome-guide.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/editor/src/components/global-styles/header.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 5
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/global-styles/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/global-styles/menu.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/header/back-button.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/header/header-skeleton.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/header/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/inserter-sidebar/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/keyboard-shortcut-help-modal/dynamic-shortcut.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/keyboard-shortcut-help-modal/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/keyboard-shortcut-help-modal/shortcut.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/list-view-sidebar/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/editor/src/components/list-view-sidebar/list-view-outline.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/local-autosave-monitor/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/media/media-editor-modal.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/mode-switcher/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/more-menu/copy-content-menu-item.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/more-menu/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/more-menu/tools-more-menu-group.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/more-menu/view-more-menu-group.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/editor/src/components/page-attributes/order.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/page-attributes/panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/editor/src/components/page-attributes/parent.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/page-attributes/test/order.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/pattern-duplicate-modal/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/pattern-overrides-panel/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/pattern-rename-modal/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/plugin-document-setting-panel/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/plugin-more-menu-item/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/plugin-post-publish-panel/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/plugin-post-publish-panel/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/plugin-post-status-info/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/plugin-pre-publish-panel/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/plugin-pre-publish-panel/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/plugin-preview-menu-item/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/plugin-sidebar-more-menu-item/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/plugin-sidebar/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-actions/actions.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-actions/index.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/editor/src/components/post-actions/set-as-homepage.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/editor/src/components/post-actions/set-as-posts-page.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-author/check.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-author/combobox.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-author/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-author/panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-author/select.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-author/test/check.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/editor/src/components/post-card-panel/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/editor/src/components/post-comments/index.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/editor/src/components/post-content-information/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/editor/src/components/post-discussion/panel.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-excerpt/check.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/editor/src/components/post-excerpt/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/editor/src/components/post-excerpt/panel.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-excerpt/plugin.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-excerpt/test/plugin.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-featured-image/check.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/editor/src/components/post-featured-image/index.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-featured-image/panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-format/check.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-format/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-format/panel.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/editor/src/components/post-last-edited-panel/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-last-revision/check.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-last-revision/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-last-revision/panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-last-revision/test/check.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/editor/src/components/post-locked-modal/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/editor/src/components/post-panel-row/index.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/editor/src/components/post-panel-section/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-pending-status/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-pending-status/test/check.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/editor/src/components/post-pingbacks/index.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-preview-button/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-preview-button/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-publish-button/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-publish-button/post-publish-button-or-toggle.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-publish-button/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-publish-button/test/post-publish-button-or-toggle.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-publish-panel/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-publish-panel/maybe-category-panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-publish-panel/maybe-post-format-panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-publish-panel/maybe-tags-panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-publish-panel/maybe-upload-media.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/editor/src/components/post-publish-panel/postpublish.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-publish-panel/prepublish.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-publish-panel/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-revisions-preview/diff-markers.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-revisions-preview/revisions-canvas.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-revisions-preview/revisions-code-diff.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-revisions-preview/revisions-header.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-revisions-preview/revisions-slider.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-revisions-preview/test/revisions-code-diff.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-revisions-preview/test/revisions-slider.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-revisions-timeline/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-revisions-timeline/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-saved-state/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-saved-state/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-schedule/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-schedule/panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-schedule/test/check.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/editor/src/components/post-status/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-sticky/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-sticky/panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-sticky/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-switch-to-draft-button/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-sync-status/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-taxonomies/flat-term-selector.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-taxonomies/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-taxonomies/most-used-terms.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-taxonomies/panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-taxonomies/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-template/block-theme.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-template/classic-theme.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/editor/src/components/post-template/create-new-template-modal.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-template/create-new-template.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-template/panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-template/reset-default-template.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-template/swap-template-button.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-text-editor/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-title/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/editor/src/components/post-title/post-title-raw.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-transform-panel/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-trash/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-type-support-check/test/index.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/editor/src/components/post-url/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/editor/src/components/post-url/panel.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-view-link/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-view-link/test/index.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/editor/src/components/post-visibility/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/post-visibility/test/check.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/posts-per-page/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/preferences-modal/enable-panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/preferences-modal/enable-plugin-document-setting-panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/preferences-modal/enable-publish-sidebar.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/preferences-modal/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/preferences-modal/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/preview-dropdown/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/provider/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/provider/with-registry-provider.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/resizable-editor/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/resizable-editor/resize-handle.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/revision-block-diff/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/revision-diff-panel/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/revision-fields-diff/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/save-publish-panels/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/sidebar/dataform-post-summary.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/sidebar/header.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/sidebar/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/editor/src/components/sidebar/post-revision-summary.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/sidebar/post-summary.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/editor/src/components/site-discussion/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/site-export/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/editor/src/components/start-page-options/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/editor/src/components/start-template-options/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/editor/src/components/style-book/color-examples.tsx": {
@@ -1374,29 +7199,211 @@
 			"count": 1
 		}
 	},
+	"packages/editor/src/components/style-book/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/styles-canvas/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/styles-canvas/revisions.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/styles-canvas/style-book.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/editor/src/components/sync-connection-error-modal/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
 		}
 	},
+	"packages/editor/src/components/table-of-contents/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/table-of-contents/panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/editor/src/components/template-actions-panel/block-theme-content.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/editor/src/components/template-actions-panel/classic-theme-content.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/template-actions-panel/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/template-content-panel/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/template-part-content-panel/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/template-part-menu-items/convert-to-regular.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/template-part-menu-items/convert-to-template-part.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/template-part-menu-items/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/template-validation-notice/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/text-editor/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/theme-support-check/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/time-to-read/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/upload-progress-snackbar/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/upload-progress-snackbar/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/visual-editor/edit-template-blocks-notification.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/editor/src/components/visual-editor/index.js": {
 		"react-hooks/refs": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/word-count/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/zoom-out-toggle/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/hooks/custom-sources-backwards-compatibility.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/hooks/media-upload.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/hooks/navigation-link-view-button.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/hooks/pattern-overrides.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/hooks/push-changes-to-global-styles/apply-globally-modal.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/hooks/push-changes-to-global-styles/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/hooks/template-part-navigation-edit-button.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/store/test/selectors.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/element/src/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/element/src/test/platform.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/element/src/test/raw-html.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/element/src/test/serialize.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/fields/src/actions/delete-post.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
+		},
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/fields/src/actions/duplicate-pattern.tsx": {
+		"no-restricted-imports": {
+			"count": 1
 		}
 	},
 	"packages/fields/src/actions/duplicate-post.tsx": {
@@ -1412,6 +7419,9 @@
 	"packages/fields/src/actions/rename-post.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
+		},
+		"no-restricted-imports": {
+			"count": 1
 		}
 	},
 	"packages/fields/src/actions/reorder-page.tsx": {
@@ -1438,6 +7448,9 @@
 		"@wordpress/use-recommended-components": {
 			"count": 3
 		},
+		"no-restricted-imports": {
+			"count": 1
+		},
 		"react-hooks/refs": {
 			"count": 7
 		}
@@ -1457,6 +7470,11 @@
 			"count": 2
 		}
 	},
+	"packages/fields/src/fields/page-title/view.tsx": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
 	"packages/fields/src/fields/parent/parent-edit.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -1465,6 +7483,16 @@
 	"packages/fields/src/fields/password/edit.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		}
+	},
+	"packages/fields/src/fields/pattern-sync-status/index.tsx": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/fields/src/fields/pattern-title/view.tsx": {
+		"no-restricted-imports": {
+			"count": 1
 		}
 	},
 	"packages/fields/src/fields/ping-status/index.tsx": {
@@ -1495,8 +7523,33 @@
 			"count": 1
 		}
 	},
+	"packages/fields/src/fields/template/hooks.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/fields/src/fields/template/template-edit.tsx": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
 	"packages/fields/src/fields/title/view.tsx": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
+	"packages/fields/src/lock-unlock.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/format-library/src/bold/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/format-library/src/code/index.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -1506,6 +7559,19 @@
 		},
 		"react-hooks/refs": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/format-library/src/italic/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/format-library/src/keyboard/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/format-library/src/language/index.js": {
@@ -1514,30 +7580,108 @@
 		},
 		"react-hooks/refs": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/format-library/src/link/css-classes-setting.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/format-library/src/link/index.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/format-library/src/link/inline.js": {
 		"react-hooks/refs": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/format-library/src/link/test/css-classes-setting.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/format-library/src/math/index.js": {
 		"react-hooks/refs": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/format-library/src/non-breaking-space/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/format-library/src/strikethrough/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/format-library/src/subscript/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/format-library/src/superscript/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/format-library/src/text-color/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/format-library/src/text-color/inline.js": {
 		"react-hooks/refs": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/format-library/src/underline/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/format-library/src/unknown/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/global-styles-engine/src/lock-unlock.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/global-styles-engine/src/private-apis.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/global-styles-ui/src/background-panel.tsx": {
+		"no-restricted-imports": {
+			"count": 1
 		}
 	},
 	"packages/global-styles-ui/src/block-preview-panel.tsx": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"no-restricted-imports": {
 			"count": 1
 		}
 	},
@@ -1553,6 +7697,11 @@
 	},
 	"packages/global-styles-ui/src/color-preview.tsx": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
+	"packages/global-styles-ui/src/dimensions-panel.tsx": {
+		"no-restricted-imports": {
 			"count": 1
 		}
 	},
@@ -1604,6 +7753,9 @@
 	"packages/global-styles-ui/src/font-library/modal.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
+		},
+		"no-restricted-imports": {
+			"count": 1
 		}
 	},
 	"packages/global-styles-ui/src/font-library/upload-fonts.tsx": {
@@ -1631,6 +7783,11 @@
 			"count": 1
 		}
 	},
+	"packages/global-styles-ui/src/lock-unlock.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
 	"packages/global-styles-ui/src/navigation-button.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
@@ -1654,10 +7811,16 @@
 	"packages/global-styles-ui/src/presets/preset-edit-header.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"no-restricted-imports": {
+			"count": 1
 		}
 	},
 	"packages/global-styles-ui/src/presets/preset-group.tsx": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"no-restricted-imports": {
 			"count": 1
 		}
 	},
@@ -1676,18 +7839,32 @@
 			"count": 1
 		}
 	},
+	"packages/global-styles-ui/src/root-menu.tsx": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
 	"packages/global-styles-ui/src/screen-background.tsx": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"no-restricted-imports": {
 			"count": 1
 		}
 	},
 	"packages/global-styles-ui/src/screen-block-list.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
+		},
+		"no-restricted-imports": {
+			"count": 1
 		}
 	},
 	"packages/global-styles-ui/src/screen-block.tsx": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"no-restricted-imports": {
 			"count": 1
 		}
 	},
@@ -1699,16 +7876,35 @@
 	"packages/global-styles-ui/src/screen-colors.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
+		},
+		"no-restricted-imports": {
+			"count": 1
 		}
 	},
 	"packages/global-styles-ui/src/screen-css.tsx": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"no-restricted-imports": {
 			"count": 1
 		}
 	},
 	"packages/global-styles-ui/src/screen-header.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 6
+		},
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/global-styles-ui/src/screen-layout.tsx": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/global-styles-ui/src/screen-revisions/revisions-buttons.tsx": {
+		"no-restricted-imports": {
+			"count": 1
 		}
 	},
 	"packages/global-styles-ui/src/screen-root.tsx": {
@@ -1741,6 +7937,11 @@
 			"count": 3
 		}
 	},
+	"packages/global-styles-ui/src/stories/index.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/global-styles-ui/src/style-variations-container.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -1756,9 +7957,24 @@
 			"count": 1
 		}
 	},
+	"packages/global-styles-ui/src/test/screen-header.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/global-styles-ui/src/typography-elements.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
+		}
+	},
+	"packages/global-styles-ui/src/typography-panel.tsx": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/global-styles-ui/src/utils.ts": {
+		"no-restricted-imports": {
+			"count": 1
 		}
 	},
 	"packages/global-styles-ui/src/variations/variations-color.tsx": {
@@ -1782,6 +7998,46 @@
 	"packages/interactivity/src/hooks.tsx": {
 		"react-hooks/immutability": {
 			"count": 5
+		}
+	},
+	"packages/interface/src/components/action-item/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/interface/src/components/complementary-area-header/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/interface/src/components/complementary-area-more-menu-item/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/interface/src/components/complementary-area-toggle/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/interface/src/components/complementary-area/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/interface/src/components/fullscreen-mode/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/interface/src/components/interface-skeleton/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/interface/src/components/pinned-items/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/lazy-editor/src/components/preview/index.tsx": {
@@ -1817,6 +8073,16 @@
 			"count": 2
 		}
 	},
+	"packages/media-editor/src/lock-unlock.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/media-editor/src/private-apis.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
 	"packages/media-fields/src/alt_text/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -1847,23 +8113,85 @@
 			"count": 1
 		}
 	},
+	"packages/nux/src/components/dot-tip/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/patterns/src/components/allow-overrides-modal.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/patterns/src/components/category-selector.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/patterns/src/components/create-pattern-modal.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/patterns/src/components/duplicate-pattern-modal.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/patterns/src/components/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/patterns/src/components/overrides-panel.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/patterns/src/components/pattern-convert-button.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/patterns/src/components/pattern-overrides-controls.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/patterns/src/components/patterns-manage-button.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/patterns/src/components/rename-pattern-category-modal.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/patterns/src/components/rename-pattern-modal.js": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/patterns/src/components/reset-overrides-control.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/plugins/src/components/test/plugin-area.js": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -1872,9 +8200,14 @@
 			"count": 7
 		}
 	},
-	"packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
+	"packages/primitives/src/svg/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/private-apis/src/test/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/rich-text/src/hook/index.js": {
@@ -1897,9 +8230,107 @@
 			"count": 1
 		}
 	},
+	"packages/viewport/src/test/if-viewport-matches.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/viewport/src/test/with-viewport-match.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/views/src/lock-unlock.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/views/src/use-view-config.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/widget-dashboard/src/components/actions-menu/actions-menu.tsx": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/widget-dashboard/src/components/commands/commands.tsx": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/widget-dashboard/src/components/widget-actions/widget-actions.tsx": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/widget-dashboard/src/components/widget-layout-controls/widget-layout-controls.tsx": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/widget-dashboard/src/lock-unlock.ts": {
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/widgets/src/blocks/legacy-widget/edit/convert-to-blocks-button.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/widgets/src/blocks/legacy-widget/edit/form.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/widgets/src/blocks/legacy-widget/edit/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/widgets/src/blocks/legacy-widget/edit/inspector-card.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/widgets/src/blocks/legacy-widget/edit/no-preview.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/widgets/src/blocks/legacy-widget/edit/preview.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/widgets/src/blocks/legacy-widget/edit/widget-type-selector.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/widgets/src/blocks/widget-group/deprecated.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/widgets/src/blocks/widget-group/edit.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/widgets/src/blocks/widget-group/save.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/widgets/src/components/move-to-widget-area/index.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
 		}
 	},
 	"packages/workflow/src/components/workflow-menu.js": {
@@ -1907,6 +8338,9 @@
 			"count": 1
 		},
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -2084,13 +8518,99 @@
 			"count": 1
 		}
 	},
+	"storybook/components/figma-embed/index.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"storybook/decorators/with-global-css.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"storybook/decorators/with-max-width-wrapper.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"storybook/decorators/with-rtl.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"storybook/preview.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"storybook/stories/docs/inline-icon.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"storybook/stories/playground/box/index.jsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"storybook/stories/playground/draggable-cross-document-fallback.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"storybook/stories/playground/fullpage/index.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"storybook/stories/playground/index.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"storybook/stories/playground/popover-with-slotfill.story.jsx": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"storybook/stories/playground/with-undo-redo/index.jsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"storybook/stories/playground/wp-compat-overlay-slot.story.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"storybook/stories/playground/zoom-out/index.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"test/integration/helpers/integration-test-editor.js": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"test/storybook-playwright/storybook/decorators/with-custom-controls.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"test/unit/config/emotion-compiler.vitest.jsdom.test.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"test/unit/config/setup.vitest.jsdom.test.jsx": {
+		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -2101,7 +8621,7 @@
 	},
 	"widgets/quick-draft/components/saved-post/saved-post.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
+			"count": 2
 		}
 	},
 	"widgets/quick-draft/fields/quick-draft-content-field/quick-draft-content-field.tsx": {

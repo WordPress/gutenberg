@@ -395,7 +395,13 @@ async function loadPostTypeEntities() {
 			__unstablePrePersist: ( persistedRecord, edits ) =>
 				prePersistPostType( persistedRecord, edits, name, isTemplate ),
 			__unstable_rest_base: postType.rest_base,
-			supportsPagination: true,
+			// The templates controller returns the whole collection and never
+			// paginates. It serves `wp_template_part` always, and `wp_template`
+			// until the template activate experiment moves it to a posts
+			// controller.
+			supportsPagination: window?.__experimentalTemplateActivate
+				? name !== 'wp_template_part'
+				: ! isTemplate,
 			getRevisionsUrl: ( parentId, revisionId ) =>
 				`/${ namespace }/${
 					postType.rest_base

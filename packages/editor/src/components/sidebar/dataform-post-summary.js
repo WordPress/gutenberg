@@ -13,6 +13,7 @@ import PostTrash from '../post-trash';
 import usePostFields from '../post-fields';
 import { usePostTemplatePanelMode } from '../post-template/hooks';
 import revisionsField from '../../dataviews/fields/revisions';
+import readingSettingsField from '../../dataviews/fields/reading-settings';
 
 const EMPTY_FORM = { layout: { type: 'panel' }, fields: [] };
 const VIEW_CONFIG_FIELDS = [ 'form' ];
@@ -58,6 +59,7 @@ function useInspectorPanelVisibility( form ) {
 			featured_media: featuredImageEnabled,
 			excerpt: excerptEnabled,
 			'post-content-info': true,
+			reading_settings: true,
 			discussion: discussionEnabled && ! isPostStatusRemoved,
 			parent: pageAttributesEnabled && ! isPostStatusRemoved,
 		};
@@ -319,9 +321,9 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 					return field;
 				} )
 				.filter( Boolean )
-				// Editor-only field, injected here rather than registered
-				// so it never leaks into the site editor list / quick-edit fields.
-				.concat( revisionsField ),
+				// Editor-only fields, injected here rather than registered
+				// so they never leak into the site editor list / quick-edit fields.
+				.concat( revisionsField, readingSettingsField ),
 		[
 			_fields,
 			templatePanelMode,
