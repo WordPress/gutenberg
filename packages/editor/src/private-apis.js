@@ -19,7 +19,11 @@ import ResizableEditor from './components/resizable-editor';
 import { registerCoreBlockBindingsSources } from './bindings/api';
 import GlobalStylesUIWrapper from './components/global-styles';
 import { StyleBookPreview } from './components/style-book';
-import { useGlobalStyles, useStyle } from './components/global-styles/hooks';
+import {
+	useGlobalStyles,
+	useGlobalStylesReset,
+	useStyle,
+} from './components/global-styles/hooks';
 import { GlobalStylesActionMenu } from './components/global-styles/menu';
 import UploadProgressSnackbar from './components/upload-progress-snackbar';
 
@@ -48,6 +52,7 @@ lock( privateApis, {
 	GlobalStylesActionMenu,
 	StyleBookPreview,
 	useGlobalStyles,
+	useGlobalStylesReset,
 	useStyle,
 	// This is a temporary private API while we're updating the site editor to use EditorProvider.
 	interfaceStore,

@@ -6,6 +6,8 @@ import {
 } from '@wordpress/global-styles-engine';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { unlock } from '../../lock-unlock';
 
@@ -202,6 +204,62 @@ export function useGlobalStyles() {
 		setUser: setUserConfig,
 		isReady: isUserConfigReady && isBaseConfigReady,
 	};
+}
+
+/**
+ * Hook to clear the global styles customizations, with a snackbar that puts
+ * them back.
+ *
+ * What is being cleared is read from the store at the moment of the reset
+ * rather than from the last render, so the snackbar also restores
+ * customizations that are already saved in the database and have no unsaved
+ * edits.
+ *
+ * @return {Object} Object containing whether there is anything to reset and the
+ *                  reset function { canReset, resetGlobalStyles }
+ */
+export function useGlobalStylesReset() {
+	const { user: userConfig, setUser: setUserConfig } = useGlobalStyles();
+	const { createSuccessNotice } = useDispatch( noticesStore );
+
+	const canReset =
+		Object.keys( userConfig?.styles ?? {} ).length > 0 ||
+		Object.keys( userConfig?.settings ?? {} ).length > 0;
+
+	const resetGlobalStyles = useCallback( () => {
+		let customizations;
+
+		setUserConfig( ( currentConfig ) => {
+			// The callback receives the config as it stands in the store, which
+			// includes anything saved in the database that has no unsaved
+			// edits. Hold on to it so the notice can put it back.
+			customizations = {
+				styles: currentConfig.styles,
+				settings: currentConfig.settings,
+			};
+
+			// Spread the current config so that `_links` is left as it is: it
+			// describes the record, and is not a customization to clear.
+			return { ...currentConfig, styles: {}, settings: {} };
+		} );
+
+		createSuccessNotice( __( 'Custom styles reset.' ), {
+			type: 'snackbar',
+			id: 'global-styles-reset',
+			actions: [
+				{
+					label: __( 'Undo' ),
+					onClick: () =>
+						setUserConfig( ( currentConfig ) => ( {
+							...currentConfig,
+							...customizations,
+						} ) ),
+				},
+			],
+		} );
+	}, [ setUserConfig, createSuccessNotice ] );
+
+	return { canReset, resetGlobalStyles };
 }
 
 /**
