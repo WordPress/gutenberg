@@ -13,6 +13,8 @@ const {
 	Editor: PrivateEditor,
 	BackButton,
 	PreferencesModal,
+	ToolsMoreMenuGroup,
+	SiteExport,
 } = unlock( editorPrivateApis );
 
 interface EditorProps {
@@ -139,6 +141,13 @@ export function Editor( {
 			   nothing until one of them opens it.
 			 */ }
 			<PreferencesModal />
+			{ /*
+			   Self-gated: renders only while editing a template or template
+			   part, the entities the exported theme is made of.
+			 */ }
+			<ToolsMoreMenuGroup>
+				<SiteExport />
+			</ToolsMoreMenuGroup>
 		</PrivateEditor>
 	);
 }

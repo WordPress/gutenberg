@@ -2,7 +2,7 @@
 
 The `BackgroundImageControl` component provides an interface for selecting, positioning, and configuring background images in the WordPress block editor.
 
-_Note:_ This is an internal component. It is not exported from `@wordpress/block-editor` and is not part of the public API; it is rendered by the Global Styles [background panel](../global-styles/background-panel.js).
+_Note:_ This is an internal component. It is not exported from `@wordpress/block-editor` and is not part of the public API; it is rendered by the Global Styles [background panel](../global-styles/background-panel.jsx).
 
 ## Features
 

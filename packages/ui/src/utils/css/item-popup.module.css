@@ -22,6 +22,30 @@
 			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 			box-shadow: var(--_wp-ui-elevation-md);
 			background-color: var(--wpds-color-background-surface-neutral-strong);
+
+			&.is-width-anchor {
+				width: var(--anchor-width);
+			}
+
+			&.is-width-content {
+				width: auto;
+			}
+
+			&.is-width-sm {
+				width: min(var(--available-width), var(--wpds-dimension-surface-width-sm));
+			}
+
+			&.is-width-md {
+				width: min(var(--available-width), var(--wpds-dimension-surface-width-md));
+			}
+
+			&.is-width-lg {
+				width: min(var(--available-width), var(--wpds-dimension-surface-width-lg));
+			}
+
+			&.is-width-available {
+				width: var(--available-width);
+			}
 		}
 
 		.list {
@@ -76,7 +100,9 @@
 			align-items: center;
 			justify-content: flex-start;
 			gap: var(--wpds-dimension-gap-xs);
+			min-width: 0;
 			min-height: var(--wp-ui-popup-item-height);
+			overflow-wrap: anywhere;
 			border-radius: var(--wpds-border-radius-sm);
 			user-select: none;
 			margin-inline: var(--wp-ui-popup-padding);
