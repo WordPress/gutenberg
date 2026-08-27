@@ -23,6 +23,11 @@ import { setupSkills } from '../../../tools/agents/setup-skills.mjs';
 const execFileAsync = promisify( execFile );
 const libDir = path.dirname( fileURLToPath( import.meta.url ) );
 const sourceRoot = path.resolve( libDir, '../../..' );
+// Denied alongside the checkout: credential stores and SSH keys live under the
+// home directory, and an agent working in a temporary workspace has no reason
+// to read it. Restricting reads to the workspace alone is not an option — the
+// agent cannot start without reading its own installation.
+const homeDirectory = os.homedir();
 const activeWorkspaces = new Map();
 
 // Resolved once per run; see resolveTree.
@@ -180,7 +185,10 @@ async function withWorkspace( context ) {
 										...gradingProvider.config?.sandbox,
 										filesystem: {
 											allowRead: [ workspace ],
-											denyRead: [ sourceRoot ],
+											denyRead: [
+												sourceRoot,
+												homeDirectory,
+											],
 										},
 									},
 								},
@@ -199,7 +207,7 @@ async function withWorkspace( context ) {
 									// source checkout — which still holds this
 									// eval's assertions — has to be denied
 									// explicitly.
-									denyRead: [ sourceRoot ],
+									denyRead: [ sourceRoot, homeDirectory ],
 								},
 							},
 					  }
