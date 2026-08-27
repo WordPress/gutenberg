@@ -4,7 +4,6 @@
 	"files": [ "../jest-console/declarations.d.ts" ],
 	"references": [
 		{ "path": "./tsconfig.build.json" },
-		{ "path": "../deprecated/tsconfig.build.json" },
 		{ "path": "../escape-html/tsconfig.build.json" }
 	],
 	// Listed files have pre-existing type errors; include them once fixed.
