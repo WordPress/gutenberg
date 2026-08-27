@@ -1,6 +1,12 @@
 import type { ReactNode } from 'react';
 import { __ } from '@wordpress/i18n';
 import { Button, Dropdown } from '@wordpress/components';
+// `IconButton` is not yet on the recommended list while the Design System
+// reviews its consistency alongside `@wordpress/components` (see
+// WordPress/gutenberg#76135). It is used here deliberately so the trigger
+// matches the reaction pills it sits beside.
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { IconButton } from '@wordpress/ui';
 import { SVG, Path } from '@wordpress/primitives';
 import {
 	Component,
@@ -221,15 +227,16 @@ export function AddReactionButton( {
 					: 'editor-collab-sidebar-panel__add-reaction-popover'
 			}
 			renderToggle={ ( { isOpen, onToggle } ) => (
-				<Button
+				<IconButton
 					size="small"
+					variant="minimal"
+					tone="neutral"
 					className="editor-collab-sidebar-panel__add-reaction-button"
 					icon={ smileyIcon }
 					label={ __( 'Add reaction' ) }
 					aria-haspopup="dialog"
 					aria-expanded={ isOpen }
 					disabled={ disabled }
-					accessibleWhenDisabled
 					onClick={ onToggle }
 					// Warm up the picker while the user is still
 					// deciding: hovering or focusing the trigger starts

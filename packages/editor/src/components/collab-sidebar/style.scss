@@ -255,16 +255,17 @@ mark.wp-note {
 
 // Emoji Reactions
 //
-// The add-reaction trigger and the reaction pills are standard small
-// Buttons, so sizing, hover, and focus styles all come from the
-// component. Only the pill treatment lives here.
+// The add-reaction trigger and the reaction pills are Design System
+// Buttons: the pill shape comes from the row's `pronounced` corner
+// radius, and the fill, hover and pressed treatments come from the
+// neutral minimal variant. Only the emoji's own metrics live here.
 .editor-collab-sidebar-panel__reaction-button,
 .editor-collab-sidebar-panel__add-reaction-button {
 	// The emoji glyph is set larger than the button's own text size, so
 	// the compact height leaves it tight against the pill edge. A pixel
 	// top and bottom gives it room; the add-reaction trigger grows to
 	// match so the row stays on one baseline.
-	height: calc(var(--wpds-dimension-size-sm) + 2px);
+	min-height: calc(var(--wpds-dimension-size-sm) + 2px);
 }
 
 .editor-collab-sidebar-panel__add-reaction-button {
@@ -273,34 +274,12 @@ mark.wp-note {
 }
 
 .editor-collab-sidebar-panel__reaction-button {
+	// The glyph and its count are one unit, closer than the Button's
+	// default gap between an icon and a label.
 	gap: $grid-unit-05;
-
-	// A row of reactions is metadata about a note, not a row of actions,
-	// so it takes the quiet fill and pill radius of a Badge rather than
-	// the accent border of a secondary Button.
-	border-radius: $radius-full;
-	background: $gray-100;
-	color: $gray-900;
-
-	&:hover:not(:disabled) {
-		background: $gray-200;
-		color: $gray-900;
-	}
-
-	// "You reacted": a light accent tint and a hairline accent border,
-	// enough to pick your own reaction out of the row without the pill
-	// competing with the note it belongs to. The doubled class matches
-	// `.components-button.is-pressed` specificity.
-	&.editor-collab-sidebar-panel__reaction-button[aria-pressed="true"] {
-		background: rgba(var(--wp-admin-theme-color--rgb), 0.06);
-		color: var(--wp-admin-theme-color-darker-20);
-		box-shadow: inset 0 0 0 $border-width rgba(var(--wp-admin-theme-color--rgb), 0.4);
-
-		&:hover:not(:disabled) {
-			background: rgba(var(--wp-admin-theme-color--rgb), 0.12);
-			color: var(--wp-admin-theme-color-darker-20);
-		}
-	}
+	// A count is at most a few characters, so the Button's four-character
+	// minimum would leave the pill padded out around it.
+	min-width: 0;
 }
 
 // Opening the picker with a pointer leaves DOM focus on the trigger once
