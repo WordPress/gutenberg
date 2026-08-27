@@ -58,6 +58,8 @@ function gutenberg_normalize_state_preset_vars( $value ) {
 function gutenberg_normalize_state_style_for_css_output( $style ) {
 	// Layout is processed separately by gutenberg_render_layout_support_flag(), so we remove it before declaration generation.
 	unset( $style['layout'] );
+	// Custom CSS is rendered by gutenberg_render_custom_css_support_styles().
+	unset( $style['css'] );
 	$style = gutenberg_normalize_state_preset_vars( $style );
 	return $style;
 }

@@ -101,6 +101,8 @@ function StyleStateInspectorSlots( {
 	const showLayoutControls =
 		hasViewportBlockStyleState( selectedBlockStyleState ) &&
 		! hasPseudoBlockStyleState( selectedBlockStyleState );
+	// Additional CSS is viewport-scoped; HTML anchor / CSS classes are not.
+	const showAdvancedControls = showLayoutControls;
 	const showSectionStyleControls =
 		isSectionBlock && blockName !== 'core/template-part';
 	return (
@@ -149,6 +151,7 @@ function StyleStateInspectorSlots( {
 						label={ __( 'Elements' ) }
 						className="elements-block-support-panel__inner-wrapper"
 					/>
+					{ showAdvancedControls && <AdvancedControls initialOpen /> }
 				</>
 			) }
 		</>

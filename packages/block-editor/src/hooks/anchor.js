@@ -2,8 +2,11 @@ import { addFilter } from '@wordpress/hooks';
 import { TextControl, ExternalLink } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 import { InspectorControls } from '../components';
 import { useBlockEditingMode } from '../components/block-editing-mode';
+import { store as blockEditorStore } from '../store';
+import { unlock } from '../lock-unlock';
 
 /**
  * Regular expression matching invalid anchor characters for replacement.
@@ -38,10 +41,18 @@ export function addAttribute( settings ) {
 	return settings;
 }
 
-function BlockEditAnchorControlPure( { anchor, setAttributes } ) {
+function BlockEditAnchorControlPure( { clientId, anchor, setAttributes } ) {
 	const blockEditingMode = useBlockEditingMode();
+	const hasSelectedStyleState = useSelect(
+		( select ) => {
+			const { hasSelectedStyleState: hasSelectedBlockStyleState } =
+				unlock( select( blockEditorStore ) );
+			return hasSelectedBlockStyleState( clientId );
+		},
+		[ clientId ]
+	);
 
-	if ( blockEditingMode !== 'default' ) {
+	if ( blockEditingMode !== 'default' || hasSelectedStyleState ) {
 		return null;
 	}
 

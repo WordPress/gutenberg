@@ -3,15 +3,27 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
-import { processCSSNesting } from '@wordpress/global-styles-engine';
+import {
+	processCSSNesting,
+	privateApis as globalStylesEnginePrivateApis,
+} from '@wordpress/global-styles-engine';
 import { store as noticesStore } from '@wordpress/notices';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import InspectorControls from '../components/inspector-controls';
 import AdvancedPanel, {
 	validateCSS,
 } from '../components/global-styles/advanced-panel';
+import { useSettings } from '../components/use-settings';
 import { cleanEmptyObject, usePrivateStyleOverride } from './utils';
+import {
+	getStyleForState,
+	isDefaultBlockStyleState,
+	setStyleForState,
+} from './block-style-state';
 import { store as blockEditorStore } from '../store';
+import { unlock } from '../lock-unlock';
+
+const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 
 // Stable reference for useInstanceId.
 const CUSTOM_CSS_INSTANCE_REFERENCE = {};
@@ -20,26 +32,108 @@ const CUSTOM_CSS_INSTANCE_REFERENCE = {};
 const EMPTY_STYLE = {};
 
 /**
+ * Returns whether a style object (including viewport/pseudo nests) has custom CSS.
+ *
+ * @param {Object|undefined} style Block style attribute.
+ * @return {boolean} Whether any custom CSS is present.
+ */
+export function styleHasCustomCSS( style ) {
+	if ( ! style || typeof style !== 'object' ) {
+		return false;
+	}
+
+	if ( typeof style.css === 'string' && style.css.trim() ) {
+		return true;
+	}
+
+	return Object.values( style ).some(
+		( value ) =>
+			value && typeof value === 'object' && styleHasCustomCSS( value )
+	);
+}
+
+/**
+ * Builds scoped custom CSS rules for the default state and each viewport.
+ *
+ * @param {Object}           style             Block style attribute.
+ * @param {string}           customCSSSelector Selector used to scope nested CSS.
+ * @param {Object|undefined} viewportSettings  Viewport settings from theme.json.
+ * @return {string|undefined} Combined CSS, or undefined when empty/invalid.
+ */
+function getCustomCSSRules( style, customCSSSelector, viewportSettings ) {
+	const cssRules = [];
+
+	const appendProcessedCSS = ( css, mediaQuery ) => {
+		if ( typeof css !== 'string' || ! css.trim() || ! validateCSS( css ) ) {
+			return;
+		}
+
+		const processed = processCSSNesting( css, customCSSSelector );
+		if ( ! processed ) {
+			return;
+		}
+
+		cssRules.push(
+			mediaQuery ? `${ mediaQuery }{${ processed }}` : processed
+		);
+	};
+
+	appendProcessedCSS( style?.css );
+
+	Object.entries( getResponsiveMediaQueries( viewportSettings ) ).forEach(
+		( [ viewport, mediaQuery ] ) => {
+			appendProcessedCSS(
+				getStyleForState( style, {
+					viewport,
+					pseudo: 'default',
+				} )?.css,
+				mediaQuery
+			);
+		}
+	);
+
+	return cssRules.length > 0 ? cssRules.join( '' ) : undefined;
+}
+
+/**
  * Inspector control for custom CSS.
  *
  * @param {Object}   props               Component props.
+ * @param {string}   props.clientId      Block client ID.
  * @param {string}   props.blockName     Block name.
  * @param {Function} props.setAttributes Function to set block attributes.
  * @param {Object}   props.style         Block style attribute.
  */
-function CustomCSSControl( { blockName, setAttributes, style } ) {
+function CustomCSSControl( { clientId, blockName, setAttributes, style } ) {
 	const blockEditingMode = useBlockEditingMode();
+	const selectedState = useSelect(
+		( select ) => {
+			const { getSelectedBlockStyleState } = unlock(
+				select( blockEditorStore )
+			);
+			return getSelectedBlockStyleState( clientId );
+		},
+		[ clientId ]
+	);
 
 	if ( blockEditingMode !== 'default' ) {
 		return null;
 	}
 	const blockType = getBlockType( blockName );
+	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
+	const stateStyle = isStateSelected
+		? getStyleForState( style, selectedState ) || EMPTY_STYLE
+		: style;
 
 	function onChange( newStyle ) {
 		// Normalize whitespace-only CSS to undefined so it gets cleaned up.
 		const css = newStyle?.css?.trim() ? newStyle.css : undefined;
+		const nextStateStyle = cleanEmptyObject( { ...newStyle, css } );
+
 		setAttributes( {
-			style: cleanEmptyObject( { ...newStyle, css } ),
+			style: isStateSelected
+				? setStyleForState( style, selectedState, nextStateStyle )
+				: nextStateStyle,
 		} );
 	}
 
@@ -54,9 +148,9 @@ function CustomCSSControl( { blockName, setAttributes, style } ) {
 	return (
 		<InspectorControls group="advanced">
 			<AdvancedPanel
-				value={ style }
+				value={ stateStyle }
 				onChange={ onChange }
-				inheritedValue={ style }
+				inheritedValue={ stateStyle }
 				help={ cssHelpText }
 			/>
 		</InspectorControls>
@@ -85,6 +179,7 @@ function CustomCSSEdit( { clientId, name, setAttributes } ) {
 
 	return (
 		<CustomCSSControl
+			clientId={ clientId }
 			blockName={ name }
 			setAttributes={ setAttributes }
 			style={ style }
@@ -102,13 +197,7 @@ function CustomCSSEdit( { clientId, name, setAttributes } ) {
  * @return {Object} Block props including className for custom CSS scoping.
  */
 function useBlockProps( { style, clientId } ) {
-	const customCSS = style?.css;
-
-	// Validate CSS is non-empty and passes validation checks.
-	const isValidCSS =
-		typeof customCSS === 'string' &&
-		customCSS.trim().length > 0 &&
-		validateCSS( customCSS );
+	const [ viewportSettings ] = useSettings( 'viewport' );
 
 	const canEditCSS = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().canEditCSS,
@@ -120,7 +209,7 @@ function useBlockProps( { style, clientId } ) {
 	// Show a warning notice when the user lacks edit_css and a block has
 	// custom CSS. The fixed notice ID ensures only one notice is shown
 	// regardless of how many blocks have CSS.
-	const hasCustomCSS = !! customCSS?.trim();
+	const hasCustomCSS = styleHasCustomCSS( style );
 	useEffect( () => {
 		if ( ! canEditCSS && hasCustomCSS ) {
 			createWarningNotice(
@@ -145,11 +234,8 @@ function useBlockProps( { style, clientId } ) {
 	// Transform the custom CSS using the same logic as global styles.
 	// Only process if CSS is valid (doesn't contain HTML markup).
 	const transformedCSS = useMemo( () => {
-		if ( ! isValidCSS ) {
-			return undefined;
-		}
-		return processCSSNesting( customCSS, customCSSSelector );
-	}, [ customCSS, customCSSSelector, isValidCSS ] );
+		return getCustomCSSRules( style, customCSSSelector, viewportSettings );
+	}, [ style, customCSSSelector, viewportSettings ] );
 
 	// Inject the CSS via style override. The type makes EditorStyles print
 	// it after all other overrides (e.g. block style variations), matching
@@ -163,7 +249,7 @@ function useBlockProps( { style, clientId } ) {
 	} );
 
 	// Only add the class if there's valid custom CSS.
-	if ( ! isValidCSS ) {
+	if ( ! transformedCSS ) {
 		return {};
 	}
 
@@ -185,7 +271,7 @@ function addSaveProps( props, blockType, attributes ) {
 		return props;
 	}
 
-	if ( ! attributes?.style?.css?.trim() ) {
+	if ( ! styleHasCustomCSS( attributes?.style ) ) {
 		return props;
 	}
 
