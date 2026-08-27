@@ -561,7 +561,7 @@ test.describe( 'Guidelines', () => {
 			).toBeFocused();
 		} );
 
-		test( 'a failed removal keeps the row and does not move focus to Add guideline', async ( {
+		test( 'a failed removal keeps the row and returns focus to its Actions button', async ( {
 			page,
 			admin,
 			requestUtils,
@@ -605,6 +605,13 @@ test.describe( 'Guidelines', () => {
 
 			await expect( blocksCard.getByText( /Error:/ ) ).toBeVisible();
 			await expect( blockRowItem( blocksCard, target ) ).toBeVisible();
+			await expect( blocksCard.locator( ':focus' ) ).toHaveCount( 1 );
+			await expect(
+				blocksCard
+					.getByRole( 'row' )
+					.filter( { hasText: target } )
+					.getByRole( 'button', { name: 'Actions' } )
+			).toBeFocused();
 			await expect(
 				blocksCard.getByRole( 'button', { name: 'Add', exact: true } )
 			).not.toBeFocused();
