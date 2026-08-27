@@ -7,6 +7,7 @@ import {
 } from '@wordpress/components';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Stack, Button as UIButton } from '@wordpress/ui';
+import { ThemeProvider } from '@wordpress/theme';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { moreVertical, published } from '@wordpress/icons';
 import { NoteCard } from './note-card';
@@ -216,29 +217,35 @@ export function Note( {
 		>
 			{ body }
 			{ isSelected && (
-				<Stack direction="row" gap="xs" justify="flex-start">
-					<AddReactionButton
-						noteId={ note.id }
-						disabled={ isThreadResolved }
-						onToggleReaction={ ( emoji ) =>
-							onToggleReaction?.( {
-								commentId: note.id,
-								emoji,
-							} )
-						}
-					/>
-					<ReactionDisplay
-						noteId={ note.id }
-						reactions={ reactions }
-						disabled={ isThreadResolved }
-						onToggleReaction={ ( emoji ) =>
-							onToggleReaction?.( {
-								commentId: note.id,
-								emoji,
-							} )
-						}
-					/>
-				</Stack>
+				// The editor sets `cornerRadius="none"`, but reactions read
+				// as badges rather than controls, so the row opts into the
+				// pill shape the Design System's `pronounced` preset gives a
+				// small Button.
+				<ThemeProvider cornerRadius="pronounced">
+					<Stack direction="row" gap="xs" justify="flex-start">
+						<AddReactionButton
+							noteId={ note.id }
+							disabled={ isThreadResolved }
+							onToggleReaction={ ( emoji ) =>
+								onToggleReaction?.( {
+									commentId: note.id,
+									emoji,
+								} )
+							}
+						/>
+						<ReactionDisplay
+							noteId={ note.id }
+							reactions={ reactions }
+							disabled={ isThreadResolved }
+							onToggleReaction={ ( emoji ) =>
+								onToggleReaction?.( {
+									commentId: note.id,
+									emoji,
+								} )
+							}
+						/>
+					</Stack>
+				</ThemeProvider>
 			) }
 			{ actionState === 'delete' && (
 				<ConfirmDialog

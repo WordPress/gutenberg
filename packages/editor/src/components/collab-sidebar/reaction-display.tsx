@@ -1,7 +1,13 @@
 import type { MouseEvent } from 'react';
 import { __, sprintf, _n } from '@wordpress/i18n';
-import { Button, Dropdown } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Dropdown } from '@wordpress/components';
+// `Button` and `IconButton` are not yet on the recommended list while the
+// Design System reviews their consistency alongside `@wordpress/components`
+// (see WordPress/gutenberg#76135). They are used here deliberately: the
+// reaction row needs the Design System's pill shape and quiet neutral
+// treatment rather than a bespoke stylesheet.
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Button, IconButton, Stack, Tooltip } from '@wordpress/ui';
 import { SVG, Path } from '@wordpress/primitives';
 import { useState, useCallback, useMemo } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
@@ -286,39 +292,55 @@ function ReactionButton( {
 		count
 	);
 
+	const accessibleLabel = tooltipText || defaultLabel;
+
 	return (
-		<Button
-			size="small"
-			className="editor-collab-sidebar-panel__reaction-button"
-			disabled={ disabled }
-			accessibleWhenDisabled
-			onClick={ ( event: MouseEvent< HTMLElement > ) => {
-				event.stopPropagation();
-				// When removing the last reaction for this emoji,
-				// the button will disappear. Move focus to the
-				// parent note to prevent focus loss.
-				if ( isActive && count === 1 ) {
-					( event.target as HTMLElement )
-						.closest< HTMLElement >(
-							'.editor-collab-sidebar-panel__thread'
-						)
-						?.focus();
+		// A neutral minimal Button is the Design System's toggle treatment:
+		// a quiet fill at rest and the strong neutral fill under
+		// `aria-pressed`, which is how "you reacted" reads without the pill
+		// competing with the note it belongs to.
+		<Tooltip.Root>
+			<Tooltip.Trigger
+				render={
+					<Button
+						size="small"
+						variant="minimal"
+						tone="neutral"
+						className="editor-collab-sidebar-panel__reaction-button"
+						disabled={ disabled }
+						aria-pressed={ isActive }
+						aria-label={ accessibleLabel }
+						onClick={ ( event: MouseEvent< HTMLElement > ) => {
+							event.stopPropagation();
+							// When removing the last reaction for this emoji,
+							// the button will disappear. Move focus to the
+							// parent note to prevent focus loss.
+							if ( isActive && count === 1 ) {
+								( event.target as HTMLElement )
+									.closest< HTMLElement >(
+										'.editor-collab-sidebar-panel__thread'
+									)
+									?.focus();
+							}
+							// Invalidate cached names since the reaction set
+							// is changing.
+							delete reactionNamesCache[
+								`${ noteId }:${ slug }`
+							];
+							onToggleReaction( slug );
+						} }
+						onMouseEnter={ fetchReactionNames }
+						onFocus={ fetchReactionNames }
+					/>
 				}
-				// Invalidate cached names since the reaction set is changing.
-				delete reactionNamesCache[ `${ noteId }:${ slug }` ];
-				onToggleReaction( slug );
-			} }
-			onMouseEnter={ fetchReactionNames }
-			onFocus={ fetchReactionNames }
-			isPressed={ isActive }
-			label={ tooltipText || defaultLabel }
-			showTooltip
-		>
-			<span className="editor-collab-sidebar-panel__reaction-button-emoji">
-				{ emoji }
-			</span>
-			<span>{ count }</span>
-		</Button>
+			>
+				<span className="editor-collab-sidebar-panel__reaction-button-emoji">
+					{ emoji }
+				</span>
+				<span>{ count }</span>
+			</Tooltip.Trigger>
+			<Tooltip.Popup>{ accessibleLabel }</Tooltip.Popup>
+		</Tooltip.Root>
 	);
 }
 
@@ -409,14 +431,15 @@ export function AddReactionButton( {
 			popoverProps={ POPOVER_PROPS }
 			contentClassName="editor-collab-sidebar-panel__add-reaction-popover"
 			renderToggle={ ( { isOpen, onToggle } ) => (
-				<Button
+				<IconButton
 					size="small"
+					variant="minimal"
+					tone="neutral"
 					className="editor-collab-sidebar-panel__add-reaction-button"
 					icon={ smileyIcon }
 					label={ __( 'Add reaction' ) }
 					aria-expanded={ isOpen }
 					disabled={ disabled }
-					accessibleWhenDisabled
 					onClick={ onToggle }
 				/>
 			) }
