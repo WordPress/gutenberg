@@ -253,8 +253,8 @@
 		}
 	}
 
-	.block-editor-list-view-block-contents:focus,
-	&.is-nesting .block-editor-list-view-block-contents {
+	&.is-nesting .block-editor-list-view-block-contents,
+	.block-editor-list-view-block-contents:focus {
 		box-shadow: none;
 		outline: none;
 
