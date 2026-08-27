@@ -40,6 +40,7 @@
 
 ### Internal
 
+-   Block bindings and variation transforms: Use the public `Menu` from `@wordpress/ui` instead of the private Components API. ([#81925](https://github.com/WordPress/gutenberg/pull/81925))
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81516](https://github.com/WordPress/gutenberg/pull/81516))
 -   Expose `isElementVisible` via private APIs so `@wordpress/editor`'s collaboration overlay can detect content hidden by a collapsed container (e.g. a closed `core/details` panel) without duplicating the visibility check ([#81322](https://github.com/WordPress/gutenberg/pull/81322)).
 
