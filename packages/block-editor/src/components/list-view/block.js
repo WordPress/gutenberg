@@ -435,7 +435,8 @@ function ListViewBlock( {
 			// For mouse clicks, keep focus in the list view so that subsequent
 			// keyboard operations (arrow navigation, copy/paste) still work.
 			const isKeyboardActivation = event?.detail === 0;
-			selectBlock( event, clientId, isKeyboardActivation ? 0 : null );
+			selectBlock( event, clientId, isKeyboardActivation ? -1 : null );
+			event.preventDefault();
 		},
 		[ clientId, selectBlock ]
 	);
