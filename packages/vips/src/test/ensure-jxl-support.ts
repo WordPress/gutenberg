@@ -22,7 +22,11 @@ jest.mock( '@wordpress/worker-threads', () => ( {
 
 // worker-code.ts is generated during a full build and is gitignored, so it
 // cannot be resolved from a unit test run.
-jest.mock( '../worker-code', () => ( { workerCode: '' } ), { virtual: true } );
+// The specifier has to match the one vips-worker.ts imports, extension and
+// all, or the virtual mock is not consulted and the resolve fails.
+jest.mock( '../worker-code.ts', () => ( { workerCode: '' } ), {
+	virtual: true,
+} );
 
 // Stands in for fetching the ~3 MB JXL chunk. Throwing from the factory is how
 // a failed chunk load surfaces: the dynamic import rejects.
