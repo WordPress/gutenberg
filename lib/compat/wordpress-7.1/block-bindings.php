@@ -7,7 +7,7 @@
  * @subpackage Block Bindings
  */
 
-// The following filter can be removed once the minimum required WordPress version is 7.1 or newer.
+// The following filters can be removed once the minimum required WordPress version is 7.1 or newer.
 add_filter(
 	'block_bindings_supported_attributes',
 	function ( $attributes, $block_type ) {
@@ -18,6 +18,16 @@ add_filter(
 	},
 	10,
 	2
+);
+
+add_filter(
+	'block_bindings_supported_attributes_core/media-text',
+	function ( $supported_attributes ) {
+		$supported_attributes[] = 'mediaUrl';
+		$supported_attributes[] = 'mediaAlt';
+		$supported_attributes[] = 'mediaId';
+		return $supported_attributes;
+	}
 );
 
 /*

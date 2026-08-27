@@ -123,6 +123,11 @@ function MediaContainer( props, ref ) {
 	const { toggleSelection } = useDispatch( blockEditorStore );
 
 	if ( mediaUrl || featuredImageURL || useFeaturedImage ) {
+		// `mediaType` may be unset when the media comes from a block binding
+		// (e.g. a pattern override) rather than a media library selection.
+		// Default to rendering an image so the bound media is visible in the editor.
+		const mediaTypeToRender = mediaType || 'image';
+
 		const onResizeStart = () => {
 			toggleSelection( false );
 		};
@@ -196,7 +201,7 @@ function MediaContainer( props, ref ) {
 					toggleUseFeaturedImage={ toggleUseFeaturedImage }
 					useFeaturedImage={ useFeaturedImage }
 				/>
-				{ ( mediaTypeRenderers[ mediaType ] || noop )() }
+				{ ( mediaTypeRenderers[ mediaTypeToRender ] || noop )() }
 				{ isTemporaryMedia && <Spinner /> }
 				{ ! useFeaturedImage && <PlaceholderContainer { ...props } /> }
 				{ ! featuredImageURL && useFeaturedImage && (

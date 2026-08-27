@@ -17,7 +17,97 @@
  */
 function render_block_core_media_text( $attributes, $content ) {
 	if ( false === $attributes['useFeaturedImage'] ) {
-		return $content;
+		$media_bindings = $attributes['metadata']['bindings'] ?? array();
+		if ( empty( $media_bindings['mediaUrl'] ) ) {
+			return $content;
+		}
+
+		/*
+		 * The `mediaUrl` and `mediaAlt` attributes are bound to a block bindings
+		 * source. `WP_Block::replace_html()` cannot match the block's descendant
+		 * selectors (e.g. `figure img`), so update the media element markup here
+		 * with the resolved values.
+		 */
+		$media_url = $attributes['mediaUrl'] ?? null;
+		if ( '' === $media_url ) {
+			return $content;
+		}
+
+		$media_type         = $attributes['mediaType'] ?? 'image';
+		$is_video           = 'video' === $media_type;
+		$media_alt          = $attributes['mediaAlt'] ?? '';
+		$has_media_on_right = 'right' === ( $attributes['mediaPosition'] ?? null );
+		$figure_query       = array(
+			'tag_name'   => 'figure',
+			'class_name' => 'wp-block-media-text__media',
+		);
+
+		/*
+		 * Locate this block's media figure, accounting for `media-position: right`
+		 * where the media column follows the content column. Returns a processor
+		 * positioned on the figure, or null if no media figure is found.
+		 */
+		$find_media_figure = static function ( $block_content ) use ( $has_media_on_right, $figure_query ) {
+			$processor = new WP_HTML_Tag_Processor( $block_content );
+			$found     = false;
+			while ( $processor->next_tag( $figure_query ) ) {
+				$found = true;
+				$processor->set_bookmark( 'media_figure' );
+				if ( ! $has_media_on_right ) {
+					break;
+				}
+			}
+			if ( ! $found || ! $processor->seek( 'media_figure' ) ) {
+				return null;
+			}
+			return $processor;
+		};
+
+		$media_processor = $find_media_figure( $content );
+		if ( null === $media_processor ) {
+			return $content;
+		}
+
+		if ( $media_processor->next_tag( array( 'tag_name' => $is_video ? 'video' : 'img' ) ) ) {
+			// Update an existing media element in the saved markup.
+			$media_processor->set_attribute( 'src', $media_url );
+			if ( ! $is_video && isset( $media_bindings['mediaAlt'] ) ) {
+				$media_processor->set_attribute( 'alt', $media_alt );
+			}
+
+			return $media_processor->get_updated_html();
+		}
+
+		// The media figure is empty (e.g. the pattern was saved without an image),
+		// so build the media element from the bound attributes and insert it.
+		$media_processor->seek( 'media_figure' );
+		$unique_id = 'wp-block-media-text__media-' . wp_unique_id();
+		$media_processor->set_attribute( 'id', $unique_id );
+
+		$media_tag = $is_video
+			? '<video controls src="' . esc_url( $media_url ) . '"></video>'
+			: '<img src="' . esc_url( $media_url ) . '"' . ( isset( $media_bindings['mediaAlt'] ) ? ' alt="' . esc_attr( $media_alt ) . '"' : '' ) . ' />';
+
+		$content = $media_processor->get_updated_html();
+		// Insert the media element right after the figure opening tag, then remove
+		// the temporary id used to target it.
+		$content = preg_replace(
+			'/(<figure\s+id="' . preg_quote( $unique_id, '/' ) . '"\s+class="wp-block-media-text__media"\s*>)/',
+			'$1' . $media_tag,
+			$content
+		);
+
+		$cleanup_processor = new WP_HTML_Tag_Processor( $content );
+		if ( $cleanup_processor->next_tag(
+			array(
+				'tag_name' => 'figure',
+				'id'       => $unique_id,
+			)
+		) ) {
+			$cleanup_processor->remove_attribute( 'id' );
+		}
+
+		return $cleanup_processor->get_updated_html();
 	}
 
 	if ( in_the_loop() ) {
