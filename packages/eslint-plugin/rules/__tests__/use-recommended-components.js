@@ -29,6 +29,7 @@ ruleTester.run( 'use-recommended-components', rule, {
 		"import { KeyboardShortcutDescription, KeyboardShortcutDisplay, useKeyboardShortcutProps } from '@wordpress/ui';",
 		"import { ControlWithError } from '@wordpress/ui';",
 		"import { ValidatedInputControl, InputLayout } from '@wordpress/ui';",
+		"import { ValidatedTextareaControl } from '@wordpress/ui';",
 
 		// Unlocked private APIs are only checked for denied names.
 		"import { privateApis } from '@wordpress/components'; import { unlock } from '../../lock-unlock'; const { SomethingElse } = unlock( privateApis );",

@@ -11,12 +11,15 @@
 	},
 	"references": [
 		{ "path": "../../packages/admin-ui/tsconfig.build.json" },
+		{ "path": "../../packages/components/tsconfig.build.json" },
 		{ "path": "../../packages/core-data/tsconfig.build.json" },
+		{ "path": "../../packages/element/tsconfig.build.json" },
 		{ "path": "../../packages/data" },
 		{ "path": "../../packages/dataviews/tsconfig.build.json" },
 		{ "path": "../../packages/fields/tsconfig.build.json" },
 		{ "path": "../../packages/html-entities/tsconfig.build.json" },
-		{ "path": "../../packages/i18n/tsconfig.build.json" }
+		{ "path": "../../packages/i18n/tsconfig.build.json" },
+		{ "path": "../../packages/lazy-editor" }
 	],
 	"include": [ "**/*.ts", "**/*.tsx" ],
 	"exclude": [ "build", "node_modules" ]

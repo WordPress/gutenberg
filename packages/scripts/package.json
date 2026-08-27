@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/scripts",
-	"version": "34.1.0",
+	"version": "34.2.0",
 	"description": "Collection of reusable scripts for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -62,7 +62,6 @@
 		"fast-glob": "^3.2.7",
 		"jest": "^30.4.1",
 		"jest-environment-jsdom": "^30.4.1",
-		"jest-environment-node": "^30.4.1",
 		"json2php": "^0.0.9",
 		"markdownlint-cli": "^0.31.1",
 		"mini-css-extract-plugin": "^2.9.2",
