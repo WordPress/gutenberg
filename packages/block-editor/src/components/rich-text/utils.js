@@ -1,14 +1,27 @@
 import { renderToString } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
+import { isFormatEqual } from '@wordpress/rich-text';
 
 export function addActiveFormats( value, activeFormats ) {
 	if ( activeFormats?.length ) {
 		let index = value.formats.length;
 
 		while ( index-- ) {
+			const existingFormats = value.formats[ index ] || [];
+
+			// Filter out active formats that already exist in the value's formats
+			// to prevent redundant nesting (e.g., nested identical <mark> elements).
+			// This is the root cause fix for: https://github.com/WordPress/gutenberg/issues/58806
+			const formatsToAdd = activeFormats.filter(
+				( activeFormat ) =>
+					! existingFormats.some( ( existingFormat ) =>
+						isFormatEqual( activeFormat, existingFormat )
+					)
+			);
+
 			value.formats[ index ] = [
-				...activeFormats,
-				...( value.formats[ index ] || [] ),
+				...formatsToAdd,
+				...existingFormats,
 			];
 		}
 	}
