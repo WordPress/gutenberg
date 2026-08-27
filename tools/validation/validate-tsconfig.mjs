@@ -432,4 +432,44 @@ for ( const routeName of routesWithTypes ) {
 	}
 }
 
+/*
+ * A reference into another package is a build-graph edge, so it must be backed
+ * by a declared dependency, or removed dependencies leave stale references.
+ */
+const workspaceProjects = glob.sync(
+	'{packages,routes,widgets}/*/tsconfig*.json',
+	{ cwd: repoRoot }
+);
+
+for ( const projectPath of workspaceProjects ) {
+	const workspaceDir = dirname( projectPath );
+	const packageJsonPath = resolve( repoRoot, workspaceDir, 'package.json' );
+	if ( ! existsSync( packageJsonPath ) ) {
+		continue;
+	}
+	const packageJson = JSON.parse( readFileSync( packageJsonPath, 'utf8' ) );
+	const declared = new Set( [
+		...Object.keys( packageJson.dependencies ?? {} ),
+		...Object.keys( packageJson.devDependencies ?? {} ),
+	] );
+
+	for ( const reference of referencedProjects(
+		resolve( repoRoot, projectPath )
+	) ) {
+		const referenceFromRoot = relative( repoRoot, reference );
+		if ( ! referenceFromRoot.startsWith( 'packages/' ) ) {
+			continue;
+		}
+		const referencedPackage = referenceFromRoot.split( '/' )[ 1 ];
+		if ( workspaceDir === `packages/${ referencedPackage }` ) {
+			continue;
+		}
+		if ( ! declared.has( `@wordpress/${ referencedPackage }` ) ) {
+			reportError(
+				`Reference to "packages/${ referencedPackage }" in ${ projectPath } without a dependency on "@wordpress/${ referencedPackage }"`
+			);
+		}
+	}
+}
+
 process.exit( hasErrors ? 1 : 0 );
