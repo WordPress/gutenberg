@@ -6,6 +6,10 @@
 
 -   `@wordpress/build` no longer parses JSX syntax in `.js` source files. Rename these files to `.jsx` or `.tsx` before building ([#82189](https://github.com/WordPress/gutenberg/pull/82189)).
 
+-   Use `WP_TESTS_SKIP_STYLE_INJECTION=true` instead of `NODE_ENV=test` to
+    disable generated style injection in Node and jsdom tests. Browser Mode
+    keeps style injection enabled ([#82154](https://github.com/WordPress/gutenberg/pull/82154)).
+
 ### Enhancements
 
 -   Target `@wordpress/browserslist-config` for JavaScript and CSS when the project has no Browserslist config, instead of Browserslist's implicit defaults ([#82179](https://github.com/WordPress/gutenberg/pull/82179)).
