@@ -21,7 +21,7 @@ module.exports = [
 		},
 	},
 	{
-		files: [ '**/*.test.js', '**/test/*.js' ],
+		files: [ '**/*.test.{js,jsx}', '**/test/*.{js,jsx}' ],
 		rules: {
 			'@wordpress/no-global-active-element': 'off',
 			'@wordpress/no-global-get-selection': 'off',
