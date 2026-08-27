@@ -1,19 +1,36 @@
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
+// @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 import { BlockControls } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { video as videoIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
+type VideoAttachment = {
+	source_url?: string;
+	mime_type?: string;
+	media_details?: {
+		optimized_video?: string;
+	};
+};
+
+type VideoOriginalControlProps = {
+	attributes: {
+		id?: number;
+		src?: string;
+	};
+	setAttributes: ( attributes: { src: string } ) => void;
+};
+
 /**
  * Builds the URL of a companion file stored next to the attachment's original.
  *
- * @param {string} sourceUrl Attachment source URL.
- * @param {string} basename  Companion file basename.
+ * @param sourceUrl Attachment source URL.
+ * @param basename  Companion file basename.
  *
- * @return {string} Absolute companion URL.
+ * @return Absolute companion URL.
  */
-function companionUrl( sourceUrl, basename ) {
+function companionUrl( sourceUrl: string, basename: string ): string {
 	const dir = sourceUrl.slice( 0, sourceUrl.lastIndexOf( '/' ) + 1 );
 	return dir + basename;
 }
@@ -32,13 +49,16 @@ function companionUrl( sourceUrl, basename ) {
  * `optimized_video` companion, so it never appears on videos that were not
  * transcoded.
  *
- * @param {Object}   props               Component props.
- * @param {Object}   props.attributes    Video block attributes.
- * @param {Function} props.setAttributes Block attribute setter.
+ * @param props               Component props.
+ * @param props.attributes    Video block attributes.
+ * @param props.setAttributes Block attribute setter.
  *
- * @return {Component|null} The control, or null when no companion applies.
+ * @return The control, or null when no companion applies.
  */
-export default function VideoOriginalControl( { attributes, setAttributes } ) {
+export default function VideoOriginalControl( {
+	attributes,
+	setAttributes,
+}: VideoOriginalControlProps ) {
 	const { id, src } = attributes;
 
 	const video = useSelect(
@@ -51,7 +71,7 @@ export default function VideoOriginalControl( { attributes, setAttributes } ) {
 				'attachment',
 				id,
 				{ context: 'view' }
-			);
+			) as VideoAttachment | undefined;
 			if ( ! record?.mime_type?.startsWith( 'video/' ) ) {
 				return null;
 			}
@@ -63,15 +83,14 @@ export default function VideoOriginalControl( { attributes, setAttributes } ) {
 		[ id ]
 	);
 
-	if ( ! video?.source_url ) {
+	const optimizedVideo = video?.media_details?.optimized_video;
+
+	if ( ! video?.source_url || ! optimizedVideo ) {
 		return null;
 	}
 
 	const originalUrl = video.source_url;
-	const optimizedUrl = companionUrl(
-		originalUrl,
-		video.media_details.optimized_video
-	);
+	const optimizedUrl = companionUrl( originalUrl, optimizedVideo );
 	const isOptimized = src === optimizedUrl;
 
 	return (
