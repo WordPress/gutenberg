@@ -3,6 +3,16 @@ export function defaultColumnsNumber( imageCount ) {
 }
 
 /**
+ * Whether a value is a plain object (and not an array).
+ *
+ * @param {*} value The value to check.
+ * @return {boolean} Whether the value is a plain object.
+ */
+export function isObject( value ) {
+	return !! value && typeof value === 'object' && ! Array.isArray( value );
+}
+
+/**
  * Whether the Gallery should use its default Flex layout behavior.
  *
  * Gallery blocks created before layout variations existed do not have an
@@ -13,10 +23,7 @@ export function defaultColumnsNumber( imageCount ) {
  * @return {boolean} Whether the Gallery uses its Flex layout.
  */
 export function isGalleryFlexLayout( layout ) {
-	const layoutType =
-		layout && typeof layout === 'object' && ! Array.isArray( layout )
-			? layout.type
-			: undefined;
+	const layoutType = isObject( layout ) ? layout.type : undefined;
 
 	return (
 		typeof layoutType !== 'string' ||
