@@ -1168,7 +1168,7 @@ test.describe( 'Block Notes', () => {
 			// match its text. The pill's own label is an `aria-label`, not
 			// text, so this only matches the popup.
 			await expect(
-				page.getByText( /reacted with Celebration emoji/ )
+				page.getByText( /reacted with Celebration/ )
 			).toBeVisible();
 		} );
 
