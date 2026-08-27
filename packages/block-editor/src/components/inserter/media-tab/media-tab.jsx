@@ -11,7 +11,18 @@ import MobileTabNavigation from '../mobile-tab-navigation';
 import CategoryTabs from '../category-tabs';
 import InserterNoResults from '../no-results';
 
-const ALLOWED_MEDIA_TYPES = [ 'image', 'video', 'audio' ];
+// Every type the tab can insert. Without `application`/`text` the picker was
+// silently filtered to playable media, so a document already in the Media
+// Library was unreachable — and one uploaded through the picker's own "Upload
+// files" tab succeeded but then vanished from the grid, with nothing on screen
+// explaining why.
+const ALLOWED_MEDIA_TYPES = [
+	'image',
+	'video',
+	'audio',
+	'application',
+	'text',
+];
 
 function MediaTab( {
 	rootClientId,

@@ -21,7 +21,7 @@ import { isBlobURL } from '@wordpress/blob';
 import { getFilename } from '@wordpress/url';
 import { Tooltip } from '@wordpress/ui';
 import InserterDraggableBlocks from '../../inserter-draggable-blocks';
-import { getBlockAndPreviewFromMedia } from './utils';
+import { getBlockAndPreviewFromMedia, getMediaTitle } from './utils';
 import { store as blockEditorStore } from '../../../store';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
@@ -238,10 +238,7 @@ export function MediaPreview( { media, onClick, onDetach, category } ) {
 		]
 	);
 
-	const title =
-		typeof media.title === 'string'
-			? media.title
-			: media.title?.rendered || __( 'no title' );
+	const title = getMediaTitle( media ) || __( 'no title' );
 
 	const onMouseEnter = useCallback( () => setIsHovered( true ), [] );
 	const onMouseLeave = useCallback( () => setIsHovered( false ), [] );

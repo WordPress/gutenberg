@@ -146,7 +146,6 @@ export function useMediaCategories( rootClientId ) {
 			unlock( select( blockEditorStore ) ).getInserterMediaCategories(),
 		[]
 	);
-
 	const { canInsertImage, canInsertVideo, canInsertAudio, canInsertFile } =
 		useSelect(
 			( select ) => {
@@ -211,7 +210,10 @@ export function useMediaCategories( rootClientId ) {
 				image: canInsertImage,
 				video: canInsertVideo,
 				audio: canInsertAudio,
+				// Everything else is inserted as a File block, so a single
+				// permission check gates every non-playable media type.
 				application: canInsertFile,
+				text: canInsertFile,
 			};
 			inserterMediaCategories.forEach( ( category ) => {
 				if (
@@ -230,8 +232,8 @@ export function useMediaCategories( rootClientId ) {
 		canInsertImage,
 		canInsertVideo,
 		canInsertAudio,
-		inserterMediaCategories,
 		canInsertFile,
+		inserterMediaCategories,
 	] );
 	return categories;
 }

@@ -1555,7 +1555,7 @@ _Properties_
 - _labels_ `Object`: Labels for the media category.
 - _labels.name_ `string`: General name of the media category. It's used in the inserter media items list.
 - _labels.search_items_ `[string]`: Label for searching items. Default is ‘Search Posts’ / ‘Search Pages’.
-- _mediaType_ `('image'|'audio'|'video')`: The media type of the media category.
+- _mediaType_ `('image'|'audio'|'video'|'application'|'text')`: The media type of the media category. Anything other than `image`, `audio` or `video` is inserted as a File block.
 - _fetch_ `(InserterMediaRequest) => Promise<InserterMediaItem[]|InserterMediaResponse>`: The function to fetch media items for the category. Returning an `InserterMediaResponse` instead of a plain array opts the category into pagination.
 - _getReportUrl_ `[(InserterMediaItem) => string]`: If the media category supports reporting media items, this function should return the report url for the media item. It accepts the `InserterMediaItem` as an argument.
 - _isExternalResource_ `[boolean]`: If the media category is an external resource, this should be set to true. This is used to avoid making a request to the external resource when checking whether the category has any media items to display in the media tab.
