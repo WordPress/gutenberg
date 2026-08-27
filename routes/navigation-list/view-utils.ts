@@ -1,31 +1,32 @@
 import { loadView } from '@wordpress/views';
-import type { View } from '@wordpress/dataviews';
+import {
+	loadEntityViewConfig,
+	getActiveViewOverrides,
+} from '@wordpress/routes-view-config';
 
 const NAVIGATION_POST_TYPE = 'wp_navigation';
-
-const DEFAULT_VIEW: View = {
-	type: 'list' as const,
-	sort: {
-		field: 'date',
-		direction: 'desc' as const,
-	},
-	titleField: 'title',
-};
-
-export function getDefaultView(): View {
-	return DEFAULT_VIEW;
-}
 
 export async function ensureView( search?: {
 	page?: number;
 	search?: string;
 } ) {
-	const defaultView = getDefaultView();
+	const {
+		default_view: defaultView,
+		default_layouts: defaultLayouts,
+		view_list: viewList,
+	} = await loadEntityViewConfig( 'postType', NAVIGATION_POST_TYPE );
+	if ( ! defaultView ) {
+		throw new Error(
+			`Missing view configuration for the ${ NAVIGATION_POST_TYPE } post type.`
+		);
+	}
 	return loadView( {
 		kind: 'postType',
 		name: NAVIGATION_POST_TYPE,
 		slug: 'default-new',
 		defaultView,
+		defaultLayouts,
+		activeViewOverrides: getActiveViewOverrides( viewList, 'all' ),
 		queryParams: search,
 	} );
 }

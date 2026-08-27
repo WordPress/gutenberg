@@ -85,6 +85,7 @@
 		{ "path": "routes/template-list" },
 		{ "path": "routes/template-part" },
 		{ "path": "routes/template-part-list" },
+		{ "path": "routes/view-config" },
 		{ "path": "storybook" },
 		{ "path": "test/e2e" },
 		{ "path": "test/performance" },
