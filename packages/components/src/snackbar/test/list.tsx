@@ -1,6 +1,6 @@
 import { act, render, screen } from '@testing-library/react';
 import { click } from '@ariakit/test';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import SnackbarList from '../list';
 
 window.scrollTo = jest.fn();
@@ -49,13 +49,28 @@ describe( 'SnackbarList', () => {
 
 		function RecreatedNotice() {
 			const [ notices, setNotices ] = useState( [ notice ] );
+			const [ shouldRecreate, setShouldRecreate ] = useState( false );
+
+			useEffect( () => {
+				if ( ! shouldRecreate ) {
+					return;
+				}
+
+				const timeoutHandle = setTimeout( () => {
+					setNotices( [ { ...notice } ] );
+					setShouldRecreate( false );
+				}, 50 );
+
+				return () => clearTimeout( timeoutHandle );
+			}, [ shouldRecreate ] );
 
 			return (
 				<SnackbarList
 					notices={ notices }
 					onRemove={ ( id ) => {
 						onRemove( id );
-						setNotices( [ { ...notice } ] );
+						setNotices( [] );
+						setShouldRecreate( true );
 					} }
 				/>
 			);
@@ -65,6 +80,9 @@ describe( 'SnackbarList', () => {
 
 		await act( async () => jest.advanceTimersByTime( 6000 ) );
 		expect( onRemove ).toHaveBeenCalledTimes( 1 );
+
+		// Recreate the notice before its 100ms exit animation completes.
+		await act( async () => jest.advanceTimersByTime( 50 ) );
 
 		expect( screen.getByTestId( 'snackbar' ) ).toHaveTextContent(
 			notice.content

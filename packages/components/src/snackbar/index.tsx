@@ -1,5 +1,6 @@
 import type { ForwardedRef, KeyboardEvent, MouseEvent } from 'react';
 import clsx from 'clsx';
+import { useIsPresent } from 'framer-motion';
 import { speak } from '@wordpress/a11y';
 import {
 	useEffect,
@@ -57,6 +58,8 @@ function UnforwardedSnackbar(
 	}: WordPressComponentProps< SnackbarProps, 'div' >,
 	ref: ForwardedRef< any >
 ) {
+	const isPresent = useIsPresent();
+
 	function dismissMe( event: KeyboardEvent | MouseEvent ) {
 		if ( event && event.preventDefault ) {
 			event.preventDefault();
@@ -91,41 +94,18 @@ function UnforwardedSnackbar(
 		callbacksRef.current = { onDismiss, onRemove };
 	} );
 
-	const timeoutRef = useRef< ReturnType< typeof setTimeout > | undefined >(
-		undefined
-	);
-
-	// Check after every render so that a snackbar which survives its removal
-	// gets a fresh timeout without resetting an active timeout on rerenders.
 	useEffect( () => {
-		if ( explicitDismiss ) {
-			if ( timeoutRef.current !== undefined ) {
-				clearTimeout( timeoutRef.current );
-				timeoutRef.current = undefined;
-			}
+		if ( explicitDismiss || ! isPresent ) {
 			return;
 		}
 
-		if ( timeoutRef.current !== undefined ) {
-			return;
-		}
-
-		timeoutRef.current = setTimeout( () => {
-			timeoutRef.current = undefined;
+		const timeoutHandle = setTimeout( () => {
 			callbacksRef.current.onDismiss?.();
 			callbacksRef.current.onRemove?.();
 		}, NOTICE_TIMEOUT );
-	} );
 
-	useEffect(
-		() => () => {
-			if ( timeoutRef.current !== undefined ) {
-				clearTimeout( timeoutRef.current );
-				timeoutRef.current = undefined;
-			}
-		},
-		[]
-	);
+		return () => clearTimeout( timeoutHandle );
+	}, [ explicitDismiss, isPresent ] );
 
 	const classes = clsx( className, 'components-snackbar', {
 		'components-snackbar-explicit-dismiss': !! explicitDismiss,
