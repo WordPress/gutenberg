@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### TypeScript
+
+-   `Popover`: Widen `offset` to also accept an object with separate main and cross axis offsets ([#82060](https://github.com/WordPress/gutenberg/pull/82060)).
+
 ## 40.0.0 (2026-08-26)
 
 ### Breaking Changes
@@ -45,7 +49,6 @@
 
 ### TypeScript
 
--   `Popover`: Widen `offset` to accept `floating-ui`'s offset object, so a popover can also be displaced along its cross axis ([#82060](https://github.com/WordPress/gutenberg/pull/82060)).
 -   `ComboboxControl`: Narrow the `onChange` callback parameter type to `string | null`, matching the values the component actually passes. The previous indexed-access type on the optional `value` prop leaked an accidental `undefined` into the union ([#81568](https://github.com/WordPress/gutenberg/pull/81568)).
 
 ### Internal

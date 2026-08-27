@@ -183,7 +183,7 @@ Used to show/hide the arrow that points at the popover's anchor.
 -   Required: No
 -   Default: `true`
 
-### `offset`: `number | { mainAxis?: number; crossAxis?: number; alignmentAxis?: number | null }`
+### `offset`: `number | { mainAxis?: number; crossAxis?: number }`
 
 The distance (in px) between the anchor and the popover. A number displaces the popover along its main axis; pass an object to also displace it along its cross axis.
 

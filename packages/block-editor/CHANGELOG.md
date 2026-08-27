@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Inserter: Keep the hovered block preview inside the viewport, so a tall preview in a short window is no longer clipped ([#82060](https://github.com/WordPress/gutenberg/pull/82060)).
 -   Client-side media processing: Refuse a batch of more than one file when the caller only takes one, such as a Cover block placeholder, matching what the server-side upload path already did. Every dropped file was uploaded instead, and the block kept whichever one finished last ([#82041](https://github.com/WordPress/gutenberg/issues/82041)).
 
 ## 17.0.0 (2026-08-26)
@@ -25,7 +26,6 @@
 
 ### Bug Fixes
 
--   Inserter: Keep the hovered block preview inside the viewport. Its 16px gap below the panel was applied as CSS that `floating-ui` could not account for ([#82060](https://github.com/WordPress/gutenberg/pull/82060)).
 -   Hide the Layout panel when a block has layout editing enabled but all controls for its layout type are disabled ([#81968](https://github.com/WordPress/gutenberg/pull/81968)).
 -   `DuotoneControl`: Keep the picked preset's identity when applying a duotone to a block. Two presets can hold the same pair of colors, and the applied preset was resolved by matching colors, so the first of any duplicate pair was saved and both appeared selected ([#81605](https://github.com/WordPress/gutenberg/pull/81605)).
 -   `InnerBlocks`: Resolve the `default` of a block's `layout` support before providing it to inner blocks. A block that declared its layout only as a support default, such as the Gallery, previously handed its children the raw support config, which has no `type`, so the children resolved to the flow layout instead. As a result an Image nested in a Gallery offered left/center/right alignment, which the flex layout does not permit ([#81606](https://github.com/WordPress/gutenberg/pull/81606)).

@@ -113,7 +113,6 @@ export type PopoverProps = {
 		| {
 				mainAxis?: number;
 				crossAxis?: number;
-				alignmentAxis?: number | null;
 		  };
 	/**
 	 * A callback invoked when the popover should be closed.
