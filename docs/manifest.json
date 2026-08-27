@@ -3036,12 +3036,6 @@
 		"parent": "data"
 	},
 	{
-		"title": "Reusable blocks",
-		"slug": "data-core-reusable-blocks",
-		"markdown_source": "../docs/reference-guides/data/data-core-reusable-blocks.md",
-		"parent": "data"
-	},
-	{
 		"title": "Rich Text",
 		"slug": "data-core-rich-text",
 		"markdown_source": "../docs/reference-guides/data/data-core-rich-text.md",

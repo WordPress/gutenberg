@@ -1,4 +1,4 @@
-import type { TaperChromaOptions } from './taper-chroma';
+import type { TaperChromaOptions } from './taper-chroma.ts';
 
 export type Ramp = {
 	// Backgrounds for surfaces (nuanced, slight variations compared to bg)

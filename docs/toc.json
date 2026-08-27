@@ -332,9 +332,6 @@
 					{
 						"docs/reference-guides/data/data-core-preferences.md": []
 					},
-					{
-						"docs/reference-guides/data/data-core-reusable-blocks.md": []
-					},
 					{ "docs/reference-guides/data/data-core-rich-text.md": [] },
 					{ "docs/reference-guides/data/data-core-viewport.md": [] }
 				]
