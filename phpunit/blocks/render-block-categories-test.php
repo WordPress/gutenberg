@@ -50,13 +50,14 @@ class Tests_Blocks_Render_Categories extends WP_UnitTestCase {
 			)
 		);
 
-		$block = new WP_Block(
+		$attributes = array(
+			'taxonomy'          => 'category',
+			'displayAsDropdown' => false,
+		);
+		$block      = new WP_Block(
 			array(
 				'blockName' => 'core/categories',
-				'attrs'     => array(
-					'taxonomy'          => 'category',
-					'displayAsDropdown' => false,
-				),
+				'attrs'     => $attributes,
 			)
 		);
 
