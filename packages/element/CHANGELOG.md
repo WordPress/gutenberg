@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 8.6.0 (2026-08-26)
+
 ### Bug Fixes
 
 -   `serialize`/`renderToString`: Render `memo`-wrapped components instead of serializing them to an empty string ([#81986](https://github.com/WordPress/gutenberg/pull/81986)).

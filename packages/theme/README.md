@@ -54,6 +54,8 @@ import '@wordpress/theme/design-tokens.css';
 
 The package's JavaScript entrypoints are ESM-only and require Node.js `^20.19.0` or `>=22.13.0`. Use `import` syntax from ESM or TypeScript configuration files.
 
+TypeScript consumers require TypeScript 5 or newer.
+
 This stylesheet is universal and does not have a separate RTL version.
 
 If your application renders React content into additional documents (an iframe, a popup window, etc.), each of those documents needs the same stylesheet loaded in its own `<head>`. See [Across documents (iframes and other portals)](#across-documents-iframes-and-other-portals).
@@ -104,7 +106,7 @@ The `color` prop accepts an object with the following optional properties:
 -   `primary`: The primary/accent seed color (default: `'#3858e9'`).
 -   `background`: The background seed color (default: `'#fcfcfc'`).
 
-Both properties accept a fully opaque sRGB-parseable string: a hex value (e.g. `#3858e9`), an `rgb()`/`rgba()` string, or a CSS named color (e.g. `'blue'`). Non-opaque alpha values, `transparent`, and other CSS color spaces (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted and will throw an error. The theme system automatically generates appropriate color ramps and determines light/dark mode based on these seed colors.
+Both properties accept a fully opaque sRGB-parseable string: a hex value (e.g. `#3858e9`), an `rgb()`/`rgba()` string, or a CSS named color (e.g. `'blue'`). Non-opaque alpha values, `transparent`, and other CSS color spaces (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted and will throw an error. The theme system automatically generates appropriate color ramps from these seed colors.
 
 Use `onColorWarnings` to receive structured warnings after the provider calculates its colors. Warnings identify generated ramp steps or semantic foreground/background pairs that do not meet their contrast targets:
 
@@ -133,6 +135,10 @@ The `cornerRadius` prop sets the overall roundness preset for the theme subtree.
 When a setting is omitted, it inherits from the closest parent `ThemeProvider`. If there is no parent value, the prebuilt defaults from the design-tokens stylesheet apply.
 
 `ThemeProvider` does not accept wrapper customization props such as `className`, `style`, `as`, `render`, or `ref`.
+
+### Light and dark themes
+
+`ThemeProvider` has no light or dark mode. It accepts color seeds and turns them into semantic design tokens. Consumers define light and dark themes by choosing those seeds: a light background seed makes the generated color ramp favor darker contrasting colors, while a dark background seed makes it favor lighter contrasting colors. The primary seed controls the accent color rather than the overall light or dark appearance.
 
 ### Nesting Providers
 
