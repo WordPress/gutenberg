@@ -1,7 +1,13 @@
 import { render, screen } from '@testing-library/react';
 import { ProgressBar } from '..';
-import { INDETERMINATE_TRACK_WIDTH } from '../styles';
 
+/*
+ * TODO: the stylesheet is mocked in these tests, so nothing the SCSS module is
+ * responsible for can be asserted here — that the `progress` element is visually
+ * hidden and only exposed for semantics, and that the indeterminate indicator is
+ * 50% wide and slides across the track. Assert those against real styles once
+ * browser-backed component tests are available.
+ */
 describe( 'ProgressBar', () => {
 	it( 'should render an indeterminate semantic progress bar element', () => {
 		render( <ProgressBar /> );
@@ -9,7 +15,6 @@ describe( 'ProgressBar', () => {
 		const progressBar = screen.getByRole( 'progressbar' );
 
 		expect( progressBar ).toBeInTheDocument();
-		expect( progressBar ).not.toBeVisible();
 		expect( progressBar ).not.toHaveValue();
 	} );
 
@@ -19,11 +24,10 @@ describe( 'ProgressBar', () => {
 		const progressBar = screen.getByRole( 'progressbar' );
 
 		expect( progressBar ).toBeInTheDocument();
-		expect( progressBar ).not.toBeVisible();
 		expect( progressBar ).toHaveValue( 55 );
 	} );
 
-	it( 'should use `INDETERMINATE_TRACK_WIDTH`% as track width for indeterminate progress bar', () => {
+	it( 'should not set an inline indicator width for indeterminate progress bar', () => {
 		const { container } = render( <ProgressBar /> );
 
 		/**
@@ -31,14 +35,12 @@ describe( 'ProgressBar', () => {
 		 * the track is an intentionally non-interactive presentation element.
 		 */
 		// eslint-disable-next-line testing-library/no-node-access
-		const indicator = container.firstChild?.firstChild;
+		const indicator = container.firstChild?.firstChild as HTMLElement;
 
-		expect( indicator ).toHaveStyle( {
-			width: `${ INDETERMINATE_TRACK_WIDTH }%`,
-		} );
-		expect( indicator ).not.toHaveStyle( {
-			'--indicator-width': expect.any( String ),
-		} );
+		// The indeterminate width is left to the stylesheet.
+		expect( indicator.style.getPropertyValue( '--indicator-width' ) ).toBe(
+			''
+		);
 	} );
 
 	it( 'should use `value`% as width for determinate progress bar', () => {
