@@ -13,7 +13,7 @@ import type { ThemeProviderColorWarning } from '../theme-provider-color-warnings
 // Give the wrapper a stable class so tests can locate it and read its
 // computed custom properties.
 jest.mock( '../style.module.css', () => ( {
-	root: 'theme-provider-root',
+	wrapper: 'theme-provider-wrapper',
 } ) );
 
 // The "strong" brand background resolves to the `color.primary` seed itself, and
@@ -39,7 +39,7 @@ function readProp( element: Element, property: string ) {
 
 // The `ThemeProvider` wrapper element that scopes the given descendant.
 function getScopingProvider( element: Element ) {
-	return element.closest< HTMLElement >( '.theme-provider-root' )!;
+	return element.closest< HTMLElement >( '.theme-provider-wrapper' )!;
 }
 
 async function withInjectedThemeProviderStyles(
@@ -49,7 +49,7 @@ async function withInjectedThemeProviderStyles(
 	style.textContent = readFileSync(
 		join( import.meta.dirname, '../style.module.css' ),
 		'utf8'
-	).replaceAll( '.root', '.theme-provider-root' );
+	).replaceAll( '.wrapper', '.theme-provider-wrapper' );
 	document.head.appendChild( style );
 
 	try {

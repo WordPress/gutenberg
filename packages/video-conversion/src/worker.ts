@@ -10,7 +10,7 @@ import {
 	cancelOperations,
 	convertGifToVideo,
 	convertHeicSequenceToVideo,
-} from './index';
+} from './index.ts';
 
 /**
  * The API object that exposes the video conversion functions to the main thread.

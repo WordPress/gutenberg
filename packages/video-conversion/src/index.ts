@@ -9,7 +9,7 @@ import {
 	canEncodeVideo,
 	type Rotation,
 } from 'mediabunny';
-import type { HeicSequenceInput, ItemId } from './types';
+import type { HeicSequenceInput, ItemId } from './types.ts';
 
 /**
  * Tracks in-progress operations so they can be cancelled at async boundaries.
