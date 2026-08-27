@@ -1,5 +1,8 @@
 import deepFreeze from 'deep-freeze';
-import { getSupportedStyles } from '../private-selectors';
+import {
+	getBlockKeyboardShortcuts,
+	getSupportedStyles,
+} from '../private-selectors';
 
 const keyBlocksByName = ( blocks ) =>
 	blocks.reduce(
@@ -197,6 +200,208 @@ describe( 'private selectors', () => {
 			);
 
 			expect( supports ).toEqual( [ 'fontSize', 'textIndent' ] );
+		} );
+	} );
+
+	describe( 'getBlockKeyboardShortcuts', () => {
+		const shortcut = {
+			name: 'test/shortcut',
+			description: 'Test shortcut.',
+			keyCombination: { modifier: 'access', character: '1' },
+		};
+
+		const getState = ( { blockTypes = [], blockVariations = {} } = {} ) =>
+			deepFreeze( {
+				blockTypes: keyBlocksByName( blockTypes ),
+				blockVariations,
+			} );
+
+		it( 'returns an empty list when no block declares a shortcut', () => {
+			expect(
+				getBlockKeyboardShortcuts(
+					getState( {
+						blockTypes: [
+							{
+								name: 'core/heading',
+								transforms: {
+									to: [
+										{
+											type: 'block',
+											blocks: [ 'core/paragraph' ],
+										},
+									],
+								},
+							},
+						],
+						blockVariations: {
+							'core/heading': [ { name: 'h1' } ],
+						},
+					} )
+				)
+			).toEqual( [] );
+		} );
+
+		it( 'restricts a variation shortcut to the block type declaring it', () => {
+			expect(
+				getBlockKeyboardShortcuts(
+					getState( {
+						blockTypes: [ { name: 'core/heading' } ],
+						blockVariations: {
+							'core/heading': [ { name: 'h1', shortcut } ],
+						},
+					} )
+				)
+			).toEqual( [
+				{
+					...shortcut,
+					targetBlockName: 'core/heading',
+					blockNames: [ 'core/heading' ],
+					variationName: 'h1',
+				},
+			] );
+		} );
+
+		it( 'resolves a `to` transform shortcut to the first target block', () => {
+			expect(
+				getBlockKeyboardShortcuts(
+					getState( {
+						blockTypes: [
+							{
+								name: 'core/heading',
+								transforms: {
+									to: [
+										{
+											type: 'block',
+											blocks: [ 'core/paragraph' ],
+											shortcuts: [ shortcut ],
+										},
+									],
+								},
+							},
+						],
+					} )
+				)
+			).toEqual( [
+				{
+					...shortcut,
+					targetBlockName: 'core/paragraph',
+					blockNames: [ 'core/heading' ],
+					variationName: undefined,
+				},
+			] );
+		} );
+
+		it( 'resolves a `from` transform shortcut to the declaring block type', () => {
+			expect(
+				getBlockKeyboardShortcuts(
+					getState( {
+						blockTypes: [
+							{
+								name: 'core/heading',
+								transforms: {
+									from: [
+										{
+											type: 'block',
+											blocks: [
+												'core/paragraph',
+												'core/list',
+											],
+											shortcuts: [ shortcut ],
+										},
+									],
+								},
+							},
+						],
+					} )
+				)
+			).toEqual( [
+				{
+					...shortcut,
+					targetBlockName: 'core/heading',
+					blockNames: [ 'core/paragraph', 'core/list' ],
+					variationName: undefined,
+				},
+			] );
+		} );
+
+		it( 'lets one transform carry a shortcut per target variation', () => {
+			expect(
+				getBlockKeyboardShortcuts(
+					getState( {
+						blockTypes: [
+							{
+								name: 'core/heading',
+								transforms: {
+									from: [
+										{
+											type: 'block',
+											blocks: [ 'core/paragraph' ],
+											shortcuts: [
+												{
+													...shortcut,
+													name: 'test/h1',
+													variationName: 'h1',
+												},
+												{
+													...shortcut,
+													name: 'test/h2',
+													variationName: 'h2',
+												},
+											],
+										},
+									],
+								},
+							},
+						],
+					} )
+				)
+			).toEqual( [
+				{
+					...shortcut,
+					name: 'test/h1',
+					targetBlockName: 'core/heading',
+					blockNames: [ 'core/paragraph' ],
+					variationName: 'h1',
+				},
+				{
+					...shortcut,
+					name: 'test/h2',
+					targetBlockName: 'core/heading',
+					blockNames: [ 'core/paragraph' ],
+					variationName: 'h2',
+				},
+			] );
+		} );
+
+		it( 'ignores shortcuts on transforms that cannot apply them', () => {
+			expect(
+				getBlockKeyboardShortcuts(
+					getState( {
+						blockTypes: [
+							{
+								name: 'core/heading',
+								transforms: {
+									// Not a block transform.
+									from: [
+										{
+											type: 'prefix',
+											prefix: '#',
+											shortcuts: [ shortcut ],
+										},
+									],
+									// No target block to switch to.
+									to: [
+										{
+											type: 'block',
+											shortcuts: [ shortcut ],
+										},
+									],
+								},
+							},
+						],
+					} )
+				)
+			).toEqual( [] );
 		} );
 	} );
 } );

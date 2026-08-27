@@ -222,15 +222,16 @@ function TextShadowEditor( { textShadow, onChange }: TextShadowEditorProps ) {
 			</Stack>
 			<ItemGroup isBordered isSeparated>
 				{ textShadowParts.map( ( part, index ) => (
-					<TextShadowItem
-						key={ index }
-						textShadow={ part }
-						onChange={ ( value ) =>
-							onChangeTextShadowPart( index, value )
-						}
-						canRemove={ textShadowParts.length > 1 }
-						onRemove={ () => onRemoveTextShadowPart( index ) }
-					/>
+					<div key={ index } role="listitem">
+						<TextShadowItem
+							textShadow={ part }
+							onChange={ ( value ) =>
+								onChangeTextShadowPart( index, value )
+							}
+							canRemove={ textShadowParts.length > 1 }
+							onRemove={ () => onRemoveTextShadowPart( index ) }
+						/>
+					</div>
 				) ) }
 			</ItemGroup>
 		</>

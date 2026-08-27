@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 1.54.0 (2026-08-26)
+
+### Enhancements
+
+-   Command Palette: Treat the per-category icon as a fallback used only when a command passes no `icon`, instead of an override that discards the command's own icon ([#81787](https://github.com/WordPress/gutenberg/pull/81787)).
+
 ## 1.53.0 (2026-08-12)
 
 ### Internal
@@ -52,6 +58,7 @@
 ## 1.41.0 (2026-03-04)
 
 ## 1.40.0 (2026-02-18)
+
 -   Add `category` property to command config, used to visually differentiate commands in the Command Palette.
 
 ## 1.39.0 (2026-01-29)

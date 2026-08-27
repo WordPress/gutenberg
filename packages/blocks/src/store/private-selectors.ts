@@ -4,7 +4,31 @@ import { getBlockType } from './selectors';
 import { getValueFromObjectPath } from './utils';
 import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '../api/constants';
 import type { BlockStoreState } from './types';
-import type { BlockAttribute, BlockBindingsSource, BlockType } from '../types';
+import type {
+	BlockAttribute,
+	BlockBindingsSource,
+	BlockShortcut,
+	BlockType,
+} from '../types';
+
+/**
+ * A keyboard shortcut declared by a block variation or transform, together with
+ * the block change it performs.
+ */
+type ResolvedBlockShortcut = BlockShortcut & {
+	/**
+	 * The block type the shortcut produces.
+	 */
+	targetBlockName: string;
+	/**
+	 * The block types the shortcut applies to.
+	 */
+	blockNames: string[];
+	/**
+	 * The variation of `targetBlockName` the shortcut produces, if any.
+	 */
+	variationName?: string;
+};
 
 const ROOT_BLOCK_SUPPORTS: string[] = [
 	'background',
@@ -285,6 +309,79 @@ export const getBlockBindingsSourceFieldsList = createRegistrySelector(
 				blockContext: Record< string, unknown >
 			) => [ source.getFieldsList, source.usesContext, blockContext ]
 		)
+);
+
+/**
+ * Returns every keyboard shortcut declared by a registered block type, through
+ * either a block variation or a block transform.
+ *
+ * @param state Data state.
+ *
+ * @return The declared shortcuts, each paired with the block change it makes.
+ */
+export const getBlockKeyboardShortcuts = createSelector(
+	( state: BlockStoreState ): ResolvedBlockShortcut[] => {
+		const shortcuts: ResolvedBlockShortcut[] = [];
+
+		for ( const blockName of Object.keys( state.blockTypes ) ) {
+			// A variation shortcut only applies to blocks that are already of
+			// the block type declaring it. Reaching the variation from another
+			// block type is a transform, and is declared as one.
+			for ( const variation of state.blockVariations[ blockName ] ??
+				[] ) {
+				if ( ! variation.shortcut ) {
+					continue;
+				}
+				shortcuts.push( {
+					...variation.shortcut,
+					targetBlockName: blockName,
+					blockNames: [ blockName ],
+					variationName: variation.name,
+				} );
+			}
+
+			const transforms = state.blockTypes[ blockName ]?.transforms;
+
+			for ( const transform of transforms?.to ?? [] ) {
+				// A `to` transform can list several target blocks, but a shortcut
+				// can only produce one of them. The first is used.
+				const targetBlockName = transform.blocks?.[ 0 ];
+				if ( transform.type !== 'block' || ! targetBlockName ) {
+					continue;
+				}
+				for ( const shortcut of transform.shortcuts ?? [] ) {
+					shortcuts.push( {
+						...shortcut,
+						targetBlockName,
+						blockNames: [ blockName ],
+						variationName:
+							shortcut.variationName ?? transform.variationName,
+					} );
+				}
+			}
+
+			for ( const transform of transforms?.from ?? [] ) {
+				if (
+					transform.type !== 'block' ||
+					! transform.blocks?.length
+				) {
+					continue;
+				}
+				for ( const shortcut of transform.shortcuts ?? [] ) {
+					shortcuts.push( {
+						...shortcut,
+						targetBlockName: blockName,
+						blockNames: transform.blocks,
+						variationName:
+							shortcut.variationName ?? transform.variationName,
+					} );
+				}
+			}
+		}
+
+		return shortcuts;
+	},
+	( state: BlockStoreState ) => [ state.blockTypes, state.blockVariations ]
 );
 
 /**
