@@ -102,8 +102,15 @@ export default function QueryContent( {
 			newQuery.perPage = postsPerPage;
 		}
 		// Remove the exclusion when it no longer applies, so the filters stay
-		// clean. We never force it on: enabling the exclusion is left to the user.
-		if ( ! shouldExcludeCurrentPost && query.excludeCurrent !== null ) {
+		// clean. We never force it on: enabling the exclusion is left to the
+		// user. An absent key is already clean — writing `null` into it would
+		// change the serialized markup of every pre-existing Query block just
+		// by opening the editor.
+		if (
+			! shouldExcludeCurrentPost &&
+			query.excludeCurrent !== undefined &&
+			query.excludeCurrent !== null
+		) {
 			newQuery.excludeCurrent = null;
 		}
 		if ( !! Object.keys( newQuery ).length ) {
