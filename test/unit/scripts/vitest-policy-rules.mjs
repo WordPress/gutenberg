@@ -90,6 +90,10 @@ const testingLibraryQueryPattern = /^(?:get|query)By/;
 const testingLibraryAsyncQueryPattern = /^findBy/;
 const testingLibraryCollectionQueryPattern = /^(?:get|query)AllBy/;
 const testingLibraryAsyncCollectionQueryPattern = /^findAllBy/;
+const testingLibraryResultDomProperties = new Set( [
+	'baseElement',
+	'container',
+] );
 
 function getTestingLibraryQueryVariables(
 	propertyName,
@@ -367,6 +371,39 @@ function isTestingLibraryDomCollectionExpression(
 	);
 }
 
+function isTestingLibraryQueryContainerExpression(
+	node,
+	testingLibraryQueryContainerFunctionVariables,
+	testingLibraryNamespaceVariables,
+	identifierVariables
+) {
+	if ( node?.type !== 'CallExpression' ) {
+		return false;
+	}
+
+	if (
+		isVariableReference(
+			node.callee,
+			testingLibraryQueryContainerFunctionVariables,
+			identifierVariables
+		)
+	) {
+		return true;
+	}
+
+	return (
+		node.callee?.type === 'MemberExpression' &&
+		[ 'render', 'within' ].includes(
+			getMemberPropertyName( node.callee )
+		) &&
+		isVariableReference(
+			node.callee.object,
+			testingLibraryNamespaceVariables,
+			identifierVariables
+		)
+	);
+}
+
 function isBrowserGlobalExpression(
 	node,
 	unboundIdentifiers,
@@ -428,6 +465,16 @@ function isBrowserGlobalExpression(
 
 	if ( node?.type === 'MemberExpression' ) {
 		const propertyName = getMemberPropertyName( node );
+		if (
+			testingLibraryResultDomProperties.has( propertyName ) &&
+			isVariableReference(
+				node.object,
+				testingLibraryScreenVariables,
+				identifierVariables
+			)
+		) {
+			return true;
+		}
 		if (
 			node.computed &&
 			typeof propertyName === 'number' &&
@@ -969,6 +1016,9 @@ export function validateVitestPolicy( {
 	const testingLibraryDomFunctionVariables = new Set();
 	const testingLibraryFireEventVariables = new Set();
 	const testingLibraryNamespaceVariables = new Set();
+	const testingLibraryQueryContainerFunctionVariables = new Set();
+	// This set contains `screen` and query containers returned by `render` or
+	// `within`.
 	const testingLibraryScreenVariables = new Set();
 	const vitestExpectVariables = new Set();
 	const vitestNamespaceVariables = new Set();
@@ -1051,6 +1101,10 @@ export function validateVitestPolicy( {
 					testingLibraryDomFunctionVariables.add( variable );
 				} else if ( importedName === 'fireEvent' ) {
 					testingLibraryFireEventVariables.add( variable );
+				} else if ( [ 'render', 'within' ].includes( importedName ) ) {
+					testingLibraryQueryContainerFunctionVariables.add(
+						variable
+					);
 				}
 			}
 			if ( importSource === 'vitest' ) {
@@ -1105,8 +1159,13 @@ export function validateVitestPolicy( {
 			computedStyleVariables.size +
 			domCollectionVariables.size +
 			domVariables.size +
+			testingLibraryAsyncCollectionFunctionVariables.size +
+			testingLibraryAsyncDomFunctionVariables.size +
+			testingLibraryCollectionFunctionVariables.size +
+			testingLibraryDomFunctionVariables.size +
 			testingLibraryFireEventVariables.size +
 			testingLibraryNamespaceVariables.size +
+			testingLibraryQueryContainerFunctionVariables.size +
 			testingLibraryScreenVariables.size +
 			vitestExpectVariables.size +
 			vitestNamespaceVariables.size +
@@ -1118,8 +1177,13 @@ export function validateVitestPolicy( {
 			computedStyleVariables.size +
 			domCollectionVariables.size +
 			domVariables.size +
+			testingLibraryAsyncCollectionFunctionVariables.size +
+			testingLibraryAsyncDomFunctionVariables.size +
+			testingLibraryCollectionFunctionVariables.size +
+			testingLibraryDomFunctionVariables.size +
 			testingLibraryFireEventVariables.size +
 			testingLibraryNamespaceVariables.size +
+			testingLibraryQueryContainerFunctionVariables.size +
 			testingLibraryScreenVariables.size +
 			vitestExpectVariables.size +
 			vitestNamespaceVariables.size +
@@ -1149,6 +1213,7 @@ export function validateVitestPolicy( {
 			if ( target.type === 'Identifier' ) {
 				const targetVariable = identifierVariables.get( target );
 				for ( const variables of [
+					testingLibraryQueryContainerFunctionVariables,
 					testingLibraryNamespaceVariables,
 					testingLibraryScreenVariables,
 					vitestExpectVariables,
@@ -1200,7 +1265,9 @@ export function validateVitestPolicy( {
 			) {
 				for ( const [ propertyName, variables ] of [
 					[ 'fireEvent', testingLibraryFireEventVariables ],
+					[ 'render', testingLibraryQueryContainerFunctionVariables ],
 					[ 'screen', testingLibraryScreenVariables ],
+					[ 'within', testingLibraryQueryContainerFunctionVariables ],
 				] ) {
 					for ( const identifier of getObjectPatternPropertyIdentifiers(
 						target,
@@ -1219,6 +1286,73 @@ export function validateVitestPolicy( {
 					}
 					const propertyName =
 						property.key?.name ?? property.key?.value ?? '';
+					const variables = getTestingLibraryQueryVariables(
+						propertyName,
+						{
+							asyncCollectionVariables:
+								testingLibraryAsyncCollectionFunctionVariables,
+							asyncDomVariables:
+								testingLibraryAsyncDomFunctionVariables,
+							collectionVariables:
+								testingLibraryCollectionFunctionVariables,
+							domVariables: testingLibraryDomFunctionVariables,
+						}
+					);
+					if ( ! variables ) {
+						continue;
+					}
+					for ( const identifier of getPatternIdentifiers(
+						property.value
+					) ) {
+						const variable = identifierVariables.get( identifier );
+						if ( variable ) {
+							variables.add( variable );
+						}
+					}
+				}
+			}
+
+			const isTestingLibraryQueryContainer =
+				isVariableReference(
+					value,
+					testingLibraryScreenVariables,
+					identifierVariables
+				) ||
+				isTestingLibraryQueryContainerExpression(
+					value,
+					testingLibraryQueryContainerFunctionVariables,
+					testingLibraryNamespaceVariables,
+					identifierVariables
+				);
+			if ( isTestingLibraryQueryContainer ) {
+				if ( target.type === 'Identifier' ) {
+					const variable = identifierVariables.get( target );
+					if ( variable ) {
+						testingLibraryScreenVariables.add( variable );
+					}
+				}
+
+				for ( const property of target.properties ?? [] ) {
+					if ( property.type !== 'Property' ) {
+						continue;
+					}
+					const propertyName =
+						property.key?.name ?? property.key?.value ?? '';
+					if (
+						testingLibraryResultDomProperties.has( propertyName )
+					) {
+						for ( const identifier of getPatternIdentifiers(
+							property.value
+						) ) {
+							const variable =
+								identifierVariables.get( identifier );
+							if ( variable ) {
+								domVariables.add( variable );
+							}
+						}
+						continue;
+					}
+
 					const variables = getTestingLibraryQueryVariables(
 						propertyName,
 						{
