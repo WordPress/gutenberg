@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Error boundary: Surface debugging details ([#{TODO}](https://github.com/WordPress/gutenberg/pull/{TODO})).
+
 ### Bug Fixes
 
 -   Prevent an error in `canInsertBlockInWidgetArea` when no widget area blocks are present.
