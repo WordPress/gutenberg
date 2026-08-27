@@ -21,6 +21,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@arethetypeswrong/cli": "^0.18.5",
 		"@babel/parser": "^7.28.6",
 		"@babel/traverse": "^7.25.7",
 		"@emotion/babel-plugin": "^11.13.5",
@@ -50,7 +51,7 @@
 		"build-vendors": "node ./packages/build-vendors.mjs",
 		"generate-worker-placeholders": "node ./packages/generate-worker-placeholders.mjs",
 		"resolve-trace-source-maps": "node ./packages/resolve-trace-source-maps.cjs",
-		"check-type-declarations": "node ./packages/check-build-type-declaration-files.cjs",
+		"check-type-declarations": "node ./packages/check-build-type-declaration-files.cjs && node ./packages/check-esm-package-types.mjs",
 		"typecheck": "node ./typecheck.mjs"
 	}
 }
