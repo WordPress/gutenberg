@@ -7,7 +7,7 @@
 ### Enhancements
 
 -   `MediaEditor`: replace `ComplementaryArea` and `InterfaceSkeleton` with a layout the media editor owns, and widen the settings panel so its controls and fields are not so cramped ([#81840](https://github.com/WordPress/gutenberg/pull/81840)).
--   `MediaEditor.ImageControls` is removed, and `renderFrame` drops `hasCanvas`. Both were added in the same unreleased cycle: the transform controls belong to the Crop panel, and `HistoryActions` already renders nothing when a panel covers the canvas, so a frame gating on it repeated that check from the outside. The `scope` prop is now inert but still accepted, so existing callers compile ([#81840](https://github.com/WordPress/gutenberg/pull/81840)).
+-   `MediaEditor.ImageControls` is removed, and `renderFrame` drops `hasCanvas`. Both were added in the same unreleased cycle: the transform controls belong to the Crop panel, and `HistoryActions` already renders nothing when a panel covers the canvas, so a frame gating on it repeated that check from the outside. The `scope` prop is removed too: it named an `@wordpress/interface` scope that persisted the panel's open state, which went with `ComplementaryArea` ([#81840](https://github.com/WordPress/gutenberg/pull/81840)).
 -   Expose the header, history (reset/undo/redo), save (cancel/save) and image control clusters as `MediaEditor` sub-components, so each frame imports and arranges them to suit its own chrome. `renderFrame` now passes data only: `footerActions` is gone, `footerLayout` is now `layout`, and `isImage` is new. `showCloseButton` moves from `MediaEditor` to `MediaEditor.HeaderActions` ([#81563](https://github.com/WordPress/gutenberg/pull/81563)).
 
 ### Bug Fixes

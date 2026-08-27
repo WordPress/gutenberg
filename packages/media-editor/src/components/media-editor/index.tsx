@@ -109,17 +109,6 @@ export interface MediaEditorProps {
 	noticesClassName?: string;
 	noticesPortalElement?: Element | null;
 	shouldCloseOnEsc?: boolean;
-	/**
-	 * Formerly the `@wordpress/interface` scope for the details sidebar, which
-	 * persisted the panel's open state per scope to user meta.
-	 *
-	 * The sidebar no longer uses `ComplementaryArea`, so nothing reads this.
-	 * The panel now opens or closes based on width alone and is not remembered
-	 * between openings. Still accepted so callers that pass it keep compiling.
-	 *
-	 * @deprecated
-	 */
-	scope?: string;
 }
 
 interface MediaEditorSidebarProps {
