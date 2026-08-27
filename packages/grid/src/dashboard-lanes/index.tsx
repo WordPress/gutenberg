@@ -7,7 +7,6 @@ import {
 	useSensors,
 } from '@dnd-kit/core';
 import {
-	arrayMove,
 	SortableContext,
 	sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
@@ -26,6 +25,7 @@ import {
 } from '@wordpress/element';
 import { LanesItem } from './lanes-item';
 import { useLanePlacement } from './use-lane-placement';
+import { arrayMoveWithPinned } from '../shared/array-move-with-pinned';
 import { GridOverlay } from '../shared/grid-overlay';
 import { gridSpanToPixelSize } from '../shared/resize-snap';
 import layoutAnimationStyles from '../shared/layout-shift-animation.module.css';
@@ -44,7 +44,7 @@ import styles from './lanes.module.css';
 
 const dashboardDragDropAnimation = createDashboardDragDropAnimation(
 	styles[ 'drag-preview-frame' ],
-	styles.dragPreviewFrameExiting
+	styles[ 'is-exiting' ]
 );
 
 // Fallback gap in pixels for math that runs before the computed gap
@@ -366,7 +366,19 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 				return;
 			}
 
-			const updatedItems = arrayMove( items, currentIndex, newIndex );
+			// Non-draggable items are pinned: they hold their index while
+			// the others reorder around them.
+			const updatedItems = arrayMoveWithPinned(
+				items,
+				currentIndex,
+				newIndex,
+				( key ) => layoutMap.get( key )?.draggable === false
+			);
+			if (
+				updatedItems.every( ( key, index ) => key === items[ index ] )
+			) {
+				return;
+			}
 			// Build a key→index lookup so the .map below is O(n)
 			// instead of O(n²) from per-item `indexOf` calls.
 			const orderByKey = new Map< string, number >();
@@ -577,6 +589,12 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 										itemStyles.get( id ) ?? {}
 									}
 									disabled={ ! editMode }
+									draggable={
+										layoutMap.get( id )?.draggable !== false
+									}
+									resizable={
+										layoutMap.get( id )?.resizable !== false
+									}
 									interacting={ interacting }
 									dragging={ activeId !== null }
 									onResize={ handleResize }
