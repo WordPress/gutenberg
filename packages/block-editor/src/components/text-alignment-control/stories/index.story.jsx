@@ -3,6 +3,7 @@ import TextAlignmentControl from '../';
 
 const meta = {
 	title: 'BlockEditor/TextAlignmentControl',
+	id: 'blockeditor-textalignmentcontrol',
 	component: TextAlignmentControl,
 	tags: [ 'status-private' ],
 	parameters: {

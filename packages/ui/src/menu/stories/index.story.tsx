@@ -17,6 +17,7 @@ import * as Menu from '../';
 
 const meta: Meta< typeof Menu.Root > = {
 	title: 'Design System/Components/Menu',
+	id: 'design-system-components-menu',
 	component: Menu.Root,
 	subcomponents: {
 		'Menu.Trigger': Menu.Trigger,

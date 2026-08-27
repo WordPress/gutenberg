@@ -12,6 +12,7 @@ import { UPLOAD_DONE, UPLOAD_SPINNER } from '../index';
  */
 const meta: Meta< typeof Snackbar > = {
 	title: 'Editor/UploadProgressSnackbar',
+	id: 'editor-uploadprogresssnackbar',
 	component: Snackbar,
 	parameters: {
 		docs: { canvas: { sourceState: 'shown' } },

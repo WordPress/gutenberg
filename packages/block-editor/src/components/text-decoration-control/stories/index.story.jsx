@@ -3,6 +3,7 @@ import TextDecorationControl from '../';
 
 const meta = {
 	title: 'BlockEditor/TextDecorationControl',
+	id: 'blockeditor-textdecorationcontrol',
 	component: TextDecorationControl,
 	parameters: {
 		docs: {

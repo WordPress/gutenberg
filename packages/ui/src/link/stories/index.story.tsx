@@ -5,6 +5,7 @@ import { Text } from '../../text';
 
 const meta: Meta< typeof Link > = {
 	title: 'Design System/Components/Link',
+	id: 'design-system-components-link',
 	component: Link,
 	tags: [ 'manifest' ],
 	parameters: {

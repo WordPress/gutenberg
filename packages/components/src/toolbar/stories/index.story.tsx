@@ -28,6 +28,7 @@ import DropdownMenu from '../../dropdown-menu';
 
 const meta: Meta< typeof Toolbar > = {
 	title: 'Components/Toolbar',
+	id: 'components-toolbar',
 	component: Toolbar,
 	subcomponents: {
 		ToolbarButton,

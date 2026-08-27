@@ -8,6 +8,7 @@ import { formDecorator } from '../../../stories/shared';
 
 const meta: Meta< typeof ValidatedInputControl > = {
 	title: 'Design System/Components/Form/With Validation/ValidatedInputControl',
+	id: 'design-system-components-form-with-validation-validatedinputcontrol',
 	component: ValidatedInputControl,
 	argTypes: {
 		customValidity: { control: false },

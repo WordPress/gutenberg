@@ -4,6 +4,7 @@ import { Spinner } from '../index';
 const meta: Meta< typeof Spinner > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/Spinner',
+	id: 'design-system-components-spinner',
 	component: Spinner,
 	// Temporary: Due to an upstream bug, render the root explicitly so the
 	// components manifest extractor can resolve props from the JSX.

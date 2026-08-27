@@ -5,6 +5,7 @@ import * as Collapsible from '../index';
 const meta: Meta< typeof Collapsible.Root > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/Collapsible',
+	id: 'design-system-components-collapsible',
 	component: Collapsible.Root,
 	subcomponents: {
 		'Collapsible.Trigger': Collapsible.Trigger,

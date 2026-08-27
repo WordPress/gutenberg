@@ -7,6 +7,7 @@ import * as icons from '../../';
 const meta = {
 	component: Icon,
 	title: 'Icons/Icon',
+	id: 'icons-icon',
 	parameters: {
 		controls: { hideNoControlsWarning: true },
 	},

@@ -6,6 +6,7 @@ import * as Card from '../index';
 const meta: Meta< typeof Card.Root > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/Card',
+	id: 'design-system-components-card',
 	component: Card.Root,
 	subcomponents: {
 		'Card.Header': Card.Header,

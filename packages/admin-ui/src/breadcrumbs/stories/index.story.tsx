@@ -5,6 +5,7 @@ import { withRouter } from '../../stories/with-router';
 const meta: Meta< typeof Breadcrumbs > = {
 	component: Breadcrumbs,
 	title: 'Admin UI/Breadcrumbs',
+	id: 'admin-ui-breadcrumbs',
 	decorators: [ withRouter ],
 };
 

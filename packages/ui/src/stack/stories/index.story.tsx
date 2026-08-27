@@ -4,6 +4,7 @@ import { Stack } from '../index';
 const meta: Meta< typeof Stack > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/Stack',
+	id: 'design-system-components-stack',
 	component: Stack,
 	parameters: {
 		componentStatus: {

@@ -7,6 +7,7 @@ import AspectRatioTool from '../aspect-ratio-tool';
 
 export default {
 	title: 'BlockEditor/DimensionsTool/AspectRatioTool',
+	id: 'blockeditor-dimensionstool-aspectratiotool',
 	component: AspectRatioTool,
 	tags: [ 'status-private' ],
 	argTypes: {

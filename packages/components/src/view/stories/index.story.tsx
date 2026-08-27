@@ -4,6 +4,7 @@ import { View } from '..';
 const meta: Meta< typeof View > = {
 	component: View,
 	title: 'Components/View',
+	id: 'components-view',
 	argTypes: {
 		as: { control: false },
 		children: { control: { type: 'text' } },

@@ -13,6 +13,7 @@ import type {
 
 const meta: Meta< typeof DashboardGrid > = {
 	title: 'Grid/DashboardGrid',
+	id: 'grid-dashboardgrid',
 	component: DashboardGrid,
 	tags: [ 'status-experimental' ],
 	args: {

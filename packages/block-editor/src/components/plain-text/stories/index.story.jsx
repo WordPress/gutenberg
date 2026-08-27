@@ -3,6 +3,7 @@ import PlainText from '..';
 
 const meta = {
 	title: 'BlockEditor/PlainText',
+	id: 'blockeditor-plaintext',
 	component: PlainText,
 	parameters: {
 		// FIXME: Story renders PlainText without a label (label).

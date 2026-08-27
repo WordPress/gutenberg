@@ -13,6 +13,7 @@ import { VisuallyHidden } from '../../visually-hidden';
 
 const meta: Meta = {
 	title: 'Design System/Components/Tooltip/Usage Guidelines',
+	id: 'design-system-components-tooltip-usage-guidelines',
 	parameters: {
 		controls: { disable: true },
 	},

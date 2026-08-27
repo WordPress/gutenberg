@@ -3,6 +3,7 @@ import * as Select from '../';
 
 const meta: Meta< typeof Select.Root > = {
 	title: 'Design System/Components/Form/Primitives/Select',
+	id: 'design-system-components-form-primitives-select',
 	component: Select.Root,
 	subcomponents: {
 		'Select.Trigger': Select.Trigger,

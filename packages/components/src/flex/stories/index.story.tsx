@@ -5,6 +5,7 @@ import { View } from '../../view';
 const meta: Meta< typeof Flex > = {
 	component: Flex,
 	title: 'Components/Flex',
+	id: 'components-flex',
 	subcomponents: { FlexBlock, FlexItem },
 	argTypes: {
 		align: { control: { type: 'text' } },

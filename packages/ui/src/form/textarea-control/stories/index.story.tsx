@@ -8,6 +8,7 @@ import {
 const meta: Meta< typeof TextareaControl > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/TextareaControl',
+	id: 'design-system-components-form-textareacontrol',
 	component: TextareaControl,
 	// Temporary: Due to an upstream bug, render the root explicitly so the
 	// components manifest extractor can resolve props from the JSX.

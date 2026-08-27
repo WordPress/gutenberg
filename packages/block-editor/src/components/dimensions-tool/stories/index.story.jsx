@@ -7,6 +7,7 @@ import DimensionsTool from '..';
 
 export default {
 	title: 'BlockEditor/DimensionsTool/DimensionsTool',
+	id: 'blockeditor-dimensionstool-dimensionstool',
 	component: DimensionsTool,
 	tags: [ 'status-private' ],
 	argTypes: {

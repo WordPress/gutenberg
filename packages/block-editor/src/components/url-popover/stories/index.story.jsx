@@ -6,6 +6,7 @@ import URLPopover from '../';
 
 const meta = {
 	title: 'BlockEditor/URLPopover',
+	id: 'blockeditor-urlpopover',
 	component: URLPopover,
 	parameters: {
 		// FIXME: Story uses a raw unstyled input whose placeholder fails color-contrast.

@@ -4,6 +4,7 @@ import DimensionControl from '../';
 export default {
 	component: DimensionControl,
 	title: 'BlockEditor/DimensionControl',
+	id: 'blockeditor-dimensioncontrol',
 };
 
 const Template = ( props ) => {

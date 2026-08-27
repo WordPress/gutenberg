@@ -3,6 +3,7 @@ import * as Notice from '../index';
 
 const meta: Meta< typeof Notice.Root > = {
 	title: 'Design System/Components/Notice',
+	id: 'design-system-components-notice',
 	component: Notice.Root,
 	subcomponents: {
 		'Notice.Title': Notice.Title,
