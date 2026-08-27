@@ -11,10 +11,13 @@ import { useView, useViewConfig } from '@wordpress/views';
 import AddNewTemplate from '../add-new-template-legacy';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
-import { useEditPostAction } from '../dataviews-actions';
+import {
+	useEditPostAction,
+	useSiteEditorPostActions,
+} from '../dataviews-actions';
 import { previewField } from './fields';
 
-const { usePostActions, usePostFields } = unlock( editorPrivateApis );
+const { usePostFields } = unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
 
@@ -88,7 +91,7 @@ export default function PageTemplates() {
 		return filterSortAndPaginate( records, view, fields );
 	}, [ records, view, fields ] );
 
-	const postTypeActions = usePostActions( {
+	const postTypeActions = useSiteEditorPostActions( {
 		postType: TEMPLATE_POST_TYPE,
 		context: 'list',
 	} );

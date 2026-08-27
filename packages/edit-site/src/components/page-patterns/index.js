@@ -18,12 +18,15 @@ import usePatternSettings from './use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 import usePatterns, { useAugmentPatternsWithPermissions } from './use-patterns';
 import PatternsActions from './actions';
-import { useEditPostAction } from '../dataviews-actions';
+import {
+	useEditPostAction,
+	useSiteEditorPostActions,
+} from '../dataviews-actions';
 import { previewField } from './fields';
 import usePatternCategories from '../sidebar-navigation-screen-patterns/use-pattern-categories';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
-const { usePostActions, usePostFields } = unlock( editorPrivateApis );
+const { usePostFields } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
@@ -114,11 +117,11 @@ export default function DataviewsPatterns() {
 
 	const dataWithPermissions = useAugmentPatternsWithPermissions( data );
 
-	const templatePartActions = usePostActions( {
+	const templatePartActions = useSiteEditorPostActions( {
 		postType: TEMPLATE_PART_POST_TYPE,
 		context: 'list',
 	} );
-	const patternActions = usePostActions( {
+	const patternActions = useSiteEditorPostActions( {
 		postType: PATTERN_TYPES.user,
 		context: 'list',
 	} );

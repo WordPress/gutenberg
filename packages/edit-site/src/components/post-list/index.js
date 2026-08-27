@@ -24,11 +24,12 @@ import { unlock } from '../../lock-unlock';
 import {
 	useEditPostAction,
 	useQuickEditPostAction,
+	useSiteEditorPostActions,
 } from '../dataviews-actions';
 import useNotesCount from './use-notes-count';
 import { QuickEditModal } from './quick-edit-modal';
 
-const { usePostActions, usePostFields } = unlock( editorPrivateApis );
+const { usePostFields } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const EMPTY_ARRAY = [];
@@ -235,7 +236,7 @@ export default function PostList( { postType } ) {
 		[ postType ]
 	);
 
-	const postTypeActions = usePostActions( {
+	const postTypeActions = useSiteEditorPostActions( {
 		postType,
 		context: 'list',
 	} );
