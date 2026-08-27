@@ -4,7 +4,7 @@ This directory tests Gutenberg's AI-assisted development workflows for effective
 
 ## Overview
 
-The standalone `evals/` package uses [Promptfoo](https://www.promptfoo.dev/docs/) to run coding agents against an isolated temporary repository.
+This directory is a standalone `@wordpress/agent-skill-evals` package. It uses [Promptfoo](https://www.promptfoo.dev/docs/) to run coding agents against an isolated temporary repository.
 
 ## How it works
 
@@ -78,7 +78,7 @@ An agent's response is its account of what it did, not what it did. Promptfoo's 
 
 So the harness reads them. `lib/diff.js` is a Promptfoo transform that stages the workspace and appends `git status` and the diff to the response before any assertion runs. Rubrics then judge that diff, and are told to prefer it wherever it contradicts the agent's summary.
 
-Taking the diff here rather than having a grading agent go and find it matters for two reasons. A model-graded assertion defers grading onto a queue, so a grader inspecting the workspace itself would be racing the `afterEach` rollback for the state it is judging. And running Git from the harness keeps it out of the sandbox, where it would need tool permissions and a readable global config.
+Taking the diff here rather than having a grading agent go and find it matters for two reasons. A model-graded assertion defers grading onto a queue, and a grader that inspects the workspace itself is then correct only because Promptfoo happens to run that queue before the `afterEach` rollback — an ordering nothing documents, and the first thing that would break on raising `maxConcurrency`. A transform runs before any assertion is graded or queued, so it depends on no such ordering. And running Git from the harness keeps it out of the sandbox, where it would need tool permissions and a readable global config.
 
 Judgement that the diff alone cannot support — whether a change follows the repository's own references — stays with `agent-rubric`, which Promptfoo documents for exactly this: verifying a claimed code change against the artifact rather than the response.
 

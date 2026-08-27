@@ -24,7 +24,7 @@ const minimalEnvironment = Object.fromEntries(
 );
 
 /**
- * The environment both agents run with.
+ * The environment the evaluated agent runs with.
  */
 export const agentEnvironment = {
 	...minimalEnvironment,
@@ -35,9 +35,9 @@ export const agentEnvironment = {
 	DOCKER_HOST: 'unix:///nonexistent/docker.sock',
 
 	// Git reads the global config on every invocation, and it lives in the home
-	// directory, which both agents are denied. Without this every `git` command
-	// in the workspace fails with `Operation not permitted` — including the
-	// status and diff the grading agent inspects. Pointing it at an empty file
-	// also keeps the developer's identity and aliases out of the workspace.
+	// directory, which the sandbox denies. Without this every `git` command in
+	// the workspace fails with `Operation not permitted`, and the agent is
+	// expected to inspect history. Pointing it at an empty file also keeps the
+	// developer's identity and aliases out of the workspace.
 	GIT_CONFIG_GLOBAL: '/dev/null',
 };

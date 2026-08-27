@@ -1,5 +1,9 @@
 /**
- * The confinement both agents run under.
+ * The confinement the evaluated agent runs under.
+ *
+ * This is for the agent under test, which holds Bash and file-editing tools.
+ * The grading agent needs none of it: with read-only tools and no shell, the
+ * SDK's own working-directory check confines it. See `default-test.js`.
  *
  * Two layers, because neither one covers the other's ground. Promptfoo passes
  * both straight through to the Claude Agent SDK without interpreting them, so

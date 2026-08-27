@@ -25,10 +25,10 @@ environment.`,
 		// confined without a sandbox — the sandbox only wraps Bash, and a
 		// grader with no Bash has nothing for it to wrap.
 		//
-		// That also makes the transform above load-bearing rather than
-		// redundant: with no shell the grader cannot run `git diff` itself, so
-		// the transform shows it what changed and its read-only tools let it
-		// check that against the repository's own references.
+		// Having no shell is also why the transform above matters: the grader
+		// cannot run `git diff` for itself, so the transform shows it what
+		// changed, and its read-only tools let it check that against the
+		// repository's own references.
 		provider: {
 			id: 'anthropic:claude-agent-sdk',
 			config: {

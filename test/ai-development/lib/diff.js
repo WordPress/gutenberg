@@ -7,14 +7,14 @@
  * file-level verification means reading the files after the eval. This is that
  * read, at the one moment it is safe to take.
  *
- * Promptfoo applies a transform in `transformRunEvalResponse`, immediately
- * after the provider returns and before any assertion is graded or queued. That
- * matters: a model-graded assertion defers grading onto a queue, so a grader
- * that inspected the workspace itself would be racing the `afterEach` rollback
- * for the state it is judging. Reading here cannot race anything.
+ * The timing is the point. Promptfoo applies a transform in
+ * `transformRunEvalResponse`, immediately after the provider returns and before
+ * any assertion is graded or queued — so this reads the workspace while it
+ * still holds the agent's work, whatever a model-graded assertion later does
+ * with its grading queue, and whenever `afterEach` rolls the workspace back.
  *
- * It also takes git out of the sandbox. Run from the harness rather than by an
- * agent, it needs no tool permissions and no readable global config.
+ * Running git here rather than inside an agent also keeps it out of the
+ * sandbox, where it would need tool permissions and a readable global config.
  *
  * @see https://www.promptfoo.dev/docs/guides/evaluate-coding-agents/
  */

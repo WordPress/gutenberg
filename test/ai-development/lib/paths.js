@@ -15,11 +15,11 @@ import { fileURLToPath } from 'node:url';
 
 const libraryDirectory = path.dirname( fileURLToPath( import.meta.url ) );
 
-// Both agents are denied the home directory, and `realpath` because a rule has
-// to name the path the operating system resolves to, not a symlink to it.
+// Denied to the evaluated agent, and `realpath` because a rule has to name the
+// path the operating system resolves to, not a symlink to it.
 export const homeDirectory = fs.realpathSync( os.homedir() );
 
-/** The checkout under evaluation. Denied to both agents: it is the answer key. */
+/** The checkout under evaluation. Denied to the agent: it is the answer key. */
 export const sourceRoot = path.resolve( libraryDirectory, '../../..' );
 
 /**

@@ -68,7 +68,8 @@ export default {
 					'Task',
 					'Skill',
 				],
-				// We want to limit the test to only accessing the repo.
+				// The sandbox's empty domain list only covers Bash and what it
+				// starts; these two reach the network on their own.
 				disallowed_tools: [ 'WebFetch', 'WebSearch' ],
 				sandbox,
 				settings: { permissions },
