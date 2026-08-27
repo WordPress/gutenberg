@@ -1138,6 +1138,33 @@ describe( 'diffRevisionContent', () => {
 			] );
 		} );
 
+		it( 'merges adjacent changed words into single del/ins pairs', () => {
+			const previous = serialize( [
+				createBlock( 'core/paragraph', {
+					content: 'one two three',
+				} ),
+			] );
+			const current = serialize( [
+				createBlock( 'core/paragraph', {
+					content: 'alpha beta gamma',
+				} ),
+			] );
+			const blocks = diffRevisionContent( current, previous );
+
+			expect( normalizeBlockTree( blocks ) ).toMatchObject( [
+				{
+					name: 'core/paragraph',
+					attributes: {
+						content:
+							'<del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">one two three</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">alpha beta gamma</ins>',
+						__revisionDiffStatus: {
+							status: 'modified',
+						},
+					},
+				},
+			] );
+		} );
+
 		it( 'detects changed link text as modification', () => {
 			const previous = serialize( [
 				createBlock( 'core/paragraph', {
@@ -1154,12 +1181,13 @@ describe( 'diffRevisionContent', () => {
 			const blocks = diffRevisionContent( current, previous );
 
 			// Word-level diff: "our site" changed to "the website" within link.
+			// Adjacent changed words are merged into a single del/ins pair.
 			expect( normalizeBlockTree( blocks ) ).toMatchObject( [
 				{
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'Visit <a href="https://example.com"><del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">our</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">the</ins> <del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">site</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">website</ins></a> today',
+							'Visit <a href="https://example.com"><del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">our site</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">the website</ins></a> today',
 						__revisionDiffStatus: {
 							status: 'modified',
 						},
@@ -1322,7 +1350,7 @@ describe( 'diffRevisionContent', () => {
 							name: 'core/paragraph',
 							attributes: {
 								content:
-									'<del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">Hello</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">Goodbye</ins> <strong><del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">world</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">everyone</ins></strong>',
+									'<del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">Hello <strong>world</strong></del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">Goodbye <strong>everyone</strong></ins>',
 								__revisionDiffStatus: {
 									status: 'modified',
 								},
