@@ -2,9 +2,11 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	getDefaultRenderingMode,
+	getNotesPostId,
 	getPostBlocksByName,
 	isCollaborationEnabledForCurrentPost,
 } from '../private-selectors';
+import { getCurrentPost } from '../selectors';
 import { lock } from '../../lock-unlock';
 
 describe( 'getPostBlocksByName', () => {
@@ -244,5 +246,105 @@ describe( 'getDefaultRenderingMode', () => {
 				'post-only'
 			);
 		} );
+	} );
+} );
+
+describe( 'getNotesPostId', () => {
+	function setupRegistry( record ) {
+		getCurrentPost.registry = {
+			select: ( store ) => {
+				if ( store === coreStore ) {
+					return {
+						getRawEntityRecord: () => record,
+					};
+				}
+			},
+		};
+	}
+
+	it( 'returns the current post ID for a regular post', () => {
+		setupRegistry( {} );
+
+		expect( getNotesPostId( { postType: 'post', postId: 123 } ) ).toBe(
+			123
+		);
+	} );
+
+	it( 'returns the current post ID for a page', () => {
+		setupRegistry( {} );
+
+		expect( getNotesPostId( { postType: 'page', postId: 45 } ) ).toBe( 45 );
+	} );
+
+	it( 'returns the numeric ID for a template served by the posts controller', () => {
+		// Under the template activation experiment templates have numeric IDs.
+		setupRegistry( {} );
+
+		expect(
+			getNotesPostId( { postType: 'wp_template', postId: 678 } )
+		).toBe( 678 );
+	} );
+
+	it( 'resolves wp_id for a saved template with a string record ID', () => {
+		setupRegistry( { wp_id: 910 } );
+
+		expect(
+			getNotesPostId( {
+				postType: 'wp_template',
+				postId: 'twentytwentyfive//archive',
+			} )
+		).toBe( 910 );
+	} );
+
+	it( 'resolves wp_id for a saved template part', () => {
+		setupRegistry( { wp_id: 112 } );
+
+		expect(
+			getNotesPostId( {
+				postType: 'wp_template_part',
+				postId: 'twentytwentyfive//header',
+			} )
+		).toBe( 112 );
+	} );
+
+	it( 'returns undefined for a pristine theme template whose wp_id is 0', () => {
+		setupRegistry( { wp_id: 0 } );
+
+		expect(
+			getNotesPostId( {
+				postType: 'wp_template',
+				postId: 'twentytwentyfive//archive',
+			} )
+		).toBeUndefined();
+	} );
+
+	it( 'returns undefined for a template record with no wp_id', () => {
+		setupRegistry( {} );
+
+		expect(
+			getNotesPostId( {
+				postType: 'wp_template',
+				postId: 'twentytwentyfive//archive',
+			} )
+		).toBeUndefined();
+	} );
+
+	it( 'returns undefined for a string post ID on other post types', () => {
+		setupRegistry( { wp_id: 5 } );
+
+		expect(
+			getNotesPostId( {
+				postType: 'wp_navigation',
+				postId: 'some//slug',
+			} )
+		).toBeUndefined();
+	} );
+
+	it( 'returns undefined when the post has not been saved yet', () => {
+		setupRegistry( {} );
+
+		expect(
+			getNotesPostId( { postType: 'post', postId: null } )
+		).toBeUndefined();
 	} );
 } );

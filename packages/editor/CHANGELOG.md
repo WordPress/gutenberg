@@ -27,6 +27,7 @@
 
 ### Enhancements
 
+-   Notes: Enable notes on saved templates and template parts in the site editor, resolving the note's target post from the template record's `wp_id` ([#72918](https://github.com/WordPress/gutenberg/issues/72918)).
 -   Commands: Add a command palette entry that opens the current post on the front end once it is published, labelled with the post type's `view_item` label ([#66720](https://github.com/WordPress/gutenberg/pull/66720)).
 -   Pre-publish panel: Remove the "Visibility" and "Publish" headings that repeated the title of the panel containing them. The publish date's reset action, which lived in the removed header, becomes a "Reset" button below the date picker, disabled but still focusable while the post is set to publish immediately ([#81806](https://github.com/WordPress/gutenberg/pull/81806)).
 
