@@ -5,6 +5,7 @@ import type {
 	ReactNode,
 	RefAttributes,
 } from 'react';
+import { claimInstance } from '../instance-guard';
 
 /**
  * Host link capability: recognition of the host's own routes plus the
@@ -44,6 +45,8 @@ export interface WidgetHost {
 }
 
 const WidgetHostContext = createContext< WidgetHost >( {} );
+
+claimInstance();
 
 type WidgetHostProviderProps = {
 	/**

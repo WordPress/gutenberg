@@ -22,6 +22,14 @@ language features and APIs, you should include [the polyfill shipped in
 `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill)
 in your code._
 
+### One instance per application
+
+The package keeps state at module scope: the host capabilities context and the field type and icon registries. Two instances of the package in one application split them: a provider or a registration in one instance never reaches consumers in the other, and nothing errors. Resolve the package once. One installed version still yields two instances when part of the application loads the CommonJS build through `require` and the rest imports the ES module build.
+
+On a WordPress page, code built with `@wordpress/build` imports it as a script module through the import map, so one instance is guaranteed. A widget bundled with another tool must externalize it: with `@wordpress/scripts`, a [`requestToExternalModule`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/dependency-extraction-webpack-plugin#requesttoexternalmodule) option that returns `true` for `@wordpress/widget-primitives`, the script module ID being the package name; with other bundlers, mark the package as external and let the import map resolve it. On npm, packages that build on this one, such as `@wordpress/widget-dashboard`, declare it as a peer dependency, so the application's copy is the only one.
+
+A second instance logs a console warning when both instances are development builds; a production build neither checks nor leaves the mark. A test runner that reloads modules re-evaluates the package and logs the same warning.
+
 ## Setup
 
 This package ships no stylesheets; there is nothing to enqueue or import.

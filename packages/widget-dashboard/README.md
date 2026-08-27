@@ -21,6 +21,10 @@ Install the module:
 npm install @wordpress/widget-dashboard --save
 ```
 
+`@wordpress/widget-primitives` is a peer dependency: install it alongside. It has to resolve once per application; see [its README](https://github.com/WordPress/gutenberg/tree/HEAD/packages/widget-primitives#one-instance-per-application).
+
+The floor of that range is the `@wordpress/widget-primitives` version that introduced the newest API this package uses; a change that adopts a newer API raises the floor with it. The ceiling widens when `@wordpress/widget-primitives` reaches `1.0.0`.
+
 _This package assumes that your code will run in an **ES2015+** environment.
 If you're using an environment that has limited or no support for such
 language features and APIs, you should include [the polyfill shipped in

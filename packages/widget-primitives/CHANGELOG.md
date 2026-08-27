@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Warn in development when a second instance of the package evaluates:
+    the host context and the registries live at module scope, so two
+    instances split providers and registrations from their consumers
+    ([#82076](https://github.com/WordPress/gutenberg/pull/82076)).
+
 ## 0.6.0 (2026-08-26)
 
 ### New Features
