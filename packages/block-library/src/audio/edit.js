@@ -177,7 +177,7 @@ function AudioEdit( {
 					dropdownMenuProps={ dropdownMenuProps }
 				>
 					<Stack className="wp-block-audio__autoplay-help-text-wrapper">
-						<Text className="wp-block-audio__autoplay-help-text">
+						<Text>
 							{ __(
 								'Most browsers block audio until a visitor interacts with the page, so autoplay often won’t work, especially on mobile. Unexpected sound can also be disruptive for screen reader users.'
 							) }
