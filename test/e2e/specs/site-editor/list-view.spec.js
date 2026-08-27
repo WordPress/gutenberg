@@ -21,11 +21,7 @@ test.describe( 'Site Editor List View', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	// v2 gap: opening the list view from the `showListViewByDefault`
-	// preference is implemented by `edit-site`'s `useAdaptEditorToCanvas`,
-	// not by the `editor` package, so the extensible site editor does not
-	// honor the preference yet.
-	test( 'should open by default when preference is enabled @site-editor-v1-only', async ( {
+	test( 'should open by default when preference is enabled', async ( {
 		page,
 		editor,
 	} ) => {
