@@ -14,7 +14,7 @@ describe( 'source file discovery', () => {
 		}
 	} );
 
-	it( 'discovers every supported source extension', async () => {
+	it( 'returns a glob that expands to every supported source extension', async () => {
 		temporaryDirectory = mkdtempSync(
 			path.join( os.tmpdir(), 'wordpress-build-source-files-' )
 		);

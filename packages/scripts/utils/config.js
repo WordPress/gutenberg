@@ -154,7 +154,7 @@ const getWebpackArgs = () => {
 	) {
 		/**
 		 * Converts a legacy path to the entry pair supported by webpack, e.g.:
-		 * `./entry-one.jsx` -> `[ 'entry-one', './entry-one.jsx] ]`
+		 * `./entry-one.jsx` -> `[ 'entry-one', './entry-one.jsx' ]`
 		 * `entry-two.tsx` -> `[ 'entry-two', './entry-two.tsx' ]`
 		 *
 		 * @param {string} path The path provided.

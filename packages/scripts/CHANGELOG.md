@@ -2,9 +2,13 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `build`: Strip JavaScript and TypeScript source extensions from legacy positional entry names so generated output uses names such as `index.js` instead of `index.tsx.js` or `index.jsx.js` ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
 ### Enhancements
 
--   Support JSX files in direct build entry naming and default unit-test lint configuration ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+-   Include `.jsx` unit tests in the default lint configuration ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
 
 ### Internal
 
