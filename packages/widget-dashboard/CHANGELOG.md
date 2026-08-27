@@ -6,6 +6,8 @@
 
 -   `@wordpress/widget-primitives` is a peer dependency: install it alongside, one instance per application ([#82076](https://github.com/WordPress/gutenberg/pull/82076)).
 
+## 0.6.0 (2026-08-26)
+
 ### New Features
 
 -   Widget chrome footer: `relevance: 'high'` actions mount as leading text
