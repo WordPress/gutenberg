@@ -16,9 +16,16 @@ import { store as noticesStore } from '@wordpress/notices';
 import { getScrollContainer } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
 import { RichTextData, create } from '@wordpress/rich-text';
 import { store as editorStore } from '../../store';
-import { FLOATING_NOTES_SIDEBAR } from './constants';
+import {
+	ALL_NOTES_SIDEBAR,
+	FLOATING_NOTES_SIDEBAR,
+	NOTES_LAST_SEEN_LIMIT,
+	NOTES_LAST_SEEN_PREFERENCE,
+	NOTES_LAST_SEEN_SCOPE,
+} from './constants';
 import { unlock } from '../../lock-unlock';
 import { createBoardStore } from './board-store';
 import { NOTE_FORMAT_NAME } from './format';
@@ -29,8 +36,11 @@ import {
 	getInlineMarkerStart,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
+	getLatestNoteActivity,
+	getUnseenNoteCount,
 	removeNoteFormat,
 	removeNoteIdFromMetadata,
+	setNotesLastSeen,
 } from './utils';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
@@ -167,6 +177,115 @@ export function useNoteThreads( postId ) {
 		notes,
 		unresolvedNotes,
 	};
+}
+
+/**
+ * Counts the note threads carrying activity the current user has not seen, and
+ * marks the post's notes as seen while the "All notes" sidebar is open.
+ *
+ * Two things count as having looked. Opening the pinned "All notes" sidebar -
+ * the one the badge sits on - is the obvious one. Selecting a thread is the
+ * other, and it matters because of the floating notes panel: once no
+ * complementary area is active - the user closed the settings sidebar - it puts
+ * itself up and shows every unresolved thread. Someone can read all of them
+ * there without ever touching "All notes", and their badge would otherwise
+ * never clear. The panel being open cannot itself count, since nobody asked for
+ * it.
+ *
+ * Selecting a thread expands it - replies unfold, a clamped note can be opened
+ * with "Show more" - so it is the point where reading is demonstrated rather
+ * than assumed. Those finer expansions are deliberately not wired up as
+ * separate signals: they all imply a selection, and a post whose notes are
+ * short and reply-free offers nothing to expand at all, which would leave its
+ * badge stuck forever. A badge that never clears is worse than one that clears
+ * eagerly.
+ *
+ * The recorded timestamp is the newest `date_gmt` the user has actually been
+ * shown rather than the current time, which keeps the comparison immune to
+ * clock skew between the browser and the server.
+ *
+ * @param {Object}  options        Options.
+ * @param {?number} options.postId Post the notes belong to.
+ * @param {Array}   options.notes  Every note thread loaded for the post.
+ * @return {number} Number of threads with unseen activity.
+ */
+export function useUnseenNotes( { postId, notes } ) {
+	const { set: setPreference } = useDispatch( preferencesStore );
+
+	const { lastSeenByPost, currentUserId, isAllNotesOpen, hasSelectedNote } =
+		useSelect(
+			( select ) => ( {
+				lastSeenByPost: select( preferencesStore ).get(
+					NOTES_LAST_SEEN_SCOPE,
+					NOTES_LAST_SEEN_PREFERENCE
+				),
+				currentUserId: select( coreStore ).getCurrentUser()?.id,
+				isAllNotesOpen:
+					select( interfaceStore ).getActiveComplementaryArea(
+						'core'
+					) === ALL_NOTES_SIDEBAR,
+				/*
+				 * `getSelectedNote` also returns 'new' for the add-note form.
+				 * Authoring a note is not reading anyone else's, so only a real
+				 * thread id counts.
+				 */
+				hasSelectedNote:
+					typeof unlock( select( editorStore ) ).getSelectedNote() ===
+					'number',
+			} ),
+			[]
+		);
+
+	const lastSeen = postId ? lastSeenByPost?.[ postId ] : undefined;
+	const latestActivity = useMemo(
+		() => getLatestNoteActivity( notes ),
+		[ notes ]
+	);
+	/*
+	 * Resolving a thread is not activity worth badging, so only open threads
+	 * are eligible. This deliberately reads the full list rather than
+	 * `unresolvedNotes`, which drops threads whose block has been deleted -
+	 * those still need attention and still appear under "All notes".
+	 */
+	const openThreads = useMemo(
+		() => ( notes ?? [] ).filter( ( thread ) => thread.status === 'hold' ),
+		[ notes ]
+	);
+
+	const hasLooked = isAllNotesOpen || hasSelectedNote;
+
+	useEffect( () => {
+		if ( ! hasLooked || ! postId || ! latestActivity ) {
+			return;
+		}
+		// Already recorded, including for activity arriving while the sidebar
+		// stays open.
+		if ( lastSeen && lastSeen >= latestActivity ) {
+			return;
+		}
+		setPreference(
+			NOTES_LAST_SEEN_SCOPE,
+			NOTES_LAST_SEEN_PREFERENCE,
+			setNotesLastSeen(
+				lastSeenByPost,
+				postId,
+				latestActivity,
+				NOTES_LAST_SEEN_LIMIT
+			)
+		);
+	}, [
+		hasLooked,
+		postId,
+		latestActivity,
+		lastSeen,
+		lastSeenByPost,
+		setPreference,
+	] );
+
+	return useMemo(
+		() => getUnseenNoteCount( openThreads, lastSeen, currentUserId ),
+		[ openThreads, lastSeen, currentUserId ]
+	);
 }
 
 /**

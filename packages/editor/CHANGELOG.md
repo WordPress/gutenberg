@@ -27,6 +27,7 @@
 
 ### Enhancements
 
+-   Notes: Badge the "All notes" toolbar toggle with the number of unresolved note threads carrying activity you have not seen. Your own notes never count, opening the sidebar or selecting a thread clears the badge, and counts above 9 display as "9+" while assistive technology is given the exact number ([#81951](https://github.com/WordPress/gutenberg/pull/81951)).
 -   Commands: Add a command palette entry that opens the current post on the front end once it is published, labelled with the post type's `view_item` label ([#66720](https://github.com/WordPress/gutenberg/pull/66720)).
 -   Pre-publish panel: Remove the "Visibility" and "Publish" headings that repeated the title of the panel containing them. The publish date's reset action, which lived in the removed header, becomes a "Reset" button below the date picker, disabled but still focusable while the post is set to publish immediately ([#81806](https://github.com/WordPress/gutenberg/pull/81806)).
 
