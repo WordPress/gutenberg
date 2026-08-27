@@ -3447,7 +3447,7 @@
 	},
 	"packages/block-library/src/navigation/edit/overlay-template-part-selector.js": {
 		"@wordpress/use-recommended-components": {
-			"count": 4
+			"count": 3
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
