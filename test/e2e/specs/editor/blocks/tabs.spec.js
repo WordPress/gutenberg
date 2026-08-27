@@ -287,11 +287,9 @@ test.describe( 'Tabs', () => {
 		} );
 
 		test( 'keeps the content of inactive panels available to find-in-page', async ( {
-			admin,
 			editor,
 			page,
 		} ) => {
-			await admin.createNewPost();
 			await editor.insertBlock( {
 				name: 'core/tabs',
 				innerBlocks: [
