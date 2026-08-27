@@ -167,7 +167,12 @@ class MediaProcessingUtils {
 		const image = imageBlock.getByRole( 'img', {
 			name: 'This image has an empty alt attribute',
 		} );
-		await expect( image ).toBeVisible();
+		// For a format the browser cannot decode (JXL), the image block swaps
+		// the <img> for a spinner placeholder as soon as the temporary blob
+		// preview fails to load, so the <img> only reappears once the upload
+		// finishes and the blob URL is replaced by the uploaded one. Allow the
+		// same window as the src assertion below.
+		await expect( image ).toBeVisible( { timeout: 30_000 } );
 		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
 			timeout: 30_000,
 		} );
