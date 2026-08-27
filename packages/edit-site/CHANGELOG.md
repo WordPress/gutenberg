@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `SidebarNavigationItem`: Stop forcing `style={ { fill: 'currentcolor' } }` on the icon. The explicit override was clobbering stroke-based icons' intrinsic styling. Colour is inherited via CSS `color` and the icon's own declared fills/strokes. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+-   `AddNewTemplate`: Preserve the admin theme color on the Author template icon after it became stroke-based. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+
 ### Internal
 
 -   Remove the `showListViewByDefault` handling from `useAdaptEditorToCanvas`; the `editor` package now applies the preference on the preview ↔ edit transition itself.
@@ -17,7 +22,6 @@
 
 ### Bug Fixes
 
--   `SidebarNavigationItem`: Stop forcing `style={ { fill: 'currentcolor' } }` on the icon. The explicit override was clobbering stroke-based icons' intrinsic styling. Colour is inherited via CSS `color` and the icon's own declared fills/strokes. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 -   Seed the root `ThemeProvider` with the admin color scheme primary color so portaled popovers and modals receive the scheme's accent colors ([#81653](https://github.com/WordPress/gutenberg/pull/81653)).
 
 ### Enhancements
