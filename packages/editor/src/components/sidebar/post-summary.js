@@ -11,6 +11,7 @@ import PostFeaturedImagePanel from '../post-featured-image/panel';
 import PostFormatPanel from '../post-format/panel';
 import PostLastEditedPanel from '../post-last-edited-panel';
 import PostPanelSection from '../post-panel-section';
+import ReadingSettingsLink from '../reading-settings-link';
 import PostSchedulePanel from '../post-schedule/panel';
 import PostStatusPanel from '../post-status';
 import PostSyncStatus from '../post-sync-status';
@@ -59,6 +60,7 @@ export default function PostSummary( { onActionPerformed } ) {
 							/>
 							<PostFeaturedImagePanel withPanelBody={ false } />
 							<PostExcerptPanel />
+							<ReadingSettingsLink />
 							<Stack direction="column" gap="xs">
 								<PostContentInformation />
 								<PostLastEditedPanel />
