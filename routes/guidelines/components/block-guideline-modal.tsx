@@ -118,7 +118,7 @@ export default function BlockGuidelineModal( {
 
 	const canSubmit = selectedBlock && guidelineText.trim().length > 0;
 
-	let submitButtonLabel: string = __( 'Save guideline' );
+	let submitButtonLabel: string = __( 'Save' );
 	if ( isSaving ) {
 		submitButtonLabel = __( 'Saving…' );
 	}

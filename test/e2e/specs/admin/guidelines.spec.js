@@ -79,13 +79,82 @@ async function saveSectionGuidelines( page, title, text ) {
 	await expect( textarea ).toBeVisible();
 	await textarea.fill( text );
 
-	await card.getByRole( 'button', { name: 'Save guidelines' } ).click();
+	await card.getByRole( 'button', { name: 'Save', exact: true } ).click();
 
 	await expect(
 		page
 			.getByTestId( 'snackbar' )
 			.filter( { hasText: 'Guidelines saved.' } )
 	).toBeVisible();
+}
+
+const SEED_BLOCKS = [
+	'core/paragraph',
+	'core/heading',
+	'core/code',
+	'core/list',
+];
+
+// Block guideline rows use the slug `guideline-block-<name>`, with `/` encoded
+// as `_` (see blockSlug in the route's data layer).
+function blockGuidelineSlug( blockName ) {
+	return `guideline-block-${ blockName.replace( '/', '_' ) }`;
+}
+
+// Seed published block guideline rows via REST (test scaffolding). Each content
+// block that owns a row shows up as one row in the Blocks list.
+async function seedBlockGuidelines( requestUtils, blockNames ) {
+	for ( const name of blockNames ) {
+		await requestUtils.rest( {
+			path: KNOWLEDGE_REST_BASE,
+			method: 'POST',
+			data: {
+				slug: blockGuidelineSlug( name ),
+				title: name,
+				content: `Guidance for ${ name }.`,
+				status: 'publish',
+			},
+		} );
+	}
+}
+
+// Expand the Blocks section and wait for its list to render `count` rows.
+async function openBlocksSection( page, count ) {
+	const blocksCard = getSectionCard( page, 'Blocks' );
+	await blocksCard
+		.getByRole( 'button', { name: 'Blocks', exact: true } )
+		.click();
+	await expect( blocksCard.getByRole( 'row' ) ).toHaveCount( count );
+	return blocksCard;
+}
+
+// The block labels currently rendered in the list, in visual order.
+function blockRowLabels( blocksCard ) {
+	return blocksCard
+		.locator( '.dataviews-view-list__title-field' )
+		.allInnerTexts();
+}
+
+// The focusable list item of the row whose label matches.
+function blockRowItem( blocksCard, label ) {
+	return blocksCard
+		.getByRole( 'row' )
+		.filter( { hasText: label } )
+		.locator( '.dataviews-view-list__item' );
+}
+
+// Remove a block guideline through the row's actions menu, then confirm.
+async function removeBlockRow( page, blocksCard, label ) {
+	await blocksCard
+		.getByRole( 'row' )
+		.filter( { hasText: label } )
+		.getByRole( 'button', { name: 'Actions' } )
+		.click();
+	await page.getByRole( 'menuitem', { name: 'Remove' } ).click();
+	await page
+		.getByRole( 'dialog', { name: 'Remove block guideline' } )
+		.getByRole( 'button', { name: 'Remove', exact: true } )
+		.click();
 }
 
 test.describe( 'Guidelines', () => {
@@ -265,13 +334,13 @@ test.describe( 'Guidelines', () => {
 
 		const copyCard = getSectionCard( page, 'Copy' );
 		await copyCard
-			.getByRole( 'button', { name: 'Clear guidelines' } )
+			.getByRole( 'button', { name: 'Clear', exact: true } )
 			.click();
 
 		// Confirm the clear in the dialog.
 		await page
 			.getByRole( 'dialog' )
-			.getByRole( 'button', { name: 'Clear guidelines' } )
+			.getByRole( 'button', { name: 'Clear' } )
 			.click();
 
 		await expect(
@@ -299,7 +368,7 @@ test.describe( 'Guidelines', () => {
 			.getByRole( 'button', { name: 'Blocks', exact: true } )
 			.click();
 		await blocksCard
-			.getByRole( 'button', { name: 'Add guideline' } )
+			.getByRole( 'button', { name: 'Add', exact: true } )
 			.click();
 
 		const dialog = page.getByRole( 'dialog', { name: 'Add guideline' } );
@@ -316,7 +385,7 @@ test.describe( 'Guidelines', () => {
 		await dialog
 			.getByRole( 'textbox', { name: 'Guideline text' } )
 			.fill( 'Keep paragraphs short.' );
-		await dialog.getByRole( 'button', { name: 'Save guideline' } ).click();
+		await dialog.getByRole( 'button', { name: 'Save' } ).click();
 
 		await expect(
 			page
@@ -426,6 +495,125 @@ test.describe( 'Guidelines', () => {
 
 			// The Blocks section is gone: no card, no per-block UI.
 			await expect( getSectionCard( page, 'Blocks' ) ).toHaveCount( 0 );
+		} );
+	} );
+
+	test.describe( 'block guideline removal focus', () => {
+		test( 'removing a block guideline moves focus to the Add button', async ( {
+			page,
+			admin,
+			requestUtils,
+		} ) => {
+			await seedBlockGuidelines( requestUtils, SEED_BLOCKS );
+			await visitGuidelinesPage( page, admin );
+			const blocksCard = await openBlocksSection(
+				page,
+				SEED_BLOCKS.length
+			);
+
+			// Remove a row with others still present: focus lands on Add, not a
+			// neighbouring row (adjacent-row focus is deferred to DataViews).
+			const labels = await blockRowLabels( blocksCard );
+			await removeBlockRow( page, blocksCard, labels[ 1 ] );
+
+			await expect(
+				page
+					.getByTestId( 'snackbar' )
+					.filter( { hasText: 'Guideline removed.' } )
+			).toBeVisible();
+			await expect(
+				blocksCard.getByRole( 'button', { name: 'Add', exact: true } )
+			).toBeFocused();
+		} );
+
+		test( 'a failed removal keeps the row and does not move focus to Add guideline', async ( {
+			page,
+			admin,
+			requestUtils,
+		} ) => {
+			await seedBlockGuidelines( requestUtils, [
+				'core/paragraph',
+				'core/heading',
+			] );
+			await visitGuidelinesPage( page, admin );
+			const blocksCard = await openBlocksSection( page, 2 );
+
+			const [ target ] = await blockRowLabels( blocksCard );
+
+			await page.route(
+				( url ) =>
+					(
+						url.searchParams.get( 'rest_route' ) ?? url.pathname
+					).includes( '/wp/v2/knowledge/' ),
+				async ( route ) => {
+					const request = route.request();
+					const isDelete =
+						request.method() === 'DELETE' ||
+						request.headers()[ 'x-http-method-override' ] ===
+							'DELETE';
+					if ( isDelete ) {
+						await route.fulfill( {
+							status: 500,
+							contentType: 'application/json',
+							body: JSON.stringify( {
+								code: 'rest_cannot_delete',
+								message: 'Deletion failed.',
+							} ),
+						} );
+						return;
+					}
+					await route.continue();
+				}
+			);
+
+			await removeBlockRow( page, blocksCard, target );
+
+			await expect( blocksCard.getByText( /Error:/ ) ).toBeVisible();
+			await expect( blockRowItem( blocksCard, target ) ).toBeVisible();
+			await expect(
+				blocksCard.getByRole( 'button', { name: 'Add', exact: true } )
+			).not.toBeFocused();
+		} );
+
+		test( 'removing a block guideline from the edit modal moves focus to the Add button', async ( {
+			page,
+			admin,
+			requestUtils,
+		} ) => {
+			await seedBlockGuidelines( requestUtils, SEED_BLOCKS );
+			await visitGuidelinesPage( page, admin );
+			const blocksCard = await openBlocksSection(
+				page,
+				SEED_BLOCKS.length
+			);
+
+			const labels = await blockRowLabels( blocksCard );
+			const removed = labels[ 0 ];
+
+			// Open the edit modal from the row's actions menu, then remove.
+			await blocksCard
+				.getByRole( 'row' )
+				.filter( { hasText: removed } )
+				.getByRole( 'button', { name: 'Actions' } )
+				.click();
+			await page.getByRole( 'menuitem', { name: 'Edit' } ).click();
+			await page
+				.getByRole( 'dialog', { name: 'Edit guideline' } )
+				.getByRole( 'button', { name: 'Remove' } )
+				.click();
+			await page
+				.getByRole( 'dialog', { name: 'Remove block guideline' } )
+				.getByRole( 'button', { name: 'Remove', exact: true } )
+				.click();
+
+			await expect(
+				page
+					.getByTestId( 'snackbar' )
+					.filter( { hasText: 'Guideline removed.' } )
+			).toBeVisible();
+			await expect(
+				blocksCard.getByRole( 'button', { name: 'Add', exact: true } )
+			).toBeFocused();
 		} );
 	} );
 } );
