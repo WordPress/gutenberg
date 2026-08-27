@@ -10,7 +10,7 @@ import {
 } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
 import { setContentEditableWrapper } from './utils';
-import { getSelectionEditableElement } from '../../utils/dom';
+import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
 
 /**
  * Handles input for selections across blocks.
@@ -28,6 +28,10 @@ export default function useInput() {
 		getSelectionStart,
 		getSelectionEnd,
 		getBlockAttributes,
+		getNextBlockClientId,
+		getBlockOrder,
+		getBlockEditingMode,
+		getBlockListSettings,
 	} = useSelect( blockEditorStore );
 	const {
 		replaceBlocks,
@@ -36,6 +40,9 @@ export default function useInput() {
 		__unstableDeleteSelection,
 		__unstableExpandSelection,
 		__unstableMarkAutomaticChange,
+		insertAfterBlock,
+		insertBlock,
+		selectBlock,
 	} = useDispatch( blockEditorStore );
 
 	return useRefEffect( ( node ) => {
@@ -70,7 +77,7 @@ export default function useInput() {
 
 			if ( ! hasMultiSelection() ) {
 				if ( event.keyCode === ENTER ) {
-					if ( event.shiftKey || __unstableIsFullySelected() ) {
+					if ( event.shiftKey ) {
 						return;
 					}
 
@@ -111,26 +118,109 @@ export default function useInput() {
 						}
 					}
 
-					if (
-						! hasBlockSupport( blockName, 'splitting', false ) &&
-						! event.__deprecatedOnSplit
-					) {
-						return;
-					}
+					const rootClientId = getBlockRootClientId( clientId );
+					const { activeElement } = event.target.ownerDocument;
 
 					// Ensure template is not locked.
 					if (
-						canInsertBlockType(
+						! __unstableIsFullySelected() &&
+						( canInsertBlockType(
 							getDefaultBlockName(),
-							getBlockRootClientId( clientId )
+							rootClientId
 						) ||
-						canInsertBlockType(
-							blockName,
-							getBlockRootClientId( clientId )
-						)
+							canInsertBlockType( blockName, rootClientId ) ) &&
+						( hasBlockSupport( blockName, 'splitting', false ) ||
+							event.__deprecatedOnSplit )
 					) {
-						__unstableSplitSelection();
 						event.preventDefault();
+						__unstableSplitSelection();
+					} else if (
+						// Handle Enter only on the block wrapper itself or
+						// an editable element within the block, which may be
+						// nested within the wrapper (e.g. Site Title). Other
+						// focusable elements (an embed's URL field, an
+						// appender button) keep their native Enter behavior.
+						( activeElement.getAttribute( 'data-block' ) ===
+							clientId ||
+							activeElement.isContentEditable ) &&
+						getBlockClientId( activeElement ) === clientId
+					) {
+						// The default block depends on context: containers
+						// such as the gallery define their own default
+						// block, which is what insertAfterBlock inserts.
+						const { defaultBlock: directInsertBlock } =
+							( rootClientId &&
+								getBlockListSettings( rootClientId ) ) ||
+							{};
+
+						if (
+							canInsertBlockType(
+								directInsertBlock?.name ??
+									getDefaultBlockName(),
+								rootClientId
+							)
+						) {
+							event.preventDefault();
+							insertAfterBlock( clientId );
+						} else {
+							// Descend into an empty container by inserting
+							// its default block, the same block an appender
+							// or ghost would insert.
+							if ( ! getBlockOrder( clientId ).length ) {
+								const { defaultBlock } =
+									getBlockListSettings( clientId ) ?? {};
+								const name =
+									defaultBlock?.name ?? getDefaultBlockName();
+
+								if ( canInsertBlockType( name, clientId ) ) {
+									event.preventDefault();
+									insertBlock(
+										createBlock(
+											name,
+											defaultBlock?.attributes
+										),
+										0,
+										clientId
+									);
+									return;
+								}
+							}
+
+							function getNextClientId( id ) {
+								let nextClientId = null;
+
+								while (
+									typeof id === 'string' &&
+									! ( nextClientId =
+										getNextBlockClientId( id ) )
+								) {
+									id = getBlockRootClientId( id );
+								}
+
+								return nextClientId;
+							}
+
+							let nextClientId =
+								getBlockOrder( clientId )[ 0 ] ??
+								getNextClientId( clientId );
+
+							while (
+								nextClientId &&
+								getBlockEditingMode( nextClientId ) ===
+									'disabled'
+							) {
+								nextClientId = getNextClientId( nextClientId );
+							}
+
+							if ( nextClientId ) {
+								event.preventDefault();
+								// An initial position of `true` is an
+								// internal sentinel: it focuses the block
+								// wrapper instead of a text field within
+								// it. See useFocusFirstElement.
+								selectBlock( nextClientId, true );
+							}
+						}
 					}
 				}
 				return;
