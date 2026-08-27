@@ -1,7 +1,7 @@
 import { wrap, terminate, type Remote } from '@wordpress/worker-threads';
-import type { ItemId, VideoMetadata, TranscodeVideoOptions } from './types';
-import type { WorkerAPI } from './worker';
-import { workerCode } from './worker-code';
+import type { ItemId, VideoMetadata, TranscodeVideoOptions } from './types.ts';
+import type { WorkerAPI } from './worker.ts';
+import { workerCode } from './worker-code.ts';
 
 /**
  * The worker instance, lazily created on first use.

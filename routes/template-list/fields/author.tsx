@@ -12,7 +12,12 @@ function useAddedBy( type: string, id: any ) {
 	const { author, authorText } = useSelect(
 		( select ) => {
 			const { getUser, getEditedEntityRecord } = select( coreStore );
-			const _record = getEditedEntityRecord( 'postType', type, id );
+			/* Templates carry `author`/`author_text`, which the selector's
+			   entity record union does not know about. */
+			const _record = ( getEditedEntityRecord( 'postType', type, id ) ||
+				undefined ) as
+				| { author?: number; author_text?: string }
+				| undefined;
 			return {
 				author: _record?.author ? getUser( _record.author ) : null,
 				authorText: _record?.author_text,

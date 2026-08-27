@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useFocusReturn } from '@wordpress/compose';
 import {
@@ -140,6 +140,34 @@ describe( 'Menu', () => {
 		expect( triggerWithPayload ).toBeDefined();
 	} );
 
+	it( 'preserves the public imperative actions ref', async () => {
+		const user = userEvent.setup();
+		const actionsRef = createRef< {
+			close: () => void;
+			unmount: () => void;
+		} >();
+
+		render(
+			<Menu.Root actionsRef={ actionsRef }>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.Item>
+						<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+					</Menu.Item>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+		expect( await screen.findByRole( 'menu' ) ).toBeVisible();
+
+		act( () => actionsRef.current?.close() );
+
+		await waitFor( () => {
+			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+		} );
+	} );
+
 	it( 'closes when Escape is pressed', async () => {
 		const user = userEvent.setup();
 
@@ -165,6 +193,385 @@ describe( 'Menu', () => {
 		expect(
 			screen.getByRole( 'button', { name: 'Actions' } )
 		).toHaveFocus();
+	} );
+
+	it( 'closes a non-modal menu without consuming an iframe pointer interaction', async () => {
+		const user = userEvent.setup();
+		const onCanvasClick = jest.fn();
+
+		function ControlledMenuWithIframes() {
+			const [ open, setOpen ] = useState( false );
+
+			return (
+				<>
+					<Menu.Root
+						modal={ false }
+						onOpenChange={ setOpen }
+						open={ open }
+					>
+						<Menu.Trigger>Actions</Menu.Trigger>
+						<Menu.Popup>
+							<Menu.Item>
+								<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+							</Menu.Item>
+						</Menu.Popup>
+					</Menu.Root>
+					<iframe title="Secondary canvas" />
+					<iframe title="Editor canvas" />
+				</>
+			);
+		}
+
+		render( <ControlledMenuWithIframes /> );
+
+		const iframe = screen.getByTitle( 'Editor canvas' );
+		const iframeDocument = document.implementation.createHTMLDocument();
+		Object.defineProperty( iframe, 'contentDocument', {
+			configurable: true,
+			get: () => iframeDocument,
+		} );
+		const canvasTarget = iframeDocument.createElement( 'button' );
+		canvasTarget.addEventListener( 'click', onCanvasClick );
+		iframeDocument.body.appendChild( canvasTarget );
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+		expect( await screen.findByRole( 'menu' ) ).toBeVisible();
+
+		act( () => {
+			canvasTarget.dispatchEvent(
+				new MouseEvent( 'pointerdown', { bubbles: true } )
+			);
+			canvasTarget.click();
+		} );
+
+		await waitFor( () => {
+			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+		} );
+		expect( onCanvasClick ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'closes a non-modal menu on a nested same-origin iframe pointer interaction', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<>
+				<Menu.Root modal={ false }>
+					<Menu.Trigger>Actions</Menu.Trigger>
+					<Menu.Popup>
+						<Menu.Item>
+							<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+						</Menu.Item>
+					</Menu.Popup>
+				</Menu.Root>
+				<iframe title="Editor canvas" />
+			</>
+		);
+
+		const editorIframe =
+			screen.getByTitle< HTMLIFrameElement >( 'Editor canvas' );
+		const editorDocument = editorIframe.contentDocument;
+
+		if ( ! editorDocument ) {
+			throw new Error( 'Expected a same-origin iframe document.' );
+		}
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+		expect( await screen.findByRole( 'menu' ) ).toBeVisible();
+
+		const nestedIframe = editorDocument.createElement( 'iframe' );
+		editorDocument.body.appendChild( nestedIframe );
+		const nestedDocument = nestedIframe.contentDocument;
+
+		if ( ! nestedDocument ) {
+			throw new Error( 'Expected a nested same-origin iframe document.' );
+		}
+
+		const nestedAddEventListener = jest.spyOn(
+			nestedDocument,
+			'addEventListener'
+		);
+		await waitFor( () => {
+			expect( nestedAddEventListener ).toHaveBeenCalledWith(
+				'pointerdown',
+				expect.any( Function ),
+				true
+			);
+		} );
+
+		act( () => {
+			nestedDocument.dispatchEvent(
+				new MouseEvent( 'pointerdown', { bubbles: true } )
+			);
+		} );
+
+		await waitFor( () => {
+			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+		} );
+	} );
+
+	it( 'does not close for pointer interactions inside a menu portaled to an iframe', async () => {
+		const user = userEvent.setup();
+		const iframe = document.createElement( 'iframe' );
+		document.body.appendChild( iframe );
+		const iframeDocument = iframe.contentDocument;
+
+		if ( ! iframeDocument ) {
+			throw new Error( 'Expected a same-origin iframe document.' );
+		}
+		const addEventListener = jest.spyOn(
+			iframeDocument,
+			'addEventListener'
+		);
+
+		try {
+			const outsideTarget = iframeDocument.createElement( 'button' );
+			iframeDocument.body.appendChild( outsideTarget );
+
+			render(
+				<Menu.Root modal={ false }>
+					<Menu.Trigger>Actions</Menu.Trigger>
+					<Menu.Popup
+						portal={
+							<Menu.Portal container={ iframeDocument.body } />
+						}
+					>
+						<Menu.Item>
+							<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+						</Menu.Item>
+					</Menu.Popup>
+				</Menu.Root>
+			);
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Actions' } )
+			);
+			const portaledMenu = await within( iframeDocument.body ).findByRole(
+				'menu'
+			);
+			const item = within( portaledMenu ).getByRole( 'menuitem', {
+				name: 'Duplicate',
+			} );
+			await waitFor( () => {
+				expect( addEventListener ).toHaveBeenCalledWith(
+					'pointerdown',
+					expect.any( Function ),
+					true
+				);
+			} );
+
+			act( () => {
+				item.dispatchEvent(
+					new MouseEvent( 'pointerdown', { bubbles: true } )
+				);
+			} );
+			expect( portaledMenu ).toBeVisible();
+
+			act( () => {
+				outsideTarget.dispatchEvent(
+					new MouseEvent( 'pointerdown', { bubbles: true } )
+				);
+			} );
+			await waitFor( () => {
+				expect( portaledMenu ).not.toBeInTheDocument();
+			} );
+		} finally {
+			iframe.remove();
+		}
+	} );
+
+	it( 'does not close a disabled non-modal menu on iframe pointerdown', async () => {
+		const user = userEvent.setup();
+
+		function MenuDisabledWhileOpen() {
+			const [ open, setOpen ] = useState( false );
+
+			return (
+				<>
+					<Menu.Root
+						disabled={ open }
+						modal={ false }
+						onOpenChange={ setOpen }
+						open={ open }
+					>
+						<Menu.Trigger>Actions</Menu.Trigger>
+						<Menu.Popup>
+							<Menu.Item>
+								<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+							</Menu.Item>
+						</Menu.Popup>
+					</Menu.Root>
+					<iframe title="Editor canvas" />
+				</>
+			);
+		}
+
+		render( <MenuDisabledWhileOpen /> );
+		const iframe = screen.getByTitle( 'Editor canvas' );
+		const iframeDocument = document.implementation.createHTMLDocument();
+		Object.defineProperty( iframe, 'contentDocument', {
+			configurable: true,
+			get: () => iframeDocument,
+		} );
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+		expect( await screen.findByRole( 'menu' ) ).toBeVisible();
+
+		act( () => {
+			iframeDocument.dispatchEvent(
+				new MouseEvent( 'pointerdown', { bubbles: true } )
+			);
+		} );
+		expect( screen.getByRole( 'menu' ) ).toBeVisible();
+	} );
+
+	it( 'reattaches the iframe listener after reload and removes it when closed', async () => {
+		const user = userEvent.setup();
+
+		const { unmount } = render(
+			<>
+				<Menu.Root modal={ false }>
+					<Menu.Trigger>Actions</Menu.Trigger>
+					<Menu.Popup>
+						<Menu.Item>
+							<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+						</Menu.Item>
+					</Menu.Popup>
+				</Menu.Root>
+				<iframe title="Editor canvas" />
+			</>
+		);
+
+		const iframe = screen.getByTitle( 'Editor canvas' );
+		const firstDocument = document.implementation.createHTMLDocument();
+		const reloadedDocument = document.implementation.createHTMLDocument();
+		let iframeDocument = firstDocument;
+		Object.defineProperty( iframe, 'contentDocument', {
+			configurable: true,
+			get: () => iframeDocument,
+		} );
+		const firstAddEventListener = jest.spyOn(
+			firstDocument,
+			'addEventListener'
+		);
+		const firstRemoveEventListener = jest.spyOn(
+			firstDocument,
+			'removeEventListener'
+		);
+		const reloadedAddEventListener = jest.spyOn(
+			reloadedDocument,
+			'addEventListener'
+		);
+		const reloadedRemoveEventListener = jest.spyOn(
+			reloadedDocument,
+			'removeEventListener'
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+		expect( await screen.findByRole( 'menu' ) ).toBeVisible();
+		await waitFor( () => {
+			expect( firstAddEventListener ).toHaveBeenCalledWith(
+				'pointerdown',
+				expect.any( Function ),
+				true
+			);
+		} );
+
+		iframeDocument = reloadedDocument;
+		act( () => iframe.dispatchEvent( new Event( 'load' ) ) );
+
+		expect( firstRemoveEventListener ).toHaveBeenCalledWith(
+			'pointerdown',
+			expect.any( Function ),
+			true
+		);
+		expect( reloadedAddEventListener ).toHaveBeenCalledWith(
+			'pointerdown',
+			expect.any( Function ),
+			true
+		);
+
+		await user.keyboard( '{Escape}' );
+		await waitFor( () => {
+			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+		} );
+		expect( reloadedRemoveEventListener ).toHaveBeenCalledWith(
+			'pointerdown',
+			expect.any( Function ),
+			true
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+		expect( await screen.findByRole( 'menu' ) ).toBeVisible();
+		unmount();
+		expect( reloadedRemoveEventListener ).toHaveBeenCalledTimes( 2 );
+	} );
+
+	it( 'moves the listener when an iframe remounts while the menu is open', async () => {
+		const user = userEvent.setup();
+
+		function MenuWithIframe( { iframeKey }: { iframeKey: string } ) {
+			return (
+				<>
+					<Menu.Root modal={ false }>
+						<Menu.Trigger>Actions</Menu.Trigger>
+						<Menu.Popup>
+							<Menu.Item>
+								<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+							</Menu.Item>
+						</Menu.Popup>
+					</Menu.Root>
+					<iframe key={ iframeKey } title="Editor canvas" />
+				</>
+			);
+		}
+
+		const { rerender } = render( <MenuWithIframe iframeKey="first" /> );
+		const firstIframe = screen.getByTitle( 'Editor canvas' );
+		const firstDocument = document.implementation.createHTMLDocument();
+		Object.defineProperty( firstIframe, 'contentDocument', {
+			configurable: true,
+			get: () => firstDocument,
+		} );
+		const firstRemoveEventListener = jest.spyOn(
+			firstDocument,
+			'removeEventListener'
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+		expect( await screen.findByRole( 'menu' ) ).toBeVisible();
+
+		rerender( <MenuWithIframe iframeKey="second" /> );
+		await waitFor( () => {
+			expect( firstRemoveEventListener ).toHaveBeenCalledWith(
+				'pointerdown',
+				expect.any( Function ),
+				true
+			);
+		} );
+
+		act( () => {
+			firstDocument.dispatchEvent(
+				new MouseEvent( 'pointerdown', { bubbles: true } )
+			);
+		} );
+		expect( screen.getByRole( 'menu' ) ).toBeVisible();
+
+		const secondIframe = screen.getByTitle( 'Editor canvas' );
+		const secondDocument = document.implementation.createHTMLDocument();
+		Object.defineProperty( secondIframe, 'contentDocument', {
+			configurable: true,
+			get: () => secondDocument,
+		} );
+		act( () => secondIframe.dispatchEvent( new Event( 'load' ) ) );
+		act( () => {
+			secondDocument.dispatchEvent(
+				new MouseEvent( 'pointerdown', { bubbles: true } )
+			);
+		} );
+
+		await waitFor( () => {
+			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+		} );
 	} );
 
 	it.each( [

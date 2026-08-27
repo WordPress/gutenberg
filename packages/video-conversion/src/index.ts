@@ -15,7 +15,7 @@ import {
 	type VideoCodec,
 	type ConversionVideoOptions,
 } from 'mediabunny';
-import type { ItemId, VideoMetadata, TranscodeVideoOptions } from './types';
+import type { ItemId, VideoMetadata, TranscodeVideoOptions } from './types.ts';
 
 /**
  * Tracks in-progress operations so they can be cancelled at async boundaries.

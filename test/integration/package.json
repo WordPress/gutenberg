@@ -20,7 +20,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"exports": {
-		"./helpers/integration-test-editor": "./helpers/integration-test-editor.js"
+		"./helpers/integration-test-editor": "./helpers/integration-test-editor.jsx"
 	},
 	"devDependencies": {
 		"@testing-library/react": "^16.3.2",

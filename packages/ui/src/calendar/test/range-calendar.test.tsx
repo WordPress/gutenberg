@@ -107,13 +107,18 @@ describe( 'RangeCalendar', () => {
 		jest.useRealTimers();
 	} );
 
+	afterEach( async () => {
+		// Let tooltip positioning updates caused by focus finish before cleanup.
+		await act( () => Promise.resolve() );
+	} );
+
 	describe( 'Semantics and basic behavior', () => {
 		it( 'should apply the correct roles, semantics and attributes', async () => {
 			render( <RangeCalendar /> );
 
 			expect(
 				screen.getByRole( 'application', {
-					name: 'Date range calendar',
+					name: 'Date range calendar, May 2025',
 				} )
 			).toBeVisible();
 
@@ -1501,7 +1506,7 @@ describe( 'RangeCalendar', () => {
 			// Check computed writing direction
 			expect(
 				screen.getByRole( 'application', {
-					name: 'Date range calendar',
+					name: /^Date range calendar,/,
 				} )
 			).toHaveAttribute( 'dir', 'rtl' );
 
