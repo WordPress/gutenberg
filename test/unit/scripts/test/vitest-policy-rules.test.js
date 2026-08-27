@@ -181,6 +181,8 @@ describe( 'Vitest policy rules', () => {
 			"import { screen } from '@testing-library/react';\nscreen.getAllByRole( 'button' ).findIndex( ( button ) => button.offsetWidth );",
 			"import { screen } from '@testing-library/react';\nscreen.getAllByRole( 'button' ).findLastIndex( ( button ) => button.offsetWidth );",
 			"import { screen } from '@testing-library/react';\nconst width = ( button ) => button.offsetWidth;\nscreen.getAllByRole( 'button' ).map( width );",
+			"import { screen } from '@testing-library/react';\nconst width = ( button ) => button.offsetWidth;\nconst measure = width;\nscreen.getAllByRole( 'button' ).map( measure );",
+			"import { screen } from '@testing-library/react';\nlet width;\nwidth = ( button ) => button.offsetWidth;\nscreen.getAllByRole( 'button' ).map( width );",
 			"import { screen } from '@testing-library/react';\nscreen.getAllByRole( 'button' ).map( ( { firstElementChild: { offsetWidth } } ) => offsetWidth );",
 		] ) {
 			expectViolation( source, 'require Browser Mode', {

@@ -934,7 +934,11 @@ function getTrackedAssignment( node ) {
 	return { target: null, value: null, isCollectionElement: false };
 }
 
-function getLocalFunction( node, identifierVariables ) {
+function getLocalFunction(
+	node,
+	identifierVariables,
+	localFunctionVariables = new Map()
+) {
 	if (
 		[ 'ArrowFunctionExpression', 'FunctionExpression' ].includes(
 			node?.type
@@ -947,6 +951,9 @@ function getLocalFunction( node, identifierVariables ) {
 	}
 
 	const variable = identifierVariables.get( node );
+	if ( localFunctionVariables.has( variable ) ) {
+		return localFunctionVariables.get( variable );
+	}
 	for ( const definition of variable?.defs ?? [] ) {
 		const candidate =
 			definition.node.type === 'VariableDeclarator'
@@ -1294,6 +1301,7 @@ export function validateVitestPolicy( {
 	}
 
 	let previousTrackedVariableCount = -1;
+	const localFunctionVariables = new Map();
 	while (
 		previousTrackedVariableCount !==
 		importedNamespaces.size +
@@ -1309,6 +1317,7 @@ export function validateVitestPolicy( {
 			testingLibraryQueryContainerFunctionVariables.size +
 			testingLibraryScreenVariables.size +
 			vitestExpectVariables.size +
+			localFunctionVariables.size +
 			vitestNamespaceVariables.size +
 			vitestViVariables.size +
 			windowVariables.size
@@ -1327,6 +1336,7 @@ export function validateVitestPolicy( {
 			testingLibraryQueryContainerFunctionVariables.size +
 			testingLibraryScreenVariables.size +
 			vitestExpectVariables.size +
+			localFunctionVariables.size +
 			vitestNamespaceVariables.size +
 			vitestViVariables.size +
 			windowVariables.size;
@@ -1345,7 +1355,8 @@ export function validateVitestPolicy( {
 				node.type === 'CallExpression'
 					? getLocalFunction(
 							node.arguments[ 0 ],
-							identifierVariables
+							identifierVariables,
+							localFunctionVariables
 					  )
 					: null;
 			if (
@@ -1401,6 +1412,14 @@ export function validateVitestPolicy( {
 
 			if ( target.type === 'Identifier' ) {
 				const targetVariable = identifierVariables.get( target );
+				const localFunction = getLocalFunction(
+					value,
+					identifierVariables,
+					localFunctionVariables
+				);
+				if ( targetVariable && localFunction ) {
+					localFunctionVariables.set( targetVariable, localFunction );
+				}
 				for ( const variables of [
 					testingLibraryQueryContainerFunctionVariables,
 					testingLibraryNamespaceVariables,
