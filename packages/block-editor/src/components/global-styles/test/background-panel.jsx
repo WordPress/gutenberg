@@ -105,7 +105,7 @@ describe( 'hasBackgroundGradientValue', () => {
  *   enabled.
  *
  * - Background gradient: renders `ColorPanelDropdown` (re-used from
- *   `color-panel.js`). The inner `Dropdown` indicator shows the inherited
+ *   `color-panel.jsx`). The inner `Dropdown` indicator shows the inherited
  *   gradient at-rest, and the `ColorPanelTab.onChange` interceptor commits
  *   the inherited value when the user clicks the active swatch.
  *

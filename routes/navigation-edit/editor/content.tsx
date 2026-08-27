@@ -19,7 +19,7 @@ type Block = {
 
 const { PrivateListView } = unlock( blockEditorPrivateApis );
 
-// Needs to be kept in sync with the query used at packages/block-library/src/page-list/edit.js.
+// Needs to be kept in sync with the query used at packages/block-library/src/page-list/edit.jsx.
 const MAX_PAGE_COUNT = 100;
 const PAGES_QUERY = [
 	'postType',

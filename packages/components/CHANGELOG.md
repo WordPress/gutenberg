@@ -10,6 +10,10 @@
 
 -   `Snackbar`: Restart the auto-dismiss timer when a notice is recreated with the same ID during removal ([#81764](https://github.com/WordPress/gutenberg/pull/81764)).
 
+### Internal
+
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
 ## 40.0.0 (2026-08-26)
 
 ### Breaking Changes

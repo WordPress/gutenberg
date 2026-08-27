@@ -65,7 +65,7 @@ process.chdir( ROOT_DIR );
 process.env.TZ = 'UTC';
 
 const transpiledPackageNames = glob(
-	path.join( ROOT_DIR, 'packages/*/src/index.{js,ts,tsx}' )
+	path.join( ROOT_DIR, 'packages/*/src/index.{js,jsx,ts,tsx}' )
 ).map( ( fileName ) => {
 	const relative = path.relative( ROOT_DIR, fileName );
 	return relative.split( path.sep )[ 1 ];
@@ -146,7 +146,7 @@ export default defineConfig( {
 				find: /^@wordpress\/block-library\/build-module\/(.*)\.mjs$/,
 				replacement: path.join(
 					ROOT_DIR,
-					'packages/block-library/src/$1.js'
+					'packages/block-library/src/$1'
 				),
 			},
 			{
