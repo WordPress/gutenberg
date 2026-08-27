@@ -18,6 +18,7 @@ import {
 } from './use-debounced-recompute';
 import { blockContainerOf } from './cursor-dom-utils';
 import type { SelectionRect } from './cursor-dom-utils';
+import { getCollaboratorDisplayName } from '../../utils/get-collaborator-display-name';
 
 const { useActiveCollaborators, useResolvedSelection } =
 	unlock( coreDataPrivateApis );
@@ -197,11 +198,15 @@ export function useRenderCursors(
 				}
 			}
 
-			const userName = user.collaboratorInfo.name;
+			const userName = getCollaboratorDisplayName(
+				user.collaboratorInfo
+			);
 			const clientId = user.clientId;
 			const color = user.isMe
 				? 'var(--wp-admin-theme-color)'
-				: getAvatarBorderColor( user.collaboratorInfo.id );
+				: getAvatarBorderColor(
+						user.collaboratorInfo.id ?? user.clientId
+				  );
 			const avatarUrl = getAvatarUrl( user.collaboratorInfo.avatar_urls );
 
 			const selectionVisual = computeSelectionVisual(

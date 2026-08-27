@@ -8,11 +8,12 @@ import { join } from 'path';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ThemeProvider } from '../theme-provider';
+import type { ThemeProviderColorWarning } from '../theme-provider-color-warnings';
 
 // Give the wrapper a stable class so tests can locate it and read its
 // computed custom properties.
 jest.mock( '../style.module.css', () => ( {
-	root: 'theme-provider-root',
+	wrapper: 'theme-provider-wrapper',
 } ) );
 
 // The "strong" brand background resolves to the `color.primary` seed itself, and
@@ -27,6 +28,10 @@ const BORDER_RADIUS_SM = '--wpds-border-radius-sm';
 const PRIMARY = '#1e90ff';
 const OTHER_PRIMARY = '#8e44ad';
 const BACKGROUND = '#f8f8f8';
+const INACCESSIBLE_PRIMARY = '#608010';
+const INACCESSIBLE_BACKGROUND = '#4f386e';
+const ACCESSIBLE_PRIMARY = '#3858e9';
+const ACCESSIBLE_BACKGROUND = '#fcfcfc';
 
 function readProp( element: Element, property: string ) {
 	return getComputedStyle( element ).getPropertyValue( property ).trim();
@@ -34,7 +39,7 @@ function readProp( element: Element, property: string ) {
 
 // The `ThemeProvider` wrapper element that scopes the given descendant.
 function getScopingProvider( element: Element ) {
-	return element.closest< HTMLElement >( '.theme-provider-root' )!;
+	return element.closest< HTMLElement >( '.theme-provider-wrapper' )!;
 }
 
 async function withInjectedThemeProviderStyles(
@@ -44,7 +49,7 @@ async function withInjectedThemeProviderStyles(
 	style.textContent = readFileSync(
 		join( import.meta.dirname, '../style.module.css' ),
 		'utf8'
-	).replaceAll( '.root', '.theme-provider-root' );
+	).replaceAll( '.wrapper', '.theme-provider-wrapper' );
 	document.head.appendChild( style );
 
 	try {
@@ -124,6 +129,87 @@ describe( 'ThemeProvider', () => {
 		expect( readProp( provider, BRAND_BG ) ).toBe( '' );
 		expect( readProp( provider, SURFACE_BG ) ).toBe( '' );
 		expect( readProp( provider, '--wp-admin-theme-color' ) ).toBe( '' );
+	} );
+
+	it( 'does not report color warnings when no colors are calculated', () => {
+		const onColorWarnings = jest.fn();
+
+		render( <ThemeProvider onColorWarnings={ onColorWarnings } /> );
+
+		expect( onColorWarnings ).not.toHaveBeenCalled();
+	} );
+
+	it( 'reports color warnings through the callback', () => {
+		const onColorWarnings = jest.fn<
+			void,
+			[ readonly ThemeProviderColorWarning[] ]
+		>();
+		const { rerender } = render(
+			<ThemeProvider
+				color={ {
+					primary: INACCESSIBLE_PRIMARY,
+					background: INACCESSIBLE_BACKGROUND,
+				} }
+				onColorWarnings={ onColorWarnings }
+			/>
+		);
+
+		const warning = onColorWarnings.mock.calls[ 0 ][ 0 ].find(
+			( item ) =>
+				item.type === 'contrast' &&
+				item.backgroundToken ===
+					'background.interactive.brand-strong-active'
+		);
+
+		expect( warning ).toEqual(
+			expect.objectContaining( {
+				type: 'contrast',
+				backgroundToken: 'background.interactive.brand-strong-active',
+				foregroundToken: 'foreground.interactive.brand-strong-active',
+				requiredContrast: 4.5,
+			} )
+		);
+		expect(
+			warning?.type === 'contrast'
+				? warning.achievedContrast
+				: Number.POSITIVE_INFINITY
+		).toBeLessThan( 4.5 );
+
+		onColorWarnings.mockClear();
+		rerender(
+			<ThemeProvider
+				color={ {
+					primary: ACCESSIBLE_PRIMARY,
+					background: ACCESSIBLE_BACKGROUND,
+				} }
+				onColorWarnings={ onColorWarnings }
+			/>
+		);
+
+		expect( onColorWarnings ).toHaveBeenCalledWith( [] );
+	} );
+
+	it( 'does not report warnings again when only the callback identity changes', () => {
+		const onColorWarnings = jest.fn<
+			void,
+			[ readonly ThemeProviderColorWarning[] ]
+		>();
+		const renderProvider = () => (
+			<ThemeProvider
+				color={ {
+					primary: ACCESSIBLE_PRIMARY,
+					background: ACCESSIBLE_BACKGROUND,
+				} }
+				onColorWarnings={ ( warnings ) => onColorWarnings( warnings ) }
+			/>
+		);
+		const { rerender } = render( renderProvider() );
+
+		expect( onColorWarnings ).toHaveBeenCalledTimes( 1 );
+
+		rerender( renderProvider() );
+
+		expect( onColorWarnings ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'does not define the custom property outside of the provider', () => {
