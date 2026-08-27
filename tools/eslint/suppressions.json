@@ -342,7 +342,7 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/block-keyboard-shortcuts/index.js": {
+	"packages/block-editor/src/components/block-keyboard-shortcuts/index.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -1024,7 +1024,7 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/duotone-control/test/index.js": {
+	"packages/block-editor/src/components/duotone-control/test/index.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -4310,7 +4310,7 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/table-of-contents/deprecated.js": {
+	"packages/block-library/src/table-of-contents/deprecated.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -7957,7 +7957,7 @@
 			"count": 1
 		}
 	},
-	"packages/global-styles-ui/src/test/screen-header.js": {
+	"packages/global-styles-ui/src/test/screen-header.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
