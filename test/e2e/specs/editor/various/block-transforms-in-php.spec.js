@@ -206,7 +206,9 @@ test.describe( 'Block transforms declared in block.json', () => {
 		await admin.createNewPost();
 
 		// Declared in block.json and nowhere else, so their presence here means
-		// the whole path from the server to the block type held.
+		// the whole path from the server to the block type held. Code's
+		// transform also carries an isMatch registered in JavaScript, so its
+		// selector arriving intact is the merge working as well.
 		const selectors = await page.evaluate( () => {
 			const rawTransform = ( name ) =>
 				window.wp.data
@@ -218,12 +220,16 @@ test.describe( 'Block transforms declared in block.json', () => {
 
 			return {
 				code: rawTransform( 'core/code' )?.selector,
+				preformatted: rawTransform( 'core/preformatted' )?.selector,
+				listItem: rawTransform( 'core/list-item' )?.selector,
 				separator: rawTransform( 'core/separator' )?.selector,
 			};
 		} );
 
 		expect( selectors ).toEqual( {
-			code: 'pre:has(> code)',
+			code: 'pre:has(> code:only-child)',
+			preformatted: 'pre',
+			listItem: 'ol > li, ul > li',
 			separator: 'hr',
 		} );
 	} );

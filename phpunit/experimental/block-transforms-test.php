@@ -552,7 +552,25 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 			'has direct child not' => array( 'pre:has(> code)', '<pre><span><code>One</code></span></pre>', false ),
 			'not'                  => array( 'pre:not(:has(> code))', '<pre>One</pre>', true ),
 			'not mismatch'         => array( 'pre:not(:has(> code))', '<pre><code>One</code></pre>', false ),
+			'only child'           => array( 'pre:has(> code:only-child)', '<pre><code>One</code></pre>', true ),
+			'only child text'      => array( 'pre:has(> code:only-child)', '<pre>Text <code>One</code></pre>', true ),
+			'only child mismatch'  => array( 'pre:has(> code:only-child)', '<pre><code>One</code><code>Two</code></pre>', false ),
 		);
+	}
+
+	public function test_matches_a_child_combinator_against_the_child() {
+		$root = Gutenberg_HTML_Element::from_html( '<ul><li>One</li></ul>' );
+		$list = $root->child_elements()[0];
+		$item = $list->child_elements()[0];
+
+		$this->assertTrue( $item->matches( 'ol > li, ul > li' ) );
+		$this->assertFalse( $list->matches( 'ol > li, ul > li' ) );
+
+		// The same item with no list around it, which is what a stray one in
+		// converted markup looks like.
+		$stray = Gutenberg_HTML_Element::from_html( '<li>One</li>' )->child_elements()[0];
+
+		$this->assertFalse( $stray->matches( 'ol > li, ul > li' ) );
 	}
 
 	public function test_core_blocks_declare_raw_transforms() {
