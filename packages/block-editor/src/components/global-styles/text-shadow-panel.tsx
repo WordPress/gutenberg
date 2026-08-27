@@ -8,16 +8,27 @@ import {
 import { Stack, Text } from '@wordpress/ui';
 import { useRef, useMemo } from '@wordpress/element';
 import { shadow as textShadowIcon, Icon, check, reset } from '@wordpress/icons';
+import type { TextShadowPreset } from '@wordpress/global-styles-engine';
 import clsx from 'clsx';
 import { useSettings } from '../use-settings';
+
+type TextShadowValue = string | undefined;
+
+interface TextShadowProps {
+	textShadow: TextShadowValue;
+	onChange: ( textShadow: TextShadowValue ) => void;
+}
+
+interface TextShadowToggleProps extends TextShadowProps {
+	onToggle: () => void;
+	isOpen: boolean;
+}
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
  * returning a new array reference on every invocation.
- *
- * @type {Array}
  */
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY: TextShadowPreset[] = [];
 
 // Above this number of presets, the list is rendered as a compact dropdown
 // rather than a long list of options.
@@ -26,10 +37,10 @@ const PRESETS_SELECT_THRESHOLD = 7;
 /**
  * Extracts the preset slug from a raw text shadow value.
  *
- * @param {string} [rawValue] The stored text shadow value.
- * @return {string|undefined} The preset slug, or undefined for custom values.
+ * @param rawValue The stored text shadow value.
+ * @return The preset slug, or undefined for custom values.
  */
-function getTextShadowPresetSlug( rawValue ) {
+function getTextShadowPresetSlug( rawValue: TextShadowValue ) {
 	if ( ! rawValue || typeof rawValue !== 'string' ) {
 		return undefined;
 	}
@@ -50,9 +61,9 @@ function getTextShadowPresetSlug( rawValue ) {
 	return undefined;
 }
 
-export function TextShadowPopover( { textShadow, onChange } ) {
+export function TextShadowPopover( { textShadow, onChange }: TextShadowProps ) {
 	const popoverProps = {
-		placement: 'left-start',
+		placement: 'left-start' as const,
 		offset: 36,
 		shift: true,
 		className: 'block-editor-global-styles__text-shadow-popover',
@@ -80,7 +91,7 @@ export function TextShadowPopover( { textShadow, onChange } ) {
 	);
 }
 
-function TextShadowControl( { textShadow, onChange } ) {
+function TextShadowControl( { textShadow, onChange }: TextShadowProps ) {
 	const [
 		defaultPresetsEnabled,
 		defaultPresets,
@@ -91,7 +102,12 @@ function TextShadowControl( { textShadow, onChange } ) {
 		'typography.textShadowPresets.default',
 		'typography.textShadowPresets.theme',
 		'typography.textShadowPresets.custom'
-	);
+	) as [
+		boolean | undefined,
+		TextShadowPreset[] | undefined,
+		TextShadowPreset[] | undefined,
+		TextShadowPreset[] | undefined,
+	];
 
 	const presets = useMemo(
 		() => [
@@ -186,8 +202,13 @@ function TextShadowControl( { textShadow, onChange } ) {
 	);
 }
 
-function TextShadowToggle( { textShadow, onChange, onToggle, isOpen } ) {
-	const buttonRef = useRef( undefined );
+function TextShadowToggle( {
+	textShadow,
+	onChange,
+	onToggle,
+	isOpen,
+}: TextShadowToggleProps ) {
+	const buttonRef = useRef< HTMLButtonElement >( undefined );
 
 	return (
 		<>

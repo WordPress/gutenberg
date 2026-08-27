@@ -1,5 +1,6 @@
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
+import type { BlockType } from '@wordpress/blocks';
 import TokenList from '@wordpress/token-list';
 import { kebabCase } from '@wordpress/kebab-case';
 import { shouldSkipSerialization } from './utils';
@@ -7,14 +8,23 @@ import { TYPOGRAPHY_SUPPORT_KEY } from './typography';
 
 export const TEXT_SHADOW_SUPPORT_KEY = 'typography.textShadow';
 
+interface TextShadowAttributes {
+	textShadow?: string;
+}
+
+interface SaveProps {
+	className?: string;
+	[ key: string ]: unknown;
+}
+
 /**
  * Filters registered block settings, extending attributes to include
  * the `textShadow` attribute.
  *
- * @param {Object} settings Original block settings.
- * @return {Object}         Filtered block settings.
+ * @param settings Original block settings.
+ * @return Filtered block settings.
  */
-function addAttributes( settings ) {
+function addAttributes( settings: BlockType ) {
 	if ( ! hasBlockSupport( settings, TEXT_SHADOW_SUPPORT_KEY ) ) {
 		return settings;
 	}
@@ -35,12 +45,16 @@ function addAttributes( settings ) {
  * Override props assigned to save component to inject the text shadow preset
  * class name.
  *
- * @param {Object} props      Additional props applied to save element.
- * @param {Object} blockType  Block type.
- * @param {Object} attributes Block attributes.
- * @return {Object}           Filtered props applied to save element.
+ * @param props      Additional props applied to save element.
+ * @param blockType  Block type.
+ * @param attributes Block attributes.
+ * @return Filtered props applied to save element.
  */
-function addSaveProps( props, blockType, attributes ) {
+function addSaveProps(
+	props: SaveProps,
+	blockType: string | BlockType,
+	attributes: TextShadowAttributes | undefined
+) {
 	if ( ! hasBlockSupport( blockType, TEXT_SHADOW_SUPPORT_KEY ) ) {
 		return props;
 	}
@@ -61,14 +75,17 @@ function addSaveProps( props, blockType, attributes ) {
 
 	// Use TokenList to dedupe classes.
 	const classes = new TokenList( props.className );
-	classes.add( `has-${ kebabCase( attributes?.textShadow ) }-text-shadow` );
+	classes.add( `has-${ kebabCase( attributes.textShadow ) }-text-shadow` );
 	const newClassName = classes.value;
 	props.className = newClassName ? newClassName : undefined;
 
 	return props;
 }
 
-function useBlockProps( { name, textShadow } ) {
+function useBlockProps( {
+	name,
+	textShadow,
+}: TextShadowAttributes & { name: string } ) {
 	return addSaveProps( {}, name, { textShadow } );
 }
 
@@ -76,7 +93,7 @@ export default {
 	useBlockProps,
 	addSaveProps,
 	attributeKeys: [ 'textShadow' ],
-	hasSupport( name ) {
+	hasSupport( name: string ) {
 		return hasBlockSupport( name, TEXT_SHADOW_SUPPORT_KEY );
 	},
 };
