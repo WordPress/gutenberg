@@ -62,7 +62,7 @@ jobs:
                   # Renames are listed as a deletion and an addition, so both paths are classified.
                   while IFS= read -r -d '' file; do
                     COUNT=$(( COUNT + 1 ))
-                    echo "changed: $file"
+                    printf 'changed: %q\n' "$file"
                     case "$file" in
                       .github/workflows/performance.yml|.github/setup-node/*) RELEVANT=1 ;;
                       # Documentation, changelogs, Storybook and other workflows cannot change the results.
