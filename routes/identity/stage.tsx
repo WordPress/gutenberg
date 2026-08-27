@@ -125,18 +125,15 @@ function Identity() {
 	};
 
 	return (
-		<Page
-			className={ styles.page }
-			title={ _x( 'Identity', 'site identity' ) }
-			headingLevel={ 2 }
-			hasPadding
-		>
-			<DataForm
-				data={ data }
-				fields={ fields }
-				form={ form }
-				onChange={ onChange }
-			/>
+		<Page title={ _x( 'Identity', 'site identity' ) } headingLevel={ 2 }>
+			<div className={ styles.form }>
+				<DataForm
+					data={ data }
+					fields={ fields }
+					form={ form }
+					onChange={ onChange }
+				/>
+			</div>
 		</Page>
 	);
 }

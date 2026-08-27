@@ -1,5 +1,6 @@
-.page {
-	// TODO: Reassess how to handle background color in Page component.
-	// https://github.com/WordPress/gutenberg/pull/81646#discussion_r3846031681
+.form {
+	flex-grow: 1;
+	min-height: 0;
 	background-color: var(--wpds-color-background-surface-neutral-strong);
+	padding: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-2xl);
 }
