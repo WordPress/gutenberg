@@ -36,10 +36,7 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 		},
 	} );
 
-	// v2 gap: the extensible site editor's navigation screen renders its list
-	// view with `showAppender: false`, so menu items cannot be appended from
-	// the sidebar there yet.
-	test( 'can use appender in site editor sidebar list view @site-editor-v1-only', async ( {
+	test( 'can use appender in site editor sidebar list view', async ( {
 		admin,
 		page,
 		requestUtils,
