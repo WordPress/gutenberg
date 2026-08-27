@@ -172,6 +172,19 @@ class Gutenberg_HTML_To_Blocks {
 	 * @return array Parsed block array.
 	 */
 	private static function convert_element( $element ) {
+		/*
+		 * The Embed block matches on the text of a paragraph rather than on a
+		 * selector, so it is the one transform `block.json` cannot describe and
+		 * the one this reads from somewhere else. It is tried first because the
+		 * transform it stands in for outranks the Paragraph block's, which is
+		 * the only other one claiming a paragraph.
+		 */
+		$embed = Gutenberg_Embed_Transforms::convert( $element );
+
+		if ( null !== $embed ) {
+			return $embed;
+		}
+
 		$transform = self::find_transform( $element );
 
 		if ( null === $transform ) {

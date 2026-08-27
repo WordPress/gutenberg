@@ -136,6 +136,7 @@ require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/block-transforms/class-gutenberg-html-element.php';
 require __DIR__ . '/experimental/block-transforms/class-gutenberg-block-attributes-parser.php';
 require __DIR__ . '/experimental/block-transforms/class-gutenberg-shortcode-transforms.php';
+require __DIR__ . '/experimental/block-transforms/class-gutenberg-embed-transforms.php';
 require __DIR__ . '/experimental/block-transforms/class-gutenberg-html-to-blocks.php';
 require __DIR__ . '/experimental/block-transforms/class-gutenberg-block-transforms.php';
 require __DIR__ . '/experimental/block-transforms/block-transforms.php';

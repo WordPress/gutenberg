@@ -13,6 +13,7 @@
  * @covers Gutenberg_HTML_To_Blocks
  * @covers Gutenberg_Block_Transforms
  * @covers Gutenberg_Block_Attributes_Parser
+ * @covers Gutenberg_Embed_Transforms
  * @covers Gutenberg_HTML_Element
  */
 class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
@@ -1340,6 +1341,109 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 
 		$this->assertSame( 'core/shortcode', $blocks[0]['blockName'] );
 		$this->assertSame( '[testplayer src="/a.mp3"]', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_turns_a_url_standing_on_its_own_into_an_embed() {
+		$blocks = gutenberg_html_to_blocks( '<p>https://vimeo.com/76979871</p>' );
+
+		$this->assertCount( 1, $blocks );
+		$this->assertSame( 'core/embed', $blocks[0]['blockName'] );
+		$this->assertSame(
+			array(
+				'url'              => 'https://vimeo.com/76979871',
+				'type'             => 'video',
+				'providerNameSlug' => 'vimeo',
+				'responsive'       => true,
+			),
+			$blocks[0]['attrs']
+		);
+	}
+
+	public function test_writes_the_markup_the_embed_block_saves() {
+		$blocks = gutenberg_html_to_blocks( '<p>https://vimeo.com/76979871</p>' );
+
+		// The class names come from the attributes, so markup and attributes
+		// have to be written together or the editor cannot validate the block.
+		$this->assertSame(
+			'<figure class="wp-block-embed is-type-video is-provider-vimeo wp-block-embed-vimeo">' .
+			'<div class="wp-block-embed__wrapper">' . "\n" . 'https://vimeo.com/76979871' . "\n" . '</div>' .
+			'</figure>',
+			$blocks[0]['innerHTML']
+		);
+	}
+
+	public function test_keeps_a_url_that_reads_as_part_of_a_sentence() {
+		$blocks = gutenberg_html_to_blocks( '<p>Watch https://vimeo.com/76979871 tonight.</p>' );
+
+		$this->assertSame( 'core/paragraph', $blocks[0]['blockName'] );
+	}
+
+	public function test_keeps_a_paragraph_naming_two_addresses() {
+		$blocks = gutenberg_html_to_blocks( '<p>https://vimeo.com/1 https://vimeo.com/2</p>' );
+
+		$this->assertSame( 'core/paragraph', $blocks[0]['blockName'] );
+	}
+
+	public function test_keeps_a_url_pointing_at_a_file() {
+		// A file is something to link to rather than something a provider
+		// can embed, unless the extension is one permalinks are built from.
+		$this->assertSame( 'core/paragraph', gutenberg_html_to_blocks( '<p>https://example.com/a.pdf</p>' )[0]['blockName'] );
+		$this->assertSame( 'core/embed', gutenberg_html_to_blocks( '<p>https://example.com/a.html</p>' )[0]['blockName'] );
+	}
+
+	public function test_keeps_a_url_that_is_not_secure() {
+		$this->assertSame( 'core/paragraph', gutenberg_html_to_blocks( '<p>http://vimeo.com/76979871</p>' )[0]['blockName'] );
+	}
+
+	public function test_reads_a_url_someone_linked() {
+		$blocks = gutenberg_html_to_blocks( '<p><a href="https://vimeo.com/76979871">https://vimeo.com/76979871</a></p>' );
+
+		$this->assertSame( 'core/embed', $blocks[0]['blockName'] );
+		$this->assertSame( 'https://vimeo.com/76979871', $blocks[0]['attrs']['url'] );
+	}
+
+	public function test_rewrites_an_x_address_to_twitter() {
+		// The oEmbed registry has no X provider yet, which the editor works
+		// around the same way.
+		$blocks = gutenberg_html_to_blocks( '<p>https://x.com/wordpress/status/123</p>' );
+
+		$this->assertSame( 'https://twitter.com/wordpress/status/123', $blocks[0]['attrs']['url'] );
+		$this->assertSame( 'twitter', $blocks[0]['attrs']['providerNameSlug'] );
+	}
+
+	public function test_embeds_a_url_no_provider_claims() {
+		// Anything the site's oEmbed registry recognises can be embedded, so
+		// an unmatched address still becomes an embed, without the class
+		// names a known provider would add.
+		$blocks = gutenberg_html_to_blocks( '<p>https://example.com/talk/</p>' );
+
+		$this->assertSame( 'core/embed', $blocks[0]['blockName'] );
+		$this->assertSame( array( 'url' => 'https://example.com/talk/' ), $blocks[0]['attrs'] );
+		$this->assertSame(
+			'<figure class="wp-block-embed"><div class="wp-block-embed__wrapper">' . "\n" . 'https://example.com/talk/' . "\n" . '</div></figure>',
+			$blocks[0]['innerHTML']
+		);
+	}
+
+	public function test_records_no_type_for_a_provider_serving_more_than_one_kind_of_media() {
+		// Flickr answers `photo` for a photo and `video` for a video, so the
+		// type belongs to the address rather than the provider. The editor
+		// fills it in when the post is next opened.
+		$blocks = gutenberg_html_to_blocks( '<p>https://flic.kr/p/abc</p>' );
+
+		$this->assertSame( 'flickr', $blocks[0]['attrs']['providerNameSlug'] );
+		$this->assertArrayNotHasKey( 'type', $blocks[0]['attrs'] );
+	}
+
+	public function test_keeps_the_class_the_paragraph_carried_on_the_embed() {
+		$blocks = gutenberg_html_to_blocks( '<p class="lead">https://vimeo.com/76979871</p>' );
+
+		$this->assertSame( 'lead', $blocks[0]['attrs']['className'] );
+		$this->assertStringContainsString( 'wp-block-embed-vimeo lead"', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_reports_that_a_conversion_can_produce_an_embed() {
+		$this->assertContains( 'core/embed', gutenberg_get_block_conversion_support()['converts'] );
 	}
 
 	/**

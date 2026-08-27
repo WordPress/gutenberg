@@ -6,8 +6,8 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
  *
  * Table rebuilds its markup on save and declines server conversion outright;
  * Image converts only the markup it can save back. Both are covered
- * separately, as are the shortcodes only the editor turns into a block of
- * their own, and the pre-filters PHP does not have (embeds, Markdown).
+ * separately, as are the embeds the server fills in more of than the editor
+ * can, and the pre-filters PHP does not have (Markdown).
  */
 const AGREED = [
 	// Headings at both ends of the range, and the class a block support reads.
@@ -49,6 +49,12 @@ const AGREED = [
 	'<p>[contact-form-7 id="5" title="Contact"]</p>',
 	'<p>See [myshortcode] here.</p>',
 
+	// The same distinction for the addresses that become embeds, on the side
+	// where nothing becomes one.
+	'<p>Watch https://vimeo.com/76979871 tonight.</p>',
+	'<p>http://vimeo.com/76979871</p>',
+	'<p>https://example.com/handbook.pdf</p>',
+
 	// Markup no block claims, at the top level and wrapping blocks.
 	'<div class="widget"><span>Legacy</span></div>',
 	'<div><h2>Inside</h2><p>Also inside.</p></div>',
@@ -76,6 +82,39 @@ const LEGACY = [
 	'<p>Teaser.</p><!--more--><p>Rest.</p>',
 	'<p>Page one.</p><!--nextpage--><p>Page two.</p>',
 	'<h1>Title</h1><p class="intro">Intro.</p><div class="ad">Ad</div><h2 id="s1">Section</h2><ul><li>a</li></ul><blockquote><p>Q</p></blockquote><pre><code>x</code></pre><hr /><table><tbody><tr><td>t</td></tr></tbody></table><p>Bye.</p>',
+];
+
+/**
+ * Addresses standing on their own, which become embeds.
+ *
+ * The one attribute the two runtimes read differently: the editor asks the
+ * provider for a URL's oEmbed type once the preview loads, which conversion
+ * cannot wait for, so the server fills it in from a table of its own instead
+ * of leaving the block half built.
+ */
+const EMBEDS = [
+	'<p>https://www.youtube.com/watch?v=dQw4w9WgXcQ</p>',
+	'<p>https://twitter.com/wordpress/status/123</p>',
+
+	// Rewritten, because the oEmbed registry has no X provider yet.
+	'<p>https://x.com/wordpress/status/123</p>',
+
+	// A provider that is not responsive, and one that cannot be previewed.
+	'<p>https://www.pinterest.com/pin/99360735500167749/</p>',
+	'<p>https://someone.smugmug.com/Photo/</p>',
+
+	// Serves photos and videos alike, so its type belongs to the address
+	// rather than the provider and neither runtime fills it in.
+	'<p>https://flic.kr/p/abc</p>',
+
+	// No provider claims it, which is still an embed: what a site can embed
+	// is decided by its oEmbed registry rather than by this list.
+	'<p>https://example.com/talk/</p>',
+
+	// Read out of the text, so a linked address counts, and the class the
+	// paragraph carried is kept.
+	'<p><a href="https://vimeo.com/76979871">https://vimeo.com/76979871</a></p>',
+	'<p class="lead">https://wordpress.tv/2016/02/04/state-of-the-word/</p>',
 ];
 
 /**
@@ -176,7 +215,7 @@ test.describe( 'Block transforms declared in block.json', () => {
 	} ) => {
 		const markup = await convertOnServer(
 			requestUtils,
-			[ ...AGREED, ...LEGACY, ...DECLINED ].join( '' )
+			[ ...AGREED, ...EMBEDS, ...LEGACY, ...DECLINED ].join( '' )
 		);
 
 		const post = await requestUtils.createPost( {
@@ -233,6 +272,71 @@ test.describe( 'Block transforms declared in block.json', () => {
 				blocks: editor,
 			} );
 		}
+	} );
+
+	test( 'fill in the embed attributes the editor asks a provider for', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		const converted = await Promise.all(
+			EMBEDS.map( async ( html ) => ( {
+				html,
+				markup: await convertOnServer( requestUtils, html ),
+			} ) )
+		);
+
+		await admin.createNewPost();
+
+		const comparison = await page.evaluate( ( cases ) => {
+			const shape = ( blocks ) =>
+				blocks.map(
+					( { name, attributes: { type, ...attributes } } ) => ( {
+						name,
+						attributes,
+					} )
+				);
+
+			return cases.map( ( { html, markup } ) => {
+				const server = window.wp.blocks.parse( markup );
+
+				return {
+					html,
+					// Everything but the type has to match what the editor
+					// would have produced from the same paragraph.
+					server: shape( server ),
+					editor: shape(
+						window.wp.blocks.rawHandler( { HTML: html } )
+					),
+					types: server.map( ( { attributes } ) => attributes.type ),
+					invalid: server
+						.filter( ( { isValid } ) => false === isValid )
+						.map( ( { name } ) => name ),
+				};
+			} );
+		}, converted );
+
+		for ( const { html, server, editor, invalid } of comparison ) {
+			expect( { html, blocks: server } ).toEqual( {
+				html,
+				blocks: editor,
+			} );
+			expect( { html, invalid } ).toEqual( { html, invalid: [] } );
+		}
+
+		// The type is written into a class name, so a block carrying one has
+		// markup the editor could only have validated if both were written
+		// together. Flickr serves photos and videos alike and carries none.
+		expect(
+			Object.fromEntries(
+				comparison.map( ( { html, types } ) => [ html, types ] )
+			)
+		).toMatchObject( {
+			'<p>https://www.youtube.com/watch?v=dQw4w9WgXcQ</p>': [ 'video' ],
+			'<p>https://twitter.com/wordpress/status/123</p>': [ 'rich' ],
+			'<p>https://flic.kr/p/abc</p>': [ undefined ],
+			'<p>https://example.com/talk/</p>': [ undefined ],
+		} );
 	} );
 
 	test( 'leave markup alone when a block declines server conversion', async ( {
@@ -292,7 +396,7 @@ test.describe( 'Block transforms declared in block.json', () => {
 	} ) => {
 		const markup = await convertOnServer(
 			requestUtils,
-			[ ...AGREED, ...LEGACY, ...DECLINED ].join( '' )
+			[ ...AGREED, ...EMBEDS, ...LEGACY, ...DECLINED ].join( '' )
 		);
 
 		const post = await requestUtils.createPost( {

@@ -107,6 +107,15 @@ function gutenberg_get_block_conversion_support() {
 		}
 	}
 
+	/*
+	 * The Embed block is matched on the text of a paragraph rather than on a
+	 * selector, so it declares no `raw` transform to read. See
+	 * `Gutenberg_Embed_Transforms`.
+	 */
+	if ( WP_Block_Type_Registry::get_instance()->get_registered( Gutenberg_Embed_Transforms::BLOCK_NAME ) instanceof WP_Block_Type ) {
+		$converts[] = Gutenberg_Embed_Transforms::BLOCK_NAME;
+	}
+
 	$converts    = array_values( array_unique( $converts ) );
 	$conditional = array_values( array_unique( $conditional ) );
 	$declines    = array_values( array_unique( $declines ) );
