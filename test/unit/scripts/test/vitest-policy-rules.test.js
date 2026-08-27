@@ -324,8 +324,9 @@ describe( 'Vitest policy rules', () => {
 			"void import( 'vitest' );",
 			"import 'vitest';",
 			"import type { it } from 'vitest';",
+			"import { expect } from 'vitest';",
 		] ) {
-			expectViolation( source, 'no explicit import from vitest', {
+			expectViolation( source, 'no explicit Vitest collector import', {
 				isVitestTest: true,
 				project: 'node',
 			} );
@@ -341,10 +342,14 @@ describe( 'Vitest policy rules', () => {
 		);
 	} );
 
-	it( 'rejects Vitest APIs imported from other modules', () => {
+	it( 'rejects competing test runner imports', () => {
 		expectViolation(
-			"import test from 'node:test';\nimport { expect } from 'vitest';\ntest( 'example', () => {} );",
-			'must be imported from vitest',
+			"import nodeTest from 'node:test';\nimport { it } from 'vitest';\nnodeTest( 'example', () => {} );",
+			'test APIs must come from vitest',
+			{ isVitestTest: true, project: 'node' }
+		);
+		expectValid(
+			"import assert from 'node:assert/strict';\nimport { it } from 'vitest';\nit( 'example', () => assert.ok( true ) );",
 			{ isVitestTest: true, project: 'node' }
 		);
 	} );
@@ -441,7 +446,7 @@ describe( 'Vitest policy rules', () => {
 			}
 		);
 		expectViolation(
-			"import { expect } from 'vitest';\nexpect( element ).toHaveStyle( {} );",
+			"import { expect, it } from 'vitest';\nexpect( element ).toHaveStyle( {} );",
 			'toHaveStyle() requires',
 			{
 				isVitestTest: true,
@@ -449,7 +454,7 @@ describe( 'Vitest policy rules', () => {
 			}
 		);
 		expectViolation(
-			"import { expect } from 'vitest';\ntest( 'example', () => {} );",
+			"import { describe, expect } from 'vitest';\ntest( 'example', () => {} );",
 			'unbound Vitest API: test',
 			{
 				isVitestTest: true,

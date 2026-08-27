@@ -48,6 +48,13 @@ const vitestApiNames = new Set( [
 	'test',
 	'vi',
 ] );
+const vitestCollectorApiNames = new Set( [
+	'describe',
+	'it',
+	'suite',
+	'test',
+] );
+const competingTestRunnerModules = new Set( [ '@jest/globals', 'node:test' ] );
 const browserModeModules = new Set( [ '@vitest/browser', 'vitest/browser' ] );
 const policyExceptionKeys = new Set( [
 	'browserFireEvent',
@@ -1077,7 +1084,7 @@ export function validateVitestPolicy( {
 	const windowVariables = new Set();
 	const violations = [];
 	const reported = new Set();
-	let hasVitestImport = false;
+	let hasVitestCollectorImport = false;
 
 	const report = ( category, message, node ) => {
 		const exceptionName = {
@@ -1119,27 +1126,24 @@ export function validateVitestPolicy( {
 		if (
 			isVitestTest &&
 			importSource === 'vitest' &&
-			runtimeSpecifiers.length
+			runtimeSpecifiers.some(
+				( specifier ) =>
+					specifier.type === 'ImportNamespaceSpecifier' ||
+					vitestCollectorApiNames.has( getImportedName( specifier ) )
+			)
 		) {
-			hasVitestImport = true;
+			hasVitestCollectorImport = true;
 		}
 		if (
 			isVitestTest &&
-			! [ 'vitest', 'vitest/globals' ].includes( importSource )
+			competingTestRunnerModules.has( importSource ) &&
+			runtimeSpecifiers.length
 		) {
-			for ( const specifier of runtimeSpecifiers ) {
-				const importedName = getImportedName( specifier );
-				const apiName = vitestApiNames.has( importedName )
-					? importedName
-					: specifier.local.name;
-				if ( vitestApiNames.has( apiName ) ) {
-					report(
-						`non-vitest-api-import-${ specifier.local.name }`,
-						`Vitest API ${ apiName } must be imported from vitest`,
-						specifier
-					);
-				}
-			}
+			report(
+				'competing-test-runner-import',
+				`test APIs must come from vitest, not ${ importSource }`,
+				node
+			);
 		}
 		for ( const specifier of node.specifiers ) {
 			const variable = identifierVariables.get( specifier.local );
@@ -1796,8 +1800,8 @@ export function validateVitestPolicy( {
 		}
 	} );
 
-	if ( isVitestTest && ! hasVitestImport ) {
-		report( 'vitest-import', 'no explicit import from vitest' );
+	if ( isVitestTest && ! hasVitestCollectorImport ) {
+		report( 'vitest-import', 'no explicit Vitest collector import' );
 	}
 
 	if (
