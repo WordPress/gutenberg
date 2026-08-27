@@ -14,6 +14,7 @@ const config = require( '../config' );
 const ARTIFACTS_PATH =
 	process.env.WP_ARTIFACTS_PATH || path.join( process.cwd(), 'artifacts' );
 const RAW_RESULTS_FILE_SUFFIX = '.performance-results.raw.json';
+const WP_ENV_PORT = 8889;
 const RESULTS_FILE_SUFFIX = '.performance-results.json';
 
 /**
@@ -25,6 +26,7 @@ const RESULTS_FILE_SUFFIX = '.performance-results.json';
  * @property {string=}  suites      Comma separated names of the test suites to run (default: all).
  * @property {string=}  testsBranch The branch whose performance test files will be used for testing.
  * @property {string=}  testsDir    Existing checkout (with installed dependencies) to use as the test runner.
+ * @property {string=}  wpSource    wp-env `core` source (e.g. `WordPress/WordPress#<sha>`); takes precedence over `wpVersion`.
  * @property {string=}  wpVersion   The WordPress version to be used as the base install for testing.
  */
 
@@ -181,6 +183,7 @@ async function runTestSuite( testSuite, testRunnerDir, runKey, saveTraces ) {
 		{
 			...process.env,
 			PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1',
+			WP_BASE_URL: `http://localhost:${ WP_ENV_PORT }`,
 			WP_ARTIFACTS_PATH: ARTIFACTS_PATH,
 			RESULTS_ID: runKey,
 			// Suppress trace writes on comparison branches so they don't
@@ -268,7 +271,7 @@ async function runPerformanceTests( branches, options ) {
 	if ( ! runningInCI ) {
 		log(
 			formats.warning(
-				'\nIn order to run the tests, the tool is going to load a WordPress environment on ports 8888 and 8889.' +
+				'\nIn order to run the tests, the tool is going to load a WordPress environment on port 8889.' +
 					'\nMake sure these ports are not used before continuing.\n'
 			)
 		);
@@ -487,36 +490,33 @@ async function runPerformanceTests( branches, options ) {
 			wpEnvConfigPath,
 			JSON.stringify(
 				{
+					// The tests only use one site, so skip the second WordPress and MySQL containers.
+					testsEnvironment: false,
+					port: WP_ENV_PORT,
 					config: {
 						WP_DEBUG: false,
 						SCRIPT_DEBUG: false,
 					},
-					core: wpZipUrl || 'WordPress/WordPress',
+					core: options.wpSource || wpZipUrl || 'WordPress/WordPress',
 					plugins: [ buildDir ],
 					themes: [ path.join( testRunnerDir, 'test/emptytheme' ) ],
-					env: {
-						tests: {
-							mappings: {
-								'wp-content/mu-plugins': path.join(
-									testRunnerDir,
-									'packages/e2e-tests/mu-plugins'
-								),
-								'wp-content/plugins/gutenberg-test-plugins':
-									path.join(
-										testRunnerDir,
-										'packages/e2e-tests/plugins'
-									),
-								'wp-content/themes/gutenberg-test-themes':
-									path.join(
-										testRunnerDir,
-										'test/gutenberg-test-themes'
-									),
-								'wp-content/themes/gutenberg-test-themes/twentytwentyone':
-									'https://downloads.wordpress.org/theme/twentytwentyone.1.7.zip',
-								'wp-content/themes/gutenberg-test-themes/twentytwentythree':
-									'https://downloads.wordpress.org/theme/twentytwentythree.1.0.zip',
-							},
-						},
+					mappings: {
+						'wp-content/mu-plugins': path.join(
+							testRunnerDir,
+							'packages/e2e-tests/mu-plugins'
+						),
+						'wp-content/plugins/gutenberg-test-plugins': path.join(
+							testRunnerDir,
+							'packages/e2e-tests/plugins'
+						),
+						'wp-content/themes/gutenberg-test-themes': path.join(
+							testRunnerDir,
+							'test/gutenberg-test-themes'
+						),
+						'wp-content/themes/gutenberg-test-themes/twentytwentyone':
+							'https://downloads.wordpress.org/theme/twentytwentyone.1.7.zip',
+						'wp-content/themes/gutenberg-test-themes/twentytwentythree':
+							'https://downloads.wordpress.org/theme/twentytwentythree.1.0.zip',
 					},
 				},
 				null,
@@ -528,7 +528,9 @@ async function runPerformanceTests( branches, options ) {
 
 	logAtIndent( 0, 'Running tests' );
 
-	if ( wpZipUrl ) {
+	if ( options.wpSource ) {
+		logAtIndent( 1, 'Using:', formats.success( options.wpSource ) );
+	} else if ( wpZipUrl ) {
 		logAtIndent(
 			1,
 			'Using:',

@@ -40,6 +40,7 @@ jobs:
             # `ref` is what gets checked out and built.
             branches: ${{ steps.branches.outputs.branches }}
             wp-version: ${{ steps.branches.outputs.wp-version }}
+            wp-source: ${{ steps.branches.outputs.wp-source }}
 
         steps:
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -57,10 +58,13 @@ jobs:
                   INPUT_WP_VERSION: ${{ github.event.inputs.wpversion }}
               run: |
                   WP_VERSION=""
+                  WP_SOURCE=""
                   WP_MAJOR="$(awk -F ': ' '/^Tested up to/{print $2}' readme.txt | cut -d. -f1,2)"
                   case "$GITHUB_EVENT_NAME" in
                     pull_request)
                       BRANCHES="$(jq -cn --arg head "$GITHUB_SHA" --arg base "$BASE_REF" --arg baseSha "$BASE_SHA" '[{name: $head, ref: $head}, {name: $base, ref: $baseSha}]')"
+                      # Pin WordPress trunk so every shard and branch runs on the same core commit.
+                      WP_SOURCE="WordPress/WordPress#$(git ls-remote https://github.com/WordPress/WordPress.git HEAD | cut -f1)"
                       ;;
                     push)
                       # The base hash used here need to be a commit that is compatible with the current WP version
@@ -113,6 +117,8 @@ jobs:
                   fi
                   echo "branches=$BRANCHES" >> "$GITHUB_OUTPUT"
                   echo "wp-version=$WP_VERSION" >> "$GITHUB_OUTPUT"
+                  echo "wp-source=$WP_SOURCE" >> "$GITHUB_OUTPUT"
+                  echo "WordPress: ${WP_SOURCE:-${WP_VERSION:-trunk}}"
                   echo "$BRANCHES" | jq .
 
     build:
@@ -207,6 +213,16 @@ jobs:
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
 
+            - name: Get Playwright version
+              id: playwright
+              run: echo "version=$(node -p 'require("@playwright/test/package.json").version')" >> "$GITHUB_OUTPUT"
+
+            - name: Cache Playwright browsers
+              uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+              with:
+                  path: ~/.cache/ms-playwright
+                  key: playwright-${{ runner.os }}-${{ runner.arch }}-${{ steps.playwright.outputs.version }}
+
             - name: Download prebuilt plugins
               uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
               with:
@@ -226,10 +242,13 @@ jobs:
               env:
                   BRANCHES: ${{ needs.prepare.outputs.branches }}
                   WP_VERSION: ${{ needs.prepare.outputs.wp-version }}
+                  WP_SOURCE: ${{ needs.prepare.outputs.wp-source }}
               run: |
                   readarray -t BRANCH_ARGS < <(echo "$BRANCHES" | jq -r '.[].name')
                   WP_VERSION_ARGS=()
-                  if [[ -n "$WP_VERSION" ]]; then
+                  if [[ -n "$WP_SOURCE" ]]; then
+                    WP_VERSION_ARGS=(--wp-source "$WP_SOURCE")
+                  elif [[ -n "$WP_VERSION" ]]; then
                     WP_VERSION_ARGS=(--wp-version "$WP_VERSION")
                   fi
                   npm exec --no release-cli -- perf "${BRANCH_ARGS[@]}" --tests-dir "$GITHUB_WORKSPACE" --plugins-dir "$RUNNER_TEMP/plugins" --suites "$PERF_SUITES" "${WP_VERSION_ARGS[@]}"

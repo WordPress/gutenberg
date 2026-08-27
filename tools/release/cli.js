@@ -96,6 +96,10 @@ program
 		"Use this branch's performance test files"
 	)
 	.option(
+		'--wp-source <source>',
+		'wp-env core source for all branches, e.g. WordPress/WordPress#<sha>; takes precedence over --wp-version'
+	)
+	.option(
 		'--wp-version <version>',
 		'Specify a WordPress version on which to test all branches'
 	)
