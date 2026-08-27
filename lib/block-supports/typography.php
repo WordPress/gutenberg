@@ -259,11 +259,6 @@ function gutenberg_render_typography_support( $block_content, $block ) {
 		if ( ! empty( $block_content ) ) {
 			$processor = new WP_HTML_Tag_Processor( $block_content );
 			if ( $processor->next_tag() ) {
-				/*
-				 * Static blocks serialize this class into their saved markup, but
-				 * dynamically rendered blocks have no save step, so it is added here.
-				 * `add_class()` is a no-op when the class is already present.
-				 */
 				$processor->add_class( 'has-fit-text' );
 				if ( ! $processor->get_attribute( 'data-wp-interactive' ) ) {
 					$processor->set_attribute( 'data-wp-interactive', true );
