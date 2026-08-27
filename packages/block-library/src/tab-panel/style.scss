@@ -1,6 +1,12 @@
 .wp-block-tab-panel {
-	&[hidden],
 	&:empty {
 		display: none !important;
+	}
+
+	// Prevent blockGap and padding from adding extra spacing when the panel is
+	// closed, which the panel would otherwise keep along with its layout box.
+	&[hidden] {
+		margin-block-start: 0;
+		padding: 0 !important;
 	}
 }

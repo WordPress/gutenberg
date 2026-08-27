@@ -101,6 +101,8 @@ export const LayoutGrid = {
 		groupBy: false,
 		groupByLabel: true,
 		hasClickableItems: true,
+		mediaFit: 'cover',
+		mediaFitControl: true,
 		perPageSizes: [ 10, 25, 50, 100 ],
 		showMedia: true,
 	},
@@ -121,6 +123,17 @@ export const LayoutGrid = {
 		hasClickableItems: {
 			control: 'boolean',
 			description: 'Are the items clickable',
+		},
+		mediaFit: {
+			control: 'select',
+			options: [ 'cover', 'contain' ],
+			description:
+				'How the media field fills the preview box: cropped to fill it ("cover") or fitted inside it ("contain"), letterboxing the media so its own aspect ratio stays visible',
+		},
+		mediaFitControl: {
+			control: 'boolean',
+			description:
+				'Whether the view options offer the "Original aspect ratio" toggle, letting users switch the media fit themselves',
 		},
 		perPageSizes: {
 			control: 'object',

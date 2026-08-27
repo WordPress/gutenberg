@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "23.8.0",
+	"version": "23.9.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -64,6 +64,10 @@
 					"@wordpress/edit-site-init"
 				],
 				"experimental": true
+			},
+			{
+				"id": "theme-preview",
+				"experimental": true
 			}
 		]
 	},
@@ -91,7 +95,10 @@
 		"wait-on": "^8.0.1"
 	},
 	"overrides": {
-		"jsdom": "26.1.0"
+		"jsdom": "26.1.0",
+		"sockjs": {
+			"uuid": "^11.1.1"
+		}
 	},
 	"scripts": {
 		"agents:setup": "npm run --workspace @wordpress/agent-tools setup --",
@@ -170,6 +177,7 @@
 		"test:php": "npm-run-all lint:php test:unit:php",
 		"test:php:watch": "wp-env --config .wp-env.test.json run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script test:watch",
 		"test:unit": "npm run --workspace @wordpress/unit-tests test:unit --",
+		"test:unit:conventions": "npm run --workspace @wordpress/unit-tests test:unit:conventions",
 		"test:unit:vitest": "npm run --workspace @wordpress/unit-tests test:unit:vitest --",
 		"test:unit:routing": "npm run --workspace @wordpress/unit-tests test:unit:routing",
 		"test:unit:date": "bash ./bin/unit-test-date.sh",
