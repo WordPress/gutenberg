@@ -2,6 +2,7 @@ import { render, act } from '@testing-library/react';
 import { useSelect } from '@wordpress/data';
 import { speak } from '@wordpress/a11y';
 import UploadProgressSnackbar from '../';
+import { lock } from '../../../lock-unlock';
 import { addFiles, advance, advanceFailed, reset } from '../tracker';
 
 jest.mock( '@wordpress/data/src/components/use-select', () => {
@@ -27,12 +28,15 @@ jest.mock( '@wordpress/a11y', () => ( {
 } ) );
 
 function mockQueue( items, failureCount = 0 ) {
+	const storeSelect = {
+		getItems: () => items,
+		isUploading: () => items.length > 0,
+	};
+	// `getFailureCount` is a private selector, so the component reads it
+	// through `unlock`.
+	lock( storeSelect, { getFailureCount: () => failureCount } );
 	useSelect.mockImplementation( ( mapSelect ) =>
-		mapSelect( () => ( {
-			getItems: () => items,
-			isUploading: () => items.length > 0,
-			getFailureCount: () => failureCount,
-		} ) )
+		mapSelect( () => storeSelect )
 	);
 }
 
@@ -217,7 +221,7 @@ describe( 'UploadProgressSnackbar', () => {
 
 		expect( mockCreateNotice ).toHaveBeenCalledWith(
 			'info',
-			'Uploaded 2 of 3 files',
+			'Uploaded 2 of 3',
 			expect.objectContaining( {
 				id: 'upload-progress',
 				// A checkmark would overstate a batch that partly failed.
@@ -225,10 +229,7 @@ describe( 'UploadProgressSnackbar', () => {
 			} )
 		);
 		// The announcement has to say the same thing the notice says.
-		expect( speak ).toHaveBeenCalledWith(
-			'Uploaded 2 of 3 files',
-			'polite'
-		);
+		expect( speak ).toHaveBeenCalledWith( 'Uploaded 2 of 3', 'polite' );
 		expect( speak ).not.toHaveBeenCalledWith(
 			'Media upload complete',
 			'polite'

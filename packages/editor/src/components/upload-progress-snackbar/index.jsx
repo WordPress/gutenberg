@@ -10,6 +10,7 @@ import {
 	useTracker,
 	getFailureCount as getTrackedFailureCount,
 } from './tracker';
+import { unlock } from '../../lock-unlock';
 
 const NOTICE_ID = 'upload-progress';
 
@@ -76,7 +77,8 @@ export const UPLOAD_DONE = (
  */
 export default function UploadProgressSnackbar() {
 	const { items, csmFailureCount } = useSelect( ( select ) => {
-		const { getItems, getFailureCount } = select( uploadStore );
+		const { getItems } = select( uploadStore );
+		const { getFailureCount } = unlock( select( uploadStore ) );
 		return {
 			items: getItems(),
 			csmFailureCount: getFailureCount(),
@@ -173,7 +175,7 @@ export default function UploadProgressSnackbar() {
 					? __( 'Upload complete' )
 					: sprintf(
 							/* translators: 1: number of files uploaded, 2: number of files in the batch. */
-							__( 'Uploaded %1$d of %2$d files' ),
+							__( 'Uploaded %1$d of %2$d' ),
 							uploaded,
 							total
 					  );

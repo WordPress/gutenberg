@@ -12,7 +12,7 @@ While uploads are in progress the snackbar shows a spinner to the left of the te
 Files leave both sources the same way whether they uploaded or failed, so each source also tallies its failures — `getFailureCount` on the upload-media store, and `getFailureCount` on the tracker. The snackbar records their sum when a batch starts and subtracts it when the batch ends, which tells it what to report:
 
 -   Everything uploaded — "Upload complete", with the checkmark.
--   Some of it uploaded — "Uploaded 3 of 5 files", without the checkmark.
+-   Some of it uploaded — "Uploaded 3 of 5", without the checkmark.
 -   Nothing uploaded — no completion snackbar at all. The per-file errors already say what happened, so the progress notice is removed rather than replaced.
 
 The component renders nothing itself — it is a controller that manages a notice.

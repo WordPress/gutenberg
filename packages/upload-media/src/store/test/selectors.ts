@@ -1,5 +1,4 @@
 import {
-	getFailureCount,
 	getItems,
 	isUploading,
 	isUploadingById,
@@ -7,6 +6,7 @@ import {
 } from '../selectors';
 import {
 	getActiveUploadCount,
+	getFailureCount,
 	getActiveImageProcessingCount,
 	getActiveVideoProcessingCount,
 	getFailedItems,
