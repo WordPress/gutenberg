@@ -47,12 +47,9 @@ export function LinkPreview( { title, url, image, badges } ) {
 							{ stripHTML( title ) }
 						</Truncate>
 						{ url && (
-							<Truncate
-								numberOfLines={ 1 }
-								className="link-preview-button__hint"
-							>
+							<span className="link-preview-button__hint">
 								{ url }
-							</Truncate>
+							</span>
 						) }
 						{ badges && badges.length > 0 && (
 							<HStack

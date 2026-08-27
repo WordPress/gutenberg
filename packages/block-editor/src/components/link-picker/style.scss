@@ -37,8 +37,7 @@
 	flex: 1;
 }
 
-.link-preview-button__title,
-.link-preview-button__hint {
+.link-preview-button__title {
 	min-width: 0;
 	display: block;
 	width: 100%;
@@ -46,19 +45,23 @@
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-}
-
-.link-preview-button__title {
 	margin-top: $grid-unit-05;
 	font-weight: var(--wpds-typography-font-weight-emphasis);
 	color: $gray-900;
-	display: block;
+	word-spacing: normal;
 }
 
 .link-preview-button__hint {
+	min-width: 0;
+	display: block;
+	width: 100%;
+	text-align: left;
 	font-size: $helptext-font-size;
 	color: $gray-700;
 	font-weight: 400;
+	word-break: break-word;
+	overflow-wrap: break-word;
+	white-space: normal;
 }
 
 .link-preview-button__icon {
