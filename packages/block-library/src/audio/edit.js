@@ -6,7 +6,9 @@ import {
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalText as WCText,
 } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import {
 	BlockControls,
 	BlockIcon,
@@ -89,14 +91,6 @@ function AudioEdit( {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
-	}
-
-	function getAutoplayHelp( checked ) {
-		return checked
-			? __(
-					'Most browsers block audio until a visitor interacts with the page, so autoplay often won’t work, especially on mobile. Unexpected sound can also be disruptive for screen reader users.'
-			  )
-			: null;
 	}
 
 	function onSelectAudio( media ) {
@@ -183,6 +177,13 @@ function AudioEdit( {
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
+					<Stack className="wp-block-audio__autoplay-help-text-wrapper">
+						<WCText variant="muted">
+							{ __(
+								'Most browsers block audio until a visitor interacts with the page, so autoplay often won’t work, especially on mobile. Unexpected sound can also be disruptive for screen reader users.'
+							) }
+						</WCText>
+					</Stack>
 					<ToolsPanelItem
 						label={ __( 'Autoplay' ) }
 						isShownByDefault
@@ -197,7 +198,6 @@ function AudioEdit( {
 							label={ __( 'Autoplay' ) }
 							onChange={ toggleAttribute( 'autoplay' ) }
 							checked={ !! autoplay }
-							help={ getAutoplayHelp }
 						/>
 					</ToolsPanelItem>
 					<ToolsPanelItem
