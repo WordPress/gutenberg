@@ -10,6 +10,7 @@ import {
 	discoverTestFiles,
 	getVitestTestsByProject,
 } from './scripts/discover-test-files.mjs';
+import { compileInlineStyle } from '../../packages/wp-build/lib/compile-inline-style.mjs';
 
 const ROOT_DIR = path.resolve(
 	path.dirname( fileURLToPath( import.meta.url ) ),
@@ -38,6 +39,31 @@ const vitestTests = getVitestTestsByProject(
 const styleMockAlias = {
 	find: /^.*\.(?:css|scss)$/,
 	replacement: path.join( ROOT_DIR, 'test/unit/config/style-mock.vitest.js' ),
+};
+const WP_BUILD_STYLE_FIXTURE_ID = 'virtual:wp-build-style-injection';
+const wpBuildStyleFixtureSource = await compileInlineStyle( {
+	cssModules: true,
+	minify: false,
+} )(
+	`@layer wp-build-test {
+	.fixture {
+		--wp-build-style-injection-test: true;
+		color: rgb(1, 2, 3);
+	}
+}`,
+	ROOT_DIR,
+	path.join( ROOT_DIR, 'test/unit/config/wp-build-style-fixture.module.css' )
+);
+const wpBuildStyleFixturePlugin = {
+	name: 'wp-build-style-injection-fixture',
+	resolveId( id ) {
+		return id === WP_BUILD_STYLE_FIXTURE_ID ? `\0${ id }` : null;
+	},
+	load( id ) {
+		return id === `\0${ WP_BUILD_STYLE_FIXTURE_ID }`
+			? wpBuildStyleFixtureSource
+			: null;
+	},
 };
 const reporters = [ 'default' ];
 
@@ -84,6 +110,7 @@ export default defineConfig( {
 		},
 	},
 	plugins: [
+		wpBuildStyleFixturePlugin,
 		react( {
 			plugins: [
 				[
@@ -161,6 +188,9 @@ export default defineConfig( {
 				},
 				test: {
 					name: 'node',
+					env: {
+						WP_TESTS_SKIP_STYLE_INJECTION: 'true',
+					},
 					environment: 'node',
 					pool: 'threads',
 					include: vitestTests.node,
@@ -181,6 +211,9 @@ export default defineConfig( {
 				},
 				test: {
 					name: 'jsdom',
+					env: {
+						WP_TESTS_SKIP_STYLE_INJECTION: 'true',
+					},
 					environment: 'jsdom',
 					pool: 'threads',
 					environmentOptions: {

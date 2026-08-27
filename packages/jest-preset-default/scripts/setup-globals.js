@@ -2,6 +2,10 @@
 // eslint-disable-next-line @wordpress/wp-global-usage
 globalThis.SCRIPT_DEBUG = true;
 
+// Built packages can include CSS that jsdom cannot parse. Keep wp-build's
+// generated style injection disabled in this test environment.
+process.env.WP_TESTS_SKIP_STYLE_INJECTION = 'true';
+
 // The remaining globals all hang off `window`, which only exists when the test
 // is using a DOM environment (jsdom). Skip them when running under
 // `@jest-environment node`.
