@@ -557,7 +557,7 @@ const PlaylistEdit = ( {
 					{ showTracklist && (
 						<>
 							<ToolsPanelItem
-								label={ __( 'Show artist name in tracklist' ) }
+								label={ __( 'Show artist name' ) }
 								isShownByDefault
 								hasValue={ () => showArtists !== true }
 								onDeselect={ () =>
@@ -565,9 +565,8 @@ const PlaylistEdit = ( {
 								}
 							>
 								<ToggleControl
-									label={ __(
-										'Show artist name in tracklist'
-									) }
+									className="wp-block-playlist__tracklist-setting"
+									label={ __( 'Show artist name' ) }
 									onChange={ toggleAttribute(
 										'showArtists'
 									) }
@@ -575,9 +574,7 @@ const PlaylistEdit = ( {
 								/>
 							</ToolsPanelItem>
 							<ToolsPanelItem
-								label={ __(
-									'Show track numbers in tracklist'
-								) }
+								label={ __( 'Show track numbers' ) }
 								isShownByDefault
 								hasValue={ () => showNumbers !== true }
 								onDeselect={ () =>
@@ -585,9 +582,8 @@ const PlaylistEdit = ( {
 								}
 							>
 								<ToggleControl
-									label={ __(
-										'Show track numbers in tracklist'
-									) }
+									className="wp-block-playlist__tracklist-setting"
+									label={ __( 'Show track numbers' ) }
 									onChange={ toggleAttribute(
 										'showNumbers'
 									) }
@@ -595,9 +591,7 @@ const PlaylistEdit = ( {
 								/>
 							</ToolsPanelItem>
 							<ToolsPanelItem
-								label={ __(
-									'Show track duration in tracklist'
-								) }
+								label={ __( 'Show duration' ) }
 								isShownByDefault
 								hasValue={ () => showTrackLength !== true }
 								onDeselect={ () =>
@@ -605,33 +599,33 @@ const PlaylistEdit = ( {
 								}
 							>
 								<ToggleControl
-									label={ __(
-										'Show track duration in tracklist'
-									) }
+									className="wp-block-playlist__tracklist-setting"
+									label={ __( 'Show duration' ) }
 									onChange={ toggleAttribute(
 										'showTrackLength'
 									) }
 									checked={ showTrackLength }
 								/>
 							</ToolsPanelItem>
+							<ToolsPanelItem
+								label={ __( 'Show images' ) }
+								isShownByDefault
+								hasValue={ () => showImages !== true }
+								onDeselect={ () =>
+									setAttributes( { showImages: true } )
+								}
+							>
+								<ToggleControl
+									className="wp-block-playlist__tracklist-setting"
+									label={ __( 'Show images' ) }
+									onChange={ toggleAttribute( 'showImages' ) }
+									checked={ showImages }
+								/>
+							</ToolsPanelItem>
 						</>
 					) }
 					<ToolsPanelItem
-						label={ __( 'Show tracklist images' ) }
-						isShownByDefault
-						hasValue={ () => showImages !== true }
-						onDeselect={ () =>
-							setAttributes( { showImages: true } )
-						}
-					>
-						<ToggleControl
-							label={ __( 'Show tracklist images' ) }
-							onChange={ toggleAttribute( 'showImages' ) }
-							checked={ showImages }
-						/>
-					</ToolsPanelItem>
-					<ToolsPanelItem
-						label={ __( 'Show track image on play button' ) }
+						label={ __( 'Show image on play button' ) }
 						isShownByDefault
 						hasValue={ () => showPlayButtonArtwork === true }
 						onDeselect={ () =>
@@ -639,7 +633,7 @@ const PlaylistEdit = ( {
 						}
 					>
 						<ToggleControl
-							label={ __( 'Show track image on play button' ) }
+							label={ __( 'Show image on play button' ) }
 							onChange={ toggleAttribute(
 								'showPlayButtonArtwork'
 							) }
