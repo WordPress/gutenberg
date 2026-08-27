@@ -1,4 +1,4 @@
-import { act, render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { click } from '@ariakit/test';
 import { speak } from '@wordpress/a11y';
 import { SVG, Path } from '@wordpress/primitives';
@@ -89,6 +89,7 @@ describe( 'Snackbar', () => {
 	} );
 
 	it( 'should not be dismissible by clicking the snackbar when the `explicitDismiss` prop is set to `true`', async () => {
+		jest.useFakeTimers();
 		const onRemove = jest.fn();
 		const onDismiss = jest.fn();
 
@@ -113,7 +114,12 @@ describe( 'Snackbar', () => {
 			'components-snackbar-explicit-dismiss'
 		);
 
-		await click( snackbar );
+		fireEvent.click( snackbar );
+
+		expect( onRemove ).not.toHaveBeenCalled();
+		expect( onDismiss ).not.toHaveBeenCalled();
+
+		await act( async () => jest.advanceTimersByTime( 6000 ) );
 
 		expect( onRemove ).not.toHaveBeenCalled();
 		expect( onDismiss ).not.toHaveBeenCalled();
