@@ -50,6 +50,7 @@
 ### Enhancements
 
 -   Add a read-only code diff to the revisions screen ([#80314](https://github.com/WordPress/gutenberg/pull/80314)).
+-   In-editor revisions: Highlight changed words in the code diff ([#81273](https://github.com/WordPress/gutenberg/pull/81273)).
 
 ### New Features
 
