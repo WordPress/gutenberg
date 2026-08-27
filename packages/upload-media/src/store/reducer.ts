@@ -5,11 +5,13 @@ import {
 	type CacheBlobUrlAction,
 	type CancelAction,
 	ItemStatus,
+	type LoadPersistedAction,
 	type OperationFinishAction,
 	type OperationStartAction,
 	type PauseItemAction,
 	type PauseQueueAction,
 	type QueueItem,
+	type RegisterCallbacksAction,
 	type RemoveAction,
 	type ResumeItemAction,
 	type ResumeQueueAction,
@@ -60,6 +62,8 @@ type Action =
 	| RevokeBlobUrlsAction
 	| UpdateProgressAction
 	| UpdateSettingsAction
+	| LoadPersistedAction
+	| RegisterCallbacksAction
 	| UnknownAction;
 
 function reducer(
@@ -297,6 +301,41 @@ function reducer(
 					...state.settings,
 					...action.settings,
 				},
+			};
+		}
+
+		case Type.LoadPersisted: {
+			// Guard against double-loading (e.g. a re-mounted provider):
+			// items already in the queue keep their current state.
+			const existingIds = new Set(
+				state.queue.map( ( item ) => item.id )
+			);
+			return {
+				...state,
+				queue: [
+					...state.queue,
+					...action.items.filter(
+						( item ) => ! existingIds.has( item.id )
+					),
+				],
+			};
+		}
+
+		case Type.RegisterCallbacks: {
+			return {
+				...state,
+				queue: state.queue.map(
+					( item ): QueueItem =>
+						item.id === action.id
+							? {
+									...item,
+									onChange: action.onChange ?? item.onChange,
+									onSuccess:
+										action.onSuccess ?? item.onSuccess,
+									onError: action.onError ?? item.onError,
+							  }
+							: item
+				),
 			};
 		}
 	}

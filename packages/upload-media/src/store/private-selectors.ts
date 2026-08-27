@@ -1,5 +1,6 @@
 import {
 	type BatchId,
+	ItemStatus,
 	OperationType,
 	type QueueItem,
 	type QueueItemId,
@@ -218,4 +219,72 @@ export function getItemProgress(
 ): number | undefined {
 	const item = state.queue.find( ( i ) => i.id === id );
 	return item?.progress;
+}
+
+/**
+ * Returns the queue item carrying the given durable upload marker.
+ *
+ * @param state    Upload state.
+ * @param uploadId Durable marker written into block attributes.
+ * @return The matching item, or undefined.
+ */
+export function getItemByUploadId(
+	state: State,
+	uploadId: string
+): QueueItem | undefined {
+	return state.queue.find( ( item ) => item.uploadId === uploadId );
+}
+
+/**
+ * Returns the queue item whose preview (or source) URL matches the given URL.
+ *
+ * Lets a block that received a blob preview URL from an upload it did not
+ * start itself (e.g. via MediaPlaceholder) find the underlying queue item.
+ *
+ * @param state Upload state.
+ * @param url   Preview blob URL or source URL.
+ * @return The matching item, or undefined.
+ */
+export function getItemByPreviewUrl(
+	state: State,
+	url: string
+): QueueItem | undefined {
+	return state.queue.find(
+		( item ) => item.attachment?.url === url || item.sourceUrl === url
+	);
+}
+
+/**
+ * Returns items loaded from durable storage that are awaiting a resume decision.
+ *
+ * @param state Upload state.
+ * @return Items in PendingResume status.
+ */
+export function getResumableItems( state: State ): QueueItem[] {
+	return state.queue.filter(
+		( item ) => item.status === ItemStatus.PendingResume
+	);
+}
+
+/**
+ * Returns the item awaiting a resume decision that carries the given durable
+ * upload marker, if any.
+ *
+ * Unlike getItemByUploadId this ignores live (in-flight) items, whose
+ * callbacks are already attached; only loaded-from-storage items need a block
+ * to re-register its callbacks.
+ *
+ * @param state    Upload state.
+ * @param uploadId Durable marker written into block attributes.
+ * @return The matching PendingResume item, or undefined.
+ */
+export function getResumableItemByUploadId(
+	state: State,
+	uploadId: string
+): QueueItem | undefined {
+	return state.queue.find(
+		( item ) =>
+			item.status === ItemStatus.PendingResume &&
+			item.uploadId === uploadId
+	);
 }

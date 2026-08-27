@@ -639,4 +639,80 @@ describe( 'reducer', () => {
 			expect( state.queue[ 0 ].progress ).toBe( 50 );
 		} );
 	} );
+
+	describe( 'LoadPersisted', () => {
+		it( 'appends loaded items to the queue', () => {
+			const item = {
+				id: 'p1',
+				status: ItemStatus.PendingResume,
+			} as any;
+			const state = reducer( undefined, {
+				type: Type.LoadPersisted,
+				items: [ item ],
+			} as any );
+			expect( state.queue ).toHaveLength( 1 );
+			expect( state.queue[ 0 ].id ).toBe( 'p1' );
+		} );
+
+		it( 'skips items already present in the queue', () => {
+			const existing = {
+				id: 'p1',
+				status: ItemStatus.Processing,
+			} as any;
+			const initial = {
+				...reducer( undefined, { type: Type.Unknown } as any ),
+				queue: [ existing ],
+			};
+			const state = reducer( initial, {
+				type: Type.LoadPersisted,
+				items: [
+					{ id: 'p1', status: ItemStatus.PendingResume } as any,
+					{ id: 'p2', status: ItemStatus.PendingResume } as any,
+				],
+			} as any );
+			expect( state.queue ).toHaveLength( 2 );
+			// The existing item keeps its current state.
+			expect( state.queue[ 0 ] ).toBe( existing );
+			expect( state.queue[ 1 ].id ).toBe( 'p2' );
+		} );
+	} );
+
+	describe( 'RegisterCallbacks', () => {
+		it( 'attaches callbacks to the matching item', () => {
+			const onChange = jest.fn();
+			const initial = {
+				...reducer( undefined, { type: Type.Unknown } as any ),
+				queue: [
+					{ id: 'p1', status: ItemStatus.PendingResume } as any,
+				],
+			};
+			const state = reducer( initial, {
+				type: Type.RegisterCallbacks,
+				id: 'p1',
+				onChange,
+			} as any );
+			expect( state.queue[ 0 ].onChange ).toBe( onChange );
+		} );
+
+		it( 'preserves existing callbacks when an action field is undefined', () => {
+			const existingOnError = jest.fn();
+			const initial = {
+				...reducer( undefined, { type: Type.Unknown } as any ),
+				queue: [
+					{
+						id: 'p1',
+						status: ItemStatus.PendingResume,
+						onError: existingOnError,
+					} as any,
+				],
+			};
+			const state = reducer( initial, {
+				type: Type.RegisterCallbacks,
+				id: 'p1',
+				onChange: jest.fn(),
+				// onError deliberately omitted
+			} as any );
+			expect( state.queue[ 0 ].onError ).toBe( existingOnError );
+		} );
+	} );
 } );

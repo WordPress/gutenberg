@@ -46,6 +46,7 @@ import type {
 	BatchId,
 	CacheBlobUrlAction,
 	ImageFormat,
+	LoadPersistedAction,
 	OnBatchSuccessHandler,
 	OnChangeHandler,
 	OnErrorHandler,
@@ -56,8 +57,10 @@ import type {
 	OperationStartAction,
 	PauseItemAction,
 	PauseQueueAction,
+	PersistedQueueItem,
 	QueueItem,
 	QueueItemId,
+	RegisterCallbacksAction,
 	ResumeQueueAction,
 	RevokeBlobUrlsAction,
 	SideloadAdditionalData,
@@ -70,6 +73,13 @@ import type {
 import { ItemStatus, OperationType, Type } from './types';
 import type { cancelItem, executeRetry } from './actions';
 import { clearRetryTimer } from './utils/retry';
+import {
+	persistItem,
+	deleteItem,
+	toPersistedRecord,
+	pruneStale,
+	isPersistenceAvailable,
+} from './utils/persistence';
 
 const DEFAULT_OUTPUT_QUALITY = 0.82;
 
@@ -81,6 +91,35 @@ const DEFAULT_OUTPUT_QUALITY = 0.82;
  * cancellation.
  */
 const ultraHdrItems = new Set< QueueItemId >();
+
+/**
+ * Persists a queue item by id if durable storage is enabled. Fire-and-forget;
+ * never throws into the pipeline.
+ *
+ * @param select             Store selectors.
+ * @param select.getItem     Returns the item for a given id.
+ * @param select.getSettings Returns the current store settings.
+ * @param id                 Item id.
+ */
+function maybePersist(
+	select: {
+		getItem: ( id: QueueItemId ) => QueueItem | undefined;
+		getSettings: () => Settings;
+	},
+	id: QueueItemId
+): void {
+	if ( select.getSettings().durableQueue === false ) {
+		return;
+	}
+	const item = select.getItem( id );
+	if ( ! item ) {
+		return;
+	}
+	const record = toPersistedRecord( item, Date.now() );
+	if ( record ) {
+		void persistItem( record );
+	}
+}
 
 type ActionCreators = {
 	cancelItem: typeof cancelItem;
@@ -103,6 +142,10 @@ type ActionCreators = {
 	updateItemProgress: typeof updateItemProgress;
 	revokeBlobUrls: typeof revokeBlobUrls;
 	detectUltraHdr: typeof detectUltraHdr;
+	loadPersistedQueue: typeof loadPersistedQueue;
+	registerItemCallbacks: typeof registerItemCallbacks;
+	resumePersistedQueue: typeof resumePersistedQueue;
+	discardPersistedQueue: typeof discardPersistedQueue;
 	< T = Record< string, unknown > >( args: T ): void;
 };
 
@@ -134,6 +177,8 @@ interface AddItemArgs {
 	sourceAttachmentId?: number;
 	abortController?: AbortController;
 	operations?: Operation[];
+	uploadId?: string;
+	postId?: number;
 }
 
 /**
@@ -151,6 +196,8 @@ interface AddItemArgs {
  * @param [$0.sourceAttachmentId] Source attachment ID. Used when optimizing an existing file for example.
  * @param [$0.abortController]    Abort controller for upload cancellation.
  * @param [$0.operations]         List of operations to perform. Defaults to automatically determined list, based on the file.
+ * @param [$0.uploadId]           Durable upload ID written into block attributes for resume after reload.
+ * @param [$0.postId]             Post the upload belongs to; persisted for the resume summary notice.
  */
 export function addItem( {
 	file: fileOrBlob,
@@ -164,8 +211,10 @@ export function addItem( {
 	sourceAttachmentId,
 	abortController,
 	operations,
+	uploadId,
+	postId,
 }: AddItemArgs ) {
-	return async ( { dispatch }: ThunkArgs ) => {
+	return async ( { select, dispatch }: ThunkArgs ) => {
 		const itemId = uuidv4();
 
 		// Hardening in case a Blob is passed instead of a File.
@@ -189,6 +238,11 @@ export function addItem( {
 			item: {
 				id: itemId,
 				batchId,
+				// Self-generate a durable marker when the caller does not
+				// provide one, so every queue item can be persisted and
+				// resumed (at minimum to the Media Library) after a reload.
+				uploadId: uploadId ?? uuidv4(),
+				postId,
 				status: ItemStatus.Processing,
 				sourceFile: cloneFile( file ),
 				file,
@@ -211,6 +265,8 @@ export function addItem( {
 					: [ OperationType.Prepare ],
 			},
 		} );
+
+		maybePersist( select, itemId );
 
 		dispatch.processItem( itemId );
 	};
@@ -565,6 +621,7 @@ export function removeItem( id: QueueItemId ) {
 
 		// Clear any pending retry timer for this item.
 		clearRetryTimer( id );
+		void deleteItem( id );
 
 		dispatch( {
 			type: Type.Remove,
@@ -604,6 +661,7 @@ export function finishOperation(
 		} );
 
 		dispatch.processItem( id );
+		maybePersist( select, id );
 
 		/*
 		 * If an upload just finished, there may be items waiting in the queue
@@ -1999,5 +2057,143 @@ export function updateSettings(
 	return {
 		type: Type.UpdateSettings,
 		settings,
+	};
+}
+
+/**
+ * Loads any persisted upload-queue records into the store as inert
+ * PendingResume items. Stale and over-budget records are pruned first. Each
+ * loaded item gets a fresh AbortController and a recreated preview blob URL so
+ * the originating block can show the image again once reconnected.
+ */
+export function loadPersistedQueue() {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		if (
+			! isPersistenceAvailable() ||
+			select.getSettings().durableQueue === false
+		) {
+			return;
+		}
+
+		const survivors = await pruneStale();
+		if ( survivors.length === 0 ) {
+			return;
+		}
+
+		const items: QueueItem[] = survivors.map(
+			( record: PersistedQueueItem ): QueueItem => {
+				const blobUrl = createBlobURL( record.file );
+				return {
+					id: record.id,
+					uploadId: record.uploadId,
+					postId: record.postId,
+					batchId: record.batchId,
+					parentId: record.parentId,
+					file: record.file,
+					sourceFile: record.sourceFile,
+					originalHeicFile: record.originalHeicFile,
+					poster: record.poster,
+					operations: record.operations,
+					currentOperation: undefined,
+					status: ItemStatus.PendingResume,
+					attachment: { ...record.attachment, url: blobUrl },
+					subSizes: record.subSizes,
+					additionalData: record.additionalData,
+					retryCount: record.retryCount,
+					nextRetryTimestamp: record.nextRetryTimestamp,
+					progress: record.progress,
+					sourceUrl: record.sourceUrl,
+					sourceAttachmentId: record.sourceAttachmentId,
+					abortController: new AbortController(),
+				};
+			}
+		);
+
+		// Track the recreated preview blob URLs so they can be revoked on discard.
+		for ( const item of items ) {
+			if ( item.attachment?.url ) {
+				dispatch< CacheBlobUrlAction >( {
+					type: Type.CacheBlobUrl,
+					id: item.id,
+					blobUrl: item.attachment.url,
+				} );
+			}
+		}
+
+		dispatch< LoadPersistedAction >( {
+			type: Type.LoadPersisted,
+			items,
+		} );
+	};
+}
+
+/**
+ * Attaches a block's callbacks to a loaded item identified by its durable
+ * marker, so a resumed upload routes its results back to the block.
+ *
+ * @param uploadId            Durable marker.
+ * @param callbacks           Block callbacks.
+ * @param callbacks.onChange  Called as previews/attachments become available.
+ * @param callbacks.onSuccess Called when the upload completes.
+ * @param callbacks.onError   Called when the upload fails.
+ */
+export function registerItemCallbacks(
+	uploadId: string,
+	{
+		onChange,
+		onSuccess,
+		onError,
+	}: {
+		onChange?: OnChangeHandler;
+		onSuccess?: OnSuccessHandler;
+		onError?: OnErrorHandler;
+	}
+) {
+	return ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItemByUploadId( uploadId );
+		if ( ! item ) {
+			return;
+		}
+		dispatch< RegisterCallbacksAction >( {
+			type: Type.RegisterCallbacks,
+			id: item.id,
+			onChange,
+			onSuccess,
+			onError,
+		} );
+	};
+}
+
+/**
+ * Resumes all loaded (PendingResume) items: flips them to Processing and runs
+ * the next operation. Items whose block never re-registered callbacks still
+ * finish to the Media Library.
+ */
+export function resumePersistedQueue() {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const resumable = select.getResumableItems();
+		for ( const item of resumable ) {
+			dispatch( { type: Type.ResumeItem, id: item.id } );
+		}
+		for ( const item of resumable ) {
+			dispatch.processItem( item.id );
+		}
+	};
+}
+
+/**
+ * Discards all loaded items and their persisted records. Called when the user
+ * declines to resume.
+ *
+ * Records are deleted per item (via removeItem) rather than wholesale, so the
+ * persisted record of an upload that is currently in flight is left intact.
+ */
+export function discardPersistedQueue() {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const resumable = select.getResumableItems();
+		for ( const item of resumable ) {
+			dispatch.revokeBlobUrls( item.id );
+			dispatch.removeItem( item.id );
+		}
 	};
 }

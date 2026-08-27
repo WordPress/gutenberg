@@ -179,6 +179,81 @@ class MediaProcessingUtils {
 
 		return await this.getMediaDetails( requestUtils, imageId );
 	}
+
+	/**
+	 * Count the records in the durable upload queue's IndexedDB store.
+	 *
+	 * Returns 0 when the database or store does not exist yet.
+	 *
+	 * @return {Promise<number>} Number of persisted queue records.
+	 */
+	async countPersistedUploads() {
+		return await this.page.evaluate(
+			() =>
+				new Promise( ( resolve, reject ) => {
+					const request = window.indexedDB.open( 'wp-upload-media' );
+					request.onsuccess = () => {
+						const db = request.result;
+						if ( ! db.objectStoreNames.contains( 'queue' ) ) {
+							db.close();
+							resolve( 0 );
+							return;
+						}
+						const countRequest = db
+							.transaction( 'queue', 'readonly' )
+							.objectStore( 'queue' )
+							.count();
+						countRequest.onsuccess = () => {
+							db.close();
+							resolve( countRequest.result );
+						};
+						countRequest.onerror = () => {
+							db.close();
+							reject( countRequest.error );
+						};
+					};
+					request.onerror = () => reject( request.error );
+				} )
+		);
+	}
+
+	/**
+	 * Clear all records from the durable upload queue's IndexedDB store, so
+	 * persisted uploads from one test never surface a resume notice in the
+	 * next one.
+	 */
+	async clearPersistedUploads() {
+		try {
+			await this.page.evaluate(
+				() =>
+					new Promise( ( resolve ) => {
+						const request =
+							window.indexedDB.open( 'wp-upload-media' );
+						request.onsuccess = () => {
+							const db = request.result;
+							if ( ! db.objectStoreNames.contains( 'queue' ) ) {
+								db.close();
+								resolve();
+								return;
+							}
+							const tx = db.transaction( 'queue', 'readwrite' );
+							tx.objectStore( 'queue' ).clear();
+							tx.oncomplete = () => {
+								db.close();
+								resolve();
+							};
+							tx.onerror = () => {
+								db.close();
+								resolve();
+							};
+						};
+						request.onerror = () => resolve();
+					} )
+			);
+		} catch {
+			// Best-effort cleanup; the page may already be closed.
+		}
+	}
 }
 
 test.describe( 'Client-side media processing', () => {
@@ -194,7 +269,10 @@ test.describe( 'Client-side media processing', () => {
 		await mediaProcessingUtils.skipIfClientSideMediaInactive( test );
 	} );
 
-	test.afterEach( async ( { requestUtils } ) => {
+	test.afterEach( async ( { requestUtils, mediaProcessingUtils } ) => {
+		// Drop any queue records a failed durable-queue test left behind so
+		// they cannot surface a resume notice in a subsequent test.
+		await mediaProcessingUtils.clearPersistedUploads();
 		await requestUtils.deleteAllMedia();
 	} );
 
@@ -741,6 +819,322 @@ test.describe( 'Client-side media processing', () => {
 		expect( createAttempts ).toBeGreaterThanOrEqual( 2 );
 
 		await page.unroute( '**/wp/v2/media**' );
+	} );
+
+	test( 'resumes an interrupted upload after a page reload', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+	} ) => {
+		// Hang all POST requests to /wp/v2/media so the upload stays
+		// in-flight (PROCESSING) and its IndexedDB record persists until
+		// after the reload — simulating a crash mid-upload. The browser
+		// aborts the pending request automatically on page navigation.
+		await page.route( '**/wp/v2/media**', async ( route ) => {
+			if (
+				route.request().method() === 'POST' &&
+				/\/wp\/v2\/media(\?|$)/.test( route.request().url() )
+			) {
+				// Never fulfill: keep the upload in-flight so its persisted
+				// IndexedDB record survives until the reload.
+				await new Promise( () => {} );
+				return;
+			}
+			await route.continue();
+		} );
+
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		// Use the suite helper so the file gets a unique temp-copy name.
+		await mediaProcessingUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			'10x10_e2e_test_image_z9T8jK.png'
+		);
+
+		// Wait until the durable upload marker is serialized onto the block.
+		// onUploadStart writes uploadId; saveDraft before this means the saved
+		// post won't carry the marker and reload finds nothing to resume.
+		await expect
+			.poll(
+				() =>
+					page.evaluate(
+						() =>
+							window.wp.data
+								.select( 'core/block-editor' )
+								.getSelectedBlock()?.attributes?.uploadId
+					),
+				{ timeout: 10_000 }
+			)
+			.toBeTruthy();
+
+		// Save the draft so the in-progress block (with its durable uploadId)
+		// survives the reload.
+		await editor.saveDraft();
+
+		// The queue item must be durably persisted before simulating the crash.
+		await expect
+			.poll( () => mediaProcessingUtils.countPersistedUploads() )
+			.toBeGreaterThan( 0 );
+
+		// Reload with the hanging route still armed: the reload aborts the
+		// held request so the upload cannot complete (and delete its
+		// persisted record) in the dying page. Unrouting first would release
+		// the held request to the server and lose that race.
+		await page.reload();
+
+		// Now drop the route so the resumed upload's POST reaches the real
+		// server and can succeed.
+		await page.unroute( '**/wp/v2/media**' );
+
+		// The resume notice must appear; click Resume to re-trigger the upload.
+		const resumeButton = page.getByRole( 'button', { name: /resume/i } );
+		await expect( resumeButton ).toBeVisible( { timeout: 15_000 } );
+		await resumeButton.click();
+
+		// After resuming, the image block should resolve to a real server URL
+		// (not a blob: URL) once the upload pipeline finishes.
+		const img = editor.canvas
+			.locator( 'role=document[name="Block: Image"i]' )
+			.getByRole( 'img' );
+		await expect
+			.poll( async () => ( await img.getAttribute( 'src' ) ) ?? '', {
+				timeout: 60_000,
+			} )
+			.toMatch( /^https?:\/\// );
+
+		// The durable marker is cleared from the block once the attachment
+		// lands, so a future reload has nothing left to resume.
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const [ block ] = window.wp.data
+						.select( 'core/block-editor' )
+						.getBlocks();
+					return block?.attributes?.uploadId ?? null;
+				} )
+			)
+			.toBeNull();
+
+		// The persisted queue record is deleted after the successful upload.
+		await expect
+			.poll( () => mediaProcessingUtils.countPersistedUploads() )
+			.toBe( 0 );
+	} );
+
+	test( 'discards an interrupted upload when the user declines to resume', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+	} ) => {
+		// Hang all POST requests to /wp/v2/media so the upload stays
+		// in-flight (PROCESSING) and its IndexedDB record persists until
+		// after the reload — simulating a crash mid-upload.
+		await page.route( '**/wp/v2/media**', async ( route ) => {
+			if (
+				route.request().method() === 'POST' &&
+				/\/wp\/v2\/media(\?|$)/.test( route.request().url() )
+			) {
+				// Never fulfill: keep the upload in-flight so its persisted
+				// IndexedDB record survives until the reload.
+				await new Promise( () => {} );
+				return;
+			}
+			await route.continue();
+		} );
+
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		await mediaProcessingUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			'10x10_e2e_test_image_z9T8jK.png'
+		);
+
+		// Wait until the durable upload marker is serialized onto the block
+		// before saving, so the saved post carries the uploadId attribute.
+		await expect
+			.poll(
+				() =>
+					page.evaluate(
+						() =>
+							window.wp.data
+								.select( 'core/block-editor' )
+								.getSelectedBlock()?.attributes?.uploadId
+					),
+				{ timeout: 10_000 }
+			)
+			.toBeTruthy();
+
+		// Save the draft so the in-progress block survives reload.
+		await editor.saveDraft();
+
+		// The queue item must be durably persisted before simulating the crash.
+		await expect
+			.poll( () => mediaProcessingUtils.countPersistedUploads() )
+			.toBeGreaterThan( 0 );
+
+		// Reload with the hanging route still armed so the held request is
+		// aborted rather than released to the server (which would complete
+		// the upload and delete its persisted record before the reload).
+		await page.reload();
+		await page.unroute( '**/wp/v2/media**' );
+
+		// Click Discard to dismiss the resume prompt.
+		const discardButton = page.getByRole( 'button', { name: /discard/i } );
+		await expect( discardButton ).toBeVisible( { timeout: 15_000 } );
+		await discardButton.click();
+
+		// The notice is gone and no Resume button remains visible.
+		await expect(
+			page.getByRole( 'button', { name: /resume/i } )
+		).toBeHidden();
+
+		// Discard clears durable storage, not just the notice.
+		await expect
+			.poll( () => mediaProcessingUtils.countPersistedUploads() )
+			.toBe( 0 );
+
+		// A second reload must not re-prompt: with storage empty, the editor
+		// loads with no interrupted-upload notice.
+		await page.reload();
+		await expect(
+			editor.canvas.locator( 'role=document[name="Block: Image"i]' )
+		).toBeVisible();
+		await expect(
+			page.getByRole( 'button', { name: /resume/i } )
+		).toBeHidden();
+	} );
+
+	test( 'resumes an interrupted gallery upload after a page reload', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+	} ) => {
+		// Hang all POST requests to /wp/v2/media so the upload stays
+		// in-flight and its IndexedDB record persists until after the reload.
+		await page.route( '**/wp/v2/media**', async ( route ) => {
+			if (
+				route.request().method() === 'POST' &&
+				/\/wp\/v2\/media(\?|$)/.test( route.request().url() )
+			) {
+				await new Promise( () => {} );
+				return;
+			}
+			await route.continue();
+		} );
+
+		await editor.insertBlock( { name: 'core/gallery' } );
+
+		const galleryBlock = editor.canvas.locator(
+			'role=document[name="Block: Gallery"i]'
+		);
+		await expect( galleryBlock ).toBeVisible();
+
+		await mediaProcessingUtils.upload(
+			galleryBlock.locator( 'data-testid=form-file-upload-input' ),
+			'10x10_e2e_test_image_z9T8jK.png'
+		);
+
+		// The gallery nests a core/image block which carries the durable
+		// marker; wait for it to be serialized before saving.
+		await expect
+			.poll(
+				() =>
+					page.evaluate( () => {
+						const gallery = window.wp.data
+							.select( 'core/block-editor' )
+							.getBlocks()
+							.find( ( b ) => b.name === 'core/gallery' );
+						return (
+							gallery?.innerBlocks?.[ 0 ]?.attributes?.uploadId ??
+							null
+						);
+					} ),
+				{ timeout: 10_000 }
+			)
+			.not.toBeNull();
+
+		await editor.saveDraft();
+
+		// The queue item must be durably persisted before simulating the crash.
+		await expect
+			.poll( () => mediaProcessingUtils.countPersistedUploads() )
+			.toBeGreaterThan( 0 );
+
+		// Reload with the hanging route still armed (see the single-image
+		// resume test), then drop it so the resumed POST can succeed.
+		await page.reload();
+		await page.unroute( '**/wp/v2/media**' );
+
+		const resumeButton = page.getByRole( 'button', { name: /resume/i } );
+		await expect( resumeButton ).toBeVisible( { timeout: 15_000 } );
+		await resumeButton.click();
+
+		// The resumed upload reconnects to the inner image block, which
+		// resolves to a real server URL once the pipeline finishes.
+		const img = editor.canvas
+			.locator( 'role=document[name="Block: Gallery"i]' )
+			.locator( 'role=document[name="Block: Image"i]' )
+			.getByRole( 'img' );
+		await expect
+			.poll( async () => ( await img.getAttribute( 'src' ) ) ?? '', {
+				timeout: 60_000,
+			} )
+			.toMatch( /^https?:\/\// );
+
+		await expect
+			.poll( () => mediaProcessingUtils.countPersistedUploads() )
+			.toBe( 0 );
+	} );
+
+	test( 'does not prompt to resume after an upload completes normally', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		await mediaProcessingUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			'10x10_e2e_test_image_z9T8jK.png'
+		);
+
+		await expect( imageBlock.getByRole( 'img' ) ).toHaveAttribute(
+			'src',
+			/^https?:\/\//,
+			{ timeout: 30_000 }
+		);
+		await mediaProcessingUtils.waitForUploadQueueEmpty();
+
+		// A completed upload leaves no persisted record behind.
+		await expect
+			.poll( () => mediaProcessingUtils.countPersistedUploads() )
+			.toBe( 0 );
+
+		await editor.saveDraft();
+		await page.reload();
+
+		// The editor loads without an interrupted-upload notice.
+		await expect(
+			editor.canvas.locator( 'role=document[name="Block: Image"i]' )
+		).toBeVisible();
+		await expect(
+			page.getByRole( 'button', { name: /resume/i } )
+		).toBeHidden();
 	} );
 
 	test( 'surfaces an error after exhausting upload retries', async ( {

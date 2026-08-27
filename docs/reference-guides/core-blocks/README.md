@@ -455,7 +455,7 @@ Insert an image to make a visual statement.
 -	**Name:** [core/image](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-image/)
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
 -	**Supports:** align (center, full, left, right, wide), anchor, color (~~background~~, ~~text~~), filter (duotone), interactivity, shadow, spacing (margin)
--	**Attributes:** alt, aspectRatio, blob, caption, focalPoint, height, href, id, isDecorative, lightbox, linkClass, linkDestination, linkTarget, rel, scale, sizeSlug, title, url, width
+-	**Attributes:** alt, aspectRatio, blob, caption, focalPoint, height, href, id, isDecorative, lightbox, linkClass, linkDestination, linkTarget, rel, scale, sizeSlug, title, uploadId, url, width
 
 ## Latest Comments
 
