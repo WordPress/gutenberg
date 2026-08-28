@@ -302,139 +302,18 @@ add_action( 'admin_print_styles', 'gutenberg_meta_box_iframe_print_styles', 99 )
  * Prints the script that adapts the classic screen to living in an iframe.
  *
  * Form submissions are prevented, because the parent editor saves through
- * its own flow, and width based media queries are rewritten to answer for
- * the parent window: the iframe is as wide as the pane, but the styles
- * should break to small screen layouts only when the user's window does.
+ * its own flow, width based media queries are rewritten to answer for the
+ * parent window, and the boxes follow the visibility preferences of the
+ * parent editor. The script is printed inline, from meta-box-iframe.js,
+ * so that it is not a registered script anything can depend on.
  */
 function gutenberg_meta_box_iframe_print_bootstrap() {
 	if ( ! gutenberg_is_meta_box_iframe_request() ) {
 		return;
 	}
-	?>
-	<script id="gutenberg-meta-box-iframe-bootstrap">
-		( () => {
-			if ( window.parent === window ) {
-				return;
-			}
-
-			// The parent editor saves through its own flow. Runs at the
-			// bubble phase so that meta box scripts handle the event first.
-			document.addEventListener( 'submit', ( event ) => {
-				event.preventDefault();
-			} );
-
-			<?php if ( in_array( 'side', gutenberg_meta_box_iframe_locations(), true ) ) : ?>
-			// The sidebar provides no fixed pane, so this document sizes
-			// its own frame to the content.
-			window.addEventListener( 'DOMContentLoaded', () => {
-				if ( ! window.frameElement ) {
-					return;
-				}
-				const applyHeight = () => {
-					window.frameElement.style.height = `${
-						document.documentElement.offsetHeight
-					}px`;
-				};
-				new ResizeObserver( applyHeight ).observe(
-					document.documentElement
-				);
-				applyHeight();
-			} );
-			<?php endif; ?>
-
-			const dimensionQuery =
-				/\(\s*(?:min-|max-)?(?:width|height|aspect-ratio|device-width|device-height)/;
-
-			const controlMediaList = ( mediaList ) => {
-				const condition = mediaList.mediaText;
-				if ( ! dimensionQuery.test( condition ) ) {
-					return;
-				}
-				const parentQuery = window.parent.matchMedia( condition );
-				const apply = () => {
-					mediaList.mediaText = parentQuery.matches
-						? 'all'
-						: 'not all';
-				};
-				parentQuery.addEventListener( 'change', apply );
-				apply();
-			};
-
-			const processRules = ( rules ) => {
-				for ( const rule of rules ) {
-					if ( rule.media ) {
-						controlMediaList( rule.media );
-					}
-					try {
-						// @import rules pull in their own sheet.
-						if ( rule.styleSheet ) {
-							processRules( rule.styleSheet.cssRules );
-						}
-					} catch ( error ) {
-						// Cross origin sheet.
-					}
-					if ( rule.cssRules ) {
-						processRules( rule.cssRules );
-					}
-				}
-			};
-
-			const processed = new WeakSet();
-			const processStyleSheets = () => {
-				for ( const sheet of document.styleSheets ) {
-					if ( processed.has( sheet ) ) {
-						continue;
-					}
-					try {
-						// Throws for cross origin sheets.
-						const rules = sheet.cssRules;
-						processed.add( sheet );
-						if ( sheet.media.mediaText ) {
-							controlMediaList( sheet.media );
-						}
-						processRules( rules );
-					} catch ( error ) {
-						// Leave the sheet as is.
-					}
-				}
-			};
-
-			const observer = new MutationObserver( ( mutations ) => {
-				let sheetsChanged = false;
-				for ( const mutation of mutations ) {
-					for ( const node of mutation.addedNodes ) {
-						if ( node.nodeName === 'STYLE' ) {
-							sheetsChanged = true;
-						}
-						if ( node.nodeName === 'LINK' ) {
-							sheetsChanged = true;
-							node.addEventListener(
-								'load',
-								processStyleSheets,
-								{ once: true }
-							);
-						}
-					}
-				}
-				if ( sheetsChanged ) {
-					processStyleSheets();
-				}
-			} );
-			observer.observe( document.documentElement, {
-				childList: true,
-				subtree: true,
-			} );
-			window.addEventListener( 'load', processStyleSheets );
-			processStyleSheets();
-
-			// Scripts should branch on the parent window's size too.
-			const iframeMatchMedia = window.matchMedia.bind( window );
-			window.matchMedia = ( query ) =>
-				dimensionQuery.test( query )
-					? window.parent.matchMedia( query )
-					: iframeMatchMedia( query );
-		} )();
-	</script>
-	<?php
+	wp_print_inline_script_tag(
+		file_get_contents( __DIR__ . '/meta-box-iframe.js' ),
+		array( 'id' => 'gutenberg-meta-box-iframe-bootstrap' )
+	);
 }
 add_action( 'admin_head', 'gutenberg_meta_box_iframe_print_bootstrap', 100 );

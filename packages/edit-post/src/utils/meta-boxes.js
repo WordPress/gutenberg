@@ -33,14 +33,25 @@ export function getMetaBoxesIframeName( location = 'main' ) {
 }
 
 /**
- * Returns the iframes the meta boxes are rendered in.
+ * Returns the documents of the currently rendered meta boxes iframes,
+ * found by their frame names.
  *
- * @return {HTMLIFrameElement[]} The meta boxes iframes.
+ * The names have to be resolved through the elements: under the editor's
+ * Document-Isolation-Policy the frames' browsing context names are
+ * cleared, so `window.frames[ name ]` finds nothing.
+ *
+ * @return {Document[]} The meta boxes iframe documents.
  */
-export function getMetaBoxesIframes() {
-	return [
-		...document.querySelectorAll( 'iframe.edit-post-meta-boxes-iframe' ),
-	];
+export function getMetaBoxesFrameDocuments() {
+	return [ 'main', 'side' ]
+		.map( ( location ) =>
+			document.querySelector(
+				`iframe[name="${ getMetaBoxesIframeName( location ) }"]`
+			)
+		)
+		.filter( Boolean )
+		.map( ( iframe ) => iframe.contentDocument )
+		.filter( Boolean );
 }
 
 /**
