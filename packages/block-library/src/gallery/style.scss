@@ -12,12 +12,6 @@ figure.wp-block-gallery.has-nested-images:where(.is-layout-flex) {
 	align-items: normal;
 }
 
-// Grid items stretch to fill their row's height by default, which leaves the
-// figure taller than its image and detaches the absolutely positioned caption
-// overlay from the image it should sit on top of.
-// .wp-block-gallery.has-nested-images:where(.is-layout-grid) > figure.wp-block-image {
-// 	align-self: start;
-// }
 // Styles for the current Gallery block's custom Flex layout.
 .wp-block-gallery.has-nested-images:where(.is-layout-flex) {
 	// Need bogus :not(#individual-image) to override long :not()
