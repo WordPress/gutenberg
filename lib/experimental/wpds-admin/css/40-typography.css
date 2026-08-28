@@ -1,0 +1,123 @@
+/**
+ * Classic admin typography, from WordPress Design System tokens.
+ *
+ * The scale is not the raw tokens. `@wordpress/ui`'s `Text` component defines
+ * the roles, and its pairings are not index-aligned — `font-size-md` (13px)
+ * pairs with `line-height-sm` (20px), not `line-height-md`. Reading the tokens
+ * alone gives the wrong answer, so the roles below follow `Text`:
+ *
+ *     body-md      13 / 20     the default UI text
+ *     body-lg      15 / 24     reading prose
+ *     heading-xl   20 / 24     emphasis weight
+ *
+ * Line heights are expressed as a ratio derived from the two tokens, so they
+ * inherit proportionally instead of pinning every descendant to one pixel
+ * height. A plain number is declared first as a fallback for engines that will
+ * not divide two lengths in `calc()`.
+ *
+ * Scope is deliberately small. Bare `h1`, `h2` and `h3` are left alone: Core
+ * makes 43 contextual heading rules, and a rule here would outrank all of them
+ * regardless of their specificity. Only the admin page title is touched, which
+ * Core already scopes to `.wrap h1`.
+ *
+ * NO `!important` IN THIS FILE. See overrides.css for the one exception.
+ */
+
+@layer wpds-overrides, wp-legacy, wpds;
+
+@layer wpds {
+
+	/* -----------------------------------------------------------------------
+	   Base
+
+	   Both properties are inherited, so they set the floor without competing
+	   with anything Core sizes explicitly. Core's own body font-size is already
+	   13px, which is exactly `font-size-md`, so only the family and the rhythm
+	   actually change here.
+	   ----------------------------------------------------------------------- */
+
+	body {
+		font-family: var(--wpds-typography-font-family-body);
+		/* body-md: 20 / 13. Fallback first for engines without length division. */
+		line-height: 1.538;
+		line-height: calc(var(--wpds-typography-line-height-sm) / var(--wpds-typography-font-size-md));
+	}
+
+	/* -----------------------------------------------------------------------
+	   Page title — the `heading-xl` role
+
+	   Core sets 23px at weight 400, which is between `xl` (20px) and `2xl`
+	   (32px) and on neither. Taking the role means the title becomes both
+	   smaller and heavier; adopting half a role would leave it matching nothing.
+	   ----------------------------------------------------------------------- */
+
+	.wrap h1 {
+		font-family: var(--wpds-typography-font-family-heading);
+		font-size: var(--wpds-typography-font-size-xl);
+		font-weight: var(--wpds-typography-font-weight-emphasis);
+		line-height: 1.2;
+		line-height: calc(var(--wpds-typography-line-height-md) / var(--wpds-typography-font-size-xl));
+	}
+
+	/* -----------------------------------------------------------------------
+	   Reading prose — the `body-lg` role
+
+	   Core sets these at 14px, which has no place on the scale and is the most
+	   used size in wp-admin. It is doing a different job from the 13px used for
+	   chrome: labels, field descriptions and row titles are the longest
+	   continuous text in the admin, and a single pixel of difference reads as an
+	   accident rather than a distinction.
+
+	   Taking them up to 15px rather than down to 13px keeps that distinction and
+	   makes it deliberate. Settings screens are where this is most visible —
+	   85% of the text on Settings > General is in this set, and third-party
+	   settings pages built from `.form-table` inherit the same treatment.
+	   ----------------------------------------------------------------------- */
+
+	/*
+	 * The controls inside a settings form inherit from it, so the field, its
+	 * label and its help text are one size.
+	 *
+	 * Core declares exactly this — `input, select, textarea, button { font-size:
+	 * inherit }` — and then overrides it for every control type: `textarea,
+	 * input` at 14px, `.wp-core-ui select` at 14px, `.wp-core-ui .button` at
+	 * 13px. The declaration is dead as written. This restores it, scoped to the
+	 * form so controls elsewhere keep following their own context.
+	 *
+	 * Buttons are included, but they need two things. `p.submit` sits outside the
+	 * table as a sibling, so it inherits from the page rather than the form and
+	 * has to be brought into the form's size first. Then the buttons inside both
+	 * can inherit like every other control.
+	 *
+	 * This is scoped rather than applied to `.button` generally. Letting every
+	 * button in wp-admin follow its container would be defensible — it is what
+	 * Core's own declaration asks for — but it is a far larger change, and the
+	 * React `Button` pins 13px too, so it is a question for the design system
+	 * rather than something to settle here.
+	 */
+	p.submit {
+		font-size: var(--wpds-typography-font-size-lg);
+	}
+
+	.form-table input,
+	.form-table select,
+	.form-table textarea,
+	.form-table .button,
+	p.submit .button {
+		font-size: inherit;
+	}
+
+	.form-table,
+	.form-table td,
+	.form-table th,
+	.form-table td p,
+	.form-table label,
+	.form-table span.description,
+	.row-title,
+	.inline-edit-row p.howto {
+		font-size: var(--wpds-typography-font-size-lg);
+		/* body-lg: 24 / 15. */
+		line-height: 1.6;
+		line-height: calc(var(--wpds-typography-line-height-md) / var(--wpds-typography-font-size-lg));
+	}
+}

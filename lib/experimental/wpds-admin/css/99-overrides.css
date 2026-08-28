@@ -62,6 +62,18 @@
 	}
 
 	/*
+	 * Cancels: wp-admin/css/list-tables.css — `.row-title` sets its font size
+	 *          with `!important`, the only such font-size rule in that file.
+	 *          Without this the row title keeps 14px while the rest of the
+	 *          reading prose moves to the design system's 15px, and it is the
+	 *          most prominent text in a list table.
+	 * DELETE WHEN: that `!important` is removed from Core.
+	 */
+	.row-title {
+		font-size: var(--wpds-typography-font-size-lg) !important;
+	}
+
+	/*
 	 * Cancels: wp-admin/css/forms.css — the `.form-invalid` rules set
 	 *          `border-color: #d63638 !important` on required fields and their
 	 *          focus state. Only `border-color` carries the flag; the companion
