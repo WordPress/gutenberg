@@ -28,11 +28,17 @@ function gutenberg_add_site_locale_to_editor_settings( $settings ) {
 	$site_is_rtl = is_rtl();
 
 	if ( get_user_locale() !== get_locale() ) {
-		$switched = switch_to_locale( get_locale() );
-		if ( $switched ) {
+		if ( switch_to_locale( get_locale() ) ) {
 			$site_lang   = get_bloginfo( 'language' );
 			$site_is_rtl = is_rtl();
 			restore_previous_locale();
+		} else {
+			// The switch fails when the site locale's translation files are
+			// not installed. Without them the front end falls back to the
+			// locale code for the `lang` attribute and to left-to-right text,
+			// so report those values rather than the user locale's.
+			$site_lang   = str_replace( '_', '-', get_locale() );
+			$site_is_rtl = false;
 		}
 	}
 
