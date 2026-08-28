@@ -381,6 +381,118 @@ export const getOrderedBlockRange = (
 };
 
 /**
+ * Build a promoted block range from inclusive DOM indices.
+ *
+ * @param allBlocks - All block elements in document order.
+ * @param firstIdx  - Index of the first block in the range.
+ * @param lastIdx   - Index of the last block in the range.
+ * @param doc       - The editor document.
+ * @return Ordered, promoted range.
+ */
+function buildRangeFromIndices(
+	allBlocks: NodeListOf< HTMLElement >,
+	firstIdx: number,
+	lastIdx: number,
+	doc: Document
+): BlockRangeResult {
+	const rawFirstEl = allBlocks[ firstIdx ];
+	const rawLastEl = allBlocks[ lastIdx ];
+	const firstEl = blockContainerOf( rawFirstEl );
+	const lastEl = blockContainerOf( rawLastEl );
+	const firstId = firstEl.getAttribute( 'data-block' )!;
+	const lastId = lastEl.getAttribute( 'data-block' )!;
+	const sameContainer = firstId === lastId;
+	const middleEls = sameContainer
+		? []
+		: getBlocksBetween( firstId, lastId, doc ).filter(
+				( el ) => ! firstEl.contains( el ) && ! lastEl.contains( el )
+		  );
+
+	return { firstEl, firstId, lastEl, lastId, middleEls, sameContainer };
+}
+
+/**
+ * Resolve a block range when one selection endpoint has been deleted from the
+ * DOM, using the last successfully rendered range to reconstruct the remaining
+ * blocks instead of clearing the entire overlay.
+ *
+ * @param startId       - clientId of the start endpoint.
+ * @param endId         - clientId of the end endpoint.
+ * @param doc           - The editor document.
+ * @param previousRange - The most recent range rendered for this selection.
+ * @return Ordered, promoted range, or null when it cannot be reconstructed.
+ */
+export const getOrderedBlockRangeWithFallback = (
+	startId: string,
+	endId: string,
+	doc: Document,
+	previousRange: BlockRangeResult | null
+): BlockRangeResult | null => {
+	const range = getOrderedBlockRange( startId, endId, doc );
+	if ( range ) {
+		return range;
+	}
+
+	if ( ! previousRange || previousRange.sameContainer ) {
+		return null;
+	}
+
+	const startEl = doc.querySelector< HTMLElement >(
+		`[data-block="${ startId }"]`
+	);
+	const endEl = doc.querySelector< HTMLElement >(
+		`[data-block="${ endId }"]`
+	);
+
+	if ( ! startEl && ! endEl ) {
+		return null;
+	}
+
+	const allBlocks = doc.querySelectorAll< HTMLElement >( '[data-block]' );
+
+	const findIndex = ( clientId: string ) => {
+		for ( let i = 0; i < allBlocks.length; i++ ) {
+			if ( allBlocks[ i ].getAttribute( 'data-block' ) === clientId ) {
+				return i;
+			}
+		}
+		return -1;
+	};
+
+	const remainingCount = previousRange.middleEls.length + 1;
+
+	if ( ! startEl && endEl ) {
+		const endIdx = findIndex( endId );
+		if ( endIdx === -1 ) {
+			return null;
+		}
+
+		const firstIdx = endIdx - remainingCount + 1;
+		if ( firstIdx < 0 || firstIdx > endIdx ) {
+			return null;
+		}
+
+		return buildRangeFromIndices( allBlocks, firstIdx, endIdx, doc );
+	}
+
+	if ( startEl && ! endEl ) {
+		const startIdx = findIndex( startId );
+		if ( startIdx === -1 ) {
+			return null;
+		}
+
+		const lastIdx = startIdx + remainingCount - 1;
+		if ( lastIdx >= allBlocks.length || lastIdx < startIdx ) {
+			return null;
+		}
+
+		return buildRangeFromIndices( allBlocks, startIdx, lastIdx, doc );
+	}
+
+	return null;
+};
+
+/**
  * Given a block element and a character offset, returns an exact inner node and offset for use in a range.
  *
  * @param blockElement   - The block element

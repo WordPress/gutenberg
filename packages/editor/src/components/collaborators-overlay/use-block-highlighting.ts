@@ -17,8 +17,9 @@ import {
 } from './use-debounced-recompute';
 import {
 	getNearestVisibleBlockAncestor,
-	getOrderedBlockRange,
+	getOrderedBlockRangeWithFallback,
 } from './cursor-dom-utils';
+import type { BlockRangeResult } from './cursor-dom-utils';
 import { resolveTargetElement } from './compute-selection';
 import { resolveStartPosition } from './resolve-start-position';
 import { getCollaboratorDisplayName } from '../../utils/get-collaborator-display-name';
@@ -64,6 +65,9 @@ export function useBlockHighlighting(
 	rerenderHighlightsOnResize: () => void;
 } {
 	const highlightedBlockIds = useRef< Set< string > >( new Set() );
+	const lastBlockRangeByClient = useRef<
+		Map< number, BlockRangeResult | null >
+	>( new Map() );
 	const userStates: ActiveCollaborator[] = useActiveCollaborators(
 		postId ?? null,
 		postType ?? null
@@ -260,14 +264,22 @@ export function useBlockHighlighting(
 					return [];
 				}
 
-				const range = getOrderedBlockRange(
+				const previousRange =
+					lastBlockRangeByClient.current.get( userState.clientId ) ??
+					null;
+
+				const range = getOrderedBlockRangeWithFallback(
 					startId,
 					endId,
-					blockEditorDocument
+					blockEditorDocument,
+					previousRange
 				);
 				if ( ! range ) {
+					lastBlockRangeByClient.current.delete( userState.clientId );
 					return [];
 				}
+
+				lastBlockRangeByClient.current.set( userState.clientId, range );
 
 				const { firstId, lastId, middleEls, sameContainer } = range;
 				const color = getAvatarBorderColor(
