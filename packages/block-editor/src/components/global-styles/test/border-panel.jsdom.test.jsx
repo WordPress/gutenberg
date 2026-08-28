@@ -53,6 +53,56 @@ const settingsAll = {
 	},
 };
 
+const shadowOnlySettings = { shadow: settingsAll.shadow };
+
+describe( 'BorderPanel — panel and control labels', () => {
+	it( 'titles the panel "Borders" when border and shadow controls are available', () => {
+		render(
+			<BorderPanel
+				value={ {} }
+				settings={ settingsAll }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'heading', { name: 'Borders' } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'titles the panel "Borders" when only a shadow control is available', () => {
+		// A shadow is treated as a soft border, so the title does not change
+		// with whichever controls a theme or block opts into. A stable title
+		// is what lets each control keep its own visible label.
+		render(
+			<BorderPanel
+				value={ {} }
+				settings={ shadowOnlySettings }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'heading', { name: 'Borders' } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'labels the shadow control even when no border control is available', () => {
+		render(
+			<BorderPanel
+				value={ {} }
+				settings={ shadowOnlySettings }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		expect( screen.getByText( 'Shadow' ) ).toBeInTheDocument();
+	} );
+} );
+
 describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 	describe( 'Border radius (input archetype)', () => {
 		it( 'renders an inherited string radius as the displayed value when local is empty', () => {

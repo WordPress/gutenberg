@@ -12,7 +12,6 @@ import BorderRadiusControl from '../border-radius-control';
 import { useColorsPerOrigin } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
-import { useBorderPanelLabel } from '../../hooks/border';
 import { ShadowPopover, useShadowPresets } from './shadow-panel-components';
 import {
 	getInheritanceProps,
@@ -365,24 +364,18 @@ export default function BorderPanel( {
 	const showBorderByDefault =
 		defaultControls?.color || defaultControls?.width;
 
-	const hasBorderControl =
-		showBorderColor ||
-		showBorderStyle ||
-		showBorderWidth ||
-		showBorderRadius;
-
-	const label = useBorderPanelLabel( {
-		hasShadowControl,
-		hasBorderControl,
-	} );
-
 	return (
 		<Wrapper
 			resetAllFilter={ resetAllFilter }
 			value={ value }
 			onChange={ onChange }
 			panelId={ panelId }
-			label={ label }
+			// A shadow is treated as a soft border, so the panel keeps one
+			// name whichever of its controls a theme or block opts into.
+			// A stable title is what lets each control show its own label
+			// unconditionally, which in turn keeps their unlink toggles
+			// aligned.
+			label={ __( 'Borders' ) }
 		>
 			{ ( showBorderWidth || showBorderColor ) && (
 				<InheritanceToolsPanelItem
@@ -458,11 +451,9 @@ export default function BorderPanel( {
 					showLocalOverrideActionsInLabel={ false }
 					panelId={ panelId }
 				>
-					{ hasBorderControl ? (
-						<BaseControl.VisualLabel as="legend">
-							{ __( 'Shadow' ) }
-						</BaseControl.VisualLabel>
-					) : null }
+					<BaseControl.VisualLabel as="legend">
+						{ __( 'Shadow' ) }
+					</BaseControl.VisualLabel>
 
 					<ShadowPopover
 						shadow={ shadow }
