@@ -5,14 +5,22 @@ import { Portal } from './portal';
 import { Positioner } from './positioner';
 import { renderSlotWithChildren } from '../../../utils/render-slot-with-children';
 import itemPopupStyles from '../../../utils/css/item-popup.module.css';
+import { getItemPopupWidthClassName } from '../../../utils/css/item-popup';
 import type { ComboboxPopupProps } from './types';
 
 export const Popup = forwardRef< HTMLDivElement, ComboboxPopupProps >(
-	function Popup( { className, portal, positioner, ...restProps }, ref ) {
+	function Popup(
+		{ className, portal, positioner, popupWidth, ...restProps },
+		ref
+	) {
 		const popupContent = (
 			<_Combobox.Popup
 				ref={ ref }
-				className={ clsx( itemPopupStyles.popup, className ) }
+				className={ clsx(
+					itemPopupStyles.popup,
+					getItemPopupWidthClassName( popupWidth ),
+					className
+				) }
 				{ ...restProps }
 			/>
 		);

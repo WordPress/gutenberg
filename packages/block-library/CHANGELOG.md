@@ -2,11 +2,21 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Query: Stop writing `excludeCurrent: null` into the `query` attribute of blocks that never had the key. The mount effect that clears a stale exclusion treated the absent key as stale, changing the serialized markup of every pre-existing Query block as soon as the editor opened it ([#82147](https://github.com/WordPress/gutenberg/pull/82147)).
+
+### Internal
+
+-   Remove unused dependencies `@wordpress/keyboard-shortcuts`, `@wordpress/reusable-blocks` and `@wordpress/viewport` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
 ## 10.5.0 (2026-08-26)
 
 ### Enhancements
 
-- `List`: Add wide and full alignment support ([#68002](https://github.com/WordPress/gutenberg/pull/68002)).
+-   Gallery: Support viewport-specific column counts and image cropping in the Flex layout.
+-   `List`: Add wide and full alignment support ([#68002](https://github.com/WordPress/gutenberg/pull/68002)).
 
 ### Internal
 
@@ -16,6 +26,7 @@
 ### Enhancements
 
 -   Columns: Add transforms between Columns and the Row variation that preserve column widths through flex child sizing controls.
+-   Gallery: Add an opt-in Grid layout while preserving the existing Flex layout for current galleries.([#81909](https://github.com/WordPress/gutenberg/pull/81909)).
 
 ### Bug Fixes
 

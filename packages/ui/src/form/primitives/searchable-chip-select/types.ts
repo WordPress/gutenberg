@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import type { ItemPopupWidthProps } from '../../../utils/css/item-popup';
 import type {
 	ComboboxCollectionProps,
 	ComboboxEmptyProps,
@@ -148,6 +149,7 @@ export type SearchableChipSelectProps = Omit<
 	ComboboxRootProps< Item, true >,
 	'children' | 'items' | 'multiple'
 > &
+	ItemPopupWidthProps &
 	Partial<
 		Pick<
 			ComboboxInputProps,
