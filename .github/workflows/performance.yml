@@ -144,8 +144,14 @@ jobs:
             # The command expects `<plugins dir>/<sanitized branch name>`.
             - name: Rename plugin directories
               run: |
+                  shopt -s nullglob
+                  dirs=("$RUNNER_TEMP"/artifacts/plugin-*)
+                  if [[ ${#dirs[@]} -eq 0 ]]; then
+                    echo "::error::No plugin artifacts were downloaded."
+                    exit 1
+                  fi
                   mkdir -p "$RUNNER_TEMP/plugins"
-                  for dir in "$RUNNER_TEMP"/artifacts/plugin-*; do
+                  for dir in "${dirs[@]}"; do
                     mv "$dir" "$RUNNER_TEMP/plugins/$(basename "$dir" | sed 's/^plugin-//')"
                   done
                   ls -la "$RUNNER_TEMP/plugins"
