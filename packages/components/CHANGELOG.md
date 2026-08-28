@@ -9,6 +9,7 @@
 ### Bug Fixes
 
 -   `Snackbar`: Restart the auto-dismiss timer when a notice is recreated with the same ID during removal ([#81764](https://github.com/WordPress/gutenberg/pull/81764)).
+-   `ToolsPanel`: Stop a panel item whose `panelId` doesn't match the panel from writing its value into that panel's menu, which could leave an orphaned entry in the dropdown ([#82127](https://github.com/WordPress/gutenberg/pull/82127)).
 
 ### Internal
 
