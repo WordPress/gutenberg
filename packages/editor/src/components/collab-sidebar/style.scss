@@ -257,20 +257,16 @@ mark.wp-note {
 //
 // The add-reaction trigger and the reaction pills are Design System
 // Buttons: the pill shape comes from the row's `pronounced` corner
-// radius, and the fill, hover and pressed treatments come from the
-// neutral minimal variant. Only the emoji's own metrics live here.
-.editor-collab-sidebar-panel__reaction-button,
-.editor-collab-sidebar-panel__add-reaction-button {
-	// The emoji glyph is set larger than the button's own text size, so
-	// the compact height leaves it tight against the pill edge. A pixel
-	// top and bottom gives it room; the add-reaction trigger grows to
-	// match so the row stays on one baseline.
-	min-height: calc(var(--wpds-dimension-size-sm) + 2px);
-}
-
-.editor-collab-sidebar-panel__add-reaction-button {
-	// Keep the icon-only trigger square at the taller size.
-	min-width: calc(var(--wpds-dimension-size-sm) + 2px);
+// radius, the outline treatment marks reactions left by others, and the
+// neutral minimal pressed treatment marks the current user's own. Only
+// the row layout and the emoji's own metrics live here.
+.editor-collab-sidebar-panel__add-reaction {
+	// `Dropdown` wraps its trigger in an inline-block container. As a
+	// flex item that becomes a block, leaving the inline-flex trigger on
+	// a line box whose descender space makes the wrapper taller than the
+	// 24px button and stretches the pills beside it to match. A flex
+	// wrapper has no line box, so the whole row stays at button height.
+	display: flex;
 }
 
 .editor-collab-sidebar-panel__reaction-button {
