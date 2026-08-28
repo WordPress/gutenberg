@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import {
 	resolveDashboardColumnCount,
 	WIDGET_DASHBOARD_CONTAINER_BREAKPOINT_ONE_COLUMN,

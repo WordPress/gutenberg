@@ -2,11 +2,30 @@
 
 ## Unreleased
 
-## 5.51.0-next.0 (2026-07-07)
+### Breaking Changes
+
+-   Turn `@wordpress/reusable-blocks` into a deprecated no-op compatibility package. `ReusableBlocksMenuItems` renders nothing, the store selectors and actions no longer have runtime effects, and the convert/delete utilities are now no-ops. The `core/reusable-blocks` store remains registered for backward compatibility.
+
+### Internal
+
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+## 5.54.0 (2026-08-26)
+
+## 5.53.0 (2026-08-12)
+
+
+## 5.52.0 (2026-07-29)
+
+## 5.51.0 (2026-07-14)
 
 ### Deprecations
 
 -   Deprecated the `wp.reusableBlocks.ReusableBlocksMenuItems` component and the `core/reusable-blocks` store actions (`__experimentalConvertBlockToStatic`, `__experimentalConvertBlocksToReusable`, `__experimentalDeleteReusableBlock`, `__experimentalSetEditingReusableBlock`) and selector (`__experimentalIsEditingReusableBlock`). The package is unused by core and will become a no-op compatibility package in a future release.
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
 
 ## 5.50.0 (2026-07-01)
 

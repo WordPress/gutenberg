@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useId } from '@wordpress/element';
 import {
 	SVG,
@@ -12,10 +9,6 @@ import {
 	LinearGradient,
 	Stop,
 } from '@wordpress/primitives';
-
-/**
- * Internal dependencies
- */
 import styles from './header-background.module.css';
 
 type StopSet = 'ring' | 'linear';

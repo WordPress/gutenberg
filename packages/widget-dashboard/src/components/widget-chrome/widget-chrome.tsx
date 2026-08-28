@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef, useId, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { plugins } from '@wordpress/icons';
 import { Card, Icon, Stack, Text } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { WidgetContextProvider } from '../../context/widget-context';
 import { LoadingOverlay, WidgetFrame } from '../widget-frame';
@@ -30,13 +19,13 @@ function UnavailableWidget( { widgetTypeName }: UnavailableWidgetProps ) {
 		<>
 			<Card.Header>
 				<span
-					className={ styles.widgetChromeHeaderIcon }
+					className={ styles[ 'widget-chrome-header-icon' ] }
 					aria-hidden="true"
 				>
 					<Icon icon={ plugins } />
 				</span>
 			</Card.Header>
-			<Card.Content className={ styles.widgetChromeContent }>
+			<Card.Content className={ styles[ 'widget-chrome-content' ] }>
 				<Stack
 					direction="column"
 					justify="center"
@@ -94,12 +83,15 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 						<Card.Root
 							render={ <section /> }
 							ref={ ref }
-							className={ clsx( styles.widgetChrome, className ) }
+							className={ clsx(
+								styles[ 'widget-chrome' ],
+								className
+							) }
 							aria-busy="true"
 							aria-label={ __( 'Loading' ) }
 						>
 							<Card.Content
-								className={ styles.widgetChromeContent }
+								className={ styles[ 'widget-chrome-content' ] }
 							>
 								<LoadingOverlay />
 							</Card.Content>
@@ -113,7 +105,10 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 					<Card.Root
 						render={ <section /> }
 						ref={ ref }
-						className={ clsx( styles.widgetChrome, className ) }
+						className={ clsx(
+							styles[ 'widget-chrome' ],
+							className
+						) }
 						aria-label={ __( 'Missing widget' ) }
 					>
 						<UnavailableWidget widgetTypeName={ widget.type } />
@@ -127,7 +122,7 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 				<Card.Root
 					render={ <section /> }
 					ref={ ref }
-					className={ clsx( styles.widgetChrome, className ) }
+					className={ clsx( styles[ 'widget-chrome' ], className ) }
 					aria-labelledby={ widgetType.title ? titleId : undefined }
 				>
 					<WidgetFrame

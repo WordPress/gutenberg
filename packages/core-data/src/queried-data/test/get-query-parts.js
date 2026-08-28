@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getQueryParts } from '../get-query-parts';
 
 describe( 'getQueryParts', () => {

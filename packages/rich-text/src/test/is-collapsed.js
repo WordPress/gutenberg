@@ -1,7 +1,3 @@
-/**
- * Internal dependencies
- */
-
 import { isCollapsed } from '../is-collapsed';
 
 describe( 'isCollapsed', () => {

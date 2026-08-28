@@ -136,7 +136,6 @@ export function TimePicker( {
 			className="components-datetime__time-field components-datetime__time-field-day" // Unused, for backwards compatibility.
 			label={ __( 'Day' ) }
 			hideLabelFromVision
-			__next40pxDefaultSize
 			value={ day }
 			step={ 1 }
 			min={ 1 }
@@ -177,7 +176,6 @@ export function TimePicker( {
 			className="components-datetime__time-field components-datetime__time-field-year" // Unused, for backwards compatibility.
 			label={ __( 'Year' ) }
 			hideLabelFromVision
-			__next40pxDefaultSize
 			value={ year }
 			step={ 1 }
 			min={ 1 }

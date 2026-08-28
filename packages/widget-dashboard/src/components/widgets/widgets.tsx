@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef, useCallback, useMemo } from '@wordpress/element';
 import { DashboardGrid, DashboardLanes } from '@wordpress/grid';
 import type {
@@ -15,13 +8,11 @@ import type {
 	ResizeHandleRenderProps,
 } from '@wordpress/grid';
 import type { WidgetName } from '@wordpress/widget-primitives';
-
-/**
- * Internal dependencies
- */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardContainerColumnCount } from '../../hooks/use-dashboard-container-column-count';
-import { WidgetAttributeControls } from '../widget-attribute-controls';
+import { splitWidgetActions } from '../../utils/split-widget-actions';
+import { WidgetActions } from '../widget-actions';
+import { WidgetAttributes } from '../widget-attributes';
 import { WidgetChrome } from '../widget-chrome';
 import { WidgetHeader } from '../widget-header';
 import { WidgetLayoutControls } from '../widget-layout-controls';
@@ -29,32 +20,61 @@ import { WidgetToolbar } from '../widget-toolbar';
 import { WidgetResizeHandle } from './widget-resize-handle';
 import styles from './widgets.module.css';
 import type {
+	DashboardInstanceOperation,
 	DashboardWidget,
 	GridTilePlacement,
 	MasonryTilePlacement,
 } from '../../types';
 
-function toGridLayout( widgets: DashboardWidget[] ): DashboardGridLayoutItem[] {
-	return widgets.map( ( w ) => ( {
-		key: w.uuid,
-		...( w.placement as GridTilePlacement | undefined ),
-	} ) );
+/*
+ * What the policy allows on one tile. The grid reads `draggable` and
+ * `resizable` per item; the others gate the tile's controls and contract.
+ */
+interface TilePermissions {
+	draggable: boolean;
+	resizable: boolean;
+	removable: boolean;
+	editable: boolean;
+}
+
+type TilePermissionsFor = ( widget: DashboardWidget ) => TilePermissions;
+
+function toGridLayout(
+	widgets: DashboardWidget[],
+	permissionsFor: TilePermissionsFor
+): DashboardGridLayoutItem[] {
+	return widgets.map( ( w ) => {
+		const { draggable, resizable } = permissionsFor( w );
+		return {
+			key: w.uuid,
+			...( w.placement as GridTilePlacement | undefined ),
+			draggable,
+			resizable,
+		};
+	} );
 }
 
 function toMasonryLayout(
-	widgets: DashboardWidget[]
+	widgets: DashboardWidget[],
+	permissionsFor: TilePermissionsFor
 ): DashboardLanesLayoutItem[] {
-	return widgets.map( ( w ) => ( {
-		key: w.uuid,
-		...( w.placement as MasonryTilePlacement | undefined ),
-	} ) );
+	return widgets.map( ( w ) => {
+		const { draggable, resizable } = permissionsFor( w );
+		return {
+			key: w.uuid,
+			...( w.placement as MasonryTilePlacement | undefined ),
+			draggable,
+			resizable,
+		};
+	} );
 }
 
+// The interaction flags are policy, not placement: they never persist.
 function applyGridChange(
 	widgets: DashboardWidget[],
 	gridLayout: DashboardGridLayoutItem[]
 ): DashboardWidget[] {
-	return gridLayout.map( ( { key, ...placement } ) => {
+	return gridLayout.map( ( { key, draggable, resizable, ...placement } ) => {
 		const existing = widgets.find( ( w ) => w.uuid === key );
 		if ( ! existing ) {
 			return {
@@ -74,20 +94,22 @@ function applyMasonryChange(
 	widgets: DashboardWidget[],
 	masonryLayout: DashboardLanesLayoutItem[]
 ): DashboardWidget[] {
-	return masonryLayout.map( ( { key, ...placement } ) => {
-		const existing = widgets.find( ( w ) => w.uuid === key );
-		if ( ! existing ) {
+	return masonryLayout.map(
+		( { key, draggable, resizable, ...placement } ) => {
+			const existing = widgets.find( ( w ) => w.uuid === key );
+			if ( ! existing ) {
+				return {
+					uuid: key,
+					type: '' as WidgetName,
+					placement,
+				};
+			}
 			return {
-				uuid: key,
-				type: '' as WidgetName,
+				...existing,
 				placement,
 			};
 		}
-		return {
-			...existing,
-			placement,
-		};
-	} );
+	);
 }
 
 export interface WidgetsProps {
@@ -101,16 +123,41 @@ export interface WidgetsProps {
  */
 export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 	function Widgets( { className }, ref ) {
-		const { layout, onLayoutChange, editMode, gridSettings, widgetTypes } =
-			useDashboardInternalContext();
+		const {
+			layout,
+			onLayoutChange,
+			editMode,
+			gridSettings,
+			widgetTypes,
+			canPerform,
+		} = useDashboardInternalContext();
 		const { containerRef, columnCount } =
 			useDashboardContainerColumnCount( ref );
 		const isMasonry = gridSettings.model === 'masonry';
 
+		const permissionsFor = useCallback< TilePermissionsFor >(
+			( widget ) => {
+				const widgetType = widgetTypes.find(
+					( type ) => type.name === widget.type
+				);
+				const allows = ( operation: DashboardInstanceOperation ) =>
+					canPerform( { operation, widget, widgetType } );
+				return {
+					draggable: allows( 'move' ),
+					resizable: allows( 'resize' ),
+					removable: allows( 'remove' ),
+					editable: allows( 'edit' ),
+				};
+			},
+			[ widgetTypes, canPerform ]
+		);
+
 		const gridLayout = useMemo(
 			() =>
-				isMasonry ? toMasonryLayout( layout ) : toGridLayout( layout ),
-			[ layout, isMasonry ]
+				isMasonry
+					? toMasonryLayout( layout, permissionsFor )
+					: toGridLayout( layout, permissionsFor ),
+			[ layout, isMasonry, permissionsFor ]
 		);
 
 		const handleGridChange = useCallback(
@@ -133,21 +180,42 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 			const widgetType = widgetTypes.find(
 				( type ) => type.name === widget.type
 			);
-			const hasSettings = !! widgetType?.attributes?.length;
+			const { removable, resizable, editable } = permissionsFor( widget );
+			const hasSettings = editable && !! widgetType?.attributes?.length;
+
 			const isFullBleed = widgetType?.presentation === 'full-bleed';
 
+			const { menu: menuActions } = splitWidgetActions( widgetType );
+			const hasActions = menuActions.length > 0;
+
 			// The active mode's controls: layout while customizing, the
-			// attribute controls (high-relevance fields plus the gear)
-			// otherwise.
+			// attribute controls (high-relevance fields on the prominent
+			// surface, plus a settings entry point when needed) and the
+			// menu actions otherwise.
 			let controls: React.ReactNode;
 			if ( editMode ) {
-				controls = <WidgetLayoutControls widget={ widget } />;
-			} else if ( hasSettings && widgetType ) {
+				controls =
+					removable || resizable ? (
+						<WidgetLayoutControls
+							widget={ widget }
+							canRemove={ removable }
+							canResize={ resizable }
+						/>
+					) : undefined;
+			} else if ( ( hasSettings || hasActions ) && widgetType ) {
 				controls = (
-					<WidgetAttributeControls
-						widget={ widget }
-						widgetType={ widgetType }
-					/>
+					<>
+						{ hasSettings && (
+							<WidgetAttributes
+								widget={ widget }
+								widgetType={ widgetType }
+							/>
+						) }
+
+						{ hasActions && (
+							<WidgetActions actions={ menuActions } />
+						) }
+					</>
 				);
 			}
 
@@ -174,7 +242,7 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 					widget={ widget }
 					index={ index }
 					className={ clsx( styles.tile, {
-						[ styles.tileEditMode ]: editMode,
+						[ styles[ 'tile-edit-mode' ] ]: editMode,
 					} ) }
 					actionableArea={ actionableArea }
 					headerToolbar={ ! inSlot ? toolbar : undefined }
@@ -184,7 +252,7 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 
 		const renderDragPreview = useCallback(
 			( { children: clone }: DragPreviewRenderProps ) => (
-				<div className={ styles.dragPreview }>{ clone }</div>
+				<div className={ styles[ 'drag-preview' ] }>{ clone }</div>
 			),
 			[]
 		);

@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+### Internal
+
+-   Remove unused dependency `use-memo-one` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+
+## 10.54.0 (2026-08-26)
+
+## 10.53.0 (2026-08-12)
+
+
+## 10.52.0 (2026-07-29)
+
+## 10.51.0 (2026-07-14)
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
 ## 10.50.0 (2026-07-01)
 
 ## 10.49.0 (2026-06-24)

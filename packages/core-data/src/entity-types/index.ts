@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { Context, Updatable } from './helpers';
 import type { Attachment } from './attachment';
 import type { Base, TemplatePartArea, TemplateType } from './base';

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { kebabToCamelCase, withScope } from '../utils';
 import { setScope, getScope, resetScope, type Scope } from '../scopes';
 import { setNamespace, getNamespace, resetNamespace } from '../namespaces';

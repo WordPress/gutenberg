@@ -295,9 +295,9 @@ If the cherry-picked fixes deserve another release candidate before the stable v
 
 Only once you’re happy with the shape of the changelog in the release draft, press the “Publish release” button.
 
-Note that you do not need to change the checkboxes above the button. If you are publishing an RC, the “Set as a pre-release” will automatically be selected, and “Set as the latest release” will be selected if you are publishing the stable version.
+Note that you do not need to change the “Release label” option above the button. If you are publishing an RC, “Pre-release” will automatically be selected, and “Latest” will be selected if you are publishing the stable version.
 
-![Publishing the release checkboxes for an RC](https://developer.wordpress.org/files/2023/07/image.png)
+![Release label options in the GitHub release form](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/github-release-label.png)
 
 Publishing the release will create a `git` tag for the version, publish the release, and trigger [another GHA workflow](https://github.com/WordPress/gutenberg/actions/workflows/upload-release-to-plugin-repo.yml) with a twofold purpose:
 
@@ -425,6 +425,8 @@ You must also ensure that all PRs being included are assigned to the GitHub Mile
 
 For example, if you are releasing version `12.5.4`, then all PRs picked for that release must be unassigned from the `12.6` Milestone and instead assigned to the `12.5` Milestone.
 
+If the milestone has no unreleased pull requests, the workflow still publishes the release draft, but its notes are replaced by a placeholder explaining how to write them by hand. Verify that every cherry-picked PR is assigned to the release milestone, then generate the changelog locally and paste it into the draft. Do not generate the notes from a different milestone.
+
 Once cherry picking is complete, you can also remove the `Backport to Gutenberg Minor Release` label from the PRs.
 
 Once you have the stable release branch in order and the correct Milestone assigned to your PRs you can _push the branch to GitHub_ and continue with the release process using the GitHub website GUI.
@@ -461,15 +463,21 @@ The process is identical to the one documented above when an RC is already out: 
 
 ### Troubleshooting
 
-> The release draft was created but it was empty/contained an error message
+> The release draft says that the changelog could not be generated automatically
 
-If you forget to assign the correct Milestone to your cherry picked PR(s) then the changelog may not be generated as you would expect.
+No unreleased pull requests were found in the release milestone, so there was nothing to pre-populate the notes with. The workflow does not fail: the version bump, the plugin ZIP, and the release draft are created as usual, and only the notes are missing, so there is no need to rerun it.
 
-It is important to always manually verify that the PRs shown in the changelog match up with those cherry picked to the release branch.
+This is expected when the release genuinely contains no pull requests, such as a security release whose commits were pushed straight to the release branch, or a re-release of a version that is already published. Write the release notes by hand, replacing the placeholder.
 
-Moreover, if the release includes only a single PR, then failing to assign the PR to the correct Milestone will cause an error to be displayed when generating the changelog. In this case you can edit the release notes to include details of the missing PR (manually copying the format from a previous release).
+If pull requests were expected, they are probably still assigned to another milestone:
 
-If for any reason the Milestone has been closed, you may reopen it for the purposes of the release.
+1. Verify that every cherry-picked PR is assigned to the release milestone. If the milestone has been closed, you may reopen it for the release.
+2. Generate the changelog locally with `npm run other:changelog -- --milestone="Gutenberg X.Y" --unreleased`.
+3. Replace the placeholder text in the draft with the output, and curate it as usual.
+
+Do not use a different milestone. Before publishing, manually verify that the PRs shown in the changelog match those cherry-picked to the release branch.
+
+Always replace the placeholder before publishing the release: whatever the release notes contain is committed to `changelog.txt` and shipped to WordPress.org.
 
 > The draft release only contains 1 asset file. Other releases have x3.
 

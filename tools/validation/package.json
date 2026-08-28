@@ -20,14 +20,18 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"type": "module",
+	"bin": {
+		"wp-validate-package-contents": "./validate-package-contents.mjs"
+	},
 	"devDependencies": {
-		"@mawesome/dependency-audit": "^0.4.5",
+		"@mawesome/dependency-audit": "^0.4.6",
 		"@wordpress/create-block": "file:../../packages/create-block",
 		"@wordpress/scripts": "file:../../packages/scripts",
 		"chalk": "^4.1.1",
+		"esbuild": "^0.27.2",
 		"glob": "^7.1.2",
 		"jsonc-parser": "^3.3.1",
-		"simple-git": "^3.24.0"
+		"simple-git": "^3.32.3"
 	},
 	"publishConfig": {
 		"access": "public"
@@ -35,6 +39,7 @@
 	"scripts": {
 		"check-installed-deps": "node ./check-installed-deps.mjs",
 		"check-licenses": "node ./check-licenses.mjs",
+		"check-private-apis": "node ./check-private-apis.mjs",
 		"dependency-audit": "dependency-audit --collapse-root-cause \"../../packages/*\"",
 		"check-local-changes": "node ./check-local-changes.cjs",
 		"check-root-dependencies": "node ./check-root-dependencies.mjs",

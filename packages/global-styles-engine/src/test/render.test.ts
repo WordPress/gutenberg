@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import {
 	getNodesWithStyles,
 	getNodesWithSettings,
@@ -30,6 +27,7 @@ jest.mock( '@wordpress/blocks', () => ( {
 	},
 	__EXPERIMENTAL_ELEMENTS: {
 		link: 'a:where(:not(.wp-element-button))',
+		heading: 'h1, h2, h3, h4, h5, h6',
 		h1: 'h1',
 		h2: 'h2',
 		h3: 'h3',
@@ -405,6 +403,49 @@ describe( 'global styles renderer', () => {
 			rootPadding: false,
 		};
 
+		it( 'uses the row value for Flow and Constrained layouts and both values for Flex and Grid layouts when block spacing is axial', () => {
+			const tree: GlobalStylesConfig = {
+				styles: {
+					blocks: {
+						'core/group': {
+							spacing: {
+								blockGap: { top: '1em', left: '2em' },
+							},
+						},
+					},
+				},
+			};
+			const blockSelectors = {
+				'core/group': {
+					selector: '.wp-block-group',
+					hasLayoutSupport: true,
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				true,
+				false,
+				false,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toContain(
+				':root :where(.wp-block-group-is-layout-flow) > * { margin-block-start: 1em; margin-block-end: 0; }'
+			);
+			expect( result ).toContain(
+				':root :where(.wp-block-group-is-layout-constrained) > * { margin-block-start: 1em; margin-block-end: 0; }'
+			);
+			expect( result ).toContain(
+				':root :where(.wp-block-group-is-layout-flex) { gap: 1em 2em; }'
+			);
+			expect( result ).toContain(
+				':root :where(.wp-block-group-is-layout-grid) { gap: 1em 2em; }'
+			);
+		} );
+
 		it( 'should return a ruleset', () => {
 			const tree = {
 				settings: {
@@ -537,7 +578,7 @@ describe( 'global styles renderer', () => {
 			};
 
 			expect( transformToStyles( tree, blockSelectors ) ).toEqual(
-				':where(body) {margin: 0;}.is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }.is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }.is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }.is-layout-constrained > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }.is-layout-constrained > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }.is-layout-constrained > .aligncenter { margin-left: auto !important; margin-right: auto !important; }.is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)) { max-width: var(--wp--style--global--content-size); margin-left: auto !important; margin-right: auto !important; }.is-layout-constrained > .alignwide { max-width: var(--wp--style--global--wide-size); }body .is-layout-flex { display:flex; }.is-layout-flex { flex-wrap: wrap; align-items: center; }.is-layout-flex > :is(*, div) { margin: 0; }body .is-layout-grid { display:grid; }.is-layout-grid > :is(*, div) { margin: 0; }body{background-color: red;margin: 10px;padding: 10px;}a:where(:not(.wp-element-button)){color: blue;}:root :where(a:where(:not(.wp-element-button)):hover){color: orange;}:root :where(a:where(:not(.wp-element-button)):focus){color: orange;}h1{font-size: 42px;}:root :where(.wp-block-group){margin-top: 10px;margin-right: 20px;margin-bottom: 30px;margin-left: 40px;padding-top: 11px;padding-right: 22px;padding-bottom: 33px;padding-left: 44px;}:root :where(h1,h2,h3,h4,h5,h6){color: orange;}:root :where(h1 a:where(:not(.wp-element-button)),h2 a:where(:not(.wp-element-button)),h3 a:where(:not(.wp-element-button)),h4 a:where(:not(.wp-element-button)),h5 a:where(:not(.wp-element-button)),h6 a:where(:not(.wp-element-button))){color: hotpink;}:root :where(h1 a:where(:not(.wp-element-button)):hover,h2 a:where(:not(.wp-element-button)):hover,h3 a:where(:not(.wp-element-button)):hover,h4 a:where(:not(.wp-element-button)):hover,h5 a:where(:not(.wp-element-button)):hover,h6 a:where(:not(.wp-element-button)):hover){color: red;}:root :where(h1 a:where(:not(.wp-element-button)):focus,h2 a:where(:not(.wp-element-button)):focus,h3 a:where(:not(.wp-element-button)):focus,h4 a:where(:not(.wp-element-button)):focus,h5 a:where(:not(.wp-element-button)):focus,h6 a:where(:not(.wp-element-button)):focus){color: red;}:root :where(.wp-block-image img, .wp-block-image .wp-crop-area){border-radius: 9999px;}:root :where(.wp-block-image){color: red;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }.has-white-color{color: var(--wp--preset--color--white) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}h1.has-blue-color,h2.has-blue-color,h3.has-blue-color,h4.has-blue-color,h5.has-blue-color,h6.has-blue-color{color: var(--wp--preset--color--blue) !important;}h1.has-blue-background-color,h2.has-blue-background-color,h3.has-blue-background-color,h4.has-blue-background-color,h5.has-blue-background-color,h6.has-blue-background-color{background-color: var(--wp--preset--color--blue) !important;}h1.has-blue-border-color,h2.has-blue-border-color,h3.has-blue-border-color,h4.has-blue-border-color,h5.has-blue-border-color,h6.has-blue-border-color{border-color: var(--wp--preset--color--blue) !important;}'
+				':where(body) {margin: 0;}.is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }.is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }.is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }.is-layout-constrained > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }.is-layout-constrained > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }.is-layout-constrained > .aligncenter { margin-left: auto !important; margin-right: auto !important; }.is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)) { max-width: var(--wp--style--global--content-size); margin-left: auto !important; margin-right: auto !important; }.is-layout-constrained > .alignwide { max-width: var(--wp--style--global--wide-size); }body .is-layout-flex { display:flex; }.is-layout-flex { flex-wrap: wrap; align-items: center; }.is-layout-flex > :is(*, div) { margin: 0; }body .is-layout-grid { display:grid; }.is-layout-grid > :is(*, div) { margin: 0; }body{background-color: red;margin: 10px;padding: 10px;}a:where(:not(.wp-element-button)){color: blue;}:root :where(a:where(:not(.wp-element-button)):hover){color: orange;}:root :where(a:where(:not(.wp-element-button)):focus){color: orange;}h1{font-size: 42px;}:root :where(.wp-block-group){margin-top: 10px;margin-right: 20px;margin-bottom: 30px;margin-left: 40px;padding-top: 11px;padding-right: 22px;padding-bottom: 33px;padding-left: 44px;}:root :where(h1,h2,h3,h4,h5,h6){color: orange;}:root :where(h1 a:where(:not(.wp-element-button)),h2 a:where(:not(.wp-element-button)),h3 a:where(:not(.wp-element-button)),h4 a:where(:not(.wp-element-button)),h5 a:where(:not(.wp-element-button)),h6 a:where(:not(.wp-element-button))){color: hotpink;}:root :where(h1 a:where(:not(.wp-element-button)):hover,h2 a:where(:not(.wp-element-button)):hover,h3 a:where(:not(.wp-element-button)):hover,h4 a:where(:not(.wp-element-button)):hover,h5 a:where(:not(.wp-element-button)):hover,h6 a:where(:not(.wp-element-button)):hover){color: red;}:root :where(h1 a:where(:not(.wp-element-button)):focus,h2 a:where(:not(.wp-element-button)):focus,h3 a:where(:not(.wp-element-button)):focus,h4 a:where(:not(.wp-element-button)):focus,h5 a:where(:not(.wp-element-button)):focus,h6 a:where(:not(.wp-element-button)):focus){color: red;}:root :where(.wp-block-image img, .wp-block-image .wp-crop-area){border-radius: 9999px;}:root :where(.wp-block-image){color: red;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }.has-white-color{color: var(--wp--preset--color--white) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}:where(h1,h2,h3,h4,h5,h6).has-blue-color{color: var(--wp--preset--color--blue) !important;}:where(h1,h2,h3,h4,h5,h6).has-blue-background-color{background-color: var(--wp--preset--color--blue) !important;}:where(h1,h2,h3,h4,h5,h6).has-blue-border-color{border-color: var(--wp--preset--color--blue) !important;}'
 			);
 		} );
 
@@ -1040,6 +1081,47 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'handles responsive block gap styles', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/group': {
+							'@mobile': {
+								spacing: {
+									blockGap: '24px',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/group': {
+					selector: '.wp-block-group',
+					hasLayoutSupport: true,
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				true,
+				false,
+				false,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toContain( '@media (width <= 480px)' );
+			expect( result ).toContain(
+				':root :where(.wp-block-group-is-layout-flow) > * { margin-block-start: 24px; margin-block-end: 0; }'
+			);
+			expect( result ).toContain(
+				':root :where(.wp-block-group-is-layout-flex) { gap: 24px; }'
+			);
+		} );
+
 		it( 'handles legacy responsive block styles', () => {
 			const tree = {
 				styles: {
@@ -1076,6 +1158,147 @@ describe( 'global styles renderer', () => {
 
 			expect( result ).toEqual(
 				':root :where(.wp-block-button){color: red;}@media (width <= 480px){:root :where(.wp-block-button){color: blue;}}'
+			);
+		} );
+
+		it( 'uses custom viewport breakpoints for responsive block styles', () => {
+			const tree = {
+				settings: {
+					viewport: {
+						mobile: '640px',
+						tablet: '960px',
+					},
+				},
+				styles: {
+					blocks: {
+						'core/button': {
+							'@mobile': {
+								color: {
+									text: 'blue',
+								},
+							},
+							'@tablet': {
+								color: {
+									text: 'green',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				'@media (width <= 640px){:root :where(.wp-block-button){color: blue;}}@media (640px < width <= 960px){:root :where(.wp-block-button){color: green;}}'
+			);
+		} );
+
+		it( 'omits tablet responsive styles when the tablet breakpoint is not larger than mobile', () => {
+			const tree = {
+				settings: {
+					viewport: {
+						mobile: '960px',
+						tablet: '640px',
+					},
+				},
+				styles: {
+					blocks: {
+						'core/button': {
+							'@mobile': {
+								color: {
+									text: 'blue',
+								},
+							},
+							'@tablet': {
+								color: {
+									text: 'green',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				'@media (width <= 960px){:root :where(.wp-block-button){color: blue;}}'
+			);
+		} );
+
+		it( 'uses a single max-width tablet query when only the tablet breakpoint is valid', () => {
+			const tree = {
+				settings: {
+					viewport: {
+						mobile: '100%',
+						tablet: '64rem',
+					},
+				},
+				styles: {
+					blocks: {
+						'core/button': {
+							'@mobile': {
+								color: {
+									text: 'blue',
+								},
+							},
+							'@tablet': {
+								color: {
+									text: 'green',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				'@media (width <= 64rem){:root :where(.wp-block-button){color: green;}}'
 			);
 		} );
 
@@ -1206,6 +1429,137 @@ describe( 'global styles renderer', () => {
 
 			expect( result ).toEqual(
 				'a:where(:not(.wp-element-button)){color: blue;}@media (width <= 480px){:root :where(a:where(:not(.wp-element-button))){color: red;}}@media (width <= 480px){:root :where(a:where(:not(.wp-element-button)):hover){color: orange;}}'
+			);
+		} );
+
+		it( 'renders block element styles defined only in a viewport', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/group': {
+							'@mobile': {
+								elements: {
+									heading: {
+										color: {
+											text: 'red',
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/group': {
+					selector: '.wp-block-group',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				'@media (width <= 480px){:root :where(.wp-block-group h1,.wp-block-group  h2,.wp-block-group  h3,.wp-block-group  h4,.wp-block-group  h5,.wp-block-group  h6){color: red;}}'
+			);
+		} );
+
+		it( 'renders block element pseudo styles defined only in a viewport', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/group': {
+							'@mobile': {
+								elements: {
+									link: {
+										':hover': {
+											color: {
+												text: 'red',
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/group': {
+					selector: '.wp-block-group',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				'@media (width <= 480px){:root :where(.wp-block-group a:where(:not(.wp-element-button)):hover){color: red;}}'
+			);
+		} );
+
+		it( 'renders block element styles defined in separate viewports', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/group': {
+							'@mobile': {
+								elements: {
+									link: {
+										color: {
+											text: 'red',
+										},
+									},
+								},
+							},
+							'@tablet': {
+								elements: {
+									link: {
+										color: {
+											text: 'blue',
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/group': {
+					selector: '.wp-block-group',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				'@media (width <= 480px){:root :where(.wp-block-group a:where(:not(.wp-element-button))){color: red;}}@media (480px < width <= 782px){:root :where(.wp-block-group a:where(:not(.wp-element-button))){color: blue;}}'
 			);
 		} );
 
@@ -1433,6 +1787,23 @@ describe( 'global styles renderer', () => {
 									colors: [ '#263135', '#69a8a7' ],
 								},
 							],
+							default: [
+								{
+									slug: 'grayscale',
+									name: 'Grayscale',
+									colors: [ '#000000', '#ffffff' ],
+								},
+							],
+							// User-created duotones need a filter in the
+							// editor too, or they render on the front end but
+							// not on the canvas.
+							custom: [
+								{
+									slug: 'custom-duotone-1',
+									name: 'Duotone 1',
+									colors: [ '#0000ff', '#1a4548' ],
+								},
+							],
 						},
 					},
 				},
@@ -1457,9 +1828,11 @@ describe( 'global styles renderer', () => {
 
 			expect( svgStyle ).toBeDefined();
 			expect( svgStyle.__unstableType ).toBe( 'svgs' );
-			expect( svgStyle.assets.join( '' ) ).toContain(
-				'wp-duotone-midnight'
-			);
+
+			const assets = svgStyle.assets.join( '' );
+			expect( assets ).toContain( 'wp-duotone-midnight' );
+			expect( assets ).toContain( 'wp-duotone-grayscale' );
+			expect( assets ).toContain( 'wp-duotone-custom-duotone-1' );
 		} );
 	} );
 

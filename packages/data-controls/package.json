@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/data-controls",
-	"version": "4.50.1-next.v.202607070741.0+a51d59513",
+	"version": "4.54.0",
 	"description": "A set of common controls for the @wordpress/data api.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -48,7 +48,7 @@
 		"@wordpress/deprecated": "file:../deprecated"
 	},
 	"peerDependencies": {
-		"react": "^18.0.0"
+		"react": "^18 || ^19"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -2,7 +2,6 @@ import { speak } from '@wordpress/a11y';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
-
 import * as AlertDialog from '..';
 import type { ConfirmResult } from '../types';
 

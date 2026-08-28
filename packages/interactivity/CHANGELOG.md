@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 6.54.0 (2026-08-26)
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project, replacing `tsconfig.test.json`. ([#81509](https://github.com/WordPress/gutenberg/pull/81509))
+
+## 6.53.0 (2026-08-12)
+
+## 6.52.0 (2026-07-29)
+
+## 6.51.0 (2026-07-14)
+
 ## 6.50.0 (2026-07-01)
 
 ## 6.49.0 (2026-06-24)

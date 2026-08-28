@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/sync",
-	"version": "1.50.1-next.v.202607070741.0+a51d59513",
+	"version": "1.54.0",
 	"description": "Sync Data.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -54,7 +54,8 @@
 		"yjs": "^13.6.29"
 	},
 	"devDependencies": {
-		"@jest/globals": "^30.2.0",
+		"@jest/globals": "^30.4.1",
+		"@types/jest": "^30.0.0",
 		"@types/node": "^20.19.39"
 	},
 	"publishConfig": {

@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+### Internal
+
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+## 4.54.0 (2026-08-26)
+
+## 4.53.0 (2026-08-12)
+
+
+## 4.52.0 (2026-07-29)
+
+## 4.51.0 (2026-07-14)
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
 ## 4.50.0 (2026-07-01)
 
 ## 4.49.0 (2026-06-24)

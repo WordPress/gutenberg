@@ -1,7 +1,4 @@
 'use strict';
-/**
- * Internal dependencies
- */
 const { ValidationError } = require( '..' );
 const postProcessConfig = require( '../post-process-config' );
 

@@ -1,7 +1,3 @@
-/**
- * Internal dependencies
- */
-
 import { isEmpty } from '../is-empty';
 
 describe( 'isEmpty', () => {

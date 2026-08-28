@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/video-conversion",
-	"version": "0.2.1-next.v.202607070741.0+a51d59513",
+	"version": "0.5.0",
 	"description": "Client-side video conversion for WordPress. Currently converts animated GIFs to MP4/WebM via WebCodecs.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -56,6 +56,9 @@
 	"dependencies": {
 		"@wordpress/worker-threads": "file:../worker-threads",
 		"mediabunny": "^1.45.2"
+	},
+	"devDependencies": {
+		"@types/jest": "^30.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

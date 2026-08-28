@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/build",
-	"version": "0.19.1-next.v.202607070741.0+a51d59513",
+	"version": "0.22.0",
 	"description": "Build tool for WordPress plugins.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -59,7 +59,7 @@
 		"@wordpress/boot": ">=0.3.0 <1.0.0",
 		"@wordpress/private-apis": "^1.0.0",
 		"@wordpress/route": ">=0.2.0 <1.0.0",
-		"@wordpress/theme": ">=0.8.0 <1.0.0"
+		"@wordpress/theme": ">=0.8.0 <3.0.0"
 	},
 	"peerDependenciesMeta": {
 		"@wordpress/boot": {

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/preferences",
-	"version": "4.50.1-next.v.202607070741.0+a51d59513",
+	"version": "4.54.0",
 	"description": "Utilities for managing WordPress preferences.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -41,7 +41,7 @@
 			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json",
-		"./build-style/": "./build-style/"
+		"./build-style/*": "./build-style/*"
 	},
 	"wpScript": true,
 	"types": "build-types",
@@ -59,13 +59,15 @@
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
-		"@wordpress/private-apis": "file:../private-apis",
-		"clsx": "^2.1.1"
+		"@wordpress/private-apis": "file:../private-apis"
+	},
+	"devDependencies": {
+		"@types/jest": "^30.0.0"
 	},
 	"peerDependencies": {
-		"@types/react": "^18.3.27",
-		"react": "^18.0.0",
-		"react-dom": "^18.0.0"
+		"@types/react": "^18 || ^19",
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
 	},
 	"peerDependenciesMeta": {
 		"@types/react": {

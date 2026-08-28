@@ -1,11 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useCallback } from '@wordpress/element';
 import {
 	cloneBlock,
 	createBlock,
-	__experimentalCloneSanitizedBlock,
+	cloneSanitizedBlock,
 	findTransform,
 	getBlockTransforms,
 	pasteHandler,
@@ -13,10 +10,6 @@ import {
 } from '@wordpress/blocks';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 
 /** @typedef {React.SyntheticEvent} SyntheticEvent */
@@ -268,7 +261,7 @@ export default function useOnBlockDrop(
 				}
 
 				const groupInnerBlocks = blocks.map( ( block ) =>
-					__experimentalCloneSanitizedBlock( block )
+					cloneSanitizedBlock( block )
 				);
 
 				const areAllImages = blocks.every( ( block ) => {

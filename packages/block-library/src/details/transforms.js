@@ -1,10 +1,4 @@
-/**
- * WordPress dependencies
- */
-import {
-	createBlock,
-	__experimentalCloneSanitizedBlock,
-} from '@wordpress/blocks';
+import { createBlock, cloneSanitizedBlock } from '@wordpress/blocks';
 
 export default {
 	from: [
@@ -21,9 +15,7 @@ export default {
 				return createBlock(
 					'core/details',
 					{},
-					blocks.map( ( block ) =>
-						__experimentalCloneSanitizedBlock( block )
-					)
+					blocks.map( ( block ) => cloneSanitizedBlock( block ) )
 				);
 			},
 		},

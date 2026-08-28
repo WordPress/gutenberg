@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import deepFreeze from 'deep-freeze';
-
-/**
- * Internal dependencies
- */
 import { getPendingLockRequests, isLockAvailable } from '../selectors';
 import { deepCopyLocksTreePath, getNode } from '../utils';
 

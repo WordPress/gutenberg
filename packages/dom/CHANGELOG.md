@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+## 4.54.0 (2026-08-26)
+
+### Bug Fixes
+
+-   `cleanNodeList`: Unwrap whitespace-only phrasing content elements instead of removing them, so pasting content like `a<em> </em>b` no longer loses the space between words ([#76696](https://github.com/WordPress/gutenberg/pull/76696)).
+
+## 4.53.0 (2026-08-12)
+
+
+## 4.52.0 (2026-07-29)
+
+## 4.51.0 (2026-07-14)
+
+### Bug Fixes
+
+-   `placeCaretAtEdge`: only place a caret when the container is itself an editable element, not when it merely inherits content editability from an editing host ancestor ([#79105](https://github.com/WordPress/gutenberg/pull/79105)).
+
 ## 4.50.0 (2026-07-01)
 
 ## 4.49.0 (2026-06-24)

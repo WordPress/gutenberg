@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Post Summary', () => {
@@ -274,5 +271,31 @@ test.describe( 'Post Summary', () => {
 					.locator( '..' ),
 			};
 		}
+	} );
+
+	test.describe( 'post status', () => {
+		test( 'shows Draft for a new post before it has been saved', async ( {
+			admin,
+			editor,
+			page,
+		} ) => {
+			await admin.createNewPost();
+			await editor.openDocumentSettingsSidebar();
+
+			const summary = page.locator( '.editor-post-summary' );
+			await expect( summary ).toBeVisible();
+
+			// A new post is an `auto-draft`, which should be presented as
+			// a Draft.
+			const editButton = summary.getByRole( 'button', {
+				name: 'Edit Status',
+			} );
+			await expect( editButton ).toHaveAccessibleDescription( 'Draft' );
+
+			await editButton.click();
+			await expect(
+				page.getByRole( 'radio', { name: 'Draft' } )
+			).toBeChecked();
+		} );
 	} );
 } );

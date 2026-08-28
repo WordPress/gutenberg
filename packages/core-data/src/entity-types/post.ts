@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type {
 	CommentingStatus,
 	Context,
@@ -11,7 +8,6 @@ import type {
 	RenderedText,
 	OmitNevers,
 } from './helpers';
-
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
 declare module './base-entity-records' {

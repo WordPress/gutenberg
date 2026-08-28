@@ -342,16 +342,24 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	public function test_converts_state_preset_vars_to_css_vars() {
 		$actual = gutenberg_normalize_state_preset_vars(
 			array(
-				'border' => array(
+				'border'     => array(
 					'color' => 'var:preset|color|accent-1',
+				),
+				'typography' => array(
+					'fontSize'   => 'var:preset|font-size|3xl',
+					'fontFamily' => 'var:preset|font-family|heavenlyBlue',
 				),
 			)
 		);
 
 		$this->assertSame(
 			array(
-				'border' => array(
+				'border'     => array(
 					'color' => 'var(--wp--preset--color--accent-1)',
+				),
+				'typography' => array(
+					'fontSize'   => 'var(--wp--preset--font-size--3-xl)',
+					'fontFamily' => 'var(--wp--preset--font-family--heavenly-blue)',
 				),
 			),
 			$actual
@@ -890,6 +898,46 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 
 		$this->assertStringContainsString(
 			'@media (width <= 480px){.' . $matches[0] . '{color:#ff0000 !important;}}',
+			$actual_stylesheet
+		);
+	}
+
+	/**
+	 * Tests that responsive text alignment generates media-query scoped CSS.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_responsive_text_alignment_generates_media_query_scoped_css() {
+		$this->ensure_block_registered( 'core/paragraph' );
+
+		$block_content = '<p class="wp-block-paragraph has-text-align-left">Hello</p>';
+		$block         = array(
+			'blockName' => 'core/paragraph',
+			'attrs'     => array(
+				'style' => array(
+					'typography' => array(
+						'textAlign' => 'left',
+					),
+					'@mobile'    => array(
+						'typography' => array(
+							'textAlign' => 'right',
+						),
+					),
+				),
+			),
+		);
+
+		$actual = gutenberg_render_block_states_support( $block_content, $block );
+
+		$this->assertMatchesRegularExpression(
+			'/^<p class="wp-block-paragraph has-text-align-left (wp-states-[a-f0-9]{8})">Hello<\/p>$/',
+			$actual
+		);
+		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){.' . $matches[0] . '{text-align:right !important;}}',
 			$actual_stylesheet
 		);
 	}

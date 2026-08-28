@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { useSelect, dispatch, resolveSelect } from '@wordpress/data';
 import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
@@ -8,16 +5,13 @@ import {
 	store as blocksStore,
 	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '@wordpress/routes-lock-unlock';
 import type {
 	Scope,
 	GuidelineRow,
 	ContentBlock,
 	GuidelineQuery,
+	KnowledgeRow,
 } from './types';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
@@ -27,6 +21,13 @@ export const KNOWLEDGE_NAME = 'wp_knowledge';
 
 const SCOPE_PREFIX = 'guideline-';
 const BLOCK_PREFIX = 'guideline-block-';
+
+// The registry scope that lists per-block guidelines. Unlike the other scopes
+// it has no single `guideline-blocks` row: its content lives in `guideline-block-*`
+// rows. It is rendered as the Blocks section and skipped by the single-row paths
+// (slug query, import/export). Removing it from the server registry removes the
+// Blocks section entirely.
+export const BLOCKS_SCOPE = 'blocks';
 
 // Sentinel slug used while the registry/block list is still empty so the
 // collection query matches nothing instead of every knowledge row.
@@ -61,7 +62,6 @@ export function blockSlug( blockName: string ): string {
 export function useContentBlocks(): ContentBlock[] {
 	return useSelect(
 		( s ) =>
-			// @ts-ignore - getBlockTypes is untyped in this context.
 			s( blocksStore )
 				.getBlockTypes()
 				.filter( ( block: ContentBlock ) =>
@@ -103,9 +103,17 @@ export function useGuidelineData(): GuidelineData {
 	);
 
 	const slugs = useMemo( () => {
+		// Per-block rows only exist while the Blocks scope is registered. When a
+		// plugin removes it, drop the block slugs so we stop querying those rows.
+		const hasBlocksScope = scopes.some( ( s ) => s.slug === BLOCKS_SCOPE );
 		const list = [
-			...scopes.map( ( s ) => scopeSlug( s.slug ) ),
-			...contentBlocks.map( ( b ) => blockSlug( b.name ) ),
+			// The Blocks scope has no single row; its per-block rows are added below.
+			...scopes
+				.filter( ( s ) => s.slug !== BLOCKS_SCOPE )
+				.map( ( s ) => scopeSlug( s.slug ) ),
+			...( hasBlocksScope
+				? contentBlocks.map( ( b ) => blockSlug( b.name ) )
+				: [] ),
 		];
 		return list.length > 0 ? list : [ NO_MATCH_SLUG ];
 	}, [ scopes, contentBlocks ] );
@@ -122,11 +130,12 @@ export function useGuidelineData(): GuidelineData {
 		[ slugs ]
 	);
 
-	const { records: rowRecords, hasResolved: rowsResolved } = useEntityRecords(
-		KNOWLEDGE_KIND,
-		KNOWLEDGE_NAME,
-		query
-	);
+	const { records: rowRecords, hasResolved: rowsResolved } =
+		useEntityRecords< KnowledgeRow >(
+			KNOWLEDGE_KIND,
+			KNOWLEDGE_NAME,
+			query
+		);
 
 	const bySlug = useMemo( () => {
 		const map: Record< string, GuidelineRow > = {};

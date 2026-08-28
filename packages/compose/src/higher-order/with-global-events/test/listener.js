@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import Listener from '../listener';
 
 describe( 'Listener', () => {

@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-
-/**
- * Internal dependencies
- */
 const {
 	setCollaboration,
 } = require( '../../editor/collaboration/fixtures/collaboration-utils' );
@@ -88,7 +81,7 @@ test.describe( 'Block Hooks API', () => {
 
 				await requestUtils.deleteAllPosts();
 				await requestUtils.deleteAllBlocks();
-				await setCollaboration( requestUtils, true );
+				await setCollaboration( requestUtils, false );
 			} );
 
 			test( `should insert hooked blocks into ${ name } on frontend`, async ( {
@@ -229,7 +222,7 @@ test.describe( 'Block Hooks API', () => {
 
 				await requestUtils.deleteAllPosts();
 				await requestUtils.deleteAllBlocks();
-				await setCollaboration( requestUtils, true );
+				await setCollaboration( requestUtils, false );
 			} );
 
 			test( `should insert hooked blocks into ${ name } on frontend`, async ( {

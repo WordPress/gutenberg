@@ -6,6 +6,8 @@ This package is still experimental. “Experimental” means this is an early im
 
 An [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) server for the WordPress Design System. Provides AI agents with component documentation, usage examples, and design tokens.
 
+TypeScript consumers that import this package require TypeScript 5 or newer.
+
 By using the MCP server, you can be confident that your AI agents are correctly following the latest design system guidance when asking questions like:
 
 -   Which components should be used for a given interaction or user interface, like a button or a dropdown
@@ -23,6 +25,8 @@ claude mcp add wordpress-design-system -- npx -y --ignore-scripts --min-release-
 ```
 
 ### OpenAI Codex
+
+The [Codex CLI](https://developers.openai.com/codex/cli) must be installed first.
 
 ```bash
 codex mcp add wordpress-design-system -- npx -y --ignore-scripts --min-release-age=2 @wordpress/design-system-mcp@latest

@@ -1,13 +1,11 @@
 #!/usr/bin/env node
-
-/**
- * External dependencies
- */
-import { execSync, spawn } from 'child_process';
+import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import { parseArgs } from 'util';
 import path from 'path';
 import fs from 'fs';
+import spawn from 'cross-spawn';
+import { spawnWatchProcess, stopWatchProcess } from './process.mjs';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 const ROOT_DIR = path.resolve( __dirname, '../..' );
@@ -29,7 +27,6 @@ function exec( command, args = [], options = {} ) {
 		const childOptions = {
 			cwd: ROOT_DIR,
 			stdio: silent ? 'pipe' : 'inherit',
-			shell: true,
 			...spawnOptions,
 		};
 
@@ -74,24 +71,6 @@ function exec( command, args = [], options = {} ) {
 		} );
 
 		child.on( 'error', reject );
-	} );
-}
-
-/**
- * Execute a command without waiting for it to complete.
- * Used for starting watch processes.
- *
- * @param {string}   command Command to execute.
- * @param {string[]} args    Command arguments.
- * @param {Object}   options Spawn options.
- * @return {Object} Child process.
- */
-function execAsync( command, args = [], options = {} ) {
-	return spawn( command, args, {
-		cwd: ROOT_DIR,
-		stdio: 'inherit',
-		shell: true,
-		...options,
 	} );
 }
 
@@ -151,12 +130,18 @@ async function dev() {
 				'@wordpress/validation-tools',
 				'--silent',
 			] ).catch( () => {
-				throw new Error( 'Run `npm install` to update.' );
+				throw new Error(
+					'Run `npm install` to update, or set GUTENBERG_CHECK_INSTALLED_DEPS=NEVER to skip this check.'
+				);
 			} );
 		}
 
 		console.log( '\n🧹 Cleaning packages...' );
-		await exec( 'npm', [ 'run', 'clean:packages' ], { silent: true } );
+		await exec(
+			'node',
+			[ path.join( __dirname, 'clean.mjs' ), '--packages' ],
+			{ silent: true }
+		);
 
 		console.log( '\n📦 Building workspaces...' );
 		await exec(
@@ -174,7 +159,7 @@ async function dev() {
 		if ( ! skipTypes ) {
 			console.log( '\n📘 Building TypeScript types...\n' );
 			const tsStartTime = Date.now();
-			await exec( 'tsgo', [ '--build' ] ).catch( () => {
+			await exec( 'tsc', [ '--build' ] ).catch( () => {
 				console.error(
 					'\n❌ TypeScript compilation failed. Try cleaning up first: `npm run clean:package-types`'
 				);
@@ -213,11 +198,11 @@ async function dev() {
 		// Start TypeScript watch (unless types are skipped).
 		const tscWatch = skipTypes
 			? null
-			: execAsync( 'tsgo', [
-					'--build',
-					'--watch',
-					'--preserveWatchOutput',
-			  ] );
+			: spawnWatchProcess(
+					'tsc',
+					[ '--build', '--watch', '--preserveWatchOutput' ],
+					{ cwd: ROOT_DIR, stdio: 'inherit' }
+			  );
 
 		// Start package build watch and wait for initial build to complete
 		// before signaling ready. wp-build outputs "Watching for changes..."
@@ -225,14 +210,13 @@ async function dev() {
 		const buildWatch = spawn( 'wp-build', [ '--watch' ], {
 			cwd: ROOT_DIR,
 			stdio: [ 'inherit', 'pipe', 'inherit' ],
-			shell: true,
 			env: { ...process.env, NODE_ENV: 'development' },
 		} );
 
 		// Handle process termination
 		const cleanup = () => {
 			console.log( '\n\n👋 Stopping watch mode...' );
-			tscWatch?.kill();
+			stopWatchProcess( tscWatch );
 			buildWatch.kill();
 			readyMarkerFile.cleanup();
 			process.exit( 0 );

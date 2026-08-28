@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import json2md from 'json2md';
-
-/**
- * Internal dependencies
- */
 import { generateMarkdownPropsJson } from './props.mjs';
 
 /**

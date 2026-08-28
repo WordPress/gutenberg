@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
 import { isTextField } from '@wordpress/dom';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
@@ -35,7 +28,6 @@ export function useEventHandlers( { clientId, isSelected } ) {
 		getBlock,
 	} = unlock( useSelect( blockEditorStore ) );
 	const {
-		insertAfterBlock,
 		removeBlock,
 		resetZoomLevel,
 		startDraggingBlocks,
@@ -73,13 +65,13 @@ export function useEventHandlers( { clientId, isSelected } ) {
 					return;
 				}
 
-				event.preventDefault();
-
-				if ( keyCode === ENTER && isZoomOut() ) {
-					resetZoomLevel();
-				} else if ( keyCode === ENTER ) {
-					insertAfterBlock( clientId );
+				if ( keyCode === ENTER ) {
+					if ( isZoomOut() ) {
+						event.preventDefault();
+						resetZoomLevel();
+					}
 				} else {
+					event.preventDefault();
 					removeBlock( clientId );
 				}
 			}
@@ -334,7 +326,6 @@ export function useEventHandlers( { clientId, isSelected } ) {
 			getBlock,
 			isReusableBlock,
 			isTemplatePart,
-			insertAfterBlock,
 			removeBlock,
 			isZoomOut,
 			resetZoomLevel,

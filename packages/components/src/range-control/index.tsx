@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ChangeEvent, FocusEvent, ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { __, isRTL } from '@wordpress/i18n';
 import { useRef, useState, forwardRef } from '@wordpress/element';
 import { useInstanceId, useMergeRefs } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import BaseControl from '../base-control';
 import Button from '../button';
 import Icon from '../icon';
@@ -34,7 +23,6 @@ import {
 	Thumb,
 	Wrapper,
 } from './styles/range-control-styles';
-
 import type { RangeControlProps } from './types';
 import type { WordPressComponentProps } from '../context';
 import { space } from '../utils/space';
@@ -68,7 +56,6 @@ function UnforwardedRangeControl(
 		// Prevent passing legacy props to internal component.
 		__nextHasNoMarginBottom: _,
 		__next40pxDefaultSize: _next40pxDefaultSize,
-		__shouldNotWarnDeprecated36pxSize: _shouldNotWarnDeprecated36pxSize,
 		afterIcon,
 		allowReset = false,
 		beforeIcon,
@@ -326,7 +313,6 @@ function UnforwardedRangeControl(
 						onChange={ handleOnChange }
 						shiftStep={ shiftStep }
 						__unstableInputWidth={ space( 20 ) }
-						__next40pxDefaultSize
 						step={ step }
 						// @ts-expect-error TODO: Investigate if the `null` value is necessary
 						value={ inputSliderValue }

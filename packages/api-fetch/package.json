@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/api-fetch",
-	"version": "7.50.1-next.v.202607070741.0+a51d59513",
+	"version": "7.54.0",
 	"description": "Utility to make WordPress REST API requests.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -47,6 +47,9 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/url": "file:../url"
+	},
+	"devDependencies": {
+		"@types/jest": "^30.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import deepFreeze from 'deep-freeze';
-
-/**
- * WordPress dependencies
- */
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { getBlockContentSchemaFromTransforms, isPlain } from '../utils';
 
 describe( 'isPlain', () => {
