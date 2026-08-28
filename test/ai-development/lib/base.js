@@ -77,7 +77,7 @@ export default {
 				// inherited environment. A workspace is built from the tree
 				// under evaluation, so a branch that adds `.claude/settings.json`
 				// would otherwise run host commands here.
-				settings: { permissions },
+				settings: { permissions, disableAllHooks: true },
 				env: agentEnvironment,
 			},
 		},
