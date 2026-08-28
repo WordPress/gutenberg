@@ -1320,7 +1320,16 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 	 */
 	public function test_reads_a_shortcode_past_a_lone_bracket( $html, $expected, $index ) {
 		$next = new ReflectionMethod( 'Gutenberg_Shortcode_Transforms', 'next' );
-		$next->setAccessible( true );
+
+		/*
+		 * ReflectionMethod::setAccessible is:
+		 * - needed until 8.1.0, as `next` is private
+		 * - redundant as of 8.1.0, which made all methods accessible
+		 * - deprecated as of 8.5.0
+		 */
+		if ( PHP_VERSION_ID < 80100 ) {
+			$next->setAccessible( true );
+		}
 
 		$match = $next->invoke( null, 'gallery', $html );
 
