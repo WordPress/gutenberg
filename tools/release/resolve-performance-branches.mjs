@@ -116,6 +116,8 @@ function resolveBranchesForEvent( options ) {
 
 	switch ( event ) {
 		case 'pull_request':
+			// The base is pinned to the commit the PR is based on, not the branch tip, so
+			// both branches match what the merge commit was built from.
 			return {
 				branches: [
 					branch( sha ),
