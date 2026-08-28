@@ -265,21 +265,15 @@ function block_core_gallery_dynamic_image_link_attributes( $attachment_id, $attr
 	$link_to = $attributes['linkTo'] ?? 'none';
 	$attrs   = array();
 
-	// Galleries can hold WordPress' 'file' and 'post' as well as this block's
-	// own 'media' and 'attachment'. Translate here so the rest of this function
-	// only deals with the block's own values.
-	if ( 'file' === $link_to ) {
-		$link_to = 'media';
-	} elseif ( 'post' === $link_to ) {
-		$link_to = 'attachment';
-	}
-
 	switch ( $link_to ) {
+		// Gutenberg uses 'media'/'attachment'; WP Core uses 'file'/'post'.
 		case 'media':
+		case 'file':
 			$attrs['href']            = wp_get_attachment_url( $attachment_id );
 			$attrs['linkDestination'] = 'media';
 			break;
 		case 'attachment':
+		case 'post':
 			$attrs['href']            = get_attachment_link( $attachment_id );
 			$attrs['linkDestination'] = 'attachment';
 			break;
