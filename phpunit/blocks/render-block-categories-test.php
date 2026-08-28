@@ -27,7 +27,7 @@ class Tests_Blocks_Render_Categories extends WP_UnitTestCase {
 			)
 		);
 
-		$output = gutenberg_render_block_core_categories( $attributes, '', $block );
+		$output = $block->render();
 
 		$this->assertSame( '', $output );
 	}
@@ -50,18 +50,17 @@ class Tests_Blocks_Render_Categories extends WP_UnitTestCase {
 			)
 		);
 
-		$attributes = array(
-			'taxonomy'          => 'category',
-			'displayAsDropdown' => false,
-		);
-		$block      = new WP_Block(
+		$block = new WP_Block(
 			array(
 				'blockName' => 'core/categories',
-				'attrs'     => $attributes,
+				'attrs'     => array(
+					'taxonomy'          => 'category',
+					'displayAsDropdown' => false,
+				),
 			)
 		);
 
-		$output = gutenberg_render_block_core_categories( $attributes, '', $block );
+		$output = $block->render();
 
 		$this->assertStringContainsString( 'wp-block-categories-list', $output );
 		$this->assertStringContainsString( 'Categories block test term', $output );
