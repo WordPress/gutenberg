@@ -279,18 +279,48 @@ class Gutenberg_HTML_To_Blocks {
 
 		foreach ( $attributes as $name => $value ) {
 			if ( ! is_array( $value ) || ! isset( $value['source'] ) ) {
-				$resolved[ $name ] = $value;
+				self::set_attribute_path( $resolved, $name, $value );
 				continue;
 			}
 
 			$sourced = Gutenberg_Block_Attributes_Parser::parse_single( $value, $element );
 
 			if ( null !== $sourced ) {
-				$resolved[ $name ] = $sourced;
+				self::set_attribute_path( $resolved, $name, $sourced );
 			}
 		}
 
 		return $resolved;
+	}
+
+	/**
+	 * Assigns a value to an attribute, which may name a path into a nested one.
+	 *
+	 * A block attribute such as `style` holds an object the block itself shapes,
+	 * so a declaration writes `style.typography.textAlign` to reach into it
+	 * rather than replacing the whole attribute.
+	 *
+	 * @param array  $attributes Attributes being built, assigned into.
+	 * @param string $path       Attribute name, or a dot separated path into one.
+	 * @param mixed  $value      Value to assign.
+	 * @return void
+	 */
+	private static function set_attribute_path( &$attributes, $path, $value ) {
+		$steps = explode( '.', $path );
+		$last  = array_pop( $steps );
+
+		$target = &$attributes;
+
+		foreach ( $steps as $step ) {
+			if ( ! isset( $target[ $step ] ) || ! is_array( $target[ $step ] ) ) {
+				$target[ $step ] = array();
+			}
+
+			$target = &$target[ $step ];
+		}
+
+		$target[ $last ] = $value;
+		unset( $target );
 	}
 
 	/**
@@ -338,7 +368,7 @@ class Gutenberg_HTML_To_Blocks {
 	 */
 	private static function create_block( $block_type, $transform, $attributes, $element, $inner_blocks ) {
 		$attributes = self::remove_default_attributes( $block_type, $attributes );
-		$markup     = self::prepare_wrapper_markup( $block_type, $transform, $element );
+		$markup     = self::prepare_wrapper_markup( $block_type, $transform, $element, $attributes );
 
 		if ( array() === $inner_blocks ) {
 			return array(
@@ -431,9 +461,10 @@ class Gutenberg_HTML_To_Blocks {
 	 * @param WP_Block_Type          $block_type Block type.
 	 * @param array                  $transform  Transform that matched the element.
 	 * @param Gutenberg_HTML_Element $element    Element to add the class to.
+	 * @param array                  $attributes Attributes the block was built with.
 	 * @return array Markup with `opening`, `closing` and `outer` keys.
 	 */
-	private static function prepare_wrapper_markup( $block_type, $transform, $element ) {
+	private static function prepare_wrapper_markup( $block_type, $transform, $element, $attributes ) {
 		$opening  = $element->get_opening_tag();
 		$closing  = $element->get_closing_tag();
 		$supports = (array) $block_type->supports;
@@ -457,29 +488,29 @@ class Gutenberg_HTML_To_Blocks {
 		 * markup, where it makes the block invalid and the deprecation that
 		 * absorbs it can swallow the whole element as the block's content.
 		 */
-		$attributes = array();
+		$rebuilt_attributes = array();
 
 		/*
 		 * The classes `useBlockProps.save()` would add, taken from the block
 		 * supports the editor itself applies rather than from a second
-		 * implementation of the same rule. A class the source already repeats
-		 * would otherwise be emitted twice, which the editor flags.
+		 * implementation of the same rule. They come first, as `save` writes
+		 * them, and a class the source already carries is not repeated.
 		 */
 		$classes = array_merge(
-			$keep_classes ? $element->get_class_names() : array(),
-			self::get_block_supports_classes( $block_type )
+			self::get_block_supports_classes( $block_type, $attributes ),
+			$keep_classes ? $element->get_class_names() : array()
 		);
 		$classes = array_values( array_unique( $classes ) );
 
 		if ( array() !== $classes ) {
-			$attributes['class'] = implode( ' ', $classes );
+			$rebuilt_attributes['class'] = implode( ' ', $classes );
 		}
 
 		if ( $keep_anchor ) {
 			$anchor = $source->get_attribute( 'id' );
 
 			if ( is_string( $anchor ) && '' !== $anchor ) {
-				$attributes['id'] = $anchor;
+				$rebuilt_attributes['id'] = $anchor;
 			}
 		}
 
@@ -487,14 +518,14 @@ class Gutenberg_HTML_To_Blocks {
 			$value = $source->get_attribute( $name );
 
 			if ( null !== $value ) {
-				$attributes[ $name ] = $value;
+				$rebuilt_attributes[ $name ] = $value;
 			}
 		}
 
 		$rebuilt = new WP_HTML_Tag_Processor( '<' . $element->tag_name . '>' );
 
 		if ( $rebuilt->next_tag() ) {
-			foreach ( $attributes as $name => $value ) {
+			foreach ( $rebuilt_attributes as $name => $value ) {
 				$rebuilt->set_attribute( $name, $value );
 			}
 
@@ -514,11 +545,31 @@ class Gutenberg_HTML_To_Blocks {
 	 * @param WP_Block_Type $block_type Block type.
 	 * @return string[] Class names.
 	 */
-	private static function get_block_supports_classes( $block_type ) {
+	private static function get_block_supports_classes( $block_type, $attributes ) {
 		$applied = wp_apply_generated_classname_support( $block_type );
 		$classes = isset( $applied['class'] ) ? trim( (string) $applied['class'] ) : '';
+		$classes = '' === $classes ? array() : preg_split( '/\s+/', $classes );
 
-		return '' === $classes ? array() : preg_split( '/\s+/', $classes );
+		/*
+		 * Text alignment is saved as a class rather than an inline style, so a
+		 * block that carries the attribute has to carry the class too or its
+		 * markup will not match what `save` produces.
+		 */
+		$supports   = (array) $block_type->supports;
+		$typography = isset( $supports['typography'] ) ? (array) $supports['typography'] : array();
+		$text_align = isset( $attributes['style']['typography']['textAlign'] )
+			? $attributes['style']['typography']['textAlign']
+			: null;
+
+		if (
+			! empty( $typography['textAlign'] )
+			&& is_string( $text_align )
+			&& ! wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textAlign' )
+		) {
+			$classes[] = 'has-text-align-' . $text_align;
+		}
+
+		return $classes;
 	}
 
 	/**

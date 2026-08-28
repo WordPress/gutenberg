@@ -4,6 +4,8 @@ import { createBlock } from './factory';
 import { matchesSelector } from './matches-selector';
 import {
 	getBlockAttributes,
+	isValidByEnum,
+	isValidByType,
 	parseWithAttributeSchema,
 } from './parser/get-block-attributes';
 
@@ -98,50 +100,128 @@ function resolveAttributeOverrides(
 	overrides: Record< string, unknown >,
 	node: Element
 ): Record< string, unknown > {
-	return Object.fromEntries(
-		Object.entries( overrides )
-			.map( ( [ name, value ] ) => {
-				if (
-					! value ||
-					typeof value !== 'object' ||
-					Array.isArray( value ) ||
-					! ( 'source' in value )
-				) {
-					return [ name, value ];
-				}
+	const attributes: Record< string, unknown > = {};
 
-				/*
-				 * A source with no selector reads whatever it is handed, so
-				 * the matched node is passed as-is: parsing its markup would
-				 * hand the source the `<body>` hpq wraps it in instead. With a
-				 * selector, the markup is parsed so the selector can match the
-				 * node itself as well as its descendants, which is what the
-				 * server-side parser does.
-				 */
-				const sourced = parseWithAttributeSchema(
-					'selector' in value ? node.outerHTML : node,
-					value as any
-				);
+	Object.entries( overrides ).forEach( ( [ name, value ] ) => {
+		const resolved = resolveAttributeValue( value, node );
 
-				// A `map` turns a sourced value into one the block declares,
-				// such as a heading tag name into a heading level.
-				const lookup = ( value as any ).map;
-				if ( lookup && typeof lookup === 'object' ) {
-					return [
-						name,
-						Object.prototype.hasOwnProperty.call(
-							lookup,
-							sourced as string
-						)
-							? lookup[ sourced as string ]
-							: undefined,
-					];
-				}
+		if ( resolved !== undefined ) {
+			setAttributePath( attributes, name, resolved );
+		}
+	} );
 
-				return [ name, sourced ];
-			} )
-			.filter( ( [ , value ] ) => value !== undefined )
-	);
+	return attributes;
+}
+
+/**
+ * Resolves one declared attribute value.
+ *
+ * @param value Declared value.
+ * @param node  Element the transform matched.
+ *
+ * @return Attribute value, or undefined when the markup supplies none.
+ */
+function resolveAttributeValue( value: unknown, node: Element ): unknown {
+	if (
+		! value ||
+		typeof value !== 'object' ||
+		Array.isArray( value ) ||
+		! ( 'source' in value )
+	) {
+		return value;
+	}
+
+	const declaration = value as DeclarativeTransform;
+
+	const sourced =
+		'style' === declaration.source
+			? readStyleProperty( node, declaration.property )
+			: /*
+			   * A source with no selector reads whatever it is handed, so the
+			   * matched node is passed as-is: parsing its markup would hand
+			   * the source the `<body>` hpq wraps it in instead. With a
+			   * selector, the markup is parsed so the selector can match the
+			   * node itself as well as its descendants, which is what the
+			   * server-side parser does.
+			   */
+			  parseWithAttributeSchema(
+					'selector' in declaration ? node.outerHTML : node,
+					declaration as any
+			  );
+
+	// A `map` turns a sourced value into one the block declares, such as a
+	// heading tag name into a heading level.
+	const lookup = declaration.map;
+	if ( lookup && typeof lookup === 'object' ) {
+		return Object.prototype.hasOwnProperty.call( lookup, sourced as string )
+			? lookup[ sourced as string ]
+			: undefined;
+	}
+
+	// The block's own attributes are validated by `getBlockAttributes`; a
+	// declared one is validated here, so that `type` and `enum` mean the same
+	// thing wherever they are written.
+	if (
+		! isValidByType( sourced, declaration.type ) ||
+		! isValidByEnum( sourced, declaration.enum )
+	) {
+		return undefined;
+	}
+
+	return sourced;
+}
+
+/**
+ * Reads one declaration out of an element's inline styles.
+ *
+ * @param node     Element to read.
+ * @param property CSS property name, as it is written in the style attribute.
+ *
+ * @return The value, or undefined when the element does not set it.
+ */
+function readStyleProperty(
+	node: Element,
+	property: unknown
+): string | undefined {
+	if ( typeof property !== 'string' ) {
+		return undefined;
+	}
+
+	const value = ( node as HTMLElement ).style?.getPropertyValue( property );
+
+	return value ? value.trim() : undefined;
+}
+
+/**
+ * Assigns a value to an attribute, which may name a path into a nested one.
+ *
+ * A block attribute such as `style` holds an object the block itself shapes, so
+ * a declaration writes `style.typography.textAlign` to reach into it rather
+ * than replacing the whole attribute.
+ *
+ * @param attributes Attributes being built.
+ * @param path       Attribute name, or a dot separated path into one.
+ * @param value      Value to assign.
+ */
+function setAttributePath(
+	attributes: Record< string, unknown >,
+	path: string,
+	value: unknown
+): void {
+	const steps = path.split( '.' );
+	const last = steps.pop() as string;
+
+	let target = attributes;
+
+	steps.forEach( ( step ) => {
+		if ( ! target[ step ] || typeof target[ step ] !== 'object' ) {
+			target[ step ] = {};
+		}
+
+		target = target[ step ] as Record< string, unknown >;
+	} );
+
+	target[ last ] = value;
 }
 
 /**

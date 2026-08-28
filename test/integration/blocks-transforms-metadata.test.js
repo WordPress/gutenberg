@@ -153,6 +153,36 @@ describe( 'Transforms declared in block metadata', () => {
 		expect( image.attributes.align ).toBe( 'left' );
 	} );
 
+	it( 'reads an inline alignment into the nested style attribute', () => {
+		const [ paragraph ] = rawHandler( {
+			HTML: '<p style="color:red;text-align:center">Centred</p>',
+		} );
+
+		expect( paragraph.name ).toBe( 'core/paragraph' );
+		expect( paragraph.attributes.style ).toEqual( {
+			typography: { textAlign: 'center' },
+		} );
+	} );
+
+	it( 'leaves an alignment the block does not accept unset', () => {
+		const [ paragraph ] = rawHandler( {
+			HTML: '<p style="text-align:justify">Justified</p>',
+		} );
+
+		// `enum` on a declared attribute is honoured, the same way it is on a
+		// block's own attributes.
+		expect( paragraph.attributes.style ).toBeUndefined();
+	} );
+
+	it( 'keeps the classes of a block whose transform is only declared', () => {
+		const [ preformatted ] = rawHandler( {
+			HTML: '<pre class="my-custom">Pre</pre>',
+		} );
+
+		expect( preformatted.name ).toBe( 'core/preformatted' );
+		expect( preformatted.attributes.className ).toBe( 'my-custom' );
+	} );
+
 	it( 'keeps a transforms accessor lazy when nothing is declared for it', () => {
 		const { transforms } = getBlockType( 'core/shortcode' );
 

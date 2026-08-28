@@ -1032,6 +1032,92 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 		$this->assertStringContainsString( '<p>', $blocks[0]['innerHTML'] );
 	}
 
+	/**
+	 * @dataProvider data_text_alignment
+	 *
+	 * @param string      $html     Markup to convert.
+	 * @param string|null $expected Alignment the block is expected to carry, or null for none.
+	 */
+	public function test_reads_inline_text_alignment( $html, $expected ) {
+		$blocks = gutenberg_html_to_blocks( $html );
+		$actual = isset( $blocks[0]['attrs']['style']['typography']['textAlign'] )
+			? $blocks[0]['attrs']['style']['typography']['textAlign']
+			: null;
+
+		$this->assertSame( $expected, $actual );
+
+		// The alignment is saved as a class, so the markup has to carry it or
+		// the block does not match what `save()` produces.
+		if ( null === $expected ) {
+			$this->assertStringNotContainsString( 'has-text-align', $blocks[0]['innerHTML'] );
+		} else {
+			$this->assertStringContainsString( "has-text-align-$expected", $blocks[0]['innerHTML'] );
+		}
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public static function data_text_alignment() {
+		return array(
+			'centred paragraph'   => array( '<p style="text-align:center">One</p>', 'center' ),
+			'right paragraph'     => array( '<p style="text-align:right">One</p>', 'right' ),
+			'left paragraph'      => array( '<p style="text-align:left">One</p>', 'left' ),
+			'among other styles'  => array( '<p style="color:red;text-align:center;margin:0">One</p>', 'center' ),
+			'spaced out'          => array( '<p style="text-align : center">One</p>', 'center' ),
+			'uppercase property'  => array( '<p style="TEXT-ALIGN:center">One</p>', 'center' ),
+			'centred heading'     => array( '<h2 style="text-align:center">One</h2>', 'center' ),
+			'a value blocks omit' => array( '<p style="text-align:justify">One</p>', null ),
+			'no alignment'        => array( '<p style="color:red">One</p>', null ),
+			'no style at all'     => array( '<p>One</p>', null ),
+		);
+	}
+
+	public function test_writes_a_declared_attribute_path_into_a_nested_attribute() {
+		$this->register(
+			'test/aligned',
+			array(
+				'attributes' => array(
+					'style' => array( 'type' => 'object' ),
+				),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'       => 'raw',
+							'selector'   => 'aside',
+							'attributes' => array(
+								'style.typography.textAlign' => array(
+									'type'     => 'string',
+									'source'   => 'style',
+									'property' => 'text-align',
+								),
+								'style.color.text' => array(
+									'type'     => 'string',
+									'source'   => 'style',
+									'property' => 'color',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$blocks = gutenberg_html_to_blocks( '<aside style="text-align:center;color:#f00">One</aside>' );
+
+		$this->assertSame(
+			array(
+				'style' => array(
+					'typography' => array( 'textAlign' => 'center' ),
+					'color'      => array( 'text' => '#f00' ),
+				),
+			),
+			$blocks[0]['attrs']
+		);
+	}
+
 	public function test_leaves_media_in_place_when_nothing_converts_it() {
 		$this->register_test_blocks();
 

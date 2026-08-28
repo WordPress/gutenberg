@@ -90,6 +90,14 @@
 				"type": "raw",
 				"selector": "p",
 				"priority": 20,
+				"attributes": {
+					"style.typography.textAlign": {
+						"type": "string",
+						"source": "style",
+						"property": "text-align",
+						"enum": [ "left", "center", "right" ]
+					}
+				},
 				"schema": {
 					"p": {
 						"children": "phrasing",

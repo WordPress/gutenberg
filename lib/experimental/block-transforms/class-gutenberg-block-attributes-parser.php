@@ -156,6 +156,9 @@ class Gutenberg_Block_Attributes_Parser {
 		}
 
 		switch ( $source ) {
+			case 'style':
+				return self::read_style_property( $target, isset( $schema['property'] ) ? $schema['property'] : null );
+
 			case 'attribute':
 				$value = $target->get_attribute( $schema['attribute'] );
 				$type  = isset( $schema['type'] ) ? $schema['type'] : null;
@@ -226,6 +229,43 @@ class Gutenberg_Block_Attributes_Parser {
 			),
 			'23.8.0'
 		);
+
+		return null;
+	}
+
+	/**
+	 * Reads one declaration out of an element's inline styles.
+	 *
+	 * @param Gutenberg_HTML_Element $element  Element to read.
+	 * @param string|null            $property CSS property name, as it is written in the style attribute.
+	 * @return string|null The value, or null when the element does not set it.
+	 */
+	private static function read_style_property( $element, $property ) {
+		if ( ! is_string( $property ) || '' === $property ) {
+			return null;
+		}
+
+		$style = $element->get_attribute( 'style' );
+
+		if ( ! is_string( $style ) ) {
+			return null;
+		}
+
+		foreach ( explode( ';', $style ) as $declaration ) {
+			$parts = explode( ':', $declaration, 2 );
+
+			if ( 2 !== count( $parts ) ) {
+				continue;
+			}
+
+			if ( strtolower( trim( $parts[0] ) ) !== strtolower( $property ) ) {
+				continue;
+			}
+
+			$value = trim( $parts[1] );
+
+			return '' === $value ? null : $value;
+		}
 
 		return null;
 	}

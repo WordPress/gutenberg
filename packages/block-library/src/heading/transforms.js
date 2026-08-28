@@ -1,6 +1,5 @@
-import { createBlock, getBlockAttributes } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
-import { getLevelFromHeadingNodeName } from './shared';
 import { getTransformedAttributes } from '../utils/get-transformed-attributes';
 
 const transforms = {
@@ -49,36 +48,6 @@ const transforms = {
 						} ),
 					} );
 				} ),
-		},
-		{
-			// Matching, the content schema and the heading level are declared
-			// in `block.json`; this supplies the text alignment, which cannot be.
-			name: 'from-raw',
-			transform( node ) {
-				const attributes = getBlockAttributes(
-					'core/heading',
-					node.outerHTML
-				);
-				const { textAlign } = node.style || {};
-
-				attributes.level = getLevelFromHeadingNodeName( node.nodeName );
-
-				if (
-					textAlign === 'left' ||
-					textAlign === 'center' ||
-					textAlign === 'right'
-				) {
-					attributes.style = {
-						...attributes.style,
-						typography: {
-							...attributes.style?.typography,
-							textAlign,
-						},
-					};
-				}
-
-				return createBlock( 'core/heading', attributes );
-			},
 		},
 		...[ 1, 2, 3, 4, 5, 6 ].map( ( level ) => ( {
 			type: 'prefix',

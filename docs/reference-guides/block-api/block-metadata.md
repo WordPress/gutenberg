@@ -564,6 +564,25 @@ An `attributes` value is used as given, unless it is an object declaring a `sour
 }
 ```
 
+Besides the sources a block attribute may use, a transform may read one declaration out of the element's inline styles with `{ "source": "style", "property": "text-align" }`.
+
+An attribute name may be a dotted path, which writes into a nested attribute rather than replacing it. That is how the Paragraph and Heading blocks read an alignment written as inline CSS into the `style` attribute they share with the rest of the block supports:
+
+```json
+{
+	"attributes": {
+		"style.typography.textAlign": {
+			"type": "string",
+			"source": "style",
+			"property": "text-align",
+			"enum": [ "left", "center", "right" ]
+		}
+	}
+}
+```
+
+A declared value is checked against its `type` and `enum` before it is used, so markup carrying something the block does not accept — `text-align: justify`, above — leaves the attribute unset rather than storing a value the block cannot render.
+
 Keys for a `block` transform:
 
 -   `blocks` (`string[]`): the block types the transform converts from (under `from`) or to (under `to`). Under `from`, `"*"` matches any block; under `to` it does not, because a declared transform builds the block it names and `"*"` names none.

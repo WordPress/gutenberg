@@ -125,6 +125,12 @@
 					}
 				},
 				"attributes": {
+					"style.typography.textAlign": {
+						"type": "string",
+						"source": "style",
+						"property": "text-align",
+						"enum": [ "left", "center", "right" ]
+					},
 					"level": {
 						"type": "number",
 						"source": "tag",
