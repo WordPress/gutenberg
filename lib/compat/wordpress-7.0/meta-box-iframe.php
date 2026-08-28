@@ -1,23 +1,15 @@
 <?php
 /**
- * Renders classic meta boxes in an iframe under the block editor.
- *
- * The block editor loads the classic edit screen, via the meta box loader
- * URL, in an iframe. On that request this file trims the page down to the
- * meta boxes: the admin chrome and the classic editor are hidden, meta
- * boxes that are only registered for backwards compatibility are removed
- * because the editor renders their replacements, and a bootstrap script
- * makes width based media queries answer for the parent window instead of
- * the iframe, so that the styles match the rest of the page.
+ * Renders classic meta boxes in iframes under the block editor, by
+ * trimming the classic edit screen down to the meta boxes when it is
+ * requested through the meta box loader URL.
  *
  * @package gutenberg
  */
 
 /**
  * Whether the current request renders meta boxes for the editor's iframe.
- *
- * The meta box loader nonce is verified by `use_block_editor_for_post()`
- * for every meta box loader request.
+ * The loader nonce is verified by `use_block_editor_for_post()`.
  *
  * @return bool Whether this is a meta box iframe request.
  */
@@ -27,22 +19,16 @@ function gutenberg_is_meta_box_iframe_request() {
 }
 
 /**
- * Sends the same cross-origin isolation header as the parent editor.
- *
- * The editor document may be cross-origin isolated with
- * `Document-Isolation-Policy` (see gutenberg_set_up_cross_origin_isolation).
- * An isolated document can only script same-origin frames that are isolated
- * the same way, and the editor has to reach into the iframe to collect the
- * meta box fields on save, so the iframed classic screen must make the same
- * decision the parent editor made.
+ * Sends the same `Document-Isolation-Policy` header as the parent editor:
+ * an isolated document can only script same-origin frames that are
+ * isolated the same way.
  */
 function gutenberg_meta_box_iframe_cross_origin_isolation() {
 	if ( ! gutenberg_is_meta_box_iframe_request() ) {
 		return;
 	}
 
-	// Mirrors the conditions in gutenberg_set_up_cross_origin_isolation()
-	// that apply to the post editor.
+	// The post editor conditions of gutenberg_set_up_cross_origin_isolation().
 	if (
 		! function_exists( 'gutenberg_is_client_side_media_processing_enabled' ) ||
 		! gutenberg_is_client_side_media_processing_enabled()
@@ -62,9 +48,6 @@ add_action( 'load-post.php', 'gutenberg_meta_box_iframe_cross_origin_isolation' 
 /**
  * Returns which meta box locations the current iframe request renders.
  *
- * The editor renders two iframes: one in the settings sidebar for the
- * `side` location, and one in the bottom pane for `normal` and `advanced`.
- *
  * @return string[] The meta box locations to render.
  */
 function gutenberg_meta_box_iframe_locations() {
@@ -76,14 +59,8 @@ function gutenberg_meta_box_iframe_locations() {
 }
 
 /**
- * Removes meta boxes that the current iframe request does not render.
- *
- * Boxes that are only registered for backwards compatibility are removed
- * because the editor renders its own replacements for these, and
- * `do_meta_boxes()` skips them only when the current screen is the block
- * editor, which the iframed classic screen is not. Boxes in other
- * locations are removed because each location is rendered by the iframe
- * responsible for it.
+ * Removes the locations other iframes render, and back-compat boxes,
+ * which `do_meta_boxes()` only skips on block editor screens.
  */
 function gutenberg_meta_box_iframe_remove_other_boxes() {
 	global $wp_meta_boxes;
@@ -119,18 +96,9 @@ function gutenberg_meta_box_iframe_remove_other_boxes() {
 add_action( 'add_meta_boxes', 'gutenberg_meta_box_iframe_remove_other_boxes', PHP_INT_MAX );
 
 /**
- * Skips rendering the meta boxes on the block editor page.
- *
- * Core renders the meta boxes into a hidden container on the block editor
- * page, but the iframes render them instead, so neither the markup nor
- * the meta box callbacks are wanted there. Core computes the list of
- * available meta boxes for the editor from this same array after this
- * filter runs, so the listing it would have computed is dispatched here,
- * from the footer, which runs after core dispatches the empty one.
- *
- * Runs after other filters so that they see the real meta boxes.
- *
- * @global WP_Screen $current_screen WordPress current screen object.
+ * Skips rendering the meta boxes on the block editor page; the iframes
+ * render them. The listing core would have computed from this array is
+ * dispatched from the footer, after core dispatches the empty one.
  *
  * @param array $wp_meta_boxes Global meta box state.
  * @return array An empty array, so that nothing renders.
@@ -200,9 +168,7 @@ function gutenberg_meta_box_iframe_dequeue_scripts() {
 		return;
 	}
 
-	// The parent editor handles autosaves. The classic autosave would
-	// submit the hidden title and content fields with the values they
-	// were loaded with.
+	// The classic autosave would submit the hidden title and content fields.
 	wp_dequeue_script( 'autosave' );
 
 	// Scrolls the page for a content editor that the iframe does not show.
@@ -211,14 +177,9 @@ function gutenberg_meta_box_iframe_dequeue_scripts() {
 add_action( 'admin_enqueue_scripts', 'gutenberg_meta_box_iframe_dequeue_scripts', PHP_INT_MAX );
 
 /**
- * Prints a hidden submit button at the top of the post form.
- *
- * The parent editor saves the meta boxes by submitting the form with
- * this button, so that submit handlers serialize their values as they
- * would for a pressed button. It skips constraint validation, which
- * would otherwise silently abort on invalid fields inside hidden meta
- * boxes, and the loader page cancels every submission, so the form
- * never navigates.
+ * Prints a hidden submit button the editor saves the meta boxes with. It
+ * skips constraint validation, which would abort on invalid fields in
+ * hidden boxes, and the bootstrap cancels the submission itself.
  */
 function gutenberg_meta_box_iframe_print_submitter() {
 	if ( ! gutenberg_is_meta_box_iframe_request() ) {
@@ -317,13 +278,9 @@ function gutenberg_meta_box_iframe_print_styles() {
 add_action( 'admin_print_styles', 'gutenberg_meta_box_iframe_print_styles', 99 );
 
 /**
- * Prints the script that adapts the classic screen to living in an iframe.
- *
- * Form submissions are prevented, because the parent editor saves through
- * its own flow, width based media queries are rewritten to answer for the
- * parent window, and the boxes follow the visibility preferences of the
- * parent editor. The script is printed inline, from meta-box-iframe.js,
- * so that it is not a registered script anything can depend on.
+ * Prints the script that adapts the classic screen to living in an
+ * iframe, inline from meta-box-iframe.js so that it is not a registered
+ * script anything can depend on.
  */
 function gutenberg_meta_box_iframe_print_bootstrap() {
 	if ( ! gutenberg_is_meta_box_iframe_request() ) {

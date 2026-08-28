@@ -286,6 +286,8 @@ export const requestMetaBoxUpdates =
 		// The frames have to be found through the elements: under the
 		// editor's Document-Isolation-Policy the frames' browsing context
 		// names are cleared, so `window.frames[ name ]` finds nothing.
+		// A document without the post form is still loading or failed to
+		// load, so there is nothing to save in it.
 		const frameDocuments = [ 'main', 'side' ]
 			.map( ( location ) =>
 				document.querySelector(
@@ -294,7 +296,9 @@ export const requestMetaBoxUpdates =
 			)
 			.filter( Boolean )
 			.map( ( iframe ) => iframe.contentDocument )
-			.filter( Boolean );
+			.filter( ( frameDocument ) =>
+				frameDocument?.getElementById( 'post' )
+			);
 
 		for ( const frameDocument of frameDocuments ) {
 			// Some meta boxes, including TinyMCE editors, only write their
