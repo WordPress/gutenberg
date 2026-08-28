@@ -32,7 +32,7 @@ class Gutenberg_REST_Revision_Fields_Test extends WP_UnitTestCase {
 
 		register_post_meta(
 			'post',
-			'gutenberg_test_release_date',
+			'gutenberg_test_event_date',
 			array(
 				'type'              => 'string',
 				'single'            => true,
@@ -50,13 +50,13 @@ class Gutenberg_REST_Revision_Fields_Test extends WP_UnitTestCase {
 				'post_content' => 'Content',
 			)
 		);
-		update_post_meta( self::$post_id, 'gutenberg_test_release_date', '3 September' );
+		update_post_meta( self::$post_id, 'gutenberg_test_event_date', 'Saturday' );
 		wp_save_post_revision( self::$post_id );
 	}
 
 	public function tear_down() {
 		remove_filter( '_wp_post_revision_fields', array( $this, 'filter_revision_fields' ) );
-		unregister_post_meta( 'post', 'gutenberg_test_release_date' );
+		unregister_post_meta( 'post', 'gutenberg_test_event_date' );
 		wp_delete_post( self::$post_id, true );
 
 		parent::tear_down();
@@ -69,7 +69,7 @@ class Gutenberg_REST_Revision_Fields_Test extends WP_UnitTestCase {
 	 * @return string[] The filtered list.
 	 */
 	public function filter_revision_fields( $fields ) {
-		$fields['gutenberg_test_release_date'] = 'Release date';
+		$fields['gutenberg_test_event_date'] = 'Event date';
 		$fields['gutenberg_test_missing']      = 'Never set';
 		return $fields;
 	}
@@ -95,13 +95,13 @@ class Gutenberg_REST_Revision_Fields_Test extends WP_UnitTestCase {
 	public function test_it_returns_the_field_with_its_label_and_value() {
 		$fields = $this->get_revision_fields();
 
-		$this->assertArrayHasKey( 'gutenberg_test_release_date', $fields );
+		$this->assertArrayHasKey( 'gutenberg_test_event_date', $fields );
 		$this->assertSame(
 			array(
-				'label' => 'Release date',
-				'value' => '3 September',
+				'label' => 'Event date',
+				'value' => 'Saturday',
 			),
-			$fields['gutenberg_test_release_date']
+			$fields['gutenberg_test_event_date']
 		);
 	}
 
@@ -121,13 +121,13 @@ class Gutenberg_REST_Revision_Fields_Test extends WP_UnitTestCase {
 		$filter = function ( $value ) {
 			return strtoupper( $value );
 		};
-		add_filter( '_wp_post_revision_field_gutenberg_test_release_date', $filter );
+		add_filter( '_wp_post_revision_field_gutenberg_test_event_date', $filter );
 
 		$fields = $this->get_revision_fields();
 
-		remove_filter( '_wp_post_revision_field_gutenberg_test_release_date', $filter );
+		remove_filter( '_wp_post_revision_field_gutenberg_test_event_date', $filter );
 
-		$this->assertSame( '3 SEPTEMBER', $fields['gutenberg_test_release_date']['value'] );
+		$this->assertSame( 'SATURDAY', $fields['gutenberg_test_event_date']['value'] );
 	}
 
 	public function test_it_is_absent_in_the_view_context() {

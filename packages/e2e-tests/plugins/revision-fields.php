@@ -36,7 +36,7 @@ add_action( 'init', 'gutenberg_test_revision_fields_register_meta' );
  * @return string[] The filtered list.
  */
 function gutenberg_test_revision_fields_add_field( $fields ) {
-	$fields['gutenberg_test_revision_field'] = 'Release date';
+	$fields['gutenberg_test_revision_field'] = 'Event date';
 	return $fields;
 }
 add_filter( '_wp_post_revision_fields', 'gutenberg_test_revision_fields_add_field' );

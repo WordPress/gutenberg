@@ -1040,7 +1040,7 @@ test.describe( 'Post revision fields registered by plugins', () => {
 					'<!-- wp:paragraph --><p>Original content</p><!-- /wp:paragraph -->',
 				status: 'draft',
 				meta: {
-					gutenberg_test_revision_field: 'Autumn',
+					gutenberg_test_revision_field: 'Saturday',
 				},
 			},
 		} );
@@ -1059,7 +1059,7 @@ test.describe( 'Post revision fields registered by plugins', () => {
 				content:
 					'<!-- wp:paragraph --><p>Second revision</p><!-- /wp:paragraph -->',
 				meta: {
-					gutenberg_test_revision_field: 'Winter',
+					gutenberg_test_revision_field: 'Sunday',
 				},
 			},
 		} );
@@ -1081,16 +1081,16 @@ test.describe( 'Post revision fields registered by plugins', () => {
 			.click();
 
 		// The name comes from the plugin, so the meta key is not shown.
-		await expect(
-			settingsSidebar.getByText( 'Release date' )
-		).toBeVisible();
+		await expect( settingsSidebar.getByText( 'Event date' ) ).toBeVisible();
 		await expect(
 			settingsSidebar.getByText( 'gutenberg_test_revision_field' )
 		).toHaveCount( 0 );
 
 		// The value of the previous revision is shown as removed, and the
 		// value of this one as added.
-		await expect( settingsSidebar.locator( 'del' ) ).toHaveText( 'Autumn' );
-		await expect( settingsSidebar.locator( 'ins' ) ).toHaveText( 'Winter' );
+		await expect( settingsSidebar.locator( 'del' ) ).toHaveText(
+			'Saturday'
+		);
+		await expect( settingsSidebar.locator( 'ins' ) ).toHaveText( 'Sunday' );
 	} );
 } );
