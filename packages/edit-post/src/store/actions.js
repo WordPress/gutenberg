@@ -9,7 +9,10 @@ import { addAction } from '@wordpress/hooks';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
-import { getMetaBoxContainer } from '../utils/meta-boxes';
+import {
+	collectMetaBoxFieldsData,
+	getMetaBoxesIframes,
+} from '../utils/meta-boxes';
 import { unlock } from '../lock-unlock';
 
 const { interfaceStore } = unlock( editorPrivateApis );
@@ -275,14 +278,26 @@ export function setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
  */
 export const requestMetaBoxUpdates =
 	() =>
-	async ( { registry, select, dispatch } ) => {
+	async ( { registry, dispatch } ) => {
 		dispatch( {
 			type: 'REQUEST_META_BOX_UPDATES',
 		} );
 
-		// Saves the wp_editor fields.
-		if ( window.tinyMCE ) {
-			window.tinyMCE.triggerSave();
+		const frameDocuments = getMetaBoxesIframes()
+			.map( ( iframe ) => iframe.contentDocument )
+			.filter( Boolean );
+
+		for ( const frameDocument of frameDocuments ) {
+			// Some meta boxes, including TinyMCE editors, only write their
+			// values into their form fields in a submit handler, so let
+			// those run first. A dispatched event never runs the default
+			// action, so the form does not actually submit.
+			frameDocument.getElementById( 'post' )?.dispatchEvent(
+				new frameDocument.defaultView.Event( 'submit', {
+					bubbles: true,
+					cancelable: true,
+				} )
+			);
 		}
 
 		// We gather the base form data.
@@ -309,14 +324,10 @@ export const requestMetaBoxUpdates =
 			post.author ? [ 'post_author', post.author ] : false,
 		].filter( Boolean );
 
-		// We gather all the metaboxes locations.
-		const activeMetaBoxLocations = select.getActiveMetaBoxLocations();
+		// We gather the meta box fields from the iframes they render in.
 		const formDataToMerge = [
 			baseFormData,
-			...activeMetaBoxLocations.map(
-				( location ) =>
-					new window.FormData( getMetaBoxContainer( location ) )
-			),
+			...frameDocuments.map( collectMetaBoxFieldsData ),
 		];
 
 		// Merge all form data objects into a single one.
@@ -449,7 +460,7 @@ export function __unstableCreateTemplate() {
 let metaBoxesInitialized = false;
 
 /**
- * Initializes WordPress `postboxes` script and the logic for saving meta boxes.
+ * Initializes the logic for saving and refreshing meta boxes.
  */
 export const initializeMetaBoxes =
 	() =>
@@ -465,11 +476,6 @@ export const initializeMetaBoxes =
 		if ( metaBoxesInitialized ) {
 			return;
 		}
-		const postType = registry.select( editorStore ).getCurrentPostType();
-		if ( window.postboxes.page !== postType ) {
-			window.postboxes.add_postbox_toggles( postType );
-		}
-
 		metaBoxesInitialized = true;
 
 		// Save metaboxes on save completion, except for autosaves.

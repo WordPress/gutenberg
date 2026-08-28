@@ -95,6 +95,8 @@
 	// Enable scrolling only for the split view.
 	.edit-post-meta-boxes-main & {
 		overflow: auto;
+		// Lets the iframe fill the pane; it scrolls its own document.
+		flex-grow: 1;
 	}
 	// Keep the contents behind the resize handle.
 	isolation: isolate;
@@ -108,6 +110,13 @@
 // In case the canvas is not iframe’d.
 .edit-post-layout__metaboxes {
 	clear: both;
+}
+
+.edit-post-meta-boxes-iframe {
+	display: block;
+	width: 100%;
+	height: 100%;
+	border: none;
 }
 
 // Only when the split view is active the visual editor should allow shrinking,

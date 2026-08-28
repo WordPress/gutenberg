@@ -370,7 +370,7 @@ _Parameters_
 
 ### initializeMetaBoxes
 
-Initializes WordPress `postboxes` script and the logic for saving meta boxes.
+Initializes the logic for saving and refreshing meta boxes.
 
 ### metaBoxUpdatesFailure
 

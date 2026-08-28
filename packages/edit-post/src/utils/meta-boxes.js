@@ -1,19 +1,79 @@
-/**
- * Function returning the current Meta Boxes DOM Node in the editor
- * whether the meta box area is opened or not.
- * If the MetaBox Area is visible returns it, and returns the original container instead.
- *
- * @param {string} location Meta Box location.
- *
- * @return {string} HTML content.
- */
-export const getMetaBoxContainer = ( location ) => {
-	const area = document.querySelector(
-		`.edit-post-meta-boxes-area.is-${ location } .metabox-location-${ location }`
-	);
-	if ( area ) {
-		return area;
-	}
+import { addQueryArgs } from '@wordpress/url';
 
-	return document.querySelector( '#metaboxes .metabox-location-' + location );
-};
+/**
+ * Returns the URL a meta boxes iframe loads: the meta box loader URL with
+ * the parameter that trims the classic screen down to the given locations.
+ *
+ * @param {string} location `main` for the normal and advanced locations
+ *                          rendered in the bottom pane, or `side` for the
+ *                          side location rendered in the settings sidebar.
+ *
+ * @return {string|undefined} The URL, if the meta box loader URL is known.
+ */
+export function getMetaBoxesIframeUrl( location = 'main' ) {
+	if ( ! window._wpMetaBoxUrl ) {
+		return undefined;
+	}
+	return addQueryArgs( window._wpMetaBoxUrl, {
+		'gutenberg-meta-box-iframe': location,
+	} );
+}
+
+/**
+ * Returns the name of the iframe rendering the given meta box locations.
+ *
+ * @param {string} location `main` or `side`.
+ *
+ * @return {string} The iframe name.
+ */
+export function getMetaBoxesIframeName( location = 'main' ) {
+	return location === 'side'
+		? 'gutenberg-meta-boxes-side'
+		: 'gutenberg-meta-boxes';
+}
+
+/**
+ * Returns the iframes the meta boxes are rendered in.
+ *
+ * @return {HTMLIFrameElement[]} The meta boxes iframes.
+ */
+export function getMetaBoxesIframes() {
+	return [
+		...document.querySelectorAll( 'iframe.edit-post-meta-boxes-iframe' ),
+	];
+}
+
+/**
+ * Collects the values of the form fields inside the meta boxes of the
+ * given document, with the browser's own form serialization.
+ *
+ * The classic screen renders the meta boxes inside one form along with
+ * the title and content fields, which must not be submitted. Disabled
+ * fields are excluded from `FormData`, so the fields outside the meta
+ * boxes are disabled while the data is constructed.
+ *
+ * @param {Document} frameDocument A meta boxes iframe document.
+ *
+ * @return {FormData} The collected fields.
+ */
+export function collectMetaBoxFieldsData( frameDocument ) {
+	const form = frameDocument.getElementById( 'post' );
+	if ( ! form ) {
+		return new window.FormData();
+	}
+	const outsideFields = [ ...form.elements ].filter(
+		( field ) =>
+			! field.disabled &&
+			! field.closest( '.meta-box-sortables .postbox' )
+	);
+	for ( const field of outsideFields ) {
+		field.disabled = true;
+	}
+	try {
+		return new frameDocument.defaultView.FormData( form );
+	} finally {
+		for ( const field of outsideFields ) {
+			field.disabled = false;
+		}
+	}
+}

@@ -47,7 +47,7 @@ import EditorInitialization from '../editor-initialization';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import InitPatternModal from '../init-pattern-modal';
 import BrowserURL from '../browser-url';
-import MetaBoxes from '../meta-boxes';
+import MetaBoxesIframe from '../meta-boxes/iframe';
 import PostEditorMoreMenu from '../more-menu';
 import WelcomeGuide from '../welcome-guide';
 import { store as editPostStore } from '../../store';
@@ -125,8 +125,7 @@ function MetaBoxesMain() {
 			!! get( 'core/edit-post', 'metaBoxesMainIsOpen' ),
 			get( 'core/edit-post', 'metaBoxesMainOpenHeight' ),
 			isMetaBoxLocationVisible( 'normal' ) ||
-				isMetaBoxLocationVisible( 'advanced' ) ||
-				isMetaBoxLocationVisible( 'side' ),
+				isMetaBoxLocationVisible( 'advanced' ),
 		];
 	}, [] );
 	const { set: setPreference } = useDispatch( preferencesStore );
@@ -266,8 +265,7 @@ function MetaBoxesMain() {
 			className="edit-post-layout__metaboxes edit-post-meta-boxes-main__liner"
 			hidden={ ! isOpen }
 		>
-			<MetaBoxes location="normal" />
-			<MetaBoxes location="advanced" />
+			<MetaBoxesIframe />
 		</div>
 	);
 
@@ -572,7 +570,7 @@ function Layout( {
 								onActionPerformed={ onActionPerformed }
 								extraSidebarPanels={
 									showMetaBoxes && (
-										<MetaBoxes location="side" />
+										<MetaBoxesIframe location="side" />
 									)
 								}
 								extraContent={

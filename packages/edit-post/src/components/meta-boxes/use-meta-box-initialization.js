@@ -6,7 +6,7 @@ import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 /**
- * Initializes WordPress `postboxes` script and the logic for saving meta boxes.
+ * Initializes the logic for saving and refreshing meta boxes.
  *
  * @param { boolean } enabled
  */
