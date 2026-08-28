@@ -11,7 +11,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import {
 	collectMetaBoxFieldsData,
-	getMetaBoxesIframes,
+	getMetaBoxesFrameDocuments,
 } from '../utils/meta-boxes';
 import { unlock } from '../lock-unlock';
 
@@ -283,9 +283,7 @@ export const requestMetaBoxUpdates =
 			type: 'REQUEST_META_BOX_UPDATES',
 		} );
 
-		const frameDocuments = getMetaBoxesIframes()
-			.map( ( iframe ) => iframe.contentDocument )
-			.filter( Boolean );
+		const frameDocuments = getMetaBoxesFrameDocuments();
 
 		for ( const frameDocument of frameDocuments ) {
 			// Some meta boxes, including TinyMCE editors, only write their
