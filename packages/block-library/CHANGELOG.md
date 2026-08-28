@@ -8,7 +8,7 @@
 -   Accordion Panel: Reset padding-block when panel is hidden ([#81782](https://github.com/WordPress/gutenberg/pull/81782)).
 -   Query: Stop writing `excludeCurrent: null` into the `query` attribute of blocks that never had the key. The mount effect that clears a stale exclusion treated the absent key as stale, changing the serialized markup of every pre-existing Query block as soon as the editor opened it ([#82147](https://github.com/WordPress/gutenberg/pull/82147)).
 -   Icon: Preserve intrinsic SVG styles when applying block styles or rotation, and keep stroke widths scaling with the block's size for compatibility ([#78808](https://github.com/WordPress/gutenberg/pull/78808)).
--   Gallery: Translate the `image_default_link_type` option into the block's own link values, so the Link control shows the matching option as selected on sites where that option is set to Media File or Attachment Page ([#82157](https://github.com/WordPress/gutenberg/pull/82157)).
+-   Gallery: Read the WordPress link values `file` and `post` as the block's own `media` and `attachment`, in both the editor and the front end, so the Link control shows the matching option as selected on sites where `image_default_link_type` is set. Stored content is left as it is ([#82157](https://github.com/WordPress/gutenberg/pull/82157)).
 
 ### Internal
 
