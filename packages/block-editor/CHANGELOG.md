@@ -10,6 +10,7 @@
 
 -   Inserter: Keep the hovered block preview inside the viewport, so a tall preview in a short window is no longer clipped ([#82060](https://github.com/WordPress/gutenberg/pull/82060)).
 -   Client-side media processing: Refuse a batch of more than one file when the caller only takes one, such as a Cover block placeholder, matching what the server-side upload path already did. Every dropped file was uploaded instead, and the block kept whichever one finished last ([#82041](https://github.com/WordPress/gutenberg/issues/82041)).
+-   `Iframe`: Accept `lang` and `dir` props and set them (plus the `rtl` body class) on the canvas iframe. The editor canvas now follows the site locale rather than the user locale, so its language and text direction match the front end, and language-dependent CSS (`hyphens`, `:lang()`), spellchecking, and `body.rtl` editor styles work inside the canvas ([#52777](https://github.com/WordPress/gutenberg/issues/52777)).
 
 ### Internal
 

@@ -107,6 +107,13 @@ function StylesCanvasRevisions( { path }, ref ) {
 			className="editor-revisions__iframe"
 			name="revisions"
 			tabIndex={ 0 }
+			{ ...( settings.siteLang && {
+				// Like the main editor canvas, the revision preview shows the
+				// site's front end, so it uses the site locale's language and
+				// direction rather than the user locale of the admin.
+				lang: settings.siteLang,
+				dir: settings.siteIsRTL ? 'rtl' : 'ltr',
+			} ) }
 		>
 			<style>
 				{

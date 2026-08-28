@@ -89,6 +89,8 @@ const BLOCK_EDITOR_SETTINGS = [
 	'postContentAttributes',
 	'postsPerPage',
 	'readOnly',
+	'siteIsRTL',
+	'siteLang',
 	'styles',
 	'titlePlaceholder',
 	'supportsLayout',

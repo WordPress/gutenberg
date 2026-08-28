@@ -139,6 +139,8 @@ function Iframe( {
 	readonly,
 	forwardedRef: ref,
 	title = __( 'Editor canvas' ),
+	lang,
+	dir,
 	...props
 } ) {
 	const { resolvedAssets, isPreviewMode } = useSelect( ( select ) => {
@@ -185,17 +187,24 @@ function Iframe( {
 
 		const { ownerDocument } = node;
 
+		// The canvas represents the site's front end, so its text direction
+		// follows the site locale (the `dir` prop) rather than the user locale
+		// of the surrounding admin. Fall back to the admin document when no
+		// direction is provided (e.g. previews).
+		const canvasDir = dir || ownerDocument.dir;
+
 		// Ideally ALL classes that are added through get_body_class should
 		// be added in the editor too, which we'll somehow have to get from
 		// the server in the future (which will run the PHP filters).
-		setBodyClasses(
-			Array.from( ownerDocument.body.classList ).filter(
+		setBodyClasses( [
+			...Array.from( ownerDocument.body.classList ).filter(
 				( name ) =>
 					name.startsWith( 'admin-color-' ) ||
 					name.startsWith( 'post-type-' ) ||
 					name === 'wp-embed-responsive'
-			)
-		);
+			),
+			...( canvasDir === 'rtl' ? [ 'rtl' ] : [] ),
+		] );
 
 		function onLoad() {
 			const { contentDocument } = node;
@@ -205,7 +214,8 @@ function Iframe( {
 
 			documentElement.classList.add( 'block-editor-iframe__html' );
 
-			contentDocument.dir = ownerDocument.dir;
+			contentDocument.dir = dir || ownerDocument.dir;
+			documentElement.lang = lang || ownerDocument.documentElement.lang;
 
 			for ( const compatStyle of getCompatibilityStyles() ) {
 				if ( contentDocument.getElementById( compatStyle.id ) ) {

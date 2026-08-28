@@ -139,6 +139,8 @@ function VisualEditor( {
 		styles,
 		hasCanvasWidth,
 		canvasWidth,
+		siteLang,
+		siteIsRTL,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostId,
@@ -192,6 +194,10 @@ function VisualEditor( {
 			styles: editorSettings.styles,
 			hasCanvasWidth: _canvasWidth !== undefined,
 			canvasWidth: _canvasWidth,
+			// The canvas reflects the site's front end, so it uses the site
+			// locale rather than the user locale of the surrounding admin.
+			siteLang: editorSettings.siteLang,
+			siteIsRTL: editorSettings.siteIsRTL,
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -480,6 +486,10 @@ function VisualEditor( {
 					height="100%"
 					iframeProps={ {
 						...iframeProps,
+						...( siteLang && {
+							lang: siteLang,
+							dir: siteIsRTL ? 'rtl' : 'ltr',
+						} ),
 						style: iframeProps?.style,
 					} }
 				>
