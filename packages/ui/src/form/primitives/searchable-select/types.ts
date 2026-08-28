@@ -176,7 +176,7 @@ export type SearchableSelectProps = Omit<
 		 * triggerContent={ ( value ) => (
 		 *   <span>
 		 *     <Icon icon={ wordpress } />
-		 *     { value }
+		 *     { value.label }
 		 *   </span>
 		 * ) }
 		 * ```

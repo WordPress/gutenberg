@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from '@wordpress/element';
 import { fn } from 'storybook/test';
 import { SearchableSelect } from '../';
 import {
@@ -45,53 +44,6 @@ export const Default: Story = {
 		'aria-label': 'Fruit',
 		defaultValue: ITEMS[ 0 ],
 		items: ITEMS,
-	},
-};
-
-/**
- * Mark a creatable action with `creatable: true` on an item in `items`.
- * It renders in the list footer and is excluded from the main list
- * automatically. Handle creation in `onValueChange`.
- */
-export const Creatable: Story = {
-	args: {
-		...Default.args,
-		items: ITEMS,
-		value: ITEMS[ 0 ],
-	},
-	render: function Template( args ) {
-		const { value: initialValue = ITEMS[ 0 ], ...restArgs } = args;
-		const [ inputValue, setInputValue ] = useState( '' );
-		const [ value, setValue ] = useState( initialValue );
-		const creatableItem = {
-			value: '__create__',
-			label:
-				'Create new item' + ( inputValue ? `: ${ inputValue }` : '' ),
-			creatable: true,
-		};
-
-		return (
-			<SearchableSelect
-				{ ...restArgs }
-				items={ [ ...ITEMS, creatableItem ] }
-				inputValue={ inputValue }
-				onInputValueChange={ setInputValue }
-				value={ value }
-				onValueChange={ ( newValue, event ) => {
-					if ( ! newValue ) {
-						return;
-					}
-
-					if ( newValue.value === creatableItem.value ) {
-						// eslint-disable-next-line no-alert
-						alert( `Create new item: '${ inputValue }'` );
-					} else {
-						setValue( newValue );
-					}
-					args.onValueChange?.( newValue, event );
-				} }
-			/>
-		);
 	},
 };
 
