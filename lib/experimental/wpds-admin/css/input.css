@@ -52,31 +52,18 @@
 		color: var(--wpds-color-foreground-interactive-neutral);
 		box-shadow: none;
 		font-family: var(--wpds-typography-font-family-body);
-		/* 16px below 600px avoids iOS zooming on focus; matches the DS. */
-		font-size: max(var(--wpds-typography-font-size-md), 16px);
+		/*
+		 * NO font-size. Core sets `input, select, textarea, button { font-size:
+		 * inherit }`, so a control takes the size of whatever contains it — which
+		 * is why a settings form reads coherently, with label, field and help text
+		 * all at one size. Pinning a size here broke that: the label stayed at the
+		 * container's size while the field it belongs to shrank to 13px.
+		 *
+		 * Inheriting keeps a control correct in every context without us having to
+		 * know what those contexts are. Core also handles the mobile case, raising
+		 * inputs to 16px below 782px so iOS does not zoom on focus.
+		 */
 		line-height: 1;
-	}
-
-	@media (min-width: 600px) {
-
-		input[type="text"],
-		input[type="password"],
-		input[type="color"],
-		input[type="date"],
-		input[type="datetime"],
-		input[type="datetime-local"],
-		input[type="email"],
-		input[type="month"],
-		input[type="number"],
-		input[type="search"],
-		input[type="tel"],
-		input[type="time"],
-		input[type="url"],
-		input[type="week"],
-		select,
-		textarea {
-			font-size: var(--wpds-typography-font-size-md);
-		}
 	}
 
 	/* -----------------------------------------------------------------------
