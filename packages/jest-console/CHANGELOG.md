@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Update Jest matcher and mock dependencies to 30.5.0 ([#82181](https://github.com/WordPress/gutenberg/pull/82181)).
+
 ## 9.2.0 (2026-08-26)
 
 ### Internal
