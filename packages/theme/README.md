@@ -268,11 +268,12 @@ The build plugins inject generated fallbacks into bare `var(--wpds-*)` reference
 
 `@wordpress/build` already applies these plugins automatically when `@wordpress/theme` is installed. You only need to configure them manually for custom build setups.
 
-| Export                                                        | Tool    | Scope |
-| ------------------------------------------------------------- | ------- | ----- |
-| `@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks` | PostCSS | CSS   |
-| `@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks` | esbuild | JS/TS |
-| `@wordpress/theme/vite-plugins/vite-ds-token-fallbacks`       | Vite    | JS/TS |
+| Export                                                                  | Tool          | Scope |
+| ----------------------------------------------------------------------- | ------------- | ----- |
+| `@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks`           | PostCSS       | CSS   |
+| `@wordpress/theme/lightningcss-plugins/lightningcss-ds-token-fallbacks` | Lightning CSS | CSS   |
+| `@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks`           | esbuild       | JS/TS |
+| `@wordpress/theme/vite-plugins/vite-ds-token-fallbacks`                 | Vite          | JS/TS |
 
 Existing fallbacks are unchanged. An unknown token in a bare reference fails the build.
 
@@ -286,6 +287,21 @@ export default {
 	plugins: [ dsTokenFallbacks ],
 };
 ```
+
+### Lightning CSS
+
+```js
+import { transform, composeVisitors } from 'lightningcss';
+import dsTokenFallbacks from '@wordpress/theme/lightningcss-plugins/lightningcss-ds-token-fallbacks';
+
+const { code } = transform( {
+	filename: 'styles.css',
+	code: Buffer.from( css ),
+	visitor: composeVisitors( [ dsTokenFallbacks ] ),
+} );
+```
+
+> **Note:** CSS Modules [`from global`](https://lightningcss.dev/css-modules.html#local-css-variables) references (for example `var(--wpds-dimension-gap-sm from global)` with `cssModules.dashedIdents`) are not yet supported. The visitor rebuilds `var()` from the token name alone, so `from` metadata is dropped and global custom properties may be incorrectly hashed.
 
 ### esbuild
 

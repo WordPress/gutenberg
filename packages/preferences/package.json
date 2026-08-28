@@ -59,8 +59,7 @@
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
-		"@wordpress/private-apis": "file:../private-apis",
-		"clsx": "^2.1.1"
+		"@wordpress/private-apis": "file:../private-apis"
 	},
 	"devDependencies": {
 		"@types/jest": "^30.0.0"
