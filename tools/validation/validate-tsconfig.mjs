@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { fileURLToPath } from 'url';
-import { dirname, basename, join, relative, resolve } from 'path';
+import { dirname, basename, join, relative, resolve, sep } from 'path';
 import { existsSync, readFileSync } from 'fs';
 import glob from 'glob';
 import JSONC from 'jsonc-parser';
@@ -456,7 +456,9 @@ for ( const projectPath of workspaceProjects ) {
 	for ( const reference of referencedProjects(
 		resolve( repoRoot, projectPath )
 	) ) {
-		const referenceFromRoot = relative( repoRoot, reference );
+		const referenceFromRoot = relative( repoRoot, reference )
+			.split( sep )
+			.join( '/' );
 		if ( ! referenceFromRoot.startsWith( 'packages/' ) ) {
 			continue;
 		}
