@@ -7,6 +7,8 @@ import {
 	getTagPushCommands,
 	getTagRefspec,
 	prepareNpmRelease,
+	getNpmReleasePreparedRefs,
+	isNpmReleasePreparedCommitStale,
 	publishPackagesToNpm,
 	publishVersionedPackagesToNpm,
 	pushNpmReleaseGitMetadata,
@@ -1215,5 +1217,152 @@ describe( 'npm publication verification resumability', () => {
 		);
 		expect( lernaVersionCalls ).toHaveLength( 0 );
 		expect( console ).toHaveLogged();
+	} );
+} );
+
+describe( 'prepared release refs', () => {
+	it( 'namespaces the refs per release target', () => {
+		expect( getNpmReleasePreparedRefs( 'wp/latest' ) ).toEqual(
+			expect.objectContaining( {
+				commit: 'refs/npm-release/wp-latest/commit',
+				tags: 'refs/npm-release/wp-latest/tags',
+			} )
+		);
+		// A concurrent release of a different target must not collide.
+		expect( getNpmReleasePreparedRefs( 'wp/6.9' ).commit ).not.toEqual(
+			getNpmReleasePreparedRefs( 'wp/latest' ).commit
+		);
+	} );
+
+	it( 'persists the package tags alongside the prepared commit', async () => {
+		const pushPreparedCommitFn = jest.fn();
+
+		await publishVersionedPackagesToNpm(
+			{
+				distTag: 'latest',
+				gitWorkingDirectoryPath: '/repo',
+				noVerifyAccessFlag: '--no-verify-access',
+				npmReleaseBranch: 'wp/latest',
+				yesFlag: '--yes',
+			},
+			{
+				commandFn: jest.fn().mockResolvedValue(),
+				deletePreparedCommitFn: jest.fn(),
+				getNpmReleasePackagesFn: jest.fn().mockResolvedValue( [
+					{
+						name: '@wordpress/a11y',
+						version: '4.54.0',
+						tagName: '@wordpress/a11y@4.54.0',
+					},
+				] ),
+				git: {
+					raw: jest.fn().mockResolvedValue( '' ),
+					revparse: jest.fn().mockResolvedValue( 'publish-sha' ),
+				},
+				pushNpmReleaseGitMetadataFn: jest.fn(),
+				pushPreparedCommitFn,
+				runNpmPublishPreflightFn: jest
+					.fn()
+					.mockResolvedValueOnce( [] )
+					.mockResolvedValueOnce( [ '@wordpress/a11y' ] ),
+				wait: jest.fn(),
+			}
+		);
+
+		expect( pushPreparedCommitFn.mock.calls[ 0 ][ 0 ] ).toEqual(
+			expect.objectContaining( {
+				npmReleaseBranch: 'wp/latest',
+				packageTags: [ '@wordpress/a11y@4.54.0' ],
+				publishCommit: 'publish-sha',
+			} )
+		);
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'restores the prepared package tags before resuming a release', async () => {
+		const restorePreparedTagsFn = jest.fn();
+		const publishVersionedPackagesToNpmFn = jest.fn();
+
+		await publishPackagesToNpm(
+			{
+				distTag: 'latest',
+				gitWorkingDirectoryPath: '/repo',
+				interactive: false,
+				minimumVersionBump: 'minor',
+				npmReleaseBranch: 'wp/latest',
+				releaseType: 'latest',
+			},
+			{
+				commandFn: jest.fn().mockResolvedValue(),
+				getPreparedCommitFn: jest
+					.fn()
+					.mockResolvedValue( 'prepared-sha' ),
+				git: {
+					checkout: jest.fn(),
+					fetch: jest.fn(),
+					raw: jest.fn().mockResolvedValue( '' ),
+					revparse: jest.fn().mockResolvedValue( 'prepared-sha' ),
+				},
+				isPreparedCommitStaleFn: jest.fn().mockResolvedValue( false ),
+				publishVersionedPackagesToNpmFn,
+				restorePreparedTagsFn,
+			}
+		);
+
+		// Without the tags, getNpmReleasePackages returns nothing on a fresh
+		// runner and the release silently completes having pushed none of them.
+		expect( restorePreparedTagsFn ).toHaveBeenCalled();
+		expect(
+			restorePreparedTagsFn.mock.invocationCallOrder[ 0 ]
+		).toBeLessThan(
+			publishVersionedPackagesToNpmFn.mock.invocationCallOrder[ 0 ]
+		);
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'is not stale while package tags are still missing from origin', async () => {
+		await expect(
+			isNpmReleasePreparedCommitStale(
+				{
+					gitWorkingDirectoryPath: '/repo',
+					npmReleaseBranch: 'wp/latest',
+					preparedCommit: 'prepared-sha',
+				},
+				{
+					getPreparedTagNamesFn: jest
+						.fn()
+						.mockResolvedValue( [ '@wordpress/a11y@4.54.0' ] ),
+					getRemoteBranchShaFn: jest
+						.fn()
+						.mockResolvedValue( 'branch-sha' ),
+					git: { raw: jest.fn().mockResolvedValue( '' ) },
+					verifyRemotePackageTagsFn: jest
+						.fn()
+						.mockRejectedValue( new Error( 'tag missing' ) ),
+				}
+			)
+		).resolves.toBe( false );
+	} );
+
+	it( 'is stale once the branch contains the commit and every tag landed', async () => {
+		await expect(
+			isNpmReleasePreparedCommitStale(
+				{
+					gitWorkingDirectoryPath: '/repo',
+					npmReleaseBranch: 'wp/latest',
+					preparedCommit: 'prepared-sha',
+				},
+				{
+					getPreparedTagNamesFn: jest
+						.fn()
+						.mockResolvedValue( [ '@wordpress/a11y@4.54.0' ] ),
+					getRemoteBranchShaFn: jest
+						.fn()
+						.mockResolvedValue( 'branch-sha' ),
+					git: { raw: jest.fn().mockResolvedValue( '' ) },
+					verifyRemotePackageTagsFn: jest.fn().mockResolvedValue(),
+				}
+			)
+		).resolves.toBe( true );
 	} );
 } );
