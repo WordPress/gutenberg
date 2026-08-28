@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { fileURLToPath } from 'url';
-import { dirname, basename, join, relative, resolve } from 'path';
+import { dirname, basename, join, relative, resolve, sep } from 'path';
 import { existsSync, readFileSync } from 'fs';
 import glob from 'glob';
 import JSONC from 'jsonc-parser';
@@ -427,6 +427,49 @@ for ( const routeName of routesWithTypes ) {
 					routeDir,
 					dependencyProject
 				) }" in ${ relative( repoRoot, routeProject ) }`
+			);
+		}
+	}
+}
+
+/*
+ * A reference into another package is a build-graph edge, so it must be backed
+ * by a declared dependency, or removed dependencies leave stale references.
+ */
+const workspaceProjects = glob.sync( '{packages,routes}/*/tsconfig*.json', {
+	cwd: repoRoot,
+} );
+
+for ( const projectPath of workspaceProjects ) {
+	const workspaceDir = dirname( projectPath );
+	const packageJsonPath = resolve( repoRoot, workspaceDir, 'package.json' );
+	if ( ! existsSync( packageJsonPath ) ) {
+		continue;
+	}
+	const packageJson = JSON.parse( readFileSync( packageJsonPath, 'utf8' ) );
+	const declared = new Set( [
+		...Object.keys( packageJson.dependencies ?? {} ),
+		...Object.keys( packageJson.devDependencies ?? {} ),
+		...Object.keys( packageJson.peerDependencies ?? {} ),
+		...Object.keys( packageJson.optionalDependencies ?? {} ),
+	] );
+
+	for ( const reference of referencedProjects(
+		resolve( repoRoot, projectPath )
+	) ) {
+		const referenceFromRoot = relative( repoRoot, reference )
+			.split( sep )
+			.join( '/' );
+		if ( ! referenceFromRoot.startsWith( 'packages/' ) ) {
+			continue;
+		}
+		const referencedPackage = referenceFromRoot.split( '/' )[ 1 ];
+		if ( workspaceDir === `packages/${ referencedPackage }` ) {
+			continue;
+		}
+		if ( ! declared.has( `@wordpress/${ referencedPackage }` ) ) {
+			reportError(
+				`Reference to "packages/${ referencedPackage }" in ${ projectPath } without a dependency on "@wordpress/${ referencedPackage }". Remove the reference, or add the dependency to package.json.`
 			);
 		}
 	}
