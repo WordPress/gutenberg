@@ -71,10 +71,6 @@ function _gutenberg_get_default_posttype_form() {
 			array(
 				'id'       => 'status',
 				'label'    => __( 'Status', 'gutenberg' ),
-				'layout'   => array(
-					'type'    => 'panel',
-					'summary' => 'status',
-				),
 				'children' => array(
 					array(
 						'id'     => 'status',
@@ -95,10 +91,6 @@ function _gutenberg_get_default_posttype_form() {
 			array(
 				'id'       => 'discussion',
 				'label'    => __( 'Discussion', 'gutenberg' ),
-				'layout'   => array(
-					'type'    => 'panel',
-					'summary' => 'discussion',
-				),
 				'children' => array(
 					array(
 						'id'     => 'comment_status',
