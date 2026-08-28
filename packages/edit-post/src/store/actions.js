@@ -298,15 +298,23 @@ export const requestMetaBoxUpdates =
 
 		for ( const frameDocument of frameDocuments ) {
 			// Some meta boxes, including TinyMCE editors, only write their
-			// values into their form fields in a submit handler, so let
-			// those run first. A dispatched event never runs the default
-			// action, so the form does not actually submit.
-			frameDocument.getElementById( 'post' )?.dispatchEvent(
-				new frameDocument.defaultView.Event( 'submit', {
-					bubbles: true,
-					cancelable: true,
-				} )
-			);
+			// values into their form fields in a submit handler, so submit
+			// the form as if a button were pressed. The loader page cancels
+			// every submission, so the form does not actually navigate. The
+			// temporary submitter skips constraint validation, which would
+			// otherwise silently abort on invalid fields inside hidden
+			// meta boxes.
+			const form = frameDocument.getElementById( 'post' );
+			if ( ! form ) {
+				continue;
+			}
+			const submitter = frameDocument.createElement( 'button' );
+			submitter.type = 'submit';
+			submitter.formNoValidate = true;
+			submitter.hidden = true;
+			form.appendChild( submitter );
+			form.requestSubmit( submitter );
+			submitter.remove();
 		}
 
 		// We gather the base form data.
