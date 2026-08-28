@@ -10,12 +10,6 @@
 		> * {
 			width: 100%;
 		}
-
-		&__suggestions_list {
-			margin-left: - $grid-unit-15;
-			margin-right: - $grid-unit-15;
-			width: calc(100% + #{$grid-unit-15 * 2});
-		}
 	}
 
 	&__contents {
@@ -31,8 +25,14 @@
 
 	.edit-site-custom-template-modal__suggestions_list {
 		@include break-small() {
-			max-height: $grid-unit-70 * 4; // Height of four buttons
 			overflow-y: auto;
+			// Height of four buttons
+			max-height: calc(#{$grid-unit-70 * 4} + 4 * var(--wpds-border-width-focus));
+			// Room for the focus ring, and keep it in view while arrowing.
+			padding: calc(2 * var(--wpds-border-width-focus));
+			margin-inline: calc(-2 * var(--wpds-border-width-focus));
+			width: calc(100% + 4 * var(--wpds-border-width-focus));
+			scroll-padding-block: calc(2 * var(--wpds-border-width-focus));
 		}
 
 		&__list-item {
@@ -63,10 +63,6 @@
 
 			&:focus {
 				background-color: $gray-100;
-			}
-
-			&:focus:not(:disabled) {
-				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color) inset;
 			}
 
 			&__title,
@@ -141,9 +137,6 @@
 		border: $border-width solid $gray-300;
 		justify-content: center;
 
-		// Show the boundary of the button, in High Contrast Mode.
-		outline: 1px solid transparent;
-
 		span:first-child {
 			color: $gray-900;
 		}
@@ -163,12 +156,6 @@
 		}
 
 		&:focus {
-			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-			border-color: transparent;
-
-			// Windows High Contrast mode will show this outline, but not the box-shadow.
-			outline: 3px solid transparent;
-
 			span:first-child {
 				color: var(--wp-admin-theme-color);
 			}

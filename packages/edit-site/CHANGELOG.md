@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Add New Template: Use the Button component's focus ring instead of the legacy `box-shadow` ones ([#80138](https://github.com/WordPress/gutenberg/issues/80138)).
+
 ### Internal
 
 -   Remove the `showListViewByDefault` handling from `useAdaptEditorToCanvas`; the `editor` package now applies the preference on the preview ↔ edit transition itself.
