@@ -1,5 +1,3 @@
-import { readFileSync } from 'fs';
-import { join } from 'path';
 import { canvasConvertToJpeg } from '../canvas-utils';
 import { getHeicUnsupportedMessage } from '../heic-support';
 
@@ -196,65 +194,77 @@ describe( 'canvasConvertToJpeg', () => {
 		} );
 	} );
 
-	describe( 'EXIF preservation', () => {
-		it( 'carries the source EXIF block into the converted JPEG', async () => {
-			// A real HEIC fixture carrying an EXIF block (Orientation=6).
-			const heicBytes = readFileSync(
-				join( __dirname, 'fixtures', 'exif-rotated-90cw.heic' )
-			);
-
-			const jpegBlob = new Blob(
-				[ new Uint8Array( [ 0xff, 0xd8, 0xff, 0xd9 ] ) ],
-				{ type: 'image/jpeg' }
-			);
+	describe( 'encoder injection', () => {
+		const setupStrategy1 = ( canvasJpeg: Blob ) => {
 			const mockBitmap = { width: 32, height: 32, close: jest.fn() };
+			const convertToBlob = jest.fn().mockResolvedValue( canvasJpeg );
 			global.createImageBitmap = jest
 				.fn()
 				.mockResolvedValue( mockBitmap );
 			global.OffscreenCanvas = jest.fn().mockImplementation( () => ( {
+				width: 32,
+				height: 32,
 				getContext: jest
 					.fn()
 					.mockReturnValue( { drawImage: jest.fn() } ),
-				convertToBlob: jest.fn().mockResolvedValue( jpegBlob ),
+				convertToBlob,
 			} ) );
+			return convertToBlob;
+		};
 
-			const file = new File( [ heicBytes ], 'photo.heic', {
-				type: 'image/heic',
-			} );
-			const result = await canvasConvertToJpeg( file );
-
-			const bytes = new Uint8Array( await result.arrayBuffer() );
-			// An APP1 EXIF segment follows the SOI marker.
-			expect( bytes[ 2 ] ).toBe( 0xff );
-			expect( bytes[ 3 ] ).toBe( 0xe1 );
-			expect( Array.from( bytes.subarray( 6, 12 ) ) ).toEqual( [
-				0x45, 0x78, 0x69, 0x66, 0, 0,
-			] );
+		const file = new File( [ 'data' ], 'photo.heic', {
+			type: 'image/heic',
 		} );
 
-		it( 'returns the plain JPEG when the source has no EXIF block', async () => {
-			const jpegBlob = new Blob(
-				[ new Uint8Array( [ 0xff, 0xd8, 0xff, 0xd9 ] ) ],
-				{ type: 'image/jpeg' }
+		it( 'encodes the decoded canvas with the given encoder', async () => {
+			const convertToBlob = setupStrategy1(
+				new Blob( [ 'canvas-jpeg' ], { type: 'image/jpeg' } )
 			);
-			const mockBitmap = { width: 32, height: 32, close: jest.fn() };
-			global.createImageBitmap = jest
+			const encode = jest
 				.fn()
-				.mockResolvedValue( mockBitmap );
-			global.OffscreenCanvas = jest.fn().mockImplementation( () => ( {
-				getContext: jest
-					.fn()
-					.mockReturnValue( { drawImage: jest.fn() } ),
-				convertToBlob: jest.fn().mockResolvedValue( jpegBlob ),
-			} ) );
+				.mockResolvedValue(
+					new Blob( [ 'vips-jpeg' ], { type: 'image/jpeg' } )
+				);
 
-			const file = new File( [ 'not-a-heic' ], 'photo.heic', {
-				type: 'image/heic',
+			const result = await canvasConvertToJpeg( file, 0.5, encode );
+
+			expect( encode ).toHaveBeenCalledWith(
+				expect.objectContaining( { width: 32, height: 32 } ),
+				0.5
+			);
+			expect( convertToBlob ).not.toHaveBeenCalled();
+			expect( await result.text() ).toBe( 'vips-jpeg' );
+			expect( result.name ).toBe( 'photo.jpg' );
+			expect( result.type ).toBe( 'image/jpeg' );
+		} );
+
+		it( 'falls back to the canvas encoder when the encoder declines', async () => {
+			const convertToBlob = setupStrategy1(
+				new Blob( [ 'canvas-jpeg' ], { type: 'image/jpeg' } )
+			);
+			const encode = jest.fn().mockResolvedValue( null );
+
+			const result = await canvasConvertToJpeg( file, 0.5, encode );
+
+			expect( convertToBlob ).toHaveBeenCalledWith( {
+				type: 'image/jpeg',
+				quality: 0.5,
 			} );
-			const result = await canvasConvertToJpeg( file );
+			expect( await result.text() ).toBe( 'canvas-jpeg' );
+		} );
 
-			const bytes = new Uint8Array( await result.arrayBuffer() );
-			expect( Array.from( bytes ) ).toEqual( [ 0xff, 0xd8, 0xff, 0xd9 ] );
+		it( 'falls back to the canvas encoder when the encoder fails', async () => {
+			const convertToBlob = setupStrategy1(
+				new Blob( [ 'canvas-jpeg' ], { type: 'image/jpeg' } )
+			);
+			const encode = jest
+				.fn()
+				.mockRejectedValue( new Error( 'worker crashed' ) );
+
+			const result = await canvasConvertToJpeg( file, 0.5, encode );
+
+			expect( convertToBlob ).toHaveBeenCalled();
+			expect( await result.text() ).toBe( 'canvas-jpeg' );
 		} );
 	} );
 } );

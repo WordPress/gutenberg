@@ -132,6 +132,37 @@ export async function vipsConvertImageFormat(
 }
 
 /**
+ * Encodes a decoded canvas as a JPEG using vips in a web worker, copying the
+ * EXIF block from the source file the canvas was decoded from.
+ *
+ * @param id      Queue item ID.
+ * @param canvas  Canvas holding the decoded, upright image.
+ * @param source  The image file the canvas was decoded from.
+ * @param quality JPEG quality (0-1).
+ * @return JPEG data.
+ */
+export async function vipsEncodeCanvasAsJpeg(
+	id: QueueItemId,
+	canvas: OffscreenCanvas,
+	source: File,
+	quality: number
+): Promise< Blob > {
+	const { vipsEncodePixelsAsJpeg: encodePixelsAsJpeg } =
+		await loadVipsModule();
+	const { width, height } = canvas;
+	const ctx = canvas.getContext( '2d' );
+	if ( ! ctx ) {
+		throw new Error( 'Could not get canvas 2d context' );
+	}
+	const pixels = ctx.getImageData( 0, 0, width, height ).data.buffer;
+	const buffer = await encodePixelsAsJpeg( id, pixels, width, height, {
+		quality,
+		metadataSource: await source.arrayBuffer(),
+	} );
+	return new Blob( [ buffer as ArrayBuffer ], { type: 'image/jpeg' } );
+}
+
+/**
  * Compresses an image using vips in a web worker.
  *
  * @param id      Queue item ID.

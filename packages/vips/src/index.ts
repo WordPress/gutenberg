@@ -10,6 +10,7 @@ import type {
 	SaveOptions,
 	ThumbnailOptions,
 	ConvertImageOptions,
+	EncodePixelsOptions,
 	ResizeImageOptions,
 } from './types.ts';
 import {
@@ -889,6 +890,102 @@ export async function hasTransparency(
 	return minAlpha < opaqueValue;
 }
 
+/**
+ * Encodes raw RGBA pixels as a JPEG, optionally carrying over the EXIF block
+ * from the file the pixels were decoded from.
+ *
+ * This backs the HEIC upload path: wasm-vips ships no HEVC decoder, so the
+ * browser decodes HEIC to pixels with its platform codecs, and a canvas
+ * re-encode would drop all metadata. libvips reads the source's EXIF from the
+ * container header alone, so no HEVC decoding is needed here either.
+ *
+ * @param id      Item ID.
+ * @param pixels  Tightly packed 8-bit RGBA pixel data, as returned by `ImageData.data`.
+ * @param width   Image width in pixels.
+ * @param height  Image height in pixels.
+ * @param options Encoding options.
+ * @return JPEG file data.
+ */
+export async function encodePixelsAsJpeg(
+	id: ItemId,
+	pixels: ArrayBuffer,
+	width: number,
+	height: number,
+	options: EncodePixelsOptions = {}
+): Promise< ArrayBuffer | ArrayBufferLike > {
+	const { quality = 0.82, metadataSource } = options;
+
+	inProgressOperations.add( id );
+
+	try {
+		const vips = await getVips();
+
+		// JPEG has no alpha channel and decoded photo pixels are opaque, so
+		// the alpha band is dropped rather than flattened.
+		const image = vips.Image.newFromMemory(
+			new Uint8Array( pixels ),
+			width,
+			height,
+			4,
+			vips.BandFormat.uchar
+		)
+			.extractBand( 0, { n: 3 } )
+			.copy( { interpretation: vips.Interpretation.srgb } );
+
+		image.onProgress = () => {
+			if ( ! inProgressOperations.has( id ) ) {
+				image.kill = true;
+			}
+		};
+
+		if ( metadataSource ) {
+			copyExif( vips, metadataSource, image );
+		}
+
+		const outBuffer = image.jpegsaveBuffer( {
+			Q: quality * 100,
+			// The source metadata was copied in deliberately; keep it.
+			keep: 'all',
+		} );
+		const result = outBuffer.buffer;
+
+		cleanup?.();
+
+		return result;
+	} finally {
+		inProgressOperations.delete( id );
+	}
+}
+
+/**
+ * Copies the EXIF block of an image file onto a decoded image, resetting the
+ * orientation to 1 as the destination pixels are already upright.
+ *
+ * Only the source header is read, so this works for formats libvips can parse
+ * but not decode (HEIC with HEVC tiles). A source without EXIF, or one libvips
+ * cannot parse, leaves the destination untouched.
+ *
+ * @param vips   The vips instance.
+ * @param source Raw bytes of the source image file.
+ * @param image  Decoded image to receive the EXIF block.
+ */
+function copyExif(
+	vips: typeof Vips,
+	source: ArrayBuffer,
+	image: Vips.Image
+): void {
+	try {
+		// `unlimited` lifts libheif's item-count limits, which the many tiles
+		// and auxiliary items of a phone HEIC exceed. Only the header is
+		// parsed here, so the decode-time guard it disables does not apply.
+		const sourceImage = vips.Image.newFromBuffer( source, '[unlimited]' );
+		image.setBlob( 'exif-data', sourceImage.getBlob( 'exif-data' ) );
+		image.setInt( 'orientation', 1 );
+	} catch {
+		// Best effort: the JPEG is still valid without metadata.
+	}
+}
+
 // Re-export with vips prefix for worker module compatibility.
 // The worker loader expects these prefixed names.
 export {
@@ -898,5 +995,6 @@ export {
 	rotateImage as vipsRotateImage,
 	hasTransparency as vipsHasTransparency,
 	getUltraHdrInfo as vipsGetUltraHdrInfo,
+	encodePixelsAsJpeg as vipsEncodePixelsAsJpeg,
 	cancelOperations as vipsCancelOperations,
 };
