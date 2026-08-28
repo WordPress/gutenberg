@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 6.54.0 (2026-08-26)
+
+## 6.53.0 (2026-08-12)
+
 ### Bug Fixes
 
 -   Scope the breakpoint media queries to `screen`, so that printing does not report the viewport as having become narrower ([#81367](https://github.com/WordPress/gutenberg/pull/81367)).

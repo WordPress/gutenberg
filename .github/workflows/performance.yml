@@ -28,15 +28,121 @@ concurrency:
 permissions: {}
 
 jobs:
-    performance:
-        timeout-minutes: 60
-        name: Run performance tests
+    prepare:
+        timeout-minutes: 5
+        name: Resolve branches to compare
         runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
         permissions:
             contents: read
         if: ${{ github.repository == 'WordPress/gutenberg' }}
+        outputs:
+            # See tools/release/resolve-performance-branches.mjs for the shapes.
+            branches: ${{ steps.branches.outputs.branches }}
+            shards: ${{ steps.branches.outputs.shards }}
+            wp-version: ${{ steps.branches.outputs.wp-version }}
+            plugin-files: ${{ steps.branches.outputs.plugin-files }}
+
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Use desired version of Node.js
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version-file: '.nvmrc'
+
+            - name: Resolve branches
+              id: branches
+              env:
+                  BASE_SHA: ${{ github.event.pull_request.base.sha }}
+                  BASE_REF: ${{ github.base_ref }}
+                  RELEASE_TAG: ${{ github.event.release.tag_name }}
+                  INPUT_BRANCHES: ${{ github.event.inputs.branches }}
+                  INPUT_WP_VERSION: ${{ github.event.inputs.wpversion }}
+              run: node tools/release/resolve-performance-branches.mjs
+
+    build:
+        timeout-minutes: 30
+        name: Build plugin (${{ matrix.branch.name }})
+        runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
+        needs: prepare
+        permissions:
+            contents: read
+        strategy:
+            fail-fast: false
+            matrix:
+                branch: ${{ fromJSON( needs.prepare.outputs.branches ) }}
+
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  ref: ${{ matrix.branch.ref }}
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
+            - name: Build
+              run: npm run build -- --skip-types || npm run build
+
+            # The list comes from bin/plugin-files.txt on the tested commit, so older refs
+            # are packaged the same way. They may lack some of the files.
+            - name: Package plugin
+              env:
+                  PLUGIN_DIR: ${{ runner.temp }}/plugin
+                  PLUGIN_FILES: ${{ needs.prepare.outputs.plugin-files }}
+              run: |
+                  mkdir -p "$PLUGIN_DIR"
+                  # post-content.php is gone from trunk but refs up to WP 6.x still require it from lib/demo.php.
+                  # shellcheck disable=SC2086 # The list holds globs that must expand.
+                  tar --ignore-failed-read -cf - $PLUGIN_FILES post-content.php \
+                    | tar -xf - -C "$PLUGIN_DIR"
+                  test -f "$PLUGIN_DIR/gutenberg.php"
+
+            - name: Upload plugin
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              with:
+                  name: ${{ matrix.branch.artifact }}
+                  path: ${{ runner.temp }}/plugin
+                  compression-level: 1
+
+            # Lets the trace artifacts be resolved with tools/build-scripts/packages/resolve-trace-source-maps.cjs
+            # after extracting both next to each other. Only the first branch records traces.
+            - name: Collect source maps
+              if: matrix.branch.name == fromJSON( needs.prepare.outputs.branches )[0].name
+              run: |
+                  mkdir -p "$RUNNER_TEMP/source-maps"
+                  if [[ -d build/scripts ]]; then
+                    find build/scripts -name '*.map' | tar -cf - -T - | tar -xf - -C "$RUNNER_TEMP/source-maps"
+                  fi
+
+            - name: Upload source maps
+              if: matrix.branch.name == fromJSON( needs.prepare.outputs.branches )[0].name
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              with:
+                  name: performance-source-maps
+                  path: ${{ runner.temp }}/source-maps
+                  if-no-files-found: ignore
+
+    performance:
+        timeout-minutes: 60
+        name: Run perf tests (${{ matrix.shard }})
+        runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
+        needs: [prepare, build]
+        permissions:
+            contents: read
+        strategy:
+            fail-fast: false
+            # Shards run in parallel to cut the wall clock time. Every shard still
+            # measures all branches on the same runner, so results stay comparable.
+            matrix:
+                include: ${{ fromJSON( needs.prepare.outputs.shards ) }}
         env:
             WP_ARTIFACTS_PATH: ${{ github.workspace }}/artifacts
+            PERF_SUITES: ${{ matrix.suites }}
 
         steps:
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -47,70 +153,38 @@ jobs:
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
 
-            - name: Install NVM
+            - name: Download prebuilt plugins
+              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+              with:
+                  pattern: plugin-*
+                  path: ${{ runner.temp }}/artifacts
+
+            # The command expects `<plugins dir>/<sanitized branch name>`.
+            - name: Rename plugin directories
               run: |
-                  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-                  export NVM_DIR="$HOME/.nvm"
-                  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-                  nvm -v
+                  shopt -s nullglob
+                  dirs=("$RUNNER_TEMP"/artifacts/plugin-*)
+                  if [[ ${#dirs[@]} -eq 0 ]]; then
+                    echo "::error::No plugin artifacts were downloaded."
+                    exit 1
+                  fi
+                  mkdir -p "$RUNNER_TEMP/plugins"
+                  for dir in "${dirs[@]}"; do
+                    mv "$dir" "$RUNNER_TEMP/plugins/$(basename "$dir" | sed 's/^plugin-//')"
+                  done
+                  ls -la "$RUNNER_TEMP/plugins"
 
-            - name: Compare performance with base branch
-              if: github.event_name == 'pull_request'
-              run: npm exec --no release-cli -- perf "$GITHUB_SHA" "$GITHUB_BASE_REF" --tests-branch "$GITHUB_SHA"
-
-            - name: Compare performance with current WordPress Core and previous Gutenberg versions
-              if: github.event_name == 'release'
+            - name: Compare performance
               env:
-                  RELEASE_TAG: ${{ github.event.release.tag_name }}
-              shell: bash
+                  BRANCHES: ${{ needs.prepare.outputs.branches }}
+                  WP_VERSION: ${{ needs.prepare.outputs.wp-version }}
               run: |
-                  PLUGIN_VERSION="${RELEASE_TAG#v}"
-                  if [[ ! "$PLUGIN_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?$ ]]; then
-                    echo "::error::Release tag '$RELEASE_TAG' does not resolve to a valid Gutenberg plugin version."
-                    exit 1
+                  readarray -t BRANCH_ARGS < <(echo "$BRANCHES" | jq -r '.[].name')
+                  WP_VERSION_ARGS=()
+                  if [[ -n "$WP_VERSION" ]]; then
+                    WP_VERSION_ARGS=(--wp-version "$WP_VERSION")
                   fi
-
-                  IFS=. read -ra PLUGIN_VERSION_ARRAY <<< "$PLUGIN_VERSION"
-                  CURRENT_RELEASE_BRANCH="release/${PLUGIN_VERSION_ARRAY[0]}.${PLUGIN_VERSION_ARRAY[1]}"
-                  PREVIOUS_VERSION_BASE_10=$((PLUGIN_VERSION_ARRAY[0] * 10 + PLUGIN_VERSION_ARRAY[1] - 1))
-                  PREVIOUS_RELEASE_BRANCH="release/$((PREVIOUS_VERSION_BASE_10 / 10)).$((PREVIOUS_VERSION_BASE_10 % 10))"
-                  if ! git ls-remote --exit-code --tags origin "$RELEASE_TAG" > /dev/null; then
-                    echo "::error::Expected release tag '$RELEASE_TAG' to exist in the Gutenberg repository."
-                    exit 1
-                  fi
-                  if ! git ls-remote --exit-code --heads origin "$CURRENT_RELEASE_BRANCH" > /dev/null; then
-                    echo "::error::Expected current release branch '$CURRENT_RELEASE_BRANCH' to exist in the Gutenberg repository."
-                    exit 1
-                  fi
-                  if ! git ls-remote --exit-code --heads origin "$PREVIOUS_RELEASE_BRANCH" > /dev/null; then
-                    echo "::error::Expected previous release branch '$PREVIOUS_RELEASE_BRANCH' to exist in the Gutenberg repository."
-                    exit 1
-                  fi
-
-                  WP_VERSION="$(awk -F ': ' '/^Tested up to/{print $2}' readme.txt)"
-                  IFS=. read -ra WP_VERSION_ARRAY <<< "$WP_VERSION"
-                  WP_MAJOR="${WP_VERSION_ARRAY[0]}.${WP_VERSION_ARRAY[1]}"
-                  npm exec --no release-cli -- perf "wp/$WP_MAJOR" "$PREVIOUS_RELEASE_BRANCH" "$CURRENT_RELEASE_BRANCH" --tests-branch "$GITHUB_SHA" --wp-version "$WP_MAJOR"
-
-            - name: Compare performance with base branch
-              if: github.event_name == 'push'
-              # The base hash used here need to be a commit that is compatible with the current WP version
-              # The current one is 28d414f1327652e2b49e784ddc12098768991c62 and it needs to be updated every WP major release.
-              # It is used as a base comparison point to avoid fluctuation in the performance metrics.
-              # See: https://developer.wordpress.org/block-editor/explanations/architecture/performance/#update-the-reference-commit.
-              run: |
-                  WP_VERSION="$(awk -F ': ' '/^Tested up to/{print $2}' readme.txt)"
-                  IFS=. read -ra WP_VERSION_ARRAY <<< "$WP_VERSION"
-                  WP_MAJOR="${WP_VERSION_ARRAY[0]}.${WP_VERSION_ARRAY[1]}"
-                  npm exec --no release-cli -- perf "$GITHUB_SHA" 28d414f1327652e2b49e784ddc12098768991c62 --tests-branch "$GITHUB_SHA" --wp-version "$WP_MAJOR"
-
-            - name: Compare performance with custom branches
-              if: github.event_name == 'workflow_dispatch'
-              env:
-                  BRANCHES: ${{ github.event.inputs.branches }}
-                  WP_VERSION: ${{ github.event.inputs.wpversion }}
-              run: |
-                  npm exec --no release-cli -- perf "$(echo "$BRANCHES" | tr ',' ' ')" --tests-branch "$GITHUB_SHA" --wp-version "$WP_VERSION"
+                  npm exec --no release-cli -- perf "${BRANCH_ARGS[@]}" --plugins-dir "$RUNNER_TEMP/plugins" --suites "$PERF_SUITES" "${WP_VERSION_ARGS[@]}"
 
             - name: Add workflow summary
               run: cat "${WP_ARTIFACTS_PATH}/summary.md" >> "$GITHUB_STEP_SUMMARY"
@@ -119,31 +193,76 @@ jobs:
               if: success()
               uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               with:
-                  name: performance-results
+                  name: performance-results-${{ matrix.shard }}
                   path: ${{ env.WP_ARTIFACTS_PATH }}/*.performance-results*.json
 
             - name: Archive performance traces
               if: always()
               uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               with:
-                  name: performance-traces
-                  path: |
-                      ${{ env.WP_ARTIFACTS_PATH }}/traces
-                      ${{ env.WP_ARTIFACTS_PATH }}/build
+                  name: performance-traces-${{ matrix.shard }}
+                  path: ${{ env.WP_ARTIFACTS_PATH }}/traces
                   if-no-files-found: ignore
-
-            - name: Publish performance results
-              if: github.event_name == 'push'
-              env:
-                  CODEHEALTH_PROJECT_TOKEN: ${{ secrets.CODEHEALTH_PROJECT_TOKEN }}
-              run: |
-                  COMMITTED_AT="$(git show -s "$GITHUB_SHA" --format="%cI")"
-                  npm run --workspace=tools/release log-performance-results -- "$CODEHEALTH_PROJECT_TOKEN" trunk "$GITHUB_SHA" 28d414f1327652e2b49e784ddc12098768991c62 "$COMMITTED_AT"
 
             - name: Archive debug artifacts (screenshots, HTML snapshots)
               uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               if: failure()
               with:
-                  name: failures-artifacts
+                  name: failures-artifacts-${{ matrix.shard }}
                   path: ${{ env.WP_ARTIFACTS_PATH }}
                   if-no-files-found: ignore
+
+    results:
+        timeout-minutes: 10
+        # Keeps the name of the job that existed before sharding, so it stays
+        # the required status check. It fails whenever a shard fails.
+        name: Run performance tests
+        runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
+        needs: [prepare, performance]
+        # Runs unless the whole workflow was skipped (forks), so a failure anywhere fails the check.
+        if: ${{ !cancelled() && needs.prepare.result != 'skipped' }}
+        permissions:
+            contents: read
+        env:
+            WP_ARTIFACTS_PATH: ${{ github.workspace }}/artifacts
+
+        steps:
+            - name: Check job results
+              if: needs.prepare.result != 'success' || needs.performance.result != 'success'
+              run: |
+                  echo "::error::Resolving the branches, building a plugin or a performance tests shard failed."
+                  exit 1
+
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Use desired version of Node.js
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version-file: '.nvmrc'
+
+            - name: Download shard results
+              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+              with:
+                  pattern: performance-results-*
+                  path: ${{ env.WP_ARTIFACTS_PATH }}
+                  merge-multiple: true
+
+            # Keep the single artifact that existed before the tests were sharded.
+            - name: Archive merged performance results
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              with:
+                  name: performance-results
+                  path: ${{ env.WP_ARTIFACTS_PATH }}/*.performance-results*.json
+
+            - name: Publish performance results
+              if: github.event_name == 'push'
+              env:
+                  CODEHEALTH_PROJECT_TOKEN: ${{ secrets.CODEHEALTH_PROJECT_TOKEN }}
+                  BRANCHES: ${{ needs.prepare.outputs.branches }}
+              run: |
+                  COMMITTED_AT="$(git show -s "$GITHUB_SHA" --format="%cI")"
+                  REFERENCE_COMMIT="$(echo "$BRANCHES" | jq -r '.[1].name')"
+                  node tools/release/log-performance-results.js "$CODEHEALTH_PROJECT_TOKEN" trunk "$GITHUB_SHA" "$REFERENCE_COMMIT" "$COMMITTED_AT"

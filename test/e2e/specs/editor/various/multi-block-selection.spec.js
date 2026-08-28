@@ -44,6 +44,51 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		);
 	} );
 
+	test( 'should disclose the blocks nested in selected blocks', async ( {
+		page,
+		editor,
+		pageUtils,
+		multiBlockSelectionUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/group',
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'inner one' },
+				},
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'inner two' },
+				},
+			],
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'outer' },
+		} );
+
+		await editor.canvas.getByText( 'outer' ).click();
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
+
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 1, 4 ] );
+
+		await expect( page.locator( '[aria-live="assertive"]' ) ).toHaveText(
+			'2 blocks selected, 4 including nested blocks.'
+		);
+
+		await editor.openDocumentSettingsSidebar();
+		await expect(
+			page.locator( '.block-editor-multi-selection-inspector__card' )
+		).toContainText( '2 Blocks' );
+		await expect(
+			page.locator( '.block-editor-multi-selection-inspector__card' )
+		).toContainText( '4 including nested blocks' );
+	} );
+
 	// See #14448: an incorrect buffer may trigger multi-selection too soon.
 	test( 'should only trigger multi-selection when at the end (-webkit)', async ( {
 		page,
