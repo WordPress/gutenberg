@@ -127,6 +127,7 @@ figure.wp-block-gallery.has-nested-images:where(.is-layout-flex) {
 .wp-block-gallery.has-nested-images {
 	figure.wp-block-image {
 		position: relative;
+		margin: 0;
 
 		// Position caption and scrim at the bottom.
 		&:has(figcaption)::before,
