@@ -60,6 +60,75 @@
 	}
 
 	/* -----------------------------------------------------------------------
+	   Headings
+
+	   Core's heading sizes are the browser defaults with a single edit: 2em,
+	   1.3em, 1em, 0.83em, 0.67em, with h2 and h3 both pushed to 1.3em. That is
+	   not a scale anyone designed, and it has two real problems.
+
+	   h2 and h3 render at exactly the same size, so the two most used heading
+	   levels in wp-admin — 128 and 55 occurrences respectively — are visually
+	   identical. A sighted reader cannot see the structure that a screen reader
+	   announces, which is a genuine accessibility failure rather than an
+	   aesthetic one. Giving them distinct steps is the point of this block.
+
+	   And h6 computes to 8.7px at the 13px base, well below a readable size.
+	   Neither h5 nor h6 is emitted anywhere in wp-admin, so this is latent in
+	   Core, but plugins can and do use them.
+
+	   These are bare element rules on purpose. Scoping them to avoid Core's
+	   contextual heading rules would hide where the design system's scale and
+	   classic admin disagree, and finding those disagreements is the point.
+
+	   h5 and h6 share `heading-sm`. The scale has five heading roles and HTML has
+	   six levels, so one pair must share until the design system grows a sixth
+	   step. Sharing at 11px is better than 8.7px, and inventing a step here would
+	   be adding to the scale rather than adopting it.
+	   ----------------------------------------------------------------------- */
+
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		font-family: var(--wpds-typography-font-family-heading);
+		/* Already Core's value; expressed here as the token it always was. */
+		font-weight: var(--wpds-typography-font-weight-emphasis);
+	}
+
+	h1 {
+		font-size: var(--wpds-typography-font-size-2xl);
+		line-height: 1.25;
+		line-height: calc(var(--wpds-typography-line-height-2xl) / var(--wpds-typography-font-size-2xl));
+	}
+
+	h2 {
+		font-size: var(--wpds-typography-font-size-xl);
+		line-height: 1.2;
+		line-height: calc(var(--wpds-typography-line-height-md) / var(--wpds-typography-font-size-xl));
+	}
+
+	h3 {
+		font-size: var(--wpds-typography-font-size-lg);
+		line-height: 1.333;
+		line-height: calc(var(--wpds-typography-line-height-sm) / var(--wpds-typography-font-size-lg));
+	}
+
+	h4 {
+		font-size: var(--wpds-typography-font-size-md);
+		line-height: 1.538;
+		line-height: calc(var(--wpds-typography-line-height-sm) / var(--wpds-typography-font-size-md));
+	}
+
+	h5,
+	h6 {
+		font-size: var(--wpds-typography-font-size-xs);
+		line-height: 1.454;
+		line-height: calc(var(--wpds-typography-line-height-xs) / var(--wpds-typography-font-size-xs));
+	}
+
+	/* -----------------------------------------------------------------------
 	   Reading prose — the `body-lg` role
 
 	   Core sets these at 14px, which has no place on the scale and is the most
