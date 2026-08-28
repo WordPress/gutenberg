@@ -220,7 +220,7 @@ test.describe( 'Gallery', () => {
 			await imageCaption.evaluate(
 				( element ) => window.getComputedStyle( element ).position
 			)
-		).not.toBe( 'absolute' );
+		).toBe( 'absolute' );
 		expect(
 			await galleryCaption.evaluate(
 				( element ) => window.getComputedStyle( element ).gridColumnEnd
@@ -264,7 +264,7 @@ test.describe( 'Gallery', () => {
 				.evaluate(
 					( element ) => window.getComputedStyle( element ).position
 				)
-		).not.toBe( 'absolute' );
+		).toBe( 'absolute' );
 		expect(
 			await renderedGallery
 				.locator( ':scope > .blocks-gallery-caption' )
