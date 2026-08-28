@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Remove unused dependencies `@wordpress/date` and `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+
 ## 0.19.0 (2026-08-26)
 
 ### Internal

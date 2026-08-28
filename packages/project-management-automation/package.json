@@ -33,7 +33,6 @@
 		"@actions/core": "^1.9.1",
 		"@actions/github": "^5.0.1",
 		"@octokit/request-error": "^2.1.0",
-		"@octokit/types": "^6.34.0",
 		"@octokit/webhooks": "^9.26.3",
 		"@octokit/webhooks-types": "^5.8.0"
 	},

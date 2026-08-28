@@ -6,6 +6,11 @@
 
 -   Prevent an error in `canInsertBlockInWidgetArea` when no widget area blocks are present.
 
+### Internal
+
+-   Remove unused dependency `@wordpress/reusable-blocks` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
 ## 6.54.0 (2026-08-26)
 
 ## 6.53.0 (2026-08-12)
