@@ -595,9 +595,6 @@ async function runPerformanceTests( branches, options ) {
 
 	logAtIndent( 0, 'Calculating results' );
 
-	const resultFiles = getFilesFromDir( ARTIFACTS_PATH ).filter( ( file ) =>
-		file.endsWith( RAW_RESULTS_FILE_SUFFIX )
-	);
 	/** @type {Record<string,Record<string, Record<string, Record<string, number>>>>} */
 	const results = {};
 
@@ -608,22 +605,23 @@ async function runPerformanceTests( branches, options ) {
 		results[ testSuite ] = {};
 		for ( const branch of branches ) {
 			const sanitizedBranchName = sanitizeBranchName( branch );
-			const resultsRounds = resultFiles
-				.filter( ( file ) =>
-					file.includes(
-						`${ testSuite }_${ sanitizedBranchName }_round-`
+			// Only this run's rounds: the artifacts directory may hold files from previous runs.
+			const resultsRounds = Array.from(
+				{ length: TEST_ROUNDS },
+				( _, round ) =>
+					path.join(
+						ARTIFACTS_PATH,
+						`${ testSuite }_${ sanitizedBranchName }_round-${
+							round + 1
+						}${ RAW_RESULTS_FILE_SUFFIX }`
 					)
-				)
-				.map( ( file ) => {
-					logAtIndent( 2, 'Reading from:', formats.success( file ) );
-					return readJSONFile( file );
-				} );
-
-			if ( resultsRounds.length !== TEST_ROUNDS ) {
-				throw new Error(
-					`Expected ${ TEST_ROUNDS } result file(s) for the "${ testSuite }" suite on "${ branch }", found ${ resultsRounds.length }.`
-				);
-			}
+			).map( ( file ) => {
+				if ( ! fs.existsSync( file ) ) {
+					throw new Error( `Missing results file: ${ file }` );
+				}
+				logAtIndent( 2, 'Reading from:', formats.success( file ) );
+				return readJSONFile( file );
+			} );
 
 			const metrics = Object.keys( resultsRounds[ 0 ] );
 			results[ testSuite ][ branch ] = {};
