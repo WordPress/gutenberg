@@ -1,0 +1,172 @@
+#!/usr/bin/env node
+/**
+ * Resolves the branches the performance workflow compares for a GitHub event.
+ * Writes `branches` (JSON array of `{ name, ref, artifact }`) and `wp-version` to `$GITHUB_OUTPUT`.
+ */
+import fs from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
+
+/*
+ * The commit trunk is compared against; must be updated on every WP major release, see
+ * https://developer.wordpress.org/block-editor/explanations/architecture/performance/#update-the-reference-commit.
+ */
+export const REFERENCE_COMMIT = '28d414f1327652e2b49e784ddc12098768991c62';
+
+/**
+ * Same replacement as `sanitizeBranchName()` in commands/performance.js.
+ *
+ * @param {string} name
+ * @return {string} Name usable in a path or an artifact name.
+ */
+function sanitizeBranchName( name ) {
+	return name.replace( /[^a-zA-Z0-9-]/g, '-' );
+}
+
+/**
+ * @param {string} name Branch label shown in the results.
+ * @param {string} ref  Git ref to build.
+ */
+function branch( name, ref = name ) {
+	return { name, ref, artifact: `plugin-${ sanitizeBranchName( name ) }` };
+}
+
+/**
+ * @param {string} readme Contents of readme.txt.
+ * @return {string} The `Tested up to` version, major.minor only.
+ */
+export function getTestedUpToMajor( readme ) {
+	const match = readme.match( /^Tested up to: (\d+\.\d+)/m );
+	if ( ! match ) {
+		throw new Error( 'Unable to read "Tested up to" from readme.txt.' );
+	}
+	return match[ 1 ];
+}
+
+/**
+ * @typedef ResolveOptions
+ *
+ * @property {string}                   event          GitHub event name.
+ * @property {string}                   sha            Commit that triggered the workflow.
+ * @property {string}                   wpMajor        The `Tested up to` version from readme.txt.
+ * @property {(ref: string) => boolean} refExists      Whether a tag or branch exists on origin.
+ * @property {string=}                  baseSha        Pull request base commit.
+ * @property {string=}                  baseRef        Pull request base branch name.
+ * @property {string=}                  releaseTag     Release tag name.
+ * @property {string=}                  inputBranches  `workflow_dispatch` branches input.
+ * @property {string=}                  inputWpVersion `workflow_dispatch` WP version input.
+ */
+
+/**
+ * @param {ResolveOptions} options
+ * @return {{ branches: Array<{ name: string, ref: string, artifact: string }>, wpVersion: string }} Resolved branches.
+ */
+export function resolveBranches( options ) {
+	const { event, sha, wpMajor, refExists } = options;
+
+	switch ( event ) {
+		case 'pull_request':
+			return {
+				branches: [
+					branch( sha ),
+					branch( options.baseRef || '', options.baseSha ),
+				],
+				wpVersion: '',
+			};
+
+		case 'push':
+			return {
+				branches: [ branch( sha ), branch( REFERENCE_COMMIT ) ],
+				wpVersion: wpMajor,
+			};
+
+		case 'release': {
+			const tag = options.releaseTag || '';
+			const version = tag.replace( /^v/, '' );
+			if ( ! /^\d+\.\d+\.\d+(-rc\.\d+)?$/.test( version ) ) {
+				throw new Error(
+					`Release tag '${ tag }' does not resolve to a valid Gutenberg plugin version.`
+				);
+			}
+			const [ major, minor ] = version.split( '.' ).map( Number );
+			const current = `release/${ major }.${ minor }`;
+			const previousBase10 = major * 10 + minor - 1;
+			const previous = `release/${ Math.floor( previousBase10 / 10 ) }.${
+				previousBase10 % 10
+			}`;
+			for ( const [ ref, description ] of [
+				[ tag, 'release tag' ],
+				[ current, 'current release branch' ],
+				[ previous, 'previous release branch' ],
+			] ) {
+				if ( ! refExists( ref ) ) {
+					throw new Error(
+						`Expected ${ description } '${ ref }' to exist in the Gutenberg repository.`
+					);
+				}
+			}
+			return {
+				branches: [
+					branch( `wp/${ wpMajor }` ),
+					branch( previous ),
+					branch( current ),
+				],
+				wpVersion: wpMajor,
+			};
+		}
+
+		case 'workflow_dispatch':
+			return {
+				branches: ( options.inputBranches || '' )
+					.split( ',' )
+					.map( ( name ) => name.trim() )
+					.filter( Boolean )
+					.map( ( name ) => branch( name ) ),
+				wpVersion: options.inputWpVersion || '',
+			};
+
+		default:
+			throw new Error( `Unsupported event: ${ event }` );
+	}
+}
+
+function main() {
+	const env = process.env;
+	const { branches, wpVersion } = resolveBranches( {
+		event: env.GITHUB_EVENT_NAME || '',
+		sha: env.GITHUB_SHA || '',
+		wpMajor: getTestedUpToMajor( fs.readFileSync( 'readme.txt', 'utf8' ) ),
+		refExists: ( ref ) => {
+			try {
+				execFileSync(
+					'git',
+					[ 'ls-remote', '--exit-code', 'origin', ref ],
+					{
+						stdio: 'ignore',
+					}
+				);
+				return true;
+			} catch {
+				return false;
+			}
+		},
+		baseSha: env.BASE_SHA,
+		baseRef: env.BASE_REF,
+		releaseTag: env.RELEASE_TAG,
+		inputBranches: env.INPUT_BRANCHES,
+		inputWpVersion: env.INPUT_WP_VERSION,
+	} );
+
+	console.log( JSON.stringify( branches, null, 2 ) );
+	fs.appendFileSync(
+		env.GITHUB_OUTPUT,
+		`branches=${ JSON.stringify( branches ) }\nwp-version=${ wpVersion }\n`
+	);
+}
+
+if (
+	process.argv[ 1 ] &&
+	import.meta.url === pathToFileURL( process.argv[ 1 ] ).href
+) {
+	main();
+}

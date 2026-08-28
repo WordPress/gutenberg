@@ -36,8 +36,7 @@ jobs:
             contents: read
         if: ${{ github.repository == 'WordPress/gutenberg' }}
         outputs:
-            # JSON array of `{ name, ref }`: `name` labels the results table and
-            # `ref` is what gets checked out and built.
+            # JSON array of `{ name, ref, artifact }`, see tools/release/resolve-performance-branches.mjs.
             branches: ${{ steps.branches.outputs.branches }}
             wp-version: ${{ steps.branches.outputs.wp-version }}
 
@@ -47,6 +46,11 @@ jobs:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
 
+            - name: Use desired version of Node.js
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version-file: '.nvmrc'
+
             - name: Resolve branches
               id: branches
               env:
@@ -55,55 +59,7 @@ jobs:
                   RELEASE_TAG: ${{ github.event.release.tag_name }}
                   INPUT_BRANCHES: ${{ github.event.inputs.branches }}
                   INPUT_WP_VERSION: ${{ github.event.inputs.wpversion }}
-              run: |
-                  WP_VERSION=""
-                  WP_MAJOR="$(awk -F ': ' '/^Tested up to/{print $2}' readme.txt | cut -d. -f1,2)"
-                  case "$GITHUB_EVENT_NAME" in
-                    pull_request)
-                      BRANCHES="$(jq -cn --arg head "$GITHUB_SHA" --arg base "$BASE_REF" --arg baseSha "$BASE_SHA" '[{name: $head, ref: $head}, {name: $base, ref: $baseSha}]')"
-                      ;;
-                    push)
-                      # The base hash used here need to be a commit that is compatible with the current WP version
-                      # The current one is 28d414f1327652e2b49e784ddc12098768991c62 and it needs to be updated every WP major release.
-                      # It is used as a base comparison point to avoid fluctuation in the performance metrics.
-                      # See: https://developer.wordpress.org/block-editor/explanations/architecture/performance/#update-the-reference-commit.
-                      BRANCHES="$(jq -cn --arg head "$GITHUB_SHA" '[{name: $head, ref: $head}, {name: "28d414f1327652e2b49e784ddc12098768991c62", ref: "28d414f1327652e2b49e784ddc12098768991c62"}]')"
-                      WP_VERSION="$WP_MAJOR"
-                      ;;
-                    release)
-                      PLUGIN_VERSION="${RELEASE_TAG#v}"
-                      if [[ ! "$PLUGIN_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?$ ]]; then
-                        echo "::error::Release tag '$RELEASE_TAG' does not resolve to a valid Gutenberg plugin version."
-                        exit 1
-                      fi
-
-                      IFS=. read -ra PLUGIN_VERSION_ARRAY <<< "$PLUGIN_VERSION"
-                      CURRENT_RELEASE_BRANCH="release/${PLUGIN_VERSION_ARRAY[0]}.${PLUGIN_VERSION_ARRAY[1]}"
-                      PREVIOUS_VERSION_BASE_10=$((PLUGIN_VERSION_ARRAY[0] * 10 + PLUGIN_VERSION_ARRAY[1] - 1))
-                      PREVIOUS_RELEASE_BRANCH="release/$((PREVIOUS_VERSION_BASE_10 / 10)).$((PREVIOUS_VERSION_BASE_10 % 10))"
-                      if ! git ls-remote --exit-code --tags origin "$RELEASE_TAG" > /dev/null; then
-                        echo "::error::Expected release tag '$RELEASE_TAG' to exist in the Gutenberg repository."
-                        exit 1
-                      fi
-                      if ! git ls-remote --exit-code --heads origin "$CURRENT_RELEASE_BRANCH" > /dev/null; then
-                        echo "::error::Expected current release branch '$CURRENT_RELEASE_BRANCH' to exist in the Gutenberg repository."
-                        exit 1
-                      fi
-                      if ! git ls-remote --exit-code --heads origin "$PREVIOUS_RELEASE_BRANCH" > /dev/null; then
-                        echo "::error::Expected previous release branch '$PREVIOUS_RELEASE_BRANCH' to exist in the Gutenberg repository."
-                        exit 1
-                      fi
-                      BRANCHES="$(jq -cn --arg wp "wp/$WP_MAJOR" --arg prev "$PREVIOUS_RELEASE_BRANCH" --arg cur "$CURRENT_RELEASE_BRANCH" '[$wp, $prev, $cur] | map({name: ., ref: .})')"
-                      WP_VERSION="$WP_MAJOR"
-                      ;;
-                    workflow_dispatch)
-                      BRANCHES="$(jq -cn --arg list "$INPUT_BRANCHES" '$list | split(",") | map(gsub("^\\s+|\\s+$"; "")) | map(select(length > 0)) | map({name: ., ref: .})')"
-                      WP_VERSION="$INPUT_WP_VERSION"
-                      ;;
-                  esac
-                  echo "branches=$BRANCHES" >> "$GITHUB_OUTPUT"
-                  echo "wp-version=$WP_VERSION" >> "$GITHUB_OUTPUT"
-                  echo "$BRANCHES" | jq .
+              run: node tools/release/resolve-performance-branches.mjs
 
     build:
         timeout-minutes: 30
@@ -151,17 +107,10 @@ jobs:
                     | tar -xf - -C "$PLUGIN_DIR"
                   test -f "$PLUGIN_DIR/gutenberg.php"
 
-            - name: Sanitize artifact name
-              id: artifact
-              env:
-                  BRANCH_NAME: ${{ matrix.branch.name }}
-              # Same replacement as `sanitizeBranchName()` in tools/release/commands/performance.js.
-              run: echo "name=plugin-$(node -e 'process.stdout.write( process.env.BRANCH_NAME.replace( /[^a-zA-Z0-9-]/g, "-" ) )')" >> "$GITHUB_OUTPUT"
-
             - name: Upload plugin
               uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               with:
-                  name: ${{ steps.artifact.outputs.name }}
+                  name: ${{ matrix.branch.artifact }}
                   path: ${{ runner.temp }}/plugin
                   compression-level: 1
 

@@ -624,7 +624,13 @@ async function runPerformanceTests( branches, options ) {
 					return readJSONFile( file );
 				} );
 
-			const metrics = Object.keys( resultsRounds[ 0 ] ?? {} );
+			if ( resultsRounds.length !== TEST_ROUNDS ) {
+				throw new Error(
+					`Expected ${ TEST_ROUNDS } result file(s) for the "${ testSuite }" suite on "${ branch }", found ${ resultsRounds.length }.`
+				);
+			}
+
+			const metrics = Object.keys( resultsRounds[ 0 ] );
 			results[ testSuite ][ branch ] = {};
 
 			for ( const metric of metrics ) {
