@@ -792,6 +792,7 @@ design-system-components-form-searchablechipselectcontrol--default
 design-system-components-form-searchablechipselectcontrol--docs
 design-system-components-form-searchablechipselectcontrol--grouped
 design-system-components-form-searchablechipselectcontrol--grouped-creatable
+design-system-components-form-searchablechipselectcontrol--popup-width
 design-system-components-form-searchablechipselectcontrol--visually-hidden-label
 design-system-components-form-searchablechipselectcontrol--with-custom-chips-and-items
 design-system-components-form-searchablechipselectcontrol--with-custom-empty-content
@@ -802,6 +803,7 @@ design-system-components-form-searchablechipselectcontrol--without-clear-button
 design-system-components-form-selectcontrol--default
 design-system-components-form-selectcontrol--docs
 design-system-components-form-selectcontrol--grouped
+design-system-components-form-selectcontrol--popup-width
 design-system-components-form-selectcontrol--visually-hidden-label
 design-system-components-form-selectcontrol--with-custom-placeholder
 design-system-components-form-selectcontrol--with-custom-trigger-and-items
