@@ -14,7 +14,7 @@
 
 ### Documentation
 
--   Add a Form best practices Storybook page for labeling composed controls.
+-   Add a Form best practices Storybook page for labeling composed controls ([#82197](https://github.com/WordPress/gutenberg/pull/82197)).
 
 ## 0.21.0 (2026-08-26)
 
