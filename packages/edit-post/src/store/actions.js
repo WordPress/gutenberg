@@ -11,7 +11,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import {
 	collectMetaBoxFieldsData,
-	getMetaBoxesFrameDocuments,
+	getMetaBoxesIframeName,
 } from '../utils/meta-boxes';
 import { unlock } from '../lock-unlock';
 
@@ -283,7 +283,18 @@ export const requestMetaBoxUpdates =
 			type: 'REQUEST_META_BOX_UPDATES',
 		} );
 
-		const frameDocuments = getMetaBoxesFrameDocuments();
+		// The frames have to be found through the elements: under the
+		// editor's Document-Isolation-Policy the frames' browsing context
+		// names are cleared, so `window.frames[ name ]` finds nothing.
+		const frameDocuments = [ 'main', 'side' ]
+			.map( ( location ) =>
+				document.querySelector(
+					`iframe[name="${ getMetaBoxesIframeName( location ) }"]`
+				)
+			)
+			.filter( Boolean )
+			.map( ( iframe ) => iframe.contentDocument )
+			.filter( Boolean );
 
 		for ( const frameDocument of frameDocuments ) {
 			// Some meta boxes, including TinyMCE editors, only write their
