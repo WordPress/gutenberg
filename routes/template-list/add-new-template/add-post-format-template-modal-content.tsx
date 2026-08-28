@@ -1,21 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import {
-	Button,
-	Flex,
-	__experimentalGrid as Grid,
-	__experimentalText as WCText,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
-import { useViewportMatch } from '@wordpress/compose';
+import { Button } from '@wordpress/components';
 import { focus } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
+import { Stack, Text } from '@wordpress/ui';
 import type { PostFormatMenuItem } from './utils';
 
 interface AddPostFormatTemplateModalContentProps {
@@ -31,8 +18,6 @@ function AddPostFormatTemplateModalContent( {
 	onBack,
 	containerRef,
 }: AddPostFormatTemplateModalContentProps ) {
-	const isMobile = useViewportMatch( 'medium', '<' );
-
 	// Focus the first focusable element when the component mounts.
 	useEffect( () => {
 		if ( containerRef?.current ) {
@@ -44,48 +29,34 @@ function AddPostFormatTemplateModalContent( {
 	}, [ containerRef ] );
 
 	return (
-		<VStack
-			spacing={ 4 }
+		<Stack
+			direction="column"
+			gap="lg"
 			className="template-list-custom-template-modal__contents-wrapper"
-			alignment="left"
+			align="flex-start"
 		>
-			<WCText as="p">
+			<Text variant="body-md" render={ <p /> }>
 				{ __(
 					'Select the post format to create an archive template for:'
 				) }
-			</WCText>
-			<Grid
-				columns={ isMobile ? 2 : 3 }
-				gap={ 4 }
-				align="flex-start"
-				justify="center"
-				className="template-list-custom-template-modal__contents"
-			>
+			</Text>
+			<div className="template-list-custom-template-modal__contents">
 				{ postFormats.map( ( format ) => (
 					<Button
 						__next40pxDefaultSize
 						key={ format.slug }
 						onClick={ () => onSelect( format ) }
 					>
-						<WCText
-							as="span"
-							weight={ 500 }
-							lineHeight={ 1.53846153846 } // 20px
-						>
-							{ format.title }
-						</WCText>
+						<Text variant="heading-md">{ format.title }</Text>
 						{ format.description && (
-							<WCText
-								as="span"
-								lineHeight={ 1.53846153846 } // 20px
-							>
+							<Text variant="body-md">
 								{ format.description }
-							</WCText>
+							</Text>
 						) }
 					</Button>
 				) ) }
-			</Grid>
-			<Flex justify="right">
+			</div>
+			<Stack direction="row" justify="flex-end">
 				<Button
 					__next40pxDefaultSize
 					variant="tertiary"
@@ -93,8 +64,8 @@ function AddPostFormatTemplateModalContent( {
 				>
 					{ __( 'Back' ) }
 				</Button>
-			</Flex>
-		</VStack>
+			</Stack>
+		</Stack>
 	);
 }
 

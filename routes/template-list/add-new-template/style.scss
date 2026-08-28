@@ -134,6 +134,15 @@
 
 .template-list-custom-template-modal__contents,
 .template-list-add-new-template__template-list__contents {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: $grid-unit-20;
+	align-items: flex-start;
+
+	@include break-medium() {
+		grid-template-columns: repeat(3, 1fr);
+	}
+
 	> .components-button {
 		padding: $grid-unit-40;
 		display: flex;
