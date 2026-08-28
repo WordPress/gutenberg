@@ -450,6 +450,8 @@ for ( const projectPath of workspaceProjects ) {
 	const declared = new Set( [
 		...Object.keys( packageJson.dependencies ?? {} ),
 		...Object.keys( packageJson.devDependencies ?? {} ),
+		...Object.keys( packageJson.peerDependencies ?? {} ),
+		...Object.keys( packageJson.optionalDependencies ?? {} ),
 	] );
 
 	for ( const reference of referencedProjects(
