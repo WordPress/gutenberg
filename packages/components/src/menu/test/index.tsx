@@ -1176,7 +1176,7 @@ describe( 'Menu', () => {
 	} );
 
 	describe( 'modality', () => {
-		it( 'should be modal by default', async () => {
+		it( 'should not be modal by default', async () => {
 			render(
 				<>
 					<Menu>
@@ -1199,10 +1199,72 @@ describe( 'Menu', () => {
 			// Menu open, focus is on the menu wrapper
 			await waitForFocusedMenu();
 
+			// Menu is not modal, therefore the outer button is part of the
+			// accessibility tree and can be found.
+			const outerButton = screen.getByRole( 'button', {
+				name: 'Button outside of dropdown',
+			} );
+			expect( outerButton ).toBeVisible();
+
+			// The outer button can be focused by pressing tab. Doing so will cause
+			// the Menu to close.
+			await user.tab();
+			expect( outerButton ).toHaveFocus();
+			await waitFor( () =>
+				expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument()
+			);
+		} );
+
+		it( 'should be modal when the `modal` prop is set to `true`', async () => {
+			render(
+				<>
+					<Menu>
+						<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
+						<Menu.Popover modal>
+							<Menu.Item>Menu item</Menu.Item>
+						</Menu.Popover>
+					</Menu>
+					<button>Button outside of dropdown</button>
+				</>
+			);
+
+			// Click to open the menu
+			await user.click(
+				screen.getByRole( 'button', {
+					name: 'Open dropdown',
+				} )
+			);
+
+			// Menu open, focus is on the menu wrapper
+			await waitForFocusedMenu();
+
 			expect(
 				screen.queryByRole( 'button', {
 					name: 'Button outside of dropdown',
 				} )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'should not render a dismiss button inside modal menus', async () => {
+			render(
+				<Menu>
+					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
+					<Menu.Popover modal>
+						<Menu.Item>Menu item</Menu.Item>
+					</Menu.Popover>
+				</Menu>
+			);
+
+			await user.click(
+				screen.getByRole( 'button', {
+					name: 'Open dropdown',
+				} )
+			);
+
+			await waitForFocusedMenu();
+
+			expect(
+				screen.queryByRole( 'button', { name: 'Dismiss popup' } )
 			).not.toBeInTheDocument();
 		} );
 

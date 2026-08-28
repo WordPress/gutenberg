@@ -175,7 +175,7 @@ keyboard event or a React synthetic event.
 
  - Type: `boolean`
  - Required: No
- - Default: `true`
+ - Default: `false`
 
 The modality of the menu popover. When set to true, interaction with
 outside elements will be disabled and only menu content will be visible to

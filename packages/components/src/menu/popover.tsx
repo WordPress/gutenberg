@@ -13,8 +13,25 @@ import { Context } from './context';
 export const Popover = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< PopoverProps, 'div', false >
->( function Popover( { gutter, shift, modal = true, ...otherProps }, ref ) {
+>( function Popover(
+	{ gutter, shift, modal = false, children, ...otherProps },
+	ref
+) {
 	const menuContext = useContext( Context );
+
+	const getPersistentElements = useCallback( () => {
+		if ( ! menuContext?.store ) {
+			return [];
+		}
+
+		const { disclosureElement } = menuContext.store.getState();
+
+		if ( ! disclosureElement ) {
+			return [];
+		}
+
+		return [ disclosureElement ];
+	}, [ menuContext?.store ] );
 
 	// Extract the side from the applied placement — useful for animations.
 	// Using `currentPlacement` instead of `placement` to make sure that we
@@ -73,6 +90,7 @@ export const Popover = forwardRef<
 			{ ...otherProps }
 			ref={ ref }
 			modal={ modal }
+			getPersistentElements={ modal ? getPersistentElements : undefined }
 			store={ menuContext.store }
 			// Root menu has an 8px distance from its trigger,
 			// otherwise 0 (which causes the submenu to slightly overlap)
@@ -87,6 +105,9 @@ export const Popover = forwardRef<
 			hideOnEscape={ hideOnEscape }
 			unmountOnHide
 			render={ renderMenu }
-		/>
+		>
+			{ modal && <Ariakit.MenuDismiss hidden /> }
+			{ children }
+		</Styled.Menu>
 	);
 } );

@@ -65,7 +65,7 @@ export interface PopoverProps {
 	 *   still be manually set to `false`.
 	 * - When the dialog is open, element tree outside it will be inert.
 	 *
-	 * @default true
+	 * @default false
 	 */
 	modal?: Ariakit.MenuProps[ 'modal' ];
 	/**
