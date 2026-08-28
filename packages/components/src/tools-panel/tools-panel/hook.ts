@@ -57,9 +57,12 @@ const generateMenuItems = ( {
 		( { defaultShown, hasValue, isShownByDefault, label } ) => {
 			const group = isShownByDefault ? 'default' : 'optional';
 
-			// If a menu item for this label has already been flagged as customized
-			// (for default controls), or toggled on (for optional controls), do not
-			// overwrite its value as those controls would lose that state.
+			// Any state a menu item already has is preserved, so that a
+			// control flagged as customized (for default controls) or toggled
+			// on (for optional controls) does not lose it. `false` is state
+			// too, so the nullish check must not treat an item the user hid
+			// as unregistered, otherwise registering any other item would
+			// re-show it.
 			const existingItemValue = currentMenuItems?.[ group ]?.[ label ];
 			// An item is always shown while it has a value. `defaultShown`
 			// only opts an optional item in when it has none.

@@ -142,9 +142,9 @@ export type ToolsPanelItem = {
 	 *
 	 * Unlike `onDeselect`, this fires whether or not the item has a value, and
 	 * only in response to an explicit menu action. Visibility changes with
-	 * another cause do not trigger it, including an item becoming visible
-	 * because it received a value or because `defaultShown` was set, and an
-	 * item hiding because its value was removed or because `Reset all` ran.
+	 * another cause do not trigger it, such as an item becoming visible
+	 * because it received a value or because `defaultShown` was set, or
+	 * hiding because `Reset all` ran.
 	 *
 	 * Items flagged with `isShownByDefault` are always visible and stay so when
 	 * toggled off, so this is never called for them.

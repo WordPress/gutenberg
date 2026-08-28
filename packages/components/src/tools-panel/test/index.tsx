@@ -599,6 +599,47 @@ describe( 'ToolsPanel', () => {
 			} );
 		} );
 
+		it( 'should keep an item the user hid hidden when another item registers', async () => {
+			// Registering an item regenerates the panel's menu state. An item
+			// the user hid is stored as `false`, which must be preserved
+			// rather than treated as unregistered and reseeded from
+			// `defaultShown`.
+			const TestPanel = ( { showExtra }: { showExtra: boolean } ) => (
+				<ToolsPanel { ...defaultProps }>
+					<ToolsPanelItem { ...altControlProps } defaultShown>
+						<div>Optional control</div>
+					</ToolsPanelItem>
+					{ showExtra && (
+						<ToolsPanelItem
+							hasValue={ () => false }
+							label="Extra"
+							onDeselect={ noop }
+							onSelect={ noop }
+						>
+							<div>Extra control</div>
+						</ToolsPanelItem>
+					) }
+				</ToolsPanel>
+			);
+
+			const { rerender } = render( <TestPanel showExtra={ false } /> );
+			expect(
+				screen.getByText( 'Optional control' )
+			).toBeInTheDocument();
+
+			await openDropdownMenu();
+			await selectMenuItem( altControlProps.label );
+			expect(
+				screen.queryByText( 'Optional control' )
+			).not.toBeInTheDocument();
+
+			rerender( <TestPanel showExtra /> );
+
+			expect(
+				screen.queryByText( 'Optional control' )
+			).not.toBeInTheDocument();
+		} );
+
 		it( 'should continue to render shown by default item after it is toggled off via menu item', async () => {
 			render(
 				<ToolsPanel { ...defaultProps }>
@@ -866,6 +907,71 @@ describe( 'ToolsPanel', () => {
 			expect( context.registerPanelItem ).toHaveBeenCalledTimes( 2 );
 			// deregisterPanelItem has still only been called once.
 			expect( context.deregisterPanelItem ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'should register with the latest defaultShown when panelId changes', () => {
+			// A consumer that persists the user's choice feeds it back in
+			// through `defaultShown`. A change to that prop must not
+			// re-register the item on its own, but a re-registration caused by
+			// something else has to seed from the saved preference rather than
+			// the value the item mounted with.
+			const context: ToolsPanelContextType = {
+				...panelContext,
+				registerPanelItem: jest.fn(),
+				deregisterPanelItem: jest.fn(),
+			};
+			const TestPanel = ( {
+				defaultShown,
+			}: {
+				defaultShown: boolean;
+			} ) => (
+				<ToolsPanelContext.Provider value={ context }>
+					<ToolsPanelItem
+						{ ...altControlProps }
+						defaultShown={ defaultShown }
+						panelId="1234"
+					>
+						<div>Item</div>
+					</ToolsPanelItem>
+				</ToolsPanelContext.Provider>
+			);
+
+			const { rerender } = render( <TestPanel defaultShown={ false } /> );
+
+			expect( context.registerPanelItem ).toHaveBeenCalledWith(
+				expect.objectContaining( { defaultShown: false } )
+			);
+
+			// Let registration settle, so that any further calls can only
+			// have been caused by the changes made below.
+			rerender( <TestPanel defaultShown={ false } /> );
+			const settledCalls = ( context.registerPanelItem as jest.Mock ).mock
+				.calls.length;
+
+			// The user shows the item and the consumer saves that preference.
+			// The updated prop alone must not re-register the item, which
+			// would discard the visibility the user chose.
+			rerender( <TestPanel defaultShown /> );
+
+			expect( context.registerPanelItem ).toHaveBeenCalledTimes(
+				settledCalls
+			);
+
+			// Simulate switching block selection away and back again, which
+			// deregisters and re-registers the item.
+			context.panelId = '4321';
+			rerender( <TestPanel defaultShown /> );
+			context.panelId = '1234';
+			rerender( <TestPanel defaultShown /> );
+
+			expect( context.deregisterPanelItem ).toHaveBeenCalledWith(
+				altControlProps.label
+			);
+			// The item registers again with the saved preference rather than
+			// the value it mounted with.
+			expect( context.registerPanelItem ).toHaveBeenLastCalledWith(
+				expect.objectContaining( { defaultShown: true } )
+			);
 		} );
 
 		it( 'should register items when ToolsPanel panelId is null', () => {
