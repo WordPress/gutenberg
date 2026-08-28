@@ -1,6 +1,7 @@
 import type { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
 import type { ReactElement } from 'react';
 import type { ComponentProps } from '../../../utils/types';
+import type { ItemPopupWidthProps } from '../../../utils/css/item-popup';
 
 export type AutocompleteCollectionProps = _Autocomplete.Collection.Props;
 
@@ -61,24 +62,25 @@ export type AutocompleteListBodyProps = ComponentProps< 'div' > & {
 
 export type AutocompletePopupProps = ComponentProps<
 	typeof _Autocomplete.Popup
-> & {
-	children?: React.ReactNode;
-	/**
-	 * Optional portal element, typically `<Autocomplete.Portal />` with custom
-	 * `container`. When omitted, `Autocomplete.Popup` uses
-	 * `Autocomplete.Portal` with default props. Do not pass `children` on the
-	 * portal element; they would be ignored.
-	 */
-	portal?: ReactElement< Omit< PortalProps, 'children' > >;
-	/**
-	 * Optional positioner element, typically `<Autocomplete.Positioner />`
-	 * with custom positioning props (`side`, `align`, `sideOffset`, collision
-	 * settings, etc.). When omitted, `Autocomplete.Popup` uses
-	 * `Autocomplete.Positioner` with default props. Do not pass `children` on
-	 * the positioner element; they would be ignored.
-	 */
-	positioner?: ReactElement< Omit< PositionerProps, 'children' > >;
-};
+> &
+	ItemPopupWidthProps & {
+		children?: React.ReactNode;
+		/**
+		 * Optional portal element, typically `<Autocomplete.Portal />` with custom
+		 * `container`. When omitted, `Autocomplete.Popup` uses
+		 * `Autocomplete.Portal` with default props. Do not pass `children` on the
+		 * portal element; they would be ignored.
+		 */
+		portal?: ReactElement< Omit< PortalProps, 'children' > >;
+		/**
+		 * Optional positioner element, typically `<Autocomplete.Positioner />`
+		 * with custom positioning props (`side`, `align`, `sideOffset`, collision
+		 * settings, etc.). When omitted, `Autocomplete.Popup` uses
+		 * `Autocomplete.Positioner` with default props. Do not pass `children` on
+		 * the positioner element; they would be ignored.
+		 */
+		positioner?: ReactElement< Omit< PositionerProps, 'children' > >;
+	};
 
 export type AutocompleteRootProps< Value = unknown > =
 	_Autocomplete.Root.Props< Value >;
