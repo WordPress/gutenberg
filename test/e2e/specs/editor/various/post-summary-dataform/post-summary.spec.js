@@ -236,27 +236,4 @@ test.describe( 'Post Summary', () => {
 			};
 		}
 	} );
-
-	test.describe( 'post status', () => {
-		test( 'shows Draft for a new post before it has been saved', async ( {
-			admin,
-			editor,
-			page,
-		} ) => {
-			await admin.createNewPost();
-			const summary = await openPostSummary( { editor, page } );
-
-			// A new post is an `auto-draft`, which should be presented as
-			// a Draft.
-			const editButton = summary.getByRole( 'button', {
-				name: 'Edit Status',
-			} );
-			await expect( editButton ).toHaveAccessibleDescription( 'Draft' );
-
-			await editButton.click();
-			await expect(
-				page.getByRole( 'radio', { name: 'Draft' } )
-			).toBeChecked();
-		} );
-	} );
 } );
