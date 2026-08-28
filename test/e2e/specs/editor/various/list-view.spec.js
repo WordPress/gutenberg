@@ -1445,7 +1445,7 @@ test.describe( 'List View', () => {
 		).toBeVisible();
 	} );
 
-	test( 'should place the caret at the end of the block when activating from List View', async ( {
+	test( 'should place the caret at the start of the block when activating from List View', async ( {
 		editor,
 		page,
 		listViewUtils,
