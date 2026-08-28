@@ -244,4 +244,162 @@ describe( 'resolveFillWidths', () => {
 			expect( result.get( 'fill' ) ).toBe( 9 );
 		} );
 	} );
+
+	describe( 'with item bounds', () => {
+		function makeBounds(
+			entries: Record< string, { minWidth: number; maxWidth: number } >
+		): Map< string, { minWidth: number; maxWidth: number } > {
+			return new Map( Object.entries( entries ) );
+		}
+
+		it( 'reserves the fill floor when planning the row', () => {
+			// Without bounds the plan is 1 + fill(2) + 3 = 6; the floor
+			// pushes the trailing item out, so the fill takes the rest.
+			const items: DashboardGridLayoutItem[] = [
+				{ key: 'a', width: 1 },
+				{ key: 'fill', width: 'fill' },
+				{ key: 'b', width: 3 },
+			];
+			const result = resolveFillWidths(
+				keys( items ),
+				makeMap( items ),
+				6,
+				makeBounds( { fill: { minWidth: 3, maxWidth: 6 } } )
+			);
+			expect( result.get( 'fill' ) ).toBe( 5 );
+		} );
+
+		it( 'caps the fill at its maximum span', () => {
+			const items: DashboardGridLayoutItem[] = [
+				{ key: 'a', width: 1 },
+				{ key: 'fill', width: 'fill' },
+			];
+			const result = resolveFillWidths(
+				keys( items ),
+				makeMap( items ),
+				6,
+				makeBounds( { fill: { minWidth: 1, maxWidth: 2 } } )
+			);
+			expect( result.get( 'fill' ) ).toBe( 2 );
+		} );
+
+		it( 'wraps a floored fill that no longer fits the row', () => {
+			const items: DashboardGridLayoutItem[] = [
+				{ key: 'a', width: 4 },
+				{ key: 'fill', width: 'fill' },
+			];
+			const result = resolveFillWidths(
+				keys( items ),
+				makeMap( items ),
+				6,
+				makeBounds( { fill: { minWidth: 3, maxWidth: 6 } } )
+			);
+			expect( result.get( 'fill' ) ).toBe( 6 );
+		} );
+
+		it( 'scans for a free run wide enough for the floor', () => {
+			// The row-1 run beside the tall tile is nine columns; a
+			// twelve-column floor sends the fill to the next empty row.
+			const items: DashboardGridLayoutItem[] = [
+				{ key: 'tall', width: 3, height: 2 },
+				{ key: 'header', width: 9, height: 1 },
+				{ key: 'fill', width: 'fill', height: 1 },
+			];
+			const result = resolveFillWidths(
+				keys( items ),
+				makeMap( items ),
+				12,
+				makeBounds( { fill: { minWidth: 12, maxWidth: 12 } } )
+			);
+			expect( result.get( 'fill' ) ).toBe( 12 );
+		} );
+
+		it( 'reserves trailing items against the floored run', () => {
+			const items: DashboardGridLayoutItem[] = [
+				{ key: 'tall', width: 3, height: 2 },
+				{ key: 'header', width: 9, height: 1 },
+				{ key: 'fill', width: 'fill', height: 1 },
+				{ key: 'trailing', width: 3, height: 1 },
+			];
+			const result = resolveFillWidths(
+				keys( items ),
+				makeMap( items ),
+				12,
+				makeBounds( { fill: { minWidth: 6, maxWidth: 12 } } )
+			);
+			expect( result.get( 'fill' ) ).toBe( 6 );
+		} );
+
+		it( 'caps the fill inside a free run', () => {
+			const items: DashboardGridLayoutItem[] = [
+				{ key: 'tall', width: 3, height: 2 },
+				{ key: 'header', width: 9, height: 1 },
+				{ key: 'fill', width: 'fill', height: 1 },
+			];
+			const result = resolveFillWidths(
+				keys( items ),
+				makeMap( items ),
+				12,
+				makeBounds( { fill: { minWidth: 1, maxWidth: 6 } } )
+			);
+			expect( result.get( 'fill' ) ).toBe( 6 );
+		} );
+
+		it( 'places a capped full item like a fixed item of its capped width', () => {
+			const items: DashboardGridLayoutItem[] = [
+				{ key: 'full', width: 'full' },
+				{ key: 'fill', width: 'fill' },
+			];
+			const result = resolveFillWidths(
+				keys( items ),
+				makeMap( items ),
+				12,
+				makeBounds( { full: { minWidth: 1, maxWidth: 4 } } )
+			);
+			expect( result.get( 'fill' ) ).toBe( 8 );
+		} );
+
+		it( 'reserves a capped full item in the fill look-ahead', () => {
+			const items: DashboardGridLayoutItem[] = [
+				{ key: 'fill', width: 'fill' },
+				{ key: 'full', width: 'full' },
+			];
+			const result = resolveFillWidths(
+				keys( items ),
+				makeMap( items ),
+				12,
+				makeBounds( { full: { minWidth: 1, maxWidth: 4 } } )
+			);
+			expect( result.get( 'fill' ) ).toBe( 8 );
+		} );
+
+		it( 'places a capped full item beside a tall tile', () => {
+			const items: DashboardGridLayoutItem[] = [
+				{ key: 'tall', width: 3, height: 2 },
+				{ key: 'full', width: 'full', height: 1 },
+				{ key: 'fill', width: 'fill', height: 1 },
+			];
+			const result = resolveFillWidths(
+				keys( items ),
+				makeMap( items ),
+				12,
+				makeBounds( { full: { minWidth: 1, maxWidth: 4 } } )
+			);
+			expect( result.get( 'fill' ) ).toBe( 5 );
+		} );
+
+		it( 'keeps a full item at the column count when its cap allows it', () => {
+			const items: DashboardGridLayoutItem[] = [
+				{ key: 'full', width: 'full' },
+				{ key: 'fill', width: 'fill' },
+			];
+			const result = resolveFillWidths(
+				keys( items ),
+				makeMap( items ),
+				12,
+				makeBounds( { full: { minWidth: 1, maxWidth: 12 } } )
+			);
+			expect( result.get( 'fill' ) ).toBe( 12 );
+		} );
+	} );
 } );
