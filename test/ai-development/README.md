@@ -66,6 +66,7 @@ So:
 - **Bash is the gap the sandbox exists to close.** The in-process file tools are already bounded: the SDK tests a path against `working_dir` before the tool runs, and one outside it is refused. Bash gets no such check, and its children none either, which is what the OS layer is for.
 - **Permission rules run the opposite way round** to sandbox paths: deny is resolved before allow and specificity is ignored, so a deny rule cannot carry an exception. That is why the workspace lives outside every denied path — in the system temp directory rather than inside the checkout, where the rules keeping the agent out of the source would have locked it out of its own working directory.
 - **The network** is unreachable, so the agent cannot look up the answer.
+- **Hooks go around both layers**, so both providers disable them. Claude Code runs a hook itself rather than through the Bash tool, before the session starts and with the inherited environment — and a workspace is built from the tree under evaluation, so a branch adding `.claude/settings.json` would otherwise run commands on the host.
 - **The environment** is bounded by `lib/environment.js`, not by either layer. The provider copies the whole of `process.env` into the agent and `config.env` can only override a name, never remove one, so anything exported in the shell that starts a run is blanked there.
 
 The subject also never sees `test/ai-development/`: it is stripped from the workspace, and the checkout holding the other copy is denied. `specs/sandbox` proves all of this by behaviour rather than by inspecting configuration.
@@ -82,7 +83,7 @@ Taking the diff here rather than having a grading agent go and find it matters f
 
 Judgement that the diff alone cannot support — whether a change follows the repository's own references — stays with `agent-rubric`, which Promptfoo documents for exactly this: verifying a claimed code change against the artifact rather than the response.
 
-Its grading provider names `working_dir` and nothing else, which is Promptfoo's documented form. That gives it the default allowlist of `Read`, `Grep`, `Glob` and `LS` — read-only, and the SDK refuses any path outside the working directory. It needs no sandbox, because the sandbox wraps Bash and this grader has none. Giving a grader a shell is what would drag in a sandbox, a readable global Git config, and the write access Promptfoo's safety guidance tells you to avoid.
+Its grading provider takes Promptfoo's documented form — naming `working_dir` and letting the default allowlist of `Read`, `Grep`, `Glob` and `LS` apply. That is read-only, and the SDK refuses any path outside the working directory, so it needs no sandbox: the sandbox wraps Bash and this grader has none. Giving a grader a shell is what would drag in a sandbox, a readable global Git config, and the write access Promptfoo's safety guidance tells you to avoid. Beyond that it adds confinement the tool list should not be relied on to provide: no settings sources, no hooks, and the same blanked environment as the subject.
 
 That is also why the transform is not redundant: with no shell the grader cannot run `git diff` itself. The transform shows it what changed; its read-only tools let it check that against `.agents/skills/`.
 
@@ -100,7 +101,7 @@ It also needs a newer Node than the repository — see `.nvmrc`.
 cd test/ai-development && nvm use && npm install
 ```
 
-Claude can use an existing Claude Code login or `ANTHROPIC_API_KEY`. Model calls consume the associated quota or paid usage.
+Claude uses your existing Claude Code login. Model calls consume the associated quota or paid usage.
 
 ## Run
 
