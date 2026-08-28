@@ -443,6 +443,32 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Should preserve clip rules when sanitizing registered icons.
+	 *
+	 * @dataProvider data_icon_content_sources
+	 *
+	 * @param bool $use_file_path Whether to register the icon from a file path.
+	 */
+	public function test_clip_rule_survives_sanitization( bool $use_file_path ) {
+		$content  = '<svg><path d="M0 0" fill-rule="evenodd" clip-rule="evenodd" /></svg>';
+		$name     = 'test-collection/clip-rule-icon';
+		$settings = array(
+			'label' => 'Clip Rule Icon',
+		);
+
+		if ( $use_file_path ) {
+			$settings['file_path'] = $this->create_temp_icon_file( $content );
+		} else {
+			$settings['content'] = $content;
+		}
+
+		$this->assertTrue( $this->register( $name, $settings ) );
+
+		$icon = $this->registry->get_registered_icon( $name );
+		$this->assertStringContainsString( 'clip-rule="evenodd"', $icon['content'] );
+	}
+
+	/**
 	 * Should fail to register an icon that provides both `content` and `file_path`.
 	 *
 	 * @expectedIncorrectUsage WP_Icons_Registry_Gutenberg::register

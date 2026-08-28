@@ -30,6 +30,7 @@ function gutenberg_get_allowed_icon_svg_tags(): array {
 				'focusable'   => true,
 				'fill'        => true,
 				'fill-rule'   => true,
+				'clip-rule'   => true,
 			),
 			$stroke_attributes
 		),
@@ -37,6 +38,7 @@ function gutenberg_get_allowed_icon_svg_tags(): array {
 			array(
 				'fill'      => true,
 				'fill-rule' => true,
+				'clip-rule' => true,
 				'd'         => true,
 				'transform' => true,
 			),
@@ -46,6 +48,7 @@ function gutenberg_get_allowed_icon_svg_tags(): array {
 			array(
 				'fill'      => true,
 				'fill-rule' => true,
+				'clip-rule' => true,
 				'points'    => true,
 				'transform' => true,
 				'focusable' => true,
