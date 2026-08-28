@@ -1,14 +1,13 @@
 import { __ } from '@wordpress/i18n';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 import { privateApis as preferencesPrivateApis } from '@wordpress/preferences';
 import EnableCustomFieldsOption from './enable-custom-fields';
+import EnablePanelOption from './enable-panel';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const { PreferencesModalSection, PreferenceBaseOption } = unlock(
-	preferencesPrivateApis
-);
+const { PreferencesModalSection } = unlock( preferencesPrivateApis );
 
 export function MetaBoxesSection( sectionProps ) {
 	const { areCustomFieldsRegistered, metaBoxes } = useSelect( ( select ) => {
@@ -21,7 +20,6 @@ export function MetaBoxesSection( sectionProps ) {
 			metaBoxes: getAllMetaBoxes(),
 		};
 	}, [] );
-	const editPostDispatch = useDispatch( editPostStore );
 
 	// The 'Custom Fields' meta box is a special case that we handle separately.
 	const thirdPartyMetaBoxes = metaBoxes.filter(
@@ -32,19 +30,16 @@ export function MetaBoxesSection( sectionProps ) {
 		return null;
 	}
 
-	const { setMetaBoxHidden } = unlock( editPostDispatch );
-
 	return (
 		<PreferencesModalSection { ...sectionProps }>
 			{ areCustomFieldsRegistered && (
 				<EnableCustomFieldsOption label={ __( 'Custom fields' ) } />
 			) }
-			{ thirdPartyMetaBoxes.map( ( { id, title, hidden } ) => (
-				<PreferenceBaseOption
+			{ thirdPartyMetaBoxes.map( ( { id, title } ) => (
+				<EnablePanelOption
 					key={ id }
 					label={ title }
-					isChecked={ ! hidden }
-					onChange={ () => setMetaBoxHidden( id, ! hidden ) }
+					panelName={ `meta-box-${ id }` }
 				/>
 			) ) }
 		</PreferencesModalSection>

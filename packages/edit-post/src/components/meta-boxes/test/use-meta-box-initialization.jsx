@@ -3,22 +3,10 @@ import { RegistryProvider, createRegistry } from '@wordpress/data';
 import { useMetaBoxInitialization } from '../use-meta-box-initialization';
 import { STORE_NAME } from '../../../store/constants';
 
-// Mock unlock to fall back to an identity function so the mock stores'
-// private actions are directly accessible, while real locked objects,
-// like the store descriptor the store module unlocks on load, keep
-// working.
-jest.mock( '../../../lock-unlock', () => {
-	const actual = jest.requireActual( '../../../lock-unlock' );
-	return {
-		unlock: ( value ) => {
-			try {
-				return actual.unlock( value );
-			} catch {
-				return value;
-			}
-		},
-	};
-} );
+// Mock unlock to be an identity function so private actions are directly accessible.
+jest.mock( '../../../lock-unlock', () => ( {
+	unlock: ( value ) => value,
+} ) );
 
 const storeConfig = {
 	actions: {

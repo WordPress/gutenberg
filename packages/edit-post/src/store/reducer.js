@@ -62,17 +62,6 @@ export function metaBoxLocations( state = {}, action ) {
 			}
 			return newState;
 		}
-		case 'SET_META_BOX_HIDDEN': {
-			const newState = {};
-			for ( const [ location, metaboxes ] of Object.entries( state ) ) {
-				newState[ location ] = metaboxes.map( ( metabox ) =>
-					metabox.id === action.id
-						? { ...metabox, hidden: action.hidden }
-						: metabox
-				);
-			}
-			return newState;
-		}
 	}
 
 	return state;
