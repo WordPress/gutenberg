@@ -94,10 +94,12 @@ export function resolveBranches( options ) {
 			const previous = `release/${ Math.floor( previousBase10 / 10 ) }.${
 				previousBase10 % 10
 			}`;
+			const wp = `wp/${ wpMajor }`;
 			for ( const [ ref, description ] of [
 				[ tag, 'release tag' ],
 				[ current, 'current release branch' ],
 				[ previous, 'previous release branch' ],
+				[ wp, 'WordPress branch' ],
 			] ) {
 				if ( ! refExists( ref ) ) {
 					throw new Error(
@@ -107,7 +109,7 @@ export function resolveBranches( options ) {
 			}
 			return {
 				branches: [
-					branch( `wp/${ wpMajor }` ),
+					branch( wp ),
 					branch( previous ),
 					branch( current ),
 				],
@@ -115,15 +117,28 @@ export function resolveBranches( options ) {
 			};
 		}
 
-		case 'workflow_dispatch':
+		case 'workflow_dispatch': {
+			const names = ( options.inputBranches || '' )
+				.split( ',' )
+				.map( ( name ) => name.trim() )
+				.filter( Boolean );
+			if ( names.length < 2 ) {
+				throw new Error( 'Need at least two branches to compare.' );
+			}
+			const artifacts = names.map( ( name ) => branch( name ).artifact );
+			const duplicate = artifacts.find(
+				( artifact, i ) => artifacts.indexOf( artifact ) !== i
+			);
+			if ( duplicate ) {
+				throw new Error(
+					`Branches must have distinct names once sanitized, "${ duplicate }" is used twice.`
+				);
+			}
 			return {
-				branches: ( options.inputBranches || '' )
-					.split( ',' )
-					.map( ( name ) => name.trim() )
-					.filter( Boolean )
-					.map( ( name ) => branch( name ) ),
+				branches: names.map( ( name ) => branch( name ) ),
 				wpVersion: options.inputWpVersion || '',
 			};
+		}
 
 		default:
 			throw new Error( `Unsupported event: ${ event }` );
@@ -132,6 +147,11 @@ export function resolveBranches( options ) {
 
 function main() {
 	const env = process.env;
+	if ( ! env.GITHUB_OUTPUT ) {
+		throw new Error(
+			'GITHUB_OUTPUT is not set; this script runs in GitHub Actions.'
+		);
+	}
 	const { branches, wpVersion } = resolveBranches( {
 		event: env.GITHUB_EVENT_NAME || '',
 		sha: env.GITHUB_SHA || '',

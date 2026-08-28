@@ -124,6 +124,42 @@ describe( 'resolveBranches', () => {
 		} );
 	} );
 
+	it( 'rejects manual runs with fewer than two branches', () => {
+		expect( () =>
+			resolveBranches( {
+				event: 'workflow_dispatch',
+				sha,
+				wpMajor: '7.1',
+				refExists,
+				inputBranches: 'trunk,',
+			} )
+		).toThrow( 'at least two branches' );
+	} );
+
+	it( 'rejects manual runs whose branches collide once sanitized', () => {
+		expect( () =>
+			resolveBranches( {
+				event: 'workflow_dispatch',
+				sha,
+				wpMajor: '7.1',
+				refExists,
+				inputBranches: 'wp/6.9,wp-6.9',
+			} )
+		).toThrow( 'plugin-wp-6-9' );
+	} );
+
+	it( 'rejects releases whose WP branch does not exist', () => {
+		expect( () =>
+			resolveBranches( {
+				event: 'release',
+				sha,
+				wpMajor: '7.1',
+				refExists: ( ref ) => ref !== 'wp/7.1',
+				releaseTag: 'v24.0.0',
+			} )
+		).toThrow( "WordPress branch 'wp/7.1'" );
+	} );
+
 	it( 'rejects unknown events', () => {
 		expect( () =>
 			resolveBranches( {

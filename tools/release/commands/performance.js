@@ -253,7 +253,7 @@ function formatAsMarkdownTable( rows ) {
  */
 async function runPerformanceTests( branches, options ) {
 	const runningInCI = !! process.env.CI || !! options.ci;
-	const TEST_ROUNDS = options.rounds || 1;
+	const TEST_ROUNDS = Number( options.rounds ) || 1;
 
 	// The default value doesn't work because commander provides an array.
 	if ( branches.length === 0 ) {
@@ -303,6 +303,12 @@ async function runPerformanceTests( branches, options ) {
 	const testRunnerDir = pluginsDir
 		? process.cwd()
 		: path.join( baseDir, 'tests' );
+
+	if ( pluginsDir && options.testsBranch ) {
+		throw new Error(
+			'--tests-branch cannot be combined with --plugins-dir; the current checkout is the test runner.'
+		);
+	}
 
 	if ( pluginsDir ) {
 		logAtIndent( 1, 'Setting up test runner' );

@@ -208,17 +208,18 @@ jobs:
         name: Run performance tests
         runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
         needs: [prepare, performance]
-        if: ${{ !cancelled() && needs.prepare.result == 'success' }}
+        # Runs unless the whole workflow was skipped (forks), so a failure anywhere fails the check.
+        if: ${{ !cancelled() && needs.prepare.result != 'skipped' }}
         permissions:
             contents: read
         env:
             WP_ARTIFACTS_PATH: ${{ github.workspace }}/artifacts
 
         steps:
-            - name: Check shard results
-              if: needs.performance.result != 'success'
+            - name: Check job results
+              if: needs.prepare.result != 'success' || needs.performance.result != 'success'
               run: |
-                  echo "::error::At least one performance tests shard failed."
+                  echo "::error::Resolving the branches, building a plugin or a performance tests shard failed."
                   exit 1
 
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -260,6 +261,8 @@ jobs:
               if: github.event_name == 'push'
               env:
                   CODEHEALTH_PROJECT_TOKEN: ${{ secrets.CODEHEALTH_PROJECT_TOKEN }}
+                  BRANCHES: ${{ needs.prepare.outputs.branches }}
               run: |
                   COMMITTED_AT="$(git show -s "$GITHUB_SHA" --format="%cI")"
-                  node tools/release/log-performance-results.js "$CODEHEALTH_PROJECT_TOKEN" trunk "$GITHUB_SHA" 28d414f1327652e2b49e784ddc12098768991c62 "$COMMITTED_AT"
+                  REFERENCE_COMMIT="$(echo "$BRANCHES" | jq -r '.[1].name')"
+                  node tools/release/log-performance-results.js "$CODEHEALTH_PROJECT_TOKEN" trunk "$GITHUB_SHA" "$REFERENCE_COMMIT" "$COMMITTED_AT"
