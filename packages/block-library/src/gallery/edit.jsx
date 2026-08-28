@@ -43,7 +43,7 @@ import {
 	isObject,
 	pickRelevantMediaFiles,
 } from './shared';
-import { getHrefAndDestination } from './utils';
+import { getHrefAndDestination, normalizeLinkTo } from './utils';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import {
 	getUpdatedLinkTargetSettings,
@@ -698,13 +698,18 @@ export default function GalleryEdit( props ) {
 
 	useEffect( () => {
 		// linkTo attribute must be saved so blocks don't break when changing image_default_link_type in options.php.
-		if ( ! linkTo ) {
+		// That option stores 'file' or 'post', which this block calls 'media'
+		// and 'attachment'. Translate both the option and any value an earlier
+		// version of this effect stored untranslated, because a value the Link
+		// control has no option for leaves the control showing nothing selected.
+		const nextLinkTo =
+			normalizeLinkTo(
+				linkTo || window?.wp?.media?.view?.settings?.defaultProps?.link
+			) || LINK_DESTINATION_NONE;
+
+		if ( nextLinkTo !== linkTo ) {
 			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( {
-				linkTo:
-					window?.wp?.media?.view?.settings?.defaultProps?.link ||
-					LINK_DESTINATION_NONE,
-			} );
+			setAttributes( { linkTo: nextLinkTo } );
 		}
 	}, [ linkTo ] );
 
