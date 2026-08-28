@@ -997,12 +997,14 @@ grid-dashboardgrid--full-width
 grid-dashboardgrid--layered
 grid-dashboardgrid--responsive
 grid-dashboardgrid--row-height
+grid-dashboardgrid--size-limits
 grid-dashboardlanes--custom-grid-overlay-story
 grid-dashboardlanes--default
 grid-dashboardlanes--docs
 grid-dashboardlanes--edit-mode
 grid-dashboardlanes--layered
 grid-dashboardlanes--responsive
+grid-dashboardlanes--size-limits
 grid-dashboardlanes--spanning
 icons-icon--current-color
 icons-icon--default
