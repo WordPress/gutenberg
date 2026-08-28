@@ -19,6 +19,22 @@ export function isLinkFormat( format ) {
 }
 
 /**
+ * @param {Object|null|undefined} replacement A rich text replacement.
+ * @return {boolean} Whether the replacement is an empty link.
+ */
+export function isEmptyLinkReplacement( replacement ) {
+	if ( ! isLinkFormat( replacement ) ) {
+		return false;
+	}
+
+	if ( replacement.innerHTML ) {
+		return false;
+	}
+
+	return true;
+}
+
+/**
  * @param {RichTextValue} value Value to inspect.
  * @return {boolean} Whether the value contains an empty link replacement.
  */
@@ -28,7 +44,7 @@ function hasEmptyLinkReplacement( value ) {
 	for ( let index = 0; index < text.length; index++ ) {
 		if (
 			text[ index ] === OBJECT_REPLACEMENT_CHARACTER &&
-			isLinkFormat( replacements[ index ] )
+			isEmptyLinkReplacement( replacements[ index ] )
 		) {
 			return true;
 		}
@@ -61,7 +77,7 @@ export function removeEmptyLinkFormats( value ) {
 
 		if (
 			character === OBJECT_REPLACEMENT_CHARACTER &&
-			isLinkFormat( replacement )
+			isEmptyLinkReplacement( replacement )
 		) {
 			if ( start !== undefined ) {
 				if ( index < start ) {

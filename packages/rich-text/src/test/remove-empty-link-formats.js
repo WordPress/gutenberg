@@ -1,6 +1,7 @@
 import { create } from '../create';
 import { toHTMLString } from '../to-html-string';
 import {
+	isEmptyLinkReplacement,
 	isLinkFormat,
 	removeEmptyLinkFormats,
 } from '../remove-empty-link-formats';
@@ -55,6 +56,22 @@ describe( 'removeEmptyLinkFormats', () => {
 		expect( removeEmptyLinkFormats( value ) ).toEqual( value );
 	} );
 
+	it( 'preserves non-editable link replacements with inner HTML', () => {
+		const value = {
+			text: OBJECT_REPLACEMENT_CHARACTER,
+			formats: [ , ],
+			replacements: [
+				{
+					type: 'my-plugin/non-editable',
+					tagName: 'a',
+					innerHTML: 'a',
+				},
+			],
+		};
+
+		expect( removeEmptyLinkFormats( value ) ).toEqual( value );
+	} );
+
 	it( 'adjusts selection after removing empty links', () => {
 		const value = {
 			text: `a${ OBJECT_REPLACEMENT_CHARACTER }b`,
@@ -76,6 +93,24 @@ describe( 'removeEmptyLinkFormats', () => {
 			start: 1,
 			end: 1,
 		} );
+	} );
+} );
+
+describe( 'isEmptyLinkReplacement', () => {
+	it( 'detects empty link replacements', () => {
+		expect(
+			isEmptyLinkReplacement( {
+				type: 'core/link',
+				attributes: { url: 'https://example.com' },
+			} )
+		).toBe( true );
+		expect(
+			isEmptyLinkReplacement( {
+				type: 'my-plugin/non-editable',
+				tagName: 'a',
+				innerHTML: 'a',
+			} )
+		).toBe( false );
 	} );
 } );
 
