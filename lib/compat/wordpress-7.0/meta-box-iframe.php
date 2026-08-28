@@ -211,6 +211,24 @@ function gutenberg_meta_box_iframe_dequeue_scripts() {
 add_action( 'admin_enqueue_scripts', 'gutenberg_meta_box_iframe_dequeue_scripts', PHP_INT_MAX );
 
 /**
+ * Prints a hidden submit button at the top of the post form.
+ *
+ * The parent editor saves the meta boxes by submitting the form with
+ * this button, so that submit handlers serialize their values as they
+ * would for a pressed button. It skips constraint validation, which
+ * would otherwise silently abort on invalid fields inside hidden meta
+ * boxes, and the loader page cancels every submission, so the form
+ * never navigates.
+ */
+function gutenberg_meta_box_iframe_print_submitter() {
+	if ( ! gutenberg_is_meta_box_iframe_request() ) {
+		return;
+	}
+	echo '<button type="submit" id="gutenberg-meta-box-submitter" formnovalidate hidden></button>';
+}
+add_action( 'edit_form_top', 'gutenberg_meta_box_iframe_print_submitter' );
+
+/**
  * Prints styles that trim the classic screen down to the meta boxes.
  */
 function gutenberg_meta_box_iframe_print_styles() {
