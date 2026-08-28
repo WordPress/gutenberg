@@ -51,6 +51,10 @@
 			"types": "./build-types/postcss-plugins/postcss-ds-token-fallbacks.d.mts",
 			"default": "./postcss-plugins/postcss-ds-token-fallbacks.mjs"
 		},
+		"./lightningcss-plugins/lightningcss-ds-token-fallbacks": {
+			"types": "./build-types/lightningcss-plugins/lightningcss-ds-token-fallbacks.d.mts",
+			"default": "./lightningcss-plugins/lightningcss-ds-token-fallbacks.mjs"
+		},
 		"./esbuild-plugins/esbuild-ds-token-fallbacks": {
 			"types": "./build-types/esbuild-plugins/esbuild-ds-token-fallbacks.d.mts",
 			"default": "./esbuild-plugins/esbuild-ds-token-fallbacks.mjs"
@@ -100,6 +104,7 @@
 		"@wordpress/validation-tools": "file:../../tools/validation",
 		"esbuild": "^0.27.2",
 		"esbuild-esm-loader": "^0.3.3",
+		"lightningcss": "^1.33.0",
 		"prettier": "npm:wp-prettier@^3.0.3",
 		"storybook": "^10.5.3",
 		"stylelint": "^16.26.1"
@@ -107,6 +112,7 @@
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",
 		"esbuild": ">=0.27.2 <1.0.0",
+		"lightningcss": ">=1.33.0 <2.0.0",
 		"postcss": "^8.0.0",
 		"react": "^18 || ^19",
 		"react-dom": "^18 || ^19",
@@ -118,6 +124,9 @@
 			"optional": true
 		},
 		"esbuild": {
+			"optional": true
+		},
+		"lightningcss": {
 			"optional": true
 		},
 		"postcss": {

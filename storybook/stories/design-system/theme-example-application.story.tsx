@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useArgs, useState } from 'storybook/preview-api';
 import { Breadcrumbs, Page } from '@wordpress/admin-ui';
-import { useId, useState } from '@wordpress/element';
 import { wordpress } from '@wordpress/icons';
 import { ThemeProvider } from '@wordpress/theme';
 import {
@@ -40,6 +40,9 @@ const SIDEBAR_THEME_PRESETS = [
 ] as const;
 
 type SidebarThemeId = ( typeof SIDEBAR_THEME_PRESETS )[ number ][ 'id' ];
+type ExampleApplicationArgs = React.ComponentProps< typeof ThemeProvider > & {
+	sidebarTheme: SidebarThemeId;
+};
 
 function getSidebarThemePreset( value: unknown ) {
 	return (
@@ -135,7 +138,7 @@ const siteLanguageOptions = [
 	{ value: 'ja', label: '日本語' },
 ];
 
-const meta: Meta< typeof ThemeProvider > = {
+const meta: Meta< ExampleApplicationArgs > = {
 	title: 'Design System/Theme/Theme Provider/Example Application',
 	component: ThemeProvider,
 	parameters: {
@@ -150,25 +153,30 @@ export default meta;
  * application shell uses its own color preset, while the main content
  * explicitly reapplies the root settings from the Storybook Theme toolbar.
  */
-export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
-	render: ( _, context ) => {
+export const ExampleApplication: StoryObj< typeof meta > = {
+	args: {
+		sidebarTheme: SIDEBAR_THEME_PRESETS[ 0 ].id,
+	},
+	render: function Render( _, context ) {
+		const [ { sidebarTheme }, updateArgs ] =
+			useArgs< ExampleApplicationArgs >();
 		const [ isSiteDetailsOpen, setIsSiteDetailsOpen ] = useState( false );
-		const [ sidebarThemeId, setSidebarThemeId ] =
-			useState< SidebarThemeId >( SIDEBAR_THEME_PRESETS[ 0 ].id );
-		const generalSettingsId = useId();
-		const displaySettingsId = useId();
 		const rootThemeSettings = getDesignSystemThemeSettings(
 			context.globals
 		);
-		const sidebarTheme = getSidebarThemePreset( sidebarThemeId );
+		const sidebarThemePreset = getSidebarThemePreset( sidebarTheme );
+		const generalSettingsId = `${ context.id }-general-settings`;
+		const displaySettingsId = `${ context.id }-display-settings`;
 
 		return (
 			<div>
 				<SidebarThemeControls
-					selectedTheme={ sidebarTheme.id }
-					onSelectTheme={ setSidebarThemeId }
+					selectedTheme={ sidebarThemePreset.id }
+					onSelectTheme={ ( selectedSidebarTheme ) =>
+						updateArgs( { sidebarTheme: selectedSidebarTheme } )
+					}
 				/>
-				<ThemeProvider color={ sidebarTheme.colors }>
+				<ThemeProvider color={ sidebarThemePreset.colors }>
 					<div
 						style={ {
 							display: 'grid',

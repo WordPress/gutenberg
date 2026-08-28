@@ -65,7 +65,6 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/kebab-case": "file:../kebab-case",
 		"@wordpress/keycodes": "file:../keycodes",
-		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/ui": "file:../ui",
 		"@wordpress/warning": "file:../warning",
 		"clsx": "^2.1.1",
