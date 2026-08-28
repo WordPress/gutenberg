@@ -1,18 +1,4 @@
 /*
- * JSON.parse accepts numbers, booleans, null, quoted strings, arrays and
- * objects. The router reads such a value as JSON; the route link hands it
- * over as text.
- */
-function parsesAsJson( value: string ): boolean {
-	try {
-		JSON.parse( value );
-		return true;
-	} catch {
-		return false;
-	}
-}
-
-/*
  * A query both navigations read alike. The route link hands the router one
  * string per key; the router's own parser, which a full load runs, folds a
  * repeated key into an array and reads JSON values as such.
@@ -21,7 +7,14 @@ function isPlainQuery( query: string ): boolean {
 	const seen = new Set< string >();
 
 	for ( const [ key, value ] of new URLSearchParams( query ) ) {
-		if ( seen.has( key ) || parsesAsJson( value ) ) {
+		let isJson = true;
+		try {
+			JSON.parse( value );
+		} catch {
+			isJson = false;
+		}
+
+		if ( seen.has( key ) || isJson ) {
 			return false;
 		}
 		seen.add( key );

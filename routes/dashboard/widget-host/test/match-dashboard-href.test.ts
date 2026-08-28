@@ -121,6 +121,15 @@ describe( 'matchDashboardHref', () => {
 		).toBeNull();
 	} );
 
+	it( 'rejects a p query value the router reads as a quoted string', () => {
+		expect(
+			matchDashboardHref(
+				'admin.php?page=dashboard&p=%2Fposts%3Fq%3D%227%22',
+				BASE
+			)
+		).toBeNull();
+	} );
+
 	it( 'rejects a p that is only a query', () => {
 		expect(
 			matchDashboardHref(
