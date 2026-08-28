@@ -20,6 +20,17 @@ import {
 import { store as blockEditorStore } from '../../store';
 import { setContentEditableWrapper } from './utils';
 
+const VERTICAL_INPUT_TYPES = [
+	'date',
+	'datetime-local',
+	'month',
+	'number',
+	'range',
+	'time',
+	'week',
+];
+const VERTICAL_INPUT_ROLES = [ 'combobox' ];
+
 /**
  * Returns true if the element should consider edge navigation upon a keyboard
  * event of the given directional key code, or false otherwise.
@@ -32,23 +43,18 @@ import { setContentEditableWrapper } from './utils';
  */
 export function isNavigationCandidate( element, keyCode, hasModifier ) {
 	const isVertical = keyCode === UP || keyCode === DOWN;
-	const { tagName } = element;
+	const { tagName, role } = element;
 	const elementType = element.getAttribute( 'type' );
 
 	// Native inputs should not navigate vertically, unless they are simple types that don't need up/down arrow keys.
 	if ( isVertical && ! hasModifier ) {
 		if ( tagName === 'INPUT' ) {
-			const verticalInputTypes = [
-				'date',
-				'datetime-local',
-				'month',
-				'number',
-				'range',
-				'time',
-				'week',
-			];
-			return ! verticalInputTypes.includes( elementType );
+			return (
+				! VERTICAL_INPUT_TYPES.includes( elementType ) &&
+				! VERTICAL_INPUT_ROLES.includes( role )
+			);
 		}
+
 		return true;
 	}
 
@@ -57,7 +63,6 @@ export function isNavigationCandidate( element, keyCode, hasModifier ) {
 		const simpleInputTypes = [
 			'button',
 			'checkbox',
-			'number',
 			'color',
 			'file',
 			'image',
