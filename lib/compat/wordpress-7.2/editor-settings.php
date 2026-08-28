@@ -1,8 +1,8 @@
 <?php
 /**
- * Editor settings additions for WordPress 7.1.
+ * Editor settings additions for WordPress 7.2.
  *
- * @since 7.1.0
+ * @since 7.2.0
  * @package gutenberg
  * @subpackage Editor
  */
