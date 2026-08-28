@@ -1,16 +1,24 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useId } from '@wordpress/element';
-import { Field } from '../../../..';
+import * as Field from '../';
+import { DETAILS_EXAMPLE } from '../../../stories/shared';
 
 const meta: Meta< typeof Field.Root > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/Primitives/Field',
 	component: Field.Root,
 	subcomponents: {
-		Item: Field.Item,
-		Label: Field.Label,
-		Control: Field.Control,
-		Description: Field.Description,
-		Details: Field.Details,
+		'Field.Item': Field.Item,
+		'Field.Label': Field.Label,
+		'Field.Control': Field.Control,
+		'Field.Description': Field.Description,
+		'Field.Details': Field.Details,
+	},
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;
@@ -22,17 +30,17 @@ export default meta;
  */
 export const Default: StoryObj< typeof Field.Root > = {
 	args: {
-		children: (
-			<>
-				<Field.Label>Label</Field.Label>
-				<Field.Control
-					render={ <input type="text" placeholder="Placeholder" /> }
-				/>
-				<Field.Description>
-					The accessible description.
-				</Field.Description>
-			</>
-		),
+		children: [
+			<Field.Label key="label">Label</Field.Label>,
+			<Field.Control
+				render={ <input type="text" placeholder="Placeholder" /> }
+				key="control"
+			/>,
+
+			<Field.Description key="description">
+				The accessible description.
+			</Field.Description>,
+		],
 	},
 };
 
@@ -64,6 +72,7 @@ export const UsingHtmlFor: StoryObj< typeof Field.Root > = {
 					id={ controlId }
 					aria-describedby={ descriptionId }
 				/>
+
 				<Field.Description id={ descriptionId }>
 					The accessible description.
 				</Field.Description>
@@ -101,6 +110,24 @@ export const UsingAriaLabelledby: StoryObj< typeof Field.Root > = {
 };
 
 /**
+ * When `hideFromVision` is set on `Field.Label`, the label is visually
+ * hidden but remains accessible to screen readers.
+ */
+export const HiddenLabel: StoryObj< typeof Field.Root > = {
+	args: {
+		children: [
+			<Field.Label hideFromVision key="label">
+				Label
+			</Field.Label>,
+			<Field.Control
+				render={ <input type="text" placeholder="Placeholder" /> }
+				key="control"
+			/>,
+		],
+	},
+};
+
+/**
  * To add rich content (such as links) to the description, use `Field.Details`.
  *
  * Although this content is not associated with the field using direct semantics,
@@ -112,20 +139,14 @@ export const UsingAriaLabelledby: StoryObj< typeof Field.Root > = {
  */
 export const WithDetails: StoryObj< typeof Field.Root > = {
 	args: {
-		children: (
-			<>
-				<Field.Label>Label</Field.Label>
-				<Field.Control
-					render={ <input type="text" placeholder="Placeholder" /> }
-				/>
-				<Field.Details>
-					Details can include{ '	' }
-					<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/a">
-						links to more information
-					</a>{ ' ' }
-					and other semantic elements.
-				</Field.Details>
-			</>
-		),
+		children: [
+			<Field.Label key="label">Label</Field.Label>,
+			<Field.Control
+				render={ <input type="text" placeholder="Placeholder" /> }
+				key="control"
+			/>,
+
+			<Field.Details key="details">{ DETAILS_EXAMPLE }</Field.Details>,
+		],
 	},
 };

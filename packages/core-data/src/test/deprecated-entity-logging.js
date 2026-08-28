@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
 import { createRegistry } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as coreDataStore } from '../index';
 
 jest.mock( '@wordpress/deprecated' );

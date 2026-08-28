@@ -1,11 +1,5 @@
-/**
- * Internal dependencies
- */
-import { parseDropEvent, onFilesDrop, onHTMLDrop, onBlockDrop } from '..';
-/**
- * WordPress dependencies
- */
 import { findTransform, pasteHandler } from '@wordpress/blocks';
+import { parseDropEvent, onFilesDrop, onHTMLDrop, onBlockDrop } from '..';
 
 const noop = () => {};
 

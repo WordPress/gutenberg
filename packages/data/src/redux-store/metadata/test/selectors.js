@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createRegistry } from '@wordpress/data';
 
 const getFooSelector = ( state ) => state;
@@ -21,7 +18,7 @@ const testStore = {
 async function resolve( registry, selector ) {
 	try {
 		await registry.resolveSelect( 'store' )[ selector ]();
-	} catch ( e ) {}
+	} catch {}
 }
 
 describe( 'getIsResolving', () => {

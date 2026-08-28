@@ -1,20 +1,13 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
 	store as coreStore,
 } from '@wordpress/core-data';
-import { Button, ComboboxControl } from '@wordpress/components';
+import { ComboboxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState, createInterpolateElement } from '@wordpress/element';
-import { debounce } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
+import { useDebounce, useEvent } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import type { DataFormControlProps } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
 import type { MediaItem } from '../types';
 import { getRenderedContent } from '../utils/get-rendered-content';
 
@@ -75,7 +68,7 @@ export default function MediaAttachedToEdit( {
 			post: 0,
 			_embedded: { ...data?._embedded, 'wp:attached-to': undefined },
 		} );
-		setOptions( [] );
+		setValue( null );
 	};
 
 	const onValueChange = async ( filterValue: string ) => {
@@ -90,24 +83,31 @@ export default function MediaAttachedToEdit( {
 			{}
 		);
 		setSearchResults( results );
-		const mappedSuggestions = results.map( ( result ) => {
+		const suggestions = results.map( ( result ) => {
 			return {
 				label: result.title,
 				value: result.id.toString(),
 			};
 		} );
-		setOptions( mappedSuggestions );
+		const includeCurrent =
+			! filterValue &&
+			suggestions.findIndex( ( s ) => s.value === value ) === -1;
+		setOptions( suggestions.concat( includeCurrent ? defaultPost : [] ) );
 		setIsLoading( false );
 	};
+
+	// `onValueChange` closes over state, so it's wrapped in `useEvent` to give
+	// `useDebounce` a stable function. Debouncing an inline function instead
+	// rebuilds the timer on every render, so nothing is debounced and each
+	// keystroke fires its own request.
+	const debouncedValueChange = useDebounce( useEvent( onValueChange ), 300 );
 
 	/**
 	 * Handle selection.
 	 *
 	 * @param {Object} selectedPostId The selected post id.
 	 */
-	const handleSelectOption = (
-		selectedPostId: string | null | undefined
-	) => {
+	const handleSelectOption = ( selectedPostId: string | null ) => {
 		if ( ! selectedPostId ) {
 			handleDetach();
 			return;
@@ -146,40 +146,22 @@ export default function MediaAttachedToEdit( {
 		}
 	};
 
-	const help = !! data.post
-		? createInterpolateElement(
-				__(
-					'Search for a post or page to attach this media to or <button>detach current</button>.'
-				),
-				{
-					button: (
-						<Button
-							__next40pxDefaultSize
-							onClick={ handleDetach }
-							variant="link"
-							accessibleWhenDisabled
-						/>
-					),
-				}
-		  )
-		: __( 'Search for a post or page to attach this media to.' );
-
 	return (
 		<ComboboxControl
 			className="dataviews-media-field__attached-to"
-			__next40pxDefaultSize
 			isLoading={ isLoading }
 			label={ __( 'Attached to' ) }
-			help={ help }
+			help={ __( 'Attach this file to a single post or page.' ) }
 			value={ value }
 			options={ options }
-			onFilterValueChange={ debounce(
-				( filterValue: unknown ) =>
-					onValueChange( filterValue as string ),
-				300
-			) }
+			onFilterValueChange={ ( filterValue: unknown ) =>
+				debouncedValueChange( filterValue as string )
+			}
 			onChange={ handleSelectOption }
 			hideLabelFromVision
+			// Opening the panel shouldn't imply the user has decided to change
+			// the attachment, so wait for them to search before showing the list.
+			expandOnFocus={ false }
 		/>
 	);
 }

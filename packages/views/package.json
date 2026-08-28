@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/views",
-	"version": "1.7.0",
+	"version": "1.21.0",
 	"description": "View persistence and management for WordPress DataViews.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -41,11 +41,19 @@
 	},
 	"types": "build-types",
 	"dependencies": {
+		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
 		"@wordpress/dataviews": "file:../dataviews",
 		"@wordpress/element": "file:../element",
 		"@wordpress/preferences": "file:../preferences",
+		"@wordpress/private-apis": "file:../private-apis",
 		"dequal": "^2.0.3"
+	},
+	"devDependencies": {
+		"@testing-library/react": "^16.3.2",
+		"@types/jest": "^30.0.0",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1"
 	},
 	"publishConfig": {
 		"access": "public"

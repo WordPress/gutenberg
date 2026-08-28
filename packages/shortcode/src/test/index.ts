@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { next, replace, attrs, string } from '../';
 
 describe( 'shortcode', () => {

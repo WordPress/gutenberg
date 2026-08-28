@@ -1,8 +1,6 @@
-/**
- * External dependencies
- */
 import * as Y from 'yjs';
 import { Awareness } from 'y-protocols/awareness';
+import * as buffer from 'lib0/buffer';
 import * as fun from 'lib0/function';
 import {
 	describe,
@@ -12,18 +10,14 @@ import {
 	beforeEach,
 	afterEach,
 } from '@jest/globals';
-
-/**
- * Internal dependencies
- */
 import { createSyncManager } from '../manager';
 import {
 	CRDT_RECORD_MAP_KEY,
 	CRDT_STATE_MAP_KEY,
 	CRDT_STATE_MAP_SAVED_AT_KEY as SAVED_AT_KEY,
 	CRDT_STATE_MAP_SAVED_BY_KEY as SAVED_BY_KEY,
+	LOCAL_EDITOR_ORIGIN,
 } from '../config';
-import { createPersistedCRDTDoc } from '../persistence';
 import { getProviderCreators } from '../providers';
 import type {
 	CRDTDoc,
@@ -33,6 +27,7 @@ import type {
 	RecordHandlers,
 	SyncConfig,
 } from '../types';
+import { serializeCrdtDoc } from '../utils';
 
 // Mock dependencies.
 jest.mock( '../providers', () => ( {
@@ -54,6 +49,7 @@ describe( 'SyncManager', () => {
 		mockRecord = {
 			id: '123',
 			title: 'Test Post',
+			meta: {},
 		};
 
 		mockProviderResult = {
@@ -83,10 +79,10 @@ describe( 'SyncManager', () => {
 					);
 				}
 			),
-			supports: {},
 			createAwareness: jest.fn(
 				( ydoc: Y.Doc ) => new Awareness( ydoc )
 			),
+			getPersistedCRDTDoc: jest.fn( () => null ),
 		};
 
 		mockHandlers = {
@@ -96,9 +92,9 @@ describe( 'SyncManager', () => {
 				Promise.resolve( mockRecord )
 			),
 			onStatusChange: jest.fn(),
+			persistCRDTDoc: jest.fn(),
 			refetchRecord: jest.fn( async () => Promise.resolve() ),
 			restoreUndoMeta: jest.fn(),
-			saveRecord: jest.fn(),
 		};
 	} );
 
@@ -225,11 +221,73 @@ describe( 'SyncManager', () => {
 			expect( mockProviderCreator ).toHaveBeenCalledTimes( 2 );
 		} );
 
+		it( 'only adds undo metadata for the entity that changed', async () => {
+			mockSyncConfig.applyChangesToCRDTDoc = jest.fn(
+				( ydoc: CRDTDoc, changes: Partial< ObjectData > ) => {
+					const recordMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
+					Object.entries( changes ).forEach( ( [ key, value ] ) => {
+						recordMap.set( key, value );
+					} );
+				}
+			);
+
+			const recordA = { id: '123', title: 'Post A', meta: {} };
+			const recordB = { id: '456', title: 'Post B', meta: {} };
+			const handlersA = {
+				...mockHandlers,
+				addUndoMeta: jest.fn(),
+				getEditedRecord: jest.fn( async () =>
+					Promise.resolve( recordA )
+				),
+				restoreUndoMeta: jest.fn(),
+			};
+			const handlersB = {
+				...mockHandlers,
+				addUndoMeta: jest.fn(),
+				getEditedRecord: jest.fn( async () =>
+					Promise.resolve( recordB )
+				),
+				restoreUndoMeta: jest.fn(),
+			};
+
+			const manager = createSyncManager();
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				recordA,
+				handlersA
+			);
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'456',
+				recordB,
+				handlersB
+			);
+
+			handlersA.addUndoMeta.mockClear();
+			handlersB.addUndoMeta.mockClear();
+
+			manager.update(
+				'post',
+				'123',
+				{ title: 'Post A updated' },
+				LOCAL_EDITOR_ORIGIN,
+				{ isNewUndoLevel: true }
+			);
+
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+			expect( handlersA.addUndoMeta ).toHaveBeenCalledTimes( 1 );
+			expect( handlersB.addUndoMeta ).not.toHaveBeenCalled();
+		} );
+
 		describe( 'persisted CRDT doc behavior', () => {
-			function createRecordWithPersistedCRDTDoc(
-				record: ObjectData,
-				persistedRecord: ObjectData = record
-			): ObjectData {
+			function createPersistedCRDTDoc(
+				persistedRecord: ObjectData
+			): string {
 				const persistedDoc = new Y.Doc();
 				const persistedRecordMap =
 					persistedDoc.getMap( CRDT_RECORD_MAP_KEY );
@@ -239,24 +297,10 @@ describe( 'SyncManager', () => {
 					}
 				);
 
-				const persistedMeta = createPersistedCRDTDoc( persistedDoc );
-				persistedDoc.destroy();
-
-				return {
-					...record,
-					meta: {
-						...record.meta,
-						...persistedMeta,
-					},
-				};
+				return serializeCrdtDoc( persistedDoc );
 			}
 
 			it( 'applies the current record when no persisted CRDT doc exists', async () => {
-				mockSyncConfig = {
-					...mockSyncConfig,
-					supports: { crdtPersistence: true },
-				};
-
 				const manager = createSyncManager();
 
 				await manager.load(
@@ -280,16 +324,18 @@ describe( 'SyncManager', () => {
 					mockSyncConfig.getChangesFromCRDTDoc
 				).not.toHaveBeenCalled();
 
-				// Verify a save operation occurred.
-				expect( mockHandlers.saveRecord ).toHaveBeenCalledTimes( 1 );
+				// Verify that the CRDT doc was persisted.
+				expect( mockHandlers.persistCRDTDoc ).toHaveBeenCalledTimes(
+					1
+				);
 			} );
 
 			it( 'accepts a valid persisted CRDT doc without applying changes', async () => {
-				const record = createRecordWithPersistedCRDTDoc( mockRecord );
-
 				mockSyncConfig = {
 					...mockSyncConfig,
-					supports: { crdtPersistence: true },
+					getPersistedCRDTDoc: jest.fn( () =>
+						createPersistedCRDTDoc( mockRecord )
+					),
 				};
 
 				const manager = createSyncManager();
@@ -298,7 +344,7 @@ describe( 'SyncManager', () => {
 					mockSyncConfig,
 					'post',
 					'123',
-					record,
+					mockRecord,
 					mockHandlers
 				);
 
@@ -313,22 +359,22 @@ describe( 'SyncManager', () => {
 				).toHaveBeenCalledTimes( 1 );
 				expect(
 					mockSyncConfig.getChangesFromCRDTDoc
-				).toHaveBeenCalledWith( expect.any( Y.Doc ), record );
+				).toHaveBeenCalledWith( expect.any( Y.Doc ), mockRecord );
 
-				// Verify no save operation occurred
+				// Verify that the CRDT doc was persisted.
 				expect( mockHandlers.editRecord ).not.toHaveBeenCalled();
-				expect( mockHandlers.saveRecord ).not.toHaveBeenCalled();
+				expect( mockHandlers.persistCRDTDoc ).not.toHaveBeenCalled();
 			} );
 
-			it( 'applies an invalid CRDT doc, then applies changes', async () => {
-				const record = createRecordWithPersistedCRDTDoc( mockRecord, {
-					...mockRecord,
-					title: 'Invalidated title from persisted CRDT doc',
-				} );
-
+			it( 'applies a persisted CRDT doc with invalidated fields, then applies changes', async () => {
 				mockSyncConfig = {
 					...mockSyncConfig,
-					supports: { crdtPersistence: true },
+					getPersistedCRDTDoc: jest.fn( () =>
+						createPersistedCRDTDoc( {
+							...mockRecord,
+							title: 'Invalidated title from persisted CRDT doc',
+						} )
+					),
 				};
 
 				const manager = createSyncManager();
@@ -337,7 +383,7 @@ describe( 'SyncManager', () => {
 					mockSyncConfig,
 					'post',
 					'123',
-					record,
+					mockRecord,
 					mockHandlers
 				);
 
@@ -359,43 +405,12 @@ describe( 'SyncManager', () => {
 				).toHaveBeenCalledTimes( 1 );
 				expect(
 					mockSyncConfig.getChangesFromCRDTDoc
-				).toHaveBeenCalledWith( expect.any( Y.Doc ), record );
+				).toHaveBeenCalledWith( expect.any( Y.Doc ), mockRecord );
 
-				// Verify a save operation occurred.
-				expect( mockHandlers.saveRecord ).toHaveBeenCalledTimes( 1 );
-			} );
-
-			it( 'ignores a persisted CRDT doc when CRDT persistence is not supported', async () => {
-				const record = createRecordWithPersistedCRDTDoc( mockRecord, {
-					...mockRecord,
-					title: 'Persisted Title',
-				} );
-
-				const manager = createSyncManager();
-
-				await manager.load(
-					mockSyncConfig,
-					'post',
-					'123',
-					record,
-					mockHandlers
+				// Verify that the CRDT doc was persisted.
+				expect( mockHandlers.persistCRDTDoc ).toHaveBeenCalledTimes(
+					1
 				);
-
-				// Current record should be applied since the persisted doc does not exist.
-				expect(
-					mockSyncConfig.applyChangesToCRDTDoc
-				).toHaveBeenCalledTimes( 1 );
-				expect(
-					mockSyncConfig.applyChangesToCRDTDoc
-				).toHaveBeenCalledWith( expect.any( Y.Doc ), record );
-
-				// getChangesFromCRDTDoc should not be called since the persisted doc is igored.
-				expect(
-					mockSyncConfig.getChangesFromCRDTDoc
-				).not.toHaveBeenCalled();
-
-				// Verify no save operation occurred because persistence is not supported.
-				expect( mockHandlers.saveRecord ).not.toHaveBeenCalled();
 			} );
 		} );
 	} );
@@ -482,10 +497,101 @@ describe( 'SyncManager', () => {
 			jest.clearAllMocks();
 			manager.update( 'post', '456', { title: 'Updated' }, 'local' );
 
-			// Wait a tick for yieldToEventLoop.
+			// Wait a tick for any async follow-up work.
 			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 			expect( mockSyncConfig.applyChangesToCRDTDoc ).toHaveBeenCalled();
+		} );
+
+		it( 'clears the undo manager after unloading all entities', async () => {
+			const manager = createSyncManager();
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'456',
+				mockRecord,
+				mockHandlers
+			);
+
+			expect( manager.undoManager ).toBeDefined();
+
+			manager.unloadAll();
+
+			expect( manager.undoManager ).toBeUndefined();
+		} );
+
+		it( 'destroys providers and skips initialization when unload runs during load', async () => {
+			// Hold provider creation open so we can interrupt the load between
+			// `entityStates.set(...)` and the provider creation resolving.
+			let resolveProvider: (
+				result: ProviderCreatorResult
+			) => void = () => {};
+			const providerPromise = new Promise< ProviderCreatorResult >(
+				( resolve ) => {
+					resolveProvider = resolve;
+				}
+			);
+			mockProviderCreator.mockImplementation( () => providerPromise );
+
+			const manager = createSyncManager();
+
+			// Start the load but do not await it. The async function will run up
+			// to the `await Promise.all(...)` and then suspend.
+			const loadPromise = manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			// Yield so loadEntity reaches its await point.
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+			// At this point providerResults is still unassigned. Trigger unload.
+			manager.unload( 'post', '123' );
+
+			// Now resolve provider creation and let the load promise finish.
+			resolveProvider( mockProviderResult );
+			await loadPromise;
+
+			// The provider that was created after unload should still be
+			// destroyed by the post-await guard.
+			expect( mockProviderResult.destroy ).toHaveBeenCalledTimes( 1 );
+
+			// Initialization and persistence work should have been skipped: no
+			// changes applied to the (now-destroyed) ydoc, no persistCRDTDoc.
+			expect(
+				mockSyncConfig.applyChangesToCRDTDoc
+			).not.toHaveBeenCalled();
+			expect( mockHandlers.persistCRDTDoc ).not.toHaveBeenCalled();
+
+			// The entity is fully torn down, so a fresh load should succeed.
+			mockProviderCreator.mockImplementation( () =>
+				Promise.resolve( mockProviderResult )
+			);
+			jest.clearAllMocks();
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			expect( mockProviderCreator ).toHaveBeenCalledTimes( 1 );
+			expect(
+				mockSyncConfig.applyChangesToCRDTDoc
+			).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 
@@ -513,7 +619,7 @@ describe( 'SyncManager', () => {
 			const changes = { title: 'Updated Title' };
 			manager.update( 'post', '123', changes, 'local-editor' );
 
-			// Wait a tick for yieldToEventLoop.
+			// Wait a tick for any async follow-up work.
 			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 			// Verify that applyChangesToCRDTDoc was called with the changes.
@@ -529,13 +635,181 @@ describe( 'SyncManager', () => {
 			expect( stateMap.get( SAVED_BY_KEY ) ).toBeUndefined();
 		} );
 
+		it( 'applies local CRDT updates synchronously before processing remote record updates when collaborating', async () => {
+			let capturedDoc: Y.Doc | null = null;
+			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
+				capturedDoc = ydoc;
+				return mockProviderResult;
+			} );
+
+			const initialRecord = {
+				id: '123',
+				title: 'Initial title',
+				content: 'Initial content',
+				meta: {},
+			};
+			const editedRecord = {
+				...initialRecord,
+				content: 'Local content',
+			};
+			const syncConfig = {
+				...mockSyncConfig,
+				applyChangesToCRDTDoc: jest.fn(
+					( ydoc: CRDTDoc, changes: Partial< ObjectData > ) => {
+						const recordMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
+						Object.entries( changes ).forEach(
+							( [ key, value ] ) => {
+								recordMap.set( key, value );
+							}
+						);
+					}
+				),
+			};
+			const handlers = {
+				...mockHandlers,
+				editRecord: jest.fn(),
+				getEditedRecord: jest.fn( async () =>
+					Promise.resolve( editedRecord )
+				),
+			};
+
+			const manager = createSyncManager();
+
+			await manager.load(
+				syncConfig,
+				'post',
+				'123',
+				initialRecord,
+				handlers
+			);
+
+			handlers.editRecord.mockClear();
+
+			// Simulate a remote peer so local updates are applied synchronously.
+			// (They are only deferred off the hot path when editing alone.)
+			const awareness = manager.getAwareness(
+				'post',
+				'123'
+			) as Awareness;
+			awareness.setLocalState( {} );
+			awareness.states.set( awareness.clientID + 1, {} );
+
+			manager.update(
+				'post',
+				'123',
+				{ content: 'Local content' },
+				LOCAL_EDITOR_ORIGIN
+			);
+
+			const remoteDoc = new Y.Doc();
+			remoteDoc
+				.getMap( CRDT_RECORD_MAP_KEY )
+				.set( 'remoteField', 'Remote value' );
+			Y.applyUpdateV2(
+				capturedDoc as unknown as Y.Doc,
+				Y.encodeStateAsUpdateV2( remoteDoc )
+			);
+			remoteDoc.destroy();
+
+			// Wait for the async remote-to-store observer.
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+			expect( handlers.editRecord ).toHaveBeenCalledTimes( 1 );
+			expect( handlers.editRecord ).toHaveBeenCalledWith( {
+				remoteField: 'Remote value',
+			} );
+		} );
+
+		it( 'defers local CRDT updates off the hot path when editing alone', async () => {
+			const manager = createSyncManager();
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			jest.clearAllMocks();
+
+			manager.update(
+				'post',
+				'123',
+				{ title: 'Updated Title' },
+				LOCAL_EDITOR_ORIGIN
+			);
+
+			// With no remote peers present, the update is deferred so nothing
+			// is applied synchronously on the typing hot path.
+			expect(
+				mockSyncConfig.applyChangesToCRDTDoc
+			).not.toHaveBeenCalled();
+
+			// It is applied on the next tick of the event loop.
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+			expect( mockSyncConfig.applyChangesToCRDTDoc ).toHaveBeenCalled();
+		} );
+
+		it( 'applies queued solo updates before a synchronous collaborative update', async () => {
+			const manager = createSyncManager();
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			jest.clearAllMocks();
+
+			// With no remote peers present, the first update is deferred.
+			manager.update(
+				'post',
+				'123',
+				{ title: 'First' },
+				LOCAL_EDITOR_ORIGIN
+			);
+			expect(
+				mockSyncConfig.applyChangesToCRDTDoc
+			).not.toHaveBeenCalled();
+
+			// Simulate a remote peer joining before the deferred update has
+			// been applied.
+			const awareness = manager.getAwareness(
+				'post',
+				'123'
+			) as Awareness;
+			awareness.setLocalState( {} );
+			awareness.states.set( awareness.clientID + 1, {} );
+
+			// The collaborative update is applied synchronously, after the
+			// queued update.
+			manager.update(
+				'post',
+				'123',
+				{ title: 'Second' },
+				LOCAL_EDITOR_ORIGIN
+			);
+
+			const appliedChanges =
+				mockSyncConfig.applyChangesToCRDTDoc.mock.calls.map(
+					( call ) => call[ 1 ]
+				);
+			expect( appliedChanges ).toEqual( [
+				{ title: 'First' },
+				{ title: 'Second' },
+			] );
+		} );
+
 		it( 'does not update when entity is not loaded', async () => {
 			const manager = createSyncManager();
 
 			const changes = { title: 'Updated Title' };
 			manager.update( 'post', '999', changes, 'local-editor' );
 
-			// Wait a tick for yieldToEventLoop.
+			// Wait a tick for any async follow-up work.
 			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 			expect(
@@ -575,7 +849,7 @@ describe( 'SyncManager', () => {
 
 			manager.update( 'post', '123', changes, customOrigin );
 
-			// Wait a tick for yieldToEventLoop.
+			// Wait a tick for any async follow-up work.
 			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 			expect( transactSpy ).toHaveBeenCalledWith(
@@ -584,7 +858,7 @@ describe( 'SyncManager', () => {
 			);
 		} );
 
-		it( 'updates the record metadata when the update is associated with a save', async () => {
+		it( 'updates save metadata when the update is associated with a save', async () => {
 			// Capture the Y.Doc from provider creator.
 			let capturedDoc: Y.Doc | null = null;
 			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
@@ -611,7 +885,7 @@ describe( 'SyncManager', () => {
 				isSave: true,
 			} );
 
-			// Wait a tick for yieldToEventLoop.
+			// Wait a tick for any async follow-up work.
 			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 			// Verify that applyChangesToCRDTDoc was called with the changes.
@@ -627,6 +901,260 @@ describe( 'SyncManager', () => {
 				now
 			);
 			expect( stateMap.get( SAVED_BY_KEY ) ).toBe( ydoc.clientID );
+		} );
+	} );
+
+	describe( 'autosave snapshots', () => {
+		async function loadEntityCapturingDoc() {
+			let capturedDoc: Y.Doc | null = null;
+			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
+				capturedDoc = ydoc;
+				return mockProviderResult;
+			} );
+
+			const manager = createSyncManager();
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			return { manager, ydoc: capturedDoc as unknown as Y.Doc };
+		}
+
+		it( 'encodes a snapshot the same document satisfies', async () => {
+			const { manager, ydoc } = await loadEntityCapturingDoc();
+
+			const stateVectorBefore = Y.encodeStateVector( ydoc );
+
+			const snapshot = manager.getEntitySnapshot( 'post', '123' );
+
+			expect( typeof snapshot ).toBe( 'string' );
+			expect(
+				manager.entityContainsSnapshot( 'post', '123', snapshot ?? '' )
+			).toBe( true );
+
+			// Neither call writes to the document, so the state vector is
+			// unchanged and nothing enters the undo scope.
+			expect( Y.encodeStateVector( ydoc ) ).toEqual( stateVectorBefore );
+			expect( manager.undoManager?.hasUndo() ).toBe( false );
+		} );
+
+		it( 'includes updates issued in the same tick in the snapshot', async () => {
+			const { manager } = await loadEntityCapturingDoc();
+
+			jest.clearAllMocks();
+			mockSyncConfig.applyChangesToCRDTDoc.mockImplementation(
+				( ydoc, changes ) => {
+					const recordMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
+					Object.entries( changes ).forEach( ( [ key, value ] ) => {
+						recordMap.set( key, value );
+					} );
+				}
+			);
+
+			const snapshotBefore = manager.getEntitySnapshot( 'post', '123' );
+
+			// With no remote peers present, this update is deferred to the
+			// next tick.
+			manager.update(
+				'post',
+				'123',
+				{ title: 'Updated Title' },
+				LOCAL_EDITOR_ORIGIN
+			);
+
+			const snapshotAfter = manager.getEntitySnapshot( 'post', '123' );
+
+			// The deferred update was applied before the snapshot was
+			// encoded, so the snapshot describes state the earlier snapshot
+			// does not.
+			expect( snapshotAfter ).not.toEqual( snapshotBefore );
+		} );
+
+		it( 'still matches after the document moves ahead of the snapshot', async () => {
+			const { manager, ydoc } = await loadEntityCapturingDoc();
+			const snapshot = manager.getEntitySnapshot( 'post', '123' ) ?? '';
+
+			ydoc.getText( 'later' ).insert( 0, 'more content' );
+
+			expect(
+				manager.entityContainsSnapshot( 'post', '123', snapshot )
+			).toBe( true );
+		} );
+
+		it( 'does not match a snapshot describing content the document lacks', async () => {
+			const { manager } = await loadEntityCapturingDoc();
+
+			// A snapshot from an unrelated document, i.e. content this
+			// document never received.
+			const otherDoc = new Y.Doc();
+			otherDoc.getText( 'text' ).insert( 0, 'content from elsewhere' );
+			const otherSnapshot = buffer.toBase64(
+				Y.encodeSnapshotV2( Y.snapshot( otherDoc ) )
+			);
+
+			expect(
+				manager.entityContainsSnapshot( 'post', '123', otherSnapshot )
+			).toBe( false );
+		} );
+
+		it( 'fails open for an undecodable snapshot', async () => {
+			const { manager } = await loadEntityCapturingDoc();
+
+			expect(
+				manager.entityContainsSnapshot(
+					'post',
+					'123',
+					'not a snapshot!'
+				)
+			).toBe( false );
+		} );
+
+		it( 'fails open for entities that are not loaded', async () => {
+			const manager = createSyncManager();
+
+			expect(
+				manager.getEntitySnapshot( 'post', '456' )
+			).toBeUndefined();
+			expect(
+				manager.entityContainsSnapshot( 'post', '456', 'anything' )
+			).toBe( false );
+		} );
+	} );
+
+	describe( 'shouldSync', () => {
+		it( 'skips loading entity when shouldSync returns false', async () => {
+			const manager = createSyncManager();
+
+			mockSyncConfig.shouldSync = jest.fn( () => false );
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			expect( mockSyncConfig.shouldSync ).toHaveBeenCalledWith(
+				'post',
+				'123'
+			);
+			expect(
+				mockSyncConfig.applyChangesToCRDTDoc
+			).not.toHaveBeenCalled();
+			expect( mockProviderCreator ).not.toHaveBeenCalled();
+		} );
+
+		it( 'loads entity when shouldSync returns true', async () => {
+			const manager = createSyncManager();
+
+			mockSyncConfig.shouldSync = jest.fn( () => true );
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			expect( mockSyncConfig.shouldSync ).toHaveBeenCalledWith(
+				'post',
+				'123'
+			);
+			expect(
+				mockSyncConfig.applyChangesToCRDTDoc
+			).toHaveBeenCalledTimes( 1 );
+			expect( mockProviderCreator ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'loads entity when shouldSync is not defined', async () => {
+			const manager = createSyncManager();
+
+			delete mockSyncConfig.shouldSync;
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			expect(
+				mockSyncConfig.applyChangesToCRDTDoc
+			).toHaveBeenCalledTimes( 1 );
+			expect( mockProviderCreator ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'skips loading collection when shouldSync returns false', async () => {
+			const manager = createSyncManager();
+
+			mockSyncConfig.shouldSync = jest.fn( () => false );
+
+			const mockCollectionHandlers = {
+				onStatusChange: jest.fn(),
+				refetchRecords: jest.fn( async () => Promise.resolve() ),
+			};
+
+			await manager.loadCollection(
+				mockSyncConfig,
+				'comment',
+				mockCollectionHandlers
+			);
+
+			expect( mockSyncConfig.shouldSync ).toHaveBeenCalledWith(
+				'comment',
+				null
+			);
+			expect( mockProviderCreator ).not.toHaveBeenCalled();
+		} );
+
+		it( 'loads collection when shouldSync returns true', async () => {
+			const manager = createSyncManager();
+
+			mockSyncConfig.shouldSync = jest.fn( () => true );
+
+			const mockCollectionHandlers = {
+				onStatusChange: jest.fn(),
+				refetchRecords: jest.fn( async () => Promise.resolve() ),
+			};
+
+			await manager.loadCollection(
+				mockSyncConfig,
+				'comment',
+				mockCollectionHandlers
+			);
+
+			expect( mockSyncConfig.shouldSync ).toHaveBeenCalledWith(
+				'comment',
+				null
+			);
+			expect( mockProviderCreator ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'loads collection when shouldSync is not defined', async () => {
+			const manager = createSyncManager();
+
+			delete mockSyncConfig.shouldSync;
+
+			const mockCollectionHandlers = {
+				onStatusChange: jest.fn(),
+				refetchRecords: jest.fn( async () => Promise.resolve() ),
+			};
+
+			await manager.loadCollection(
+				mockSyncConfig,
+				'comment',
+				mockCollectionHandlers
+			);
+
+			expect( mockProviderCreator ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 
@@ -672,6 +1200,44 @@ describe( 'SyncManager', () => {
 			expect( mockHandlers.editRecord ).toHaveBeenCalledWith( {
 				title: 'Title from remote peer',
 			} );
+		} );
+
+		it( 'refetches the entity record when a remote save updates save metadata', async () => {
+			// Capture the Y.Doc from provider creator.
+			let capturedDoc: Y.Doc | null = null;
+			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
+				capturedDoc = ydoc;
+				return mockProviderResult;
+			} );
+
+			const manager = createSyncManager();
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			mockHandlers.refetchRecord.mockClear();
+
+			expect( capturedDoc ).not.toBeNull();
+
+			const remoteDoc = new Y.Doc();
+			const stateMap = remoteDoc.getMap( CRDT_STATE_MAP_KEY );
+			stateMap.set( SAVED_AT_KEY, Date.now() + 1000 );
+			stateMap.set( SAVED_BY_KEY, remoteDoc.clientID );
+			Y.applyUpdateV2(
+				capturedDoc as unknown as Y.Doc,
+				Y.encodeStateAsUpdateV2( remoteDoc )
+			);
+			remoteDoc.destroy();
+
+			// Wait a tick.
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+			expect( mockHandlers.refetchRecord ).toHaveBeenCalledTimes( 1 );
 		} );
 
 		it( 'does not edit the local record for local transactions', async () => {

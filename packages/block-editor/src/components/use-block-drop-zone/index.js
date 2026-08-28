@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { useCallback, useState } from '@wordpress/element';
 import {
@@ -13,10 +10,6 @@ import {
 	isUnmodifiedDefaultBlock as getIsUnmodifiedDefaultBlock,
 	store as blocksStore,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import useOnBlockDrop from '../use-on-block-drop';
 import {
 	getDistanceToNearestEdge,

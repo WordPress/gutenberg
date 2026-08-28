@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import {
 	registerBlockType,
 	unregisterBlockType,
 	getBlockType,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import AutoRegisterControls from '../auto-inspector-controls';
 
 describe( 'auto-inspector-controls', () => {

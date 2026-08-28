@@ -1,21 +1,13 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { Spinner } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type { ViewGridProps } from '../../../types';
 import getDataByGroup from '../utils/get-data-by-group';
+import useSelectionProps from '../utils/use-selection-props';
+import { hasAPossibleBulkAction } from '../../dataviews-bulk-actions';
 import CompositeGrid from './composite-grid';
+import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
 
 function ViewGrid< Item >( {
 	actions,
@@ -32,14 +24,45 @@ function ViewGrid< Item >( {
 	className,
 	empty,
 }: ViewGridProps< Item > ) {
+	const isDelayedLoading = useDelayedLoading( !! isLoading );
 	const hasData = !! data?.length;
 	const groupField = view.groupBy?.field
 		? fields.find( ( f ) => f.id === view.groupBy?.field )
 		: null;
 	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
+	// The selection hook must see every selectable item in render order so a
+	// Shift+Click range can span groups and share a single anchor. Each
+	// CompositeGrid renders one group, so derive it here from the flattened
+	// group order rather than inside CompositeGrid.
+	const orderedData = dataByGroup
+		? Array.from( dataByGroup.values() ).flat()
+		: data;
+	const { getSelectionProps } = useSelectionProps( {
+		data: orderedData,
+		getItemId,
+		isItemSelectable: ( item ) => hasAPossibleBulkAction( actions, item ),
+		selection,
+		onChangeSelection,
+		selectionMode: 'multi',
+		shouldSelectOnClick: false,
+	} );
+	if ( ! hasData ) {
+		return (
+			<div
+				className={ clsx( 'dataviews-no-results', {
+					'is-refreshing': isDelayedLoading,
+				} ) }
+			>
+				{ empty }
+			</div>
+		);
+	}
 	const gridProps = {
-		className,
+		className: clsx( className, {
+			'is-refreshing': ! isInfiniteScroll && isDelayedLoading,
+		} ),
+		inert: ! isInfiniteScroll && !! isLoading ? 'true' : undefined,
 		isLoading,
 		view,
 		fields,
@@ -50,6 +73,7 @@ function ViewGrid< Item >( {
 		renderItemLink,
 		getItemId,
 		actions,
+		getSelectionProps,
 	};
 	return (
 		<>
@@ -87,7 +111,7 @@ function ViewGrid< Item >( {
 			}
 			{
 				// Render a single grid with all data.
-				hasData && ! dataByGroup && (
+				! dataByGroup && (
 					<CompositeGrid
 						{ ...gridProps }
 						data={ data }
@@ -95,26 +119,7 @@ function ViewGrid< Item >( {
 					/>
 				)
 			}
-			{
-				// Render empty state.
-				! hasData && (
-					<div
-						className={ clsx( {
-							'dataviews-loading': isLoading,
-							'dataviews-no-results': ! isLoading,
-						} ) }
-					>
-						{ isLoading ? (
-							<p>
-								<Spinner />
-							</p>
-						) : (
-							empty
-						) }
-					</div>
-				)
-			}
-			{ hasData && isLoading && (
+			{ isInfiniteScroll && isLoading && (
 				<p className="dataviews-loading-more">
 					<Spinner />
 				</p>

@@ -58,7 +58,7 @@ function UnforwardedTooltip(
 	// Compute tooltip's placement:
 	// - give priority to `placement` prop, if defined
 	// - otherwise, compute it from the legacy `position` prop (if defined)
-	// - finally, fallback to the default placement: 'bottom'
+	// - finally, fallback to the default placement: 'top'
 	let computedPlacement;
 	if ( placement !== undefined ) {
 		computedPlacement = placement;
@@ -69,7 +69,7 @@ function UnforwardedTooltip(
 			alternative: '`placement` prop',
 		} );
 	}
-	computedPlacement = computedPlacement || 'bottom';
+	computedPlacement = computedPlacement || 'top';
 
 	const tooltipStore = Ariakit.useTooltipStore( {
 		placement: computedPlacement,

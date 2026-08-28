@@ -2,6 +2,46 @@
 
 ## Unreleased
 
+### Internal
+
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+## 4.54.0 (2026-08-26)
+
+## 4.53.0 (2026-08-12)
+
+
+## 4.52.0 (2026-07-29)
+
+## 4.51.0 (2026-07-14)
+
+### Enhancements
+
+-   Use the emphasis font-weight token for UI emphasis ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 4.50.0 (2026-07-01)
+
+## 4.49.0 (2026-06-24)
+
+## 4.48.1 (2026-06-16)
+
+## 4.48.0 (2026-06-10)
+
+## 4.47.0 (2026-05-27)
+
+## 4.46.0 (2026-05-14)
+
+## 4.45.0 (2026-04-29)
+
+## 4.44.0 (2026-04-15)
+
+## 4.43.0 (2026-04-01)
+
+## 4.42.0 (2026-03-18)
+
+## 4.41.0 (2026-03-04)
+
 ## 4.40.0 (2026-02-18)
 
 ## 4.39.0 (2026-01-29)

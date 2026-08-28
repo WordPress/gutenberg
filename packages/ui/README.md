@@ -11,6 +11,10 @@ While similar in scope to `@wordpress/components`, there are a few key differenc
 -   `@wordpress/components` grew organically as a collection of unrelated UI elements for WordPress screens. In contrast, this package is an implementation of a design system that guarantees user- and developer-facing cohesion between components.
 -   Unlike `@wordpress/components`, this package is not bundled as a WordPress script available on the `window.wp` global and is instead distributed as an npm package that follows [semantic versioning](https://semver.org/) for release changes.
 
+`@wordpress/theme`, `@wordpress/ui`, and `@wordpress/icons` form the foundational layer of the Design System. Higher-level compositional packages, including `@wordpress/dataviews` and `@wordpress/admin-ui`, build common solutions from those foundations. See the version-matched [Design System introduction](../../storybook/stories/design-system/introduction.mdx) in a Gutenberg checkout, or the [latest copy on Gutenberg trunk](https://github.com/WordPress/gutenberg/blob/trunk/storybook/stories/design-system/introduction.mdx) when reading this package outside the monorepo.
+
+This package includes many common UI components, but equivalent components can still live in `@wordpress/components`. For current component-by-component guidance, including when an existing `@wordpress/components` component remains the recommended choice, see the version-matched [`use-recommended-components` rule documentation](../eslint-plugin/docs/rules/use-recommended-components.md) in a Gutenberg checkout, or the [latest copy on Gutenberg trunk](https://github.com/WordPress/gutenberg/blob/trunk/packages/eslint-plugin/docs/rules/use-recommended-components.md) when reading this package outside the monorepo.
+
 This is a companion to the `@wordpress/theme` package that provides:
 
 -   **Design Tokens**: A comprehensive system of design tokens for colors, spacing, typography, and more
@@ -24,15 +28,66 @@ Install using NPM:
 npm install @wordpress/ui
 ```
 
-As an implementation of the design system and companion to the `@wordpress/theme` package, these components depend on CSS custom properties defined by the theme package. This is managed on your behalf in a WordPress admin page context, but you will need to install and include the base theme stylesheet yourself if you're using the components in an application outside WordPress:
+## Setup
+
+As an implementation of the design system and companion to the `@wordpress/theme` package, these components depend on CSS custom properties defined by the theme package. What you need to set up depends on whether you're building for a WordPress context, and how much of the theming features you want to use.
+
+### Within standard WordPress editor screens
+
+In standard WordPress editor screens (such as the post editor or the site editor), stylesheets, isolation styles, and layout styles are managed centrally by Gutenberg. You don't need to add any setup yourself — and you should avoid doing so in this shared context to prevent conflicts.
+
+### Elsewhere
+
+The components ship with built-in fallback values for all CSS custom properties, so they work out of the box without any theme setup. For full theming capabilities, it's recommended that you install and load the design tokens stylesheet:
 
 ```
 npm install @wordpress/theme
 ```
 
-```tsx
+```js
 import '@wordpress/theme/design-tokens.css';
 ```
+
+This stylesheet is universal and does not have a separate RTL version.
+
+To ensure that portaled popovers appear correctly, add these isolation styles to your application's layout root element:
+
+```css
+.root {
+	isolation: isolate;
+}
+```
+
+In order to support overlay elements such as backdrops to correctly cover the whole browser viewport even when scrolled, add the following style to your global styles:
+
+```css
+body {
+	position: relative;
+}
+```
+
+Components in this package use [CSS cascade layers](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Cascade_layers) when defining their styles, which can conflict in some applications which apply styles on bare element selectors (for example, `input { border-color: #aaa; }`). You should avoid these kinds of bare element selector styling if you can, preferring CSS classes instead where possible.
+
+If you need to customize the cascade layer order relative to your own CSS cascade layers, the component styles are scoped under the `wp-ui` layer, which you can use when defining your own layer order:
+
+```css
+@layer wp-ui, example-app;
+```
+
+#### Mixing with `@wordpress/components`
+
+If your app pairs `@wordpress/ui` with `@wordpress/components` overlays and bundles both packages directly (i.e. without relying on the `window.wp.components` global exposed by WordPress's script-loader), call `useEnableWpCompatOverlaySlot()` once from a long-lived root component:
+
+```tsx
+import { useEnableWpCompatOverlaySlot } from '@wordpress/ui';
+
+function App() {
+	useEnableWpCompatOverlaySlot();
+	return <YourApp />;
+}
+```
+
+This opts the app into a shared body-level overlay container so `@wordpress/ui` overlays reliably stack above `@wordpress/components` overlays. The opt-in is one-way and idempotent. It is not needed in standard WordPress editor screens, where the slot auto-enables based on `window.wp.components`.
 
 ## Usage
 
@@ -95,6 +150,88 @@ function MyComponent() {
 	return <Stack className="my-custom-class">{ /* ... */ }</Stack>;
 }
 ```
+
+### Controlled and Uncontrolled Modes
+
+Interactive components that manage internal state (such as open/closed, selected value, etc.) follow a consistent prop naming convention that supports both **controlled** and **uncontrolled** usage.
+
+#### Prop naming pattern
+
+For a given state `x`, the convention is:
+
+| Prop        | Purpose                                                                                                                                 |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `defaultX`  | Sets the initial value in **uncontrolled** mode. The component manages subsequent state changes internally.                             |
+| `x`         | Sets the current value in **controlled** mode. The consumer is responsible for updating the value in response to changes.               |
+| `onXChange` | Callback invoked when the state changes. Receives the new value as its first argument. Works in both controlled and uncontrolled modes. |
+
+For example, a component with an open/closed state would expose:
+
+-   `defaultOpen` — initial open state (uncontrolled)
+-   `open` — current open state (controlled)
+-   `onOpenChange` — called when the open state changes
+
+And a component with a selectable value would expose:
+
+-   `defaultValue` — initial value (uncontrolled)
+-   `value` — current value (controlled)
+-   `onValueChange` — called when the value changes
+
+#### Uncontrolled usage
+
+In uncontrolled mode, the component manages its own state. Use `defaultX` to set the initial value, and optionally `onXChange` to react to changes:
+
+```tsx
+import { Tabs } from '@wordpress/ui';
+
+function MyTabs() {
+	return (
+		<Tabs.Root
+			defaultValue="tab1"
+			onValueChange={ ( value ) => console.log( value ) }
+		>
+			<Tabs.List>
+				<Tabs.Tab value="tab1">Tab 1</Tabs.Tab>
+				<Tabs.Tab value="tab2">Tab 2</Tabs.Tab>
+			</Tabs.List>
+			<Tabs.Panel value="tab1">Content 1</Tabs.Panel>
+			<Tabs.Panel value="tab2">Content 2</Tabs.Panel>
+		</Tabs.Root>
+	);
+}
+```
+
+#### Controlled usage
+
+In controlled mode, the consumer owns the state and passes it via `x`. State changes are handled through `onXChange`:
+
+```tsx
+import { useState } from '@wordpress/element';
+import { CollapsibleCard } from '@wordpress/ui';
+
+function MyCard() {
+	const [ isOpen, setIsOpen ] = useState( false );
+
+	return (
+		<CollapsibleCard.Root open={ isOpen } onOpenChange={ setIsOpen }>
+			<CollapsibleCard.Header>Details</CollapsibleCard.Header>
+			<CollapsibleCard.Content>
+				Collapsible content here.
+			</CollapsibleCard.Content>
+		</CollapsibleCard.Root>
+	);
+}
+```
+
+When both `x` and `defaultX` are provided, `x` takes precedence and the component behaves in controlled mode. When neither is provided, the component uses its own internal default (typically documented via a `@default` JSDoc tag on the `defaultX` prop).
+
+#### Difference from native `onChange`
+
+The `onXChange` callback is distinct from the native DOM `onChange` event handler. Native `onChange` fires a `React.ChangeEvent` tied to a specific DOM element, while `onXChange` provides the new **value** directly — making it simpler to use and consistent across all components, including compound and non-form components.
+
+Components that wrap native form elements may still support native event handlers (like `onChange`, `onInput`) for interoperability, but `onXChange` is the recommended approach within this package.
+
+For guidance on implementing this pattern in new components, see [Controlled and uncontrolled props](./CONTRIBUTING.md#controlled-and-uncontrolled-props).
 
 ## Contributing to this package
 

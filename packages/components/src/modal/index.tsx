@@ -19,11 +19,11 @@ import {
 import { __ } from '@wordpress/i18n';
 import { close } from '@wordpress/icons';
 import { getScrollContainer } from '@wordpress/dom';
+import { withIgnoreIMEEvents } from '@wordpress/keycodes';
 import * as ariaHelper from './aria-helper';
 import Button from '../button';
 import StyleProvider from '../style-provider';
 import type { ModalProps } from './types';
-import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 import { Spacer } from '../spacer';
 import { useModalExitAnimation } from './use-modal-exit-animation';
 import { ModalContext, type Dismissers } from './context';
@@ -168,8 +168,7 @@ function UnforwardedModal(
 		};
 	}, [ bodyOpenClassName ] );
 
-	const { closeModal, frameRef, frameStyle, overlayClassname } =
-		useModalExitAnimation();
+	const { closeModal, frameRef, overlayClassname } = useModalExitAnimation();
 
 	// Calls the isContentScrollable callback when the Modal children container resizes.
 	useLayoutEffect( () => {
@@ -196,6 +195,7 @@ function UnforwardedModal(
 			! event.defaultPrevented
 		) {
 			event.preventDefault();
+			event.stopPropagation();
 			closeModal().then( () => onRequestClose( event ) );
 		}
 	}
@@ -259,10 +259,7 @@ function UnforwardedModal(
 						sizeClass,
 						className
 					) }
-					style={ {
-						...frameStyle,
-						...style,
-					} }
+					style={ style }
 					ref={ useMergeRefs( [
 						frameRef,
 						constrainedTabbingRef,

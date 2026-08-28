@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
@@ -8,11 +5,7 @@ import {
 	privateApis as corePrivateApis,
 	type WpTemplate,
 } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../lock-unlock';
+import { unlock } from '@wordpress/routes-lock-unlock';
 import type { Template } from './types';
 
 const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
@@ -28,8 +21,18 @@ export function useTemplates( activeView: string = 'active' ) {
 		useSelect( ( select ) => {
 			const { getEntityRecord, getCurrentTheme } = select( coreStore );
 			return {
-				activeTemplatesOption: getEntityRecord( 'root', 'site' )
-					?.active_templates,
+				activeTemplatesOption: (
+					getEntityRecord( 'root', 'site' ) as
+						| {
+								/* Experimental option, absent from the
+								   `Settings` entity type. */
+								active_templates?: Record<
+									string,
+									string | number
+								>;
+						  }
+						| undefined
+				 )?.active_templates,
 				activeTheme: getCurrentTheme(),
 				defaultTemplateTypes:
 					select( coreStore ).getCurrentTheme()

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { Preview } from '@wordpress/lazy-editor';
 import type { WpTemplatePart } from '@wordpress/core-data';
