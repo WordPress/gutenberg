@@ -153,3 +153,107 @@ test.describe( 'Meta boxes', () => {
 		).toHaveAttribute( 'content', 'Explicitly set excerpt.' );
 	} );
 } );
+
+test.describe( 'Meta box locations', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-side-meta-box-demo'
+		);
+		await requestUtils.deleteAllPosts();
+	} );
+
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-side-meta-box-demo'
+		);
+	} );
+
+	test( 'Should save content typed into a TinyMCE meta box field', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'TinyMCE meta box' );
+
+		// Click near the label, away from the resize handle overlaying the
+		// center of the toggle.
+		await page
+			.getByRole( 'button', { name: 'Meta Boxes', exact: true } )
+			.click( { position: { x: 40, y: 10 } } );
+		const mainFrame = page.frameLocator(
+			'iframe[name="gutenberg-meta-boxes"]'
+		);
+		const richText = mainFrame
+			.frameLocator( '#demo_summary_ifr' )
+			.locator( 'body#tinymce' );
+		await richText.click();
+		await page.keyboard.type( 'Typed into the editor.' );
+
+		const metaBoxesSaved = page.waitForResponse(
+			( response ) =>
+				response.url().includes( 'meta-box-loader=1' ) &&
+				response.request().method() === 'POST'
+		);
+		await editor.saveDraft();
+		await metaBoxesSaved;
+		await page.reload();
+
+		await page
+			.getByRole( 'button', { name: 'Meta Boxes', exact: true } )
+			.click( { position: { x: 40, y: 10 } } );
+		await expect(
+			mainFrame
+				.frameLocator( '#demo_summary_ifr' )
+				.locator( 'body#tinymce' )
+		).toHaveText( 'Typed into the editor.' );
+	} );
+
+	test( 'Should render and save side location meta boxes in the settings sidebar', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.openDocumentSettingsSidebar();
+		const sideFrame = page.frameLocator(
+			'iframe[name="gutenberg-meta-boxes-side"]'
+		);
+		await sideFrame
+			.getByRole( 'textbox', { name: 'Venue' } )
+			.fill( 'School field' );
+		await sideFrame
+			.getByRole( 'checkbox', { name: 'Show on the front page' } )
+			.check();
+		await sideFrame
+			.getByRole( 'combobox', { name: 'Layout' } )
+			.selectOption( 'narrow' );
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Side boxes' );
+
+		const metaBoxesSaved = page.waitForResponse(
+			( response ) =>
+				response.url().includes( 'meta-box-loader=1' ) &&
+				response.request().method() === 'POST'
+		);
+		await editor.saveDraft();
+		await metaBoxesSaved;
+		await page.reload();
+
+		await editor.openDocumentSettingsSidebar();
+		await expect(
+			sideFrame.getByRole( 'textbox', { name: 'Venue' } )
+		).toHaveValue( 'School field' );
+		await expect(
+			sideFrame.getByRole( 'checkbox', {
+				name: 'Show on the front page',
+			} )
+		).toBeChecked();
+		await expect(
+			sideFrame.getByRole( 'combobox', { name: 'Layout' } )
+		).toHaveValue( 'narrow' );
+	} );
+} );
