@@ -1,10 +1,9 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const { EXPERIMENTS, EDITOR_CONTEXTS, openPostSummary } = require( './utils' );
 
 test.describe( 'Post Summary', () => {
 	test.beforeEach( async ( { requestUtils } ) => {
-		await requestUtils.setGutenbergExperiments( [
-			'gutenberg-dataform-inspector',
-		] );
+		await requestUtils.setGutenbergExperiments( EXPERIMENTS );
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
@@ -16,41 +15,6 @@ test.describe( 'Post Summary', () => {
 		const UPDATED_DESCRIPTION =
 			'Updated pattern description from DataForm.';
 		const FINAL_CONTENT = `<!-- wp:paragraph -->\n<p>Pattern summary content with eight words here again.</p>\n<!-- /wp:paragraph -->`;
-		const EDITOR_CONTEXTS = [
-			{
-				name: 'post editor',
-				openPattern: async ( { admin, pattern } ) => {
-					await admin.editPost( pattern.id );
-				},
-				savePattern: async ( { page } ) => {
-					await page
-						.getByRole( 'region', { name: 'Editor top bar' } )
-						.getByRole( 'button', { name: 'Save', exact: true } )
-						.click();
-					await page
-						.getByRole( 'button', {
-							name: 'Dismiss this notice',
-						} )
-						.filter( { hasText: 'Pattern updated.' } )
-						.waitFor();
-				},
-			},
-			{
-				name: 'site editor',
-				openPattern: async ( { admin, pattern } ) => {
-					await admin.visitSiteEditor( {
-						postId: pattern.id,
-						postType: 'wp_block',
-						canvas: 'edit',
-					} );
-				},
-				savePattern: async ( { editor } ) => {
-					await editor.saveSiteEditorEntities( {
-						isOnlyCurrentEntityDirty: true,
-					} );
-				},
-			},
-		];
 
 		test.beforeAll( async ( { requestUtils } ) => {
 			await requestUtils.activateTheme( 'emptytheme' );
@@ -65,7 +29,7 @@ test.describe( 'Post Summary', () => {
 			await requestUtils.activateTheme( 'twentytwentyone' );
 		} );
 
-		for ( const { name, openPattern, savePattern } of EDITOR_CONTEXTS ) {
+		for ( const { name, open, save } of EDITOR_CONTEXTS ) {
 			test( `shows pattern summary fields in the ${ name }`, async ( {
 				admin,
 				editor,
@@ -74,9 +38,16 @@ test.describe( 'Post Summary', () => {
 			} ) => {
 				const pattern =
 					await createPatternWithSummaryData( requestUtils );
-				await openPattern( { admin, pattern } );
+				await open(
+					{ admin, page },
+					{ postType: 'wp_block', postId: pattern.id }
+				);
 
-				const summary = await openPatternSummary( { editor, page } );
+				const summary = await openPostSummary( {
+					editor,
+					page,
+					tab: 'Pattern',
+				} );
 				const fields = getPatternSummaryFields( { page, summary } );
 
 				await expect(
@@ -106,12 +77,13 @@ test.describe( 'Post Summary', () => {
 					fields.syncStatus.row.getByRole( 'button' )
 				).toHaveCount( 0 );
 
-				await savePattern( { editor, page } );
+				await save( { editor, page } );
 				await page.reload();
 
-				const reloadedSummary = await openPatternSummary( {
+				const reloadedSummary = await openPostSummary( {
 					editor,
 					page,
+					tab: 'Pattern',
 				} );
 				await expect(
 					getPatternSummaryFields( {
@@ -132,7 +104,11 @@ test.describe( 'Post Summary', () => {
 			const title = 'DataForm direct synced pattern';
 			await createPatternFromModal( { admin, page, title } );
 
-			const summary = await openPatternSummary( { editor, page } );
+			const summary = await openPostSummary( {
+				editor,
+				page,
+				tab: 'Pattern',
+			} );
 			const fields = getPatternSummaryFields( { page, summary } );
 
 			await expect( fields.title ).toHaveText( title );
@@ -154,7 +130,11 @@ test.describe( 'Post Summary', () => {
 				isSynced: false,
 			} );
 
-			const summary = await openPatternSummary( { editor, page } );
+			const summary = await openPostSummary( {
+				editor,
+				page,
+				tab: 'Pattern',
+			} );
 			const fields = getPatternSummaryFields( { page, summary } );
 
 			await expect( fields.title ).toHaveText( title );
@@ -216,22 +196,6 @@ test.describe( 'Post Summary', () => {
 			await expect( modal ).toBeHidden();
 		}
 
-		async function openPatternSummary( { editor, page } ) {
-			await editor.openDocumentSettingsSidebar();
-
-			const settingsSidebar = page.getByRole( 'region', {
-				name: 'Editor settings',
-			} );
-			await settingsSidebar
-				.getByRole( 'tab', { name: 'Pattern' } )
-				.click();
-
-			const summary = page.locator( '.editor-post-summary' );
-			await expect( summary ).toBeVisible();
-
-			return summary;
-		}
-
 		function getPatternSummaryFields( { page, summary } ) {
 			return {
 				title: summary.locator( '.editor-post-card-panel__title-name' ),
@@ -280,10 +244,7 @@ test.describe( 'Post Summary', () => {
 			page,
 		} ) => {
 			await admin.createNewPost();
-			await editor.openDocumentSettingsSidebar();
-
-			const summary = page.locator( '.editor-post-summary' );
-			await expect( summary ).toBeVisible();
+			const summary = await openPostSummary( { editor, page } );
 
 			// A new post is an `auto-draft`, which should be presented as
 			// a Draft.
