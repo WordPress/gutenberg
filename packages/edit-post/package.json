@@ -47,7 +47,6 @@
 		"postbox"
 	],
 	"dependencies": {
-		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/admin-ui": "file:../admin-ui",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/base-styles": "file:../base-styles",
@@ -60,7 +59,6 @@
 		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
 		"@wordpress/deprecated": "file:../deprecated",
-		"@wordpress/dom": "file:../dom",
 		"@wordpress/editor": "file:../editor",
 		"@wordpress/element": "file:../element",
 		"@wordpress/global-styles-engine": "file:../global-styles-engine",
@@ -77,8 +75,6 @@
 		"@wordpress/theme": "file:../theme",
 		"@wordpress/ui": "file:../ui",
 		"@wordpress/url": "file:../url",
-		"@wordpress/viewport": "file:../viewport",
-		"@wordpress/warning": "file:../warning",
 		"@wordpress/widgets": "file:../widgets",
 		"clsx": "^2.1.1"
 	},

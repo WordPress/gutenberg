@@ -62,7 +62,6 @@
 		"fast-glob": "^3.2.7",
 		"jest": "^30.4.1",
 		"jest-environment-jsdom": "^30.4.1",
-		"jest-environment-node": "^30.4.1",
 		"json2php": "^0.0.9",
 		"markdownlint-cli": "^0.31.1",
 		"mini-css-extract-plugin": "^2.9.2",
