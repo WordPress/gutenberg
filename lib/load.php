@@ -118,6 +118,7 @@ require __DIR__ . '/compat/wordpress-7.0/kses.php';
 require __DIR__ . '/compat/wordpress-7.0/command-palette.php';
 require __DIR__ . '/compat/wordpress-7.0/script-modules.php';
 require __DIR__ . '/compat/wordpress-7.0/fonts.php';
+require __DIR__ . '/compat/wordpress-7.0/meta-box-iframe.php';
 
 if ( class_exists( '\WordPress\AiClient\AiClient' ) ) {
 	require __DIR__ . '/compat/wordpress-7.0/class-wp-connector-registry.php';
@@ -141,7 +142,6 @@ require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/script-modules.php';
 require __DIR__ . '/experimental/pages/site-editor.php';
 require __DIR__ . '/experimental/collaboration/meta-box-rtc-compat.php';
-require __DIR__ . '/experimental/meta-box-iframe.php';
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-extensible-site-editor' ) ) {
 	require __DIR__ . '/experimental/extensible-site-editor.php';
