@@ -476,7 +476,10 @@ export default function QueryInspectorControls( props ) {
 					{ showExcludeCurrentControl && (
 						<ToolsPanelItem
 							label={ __( 'Exclude' ) }
-							hasValue={ () => excludeCurrent !== null }
+							hasValue={ () =>
+								excludeCurrent !== undefined &&
+								excludeCurrent !== null
+							}
 							onDeselect={ () =>
 								setQuery( { excludeCurrent: null } )
 							}
