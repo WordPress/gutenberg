@@ -211,6 +211,7 @@ export function AddReactionButton( {
 
 	return (
 		<Dropdown
+			className="editor-collab-sidebar-panel__add-reaction"
 			popoverProps={ {
 				...POPOVER_PROPS,
 				// The popup wraps a searchbox, a nested popup trigger, and
@@ -229,7 +230,7 @@ export function AddReactionButton( {
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<IconButton
 					size="small"
-					variant="minimal"
+					variant="outline"
 					tone="neutral"
 					className="editor-collab-sidebar-panel__add-reaction-button"
 					icon={ smileyIcon }

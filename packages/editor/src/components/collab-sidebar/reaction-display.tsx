@@ -312,7 +312,11 @@ function ReactionButton( {
 				render={
 					<Button
 						size="small"
-						variant="minimal"
+						// The Design System styles `aria-pressed` only on the
+						// neutral minimal variant, so the current user's own
+						// reaction takes that solid chip while everyone else's
+						// reads as a quieter outline.
+						variant={ isActive ? 'minimal' : 'outline' }
 						tone="neutral"
 						className="editor-collab-sidebar-panel__reaction-button"
 						disabled={ disabled }
