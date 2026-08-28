@@ -243,10 +243,6 @@ export const Creatable: Story = {
 	},
 };
 
-/**
- * Announce loading through `Status` and the empty list through `Empty`.
- * Keep `Status` mounted and change its children.
- */
 export const AsyncItems: Story = {
 	render: function Template( args ) {
 		const [ loading, setLoading ] = useState( true );
