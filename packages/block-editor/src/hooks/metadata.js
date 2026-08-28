@@ -21,6 +21,14 @@ export function addMetaAttribute( blockTypeSettings ) {
 		...blockTypeSettings.attributes,
 		[ META_ATTRIBUTE_NAME ]: {
 			type: 'object',
+			/*
+			 * Declares the collection keys so real-time collaboration can share
+			 * one container per key instead of losing a concurrent first write.
+			 * See https://github.com/WordPress/gutenberg/issues/74751.
+			 */
+			query: {
+				noteId: { type: 'array' },
+			},
 		},
 	};
 

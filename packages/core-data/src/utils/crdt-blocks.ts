@@ -224,10 +224,117 @@ export function deserializeBlockAttributes( blocks: Block[] ): Block[] {
 		return {
 			...rest,
 			name,
-			attributes: newAttributes,
+			attributes: withoutEmptyDeclaredContainers( name, newAttributes ),
 			innerBlocks: deserializeBlockAttributes( innerBlocks ?? [] ),
 		};
 	} );
+}
+
+/**
+ * Remove the empty declared containers the document materializes (see
+ * createEmptyYContainer). Editor blocks omit those keys, so they are stripped
+ * whenever blocks are read back out of the document.
+ *
+ * @param blockName  The block type name.
+ * @param attributes The block attributes, as plain values from toJSON().
+ * @return The attributes without empty declared containers.
+ */
+function withoutEmptyDeclaredContainers(
+	blockName: string,
+	attributes: BlockAttributes
+): BlockAttributes {
+	let newAttributes: BlockAttributes | undefined;
+
+	for ( const [ attributeName, schema ] of getBlockAttributeSchemas(
+		blockName
+	) ) {
+		const value = attributes?.[ attributeName ];
+
+		if ( ! schema.query || value === undefined ) {
+			continue;
+		}
+
+		const stripped = withoutEmptyDeclaredValues( schema, value );
+
+		if ( stripped === value ) {
+			continue;
+		}
+
+		newAttributes = newAttributes ?? { ...attributes };
+
+		if ( stripped === undefined ) {
+			delete newAttributes[ attributeName ];
+		} else {
+			newAttributes[ attributeName ] = stripped;
+		}
+	}
+
+	return newAttributes ?? attributes;
+}
+
+/**
+ * Recursively strip a value's empty declared containers, returning undefined
+ * once nothing is left.
+ *
+ * @param schema The attribute type definition for this value.
+ * @param value  The value, as plain values from toJSON().
+ * @return The stripped value, undefined when empty, or `value` when unchanged.
+ */
+function withoutEmptyDeclaredValues(
+	schema: BlockAttributeSchema,
+	value: unknown
+): unknown {
+	if ( schema.type === 'array' ) {
+		return Array.isArray( value ) && value.length === 0 ? undefined : value;
+	}
+
+	if ( schema.type !== 'object' || ! schema.query || ! isRecord( value ) ) {
+		return value;
+	}
+
+	let newValue: Record< string, unknown > | undefined;
+
+	for ( const [ key, subSchema ] of Object.entries( schema.query ) ) {
+		if ( ! Object.hasOwn( value, key ) ) {
+			continue;
+		}
+
+		const stripped = withoutEmptyDeclaredValues( subSchema, value[ key ] );
+
+		if ( stripped === value[ key ] ) {
+			continue;
+		}
+
+		newValue = newValue ?? { ...value };
+
+		if ( stripped === undefined ) {
+			delete newValue[ key ];
+		} else {
+			newValue[ key ] = stripped;
+		}
+	}
+
+	const result = newValue ?? value;
+
+	return Object.keys( result ).length === 0 ? undefined : result;
+}
+
+/**
+ * Recursively remove the empty declared containers from blocks extracted from
+ * the CRDT document.
+ *
+ * @param blocks Blocks as extracted from the CRDT document via toJSON().
+ * @return The blocks without empty declared containers.
+ */
+export function stripEmptyDeclaredContainers( blocks: Block[] ): Block[] {
+	return blocks.map( ( block: Block ) => ( {
+		...block,
+		attributes: withoutEmptyDeclaredContainers(
+			block.name,
+			block.attributes
+		),
+		innerBlocks: stripEmptyDeclaredContainers( block.innerBlocks ?? [] ),
+	} ) );
 }
 
 /**
@@ -244,8 +351,18 @@ function areBlocksEqual( gblock: Block, yblock: YBlock ): boolean {
 		clientId: null,
 	};
 	const res = fastDeepEqual(
-		Object.assign( {}, gblock, overwrites ),
-		Object.assign( {}, yblockAsJson, overwrites )
+		Object.assign( {}, gblock, overwrites, {
+			attributes: withoutEmptyDeclaredContainers(
+				gblock.name,
+				gblock.attributes
+			),
+		} ),
+		Object.assign( {}, yblockAsJson, overwrites, {
+			attributes: withoutEmptyDeclaredContainers(
+				yblockAsJson.name,
+				yblockAsJson.attributes as unknown as BlockAttributes
+			),
+		} )
 	);
 	const inners = gblock.innerBlocks || [];
 	const yinners = yblock.get( 'innerBlocks' );
@@ -262,7 +379,7 @@ function createNewYAttributeMap(
 	blockName: string,
 	attributes: BlockAttributes
 ): YBlockAttributes {
-	return new Y.Map(
+	const yMap = new Y.Map(
 		Object.entries( attributes ).map(
 			( [ attributeName, attributeValue ] ) => {
 				return [
@@ -276,6 +393,24 @@ function createNewYAttributeMap(
 			}
 		)
 	);
+
+	// Materialize declared containers the block omits, so they are created
+	// with the block instead of by whoever writes the attribute first.
+	for ( const [ attributeName, schema ] of getBlockAttributeSchemas(
+		blockName
+	) ) {
+		if ( ! schema.query || Object.hasOwn( attributes, attributeName ) ) {
+			continue;
+		}
+
+		const container = createEmptyYContainer( schema );
+
+		if ( container ) {
+			yMap.set( attributeName, container );
+		}
+	}
+
+	return yMap;
 }
 
 function createNewYAttributeValue(
@@ -324,11 +459,86 @@ function createYValueFromSchema(
 		return yArray;
 	}
 
+	// Arrays of primitives are stored as Y.Array too, so that concurrent
+	// insertions are preserved. Arrays of objects without a query schema have
+	// no described structure to merge, so they stay plain values.
+	if (
+		schema.type === 'array' &&
+		Array.isArray( value ) &&
+		value.every( ( item ) => item === null || typeof item !== 'object' )
+	) {
+		const yArray = new Y.Array< unknown >();
+
+		if ( value.length > 0 ) {
+			yArray.insert( 0, value );
+		}
+
+		return yArray;
+	}
+
 	if ( schema.type === 'object' && schema.query && isRecord( value ) ) {
 		return createYMapFromQuery( schema.query, value );
 	}
 
 	return value;
+}
+
+/**
+ * Create the empty shared container a schema describes.
+ *
+ * Containers are materialized for every block up front: Yjs keeps concurrent
+ * insertions into a shared container, but resolves concurrent creation of the
+ * container itself as last-writer-wins, discarding one peer's contents.
+ *
+ * @param schema The attribute type definition.
+ * @return The empty container, or undefined when the schema describes none.
+ */
+function createEmptyYContainer(
+	schema: BlockAttributeSchema | undefined
+): Y.Array< unknown > | Y.Map< unknown > | undefined {
+	if ( schema?.type === 'array' ) {
+		return new Y.Array< unknown >();
+	}
+
+	if ( schema?.type === 'object' && schema.query ) {
+		return createYMapFromQuery( schema.query, undefined );
+	}
+
+	return undefined;
+}
+
+/**
+ * Empty a container in place. Re-creating it would reintroduce the creation
+ * race that materializing it avoids, so containers are only ever cleared.
+ *
+ * @param container      The Y.js container to empty.
+ * @param schema         The attribute type definition for the container.
+ * @param cursorPosition The local cursor position for rich-text delta merges.
+ * @param cursorScope    The selected block attribute scope for rich-text cursor hints.
+ */
+function clearYContainer(
+	container: unknown,
+	schema: BlockAttributeSchema | undefined,
+	cursorPosition: MergeCursorPosition,
+	cursorScope: RichTextCursorScope
+): void {
+	if ( container instanceof Y.Array ) {
+		if ( container.length > 0 ) {
+			container.delete( 0, container.length );
+		}
+		return;
+	}
+
+	if ( container instanceof Y.Map && schema?.query ) {
+		// Clears every key, preserving the declared nested containers.
+		mergeYMapValues(
+			container,
+			{},
+			schema.query,
+			cursorPosition,
+			cursorScope
+		);
+	}
 }
 
 /**
@@ -353,16 +563,28 @@ function createYMapFromQuery(
 	query: Record< string, BlockAttributeSchema >,
 	obj: unknown
 ): Y.Map< unknown > {
-	if ( ! isRecord( obj ) ) {
-		return new Y.Map();
-	}
+	const record = isRecord( obj ) ? obj : {};
 
-	const entries: [ string, unknown ][] = Object.entries( obj ).map(
+	const entries: [ string, unknown ][] = Object.entries( record ).map(
 		( [ key, val ] ): [ string, unknown ] => {
 			const subSchema = query[ key ];
 			return [ key, createYValueFromSchema( subSchema, val ) ];
 		}
 	);
+
+	// Materialize declared containers the value omits, so they are created
+	// with the block instead of by whoever writes the key first.
+	for ( const [ key, subSchema ] of Object.entries( query ) ) {
+		if ( Object.hasOwn( record, key ) ) {
+			continue;
+		}
+
+		const container = createEmptyYContainer( subSchema );
+
+		if ( container ) {
+			entries.push( [ key, container ] );
+		}
+	}
 
 	return new Y.Map( entries );
 }
@@ -559,12 +781,36 @@ export function mergeCrdtBlocks(
 
 						// Delete any attributes that are no longer present.
 						localAttributes.forEach(
-							( _attrValue: unknown, attrName: string ) => {
+							( attrValue: unknown, attrName: string ) => {
 								if (
 									! incomingBlockPropertyValue.hasOwnProperty(
 										attrName
 									)
 								) {
+									const schema = getBlockAttributeSchema(
+										incomingYBlock.name,
+										attrName
+									);
+
+									// Declared containers are emptied, never
+									// deleted, so they stay shared across peers.
+									if (
+										attrValue instanceof Y.AbstractType &&
+										createEmptyYContainer( schema )
+									) {
+										clearYContainer(
+											attrValue,
+											schema,
+											attributeCursor,
+											{
+												attributeKey: attrName,
+												clientId:
+													incomingYBlock.clientId,
+											}
+										);
+										return;
+									}
+
 									localAttributes.delete( attrName );
 								}
 							}
@@ -843,6 +1089,12 @@ function mergeYValue(
 	) {
 		mergeYArray( currentVal, newVal, schema, cursorPosition, cursorScope );
 	} else if (
+		schema?.type === 'array' &&
+		Array.isArray( newVal ) &&
+		currentVal instanceof Y.Array
+	) {
+		mergeYPlainArray( currentVal, newVal );
+	} else if (
 		schema?.type === 'object' &&
 		schema.query &&
 		isRecord( newVal ) &&
@@ -855,6 +1107,13 @@ function mergeYValue(
 			cursorPosition,
 			cursorScope
 		);
+	} else if (
+		currentVal instanceof Y.AbstractType &&
+		createEmptyYContainer( schema )
+	) {
+		// The incoming value cannot fill the declared container: it is absent
+		// or no longer the declared shape. Empty it rather than replace it.
+		clearYContainer( currentVal, schema, cursorPosition, cursorScope );
 	} else {
 		const newYValue = createYValueFromSchema( schema, newVal );
 
@@ -864,6 +1123,59 @@ function mergeYValue(
 		if ( newYValue !== newVal || ! fastDeepEqual( currentVal, newVal ) ) {
 			yMap.set( key, newYValue );
 		}
+	}
+}
+
+/**
+ * Merge an incoming plain array into an existing Y.Array of plain values.
+ *
+ * Uses the same left-right sweep diff as mergeYArray, comparing values
+ * directly. Keeping the Y.Array itself is the point: concurrent insertions are
+ * both preserved, whereas replacing it wholesale would discard one.
+ *
+ * @param yArray   The existing Y.Array to update.
+ * @param newValue The new plain array to merge into the Y.Array.
+ */
+function mergeYPlainArray( yArray: Y.Array< unknown >, newValue: unknown[] ) {
+	const numOfCommonEntries = Math.min( newValue.length, yArray.length );
+
+	let left = 0;
+	let right = 0;
+
+	// Skip equal elements from left.
+	for (
+		;
+		left < numOfCommonEntries &&
+		fastDeepEqual( newValue[ left ], yArray.get( left ) );
+		left++
+	) {
+		/* nop */
+	}
+
+	// Skip equal elements from right.
+	for (
+		;
+		right < numOfCommonEntries - left &&
+		fastDeepEqual(
+			newValue[ newValue.length - right - 1 ],
+			yArray.get( yArray.length - right - 1 )
+		);
+		right++
+	) {
+		/* nop */
+	}
+
+	// Replace the changed middle section. Only that range is touched, so an
+	// element another peer concurrently inserted outside it is left alone.
+	const numOfStaleEntries = yArray.length - left - right;
+	const numOfNewEntries = newValue.length - left - right;
+
+	if ( numOfStaleEntries > 0 ) {
+		yArray.delete( left, numOfStaleEntries );
+	}
+
+	if ( numOfNewEntries > 0 ) {
+		yArray.insert( left, newValue.slice( left, left + numOfNewEntries ) );
 	}
 }
 
@@ -900,6 +1212,23 @@ function mergeYMapValues(
 	// Delete properties absent from the incoming object.
 	for ( const key of yMap.keys() ) {
 		if ( ! Object.hasOwn( newObj, key ) ) {
+			const currentVal = yMap.get( key );
+
+			// Declared containers are emptied, never deleted, so they stay
+			// shared across peers.
+			if (
+				currentVal instanceof Y.AbstractType &&
+				createEmptyYContainer( query[ key ] )
+			) {
+				clearYContainer(
+					currentVal,
+					query[ key ],
+					cursorPosition,
+					cursorScope
+				);
+				continue;
+			}
+
 			yMap.delete( key );
 		}
 	}
@@ -1014,6 +1343,18 @@ function getBlockAttributeSchema(
 	blockName: string,
 	attributeName: string
 ): BlockAttributeSchema | undefined {
+	return getBlockAttributeSchemas( blockName ).get( attributeName );
+}
+
+/**
+ * Get the attribute type definitions for every attribute of a block type.
+ *
+ * @param blockName The name of the block, e.g. 'core/paragraph'.
+ * @return The type definitions, keyed by attribute name.
+ */
+function getBlockAttributeSchemas(
+	blockName: string
+): Map< string, BlockAttributeSchema > {
 	if ( ! cachedBlockAttributeSchemas ) {
 		// Parse the attributes for all blocks once.
 		cachedBlockAttributeSchemas = new Map();
@@ -1033,7 +1374,7 @@ function getBlockAttributeSchema(
 		}
 	}
 
-	return cachedBlockAttributeSchemas.get( blockName )?.get( attributeName );
+	return cachedBlockAttributeSchemas.get( blockName ) ?? new Map();
 }
 
 /**
@@ -1059,7 +1400,7 @@ function isExpectedAttributeType(
 		return typeof attributeValue === 'string';
 	}
 
-	if ( schema?.type === 'array' && schema.query ) {
+	if ( schema?.type === 'array' ) {
 		return attributeValue instanceof Y.Array;
 	}
 
