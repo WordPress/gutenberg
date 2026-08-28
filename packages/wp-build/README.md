@@ -12,9 +12,6 @@ Build tool for WordPress plugins.
 -   **PHP Generation**: Automatically generates PHP registration files for scripts, modules, and styles
 -   **Watch Mode**: Incremental rebuilds during development
 
-JSX syntax must use a `.jsx` or `.tsx` file extension. Files ending in `.js`
-use esbuild's standard JavaScript loader and cannot contain JSX.
-
 ## Installation
 
 ```bash
