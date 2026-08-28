@@ -569,6 +569,65 @@ describe( 'polling-manager', () => {
 	} );
 
 	describe( 'collaborator queue resumption', () => {
+		it( 'does not publish sync-manager bootstrap updates when queues resume', async () => {
+			mockPostSyncUpdate.mockResolvedValue( {
+				rooms: [
+					{
+						room: 'primary-room',
+						end_cursor: 1,
+						awareness: {
+							1: { collaboratorInfo: { id: 100 } },
+							2: { collaboratorInfo: { id: 200 } },
+						},
+						updates: [],
+					},
+				],
+			} );
+
+			const doc = createMockDoc( 1 );
+
+			pollingManager.registerRoom( {
+				room: 'primary-room',
+				doc,
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			// First poll detects collaborators and resumes the queue for later polls.
+			await jest.advanceTimersByTimeAsync( 0 );
+
+			const onDocUpdate = getOnDocUpdate( doc );
+			onDocUpdate( new Uint8Array( [ 1, 2, 3 ] ), 'syncManager' );
+			onDocUpdate( new Uint8Array( [ 4, 5, 6 ] ), 'gutenberg' );
+
+			mockPostSyncUpdate.mockResolvedValue( {
+				rooms: [
+					{
+						room: 'primary-room',
+						end_cursor: 2,
+						awareness: {
+							1: { collaboratorInfo: { id: 100 } },
+							2: { collaboratorInfo: { id: 200 } },
+						},
+						updates: [],
+					},
+				],
+			} );
+
+			await jest.advanceTimersByTimeAsync( 1000 );
+
+			const secondCallPayload = mockPostSyncUpdate.mock.calls[ 1 ][ 0 ];
+			const updates = secondCallPayload.rooms[ 0 ].updates;
+			const updateData = updates.map(
+				( update: { data: string } ) => update.data
+			);
+
+			expect( updateData ).toContain( 'BAUG' );
+			expect( updateData ).not.toContain( 'AQID' );
+		} );
+
 		it( 'resumes non-primary room queues when collaborators are detected on primary room', async () => {
 			// First poll: primary room has collaborators, collection room has none.
 			mockPostSyncUpdate.mockResolvedValue( {

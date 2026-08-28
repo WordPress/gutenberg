@@ -147,6 +147,58 @@ export default class CollaborationUtils {
 	}
 
 	/**
+	 * Open the same post in a new browser context using the primary user's
+	 * authenticated session. This models a second same-account editor window.
+	 *
+	 * @param postId The post ID to open.
+	 * @return The joined page and editor.
+	 */
+	async joinCurrentUserSession(
+		postId: number
+	): Promise< { page: Page; editor: Editor } > {
+		const context = await this.admin.browser.newContext( {
+			baseURL: BASE_URL,
+			storageState: await this.primaryPage.context().storageState(),
+		} );
+		const newPage = await context.newPage();
+
+		await newPage.goto( `/wp-admin/post.php?post=${ postId }&action=edit` );
+		await newPage.waitForFunction(
+			() => window?.wp?.data && window?.wp?.blocks,
+			undefined,
+			{ timeout: 30000 }
+		);
+		await newPage.evaluate( () => {
+			window.wp.data
+				.dispatch( 'core/preferences' )
+				.set( 'core/edit-post', 'welcomeGuide', false );
+			window.wp.data
+				.dispatch( 'core/preferences' )
+				.set( 'core/edit-post', 'fullscreenMode', false );
+		} );
+
+		const newEditor = new Editor( { page: newPage } );
+
+		await this.waitForCollaborationReady( newPage );
+
+		this.sessions.push( {
+			user: {
+				username: 'current-user',
+				email: '',
+				firstName: '',
+				lastName: '',
+				password: '',
+				roles: [],
+			},
+			context,
+			page: newPage,
+			editor: newEditor,
+		} );
+
+		return { page: newPage, editor: newEditor };
+	}
+
+	/**
 	 * Wait for all current participants (primary + joined users) to
 	 * discover each other via the awareness protocol, then wait for
 	 * sync cycles to complete.
