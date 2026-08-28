@@ -1014,7 +1014,24 @@ test.describe( 'List (@firefox)', () => {
 <!-- /wp:list -->`
 		);
 
-		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' ); // Should delete "i".
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>1<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>a<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
+		);
+
 		await page.keyboard.press( 'Backspace' ); // Should merge into "a".
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -1029,7 +1046,20 @@ test.describe( 'List (@firefox)', () => {
 <!-- /wp:list -->`
 		);
 
-		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' ); // Should delete "a".
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>1<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
+		);
+
 		await page.keyboard.press( 'Backspace' ); // Should merge into "1".
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -1040,7 +1070,16 @@ test.describe( 'List (@firefox)', () => {
 <!-- /wp:list -->`
 		);
 
-		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' ); // Should delete "1".
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
+		);
+
 		await page.keyboard.press( 'Backspace' ); // Should remove list.
 
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
