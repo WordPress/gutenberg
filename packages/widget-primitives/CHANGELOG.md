@@ -8,6 +8,9 @@
     route's query when the href has one; docblock, README, Storybook page
     and seam diagram say so
     ([#82066](https://github.com/WordPress/gutenberg/pull/82066)).
+-   `WidgetAction.download`: any value but `false` downloads; `true` or `''`
+    keep the original filename
+    ([#82073](https://github.com/WordPress/gutenberg/pull/82073)).
 
 ## 0.6.0 (2026-08-26)
 
@@ -34,9 +37,6 @@
 
 ### Documentation
 
--   `WidgetAction`: state the `download` semantics; any value but `false`
-    downloads, and `true` or `''` keep the original filename
-    ([#82073](https://github.com/WordPress/gutenberg/pull/82073)).
 -   Add a Widget host doc page: the capability seam and the `links`
     contract, with the consumption rules link actions follow
     ([#81740](https://github.com/WordPress/gutenberg/pull/81740)).
