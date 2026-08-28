@@ -85,6 +85,7 @@
 		&:focus::after {
 			--focus-color: var(--wp-block-synced-color);
 			@include outset-ring__focus();
+			outline-offset: -2px;
 		}
 	}
 	&.is-selected .block-editor-list-view-block-contents,
@@ -93,10 +94,12 @@
 	}
 	&.is-selected .block-editor-list-view-block-contents:focus::after {
 		@include outset-ring__focus();
+		outline-offset: -2px;
 	}
 	&.is-selected.is-synced .block-editor-list-view-block-contents:focus::after {
 		--focus-color: var(--wp-block-synced-color);
 		@include outset-ring__focus();
+		outline-offset: -2px;
 	}
 	&.is-selected .block-editor-list-view-block__menu:focus,
 	&.is-selected.is-synced .block-editor-list-view-block__menu:focus {
@@ -266,7 +269,9 @@
 			bottom: 0;
 			left: 0;
 			border-radius: inherit;
+			box-shadow: inset 0 0 0 3px #{ $white };
 			@include outset-ring__focus();
+			outline-offset: -1px;
 			z-index: 2;
 			pointer-events: none;
 		}
