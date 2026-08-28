@@ -170,6 +170,9 @@ jobs:
                   package-manager-cache: false
 
             - name: npm install
+              # Not the setup-node composite action: its cached node_modules
+              # path skips `prepare` scripts, and bundling from source needs
+              # what they generate (e.g. the icons `src/library`).
               run: npm install
 
             - name: Check private API usage in bundled packages

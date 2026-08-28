@@ -71,7 +71,10 @@ function readPackageJson( name ) {
 
 // `module` limits the sweep to packages shipping a browser ESM build — the
 // ones that can end up inlined in a consumer bundle. Node tooling packages
-// (env, scripts, docgen, …) deliberately fall outside the gate.
+// (env, scripts, docgen, …) deliberately fall outside the gate. This is
+// intentionally narrower than the bundled-package predicate in
+// `tools/eslint/config.mjs`, which restricts direct private-apis imports in
+// every bundled package, browser build or not.
 function isBundled( pkgJson ) {
 	return (
 		pkgJson &&

@@ -1,4 +1,5 @@
 {
+	"comment": "The direct-import counterpart of the lock-unlock entries lives in tools/eslint/suppressions.json (no-restricted-imports). The two lists are enforced independently — a stale entry fails CI in each — but a package dropping private APIs needs an edit in both.",
 	"exceptions": [
 		{
 			"comment": "ThemeProvider falls back to the WP 7.2 theme/ui private APIs when the public API is unavailable. Remove when the fallback is deleted (scheduled for WP 7.3; see the TODO in the file).",
