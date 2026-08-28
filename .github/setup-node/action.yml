@@ -54,7 +54,7 @@ runs:
               key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-npm-${{ steps.node-version.outputs.NPM_VERSION }}-${{ hashFiles('package-lock.json', 'patches/**') }}
 
         - name: Install npm dependencies
-          if: ${{ inputs.enable-caching == 'false' || steps.cache-node_modules.outputs.cache-hit != 'true' }}
+          if: ${{ steps.cache-node_modules.outputs.cache-hit != 'true' }}
           run: |
               npm ci
           shell: bash
