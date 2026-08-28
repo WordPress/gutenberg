@@ -5,12 +5,28 @@ import { focus } from '@wordpress/dom';
 import { Stack, Text } from '@wordpress/ui';
 import { usePostFormatMenuItems } from './utils';
 
+type PostFormatTemplate = {
+	slug: string;
+	title: string;
+	description?: string;
+};
+
+type AddPostFormatTemplateModalContentProps = {
+	onSelect: ( format: PostFormatTemplate ) => void;
+	onBack: () => void;
+	containerRef: React.RefObject< HTMLDivElement | null >;
+};
+
 function AddPostFormatTemplateModalContent( {
 	onSelect,
 	onBack,
 	containerRef,
-} ) {
-	const { availableFormats: postFormats } = usePostFormatMenuItems();
+}: AddPostFormatTemplateModalContentProps ) {
+	// We are already past the click action, so we can ignore the entryPoint return value.
+	// Casting is needed because utils.js is untyped JavaScript.
+	const { availableFormats: postFormats } = usePostFormatMenuItems(
+		() => {}
+	) as { entryPoint: unknown; availableFormats: PostFormatTemplate[] };
 
 	// Focus the first focusable element when the component mounts.
 	useEffect( () => {
