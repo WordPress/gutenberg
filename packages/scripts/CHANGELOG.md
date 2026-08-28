@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 34.3.0-next.0 (2026-08-28)
+
 ### Bug Fixes
 
 -   `build`: Strip JavaScript and TypeScript source extensions from legacy positional entry names so generated output uses names such as `index.js` instead of `index.tsx.js` or `index.jsx.js` ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).

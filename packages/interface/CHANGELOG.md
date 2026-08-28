@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 10.0.1-next.0 (2026-08-28)
+
 ### Internal
 
 -   Remove unused dependency `@wordpress/a11y` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).

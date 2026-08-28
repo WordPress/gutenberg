@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.3.1-next.0 (2026-08-28)
+
 ### Internal
 
 -   Remove the `showListViewByDefault` handling from `useAdaptEditorToCanvas`; the `editor` package now applies the preference on the preview ↔ edit transition itself.

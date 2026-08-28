@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.23.0-next.0 (2026-08-28)
+
 ### Enhancements
 
 -   Transpile `.jsx` package, route, and widget source files alongside the existing JavaScript and TypeScript extensions, and ignore JSX tests during watch rebuilds ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).

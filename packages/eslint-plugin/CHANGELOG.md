@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 25.10.1-next.0 (2026-08-28)
+
 ### Bug Fixes
 
 -   Apply test-only DOM global exceptions to both JavaScript and JSX test files ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
