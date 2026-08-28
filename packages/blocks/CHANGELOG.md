@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### New Features
+
+-   Block transforms can be declared in `block.json`, where PHP can read them too, instead of only in JavaScript. Declared transforms are merged with those registered in JavaScript: a block registering transforms only in JavaScript is unaffected, and a JavaScript transform sharing a declared transform's `name` is merged over it ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+-   `shortcode` transforms can be declared in `block.json` alongside `raw` and `block` ones. A declared attribute names where to read its value: `"source": "shortcodeText"` takes the shortcode as it was written, and `"source": "shortcodeAttribute"` takes the named `attribute`, or the first one present when it names several ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+-   A declared transform attribute can read one inline CSS declaration with `"source": "style"` and a `property`, and its name can be a dotted path such as `style.typography.textAlign`, which writes into a nested attribute rather than replacing it ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+-   `unstable__bootstrapServerSideBlockDefinitions` no longer ignores a repeat call for a block it already knows: the definition in place still wins, except that transforms are contributed when it carried none ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+
 ### Breaking Changes
 
 -   `BlockTransform` is now a discriminated union over its `type`, so that each kind of transform declares its own fields: `shortcode` transforms accept `tag` and `attributes` with `shortcode` matchers, `enter` transforms `regExp`, `prefix` transforms `prefix`, and `raw` transforms `selector` and `schema`. `blocks`, `variationName` and `shortcuts` now belong to `block` transforms only, and `blocks` is required there. This fixes type errors when registering blocks with documented shortcode transforms, but reading a variant field off a `BlockTransform` that has not been narrowed on its `type` no longer compiles — including the result of `findTransform` ([#81811](https://github.com/WordPress/gutenberg/issues/81811)).
@@ -9,15 +16,15 @@
 
 ### Bug Fixes
 
+-   `registerBlockType` no longer discards the transforms a server-bootstrapped definition declared when a block is registered by name with transforms of its own; the two are merged in `processBlockType`, beside the merge `variations` already gets ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+-   `rawHandler` keeps the matched element's classes on a block whose transform is only declared in `block.json`, which previously dropped them ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+-   A `<!--more-->` or `<!--nextpage-->` that is not inside a paragraph no longer disappears during raw handling ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
 -   `getBlockAttributes` no longer breaks when a block has no content to parse, such as a self-closing shortcode: missing content is treated as empty markup instead of reaching the attribute matchers ([#81831](https://github.com/WordPress/gutenberg/pull/81831)).
 
 ## 15.27.0 (2026-08-26)
 
 ### New Features
 
--   Block transforms can be declared in `block.json`, where PHP can read them too, instead of only in JavaScript. Declared transforms are merged with those registered in JavaScript: a block registering transforms only in JavaScript is unaffected, and a JavaScript transform sharing a declared transform's `name` is merged over it ([#13163](https://github.com/WordPress/gutenberg/issues/13163)).
--   `unstable__bootstrapServerSideBlockDefinitions` no longer ignores a repeat call for a block it already knows: the definition in place still wins, but the later call contributes the fields it did not carry ([#13163](https://github.com/WordPress/gutenberg/issues/13163)).
--   `shortcode` transforms can be declared in `block.json` alongside `raw` and `block` ones. A declared attribute names where to read its value: `"source": "shortcodeText"` takes the shortcode as it was written, and `"source": "shortcodeAttribute"` takes the named `attribute`, or the first one present when it names several ([#13163](https://github.com/WordPress/gutenberg/issues/13163)).
 -   Block variations and `block` type block transforms accept a `shortcut` property, declaring a keyboard shortcut that applies the variation or transform to the selected block. See the [block variations](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-variations/) and [block transforms](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-transforms/) documentation ([#81588](https://github.com/WordPress/gutenberg/pull/81588)).
 
 ## 15.26.0 (2026-08-12)

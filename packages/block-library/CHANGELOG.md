@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Declare block transforms in `block.json` rather than only in JavaScript, so the editor and PHP read the same definition and HTML can be converted to blocks on the server ([#82013](https://github.com/WordPress/gutenberg/pull/82013)). Covers the `raw` transforms of the Paragraph, Heading, List, List Item, Quote, Code, Preformatted, Separator, Image, Table, More and Page Break blocks, and the block-to-block transforms of the Calendar and Tag Cloud blocks. A transform that cannot be written as data keeps its JavaScript definition and shares the declared transform's `name`.
+-   Image: Convert on the server the media whose markup the block can save back unchanged, and leave the rest as it was. Markup carrying more than the block reads — an attachment ID or alignment in a class name, declared dimensions, a legacy `wp-caption` paragraph — would not survive being saved again, so it stays as Custom HTML rather than becoming a block the editor flags ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+-   Shortcode: Declare the block's `shortcode` transform in `block.json`, so a shortcode standing on its own becomes a Shortcode block on the server as well as in the editor rather than staying inside a paragraph. A shortcode reading as part of a sentence is left where it is, as before ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+-   Paragraph, Heading: Read a `text-align` written as inline CSS through the block's declared transform, so an alignment survives conversion outside the editor as well as in it ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+-   List: Leave an `<ol>` carrying a `type` or an inline style as Custom HTML rather than converting it into a list that has lost the numbering style ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+-   More: Read the `<!--noteaser-->` marker through the block's declared transform, which is the last thing its JavaScript transform was needed for ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+
 ### Internal
 
 -   Remove unused dependencies `@wordpress/keyboard-shortcuts`, `@wordpress/reusable-blocks` and `@wordpress/viewport` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
@@ -15,9 +24,6 @@
 
 ### Internal
 
--   Declare block transforms in `block.json` rather than only in JavaScript, so the editor and PHP read the same definition and HTML can be converted to blocks on the server ([#13163](https://github.com/WordPress/gutenberg/issues/13163)). Covers the `raw` transforms of the Paragraph, Heading, List, List Item, Quote, Code, Preformatted, Separator, Image, Table, More and Page Break blocks, and the block-to-block transforms of the Calendar and Tag Cloud blocks. A transform that cannot be written as data keeps its JavaScript definition and shares the declared transform's `name`.
--   Image: Convert on the server the media whose markup the block can save back unchanged, and leave the rest as it was. Markup carrying more than the block reads — an attachment ID or alignment in a class name, declared dimensions, a legacy `wp-caption` paragraph — would not survive being saved again, so it stays as Custom HTML rather than becoming a block the editor flags ([#13163](https://github.com/WordPress/gutenberg/issues/13163)).
--   Shortcode: Declare the block's `shortcode` transform in `block.json`, so a shortcode standing on its own becomes a Shortcode block on the server as well as in the editor rather than staying inside a paragraph. A shortcode reading as part of a sentence is left where it is, as before ([#13163](https://github.com/WordPress/gutenberg/issues/13163)).
 -   Heading: Declare the heading level and paragraph keyboard shortcuts on the block's variations and transforms, rather than in a `BlockKeyboardShortcuts` component that every editor had to render. The `BlockKeyboardShortcuts` private export has been removed ([#81588](https://github.com/WordPress/gutenberg/pull/81588)).
 -   Math: Use `ValidatedTextareaControl` from `@wordpress/ui` in the LaTeX popover instead of unlocking `ValidatedTextareaControl` from the `@wordpress/components` private APIs ([#81984](https://github.com/WordPress/gutenberg/pull/81984)).
 
