@@ -469,7 +469,7 @@ for ( const projectPath of workspaceProjects ) {
 		}
 		if ( ! declared.has( `@wordpress/${ referencedPackage }` ) ) {
 			reportError(
-				`Reference to "packages/${ referencedPackage }" in ${ projectPath } without a dependency on "@wordpress/${ referencedPackage }"`
+				`Reference to "packages/${ referencedPackage }" in ${ projectPath } without a dependency on "@wordpress/${ referencedPackage }". Remove the reference, or add the dependency to package.json.`
 			);
 		}
 	}
