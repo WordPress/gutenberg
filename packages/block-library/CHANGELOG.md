@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Accordion Panel: Reset padding-block when panel is hidden ([#81782](https://github.com/WordPress/gutenberg/pull/81782)).
 -   Query: Stop writing `excludeCurrent: null` into the `query` attribute of blocks that never had the key. The mount effect that clears a stale exclusion treated the absent key as stale, changing the serialized markup of every pre-existing Query block as soon as the editor opened it ([#82147](https://github.com/WordPress/gutenberg/pull/82147)).
 
 ### Internal
