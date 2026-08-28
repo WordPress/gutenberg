@@ -1,0 +1,79 @@
+/**
+ * Overrides that exist ONLY to cancel an `!important` in Core's admin CSS.
+ *
+ * THIS IS THE ONE FILE ALLOWED TO USE `!important`, and it is deliberately tiny.
+ *
+ * Why it sits in `wpds-overrides`, declared BEFORE `wp-legacy`:
+ * importance reverses layer order. For normal declarations the last layer wins
+ * (`wpds` beats `wp-legacy`); for `!important` the FIRST layer wins. So an
+ * `!important` in a layer above Core's loses, no matter its specificity —
+ * specificity is not even consulted, because layer order is compared first.
+ * The only way to beat a demoted `!important` is from a layer below it.
+ *
+ * THE COST, stated plainly: a rule here also beats a third-party plugin's
+ * unlayered `!important`. Today those plugins usually win by source order, so
+ * every entry below takes precedence away from someone. That is why this file
+ * is restricted to declarations that are cancelling a Core `!important` and
+ * nothing else, and why each block records what would let us delete it.
+ *
+ * Every entry here should eventually disappear: when Core drops the matching
+ * `!important`, the plain rules in button.css take over on their own and the
+ * block below can be removed with no other change.
+ */
+
+@layer wpds-overrides, wp-legacy, wpds;
+
+@layer wpds-overrides {
+
+	/*
+	 * Cancels: wp-includes/css/buttons.css — the default/secondary disabled rule
+	 *          sets color / border-color / background / box-shadow / transform
+	 *          with `!important`.
+	 * DELETE WHEN: those `!important` flags are removed from Core.
+	 */
+	.wp-core-ui .button:disabled,
+	.wp-core-ui .button[disabled],
+	.wp-core-ui .button.disabled,
+	.wp-core-ui .button[aria-disabled="true"],
+	.wp-core-ui .button-secondary:disabled,
+	.wp-core-ui .button-secondary[disabled],
+	.wp-core-ui .button-secondary.disabled,
+	.wp-core-ui .button-secondary[aria-disabled="true"],
+	.wp-core-ui .button-disabled {
+		border-color: var(--wpds-color-stroke-interactive-neutral-disabled) !important;
+		background: transparent !important;
+		color: var(--wpds-color-foreground-content-neutral-weak) !important;
+	}
+
+	/*
+	 * Cancels: wp-includes/css/buttons.css — `.button-primary-disabled` and
+	 *          `.button-primary.disabled` set color / background / border-color /
+	 *          box-shadow / text-shadow with `!important`.
+	 * DELETE WHEN: those `!important` flags are removed from Core.
+	 */
+	/*
+	 * Cancels: wp-admin/css/forms.css — the `.form-invalid` rules set
+	 *          `border-color: #d63638 !important` on required fields and their
+	 *          focus state. Only `border-color` carries the flag; the companion
+	 *          `box-shadow` does not, so input.css handles that normally.
+	 * DELETE WHEN: that `!important` is removed from Core.
+	 */
+	.form-invalid .form-required,
+	.form-invalid .form-required:focus,
+	.form-invalid.form-required input,
+	.form-invalid.form-required input:focus,
+	.form-invalid.form-required select,
+	.form-invalid.form-required select:focus {
+		border-color: var(--wpds-color-stroke-interactive-error) !important;
+	}
+
+	.wp-core-ui .button-primary:disabled,
+	.wp-core-ui .button-primary[disabled],
+	.wp-core-ui .button-primary.disabled,
+	.wp-core-ui .button-primary[aria-disabled="true"],
+	.wp-core-ui .button-primary-disabled {
+		border-color: transparent !important;
+		background: var(--wp-admin-theme-color) !important;
+		color: rgba(255, 255, 255, 0.4) !important;
+	}
+}

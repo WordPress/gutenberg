@@ -1,0 +1,209 @@
+/**
+ * Classic admin buttons, restyled from WordPress Design System tokens.
+ *
+ * Target: visual parity with the React `Button`
+ * (packages/components/src/button/style.scss). The React component is the
+ * source of truth for *values*. The selectors here are hand-authored against
+ * classic markup and are deliberately NOT derived from it — deriving selectors
+ * is what sank the earlier generation POC.
+ *
+ * Cascade: everything lives in the `wpds` layer, which sits above `wp-legacy`,
+ * where load.php demotes Core's own buttons.css. Layer order means the plain
+ * selectors below beat Core's more specific ones with no specificity
+ * escalation — and unlayered plugin CSS still beats us, which is the point.
+ *
+ * NO `!important` IN THIS FILE. Measured: a layered `!important` outranks a
+ * third-party plugin's *unlayered* `!important`, even when the plugin's
+ * stylesheet loads later. That would silently break overrides the ecosystem
+ * has relied on for years. Enforced by stylelint.
+ *
+ * Accent colour is always var(--wp-admin-theme-color) so admin colour schemes
+ * keep working. Never hardcode it.
+ */
+
+@layer wpds-overrides, wp-legacy, wpds;
+
+@layer wpds {
+
+	/* -----------------------------------------------------------------------
+	   Base — shared by default, primary and secondary
+	   ----------------------------------------------------------------------- */
+
+	.wp-core-ui .button,
+	.wp-core-ui .button-primary,
+	.wp-core-ui .button-secondary {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		box-sizing: border-box;
+		/*
+		 * NO height here, deliberately. Core's default is already 40px, which is
+		 * exactly --wpds-dimension-size-lg, so asserting it gains nothing — and it
+		 * costs a great deal, because a height declared in this layer outranks
+		 * Core's CONTEXTUAL overrides regardless of their specificity. Core makes
+		 * 67 such rules (`.wp-core-ui .tablenav .button` and friends) to make
+		 * toolbars compact; declaring a height here silently flattened all of
+		 * them, and the list-table toolbar rendered as a mix of 32px and 40px
+		 * controls that no longer shared a midline.
+		 *
+		 * Height is Core's. Appearance is ours.
+		 */
+		margin: 0;
+		padding: 4px 12px;
+		font-family: inherit;
+		font-size: 13px;
+		font-weight: var(--wpds-typography-font-weight-emphasis);
+		line-height: 1;
+		text-decoration: none;
+		white-space: nowrap;
+		/*
+		 * NO vertical-align either. Core varies it by context — `top` for the
+		 * base, `baseline` for `p .button`, `middle` for `.button-group` — and a
+		 * blanket value here flattens those the same way a height would. It is how
+		 * the control sits in a line of other content, which is layout, not
+		 * appearance. Measured: forcing `top` pushed the list table's "156 items"
+		 * label 7px above the midline of its own toolbar.
+		 *
+		 * `line-height` stays ours: it pairs with our padding to centre the label
+		 * inside the box, and reverting it makes buttons 34px tall.
+		 */
+		appearance: none;
+		cursor: var(--wpds-cursor-control);
+		border: var(--wpds-border-width-xs) solid transparent;
+		border-radius: var(--wpds-border-radius-sm);
+		background: none;
+		color: var(--wpds-color-foreground-content-neutral);
+		box-shadow: none;
+		text-shadow: none;
+	}
+
+	/* -----------------------------------------------------------------------
+	   Focus — outline/outline-offset, never box-shadow.
+	   Core's legacy ring is a box-shadow; the base rule above clears it.
+	   ----------------------------------------------------------------------- */
+
+	.wp-core-ui .button:focus,
+	.wp-core-ui .button-primary:focus,
+	.wp-core-ui .button-secondary:focus,
+	.wp-core-ui .button.focus,
+	.wp-core-ui .button-primary.focus,
+	.wp-core-ui .button-secondary.focus {
+		outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+		outline-offset: var(--wpds-border-width-focus);
+		box-shadow: none;
+	}
+
+	/* React suppresses the ring while the button is actively pressed. */
+	.wp-core-ui .button:focus:active,
+	.wp-core-ui .button-primary:focus:active,
+	.wp-core-ui .button-secondary:focus:active {
+		outline-color: transparent;
+	}
+
+	/* -----------------------------------------------------------------------
+	   Default and secondary — maps to the React `is-secondary` variant
+	   ----------------------------------------------------------------------- */
+
+	.wp-core-ui .button,
+	.wp-core-ui .button-secondary {
+		border-color: var(--wp-admin-theme-color);
+		color: var(--wp-admin-theme-color);
+		background: transparent;
+	}
+
+	@media not (prefers-reduced-motion) {
+		.wp-core-ui .button,
+		.wp-core-ui .button-secondary {
+			transition: border-color 0.1s linear;
+		}
+	}
+
+	.wp-core-ui .button:hover,
+	.wp-core-ui .button-secondary:hover,
+	.wp-core-ui .button.hover,
+	.wp-core-ui .button-secondary.hover {
+		border-color: var(--wp-admin-theme-color-darker-20);
+		color: var(--wp-admin-theme-color-darker-20);
+		background: color-mix(in srgb, var(--wp-admin-theme-color) 4%, transparent);
+	}
+
+	/* Hide the border while pressed, keeping its width so nothing shifts. */
+	.wp-core-ui .button:active,
+	.wp-core-ui .button-secondary:active {
+		border-color: transparent;
+		background: color-mix(in srgb, var(--wp-admin-theme-color) 8%, transparent);
+	}
+
+	/*
+	 * `.active` is a PERSISTENT selected state in classic admin, toggled by
+	 * legacy admin JS. It is not `:active`. Never conflate the two.
+	 */
+	.wp-core-ui .button.active,
+	.wp-core-ui .button-secondary.active {
+		border-color: var(--wp-admin-theme-color-darker-20);
+		color: var(--wp-admin-theme-color-darker-20);
+		background: color-mix(in srgb, var(--wp-admin-theme-color) 8%, transparent);
+	}
+
+	/* -----------------------------------------------------------------------
+	   Primary — maps to the React `is-primary` variant
+	   ----------------------------------------------------------------------- */
+
+	.wp-core-ui .button-primary {
+		border-color: transparent;
+		background: var(--wp-admin-theme-color);
+		color: var(--wpds-color-foreground-interactive-brand-strong);
+	}
+
+	.wp-core-ui .button-primary:hover,
+	.wp-core-ui .button-primary.hover {
+		border-color: transparent;
+		background: var(--wp-admin-theme-color-darker-10);
+		color: var(--wpds-color-foreground-interactive-brand-strong);
+	}
+
+	.wp-core-ui .button-primary:active,
+	.wp-core-ui .button-primary.active {
+		border-color: transparent;
+		background: var(--wp-admin-theme-color-darker-20);
+		color: var(--wpds-color-foreground-interactive-brand-strong);
+	}
+
+	/* -----------------------------------------------------------------------
+	   Disabled — classic drives this from classes as well as attributes
+	   ----------------------------------------------------------------------- */
+
+	.wp-core-ui .button:disabled,
+	.wp-core-ui .button[disabled],
+	.wp-core-ui .button.disabled,
+	.wp-core-ui .button[aria-disabled="true"],
+	.wp-core-ui .button-secondary:disabled,
+	.wp-core-ui .button-secondary[disabled],
+	.wp-core-ui .button-secondary.disabled,
+	.wp-core-ui .button-secondary[aria-disabled="true"],
+	.wp-core-ui .button-disabled {
+		border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+		color: var(--wpds-color-foreground-content-neutral-weak);
+		background: transparent;
+		transform: none;
+	}
+
+	.wp-core-ui .button-primary:disabled,
+	.wp-core-ui .button-primary[disabled],
+	.wp-core-ui .button-primary.disabled,
+	.wp-core-ui .button-primary[aria-disabled="true"],
+	.wp-core-ui .button-primary-disabled {
+		border-color: transparent;
+		background: var(--wp-admin-theme-color);
+		color: rgba(255, 255, 255, 0.4);
+	}
+
+	/* Disabled buttons keep their focus ring when focused. */
+	.wp-core-ui .button:disabled:focus,
+	.wp-core-ui .button[aria-disabled="true"]:focus,
+	.wp-core-ui .button-primary:disabled:focus,
+	.wp-core-ui .button-primary[aria-disabled="true"]:focus {
+		outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+		outline-offset: var(--wpds-border-width-focus);
+	}
+}

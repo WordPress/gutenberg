@@ -1,0 +1,64 @@
+/**
+ * Classic-only button styles with no React counterpart.
+ *
+ * RULE: every rule in this file carries the condition that would let us delete
+ * it. Without that this file becomes permanent sediment instead of a to-do list.
+ *
+ * Heights are deliberately absent here too: Core already defines every one of
+ * these sizes at the same values, and a height declared in this layer would
+ * outrank Core's contextual overrides. Only the padding and font-size remain.
+ *
+ * Sizing note — the atomic-styles brief recorded `.button-compact`,
+ * `.button-small` and `.button-large` as classic-only sizes missing from the
+ * design system. That is not accurate as of this branch: the React Button has
+ * `is-compact` (32px) and `is-small` (24px), matching classic's heights exactly,
+ * so those need no exception and are handled by button.css. `.button-large` is
+ * defined by Core as an explicit 40px, identical to the default, so it also
+ * needs nothing. Only `.button-hero` is genuinely unmatched.
+ */
+
+@layer wpds-overrides, wp-legacy, wpds;
+
+@layer wpds {
+
+	/*
+	 * Compact — 32px. Matches React `is-compact`.
+	 * DELETE WHEN: never; this is parity, not an exception. Kept here only
+	 * because Core's size classes are all defined together and splitting them
+	 * across two files would be harder to read.
+	 */
+	.wp-core-ui .button.button-compact,
+	.wp-core-ui .button-group.button-compact .button {
+		padding: 0 12px;
+	}
+
+	/*
+	 * Small — 24px. Matches React `is-small`.
+	 * DELETE WHEN: never; see above.
+	 */
+	.wp-core-ui .button.button-small,
+	.wp-core-ui .button-group.button-small .button {
+		padding: 0 8px;
+		font-size: 11px;
+	}
+
+	/*
+	 * Large — Core defines this as an explicit 40px, i.e. the default size,
+	 * kept for semantic clarity in markup.
+	 * DELETE WHEN: nothing to delete; listed for completeness so a reader does
+	 * not go looking for a missing rule.
+	 */
+
+	/*
+	 * Hero — 48px. GENUINE EXCEPTION: no React equivalent exists.
+	 * DELETE WHEN: either a 48px size lands on the React Button (at which point
+	 * this becomes parity and moves to button.css), or Core deprecates
+	 * `.button-hero`. Until one of those happens this rule is load-bearing.
+	 * Used by the installer and a handful of onboarding screens.
+	 */
+	.wp-core-ui .button.button-hero,
+	.wp-core-ui .button-group.button-hero .button {
+		padding: 0 36px;
+		font-size: 14px;
+	}
+}
