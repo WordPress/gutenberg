@@ -809,12 +809,59 @@ class Gutenberg_HTML_To_Blocks {
 			return false;
 		}
 
-		$copy   = $probe->children[0];
+		$copy = $probe->children[0];
+
+		if ( ! self::attributes_already_conform( $copy, $schema ) ) {
+			return false;
+		}
+
 		$before = $copy->get_inner_html();
 
 		self::apply_content_schema( $copy, $schema );
 
 		return $before === $copy->get_inner_html();
+	}
+
+	/**
+	 * Determines whether an element carries only attributes a schema names.
+	 *
+	 * The wrapper's attributes are part of what a block saves, so a schema that
+	 * lists them is saying which ones the block can write back. One the block
+	 * would drop is content the conversion would lose, the same as content the
+	 * content schema does not allow.
+	 *
+	 * @param Gutenberg_HTML_Element $element Element to test.
+	 * @param array                  $schema  Content schema.
+	 * @return bool Whether the element's attributes are all named by the schema.
+	 */
+	private static function attributes_already_conform( $element, $schema ) {
+		if ( ! isset( $schema[ $element->tag_name ] ) || ! is_array( $schema[ $element->tag_name ] ) ) {
+			return true;
+		}
+
+		$allowed = self::get_schema_attributes( $schema[ $element->tag_name ] );
+
+		// A schema keeping every attribute has nothing to say about them.
+		if ( null === $allowed ) {
+			return true;
+		}
+
+		foreach ( array_keys( $element->attributes ) as $name ) {
+			/*
+			 * `class` and `id` are written by the `customClassName` and
+			 * `anchor` supports rather than by the block, so a schema does not
+			 * have to name them.
+			 */
+			if ( 'class' === $name || 'id' === $name ) {
+				continue;
+			}
+
+			if ( ! in_array( $name, $allowed, true ) ) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**

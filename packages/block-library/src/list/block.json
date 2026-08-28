@@ -95,13 +95,13 @@
 				"serverConversion": {
 					"requires": {
 						"ol": {
-							"attributes": "*",
+							"attributes": [ "start", "reversed" ],
 							"children": {
 								"li": { "attributes": "*", "children": "*" }
 							}
 						},
 						"ul": {
-							"attributes": "*",
+							"attributes": [],
 							"children": {
 								"li": { "attributes": "*", "children": "*" }
 							}

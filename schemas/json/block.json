@@ -50,7 +50,7 @@
 							"type": "object",
 							"properties": {
 								"requires": {
-									"description": "The content the block is able to save back. Written like a transform's `schema`.",
+									"description": "The content the block is able to save back, and the wrapper attributes along with it. Written like a transform's `schema`. `class` and `id` never have to be named: the `customClassName` and `anchor` supports write those.",
 									"type": "object"
 								}
 							},

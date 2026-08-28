@@ -1118,6 +1118,52 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * A `requires` schema names the wrapper attributes a block can write back as
+	 * well as its content, so markup carrying one the block would drop is left
+	 * alone rather than converted into a block that has lost it.
+	 *
+	 * @dataProvider data_list_wrapper_attributes
+	 *
+	 * @param string $html     Markup to convert.
+	 * @param string $expected Name of the block the conversion is expected to produce.
+	 */
+	public function test_declines_a_list_carrying_what_it_cannot_save( $html, $expected ) {
+		$blocks = gutenberg_html_to_blocks( $html );
+
+		$this->assertSame( $expected, $blocks[0]['blockName'] );
+
+		// Declining is only worth it if nothing is lost by it.
+		if ( 'core/html' === $expected ) {
+			$this->assertSame( $html, $blocks[0]['innerHTML'] );
+		}
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public static function data_list_wrapper_attributes() {
+		return array(
+			'plain list'      => array( '<ul><li>One</li></ul>', 'core/list' ),
+			'start'           => array( '<ol start="3"><li>One</li></ol>', 'core/list' ),
+			'reversed'        => array( '<ol reversed><li>One</li></ol>', 'core/list' ),
+			'numbering style' => array( '<ol type="A"><li>One</li></ol>', 'core/html' ),
+			'inline style'    => array( '<ul style="margin:0"><li>One</li></ul>', 'core/html' ),
+		);
+	}
+
+	public function test_keeps_the_attributes_block_supports_write_back() {
+		// `class` and `id` are written by the `customClassName` and `anchor`
+		// supports, so a `requires` schema does not have to name them.
+		$blocks = gutenberg_html_to_blocks( '<ol id="x" class="y"><li>One</li></ol>' );
+
+		$this->assertSame( 'core/list', $blocks[0]['blockName'] );
+		$this->assertSame( 'x', $blocks[0]['attrs']['anchor'] );
+		$this->assertSame( 'y', $blocks[0]['attrs']['className'] );
+	}
+
 	public function test_leaves_media_in_place_when_nothing_converts_it() {
 		$this->register_test_blocks();
 
