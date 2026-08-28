@@ -602,6 +602,13 @@ export const StyleBookBody = ( {
 			} ) }
 			name="style-book-canvas"
 			tabIndex={ 0 }
+			{ ...( settings.siteLang && {
+				// Like the main editor canvas, the style book shows the
+				// site's front end, so it uses the site locale's language and
+				// direction rather than the user locale of the admin.
+				lang: settings.siteLang,
+				dir: settings.siteIsRTL ? 'rtl' : 'ltr',
+			} ) }
 			{ ...( onClick ? buttonModeProps : {} ) }
 		>
 			<EditorStyles styles={ settings.styles } />

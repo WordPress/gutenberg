@@ -11,6 +11,7 @@
 -   `EditorInterface`: Apply the `showListViewByDefault` preference when the editor enters edit mode, so every editor built on the package honors it — including the extensible site editor, which previously ignored it. The logic moves here from `edit-post` and `edit-site`.
 -   `StylesCanvas`: In preview mode, render edge to edge without the close button and Escape handler. There the canvas is the whole surface rather than a frame opened over an editing session, and whatever opened it owns closing it.
 -   `VisualEditor`: Pass the site locale's language and text direction (the `siteLang` and `siteIsRTL` editor settings) to the editor canvas iframe, so the canvas matches the site's front end rather than the user's admin locale ([#80660](https://github.com/WordPress/gutenberg/pull/80660)).
+-   `StyleBook`, `StylesCanvas`: Apply the site locale's language and text direction to the style book and style revisions canvases as well, so every front-end canvas on a screen agrees with the main editor canvas ([#80660](https://github.com/WordPress/gutenberg/pull/80660)).
 
 ### Bug Fixes
 
