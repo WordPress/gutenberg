@@ -401,13 +401,6 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 	$layout_type    = $layout['type'] ?? null;
 	$is_flex_layout = ! is_string( $layout_type ) || '' === $layout_type || 'flex' === $layout_type;
 
-	// Gallery blocks created before layout variations existed do not have an
-	// explicit layout attribute. Missing and malformed layout data therefore
-	// falls back to Flex so existing galleries retain their current appearance.
-	$layout         = is_array( $attributes['layout'] ?? null ) ? $attributes['layout'] : array();
-	$layout_type    = $layout['type'] ?? null;
-	$is_flex_layout = ! is_string( $layout_type ) || '' === $layout_type || 'flex' === $layout_type;
-
 	// In dynamic mode the gallery's images are resolved at render time instead of
 	// being authored as inner blocks, so `save.jsx` persists at most the
 	// gallery-level caption — a bare `<figcaption>`, or nothing when there is no
