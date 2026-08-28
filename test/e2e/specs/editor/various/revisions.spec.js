@@ -1009,3 +1009,88 @@ test.describe( 'Post autosave shareable URLs with revisions disabled', () => {
 			.toBe( String( autosave.id ) );
 	} );
 } );
+
+test.describe( 'Post revision fields registered by plugins', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-revision-fields'
+		);
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-revision-fields'
+		);
+		await requestUtils.deleteAllPosts();
+	} );
+
+	test( 'shows a field under the name the plugin gave it', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		// Creating a post does not create a revision, so update it twice.
+		const post = await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/posts',
+			data: {
+				title: 'Revision Fields Test',
+				content:
+					'<!-- wp:paragraph --><p>Original content</p><!-- /wp:paragraph -->',
+				status: 'draft',
+				meta: {
+					gutenberg_test_revision_field: 'Autumn',
+				},
+			},
+		} );
+		await requestUtils.rest( {
+			method: 'POST',
+			path: `/wp/v2/posts/${ post.id }`,
+			data: {
+				content:
+					'<!-- wp:paragraph --><p>First revision</p><!-- /wp:paragraph -->',
+			},
+		} );
+		await requestUtils.rest( {
+			method: 'POST',
+			path: `/wp/v2/posts/${ post.id }`,
+			data: {
+				content:
+					'<!-- wp:paragraph --><p>Second revision</p><!-- /wp:paragraph -->',
+				meta: {
+					gutenberg_test_revision_field: 'Winter',
+				},
+			},
+		} );
+
+		await admin.editPost( post.id );
+		await editor.openDocumentSettingsSidebar();
+		const settingsSidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await settingsSidebar.getByRole( 'tab', { name: 'Post' } ).click();
+		await settingsSidebar
+			.getByRole( 'button', {
+				name: 'Open revisions screen: 2 revisions',
+			} )
+			.click();
+
+		await settingsSidebar
+			.getByRole( 'button', { name: 'Fields', exact: true } )
+			.click();
+
+		// The name comes from the plugin, so the meta key is not shown.
+		await expect(
+			settingsSidebar.getByText( 'Release date' )
+		).toBeVisible();
+		await expect(
+			settingsSidebar.getByText( 'gutenberg_test_revision_field' )
+		).toHaveCount( 0 );
+
+		// The value of the previous revision is shown as removed, and the
+		// value of this one as added.
+		await expect( settingsSidebar.locator( 'del' ) ).toHaveText( 'Autumn' );
+		await expect( settingsSidebar.locator( 'ins' ) ).toHaveText( 'Winter' );
+	} );
+} );

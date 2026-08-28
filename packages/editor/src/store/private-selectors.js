@@ -354,6 +354,7 @@ export function buildRevisionsPageQuery( revisionKey, page ) {
 				'author',
 				'slug',
 				'meta',
+				'revision_fields',
 				'title.raw',
 				'excerpt.raw',
 				'content.raw',

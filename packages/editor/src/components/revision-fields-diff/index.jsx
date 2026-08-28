@@ -28,18 +28,22 @@ function stringifyValue( value ) {
 }
 
 /**
- * Determines whether a meta value should be treated as empty.
+ * Determines whether a value should be treated as empty.
  *
  * @param {string} str The stringified value.
  * @return {boolean} Whether the value is effectively empty.
  */
-function isEmptyMeta( str ) {
+function isEmptyValue( str ) {
 	return ! str || str === '[]' || str === '{}';
 }
 
 /**
- * Panel that shows meta field diffs between the current revision and
+ * Panel that shows the fields that changed between the current revision and
  * the previous revision in the document sidebar during revision mode.
+ *
+ * Fields a plugin registered with `_wp_post_revision_fields` come with a name
+ * to show, and cover the same ground as the classic revisions screen. The
+ * post meta the REST API exposes is shown under its key.
  */
 export default function RevisionFieldsDiffPanel() {
 	const { revision, previousRevision } = useSelect( ( select ) => {
@@ -53,42 +57,71 @@ export default function RevisionFieldsDiffPanel() {
 		};
 	}, [] );
 
-	const entries = useMemo( () => {
+	const { entries, labels } = useMemo( () => {
+		const nothing = { entries: null, labels: null };
+
 		if ( ! revision ) {
-			return null;
+			return nothing;
 		}
 
+		const revisionFields = revision.revision_fields ?? {};
+		const previousFields = previousRevision?.revision_fields ?? {};
 		const revisionMeta = revision.meta ?? {};
 		const previousMeta = previousRevision?.meta ?? {};
-		const allMetaKeys = new Set( [
-			...Object.keys( revisionMeta ),
-			...Object.keys( previousMeta ),
+
+		const fieldKeys = new Set( [
+			...Object.keys( revisionFields ),
+			...Object.keys( previousFields ),
 		] );
+		const metaKeys = new Set(
+			[
+				...Object.keys( revisionMeta ),
+				...Object.keys( previousMeta ),
+			].filter( ( key ) => ! fieldKeys.has( key ) )
+		);
 
 		const result = {};
+		const names = {};
 
-		for ( const key of allMetaKeys ) {
-			const revStr = stringifyValue( revisionMeta[ key ] );
-			const prevStr = stringifyValue( previousMeta[ key ] );
+		const add = ( key, from, to, label ) => {
+			const fromStr = stringifyValue( from );
+			const toStr = stringifyValue( to );
 
-			if ( isEmptyMeta( revStr ) && isEmptyMeta( prevStr ) ) {
-				continue;
+			if ( isEmptyValue( fromStr ) && isEmptyValue( toStr ) ) {
+				return;
 			}
 
-			result[ key ] = diffWordsWithSpace( prevStr, revStr );
+			result[ key ] = diffWordsWithSpace( fromStr, toStr );
+			names[ key ] = label;
+		};
+
+		for ( const key of fieldKeys ) {
+			add(
+				key,
+				previousFields[ key ]?.value,
+				revisionFields[ key ]?.value,
+				revisionFields[ key ]?.label ??
+					previousFields[ key ]?.label ??
+					key
+			);
+		}
+
+		for ( const key of metaKeys ) {
+			add( key, previousMeta[ key ], revisionMeta[ key ], key );
 		}
 
 		if ( Object.keys( result ).length === 0 ) {
-			return null;
+			return nothing;
 		}
 
-		return result;
+		return { entries: result, labels: names };
 	}, [ revision, previousRevision ] );
 
 	return (
 		<RevisionDiffPanel
-			title={ __( 'Meta' ) }
+			title={ __( 'Fields' ) }
 			entries={ entries }
+			labels={ labels }
 			initialOpen={ false }
 			className="editor-revision-meta-diff__content"
 		/>
