@@ -1,5 +1,6 @@
 import { autop, removep } from '@wordpress/autop';
 import { getPhrasingContentSchema } from '@wordpress/dom';
+import warning from '@wordpress/warning';
 import { createBlock } from './factory';
 import { matchesSelector } from './matches-selector';
 import {
@@ -136,18 +137,7 @@ function resolveAttributeValue( value: unknown, node: Element ): unknown {
 	const sourced =
 		'style' === declaration.source
 			? readStyleProperty( node, declaration.property )
-			: /*
-			   * A source with no selector reads whatever it is handed, so the
-			   * matched node is passed as-is: parsing its markup would hand
-			   * the source the `<body>` hpq wraps it in instead. With a
-			   * selector, the markup is parsed so the selector can match the
-			   * node itself as well as its descendants, which is what the
-			   * server-side parser does.
-			   */
-			  parseWithAttributeSchema(
-					'selector' in declaration ? node.outerHTML : node,
-					declaration as any
-			  );
+			: readSourcedValue( declaration, node );
 
 	// A `map` turns a sourced value into one the block declares, such as a
 	// heading tag name into a heading level.
@@ -169,6 +159,42 @@ function resolveAttributeValue( value: unknown, node: Element ): unknown {
 	}
 
 	return sourced;
+}
+
+/**
+ * Reads a declared attribute out of the matched markup.
+ *
+ * The declaration comes from a `block.json` file, so a source the editor does
+ * not know, or a selector it cannot parse, is a mistake in that file rather
+ * than a reason to throw out of every conversion.
+ *
+ * @param declaration Declared attribute.
+ * @param node        Element the transform matched.
+ *
+ * @return Attribute value, or undefined when it cannot be read.
+ */
+function readSourcedValue(
+	declaration: DeclarativeTransform,
+	node: Element
+): unknown {
+	try {
+		/*
+		 * A source with no selector reads whatever it is handed, so the matched
+		 * node is passed as-is: parsing its markup would hand the source the
+		 * `<body>` hpq wraps it in instead. With a selector, the markup is
+		 * parsed so the selector can match the node itself as well as its
+		 * descendants, which is what the server-side parser does.
+		 */
+		return parseWithAttributeSchema(
+			'selector' in declaration ? node.outerHTML : node,
+			declaration as any
+		);
+	} catch {
+		warning(
+			`The "${ declaration.source }" attribute source declared by a block cannot be read, so the attribute is left unset.`
+		);
+		return undefined;
+	}
 }
 
 /**
@@ -297,14 +323,6 @@ function createRawTransform(
 }
 
 /**
- * Builds the transform function a declared block-to-block transform implies.
- *
- * @param target     Name of the block the transform produces.
- * @param attributes Declared attribute policy.
- *
- * @return Transform function.
- */
-/**
  * Builds the attribute readers a `shortcode` transform runs.
  *
  * The shortcode converter calls a `shortcode` function per attribute, passing
@@ -368,6 +386,14 @@ function createShortcodeAttributes( attributes: unknown ) {
 	);
 }
 
+/**
+ * Builds the transform function a declared block-to-block transform implies.
+ *
+ * @param target     Name of the block the transform produces.
+ * @param attributes Declared attribute policy.
+ *
+ * @return Transform function.
+ */
 function createBlockTransform( target: string, attributes: unknown ) {
 	return (
 		sourceAttributes: Record< string, unknown >,
@@ -457,16 +483,9 @@ function normalizeTransform(
 		} ) );
 	}
 
-	return [
-		{
-			...rest,
-			attributes,
-			sourceAttributes,
-			innerBlocks,
-			schema,
-			serverConversion,
-		},
-	];
+	// Any other type is carried through as declared: `enter`, `files` and
+	// `prefix` need nothing resolving.
+	return [ { ...transform } ];
 }
 
 /**

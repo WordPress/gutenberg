@@ -2,10 +2,7 @@ import { select, dispatch } from '@wordpress/data';
 import { _x } from '@wordpress/i18n';
 import warning from '@wordpress/warning';
 import i18nBlockSchema from './i18n-block.json';
-import {
-	mergeBlockTransforms,
-	normalizeMetadataTransforms,
-} from './metadata-transforms';
+import { normalizeMetadataTransforms } from './metadata-transforms';
 import { store as blocksStore } from '../store';
 import { unlock } from '../lock-unlock';
 import type {
@@ -186,33 +183,30 @@ export function registerBlockType<
 		dispatch( blocksStore )
 	);
 
-	let declaredTransforms;
-
 	if ( isObject( blockNameOrMetadata ) ) {
 		const metadata = getBlockSettingsFromMetadata( blockNameOrMetadata );
-		addBootstrappedBlockType( name, metadata );
 
 		/*
-		 * Transforms are merged here rather than travelling with the rest of the
-		 * metadata, because the store keeps a server-provided definition over a
-		 * client one. Both read the same `block.json`, so the merged result is
-		 * the more complete of the two.
+		 * Transforms travel with the rest of the metadata rather than being
+		 * merged into the settings here, so that a block registered by name
+		 * against a server-bootstrapped definition keeps the transforms that
+		 * definition declared. `processBlockType` merges the two.
 		 */
-		declaredTransforms = normalizeMetadataTransforms(
-			blockNameOrMetadata.transforms as any,
-			name
+		addBootstrappedBlockType(
+			name,
+			blockNameOrMetadata.transforms
+				? {
+						...metadata,
+						transforms: normalizeMetadataTransforms(
+							blockNameOrMetadata.transforms as any,
+							name
+						),
+				  }
+				: metadata
 		);
 	}
 
-	const transforms = mergeBlockTransforms(
-		declaredTransforms,
-		settings?.transforms as any
-	);
-
-	addUnprocessedBlockType(
-		name,
-		transforms ? { ...settings, transforms } : settings
-	);
+	addUnprocessedBlockType( name, settings );
 
 	return select( blocksStore ).getBlockType( name );
 }

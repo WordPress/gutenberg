@@ -1,9 +1,12 @@
 import {
+	createBlock,
 	getBlockTransforms,
 	getBlockType,
 	pasteHandler,
 	rawHandler,
+	registerBlockType,
 	serialize,
+	unregisterBlockType,
 	// eslint-disable-next-line camelcase
 	unstable__bootstrapServerSideBlockDefinitions,
 } from '@wordpress/blocks';
@@ -181,6 +184,50 @@ describe( 'Transforms declared in block metadata', () => {
 
 		expect( preformatted.name ).toBe( 'core/preformatted' );
 		expect( preformatted.attributes.className ).toBe( 'my-custom' );
+	} );
+
+	it( 'keeps declared transforms when a block is registered by name', () => {
+		const name = 'test/registered-by-name';
+
+		// What a server-bootstrapped definition looks like: `block.json`
+		// arrives first, and the block registers itself separately.
+		unstable__bootstrapServerSideBlockDefinitions( {
+			[ name ]: {
+				apiVersion: 3,
+				title: 'Registered by name',
+				category: 'text',
+				attributes: {},
+				transforms: {
+					from: [
+						{ type: 'raw', name: 'from-raw', selector: 'aside' },
+					],
+				},
+			},
+		} );
+
+		registerBlockType( name, {
+			apiVersion: 3,
+			title: 'Registered by name',
+			category: 'text',
+			transforms: {
+				from: [
+					{
+						type: 'block',
+						blocks: [ 'core/paragraph' ],
+						transform: () => createBlock( name ),
+					},
+				],
+			},
+		} );
+
+		const { transforms } = getBlockType( name );
+
+		expect( transforms.from ).toHaveLength( 2 );
+		expect(
+			transforms.from.map( ( transform ) => transform.type ).sort()
+		).toEqual( [ 'block', 'raw' ] );
+
+		unregisterBlockType( name );
 	} );
 
 	it( 'keeps a transforms accessor lazy when nothing is declared for it', () => {

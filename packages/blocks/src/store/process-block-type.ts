@@ -3,6 +3,7 @@ import { isValidElementType } from 'react-is';
 import deprecated from '@wordpress/deprecated';
 import { applyFilters } from '@wordpress/hooks';
 import warning from '@wordpress/warning';
+import { mergeBlockTransforms } from '../api/metadata-transforms';
 import { isValidIcon, normalizeIconObject, omit } from '../api/utils';
 import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from '../api/constants';
 import type {
@@ -102,6 +103,16 @@ export const processBlockType =
 				Array.isArray( blockSettings?.variations )
 					? blockSettings.variations
 					: []
+			),
+			/*
+			 * A block declares transforms in `block.json`, which reaches here
+			 * bootstrapped, and may register more from JavaScript. Both
+			 * describe the same block, so the merged result is the more
+			 * complete of the two rather than whichever arrived last.
+			 */
+			transforms: mergeBlockTransforms(
+				bootstrappedBlockType?.transforms,
+				blockSettings?.transforms
 			),
 		};
 

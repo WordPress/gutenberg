@@ -69,18 +69,15 @@ function bootstrappedBlockTypes(
 
 			/*
 			 * A definition already in place wins, because it was initialized
-			 * from the server. A later one still contributes the fields that
-			 * one did not carry, which is how a field the server sends
-			 * separately reaches the block type.
+			 * from the server. Transforms are the exception: a server that
+			 * predates them sends a definition without any, and the block's
+			 * own `block.json` is then the only place they can come from.
 			 */
 			if ( serverDefinition ) {
-				const added = Object.fromEntries(
-					Object.entries( newDefinition ).filter(
-						( [ key ] ) => ! ( key in serverDefinition )
-					)
-				);
-
-				if ( 0 === Object.keys( added ).length ) {
+				if (
+					! ( 'transforms' in newDefinition ) ||
+					'transforms' in serverDefinition
+				) {
 					return state;
 				}
 
@@ -88,7 +85,7 @@ function bootstrappedBlockTypes(
 					...state,
 					[ name ]: {
 						...serverDefinition,
-						...added,
+						transforms: newDefinition.transforms,
 					} as Partial< BlockType >,
 				};
 			}
