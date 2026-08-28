@@ -40,14 +40,15 @@ export function useViewConfig( {
 		: undefined;
 	return useSelect(
 		( select ) => {
-			const { getViewConfig } = unlock( select( coreStore ) );
-			// Only pass options when a subset is requested, so the selector
-			// resolves under the same cache key as `getViewConfig( kind, name )`
-			// and callers that preload the full config outside React (route
-			// loaders) share the request instead of triggering a second one.
-			return fieldsKey
-				? getViewConfig( kind, name, { fields: fieldsKey } )
-				: getViewConfig( kind, name );
+			return unlock( select( coreStore ) ).getViewConfig(
+				kind,
+				name,
+				fieldsKey
+					? {
+							fields: fieldsKey,
+					  }
+					: undefined
+			);
 		},
 		[ kind, name, fieldsKey ]
 	);
