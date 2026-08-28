@@ -249,32 +249,6 @@ function block_core_gallery_resolve_dynamic_source( $source, $block ) {
 }
 
 /**
- * Translates a link destination stored by WordPress into the value the Gallery
- * block uses. WordPress records the site-wide default in the
- * `image_default_link_type` option as `file` or `post`; the block calls the same
- * two destinations `media` and `attachment`. Galleries saved by older versions
- * of the block hold the WordPress values too. Any other value, including one the
- * block already understands, is returned unchanged.
- *
- * Mirrors the editor's `normalizeLinkTo()` (see `gallery/utils.js`).
- *
- * @since 7.0.0
- *
- * @param string $link_to Link destination to translate.
- * @return string Link destination in the block's own vocabulary.
- */
-function block_core_gallery_normalize_link_to( $link_to ) {
-	switch ( $link_to ) {
-		case 'file':
-			return 'media';
-		case 'post':
-			return 'attachment';
-		default:
-			return $link_to;
-	}
-}
-
-/**
  * Builds the link-related image block attributes for a dynamically rendered
  * gallery image, mapping the gallery-wide `linkTo` setting onto a single image.
  *
@@ -288,8 +262,17 @@ function block_core_gallery_normalize_link_to( $link_to ) {
  *               `linkTarget`, `rel`, `lightbox`).
  */
 function block_core_gallery_dynamic_image_link_attributes( $attachment_id, $attributes ) {
-	$link_to = block_core_gallery_normalize_link_to( $attributes['linkTo'] ?? 'none' );
+	$link_to = $attributes['linkTo'] ?? 'none';
 	$attrs   = array();
+
+	// Galleries can hold WordPress' 'file' and 'post' as well as this block's
+	// own 'media' and 'attachment'. Translate here so the rest of this function
+	// only deals with the block's own values.
+	if ( 'file' === $link_to ) {
+		$link_to = 'media';
+	} elseif ( 'post' === $link_to ) {
+		$link_to = 'attachment';
+	}
 
 	switch ( $link_to ) {
 		case 'media':
