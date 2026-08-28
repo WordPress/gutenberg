@@ -1015,43 +1015,7 @@ test.describe( 'List (@firefox)', () => {
 		);
 
 		await page.keyboard.press( 'Backspace' );
-		await page.keyboard.press( 'Backspace' ); // Should be at level 1.
-
-		await expect.poll( editor.getEditedPostContent ).toBe(
-			`<!-- wp:list -->
-<ul class="wp-block-list"><!-- wp:list-item -->
-<li>1<!-- wp:list -->
-<ul class="wp-block-list"><!-- wp:list-item -->
-<li>a</li>
-<!-- /wp:list-item -->
-
-<!-- wp:list-item -->
-<li></li>
-<!-- /wp:list-item --></ul>
-<!-- /wp:list --></li>
-<!-- /wp:list-item --></ul>
-<!-- /wp:list -->`
-		);
-
-		await page.keyboard.press( 'Backspace' ); // Should be at level 0.
-
-		await expect.poll( editor.getEditedPostContent ).toBe(
-			`<!-- wp:list -->
-<ul class="wp-block-list"><!-- wp:list-item -->
-<li>1<!-- wp:list -->
-<ul class="wp-block-list"><!-- wp:list-item -->
-<li>a</li>
-<!-- /wp:list-item --></ul>
-<!-- /wp:list --></li>
-<!-- /wp:list-item -->
-
-<!-- wp:list-item -->
-<li></li>
-<!-- /wp:list-item --></ul>
-<!-- /wp:list -->`
-		);
-
-		await page.keyboard.press( 'Backspace' ); // Should be at level 1.
+		await page.keyboard.press( 'Backspace' ); // Should merge into "a".
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
@@ -1066,21 +1030,7 @@ test.describe( 'List (@firefox)', () => {
 		);
 
 		await page.keyboard.press( 'Backspace' );
-		await page.keyboard.press( 'Backspace' ); // Should be at level 0.
-
-		await expect.poll( editor.getEditedPostContent ).toBe(
-			`<!-- wp:list -->
-<ul class="wp-block-list"><!-- wp:list-item -->
-<li>1</li>
-<!-- /wp:list-item -->
-
-<!-- wp:list-item -->
-<li></li>
-<!-- /wp:list-item --></ul>
-<!-- /wp:list -->`
-		);
-
-		await page.keyboard.press( 'Backspace' ); // Should be at level 0.
+		await page.keyboard.press( 'Backspace' ); // Should merge into "1".
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
@@ -1095,7 +1045,7 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 
-		// That's 9 key presses to create the list, and 9 key presses to remove
+		// That's 9 key presses to create the list, and 6 key presses to remove
 		// the list. ;)
 	} );
 
@@ -1136,7 +1086,7 @@ test.describe( 'List (@firefox)', () => {
 <!-- /wp:list -->`
 		);
 
-		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Shift+Tab' );
 		// Type to also verify the caret stays in the outdented item.
 		await page.keyboard.type( 'x' );
 
@@ -1175,10 +1125,11 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( ' c' );
 		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'd' );
+		await page.keyboard.type( 'd' );
 		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'Backspace' );
-		await page.keyboard.press( 'Backspace' );
+		// Enter on an empty item outdents it, one level per press.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'e' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -1280,102 +1231,8 @@ test.describe( 'List (@firefox)', () => {
 			},
 		] );
 
-		// Now that the item is empty, backspace should outdent it by one level
-		await page.keyboard.press( 'Backspace' );
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/list',
-				innerBlocks: [
-					{
-						name: 'core/list-item',
-						attributes: { content: 'a' },
-						innerBlocks: [
-							{
-								name: 'core/list',
-								innerBlocks: [
-									{
-										name: 'core/list-item',
-										attributes: { content: 'b' },
-									},
-									{
-										name: 'core/list-item',
-										attributes: { content: '' },
-										innerBlocks: [
-											{
-												name: 'core/list',
-												innerBlocks: [
-													{
-														name: 'core/list-item',
-														attributes: {
-															content: 'd',
-														},
-													},
-												],
-											},
-										],
-									},
-								],
-							},
-						],
-					},
-					{
-						name: 'core/list-item',
-						attributes: { content: 'e' },
-					},
-				],
-			},
-		] );
-
-		// Another backspace outdents the item to the root of the list
-		await page.keyboard.press( 'Backspace' );
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/list',
-				innerBlocks: [
-					{
-						name: 'core/list-item',
-						attributes: { content: 'a' },
-						innerBlocks: [
-							{
-								name: 'core/list',
-								innerBlocks: [
-									{
-										name: 'core/list-item',
-										attributes: { content: 'b' },
-									},
-								],
-							},
-						],
-					},
-					{
-						name: 'core/list-item',
-						attributes: { content: '' },
-						innerBlocks: [
-							{
-								name: 'core/list',
-								innerBlocks: [
-									{
-										name: 'core/list-item',
-										attributes: {
-											content: 'd',
-										},
-									},
-								],
-							},
-						],
-					},
-
-					{
-						name: 'core/list-item',
-						attributes: { content: 'e' },
-					},
-				],
-			},
-		] );
-
-		// Finally, backspace at the list root should merge into "b", BUT NOW
-		// IT WOULD BE GREAT IF "d" WENT BACK TO ITS ORIGINAL INDENTATION
-		// LEVEL, I.E. IT SHOULD BECOME A CHILD OF "b", NOT ITS SIBLING.
+		// Now that the item is empty, backspace merges it into "b", and
+		// "d" keeps its original indentation level as a child of "b".
 		await page.keyboard.press( 'Backspace' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
