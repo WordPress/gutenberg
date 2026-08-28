@@ -53,6 +53,23 @@ export function getTestedUpToMajor( readme ) {
  * @return {{ branches: Array<{ name: string, ref: string, artifact: string }>, wpVersion: string }} Resolved branches.
  */
 export function resolveBranches( options ) {
+	const result = resolveBranchesForEvent( options );
+	const artifacts = result.branches.map( ( { artifact } ) => artifact );
+	const duplicate = artifacts.find(
+		( artifact, i ) => artifacts.indexOf( artifact ) !== i
+	);
+	if ( duplicate ) {
+		throw new Error(
+			`Branches must have distinct names once sanitized, "${ duplicate }" is used twice.`
+		);
+	}
+	return result;
+}
+
+/**
+ * @param {ResolveOptions} options
+ */
+function resolveBranchesForEvent( options ) {
 	const { event, sha, wpMajor, refExists } = options;
 
 	switch ( event ) {
@@ -115,15 +132,6 @@ export function resolveBranches( options ) {
 				.filter( Boolean );
 			if ( names.length < 2 ) {
 				throw new Error( 'Need at least two branches to compare.' );
-			}
-			const artifacts = names.map( ( name ) => branch( name ).artifact );
-			const duplicate = artifacts.find(
-				( artifact, i ) => artifacts.indexOf( artifact ) !== i
-			);
-			if ( duplicate ) {
-				throw new Error(
-					`Branches must have distinct names once sanitized, "${ duplicate }" is used twice.`
-				);
 			}
 			return {
 				branches: names.map( ( name ) => branch( name ) ),
