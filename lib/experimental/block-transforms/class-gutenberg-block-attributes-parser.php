@@ -117,7 +117,13 @@ class Gutenberg_Block_Attributes_Parser {
 	 */
 	private static function apply_source( $schema, $element ) {
 		$selector = isset( $schema['selector'] ) ? $schema['selector'] : null;
-		$source   = $schema['source'];
+		$source   = isset( $schema['source'] ) ? $schema['source'] : null;
+
+		// An attribute with no source is stored in the block's comment rather
+		// than read out of its markup.
+		if ( ! is_string( $source ) ) {
+			return null;
+		}
 
 		if ( 'query' === $source ) {
 			$sub_schema = isset( $schema['query'] ) ? $schema['query'] : array();
@@ -160,6 +166,16 @@ class Gutenberg_Block_Attributes_Parser {
 				return self::read_style_property( $target, isset( $schema['property'] ) ? $schema['property'] : null );
 
 			case 'attribute':
+				if ( ! isset( $schema['attribute'] ) || ! is_string( $schema['attribute'] ) ) {
+					_doing_it_wrong(
+						__METHOD__,
+						__( 'An "attribute" block attribute source has to name the attribute it reads.', 'gutenberg' ),
+						'23.8.0'
+					);
+
+					return null;
+				}
+
 				$value = $target->get_attribute( $schema['attribute'] );
 				$type  = isset( $schema['type'] ) ? $schema['type'] : null;
 

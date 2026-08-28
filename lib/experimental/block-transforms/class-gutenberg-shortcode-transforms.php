@@ -101,7 +101,9 @@ class Gutenberg_Shortcode_Transforms {
 				continue;
 			}
 
-			if ( preg_match( self::regexp( $transform['tag'] ), $html ) ) {
+			$pattern = self::regexp( $transform['tag'] );
+
+			if ( null !== $pattern && preg_match( $pattern, $html ) ) {
 				return $transform;
 			}
 		}
@@ -275,10 +277,77 @@ class Gutenberg_Shortcode_Transforms {
 	 * written so a transform can match a family of tags rather than one name.
 	 *
 	 * @param string $tag Shortcode tag, or a pattern matching several.
-	 * @return string Regular expression.
+	 * @return string|null Regular expression, or null when the tag cannot be written into one.
 	 */
 	private static function regexp( $tag ) {
+		static $checked = array();
+
+		if ( ! isset( $checked[ $tag ] ) ) {
+			$checked[ $tag ] = self::is_usable_tag( $tag );
+		}
+
+		if ( ! $checked[ $tag ] ) {
+			return null;
+		}
+
+		return self::compose_regexp( $tag );
+	}
+
+	/**
+	 * Writes a tag into the shortcode pattern.
+	 *
+	 * The same pattern `regexp()` in `@wordpress/shortcode` builds, so the two
+	 * runtimes match the same text and number their groups the same way.
+	 *
+	 * @param string $tag Shortcode tag, or a pattern matching several.
+	 * @return string Regular expression, which may or may not compile.
+	 */
+	private static function compose_regexp( $tag ) {
 		return '#\[(\[?)(' . $tag . ')(?![\w-])([^\]\/]*(?:\/(?!\])[^\]\/]*)*?)(?:(\/)\]|\](?:([^\[]*(?:\[(?!\/\2\])[^\[]*)*)(\[\/\2\]))?)(\]?)#s';
+	}
+
+	/**
+	 * Determines whether a tag can be written into the shortcode pattern.
+	 *
+	 * The tag goes in as written, so that a transform can match a family of
+	 * tags rather than one name. That leaves three ways to break the pattern
+	 * it goes into, all of them silent: a `#` ends it early, a capturing group
+	 * renumbers every group after it, and anything else invalid stops it
+	 * compiling at all.
+	 *
+	 * @param string $tag Shortcode tag, or a pattern matching several.
+	 * @return bool Whether the tag is usable.
+	 */
+	private static function is_usable_tag( $tag ) {
+		$reason = '';
+
+		if ( ! is_string( $tag ) || '' === $tag ) {
+			$reason = __( 'it is empty', 'gutenberg' );
+		} elseif ( false !== strpos( $tag, '#' ) ) {
+			$reason = __( 'it contains a "#"', 'gutenberg' );
+		} elseif ( preg_match( '/\((?!\?)/', $tag ) ) {
+			$reason = __( 'it opens a capturing group, which has to be written "(?:" instead', 'gutenberg' );
+			// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- An invalid pattern is reported below rather than as a PHP warning.
+		} elseif ( false === @preg_match( self::compose_regexp( $tag ), '' ) ) {
+			$reason = __( 'it is not a valid pattern', 'gutenberg' );
+		}
+
+		if ( '' === $reason ) {
+			return true;
+		}
+
+		_doing_it_wrong(
+			__METHOD__,
+			sprintf(
+				/* translators: 1: Shortcode tag declared by a block. 2: Why it cannot be used, for example "it contains a "#"". */
+				__( 'The shortcode tag "%1$s" cannot be matched because %2$s.', 'gutenberg' ),
+				is_string( $tag ) ? $tag : gettype( $tag ),
+				$reason
+			),
+			'23.8.0'
+		);
+
+		return false;
 	}
 
 	/**
@@ -294,7 +363,13 @@ class Gutenberg_Shortcode_Transforms {
 			return null;
 		}
 
-		if ( ! preg_match( self::regexp( $tag ), $html, $matches, PREG_OFFSET_CAPTURE, $offset ) ) {
+		$pattern = self::regexp( $tag );
+
+		if ( null === $pattern ) {
+			return null;
+		}
+
+		if ( ! preg_match( $pattern, $html, $matches, PREG_OFFSET_CAPTURE, $offset ) ) {
 			return null;
 		}
 
@@ -304,6 +379,20 @@ class Gutenberg_Shortcode_Transforms {
 		// An escaped shortcode, `[[tag]]`, is text rather than a shortcode.
 		if ( '[' === $matches[1][0] && ']' === ( isset( $matches[7] ) ? $matches[7][0] : '' ) ) {
 			return self::next( $tag, $html, $index + strlen( $text ) );
+		}
+
+		/*
+		 * A single bracket either side is the text around the shortcode rather
+		 * than part of it, and `next()` in `@wordpress/shortcode` trims it off
+		 * the match and moves the index past it.
+		 */
+		if ( '' !== $matches[1][0] ) {
+			$text = substr( $text, 1 );
+			++$index;
+		}
+
+		if ( isset( $matches[7] ) && '' !== $matches[7][0] ) {
+			$text = substr( $text, 0, -1 );
 		}
 
 		return array(

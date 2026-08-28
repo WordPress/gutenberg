@@ -1210,6 +1210,141 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_refuses_a_transform_callback_written_as_text() {
+		// `block.json` is JSON, so a callback there can only be a string, and
+		// PHP would resolve it to whatever global function bears that name.
+		$this->setExpectedIncorrectUsage( 'Gutenberg_HTML_To_Blocks::is_transform_callback' );
+
+		$this->register(
+			'test/named-callback',
+			array(
+				'attributes' => array(),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'    => 'raw',
+							'isMatch' => 'phpversion',
+						),
+					),
+				),
+			)
+		);
+
+		// The transform matches nothing rather than calling `phpversion()`.
+		$blocks = gutenberg_html_to_blocks( '<aside>One</aside>' );
+
+		$this->assertSame( 'core/html', $blocks[0]['blockName'] );
+	}
+
+	public function test_refuses_an_attribute_source_naming_no_attribute() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_Block_Attributes_Parser::apply_source' );
+
+		$this->register(
+			'test/nameless-attribute',
+			array(
+				'attributes' => array(
+					'value' => array(
+						'type'   => 'string',
+						'source' => 'attribute',
+					),
+				),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'     => 'raw',
+							'selector' => 'aside',
+						),
+					),
+				),
+			)
+		);
+
+		$blocks = gutenberg_html_to_blocks( '<aside data-x="1">One</aside>' );
+
+		$this->assertSame( 'test/nameless-attribute', $blocks[0]['blockName'] );
+		$this->assertArrayNotHasKey( 'value', $blocks[0]['attrs'] );
+	}
+
+	/**
+	 * @dataProvider data_unusable_shortcode_tags
+	 *
+	 * @param string $tag Shortcode tag a block declares.
+	 */
+	public function test_refuses_a_shortcode_tag_that_would_break_the_pattern( $tag ) {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_Shortcode_Transforms::is_usable_tag' );
+
+		$this->register(
+			'test/shortcode-' . md5( $tag ),
+			array(
+				'attributes' => array(),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type' => 'shortcode',
+							'tag'  => $tag,
+						),
+					),
+				),
+			)
+		);
+
+		/*
+		 * The block's own transform never runs; the shortcode falls to the
+		 * Shortcode block, which is lossless, rather than being matched
+		 * against a pattern that does not mean what the block wrote.
+		 */
+		$blocks = gutenberg_html_to_blocks( '<p>[thing]</p>' );
+
+		$this->assertSame( 'core/shortcode', $blocks[0]['blockName'] );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public static function data_unusable_shortcode_tags() {
+		return array(
+			'pattern delimiter' => array( 'thing#' ),
+			'capturing group'   => array( '(thing)' ),
+			'invalid pattern'   => array( '*thing' ),
+		);
+	}
+
+	/**
+	 * @dataProvider data_lone_brackets
+	 *
+	 * @param string $html     Markup holding a shortcode.
+	 * @param string $expected Text the match is expected to cover.
+	 * @param int    $index    Offset the match is expected to start at.
+	 */
+	public function test_reads_a_shortcode_past_a_lone_bracket( $html, $expected, $index ) {
+		$next = new ReflectionMethod( 'Gutenberg_Shortcode_Transforms', 'next' );
+		$next->setAccessible( true );
+
+		$match = $next->invoke( null, 'gallery', $html );
+
+		$this->assertSame( $expected, $match['text'] );
+		$this->assertSame( $index, $match['index'] );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * Every expectation here was taken from `next()` in `@wordpress/shortcode`.
+	 *
+	 * @return array[]
+	 */
+	public static function data_lone_brackets() {
+		return array(
+			'plain'            => array( '[gallery]', '[gallery]', 0 ),
+			'in a sentence'    => array( 'a [gallery] b', '[gallery]', 2 ),
+			'leading bracket'  => array( '[[gallery]', '[gallery]', 1 ),
+			'trailing bracket' => array( '[gallery]]', '[gallery]', 0 ),
+			'both, mid text'   => array( 'x[[gallery] y', '[gallery]', 2 ),
+		);
+	}
+
 	public function test_leaves_media_in_place_when_nothing_converts_it() {
 		$this->register_test_blocks();
 

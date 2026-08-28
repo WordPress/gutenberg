@@ -197,7 +197,7 @@ class Gutenberg_HTML_To_Blocks {
 			self::apply_content_schema( $element, $transform['schema'] );
 		}
 
-		if ( isset( $transform['transform'] ) && is_callable( $transform['transform'] ) ) {
+		if ( isset( $transform['transform'] ) && self::is_transform_callback( $transform['transform'] ) ) {
 			$block = call_user_func( $transform['transform'], $element, array( __CLASS__, 'convert' ) );
 
 			if ( is_array( $block ) && isset( $block['blockName'] ) ) {
@@ -775,7 +775,7 @@ class Gutenberg_HTML_To_Blocks {
 	 */
 	private static function find_transform( $element ) {
 		foreach ( self::get_raw_transforms() as $transform ) {
-			if ( isset( $transform['isMatch'] ) && is_callable( $transform['isMatch'] ) ) {
+			if ( isset( $transform['isMatch'] ) && self::is_transform_callback( $transform['isMatch'] ) ) {
 				if ( ! call_user_func( $transform['isMatch'], $element ) ) {
 					continue;
 				}
@@ -898,6 +898,36 @@ class Gutenberg_HTML_To_Blocks {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Determines whether a transform's callback may be called.
+	 *
+	 * A transform reaches `WP_Block_Type::$transforms` from a `block.json`
+	 * file as often as from PHP, and JSON has no functions: a string there is
+	 * a mistake, not a callback, and PHP would resolve it to whatever global
+	 * function happens to bear that name. Only a callback that could not have
+	 * come out of JSON is called.
+	 *
+	 * @param mixed $callback Value declared for `isMatch` or `transform`.
+	 * @return bool Whether it may be called.
+	 */
+	private static function is_transform_callback( $callback ) {
+		if ( is_string( $callback ) ) {
+			_doing_it_wrong(
+				__METHOD__,
+				sprintf(
+					/* translators: %s: Name written where a callback belongs. */
+					__( 'A block transform cannot name its callback as text ("%s"). Declare what the transform does in `block.json`, or register the block from PHP with a callback.', 'gutenberg' ),
+					$callback
+				),
+				'23.8.0'
+			);
+
+			return false;
+		}
+
+		return is_callable( $callback );
 	}
 
 	/**
