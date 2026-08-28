@@ -40,7 +40,7 @@ const NPM_RELEASE_TAG_PUSH_BATCH_SIZE = 25;
  * and unlike pushing the release branch it never advertises versions that are
  * not on npm yet.
  */
-const NPM_RELEASE_PREPARED_REF = 'refs/npm-release/prepared';
+const NPM_RELEASE_PREPARED_REF_PREFIX = 'refs/npm-release';
 
 /**
  * Release type names.
@@ -860,32 +860,71 @@ async function pushNpmReleaseGitMetadata(
 }
 
 /**
- * Pushes the prepared release commit to a durable scratch ref.
+ * Builds the prepared-release ref names for a release target.
  *
- * @param {Object} options                         Options.
- * @param {string} options.gitWorkingDirectoryPath Git working directory path.
- * @param {string} options.publishCommit           Publish commit SHA.
- * @param {Object} deps                            Dependencies.
- * @param {Object} deps.git                        Git client.
+ * Each release target gets its own namespace so a `latest` release cannot
+ * overwrite or delete the recovery data of a concurrent `next` or `wp-X.Y` one.
+ *
+ * @param {string} npmReleaseBranch Npm release branch.
+ *
+ * @return {{base: string, commit: string, tags: string}} Prepared ref names.
+ */
+function getNpmReleasePreparedRefs( npmReleaseBranch ) {
+	const slug = npmReleaseBranch.replace( /\//g, '-' );
+	const base = `${ NPM_RELEASE_PREPARED_REF_PREFIX }/${ slug }`;
+	return { base, commit: `${ base }/commit`, tags: `${ base }/tags` };
+}
+
+/**
+ * Pushes the prepared release commit and its package tags to scratch refs.
+ *
+ * The tags matter as much as the commit. `getNpmReleasePackages` derives the
+ * release set from the tags Lerna left at `HEAD`, so a resumed runner without
+ * them sees an empty release, skips publishing, pushes no tags, and reports
+ * success.
+ *
+ * @param {Object}   options                         Options.
+ * @param {string}   options.gitWorkingDirectoryPath Git working directory path.
+ * @param {string}   options.npmReleaseBranch        Npm release branch.
+ * @param {string[]} options.packageTags             Package tag names.
+ * @param {string}   options.publishCommit           Publish commit SHA.
+ * @param {Object}   deps                            Dependencies.
+ * @param {Object}   deps.git                        Git client.
  */
 async function pushNpmReleasePreparedCommit(
-	{ gitWorkingDirectoryPath, publishCommit },
+	{ gitWorkingDirectoryPath, npmReleaseBranch, packageTags, publishCommit },
 	deps = {}
 ) {
 	const { git = SimpleGit( gitWorkingDirectoryPath ) } = deps;
+	const refs = getNpmReleasePreparedRefs( npmReleaseBranch );
 	log( '>> Persisting the prepared release commit before publishing.' );
 	await git.raw(
 		'push',
 		'--force',
 		'origin',
-		`${ publishCommit }:${ NPM_RELEASE_PREPARED_REF }`
+		`${ publishCommit }:${ refs.commit }`
 	);
+	for ( const packageTagChunk of chunk(
+		packageTags,
+		NPM_RELEASE_TAG_PUSH_BATCH_SIZE
+	) ) {
+		await git.raw(
+			'push',
+			'--force',
+			'origin',
+			...packageTagChunk.map(
+				( tagName ) =>
+					`refs/tags/${ tagName }:${ refs.tags }/${ tagName }`
+			)
+		);
+	}
 }
 
 /**
  * Reads the prepared release commit from the scratch ref, if one exists.
  *
  * @param {string} gitWorkingDirectoryPath Git working directory path.
+ * @param {string} npmReleaseBranch        Npm release branch.
  * @param {Object} deps                    Dependencies.
  * @param {Object} deps.git                Git client.
  *
@@ -893,39 +932,130 @@ async function pushNpmReleasePreparedCommit(
  */
 async function getNpmReleasePreparedCommit(
 	gitWorkingDirectoryPath,
+	npmReleaseBranch,
 	deps = {}
 ) {
 	const { git = SimpleGit( gitWorkingDirectoryPath ) } = deps;
-	const output = await git.raw(
-		'ls-remote',
-		'origin',
-		NPM_RELEASE_PREPARED_REF
-	);
+	const refs = getNpmReleasePreparedRefs( npmReleaseBranch );
+	const output = await git.raw( 'ls-remote', 'origin', refs.commit );
 	const [ sha ] = output.trim().split( /\s+/ );
 	return sha || null;
 }
 
 /**
+ * Reads the package tag names persisted alongside a prepared commit.
+ *
+ * @param {string} gitWorkingDirectoryPath Git working directory path.
+ * @param {string} npmReleaseBranch        Npm release branch.
+ * @param {Object} deps                    Dependencies.
+ * @param {Object} deps.git                Git client.
+ *
+ * @return {Promise<string[]>} Persisted package tag names.
+ */
+async function getNpmReleasePreparedTagNames(
+	gitWorkingDirectoryPath,
+	npmReleaseBranch,
+	deps = {}
+) {
+	const { git = SimpleGit( gitWorkingDirectoryPath ) } = deps;
+	const refs = getNpmReleasePreparedRefs( npmReleaseBranch );
+	const output = await git.raw( 'ls-remote', 'origin', `${ refs.tags }/*` );
+	return output
+		.split( '\n' )
+		.map( ( line ) => line.trim().split( /\s+/ )[ 1 ] )
+		.filter( Boolean )
+		.map( ( ref ) => ref.slice( `${ refs.tags }/`.length ) );
+}
+
+/**
+ * Restores the persisted package tags into the local repository.
+ *
+ * @param {string} gitWorkingDirectoryPath Git working directory path.
+ * @param {string} npmReleaseBranch        Npm release branch.
+ * @param {Object} deps                    Dependencies.
+ * @param {Object} deps.git                Git client.
+ */
+async function restoreNpmReleasePreparedTags(
+	gitWorkingDirectoryPath,
+	npmReleaseBranch,
+	deps = {}
+) {
+	const { git = SimpleGit( gitWorkingDirectoryPath ) } = deps;
+	const refs = getNpmReleasePreparedRefs( npmReleaseBranch );
+	log( '>> Restoring the package tags prepared by the previous run.' );
+	await git.raw(
+		'fetch',
+		'--force',
+		'origin',
+		`${ refs.tags }/*:refs/tags/*`
+	);
+}
+
+/**
+ * Deletes the prepared release scratch refs.
+ *
+ * @param {string} gitWorkingDirectoryPath Git working directory path.
+ * @param {string} npmReleaseBranch        Npm release branch.
+ * @param {Object} deps                    Dependencies.
+ * @param {Object} deps.git                Git client.
+ */
+async function deleteNpmReleasePreparedCommit(
+	gitWorkingDirectoryPath,
+	npmReleaseBranch,
+	deps = {}
+) {
+	const { git = SimpleGit( gitWorkingDirectoryPath ) } = deps;
+	const refs = getNpmReleasePreparedRefs( npmReleaseBranch );
+	const tagNames = await getNpmReleasePreparedTagNames(
+		gitWorkingDirectoryPath,
+		npmReleaseBranch,
+		{ git }
+	);
+	for ( const tagChunk of chunk(
+		tagNames,
+		NPM_RELEASE_TAG_PUSH_BATCH_SIZE
+	) ) {
+		await git.raw(
+			'push',
+			'origin',
+			'--delete',
+			...tagChunk.map( ( tagName ) => `${ refs.tags }/${ tagName }` )
+		);
+	}
+	await git.raw( 'push', 'origin', '--delete', refs.commit );
+}
+
+/**
  * Reports whether a prepared commit belongs to a release that already finished.
  *
- * A completed release leaves its commit on the npm release branch, so a scratch
- * ref still pointing there was abandoned rather than interrupted mid-flight.
+ * Containment in the release branch is not sufficient. Git metadata pushes the
+ * branch before the package tags, so a run that lost the tag push leaves the
+ * commit on the branch with tags still outstanding; treating that as finished
+ * would delete the recovery data for a release that never completed.
  *
- * @param {Object} options                         Options.
- * @param {string} options.gitWorkingDirectoryPath Git working directory path.
- * @param {string} options.npmReleaseBranch        Npm release branch.
- * @param {string} options.preparedCommit          Prepared commit SHA.
- * @param {Object} deps                            Dependencies.
- * @param {Object} deps.git                        Git client.
+ * @param {Object}   options                         Options.
+ * @param {string}   options.gitWorkingDirectoryPath Git working directory path.
+ * @param {string}   options.npmReleaseBranch        Npm release branch.
+ * @param {string}   options.preparedCommit          Prepared commit SHA.
+ * @param {Object}   deps                            Dependencies.
+ * @param {Function} deps.getPreparedTagNamesFn      Reads persisted tag names.
+ * @param {Function} deps.getRemoteBranchShaFn       Reads the remote branch SHA.
+ * @param {Object}   deps.git                        Git client.
+ * @param {Function} deps.verifyRemotePackageTagsFn  Verifies remote package tags.
  *
- * @return {Promise<boolean>} True when the prepared commit is already released.
+ * @return {Promise<boolean>} True when the prepared release already completed.
  */
 async function isNpmReleasePreparedCommitStale(
 	{ gitWorkingDirectoryPath, npmReleaseBranch, preparedCommit },
 	deps = {}
 ) {
-	const { git = SimpleGit( gitWorkingDirectoryPath ) } = deps;
-	const remoteSha = await getRemoteBranchSha(
+	const {
+		getPreparedTagNamesFn = getNpmReleasePreparedTagNames,
+		getRemoteBranchShaFn = getRemoteBranchSha,
+		git = SimpleGit( gitWorkingDirectoryPath ),
+		verifyRemotePackageTagsFn = verifyRemotePackageTags,
+	} = deps;
+	const remoteSha = await getRemoteBranchShaFn(
 		gitWorkingDirectoryPath,
 		npmReleaseBranch,
 		{ git }
@@ -940,25 +1070,27 @@ async function isNpmReleasePreparedCommitStale(
 			preparedCommit,
 			remoteSha
 		);
+	} catch {
+		return false;
+	}
+	const packageTags = await getPreparedTagNamesFn(
+		gitWorkingDirectoryPath,
+		npmReleaseBranch,
+		{ git }
+	);
+	try {
+		await verifyRemotePackageTagsFn(
+			{
+				gitWorkingDirectoryPath,
+				packageTags,
+				publishCommit: preparedCommit,
+			},
+			{ git }
+		);
 		return true;
 	} catch {
 		return false;
 	}
-}
-
-/**
- * Deletes the prepared release scratch ref.
- *
- * @param {string} gitWorkingDirectoryPath Git working directory path.
- * @param {Object} deps                    Dependencies.
- * @param {Object} deps.git                Git client.
- */
-async function deleteNpmReleasePreparedCommit(
-	gitWorkingDirectoryPath,
-	deps = {}
-) {
-	const { git = SimpleGit( gitWorkingDirectoryPath ) } = deps;
-	await git.raw( 'push', 'origin', '--delete', NPM_RELEASE_PREPARED_REF );
 }
 
 /**
@@ -1030,7 +1162,12 @@ async function publishVersionedPackagesToNpm(
 	 * runner even if a later phase fails.
 	 */
 	await pushPreparedCommitFn(
-		{ gitWorkingDirectoryPath, publishCommit },
+		{
+			gitWorkingDirectoryPath,
+			npmReleaseBranch,
+			packageTags: releasePackages.map( ( { tagName } ) => tagName ),
+			publishCommit,
+		},
 		{ git }
 	);
 	try {
@@ -1089,7 +1226,9 @@ async function publishVersionedPackagesToNpm(
 	} );
 
 	// The release is durable in Git now, so the scratch ref has served its purpose.
-	await deletePreparedCommitFn( gitWorkingDirectoryPath, { git } );
+	await deletePreparedCommitFn( gitWorkingDirectoryPath, npmReleaseBranch, {
+		git,
+	} );
 }
 
 /**
@@ -1118,6 +1257,7 @@ async function publishPackagesToNpm(
 		git = SimpleGit( gitWorkingDirectoryPath ),
 		isPreparedCommitStaleFn = isNpmReleasePreparedCommitStale,
 		publishVersionedPackagesToNpmFn = publishVersionedPackagesToNpm,
+		restorePreparedTagsFn = restoreNpmReleasePreparedTags,
 	} = deps;
 	log( '>> Installing npm packages.' );
 	await commandFn( 'npm ci', {
@@ -1141,9 +1281,11 @@ async function publishPackagesToNpm(
 	 * published package references, so resume from the prepared commit instead
 	 * and let the preflight skip whatever already made it to the registry.
 	 */
-	const preparedCommit = await getPreparedCommitFn( gitWorkingDirectoryPath, {
-		git,
-	} );
+	const preparedCommit = await getPreparedCommitFn(
+		gitWorkingDirectoryPath,
+		npmReleaseBranch,
+		{ git }
+	);
 	if (
 		preparedCommit &&
 		( await isPreparedCommitStaleFn(
@@ -1154,13 +1296,30 @@ async function publishPackagesToNpm(
 		log(
 			`>> Ignoring the stale prepared commit ${ preparedCommit }; it is already on ${ npmReleaseBranch }.`
 		);
-		await deletePreparedCommitFn( gitWorkingDirectoryPath, { git } );
+		await deletePreparedCommitFn(
+			gitWorkingDirectoryPath,
+			npmReleaseBranch,
+			{
+				git,
+			}
+		);
 	} else if ( preparedCommit ) {
 		log(
 			`>> Resuming the prepared release commit ${ preparedCommit } from a previous run.`
 		);
-		await git.fetch( 'origin', NPM_RELEASE_PREPARED_REF );
+		const refs = getNpmReleasePreparedRefs( npmReleaseBranch );
+		await git.fetch( 'origin', refs.commit );
 		await git.checkout( preparedCommit );
+		/*
+		 * Lerna's tags never left the original runner, and the release set is
+		 * derived from the tags at HEAD. Restore them or this run computes an
+		 * empty release and completes without pushing any of them.
+		 */
+		await restorePreparedTagsFn(
+			gitWorkingDirectoryPath,
+			npmReleaseBranch,
+			{ git }
+		);
 
 		await publishVersionedPackagesToNpmFn( {
 			distTag,
@@ -1497,6 +1656,8 @@ module.exports = {
 	deleteNpmReleasePreparedCommit,
 	finalizePreparedNpmRelease,
 	getNpmReleasePreparedCommit,
+	getNpmReleasePreparedRefs,
+	getNpmReleasePreparedTagNames,
 	getNpmReleasePackages,
 	getNpmReleaseGitRecoveryCommands,
 	getRemoteBranchSha,
@@ -1510,6 +1671,7 @@ module.exports = {
 	pushNpmReleaseGitMetadata,
 	isNpmReleasePreparedCommitStale,
 	pushNpmReleasePreparedCommit,
+	restoreNpmReleasePreparedTags,
 	publishNpmGutenbergPlugin,
 	publishNpmBugfixLatest,
 	publishNpmBugfixWordPressCore,
