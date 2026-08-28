@@ -17,8 +17,8 @@ import type {
 	BorderControlProps,
 } from '../../border-control/types';
 
-const BorderLabel = ( props: LabelProps ) => {
-	const { label, hideLabelFromVision } = props;
+const BorderLabel = ( props: LabelProps & { className?: string } ) => {
+	const { className, label, hideLabelFromVision } = props;
 
 	if ( ! label ) {
 		return null;
@@ -28,9 +28,13 @@ const BorderLabel = ( props: LabelProps ) => {
 	// the stable `.components-base-control__label` className consumers style
 	// against; `StyledLabel` is an emotion component with a generated one.
 	return hideLabelFromVision ? (
-		<VisuallyHidden as="label">{ label }</VisuallyHidden>
+		<VisuallyHidden as="label" className={ className }>
+			{ label }
+		</VisuallyHidden>
 	) : (
-		<BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel>
+		<BaseControl.VisualLabel className={ className }>
+			{ label }
+		</BaseControl.VisualLabel>
 	);
 };
 
@@ -48,6 +52,7 @@ const UnconnectedBorderBoxControl = (
 		hasMixedBorders,
 		hasVisibleLabel,
 		headerClassName,
+		headerLabelClassName,
 		hideLabelFromVision,
 		isLinked,
 		label,
@@ -95,6 +100,7 @@ const UnconnectedBorderBoxControl = (
 				// radius one.
 				<HStack className={ headerClassName }>
 					<BorderLabel
+						className={ headerLabelClassName }
 						label={ label }
 						hideLabelFromVision={ hideLabelFromVision }
 					/>

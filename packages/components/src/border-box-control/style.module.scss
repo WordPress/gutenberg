@@ -25,7 +25,7 @@
 	/* The label supplies its own bottom margin as the gap to the input below.
 	   In the header row that gap comes from the row itself, and the margin
 	   would knock the vertically centered label off center. */
-	:global(.components-base-control__label) {
+	.header-label {
 		margin-bottom: 0;
 	}
 }
