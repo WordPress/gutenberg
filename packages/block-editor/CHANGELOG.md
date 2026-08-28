@@ -2,10 +2,18 @@
 
 ## Unreleased
 
+### Internal
+
+-   Remove unused dependencies `@wordpress/escape-html`, `@wordpress/wordcount` and `deepmerge` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+
 ### Bug Fixes
 
 -   Inserter: Keep the hovered block preview inside the viewport, so a tall preview in a short window is no longer clipped ([#82060](https://github.com/WordPress/gutenberg/pull/82060)).
 -   Client-side media processing: Refuse a batch of more than one file when the caller only takes one, such as a Cover block placeholder, matching what the server-side upload path already did. Every dropped file was uploaded instead, and the block kept whichever one finished last ([#82041](https://github.com/WordPress/gutenberg/issues/82041)).
+
+### Internal
+
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
 
 ## 17.0.0 (2026-08-26)
 

@@ -1,103 +1,65 @@
 import { loadView } from '@wordpress/views';
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import type { Type } from '@wordpress/core-data';
-import type {
-	View,
-	Filter,
-	SupportedLayouts,
-	ViewTable,
-} from '@wordpress/dataviews';
+import type { View, SupportedLayouts } from '@wordpress/dataviews';
+import { unlock } from '@wordpress/routes-lock-unlock';
 
-const DEFAULT_VIEW: View = {
-	type: 'table' as const,
-	sort: {
-		field: 'date',
-		direction: 'desc' as const,
-	},
-	fields: [ 'author', 'status', 'date' ],
-	titleField: 'title',
-	mediaField: 'featured_media',
-	descriptionField: 'excerpt',
-};
-
-const DEFAULT_TABLE_LAYOUT: Omit< ViewTable, 'type' > = {
-	layout: {
-		styles: {
-			author: {
-				align: 'start',
-			},
-		},
-	},
-};
-
-export const DEFAULT_LAYOUTS: SupportedLayouts = {
-	table: DEFAULT_TABLE_LAYOUT,
-	grid: true,
-	list: true,
-};
-
-export const DEFAULT_VIEWS: {
-	slug: string;
-	label: string;
-}[] = [
-	{
-		slug: 'all',
-		label: 'All',
-	},
-	{
-		slug: 'publish',
-		label: 'Published',
-	},
-	{
-		slug: 'draft',
-		label: 'Draft',
-	},
-	{
-		slug: 'pending',
-		label: 'Pending',
-	},
-	{
-		slug: 'private',
-		label: 'Private',
-	},
-	{
-		slug: 'trash',
-		label: 'Trash',
-	},
-];
-
-type ActiveViewOverrides = {
-	filters?: Filter[];
-	sort?: View[ 'sort' ];
+/**
+ * A layer merged on top of a view. Mirrors the `ViewOverrides` type of
+ * `@wordpress/views`, which is not exported.
+ */
+export type ViewOverrides = Partial< Omit< View, 'type' | 'layout' > > & {
+	type?: View[ 'type' ];
 	layout?: Record< string, unknown >;
 };
 
-export function getActiveViewOverridesForTab(
-	slug: string
-): ActiveViewOverrides {
-	if ( slug === 'all' ) {
-		return {
-			...DEFAULT_TABLE_LAYOUT,
-		};
-	}
+export interface ViewListEntry {
+	title: string;
+	slug: string;
+	view?: ViewOverrides;
+}
+
+interface EntityViewConfig {
+	default_view: View | undefined;
+	default_layouts: SupportedLayouts | undefined;
+	view_list: ViewListEntry[] | undefined;
+}
+
+/**
+ * Resolves the server-provided view configuration for the given post type,
+ * for use in the route loader that runs outside React (where `useViewConfig`
+ * is unavailable).
+ *
+ * @param postType The post type name.
+ * @return The entity view configuration.
+ */
+export async function loadPostTypeViewConfig(
+	postType: string
+): Promise< EntityViewConfig > {
+	const config = await unlock( resolveSelect( coreStore ) ).getViewConfig(
+		'postType',
+		postType
+	);
 	return {
-		...DEFAULT_TABLE_LAYOUT,
-		filters: [
-			{
-				field: 'status',
-				operator: 'is',
-				value: slug,
-			},
-		],
+		default_view: config?.default_view,
+		default_layouts: config?.default_layouts,
+		view_list: config?.view_list,
 	};
 }
 
-export function getDefaultView( postType: Type | undefined ): View {
-	return {
-		...DEFAULT_VIEW,
-		showLevels: postType?.hierarchical,
-	};
+/**
+ * Returns the view overrides of the entry in the view list matching the
+ * given slug, or an empty object when there is none.
+ *
+ * @param viewList The `view_list` of an entity view configuration.
+ * @param slug     Slug of the active view.
+ * @return The view overrides for the active view.
+ */
+export function getActiveViewOverrides(
+	viewList: ViewListEntry[] | undefined,
+	slug: string
+): ViewOverrides {
+	return viewList?.find( ( v ) => v.slug === slug )?.view ?? {};
 }
 
 export async function ensureView(
@@ -105,18 +67,26 @@ export async function ensureView(
 	slug?: string,
 	search?: { page?: number; search?: string }
 ) {
-	const postTypeObject = await resolveSelect( coreStore ).getPostType( type );
-	const defaultView = getDefaultView( postTypeObject );
+	const {
+		default_view: defaultView,
+		default_layouts: defaultLayouts,
+		view_list: viewList,
+	} = await loadPostTypeViewConfig( type );
+	if ( ! defaultView ) {
+		throw new Error(
+			`Missing view configuration for the ${ type } post type.`
+		);
+	}
 	return loadView( {
 		kind: 'postType',
 		name: type,
 		slug: 'default-new',
 		defaultView,
-		activeViewOverrides: getActiveViewOverridesForTab( slug ?? 'all' ),
+		defaultLayouts,
+		activeViewOverrides: getActiveViewOverrides( viewList, slug ?? 'all' ),
 		queryParams: search,
 	} );
 }
-
 export function viewToQuery( view: View, postType: string ) {
 	const result: Record< string, any > = { _embed: 'author,wp:featuredmedia' };
 
