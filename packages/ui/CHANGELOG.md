@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   `Autocomplete.Popup`, `Combobox.Popup`, `Select.Popup`: Rename the `popupWidth` prop to `width`. Composites (`SelectControl`, `SearchableChipSelect`, `SearchableChipSelectControl`) keep `popupWidth`.
+-   `Autocomplete.Popup`, `Combobox.Popup`, `Select.Popup`: Rename the `popupWidth` prop to `width`. Composites (`SelectControl`, `SearchableChipSelect`, `SearchableChipSelectControl`) keep `popupWidth` ([#82193](https://github.com/WordPress/gutenberg/pull/82193)).
 -   `Autocomplete.Popup`, `Combobox.Popup`, `Select.Popup`, `SearchableChipSelect`, and `SearchableChipSelectControl`: The popup now defaults to a fixed anchor width. Use `width="content"` on Popups, or `popupWidth="content"` on composites, to restore content-sized width between the anchor and available viewport bounds ([#82087](https://github.com/WordPress/gutenberg/pull/82087)).
 -   Portaled overlays (`AlertDialog`, `Autocomplete`, `Combobox`, `Dialog`, `Drawer`, `Menu`, `Popover`, and `Select`) now inherit the theme from their portal destination instead of re-emitting the trigger's nearest contextual theme. Default portals use the document root theme; custom portal containers use their DOM ancestry ([#82038](https://github.com/WordPress/gutenberg/pull/82038)).
 
