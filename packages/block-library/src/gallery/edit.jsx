@@ -23,7 +23,7 @@ import {
 	MediaReplaceFlow,
 	useSettings,
 } from '@wordpress/block-editor';
-import { useEffect, useMemo } from '@wordpress/element';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
@@ -37,7 +37,12 @@ import {
 	fullscreen,
 } from '@wordpress/icons';
 import { sharedIcon } from './shared-icon';
-import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
+import {
+	defaultColumnsNumber,
+	isGalleryFlexLayout,
+	isObject,
+	pickRelevantMediaFiles,
+} from './shared';
 import { getHrefAndDestination } from './utils';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import {
@@ -158,7 +163,10 @@ export default function GalleryEdit( props ) {
 		linkTo,
 		sizeSlug,
 		aspectRatio,
+		layout,
 	} = attributes;
+	const isFlexLayout = isGalleryFlexLayout( layout );
+	const previousLayoutRef = useRef( layout );
 
 	const {
 		__unstableMarkNextChangeAsNotPersistent,
@@ -168,6 +176,47 @@ export default function GalleryEdit( props ) {
 	} = useDispatch( blockEditorStore );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
+
+	useEffect( () => {
+		// Variations replace the whole layout object. Carry Grid-only settings
+		// across a layout type change so switching back restores them.
+		const previousLayout = previousLayoutRef.current;
+		previousLayoutRef.current = layout;
+
+		if (
+			! isObject( previousLayout ) ||
+			! isObject( layout ) ||
+			previousLayout.type === layout.type
+		) {
+			return;
+		}
+
+		const nextLayout = { ...layout };
+		let hasPreservedGridSetting = false;
+
+		if (
+			! Object.hasOwn( layout, 'columnCount' ) &&
+			Number.isInteger( previousLayout.columnCount ) &&
+			previousLayout.columnCount > 0
+		) {
+			nextLayout.columnCount = previousLayout.columnCount;
+			hasPreservedGridSetting = true;
+		}
+
+		if (
+			! Object.hasOwn( layout, 'minimumColumnWidth' ) &&
+			typeof previousLayout.minimumColumnWidth === 'string'
+		) {
+			nextLayout.minimumColumnWidth = previousLayout.minimumColumnWidth;
+			hasPreservedGridSetting = true;
+		}
+
+		if ( hasPreservedGridSetting ) {
+			previousLayoutRef.current = nextLayout;
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { layout: nextLayout } );
+		}
+	}, [ layout, setAttributes, __unstableMarkNextChangeAsNotPersistent ] );
 
 	const { getBlock, getSettings, innerBlockImages, multiGallerySelection } =
 		useSelect(
@@ -627,9 +676,10 @@ export default function GalleryEdit( props ) {
 				'blocks-gallery-grid',
 				{
 					[ `align${ align }` ]: align,
-					[ `columns-${ columns }` ]: columns !== undefined,
-					'columns-default': columns === undefined,
-					'is-cropped': imageCrop,
+					[ `columns-${ columns }` ]:
+						isFlexLayout && columns !== undefined,
+					'columns-default': isFlexLayout && columns === undefined,
+					'is-cropped': isFlexLayout && imageCrop,
 				},
 			]
 		),
@@ -711,9 +761,11 @@ export default function GalleryEdit( props ) {
 					resetAll={ () => {
 						setAttributes( {
 							navigationButtonType: 'icon',
-							columns: undefined,
-							imageCrop: true,
 							randomOrder: false,
+							...( isFlexLayout && {
+								columns: undefined,
+								imageCrop: true,
+							} ),
 						} );
 
 						setAspectRatio( 'auto' );
@@ -728,7 +780,7 @@ export default function GalleryEdit( props ) {
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
-					{ displayedImageCount > 1 && (
+					{ isFlexLayout && displayedImageCount > 1 && (
 						<ToolsPanelItem
 							isShownByDefault
 							label={ __( 'Columns' ) }
@@ -779,20 +831,22 @@ export default function GalleryEdit( props ) {
 							/>
 						</ToolsPanelItem>
 					) }
-					<ToolsPanelItem
-						isShownByDefault
-						label={ __( 'Crop images to fit' ) }
-						hasValue={ () => ! imageCrop }
-						onDeselect={ () =>
-							setAttributes( { imageCrop: true } )
-						}
-					>
-						<ToggleControl
+					{ isFlexLayout && (
+						<ToolsPanelItem
+							isShownByDefault
 							label={ __( 'Crop images to fit' ) }
-							checked={ !! imageCrop }
-							onChange={ toggleImageCrop }
-						/>
-					</ToolsPanelItem>
+							hasValue={ () => ! imageCrop }
+							onDeselect={ () =>
+								setAttributes( { imageCrop: true } )
+							}
+						>
+							<ToggleControl
+								label={ __( 'Crop images to fit' ) }
+								checked={ !! imageCrop }
+								onChange={ toggleImageCrop }
+							/>
+						</ToolsPanelItem>
+					) }
 					<ToolsPanelItem
 						isShownByDefault
 						label={ __( 'Randomize order' ) }
@@ -930,10 +984,12 @@ export default function GalleryEdit( props ) {
 						/>
 					</BlockControls>
 				) }
-				<GalleryGapCustomProperties
-					style={ attributes.style }
-					clientId={ clientId }
-				/>
+				{ isFlexLayout && (
+					<GalleryGapCustomProperties
+						style={ attributes.style }
+						clientId={ clientId }
+					/>
+				) }
 			</>
 			{ isDynamic ? (
 				<GalleryDynamicView

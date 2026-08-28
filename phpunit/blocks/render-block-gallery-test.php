@@ -121,6 +121,23 @@ class Tests_Blocks_Render_Gallery extends WP_UnitTestCase {
 		}
 	}
 
+	public function test_dynamic_grid_uses_only_standard_grid_layout_classes() {
+		$output = $this->render_in_loop(
+			'<!-- wp:gallery {"dynamicContent":{"source":"core/attached-media"},"layout":{"type":"grid","columnCount":2},"columns":2,"imageCrop":true} /-->'
+		);
+
+		$this->assertStringContainsString( 'is-layout-grid', $output );
+		$this->assertStringNotContainsString( 'is-layout-flex', $output );
+		$this->assertStringNotContainsString( 'columns-2', $output );
+		$this->assertStringNotContainsString( 'columns-default', $output );
+		$this->assertStringNotContainsString( 'is-cropped', $output );
+		$this->assertDoesNotMatchRegularExpression(
+			'/\bwp-block-gallery-\d+\b/',
+			$output,
+			'Grid galleries should not receive the unique class used by the custom Flex gap calculation.'
+		);
+	}
+
 	public function test_dynamic_attached_to_post_honours_order() {
 		$asc  = $this->render_in_loop(
 			'<!-- wp:gallery {"dynamicContent":{"source":"core/attached-media","args":{"orderBy":"date","order":"asc"}}} /-->'
