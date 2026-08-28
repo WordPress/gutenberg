@@ -6,6 +6,7 @@
 
 -   `Popover`: Widen `offset` to also accept an object with separate main and cross axis offsets. The same applies to `BorderBoxControl`'s `popoverOffset` prop ([#82060](https://github.com/WordPress/gutenberg/pull/82060)).
 -   `ToolsPanelItem`: Add `defaultShown` to show an optional item that has no value, and an `onShownChange` callback that fires only when the user toggles the item in the panel's menu ([#78010](https://github.com/WordPress/gutenberg/pull/78010)).
+-   `BorderBoxControl`: render the linked/unlinked toggle in a row alongside the label when a visible label is present, so it lines up with the equivalent toggle on sibling controls. Without a visible label the toggle stays beside the input, as before. The visible label is now a `BaseControl.VisualLabel` ([#73596](https://github.com/WordPress/gutenberg/issues/73596)).
 
 ### Bug Fixes
 

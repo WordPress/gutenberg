@@ -76,6 +76,29 @@ describe( 'BorderBoxControl', () => {
 			expect( linkedButton ).toBeInTheDocument();
 		} );
 
+		it( 'should place the linked button in the label row when the label is visible', async () => {
+			const user = userEvent.setup();
+			render( <TestBorderBoxControl { ...props } /> );
+
+			// The toggle shares the label's row — ahead of the border inputs
+			// rather than beside them — so it lines up with the equivalent
+			// toggle on sibling controls such as border radius. Tab order is
+			// how that placement is observable to a user.
+			await user.tab();
+
+			expect( screen.getByLabelText( 'Unlink sides' ) ).toHaveFocus();
+		} );
+
+		it( 'should place the linked button after the border inputs when the label is hidden', async () => {
+			const user = userEvent.setup();
+			render( <TestBorderBoxControl { ...props } hideLabelFromVision /> );
+
+			// With no label row to join, the toggle stays alongside the inputs.
+			await user.tab();
+
+			expect( screen.getByLabelText( toggleLabelRegex ) ).toHaveFocus();
+		} );
+
 		it( 'should hide label', () => {
 			render( <TestBorderBoxControl { ...props } hideLabelFromVision /> );
 

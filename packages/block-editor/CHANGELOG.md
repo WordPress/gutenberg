@@ -6,6 +6,10 @@
 
 -   `BackgroundImageControl`: Support setting the background image from a URL, through the URL field in the media replace popover ([#82230](https://github.com/WordPress/gutenberg/pull/82230)).
 
+### Enhancements
+
+-   Borders: rename the "Border & Shadow" panel to "Borders", and always show the Border control's visible label so its "Unlink sides" toggle lines up with the border radius one ([#73596](https://github.com/WordPress/gutenberg/issues/73596)).
+
 ### Internal
 
 -   Remove unused dependencies `@wordpress/escape-html`, `@wordpress/wordcount` and `deepmerge` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).

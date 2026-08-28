@@ -286,15 +286,16 @@ export function useBorderPanelLabel( {
 		hasShadowControl = controls?.hasShadow;
 	}
 
-	if ( hasBorderControl && hasShadowControl ) {
-		return __( 'Border & Shadow' );
-	}
-
-	if ( hasShadowControl ) {
+	// A shadow is treated as a soft border, so a panel that offers any border
+	// control is "Borders" whether or not it also offers a shadow. Keeping the
+	// title stable is what lets the Border control show its own visible label
+	// unconditionally, which in turn keeps its unlink toggle aligned with the
+	// Radius one.
+	if ( hasShadowControl && ! hasBorderControl ) {
 		return __( 'Shadow' );
 	}
 
-	return __( 'Border' );
+	return __( 'Borders' );
 }
 
 /**
