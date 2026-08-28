@@ -1,14 +1,13 @@
 import clsx from 'clsx';
-import { useMemo } from '@wordpress/element';
-import { useRefEffect } from '@wordpress/compose';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { store as editorStore } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import {
 	getMetaBoxesIframeUrl,
 	getMetaBoxesIframeName,
 } from '../../utils/meta-boxes';
 import { store as editPostStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 export default function MetaBoxesIframe( {
 	location = 'main',
@@ -28,61 +27,25 @@ export default function MetaBoxesIframe( {
 		[ isSide ]
 	);
 
-	// The ids of the meta boxes hidden through the Preferences modal, as
-	// one string so that the value is stable across store updates.
 	const hiddenIds = useSelect(
-		( select ) => {
-			const { getMetaBoxesPerLocation } = select( editPostStore );
-			const { isEditorPanelEnabled } = select( editorStore );
-			const locations = isSide ? [ 'side' ] : [ 'normal', 'advanced' ];
-			return locations
-				.flatMap(
-					( boxLocation ) =>
-						getMetaBoxesPerLocation( boxLocation ) ?? []
-				)
-				.filter(
-					( { id } ) => ! isEditorPanelEnabled( `meta-box-${ id }` )
-				)
-				.map( ( { id } ) => id )
-				.join( ',' );
-		},
-		[ isSide ]
+		( select ) =>
+			unlock( select( editPostStore ) ).getHiddenMetaBoxIds( location ),
+		[ location ]
 	);
 
-	// Hides the meta boxes hidden through the Preferences modal by adding
-	// a style sheet to the iframe document. Reapplied on every load.
-	const visibilityRef = useRefEffect< HTMLIFrameElement >(
-		( iframe ) => {
-			const apply = () => {
-				const frameDocument = iframe.contentDocument;
-				if ( ! frameDocument?.head ) {
-					return;
-				}
-				let style = frameDocument.getElementById(
-					'gutenberg-meta-box-visibility'
-				);
-				if ( ! style ) {
-					style = frameDocument.createElement( 'style' );
-					style.id = 'gutenberg-meta-box-visibility';
-					frameDocument.head.appendChild( style );
-				}
-				style.textContent = hiddenIds
-					.split( ',' )
-					.filter( Boolean )
-					.map(
-						( id ) =>
-							`#${ window.CSS.escape( id ) } { display: none; }`
-					)
-					.join( '\n' );
-			};
-			iframe.addEventListener( 'load', apply );
-			apply();
-			return () => iframe.removeEventListener( 'load', apply );
-		},
-		[ hiddenIds ]
+	const [ frameDocument, setFrameDocument ] = useState< Document | null >(
+		null
 	);
 
-	const ref = visibilityRef;
+	// The class is toggled both ways because the block editor ignores the
+	// classic Screen Options hidden state, which the server renders the
+	// boxes with.
+	useEffect( () => {
+		const boxes = frameDocument?.querySelectorAll( '.postbox' ) ?? [];
+		for ( const box of boxes ) {
+			box.classList.toggle( 'hide-if-js', hiddenIds.includes( box.id ) );
+		}
+	}, [ frameDocument, hiddenIds ] );
 
 	if ( ! src || ! isVisible ) {
 		return null;
@@ -90,7 +53,9 @@ export default function MetaBoxesIframe( {
 
 	return (
 		<iframe
-			ref={ ref }
+			onLoad={ ( event ) =>
+				setFrameDocument( event.currentTarget.contentDocument )
+			}
 			className={ clsx(
 				'edit-post-meta-boxes-iframe',
 				`is-${ location }`
