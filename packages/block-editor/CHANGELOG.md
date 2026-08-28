@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `ListView`: Updated to use `outset-ring__focus()` mixin for focus outline wherever applicable instead of the previous box-shadow implementation. ([#82129](https://github.com/WordPress/gutenberg/pull/82129))
+
 ### Bug Fixes
 
 -   Inserter: Keep the hovered block preview inside the viewport, so a tall preview in a short window is no longer clipped ([#82060](https://github.com/WordPress/gutenberg/pull/82060)).
