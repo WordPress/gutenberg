@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Remove empty link formats during RichText parsing and editing so invalid anchors are cleaned up automatically ([#81936](https://github.com/WordPress/gutenberg/issues/81936)).
+-   Remove empty link formats during RichText parsing and editing so invalid anchors are cleaned up automatically ([#82174](https://github.com/WordPress/gutenberg/pull/82174)).
 
 ## 7.54.0 (2026-08-26)
 
