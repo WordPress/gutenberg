@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   DataForm: a combined form field (one with `children`) is now treated purely as a layout container. Its `id` is no longer resolved against the field definitions, so a field sharing that `id` no longer contributes validation rules to the group, and the `panel` layout summarizes the group with its first leaf child instead. ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER))
+
 ### Internal
 
 -   Remove unused dependency `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
