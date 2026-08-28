@@ -109,6 +109,21 @@ jobs:
                   path: ${{ runner.temp }}/plugin
                   compression-level: 1
 
+            # Lets the trace artifacts be resolved with tools/build-scripts/packages/resolve-trace-source-maps.cjs
+            # after extracting both next to each other. Only the first branch records traces.
+            - name: Collect source maps
+              if: matrix.branch.name == fromJSON( needs.prepare.outputs.branches )[0].name
+              run: |
+                  mkdir -p "$RUNNER_TEMP/source-maps"
+                  find build/scripts -name '*.map' | tar -cf - -T - | tar -xf - -C "$RUNNER_TEMP/source-maps"
+
+            - name: Upload source maps
+              if: matrix.branch.name == fromJSON( needs.prepare.outputs.branches )[0].name
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              with:
+                  name: performance-source-maps
+                  path: ${{ runner.temp }}/source-maps
+
     performance:
         timeout-minutes: 60
         name: Run perf tests (${{ matrix.shard }})
@@ -183,9 +198,7 @@ jobs:
               uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               with:
                   name: performance-traces-${{ matrix.shard }}
-                  path: |
-                      ${{ env.WP_ARTIFACTS_PATH }}/traces
-                      ${{ env.WP_ARTIFACTS_PATH }}/build
+                  path: ${{ env.WP_ARTIFACTS_PATH }}/traces
                   if-no-files-found: ignore
 
             - name: Archive debug artifacts (screenshots, HTML snapshots)
