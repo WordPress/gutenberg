@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import pipe from '../pipe';
 
 describe( 'pipe', () => {

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getQueryParts } from '../get-query-parts';
 
 describe( 'getQueryParts', () => {
@@ -11,6 +8,7 @@ describe( 'getQueryParts', () => {
 			context: 'default',
 			page: 2,
 			perPage: 2,
+			offset: null,
 			stableKey: '',
 			fields: null,
 			include: null,
@@ -28,6 +26,7 @@ describe( 'getQueryParts', () => {
 			context: 'default',
 			page: 1,
 			perPage: 10,
+			offset: null,
 			stableKey: 'include=1',
 			fields: null,
 			include: [ 1 ],
@@ -43,6 +42,7 @@ describe( 'getQueryParts', () => {
 			context: 'default',
 			page: 1,
 			perPage: 10,
+			offset: null,
 			stableKey: '%3F=%26&b=2',
 			fields: null,
 			include: null,
@@ -56,6 +56,7 @@ describe( 'getQueryParts', () => {
 			context: 'default',
 			page: 1,
 			perPage: 10,
+			offset: null,
 			stableKey: 'a%5B0%5D=1&a%5B1%5D=2',
 			fields: null,
 			include: null,
@@ -71,6 +72,7 @@ describe( 'getQueryParts', () => {
 			context: 'default',
 			page: 1,
 			perPage: 10,
+			offset: null,
 			stableKey: 'b=2',
 			fields: null,
 			include: null,
@@ -84,6 +86,7 @@ describe( 'getQueryParts', () => {
 			context: 'default',
 			page: 1,
 			perPage: -1,
+			offset: null,
 			stableKey: 'b=2',
 			fields: null,
 			include: null,
@@ -97,6 +100,7 @@ describe( 'getQueryParts', () => {
 			context: 'default',
 			page: 1,
 			perPage: 10,
+			offset: null,
 			stableKey: '_fields=id%2Ctitle',
 			fields: [ 'id', 'title' ],
 			include: null,
@@ -109,10 +113,37 @@ describe( 'getQueryParts', () => {
 		expect( parts ).toEqual( {
 			page: 1,
 			perPage: 10,
+			offset: null,
 			stableKey: '',
 			include: null,
 			fields: null,
 			context: 'view',
 		} );
+	} );
+
+	it( 'extracts offset and excludes it from stableKey', () => {
+		const parts = getQueryParts( {
+			per_page: 50,
+			offset: 100,
+		} );
+
+		expect( parts ).toEqual( {
+			context: 'default',
+			page: 1,
+			perPage: 50,
+			offset: 100,
+			stableKey: '',
+			fields: null,
+			include: null,
+		} );
+	} );
+
+	it( 'ignores non-numeric offset values', () => {
+		const parts = getQueryParts( {
+			per_page: 10,
+			offset: 'abc',
+		} );
+
+		expect( parts.offset ).toBeNull();
 	} );
 } );

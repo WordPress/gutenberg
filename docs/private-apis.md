@@ -29,6 +29,7 @@ Private actions:
 Private selectors:
 - `getAllBlockBindingsSources`
 - `getBlockBindingsSource`
+- `getBlockKeyboardShortcuts`
 - `getBootstrappedBlockType`
 - `getSupportedStyles`
 - `getUnprocessedBlockTypes`
@@ -40,7 +41,6 @@ Private exports:
 - `__experimentalPopoverLegacyPositionToPlacement`
 - `ComponentsContext`
 - `Tabs`
-- `Theme`
 - `Menu`
 - `kebabCase`
 
@@ -96,7 +96,6 @@ Private exports:
 - `normalizeString`
 - `PrivateListView`
 - `ResizableBoxPopover`
-- `BlockInfo`
 - `useHasBlockToolbar`
 - `cleanEmptyObject`
 - `BlockQuickNavigation`
@@ -122,23 +121,25 @@ Private exports:
 - `PrivatePublishDateTimePicker`: version of public `PublishDateTimePicker` that has two extra props: `isCompact` and `showPopoverHeaderActions`.
 - `useSpacingSizes`
 - `useBlockDisplayTitle`
-- `__unstableBlockStyleVariationOverridesWithConfig`
+- `BlockStyleVariationOverridesWithConfig`
 - `setBackgroundStyleDefaults`
 - `sectionRootClientIdKey`
-- `__unstableCommentIconFill`
-- `__unstableCommentIconToolbarFill`
+- `NoteIconSlotFill`
+- `NoteIconToolbarSlotFill`
 
 ### `core/block-editor` store
 
 Private actions:
 - `__experimentalUpdateSettings`: version of public `updateSettings` action that filters out some private/experimental settings.
 - `clearBlockRemovalPrompt`
+- `clearRequestedInspectorTab`
 - `deleteStyleOverride`
 - `ensureDefaultBlock`
 - `expandBlock`
 - `hideBlockInterface`
 - `modifyContentLockBlock`
 - `privateRemoveBlocks`
+- `requestInspectorTab`
 - `resetZoomLevel`
 - `setBlockRemovalRules`
 - `setInsertionPoint`
@@ -172,6 +173,7 @@ Private selectors:
 - `getPatternBySlug`
 - `getRegisteredInserterMediaCategories`
 - `getRemovalPromptData`
+- `getRequestedInspectorTab`
 - `getReusableBlocks`
 - `getSectionRootClientId`
 - `getStyleOverrides`
@@ -189,6 +191,10 @@ Private selectors:
 ## core-data
 
 Private exports:
+- `EntitiesSavedStates`
+- `EntitiesSavedStatesExtensible`
+- `getTemplateInfo`
+- `getTemplatePartIcon`
 - `useEntityRecordsWithPermissions`
 
 ### `core` store
@@ -241,7 +247,8 @@ Private selectors:
 ## block-library
 
 Private exports:
-- `BlockKeyboardShortcuts`
+- `NAVIGATION_OVERLAY_TEMPLATE_PART_AREA`
+- `NavigationLinkUI`
 
 ## router (private exports only)
 
@@ -260,7 +267,6 @@ Private exports:
 Private exports:
 - `CreateTemplatePartModal`
 - `BackButton`
-- `EntitiesSavedStatesExtensible`
 - `Editor`
 - `PluginPostExcerpt`
 - `PostCardPanel`
@@ -300,7 +306,6 @@ Private selectors:
 - `getListViewToggleRef`
 - `getPostBlocksByName`
 - `getPostIcon`
-- `hasPostMetaChanges`
 - `isEntityReady`
 
 ## edit-post

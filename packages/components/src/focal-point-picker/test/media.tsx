@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import Media from '../media';
 import type { FocalPointPickerMediaProps } from '../types';
 

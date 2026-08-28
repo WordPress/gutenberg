@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
 import { isTextField } from '@wordpress/dom';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
@@ -35,7 +28,6 @@ export function useEventHandlers( { clientId, isSelected } ) {
 		getBlock,
 	} = unlock( useSelect( blockEditorStore ) );
 	const {
-		insertAfterBlock,
 		removeBlock,
 		resetZoomLevel,
 		startDraggingBlocks,
@@ -73,13 +65,13 @@ export function useEventHandlers( { clientId, isSelected } ) {
 					return;
 				}
 
-				event.preventDefault();
-
-				if ( keyCode === ENTER && isZoomOut() ) {
-					resetZoomLevel();
-				} else if ( keyCode === ENTER ) {
-					insertAfterBlock( clientId );
+				if ( keyCode === ENTER ) {
+					if ( isZoomOut() ) {
+						event.preventDefault();
+						resetZoomLevel();
+					}
 				} else {
+					event.preventDefault();
 					removeBlock( clientId );
 				}
 			}
@@ -319,17 +311,12 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				editContentOnlySection( clientId );
 			}
 
-			// Only add double-click listener if experimental flag is enabled
-			if ( window?.__experimentalContentOnlyPatternInsertion ) {
-				node.addEventListener( 'dblclick', onDoubleClick );
-			}
+			node.addEventListener( 'dblclick', onDoubleClick );
 
 			return () => {
 				node.removeEventListener( 'keydown', onKeyDown );
 				node.removeEventListener( 'dragstart', onDragStart );
-				if ( window?.__experimentalContentOnlyPatternInsertion ) {
-					node.removeEventListener( 'dblclick', onDoubleClick );
-				}
+				node.removeEventListener( 'dblclick', onDoubleClick );
 			};
 		},
 		[
@@ -339,7 +326,6 @@ export function useEventHandlers( { clientId, isSelected } ) {
 			getBlock,
 			isReusableBlock,
 			isTemplatePart,
-			insertAfterBlock,
 			removeBlock,
 			isZoomOut,
 			resetZoomLevel,

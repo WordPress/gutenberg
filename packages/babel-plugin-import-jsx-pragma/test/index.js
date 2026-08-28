@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { transformSync } from '@babel/core';
-
-/**
- * Internal dependencies
- */
 import plugin from '../';
 
 describe( 'babel-plugin-import-jsx-pragma', () => {
@@ -159,7 +152,10 @@ describe( 'babel-plugin-import-jsx-pragma', () => {
 function getTransformedCode( source, options = {} ) {
 	const { code } = transformSync( source, {
 		configFile: false,
-		plugins: [ [ plugin, options ], '@babel/plugin-syntax-jsx' ],
+		plugins: [
+			[ plugin, options ],
+			require.resolve( '@babel/plugin-syntax-jsx' ),
+		],
 	} );
 
 	return code;

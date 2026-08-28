@@ -1,7 +1,3 @@
-/**
- * Internal dependencies
- */
-
 import { getActiveFormat } from '../get-active-format';
 
 describe( 'getActiveFormat', () => {

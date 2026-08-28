@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { unregisterBlockType, registerBlockType } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import {
 	transformMatchingBlock,
 	getPatternTransformedBlocks,

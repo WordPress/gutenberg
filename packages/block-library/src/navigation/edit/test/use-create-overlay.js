@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { renderHook, act } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import useCreateOverlayTemplatePart from '../use-create-overlay';
 
 // Mock useDispatch and useSelect
@@ -83,7 +72,7 @@ describe( 'useCreateOverlayTemplatePart', () => {
 		} );
 
 		mockGetPatternBySlug.mockReturnValue( {
-			name: 'gutenberg/navigation-overlay',
+			name: 'core/navigation-overlay',
 			title: 'Navigation Overlay',
 			content:
 				'<!-- wp:group --><div class="wp-block-group"><!-- wp:navigation-overlay-close /--><!-- wp:navigation /--></div><!-- /wp:group -->',
@@ -93,11 +82,11 @@ describe( 'useCreateOverlayTemplatePart', () => {
 	it( 'should save a new overlay with correct parameters when no overlays exist', async () => {
 		const overlayTemplateParts = [];
 		const createdOverlay = {
-			id: 'twentytwentyfive//overlay',
+			id: 'twentytwentyfive//navigation-overlay',
 			theme: 'twentytwentyfive',
-			slug: 'overlay',
+			slug: 'navigation-overlay',
 			title: {
-				rendered: 'Overlay',
+				rendered: 'Navigation Overlay',
 			},
 			area: 'navigation-overlay',
 		};
@@ -117,8 +106,8 @@ describe( 'useCreateOverlayTemplatePart', () => {
 			'postType',
 			'wp_template_part',
 			expect.objectContaining( {
-				slug: 'overlay',
-				title: 'Overlay',
+				slug: 'navigation-overlay',
+				title: 'Navigation Overlay',
 				content: expect.any( String ),
 				area: 'navigation-overlay',
 			} ),
@@ -129,21 +118,21 @@ describe( 'useCreateOverlayTemplatePart', () => {
 
 	it( 'should generate unique title when overlays already exist', async () => {
 		const existingOverlay = {
-			id: 'twentytwentyfive//overlay',
+			id: 'twentytwentyfive//navigation-overlay',
 			theme: 'twentytwentyfive',
-			slug: 'overlay',
+			slug: 'navigation-overlay',
 			title: {
-				rendered: 'Overlay',
+				rendered: 'Navigation Overlay',
 			},
 			area: 'navigation-overlay',
 		};
 		const overlayTemplateParts = [ existingOverlay ];
 		const createdOverlay = {
-			id: 'twentytwentyfive//overlay-2',
+			id: 'twentytwentyfive//navigation-overlay-2',
 			theme: 'twentytwentyfive',
-			slug: 'overlay-2',
+			slug: 'navigation-overlay-2',
 			title: {
-				rendered: 'Overlay 2',
+				rendered: 'Navigation Overlay 2',
 			},
 			area: 'navigation-overlay',
 		};
@@ -158,13 +147,13 @@ describe( 'useCreateOverlayTemplatePart', () => {
 			await createOverlayTemplatePart.current();
 		} );
 
-		// Verify it generates a unique title (Overlay 2) when Overlay already exists
+		// Verify it generates a unique title (Navigation Overlay 2) when Navigation Overlay already exists
 		expect( mockSaveEntityRecord ).toHaveBeenCalledWith(
 			'postType',
 			'wp_template_part',
 			expect.objectContaining( {
-				title: 'Overlay 2',
-				slug: 'overlay-2',
+				title: 'Navigation Overlay 2',
+				slug: 'navigation-overlay-2',
 				content: expect.any( String ),
 				area: 'navigation-overlay',
 			} ),
@@ -175,11 +164,11 @@ describe( 'useCreateOverlayTemplatePart', () => {
 	it( 'should use pattern content when pattern is found', async () => {
 		const overlayTemplateParts = [];
 		const createdOverlay = {
-			id: 'twentytwentyfive//overlay',
+			id: 'twentytwentyfive//navigation-overlay',
 			theme: 'twentytwentyfive',
-			slug: 'overlay',
+			slug: 'navigation-overlay',
 			title: {
-				rendered: 'Overlay',
+				rendered: 'Navigation Overlay',
 			},
 			area: 'navigation-overlay',
 		};
@@ -199,7 +188,7 @@ describe( 'useCreateOverlayTemplatePart', () => {
 		} );
 
 		expect( mockGetPatternBySlug ).toHaveBeenCalledWith(
-			'gutenberg/navigation-overlay'
+			'core/navigation-overlay'
 		);
 
 		expect( parse ).toHaveBeenCalledWith( mockGetPatternBySlug().content, {
@@ -212,11 +201,11 @@ describe( 'useCreateOverlayTemplatePart', () => {
 	it( 'should use empty paragraph when pattern is not found', async () => {
 		const overlayTemplateParts = [];
 		const createdOverlay = {
-			id: 'twentytwentyfive//overlay',
+			id: 'twentytwentyfive//navigation-overlay',
 			theme: 'twentytwentyfive',
-			slug: 'overlay',
+			slug: 'navigation-overlay',
 			title: {
-				rendered: 'Overlay',
+				rendered: 'Navigation Overlay',
 			},
 			area: 'navigation-overlay',
 		};

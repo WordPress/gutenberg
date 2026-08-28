@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { Context, Updatable } from './helpers';
 import type { Attachment } from './attachment';
 import type { Base, TemplatePartArea, TemplateType } from './base';
@@ -12,6 +9,7 @@ import type {
 } from './font-collection';
 import type { FontFamily, FontFace, WpFontFamily } from './font-family';
 import type { GlobalStylesRevision } from './global-styles-revision';
+import type { Icon } from './icon';
 import type { MenuLocation } from './menu-location';
 import type { NavMenu } from './nav-menu';
 import type { NavMenuItem } from './nav-menu-item';
@@ -45,6 +43,7 @@ export type {
 	FontFace,
 	FontFamily,
 	GlobalStylesRevision,
+	Icon,
 	MenuLocation,
 	NavMenu,
 	NavMenuItem,
@@ -109,6 +108,7 @@ export interface PerPackageEntityRecords< C extends Context > {
 		| Comment< C >
 		| FontCollection< C >
 		| GlobalStylesRevision< C >
+		| Icon< C >
 		| MenuLocation< C >
 		| NavMenu< C >
 		| NavMenuItem< C >

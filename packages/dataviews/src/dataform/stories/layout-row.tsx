@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import DataForm from '../index';
 import type { Field, Form } from '../../types';
 
@@ -42,7 +35,7 @@ const LayoutRowComponent = ( {
 	const customerFields: Field< Customer >[] = [
 		{
 			id: 'name',
-			label: 'Customer Name',
+			label: 'Customer name',
 			type: 'text',
 		},
 		{
@@ -57,37 +50,37 @@ const LayoutRowComponent = ( {
 		},
 		{
 			id: 'shippingAddress',
-			label: 'Shipping Address',
+			label: 'Shipping address',
 			type: 'text',
 		},
 		{
 			id: 'shippingCity',
-			label: 'Shipping City',
+			label: 'Shipping city',
 			type: 'text',
 		},
 		{
 			id: 'shippingPostalCode',
-			label: 'Shipping Postal Code',
+			label: 'Shipping postal code',
 			type: 'text',
 		},
 		{
 			id: 'shippingCountry',
-			label: 'Shipping Country',
+			label: 'Shipping country',
 			type: 'text',
 		},
 		{
 			id: 'billingAddress',
-			label: 'Billing Address',
+			label: 'Billing address',
 			type: 'text',
 		},
 		{
 			id: 'billingCity',
-			label: 'Billing City',
+			label: 'Billing city',
 			type: 'text',
 		},
 		{
 			id: 'billingPostalCode',
-			label: 'Billing Postal Code',
+			label: 'Billing postal code',
 			type: 'text',
 		},
 		{
@@ -102,7 +95,7 @@ const LayoutRowComponent = ( {
 		},
 		{
 			id: 'hasDiscount',
-			label: 'Has Discount?',
+			label: 'Has discount?',
 			type: 'boolean',
 		},
 		{

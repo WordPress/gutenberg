@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import deepMerge from 'deepmerge';
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import normalizeFields from '../field-types';
 import normalizeForm from '../components/dataform-layouts/normalize-form';
 import type {
@@ -40,7 +29,10 @@ function isFormValid( formValidity: FormValidity | undefined ): boolean {
 					// Recursively check children validations
 					return isFormValid( validation as FormValidity );
 				}
-				return validation.type === 'valid';
+				return (
+					validation.type !== 'invalid' &&
+					validation.type !== 'validating'
+				);
 			}
 		);
 	} );
@@ -147,6 +139,7 @@ function setValidityAtPath(
 			current[ segment ] = {};
 		}
 
+		current[ segment ] = { ...current[ segment ] };
 		current = current[ segment ];
 	}
 
@@ -157,6 +150,45 @@ function setValidityAtPath(
 		...fieldValidity,
 	};
 
+	return result;
+}
+
+function removeValidationProperty(
+	formValidity: FormValidity | undefined,
+	path: string[],
+	property: keyof FieldValidity
+): FormValidity | undefined {
+	if ( ! formValidity || path.length === 0 ) {
+		return formValidity;
+	}
+	const result = { ...formValidity };
+	// Navigate to parent of target.
+	let current: any = result;
+	for ( let i = 0; i < path.length - 1; i++ ) {
+		const segment = path[ i ];
+		if ( ! current[ segment ] ) {
+			return formValidity; // Path doesn't exist
+		}
+		current[ segment ] = { ...current[ segment ] };
+		current = current[ segment ];
+	}
+	const finalKey = path[ path.length - 1 ];
+	if ( ! current[ finalKey ] ) {
+		return formValidity;
+	}
+	const fieldValidity = { ...current[ finalKey ] };
+	delete fieldValidity[ property ];
+	// If field has no more validations, remove it entirely.
+	if ( Object.keys( fieldValidity ).length === 0 ) {
+		delete current[ finalKey ];
+	} else {
+		// Keep the field if it has other validations (including children).
+		current[ finalKey ] = fieldValidity;
+	}
+	// If root is empty, return undefined
+	if ( Object.keys( result ).length === 0 ) {
+		return undefined;
+	}
 	return result;
 }
 
@@ -215,6 +247,15 @@ function handleElementsValidationAsync< Item >(
 					);
 					return newFormValidity;
 				} );
+			} else {
+				// Validation passed so we need to remove `elements` from validity.
+				setFormValidity( ( prev ) => {
+					return removeValidationProperty(
+						prev,
+						[ ...path, formField.id ],
+						'elements'
+					);
+				} );
 			}
 		} )
 		.catch( ( error ) => {
@@ -265,18 +306,13 @@ function handleCustomValidationAsync< Item >(
 			}
 
 			if ( result === null ) {
+				// Validation passed so we need to remove `custom` from validity.
 				setFormValidity( ( prev ) => {
-					const newFormValidity = setValidityAtPath(
+					return removeValidationProperty(
 						prev,
-						{
-							custom: {
-								type: 'valid',
-								message: __( 'Valid' ),
-							},
-						},
-						[ ...path, formField.id ]
+						[ ...path, formField.id ],
+						'custom'
 					);
-					return newFormValidity;
 				} );
 				return;
 			}
@@ -352,11 +388,37 @@ type PromiseHandler< Item > = {
 	item: Item;
 };
 
+function isFormFieldHidden< Item >(
+	formField: FormFieldToValidate< Item >,
+	item: Item
+): boolean {
+	// `DataFormLayout` only applies `isVisible` to leaf fields; combined
+	// fields are always rendered, so they must always be validated.
+	return (
+		formField.children.length === 0 &&
+		!! formField.field?.isVisible &&
+		! formField.field.isVisible( item )
+	);
+}
+
 function validateFormField< Item >(
 	item: Item,
 	formField: FormFieldToValidate< Item >,
 	promiseHandler: PromiseHandler< Item >
 ): FieldValidity | undefined {
+	if ( isFormFieldHidden( formField, item ) ) {
+		// Invalidate in-flight async validations so a stale result cannot
+		// resurface for a field that is no longer rendered.
+		const { customCounterRef, elementsCounterRef } = promiseHandler;
+		if ( customCounterRef.current[ formField.id ] ) {
+			customCounterRef.current[ formField.id ] += 1;
+		}
+		if ( elementsCounterRef.current[ formField.id ] ) {
+			elementsCounterRef.current[ formField.id ] += 1;
+		}
+		return undefined;
+	}
+
 	// Validate the field: isValid.required
 	if (
 		formField.field?.isValid.required &&
@@ -448,27 +510,6 @@ function validateFormField< Item >(
 		};
 	}
 
-	// Validate the field: isValid.elements (async)
-	if (
-		!! formField.field &&
-		formField.field.isValid.elements &&
-		formField.field.hasElements &&
-		typeof formField.field.getElements === 'function'
-	) {
-		handleElementsValidationAsync(
-			formField.field.getElements(),
-			formField,
-			promiseHandler
-		);
-
-		return {
-			elements: {
-				type: 'validating',
-				message: __( 'Validating…' ),
-			},
-		};
-	}
-
 	// Validate the field: isValid.custom (sync)
 	let customError;
 	if ( !! formField.field && formField.field.isValid.custom ) {
@@ -512,16 +553,39 @@ function validateFormField< Item >(
 		};
 	}
 
+	// Aggregate async validations (`elements` and `custom`).
+	const fieldValidity: FieldValidity = {};
+	// Validate the field: isValid.elements (async)
+	if (
+		!! formField.field &&
+		formField.field.isValid.elements &&
+		formField.field.hasElements &&
+		typeof formField.field.getElements === 'function'
+	) {
+		handleElementsValidationAsync(
+			formField.field.getElements(),
+			formField,
+			promiseHandler
+		);
+		fieldValidity.elements = {
+			type: 'validating',
+			message: __( 'Validating…' ),
+		};
+	}
+
 	// Validate the field: isValid.custom (async)
 	if ( customError instanceof Promise ) {
 		handleCustomValidationAsync( customError, formField, promiseHandler );
 
-		return {
-			custom: {
-				type: 'validating',
-				message: __( 'Validating…' ),
-			},
+		fieldValidity.custom = {
+			type: 'validating',
+			message: __( 'Validating…' ),
 		};
+	}
+
+	// Return aggregated validations if any exist
+	if ( Object.keys( fieldValidity ).length > 0 ) {
+		return fieldValidity;
 	}
 
 	// Validate its children.
@@ -559,19 +623,22 @@ function getFormFieldValue< Item >(
 	item: Item
 ): any {
 	const fieldValue = formField?.field?.getValue( { item } );
+	// `isHidden` is never read directly. It is folded into the snapshot so
+	// that the `fastDeepEqual` change check in `validate` fails when a
+	// field's visibility toggles with an unchanged value, forcing that
+	// field to re-validate instead of being skipped as untouched.
+	const isHidden = isFormFieldHidden( formField, item );
 	if ( formField.children.length === 0 ) {
-		return fieldValue;
+		return { value: fieldValue, isHidden };
 	}
 
 	const childrenValues = formField.children.map( ( child ) =>
 		getFormFieldValue( child, item )
 	);
-	if ( ! childrenValues ) {
-		return fieldValue;
-	}
 
 	return {
 		value: fieldValue,
+		isHidden,
 		children: childrenValues,
 	};
 }

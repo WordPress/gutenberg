@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { stageActivation as TemplateListActivation } from './stage-activation';
 import { stageLegacy as TemplateListLegacy } from './stage-legacy';
 

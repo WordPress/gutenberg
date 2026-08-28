@@ -1,17 +1,10 @@
-/**
- * External dependencies
- */
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useEffect, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import {
+	getWpCompatOverlaySlot,
+	useEnableWpCompatOverlaySlot,
+} from '@wordpress/ui';
 import Modal from '../';
 import type { ModalProps } from '../types';
 
@@ -87,6 +80,25 @@ describe( 'Modal', () => {
 		);
 		await user.keyboard( '[Escape]' );
 		expect( onRequestClose ).toHaveBeenCalled();
+	} );
+
+	it( 'should stop an Escape key press from propagating when it dismisses the modal', async () => {
+		const user = userEvent.setup();
+		const documentKeyDownHandler = jest.fn();
+		document.addEventListener( 'keydown', documentKeyDownHandler );
+
+		try {
+			render(
+				<Modal onRequestClose={ noop }>
+					<p>Modal content</p>
+				</Modal>
+			);
+
+			await user.keyboard( '[Escape]' );
+			expect( documentKeyDownHandler ).not.toHaveBeenCalled();
+		} finally {
+			document.removeEventListener( 'keydown', documentKeyDownHandler );
+		}
 	} );
 
 	it( 'should return focus when dismissed by clicking outside', async () => {
@@ -254,6 +266,44 @@ describe( 'Modal', () => {
 		expect( container ).not.toHaveAttribute( 'aria-hidden' );
 	} );
 
+	it( 'keeps the @wordpress/ui compat overlay slot exposed while open', async () => {
+		const user = userEvent.setup();
+
+		const CompatOverlayDemo = () => {
+			useEnableWpCompatOverlaySlot();
+			useEffect( () => {
+				const slot = getWpCompatOverlaySlot();
+				return () => slot?.remove();
+			}, [] );
+
+			const [ isShown, setIsShown ] = useState( false );
+			return (
+				<>
+					<button onClick={ () => setIsShown( true ) }>
+						Open Modal
+					</button>
+					{ isShown && (
+						<Modal onRequestClose={ () => setIsShown( false ) }>
+							<p>Modal content</p>
+						</Modal>
+					) }
+				</>
+			);
+		};
+
+		const { container } = render( <CompatOverlayDemo /> );
+		// Disable reason: The infrastructure slot has no semantic role.
+		// eslint-disable-next-line testing-library/no-node-access
+		const slot = document.querySelector( '[data-wp-compat-overlay-slot]' );
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Open Modal' } )
+		);
+
+		expect( container ).toHaveAttribute( 'aria-hidden', 'true' );
+		expect( slot ).toHaveAttribute( 'aria-hidden', 'false' );
+	} );
+
 	it( 'should render `headerActions` React nodes', async () => {
 		render(
 			<Modal
@@ -269,9 +319,6 @@ describe( 'Modal', () => {
 	} );
 
 	describe( 'Focus handling', () => {
-		const originalGetClientRects =
-			window.HTMLElement.prototype.getClientRects;
-
 		const FocusMountDemo = ( {
 			focusOnMount,
 		}: Pick< ModalProps, 'focusOnMount' > ) => {
@@ -299,27 +346,6 @@ describe( 'Modal', () => {
 				</>
 			);
 		};
-
-		beforeEach( () => {
-			/**
-			 * The test environment does not have a layout engine, so we need to mock
-			 * the getClientRects method. This ensures that the focusable elements can be
-			 * found by the `focusOnMount` logic which depends on layout information
-			 * to determine if the element is visible or not.
-			 * See https://github.com/WordPress/gutenberg/blob/trunk/packages/dom/src/focusable.js#L55-L61.
-			 */
-			// @ts-expect-error We're not trying to comply to the DOM spec, only mocking
-			window.HTMLElement.prototype.getClientRects = function () {
-				return [ 'trick-jsdom-into-having-size-for-element-rect' ];
-			};
-		} );
-
-		afterEach( () => {
-			// Restore original HTMLElement prototype.
-			// See beforeEach for details.
-			window.HTMLElement.prototype.getClientRects =
-				originalGetClientRects;
-		} );
 
 		it( 'should focus the Modal dialog by default when `focusOnMount` prop is not provided', async () => {
 			const user = userEvent.setup();

@@ -1,16 +1,10 @@
-/**
- * External dependencies
- */
 import type { Browser, Page, BrowserContext } from '@playwright/test';
-
-/**
- * Internal dependencies
- */
 import { createNewPost } from './create-new-post';
 import { getPageError } from './get-page-error';
 import { visitAdminPage } from './visit-admin-page';
 import { editPost } from './edit-post';
 import { visitSiteEditor } from './visit-site-editor';
+import { waitForSiteEditor } from './wait-for-site-editor';
 import type { PageUtils } from '../page-utils';
 import type { Editor } from '../editor';
 
@@ -45,4 +39,7 @@ export class Admin {
 	visitAdminPage: typeof visitAdminPage = visitAdminPage.bind( this );
 	/** @borrows visitSiteEditor as this.visitSiteEditor */
 	visitSiteEditor: typeof visitSiteEditor = visitSiteEditor.bind( this );
+	/** @borrows waitForSiteEditor as this.waitForSiteEditor */
+	waitForSiteEditor: typeof waitForSiteEditor =
+		waitForSiteEditor.bind( this );
 }

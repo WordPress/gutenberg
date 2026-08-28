@@ -1,20 +1,19 @@
-/**
- * External dependencies
- */
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useMemo, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import DataViewsPicker from '../index';
-import { LAYOUT_PICKER_GRID } from '../../constants';
-import type { ActionButton, View, ViewPickerGrid } from '../../types';
+import {
+	LAYOUT_PICKER_ACTIVITY,
+	LAYOUT_PICKER_GRID,
+	LAYOUT_PICKER_TABLE,
+} from '../../constants';
+import type {
+	ActionButton,
+	Field,
+	SupportedLayouts,
+	View,
+	ViewPickerGrid,
+} from '../../types';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 
 type Data = {
@@ -70,20 +69,43 @@ const multiSelectActions: ActionButton< Data >[] = [
 	},
 ];
 
+// Groups ids 1 and 3 together and 2 on its own, so the rendered order
+// (1, 3, 2) differs from the order of `data`. `enableSorting: false` is what
+// makes that possible: it stops `filterSortAndPaginate` from sorting the data
+// into group order first, which would leave the two orders identical.
+const groupingFields: Field< Data >[] = [
+	{
+		id: 'parity',
+		label: 'Parity',
+		getValue: ( { item }: { item: Data } ) =>
+			item.id % 2 === 0 ? 'even' : 'odd',
+		enableSorting: false,
+	},
+];
+
+type PickerLayout =
+	| typeof LAYOUT_PICKER_GRID
+	| typeof LAYOUT_PICKER_TABLE
+	| typeof LAYOUT_PICKER_ACTIVITY;
+
 function Picker( {
 	view: additionalView,
 	actions,
 	label,
 	multiselect,
+	layout = LAYOUT_PICKER_GRID,
+	fields = [],
 	...props
 }: {
 	actions?: ActionButton< Data >[];
 	view?: Partial< View >;
 	label?: string;
 	multiselect?: boolean;
+	layout?: PickerLayout;
+	fields?: Field< Data >[];
 } ) {
 	const [ view, setView ] = useState< View >( {
-		type: LAYOUT_PICKER_GRID,
+		type: layout,
 		fields: [],
 		titleField: 'title',
 		mediaField: 'image',
@@ -92,13 +114,13 @@ function Picker( {
 		perPage: 10,
 		filters: [],
 		...additionalView,
-	} as ViewPickerGrid );
+	} as View );
 
 	const [ selection, setSelection ] = useState< string[] >( [] );
 
 	const { data: shownData, paginationInfo } = useMemo( () => {
-		return filterSortAndPaginate( data, view, [] );
-	}, [ view ] );
+		return filterSortAndPaginate( data, view, fields );
+	}, [ view, fields ] );
 
 	const dataViewProps = {
 		actions,
@@ -107,8 +129,8 @@ function Picker( {
 		paginationInfo,
 		data: shownData,
 		view,
-		defaultLayouts: { [ LAYOUT_PICKER_GRID ]: {} },
-		fields: [],
+		defaultLayouts: { [ layout ]: true } as SupportedLayouts,
+		fields,
 		onChangeView: setView,
 		multiselect,
 		selection,
@@ -473,6 +495,254 @@ describe( 'DataViews Picker', () => {
 					'true'
 				);
 			} );
+		} );
+
+		describe( 'media fit', () => {
+			// Both the flat and grouped branches put the class on the listbox:
+			// the flat branch renders `GridItems` as the listbox itself, and
+			// the grouped one nests its per-group grids inside it.
+			it( 'crops previews by default', () => {
+				render( <Picker /> );
+				expect( screen.getByRole( 'listbox' ) ).not.toHaveClass(
+					'has-media-fit-contain'
+				);
+			} );
+
+			it( 'fits previews when configured to contain', () => {
+				render(
+					<Picker
+						view={
+							{
+								layout: { mediaFit: 'contain' },
+							} as Partial< ViewPickerGrid >
+						}
+					/>
+				);
+				expect( screen.getByRole( 'listbox' ) ).toHaveClass(
+					'has-media-fit-contain'
+				);
+			} );
+
+			it( 'ignores an unsupported value and falls back to cropping', () => {
+				render(
+					<Picker
+						view={
+							{
+								// Deliberately outside the `MediaFit` union.
+								layout: { mediaFit: 'fill' },
+							} as unknown as Partial< ViewPickerGrid >
+						}
+					/>
+				);
+				expect( screen.getByRole( 'listbox' ) ).not.toHaveClass(
+					'has-media-fit-contain'
+				);
+			} );
+
+			it( 'applies the fit when the data is grouped', () => {
+				render(
+					<Picker
+						fields={ groupingFields }
+						view={
+							{
+								groupBy: { field: 'parity', direction: 'asc' },
+								layout: { mediaFit: 'contain' },
+							} as Partial< ViewPickerGrid >
+						}
+					/>
+				);
+
+				expect( screen.getByRole( 'listbox' ) ).toHaveClass(
+					'has-media-fit-contain'
+				);
+			} );
+		} );
+	} );
+
+	describe.each( [
+		[ 'picker grid', LAYOUT_PICKER_GRID ],
+		[ 'picker table', LAYOUT_PICKER_TABLE ],
+		[ 'picker activity', LAYOUT_PICKER_ACTIVITY ],
+	] as const )( 'Range selection (%s)', ( _layoutName, layout ) => {
+		it( 'selects the range between the clicked item and the Shift-clicked item', async () => {
+			render(
+				<Picker actions={ multiSelectActions } layout={ layout } />
+			);
+
+			const user = userEvent.setup();
+			const options = screen.getAllByRole( 'option' );
+
+			await user.click( options[ 0 ] );
+
+			await user.keyboard( '{Shift>}' );
+			await user.click( options[ 2 ] );
+			await user.keyboard( '{/Shift}' );
+
+			expect( options[ 0 ] ).toHaveAttribute( 'aria-selected', 'true' );
+			expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
+			expect( options[ 2 ] ).toHaveAttribute( 'aria-selected', 'true' );
+			expect( onChangeSelection ).toHaveBeenLastCalledWith( [
+				data[ 0 ].id.toString(),
+				data[ 1 ].id.toString(),
+				data[ 2 ].id.toString(),
+			] );
+		} );
+
+		it( 'redefines the range from the anchor when consecutive Shift+Clicks reverse direction', async () => {
+			render(
+				<Picker actions={ multiSelectActions } layout={ layout } />
+			);
+
+			const user = userEvent.setup();
+			const options = screen.getAllByRole( 'option' );
+
+			// The plain click anchors the range on the second item.
+			await user.click( options[ 1 ] );
+
+			await user.keyboard( '{Shift>}' );
+			await user.click( options[ 2 ] );
+			await user.click( options[ 0 ] );
+			await user.keyboard( '{/Shift}' );
+
+			// The anchor stayed on the second item, so reversing direction
+			// replaces the previous range rather than extending it.
+			expect( options[ 0 ] ).toHaveAttribute( 'aria-selected', 'true' );
+			expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
+			expect( options[ 2 ] ).toHaveAttribute( 'aria-selected', 'false' );
+			expect( onChangeSelection ).toHaveBeenLastCalledWith( [
+				data[ 0 ].id.toString(),
+				data[ 1 ].id.toString(),
+			] );
+		} );
+
+		it( 'selects only the Shift-clicked item when the picker is single-select', async () => {
+			render(
+				<Picker actions={ singleSelectActions } layout={ layout } />
+			);
+
+			const user = userEvent.setup();
+			const options = screen.getAllByRole( 'option' );
+
+			await user.click( options[ 0 ] );
+
+			await user.keyboard( '{Shift>}' );
+			await user.click( options[ 2 ] );
+			await user.keyboard( '{/Shift}' );
+
+			expect( options[ 0 ] ).toHaveAttribute( 'aria-selected', 'false' );
+			expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'false' );
+			expect( options[ 2 ] ).toHaveAttribute( 'aria-selected', 'true' );
+			expect( onChangeSelection ).toHaveBeenLastCalledWith( [
+				data[ 2 ].id.toString(),
+			] );
+		} );
+
+		it( 'extends the range in rendered order when grouping reorders the data', async () => {
+			render(
+				<Picker
+					actions={ multiSelectActions }
+					layout={ layout }
+					fields={ groupingFields }
+					view={ {
+						groupBy: { field: 'parity', direction: 'asc' },
+					} }
+				/>
+			);
+
+			const user = userEvent.setup();
+			const options = screen.getAllByRole( 'option' );
+
+			await user.click( options[ 0 ] );
+
+			await user.keyboard( '{Shift>}' );
+			await user.click( options[ 1 ] );
+			await user.keyboard( '{/Shift}' );
+
+			// The two clicked items are rendered neighbours but sit at either
+			// end of `data`, so a range following `data` order would have
+			// swept up the item in between.
+			expect( options[ 2 ] ).toHaveAttribute( 'aria-selected', 'false' );
+			expect( onChangeSelection ).toHaveBeenLastCalledWith( [
+				data[ 0 ].id.toString(),
+				data[ 2 ].id.toString(),
+			] );
+		} );
+	} );
+
+	describe( 'Default layouts', () => {
+		/**
+		 * A minimal Picker that intentionally omits the `defaultLayouts` prop so
+		 * that DataViewsPicker falls back to its internal DEFAULT_PICKER_LAYOUTS
+		 * constant ({ pickerGrid: true, pickerTable: true }).
+		 */
+		function PickerWithoutDefaultLayouts() {
+			const [ view, setView ] = useState< View >( {
+				type: LAYOUT_PICKER_GRID,
+				fields: [],
+				titleField: 'title',
+				mediaField: 'image',
+				search: '',
+				page: 1,
+				perPage: 10,
+				filters: [],
+			} satisfies ViewPickerGrid );
+
+			const [ selection, setSelection ] = useState< string[] >( [] );
+
+			const { data: shownData, paginationInfo } = useMemo( () => {
+				return filterSortAndPaginate( data, view, [] );
+			}, [ view ] );
+
+			return (
+				<DataViewsPicker
+					getItemId={ ( item: Data ) => item.id.toString() }
+					paginationInfo={ paginationInfo }
+					data={ shownData }
+					view={ view }
+					fields={ [] }
+					onChangeView={ setView }
+					selection={ selection }
+					onChangeSelection={ setSelection }
+					// No `defaultLayouts` prop falls back to DEFAULT_PICKER_LAYOUTS
+				/>
+			);
+		}
+
+		it( 'renders both picker layout options when defaultLayouts is not provided', async () => {
+			render( <PickerWithoutDefaultLayouts /> );
+
+			const user = userEvent.setup();
+
+			// Both picker layouts are available, so the Layout switcher button
+			// (rendered by ViewTypeMenu) must be present.
+			const layoutButton = screen.getByRole( 'button', {
+				name: 'Layout',
+			} );
+			expect( layoutButton ).toBeInTheDocument();
+
+			// Open the layout menu.
+			await user.click( layoutButton );
+
+			// Both "Grid" and "Table" picker layout options must appear in the menu.
+			expect(
+				await screen.findByRole( 'menuitemradio', { name: 'Grid' } )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'Table' } )
+			).toBeInTheDocument();
+
+			// The Activity layout is opt-in and must not appear by default.
+			expect(
+				screen.queryByRole( 'menuitemradio', { name: 'Activity' } )
+			).not.toBeInTheDocument();
+
+			// The grid layout is active by default.
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'Grid' } )
+			).toBeChecked();
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'Table' } )
+			).not.toBeChecked();
 		} );
 	} );
 } );

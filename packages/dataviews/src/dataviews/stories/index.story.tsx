@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import DataViews from '../index';
 import LayoutActivityComponent from './layout-activity';
 import LayoutTableComponent from './layout-table';
@@ -13,16 +6,27 @@ import LayoutGridComponent from './layout-grid';
 import LayoutListComponent from './layout-list';
 import LayoutCustomComponent from './layout-custom';
 import InfiniteScrollComponent from './infinite-scroll';
+import AsyncInfiniteScrollComponent from './async-infinite-scroll';
 import WithCardComponent from './with-card';
 import FreeCompositionComponent from './free-composition';
 import MinimalUIComponent from './minimal-ui';
 import EmptyComponent from './empty';
-
 import './style.css';
 
 const meta = {
+	tags: [ 'manifest' ],
 	title: 'DataViews/DataViews',
 	component: DataViews,
+	args: {
+		containerHeight: 'auto',
+	},
+	argTypes: {
+		containerHeight: {
+			control: 'select',
+			options: [ 'auto', '600px', '80vh' ],
+			description: 'Height of the container',
+		},
+	},
 	// Use fullscreen layout and a wrapper div with padding to resolve conflicts
 	// between Ariakit's Dialog (usePreventBodyScroll) and Storybook's body padding
 	// (sb-main-padding class). This ensures consistent layout in DataViews stories
@@ -31,9 +35,17 @@ const meta = {
 		layout: 'fullscreen',
 	},
 	decorators: [
-		( Story ) => (
+		( Story, { args, parameters }: { args: any; parameters: any } ) => (
 			<div style={ { padding: '1rem' } }>
-				<Story />
+				<div
+					style={ {
+						height:
+							parameters.containerHeight ?? args.containerHeight,
+						minHeight: 0,
+					} }
+				>
+					<Story containerHeight={ args.containerHeight } />
+				</div>
 			</div>
 		),
 	],
@@ -79,11 +91,18 @@ export const LayoutTable = {
 };
 
 export const LayoutGrid = {
+	parameters: {
+		// FIXME: Grid media buttons lack names (button-name).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	render: LayoutGridComponent,
 	args: {
 		groupBy: false,
 		groupByLabel: true,
 		hasClickableItems: true,
+		mediaFit: 'cover',
+		mediaFitControl: true,
 		perPageSizes: [ 10, 25, 50, 100 ],
 		showMedia: true,
 	},
@@ -105,6 +124,17 @@ export const LayoutGrid = {
 			control: 'boolean',
 			description: 'Are the items clickable',
 		},
+		mediaFit: {
+			control: 'select',
+			options: [ 'cover', 'contain' ],
+			description:
+				'How the media field fills the preview box: cropped to fill it ("cover") or fitted inside it ("contain"), letterboxing the media so its own aspect ratio stays visible',
+		},
+		mediaFitControl: {
+			control: 'boolean',
+			description:
+				'Whether the view options offer the "Original aspect ratio" toggle, letting users switch the media fit themselves',
+		},
 		perPageSizes: {
 			control: 'object',
 			description: 'Array of available page sizes',
@@ -119,6 +149,7 @@ export const LayoutGrid = {
 export const LayoutList = {
 	render: LayoutListComponent,
 	args: {
+		fullWidth: false,
 		groupBy: false,
 		groupByLabel: true,
 		hasClickableItems: true,
@@ -129,6 +160,11 @@ export const LayoutList = {
 		backgroundColor: {
 			control: 'color',
 			description: 'Background color of the DataViews component',
+		},
+		fullWidth: {
+			control: 'boolean',
+			description:
+				'Whether to use full width or a contained layout (400px)',
 		},
 		groupBy: {
 			control: 'boolean',
@@ -157,6 +193,7 @@ export const LayoutList = {
 export const LayoutActivity = {
 	render: LayoutActivityComponent,
 	args: {
+		fullWidth: false,
 		groupBy: false,
 		groupByLabel: true,
 		hasClickableItems: true,
@@ -167,6 +204,11 @@ export const LayoutActivity = {
 		backgroundColor: {
 			control: 'color',
 			description: 'Background color of the DataViews component',
+		},
+		fullWidth: {
+			control: 'boolean',
+			description:
+				'Whether to use full width or a contained layout (400px)',
 		},
 		groupBy: {
 			control: 'boolean',
@@ -200,18 +242,12 @@ export const Empty = {
 	render: EmptyComponent,
 	args: {
 		customEmpty: false,
-		containerHeight: '50vh',
 		isLoading: false,
 	},
 	argTypes: {
 		customEmpty: {
 			control: 'boolean',
 			description: 'Use custom empty state with planet illustration',
-		},
-		containerHeight: {
-			control: 'select',
-			options: [ 'auto', '50vh', '100vh' ],
-			description: 'Height of the container',
 		},
 		isLoading: {
 			control: 'boolean',
@@ -221,6 +257,11 @@ export const Empty = {
 };
 
 export const MinimalUI = {
+	parameters: {
+		// FIXME: Scroll region is not keyboard-accessible (scrollable-region-focusable).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	render: MinimalUIComponent,
 	argTypes: {
 		layout: {
@@ -241,4 +282,39 @@ export const WithCard = {
 
 export const InfiniteScroll = {
 	render: InfiniteScrollComponent,
+	parameters: {
+		containerHeight: '600px',
+	},
+	argTypes: {
+		containerHeight: {
+			control: false,
+			table: {
+				disable: true,
+			},
+		},
+	},
+};
+
+/**
+ * Infinite scroll where pages load asynchronously (with `isLoading`), like a
+ * real network-backed consumer that fetches one window at a time. Reproduces
+ * the scroll-position jump that the synchronous story does not.
+ */
+export const AsyncInfiniteScroll = {
+	render: AsyncInfiniteScrollComponent,
+	parameters: {
+		// FIXME: List items lack a required parent (aria-required-parent).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+		// Fill the viewport so the list bottom is the window bottom.
+		containerHeight: 'calc(100vh - 2rem)',
+	},
+	argTypes: {
+		containerHeight: {
+			control: false,
+			table: {
+				disable: true,
+			},
+		},
+	},
 };

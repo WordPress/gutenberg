@@ -1,13 +1,26 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Fieldset } from '../../../..';
+import * as Fieldset from '../';
+import { DETAILS_EXAMPLE } from '../../../stories/shared';
 
 const meta: Meta< typeof Fieldset.Root > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/Primitives/Fieldset',
 	component: Fieldset.Root,
+	// Temporary: Due to an upstream bug, render the root explicitly so the
+	// components manifest extractor can resolve props from the JSX.
+	//
+	// See: https://github.com/storybookjs/storybook/issues/34877
+	render: ( args ) => <Fieldset.Root { ...args } />,
 	subcomponents: {
-		Legend: Fieldset.Legend,
-		Description: Fieldset.Description,
-		Details: Fieldset.Details,
+		'Fieldset.Legend': Fieldset.Legend,
+		'Fieldset.Description': Fieldset.Description,
+		'Fieldset.Details': Fieldset.Details,
+	},
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;
@@ -16,20 +29,38 @@ type Story = StoryObj< typeof Fieldset.Root >;
 
 export const Default: Story = {
 	args: {
-		children: (
-			<>
-				<Fieldset.Legend>Legend</Fieldset.Legend>
-				{ [ 'Apples', 'Bananas' ].map( ( fruit ) => (
-					// eslint-disable-next-line jsx-a11y/label-has-associated-control
-					<label key={ fruit }>
-						<input type="checkbox" /> { fruit }
-					</label>
-				) ) }
-				<Fieldset.Description>
-					This is a description for the entire fieldset.
-				</Fieldset.Description>
-			</>
-		),
+		children: [
+			<Fieldset.Legend key="legend">Legend</Fieldset.Legend>,
+			[ 'Apples', 'Bananas' ].map( ( fruit ) => (
+				// eslint-disable-next-line jsx-a11y/label-has-associated-control
+				<label key={ fruit }>
+					<input type="checkbox" /> { fruit }
+				</label>
+			) ),
+			<Fieldset.Description key="description">
+				This is a description for the entire fieldset.
+			</Fieldset.Description>,
+		],
+	},
+};
+
+/**
+ * When `hideFromVision` is set on `Fieldset.Legend`, the legend is visually
+ * hidden but remains accessible to screen readers.
+ */
+export const HiddenLegend: Story = {
+	args: {
+		children: [
+			<Fieldset.Legend hideFromVision key="legend">
+				Legend
+			</Fieldset.Legend>,
+			[ 'Apples', 'Bananas' ].map( ( fruit ) => (
+				// eslint-disable-next-line jsx-a11y/label-has-associated-control
+				<label key={ fruit }>
+					<input type="checkbox" /> { fruit }
+				</label>
+			) ),
+		],
 	},
 };
 
@@ -45,23 +76,17 @@ export const Default: Story = {
  */
 export const WithDetails: Story = {
 	args: {
-		children: (
-			<>
-				<Fieldset.Legend>Legend</Fieldset.Legend>
-				{ [ 'Apples', 'Bananas' ].map( ( fruit ) => (
-					// eslint-disable-next-line jsx-a11y/label-has-associated-control
-					<label key={ fruit }>
-						<input type="checkbox" /> { fruit }
-					</label>
-				) ) }
-				<Fieldset.Details>
-					Details can include{ ' ' }
-					<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/a">
-						links to more information
-					</a>{ ' ' }
-					and other semantic elements.
-				</Fieldset.Details>
-			</>
-		),
+		children: [
+			<Fieldset.Legend key="legend">Legend</Fieldset.Legend>,
+			[ 'Apples', 'Bananas' ].map( ( fruit ) => (
+				// eslint-disable-next-line jsx-a11y/label-has-associated-control
+				<label key={ fruit }>
+					<input type="checkbox" /> { fruit }
+				</label>
+			) ),
+			<Fieldset.Details key="details">
+				{ DETAILS_EXAMPLE }
+			</Fieldset.Details>,
+		],
 	},
 };

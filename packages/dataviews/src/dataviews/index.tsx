@@ -1,18 +1,14 @@
-/**
- * External dependencies
- */
 import type { ReactNode, ComponentProps, ReactElement } from 'react';
-
-/**
- * WordPress dependencies
- */
-import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
-import { useResizeObserver, throttle } from '@wordpress/compose';
+import clsx from 'clsx';
+import {
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
+import { useResizeObserver } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import DataViewsContext from '../components/dataviews-context';
 import { VIEW_LAYOUTS } from '../components/dataviews-layouts';
 import {
@@ -31,6 +27,8 @@ import DataViewsViewConfig, {
 	ViewTypeMenu,
 } from '../components/dataviews-view-config';
 import normalizeFields from '../field-types';
+import useData from '../hooks/use-data';
+import { useInfiniteScroll } from '../hooks/use-infinite-scroll';
 import type { Action, Field, View, SupportedLayouts } from '../types';
 import type { SelectionOrUpdater } from '../types/private';
 type ItemWithId = { id: string };
@@ -47,9 +45,8 @@ type DataViewsProps< Item > = {
 	paginationInfo: {
 		totalItems: number;
 		totalPages: number;
-		infiniteScrollHandler?: () => void;
 	};
-	defaultLayouts: SupportedLayouts;
+	defaultLayouts?: SupportedLayouts;
 	selection?: string[];
 	onChangeSelection?: ( items: string[] ) => void;
 	onClickItem?: ( item: Item ) => void;
@@ -64,8 +61,15 @@ type DataViewsProps< Item > = {
 	children?: ReactNode;
 	config?: {
 		perPageSizes: number[];
+		/**
+		 * Whether the view config popover offers the "Original aspect ratio"
+		 * control for grid layouts, letting users switch item previews
+		 * between cropped (`cover`) and fitted (`contain`).
+		 */
+		mediaFitControl?: boolean;
 	};
 	empty?: ReactNode;
+	onReset?: ( () => void ) | false;
 } & ( Item extends ItemWithId
 	? { getItemId?: ( item: Item ) => string }
 	: { getItemId: ( item: Item ) => string } );
@@ -73,6 +77,7 @@ type DataViewsProps< Item > = {
 const defaultGetItemId = ( item: ItemWithId ) => item.id;
 const defaultIsItemClickable = () => true;
 const EMPTY_ARRAY: any[] = [];
+const DEFAULT_LAYOUTS: SupportedLayouts = { table: {}, grid: {}, list: {} };
 
 const dataViewsLayouts = VIEW_LAYOUTS.filter(
 	( viewLayout ) => ! viewLayout.isPicker
@@ -88,25 +93,30 @@ function DefaultUI( {
 	search = true,
 	searchLabel = undefined,
 }: DefaultUIProps ) {
+	const { view } = useContext( DataViewsContext );
+	const isInfiniteScroll = view.infiniteScrollEnabled;
 	return (
 		<>
 			<Stack
 				direction="row"
 				align="top"
 				justify="space-between"
-				className="dataviews__view-actions"
-				gap="2xs"
+				className={ clsx( 'dataviews__view-actions', {
+					'dataviews__view-actions--infinite-scroll':
+						isInfiniteScroll,
+				} ) }
+				gap="xs"
 			>
 				<Stack
 					direction="row"
 					justify="start"
-					gap="xs"
+					gap="sm"
 					className="dataviews__search"
 				>
 					{ search && <DataViewsSearch label={ searchLabel } /> }
 					<FiltersToggle />
 				</Stack>
-				<Stack direction="row" gap="2xs" style={ { flexShrink: 0 } }>
+				<Stack direction="row" gap="xs" style={ { flexShrink: 0 } }>
 					<DataViewsViewConfig />
 					{ header }
 				</Stack>
@@ -130,7 +140,7 @@ function DataViews< Item >( {
 	getItemLevel,
 	isLoading = false,
 	paginationInfo,
-	defaultLayouts: defaultLayoutsProperty,
+	defaultLayouts: defaultLayoutsProperty = DEFAULT_LAYOUTS,
 	selection: selectionProperty,
 	onChangeSelection,
 	onClickItem,
@@ -140,9 +150,34 @@ function DataViews< Item >( {
 	children,
 	config = { perPageSizes: [ 10, 20, 50, 100 ] },
 	empty,
+	onReset,
 }: DataViewsProps< Item > ) {
-	const { infiniteScrollHandler } = paginationInfo;
-	const containerRef = useRef< HTMLDivElement | null >( null );
+	const [ selectionState, setSelectionState ] = useState< string[] >( [] );
+	const isUncontrolled =
+		selectionProperty === undefined || onChangeSelection === undefined;
+	const selection = isUncontrolled ? selectionState : selectionProperty;
+
+	// useData handles both infinite scroll and standard pagination paths,
+	// preserving previous data while loading and tracking initial load state.
+	const {
+		data: displayData,
+		paginationInfo: displayPaginationInfo,
+		hasInitiallyLoaded,
+		setVisibleEntries,
+	} = useData( {
+		view,
+		data: data as any,
+		getItemId: getItemId as any,
+		isLoading,
+		selection,
+		paginationInfo,
+	} ) as {
+		data: ( Item & { position?: number } )[];
+		paginationInfo: { totalItems: number; totalPages: number };
+		hasInitiallyLoaded: boolean;
+		setVisibleEntries?: React.Dispatch< React.SetStateAction< number[] > >;
+	};
+	const containerRef = useRef< HTMLDivElement >( null );
 	const [ containerWidth, setContainerWidth ] = useState( 0 );
 	const resizeObserverRef = useResizeObserver(
 		( resizeObserverEntries: any ) => {
@@ -152,10 +187,6 @@ function DataViews< Item >( {
 		},
 		{ box: 'border-box' }
 	);
-	const [ selectionState, setSelectionState ] = useState< string[] >( [] );
-	const isUncontrolled =
-		selectionProperty === undefined || onChangeSelection === undefined;
-	const selection = isUncontrolled ? selectionState : selectionProperty;
 	const [ openedFilter, setOpenedFilter ] = useState< string | null >( null );
 	function setSelectionWithChange( value: SelectionOrUpdater ) {
 		const newValue =
@@ -168,11 +199,16 @@ function DataViews< Item >( {
 		}
 	}
 	const _fields = useMemo( () => normalizeFields( fields ), [ fields ] );
+	// When infinite scroll is enabled, don't filter selection by current data
+	// because items may be scrolled out of view but still selected.
 	const _selection = useMemo( () => {
+		if ( view.infiniteScrollEnabled ) {
+			return selection;
+		}
 		return selection.filter( ( id ) =>
 			data.some( ( item ) => getItemId( item ) === id )
 		);
-	}, [ selection, data, getItemId ] );
+	}, [ selection, data, getItemId, view.infiniteScrollEnabled ] );
 
 	const filters = useFilters( _fields, view );
 	const hasPrimaryOrLockedFilters = useMemo(
@@ -186,50 +222,35 @@ function DataViews< Item >( {
 		hasPrimaryOrLockedFilters
 	);
 
+	const { intersectionObserver } = useInfiniteScroll( {
+		view,
+		onChangeView,
+		isLoading,
+		paginationInfo,
+		containerRef,
+		setVisibleEntries,
+	} );
+
 	useEffect( () => {
 		if ( hasPrimaryOrLockedFilters && ! isShowingFilter ) {
 			setIsShowingFilter( true );
 		}
 	}, [ hasPrimaryOrLockedFilters, isShowingFilter ] );
 
-	// Attach scroll event listener for infinite scroll
-	useEffect( () => {
-		if ( ! view.infiniteScrollEnabled || ! containerRef.current ) {
-			return;
-		}
-
-		const handleScroll = throttle( ( event: unknown ) => {
-			const target = ( event as Event ).target as HTMLElement;
-			const scrollTop = target.scrollTop;
-			const scrollHeight = target.scrollHeight;
-			const clientHeight = target.clientHeight;
-
-			// Check if user has scrolled near the bottom
-			if ( scrollTop + clientHeight >= scrollHeight - 100 ) {
-				infiniteScrollHandler?.();
-			}
-		}, 100 ); // Throttle to 100ms
-
-		const container = containerRef.current;
-		container.addEventListener( 'scroll', handleScroll );
-
-		return () => {
-			container.removeEventListener( 'scroll', handleScroll );
-			handleScroll.cancel(); // Cancel any pending throttled calls
-		};
-	}, [ infiniteScrollHandler, view.infiniteScrollEnabled ] );
-
-	// Filter out DataViewsPicker layouts.
+	// Filter out DataViewsPicker layouts and normalize `true` to `{}`.
 	const defaultLayouts = useMemo(
 		() =>
 			Object.fromEntries(
-				Object.entries( defaultLayoutsProperty ).filter(
-					( [ layoutType ] ) => {
+				Object.entries( defaultLayoutsProperty )
+					.filter( ( [ layoutType ] ) => {
 						return dataViewsLayouts.some(
 							( viewLayout ) => viewLayout.type === layoutType
 						);
-					}
-				)
+					} )
+					.map( ( [ key, value ] ) => [
+						key,
+						value === true ? {} : value,
+					] )
 			),
 		[ defaultLayoutsProperty ]
 	);
@@ -245,9 +266,9 @@ function DataViews< Item >( {
 				onChangeView,
 				fields: _fields,
 				actions,
-				data,
+				data: displayData,
 				isLoading,
-				paginationInfo,
+				paginationInfo: displayPaginationInfo,
 				selection: _selection,
 				onChangeSelection: setSelectionWithChange,
 				openedFilter,
@@ -266,10 +287,12 @@ function DataViews< Item >( {
 				setIsShowingFilter,
 				config,
 				empty,
-				hasInfiniteScrollHandler: !! infiniteScrollHandler,
+				hasInitiallyLoaded,
+				onReset,
+				intersectionObserver,
 			} }
 		>
-			<div className="dataviews-wrapper" ref={ containerRef }>
+			<div className="dataviews-wrapper">
 				{ children ?? (
 					<DefaultUI
 						header={ header }
@@ -282,6 +305,11 @@ function DataViews< Item >( {
 	);
 }
 
+/**
+ * `DataViews` renders a dataset using configurable layouts (table, grid, list)
+ * with built-in search, filtering, sorting, pagination, and actions. Use it to
+ * display and manage a collection of records.
+ */
 // Populate the DataViews sub components
 const DataViewsSubComponents = DataViews as typeof DataViews & {
 	BulkActionToolbar: typeof BulkActionsFooter;

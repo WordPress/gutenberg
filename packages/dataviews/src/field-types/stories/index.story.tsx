@@ -1,24 +1,23 @@
-/**
- * WordPress dependencies
- */
 import { useState, useMemo } from '@wordpress/element';
 import {
-	Icon,
+	Icon as WCIcon,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { starFilled } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import DataViews from '../../dataviews/index';
 import DataForm from '../../dataform/index';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import type { View, Form, Field } from '../../types';
 
 const meta = {
+	parameters: {
+		// FIXME: Helper text fails color-contrast.
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
+
 	title: 'DataViews/FieldTypes',
 	component: DataForm,
 	argTypes: {
@@ -34,9 +33,11 @@ const meta = {
 				'Chooses the Edit function for the field. "Default" means use the default Edit function for the field type.',
 			options: [
 				'default',
+				'adaptiveSelect',
 				'array',
 				'checkbox',
 				'color',
+				'combobox',
 				'date',
 				'datetime',
 				'email',
@@ -48,6 +49,7 @@ const meta = {
 				'telephone',
 				'url',
 				'text',
+				'time',
 				'toggle',
 				'toggleGroup',
 			],
@@ -58,11 +60,23 @@ const meta = {
 				'Whether the filter should fetch elements asynchronously.',
 			options: [ true, false ],
 		},
+		manyElements: {
+			control: { type: 'boolean' },
+			description:
+				'Add 10 more elements to push over the threshold and trigger Combobox rendering',
+			if: { arg: 'Edit', eq: 'adaptiveSelect' },
+		},
+		disabled: {
+			control: { type: 'boolean' },
+			description: 'Whether the field controls are disabled.',
+		},
 	},
 	args: {
 		type: 'regular',
 		Edit: 'default',
 		asyncElements: false,
+		manyElements: false,
+		disabled: false,
 	},
 };
 export default meta;
@@ -74,7 +88,7 @@ const DollarPrefix = () => (
 );
 const StarIconPrefix = () => (
 	<InputControlPrefixWrapper variant="icon">
-		<Icon icon={ starFilled } />
+		<WCIcon icon={ starFilled } />
 	</InputControlPrefixWrapper>
 );
 const PercentSuffix = () => (
@@ -101,9 +115,13 @@ type DataType = {
 	booleanWithToggle: boolean;
 	booleanWithElements: boolean;
 	datetime: string;
+	datetimeCompact?: string;
 	datetimeWithElements: string;
 	date: string;
 	dateWithElements: string;
+	time: string;
+	timeWithSeconds: string;
+	timeWithElements: string;
 	email: string;
 	emailWithElements: string;
 	telephone: string;
@@ -141,9 +159,13 @@ const data: DataType[] = [
 		booleanWithToggle: true,
 		booleanWithElements: true,
 		datetime: '2021-01-01T14:30:00Z',
+		datetimeCompact: '2021-01-01T14:30:00Z',
 		datetimeWithElements: '1982-05-10T20:30:00Z',
 		date: '2021-01-01',
 		dateWithElements: '2021-01-01',
+		time: '14:30',
+		timeWithSeconds: '14:30:45',
+		timeWithElements: '13:00',
 		email: 'hi@example.com',
 		emailWithElements: 'bob@example.com',
 		telephone: '+1-555-123-4567',
@@ -167,6 +189,23 @@ const data: DataType[] = [
 		priceWithBoth: '199.99',
 	},
 ];
+
+// Helper function to generate additional elements for demonstrating the threshold
+function generateAdditionalElements(
+	count: number,
+	prefix: string
+): { value: any; label: string }[] {
+	const additional = [];
+	for ( let i = 1; i <= count; i++ ) {
+		additional.push( {
+			value: `${ prefix }${ i + 3 }`,
+			label: `${ prefix.charAt( 0 ).toUpperCase() + prefix.slice( 1 ) } ${
+				i + 3
+			}`,
+		} );
+	}
+	return additional;
+}
 
 const fields: Field< DataType >[] = [
 	{
@@ -278,6 +317,16 @@ const fields: Field< DataType >[] = [
 		description: 'Help for datetime.',
 	},
 	{
+		id: 'datetimeCompact',
+		type: 'datetime',
+		label: 'Datetime (compact)',
+		description: 'Datetime field without the calendar widget.',
+		Edit: {
+			control: 'datetime',
+			compact: true,
+		},
+	},
+	{
 		id: 'datetimeWithElements',
 		type: 'datetime',
 		label: 'Datetime (with elements)',
@@ -312,6 +361,31 @@ const fields: Field< DataType >[] = [
 			{ value: '2021-01-01', label: 'January 1st, 2021' },
 			{ value: '2021-02-01', label: 'February 1st, 2021' },
 			{ value: '2021-03-01', label: 'March 1st, 2021' },
+		],
+	},
+	{
+		id: 'time',
+		type: 'time',
+		label: 'Time',
+		description: 'Help for time.',
+	},
+	{
+		id: 'timeWithSeconds',
+		type: 'time',
+		label: 'Time (with seconds)',
+		description:
+			'A format that renders seconds also gives the control a seconds field.',
+		format: { time: 'H:i:s' },
+	},
+	{
+		id: 'timeWithElements',
+		type: 'time',
+		label: 'Time (with elements)',
+		description: 'Help for time with elements.',
+		elements: [
+			{ value: '09:00', label: 'Morning' },
+			{ value: '13:00', label: 'Afternoon' },
+			{ value: '19:00', label: 'Evening' },
 		],
 	},
 	{
@@ -527,9 +601,11 @@ const fields: Field< DataType >[] = [
 type PanelTypes = 'regular' | 'panel';
 type ControlTypes =
 	| 'default'
+	| 'adaptiveSelect'
 	| 'array'
 	| 'checkbox'
 	| 'color'
+	| 'combobox'
 	| 'date'
 	| 'datetime'
 	| 'email'
@@ -541,6 +617,7 @@ type ControlTypes =
 	| 'telephone'
 	| 'url'
 	| 'text'
+	| 'time'
 	| 'toggle'
 	| 'toggleGroup';
 
@@ -549,6 +626,8 @@ interface FieldTypeStoryProps {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	manyElements: boolean;
+	disabled: boolean;
 }
 
 const FieldTypeStory = ( {
@@ -556,15 +635,47 @@ const FieldTypeStory = ( {
 	type,
 	Edit,
 	asyncElements,
+	manyElements,
+	disabled,
 }: FieldTypeStoryProps ) => {
 	const storyFields = useMemo( () => {
 		let fieldsToProcess = _fields;
 
-		if ( Edit !== 'default' ) {
-			fieldsToProcess = _fields.map( ( field: Field< DataType > ) => ( {
+		if ( disabled ) {
+			fieldsToProcess = fieldsToProcess.map( ( field ) => ( {
 				...field,
-				Edit,
+				isDisabled: true,
 			} ) );
+		}
+
+		if ( Edit !== 'default' ) {
+			fieldsToProcess = fieldsToProcess.map(
+				( field: Field< DataType > ) => ( {
+					...field,
+					Edit,
+				} )
+			);
+		}
+
+		// Expand elements when adaptiveSelect is selected and manyElements is toggled
+		if ( Edit === 'adaptiveSelect' && manyElements ) {
+			fieldsToProcess = fieldsToProcess.map( ( field ) => {
+				if ( field.elements && Array.isArray( field.elements ) ) {
+					const fieldIdPrefix = field.id.replace(
+						'WithElements',
+						''
+					);
+					const additionalElements = generateAdditionalElements(
+						10,
+						fieldIdPrefix
+					);
+					return {
+						...field,
+						elements: [ ...field.elements, ...additionalElements ],
+					};
+				}
+				return field;
+			} );
 		}
 
 		if ( asyncElements ) {
@@ -576,7 +687,7 @@ const FieldTypeStory = ( {
 						elements: undefined,
 						getElements: () =>
 							new Promise( ( resolve ) =>
-								setTimeout( () => resolve( elements ), 3500 )
+								setTimeout( () => resolve( elements ), 500 )
 							),
 					};
 				}
@@ -585,7 +696,7 @@ const FieldTypeStory = ( {
 		}
 
 		return fieldsToProcess;
-	}, [ _fields, Edit, asyncElements ] );
+	}, [ _fields, Edit, asyncElements, manyElements, disabled ] );
 	const form = useMemo(
 		() => ( {
 			layout: { type },
@@ -617,7 +728,7 @@ const FieldTypeStory = ( {
 		null;
 
 	return (
-		<Stack direction="row" gap="xs" align="stretch">
+		<Stack direction="row" gap="sm" align="stretch">
 			<div style={ { flex: 2 } }>
 				<DataViews
 					getItemId={ ( item ) => item.id.toString() }
@@ -636,7 +747,7 @@ const FieldTypeStory = ( {
 						},
 					] }
 					defaultLayouts={ {
-						table: {},
+						table: true,
 					} }
 					selection={ selectedIds.map( ( id ) => id.toString() ) }
 					onChangeSelection={ ( newSelection ) =>
@@ -647,7 +758,7 @@ const FieldTypeStory = ( {
 				/>
 			</div>
 			{ selectedItem ? (
-				<Stack direction="column" gap="xs" align="top">
+				<Stack direction="column" gap="sm" align="top">
 					<DataForm
 						data={ selectedItem }
 						form={ form }
@@ -671,7 +782,7 @@ const FieldTypeStory = ( {
 			) : (
 				<Stack
 					direction="column"
-					gap="xs"
+					gap="sm"
 					align="center"
 					justify="center"
 				>
@@ -692,10 +803,14 @@ export const AllComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	manyElements,
+	disabled,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	manyElements: boolean;
+	disabled: boolean;
 } ) => {
 	return (
 		<FieldTypeStory
@@ -703,6 +818,8 @@ export const AllComponent = ( {
 			type={ type }
 			Edit={ Edit }
 			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
 		/>
 	);
 };
@@ -712,10 +829,14 @@ export const TextComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	manyElements,
+	disabled,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	manyElements: boolean;
+	disabled: boolean;
 } ) => {
 	const textFields = useMemo(
 		() => fields.filter( ( field ) => field.type === 'text' ),
@@ -728,6 +849,8 @@ export const TextComponent = ( {
 			type={ type }
 			Edit={ Edit }
 			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
 		/>
 	);
 };
@@ -737,12 +860,16 @@ export const IntegerComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	manyElements,
 	formatSeparatorThousand,
+	disabled,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	manyElements: boolean;
 	formatSeparatorThousand?: string;
+	disabled: boolean;
 } ) => {
 	const integerFields = useMemo(
 		() =>
@@ -768,6 +895,8 @@ export const IntegerComponent = ( {
 			type={ type }
 			Edit={ Edit }
 			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
 		/>
 	);
 };
@@ -787,16 +916,20 @@ export const NumberComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	manyElements,
 	formatSeparatorThousand,
 	formatSeparatorDecimal,
 	formatDecimals,
+	disabled,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	manyElements: boolean;
 	formatSeparatorThousand?: string;
 	formatSeparatorDecimal?: string;
 	formatDecimals?: number;
+	disabled: boolean;
 } ) => {
 	const numberFields = useMemo(
 		() =>
@@ -838,6 +971,8 @@ export const NumberComponent = ( {
 			type={ type }
 			Edit={ Edit }
 			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
 		/>
 	);
 };
@@ -869,10 +1004,14 @@ export const BooleanComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	manyElements,
+	disabled,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	manyElements: boolean;
+	disabled: boolean;
 } ) => {
 	const booleanFields = useMemo(
 		() => fields.filter( ( field ) => field.type === 'boolean' ),
@@ -885,6 +1024,8 @@ export const BooleanComponent = ( {
 			type={ type }
 			Edit={ Edit }
 			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
 		/>
 	);
 };
@@ -894,14 +1035,18 @@ export const DateTimeComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	manyElements,
 	formatDatetime,
 	formatWeekStartsOn,
+	disabled,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	manyElements: boolean;
 	formatDatetime?: string;
 	formatWeekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+	disabled: boolean;
 } ) => {
 	const datetimeFields = useMemo(
 		() =>
@@ -926,7 +1071,7 @@ export const DateTimeComponent = ( {
 					}
 					return field;
 				} ),
-		[ fields, formatDatetime, formatWeekStartsOn ]
+		[ formatDatetime, formatWeekStartsOn ]
 	);
 
 	return (
@@ -935,6 +1080,8 @@ export const DateTimeComponent = ( {
 			type={ type }
 			Edit={ Edit }
 			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
 		/>
 	);
 };
@@ -970,14 +1117,18 @@ export const DateComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	manyElements,
 	formatDate,
 	formatWeekStartsOn,
+	disabled,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	manyElements: boolean;
 	formatDate?: string;
 	formatWeekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+	disabled: boolean;
 } ) => {
 	const dateFields = useMemo(
 		() =>
@@ -1011,6 +1162,8 @@ export const DateComponent = ( {
 			type={ type }
 			Edit={ Edit }
 			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
 		/>
 	);
 };
@@ -1042,14 +1195,68 @@ DateComponent.argTypes = {
 	},
 };
 
-export const EmailComponent = ( {
+export const TimeComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	manyElements,
+	formatTime,
+	disabled,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	manyElements: boolean;
+	formatTime?: string;
+	disabled: boolean;
+} ) => {
+	const timeFields = useMemo(
+		() =>
+			fields
+				.filter( ( field ) => field.type === 'time' )
+				.map( ( field ) =>
+					formatTime
+						? { ...field, format: { time: formatTime } }
+						: field
+				),
+		[ formatTime ]
+	);
+
+	return (
+		<FieldTypeStory
+			fields={ timeFields }
+			type={ type }
+			Edit={ Edit }
+			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
+		/>
+	);
+};
+TimeComponent.storyName = 'time';
+TimeComponent.args = {
+	formatTime: '',
+};
+TimeComponent.argTypes = {
+	formatTime: {
+		control: 'text',
+		description:
+			'Custom PHP time format string (e.g., "g:i a" for "2:30 pm"). Leave empty to use the format each field declares.',
+	},
+};
+
+export const EmailComponent = ( {
+	type,
+	Edit,
+	asyncElements,
+	manyElements,
+	disabled,
+}: {
+	type: PanelTypes;
+	Edit: ControlTypes;
+	asyncElements: boolean;
+	manyElements: boolean;
+	disabled: boolean;
 } ) => {
 	const emailFields = useMemo(
 		() => fields.filter( ( field ) => field.type === 'email' ),
@@ -1062,6 +1269,8 @@ export const EmailComponent = ( {
 			type={ type }
 			Edit={ Edit }
 			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
 		/>
 	);
 };
@@ -1071,10 +1280,14 @@ export const TelephoneComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	manyElements,
+	disabled,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	manyElements: boolean;
+	disabled: boolean;
 } ) => {
 	const telephoneFields = fields.filter( ( field ) =>
 		field.id.startsWith( 'telephone' )
@@ -1086,6 +1299,8 @@ export const TelephoneComponent = ( {
 			type={ type }
 			Edit={ Edit }
 			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
 		/>
 	);
 };
@@ -1095,10 +1310,14 @@ export const UrlComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	manyElements,
+	disabled,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	manyElements: boolean;
+	disabled: boolean;
 } ) => {
 	const urlFields = useMemo(
 		() => fields.filter( ( field ) => field.type === 'url' ),
@@ -1111,6 +1330,8 @@ export const UrlComponent = ( {
 			type={ type }
 			Edit={ Edit }
 			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
 		/>
 	);
 };
@@ -1120,10 +1341,14 @@ export const ColorComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	manyElements,
+	disabled,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	manyElements: boolean;
+	disabled: boolean;
 } ) => {
 	const colorFields = useMemo(
 		() => fields.filter( ( field ) => field.type === 'color' ),
@@ -1136,6 +1361,8 @@ export const ColorComponent = ( {
 			type={ type }
 			Edit={ Edit }
 			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
 		/>
 	);
 };
@@ -1145,10 +1372,14 @@ export const MediaComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	manyElements,
+	disabled,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	manyElements: boolean;
+	disabled: boolean;
 } ) => {
 	const mediaFields = useMemo(
 		() => fields.filter( ( field ) => field.type === 'media' ),
@@ -1161,6 +1392,8 @@ export const MediaComponent = ( {
 			type={ type }
 			Edit={ Edit }
 			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
 		/>
 	);
 };
@@ -1170,10 +1403,14 @@ export const ArrayComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	manyElements,
+	disabled,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	manyElements: boolean;
+	disabled: boolean;
 } ) => {
 	const arrayTextFields = useMemo(
 		() => fields.filter( ( field ) => field.type === 'array' ),
@@ -1186,6 +1423,8 @@ export const ArrayComponent = ( {
 			type={ type }
 			Edit={ Edit }
 			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
 		/>
 	);
 };
@@ -1195,10 +1434,14 @@ export const PasswordComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	manyElements,
+	disabled,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	manyElements: boolean;
+	disabled: boolean;
 } ) => {
 	const passwordFields = fields.filter( ( field ) =>
 		field.id.startsWith( 'password' )
@@ -1210,6 +1453,8 @@ export const PasswordComponent = ( {
 			type={ type }
 			Edit={ Edit }
 			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
 		/>
 	);
 };
@@ -1219,10 +1464,14 @@ export const NoTypeComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	manyElements,
+	disabled,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	manyElements: boolean;
+	disabled: boolean;
 } ) => {
 	const noTypeFields = useMemo(
 		() => fields.filter( ( field ) => field.type === undefined ),
@@ -1235,6 +1484,8 @@ export const NoTypeComponent = ( {
 			type={ type }
 			Edit={ Edit }
 			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
 		/>
 	);
 };

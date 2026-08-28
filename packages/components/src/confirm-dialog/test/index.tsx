@@ -1,13 +1,7 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * Internal dependencies
- */
 import { ConfirmDialog } from '..';
+import styles from '../style.module.scss';
 
 const noop = () => {};
 
@@ -25,11 +19,56 @@ describe( 'Confirm', () => {
 				const elementsTexts = [ 'Are you sure?', 'OK', 'Cancel' ];
 
 				expect( dialog ).toBeInTheDocument();
+				expect( dialog ).toHaveClass( 'components-confirm-dialog' );
+				// Disable reason: Semantic queries can't reach the overlay.
+				// eslint-disable-next-line testing-library/no-node-access
+				expect( dialog.parentElement ).toHaveClass( styles.wrapper );
 
 				elementsTexts.forEach( ( txt ) => {
 					const el = screen.getByText( txt );
 					expect( el ).toBeInTheDocument();
 				} );
+			} );
+			it( 'uses title as the dialog accessible name while the default header is hidden', () => {
+				const title = 'Delete item?';
+
+				render(
+					<ConfirmDialog
+						title={ title }
+						onConfirm={ noop }
+						onCancel={ noop }
+					>
+						Are you sure?
+					</ConfirmDialog>
+				);
+
+				expect(
+					screen.getByRole( 'dialog', { name: title } )
+				).toBeInTheDocument();
+				expect(
+					screen.queryByRole( 'heading', { name: title } )
+				).not.toBeInTheDocument();
+			} );
+			it( 'renders the title heading when __experimentalHideHeader is false', () => {
+				const title = 'Delete item?';
+
+				render(
+					<ConfirmDialog
+						title={ title }
+						__experimentalHideHeader={ false }
+						onConfirm={ noop }
+						onCancel={ noop }
+					>
+						Are you sure?
+					</ConfirmDialog>
+				);
+
+				expect(
+					screen.getByRole( 'dialog', { name: title } )
+				).toBeInTheDocument();
+				expect(
+					screen.getByRole( 'heading', { name: title } )
+				).toBeInTheDocument();
 			} );
 			it( 'should render correctly with custom button labels', () => {
 				const cancelButtonText = 'No thanks';

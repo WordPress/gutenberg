@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useMemo, useState } from '@wordpress/element';
-import { Button, privateApis } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
+import { Button } from '@wordpress/components';
+import { Stack, ValidatedInputControl } from '@wordpress/ui';
 import DataForm from '../index';
 import useFormValidity from '../../hooks/use-form-validity';
 import type {
@@ -17,9 +10,6 @@ import type {
 	NormalizedRules,
 } from '../../types';
 import DateControl from '../../components/dataform-controls/date';
-import { unlock } from '../../lock-unlock';
-
-const { ValidatedTextControl } = unlock( privateApis );
 
 function getCustomValidity< Item >(
 	isValid: NormalizedRules< Item >,
@@ -29,8 +19,11 @@ function getCustomValidity< Item >(
 	if ( isValid?.required && validity?.required ) {
 		// If the consumer provides a message for required,
 		// use it instead of the native built-in message.
-		customValidity = validity?.required?.message
-			? validity.required
+		customValidity = validity.required.message
+			? {
+					type: validity.required.type,
+					message: validity.required.message,
+			  }
 			: undefined;
 	} else if ( isValid?.elements && validity?.elements ) {
 		customValidity = validity.elements;
@@ -59,15 +52,19 @@ function CustomEditControl< Item >( {
 	);
 
 	return (
-		<ValidatedTextControl
+		<ValidatedInputControl
 			required={ !! isValid?.required }
 			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ label }
 			placeholder={ placeholder }
 			value={ value ?? '' }
-			help={ description }
-			onChange={ onChangeControl }
-			__next40pxDefaultSize
+			description={
+				typeof description === 'string' ? description : undefined
+			}
+			details={
+				typeof description === 'string' ? undefined : description
+			}
+			onValueChange={ onChangeControl }
 			hideLabelFromVision={ hideLabelFromVision }
 		/>
 	);
@@ -86,7 +83,13 @@ const ValidationComponent = ( {
 	custom: 'sync' | 'async' | 'none';
 	pattern: boolean;
 	minMax: boolean;
-	layout: 'regular' | 'panel' | 'card' | 'details';
+	layout:
+		| 'regular'
+		| 'panel-dropdown'
+		| 'panel-modal'
+		| 'card-collapsible'
+		| 'card-not-collapsible'
+		| 'details';
 } ) => {
 	type ValidatedItem = {
 		text: string;
@@ -106,9 +109,13 @@ const ValidationComponent = ( {
 		password: string;
 		toggle?: boolean;
 		toggleGroup?: string;
+		combobox?: string;
 		date?: string;
 		dateRange?: string;
 		datetime?: string;
+		time?: string;
+		showConditionalText?: boolean;
+		conditionalText?: string;
 	};
 
 	const [ post, setPost ] = useState< ValidatedItem >( {
@@ -129,9 +136,13 @@ const ValidationComponent = ( {
 		password: 'secretpassword123',
 		toggle: undefined,
 		toggleGroup: undefined,
+		combobox: undefined,
 		date: undefined,
 		dateRange: undefined,
 		datetime: undefined,
+		time: undefined,
+		showConditionalText: undefined,
+		conditionalText: undefined,
 	} );
 
 	// Cache for getElements functions - ensures promises are only created once
@@ -235,6 +246,25 @@ const ValidationComponent = ( {
 										{
 											value: 'option3',
 											label: 'Option 3',
+										},
+									] ),
+								3500
+							)
+						);
+						break;
+
+					case 'combobox':
+						promiseCache[ fieldId ] = new Promise( ( resolve ) =>
+							setTimeout(
+								() =>
+									resolve( [
+										{ value: 'apple', label: 'Apple' },
+										{ value: 'banana', label: 'Banana' },
+										{ value: 'cherry', label: 'Cherry' },
+										{ value: 'date', label: 'Date' },
+										{
+											value: 'elderberry',
+											label: 'Elderberry',
 										},
 									] ),
 								3500
@@ -364,6 +394,14 @@ const ValidationComponent = ( {
 			return null;
 		};
 
+		const customComboboxRule = ( value: ValidatedItem ) => {
+			if ( value.combobox !== 'apple' ) {
+				return 'Value must be Apple.';
+			}
+
+			return null;
+		};
+
 		const customPasswordRule = ( value: ValidatedItem ) => {
 			if ( value.password.length < 8 ) {
 				return 'Password must be at least 8 characters long.';
@@ -399,6 +437,17 @@ const ValidationComponent = ( {
 			const now = new Date();
 			if ( selectedDateTime < now ) {
 				return 'Date and time must not be in the past.';
+			}
+
+			return null;
+		};
+
+		const customTimeRule = ( value: ValidatedItem ) => {
+			if ( ! value.time ) {
+				return null;
+			}
+			if ( value.time >= '13:00' && value.time < '14:00' ) {
+				return 'Time must not be between 13:00 and 14:00 (lunch break).';
 			}
 
 			return null;
@@ -704,7 +753,7 @@ const ValidationComponent = ( {
 			},
 			{
 				id: 'customEdit',
-				label: 'Custom Control',
+				label: 'Custom control',
 				Edit: CustomEditControl,
 				isValid: {
 					required,
@@ -748,7 +797,7 @@ const ValidationComponent = ( {
 			{
 				id: 'toggleGroup',
 				type: 'text',
-				label: 'Toggle Group',
+				label: 'Toggle group',
 				Edit: 'toggleGroup',
 				elements:
 					elements === 'async'
@@ -769,38 +818,126 @@ const ValidationComponent = ( {
 				},
 			},
 			{
+				id: 'combobox',
+				type: 'text',
+				Edit: 'combobox',
+				label: 'Combobox',
+				placeholder: 'Search and select a fruit',
+				elements:
+					elements === 'async'
+						? undefined
+						: [
+								{ value: 'apple', label: 'Apple' },
+								{ value: 'banana', label: 'Banana' },
+								{ value: 'blueberry', label: 'Blueberry' },
+								{ value: 'cherry', label: 'Cherry' },
+								{ value: 'date', label: 'Date' },
+								{ value: 'elderberry', label: 'Elderberry' },
+								{ value: 'fig', label: 'Fig' },
+								{ value: 'grape', label: 'Grape' },
+								{ value: 'honeydew', label: 'Honeydew' },
+								{ value: 'kiwi', label: 'Kiwi' },
+								{ value: 'lemon', label: 'Lemon' },
+								{ value: 'mango', label: 'Mango' },
+								{ value: 'nectarine', label: 'Nectarine' },
+								{ value: 'orange', label: 'Orange' },
+								{ value: 'papaya', label: 'Papaya' },
+								{ value: 'pear', label: 'Pear' },
+								{ value: 'quince', label: 'Quince' },
+								{ value: 'raspberry', label: 'Raspberry' },
+								{ value: 'strawberry', label: 'Strawberry' },
+								{ value: 'tangerine', label: 'Tangerine' },
+								{ value: 'watermelon', label: 'Watermelon' },
+						  ],
+				getElements:
+					elements === 'async'
+						? getElements( 'combobox' )
+						: undefined,
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customComboboxRule ),
+				},
+			},
+			{
 				id: 'date',
 				type: 'date',
 				label: 'Date',
+				description: minMax
+					? 'Must be between Apr 1 and Apr 20, 2026'
+					: undefined,
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customDateRule ),
+					min: minMax ? '2026-04-01' : undefined,
+					max: minMax ? '2026-04-20' : undefined,
 				},
 			},
 			{
 				id: 'dateRange',
 				type: 'date',
-				label: 'Date Range',
+				label: 'Date range',
 				Edit: DateRangeEdit,
+				description: minMax
+					? 'Must be between Apr 1 and Apr 20, 2026'
+					: undefined,
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customDateRangeRule ),
+					min: minMax ? '2026-04-01' : undefined,
+					max: minMax ? '2026-04-20' : undefined,
 				},
 			},
 			{
 				id: 'datetime',
 				type: 'datetime',
-				label: 'Date Time',
+				label: 'Date time',
+				description: minMax
+					? 'Must be between Apr 1 and Apr 20, 2026'
+					: undefined,
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customDateTimeRule ),
+					min: minMax ? '2026-04-01T00:00:00.000Z' : undefined,
+					max: minMax ? '2026-04-20T23:59:59.000Z' : undefined,
+				},
+			},
+			{
+				id: 'time',
+				type: 'time',
+				label: 'Time',
+				description: minMax
+					? 'Must be between 09:00 and 17:00'
+					: undefined,
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customTimeRule ),
+					min: minMax ? '09:00' : undefined,
+					max: minMax ? '17:00' : undefined,
+				},
+			},
+			{
+				id: 'showConditionalText',
+				type: 'boolean',
+				label: 'Show conditional text',
+			},
+			{
+				id: 'conditionalText',
+				type: 'text',
+				label: 'Conditional text',
+				description:
+					'Always required, but only validated while visible.',
+				isVisible: ( item ) => item.showConditionalText === true,
+				isValid: {
+					required: true,
 				},
 			},
 		];
-	}, [ elements, custom, required, pattern, minMax, getElements ] );
+	}, [ elements, custom, pattern, minMax, getElements, required ] );
 
 	const form = useMemo( () => {
 		if ( layout === 'regular' ) {
@@ -853,6 +990,7 @@ const ValidationComponent = ( {
 					'password',
 					'textarea',
 					'select',
+					'combobox',
 					'textWithRadio',
 					'boolean',
 					'toggle',
@@ -861,6 +999,9 @@ const ValidationComponent = ( {
 					'date',
 					'dateRange',
 					'datetime',
+					'time',
+					'showConditionalText',
+					'conditionalText',
 				],
 			};
 		}
@@ -869,41 +1010,53 @@ const ValidationComponent = ( {
 		const groupedFields = [
 			{
 				id: 'textFields',
-				label: 'Text Fields',
+				label: 'Text fields',
 				children: [ 'text', 'textarea', 'password', 'customEdit' ],
 			},
 			{
 				id: 'numberFields',
-				label: 'Number Fields',
+				label: 'Number fields',
 				children: [ 'integer', 'number' ],
 			},
 			{
 				id: 'contactFields',
-				label: 'Contact Fields',
+				label: 'Contact fields',
 				children: [ 'email', 'telephone', 'url' ],
 			},
 			{
 				id: 'selectFields',
-				label: 'Selection Fields',
-				children: [ 'select', 'textWithRadio' ],
+				label: 'Selection fields',
+				children: [ 'select', 'combobox', 'textWithRadio' ],
 			},
 			{
 				id: 'booleanFields',
-				label: 'Boolean Fields',
+				label: 'Boolean fields',
 				children: [ 'boolean', 'toggle', 'toggleGroup' ],
 			},
 			{ id: 'color' },
 			{ id: 'array' },
 			{
 				id: 'dateFields',
-				label: 'Date Fields',
-				children: [ 'date', 'dateRange', 'datetime' ],
+				label: 'Date fields',
+				children: [ 'date', 'dateRange', 'datetime', 'time' ],
+			},
+			{
+				id: 'conditionalFields',
+				label: 'Conditionally visible fields',
+				children: [ 'showConditionalText', 'conditionalText' ],
 			},
 		];
 
-		if ( layout === 'panel' ) {
+		if ( layout === 'panel-dropdown' ) {
 			return {
-				layout: { type: 'panel' as const },
+				layout: { type: 'panel' as const, openAs: 'dropdown' as const },
+				fields: groupedFields,
+			};
+		}
+
+		if ( layout === 'panel-modal' ) {
+			return {
+				layout: { type: 'panel' as const, openAs: 'modal' as const },
 				fields: groupedFields,
 			};
 		}
@@ -915,8 +1068,16 @@ const ValidationComponent = ( {
 			};
 		}
 
+		if ( layout === 'card-collapsible' ) {
+			return {
+				layout: { type: 'card' as const },
+				fields: groupedFields,
+			};
+		}
+
+		// card-not-collapsible
 		return {
-			layout: { type: 'card' as const },
+			layout: { type: 'card' as const, isCollapsible: false },
 			fields: groupedFields,
 		};
 	}, [ layout ] );
@@ -925,7 +1086,7 @@ const ValidationComponent = ( {
 
 	return (
 		<form>
-			<Stack direction="column" align="start" gap="xl">
+			<Stack direction="column" align="start" gap="3xl">
 				<DataForm< ValidatedItem >
 					data={ post }
 					fields={ _fields }
