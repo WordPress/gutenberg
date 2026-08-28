@@ -1,4 +1,10 @@
-import type { Context, Updatable } from './helpers';
+import type {
+	Context,
+	OmitNevers,
+	PostStatus,
+	RenderedText,
+	Updatable,
+} from './helpers';
 import type { Attachment } from './attachment';
 import type { Base, TemplatePartArea, TemplateType } from './base';
 import type { Comment } from './comment';
@@ -53,11 +59,14 @@ export type {
 	NavMenu,
 	NavMenuItem,
 	Navigation,
+	OmitNevers,
 	Page,
 	Plugin,
 	Post,
 	PostRevision,
+	PostStatus,
 	PostStatusObject,
+	RenderedText,
 	Settings,
 	Sidebar,
 	Taxonomy,

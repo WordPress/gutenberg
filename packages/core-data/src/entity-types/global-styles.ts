@@ -1,9 +1,4 @@
-import type {
-	Context,
-	ContextualField,
-	OmitNevers,
-	RenderedText,
-} from './helpers';
+import type { Context, ContextualField, OmitNevers } from './helpers';
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
 declare module './base-entity-records' {
@@ -12,11 +7,18 @@ declare module './base-entity-records' {
 			/**
 			 * Unique identifier for the global styles record.
 			 */
-			id: string;
+			id: number;
 			/**
 			 * The title of the global styles variation.
+			 *
+			 * Not a `RenderedText`: the global styles controller places both
+			 * `raw` and `rendered` in every context, where the posts
+			 * controller keeps `raw` to `edit`.
 			 */
-			title: RenderedText< C >;
+			title: {
+				raw: string;
+				rendered: string;
+			};
 			/**
 			 * The styles the variation applies.
 			 */
