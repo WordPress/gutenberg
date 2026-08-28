@@ -112,6 +112,25 @@ export const spec = [
 		},
 	},
 	{
+		description: 'should create an empty value from empty anchor tags',
+		html: '<a href="https://google.com"></a>',
+		createRange: ( element ) => ( {
+			startOffset: 0,
+			startContainer: element,
+			endOffset: 1,
+			endContainer: element,
+		} ),
+		startPath: [ 0, 0 ],
+		endPath: [ 0, 0 ],
+		record: {
+			start: 0,
+			end: 0,
+			formats: [],
+			replacements: [],
+			text: '',
+		},
+	},
+	{
 		description: 'should create a value without formatting',
 		html: 'test',
 		createRange: ( element ) => ( {

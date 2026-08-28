@@ -119,6 +119,13 @@ exports[`recordToDom should create an empty value from empty tags 1`] = `
 </body>
 `;
 
+exports[`recordToDom should create an empty value from empty anchor tags 1`] = `
+<body>
+  
+  ﻿
+</body>
+`;
+
 exports[`recordToDom should disarm on* attribute 1`] = `
 <body>
   
