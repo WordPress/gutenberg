@@ -115,7 +115,9 @@ jobs:
               if: matrix.branch.name == fromJSON( needs.prepare.outputs.branches )[0].name
               run: |
                   mkdir -p "$RUNNER_TEMP/source-maps"
-                  find build/scripts -name '*.map' | tar -cf - -T - | tar -xf - -C "$RUNNER_TEMP/source-maps"
+                  if [[ -d build/scripts ]]; then
+                    find build/scripts -name '*.map' | tar -cf - -T - | tar -xf - -C "$RUNNER_TEMP/source-maps"
+                  fi
 
             - name: Upload source maps
               if: matrix.branch.name == fromJSON( needs.prepare.outputs.branches )[0].name
@@ -123,6 +125,7 @@ jobs:
               with:
                   name: performance-source-maps
                   path: ${{ runner.temp }}/source-maps
+                  if-no-files-found: ignore
 
     performance:
         timeout-minutes: 60
