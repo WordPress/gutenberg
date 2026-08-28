@@ -277,11 +277,6 @@
 		right: 0;
 	}
 
-	&.is-nesting .block-editor-list-view__menu:focus {
-		@include outset-ring__focus();
-		z-index: 1;
-	}
-
 	&.is-visible .block-editor-list-view-block-contents {
 		opacity: 1;
 		@include animation__fade-in;
