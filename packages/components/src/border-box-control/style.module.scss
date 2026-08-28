@@ -22,10 +22,11 @@
 	height: $grid-unit-20;
 	margin-bottom: $grid-unit-15;
 
-	/* The label supplies its own bottom margin as the gap to the input below.
-	   In the header row that gap comes from the row itself, and the margin
-	   would knock the vertically centered label off center. */
-	.header-label {
+	/* The label (a `BaseControl.VisualLabel`, so a `span`) supplies its own
+	   bottom margin as the gap to the input below. In the header row that gap
+	   comes from the row itself, and the margin would knock the vertically
+	   centered label off center. */
+	> span {
 		margin-bottom: 0;
 	}
 }

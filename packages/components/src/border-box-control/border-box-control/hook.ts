@@ -115,7 +115,6 @@ export function useBorderBoxControl(
 	} );
 	const wrapperClassName = styles.wrapper;
 	const headerClassName = styles.header;
-	const headerLabelClassName = styles[ 'header-label' ];
 
 	return {
 		...otherProps,
@@ -123,7 +122,6 @@ export function useBorderBoxControl(
 		colors,
 		hasVisibleLabel,
 		headerClassName,
-		headerLabelClassName,
 		hideLabelFromVision,
 		label,
 		disableUnits: mixedBorders && ! hasWidthValue,
