@@ -154,6 +154,10 @@ export function QuickEditModal( {
 			{
 				id: 'status',
 				label: __( 'Status' ),
+				layout: {
+					type: 'panel',
+					summary: 'status',
+				},
 				children: [
 					{
 						id: 'status',
