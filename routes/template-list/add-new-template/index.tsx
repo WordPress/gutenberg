@@ -503,7 +503,7 @@ function useMissingTemplates(
 	} );
 
 	const onClickPostFormatMenuItem = useCallback(
-		( { postFormats } ) => {
+		( { postFormats }: { postFormats: PostFormatMenuItem[] } ) => {
 			setPostFormats?.( postFormats );
 			onClickPostFormats?.();
 		},

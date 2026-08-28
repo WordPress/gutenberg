@@ -5540,50 +5540,12 @@
 			"count": 1
 		}
 	},
-	"packages/edit-site/src/components/add-new-template-legacy/add-custom-generic-template-modal-content.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/edit-site/src/components/add-new-template-legacy/add-custom-template-modal-content.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 4
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/edit-site/src/components/add-new-template-legacy/index.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 4
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/edit-site/src/components/add-new-template/add-custom-generic-template-modal-content.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/edit-site/src/components/add-new-template/add-custom-template-modal-content.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 4
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/edit-site/src/components/add-new-template/index.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 4
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}

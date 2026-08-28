@@ -1,8 +1,8 @@
 import { paramCase as kebabCase } from 'change-case';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Button, TextControl } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Button } from '@wordpress/components';
+import { InputControl, Stack } from '@wordpress/ui';
 
 interface AddCustomGenericTemplateModalContentProps {
 	createTemplate: (
@@ -51,14 +51,14 @@ function AddCustomGenericTemplateModalContent( {
 	return (
 		<form onSubmit={ onCreateTemplate }>
 			<Stack direction="column" gap="xl">
-				<TextControl
+				<InputControl
 					label={ __( 'Name' ) }
 					value={ title }
-					onChange={ setTitle }
+					onValueChange={ setTitle }
 					placeholder={ defaultTitle }
 					disabled={ isBusy }
 					ref={ inputRef }
-					help={ __(
+					description={ __(
 						// eslint-disable-next-line no-restricted-syntax -- 'sidebar' is a common web design term for layouts
 						'Describe the template, e.g. "Post with sidebar". A custom template can be manually applied to any post or page.'
 					) }
