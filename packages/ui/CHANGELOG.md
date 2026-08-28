@@ -9,7 +9,7 @@
 
 ### New Features
 
--   `Autocomplete.Status`, `Combobox.Status`: Add a `Status` subcomponent that wraps the Base UI primitive and announces async list status to screen readers.
+-   `Autocomplete.Status`, `Combobox.Status`: Add a `Status` subcomponent that wraps the Base UI primitive and announces async list status to screen readers ([#82195](https://github.com/WordPress/gutenberg/pull/82195)).
 
 ### Enhancements
 
