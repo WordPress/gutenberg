@@ -33,28 +33,6 @@ export function getMetaBoxesIframeName( location = 'main' ) {
 }
 
 /**
- * Returns the documents of the currently rendered meta boxes iframes,
- * found by their frame names.
- *
- * The names have to be resolved through the elements: under the editor's
- * Document-Isolation-Policy the frames' browsing context names are
- * cleared, so `window.frames[ name ]` finds nothing.
- *
- * @return {Document[]} The meta boxes iframe documents.
- */
-export function getMetaBoxesFrameDocuments() {
-	return [ 'main', 'side' ]
-		.map( ( location ) =>
-			document.querySelector(
-				`iframe[name="${ getMetaBoxesIframeName( location ) }"]`
-			)
-		)
-		.filter( Boolean )
-		.map( ( iframe ) => iframe.contentDocument )
-		.filter( Boolean );
-}
-
-/**
  * Collects the values of the form fields inside the meta boxes of the
  * given document, with the browser's own form serialization.
  *

@@ -11,7 +11,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import {
 	collectMetaBoxFieldsData,
-	getMetaBoxesFrameDocuments,
+	getMetaBoxesIframeName,
 } from '../utils/meta-boxes';
 import { unlock } from '../lock-unlock';
 
@@ -283,19 +283,38 @@ export const requestMetaBoxUpdates =
 			type: 'REQUEST_META_BOX_UPDATES',
 		} );
 
-		const frameDocuments = getMetaBoxesFrameDocuments();
+		// The frames have to be found through the elements: under the
+		// editor's Document-Isolation-Policy the frames' browsing context
+		// names are cleared, so `window.frames[ name ]` finds nothing.
+		const frameDocuments = [ 'main', 'side' ]
+			.map( ( location ) =>
+				document.querySelector(
+					`iframe[name="${ getMetaBoxesIframeName( location ) }"]`
+				)
+			)
+			.filter( Boolean )
+			.map( ( iframe ) => iframe.contentDocument )
+			.filter( Boolean );
 
 		for ( const frameDocument of frameDocuments ) {
 			// Some meta boxes, including TinyMCE editors, only write their
-			// values into their form fields in a submit handler, so let
-			// those run first. A dispatched event never runs the default
-			// action, so the form does not actually submit.
-			frameDocument.getElementById( 'post' )?.dispatchEvent(
-				new frameDocument.defaultView.Event( 'submit', {
-					bubbles: true,
-					cancelable: true,
-				} )
-			);
+			// values into their form fields in a submit handler, so submit
+			// the form as if a button were pressed. The loader page cancels
+			// every submission, so the form does not actually navigate. The
+			// temporary submitter skips constraint validation, which would
+			// otherwise silently abort on invalid fields inside hidden
+			// meta boxes.
+			const form = frameDocument.getElementById( 'post' );
+			if ( ! form ) {
+				continue;
+			}
+			const submitter = frameDocument.createElement( 'button' );
+			submitter.type = 'submit';
+			submitter.formNoValidate = true;
+			submitter.hidden = true;
+			form.appendChild( submitter );
+			form.requestSubmit( submitter );
+			submitter.remove();
 		}
 
 		// We gather the base form data.
