@@ -1,0 +1,109 @@
+/**
+ * wp-admin corner radii, consolidated onto the design system scale.
+ *
+ * This is consolidation rather than restyling. Core's admin CSS carries 120
+ * border-radius declarations across 26 distinct values, including 3px, 5px, 9px
+ * and 11px — values nobody chose as a system. The design system has five steps:
+ *
+ *   --wpds-border-radius-xs   1px
+ *   --wpds-border-radius-sm   2px
+ *   --wpds-border-radius-md   4px
+ *   --wpds-border-radius-lg   8px
+ *   --wpds-border-radius-xl  12px
+ *
+ * Those counts deliberately EXCLUDE wp-admin/css/about.css. The About screens are
+ * the one place in wp-admin where arbitrary, unsystematic styling is sanctioned —
+ * the page is art-directed afresh most releases — so counting its radii as
+ * evidence of inconsistency would be unfair. It is exempt from this effort. (Note
+ * it is still a dependency of the `wp-admin` handle, so it loads everywhere, but
+ * 244 of its 246 rule blocks are scoped to About containers.)
+ *
+ * Scope here is CONTAINERS — cards, panels, postboxes, table wrappers. Controls
+ * were tokenised in the previous phase. Deliberately untouched:
+ *
+ *   - Circles and pills (50%, 100%, 9999px, and the 11px on a 22px-tall counter).
+ *     Those are shapes, not scale steps, and rounding them to a token would be a
+ *     redesign.
+ *   - Explicit `0` resets.
+ *   - The Customizer, media views, about.php and theme browser, which are
+ *     specialised screens better handled with their own surfaces later.
+ *
+ * NO `!important` IN THIS FILE. See 99-overrides.css for the one exception.
+ */
+
+@layer wpds-overrides, wp-legacy, wpds;
+
+@layer wpds {
+
+	/* =======================================================================
+	   GROUP 1 — Exact matches. No pixel moves.
+
+	   Every declaration below already equals its token value, so this group is
+	   a pure find-and-replace: the rendered result is byte-identical, and the
+	   only change is that the value now comes from the scale instead of being
+	   written out. This is the part with no design argument against it.
+	   ======================================================================= */
+
+	/* 8px, already exactly --wpds-border-radius-lg. */
+	#dashboard-widgets .postbox,
+	#dashboard-widgets .postbox-container .empty-container,
+	.welcome-panel,
+	.card,
+	.plugin-card,
+	.sortable-placeholder,
+	#plugin-information-title.with-banner h2 {
+		border-radius: var(--wpds-border-radius-lg);
+	}
+
+	/* 4px, already exactly --wpds-border-radius-md. */
+	.inline-edit-wrapper {
+		border-radius: var(--wpds-border-radius-md);
+	}
+
+	/*
+	 * 2px, already exactly --wpds-border-radius-sm. Notices are not listed
+	 * here, including their dismiss button: that component is styled as a
+	 * whole elsewhere and sets its own radius.
+	 */
+	#pass-strength-result,
+	.profile-php .wp-pwd .caps-warning {
+		border-radius: var(--wpds-border-radius-sm);
+	}
+
+	/* =======================================================================
+	   GROUP 2 — Near misses. Each moves by 1px.
+
+	   These are the ad-hoc values. Every one is within a pixel of a scale step,
+	   which is the evidence that they were written by hand rather than chosen.
+	   Listed individually so each 1px change is reviewable on its own.
+	   ======================================================================= */
+
+	/*
+	 * 5px -> 4px. Comment count bubbles in the posts and comments list tables.
+	 * These sit next to controls already on the scale, so the odd radius reads
+	 * as a mismatch at small sizes.
+	 */
+	.column-response .comment-count-no-comments,
+	.column-response .comment-count-approved,
+	.media .row-actions .copy-to-clipboard-container .success {
+		border-radius: var(--wpds-border-radius-md);
+	}
+
+	/*
+	 * 5px -> 4px. The Press This bookmarklet button.
+	 */
+	.pressthis-bookmarklet,
+	.pressthis-bookmarklet:hover,
+	.pressthis-bookmarklet:focus,
+	.pressthis-bookmarklet:active {
+		border-radius: var(--wpds-border-radius-md);
+	}
+
+	/*
+	 * 3px -> 2px. The remove button on bulk-edit title chips. Matches the
+	 * control radius used everywhere else, which is what it sits among.
+	 */
+	#bulk-titles .ntdelbutton {
+		border-radius: var(--wpds-border-radius-sm);
+	}
+}
