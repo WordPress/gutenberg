@@ -27,6 +27,7 @@
 			font-size: var(--wpds-typography-font-size-sm);
 			line-height: var(--wpds-typography-line-height-xs);
 			color: var(--wpds-color-foreground-content-neutral-weak);
+			text-wrap: pretty;
 		}
 	}
 }
