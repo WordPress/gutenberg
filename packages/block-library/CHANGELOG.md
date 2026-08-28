@@ -14,6 +14,7 @@
 ### Enhancements
 
 -   Columns: Add transforms between Columns and the Row variation that preserve column widths through flex child sizing controls.
+-   Image: Preserve global HTML attributes (`id`, `title`, `lang`, `dir`, `role` and the `aria-*` set) authored on the image's link, so hand-edited markup no longer invalidates the block ([#58235](https://github.com/WordPress/gutenberg/issues/58235)).
 
 ### Bug Fixes
 

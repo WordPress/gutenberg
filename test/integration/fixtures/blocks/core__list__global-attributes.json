@@ -1,0 +1,35 @@
+[
+	{
+		"name": "core/list",
+		"isValid": true,
+		"attributes": {
+			"ordered": false,
+			"values": "",
+			"globalAttributes": {
+				"aria-describedby": "list-description",
+				"dir": "ltr",
+				"lang": "en",
+				"role": "list",
+				"title": "A list of features"
+			}
+		},
+		"innerBlocks": [
+			{
+				"name": "core/list-item",
+				"isValid": true,
+				"attributes": {
+					"content": "Text &amp; Headings"
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/list-item",
+				"isValid": true,
+				"attributes": {
+					"content": "Images &amp; Videos"
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]

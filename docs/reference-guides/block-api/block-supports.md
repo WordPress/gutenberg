@@ -750,6 +750,22 @@ When the block declares support for `filter.duotone`, the attributes definition 
     }
     ```
 
+## globalAttributes
+
+-   Type: `boolean`
+-   Default value: `true`
+
+Preserves the global HTML attributes authored on the block's root element, so that hand-edited markup does not invalidate the block. The preserved attributes are `aria-controls`, `aria-current`, `aria-describedby`, `aria-details`, `aria-expanded`, `aria-hidden`, `aria-labelledby`, `aria-live`, `dir`, `lang`, `role` and `title`; they are stored on the block's `globalAttributes` attribute and written back to the root element on save.
+
+`class`, `id` and `aria-label` are not included, because they are already covered by the [`customClassName`](#customclassname), [`anchor`](#anchor) and [`ariaLabel`](#arialabel) supports. `style` is not included, because block supports own the root element's inline styles, and `data-*` attributes are not included, because they cannot be enumerated.
+
+```js
+supports: {
+	// Remove the support for preserving global HTML attributes.
+	globalAttributes: false
+}
+```
+
 ## html
 
 -   Type: `boolean`

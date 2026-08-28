@@ -326,6 +326,11 @@
 					"type": "boolean",
 					"default": true
 				},
+				"globalAttributes": {
+					"description": "This property controls whether the global HTML attributes authored on the block's root element (`aria-controls`, `aria-current`, `aria-describedby`, `aria-details`, `aria-expanded`, `aria-hidden`, `aria-labelledby`, `aria-live`, `dir`, `lang`, `role` and `title`) are preserved when the block is parsed, instead of invalidating the block. `class`, `id` and `aria-label` are covered by the `customClassName`, `anchor` and `ariaLabel` supports respectively.",
+					"type": "boolean",
+					"default": true
+				},
 				"customCSS": {
 					"description": "This property adds a field to define custom CSS for the block instance.",
 					"type": "boolean",

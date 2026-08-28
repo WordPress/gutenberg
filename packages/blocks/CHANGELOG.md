@@ -6,6 +6,10 @@
 
 -   Block variations and `block` type block transforms accept a `shortcut` property, declaring a keyboard shortcut that applies the variation or transform to the selected block. See the [block variations](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-variations/) and [block transforms](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-transforms/) documentation ([#81588](https://github.com/WordPress/gutenberg/pull/81588)).
 
+### Enhancements
+
+-   Preserve the global HTML attributes (`aria-*`, `dir`, `lang`, `role`, `title`) authored on a block's root element instead of invalidating the block, via the new `globalAttributes` block support ([#58235](https://github.com/WordPress/gutenberg/issues/58235)).
+
 ## 15.26.0 (2026-08-12)
 
 ### Internal

@@ -27,6 +27,20 @@ export default function save( { attributes } ) {
 		sizeSlug,
 		title,
 		isDecorative,
+		linkId,
+		linkTitle,
+		linkLang,
+		linkDir,
+		linkRole,
+		linkAriaControls,
+		linkAriaCurrent,
+		linkAriaDescribedby,
+		linkAriaDetails,
+		linkAriaExpanded,
+		linkAriaHidden,
+		linkAriaLabel,
+		linkAriaLabelledby,
+		linkAriaLive,
 		metadata: { bindings = {} } = {},
 	} = attributes;
 
@@ -110,6 +124,20 @@ export default function save( { attributes } ) {
 					href={ href }
 					target={ linkTarget }
 					rel={ newRel }
+					id={ linkId }
+					title={ linkTitle }
+					lang={ linkLang }
+					dir={ linkDir }
+					role={ linkRole }
+					aria-controls={ linkAriaControls }
+					aria-current={ linkAriaCurrent }
+					aria-describedby={ linkAriaDescribedby }
+					aria-details={ linkAriaDetails }
+					aria-expanded={ linkAriaExpanded }
+					aria-hidden={ linkAriaHidden }
+					aria-label={ linkAriaLabel }
+					aria-labelledby={ linkAriaLabelledby }
+					aria-live={ linkAriaLive }
 				>
 					{ image }
 				</a>

@@ -1,6 +1,30 @@
 export const BLOCK_ICON_DEFAULT = 'block-default';
 
 /**
+ * Global HTML attributes preserved on a block's root element when the block
+ * supports `globalAttributes`.
+ *
+ * `class`, `id` and `aria-label` are deliberately absent: they are already
+ * round-tripped by the `customClassName`, `anchor` and `ariaLabel` supports
+ * respectively. `style` is absent because block supports own the root element's
+ * inline styles, and `data-*` is absent because it cannot be enumerated.
+ */
+export const GLOBAL_HTML_ATTRIBUTES = [
+	'aria-controls',
+	'aria-current',
+	'aria-describedby',
+	'aria-details',
+	'aria-expanded',
+	'aria-hidden',
+	'aria-labelledby',
+	'aria-live',
+	'dir',
+	'lang',
+	'role',
+	'title',
+];
+
+/**
  * Array of valid keys in a block type settings deprecation object.
  */
 export const DEPRECATED_ENTRY_KEYS = [

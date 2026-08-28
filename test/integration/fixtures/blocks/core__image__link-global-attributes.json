@@ -1,0 +1,30 @@
+[
+	{
+		"name": "core/image",
+		"isValid": true,
+		"attributes": {
+			"url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
+			"alt": "",
+			"caption": "",
+			"href": "https://wordpress.org/",
+			"linkClass": "custom-link",
+			"linkDestination": "custom",
+			"linkId": "wordpress-org-link",
+			"linkTitle": "WordPress.org",
+			"linkLang": "en",
+			"linkDir": "ltr",
+			"linkRole": "link",
+			"linkAriaControls": "site-region",
+			"linkAriaCurrent": "page",
+			"linkAriaDescribedby": "link-description",
+			"linkAriaDetails": "link-details",
+			"linkAriaExpanded": "false",
+			"linkAriaHidden": "false",
+			"linkAriaLabel": "Visit WordPress.org",
+			"linkAriaLabelledby": "link-label",
+			"linkAriaLive": "polite",
+			"isDecorative": false
+		},
+		"innerBlocks": []
+	}
+]

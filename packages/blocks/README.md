@@ -333,6 +333,12 @@ _Returns_
 
 -   `string | null`: Block name.
 
+### GLOBAL_HTML_ATTRIBUTES
+
+Global HTML attributes preserved on a block's root element when the block supports `globalAttributes`.
+
+`class`, `id` and `aria-label` are deliberately absent: they are already round-tripped by the `customClassName`, `anchor` and `ariaLabel` supports respectively. `style` is absent because block supports own the root element's inline styles, and `data-*` is absent because it cannot be enumerated.
+
 ### hasBlockSupport
 
 Returns true if the block defines support for a feature, or false otherwise.

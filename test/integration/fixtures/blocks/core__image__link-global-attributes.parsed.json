@@ -1,0 +1,13 @@
+[
+	{
+		"blockName": "core/image",
+		"attrs": {
+			"linkDestination": "custom"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<figure class=\"wp-block-image\"><a class=\"custom-link\" href=\"https://wordpress.org/\" id=\"wordpress-org-link\" title=\"WordPress.org\" lang=\"en\" dir=\"ltr\" role=\"link\" aria-controls=\"site-region\" aria-current=\"page\" aria-describedby=\"link-description\" aria-details=\"link-details\" aria-expanded=\"false\" aria-hidden=\"false\" aria-label=\"Visit WordPress.org\" aria-labelledby=\"link-label\" aria-live=\"polite\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" alt=\"\" /></a></figure>\n",
+		"innerContent": [
+			"\n<figure class=\"wp-block-image\"><a class=\"custom-link\" href=\"https://wordpress.org/\" id=\"wordpress-org-link\" title=\"WordPress.org\" lang=\"en\" dir=\"ltr\" role=\"link\" aria-controls=\"site-region\" aria-current=\"page\" aria-describedby=\"link-description\" aria-details=\"link-details\" aria-expanded=\"false\" aria-hidden=\"false\" aria-label=\"Visit WordPress.org\" aria-labelledby=\"link-label\" aria-live=\"polite\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" alt=\"\" /></a></figure>\n"
+		]
+	}
+]

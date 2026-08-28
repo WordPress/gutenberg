@@ -1,0 +1,30 @@
+[
+	{
+		"blockName": "core/list",
+		"attrs": {},
+		"innerBlocks": [
+			{
+				"blockName": "core/list-item",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "\n<li>Text &amp; Headings</li>\n",
+				"innerContent": [ "\n<li>Text &amp; Headings</li>\n" ]
+			},
+			{
+				"blockName": "core/list-item",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "\n<li>Images &amp; Videos</li>\n",
+				"innerContent": [ "\n<li>Images &amp; Videos</li>\n" ]
+			}
+		],
+		"innerHTML": "\n<ul aria-describedby=\"list-description\" role=\"list\" lang=\"en\" dir=\"ltr\" title=\"A list of features\" class=\"wp-block-list\">\n\n</ul>\n",
+		"innerContent": [
+			"\n<ul aria-describedby=\"list-description\" role=\"list\" lang=\"en\" dir=\"ltr\" title=\"A list of features\" class=\"wp-block-list\">",
+			null,
+			"\n\n",
+			null,
+			"</ul>\n"
+		]
+	}
+]

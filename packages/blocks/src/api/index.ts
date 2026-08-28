@@ -163,6 +163,7 @@ export {
 export { default as children } from './children';
 export { default as node } from './node';
 export {
+	GLOBAL_HTML_ATTRIBUTES,
 	__EXPERIMENTAL_STYLE_PROPERTY,
 	__EXPERIMENTAL_ELEMENTS,
 	__EXPERIMENTAL_PATHS_WITH_OVERRIDE,

@@ -12,6 +12,7 @@ import allowedBlocks from './allowed-blocks';
 import anchor from './anchor';
 import ariaLabel from './aria-label';
 import blockFields from './block-fields';
+import globalAttributes from './global-attributes';
 import customClassName from './custom-class-name';
 import './generated-class-name';
 import style from './style';
@@ -80,6 +81,7 @@ createBlockSaveFilter( [
 	textAlign,
 	anchor,
 	ariaLabel,
+	globalAttributes,
 	customClassName,
 	border,
 	customCSS,
