@@ -3,13 +3,11 @@ import getMediaIdsInBlocks from './media-ids-in-blocks';
 import invalidateAttachmentResolutions from './invalidate-attachment-resolutions';
 
 /**
- * Reports a failure without interpolating it.
+ * Logs a failure rather than putting it in the message. A failed `apiFetch`
+ * isn't always an `Error` — often it's a plain object — so writing it into a
+ * string would print "[object Object]".
  *
- * Silent to the user is the design; silent to whoever is debugging it is not.
- * A rejected `apiFetch` is not reliably an `Error` - a REST error arrives as a
- * plain `{ code, message }` - so `${ reason }` would print "[object Object]".
- *
- * @param {*} reason Whatever the rejection carried.
+ * @param {*} reason Whatever the failure carried.
  */
 function warnAttachFailed( reason ) {
 	// eslint-disable-next-line no-console
@@ -17,59 +15,30 @@ function warnAttachFailed( reason ) {
 }
 
 /**
- * Attaches the media a post displays to that post, if it belongs to no post yet.
- *
- * Uploading a file into a post has always parented that attachment to the post;
- * selecting an existing file from the Media Library never has. So the same image
- * reads as `Unattached` or not depending only on how it reached the block, and
- * media that is genuinely in use looks safe to delete.
- *
- * Runs on save and reads the post's blocks, which is what keeps the scope
- * honest in both directions. Only media an Image or Gallery block displays is
- * considered — a featured image, a site icon, or a picker an SEO plugin renders
- * is not this post's to claim. And media added and then removed before saving is
- * simply not in the tree, so it is never attached.
- *
- * Silent by design, the way the Classic Editor was: attachment is a detail of
- * how WordPress records media, not a decision worth interrupting someone for.
- * The affordance for undoing it already exists and is better than a prompt — the
- * inserter's attached-media tab has a persistent per-item "Detach from post".
- *
- * Takes the post's blocks rather than reading the canvas, and the distinction is
- * load-bearing. With "Show template" on, the block editor holds the *template's*
- * tree with the post nested inside a `core/post-content` block, so the canvas
- * includes media belonging to the template — which this post has no claim on.
- * One save writes one entity, so the media considered has to come from that
- * entity.
+ * When a post is saved, attaches any images in its content that aren't already
+ * attached to a post. Uploading an image into a post has always done this;
+ * picking one from the Media Library never has.
  *
  * @param {Object}   registry    A `@wordpress/data` registry.
  * @param {Object}   post        The post that was saved.
  * @param {number}   post.id     Its ID.
  * @param {string}   post.type   Its post type.
- * @param {Object[]} post.blocks Its own blocks, not the canvas's.
+ * @param {Object[]} post.blocks The post's own blocks — not the ones on screen.
+ *                               With "Show template" on, the editor shows the
+ *                               template with the post inside it, so what's on
+ *                               screen also includes the template's images.
  */
 export default async function attachMediaInPost( registry, post ) {
 	try {
 		await attach( registry, post );
 	} catch ( error ) {
-		// The two lookups in `attach` can reject on their own — `context=edit`
-		// on the media collection is a 403 for a contributor — and the caller
-		// neither awaits this nor attaches a handler, so without this catch a
-		// rejection would surface as an unhandled one.
+		// Nothing is waiting on this, so an error thrown here would go nowhere.
+		// Either lookup below can fail on its own: someone who can't edit other
+		// people's media gets a 403.
 		warnAttachFailed( error );
 	}
 }
 
-/**
- * The work, split out so the entry point above can be the only thing that has
- * to be careful about rejections.
- *
- * @param {Object}   registry    A `@wordpress/data` registry.
- * @param {Object}   post        The post that was saved.
- * @param {number}   post.id     Its ID.
- * @param {string}   post.type   Its post type.
- * @param {Object[]} post.blocks Its own blocks.
- */
 async function attach( registry, { id: postId, type: postType, blocks } ) {
 	const mediaIds = getMediaIdsInBlocks( blocks );
 
@@ -77,12 +46,9 @@ async function attach( registry, { id: postId, type: postType, blocks } ) {
 		return;
 	}
 
-	// A post type with no front end of its own is a poor owner for media. A
-	// template is the clearest case: it has no URL, and the same template backs
-	// many posts, so "uploaded to" pointing at it says nothing useful. `savePost`
-	// handles templates as well as posts, so this has to be checked rather than
-	// assumed. Ordered after the cheap block scan so a post with no media at all
-	// still costs nothing.
+	// Templates and the like have no front end of their own, so an image can't
+	// really belong to one — and `savePost` saves those too. Checked after the
+	// block scan, so a post with no images costs nothing.
 	const postTypeObject = await registry
 		.resolveSelect( coreStore )
 		.getPostType( postType );
@@ -91,9 +57,9 @@ async function attach( registry, { id: postId, type: postType, blocks } ) {
 		return;
 	}
 
-	// `resolveSelect`, not `select`: a plain select here would kick off the
-	// resolver and hand back `undefined` in the same breath. One request covers
-	// the post — `fetch-all-middleware` rewrites `per_page: -1` to 100.
+	// `resolveSelect` waits for the data. A plain `select` would start the
+	// request and return `undefined` straight away. This is one request for the
+	// whole post: `fetch-all-middleware` turns `per_page: -1` into 100.
 	const media = await registry
 		.resolveSelect( coreStore )
 		.getEntityRecords( 'postType', 'attachment', {
@@ -101,10 +67,9 @@ async function attach( registry, { id: postId, type: postType, blocks } ) {
 			per_page: -1,
 		} );
 
-	// Only ever fill an empty parent. An attachment that already belongs to
-	// another post is left alone: `post_parent` holds one post, so claiming it
-	// here would silently take the file away from wherever it came from.
-	// WordPress reports "belongs to nothing" as `null`, never `0`.
+	// Only fill in a blank parent. An image can belong to one post at a time, so
+	// attaching one that's already taken would quietly remove it from the post
+	// it came from. WordPress writes "not attached" as `null`, never `0`.
 	const unattached = ( media ?? [] ).filter( ( item ) => ! item.post );
 
 	if ( ! unattached.length ) {
@@ -113,8 +78,7 @@ async function attach( registry, { id: postId, type: postType, blocks } ) {
 
 	const { saveEntityRecord } = registry.dispatch( coreStore );
 
-	// `allSettled` so one file the user turns out not to be able to edit doesn't
-	// strand the rest, and so a rejection cannot escape this function.
+	// `allSettled` so one image the user can't edit doesn't stop the others.
 	const results = await Promise.allSettled(
 		unattached.map( ( item ) =>
 			saveEntityRecord( 'postType', 'attachment', {
@@ -124,8 +88,6 @@ async function attach( registry, { id: postId, type: postType, blocks } ) {
 		)
 	);
 
-	// The likeliest failure is a 403: attaching writes to the attachment, so a
-	// contributor using someone else's media cannot do it.
 	results.forEach( ( result ) => {
 		if ( result.status === 'rejected' ) {
 			warnAttachFailed( result.reason );
@@ -136,9 +98,7 @@ async function attach( registry, { id: postId, type: postType, blocks } ) {
 		return;
 	}
 
-	// Saving a record updates that record, but not the cached queries listing
-	// media by parent. Without this the Gallery block's dynamic mode and the
-	// inserter's attached-media tab keep showing the pre-save answer until the
-	// page is reloaded.
+	// Ensure the attachments cache is updated so that on save,
+	// the Dynamic Gallery and Attached images category can refresh.
 	invalidateAttachmentResolutions( registry );
 }

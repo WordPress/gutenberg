@@ -278,20 +278,13 @@ export const savePost =
 		}
 		dispatch( { type: 'REQUEST_POST_UPDATE_FINISH', options } );
 
-		// Attach media the post displays but that belongs to no post yet,
-		// matching what uploading into a post has always done. An autosave or a
-		// preview is not the user committing anything, so neither is the moment
-		// to start claiming their media.
+		// Attach any images in the post that aren't attached to a post yet. Not
+		// awaited: it shouldn't hold up the editor showing "Saved", and it
+		// handles its own errors.
 		//
-		// `isDeletingPost` covers trashing: `trashPost` deletes the post and
-		// then calls this action, and `isEditedPostSaveable` has no status check
-		// to stop it, so without this a post on its way to the bin would take
-		// ownership of media on the way out. The store still holds the pre-trash
-		// record at that point, so the delete flag is the signal, not the status.
-		//
-		// Not awaited: this is bookkeeping, and it must not hold up the editor
-		// reaching "Saved". It swallows its own errors, so nothing can reject
-		// here. `autoAttachMediaEnabled` is the documented way to switch it off.
+		// `isDeletingPost` is what catches trashing. `trashPost` deletes the post
+		// and then calls this, and the record still says what it did before the
+		// delete, so checking the status alone would miss it.
 		if (
 			! error &&
 			! options.isAutosave &&
@@ -303,11 +296,8 @@ export const savePost =
 			attachMediaInPost( registry, {
 				id: previousRecord.id,
 				type: previousRecord.type,
-				// The post's own blocks, not the canvas's: in template mode the
-				// block editor holds the template's tree with this post nested
-				// inside it. Same source `getEditedPostContent` serialized
-				// above, so the media considered and the content written cannot
-				// disagree.
+				// The post's own blocks, not the ones on screen — see
+				// `attachMediaInPost`. Same source as the content saved above.
 				blocks: select.getEditorBlocks(),
 			} );
 		}
