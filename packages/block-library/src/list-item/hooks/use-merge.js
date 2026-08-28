@@ -151,8 +151,7 @@ export default function useMerge( clientId, onMerge ) {
 		} else {
 			// Merge into the previous line: the trailing item of the
 			// previous sibling, or the parent item's own line for a first
-			// child. Backspace deletes backwards; outdenting stays on
-			// Shift+Tab and on Enter in an empty item.
+			// child.
 			const previousBlockClientId = getPreviousBlockClientId( clientId );
 			if ( previousBlockClientId ) {
 				const trailingId = getTrailingId( previousBlockClientId );
