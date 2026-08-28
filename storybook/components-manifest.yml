@@ -110,6 +110,7 @@
             - className
             - finalFocus
             - initialFocus
+            - popupWidth
             - portal
             - positioner
             - render
@@ -1102,6 +1103,7 @@
       - onValueChange
       - open
       - openOnInputClick
+      - popupWidth
       - readOnly
       - ref
       - required
@@ -1193,6 +1195,7 @@
       - onValueChange
       - open
       - openOnInputClick
+      - popupWidth
       - readOnly
       - ref
       - required
