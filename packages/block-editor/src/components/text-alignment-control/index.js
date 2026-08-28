@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	alignLeft,
@@ -76,8 +69,6 @@ export default function TextAlignmentControl( {
 	return (
 		<ToggleGroupControl
 			isDeselectable
-			__nextHasNoMarginBottom
-			__next40pxDefaultSize
 			label={ __( 'Text alignment' ) }
 			className={ clsx(
 				'block-editor-text-alignment-control',

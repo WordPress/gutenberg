@@ -1,26 +1,24 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * Internal dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { Truncate } from '..';
 
 const meta: Meta< typeof Truncate > = {
 	component: Truncate,
-	title: 'Components (Experimental)/Typography/Truncate',
-	id: 'components-experimental-truncate',
+	title: 'Components/Typography/Truncate',
+	id: 'components-truncate',
 	argTypes: {
 		children: { control: { type: 'text' } },
 		as: { control: { type: 'text' } },
 	},
+	tags: [ 'status-experimental', 'manifest' ],
 	parameters: {
 		controls: {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;

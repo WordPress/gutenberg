@@ -1,16 +1,29 @@
+@use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "../utils/theme-variables" as *;
+
 .components-form-token-field__input-container {
-	@include input-control($components-color-accent);
+	@include input-control;
 	width: 100%;
 	padding: 0;
 	cursor: text;
 
 	&.is-disabled {
-		background: $gray-300;
-		border-color: $gray-300;
+		background: $components-color-gray-100;
+		border-color: $components-color-gray-400;
+		cursor: default;
+
+		// TODO: Use WPDS disabled border tokens once this container is aligned with the design system.
+		// Until then, cancel `input-control` hover styles (the wrapper uses `.is-disabled`, not `:disabled`).
+		&:hover {
+			border-color: $components-color-gray-400;
+		}
 	}
 
 	&.is-active {
-		@include input-style__focus($components-color-accent);
+		@include outset-ring__focus;
 	}
 
 	// Token input
@@ -19,6 +32,7 @@
 		flex: 1;
 		font-family: inherit;
 		font-size: 16px;
+		line-height: 1; // Override forms.css styles
 		width: 100%;
 		max-width: 100%;
 		margin-left: 4px;
@@ -72,6 +86,14 @@
 		.components-form-token-field__token-text,
 		.components-form-token-field__remove-token {
 			color: $gray-700;
+		}
+	}
+
+	&.is-disabled {
+		.components-form-token-field__token-text,
+		.components-form-token-field__remove-token.components-button {
+			background: $components-color-gray-100;
+			color: $components-color-gray-600;
 		}
 	}
 
@@ -191,6 +213,6 @@
 	}
 
 	&:not(.is-empty) {
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 	}
 }

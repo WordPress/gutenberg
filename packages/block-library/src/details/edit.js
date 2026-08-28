@@ -1,11 +1,9 @@
-/**
- * WordPress dependencies
- */
 import {
 	RichText,
 	useBlockProps,
 	useInnerBlocksProps,
 	InspectorControls,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	TextControl,
@@ -15,32 +13,41 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import { useSelect } from '@wordpress/data';
+import { withIgnoreIMEEvents } from '@wordpress/keycodes';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
-const TEMPLATE = [
-	[
-		'core/paragraph',
-		{
-			placeholder: __( 'Type / to add a hidden block' ),
-		},
-	],
-];
-
-function DetailsEdit( { attributes, setAttributes } ) {
+function DetailsEdit( { attributes, setAttributes, clientId } ) {
 	const { name, showContent, summary, allowedBlocks, placeholder } =
 		attributes;
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: TEMPLATE,
 		__experimentalCaptureToolbars: true,
 		allowedBlocks,
 	} );
 	const [ isOpen, setIsOpen ] = useState( showContent );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
+	// Check if the inner blocks are selected.
+	const hasSelectedInnerBlock = useSelect(
+		( select ) =>
+			select( blockEditorStore ).hasSelectedInnerBlock( clientId, true ),
+		[ clientId ]
+	);
+
+	const handleSummaryKeyDown = ( event ) => {
+		if ( event.key === 'Enter' && ! event.shiftKey ) {
+			setIsOpen( ( prevIsOpen ) => ! prevIsOpen );
+			event.preventDefault();
+		}
+	};
+
+	// Prevent spacebar from toggling <details> while typing.
+	const handleSummaryKeyUp = ( event ) => {
+		if ( event.key === ' ' ) {
+			event.preventDefault();
+		}
+	};
 
 	return (
 		<>
@@ -65,7 +72,6 @@ function DetailsEdit( { attributes, setAttributes } ) {
 						} }
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Open by default' ) }
 							checked={ showContent }
 							onChange={ () =>
@@ -79,8 +85,6 @@ function DetailsEdit( { attributes, setAttributes } ) {
 			</InspectorControls>
 			<InspectorControls group="advanced">
 				<TextControl
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					label={ __( 'Name attribute' ) }
 					value={ name || '' }
 					onChange={ ( newName ) =>
@@ -93,13 +97,19 @@ function DetailsEdit( { attributes, setAttributes } ) {
 			</InspectorControls>
 			<details
 				{ ...innerBlocksProps }
-				open={ isOpen }
+				open={ isOpen || hasSelectedInnerBlock }
 				onToggle={ ( event ) => setIsOpen( event.target.open ) }
+				name={ name || '' }
 			>
-				<summary>
+				<summary
+					onKeyDown={ withIgnoreIMEEvents( handleSummaryKeyDown ) }
+					onKeyUp={ handleSummaryKeyUp }
+				>
 					<RichText
 						identifier="summary"
-						aria-label={ __( 'Write summary' ) }
+						aria-label={ __(
+							'Write summary. Press Enter to expand or collapse the details.'
+						) }
 						placeholder={ placeholder || __( 'Write summary…' ) }
 						withoutInteractiveFormatting
 						value={ summary }

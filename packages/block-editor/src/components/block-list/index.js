@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	AsyncModeProvider,
 	useSelect,
@@ -15,15 +8,11 @@ import {
 import { useMergeRefs, useDebounce } from '@wordpress/compose';
 import {
 	createContext,
+	useEffect,
 	useMemo,
 	useCallback,
-	useEffect,
 } from '@wordpress/element';
-import { getDefaultBlockName } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import { useInBetweenInserter } from './use-in-between-inserter';
@@ -35,25 +24,48 @@ import {
 	BlockEditContextProvider,
 	DEFAULT_BLOCK_EDIT_CONTEXT,
 } from '../block-edit/context';
-import { useTypingObserver } from '../observe-typing';
 import { ZoomOutSeparator } from './zoom-out-separator';
 import { unlock } from '../../lock-unlock';
 
 export const IntersectionObserver = createContext();
+IntersectionObserver.displayName = 'IntersectionObserverContext';
+
 const pendingBlockVisibilityUpdatesPerRegistry = new WeakMap();
+const delayedBlockVisibilityDebounceOptions = {
+	trailing: true,
+};
 
 function Root( { className, ...settings } ) {
-	const { isOutlineMode, isFocusMode, temporarilyEditingAsBlocks } =
-		useSelect( ( select ) => {
-			const { getSettings, getTemporarilyEditingAsBlocks, isTyping } =
-				unlock( select( blockEditorStore ) );
-			const { outlineMode, focusMode } = getSettings();
-			return {
-				isOutlineMode: outlineMode && ! isTyping(),
-				isFocusMode: focusMode,
-				temporarilyEditingAsBlocks: getTemporarilyEditingAsBlocks(),
-			};
-		}, [] );
+	const {
+		isOutlineMode,
+		isFocusMode,
+		isPreviewMode,
+		editedContentOnlySection,
+	} = useSelect( ( select ) => {
+		const {
+			getSettings,
+			isTyping,
+			hasBlockSpotlight,
+			getEditedContentOnlySection,
+		} = unlock( select( blockEditorStore ) );
+		const {
+			outlineMode,
+			focusMode,
+			isPreviewMode: _isPreviewMode,
+		} = getSettings();
+		return {
+			isOutlineMode: outlineMode && ! isTyping(),
+			/*
+			 * Spotlight fades everything but the block being worked on, which
+			 * has nothing to offer a canvas that cannot be edited — a preview
+			 * would just render most of its content faded out.
+			 */
+			isFocusMode:
+				! _isPreviewMode && ( focusMode || hasBlockSpotlight() ),
+			isPreviewMode: _isPreviewMode,
+			editedContentOnlySection: getEditedContentOnlySection(),
+		};
+	}, [] );
 	const registry = useRegistry();
 	const { setBlockVisibility } = useDispatch( blockEditorStore );
 
@@ -68,9 +80,7 @@ function Root( { className, ...settings } ) {
 			setBlockVisibility( updates );
 		}, [ registry ] ),
 		300,
-		{
-			trailing: true,
-		}
+		delayedBlockVisibilityDebounceOptions
 	);
 	const intersectionObserver = useMemo( () => {
 		const { IntersectionObserver: Observer } = window;
@@ -97,11 +107,11 @@ function Root( { className, ...settings } ) {
 			ref: useMergeRefs( [
 				useBlockSelectionClearer(),
 				useInBetweenInserter(),
-				useTypingObserver(),
 			] ),
 			className: clsx( 'is-root-container', className, {
 				'is-outline-mode': isOutlineMode,
 				'is-focus-mode': isFocusMode,
+				'is-preview-mode': isPreviewMode,
 			} ),
 		},
 		settings
@@ -109,33 +119,41 @@ function Root( { className, ...settings } ) {
 	return (
 		<IntersectionObserver.Provider value={ intersectionObserver }>
 			<div { ...innerBlocksProps } />
-			{ !! temporarilyEditingAsBlocks && (
-				<StopEditingAsBlocksOnOutsideSelect
-					clientId={ temporarilyEditingAsBlocks }
+			{ !! editedContentOnlySection && (
+				<StopEditingContentOnlySectionOnOutsideSelect
+					clientId={ editedContentOnlySection }
 				/>
 			) }
 		</IntersectionObserver.Provider>
 	);
 }
 
-function StopEditingAsBlocksOnOutsideSelect( { clientId } ) {
-	const { stopEditingAsBlocks } = unlock( useDispatch( blockEditorStore ) );
+function StopEditingContentOnlySectionOnOutsideSelect( { clientId } ) {
+	const { stopEditingContentOnlySection } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const isBlockOrDescendantSelected = useSelect(
 		( select ) => {
-			const { isBlockSelected, hasSelectedInnerBlock } =
-				select( blockEditorStore );
+			const {
+				isBlockSelected,
+				hasSelectedInnerBlock,
+				getBlockSelectionStart,
+			} = select( blockEditorStore );
 			return (
+				! getBlockSelectionStart() ||
 				isBlockSelected( clientId ) ||
 				hasSelectedInnerBlock( clientId, true )
 			);
 		},
 		[ clientId ]
 	);
+
 	useEffect( () => {
 		if ( ! isBlockOrDescendantSelected ) {
-			stopEditingAsBlocks( clientId );
+			stopEditingContentOnlySection();
 		}
-	}, [ isBlockOrDescendantSelected, clientId, stopEditingAsBlocks ] );
+	}, [ isBlockOrDescendantSelected, stopEditingContentOnlySection ] );
+
 	return null;
 }
 
@@ -166,6 +184,8 @@ function Items( {
 		isZoomOut,
 		selectedBlocks,
 		visibleBlocks,
+		ghostBlockName,
+		ghostBlockAttributes,
 		shouldRenderAppender,
 	} = useSelect(
 		( select ) => {
@@ -177,6 +197,9 @@ function Items( {
 				getTemplateLock,
 				getBlockEditingMode,
 				isSectionBlock,
+				isContainerInsertableToInContentOnlyMode,
+				getBlockName,
+				getBlockListSettings,
 				isZoomOut: _isZoomOut,
 				canInsertBlockType,
 			} = unlock( select( blockEditorStore ) );
@@ -189,6 +212,25 @@ function Items( {
 					selectedBlocks: EMPTY_ARRAY,
 					visibleBlocks: EMPTY_SET,
 				};
+			}
+
+			// A block list without a custom appender renders a ghost of
+			// the container's default block while empty: a real block
+			// object rendered before it exists in the store, inserted on
+			// entry.
+			let _ghostBlockName;
+			let _ghostBlockAttributes;
+			if ( hasAppender && ! hasCustomAppender && ! _order.length ) {
+				const defaultBlock = ( rootClientId
+					? getBlockListSettings( rootClientId )?.defaultBlock
+					: undefined ) ?? { name: getDefaultBlockName() };
+				if (
+					defaultBlock.name &&
+					canInsertBlockType( defaultBlock.name, rootClientId )
+				) {
+					_ghostBlockName = defaultBlock.name;
+					_ghostBlockAttributes = defaultBlock.attributes;
+				}
 			}
 
 			const selectedBlockClientIds = getSelectedBlockClientIds();
@@ -207,17 +249,30 @@ function Items( {
 				rootClientId === selectedBlockClientId
 			);
 
+			const templateLock = getTemplateLock( rootClientId );
+
+			const appenderAllowed =
+				( ! isSectionBlock( rootClientId ) ||
+					isContainerInsertableToInContentOnlyMode(
+						getBlockName( selectedBlockClientId ),
+						rootClientId
+					) ) &&
+				getBlockEditingMode( rootClientId ) !== 'disabled' &&
+				( ! templateLock || templateLock === 'contentOnly' ) &&
+				hasAppender &&
+				! _isZoomOut();
+
 			return {
 				order: _order,
 				selectedBlocks: selectedBlockClientIds,
 				visibleBlocks: __unstableGetVisibleBlocks(),
 				isZoomOut: _isZoomOut(),
+				// The ghost is the block list's empty state: it renders
+				// whether or not the block is selected.
+				ghostBlockName: appenderAllowed ? _ghostBlockName : undefined,
+				ghostBlockAttributes: _ghostBlockAttributes,
 				shouldRenderAppender:
-					! isSectionBlock( rootClientId ) &&
-					getBlockEditingMode( rootClientId ) !== 'disabled' &&
-					! getTemplateLock( rootClientId ) &&
-					hasAppender &&
-					! _isZoomOut() &&
+					appenderAllowed &&
 					( hasCustomAppender ||
 						hasSelectedRoot ||
 						showRootAppender ),
@@ -226,14 +281,29 @@ function Items( {
 		[ rootClientId, hasAppender, hasCustomAppender ]
 	);
 
+	// One ghost per empty period: regenerated when the list empties again
+	// or the default block changes, stable in between so the client ID,
+	// and with it the DOM, survives materialization.
+	const ghostBlock = useMemo(
+		() =>
+			ghostBlockName
+				? createBlock( ghostBlockName, ghostBlockAttributes )
+				: null,
+		[ ghostBlockName, ghostBlockAttributes ]
+	);
+	const showGhost = !! ghostBlock;
+
+	const items = showGhost ? [ ...order, ghostBlock.clientId ] : order;
+
 	return (
 		<LayoutProvider value={ layout }>
-			{ order.map( ( clientId ) => (
+			{ items.map( ( clientId ) => (
 				<AsyncModeProvider
 					key={ clientId }
 					value={
 						// Only provide data asynchronously if the block is
-						// not visible and not selected.
+						// not visible, not selected, and not the ghost.
+						clientId !== ghostBlock?.clientId &&
 						! visibleBlocks.has( clientId ) &&
 						! selectedBlocks.includes( clientId )
 					}
@@ -248,6 +318,11 @@ function Items( {
 					<BlockListBlock
 						rootClientId={ rootClientId }
 						clientId={ clientId }
+						ghostBlock={
+							clientId === ghostBlock?.clientId
+								? ghostBlock
+								: undefined
+						}
 					/>
 					{ isZoomOut && (
 						<ZoomOutSeparator
@@ -259,7 +334,7 @@ function Items( {
 				</AsyncModeProvider>
 			) ) }
 			{ order.length < 1 && placeholder }
-			{ shouldRenderAppender && (
+			{ shouldRenderAppender && ! showGhost && (
 				<BlockListAppender
 					tagName={ __experimentalAppenderTagName }
 					rootClientId={ rootClientId }

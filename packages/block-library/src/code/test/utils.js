@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { escape } from '../utils';
 
 describe( 'core/code', () => {

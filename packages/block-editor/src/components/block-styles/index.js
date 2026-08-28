@@ -1,43 +1,79 @@
-/**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
-import { useState } from '@wordpress/element';
-import { debounce, useViewportMatch } from '@wordpress/compose';
+import { useState, useMemo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { debounce, useInstanceId } from '@wordpress/compose';
 import {
-	Button,
+	Composite,
 	__experimentalTruncate as Truncate,
-	Popover,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
-import BlockStylesPreviewPanel from './preview-panel';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Button } from '@wordpress/ui';
+import { __ } from '@wordpress/i18n';
+import PreviewBlockPopover from '../block-switcher/preview-block-popover';
 import useStylesForBlocks from './use-styles-for-block';
+import { useToolsPanelDropdownMenuProps } from '../global-styles/utils';
+import { getDefaultStyle, replaceActiveStyle } from './utils';
+import { store as blockEditorStore } from '../../store';
 
 const noop = () => {};
 
+const getCompositeItemId = ( instanceId, style ) =>
+	`${ instanceId }-${ style.name }`;
+
 // Block Styles component for the Settings Sidebar.
 function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
+	const canEdit = useSelect(
+		( select ) => select( blockEditorStore ).canEditBlock( clientId ),
+		[ clientId ]
+	);
 	const {
 		onSelect,
 		stylesToRender,
 		activeStyle,
 		genericPreviewBlock,
-		className: previewClassName,
+		className,
 	} = useStylesForBlocks( {
 		clientId,
 		onSwitch,
 	} );
 	const [ hoveredStyle, setHoveredStyle ] = useState( null );
-	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const [ blockStylesAnchor, setBlockStylesAnchor ] = useState( null );
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const instanceId = useInstanceId(
+		BlockStyles,
+		'block-editor-block-styles'
+	);
 
-	if ( ! stylesToRender || stylesToRender.length === 0 ) {
+	const styleRows = useMemo( () => {
+		const rows = [];
+		for ( let i = 0; i < ( stylesToRender?.length ?? 0 ); i += 2 ) {
+			rows.push( stylesToRender.slice( i, i + 2 ) );
+		}
+		return rows;
+	}, [ stylesToRender ] );
+
+	const previewBlocks = useMemo( () => {
+		if ( ! hoveredStyle || ! genericPreviewBlock ) {
+			return null;
+		}
+		const previewClassName = replaceActiveStyle(
+			className,
+			activeStyle,
+			hoveredStyle
+		);
+		return [
+			{
+				...genericPreviewBlock,
+				attributes: {
+					...( genericPreviewBlock.attributes || {} ),
+					className: previewClassName,
+				},
+			},
+		];
+	}, [ hoveredStyle, genericPreviewBlock, className, activeStyle ] );
+
+	if ( ! canEdit || ! stylesToRender || stylesToRender.length === 0 ) {
 		return null;
 	}
 
@@ -59,62 +95,124 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 		onHoverClassName( item?.name ?? null );
 	};
 
-	return (
-		<div className="block-editor-block-styles">
-			<div className="block-editor-block-styles__variants">
-				{ stylesToRender.map( ( style ) => {
-					const buttonText = style.label || style.name;
+	const onSetActiveId = ( nextActiveId ) => {
+		const nextStyle = stylesToRender.find(
+			( style ) =>
+				getCompositeItemId( instanceId, style ) === nextActiveId
+		);
+		if ( nextStyle && nextStyle.name !== activeStyle.name ) {
+			onSelectStylePreview( nextStyle );
+		}
+	};
 
-					return (
-						<Button
-							__next40pxDefaultSize
-							className={ clsx(
-								'block-editor-block-styles__item',
-								{
-									'is-active':
-										activeStyle.name === style.name,
-								}
-							) }
-							key={ style.name }
-							variant="secondary"
-							label={ buttonText }
-							onMouseEnter={ () => styleItemHandler( style ) }
-							onFocus={ () => styleItemHandler( style ) }
-							onMouseLeave={ () => styleItemHandler( null ) }
-							onBlur={ () => styleItemHandler( null ) }
-							onClick={ () => onSelectStylePreview( style ) }
-							aria-current={ activeStyle.name === style.name }
-						>
-							<Truncate
-								numberOfLines={ 1 }
-								className="block-editor-block-styles__item-text"
-							>
-								{ buttonText }
-							</Truncate>
-						</Button>
-					);
-				} ) }
-			</div>
-			{ hoveredStyle && ! isMobileViewport && (
-				<Popover
-					placement="left-start"
-					offset={ 34 }
-					focusOnMount={ false }
+	const defaultStyle = getDefaultStyle( stylesToRender );
+
+	const hasValue = () => {
+		return activeStyle?.name !== defaultStyle?.name;
+	};
+
+	const onDeselect = () => {
+		onSelectStylePreview( defaultStyle );
+	};
+
+	return (
+		<ToolsPanel
+			label={ __( 'Styles' ) }
+			resetAll={ onDeselect }
+			panelId={ clientId }
+			hasInnerWrapper
+			dropdownMenuProps={ dropdownMenuProps }
+		>
+			<ToolsPanelItem
+				hasValue={ hasValue }
+				label={ __( 'Variation' ) }
+				onDeselect={ onDeselect }
+				isShownByDefault
+				panelId={ clientId }
+			>
+				<div
+					ref={ setBlockStylesAnchor }
+					className="block-editor-block-styles"
 				>
-					<div
-						className="block-editor-block-styles__preview-panel"
-						onMouseLeave={ () => styleItemHandler( null ) }
+					<Composite
+						role="radiogroup"
+						aria-label={ __( 'Styles' ) }
+						className="block-editor-block-styles__variants"
+						activeId={ getCompositeItemId(
+							instanceId,
+							activeStyle
+						) }
+						setActiveId={ onSetActiveId }
+						focusLoop
+						focusWrap
+						focusShift
 					>
-						<BlockStylesPreviewPanel
-							activeStyle={ activeStyle }
-							className={ previewClassName }
-							genericPreviewBlock={ genericPreviewBlock }
-							style={ hoveredStyle }
+						{ styleRows.map( ( row, rowIndex ) => (
+							<Composite.Row
+								key={ rowIndex }
+								className="block-editor-block-styles__row"
+							>
+								{ row.map( ( style ) => (
+									<Composite.Item
+										key={ style.name }
+										id={ getCompositeItemId(
+											instanceId,
+											style
+										) }
+										render={
+											<Button
+												className="block-editor-block-styles__item"
+												tone="neutral"
+												variant={
+													activeStyle.name ===
+													style.name
+														? 'solid'
+														: 'outline'
+												}
+											/>
+										}
+										role="radio"
+										aria-checked={
+											activeStyle.name === style.name
+										}
+										onMouseEnter={ () =>
+											styleItemHandler( style )
+										}
+										onFocus={ () =>
+											styleItemHandler( style )
+										}
+										onMouseLeave={ () =>
+											styleItemHandler( null )
+										}
+										onBlur={ () =>
+											styleItemHandler( null )
+										}
+										onClick={ () =>
+											onSelectStylePreview( style )
+										}
+									>
+										<Truncate
+											numberOfLines={ 3 }
+											className="block-editor-block-styles__item-text"
+										>
+											{ style.label || style.name }
+										</Truncate>
+									</Composite.Item>
+								) ) }
+							</Composite.Row>
+						) ) }
+					</Composite>
+					{ previewBlocks && (
+						<PreviewBlockPopover
+							blocks={ previewBlocks }
+							placement="left-start"
+							offset={ 34 }
+							anchor={ blockStylesAnchor }
 						/>
-					</div>
-				</Popover>
-			) }
-		</div>
+					) }
+				</div>
+			</ToolsPanelItem>
+		</ToolsPanel>
 	);
 }
 

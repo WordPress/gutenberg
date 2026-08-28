@@ -1,26 +1,15 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	useBlockProps,
 	getCustomValueFromPreset,
 	getSpacingPresetCssVar,
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { ResizableBox } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
-import { View } from '@wordpress/primitives';
 import { useSelect, useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 import SpacerControls from './controls';
 import { MIN_SPACER_SIZE } from './constants';
@@ -346,9 +335,11 @@ const SpacerEdit = ( {
 		__unstableMarkNextChangeAsNotPersistent,
 	] );
 
+	const blockEditingMode = useBlockEditingMode();
+
 	return (
 		<>
-			<View
+			<div
 				{ ...useBlockProps( {
 					style,
 					className: clsx( className, {
@@ -356,8 +347,9 @@ const SpacerEdit = ( {
 					} ),
 				} ) }
 			>
-				{ resizableBoxWithOrientation( inheritedOrientation ) }
-			</View>
+				{ blockEditingMode === 'default' &&
+					resizableBoxWithOrientation( inheritedOrientation ) }
+			</div>
 			{ ! isFlexLayout && (
 				<SpacerControls
 					setAttributes={ setAttributes }

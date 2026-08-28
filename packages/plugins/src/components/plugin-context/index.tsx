@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { createContext, useContext } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import type { WPPlugin } from '../../api';
 
 export interface PluginContext {
@@ -19,6 +12,7 @@ const Context = createContext< PluginContext >( {
 	name: null,
 	icon: null,
 } );
+Context.displayName = 'PluginContext';
 
 export const PluginContextProvider = Context.Provider;
 

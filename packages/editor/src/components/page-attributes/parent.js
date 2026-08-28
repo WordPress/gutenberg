@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import removeAccents from 'remove-accents';
-
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	Button,
@@ -24,10 +17,6 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 import { filterURLForDisplay } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import PostPanelRow from '../post-panel-row';
 import { buildTermsTree } from '../../utils/terms';
 import { store as editorStore } from '../../store';
@@ -60,7 +49,7 @@ export const getItemPriority = ( name, searchValue ) => {
  */
 export function PageAttributesParent() {
 	const { editPost } = useDispatch( editorStore );
-	const [ fieldValue, setFieldValue ] = useState( false );
+	const [ fieldValue, setFieldValue ] = useState( '' );
 	const {
 		isHierarchical,
 		parentPostId,
@@ -91,9 +80,11 @@ export function PageAttributesParent() {
 				_fields: 'id,title,parent',
 			};
 
-			// Perform a search when the field is changed.
+			// Perform a search by relevance when the field is changed.
 			if ( !! fieldValue ) {
 				query.search = fieldValue;
+				query.orderby = 'relevance';
+				query.search_columns = [ 'post_title' ];
 			}
 
 			const parentPost = pageId
@@ -193,8 +184,6 @@ export function PageAttributesParent() {
 
 	return (
 		<ComboboxControl
-			__nextHasNoMarginBottom
-			__next40pxDefaultSize
 			className="editor-page-attributes__parent"
 			label={ __( 'Parent' ) }
 			help={ __( 'Choose a parent page.' ) }

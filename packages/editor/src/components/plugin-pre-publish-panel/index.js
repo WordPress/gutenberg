@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createSlotFill, PanelBody } from '@wordpress/components';
 import { usePluginContext } from '@wordpress/plugins';
 

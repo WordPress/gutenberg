@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createBlock } from '@wordpress/blocks';
 
 const mediaTypeTag = { image: 'img', video: 'video', audio: 'audio' };
@@ -12,7 +9,7 @@ const mediaTypeTag = { image: 'img', video: 'video', audio: 'audio' };
  *
  * @param {InserterMediaItem}         media     The media object to create the block from.
  * @param {('image'|'audio'|'video')} mediaType The media type to create the block for.
- * @return {[WPBlock, JSX.Element]} An array containing the block and the preview element.
+ * @return {[WPBlock, React.JSX.Element]} An array containing the block and the preview element.
  */
 export function getBlockAndPreviewFromMedia( media, mediaType ) {
 	// Add the common attributes between the different media types.

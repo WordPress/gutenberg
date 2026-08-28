@@ -1,30 +1,14 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import BaseInputControl from '../';
+import InputControlPrefixWrapper from '../input-prefix-wrapper';
 
 const getInput = () => screen.getByTestId( 'input' );
 
 describe( 'InputControl', () => {
 	const InputControl = ( props ) => {
-		return (
-			<BaseInputControl
-				{ ...props }
-				__next40pxDefaultSize
-				data-testid="input"
-			/>
-		);
+		return <BaseInputControl { ...props } data-testid="input" />;
 	};
 
 	describe( 'Basic rendering', () => {
@@ -42,6 +26,16 @@ describe( 'InputControl', () => {
 			const input = getInput();
 
 			expect( input ).toHaveAttribute( 'type', 'number' );
+		} );
+
+		it( 'should flag empty inputs with data-empty-value', () => {
+			const { rerender } = render( <InputControl type="time" /> );
+
+			expect( getInput() ).toHaveAttribute( 'data-empty-value' );
+
+			rerender( <InputControl type="time" value="12:30" /> );
+
+			expect( getInput() ).not.toHaveAttribute( 'data-empty-value' );
 		} );
 
 		it( 'should render label', () => {
@@ -69,23 +63,6 @@ describe( 'InputControl', () => {
 				// eslint-disable-next-line testing-library/no-node-access
 				help.closest( `#${ input.getAttribute( 'aria-describedby' ) }` )
 			).toBeVisible();
-		} );
-	} );
-
-	describe( 'Ensurance of focus for number inputs', () => {
-		it( 'should focus its input on mousedown events', async () => {
-			const user = await userEvent.setup();
-			const spy = jest.fn();
-			render( <InputControl type="number" onFocus={ spy } /> );
-			const target = getInput();
-
-			// Hovers the input and presses (without releasing) primary button.
-			await user.pointer( [
-				{ target },
-				{ keys: '[MouseLeft]', target },
-			] );
-
-			expect( spy ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 
@@ -228,6 +205,33 @@ describe( 'InputControl', () => {
 			await user.click( document.body );
 
 			expect( spyChange ).toHaveBeenLastCalledWith( 'this is meow' );
+		} );
+	} );
+
+	describe( 'Legacy size support', () => {
+		it( 'treats __unstable-large the same as default', () => {
+			const prefix = (
+				<InputControlPrefixWrapper>$</InputControlPrefixWrapper>
+			);
+
+			render( <InputControl label="Test" prefix={ prefix } /> );
+			render(
+				<InputControl
+					label="Test"
+					prefix={ prefix }
+					{ ...{ size: '__unstable-large' } }
+				/>
+			);
+
+			const [ defaultPrefixWrapper, legacyPrefixWrapper ] =
+				screen.getAllByText( '$' );
+			const [ defaultInput, legacyInput ] =
+				screen.getAllByTestId( 'input' );
+
+			expect( legacyPrefixWrapper ).toMatchStyleDiffSnapshot(
+				defaultPrefixWrapper
+			);
+			expect( legacyInput ).toMatchStyleDiffSnapshot( defaultInput );
 		} );
 	} );
 } );

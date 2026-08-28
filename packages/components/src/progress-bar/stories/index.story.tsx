@@ -1,14 +1,8 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * Internal dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { ProgressBar } from '..';
 
 const meta: Meta< typeof ProgressBar > = {
+	tags: [ 'manifest' ],
 	component: ProgressBar,
 	title: 'Components/Feedback/ProgressBar',
 	id: 'components-progressbar',
@@ -20,6 +14,10 @@ const meta: Meta< typeof ProgressBar > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;

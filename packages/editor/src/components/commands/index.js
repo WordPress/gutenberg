@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, isRTL, sprintf } from '@wordpress/i18n';
 import {
@@ -8,13 +5,11 @@ import {
 	code,
 	drawerLeft,
 	drawerRight,
-	edit,
+	pencil,
 	formatListBullets,
 	listView,
 	external,
-	keyboard,
 	symbol,
-	page,
 	layout,
 	rotateRight,
 	rotateLeft,
@@ -25,12 +20,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
 import { store as interfaceStore } from '@wordpress/interface';
-import { getPath } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 import {
@@ -42,6 +32,49 @@ import { modalName as patternRenameModalName } from '../pattern-rename-modal';
 import { modalName as patternDuplicateModalName } from '../pattern-duplicate-modal';
 import isTemplateRevertable from '../../store/utils/is-template-revertable';
 
+/**
+ * Returns the command that toggles content-only editing for patterns and template parts.
+ * The command is registered both globally for search and contextually for block
+ * selection, so keeping it in one place ensures the label and callback stay aligned.
+ *
+ * @param {Object}   options                                               Command options.
+ * @param {boolean}  options.disableContentOnlyForPatternsAndTemplateParts Whether content-only editing is disabled for patterns and template parts.
+ * @param {Function} options.stopEditingContentOnlySection                 Stops editing the current content-only section before changing the setting.
+ * @param {Function} options.updateEditorSettings                          Updates the editor settings.
+ * @return {Object} The command configuration.
+ */
+function getTogglePatternEditingCommand( {
+	disableContentOnlyForPatternsAndTemplateParts,
+	stopEditingContentOnlySection,
+	updateEditorSettings,
+} ) {
+	return {
+		name: 'core/toggle-pattern-editing',
+		label: disableContentOnlyForPatternsAndTemplateParts
+			? __( 'Disable editing all patterns' )
+			: __( 'Enable editing all patterns' ),
+		icon: symbol,
+		category: 'command',
+		callback: ( { close } ) => {
+			const disableContentOnly =
+				! disableContentOnlyForPatternsAndTemplateParts;
+			stopEditingContentOnlySection();
+			updateEditorSettings( {
+				disableContentOnlyForUnsyncedPatterns: disableContentOnly,
+				disableContentOnlyForTemplateParts: disableContentOnly,
+			} );
+			close();
+		},
+	};
+}
+
+function isPatternOrTemplatePartBlock( blockName, attributes ) {
+	return (
+		!! attributes?.metadata?.patternName ||
+		blockName === 'core/template-part'
+	);
+}
+
 const getEditorCommandLoader = () =>
 	function useEditorCommandLoader() {
 		const {
@@ -52,15 +85,26 @@ const getEditorCommandLoader = () =>
 			isFocusMode,
 			isPreviewMode,
 			isViewable,
+			isPublished,
+			viewLink,
+			viewItemLabel,
 			isCodeEditingEnabled,
 			isRichEditingEnabled,
 			isPublishSidebarEnabled,
+			disableContentOnlyForUnsyncedPatterns,
+			disableContentOnlyForTemplateParts,
 		} = useSelect( ( select ) => {
 			const { get } = select( preferencesStore );
-			const { isListViewOpened, getCurrentPostType, getEditorSettings } =
-				select( editorStore );
+			const {
+				isListViewOpened,
+				getCurrentPostType,
+				getEditorSettings,
+				getEditedPostAttribute,
+				isCurrentPostPublished,
+			} = select( editorStore );
 			const { getSettings } = select( blockEditorStore );
 			const { getPostType } = select( coreStore );
+			const postType = getPostType( getCurrentPostType() );
 
 			return {
 				editorMode: get( 'core', 'editorMode' ) ?? 'visual',
@@ -69,12 +113,19 @@ const getEditorCommandLoader = () =>
 				isDistractionFree: get( 'core', 'distractionFree' ),
 				isFocusMode: get( 'core', 'focusMode' ),
 				isPreviewMode: getSettings().isPreviewMode,
-				isViewable:
-					getPostType( getCurrentPostType() )?.viewable ?? false,
+				isViewable: postType?.viewable ?? false,
+				isPublished: isCurrentPostPublished(),
+				viewLink: getEditedPostAttribute( 'link' ),
+				viewItemLabel: postType?.labels?.view_item,
 				isCodeEditingEnabled: getEditorSettings().codeEditingEnabled,
 				isRichEditingEnabled: getEditorSettings().richEditingEnabled,
 				isPublishSidebarEnabled:
 					select( editorStore ).isPublishSidebarEnabled(),
+				disableContentOnlyForUnsyncedPatterns:
+					!! getEditorSettings()
+						.disableContentOnlyForUnsyncedPatterns,
+				disableContentOnlyForTemplateParts:
+					!! getEditorSettings().disableContentOnlyForTemplateParts,
 			};
 		}, [] );
 		const { getActiveComplementaryArea } = useSelect( interfaceStore );
@@ -87,23 +138,15 @@ const getEditorCommandLoader = () =>
 			toggleDistractionFree,
 			toggleSpotlightMode,
 			toggleTopToolbar,
+			updateEditorSettings,
 		} = useDispatch( editorStore );
+		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+		const { stopEditingContentOnlySection } = unlock(
+			useDispatch( blockEditorStore )
+		);
 		const { openModal, enableComplementaryArea, disableComplementaryArea } =
 			useDispatch( interfaceStore );
 		const { getCurrentPostId } = useSelect( editorStore );
-		const { isBlockBasedTheme, canCreateTemplate } = useSelect(
-			( select ) => {
-				return {
-					isBlockBasedTheme:
-						select( coreStore ).getCurrentTheme()?.is_block_theme,
-					canCreateTemplate: select( coreStore ).canUser( 'create', {
-						kind: 'postType',
-						name: 'wp_template',
-					} ),
-				};
-			},
-			[]
-		);
 		const allowSwitchEditorMode =
 			isCodeEditingEnabled && isRichEditingEnabled;
 
@@ -112,11 +155,14 @@ const getEditorCommandLoader = () =>
 		}
 
 		const commands = [];
+		const disableContentOnlyForPatternsAndTemplateParts =
+			disableContentOnlyForUnsyncedPatterns &&
+			disableContentOnlyForTemplateParts;
 
 		commands.push( {
 			name: 'core/open-shortcut-help',
 			label: __( 'Keyboard shortcuts' ),
-			icon: keyboard,
+			category: 'view',
 			callback: ( { close } ) => {
 				close();
 				openModal( 'editor/keyboard-shortcut-help' );
@@ -128,6 +174,7 @@ const getEditorCommandLoader = () =>
 			label: isDistractionFree
 				? __( 'Exit Distraction free' )
 				: __( 'Enter Distraction free' ),
+			category: 'command',
 			callback: ( { close } ) => {
 				toggleDistractionFree();
 				close();
@@ -137,6 +184,7 @@ const getEditorCommandLoader = () =>
 		commands.push( {
 			name: 'core/open-preferences',
 			label: __( 'Editor preferences' ),
+			category: 'view',
 			callback: ( { close } ) => {
 				close();
 				openModal( 'editor/preferences' );
@@ -148,6 +196,7 @@ const getEditorCommandLoader = () =>
 			label: isFocusMode
 				? __( 'Exit Spotlight mode' )
 				: __( 'Enter Spotlight mode' ),
+			category: 'command',
 			callback: ( { close } ) => {
 				toggleSpotlightMode();
 				close();
@@ -160,6 +209,7 @@ const getEditorCommandLoader = () =>
 				? __( 'Close List View' )
 				: __( 'Open List View' ),
 			icon: listView,
+			category: 'command',
 			callback: ( { close } ) => {
 				setIsListViewOpened( ! isListViewOpen );
 				close();
@@ -178,11 +228,20 @@ const getEditorCommandLoader = () =>
 		commands.push( {
 			name: 'core/toggle-top-toolbar',
 			label: __( 'Top toolbar' ),
+			category: 'command',
 			callback: ( { close } ) => {
 				toggleTopToolbar();
 				close();
 			},
 		} );
+
+		commands.push(
+			getTogglePatternEditingCommand( {
+				disableContentOnlyForPatternsAndTemplateParts,
+				stopEditingContentOnlySection,
+				updateEditorSettings,
+			} )
+		);
 
 		if ( allowSwitchEditorMode ) {
 			commands.push( {
@@ -192,6 +251,7 @@ const getEditorCommandLoader = () =>
 						? __( 'Open code editor' )
 						: __( 'Exit code editor' ),
 				icon: code,
+				category: 'command',
 				callback: ( { close } ) => {
 					switchEditorMode(
 						editorMode === 'visual' ? 'text' : 'visual'
@@ -206,6 +266,7 @@ const getEditorCommandLoader = () =>
 			label: showBlockBreadcrumbs
 				? __( 'Hide block breadcrumbs' )
 				: __( 'Show block breadcrumbs' ),
+			category: 'command',
 			callback: ( { close } ) => {
 				toggle( 'core', 'showBlockBreadcrumbs' );
 				close();
@@ -225,6 +286,7 @@ const getEditorCommandLoader = () =>
 			name: 'core/open-settings-sidebar',
 			label: __( 'Show or hide the Settings panel' ),
 			icon: isRTL() ? drawerLeft : drawerRight,
+			category: 'command',
 			callback: ( { close } ) => {
 				const activeSidebar = getActiveComplementaryArea( 'core' );
 				close();
@@ -240,6 +302,7 @@ const getEditorCommandLoader = () =>
 			name: 'core/open-block-inspector',
 			label: __( 'Show or hide the Block settings panel' ),
 			icon: blockDefault,
+			category: 'command',
 			callback: ( { close } ) => {
 				const activeSidebar = getActiveComplementaryArea( 'core' );
 				close();
@@ -257,6 +320,7 @@ const getEditorCommandLoader = () =>
 				? __( 'Disable pre-publish checks' )
 				: __( 'Enable pre-publish checks' ),
 			icon: formatListBullets,
+			category: 'command',
 			callback: ( { close } ) => {
 				close();
 				toggle( 'core', 'isPublishSidebarEnabled' );
@@ -277,6 +341,7 @@ const getEditorCommandLoader = () =>
 				name: 'core/preview-link',
 				label: __( 'Preview in a new tab' ),
 				icon: external,
+				category: 'view',
 				callback: async ( { close } ) => {
 					close();
 					const postId = getCurrentPostId();
@@ -284,18 +349,16 @@ const getEditorCommandLoader = () =>
 					window.open( link, `wp-preview-${ postId }` );
 				},
 			} );
-		}
-		if ( canCreateTemplate && isBlockBasedTheme ) {
-			const isSiteEditor = getPath( window.location.href )?.includes(
-				'site-editor.php'
-			);
-			if ( ! isSiteEditor ) {
+
+			if ( isPublished && viewLink ) {
 				commands.push( {
-					name: 'core/go-to-site-editor',
-					label: __( 'Open Site Editor' ),
+					name: 'core/view-link',
+					label: viewItemLabel || __( 'View post' ),
+					icon: external,
+					category: 'view',
 					callback: ( { close } ) => {
 						close();
-						document.location = 'site-editor.php';
+						window.open( viewLink, '_blank' );
 					},
 				} );
 			}
@@ -304,6 +367,76 @@ const getEditorCommandLoader = () =>
 		return {
 			commands,
 			isLoading: false,
+		};
+	};
+
+const getPatternEditingContextualCommands = () =>
+	function usePatternEditingContextualCommands( { search } ) {
+		const {
+			disableContentOnlyForPatternsAndTemplateParts,
+			hasPatternOrTemplatePartSelection,
+			isPreviewMode,
+		} = useSelect( ( select ) => {
+			const {
+				getBlockAttributes,
+				getBlockName,
+				getBlockParents,
+				getSelectedBlockClientId,
+				getSelectedBlockClientIds,
+				getSettings,
+			} = select( blockEditorStore );
+			const { getEditorSettings } = select( editorStore );
+			const editorSettings = getEditorSettings();
+			const selectedBlockClientId = getSelectedBlockClientId();
+			const selectedBlockClientIds = getSelectedBlockClientIds();
+			const clientIdsToCheck =
+				selectedBlockClientId && selectedBlockClientIds.length === 1
+					? [
+							selectedBlockClientId,
+							...getBlockParents( selectedBlockClientId, true ),
+					  ]
+					: [];
+
+			return {
+				disableContentOnlyForPatternsAndTemplateParts:
+					!! editorSettings.disableContentOnlyForUnsyncedPatterns &&
+					!! editorSettings.disableContentOnlyForTemplateParts,
+				hasPatternOrTemplatePartSelection: clientIdsToCheck.some(
+					( clientId ) =>
+						isPatternOrTemplatePartBlock(
+							getBlockName( clientId ),
+							getBlockAttributes( clientId )
+						)
+				),
+				isPreviewMode: getSettings().isPreviewMode,
+			};
+		}, [] );
+		const { updateEditorSettings } = useDispatch( editorStore );
+		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+		const { stopEditingContentOnlySection } = unlock(
+			useDispatch( blockEditorStore )
+		);
+
+		// Keep the disable command available after full pattern editing is enabled,
+		// even when the current selection is no longer inside a pattern or template part.
+		if (
+			search ||
+			( ! hasPatternOrTemplatePartSelection &&
+				! disableContentOnlyForPatternsAndTemplateParts ) ||
+			isPreviewMode
+		) {
+			return { isLoading: false, commands: [] };
+		}
+
+		return {
+			isLoading: false,
+			commands: [
+				getTogglePatternEditingCommand( {
+					disableContentOnlyForPatternsAndTemplateParts,
+					stopEditingContentOnlySection,
+					updateEditorSettings,
+				} ),
+			],
 		};
 	};
 
@@ -322,7 +455,8 @@ const getEditedEntityContextualCommands = () =>
 			commands.push( {
 				name: 'core/rename-pattern',
 				label: __( 'Rename pattern' ),
-				icon: edit,
+				icon: pencil,
+				category: 'edit',
 				callback: ( { close } ) => {
 					openModal( patternRenameModalName );
 					close();
@@ -332,6 +466,7 @@ const getEditedEntityContextualCommands = () =>
 				name: 'core/duplicate-pattern',
 				label: __( 'Duplicate pattern' ),
 				icon: symbol,
+				category: 'command',
 				callback: ( { close } ) => {
 					openModal( patternDuplicateModalName );
 					close();
@@ -344,24 +479,37 @@ const getEditedEntityContextualCommands = () =>
 
 const getPageContentFocusCommands = () =>
 	function usePageContentFocusCommands() {
-		const { onNavigateToEntityRecord, goBack, templateId, isPreviewMode } =
-			useSelect( ( select ) => {
-				const {
-					getRenderingMode,
-					getEditorSettings: _getEditorSettings,
-					getCurrentTemplateId,
-				} = unlock( select( editorStore ) );
-				const editorSettings = _getEditorSettings();
-				return {
-					isTemplateHidden: getRenderingMode() === 'post-only',
-					onNavigateToEntityRecord:
-						editorSettings.onNavigateToEntityRecord,
-					getEditorSettings: _getEditorSettings,
-					goBack: editorSettings.onNavigateToPreviousEntityRecord,
-					templateId: getCurrentTemplateId(),
-					isPreviewMode: editorSettings.isPreviewMode,
-				};
-			}, [] );
+		const {
+			onNavigateToEntityRecord,
+			goBack,
+			templateId,
+			isPreviewMode,
+			canEditTemplate,
+		} = useSelect( ( select ) => {
+			const {
+				getRenderingMode,
+				getEditorSettings: _getEditorSettings,
+				getCurrentTemplateId,
+			} = unlock( select( editorStore ) );
+			const editorSettings = _getEditorSettings();
+			const _templateId = getCurrentTemplateId();
+			return {
+				isTemplateHidden: getRenderingMode() === 'post-only',
+				onNavigateToEntityRecord:
+					editorSettings.onNavigateToEntityRecord,
+				getEditorSettings: _getEditorSettings,
+				goBack: editorSettings.onNavigateToPreviousEntityRecord,
+				templateId: _templateId,
+				isPreviewMode: editorSettings.isPreviewMode,
+				canEditTemplate:
+					!! _templateId &&
+					select( coreStore ).canUser( 'update', {
+						kind: 'postType',
+						name: 'wp_template',
+						id: _templateId,
+					} ),
+			};
+		}, [] );
 		const { editedRecord: template, hasResolved } = useEntityRecord(
 			'postType',
 			'wp_template',
@@ -374,7 +522,7 @@ const getPageContentFocusCommands = () =>
 
 		const commands = [];
 
-		if ( templateId && hasResolved ) {
+		if ( templateId && hasResolved && canEditTemplate ) {
 			commands.push( {
 				name: 'core/switch-to-template-focus',
 				label: sprintf(
@@ -383,6 +531,7 @@ const getPageContentFocusCommands = () =>
 					decodeEntities( template.title )
 				),
 				icon: layout,
+				category: 'edit',
 				callback: ( { close } ) => {
 					onNavigateToEntityRecord( {
 						postId: templateId,
@@ -397,7 +546,7 @@ const getPageContentFocusCommands = () =>
 			commands.push( {
 				name: 'core/switch-to-previous-entity',
 				label: __( 'Go back' ),
-				icon: page,
+				category: 'view',
 				callback: ( { close } ) => {
 					goBack();
 					close();
@@ -454,6 +603,7 @@ const getManipulateDocumentCommands = () =>
 				name: 'core/reset-template',
 				label,
 				icon: isRTL() ? rotateRight : rotateLeft,
+				category: 'command',
 				callback: ( { close } ) => {
 					revertTemplate( template );
 					close();
@@ -477,6 +627,12 @@ export default function useCommands() {
 		name: 'core/editor/contextual-commands',
 		hook: getEditedEntityContextualCommands(),
 		context: 'entity-edit',
+	} );
+
+	useCommandLoader( {
+		name: 'core/editor/pattern-editing-contextual-commands',
+		hook: getPatternEditingContextualCommands(),
+		context: 'block-selection-edit',
 	} );
 
 	useCommandLoader( {

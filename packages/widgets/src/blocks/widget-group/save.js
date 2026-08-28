@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { InnerBlocks, RichText } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {

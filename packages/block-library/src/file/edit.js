@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { isBlobURL } from '@wordpress/blob';
 import {
 	__unstableGetAnimateClassName as getAnimateClassName,
@@ -23,16 +16,13 @@ import {
 	store as blockEditorStore,
 	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { useCopyToClipboard } from '@wordpress/compose';
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { file as icon } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
+import { getFilename } from '@wordpress/url';
 import FileBlockInspector from './inspector';
 import { browserSupportsPdfs } from './utils';
 import removeAnchorTag from '../utils/remove-anchor-tag';
@@ -76,35 +66,26 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 	const { media } = useSelect(
 		( select ) => ( {
-			media:
-				id === undefined
-					? undefined
-					: select( coreStore ).getMedia( id ),
+			media: !! id
+				? select( coreStore ).getEntityRecord(
+						'postType',
+						'attachment',
+						id,
+						{ context: 'view' }
+				  )
+				: undefined,
 		} ),
 		[ id ]
 	);
 
 	const { createErrorNotice } = useDispatch( noticesStore );
-	const { toggleSelection, __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
+	const { toggleSelection } = useDispatch( blockEditorStore );
 
 	useUploadMediaFromBlobURL( {
 		url: temporaryURL,
 		onChange: onSelectFile,
 		onError: onUploadError,
 	} );
-
-	// Note: Handle setting a default value for `downloadButtonText` via HTML API
-	// when it supports replacing text content for HTML tags.
-	useEffect( () => {
-		if ( RichText.isEmpty( downloadButtonText ) ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( {
-				downloadButtonText: _x( 'Download', 'button label' ),
-			} );
-		}
-		// This effect should only run on mount.
-	}, [] );
 
 	function onSelectFile( newMedia ) {
 		if ( ! newMedia || ! newMedia.url ) {
@@ -127,7 +108,10 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 			return;
 		}
 
-		const isPdf = newMedia.url.endsWith( '.pdf' );
+		const isPdf =
+			// Media Library and REST API use different properties for mime type.
+			( newMedia.mime || newMedia.mime_type ) === 'application/pdf' ||
+			getFilename( newMedia.url ).toLowerCase().endsWith( '.pdf' );
 		const pdfAttributes = {
 			displayPreview: isPdf
 				? attributes.displayPreview ?? true

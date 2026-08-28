@@ -1,29 +1,13 @@
-/**
- * WordPress dependencies
- */
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import {
-	privateApis as componentsPrivateApis,
-	ProgressBar,
-} from '@wordpress/components';
+import { ProgressBar } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { unlock } from '../../lock-unlock';
-import { useStylesPreviewColors } from '../global-styles/hooks';
 
-const { Theme } = unlock( componentsPrivateApis );
-const { useGlobalStyle } = unlock( blockEditorPrivateApis );
+const { useStyle } = unlock( editorPrivateApis );
 
 export default function CanvasLoader( { id } ) {
-	const [ fallbackIndicatorColor ] = useGlobalStyle( 'color.text' );
-	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
-	const { highlightedColors } = useStylesPreviewColors();
-	const indicatorColor =
-		highlightedColors[ 0 ]?.color ?? fallbackIndicatorColor;
+	const textColor = useStyle( 'color.text' );
 	const { elapsed, total } = useSelect( ( select ) => {
 		const selectorsByStatus = select( coreStore ).countSelectorsByStatus();
 		const resolving = selectorsByStatus.resolving ?? 0;
@@ -35,10 +19,11 @@ export default function CanvasLoader( { id } ) {
 	}, [] );
 
 	return (
-		<div className="edit-site-canvas-loader">
-			<Theme accent={ indicatorColor } background={ backgroundColor }>
-				<ProgressBar id={ id } max={ total } value={ elapsed } />
-			</Theme>
+		<div
+			className="edit-site-canvas-loader"
+			style={ textColor ? { '--color': textColor } : undefined }
+		>
+			<ProgressBar id={ id } max={ total } value={ elapsed } />
 		</div>
 	);
 }

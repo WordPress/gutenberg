@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import items, {
 	categories,
 	collections,

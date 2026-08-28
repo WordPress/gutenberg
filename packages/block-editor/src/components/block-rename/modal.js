@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -12,13 +9,10 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
 import { useSelect, useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { useBlockDisplayInformation } from '..';
 import isEmptyString from './is-empty-string';
+import { cleanEmptyObject } from '../../hooks/utils';
 
 export default function BlockRenameModal( { clientId, onClose } ) {
 	const [ editedBlockName, setEditedBlockName ] = useState();
@@ -75,10 +69,10 @@ export default function BlockRenameModal( { clientId, onClose } ) {
 		// Must be assertive to immediately announce change.
 		speak( message, 'assertive' );
 		updateBlockAttributes( [ clientId ], {
-			metadata: {
+			metadata: cleanEmptyObject( {
 				...metadata,
 				name: newName,
-			},
+			} ),
 		} );
 
 		// Immediate close avoids ability to hit save multiple times.
@@ -106,8 +100,6 @@ export default function BlockRenameModal( { clientId, onClose } ) {
 			>
 				<VStack spacing="3">
 					<TextControl
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
 						value={ editedBlockName ?? blockName }
 						label={ __( 'Name' ) }
 						help={

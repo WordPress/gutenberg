@@ -1,20 +1,9 @@
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
-
-/**
- * WordPress dependencies
- */
 import { Button, Dropdown } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
 import { listView } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import ListView from '../list-view';
 import { store as blockEditorStore } from '../../store';
 

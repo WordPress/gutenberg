@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import BaseControl from '..';
 import { useBaseControlProps } from '../hooks';
 import type { BaseControlProps } from '../types';
@@ -14,7 +7,7 @@ const MyBaseControl = ( props: Omit< BaseControlProps, 'children' > ) => {
 	const { baseControlProps, controlProps } = useBaseControlProps( props );
 
 	return (
-		<BaseControl { ...baseControlProps } __nextHasNoMarginBottom>
+		<BaseControl { ...baseControlProps }>
 			<textarea { ...controlProps } />
 		</BaseControl>
 	);

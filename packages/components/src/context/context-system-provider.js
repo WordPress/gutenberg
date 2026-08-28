@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import deepmerge from 'deepmerge';
-import fastDeepEqual from 'fast-deep-equal/es6';
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import { isPlainObject } from 'is-plain-object';
-
-/**
- * WordPress dependencies
- */
 import {
 	createContext,
 	useContext,
@@ -16,15 +9,13 @@ import {
 	memo,
 } from '@wordpress/element';
 import warn from '@wordpress/warning';
-
-/**
- * Internal dependencies
- */
 import { useUpdateEffect } from '../utils';
 
 export const ComponentsContext = createContext(
 	/** @type {Record<string, any>} */ ( {} )
 );
+ComponentsContext.displayName = 'ComponentsContext';
+
 export const useComponentsContext = () => useContext( ComponentsContext );
 
 /**
@@ -86,10 +77,10 @@ function useContextSystemBridge( { value } ) {
  * ```
  *
  * @template {Record<string, any>} T
- * @param {Object}                    options
- * @param {import('react').ReactNode} options.children Children to render.
- * @param {T}                         options.value    Props to render into connected components.
- * @return {JSX.Element} A Provider wrapped component.
+ * @param {Object}          options
+ * @param {React.ReactNode} options.children Children to render.
+ * @param {T}               options.value    Props to render into connected components.
+ * @return {React.JSX.Element} A Provider wrapped component.
  */
 const BaseContextSystemProvider = ( { children, value } ) => {
 	const contextValue = useContextSystemBridge( { value } );

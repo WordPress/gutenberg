@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { createBlock } from '@wordpress/blocks';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { IMAGE_BACKGROUND_TYPE, VIDEO_BACKGROUND_TYPE } from './shared';
 import { unlock } from '../lock-unlock';
 
@@ -37,7 +30,11 @@ const transforms = {
 						createBlock( 'core/paragraph', {
 							content: caption,
 							fontSize: 'large',
-							align: 'center',
+							style: {
+								typography: {
+									textAlign: 'center',
+								},
+							},
 						} ),
 					]
 				),
@@ -60,7 +57,11 @@ const transforms = {
 						createBlock( 'core/paragraph', {
 							content: caption,
 							fontSize: 'large',
-							align: 'center',
+							style: {
+								typography: {
+									textAlign: 'center',
+								},
+							},
 						} ),
 					]
 				),

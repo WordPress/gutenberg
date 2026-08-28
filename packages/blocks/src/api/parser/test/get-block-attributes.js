@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { attr } from 'hpq';
-
-/**
- * Internal dependencies
- */
 import {
 	getBlockAttribute,
 	getBlockAttributes,
@@ -382,6 +375,7 @@ describe( 'attributes parsing', () => {
 
 		it( 'should work when block type is passed as string', () => {
 			registerBlockType( 'core/meal', {
+				apiVersion: 3,
 				title: 'Meal',
 				category: 'widgets',
 				attributes: {

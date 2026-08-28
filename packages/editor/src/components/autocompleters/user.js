@@ -1,10 +1,13 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
+/**
+ * Renders a user label for the autocompleter.
+ *
+ * @param {Object} user User object.
+ * @return {React.JSX.Element} User label component.
+ */
 export function getUserLabel( user ) {
 	const avatar =
 		user.avatar_urls && user.avatar_urls[ 24 ] ? (
@@ -46,7 +49,7 @@ export default {
 				const { getUsers } = select( coreStore );
 				return getUsers( {
 					context: 'view',
-					search: encodeURIComponent( filterValue ),
+					search: filterValue,
 				} );
 			},
 			[ filterValue ]

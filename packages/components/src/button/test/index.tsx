@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
+import { press } from '@ariakit/test';
 import { createRef, forwardRef } from '@wordpress/element';
 import { plusCircle } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import _Button from '..';
 import Tooltip from '../../tooltip';
 import cleanupTooltip from '../../tooltip/test/utils';
-import { press } from '@ariakit/test';
 
 jest.mock( '../../icon', () => () => <div data-testid="test-icon" /> );
 
@@ -101,6 +90,57 @@ describe( 'Button', () => {
 					<></>
 				</Button>
 			);
+			expect( screen.getByRole( 'button' ) ).not.toHaveClass(
+				'has-text'
+			);
+		} );
+
+		it( 'should render a button element with has-text when the text is not the first child', () => {
+			const isBusy = false;
+
+			render(
+				<Button icon={ plusCircle } isBusy={ isBusy }>
+					{ isBusy && 'Saving…' }
+					{ ! isBusy && 'Save' }
+				</Button>
+			);
+
+			expect( screen.getByRole( 'button' ) ).toHaveClass( 'has-text' );
+		} );
+
+		it( 'should render a button element with has-text when children are wrapped in an element', () => {
+			render(
+				<Button icon={ plusCircle }>
+					<span>Children</span>
+				</Button>
+			);
+
+			expect( screen.getByRole( 'button' ) ).toHaveClass( 'has-text' );
+		} );
+
+		it( 'should render a button element with has-text when children are wrapped in a fragment', () => {
+			render(
+				<Button icon={ plusCircle }>
+					<>Children</>
+				</Button>
+			);
+
+			expect( screen.getByRole( 'button' ) ).toHaveClass( 'has-text' );
+		} );
+
+		it( 'should render a button element without has-text when every child is falsy', () => {
+			const isBusy: boolean = false;
+
+			render(
+				<Button icon={ plusCircle }>
+					{ isBusy && 'Generating…' }
+					{ null }
+					{ /* See: https://github.com/jsx-eslint/eslint-plugin-react/issues/3995 */ }
+					{ /* eslint-disable-next-line react/jsx-curly-brace-presence */ }
+					{ '' }
+				</Button>
+			);
+
 			expect( screen.getByRole( 'button' ) ).not.toHaveClass(
 				'has-text'
 			);
@@ -234,7 +274,6 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should add a disabled prop to the button', () => {
-			// eslint-disable-next-line no-restricted-syntax
 			render( <Button disabled /> );
 
 			expect( screen.getByRole( 'button' ) ).toBeDisabled();
@@ -522,7 +561,6 @@ describe( 'Button', () => {
 
 		it( 'should become a button again when disabled is supplied', () => {
 			// @ts-expect-error - a button should not have `href`
-			// eslint-disable-next-line no-restricted-syntax
 			render( <Button href="https://wordpress.org/" disabled /> );
 
 			expect( screen.getByRole( 'button' ) ).toBeVisible();
@@ -532,7 +570,6 @@ describe( 'Button', () => {
 			render(
 				<Button
 					// @ts-expect-error - a button should not have `href`
-					// eslint-disable-next-line no-restricted-syntax
 					href="https://wordpress.org/"
 					disabled
 					accessibleWhenDisabled
@@ -619,7 +656,6 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should not break when the legacy __experimentalIsFocusable prop is passed', () => {
-			// eslint-disable-next-line no-restricted-syntax
 			render( <Button disabled __experimentalIsFocusable /> );
 			const button = screen.getByRole( 'button' );
 
@@ -634,17 +670,15 @@ describe( 'Button', () => {
 			{ /* @ts-expect-error - `target` requires `href` */ }
 			<Button target="foo" />
 
-			{ /* eslint-disable no-restricted-syntax */ }
 			{ /* @ts-expect-error - `disabled` is only for buttons */ }
 			<Button href="foo" disabled />
-			{ /* eslint-enable no-restricted-syntax */ }
 
 			<Button href="foo" type="image/png" />
 			{ /* @ts-expect-error - if button, type must be submit/reset/button */ }
 			<Button type="image/png" />
-			{ /* @ts-expect-error */ }
+			{ /* @ts-expect-error `type` must be submit, reset or button. */ }
 			<Button type="invalidtype" />
-			{ /* @ts-expect-error */ }
+			{ /* @ts-expect-error `accessibleWhenDisabled` is not supported on a link button. */ }
 			<Button disabled accessibleWhenDisabled href="foo" />
 		</>;
 	} );

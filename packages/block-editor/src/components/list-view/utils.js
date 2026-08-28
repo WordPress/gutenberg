@@ -1,8 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { focus } from '@wordpress/dom';
+
+// Must match the row height in `style.scss`; the windowing math relies on it.
+// See: https://github.com/WordPress/gutenberg/pull/35230 for additional context.
+export const BLOCK_LIST_ITEM_HEIGHT = 32;
 
 export const getBlockPositionDescription = ( position, siblingCount, level ) =>
 	sprintf(
@@ -13,13 +14,13 @@ export const getBlockPositionDescription = ( position, siblingCount, level ) =>
 		level
 	);
 
-export const getBlockPropertiesDescription = ( blockInformation, isLocked ) =>
+export const getBlockPropertiesDescription = ( positionLabel, isLocked ) =>
 	[
-		blockInformation?.positionLabel
+		positionLabel
 			? `${ sprintf(
 					// translators: %s: Position of selected block, e.g. "Sticky" or "Fixed".
 					__( 'Position: %s' ),
-					blockInformation.positionLabel
+					positionLabel
 			  ) }.`
 			: undefined,
 		isLocked ? __( 'This block is locked.' ) : undefined,
@@ -79,35 +80,60 @@ export function getCommonDepthClientIds(
  *
  * @param {string}       focusClientId   The client ID of the block to focus.
  * @param {?HTMLElement} treeGridElement The container element to search within.
+ * @param {?AbortSignal} signal          Optional signal to stop waiting for the row and leave focus alone.
  */
-export function focusListItem( focusClientId, treeGridElement ) {
-	const getFocusElement = () => {
-		const row = treeGridElement?.querySelector(
-			`[role=row][data-block="${ focusClientId }"]`
-		);
-		if ( ! row ) {
-			return null;
+export function focusListItem( focusClientId, treeGridElement, signal ) {
+	if ( ! treeGridElement ) {
+		return;
+	}
+
+	const selector = `[role=row][data-block="${ focusClientId }"]`;
+
+	return new Promise( ( resolve ) => {
+		if ( treeGridElement.querySelector( selector ) ) {
+			return resolve( treeGridElement.querySelector( selector ) );
 		}
-		// Focus the first focusable in the row, which is the ListViewBlockSelectButton.
-		return focus.focusable.find( row )[ 0 ];
-	};
 
-	let focusElement = getFocusElement();
-	if ( focusElement ) {
-		focusElement.focus();
-	} else {
-		// The element hasn't been painted yet. Defer focusing on the next frame.
-		// This could happen when all blocks have been deleted and the default block
-		// hasn't been added to the editor yet.
-		window.requestAnimationFrame( () => {
-			focusElement = getFocusElement();
-
-			// Ignore if the element still doesn't exist.
-			if ( focusElement ) {
-				focusElement.focus();
+		let timer = null;
+		// Wait for the element to be added to the DOM.
+		const observer = new window.MutationObserver( () => {
+			if ( treeGridElement.querySelector( selector ) ) {
+				clearTimeout( timer );
+				observer.disconnect();
+				resolve( treeGridElement.querySelector( selector ) );
 			}
 		} );
-	}
+
+		observer.observe( treeGridElement, {
+			childList: true,
+			subtree: true,
+		} );
+
+		signal?.addEventListener(
+			'abort',
+			() => {
+				clearTimeout( timer );
+				observer.disconnect();
+				resolve( null );
+			},
+			{ once: true }
+		);
+
+		// Stop trying after 3 seconds.
+		timer = setTimeout( () => {
+			observer.disconnect();
+			resolve( null );
+		}, 3000 );
+	} ).then( ( element ) => {
+		if ( signal?.aborted ) {
+			return;
+		}
+
+		if ( element && element.isConnected ) {
+			// Focus the first focusable in the row, which is the ListViewBlockSelectButton.
+			focus.focusable.find( element )?.[ 0 ]?.focus();
+		}
+	} );
 }
 
 /**

@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import BaseCheckboxControl from '..';
 import type { CheckboxControlProps } from '../types';
 
@@ -20,20 +9,13 @@ const noop = () => {};
 const getInput = () => screen.getByRole( 'checkbox' ) as HTMLInputElement;
 
 const CheckboxControl = ( props: Omit< CheckboxControlProps, 'onChange' > ) => {
-	return (
-		<BaseCheckboxControl
-			onChange={ noop }
-			{ ...props }
-			__nextHasNoMarginBottom
-		/>
-	);
+	return <BaseCheckboxControl onChange={ noop } { ...props } />;
 };
 
 const ControlledCheckboxControl = ( { onChange }: CheckboxControlProps ) => {
 	const [ isChecked, setChecked ] = useState( false );
 	return (
 		<BaseCheckboxControl
-			__nextHasNoMarginBottom
 			checked={ isChecked }
 			onChange={ ( value ) => {
 				setChecked( value );

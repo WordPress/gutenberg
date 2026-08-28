@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useRefEffect } from '@wordpress/compose';
 import { useEffect, useState } from '@wordpress/element';
 import { Disabled, Placeholder, Spinner } from '@wordpress/components';

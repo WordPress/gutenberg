@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { formatFontStyle } from '../format-font-style';
 
 describe( 'formatFontStyle', () => {

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import InserterListItem from '../inserter-list-item';
 import { InserterListboxGroup, InserterListboxRow } from '../inserter-listbox';
 

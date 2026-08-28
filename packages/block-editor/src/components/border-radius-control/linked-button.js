@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Button } from '@wordpress/components';
 import { link, linkOff } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
@@ -11,7 +8,7 @@ export default function LinkedButton( { isLinked, ...props } ) {
 	return (
 		<Button
 			{ ...props }
-			className="component-border-radius-control__linked-button"
+			className="components-border-radius-control__linked-button"
 			size="small"
 			icon={ isLinked ? link : linkOff }
 			iconSize={ 24 }

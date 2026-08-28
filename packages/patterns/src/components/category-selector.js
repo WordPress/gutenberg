@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { FormTokenField } from '@wordpress/components';
@@ -60,8 +57,6 @@ export default function CategorySelector( {
 			label={ __( 'Categories' ) }
 			tokenizeOnBlur
 			__experimentalExpandOnFocus
-			__next40pxDefaultSize
-			__nextHasNoMarginBottom
 		/>
 	);
 }

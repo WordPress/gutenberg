@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { CheckboxControl } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import PostStickyCheck from './check';
 import { store as editorStore } from '../../store';
 
@@ -32,7 +25,6 @@ export default function PostSticky() {
 				help={ __( 'Pin this post to the top of the blog.' ) }
 				checked={ postSticky }
 				onChange={ () => editPost( { sticky: ! postSticky } ) }
-				__nextHasNoMarginBottom
 			/>
 		</PostStickyCheck>
 	);
