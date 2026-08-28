@@ -174,6 +174,10 @@ export function QuickEditModal( {
 			{
 				id: 'discussion',
 				label: __( 'Discussion' ),
+				layout: {
+					type: 'panel',
+					summary: 'discussion',
+				},
 				children: [
 					{
 						id: 'comment_status',
