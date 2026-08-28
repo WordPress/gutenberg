@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Accordion Panel: Reset padding-block when panel is hidden ([#81782](https://github.com/WordPress/gutenberg/pull/81782)).
+
 ### Enhancements
 
 -   Playlist Track: Use a dedicated icon for the block toolbar. ([#80959](https://github.com/WordPress/gutenberg/pull/80959))
