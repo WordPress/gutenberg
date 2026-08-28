@@ -31,35 +31,3 @@ export function getMetaBoxesIframeName( location = 'main' ) {
 		? 'gutenberg-meta-boxes-side'
 		: 'gutenberg-meta-boxes';
 }
-
-/**
- * Collects the values of the form fields inside the meta boxes of the
- * given document, with the browser's own form serialization.
- *
- * The classic screen renders the meta boxes inside one form along with
- * the title and content fields, which must not be submitted. Disabled
- * fields are excluded from `FormData`, so the fields outside the meta
- * boxes are disabled while the data is constructed.
- *
- * @param {Document} frameDocument A meta boxes iframe document.
- *
- * @return {FormData} The collected fields.
- */
-export function collectMetaBoxFieldsData( frameDocument ) {
-	const form = frameDocument.getElementById( 'post' );
-	const outsideFields = [ ...form.elements ].filter(
-		( field ) =>
-			! field.disabled &&
-			! field.closest( '.meta-box-sortables .postbox' )
-	);
-	for ( const field of outsideFields ) {
-		field.disabled = true;
-	}
-	try {
-		return new frameDocument.defaultView.FormData( form );
-	} finally {
-		for ( const field of outsideFields ) {
-			field.disabled = false;
-		}
-	}
-}
