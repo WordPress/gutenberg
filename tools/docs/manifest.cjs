@@ -3,18 +3,18 @@ const fs = require( 'fs' );
 const path = require( 'path' );
 const { join, resolve } = path;
 const { pascalCase } = require( 'change-case' );
-const glob = require( 'glob' ).sync;
+const { globSync } = require( 'glob' );
 
 const ROOT_DIR = resolve( __dirname, '../..' );
 const baseRepoUrl = '..';
-const blockJsonPaths = glob( 'packages/block-library/src/*/block.json', {
+const blockJsonPaths = globSync( 'packages/block-library/src/*/block.json', {
 	cwd: ROOT_DIR,
-} );
-const blockCategoryPaths = glob(
+} ).sort();
+const blockCategoryPaths = globSync(
 	'docs/reference-guides/core-blocks/category-*.md',
 	{ cwd: ROOT_DIR }
-);
-const componentPaths = glob( 'packages/components/src/*/**/README.md', {
+).sort();
+const componentPaths = globSync( 'packages/components/src/*/**/README.md', {
 	cwd: ROOT_DIR,
 	// Don't expose documentation for private components just yet.
 	ignore: [
@@ -25,8 +25,9 @@ const componentPaths = glob( 'packages/components/src/*/**/README.md', {
 		'packages/components/src/custom-select-control-v2/README.md',
 		'packages/components/src/badge/README.md',
 	],
-} );
-const packagePaths = glob( 'packages/*/package.json', { cwd: ROOT_DIR } )
+} ).sort( ( a, b ) => a.localeCompare( b ) );
+const packagePaths = globSync( 'packages/*/package.json', { cwd: ROOT_DIR } )
+	.sort()
 	.filter(
 		// Ignore private packages.
 		( fileName ) => ! require( join( ROOT_DIR, fileName ) ).private

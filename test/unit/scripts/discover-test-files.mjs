@@ -1,7 +1,5 @@
 import path from 'node:path';
-import globPackage from 'glob';
-
-const { sync: glob } = globPackage;
+import { globSync } from 'glob';
 
 export const TEST_PATTERNS = [
 	'**/__tests__/**/*.[jt]s?(x)',
@@ -34,7 +32,7 @@ export function discoverTestFiles( rootDir ) {
 	return [
 		...new Set(
 			TEST_PATTERNS.flatMap( ( pattern ) =>
-				glob( pattern, {
+				globSync( pattern, {
 					absolute: false,
 					cwd: rootDir,
 					dot: true,
