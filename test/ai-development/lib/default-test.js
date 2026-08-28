@@ -1,4 +1,5 @@
 import withWorkspaceChanges from './diff.js';
+import { agentEnvironment } from './environment.js';
 import { workspace } from './paths.js';
 
 /**
@@ -34,6 +35,9 @@ environment.`,
 				// No settings sources means no hooks to load; saying so makes
 				// the guarantee explicit rather than a consequence.
 				settings: { disableAllHooks: true },
+				// It has no shell to read these with, but that is a property
+				// of the current tool list rather than something to depend on.
+				env: agentEnvironment,
 			},
 		},
 	},
