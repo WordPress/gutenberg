@@ -247,7 +247,7 @@ export const AsyncItems: Story = {
 	render: function Template( args ) {
 		const [ loading, setLoading ] = useState( true );
 		const [ items, setItems ] = useState< FixtureItem[] >( [] );
-		const [ value, setValue ] = useState< FixtureItem | undefined >();
+		const [ value, setValue ] = useState< unknown >();
 
 		useEffect( () => {
 			const timeout = setTimeout( () => {
