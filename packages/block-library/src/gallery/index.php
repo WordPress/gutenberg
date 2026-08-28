@@ -88,6 +88,91 @@ function block_core_gallery_get_column_gap_value( $gap, $fallback_gap ) {
 }
 
 /**
+ * Returns Gallery-specific responsive Flex rules for a viewport.
+ *
+ * @since 7.1.0
+ *
+ * @param string $selector       Gallery block selector.
+ * @param mixed  $viewport_style Viewport style data.
+ * @param string $media_query    Viewport media query.
+ * @return array[] Gallery responsive Flex rules.
+ */
+function block_core_gallery_get_responsive_flex_style_rules( $selector, $viewport_style, $media_query ) {
+	if ( ! is_array( $viewport_style ) || ! is_string( $media_query ) ) {
+		return array();
+	}
+
+	$rules            = array();
+	$gallery_selector = "{$selector}.wp-block-gallery.has-nested-images:where(.is-layout-flex)";
+	$image_selector   = "{$gallery_selector} figure.wp-block-image:not(#individual-image)";
+	$columns          = $viewport_style['columns'] ?? null;
+
+	if ( is_int( $columns ) && $columns >= 1 && $columns <= 8 ) {
+		$width   = 1 === $columns
+			? '100%'
+			: sprintf(
+				'calc((100%% - (var(--wp--style--unstable-gallery-gap, 16px) * %1$d)) / %2$d)',
+				$columns - 1,
+				$columns
+			);
+		$rules[] = array(
+			'selector'     => $image_selector,
+			'declarations' => array( 'width' => "{$width} !important" ),
+			'rules_group'  => $media_query,
+		);
+	}
+
+	$image_crop = $viewport_style['imageCrop'] ?? null;
+	if ( ! is_bool( $image_crop ) ) {
+		return $rules;
+	}
+
+	$rules[] = array(
+		'selector'     => $image_selector,
+		'declarations' => $image_crop
+			? array(
+				'align-self'    => 'inherit !important',
+				'margin-bottom' => '0 !important',
+			)
+			: array(
+				'align-self'    => 'auto !important',
+				'margin-top'    => '0 !important',
+				'margin-bottom' => 'auto !important',
+			),
+		'rules_group'  => $media_query,
+	);
+	$rules[] = array(
+		'selector'     => "{$image_selector} > div:not(.components-drop-zone)",
+		'declarations' => array( 'display' => $image_crop ? 'flex !important' : 'block !important' ),
+		'rules_group'  => $media_query,
+	);
+	$rules[] = array(
+		'selector'     => "{$image_selector} > a",
+		'declarations' => array( 'display' => $image_crop ? 'flex !important' : 'inline-block !important' ),
+		'rules_group'  => $media_query,
+	);
+	$rules[] = array(
+		'selector'     => "{$image_selector} a,{$image_selector} img",
+		'declarations' => $image_crop
+			? array(
+				'width'      => '100% !important',
+				'flex'       => '1 0 0% !important',
+				'height'     => '100% !important',
+				'object-fit' => 'cover !important',
+			)
+			: array(
+				'width'      => 'auto !important',
+				'flex'       => '0 1 auto !important',
+				'height'     => 'auto !important',
+				'object-fit' => 'fill !important',
+			),
+		'rules_group'  => $media_query,
+	);
+
+	return $rules;
+}
+
+/**
  * Resolves a Gallery block's `dynamicContent` to an ordered list of image
  * attachment IDs.
  *
@@ -460,22 +545,29 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 			} elseif ( ! $has_block_gap && $has_global_viewport_block_gap ) {
 				$viewport_gap = $global_gallery_styles[ $breakpoint ]['spacing']['blockGap'];
 			} else {
-				continue;
+				$viewport_gap = null;
 			}
 
-			if ( null === $viewport_gap ) {
-				continue;
-			}
-
-			$gallery_styles[] = array(
-				'selector'     => ".wp-block-gallery.{$unique_gallery_classname}",
-				'declarations' => array(
-					'--wp--style--unstable-gallery-gap' => block_core_gallery_get_column_gap_value(
-						$viewport_gap,
-						$fallback_gap
+			if ( null !== $viewport_gap ) {
+				$gallery_styles[] = array(
+					'selector'     => ".wp-block-gallery.{$unique_gallery_classname}",
+					'declarations' => array(
+						'--wp--style--unstable-gallery-gap' => block_core_gallery_get_column_gap_value(
+							$viewport_gap,
+							$fallback_gap
+						),
 					),
-				),
-				'rules_group'  => $media_query,
+					'rules_group'  => $media_query,
+				);
+			}
+
+			$gallery_styles = array_merge(
+				$gallery_styles,
+				block_core_gallery_get_responsive_flex_style_rules(
+					".{$unique_gallery_classname}",
+					$viewport_style,
+					$media_query
+				)
 			);
 		}
 
