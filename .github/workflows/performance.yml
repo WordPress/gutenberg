@@ -36,8 +36,9 @@ jobs:
             contents: read
         if: ${{ github.repository == 'WordPress/gutenberg' }}
         outputs:
-            # JSON array of `{ name, ref, artifact }`, see tools/release/resolve-performance-branches.mjs.
+            # See tools/release/resolve-performance-branches.mjs for the shapes.
             branches: ${{ steps.branches.outputs.branches }}
+            shards: ${{ steps.branches.outputs.shards }}
             wp-version: ${{ steps.branches.outputs.wp-version }}
 
         steps:
@@ -126,13 +127,7 @@ jobs:
             # Shards run in parallel to cut the wall clock time. Every shard still
             # measures all branches on the same runner, so results stay comparable.
             matrix:
-                include:
-                    - shard: post-editor
-                      suites: post-editor
-                    - shard: site-editor
-                      suites: site-editor
-                    - shard: media-and-front-end
-                      suites: front-end-block-theme,front-end-classic-theme,media-processing,media-upload
+                include: ${{ fromJSON( needs.prepare.outputs.shards ) }}
         env:
             WP_ARTIFACTS_PATH: ${{ github.workspace }}/artifacts
             PERF_SUITES: ${{ matrix.suites }}
@@ -238,17 +233,6 @@ jobs:
                   pattern: performance-results-*
                   path: ${{ env.WP_ARTIFACTS_PATH }}
                   merge-multiple: true
-
-            # Fails when a suite is missing from every shard of the matrix above.
-            - name: Check that every suite ran
-              run: |
-                  for spec in test/performance/specs/*.spec.js; do
-                    suite="$(basename "$spec" .spec.js)"
-                    if [[ ! -f "${WP_ARTIFACTS_PATH}/${suite}.performance-results.json" ]]; then
-                      echo "::error::No results for the '${suite}' suite. Add it to a shard in performance.yml."
-                      exit 1
-                    fi
-                  done
 
             # Keep the single artifact that existed before the tests were sharded.
             - name: Archive merged performance results

@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 /**
- * Resolves the branches the performance workflow compares for a GitHub event.
- * Writes `branches` (JSON array of `{ name, ref, artifact }`) and `wp-version` to `$GITHUB_OUTPUT`.
+ * Resolves the branches and the suite shards the performance workflow runs for a GitHub event.
+ * Writes `branches` (`{ name, ref, artifact }[]`), `shards` (`{ shard, suites }[]`) and `wp-version` to `$GITHUB_OUTPUT`.
  */
 import fs from 'node:fs';
+import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { sanitizeBranchName } from './lib/sanitize-branch-name.js';
@@ -13,6 +14,46 @@ import { sanitizeBranchName } from './lib/sanitize-branch-name.js';
  * https://developer.wordpress.org/block-editor/explanations/architecture/performance/#update-the-reference-commit.
  */
 export const REFERENCE_COMMIT = '28d414f1327652e2b49e784ddc12098768991c62';
+
+/*
+ * Suites grouped into CI jobs that run in parallel, balanced by their duration.
+ * Every spec in test/performance/specs must appear exactly once.
+ */
+export const SHARDS = {
+	'post-editor': [ 'post-editor' ],
+	'site-editor': [ 'site-editor' ],
+	'media-and-front-end': [
+		'front-end-block-theme',
+		'front-end-classic-theme',
+		'media-processing',
+		'media-upload',
+	],
+};
+
+/**
+ * @param {string[]} suites Names of the spec files in test/performance/specs, without extension.
+ * @return {Array<{ shard: string, suites: string }>} Matrix entries for the CI shards.
+ */
+export function resolveShards( suites ) {
+	const assigned = Object.values( SHARDS ).flat();
+	const missing = suites.filter( ( suite ) => ! assigned.includes( suite ) );
+	const unknown = assigned.filter( ( suite ) => ! suites.includes( suite ) );
+	const duplicate = assigned.find(
+		( suite, i ) => assigned.indexOf( suite ) !== i
+	);
+	if ( missing.length || unknown.length || duplicate ) {
+		throw new Error(
+			`SHARDS in resolve-performance-branches.mjs must list every performance suite exactly once. ` +
+				`Missing: ${ missing.join( ', ' ) || 'none' }. Unknown: ${
+					unknown.join( ', ' ) || 'none'
+				}. Duplicate: ${ duplicate || 'none' }.`
+		);
+	}
+	return Object.entries( SHARDS ).map( ( [ shard, shardSuites ] ) => ( {
+		shard,
+		suites: shardSuites.join( ',' ),
+	} ) );
+}
 
 /**
  * @param {string} name Branch label shown in the results.
@@ -182,10 +223,22 @@ function main() {
 		inputWpVersion: env.INPUT_WP_VERSION,
 	} );
 
-	console.log( JSON.stringify( branches, null, 2 ) );
+	const shards = resolveShards(
+		fs
+			.readdirSync( path.join( 'test', 'performance', 'specs' ) )
+			.filter( ( file ) => file.endsWith( '.spec.js' ) )
+			.map( ( file ) => path.basename( file, '.spec.js' ) )
+	);
+
+	console.log( JSON.stringify( { branches, shards, wpVersion }, null, 2 ) );
 	fs.appendFileSync(
 		env.GITHUB_OUTPUT,
-		`branches=${ JSON.stringify( branches ) }\nwp-version=${ wpVersion }\n`
+		[
+			`branches=${ JSON.stringify( branches ) }`,
+			`shards=${ JSON.stringify( shards ) }`,
+			`wp-version=${ wpVersion }`,
+			'',
+		].join( '\n' )
 	);
 }
 

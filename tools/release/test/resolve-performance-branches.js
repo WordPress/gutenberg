@@ -1,5 +1,8 @@
+const fs = require( 'node:fs' );
+const path = require( 'node:path' );
 const {
 	resolveBranches,
+	resolveShards,
 	getTestedUpToMajor,
 	REFERENCE_COMMIT,
 } = require( '../resolve-performance-branches.mjs' );
@@ -189,5 +192,33 @@ describe( 'resolveBranches', () => {
 				refExists,
 			} )
 		).toThrow( 'Unsupported event' );
+	} );
+} );
+
+describe( 'resolveShards', () => {
+	const specs = fs
+		.readdirSync(
+			path.join( __dirname, '../../../test/performance/specs' )
+		)
+		.filter( ( file ) => file.endsWith( '.spec.js' ) )
+		.map( ( file ) => path.basename( file, '.spec.js' ) );
+
+	it( 'covers every spec file in the repository exactly once', () => {
+		const shards = resolveShards( specs );
+		expect(
+			shards.flatMap( ( { suites } ) => suites.split( ',' ) ).sort()
+		).toEqual( [ ...specs ].sort() );
+	} );
+
+	it( 'fails when a spec is not assigned to a shard', () => {
+		expect( () => resolveShards( [ ...specs, 'new-suite' ] ) ).toThrow(
+			'Missing: new-suite'
+		);
+	} );
+
+	it( 'fails when a shard lists a spec that does not exist', () => {
+		expect( () => resolveShards( specs.slice( 1 ) ) ).toThrow(
+			`Unknown: ${ specs[ 0 ] }`
+		);
 	} );
 } );
