@@ -47,9 +47,6 @@ export function getMetaBoxesIframeName( location = 'main' ) {
  */
 export function collectMetaBoxFieldsData( frameDocument ) {
 	const form = frameDocument.getElementById( 'post' );
-	if ( ! form ) {
-		return new window.FormData();
-	}
 	const outsideFields = [ ...form.elements ].filter(
 		( field ) =>
 			! field.disabled &&
