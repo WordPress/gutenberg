@@ -6,10 +6,14 @@ import type {
 import { unlock } from '../../lock-unlock';
 import {
 	getCursorPosition,
-	getOrderedBlockRange,
+	getOrderedBlockRangeWithFallback,
 	getSelectionRects,
 } from './cursor-dom-utils';
-import type { CursorCoords, SelectionRect } from './cursor-dom-utils';
+import type {
+	BlockRangeResult,
+	CursorCoords,
+	SelectionRect,
+} from './cursor-dom-utils';
 
 const { SelectionDirection, SelectionType } = unlock(
 	coreDataPrivateApis
@@ -98,13 +102,15 @@ export function resolveTargetElement(
  * @param start          - Start position (block clientId + text index).
  * @param end            - End position (only for range selections).
  * @param overlayContext - Shared editor document / overlay references.
+ * @param previousRange  - Last rendered block range for partial endpoint recovery.
  * @return Cursor coordinates and optional selection rectangles.
  */
 export function computeSelectionVisual(
 	selection: any,
 	start: ResolvedSelection,
 	end: ResolvedSelection | undefined,
-	overlayContext: OverlayContext
+	overlayContext: OverlayContext,
+	previousRange: BlockRangeResult | null = null
 ): SelectionVisual {
 	if (
 		selection.type === SelectionType.None ||
@@ -121,7 +127,13 @@ export function computeSelectionVisual(
 	if ( ! end ) {
 		return {};
 	}
-	return computeTextSelection( selection, start, end, overlayContext );
+	return computeTextSelection(
+		selection,
+		start,
+		end,
+		overlayContext,
+		previousRange
+	);
 }
 
 /**
@@ -160,13 +172,15 @@ function computeCursorOnly(
  * @param start          - Start position (block clientId + text index).
  * @param end            - End position (block clientId + text index).
  * @param overlayContext - Shared editor document / overlay references.
+ * @param previousRange  - Last rendered block range for partial endpoint recovery.
  * @return Cursor coordinates and optional selection rectangles.
  */
 function computeTextSelection(
 	selection: any,
 	start: ResolvedSelection,
 	end: ResolvedSelection,
-	overlayContext: OverlayContext
+	overlayContext: OverlayContext,
+	previousRange: BlockRangeResult | null
 ): SelectionVisual {
 	if ( ! start.localClientId || ! end.localClientId ) {
 		return {};
@@ -208,7 +222,12 @@ function computeTextSelection(
 	// non-text blocks (image, spacer, etc.) via use-block-highlighting.
 	// No cursor coords — the single avatar placed by use-block-highlighting on
 	// the topmost block is the only indicator.
-	return computeMultiBlockOverlayRects( start, end, overlayContext );
+	return computeMultiBlockOverlayRects(
+		start,
+		end,
+		overlayContext,
+		previousRange
+	);
 }
 
 /**
@@ -248,19 +267,22 @@ function blockBoundingRect(
  * @param start          - Start endpoint (container-level clientId + text offset).
  * @param end            - End endpoint (container-level clientId + text offset).
  * @param overlayContext - Shared editor document / overlay references.
+ * @param previousRange  - Last rendered block range for partial endpoint recovery.
  * @return selectionRects covering each text block in the selection, or {}.
  */
 function computeMultiBlockOverlayRects(
 	start: ResolvedSelection,
 	end: ResolvedSelection,
-	overlayContext: OverlayContext
+	overlayContext: OverlayContext,
+	previousRange: BlockRangeResult | null
 ): SelectionVisual {
 	const { editorDocument, overlayRect } = overlayContext;
 
-	const range = getOrderedBlockRange(
+	const range = getOrderedBlockRangeWithFallback(
 		start.localClientId!,
 		end.localClientId!,
-		editorDocument
+		editorDocument,
+		previousRange
 	);
 	if ( ! range ) {
 		return {};

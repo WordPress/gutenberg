@@ -6,7 +6,7 @@ import type {
 	PostEditorAwarenessState as ActiveCollaborator,
 } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { unlock } from '../../lock-unlock';
 import { getAvatarUrl } from './get-avatar-url';
@@ -16,8 +16,11 @@ import {
 	useDebouncedRecompute,
 	useRequestAnimationFrameRecompute,
 } from './use-debounced-recompute';
-import { blockContainerOf } from './cursor-dom-utils';
-import type { SelectionRect } from './cursor-dom-utils';
+import {
+	blockContainerOf,
+	getOrderedBlockRangeWithFallback,
+} from './cursor-dom-utils';
+import type { BlockRangeResult, SelectionRect } from './cursor-dom-utils';
 import { getCollaboratorDisplayName } from '../../utils/get-collaborator-display-name';
 
 const { useActiveCollaborators, useResolvedSelection } =
@@ -82,6 +85,9 @@ export function useRenderCursors(
 	const [ cursorPositions, setCursorPositions ] = useState< CursorData[] >(
 		[]
 	);
+	const lastBlockRangeByClient = useRef<
+		Map< number, BlockRangeResult | null >
+	>( new Map() );
 
 	// Bump this counter to force the effect to re-run (e.g. after a layout shift).
 	const [ recomputeToken, rerenderCursorsAfterDelay ] =
@@ -209,12 +215,38 @@ export function useRenderCursors(
 				  );
 			const avatarUrl = getAvatarUrl( user.collaboratorInfo.avatar_urls );
 
+			const previousBlockRange =
+				selection.type === SelectionType.SelectionInMultipleBlocks &&
+				start.localClientId &&
+				end?.localClientId
+					? lastBlockRangeByClient.current.get( clientId ) ?? null
+					: null;
+
 			const selectionVisual = computeSelectionVisual(
 				selection,
 				start,
 				end,
-				overlayContext
+				overlayContext,
+				previousBlockRange
 			);
+
+			if (
+				selection.type === SelectionType.SelectionInMultipleBlocks &&
+				start.localClientId &&
+				end?.localClientId
+			) {
+				const range = getOrderedBlockRangeWithFallback(
+					start.localClientId,
+					end.localClientId,
+					blockEditorDocument,
+					previousBlockRange
+				);
+				if ( range ) {
+					lastBlockRangeByClient.current.set( clientId, range );
+				} else {
+					lastBlockRangeByClient.current.delete( clientId );
+				}
+			}
 
 			const hasCoords = Boolean( selectionVisual.coords );
 			const hasRects =

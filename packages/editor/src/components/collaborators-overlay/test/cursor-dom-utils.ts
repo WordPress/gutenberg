@@ -1,6 +1,8 @@
 import {
 	getCursorPosition,
 	getNearestVisibleBlockAncestor,
+	getOrderedBlockRange,
+	getOrderedBlockRangeWithFallback,
 	getSelectionRects,
 } from '../cursor-dom-utils';
 
@@ -176,6 +178,107 @@ describe( 'cursor-dom-utils', () => {
 			const el = document.createElement( 'p' );
 
 			expect( getNearestVisibleBlockAncestor( el ) ).toBeNull();
+		} );
+	} );
+
+	describe( 'getOrderedBlockRangeWithFallback', () => {
+		function createBlock( clientId: string, text: string ) {
+			const block = document.createElement( 'div' );
+			block.setAttribute( 'data-block', clientId );
+			const paragraph = document.createElement( 'p' );
+			paragraph.textContent = text;
+			block.appendChild( paragraph );
+			document.body.appendChild( block );
+			return block;
+		}
+
+		afterEach( () => {
+			document.body.innerHTML = '';
+		} );
+
+		it( 'returns the normal range when both endpoints exist', () => {
+			createBlock( 'block-a', 'A' );
+			createBlock( 'block-b', 'B' );
+			createBlock( 'block-c', 'C' );
+
+			const previousRange = getOrderedBlockRange(
+				'block-a',
+				'block-c',
+				document
+			);
+			const range = getOrderedBlockRangeWithFallback(
+				'block-a',
+				'block-c',
+				document,
+				previousRange
+			);
+
+			expect( range?.firstId ).toBe( 'block-a' );
+			expect( range?.lastId ).toBe( 'block-c' );
+			expect( range?.middleEls ).toHaveLength( 1 );
+		} );
+
+		it( 'keeps the remaining blocks when the start endpoint is deleted', () => {
+			createBlock( 'block-a', 'A' );
+			createBlock( 'block-b', 'B' );
+			createBlock( 'block-c', 'C' );
+
+			const previousRange = getOrderedBlockRange(
+				'block-a',
+				'block-c',
+				document
+			);
+			document.querySelector( '[data-block="block-a"]' )?.remove();
+
+			const range = getOrderedBlockRangeWithFallback(
+				'block-a',
+				'block-c',
+				document,
+				previousRange
+			);
+
+			expect( range?.firstId ).toBe( 'block-b' );
+			expect( range?.lastId ).toBe( 'block-c' );
+			expect( range?.middleEls ).toHaveLength( 0 );
+		} );
+
+		it( 'keeps the remaining blocks when the end endpoint is deleted', () => {
+			createBlock( 'block-a', 'A' );
+			createBlock( 'block-b', 'B' );
+			createBlock( 'block-c', 'C' );
+
+			const previousRange = getOrderedBlockRange(
+				'block-a',
+				'block-c',
+				document
+			);
+			document.querySelector( '[data-block="block-c"]' )?.remove();
+
+			const range = getOrderedBlockRangeWithFallback(
+				'block-a',
+				'block-c',
+				document,
+				previousRange
+			);
+
+			expect( range?.firstId ).toBe( 'block-a' );
+			expect( range?.lastId ).toBe( 'block-b' );
+			expect( range?.middleEls ).toHaveLength( 0 );
+		} );
+
+		it( 'returns null when no previous range is available', () => {
+			createBlock( 'block-a', 'A' );
+			createBlock( 'block-c', 'C' );
+			document.querySelector( '[data-block="block-a"]' )?.remove();
+
+			const range = getOrderedBlockRangeWithFallback(
+				'block-a',
+				'block-c',
+				document,
+				null
+			);
+
+			expect( range ).toBeNull();
 		} );
 	} );
 } );
