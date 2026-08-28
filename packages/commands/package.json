@@ -53,8 +53,8 @@
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/preferences": "file:../preferences",
 		"@wordpress/private-apis": "file:../private-apis",
-		"clsx": "^2.1.1",
-		"cmdk": "^1.0.0"
+		"@wordpress/ui": "file:../ui",
+		"command-score": "^0.1.2"
 	},
 	"peerDependencies": {
 		"react": "^18 || ^19",

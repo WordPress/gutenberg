@@ -1,19 +1,17 @@
-import { Command, useCommandState } from 'cmdk';
-import clsx from 'clsx';
+import { Autocomplete } from '@wordpress/ui';
+import commandScore from 'command-score';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	useState,
 	useEffect,
 	useRef,
+	useMemo,
+	useCallback,
 	isValidElement,
 	Component,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import {
-	Modal,
-	TextHighlight,
-	__experimentalHStack as HStack,
-} from '@wordpress/components';
+import { Modal, TextHighlight } from '@wordpress/components';
 import {
 	store as keyboardShortcutsStore,
 	useShortcut,
@@ -24,13 +22,13 @@ import { store as commandsStore } from '../store';
 import { unlock } from '../lock-unlock';
 import {
 	recordUsage,
+	useHasRecentCommands,
 	useLoaderCollector,
 	useRecentCommands,
 } from './use-recent-commands';
 
-// Namespaces item ids to avoid collisions with other elements on the page.
-const ITEM_ID_PREFIX = 'command-palette-item-';
 const inputLabel = __( 'Search commands and settings' );
+const EMPTY_ARRAY = [];
 
 /**
  * Fallback icons per command category, used when a command provides no icon of
@@ -72,220 +70,147 @@ export function isValidIcon( icon ) {
 	);
 }
 
-function CommandItem( { command, search, category, valuePrefix } ) {
+/**
+ * Appends a command's keywords to the string that gets scored. The published
+ * `command-score` package only takes `( string, abbreviation )`; the copy
+ * vendored in `cmdk` accepted a third `aliases` argument and folded it into the
+ * scored string exactly like this, so keyword matches keep working.
+ *
+ * @param {string}    value    The command's searchable label.
+ * @param {string[]=} keywords The command's keywords.
+ *
+ * @return {string} The string to score against the search term.
+ */
+function withKeywords( value, keywords ) {
+	return keywords?.length ? `${ value } ${ keywords.join( ' ' ) }` : value;
+}
+
+/**
+ * Compares the parts of two commands that decide what the palette renders.
+ *
+ * Loader hooks are free to rebuild their commands on every render, so functions
+ * and other non-primitives are deliberately left out: comparing them by
+ * identity would report a change on every render and re-render endlessly.
+ *
+ * @param {Object} a First command.
+ * @param {Object} b Second command.
+ *
+ * @return {boolean} Whether both commands render the same way.
+ */
+function rendersTheSame( a, b ) {
+	const aKeywords = a.keywords ?? EMPTY_ARRAY;
+	const bKeywords = b.keywords ?? EMPTY_ARRAY;
+	return (
+		a.name === b.name &&
+		a.label === b.label &&
+		a.searchLabel === b.searchLabel &&
+		a.category === b.category &&
+		aKeywords.length === bKeywords.length &&
+		aKeywords.every( ( keyword, i ) => keyword === bKeywords[ i ] )
+	);
+}
+
+/**
+ * De-duplicates a list of commands by name, preserving order.
+ *
+ * @param {Object[]} commands The commands to de-duplicate.
+ *
+ * @return {Object[]} The de-duplicated commands.
+ */
+function dedupeCommands( commands ) {
+	const seen = new Set();
+	const result = [];
+	for ( const command of commands ) {
+		if ( seen.has( command.name ) ) {
+			continue;
+		}
+		seen.add( command.name );
+		result.push( command );
+	}
+	return result;
+}
+
+/**
+ * Ranks and filters a list of commands against the search term using the same
+ * fuzzy scoring algorithm previously provided by `cmdk` (`command-score`).
+ * Score-0 matches are dropped and the result is sorted by descending relevance.
+ *
+ * @param {Object[]} commands The commands to rank.
+ * @param {string}   search   The search term.
+ *
+ * @return {Object[]} The matching commands, ordered by relevance.
+ */
+function rankCommands( commands, search ) {
+	const scored = [];
+	for ( const command of dedupeCommands( commands ) ) {
+		const value = command.searchLabel ?? command.label;
+		const score = commandScore(
+			withKeywords( value, command.keywords ),
+			search
+		);
+		if ( score > 0 ) {
+			scored.push( { command, score } );
+		}
+	}
+	scored.sort( ( a, b ) => b.score - a.score );
+	return scored.map( ( { command } ) => command );
+}
+
+function CommandItem( { command, search, category, onRun } ) {
 	const { close } = useDispatch( commandsStore );
 	const commandCategory = category ?? command.category;
 	const icon = command.icon ?? CATEGORY_FALLBACK_ICONS[ commandCategory ];
-	const label = command.searchLabel ?? command.label;
-	const value = valuePrefix ? `${ valuePrefix }${ command.name }` : label;
 	return (
-		<Command.Item
-			key={ command.name }
-			id={ `${ ITEM_ID_PREFIX }${ value.toLowerCase() }` }
-			value={ value }
-			keywords={
-				valuePrefix
-					? [ ...( command.keywords ?? [] ), label ]
-					: command.keywords
-			}
-			onSelect={ () => {
-				recordUsage( command.name );
-				command.callback( { close } );
-			} }
+		<Autocomplete.Item
+			value={ command }
+			className="commands-command-menu__item"
+			onClick={ () => onRun( command, close ) }
 		>
-			<HStack
-				alignment="left"
-				className={ clsx( 'commands-command-menu__item', {
-					'has-icon': !! icon,
-				} ) }
-			>
-				{ isValidIcon( icon ) && <Icon icon={ icon } /> }
-				<span className="commands-command-menu__item-label">
-					<TextHighlight
-						text={ command.label }
-						highlight={ search }
-					/>
+			{ isValidIcon( icon ) && <Icon icon={ icon } /> }
+			<span className="commands-command-menu__item-label">
+				<TextHighlight text={ command.label } highlight={ search } />
+			</span>
+			{ CATEGORY_LABELS[ commandCategory ] && (
+				<span className="commands-command-menu__item-category">
+					{ CATEGORY_LABELS[ commandCategory ] }
 				</span>
-				{ CATEGORY_LABELS[ commandCategory ] && (
-					<span className="commands-command-menu__item-category">
-						{ CATEGORY_LABELS[ commandCategory ] }
-					</span>
-				) }
-			</HStack>
-		</Command.Item>
+			) }
+		</Autocomplete.Item>
 	);
 }
 
-function CommandMenuLoader( { name, search, hook, category, valuePrefix } ) {
-	const { setLoaderLoading } = unlock( useDispatch( commandsStore ) );
-	const { isLoading: loading, commands = [] } = hook( { search } ) ?? {};
-	useEffect( () => {
-		setLoaderLoading( name, loading );
-	}, [ setLoaderLoading, name, loading ] );
+// Runs a single command loader and reports its resolved commands up to the
+// parent via `onResolved`. Renders nothing; it exists solely to call the
+// loader hook in isolation (respecting the rules of hooks) and to aggregate
+// dynamic commands into the shared item list.
+function LoaderRunner( { loader, search, onResolved } ) {
+	useLoaderCollector( {
+		hook: loader.hook,
+		name: loader.name,
+		search,
+		onResolved,
+	} );
 
-	if ( ! commands.length ) {
-		return null;
-	}
-
-	return (
-		<>
-			{ commands.map( ( command ) => (
-				<CommandItem
-					key={ command.name }
-					command={ command }
-					search={ search }
-					category={ command.category ?? category }
-					valuePrefix={ valuePrefix }
-				/>
-			) ) }
-		</>
-	);
-}
-
-function CommandMenuLoaderWrapper( { hook, ...props } ) {
-	// The "hook" prop is actually a custom React hook
-	// so to avoid breaking the rules of hooks
-	// the CommandMenuLoaderWrapper component need to be
-	// remounted on each hook prop change.
-	const currentLoaderRef = useRef( hook );
-	const [ key, setKey ] = useState( 0 );
-	useEffect( () => {
-		if ( currentLoaderRef.current !== hook ) {
-			currentLoaderRef.current = hook;
-			setKey( ( prevKey ) => prevKey + 1 );
-		}
-	}, [ hook ] );
-
-	return (
-		<CommandMenuLoader
-			key={ key }
-			hook={ currentLoaderRef.current }
-			{ ...props }
-		/>
-	);
-}
-
-function CommandList( { search, commands, loaders, valuePrefix } ) {
-	return (
-		<>
-			{ commands.map( ( command ) => (
-				<CommandItem
-					key={ command.name }
-					command={ command }
-					search={ search }
-					valuePrefix={ valuePrefix }
-				/>
-			) ) }
-			{ loaders.map( ( loader ) => (
-				<CommandMenuLoaderWrapper
-					key={ loader.name }
-					name={ loader.name }
-					search={ search }
-					hook={ loader.hook }
-					category={ loader.category }
-					valuePrefix={ valuePrefix }
-				/>
-			) ) }
-		</>
-	);
-}
-
-function RecentLoaderRunner( { hook, name, filterNames, onResolved } ) {
-	useLoaderCollector( hook, name, filterNames, onResolved );
 	return null;
 }
 
-function RecentGroup() {
-	const { commands, loaders, recentSet, onResolved } = useRecentCommands();
+// The "hook" prop is actually a custom React hook, so to avoid breaking the
+// rules of hooks the `LoaderRunner` needs to be remounted whenever the hook
+// identity changes.
+function LoaderRunnerWrapper( { loader, ...props } ) {
+	const [ tracked, setTracked ] = useState( () => ( {
+		hook: loader.hook,
+		key: 0,
+	} ) );
 
-	if ( ! commands.length && ! loaders.length ) {
+	if ( tracked.hook !== loader.hook ) {
+		// Derive new state during render and skip this pass so the next render
+		// mounts a fresh `LoaderRunner` for the new hook.
+		setTracked( ( prev ) => ( { hook: loader.hook, key: prev.key + 1 } ) );
 		return null;
 	}
 
-	return (
-		<Command.Group heading={ __( 'Recent' ) }>
-			{ loaders.map( ( loader ) => (
-				<RecentLoaderRunner
-					key={ loader.name }
-					name={ loader.name }
-					hook={ loader.hook }
-					filterNames={ recentSet }
-					onResolved={ onResolved }
-				/>
-			) ) }
-			{ commands.map( ( command ) => (
-				<CommandItem
-					key={ command.name }
-					command={ command }
-					search=""
-					valuePrefix="recent-"
-				/>
-			) ) }
-		</Command.Group>
-	);
-}
-
-function SuggestionsGroup() {
-	const { commands, loaders } = useSelect( ( select ) => {
-		const { getCommands, getCommandLoaders } = select( commandsStore );
-		return {
-			commands: getCommands( true ),
-			loaders: getCommandLoaders( true ),
-		};
-	}, [] );
-
-	return (
-		<Command.Group heading={ __( 'Suggestions' ) }>
-			<CommandList search="" commands={ commands } loaders={ loaders } />
-		</Command.Group>
-	);
-}
-
-function ResultsGroup( { search } ) {
-	const { commands, contextualCommands, loaders, contextualLoaders } =
-		useSelect( ( select ) => {
-			const { getCommands, getCommandLoaders } = select( commandsStore );
-			return {
-				commands: getCommands( false ),
-				contextualCommands: getCommands( true ),
-				loaders: getCommandLoaders( false ),
-				contextualLoaders: getCommandLoaders( true ),
-			};
-		}, [] );
-
-	return (
-		<Command.Group heading={ __( 'Results' ) }>
-			<CommandList
-				search={ search }
-				commands={ commands }
-				loaders={ loaders }
-			/>
-			<CommandList
-				search={ search }
-				commands={ contextualCommands }
-				loaders={ contextualLoaders }
-			/>
-		</Command.Group>
-	);
-}
-
-function CommandInput( { search, setSearch } ) {
-	const commandMenuInput = useRef();
-	const _value = useCommandState( ( state ) => state.value );
-	const selectedItemId = _value ? `${ ITEM_ID_PREFIX }${ _value }` : null;
-	useEffect( () => {
-		// Focus the command palette input when mounting the modal.
-		commandMenuInput.current.focus();
-	}, [] );
-	return (
-		<Command.Input
-			ref={ commandMenuInput }
-			value={ search }
-			onValueChange={ setSearch }
-			placeholder={ inputLabel }
-			aria-activedescendant={ selectedItemId }
-		/>
-	);
+	return <LoaderRunner key={ tracked.key } loader={ loader } { ...props } />;
 }
 
 /**
@@ -294,14 +219,186 @@ function CommandInput( { search, setSearch } ) {
 export function CommandMenu() {
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 	const [ search, setSearch ] = useState( '' );
-	const { isOpen: paletteIsOpen, loadersLoading } = useSelect(
-		( select ) => ( {
-			isOpen: select( commandsStore ).isOpen(),
+	const {
+		isOpen: paletteIsOpen,
+		loadersLoading,
+		staticCommands,
+		contextualCommands,
+		staticLoaders,
+		contextualLoaders,
+	} = useSelect( ( select ) => {
+		const { getCommands, getCommandLoaders, isOpen } =
+			select( commandsStore );
+		return {
+			isOpen: isOpen(),
 			loadersLoading: unlock( select( commandsStore ) ).isLoading(),
-		} ),
-		[]
-	);
+			staticCommands: getCommands( false ),
+			contextualCommands: getCommands( true ),
+			staticLoaders: getCommandLoaders( false ),
+			contextualLoaders: getCommandLoaders( true ),
+		};
+	}, [] );
 	const { open, close } = useDispatch( commandsStore );
+	const hasRecentCommands = useHasRecentCommands();
+
+	// Aggregate the commands resolved by each dynamic loader. Each loader runs
+	// in its own `LoaderRunner` component and reports back here. Re-rendering is
+	// driven by `rendersTheSame`, so a loader that rebuilds equivalent commands
+	// on every render does not churn the list. The newest objects are still kept
+	// in a ref, because their callbacks close over state that the compared
+	// fields do not reflect.
+	const latestLoaderCommands = useRef( new Map() );
+	const [ resolvedMap, setResolvedMap ] = useState( () => new Map() );
+	const onResolved = useCallback( ( loaderName, cmds ) => {
+		latestLoaderCommands.current.set( loaderName, cmds );
+		setResolvedMap( ( prev ) => {
+			const prevCmds = prev.get( loaderName );
+			if (
+				prevCmds &&
+				prevCmds.length === cmds.length &&
+				prevCmds.every( ( c, i ) => rendersTheSame( c, cmds[ i ] ) )
+			) {
+				return prev;
+			}
+			const next = new Map( prev );
+			next.set( loaderName, cmds );
+			return next;
+		} );
+	}, [] );
+
+	// The rendered command object can predate the loader's latest report, so
+	// look the command up again before running it.
+	const runCommand = useCallback( ( command, closeMenu ) => {
+		recordUsage( command.name );
+		let latest;
+		for ( const cmds of latestLoaderCommands.current.values() ) {
+			latest = cmds.find( ( c ) => c.name === command.name );
+			if ( latest ) {
+				break;
+			}
+		}
+		( latest ?? command ).callback( { close: closeMenu } );
+	}, [] );
+
+	const loaders = useMemo(
+		() => [ ...contextualLoaders, ...staticLoaders ],
+		[ contextualLoaders, staticLoaders ]
+	);
+	// Only run the loaders whose results can actually be shown. With no search
+	// term the non-contextual ones matter solely for resolving recently used
+	// commands, and running them anyway makes the loaders that ignore `search`
+	// fetch on every open.
+	const activeLoaders = useMemo(
+		() => ( search || hasRecentCommands ? loaders : contextualLoaders ),
+		[ search, hasRecentCommands, loaders, contextualLoaders ]
+	);
+	const contextualLoaderNames = useMemo(
+		() => new Set( contextualLoaders.map( ( loader ) => loader.name ) ),
+		[ contextualLoaders ]
+	);
+	// Commands returned by a loader hook never pass through `registerCommand`,
+	// so they have no category of their own unless the hook sets one. The
+	// loader's category stands in for them.
+	const loaderCategories = useMemo(
+		() =>
+			new Map(
+				loaders.map( ( loader ) => [ loader.name, loader.category ] )
+			),
+		[ loaders ]
+	);
+
+	const { allLoaderCommands, contextualLoaderCommands } = useMemo( () => {
+		const all = [];
+		const contextual = [];
+		for ( const [ name, cmds ] of resolvedMap ) {
+			const loaderCategory = loaderCategories.get( name );
+			const categorized = cmds.map( ( command ) =>
+				command.category
+					? command
+					: { ...command, category: loaderCategory }
+			);
+			all.push( ...categorized );
+			if ( contextualLoaderNames.has( name ) ) {
+				contextual.push( ...categorized );
+			}
+		}
+		return {
+			allLoaderCommands: all,
+			contextualLoaderCommands: contextual,
+		};
+	}, [ resolvedMap, contextualLoaderNames, loaderCategories ] );
+
+	const allCommands = useMemo(
+		() => [
+			...contextualCommands,
+			...staticCommands,
+			...allLoaderCommands,
+		],
+		[ contextualCommands, staticCommands, allLoaderCommands ]
+	);
+
+	const recentCommands = useRecentCommands( allCommands );
+
+	// Build the grouped item list passed to `Autocomplete`. The groups shown
+	// depend on whether a search term is present, mirroring the previous
+	// Recent / Suggestions / Results behavior.
+	const groups = useMemo( () => {
+		if ( search ) {
+			const results = rankCommands( allCommands, search );
+			return results.length
+				? [
+						{
+							key: 'results',
+							label: __( 'Results' ),
+							search,
+							items: results,
+						},
+				  ]
+				: EMPTY_ARRAY;
+		}
+
+		const result = [];
+
+		// Recent.
+		if ( recentCommands.length ) {
+			result.push( {
+				key: 'recent',
+				label: __( 'Recent' ),
+				search: '',
+				items: recentCommands,
+			} );
+		}
+
+		// Suggestions (contextual commands and loaders only).
+		const suggestions = dedupeCommands( [
+			...contextualCommands,
+			...contextualLoaderCommands,
+		] );
+		if ( suggestions.length ) {
+			result.push( {
+				key: 'suggestions',
+				label: __( 'Suggestions' ),
+				search: '',
+				items: suggestions,
+			} );
+		}
+
+		return result;
+	}, [
+		search,
+		allCommands,
+		recentCommands,
+		contextualCommands,
+		contextualLoaderCommands,
+	] );
+
+	const inputRef = useRef();
+	useEffect( () => {
+		// Focus the command palette input when mounting the modal.
+		if ( paletteIsOpen ) {
+			inputRef.current?.focus();
+		}
+	}, [ paletteIsOpen ] );
 
 	useEffect( () => {
 		registerShortcut( {
@@ -345,6 +442,8 @@ export function CommandMenu() {
 		return false;
 	}
 
+	const showEmpty = !! search && ! loadersLoading && ! groups.length;
+
 	return (
 		<Modal
 			className="commands-command-menu"
@@ -355,28 +454,83 @@ export function CommandMenu() {
 			contentLabel={ __( 'Command palette' ) }
 		>
 			<div className="commands-command-menu__container">
-				<Command label={ inputLabel } loop>
+				<Autocomplete.Root
+					items={ groups }
+					// Also turns off the built-in substring filter, leaving
+					// `rankCommands` in charge. Any other mode would filter the
+					// ranked results again and drop non-substring matches.
+					mode="none"
+					value={ search }
+					onValueChange={ setSearch }
+					open
+					inline
+					// `true` only highlights once a query is typed, which
+					// leaves Enter dead right after opening the palette.
+					autoHighlight="always"
+				>
+					{ activeLoaders.map( ( loader ) => (
+						<LoaderRunnerWrapper
+							key={ loader.name }
+							loader={ loader }
+							search={ search }
+							onResolved={ onResolved }
+						/>
+					) ) }
 					<div className="commands-command-menu__header">
 						<Icon
 							className="commands-command-menu__header-search-icon"
 							icon={ inputIcon }
 						/>
-						<CommandInput
-							search={ search }
-							setSearch={ setSearch }
+						<Autocomplete.Input
+							ref={ inputRef }
+							placeholder={ inputLabel }
+							aria-label={ inputLabel }
+							className="commands-command-menu__input"
+							// Render a plain input so the palette keeps its
+							// borderless appearance instead of the design
+							// system's bordered input control.
+							render={ <input /> }
 						/>
 					</div>
-					<Command.List label={ __( 'Command suggestions' ) }>
-						{ search && ! loadersLoading && (
-							<Command.Empty>
-								{ __( 'No results found.' ) }
-							</Command.Empty>
-						) }
-						{ ! search && <RecentGroup /> }
-						{ ! search && <SuggestionsGroup /> }
-						{ search && <ResultsGroup search={ search } /> }
-					</Command.List>
-				</Command>
+					<Autocomplete.List
+						className="commands-command-menu__list"
+						aria-label={ __( 'Command suggestions' ) }
+					>
+						{ /* This element is the `role="status"` live region:
+						     unmounting it would drop the announcement. */ }
+						<Autocomplete.Empty className="commands-command-menu__empty">
+							{ showEmpty ? __( 'No results found.' ) : null }
+						</Autocomplete.Empty>
+						<Autocomplete.ListBody className="commands-command-menu__list-scrollable-container">
+							<Autocomplete.Collection>
+								{ ( group ) => (
+									<Autocomplete.Group
+										key={ group.key }
+										items={ group.items }
+										className="commands-command-menu__group"
+									>
+										<Autocomplete.GroupLabel>
+											{ group.label }
+										</Autocomplete.GroupLabel>
+										<Autocomplete.Collection>
+											{ ( command ) => (
+												<CommandItem
+													key={ command.name }
+													command={ command }
+													search={ group.search }
+													category={
+														command.category
+													}
+													onRun={ runCommand }
+												/>
+											) }
+										</Autocomplete.Collection>
+									</Autocomplete.Group>
+								) }
+							</Autocomplete.Collection>
+						</Autocomplete.ListBody>
+					</Autocomplete.List>
+				</Autocomplete.Root>
 			</div>
 		</Modal>
 	);
