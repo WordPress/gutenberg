@@ -6,7 +6,7 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { useDispatch } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { createElement, useEffect } from '@wordpress/element';
 import {
 	initializeEditor,
 	selectBlock,
@@ -32,7 +32,7 @@ function ViewportStateInitializer() {
 		setStyleStateViewport( '@mobile' );
 	}, [ setResponsiveEditing, setStyleStateViewport ] );
 
-	return <div { ...useBlockProps() } />;
+	return createElement( 'div', useBlockProps() );
 }
 
 /**
@@ -137,7 +137,7 @@ describe( 'Gallery block', () => {
 				createGallery( { layout: { type: 'grid' } } ),
 				createBlock( VIEWPORT_STATE_INITIALIZER ),
 			] );
-			await selectBlock( 'Block: Grid Gallery' );
+			await selectBlock( 'Block: Gallery Grid' );
 
 			expect(
 				screen.queryByRole( 'tab', { name: 'Settings' } )
