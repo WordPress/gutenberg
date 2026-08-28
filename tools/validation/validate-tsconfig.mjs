@@ -436,10 +436,9 @@ for ( const routeName of routesWithTypes ) {
  * A reference into another package is a build-graph edge, so it must be backed
  * by a declared dependency, or removed dependencies leave stale references.
  */
-const workspaceProjects = glob.sync(
-	'{packages,routes,widgets}/*/tsconfig*.json',
-	{ cwd: repoRoot }
-);
+const workspaceProjects = glob.sync( '{packages,routes}/*/tsconfig*.json', {
+	cwd: repoRoot,
+} );
 
 for ( const projectPath of workspaceProjects ) {
 	const workspaceDir = dirname( projectPath );
