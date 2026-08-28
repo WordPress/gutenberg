@@ -7620,6 +7620,9 @@
 		}
 	},
 	"packages/format-library/src/non-breaking-space/index.jsx": {
+		"react-hooks/refs": {
+			"count": 2
+		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
