@@ -10,6 +10,7 @@
 
 -   Remove unused dependencies `@wordpress/hooks`, `@wordpress/primitives`, `@wordpress/router`, etc. ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Update a source reference after its JSX file moved to the `.jsx` extension ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+-   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
 
 ## 0.46.0 (2026-08-26)
 

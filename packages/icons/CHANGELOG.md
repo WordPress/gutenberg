@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Stroke-based icons now declare `fill: none` via inline `style` on the outer `<svg>` instead of the `fill` attribute, so the source's intent survives ordinary third-party CSS overrides like `.foo svg { fill: currentColor }` without using `!important`. Consumers should use CSS `color` to recolor icons. A `fill` prop or ordinary CSS `fill` declaration no longer overrides the intrinsic `fill: none`; pass `style={ { fill: value } }` to deliberately replace it. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+-   Stroke-based icons use `vector-effect="non-scaling-stroke"`, so their stroke width stays constant when rendered outside the Icon block at sizes other than 24px. The Icon block deliberately restores the previous proportional stroke scaling. When new bundled icon elements run with an older externalized `wp.components.Icon`, supplying an unrelated `style` prop can replace the icon's intrinsic style; update the paired packages together to retain merged styles. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+
+### Enhancements
+
+-   Redraw 35 icons as stroke-based for variable stroke-width support, and introduce the `vector-effect="non-scaling-stroke"` convention so stroke weight stays consistent across icon sizes (originally landed in [#78774](https://github.com/WordPress/gutenberg/pull/78774), reverted in [#78854](https://github.com/WordPress/gutenberg/pull/78854) due to CSS-override regressions, re-introduced here with the resilience fix): `addCard`, `addTemplate`, `cancelCircleFilled`, `caution`, `cautionFilled`, `code`, `commentAuthorAvatar`, `cover`, `currencyDollar`, `currencyEuro`, `currencyPound`, `drafts`, `help`, `helpFilled`, `image`, `info`, `lifesaver`, `link`, `linkOff`, `navigation`, `notAllowed`, `paragraph`, `pending`, `plusCircle`, `plusCircleFilled`, `published`, `scheduled`, `siteLogo`, `square`, `starEmpty`, `starFilled`, `starHalf`, `styles`, `time`, `tip`. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+
+### Bug Fixes
+
+-   `Icon`: Merge a consumer-supplied `style` prop with the icon's intrinsic styles instead of replacing them, so styles like `fill: none` on stroke-based icons survive unless the consumer overrides the same property explicitly. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+
 ## 15.5.0 (2026-08-26)
 
 ### Internal

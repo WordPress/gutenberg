@@ -2,11 +2,17 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `SidebarNavigationItem`: Stop forcing `style={ { fill: 'currentcolor' } }` on the icon. The explicit override was clobbering stroke-based icons' intrinsic styling. Colour is inherited via CSS `color` and the icon's own declared fills/strokes. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+-   `AddNewTemplate`: Preserve the admin theme color on the Author template icon after it became stroke-based. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+
 ### Internal
 
 -   Remove the `showListViewByDefault` handling from `useAdaptEditorToCanvas`; the `editor` package now applies the preference on the preview ↔ edit transition itself.
 -   Remove unused dependencies `@wordpress/blob`, `@wordpress/date`, `@wordpress/escape-html`, etc. ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+-   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
 
 ## 7.3.0 (2026-08-26)
 
