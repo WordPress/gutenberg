@@ -52,6 +52,9 @@
 	   ----------------------------------------------------------------------- */
 
 	.wrap h1 {
+		/* Core gives the page title no margin: it shares a header row with the
+		   page action beside it. */
+		margin-block: 0;
 		font-family: var(--wpds-typography-font-family-heading);
 		font-size: var(--wpds-typography-font-size-xl);
 		font-weight: var(--wpds-typography-font-weight-emphasis);
@@ -95,6 +98,24 @@
 		font-family: var(--wpds-typography-font-family-heading);
 		/* Already Core's value; expressed here as the token it always was. */
 		font-weight: var(--wpds-typography-font-weight-emphasis);
+		/*
+		 * Core's heading margins are the browser defaults — .67em, 1em, 1.33em,
+		 * 1.67em, 2.33em — and those multipliers were tuned against Core's own
+		 * sizes so every level landed on roughly the same 17 to 20px. Changing
+		 * the sizes leaves the multipliers behind: h3 ends up with less space
+		 * than h4, and h6 with the most of any heading.
+		 *
+		 * One rhythm for every level replaces them, from the gap scale, with more
+		 * space above than below so a heading binds to what it introduces rather
+		 * than floating between blocks. The combined space between blocks stays
+		 * close to what Core produced; it is distributed differently.
+		 *
+		 * There is nothing to copy from the design system here. `Text` sets
+		 * `margin: 0` and spacing comes from `gap` on a flex container, so this
+		 * is classic's own rhythm expressed in tokens rather than a rhythm
+		 * adopted from the system.
+		 */
+		margin-block: var(--wpds-dimension-gap-xl) var(--wpds-dimension-gap-sm);
 	}
 
 	h1 {
@@ -223,5 +244,6 @@
 		font-size: revert-layer;
 		font-weight: revert-layer;
 		line-height: revert-layer;
+		margin-block: revert-layer;
 	}
 }
