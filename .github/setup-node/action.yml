@@ -17,7 +17,7 @@ runs:
               node-version-file: ${{ inputs.node-version == '' && '.nvmrc' || '' }}
               node-version: ${{ inputs.node-version }}
               package-manager-cache: ${{ inputs.enable-caching == 'true' && 'true' || 'false' }}
-              # Caching for npm dependencies is automatically enabled when package.json contains devEngines.packageManager field set cache: npm
+              # Caching for npm dependencies is automatically enabled when package.json contains devEngines.packageManager field set to npm.
               cache-dependency-path: |
                   package-lock.json
                   patches/**
