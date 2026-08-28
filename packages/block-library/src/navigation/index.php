@@ -1239,9 +1239,28 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 			'class_name' => 'has-child',
 		)
 	) ) {
+		$computed_visibility = block_core_navigation_get_submenu_visibility( $block_attributes );
+		$open_on_hover       = 'hover' === $computed_visibility;
+		$open_on_click       = 'click' === $computed_visibility;
+
 		// Add directives to the parent `<li>`.
 		$tags->set_attribute( 'data-wp-interactive', 'core/navigation' );
-		$tags->set_attribute( 'data-wp-context', '{ "submenuOpenedBy": { "click": false, "hover": false, "focus": false }, "type": "submenu", "modal": null, "previousFocus": null }' );
+		$tags->set_attribute(
+			'data-wp-context',
+			wp_json_encode(
+				array(
+					'submenuOpenedBy' => array(
+						'click' => false,
+						'hover' => false,
+						'focus' => false,
+					),
+					'type'            => 'submenu',
+					'openOnClick'     => $open_on_click,
+					'modal'           => null,
+					'previousFocus'   => null,
+				)
+			)
+		);
 		$tags->set_attribute( 'data-wp-watch', 'callbacks.initMenu' );
 		$tags->set_attribute( 'data-wp-on--focusout', 'actions.handleMenuFocusout' );
 		$tags->set_attribute( 'data-wp-on--keydown', 'actions.handleMenuKeydown' );
@@ -1251,9 +1270,6 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 		// an overlay to capture the clicks, instead of relying on the focusout
 		// event.
 		$tags->set_attribute( 'tabindex', '-1' );
-
-		$computed_visibility = block_core_navigation_get_submenu_visibility( $block_attributes );
-		$open_on_hover       = 'hover' === $computed_visibility;
 
 		if ( $open_on_hover ) {
 			$tags->set_attribute( 'data-wp-on--pointerenter', 'actions.openMenuOnHover' );
