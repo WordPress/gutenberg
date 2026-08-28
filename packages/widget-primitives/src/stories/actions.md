@@ -63,3 +63,33 @@ The widget lists its actions; it never specifies where they go. The host maps th
 `relevance` carries the widget's side of that decision: `'high'` marks an action worth the most prominent surface, `'medium'` one worth persistent but compact visibility, and `'low'` (the default) the rest. Attributes use the same vocabulary: the widget declares intent, and the host owns the surface.
 
 The dashboard maps it as: `'high'` as text links in a persistent footer, `'medium'` beside them as compact icon affordances, the rest in the "More" menu. Full-bleed widgets keep every action in the menu.
+
+## Runtime actions
+
+A declaration is static: it exists before the widget mounts and knows nothing of what the widget loads. Some verbs only exist once it does: a label with a count, a target that follows the instance's attributes, a download of the rows on screen. A mounted widget declares those through `useWidgetActions`, with the same envelope and one fulfillment: `href`, as declared, or `callback`, a function the host runs when the action is triggered, pending while a returned promise settles.
+
+```ts
+const actions = useMemo< WidgetRuntimeAction[] >(
+	() =>
+		rows.length > 0
+			? [
+					{
+						id: 'export',
+						label: __( 'Download CSV' ),
+						relevance: 'medium',
+						callback: () => downloadBlob( 'report.csv', toCsv( rows ) ),
+					},
+				]
+			: [],
+	[ rows ]
+);
+const hosted = useWidgetActions( actions );
+```
+
+Three rules hold the two sources together:
+
+-   **Conditioned by not declaring.** The list replaces the previous one; an action that does not apply right now is left out, and the host withdraws it.
+-   **The manifest is the baseline, the runtime upgrades it.** A runtime action carrying a declared action's `id` takes its place. The declared "Details" shows while loading; once the counts arrive, "Review 3 items" with the filtered target replaces it.
+-   **Placement stays the host's.** Runtime actions ride the same `relevance` scale; the widget still never names a surface.
+
+`useWidgetActions` returns whether the host took the actions. Under a host without the `actions` capability it returns `false`, and the widget keeps rendering its own affordance, the same fallback a link keeps without `links`.

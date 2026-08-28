@@ -14,7 +14,7 @@ A widget renders inside a host, and the host inside an application. Some of what
 
 The provider merges its value over the inherited one, so an application can mount a base host once and layer capabilities per subtree. Reading without any provider yields `{}`.
 
-The provider belongs to the application layer, wrapping the dashboard or whatever surface renders widgets. The rendering engine never mounts one for itself, and keeps no dependency on the application's router.
+The application mounts the provider, wrapping the dashboard or whatever surface renders widgets, and the rendering engine keeps no dependency on the application's router. A host nests one only to bind a capability to the instance it renders, as `actions` below.
 
 ## The `links` capability
 
@@ -33,6 +33,20 @@ links: {
 `match` answers one question: does this href target one of the application's own routes? On a hit it returns the in-app route, `'/sales?by=day'`, path and query as the router takes them, and the consumer mounts `Link` with it, so the navigation is client-side. On `null` the consumer falls back to a plain anchor.
 
 The action declaration does not change either way. A widget declares the portable URL of its target, `admin.php?page=analytics&p=%2Fsales%3Fby%3Dday`, the route encoded inside `p` with its query; in the owning application that materializes as a router link, everywhere else as a plain anchor that full-loads to the same place. Recognition is the application's: reachability depends on the routes it registered, which change per application and over time.
+
+## The `actions` capability
+
+```ts
+actions: {
+	declare: ( actions: WidgetRuntimeAction[] ) => void;
+}
+```
+
+`declare` takes the actions a mounted widget wants placed for its own instance, the ones its declaration cannot know: a label with a count, a target that follows the instance's attributes, a download of the rows it loaded. The list replaces the previous one; an empty list withdraws it. A runtime action carrying a declared action's `id` takes that action's place, so a static declaration is the baseline and the runtime upgrades it once the widget knows more.
+
+The host binds the capability to the instance where it mounts the widget's render, so the widget never names which instance it is. The widget's side is `useWidgetActions`, which declares in a layout effect and withdraws on unmount. Without the capability the hook returns `false`, and the widget keeps rendering its own affordances.
+
+The runtime list carries data, not UI: the same envelope as a declared action and one fulfillment, `href` or `callback`. Placement and materialization stay the host's, as for declared actions.
 
 ## Providing it
 
@@ -63,6 +77,21 @@ render(
 );
 
 expect( ref.current ).toBe( screen.getByRole( 'link', { name: 'Reports' } ) );
+```
+
+### `actions`, bound per instance
+
+A host that places actions binds `declare` per instance where it mounts the render, nesting a provider over the application's: the merge keeps `links` in reach.
+
+```tsx
+const host = useMemo< WidgetHost >(
+	() => ( { actions: { declare: ( actions ) => place( uuid, actions ) } } ),
+	[ place, uuid ]
+);
+
+<WidgetHostProvider value={ host }>
+	<WidgetRender { ...props } />
+</WidgetHostProvider>;
 ```
 
 ## Consuming it

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `useWidgetActions( actions )`: a mounted widget declares the actions it wants placed by its host, computed from what its render knows; an action is conditioned by not declaring it, and one carrying a declared action's `id` takes its place. `WidgetHost` gains the `actions` capability (`WidgetHostActions.declare`) hosts bind per instance. Types `WidgetActionEnvelope`, `WidgetCallbackAction` (the runtime-only `callback` fulfillment) and `WidgetRuntimeAction` ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+
 ### Internal
 
 -   Keep Vite from analyzing host-provided widget metadata URLs in `useWidgetTypes`. ([#83602](https://github.com/WordPress/gutenberg/pull/83602))

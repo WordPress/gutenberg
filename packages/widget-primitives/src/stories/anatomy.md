@@ -67,6 +67,8 @@ The pattern matches attributes: the widget declares the intent, and the host dec
 
 The host never interprets what an action _means_, only how to offer it: which primitive to mount, and where. For a link that means mounting a real link primitive wherever the surface allows one, and deciding how to reach the target, which the widget cannot know (see **Actions**).
 
+A mounted widget can also declare actions at runtime, through `useWidgetActions`, for the verbs its declaration cannot know: a count in the label, a target that follows the instance's attributes, a download of what it loaded. Same envelope, same placement rules; a runtime action carrying a declared `id` takes its place.
+
 ## Why the split matters
 
 Each layer is consumed by one verb: identity is _copied_, framing is _translated_, representation is _rendered_. Each verb is a boundary of ownership.

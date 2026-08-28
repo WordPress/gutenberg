@@ -70,17 +70,10 @@ export interface WidgetHelp {
 export type WidgetRelevance = 'high' | 'medium' | 'low';
 
 /**
- * A user-triggerable verb a widget type declares. The declaration is
- * serializable data: an envelope (`id`, `label`, optional `icon` and
- * `relevance`) plus exactly one fulfillment, named by the key carrying it.
- * Today the only key is `href`, so the only fulfillment is a link.
- *
- * The host owns what follows: which primitive materializes the fulfillment,
- * and where the affordance is placed. For a link that means mounting a real
- * link primitive wherever the surface allows one, so middle-click, copy
- * address, and the anchor role survive.
+ * What every action carries, whatever fulfills it: the identity a host
+ * places and labels.
  */
-export interface WidgetAction {
+export interface WidgetActionEnvelope {
 	/**
 	 * Stable identifier, local to the widget type.
 	 */
@@ -103,7 +96,20 @@ export interface WidgetAction {
 	 * How relevant the action is among the widget's actions.
 	 */
 	relevance?: WidgetRelevance;
+}
 
+/**
+ * A user-triggerable verb a widget type declares. The declaration is
+ * serializable data: an envelope (`id`, `label`, optional `icon` and
+ * `relevance`) plus exactly one fulfillment, named by the key carrying it.
+ * Today the only key is `href`, so the only fulfillment is a link.
+ *
+ * The host owns what follows: which primitive materializes the fulfillment,
+ * and where the affordance is placed. For a link that means mounting a real
+ * link primitive wherever the surface allows one, so middle-click, copy
+ * address, and the anchor role survive.
+ */
+export interface WidgetAction extends WidgetActionEnvelope {
 	/**
 	 * Link fulfillment: the destination. A URL, an admin path, or a
 	 * widget-local file.
@@ -122,6 +128,26 @@ export interface WidgetAction {
 	 */
 	openInNewTab?: boolean;
 }
+
+/**
+ * An action fulfilled by a function: triggering it runs `callback`. A
+ * function does not serialize, so this form never appears in a widget
+ * type; a mounted widget declares it for its own instance through
+ * `useWidgetActions`, closing over the state only the render has.
+ */
+export interface WidgetCallbackAction extends WidgetActionEnvelope {
+	/**
+	 * Callback fulfillment: what triggering the action runs. A returned
+	 * promise keeps the affordance pending until it settles.
+	 */
+	callback: () => void | Promise< void >;
+}
+
+/**
+ * An action as a host materializes it: the type's declared link, or one
+ * of either fulfillment a mounted widget declares at runtime.
+ */
+export type WidgetRuntimeAction = WidgetAction | WidgetCallbackAction;
 
 /**
  * Wire form of a `WidgetAction`, as carried by a `WidgetModuleRecord`:
