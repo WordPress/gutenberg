@@ -101,7 +101,9 @@ It also needs a newer Node than the repository — see `.nvmrc`.
 cd test/ai-development && nvm use && npm install
 ```
 
-Claude uses your existing Claude Code login. Model calls consume the associated quota or paid usage.
+Runs go through [Claude Code](https://claude.com/claude-code), so it has to be
+installed and signed in — run `claude`, then `/login`, before the first eval.
+Model calls consume the associated quota or paid usage.
 
 ## Run
 
