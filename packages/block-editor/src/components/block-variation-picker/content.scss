@@ -16,6 +16,7 @@
 	font-size: $helptext-font-size;
 
 	svg {
+		fill: $gray-600;
 		color: $gray-600 !important;
 	}
 
@@ -28,6 +29,7 @@
 	}
 
 	.components-button:hover svg {
+		fill: var(--wp-admin-theme-color);
 		color: var(--wp-admin-theme-color) !important;
 	}
 
