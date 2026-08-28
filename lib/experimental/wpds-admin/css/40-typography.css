@@ -189,4 +189,39 @@
 		line-height: 1.6;
 		line-height: calc(var(--wpds-typography-line-height-md) / var(--wpds-typography-font-size-lg));
 	}
+
+	/* -----------------------------------------------------------------------
+	   Defer to Core on the About screens
+
+	   SCAFFOLDING. This exists because of how the restyle reaches Core, not
+	   because of anything it decides, and it is deleted when the restyle is
+	   ported into Core.
+
+	   About is art-directed per release and is exempt from this work, the same
+	   way it is excluded from the radius consolidation. Core protects it with
+	   specificity — `.about-php .about__header-title h1` is (0,2,1) against a
+	   bare `h1` at (0,0,1), which wins comfortably in a normal cascade.
+
+	   It does not win here. Layer order is compared before specificity, so a
+	   bare selector in this layer beats a far more specific one in `wp-legacy`,
+	   and the 64px hero heading collapsed to 20px.
+
+	   `revert-layer` hands those elements back to the layer below rather than
+	   restating any of Core's values, so About keeps whatever it is designed to
+	   have, now and after it is redesigned. Once this styling lives in Core there
+	   are no layers, About's specificity works again, and this block goes.
+	   ----------------------------------------------------------------------- */
+
+	.about__container h1,
+	.about__container h2,
+	.about__container h3,
+	.about__container h4,
+	.about__container h5,
+	.about__container h6,
+	.about__header-title h1 {
+		font-family: revert-layer;
+		font-size: revert-layer;
+		font-weight: revert-layer;
+		line-height: revert-layer;
+	}
 }
