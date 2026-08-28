@@ -56,16 +56,22 @@ import {
 	LINK_DESTINATION_NONE,
 	LINK_DESTINATION_LIGHTBOX,
 	DEFAULT_MEDIA_SIZE_SLUG,
+	MAX_COLUMNS,
 } from './constants';
 import useImageSizes from './use-image-sizes';
 import useGetNewImages from './use-get-new-images';
 import useGetMedia from './use-get-media';
-import GalleryGapCustomProperties from './gap-styles';
+import GalleryFlexStyles from './flex-styles';
 import useDynamicGallery from './use-dynamic-gallery';
 import { GallerySourcePanel, GalleryDynamicView } from './dynamic-gallery';
 import { getDynamicSource, ATTACHED_MEDIA } from './dynamic-source';
+import { unlock } from '../lock-unlock';
+import {
+	getViewportGalleryStyle,
+	getUpdatedGalleryStyle,
+	isValidGalleryColumns,
+} from './responsive-styles';
 
-const MAX_COLUMNS = 8;
 const LINK_OPTIONS = [
 	{
 		icon: customLink,
@@ -218,32 +224,64 @@ export default function GalleryEdit( props ) {
 		}
 	}, [ layout, setAttributes, __unstableMarkNextChangeAsNotPersistent ] );
 
-	const { getBlock, getSettings, innerBlockImages, multiGallerySelection } =
-		useSelect(
-			( select ) => {
-				const {
-					getBlockName,
-					getMultiSelectedBlockClientIds,
-					getSettings: _getSettings,
-					getBlock: _getBlock,
-				} = select( blockEditorStore );
-				const multiSelectedClientIds = getMultiSelectedBlockClientIds();
+	const {
+		getBlock,
+		getSettings,
+		innerBlockImages,
+		multiGallerySelection,
+		selectedStyleState,
+	} = useSelect(
+		( select ) => {
+			const {
+				getBlockName,
+				getMultiSelectedBlockClientIds,
+				getSettings: _getSettings,
+				getBlock: _getBlock,
+				getSelectedBlockStyleState,
+			} = unlock( select( blockEditorStore ) );
+			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
 
-				return {
-					getBlock: _getBlock,
-					getSettings: _getSettings,
-					innerBlockImages:
-						_getBlock( clientId )?.innerBlocks ?? EMPTY_ARRAY,
-					multiGallerySelection:
-						multiSelectedClientIds.length &&
-						multiSelectedClientIds.every(
-							( _clientId ) =>
-								getBlockName( _clientId ) === 'core/gallery'
-						),
-				};
-			},
-			[ clientId ]
-		);
+			return {
+				getBlock: _getBlock,
+				getSettings: _getSettings,
+				innerBlockImages:
+					_getBlock( clientId )?.innerBlocks ?? EMPTY_ARRAY,
+				multiGallerySelection:
+					multiSelectedClientIds.length &&
+					multiSelectedClientIds.every(
+						( _clientId ) =>
+							getBlockName( _clientId ) === 'core/gallery'
+					),
+				selectedStyleState: getSelectedBlockStyleState( clientId ),
+			};
+		},
+		[ clientId ]
+	);
+	const isViewportStyleState =
+		selectedStyleState?.viewport &&
+		selectedStyleState.viewport !== 'default';
+	const viewportStyle = isViewportStyleState
+		? getViewportGalleryStyle(
+				attributes.style,
+				selectedStyleState.viewport
+		  )
+		: {};
+	const baseColumns = isValidGalleryColumns( columns ) ? columns : undefined;
+	const baseImageCrop = typeof imageCrop === 'boolean' ? imageCrop : true;
+	const hasViewportColumns =
+		isViewportStyleState &&
+		Object.hasOwn( viewportStyle, 'columns' ) &&
+		isValidGalleryColumns( viewportStyle.columns );
+	const hasViewportImageCrop =
+		isViewportStyleState &&
+		Object.hasOwn( viewportStyle, 'imageCrop' ) &&
+		typeof viewportStyle.imageCrop === 'boolean';
+	const activeColumns = hasViewportColumns
+		? viewportStyle.columns
+		: baseColumns;
+	const activeImageCrop = hasViewportImageCrop
+		? viewportStyle.imageCrop
+		: baseImageCrop;
 
 	const images = useMemo(
 		() =>
@@ -536,12 +574,31 @@ export default function GalleryEdit( props ) {
 		);
 	}
 
+	function setGalleryFlexSettings( settings ) {
+		if ( ! isViewportStyleState ) {
+			setAttributes( settings );
+			return;
+		}
+
+		setAttributes( {
+			style: getUpdatedGalleryStyle( {
+				style: attributes.style,
+				viewport: selectedStyleState.viewport,
+				baseSettings: {
+					columns: baseColumns,
+					imageCrop: baseImageCrop,
+				},
+				settings,
+			} ),
+		} );
+	}
+
 	function setColumnsNumber( value ) {
-		setAttributes( { columns: value } );
+		setGalleryFlexSettings( { columns: value } );
 	}
 
 	function toggleImageCrop() {
-		setAttributes( { imageCrop: ! imageCrop } );
+		setGalleryFlexSettings( { imageCrop: ! activeImageCrop } );
 	}
 
 	function toggleRandomOrder() {
@@ -666,6 +723,7 @@ export default function GalleryEdit( props ) {
 		className: clsx(
 			className,
 			'has-nested-images',
+			`wp-block-gallery-${ clientId }`,
 			// In dynamic mode there are no inner blocks and the gallery isn't
 			// rendered through the `Gallery` component, so the classes that
 			// component normally composes onto the `<figure>` (see `gallery.jsx`)
@@ -750,15 +808,31 @@ export default function GalleryEdit( props ) {
 
 	return (
 		<>
-			<InspectorControls>
-				<GallerySourcePanel
-					dynamic={ dynamic }
-					dropdownMenuProps={ dropdownMenuProps }
-					hasImages={ hasImages }
-				/>
+			<InspectorControls
+				group={
+					isViewportStyleState && isFlexLayout
+						? 'viewport'
+						: 'default'
+				}
+			>
+				{ ! isViewportStyleState && (
+					<GallerySourcePanel
+						dynamic={ dynamic }
+						dropdownMenuProps={ dropdownMenuProps }
+						hasImages={ hasImages }
+					/>
+				) }
 				<ToolsPanel
 					label={ __( 'Settings' ) }
 					resetAll={ () => {
+						if ( isViewportStyleState ) {
+							setGalleryFlexSettings( {
+								columns: undefined,
+								imageCrop: undefined,
+							} );
+							return;
+						}
+
 						setAttributes( {
 							navigationButtonType: 'icon',
 							randomOrder: false,
@@ -785,15 +859,18 @@ export default function GalleryEdit( props ) {
 							isShownByDefault
 							label={ __( 'Columns' ) }
 							hasValue={ () =>
-								!! columns && columns !== displayedImageCount
+								isViewportStyleState
+									? hasViewportColumns
+									: !! activeColumns &&
+									  activeColumns !== displayedImageCount
 							}
 							onDeselect={ () => setColumnsNumber( undefined ) }
 						>
 							<RangeControl
 								label={ __( 'Columns' ) }
 								value={
-									columns
-										? columns
+									activeColumns
+										? activeColumns
 										: defaultColumnsNumber(
 												displayedImageCount
 										  )
@@ -808,60 +885,71 @@ export default function GalleryEdit( props ) {
 							/>
 						</ToolsPanelItem>
 					) }
-					{ imageSizeOptions?.length > 0 && (
-						<ToolsPanelItem
-							isShownByDefault
-							label={ __( 'Resolution' ) }
-							hasValue={ () =>
-								sizeSlug !== DEFAULT_MEDIA_SIZE_SLUG
-							}
-							onDeselect={ () =>
-								updateImagesSize( DEFAULT_MEDIA_SIZE_SLUG )
-							}
-						>
-							<SelectControl
+					{ ! isViewportStyleState &&
+						imageSizeOptions?.length > 0 && (
+							<ToolsPanelItem
+								isShownByDefault
 								label={ __( 'Resolution' ) }
-								help={ __(
-									'Select the size of the source images.'
-								) }
-								value={ sizeSlug }
-								options={ imageSizeOptions }
-								onChange={ updateImagesSize }
-								hideCancelButton
-							/>
-						</ToolsPanelItem>
-					) }
+								hasValue={ () =>
+									sizeSlug !== DEFAULT_MEDIA_SIZE_SLUG
+								}
+								onDeselect={ () =>
+									updateImagesSize( DEFAULT_MEDIA_SIZE_SLUG )
+								}
+							>
+								<SelectControl
+									label={ __( 'Resolution' ) }
+									help={ __(
+										'Select the size of the source images.'
+									) }
+									value={ sizeSlug }
+									options={ imageSizeOptions }
+									onChange={ updateImagesSize }
+									hideCancelButton
+								/>
+							</ToolsPanelItem>
+						) }
 					{ isFlexLayout && (
 						<ToolsPanelItem
 							isShownByDefault
 							label={ __( 'Crop images to fit' ) }
-							hasValue={ () => ! imageCrop }
+							hasValue={ () =>
+								isViewportStyleState
+									? hasViewportImageCrop
+									: ! activeImageCrop
+							}
 							onDeselect={ () =>
-								setAttributes( { imageCrop: true } )
+								setGalleryFlexSettings( {
+									imageCrop: isViewportStyleState
+										? undefined
+										: true,
+								} )
 							}
 						>
 							<ToggleControl
 								label={ __( 'Crop images to fit' ) }
-								checked={ !! imageCrop }
+								checked={ activeImageCrop }
 								onChange={ toggleImageCrop }
 							/>
 						</ToolsPanelItem>
 					) }
-					<ToolsPanelItem
-						isShownByDefault
-						label={ __( 'Randomize order' ) }
-						hasValue={ () => !! randomOrder }
-						onDeselect={ () =>
-							setAttributes( { randomOrder: false } )
-						}
-					>
-						<ToggleControl
+					{ ! isViewportStyleState && (
+						<ToolsPanelItem
+							isShownByDefault
 							label={ __( 'Randomize order' ) }
-							checked={ !! randomOrder }
-							onChange={ toggleRandomOrder }
-						/>
-					</ToolsPanelItem>
-					{ hasLinkTo && (
+							hasValue={ () => !! randomOrder }
+							onDeselect={ () =>
+								setAttributes( { randomOrder: false } )
+							}
+						>
+							<ToggleControl
+								label={ __( 'Randomize order' ) }
+								checked={ !! randomOrder }
+								onChange={ toggleRandomOrder }
+							/>
+						</ToolsPanelItem>
+					) }
+					{ ! isViewportStyleState && hasLinkTo && (
 						<ToolsPanelItem
 							isShownByDefault
 							label={ __( 'Open images in new tab' ) }
@@ -875,62 +963,67 @@ export default function GalleryEdit( props ) {
 							/>
 						</ToolsPanelItem>
 					) }
-					{ aspectRatioOptions.length > 1 && (
-						<ToolsPanelItem
-							hasValue={ () =>
-								!! aspectRatio && aspectRatio !== 'auto'
-							}
-							label={ __( 'Aspect ratio' ) }
-							onDeselect={ () => setAspectRatio( 'auto' ) }
-							isShownByDefault
-						>
-							<SelectControl
+					{ ! isViewportStyleState &&
+						aspectRatioOptions.length > 1 && (
+							<ToolsPanelItem
+								hasValue={ () =>
+									!! aspectRatio && aspectRatio !== 'auto'
+								}
 								label={ __( 'Aspect ratio' ) }
-								help={ __(
-									'Set a consistent aspect ratio for all images in the gallery.'
-								) }
-								value={ aspectRatio }
-								options={ aspectRatioOptions }
-								onChange={ setAspectRatio }
-							/>
-						</ToolsPanelItem>
-					) }
-					{ lightboxSetting?.allowEditing && hasLightboxImages && (
-						<ToolsPanelItem
-							label={ __( 'Navigation button type' ) }
-							isShownByDefault
-							hasValue={ () => navigationButtonType !== 'icon' }
-							onDeselect={ () =>
-								setAttributes( {
-									navigationButtonType: 'icon',
-								} )
-							}
-						>
-							<ToggleGroupControl
+								onDeselect={ () => setAspectRatio( 'auto' ) }
+								isShownByDefault
+							>
+								<SelectControl
+									label={ __( 'Aspect ratio' ) }
+									help={ __(
+										'Set a consistent aspect ratio for all images in the gallery.'
+									) }
+									value={ aspectRatio }
+									options={ aspectRatioOptions }
+									onChange={ setAspectRatio }
+								/>
+							</ToolsPanelItem>
+						) }
+					{ ! isViewportStyleState &&
+						lightboxSetting?.allowEditing &&
+						hasLightboxImages && (
+							<ToolsPanelItem
 								label={ __( 'Navigation button type' ) }
-								value={ navigationButtonType }
-								onChange={ ( value ) =>
+								isShownByDefault
+								hasValue={ () =>
+									navigationButtonType !== 'icon'
+								}
+								onDeselect={ () =>
 									setAttributes( {
-										navigationButtonType: value,
+										navigationButtonType: 'icon',
 									} )
 								}
-								isBlock
-								help={ __(
-									'Adjust the appearance of buttons in the lightbox.'
-								) }
 							>
-								{ NAVIGATION_BUTTON_TYPE_OPTIONS.map(
-									( option ) => (
-										<ToggleGroupControlOption
-											key={ option.value }
-											value={ option.value }
-											label={ option.label }
-										/>
-									)
-								) }
-							</ToggleGroupControl>
-						</ToolsPanelItem>
-					) }
+								<ToggleGroupControl
+									label={ __( 'Navigation button type' ) }
+									value={ navigationButtonType }
+									onChange={ ( value ) =>
+										setAttributes( {
+											navigationButtonType: value,
+										} )
+									}
+									isBlock
+									help={ __(
+										'Adjust the appearance of buttons in the lightbox.'
+									) }
+								>
+									{ NAVIGATION_BUTTON_TYPE_OPTIONS.map(
+										( option ) => (
+											<ToggleGroupControlOption
+												key={ option.value }
+												value={ option.value }
+												label={ option.label }
+											/>
+										)
+									) }
+								</ToggleGroupControl>
+							</ToolsPanelItem>
+						) }
 				</ToolsPanel>
 			</InspectorControls>
 			<BlockControls group="block">
@@ -985,7 +1078,7 @@ export default function GalleryEdit( props ) {
 					</BlockControls>
 				) }
 				{ isFlexLayout && (
-					<GalleryGapCustomProperties
+					<GalleryFlexStyles
 						style={ attributes.style }
 						clientId={ clientId }
 					/>
