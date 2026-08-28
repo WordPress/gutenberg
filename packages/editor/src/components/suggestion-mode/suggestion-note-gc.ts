@@ -27,10 +27,23 @@
  * register their comment id as in flight (provider.js) for their duration,
  * and the note's local record must still be pending (`status: 'hold'`, no
  * `_wp_suggestion_status`) at collection time.
+ *
+ * A note somebody has replied to is never collected (#81958). Trashing a root
+ * comment takes its replies with it, so collecting one would turn "I withdrew
+ * my suggestion" into "I deleted your comment" — silently, and for a reply the
+ * person pressing Ctrl+Z may never have seen. The note is kept and the
+ * withdrawal announced instead, the same trade the format-toggle path makes
+ * (see suggestion-format-keyboard.ts). The replies are counted at the server,
+ * not in the thread list this session loaded: the reply that has to stop a
+ * collection is typically one a colleague wrote after the editor opened.
  */
+import apiFetch from '@wordpress/api-fetch';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as noticesStore } from '@wordpress/notices';
+import { __ } from '@wordpress/i18n';
+import { addQueryArgs } from '@wordpress/url';
 // @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSuggestionOverlay } from './overlay-context';
@@ -46,7 +59,7 @@ import {
 import { findSuggestionRange } from '../inline-suggestions';
 import { getNoteIdsFromMetadata } from '../collab-sidebar/utils';
 import { store as editorStore } from '../../store';
-import { useNoteThreads } from '../collab-sidebar/hooks';
+import { getNoteThreadsQuery, useNoteThreads } from '../collab-sidebar/hooks';
 
 /*
  * Grace period between observing an anchor's disappearance and trashing the
@@ -160,6 +173,7 @@ export default function SuggestionNoteGC() {
 	const { notes } = useNoteThreads( postId );
 	const { entries, clearOverlay } = useSuggestionOverlay();
 	const { saveEntityRecord } = useDispatch( coreStore );
+	const { createNotice } = useDispatch( noticesStore );
 	const registry = useRegistry();
 
 	// Pending suggestion root notes only; replies and resolved notes have no
@@ -262,32 +276,117 @@ export default function SuggestionNoteGC() {
 	const seenRef = useRef( new Set() );
 	// Scheduled collections, keyed by note id.
 	const timersRef = useRef( new Map() );
+	/*
+	 * Notes spared because they carry replies. Kept so the reprieve is decided
+	 * — and announced — once per withdrawal rather than on every later edit
+	 * that re-runs the probe. Cleared when the anchor comes back, so a note
+	 * whose replies are gone by the next withdrawal is collected normally.
+	 */
+	const keptRef = useRef( new Set< string >() );
 
 	useEffect( () => {
 		const blockEditor = registry.select( blockEditorStore );
 		const timers = timersRef.current;
 
-		const collect = ( note: any, anchor: any ) => {
-			timers.delete( String( note.id ) );
-			// Recheck against settled state: the anchor may be back (redo
-			// beat the grace period) or the note may have been decided.
+		/*
+		 * Whether anyone has answered this note, asked of the server rather than
+		 * of the thread list `useNoteThreads` resolved when the editor loaded.
+		 * Nothing refreshes that list for replies written elsewhere, which is the
+		 * case this guard exists for (#81958): a colleague answers the note in
+		 * their own session, the copy here still says nobody did, and the
+		 * withdrawal takes their comment with it. A withdrawal is rare and
+		 * already waits out a grace period, so it can afford the round trip.
+		 *
+		 * Resolves to `null` when the answer is unknown - a request that failed.
+		 */
+		const fetchHasReplies = async ( noteId: number | string ) => {
+			try {
+				const replies: any = await apiFetch( {
+					path: addQueryArgs( '/wp/v2/comments', {
+						...getNoteThreadsQuery( postId as number ),
+						parent: noteId,
+						// Existence is the whole question.
+						per_page: 1,
+						_fields: 'id',
+					} ),
+				} );
+				return replies.length > 0;
+			} catch {
+				return null;
+			}
+		};
+
+		/*
+		 * Whether the withdrawal still stands. Probed before the reply fetch and
+		 * again after it: the fetch is a real round trip, and a redo can put the
+		 * anchor back - or a peer decide the note - while it is in flight.
+		 */
+		const isWithdrawn = ( note: any, anchor: any ) => {
 			if (
 				isAnchorPresent( note, anchor, blockEditor, entriesRef.current )
 			) {
-				return;
+				return false;
 			}
 			if ( isSuggestionDecisionInFlight( note.id ) ) {
-				return;
+				return false;
 			}
 			const record: any = registry
 				.select( coreStore )
 				.getEntityRecord( 'root', 'comment', note.id );
 			const lifecycleStatus = record?.meta?._wp_suggestion_status;
-			if (
-				! record ||
-				record.status !== 'hold' ||
-				( lifecycleStatus && lifecycleStatus !== 'pending' )
-			) {
+			return (
+				!! record &&
+				record.status === 'hold' &&
+				( ! lifecycleStatus || lifecycleStatus === 'pending' )
+			);
+		};
+
+		const collect = async ( note: any, anchor: any ) => {
+			timers.delete( String( note.id ) );
+			// Recheck against settled state: the anchor may be back (redo beat
+			// the grace period) or the note may have been decided.
+			if ( ! isWithdrawn( note, anchor ) ) {
+				return;
+			}
+			const replied = await fetchHasReplies( note.id );
+			if ( ! isWithdrawn( note, anchor ) ) {
+				return;
+			}
+			/*
+			 * Unknown, not "nobody replied". Keep the note, but say nothing and
+			 * latch nothing: announcing would assert replies that may not
+			 * exist, and sparing it for the session would put a healthy orphan
+			 * out of the collector's reach over one failed request. The next
+			 * presence change asks again.
+			 */
+			if ( replied === null ) {
+				return;
+			}
+			// The note is a discussion now, not just a proposal: keep it, and
+			// say so — the person who withdrew the suggestion is the only one
+			// who can see that the note outlived it.
+			if ( replied ) {
+				keptRef.current.add( String( note.id ) );
+				/*
+				 * The replies that spared it may be news to this session too.
+				 * Drop the stale list so the sidebar can show what the snackbar
+				 * is talking about.
+				 */
+				( registry.dispatch( coreStore ) as any ).invalidateResolution(
+					'getEntityRecords',
+					[
+						'root',
+						'comment',
+						getNoteThreadsQuery( postId as number ),
+					]
+				);
+				createNotice(
+					'info',
+					__(
+						'Suggestion withdrawn. The note is kept because it has replies.'
+					),
+					{ type: 'snackbar', isDismissible: true }
+				);
 				return;
 			}
 			saveEntityRecord(
@@ -336,6 +435,7 @@ export default function SuggestionNoteGC() {
 			);
 			if ( present ) {
 				seenRef.current.add( idKey );
+				keptRef.current.delete( idKey );
 				if ( timers.has( idKey ) ) {
 					clearTimeout( timers.get( idKey ) );
 					timers.delete( idKey );
@@ -345,6 +445,7 @@ export default function SuggestionNoteGC() {
 			if (
 				! seenRef.current.has( idKey ) ||
 				timers.has( idKey ) ||
+				keptRef.current.has( idKey ) ||
 				isSuggestionDecisionInFlight( note.id )
 			) {
 				continue;
