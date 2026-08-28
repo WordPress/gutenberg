@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useRegistry, useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { isUnmodifiedBlock, switchToBlockType } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import useOutdentListItem from './use-outdent-list-item';
 
 export default function useMerge( clientId, onMerge ) {

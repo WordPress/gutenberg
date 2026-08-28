@@ -1,14 +1,7 @@
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const fs = require( 'fs/promises' );
 const os = require( 'os' );
 const { randomUUID } = require( 'crypto' );
-
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -49,7 +42,7 @@ test.describe( 'Gallery', () => {
 		} );
 
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await pageUtils.pressKeys( 'primary+v' );
 

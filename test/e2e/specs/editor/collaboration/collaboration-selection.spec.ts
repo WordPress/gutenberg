@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 import { pressKey, LINE_START_KEY } from './fixtures/keyboard-utils';
 

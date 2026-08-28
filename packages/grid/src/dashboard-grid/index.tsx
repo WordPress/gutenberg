@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import {
 	DndContext,
 	DragOverlay,
@@ -10,16 +7,11 @@ import {
 	useSensors,
 } from '@dnd-kit/core';
 import {
-	arrayMove,
 	SortableContext,
 	sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
 import type { DragMoveEvent, DragStartEvent } from '@dnd-kit/core';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useResizeObserver, useEvent, useMergeRefs } from '@wordpress/compose';
 import {
 	forwardRef,
@@ -31,11 +23,8 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { GridItem } from './grid-item';
+import { arrayMoveWithPinned } from '../shared/array-move-with-pinned';
 import { GridOverlay } from '../shared/grid-overlay';
 import { gridSpanToPixelSize } from '../shared/resize-snap';
 import layoutAnimationStyles from '../shared/layout-shift-animation.module.css';
@@ -54,7 +43,7 @@ import styles from './grid.module.css';
 
 const dashboardDragDropAnimation = createDashboardDragDropAnimation(
 	styles[ 'drag-preview-frame' ],
-	styles.dragPreviewFrameExiting
+	styles[ 'is-exiting' ]
 );
 
 // Fallback gap in pixels for math that runs before the computed gap
@@ -414,7 +403,19 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				return;
 			}
 
-			const updatedItems = arrayMove( items, currentIndex, newIndex );
+			// Non-draggable items are pinned: they hold their index while
+			// the others reorder around them.
+			const updatedItems = arrayMoveWithPinned(
+				items,
+				currentIndex,
+				newIndex,
+				( key ) => layoutMap.get( key )?.draggable === false
+			);
+			if (
+				updatedItems.every( ( key, index ) => key === items[ index ] )
+			) {
+				return;
+			}
 			const updatedLayout = activeLayout.map( ( item ) => ( {
 				...item,
 				order: updatedItems.indexOf( item.key ),
@@ -673,6 +674,12 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 								}
 								maxColumns={ effectiveColumns }
 								disabled={ ! editMode }
+								draggable={
+									layoutMap.get( id )?.draggable !== false
+								}
+								resizable={
+									layoutMap.get( id )?.resizable !== false
+								}
 								verticalResizable={ rowHeight !== 'auto' }
 								interacting={ activeId !== null || isResizing }
 								dragging={ activeId !== null }

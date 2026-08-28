@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import { subDays, subWeeks, subMonths, subYears } from 'date-fns';
-
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { createInterpolateElement } from '@wordpress/element';
 import { getDate } from '@wordpress/date';
 import type { ReactElement } from 'react';
-
-/**
- * Internal dependencies
- */
 import type {
 	FilterOperator,
 	NormalizedFilter,

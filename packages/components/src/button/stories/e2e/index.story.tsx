@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { StoryFn, Meta } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { wordpress } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { Button } from '../..';
 import type { ButtonAsButtonProps, ButtonAsAnchorProps } from '../../types';
 

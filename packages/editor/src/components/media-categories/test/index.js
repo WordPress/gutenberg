@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { dispatch, resolveSelect, select, subscribe } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import getInserterMediaCategories from '..';
 
 jest.mock( '@wordpress/data', () => ( {

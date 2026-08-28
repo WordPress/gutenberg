@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { act, renderHook } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { useMediaEditorState } from '../use-media-editor-state';
 
 const IMAGE = {

@@ -72,12 +72,12 @@ function gutenberg_get_note_mentioned_user_ids( string $content ): array {
  *
  * @since 7.1.0
  *
- * @param WP_Comment $comment  The note that was just inserted.
- * @param mixed      $request  The REST request. Unused.
- * @param bool       $creating Whether this is a create (true) or update (false).
+ * @param WP_Comment|null $comment  The note that was just inserted. Null only if it was deleted in the meantime.
+ * @param mixed           $request  The REST request. Unused.
+ * @param bool            $creating Whether this is a create (true) or update (false).
  */
-function gutenberg_notify_note_mentions( WP_Comment $comment, $request = null, bool $creating = true ): void {
-	if ( ! $creating ) {
+function gutenberg_notify_note_mentions( ?WP_Comment $comment, $request = null, bool $creating = true ): void {
+	if ( ! $creating || ! $comment ) {
 		return;
 	}
 
@@ -92,9 +92,12 @@ function gutenberg_notify_note_mentions( WP_Comment $comment, $request = null, b
 
 	$mentioned = gutenberg_get_note_mentioned_user_ids( $comment->comment_content );
 
-	$author_id      = (int) $comment->user_id;
-	$post           = get_post( (int) $comment->comment_post_ID );
-	$post_author_id = $post ? (int) $post->post_author : 0;
+	$author_id = (int) $comment->user_id;
+
+	// get_post() falls back to the global post when passed 0, which would compose the email about the wrong post.
+	$comment_post_id = (int) $comment->comment_post_ID;
+	$post            = $comment_post_id ? get_post( $comment_post_id ) : null;
+	$post_author_id  = $post ? (int) $post->post_author : 0;
 
 	/*
 	 * The recipient set is bounded and small (one note's mentions), so
@@ -169,11 +172,31 @@ add_action( 'rest_insert_comment', 'gutenberg_notify_note_mentions', 10, 3 );
 function gutenberg_send_note_notification( WP_User $user, WP_Comment $comment, ?WP_Post $post ): bool {
 	$switched_locale = switch_to_user_locale( $user->ID );
 
+	/*
+	 * The site title and the post title are escaped on the way into the database,
+	 * and note content is stored as HTML. Both are reversed once here for the
+	 * plain text arena of emails. Decoding a second time would go too far and
+	 * resolve entities the author meant to be read literally. Tags are stripped
+	 * before decoding, so escaped text such as "&lt;code&gt;" survives as text
+	 * rather than being read as a tag and dropped.
+	 */
 	$blogname    = wp_specialchars_decode( get_option( 'blogname' ), ENT_QUOTES );
 	$post_title  = $post ? wp_specialchars_decode( get_the_title( $post ), ENT_QUOTES ) : '';
 	$author_name = $comment->comment_author ? $comment->comment_author : __( 'Someone', 'gutenberg' );
-	$content     = wp_strip_all_tags( wp_specialchars_decode( $comment->comment_content ) );
-	$edit_link   = $post ? get_edit_post_link( $post->ID, 'url' ) : '';
+	$content     = wp_specialchars_decode( wp_strip_all_tags( $comment->comment_content ) );
+
+	/*
+	 * The rest of the message is composed for the recipient, and so is the editor
+	 * link: get_edit_post_link() answers for whoever is current, which here is the
+	 * note's author over REST and nobody at all under WP-Cron.
+	 */
+	$edit_link = '';
+	if ( $post ) {
+		$previous_user_id = get_current_user_id();
+		wp_set_current_user( $user->ID );
+		$edit_link = (string) get_edit_post_link( $post->ID, 'url' );
+		wp_set_current_user( $previous_user_id );
+	}
 
 	/* translators: %1$s: commenter name, %2$s: post title. */
 	$message = sprintf( __( '%1$s mentioned you in a note on "%2$s".', 'gutenberg' ), $author_name, $post_title );
@@ -183,13 +206,16 @@ function gutenberg_send_note_notification( WP_User $user, WP_Comment $comment, ?
 	$lines = array( $message, '' );
 	if ( '' !== $content ) {
 		$lines[] = $content;
-		$lines[] = '';
 	}
 	if ( $edit_link ) {
-		$lines[] = $edit_link;
+		$lines[] = '';
+		$lines[] = __( 'Edit This', 'gutenberg' ) . ': ' . $edit_link;
 	}
 
-	$sent = wp_mail( $user->user_email, wp_specialchars_decode( $subject ), implode( "\n", $lines ) );
+	// Declared explicitly so a filtered default cannot turn the message into HTML.
+	$headers = 'Content-Type: text/plain; charset="' . get_option( 'blog_charset' ) . '"';
+
+	$sent = wp_mail( $user->user_email, $subject, implode( "\n", $lines ), $headers );
 
 	if ( $switched_locale ) {
 		restore_previous_locale();

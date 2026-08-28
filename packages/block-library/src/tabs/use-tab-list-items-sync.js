@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
@@ -12,7 +9,7 @@ const EMPTY_ARRAY = [];
  *
  * Whenever the list of core/tab-panel blocks changes (add, remove, reorder, or
  * label edit), this hook updates the `tabs` attribute on the core/tab-list
- * block so that save.js can render the correct buttons.
+ * block so that save.jsx can render the correct buttons.
  *
  * @param {string} tabsClientId Client ID of the core/tabs block.
  */

@@ -1,7 +1,7 @@
 import type { Combobox as _Combobox } from '@base-ui/react/combobox';
 import type { ReactElement } from 'react';
-
 import type { ComponentProps } from '../../../utils/types';
+import type { ItemPopupWidthProps } from '../../../utils/css/item-popup';
 import type { InputLayoutProps } from '../input-layout/types';
 
 type ComboboxSize = Exclude< InputLayoutProps[ 'size' ], 'small' >;
@@ -50,7 +50,7 @@ export type ComboboxGroupLabelProps = ComponentProps<
 
 export type ComboboxInputProps = Omit<
 	ComponentProps< typeof _Combobox.Input >,
-	'size'
+	'size' | 'type' // The combobox role is only valid on input type="text".
 >;
 
 export type ComboboxInputGroupProps = ComponentProps<
@@ -61,12 +61,6 @@ export type ComboboxInputGroupProps = ComponentProps<
 
 export type ComboboxItemProps = ComponentProps< typeof _Combobox.Item > & {
 	children?: React.ReactNode;
-	/**
-	 * The size of the item.
-	 *
-	 * @default 'default'
-	 */
-	size?: ComboboxSize;
 	/**
 	 * The variant of the item.
 	 *
@@ -94,24 +88,25 @@ export type PortalProps = ComponentProps< typeof _Combobox.Portal >;
 
 export type PositionerProps = ComponentProps< typeof _Combobox.Positioner >;
 
-export type ComboboxPopupProps = ComponentProps< typeof _Combobox.Popup > & {
-	children?: React.ReactNode;
-	/**
-	 * Optional portal element, typically `<Combobox.Portal />` with custom
-	 * `container`. When omitted, `Combobox.Popup` uses `Combobox.Portal` with
-	 * default props. Do not pass `children` on the portal element; they would be
-	 * ignored.
-	 */
-	portal?: ReactElement< Omit< PortalProps, 'children' > >;
-	/**
-	 * Optional positioner element, typically `<Combobox.Positioner />` with
-	 * custom positioning props (`side`, `align`, `sideOffset`, collision
-	 * settings, etc.). When omitted, `Combobox.Popup` uses
-	 * `Combobox.Positioner` with default props. Do not pass `children` on the
-	 * positioner element; they would be ignored.
-	 */
-	positioner?: ReactElement< Omit< PositionerProps, 'children' > >;
-};
+export type ComboboxPopupProps = ComponentProps< typeof _Combobox.Popup > &
+	ItemPopupWidthProps & {
+		children?: React.ReactNode;
+		/**
+		 * Optional portal element, typically `<Combobox.Portal />` with custom
+		 * `container`. When omitted, `Combobox.Popup` uses `Combobox.Portal` with
+		 * default props. Do not pass `children` on the portal element; they would be
+		 * ignored.
+		 */
+		portal?: ReactElement< Omit< PortalProps, 'children' > >;
+		/**
+		 * Optional positioner element, typically `<Combobox.Positioner />` with
+		 * custom positioning props (`side`, `align`, `sideOffset`, collision
+		 * settings, etc.). When omitted, `Combobox.Popup` uses
+		 * `Combobox.Positioner` with default props. Do not pass `children` on the
+		 * positioner element; they would be ignored.
+		 */
+		positioner?: ReactElement< Omit< PositionerProps, 'children' > >;
+	};
 
 export type ComboboxRootProps<
 	Value,

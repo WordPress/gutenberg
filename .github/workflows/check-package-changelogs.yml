@@ -24,6 +24,7 @@ on:
             - 'packages/wp-build/**'
             - '!packages/*/src/**/stories/**'
             - '!packages/*/src/**/test/**'
+            - '!packages/*/CHANGELOG.md'
 
 # Disable permissions for all available scopes by default.
 # Any needed permissions should be configured at the job level.
@@ -84,7 +85,7 @@ jobs:
                   # tracked packages, so this matrix entry may run on a PR that
                   # doesn't touch its package. Short-circuit if that's the case.
                   relevant_changes=$(git diff --name-only "$BASE_SHA"...HEAD -- "${PACKAGE_PATH}/" \
-                      | grep -Ev "^${PACKAGE_PATH}/src/(.+/)?(stories|test)/" || true)
+                      | grep -Ev "^${PACKAGE_PATH}/(src/(.+/)?(stories|test)/|CHANGELOG\.md$)" || true)
 
                   if [ -z "$relevant_changes" ]; then
                       echo "No relevant changes under ${PACKAGE_PATH}; skipping CHANGELOG check."

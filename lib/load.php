@@ -79,6 +79,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.1/query-block.php';
 	require __DIR__ . '/compat/wordpress-7.1/block-comments.php';
 
+	// WordPress 7.2 compat.
+	require __DIR__ . '/compat/wordpress-7.2/view-config-api.php';
+
 	// Real-time collaboration.
 	require __DIR__ . '/experimental/collaboration/class-gutenberg-rest-autosaves-controller.php';
 	require __DIR__ . '/experimental/collaboration/rest-api.php';
@@ -137,8 +140,12 @@ require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/script-modules.php';
 require __DIR__ . '/experimental/pages/site-editor.php';
-require __DIR__ . '/experimental/extensible-site-editor.php';
 require __DIR__ . '/experimental/collaboration/meta-box-rtc-compat.php';
+
+if ( gutenberg_is_experiment_enabled( 'gutenberg-extensible-site-editor' ) ) {
+	require __DIR__ . '/experimental/extensible-site-editor.php';
+	require __DIR__ . '/experimental/theme-preview/load.php';
+}
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-dataform-inspector' ) ) {
 	require __DIR__ . '/experimental/dataform-inspector-preload.php';
@@ -229,13 +236,6 @@ require __DIR__ . '/overlay-patterns.php';
 if ( gutenberg_is_experiment_enabled( 'gutenberg-guidelines' ) ) {
 	require __DIR__ . '/experimental/knowledge/load.php';
 	require __DIR__ . '/experimental/knowledge/index.php';
-}
-
-// Content types (only load when experiment is enabled).
-if ( gutenberg_is_experiment_enabled( 'gutenberg-content-types' ) ) {
-	require __DIR__ . '/experimental/content-types/load.php';
-	require __DIR__ . '/experimental/content-types/index.php';
-	require __DIR__ . '/experimental/content-types/post-types.php';
 }
 
 // Dashboard Widgets (only load when experiment is enabled).

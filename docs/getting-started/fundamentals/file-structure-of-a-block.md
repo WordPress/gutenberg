@@ -23,13 +23,13 @@ The `package.json` file is used to configure a Node.js project, which is technic
 
 In a standard project, the `src` (source) folder contains the raw, uncompiled code, including JavaScript, CSS, and other assets necessary for developing the block. This is where you write and edit your block's source code, utilizing modern JavaScript features and JSX for React components.
 
-The [build process](docs/block-editor/getting-started/fundamentals/javascript-in-the-block-editor/#javascript-build-process.md) provided by `wp-scripts` will then take the files from this folder and generate the production-ready files in the project's `build` folder. 
+The [build process](/docs/getting-started/fundamentals/javascript-in-the-block-editor.md#javascript-with-a-build-process) provided by `wp-scripts` will then take the files from this folder and generate the production-ready files in the project's `build` folder.
 
 ### `block.json`
 
-The `block.json` file contains the [block's metadata](docs/block-editor/reference-guides/block-api/block-metadata/), streamlining its definition and registration across client-side and server-side environments. 
+The `block.json` file contains the [block's metadata](/docs/reference-guides/block-api/block-metadata.md), streamlining its definition and registration across client-side and server-side environments. 
 
-This file includes the block name, description, [attributes](docs/block-editor/reference-guides/block-api/block-attributes/), [supports](docs/block-editor/reference-guides/block-api/block-supports/), and more, as well as the locations of essential files responsible for the block's functionality, appearance, and styling. 
+This file includes the block name, description, [attributes](/docs/reference-guides/block-api/block-attributes.md), [supports](/docs/reference-guides/block-api/block-supports.md), and more, as well as the locations of essential files responsible for the block's functionality, appearance, and styling. 
 
 When a build process is applied, the `block.json` file and the other generated files are moved to a designated folder, often the `build` folder. Consequently, the file paths specified within `block.json` point to these processed, bundled versions of the files. 
 
@@ -60,7 +60,7 @@ The `save.js` exports the function that returns the static HTML markup that gets
 A `style` file with extensions `.css`, `.scss`, or `.sass` contains the styles of the block that will be loaded in both the Block Editor and on the front end. In the build process, this file is converted into `style-index.css`, which is usually defined using the [`style`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style) property in `block.json`
 
 <div class="callout callout-info">
-    The webpack configuration used internally by <code>wp-scripts</code> includes a <a href="https://webpack.js.org/loaders/css-loader/">css-loader</a> chained with <a herf="https://webpack.js.org/loaders/postcss-loader/">postcss-loader</a> and <a href="https://webpack.js.org/loaders/sass-loader/">sass-loader</a> that allows it to process CSS, SASS or SCSS files. Check <a href="https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#default-webpack-config">Default webpack config</a> for more info
+    The webpack configuration used internally by <code>wp-scripts</code> includes a <a href="https://webpack.js.org/loaders/css-loader/">css-loader</a> chained with <a href="https://webpack.js.org/loaders/postcss-loader/">postcss-loader</a> and <a href="https://webpack.js.org/loaders/sass-loader/">sass-loader</a> that allows it to process CSS, SASS or SCSS files. Check <a href="https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#default-webpack-config">Default webpack config</a> for more info
 </div>
 
 ### `editor.(css|scss|sass)`

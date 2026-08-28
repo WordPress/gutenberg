@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import { execFile } from 'child_process';
 import path from 'path';
 import { promisify } from 'util';
-
-/**
- * Internal dependencies
- */
 import config from '../lib/';
 
 const execFileAsync = promisify( execFile );

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { canvasConvertToJpeg } from '../canvas-utils';
 import { getHeicUnsupportedMessage } from '../heic-support';
 
@@ -15,13 +12,13 @@ describe( 'canvasConvertToJpeg', () => {
 		if ( originalCreateImageBitmap ) {
 			global.createImageBitmap = originalCreateImageBitmap;
 		} else {
-			// @ts-ignore
+			// @ts-expect-error The operand of `delete` must be optional.
 			delete global.createImageBitmap;
 		}
 		if ( originalOffscreenCanvas ) {
 			global.OffscreenCanvas = originalOffscreenCanvas;
 		} else {
-			// @ts-ignore
+			// @ts-expect-error The operand of `delete` must be optional.
 			delete global.OffscreenCanvas;
 		}
 		if ( originalImageDecoder ) {

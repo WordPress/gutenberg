@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getShadowParts, shadowStringToObject } from '../shadow-utils';
 
 const colorFormats = {

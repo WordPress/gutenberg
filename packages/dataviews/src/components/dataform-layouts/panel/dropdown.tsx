@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalHeading as Heading,
 	__experimentalSpacer as Spacer,
@@ -12,10 +9,6 @@ import { useMemo, useRef, useState } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
 import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type {
 	FieldLayoutProps,
 	NormalizedForm,

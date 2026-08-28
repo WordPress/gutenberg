@@ -16,19 +16,39 @@ const {
 const ALLOWLIST = {
 	'@wordpress/ui': {
 		allowed: [
+			'Autocomplete',
 			'Badge',
+			'Calendar',
 			'Card',
 			'Collapsible',
 			'CollapsibleCard',
+			'ControlWithError',
 			'EmptyState',
+			'Field',
+			'Fieldset',
 			'Icon',
+			'Input',
+			'InputControl',
+			'InputLayout',
+			'KeyboardShortcutDescription',
+			'KeyboardShortcutDisplay',
 			'Link',
+			'RangeCalendar',
+			'SearchableChipSelect',
+			'SearchableChipSelectControl',
 			'Skeleton',
+			'Spinner',
 			'Stack',
 			'Tabs',
 			'Text',
+			'Textarea',
+			'TextareaControl',
 			'Tooltip',
+			'ValidatedInputControl',
+			'ValidatedTextareaControl',
+			'ValidityIndicator',
 			'VisuallyHidden',
+			'useKeyboardShortcutProps',
 		],
 		message:
 			'`{{ name }}` from `{{ source }}` is not yet recommended for use in a WordPress environment.',
@@ -63,7 +83,8 @@ const DENYLIST = {
 		__experimentalVStack: 'Use `Stack` from `@wordpress/ui` instead.',
 		__experimentalZStack:
 			'{{ name }} is planned for deprecation. Write your own CSS instead.',
-		Animate: '{{ name }} is planned for deprecation.',
+		Animate:
+			'Write your own CSS animations instead, preferably using the motion tokens available in `@wordpress/theme`.',
 		Card: 'Use `Card.Root` from `@wordpress/ui` instead.',
 		CardBody: 'Use `Card.Content` from `@wordpress/ui` instead.',
 		CardDivider: 'A divider is no longer a standard pattern for cards.',
@@ -76,10 +97,16 @@ const DENYLIST = {
 			'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
 		FlexItem:
 			'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
+		__experimentalInputControl:
+			'Use `InputControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
 		ResponsiveWrapper: '{{ name }} is planned for deprecation.',
 		TabPanel: 'Use `Tabs` from `@wordpress/ui` instead.',
 		TabbableContainer: '{{ name }} is planned for deprecation.',
 		Tabs: 'Use `Tabs` from `@wordpress/ui` instead.',
+		TextControl:
+			'Use `InputControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
+		TextareaControl:
+			'Use `TextareaControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
 		Tooltip: 'Use `Tooltip` from `@wordpress/ui` instead.',
 		VisuallyHidden: 'Use `{{ name }}` from `@wordpress/ui` instead.',
 	},

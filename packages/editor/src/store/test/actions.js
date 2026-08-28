@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { speak } from '@wordpress/a11y';
 import apiFetch from '@wordpress/api-fetch';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -8,15 +5,9 @@ import { store as coreStore } from '@wordpress/core-data';
 import { createRegistry } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
-
 jest.mock( '@wordpress/a11y', () => ( {
 	speak: jest.fn(),
 } ) );
-
-/**
- * Internal dependencies
- */
-
 import { store as editorStore } from '..';
 import * as actions from '../actions';
 import { unlock } from '../../lock-unlock';
@@ -145,7 +136,7 @@ describe( 'Post actions', () => {
 	} );
 
 	describe( 'setDeviceType', () => {
-		it( 'sets the canvas width using custom rem viewport settings', () => {
+		it( 'sets the canvas one pixel inside a custom rem viewport breakpoint', () => {
 			const registry = createRegistryWithStores();
 
 			registry.dispatch( blockEditorStore ).updateSettings( {
@@ -163,7 +154,7 @@ describe( 'Post actions', () => {
 
 			expect(
 				unlock( registry.select( editorStore ) ).getCanvasWidth()
-			).toBe( 1024 );
+			).toBe( 1023 );
 			expect( registry.select( editorStore ).getDeviceType() ).toBe(
 				'Tablet'
 			);

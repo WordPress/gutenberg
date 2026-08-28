@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getTrackAttributes } from '../utils';
 
 describe( 'Playlist block edit utilities', () => {

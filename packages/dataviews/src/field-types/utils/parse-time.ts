@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { isValid, parse } from 'date-fns';
 
 // Times are wall-clock, so a trailing zone designator is tolerated for

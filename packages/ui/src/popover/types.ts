@@ -1,6 +1,5 @@
 import type { ReactElement, ReactNode } from 'react';
 import type { Popover as _Popover } from '@base-ui/react/popover';
-
 import type { ComponentProps } from '../utils/types';
 
 export type PortalProps = ComponentProps< typeof _Popover.Portal >;

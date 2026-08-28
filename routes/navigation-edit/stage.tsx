@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useParams } from '@wordpress/route';
 import { Page, Breadcrumbs } from '@wordpress/admin-ui';
 import { useSelect } from '@wordpress/data';
@@ -8,10 +5,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import type { Post } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import NavigationMenuEditor from './editor';
 
 const NAVIGATION_POST_TYPE = 'wp_navigation';

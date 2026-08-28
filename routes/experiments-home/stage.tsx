@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Page } from '@wordpress/admin-ui';
 import { Spinner } from '@wordpress/components';
 import { useEntityRecord } from '@wordpress/core-data';
@@ -15,10 +12,6 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { Card, Link, Stack, Text } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import './style.scss';
 import { fetchExperiments, type Experiment } from './api';
 

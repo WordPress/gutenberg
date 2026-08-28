@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const getJSDocFromToken = require( '../lib/get-jsdoc-from-token' );
 const engine = require( '../lib/engine' );
 

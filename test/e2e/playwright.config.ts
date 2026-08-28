@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import os from 'os';
 import { fileURLToPath } from 'url';
 import { defineConfig, devices } from '@playwright/test';
-
-/**
- * WordPress dependencies
- */
 import baseConfig from '@wordpress/scripts/config/playwright.config.js';
 
 const baseTestIgnore: Array< string | RegExp > = [];
