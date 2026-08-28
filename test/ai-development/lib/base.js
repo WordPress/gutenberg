@@ -72,6 +72,11 @@ export default {
 				// starts; these two reach the network on their own.
 				disallowed_tools: [ 'WebFetch', 'WebSearch' ],
 				sandbox,
+				// Hooks are run by Claude Code itself, outside the sandbox
+				// that wraps Bash, before the session starts and with the
+				// inherited environment. A workspace is built from the tree
+				// under evaluation, so a branch that adds `.claude/settings.json`
+				// would otherwise run host commands here.
 				settings: { permissions },
 				env: agentEnvironment,
 			},

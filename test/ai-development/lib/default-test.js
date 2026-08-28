@@ -31,6 +31,9 @@ environment.`,
 				// the developer's own ~/.claude instructions into the grader's
 				// context and make a grade depend on whose machine it ran on.
 				setting_sources: [],
+				// No settings sources means no hooks to load; saying so makes
+				// the guarantee explicit rather than a consequence.
+				settings: { disableAllHooks: true },
 			},
 		},
 	},
