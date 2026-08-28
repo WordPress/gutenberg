@@ -42,7 +42,7 @@ function getBlockGapValue( style ) {
 }
 
 export default function GalleryFlexStyles( { style, clientId } ) {
-	const selector = `#block-${ clientId }`;
+	const selector = `.wp-block-gallery-${ clientId }`;
 	const [ viewportSettings ] = useSettings( 'viewport' );
 	const globalStyles = useSelect(
 		( select ) =>

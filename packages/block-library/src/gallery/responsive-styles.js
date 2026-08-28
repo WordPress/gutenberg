@@ -94,7 +94,7 @@ function getColumnsCSS( selector, columns ) {
 					columns - 1
 			  })) / ${ columns })`;
 
-	return `${ getImageSelector( selector ) }{width:${ width };}`;
+	return `${ getImageSelector( selector ) }{width:${ width } !important;}`;
 }
 
 function getImageCropCSS( selector, imageCrop ) {
@@ -104,10 +104,10 @@ function getImageCropCSS( selector, imageCrop ) {
 	const mediaSelector = `${ imageSelector } a,${ imageSelector } img`;
 
 	if ( imageCrop ) {
-		return `${ imageSelector }{align-self:inherit;margin-bottom:0;}${ wrapperSelector },${ linkSelector }{display:flex;}${ mediaSelector }{width:100%;flex:1 0 0%;height:100%;object-fit:cover;}`;
+		return `${ imageSelector }{align-self:inherit !important;margin-bottom:0 !important;}${ wrapperSelector },${ linkSelector }{display:flex !important;}${ mediaSelector }{width:100% !important;flex:1 0 0% !important;height:100% !important;object-fit:cover !important;}`;
 	}
 
-	return `${ imageSelector }{align-self:auto;margin-top:0;margin-bottom:auto;}${ wrapperSelector }{display:block;}${ linkSelector }{display:inline-block;}${ mediaSelector }{width:auto;flex:0 1 auto;height:auto;object-fit:fill;}`;
+	return `${ imageSelector }{align-self:auto !important;margin-top:0 !important;margin-bottom:auto !important;}${ wrapperSelector }{display:block !important;}${ linkSelector }{display:inline-block !important;}${ mediaSelector }{width:auto !important;flex:0 1 auto !important;height:auto !important;object-fit:fill !important;}`;
 }
 
 /**

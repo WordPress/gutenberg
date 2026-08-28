@@ -723,6 +723,7 @@ export default function GalleryEdit( props ) {
 		className: clsx(
 			className,
 			'has-nested-images',
+			`wp-block-gallery-${ clientId }`,
 			// In dynamic mode there are no inner blocks and the gallery isn't
 			// rendered through the `Gallery` component, so the classes that
 			// component normally composes onto the `<figure>` (see `gallery.jsx`)

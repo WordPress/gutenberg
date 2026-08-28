@@ -117,7 +117,7 @@ function block_core_gallery_get_responsive_flex_style_rules( $selector, $viewpor
 			);
 		$rules[] = array(
 			'selector'     => $image_selector,
-			'declarations' => array( 'width' => $width ),
+			'declarations' => array( 'width' => "{$width} !important" ),
 			'rules_group'  => $media_query,
 		);
 	}
@@ -131,40 +131,40 @@ function block_core_gallery_get_responsive_flex_style_rules( $selector, $viewpor
 		'selector'     => $image_selector,
 		'declarations' => $image_crop
 			? array(
-				'align-self'    => 'inherit',
-				'margin-bottom' => '0',
+				'align-self'    => 'inherit !important',
+				'margin-bottom' => '0 !important',
 			)
 			: array(
-				'align-self'    => 'auto',
-				'margin-top'    => '0',
-				'margin-bottom' => 'auto',
+				'align-self'    => 'auto !important',
+				'margin-top'    => '0 !important',
+				'margin-bottom' => 'auto !important',
 			),
 		'rules_group'  => $media_query,
 	);
 	$rules[] = array(
 		'selector'     => "{$image_selector} > div:not(.components-drop-zone)",
-		'declarations' => array( 'display' => $image_crop ? 'flex' : 'block' ),
+		'declarations' => array( 'display' => $image_crop ? 'flex !important' : 'block !important' ),
 		'rules_group'  => $media_query,
 	);
 	$rules[] = array(
 		'selector'     => "{$image_selector} > a",
-		'declarations' => array( 'display' => $image_crop ? 'flex' : 'inline-block' ),
+		'declarations' => array( 'display' => $image_crop ? 'flex !important' : 'inline-block !important' ),
 		'rules_group'  => $media_query,
 	);
 	$rules[] = array(
 		'selector'     => "{$image_selector} a,{$image_selector} img",
 		'declarations' => $image_crop
 			? array(
-				'width'      => '100%',
-				'flex'       => '1 0 0%',
-				'height'     => '100%',
-				'object-fit' => 'cover',
+				'width'      => '100% !important',
+				'flex'       => '1 0 0% !important',
+				'height'     => '100% !important',
+				'object-fit' => 'cover !important',
 			)
 			: array(
-				'width'      => 'auto',
-				'flex'       => '0 1 auto',
-				'height'     => 'auto',
-				'object-fit' => 'fill',
+				'width'      => 'auto !important',
+				'flex'       => '0 1 auto !important',
+				'height'     => 'auto !important',
+				'object-fit' => 'fill !important',
 			),
 		'rules_group'  => $media_query,
 	);
