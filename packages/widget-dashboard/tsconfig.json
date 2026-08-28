@@ -7,6 +7,7 @@
 	"files": [ "global.d.ts" ],
 	"references": [
 		{ "path": "./tsconfig.build.json" },
+		{ "path": "../admin-ui/tsconfig.build.json" },
 		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../data" },
@@ -15,7 +16,6 @@
 		{ "path": "../grid/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons/tsconfig.build.json" },
-		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
 		{ "path": "../style-runtime/tsconfig.build.json" },
 		{ "path": "../ui/tsconfig.build.json" },
