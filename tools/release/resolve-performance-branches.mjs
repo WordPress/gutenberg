@@ -46,15 +46,15 @@ export function getTestedUpToMajor( readme ) {
 /**
  * @typedef ResolveOptions
  *
- * @property {string}                   event          GitHub event name.
- * @property {string}                   sha            Commit that triggered the workflow.
- * @property {string}                   wpMajor        The `Tested up to` version from readme.txt.
- * @property {(ref: string) => boolean} refExists      Whether a tag or branch exists on origin.
- * @property {string=}                  baseSha        Pull request base commit.
- * @property {string=}                  baseRef        Pull request base branch name.
- * @property {string=}                  releaseTag     Release tag name.
- * @property {string=}                  inputBranches  `workflow_dispatch` branches input.
- * @property {string=}                  inputWpVersion `workflow_dispatch` WP version input.
+ * @property {string}                                         event          GitHub event name.
+ * @property {string}                                         sha            Commit that triggered the workflow.
+ * @property {string}                                         wpMajor        The `Tested up to` version from readme.txt.
+ * @property {(ref: string, kind: 'tag' | 'head') => boolean} refExists      Whether a tag or branch exists on origin.
+ * @property {string=}                                        baseSha        Pull request base commit.
+ * @property {string=}                                        baseRef        Pull request base branch name.
+ * @property {string=}                                        releaseTag     Release tag name.
+ * @property {string=}                                        inputBranches  `workflow_dispatch` branches input.
+ * @property {string=}                                        inputWpVersion `workflow_dispatch` WP version input.
  */
 
 /**
@@ -95,13 +95,13 @@ export function resolveBranches( options ) {
 				previousBase10 % 10
 			}`;
 			const wp = `wp/${ wpMajor }`;
-			for ( const [ ref, description ] of [
-				[ tag, 'release tag' ],
-				[ current, 'current release branch' ],
-				[ previous, 'previous release branch' ],
-				[ wp, 'WordPress branch' ],
+			for ( const [ ref, kind, description ] of [
+				[ tag, 'tag', 'release tag' ],
+				[ current, 'head', 'current release branch' ],
+				[ previous, 'head', 'previous release branch' ],
+				[ wp, 'head', 'WordPress branch' ],
 			] ) {
-				if ( ! refExists( ref ) ) {
+				if ( ! refExists( ref, kind ) ) {
 					throw new Error(
 						`Expected ${ description } '${ ref }' to exist in the Gutenberg repository.`
 					);
@@ -156,11 +156,17 @@ function main() {
 		event: env.GITHUB_EVENT_NAME || '',
 		sha: env.GITHUB_SHA || '',
 		wpMajor: getTestedUpToMajor( fs.readFileSync( 'readme.txt', 'utf8' ) ),
-		refExists: ( ref ) => {
+		refExists: ( ref, kind ) => {
 			try {
 				execFileSync(
 					'git',
-					[ 'ls-remote', '--exit-code', 'origin', ref ],
+					[
+						'ls-remote',
+						'--exit-code',
+						kind === 'tag' ? '--tags' : '--heads',
+						'origin',
+						ref,
+					],
 					{
 						stdio: 'ignore',
 					}

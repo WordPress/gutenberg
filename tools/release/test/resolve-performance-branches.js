@@ -93,6 +93,26 @@ describe( 'resolveBranches', () => {
 		).toThrow( "Release tag 'v24.0' does not resolve" );
 	} );
 
+	it( 'checks the release tag among tags and the branches among heads', () => {
+		const seen = [];
+		resolveBranches( {
+			event: 'release',
+			sha,
+			wpMajor: '7.1',
+			refExists: ( ref, kind ) => {
+				seen.push( `${ kind }:${ ref }` );
+				return true;
+			},
+			releaseTag: 'v24.0.0',
+		} );
+		expect( seen ).toEqual( [
+			'tag:v24.0.0',
+			'head:release/24.0',
+			'head:release/23.9',
+			'head:wp/7.1',
+		] );
+	} );
+
 	it( 'rejects releases whose branches do not exist', () => {
 		expect( () =>
 			resolveBranches( {

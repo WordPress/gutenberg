@@ -22,7 +22,7 @@ const RESULTS_FILE_SUFFIX = '.performance-results.json';
  * @property {boolean=} ci          Run on CI.
  * @property {string=}  pluginsDir  Directory with a prebuilt plugin per branch in `<sanitized branch>/`.
  *                                  The current checkout is then used as the test runner.
- * @property {number=}  rounds      Run each test suite this many times for each branch.
+ * @property {string=}  rounds      Run each test suite this many times for each branch.
  * @property {string=}  suites      Comma separated names of the test suites to run (default: all).
  * @property {string=}  testsBranch The branch whose performance test files will be used for testing.
  * @property {string=}  wpVersion   The WordPress version to be used as the base install for testing.
@@ -286,6 +286,12 @@ async function runPerformanceTests( branches, options ) {
 		throw new Error( `Need at least two git refs to run` );
 	}
 
+	if ( options.pluginsDir && options.testsBranch ) {
+		throw new Error(
+			'--tests-branch cannot be combined with --plugins-dir; the current checkout is the test runner.'
+		);
+	}
+
 	const baseDir = path.join( os.tmpdir(), 'wp-performance-tests' );
 
 	if ( fs.existsSync( baseDir ) ) {
@@ -303,12 +309,6 @@ async function runPerformanceTests( branches, options ) {
 	const testRunnerDir = pluginsDir
 		? process.cwd()
 		: path.join( baseDir, 'tests' );
-
-	if ( pluginsDir && options.testsBranch ) {
-		throw new Error(
-			'--tests-branch cannot be combined with --plugins-dir; the current checkout is the test runner.'
-		);
-	}
 
 	if ( pluginsDir ) {
 		logAtIndent( 1, 'Setting up test runner' );
@@ -558,7 +558,7 @@ async function runPerformanceTests( branches, options ) {
 			const envDir = branchDirs[ branch ];
 
 			logAtIndent( 2, 'Starting environment' );
-			await runShellScript( `${ wpEnvPath } start`, envDir );
+			await runShellScript( `"${ wpEnvPath }" start`, envDir );
 
 			for ( const testSuite of testSuites ) {
 				logAtIndent( 2, `Suite: ${ formats.success( testSuite ) }` );
@@ -575,7 +575,7 @@ async function runPerformanceTests( branches, options ) {
 			}
 
 			logAtIndent( 2, 'Stopping environment' );
-			await runShellScript( `${ wpEnvPath } stop`, envDir );
+			await runShellScript( `"${ wpEnvPath }" stop`, envDir );
 		}
 	}
 

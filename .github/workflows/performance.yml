@@ -116,7 +116,7 @@ jobs:
 
     performance:
         timeout-minutes: 60
-        name: Run performance tests (${{ matrix.shard }})
+        name: Run perf tests (${{ matrix.shard }})
         runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
         needs: [prepare, build]
         permissions:
