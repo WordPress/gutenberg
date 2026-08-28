@@ -36,7 +36,13 @@ const ROOT = path.resolve(
 	'../..'
 );
 const PACKAGES_DIR = path.join( ROOT, 'packages' );
+// The platform singletons that must never be inlined into a consumer bundle:
+// stateful registries where a second copy forks state. Not derivable from
+// package.json (`wpScript` covers many safely inlined packages too). Keep in
+// sync with the externals regex in `packages/dataviews/build.cjs`.
 const SINGLETONS = new Set( [ 'data', 'hooks', 'i18n', 'date' ] );
+// ROOT-relative like the metafile keys it is matched against.
+const PRIVATE_APIS_DIR = 'packages/private-apis/';
 const CONFIG = 'check-private-apis.config.json';
 
 function readExceptions() {
@@ -101,6 +107,17 @@ function resolveSource( base ) {
 function wordpressSources( onUnresolved, exclude ) {
 	const excluded = ( resolved ) =>
 		exclude.has( path.relative( ROOT, resolved ) );
+	// A resolved file enters the graph marked side-effect free, unless it is
+	// excluded (then it goes external under its import specifier). esbuild
+	// only honors package.json `sideEffects` for files inside node_modules,
+	// so plugin-resolved paths must declare here what the packages declare
+	// for their published builds: their JS is side-effect free (only style
+	// files are not, and those stay external). Without this, module-level
+	// lock() calls in unused private-apis registries defeat tree shaking.
+	const keep = ( resolved, specifier ) =>
+		excluded( resolved )
+			? { path: specifier, external: true }
+			: { path: resolved, sideEffects: false };
 	return {
 		name: 'wordpress-sources',
 		setup( build ) {
@@ -130,24 +147,14 @@ function wordpressSources( onUnresolved, exclude ) {
 					onUnresolved( args.path, args.importer );
 					return { path: args.path, external: true };
 				}
-				if ( excluded( resolved ) ) {
-					return { path: args.path, external: true };
-				}
-				// esbuild does not read package.json for plugin-resolved paths,
-				// so declare what the packages themselves declare: their JS is
-				// side-effect free (only style files are not, and those stay
-				// external here). Without this, module-level lock() calls in
-				// unused private-apis registries defeat tree shaking.
-				return { path: resolved, sideEffects: false };
+				return keep( resolved, args.path );
 			} );
 			build.onResolve( { filter: /^[^./]/ }, ( args ) => ( {
 				path: args.path,
 				external: true,
 			} ) );
-			// esbuild only honors package.json `sideEffects` for files inside
-			// node_modules, so relative imports between source files must be
-			// marked side-effect free here too. Matches what the packages
-			// declare for their published builds.
+			// Relative imports would resolve without a plugin; intercepting
+			// them only serves the `keep` contract above.
 			build.onResolve( { filter: /^\./ }, ( args ) => {
 				const resolved = resolveSource(
 					path.resolve( path.dirname( args.importer ), args.path )
@@ -155,10 +162,7 @@ function wordpressSources( onUnresolved, exclude ) {
 				if ( ! resolved ) {
 					return undefined;
 				}
-				if ( excluded( resolved ) ) {
-					return { path: args.path, external: true };
-				}
-				return { path: resolved, sideEffects: false };
+				return keep( resolved, args.path );
 			} );
 		},
 	};
@@ -256,18 +260,18 @@ async function checkPackage( name, exclude = new Set() ) {
 		}
 	}
 	const offenders = [ ...kept ].filter( ( file ) =>
-		file.startsWith( 'packages/private-apis/' )
+		file.startsWith( PRIVATE_APIS_DIR )
 	);
 	// The files that actually consume private-apis (the lock-unlock modules),
 	// each with an import chain from the entry showing how they got pulled in.
 	const culprits = offenders.length
 		? [ ...kept ].filter(
 				( file ) =>
-					! file.startsWith( 'packages/private-apis/' ) &&
+					! file.startsWith( PRIVATE_APIS_DIR ) &&
 					( result.metafile.inputs[ file ]?.imports ?? [] ).some(
 						( dep ) =>
 							! dep.external &&
-							dep.path.startsWith( 'packages/private-apis/' )
+							dep.path.startsWith( PRIVATE_APIS_DIR )
 					)
 		  )
 		: [];
