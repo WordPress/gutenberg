@@ -151,7 +151,27 @@ describe( 'Snackbar', () => {
 	} );
 
 	describe( 'actions', () => {
-		it( 'should render only the first action with a warning when multiple actions are passed', () => {
+		it( 'should render up to two actions without a warning', () => {
+			render(
+				<Snackbar
+					actions={ [
+						{ label: 'One', url: 'https://example.com' },
+						{ label: 'Two', url: 'https://example.com' },
+					] }
+				>
+					Message
+				</Snackbar>
+			);
+
+			const snackbar = screen.getByTestId( testId );
+			const actions = within( snackbar ).getAllByRole( 'link' );
+
+			expect( actions ).toHaveLength( 2 );
+			expect( actions[ 0 ] ).toHaveTextContent( 'One' );
+			expect( actions[ 1 ] ).toHaveTextContent( 'Two' );
+		} );
+
+		it( 'should render only the first two actions with a warning when more than two actions are passed', () => {
 			render(
 				<Snackbar
 					actions={ [
@@ -165,17 +185,18 @@ describe( 'Snackbar', () => {
 			);
 
 			expect( console ).toHaveWarnedWith(
-				'Snackbar can only have one action. Use Notice if your message requires many actions.'
+				'Snackbar can only have up to two actions. Use Notice if your message requires more actions.'
 			);
 
 			const snackbar = screen.getByTestId( testId );
-			const action = within( snackbar ).getByRole( 'link' );
+			const actions = within( snackbar ).getAllByRole( 'link' );
 
-			expect( action ).toBeVisible();
-			expect( action ).toHaveTextContent( 'One' );
+			expect( actions ).toHaveLength( 2 );
+			expect( actions[ 0 ] ).toHaveTextContent( 'One' );
+			expect( actions[ 1 ] ).toHaveTextContent( 'Two' );
 		} );
 
-		it( 'should be rendered as a link when the `url` prop is set', () => {
+		it( 'should render a single action correctly', () => {
 			render(
 				<Snackbar
 					actions={ [
@@ -233,6 +254,31 @@ describe( 'Snackbar', () => {
 				name: 'View post',
 			} );
 			expect( link ).toBeVisible();
+		} );
+
+		it( 'should handle clicking on the second action', async () => {
+			const onClick1 = jest.fn();
+			const onClick2 = jest.fn();
+
+			render(
+				<Snackbar
+					actions={ [
+						{ label: 'First Action', onClick: onClick1 },
+						{ label: 'Second Action', onClick: onClick2 },
+					] }
+				>
+					Post updated.
+				</Snackbar>
+			);
+
+			const snackbar = screen.getByTestId( testId );
+			const buttons = within( snackbar ).getAllByRole( 'button' );
+			const secondButton = buttons[ 1 ];
+
+			await click( secondButton );
+
+			expect( onClick2 ).toHaveBeenCalledTimes( 1 );
+			expect( onClick1 ).not.toHaveBeenCalled();
 		} );
 	} );
 

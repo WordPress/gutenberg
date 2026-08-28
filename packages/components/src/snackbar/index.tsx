@@ -110,13 +110,28 @@ function UnforwardedSnackbar(
 	const classes = clsx( className, 'components-snackbar', {
 		'components-snackbar-explicit-dismiss': !! explicitDismiss,
 	} );
-	if ( actions && actions.length > 1 ) {
-		// We need to inform developers that snackbar only accepts 1 action.
+	if ( actions && actions.length > 2 ) {
+		// We need to inform developers that snackbar only accepts up to 2 actions.
 		warning(
-			'Snackbar can only have one action. Use Notice if your message requires many actions.'
+			'Snackbar can only have up to two actions. Use Notice if your message requires more actions.'
 		);
-		// return first element only while keeping it inside an array
-		actions = [ actions[ 0 ] ];
+		// return first two elements only while keeping them inside an array
+		actions = actions.slice( 0, 2 );
+	}
+
+	if ( actions && actions.length > 0 ) {
+		const MAX_ACTION_LABEL_LENGTH = 20;
+		actions = actions.map( ( action ) => {
+			if (
+				action.label &&
+				action.label.length > MAX_ACTION_LABEL_LENGTH
+			) {
+				warning(
+					`Snackbar action label "${ action.label }" exceeds the recommended maximum length of ${ MAX_ACTION_LABEL_LENGTH } characters.`
+				);
+			}
+			return action;
+		} );
 	}
 
 	const snackbarContentClassnames = clsx( 'components-snackbar__content', {
