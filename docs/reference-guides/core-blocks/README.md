@@ -399,7 +399,7 @@ Display multiple images in a rich gallery.
 -	**Name:** [core/gallery](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-gallery/)
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
 -	**Allowed Blocks:** core/image
--	**Supports:** align, anchor, color (background, gradients, ~~text~~), interactivity (clientNavigation), layout (default, ~~allowEditing~~, ~~allowInheriting~~, ~~allowSwitching~~), listView, spacing (blockGap, margin, padding), units (em, px, rem, vh, vw), ~~html~~
+-	**Supports:** align, anchor, color (background, gradients, ~~text~~), interactivity (clientNavigation), layout (allowEditing, allowSizingOnChildren, default, ~~allowInheriting~~, ~~allowJustification~~, ~~allowOrientation~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~, ~~allowWrap~~), listView, spacing (blockGap, margin, padding), units (em, px, rem, vh, vw), ~~html~~
 -	**Attributes:** allowResize, aspectRatio, caption, columns, dynamicContent, fixedHeight, ids, imageCrop, images, linkTarget, linkTo, navigationButtonType, randomOrder, shortCodeTransforms, sizeSlug
 
 ## Group

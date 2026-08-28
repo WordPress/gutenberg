@@ -1,4 +1,5 @@
 import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { createBlock } from '@wordpress/blocks';
 import {
 	initializeEditor,
@@ -52,6 +53,90 @@ describe( 'Gallery block', () => {
 			expect(
 				screen.getByRole( 'button', { name: 'Align block' } )
 			).toBeInTheDocument();
+		} );
+	} );
+
+	describe( 'Layout', () => {
+		const createGallery = ( attributes = {} ) =>
+			createBlock( 'core/gallery', attributes, [
+				createBlock( 'core/image', IMAGE_ATTRIBUTES ),
+				createBlock( 'core/image', {
+					...IMAGE_ATTRIBUTES,
+					id: 2,
+				} ),
+			] );
+
+		test( 'keeps the custom Gallery controls for the default Flex layout', async () => {
+			await setup( createGallery() );
+			await selectBlock( 'Block: Gallery' );
+
+			expect(
+				await screen.findByRole( 'slider', { name: 'Columns' } )
+			).toBeInTheDocument();
+			expect(
+				screen.getByLabelText( 'Crop images to fit' )
+			).toBeInTheDocument();
+			expect(
+				screen.queryByText( 'Min. column width' )
+			).not.toBeInTheDocument();
+		} );
+
+		test( 'preserves layout settings when switching Gallery variations', async () => {
+			await setup(
+				createGallery( {
+					columns: 2,
+					imageCrop: false,
+					layout: {
+						type: 'grid',
+						columnCount: 4,
+						minimumColumnWidth: '10rem',
+					},
+				} )
+			);
+			await selectBlock( 'Block: Gallery Grid' );
+
+			expect(
+				screen.queryByLabelText( 'Crop images to fit' )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'slider', { name: 'Columns' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.getByRole( 'radio', { name: 'Gallery Grid' } )
+			).toBeChecked();
+
+			await userEvent.click(
+				await screen.findByRole( 'radio', {
+					name: 'Transform to Gallery',
+				} )
+			);
+
+			// Switching layouts only changes the layout attribute. The Gallery's
+			// previous Flex settings are restored when switching back.
+			expect(
+				screen.getByRole( 'slider', { name: 'Columns' } )
+			).toHaveValue( '2' );
+			expect(
+				screen.getByLabelText( 'Crop images to fit' )
+			).not.toBeChecked();
+
+			await userEvent.click(
+				screen.getByRole( 'radio', {
+					name: 'Transform to Gallery Grid',
+				} )
+			);
+			await userEvent.click(
+				screen.getByRole( 'tab', { name: 'Styles' } )
+			);
+
+			expect(
+				await screen.findByRole( 'spinbutton', { name: 'Columns' } )
+			).toHaveDisplayValue( '4' );
+			expect(
+				await screen.findByRole( 'spinbutton', {
+					name: 'Minimum column width',
+				} )
+			).toHaveDisplayValue( '10' );
 		} );
 	} );
 } );

@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `Autocomplete.Popup`, `Combobox.Popup`, `Select.Popup`, `SearchableChipSelect`, and `SearchableChipSelectControl`: The popup now defaults to a fixed anchor width. Use `popupWidth="content"` to restore content-sized width between the anchor and available viewport bounds ([#82087](https://github.com/WordPress/gutenberg/pull/82087)).
+-   Portaled overlays (`AlertDialog`, `Autocomplete`, `Combobox`, `Dialog`, `Drawer`, `Menu`, `Popover`, and `Select`) now inherit the theme from their portal destination instead of re-emitting the trigger's nearest contextual theme. Default portals use the document root theme; custom portal containers use their DOM ancestry ([#82038](https://github.com/WordPress/gutenberg/pull/82038)).
+
+### Enhancements
+
+-   `Autocomplete.Popup`, `Combobox.Popup`, `SearchableChipSelect`, `SearchableChipSelectControl`, `Select.Popup`, and `SelectControl`: Add `popupWidth` prop with preset width constraints (`anchor`, `content`, `sm`, `md`, `lg`, and `available`) for the item popup. `SelectControl` defaults to `content` to preserve prior popup sizing ([#82087](https://github.com/WordPress/gutenberg/pull/82087)).
+
 ## 0.21.0 (2026-08-26)
 
 ### New Features
@@ -60,6 +69,7 @@
 -   Update `@base-ui/react` from `1.6.0` to `1.7.0`. ([#81390](https://github.com/WordPress/gutenberg/pull/81390))
 -   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509), [#81514](https://github.com/WordPress/gutenberg/pull/81514), [#81516](https://github.com/WordPress/gutenberg/pull/81516), [#81518](https://github.com/WordPress/gutenberg/pull/81518))
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81515](https://github.com/WordPress/gutenberg/pull/81515))
+-   Remove unused `outset-ring--focus-within-visible` CSS module class. ([#82077](https://github.com/WordPress/gutenberg/pull/82077))
 
 ## 0.20.0 (2026-08-12)
 

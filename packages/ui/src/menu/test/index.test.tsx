@@ -318,6 +318,10 @@ describe( 'Menu', () => {
 		if ( ! iframeDocument ) {
 			throw new Error( 'Expected a same-origin iframe document.' );
 		}
+		const addEventListener = jest.spyOn(
+			iframeDocument,
+			'addEventListener'
+		);
 
 		try {
 			const outsideTarget = iframeDocument.createElement( 'button' );
@@ -346,6 +350,13 @@ describe( 'Menu', () => {
 			);
 			const item = within( portaledMenu ).getByRole( 'menuitem', {
 				name: 'Duplicate',
+			} );
+			await waitFor( () => {
+				expect( addEventListener ).toHaveBeenCalledWith(
+					'pointerdown',
+					expect.any( Function ),
+					true
+				);
 			} );
 
 			act( () => {

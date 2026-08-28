@@ -72,7 +72,6 @@
 		"@wordpress/plugins": "file:../plugins",
 		"@wordpress/preferences": "file:../preferences",
 		"@wordpress/private-apis": "file:../private-apis",
-		"@wordpress/reusable-blocks": "file:../reusable-blocks",
 		"@wordpress/theme": "file:../theme",
 		"@wordpress/ui": "file:../ui",
 		"@wordpress/url": "file:../url",

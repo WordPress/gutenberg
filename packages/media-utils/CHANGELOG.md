@@ -10,6 +10,7 @@
 
 ### Bug Fixes
 
+-   Report a server-side upload failure in plain language instead of passing on the REST client's `invalid_json` and `unknown_error` messages ([#81735](https://github.com/WordPress/gutenberg/pull/81735)).
 -   Prevent editor block removal by stopping undo/redo event propagation when the Media Library modal is open ([#79898](https://github.com/WordPress/gutenberg/pull/79898)).
 
 ### Internal
