@@ -11,6 +11,15 @@ import { spawnSync } from 'node:child_process';
 
 describe( 'JSX source extensions', () => {
 	let temporaryDirectory;
+	const buildFormats = [
+		[ 'CommonJS', 'main', './build/index.cjs', 'build/index.cjs' ],
+		[
+			'ESM',
+			'module',
+			'./build-module/index.mjs',
+			'build-module/index.mjs',
+		],
+	];
 
 	beforeEach( () => {
 		temporaryDirectory = mkdtempSync(
@@ -22,7 +31,7 @@ describe( 'JSX source extensions', () => {
 		rmSync( temporaryDirectory, { force: true, recursive: true } );
 	} );
 
-	function buildProject( sourceFilename ) {
+	function buildProject( sourceFilename, packageField, packageEntry ) {
 		const sourceDirectory = path.join(
 			temporaryDirectory,
 			'packages/example/src'
@@ -42,7 +51,7 @@ describe( 'JSX source extensions', () => {
 			JSON.stringify( {
 				name: '@test/example',
 				version: '1.0.0',
-				module: './build-module/index.mjs',
+				[ packageField ]: packageEntry,
 			} )
 		);
 		writeFileSync(
@@ -60,26 +69,41 @@ describe( 'JSX source extensions', () => {
 		);
 	}
 
-	it( 'builds JSX from a .jsx source file', () => {
-		const result = buildProject( 'index.jsx' );
+	it.each( buildFormats )(
+		'builds JSX from a .jsx source file for %s output',
+		( _format, packageField, packageEntry, outputFile ) => {
+			const result = buildProject(
+				'index.jsx',
+				packageField,
+				packageEntry
+			);
 
-		expect( result.status ).toBe( 0 );
-		expect(
-			existsSync(
-				path.join(
-					temporaryDirectory,
-					'packages/example/build-module/index.mjs'
+			expect( result.status ).toBe( 0 );
+			expect(
+				existsSync(
+					path.join(
+						temporaryDirectory,
+						'packages/example',
+						outputFile
+					)
 				)
-			)
-		).toBe( true );
-	} );
+			).toBe( true );
+		}
+	);
 
-	it( 'rejects JSX syntax in a .js source file', () => {
-		const result = buildProject( 'index.js' );
+	it.each( buildFormats )(
+		'rejects JSX syntax in a .js source file for %s output',
+		( _format, packageField, packageEntry ) => {
+			const result = buildProject(
+				'index.js',
+				packageField,
+				packageEntry
+			);
 
-		expect( result.status ).not.toBe( 0 );
-		expect( `${ result.stdout }${ result.stderr }` ).toContain(
-			'The JSX syntax extension is not currently enabled'
-		);
-	} );
+			expect( result.status ).not.toBe( 0 );
+			expect( `${ result.stdout }${ result.stderr }` ).toContain(
+				'The JSX syntax extension is not currently enabled'
+			);
+		}
+	);
 } );
