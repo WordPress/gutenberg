@@ -148,4 +148,17 @@ describe( 'Icon', () => {
 		expect( icon ).toHaveStyle( 'fill: none' );
 		expect( icon ).toHaveStyle( 'margin-inline-start: 4px' );
 	} );
+
+	it( "does not add a 'style' prop to a non-svg element without styles", () => {
+		let hasStyleProp = true;
+		const CustomIcon = ( props: Record< string, unknown > ) => {
+			hasStyleProp = 'style' in props;
+			return <span data-testid={ testId } />;
+		};
+
+		render( <Icon icon={ <CustomIcon /> } /> );
+
+		expect( screen.getByTestId( testId ) ).toBeVisible();
+		expect( hasStyleProp ).toBe( false );
+	} );
 } );

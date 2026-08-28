@@ -89,27 +89,29 @@ function Icon( {
 		} );
 	}
 
-	if ( icon && ( icon.type === 'svg' || icon.type === SVG ) ) {
-		const { style: consumerStyle, ...restProps } =
-			additionalProps as SVGProps< SVGSVGElement >;
-
-		const appliedProps = {
-			...icon.props,
-			width: size,
-			height: size,
-			...restProps,
-			// Merge styles so the icon's intrinsic style (e.g. `fill: none` on
-			// stroke-based icons) is preserved unless the consumer overrides
-			// the same property explicitly.
-			style: { ...icon.props.style, ...consumerStyle },
-		};
-
-		return <SVG { ...appliedProps } />;
-	}
-
 	if ( isValidElement< SizeProps >( icon ) ) {
 		const { style: consumerStyle, ...restProps } =
 			additionalProps as SVGProps< SVGSVGElement >;
+		const mergedStyle =
+			icon.props.style || consumerStyle
+				? { ...icon.props.style, ...consumerStyle }
+				: undefined;
+		const styleProps = mergedStyle ? { style: mergedStyle } : {};
+
+		if ( icon.type === 'svg' || icon.type === SVG ) {
+			const appliedProps = {
+				...icon.props,
+				width: size,
+				height: size,
+				...restProps,
+				// Merge styles so the icon's intrinsic style (e.g. `fill: none` on
+				// stroke-based icons) is preserved unless the consumer overrides
+				// the same property explicitly.
+				...styleProps,
+			};
+
+			return <SVG { ...appliedProps } />;
+		}
 
 		return cloneElement( icon, {
 			size,
@@ -118,10 +120,7 @@ function Icon( {
 			...restProps,
 			// Merge styles so the icon's intrinsic style is preserved unless
 			// the consumer overrides the same property explicitly.
-			style: {
-				...( icon.props as { style?: CSSProperties } ).style,
-				...consumerStyle,
-			},
+			...styleProps,
 		} );
 	}
 
