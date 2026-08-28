@@ -43,4 +43,22 @@ class Block_Core_Icon_Render_Test extends WP_UnitTestCase {
 		$this->assertMatchesRegularExpression( '/(?:^|;)\s*width\s*:\s*48px\s*(?:;|$)/', $style );
 		$this->assertLessThan( strpos( $style, 'width' ), strpos( $style, 'fill' ) );
 	}
+
+	public function test_preserves_intrinsic_svg_style_when_applying_rotation() {
+		$output = gutenberg_render_block_core_icon(
+			array(
+				'icon'     => 'core/info',
+				'rotation' => 90,
+			)
+		);
+
+		$processor = new WP_HTML_Tag_Processor( $output );
+		$this->assertTrue( $processor->next_tag( 'svg' ) );
+
+		$style = $processor->get_attribute( 'style' );
+		$this->assertIsString( $style );
+		$this->assertMatchesRegularExpression( '/(?:^|;)\s*fill\s*:\s*none\s*(?:;|$)/', $style );
+		$this->assertMatchesRegularExpression( '/(?:^|;)\s*rotate\s*:\s*90deg\s*(?:;|$)/', $style );
+		$this->assertLessThan( strpos( $style, 'rotate' ), strpos( $style, 'fill' ) );
+	}
 }
