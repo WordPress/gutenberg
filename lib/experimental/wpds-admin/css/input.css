@@ -1,0 +1,272 @@
+/**
+ * Classic admin text inputs, selects and textareas, restyled from WordPress
+ * Design System tokens.
+ *
+ * Target: visual parity with the `@wordpress/ui` input primitive
+ * (packages/ui/src/form/primitives/input-layout/style.module.css), which is the
+ * purest token expression of a field in the design system. Values come from
+ * there; the selectors below are hand-authored against classic markup.
+ *
+ * Selector list mirrors Core's own in wp-admin/css/forms.css so the same set of
+ * controls is covered — no more, no less.
+ *
+ * NO `!important` IN THIS FILE. See overrides.css for the one exception and why.
+ */
+
+@layer wpds-overrides, wp-legacy, wpds;
+
+@layer wpds {
+
+	/* -----------------------------------------------------------------------
+	   Base — shared by text inputs, select and textarea
+	   ----------------------------------------------------------------------- */
+
+	input[type="text"],
+	input[type="password"],
+	input[type="color"],
+	input[type="date"],
+	input[type="datetime"],
+	input[type="datetime-local"],
+	input[type="email"],
+	input[type="month"],
+	input[type="number"],
+	input[type="search"],
+	input[type="tel"],
+	input[type="time"],
+	input[type="url"],
+	input[type="week"],
+	select,
+	textarea {
+		box-sizing: border-box;
+		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-interactive-neutral);
+		border-radius: var(--wpds-border-radius-sm);
+		/*
+		 * DEVIATION from the design system, deliberate.
+		 * The DS field is transparent (`--wpds-color-background-interactive-neutral-weak`
+		 * is `#0000`) because it always sits on a defined surface. Classic admin
+		 * has no such guarantee — fields sit directly on the grey `#f0f0f0` page
+		 * background as often as on white cards — so a transparent field would
+		 * read as grey on many screens. White keeps the field legible as a field.
+		 */
+		background-color: var(--wpds-color-background-surface-neutral-strong);
+		color: var(--wpds-color-foreground-interactive-neutral);
+		box-shadow: none;
+		font-family: var(--wpds-typography-font-family-body);
+		/* 16px below 600px avoids iOS zooming on focus; matches the DS. */
+		font-size: max(var(--wpds-typography-font-size-md), 16px);
+		line-height: 1;
+	}
+
+	@media (min-width: 600px) {
+
+		input[type="text"],
+		input[type="password"],
+		input[type="color"],
+		input[type="date"],
+		input[type="datetime"],
+		input[type="datetime-local"],
+		input[type="email"],
+		input[type="month"],
+		input[type="number"],
+		input[type="search"],
+		input[type="tel"],
+		input[type="time"],
+		input[type="url"],
+		input[type="week"],
+		select,
+		textarea {
+			font-size: var(--wpds-typography-font-size-md);
+		}
+	}
+
+	/* -----------------------------------------------------------------------
+	   Sizing — text inputs and select get a fixed height; textarea does not
+	   ----------------------------------------------------------------------- */
+
+	input[type="text"],
+	input[type="password"],
+	input[type="date"],
+	input[type="datetime"],
+	input[type="datetime-local"],
+	input[type="email"],
+	input[type="month"],
+	input[type="number"],
+	input[type="search"],
+	input[type="tel"],
+	input[type="time"],
+	input[type="url"],
+	input[type="week"] {
+		/* No height — see the note in button.css. Core's default is already 40px
+		   and its contextual rules must keep winning. */
+		padding: 0 var(--wpds-dimension-padding-md);
+	}
+
+	/*
+	 * Select needs asymmetric padding, because Core draws the dropdown arrow as a
+	 * background image at the trailing edge and the text has to clear it.
+	 *
+	 * Core reserves exactly the arrow's own width (24px for a 16px arrow inset
+	 * 8px), so the text ends precisely where the arrow begins and there is no
+	 * gutter at all. React's SelectControl reserves the icon PLUS a trailing
+	 * gutter mirroring the leading one:
+	 *
+	 *     paddingLeft:  controlPaddingX          // 12
+	 *     paddingRight: controlPaddingX + 18     // chevronIconSize
+	 *
+	 * This adopts that formula rather than inventing a number, so the two are the
+	 * same construction rather than coincidentally similar.
+	 *
+	 * The 18px is deliberately not a token. The icon set is drawn and hinted at
+	 * 24x24 and, being fill-based, scales badly to arbitrary sizes; 18 is 75% of
+	 * 24, picked to interpolate cleanly. Mirroring it keeps classic and the
+	 * component in step.
+	 *
+	 * Logical properties, so this follows the arrow when Core's RTL stylesheet
+	 * flips it to the leading edge.
+	 */
+	select {
+		/*
+		 * Only the TRAILING padding, not the shorthand. Core narrows the leading
+		 * padding contextually (`.wp-core-ui .tablenav select` uses 8px), and a
+		 * shorthand here would flatten that along with everything else. Setting
+		 * one side leaves Core's contextual value on the other intact, and the
+		 * arrow still gets its gutter in every context.
+		 *
+		 * No height, for the reason given in button.css.
+		 */
+		padding-inline-end: calc(var(--wpds-dimension-padding-md) + 18px);
+	}
+
+	textarea {
+		padding: var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-md);
+		line-height: var(--wpds-typography-line-height-md);
+	}
+
+	/* -----------------------------------------------------------------------
+	   Placeholder
+	   ----------------------------------------------------------------------- */
+
+	/*
+	 * Uses the design system token even though it fails contrast on white
+	 * (#8d8d8d is about 3.3:1; WCAG AA wants 4.5:1 for text). Matching the token
+	 * is deliberate: diverging here would hide the problem and report a false
+	 * difference against the component. The fix belongs in the design system.
+	 */
+	input::placeholder,
+	textarea::placeholder {
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+		opacity: 1;
+	}
+
+	/* -----------------------------------------------------------------------
+	   Hover — classic has no hover state; the design system darkens the border.
+
+	   Excluded from disabled and readonly fields. Without the :not() the hover
+	   rule outranks the disabled rule: an attribute selector plus a pseudo-class
+	   is (0,2,1), while `input:disabled` is only (0,1,1), so hovering a disabled
+	   field would light up its border as if it were editable.
+	   ----------------------------------------------------------------------- */
+
+	input[type="text"]:hover,
+	input[type="password"]:hover,
+	input[type="date"]:hover,
+	input[type="datetime"]:hover,
+	input[type="datetime-local"]:hover,
+	input[type="email"]:hover,
+	input[type="month"]:hover,
+	input[type="number"]:hover,
+	input[type="search"]:hover,
+	input[type="tel"]:hover,
+	input[type="time"]:hover,
+	input[type="url"]:hover,
+	input[type="week"]:hover,
+	select:hover,
+	textarea:hover {
+		border-color: var(--wpds-color-stroke-interactive-neutral-active);
+	}
+
+	/* Disabled fields keep the disabled border on hover. */
+	input:disabled:hover,
+	input.disabled:hover,
+	input[aria-disabled="true"]:hover,
+	select:disabled:hover,
+	select.disabled:hover,
+	select[aria-disabled="true"]:hover,
+	textarea:disabled:hover,
+	textarea.disabled:hover,
+	textarea[aria-disabled="true"]:hover {
+		border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+	}
+
+	/*
+	 * Readonly fields keep the NORMAL border on hover — they are not disabled,
+	 * their border is the normal one, and lightening it would be wrong in the
+	 * other direction. They simply do not gain the hover emphasis, because the
+	 * tinted background already says the value cannot be edited.
+	 */
+	input[readonly]:hover,
+	input.readonly:hover,
+	textarea[readonly]:hover,
+	textarea.readonly:hover {
+		border-color: var(--wpds-color-stroke-interactive-neutral);
+	}
+
+	/* -----------------------------------------------------------------------
+	   Focus — outline/outline-offset, never box-shadow.
+	   Core's ring is a box-shadow plus an accent border; both are replaced.
+	   ----------------------------------------------------------------------- */
+
+	input[type="text"]:focus,
+	input[type="password"]:focus,
+	input[type="color"]:focus,
+	input[type="date"]:focus,
+	input[type="datetime"]:focus,
+	input[type="datetime-local"]:focus,
+	input[type="email"]:focus,
+	input[type="month"]:focus,
+	input[type="number"]:focus,
+	input[type="search"]:focus,
+	input[type="tel"]:focus,
+	input[type="time"]:focus,
+	input[type="url"]:focus,
+	input[type="week"]:focus,
+	select:focus,
+	textarea:focus {
+		border-color: var(--wpds-color-stroke-interactive-neutral);
+		outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+		outline-offset: var(--wpds-border-width-focus);
+		box-shadow: none;
+	}
+
+	/* -----------------------------------------------------------------------
+	   Disabled and readonly
+	   ----------------------------------------------------------------------- */
+
+	input:disabled,
+	input.disabled,
+	input[aria-disabled="true"],
+	select:disabled,
+	select.disabled,
+	select[aria-disabled="true"],
+	textarea:disabled,
+	textarea.disabled,
+	textarea[aria-disabled="true"] {
+		/*
+		 * DS border and text, but a tinted background rather than the DS's
+		 * transparent one. Classic forms are dense, and border-plus-text alone is
+		 * a weak disabled signal at a glance; the tint is what classic readers
+		 * already recognise. Same reasoning as the base background above.
+		 */
+		background-color: var(--wpds-color-background-surface-neutral-weak);
+		border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+		box-shadow: none;
+	}
+
+	input.readonly,
+	input[readonly],
+	textarea.readonly,
+	textarea[readonly] {
+		background-color: var(--wpds-color-background-surface-neutral-weak);
+	}
+}
