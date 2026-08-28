@@ -138,7 +138,7 @@ interface DashboardGridLayoutItem {
 
 -   `number`: span that many columns (clamped to the grid's column count).
 -   `'fill'`: fill the remaining columns in the current row.
--   `'full'`: span every column, or the item's maximum width when `itemLimits` caps it.
+-   `'full'`: span every column and force a row break; an `itemLimits` maximum caps the span.
 
 `'fill'` is resolved per-row against the remaining free space.
 
