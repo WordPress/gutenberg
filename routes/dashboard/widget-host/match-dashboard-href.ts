@@ -24,7 +24,7 @@ function isPlainQuery( query: string ): boolean {
 }
 
 /**
- * Resolves an action href to a route path inside this SPA.
+ * Resolves an action href to a route inside this SPA.
  *
  * A href belongs here when it targets the same document (origin and
  * pathname) and the same admin `page`; the route is then whatever `p`
@@ -38,7 +38,7 @@ function isPlainQuery( query: string ): boolean {
  * @param {string} href Action href, absolute or relative.
  * @param {string} base Document URL the href is judged against; defaults
  *                      to the current location.
- * @return {string | null} The in-app route path, or `null`.
+ * @return {string | null} The in-app route, its query included, or `null`.
  */
 export function matchDashboardHref(
 	href: string,
