@@ -1,18 +1,18 @@
 /**
- * Checks the read assertions without spending model calls.
+ * Checks the read assertions in `../reads.js` without spending model calls.
  *
  * These are the cases the naive check got wrong — a path named but not read, a
  * read that was refused, a read that stopped early — so they are worth holding
  * still. An assertion is a plain function, so each is a recorded set of tool
  * calls and an expected verdict.
  *
- *   npm run test:grader
+ *   npm run test:utils
  */
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
-import { assertRead, assertNotRead } from '../../utils/index.js';
+import { assertRead, assertNotRead } from '../index.js';
 import { sourceRoot } from '../../lib/paths.js';
 
 const REFERENCE = '.agents/skills/testing/references/e2e.md';
