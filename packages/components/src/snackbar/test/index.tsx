@@ -234,6 +234,37 @@ describe( 'Snackbar', () => {
 			} );
 			expect( link ).toBeVisible();
 		} );
+
+		it( 'should dismiss without activating the action when clicking the snackbar body', async () => {
+			const onClick = jest.fn();
+			const onDismiss = jest.fn();
+			const onRemove = jest.fn();
+
+			render(
+				<Snackbar
+					onDismiss={ onDismiss }
+					onRemove={ onRemove }
+					actions={ [ { label: 'Undo', onClick } ] }
+				>
+					Post trashed.
+				</Snackbar>
+			);
+
+			const snackbar = screen.getByTestId( testId );
+
+			// The wrapper stays labelled as the dismiss affordance; the action
+			// keeps its own accessible name on the element that performs it.
+			expect( snackbar ).toHaveAttribute(
+				'aria-label',
+				'Dismiss this notice'
+			);
+
+			await click( snackbar );
+
+			expect( onDismiss ).toHaveBeenCalledTimes( 1 );
+			expect( onRemove ).toHaveBeenCalledTimes( 1 );
+			expect( onClick ).not.toHaveBeenCalled();
+		} );
 	} );
 
 	describe( 'useSpokenMessage', () => {

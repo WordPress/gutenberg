@@ -48,6 +48,11 @@
 	.components-snackbar__dismiss-button {
 		margin-left: $grid-unit-30;
 		cursor: var(--wpds-cursor-control);
+
+		// Stack above the action's enlarged click target, which bleeds toward
+		// the dismiss button from the left.
+		position: relative;
+		z-index: 1;
 	}
 }
 
@@ -56,6 +61,41 @@
 	margin-left: $grid-unit-40;
 	color: $white;
 	flex-shrink: 0;
+
+	// The action is a short piece of text in a tall bar, so its own box is a
+	// small target. Bleed a pseudo-element out to the surrounding whitespace
+	// to enlarge it. The pseudo-element is a child of the action, so the click
+	// still lands on the real anchor or button: modifier-clicks, the context
+	// menu and `rel` semantics all keep working.
+	position: relative;
+
+	&::after {
+		content: "";
+		position: absolute;
+		// Vertically out to the snackbar's padding edge; horizontally into
+		// half of each adjacent gap, so the message text keeps the rest of the
+		// bar for click-to-dismiss.
+		top: -$grid-unit-15;
+		bottom: -$grid-unit-15;
+		left: -$grid-unit-20;
+		right: -$grid-unit-15;
+		border-radius: $radius-small;
+	}
+
+	// Without an explicit dismiss button the action is last in the bar, so its
+	// target can bleed all the way to the right padding edge.
+	.components-snackbar:not(.components-snackbar-explicit-dismiss) & {
+		&::after {
+			right: -$grid-unit-05 * 5;
+		}
+	}
+
+	// Reveal the enlarged target on hover and keyboard focus, so the area that
+	// responds to a click is discoverable rather than invisible.
+	&:hover::after,
+	&:focus-visible::after {
+		background: rgba($white, 0.1);
+	}
 
 	&:focus {
 		box-shadow: none;
