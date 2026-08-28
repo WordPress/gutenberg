@@ -29,6 +29,7 @@ const meta: Meta< typeof Combobox.Root > = {
 		'Combobox.Chips': Combobox.Chips,
 		'Combobox.ChipWithRemove': Combobox.ChipWithRemove,
 		'Combobox.Empty': Combobox.Empty,
+		'Combobox.Status': Combobox.Status,
 		'Combobox.Clear': Combobox.Clear,
 	},
 	parameters: {
@@ -242,19 +243,21 @@ export const Creatable: Story = {
 	},
 };
 
+/**
+ * Announce loading through `Status` and the empty list through `Empty`.
+ * Keep `Status` mounted and change its children.
+ */
 export const AsyncItems: Story = {
 	render: function Template( args ) {
-		const LOADING_ITEM = {
-			value: 'loading',
-			label: 'Loading...',
-		};
-		const [ items, setItems ] = useState( [ LOADING_ITEM ] );
-		const [ value, setValue ] = useState< unknown >( LOADING_ITEM );
+		const [ loading, setLoading ] = useState( true );
+		const [ items, setItems ] = useState< FixtureItem[] >( [] );
+		const [ value, setValue ] = useState< FixtureItem | undefined >();
 
 		useEffect( () => {
 			const timeout = setTimeout( () => {
 				setItems( ITEMS );
 				setValue( ITEMS[ 0 ] );
+				setLoading( false );
 			}, 3000 );
 
 			return () => clearTimeout( timeout );
@@ -272,7 +275,12 @@ export const AsyncItems: Story = {
 					<div style={ inputWrapperStyle }>
 						<Combobox.Input placeholder="Search" />
 					</div>
-					<Combobox.Empty>No results found.</Combobox.Empty>
+					<Combobox.Status>
+						{ loading ? 'Loading...' : null }
+					</Combobox.Status>
+					<Combobox.Empty>
+						{ loading ? null : 'No results found.' }
+					</Combobox.Empty>
 					<Combobox.List>
 						<Combobox.ListBody>
 							<Combobox.Collection>
@@ -280,7 +288,6 @@ export const AsyncItems: Story = {
 									<Combobox.Item
 										key={ item.value }
 										value={ item }
-										disabled={ item.value === 'loading' }
 									>
 										{ item.label }
 									</Combobox.Item>

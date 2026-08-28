@@ -31,6 +31,7 @@ describe( 'Autocomplete', () => {
 		const itemRef = createRef< HTMLDivElement >();
 		const clearRef = createRef< HTMLButtonElement >();
 		const emptyRef = createRef< HTMLDivElement >();
+		const statusRef = createRef< HTMLDivElement >();
 
 		render(
 			<Autocomplete.Root items={ ITEMS }>
@@ -38,6 +39,9 @@ describe( 'Autocomplete', () => {
 					<Autocomplete.Input ref={ inputRef } placeholder="Search" />
 				</Autocomplete.InputGroup>
 				<Autocomplete.Popup ref={ popupRef }>
+					<Autocomplete.Status ref={ statusRef }>
+						Loading...
+					</Autocomplete.Status>
 					<Autocomplete.Empty ref={ emptyRef }>
 						No results found.
 					</Autocomplete.Empty>
@@ -78,6 +82,53 @@ describe( 'Autocomplete', () => {
 		expect( itemRef.current ).toBeInstanceOf( HTMLDivElement );
 		expect( clearRef.current ).toBeInstanceOf( HTMLButtonElement );
 		expect( emptyRef.current ).toBeInstanceOf( HTMLDivElement );
+		expect( statusRef.current ).toBeInstanceOf( HTMLDivElement );
+	} );
+
+	it( 'announces status without unmounting the live region', async () => {
+		const statusRef = createRef< HTMLDivElement >();
+
+		function StatusExample( { message }: { message: string } ) {
+			return (
+				<Autocomplete.Root items={ ITEMS } defaultOpen>
+					<Autocomplete.Input placeholder="Search" />
+					<Autocomplete.Popup>
+						<Autocomplete.Status ref={ statusRef }>
+							{ message }
+						</Autocomplete.Status>
+						<Autocomplete.List>
+							<Autocomplete.ListBody>
+								<Autocomplete.Collection>
+									{ ( item ) => (
+										<Autocomplete.Item
+											key={ item.id }
+											value={ item }
+										>
+											{ item.value }
+										</Autocomplete.Item>
+									) }
+								</Autocomplete.Collection>
+							</Autocomplete.ListBody>
+						</Autocomplete.List>
+					</Autocomplete.Popup>
+				</Autocomplete.Root>
+			);
+		}
+
+		const { rerender } = render( <StatusExample message="Loading..." /> );
+
+		const status = await screen.findByRole( 'status' );
+		expect( status ).toBeVisible();
+		expect( status ).toHaveTextContent( 'Loading...' );
+
+		const statusNode = statusRef.current;
+		expect( statusNode ).toBeInstanceOf( HTMLDivElement );
+
+		rerender( <StatusExample message="" /> );
+
+		expect( statusRef.current ).toBe( statusNode );
+		expect( screen.getByRole( 'status' ) ).toBe( statusNode );
+		expect( screen.getByRole( 'status' ) ).toHaveTextContent( '' );
 	} );
 
 	describe( 'portal', () => {

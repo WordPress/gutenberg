@@ -35,6 +35,7 @@ const meta: Meta< typeof Autocomplete.Root > = {
 		'Autocomplete.Row': Autocomplete.Row,
 		'Autocomplete.Value': Autocomplete.Value,
 		'Autocomplete.Empty': Autocomplete.Empty,
+		'Autocomplete.Status': Autocomplete.Status,
 		'Autocomplete.Clear': Autocomplete.Clear,
 	},
 	parameters: {
@@ -126,6 +127,10 @@ export const OpenOnlyOnMatch: Story = {
 	},
 };
 
+/**
+ * Announce loading through `Status` and the empty list through `Empty`.
+ * Keep `Status` mounted and change its children.
+ */
 export const AsyncItems: Story = {
 	render: function Template( args ) {
 		const [ query, setQuery ] = useState( '' );
@@ -154,8 +159,11 @@ export const AsyncItems: Story = {
 			>
 				<Autocomplete.Input placeholder="Enter a URL" />
 				<Autocomplete.Popup>
+					<Autocomplete.Status>
+						{ loading ? 'Loading...' : null }
+					</Autocomplete.Status>
 					<Autocomplete.Empty>
-						{ loading ? 'Loading...' : 'No matching items.' }
+						{ loading ? null : 'No matching items.' }
 					</Autocomplete.Empty>
 					<Autocomplete.List>
 						<Autocomplete.ListBody>

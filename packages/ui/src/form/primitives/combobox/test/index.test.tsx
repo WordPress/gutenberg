@@ -68,6 +68,7 @@ describe( 'Combobox', () => {
 		const chipWithRemoveRef = createRef< HTMLDivElement >();
 		const clearRef = createRef< HTMLButtonElement >();
 		const emptyRef = createRef< HTMLDivElement >();
+		const statusRef = createRef< HTMLDivElement >();
 
 		render(
 			<Combobox.Root items={ ITEMS } defaultValue={ ITEMS[ 0 ] }>
@@ -87,6 +88,9 @@ describe( 'Combobox', () => {
 							<Combobox.Clear ref={ clearRef } />
 						</Combobox.Chips>
 					</Combobox.Value>
+					<Combobox.Status ref={ statusRef }>
+						Loading...
+					</Combobox.Status>
 					<Combobox.Empty ref={ emptyRef }>
 						No results found.
 					</Combobox.Empty>
@@ -135,6 +139,53 @@ describe( 'Combobox', () => {
 		expect( chipWithRemoveRef.current ).toBeInstanceOf( HTMLDivElement );
 		expect( clearRef.current ).toBeInstanceOf( HTMLButtonElement );
 		expect( emptyRef.current ).toBeInstanceOf( HTMLDivElement );
+		expect( statusRef.current ).toBeInstanceOf( HTMLDivElement );
+	} );
+
+	it( 'announces status without unmounting the live region', async () => {
+		const statusRef = createRef< HTMLDivElement >();
+
+		function StatusExample( { message }: { message: string } ) {
+			return (
+				<Combobox.Root items={ ITEMS } defaultOpen>
+					<Combobox.Trigger />
+					<Combobox.Popup>
+						<Combobox.Status ref={ statusRef }>
+							{ message }
+						</Combobox.Status>
+						<Combobox.List>
+							<Combobox.ListBody>
+								<Combobox.Collection>
+									{ ( item ) => (
+										<Combobox.Item
+											key={ item.id }
+											value={ item }
+										>
+											{ item.value }
+										</Combobox.Item>
+									) }
+								</Combobox.Collection>
+							</Combobox.ListBody>
+						</Combobox.List>
+					</Combobox.Popup>
+				</Combobox.Root>
+			);
+		}
+
+		const { rerender } = render( <StatusExample message="Loading..." /> );
+
+		const status = await screen.findByRole( 'status' );
+		expect( status ).toBeVisible();
+		expect( status ).toHaveTextContent( 'Loading...' );
+
+		const statusNode = statusRef.current;
+		expect( statusNode ).toBeInstanceOf( HTMLDivElement );
+
+		rerender( <StatusExample message="" /> );
+
+		expect( statusRef.current ).toBe( statusNode );
+		expect( screen.getByRole( 'status' ) ).toBe( statusNode );
+		expect( screen.getByRole( 'status' ) ).toHaveTextContent( '' );
 	} );
 
 	it( 'uses a custom positioner', async () => {
