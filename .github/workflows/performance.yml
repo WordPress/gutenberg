@@ -96,6 +96,7 @@ jobs:
                   PLUGIN_FILES: ${{ needs.prepare.outputs.plugin-files }}
               run: |
                   mkdir -p "$PLUGIN_DIR"
+                  # post-content.php is gone from trunk but refs up to WP 6.x still require it from lib/demo.php.
                   # shellcheck disable=SC2086 # The list holds globs that must expand.
                   tar --ignore-failed-read -cf - $PLUGIN_FILES post-content.php \
                     | tar -xf - -C "$PLUGIN_DIR"
