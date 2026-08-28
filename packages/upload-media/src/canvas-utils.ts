@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getFileBasename } from './utils';
 import { parseHeic } from './heic-parser';
 import { getHeicUnsupportedMessage } from './heic-support';

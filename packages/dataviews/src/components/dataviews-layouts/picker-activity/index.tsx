@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { Spinner, Composite } from '@wordpress/components';
 import { useContext, useMemo, useRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { Stack, VisuallyHidden } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import DataViewsContext from '../../dataviews-context';
 import { useIsMultiselectPicker } from '../../dataviews-picker-footer';
 import getDataByGroup from '../utils/get-data-by-group';

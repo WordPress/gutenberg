@@ -1,27 +1,18 @@
-/**
- * WordPress dependencies
- */
-import {
-	BaseControl,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { isSameMonth } from 'date-fns';
+import { BaseControl } from '@wordpress/components';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
+import { speak } from '@wordpress/a11y';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
-import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
+import { Calendar, Stack, ValidatedInputControl } from '@wordpress/ui';
 import type { DataFormControlProps, FormatDatetime } from '../../types';
 import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../../constants';
 import RelativeDateControl from './utils/relative-date-control';
+import toCalendarDate from './utils/to-calendar-date';
 import useDisabledDateMatchers from './utils/use-disabled-date-matchers';
 import getCustomValidity from './utils/get-custom-validity';
+import getCalendarLocale from './utils/get-calendar-locale';
 import parseDateTime from '../../field-types/utils/parse-date-time';
-import { unlock } from '../../lock-unlock';
-
-const { DateCalendar, ValidatedInputControl } = unlock( componentsPrivateApis );
 
 const formatDateTime = ( value?: string ): string => {
 	if ( ! value ) {
@@ -45,16 +36,32 @@ function CalendarDateTimeControl< Item >( {
 	const disabled = field.isDisabled( { item: data, field } );
 	const fieldValue = getValue( { item: data } );
 	const value = typeof fieldValue === 'string' ? fieldValue : undefined;
+	const { timezone } = getSettings();
+	const timeZone = timezone.string || dateI18n( 'P' );
 
 	const [ calendarMonth, setCalendarMonth ] = useState< Date >( () => {
 		const parsedDate = parseDateTime( value );
-		return parsedDate || new Date(); // Default to current month
+		return toCalendarDate( parsedDate || new Date(), timeZone );
 	} );
+	// Follow external value changes in the same timezone frame as the calendar.
+	useEffect( () => {
+		const parsedDate = parseDateTime( value );
+		if ( parsedDate ) {
+			const targetMonth = toCalendarDate( parsedDate, timeZone );
+			setCalendarMonth( ( currentMonth ) =>
+				isSameMonth(
+					targetMonth,
+					toCalendarDate( currentMonth, timeZone )
+				)
+					? currentMonth
+					: targetMonth
+			);
+		}
+	}, [ timeZone, value ] );
 
 	const inputControlRef = useRef< HTMLInputElement >( null );
 	const validationTimeoutRef =
 		useRef< ReturnType< typeof setTimeout > >( undefined );
-	const previousFocusRef = useRef< Element | null >( null );
 
 	const { minConstraint, maxConstraint, disabledMatchers } =
 		useDisabledDateMatchers( isValid, parseDateTime );
@@ -67,60 +74,50 @@ function CalendarDateTimeControl< Item >( {
 
 	// Cleanup timeout on unmount
 	useEffect( () => {
-		return () => {
-			if ( validationTimeoutRef.current ) {
-				clearTimeout( validationTimeoutRef.current );
-			}
-		};
+		return () => clearTimeout( validationTimeoutRef.current );
 	}, [] );
 
 	const onSelectDate = useCallback(
-		( newDate: Date | undefined | null ) => {
-			let dateTimeValue: string | undefined;
+		( newDate: Date | null ) => {
 			if ( newDate ) {
-				// Extract the date part in WP timezone from the calendar selection
+				// Extract the date part in the WordPress timezone.
 				const wpDate = dateI18n( 'Y-m-d', newDate );
 
-				// Preserve time if it exists in current value, otherwise use current time
-				let wpTime: string;
-				if ( value ) {
-					wpTime = dateI18n( 'H:i', getDate( value ) );
-				} else {
-					wpTime = dateI18n( 'H:i', newDate );
-				}
+				// Preserve time if it exists. A new value starts at midnight in
+				// the site timezone.
+				const wpTime = value
+					? dateI18n( 'H:i', getDate( value ) )
+					: '00:00';
 
 				// Combine date and time in WP timezone and convert to ISO
 				const finalDateTime = getDate( `${ wpDate }T${ wpTime }` );
-				dateTimeValue = finalDateTime.toISOString();
-				onChangeCallback( dateTimeValue );
-
-				// Clear any existing timeout
-				if ( validationTimeoutRef.current ) {
-					clearTimeout( validationTimeoutRef.current );
-				}
+				onChangeCallback( finalDateTime.toISOString() );
 			} else {
 				onChangeCallback( undefined );
 			}
-			// Save the currently focused element
-			previousFocusRef.current =
-				inputControlRef.current &&
-				inputControlRef.current.ownerDocument.activeElement;
 
-			// Trigger validation display by simulating focus, blur, and changes.
-			// Use a timeout to ensure it runs after the value update.
+			// A calendar interaction counts as touching the field: reveal the
+			// input's validity state by firing a synthetic `invalid` event,
+			// which the validated control listens to in order to display its
+			// error message without moving focus (unlike `reportValidity()`).
+			// The control re-reads the message on this event, so dispatching
+			// unconditionally is also what clears a stale error once a valid
+			// date is selected.
+			// The timeout ensures the input has re-rendered with the new
+			// value before its validity is sampled.
+			clearTimeout( validationTimeoutRef.current );
 			validationTimeoutRef.current = setTimeout( () => {
-				if ( inputControlRef.current ) {
-					inputControlRef.current.focus();
-					inputControlRef.current.blur();
-					onChangeCallback( dateTimeValue );
-
-					// Restore focus to the previously focused element
-					if (
-						previousFocusRef.current &&
-						previousFocusRef.current instanceof HTMLElement
-					) {
-						previousFocusRef.current.focus();
-					}
+				const input = inputControlRef.current;
+				if ( ! input ) {
+					return;
+				}
+				input.dispatchEvent(
+					new Event( 'invalid', { cancelable: true } )
+				);
+				// Focus stays on the calendar, so announce the message;
+				// revealing it alone would go unnoticed by screen readers.
+				if ( input.validationMessage ) {
+					speak( input.validationMessage );
 				}
 			}, 0 );
 		},
@@ -137,22 +134,20 @@ function CalendarDateTimeControl< Item >( {
 				// Update calendar month to match
 				const parsedDate = parseDateTime( dateTime.toISOString() );
 				if ( parsedDate ) {
-					setCalendarMonth( parsedDate );
+					setCalendarMonth( toCalendarDate( parsedDate, timeZone ) );
 				}
 			} else {
 				onChangeCallback( undefined );
 			}
 		},
-		[ onChangeCallback ]
+		[ onChangeCallback, timeZone ]
 	);
 
 	const { format: fieldFormat } = field;
 	const weekStartsOn =
 		( fieldFormat as FormatDatetime ).weekStartsOn ??
 		getSettings().l10n.startOfWeek;
-	const {
-		timezone: { string: timezoneString },
-	} = getSettings();
+	const locale = getCalendarLocale( getSettings().l10n.locale );
 
 	let displayLabel = label;
 	if ( isValid?.required && ! markWhenOptional && ! hideLabelFromVision ) {
@@ -182,7 +177,7 @@ function CalendarDateTimeControl< Item >( {
 					label={ __( 'Date time' ) }
 					hideLabelFromVision
 					value={ formatDateTime( value ) }
-					onChange={ handleManualDateTimeChange }
+					onValueChange={ handleManualDateTimeChange }
 					disabled={ disabled }
 					min={
 						minConstraint
@@ -197,17 +192,15 @@ function CalendarDateTimeControl< Item >( {
 				/>
 				{ /* Calendar widget */ }
 				{ ! compact && (
-					<DateCalendar
+					<Calendar
 						style={ { width: '100%' } }
-						selected={
-							value
-								? parseDateTime( value ) || undefined
-								: undefined
-						}
-						onSelect={ onSelectDate }
+						value={ value ? parseDateTime( value ) : null }
+						onValueChange={ onSelectDate }
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
-						timeZone={ timezoneString || undefined }
+						timeZone={ timeZone }
+						locale={ locale }
+						dir={ isRTL() ? 'rtl' : 'ltr' }
 						weekStartsOn={ weekStartsOn }
 						disabled={ disabled || disabledMatchers }
 					/>

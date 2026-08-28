@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import warn from '@wordpress/warning';
-
-/**
- * Internal dependencies
- */
 import { useComponentsContext } from './context-system-provider';
 import { getNamespace, getConnectedNamespace } from './utils';
 import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';

@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import {
 	insert,
 	toHTMLString,
 	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
 import { getBlockTransforms, findTransform } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../../store';
 import { preventEventDiscovery } from '../prevent-event-discovery';
 import {

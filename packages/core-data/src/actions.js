@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import { v4 as uuid } from 'uuid';
-
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { clearUnchangedEdits, getNestedValue, setNestedValue } from './utils';
 import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
@@ -439,12 +428,15 @@ export const deleteEntityRecord =
  * Returns an action object that triggers an
  * edit to an entity record.
  *
- * @param {string}        kind                 Kind of the edited entity record.
- * @param {string}        name                 Name of the edited entity record.
- * @param {number|string} recordId             Record ID of the edited entity record.
- * @param {Object}        edits                The edits.
- * @param {Object}        options              Options for the edit.
- * @param {boolean}       [options.undoIgnore] Whether to ignore the edit in undo history or not.
+ * @param {string}                  kind                 Kind of the edited entity record.
+ * @param {string}                  name                 Name of the edited entity record.
+ * @param {number|string|undefined} recordId             Pass `undefined` for keyless entities.
+ * @param {Object}                  edits                The edits.
+ * @param {Object}                  options              Options for the edit.
+ * @param {boolean}                 [options.undoIgnore] Whether to ignore the edit in undo history or not.
+ * @param {boolean}                 [options.isCached]   Whether the edit is transient (e.g. typing). Transient
+ *                                                       edits are staged and eventually merged into the
+ *                                                       preceding undo level instead of creating a new one.
  *
  * @return {Object} Action object.
  */
@@ -546,9 +538,9 @@ export const editEntityRecord =
  * Action triggered to clear all edits from
  * an entity record.
  *
- * @param {string}        kind     Kind of the entity.
- * @param {string}        name     Name of the entity.
- * @param {number|string} recordId Record ID of the entity record.
+ * @param {string}        kind       Kind of the entity.
+ * @param {string}        name       Name of the entity.
+ * @param {number|string} [recordId] Is omitted for keyless entities.
  *
  * @return {Object} Action object.
  */
@@ -870,13 +862,19 @@ export const saveEntityRecord =
 						method: recordId ? 'PUT' : 'POST',
 						data: edits,
 					} );
+					// Pass the pre-`__unstablePrePersist` edits so the reducer
+					// can clear the persisted edits from state. The values
+					// added by `__unstablePrePersist` (e.g. a fresh CRDT
+					// snapshot in `meta`) never exist in the state edits, so
+					// comparing against them would fail to match and leave the
+					// record dirty after a successful save.
 					dispatch.receiveEntityRecords(
 						kind,
 						name,
 						updatedRecord,
 						undefined,
 						true,
-						edits
+						record
 					);
 					if ( entityConfig.syncConfig ) {
 						let syncChanges;
@@ -989,10 +987,10 @@ export const __experimentalBatch =
 /**
  * Action triggered to save an entity record's edits.
  *
- * @param {string}  kind     Kind of the entity.
- * @param {string}  name     Name of the entity.
- * @param {Object}  recordId ID of the record.
- * @param {Object=} options  Saving options.
+ * @param {string}        kind       Kind of the entity.
+ * @param {string}        name       Name of the entity.
+ * @param {number|string} [recordId] Is omitted for keyless entities.
+ * @param {Object}        [options]  Saving options.
  */
 export const saveEditedEntityRecord =
 	( kind, name, recordId, options ) =>

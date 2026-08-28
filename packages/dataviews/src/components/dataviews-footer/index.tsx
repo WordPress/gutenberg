@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useContext } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import DataViewsContext from '../dataviews-context';
 import DataViewsPagination, {
 	hasPaginationControls,

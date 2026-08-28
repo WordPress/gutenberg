@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import type { View, SupportedLayouts } from '@wordpress/dataviews';
 
 /**

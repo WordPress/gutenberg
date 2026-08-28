@@ -1,5 +1,6 @@
 import { Popover as _Popover } from '@base-ui/react/popover';
 import type { RootProps } from './types';
+import { DirectionProvider } from '../utils/direction-provider';
 
 /**
  * An accessible popup anchored to a trigger element.
@@ -38,7 +39,11 @@ import type { RootProps } from './types';
  * ```
  */
 function Root( props: RootProps ) {
-	return <_Popover.Root { ...props } />;
+	return (
+		<DirectionProvider>
+			<_Popover.Root { ...props } />
+		</DirectionProvider>
+	);
 }
 
 export { Root };

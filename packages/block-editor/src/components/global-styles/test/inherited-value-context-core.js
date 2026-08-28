@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { renderHook } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { useResolvedStyle } from '../inherited-value-context';
 import { globalStylesDataKey } from '../../../store/private-keys';
 
@@ -42,7 +31,7 @@ jest.mock( '../../../store', () => ( {
 	store: { name: 'core/block-editor' },
 } ) );
 
-// `inherited-value-context.js` imports the blocks store for
+// `inherited-value-context.jsx` imports the blocks store for
 // `useVariationAndElements`. Its real import chain needs data-module exports
 // the stub above does not provide, so stub the blocks module too.
 jest.mock( '@wordpress/blocks', () => ( {

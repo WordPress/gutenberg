@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import {
 	alignCenter,
 	alignLeft,
@@ -24,10 +17,6 @@ import {
 	chevronDown,
 	inlineImage,
 } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import {
 	Toolbar,
 	ToolbarButton,

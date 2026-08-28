@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 const globals = require( 'globals' );
 const { fixupPluginRules } = require( '@eslint/compat' );
 const importPlugin = fixupPluginRules( require( 'eslint-plugin-import' ) );
-
-/**
- * Internal dependencies
- */
 const jsxA11yConfig = require( './jsx-a11y' );
 const customConfig = require( './custom' );
 const reactConfig = require( './react' );

@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type {
 	ComponentProps,
@@ -8,17 +5,8 @@ import type {
 	HTMLAttributes,
 	CSSProperties,
 } from 'react';
-
-/**
- * WordPress dependencies
- */
-import {
-	Flex,
-	FlexItem,
-	Composite,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
-import { Stack, Tooltip } from '@wordpress/ui';
+import { Flex, FlexItem, Composite } from '@wordpress/components';
+import { Badge, Stack, Tooltip } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import {
@@ -27,11 +15,6 @@ import {
 	useRef,
 	forwardRef,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../../../lock-unlock';
 import { MEDIA_ASPECT_RATIOS } from '../../../constants';
 import ItemActions from '../../dataviews-item-actions';
 import DataViewsSelectionCheckbox from '../../dataviews-selection-checkbox';
@@ -48,7 +31,6 @@ import type {
 import type { SetSelection } from '../../../types/private';
 import type { SelectionProps } from '../utils/use-selection-props';
 import { ItemClickWrapper } from '../utils/item-click-wrapper';
-const { Badge: WCBadge } = unlock( componentsPrivateApis );
 import { useGridColumns } from './preview-size-picker';
 import { GridItems } from '../utils/grid-items';
 import {
@@ -261,7 +243,8 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 						>
 							{ badgeFields.map( ( field ) => {
 								return (
-									<WCBadge
+									/* @ts-expect-error `Badge` is text-only, but a badge field renders whatever its `render` returns. */
+									<Badge
 										key={ field.id }
 										className="dataviews-view-grid__field-value"
 									>
@@ -269,7 +252,7 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 											item={ item }
 											field={ field }
 										/>
-									</WCBadge>
+									</Badge>
 								);
 							} ) }
 						</Stack>
@@ -370,12 +353,12 @@ export default function CompositeGrid< Item >( {
 	const { paginationInfo, resizeObserverRef } =
 		useContext( DataViewsContext );
 	const gridColumns = useGridColumns();
-	// Consumer-configured aspect ratio for item previews, validated against
-	// the presets (like `density`) so arbitrary values are ignored, and
-	// surfaced to CSS as a custom property the media field's stylesheet
-	// reads. Always set (with the square default), so an identically-named
-	// variable set by a consumer on an ancestor can't leak into the previews
-	// when the view doesn't configure a ratio.
+	// Consumer-configured shape for item previews, validated against the
+	// presets (like `density`) so arbitrary values are ignored, and surfaced
+	// to CSS as a custom property the media field's stylesheet reads. Always
+	// set (with the square default), so an identically-named variable set by
+	// a consumer on an ancestor can't leak into the previews when the view
+	// doesn't configure a ratio.
 	const gridStyle = {
 		'--wp-dataviews-media-aspect-ratio':
 			view.layout?.aspectRatio &&
@@ -383,6 +366,10 @@ export default function CompositeGrid< Item >( {
 				? view.layout.aspectRatio
 				: '1/1',
 	} as CSSProperties;
+	// `mediaFit` is a class rather than a custom property (unlike the aspect
+	// ratio above) because it switches the preview box's background token as
+	// well as its `object-fit`, which a custom property can't do.
+	const isMediaContain = view.layout?.mediaFit === 'contain';
 	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
 	const titleField = fields.find(
 		( field ) => field.id === view?.titleField
@@ -448,6 +435,7 @@ export default function CompositeGrid< Item >( {
 												'compact',
 												'comfortable',
 											].includes( view.layout.density ),
+										'has-media-fit-contain': isMediaContain,
 									}
 								) }
 								previewSize={ view.layout?.previewSize }
@@ -550,6 +538,7 @@ export default function CompositeGrid< Item >( {
 								[ 'compact', 'comfortable' ].includes(
 									view.layout.density
 								),
+							'has-media-fit-contain': isMediaContain,
 						} ) }
 						focusWrap
 						aria-busy={ isLoading }

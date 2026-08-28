@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { lineDashed, lineDotted, lineSolid } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { contextConnect } from '../../context';
 import type { StylePickerProps } from '../types';
 import {

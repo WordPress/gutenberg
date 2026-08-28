@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ComponentProps, CSSProperties, ReactElement } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 import { Spinner, Popover } from '@wordpress/components';
 import {
@@ -17,10 +10,6 @@ import {
 	useState,
 } from '@wordpress/element';
 import { isAppleOS } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import DataViewsContext from '../../dataviews-context';
 import DataViewsSelectionCheckbox from '../../dataviews-selection-checkbox';
 import ItemActions from '../../dataviews-item-actions';

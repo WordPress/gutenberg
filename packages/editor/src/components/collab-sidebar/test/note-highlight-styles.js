@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { buildHighlightCss } from '../note-highlight-styles';
 import { getAvatarBorderColor } from '../utils';
 

@@ -2,6 +2,39 @@
 
 ## Unreleased
 
+### Internal
+
+-   Remove the `showListViewByDefault` handling from `useAdaptEditorToCanvas`; the `editor` package now applies the preference on the preview ↔ edit transition itself.
+-   Remove unused dependencies `@wordpress/blob`, `@wordpress/date`, `@wordpress/escape-html`, etc. ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+## 7.3.0 (2026-08-26)
+
+### Enhancements
+
+-   Offer the Export tool only while editing a template or a template part, the entities the exported theme is made of. The menu item now lives in the editor package ([#81992](https://github.com/WordPress/gutenberg/pull/81992)).
+
+### Bug Fixes
+
+-   Seed the root `ThemeProvider` with the admin color scheme primary color so portaled popovers and modals receive the scheme's accent colors ([#81653](https://github.com/WordPress/gutenberg/pull/81653)).
+
+### Enhancements
+
+-   Unify the Site Editor sidebar section descriptions for Templates, Pages, Navigation, and Patterns. ([#60304](https://github.com/WordPress/gutenberg/issues/60304))
+
+### Internal
+
+-   Stop rendering `EditorKeyboardShortcutsRegister`, which the editor provider now renders itself ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).
+
+### Bug Fixes
+
+-   Open an entity at the width its `viewport` param asks for through the editor provider rather than a sync effect, so the width comes from the theme's breakpoints rather than the defaults, and stop writing the current width back into the param when leaving an entity ([#81750](https://github.com/WordPress/gutenberg/pull/81750)).
+
+## 7.2.0 (2026-08-12)
+
+### Bug Fixes
+
+-   Identity: Decode HTML entities in the Site Title and Site Tagline fields. ([#81269](https://github.com/WordPress/gutenberg/pull/81269))
 
 ## 7.1.0 (2026-07-29)
 

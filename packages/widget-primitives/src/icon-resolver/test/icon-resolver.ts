@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { createElement } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import {
 	registerIconResolver,
 	resolveIcon,

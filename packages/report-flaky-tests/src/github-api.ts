@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { getOctokit } from '@actions/github';
 import type { GitHub } from '@actions/github/lib/utils';
 

@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { queryByAttribute, render, screen } from '@testing-library/react';
 import { click, press, waitFor } from '@ariakit/test';
 import type { ComponentProps } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { Composite } from '..';
 
 async function renderAndValidate( ...args: Parameters< typeof render > ) {

@@ -1,8 +1,5 @@
-/**
- * WordPress dependencies
- */
-import { __, _x, _n, _nx } from '@wordpress/i18n';
 import { addFilter } from '@wordpress/hooks';
+import { __, _x, _n, _nx } from '@wordpress/i18n';
 
 describe( 'i18n filters', () => {
 	test( 'Default i18n functions call filters', () => {

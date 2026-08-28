@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { renderHook } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { useTransformStyle } from '../use-transform-style';
 import type { CropperState, Size } from '../../../core/types';
 import { DEFAULT_STATE } from '../../../core/constants';

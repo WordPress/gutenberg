@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	getBlockType,
 	getBlockTypes,
@@ -17,10 +14,6 @@ import { symbol } from '@wordpress/icons';
 import { create, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 import { createSelector, createRegistrySelector } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import {
 	isFiltered,
 	checkAllowListRecursive,
@@ -34,7 +27,6 @@ import {
 import { orderBy } from '../utils/sorting';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
-
 import {
 	getContentLockingParent,
 	getEditedContentOnlySection,
@@ -1357,8 +1349,11 @@ const getSelectedBlockAncestors = createSelector(
  * @return {boolean} Whether the block has an inner block selected
  */
 export function hasSelectedInnerBlock( state, clientId, deep = false ) {
-	const selectedBlockClientIds = getSelectedBlockClientIds( state );
+	if ( ! clientId ) {
+		return false;
+	}
 
+	const selectedBlockClientIds = getSelectedBlockClientIds( state );
 	if ( ! selectedBlockClientIds.length ) {
 		return false;
 	}

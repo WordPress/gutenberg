@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import RadioControl from '../';
 
 const ControlledRadioControl = ( {
@@ -45,6 +34,14 @@ const defaultPropsWithDescriptions = {
 	options: defaultProps.options.map( ( option, index ) => ( {
 		...option,
 		description: `This is the option number ${ index + 1 }.`,
+	} ) ),
+};
+
+const defaultPropsWithDisabledOption = {
+	...defaultProps,
+	options: defaultProps.options.map( ( option, index ) => ( {
+		...option,
+		disabled: index === 1,
 	} ) ),
 };
 
@@ -89,6 +86,29 @@ describe.each( [
 
 			expect(
 				screen.getByRole( 'radiogroup', { name: defaultProps.label } )
+			).toBeDisabled();
+		} );
+
+		it( 'should disable an individual option without disabling the radio group', () => {
+			render(
+				<Component
+					{ ...defaultPropsWithDisabledOption }
+					onChange={ () => {} }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'radiogroup', { name: defaultProps.label } )
+			).toBeEnabled();
+			expect(
+				screen.getByRole( 'radio', {
+					name: defaultProps.options[ 0 ].label,
+				} )
+			).toBeEnabled();
+			expect(
+				screen.getByRole( 'radio', {
+					name: defaultProps.options[ 1 ].label,
+				} )
 			).toBeDisabled();
 		} );
 
@@ -177,6 +197,34 @@ describe.each( [
 	} );
 
 	describe( 'interaction', () => {
+		it( 'should keep enabled options interactive when another option is disabled', async () => {
+			const user = userEvent.setup();
+			const onChangeSpy = jest.fn();
+			render(
+				<Component
+					{ ...defaultPropsWithDisabledOption }
+					onChange={ onChangeSpy }
+				/>
+			);
+
+			await user.click(
+				screen.getByRole( 'radio', {
+					name: defaultProps.options[ 1 ].label,
+				} )
+			);
+			expect( onChangeSpy ).not.toHaveBeenCalled();
+
+			await user.click(
+				screen.getByRole( 'radio', {
+					name: defaultProps.options[ 2 ].label,
+				} )
+			);
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
+			expect( onChangeSpy ).toHaveBeenLastCalledWith(
+				defaultProps.options[ 2 ].value
+			);
+		} );
+
 		it( 'should select a new value when clicking on the radio input', async () => {
 			const user = userEvent.setup();
 			const onChangeSpy = jest.fn();

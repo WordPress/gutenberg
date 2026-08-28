@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	areGlobalStylesEqual,
 	privateApis as globalStylesEnginePrivateApis,
@@ -10,10 +7,6 @@ import type {
 	GlobalStylesSettings,
 } from '@wordpress/global-styles-engine';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { unlock } from './lock-unlock';
 
 const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );

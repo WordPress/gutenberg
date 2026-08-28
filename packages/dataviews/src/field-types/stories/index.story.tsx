@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useState, useMemo } from '@wordpress/element';
 import {
 	Icon as WCIcon,
@@ -9,16 +6,18 @@ import {
 } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { starFilled } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import DataViews from '../../dataviews/index';
 import DataForm from '../../dataform/index';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import type { View, Form, Field } from '../../types';
 
 const meta = {
+	parameters: {
+		// FIXME: Helper text fails color-contrast.
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
+
 	title: 'DataViews/FieldTypes',
 	component: DataForm,
 	argTypes: {

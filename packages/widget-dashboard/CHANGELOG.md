@@ -2,6 +2,63 @@
 
 ## Unreleased
 
+### New Features
+
+-   `WidgetDashboard.Policy`: a provider that governs the dashboards below
+    it through `canPerform( request )`. Operations: `customize` (the
+    Customize button and the matching commands), `insert` (what the
+    inserter offers; a rejected type keeps rendering where already
+    placed), and per instance `remove`, `move`, `resize`, and `edit`
+    (the tile controls and gestures; a widget denied `edit` receives no
+    `setAttributes`). Nested policies compose restrictively. Exports the
+    `DashboardOperationRequest`, `DashboardInstanceOperation`,
+    `DashboardInstanceOperationRequest`, and `CanPerformDashboardOperation`
+    types ([#81967](https://github.com/WordPress/gutenberg/pull/81967)).
+-   The Add widget button and command show only while the policy lets some
+    registered type be inserted
+    ([#81967](https://github.com/WordPress/gutenberg/pull/81967)).
+
+### Internal
+
+-   Remove unused dependency `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+
+## 0.6.0 (2026-08-26)
+
+### New Features
+
+-   Widget chrome footer: `relevance: 'high'` actions mount as leading text
+    links (declared icon as prefix) in a persistent strip under the widget
+    body, `'medium'` as trailing compact affordances (icon-only with a
+    declared icon); the "More" menu keeps the rest, and full-bleed widgets
+    keep every action in the menu
+    ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
+-   A link action whose target the host recognizes as one of its own routes
+    (the `links` capability from `useWidgetHost`) mounts the host router's
+    link and navigates client-side; `download` and `openInNewTab` keep the
+    plain anchor ([#81740](https://github.com/WordPress/gutenberg/pull/81740)).
+
+### Documentation
+
+-   Add a `HostLinks` story: a demo host whose `links` capability turns an
+    in-app action target into a client-side route link, beside a plain
+    anchor and a download
+    ([#81740](https://github.com/WordPress/gutenberg/pull/81740)).
+
+### Internal
+
+-   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509), [#81515](https://github.com/WordPress/gutenberg/pull/81515), [#81516](https://github.com/WordPress/gutenberg/pull/81516), [#81518](https://github.com/WordPress/gutenberg/pull/81518))
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 0.5.0 (2026-08-12)
+
+### New Features
+
+-   Tile spacing is host-tunable via `--wp-widget-dashboard-tile-padding` and
+    `--wp-widget-dashboard-tile-header-gap`; the header gap follows the tile
+    padding unless set apart ([#81352](https://github.com/WordPress/gutenberg/pull/81352)).
+-   The actions "More" menu renders each action's resolved icon as the menu
+    item prefix ([#81275](https://github.com/WordPress/gutenberg/pull/81275)).
+
 ### Enhancements
 
 -   Widget chrome and picker preview chrome: preserve their flex-column layout
@@ -10,6 +67,12 @@
 ### Documentation
 
 -   Describe what the "More" menu mounts for a link fulfillment ([#80974](https://github.com/WordPress/gutenberg/pull/80974)).
+
+### Internal
+
+-   Widget actions menu: render the action icon directly; the widget types
+    contract guarantees a renderable element ([#81381](https://github.com/WordPress/gutenberg/pull/81381)).
+-   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
 
 ## 0.4.0 (2026-07-29)
 

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { subDays, subYears } from 'date-fns';
-
-/**
- * Internal dependencies
- */
 import filterSortAndPaginate from '../filter-sort-and-paginate';
 import { data, fields } from '../../dataviews/stories/fixtures';
 

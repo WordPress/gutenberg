@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * External dependencies
- */
 import fastDeepEqual from 'fast-deep-equal';
 
 export default function useInternalValue( value ) {

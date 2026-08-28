@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const utils = require( './utils' );
 const getStylelintResult = utils.getStylelintResult;
 

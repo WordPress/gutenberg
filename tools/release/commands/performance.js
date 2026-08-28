@@ -1,14 +1,7 @@
-/**
- * External dependencies
- */
 const os = require( 'os' );
 const fs = require( 'fs' );
 const path = require( 'path' );
 const SimpleGit = require( 'simple-git' );
-
-/**
- * Internal dependencies
- */
 const { formats, log } = require( '../lib/logger' );
 const {
 	runShellScript,
@@ -102,6 +95,11 @@ function quartiles( array ) {
 	}
 
 	const q50 = med( 0, numbers.length );
+
+	// A single value has no halves, and `med()` would read past the array.
+	if ( numbers.length === 1 ) {
+		return { q25: q50, q50, q75: q50 };
+	}
 
 	let q25, q75;
 	if ( numbers.length % 2 === 0 ) {

@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { TestCaseResult } from '@jest/test-result';
 import type { TestResult } from '@playwright/test/reporter';
 

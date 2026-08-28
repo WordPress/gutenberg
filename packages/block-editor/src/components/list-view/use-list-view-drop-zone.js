@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { useState, useCallback, useEffect } from '@wordpress/element';
 import {
@@ -9,10 +6,6 @@ import {
 	usePrevious,
 } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import {
 	getDistanceToNearestEdge,
 	isPointContainedByRect,

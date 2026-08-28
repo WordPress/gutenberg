@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useState, useMemo, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
@@ -15,10 +12,6 @@ import { useDebouncedInput } from '@wordpress/compose';
 import { focus } from '@wordpress/dom';
 import { safeDecodeURI } from '@wordpress/url';
 import { Stack, Text } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { mapToIHasNameAndId } from './utils';
 
 const EMPTY_ARRAY = [];

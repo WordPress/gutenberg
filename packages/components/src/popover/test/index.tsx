@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import {
 	act,
 	render,
@@ -10,15 +7,7 @@ import {
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { CSSProperties } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import {
 	computePopoverPosition,
 	positionToPlacement,
@@ -26,7 +15,7 @@ import {
 } from '../utils';
 import Popover from '..';
 import type { PopoverProps } from '../types';
-import { PopoverInsideIframeRenderedInExternalSlot } from './utils';
+import { PopoverInsideIframeRenderedInExternalSlot } from './utils/index.js';
 
 type PositionToPlacementTuple = [
 	NonNullable< PopoverProps[ 'position' ] >,
@@ -181,6 +170,29 @@ describe( 'Popover', () => {
 					expect(
 						screen.getByText( 'Popover content' )
 					).toBeVisible()
+				);
+			} );
+		} );
+
+		describe( 'offset', () => {
+			it( 'should displace the popover along its cross axis when passed an offset object', async () => {
+				render(
+					<Popover
+						placement="right-start"
+						offset={ { mainAxis: 16, crossAxis: 24 } }
+						animate={ false }
+						flip={ false }
+						shift={ false }
+						data-testid="popover-element"
+					>
+						Hello
+					</Popover>
+				);
+				const popover = screen.getByTestId( 'popover-element' );
+
+				await waitFor( () => expect( popover ).toBeVisible() );
+				expect( popover ).toHaveStyle(
+					'transform: translateX(16px) translateY(24px)'
 				);
 			} );
 		} );

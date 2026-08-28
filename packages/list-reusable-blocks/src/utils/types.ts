@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import type { Post as CorePost, Type } from '@wordpress/core-data';
 
 export interface ImportDropdownProps {

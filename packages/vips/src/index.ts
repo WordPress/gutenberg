@@ -1,17 +1,8 @@
-/**
- * External dependencies
- */
 import Vips from 'wasm-vips';
-
 // @ts-expect-error - WASM files are inlined as Uint8Array at build time.
 import VipsModule from 'wasm-vips/vips.wasm';
-
 // @ts-expect-error - WASM files are inlined as Uint8Array at build time.
 import VipsHeifModule from 'wasm-vips/vips-heif.wasm';
-
-/**
- * Internal dependencies
- */
 import type {
 	ItemId,
 	ImageSizeCrop,
@@ -20,8 +11,12 @@ import type {
 	ThumbnailOptions,
 	ConvertImageOptions,
 	ResizeImageOptions,
-} from './types';
-import { supportsAnimation, supportsInterlace, supportsQuality } from './utils';
+} from './types.ts';
+import {
+	supportsAnimation,
+	supportsInterlace,
+	supportsQuality,
+} from './utils.ts';
 
 interface EmscriptenModule {
 	setAutoDeleteLater: ( autoDelete: boolean ) => void;

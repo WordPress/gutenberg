@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import {
 	describe,
 	expect,
@@ -9,10 +6,6 @@ import {
 	beforeEach,
 	afterEach,
 } from '@jest/globals';
-
-/**
- * Internal dependencies
- */
 import { logPerformanceTiming, passThru } from '../performance';
 
 describe( 'performance utilities', () => {

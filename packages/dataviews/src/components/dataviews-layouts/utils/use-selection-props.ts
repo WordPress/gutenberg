@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useRef } from '@wordpress/element';
 import { isAppleOS } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import { SELECTION_CHECKBOX_CLASS } from '../../dataviews-selection-checkbox';
 import type { SetSelection } from '../../../types/private';
 

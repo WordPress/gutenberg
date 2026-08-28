@@ -1,0 +1,51 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+%red-focus-ring {
+	--focus-color: #{ $alert-red };
+}
+
+.dataviews-validated-control {
+	// For components based on InputBase
+	&:has(:is(input, select):invalid[data-validity-visible])
+	.components-input-control__backdrop {
+		@extend %red-focus-ring;
+
+		border-color: $alert-red;
+	}
+
+	// For ComboboxControl
+	.components-combobox-control__suggestions-container:has(
+	input:invalid[data-validity-visible]
+):not(:has([aria-expanded="true"])) {
+		@extend %red-focus-ring;
+
+		border-color: $alert-red;
+	}
+}
+
+.dataviews-validated-control__wrapper-with-error-delegate {
+	position: relative;
+
+	// For FormTokenField
+	&:has(input:invalid[data-validity-visible]) .components-form-token-field__input-container:not(:has([aria-expanded="true"])) {
+		@extend %red-focus-ring;
+
+		border-color: $alert-red;
+	}
+
+	// For ToggleGroupControl
+	&:has(input[type="radio"]:invalid[data-validity-visible]) {
+		@extend %red-focus-ring;
+	}
+}
+
+.dataviews-validated-control__error-delegate {
+	position: absolute;
+	top: 0;
+	height: 100%;
+	width: 100%;
+	opacity: 0;
+	pointer-events: none;
+}
+

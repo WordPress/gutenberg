@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ReactElement } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { Button, CheckboxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState, useRef, useContext } from '@wordpress/element';
@@ -13,10 +6,6 @@ import { useRegistry } from '@wordpress/data';
 import { closeSmall } from '@wordpress/icons';
 import { useViewportMatch } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import DataViewsContext from '../dataviews-context';
 import { ActionModal } from '../dataviews-item-actions';
 import type { Action, ActionModal as ActionModalType } from '../../types';

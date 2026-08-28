@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -202,6 +199,54 @@ test.describe( 'Style Revisions', () => {
 			page.locator( 'iframe[name="style-book-canvas"]' )
 		).toBeVisible();
 		// The Revisions list is hidden.
+		await expect(
+			page.getByLabel( 'Global styles revisions list' )
+		).toBeHidden();
+	} );
+
+	test( 'should close the revisions panel with a single click of Back after selecting a revision', async ( {
+		page,
+		editor,
+		userGlobalStylesRevisions,
+	} ) => {
+		await editor.canvas.locator( 'body' ).click();
+		await userGlobalStylesRevisions.openStylesPanel();
+		await page.getByRole( 'button', { name: 'Revisions' } ).click();
+
+		// Selecting a revision puts its id in the path (`/revisions/12`).
+		await page
+			.getByRole( 'option', { name: /^Changes saved by / } )
+			.last()
+			.click();
+
+		await page.getByRole( 'button', { name: 'Back', exact: true } ).click();
+
+		await expect(
+			page.getByLabel( 'Global styles revisions list' )
+		).toBeHidden();
+	} );
+
+	test( 'should close the revisions panel after applying a revision', async ( {
+		page,
+		editor,
+		userGlobalStylesRevisions,
+	} ) => {
+		await editor.canvas.locator( 'body' ).click();
+		await userGlobalStylesRevisions.openStylesPanel();
+		await page.getByRole( 'button', { name: 'Revisions' } ).click();
+
+		await page
+			.getByLabel( 'Global styles revisions list' )
+			.getByRole( 'option' )
+			.last()
+			.click();
+
+		await page
+			.getByRole( 'button', {
+				name: 'Apply the selected revision to your site.',
+			} )
+			.click();
+
 		await expect(
 			page.getByLabel( 'Global styles revisions list' )
 		).toBeHidden();

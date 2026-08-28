@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-
-/**
- * Internal dependencies
- */
 const {
 	recordRequests,
 	waitForRequestsToSettle,

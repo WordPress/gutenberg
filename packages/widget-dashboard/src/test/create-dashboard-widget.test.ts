@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import type { WidgetType } from '@wordpress/widget-primitives';
-
-/**
- * Internal dependencies
- */
 import { createDashboardWidget } from '../utils/create-dashboard-widget';
 
 const baseType: WidgetType = {

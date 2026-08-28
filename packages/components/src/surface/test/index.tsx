@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { Surface } from '../index';
 
 // Checking for deprecation warnings before other tests because the `deprecated`

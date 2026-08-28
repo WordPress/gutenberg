@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { type LinearGradientNode } from 'gradient-parser';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import AnglePickerControl from '../angle-picker-control';
 import CustomGradientBar from './gradient-bar';
 import { Flex } from '../flex';
