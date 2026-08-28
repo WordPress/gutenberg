@@ -223,7 +223,14 @@ export function Note( {
 				// pill shape the Design System's `pronounced` preset gives a
 				// small Button.
 				<ThemeProvider cornerRadius="pronounced">
-					<Stack direction="row" gap="sm" justify="flex-start">
+					<Stack
+						direction="row"
+						gap="sm"
+						justify="flex-start"
+						// The pills wrap onto further rows; without this the
+						// trigger stretches to the full wrapped height.
+						align="flex-start"
+					>
 						<AddReactionButton
 							noteId={ note.id }
 							disabled={ isThreadResolved }
