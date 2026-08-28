@@ -41,7 +41,7 @@ $palette-header-height: 48px;
 		justify-content: center;
 		border-radius: $radius-small 0 0 $radius-small;
 
-		& + [cmdk-input] {
+		& + .commands-command-menu__input {
 			border-top-left-radius: 0;
 			border-bottom-left-radius: 0;
 		}
@@ -58,7 +58,7 @@ $palette-header-height: 48px;
 	// the style here is a hack to force safari to repaint to avoid a style glitch
 	will-change: transform;
 
-	[cmdk-input] {
+	.commands-command-menu__input {
 		border: none;
 		width: 100%;
 		padding: $grid-unit-15 $grid-unit-05;
@@ -68,6 +68,7 @@ $palette-header-height: 48px;
 		font-size: 15px;
 		line-height: 24px;
 		border-radius: 0;
+		background: transparent;
 
 		&::placeholder {
 			color: $gray-700;
@@ -79,92 +80,37 @@ $palette-header-height: 48px;
 		}
 	}
 
-	[cmdk-item] {
-		cursor: var(--wpds-cursor-control);
-		display: flex;
-		align-items: center;
-		padding: $grid-unit-05 0;
-		color: $gray-900;
-		font-size: $default-font-size;
-
-		&[aria-disabled="true"] {
-			color: $gray-600;
-			cursor: not-allowed;
-		}
-
-		svg {
-			fill: $gray-900;
-		}
-
-		> div {
-			border-radius: $radius-small;
-			min-height: $grid-unit-40;
-			padding: $grid-unit-05;
-			padding-left: $grid-unit-50; // Account for commands without icons.
-			padding-right: $grid-unit-20; // Accounts for the command category.
-		}
-
-		&[aria-selected="true"] > div,
-		&:active > div {
-			background: var(--wp-admin-theme-color);
-			color: $white;
-
-			svg {
-				fill: $white;
-			}
-		}
-
-		> .has-icon {
-			padding-left: $grid-unit;
-		}
-	}
-
-	[cmdk-group]:has([cmdk-group-items]:empty) {
-		display: none;
-	}
-
-	[cmdk-root] > [cmdk-list] {
+	// Reset the design-system list layout to a simple scrolling container so the
+	// palette keeps its previous appearance.
+	.commands-command-menu__list {
+		display: block;
 		max-height: min($palette-max-height - $palette-header-height, calc(70vh - $palette-header-height));
 		overflow: auto;
 		scroll-padding-top: $grid-unit-10;
 		scroll-padding-bottom: $grid-unit-10;
+		font-family: inherit;
+		font-size: $default-font-size;
+		color: $gray-900;
 
-		// Show border when there are commands or "nothing found" message.
-		&:has([cmdk-group-items]:not(:empty)),
-		&:has([cmdk-empty]) {
+		// Show a border once there are results or a "nothing found" message.
+		&:has(.commands-command-menu__group),
+		&:has(.commands-command-menu__empty:not(:empty)) {
 			border-top: $border-width solid $gray-300;
 		}
-
-		& [cmdk-list-sizer] > [cmdk-group] > [cmdk-group-items]:not(:empty) {
-			padding: 0 $grid-unit-10 $grid-unit-05;
-		}
-
-		[cmdk-group-heading] {
-			margin-top: $grid-unit-10;
-			padding: $grid-unit-10 $grid-unit-20;
-			line-height: $grid-unit-20;
-			font-size: $font-size-x-small;
-			font-weight: var(--wpds-typography-font-weight-emphasis);
-			text-transform: uppercase;
-			color: $gray-900;
-		}
 	}
 
-	[cmdk-empty] {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		white-space: pre-wrap;
-		color: $gray-900;
-		padding: $grid-unit-10 0 $grid-unit-40;
+	.commands-command-menu__list-scrollable-container {
+		display: block;
+		overflow: visible;
+		padding: 0;
 	}
 
-	[cmdk-loading] {
-		padding: $grid-unit-20;
-	}
-
-	[cmdk-list-sizer] {
-		position: relative;
+	// The group, group label, item, and empty state inherit their styling from
+	// the `@wordpress/ui` Autocomplete primitives. Only the icon color, which
+	// the primitives leave to the consumer, needs to follow the item's
+	// foreground color across all states.
+	.commands-command-menu__item svg {
+		fill: currentColor;
 	}
 }
 
@@ -186,14 +132,9 @@ $palette-header-height: 48px;
 	font-size: $default-font-size;
 	line-height: $default-line-height;
 	text-align: right;
-
-	[aria-selected="true"] &,
-	[cmdk-item]:active & {
-		color: rgba($white, 0.8);
-	}
 }
 
-.commands-command-menu__item mark {
+.commands-command-menu__item-label mark {
 	color: inherit;
 	background: unset;
 	font-weight: var(--wpds-typography-font-weight-emphasis);

@@ -4653,12 +4653,6 @@
 		}
 	},
 	"packages/commands/src/components/command-menu.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"react-hooks/refs": {
-			"count": 1
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
