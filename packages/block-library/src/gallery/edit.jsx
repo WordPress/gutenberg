@@ -170,7 +170,6 @@ export default function GalleryEdit( props ) {
 
 	const {
 		__unstableMarkNextChangeAsNotPersistent,
-		__unstableMarkLastChangeAsPersistent,
 		replaceInnerBlocks,
 		updateBlockAttributes,
 		selectBlock,
@@ -217,17 +216,7 @@ export default function GalleryEdit( props ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( { layout: nextLayout } );
 		}
-
-		// Every switch between layout types only touches the `layout`
-		// attribute, so without this the next switch would be merged into
-		// this one instead of creating its own undo level.
-		__unstableMarkLastChangeAsPersistent();
-	}, [
-		layout,
-		setAttributes,
-		__unstableMarkNextChangeAsNotPersistent,
-		__unstableMarkLastChangeAsPersistent,
-	] );
+	}, [ layout, setAttributes, __unstableMarkNextChangeAsNotPersistent ] );
 
 	const { getBlock, getSettings, innerBlockImages, multiGallerySelection } =
 		useSelect(
