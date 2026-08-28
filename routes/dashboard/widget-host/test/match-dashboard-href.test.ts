@@ -76,6 +76,51 @@ describe( 'matchDashboardHref', () => {
 		).toBe( '/reports?period=7d' );
 	} );
 
+	it( 'keeps a comma-separated list, which both navigations read as text', () => {
+		expect(
+			matchDashboardHref(
+				'admin.php?page=dashboard&p=%2Fsite-health%3Fstatus%3Dcritical%2Crecommended',
+				BASE
+			)
+		).toBe( '/site-health?status=critical,recommended' );
+	} );
+
+	it( 'rejects a p query with a repeated key', () => {
+		expect(
+			matchDashboardHref(
+				'admin.php?page=dashboard&p=%2Fposts%3Fstatus%3Ddraft%26status%3Dpending',
+				BASE
+			)
+		).toBeNull();
+	} );
+
+	it( 'rejects a p query value the router reads as a number', () => {
+		expect(
+			matchDashboardHref(
+				'admin.php?page=dashboard&p=%2Fposts%3Fauthor%3D12',
+				BASE
+			)
+		).toBeNull();
+	} );
+
+	it( 'rejects a p query value the router reads as a boolean', () => {
+		expect(
+			matchDashboardHref(
+				'admin.php?page=dashboard&p=%2Fposts%3Fsticky%3Dtrue',
+				BASE
+			)
+		).toBeNull();
+	} );
+
+	it( 'rejects a p query value the router reads as JSON', () => {
+		expect(
+			matchDashboardHref(
+				'admin.php?page=dashboard&p=%2Fposts%3Fview%3D%7B%22type%22%3A%22table%22%7D',
+				BASE
+			)
+		).toBeNull();
+	} );
+
 	it( 'rejects a p that is only a query', () => {
 		expect(
 			matchDashboardHref(

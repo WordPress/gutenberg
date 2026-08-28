@@ -1,3 +1,35 @@
+/*
+ * JSON.parse accepts numbers, booleans, null, quoted strings, arrays and
+ * objects. The router reads such a value as JSON; the route link hands it
+ * over as text.
+ */
+function parsesAsJson( value: string ): boolean {
+	try {
+		JSON.parse( value );
+		return true;
+	} catch {
+		return false;
+	}
+}
+
+/*
+ * A query both navigations read alike. The route link hands the router one
+ * string per key; the router's own parser, which a full load runs, folds a
+ * repeated key into an array and reads JSON values as such.
+ */
+function isPlainQuery( query: string ): boolean {
+	const seen = new Set< string >();
+
+	for ( const [ key, value ] of new URLSearchParams( query ) ) {
+		if ( seen.has( key ) || parsesAsJson( value ) ) {
+			return false;
+		}
+		seen.add( key );
+	}
+
+	return true;
+}
+
 /**
  * Resolves an action href to a route path inside this SPA.
  *
@@ -6,7 +38,9 @@
  * carries, its own query included, which the router reads as the route's
  * search params. Anything a route navigation cannot deliver faithfully
  * stays a plain anchor: a hash, search params beyond `page` and `p`,
- * duplicates of either, or a `p` that is not a root-relative path.
+ * duplicates of either, a `p` that is not a root-relative path, or a
+ * query the router would not read as the route link hands it over (a
+ * repeated key, or a value that parses as JSON).
  *
  * @param {string} href Action href, absolute or relative.
  * @param {string} base Document URL the href is judged against; defaults
@@ -66,8 +100,13 @@ export function matchDashboardHref(
 	 * relative path, where the full load cannot follow; a hash never
 	 * survives the round trip.
 	 */
-	const pathname = path.split( '?' )[ 0 ];
+	const queryStart = path.indexOf( '?' );
+	const pathname = queryStart === -1 ? path : path.slice( 0, queryStart );
 	if ( ! /^\/(?!\/)/.test( pathname ) || path.includes( '#' ) ) {
+		return null;
+	}
+
+	if ( queryStart !== -1 && ! isPlainQuery( path.slice( queryStart + 1 ) ) ) {
 		return null;
 	}
 
