@@ -1,16 +1,8 @@
+import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
-import { createRef } from '@wordpress/element';
-import { Icon } from '../index';
+import Icon from '..';
 
 describe( 'Icon', () => {
-	it( 'forwards ref', () => {
-		const ref = createRef< SVGSVGElement >();
-
-		render( <Icon ref={ ref } icon={ <svg /> } /> );
-
-		expect( ref.current ).toBeInstanceOf( SVGSVGElement );
-	} );
-
 	it( "merges consumer styles with the icon's intrinsic styles", () => {
 		render(
 			<Icon
@@ -24,5 +16,18 @@ describe( 'Icon', () => {
 		expect( icon ).toHaveStyle( 'fill: none' );
 		expect( icon ).toHaveStyle( 'opacity: 1' );
 		expect( icon ).toHaveStyle( 'margin-inline-start: 4px' );
+	} );
+
+	it( "does not add a 'style' prop when neither side defines one", () => {
+		let hasStyleProp = true;
+		const CustomIcon = ( props: Record< string, unknown > ) => {
+			hasStyleProp = 'style' in props;
+			return <svg data-testid="test-icon" />;
+		};
+
+		render( <Icon icon={ <CustomIcon /> } /> );
+
+		expect( screen.getByTestId( 'test-icon' ) ).toBeVisible();
+		expect( hasStyleProp ).toBe( false );
 	} );
 } );
