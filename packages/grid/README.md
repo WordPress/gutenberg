@@ -389,6 +389,7 @@ layout item key:
 ```jsx
 <DashboardGrid
 	layout={ layout }
+	rowHeight={ 80 }
 	itemLimits={ {
 		chart: { minWidth: 320, minHeight: 200 },
 		note: { maxWidth: 500 },
@@ -413,8 +414,9 @@ every other tile keeps its stored span, even while it renders bounded.
 `'full'` and `'fill'` widths respect a maximum: `'full'` renders at the
 capped span and places like a fixed item of that width, and `'fill'`
 reserves at least its minimum and never exceeds its maximum.
-`DashboardLanes` takes `GridItemWidthLimits`: lane heights are
-content-driven.
+Height limits apply when `rowHeight` is numeric and stay open with
+`'auto'` rows. `DashboardLanes` takes `GridItemWidthLimits`: lane
+heights are content-driven.
 
 ### Accessibility
 
