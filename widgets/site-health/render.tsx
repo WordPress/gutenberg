@@ -162,6 +162,7 @@ export default function SiteHealth() {
 	const issuesTotal = counts.recommended + counts.critical;
 	const tone = toneForPercentage( percentage );
 	const href = reviewHref( counts );
+
 	const path = links?.match( href ) ?? null;
 	const HostLink = links?.Link;
 	const reviewLabel = sprintf(
