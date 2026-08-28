@@ -145,7 +145,6 @@ function gutenberg_meta_box_iframe_remove_parent_boxes( $wp_meta_boxes ) {
 	// The same computation as in the_block_editor_meta_boxes().
 	$locations               = array( 'side', 'normal', 'advanced' );
 	$priorities              = array( 'high', 'sorted', 'core', 'default', 'low' );
-	$hidden                  = get_hidden_meta_boxes( $current_screen );
 	$meta_boxes_per_location = array();
 	foreach ( $locations as $location ) {
 		$meta_boxes_per_location[ $location ] = array();
@@ -170,31 +169,14 @@ function gutenberg_meta_box_iframe_remove_parent_boxes( $wp_meta_boxes ) {
 				}
 
 				$meta_boxes_per_location[ $location ][] = array(
-					'id'     => $meta_box['id'],
-					'title'  => $meta_box['title'],
-					'hidden' => in_array( $meta_box['id'], $hidden, true ),
+					'id'    => $meta_box['id'],
+					'title' => $meta_box['title'],
 				);
 			}
 		}
 	}
 
-	// The state the editor needs to save meta box visibility the way the
-	// classic screen does: over admin-ajax to the user option the server
-	// renders the boxes with. The collapsed state is saved by the same
-	// ajax action, so the current value is passed along for the editor to
-	// send back unchanged.
-	$closed = get_user_option( 'closedpostboxes_' . $current_screen->id );
-	if ( ! is_array( $closed ) ) {
-		$closed = array();
-	}
-	$screen_state = array(
-		'page'   => $current_screen->id,
-		'nonce'  => wp_create_nonce( 'closedpostboxes' ),
-		'closed' => array_values( array_filter( $closed ) ),
-	);
-
-	$script = 'window._wpMetaBoxScreenState = ' . wp_json_encode( $screen_state, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ) . ';
-	window._wpLoadBlockEditor && window._wpLoadBlockEditor.then( function() {
+	$script = 'window._wpLoadBlockEditor && window._wpLoadBlockEditor.then( function() {
 		wp.data.dispatch( \'core/edit-post\' ).setAvailableMetaBoxesPerLocation( ' . wp_json_encode( $meta_boxes_per_location, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ) . ' );
 	} );';
 

@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import { useMemo } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import {
 	getMetaBoxesIframeUrl,
@@ -27,36 +28,52 @@ export default function MetaBoxesIframe( {
 		[ isSide ]
 	);
 
-	// The ids of the hidden meta boxes, as one string so that the value is
-	// stable across store updates.
+	// The ids of the meta boxes hidden through the Preferences modal, as
+	// one string so that the value is stable across store updates.
 	const hiddenIds = useSelect(
-		( select ) =>
-			select( editPostStore )
-				.getAllMetaBoxes()
-				.filter( ( { hidden } ) => hidden )
+		( select ) => {
+			const { getMetaBoxesPerLocation } = select( editPostStore );
+			const { isEditorPanelEnabled } = select( editorStore );
+			const locations = isSide ? [ 'side' ] : [ 'normal', 'advanced' ];
+			return locations
+				.flatMap(
+					( boxLocation ) =>
+						getMetaBoxesPerLocation( boxLocation ) ?? []
+				)
+				.filter(
+					( { id } ) => ! isEditorPanelEnabled( `meta-box-${ id }` )
+				)
 				.map( ( { id } ) => id )
-				.join( ',' ),
-		[]
+				.join( ',' );
+		},
+		[ isSide ]
 	);
 
-	// The document renders with the visibility saved on the server, which
-	// a change made while it is loading would miss, so the store's
-	// visibility is applied to the rendered boxes on load and on change.
+	// Hides the meta boxes hidden through the Preferences modal by adding
+	// a style sheet to the iframe document. Reapplied on every load.
 	const visibilityRef = useRefEffect< HTMLIFrameElement >(
 		( iframe ) => {
-			const hiddenSet = new Set(
-				hiddenIds.split( ',' ).filter( Boolean )
-			);
 			const apply = () => {
-				const boxes =
-					iframe.contentDocument?.querySelectorAll( '.postbox' ) ??
-					[];
-				for ( const box of boxes ) {
-					box.classList.toggle(
-						'hide-if-js',
-						hiddenSet.has( box.id )
-					);
+				const frameDocument = iframe.contentDocument;
+				if ( ! frameDocument?.head ) {
+					return;
 				}
+				let style = frameDocument.getElementById(
+					'gutenberg-meta-box-visibility'
+				);
+				if ( ! style ) {
+					style = frameDocument.createElement( 'style' );
+					style.id = 'gutenberg-meta-box-visibility';
+					frameDocument.head.appendChild( style );
+				}
+				style.textContent = hiddenIds
+					.split( ',' )
+					.filter( Boolean )
+					.map(
+						( id ) =>
+							`#${ window.CSS.escape( id ) } { display: none; }`
+					)
+					.join( '\n' );
 			};
 			iframe.addEventListener( 'load', apply );
 			apply();
@@ -65,13 +82,15 @@ export default function MetaBoxesIframe( {
 		[ hiddenIds ]
 	);
 
+	const ref = visibilityRef;
+
 	if ( ! src || ! isVisible ) {
 		return null;
 	}
 
 	return (
 		<iframe
-			ref={ visibilityRef }
+			ref={ ref }
 			className={ clsx(
 				'edit-post-meta-boxes-iframe',
 				`is-${ location }`
