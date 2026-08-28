@@ -330,30 +330,48 @@ class Gutenberg_HTML_To_Blocks {
 	 * child elements and leaves the rest in place, so a block can hold both text
 	 * and inner blocks the way a list item does.
 	 *
-	 * @param Gutenberg_HTML_Element $element     Element to take inner blocks from.
+	 * @param Gutenberg_HTML_Element $element      Element to take inner blocks from.
 	 * @param true|string            $inner_blocks `true`, or a selector matching child elements.
-	 * @return array[] Parsed block arrays.
+	 * @return array `blocks`, the parsed block arrays, and `segments`, the markup between them: one more segment than there are blocks.
 	 */
 	private static function extract_inner_blocks( $element, $inner_blocks ) {
 		if ( true === $inner_blocks ) {
 			$blocks            = self::convert( $element->get_inner_html() );
 			$element->children = array();
 
-			return $blocks;
+			return array(
+				'blocks'   => $blocks,
+				'segments' => array_fill( 0, count( $blocks ) + 1, '' ),
+			);
 		}
 
-		$blocks = array();
+		$blocks   = array();
+		$segments = array();
+		$kept     = array();
+		$segment  = '';
 
-		foreach ( $element->child_elements() as $child ) {
-			if ( ! $child->matches( $inner_blocks ) ) {
+		foreach ( $element->children as $child ) {
+			if (
+				Gutenberg_HTML_Element::ELEMENT === $child->type
+				&& $child->matches( $inner_blocks )
+			) {
+				$blocks[]   = self::convert_element( $child );
+				$segments[] = $segment;
+				$segment    = '';
 				continue;
 			}
 
-			$blocks[] = self::convert_element( $child );
-			$child->remove();
+			$segment .= $child->get_outer_html();
+			$kept[]   = $child;
 		}
 
-		return $blocks;
+		$segments[]        = $segment;
+		$element->children = $kept;
+
+		return array(
+			'blocks'   => $blocks,
+			'segments' => $segments,
+		);
 	}
 
 	/**
@@ -363,14 +381,14 @@ class Gutenberg_HTML_To_Blocks {
 	 * @param array                  $transform    Transform that matched the element.
 	 * @param array                  $attributes   Block attributes.
 	 * @param Gutenberg_HTML_Element $element      Element the block was derived from.
-	 * @param array[]                $inner_blocks Inner blocks.
+	 * @param array                  $inner_blocks Inner blocks and the markup around them, or an empty array when the block has none.
 	 * @return array Parsed block array.
 	 */
 	private static function create_block( $block_type, $transform, $attributes, $element, $inner_blocks ) {
 		$attributes = self::remove_default_attributes( $block_type, $attributes );
 		$markup     = self::prepare_wrapper_markup( $block_type, $transform, $element, $attributes );
 
-		if ( array() === $inner_blocks ) {
+		if ( array() === $inner_blocks || array() === $inner_blocks['blocks'] ) {
 			return array(
 				'blockName'    => $block_type->name,
 				'attrs'        => $attributes,
@@ -380,19 +398,37 @@ class Gutenberg_HTML_To_Blocks {
 			);
 		}
 
-		$before        = $markup['opening'] . $element->get_inner_html();
-		$after         = $markup['closing'];
-		$inner_content = array( $before );
+		/*
+		 * Each inner block stands where it stood in the source, between the
+		 * markup that surrounded it. Appending them all after the rest would
+		 * reorder the content around them.
+		 */
+		$blocks        = $inner_blocks['blocks'];
+		$segments      = $inner_blocks['segments'];
+		$last          = count( $blocks ) - 1;
+		$inner_content = array( $markup['opening'] . $segments[0] );
 
-		$inner_content = array_merge( $inner_content, array_fill( 0, count( $inner_blocks ), null ) );
+		foreach ( $blocks as $index => $ignored ) {
+			$tail = $segments[ $index + 1 ];
 
-		$inner_content[] = $after;
+			if ( $index === $last ) {
+				$tail .= $markup['closing'];
+			}
+
+			$inner_content[] = null;
+
+			// `parse_blocks()` writes nothing between two adjacent inner
+			// blocks rather than an empty string.
+			if ( '' !== $tail ) {
+				$inner_content[] = $tail;
+			}
+		}
 
 		return array(
 			'blockName'    => $block_type->name,
 			'attrs'        => $attributes,
-			'innerBlocks'  => $inner_blocks,
-			'innerHTML'    => $before . $after,
+			'innerBlocks'  => $blocks,
+			'innerHTML'    => implode( '', array_filter( $inner_content, 'is_string' ) ),
 			'innerContent' => $inner_content,
 		);
 	}

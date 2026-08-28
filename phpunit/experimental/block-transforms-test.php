@@ -1164,6 +1164,52 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 		$this->assertSame( 'y', $blocks[0]['attrs']['className'] );
 	}
 
+	public function test_keeps_an_inner_block_where_it_stood() {
+		// A nested list sits between the text before it and the text after it.
+		// Appending every inner block after the rest of the content would run
+		// the two together and move the list to the end.
+		$blocks = gutenberg_html_to_blocks( '<ul><li>One<ul><li>Nested</li></ul>After</li></ul>' );
+
+		$item = $blocks[0]['innerBlocks'][0];
+
+		$this->assertSame( 'core/list-item', $item['blockName'] );
+		$this->assertCount( 1, $item['innerBlocks'] );
+		$this->assertSame( 'core/list', $item['innerBlocks'][0]['blockName'] );
+
+		$this->assertSame(
+			array( '<li>One', null, 'After</li>' ),
+			$item['innerContent']
+		);
+	}
+
+	public function test_writes_nothing_between_adjacent_inner_blocks() {
+		$this->register_test_blocks();
+		$this->register(
+			'test/group',
+			array(
+				'attributes' => array(),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'        => 'raw',
+							'selector'    => 'section',
+							'innerBlocks' => 'p',
+						),
+					),
+				),
+			)
+		);
+
+		$blocks = gutenberg_html_to_blocks( '<section><p>One</p><p>Two</p></section>' );
+
+		// `parse_blocks()` writes no empty string between two inner blocks that
+		// stood next to each other.
+		$this->assertSame(
+			array( '<section class="wp-block-test-group">', null, null, '</section>' ),
+			$blocks[0]['innerContent']
+		);
+	}
+
 	public function test_leaves_media_in_place_when_nothing_converts_it() {
 		$this->register_test_blocks();
 
