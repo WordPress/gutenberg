@@ -299,22 +299,13 @@ export const requestMetaBoxUpdates =
 		for ( const frameDocument of frameDocuments ) {
 			// Some meta boxes, including TinyMCE editors, only write their
 			// values into their form fields in a submit handler, so submit
-			// the form as if a button were pressed. The loader page cancels
-			// every submission, so the form does not actually navigate. The
-			// temporary submitter skips constraint validation, which would
-			// otherwise silently abort on invalid fields inside hidden
-			// meta boxes.
-			const form = frameDocument.getElementById( 'post' );
-			if ( ! form ) {
-				continue;
-			}
-			const submitter = frameDocument.createElement( 'button' );
-			submitter.type = 'submit';
-			submitter.formNoValidate = true;
-			submitter.hidden = true;
-			form.appendChild( submitter );
-			form.requestSubmit( submitter );
-			submitter.remove();
+			// the form with the hidden button the loader page renders for
+			// this. The loader cancels every submission, so the form does
+			// not actually navigate.
+			const submitter = frameDocument.getElementById(
+				'gutenberg-meta-box-submitter'
+			);
+			submitter?.form?.requestSubmit( submitter );
 		}
 
 		// We gather the base form data.
