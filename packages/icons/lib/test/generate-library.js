@@ -23,6 +23,16 @@ describe( 'svgToTsx style attribute conversion', () => {
 		expect( tsx ).toContain( '<text> style="fill: none"</text>' );
 	} );
 
+	it( 'converts inline styles on non-primitive SVG elements', () => {
+		const tsx = svgToTsx(
+			'<svg><text style="fill: none">Example</text></svg>'
+		);
+
+		expect( tsx ).toContain(
+			'<text style={ { fill: "none" } }>Example</text>'
+		);
+	} );
+
 	it( 'rejects unsupported inline styles', () => {
 		expect( () =>
 			svgToTsx( '<svg style="fill: red"><path d="M0 0" /></svg>' )

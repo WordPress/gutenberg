@@ -230,20 +230,6 @@ async function generateIndex() {
 // like `<Circle />`, taking care of importing those primitives first.
 function svgToTsx( svgContent ) {
 	let jsxContent = svgContent.trim();
-	const primitives = {
-		circle: 'Circle',
-		clippath: 'ClipPath',
-		defs: 'Defs',
-		ellipse: 'Ellipse',
-		g: 'G',
-		line: 'Line',
-		path: 'Path',
-		polygon: 'Polygon',
-		polyline: 'Polyline',
-		rect: 'Rect',
-		svg: 'SVG',
-	};
-	const tagsRe = Object.keys( primitives ).join( '|' );
 
 	jsxContent = jsxContent.replace( /\sclass=/g, ' className=' );
 
@@ -271,10 +257,8 @@ function svgToTsx( svgContent ) {
 	// Convert the source convention `style="fill: none"` into JSX style object
 	// syntax. Reject other inline styles so this targeted conversion cannot
 	// silently generate an incomplete JSX style object.
-	const openingTagWithStyleRe = new RegExp(
-		`(<(?:${ tagsRe })\\b(?:[^>"']|"[^"]*"|'[^']*')*?)\\sstyle=(["'])(.*?)\\2`,
-		'gs'
-	);
+	const openingTagWithStyleRe =
+		/(<[A-Za-z][\w:-]*\b(?:[^>"']|"[^"]*"|'[^']*')*?)\sstyle=(["'])(.*?)\2/gs;
 	jsxContent = jsxContent.replace(
 		openingTagWithStyleRe,
 		( _, openingTag, _quote, cssString ) => {
@@ -288,8 +272,25 @@ function svgToTsx( svgContent ) {
 		}
 	);
 
+	// Tags that ought to be converted to WordPress primitives when converting
+	// SVGs to React elements
+	const primitives = {
+		circle: 'Circle',
+		clippath: 'ClipPath',
+		defs: 'Defs',
+		ellipse: 'Ellipse',
+		g: 'G',
+		line: 'Line',
+		path: 'Path',
+		polygon: 'Polygon',
+		polyline: 'Polyline',
+		rect: 'Rect',
+		svg: 'SVG',
+	};
+
 	// Prepare regular expressions to match opening tags and closing tags to
 	// transform to primitives: <circle ...>, </circle>, etc.
+	const tagsRe = Object.keys( primitives ).join( '|' );
 	const openRe = new RegExp( `<(${ tagsRe })\\b`, 'g' );
 	const closeRe = new RegExp( `<\/(${ tagsRe })>`, 'g' );
 
