@@ -222,6 +222,33 @@ function gutenberg_wpds_admin_render_harness() {
 	}
 	echo '</tbody></table>';
 
+	echo '<h2>' . esc_html__( 'Notices', 'gutenberg' ) . '</h2>';
+	$notice_tones = array(
+		'.notice (no tone)' => 'notice',
+		'.notice-info'      => 'notice notice-info',
+		'.notice-success'   => 'notice notice-success',
+		'.notice-warning'   => 'notice notice-warning',
+		'.notice-error'     => 'notice notice-error',
+		'.notice-alt'       => 'notice notice-info notice-alt',
+		'div.updated'       => 'updated',
+		'div.error'         => 'error',
+	);
+	foreach ( $notice_tones as $label => $classes ) {
+		printf(
+			'<div class="%s"><p><strong>%s</strong> %s</p></div>',
+			esc_attr( $classes ),
+			esc_html( $label ),
+			esc_html__( 'This is a notice.', 'gutenberg' )
+		);
+	}
+
+	echo '<h2>' . esc_html__( 'Notice — dismissible', 'gutenberg' ) . '</h2>';
+	printf(
+		'<div class="notice notice-warning is-dismissible"><p>%s</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">%s</span></button></div>',
+		esc_html__( 'The dismiss button inherits the notice tone.', 'gutenberg' ),
+		esc_html__( 'Dismiss this notice.', 'gutenberg' )
+	);
+
 	echo '<h2>' . esc_html__( 'Ecosystem override check', 'gutenberg' ) . '</h2>';
 	echo '<p>' . esc_html__( 'This button is styled by an unlayered rule, exactly as a third-party plugin would style it. It MUST stay orange — if it picks up the restyle instead, the back-compat guarantee this work depends on is broken.', 'gutenberg' ) . '</p>';
 	// Unlayered on purpose: this stands in for third-party plugin CSS.
