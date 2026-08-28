@@ -8,13 +8,16 @@ import {
 	getTagRefspec,
 	prepareNpmRelease,
 	getNpmReleasePreparedRefs,
+	getNpmReleasePreparedPluginBranch,
 	isNpmReleasePreparedCommitStale,
 	publishPackagesToNpm,
 	publishVersionedPackagesToNpm,
+	pushNpmReleasePreparedCommit,
 	pushNpmReleaseGitMetadata,
 	runNpmPublishPreflight,
 	runNpmReleasePhase,
 	runPackagesRelease,
+	resumePreparedNpmRelease,
 	verifyRemotePackageTags,
 } from '../packages';
 
@@ -113,14 +116,17 @@ describe( 'runPackagesRelease', () => {
 		const publishPreparedPackagesToNpmFn = jest
 			.fn()
 			.mockResolvedValue( 'publish-sha' );
+		const resumePreparedNpmReleaseFn = jest.fn().mockResolvedValue( null );
 		const finalizePreparedNpmReleaseFn = jest.fn();
 
 		await runPackagesRelease( config, [], {
 			finalizePreparedNpmReleaseFn,
 			prepareNpmReleaseFn,
 			publishPreparedPackagesToNpmFn,
+			resumePreparedNpmReleaseFn,
 		} );
 
+		expect( resumePreparedNpmReleaseFn ).toHaveBeenCalledWith( config );
 		expect( prepareNpmReleaseFn ).toHaveBeenCalledTimes( 1 );
 		expect( prepareNpmReleaseFn ).toHaveBeenCalledWith( config );
 		expect( publishPreparedPackagesToNpmFn ).toHaveBeenCalledTimes( 1 );
@@ -139,6 +145,40 @@ describe( 'runPackagesRelease', () => {
 			publishPreparedPackagesToNpmFn.mock.invocationCallOrder[ 0 ]
 		).toBeLessThan(
 			finalizePreparedNpmReleaseFn.mock.invocationCallOrder[ 0 ]
+		);
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'resumes a prepared release before syncing or updating the release branch', async () => {
+		const config = {
+			gitWorkingDirectoryPath: '/repo',
+			interactive: false,
+		};
+		const releaseState = {
+			changelogCommit: 'changelog-sha',
+			pluginReleaseBranch: 'release/23.9',
+			publishCommit: 'prepared-sha',
+		};
+		const resumePreparedNpmReleaseFn = jest
+			.fn()
+			.mockResolvedValue( releaseState );
+		const prepareNpmReleaseFn = jest.fn();
+		const publishPreparedPackagesToNpmFn = jest.fn();
+		const finalizePreparedNpmReleaseFn = jest.fn();
+
+		await runPackagesRelease( config, [], {
+			finalizePreparedNpmReleaseFn,
+			prepareNpmReleaseFn,
+			publishPreparedPackagesToNpmFn,
+			resumePreparedNpmReleaseFn,
+		} );
+
+		expect( resumePreparedNpmReleaseFn ).toHaveBeenCalledWith( config );
+		expect( prepareNpmReleaseFn ).not.toHaveBeenCalled();
+		expect( publishPreparedPackagesToNpmFn ).not.toHaveBeenCalled();
+		expect( finalizePreparedNpmReleaseFn ).toHaveBeenCalledWith(
+			config,
+			releaseState
 		);
 		expect( console ).toHaveLogged();
 	} );
@@ -1149,78 +1189,107 @@ describe( 'npm publication verification resumability', () => {
 
 	it( 'ignores a stale prepared commit already merged into the release branch', async () => {
 		const commandFn = jest.fn().mockResolvedValue();
+		const deletePreparedCommitFn = jest.fn();
 		const git = {
 			checkout: jest.fn(),
 			fetch: jest.fn(),
 			raw: jest.fn().mockResolvedValue( '' ),
-			revparse: jest.fn().mockResolvedValue( 'sha' ),
 		};
 
-		await publishPackagesToNpm(
-			{
-				distTag: 'latest',
-				gitWorkingDirectoryPath: '/repo',
-				interactive: false,
-				minimumVersionBump: 'minor',
-				npmReleaseBranch: 'wp/latest',
-				releaseType: 'latest',
-			},
-			{
-				commandFn,
-				deletePreparedCommitFn: jest.fn(),
-				getPreparedCommitFn: jest.fn().mockResolvedValue( 'stale-sha' ),
-				// A completed release leaves its commit on the branch.
-				isPreparedCommitStaleFn: jest.fn().mockResolvedValue( true ),
-				git,
-				publishVersionedPackagesToNpmFn: jest.fn(),
-			}
-		);
+		await expect(
+			resumePreparedNpmRelease(
+				{
+					distTag: 'latest',
+					gitWorkingDirectoryPath: '/repo',
+					interactive: false,
+					minimumVersionBump: 'minor',
+					npmReleaseBranch: 'wp/latest',
+					releaseType: 'latest',
+				},
+				{
+					commandFn,
+					deletePreparedCommitFn,
+					getPreparedCommitFn: jest
+						.fn()
+						.mockResolvedValue( 'stale-sha' ),
+					// A completed release leaves its commit on the branch.
+					isPreparedCommitStaleFn: jest
+						.fn()
+						.mockResolvedValue( true ),
+					git,
+					publishVersionedPackagesToNpmFn: jest.fn(),
+				}
+			)
+		).resolves.toBeNull();
 
-		const lernaVersionCalls = commandFn.mock.calls.filter( ( [ cmd ] ) =>
-			cmd.includes( 'lerna version' )
-		);
-		expect( lernaVersionCalls ).toHaveLength( 1 );
+		expect( deletePreparedCommitFn ).toHaveBeenCalled();
 		expect( git.checkout ).not.toHaveBeenCalled();
 		expect( console ).toHaveLogged();
 	} );
 
 	it( 'resumes from an existing prepared commit instead of re-versioning', async () => {
 		const commandFn = jest.fn().mockResolvedValue();
+		const publishVersionedPackagesToNpmFn = jest.fn();
 		const git = {
-			revparse: jest.fn().mockResolvedValue( 'prepared-sha' ),
-			raw: jest.fn().mockResolvedValue( '' ),
+			raw: jest
+				.fn()
+				.mockResolvedValue( 'changelog-sha\0Update changelog files' ),
 			checkout: jest.fn(),
 			fetch: jest.fn(),
 		};
 
-		await publishPackagesToNpm(
-			{
-				distTag: 'latest',
-				gitWorkingDirectoryPath: '/repo',
-				interactive: false,
-				minimumVersionBump: 'minor',
-				npmReleaseBranch: 'wp/latest',
-				releaseType: 'latest',
-			},
-			{
-				commandFn,
-				getPreparedCommitFn: jest
-					.fn()
-					.mockResolvedValue( 'prepared-sha' ),
-				git,
-				publishVersionedPackagesToNpmFn: jest.fn(),
-			}
-		);
+		await expect(
+			resumePreparedNpmRelease(
+				{
+					distTag: 'latest',
+					gitWorkingDirectoryPath: '/repo',
+					interactive: false,
+					minimumVersionBump: 'minor',
+					npmReleaseBranch: 'wp/latest',
+					releaseType: 'latest',
+				},
+				{
+					commandFn,
+					getPreparedCommitFn: jest
+						.fn()
+						.mockResolvedValue( 'prepared-sha' ),
+					getPreparedPluginReleaseBranchFn: jest
+						.fn()
+						.mockReturnValue( 'release/23.9' ),
+					git,
+					isPreparedCommitStaleFn: jest
+						.fn()
+						.mockResolvedValue( false ),
+					publishVersionedPackagesToNpmFn,
+					restorePreparedTagsFn: jest.fn(),
+				}
+			)
+		).resolves.toEqual( {
+			changelogCommit: 'changelog-sha',
+			pluginReleaseBranch: 'release/23.9',
+			publishCommit: 'prepared-sha',
+		} );
 
 		const lernaVersionCalls = commandFn.mock.calls.filter( ( [ cmd ] ) =>
 			cmd.includes( 'lerna version' )
 		);
 		expect( lernaVersionCalls ).toHaveLength( 0 );
+		expect( publishVersionedPackagesToNpmFn ).toHaveBeenCalled();
 		expect( console ).toHaveLogged();
 	} );
 } );
 
 describe( 'prepared release refs', () => {
+	it( 'recovers the plugin branch from the prepared checkout version', () => {
+		expect(
+			getNpmReleasePreparedPluginBranch( '/repo', {
+				readJSON: jest.fn().mockReturnValue( {
+					version: '23.9.0-rc.1',
+				} ),
+			} )
+		).toBe( 'release/23.9' );
+	} );
+
 	it( 'namespaces the refs per release target', () => {
 		expect( getNpmReleasePreparedRefs( 'wp/latest' ) ).toEqual(
 			expect.objectContaining( {
@@ -1279,11 +1348,45 @@ describe( 'prepared release refs', () => {
 		expect( console ).toHaveLogged();
 	} );
 
+	it( 'publishes the prepared commit marker only after every tag batch succeeds', async () => {
+		const packageTags = Array.from(
+			{ length: 26 },
+			( _, index ) => `tag-${ index }`
+		);
+		const git = {
+			raw: jest.fn( ( ...args ) => {
+				if ( args.some( ( arg ) => arg.includes( 'tag-25' ) ) ) {
+					throw new Error( 'tag push failed' );
+				}
+			} ),
+		};
+
+		await expect(
+			pushNpmReleasePreparedCommit(
+				{
+					gitWorkingDirectoryPath: '/repo',
+					npmReleaseBranch: 'wp/latest',
+					packageTags,
+					publishCommit: 'publish-sha',
+				},
+				{ git }
+			)
+		).rejects.toThrow( 'tag push failed' );
+		expect( console ).toHaveLogged();
+
+		expect( git.raw ).not.toHaveBeenCalledWith(
+			'push',
+			'--force',
+			'origin',
+			'publish-sha:refs/npm-release/wp-latest/commit'
+		);
+	} );
+
 	it( 'restores the prepared package tags before resuming a release', async () => {
 		const restorePreparedTagsFn = jest.fn();
 		const publishVersionedPackagesToNpmFn = jest.fn();
 
-		await publishPackagesToNpm(
+		await resumePreparedNpmRelease(
 			{
 				distTag: 'latest',
 				gitWorkingDirectoryPath: '/repo',
@@ -1297,6 +1400,12 @@ describe( 'prepared release refs', () => {
 				getPreparedCommitFn: jest
 					.fn()
 					.mockResolvedValue( 'prepared-sha' ),
+				getPreparedChangelogCommitFn: jest
+					.fn()
+					.mockResolvedValue( null ),
+				getPreparedPluginReleaseBranchFn: jest
+					.fn()
+					.mockReturnValue( 'release/23.9' ),
 				git: {
 					checkout: jest.fn(),
 					fetch: jest.fn(),
