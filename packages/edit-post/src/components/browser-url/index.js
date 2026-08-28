@@ -3,7 +3,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { addQueryArgs, getQueryArg } from '@wordpress/url';
 import { store as editorStore } from '@wordpress/editor';
 import { unlock } from '../../lock-unlock';
-import useClassicRevisionRedirect from './use-classic-revision-redirect';
 
 /**
  * Safari throws when rapid revision changes trigger more than 100 History API
@@ -28,8 +27,6 @@ export function getPostEditURL( postId, revisionId ) {
 }
 
 export default function BrowserURL() {
-	useClassicRevisionRedirect();
-
 	// Read the initial revision once, before URL sync can overwrite it.
 	const [ initialRevisionId ] = useState( () => {
 		const revision = Number(

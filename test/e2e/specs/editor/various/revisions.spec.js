@@ -389,19 +389,33 @@ test.describe( 'Post revisions', () => {
 
 test.describe( 'Post revisions with classic meta boxes', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.activatePlugin( 'gutenberg-test-plugin-meta-box' );
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-revisions-meta-box'
+		);
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deactivatePlugin( 'gutenberg-test-plugin-meta-box' );
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-revisions-meta-box'
+		);
 	} );
 
-	test( 'falls back to the classic revisions screen', async ( {
+	test( 'restores values saved by a classic meta box', async ( {
 		admin,
 		editor,
 		page,
+		requestUtils,
 	} ) => {
 		await admin.createNewPost();
+
+		// Click near the label, away from the resize handle overlaying the
+		// center of the toggle.
+		await page
+			.getByRole( 'button', { name: 'Meta Boxes', exact: true } )
+			.click( { position: { x: 40, y: 10 } } );
+		const metaBoxField = page.getByRole( 'textbox', {
+			name: 'Revisions meta box field',
+		} );
 
 		await editor.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
@@ -410,6 +424,7 @@ test.describe( 'Post revisions with classic meta boxes', () => {
 			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'Original content' );
+		await metaBoxField.fill( 'Original meta' );
 		await editor.saveDraft();
 
 		await editor.canvas
@@ -417,74 +432,45 @@ test.describe( 'Post revisions with classic meta boxes', () => {
 			.click();
 		await page.keyboard.press( 'End' );
 		await page.keyboard.type( ' - Updated content' );
+		await metaBoxField.fill( 'Updated meta' );
 		await editor.saveDraft();
 
-		await editor.openDocumentSettingsSidebar();
-		const settingsSidebar = page.getByRole( 'region', {
-			name: 'Editor settings',
-		} );
-		await settingsSidebar.getByRole( 'tab', { name: 'Post' } ).click();
-
-		// With classic meta boxes the Revisions control is rendered as a
-		// link to the classic admin screen, not a button that opens the
-		// in-editor visual revisions mode.
-		const revisionsLink = settingsSidebar.getByRole( 'link', {
-			name: 'Open revisions screen: 2 revisions',
-		} );
-		await expect( revisionsLink ).toBeVisible();
-		await expect( revisionsLink ).toHaveAttribute(
-			'href',
-			/revision\.php\?revision=\d+/
-		);
-
-		// The inline DataViews revisions panel is hidden (its PanelBody
-		// toggle would be the only element with accessible name exactly
-		// "Revisions"; substring matches like the slug field aria-label
-		// are excluded with exact: true).
-		await expect(
-			settingsSidebar.getByRole( 'button', {
-				name: 'Revisions',
-				exact: true,
-			} )
-		).toHaveCount( 0 );
-	} );
-
-	test( 'redirects revision deep links to the classic screen', async ( {
-		admin,
-		page,
-		requestUtils,
-	} ) => {
-		const post = await requestUtils.rest( {
-			method: 'POST',
-			path: '/wp/v2/posts',
-			data: {
-				title: 'Meta box deep link',
-				content:
-					'<!-- wp:paragraph --><p>Original content</p><!-- /wp:paragraph -->',
-				status: 'draft',
-			},
-		} );
-		await requestUtils.rest( {
-			method: 'POST',
-			path: `/wp/v2/posts/${ post.id }`,
-			data: {
-				content:
-					'<!-- wp:paragraph --><p>Updated content</p><!-- /wp:paragraph -->',
-			},
-		} );
+		// Saving twice through the editor and the meta box form produces more
+		// than two revisions, so the revision to restore is the most recent
+		// one that still holds the original content.
+		const postId = new URL( page.url() ).searchParams.get( 'post' );
 		const revisions = await requestUtils.rest( {
-			path: `/wp/v2/posts/${ post.id }/revisions`,
+			path: `/wp/v2/posts/${ postId }/revisions`,
+			params: { per_page: 100 },
 		} );
-		const oldestRevisionId = revisions[ revisions.length - 1 ].id;
+		const revision = revisions.find(
+			( { content } ) =>
+				content.rendered.includes( 'Original content' ) &&
+				! content.rendered.includes( 'Updated content' )
+		);
 
 		await admin.visitAdminPage(
 			'post.php',
-			`post=${ post.id }&action=edit&revision=${ oldestRevisionId }`
+			`post=${ postId }&action=edit&revision=${ revision.id }`
 		);
 
-		await expect( page ).toHaveURL(
-			new RegExp( `revision\\.php\\?revision=${ oldestRevisionId }` )
-		);
+		await page.getByRole( 'button', { name: 'Restore' } ).click();
+
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Restored to revision' } )
+		).toBeVisible();
+
+		// The meta box is rendered by PHP, so its restored value only shows
+		// once the editor has loaded again.
+		await expect( metaBoxField ).toHaveValue( 'Original meta' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Original content' },
+			},
+		] );
 	} );
 
 	test( 'keeps invalid revision deep links in the editor', async ( {

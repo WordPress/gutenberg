@@ -1,5 +1,5 @@
 import { useLayoutEffect } from '@wordpress/element';
-import { useDispatch, useRegistry } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { getQueryArg } from '@wordpress/url';
@@ -13,13 +13,11 @@ import useEntityContainsSnapshot from './use-entity-contains-snapshot';
  * @param {Object}   props                      Function props.
  * @param {Object}   props.autosave             The `autosave` editor setting.
  * @param {Function} props.createWarningNotice  Action that creates the notice.
- * @param {Object}   props.registry             The data registry.
  * @param {Function} props.setCurrentRevisionId Action that opens a revision.
  */
 function showAutosaveExistsNotice( {
 	autosave,
 	createWarningNotice,
-	registry,
 	setCurrentRevisionId,
 } ) {
 	// The only place core exposes the autosave ID is the edit
@@ -36,19 +34,8 @@ function showAutosaveExistsNotice( {
 					label: __( 'View the autosave' ),
 					...( autosaveId
 						? {
-								onClick: () => {
-									// `disableVisualRevisions` is only set
-									// after mount, so read it at click time.
-									const { disableVisualRevisions } = registry
-										.select( editorStore )
-										.getEditorSettings();
-									if ( disableVisualRevisions ) {
-										window.location.href =
-											autosave.editLink;
-										return;
-									}
-									setCurrentRevisionId( autosaveId );
-								},
+								onClick: () =>
+									setCurrentRevisionId( autosaveId ),
 						  }
 						: { url: autosave.editLink } ),
 				},
@@ -80,7 +67,6 @@ function showAutosaveExistsNotice( {
  * @param {Object}  props.settings The editor settings.
  */
 export default function useAutosaveNotice( { post, recovery, settings } ) {
-	const registry = useRegistry();
 	const { createWarningNotice } = useDispatch( noticesStore );
 	const { setCurrentRevisionId } = unlock( useDispatch( editorStore ) );
 
@@ -111,7 +97,6 @@ export default function useAutosaveNotice( { post, recovery, settings } ) {
 		showAutosaveExistsNotice( {
 			autosave: settings.autosave,
 			createWarningNotice,
-			registry,
 			setCurrentRevisionId,
 		} );
 
