@@ -9,7 +9,13 @@ import {
 	inertValue,
 } from '@wordpress/ui';
 import { HostLink } from '@wordpress/widget-primitives';
-import type { WidgetAction, WidgetIcon } from '@wordpress/widget-primitives';
+import type {
+	WidgetAction,
+	WidgetIcon,
+	WidgetRuntimeAction,
+} from '@wordpress/widget-primitives';
+import { isCallbackAction } from '../../utils/action-fulfillment';
+import { CallbackAction } from '../widget-actions/callback-action';
 import styles from './widget-footer.module.css';
 
 type IconActionProps = {
@@ -71,7 +77,7 @@ type WidgetFooterProps = {
 	/**
 	 * The promoted actions (`relevance: 'high'` and `'medium'`).
 	 */
-	actions: WidgetAction[];
+	actions: WidgetRuntimeAction[];
 
 	/**
 	 * Inert the footer while customizing.
@@ -81,9 +87,9 @@ type WidgetFooterProps = {
 
 /**
  * Persistent strip under the widget body. `'high'` actions mount as leading
- * text links, a declared icon riding as prefix; `'medium'` actions as
+ * text affordances, a declared icon riding as prefix; `'medium'` actions as
  * trailing compact affordances, icon-only when they declare an icon. Every
- * affordance is a real anchor.
+ * link is a real anchor; a callback action mounts a button.
  *
  * A target the host recognizes as one of its own routes mounts the host
  * router's link through `HostLink`, so it navigates client-side.
@@ -116,22 +122,29 @@ export function WidgetFooter( {
 		>
 			{ highActions.length > 0 && (
 				<Stack direction="row" align="center" gap="lg" wrap="wrap">
-					{ highActions.map( ( action ) => (
-						<Link
-							key={ action.id }
-							className={
-								action.icon
-									? styles[ 'prefixed-action' ]
-									: undefined
-							}
-							download={ action.download }
-							openInNewTab={ action.openInNewTab }
-							render={ <HostLink href={ action.href } /> }
-						>
-							{ action.icon && <Icon icon={ action.icon } /> }
-							{ action.label }
-						</Link>
-					) ) }
+					{ highActions.map( ( action ) =>
+						isCallbackAction( action ) ? (
+							<CallbackAction
+								key={ action.id }
+								action={ action }
+							/>
+						) : (
+							<Link
+								key={ action.id }
+								className={
+									action.icon
+										? styles[ 'prefixed-action' ]
+										: undefined
+								}
+								download={ action.download }
+								openInNewTab={ action.openInNewTab }
+								render={ <HostLink href={ action.href } /> }
+							>
+								{ action.icon && <Icon icon={ action.icon } /> }
+								{ action.label }
+							</Link>
+						)
+					) }
 				</Stack>
 			) }
 
@@ -143,8 +156,18 @@ export function WidgetFooter( {
 					className={ styles[ 'compact-actions' ] }
 				>
 					<Tooltip.Provider>
-						{ mediumActions.map( ( action ) =>
-							action.icon ? (
+						{ mediumActions.map( ( action ) => {
+							if ( isCallbackAction( action ) ) {
+								return (
+									<CallbackAction
+										key={ action.id }
+										action={ action }
+										compact
+									/>
+								);
+							}
+
+							return action.icon ? (
 								<IconAction
 									key={ action.id }
 									action={ { ...action, icon: action.icon } }
@@ -158,8 +181,8 @@ export function WidgetFooter( {
 								>
 									{ action.label }
 								</Link>
-							)
-						) }
+							);
+						} ) }
 					</Tooltip.Provider>
 				</Stack>
 			) }

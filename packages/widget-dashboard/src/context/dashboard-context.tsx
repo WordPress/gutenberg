@@ -19,6 +19,8 @@ import { enforceLayoutPolicy } from '../utils/enforce-layout-policy';
 import { normalizeGridSettings } from '../utils/normalize-grid-settings';
 import { resolveDashboardColumnCap } from '../utils/resolve-dashboard-column-count/resolve-dashboard-column-count';
 import { DEFAULT_ROW_HEIGHT } from '../utils/row-height-presets';
+import { createRuntimeActionsMap } from '../utils/runtime-actions-map';
+import type { RuntimeActionsMap } from '../utils/runtime-actions-map';
 import { useDashboardPolicy } from '../components/dashboard-policy';
 import type {
 	CanPerformDashboardOperation,
@@ -99,6 +101,11 @@ interface InternalDashboardContextValue {
 	 * so further policy sources compose at this single point.
 	 */
 	canPerform: CanPerformDashboardOperation;
+
+	/**
+	 * The actions each mounted instance declares at runtime.
+	 */
+	runtimeActions: RuntimeActionsMap;
 }
 
 const ALLOW_EVERY_OPERATION: CanPerformDashboardOperation = () => true;
@@ -179,6 +186,7 @@ export function WidgetDashboardProvider( {
 }: ProviderProps ): React.ReactNode {
 	const [ stagingLayout, setStagingLayout ] =
 		useState< DashboardWidget[] >( committedLayout );
+	const [ runtimeActions ] = useState( createRuntimeActionsMap );
 
 	const policy = useDashboardPolicy();
 
@@ -316,6 +324,7 @@ export function WidgetDashboardProvider( {
 			onEditChange,
 			resolveWidgetModule,
 			canPerform,
+			runtimeActions,
 		} ),
 		[
 			widgetTypes,
@@ -333,6 +342,7 @@ export function WidgetDashboardProvider( {
 			onEditChange,
 			resolveWidgetModule,
 			canPerform,
+			runtimeActions,
 		]
 	);
 

@@ -3,8 +3,13 @@ import { moreVertical } from '@wordpress/icons';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
 import { IconButton, Menu } from '@wordpress/ui';
 import { HostLink } from '@wordpress/widget-primitives';
-import type { WidgetAction } from '@wordpress/widget-primitives';
+import type {
+	WidgetCallbackAction,
+	WidgetRuntimeAction,
+} from '@wordpress/widget-primitives';
+import { useRunAction } from './use-run-action';
 import { useReserveHeaderSpace } from '../widget-header/widget-header-fit';
+import { isCallbackAction } from '../../utils/action-fulfillment';
 import styles from './widget-actions.module.css';
 
 type WidgetActionsProps = {
@@ -13,8 +18,35 @@ type WidgetActionsProps = {
 	 * the footer takes `'high'` and `'medium'`, this menu the rest, and
 	 * every action for full-bleed widgets, which have no footer.
 	 */
-	actions: WidgetAction[];
+	actions: WidgetRuntimeAction[];
 };
+
+type CallbackMenuItemProps = {
+	action: WidgetCallbackAction;
+};
+
+/**
+ * A callback action as a menu item, disabled while its promise settles.
+ *
+ * @param {CallbackMenuItemProps} props Component props.
+ */
+function CallbackMenuItem( { action }: CallbackMenuItemProps ) {
+	const { run, isPending } = useRunAction( action );
+
+	return (
+		<Menu.Item
+			disabled={ isPending }
+			onClick={ run }
+			prefix={
+				action.icon ? (
+					<Menu.PrefixIcon icon={ action.icon } />
+				) : undefined
+			}
+		>
+			<Menu.ItemLabel>{ action.label }</Menu.ItemLabel>
+		</Menu.Item>
+	);
+}
 
 /**
  * Materializes widget actions as a "more" menu in the chrome: a three-dots
@@ -56,24 +88,33 @@ export function WidgetActions( {
 
 				<Menu.Popup>
 					<Menu.Group>
-						{ actions.map( ( action ) => (
-							<Menu.LinkItem
-								key={ action.id }
-								download={ action.download }
-								openInNewTab={ action.openInNewTab }
-								render={ <HostLink href={ action.href } /> }
-								closeOnClick
-								prefix={
-									action.icon ? (
-										<Menu.PrefixIcon icon={ action.icon } />
-									) : undefined
-								}
-							>
-								<Menu.ItemLabel>
-									{ action.label }
-								</Menu.ItemLabel>
-							</Menu.LinkItem>
-						) ) }
+						{ actions.map( ( action ) =>
+							isCallbackAction( action ) ? (
+								<CallbackMenuItem
+									key={ action.id }
+									action={ action }
+								/>
+							) : (
+								<Menu.LinkItem
+									key={ action.id }
+									download={ action.download }
+									openInNewTab={ action.openInNewTab }
+									render={ <HostLink href={ action.href } /> }
+									closeOnClick
+									prefix={
+										action.icon ? (
+											<Menu.PrefixIcon
+												icon={ action.icon }
+											/>
+										) : undefined
+									}
+								>
+									<Menu.ItemLabel>
+										{ action.label }
+									</Menu.ItemLabel>
+								</Menu.LinkItem>
+							)
+						) }
 					</Menu.Group>
 				</Menu.Popup>
 			</Menu.Root>

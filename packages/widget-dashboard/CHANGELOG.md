@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Runtime actions: the engine lends every mounted instance the `actions` host capability, merges what the widget declares through `useWidgetActions` with the type's declared actions (a runtime action carrying a declared `id` takes its place), and routes the result to the footer and the More menu by relevance. A `callback` action materializes as a button, disabled while its promise settles ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+
 ### Enhancements
 
 -   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).

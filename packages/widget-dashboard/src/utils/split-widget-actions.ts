@@ -1,23 +1,35 @@
-import type { WidgetAction, WidgetType } from '@wordpress/widget-primitives';
+import type {
+	WidgetRuntimeAction,
+	WidgetType,
+} from '@wordpress/widget-primitives';
+import { mergeWidgetActions } from './merge-widget-actions';
 
 /**
- * Splits a widget type's actions across the chrome surfaces: the footer
- * takes `relevance: 'high'` and `'medium'`, the More menu the rest.
- * Full-bleed widgets have no footer, so every action stays in the menu.
+ * Splits a widget's actions across the chrome surfaces: the footer takes
+ * `relevance: 'high'` and `'medium'`, the More menu the rest. Full-bleed
+ * widgets have no footer, so every action stays in the menu. The instance's
+ * runtime actions join the type's declared ones first.
  *
- * @param widgetType The widget type whose actions are routed.
+ * @param {WidgetType | undefined} widgetType     The widget type whose actions are routed.
+ * @param {WidgetRuntimeAction[]}  runtimeActions The actions its mounted instance declares.
  */
-export function splitWidgetActions( widgetType?: WidgetType ): {
-	footer: WidgetAction[];
-	menu: WidgetAction[];
+export function splitWidgetActions(
+	widgetType?: WidgetType,
+	runtimeActions: WidgetRuntimeAction[] = []
+): {
+	footer: WidgetRuntimeAction[];
+	menu: WidgetRuntimeAction[];
 } {
-	const actions = widgetType?.actions ?? [];
+	const actions = mergeWidgetActions(
+		widgetType?.actions ?? [],
+		runtimeActions
+	);
 
 	if ( widgetType?.presentation === 'full-bleed' ) {
 		return { footer: [], menu: actions };
 	}
 
-	const isPromoted = ( action: WidgetAction ) =>
+	const isPromoted = ( action: WidgetRuntimeAction ) =>
 		action.relevance === 'high' || action.relevance === 'medium';
 
 	return {
