@@ -4,11 +4,22 @@ import { __ } from '@wordpress/i18n';
 import { Button, TextControl } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 
-function AddCustomGenericTemplateModalContent( { createTemplate, onBack } ) {
+interface AddCustomGenericTemplateModalContentProps {
+	createTemplate: (
+		template: { slug: string; title: string },
+		isWPSuggestion: boolean
+	) => Promise< void >;
+	onBack: () => void;
+}
+
+function AddCustomGenericTemplateModalContent( {
+	createTemplate,
+	onBack,
+}: AddCustomGenericTemplateModalContentProps ) {
 	const [ title, setTitle ] = useState( '' );
 	const defaultTitle = __( 'Custom Template' );
 	const [ isBusy, setIsBusy ] = useState( false );
-	const inputRef = useRef();
+	const inputRef = useRef< HTMLInputElement >( null );
 
 	// Set focus to the name input when the component mounts
 	useEffect( () => {
@@ -17,7 +28,7 @@ function AddCustomGenericTemplateModalContent( { createTemplate, onBack } ) {
 		}
 	}, [] );
 
-	async function onCreateTemplate( event ) {
+	async function onCreateTemplate( event: React.FormEvent ) {
 		event.preventDefault();
 		if ( isBusy ) {
 			return;

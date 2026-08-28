@@ -14,14 +14,46 @@ import { safeDecodeURI } from '@wordpress/url';
 import { Stack, Text } from '@wordpress/ui';
 import { mapToIHasNameAndId } from './utils';
 
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY: any[] = [];
+
+interface Suggestion {
+	id: string | number;
+	name: string;
+	slug: string;
+	link?: string;
+}
+
+interface EntityForSuggestions {
+	type: string;
+	slug: string;
+	config: {
+		recordNamePath?: string;
+		queryArgs: ( search: string ) => Record< string, any >;
+		getSpecificTemplate: ( suggestion: Suggestion ) => any;
+	};
+	labels: {
+		singular_name: string;
+		search_items: string;
+		not_found: string;
+		all_items: string;
+	};
+	hasGeneralTemplate?: boolean;
+	template?: any;
+}
+
+interface SuggestionListItemProps {
+	suggestion: Suggestion;
+	search: string;
+	onSelect: ( template: any ) => void;
+	entityForSuggestions: EntityForSuggestions;
+}
 
 function SuggestionListItem( {
 	suggestion,
 	search,
 	onSelect,
 	entityForSuggestions,
-} ) {
+}: SuggestionListItemProps ) {
 	const baseCssClass =
 		'edit-site-custom-template-modal__suggestions_list__list-item';
 	return (
@@ -56,7 +88,10 @@ function SuggestionListItem( {
 	);
 }
 
-function useSearchSuggestions( entityForSuggestions, search ) {
+function useSearchSuggestions(
+	entityForSuggestions: EntityForSuggestions,
+	search: string
+): Suggestion[] {
 	const { config } = entityForSuggestions;
 	const query = useMemo(
 		() => ( {
@@ -74,14 +109,15 @@ function useSearchSuggestions( entityForSuggestions, search ) {
 			entityForSuggestions.slug,
 			query
 		);
-	const [ suggestions, setSuggestions ] = useState( EMPTY_ARRAY );
+	const [ suggestions, setSuggestions ] =
+		useState< Suggestion[] >( EMPTY_ARRAY );
 	useEffect( () => {
 		if ( ! searchHasResolved ) {
 			return;
 		}
-		let newSuggestions = EMPTY_ARRAY;
+		let newSuggestions: Suggestion[] = EMPTY_ARRAY;
 		if ( searchResults?.length ) {
-			newSuggestions = searchResults;
+			newSuggestions = searchResults as Suggestion[];
 			if ( config.recordNamePath ) {
 				newSuggestions = mapToIHasNameAndId(
 					newSuggestions,
@@ -96,7 +132,15 @@ function useSearchSuggestions( entityForSuggestions, search ) {
 	return suggestions;
 }
 
-function SuggestionList( { entityForSuggestions, onSelect } ) {
+interface SuggestionListProps {
+	entityForSuggestions: EntityForSuggestions;
+	onSelect: ( template: any ) => void;
+}
+
+function SuggestionList( {
+	entityForSuggestions,
+	onSelect,
+}: SuggestionListProps ) {
 	const [ search, setSearch, debouncedSearch ] = useDebouncedInput();
 	const suggestions = useSearchSuggestions(
 		entityForSuggestions,
@@ -148,13 +192,22 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 	);
 }
 
+interface AddCustomTemplateModalContentProps {
+	onSelect: ( template: any ) => void;
+	entityForSuggestions: EntityForSuggestions;
+	onBack: () => void;
+	containerRef: React.RefObject< HTMLDivElement | null >;
+}
+
 function AddCustomTemplateModalContent( {
 	onSelect,
 	entityForSuggestions,
 	onBack,
 	containerRef,
-} ) {
-	const [ showSearchEntities, setShowSearchEntities ] = useState();
+}: AddCustomTemplateModalContentProps ) {
+	const [ showSearchEntities, setShowSearchEntities ] = useState<
+		boolean | undefined
+	>();
 
 	// Focus on the first focusable element when the modal opens.
 	// We handle focus management in the parent modal, just need to focus on the first focusable element.
