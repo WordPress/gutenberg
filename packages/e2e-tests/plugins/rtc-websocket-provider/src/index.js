@@ -8,6 +8,7 @@
  */
 
 import { WebsocketProvider } from 'y-websocket';
+import { setYjsModule } from './yjs-external';
 
 const TEST_PROVIDER_NAMESPACE = 'gutenberg-test/rtc-websocket-provider';
 const DEFAULT_URL = 'ws://127.0.0.1:18991';
@@ -37,7 +38,11 @@ function updateDebugState( room, patch ) {
 }
 
 function createWebSocketProvider() {
-	return async ( { awareness, objectType, objectId, ydoc } ) => {
+	return async ( { awareness, objectType, objectId, ydoc, Y } ) => {
+		// Point the bundled y-websocket and y-protocols modules at the Yjs
+		// instance used by the editor. See yjs-external.js.
+		setYjsModule( Y );
+
 		const room = objectId ? `${ objectType }:${ objectId }` : objectType;
 
 		updateDebugState( room, {
