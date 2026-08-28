@@ -9,6 +9,7 @@ permissions: {}
 
 jobs:
     auto_label_pull_request:
+        if: ${{ github.repository == 'WordPress/gutenberg' }}
         permissions:
             contents: read
             pull-requests: write

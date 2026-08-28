@@ -211,7 +211,11 @@ jobs:
 
     merge-artifacts:
         name: Merge Artifacts
-        if: ${{ !cancelled() }}
+        if: |
+            ! cancelled() && (
+              github.repository == 'WordPress/gutenberg' ||
+              github.event_name == 'pull_request'
+            )
         needs: [e2e-playwright, e2e-playwright-rtc-websocket]
         runs-on: 'ubuntu-24.04'
         permissions:

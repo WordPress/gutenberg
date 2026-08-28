@@ -60,7 +60,7 @@ jobs:
         runs-on: 'ubuntu-24.04'
         environment: 'GitHub Releases'
         permissions: {}
-        if: ${{ github.event_name == 'workflow_dispatch' }}
+        if: ${{ github.repository == 'WordPress/gutenberg' && github.event_name == 'workflow_dispatch' }}
 
         steps:
             # Request the same elevated permissions as create-release so invalid
@@ -81,18 +81,19 @@ jobs:
         environment: 'GitHub Releases'
         needs: [compute-stable-branches, preflight-release-token]
         if: |
-            github.event_name == 'workflow_dispatch' && (
-              (
-                github.ref == 'refs/heads/trunk' ||
-                endsWith( github.ref, needs.compute-stable-branches.outputs.next_stable_branch )
-              ) && (
-                github.event.inputs.version == 'rc' ||
-                github.event.inputs.version == 'stable'
-              ) || (
-                startsWith( github.ref, 'refs/heads/release/' ) &&
-                github.event.inputs.version == 'stable'
+            github.repository == 'WordPress/gutenberg' &&
+              github.event_name == 'workflow_dispatch' && (
+                (
+                  github.ref == 'refs/heads/trunk' ||
+                  endsWith( github.ref, needs.compute-stable-branches.outputs.next_stable_branch )
+                ) && (
+                  github.event.inputs.version == 'rc' ||
+                  github.event.inputs.version == 'stable'
+                ) || (
+                  startsWith( github.ref, 'refs/heads/release/' ) &&
+                  github.event.inputs.version == 'stable'
+                )
               )
-            )
         outputs:
             old_version: ${{ steps.get_version.outputs.old_version }}
             new_version: ${{ steps.get_version.outputs.new_version }}
@@ -218,14 +219,14 @@ jobs:
         needs: bump-version
         if: |
             always() && (
-              github.event_name == 'pull_request' ||
-              (
-                github.event_name == 'workflow_dispatch' &&
-                needs.bump-version.result == 'success'
-              ) ||
-              (
-                github.event_name != 'workflow_dispatch' &&
-                github.repository == 'WordPress/gutenberg'
+              github.event_name == 'pull_request' || (
+                github.repository == 'WordPress/gutenberg' && (
+                  (
+                    github.event_name == 'workflow_dispatch' &&
+                    needs.bump-version.result == 'success'
+                  ) ||
+                  github.event_name != 'workflow_dispatch'
+                )
               )
             )
         strategy:
@@ -397,6 +398,7 @@ jobs:
         environment: 'GitHub Releases'
         if: |
             always() &&
+            github.repository == 'WordPress/gutenberg' &&
             needs.build.result == 'failure' &&
             needs.bump-version.outputs.release_branch_commit
 
@@ -460,8 +462,9 @@ jobs:
         name: Create Release Draft and Attach Asset
         needs: [bump-version, build]
         runs-on: 'ubuntu-24.04'
+        if: ${{ github.repository == 'WordPress/gutenberg' && github.event_name == 'workflow_dispatch' && needs.bump-version.outputs.new_version }}
+        permissions: {}
         environment: 'GitHub Releases'
-        if: ${{ needs.bump-version.outputs.new_version }}
 
         steps:
             - name: Generate application token
@@ -536,7 +539,7 @@ jobs:
             contents: read
         environment: WordPress packages
         needs: [bump-version, build]
-        if: ${{ endsWith( needs.bump-version.outputs.new_version, '-rc.1' ) }}
+        if: ${{ github.repository == 'WordPress/gutenberg' && endsWith( needs.bump-version.outputs.new_version, '-rc.1' ) }}
         steps:
             - name: Checkout (for CLI)
               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

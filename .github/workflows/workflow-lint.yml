@@ -33,6 +33,7 @@ permissions: {}
 jobs:
     lint:
         name: Lint GitHub Action files
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         permissions:
             security-events: write
             actions: read

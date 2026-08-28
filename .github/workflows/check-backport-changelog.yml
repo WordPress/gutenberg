@@ -31,7 +31,10 @@ jobs:
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
-        if: ${{ !contains(github.event.pull_request.labels.*.name, 'No Core Sync Required') && !contains(github.event.pull_request.labels.*.name, 'Backport from WordPress Core') }}
+        if: |
+            github.repository == 'WordPress/gutenberg' &&
+            ! contains( github.event.pull_request.labels.*.name, 'No Core Sync Required' ) &&
+            ! contains( github.event.pull_request.labels.*.name, 'Backport from WordPress Core' )
         steps:
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
