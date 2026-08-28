@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
  * Resolves the branches and the suite shards the performance workflow runs for a GitHub event.
- * Writes `branches` (`{ name, ref, artifact }[]`), `shards` (`{ shard, suites }[]`) and `wp-version` to `$GITHUB_OUTPUT`.
+ * Writes `branches` (`{ name, ref, artifact }[]`), `shards` (`{ shard, suites }[]`), `wp-version`
+ * and `plugin-files` (space separated globs from bin/plugin-files.txt) to `$GITHUB_OUTPUT`.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -230,13 +231,23 @@ function main() {
 			.map( ( file ) => path.basename( file, '.spec.js' ) )
 	);
 
-	console.log( JSON.stringify( { branches, shards, wpVersion }, null, 2 ) );
+	const pluginFiles = fs
+		.readFileSync( path.join( 'bin', 'plugin-files.txt' ), 'utf8' )
+		.split( '\n' )
+		.map( ( line ) => line.trim() )
+		.filter( ( line ) => line && ! line.startsWith( '#' ) )
+		.join( ' ' );
+
+	console.log(
+		JSON.stringify( { branches, shards, wpVersion, pluginFiles }, null, 2 )
+	);
 	fs.appendFileSync(
 		env.GITHUB_OUTPUT,
 		[
 			`branches=${ JSON.stringify( branches ) }`,
 			`shards=${ JSON.stringify( shards ) }`,
 			`wp-version=${ wpVersion }`,
+			`plugin-files=${ pluginFiles }`,
 			'',
 		].join( '\n' )
 	);

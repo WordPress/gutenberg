@@ -40,6 +40,7 @@ jobs:
             branches: ${{ steps.branches.outputs.branches }}
             shards: ${{ steps.branches.outputs.shards }}
             wp-version: ${{ steps.branches.outputs.wp-version }}
+            plugin-files: ${{ steps.branches.outputs.plugin-files }}
 
         steps:
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -87,24 +88,16 @@ jobs:
             - name: Build
               run: npm run build -- --skip-types || npm run build
 
-            # Same file list as bin/build-plugin-zip.sh. Older refs may lack some of them.
+            # The list comes from bin/plugin-files.txt on the tested commit, so older refs
+            # are packaged the same way. They may lack some of the files.
             - name: Package plugin
               env:
                   PLUGIN_DIR: ${{ runner.temp }}/plugin
+                  PLUGIN_FILES: ${{ needs.prepare.outputs.plugin-files }}
               run: |
                   mkdir -p "$PLUGIN_DIR"
-                  tar --ignore-failed-read -cf - \
-                    gutenberg.php \
-                    lib \
-                    packages/block-serialization-default-parser/*.php \
-                    packages/icons/src/manifest.php \
-                    packages/icons/src/library/*.svg \
-                    build \
-                    build-module \
-                    post-content.php \
-                    readme.txt \
-                    changelog.txt \
-                    README.md \
+                  # shellcheck disable=SC2086 # The list holds globs that must expand.
+                  tar --ignore-failed-read -cf - $PLUGIN_FILES post-content.php \
                     | tar -xf - -C "$PLUGIN_DIR"
                   test -f "$PLUGIN_DIR/gutenberg.php"
 
