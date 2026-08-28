@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `useAnchor` now expects an `editableContentRef` option holding the ref to the editable content element. The existing `editableContentElement` option keeps working, but is deprecated since 7.2.
+-   `useAnchor` now expects an `editableContentRef` option holding the ref to the editable content element. The existing `editableContentElement` option keeps working, but is deprecated since 7.2 ([#82191](https://github.com/WordPress/gutenberg/pull/82191)).
 
 ## 7.54.0 (2026-08-26)
 
