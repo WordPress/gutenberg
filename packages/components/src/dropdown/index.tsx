@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-import { useRef, useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
 import { contextConnect, useContextSystem } from '../context';
@@ -51,12 +51,67 @@ const UnconnectedDropdown = (
 	const [ fallbackPopoverAnchor, setFallbackPopoverAnchor ] =
 		useState< HTMLDivElement | null >( null );
 	const containerRef = useRef< HTMLDivElement >( null );
+	const popoverRef = useRef< HTMLDivElement >( null );
+	const mergedPopoverRef = useMergeRefs( [ popoverRef, popoverProps?.ref ] );
+	const lastInteractionWasInsideRef = useRef( false );
 
 	const [ isOpen, setIsOpen ] = useControlledValue( {
 		defaultValue: defaultOpen,
 		value: open,
 		onChange: onToggle,
 	} );
+
+	useEffect( () => {
+		if ( ! isOpen || ! containerRef.current ) {
+			return;
+		}
+
+		const { ownerDocument } = containerRef.current;
+
+		function handleInteraction( event: Event ) {
+			const target = event.target as Node | null;
+			if ( ! target ) {
+				return;
+			}
+
+			// Ignore focusin events landing inside a [role="dialog"], because
+			// focus moving into a dialog (e.g. on modal mount) is the consequence
+			// of an action, not the user interaction that triggered it.
+			if (
+				event.type === 'focusin' &&
+				( target as Element ).closest?.( '[role="dialog"]' )
+			) {
+				return;
+			}
+
+			const isInsideContainer = containerRef.current?.contains( target );
+			const isInsidePopover = popoverRef.current?.contains( target );
+
+			lastInteractionWasInsideRef.current = !! (
+				isInsideContainer || isInsidePopover
+			);
+		}
+
+		ownerDocument.addEventListener(
+			'pointerdown',
+			handleInteraction,
+			true
+		);
+		ownerDocument.addEventListener( 'focusin', handleInteraction, true );
+
+		return () => {
+			ownerDocument.removeEventListener(
+				'pointerdown',
+				handleInteraction,
+				true
+			);
+			ownerDocument.removeEventListener(
+				'focusin',
+				handleInteraction,
+				true
+			);
+		};
+	}, [ isOpen ] );
 
 	/**
 	 * Closes the popover when focus leaves it unless the toggle was pressed or
@@ -70,11 +125,23 @@ const UnconnectedDropdown = (
 		}
 
 		const { ownerDocument } = containerRef.current;
-		const dialog =
-			ownerDocument?.activeElement?.closest( '[role="dialog"]' );
+		const activeElement = ownerDocument?.activeElement;
+		const isFocusOutside =
+			! containerRef.current.contains( activeElement ) &&
+			! popoverRef.current?.contains( activeElement );
+
+		if ( ! isFocusOutside ) {
+			return;
+		}
+
+		const dialog = activeElement?.closest( '[role="dialog"]' );
+		const isParentDialog =
+			dialog && dialog.contains( containerRef.current );
+
 		if (
-			! containerRef.current.contains( ownerDocument.activeElement ) &&
-			( ! dialog || dialog.contains( containerRef.current ) )
+			! dialog ||
+			isParentDialog ||
+			! lastInteractionWasInsideRef.current
 		) {
 			close();
 		}
@@ -115,6 +182,7 @@ const UnconnectedDropdown = (
 			{ renderToggle( args ) }
 			{ isOpen && (
 				<Popover
+					ref={ mergedPopoverRef }
 					position={ position }
 					onClose={ close }
 					onFocusOutside={ closeIfFocusOutside }
