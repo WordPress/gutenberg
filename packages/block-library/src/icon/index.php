@@ -125,11 +125,13 @@ function render_block_core_icon( $attributes ) {
 		if ( $rotation ) {
 			$current_style = $processor->get_attribute( 'style' ) ?? '';
 			$rotation_css  = 'rotate: ' . $rotation . 'deg;';
-			if ( $current_style ) {
-				$processor->set_attribute( 'style', $current_style . ' ' . $rotation_css );
-			} else {
-				$processor->set_attribute( 'style', $rotation_css );
-			}
+			$trimmed_style = is_string( $current_style )
+				? rtrim( trim( $current_style ), ';' )
+				: '';
+			$merged_style  = '' !== $trimmed_style
+				? $trimmed_style . '; ' . $rotation_css
+				: $rotation_css;
+			$processor->set_attribute( 'style', $merged_style );
 		}
 
 		$svg = $processor->get_updated_html();
