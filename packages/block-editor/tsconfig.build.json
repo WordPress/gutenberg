@@ -14,7 +14,6 @@
 		{ "path": "../deprecated/tsconfig.build.json" },
 		{ "path": "../dom" },
 		{ "path": "../element/tsconfig.build.json" },
-		{ "path": "../escape-html/tsconfig.build.json" },
 		{ "path": "../preferences/tsconfig.build.json" },
 		{ "path": "../global-styles-engine/tsconfig.build.json" },
 		{ "path": "../priority-queue/tsconfig.build.json" },
@@ -36,15 +35,14 @@
 		{ "path": "../ui/tsconfig.build.json" },
 		{ "path": "../url" },
 		{ "path": "../upload-media/tsconfig.build.json" },
-		{ "path": "../warning" },
-		{ "path": "../wordcount/tsconfig.build.json" }
+		{ "path": "../warning" }
 	],
 	// NOTE: This package is being progressively typed. You are encouraged to
 	// expand this array with files which can be type-checked. At some point in
 	// the future, this can be simplified to an `includes` of `src/**/*`.
 	"files": [
 		"src/lock-unlock.ts",
-		"src/components/block-context/index.js",
+		"src/components/block-context/index.jsx",
 		"src/components/block-visibility/constants.ts",
 		"src/components/block-visibility/use-block-visibility.ts"
 	],

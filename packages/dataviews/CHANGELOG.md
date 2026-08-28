@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Internal
+
+-   Remove unused dependency `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
+
+## 18.1.0 (2026-08-26)
+
 ### Enhancements
 
 -   DataViews: Add a `mediaFit` option to the `grid` and `pickerGrid` layouts to fit item previews inside their box (`contain`) instead of cropping them (`cover`), so the media's own aspect ratio stays visible. A fitted preview is letterboxed against a neutral background, so each item still reads as a unit. Consumers can offer this to users as an "Original aspect ratio" toggle in the view options via `config.mediaFitControl` ([#81604](https://github.com/WordPress/gutenberg/pull/81604)).

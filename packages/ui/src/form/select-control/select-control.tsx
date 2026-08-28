@@ -19,6 +19,7 @@ export const SelectControl = forwardRef<
 		details,
 		hideLabelFromVision,
 		placeholder,
+		popupWidth = 'content',
 		size = 'default',
 		triggerContent,
 		...restProps
@@ -38,7 +39,7 @@ export const SelectControl = forwardRef<
 				>
 					{ triggerContent }
 				</Select.Trigger>
-				<Select.Popup>
+				<Select.Popup popupWidth={ popupWidth }>
 					{ children !== undefined
 						? children
 						: items?.map( ( item ) => (

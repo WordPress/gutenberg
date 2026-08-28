@@ -67,7 +67,7 @@ const developmentFiles = [
 const glob = require( 'glob' ).sync;
 const typedFiles = glob( 'packages/*/package.json', { cwd: rootDir } )
 	.filter( ( fileName ) => require( join( rootDir, fileName ) ).types )
-	.map( ( fileName ) => fileName.replace( 'package.json', '**/*.js' ) );
+	.map( ( fileName ) => fileName.replace( 'package.json', '**/*.{js,jsx}' ) );
 
 // All files from bundled packages: packages not registered as WordPress
 // scripts or script modules, which plugins therefore compile into their own
@@ -272,6 +272,8 @@ export default dedupePlugins( [
 			'example-*/',
 		],
 	},
+	// ESLint's default file discovery does not include JSX files.
+	{ files: [ '**/*.jsx' ] },
 
 	// Base recommended config from @wordpress/eslint-plugin.
 	...wpPlugin.configs.recommended,
@@ -387,6 +389,10 @@ export default dedupePlugins( [
 					definedTags: [ 'jest-environment' ],
 				},
 			],
+			'react/jsx-filename-extension': [
+				'error',
+				{ extensions: [ '.tsx' ] },
+			],
 			'react-hooks/config': [
 				'error',
 				{
@@ -450,9 +456,9 @@ export default dedupePlugins( [
 
 	// Override: Package source files — forbid raw SVG elements.
 	{
-		files: [ 'packages/**/*.js' ],
+		files: [ 'packages/**/*.{js,jsx}' ],
 		ignores: [
-			'packages/block-library/src/*/save.js',
+			'packages/block-library/src/*/save.{js,jsx}',
 			...developmentFiles,
 		],
 		rules: {
@@ -497,8 +503,8 @@ export default dedupePlugins( [
 		...config,
 		files: [
 			'packages/jest*/**/*.js',
-			'**/test/**/*.js',
-			'**/__tests__/**/*.js',
+			'**/test/**/*.{js,jsx}',
+			'**/__tests__/**/*.{js,jsx}',
 		],
 		ignores: [ 'test/e2e/**/*.js', 'test/performance/**/*.js' ],
 	} ) ),
@@ -667,20 +673,6 @@ export default dedupePlugins( [
 		rules: {
 			'react-hooks/rules-of-hooks': 'off',
 			'react-hooks/static-components': 'off',
-		},
-	},
-
-	// Override: Storybook + components — enforce JSX file extensions.
-	{
-		files: [
-			'**/@(storybook|stories)/**',
-			'packages/components/src/**/*.tsx',
-		],
-		rules: {
-			'react/jsx-filename-extension': [
-				'error',
-				{ extensions: [ '.jsx', '.tsx' ] },
-			],
 		},
 	},
 
@@ -997,7 +989,7 @@ export default dedupePlugins( [
 		files: [
 			'packages/block-editor/src/components/inserter/media-tab/hooks.js',
 			'packages/block-editor/src/components/use-paste-styles/index.js',
-			'packages/block-library/src/pattern/edit.js',
+			'packages/block-library/src/pattern/edit.jsx',
 			'packages/components/src/sandbox/index.tsx',
 		],
 		rules: {
