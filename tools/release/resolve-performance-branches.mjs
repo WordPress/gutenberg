@@ -6,22 +6,13 @@
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
+import { sanitizeBranchName } from './lib/sanitize-branch-name.js';
 
 /*
  * The commit trunk is compared against; must be updated on every WP major release, see
  * https://developer.wordpress.org/block-editor/explanations/architecture/performance/#update-the-reference-commit.
  */
 export const REFERENCE_COMMIT = '28d414f1327652e2b49e784ddc12098768991c62';
-
-/**
- * Same replacement as `sanitizeBranchName()` in commands/performance.js.
- *
- * @param {string} name
- * @return {string} Name usable in a path or an artifact name.
- */
-function sanitizeBranchName( name ) {
-	return name.replace( /[^a-zA-Z0-9-]/g, '-' );
-}
 
 /**
  * @param {string} name Branch label shown in the results.

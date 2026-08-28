@@ -10,6 +10,7 @@ const {
 	getFilesFromDir,
 } = require( '../lib/utils' );
 const config = require( '../config' );
+const { sanitizeBranchName } = require( '../lib/sanitize-branch-name' );
 
 const ARTIFACTS_PATH =
 	process.env.WP_ARTIFACTS_PATH || path.join( process.cwd(), 'artifacts' );
@@ -53,17 +54,6 @@ function logAtIndent( indent, msg, ...args ) {
 		newline + timestamp + ' ' + '    '.repeat( indent ) + prefix + msg,
 		...args
 	);
-}
-
-/**
- * Sanitizes branch name to be used in a path or a filename.
- *
- * @param {string} branch
- *
- * @return {string} Sanitized branch name.
- */
-function sanitizeBranchName( branch ) {
-	return branch.replace( /[^a-zA-Z0-9-]/g, '-' );
 }
 
 /**
