@@ -550,10 +550,18 @@ describe( 'normalizeFields: default getValue', () => {
 			];
 			const normalizedFields = normalizeFields( fields );
 
-			const resultAsc = normalizedFields[ 0 ].sort( itemA, itemB, 'asc' );
+			const resultAsc = normalizedFields[ 0 ].sort(
+				itemA,
+				itemB,
+				'asc'
+			);
 			expect( resultAsc ).toBe( -15 );
 
-			const resultDesc = normalizedFields[ 0 ].sort( itemA, itemB, 'desc' );
+			const resultDesc = normalizedFields[ 0 ].sort(
+				itemA,
+				itemB,
+				'desc'
+			);
 			expect( resultDesc ).toBe( 15 );
 		} );
 	} );
