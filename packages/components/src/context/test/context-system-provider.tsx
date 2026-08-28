@@ -7,9 +7,12 @@ import type {
 	ReactNode,
 } from 'react';
 import { cloneElement } from '@wordpress/element';
+import warn from '@wordpress/warning';
 import { contextConnect } from '../context-connect';
 import { ContextSystemProvider } from '../context-system-provider';
 import { useContextSystem } from '../use-context-system';
+
+jest.mock( '@wordpress/warning', () => jest.fn() );
 
 const View = styled.div``;
 
@@ -37,6 +40,24 @@ function TestComponentWithQuote(
 }
 
 describe( 'props', () => {
+	test( 'should not warn when rerendered without a value', () => {
+		jest.mocked( warn ).mockClear();
+
+		const { rerender } = render(
+			<ContextSystemProvider>
+				<div />
+			</ContextSystemProvider>
+		);
+
+		rerender(
+			<ContextSystemProvider>
+				<div />
+			</ContextSystemProvider>
+		);
+
+		expect( warn ).not.toHaveBeenCalled();
+	} );
+
 	test( 'should render correctly', () => {
 		const ConnectedComponent = contextConnect( TestComponent, 'Component' );
 		const { container } = render(

@@ -32,7 +32,7 @@ export const useComponentsContext = () => useContext( ComponentsContext );
  * @return {Record<string, any>} The consolidated value.
  */
 function useContextSystemBridge( {
-	value = {},
+	value,
 }: {
 	value?: ContextSystemValue;
 } ): ContextSystemValue {
