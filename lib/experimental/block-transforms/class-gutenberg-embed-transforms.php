@@ -511,7 +511,7 @@ class Gutenberg_Embed_Transforms {
 		$markup = sprintf(
 			'<figure class="%s"><div class="wp-block-embed__wrapper">%s</div></figure>',
 			esc_attr( implode( ' ', self::prepare_class_names( $attributes ) ) ),
-			"\n" . $url . "\n"
+			"\n" . self::escape_text( $url ) . "\n"
 		);
 
 		return array(
@@ -550,6 +550,29 @@ class Gutenberg_Embed_Transforms {
 		}
 
 		return $attributes;
+	}
+
+	/**
+	 * Escapes a string for a text node, the way the block's `save` does.
+	 *
+	 * The URL is written into the markup as text, so an address carrying an
+	 * `&` has to be encoded or the block will not match what `save` produces.
+	 * These are the characters, and the forms, React escapes text with.
+	 *
+	 * @param string $text Text to escape.
+	 * @return string Escaped text.
+	 */
+	private static function escape_text( $text ) {
+		return strtr(
+			$text,
+			array(
+				'&' => '&amp;',
+				'<' => '&lt;',
+				'>' => '&gt;',
+				'"' => '&quot;',
+				"'" => '&#x27;',
+			)
+		);
 	}
 
 	/**

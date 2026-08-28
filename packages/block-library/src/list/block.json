@@ -92,6 +92,18 @@
 				"type": "raw",
 				"selector": "ol,ul",
 				"sourceAttributes": false,
+				"serverConversion": {
+					"requires": {
+						"ol": {
+							"attributes": "*",
+							"children": { "li": { "attributes": "*", "children": "*" } }
+						},
+						"ul": {
+							"attributes": "*",
+							"children": { "li": { "attributes": "*", "children": "*" } }
+						}
+					}
+				},
 				"innerBlocks": "li",
 				"attributes": {
 					"ordered": {

@@ -1,3 +1,4 @@
+import { autop, removep } from '@wordpress/autop';
 import { getPhrasingContentSchema } from '@wordpress/dom';
 import { createBlock } from './factory';
 import {
@@ -242,8 +243,12 @@ function createShortcodeAttributes( attributes: unknown ) {
 						name,
 						{
 							...rest,
+							// The matched text as the editor stores it:
+							// classic content arrives wrapped in the
+							// paragraphs `wpautop` added, which the block
+							// saves back verbatim.
 							shortcode: ( _attrs: unknown, match: any ) =>
-								match?.content,
+								removep( autop( match?.content ?? '' ) ),
 						},
 					];
 				}
@@ -432,42 +437,62 @@ export function mergeBlockTransforms(
 		return undefined;
 	}
 
-	return Object.fromEntries(
-		Array.from( directions ).map( ( direction ) => {
-			const declared = metadataTransforms[ direction ];
-			const client = clientTransforms[ direction ];
+	const merged: Record< string, DeclarativeTransform[] > = {};
 
-			if ( ! Array.isArray( declared ) ) {
-				return [ direction, client ];
+	directions.forEach( ( direction ) => {
+		const declared = metadataTransforms[ direction ];
+
+		if ( ! Array.isArray( declared ) ) {
+			/*
+			 * Copied rather than read: a block may define a direction as an
+			 * accessor to keep the list current as other blocks register, and
+			 * reading it here would freeze it at whatever was registered so
+			 * far. The Shortcode block's `to` is one.
+			 */
+			const descriptor = Object.getOwnPropertyDescriptor(
+				clientTransforms,
+				direction
+			);
+
+			if ( descriptor ) {
+				Object.defineProperty( merged, direction, descriptor );
 			}
 
-			if ( ! Array.isArray( client ) ) {
-				return [ direction, declared ];
+			return;
+		}
+
+		const client = clientTransforms[ direction ];
+
+		if ( ! Array.isArray( client ) ) {
+			merged[ direction ] = declared;
+
+			return;
+		}
+
+		const result = [ ...declared ];
+
+		client.forEach( ( clientTransform ) => {
+			const index = clientTransform.name
+				? result.findIndex(
+						( declaredTransform ) =>
+							declaredTransform.name === clientTransform.name
+				  )
+				: -1;
+
+			if ( index !== -1 ) {
+				result[ index ] = {
+					...result[ index ],
+					...clientTransform,
+				};
+			} else {
+				result.push( clientTransform );
 			}
+		} );
 
-			const result = [ ...declared ];
+		merged[ direction ] = result;
+	} );
 
-			client.forEach( ( clientTransform ) => {
-				const index = clientTransform.name
-					? result.findIndex(
-							( declaredTransform ) =>
-								declaredTransform.name === clientTransform.name
-					  )
-					: -1;
-
-				if ( index !== -1 ) {
-					result[ index ] = {
-						...result[ index ],
-						...clientTransform,
-					};
-				} else {
-					result.push( clientTransform );
-				}
-			} );
-
-			return [ direction, result ];
-		} )
-	);
+	return merged;
 }
 
 /**

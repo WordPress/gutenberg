@@ -1456,6 +1456,26 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 		$this->assertNull( gutenberg_switch_block_type( array( $block ), 'test/source' ) );
 	}
 
+	public function test_leaves_a_list_holding_more_than_its_items_alone() {
+		// The List block saves its items and nothing else, so markup carrying
+		// anything beside them cannot be reproduced. A nested list written as
+		// a sibling rather than inside an item is the common shape.
+		$this->assertSame( 'core/html', gutenberg_html_to_blocks( '<ul><li>a</li><ul><li>b</li></ul></ul>' )[0]['blockName'] );
+		$this->assertSame( 'core/html', gutenberg_html_to_blocks( '<ul><li>a</li>stray<li>b</li></ul>' )[0]['blockName'] );
+
+		// A list that holds only items still converts.
+		$this->assertSame( 'core/list', gutenberg_html_to_blocks( '<ul><li>a</li><li>b</li></ul>' )[0]['blockName'] );
+	}
+
+	public function test_encodes_an_embed_url_the_way_the_block_saves_it() {
+		// The URL is written into the markup as text, so an address carrying
+		// an `&` has to be encoded or the block will not validate.
+		$blocks = gutenberg_html_to_blocks( '<p>https://www.youtube.com/watch?v=abc&amp;list=xyz</p>' );
+
+		$this->assertSame( 'https://www.youtube.com/watch?v=abc&list=xyz', $blocks[0]['attrs']['url'] );
+		$this->assertStringContainsString( "\n" . 'https://www.youtube.com/watch?v=abc&amp;list=xyz' . "\n", $blocks[0]['innerHTML'] );
+	}
+
 	public function test_turns_a_url_standing_on_its_own_into_an_embed() {
 		$blocks = gutenberg_html_to_blocks( '<p>https://vimeo.com/76979871</p>' );
 

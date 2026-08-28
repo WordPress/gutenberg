@@ -1,5 +1,6 @@
 import {
 	getBlockTransforms,
+	getBlockType,
 	pasteHandler,
 	rawHandler,
 	serialize,
@@ -150,6 +151,45 @@ describe( 'Transforms declared in block metadata', () => {
 		expect( image.name ).toBe( 'core/image' );
 		expect( image.attributes.id ).toBe( 42 );
 		expect( image.attributes.align ).toBe( 'left' );
+	} );
+
+	it( 'keeps a transforms accessor lazy when nothing is declared for it', () => {
+		const { transforms } = getBlockType( 'core/shortcode' );
+
+		// The Shortcode block builds `to` on read, one entry per block
+		// declaring a shortcode transform, so reading it while merging would
+		// freeze it before the later blocks register.
+		expect(
+			Object.getOwnPropertyDescriptor( transforms, 'to' ).get
+		).toBeInstanceOf( Function );
+
+		const sources = getBlockTransforms( 'from' )
+			.filter( ( { type } ) => 'shortcode' === type )
+			.map( ( { blockName } ) => blockName );
+
+		expect( sources ).toContain( 'core/video' );
+		expect( transforms.to.map( ( { blocks } ) => blocks[ 0 ] ) ).toContain(
+			'core/video'
+		);
+	} );
+
+	it( 'normalises the text a declared shortcode transform stores', () => {
+		// Classic content arrives wrapped in the paragraphs `wpautop` added,
+		// and the block saves its text back verbatim.
+		expect(
+			serialize(
+				rawHandler( {
+					HTML:
+						'<p>[su_box title="x"]</p>\n' +
+						'<p>Hello <br>there</p>\n' +
+						'<p>[/su_box]</p>',
+				} )
+			)
+		).toBe(
+			'<!-- wp:shortcode -->\n' +
+				'[su_box title="x"]\n\nHello\nthere\n\n[/su_box]\n' +
+				'<!-- /wp:shortcode -->'
+		);
 	} );
 
 	describe( 'pasting, which resolves the schema differently', () => {
