@@ -5,6 +5,10 @@ import { mergePair } from './concat';
 import { OBJECT_REPLACEMENT_CHARACTER, ZWNBSP } from './special-characters';
 import { toHTMLString } from './to-html-string';
 import { getTextContent } from './get-text-content';
+import {
+	isLinkFormat,
+	removeEmptyLinkFormats,
+} from './remove-empty-link-formats';
 
 /** @typedef {import('./types').RichTextValue} RichTextValue */
 
@@ -245,11 +249,11 @@ export function create( {
 	__unstableIsEditableTree: isEditableTree,
 } = {} ) {
 	if ( html instanceof RichTextData ) {
-		return {
+		return removeEmptyLinkFormats( {
 			text: html.text,
 			formats: html.formats,
 			replacements: html.replacements,
-		};
+		} );
 	}
 
 	if ( typeof text === 'string' && text.length > 0 ) {
@@ -270,11 +274,13 @@ export function create( {
 		return createEmptyValue();
 	}
 
-	return createFromElement( {
-		element,
-		range,
-		isEditableTree,
-	} );
+	return removeEmptyLinkFormats(
+		createFromElement( {
+			element,
+			range,
+			isEditableTree,
+		} )
+	);
 }
 
 /**
@@ -622,7 +628,7 @@ function createFromElement( { element, range, isEditableTree } ) {
 		) {
 			mergePair( accumulator, value );
 		} else if ( value.text.length === 0 ) {
-			if ( format.attributes ) {
+			if ( format.attributes && ! isLinkFormat( format ) ) {
 				mergePair( accumulator, {
 					formats: [ , ],
 					replacements: [ format ],
