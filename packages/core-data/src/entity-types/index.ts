@@ -1,10 +1,4 @@
-import type {
-	Context,
-	OmitNevers,
-	PostStatus,
-	RenderedText,
-	Updatable,
-} from './helpers';
+import type { Context, Updatable } from './helpers';
 import type { Attachment } from './attachment';
 import type { Base, TemplatePartArea, TemplateType } from './base';
 import type { Comment } from './comment';
@@ -34,8 +28,8 @@ import type { User } from './user';
 import type { Type } from './type';
 import type { Widget } from './widget';
 import type { WidgetType } from './widget-type';
-import type { WpBlock } from './wp-block';
-import type { WpNavigation } from './wp-navigation';
+import type { Block } from './block';
+import type { Navigation } from './navigation';
 import type { WpTemplate } from './wp-template';
 import type { WpTemplatePart } from './wp-template-part';
 
@@ -44,6 +38,7 @@ export type { BaseEntityRecords } from './base-entity-records';
 export type {
 	Attachment,
 	Base as UnstableBase,
+	Block,
 	CollectionFontFace,
 	CollectionFontFamily,
 	Comment,
@@ -57,14 +52,12 @@ export type {
 	MenuLocation,
 	NavMenu,
 	NavMenuItem,
-	OmitNevers,
+	Navigation,
 	Page,
 	Plugin,
 	Post,
 	PostRevision,
-	PostStatus,
 	PostStatusObject,
-	RenderedText,
 	Settings,
 	Sidebar,
 	Taxonomy,
@@ -77,9 +70,7 @@ export type {
 	User,
 	Widget,
 	WidgetType,
-	WpBlock,
 	WpFontFamily,
-	WpNavigation,
 	WpTemplate,
 	WpTemplatePart,
 };
@@ -143,8 +134,8 @@ export interface PerPackageEntityRecords< C extends Context > {
 		| Widget< C >
 		| WidgetType< C >
 		| WpFontFamily< C >
-		| WpBlock< C >
-		| WpNavigation< C >
+		| Block< C >
+		| Navigation< C >
 		| WpTemplate< C >
 		| WpTemplatePart< C >;
 }
@@ -196,9 +187,9 @@ export interface PostTypeEntityRecordTypes< C extends Context > {
 	attachment: Attachment< C >;
 	page: Page< C >;
 	post: Post< C >;
-	wp_block: WpBlock< C >;
+	wp_block: Block< C >;
 	wp_font_family: WpFontFamily< C >;
-	wp_navigation: WpNavigation< C >;
+	wp_navigation: Navigation< C >;
 	wp_template: WpTemplate< C >;
 	wp_template_part: WpTemplatePart< C >;
 }

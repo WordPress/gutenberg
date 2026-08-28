@@ -16,9 +16,12 @@ declare module './base-entity-records' {
 		 * `editor` and `revisions`, so the posts controller omits the fields
 		 * gated on the other supports -- there is no `author`, `excerpt`,
 		 * `featured_media`, `comment_status`, `ping_status`, `menu_order`,
-		 * `meta` or `template` on this record.
+		 * `meta` or `template` on this record. The post type is registered
+		 * `public => false`, and both `permalink_template` and
+		 * `generated_slug` are gated on the post type being viewable and
+		 * public, so neither is present either.
 		 */
-		export interface WpNavigation< C extends Context > {
+		export interface Navigation< C extends Context > {
 			/**
 			 * The date the navigation menu was published, in the site's timezone.
 			 */
@@ -64,14 +67,6 @@ declare module './base-entity-records' {
 			 */
 			password: ContextualField< string, 'edit', C >;
 			/**
-			 * Permalink template for the navigation menu.
-			 */
-			permalink_template: ContextualField< string, 'edit', C >;
-			/**
-			 * Slug automatically generated from the navigation menu title.
-			 */
-			generated_slug: ContextualField< string, 'edit', C >;
-			/**
 			 * The title for the navigation menu.
 			 */
 			title: RenderedText< C >;
@@ -96,6 +91,6 @@ declare module './base-entity-records' {
 	}
 }
 
-export type WpNavigation< C extends Context = 'edit' > = OmitNevers<
-	_BaseEntityRecords.WpNavigation< C >
+export type Navigation< C extends Context = 'edit' > = OmitNevers<
+	_BaseEntityRecords.Navigation< C >
 >;

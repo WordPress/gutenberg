@@ -15,14 +15,16 @@ declare module './base-entity-records' {
 		 * `wp_block` supports `title`, `excerpt`, `editor`, `revisions` and
 		 * `custom-fields`, so the posts controller omits `author`,
 		 * `featured_media`, `comment_status`, `ping_status`, `menu_order` and
-		 * `template`.
+		 * `template`. The post type is registered `public => false`, and both
+		 * `permalink_template` and `generated_slug` are gated on the post type
+		 * being viewable and public, so neither is on this record either.
 		 *
 		 * `WP_REST_Blocks_Controller` then reshapes `title` and `content`: it
 		 * exposes `raw` in the view context as well as edit, and removes
 		 * `rendered` entirely, because rendering a pattern requires it to be
 		 * inside a post. Neither field carries `rendered` on this record.
 		 */
-		export interface WpBlock< C extends Context > {
+		export interface Block< C extends Context > {
 			/**
 			 * The date the pattern was published, in the site's timezone.
 			 */
@@ -68,14 +70,6 @@ declare module './base-entity-records' {
 			 */
 			password: ContextualField< string, 'edit', C >;
 			/**
-			 * Permalink template for the pattern.
-			 */
-			permalink_template: ContextualField< string, 'edit', C >;
-			/**
-			 * Slug automatically generated from the pattern title.
-			 */
-			generated_slug: ContextualField< string, 'edit', C >;
-			/**
 			 * The title for the pattern. Carries no `rendered` form.
 			 */
 			title: ContextualField< { raw: string }, 'view' | 'edit', C >;
@@ -119,6 +113,6 @@ declare module './base-entity-records' {
 	}
 }
 
-export type WpBlock< C extends Context = 'edit' > = OmitNevers<
-	_BaseEntityRecords.WpBlock< C >
+export type Block< C extends Context = 'edit' > = OmitNevers<
+	_BaseEntityRecords.Block< C >
 >;

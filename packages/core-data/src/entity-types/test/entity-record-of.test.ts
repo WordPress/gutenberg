@@ -11,8 +11,8 @@ import type { Attachment } from '../attachment';
 import type { Base } from '../base';
 import type { Comment } from '../comment';
 import type { GlobalStyles } from '../global-styles';
-import type { WpBlock } from '../wp-block';
-import type { WpNavigation } from '../wp-navigation';
+import type { Block } from '../block';
+import type { Navigation } from '../navigation';
 import type { Page } from '../page';
 import type { Post } from '../post';
 import type { Settings } from '../settings';
@@ -83,11 +83,11 @@ describe( 'EntityRecordOf', () => {
 		> = true;
 		const block: Expect<
 			EntityRecordOf< 'postType', 'wp_block' >,
-			WpBlock< 'edit' >
+			Block< 'edit' >
 		> = true;
 		const navigation: Expect<
 			EntityRecordOf< 'postType', 'wp_navigation' >,
-			WpNavigation< 'edit' >
+			Navigation< 'edit' >
 		> = true;
 
 		expect( [
@@ -232,10 +232,16 @@ describe( 'EntityRecordOf', () => {
 	 * `selectors.test.ts` covers -- not by widening this type.
 	 */
 	it( 'rejects pairs it does not know', () => {
-		// @ts-expect-error -- 'my_custom_type' is not a known post type.
-		type UnknownName = EntityRecordOf< 'postType', 'my_custom_type' >;
-		// @ts-expect-error -- 'myPlugin' is not a known entity kind.
-		type UnknownKind = EntityRecordOf< 'myPlugin', 'order' >;
+		type UnknownName = EntityRecordOf<
+			'postType',
+			// @ts-expect-error -- 'my_custom_type' is not a known post type.
+			'my_custom_type'
+		>;
+		type UnknownKind = EntityRecordOf<
+			// @ts-expect-error -- 'myPlugin' is not a known entity kind.
+			'myPlugin',
+			'order'
+		>;
 
 		const rejected: [ UnknownName?, UnknownKind? ] = [];
 		expect( rejected ).toHaveLength( 0 );
