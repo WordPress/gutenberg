@@ -128,11 +128,13 @@ if ( class_exists( '\WordPress\AiClient\AiClient' ) ) {
 // WordPress 7.1 compat.
 require __DIR__ . '/compat/wordpress-7.1/admin-bar.php';
 require __DIR__ . '/compat/wordpress-7.1/blocks.php';
-require __DIR__ . '/compat/wordpress-7.1/editor-settings.php';
 require __DIR__ . '/compat/wordpress-7.1/kses.php';
 require __DIR__ . '/compat/wordpress-7.1/media.php';
 require __DIR__ . '/compat/wordpress-7.1/preload.php';
 require __DIR__ . '/compat/wordpress-7.1/icons.php';
+
+// WordPress 7.2 compat.
+require __DIR__ . '/compat/wordpress-7.2/editor-settings.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
