@@ -117,35 +117,14 @@ class Gutenberg_Shortcode_Transforms {
 	 * @return array[] Shortcode transforms, each carrying the `blockName` it belongs to.
 	 */
 	private static function get_transforms() {
-		$transforms = array();
-
-		foreach ( WP_Block_Type_Registry::get_instance()->get_all_registered() as $block_type ) {
-			if ( ! isset( $block_type->transforms['from'] ) || ! is_array( $block_type->transforms['from'] ) ) {
-				continue;
-			}
-
-			foreach ( $block_type->transforms['from'] as $index => $transform ) {
-				if ( ! is_array( $transform ) || ! isset( $transform['type'], $transform['tag'] ) || 'shortcode' !== $transform['type'] ) {
-					continue;
+		return array_values(
+			array_filter(
+				Gutenberg_Block_Transforms::get_declared_transforms( 'shortcode' ),
+				static function ( $transform ) {
+					return isset( $transform['tag'] );
 				}
-
-				$transform['blockName'] = $block_type->name;
-				$transform['priority']  = isset( $transform['priority'] ) ? (int) $transform['priority'] : 10;
-				$transform['order']     = $index;
-				$transforms[]           = $transform;
-			}
-		}
-
-		usort(
-			$transforms,
-			static function ( $a, $b ) {
-				return $a['priority'] === $b['priority']
-					? $a['order'] - $b['order']
-					: $a['priority'] - $b['priority'];
-			}
+			)
 		);
-
-		return $transforms;
 	}
 
 	/**
@@ -191,7 +170,7 @@ class Gutenberg_Shortcode_Transforms {
 
 		return array(
 			'blockName'    => $block_type->name,
-			'attrs'        => self::remove_sourced_attributes( $block_type, $attributes ),
+			'attrs'        => Gutenberg_Block_Transforms::remove_implied_attributes( $block_type, $attributes ),
 			'innerBlocks'  => array(),
 			'innerHTML'    => $markup,
 			'innerContent' => array( $markup ),
@@ -223,25 +202,6 @@ class Gutenberg_Shortcode_Transforms {
 		}
 
 		return null;
-	}
-
-	/**
-	 * Returns the attributes worth serializing into the block delimiter.
-	 *
-	 * @param WP_Block_Type $block_type Block type.
-	 * @param array         $attributes Attribute values.
-	 * @return array Attribute values.
-	 */
-	private static function remove_sourced_attributes( $block_type, $attributes ) {
-		$definitions = (array) $block_type->attributes;
-
-		foreach ( $attributes as $name => $value ) {
-			if ( isset( $definitions[ $name ]['source'] ) ) {
-				unset( $attributes[ $name ] );
-			}
-		}
-
-		return $attributes;
 	}
 
 	/**

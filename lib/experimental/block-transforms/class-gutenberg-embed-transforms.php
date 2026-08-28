@@ -582,7 +582,8 @@ class Gutenberg_Embed_Transforms {
 	 * @return string[] Class names.
 	 */
 	private static function prepare_class_names( $attributes ) {
-		$classes = array( 'wp-block-embed' );
+		$default = wp_get_block_default_classname( self::BLOCK_NAME );
+		$classes = is_string( $default ) && '' !== $default ? array( $default ) : array();
 
 		if ( isset( $attributes['type'] ) ) {
 			$classes[] = 'is-type-' . $attributes['type'];

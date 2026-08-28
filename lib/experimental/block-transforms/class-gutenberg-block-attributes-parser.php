@@ -223,6 +223,14 @@ class Gutenberg_Block_Attributes_Parser {
 			case 'rich-text':
 				$html = $target->get_inner_html();
 
+				/*
+				 * `RichTextData.fromHTMLElement()` collapses each text node on
+				 * its own, leaving attribute values alone; this collapses the
+				 * markup as one string, so whitespace inside an attribute is
+				 * collapsed too. Nothing reads the difference today, because a
+				 * sourced value is re-derived from the markup rather than
+				 * written into the block, and the markup is carried unchanged.
+				 */
 				if ( empty( $schema['__unstablePreserveWhiteSpace'] ) ) {
 					$html = trim( preg_replace( '/[\r\n\t ]+/', ' ', $html ) );
 				}

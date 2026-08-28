@@ -1345,6 +1345,46 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_orders_shortcode_transforms_across_blocks_by_registration() {
+		/*
+		 * Two blocks declaring the same shortcode at the same priority resolve
+		 * in the order they were registered. `usort` is only stable from PHP
+		 * 8.0, so the ordering has to come from a counter spanning the whole
+		 * registry rather than each block's own list.
+		 */
+		foreach ( array( 'test/first-shortcode', 'test/second-shortcode' ) as $block_name ) {
+			$this->register(
+				$block_name,
+				array(
+					'attributes' => array(
+						'text' => array(
+							'type'     => 'string',
+							'source'   => 'raw',
+							'selector' => '',
+						),
+					),
+					'transforms' => array(
+						'from' => array(
+							array(
+								'type'       => 'shortcode',
+								'tag'        => 'testthing',
+								'attributes' => array(
+									'text' => array( 'source' => 'shortcodeText' ),
+								),
+							),
+						),
+					),
+				)
+			);
+		}
+
+		$blocks = gutenberg_html_to_blocks( "<p>Before</p>\n[testthing]\n<p>After</p>" );
+		$names  = wp_list_pluck( $blocks, 'blockName' );
+
+		$this->assertContains( 'test/first-shortcode', $names );
+		$this->assertNotContains( 'test/second-shortcode', $names );
+	}
+
 	public function test_leaves_media_in_place_when_nothing_converts_it() {
 		$this->register_test_blocks();
 

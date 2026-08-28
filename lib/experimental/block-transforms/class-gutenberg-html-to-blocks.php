@@ -385,16 +385,18 @@ class Gutenberg_HTML_To_Blocks {
 	 * @return array Parsed block array.
 	 */
 	private static function create_block( $block_type, $transform, $attributes, $element, $inner_blocks ) {
-		$attributes = self::remove_default_attributes( $block_type, $attributes );
+		$attributes = Gutenberg_Block_Transforms::remove_implied_attributes( $block_type, $attributes );
 		$markup     = self::prepare_wrapper_markup( $block_type, $transform, $element, $attributes );
 
 		if ( array() === $inner_blocks || array() === $inner_blocks['blocks'] ) {
+			$outer = $markup['opening'] . $element->get_inner_html() . $markup['closing'];
+
 			return array(
 				'blockName'    => $block_type->name,
 				'attrs'        => $attributes,
 				'innerBlocks'  => array(),
-				'innerHTML'    => $markup['outer'],
-				'innerContent' => array( $markup['outer'] ),
+				'innerHTML'    => $outer,
+				'innerContent' => array( $outer ),
 			);
 		}
 
@@ -460,33 +462,6 @@ class Gutenberg_HTML_To_Blocks {
 	}
 
 	/**
-	 * Drops attribute values that match the block type's declared defaults.
-	 *
-	 * @param WP_Block_Type $block_type Block type.
-	 * @param array         $attributes Attribute values.
-	 * @return array Attribute values worth serializing.
-	 */
-	private static function remove_default_attributes( $block_type, $attributes ) {
-		$definitions = (array) $block_type->attributes;
-
-		foreach ( $attributes as $name => $value ) {
-			$definition = isset( $definitions[ $name ] ) ? $definitions[ $name ] : array();
-
-			if ( array_key_exists( 'default', $definition ) && $definition['default'] === $value ) {
-				unset( $attributes[ $name ] );
-				continue;
-			}
-
-			// Sourced attributes are read back out of the markup, not the delimiter.
-			if ( isset( $definition['source'] ) ) {
-				unset( $attributes[ $name ] );
-			}
-		}
-
-		return $attributes;
-	}
-
-	/**
 	 * Adds the block's generated class name to its wrapper element.
 	 *
 	 * Static blocks save markup that carries a `wp-block-*` class, and block
@@ -498,7 +473,7 @@ class Gutenberg_HTML_To_Blocks {
 	 * @param array                  $transform  Transform that matched the element.
 	 * @param Gutenberg_HTML_Element $element    Element to add the class to.
 	 * @param array                  $attributes Attributes the block was built with.
-	 * @return array Markup with `opening`, `closing` and `outer` keys.
+	 * @return array Markup with `opening` and `closing` keys.
 	 */
 	private static function prepare_wrapper_markup( $block_type, $transform, $element, $attributes ) {
 		$opening  = $element->get_opening_tag();
@@ -514,7 +489,6 @@ class Gutenberg_HTML_To_Blocks {
 			return array(
 				'opening' => $opening,
 				'closing' => $closing,
-				'outer'   => $opening . $element->get_inner_html() . $closing,
 			);
 		}
 
@@ -571,7 +545,6 @@ class Gutenberg_HTML_To_Blocks {
 		return array(
 			'opening' => $opening,
 			'closing' => $closing,
-			'outer'   => $opening . $element->get_inner_html() . $closing,
 		);
 	}
 
@@ -936,45 +909,7 @@ class Gutenberg_HTML_To_Blocks {
 	 * @return array[] Raw transforms, each carrying the `blockName` it belongs to.
 	 */
 	private static function get_raw_transforms() {
-		$transforms = array();
-		$order      = 0;
-
-		foreach ( WP_Block_Type_Registry::get_instance()->get_all_registered() as $block_type ) {
-			if ( ! isset( $block_type->transforms['from'] ) || ! is_array( $block_type->transforms['from'] ) ) {
-				continue;
-			}
-
-			foreach ( $block_type->transforms['from'] as $transform ) {
-				if ( ! is_array( $transform ) || ! isset( $transform['type'] ) || 'raw' !== $transform['type'] ) {
-					continue;
-				}
-
-				$transform['blockName'] = $block_type->name;
-				$transform['priority']  = isset( $transform['priority'] ) ? (int) $transform['priority'] : 10;
-
-				/*
-				 * Registration order across every block, not the index within
-				 * one block's own list: `usort` is only stable from PHP 8.0,
-				 * so transforms of equal priority would otherwise resolve
-				 * differently on the versions below it.
-				 */
-				$transform['order'] = $order;
-				++$order;
-
-				$transforms[] = $transform;
-			}
-		}
-
-		usort(
-			$transforms,
-			static function ( $a, $b ) {
-				return $a['priority'] === $b['priority']
-					? $a['order'] - $b['order']
-					: $a['priority'] - $b['priority'];
-			}
-		);
-
-		return $transforms;
+		return Gutenberg_Block_Transforms::get_declared_transforms( 'raw' );
 	}
 
 	/**

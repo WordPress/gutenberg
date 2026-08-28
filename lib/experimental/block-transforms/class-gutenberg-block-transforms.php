@@ -29,7 +29,9 @@ class Gutenberg_Block_Transforms {
 	 * @return array[]|null Parsed block arrays, or null when no transform applies.
 	 */
 	public static function switch_block_type( $blocks, $target_name ) {
-		$blocks = isset( $blocks['blockName'] ) ? array( $blocks ) : array_values( $blocks );
+		// A single parsed block carries a `blockName`, which is null for classic
+		// content, so the key has to be looked for rather than its value.
+		$blocks = array_key_exists( 'blockName', $blocks ) ? array( $blocks ) : array_values( $blocks );
 
 		if ( array() === $blocks ) {
 			return null;
@@ -49,7 +51,17 @@ class Gutenberg_Block_Transforms {
 			return null;
 		}
 
-		$transform = self::find_transform( $source_type, $target_type, count( $blocks ) > 1 );
+		/*
+		 * A declared transform maps one block's attributes onto another's. It
+		 * has no way to say how several blocks' attributes combine, which only
+		 * a JavaScript transform can express, so a multi-block selection is
+		 * refused rather than silently converted from the first block alone.
+		 */
+		if ( count( $blocks ) > 1 ) {
+			return null;
+		}
+
+		$transform = self::find_transform( $source_type, $target_type );
 
 		if ( null === $transform ) {
 			return null;
@@ -88,32 +100,17 @@ class Gutenberg_Block_Transforms {
 	 * The source's `to` transforms take precedence over the target's `from`
 	 * transforms, matching the editor.
 	 *
-	 * @param WP_Block_Type $source_type    Block type being converted.
-	 * @param WP_Block_Type $target_type    Block type to convert to.
-	 * @param bool          $is_multi_block Whether more than one block is being converted.
+	 * @param WP_Block_Type $source_type Block type being converted.
+	 * @param WP_Block_Type $target_type Block type to convert to.
 	 * @return array|null Matching transform, or null.
 	 */
-	private static function find_transform( $source_type, $target_type, $is_multi_block ) {
+	private static function find_transform( $source_type, $target_type ) {
 		$candidates = array_merge(
 			self::get_block_transforms( $source_type, 'to', $target_type->name ),
 			self::get_block_transforms( $target_type, 'from', $source_type->name )
 		);
 
-		/*
-		 * A declared transform maps one block's attributes onto another's. It
-		 * has no way to say how several blocks' attributes combine, which only
-		 * a JavaScript transform can express, so a multi-block selection is
-		 * refused rather than silently converted from the first block alone.
-		 */
-		if ( $is_multi_block ) {
-			return null;
-		}
-
-		foreach ( $candidates as $transform ) {
-			return $transform;
-		}
-
-		return null;
+		return isset( $candidates[0] ) ? $candidates[0] : null;
 	}
 
 	/**
@@ -155,8 +152,87 @@ class Gutenberg_Block_Transforms {
 			$matching[]            = $transform;
 		}
 
+		return self::sort_by_priority( $matching );
+	}
+
+	/**
+	 * Returns every transform of one type declared by any registered block.
+	 *
+	 * @param string $type Transform type, such as `raw` or `shortcode`.
+	 * @return array[] Transforms, each carrying the `blockName` it belongs to, in the order they should be tried.
+	 */
+	public static function get_declared_transforms( $type ) {
+		$transforms = array();
+		$order      = 0;
+
+		foreach ( WP_Block_Type_Registry::get_instance()->get_all_registered() as $block_type ) {
+			if ( ! isset( $block_type->transforms['from'] ) || ! is_array( $block_type->transforms['from'] ) ) {
+				continue;
+			}
+
+			foreach ( $block_type->transforms['from'] as $transform ) {
+				if ( ! is_array( $transform ) || ! isset( $transform['type'] ) || $type !== $transform['type'] ) {
+					continue;
+				}
+
+				$transform['blockName'] = $block_type->name;
+				$transform['priority']  = isset( $transform['priority'] ) ? (int) $transform['priority'] : 10;
+
+				/*
+				 * Registration order across every block, not the index within
+				 * one block's own list: `usort` is only stable from PHP 8.0,
+				 * so transforms of equal priority would otherwise resolve
+				 * differently on the versions below it.
+				 */
+				$transform['order'] = $order;
+				++$order;
+
+				$transforms[] = $transform;
+			}
+		}
+
+		return self::sort_by_priority( $transforms );
+	}
+
+	/**
+	 * Returns the attributes worth writing into a block's delimiter.
+	 *
+	 * An attribute the block sources from its own markup is read back out of
+	 * that markup, and one equal to the block's default is what the block
+	 * would assume anyway, so neither belongs in the delimiter.
+	 *
+	 * @param WP_Block_Type $block_type Block type.
+	 * @param array         $attributes Attribute values.
+	 * @return array Attribute values.
+	 */
+	public static function remove_implied_attributes( $block_type, $attributes ) {
+		$definitions = (array) $block_type->attributes;
+
+		foreach ( $attributes as $name => $value ) {
+			$definition = isset( $definitions[ $name ] ) ? $definitions[ $name ] : array();
+
+			if ( isset( $definition['source'] ) ) {
+				unset( $attributes[ $name ] );
+				continue;
+			}
+
+			if ( array_key_exists( 'default', $definition ) && $definition['default'] === $value ) {
+				unset( $attributes[ $name ] );
+			}
+		}
+
+		return $attributes;
+	}
+
+	/**
+	 * Orders transforms by priority, and by declaration order within a priority.
+	 *
+	 * @param array[] $transforms Transforms carrying `priority` and `order`.
+	 * @return array[] Ordered transforms.
+	 */
+	public static function sort_by_priority( $transforms ) {
 		usort(
-			$matching,
+			$transforms,
 			static function ( $a, $b ) {
 				return $a['priority'] === $b['priority']
 					? $a['order'] - $b['order']
@@ -164,7 +240,7 @@ class Gutenberg_Block_Transforms {
 			}
 		);
 
-		return $matching;
+		return $transforms;
 	}
 
 	/**
