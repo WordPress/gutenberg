@@ -4678,11 +4678,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/border-control/test/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/components/src/box-control/styles/box-control-icon-styles.ts": {
 		"no-restricted-imports": {
 			"count": 2
@@ -4708,21 +4703,8 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/context/context-system-provider.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/components/src/context/stories/ComponentsProvider.stories.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/components/src/context/test/context-system-provider.jsx": {
+	"packages/components/src/context/test/context-system-provider.tsx": {
 		"no-restricted-imports": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -4811,21 +4793,6 @@
 			"count": 3
 		}
 	},
-	"packages/components/src/input-control/test/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/components/src/item-group/test/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/components/src/menu-item/test/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/components/src/menu/styles.ts": {
 		"no-restricted-imports": {
 			"count": 2
@@ -4881,16 +4848,6 @@
 	},
 	"packages/components/src/slot-fill/slot.tsx": {
 		"react-hooks/refs": {
-			"count": 1
-		}
-	},
-	"packages/components/src/slot-fill/test/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/components/src/slot-fill/test/slot.jsx": {
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -4959,22 +4916,9 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/utils/hooks/test/use-controlled-state.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/components/src/utils/hooks/test/use-controlled-value.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/components/src/utils/hooks/test/use-cx.jsx": {
+	"packages/components/src/utils/hooks/test/use-cx.tsx": {
 		"no-restricted-imports": {
 			"count": 3
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
 	"packages/components/src/utils/hooks/use-cx.ts": {
@@ -4987,18 +4931,8 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/utils/test/get-node-text.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/components/src/utils/test/polymorphic-element.tsx": {
 		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/components/src/view/test/index.jsx": {
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
