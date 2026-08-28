@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Remove unused dependency `@wordpress/commands` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+
 ## 0.21.0 (2026-08-26)
 
 ### Bug Fixes

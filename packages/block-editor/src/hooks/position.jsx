@@ -261,6 +261,7 @@ export function PositionPanelPure( {
 				label={ __( 'Position' ) }
 				hideLabelFromVision
 				description={ stickyHelpText }
+				popupWidth="anchor"
 				items={ options }
 				value={ selectedOption }
 				onValueChange={ ( selectedItem ) => {
@@ -277,7 +278,6 @@ export function PositionPanelPure( {
 							key={ option.key }
 							value={ option }
 							label={ option.label }
-							className="block-editor-hooks__position-control-item"
 							aria-describedby={ hintId }
 						>
 							<div>{ option.label }</div>

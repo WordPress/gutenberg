@@ -10,7 +10,7 @@ import {
 	TEMPLATE_PART_POST_TYPE,
 } from '../../store/constants';
 
-// Taken from packages/editor/src/components/time-to-read/index.js.
+// Taken from packages/editor/src/components/time-to-read/index.jsx.
 const AVERAGE_READING_RATE = 189;
 
 // This component renders the wordcount and reading time for the post.

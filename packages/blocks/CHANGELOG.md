@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `BlockTransform` is now a discriminated union over its `type`, so that each kind of transform declares its own fields: `shortcode` transforms accept `tag` and `attributes` with `shortcode` matchers, `enter` transforms `regExp`, `prefix` transforms `prefix`, and `raw` transforms `selector` and `schema`. `blocks`, `variationName` and `shortcuts` now belong to `block` transforms only, and `blocks` is required there. This fixes type errors when registering blocks with documented shortcode transforms, but reading a variant field off a `BlockTransform` that has not been narrowed on its `type` no longer compiles — including the result of `findTransform` ([#81811](https://github.com/WordPress/gutenberg/issues/81811)).
+-   Removed the `transforms.supportedMobileTransforms` block type property, along with the `supportedMobileTransforms` and `usingMobileTransformations` properties of a block transform. They were only meaningful to the React Native implementation, removed in [#78747](https://github.com/WordPress/gutenberg/pull/78747), and nothing reads them any more. Note that the filter they drove was not platform-gated: a block type still declaring `supportedMobileTransforms` had its transforms filtered everywhere, and `getBlockTransforms` no longer filters them at all ([#81831](https://github.com/WordPress/gutenberg/pull/81831)).
+
+### Bug Fixes
+
+-   `getBlockAttributes` no longer breaks when a block has no content to parse, such as a self-closing shortcode: missing content is treated as empty markup instead of reaching the attribute matchers ([#81831](https://github.com/WordPress/gutenberg/pull/81831)).
+
 ## 15.27.0 (2026-08-26)
 
 ### New Features
