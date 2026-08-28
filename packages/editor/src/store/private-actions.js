@@ -3,12 +3,12 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { addQueryArgs } from '@wordpress/url';
+import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
 import apiFetch from '@wordpress/api-fetch';
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
-import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
 import isTemplateRevertable from './utils/is-template-revertable';
+import { setRestoredRevisionNotice } from '../utils/restored-revision-notice';
 import { buildRevisionsPageQuery } from './private-selectors';
 import {
 	getDeviceTypeByCanvasWidth,
@@ -658,91 +658,59 @@ export function setShowRevisionDiff( showDiff ) {
 }
 
 /**
- * Restore a revision by replacing the current content with the revision's content
- * and auto-saving.
+ * Restore a revision on the server and reload the editor.
+ *
+ * Restoring runs `wp_restore_post_revision()`, the same function the classic
+ * revision.php screen uses, so that everything the revision holds is restored,
+ * including meta that the editor does not know about. Classic meta boxes are
+ * rendered and saved by PHP, and would submit their stale values on the next
+ * save, so the editor is loaded again to pick up the restored values.
  *
  * @param {number} revisionId The revision ID to restore.
  */
 export const restoreRevision =
 	( revisionId ) =>
-	async ( { select, dispatch, registry } ) => {
+	async ( { select, registry } ) => {
 		const postType = select.getCurrentPostType();
 		const postId = select.getCurrentPostId();
 
 		const entityConfig = registry
 			.select( coreStore )
 			.getEntityConfig( 'postType', postType );
-		const revisionKey = entityConfig?.revisionKey || 'id';
 
-		// Use resolveSelect to ensure the revision is fetched if not yet
-		// in the store. The _fields parameter matches the query used by
-		// getRevisions so the result is served from cache without an
-		// extra API call.
-		const revision = await registry
-			.resolveSelect( coreStore )
-			.getRevision( 'postType', postType, postId, revisionId, {
-				context: 'edit',
-				_fields: [
-					...new Set( [
-						'id',
-						'date',
-						'modified',
-						'author',
-						'meta',
-						'title.raw',
-						'excerpt.raw',
-						'content.raw',
-						revisionKey,
-					] ),
-				].join(),
+		let restored;
+		try {
+			restored = await apiFetch( {
+				path: `${ entityConfig.getRevisionsUrl(
+					postId,
+					revisionId
+				) }/restore`,
+				method: 'POST',
 			} );
-
-		if ( ! revision ) {
+		} catch ( error ) {
+			registry
+				.dispatch( noticesStore )
+				.createErrorNotice(
+					error.message ||
+						__( 'The revision could not be restored.' ),
+					{
+						type: 'snackbar',
+						id: 'editor-revision-restore-failed',
+					}
+				);
 			return;
 		}
 
-		// Build the edits object with all restorable fields from the revision.
-		const edits = {
-			blocks: undefined,
-			content: revision.content.raw,
-		};
-		if ( revision.title?.raw !== undefined ) {
-			edits.title = revision.title.raw;
-		}
-		if ( revision.excerpt?.raw !== undefined ) {
-			edits.excerpt = revision.excerpt.raw;
-		}
-		if ( revision.meta !== undefined ) {
-			edits.meta = revision.meta;
-		}
+		// The notice outlives the page it was created on.
+		setRestoredRevisionNotice( {
+			postType,
+			postId,
+			date: restored?.date,
+		} );
 
-		// Apply edits and save.
-		dispatch.editPost( edits );
-
-		// Exit revisions mode.
-		dispatch.setCurrentRevisionId( null );
-
-		// Save the post to persist the restored revision.
-		await dispatch.savePost();
-		if ( select.didPostSaveRequestFail() ) {
-			return;
-		}
-
-		// The saved post is now newer than any autosave, so the
-		// autosave notice is stale.
-		registry.dispatch( noticesStore ).removeNotice( 'autosave-exists' );
-
-		// Show success notice.
-		registry.dispatch( noticesStore ).createSuccessNotice(
-			sprintf(
-				/* translators: %s: Date and time of the revision. */
-				__( 'Restored to revision from %s.' ),
-				dateI18n( getDateSettings().formats.datetime, revision.date )
-			),
-			{
-				type: 'snackbar',
-				id: 'editor-revision-restored',
-			}
+		window.location.href = removeQueryArgs(
+			window.location.href,
+			'revision'
 		);
 	};
 

@@ -118,8 +118,11 @@ function gutenberg_rest_theme_global_styles_link_rel_7_0( $response, $theme ) {
 add_filter( 'rest_prepare_theme', 'gutenberg_rest_theme_global_styles_link_rel_7_0', 10, 2 );
 
 /**
- * Overrides the default REST controller for revisions to support nested
- * _fields parameters (e.g. content.raw without content.rendered).
+ * Overrides the default REST controllers for revisions.
+ *
+ * The Gutenberg controllers support nested _fields parameters (e.g.
+ * content.raw without content.rendered) and add a route to restore a
+ * revision.
  *
  * The core WP_REST_Revisions_Controller uses in_array() checks for content,
  * title, excerpt, and guid fields, which prevents sub-field filtering via
@@ -127,13 +130,98 @@ add_filter( 'rest_prepare_theme', 'gutenberg_rest_theme_global_styles_link_rel_7
  * so that clients can avoid expensive server-side rendering when only raw
  * data is needed.
  *
- * Only overrides when revisions_rest_controller_class is not explicitly set.
+ * Post types that set their own controller keep it, except for templates,
+ * which are switched to the Gutenberg subclass of the core template
+ * revisions controller.
  */
 function gutenberg_override_revisions_rest_controller( $args ) {
 	if ( empty( $args['revisions_rest_controller_class'] ) ) {
 		$args['revisions_rest_controller_class'] = 'Gutenberg_REST_Revisions_Controller';
+	} elseif ( 'WP_REST_Template_Revisions_Controller' === $args['revisions_rest_controller_class'] ) {
+		$args['revisions_rest_controller_class'] = 'Gutenberg_REST_Template_Revisions_Controller';
 	}
 	return $args;
 }
 
 add_filter( 'register_post_type_args', 'gutenberg_override_revisions_rest_controller', 10, 1 );
+
+/**
+ * Checks whether the current user may restore a revision of a parent post.
+ *
+ * Shared by the revisions controllers, which resolve the parent post
+ * differently.
+ *
+ * @param WP_Post|WP_Error $parent_post Parent post of the revision, or the
+ *                                      error that resolving it produced.
+ * @return true|WP_Error True if the user may restore, WP_Error otherwise.
+ */
+function gutenberg_rest_restore_revision_permissions_check( $parent_post ) {
+	if ( is_wp_error( $parent_post ) ) {
+		return $parent_post;
+	}
+
+	if ( ! current_user_can( 'edit_post', $parent_post->ID ) ) {
+		return new WP_Error(
+			'rest_cannot_restore_revision',
+			__( 'Sorry, you are not allowed to restore revisions of this post.' ),
+			array( 'status' => rest_authorization_required_code() )
+		);
+	}
+
+	return true;
+}
+
+/**
+ * Restores a revision of a parent post.
+ *
+ * Shared by the revisions controllers, which resolve the parent post
+ * differently.
+ *
+ * @param WP_Post|WP_Error $parent_post Parent post of the revision, or the
+ *                                      error that resolving it produced.
+ * @param WP_Post|WP_Error $revision    The revision to restore, or the error
+ *                                      that resolving it produced.
+ * @return WP_REST_Response|WP_Error Response object with the parent and
+ *                                   revision IDs and the date of the restored
+ *                                   revision, or WP_Error object on failure.
+ */
+function gutenberg_rest_restore_revision( $parent_post, $revision ) {
+	if ( is_wp_error( $parent_post ) ) {
+		return $parent_post;
+	}
+
+	if ( is_wp_error( $revision ) ) {
+		return $revision;
+	}
+
+	if ( (int) $parent_post->ID !== (int) $revision->post_parent ) {
+		return new WP_Error(
+			'rest_revision_parent_id_mismatch',
+			/* translators: %d: A post id. */
+			sprintf( __( 'The revision does not belong to the specified parent with id of "%d"' ), $parent_post->ID ),
+			array( 'status' => 404 )
+		);
+	}
+
+	$result = wp_restore_post_revision( $revision->ID );
+
+	if ( is_wp_error( $result ) ) {
+		return $result;
+	}
+
+	if ( ! $result ) {
+		return new WP_Error(
+			'rest_cannot_restore_revision',
+			__( 'The revision could not be restored.' ),
+			array( 'status' => 500 )
+		);
+	}
+
+	return new WP_REST_Response(
+		array(
+			'parent'   => (int) $parent_post->ID,
+			'revision' => (int) $revision->ID,
+			'date'     => mysql_to_rfc3339( $revision->post_date ),
+		)
+	);
+}
