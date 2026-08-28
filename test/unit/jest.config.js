@@ -1,5 +1,5 @@
 const path = require( 'path' );
-const glob = require( 'glob' ).sync;
+const { globSync } = require( 'glob' );
 const testMigration = require( './test-migration.json' );
 
 /**
@@ -23,12 +23,15 @@ const vitestTestPathIgnorePatterns = [
 process.chdir( ROOT_DIR );
 
 // Finds all packages which are transpiled with Babel to force Jest to use their source code.
-const transpiledPackageNames = glob(
-	path.join( ROOT_DIR, 'packages/*/src/index.{js,jsx,ts,tsx}' )
-).map( ( fileName ) => {
-	const relative = path.relative( ROOT_DIR, fileName );
-	return relative.split( path.sep )[ 1 ];
-} );
+const transpiledPackageNames = globSync(
+	'packages/*/src/index.{js,jsx,ts,tsx}',
+	{ cwd: ROOT_DIR, absolute: true }
+)
+	.sort()
+	.map( ( fileName ) => {
+		const relative = path.relative( ROOT_DIR, fileName );
+		return relative.split( path.sep )[ 1 ];
+	} );
 
 const dependenciesToTransform = [
 	'@ariakit/test',
