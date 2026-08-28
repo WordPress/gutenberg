@@ -3,8 +3,8 @@
 @use "@wordpress/base-styles/mixins" as *;
 
 .wp-block[data-align="center"] > .wp-block-icon {
-	display: flex;
-	justify-content: center;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 .wp-block-icon__inserter-sidebar {

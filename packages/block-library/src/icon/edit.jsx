@@ -17,10 +17,6 @@ import {
 	InspectorControls,
 	useBlockProps,
 	useBlockEditingMode,
-	__experimentalUseColorProps as useColorProps,
-	__experimentalUseBorderProps as useBorderProps,
-	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
-	getDimensionsClassesAndStyles as useDimensionsProps,
 } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 import { SVG, Rect, Path } from '@wordpress/primitives';
@@ -57,19 +53,6 @@ export function Edit( { attributes, setAttributes } ) {
 	const [ isInserterOpen, setInserterOpen ] = useState( false );
 
 	const isContentOnlyMode = useBlockEditingMode() === 'contentOnly';
-
-	const colorProps = useColorProps( attributes );
-	// Only padding is applied to the inner SVG element, matching the front
-	// end. The margin support is serialized to the block wrapper instead.
-	const spacingProps = useSpacingProps( {
-		style: {
-			spacing: {
-				padding: attributes.style?.spacing?.padding,
-			},
-		},
-	} );
-	const borderProps = useBorderProps( attributes );
-	const dimensionsProps = useDimensionsProps( attributes );
 
 	const selectedIcon = useSelect(
 		( select ) => {
@@ -211,37 +194,14 @@ export function Edit( { attributes, setAttributes } ) {
 					<HtmlRenderer
 						html={ iconToDisplay }
 						wrapperProps={ {
-							className: clsx(
-								colorProps.className,
-								borderProps.className,
-								spacingProps.className,
-								dimensionsProps.className,
-								flipClasses
-							),
-							style: {
-								...colorProps.style,
-								...borderProps.style,
-								...spacingProps.style,
-								...dimensionsProps.style,
-								...rotationStyle,
-							},
+							className: clsx( flipClasses ),
+							style: rotationStyle,
 						} }
 					/>
 				) : (
 					<IconPlaceholder
-						className={ clsx(
-							borderProps.className,
-							spacingProps.className,
-							dimensionsProps.className,
-							flipClasses
-						) }
-						style={ {
-							...borderProps.style,
-							...spacingProps.style,
-							...dimensionsProps.style,
-							...rotationStyle,
-							height: 'auto',
-						} }
+						className={ clsx( flipClasses ) }
+						style={ rotationStyle }
 					/>
 				) }
 			</div>

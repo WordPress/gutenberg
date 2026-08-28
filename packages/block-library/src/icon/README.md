@@ -41,10 +41,8 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 
 _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
 
-- **root**: `.wp-block-icon svg`
+- **root**: `.wp-block-icon`
 - **css**: `.wp-block-icon`
-- **spacing**:
-  - margin: `.wp-block-icon`
 
 ## Block Markup
 
