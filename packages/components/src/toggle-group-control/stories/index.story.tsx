@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import { formatLowercase, formatUppercase } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import {
 	ToggleGroupControl,
 	ToggleGroupControlOption,
@@ -33,10 +22,15 @@ const meta: Meta< typeof ToggleGroupControl > = {
 		onChange: { action: 'onChange' },
 		value: { control: false },
 	},
-	tags: [ 'status-experimental' ],
+	tags: [ 'status-experimental', 'manifest' ],
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `ToggleGroupControl` in `@wordpress/ui`, but continue using for now.',
+		},
 	},
 };
 export default meta;
@@ -50,7 +44,6 @@ const Template: StoryFn< typeof ToggleGroupControl > = ( {
 
 	return (
 		<ToggleGroupControl
-			__next40pxDefaultSize
 			{ ...props }
 			onChange={ ( ...changeArgs ) => {
 				setValue( ...changeArgs );
@@ -85,6 +78,7 @@ Default.args = {
 		{ value: 'right', label: 'Right' },
 		{ value: 'justify', label: 'Justify' },
 	].map( mapPropsToOptionComponent ),
+	help: 'Help text to describe the control.',
 	isBlock: true,
 	label: 'Label',
 };

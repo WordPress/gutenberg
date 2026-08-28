@@ -1,27 +1,21 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Button from '../../button';
 import ScrollLock from '..';
 
 const meta: Meta< typeof ScrollLock > = {
+	tags: [ 'manifest' ],
 	component: ScrollLock,
 	title: 'Components/Utilities/ScrollLock',
 	id: 'components-scrolllock',
 	parameters: {
 		controls: { hideNoControlsWarning: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;

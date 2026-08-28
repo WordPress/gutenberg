@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import TextareaControl from '..';
 
 const meta: Meta< typeof TextareaControl > = {
@@ -21,6 +10,9 @@ const meta: Meta< typeof TextareaControl > = {
 		onChange: { action: 'onChange' },
 		label: { control: { type: 'text' } },
 		help: { control: { type: 'text' } },
+		disabled: {
+			control: { type: 'boolean' },
+		},
 		value: { control: false },
 	},
 	parameters: {
@@ -28,6 +20,11 @@ const meta: Meta< typeof TextareaControl > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Use [`TextareaControl`](?path=/docs/design-system-components-form-textareacontrol--docs) from `@wordpress/ui` instead. See the [migration guide](?path=/docs/components-textareacontrol--migration-guide).',
+		},
 	},
 };
 export default meta;

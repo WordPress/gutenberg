@@ -1,36 +1,27 @@
-/**
- * External dependencies
- */
 import deepMerge from 'deepmerge';
-
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalSpacer as Spacer,
 	Button,
 	Modal,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 import { useContext, useMemo, useRef, useState } from '@wordpress/element';
 import { useFocusOnMount, useMergeRefs } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type {
 	Field,
 	NormalizedForm,
 	NormalizedFormField,
-	NormalizedField,
+	NormalizedPanelLayout,
+	PanelOpenAsModal,
+	FieldLayoutProps,
 } from '../../../types';
 import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import SummaryButton from './summary-button';
 import useFormValidity from '../../../hooks/use-form-validity';
-import useReportValidity from '../../../hooks/use-report-validity';
+import useRevealValidity from '../../../hooks/use-reveal-validity';
 import DataFormContext from '../../dataform-context';
+import useFieldFromFormField from './utils/use-field-from-form-field';
 
 function ModalContent< Item >( {
 	data,
@@ -47,6 +38,8 @@ function ModalContent< Item >( {
 	fieldLabel: string;
 	touched: boolean;
 } ) {
+	const { openAs } = field.layout as NormalizedPanelLayout;
+	const { applyLabel, cancelLabel } = openAs as PanelOpenAsModal;
 	const { fields } = useContext( DataFormContext );
 	const [ changes, setChanges ] = useState< Partial< Item > >( {} );
 	const modalData = useMemo( () => {
@@ -99,8 +92,8 @@ function ModalContent< Item >( {
 	const mergedRef = useMergeRefs( [ focusOnMountRef, contentRef ] );
 
 	// When the modal is opened after being previously closed (touched),
-	// trigger reportValidity to show field-level errors.
-	useReportValidity( contentRef, touched );
+	// reveal the field-level errors.
+	useRevealValidity( contentRef, touched );
 
 	return (
 		<Modal
@@ -117,13 +110,19 @@ function ModalContent< Item >( {
 					onChange={ handleOnChange }
 					validity={ validity }
 				>
-					{ ( FieldLayout, childField, childFieldValidity ) => (
+					{ (
+						FieldLayout,
+						childField,
+						childFieldValidity,
+						markWhenOptional
+					) => (
 						<FieldLayout
 							key={ childField.id }
 							data={ modalData }
 							field={ childField }
 							onChange={ handleOnChange }
 							hideLabelFromVision={ form.fields.length < 2 }
+							markWhenOptional={ markWhenOptional }
 							validity={ childFieldValidity }
 						/>
 					) }
@@ -132,7 +131,7 @@ function ModalContent< Item >( {
 			<Stack
 				direction="row"
 				className="dataforms-layouts-panel__modal-footer"
-				gap="sm"
+				gap="md"
 			>
 				<Spacer style={ { flex: 1 } } />
 				<Button
@@ -140,14 +139,14 @@ function ModalContent< Item >( {
 					onClick={ onClose }
 					__next40pxDefaultSize
 				>
-					{ __( 'Cancel' ) }
+					{ cancelLabel }
 				</Button>
 				<Button
 					variant="primary"
 					onClick={ onApply }
 					__next40pxDefaultSize
 				>
-					{ __( 'Apply' ) }
+					{ applyLabel }
 				</Button>
 			</Stack>
 		</Modal>
@@ -158,40 +157,35 @@ function PanelModal< Item >( {
 	data,
 	field,
 	onChange,
-	labelPosition,
-	summaryFields,
-	fieldDefinition,
-	onClose: onCloseCallback,
-	touched,
-}: {
-	data: Item;
-	field: NormalizedFormField;
-	onChange: ( value: any ) => void;
-	labelPosition: 'side' | 'top' | 'none';
-	summaryFields: NormalizedField< Item >[];
-	fieldDefinition: NormalizedField< Item >;
-	onClose?: () => void;
-	touched: boolean;
-} ) {
+	validity,
+}: FieldLayoutProps< Item > ) {
+	const [ touched, setTouched ] = useState( false );
+
 	const [ isOpen, setIsOpen ] = useState( false );
 
-	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;
+	const { fieldDefinition, fieldLabel, summaryFields } =
+		useFieldFromFormField( field );
+	if ( ! fieldDefinition ) {
+		return null;
+	}
 
 	const handleClose = () => {
 		setIsOpen( false );
-		onCloseCallback?.();
+		setTouched( true );
 	};
 
 	return (
 		<>
 			<SummaryButton
-				summaryFields={ summaryFields }
 				data={ data }
-				labelPosition={ labelPosition }
+				field={ field }
 				fieldLabel={ fieldLabel }
+				summaryFields={ summaryFields }
+				validity={ validity }
+				touched={ touched }
 				disabled={ fieldDefinition.readOnly === true }
 				onClick={ () => setIsOpen( true ) }
-				aria-expanded={ isOpen }
+				isOpen={ isOpen }
 			/>
 			{ isOpen && (
 				<ModalContent

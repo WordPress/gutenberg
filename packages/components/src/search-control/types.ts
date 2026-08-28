@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { InputControlProps } from '../input-control/types';
 
 export type SearchControlProps = Pick< InputControlProps, 'help' | 'value' > & {
@@ -70,7 +67,7 @@ export type SearchControlProps = Pick< InputControlProps, 'help' | 'value' > & {
 
 export type SuffixItemProps = Pick<
 	SearchControlProps,
-	'value' | 'onChange' | 'onClose'
+	'onChange' | 'onClose'
 > & {
-	searchRef: React.RefObject< HTMLInputElement >;
+	searchRef: React.RefObject< HTMLInputElement | null >;
 };

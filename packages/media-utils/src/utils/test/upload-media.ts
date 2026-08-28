@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { uploadMedia } from '../upload-media';
 import { UploadError } from '../upload-error';
 import { uploadToServer } from '../upload-to-server';
@@ -230,6 +227,32 @@ describe( 'uploadMedia', () => {
 			new UploadError( {
 				code: 'GENERAL',
 				message: 'Could not get a valid response from the server.',
+				file: imageFile,
+			} )
+		);
+	} );
+
+	it( 'should report a server failure when the response cannot be parsed', async () => {
+		// What `apiFetch` rejects with when the endpoint answers with
+		// something other than JSON, such as a PHP fatal error page.
+		( uploadToServer as jest.Mock ).mockRejectedValue( {
+			code: 'invalid_json',
+			message: 'The response is not a valid JSON response.',
+		} );
+
+		const onError = jest.fn();
+		uploadMedia( {
+			filesList: [ imageFile ],
+			onError,
+			multiple: false,
+		} );
+
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+		expect( onError ).toHaveBeenCalledWith(
+			new UploadError( {
+				code: 'GENERAL',
+				message: 'Failed to upload "test.jpeg". Please try again.',
 				file: imageFile,
 			} )
 		);

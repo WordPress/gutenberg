@@ -13,7 +13,7 @@
  * @since 5.8.0
  *
  * @param array  $attributes Block attributes.
- * @param array  $_content   Block content.
+ * @param array  $content    Block content.
  * @param object $block      Block instance.
  *
  * @return string Returns the query title based on the queried object.
@@ -74,8 +74,8 @@ function render_block_core_query_title( $attributes, $content, $block ) {
 		}
 	}
 
-	$level    = isset( $attributes['level'] ) ? (int) $attributes['level'] : 1;
-	$tag_name = 0 === $level ? 'p' : 'h' . (int) $attributes['level'];
+	$level    = (int) ( $attributes['level'] ?? 1 );
+	$tag_name = 0 === $level ? 'p' : 'h' . $level;
 
 	$align_class_name   = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );

@@ -1,14 +1,7 @@
 'use strict';
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const { existsSync } = require( 'fs' );
 const chalk = require( 'chalk' );
-
-/**
- * Internal dependencies
- */
 const { loadConfig } = require( '../config' );
 const { getRuntime, detectRuntime } = require( '../runtime' );
 
@@ -39,15 +32,21 @@ function isEnvironmentInitialized( config ) {
 /**
  * Outputs the status of the wp-env environment.
  *
- * @param {Object}  options
- * @param {Object}  options.spinner A CLI spinner which indicates progress.
- * @param {boolean} options.debug   True if debug mode is enabled.
- * @param {boolean} options.json    True to output as JSON.
+ * @param {Object}      options
+ * @param {Object}      options.spinner A CLI spinner which indicates progress.
+ * @param {boolean}     options.debug   True if debug mode is enabled.
+ * @param {boolean}     options.json    True to output as JSON.
+ * @param {string|null} options.config  Path to a custom .wp-env.json configuration file.
  */
-module.exports = async function status( { spinner, debug, json } ) {
+module.exports = async function status( {
+	spinner,
+	debug,
+	json,
+	config: customConfigPath,
+} ) {
 	spinner.text = 'Getting environment status.';
 
-	const config = await loadConfig( path.resolve( '.' ) );
+	const config = await loadConfig( path.resolve( '.' ), customConfigPath );
 
 	// Check if environment is initialized by looking for runtime-specific files.
 	// We check for these files specifically because the work directory may exist
@@ -70,7 +69,7 @@ module.exports = async function status( { spinner, debug, json } ) {
 	}
 
 	// Detect and get runtime.
-	const runtimeName = detectRuntime( config.workDirectoryPath );
+	const runtimeName = await detectRuntime( config.workDirectoryPath );
 	const runtime = getRuntime( runtimeName );
 
 	// Get status from runtime.

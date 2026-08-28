@@ -1,21 +1,9 @@
 'use strict';
-
-/**
- * External dependencies
- */
 const fs = require( 'fs' ).promises;
 const http = require( 'http' );
 const path = require( 'path' );
 const spawn = require( 'cross-spawn' );
-
-/**
- * Promisified dependencies
- */
 const { rimraf } = require( 'rimraf' );
-
-/**
- * Internal dependencies
- */
 const { buildBlueprint, getMountArgs } = require( './blueprint-builder' );
 const { UnsupportedCommandError } = require( '../errors' );
 const { downloadSource } = require( '../../download-sources' );
@@ -48,7 +36,7 @@ class PlaygroundRuntime {
 			testsEnvironment: false, // Single environment only
 			xdebug: true, // Supported via --xdebug flag
 			spx: false, // Not supported in WebAssembly
-			phpMyAdmin: false, // Supported on playground.wordpress.net but not in CLI yet
+			phpMyAdmin: true, // Supported via --phpmyadmin CLI flag
 			multisite: true, // Supported via Blueprint
 			customPhpVersion: true, // Supported via --php flag
 			persistentDatabase: false, // Could be supported via mounts (not yet implemented)
@@ -76,15 +64,22 @@ class PlaygroundRuntime {
 	}
 
 	/**
+	 * Get the warning message for cleanup confirmation.
+	 *
+	 * @return {string} Warning message.
+	 */
+	getCleanupWarningMessage() {
+		return 'WARNING! This will remove the WordPress Playground environment and all local files.';
+	}
+
+	/**
 	 * Start the WordPress Playground environment.
 	 *
-	 * @param {Object}  config          The wp-env config object.
-	 * @param {Object}  options         Start options.
-	 * @param {Object}  options.spinner A CLI spinner which indicates progress.
-	 * @param {boolean} options.debug   True if debug mode is enabled.
-	 * @param {string}  options.xdebug  The Xdebug mode to set.
+	 * @param {Object} config          The wp-env config object.
+	 * @param {Object} options         Start options.
+	 * @param {Object} options.spinner A CLI spinner which indicates progress.
 	 */
-	async start( config, { spinner, debug, xdebug } ) {
+	async start( config, { spinner } ) {
 		const envConfig = config.env.development;
 
 		spinner.text = 'Starting WordPress Playground.';
@@ -118,7 +113,7 @@ class PlaygroundRuntime {
 					downloadSource( source, {
 						onProgress: () => {}, // Progress tracking could be added
 						spinner,
-						debug,
+						debug: config.debug,
 					} )
 				)
 			);
@@ -139,7 +134,6 @@ class PlaygroundRuntime {
 		// Get mount arguments
 		const mountArgs = getMountArgs( config );
 
-		// Determine port
 		const port = envConfig.port || 8888;
 		const phpVersion = envConfig.phpVersion || '8.2';
 
@@ -157,11 +151,15 @@ class PlaygroundRuntime {
 			...mountArgs,
 		];
 
-		if ( debug ) {
+		if ( config.debug ) {
 			cliArgs.push( '--verbosity', 'debug' );
 		}
 
-		if ( xdebug ) {
+		if ( envConfig.phpmyadmin ) {
+			cliArgs.push( '--phpmyadmin' );
+		}
+
+		if ( config.xdebug && config.xdebug !== 'off' ) {
 			cliArgs.push( '--xdebug' );
 		}
 
@@ -175,12 +173,27 @@ class PlaygroundRuntime {
 		// Create write stream for log file
 		const logFileStream = await fs.open( logFile, 'w' );
 
+		// Resolve the CLI binary directly so that it is found even when
+		// the package is nested inside workspace node_modules (where npx
+		// cannot discover it).
+		const cliPackageJson = require.resolve(
+			'@wp-playground/cli/package.json'
+		);
+		const cliEntryPoint = path.join(
+			path.dirname( cliPackageJson ),
+			'wp-playground.js'
+		);
+
 		return new Promise( ( resolve, reject ) => {
-			const child = spawn( 'npx', [ '@wp-playground/cli', ...cliArgs ], {
-				detached: true,
-				stdio: [ 'ignore', logFileStream.fd, logFileStream.fd ],
-				env: { ...process.env, FORCE_COLOR: '0' },
-			} );
+			const child = spawn(
+				process.execPath,
+				[ cliEntryPoint, ...cliArgs ],
+				{
+					detached: true,
+					stdio: [ 'ignore', logFileStream.fd, logFileStream.fd ],
+					env: { ...process.env, FORCE_COLOR: '0' },
+				}
+			);
 
 			// Store child process reference
 			this.serverProcess = child;
@@ -232,8 +245,17 @@ class PlaygroundRuntime {
 				.then( async () => {
 					spinner.text = `WordPress Playground started at ${ siteUrl }`;
 
-					const message =
-						'WordPress development site started at ' + siteUrl;
+					const phpmyadminUrl = envConfig.phpmyadmin
+						? `${ siteUrl }/phpmyadmin`
+						: null;
+
+					const message = [
+						'WordPress development site started at ' + siteUrl,
+						phpmyadminUrl &&
+							`phpMyAdmin started at ${ phpmyadminUrl }`,
+					]
+						.filter( Boolean )
+						.join( '\n' );
 
 					resolve( {
 						message,
@@ -293,7 +315,7 @@ class PlaygroundRuntime {
 			try {
 				const pidContent = await fs.readFile( pidFile, 'utf8' );
 				pid = parseInt( pidContent.trim(), 10 );
-			} catch ( error ) {
+			} catch {
 				// PID file doesn't exist or can't be read
 				spinner.text = 'Stopped WordPress Playground.';
 				return;
@@ -316,7 +338,7 @@ class PlaygroundRuntime {
 				} catch {
 					// Process group already terminated
 				}
-			} catch ( error ) {
+			} catch {
 				// Process group doesn't exist or already terminated
 			}
 
@@ -351,6 +373,25 @@ class PlaygroundRuntime {
 	}
 
 	/**
+	 * Cleanup the WordPress Playground environment.
+	 *
+	 * For Playground, cleanup is the same as destroy since there are no
+	 * shared resources like Docker images to preserve.
+	 *
+	 * @param {Object} config          The wp-env config object.
+	 * @param {Object} options         Cleanup options.
+	 * @param {Object} options.spinner A CLI spinner which indicates progress.
+	 */
+	async cleanup( config, { spinner } ) {
+		await this.stop( config, { spinner } );
+
+		spinner.text = 'Removing local files.';
+		await rimraf( config.workDirectoryPath );
+
+		spinner.text = 'Cleaned up WordPress Playground environment.';
+	}
+
+	/**
 	 * Run a command in the Playground environment.
 	 *
 	 * @param {Object}   config            The wp-env config object.
@@ -367,21 +408,20 @@ class PlaygroundRuntime {
 	}
 
 	/**
-	 * Clean/reset the WordPress database.
+	 * Reset the WordPress database.
 	 *
-	 * @param {Object}  config          The wp-env config object.
-	 * @param {Object}  options         Clean options.
-	 * @param {Object}  options.spinner A CLI spinner which indicates progress.
-	 * @param {boolean} options.debug   True if debug mode is enabled.
+	 * @param {Object} config          The wp-env config object.
+	 * @param {Object} options         Reset options.
+	 * @param {Object} options.spinner A CLI spinner which indicates progress.
 	 */
-	async clean( config, { spinner, debug } ) {
-		spinner.text = 'Cleaning WordPress Playground environment.';
+	async clean( config, { spinner } ) {
+		spinner.text = 'Resetting WordPress Playground environment.';
 
 		// For Playground, we restart the server to reset the database
 		await this.stop( config, { spinner } );
-		await this.start( config, { spinner, debug } );
+		await this.start( config, { spinner } );
 
-		spinner.text = 'Cleaned WordPress Playground environment.';
+		spinner.text = 'Reset WordPress Playground environment.';
 	}
 
 	/**
@@ -421,6 +461,10 @@ class PlaygroundRuntime {
 			runtime: 'playground',
 			urls: {
 				development: isRunning ? `http://localhost:${ port }` : null,
+				phpmyadmin:
+					isRunning && envConfig.phpmyadmin
+						? `http://localhost:${ port }/phpmyadmin`
+						: null,
 			},
 			ports: {
 				development: port,

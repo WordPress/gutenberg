@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * Internal dependencies
- */
 import _Picker from '..';
 import type { FocalPointPickerProps } from '../types';
 
@@ -198,6 +191,37 @@ describe( 'FocalPointPicker', () => {
 				 ).value
 			).toBe( '20' );
 			expect( onChangeSpy ).not.toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'label', () => {
+		it( 'should render the label as a visible legend', () => {
+			render( <Picker { ...props } label="Focal point" /> );
+
+			expect(
+				screen.getByRole( 'group', { name: 'Focal point' } )
+			).toBeVisible();
+
+			const legend = screen.getByText( 'Focal point' );
+
+			expect( legend.tagName ).toBe( 'LEGEND' );
+			expect( legend ).toBeVisible();
+			expect( legend ).not.toHaveAttribute( 'data-visually-hidden' );
+		} );
+
+		it( 'should visually hide the legend when `hideLabelFromVision` is enabled', () => {
+			render(
+				<Picker { ...props } label="Focal point" hideLabelFromVision />
+			);
+
+			expect(
+				screen.getByRole( 'group', { name: 'Focal point' } )
+			).toBeVisible();
+
+			const legend = screen.getByText( 'Focal point' );
+
+			expect( legend.tagName ).toBe( 'LEGEND' );
+			expect( legend ).toHaveAttribute( 'data-visually-hidden' );
 		} );
 	} );
 } );

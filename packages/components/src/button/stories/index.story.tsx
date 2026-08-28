@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import {
 	formatBold,
 	formatItalic,
@@ -14,14 +7,10 @@ import {
 	more,
 	wordpress,
 } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
-import './style.css';
 import Button from '..';
 
 const meta: Meta< typeof Button > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Actions/Button',
 	id: 'components-button',
 	component: Button,
@@ -52,6 +41,11 @@ const meta: Meta< typeof Button > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'Will be superseded by [`Button`](?path=/docs/design-system-components-button--docs) in `@wordpress/ui`, but continue using for now.',
+		},
 	},
 };
 export default meta;

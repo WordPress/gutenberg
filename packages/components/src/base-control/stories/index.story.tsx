@@ -1,15 +1,9 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import BaseControl, { useBaseControlProps } from '..';
 import Button from '../../button';
 
 const meta: Meta< typeof BaseControl > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Selection & Input/Common/BaseControl',
 	id: 'components-basecontrol',
 	component: BaseControl,
@@ -24,6 +18,11 @@ const meta: Meta< typeof BaseControl > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: '`BaseControl.VisualLabel` can continue to be used for now. To add labels and descriptions semantically, use [`Field`](?path=/docs/design-system-components-form-primitives-field--docs) in `@wordpress/ui`.',
+		},
 	},
 };
 export default meta;

@@ -1,128 +1,65 @@
-/**
- * WordPress dependencies
- */
 import { loadView } from '@wordpress/views';
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import type { Type } from '@wordpress/core-data';
-import type { View } from '@wordpress/dataviews';
+import type { View, SupportedLayouts } from '@wordpress/dataviews';
+import { unlock } from '@wordpress/routes-lock-unlock';
 
-const DEFAULT_VIEW: View = {
-	type: 'table' as const,
-	sort: {
-		field: 'date',
-		direction: 'desc' as const,
-	},
-	fields: [ 'author', 'status', 'date' ],
-	titleField: 'title',
-	mediaField: 'featured_media',
-	descriptionField: 'excerpt',
+/**
+ * A layer merged on top of a view. Mirrors the `ViewOverrides` type of
+ * `@wordpress/views`, which is not exported.
+ */
+export type ViewOverrides = Partial< Omit< View, 'type' | 'layout' > > & {
+	type?: View[ 'type' ];
+	layout?: Record< string, unknown >;
 };
 
-export const DEFAULT_LAYOUTS = {
-	table: {},
-	grid: {},
-	list: {},
-};
-
-export const DEFAULT_VIEWS: {
+export interface ViewListEntry {
+	title: string;
 	slug: string;
-	label: string;
-	view: View;
-}[] = [
-	{
-		slug: 'all',
-		label: 'All',
-		view: {
-			...DEFAULT_VIEW,
-		},
-	},
-	{
-		slug: 'publish',
-		label: 'Published',
-		view: {
-			...DEFAULT_VIEW,
-			filters: [
-				{
-					field: 'status',
-					operator: 'is',
-					value: 'publish',
-				},
-			],
-		},
-	},
-	{
-		slug: 'draft',
-		label: 'Draft',
-		view: {
-			...DEFAULT_VIEW,
-			filters: [
-				{
-					field: 'status',
-					operator: 'is',
-					value: 'draft',
-				},
-			],
-		},
-	},
-	{
-		slug: 'pending',
-		label: 'Pending',
-		view: {
-			...DEFAULT_VIEW,
-			filters: [
-				{
-					field: 'status',
-					operator: 'is',
-					value: 'pending',
-				},
-			],
-		},
-	},
-	{
-		slug: 'private',
-		label: 'Private',
-		view: {
-			...DEFAULT_VIEW,
-			filters: [
-				{
-					field: 'status',
-					operator: 'is',
-					value: 'private',
-				},
-			],
-		},
-	},
-	{
-		slug: 'trash',
-		label: 'Trash',
-		view: {
-			...DEFAULT_VIEW,
-			filters: [
-				{
-					field: 'status',
-					operator: 'is',
-					value: 'trash',
-				},
-			],
-		},
-	},
-];
+	view?: ViewOverrides;
+}
 
-export function getDefaultView(
-	postType: Type | undefined,
-	slug?: string
-): View {
-	// Find the view configuration by slug
-	const viewConfig = DEFAULT_VIEWS.find( ( v ) => v.slug === slug );
+interface EntityViewConfig {
+	default_view: View | undefined;
+	default_layouts: SupportedLayouts | undefined;
+	view_list: ViewListEntry[] | undefined;
+}
 
-	// Use the view from the config if found, otherwise use default
-	const baseView = viewConfig?.view || DEFAULT_VIEW;
-
+/**
+ * Resolves the server-provided view configuration for the given post type,
+ * for use in the route loader that runs outside React (where `useViewConfig`
+ * is unavailable).
+ *
+ * @param postType The post type name.
+ * @return The entity view configuration.
+ */
+export async function loadPostTypeViewConfig(
+	postType: string
+): Promise< EntityViewConfig > {
+	const config = await unlock( resolveSelect( coreStore ) ).getViewConfig(
+		'postType',
+		postType
+	);
 	return {
-		...baseView,
-		showLevels: postType?.hierarchical,
+		default_view: config?.default_view,
+		default_layouts: config?.default_layouts,
+		view_list: config?.view_list,
 	};
+}
+
+/**
+ * Returns the view overrides of the entry in the view list matching the
+ * given slug, or an empty object when there is none.
+ *
+ * @param viewList The `view_list` of an entity view configuration.
+ * @param slug     Slug of the active view.
+ * @return The view overrides for the active view.
+ */
+export function getActiveViewOverrides(
+	viewList: ViewListEntry[] | undefined,
+	slug: string
+): ViewOverrides {
+	return viewList?.find( ( v ) => v.slug === slug )?.view ?? {};
 }
 
 export async function ensureView(
@@ -130,19 +67,28 @@ export async function ensureView(
 	slug?: string,
 	search?: { page?: number; search?: string }
 ) {
-	const postTypeObject = await resolveSelect( coreStore ).getPostType( type );
-	const defaultView = getDefaultView( postTypeObject, slug );
+	const {
+		default_view: defaultView,
+		default_layouts: defaultLayouts,
+		view_list: viewList,
+	} = await loadPostTypeViewConfig( type );
+	if ( ! defaultView ) {
+		throw new Error(
+			`Missing view configuration for the ${ type } post type.`
+		);
+	}
 	return loadView( {
 		kind: 'postType',
 		name: type,
-		slug: slug ?? 'all',
+		slug: 'default-new',
 		defaultView,
+		defaultLayouts,
+		activeViewOverrides: getActiveViewOverrides( viewList, slug ?? 'all' ),
 		queryParams: search,
 	} );
 }
-
 export function viewToQuery( view: View, postType: string ) {
-	const result: Record< string, any > = {};
+	const result: Record< string, any > = { _embed: 'author,wp:featuredmedia' };
 
 	// Pagination, sorting, search.
 	if ( undefined !== view.perPage ) {

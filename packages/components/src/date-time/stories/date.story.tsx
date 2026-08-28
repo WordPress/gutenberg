@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState, useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import DatePicker from '../date';
+import DatePicker from '../date-picker';
 import { daysFromNow, isWeekend } from './utils';
 
 const meta: Meta< typeof DatePicker > = {
@@ -25,6 +14,11 @@ const meta: Meta< typeof DatePicker > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Consider using a `TextControl` with `type="date"` or `type="datetime-local"` instead.',
+		},
 	},
 };
 export default meta;

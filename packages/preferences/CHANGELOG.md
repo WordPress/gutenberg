@@ -2,6 +2,66 @@
 
 ## Unreleased
 
+### Internal
+
+-   Remove unused dependency `clsx` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+
+## 4.54.0 (2026-08-26)
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 4.53.0 (2026-08-12)
+
+### Internal
+
+-   Remove unused `isAction` prop from preferences modal tab buttons (`Item` has ignored it since it was replaced by `onClick`) ([#80705](https://github.com/WordPress/gutenberg/pull/80705)).
+
+## 4.52.0 (2026-07-29)
+
+### Internal
+
+-   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).
+
+## 4.51.0 (2026-07-14)
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 4.50.0 (2026-07-01)
+
+## 4.49.0 (2026-06-24)
+
+## 4.48.1 (2026-06-16)
+
+## 4.48.0 (2026-06-10)
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+### Documentation
+
+-   Fix documentation typos ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
+
+## 4.47.0 (2026-05-27)
+
+## 4.46.0 (2026-05-14)
+
+## 4.45.0 (2026-04-29)
+
+## 4.44.0 (2026-04-15)
+
+## 4.43.0 (2026-04-01)
+
+## 4.42.0 (2026-03-18)
+
+## 4.41.0 (2026-03-04)
+
+## 4.40.0 (2026-02-18)
+
 ## 4.39.0 (2026-01-29)
 
 ## 4.38.0 (2026-01-16)
@@ -14,7 +74,7 @@
 
 ### Internal
 
-- TypeScript conversion
+-   TypeScript conversion
 
 ## 4.33.0 (2025-10-17)
 

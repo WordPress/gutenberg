@@ -1,19 +1,10 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import type { ComponentProps } from 'react';
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import FormTokenField from '../';
 
 const meta: Meta< typeof FormTokenField > = {
+	tags: [ 'manifest' ],
 	component: FormTokenField,
 	title: 'Components/Selection & Input/Common/FormTokenField',
 	id: 'components-formtokenfield',
@@ -24,12 +15,18 @@ const meta: Meta< typeof FormTokenField > = {
 		__experimentalValidateInput: {
 			control: false,
 		},
+		help: { control: 'text' },
 	},
 	parameters: {
 		controls: {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `SearchableChipSelect` in `@wordpress/ui`, but continue using for now.',
+		},
 	},
 };
 export default meta;
@@ -50,7 +47,6 @@ const DefaultTemplate: StoryFn< typeof FormTokenField > = ( { ...args } ) => {
 
 	return (
 		<FormTokenField
-			__next40pxDefaultSize
 			{ ...args }
 			value={ selectedContinents }
 			onChange={ ( tokens ) => setSelectedContinents( tokens ) }
@@ -64,7 +60,6 @@ export const Default: StoryFn< typeof FormTokenField > = DefaultTemplate.bind(
 Default.args = {
 	label: 'Type a continent',
 	suggestions: continents,
-	__next40pxDefaultSize: true,
 };
 
 export const Async: StoryFn< typeof FormTokenField > = ( {
@@ -91,7 +86,6 @@ export const Async: StoryFn< typeof FormTokenField > = ( {
 
 	return (
 		<FormTokenField
-			__next40pxDefaultSize
 			{ ...args }
 			value={ selectedContinents }
 			suggestions={ availableContinents }
@@ -103,7 +97,6 @@ export const Async: StoryFn< typeof FormTokenField > = ( {
 Async.args = {
 	label: 'Type a continent',
 	suggestions: continents,
-	__next40pxDefaultSize: true,
 };
 
 export const DropdownSelector: StoryFn< typeof FormTokenField > =

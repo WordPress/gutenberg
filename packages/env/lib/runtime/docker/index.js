@@ -1,23 +1,14 @@
 'use strict';
-/**
- * External dependencies
- */
 const { spawn, execSync } = require( 'child_process' );
 const path = require( 'path' );
 const util = require( 'util' );
+const exec = util.promisify( require( 'child_process' ).exec );
 const { v2: dockerCompose } = require( 'docker-compose' );
 const { rimraf } = require( 'rimraf' );
-
-/**
- * Promisified dependencies
- */
-const sleep = util.promisify( setTimeout );
-const exec = util.promisify( require( 'child_process' ).exec );
-
-/**
- * Internal dependencies
- */
-const initConfig = require( './init-config' );
+const {
+	writeDockerFiles,
+	ensureDockerInitialized,
+} = require( './docker-config' );
 const getHostUser = require( './get-host-user' );
 const downloadSources = require( './download-sources' );
 const downloadWPPHPUnit = require( './download-wp-phpunit' );
@@ -26,7 +17,6 @@ const {
 	validateRunContainer,
 } = require( './validate-run-container' );
 const {
-	checkDatabaseConnection,
 	configureWordPress,
 	resetDatabase,
 	setupWordPressDirectories,
@@ -96,20 +86,15 @@ class DockerRuntime {
 	 * @param {Object}   options         Start options.
 	 * @param {Object}   options.spinner A CLI spinner which indicates progress.
 	 * @param {boolean}  options.update  If true, update sources.
-	 * @param {string}   options.xdebug  The Xdebug mode to set.
-	 * @param {string}   options.spx     The SPX mode to set.
-	 * @param {boolean}  options.debug   True if debug mode is enabled.
 	 * @return {Promise<Object>} Result object with message and siteUrl.
 	 */
-	async start( config, { spinner, update, xdebug, spx, debug } ) {
-		// Initialize Docker-specific files (docker-compose.yml, Dockerfiles)
-		const fullConfig = await initConfig( {
-			spinner,
-			debug,
-			xdebug,
-			spx,
-			writeChanges: true,
-		} );
+	async start( config, { spinner, update } ) {
+		// Write Docker-specific files (docker-compose.yml, Dockerfiles).
+		// The config already has ports resolved and xdebug/spx set by start.js.
+		const fullConfig = await writeDockerFiles( config );
+		const debug = fullConfig.debug;
+
+		const testsEnabled = config.testsEnvironment !== false;
 
 		// Check if the hash of the config has changed. If so, run configuration.
 		const configHash = md5( fullConfig );
@@ -139,13 +124,19 @@ class DockerRuntime {
 		 * the container before continuing allows the docker entrypoint script,
 		 * which restores the files, to run again when we start the containers.
 		 *
-		 * Additionally, this serves as a way to restart the container entirely
-		 * should the need arise.
+		 * Additionally, --remove-orphans ensures containers from services that
+		 * were removed in the new config (e.g., tests-* after setting
+		 * testsEnvironment: false) are properly stopped.
 		 *
 		 * @see https://github.com/WordPress/gutenberg/pull/20253#issuecomment-587228440
 		 */
 		if ( shouldConfigureWp ) {
-			await this.stop( fullConfig, { spinner, debug } );
+			spinner.text = 'Stopping WordPress.';
+			await dockerCompose.down( {
+				config: dockerComposeConfigPath,
+				log: debug,
+				commandOptions: [ '--remove-orphans' ],
+			} );
 			// Update the images before starting the services again.
 			spinner.text = 'Updating docker images.';
 
@@ -156,7 +147,9 @@ class DockerRuntime {
 			// as docker volumes, simply updating the image will not change those
 			// files. Thus, we need to remove those volumes in order for the files
 			// to be updated when pulling the new images.
-			const volumesToRemove = `${ directoryHash }_wordpress ${ directoryHash }_tests-wordpress`;
+			const volumesToRemove = testsEnabled
+				? `${ directoryHash }_wordpress ${ directoryHash }_tests-wordpress`
+				: `${ directoryHash }_wordpress`;
 
 			try {
 				if ( fullConfig.debug ) {
@@ -169,12 +162,26 @@ class DockerRuntime {
 				// stop wp-env from working correctly.
 			}
 
-			await dockerCompose.pullAll( dockerComposeConfig );
+			try {
+				await dockerCompose.pullAll( dockerComposeConfig );
+			} catch {
+				// Note: pulling the images requires connecting to the Docker
+				// registry, which may be unavailable (e.g., offline or an
+				// outage). Locally cached images will be used instead, so this
+				// error should not stop wp-env from working correctly.
+				spinner.info(
+					'Could not pull docker images; using cached images instead.'
+				);
+			}
 			spinner.text = 'Downloading sources.';
 		}
 
+		const mysqlServices = [ 'mysql' ];
+		if ( testsEnabled ) {
+			mysqlServices.push( 'tests-mysql' );
+		}
 		await Promise.all( [
-			dockerCompose.upOne( 'mysql', {
+			dockerCompose.upMany( mysqlServices, {
 				...dockerComposeConfig,
 				commandOptions: shouldConfigureWp
 					? [ '--build', '--force-recreate' ]
@@ -189,39 +196,46 @@ class DockerRuntime {
 			await setupWordPressDirectories( fullConfig );
 
 			// Use the WordPress versions to download the PHPUnit suite.
-			const wpVersions = await Promise.all( [
+			const wpVersionPromises = [
 				readWordPressVersion(
 					fullConfig.env.development.coreSource,
 					spinner,
 					debug
 				),
-				readWordPressVersion(
-					fullConfig.env.tests.coreSource,
-					spinner,
-					debug
-				),
-			] );
-			await downloadWPPHPUnit(
-				fullConfig,
-				{ development: wpVersions[ 0 ], tests: wpVersions[ 1 ] },
-				spinner,
-				debug
-			);
+			];
+			if ( testsEnabled ) {
+				wpVersionPromises.push(
+					readWordPressVersion(
+						fullConfig.env.tests.coreSource,
+						spinner,
+						debug
+					)
+				);
+			}
+			const wpVersions = await Promise.all( wpVersionPromises );
+			const wpVersionMap = {
+				development: wpVersions[ 0 ],
+			};
+			if ( testsEnabled ) {
+				wpVersionMap.tests = wpVersions[ 1 ];
+			}
+			await downloadWPPHPUnit( fullConfig, wpVersionMap, spinner, debug );
 		}
 
 		spinner.text = 'Starting WordPress.';
 
-		await dockerCompose.upMany(
-			[ 'wordpress', 'tests-wordpress', 'cli', 'tests-cli' ],
-			{
-				...dockerComposeConfig,
-				commandOptions: shouldConfigureWp
-					? [ '--build', '--force-recreate' ]
-					: [],
-			}
-		);
+		const wpServices = [ 'wordpress', 'cli' ];
+		if ( testsEnabled ) {
+			wpServices.push( 'tests-wordpress', 'tests-cli' );
+		}
+		await dockerCompose.upMany( wpServices, {
+			...dockerComposeConfig,
+			commandOptions: shouldConfigureWp
+				? [ '--build', '--force-recreate' ]
+				: [],
+		} );
 
-		if ( fullConfig.env.development.phpmyadminPort ) {
+		if ( fullConfig.env.development.phpmyadmin ) {
 			await dockerCompose.upOne( 'phpmyadmin', {
 				...dockerComposeConfig,
 				commandOptions: shouldConfigureWp
@@ -230,7 +244,7 @@ class DockerRuntime {
 			} );
 		}
 
-		if ( fullConfig.env.tests.phpmyadminPort ) {
+		if ( testsEnabled && fullConfig.env.tests.phpmyadmin ) {
 			await dockerCompose.upOne( 'tests-phpmyadmin', {
 				...dockerComposeConfig,
 				commandOptions: shouldConfigureWp
@@ -250,21 +264,8 @@ class DockerRuntime {
 		if ( shouldConfigureWp ) {
 			spinner.text = 'Configuring WordPress.';
 
-			try {
-				await checkDatabaseConnection( fullConfig );
-			} catch ( error ) {
-				// Wait 30 seconds for MySQL to accept connections.
-				await retry( () => checkDatabaseConnection( fullConfig ), {
-					times: 30,
-					delay: 1000,
-				} );
-
-				// It takes 3-4 seconds for MySQL to be ready after it starts accepting connections.
-				await sleep( 4000 );
-			}
-
 			// Retry WordPress installation in case MySQL *still* wasn't ready.
-			await Promise.all( [
+			const configTasks = [
 				retry(
 					() =>
 						configureWordPress(
@@ -276,13 +277,19 @@ class DockerRuntime {
 						times: 2,
 					}
 				),
-				retry(
-					() => configureWordPress( 'tests', fullConfig, spinner ),
-					{
-						times: 2,
-					}
-				),
-			] );
+			];
+			if ( testsEnabled ) {
+				configTasks.push(
+					retry(
+						() =>
+							configureWordPress( 'tests', fullConfig, spinner ),
+						{
+							times: 2,
+						}
+					)
+				);
+			}
+			await Promise.all( configTasks );
 
 			// Set the cache key once everything has been configured.
 			await setCache( CONFIG_CACHE_KEY, configHash, {
@@ -292,7 +299,6 @@ class DockerRuntime {
 
 		// Get port information for the result message
 		const siteUrl = fullConfig.env.development.config.WP_SITEURL;
-		const testsSiteUrl = fullConfig.env.tests.config.WP_SITEURL;
 
 		const mySQLPort = await this._getPublicDockerPort(
 			'mysql',
@@ -300,23 +306,9 @@ class DockerRuntime {
 			dockerComposeConfig
 		);
 
-		const testsMySQLPort = await this._getPublicDockerPort(
-			'tests-mysql',
-			3306,
-			dockerComposeConfig
-		);
-
-		const phpmyadminPort = fullConfig.env.development.phpmyadminPort
+		const phpmyadminPort = fullConfig.env.development.phpmyadmin
 			? await this._getPublicDockerPort(
 					'phpmyadmin',
-					80,
-					dockerComposeConfig
-			  )
-			: null;
-
-		const testsPhpmyadminPort = fullConfig.env.tests.phpmyadminPort
-			? await this._getPublicDockerPort(
-					'tests-phpmyadmin',
 					80,
 					dockerComposeConfig
 			  )
@@ -325,20 +317,39 @@ class DockerRuntime {
 		const message = [
 			'WordPress development site started' +
 				( siteUrl ? ` at ${ siteUrl }` : '.' ),
-			'WordPress test site started' +
-				( testsSiteUrl ? ` at ${ testsSiteUrl }` : '.' ),
 			`MySQL is listening on port ${ mySQLPort }`,
-			`MySQL for automated testing is listening on port ${ testsMySQLPort }`,
 			phpmyadminPort &&
 				`phpMyAdmin started at http://localhost:${ phpmyadminPort }`,
-			testsPhpmyadminPort &&
-				`phpMyAdmin for automated testing started at http://localhost:${ testsPhpmyadminPort }`,
-		]
-			.filter( Boolean )
-			.join( '\n' );
+		];
+
+		if ( testsEnabled ) {
+			const testsSiteUrl = fullConfig.env.tests.config.WP_SITEURL;
+			const testsMySQLPort = await this._getPublicDockerPort(
+				'tests-mysql',
+				3306,
+				dockerComposeConfig
+			);
+			const testsPhpmyadminPort = fullConfig.env.tests.phpmyadmin
+				? await this._getPublicDockerPort(
+						'tests-phpmyadmin',
+						80,
+						dockerComposeConfig
+				  )
+				: null;
+
+			message.push(
+				'WordPress test site started' +
+					( testsSiteUrl ? ` at ${ testsSiteUrl }` : '.' ),
+				`MySQL for automated testing is listening on port ${ testsMySQLPort }`,
+				testsPhpmyadminPort &&
+					`phpMyAdmin for automated testing started at http://localhost:${ testsPhpmyadminPort }`
+			);
+		}
+
+		const formattedMessage = message.filter( Boolean ).join( '\n' );
 
 		return {
-			message,
+			message: formattedMessage,
 			siteUrl,
 		};
 	}
@@ -370,6 +381,15 @@ class DockerRuntime {
 	}
 
 	/**
+	 * Get the warning message for cleanup confirmation.
+	 *
+	 * @return {string} Warning message.
+	 */
+	getCleanupWarningMessage() {
+		return 'WARNING! This will remove Docker containers, volumes, networks, and local files associated with the WordPress instance. Docker images will be preserved.';
+	}
+
+	/**
 	 * Stop the Docker containers.
 	 *
 	 * @param {WPConfig} config          The wp-env config object.
@@ -378,15 +398,12 @@ class DockerRuntime {
 	 * @param {boolean}  options.debug   True if debug mode is enabled.
 	 */
 	async stop( config, { spinner, debug } ) {
-		const { dockerComposeConfigPath } = await initConfig( {
-			spinner,
-			debug,
-		} );
+		ensureDockerInitialized( config, spinner );
 
 		spinner.text = 'Stopping WordPress.';
 
 		await dockerCompose.down( {
-			config: dockerComposeConfigPath,
+			config: config.dockerComposeConfigPath,
 			log: debug,
 		} );
 
@@ -413,7 +430,8 @@ class DockerRuntime {
 		spinner.text = 'Removing local files.';
 		// Note: there is a race condition where docker compose actually hasn't finished
 		// by this point, which causes rimraf to fail. We need to wait at least 2.5-5s,
-		// but using 10s in case it's dependant on the machine.
+		// but using 10s in case it's dependent on the machine. Removing images takes
+		// longer so we use a longer wait time here.
 		await new Promise( ( resolve ) => setTimeout( resolve, 10000 ) );
 		await rimraf( config.workDirectoryPath );
 
@@ -421,52 +439,101 @@ class DockerRuntime {
 	}
 
 	/**
-	 * Clean/reset the WordPress database.
+	 * Cleanup the Docker containers and remove local files, but preserve images.
+	 *
+	 * @param {WPConfig} config          The wp-env config object.
+	 * @param {Object}   options         Cleanup options.
+	 * @param {Object}   options.spinner A CLI spinner which indicates progress.
+	 * @param {boolean}  options.debug   True if debug mode is enabled.
+	 */
+	async cleanup( config, { spinner, debug } ) {
+		spinner.text = 'Removing docker containers, volumes, and networks.';
+
+		await dockerCompose.down( {
+			config: config.dockerComposeConfigPath,
+			commandOptions: [ '--volumes', '--remove-orphans' ],
+			log: debug,
+		} );
+
+		spinner.text = 'Removing local files.';
+		// Note: there is a race condition where docker compose actually hasn't finished
+		// by this point, which causes rimraf to fail. We need to wait at least 2.5-5s,
+		// but since we're not removing images, the wait can be shorter.
+		await new Promise( ( resolve ) => setTimeout( resolve, 3000 ) );
+		await rimraf( config.workDirectoryPath );
+
+		spinner.text = 'Cleaned up WordPress environment.';
+	}
+
+	/**
+	 * Reset the WordPress database.
 	 *
 	 * @param {WPConfig} config              The wp-env config object.
-	 * @param {Object}   options             Clean options.
-	 * @param {string}   options.environment The environment to clean.
+	 * @param {Object}   options             Reset options.
+	 * @param {string}   options.environment The environment to reset.
 	 * @param {Object}   options.spinner     A CLI spinner which indicates progress.
 	 * @param {boolean}  options.debug       True if debug mode is enabled.
 	 */
 	async clean( config, { environment, spinner, debug } ) {
-		const fullConfig = await initConfig( { spinner, debug } );
+		ensureDockerInitialized( config, spinner );
+
+		const testsEnabled = config.testsEnvironment !== false;
+
+		if ( ! testsEnabled && environment === 'tests' ) {
+			throw new Error(
+				'Cannot reset the tests environment because it is disabled in the configuration.'
+			);
+		}
 
 		const description = `${ environment } environment${
 			environment === 'all' ? 's' : ''
 		}`;
-		spinner.text = `Cleaning ${ description }.`;
+		spinner.text = `Resetting ${ description }.`;
 
 		const tasks = [];
 
-		// Start the database first to avoid race conditions where all tasks create
-		// different docker networks with the same name.
-		await dockerCompose.upOne( 'mysql', {
-			config: fullConfig.dockerComposeConfigPath,
-			log: fullConfig.debug,
+		// Start the appropriate MySQL service(s) first to avoid race conditions
+		// where parallel tasks try to create docker networks with the same name.
+		// The dependency chain (cli -> wordpress -> mysql with service_healthy)
+		// ensures MySQL is ready before database operations run.
+		const mysqlServices = [];
+		if ( environment === 'all' || environment === 'development' ) {
+			mysqlServices.push( 'mysql' );
+		}
+		if (
+			testsEnabled &&
+			( environment === 'all' || environment === 'tests' )
+		) {
+			mysqlServices.push( 'tests-mysql' );
+		}
+
+		await dockerCompose.upMany( mysqlServices, {
+			config: config.dockerComposeConfigPath,
+			log: debug,
 		} );
 
 		if ( environment === 'all' || environment === 'development' ) {
 			tasks.push(
-				resetDatabase( 'development', fullConfig )
-					.then( () =>
-						configureWordPress( 'development', fullConfig )
-					)
+				resetDatabase( 'development', config )
+					.then( () => configureWordPress( 'development', config ) )
 					.catch( () => {} )
 			);
 		}
 
-		if ( environment === 'all' || environment === 'tests' ) {
+		if (
+			testsEnabled &&
+			( environment === 'all' || environment === 'tests' )
+		) {
 			tasks.push(
-				resetDatabase( 'tests', fullConfig )
-					.then( () => configureWordPress( 'tests', fullConfig ) )
+				resetDatabase( 'tests', config )
+					.then( () => configureWordPress( 'tests', config ) )
 					.catch( () => {} )
 			);
 		}
 
 		await Promise.all( tasks );
 
-		spinner.text = `Cleaned ${ description }.`;
+		spinner.text = `Reset ${ description }.`;
 	}
 
 	/**
@@ -487,24 +554,27 @@ class DockerRuntime {
 	 * @param {string[]} options.command   The command to run.
 	 * @param {string}   options.envCwd    The working directory.
 	 * @param {Object}   options.spinner   A CLI spinner which indicates progress.
-	 * @param {boolean}  options.debug     True if debug mode is enabled.
 	 */
-	async run( config, { container, command, envCwd, spinner, debug } ) {
+	async run( config, { container, command, envCwd, spinner } ) {
 		// Validate the container name (throws for deprecated containers)
 		validateRunContainer( container );
 
-		const fullConfig = await initConfig( { spinner, debug } );
+		if (
+			config.testsEnvironment === false &&
+			container.startsWith( 'tests-' )
+		) {
+			throw new Error(
+				`Cannot run commands on "${ container }" because the tests environment is disabled in the configuration.`
+			);
+		}
+
+		ensureDockerInitialized( config, spinner );
 
 		// Shows a contextual tip for the given command.
 		const joinedCommand = command.join( ' ' );
 		this._showCommandTips( joinedCommand, container, spinner );
 
-		await this._spawnCommandDirectly(
-			fullConfig,
-			container,
-			command,
-			envCwd
-		);
+		await this._spawnCommandDirectly( config, container, command, envCwd );
 
 		spinner.text = `Ran \`${ joinedCommand }\` in '${ container }'.`;
 	}
@@ -517,10 +587,17 @@ class DockerRuntime {
 	 * @param {string}   options.environment The environment to show logs for.
 	 * @param {boolean}  options.watch       If true, follow along with log output.
 	 * @param {Object}   options.spinner     A CLI spinner which indicates progress.
-	 * @param {boolean}  options.debug       True if debug mode is enabled.
 	 */
-	async logs( config, { environment, watch, spinner, debug } ) {
-		const fullConfig = await initConfig( { spinner, debug } );
+	async logs( config, { environment, watch, spinner } ) {
+		ensureDockerInitialized( config, spinner );
+
+		const testsEnabled = config.testsEnvironment !== false;
+
+		if ( ! testsEnabled && environment === 'tests' ) {
+			throw new Error(
+				'Cannot show logs for the tests environment because it is disabled in the configuration.'
+			);
+		}
 
 		// If we show text while watching the logs, it will continue showing up every
 		// few lines in the logs as they happen, which isn't a good look. So only
@@ -529,15 +606,21 @@ class DockerRuntime {
 			spinner.text = `Showing logs for the ${ environment } environment.`;
 		}
 
-		const servicesToWatch =
-			environment === 'all'
+		let servicesToWatch;
+		if ( environment === 'all' ) {
+			servicesToWatch = testsEnabled
 				? [ 'tests-wordpress', 'wordpress' ]
-				: [ environment === 'tests' ? 'tests-wordpress' : 'wordpress' ];
+				: [ 'wordpress' ];
+		} else {
+			servicesToWatch = [
+				environment === 'tests' ? 'tests-wordpress' : 'wordpress',
+			];
+		}
 
 		const output = await Promise.all( [
 			...servicesToWatch.map( ( service ) =>
 				dockerCompose.logs( service, {
-					config: fullConfig.dockerComposeConfigPath,
+					config: config.dockerComposeConfigPath,
 					log: watch, // Must log inline if we are watching the log output.
 					commandOptions: watch ? [ '--follow' ] : [],
 				} )
@@ -589,14 +672,17 @@ class DockerRuntime {
 	async getStatus( config, { spinner, debug } ) {
 		spinner.text = 'Getting environment status.';
 
-		const fullConfig = await initConfig( { spinner, debug } );
+		ensureDockerInitialized( config, spinner );
+
 		const dockerComposeConfig = {
-			config: fullConfig.dockerComposeConfigPath,
+			config: config.dockerComposeConfigPath,
 			log: debug,
 		};
 
 		// Check if containers are running by trying to get a port.
 		let isRunning = false;
+		let developmentPort = null;
+		let testsPort = null;
 		let mySQLPort = null;
 		let phpmyadminPort = null;
 
@@ -608,7 +694,19 @@ class DockerRuntime {
 			);
 			isRunning = true;
 
-			if ( fullConfig.env.development.phpmyadminPort ) {
+			developmentPort = await this._getPublicDockerPort(
+				'wordpress',
+				80,
+				dockerComposeConfig
+			);
+
+			testsPort = await this._getPublicDockerPort(
+				'tests-wordpress',
+				80,
+				dockerComposeConfig
+			);
+
+			if ( config.env.development.phpmyadmin ) {
 				phpmyadminPort = await this._getPublicDockerPort(
 					'phpmyadmin',
 					80,
@@ -619,7 +717,9 @@ class DockerRuntime {
 			// Containers are not running.
 		}
 
-		const siteUrl = fullConfig.env.development.config.WP_SITEURL;
+		const siteUrl = config.env.development.config.WP_SITEURL;
+
+		const testsEnabled = config.testsEnvironment !== false;
 
 		return {
 			status: isRunning ? 'running' : 'stopped',
@@ -632,16 +732,18 @@ class DockerRuntime {
 						: null,
 			},
 			ports: {
-				development: fullConfig.env.development.port,
-				tests: fullConfig.env.tests.port,
+				development: developmentPort,
+				...( testsEnabled && {
+					tests: testsPort,
+				} ),
 				mysql: mySQLPort,
 			},
 			config: {
-				multisite: fullConfig.env.development.multisite,
-				xdebug: fullConfig.xdebug || 'off',
+				multisite: config.env.development.multisite,
+				xdebug: config.xdebug || 'off',
 			},
-			configPath: fullConfig.configDirectoryPath,
-			installPath: fullConfig.workDirectoryPath,
+			configPath: config.configDirectoryPath,
+			installPath: config.workDirectoryPath,
 		};
 	}
 

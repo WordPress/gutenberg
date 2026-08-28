@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import type { ComponentProps } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { BorderControl } from '..';
 import type { Border } from '../types';
 
@@ -28,6 +17,10 @@ const meta: Meta< typeof BorderControl > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'editor',
+		},
 	},
 };
 export default meta;
@@ -82,7 +75,6 @@ const Template: StoryFn< typeof BorderControl > = ( {
 
 	return (
 		<BorderControl
-			__next40pxDefaultSize
 			onChange={ onChangeMerged }
 			value={ border }
 			{ ...props }
@@ -94,7 +86,6 @@ export const Default = Template.bind( {} );
 Default.args = {
 	colors,
 	label: 'Border',
-	__next40pxDefaultSize: true,
 	enableAlpha: true,
 	enableStyle: true,
 	shouldSanitizeBorder: true,

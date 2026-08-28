@@ -1,14 +1,35 @@
-import { Fragment, useState } from '@wordpress/element';
+import { Fragment } from '@wordpress/element';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { cog } from '@wordpress/icons';
+import { wordpress } from '@wordpress/icons';
+import {
+	displayShortcut,
+	shortcutAriaLabel,
+	ariaKeyShortcut,
+} from '@wordpress/keycodes';
+import {
+	KeyboardShortcutDescription,
+	KeyboardShortcutDisplay,
+	useKeyboardShortcutProps,
+} from '@wordpress/ui';
 import { Button } from '../index';
+import * as Tooltip from '../../tooltip';
 
 const meta: Meta< typeof Button > = {
 	title: 'Design System/Components/Button',
 	component: Button,
+	subcomponents: {
+		'Button.Icon': Button.Icon,
+	},
 	argTypes: {
 		'aria-pressed': {
 			control: { type: 'boolean' },
+		},
+	},
+	parameters: {
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components` and text overflow behavior. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };
@@ -85,8 +106,8 @@ export const AllTonesAndVariants: Story = {
 		<div
 			style={ {
 				display: 'grid',
-				gridTemplateColumns: 'max-content repeat(2, min-content)',
-				color: 'var(--wpds-color-fg-content-neutral)',
+				gridTemplateColumns: 'max-content repeat(2, max-content)',
+				color: 'var(--wpds-color-foreground-content-neutral)',
 			} }
 		>
 			<div></div>
@@ -146,12 +167,7 @@ export const WithIcon: Story = {
 	...Default,
 	args: {
 		...Default.args,
-		children: (
-			<>
-				<Button.Icon icon={ cog } />
-				Button
-			</>
-		),
+		children: [ <Button.Icon icon={ wordpress } key="icon" />, 'Button' ],
 	},
 };
 
@@ -166,8 +182,7 @@ export const Loading: Story = {
 
 /**
  * The pressed state is only available for buttons with `tone="neutral"` and
- * `variant="minimal"`. This represents a toggle button that is currently in an
- * active/pressed state.
+ * `variant="minimal"` and can be toggled via the `aria-pressed` HTML attribute.
  */
 export const Pressed: Story = {
 	...Default,
@@ -175,18 +190,57 @@ export const Pressed: Story = {
 		...Default.args,
 		tone: 'neutral',
 		variant: 'minimal',
+		'aria-pressed': true,
 	},
-	render: ( args ) => {
-		const [ isPressed, setIsPressed ] = useState( true );
+};
+
+/**
+ * `Button` has no dedicated `shortcut` prop. Use the keyboard shortcut
+ * utilities to compose a visual hint in the tooltip, `aria-keyshortcuts` for
+ * assistive technology, and a visually hidden description. Consumers remain
+ * responsible for registering the shortcut and handling the corresponding
+ * keyboard event.
+ */
+export const WithKeyboardShortcut: Story = {
+	args: {
+		children: 'Save',
+	},
+	render: ( {
+		children,
+		'aria-describedby': consumerDescribedBy,
+		'aria-keyshortcuts': consumerKeyShortcuts,
+		...args
+	} ) => {
+		const shortcut = {
+			displayShortcut: displayShortcut.primary( 's' ),
+			ariaKeyShortcut: ariaKeyShortcut.primary( 's' ),
+			label: shortcutAriaLabel.primary( 's' ),
+		};
+		const { descriptionId, targetProps } = useKeyboardShortcutProps( {
+			'aria-describedby': consumerDescribedBy,
+			'aria-keyshortcuts': consumerKeyShortcuts,
+			shortcut,
+		} );
 
 		return (
-			<Button
-				{ ...args }
-				aria-pressed={ isPressed }
-				onClick={ () => setIsPressed( ! isPressed ) }
-			>
-				Button
-			</Button>
+			<Tooltip.Root>
+				<Tooltip.Trigger
+					render={ <Button { ...args } /> }
+					{ ...targetProps }
+				>
+					{ children }
+					{ descriptionId && (
+						<KeyboardShortcutDescription
+							descriptionId={ descriptionId }
+							shortcut={ shortcut }
+						/>
+					) }
+				</Tooltip.Trigger>
+				<Tooltip.Popup>
+					{ children }{ ' ' }
+					<KeyboardShortcutDisplay shortcut={ shortcut } />
+				</Tooltip.Popup>
+			</Tooltip.Root>
 		);
 	},
 };

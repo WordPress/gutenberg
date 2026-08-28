@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	computeCaretRect,
 	focus,
@@ -9,16 +6,19 @@ import {
 	placeCaretAtHorizontalEdge,
 	placeCaretAtVerticalEdge,
 	isRTL,
+	isFormElement,
 } from '@wordpress/dom';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
-import { getBlockClientId, isInSameBlock } from '../../utils/dom';
+import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
+import {
+	getBlockClientId,
+	getSelectionEditableElement,
+	isInSameBlock,
+} from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
+import { setContentEditableWrapper } from './utils';
 
 /**
  * Returns true if the element should consider edge navigation upon a keyboard
@@ -114,10 +114,6 @@ export function getClosestTabbable(
 	}
 
 	function isTabCandidate( node ) {
-		if ( node.closest( '[inert]' ) ) {
-			return;
-		}
-
 		// Skip if there's only one child that is content editable (and thus a
 		// better candidate).
 		if (
@@ -128,13 +124,41 @@ export function getClosestTabbable(
 			return;
 		}
 
+		// Wrappers that merge with the text flow dissolve into it: their
+		// content is the better candidate. Any other container is a
+		// boundary the caret stops on.
+		const blockType = getBlockType( node.getAttribute( 'data-type' ) );
+		if (
+			node.contentEditable !== 'true' &&
+			getBlockClientId( node ) &&
+			blockType &&
+			( blockType.merge ||
+				hasBlockSupport( blockType, '__experimentalOnMerge' ) ) &&
+			focus.focusable
+				.find( node )
+				// Exclude form elements for now because primary+a cannot be
+				// used to select the parent element.
+				.filter( ( element ) => ! isFormElement( element ) ).length !==
+				0
+		) {
+			return false;
+		}
+
 		// Not a candidate if the node is not tabbable.
 		if ( ! focus.tabbable.isTabbableIndex( node ) ) {
 			return false;
 		}
 
-		// Skip focusable elements such as links within content editable nodes.
-		if ( node.isContentEditable && node.contentEditable !== 'true' ) {
+		// Skip focusable elements such as links within content editable
+		// nodes: nodes whose closest editable host is an editable element
+		// within a block. When an editable root (e.g. the canvas wrapper)
+		// is the editing host, everything within it is content editable,
+		// but focusables like block wrappers are not text content.
+		if (
+			node.isContentEditable &&
+			node.contentEditable !== 'true' &&
+			getBlockClientId( node.closest( '[contenteditable="true"]' ) )
+		) {
 			return false;
 		}
 
@@ -159,11 +183,15 @@ export default function useArrowNav() {
 	const {
 		getMultiSelectedBlocksStartClientId,
 		getMultiSelectedBlocksEndClientId,
+		getNextBlockClientId,
+		getPreviousBlockClientId,
+		getSelectedBlockClientId,
+		getSelectionStart,
 		getSettings,
 		hasMultiSelection,
 		__unstableIsFullySelected,
 	} = useSelect( blockEditorStore );
-	const { selectBlock } = useDispatch( blockEditorStore );
+	const { selectBlock, multiSelect } = useDispatch( blockEditorStore );
 	return useRefEffect( ( node ) => {
 		// Here a DOMRect is stored while moving the caret vertically so
 		// vertical position of the start position can be restored. This is to
@@ -190,8 +218,17 @@ export default function useArrowNav() {
 				return;
 			}
 
-			const { keyCode, target, shiftKey, ctrlKey, altKey, metaKey } =
-				event;
+			const { keyCode, shiftKey, ctrlKey, altKey, metaKey } = event;
+			// When the wrapper is contentEditable and holds focus (the
+			// selected block supports `editableRoot`), the event targets the
+			// wrapper; resolve the editable element containing the selection.
+			const target =
+				( event.target === node &&
+					getSelectionEditableElement(
+						node.ownerDocument.defaultView.getSelection(),
+						node
+					) ) ||
+				event.target;
 			const isUp = keyCode === UP;
 			const isDown = keyCode === DOWN;
 			const isLeft = keyCode === LEFT;
@@ -218,6 +255,32 @@ export default function useArrowNav() {
 			// selection to the start or end of the selection.
 			if ( hasMultiSelection() ) {
 				if ( shiftKey ) {
+					// A fully selected multi-selection has no native
+					// selection to extend (use-multi-selection cleared it),
+					// so grow or shrink it by one block at the focus end.
+					// Only without a usable native selection: a selection
+					// that is fully selected because it resolves to a
+					// nesting ancestor keeps its native selection, which
+					// the browser extends natively (and the observer
+					// promotes to the common level).
+					const selection = defaultView.getSelection();
+					if (
+						__unstableIsFullySelected() &&
+						( ! selection.rangeCount || selection.isCollapsed )
+					) {
+						const anchorClientId =
+							getMultiSelectedBlocksStartClientId();
+						const focusClientId =
+							getMultiSelectedBlocksEndClientId();
+						const nextClientId = isReverse
+							? getPreviousBlockClientId( focusClientId )
+							: getNextBlockClientId( focusClientId );
+
+						if ( nextClientId ) {
+							multiSelect( anchorClientId, nextClientId );
+							event.preventDefault();
+						}
+					}
 					return;
 				}
 
@@ -235,6 +298,26 @@ export default function useArrowNav() {
 					selectBlock( getMultiSelectedBlocksEndClientId(), -1 );
 				}
 
+				return;
+			}
+
+			// A block selected without a text selection within it (e.g. an
+			// image or spacer) has no native selection to extend: start a
+			// block multi-selection with the adjacent block.
+			if (
+				shiftKey &&
+				getSelectedBlockClientId() &&
+				! getSelectionStart().attributeKey
+			) {
+				const selectedClientId = getSelectedBlockClientId();
+				const nextClientId = isReverse
+					? getPreviousBlockClientId( selectedClientId )
+					: getNextBlockClientId( selectedClientId );
+
+				if ( nextClientId ) {
+					multiSelect( selectedClientId, nextClientId );
+					event.preventDefault();
+				}
 				return;
 			}
 
@@ -263,13 +346,22 @@ export default function useArrowNav() {
 			const { keepCaretInsideBlock } = getSettings();
 
 			if ( shiftKey ) {
-				if (
-					isClosestTabbableABlock( target, isReverse ) &&
-					isNavEdge( target, isReverse )
-				) {
-					node.contentEditable = true;
-					// Firefox doesn't automatically move focus.
-					node.focus();
+				if ( isNavEdge( target, isReverse ) ) {
+					if ( isClosestTabbableABlock( target, isReverse ) ) {
+						setContentEditableWrapper( node, true );
+					} else if ( node.contentEditable === 'true' ) {
+						// There is no block to extend the selection into.
+						// Within an editable wrapper the selection could
+						// natively escape into surrounding editable elements
+						// (e.g. the post title), so keep it inside the block
+						// by extending it to the block's edge.
+						const selection = defaultView.getSelection();
+						selection.extend(
+							target,
+							isReverse ? 0 : target.childNodes.length
+						);
+						event.preventDefault();
+					}
 				}
 			} else if (
 				isVertical &&

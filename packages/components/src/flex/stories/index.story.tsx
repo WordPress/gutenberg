@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import { Flex, FlexItem, FlexBlock } from '../';
 import { View } from '../../view';
 
@@ -31,6 +24,11 @@ const meta: Meta< typeof Flex > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Planned for deprecation. For use cases not covered by [`Stack`](?path=/docs/design-system-components-stack--docs) from `@wordpress/ui`, write your own CSS.',
+		},
 	},
 };
 export default meta;

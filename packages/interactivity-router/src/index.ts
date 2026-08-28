@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { store, privateApis, getConfig } from '@wordpress/interactivity';
-
-/**
- * Internal dependencies
- */
 import { preloadStyles, applyStyles, type StyleElement } from './assets/styles';
 import {
 	preloadScriptModules,
@@ -16,7 +9,7 @@ import {
 
 const {
 	getRegionRootFragment,
-	initialVdom,
+	initialVdomPromise,
 	toVdom,
 	render,
 	parseServerData,
@@ -25,6 +18,8 @@ const {
 	routerRegions,
 	h: createElement,
 	navigationSignal,
+	sessionId,
+	warn,
 } = privateApis(
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
 );
@@ -48,7 +43,7 @@ export interface PrefetchOptions {
 }
 
 interface VdomParams {
-	vdom?: typeof initialVdom;
+	vdom?: WeakMap< Element, any >;
 }
 
 interface Page {
@@ -88,7 +83,7 @@ const parseRegionAttribute = ( region: Element ) => {
 	try {
 		const { id, attachTo } = JSON.parse( value );
 		return { id, attachTo };
-	} catch ( e ) {
+	} catch {
 		return { id: value };
 	}
 };
@@ -167,7 +162,7 @@ const fetchPage = async ( url: string, { html }: { html: string } ) => {
 		}
 		const dom = new window.DOMParser().parseFromString( html, 'text/html' );
 		return await preparePage( url, dom );
-	} catch ( e ) {
+	} catch {
 		return false;
 	}
 };
@@ -220,7 +215,7 @@ const preparePage: PreparePage = async ( url, dom, { vdom } = {} ) => {
 
 	// Wait for styles and modules to be ready.
 	const [ styles, scriptModules ] = await Promise.all( [
-		Promise.all( preloadStyles( dom, url ) ),
+		Promise.all( preloadStyles( dom ) ),
 		Promise.all( preloadScriptModules( dom ) ),
 	] );
 
@@ -359,14 +354,19 @@ document.querySelectorAll( regionsSelector ).forEach( ( region ) => {
 window.document
 	.querySelectorAll< HTMLScriptElement >( 'script[type=module][src]' )
 	.forEach( ( { src } ) => markScriptModuleAsResolved( src ) );
-pages.set(
-	getPagePath( window.location.href ),
-	Promise.resolve(
-		preparePage( getPagePath( window.location.href ), document, {
-			vdom: initialVdom,
-		} )
-	)
-);
+
+// Await hydration completion before setting the initial page to ensure initialVdom is populated.
+( async () => {
+	const initialVdomMap = await initialVdomPromise;
+	pages.set(
+		getPagePath( window.location.href ),
+		Promise.resolve(
+			preparePage( getPagePath( window.location.href ), document, {
+				vdom: initialVdomMap,
+			} )
+		)
+	);
+} )();
 
 // Variable to store the current navigation.
 let navigatingTo = '';
@@ -394,12 +394,28 @@ interface Store {
 	};
 }
 
+const { state: privateState } = store(
+	'core/router/private',
+	{
+		state: {
+			navigation: {
+				hasStarted: false,
+				hasFinished: false,
+			},
+		},
+	},
+	{ lock: true }
+);
+
 export const { state, actions } = store< Store >( 'core/router', {
 	state: {
-		url: window.location.href,
-		navigation: {
-			hasStarted: false,
-			hasFinished: false,
+		get navigation() {
+			if ( globalThis.SCRIPT_DEBUG ) {
+				warn(
+					`The usage of state.navigation.{hasStarted|hasFinished} from core/router is deprecated and will stop working in WordPress 7.1.`
+				);
+			}
+			return privateState.navigation;
 		},
 	},
 	actions: {
@@ -428,7 +444,7 @@ export const { state, actions } = store< Store >( 'core/router', {
 			}
 
 			const pagePath = getPagePath( href );
-			const { navigation } = state;
+			const { navigation } = privateState;
 			const {
 				loadingAnimation = true,
 				screenReaderAnnouncement = true,
@@ -498,7 +514,7 @@ export const { state, actions } = store< Store >( 'core/router', {
 
 				window.history[
 					options.replace ? 'replaceState' : 'pushState'
-				]( {}, '', href );
+				]( { wpInteractivityId: sessionId }, '', href );
 
 				if ( screenReaderAnnouncement ) {
 					a11ySpeak( 'loaded' );
@@ -546,6 +562,9 @@ export const { state, actions } = store< Store >( 'core/router', {
 	},
 } );
 
+// Initialize the URL in the state if it hasn't been set yet in the server.
+state.url = state.url || window.location.href;
+
 /**
  * Announces a message to screen readers.
  *
@@ -574,14 +593,14 @@ function a11ySpeak( messageKey: keyof typeof navigationTexts ) {
 			// Fallback to localized strings from Interactivity API state.
 			// @todo This block is for Core < 6.7.0. Remove when support is dropped.
 
-			// @ts-expect-error
+			// @ts-expect-error `texts` is not part of the typed navigation state.
 			if ( state.navigation.texts?.loading ) {
-				// @ts-expect-error
+				// @ts-expect-error `texts` is not part of the typed navigation state.
 				navigationTexts.loading = state.navigation.texts.loading;
 			}
-			// @ts-expect-error
+			// @ts-expect-error `texts` is not part of the typed navigation state.
 			if ( state.navigation.texts?.loaded ) {
-				// @ts-expect-error
+				// @ts-expect-error `texts` is not part of the typed navigation state.
 				navigationTexts.loaded = state.navigation.texts.loaded;
 			}
 		}

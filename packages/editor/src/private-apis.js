@@ -1,18 +1,10 @@
-/**
- * WordPress dependencies
- */
 import {
 	CreateTemplatePartModal,
 	patternTitleField,
 	templateTitleField,
 } from '@wordpress/fields';
 import * as interfaceApis from '@wordpress/interface';
-
-/**
- * Internal dependencies
- */
 import { lock } from './lock-unlock';
-import { EntitiesSavedStatesExtensible } from './components/entities-saved-states';
 import BackButton from './components/header/back-button';
 import Editor from './components/editor';
 import PluginPostExcerpt from './components/post-excerpt/plugin';
@@ -21,18 +13,15 @@ import PreferencesModal from './components/preferences-modal';
 import { usePostActions } from './components/post-actions/actions';
 import usePostFields from './components/post-fields';
 import ToolsMoreMenuGroup from './components/more-menu/tools-more-menu-group';
+import SiteExport from './components/site-export';
 import ViewMoreMenuGroup from './components/more-menu/view-more-menu-group';
 import ResizableEditor from './components/resizable-editor';
 import { registerCoreBlockBindingsSources } from './bindings/api';
-import { getTemplateInfo } from './utils/get-template-info';
 import GlobalStylesUIWrapper from './components/global-styles';
 import { StyleBookPreview } from './components/style-book';
 import { useGlobalStyles, useStyle } from './components/global-styles/hooks';
 import { GlobalStylesActionMenu } from './components/global-styles/menu';
-import {
-	useGenerateBlockPath,
-	useRestoreBlockFromPath,
-} from './utils/block-selection-path';
+import UploadProgressSnackbar from './components/upload-progress-snackbar';
 
 const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 
@@ -42,7 +31,6 @@ lock( privateApis, {
 	patternTitleField,
 	templateTitleField,
 	BackButton,
-	EntitiesSavedStatesExtensible,
 	Editor,
 	PluginPostExcerpt,
 	PostCardPanel,
@@ -50,19 +38,17 @@ lock( privateApis, {
 	usePostActions,
 	usePostFields,
 	ToolsMoreMenuGroup,
+	SiteExport,
 	ViewMoreMenuGroup,
 	ResizableEditor,
+	UploadProgressSnackbar,
 	registerCoreBlockBindingsSources,
-	getTemplateInfo,
 	// Global Styles
 	GlobalStylesUIWrapper,
 	GlobalStylesActionMenu,
 	StyleBookPreview,
 	useGlobalStyles,
 	useStyle,
-	// Block selection
-	useGenerateBlockPath,
-	useRestoreBlockFromPath,
 	// This is a temporary private API while we're updating the site editor to use EditorProvider.
 	interfaceStore,
 	...remainingInterfaceApis,

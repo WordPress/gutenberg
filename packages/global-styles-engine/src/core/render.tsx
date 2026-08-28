@@ -1,20 +1,13 @@
-/**
- * WordPress dependencies
- */
 import {
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
 	getBlockSupport,
 	getBlockTypes,
 	store as blocksStore,
-	// @ts-expect-error - @wordpress/blocks module doesn't have TypeScript declarations
 } from '@wordpress/blocks';
+import type { BlockType } from '@wordpress/blocks';
 import { getCSSRules, getCSSValueFromRawStyle } from '@wordpress/style-engine';
 import { select } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import {
 	PRESET_METADATA,
 	ROOT_BLOCK_SELECTOR,
@@ -23,6 +16,7 @@ import {
 	scopeFeatureSelectors,
 	appendToSelector,
 	getBlockStyleVariationSelector,
+	getBlockStyleVariationFeatureSelector,
 	getResolvedValue,
 } from '../utils/common';
 import { getBlockSelector } from './selectors';
@@ -33,14 +27,10 @@ import { getGapCSSValue } from '../utils/gap';
 import { setBackgroundStyleDefaults } from '../utils/background';
 import { LAYOUT_DEFINITIONS } from '../utils/layout';
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
+import { getResponsiveMediaQueries } from '../utils/viewport';
 import { getSetting } from '../settings/get-setting';
-import type {
-	BlockStyleVariation,
-	BlockType,
-	GlobalStylesConfig,
-	GlobalStylesSettings,
-	GlobalStylesStyles,
-} from '../types';
+import type { GlobalStylesConfig, GlobalStylesStyles } from '../types';
+import { normalizeStyleStateAliases } from '../style-state-back-compat';
 
 // =============================================================================
 // LOCAL TYPE DEFINITIONS
@@ -144,6 +134,48 @@ export type BlockSelectors = Record<
 	}
 >;
 
+/**
+ * Style node metadata used to render one selector's style rules.
+ *
+ * - `styles`: theme.json style object for this node.
+ * - `selector`: CSS selector used for the node's base declarations.
+ * - `selectorSuffix`: optional suffix used to append additional selectors,
+ *   such as pseudo selectors, to base and feature selectors.
+ * - `mediaQuery`: optional media query wrapping this node's rules.
+ * - `skipSelectorWrapper`: omits the `:root :where()` specificity wrapper.
+ * - `duotoneSelector`: alternate selector for duotone filter declarations.
+ * - `featureSelectors`: feature-level selectors for block supports.
+ * - `fallbackGapValue`: fallback block gap value used by layout rules.
+ * - `hasLayoutSupport`: whether layout styles can be generated for the node.
+ * - `isStyleVariation`: whether this node is a block style variation.
+ * - `variationName`: block style variation name used for feature selectors.
+ * - `layoutSelector`: optional selector override for layout styles.
+ * - `layoutHasBlockGapSupport`: optional block gap support override for layout styles.
+ * - `name`: block name used by block-specific declaration adjustments.
+ * - `elementName`: element name used to resolve valid pseudo selectors.
+ */
+interface StylesNode {
+	styles: any;
+	selector: string;
+	selectorSuffix?: string;
+	mediaQuery?: string;
+	skipSelectorWrapper?: boolean;
+	duotoneSelector?: string;
+	featureSelectors?:
+		| string
+		| Record< string, string | Record< string, string > >;
+	fallbackGapValue?: string;
+	hasLayoutSupport?: boolean;
+	isStyleVariation?: boolean;
+	variationName?: string;
+	layoutSelector?: string;
+	layoutHasBlockGapSupport?: boolean;
+	name?: string;
+	elementName?: string;
+}
+
+type ElementName = keyof typeof ELEMENTS;
+
 // Elements that rely on class names in their selectors.
 const ELEMENT_CLASS_NAMES = {
 	button: 'wp-element-button',
@@ -160,55 +192,35 @@ const BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS = {
 	typography: 'typography',
 };
 
-/**
- * Transform given preset tree into a set of style declarations.
- *
- * @param blockPresets   Block presets object
- * @param mergedSettings Merged theme.json settings
- * @return An array of style declarations
- */
-function getPresetsDeclarations(
-	blockPresets: Record< string, any > = {},
-	mergedSettings: GlobalStylesSettings
-): string[] {
-	return PRESET_METADATA.reduce(
-		(
-			declarations: string[],
-			{ path, valueKey, valueFunc, cssVarInfix }: PresetMetadata
-		) => {
-			const presetByOrigin = getValueFromObjectPath(
-				blockPresets,
-				path,
-				[]
-			) as PresetsByOrigin;
-			[ 'default', 'theme', 'custom' ].forEach( ( origin ) => {
-				if ( presetByOrigin[ origin ] ) {
-					presetByOrigin[ origin ].forEach( ( value: any ) => {
-						if ( valueKey && ! valueFunc ) {
-							declarations.push(
-								`--wp--preset--${ cssVarInfix }--${ kebabCase(
-									value.slug
-								) }: ${ value[ valueKey ] }`
-							);
-						} else if (
-							valueFunc &&
-							typeof valueFunc === 'function'
-						) {
-							declarations.push(
-								`--wp--preset--${ cssVarInfix }--${ kebabCase(
-									value.slug
-								) }: ${ valueFunc( value, mergedSettings ) }`
-							);
-						}
-					} );
-				}
-			} );
+// The valid pseudo-selectors that can be used for blocks.
+// Keep in sync with WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS.
+const VALID_BLOCK_PSEUDO_SELECTORS: Record< string, string[] > = {
+	'core/button': [ ':hover', ':focus', ':focus-visible', ':active' ],
+	'core/navigation-link': [ ':hover', ':focus', ':focus-visible', ':active' ],
+};
 
-			return declarations;
-		},
-		[] as string[]
-	);
-}
+// The valid pseudo-selectors that can be used for elements.
+// Keep in sync with WP_Theme_JSON_Gutenberg::VALID_ELEMENT_PSEUDO_SELECTORS.
+const VALID_ELEMENT_PSEUDO_SELECTORS: Record< string, string[] > = {
+	link: [
+		':link',
+		':any-link',
+		':visited',
+		':hover',
+		':focus',
+		':focus-visible',
+		':active',
+	],
+	button: [
+		':link',
+		':any-link',
+		':visited',
+		':hover',
+		':focus',
+		':focus-visible',
+		':active',
+	],
+};
 
 /**
  * Transform given preset tree into a set of preset class declarations.
@@ -247,13 +259,15 @@ function getPresetsClasses(
 									const classSelectorToUse = `.has-${ kebabCase(
 										slug
 									) }-${ classSuffix }`;
+									// Wrap the block selector in `:where()` so a block-level
+									// preset keeps the same 0-1-0 specificity as a root-level
+									// one. Without it, rules like `p.has-x-color` out-rank
+									// equally-important 0-1-0 rules targeting the same
+									// property, such as per-instance responsive state styles.
+									// `blockSelector` can be a list, e.g. "h1, h2, h3".
 									const selectorToUse = blockSelector
-										.split( ',' ) // Selector can be "h1, h2, h3"
-										.map(
-											( selector ) =>
-												`${ selector }${ classSelectorToUse }`
-										)
-										.join( ',' );
+										? `:where(${ blockSelector })${ classSelectorToUse }`
+										: classSelectorToUse;
 									const value = `var(--wp--preset--${ cssVarInfix }--${ kebabCase(
 										slug
 									) })`;
@@ -282,7 +296,8 @@ function getPresetsSvgFilters(
 			metadata.path,
 			{}
 		) as PresetsByOrigin;
-		return [ 'default', 'theme' ]
+		// Includes `custom`, since the front end renders every origin.
+		return [ 'default', 'theme', 'custom' ]
 			.filter( ( origin ) => presetByOrigin[ origin ] )
 			.flatMap( ( origin ) =>
 				presetByOrigin[ origin ].map( ( preset: any ) =>
@@ -317,25 +332,147 @@ function flattenTree(
 }
 
 /**
- * Gets variation selector string from feature selector.
+ * Updates the text indent selector for paragraph blocks based on the textIndent setting.
  *
- * @param featureSelector        The feature selector
- * @param styleVariationSelector The style variation selector
- * @return Combined selector string
+ * The textIndent setting can be 'subsequent' (default), 'all', or false.
+ * When set to 'all', the selector should be '.wp-block-paragraph' instead of
+ * '.wp-block-paragraph + .wp-block-paragraph' to apply indent to all paragraphs.
+ *
+ * @param featureDeclarations The feature declarations keyed by selector
+ * @param settings            Theme.json settings
+ * @param blockName           The name of the block being processed
+ * @return Updated feature declarations
  */
-function concatFeatureVariationSelectorString(
-	featureSelector: string,
-	styleVariationSelector: string
-): string {
-	const featureSelectors = featureSelector.split( ',' );
-	const combinedSelectors: string[] = [];
-	featureSelectors.forEach( ( selector ) => {
-		combinedSelectors.push(
-			`${ styleVariationSelector.trim() }${ selector.trim() }`
-		);
-	} );
-	return combinedSelectors.join( ', ' );
-}
+const updateParagraphTextIndentSelector = (
+	featureDeclarations: Record< string, string[] >,
+	settings: Record< string, any > | undefined,
+	blockName: string | undefined
+): Record< string, string[] > => {
+	if ( blockName !== 'core/paragraph' ) {
+		return featureDeclarations;
+	}
+
+	// Check block-level settings first, then fall back to global settings.
+	const blockSettings = settings?.blocks?.[ 'core/paragraph' ];
+	const textIndentSetting =
+		blockSettings?.typography?.textIndent ??
+		settings?.typography?.textIndent ??
+		'subsequent';
+
+	if ( textIndentSetting !== 'all' ) {
+		return featureDeclarations;
+	}
+
+	// Look for the text indent selector and replace it.
+	const oldSelector = '.wp-block-paragraph + .wp-block-paragraph';
+	const newSelector = '.wp-block-paragraph';
+
+	if ( oldSelector in featureDeclarations ) {
+		const declarations = featureDeclarations[ oldSelector ];
+		const updated = { ...featureDeclarations };
+		delete updated[ oldSelector ];
+		updated[ newSelector ] = declarations;
+		return updated;
+	}
+
+	return featureDeclarations;
+};
+
+/**
+ * Updates button width declarations to use a calc() formula for percentage values.
+ *
+ * When a percentage width is set on the Button block via Global Styles, the
+ * resulting CSS needs to account for block gap spacing so that buttons tile
+ * correctly on a row (e.g. 4 buttons at 25% width all fit on one row).
+ *
+ * This mirrors the dynamic calc() formula applied at the block instance level
+ * in the button block's stylesheet (style.scss).
+ *
+ * @param featureDeclarations Feature declarations keyed by selector.
+ * @param settings            The theme.json settings.
+ * @return Updated feature declarations.
+ */
+const updateButtonWidthDeclarations = (
+	featureDeclarations: Record< string, string[] >,
+	settings: Record< string, any > | undefined
+): Record< string, string[] > => {
+	const buttonSelector = '.wp-block-button';
+	if ( ! ( buttonSelector in featureDeclarations ) ) {
+		return featureDeclarations;
+	}
+
+	const updated = { ...featureDeclarations };
+	updated[ buttonSelector ] = updated[ buttonSelector ].map(
+		( declaration ) => {
+			// Match "width: <value>" declarations.
+			const match = declaration.match( /^width:\s*(.+)$/ );
+			if ( ! match ) {
+				return declaration;
+			}
+
+			const value = match[ 1 ];
+			let percentage: number | null = null;
+
+			// Case 1: Direct percentage value e.g. "25%".
+			if ( value.endsWith( '%' ) ) {
+				percentage = parseFloat( value );
+			}
+
+			// Case 2: Preset CSS var e.g. "var(--wp--preset--dimension--50)".
+			const presetPrefix = 'var(--wp--preset--dimension--';
+			if (
+				percentage === null &&
+				value.startsWith( presetPrefix ) &&
+				value.endsWith( ')' )
+			) {
+				const slug = value.slice( presetPrefix.length, -1 );
+
+				/*
+				 * Look up the preset size across all origins.
+				 * Check block-level settings first (core/button), then top-level settings.
+				 * Spread block-level entries first so they take precedence.
+				 */
+				const dimensionSizes = {
+					...( settings?.dimensions?.dimensionSizes ?? {} ),
+					...( settings?.blocks?.[ 'core/button' ]?.dimensions
+						?.dimensionSizes ?? {} ),
+				};
+				for ( const origin of Object.values( dimensionSizes ) ) {
+					if ( ! Array.isArray( origin ) ) {
+						continue;
+					}
+					for ( const preset of origin ) {
+						if (
+							preset.slug === slug &&
+							typeof preset.size === 'string' &&
+							preset.size.endsWith( '%' )
+						) {
+							percentage = parseFloat( preset.size );
+							break;
+						}
+					}
+					if ( percentage !== null ) {
+						break;
+					}
+				}
+			}
+
+			if ( percentage === null || isNaN( percentage ) ) {
+				return declaration;
+			}
+
+			/*
+			 * Apply the same calc() formula as the block instance level (style.scss).
+			 * The numeric percentage value is used as a unitless number:
+			 * - Multiplied by 1% to get the percentage width.
+			 * - Divided by 100 to calculate the gap adjustment proportion.
+			 */
+			return `width: calc(${ percentage } * 1% - (var(--wp--style--block-gap, 0.5em) * (1 - ${ percentage } / 100)))`;
+		}
+	);
+
+	return updated;
+};
 
 /**
  * Generate style declarations for a block's custom feature and subfeature
@@ -630,9 +767,8 @@ export function getLayoutStyles( {
 	fallbackGapValue?: string;
 } ): string {
 	let ruleset = '';
-	let gapValue = hasBlockGapSupport
-		? getGapCSSValue( style?.spacing?.blockGap )
-		: '';
+	const blockGapValue = style?.spacing?.blockGap;
+	let gapValue = hasBlockGapSupport ? getGapCSSValue( blockGapValue ) : '';
 
 	// Ensure a fallback gap value for the root layout definitions,
 	// and use a fallback value if one is provided for the current block.
@@ -643,6 +779,10 @@ export function getLayoutStyles( {
 			gapValue = fallbackGapValue;
 		}
 	}
+	const rowGapValue =
+		hasBlockGapSupport && blockGapValue && typeof blockGapValue !== 'string'
+			? getGapCSSValue( blockGapValue.top )
+			: gapValue;
 
 	if ( gapValue && layoutDefinitions ) {
 		Object.values( layoutDefinitions ).forEach(
@@ -655,6 +795,11 @@ export function getLayoutStyles( {
 				) {
 					return;
 				}
+				const layoutGapValue = [ 'default', 'constrained' ].includes(
+					name
+				)
+					? rowGapValue
+					: gapValue;
 
 				if ( spacingStyles?.length ) {
 					spacingStyles.forEach( ( spacingStyle: any ) => {
@@ -665,7 +810,7 @@ export function getLayoutStyles( {
 								( [ cssProperty, cssValue ] ) => {
 									declarations.push(
 										`${ cssProperty }: ${
-											cssValue ? cssValue : gapValue
+											cssValue ? cssValue : layoutGapValue
 										}`
 									);
 								}
@@ -764,13 +909,35 @@ const STYLE_KEYS = [
 	'background',
 ];
 
-function pickStyleKeys( treeToPickFrom: any ): any {
+function pickStyleKeys(
+	treeToPickFrom: any,
+	responsiveMediaQueries: Record< string, string >
+): any {
+	return pickStyleAndPseudoKeys(
+		treeToPickFrom,
+		undefined,
+		responsiveMediaQueries
+	);
+}
+
+function pickStyleAndPseudoKeys(
+	treeToPickFrom: any,
+	blockName: string | undefined,
+	responsiveMediaQueries: Record< string, string >
+): any {
 	if ( ! treeToPickFrom ) {
 		return {};
 	}
 	const entries = Object.entries( treeToPickFrom );
-	const pickedEntries = entries.filter( ( [ key ] ) =>
-		STYLE_KEYS.includes( key )
+	const allowedPseudoSelectors = blockName
+		? VALID_BLOCK_PSEUDO_SELECTORS[ blockName ] ?? []
+		: [];
+
+	const pickedEntries = entries.filter(
+		( [ key ] ) =>
+			STYLE_KEYS.includes( key ) ||
+			allowedPseudoSelectors.includes( key ) ||
+			responsiveMediaQueries[ key ]
 	);
 	// clone the style objects so that `getFeatureDeclarations` can remove consumed keys from it
 	const clonedEntries = pickedEntries.map( ( [ key, style ] ) => [
@@ -780,29 +947,163 @@ function pickStyleKeys( treeToPickFrom: any ): any {
 	return Object.fromEntries( clonedEntries );
 }
 
+/**
+ * Creates style nodes for configured block and element pseudo selectors.
+ *
+ * Only pseudo selectors listed in the matching block or element allow-list are
+ * considered. This mirrors the PHP renderer and avoids treating arbitrary
+ * colon-prefixed keys as pseudo selectors.
+ *
+ * @param node Style node that may contain configured pseudo styles.
+ * @return Style nodes for the configured pseudo states.
+ */
+function getPseudoStyleNodes( node: StylesNode ): StylesNode[] {
+	const {
+		styles,
+		selector,
+		featureSelectors,
+		name,
+		elementName,
+		mediaQuery,
+		variationName,
+	} = node;
+	const pseudoSelectors = name
+		? VALID_BLOCK_PSEUDO_SELECTORS[ name ] ?? []
+		: VALID_ELEMENT_PSEUDO_SELECTORS[ elementName ?? '' ] ?? [];
+
+	if ( ! pseudoSelectors.length ) {
+		return [];
+	}
+
+	return pseudoSelectors.flatMap( ( pseudoSelector ) => {
+		const pseudoStyles = styles?.[ pseudoSelector ];
+		if ( ! pseudoStyles || typeof pseudoStyles !== 'object' ) {
+			return [];
+		}
+
+		return [
+			{
+				styles: JSON.parse( JSON.stringify( pseudoStyles ) ),
+				selector,
+				selectorSuffix: pseudoSelector,
+				mediaQuery,
+				featureSelectors:
+					featureSelectors && typeof featureSelectors !== 'string'
+						? featureSelectors
+						: undefined,
+				name,
+				elementName,
+				variationName,
+			},
+		];
+	} );
+}
+
+/**
+ * Creates style nodes for configured responsive breakpoint states.
+ *
+ * Breakpoint nodes render feature-level, base, and pseudo declarations through
+ * the normal node renderer.
+ *
+ * @param node                   Style node that may contain configured responsive state styles.
+ * @param responsiveMediaQueries Media queries keyed by responsive state name.
+ * @return Responsive style nodes in configured breakpoint order.
+ */
+function getResponsiveStyleNodes(
+	node: StylesNode,
+	responsiveMediaQueries: Record< string, string >
+): StylesNode[] {
+	const {
+		styles,
+		selector,
+		fallbackGapValue,
+		featureSelectors,
+		hasLayoutSupport,
+		layoutHasBlockGapSupport,
+		layoutSelector,
+		name,
+		elementName,
+		isStyleVariation,
+		variationName,
+	} = node;
+
+	if ( ! name && ! elementName ) {
+		return [];
+	}
+
+	return Object.entries( responsiveMediaQueries ).flatMap(
+		( [ breakpointKey, mediaQuery ] ) => {
+			const breakpointStyles = styles?.[ breakpointKey ];
+			if ( ! breakpointStyles || typeof breakpointStyles !== 'object' ) {
+				return [];
+			}
+
+			return [
+				{
+					styles: JSON.parse( JSON.stringify( breakpointStyles ) ),
+					selector,
+					mediaQuery,
+					featureSelectors:
+						featureSelectors && typeof featureSelectors !== 'string'
+							? featureSelectors
+							: undefined,
+					fallbackGapValue,
+					hasLayoutSupport,
+					name,
+					elementName,
+					isStyleVariation,
+					variationName,
+					layoutSelector,
+					layoutHasBlockGapSupport,
+				},
+			];
+		}
+	);
+}
+
+/**
+ * Collects element styles from the default and responsive branches of a style
+ * node. Responsive styles are copied onto the element node so they can be
+ * expanded by `getResponsiveStyleNodes`.
+ *
+ * @param styleNode              Style node that may contain element styles.
+ * @param responsiveMediaQueries Media queries keyed by responsive state name.
+ * @return Element styles keyed by element name.
+ */
+function getElementStylesByName(
+	styleNode: BlockNode | BlockVariation,
+	responsiveMediaQueries: Record< string, string >
+): Record< string, any > {
+	const elementStylesByName = { ...( styleNode?.elements ?? {} ) };
+
+	Object.keys( responsiveMediaQueries ).forEach( ( breakpointKey ) => {
+		Object.entries( styleNode?.[ breakpointKey ]?.elements ?? {} ).forEach(
+			( [ elementName, styles ] ) => {
+				elementStylesByName[ elementName ] = {
+					...( elementStylesByName[ elementName ] ?? {} ),
+					[ breakpointKey ]: styles,
+				};
+			}
+		);
+	} );
+
+	return elementStylesByName;
+}
+
 export const getNodesWithStyles = (
 	tree: GlobalStylesConfig,
 	blockSelectors: string | BlockSelectors
 ): any[] => {
-	const nodes: {
-		styles: Partial< Omit< GlobalStylesStyles, 'elements' | 'blocks' > >;
-		selector: string;
-		skipSelectorWrapper?: boolean;
-		duotoneSelector?: string;
-		featureSelectors?:
-			| string
-			| Record< string, string | Record< string, string > >;
-		fallbackGapValue?: string;
-		hasLayoutSupport?: boolean;
-		styleVariationSelectors?: Record< string, string >;
-	}[] = [];
+	const nodes: StylesNode[] = [];
 
 	if ( ! tree?.styles ) {
 		return nodes;
 	}
 
+	const responsiveMediaQueries = getResponsiveMediaQueries( tree );
+
 	// Top-level.
-	const styles = pickStyleKeys( tree.styles );
+	const styles = pickStyleKeys( tree.styles, responsiveMediaQueries );
 	if ( styles ) {
 		nodes.push( {
 			styles,
@@ -818,6 +1119,7 @@ export const getNodesWithStyles = (
 			nodes.push( {
 				styles: tree.styles?.elements?.[ name ] ?? {},
 				selector: selector as string,
+				elementName: name,
 				// Top level elements that don't use a class name should not receive the
 				// `:root :where()` wrapper to maintain backwards compatibility.
 				skipSelectorWrapper: ! (
@@ -830,23 +1132,28 @@ export const getNodesWithStyles = (
 	// Iterate over blocks: they can have styles & elements.
 	Object.entries( tree.styles?.blocks ?? {} ).forEach(
 		( [ blockName, node ] ) => {
-			const blockStyles = pickStyleKeys( node );
+			const blockStyles = pickStyleAndPseudoKeys(
+				node,
+				blockName,
+				responsiveMediaQueries
+			);
 			const typedNode = node as BlockNode;
 
-			// Store variation data for later processing, but don't add to nodes yet.
-			// Variations should be processed AFTER the main block styles to match PHP order.
+			// Store variation child nodes so they can be inserted after the block's own elements.
 			const variationNodesToAdd: typeof nodes = [];
+			const variationStyleNodesToAdd: typeof nodes = [];
 
 			if ( typedNode?.variations ) {
-				const variations: Record< string, any > = {};
 				Object.entries( typedNode.variations ).forEach(
 					( [ variationName, variation ] ) => {
 						const typedVariation = variation as BlockVariation;
-						variations[ variationName ] =
-							pickStyleKeys( typedVariation );
+						const variationStyles = pickStyleAndPseudoKeys(
+							typedVariation,
+							blockName,
+							responsiveMediaQueries
+						);
 						if ( typedVariation?.css ) {
-							variations[ variationName ].css =
-								typedVariation.css;
+							variationStyles.css = typedVariation.css;
 						}
 						const variationSelector =
 							typeof blockSelectors !== 'string'
@@ -855,21 +1162,51 @@ export const getNodesWithStyles = (
 										variationName
 								  ]
 								: undefined;
+						if (
+							variationSelector &&
+							typeof blockSelectors !== 'string'
+						) {
+							const blockSelector = blockSelectors[ blockName ];
+							variationStyleNodesToAdd.push( {
+								styles: variationStyles,
+								selector: variationSelector,
+								featureSelectors:
+									blockSelector?.featureSelectors,
+								fallbackGapValue:
+									blockSelector?.fallbackGapValue,
+								hasLayoutSupport:
+									blockSelector?.hasLayoutSupport,
+								isStyleVariation: true,
+								variationName,
+								layoutSelector:
+									variationSelector + blockSelector.selector,
+								layoutHasBlockGapSupport: true,
+								name: blockName,
+							} );
+						}
 
 						// Process the variation's inner element styles.
 						// This comes before the inner block styles so the
 						// element styles within the block type styles take
 						// precedence over these.
 						Object.entries(
-							typedVariation?.elements ?? {}
+							getElementStylesByName(
+								typedVariation,
+								responsiveMediaQueries
+							)
 						).forEach( ( [ element, elementStyles ] ) => {
-							if ( elementStyles && ELEMENTS[ element ] ) {
+							if (
+								elementStyles &&
+								ELEMENTS[ element as ElementName ]
+							) {
 								variationNodesToAdd.push( {
 									styles: elementStyles,
 									selector: scopeSelector(
 										variationSelector,
-										ELEMENTS[ element ]
+										ELEMENTS[ element as ElementName ]
 									),
+									elementName: element,
+									isStyleVariation: true,
 								} );
 							}
 						} );
@@ -909,7 +1246,11 @@ export const getNodesWithStyles = (
 										: undefined;
 
 								const variationBlockStyleNodes =
-									pickStyleKeys( variationBlockStyles );
+									pickStyleAndPseudoKeys(
+										variationBlockStyles,
+										variationBlockName,
+										responsiveMediaQueries
+									);
 
 								if ( variationBlockStyles?.css ) {
 									variationBlockStyleNodes.css =
@@ -925,6 +1266,8 @@ export const getNodesWithStyles = (
 
 								variationNodesToAdd.push( {
 									selector: variationBlockSelector,
+									name: variationBlockName,
+									isStyleVariation: true,
 									duotoneSelector: variationDuotoneSelector,
 									featureSelectors: variationFeatureSelectors,
 									fallbackGapValue:
@@ -939,7 +1282,10 @@ export const getNodesWithStyles = (
 								// Process element styles for the inner blocks
 								// of the variation.
 								Object.entries(
-									variationBlockStyles.elements ?? {}
+									getElementStylesByName(
+										variationBlockStyles,
+										responsiveMediaQueries
+									)
 								).forEach(
 									( [
 										variationBlockElement,
@@ -947,16 +1293,21 @@ export const getNodesWithStyles = (
 									] ) => {
 										if (
 											variationBlockElementStyles &&
-											ELEMENTS[ variationBlockElement ]
+											ELEMENTS[
+												variationBlockElement as ElementName
+											]
 										) {
 											variationNodesToAdd.push( {
 												styles: variationBlockElementStyles,
 												selector: scopeSelector(
 													variationBlockSelector,
 													ELEMENTS[
-														variationBlockElement
+														variationBlockElement as ElementName
 													]
 												),
+												elementName:
+													variationBlockElement,
+												isStyleVariation: true,
 											} );
 										}
 									}
@@ -965,7 +1316,6 @@ export const getNodesWithStyles = (
 						);
 					}
 				);
-				blockStyles.variations = variations;
 			}
 
 			if (
@@ -983,36 +1333,40 @@ export const getNodesWithStyles = (
 					styles: blockStyles,
 					featureSelectors:
 						blockSelectors[ blockName ].featureSelectors,
-					styleVariationSelectors:
-						blockSelectors[ blockName ].styleVariationSelectors,
+					name: blockName,
 				} );
 			}
 
-			Object.entries( typedNode?.elements ?? {} ).forEach(
-				( [ elementName, value ] ) => {
-					if (
-						typeof blockSelectors !== 'string' &&
-						value &&
-						blockSelectors?.[ blockName ] &&
-						ELEMENTS[ elementName ]
-					) {
-						nodes.push( {
-							styles: value,
-							selector: blockSelectors[ blockName ]?.selector
-								.split( ',' )
-								.map( ( sel: string ) => {
-									const elementSelectors =
-										ELEMENTS[ elementName ].split( ',' );
-									return elementSelectors.map(
-										( elementSelector: string ) =>
-											sel + ' ' + elementSelector
-									);
-								} )
-								.join( ',' ),
-						} );
-					}
+			nodes.push( ...variationStyleNodesToAdd );
+
+			Object.entries(
+				getElementStylesByName( typedNode, responsiveMediaQueries )
+			).forEach( ( [ elementName, value ] ) => {
+				if (
+					typeof blockSelectors !== 'string' &&
+					value &&
+					blockSelectors?.[ blockName ] &&
+					ELEMENTS[ elementName as ElementName ]
+				) {
+					nodes.push( {
+						styles: value,
+						selector: blockSelectors[ blockName ]?.selector
+							.split( ',' )
+							.map( ( sel: string ) => {
+								const elementSelectors =
+									ELEMENTS[
+										elementName as ElementName
+									].split( ',' );
+								return elementSelectors.map(
+									( elementSelector: string ) =>
+										sel + ' ' + elementSelector
+								);
+							} )
+							.join( ',' ),
+						elementName,
+					} );
 				}
-			);
+			} );
 
 			// Add variation nodes AFTER the main block and its elements
 			// to match PHP processing order.
@@ -1034,7 +1388,9 @@ export const getNodesWithSettings = (
 		duotoneSelector?: string;
 		fallbackGapValue?: string;
 		hasLayoutSupport?: boolean;
-		featureSelectors?: Record< string, string >;
+		featureSelectors?:
+			| string
+			| Record< string, string | Record< string, string > >;
 		styleVariationSelectors?: Record< string, string >;
 	}[] = [];
 
@@ -1080,6 +1436,8 @@ export const getNodesWithSettings = (
 					presets: blockPresets,
 					custom: blockCustom,
 					selector: blockSelectors[ blockName ]?.selector,
+					featureSelectors:
+						blockSelectors[ blockName ]?.featureSelectors,
 				} );
 			}
 		}
@@ -1088,28 +1446,298 @@ export const getNodesWithSettings = (
 	return nodes;
 };
 
+/**
+ * Resolves the selector for a given block support feature.
+ *
+ * If the block defines a feature-level selector (as a string or an object
+ * with a `root` key), that selector is returned. Otherwise the fallback
+ * selector is used.
+ *
+ * @param {string|Record<string,string|Record<string,string>>|undefined} featureSelectors The block's feature selectors.
+ * @param {string}                                                       featureKey       The feature key to resolve.
+ * @param {string}                                                       fallback         The default selector.
+ * @return {string} The resolved selector.
+ */
+function resolveFeatureSelector(
+	featureSelectors:
+		| string
+		| Record< string, string | Record< string, string > >
+		| undefined,
+	featureKey: string,
+	fallback: string
+): string {
+	if ( ! featureSelectors || typeof featureSelectors === 'string' ) {
+		return fallback;
+	}
+
+	const feature = featureSelectors[ featureKey ];
+	if ( typeof feature === 'string' ) {
+		return feature;
+	}
+	if ( typeof feature === 'object' && feature.root ) {
+		return feature.root;
+	}
+	return fallback;
+}
+
+/**
+ * Collects CSS variable declarations for a single preset metadata entry
+ * across all origins.
+ *
+ * @param {Record<string,any>}             presets        The preset values keyed by origin.
+ * @param {GlobalStylesConfig['settings']} mergedSettings The merged global styles settings.
+ * @param {PresetMetadata}                 presetMetadata The preset metadata.
+ * @return {string[]} The CSS variable declarations.
+ */
+function getPresetVarDeclarations(
+	presets: Record< string, any >,
+	mergedSettings: GlobalStylesConfig[ 'settings' ],
+	{ path, valueKey, valueFunc, cssVarInfix }: PresetMetadata
+): string[] {
+	const presetByOrigin = getValueFromObjectPath(
+		presets,
+		path,
+		[]
+	) as PresetsByOrigin;
+
+	const declarations: string[] = [];
+	for ( const origin of [ 'default', 'theme', 'custom' ] ) {
+		if ( ! presetByOrigin[ origin ] ) {
+			continue;
+		}
+		for ( const value of presetByOrigin[ origin ] ) {
+			const slug = kebabCase( value.slug );
+			if ( valueKey && ! valueFunc ) {
+				declarations.push(
+					`--wp--preset--${ cssVarInfix }--${ slug }: ${ value[ valueKey ] }`
+				);
+			} else if ( valueFunc && typeof valueFunc === 'function' ) {
+				declarations.push(
+					`--wp--preset--${ cssVarInfix }--${ slug }: ${ valueFunc(
+						value,
+						mergedSettings
+					) }`
+				);
+			}
+		}
+	}
+	return declarations;
+}
+
 export const generateCustomProperties = (
 	tree: GlobalStylesConfig,
 	blockSelectors: BlockSelectors
 ): string => {
-	const settings = getNodesWithSettings( tree, blockSelectors );
+	const nodes = getNodesWithSettings( tree, blockSelectors );
 	let ruleset = '';
-	settings.forEach( ( { presets, custom, selector } ) => {
-		const declarations = tree?.settings
-			? getPresetsDeclarations( presets, tree?.settings )
-			: [];
-		const customProps = flattenTree( custom, '--wp--custom--', '--' );
-		if ( customProps.length > 0 ) {
-			declarations.push( ...customProps );
+
+	for ( const { presets, custom, selector, featureSelectors } of nodes ) {
+		const defaultSelector = selector as string;
+
+		/*
+		 * Group preset declarations by selector. Blocks that define
+		 * feature-level selectors need their preset CSS variables output
+		 * under that feature selector instead of the block's root selector.
+		 */
+		const varsBySelector: Record< string, string[] > = {
+			[ defaultSelector ]: [],
+		};
+
+		if ( tree?.settings ) {
+			for ( const metadata of PRESET_METADATA ) {
+				const declarations = getPresetVarDeclarations(
+					presets,
+					tree.settings,
+					metadata
+				);
+				if ( declarations.length === 0 ) {
+					continue;
+				}
+
+				const target = resolveFeatureSelector(
+					featureSelectors,
+					metadata.path[ 0 ],
+					defaultSelector
+				);
+				if ( ! varsBySelector[ target ] ) {
+					varsBySelector[ target ] = [];
+				}
+				varsBySelector[ target ].push( ...declarations );
+			}
 		}
 
-		if ( declarations.length > 0 ) {
-			ruleset += `${ selector }{${ declarations.join( ';' ) };}`;
+		// Custom properties always use the block's default selector.
+		const customProps = flattenTree( custom, '--wp--custom--', '--' );
+		if ( customProps.length > 0 ) {
+			varsBySelector[ defaultSelector ].push( ...customProps );
 		}
-	} );
+
+		for ( const [ ruleSelector, declarations ] of Object.entries(
+			varsBySelector
+		) ) {
+			if ( declarations.length > 0 ) {
+				ruleset += `${ ruleSelector }{${ declarations.join( ';' ) };}`;
+			}
+		}
+	}
 
 	return ruleset;
 };
+
+/**
+ * Renders CSS rules for a single style node.
+ *
+ * The node renderer handles feature-level selectors, duotone declarations,
+ * layout styles, base declarations, and custom CSS. State nodes are expanded
+ * before rendering so ordering matches the PHP renderer.
+ *
+ * @param node                          Style node metadata and styles.
+ * @param context                       Render context and feature flags.
+ * @param context.tree                  Global styles tree.
+ * @param context.useRootPaddingAlign   Whether root padding alignment is enabled.
+ * @param context.disableLayoutStyles   Whether layout styles are disabled.
+ * @param context.hasBlockGapSupport    Whether block gap support is enabled.
+ * @param context.hasFallbackGapSupport Whether fallback gap support is enabled.
+ * @param context.disableRootPadding    Whether root padding declarations are disabled.
+ * @return Rendered CSS rules for the node.
+ */
+function renderStylesNode(
+	node: StylesNode,
+	{
+		tree,
+		useRootPaddingAlign,
+		disableLayoutStyles,
+		hasBlockGapSupport,
+		hasFallbackGapSupport,
+		disableRootPadding,
+	}: {
+		tree: GlobalStylesConfig;
+		useRootPaddingAlign?: boolean;
+		disableLayoutStyles: boolean;
+		hasBlockGapSupport?: boolean;
+		hasFallbackGapSupport?: boolean;
+		disableRootPadding: boolean;
+	}
+): string {
+	const {
+		selector,
+		selectorSuffix,
+		mediaQuery,
+		duotoneSelector,
+		styles,
+		fallbackGapValue,
+		hasLayoutSupport,
+		featureSelectors,
+		layoutSelector,
+		layoutHasBlockGapSupport,
+		skipSelectorWrapper,
+		name,
+		variationName,
+	} = node;
+	let ruleset = '';
+	const effectiveSelector = selectorSuffix
+		? appendToSelector( selector, selectorSuffix )
+		: selector;
+
+	// Process styles for block support features with custom feature level
+	// CSS selectors set.
+	if ( featureSelectors && typeof featureSelectors !== 'string' ) {
+		let featureDeclarations = getFeatureDeclarations(
+			featureSelectors,
+			styles
+		);
+
+		// Update text indent selector for paragraph blocks based on the textIndent setting.
+		featureDeclarations = updateParagraphTextIndentSelector(
+			featureDeclarations,
+			tree.settings,
+			name
+		);
+
+		// Update button width declarations for percentage values to use calc() with block gap.
+		featureDeclarations = updateButtonWidthDeclarations(
+			featureDeclarations,
+			tree.settings
+		);
+
+		Object.entries( featureDeclarations ).forEach(
+			( [ featureSelector, declarations ] ) => {
+				if ( declarations.length ) {
+					let selectorForRule = variationName
+						? getBlockStyleVariationFeatureSelector(
+								variationName,
+								featureSelector
+						  )
+						: featureSelector;
+					selectorForRule = selectorSuffix
+						? appendToSelector( selectorForRule, selectorSuffix )
+						: selectorForRule;
+					const rules = declarations.join( ';' );
+					ruleset += `:root :where(${ selectorForRule }){${ rules };}`;
+				}
+			}
+		);
+	}
+
+	// Process duotone styles.
+	if ( duotoneSelector ) {
+		const duotoneStyles: any = {};
+		if ( styles?.filter ) {
+			duotoneStyles.filter = styles.filter;
+			delete styles.filter;
+		}
+		const duotoneDeclarations = getStylesDeclarations( duotoneStyles );
+		if ( duotoneDeclarations.length ) {
+			ruleset += `${ duotoneSelector }{${ duotoneDeclarations.join(
+				';'
+			) };}`;
+		}
+	}
+
+	// Process blockGap and layout styles.
+	const selectorForLayout = layoutSelector ?? effectiveSelector;
+	const hasBlockGapSupportForLayout =
+		layoutHasBlockGapSupport ?? hasBlockGapSupport;
+	if (
+		! disableLayoutStyles &&
+		( ROOT_BLOCK_SELECTOR === selectorForLayout || hasLayoutSupport )
+	) {
+		ruleset += getLayoutStyles( {
+			style: styles,
+			selector: selectorForLayout,
+			hasBlockGapSupport: hasBlockGapSupportForLayout,
+			hasFallbackGapSupport,
+			fallbackGapValue,
+		} );
+	}
+
+	// Process the remaining block styles (they use either normal block class or __experimentalSelector).
+	const styleDeclarations = getStylesDeclarations(
+		styles,
+		effectiveSelector,
+		useRootPaddingAlign,
+		tree,
+		disableRootPadding
+	);
+	if ( styleDeclarations?.length ) {
+		const generalSelector = skipSelectorWrapper
+			? effectiveSelector
+			: `:root :where(${ effectiveSelector })`;
+		ruleset += `${ generalSelector }{${ styleDeclarations.join( ';' ) };}`;
+	}
+	if ( styles?.css ) {
+		ruleset += processCSSNesting(
+			styles.css,
+			`:root :where(${ effectiveSelector })`
+		);
+	}
+
+	if ( mediaQuery && ruleset ) {
+		return `${ mediaQuery }{${ ruleset }}`;
+	}
+
+	return ruleset;
+}
 
 export const transformToStyles = (
 	tree: GlobalStylesConfig,
@@ -1131,10 +1759,18 @@ export const transformToStyles = (
 		variationStyles: false,
 		...styleOptions,
 	};
-	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
-	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
-	const useRootPaddingAlign = tree?.settings?.useRootPaddingAwareAlignments;
-	const { contentSize, wideSize } = tree?.settings?.layout || {};
+	const normalizedTree = normalizeStyleStateAliases( tree );
+	const nodesWithStyles = getNodesWithStyles(
+		normalizedTree,
+		blockSelectors
+	);
+	const nodesWithSettings = getNodesWithSettings(
+		normalizedTree,
+		blockSelectors
+	);
+	const useRootPaddingAlign =
+		normalizedTree?.settings?.useRootPaddingAwareAlignments;
+	const { contentSize, wideSize } = normalizedTree?.settings?.layout || {};
 	const hasBodyStyles =
 		options.marginReset || options.rootPadding || options.layoutStyles;
 
@@ -1180,204 +1816,33 @@ export const transformToStyles = (
 	}
 
 	if ( options.blockStyles ) {
-		nodesWithStyles.forEach(
-			( {
-				selector,
-				duotoneSelector,
-				styles,
-				fallbackGapValue,
-				hasLayoutSupport,
-				featureSelectors,
-				styleVariationSelectors,
-				skipSelectorWrapper,
-			} ) => {
-				// Process styles for block support features with custom feature level
-				// CSS selectors set.
-				if ( featureSelectors ) {
-					const featureDeclarations = getFeatureDeclarations(
-						featureSelectors,
-						styles
-					);
-
-					Object.entries( featureDeclarations ).forEach(
-						( [ cssSelector, declarations ] ) => {
-							if ( declarations.length ) {
-								const rules = declarations.join( ';' );
-								ruleset += `:root :where(${ cssSelector }){${ rules };}`;
-							}
-						}
-					);
-				}
-
-				// Process duotone styles.
-				if ( duotoneSelector ) {
-					const duotoneStyles: any = {};
-					if ( styles?.filter ) {
-						duotoneStyles.filter = styles.filter;
-						delete styles.filter;
-					}
-					const duotoneDeclarations =
-						getStylesDeclarations( duotoneStyles );
-					if ( duotoneDeclarations.length ) {
-						ruleset += `${ duotoneSelector }{${ duotoneDeclarations.join(
-							';'
-						) };}`;
-					}
-				}
-
-				// Process blockGap and layout styles.
-				if (
-					! disableLayoutStyles &&
-					( ROOT_BLOCK_SELECTOR === selector || hasLayoutSupport )
-				) {
-					ruleset += getLayoutStyles( {
-						style: styles,
-						selector,
-						hasBlockGapSupport,
-						hasFallbackGapSupport,
-						fallbackGapValue,
-					} );
-				}
-
-				// Process the remaining block styles (they use either normal block class or __experimentalSelector).
-				const styleDeclarations = getStylesDeclarations(
-					styles,
-					selector,
-					useRootPaddingAlign,
-					tree,
-					disableRootPadding
-				);
-				if ( styleDeclarations?.length ) {
-					const generalSelector = skipSelectorWrapper
-						? selector
-						: `:root :where(${ selector })`;
-					ruleset += `${ generalSelector }{${ styleDeclarations.join(
-						';'
-					) };}`;
-				}
-				if ( styles?.css ) {
-					ruleset += processCSSNesting(
-						styles.css,
-						`:root :where(${ selector })`
-					);
-				}
-
-				if ( options.variationStyles && styleVariationSelectors ) {
-					Object.entries( styleVariationSelectors ).forEach(
-						( [ styleVariationName, styleVariationSelector ] ) => {
-							const styleVariations =
-								styles?.variations?.[ styleVariationName ];
-							if ( styleVariations ) {
-								// If the block uses any custom selectors for block support, add those first.
-								if ( featureSelectors ) {
-									const featureDeclarations =
-										getFeatureDeclarations(
-											featureSelectors,
-											styleVariations
-										);
-
-									Object.entries(
-										featureDeclarations
-									).forEach(
-										( [ baseSelector, declarations ]: [
-											string,
-											string[],
-										] ) => {
-											if ( declarations.length ) {
-												const cssSelector =
-													concatFeatureVariationSelectorString(
-														baseSelector,
-														styleVariationSelector as string
-													);
-												const rules =
-													declarations.join( ';' );
-												ruleset += `:root :where(${ cssSelector }){${ rules };}`;
-											}
-										}
-									);
-								}
-
-								// Otherwise add regular selectors.
-								const styleVariationDeclarations =
-									getStylesDeclarations(
-										styleVariations,
-										styleVariationSelector as string,
-										useRootPaddingAlign,
-										tree
-									);
-								if ( styleVariationDeclarations.length ) {
-									ruleset += `:root :where(${ styleVariationSelector }){${ styleVariationDeclarations.join(
-										';'
-									) };}`;
-								}
-								if ( styleVariations?.css ) {
-									ruleset += processCSSNesting(
-										styleVariations.css,
-										`:root :where(${ styleVariationSelector })`
-									);
-								}
-								// Generate layout styles for the variation if it supports layout and has blockGap defined.
-								if (
-									hasLayoutSupport &&
-									styleVariations?.spacing?.blockGap
-								) {
-									// Append block selector to variation selector so layout classes are properly constructed.
-									const variationSelectorWithBlock =
-										styleVariationSelector + selector;
-									ruleset += getLayoutStyles( {
-										style: styleVariations,
-										selector: variationSelectorWithBlock,
-										hasBlockGapSupport: true,
-										hasFallbackGapSupport,
-										fallbackGapValue,
-									} );
-								}
-							}
-						}
-					);
-				}
-
-				// Check for pseudo selector in `styles` and handle separately.
-				const pseudoSelectorStyles = Object.entries( styles ).filter(
-					( [ key ] ) => key.startsWith( ':' )
-				);
-
-				if ( pseudoSelectorStyles?.length ) {
-					pseudoSelectorStyles.forEach(
-						( [ pseudoKey, pseudoStyle ] ) => {
-							const pseudoDeclarations =
-								getStylesDeclarations( pseudoStyle );
-
-							if ( ! pseudoDeclarations?.length ) {
-								return;
-							}
-
-							// `selector` may be provided in a form
-							// where block level selectors have sub element
-							// selectors appended to them as a comma separated
-							// string.
-							// e.g. `h1 a,h2 a,h3 a,h4 a,h5 a,h6 a`;
-							// Split and append pseudo selector to create
-							// the proper rules to target the elements.
-							const _selector = selector
-								.split( ',' )
-								.map( ( sel: string ) => sel + pseudoKey )
-								.join( ',' );
-
-							// As pseudo classes such as :hover, :focus etc. have class-level
-							// specificity, they must use the `:root :where()` wrapper. This.
-							// caps the specificity at `0-1-0` to allow proper nesting of variations
-							// and block type element styles.
-							const pseudoRule = `:root :where(${ _selector }){${ pseudoDeclarations.join(
-								';'
-							) };}`;
-
-							ruleset += pseudoRule;
-						}
-					);
-				}
+		const responsiveMediaQueries = getResponsiveMediaQueries( tree );
+		nodesWithStyles.forEach( ( node ) => {
+			if ( node.isStyleVariation && ! options.variationStyles ) {
+				return;
 			}
-		);
+
+			const responsiveNodes = getResponsiveStyleNodes(
+				node,
+				responsiveMediaQueries
+			);
+			// Match PHP node order: base, responsive base, pseudo, responsive pseudo.
+			[
+				node,
+				...responsiveNodes,
+				...getPseudoStyleNodes( node ),
+				...responsiveNodes.flatMap( getPseudoStyleNodes ),
+			].forEach( ( expandedNode ) => {
+				ruleset += renderStylesNode( expandedNode, {
+					tree: normalizedTree,
+					useRootPaddingAlign,
+					disableLayoutStyles,
+					hasBlockGapSupport,
+					hasFallbackGapSupport,
+					disableRootPadding,
+				} );
+			} );
+		} );
 	}
 
 	if ( options.layoutStyles ) {
@@ -1396,7 +1861,8 @@ export const transformToStyles = (
 	if ( options.blockGap && hasBlockGapSupport ) {
 		// Use fallback of `0.5em` just in case, however if there is blockGap support, there should nearly always be a real value.
 		const gapValue =
-			getGapCSSValue( tree?.styles?.spacing?.blockGap ) || '0.5em';
+			getGapCSSValue( normalizedTree?.styles?.spacing?.blockGap ) ||
+			'0.5em';
 		ruleset =
 			ruleset +
 			`:root :where(.wp-site-blocks) > * { margin-block-start: ${ gapValue }; margin-block-end: 0; }`;
@@ -1484,22 +1950,24 @@ export const getBlockSelectors = (
 				'color.__experimentalDuotone',
 				false
 			);
-			duotoneSelector =
-				duotoneSupport &&
-				rootSelector &&
-				scopeSelector( rootSelector, duotoneSupport );
+			if ( typeof duotoneSupport === 'string' && rootSelector ) {
+				duotoneSelector = scopeSelector( rootSelector, duotoneSupport );
+			}
 		}
 
 		const hasLayoutSupport =
 			!! blockType?.supports?.layout ||
 			!! blockType?.supports?.__experimentalLayout;
+		const blockGapSupport = blockType?.supports?.spacing?.blockGap;
 		const fallbackGapValue =
-			// @ts-expect-error
-			blockType?.supports?.spacing?.blockGap?.__experimentalDefault;
+			typeof blockGapSupport === 'object' &&
+			! Array.isArray( blockGapSupport )
+				? blockGapSupport.__experimentalDefault
+				: undefined;
 
 		const blockStyleVariations = getBlockStyles( name );
 		const styleVariationSelectors: Record< string, string > = {};
-		blockStyleVariations?.forEach( ( variation: BlockStyleVariation ) => {
+		blockStyleVariations?.forEach( ( variation ) => {
 			const variationSuffix = variationInstanceId
 				? `-${ variationInstanceId }`
 				: '';
@@ -1701,7 +2169,7 @@ export function generateGlobalStyles(
 		},
 		{
 			assets: svgs,
-			__unstableType: 'svg',
+			__unstableType: 'svgs',
 			isGlobalStyles: true,
 		},
 	];
@@ -1712,7 +2180,22 @@ export function generateGlobalStyles(
 	blocks.forEach( ( blockType: BlockType ) => {
 		const blockStyles = updatedConfig?.styles?.blocks?.[ blockType.name ];
 		if ( blockStyles?.css ) {
-			const selector = blockSelectors[ blockType.name ].selector;
+			const { featureSelectors } = blockSelectors[ blockType.name ];
+			const cssFeatureSelector =
+				typeof featureSelectors === 'object'
+					? featureSelectors?.css
+					: undefined;
+			let resolvedCssSelector: string | undefined;
+			if ( typeof cssFeatureSelector === 'string' ) {
+				resolvedCssSelector = cssFeatureSelector;
+			} else if ( typeof cssFeatureSelector === 'object' ) {
+				resolvedCssSelector = (
+					cssFeatureSelector as Record< string, string >
+				 )?.root;
+			}
+			const selector =
+				resolvedCssSelector ??
+				blockSelectors[ blockType.name ].selector;
 			styles.push( {
 				css: processCSSNesting( blockStyles.css, selector ),
 				isGlobalStyles: true,

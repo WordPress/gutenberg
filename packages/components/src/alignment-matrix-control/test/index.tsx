@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen, waitFor, within } from '@testing-library/react';
 import { press, click } from '@ariakit/test';
-
-/**
- * Internal dependencies
- */
 import AlignmentMatrixControl from '..';
 
 const getControl = () => {
@@ -18,7 +11,7 @@ const getCell = ( name: string ) => {
 };
 
 const renderAndInitCompositeStore = async (
-	jsx: JSX.Element,
+	jsx: React.JSX.Element,
 	focusedCell = 'center center'
 ) => {
 	const view = render( jsx );

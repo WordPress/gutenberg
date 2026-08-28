@@ -1,15 +1,8 @@
-/**
- * External dependencies
- */
 import { RuleTester } from 'eslint';
-
-/**
- * Internal dependencies
- */
 import rule from '../no-unsafe-wp-apis';
 
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		sourceType: 'module',
 		ecmaVersion: 6,
 	},
@@ -54,6 +47,13 @@ ruleTester.run( 'no-unsafe-wp-apis', rule, {
 			options,
 		},
 		{ code: "import * as s from '@wordpress/package';", options },
+		{
+			// String-literal imports (e.g. `import { 'a' as b }`) have a
+			// non-identifier `imported` node and are ignored by the rule.
+			code: "import { '__experimentalUnsafe' as s } from '@wordpress/package';",
+			options,
+			languageOptions: { sourceType: 'module', ecmaVersion: 2022 },
+		},
 	],
 
 	invalid: [
@@ -64,7 +64,6 @@ ruleTester.run( 'no-unsafe-wp-apis', rule, {
 				{
 					message: `Usage of \`__experimentalUnsafe\` from \`@wordpress/package\` is not allowed.
 See https://developer.wordpress.org/block-editor/contributors/develop/coding-guidelines/#experimental-and-unstable-apis for details.`,
-					type: 'ImportSpecifier',
 				},
 			],
 		},
@@ -75,7 +74,6 @@ See https://developer.wordpress.org/block-editor/contributors/develop/coding-gui
 				{
 					message: `Usage of \`__experimentalSafe\` from \`@wordpress/unsafe\` is not allowed.
 See https://developer.wordpress.org/block-editor/contributors/develop/coding-guidelines/#experimental-and-unstable-apis for details.`,
-					type: 'ImportSpecifier',
 				},
 			],
 		},
@@ -86,7 +84,6 @@ See https://developer.wordpress.org/block-editor/contributors/develop/coding-gui
 				{
 					message: `Usage of \`__experimentalSafe\` from \`@wordpress/unsafe\` is not allowed.
 See https://developer.wordpress.org/block-editor/contributors/develop/coding-guidelines/#experimental-and-unstable-apis for details.`,
-					type: 'ImportSpecifier',
 				},
 			],
 		},
@@ -97,7 +94,6 @@ See https://developer.wordpress.org/block-editor/contributors/develop/coding-gui
 				{
 					message: `Usage of \`__experimentalUnsafe\` from \`@wordpress/package\` is not allowed.
 See https://developer.wordpress.org/block-editor/contributors/develop/coding-guidelines/#experimental-and-unstable-apis for details.`,
-					type: 'ImportSpecifier',
 				},
 			],
 		},
@@ -108,7 +104,6 @@ See https://developer.wordpress.org/block-editor/contributors/develop/coding-gui
 				{
 					message: `Usage of \`__unstableFeature\` from \`@wordpress/package\` is not allowed.
 See https://developer.wordpress.org/block-editor/contributors/develop/coding-guidelines/#experimental-and-unstable-apis for details.`,
-					type: 'ImportSpecifier',
 				},
 			],
 		},

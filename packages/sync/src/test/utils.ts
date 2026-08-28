@@ -1,19 +1,20 @@
-/**
- * External dependencies
- */
 import * as Y from 'yjs';
 import * as buffer from 'lib0/buffer';
 import { describe, expect, it, beforeEach } from '@jest/globals';
-
-/**
- * Internal dependencies
- */
-import { createYjsDoc, serializeCrdtDoc, deserializeCrdtDoc } from '../utils';
+import {
+	createYjsDoc,
+	initializeYjsDoc,
+	markEntityAsSaved,
+	serializeCrdtDoc,
+	deserializeCrdtDoc,
+} from '../utils';
 import {
 	CRDT_DOC_META_PERSISTENCE_KEY,
 	CRDT_DOC_VERSION,
 	CRDT_STATE_MAP_KEY,
-	CRDT_STATE_VERSION_KEY,
+	CRDT_STATE_MAP_SAVED_AT_KEY as SAVED_AT_KEY,
+	CRDT_STATE_MAP_SAVED_BY_KEY as SAVED_BY_KEY,
+	CRDT_STATE_MAP_VERSION_KEY as VERSION_KEY,
 } from '../config';
 
 describe( 'utils', () => {
@@ -40,13 +41,81 @@ describe( 'utils', () => {
 			expect( ydoc.meta?.size ).toBe( 0 );
 		} );
 
+		it( 'does not advance the state vector when creating the doc', () => {
+			const ydoc = createYjsDoc();
+			const sv = Y.decodeStateVector( Y.encodeStateVector( ydoc ) );
+
+			// createYjsDoc does not make any updates to the doc, so the state
+			// vector for the doc's client ID should be undefined.
+			expect( sv.get( ydoc.clientID ) ).toBeUndefined();
+		} );
+	} );
+
+	describe( 'initializeYjsDoc', () => {
 		it( 'sets the CRDT document version in the state map', () => {
-			const ydoc = createYjsDoc( {} );
+			const ydoc = new Y.Doc( {} );
 			const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
 
-			expect( stateMap.get( CRDT_STATE_VERSION_KEY ) ).toBe(
-				CRDT_DOC_VERSION
-			);
+			initializeYjsDoc( ydoc );
+
+			expect( stateMap.get( VERSION_KEY ) ).toBe( CRDT_DOC_VERSION );
+		} );
+
+		it( 'advances the state vector when setting the version key', () => {
+			const ydoc = new Y.Doc();
+
+			initializeYjsDoc( ydoc );
+
+			const sv = Y.decodeStateVector( Y.encodeStateVector( ydoc ) );
+
+			// createYjsDoc sets VERSION_KEY via stateMap.set(), which creates
+			// a Yjs operation. This advances the state vector for the doc's
+			// client ID to clock 1.
+			expect( sv.get( ydoc.clientID ) ).toBe( 1 );
+		} );
+
+		it( 'fires an update event when setting the version key', () => {
+			const updates: Uint8Array[] = [];
+			const ydoc = new Y.Doc();
+
+			ydoc.on( 'update', ( update: Uint8Array ) => {
+				updates.push( update );
+			} );
+
+			initializeYjsDoc( ydoc );
+
+			expect( updates ).toHaveLength( 1 );
+		} );
+	} );
+
+	describe( 'markEntityAsSaved', () => {
+		it( 'sets the saved-at timestamp and saved-by client ID', () => {
+			const ydoc = createYjsDoc();
+			const before = Date.now();
+
+			markEntityAsSaved( ydoc );
+
+			const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
+			const savedAt = stateMap.get( SAVED_AT_KEY ) as number;
+			const savedBy = stateMap.get( SAVED_BY_KEY );
+
+			expect( savedAt ).toBeGreaterThanOrEqual( before );
+			expect( savedAt ).toBeLessThanOrEqual( Date.now() );
+			expect( savedBy ).toBe( ydoc.clientID );
+		} );
+
+		it( 'updates the timestamp on subsequent calls', () => {
+			const ydoc = createYjsDoc();
+
+			markEntityAsSaved( ydoc );
+			const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
+			const firstSavedAt = stateMap.get( SAVED_AT_KEY ) as number;
+
+			// Small delay to ensure timestamp changes.
+			markEntityAsSaved( ydoc );
+			const secondSavedAt = stateMap.get( SAVED_AT_KEY ) as number;
+
+			expect( secondSavedAt ).toBeGreaterThanOrEqual( firstSavedAt );
 		} );
 	} );
 
@@ -69,6 +138,65 @@ describe( 'utils', () => {
 			expect( typeof parsed.document ).toBe( 'string' );
 			expect( parsed.document.length ).toBeGreaterThan( 0 );
 		} );
+
+		it( 'garbage-collects undo-pinned deleted content when serializing', () => {
+			const ytext = testDoc.getText( 'content' );
+			const origin = 'test-local-origin';
+			const undoManager = new Y.UndoManager( ytext, {
+				captureTimeout: 0,
+				trackedOrigins: new Set( [ origin ] ),
+			} );
+			const largeText = 'x'.repeat( 100000 );
+
+			// Insert and delete in separate tracked transactions. The undo
+			// manager flags the deleted content with `keep`, blocking garbage
+			// collection in the live doc.
+			testDoc.transact( () => ytext.insert( 0, largeText ), origin );
+			testDoc.transact(
+				() => ytext.delete( 0, largeText.length ),
+				origin
+			);
+
+			const liveDocSize = Y.encodeStateAsUpdateV2( testDoc ).byteLength;
+			const serialized = serializeCrdtDoc( testDoc );
+			const compactedSize = buffer.fromBase64(
+				JSON.parse( serialized ).document
+			).byteLength;
+
+			// The live doc still carries the deleted content for undo; the
+			// serialized snapshot must not.
+			expect( liveDocSize ).toBeGreaterThan( largeText.length );
+			expect( compactedSize ).toBeLessThan( 1000 );
+
+			// The snapshot deserializes to the current (post-delete) state.
+			const deserialized = deserializeCrdtDoc( serialized );
+			expect( deserialized!.getText( 'content' ).toString() ).toBe( '' );
+
+			undoManager.destroy();
+		} );
+
+		it( 'does not affect undo history on the live doc', () => {
+			const ytext = testDoc.getText( 'content' );
+			const origin = 'test-local-origin';
+			const undoManager = new Y.UndoManager( ytext, {
+				captureTimeout: 0,
+				trackedOrigins: new Set( [ origin ] ),
+			} );
+
+			testDoc.transact(
+				() => ytext.insert( 0, 'Hello, world!' ),
+				origin
+			);
+			testDoc.transact( () => ytext.delete( 0, 13 ), origin );
+
+			serializeCrdtDoc( testDoc );
+
+			// Undo the delete: the content must still be restorable.
+			undoManager.undo();
+			expect( ytext.toString() ).toBe( 'Hello, world!' );
+
+			undoManager.destroy();
+		} );
 	} );
 
 	describe( 'deserializeCrdtDoc', () => {
@@ -77,6 +205,8 @@ describe( 'utils', () => {
 
 		beforeEach( () => {
 			originalDoc = createYjsDoc();
+			initializeYjsDoc( originalDoc );
+
 			const ymap = originalDoc.getMap( 'testMap' );
 			ymap.set( 'title', 'Test Title' );
 			ymap.set( 'count', 42 );
@@ -142,9 +272,7 @@ describe( 'utils', () => {
 			expect( deserialized ).toBeInstanceOf( Y.Doc );
 
 			const stateMap = deserialized!.getMap( CRDT_STATE_MAP_KEY );
-			expect( stateMap.get( CRDT_STATE_VERSION_KEY ) ).toBe(
-				CRDT_DOC_VERSION
-			);
+			expect( stateMap.get( VERSION_KEY ) ).toBe( CRDT_DOC_VERSION );
 		} );
 	} );
 

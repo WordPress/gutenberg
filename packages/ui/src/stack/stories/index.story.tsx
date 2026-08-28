@@ -1,17 +1,23 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Stack } from '../index';
-import { Box } from '../../box';
 
 const meta: Meta< typeof Stack > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/Stack',
 	component: Stack,
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
+	},
 };
 export default meta;
 
 const DemoBox = ( { variant }: { variant?: 'lg' } ) => (
-	<Box
-		backgroundColor="brand"
+	<div
 		style={ {
+			backgroundColor: 'var(--wpds-color-background-surface-brand)',
 			width: variant === 'lg' ? '150px' : '100px',
 			height: variant === 'lg' ? '150px' : '100px',
 		} }
@@ -22,17 +28,15 @@ type Story = StoryObj< typeof Stack >;
 
 export const Default: Story = {
 	args: {
-		gap: 'sm',
-		children: (
-			<>
-				<DemoBox />
-				<DemoBox variant="lg" />
-				<DemoBox />
-				<DemoBox />
-				<DemoBox variant="lg" />
-				<DemoBox />
-			</>
-		),
+		gap: 'md',
+		children: [
+			<DemoBox key="demoBox" />,
+			<DemoBox variant="lg" key="demoBox-2" />,
+			<DemoBox key="demoBox-3" />,
+			<DemoBox key="demoBox-4" />,
+			<DemoBox variant="lg" key="demoBox-5" />,
+			<DemoBox key="demoBox-6" />,
+		],
 	},
 	argTypes: {
 		align: {
@@ -45,6 +49,7 @@ export const Default: Story = {
 				'baseline',
 				'stretch',
 			],
+
 			table: {
 				type: {
 					summary:
@@ -66,6 +71,7 @@ export const Default: Story = {
 				'left',
 				'right',
 			],
+
 			table: {
 				type: {
 					summary:
@@ -88,20 +94,18 @@ export const Nested: Story = {
 		...Default.args,
 		align: 'center',
 		justify: 'center',
-		children: (
-			<>
-				<DemoBox variant="lg" />
-				<Stack gap="md">
-					<DemoBox />
-					<DemoBox />
-				</Stack>
-				<DemoBox variant="lg" />
-				<Stack direction="column">
-					<DemoBox />
-					<DemoBox />
-				</Stack>
-				<DemoBox variant="lg" />
-			</>
-		),
+		children: [
+			<DemoBox variant="lg" key="demoBox" />,
+			<Stack gap="lg" key="stack">
+				<DemoBox />
+				<DemoBox />
+			</Stack>,
+			<DemoBox variant="lg" key="demoBox-2" />,
+			<Stack direction="column" key="stack-2">
+				<DemoBox />
+				<DemoBox />
+			</Stack>,
+			<DemoBox variant="lg" key="demoBox-3" />,
+		],
 	},
 };
