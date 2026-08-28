@@ -135,6 +135,65 @@ describe( 'editEntityRecord', () => {
 		} );
 	} );
 
+	it( 'does not capture the persisted CRDT document in merged meta edits for synced entities', () => {
+		const dispatch = jest.fn();
+		const syncManager = { update: jest.fn() };
+		getSyncManager.mockReturnValue( syncManager );
+		const select = {
+			getEntityConfig: () => ( {
+				kind: 'postType',
+				name: 'post',
+				mergedEdits: { meta: true },
+				syncConfig: {},
+			} ),
+			getRawEntityRecord: () => ( {
+				id: 1,
+				meta: {
+					existingKey: 'existingValue',
+					_crdt_document: 'persisted-doc',
+				},
+			} ),
+			getEditedEntityRecord: () => ( {
+				id: 1,
+				meta: {
+					existingKey: 'existingValue',
+					_crdt_document: 'persisted-doc',
+				},
+			} ),
+			getUndoManager: () => ( {
+				addRecord: jest.fn(),
+			} ),
+		};
+
+		editEntityRecord( 'postType', 'post', 1, {
+			meta: { newKey: 'newValue' },
+		} )( {
+			select,
+			dispatch,
+		} );
+
+		// The persisted CRDT document changes on every save; capturing it in
+		// the meta edit would keep the record dirty after the edit itself is
+		// persisted (e.g. by a collaborator's save).
+		const expectedMeta = {
+			existingKey: 'existingValue',
+			newKey: 'newValue',
+		};
+		expect( dispatch ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				type: 'EDIT_ENTITY_RECORD',
+				edits: { meta: expectedMeta },
+			} )
+		);
+		expect( syncManager.update ).toHaveBeenCalledWith(
+			'postType/post',
+			1,
+			{ meta: expectedMeta },
+			'local-editor',
+			{ isNewUndoLevel: true }
+		);
+	} );
+
 	it( 'handles both merged and non-merged edits together', () => {
 		const dispatch = jest.fn();
 		const select = {

@@ -193,6 +193,7 @@ function entity( entityConfig ) {
 		replaceAction( ( action ) => {
 			return {
 				key: entityConfig.key || DEFAULT_ENTITY_KEY,
+				mergedEdits: entityConfig.mergedEdits || {},
 				...action,
 			};
 		} ),
@@ -221,25 +222,72 @@ function entity( entityConfig ) {
 
 							const nextEdits = Object.keys( edits ).reduce(
 								( acc, key ) => {
-									// If the edited value is still different to the persisted value,
-									// keep the edited value in edits.
+									// An edit no longer needs to be tracked when
+									// its value matches the received record, or
+									// when it matches the value that was sent to
+									// the server (the server sometimes alters a
+									// sent value, in which case the response is
+									// authoritative).
+									const editValue = edits[ key ];
+									// Edits are the "raw" attribute values, but records may have
+									// objects with more properties, so we use `get` here for the
+									// comparison.
+									const recordValue =
+										record[ key ]?.raw ?? record[ key ];
+									const persistedValue =
+										action.persistedEdits?.[ key ];
+
+									let isPersisted;
 									if (
-										// Edits are the "raw" attribute values, but records may have
-										// objects with more properties, so we use `get` here for the
-										// comparison.
-										! fastDeepEqual(
-											edits[ key ],
-											record[ key ]?.raw ?? record[ key ]
-										) &&
-										// Sometimes the server alters the sent value which means
-										// we need to also remove the edits before the api request.
-										( ! action.persistedEdits ||
-											! fastDeepEqual(
-												edits[ key ],
-												action.persistedEdits[ key ]
-											) )
+										action.mergedEdits?.[ key ] &&
+										editValue &&
+										'object' === typeof editValue &&
+										recordValue &&
+										'object' === typeof recordValue
 									) {
-										acc[ key ] = edits[ key ];
+										// Merged-edit keys (e.g. a post's `meta`)
+										// hold a full object snapshot, while the
+										// record may carry additional
+										// server-managed properties the client
+										// never edits (e.g. the persisted CRDT
+										// document). Compare property by property
+										// so those extra properties don't keep the
+										// snapshot marked dirty forever. The edit
+										// is dropped whole or kept whole — never
+										// partially pruned — because an edited
+										// value replaces the record's value
+										// wholesale in the edited record.
+										isPersisted = Object.entries(
+											editValue
+										).every(
+											( [ subKey, subValue ] ) =>
+												fastDeepEqual(
+													subValue,
+													recordValue[ subKey ]
+												) ||
+												( action.persistedEdits &&
+													fastDeepEqual(
+														subValue,
+														persistedValue?.[
+															subKey
+														]
+													) )
+										);
+									} else {
+										isPersisted =
+											fastDeepEqual(
+												editValue,
+												recordValue
+											) ||
+											( action.persistedEdits &&
+												fastDeepEqual(
+													editValue,
+													persistedValue
+												) );
+									}
+
+									if ( ! isPersisted ) {
+										acc[ key ] = editValue;
 									}
 									return acc;
 								},
