@@ -32,7 +32,7 @@ jobs:
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
-        if: ${{ github.repository == 'WordPress/gutenberg' && github.event_name == 'workflow_dispatch' }}
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         outputs:
             current_stable_branch: ${{ steps.get_branches.outputs.current_stable_branch }}
             next_stable_branch: ${{ steps.get_branches.outputs.next_stable_branch }}
