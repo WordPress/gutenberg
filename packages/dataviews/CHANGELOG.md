@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   DataForm: Remove the minimum row height from the `regular` layout, so rows size to their content. [#82052](https://github.com/WordPress/gutenberg/pull/82052)
+
 ### Internal
 
 -   Remove unused dependency `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
@@ -18,7 +22,6 @@
 
 -   DataViews: Restore the divider that marks the sticky Actions column when a table layout is horizontally scrollable. It was drawn with a surface background token rather than a stroke one, making it invisible against the table, so nothing indicated there were more properties to scroll to. [#82055](https://github.com/WordPress/gutenberg/pull/82055)
 -   Picker grid layout: Clip item previews to the media box's rounded corners, as the grid layout already does, so an image no longer squares off its corners ([#81604](https://github.com/WordPress/gutenberg/pull/81604)).
--   DataForm: Remove the minimum row height from the `regular` layout, so rows size to their content. [#82052](https://github.com/WordPress/gutenberg/pull/82052)
 -   DataForm: Keep the displayed calendar month of the `date` and `datetime` controls in sync when the value changes from outside the control, e.g. after an undo, a reset, or switching the edited item. [#81635](https://github.com/WordPress/gutenberg/pull/81635)
 -   DataForms: Fix the `date` and `datetime` controls selecting and highlighting the day next to the one clicked. A site configured with a UTC offset rather than a named timezone reports no timezone the calendar can work in, so it fell back to the browser's while the values stayed anchored to the site's. The `datetime` calendar is now given the site's UTC offset itself — which also keeps the day it marks as today the site's — and a `date` value is treated as a plain calendar day, parsed in the same browser timezone the calendar reads it in. [#81498](https://github.com/WordPress/gutenberg/pull/81498)
 -   Validated form controls: Align invalid focus styling for InputBase-based controls with the design system ([#80417](https://github.com/WordPress/gutenberg/pull/80417)).
