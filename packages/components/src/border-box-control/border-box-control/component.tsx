@@ -86,28 +86,28 @@ const UnconnectedBorderBoxControl = (
 		);
 
 	const mergedRef = useMergeRefs( [ setPopoverAnchor, forwardedRef ] );
-	const linkedButton = (
-		<BorderBoxControlLinkedButton
-			onClick={ toggleLinked }
-			isLinked={ isLinked }
-		/>
-	);
-	const borderLabel = (
-		<BorderLabel
-			label={ label }
-			hideLabelFromVision={ hideLabelFromVision }
-		/>
-	);
 
 	return (
 		<View className={ className } { ...otherProps } ref={ mergedRef }>
 			{ hasVisibleLabel ? (
+				// The toggle shares the label's row so that it lines up with
+				// the equivalent toggle on sibling controls, e.g. the border
+				// radius one.
 				<HStack className={ headerClassName }>
-					{ borderLabel }
-					{ linkedButton }
+					<BorderLabel
+						label={ label }
+						hideLabelFromVision={ hideLabelFromVision }
+					/>
+					<BorderBoxControlLinkedButton
+						onClick={ toggleLinked }
+						isLinked={ isLinked }
+					/>
 				</HStack>
 			) : (
-				borderLabel
+				<BorderLabel
+					label={ label }
+					hideLabelFromVision={ hideLabelFromVision }
+				/>
 			) }
 			<View className={ wrapperClassName }>
 				{ isLinked ? (
@@ -146,7 +146,14 @@ const UnconnectedBorderBoxControl = (
 						}
 					/>
 				) }
-				{ ! hasVisibleLabel && linkedButton }
+				{ /* With no label row to join, the toggle sits alongside the
+				     inputs instead. */ }
+				{ ! hasVisibleLabel && (
+					<BorderBoxControlLinkedButton
+						onClick={ toggleLinked }
+						isLinked={ isLinked }
+					/>
+				) }
 			</View>
 		</View>
 	);
