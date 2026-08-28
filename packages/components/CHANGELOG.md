@@ -20,6 +20,7 @@
 -   Migrate JSX files to TypeScript and remove their ESLint filename suppressions ([#82132](https://github.com/WordPress/gutenberg/pull/82132)).
 -   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
 -   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
+-   `ToolsPanel`: Cut the render cascade panel items set off when the selected block changes, and keep a default control resettable when `Reset all` leaves its value in place ([#82180](https://github.com/WordPress/gutenberg/pull/82180)).
 
 ## 40.0.0 (2026-08-26)
 
