@@ -166,11 +166,18 @@ export default function GalleryEdit( props ) {
 		imageCrop,
 		randomOrder,
 		linkTarget,
-		linkTo,
+		linkTo: storedLinkTo,
 		sizeSlug,
 		aspectRatio,
 		layout,
 	} = attributes;
+	// Galleries saved before this value was translated, and galleries created by
+	// older versions of this block, hold WordPress' 'file' and 'post' rather than
+	// this block's 'media' and 'attachment'. Translate on the way in so the rest
+	// of the component only deals with this block's own values. What is stored
+	// stays as it is: rewriting it would change posts nobody asked us to change,
+	// and the front end reads the stored value through the same translation.
+	const linkTo = normalizeLinkTo( storedLinkTo );
 	const isFlexLayout = isGalleryFlexLayout( layout );
 	const previousLayoutRef = useRef( layout );
 
@@ -699,19 +706,17 @@ export default function GalleryEdit( props ) {
 	useEffect( () => {
 		// linkTo attribute must be saved so blocks don't break when changing image_default_link_type in options.php.
 		// That option stores 'file' or 'post', which this block calls 'media'
-		// and 'attachment'. Translate both the option and any value an earlier
-		// version of this effect stored untranslated, because a value the Link
-		// control has no option for leaves the control showing nothing selected.
-		const nextLinkTo =
-			normalizeLinkTo(
-				linkTo || window?.wp?.media?.view?.settings?.defaultProps?.link
-			) || LINK_DESTINATION_NONE;
-
-		if ( nextLinkTo !== linkTo ) {
+		// and 'attachment', so translate it before storing it.
+		if ( ! storedLinkTo ) {
 			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { linkTo: nextLinkTo } );
+			setAttributes( {
+				linkTo:
+					normalizeLinkTo(
+						window?.wp?.media?.view?.settings?.defaultProps?.link
+					) || LINK_DESTINATION_NONE,
+			} );
 		}
-	}, [ linkTo ] );
+	}, [ storedLinkTo ] );
 
 	const hasImageIds = hasImages && images.some( ( image ) => !! image.id );
 	const imagesUploading = images.some(

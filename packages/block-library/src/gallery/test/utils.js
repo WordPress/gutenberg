@@ -1,4 +1,4 @@
-import { normalizeLinkTo } from '../utils';
+import { getHrefAndDestination, normalizeLinkTo } from '../utils';
 
 describe( 'normalizeLinkTo', () => {
 	it( 'translates the values WordPress stores in image_default_link_type', () => {
@@ -20,30 +20,57 @@ describe( 'normalizeLinkTo', () => {
 } );
 
 describe( 'linkTo seeding', () => {
-	// Mirrors the expression in GalleryEdit's linkTo effect, which is where the
-	// stored value is decided from the block attribute and the WordPress option.
-	function resolveLinkTo( linkTo, optionValue ) {
-		return normalizeLinkTo( linkTo || optionValue ) || 'none';
+	// Mirrors the expression in GalleryEdit's effect, which only runs when the
+	// gallery has no stored value yet.
+	function seedLinkTo( optionValue ) {
+		return normalizeLinkTo( optionValue ) || 'none';
 	}
 
-	it( "seeds a new gallery from the option in the block's vocabulary", () => {
-		expect( resolveLinkTo( undefined, 'file' ) ).toBe( 'media' );
-		expect( resolveLinkTo( undefined, 'post' ) ).toBe( 'attachment' );
+	it( "stores the option in the block's own vocabulary", () => {
+		expect( seedLinkTo( 'file' ) ).toBe( 'media' );
+		expect( seedLinkTo( 'post' ) ).toBe( 'attachment' );
 	} );
 
 	it( 'falls back to none when the option is unset', () => {
-		expect( resolveLinkTo( undefined, undefined ) ).toBe( 'none' );
-		expect( resolveLinkTo( undefined, '' ) ).toBe( 'none' );
+		expect( seedLinkTo( undefined ) ).toBe( 'none' );
+		expect( seedLinkTo( '' ) ).toBe( 'none' );
+	} );
+} );
+
+describe( 'getHrefAndDestination', () => {
+	const image = {
+		url: 'https://example.com/pic.jpg',
+		link: 'https://example.com/pic/',
+	};
+
+	it( 'accepts the values WordPress stores, without them being migrated', () => {
+		expect( getHrefAndDestination( image, 'file' ) ).toMatchObject( {
+			href: image.url,
+			linkDestination: 'media',
+		} );
+		expect( getHrefAndDestination( image, 'post' ) ).toMatchObject( {
+			href: image.link,
+			linkDestination: 'attachment',
+		} );
 	} );
 
-	it( 'translates a value an earlier version stored untranslated', () => {
-		expect( resolveLinkTo( 'file', 'none' ) ).toBe( 'media' );
-		expect( resolveLinkTo( 'post', 'none' ) ).toBe( 'attachment' );
+	it( "accepts the block's own values", () => {
+		expect( getHrefAndDestination( image, 'media' ) ).toMatchObject( {
+			href: image.url,
+			linkDestination: 'media',
+		} );
+		expect( getHrefAndDestination( image, 'attachment' ) ).toMatchObject( {
+			href: image.link,
+			linkDestination: 'attachment',
+		} );
 	} );
 
-	it( 'leaves a gallery that already has a supported value untouched', () => {
-		expect( resolveLinkTo( 'lightbox', 'file' ) ).toBe( 'lightbox' );
-		expect( resolveLinkTo( 'none', 'file' ) ).toBe( 'none' );
-		expect( resolveLinkTo( 'media', 'post' ) ).toBe( 'media' );
+	it( 'translates a per-image value too', () => {
+		expect( getHrefAndDestination( image, 'none', 'file' ) ).toMatchObject(
+			{
+				href: image.url,
+				linkDestination: 'media',
+			}
+		);
 	} );
 } );
