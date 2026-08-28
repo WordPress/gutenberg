@@ -15,13 +15,14 @@ function TestHarness( {
 		result: ReturnType< typeof useDeprioritizedInitialFocus >
 	) => void;
 } ) {
-	const { resolvedInitialFocus, popupRef } = useDeprioritizedInitialFocus( {
+	const result = useDeprioritizedInitialFocus( {
 		initialFocus,
 		deprioritizedAttributes: [ ATTR ],
 	} );
+	const { popupRef } = result;
 
 	useEffect( () => {
-		onResolved( { resolvedInitialFocus, popupRef } );
+		onResolved( result );
 	} );
 
 	return (
@@ -154,14 +155,14 @@ describe( 'useDeprioritizedInitialFocus', () => {
 					r: ReturnType< typeof useDeprioritizedInitialFocus >
 				) => void;
 			} ) {
-				const { resolvedInitialFocus, popupRef } =
-					useDeprioritizedInitialFocus( {
-						initialFocus: undefined,
-						deprioritizedAttributes: [ ATTR ],
-					} );
+				const result = useDeprioritizedInitialFocus( {
+					initialFocus: undefined,
+					deprioritizedAttributes: [ ATTR ],
+				} );
+				const { popupRef } = result;
 
 				useEffect( () => {
-					onResolvedProp( { resolvedInitialFocus, popupRef } );
+					onResolvedProp( result );
 				} );
 
 				return (
