@@ -363,6 +363,95 @@ describe( 'diffRevisionContent', () => {
 		] );
 	} );
 
+	it( 'treats identical attrs with different key order as unchanged', () => {
+		// `@wordpress/block-serialization-default-parser` preserves whatever
+		// key order the source block-comment JSON used. Two semantically
+		// identical blocks can therefore round-trip to two different
+		// JSON.stringify outputs — they must still be detected as unchanged.
+		const previous =
+			'<!-- wp:paragraph {"align":"center","textColor":"primary"} -->\n' +
+			'<p class="has-text-align-center has-primary-color has-text-color">Hello</p>\n' +
+			'<!-- /wp:paragraph -->';
+		const current =
+			'<!-- wp:paragraph {"textColor":"primary","align":"center"} -->\n' +
+			'<p class="has-text-align-center has-primary-color has-text-color">Hello</p>\n' +
+			'<!-- /wp:paragraph -->';
+		const blocks = diffRevisionContent( current, previous );
+
+		expect( normalizeBlockTree( blocks ) ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					__revisionDiffStatus: undefined,
+				},
+			},
+		] );
+	} );
+
+	it( 'treats trailing-whitespace-only innerHTML differences as unchanged', () => {
+		// Trailing whitespace inside a block comment is structurally
+		// invisible — the rendered output is the same, so the block must
+		// not show up as a no-op "modified" entry.
+		const previous =
+			'<!-- wp:paragraph {"align":"center"} -->\n' +
+			'<p class="has-text-align-center">Hello</p>\n' +
+			'<!-- /wp:paragraph -->';
+		const current =
+			'<!-- wp:paragraph {"align":"center"} -->\n' +
+			'<p class="has-text-align-center">Hello</p>  \n' +
+			'<!-- /wp:paragraph -->';
+		const blocks = diffRevisionContent( current, previous );
+
+		expect( normalizeBlockTree( blocks ) ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					__revisionDiffStatus: undefined,
+				},
+			},
+		] );
+	} );
+
+	it( 'does not drag a neighbour with a key-order swap into a real change', () => {
+		// One real change (className flip) next to one cosmetic-only
+		// difference (attr key reorder). Only the real change should be
+		// reported as modified — the neighbour must remain unchanged.
+		const previous =
+			'<!-- wp:paragraph {"className":"has-large-padding-top"} -->\n' +
+			'<p class="has-large-padding-top">First</p>\n' +
+			'<!-- /wp:paragraph -->\n\n' +
+			'<!-- wp:paragraph {"align":"center","textColor":"primary"} -->\n' +
+			'<p class="has-text-align-center has-primary-color has-text-color">Second</p>\n' +
+			'<!-- /wp:paragraph -->';
+		const current =
+			'<!-- wp:paragraph {"className":"has-medium-padding-top"} -->\n' +
+			'<p class="has-medium-padding-top">First</p>\n' +
+			'<!-- /wp:paragraph -->\n\n' +
+			'<!-- wp:paragraph {"textColor":"primary","align":"center"} -->\n' +
+			'<p class="has-text-align-center has-primary-color has-text-color">Second</p>\n' +
+			'<!-- /wp:paragraph -->';
+		const blocks = diffRevisionContent( current, previous );
+
+		// Only the first paragraph (real className change) is modified.
+		// The second paragraph (cosmetic key reorder) stays unchanged.
+		expect( normalizeBlockTree( blocks ) ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					__revisionDiffStatus: {
+						status: 'modified',
+					},
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					__revisionDiffStatus: undefined,
+				},
+			},
+		] );
+	} );
+
 	it( 'pairs blocks as modified when attrs differ but content is identical', () => {
 		const previous = serialize( [
 			createBlock( 'core/paragraph', { content: 'Same content' } ),

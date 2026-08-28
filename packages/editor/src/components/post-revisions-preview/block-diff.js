@@ -59,6 +59,61 @@ function stringifyValue( value ) {
 }
 
 /**
+ * Deterministic JSON.stringify: recursively sorts object keys so that two
+ * objects with the same attributes serialize identically regardless of the
+ * order their keys were inserted in.
+ *
+ * Used for block-signature comparison and attrs-equality checks below.
+ * `@wordpress/block-serialization-default-parser` preserves whatever key
+ * order the source block-comment JSON used, so the same logical block can
+ * round-trip to two different `JSON.stringify` outputs (e.g. after a
+ * programmatic re-serialization), which produced phantom "removed + added"
+ * pairs and no-op "modified" entries.
+ *
+ * @param {*} value The value to stringify.
+ * @return {string} The stringified value with object keys in sorted order.
+ */
+function canonicalStringify( value ) {
+	if ( value === null || typeof value !== 'object' ) {
+		return JSON.stringify( value ) ?? 'null';
+	}
+	if ( Array.isArray( value ) ) {
+		return '[' + value.map( canonicalStringify ).join( ',' ) + ']';
+	}
+	const keys = Object.keys( value )
+		.filter( ( k ) => value[ k ] !== undefined )
+		.sort();
+	return (
+		'{' +
+		keys
+			.map(
+				( k ) =>
+					JSON.stringify( k ) + ':' + canonicalStringify( value[ k ] )
+			)
+			.join( ',' ) +
+		'}'
+	);
+}
+
+/**
+ * Block's own structural content fragments (between/around its inner blocks),
+ * normalized for comparison: null entries dropped, each remaining segment
+ * trimmed, then empty results dropped. Used for the position-swap escape
+ * hatch in `pairSimilarBlocks` so that purely-cosmetic whitespace
+ * differences in `innerContent` don't cause genuinely-equal blocks to be
+ * paired as a no-op "modified" entry.
+ *
+ * @param {Object} block Raw block.
+ * @return {string[]} Trimmed non-empty content fragments.
+ */
+function normalizedInnerContent( block ) {
+	return ( block.innerContent || [] )
+		.filter( ( c ) => c !== null )
+		.map( ( c ) => c.trim() )
+		.filter( ( c ) => c !== '' );
+}
+
+/**
  * Calculate text similarity using word-set overlap.
  *
  * Uses a variant of the Jaccard index (https://en.wikipedia.org/wiki/Jaccard_index)
@@ -202,13 +257,19 @@ function pairSimilarBlocks( blocks ) {
 		// pair them directly — no ambiguity, no similarity check needed.
 		if ( sameNameRemoved.length === 1 && unpaired.length === 1 ) {
 			const add = unpaired[ 0 ];
+			// canonicalStringify (sorted-key) and normalizedInnerContent
+			// (trimmed) so that the position-swap escape hatch fires for
+			// genuinely-equal blocks even when their attrs were
+			// re-serialized in a different key order or their innerHTML
+			// picked up cosmetic whitespace.
 			const attrsMatch =
-				JSON.stringify( rem.block.attrs ) ===
-				JSON.stringify( add.block.attrs );
+				canonicalStringify( rem.block.attrs ) ===
+				canonicalStringify( add.block.attrs );
 			// Only skip pairing if both content and attrs are identical
 			// (position swap, not a modification).
 			const contentMatch =
-				( rem.block.innerHTML || '' ) === ( add.block.innerHTML || '' );
+				canonicalStringify( normalizedInnerContent( rem.block ) ) ===
+				canonicalStringify( normalizedInnerContent( add.block ) );
 			if ( ! contentMatch || ! attrsMatch ) {
 				bestMatch = add;
 			}
@@ -224,8 +285,8 @@ function pairSimilarBlocks( blocks ) {
 				// are position swaps, not modifications. They should show
 				// as separate removed + added, not as a no-op "modified".
 				const attrsMatch =
-					JSON.stringify( rem.block.attrs ) ===
-					JSON.stringify( add.block.attrs );
+					canonicalStringify( rem.block.attrs ) ===
+					canonicalStringify( add.block.attrs );
 				if (
 					score > bestScore &&
 					score > SIMILARITY_THRESHOLD &&
@@ -324,14 +385,14 @@ function diffRawBlocks( currentRaw, previousRaw ) {
 	previousRaw = previousRaw.filter( ( b ) => ! isWhitespaceRawBlock( b ) );
 
 	const createBlockSignature = ( rawBlock ) =>
-		JSON.stringify( {
+		// canonicalStringify (sorted keys) + normalizedInnerContent so that
+		// identical blocks with re-ordered attrs or whitespace-only innerHTML
+		// differences collapse to the same signature and are matched as
+		// unchanged by the LCS — not as a phantom removed + added pair.
+		canonicalStringify( {
 			name: rawBlock.blockName,
 			attrs: rawBlock.attrs,
-			// Use innerContent filtered to non-null and non-whitespace-only strings.
-			// This excludes whitespace between inner blocks which changes based on count.
-			html: ( rawBlock.innerContent || [] ).filter(
-				( c ) => c !== null && c.trim() !== ''
-			),
+			html: normalizedInnerContent( rawBlock ),
 		} );
 	const currentSigs = currentRaw.map( createBlockSignature );
 	const previousSigs = previousRaw.map( createBlockSignature );
