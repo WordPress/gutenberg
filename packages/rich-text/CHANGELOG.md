@@ -2,10 +2,13 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `useAnchor` now expects an `editableContentRef` option holding the ref to the editable content element. The existing `editableContentElement` option keeps working, but is deprecated since 7.2.
+
 ## 7.54.0 (2026-08-26)
 
 ## 7.53.0 (2026-08-12)
-
 
 ## 7.52.0 (2026-07-29)
 

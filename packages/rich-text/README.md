@@ -464,8 +464,9 @@ This hook, to be used in a format type's Edit component, returns the active elem
 
 _Parameters_
 
--   _obj_ `{ editableContentElement: HTMLElement | null; settings?: WPFormat; }`: Named parameters.
--   _obj.editableContentElement_ `HTMLElement | null`: The element containing the editable content.
+-   _obj_ `{ editableContentRef?: RefObject< HTMLElement | null >; editableContentElement?: HTMLElement | null; settings?: WPFormat; }`: Named parameters.
+-   _obj.editableContentRef_ `RefObject< HTMLElement | null >`: Ref to the element containing the editable content.
+-   _obj.editableContentElement_ `HTMLElement | null`: The element containing the editable content. Deprecated since 7.2: pass `editableContentRef` instead.
 -   _obj.settings_ `WPFormat`: The format type's settings.
 
 _Returns_

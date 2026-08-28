@@ -62,7 +62,7 @@ function Edit( { isActive, value, onChange, contentRef } ) {
 
 function InlineLanguageUI( { value, contentRef, onChange, onClose } ) {
 	const popoverAnchor = useAnchor( {
-		editableContentElement: contentRef.current,
+		editableContentRef: contentRef,
 		settings: language,
 	} );
 

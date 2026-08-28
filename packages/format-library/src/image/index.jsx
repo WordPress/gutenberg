@@ -60,7 +60,7 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 	const [ editedAlt, setEditedAlt ] = useState( alt );
 	const hasChanged = editedWidth !== width || editedAlt !== alt;
 	const popoverAnchor = useAnchor( {
-		editableContentElement: contentRef.current,
+		editableContentRef: contentRef,
 		settings: image,
 	} );
 
