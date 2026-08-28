@@ -404,7 +404,7 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	 *
 	 * @return array<string, array{0: bool}>
 	 */
-	public function data_icon_content_sources() {
+	public function data_icon_content_sources(): array {
 		return array(
 			'inline content' => array( false ),
 			'file path'      => array( true ),
@@ -418,7 +418,7 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	 *
 	 * @param bool $use_file_path Whether to register the icon from a file path.
 	 */
-	public function test_stroke_attributes_survive_sanitization( $use_file_path ) {
+	public function test_stroke_attributes_survive_sanitization( bool $use_file_path ) {
 		$content  = '<svg fill="currentColor" style="fill: none" stroke="currentColor" stroke-width="1.5"><path d="M0 0" vector-effect="non-scaling-stroke"/><polygon points="0,0 1,1" stroke="currentColor" vector-effect="non-scaling-stroke"/></svg>';
 		$name     = 'test-collection/stroke-icon';
 		$settings = array(

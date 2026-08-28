@@ -4,8 +4,9 @@
  * Returns the SVG elements and attributes allowed for registered icons.
  *
  * @return array[] Allowed SVG elements and attributes.
+ * @phpstan-return array<non-falsy-string, array<non-falsy-string, true>>
  */
-function gutenberg_get_allowed_icon_svg_tags() {
+function gutenberg_get_allowed_icon_svg_tags(): array {
 	$stroke_attributes = array(
 		'style'             => true,
 		'stroke'            => true,
