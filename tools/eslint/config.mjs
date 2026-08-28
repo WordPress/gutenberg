@@ -62,7 +62,10 @@ const developmentFiles = [
 ];
 
 // All files from packages that have types provided with TypeScript.
-const typedFiles = globSync( 'packages/*/package.json', { cwd: rootDir } )
+const typedFiles = globSync( 'packages/*/package.json', {
+	cwd: rootDir,
+	posix: true,
+} )
 	.sort()
 	.filter( ( fileName ) => require( join( rootDir, fileName ) ).types )
 	.map( ( fileName ) => fileName.replace( 'package.json', '**/*.{js,jsx}' ) );
@@ -72,6 +75,7 @@ const typedFiles = globSync( 'packages/*/package.json', { cwd: rootDir } )
 // bundles when importing them via npm.
 const bundledPackageFiles = globSync( 'packages/*/package.json', {
 	cwd: rootDir,
+	posix: true,
 } )
 	.sort()
 	.filter( ( fileName ) => {

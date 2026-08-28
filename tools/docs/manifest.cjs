@@ -9,13 +9,15 @@ const ROOT_DIR = resolve( __dirname, '../..' );
 const baseRepoUrl = '..';
 const blockJsonPaths = globSync( 'packages/block-library/src/*/block.json', {
 	cwd: ROOT_DIR,
+	posix: true,
 } ).sort();
 const blockCategoryPaths = globSync(
 	'docs/reference-guides/core-blocks/category-*.md',
-	{ cwd: ROOT_DIR }
+	{ cwd: ROOT_DIR, posix: true }
 ).sort();
 const componentPaths = globSync( 'packages/components/src/*/**/README.md', {
 	cwd: ROOT_DIR,
+	posix: true,
 	// Don't expose documentation for private components just yet.
 	ignore: [
 		'packages/components/src/theme/README.md',
@@ -26,7 +28,10 @@ const componentPaths = globSync( 'packages/components/src/*/**/README.md', {
 		'packages/components/src/badge/README.md',
 	],
 } ).sort( ( a, b ) => a.localeCompare( b ) );
-const packagePaths = globSync( 'packages/*/package.json', { cwd: ROOT_DIR } )
+const packagePaths = globSync( 'packages/*/package.json', {
+	cwd: ROOT_DIR,
+	posix: true,
+} )
 	.sort()
 	.filter(
 		// Ignore private packages.

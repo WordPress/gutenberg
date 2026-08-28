@@ -440,6 +440,7 @@ for ( const routeName of routesWithTypes ) {
  */
 const workspaceProjects = globSync( '{packages,routes}/*/tsconfig*.json', {
 	cwd: repoRoot,
+	posix: true,
 } ).sort();
 
 for ( const projectPath of workspaceProjects ) {
