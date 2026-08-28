@@ -364,18 +364,14 @@ export const getActiveMetaBoxLocations = createSelector(
  *
  * @return {boolean} Whether the meta box location is active and visible.
  */
-export const isMetaBoxLocationVisible = createRegistrySelector(
-	( select ) => ( state, location ) => {
-		return (
-			isMetaBoxLocationActive( state, location ) &&
-			getMetaBoxesPerLocation( state, location )?.some( ( { id } ) => {
-				return select( editorStore ).isEditorPanelEnabled(
-					`meta-box-${ id }`
-				);
-			} )
-		);
-	}
-);
+export function isMetaBoxLocationVisible( state, location ) {
+	return (
+		isMetaBoxLocationActive( state, location ) &&
+		!! getMetaBoxesPerLocation( state, location )?.some(
+			( { hidden } ) => ! hidden
+		)
+	);
+}
 
 /**
  * Returns true if there is an active meta box in the given location, or false
