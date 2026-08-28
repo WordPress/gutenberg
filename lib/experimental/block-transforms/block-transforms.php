@@ -32,12 +32,9 @@ add_filter( 'block_type_metadata_settings', 'gutenberg_register_block_transforms
  *
  * `get_block_editor_server_block_settings()` picks a fixed list of block type
  * fields and offers no filter, so the field travels in a bootstrap call of its
- * own. The block store keeps the definition it already has and takes only the
- * fields that one did not carry, which leaves everything core sent untouched
+ * own. The block store keeps the definition it already has and takes only
+ * `transforms` from a later call, which leaves everything core sent untouched
  * and makes this a no-op once core sends `transforms` itself.
- *
- * Every editor screen adds its own bootstrap call before
- * `enqueue_block_editor_assets` runs, so this one always follows it.
  *
  * @return void
  */
