@@ -384,6 +384,31 @@ async function runPerformanceTests( branches, options ) {
 		);
 	}
 
+	logAtIndent( 1, 'Looking for test files' );
+	const requestedSuites = ( options.suites || '' )
+		.split( ',' )
+		.map( ( suite ) => suite.trim() )
+		.filter( Boolean );
+	const availableSuites = getFilesFromDir(
+		path.join( testRunnerDir, 'test/performance/specs' )
+	).map( ( file ) => path.basename( file, '.spec.js' ) );
+	const unknownSuites = requestedSuites.filter(
+		( suite ) => ! availableSuites.includes( suite )
+	);
+	if ( unknownSuites.length ) {
+		throw new Error(
+			`Unknown test suite(s): ${ unknownSuites.join( ', ' ) }. ` +
+				`Available: ${ availableSuites.join( ', ' ) }`
+		);
+	}
+	const testSuites = availableSuites.filter(
+		( suite ) =>
+			requestedSuites.length === 0 || requestedSuites.includes( suite )
+	);
+	for ( const suite of testSuites ) {
+		logAtIndent( 2, 'Found:', formats.success( suite ) );
+	}
+
 	logAtIndent( 1, 'Setting up test environments' );
 
 	const envsDir = path.join( baseDir, 'environments' );
@@ -494,32 +519,6 @@ async function runPerformanceTests( branches, options ) {
 			),
 			'utf8'
 		);
-	}
-
-	logAtIndent( 0, 'Looking for test files' );
-
-	const requestedSuites = ( options.suites || '' )
-		.split( ',' )
-		.map( ( suite ) => suite.trim() )
-		.filter( Boolean );
-	const availableSuites = getFilesFromDir(
-		path.join( testRunnerDir, 'test/performance/specs' )
-	).map( ( file ) => path.basename( file, '.spec.js' ) );
-	const unknownSuites = requestedSuites.filter(
-		( suite ) => ! availableSuites.includes( suite )
-	);
-	if ( unknownSuites.length ) {
-		throw new Error(
-			`Unknown test suite(s): ${ unknownSuites.join( ', ' ) }. ` +
-				`Available: ${ availableSuites.join( ', ' ) }`
-		);
-	}
-	const testSuites = availableSuites.filter(
-		( suite ) =>
-			requestedSuites.length === 0 || requestedSuites.includes( suite )
-	);
-	for ( const suite of testSuites ) {
-		logAtIndent( 1, 'Found:', formats.success( suite ) );
 	}
 
 	logAtIndent( 0, 'Running tests' );
