@@ -46,6 +46,22 @@ describe( 'specialCommentConverter', () => {
 			<p>Third paragraph</p>`
 		);
 	} );
+	it( 'should keep a comment that is not inside a paragraph', () => {
+		expect(
+			deepFilterHTML( '<p>First</p><!--more--><p>Second</p>', [
+				specialCommentConverter,
+			] )
+		).toEqual(
+			'<p>First</p><wp-block data-block="core/more"></wp-block><p>Second</p>'
+		);
+	} );
+	it( 'should keep a comment between text', () => {
+		expect(
+			deepFilterHTML( 'First<!--more-->Second', [
+				specialCommentConverter,
+			] )
+		).toEqual( 'First<wp-block data-block="core/more"></wp-block>Second' );
+	} );
 	describe( 'when more comment is inside paragraph', () => {
 		it( 'should split the paragraph', () => {
 			const output = deepFilterHTML(

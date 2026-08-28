@@ -1,4 +1,4 @@
-import { remove, replace } from '@wordpress/dom';
+import { remove } from '@wordpress/dom';
 
 /**
  * Looks for `<!--nextpage-->` and `<!--more-->` comments and
@@ -37,7 +37,11 @@ export default function specialCommentConverter(
 	// and remove the paragraph. If there's no paragraph, fall back to simply
 	// replacing the comment.
 	if ( ! node.parentNode || node.parentNode.nodeName !== 'P' ) {
-		replace( node as Element, block );
+		// The block stands where the comment stood. `replace()` from
+		// `@wordpress/dom` inserts after the comment's *parent* instead, which
+		// drops the block out of the document when that parent is the body.
+		node.parentNode?.insertBefore( block, node );
+		remove( node as Element );
 	} else {
 		const childNodes = Array.from( node.parentNode.childNodes );
 		const nodeIndex = childNodes.indexOf( node as ChildNode );

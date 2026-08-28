@@ -454,7 +454,13 @@ class Gutenberg_HTML_Element {
 			return false;
 		}
 
-		foreach ( self::parse_selector_list( $selector ) as $complex ) {
+		$selector_list = self::parse_selector_list( $selector );
+
+		if ( null === $selector_list ) {
+			return false;
+		}
+
+		foreach ( $selector_list as $complex ) {
 			if ( $this->matches_complex_selector( $complex ) ) {
 				return true;
 			}
@@ -697,18 +703,41 @@ class Gutenberg_HTML_Element {
 	 * descendant and child combinators, and the `:has()`, `:not()` and
 	 * `:only-child` pseudo-classes.
 	 *
+	 * A selector list that uses anything outside that subset is rejected whole, so
+	 * it matches nothing rather than silently matching more than it names.
+	 *
 	 * @param string $selector Selector list.
-	 * @return array[] Parsed complex selectors.
+	 * @return array[]|null Parsed complex selectors, or null when unsupported.
 	 */
 	private static function parse_selector_list( $selector ) {
-		if ( isset( self::$selector_cache[ $selector ] ) ) {
+		if ( array_key_exists( $selector, self::$selector_cache ) ) {
 			return self::$selector_cache[ $selector ];
 		}
 
 		$parsed = array();
 
 		foreach ( self::split_selector_list( $selector ) as $complex_selector ) {
-			$parsed[] = self::parse_complex_selector( $complex_selector );
+			$complex = self::parse_complex_selector( $complex_selector );
+
+			if ( null === $complex ) {
+				$parsed = null;
+				break;
+			}
+
+			$parsed[] = $complex;
+		}
+
+		if ( null === $parsed || array() === $parsed ) {
+			$parsed = null;
+			_doing_it_wrong(
+				__METHOD__,
+				sprintf(
+					/* translators: %s: CSS selector, for example "p:first-child". */
+					__( 'The "%s" selector uses CSS that is not supported on the server, so it matches nothing.', 'gutenberg' ),
+					$selector
+				),
+				'23.8.0'
+			);
 		}
 
 		self::$selector_cache[ $selector ] = $parsed;
@@ -752,7 +781,7 @@ class Gutenberg_HTML_Element {
 	 * Parses a single complex selector into compound selectors and combinators.
 	 *
 	 * @param string $selector Complex selector.
-	 * @return array[] Parts, each with `combinator` and `compound` keys.
+	 * @return array[]|null Parts, each with `combinator` and `compound` keys, or null when unsupported.
 	 */
 	private static function parse_complex_selector( $selector ) {
 		$parts      = array();
@@ -760,14 +789,22 @@ class Gutenberg_HTML_Element {
 		$depth      = 0;
 		$current    = '';
 
-		$flush = function () use ( &$parts, &$current, &$combinator ) {
+		$rejected = false;
+
+		$flush = function () use ( &$parts, &$current, &$combinator, &$rejected ) {
 			if ( '' === $current ) {
 				return;
 			}
 
+			$compound = self::parse_compound_selector( $current );
+
+			if ( null === $compound ) {
+				$rejected = true;
+			}
+
 			$parts[]    = array(
 				'combinator' => $combinator,
-				'compound'   => self::parse_compound_selector( $current ),
+				'compound'   => $compound,
 			);
 			$current    = '';
 			$combinator = null;
@@ -801,9 +838,11 @@ class Gutenberg_HTML_Element {
 
 		$flush();
 
-		if ( array() !== $parts ) {
-			$parts[0]['combinator'] = null;
+		if ( $rejected || array() === $parts ) {
+			return null;
 		}
+
+		$parts[0]['combinator'] = null;
 
 		return $parts;
 	}
@@ -812,7 +851,7 @@ class Gutenberg_HTML_Element {
 	 * Parses a compound selector.
 	 *
 	 * @param string $selector Compound selector.
-	 * @return array Parsed compound selector.
+	 * @return array|null Parsed compound selector, or null when it uses unsupported syntax.
 	 */
 	private static function parse_compound_selector( $selector ) {
 		$compound = array(
@@ -839,7 +878,7 @@ class Gutenberg_HTML_Element {
 
 			if ( '.' === $character || '#' === $character ) {
 				if ( ! preg_match( '/^[.#]([^.#\[:]+)/', substr( $selector, $at ), $matches ) ) {
-					break;
+					return null;
 				}
 
 				if ( '.' === $character ) {
@@ -855,10 +894,15 @@ class Gutenberg_HTML_Element {
 			if ( '[' === $character ) {
 				$end = strpos( $selector, ']', $at );
 				if ( false === $end ) {
-					break;
+					return null;
 				}
 
-				$compound['attributes'][] = self::parse_attribute_selector( substr( $selector, $at + 1, $end - $at - 1 ) );
+				$attribute = self::parse_attribute_selector( substr( $selector, $at + 1, $end - $at - 1 ) );
+				if ( null === $attribute ) {
+					return null;
+				}
+
+				$compound['attributes'][] = $attribute;
 				$at                       = $end + 1;
 				continue;
 			}
@@ -871,13 +915,13 @@ class Gutenberg_HTML_Element {
 				}
 
 				if ( ! preg_match( '/^:(has|not)\(/', substr( $selector, $at ), $matches ) ) {
-					break;
+					return null;
 				}
 
 				$open  = $at + strlen( $matches[0] ) - 1;
 				$close = self::find_closing_parenthesis( $selector, $open );
 				if ( null === $close ) {
-					break;
+					return null;
 				}
 
 				$argument = trim( substr( $selector, $open + 1, $close - $open - 1 ) );
@@ -897,7 +941,7 @@ class Gutenberg_HTML_Element {
 				continue;
 			}
 
-			break;
+			return null;
 		}
 
 		return $compound;
@@ -907,15 +951,23 @@ class Gutenberg_HTML_Element {
 	 * Parses the contents of an attribute selector.
 	 *
 	 * @param string $selector Attribute selector without the enclosing brackets.
-	 * @return array Parsed attribute selector.
+	 * @return array|null Parsed attribute selector, or null when it uses an unsupported operator.
 	 */
 	private static function parse_attribute_selector( $selector ) {
-		if ( ! preg_match( '/^([^~^$*|=]+)(~?=)(.*)$/', $selector, $matches ) ) {
+		if ( ! preg_match( '/^\s*([a-zA-Z_:][a-zA-Z0-9_:.-]*)\s*(?:(\S?=)(.*))?$/', $selector, $matches ) ) {
+			return null;
+		}
+
+		if ( ! isset( $matches[2] ) || '' === $matches[2] ) {
 			return array(
-				'name'     => strtolower( trim( $selector ) ),
+				'name'     => strtolower( $matches[1] ),
 				'operator' => null,
 				'value'    => null,
 			);
+		}
+
+		if ( '=' !== $matches[2] && '~=' !== $matches[2] ) {
+			return null;
 		}
 
 		$value = trim( $matches[3] );
@@ -929,7 +981,7 @@ class Gutenberg_HTML_Element {
 		}
 
 		return array(
-			'name'     => strtolower( trim( $matches[1] ) ),
+			'name'     => strtolower( $matches[1] ),
 			'operator' => $matches[2],
 			'value'    => $value,
 		);

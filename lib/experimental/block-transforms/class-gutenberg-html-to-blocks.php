@@ -20,7 +20,11 @@ class Gutenberg_HTML_To_Blocks {
 	/**
 	 * Elements that belong inside a paragraph rather than beside one.
 	 *
-	 * @see https://html.spec.whatwg.org/multipage/dom.html#phrasing-content-2
+	 * The tags `isPhrasingContent()` answers true for: everything the phrasing
+	 * content schema names, plus `span`, which the schema leaves out so that
+	 * filtering unwraps it.
+	 *
+	 * @see isPhrasingContent() in `@wordpress/dom`.
 	 *
 	 * @var string[]
 	 */
@@ -33,42 +37,30 @@ class Gutenberg_HTML_To_Blocks {
 		'bdo',
 		'br',
 		'canvas',
-		'cite',
 		'code',
 		'data',
-		'datalist',
 		'del',
 		'dfn',
 		'em',
 		'embed',
 		'i',
-		'iframe',
 		'img',
-		'input',
 		'ins',
 		'kbd',
-		'label',
-		'map',
 		'mark',
 		'math',
-		'meter',
 		'object',
-		'output',
-		'picture',
-		'progress',
 		'q',
+		'rp',
+		'rt',
 		'ruby',
 		's',
 		'samp',
-		'select',
 		'small',
 		'span',
 		'strong',
 		'sub',
 		'sup',
-		'svg',
-		'template',
-		'textarea',
 		'time',
 		'u',
 		'var',
@@ -76,11 +68,6 @@ class Gutenberg_HTML_To_Blocks {
 		'wbr',
 	);
 
-	/**
-	 * Media elements that a figure should wrap when they appear on their own.
-	 *
-	 * @var string[]
-	 */
 	const FIGURE_CONTENT = array( 'img', 'video', 'audio', 'iframe', 'embed', 'object' );
 
 	/**
@@ -829,51 +816,170 @@ class Gutenberg_HTML_To_Blocks {
 	/**
 	 * Replaces `<!--more-->` and `<!--nextpage-->` with elements blocks can match.
 	 *
+	 * The counterpart of `specialCommentConverter` in `@wordpress/blocks`: a
+	 * marker inside a paragraph splits it rather than staying in its text, and
+	 * a `<!--more-->` takes any following `<!--noteaser-->` with it.
+	 *
 	 * @param Gutenberg_HTML_Element $root Fragment root.
 	 * @return void
 	 */
 	private static function convert_special_comments( $root ) {
-		foreach ( $root->children as $index => $child ) {
+		$source   = $root->children;
+		$children = array();
+		$consumed = array();
+
+		foreach ( $source as $index => $child ) {
+			if ( isset( $consumed[ $index ] ) ) {
+				continue;
+			}
+
 			if ( Gutenberg_HTML_Element::ELEMENT === $child->type ) {
 				self::convert_special_comments( $child );
+
+				if ( 'p' === $child->tag_name ) {
+					foreach ( self::split_on_special_comments( $child ) as $piece ) {
+						$children[] = $piece;
+					}
+					continue;
+				}
+
+				$children[] = $child;
 				continue;
 			}
 
 			if ( Gutenberg_HTML_Element::COMMENT !== $child->type ) {
+				$children[] = $child;
 				continue;
 			}
 
-			$text       = trim( $child->text );
-			$attributes = null;
+			$element = self::special_comment_element( $child, $source, $index, $consumed );
 
-			if ( 'nextpage' === $text ) {
-				$attributes = array( 'data-block' => 'core/nextpage' );
-			} elseif ( 'more' === $text || 0 === strpos( $text, 'more ' ) ) {
-				$attributes = array( 'data-block' => 'core/more' );
-				$custom     = trim( substr( $text, 4 ) );
+			$children[] = null === $element ? $child : $element;
+		}
 
-				if ( '' !== $custom ) {
-					$attributes['data-custom-text'] = $custom;
-				}
+		foreach ( $children as $child ) {
+			$child->parent = $root;
+		}
+
+		$root->children = $children;
+	}
+
+	/**
+	 * Builds the element a special comment stands for.
+	 *
+	 * @param Gutenberg_HTML_Element   $comment  Comment node.
+	 * @param Gutenberg_HTML_Element[] $siblings Nodes the comment sits among.
+	 * @param int                      $index    Offset of the comment within them.
+	 * @param array                    $consumed Offsets already taken, added to when a `<!--noteaser-->` is claimed.
+	 * @return Gutenberg_HTML_Element|null Element to stand in for the comment, or null when it is not a special comment.
+	 */
+	private static function special_comment_element( $comment, $siblings, $index, &$consumed ) {
+		$text = trim( $comment->text );
+
+		if ( 'nextpage' === $text ) {
+			$attributes = array( 'data-block' => 'core/nextpage' );
+			$markup     = '<!--nextpage-->';
+		} elseif ( 'more' === $text || 0 === strpos( $text, 'more ' ) ) {
+			$attributes = array( 'data-block' => 'core/more' );
+			$custom     = trim( substr( $text, 4 ) );
+			$markup     = '' === $custom ? '<!--more-->' : '<!--more ' . $custom . '-->';
+
+			if ( '' !== $custom ) {
+				$attributes['data-custom-text'] = $custom;
 			}
-
-			if ( null === $attributes ) {
-				continue;
-			}
-
-			$element = Gutenberg_HTML_Element::create_element( 'wp-block', $attributes );
 
 			/*
-			 * The More and Page Break blocks save the very comment being
-			 * replaced here, so keep it as the element's markup. The synthetic
-			 * element only exists so a block can declare a selector for it.
+			 * A `<!--noteaser-->` marks the More block as hiding the text
+			 * before it. It is rarely the comment's immediate sibling, so the
+			 * rest of the siblings are searched, as the editor searches them.
 			 */
-			$element->set_opening_tag( $child->get_outer_html() );
-			$element->set_closing_tag( '' );
+			$total = count( $siblings );
+			for ( $at = $index + 1; $at < $total; $at++ ) {
+				$sibling = $siblings[ $at ];
 
-			$element->parent          = $root;
-			$root->children[ $index ] = $element;
+				if (
+					Gutenberg_HTML_Element::COMMENT === $sibling->type
+					&& 'noteaser' === trim( $sibling->text )
+				) {
+					$attributes['data-no-teaser'] = '';
+					$consumed[ $at ]              = true;
+					$markup                      .= "\n<!--noteaser-->";
+					break;
+				}
+			}
+		} else {
+			return null;
 		}
+
+		$element = Gutenberg_HTML_Element::create_element( 'wp-block', $attributes );
+
+		/*
+		 * The More and Page Break blocks save the comment being replaced here,
+		 * so the element carries what their `save()` writes rather than the
+		 * source comment, which may be spelled differently. The synthetic
+		 * element only exists so a block can declare a selector for it.
+		 */
+		$element->set_opening_tag( $markup );
+		$element->set_closing_tag( '' );
+
+		return $element;
+	}
+
+	/**
+	 * Splits a paragraph around the special comment elements inside it.
+	 *
+	 * @param Gutenberg_HTML_Element $paragraph Paragraph to split.
+	 * @return Gutenberg_HTML_Element[] The paragraph itself when it holds no marker, otherwise the pieces it splits into.
+	 */
+	private static function split_on_special_comments( $paragraph ) {
+		$pieces = array();
+		$run    = array();
+
+		foreach ( $paragraph->children as $child ) {
+			if (
+				Gutenberg_HTML_Element::ELEMENT === $child->type
+				&& 'wp-block' === $child->tag_name
+				&& null !== $child->get_attribute( 'data-block' )
+			) {
+				if ( array() !== $run ) {
+					$pieces[] = self::paragraph_from( $paragraph, $run );
+					$run      = array();
+				}
+
+				$pieces[] = $child;
+				continue;
+			}
+
+			$run[] = $child;
+		}
+
+		if ( array() === $pieces ) {
+			return array( $paragraph );
+		}
+
+		if ( array() !== $run ) {
+			$pieces[] = self::paragraph_from( $paragraph, $run );
+		}
+
+		return $pieces;
+	}
+
+	/**
+	 * Builds one side of a split paragraph.
+	 *
+	 * @param Gutenberg_HTML_Element   $paragraph Paragraph being split, whose markup the piece keeps.
+	 * @param Gutenberg_HTML_Element[] $children  Nodes the piece holds.
+	 * @return Gutenberg_HTML_Element Paragraph holding those nodes.
+	 */
+	private static function paragraph_from( $paragraph, $children ) {
+		$piece = Gutenberg_HTML_Element::create_element( 'p' );
+		$piece->set_opening_tag( $paragraph->get_opening_tag() );
+
+		foreach ( $children as $child ) {
+			$piece->append_child( $child );
+		}
+
+		return $piece;
 	}
 
 	/**
@@ -1022,6 +1128,11 @@ class Gutenberg_HTML_To_Blocks {
 	/**
 	 * Wraps loose text and phrasing content in paragraphs.
 	 *
+	 * Mirrors `normaliseBlocks()` called with `{ raw: true }`, which is how
+	 * `rawHandler()` calls it: a single `<br>` stays inside the paragraph and
+	 * only a double one starts a new paragraph, content following a paragraph
+	 * joins that paragraph, and deliberate empty paragraphs are kept.
+	 *
 	 * @see normaliseBlocks() in `@wordpress/blocks`.
 	 *
 	 * @param Gutenberg_HTML_Element $root Fragment root.
@@ -1029,25 +1140,18 @@ class Gutenberg_HTML_To_Blocks {
 	 */
 	private static function normalise( $root ) {
 		$children = $root->children;
+		$total    = count( $children );
 		$blocks   = array();
-		$open     = null;
 
-		foreach ( $children as $child ) {
-			if ( Gutenberg_HTML_Element::COMMENT === $child->type ) {
-				continue;
-			}
+		for ( $at = 0; $at < $total; $at++ ) {
+			$child = $children[ $at ];
 
 			if ( Gutenberg_HTML_Element::TEXT === $child->type ) {
 				if ( '' === trim( $child->text ) ) {
 					continue;
 				}
 
-				if ( null === $open ) {
-					$open     = Gutenberg_HTML_Element::create_element( 'p' );
-					$blocks[] = $open;
-				}
-
-				$open->append_child( $child );
+				self::open_paragraph( $blocks )->append_child( $child );
 				continue;
 			}
 
@@ -1056,35 +1160,73 @@ class Gutenberg_HTML_To_Blocks {
 			}
 
 			if ( 'br' === $child->tag_name ) {
-				$open = null;
+				$next = isset( $children[ $at + 1 ] ) ? $children[ $at + 1 ] : null;
+
+				if (
+					null !== $next
+					&& Gutenberg_HTML_Element::ELEMENT === $next->type
+					&& 'br' === $next->tag_name
+				) {
+					$blocks[] = Gutenberg_HTML_Element::create_element( 'p' );
+					++$at;
+				}
+
+				// A `<br>` only survives inside a paragraph that has content.
+				$last = self::last_block( $blocks );
+				if ( null !== $last && 'p' === $last->tag_name && array() !== $last->children ) {
+					$last->append_child( $child );
+				}
+
 				continue;
 			}
 
-			if ( ! in_array( $child->tag_name, self::PHRASING_CONTENT, true ) ) {
-				$open     = null;
-				$blocks[] = $child;
+			if (
+				'p' !== $child->tag_name
+				&& in_array( $child->tag_name, self::PHRASING_CONTENT, true )
+			) {
+				self::open_paragraph( $blocks )->append_child( $child );
 				continue;
 			}
 
-			if ( null === $open ) {
-				$open     = Gutenberg_HTML_Element::create_element( 'p' );
-				$blocks[] = $open;
-			}
-
-			$open->append_child( $child );
+			$blocks[] = $child;
 		}
 
 		foreach ( $blocks as $block ) {
 			$block->parent = $root;
 		}
 
-		$root->children = array_values(
-			array_filter(
-				$blocks,
-				static function ( $block ) {
-					return ! ( 'p' === $block->tag_name && $block->is_empty() );
-				}
-			)
-		);
+		$root->children = $blocks;
+	}
+
+	/**
+	 * Returns the paragraph the next piece of phrasing content belongs in.
+	 *
+	 * Mirrors `normaliseBlocks()`'s `accu.lastChild.nodeName !== 'P'` test, so
+	 * text following a source paragraph joins it rather than starting a new one.
+	 *
+	 * @param Gutenberg_HTML_Element[] $blocks Accumulated blocks, appended to when a paragraph is opened.
+	 * @return Gutenberg_HTML_Element Paragraph to append to.
+	 */
+	private static function open_paragraph( &$blocks ) {
+		$last = self::last_block( $blocks );
+
+		if ( null !== $last && 'p' === $last->tag_name ) {
+			return $last;
+		}
+
+		$paragraph = Gutenberg_HTML_Element::create_element( 'p' );
+		$blocks[]  = $paragraph;
+
+		return $paragraph;
+	}
+
+	/**
+	 * Returns the last accumulated block.
+	 *
+	 * @param Gutenberg_HTML_Element[] $blocks Accumulated blocks.
+	 * @return Gutenberg_HTML_Element|null Last block, or null when there is none.
+	 */
+	private static function last_block( $blocks ) {
+		return array() === $blocks ? null : $blocks[ count( $blocks ) - 1 ];
 	}
 }

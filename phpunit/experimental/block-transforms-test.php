@@ -558,6 +558,51 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * An unsupported selector must match nothing rather than match more than it
+	 * names: the editor throws on it and `getRawTransforms()` treats the throw
+	 * as "no match", so failing open would convert markup the editor leaves alone.
+	 *
+	 * @dataProvider data_unsupported_selectors
+	 *
+	 * @param string $selector Selector using CSS the server does not support.
+	 * @param string $html     Markup whose first element the selector is matched against.
+	 */
+	public function test_unsupported_selectors_match_nothing( $selector, $html ) {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_HTML_Element::parse_selector_list' );
+
+		$root    = Gutenberg_HTML_Element::from_html( $html );
+		$element = $root->child_elements()[0];
+
+		$this->assertFalse( $element->matches( $selector ) );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * Every selector here must be unique across the suite: the parse result is
+	 * cached, so a repeat would not raise the notice a second time.
+	 *
+	 * @return array[]
+	 */
+	public static function data_unsupported_selectors() {
+		return array(
+			'structural pseudo-class' => array( 'p:first-child', '<p>One</p>' ),
+			'functional pseudo-class' => array( 'p:nth-child(2)', '<p>One</p>' ),
+			'pseudo-element'          => array( 'p::before', '<p>One</p>' ),
+			'matches-any'             => array( ':is(p)', '<p>One</p>' ),
+			'specificity-zero'        => array( ':where(p)', '<p>One</p>' ),
+			'unsupported in a list'   => array( 'p, :is(h1)', '<p>One</p>' ),
+			'adjacent sibling'        => array( 'p + p', '<p>One</p>' ),
+			'general sibling'         => array( 'p ~ p', '<p>One</p>' ),
+			'prefix operator'         => array( 'a[href^="https"]', '<a href="https://example.com">One</a>' ),
+			'suffix operator'         => array( 'a[href$=".pdf"]', '<a href="a.pdf">One</a>' ),
+			'substring operator'      => array( 'a[href*="example"]', '<a href="example.com">One</a>' ),
+			'unclosed bracket'        => array( 'p[data-x', '<p data-x="1">One</p>' ),
+			'unclosed parenthesis'    => array( 'p:has(', '<p><span>One</span></p>' ),
+		);
+	}
+
 	public function test_matches_a_child_combinator_against_the_child() {
 		$root = Gutenberg_HTML_Element::from_html( '<ul><li>One</li></ul>' );
 		$list = $root->child_elements()[0];
@@ -811,6 +856,182 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 		$this->assertStringContainsString( '<video src="/a.mp4">', $blocks[0]['innerHTML'] );
 	}
 
+	/**
+	 * `rawHandler()` normalises with `{ raw: true }`, so a single `<br>` stays
+	 * inside its paragraph, content following a paragraph joins it, and empty
+	 * paragraphs are deliberate content rather than noise.
+	 *
+	 * @dataProvider data_normalisation
+	 *
+	 * @param string   $html     Markup to convert.
+	 * @param string[] $expected Inner HTML of each block the conversion produces.
+	 */
+	public function test_normalises_loose_content_like_the_editor( $html, $expected ) {
+		$this->register_test_blocks();
+
+		$blocks = gutenberg_html_to_blocks( $html );
+
+		$this->assertSame( $expected, wp_list_pluck( $blocks, 'innerHTML' ) );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * Every expectation here was taken from `normaliseBlocks( html, { raw: true } )`.
+	 *
+	 * @return array[]
+	 */
+	public static function data_normalisation() {
+		return array(
+			'single line break kept'   => array( 'One<br>Two', array( '<p>One<br>Two</p>' ) ),
+			'double line break splits' => array( 'One<br><br>Two', array( '<p>One</p>', '<p>Two</p>' ) ),
+			'triple line break'        => array( 'One<br><br><br>Two', array( '<p>One</p>', '<p>Two</p>' ) ),
+			'leading line break'       => array( '<br>One', array( '<p>One</p>' ) ),
+			'trailing line break'      => array( 'One<br>', array( '<p>One<br></p>' ) ),
+			'text joins a paragraph'   => array( '<p>One</p>Two', array( '<p>OneTwo</p>' ) ),
+			'phrasing joins it too'    => array( '<p>One</p><em>Two</em>', array( '<p>One<em>Two</em></p>' ) ),
+			'a block ends it'          => array( '<p>One</p><h1>Two</h1>Three', array( '<p>One</p>', '<h1 class="wp-block-test-heading">Two</h1>', '<p>Three</p>' ) ),
+			'empty paragraph kept'     => array( '<p></p><p>Two</p>', array( '<p></p>', '<p>Two</p>' ) ),
+			'empty paragraph between'  => array( '<p>One</p><p></p><p>Two</p>', array( '<p>One</p>', '<p></p>', '<p>Two</p>' ) ),
+		);
+	}
+
+	/**
+	 * @dataProvider data_special_comments
+	 *
+	 * @param string $html     Markup to convert.
+	 * @param array  $expected Block name and inner HTML of each block the conversion produces.
+	 */
+	public function test_converts_special_comments_like_the_editor( $html, $expected ) {
+		$blocks = gutenberg_html_to_blocks( $html );
+		$actual = array();
+
+		foreach ( $blocks as $block ) {
+			$actual[] = array( $block['blockName'], $block['innerHTML'] );
+		}
+
+		$this->assertSame( $expected, $actual );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * Every expectation here was taken from `rawHandler()`.
+	 *
+	 * @return array[]
+	 */
+	public static function data_special_comments() {
+		return array(
+			'between paragraphs'        => array(
+				'<p>Before</p><!--more--><p>After</p>',
+				array(
+					array( 'core/paragraph', '<p>Before</p>' ),
+					array( 'core/more', '<!--more-->' ),
+					array( 'core/paragraph', '<p>After</p>' ),
+				),
+			),
+			'inside a paragraph'        => array(
+				'<p>Before<!--more-->After</p>',
+				array(
+					array( 'core/paragraph', '<p>Before</p>' ),
+					array( 'core/more', '<!--more-->' ),
+					array( 'core/paragraph', '<p>After</p>' ),
+				),
+			),
+			'alone in a paragraph'      => array(
+				'<p><!--more--></p>',
+				array( array( 'core/more', '<!--more-->' ) ),
+			),
+			'between text'              => array(
+				'Text<!--more-->More',
+				array(
+					array( 'core/paragraph', '<p>Text</p>' ),
+					array( 'core/more', '<!--more-->' ),
+					array( 'core/paragraph', '<p>More</p>' ),
+				),
+			),
+			'no teaser'                 => array(
+				"<p>Before</p><!--more-->\n<!--noteaser-->\n<p>After</p>",
+				array(
+					array( 'core/paragraph', '<p>Before</p>' ),
+					array( 'core/more', "<!--more-->\n<!--noteaser-->" ),
+					array( 'core/paragraph', '<p>After</p>' ),
+				),
+			),
+			'custom text'               => array(
+				'<p>Before</p><!--more Read on--><p>After</p>',
+				array(
+					array( 'core/paragraph', '<p>Before</p>' ),
+					array( 'core/more', '<!--more Read on-->' ),
+					array( 'core/paragraph', '<p>After</p>' ),
+				),
+			),
+			'page break in a paragraph' => array(
+				'<p>Before<!--nextpage-->After</p>',
+				array(
+					array( 'core/paragraph', '<p>Before</p>' ),
+					array( 'core/nextpage', '<!--nextpage-->' ),
+					array( 'core/paragraph', '<p>After</p>' ),
+				),
+			),
+		);
+	}
+
+	public function test_reads_the_teaser_flag_off_a_more_comment() {
+		$blocks = gutenberg_html_to_blocks( '<p>Before<!--more--><!--noteaser-->After</p>' );
+
+		$this->assertSame( 'core/more', $blocks[1]['blockName'] );
+		$this->assertSame( array( 'noTeaser' => true ), $blocks[1]['attrs'] );
+	}
+
+	public function test_normalises_a_more_comment_to_what_the_block_saves() {
+		// The source spells the marker loosely; the block saves it one way, and
+		// markup that does not match `save()` is an invalid block.
+		$blocks = gutenberg_html_to_blocks( '<p>Before</p><!--more   Read on  --><p>After</p>' );
+
+		$this->assertSame( '<!--more Read on-->', $blocks[1]['innerHTML'] );
+		$this->assertSame( array( 'customText' => 'Read on' ), $blocks[1]['attrs'] );
+	}
+
+	/**
+	 * `normalise()` decides what joins a paragraph from the same list
+	 * `isPhrasingContent()` reads, so an element the editor leaves standing on
+	 * its own must not be swept into one here.
+	 *
+	 * @dataProvider data_non_phrasing_elements
+	 *
+	 * @param string $html Markup whose first element is not phrasing content.
+	 */
+	public function test_leaves_non_phrasing_elements_out_of_paragraphs( $html ) {
+		$blocks = gutenberg_html_to_blocks( $html );
+
+		$this->assertStringNotContainsString( '<p>', $blocks[0]['innerHTML'] );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public static function data_non_phrasing_elements() {
+		return array(
+			'cite'     => array( '<cite>A citation</cite>' ),
+			'iframe'   => array( '<iframe src="/x"></iframe>' ),
+			'label'    => array( '<label>A label</label>' ),
+			'select'   => array( '<select><option>One</option></select>' ),
+			'input'    => array( '<input value="x">' ),
+			'progress' => array( '<progress value="1"></progress>' ),
+			'picture'  => array( '<picture><img src="/a.png"></picture>' ),
+		);
+	}
+
+	public function test_keeps_ruby_annotations_inside_a_paragraph() {
+		// `rt` and `rp` are phrasing content the server used to leave out.
+		$blocks = gutenberg_html_to_blocks( '<rt>note</rt>' );
+
+		$this->assertStringContainsString( '<p>', $blocks[0]['innerHTML'] );
+	}
+
 	public function test_leaves_media_in_place_when_nothing_converts_it() {
 		$this->register_test_blocks();
 
@@ -848,9 +1069,18 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 
 		$blocks = gutenberg_html_to_blocks( '<p><video src="/a.mp4"></video></p>' );
 
-		$this->assertCount( 1, $blocks );
 		$this->assertSame( 'test/picture', $blocks[0]['blockName'] );
 		$this->assertStringContainsString( '<video src="/a.mp4">', $blocks[0]['innerHTML'] );
+
+		/*
+		 * The paragraph the media came out of is left behind empty, which is
+		 * what `figureContentReducer()` followed by `normaliseBlocks()` in raw
+		 * mode does: `<p><img></p>` becomes an Image block and an empty
+		 * Paragraph in the editor too.
+		 */
+		$this->assertCount( 2, $blocks );
+		$this->assertSame( 'test/paragraph', $blocks[1]['blockName'] );
+		$this->assertSame( '<p></p>', $blocks[1]['innerHTML'] );
 	}
 
 	public function test_keeps_media_that_reads_as_part_of_a_sentence() {

@@ -1,6 +1,7 @@
 import { autop, removep } from '@wordpress/autop';
 import { getPhrasingContentSchema } from '@wordpress/dom';
 import { createBlock } from './factory';
+import { matchesSelector } from './matches-selector';
 import {
 	getBlockAttributes,
 	parseWithAttributeSchema,
@@ -109,8 +110,16 @@ function resolveAttributeOverrides(
 					return [ name, value ];
 				}
 
+				/*
+				 * A source with no selector reads whatever it is handed, so
+				 * the matched node is passed as-is: parsing its markup would
+				 * hand the source the `<body>` hpq wraps it in instead. With a
+				 * selector, the markup is parsed so the selector can match the
+				 * node itself as well as its descendants, which is what the
+				 * server-side parser does.
+				 */
 				const sourced = parseWithAttributeSchema(
-					node.outerHTML,
+					'selector' in value ? node.outerHTML : node,
 					value as any
 				);
 
@@ -183,7 +192,7 @@ function createRawTransform(
 			sourceNode.innerHTML = '';
 		} else if ( typeof innerBlocks === 'string' ) {
 			const matched = Array.from( sourceNode.children ).filter(
-				( child ) => child.matches( innerBlocks )
+				( child ) => matchesSelector( child, innerBlocks )
 			);
 			innerBlockList = matched.flatMap( ( child ) =>
 				toBlocks( child.outerHTML )

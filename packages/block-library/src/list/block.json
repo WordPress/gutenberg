@@ -96,11 +96,15 @@
 					"requires": {
 						"ol": {
 							"attributes": "*",
-							"children": { "li": { "attributes": "*", "children": "*" } }
+							"children": {
+								"li": { "attributes": "*", "children": "*" }
+							}
 						},
 						"ul": {
 							"attributes": "*",
-							"children": { "li": { "attributes": "*", "children": "*" } }
+							"children": {
+								"li": { "attributes": "*", "children": "*" }
+							}
 						}
 					}
 				},

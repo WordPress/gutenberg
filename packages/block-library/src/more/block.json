@@ -46,6 +46,11 @@
 						"type": "string",
 						"source": "attribute",
 						"attribute": "data-custom-text"
+					},
+					"noTeaser": {
+						"type": "boolean",
+						"source": "attribute",
+						"attribute": "data-no-teaser"
 					}
 				}
 			}
