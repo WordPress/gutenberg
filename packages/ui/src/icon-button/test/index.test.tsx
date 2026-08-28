@@ -37,7 +37,14 @@ describe( 'IconButton', () => {
 		it( 'does not show tooltip when truly disabled', async () => {
 			const user = userEvent.setup();
 
-			render( <IconButton label="Save" icon={ <svg /> } disabled /> );
+			render(
+				<IconButton
+					label="Save"
+					icon={ <svg /> }
+					disabled
+					focusableWhenDisabled={ false }
+				/>
+			);
 
 			const button = screen.getByRole( 'button', { name: 'Save' } );
 			await user.hover( button );
@@ -45,17 +52,10 @@ describe( 'IconButton', () => {
 			expect( screen.queryByText( 'Save' ) ).not.toBeInTheDocument();
 		} );
 
-		it( 'shows tooltip when focusably disabled', async () => {
+		it( 'shows tooltip when disabled by default', async () => {
 			const user = userEvent.setup();
 
-			render(
-				<IconButton
-					label="Save"
-					icon={ <svg /> }
-					disabled
-					focusableWhenDisabled
-				/>
-			);
+			render( <IconButton label="Save" icon={ <svg /> } disabled /> );
 
 			const button = screen.getByRole( 'button', { name: 'Save' } );
 			await user.hover( button );
@@ -67,25 +67,30 @@ describe( 'IconButton', () => {
 	} );
 
 	describe( 'shortcut', () => {
-		it( 'sets aria-keyshortcuts attribute on the button', () => {
-			const { rerender } = render(
-				<IconButton
-					label="Save"
-					icon={ <svg /> }
-					shortcut={ {
-						displayShortcut: '⌘S',
-						ariaKeyShortcut: 'Meta+S',
-					} }
-				/>
+		it( 'uses the human-readable label in the accessible description', () => {
+			const externalDescriptionId = 'external-description';
+
+			render(
+				<>
+					<span id={ externalDescriptionId }>Available offline.</span>
+					<IconButton
+						label="Save"
+						icon={ <svg /> }
+						aria-describedby={ externalDescriptionId }
+						shortcut={ {
+							displayShortcut: '⌘S',
+							ariaKeyShortcut: 'Meta+S',
+							label: 'Command S',
+						} }
+					/>
+				</>
 			);
 
 			const button = screen.getByRole( 'button', { name: 'Save' } );
 			expect( button ).toHaveAttribute( 'aria-keyshortcuts', 'Meta+S' );
-
-			// The aria-keyshortcuts attribute is removed when there is no
-			// `shortcut` prop.
-			rerender( <IconButton label="Save" icon={ <svg /> } /> );
-			expect( button ).not.toHaveAttribute( 'aria-keyshortcuts' );
+			expect( button ).toHaveAccessibleDescription(
+				'Available offline. Keyboard shortcut: Command S'
+			);
 		} );
 
 		it( 'displays the shortcut in the tooltip but hides it from assistive technology', async () => {
@@ -98,6 +103,7 @@ describe( 'IconButton', () => {
 					shortcut={ {
 						displayShortcut: '⌘S',
 						ariaKeyShortcut: 'Meta+S',
+						label: 'Command S',
 					} }
 				/>
 			);
@@ -114,6 +120,51 @@ describe( 'IconButton', () => {
 				'aria-hidden',
 				'true'
 			);
+			expect( screen.getByText( '⌘S' ) ).toHaveAttribute( 'dir', 'ltr' );
+		} );
+
+		it( 'preserves direct ARIA props when shortcut metadata is omitted', () => {
+			const externalDescriptionId = 'external-description';
+
+			render(
+				<>
+					<span id={ externalDescriptionId }>Available offline.</span>
+					<IconButton
+						label="Save"
+						icon={ <svg /> }
+						aria-describedby={ externalDescriptionId }
+						aria-keyshortcuts="Meta+S"
+					/>
+				</>
+			);
+
+			const button = screen.getByRole( 'button', {
+				name: 'Save',
+				description: 'Available offline.',
+			} );
+			expect( button ).toHaveAttribute( 'aria-keyshortcuts', 'Meta+S' );
+		} );
+
+		it( 'keeps shortcut metadata available when focusable while disabled', () => {
+			render(
+				<IconButton
+					label="Save"
+					icon={ <svg /> }
+					disabled
+					shortcut={ {
+						displayShortcut: '⌘S',
+						ariaKeyShortcut: 'Meta+S',
+						label: 'Command S',
+					} }
+				/>
+			);
+
+			const button = screen.getByRole( 'button', {
+				name: 'Save',
+				description: 'Keyboard shortcut: Command S',
+			} );
+			expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
+			expect( button ).toHaveAttribute( 'aria-keyshortcuts', 'Meta+S' );
 		} );
 	} );
 } );

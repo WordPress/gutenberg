@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { bold } from './bold';
 import { code } from './code';
 import { image } from './image';

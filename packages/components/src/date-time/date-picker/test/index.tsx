@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import { format } from 'date-fns';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * Internal dependencies
- */
 import DatePicker from '..';
 
 describe( 'DatePicker', () => {

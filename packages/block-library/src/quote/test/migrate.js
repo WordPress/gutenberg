@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import {
 	registerBlockType,
 	serialize,
 	unregisterBlockType,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { migrateToQuoteV2 } from '../deprecated';
 import * as paragraph from '../../paragraph';
 import * as quote from '../../quote';

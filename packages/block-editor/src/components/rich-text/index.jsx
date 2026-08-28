@@ -1,0 +1,610 @@
+import clsx from 'clsx';
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+import {
+	useRef,
+	useState,
+	useCallback,
+	useEffect,
+	useMemo,
+	forwardRef,
+	useContext,
+} from '@wordpress/element';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
+import { useMergeRefs, useInstanceId } from '@wordpress/compose';
+import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
+import { Popover } from '@wordpress/components';
+import { getBlockBindingsSource } from '@wordpress/blocks';
+import deprecated from '@wordpress/deprecated';
+import { __, sprintf } from '@wordpress/i18n';
+import { useBlockEditorAutocompleteProps } from '../autocomplete';
+import { useBlockEditContext } from '../block-edit';
+import {
+	blockBindingsKey,
+	blockEditingModeKey,
+	isPreviewModeKey,
+} from '../block-edit/context';
+import FormatToolbarContainer from './format-toolbar-container';
+import { store as blockEditorStore } from '../../store';
+import { useMarkPersistent } from './use-mark-persistent';
+import { useEventListeners } from './event-listeners';
+import FormatEdit from './format-edit';
+import { getAllowedFormats } from './utils';
+import { Content, valueToHTMLString } from './content';
+import { withDeprecations } from './with-deprecations';
+import BlockContext from '../block-context';
+import { unlock } from '../../lock-unlock';
+import { PrivateBlockContext } from '../block-list/private-block-context';
+
+// `RichTextShortcut` and `RichTextInputEvent` now live in
+// `@wordpress/rich-text` so they share the shortcut and input-event contexts
+// with standalone rich text fields. Re-exported below for back-compat (e.g.
+// `@wordpress/format-library` imports them from `@wordpress/block-editor`).
+const {
+	useRichText,
+	KeyboardShortcutContext,
+	InputEventContext,
+	RichTextShortcut,
+	RichTextInputEvent,
+} = unlock( richTextPrivateApis );
+
+const instanceIdKey = Symbol( 'instanceId' );
+
+function RichTextWrapper(
+	{
+		children,
+		tagName = 'div',
+		value: adjustedValue = '',
+		onChange: adjustedOnChange,
+		isSelected: originalIsSelected,
+		multiline,
+		inlineToolbar,
+		wrapperClassName,
+		autocompleters,
+		onReplace,
+		placeholder,
+		allowedFormats,
+		withoutInteractiveFormatting,
+		onRemove,
+		onMerge,
+		onSplit,
+		__unstableOnSplitAtEnd: onSplitAtEnd,
+		__unstableOnSplitAtDoubleLineEnd: onSplitAtDoubleLineEnd,
+		identifier,
+		preserveWhiteSpace,
+		__unstablePastePlainText: pastePlainText,
+		__unstableEmbedURLOnPaste,
+		__unstableDisableFormats: disableFormats,
+		disableLineBreaks,
+		__unstableAllowPrefixTransformations,
+		readOnly,
+		...props
+	},
+	forwardedRef
+) {
+	if ( onSplit ) {
+		deprecated( 'wp.blockEditor.RichText onSplit prop', {
+			since: '6.4',
+			alternative: 'block.json support key: "splitting"',
+		} );
+	}
+
+	const { supportsSplitting } = useContext( PrivateBlockContext );
+	const instanceId = useInstanceId( RichTextWrapper );
+	const anchorRef = useRef();
+	const [ anchorElement, setAnchorElement ] = useState( null );
+	const context = useBlockEditContext();
+	const { clientId, isSelected: isBlockSelected, name: blockName } = context;
+	const blockBindings = context[ blockBindingsKey ];
+	const hasDefaultEditingMode = context[ blockEditingModeKey ] === 'default';
+	const blockContext = useContext( BlockContext );
+	const registry = useRegistry();
+	const selector = ( select ) => {
+		// Avoid subscribing to the block editor store if the block is not
+		// selected.
+		if ( ! isBlockSelected ) {
+			return { isSelected: false };
+		}
+
+		const { getSelectionStart, getSelectionEnd } =
+			select( blockEditorStore );
+		const selectionStart = getSelectionStart();
+		const selectionEnd = getSelectionEnd();
+
+		let isSelected;
+
+		if ( originalIsSelected === undefined ) {
+			isSelected =
+				selectionStart.clientId === clientId &&
+				selectionEnd.clientId === clientId &&
+				( identifier
+					? selectionStart.attributeKey === identifier
+					: selectionStart[ instanceIdKey ] === instanceId );
+		} else if ( originalIsSelected ) {
+			isSelected = selectionStart.clientId === clientId;
+		}
+
+		return {
+			selectionStart: isSelected ? selectionStart.offset : undefined,
+			selectionEnd: isSelected ? selectionEnd.offset : undefined,
+			isSelected,
+		};
+	};
+	const { selectionStart, selectionEnd, isSelected } = useSelect( selector, [
+		clientId,
+		identifier,
+		instanceId,
+		originalIsSelected,
+		isBlockSelected,
+	] );
+
+	const { disableBoundBlock, bindingsPlaceholder, bindingsLabel } = useSelect(
+		( select ) => {
+			if ( ! blockBindings?.[ identifier ] ) {
+				return {};
+			}
+
+			const { __experimentalBlockBindingsSupportedAttributes } =
+				select( blockEditorStore ).getSettings();
+
+			const bindableAttributes =
+				__experimentalBlockBindingsSupportedAttributes?.[ blockName ];
+
+			if ( ! bindableAttributes ) {
+				return {};
+			}
+
+			const relatedBinding = blockBindings[ identifier ];
+			const blockBindingsSource = getBlockBindingsSource(
+				relatedBinding.source
+			);
+			const blockBindingsContext = {};
+			if ( blockBindingsSource?.usesContext?.length ) {
+				for ( const key of blockBindingsSource.usesContext ) {
+					blockBindingsContext[ key ] = blockContext[ key ];
+				}
+			}
+
+			const _disableBoundBlock =
+				! blockBindingsSource?.canUserEditValue?.( {
+					select,
+					context: blockBindingsContext,
+					args: relatedBinding.args,
+				} );
+
+			// Don't modify placeholders if value is not empty.
+			if ( adjustedValue.length > 0 ) {
+				return {
+					disableBoundBlock: _disableBoundBlock,
+					// Null values will make them fall back to the default behavior.
+					bindingsPlaceholder: null,
+					bindingsLabel: null,
+				};
+			}
+
+			const { getBlockAttributes } = select( blockEditorStore );
+			const blockAttributes = getBlockAttributes( clientId );
+			let clientSideFieldLabel = null;
+			if ( blockBindingsSource?.getFieldsList ) {
+				const fieldsItems = blockBindingsSource.getFieldsList( {
+					select,
+					context: blockBindingsContext,
+				} );
+				clientSideFieldLabel = fieldsItems?.find( ( item ) =>
+					fastDeepEqual( item.args, relatedBinding?.args )
+				)?.label;
+			}
+
+			const bindingKey =
+				clientSideFieldLabel ?? blockBindingsSource?.label;
+
+			const _bindingsPlaceholder = _disableBoundBlock
+				? bindingKey
+				: sprintf(
+						/* translators: %s: connected field label or source label */
+						__( 'Add %s' ),
+						bindingKey
+				  );
+			const _bindingsLabel = _disableBoundBlock
+				? relatedBinding?.args?.key || blockBindingsSource?.label
+				: sprintf(
+						/* translators: %s: source label or key */
+						__( 'Empty %s; start writing to edit its value' ),
+						relatedBinding?.args?.key || blockBindingsSource?.label
+				  );
+
+			return {
+				disableBoundBlock: _disableBoundBlock,
+				bindingsPlaceholder:
+					blockAttributes?.placeholder || _bindingsPlaceholder,
+				bindingsLabel: _bindingsLabel,
+			};
+		},
+		[
+			blockBindings,
+			identifier,
+			blockName,
+			adjustedValue,
+			clientId,
+			blockContext,
+		]
+	);
+	const isInsidePatternOverrides = !! blockContext?.[ 'pattern/overrides' ];
+	const hasOverrideEnabled =
+		blockBindings?.__default?.source === 'core/pattern-overrides';
+
+	const shouldDisableForPattern =
+		isInsidePatternOverrides && ! hasOverrideEnabled;
+
+	const shouldDisableEditing =
+		readOnly || disableBoundBlock || shouldDisableForPattern;
+
+	// Whether the wrapper is the editing host, which depends on the selected
+	// block, not necessarily this one. Only the selected, default-mode block
+	// can be it, so others skip the subscription entirely.
+	const isEditingHost = useSelect(
+		( select ) => {
+			if (
+				shouldDisableEditing ||
+				! hasDefaultEditingMode ||
+				! isBlockSelected
+			) {
+				return false;
+			}
+
+			const { getSelectedBlockClientId, canHostEditableRoot } = unlock(
+				select( blockEditorStore )
+			);
+			return canHostEditableRoot( getSelectedBlockClientId() );
+		},
+		[ shouldDisableEditing, hasDefaultEditingMode, isBlockSelected ]
+	);
+
+	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
+		useSelect( blockEditorStore );
+	const { selectionChange } = useDispatch( blockEditorStore );
+	const adjustedAllowedFormats = getAllowedFormats( {
+		allowedFormats,
+		disableFormats,
+	} );
+	const hasFormats =
+		! adjustedAllowedFormats || adjustedAllowedFormats.length > 0;
+
+	const onSelectionChange = useCallback(
+		( start, end ) => {
+			const selection = {};
+			const unset = start === undefined && end === undefined;
+
+			const baseSelection = {
+				clientId,
+				[ identifier ? 'attributeKey' : instanceIdKey ]: identifier
+					? identifier
+					: instanceId,
+			};
+
+			if ( typeof start === 'number' || unset ) {
+				// If we are only setting the start (or the end below), which
+				// means a partial selection, and we're not updating a selection
+				// with the same client ID, abort. This means the selected block
+				// is a parent block.
+				if (
+					end === undefined &&
+					getBlockRootClientId( clientId ) !==
+						getBlockRootClientId( getSelectionEnd().clientId )
+				) {
+					return;
+				}
+
+				selection.start = {
+					...baseSelection,
+					offset: start,
+				};
+			}
+
+			if ( typeof end === 'number' || unset ) {
+				if (
+					start === undefined &&
+					getBlockRootClientId( clientId ) !==
+						getBlockRootClientId( getSelectionStart().clientId )
+				) {
+					return;
+				}
+
+				selection.end = {
+					...baseSelection,
+					offset: end,
+				};
+			}
+
+			selectionChange( selection );
+		},
+		[
+			clientId,
+			getBlockRootClientId,
+			getSelectionEnd,
+			getSelectionStart,
+			identifier,
+			instanceId,
+			selectionChange,
+		]
+	);
+
+	const {
+		value,
+		getValue,
+		onChange,
+		ref: richTextRef,
+		formatTypes,
+	} = useRichText( {
+		value: adjustedValue,
+		onChange: adjustedOnChange,
+		selectionStart,
+		selectionEnd,
+		onSelectionChange,
+		placeholder: bindingsPlaceholder || placeholder,
+		__unstableIsSelected: isSelected,
+		__unstableDisableFormats: disableFormats,
+		preserveWhiteSpace,
+		__unstableDependencies: [ tagName ],
+		allowedFormats: adjustedAllowedFormats,
+		withoutInteractiveFormatting,
+		__unstableFormatTypeHandlerContext: useMemo(
+			() => ( {
+				richTextIdentifier: identifier,
+				blockClientId: clientId,
+			} ),
+			[ identifier, clientId ]
+		),
+	} );
+	const autocompleteProps = useBlockEditorAutocompleteProps( {
+		onReplace,
+		completers: autocompleters,
+		record: value,
+		onChange,
+	} );
+
+	// While a focused editing host owns the selection (the block supports
+	// `editableRoot`), ARIA attributes describing the autocomplete state must
+	// be mirrored onto the host: assistive technology resolves them relative
+	// to the focused element.
+	const {
+		'aria-autocomplete': ariaAutocomplete,
+		'aria-haspopup': ariaHasPopup,
+		'aria-controls': ariaControls,
+		'aria-owns': ariaOwns,
+		'aria-activedescendant': ariaActiveDescendant,
+	} = autocompleteProps;
+	useEffect( () => {
+		if ( ! isSelected ) {
+			return;
+		}
+
+		const host = anchorRef.current?.parentElement?.closest(
+			'[contenteditable="true"]'
+		);
+
+		if ( ! host ) {
+			return;
+		}
+
+		const attributes = {
+			'aria-autocomplete': ariaAutocomplete,
+			'aria-haspopup': ariaHasPopup,
+			'aria-controls': ariaControls,
+			'aria-owns': ariaOwns,
+			'aria-activedescendant': ariaActiveDescendant,
+		};
+
+		for ( const [ key, value_ ] of Object.entries( attributes ) ) {
+			if ( value_ === undefined ) {
+				host.removeAttribute( key );
+			} else {
+				host.setAttribute( key, value_ );
+			}
+		}
+
+		return () => {
+			for ( const key of Object.keys( attributes ) ) {
+				host.removeAttribute( key );
+			}
+		};
+	}, [
+		isSelected,
+		ariaAutocomplete,
+		ariaHasPopup,
+		ariaControls,
+		ariaOwns,
+		ariaActiveDescendant,
+	] );
+
+	useMarkPersistent( { html: adjustedValue, value } );
+
+	const keyboardShortcuts = useRef( new Set() );
+	const inputEvents = useRef( new Set() );
+
+	function onFocus() {
+		anchorRef.current?.focus();
+	}
+
+	// Setting tabIndex to 0 is unnecessary, the element is already focusable
+	// because it's contentEditable. This also fixes a Safari bug where it's
+	// not possible to Shift+Click multi select blocks when Shift Clicking
+	// into an element with tabIndex because Safari will focus the element.
+	// However, Safari will correctly ignore nested contentEditable elements.
+	// While the writing flow wrapper is contentEditable (the selected block
+	// supports `editableRoot`), nested editable elements are no longer
+	// focusable areas on their own, so an explicit tabIndex restores their
+	// focusability.
+	let tabIndex = props.tabIndex;
+	if ( isEditingHost ) {
+		tabIndex = props.tabIndex ?? 0;
+	} else if ( ! shouldDisableEditing && props.tabIndex === 0 ) {
+		tabIndex = null;
+	}
+
+	const TagName = tagName;
+	return (
+		<>
+			{ isSelected && (
+				<KeyboardShortcutContext.Provider value={ keyboardShortcuts }>
+					<InputEventContext.Provider value={ inputEvents }>
+						<Popover.__unstableSlotNameProvider value="__unstable-block-tools-after">
+							{ children &&
+								children( { value, onChange, onFocus } ) }
+
+							<FormatEdit
+								value={ value }
+								onChange={ onChange }
+								onFocus={ onFocus }
+								formatTypes={ formatTypes }
+								forwardedRef={ anchorRef }
+							/>
+						</Popover.__unstableSlotNameProvider>
+					</InputEventContext.Provider>
+				</KeyboardShortcutContext.Provider>
+			) }
+			{ isSelected && hasFormats && (
+				<FormatToolbarContainer
+					inline={ inlineToolbar }
+					editableContentElement={ anchorElement }
+				/>
+			) }
+			<TagName
+				// Overridable props.
+				role="textbox"
+				aria-multiline={ ! disableLineBreaks }
+				aria-readonly={ shouldDisableEditing }
+				{ ...props }
+				// Unset draggable (coming from block props) for contentEditable
+				// elements because it will interfere with multi block selection
+				// when the contentEditable and draggable elements are the same
+				// element.
+				draggable={ undefined }
+				aria-label={
+					bindingsLabel || props[ 'aria-label' ] || placeholder
+				}
+				{ ...autocompleteProps }
+				ref={ useMergeRefs( [
+					// Rich text ref must be first because its focus listener
+					// must be set up before any other ref calls .focus() on
+					// mount.
+					richTextRef,
+					forwardedRef,
+					autocompleteProps.ref,
+					props.ref,
+					useEventListeners( {
+						registry,
+						getValue,
+						onChange,
+						__unstableAllowPrefixTransformations,
+						formatTypes,
+						onReplace,
+						selectionChange,
+						isSelected,
+						disableFormats,
+						value,
+						tagName,
+						onSplit,
+						__unstableEmbedURLOnPaste,
+						pastePlainText,
+						onMerge,
+						onRemove,
+						disableLineBreaks,
+						onSplitAtEnd,
+						onSplitAtDoubleLineEnd,
+						keyboardShortcuts,
+						inputEvents,
+						supportsSplitting,
+					} ),
+					anchorRef,
+					setAnchorElement,
+				] ) }
+				contentEditable={ ! shouldDisableEditing }
+				suppressContentEditableWarning
+				className={ clsx(
+					'block-editor-rich-text__editable',
+					props.className,
+					'rich-text'
+				) }
+				tabIndex={ tabIndex }
+				data-wp-block-attribute-key={ identifier }
+			/>
+		</>
+	);
+}
+
+const ForwardedRichTextWrapper = forwardRef( RichTextWrapper );
+
+export { ForwardedRichTextWrapper as RichTextWrapper };
+
+// This is the private API for the RichText component.
+// It allows access to all props, not just the public ones.
+export const PrivateRichText = withDeprecations( ForwardedRichTextWrapper );
+
+PrivateRichText.Content = Content;
+PrivateRichText.isEmpty = ( value ) => {
+	return ! value || value.length === 0;
+};
+
+// This is the public API for the RichText component.
+// We wrap the PrivateRichText component to hide some props from the public API.
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md
+ */
+const PublicForwardedRichTextContainer = forwardRef( ( props, ref ) => {
+	const context = useBlockEditContext();
+	const isPreviewMode = context[ isPreviewModeKey ];
+
+	if ( isPreviewMode ) {
+		// Remove all non-content props.
+		const {
+			children,
+			tagName: Tag = 'div',
+			value,
+			onChange,
+			isSelected,
+			multiline,
+			inlineToolbar,
+			wrapperClassName,
+			autocompleters,
+			onReplace,
+			placeholder,
+			allowedFormats,
+			withoutInteractiveFormatting,
+			onRemove,
+			onMerge,
+			onSplit,
+			__unstableOnSplitAtEnd,
+			__unstableOnSplitAtDoubleLineEnd,
+			identifier,
+			preserveWhiteSpace,
+			__unstablePastePlainText,
+			__unstableEmbedURLOnPaste,
+			__unstableDisableFormats,
+			disableLineBreaks,
+			__unstableAllowPrefixTransformations,
+			readOnly,
+			...contentProps
+		} = props;
+		return (
+			<Tag
+				ref={ ref }
+				{ ...contentProps }
+				dangerouslySetInnerHTML={ {
+					__html: valueToHTMLString( value, multiline ) || '<br>',
+				} }
+			/>
+		);
+	}
+
+	return <PrivateRichText ref={ ref } { ...props } readOnly={ false } />;
+} );
+
+PublicForwardedRichTextContainer.Content = Content;
+PublicForwardedRichTextContainer.isEmpty = ( value ) => {
+	return ! value || value.length === 0;
+};
+
+export default PublicForwardedRichTextContainer;
+export { RichTextShortcut };
+export { RichTextToolbarButton } from './toolbar-button';
+export { RichTextInputEvent as __unstableRichTextInputEvent };

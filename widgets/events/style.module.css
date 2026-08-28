@@ -1,0 +1,19 @@
+.container {
+	block-size: 100%;
+	min-height: 200px;
+}
+
+.location-picker-in-widget {
+	flex-grow: 1;
+	padding: var(--wpds-dimension-padding-2xl);
+}
+
+.status-text {
+	padding-inline: var(--wpds-dimension-padding-2xl);
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	margin: 0;
+}
+
+.no-location-selected {
+	flex-grow: 1;
+}

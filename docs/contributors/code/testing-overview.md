@@ -19,7 +19,7 @@ When writing tests consider the following:
 
 ## JavaScript testing
 
-Tests for JavaScript use [Jest](https://jestjs.io/) as the test runner and its API for [globals](https://jestjs.io/docs/en/api.html) (`describe`, `test`, `beforeEach` and so on) [assertions](https://jestjs.io/docs/en/expect.html), [mocks](https://jestjs.io/docs/en/mock-functions.html), [spies](https://jestjs.io/docs/en/jest-object.html#jestspyonobject-methodname) and [mock functions](https://jestjs.io/docs/en/mock-function-api.html). If needed, you can also use [React Testing Library](https://testing-library.com/docs/react-testing-library/intro) for React component testing.
+JavaScript unit tests are partitioned between Jest and Vitest during the [Vitest migration](/test/unit/VITEST_MIGRATION.md). Jest-owned tests use the Jest API for [globals](https://jestjs.io/docs/en/api.html) (`describe`, `test`, `beforeEach` and so on), [assertions](https://jestjs.io/docs/en/expect.html), [mocks](https://jestjs.io/docs/en/mock-functions.html), [spies](https://jestjs.io/docs/en/jest-object.html#jestspyonobject-methodname), and [mock functions](https://jestjs.io/docs/en/mock-function-api.html). If needed, you can also use [React Testing Library](https://testing-library.com/docs/react-testing-library/intro) for React component testing.
 
 _It should be noted that in the past, React components were unit tested with [Enzyme](https://github.com/airbnb/enzyme). However, React Testing Library (RTL) is now used for all existing and new tests instead._
 
@@ -33,7 +33,7 @@ Linting is static code analysis used to enforce coding standards and to avoid po
 
 To improve your developer workflow, you should setup an editor linting integration. See the [getting started documentation](/docs/contributors/code/getting-started-with-code-contribution.md) for additional information.
 
-To run unit tests only, without the linter, use `npm run test:unit` instead.
+During the Jest-to-Vitest migration, run both `npm run test:unit` and `npm run test:unit:vitest` to execute all JavaScript unit tests without the linter. The runner-specific commands continue to accept their own CLI options.
 
 ### Folder structure
 
@@ -291,7 +291,7 @@ test( 'fires onChange when a new value is typed', async () => {
 
 ### Integration testing for block UI
 
-Integration testing is defined as a type of testing where different parts are tested as a group. In this case, the parts that we want to test are the different components that are required to be rendered for a specific block or editor logic. In the end, they are very similar to unit tests as they are run with the same command using the Jest library. The main difference is that for the integration tests the blocks are run within a [`special instance of the block editor`](https://github.com/WordPress/gutenberg/blob/trunk/test/integration/helpers/integration-test-editor.js#L60).
+Integration testing is defined as a type of testing where different parts are tested as a group. In this case, the parts that we want to test are the different components that are required to be rendered for a specific block or editor logic. In the end, they are very similar to unit tests as they are run with the same command using the Jest library. The main difference is that for the integration tests the blocks are run within a [`special instance of the block editor`](https://github.com/WordPress/gutenberg/blob/trunk/test/integration/helpers/integration-test-editor.jsx#L60).
 
 The advantage of this approach is that the bulk of a block editor's functionality (block toolbar and inspector panel interactions, etc.) can be tested without having to fire up the full e2e test framework. This means the tests can run much faster and more reliably. It is suggested that as much of a block's UI functionality as possible is covered with integration tests, with e2e tests used for interactions that require a full browser environment, eg. file uploads, drag and drop, etc.
 
@@ -323,8 +323,8 @@ When a snapshot test fails, it just means that a component's rendering has chang
 However, if the change was intentional, follow these steps to update the snapshot. Run the following to update the snapshots:
 
 ```sh
-# --testPathPattern is optional but will be much faster by only running matching tests
-npm run test:unit -- --updateSnapshot --testPathPattern path/to/tests
+# --testPathPatterns is optional but will be much faster by only running matching tests
+npm run test:unit -- --updateSnapshot --testPathPatterns path/to/tests
 
 # Update snapshot for e2e tests
 npm run test:e2e -- --update-snapshots path/to/spec
@@ -403,10 +403,10 @@ Reducer tests are also a great fit for snapshots. They are often large, complex 
 You might be blindsided by CI tests failing when snapshots don't match. You'll need to [update snapshots] if the changes are expected. The quick and dirty solution is to invoke Jest with `--updateSnapshot`. That can be done as follows:
 
 ```sh
-npm run test:unit -- --updateSnapshot --testPathPattern path/to/tests
+npm run test:unit -- --updateSnapshot --testPathPatterns path/to/tests
 ```
 
-`--testPathPattern` is not required, but specifying a path will speed things up by running a subset of tests.
+`--testPathPatterns` is not required, but specifying a path will speed things up by running a subset of tests.
 
 It's a great idea to keep `npm run test:unit:watch` running in the background as you work. Jest will run only the relevant tests for changed files, and when snapshot tests fail, just hit `u` to update a snapshot!
 
@@ -478,31 +478,7 @@ In that case, you might see test failures and `TypeError` reported by Jest in th
 
 ### Debugging Jest unit tests
 
-Running `npm run test:unit:debug` will start the tests in debug mode so a [node inspector client](https://nodejs.org/en/docs/guides/debugging-getting-started/#inspector-clients) can connect to the process and inspect the execution. Instructions for using Google Chrome or Visual Studio Code as an inspector client can be found in the [wp-scripts documentation](/packages/scripts/README.md#debugging-jest-unit-tests).
-
-## Native mobile testing
-
-Part of the unit-tests suite is a set of Jest tests run exercise native-mobile codepaths, developed in React Native. Since those tests run on Node, they can be launched locally on your development machine without the need for specific native Android or iOS dev tools or SDKs. It also means that they can be debugged using typical dev tools. Read on for instructions how to debug.
-
-### Debugging the native mobile unit tests
-
-To locally run the tests in debug mode, follow these steps:
-
-0. Make sure you have ran `npm ci` to install all the packages
-1. Run `npm run test:native:debug` inside the Gutenberg root folder, on the CLI. Node is now waiting for the debugger to connect.
-2. Open `chrome://inspect` in Chrome
-3. Under the "Remote Target" section, look for a `../../node_modules/.bin/jest` target and click on the "inspect" link. That will open a new window with the Chrome DevTools debugger attached to the process and stopped at the beginning of the `jest.js` file. Alternatively, if the targets are not visible, click on the `Open dedicated DevTools for Node` link in the same page.
-4. You can place breakpoints or `debugger;` statements throughout the code, including the tests code, to stop and inspect
-5. Click on the "Play" button to resume execution
-6. Enjoy debugging the native mobile unit tests!
-
-### Native mobile end-to-end tests
-
-Contributors to Gutenberg will note that PRs include continuous integration E2E tests running the native mobile E2E tests on Android and iOS. For troubleshooting failed tests, check our guide on [native mobile tests in continuous integration](/docs/contributors/code/react-native/integration-test-guide.md). More information on running these tests locally can be found in [here](/packages/react-native-editor/__device-tests__/README.md).
-
-### Native mobile integration tests
-
-There is an ongoing effort to add integration tests to the native mobile project using the [`react-native-testing-library`](https://testing-library.com/docs/react-native-testing-library/intro/) library. A guide to writing integration tests can be found [here](/docs/contributors/code/react-native/integration-test-guide.md).
+Running `npm run test:unit:debug` will start the tests in debug mode so a [node inspector client](https://nodejs.org/en/learn/getting-started/debugging#inspector-clients) can connect to the process and inspect the execution. Instructions for using Google Chrome or Visual Studio Code as an inspector client can be found in the [wp-scripts documentation](/packages/scripts/README.md#debugging-jest-unit-tests).
 
 ## End-to-end testing
 
@@ -556,7 +532,7 @@ Every core block is required to have at least one set of fixture files for its m
 
 ### Flaky tests
 
-A test is considered to be **flaky** when it can pass and fail across multiple retry attempts without any code changes. We auto retry failed tests at most **twice** on CI to detect and report them to GitHub issues automatically under the [`[Type] Flaky Test`](https://github.com/WordPress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3A%22%5BType%5D+Flaky+Test%22) label via [`report-flaky-tests`](https://github.com/WordPress/gutenberg/tree/trunk/packages/report-flaky-tests) GitHub action. Note that a test that failed three times in a row is not counted as a flaky test and will not be reported to an issue.
+A test is considered to be **flaky** when it can pass and fail across multiple retry attempts without any code changes. We auto retry failed tests at most **twice** on CI to detect them, and report them, together with their errors, as a single comment on the pull request via the [`report-flaky-tests`](https://github.com/WordPress/gutenberg/tree/trunk/packages/report-flaky-tests) GitHub action. Note that a test that failed three times in a row is not counted as a flaky test and will not be reported, and that flaky tests are only reported on pull requests.
 
 ## PHP testing
 
@@ -638,16 +614,16 @@ npm run test:performance
 
 This gives you the result for the current branch/code on the running environment.
 
-In addition to that, you can also compare the metrics across branches (or tags or commits) by running the following command `./bin/plugin/cli.js perf [branches]`, example:
+In addition to that, you can also compare the metrics across branches (or tags or commits) by running the following command `npm exec release-cli -- perf [branches]`, example:
 
 ```
-./bin/plugin/cli.js perf trunk v8.1.0 v8.0.0
+npm exec release-cli -- perf trunk v8.1.0 v8.0.0
 ```
 
 Finally, you can pass an additional `--tests-branch` argument to specify which branch's performance test files you'd like to run. This is particularly useful when modifying/extending the perf tests:
 
 ```
-./bin/plugin/cli.js perf trunk v8.1.0 v8.0.0 --tests-branch add/perf-tests-coverage
+npm exec release-cli -- perf trunk v8.1.0 v8.0.0 --tests-branch add/perf-tests-coverage
 ```
 
 **Note** This command needs may take some time to perform the benchmark. While running make sure to avoid using your computer or have a lot of background process to minimize external factors that can impact the results across branches.

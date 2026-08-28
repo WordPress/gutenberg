@@ -1,22 +1,10 @@
-/**
- * WordPress dependencies
- */
+import clsx from 'clsx';
 import { usePrevious } from '@wordpress/compose';
-import {
-	useCallback,
-	useEffect,
-	useLayoutEffect,
-	useMemo,
-} from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import * as styles from '../styles';
+import { useCallback, useEffect, useLayoutEffect } from '@wordpress/element';
+import styles from '../style.module.scss';
 import { useToolsPanelContext } from '../context';
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
-import { useCx } from '../../utils/hooks/use-cx';
 import type { ToolsPanelItemProps } from '../types';
 
 const noop = () => {};
@@ -125,13 +113,16 @@ export function useToolsPanelItem(
 	const isValueSet = hasValue();
 	// Notify the panel when an item's value has changed except for optional
 	// items without value because the item should not cause itself to hide.
+	// Items that don't belong to the panel on screen stay silent, otherwise
+	// they would leave an orphaned entry in its menu.
 	useEffect( () => {
-		if ( ! isShownByDefault && ! isValueSet ) {
+		if ( ! hasMatchingPanel || ( ! isShownByDefault && ! isValueSet ) ) {
 			return;
 		}
 
 		flagItemCustomization( isValueSet, label, menuGroup );
 	}, [
+		hasMatchingPanel,
 		isValueSet,
 		menuGroup,
 		label,
@@ -174,32 +165,15 @@ export function useToolsPanelItem(
 		? menuItems?.[ menuGroup ]?.[ label ] !== undefined
 		: isMenuItemChecked;
 
-	const cx = useCx();
-	const classes = useMemo( () => {
-		const shouldApplyPlaceholderStyles =
-			shouldRenderPlaceholder && ! isShown;
-		const firstItemStyle =
-			firstDisplayedItem === label && __experimentalFirstVisibleItemClass;
-		const lastItemStyle =
-			lastDisplayedItem === label && __experimentalLastVisibleItemClass;
-		return cx(
-			styles.ToolsPanelItem,
-			shouldApplyPlaceholderStyles && styles.ToolsPanelItemPlaceholder,
-			! shouldApplyPlaceholderStyles && className,
-			firstItemStyle,
-			lastItemStyle
-		);
-	}, [
-		isShown,
-		shouldRenderPlaceholder,
-		className,
-		cx,
-		firstDisplayedItem,
-		lastDisplayedItem,
-		__experimentalFirstVisibleItemClass,
-		__experimentalLastVisibleItemClass,
-		label,
-	] );
+	const shouldApplyPlaceholderStyles = shouldRenderPlaceholder && ! isShown;
+	const classes = clsx(
+		styles[ 'tools-panel-item' ],
+		shouldApplyPlaceholderStyles &&
+			styles[ 'tools-panel-item-placeholder' ],
+		! shouldApplyPlaceholderStyles && className,
+		firstDisplayedItem === label && __experimentalFirstVisibleItemClass,
+		lastDisplayedItem === label && __experimentalLastVisibleItemClass
+	);
 
 	return {
 		...otherProps,

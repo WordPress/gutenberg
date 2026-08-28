@@ -1,7 +1,4 @@
 'use strict';
-/**
- * Internal dependencies
- */
 const mergeConfigs = require( '../merge-configs' );
 
 describe( 'mergeConfigs', () => {

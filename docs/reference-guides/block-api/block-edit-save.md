@@ -213,7 +213,7 @@ it can help you adjust how a block is rendered. For example, you could render a 
 
 ```jsx
 save: ( { attributes, innerBlocks } ) => {
-	const { className, ...rest } = useBlockProps.save();
+	let { className, ...rest } = useBlockProps.save();
 
 	// innerBlocks could also be an object - react element during initialization
 	const numberOfInnerBlocks = innerBlocks?.length;
@@ -253,7 +253,6 @@ edit: ( { attributes, setAttributes } ) => {
 	return (
 		<div { ...blockProps }>
 			<TextControl
-				__next40pxDefaultSize
 				label='My Text Field'
 				value={ attributes.content }
 				onChange={ updateFieldValue }
@@ -290,7 +289,6 @@ edit: ( { attributes, setAttributes } ) => {
 	return (
 		<div { ...blockProps }>
 			<TextControl
-				__next40pxDefaultSize
 				label='Number Posts to Show'
 				value={ attributes.postsToShow }
 				onChange={ ( val ) => {

@@ -136,6 +136,7 @@
 					{ "docs/how-to-guides/themes/theme-support.md": [] }
 				]
 			},
+			{ "docs/how-to-guides/client-side-media.md": [] },
 			{ "docs/how-to-guides/thunks.md": [] },
 			{
 				"docs/how-to-guides/widgets/README.md": [
@@ -194,7 +195,7 @@
 					}
 				]
 			},
-			{ "docs/reference-guides/core-blocks.md": [] },
+			{ "docs/reference-guides/core-blocks/README.md": "{{blocks}}" },
 			{
 				"docs/reference-guides/filters/README.md": [
 					{ "docs/reference-guides/filters/block-filters.md": [] },
@@ -296,6 +297,7 @@
 					}
 				]
 			},
+			{ "docs/reference-guides/view-config-reference.md": [] },
 			{ "packages/components/README.md": "{{components}}" },
 			{ "docs/reference-guides/packages.md": "{{packages}}" },
 			{
@@ -327,12 +329,8 @@
 						"docs/reference-guides/data/data-core-keyboard-shortcuts.md": []
 					},
 					{ "docs/reference-guides/data/data-core-notices.md": [] },
-					{ "docs/reference-guides/data/data-core-nux.md": [] },
 					{
 						"docs/reference-guides/data/data-core-preferences.md": []
-					},
-					{
-						"docs/reference-guides/data/data-core-reusable-blocks.md": []
 					},
 					{ "docs/reference-guides/data/data-core-rich-text.md": [] },
 					{ "docs/reference-guides/data/data-core-viewport.md": [] }
@@ -355,7 +353,13 @@
 					{
 						"docs/explanations/architecture/full-site-editing-templates.md": []
 					},
-					{ "docs/explanations/architecture/styles.md": [] }
+					{ "docs/explanations/architecture/styles.md": [] },
+					{
+						"docs/explanations/architecture/client-side-media-architecture.md": []
+					},
+					{
+						"docs/explanations/architecture/dashboard-widgets.md": []
+					}
 				]
 			},
 			{
@@ -392,6 +396,8 @@
 					},
 					{ "docs/contributors/code/scripts.md": [] },
 					{ "docs/contributors/code/managing-packages.md": [] },
+					{ "docs/contributors/code/workspace-development.md": [] },
+					{ "docs/contributors/code/agents-and-skills.md": [] },
 					{
 						"docs/contributors/code/release/README.md": [
 							{
@@ -405,22 +411,6 @@
 							}
 						]
 					},
-					{
-						"docs/contributors/code/react-native/README.md": [
-							{
-								"docs/contributors/code/react-native/getting-started-react-native.md": []
-							},
-							{
-								"docs/contributors/code/react-native/osx-setup-guide.md": []
-							},
-							{
-								"docs/contributors/code/react-native/integration-test-guide.md": []
-							},
-							{
-								"docs/contributors/code/react-native/internationalization-guide.md": []
-							}
-						]
-					},
 					{ "docs/contributors/code/backward-compatibility.md": [] },
 					{ "docs/contributors/code/deprecations.md": [] },
 					{
@@ -430,6 +420,9 @@
 			},
 			{
 				"docs/contributors/design/README.md": [
+					{
+						"docs/contributors/design/design-system-packages.md": []
+					},
 					{ "docs/contributors/design/the-block.md": [] }
 				]
 			},

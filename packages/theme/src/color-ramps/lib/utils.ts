@@ -1,12 +1,4 @@
-/**
- * External dependencies
- */
-import { type ColorTypes } from 'colorjs.io/fn';
-
-/**
- * Internal dependencies
- */
-import './register-color-spaces';
+import { type PlainColorObject } from 'colorjs.io/fn';
 import {
 	WHITE,
 	BLACK,
@@ -15,9 +7,9 @@ import {
 	ACCENT_SCALE_BASE_LIGHTNESS_THRESHOLDS,
 	MAX_BISECTION_ITERATIONS,
 	CONTRAST_EPSILON,
-} from './constants';
-import type { Ramp, RampConfig, RampDirection } from './types';
-import { getContrast } from './color-utils';
+} from './constants.ts';
+import type { Ramp, RampConfig, RampDirection } from './types.ts';
+import { getContrast } from './color-utils.ts';
 
 /**
  * Build a dependency graph from the steps configuration
@@ -142,7 +134,7 @@ export function stepsForStep(
  * ramp direction value.
  */
 export function computeBetterFgColorDirection(
-	seed: ColorTypes,
+	seed: string | PlainColorObject,
 	preferLighter?: boolean
 ): {
 	better: RampDirection;

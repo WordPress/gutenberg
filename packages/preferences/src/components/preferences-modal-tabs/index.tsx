@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useViewportMatch } from '@wordpress/compose';
 import {
 	Navigator,
@@ -18,10 +15,6 @@ import {
 import { useMemo, useState } from '@wordpress/element';
 import { chevronLeft, chevronRight, Icon } from '@wordpress/icons';
 import { isRTL, __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 
 const { Tabs } = unlock( componentsPrivateApis );
@@ -110,12 +103,10 @@ export default function PreferencesModalTabs( {
 							<ItemGroup>
 								{ tabs.map( ( tab ) => {
 									return (
-										// @ts-expect-error: Navigator.Button is currently typed in a way that prevents Item from being passed in
 										<Navigator.Button
 											key={ tab.name }
 											path={ `/${ tab.name }` }
 											as={ Item }
-											isAction
 										>
 											<HStack justify="space-between">
 												<FlexItem>

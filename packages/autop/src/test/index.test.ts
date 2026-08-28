@@ -1,10 +1,33 @@
-/**
- * Internal dependencies
- */
 import { autop, removep } from '../';
 
 test( 'empty string', () => {
 	expect( autop( '' ) ).toBe( '' );
+} );
+
+// Regression test for https://github.com/WordPress/gutenberg/issues/9056.
+// Newlines inside <script>, <style>, <svg>, and <math> tags must not be
+// converted to <br /> tags.
+test( 'does not insert <br /> inside <script>, <style>, <svg>, or <math> tags', () => {
+	const script =
+		'Some text...\n' +
+		'<script type="text/javascript">\n' +
+		'alert(1);\n' +
+		'</script>';
+	expect( autop( script ) ).toBe(
+		'<p>Some text...<br />\n' +
+			'<script type="text/javascript">\n' +
+			'alert(1);\n' +
+			'</script></p>\n'
+	);
+
+	const style =
+		'Some text...\n' + '<style>\n' + '.foo { color: red; }\n' + '</style>';
+	expect( autop( style ) ).toBe(
+		'<p>Some text...</p>\n' +
+			'<style>\n' +
+			'.foo { color: red; }\n' +
+			'</style>\n'
+	);
 } );
 
 test( 'first post', () => {
