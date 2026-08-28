@@ -2,9 +2,9 @@
 
 ## Unreleased
 
-### Bug Fixes
+### Breaking Changes
 
--   DataForm: a combined form field (one with `children`) is now treated purely as a layout container. Its `id` is no longer resolved against the field definitions, so a field sharing that `id` no longer contributes validation rules to the group, and the `panel` layout summarizes the group with its first leaf child instead. ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER))
+-   DataForm: a combined form field (one with `children`) is now treated purely as a layout container. Its `id` is no longer resolved against the field definitions: a field sharing that `id` no longer contributes validation rules to the group, and the `panel` layout no longer uses it for the collapsed summary or `readOnly` state, falling back to the group's first leaf child instead. Use `layout.summary` to pick the summary field explicitly ([#82175](https://github.com/WordPress/gutenberg/pull/82175)).
 
 ### Internal
 
