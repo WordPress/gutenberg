@@ -6,23 +6,26 @@
 
 -   DataForm: a combined form field (one with `children`) is now treated purely as a layout container. Its `id` is no longer resolved against the field definitions: a field sharing that `id` no longer contributes validation rules to the group, and the `panel` layout no longer uses it for the collapsed summary or `readOnly` state, falling back to the group's first leaf child instead ([#82175](https://github.com/WordPress/gutenberg/pull/82175)).
 
-    If a combined field relied on sharing its `id` with a field to pick the panel summary, declare it through `layout.summary` instead:
+    If a combined field relied on sharing its `id` with a field to pick the panel summary, declare it through `layout.summary` instead. For example, a `discussion` field whose `render` summarizes `comment_status` and `ping_status` together:
 
     ```js
-    // Before: the summary came from the `status` field because the group shares its id.
+    // Before: the summary came from the `discussion` field because the group shares its id.
     const form = {
     	layout: { type: 'panel' },
-    	fields: [ { id: 'status', children: [ 'status', 'password' ] } ],
+    	fields: [
+    		{ id: 'discussion', children: [ 'comment_status', 'ping_status' ] },
+    	],
     };
 
-    // After: the summary field is explicit.
+    // After: the summary field is explicit. Without it, the group would
+    // now be summarized by its first child, `comment_status`.
     const form = {
     	layout: { type: 'panel' },
     	fields: [
     		{
-    			id: 'status',
-    			layout: { type: 'panel', summary: 'status' },
-    			children: [ 'status', 'password' ],
+    			id: 'discussion',
+    			layout: { type: 'panel', summary: 'discussion' },
+    			children: [ 'comment_status', 'ping_status' ],
     		},
     	],
     };
