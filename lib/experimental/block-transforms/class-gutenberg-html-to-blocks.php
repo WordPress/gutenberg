@@ -18,6 +18,13 @@
  */
 class Gutenberg_HTML_To_Blocks {
 	/**
+	 * Raw transforms gathered for the conversion in progress.
+	 *
+	 * @var array[]|null
+	 */
+	private static $raw_transforms = null;
+
+	/**
 	 * Elements that belong inside a paragraph rather than beside one.
 	 *
 	 * The tags `isPhrasingContent()` answers true for: everything the phrasing
@@ -89,6 +96,36 @@ class Gutenberg_HTML_To_Blocks {
 		if ( '' === trim( $html ) ) {
 			return array();
 		}
+
+		/*
+		 * Gathering the raw transforms walks every registered block and sorts
+		 * what it finds, and `find_transform()` wants them once per element.
+		 * They are held for the length of one conversion, during which no
+		 * block can be registered, rather than cached beyond it, where a block
+		 * registered later would be missed.
+		 */
+		$outermost = null === self::$raw_transforms;
+
+		if ( $outermost ) {
+			self::$raw_transforms = Gutenberg_Block_Transforms::get_declared_transforms( 'raw' );
+		}
+
+		try {
+			return self::convert_html( $html );
+		} finally {
+			if ( $outermost ) {
+				self::$raw_transforms = null;
+			}
+		}
+	}
+
+	/**
+	 * Converts markup into blocks, with the raw transforms already gathered.
+	 *
+	 * @param string $html HTML to convert.
+	 * @return array[] Parsed block arrays.
+	 */
+	private static function convert_html( $html ) {
 
 		if ( false !== strpos( $html, '<!-- wp:' ) ) {
 			$blocks = parse_blocks( $html );
@@ -909,7 +946,9 @@ class Gutenberg_HTML_To_Blocks {
 	 * @return array[] Raw transforms, each carrying the `blockName` it belongs to.
 	 */
 	private static function get_raw_transforms() {
-		return Gutenberg_Block_Transforms::get_declared_transforms( 'raw' );
+		return null === self::$raw_transforms
+			? Gutenberg_Block_Transforms::get_declared_transforms( 'raw' )
+			: self::$raw_transforms;
 	}
 
 	/**

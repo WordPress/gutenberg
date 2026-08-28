@@ -503,6 +503,22 @@ class Gutenberg_HTML_Element {
 	public function query_selector_all( $selector ) {
 		$matches = array();
 
+		$this->collect_matches( $selector, $matches );
+
+		return $matches;
+	}
+
+	/**
+	 * Appends every matching descendant to a list, in document order.
+	 *
+	 * The list is passed down rather than merged back up, so that a deep tree
+	 * costs one append per match rather than one array copy per level.
+	 *
+	 * @param string                   $selector Selector list.
+	 * @param Gutenberg_HTML_Element[] $matches  List to append to.
+	 * @return void
+	 */
+	private function collect_matches( $selector, &$matches ) {
 		foreach ( $this->children as $child ) {
 			if ( self::ELEMENT !== $child->type ) {
 				continue;
@@ -512,10 +528,8 @@ class Gutenberg_HTML_Element {
 				$matches[] = $child;
 			}
 
-			$matches = array_merge( $matches, $child->query_selector_all( $selector ) );
+			$child->collect_matches( $selector, $matches );
 		}
-
-		return $matches;
 	}
 
 	/**
