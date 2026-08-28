@@ -263,6 +263,27 @@
 		box-shadow: none;
 	}
 
+	/*
+	 * The dropdown arrow is a background image with its colour baked into the
+	 * data URI, so it cannot follow a token or `currentColor`. Core swaps in a
+	 * grey arrow for `select.disabled` and `select:disabled`, but leaves
+	 * `select[aria-disabled="true"]` with only `cursor: default` — no visual
+	 * disabled treatment at all.
+	 *
+	 * Since the rules above do give an aria-disabled field the disabled box, the
+	 * arrow has to follow, or it stays black against a greyed control. This
+	 * repeats Core's own grey arrow verbatim so all three disabled forms render
+	 * identically; the colour is Core's #a0a5aa rather than the disabled token,
+	 * because matching the other two matters more than matching the palette
+	 * while the value is trapped inside a data URI.
+	 *
+	 * Replacing dashicons with the stroke-based set removes this entirely: a
+	 * masked icon takes `currentColor` and needs no second copy.
+	 */
+	select[aria-disabled="true"] {
+		background-image: url(data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M5%206l5%205%205-5%202%201-7%207-7-7%202-1z%22%20fill%3D%22%23a0a5aa%22%2F%3E%3C%2Fsvg%3E);
+	}
+
 	input.readonly,
 	input[readonly],
 	textarea.readonly,
