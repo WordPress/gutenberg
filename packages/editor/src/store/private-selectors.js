@@ -1,11 +1,3 @@
-/**
- * External dependencies
- */
-import fastDeepEqual from 'fast-deep-equal';
-
-/**
- * WordPress dependencies
- */
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import {
@@ -15,12 +7,11 @@ import {
 	page as pageIcon,
 	verse,
 } from '@wordpress/icons';
-import { store as coreStore } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	privateApis as coreDataPrivateApis,
+} from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import {
 	getRenderingMode,
 	getCurrentPost,
@@ -34,7 +25,6 @@ import {
 	getEntityFields as _getEntityFields,
 	isEntityReady as _isEntityReady,
 } from '../dataviews/store/private-selectors';
-import { getTemplatePartIcon } from '../utils';
 import { unlock } from '../lock-unlock';
 
 const EMPTY_INSERTION_POINT = {
@@ -42,6 +32,8 @@ const EMPTY_INSERTION_POINT = {
 	insertionIndex: undefined,
 	filterValue: undefined,
 };
+
+const { getTemplatePartIcon } = unlock( coreDataPrivateApis );
 
 /**
  * These are rendering modes that the editor supports.
@@ -175,45 +167,6 @@ export const getPostIcon = createRegistrySelector(
 			}
 			return pageIcon;
 		}
-	}
-);
-
-/**
- * Returns true if there are unsaved changes to the
- * post's meta fields, and false otherwise.
- *
- * @param {Object} state    Global application state.
- * @param {string} postType The post type of the post.
- * @param {number} postId   The ID of the post.
- *
- * @return {boolean} Whether there are edits or not in the meta fields of the relevant post.
- */
-export const hasPostMetaChanges = createRegistrySelector(
-	( select ) => ( state, postType, postId ) => {
-		const { type: currentPostType, id: currentPostId } =
-			getCurrentPost( state );
-		// If no postType or postId is passed, use the current post.
-		const edits = select( coreStore ).getEntityRecordNonTransientEdits(
-			'postType',
-			postType || currentPostType,
-			postId || currentPostId
-		);
-
-		if ( ! edits?.meta ) {
-			return false;
-		}
-
-		// Compare if anything apart from `footnotes` has changed.
-		const originalPostMeta = select( coreStore ).getEntityRecord(
-			'postType',
-			postType || currentPostType,
-			postId || currentPostId
-		)?.meta;
-
-		return ! fastDeepEqual(
-			{ ...originalPostMeta, footnotes: undefined },
-			{ ...edits.meta, footnotes: undefined }
-		);
 	}
 );
 
@@ -359,9 +312,15 @@ export function getShowStylebook( state ) {
  * @param {Object} state Global application state.
  * @return {number} The canvas width in pixels.
  */
-export function getCanvasWidth( state ) {
-	return state.canvasWidth;
-}
+export const getCanvasWidth = createRegistrySelector(
+	( select ) => ( state ) => {
+		// Return undefined while zoomed out to disable canvas resizing.
+		if ( unlock( select( blockEditorStore ) ).isZoomOut() ) {
+			return undefined;
+		}
+		return state.canvasWidth;
+	}
+);
 
 /**
  * Returns the current revisions page number.
@@ -506,8 +465,23 @@ export const getCurrentRevision = createRegistrySelector(
 		if ( ! revisions ) {
 			return null;
 		}
+		const revision = revisions.find(
+			( record ) => record[ revisionKey ] === revisionId
+		);
+		if ( revision ) {
+			return revision;
+		}
+
+		// When revisions are disabled, autosaves are missing from the collection
+		// but still available through the individual endpoint.
 		return (
-			revisions.find( ( r ) => r[ revisionKey ] === revisionId ) ?? null
+			select( coreStore ).getRevision(
+				'postType',
+				postType,
+				postId,
+				revisionId,
+				{ context: 'edit' }
+			) ?? null
 		);
 	}
 );
@@ -620,7 +594,7 @@ export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
 		return Boolean(
 			syncConfig &&
 				syncConfig.supportsPersistence &&
-				window._wpCollaborationEnabled &&
+				window.__experimentalEnableRealTimeCollaboration &&
 				false !==
 					syncConfig.shouldSync?.(
 						`postType/${ currentPostType }`,

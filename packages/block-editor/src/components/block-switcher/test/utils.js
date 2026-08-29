@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { unregisterBlockType, registerBlockType } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { getMatchingBlockByName, getRetainedBlockAttributes } from '../utils';
 
 describe( 'BlockSwitcher - utils', () => {

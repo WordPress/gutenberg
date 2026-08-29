@@ -2,6 +2,37 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `build`: Strip JavaScript and TypeScript source extensions from legacy positional entry names so generated output uses names such as `index.js` instead of `index.tsx.js` or `index.jsx.js` ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+### Enhancements
+
+-   Include `.jsx` unit tests in the default lint configuration ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+### Internal
+
+-   Update bundled Jest packages to 30.5.0 ([#82181](https://github.com/WordPress/gutenberg/pull/82181)).
+-   Remove unused dependency `jest-environment-node` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+
+## 34.2.0 (2026-08-26)
+
+## 34.1.0 (2026-08-12)
+
+### Bug Fixes
+
+-   Set Sass's `charset` option to `false` so production builds no longer emit a UTF-8 BOM in the middle of the extracted CSS ([#81383](https://github.com/WordPress/gutenberg/pull/81383)).
+
+## 34.0.0 (2026-07-29)
+
+### Breaking Changes
+
+-   Upgrade the bundled Jest packages from v29 to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
+
+### Enhancements
+
+- 	`format`: Detect `prettier.config.mjs` so the bundled default config is not used when one is present ([#80422](https://github.com/WordPress/gutenberg/pull/80422)).
+
 ## 33.0.0 (2026-07-14)
 
 ### Breaking Changes
@@ -13,6 +44,7 @@
 -   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
 -   Update `stylelint` to `^16.26.1` ([#79648](https://github.com/WordPress/gutenberg/pull/79648)).
 -   Widen the `@playwright/test` peer dependency to `>=1` and mark it optional, so consumers aren't forced to bump Playwright or satisfy it under strict peer deps ([#78632](https://github.com/WordPress/gutenberg/pull/78632)).
+-   Update `webpack-dev-server` to `^5.2.1`, resolving several Dependabot security alerts and migrating the internal dev-server proxy config to the v5 array format ([#80347](https://github.com/WordPress/gutenberg/pull/80347)).
 
 ## 32.6.0 (2026-07-01)
 

@@ -2,6 +2,38 @@
 
 ## Unreleased
 
+## 13.0.0 (2026-08-26)
+
+### Breaking Changes
+
+-   Remove the `input-style__focus` mixin. Use `outset-ring__focus` instead ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
+
+### Enhancements
+
+-   `input-control`: Use `outset-ring__focus` for focus styling, WPDS tokens for border styling, and a hover border treatment aligned with `@wordpress/ui`. If you also define custom `:focus` box-shadow styles on the same selector, remove them to avoid duplicate focus rings ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
+-   `outset-ring__focus`: Use a `--focus-color` fallback in the outline instead of declaring the custom property locally, so ancestor overrides apply correctly ([#81242](https://github.com/WordPress/gutenberg/pull/81242)).
+
+## 12.1.0 (2026-08-12)
+
+
+## 12.0.0 (2026-07-29)
+
+### Breaking Changes
+
+-   Remove the `$accent-color` parameter from `input-control` and `input-style__focus`. Focus styling now uses `--wp-admin-theme-color` internally ([#80595](https://github.com/WordPress/gutenberg/pull/80595)).
+
+### Enhancements
+
+-   `outset-ring__focus`: Allow overriding the focus ring color via the `--focus-color` custom property ([#80587](https://github.com/WordPress/gutenberg/pull/80587)).
+
+### Bug Fixes
+
+-   Lower the editor z-index of left/right aligned blocks below sticky and fixed position blocks, so floated blocks no longer cover stuck blocks while scrolling ([#80749](https://github.com/WordPress/gutenberg/pull/80749)).
+
+### Internal
+
+-   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).
+
 ## 11.0.0 (2026-07-14)
 
 ### Breaking Changes

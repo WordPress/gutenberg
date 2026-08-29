@@ -1,13 +1,9 @@
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const fs = require( 'fs/promises' );
 const os = require( 'os' );
 const { randomUUID } = require( 'crypto' );
 const { createRequire } = require( 'node:module' );
 const { pathToFileURL } = require( 'node:url' );
-
 /**
  * Resolves the `wasm-vips` entry point from the `@wordpress/vips` package,
  * which declares it as a direct dependency. This works whether or not
@@ -21,11 +17,10 @@ const wasmVipsEntry = pathToFileURL(
 		'wasm-vips'
 	)
 ).href;
-
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const {
+	skipIfClientSideMediaInactive,
+} = require( './client-side-media-utils' );
 
 /**
  * Probes a remote JPEG for an embedded UltraHDR gain map.
@@ -113,41 +108,12 @@ class MediaProcessingUtils {
 
 	/**
 	 * Skip the test unless the client-side media processing pipeline is the
-	 * active upload path. This mirrors the gate used in the editor's
-	 * media-upload util: the global flag must be set AND the browser must
-	 * meet the feature detection requirements (cross-origin isolation,
-	 * SharedArrayBuffer, Web Workers, WebAssembly).
+	 * active upload path.
 	 *
-	 * @param {import('@playwright/test').TestInfo} testInstance The test object for skipping.
+	 * @param {import('@playwright/test').TestType} testInstance The test object for skipping.
 	 */
 	async skipIfClientSideMediaInactive( testInstance ) {
-		const isActive = await this.page.evaluate( () => {
-			if ( ! window.__clientSideMediaProcessing ) {
-				return false;
-			}
-			// Prefer the package's own detection when available so the
-			// gate stays in sync with the editor's runtime decision.
-			if (
-				window.wp?.uploadMedia &&
-				typeof window.wp.uploadMedia.isClientSideMediaSupported ===
-					'function'
-			) {
-				return window.wp.uploadMedia.isClientSideMediaSupported();
-			}
-			// Fall back to the core preconditions for CSM. These are the
-			// signals the package's feature detection inspects first.
-			return (
-				window.crossOriginIsolated === true &&
-				typeof SharedArrayBuffer !== 'undefined' &&
-				typeof WebAssembly !== 'undefined' &&
-				typeof Worker !== 'undefined'
-			);
-		} );
-
-		testInstance.skip(
-			! isActive,
-			'Client-side media processing is not active in this environment'
-		);
+		await skipIfClientSideMediaInactive( this.page, testInstance );
 	}
 
 	/**
@@ -831,5 +797,164 @@ test.describe( 'Client-side media processing', () => {
 		expect( createAttempts ).toBe( maxRetryAttempts + 1 );
 
 		await page.unroute( '**/wp/v2/media**' );
+	} );
+
+	test( 'reports a server failure in plain language', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+	} ) => {
+		/*
+		 * Answer the create request with a 500 carrying an HTML body, which
+		 * is what a PHP fatal or a server that cannot write its temporary
+		 * files produces. `apiFetch` cannot read that as a REST error, so it
+		 * rejects with its internal `invalid_json` code — and the editor used
+		 * to show that verbatim as "The response is not a valid JSON
+		 * response." (see gutenberg#81711).
+		 */
+		await page.route( '**/wp/v2/media**', async ( route ) => {
+			const request = route.request();
+			const isCreate =
+				request.method() === 'POST' &&
+				/\/wp\/v2\/media(\?|$)/.test( request.url() );
+			if ( isCreate ) {
+				await route.fulfill( {
+					status: 500,
+					contentType: 'text/html',
+					body: '<html><body>Fatal error: allowed memory size exhausted</body></html>',
+				} );
+				return;
+			}
+			await route.continue();
+		} );
+
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		const uniqueName = await mediaProcessingUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			'1024x768_e2e_test_image_size.jpeg'
+		);
+
+		const snackbars = page.locator( '.components-snackbar' );
+
+		// The message names the file and offers a way forward.
+		const errorSnackbar = snackbars.filter( {
+			hasText: /failed to upload/i,
+		} );
+		await expect( errorSnackbar ).toBeVisible( { timeout: 30_000 } );
+		await expect( errorSnackbar ).toContainText( uniqueName );
+
+		// The REST client's internals must not reach the user.
+		await expect(
+			snackbars.filter( { hasText: /valid JSON/i } )
+		).toBeHidden();
+
+		await page.unroute( '**/wp/v2/media**' );
+	} );
+
+	test( 'recovers when the image processing worker crashes mid-upload', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		/*
+		 * Capture workers created from this point on. The vips worker is
+		 * created lazily (from a Blob URL) when the first image operation
+		 * starts, so wrapping the constructor before uploading reliably
+		 * captures it.
+		 */
+		await page.evaluate( () => {
+			window.__capturedBlobWorkers = [];
+			const OriginalWorker = window.Worker;
+			window.Worker = class extends OriginalWorker {
+				constructor( scriptURL, options ) {
+					super( scriptURL, options );
+					if ( String( scriptURL ).startsWith( 'blob:' ) ) {
+						window.__capturedBlobWorkers.push( this );
+					}
+				}
+			};
+		} );
+
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		// A large image keeps transcoding busy long enough for the
+		// simulated crash to land while vips work is still pending.
+		await mediaProcessingUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			'5000x4000_e2e_test_image_oversized.jpeg'
+		);
+
+		// Wait for the vips worker to spin up, which means image
+		// processing has started.
+		await page.waitForFunction(
+			() => window.__capturedBlobWorkers.length > 0,
+			undefined,
+			{ timeout: 30_000 }
+		);
+
+		/*
+		 * Simulate a worker crash: stop the underlying thread, then fire the
+		 * error event a real crash would emit so the RPC layer marks the
+		 * worker as failed and rejects its pending calls.
+		 */
+		await page.evaluate( () => {
+			for ( const worker of window.__capturedBlobWorkers ) {
+				worker.terminate();
+				worker.dispatchEvent(
+					new ErrorEvent( 'error', {
+						message: 'Simulated worker crash',
+					} )
+				);
+			}
+		} );
+
+		// The failure must surface to the user rather than dying silently
+		// inside the queue.
+		const errorSnackbar = page
+			.locator( '.components-snackbar' )
+			.filter( { hasText: /cannot generate responsive image sizes/i } );
+		await expect( errorSnackbar ).toBeVisible( { timeout: 30_000 } );
+
+		// The failed item must leave the queue instead of hanging forever…
+		await mediaProcessingUtils.waitForUploadQueueEmpty( 30_000 );
+
+		// …which releases the save lock so the post is saveable again.
+		await expect
+			.poll(
+				() =>
+					page.evaluate( () =>
+						window.wp.data
+							.select( 'core/editor' )
+							.isPostSavingLocked()
+					),
+				{ timeout: 10_000 }
+			)
+			.toBe( false );
+
+		/*
+		 * Emptying the queue also terminates the dead worker, so the next
+		 * upload lazily creates a fresh one and completes normally. Clear
+		 * the canvas first so the failed upload's leftover image block
+		 * doesn't collide with the helper's block locator.
+		 */
+		await editor.setContent( '' );
+		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+			editor,
+			requestUtils,
+			'1024x768_e2e_test_image_size.jpeg'
+		);
+		expect( media.mime_type ).toBe( 'image/jpeg' );
 	} );
 } );

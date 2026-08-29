@@ -12,11 +12,13 @@
 			overflow: hidden;
 			display: flex;
 			align-items: center;
+			max-width: 100%;
 			min-height: var(--wpds-dimension-size-sm);
 			border: 1px solid var(--wpds-color-stroke-interactive-neutral);
 			border-radius: 12px;
 			background-color: var(--wpds-color-background-interactive-neutral-weak);
 			font-size: var(--wpds-typography-font-size-md);
+			line-height: var(--wpds-typography-line-height-xs);
 			color: var(--wpds-color-foreground-interactive-neutral);
 			cursor: default;
 
@@ -61,8 +63,10 @@
 		}
 
 		.chip-content {
+			min-width: 0;
 			padding-inline-start: var(--wp-ui-combobox-chip-content-padding-inline-start);
 			padding-block: var(--wpds-dimension-padding-xs);
+			overflow-wrap: anywhere;
 		}
 
 		.chip-remove {

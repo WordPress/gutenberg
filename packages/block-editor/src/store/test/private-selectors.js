@@ -1,11 +1,8 @@
-/**
- * WordPress dependencies
- */
-import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
+import {
+	registerBlockType,
+	unregisterBlockType,
+	privateApis as blocksPrivateApis,
+} from '@wordpress/blocks';
 import {
 	isBlockInterfaceHidden,
 	getLastInsertedBlocksClientIds,
@@ -24,14 +21,21 @@ import {
 	isBlockHiddenAtViewport,
 	getViewportModalClientIds,
 	isSectionBlock,
+	isSyncedBlock,
 	getParentSectionBlock,
 	getSelectedBlockStyleState,
 	hasSelectedStyleState,
 	isSelectedBlockStyleStateShownOnCanvas,
 	shouldRenderBlockListView,
+	getStyleOverrides,
+	canHostEditableRoot,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
 import { deviceTypeKey } from '../private-keys';
+import reducer from '../reducer';
+import { unlock } from '../../lock-unlock';
+
+const { editableRootKey } = unlock( blocksPrivateApis );
 
 describe( 'private selectors', () => {
 	describe( 'isBlockInterfaceHidden', () => {
@@ -640,10 +644,6 @@ describe( 'private selectors', () => {
 				[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', {} ],
 			] ),
 		};
-		getEnabledClientIdsTree.registry = {
-			select: jest.fn( () => ( {} ) ),
-		};
-
 		it( 'should return tree containing only clientId and innerBlocks', () => {
 			const state = {
 				...baseState,
@@ -934,12 +934,6 @@ describe( 'private selectors', () => {
 			unregisterBlockType( TEST_STRUCTURE_BLOCK );
 		} );
 
-		beforeEach( () => {
-			getListViewClientIdsTree.registry = {
-				select: jest.fn( () => ( {} ) ),
-			};
-		} );
-
 		it( 'includes disabled outside-section context while preserving the edited section', () => {
 			const state = createBaseState();
 
@@ -1183,6 +1177,111 @@ describe( 'private selectors', () => {
 				},
 			] );
 		} );
+
+		it( 'returns the same tree when section-only state changes outside of a content-only section edit', () => {
+			const state = {
+				...createBaseState(),
+				editedContentOnlySection: undefined,
+				derivedBlockEditingModes: new Map(),
+			};
+			const tree = getListViewClientIdsTree( state );
+
+			// None of this is read unless a content-only section is edited.
+			const nextState = {
+				...state,
+				blocks: {
+					...state.blocks,
+					byClientId: new Map( state.blocks.byClientId ),
+					attributes: new Map( state.blocks.attributes ),
+				},
+				blockListSettings: new Map( [
+					[ 'header', { templateLock: 'contentOnly' } ],
+				] ),
+				settings: { ...state.settings },
+			};
+
+			expect( getListViewClientIdsTree( nextState ) ).toBe( tree );
+		} );
+
+		it( 'rebuilds the tree when a pattern name changes while a content-only section is edited', () => {
+			const state = createBaseState();
+
+			// `other-structure` is hidden while `other-pattern` is a section.
+			expect( getListViewClientIdsTree( state ) ).toEqual( [
+				{ clientId: 'header', innerBlocks: [] },
+				{
+					clientId: 'edited-pattern',
+					innerBlocks: [
+						{ clientId: 'edited-content', innerBlocks: [] },
+					],
+				},
+				{
+					clientId: 'other-pattern',
+					innerBlocks: [
+						{ clientId: 'other-content', innerBlocks: [] },
+					],
+				},
+			] );
+
+			const nextState = {
+				...state,
+				blocks: {
+					...state.blocks,
+					attributes: new Map( state.blocks.attributes ).set(
+						'other-pattern',
+						{ metadata: {} }
+					),
+				},
+			};
+
+			// It is no longer a section, so its structural child is shown.
+			expect( getListViewClientIdsTree( nextState ) ).toEqual( [
+				{ clientId: 'header', innerBlocks: [] },
+				{
+					clientId: 'edited-pattern',
+					innerBlocks: [
+						{ clientId: 'edited-content', innerBlocks: [] },
+					],
+				},
+				{
+					clientId: 'other-pattern',
+					innerBlocks: [
+						{ clientId: 'other-content', innerBlocks: [] },
+						{ clientId: 'other-structure', innerBlocks: [] },
+					],
+				},
+			] );
+		} );
+
+		// The memoization above is only reachable if the reducer preserves
+		// these references through a keystroke.
+		it( 'should keep its dependants referentially stable while typing', () => {
+			const block = ( clientId ) => ( {
+				clientId,
+				name: TEST_CONTENT_BLOCK,
+				attributes: { content: clientId },
+				innerBlocks: [],
+			} );
+			const state = reducer( reducer( undefined, { type: '@@init' } ), {
+				type: 'RESET_BLOCKS',
+				blocks: [ block( 'a' ), block( 'b' ) ],
+			} );
+
+			const next = reducer( state, {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				clientIds: [ 'a' ],
+				attributes: { content: 'typed' },
+			} );
+
+			// Guards against the assertion below passing vacuously.
+			expect( next.blocks.attributes ).not.toBe(
+				state.blocks.attributes
+			);
+
+			expect( getListViewClientIdsTree( next ) ).toBe(
+				getListViewClientIdsTree( state )
+			);
+		} );
 	} );
 
 	describe( 'getEnabledBlockParents', () => {
@@ -1346,6 +1445,27 @@ describe( 'private selectors', () => {
 			expect( getExpandedBlock( state ) ).toBe(
 				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f'
 			);
+		} );
+	} );
+
+	describe( 'getStyleOverrides', () => {
+		it( 'sorts overrides by the order of the blocks they belong to', () => {
+			const state = {
+				blocks: {
+					order: new Map( [ [ '', [ 'block-1', 'block-2' ] ] ] ),
+				},
+				styleOverrides: new Map( [
+					[ 'override-2', { clientId: 'block-2', css: '.b{}' } ],
+					[ 'override-1', { clientId: 'block-1', css: '.a{}' } ],
+					[ 'override-global', { css: '.global{}' } ],
+				] ),
+			};
+
+			expect( getStyleOverrides( state ) ).toEqual( [
+				[ 'override-global', { css: '.global{}' } ],
+				[ 'override-1', { clientId: 'block-1', css: '.a{}' } ],
+				[ 'override-2', { clientId: 'block-2', css: '.b{}' } ],
+			] );
 		} );
 	} );
 
@@ -2386,6 +2506,55 @@ describe( 'private selectors', () => {
 		} );
 	} );
 
+	describe( 'isSyncedBlock', () => {
+		const createState = ( { blockName, patternName } = {} ) => ( {
+			blocks: {
+				byClientId: new Map( [ [ 'block-1', { name: blockName } ] ] ),
+				attributes: new Map( [
+					[
+						'block-1',
+						patternName ? { metadata: { patternName } } : {},
+					],
+				] ),
+				parents: new Map( [ [ 'block-1', '' ] ] ),
+			},
+		} );
+
+		it( 'returns true for synced patterns', () => {
+			const state = createState( { blockName: 'core/block' } );
+			expect( isSyncedBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns true for template parts', () => {
+			const state = createState( { blockName: 'core/template-part' } );
+			expect( isSyncedBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns false for blocks that are neither', () => {
+			const state = createState( { blockName: 'core/group' } );
+			expect( isSyncedBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'returns false for a synced block that is displayed as a pattern', () => {
+			const state = createState( {
+				blockName: 'core/template-part',
+				patternName: 'my-pattern',
+			} );
+			expect( isSyncedBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'returns true for a synced block whose pattern is being edited', () => {
+			const state = {
+				...createState( {
+					blockName: 'core/template-part',
+					patternName: 'my-pattern',
+				} ),
+				editedContentOnlySection: 'block-1',
+			};
+			expect( isSyncedBlock( state, 'block-1' ) ).toBe( true );
+		} );
+	} );
+
 	describe( 'getParentSectionBlock', () => {
 		it( 'returns undefined when there are no parent section blocks', () => {
 			const state = {
@@ -2526,6 +2695,134 @@ describe( 'private selectors', () => {
 			expect( getParentSectionBlock( state, 'inner-block' ) ).toBe(
 				'pattern-a'
 			);
+		} );
+	} );
+
+	describe( 'canHostEditableRoot', () => {
+		beforeEach( () => {
+			registerBlockType( 'core/test-editable-root', {
+				apiVersion: 3,
+				save: () => null,
+				category: 'text',
+				title: 'Editable root',
+				[ editableRootKey ]: true,
+			} );
+			registerBlockType( 'core/test-plain', {
+				apiVersion: 3,
+				save: () => null,
+				category: 'text',
+				title: 'Plain',
+			} );
+		} );
+
+		afterEach( () => {
+			unregisterBlockType( 'core/test-editable-root' );
+			unregisterBlockType( 'core/test-plain' );
+		} );
+
+		const createState = () => ( {
+			blocks: {
+				byClientId: new Map( [
+					[ 'a', { name: 'core/test-editable-root' } ],
+					[ 'b', { name: 'core/test-editable-root' } ],
+				] ),
+				attributes: new Map( [
+					[ 'a', { content: 'a' } ],
+					[ 'b', { content: 'b' } ],
+				] ),
+				order: new Map( [
+					[ '', [ 'a', 'b' ] ],
+					[ 'a', [] ],
+					[ 'b', [] ],
+				] ),
+				parents: new Map( [
+					[ 'a', '' ],
+					[ 'b', '' ],
+				] ),
+				blockEditingModes: new Map(),
+			},
+			derivedBlockEditingModes: new Map(),
+			blocksMode: {},
+		} );
+
+		it( 'should return true for a block supporting editableRoot with editable siblings', () => {
+			expect( canHostEditableRoot( createState(), 'a' ) ).toBe( true );
+		} );
+
+		it( 'should return false for a lone block', () => {
+			const state = createState();
+			state.blocks.order = new Map( [
+				[ '', [ 'a' ] ],
+				[ 'a', [] ],
+			] );
+
+			expect( canHostEditableRoot( state, 'a' ) ).toBe( false );
+		} );
+
+		it( 'should return false when a sibling is not editable', () => {
+			const state = createState();
+			state.derivedBlockEditingModes = new Map( [ [ 'b', 'disabled' ] ] );
+
+			expect( canHostEditableRoot( state, 'a' ) ).toBe( false );
+		} );
+
+		// The sibling scan is O(siblings) and runs in every rich text instance.
+		it( 'should not recompute when only block attributes change', () => {
+			const state = createState();
+			expect( canHostEditableRoot( state, 'a' ) ).toBe( true );
+
+			// Change the uncached result without touching a dependant.
+			state.blocks.byClientId.set( 'a', { name: 'core/test-plain' } );
+
+			const nextState = {
+				...state,
+				blocks: {
+					...state.blocks,
+					attributes: new Map( [
+						[ 'a', { content: 'typed' } ],
+						[ 'b', { content: 'b' } ],
+					] ),
+				},
+			};
+
+			expect( canHostEditableRoot( nextState, 'a' ) ).toBe( true );
+
+			nextState.blocks.byClientId = new Map( state.blocks.byClientId );
+			expect( canHostEditableRoot( nextState, 'a' ) ).toBe( false );
+		} );
+
+		// The memoization above is only reachable if the reducer preserves
+		// these references through a keystroke.
+		it( 'should keep its dependants referentially stable while typing', () => {
+			const block = ( clientId ) => ( {
+				clientId,
+				name: 'core/test-editable-root',
+				attributes: { content: clientId },
+				innerBlocks: [],
+			} );
+			const state = reducer( reducer( undefined, { type: '@@init' } ), {
+				type: 'RESET_BLOCKS',
+				blocks: [ block( 'a' ), block( 'b' ) ],
+			} );
+
+			const next = reducer( state, {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				clientIds: [ 'a' ],
+				attributes: { content: 'typed' },
+			} );
+
+			// Guards against the assertions below passing vacuously.
+			expect( next.blocks.attributes ).not.toBe(
+				state.blocks.attributes
+			);
+
+			const before = canHostEditableRoot.getDependants( state );
+			const after = canHostEditableRoot.getDependants( next );
+
+			expect( after ).toHaveLength( before.length );
+			after.forEach( ( dependant, index ) => {
+				expect( dependant ).toBe( before[ index ] );
+			} );
 		} );
 	} );
 } );

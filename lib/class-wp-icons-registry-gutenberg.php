@@ -132,6 +132,8 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				);
 				return false;
 			}
+
+			$icon_properties['content'] = $sanitized_icon_content;
 		}
 
 		$qualified_name = $collection . '/' . $unqualified_name;
@@ -181,6 +183,23 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 
 		unset( $this->registered_icons[ $icon_name ] );
 		return true;
+	}
+
+	/**
+	 * Sanitizes the icon SVG content.
+	 *
+	 * Overrides the base class to allow stroke-related attributes and inline
+	 * styles required by stroke-based icons.
+	 *
+	 * The signature is intentionally left without type declarations to stay
+	 * compatible with the parent WP_Icons_Registry::sanitize_icon_content()
+	 * shipped in WordPress core, which declares none.
+	 *
+	 * @param string $icon_content The icon SVG content to sanitize.
+	 * @return string The sanitized icon SVG content.
+	 */
+	protected function sanitize_icon_content( $icon_content ) {
+		return wp_kses( $icon_content, gutenberg_get_allowed_icon_svg_tags() );
 	}
 
 	/**
@@ -249,16 +268,36 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	}
 
 	/**
-	 * Redefined to break away from base class.
-	 */
-	protected static $instance = null;
-
-	/**
-	 * Redefined to access new `$instance`
+	 * Returns the shared registry instance.
+	 *
+	 * The base `$instance` slot is intentionally not redefined, so both
+	 * `WP_Icons_Registry::get_instance()` (used by core) and this method share
+	 * one instance. An existing base registry is upgraded, replaying any
+	 * non-`core/` icons so they are not lost.
 	 */
 	public static function get_instance() {
-		if ( null === self::$instance ) {
-			self::$instance = new self();
+		if ( ! self::$instance instanceof self ) {
+			$original_registry  = self::$instance;
+			$gutenberg_registry = new self();
+
+			if ( null !== $original_registry ) {
+				foreach ( $original_registry->get_registered_icons() as $icon ) {
+					if ( str_starts_with( $icon['name'], 'core/' ) ) {
+						continue;
+					}
+					$icon_properties = array( 'label' => $icon['label'] );
+					if ( ! empty( $icon['content'] ) ) {
+						$icon_properties['content'] = $icon['content'];
+					} elseif ( ! empty( $icon['file_path'] ) ) {
+						$icon_properties['file_path'] = $icon['file_path'];
+					} else {
+						continue;
+					}
+					$gutenberg_registry->register( $icon['name'], $icon_properties );
+				}
+			}
+
+			self::$instance = $gutenberg_registry;
 		}
 
 		return self::$instance;
@@ -266,43 +305,10 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 }
 
 /**
- * Forces WP_Icons_Registry_Gutenberg instantiation and overrides WP_Icons_Registry
- * so that all code using WP_Icons_Registry::{method_name}() receives the Gutenberg
- * registry.
+ * Overrides the base `WP_Icons_Registry` singleton with the Gutenberg registry so
+ * that all code using `WP_Icons_Registry::{method_name}()` receives it.
  */
 function gutenberg_override_wp_icons_registry() {
-	$reflection = new ReflectionClass( WP_Icons_Registry::class );
-	$property   = $reflection->getProperty( 'instance' );
-	/*
-		* ReflectionProperty::setAccessible is:
-		* - redundant as of 8.1.0, which made all properties accessible
-		* - deprecated as of 8.5.0
-		* - needed until 8.1.0, as property `instance` is private
-		*/
-	if ( PHP_VERSION_ID < 80100 ) {
-		$property->setAccessible( true );
-	}
-	$original_registry  = $property->getValue( null );
-	$gutenberg_registry = WP_Icons_Registry_Gutenberg::get_instance();
-
-	// If the original registry was already instantiated, replay any icons outside
-	// the `core/` namespace onto the Gutenberg registry so they are not lost.
-	if ( null !== $original_registry ) {
-		foreach ( $original_registry->get_registered_icons() as $icon ) {
-			if ( str_starts_with( $icon['name'], 'core/' ) ) {
-				continue;
-			}
-			$icon_properties = array( 'label' => $icon['label'] );
-			if ( ! empty( $icon['content'] ) ) {
-				$icon_properties['content'] = $icon['content'];
-			} elseif ( ! empty( $icon['file_path'] ) ) {
-				$icon_properties['file_path'] = $icon['file_path'];
-			} else {
-				continue;
-			}
-			$gutenberg_registry->register( $icon['name'], $icon_properties );
-		}
-	}
-	$property->setValue( null, $gutenberg_registry );
+	WP_Icons_Registry_Gutenberg::get_instance();
 }
 add_action( 'init', 'gutenberg_override_wp_icons_registry', 1 );

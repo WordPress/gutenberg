@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/jest-preset-default",
-	"version": "12.51.0",
+	"version": "14.1.0",
 	"description": "Default Jest preset for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -29,10 +29,15 @@
 		"index.js",
 		"jest-preset.js"
 	],
-	"main": "index.js",
+	"main": "jest-preset.js",
+	"exports": {
+		".": "./jest-preset.js",
+		"./jest-preset": "./jest-preset.js",
+		"./package.json": "./package.json"
+	},
 	"dependencies": {
 		"@wordpress/jest-console": "file:../jest-console",
-		"babel-jest": "^29.7.0",
+		"babel-jest": "^30.5.0",
 		"change-case": "^4.1.2"
 	},
 	"devDependencies": {
@@ -40,7 +45,7 @@
 	},
 	"peerDependencies": {
 		"@babel/core": ">=7",
-		"jest": ">=29"
+		"jest": ">=30"
 	},
 	"publishConfig": {
 		"access": "public"

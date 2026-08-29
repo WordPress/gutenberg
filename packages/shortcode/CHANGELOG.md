@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+## 4.54.0 (2026-08-26)
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 4.53.0 (2026-08-12)
+
+## 4.52.0 (2026-07-29)
+
+### Internal
+
+-   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).
+
 ## 4.51.0 (2026-07-14)
 
 ## 4.50.0 (2026-07-01)

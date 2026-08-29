@@ -2,6 +2,41 @@
 
 ## Unreleased
 
+### Internal
+
+-   Remove unused dependency `@wordpress/a11y` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+## 10.0.0 (2026-08-26)
+
+### Breaking Changes
+
+-   `ActionItem`: `as` now defaults to `MenuItem` instead of `Button` ([#81507](https://github.com/WordPress/gutenberg/pull/81507)).
+-   `ActionItem.Slot`: Remove the `bubblesVirtually` prop ([#81507](https://github.com/WordPress/gutenberg/pull/81507)).
+
+## 9.38.0 (2026-08-12)
+
+### Enhancements
+
+-   `ComplementaryArea`: Add a `render` prop to replace the default container element with a given React element ([#81054](https://github.com/WordPress/gutenberg/pull/81054)).
+
+### Bug Fixes
+
+-   `ComplementaryArea`: Remove incorrect `aria-expanded` attribute from the "Pin to toolbar" toggle button, which already exposes its state via `aria-pressed` ([#79874](https://github.com/WordPress/gutenberg/pull/79874)).
+-   `InterfaceSkeleton`: Increase the footer height from 24px to 32px to prevent the focus ring from being clipped ([#81145](https://github.com/WordPress/gutenberg/pull/81145)).
+-   `InterfaceSkeleton`: Stop the secondary sidebar from animating itself into place on page load when it is already open, for example with the "Always open List View" preference enabled ([#81362](https://github.com/WordPress/gutenberg/pull/81362)).
+
+### Internal
+
+-   `ComplementaryArea`: Take the panel width from the stylesheet instead of a hardcoded inline style, and resolve the exit transition through `AnimatePresence`'s `custom` prop instead of a forced re-render ([#81363](https://github.com/WordPress/gutenberg/pull/81363)).
+-   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
+
+## 9.37.0 (2026-07-29)
+
+### Internal
+
+-   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).
+
 ## 9.36.0 (2026-07-14)
 
 ### Enhancements

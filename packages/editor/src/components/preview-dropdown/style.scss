@@ -2,3 +2,11 @@
 	padding-right: 4px;
 	padding-left: 6px;
 }
+
+// Tint the toggle to signal that responsive styling is active, reusing the
+// synced-pattern color for a consistent "special state" cue. Coloring the
+// button (rather than just the icon) also tints the "View" text label when the
+// "Show button text labels" preference is on; the icon follows via currentColor.
+.editor-preview-dropdown.is-responsive-editing .editor-preview-dropdown__toggle {
+	color: var(--wp-block-synced-color);
+}

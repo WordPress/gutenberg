@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { FetchHandler } from '../../types';
 import mediaUploadMiddleware from '../media-upload';
 

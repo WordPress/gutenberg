@@ -9,16 +9,8 @@
  * from that store (getItems, isBatchUploaded, getItemProgress, etc.) while
  * keeping the same return interface.
  */
-
-/**
- * WordPress dependencies
- */
 import { useState, useCallback } from '@wordpress/element';
 import { isBlobURL } from '@wordpress/blob';
-
-/**
- * Internal dependencies
- */
 import type { Attachment } from '../../utils/types';
 import { UploadError } from '../../utils/upload-error';
 import type { UploadingFile } from './upload-status-popover';

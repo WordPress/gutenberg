@@ -1,16 +1,8 @@
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const fs = require( 'fs/promises' );
 const os = require( 'os' );
 const { randomUUID } = require( 'crypto' );
-
 /** @typedef {import('@playwright/test').Page} Page */
-
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -246,7 +238,7 @@ test.describe( 'Image', () => {
 		] = await editor.getBlocks();
 
 		// Open the media editor modal from the block toolbar.
-		await editor.clickBlockToolbarButton( 'Crop' );
+		await editor.clickBlockToolbarButton( 'Edit image' );
 		const modal = page.locator( 'role=dialog[name="Edit media"i]' );
 		await expect( modal ).toBeVisible();
 
@@ -269,6 +261,19 @@ test.describe( 'Image', () => {
 		expect( id ).not.toBe( initialId );
 		expect( url ).not.toBe( initialUrl );
 		await expect( image ).toHaveAttribute( 'src', url );
+
+		// The swap loading state must clear once the new file has loaded.
+		await expect( image ).not.toHaveClass( /is-swapping-media/ );
+		await expect(
+			imageBlock.locator( '.components-spinner' )
+		).toBeHidden();
+
+		// Closing the modal returns focus to the "Edit image" toolbar button.
+		// The button is disabled (not hidden) while the edit loads, so it stays
+		// in the DOM to receive focus rather than dropping it to the canvas.
+		await expect(
+			page.locator( 'role=button[name="Edit image"i]' )
+		).toBeFocused();
 	} );
 
 	test( 'should undo without broken temporary state', async ( {

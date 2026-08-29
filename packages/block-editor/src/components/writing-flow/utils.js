@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import {
@@ -11,10 +8,6 @@ import {
 	getBlockTransforms,
 	store as blocksStore,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { getPasteEventData } from '../../utils/pasting';
 import { store as blockEditorStore } from '../../store';
 
@@ -118,29 +111,6 @@ function toPlainText( html ) {
 	return plainText.replace( /\n\n+/g, '\n\n' );
 }
 
-let shiftClickInProgress = false;
-
-/**
- * Tracks whether a shift+click gesture is in progress, from the shift held
- * mousedown until its mouseup. Maintained by the selection observer; read by
- * the block focus handler, since the focus event fired between the two
- * carries no modifier keys.
- *
- * @param {boolean} value Whether a shift+click gesture is in progress.
- */
-export function setShiftClickInProgress( value ) {
-	shiftClickInProgress = value;
-}
-
-/**
- * Returns whether a shift+click gesture is in progress.
- *
- * @return {boolean} Whether a shift+click gesture is in progress.
- */
-export function isShiftClickInProgress() {
-	return shiftClickInProgress;
-}
-
 /**
  * Makes the wrapper element an editing host, or stops it from being one. The
  * ARIA attributes travel with the editability: while the wrapper is the
@@ -194,7 +164,9 @@ export function setContentEditableWrapper(
 	node.setAttribute( 'aria-label', __( 'Editor canvas' ) );
 
 	if ( focus ) {
-		node.focus();
+		// Without preventScroll, focusing the wrapper scrolls the
+		// viewport to the top of the wrapper.
+		node.focus( { preventScroll: true } );
 	}
 
 	return true;

@@ -1,7 +1,6 @@
-/**
- * Internal dependencies
- */
 import type { ComponentType, ReactElement } from 'react';
+import type { WPKeycodeModifier } from '@wordpress/keycodes';
+import type { ShortcodeAttrs, ShortcodeMatch } from '@wordpress/shortcode';
 
 /**
  * An icon type definition. One of a Dashicon slug, an element,
@@ -51,6 +50,61 @@ export type BlockTypeIcon = BlockTypeIconDescriptor | BlockTypeIconRender;
  * Named block variation scopes.
  */
 export type BlockVariationScope = 'block' | 'inserter' | 'transform';
+
+/**
+ * A key combination that triggers a block shortcut.
+ */
+export interface BlockShortcutKeyCombination {
+	/**
+	 * The modifier the character is pressed with. When omitted, the character
+	 * is matched on its own.
+	 */
+	modifier?: WPKeycodeModifier;
+	/**
+	 * The character, e.g. `2`, or a special key such as `escape`.
+	 */
+	character: string;
+}
+
+/**
+ * A keyboard shortcut declared by a block variation or a block transform.
+ *
+ * Shortcuts are registered with the `core/keyboard-shortcuts` store while the
+ * block editor is mounted, and apply to the selected block.
+ *
+ * The same shortcut may be declared in more than one place, so long as every
+ * declaration agrees on the key combination and description. A shortcut that
+ * both switches a block's type and picks a variation of it is declared twice:
+ * once on the variation, for a block that is already of that type, and once on
+ * the transform that produces it.
+ */
+export interface BlockShortcut {
+	/**
+	 * The unique and machine-readable shortcut name, e.g.
+	 * `core/block-editor/transform-heading-to-paragraph`.
+	 */
+	name: string;
+	/**
+	 * A human-readable description, shown in the keyboard shortcuts help
+	 * modal.
+	 */
+	description: string;
+	/**
+	 * The key combination that triggers the shortcut.
+	 */
+	keyCombination: BlockShortcutKeyCombination;
+	/**
+	 * Alternative key combinations that trigger the same shortcut.
+	 */
+	aliases?: BlockShortcutKeyCombination[];
+	/**
+	 * The variation of the produced block type this shortcut targets. Only
+	 * meaningful on a block transform, where it lets one transform carry a
+	 * shortcut per variation of the block it produces. Defaults to the
+	 * transform's own `variationName`.
+	 */
+	variationName?: string;
+}
 
 /**
  * An object describing a variation defined for the block type.
@@ -113,6 +167,15 @@ export interface BlockVariation<
 	 */
 	scope?: BlockVariationScope[];
 	/**
+	 * A keyboard shortcut that applies this variation to the selected block.
+	 *
+	 * It only applies to blocks that are already of this block type, and does
+	 * nothing when `isActive` reports the variation as already active. To reach
+	 * the variation from another block type, declare the same shortcut on a
+	 * block transform that produces this one.
+	 */
+	shortcut?: BlockShortcut;
+	/**
 	 * An array of terms (which can be translated)
 	 * that help users discover the variation
 	 * while searching.
@@ -155,30 +218,218 @@ export interface BlockAttribute {
 }
 
 /**
- * A block transform object.
+ * The properties shared by every kind of block transform.
+ *
+ * Internal: consumers narrow a `BlockTransform` on its `type` and get one of the
+ * variants below, or write helpers generic over `BlockTransform` itself.
  */
-export interface BlockTransform<
-	Attributes extends Record< string, unknown > = Record< string, unknown >,
-> {
-	type: 'block' | 'enter' | 'files' | 'prefix' | 'raw' | 'shortcode';
-	blocks?: string[];
+interface BlockTransformBase {
 	/**
-	 * The target block variation name for block transforms that produce a
-	 * variation of the transformed block type.
+	 * The transform's priority. A lower number means a higher priority.
+	 * Defaults to `10`.
+	 */
+	priority?: number;
+}
+
+/**
+ * A transform from or to another block type, shown in the block switcher.
+ */
+export interface BlockBlockTransform<
+	Attributes extends Record< string, unknown > = Record< string, unknown >,
+> extends BlockTransformBase {
+	type: 'block';
+	/**
+	 * The names of the block types the transform applies to (`from`) or
+	 * produces (`to`). A single entry of `*` makes it a wildcard transform,
+	 * matching any block type.
+	 */
+	blocks: string[];
+	/**
+	 * The target block variation name for transforms that produce a variation
+	 * of the transformed block type.
 	 */
 	variationName?: string;
-	priority?: number;
+	/**
+	 * Keyboard shortcuts that apply this transform to the selected block.
+	 *
+	 * On a `to` transform they apply to the block declaring it, and produce the
+	 * first entry of `blocks`. On a `from` transform they apply to any block
+	 * listed in `blocks`, and produce the block declaring it. Each shortcut may
+	 * target a different variation of the produced block through its own
+	 * `variationName`, which is what lets one transform carry a shortcut per
+	 * variation without appearing more than once in the block switcher.
+	 */
+	shortcuts?: BlockShortcut[];
+	/**
+	 * Whether the transform applies to a selection of multiple blocks, in which
+	 * case `isMatch` and `transform` receive arrays.
+	 */
 	isMultiBlock?: boolean;
 	isMatch?: (
 		attributes: Attributes | Attributes[],
 		block: Block | Block[]
 	) => boolean;
-	transform?: ( ...args: unknown[] ) => Block | Block[];
+	transform?: (
+		attributes: Attributes | Attributes[],
+		innerBlocks: Block[] | Block[][]
+	) => Block | Block[];
+	/**
+	 * Takes over the conversion entirely, receiving the source blocks instead
+	 * of their attributes. Used by the Group block.
+	 */
 	__experimentalConvert?: ( blocks: Block | Block[] ) => Block | Block[];
-	blockName?: string;
-	usingMobileTransformations?: boolean;
-	supportedMobileTransforms?: string[];
 }
+
+/**
+ * A transform triggered by typing a value in a block and pressing Enter.
+ */
+export interface BlockEnterTransform extends BlockTransformBase {
+	type: 'enter';
+	/**
+	 * The pattern the typed value has to match for the transform to apply.
+	 */
+	regExp: RegExp;
+	transform?: ( value: { content: string } ) => Block | Block[];
+}
+
+/**
+ * A transform from files dropped or pasted into the editor.
+ */
+export interface BlockFilesTransform extends BlockTransformBase {
+	type: 'files';
+	isMatch?: ( files: File[] ) => boolean;
+	transform?: (
+		files: File[],
+		onChange?: ( id: string, attributes: Record< string, unknown > ) => void
+	) => Block | Block[];
+}
+
+/**
+ * A transform triggered by typing a prefix followed by a space.
+ */
+export interface BlockPrefixTransform extends BlockTransformBase {
+	type: 'prefix';
+	/**
+	 * The prefix that triggers the transform, e.g. `#` or `>`.
+	 */
+	prefix: string;
+	transform?: ( content: string ) => Block | Block[];
+}
+
+/**
+ * Options accepted by the raw handlers, `rawHandler` and `pasteHandler`.
+ */
+export interface RawHandlerOptions {
+	/**
+	 * The HTML to convert.
+	 */
+	HTML?: string;
+	/**
+	 * Plain text version of the content.
+	 */
+	plainText?: string;
+	/**
+	 * Whether to handle the content as blocks or as inline content.
+	 *
+	 * - `AUTO`: decide based on the content passed.
+	 * - `INLINE`: always handle as inline content, and return a string.
+	 * - `BLOCKS`: always handle as blocks, and return an array of blocks.
+	 */
+	mode?: 'AUTO' | 'INLINE' | 'BLOCKS';
+	/**
+	 * The tag into which the content will be inserted.
+	 */
+	tagName?: string;
+}
+
+/**
+ * A raw handler, either `rawHandler` or `pasteHandler`. A `raw` transform
+ * receives one as the second argument of its `transform`, to convert nested
+ * content the same way the surrounding content is converted.
+ */
+export type RawHandler = ( options: RawHandlerOptions ) => Block[] | string;
+
+/**
+ * A transform from raw HTML, used when pasting content into the editor.
+ */
+export interface BlockRawTransform extends BlockTransformBase {
+	type: 'raw';
+	/**
+	 * A CSS selector the pasted node has to match. Used as a fallback when
+	 * `isMatch` is not provided.
+	 */
+	selector?: string;
+	/**
+	 * The HTML the transform is allowed to keep, either as a schema or as a
+	 * function returning one.
+	 */
+	schema?:
+		| Record< string, unknown >
+		| ( ( args: {
+				phrasingContentSchema: Record< string, unknown >;
+				isPaste: boolean;
+		  } ) => Record< string, unknown > );
+	isMatch?: ( node: Element ) => boolean;
+	transform?: ( node: Element, handler: RawHandler ) => Block | Block[];
+}
+
+/**
+ * A block attribute of a shortcode transform, which may source its value from
+ * the matched shortcode instead of the block's markup.
+ */
+export interface ShortcodeTransformAttribute extends BlockAttribute {
+	/**
+	 * Returns the attribute value for the matched shortcode.
+	 */
+	shortcode?: (
+		attributes: ShortcodeAttrs,
+		match: ShortcodeMatch
+	) => unknown;
+}
+
+/**
+ * A transform from a shortcode found in the pasted or raw content.
+ */
+export interface BlockShortcodeTransform extends BlockTransformBase {
+	type: 'shortcode';
+	/**
+	 * The shortcode tag, or tags, the transform matches. Each entry is used as
+	 * a regular expression, so it may match a family of tags.
+	 */
+	tag: string | string[];
+	/**
+	 * The block attributes to source from the matched shortcode. Ignored when
+	 * `transform` is provided.
+	 */
+	attributes?: Record< string, ShortcodeTransformAttribute >;
+	isMatch?: ( attributes: ShortcodeAttrs ) => boolean;
+	transform?: (
+		attributes: ShortcodeAttrs,
+		match: ShortcodeMatch
+	) => Block | Block[];
+}
+
+/**
+ * A block transform object. The `type` property discriminates between the kinds
+ * of transform, each of which declares its own fields.
+ */
+export type BlockTransform<
+	Attributes extends Record< string, unknown > = Record< string, unknown >,
+> =
+	| BlockBlockTransform< Attributes >
+	| BlockEnterTransform
+	| BlockFilesTransform
+	| BlockPrefixTransform
+	| BlockRawTransform
+	| BlockShortcodeTransform;
+
+/**
+ * A block transform as returned by `getBlockTransforms`, which stamps the name
+ * of the block type declaring the transform onto it.
+ */
+export type NormalizedBlockTransform<
+	Transform extends BlockTransform = BlockTransform,
+> = Transform & { blockName: string };
 
 /**
  * Internal type for the innerBlocks property inside of the example.
@@ -292,6 +543,19 @@ export interface BlockType<
 	 */
 	allowedBlocks?: string[];
 	/**
+	 * Initial child blocks created when an empty block of this type
+	 * is inserted, as a list of `[ name, attributes, innerTemplate ]`
+	 * items.
+	 */
+	template?: Array<
+		[ string, Record< string, unknown >?, Array< unknown >? ]
+	>;
+	/**
+	 * Whether the selection should move into the first block created from
+	 * the template when it is inserted.
+	 */
+	templateInsertUpdatesSelection?: boolean;
+	/**
 	 * Context provided for available access by descendants of
 	 * blocks of this type, in the form of an object which maps
 	 * a context name to one of the block's own attributes.
@@ -390,10 +654,6 @@ export interface BlockType<
 		 * Transforms from this block type to another block type.
 		 */
 		to?: BlockTransform[];
-		/**
-		 * The transformations available for mobile devices.
-		 */
-		supportedMobileTransforms?: string[];
 	};
 	/**
 	 * Array of the names of context values to inherit from
@@ -840,8 +1100,17 @@ export interface TypographyProps {
 export interface SpacingProps {
 	/**
 	 * Enable block gap control.
+	 *
+	 * The object form declares the sides the control applies to, and the gap
+	 * value to fall back to when neither the theme nor the user has set one.
 	 */
-	blockGap: boolean | AxialDirection[];
+	blockGap:
+		| boolean
+		| AxialDirection[]
+		| {
+				__experimentalDefault?: string;
+				sides?: AxialDirection[];
+		  };
 
 	/**
 	 * Enable margin control UI for all or specified element directions.

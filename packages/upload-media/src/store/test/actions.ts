@@ -1,23 +1,14 @@
-/**
- * WordPress dependencies
- */
 import { createRegistry } from '@wordpress/data';
 type WPDataRegistry = ReturnType< typeof createRegistry >;
-
-/**
- * Internal dependencies
- */
 import { store as uploadStore } from '..';
 import { ItemStatus, OperationType } from '../types';
 import { unlock } from '../../lock-unlock';
-
 jest.mock( '@wordpress/blob', () => ( {
 	__esModule: true,
 	createBlobURL: jest.fn( () => 'blob:foo' ),
 	isBlobURL: jest.fn( ( str: string ) => str.startsWith( 'blob:' ) ),
 	revokeBlobURL: jest.fn(),
 } ) );
-
 jest.mock( '../utils', () => ( {
 	vipsCancelOperations: jest.fn( () => Promise.resolve( true ) ),
 	vipsResizeImage: jest.fn( () =>
@@ -32,7 +23,6 @@ jest.mock( '../utils', () => ( {
 	vipsConvertImageFormat: jest.fn(),
 	terminateVipsWorker: jest.fn(),
 } ) );
-
 /*
  * actions.ts transitively imports private-actions, which also pulls in
  * convertGifToVideo / isUnsupportedConversionError, so the mock must cover the
@@ -47,7 +37,6 @@ jest.mock( '../utils/video-conversion', () => {
 		isUnsupportedConversionError: actual.isUnsupportedConversionError,
 	};
 } );
-
 // Import the mocked modules to access the mock functions.
 import { vipsCancelOperations } from '../utils';
 import { cancelGifToVideoOperations } from '../utils/video-conversion';
@@ -55,7 +44,6 @@ import { cancelGifToVideoOperations } from '../utils/video-conversion';
 function createRegistryWithStores() {
 	// Create a registry and register used stores.
 	const registry = createRegistry();
-	// @ts-ignore
 	[ uploadStore ].forEach( registry.register );
 	return registry;
 }
@@ -691,6 +679,103 @@ describe( 'actions', () => {
 				.cancelItem( item.id, new Error( 'Test error' ), true );
 
 			expect( onError ).not.toHaveBeenCalled();
+		} );
+
+		it( 'still calls onError and removes the item when vips cancellation rejects', async () => {
+			/*
+			 * When the vips worker has crashed, any call on its remote —
+			 * including the cancellation itself — rejects. That rejection
+			 * must not abort cancelItem, or the item would be stuck in the
+			 * queue forever with no error surfaced.
+			 */
+			( vipsCancelOperations as jest.Mock ).mockImplementationOnce( () =>
+				Promise.reject( new Error( 'Worker error: crashed' ) )
+			);
+
+			const onError = jest.fn();
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+				onError,
+			} );
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await registry
+				.dispatch( uploadStore )
+				.cancelItem( item.id, new Error( 'Test error' ) );
+
+			expect( onError ).toHaveBeenCalledWith(
+				expect.objectContaining( { message: 'Test error' } )
+			);
+			expect(
+				unlock( registry.select( uploadStore ) ).getAllItems()
+			).toHaveLength( 0 );
+		} );
+
+		it( 'still calls onError and removes the item when GIF-to-video cancellation rejects', async () => {
+			( cancelGifToVideoOperations as jest.Mock ).mockImplementationOnce(
+				() => Promise.reject( new Error( 'Worker error: crashed' ) )
+			);
+
+			const onError = jest.fn();
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+				onError,
+			} );
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await registry
+				.dispatch( uploadStore )
+				.cancelItem( item.id, new Error( 'Test error' ) );
+
+			expect( onError ).toHaveBeenCalledWith(
+				expect.objectContaining( { message: 'Test error' } )
+			);
+			expect(
+				unlock( registry.select( uploadStore ) ).getAllItems()
+			).toHaveLength( 0 );
+		} );
+
+		it( 'removes the item even when the workers never answer the cancel calls', async () => {
+			/*
+			 * A busy vips worker is synchronously blocked inside a wasm call
+			 * and cannot answer the cancellation RPC until the current
+			 * operation - and every operation already queued behind it -
+			 * finishes, which for a large animated GIF takes minutes. The
+			 * worker cancels are best-effort cleanup; cancelItem must not
+			 * block on them, or the cancelled item lingers in the queue and
+			 * gates the parent's finalization the whole time.
+			 */
+			( vipsCancelOperations as jest.Mock ).mockImplementationOnce(
+				() => new Promise( () => {} )
+			);
+			( cancelGifToVideoOperations as jest.Mock ).mockImplementationOnce(
+				() => new Promise( () => {} )
+			);
+
+			const onError = jest.fn();
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+				onError,
+			} );
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await registry
+				.dispatch( uploadStore )
+				.cancelItem( item.id, new Error( 'Test error' ) );
+
+			expect( vipsCancelOperations ).toHaveBeenCalledWith( item.id );
+			expect( onError ).toHaveBeenCalledWith(
+				expect.objectContaining( { message: 'Test error' } )
+			);
+			expect(
+				unlock( registry.select( uploadStore ) ).getAllItems()
+			).toHaveLength( 0 );
 		} );
 
 		describe( 'parent cancellation when child sideload fails', () => {
@@ -1681,7 +1766,7 @@ describe( 'actions', () => {
 
 		afterEach( () => {
 			// Clean up global mock.
-			// @ts-ignore
+			// @ts-expect-error The operand of `delete` must be optional.
 			delete global.createImageBitmap;
 		} );
 

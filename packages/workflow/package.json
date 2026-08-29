@@ -40,7 +40,7 @@
 			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json",
-		"./build-style/": "./build-style/"
+		"./build-style/*": "./build-style/*"
 	},
 	"wpScriptModuleExports": {
 		".": "./build-module/index.mjs"
@@ -55,8 +55,8 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
+		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/private-apis": "file:../private-apis",
-		"clsx": "^2.1.1",
 		"cmdk": "^1.0.0"
 	},
 	"peerDependencies": {

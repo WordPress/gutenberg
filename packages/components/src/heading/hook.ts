@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import { useContextSystem } from '../context';
 import { useText } from '../text';

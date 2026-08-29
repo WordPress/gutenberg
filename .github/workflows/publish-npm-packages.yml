@@ -37,7 +37,7 @@ jobs:
         environment: WordPress packages
         steps:
             - name: Checkout (for CLI)
-              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   path: cli
                   ref: trunk
@@ -46,7 +46,7 @@ jobs:
 
             - name: Checkout (for publishing)
               if: ${{ github.event.inputs.release_type != 'wp' }}
-              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   path: publish
                   # Later, we switch this branch in the script that publishes packages.
@@ -57,7 +57,7 @@ jobs:
 
             - name: Checkout (for publishing WP major version)
               if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
-              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   path: publish
                   ref: wp/${{ github.event.inputs.wp_version }}
@@ -74,23 +74,19 @@ jobs:
                   git config user.name "Gutenberg Repository Automation"
                   git config user.email gutenberg@wordpress.org
 
+            # The release CLI is always loaded from trunk, so use its runtime for every release.
+            # The selected publishing branch must remain installable under this runtime.
             - name: Setup Node.js
-              if: ${{ github.event.inputs.release_type != 'wp' }}
               uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
               with:
                   node-version-file: 'cli/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'
                   check-latest: true
 
-            # Keep the release CLI and publish checkout on one runtime;
-            # active wp release branches must stay compatible with the trunk release CLI.
-            - name: Setup Node.js (for WP major version)
-              if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
-              uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
-              with:
-                  node-version-file: 'publish/.nvmrc'
-                  registry-url: 'https://registry.npmjs.org'
-                  check-latest: true
+            - name: Pin npm version for consistency
+              run: |
+                  npm install --global npm@10
+                  npm --version
 
             - name: Publish development packages to npm ("next" dist-tag)
               if: ${{ github.event.inputs.release_type == 'development' }}

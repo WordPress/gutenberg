@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { normalizeStyleStateAliases } from '../convert-legacy-block';
 
 describe( 'normalizeStyleStateAliases', () => {

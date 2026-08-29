@@ -1,11 +1,8 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
+import { store as noticesStore } from '@wordpress/notices';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { decodeEntities } from '@wordpress/html-entities';
+import { __ } from '@wordpress/i18n';
 import { STORE_NAME } from './name';
 import { getSyncManager, hasSyncManager } from './sync';
 
@@ -247,3 +244,181 @@ export function setSyncConnectionStatus( kind, name, key, status ) {
 		status,
 	};
 }
+
+/**
+ * Save entity records marked as dirty.
+ *
+ * @param {Object}   options                        Options for the action.
+ * @param {Function} [options.onSave]               Callback when saving happens.
+ * @param {object[]} [options.dirtyEntityRecords]   Array of dirty entities.
+ * @param {object[]} [options.entitiesToSkip]       Array of entities to skip saving.
+ * @param {Function} [options.close]                Callback when the actions is called. It should be consolidated with `onSave`.
+ * @param {string}   [options.successNoticeContent] Optional custom success notice content. Defaults to 'Site updated.'.
+ */
+export const saveDirtyEntities =
+	( {
+		onSave,
+		dirtyEntityRecords = [],
+		entitiesToSkip = [],
+		close,
+		successNoticeContent,
+	} = {} ) =>
+	( { registry } ) => {
+		const PUBLISH_ON_SAVE_ENTITIES = [
+			{ kind: 'postType', name: 'wp_navigation' },
+		];
+		const saveNoticeId = 'site-editor-save-success';
+		const homeUrl = registry
+			.select( STORE_NAME )
+			.getEntityRecord( 'root', '__unstableBase' )?.home;
+		registry.dispatch( noticesStore ).removeNotice( saveNoticeId );
+		const entitiesToSave = dirtyEntityRecords.filter(
+			( { kind, name, key, property } ) => {
+				return ! entitiesToSkip.some(
+					( elt ) =>
+						elt.kind === kind &&
+						elt.name === name &&
+						elt.key === key &&
+						elt.property === property
+				);
+			}
+		);
+		close?.( entitiesToSave );
+		const siteItemsToSave = [];
+		const pendingSavedRecords = [];
+		entitiesToSave.forEach( ( { kind, name, key, property } ) => {
+			if ( 'root' === kind && 'site' === name ) {
+				siteItemsToSave.push( property );
+			} else {
+				if (
+					PUBLISH_ON_SAVE_ENTITIES.some(
+						( typeToPublish ) =>
+							typeToPublish.kind === kind &&
+							typeToPublish.name === name
+					)
+				) {
+					registry
+						.dispatch( STORE_NAME )
+						.editEntityRecord( kind, name, key, {
+							status: 'publish',
+						} );
+				}
+
+				pendingSavedRecords.push(
+					registry
+						.dispatch( STORE_NAME )
+						.saveEditedEntityRecord( kind, name, key, {
+							throwOnError: true,
+						} )
+						.catch( ensureError )
+				);
+			}
+		} );
+		if ( siteItemsToSave.length ) {
+			pendingSavedRecords.push(
+				registry
+					.dispatch( STORE_NAME )
+					.__experimentalSaveSpecifiedEntityEdits(
+						'root',
+						'site',
+						undefined,
+						siteItemsToSave,
+						{
+							throwOnError: true,
+						}
+					)
+					.catch( ensureError )
+			);
+		}
+		registry
+			.dispatch( blockEditorStore )
+			.__unstableMarkLastChangeAsPersistent();
+
+		return Promise.all( pendingSavedRecords )
+			.then( async ( values ) => {
+				if ( onSave ) {
+					await onSave();
+				}
+				return values;
+			} )
+			.then( ( values ) => {
+				const errors = values.filter( ( v ) => v instanceof Error );
+				if ( errors.length ) {
+					const firstMessage = errors.find(
+						( e ) => e.message
+					)?.message;
+
+					registry
+						.dispatch( noticesStore )
+						.createErrorNotice(
+							decodeEntities(
+								firstMessage || __( 'Saving failed.' )
+							),
+							{
+								type: 'snackbar',
+								id: saveNoticeId,
+							}
+						);
+				} else {
+					registry
+						.dispatch( noticesStore )
+						.createSuccessNotice(
+							successNoticeContent || __( 'Site updated.' ),
+							{
+								type: 'snackbar',
+								id: saveNoticeId,
+								actions: [
+									{
+										label: __( 'View site' ),
+										url: homeUrl,
+										openInNewTab: true,
+									},
+								],
+							}
+						);
+				}
+			} )
+			.catch( ( error ) =>
+				registry
+					.dispatch( noticesStore )
+					.createErrorNotice(
+						decodeEntities(
+							error?.message || __( 'Saving failed.' )
+						),
+						{
+							type: 'snackbar',
+							id: saveNoticeId,
+						}
+					)
+			);
+
+		function ensureError( error ) {
+			if ( error instanceof Error ) {
+				return error;
+			}
+
+			// Expect certain errors to be plain objects with a `message`
+			// property, such as those thrown by `apiFetch`. Otherwise, do our
+			// best to infer a message via duck typing.
+			let message;
+			if ( ! error ) {
+			} else if ( typeof error.message === 'string' ) {
+				message = error.message;
+			} else if ( typeof error === 'string' ) {
+				message = error;
+			} else if (
+				// Only consider own method, lest we erroneously end up calling
+				// `Object#toString` at the end of the prototype chain, thereby
+				// returning `"[object Object]"`.
+				Object.hasOwn( error, 'toString' ) &&
+				typeof error.toString === 'function'
+			) {
+				const result = error.toString();
+				if ( typeof result === 'string' ) {
+					message = result;
+				}
+			}
+
+			return new Error( message, { cause: error } );
+		}
+	};

@@ -4,6 +4,7 @@ import * as Field from '../';
 import { DETAILS_EXAMPLE } from '../../../stories/shared';
 
 const meta: Meta< typeof Field.Root > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/Primitives/Field',
 	component: Field.Root,
 	subcomponents: {
@@ -15,9 +16,8 @@ const meta: Meta< typeof Field.Root > = {
 	},
 	parameters: {
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components` and component set completeness. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };
@@ -30,17 +30,17 @@ export default meta;
  */
 export const Default: StoryObj< typeof Field.Root > = {
 	args: {
-		children: (
-			<>
-				<Field.Label>Label</Field.Label>
-				<Field.Control
-					render={ <input type="text" placeholder="Placeholder" /> }
-				/>
-				<Field.Description>
-					The accessible description.
-				</Field.Description>
-			</>
-		),
+		children: [
+			<Field.Label key="label">Label</Field.Label>,
+			<Field.Control
+				render={ <input type="text" placeholder="Placeholder" /> }
+				key="control"
+			/>,
+
+			<Field.Description key="description">
+				The accessible description.
+			</Field.Description>,
+		],
 	},
 };
 
@@ -72,6 +72,7 @@ export const UsingHtmlFor: StoryObj< typeof Field.Root > = {
 					id={ controlId }
 					aria-describedby={ descriptionId }
 				/>
+
 				<Field.Description id={ descriptionId }>
 					The accessible description.
 				</Field.Description>
@@ -114,14 +115,15 @@ export const UsingAriaLabelledby: StoryObj< typeof Field.Root > = {
  */
 export const HiddenLabel: StoryObj< typeof Field.Root > = {
 	args: {
-		children: (
-			<>
-				<Field.Label hideFromVision>Label</Field.Label>
-				<Field.Control
-					render={ <input type="text" placeholder="Placeholder" /> }
-				/>
-			</>
-		),
+		children: [
+			<Field.Label hideFromVision key="label">
+				Label
+			</Field.Label>,
+			<Field.Control
+				render={ <input type="text" placeholder="Placeholder" /> }
+				key="control"
+			/>,
+		],
 	},
 };
 
@@ -137,14 +139,14 @@ export const HiddenLabel: StoryObj< typeof Field.Root > = {
  */
 export const WithDetails: StoryObj< typeof Field.Root > = {
 	args: {
-		children: (
-			<>
-				<Field.Label>Label</Field.Label>
-				<Field.Control
-					render={ <input type="text" placeholder="Placeholder" /> }
-				/>
-				<Field.Details>{ DETAILS_EXAMPLE }</Field.Details>
-			</>
-		),
+		children: [
+			<Field.Label key="label">Label</Field.Label>,
+			<Field.Control
+				render={ <input type="text" placeholder="Placeholder" /> }
+				key="control"
+			/>,
+
+			<Field.Details key="details">{ DETAILS_EXAMPLE }</Field.Details>,
+		],
 	},
 };
