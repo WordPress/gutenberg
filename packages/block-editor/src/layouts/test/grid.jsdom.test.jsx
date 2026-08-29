@@ -1,17 +1,20 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import grid from '../grid';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 const GridLayoutInspectorControls = grid.inspectorControls;
 const PANEL_ID = 'test-panel';
 
 function renderInspectorControls( props = {} ) {
 	return render(
-		<ToolsPanel label="Layout" resetAll={ jest.fn() } panelId={ PANEL_ID }>
+		<ToolsPanel label="Layout" resetAll={ vi.fn() } panelId={ PANEL_ID }>
 			<GridLayoutInspectorControls
 				clientId={ PANEL_ID }
 				layout={ {} }
-				onChange={ jest.fn() }
+				onChange={ vi.fn() }
 				{ ...props }
 			/>
 		</ToolsPanel>

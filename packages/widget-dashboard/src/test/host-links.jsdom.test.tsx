@@ -1,4 +1,5 @@
-import '@testing-library/jest-dom';
+import { describe, expect, it } from 'vitest';
+import '@testing-library/jest-dom/vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { forwardRef } from '@wordpress/element';
@@ -10,6 +11,11 @@ import type {
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 import { WidgetActions } from '../components/widget-actions/widget-actions';
 import { WidgetFooter } from '../components/widget-footer/widget-footer';
+
+globalThis.wpVitest.mockCSSSupports();
+globalThis.wpVitest.mockResizeObserver();
+globalThis.wpVitest.mockScrollIntoView();
+globalThis.wpVitest.mockVisibleElements();
 
 const MATCHED_HREF = 'admin.php?page=dashboard&p=/reports';
 const MATCHED_PATH = '/reports';

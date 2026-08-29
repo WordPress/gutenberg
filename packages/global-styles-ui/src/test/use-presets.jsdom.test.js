@@ -1,9 +1,13 @@
 import { renderHook } from '@testing-library/react';
-jest.mock( '../hooks', () => ( {
-	useSetting: jest.fn(),
-} ) );
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { useSetting } from '../hooks';
 import { usePresets } from '../presets/use-presets';
-const mockUseSetting = require( '../hooks' ).useSetting;
+
+vi.mock( import( '../hooks' ), () => ( {
+	useSetting: vi.fn(),
+} ) );
+
+const mockUseSetting = vi.mocked( useSetting );
 
 describe( 'usePresets', () => {
 	const presets = [
@@ -18,14 +22,14 @@ describe( 'usePresets', () => {
 	let setPresets;
 
 	beforeEach( () => {
-		setPresets = jest.fn();
-		jest.clearAllMocks();
+		setPresets = vi.fn();
+		vi.clearAllMocks();
 	} );
 
 	function mockSettings( value = presets, base = basePresets ) {
 		mockUseSetting.mockImplementation( ( path, blockName, readFrom ) => {
 			if ( readFrom === 'base' ) {
-				return [ base, jest.fn() ];
+				return [ base, vi.fn() ];
 			}
 			return [ value, setPresets ];
 		} );

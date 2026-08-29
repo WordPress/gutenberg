@@ -1,21 +1,21 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import domReady from '@wordpress/dom-ready';
 import { setup, speak } from '../';
 import clear from '../shared/clear';
 import filterMessage from '../shared/filter-message';
 
-jest.mock( '../shared/clear', () => {
-	return jest.fn();
-} );
-jest.mock( '@wordpress/dom-ready', () => {
-	return jest.fn( ( callback: () => void ) => {
+vi.mock( import( '../shared/clear' ), () => ( {
+	default: vi.fn(),
+} ) );
+vi.mock( import( '@wordpress/dom-ready' ), () => ( {
+	default: vi.fn( ( callback: VoidFunction ) => {
 		callback();
-	} );
-} );
-jest.mock( '../shared/filter-message', () => {
-	return jest.fn( ( message: string ) => {
-		return message;
-	} );
-} );
+		return undefined;
+	} ),
+} ) );
+vi.mock( import( '../shared/filter-message' ), () => ( {
+	default: vi.fn( ( message: string ) => message ),
+} ) );
 
 describe( 'speak', () => {
 	let containerPolite = document.getElementById( 'a11y-speak-polite' );

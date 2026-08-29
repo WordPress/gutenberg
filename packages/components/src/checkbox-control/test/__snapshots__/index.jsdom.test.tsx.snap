@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`CheckboxControl Basic rendering should render the indeterminate icon when in the indeterminate state 1`] = `
+exports[`CheckboxControl > Basic rendering > should render the indeterminate icon when in the indeterminate state 1`] = `
 Snapshot Diff:
 - First value
 + Second value

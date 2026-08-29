@@ -1,8 +1,14 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { useSelect } from '@wordpress/data';
 import PostLastRevisionCheck from '../check';
 
-jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useSelect: vi.fn(),
+} ) );
 
 function setupDataMock( id, count ) {
 	useSelect.mockImplementation( ( mapSelect ) =>

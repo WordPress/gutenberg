@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { speak } from '@wordpress/a11y';
 import apiFetch from '@wordpress/api-fetch';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -5,12 +6,15 @@ import { store as coreStore } from '@wordpress/core-data';
 import { createRegistry } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
-jest.mock( '@wordpress/a11y', () => ( {
-	speak: jest.fn(),
-} ) );
 import { store as editorStore } from '..';
 import * as actions from '../actions';
 import { unlock } from '../../lock-unlock';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
+vi.mock( '@wordpress/a11y', () => ( {
+	speak: vi.fn(),
+} ) );
 
 const postId = 44;
 
@@ -564,8 +568,8 @@ describe( 'Post actions', () => {
 				status: 'publish',
 			};
 
-			const dispatch = Object.assign( jest.fn(), {
-				savePost: jest.fn(),
+			const dispatch = Object.assign( vi.fn(), {
+				savePost: vi.fn(),
 			} );
 			const select = {
 				getCurrentPostType: () => 'post',
@@ -573,8 +577,8 @@ describe( 'Post actions', () => {
 			};
 			const registry = {
 				dispatch: () => ( {
-					removeNotice: jest.fn(),
-					createErrorNotice: jest.fn(),
+					removeNotice: vi.fn(),
+					createErrorNotice: vi.fn(),
 				} ),
 				resolveSelect: () => ( {
 					getPostType: () => ( {

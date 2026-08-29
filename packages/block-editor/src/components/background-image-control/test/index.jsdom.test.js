@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { backgroundPositionToCoords, coordsToBackgroundPosition } from '../';
 
 describe( 'backgroundPositionToCoords', () => {

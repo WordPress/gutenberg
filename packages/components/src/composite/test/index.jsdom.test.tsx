@@ -1,3 +1,13 @@
+import {
+	afterAll,
+	beforeAll,
+	describe,
+	expect,
+	it,
+	test,
+	vi,
+	type MockInstance,
+} from 'vitest';
 import { queryByAttribute, render, screen } from '@testing-library/react';
 import { click, press, waitFor } from '@ariakit/test';
 import type { ComponentProps } from 'react';
@@ -18,15 +28,15 @@ async function renderAndValidate( ...args: Parameters< typeof render > ) {
 }
 
 describe( 'Composite', () => {
-	let clientHeightSpy: jest.SpiedGetter<
-		typeof HTMLElement.prototype.clientHeight
+	let clientHeightSpy: MockInstance<
+		() => typeof HTMLElement.prototype.clientHeight
 	>;
 
 	beforeAll( () => {
 		// This is necessary because of how Ariakit calculates page up and
 		// page down. Without this, nothing has a height, and so paging up
 		// and down doesn't behave as expected in tests.
-		clientHeightSpy = jest
+		clientHeightSpy = vi
 			.spyOn( HTMLElement.prototype, 'clientHeight', 'get' )
 			.mockImplementation( function getClientHeight( this: HTMLElement ) {
 				if ( this.tagName === 'BODY' ) {

@@ -1,11 +1,12 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import triggerFetch from '@wordpress/api-fetch';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
-jest.mock( '@wordpress/api-fetch' );
 import { render, waitFor } from '@testing-library/react';
 import { store as coreDataStore } from '../../index';
 import useEntityRecords, {
 	useEntityRecordsWithPermissions,
 } from '../use-entity-records';
+vi.mock( '@wordpress/api-fetch' );
 
 describe( 'useEntityRecords', () => {
 	let registry;

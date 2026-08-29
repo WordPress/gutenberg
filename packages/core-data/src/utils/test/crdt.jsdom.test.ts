@@ -1,19 +1,40 @@
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+	type Mock,
+} from 'vitest';
 import { Y } from '@wordpress/sync';
-import { describe, expect, it, jest, beforeEach } from '@jest/globals';
+import { parse } from '@wordpress/blocks';
+import { RichTextData } from '@wordpress/rich-text';
+import { CRDT_RECORD_MAP_KEY } from '../../sync';
+import {
+	applyPostChangesToCRDTDoc,
+	defaultCollectionSyncConfig,
+	defaultSyncConfig,
+	getPostChangesFromCRDTDoc,
+	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
+	type PostChanges,
+	type YPostRecord,
+} from '../crdt';
+import type { Block, YBlock, YBlockRecord, YBlocks } from '../crdt-blocks';
+import { updateSelectionHistory } from '../crdt-selection';
+import { createYMap, getRootMap, type YMapWrap } from '../crdt-utils';
+import type { Post } from '../../entity-types';
 /**
  * Mock getBlockTypes so CRDT merging can identify rich-text attributes.
  * Also stub __unstableSerializeAndClean so we can assert how it's invoked
  * (the real implementation returns "" without registered block types, which
  * isn't useful for asserting closure-capture behavior).
  */
-jest.mock( '@wordpress/blocks', () => {
-	const actual = jest.requireActual( '@wordpress/blocks' ) as Record<
-		string,
-		unknown
-	>;
+vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => {
+	const actual = await importOriginal();
 	return {
 		...actual,
-		getBlockTypes: () => [
+		getBlockTypes: ( () => [
 			{
 				name: 'core/paragraph',
 				attributes: { content: { type: 'rich-text' } },
@@ -37,31 +58,15 @@ jest.mock( '@wordpress/blocks', () => {
 					},
 				},
 			},
-		],
+		] ) as unknown as typeof import('@wordpress/blocks').getBlockTypes,
 		// Mocked so tests can control what the Code Editor sync path "parses"
 		// from raw content without needing real block-type registration.
-		parse: jest.fn( () => [] ),
-		__unstableSerializeAndClean: jest.fn(
+		parse: vi.fn( () => [] ),
+		__unstableSerializeAndClean: vi.fn(
 			( blocks: unknown[] ) => `serialized:${ blocks?.length ?? 0 }`
 		),
 	};
 } );
-import { parse } from '@wordpress/blocks';
-import { RichTextData } from '@wordpress/rich-text';
-import { CRDT_RECORD_MAP_KEY } from '../../sync';
-import {
-	applyPostChangesToCRDTDoc,
-	defaultCollectionSyncConfig,
-	defaultSyncConfig,
-	getPostChangesFromCRDTDoc,
-	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
-	type PostChanges,
-	type YPostRecord,
-} from '../crdt';
-import type { Block, YBlock, YBlockRecord, YBlocks } from '../crdt-blocks';
-import { updateSelectionHistory } from '../crdt-selection';
-import { createYMap, getRootMap, type YMapWrap } from '../crdt-utils';
-import type { Post } from '../../entity-types';
 
 // Default synced properties matching the base set built in entities.js,
 // plus 'categories' and 'tags' as example taxonomy rest_base values.
@@ -166,13 +171,13 @@ describe( 'crdt', () => {
 
 	beforeEach( () => {
 		doc = new Y.Doc();
-		jest.clearAllMocks();
-		jest.useFakeTimers();
+		vi.clearAllMocks();
+		vi.useFakeTimers();
 	} );
 
 	afterEach( () => {
-		jest.runAllTimers();
-		jest.useRealTimers();
+		vi.runAllTimers();
+		vi.useRealTimers();
 		doc.destroy();
 	} );
 
@@ -375,7 +380,7 @@ describe( 'crdt', () => {
 			// only. `parse()` is mocked to return blocks with freshly minted
 			// clientIds — the sync layer must not let those overwrite the
 			// stable clientIds already in the Y.Array.
-			( parse as jest.Mock ).mockReturnValueOnce( [
+			( parse as Mock ).mockReturnValueOnce( [
 				{
 					name: 'core/paragraph',
 					attributes: { content: 'Hello' },

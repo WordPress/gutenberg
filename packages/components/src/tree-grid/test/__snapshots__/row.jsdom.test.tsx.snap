@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`TreeGridRow forwards other props to the rendered tr element 1`] = `
+exports[`TreeGridRow > forwards other props to the rendered tr element 1`] = `
 <div>
   <table>
     <tbody>
@@ -20,7 +20,7 @@ exports[`TreeGridRow forwards other props to the rendered tr element 1`] = `
 </div>
 `;
 
-exports[`TreeGridRow renders a tr with support for level, positionInSet and setSize props 1`] = `
+exports[`TreeGridRow > renders a tr with support for level, positionInSet and setSize props 1`] = `
 <div>
   <table>
     <tbody>

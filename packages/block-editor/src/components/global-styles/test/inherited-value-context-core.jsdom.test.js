@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useSelect } from '@wordpress/data';
 import { useResolvedStyle } from '../inherited-value-context';
@@ -19,28 +20,28 @@ afterEach( () => {
 
 // Only `useSelect` is called by the hook. The other four are needed at import
 // time by the store modules this file pulls in transitively.
-jest.mock( '@wordpress/data', () => ( {
-	useSelect: jest.fn(),
-	register: jest.fn(),
-	createReduxStore: jest.fn(),
-	createSelector: jest.fn( ( callback ) => callback ),
-	combineReducers: jest.fn( ( reducers ) => reducers ),
+vi.mock( import( '@wordpress/data' ), () => ( {
+	useSelect: vi.fn(),
+	register: vi.fn(),
+	createReduxStore: vi.fn(),
+	createSelector: vi.fn( ( callback ) => callback ),
+	combineReducers: vi.fn( ( reducers ) => reducers ),
 } ) );
 
-jest.mock( '../../../store', () => ( {
+vi.mock( import( '../../../store' ), () => ( {
 	store: { name: 'core/block-editor' },
 } ) );
 
 // `inherited-value-context.jsx` imports the blocks store for
 // `useVariationAndElements`. Its real import chain needs data-module exports
 // the stub above does not provide, so stub the blocks module too.
-jest.mock( '@wordpress/blocks', () => ( {
+vi.mock( import( '@wordpress/blocks' ), () => ( {
 	store: { name: 'core/blocks' },
 	getBlockType: ( blockName ) =>
 		( { 'core/heading': { title: 'Heading' } } )[ blockName ],
 } ) );
 
-jest.mock( '../../../hooks/block-style-variation', () => ( {
+vi.mock( import( '../../../hooks/block-style-variation' ), () => ( {
 	getVariationNameFromClass: ( className ) => {
 		const match = /is-style-([\w-]+)/.exec( className || '' );
 		return match ? match[ 1 ] : null;

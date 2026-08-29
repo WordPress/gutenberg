@@ -1,8 +1,11 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
 import BaseCheckboxControl from '..';
 import type { CheckboxControlProps } from '../types';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 const noop = () => {};
 
@@ -87,7 +90,7 @@ describe( 'CheckboxControl', () => {
 			const user = userEvent.setup();
 
 			let state = false;
-			const setState = jest.fn(
+			const setState = vi.fn(
 				( nextState: boolean ) => ( state = nextState )
 			);
 

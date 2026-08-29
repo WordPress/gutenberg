@@ -1,0 +1,15 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"composite": false,
+		"emitDeclarationOnly": false,
+		"noEmit": true,
+		"rootDir": ".",
+		"types": [ "gutenberg-env", "gutenberg-vitest-test-env" ]
+	},
+	"references": [ { "path": "./tsconfig.json" } ],
+	"files": [],
+	"include": [ "src/test/**/*.ts" ],
+	"exclude": []
+}

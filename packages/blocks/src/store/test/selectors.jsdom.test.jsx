@@ -1,3 +1,4 @@
+import { describe, expect, it, test } from 'vitest';
 import deepFreeze from 'deep-freeze';
 import { RichTextData } from '@wordpress/rich-text';
 import {

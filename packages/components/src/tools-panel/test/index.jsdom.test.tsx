@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ToolsPanel, ToolsPanelContext, ToolsPanelItem } from '../';
@@ -9,8 +10,10 @@ import type {
 	ResetAllFilter,
 } from '../types';
 
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
 const { Fill: ToolsPanelItems, Slot } = createSlotFill( 'ToolsPanelSlot' );
-const resetAll = jest.fn();
+const resetAll = vi.fn();
 const noop = () => undefined;
 const gridContextValue = {
 	Grid: {
@@ -30,51 +33,51 @@ const defaultProps = {
 // Default props for an enabled control to be rendered within panel.
 let controlValue: ControlValue = true;
 const controlProps = {
-	hasValue: jest.fn().mockImplementation( () => {
+	hasValue: vi.fn().mockImplementation( () => {
 		return !! controlValue;
 	} ),
 	label: 'Example',
-	onDeselect: jest.fn().mockImplementation( () => {
+	onDeselect: vi.fn().mockImplementation( () => {
 		controlValue = undefined;
 	} ),
-	onSelect: jest.fn(),
+	onSelect: vi.fn(),
 };
 
 // Default props without a value for an alternate control to be rendered within
 // the panel.
 let altControlValue: ControlValue = false;
 const altControlProps = {
-	hasValue: jest.fn().mockImplementation( () => {
+	hasValue: vi.fn().mockImplementation( () => {
 		return !! altControlValue;
 	} ),
 	label: 'Alt',
-	onDeselect: jest.fn(),
-	onSelect: jest.fn(),
+	onDeselect: vi.fn(),
+	onSelect: vi.fn(),
 };
 
 // Default props for wrapped or grouped panel items.
 let nestedControlValue: ControlValue = true;
 const nestedControlProps = {
-	hasValue: jest.fn().mockImplementation( () => {
+	hasValue: vi.fn().mockImplementation( () => {
 		return !! nestedControlValue;
 	} ),
 	label: 'Nested Control 1',
-	onDeselect: jest.fn().mockImplementation( () => {
+	onDeselect: vi.fn().mockImplementation( () => {
 		nestedControlValue = undefined;
 	} ),
-	onSelect: jest.fn(),
+	onSelect: vi.fn(),
 	isShownByDefault: true,
 };
 
 // Alternative props for wrapped or grouped panel items.
 const altNestedControlValue: ControlValue = false;
 const altNestedControlProps = {
-	hasValue: jest.fn().mockImplementation( () => {
+	hasValue: vi.fn().mockImplementation( () => {
 		return !! altNestedControlValue;
 	} ),
 	label: 'Nested Control 2',
-	onDeselect: jest.fn(),
-	onSelect: jest.fn(),
+	onDeselect: vi.fn(),
+	onSelect: vi.fn(),
 };
 
 // Simple custom component grouping panel items. Used to test panel item
@@ -106,10 +109,10 @@ const panelContext: ToolsPanelContextType = {
 	hasMenuItems: false,
 	isResetting: false,
 	shouldRenderPlaceholderItems: false,
-	registerPanelItem: jest.fn(),
-	deregisterPanelItem: jest.fn(),
-	registerResetAllFilter: jest.fn(),
-	deregisterResetAllFilter: jest.fn(),
+	registerPanelItem: vi.fn(),
+	deregisterPanelItem: vi.fn(),
+	registerResetAllFilter: vi.fn(),
+	deregisterResetAllFilter: vi.fn(),
 	flagItemCustomization: noop,
 	areAllOptionalControlsHidden: true,
 };
@@ -425,8 +428,8 @@ describe( 'ToolsPanel', () => {
 					attributes: { value: toolsPanelItemValue },
 					hasValue: () => !! toolsPanelItemValue,
 					label: 'Alt',
-					onDeselect: jest.fn(),
-					onSelect: jest.fn(),
+					onDeselect: vi.fn(),
+					onSelect: vi.fn(),
 				};
 
 				return (
@@ -461,8 +464,8 @@ describe( 'ToolsPanel', () => {
 					attributes: { value: toolsPanelItemValue },
 					hasValue: () => !! toolsPanelItemValue,
 					label: 'Alt',
-					onDeselect: jest.fn(),
-					onSelect: jest.fn(),
+					onDeselect: vi.fn(),
+					onSelect: vi.fn(),
 				};
 
 				// The null panelId below simulates the panel prop when there
@@ -552,12 +555,12 @@ describe( 'ToolsPanel', () => {
 		it( 'should render default controls with conditional isShownByDefault', async () => {
 			const linkedControlValue = false;
 			const linkedControlProps = {
-				hasValue: jest.fn().mockImplementation( () => {
+				hasValue: vi.fn().mockImplementation( () => {
 					return !! linkedControlValue;
 				} ),
 				label: 'Linked',
-				onDeselect: jest.fn(),
-				onSelect: jest.fn(),
+				onDeselect: vi.fn(),
+				onSelect: vi.fn(),
 			};
 
 			const TestPanel = () => (
@@ -624,12 +627,12 @@ describe( 'ToolsPanel', () => {
 		it( 'should handle conditionally rendered default control', async () => {
 			const conditionalControlValue = false;
 			const conditionalControlProps = {
-				hasValue: jest.fn().mockImplementation( () => {
+				hasValue: vi.fn().mockImplementation( () => {
 					return !! conditionalControlValue;
 				} ),
 				label: 'Conditional',
-				onDeselect: jest.fn(),
-				onSelect: jest.fn(),
+				onDeselect: vi.fn(),
+				onSelect: vi.fn(),
 			};
 
 			const TestPanel = () => (
@@ -687,7 +690,7 @@ describe( 'ToolsPanel', () => {
 
 	describe( 'registration of panel items', () => {
 		beforeEach( () => {
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 		} );
 
 		it( 'should register and deregister items when panelId changes', () => {
@@ -824,7 +827,7 @@ describe( 'ToolsPanel', () => {
 
 	describe( 'callbacks on menu item selection', () => {
 		beforeEach( () => {
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 		} );
 
 		it( 'should call onDeselect callback when menu item is toggled off', async () => {
@@ -952,7 +955,7 @@ describe( 'ToolsPanel', () => {
 
 	describe( 'rendering via SlotFills', () => {
 		beforeEach( () => {
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 		} );
 
 		it( 'should maintain visual order of controls when toggled on and off', async () => {
@@ -1255,23 +1258,23 @@ describe( 'ToolsPanel', () => {
 	describe( 'panel header icon toggle', () => {
 		const defaultControlsValue = false;
 		const defaultControls = {
-			hasValue: jest.fn().mockImplementation( () => {
+			hasValue: vi.fn().mockImplementation( () => {
 				return !! defaultControlsValue;
 			} ),
 			label: 'Default',
-			onDeselect: jest.fn(),
-			onSelect: jest.fn(),
+			onDeselect: vi.fn(),
+			onSelect: vi.fn(),
 			isShownByDefault: true,
 		};
 
 		const optionalControlsValue = false;
 		const optionalControls = {
-			hasValue: jest.fn().mockImplementation( () => {
+			hasValue: vi.fn().mockImplementation( () => {
 				return !! optionalControlsValue;
 			} ),
 			label: 'Optional',
-			onDeselect: jest.fn(),
-			onSelect: jest.fn(),
+			onDeselect: vi.fn(),
+			onSelect: vi.fn(),
 			isShownByDefault: false,
 		};
 
@@ -1331,8 +1334,8 @@ describe( 'ToolsPanel', () => {
 		} );
 
 		it( 'should not call reset all for different panelIds', async () => {
-			const resetItem = jest.fn();
-			const resetItemB = jest.fn();
+			const resetItem = vi.fn();
+			const resetItemB = vi.fn();
 
 			const children = (
 				<>

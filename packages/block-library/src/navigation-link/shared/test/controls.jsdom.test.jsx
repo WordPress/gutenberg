@@ -1,35 +1,40 @@
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { Controls } from '../controls';
+import { useEntityBinding } from '../use-entity-binding';
+import { useIsInvalidLink } from '../use-is-invalid-link';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 // Mock the updateAttributes function
 let mockUpdateAttributes;
-jest.mock( '../update-attributes', () => ( {
+vi.mock( import( '../update-attributes' ), () => ( {
 	updateAttributes: ( ...args ) => mockUpdateAttributes( ...args ),
 } ) );
 
 // Mock the useToolsPanelDropdownMenuProps hook
-jest.mock( '../../../utils/hooks', () => ( {
+vi.mock( import( '../../../utils/hooks' ), () => ( {
 	useToolsPanelDropdownMenuProps: () => ( {} ),
 } ) );
 
 // Mock the useEntityBinding hook
-jest.mock( '../use-entity-binding', () => ( {
-	useEntityBinding: jest.fn( () => ( {
+vi.mock( import( '../use-entity-binding' ), () => ( {
+	useEntityBinding: vi.fn( () => ( {
 		hasUrlBinding: false,
 		isBoundEntityAvailable: false,
-		clearBinding: jest.fn(),
+		clearBinding: vi.fn(),
 	} ) ),
 } ) );
 
 // Mock the useIsInvalidLink hook
-jest.mock( '../use-is-invalid-link', () => ( {
-	useIsInvalidLink: jest.fn( () => [ false, false ] ),
+vi.mock( import( '../use-is-invalid-link' ), () => ( {
+	useIsInvalidLink: vi.fn( () => [ false, false ] ),
 } ) );
 
 describe( 'Controls', () => {
 	// Initialize the mock function
 	beforeAll( () => {
-		mockUpdateAttributes = jest.fn();
+		mockUpdateAttributes = vi.fn();
 	} );
 
 	const defaultProps = {
@@ -40,25 +45,23 @@ describe( 'Controls', () => {
 			rel: 'nofollow',
 			opensInNewTab: false,
 		},
-		setAttributes: jest.fn(),
-		setIsEditingControl: jest.fn(),
+		setAttributes: vi.fn(),
+		setIsEditingControl: vi.fn(),
 		clientId: 'test-client-id',
 	};
 
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 		mockUpdateAttributes.mockClear();
 
 		// Reset useEntityBinding mock to default
-		const { useEntityBinding } = require( '../use-entity-binding' );
 		useEntityBinding.mockReturnValue( {
 			hasUrlBinding: false,
 			isBoundEntityAvailable: false,
-			clearBinding: jest.fn(),
+			clearBinding: vi.fn(),
 		} );
 
 		// Reset useIsInvalidLink mock to default
-		const { useIsInvalidLink } = require( '../use-is-invalid-link' );
 		useIsInvalidLink.mockReturnValue( [ false, false ] );
 	} );
 
@@ -126,11 +129,10 @@ describe( 'Controls', () => {
 
 	describe( 'URL binding help text', () => {
 		it( 'shows invalid link help text when bound entity is not available', () => {
-			const { useEntityBinding } = require( '../use-entity-binding' );
 			useEntityBinding.mockReturnValue( {
 				hasUrlBinding: true,
 				isBoundEntityAvailable: false,
-				clearBinding: jest.fn(),
+				clearBinding: vi.fn(),
 			} );
 
 			const propsWithCategoryBinding = {
@@ -152,7 +154,6 @@ describe( 'Controls', () => {
 		} );
 
 		it( 'shows draft help text for draft entities', () => {
-			const { useIsInvalidLink } = require( '../use-is-invalid-link' );
 			useIsInvalidLink.mockReturnValue( [ false, true ] ); // isInvalid: false, isDraft: true
 
 			const propsWithDraftPage = {
@@ -174,7 +175,6 @@ describe( 'Controls', () => {
 		} );
 
 		it( 'shows draft help text for different entity types', () => {
-			const { useIsInvalidLink } = require( '../use-is-invalid-link' );
 			useIsInvalidLink.mockReturnValue( [ false, true ] );
 
 			const propsWithDraftPost = {

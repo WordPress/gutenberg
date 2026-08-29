@@ -1,8 +1,22 @@
-import { act, render } from '@testing-library/react';
+import { render, act } from '@testing-library/react';
+import {
+	afterAll,
+	afterEach,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
 import { useSelect } from '@wordpress/data';
 import { default as BrowserURL, getPostEditURL } from '../';
 
-jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
+vi.mock( '@wordpress/data/src/components/use-select', () => ( {
+	default: vi.fn(),
+} ) );
 
 function setupUseSelectMock( { postId, postStatus, currentRevisionId } ) {
 	useSelect.mockImplementation( () => {
@@ -15,7 +29,7 @@ function setupUseSelectMock( { postId, postStatus, currentRevisionId } ) {
 }
 
 function flushURLWrites() {
-	act( () => jest.runAllTimers() );
+	act( () => vi.runAllTimers() );
 }
 
 describe( 'getPostEditURL', () => {
@@ -30,17 +44,18 @@ describe( 'BrowserURL', () => {
 	let replaceStateSpy;
 
 	beforeAll( () => {
-		replaceStateSpy = jest.spyOn( window.history, 'replaceState' );
+		replaceStateSpy = vi.spyOn( window.history, 'replaceState' );
 	} );
 
 	beforeEach( () => {
-		jest.useFakeTimers();
+		vi.useFakeTimers();
+		window.history.replaceState( {}, '', '/' );
 		replaceStateSpy.mockReset();
 	} );
 
 	afterEach( () => {
-		act( () => jest.runOnlyPendingTimers() );
-		jest.useRealTimers();
+		act( () => vi.runOnlyPendingTimers() );
+		vi.useRealTimers();
 	} );
 
 	afterAll( () => {
@@ -126,7 +141,7 @@ describe( 'BrowserURL', () => {
 		const { rerender } = render( <BrowserURL /> );
 		flushURLWrites();
 
-		act( () => jest.advanceTimersByTime( 301 ) );
+		act( () => vi.advanceTimersByTime( 301 ) );
 		setupUseSelectMock( {
 			postId: 1,
 			postStatus: 'draft',
@@ -149,7 +164,6 @@ describe( 'BrowserURL', () => {
 			currentRevisionId: 5,
 		} );
 		const { rerender } = render( <BrowserURL /> );
-		flushURLWrites();
 
 		setupUseSelectMock( {
 			postId: 1,

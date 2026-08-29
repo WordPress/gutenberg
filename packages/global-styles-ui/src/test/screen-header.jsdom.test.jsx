@@ -1,6 +1,9 @@
+import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { Navigator, useNavigator } from '@wordpress/components';
 import { ScreenHeader } from '../screen-header';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 function CurrentPath() {
 	const { location } = useNavigator();
@@ -35,7 +38,7 @@ describe( 'ScreenHeader back button', () => {
 	} );
 
 	it( 'uses onBack instead of the default navigation when one is given', () => {
-		const onBack = jest.fn();
+		const onBack = vi.fn();
 		renderAtRevision( { onBack } );
 
 		fireEvent.click(

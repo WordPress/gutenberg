@@ -1,3 +1,4 @@
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
@@ -8,6 +9,8 @@ import {
 	BACKGROUND_BLOCK_DEFAULT_VALUES,
 } from '../background';
 import { BackgroundToolsPanel } from '../../components/global-styles/background-panel';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 describe( 'background', () => {
 	describe( 'backgroundResetAllFilter', () => {
@@ -164,7 +167,7 @@ describe( 'background', () => {
 				background: { gradient: true },
 			};
 			const user = userEvent.setup();
-			const setAttributes = jest.fn();
+			const setAttributes = vi.fn();
 
 			render(
 				<BackgroundImagePanel
@@ -201,7 +204,7 @@ describe( 'background', () => {
 				background: { gradient: false },
 			};
 			const user = userEvent.setup();
-			const setAttributes = jest.fn();
+			const setAttributes = vi.fn();
 
 			render(
 				<BackgroundImagePanel

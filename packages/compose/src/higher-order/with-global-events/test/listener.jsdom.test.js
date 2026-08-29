@@ -1,19 +1,28 @@
+import {
+	afterAll,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
 import Listener from '../listener';
 
 describe( 'Listener', () => {
-	const createHandler = () => ( { handleEvent: jest.fn() } );
+	const createHandler = () => ( { handleEvent: vi.fn() } );
 
 	let listener, _addEventListener, _removeEventListener;
 	beforeAll( () => {
 		_addEventListener = global.window.addEventListener;
 		_removeEventListener = global.window.removeEventListener;
-		global.window.addEventListener = jest.fn();
-		global.window.removeEventListener = jest.fn();
+		global.window.addEventListener = vi.fn();
+		global.window.removeEventListener = vi.fn();
 	} );
 
 	beforeEach( () => {
 		listener = new Listener();
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	afterAll( () => {

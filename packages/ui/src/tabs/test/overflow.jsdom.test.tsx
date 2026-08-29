@@ -6,13 +6,13 @@
  * firing only the observers that watch a tab reproduces the exact case the old
  * list-only observer missed. Passes with the fix; fails without it.
  */
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, render, screen } from '@testing-library/react';
 import { Tabs } from '../..';
 
-// The jest preset mocks CSS Modules to `{}`; expose the keys so we can assert
+// The Vitest preset mocks CSS Modules; expose the keys so we can assert
 // on `is-overflowing-last`, the class that drives the fade.
-jest.mock( '../style.module.css', () => ( {
-	__esModule: true,
+vi.mock( import( '../style.module.css' ), () => ( {
 	default: new Proxy( {}, { get: ( _target, key ) => key } ),
 } ) );
 

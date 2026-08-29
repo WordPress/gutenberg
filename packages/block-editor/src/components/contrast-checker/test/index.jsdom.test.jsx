@@ -1,8 +1,9 @@
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { speak } from '@wordpress/a11y';
 import ContrastChecker from '../';
 
-jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
+vi.mock( import( '@wordpress/a11y' ), () => ( { speak: vi.fn() } ) );
 
 describe( 'ContrastChecker', () => {
 	const backgroundColor = '#ffffff';

@@ -1,9 +1,18 @@
 import {
+	afterAll,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
+import {
 	createReduxStore,
 	createRegistry,
 	RegistryProvider,
 } from '@wordpress/data';
-import { render, screen, waitFor } from '@testing-library/react';
 import useQuerySelect from '../use-query-select';
 
 /* eslint-disable @wordpress/wp-global-usage */
@@ -41,8 +50,8 @@ describe( 'useQuerySelect', () => {
 	};
 
 	it( 'passes the relevant data to the component', () => {
-		const selectSpy = jest.fn();
-		const TestComponent = jest
+		const selectSpy = vi.fn();
+		const TestComponent = vi
 			.fn()
 			.mockImplementation( getTestComponent( selectSpy, 'keyName' ) );
 		render(
@@ -60,7 +69,7 @@ describe( 'useQuerySelect', () => {
 
 	it( 'uses memoized selectors', () => {
 		const selectors = [];
-		const TestComponent = jest.fn().mockImplementation( ( props ) => {
+		const TestComponent = vi.fn().mockImplementation( ( props ) => {
 			useQuerySelect(
 				function ( query ) {
 					selectors.push( query( 'testStore' ) );
@@ -99,7 +108,7 @@ describe( 'useQuerySelect', () => {
 
 	it( 'returns the expected "response" details – no resolvers and arguments', () => {
 		let querySelectData;
-		const TestComponent = jest.fn().mockImplementation( () => {
+		const TestComponent = vi.fn().mockImplementation( () => {
 			querySelectData = useQuerySelect( function ( query ) {
 				return query( 'testStore' ).getFoo();
 			}, [] );
@@ -149,7 +158,7 @@ describe( 'useQuerySelect', () => {
 		);
 
 		let querySelectData;
-		const TestComponent = jest.fn().mockImplementation( () => {
+		const TestComponent = vi.fn().mockImplementation( () => {
 			querySelectData = useQuerySelect( function ( query ) {
 				return query( 'resolverStore' ).getResolvedFoo( 10 );
 			}, [] );

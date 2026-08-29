@@ -1,10 +1,13 @@
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useState } from '@wordpress/element';
 import type { WidgetType } from '@wordpress/widget-primitives';
 import { WidgetDashboard } from '../widget-dashboard';
 import type { CanPerformDashboardOperation, DashboardWidget } from '../types';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 const widgetTypes: WidgetType[] = [];
 
@@ -88,7 +91,7 @@ describe( 'WidgetDashboard.Actions', () => {
 	} );
 
 	it( 'fires onEditChange with true when Customize is clicked', async () => {
-		const onEditChange = jest.fn();
+		const onEditChange = vi.fn();
 		render( <Harness onEditChange={ onEditChange } /> );
 
 		await user.click( screen.getByRole( 'button', { name: 'Customize' } ) );
@@ -105,8 +108,8 @@ describe( 'WidgetDashboard.Actions', () => {
 	} );
 
 	it( 'fires onEditChange with false when Cancel is clicked', async () => {
-		const onEditChange = jest.fn();
-		const onLayoutChange = jest.fn();
+		const onEditChange = vi.fn();
+		const onLayoutChange = vi.fn();
 		render(
 			<Harness
 				initialEditMode
@@ -171,7 +174,7 @@ describe( 'WidgetDashboard.Actions', () => {
 	} );
 
 	it( 'enters edit mode on an empty layout only when customize is allowed', () => {
-		const onEditChange = jest.fn();
+		const onEditChange = vi.fn();
 		const { unmount } = render(
 			<Harness layout={ [] } onEditChange={ onEditChange } />
 		);
@@ -190,14 +193,19 @@ describe( 'WidgetDashboard.Actions', () => {
 	} );
 
 	it( 'throws when used outside a WidgetDashboard subtree', () => {
-		const spy = jest
-			.spyOn( console, 'error' )
-			.mockImplementation( () => {} );
+		const spy = vi.spyOn( console, 'error' ).mockImplementation( () => {} );
+		const preventJSDOMError = ( event: ErrorEvent ) => {
+			event.preventDefault();
+		};
+		window.addEventListener( 'error', preventJSDOMError );
 
-		expect( () => render( <WidgetDashboard.Actions /> ) ).toThrow(
-			/Dashboard compound used outside a WidgetDashboard subtree/
-		);
-
-		spy.mockRestore();
+		try {
+			expect( () => render( <WidgetDashboard.Actions /> ) ).toThrow(
+				/Dashboard compound used outside a WidgetDashboard subtree/
+			);
+		} finally {
+			window.removeEventListener( 'error', preventJSDOMError );
+			spy.mockRestore();
+		}
 	} );
 } );

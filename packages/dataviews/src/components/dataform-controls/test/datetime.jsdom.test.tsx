@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getSettings, setSettings } from '@wordpress/date';
@@ -6,7 +7,12 @@ import normalizeFields from '../../../field-types';
 import DateTime from '../datetime';
 import type { DataFormControlProps } from '../../../types';
 
-jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
+vi.mock(
+	import( '@wordpress/a11y' ),
+	() => ( { speak: vi.fn() } ) as unknown as typeof import('@wordpress/a11y')
+);
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 const noop = () => {};
 
@@ -66,7 +72,7 @@ describe( 'DateTime control', () => {
 
 	afterEach( () => {
 		setSettings( originalSettings );
-		jest.useRealTimers();
+		vi.useRealTimers();
 	} );
 
 	it( 'should move the calendar to the month of a value changed from outside the control', () => {
@@ -235,9 +241,9 @@ describe( 'DateTime control', () => {
 		} );
 
 		it( "should mark the site's today", () => {
-			jest.useFakeTimers();
+			vi.useFakeTimers();
 			// 20:00 UTC on Aug 15 is already Aug 16 on a UTC+14 site.
-			jest.setSystemTime( new Date( '2026-08-15T20:00:00.000Z' ) );
+			vi.setSystemTime( new Date( '2026-08-15T20:00:00.000Z' ) );
 			setSiteOffset( 14 );
 
 			render(

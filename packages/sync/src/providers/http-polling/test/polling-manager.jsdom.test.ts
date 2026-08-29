@@ -4,58 +4,78 @@ import {
 	describe,
 	expect,
 	it,
-	jest,
-} from '@jest/globals';
+	vi,
+	type Mock,
+} from 'vitest';
 import { type SyncPayload, type SyncResponse } from '../types';
 
 // Mock all external dependencies before imports.
-jest.mock( 'yjs', () => ( {
-	mergeUpdatesV2: jest.fn( () => new Uint8Array() ),
-	applyUpdateV2: jest.fn(),
-	encodeStateAsUpdateV2: jest.fn( () => new Uint8Array() ),
+vi.mock( import( 'yjs' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	mergeUpdatesV2: vi.fn( () => new Uint8Array() ),
+	applyUpdateV2: vi.fn(),
+	encodeStateAsUpdateV2: vi.fn( () => new Uint8Array() ),
 } ) );
 
-jest.mock( 'lib0/encoding', () => ( {
-	createEncoder: jest.fn( () => ( {} ) ),
-	toUint8Array: jest.fn( () => new Uint8Array( [ 0 ] ) ),
+vi.mock( import( 'lib0/encoding' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	createEncoder: vi.fn< typeof import('lib0/encoding').createEncoder >(
+		() =>
+			( {} ) as ReturnType< typeof import('lib0/encoding').createEncoder >
+	),
+	toUint8Array: vi.fn< typeof import('lib0/encoding').toUint8Array >(
+		() => new Uint8Array( [ 0 ] )
+	),
 } ) );
 
-jest.mock( 'lib0/decoding', () => ( {
-	createDecoder: jest.fn( () => ( {} ) ),
+vi.mock( import( 'lib0/decoding' ), async ( importOriginal ) => {
+	const original = await importOriginal();
+
+	return {
+		...original,
+		createDecoder: vi.fn( () => ( {} ) ),
+	} as unknown as typeof original;
+} );
+
+vi.mock( import( 'y-protocols/sync' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	writeSyncStep1: vi.fn(),
+	readSyncMessage: vi.fn(),
 } ) );
 
-jest.mock( 'y-protocols/sync', () => ( {
-	writeSyncStep1: jest.fn(),
-	readSyncMessage: jest.fn(),
+vi.mock( import( 'y-protocols/awareness' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	removeAwarenessStates: vi.fn(),
 } ) );
 
-jest.mock( 'y-protocols/awareness', () => ( {
-	removeAwarenessStates: jest.fn(),
-} ) );
-
-jest.mock( '@wordpress/hooks', () => ( {
-	applyFilters: jest.fn(
+vi.mock( import( '@wordpress/hooks' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	applyFilters: vi.fn(
 		( _hook: string, defaultValue: unknown ) => defaultValue
 	),
 } ) );
 
-jest.mock( '../config', () => ( {
-	...( jest.requireActual( '../config' ) as object ),
-	MAX_UPDATE_SIZE_IN_BYTES: 10,
-	// Shrink the per-request room cap so rotation tests don't need 50+
-	// registered rooms. Existing tests register at most 2 rooms and
-	// stay well under this cap.
-	MAX_ROOMS_PER_REQUEST: 10,
-	MAX_SYNC_REQUEST_BODY_SIZE_IN_BYTES: 1000,
-	// Keep the dynamic-shrink floor below MAX so the halving logic in the
-	// 413 retry path has room to actually halve.
-	MIN_SYNC_REQUEST_BODY_SIZE_IN_BYTES: 100,
-} ) );
+vi.mock( import( '../config' ), async ( importOriginal ) => {
+	const original = await importOriginal();
 
-jest.mock( '../utils', () => ( {
-	...( jest.requireActual( '../utils' ) as object ),
-	postSyncUpdate: jest.fn(),
-	postSyncUpdateNonBlocking: jest.fn(),
+	return {
+		...original,
+		MAX_UPDATE_SIZE_IN_BYTES: 10,
+		// Shrink the per-request room cap so rotation tests don't need 50+
+		// registered rooms. Existing tests register at most 2 rooms and
+		// stay well under this cap.
+		MAX_ROOMS_PER_REQUEST: 10,
+		MAX_SYNC_REQUEST_BODY_SIZE_IN_BYTES: 1000,
+		// Keep the dynamic-shrink floor below MAX so the halving logic in the
+		// 413 retry path has room to actually halve.
+		MIN_SYNC_REQUEST_BODY_SIZE_IN_BYTES: 100,
+	} as unknown as typeof original;
+} );
+
+vi.mock( import( '../utils' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	postSyncUpdate: vi.fn(),
+	postSyncUpdateNonBlocking: vi.fn(),
 } ) );
 
 interface PollingManager {
@@ -81,7 +101,7 @@ function createDeferred< T >() {
 }
 
 function createMockDoc( clientID = 1 ) {
-	return { clientID, on: jest.fn(), off: jest.fn() };
+	return { clientID, on: vi.fn(), off: vi.fn() };
 }
 
 // Helper to extract the onDocUpdate callback registered via doc.on('updateV2', ...).
@@ -98,11 +118,11 @@ function getOnDocUpdate( doc: ReturnType< typeof createMockDoc > ) {
 function createMockAwareness() {
 	return {
 		clientID: 1,
-		getLocalState: jest.fn( () => ( {} ) ),
-		getStates: jest.fn( () => new Map() ),
-		on: jest.fn(),
-		off: jest.fn(),
-		emit: jest.fn(),
+		getLocalState: vi.fn( () => ( {} ) ),
+		getStates: vi.fn( () => new Map() ),
+		on: vi.fn(),
+		off: vi.fn(),
+		emit: vi.fn(),
 	};
 }
 
@@ -112,6 +132,18 @@ function simulateVisibilityChange( state: string ) {
 		get: () => state,
 	} );
 	document.dispatchEvent( new Event( 'visibilitychange' ) );
+}
+
+async function advancePollingTime( duration: number ) {
+	// The polling callback crosses several awaited request and response stages.
+	// Drain that promise chain before and after moving the fake clock.
+	for ( let attempt = 0; attempt < 50; attempt++ ) {
+		await Promise.resolve();
+	}
+	vi.advanceTimersByTime( duration );
+	for ( let attempt = 0; attempt < 50; attempt++ ) {
+		await Promise.resolve();
+	}
 }
 
 const syncResponse = {
@@ -146,31 +178,54 @@ function getServerAwareness(
 
 describe( 'polling-manager', () => {
 	let pollingManager: PollingManager;
-	let mockPostSyncUpdate: jest.Mock<
-		typeof import('../utils').postSyncUpdate
-	>;
-	let mockPostSyncUpdateNonBlocking: jest.Mock<
+	let mockPostSyncUpdate: Mock< typeof import('../utils').postSyncUpdate >;
+	let mockPostSyncUpdateNonBlocking: Mock<
 		typeof import('../utils').postSyncUpdateNonBlocking
 	>;
-	let mockApplyFilters: jest.Mock;
+	let mockApplyFilters: Mock;
+	let registeredRooms: Set< string >;
 
-	beforeEach( () => {
-		jest.useFakeTimers();
-
-		// Use isolateModules so each test gets fresh module-level state
-		// (isPolling, pollingTimeoutId, roomStates, etc.).
-		jest.isolateModules( () => {
-			pollingManager = require( '../polling-manager' ).pollingManager;
-			mockPostSyncUpdate = require( '../utils' ).postSyncUpdate;
-			mockPostSyncUpdateNonBlocking =
-				require( '../utils' ).postSyncUpdateNonBlocking;
-			mockApplyFilters = require( '@wordpress/hooks' ).applyFilters;
+	beforeEach( async () => {
+		vi.clearAllMocks();
+		vi.resetModules();
+		vi.useFakeTimers( {
+			toFake: [ 'clearTimeout', 'setTimeout' ],
 		} );
+
+		// Reload the module graph so each test gets fresh module-level state
+		// (isPolling, pollingTimeoutId, roomStates, etc.).
+		const manager = ( await import( '../polling-manager' ) ).pollingManager;
+		registeredRooms = new Set();
+		pollingManager = {
+			registerRoom( options ) {
+				registeredRooms.add( options.room );
+				manager.registerRoom(
+					options as Parameters< typeof manager.registerRoom >[ 0 ]
+				);
+			},
+			unregisterRoom( room, options ) {
+				registeredRooms.delete( room );
+				manager.unregisterRoom( room, options );
+			},
+		};
+		const utils = await import( '../utils' );
+		mockPostSyncUpdate = vi.mocked( utils.postSyncUpdate );
+		mockPostSyncUpdateNonBlocking = vi.mocked(
+			utils.postSyncUpdateNonBlocking
+		);
+		mockApplyFilters = vi.mocked(
+			( await import( '@wordpress/hooks' ) ).applyFilters
+		);
 	} );
 
 	afterEach( () => {
-		jest.clearAllTimers();
-		jest.useRealTimers();
+		for ( const room of registeredRooms ) {
+			pollingManager.unregisterRoom( room, {
+				sendDisconnectSignal: false,
+			} );
+		}
+		vi.clearAllTimers();
+		vi.useRealTimers();
 		Object.defineProperty( document, 'visibilityState', {
 			configurable: true,
 			get: () => 'visible',
@@ -181,14 +236,14 @@ describe( 'polling-manager', () => {
 		it( 'emits document-size-limit-exceeded error when an update exceeds the size limit', async () => {
 			mockPostSyncUpdate.mockResolvedValue( syncResponse );
 
-			const onStatusChange = jest.fn();
+			const onStatusChange = vi.fn();
 			const doc = createMockDoc( 1 );
 
 			pollingManager.registerRoom( {
 				room: 'test-room',
 				doc,
 				awareness: createMockAwareness(),
-				log: jest.fn(),
+				log: vi.fn(),
 				onStatusChange,
 			} );
 
@@ -213,8 +268,8 @@ describe( 'polling-manager', () => {
 				room: 'test-room',
 				doc,
 				awareness: createMockAwareness(),
-				log: jest.fn(),
-				onStatusChange: jest.fn(),
+				log: vi.fn(),
+				onStatusChange: vi.fn(),
 			} );
 
 			const onDocUpdate = getOnDocUpdate( doc );
@@ -242,19 +297,19 @@ describe( 'polling-manager', () => {
 		it( 'does not trigger for updates within the size limit', async () => {
 			mockPostSyncUpdate.mockResolvedValue( syncResponse );
 
-			const onStatusChange = jest.fn();
+			const onStatusChange = vi.fn();
 			const doc = createMockDoc( 1 );
 
 			pollingManager.registerRoom( {
 				room: 'test-room',
 				doc,
 				awareness: createMockAwareness(),
-				log: jest.fn(),
+				log: vi.fn(),
 				onStatusChange,
 			} );
 
 			// Flush the initial poll so 'connected' status is emitted first.
-			await jest.advanceTimersByTimeAsync( 0 );
+			await advancePollingTime( 0 );
 			onStatusChange.mockClear();
 
 			// Send an update within the limit (10 bytes).
@@ -293,17 +348,17 @@ describe( 'polling-manager', () => {
 				],
 			} );
 
-			const onStatusChange = jest.fn();
+			const onStatusChange = vi.fn();
 
 			pollingManager.registerRoom( {
 				room: 'test-room',
 				doc: createMockDoc( 1 ),
 				awareness: createMockAwareness(),
-				log: jest.fn(),
+				log: vi.fn(),
 				onStatusChange,
 			} );
 
-			await jest.advanceTimersByTimeAsync( 0 );
+			await advancePollingTime( 0 );
 
 			expect( onStatusChange ).toHaveBeenCalledWith( {
 				status: 'disconnected',
@@ -332,17 +387,17 @@ describe( 'polling-manager', () => {
 				],
 			} );
 
-			const onStatusChange = jest.fn();
+			const onStatusChange = vi.fn();
 
 			pollingManager.registerRoom( {
 				room: 'test-room',
 				doc: createMockDoc( 1 ),
 				awareness: createMockAwareness(),
-				log: jest.fn(),
+				log: vi.fn(),
 				onStatusChange,
 			} );
 
-			await jest.advanceTimersByTimeAsync( 0 );
+			await advancePollingTime( 0 );
 
 			expect( onStatusChange ).not.toHaveBeenCalledWith(
 				expect.objectContaining( {
@@ -370,11 +425,11 @@ describe( 'polling-manager', () => {
 				room: 'first-room',
 				doc: createMockDoc( 1 ),
 				awareness: createMockAwareness(),
-				log: jest.fn(),
-				onStatusChange: jest.fn(),
+				log: vi.fn(),
+				onStatusChange: vi.fn(),
 			} );
 
-			await jest.advanceTimersByTimeAsync( 0 );
+			await advancePollingTime( 0 );
 
 			// Now register a second room with many clients — should not disconnect.
 			const awarenessMany = {
@@ -402,17 +457,17 @@ describe( 'polling-manager', () => {
 				],
 			} );
 
-			const onStatusChange = jest.fn();
+			const onStatusChange = vi.fn();
 
 			pollingManager.registerRoom( {
 				room: 'second-room',
 				doc: createMockDoc( 2 ),
 				awareness: createMockAwareness(),
-				log: jest.fn(),
+				log: vi.fn(),
 				onStatusChange,
 			} );
 
-			await jest.advanceTimersByTimeAsync( 1000 );
+			await advancePollingTime( 1000 );
 
 			expect( onStatusChange ).not.toHaveBeenCalledWith(
 				expect.objectContaining( {
@@ -441,18 +496,18 @@ describe( 'polling-manager', () => {
 				],
 			} );
 
-			const onStatusChange = jest.fn();
+			const onStatusChange = vi.fn();
 
 			pollingManager.registerRoom( {
 				room: 'test-room',
 				doc: createMockDoc( 1 ),
 				awareness: createMockAwareness(),
-				log: jest.fn(),
+				log: vi.fn(),
 				onStatusChange,
 			} );
 
 			// First poll passes.
-			await jest.advanceTimersByTimeAsync( 0 );
+			await advancePollingTime( 0 );
 			onStatusChange.mockClear();
 
 			// Second poll: 5 clients (over limit).
@@ -474,7 +529,7 @@ describe( 'polling-manager', () => {
 				],
 			} );
 
-			await jest.advanceTimersByTimeAsync( 1000 );
+			await advancePollingTime( 1000 );
 
 			// Should NOT disconnect — limit check only runs on initial sync.
 			expect( onStatusChange ).not.toHaveBeenCalledWith(
@@ -509,11 +564,11 @@ describe( 'polling-manager', () => {
 				room: 'my-custom-room',
 				doc: createMockDoc( 1 ),
 				awareness: createMockAwareness(),
-				log: jest.fn(),
-				onStatusChange: jest.fn(),
+				log: vi.fn(),
+				onStatusChange: vi.fn(),
 			} );
 
-			await jest.advanceTimersByTimeAsync( 0 );
+			await advancePollingTime( 0 );
 
 			expect( mockApplyFilters ).toHaveBeenCalledWith(
 				'sync.pollingProvider.maxClientsPerRoom',
@@ -545,17 +600,17 @@ describe( 'polling-manager', () => {
 				],
 			} );
 
-			const onStatusChange = jest.fn();
+			const onStatusChange = vi.fn();
 
 			pollingManager.registerRoom( {
 				room: 'test-room',
 				doc: createMockDoc( 1 ),
 				awareness: createMockAwareness(),
-				log: jest.fn(),
+				log: vi.fn(),
 				onStatusChange,
 			} );
 
-			await jest.advanceTimersByTimeAsync( 0 );
+			await advancePollingTime( 0 );
 
 			// 5 clients under a limit of 10 — should not disconnect.
 			expect( onStatusChange ).not.toHaveBeenCalledWith(
@@ -596,20 +651,20 @@ describe( 'polling-manager', () => {
 				room: 'primary-room',
 				doc: createMockDoc( 1 ),
 				awareness: createMockAwareness(),
-				log: jest.fn(),
-				onStatusChange: jest.fn(),
+				log: vi.fn(),
+				onStatusChange: vi.fn(),
 			} );
 
 			pollingManager.registerRoom( {
 				room: 'collection-room',
 				doc: createMockDoc( 2 ),
 				awareness: createMockAwareness(),
-				log: jest.fn(),
-				onStatusChange: jest.fn(),
+				log: vi.fn(),
+				onStatusChange: vi.fn(),
 			} );
 
 			// First poll: detects collaborators on primary room, resumes all queues.
-			await jest.advanceTimersByTimeAsync( 0 );
+			await advancePollingTime( 0 );
 
 			// Second poll: collection room queue should now be unpaused,
 			// so its initial sync_step1 update should be included.
@@ -633,7 +688,7 @@ describe( 'polling-manager', () => {
 				],
 			} );
 
-			await jest.advanceTimersByTimeAsync( 1000 );
+			await advancePollingTime( 1000 );
 
 			// The second call should include non-empty updates for the collection room.
 			const secondCallPayload = mockPostSyncUpdate.mock.calls[ 1 ][ 0 ];
@@ -666,23 +721,23 @@ describe( 'polling-manager', () => {
 				room: 'primary-room',
 				doc: createMockDoc( 1 ),
 				awareness: createMockAwareness(),
-				log: jest.fn(),
-				onStatusChange: jest.fn(),
+				log: vi.fn(),
+				onStatusChange: vi.fn(),
 			} );
 
 			pollingManager.registerRoom( {
 				room: 'collection-room',
 				doc: createMockDoc( 2 ),
 				awareness: createMockAwareness(),
-				log: jest.fn(),
-				onStatusChange: jest.fn(),
+				log: vi.fn(),
+				onStatusChange: vi.fn(),
 			} );
 
 			// First poll: no collaborators.
-			await jest.advanceTimersByTimeAsync( 0 );
+			await advancePollingTime( 0 );
 
 			// Second poll: collection room queue should still be paused.
-			await jest.advanceTimersByTimeAsync( 4000 );
+			await advancePollingTime( 4000 );
 
 			const secondCallPayload = mockPostSyncUpdate.mock.calls[ 1 ][ 0 ];
 			const collectionRoom = secondCallPayload.rooms.find(
@@ -716,20 +771,20 @@ describe( 'polling-manager', () => {
 				room: 'primary-room',
 				doc: createMockDoc( 1 ),
 				awareness: createMockAwareness(),
-				log: jest.fn(),
-				onStatusChange: jest.fn(),
+				log: vi.fn(),
+				onStatusChange: vi.fn(),
 			} );
 
 			pollingManager.registerRoom( {
 				room: 'collection-room',
 				doc: collectionDoc,
 				awareness: createMockAwareness(),
-				log: jest.fn(),
-				onStatusChange: jest.fn(),
+				log: vi.fn(),
+				onStatusChange: vi.fn(),
 			} );
 
 			// First poll: no collaborators, queues stay paused.
-			await jest.advanceTimersByTimeAsync( 0 );
+			await advancePollingTime( 0 );
 
 			// Simulate a local doc update on the collection room (e.g., a note was saved).
 			const onDocUpdate = getOnDocUpdate( collectionDoc );
@@ -752,7 +807,7 @@ describe( 'polling-manager', () => {
 					},
 				],
 			} );
-			await jest.advanceTimersByTimeAsync( 4000 );
+			await advancePollingTime( 4000 );
 
 			const secondCallPayload = mockPostSyncUpdate.mock.calls[ 1 ][ 0 ];
 			const collectionRoomPoll2 = secondCallPayload.rooms.find(
@@ -780,7 +835,7 @@ describe( 'polling-manager', () => {
 					},
 				],
 			} );
-			await jest.advanceTimersByTimeAsync( 4000 );
+			await advancePollingTime( 4000 );
 
 			// Fourth poll: collection room should now send accumulated updates.
 			mockPostSyncUpdate.mockResolvedValue( {
@@ -802,7 +857,7 @@ describe( 'polling-manager', () => {
 					},
 				],
 			} );
-			await jest.advanceTimersByTimeAsync( 1000 );
+			await advancePollingTime( 1000 );
 
 			const fourthCallPayload = mockPostSyncUpdate.mock.calls[ 3 ][ 0 ];
 			const collectionRoomPoll4 = fourthCallPayload.rooms.find(
@@ -833,14 +888,14 @@ describe( 'polling-manager', () => {
 				],
 			} );
 
-			const onStatusChangeA = jest.fn();
-			const onStatusChangeB = jest.fn();
+			const onStatusChangeA = vi.fn();
+			const onStatusChangeB = vi.fn();
 
 			pollingManager.registerRoom( {
 				room: 'room-a',
 				doc: createMockDoc( 1 ),
 				awareness: createMockAwareness(),
-				log: jest.fn(),
+				log: vi.fn(),
 				onStatusChange: onStatusChangeA,
 			} );
 
@@ -848,11 +903,11 @@ describe( 'polling-manager', () => {
 				room: 'room-b',
 				doc: createMockDoc( 2 ),
 				awareness: createMockAwareness(),
-				log: jest.fn(),
+				log: vi.fn(),
 				onStatusChange: onStatusChangeB,
 			} );
 
-			await jest.advanceTimersByTimeAsync( 0 );
+			await advancePollingTime( 0 );
 			onStatusChangeA.mockClear();
 			onStatusChangeB.mockClear();
 
@@ -862,7 +917,7 @@ describe( 'polling-manager', () => {
 				message: 'Protocol version mismatch',
 			} );
 
-			await jest.advanceTimersByTimeAsync( 4000 );
+			await advancePollingTime( 4000 );
 
 			expect( onStatusChangeA ).toHaveBeenCalledWith( {
 				status: 'disconnected',
@@ -887,11 +942,11 @@ describe( 'polling-manager', () => {
 				room: 'test-room',
 				doc: createMockDoc( 1 ),
 				awareness: createMockAwareness(),
-				log: jest.fn(),
-				onStatusChange: jest.fn(),
+				log: vi.fn(),
+				onStatusChange: vi.fn(),
 			} );
 
-			await jest.advanceTimersByTimeAsync( 0 );
+			await advancePollingTime( 0 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
 
 			// Second poll: protocol mismatch.
@@ -899,12 +954,12 @@ describe( 'polling-manager', () => {
 				code: 'rest_sync_protocol_mismatch',
 			} );
 
-			await jest.advanceTimersByTimeAsync( 4000 );
+			await advancePollingTime( 4000 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
 
 			// Wait a long time — no further polls should occur (return stops scheduling).
 			mockPostSyncUpdate.mockResolvedValue( syncResponse );
-			await jest.advanceTimersByTimeAsync( 60000 );
+			await advancePollingTime( 60000 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
 		} );
 
@@ -915,18 +970,18 @@ describe( 'polling-manager', () => {
 				room: 'test-room',
 				doc: createMockDoc( 1 ),
 				awareness: createMockAwareness(),
-				log: jest.fn(),
-				onStatusChange: jest.fn(),
+				log: vi.fn(),
+				onStatusChange: vi.fn(),
 			} );
 
-			await jest.advanceTimersByTimeAsync( 0 );
+			await advancePollingTime( 0 );
 			mockPostSyncUpdateNonBlocking.mockClear();
 
 			mockPostSyncUpdate.mockRejectedValueOnce( {
 				code: 'rest_sync_protocol_mismatch',
 			} );
 
-			await jest.advanceTimersByTimeAsync( 4000 );
+			await advancePollingTime( 4000 );
 
 			expect( mockPostSyncUpdateNonBlocking ).not.toHaveBeenCalled();
 		} );
@@ -938,17 +993,17 @@ describe( 'polling-manager', () => {
 				room: 'test-room',
 				doc: createMockDoc( 1 ),
 				awareness: createMockAwareness(),
-				log: jest.fn(),
-				onStatusChange: jest.fn(),
+				log: vi.fn(),
+				onStatusChange: vi.fn(),
 			} );
 
-			await jest.advanceTimersByTimeAsync( 0 );
+			await advancePollingTime( 0 );
 
 			mockPostSyncUpdate.mockRejectedValueOnce( {
 				code: 'rest_sync_protocol_mismatch',
 			} );
 
-			await jest.advanceTimersByTimeAsync( 4000 );
+			await advancePollingTime( 4000 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
 
 			// Register a new room. If isPolling weren't reset, this would
@@ -959,11 +1014,11 @@ describe( 'polling-manager', () => {
 				room: 'new-room',
 				doc: createMockDoc( 3 ),
 				awareness: createMockAwareness(),
-				log: jest.fn(),
-				onStatusChange: jest.fn(),
+				log: vi.fn(),
+				onStatusChange: vi.fn(),
 			} );
 
-			await jest.advanceTimersByTimeAsync( 0 );
+			await advancePollingTime( 0 );
 
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
 			const lastPayload = mockPostSyncUpdate.mock.calls[ 2 ][ 0 ];
@@ -975,24 +1030,24 @@ describe( 'polling-manager', () => {
 			// First poll succeeds.
 			mockPostSyncUpdate.mockResolvedValueOnce( syncResponse );
 
-			const onStatusChange = jest.fn();
+			const onStatusChange = vi.fn();
 
 			pollingManager.registerRoom( {
 				room: 'test-room',
 				doc: createMockDoc( 1 ),
 				awareness: createMockAwareness(),
-				log: jest.fn(),
+				log: vi.fn(),
 				onStatusChange,
 			} );
 
-			await jest.advanceTimersByTimeAsync( 0 );
+			await advancePollingTime( 0 );
 
 			// Protocol mismatch — should return early without touching backoff.
 			mockPostSyncUpdate.mockRejectedValueOnce( {
 				code: 'rest_sync_protocol_mismatch',
 			} );
 
-			await jest.advanceTimersByTimeAsync( 4000 );
+			await advancePollingTime( 4000 );
 
 			// The error should be protocol-mismatch, not unknown-error
 			// (which would indicate the generic catch handler ran).
@@ -1027,20 +1082,20 @@ describe( 'polling-manager', () => {
 					room: `room-${ i }`,
 					doc,
 					awareness: createMockAwareness(),
-					log: jest.fn(),
-					onStatusChange: jest.fn(),
+					log: vi.fn(),
+					onStatusChange: vi.fn(),
 				} );
 			}
 
 			// First poll includes the primary room and detects a collaborator,
 			// which resumes all queues.
-			await jest.advanceTimersByTimeAsync( 0 );
+			await advancePollingTime( 0 );
 
 			docs.forEach( ( doc ) => {
 				getOnDocUpdate( doc )( new Uint8Array( 8 ), 'user' );
 			} );
 
-			await jest.advanceTimersByTimeAsync( 1000 );
+			await advancePollingTime( 1000 );
 
 			const secondCallPayload = mockPostSyncUpdate.mock
 				.calls[ 1 ][ 0 ] as {
@@ -1054,7 +1109,7 @@ describe( 'polling-manager', () => {
 				0
 			);
 
-			await jest.advanceTimersByTimeAsync( 1000 );
+			await advancePollingTime( 1000 );
 
 			const thirdCallPayload = mockPostSyncUpdate.mock
 				.calls[ 2 ][ 0 ] as {
@@ -1089,11 +1144,11 @@ describe( 'polling-manager', () => {
 				room: 'test-room',
 				doc,
 				awareness: createMockAwareness(),
-				log: jest.fn(),
-				onStatusChange: jest.fn(),
+				log: vi.fn(),
+				onStatusChange: vi.fn(),
 			} );
 
-			await jest.advanceTimersByTimeAsync( 0 );
+			await advancePollingTime( 0 );
 
 			getOnDocUpdate( doc )( new Uint8Array( [ 1, 2, 3 ] ), 'user' );
 
@@ -1102,7 +1157,7 @@ describe( 'polling-manager', () => {
 				message: 'Request body is too large.',
 				data: { status: 413 },
 			} );
-			await jest.advanceTimersByTimeAsync( 1000 );
+			await advancePollingTime( 1000 );
 
 			const failedPayload = mockPostSyncUpdate.mock.calls[ 1 ][ 0 ] as {
 				rooms: Array< {
@@ -1116,7 +1171,7 @@ describe( 'polling-manager', () => {
 			mockPostSyncUpdate.mockResolvedValueOnce(
 				responseWithCollaborator
 			);
-			await jest.advanceTimersByTimeAsync( 1000 );
+			await advancePollingTime( 1000 );
 
 			const retryPayload = mockPostSyncUpdate.mock.calls[ 2 ][ 0 ] as {
 				rooms: Array< {
@@ -1155,12 +1210,12 @@ describe( 'polling-manager', () => {
 				room: 'test-room',
 				doc,
 				awareness: createMockAwareness(),
-				log: jest.fn(),
-				onStatusChange: jest.fn(),
+				log: vi.fn(),
+				onStatusChange: vi.fn(),
 			} );
 
 			// Flush the initial poll (queue is paused, so no updates sent).
-			await jest.advanceTimersByTimeAsync( 0 );
+			await advancePollingTime( 0 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
 
 			// Add a document update (queue is now resumed due to collaborators).
@@ -1169,7 +1224,7 @@ describe( 'polling-manager', () => {
 
 			// Second poll: fail with a network error.
 			mockPostSyncUpdate.mockRejectedValueOnce( new Error( 'timeout' ) );
-			await jest.advanceTimersByTimeAsync( 1000 );
+			await advancePollingTime( 1000 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
 
 			// Verify the second poll included the queued updates (sync_step1 + doc update).
@@ -1190,7 +1245,7 @@ describe( 'polling-manager', () => {
 			);
 
 			// First failure with collaborators: retry in 1000ms (schedule[0]).
-			await jest.advanceTimersByTimeAsync( 1000 );
+			await advancePollingTime( 1000 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
 
 			const thirdCallPayload = mockPostSyncUpdate.mock
@@ -1212,16 +1267,16 @@ describe( 'polling-manager', () => {
 				room: 'test-room',
 				doc: createMockDoc( 1 ),
 				awareness: createMockAwareness(),
-				log: jest.fn(),
-				onStatusChange: jest.fn(),
+				log: vi.fn(),
+				onStatusChange: vi.fn(),
 			} );
 
-			await jest.advanceTimersByTimeAsync( 0 );
+			await advancePollingTime( 0 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
 
 			// Second poll: fail (no updates were sent because queue is paused).
 			mockPostSyncUpdate.mockRejectedValueOnce( new Error( 'timeout' ) );
-			await jest.advanceTimersByTimeAsync( 4000 );
+			await advancePollingTime( 4000 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
 
 			// Verify no updates were sent on the failed poll.
@@ -1236,7 +1291,7 @@ describe( 'polling-manager', () => {
 			// Third poll: succeed — should still have no updates (no compaction queued).
 			// First failure solo: retry in 2000ms (schedule[0]).
 			mockPostSyncUpdate.mockResolvedValueOnce( syncResponse );
-			await jest.advanceTimersByTimeAsync( 2000 );
+			await advancePollingTime( 2000 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
 
 			const thirdCallPayload = mockPostSyncUpdate.mock
@@ -1260,8 +1315,8 @@ describe( 'polling-manager', () => {
 				room: 'test-room',
 				doc: createMockDoc(),
 				awareness: createMockAwareness(),
-				log: jest.fn(),
-				onStatusChange: jest.fn(),
+				log: vi.fn(),
+				onStatusChange: vi.fn(),
 			} );
 
 			// registerRoom → poll() → start() → postSyncUpdate (pending).
@@ -1282,12 +1337,12 @@ describe( 'polling-manager', () => {
 				room: 'test-room',
 				doc: createMockDoc(),
 				awareness: createMockAwareness(),
-				log: jest.fn(),
-				onStatusChange: jest.fn(),
+				log: vi.fn(),
+				onStatusChange: vi.fn(),
 			} );
 
 			// Flush so the first poll completes and schedules a timeout.
-			await jest.advanceTimersByTimeAsync( 0 );
+			await advancePollingTime( 0 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
 
 			// Tab hidden → visible while a timeout is pending.
@@ -1295,7 +1350,7 @@ describe( 'polling-manager', () => {
 			simulateVisibilityChange( 'visible' );
 
 			// Should trigger an immediate repoll (not wait for timeout).
-			await jest.advanceTimersByTimeAsync( 0 );
+			await advancePollingTime( 0 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
 		} );
 	} );
@@ -1321,24 +1376,24 @@ describe( 'polling-manager', () => {
 			};
 			mockPostSyncUpdate.mockResolvedValueOnce( twoRoomResponse );
 
-			const onStatusChangeA = jest.fn();
-			const onStatusChangeB = jest.fn();
+			const onStatusChangeA = vi.fn();
+			const onStatusChangeB = vi.fn();
 			pollingManager.registerRoom( {
 				room: 'test-room',
 				doc: createMockDoc( 1 ),
 				awareness: createMockAwareness(),
-				log: jest.fn(),
+				log: vi.fn(),
 				onStatusChange: onStatusChangeA,
 			} );
 			pollingManager.registerRoom( {
 				room: 'other-room',
 				doc: createMockDoc( 2 ),
 				awareness: createMockAwareness(),
-				log: jest.fn(),
+				log: vi.fn(),
 				onStatusChange: onStatusChangeB,
 			} );
 
-			await jest.advanceTimersByTimeAsync( 0 );
+			await advancePollingTime( 0 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
 
 			// Second poll: 403 listing only test-room.
@@ -1348,7 +1403,7 @@ describe( 'polling-manager', () => {
 					'You do not have permission to sync one or more entities: test-room.',
 				data: { status: 403, rooms: [ 'test-room' ] },
 			} );
-			await jest.advanceTimersByTimeAsync( 4000 );
+			await advancePollingTime( 4000 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
 
 			// No error should be emitted — the room is silently removed.
@@ -1376,7 +1431,7 @@ describe( 'polling-manager', () => {
 					},
 				],
 			} );
-			await jest.advanceTimersByTimeAsync( 4000 );
+			await advancePollingTime( 4000 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
 		} );
 
@@ -1409,25 +1464,25 @@ describe( 'polling-manager', () => {
 				room: 'keep-room',
 				doc: keepDoc,
 				awareness: createMockAwareness(),
-				log: jest.fn(),
-				onStatusChange: jest.fn(),
+				log: vi.fn(),
+				onStatusChange: vi.fn(),
 			} );
 			pollingManager.registerRoom( {
 				room: 'forbidden-room-a',
 				doc: createMockDoc( 2 ),
 				awareness: createMockAwareness(),
-				log: jest.fn(),
-				onStatusChange: jest.fn(),
+				log: vi.fn(),
+				onStatusChange: vi.fn(),
 			} );
 			pollingManager.registerRoom( {
 				room: 'forbidden-room-b',
 				doc: createMockDoc( 3 ),
 				awareness: createMockAwareness(),
-				log: jest.fn(),
-				onStatusChange: jest.fn(),
+				log: vi.fn(),
+				onStatusChange: vi.fn(),
 			} );
 
-			await jest.advanceTimersByTimeAsync( 0 );
+			await advancePollingTime( 0 );
 
 			const onDocUpdate = getOnDocUpdate( keepDoc );
 			onDocUpdate( new Uint8Array( [ 1, 2, 3 ] ), 'local-origin' );
@@ -1441,7 +1496,7 @@ describe( 'polling-manager', () => {
 					rooms: [ 'forbidden-room-a', 'forbidden-room-b' ],
 				},
 			} );
-			await jest.advanceTimersByTimeAsync( 1000 );
+			await advancePollingTime( 1000 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
 
 			const failedPayload = mockPostSyncUpdate.mock.calls[ 1 ][ 0 ];
@@ -1460,7 +1515,7 @@ describe( 'polling-manager', () => {
 					},
 				],
 			} );
-			await jest.advanceTimersByTimeAsync( 1000 );
+			await advancePollingTime( 1000 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
 
 			const retryPayload = mockPostSyncUpdate.mock.calls[ 2 ][ 0 ];
@@ -1489,20 +1544,20 @@ describe( 'polling-manager', () => {
 				room: 'primary',
 				doc: primaryDoc,
 				awareness: createMockAwareness(),
-				log: jest.fn(),
-				onStatusChange: jest.fn(),
+				log: vi.fn(),
+				onStatusChange: vi.fn(),
 			} );
 			for ( let i = 1; i <= 10; i++ ) {
 				pollingManager.registerRoom( {
 					room: `overflow-${ i }`,
 					doc: createMockDoc( i + 1 ),
 					awareness: createMockAwareness(),
-					log: jest.fn(),
-					onStatusChange: jest.fn(),
+					log: vi.fn(),
+					onStatusChange: vi.fn(),
 				} );
 			}
 
-			await jest.advanceTimersByTimeAsync( 0 );
+			await advancePollingTime( 0 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
 
 			const onPrimaryDocUpdate = getOnDocUpdate( primaryDoc );
@@ -1517,7 +1572,7 @@ describe( 'polling-manager', () => {
 					rooms: [ 'overflow-1', 'overflow-10' ],
 				},
 			} );
-			await jest.advanceTimersByTimeAsync( 1000 );
+			await advancePollingTime( 1000 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
 
 			const failedPayload = mockPostSyncUpdate.mock.calls[ 1 ][ 0 ] as {
@@ -1543,7 +1598,7 @@ describe( 'polling-manager', () => {
 			expect( failedPrimaryRoom!.updates.length ).toBeGreaterThan( 0 );
 
 			mockPostSyncUpdate.mockResolvedValueOnce( { rooms: [] } );
-			await jest.advanceTimersByTimeAsync( 1000 );
+			await advancePollingTime( 1000 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
 
 			const retryPayload = mockPostSyncUpdate.mock.calls[ 2 ][ 0 ] as {
@@ -1562,16 +1617,16 @@ describe( 'polling-manager', () => {
 		it( 'retries normally on a 401 (not treated as forbidden)', async () => {
 			mockPostSyncUpdate.mockResolvedValueOnce( syncResponse );
 
-			const onStatusChange = jest.fn();
+			const onStatusChange = vi.fn();
 			pollingManager.registerRoom( {
 				room: 'test-room',
 				doc: createMockDoc( 1 ),
 				awareness: createMockAwareness(),
-				log: jest.fn(),
+				log: vi.fn(),
 				onStatusChange,
 			} );
 
-			await jest.advanceTimersByTimeAsync( 0 );
+			await advancePollingTime( 0 );
 
 			// Fail with a 401 — should go through normal retry path.
 			mockPostSyncUpdate.mockRejectedValueOnce( {
@@ -1579,7 +1634,7 @@ describe( 'polling-manager', () => {
 				message: 'You are not currently logged in.',
 				data: { status: 401 },
 			} );
-			await jest.advanceTimersByTimeAsync( 4000 );
+			await advancePollingTime( 4000 );
 
 			// Should emit a disconnected status (normal error handling).
 			expect( onStatusChange ).toHaveBeenCalledWith(
@@ -1591,7 +1646,7 @@ describe( 'polling-manager', () => {
 
 			// Should retry after backoff (2000ms for solo first failure).
 			mockPostSyncUpdate.mockResolvedValueOnce( syncResponse );
-			await jest.advanceTimersByTimeAsync( 2000 );
+			await advancePollingTime( 2000 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
 		} );
 
@@ -1602,22 +1657,22 @@ describe( 'polling-manager', () => {
 				room: 'test-room',
 				doc: createMockDoc( 1 ),
 				awareness: createMockAwareness(),
-				log: jest.fn(),
-				onStatusChange: jest.fn(),
+				log: vi.fn(),
+				onStatusChange: vi.fn(),
 			} );
 
-			await jest.advanceTimersByTimeAsync( 0 );
+			await advancePollingTime( 0 );
 
 			// Fail with a generic network error (no data.status).
 			mockPostSyncUpdate.mockRejectedValueOnce(
 				new Error( 'Network error' )
 			);
-			await jest.advanceTimersByTimeAsync( 4000 );
+			await advancePollingTime( 4000 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
 
 			// Should retry after backoff (2000ms for solo first failure).
 			mockPostSyncUpdate.mockResolvedValueOnce( syncResponse );
-			await jest.advanceTimersByTimeAsync( 2000 );
+			await advancePollingTime( 2000 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
 		} );
 
@@ -1628,11 +1683,11 @@ describe( 'polling-manager', () => {
 				room: 'test-room',
 				doc: createMockDoc( 1 ),
 				awareness: createMockAwareness(),
-				log: jest.fn(),
-				onStatusChange: jest.fn(),
+				log: vi.fn(),
+				onStatusChange: vi.fn(),
 			} );
 
-			await jest.advanceTimersByTimeAsync( 0 );
+			await advancePollingTime( 0 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
 
 			// Next poll: 403 listing the only registered room.
@@ -1642,7 +1697,7 @@ describe( 'polling-manager', () => {
 					'You do not have permission to sync one or more entities: test-room.',
 				data: { status: 403, rooms: [ 'test-room' ] },
 			} );
-			await jest.advanceTimersByTimeAsync( 4000 );
+			await advancePollingTime( 4000 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
 
 			// The server already denied the sync request, so our awareness
@@ -1657,11 +1712,11 @@ describe( 'polling-manager', () => {
 				room: 'test-room',
 				doc: createMockDoc( 1 ),
 				awareness: createMockAwareness(),
-				log: jest.fn(),
-				onStatusChange: jest.fn(),
+				log: vi.fn(),
+				onStatusChange: vi.fn(),
 			} );
 
-			await jest.advanceTimersByTimeAsync( 0 );
+			await advancePollingTime( 0 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
 
 			// Next poll: a generic 403 without room details.
@@ -1671,7 +1726,7 @@ describe( 'polling-manager', () => {
 				message: 'You do not have permission to perform this action.',
 				data: { status: 403 },
 			} );
-			await jest.advanceTimersByTimeAsync( 4000 );
+			await advancePollingTime( 4000 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
 
 			// Register a brand-new room. This should kick off a fresh poll
@@ -1691,11 +1746,11 @@ describe( 'polling-manager', () => {
 				room: 'new-room',
 				doc: createMockDoc( 2 ),
 				awareness: createMockAwareness(),
-				log: jest.fn(),
-				onStatusChange: jest.fn(),
+				log: vi.fn(),
+				onStatusChange: vi.fn(),
 			} );
 
-			await jest.advanceTimersByTimeAsync( 0 );
+			await advancePollingTime( 0 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
 		} );
 	} );
@@ -1716,8 +1771,8 @@ describe( 'polling-manager', () => {
 				room,
 				doc: createMockDoc( 1 ),
 				awareness: createMockAwareness(),
-				log: jest.fn(),
-				onStatusChange: jest.fn(),
+				log: vi.fn(),
+				onStatusChange: vi.fn(),
 			} );
 		}
 
@@ -1748,8 +1803,8 @@ describe( 'polling-manager', () => {
 			// Primary + 9 overflow = 10 rooms, exactly at the cap.
 			const overflow = registerPrimaryAndOverflow( pollingManager, 9 );
 
-			await jest.advanceTimersByTimeAsync( 0 );
-			await jest.advanceTimersByTimeAsync( 4000 );
+			await advancePollingTime( 0 );
+			await advancePollingTime( 4000 );
 
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
 
@@ -1767,9 +1822,9 @@ describe( 'polling-manager', () => {
 			// Primary + 11 overflow = 12 rooms, over the cap of 10.
 			registerPrimaryAndOverflow( pollingManager, 11 );
 
-			await jest.advanceTimersByTimeAsync( 0 );
-			await jest.advanceTimersByTimeAsync( 4000 );
-			await jest.advanceTimersByTimeAsync( 4000 );
+			await advancePollingTime( 0 );
+			await advancePollingTime( 4000 );
+			await advancePollingTime( 4000 );
 
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
 
@@ -1792,9 +1847,9 @@ describe( 'polling-manager', () => {
 			// enough to cover every overflow room at least once.
 			const overflow = registerPrimaryAndOverflow( pollingManager, 15 );
 
-			await jest.advanceTimersByTimeAsync( 0 );
-			await jest.advanceTimersByTimeAsync( 4000 );
-			await jest.advanceTimersByTimeAsync( 4000 );
+			await advancePollingTime( 0 );
+			await advancePollingTime( 4000 );
+			await advancePollingTime( 4000 );
 
 			const overflowSeen = new Set< string >();
 			// Skip poll 0 (primary only); inspect rotation polls.
@@ -1815,9 +1870,9 @@ describe( 'polling-manager', () => {
 			// Primary + 11 overflow rooms, 9 slots per request.
 			registerPrimaryAndOverflow( pollingManager, 11 );
 
-			await jest.advanceTimersByTimeAsync( 0 );
-			await jest.advanceTimersByTimeAsync( 4000 );
-			await jest.advanceTimersByTimeAsync( 4000 );
+			await advancePollingTime( 0 );
+			await advancePollingTime( 4000 );
+			await advancePollingTime( 4000 );
 
 			// Compare the two rotation polls (poll 0 is primary-only).
 			const first = getRoomNames( 1 ).slice( 1 );
@@ -1830,19 +1885,20 @@ describe( 'polling-manager', () => {
 		} );
 
 		it( 'advances the rotation window even when a poll fails', async () => {
+			mockPostSyncUpdate.mockResolvedValueOnce( { rooms: [] } );
+
 			// Primary + 11 overflow rooms, 9 slots per request.
 			registerPrimaryAndOverflow( pollingManager, 11 );
 
 			// Poll 1: primary only (fires synchronously at registration).
-			mockPostSyncUpdate.mockResolvedValueOnce( { rooms: [] } );
-			await jest.advanceTimersByTimeAsync( 0 );
+			await advancePollingTime( 0 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
 			expect( getRoomNames( 0 ) ).toEqual( [ 'primary' ] );
 
 			// Poll 2 fails while sending primary + 9 overflow. The
 			// rotation offset should still advance past this window.
 			mockPostSyncUpdate.mockRejectedValueOnce( new Error( 'network' ) );
-			await jest.advanceTimersByTimeAsync( 4000 );
+			await advancePollingTime( 4000 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
 
 			const failedSent = getRoomNames( 1 );
@@ -1852,7 +1908,7 @@ describe( 'polling-manager', () => {
 			// Poll 3 retries after the failure and should send a different
 			// overflow slice, proving the offset advanced despite the error.
 			mockPostSyncUpdate.mockResolvedValueOnce( { rooms: [] } );
-			await jest.advanceTimersByTimeAsync( 2000 );
+			await advancePollingTime( 2000 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
 
 			const retrySent = getRoomNames( 2 );
@@ -1869,7 +1925,7 @@ describe( 'polling-manager', () => {
 
 			// Flush the initial poll so the pagehide test observes
 			// postSyncUpdateNonBlocking calls from the page-hide handler only.
-			await jest.advanceTimersByTimeAsync( 0 );
+			await advancePollingTime( 0 );
 			mockPostSyncUpdateNonBlocking.mockClear();
 
 			window.dispatchEvent( new Event( 'pagehide' ) );

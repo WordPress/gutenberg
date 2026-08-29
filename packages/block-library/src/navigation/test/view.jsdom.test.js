@@ -1,7 +1,9 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 let mockRegisteredStore;
 let mockCurrentContext;
 
-jest.mock( '@wordpress/interactivity', () => ( {
+vi.mock( import( '@wordpress/interactivity' ), () => ( {
 	store: ( name, config ) => {
 		mockRegisteredStore = config;
 		return config;
@@ -13,7 +15,7 @@ jest.mock( '@wordpress/interactivity', () => ( {
 
 describe( 'Navigation view script', () => {
 	beforeEach( async () => {
-		jest.resetModules();
+		vi.resetModules();
 		mockRegisteredStore = null;
 		mockCurrentContext = null;
 		// Import the view.js script to register the store

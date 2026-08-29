@@ -1,3 +1,11 @@
+import {
+	afterEach,
+	describe,
+	expect,
+	it,
+	vi,
+	type MockedFunction,
+} from 'vitest';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useFocusReturn } from '@wordpress/compose';
@@ -13,12 +21,16 @@ import type { ReactNode } from 'react';
 import * as Menu from '../index';
 import { useEnableWpCompatOverlaySlot } from '../../utils/use-enable-wp-compat-overlay-slot';
 
-jest.mock( '@wordpress/i18n', () => ( {
-	...jest.requireActual( '@wordpress/i18n' ),
-	isRTL: jest.fn( () => false ),
+vi.mock( import( '@wordpress/i18n' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	isRTL: vi.fn( () => false ),
 } ) );
 
-const mockedIsRTL = isRTL as jest.MockedFunction< typeof isRTL >;
+const mockedIsRTL = isRTL as MockedFunction< typeof isRTL >;
+
+globalThis.wpVitest.mockPointerEvent();
+globalThis.wpVitest.mockScrollIntoView();
+globalThis.wpVitest.mockVisibleElements();
 
 afterEach( () => {
 	mockedIsRTL.mockClear();
@@ -197,7 +209,7 @@ describe( 'Menu', () => {
 
 	it( 'closes a non-modal menu without consuming an iframe pointer interaction', async () => {
 		const user = userEvent.setup();
-		const onCanvasClick = jest.fn();
+		const onCanvasClick = vi.fn();
 
 		function ControlledMenuWithIframes() {
 			const [ open, setOpen ] = useState( false );
@@ -286,7 +298,7 @@ describe( 'Menu', () => {
 			throw new Error( 'Expected a nested same-origin iframe document.' );
 		}
 
-		const nestedAddEventListener = jest.spyOn(
+		const nestedAddEventListener = vi.spyOn(
 			nestedDocument,
 			'addEventListener'
 		);
@@ -318,10 +330,7 @@ describe( 'Menu', () => {
 		if ( ! iframeDocument ) {
 			throw new Error( 'Expected a same-origin iframe document.' );
 		}
-		const addEventListener = jest.spyOn(
-			iframeDocument,
-			'addEventListener'
-		);
+		const addEventListener = vi.spyOn( iframeDocument, 'addEventListener' );
 
 		try {
 			const outsideTarget = iframeDocument.createElement( 'button' );
@@ -449,19 +458,19 @@ describe( 'Menu', () => {
 			configurable: true,
 			get: () => iframeDocument,
 		} );
-		const firstAddEventListener = jest.spyOn(
+		const firstAddEventListener = vi.spyOn(
 			firstDocument,
 			'addEventListener'
 		);
-		const firstRemoveEventListener = jest.spyOn(
+		const firstRemoveEventListener = vi.spyOn(
 			firstDocument,
 			'removeEventListener'
 		);
-		const reloadedAddEventListener = jest.spyOn(
+		const reloadedAddEventListener = vi.spyOn(
 			reloadedDocument,
 			'addEventListener'
 		);
-		const reloadedRemoveEventListener = jest.spyOn(
+		const reloadedRemoveEventListener = vi.spyOn(
 			reloadedDocument,
 			'removeEventListener'
 		);
@@ -532,7 +541,7 @@ describe( 'Menu', () => {
 			configurable: true,
 			get: () => firstDocument,
 		} );
-		const firstRemoveEventListener = jest.spyOn(
+		const firstRemoveEventListener = vi.spyOn(
 			firstDocument,
 			'removeEventListener'
 		);
@@ -765,8 +774,8 @@ describe( 'Menu', () => {
 
 	it( 'renders checkbox and radio item roles', async () => {
 		const user = userEvent.setup();
-		const onCheckedChange = jest.fn();
-		const onValueChange = jest.fn();
+		const onCheckedChange = vi.fn();
+		const onValueChange = vi.fn();
 
 		render(
 			<Menu.Root>
@@ -859,7 +868,6 @@ describe( 'Menu', () => {
 				</Menu.Root>
 			)
 		).toThrow( 'Menu.ItemLabel must be the first direct child' );
-		// @ts-expect-error Provided by the @wordpress/jest-console environment.
 		expect( console ).toHaveErrored();
 	} );
 
@@ -878,7 +886,6 @@ describe( 'Menu', () => {
 				</Menu.Root>
 			)
 		).toThrow( 'Menu.ItemLabel must be the first direct child' );
-		// @ts-expect-error Provided by the @wordpress/jest-console environment.
 		expect( console ).toHaveErrored();
 	} );
 

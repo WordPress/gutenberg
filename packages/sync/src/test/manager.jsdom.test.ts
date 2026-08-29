@@ -3,13 +3,15 @@ import { Awareness } from 'y-protocols/awareness';
 import * as buffer from 'lib0/buffer';
 import * as fun from 'lib0/function';
 import {
+	afterEach,
+	beforeEach,
 	describe,
 	expect,
 	it,
-	jest,
-	beforeEach,
-	afterEach,
-} from '@jest/globals';
+	vi,
+	type Mock,
+	type Mocked,
+} from 'vitest';
 import { createSyncManager } from '../manager';
 import {
 	CRDT_RECORD_MAP_KEY,
@@ -30,21 +32,22 @@ import type {
 import { serializeCrdtDoc } from '../utils';
 
 // Mock dependencies.
-jest.mock( '../providers', () => ( {
-	getProviderCreators: jest.fn(),
+vi.mock( import( '../providers' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	getProviderCreators: vi.fn(),
 } ) );
-const mockGetProviderCreators = jest.mocked( getProviderCreators );
+const mockGetProviderCreators = vi.mocked( getProviderCreators );
 
 describe( 'SyncManager', () => {
-	let mockHandlers: jest.MockedObject< RecordHandlers >;
-	let mockProviderCreator: jest.Mock< ProviderCreator >;
+	let mockHandlers: Mocked< RecordHandlers >;
+	let mockProviderCreator: Mock< ProviderCreator >;
 	let mockProviderResult: ProviderCreatorResult;
 	let mockRecord: ObjectData;
-	let mockSyncConfig: jest.MockedObject< SyncConfig >;
+	let mockSyncConfig: Mocked< SyncConfig >;
 
 	beforeEach( () => {
 		// Reset all mocks
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 
 		mockRecord = {
 			id: '123',
@@ -53,17 +56,17 @@ describe( 'SyncManager', () => {
 		};
 
 		mockProviderResult = {
-			destroy: jest.fn(),
-			on: jest.fn(),
+			destroy: vi.fn(),
+			on: vi.fn(),
 		};
-		mockProviderCreator = jest.fn( () =>
+		mockProviderCreator = vi.fn( () =>
 			Promise.resolve( mockProviderResult )
 		);
 		mockGetProviderCreators.mockReturnValue( [ mockProviderCreator ] );
 
 		mockSyncConfig = {
-			applyChangesToCRDTDoc: jest.fn(),
-			getChangesFromCRDTDoc: jest.fn(
+			applyChangesToCRDTDoc: vi.fn(),
+			getChangesFromCRDTDoc: vi.fn(
 				( ydoc: CRDTDoc, editedRecord: ObjectData ) => {
 					const ymap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
 
@@ -79,27 +82,26 @@ describe( 'SyncManager', () => {
 					);
 				}
 			),
-			createAwareness: jest.fn(
-				( ydoc: Y.Doc ) => new Awareness( ydoc )
-			),
-			getPersistedCRDTDoc: jest.fn( () => null ),
+			createAwareness: vi.fn( ( ydoc: Y.Doc ) => new Awareness( ydoc ) ),
+			getPersistedCRDTDoc: vi.fn( () => null ),
+			shouldSync: undefined,
+			supportsPersistence: undefined,
 		};
 
 		mockHandlers = {
-			addUndoMeta: jest.fn(),
-			editRecord: jest.fn(),
-			getEditedRecord: jest.fn( async () =>
-				Promise.resolve( mockRecord )
-			),
-			onStatusChange: jest.fn(),
-			persistCRDTDoc: jest.fn(),
-			refetchRecord: jest.fn( async () => Promise.resolve() ),
-			restoreUndoMeta: jest.fn(),
+			addUndoMeta: vi.fn(),
+			editRecord: vi.fn(),
+			getEditedRecord: vi.fn( async () => Promise.resolve( mockRecord ) ),
+			onStatusChange: vi.fn(),
+			onUndoStackChange: undefined,
+			persistCRDTDoc: vi.fn(),
+			refetchRecord: vi.fn( async () => Promise.resolve() ),
+			restoreUndoMeta: vi.fn(),
 		};
 	} );
 
 	afterEach( () => {
-		jest.restoreAllMocks();
+		vi.restoreAllMocks();
 	} );
 
 	describe( 'load', () => {
@@ -222,7 +224,7 @@ describe( 'SyncManager', () => {
 		} );
 
 		it( 'only adds undo metadata for the entity that changed', async () => {
-			mockSyncConfig.applyChangesToCRDTDoc = jest.fn(
+			mockSyncConfig.applyChangesToCRDTDoc = vi.fn(
 				( ydoc: CRDTDoc, changes: Partial< ObjectData > ) => {
 					const recordMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
 					Object.entries( changes ).forEach( ( [ key, value ] ) => {
@@ -235,19 +237,19 @@ describe( 'SyncManager', () => {
 			const recordB = { id: '456', title: 'Post B', meta: {} };
 			const handlersA = {
 				...mockHandlers,
-				addUndoMeta: jest.fn(),
-				getEditedRecord: jest.fn( async () =>
+				addUndoMeta: vi.fn(),
+				getEditedRecord: vi.fn( async () =>
 					Promise.resolve( recordA )
 				),
-				restoreUndoMeta: jest.fn(),
+				restoreUndoMeta: vi.fn(),
 			};
 			const handlersB = {
 				...mockHandlers,
-				addUndoMeta: jest.fn(),
-				getEditedRecord: jest.fn( async () =>
+				addUndoMeta: vi.fn(),
+				getEditedRecord: vi.fn( async () =>
 					Promise.resolve( recordB )
 				),
-				restoreUndoMeta: jest.fn(),
+				restoreUndoMeta: vi.fn(),
 			};
 
 			const manager = createSyncManager();
@@ -333,7 +335,7 @@ describe( 'SyncManager', () => {
 			it( 'accepts a valid persisted CRDT doc without applying changes', async () => {
 				mockSyncConfig = {
 					...mockSyncConfig,
-					getPersistedCRDTDoc: jest.fn( () =>
+					getPersistedCRDTDoc: vi.fn( () =>
 						createPersistedCRDTDoc( mockRecord )
 					),
 				};
@@ -369,7 +371,7 @@ describe( 'SyncManager', () => {
 			it( 'applies a persisted CRDT doc with invalidated fields, then applies changes', async () => {
 				mockSyncConfig = {
 					...mockSyncConfig,
-					getPersistedCRDTDoc: jest.fn( () =>
+					getPersistedCRDTDoc: vi.fn( () =>
 						createPersistedCRDTDoc( {
 							...mockRecord,
 							title: 'Invalidated title from persisted CRDT doc',
@@ -453,7 +455,7 @@ describe( 'SyncManager', () => {
 
 			manager.unload( 'post', '123' );
 
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 
 			await manager.load(
 				mockSyncConfig,
@@ -494,7 +496,7 @@ describe( 'SyncManager', () => {
 			expect( mockProviderResult.destroy ).toHaveBeenCalledTimes( 1 );
 
 			// Should still be able to update the other entity
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 			manager.update( 'post', '456', { title: 'Updated' }, 'local' );
 
 			// Wait a tick for any async follow-up work.
@@ -578,7 +580,7 @@ describe( 'SyncManager', () => {
 			mockProviderCreator.mockImplementation( () =>
 				Promise.resolve( mockProviderResult )
 			);
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 
 			await manager.load(
 				mockSyncConfig,
@@ -614,7 +616,7 @@ describe( 'SyncManager', () => {
 				mockHandlers
 			);
 
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 
 			const changes = { title: 'Updated Title' };
 			manager.update( 'post', '123', changes, 'local-editor' );
@@ -654,7 +656,7 @@ describe( 'SyncManager', () => {
 			};
 			const syncConfig = {
 				...mockSyncConfig,
-				applyChangesToCRDTDoc: jest.fn(
+				applyChangesToCRDTDoc: vi.fn(
 					( ydoc: CRDTDoc, changes: Partial< ObjectData > ) => {
 						const recordMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
 						Object.entries( changes ).forEach(
@@ -667,8 +669,8 @@ describe( 'SyncManager', () => {
 			};
 			const handlers = {
 				...mockHandlers,
-				editRecord: jest.fn(),
-				getEditedRecord: jest.fn( async () =>
+				editRecord: vi.fn(),
+				getEditedRecord: vi.fn( async () =>
 					Promise.resolve( editedRecord )
 				),
 			};
@@ -731,7 +733,7 @@ describe( 'SyncManager', () => {
 				mockHandlers
 			);
 
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 
 			manager.update(
 				'post',
@@ -762,7 +764,7 @@ describe( 'SyncManager', () => {
 				mockHandlers
 			);
 
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 
 			// With no remote peers present, the first update is deferred.
 			manager.update(
@@ -839,7 +841,7 @@ describe( 'SyncManager', () => {
 			expect( capturedDoc ).not.toBeNull();
 
 			// Spy on transact to verify origin is passed
-			const transactSpy = jest.spyOn(
+			const transactSpy = vi.spyOn(
 				capturedDoc as unknown as Y.Doc,
 				'transact'
 			);
@@ -876,7 +878,7 @@ describe( 'SyncManager', () => {
 				mockHandlers
 			);
 
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 
 			const changes = { title: 'Updated Title' };
 			const now = Date.now();
@@ -946,7 +948,7 @@ describe( 'SyncManager', () => {
 		it( 'includes updates issued in the same tick in the snapshot', async () => {
 			const { manager } = await loadEntityCapturingDoc();
 
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 			mockSyncConfig.applyChangesToCRDTDoc.mockImplementation(
 				( ydoc, changes ) => {
 					const recordMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
@@ -1030,7 +1032,7 @@ describe( 'SyncManager', () => {
 		it( 'skips loading entity when shouldSync returns false', async () => {
 			const manager = createSyncManager();
 
-			mockSyncConfig.shouldSync = jest.fn( () => false );
+			mockSyncConfig.shouldSync = vi.fn( () => false );
 
 			await manager.load(
 				mockSyncConfig,
@@ -1053,7 +1055,7 @@ describe( 'SyncManager', () => {
 		it( 'loads entity when shouldSync returns true', async () => {
 			const manager = createSyncManager();
 
-			mockSyncConfig.shouldSync = jest.fn( () => true );
+			mockSyncConfig.shouldSync = vi.fn( () => true );
 
 			await manager.load(
 				mockSyncConfig,
@@ -1095,11 +1097,11 @@ describe( 'SyncManager', () => {
 		it( 'skips loading collection when shouldSync returns false', async () => {
 			const manager = createSyncManager();
 
-			mockSyncConfig.shouldSync = jest.fn( () => false );
+			mockSyncConfig.shouldSync = vi.fn( () => false );
 
 			const mockCollectionHandlers = {
-				onStatusChange: jest.fn(),
-				refetchRecords: jest.fn( async () => Promise.resolve() ),
+				onStatusChange: vi.fn(),
+				refetchRecords: vi.fn( async () => Promise.resolve() ),
 			};
 
 			await manager.loadCollection(
@@ -1118,11 +1120,11 @@ describe( 'SyncManager', () => {
 		it( 'loads collection when shouldSync returns true', async () => {
 			const manager = createSyncManager();
 
-			mockSyncConfig.shouldSync = jest.fn( () => true );
+			mockSyncConfig.shouldSync = vi.fn( () => true );
 
 			const mockCollectionHandlers = {
-				onStatusChange: jest.fn(),
-				refetchRecords: jest.fn( async () => Promise.resolve() ),
+				onStatusChange: vi.fn(),
+				refetchRecords: vi.fn( async () => Promise.resolve() ),
 			};
 
 			await manager.loadCollection(
@@ -1144,8 +1146,8 @@ describe( 'SyncManager', () => {
 			delete mockSyncConfig.shouldSync;
 
 			const mockCollectionHandlers = {
-				onStatusChange: jest.fn(),
-				refetchRecords: jest.fn( async () => Promise.resolve() ),
+				onStatusChange: vi.fn(),
+				refetchRecords: vi.fn( async () => Promise.resolve() ),
 			};
 
 			await manager.loadCollection(
@@ -1267,7 +1269,7 @@ describe( 'SyncManager', () => {
 			const recordMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
 
 			// Clear previous calls
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 
 			// Simulate a local update with sync manager origin
 			ydoc.transact( () => {
