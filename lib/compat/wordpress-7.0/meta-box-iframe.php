@@ -59,43 +59,6 @@ function gutenberg_meta_box_iframe_locations() {
 }
 
 /**
- * Removes the locations other iframes render, and back-compat boxes,
- * which `do_meta_boxes()` only skips on block editor screens.
- */
-function gutenberg_meta_box_iframe_remove_other_boxes() {
-	global $wp_meta_boxes;
-
-	if ( ! gutenberg_is_meta_box_iframe_request() || ! is_array( $wp_meta_boxes ) ) {
-		return;
-	}
-
-	$rendered_locations = gutenberg_meta_box_iframe_locations();
-
-	foreach ( $wp_meta_boxes as $screen_id => $locations ) {
-		foreach ( $locations as $location => $priorities ) {
-			if ( ! in_array( $location, $rendered_locations, true ) ) {
-				unset( $wp_meta_boxes[ $screen_id ][ $location ] );
-				continue;
-			}
-			foreach ( $priorities as $priority => $boxes ) {
-				if ( ! is_array( $boxes ) ) {
-					continue;
-				}
-				foreach ( $boxes as $box_id => $box ) {
-					if (
-						is_array( $box ) &&
-						! empty( $box['args']['__back_compat_meta_box'] )
-					) {
-						unset( $wp_meta_boxes[ $screen_id ][ $location ][ $priority ][ $box_id ] );
-					}
-				}
-			}
-		}
-	}
-}
-add_action( 'add_meta_boxes', 'gutenberg_meta_box_iframe_remove_other_boxes', PHP_INT_MAX );
-
-/**
  * Skips rendering the meta boxes on the block editor page; the iframes
  * render them. The listing core would have computed from this array is
  * dispatched from the footer, after core dispatches the empty one.
@@ -180,6 +143,10 @@ function gutenberg_meta_box_iframe_render_page( $replace, $post ) {
 		return true;
 	}
 
+	// As on the block editor page, so plugins register the same boxes and
+	// do_meta_boxes() skips the boxes the block editor replaces.
+	get_current_screen()->is_block_editor( true );
+
 	require_once ABSPATH . 'wp-admin/includes/meta-boxes.php';
 	register_and_do_post_meta_boxes( $post );
 
@@ -194,10 +161,16 @@ function gutenberg_meta_box_iframe_render_page( $replace, $post ) {
 		<button type="submit" id="gutenberg-meta-box-submitter" formnovalidate hidden></button>
 		<?php
 		the_block_editor_meta_box_post_form_hidden_fields( $post );
-		foreach ( gutenberg_meta_box_iframe_locations() as $location ) {
-			do_meta_boxes( get_current_screen(), $location, $post );
-		}
 		?>
+		<div id="poststuff" class="sidebar-open">
+			<div id="postbox-container-2" class="postbox-container">
+				<?php
+				foreach ( gutenberg_meta_box_iframe_locations() as $location ) {
+					do_meta_boxes( get_current_screen(), $location, $post );
+				}
+				?>
+			</div>
+		</div>
 	</form>
 	<?php
 	iframe_footer();
@@ -217,6 +190,13 @@ function gutenberg_meta_box_iframe_print_styles() {
 	<style id="gutenberg-meta-box-iframe-styles">
 		body.iframe {
 			margin: 12px;
+		}
+		#poststuff {
+			padding-top: 0;
+			min-width: 0;
+		}
+		.postbox-container {
+			float: none;
 		}
 		.meta-box-sortables {
 			min-height: 0 !important;
