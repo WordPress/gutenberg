@@ -268,3 +268,154 @@ const partialRight =
 const walkToStart = partialRight( walkToBoundary, 'backwards' );
 
 const walkToEnd = partialRight( walkToBoundary, 'forwards' );
+
+/**
+ * @typedef {import('@wordpress/rich-text').RichTextValue} RichTextValue
+ */
+
+/**
+ * Whether the value includes inline object replacements such as images.
+ *
+ * @param {RichTextValue} value The value to check.
+ * @return {boolean} True when inline replacements exist.
+ */
+export function hasInlineReplacements( value ) {
+	return value.replacements?.some( Boolean ) ?? false;
+}
+
+/**
+ * @param {RichTextValue} value The rich text value to parse.
+ * @return {Array<{ type: 'text', content: string } | { type: 'replacement', replacement: *, format: * }>} Segments.
+ */
+function getLinkContentSegments( value ) {
+	const { text, formats, replacements } = value;
+	const segments = [];
+	let textBuffer = '';
+
+	for ( let index = 0; index < text.length; index++ ) {
+		if ( replacements[ index ] ) {
+			if ( textBuffer ) {
+				segments.push( { type: 'text', content: textBuffer } );
+				textBuffer = '';
+			}
+
+			segments.push( {
+				type: 'replacement',
+				replacement: replacements[ index ],
+				format: formats[ index ],
+				character: text[ index ],
+			} );
+			continue;
+		}
+
+		textBuffer += text[ index ];
+	}
+
+	if ( textBuffer ) {
+		segments.push( { type: 'text', content: textBuffer } );
+	}
+
+	return segments;
+}
+
+/**
+ * Builds a RichTextValue from editable link title text while preserving inline
+ * object replacements within the original linked content.
+ *
+ * @param {RichTextValue} sourceValue  The linked rich text slice.
+ * @param {string}        displayTitle The title shown in the Link UI.
+ * @return {Pick<RichTextValue, 'text' | 'formats' | 'replacements'>} The rebuilt value.
+ */
+export function createLinkTextValueFromDisplayTitle(
+	sourceValue,
+	displayTitle
+) {
+	const { formats, replacements, text } = sourceValue;
+
+	if ( ! hasInlineReplacements( sourceValue ) ) {
+		return {
+			text: displayTitle,
+			formats: [],
+			replacements: [],
+		};
+	}
+
+	const segments = getLinkContentSegments( sourceValue );
+	const textSegments = segments.filter(
+		( segment ) => segment.type === 'text'
+	);
+	const originalDisplay = textSegments
+		.map( ( segment ) => segment.content )
+		.join( '' );
+
+	if ( displayTitle === originalDisplay ) {
+		return {
+			text,
+			formats,
+			replacements,
+		};
+	}
+
+	if ( originalDisplay.length === 0 && displayTitle.length > 0 ) {
+		const prependFormats = Array( displayTitle.length );
+		const prependReplacements = Array( displayTitle.length );
+
+		return {
+			text: displayTitle + text,
+			formats: prependFormats.concat( formats ),
+			replacements: prependReplacements.concat( replacements ),
+		};
+	}
+
+	const firstSegment = segments[ 0 ];
+	const trailingText = textSegments.at( -1 )?.content ?? '';
+	let updatedLeadingText = displayTitle;
+	let updatedTrailingText = '';
+
+	if ( textSegments.length > 1 ) {
+		updatedTrailingText = trailingText;
+		updatedLeadingText = displayTitle.slice(
+			0,
+			displayTitle.length - trailingText.length
+		);
+	} else if ( firstSegment.type === 'replacement' ) {
+		updatedLeadingText = '';
+		updatedTrailingText = displayTitle;
+	}
+
+	let textSegmentIndex = 0;
+	let newText = '';
+	const newFormats = [];
+	const newReplacements = [];
+
+	for ( const segment of segments ) {
+		if ( segment.type === 'text' ) {
+			let updatedText = segment.content;
+
+			if ( textSegmentIndex === 0 ) {
+				updatedText = updatedLeadingText;
+			} else if ( textSegmentIndex === textSegments.length - 1 ) {
+				updatedText = updatedTrailingText;
+			}
+
+			for ( let index = 0; index < updatedText.length; index++ ) {
+				newText += updatedText[ index ];
+				newFormats.push( undefined );
+				newReplacements.push( undefined );
+			}
+
+			textSegmentIndex++;
+			continue;
+		}
+
+		newText += segment.character;
+		newFormats.push( segment.format );
+		newReplacements.push( segment.replacement );
+	}
+
+	return {
+		text: newText,
+		formats: newFormats,
+		replacements: newReplacements,
+	};
+}
