@@ -3,6 +3,7 @@ import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { createSlotFill } from '@wordpress/components';
+// @ts-expect-error No exported types
 import { useStyleOverride } from '@wordpress/block-editor';
 import { Notes } from './notes';
 import { store as editorStore } from '../../store';
