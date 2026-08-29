@@ -5,6 +5,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { video as videoIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import { companionUrl } from './companion-url';
 
 type VideoAttachment = {
 	source_url?: string;
@@ -21,19 +22,6 @@ type VideoOriginalControlProps = {
 	};
 	setAttributes: ( attributes: { src: string } ) => void;
 };
-
-/**
- * Builds the URL of a companion file stored next to the attachment's original.
- *
- * @param sourceUrl Attachment source URL.
- * @param basename  Companion file basename.
- *
- * @return Absolute companion URL.
- */
-function companionUrl( sourceUrl: string, basename: string ): string {
-	const dir = sourceUrl.slice( 0, sourceUrl.lastIndexOf( '/' ) + 1 );
-	return dir + basename;
-}
 
 /**
  * Toolbar control that toggles a video block between the web-safe transcoded

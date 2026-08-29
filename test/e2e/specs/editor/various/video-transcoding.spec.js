@@ -202,4 +202,50 @@ test.describe( 'Video transcoding: web-safe conversion', () => {
 		);
 		expect( originalSrc ).toMatch( /\.webm(\?.*)?$/i );
 	} );
+
+	test( 'plays the companion when the video is picked from the Media Library', async ( {
+		editor,
+		page,
+		videoTranscodingUtils,
+	} ) => {
+		// Upload once so a transcoded attachment exists in the library.
+		await editor.insertBlock( { name: 'core/video' } );
+		const videoBlocks = editor.canvas.locator(
+			'role=document[name="Block: Video"i]'
+		);
+		await videoTranscodingUtils.upload(
+			videoBlocks.first().locator( 'data-testid=form-file-upload-input' ),
+			VIDEO_FIXTURE
+		);
+		await videoTranscodingUtils.waitForUploadQueueEmpty( 120_000 );
+
+		// Pick that attachment from the library into a fresh block. The
+		// library's selection object carries no `media_details`, so the
+		// companion has to be looked up from the attachment record.
+		await editor.insertBlock( { name: 'core/video' } );
+		await videoBlocks
+			.nth( 1 )
+			.getByRole( 'button', { name: 'Media Library' } )
+			.click();
+
+		const modal = page.locator( '.media-modal' );
+		await expect( modal ).toBeVisible();
+		await modal.locator( '.attachment' ).first().click();
+		await modal
+			.getByRole( 'button', { name: 'Select', exact: true } )
+			.click();
+
+		await expect
+			.poll( () =>
+				page.evaluate(
+					() =>
+						window.wp.data
+							.select( 'core/block-editor' )
+							.getBlocks()
+							.filter( ( b ) => b.name === 'core/video' )[ 1 ]
+							?.attributes.src
+				)
+			)
+			.toMatch( /\.mp4(\?.*)?$/i );
+	} );
 } );
