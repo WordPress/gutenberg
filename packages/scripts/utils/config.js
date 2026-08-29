@@ -154,15 +154,15 @@ const getWebpackArgs = () => {
 	) {
 		/**
 		 * Converts a legacy path to the entry pair supported by webpack, e.g.:
-		 * `./entry-one.js` -> `[ 'entry-one', './entry-one.js] ]`
-		 * `entry-two.js` -> `[ 'entry-two', './entry-two.js' ]`
+		 * `./entry-one.jsx` -> `[ 'entry-one', './entry-one.jsx' ]`
+		 * `entry-two.tsx` -> `[ 'entry-two', './entry-two.tsx' ]`
 		 *
 		 * @param {string} path The path provided.
 		 *
 		 * @return {string[]} The entry pair of its name and the file path.
 		 */
 		const pathToEntry = ( path ) => {
-			const entryName = basename( path, '.js' );
+			const entryName = basename( path, extname( path ) );
 
 			return [ entryName, path ];
 		};

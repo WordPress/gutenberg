@@ -1014,44 +1014,25 @@ test.describe( 'List (@firefox)', () => {
 <!-- /wp:list -->`
 		);
 
-		await page.keyboard.press( 'Backspace' );
-		await page.keyboard.press( 'Backspace' ); // Should be at level 1.
+		await page.keyboard.press( 'Backspace' ); // Should delete "i".
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul class="wp-block-list"><!-- wp:list-item -->
 <li>1<!-- wp:list -->
 <ul class="wp-block-list"><!-- wp:list-item -->
-<li>a</li>
-<!-- /wp:list-item -->
-
-<!-- wp:list-item -->
+<li>a<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list --></li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 
-		await page.keyboard.press( 'Backspace' ); // Should be at level 0.
-
-		await expect.poll( editor.getEditedPostContent ).toBe(
-			`<!-- wp:list -->
-<ul class="wp-block-list"><!-- wp:list-item -->
-<li>1<!-- wp:list -->
-<ul class="wp-block-list"><!-- wp:list-item -->
-<li>a</li>
-<!-- /wp:list-item --></ul>
-<!-- /wp:list --></li>
-<!-- /wp:list-item -->
-
-<!-- wp:list-item -->
-<li></li>
-<!-- /wp:list-item --></ul>
-<!-- /wp:list -->`
-		);
-
-		await page.keyboard.press( 'Backspace' ); // Should be at level 1.
+		await page.keyboard.press( 'Backspace' ); // Should merge into "a".
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
@@ -1065,22 +1046,21 @@ test.describe( 'List (@firefox)', () => {
 <!-- /wp:list -->`
 		);
 
-		await page.keyboard.press( 'Backspace' );
-		await page.keyboard.press( 'Backspace' ); // Should be at level 0.
+		await page.keyboard.press( 'Backspace' ); // Should delete "a".
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul class="wp-block-list"><!-- wp:list-item -->
-<li>1</li>
-<!-- /wp:list-item -->
-
-<!-- wp:list-item -->
+<li>1<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 
-		await page.keyboard.press( 'Backspace' ); // Should be at level 0.
+		await page.keyboard.press( 'Backspace' ); // Should merge into "1".
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
@@ -1090,13 +1070,248 @@ test.describe( 'List (@firefox)', () => {
 <!-- /wp:list -->`
 		);
 
-		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' ); // Should delete "1".
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
+		);
+
 		await page.keyboard.press( 'Backspace' ); // Should remove list.
 
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 
-		// That's 9 key presses to create the list, and 9 key presses to remove
+		// That's 9 key presses to create the list, and 6 key presses to remove
 		// the list. ;)
+	} );
+
+	test( 'should outdent an empty middle item without adding an item', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+
+		await page.keyboard.type( '* a' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( ' b' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'c' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'ArrowUp' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>a<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>b</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>c</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
+		);
+
+		await page.keyboard.press( 'Shift+Tab' );
+		// Type to also verify the caret stays in the outdented item.
+		await page.keyboard.type( 'x' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>a<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>b</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>x<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>c</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
+		);
+	} );
+
+	test( 'should try to preserve the indentation level of nested items as their parent gets merged', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+
+		await page.keyboard.type( '* a' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( ' b' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( ' c' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'd' );
+		await page.keyboard.press( 'Enter' );
+		// Enter on an empty item outdents it, one level per press.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'e' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'a' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'b' },
+										innerBlocks: [
+											{
+												name: 'core/list',
+												innerBlocks: [
+													{
+														name: 'core/list-item',
+														attributes: {
+															content: 'c',
+														},
+													},
+													{
+														name: 'core/list-item',
+														attributes: {
+															content: 'd',
+														},
+													},
+												],
+											},
+										],
+									},
+								],
+							},
+						],
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'e' },
+					},
+				],
+			},
+		] );
+
+		// Place caret to the right of list-item "c"
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowRight' );
+
+		// Backspace should empty the text of that list-item, and nothing else
+		await page.keyboard.press( 'Backspace' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'a' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'b' },
+										innerBlocks: [
+											{
+												name: 'core/list',
+												innerBlocks: [
+													{
+														name: 'core/list-item',
+														attributes: {
+															content: '',
+														},
+													},
+													{
+														name: 'core/list-item',
+														attributes: {
+															content: 'd',
+														},
+													},
+												],
+											},
+										],
+									},
+								],
+							},
+						],
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'e' },
+					},
+				],
+			},
+		] );
+
+		// Now that the item is empty, backspace merges it into "b", and
+		// "d" keeps its original indentation level as a child of "b".
+		await page.keyboard.press( 'Backspace' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'a' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'b' },
+										innerBlocks: [
+											{
+												name: 'core/list',
+												innerBlocks: [
+													{
+														name: 'core/list-item',
+														attributes: {
+															content: 'd',
+														},
+													},
+												],
+											},
+										],
+									},
+								],
+							},
+						],
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'e' },
+					},
+				],
+			},
+		] );
 	} );
 
 	test( 'should place the caret in the right place with nested list', async ( {

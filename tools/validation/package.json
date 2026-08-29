@@ -28,7 +28,8 @@
 		"@wordpress/create-block": "file:../../packages/create-block",
 		"@wordpress/scripts": "file:../../packages/scripts",
 		"chalk": "^4.1.1",
-		"glob": "^7.1.2",
+		"esbuild": "^0.27.2",
+		"glob": "^13.0.6",
 		"jsonc-parser": "^3.3.1",
 		"simple-git": "^3.32.3"
 	},
@@ -38,6 +39,7 @@
 	"scripts": {
 		"check-installed-deps": "node ./check-installed-deps.mjs",
 		"check-licenses": "node ./check-licenses.mjs",
+		"check-private-apis": "node ./check-private-apis.mjs",
 		"dependency-audit": "dependency-audit --collapse-root-cause \"../../packages/*\"",
 		"check-local-changes": "node ./check-local-changes.cjs",
 		"check-root-dependencies": "node ./check-root-dependencies.mjs",

@@ -106,7 +106,7 @@ The `color` prop accepts an object with the following optional properties:
 -   `primary`: The primary/accent seed color (default: `'#3858e9'`).
 -   `background`: The background seed color (default: `'#fcfcfc'`).
 
-Both properties accept a fully opaque sRGB-parseable string: a hex value (e.g. `#3858e9`), an `rgb()`/`rgba()` string, or a CSS named color (e.g. `'blue'`). Non-opaque alpha values, `transparent`, and other CSS color spaces (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted and will throw an error. The theme system automatically generates appropriate color ramps and determines light/dark mode based on these seed colors.
+Both properties accept a fully opaque sRGB-parseable string: a hex value (e.g. `#3858e9`), an `rgb()`/`rgba()` string, or a CSS named color (e.g. `'blue'`). Non-opaque alpha values, `transparent`, and other CSS color spaces (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted and will throw an error. The theme system automatically generates appropriate color ramps from these seed colors.
 
 Use `onColorWarnings` to receive structured warnings after the provider calculates its colors. Warnings identify generated ramp steps or semantic foreground/background pairs that do not meet their contrast targets:
 
@@ -135,6 +135,10 @@ The `cornerRadius` prop sets the overall roundness preset for the theme subtree.
 When a setting is omitted, it inherits from the closest parent `ThemeProvider`. If there is no parent value, the prebuilt defaults from the design-tokens stylesheet apply.
 
 `ThemeProvider` does not accept wrapper customization props such as `className`, `style`, `as`, `render`, or `ref`.
+
+### Light and dark themes
+
+`ThemeProvider` has no light or dark mode. It accepts color seeds and turns them into semantic design tokens. Consumers define light and dark themes by choosing those seeds: a light background seed makes the generated color ramp favor darker contrasting colors, while a dark background seed makes it favor lighter contrasting colors. The primary seed controls the accent color rather than the overall light or dark appearance.
 
 ### Nesting Providers
 
@@ -264,11 +268,12 @@ The build plugins inject generated fallbacks into bare `var(--wpds-*)` reference
 
 `@wordpress/build` already applies these plugins automatically when `@wordpress/theme` is installed. You only need to configure them manually for custom build setups.
 
-| Export                                                        | Tool    | Scope |
-| ------------------------------------------------------------- | ------- | ----- |
-| `@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks` | PostCSS | CSS   |
-| `@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks` | esbuild | JS/TS |
-| `@wordpress/theme/vite-plugins/vite-ds-token-fallbacks`       | Vite    | JS/TS |
+| Export                                                                  | Tool          | Scope |
+| ----------------------------------------------------------------------- | ------------- | ----- |
+| `@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks`           | PostCSS       | CSS   |
+| `@wordpress/theme/lightningcss-plugins/lightningcss-ds-token-fallbacks` | Lightning CSS | CSS   |
+| `@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks`           | esbuild       | JS/TS |
+| `@wordpress/theme/vite-plugins/vite-ds-token-fallbacks`                 | Vite          | JS/TS |
 
 Existing fallbacks are unchanged. An unknown token in a bare reference fails the build.
 
@@ -282,6 +287,21 @@ export default {
 	plugins: [ dsTokenFallbacks ],
 };
 ```
+
+### Lightning CSS
+
+```js
+import { transform, composeVisitors } from 'lightningcss';
+import dsTokenFallbacks from '@wordpress/theme/lightningcss-plugins/lightningcss-ds-token-fallbacks';
+
+const { code } = transform( {
+	filename: 'styles.css',
+	code: Buffer.from( css ),
+	visitor: composeVisitors( [ dsTokenFallbacks ] ),
+} );
+```
+
+> **Note:** CSS Modules [`from global`](https://lightningcss.dev/css-modules.html#local-css-variables) references (for example `var(--wpds-dimension-gap-sm from global)` with `cssModules.dashedIdents`) are not yet supported. The visitor rebuilds `var()` from the token name alone, so `from` metadata is dropped and global custom properties may be incorrectly hashed.
 
 ### esbuild
 
