@@ -18,7 +18,6 @@
 		{ "path": "../html-entities/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons/tsconfig.build.json" },
-		{ "path": "../is-shallow-equal/tsconfig.build.json" },
 		{ "path": "../notices/tsconfig.build.json" },
 		{ "path": "../private-apis" },
 		{ "path": "../rich-text" },

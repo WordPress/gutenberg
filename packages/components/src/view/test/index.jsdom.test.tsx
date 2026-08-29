@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import type { ComponentPropsWithoutRef } from 'react';
 import { forwardRef } from '@wordpress/element';
 import { View } from '../index';
 
@@ -22,7 +23,10 @@ describe( 'props', () => {
 	} );
 
 	test( 'should render as a custom component', () => {
-		const CustomComponent = forwardRef( ( props, ref ) => (
+		const CustomComponent = forwardRef<
+			HTMLElement,
+			ComponentPropsWithoutRef< 'section' >
+		>( ( props, ref ) => (
 			<section ref={ ref } data-custom-component { ...props } />
 		) );
 

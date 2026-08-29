@@ -1,6 +1,3 @@
-/**
- * @jest-environment node
- */
 import plugin from '../no-unknown-ds-tokens.mjs';
 import { getStylelintResult } from './utils';
 

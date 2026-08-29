@@ -1,18 +1,32 @@
 import { render, fireEvent, screen } from '@testing-library/react';
+import type { ChangeEvent } from 'react';
 import useControlledState from '../use-controlled-state';
 
 const noop = () => {};
 
 describe( 'hooks', () => {
-	const getInput = () => screen.getByTestId( 'input' );
+	const getInput = () => screen.getByTestId< HTMLInputElement >( 'input' );
 
 	describe( 'useControlledState', () => {
-		const Example = ( { initial, value: valueProp, onChange = noop } ) => {
+		type ExampleProps = {
+			initial?: string;
+			value?: string;
+			onChange?: ( value: string ) => void;
+		};
+
+		const Example = ( {
+			initial,
+			value: valueProp,
+			onChange = noop,
+		}: ExampleProps ) => {
 			const [ state, setState ] = useControlledState( valueProp, {
 				initial,
+				fallback: '',
 			} );
 
-			const handleOnChange = ( event ) => {
+			const handleOnChange = (
+				event: ChangeEvent< HTMLInputElement >
+			) => {
 				const nextValue = event.target.value;
 				setState( nextValue );
 				onChange( nextValue );

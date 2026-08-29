@@ -1,16 +1,17 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { KeyboardEvent } from 'react';
 import { useState } from '@wordpress/element';
 import BaseInputControl from '../';
 import InputControlPrefixWrapper from '../input-prefix-wrapper';
+import type { InputControlProps } from '../types';
 
-const getInput = () => screen.getByTestId( 'input' );
+const getInput = () => screen.getByTestId< HTMLInputElement >( 'input' );
 
 describe( 'InputControl', () => {
-	const InputControl = ( props ) => {
+	const InputControl = ( props: InputControlProps ) => {
 		return <BaseInputControl { ...props } data-testid="input" />;
 	};
-
 	describe( 'Basic rendering', () => {
 		it( 'should render', () => {
 			render( <InputControl /> );
@@ -85,14 +86,16 @@ describe( 'InputControl', () => {
 		it( 'should work as a controlled component given normal, falsy or nullish values', async () => {
 			const user = await userEvent.setup();
 			const spy = jest.fn();
-			const heldKeySet = new Set();
+			const heldKeySet = new Set< string >();
 			const Example = () => {
-				const [ state, setState ] = useState( 'one' );
-				const onChange = ( value ) => {
+				const [ state, setState ] = useState< string | undefined >(
+					'one'
+				);
+				const onChange = ( value: string | undefined ) => {
 					setState( value );
 					spy( value );
 				};
-				const onKeyDown = ( { key } ) => {
+				const onKeyDown = ( { key }: KeyboardEvent ) => {
 					heldKeySet.add( key );
 					if ( key === 'Escape' ) {
 						if ( heldKeySet.has( 'Meta' ) ) {
@@ -104,7 +107,8 @@ describe( 'InputControl', () => {
 						}
 					}
 				};
-				const onKeyUp = ( { key } ) => heldKeySet.delete( key );
+				const onKeyUp = ( { key }: KeyboardEvent ) =>
+					heldKeySet.delete( key );
 				return (
 					<InputControl
 						value={ state }
@@ -189,7 +193,8 @@ describe( 'InputControl', () => {
 						let { value } = state;
 						if (
 							action.type === 'COMMIT' &&
-							action.payload.event.type === 'blur'
+							action.payload.event?.type === 'blur' &&
+							value !== undefined
 						) {
 							value = value.replace( /\bnow\b/, 'meow' );
 						}
@@ -219,7 +224,8 @@ describe( 'InputControl', () => {
 				<InputControl
 					label="Test"
 					prefix={ prefix }
-					{ ...{ size: '__unstable-large' } }
+					// @ts-expect-error Verify the legacy value that is omitted from the public type.
+					size="__unstable-large"
 				/>
 			);
 
