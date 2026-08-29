@@ -1,9 +1,13 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
 
 .edit-post-meta-boxes-main {
-	filter: drop-shadow(0 -1px rgba($color: #000, $alpha: 0.133)); // 0.133 = $gray-200 but with alpha.
+	// 0.133 = $gray-200 but with alpha. A box-shadow, not a drop-shadow
+	// filter: a filter turns the pane into the containing block of the
+	// iframe, which positions itself over the whole editor during modals.
+	box-shadow: 0 -1px rgba($color: #000, $alpha: 0.133);
 	// Windows High Contrast mode will show this outline, but not the shadow.
 	outline: 1px solid transparent;
 	background-color: $white;
@@ -117,6 +121,36 @@
 	width: 100%;
 	height: 100%;
 	border: none;
+
+	// While a meta box shows a modal, the frame covers the whole editor,
+	// since nothing inside an iframe can render outside of it. The height
+	// takes priority over the inline height the sidebar frame sets on
+	// itself.
+	&.has-open-modal {
+		position: fixed;
+		inset: 0;
+		height: 100% !important;
+		z-index: z-index(".components-modal__screen-overlay");
+	}
+}
+
+// While a frame covers the editor, the stacking contexts between it and
+// the page would keep it under the admin bar, menu, and sidebar. The
+// editor wrapper, a context because it is position: fixed, carries the
+// frame's level against the admin bar and menu; the contexts inside are
+// flattened so the frame's own level decides.
+.editor-editor-interface:has(.edit-post-meta-boxes-iframe.has-open-modal) {
+	z-index: z-index(".components-modal__screen-overlay");
+
+	.edit-post-meta-boxes-main__liner,
+	.interface-interface-skeleton__content {
+		isolation: auto;
+	}
+
+	.editor-sidebar__panel,
+	.interface-interface-skeleton__sidebar {
+		z-index: auto;
+	}
 }
 
 // Only when the split view is active the visual editor should allow shrinking,
