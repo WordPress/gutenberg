@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `Radio` form primitive.
+
 ### Breaking Changes
 
 -   `Autocomplete.Popup`, `Combobox.Popup`, `Select.Popup`, `SearchableChipSelect`, and `SearchableChipSelectControl`: The popup now defaults to a fixed anchor width. Use `popupWidth="content"` to restore content-sized width between the anchor and available viewport bounds ([#82087](https://github.com/WordPress/gutenberg/pull/82087)).
