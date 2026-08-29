@@ -41,7 +41,7 @@ test.describe( 'List (@firefox)', () => {
 	} ) => {
 		// Create a block with some text that will trigger a list creation.
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* A list item' );
 
@@ -68,7 +68,7 @@ test.describe( 'List (@firefox)', () => {
 	} ) => {
 		// Create a list with the slash block shortcut.
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'test' );
 		await pageUtils.pressKeys( 'ArrowLeft', { times: 4 } );
@@ -88,7 +88,7 @@ test.describe( 'List (@firefox)', () => {
 	} ) => {
 		// Create a block with some text that will trigger a list creation.
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '1) A list item' );
 
@@ -107,7 +107,7 @@ test.describe( 'List (@firefox)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '1. ' );
 		await pageUtils.pressKeys( 'primary+z' );
@@ -124,7 +124,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* ' );
 		await page.keyboard.press( 'Backspace' );
@@ -141,7 +141,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* ' );
 		await expect(
@@ -161,7 +161,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* ' );
 		await editor.showBlockToolbar();
@@ -179,7 +179,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.evaluate( () => delete window.requestIdleCallback );
 		await page.keyboard.type( '* ' );
@@ -200,7 +200,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* ' );
 		await page.keyboard.press( 'Escape' );
@@ -217,7 +217,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* a' );
 		await page.keyboard.press( 'Backspace' );
@@ -249,7 +249,7 @@ test.describe( 'List (@firefox)', () => {
 	test( 'can be created by typing "/list"', async ( { editor, page } ) => {
 		// Create a list with the slash block shortcut.
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/list' );
 		await expect(
@@ -272,7 +272,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'test' );
 		await editor.transformBlockTo( 'core/list' );
@@ -291,7 +291,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
@@ -322,7 +322,7 @@ test.describe( 'List (@firefox)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'one' );
 		await pageUtils.pressKeys( 'shift+Enter' );
@@ -348,7 +348,7 @@ test.describe( 'List (@firefox)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'one' );
 		await pageUtils.pressKeys( 'shift+Enter' );
@@ -623,7 +623,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '1. one' );
 		await page.keyboard.press( 'Enter' );
@@ -989,7 +989,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 
 		await page.keyboard.type( '* 1' ); // Should be at level 0.
@@ -1014,44 +1014,25 @@ test.describe( 'List (@firefox)', () => {
 <!-- /wp:list -->`
 		);
 
-		await page.keyboard.press( 'Backspace' );
-		await page.keyboard.press( 'Backspace' ); // Should be at level 1.
+		await page.keyboard.press( 'Backspace' ); // Should delete "i".
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul class="wp-block-list"><!-- wp:list-item -->
 <li>1<!-- wp:list -->
 <ul class="wp-block-list"><!-- wp:list-item -->
-<li>a</li>
-<!-- /wp:list-item -->
-
-<!-- wp:list-item -->
+<li>a<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list --></li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 
-		await page.keyboard.press( 'Backspace' ); // Should be at level 0.
-
-		await expect.poll( editor.getEditedPostContent ).toBe(
-			`<!-- wp:list -->
-<ul class="wp-block-list"><!-- wp:list-item -->
-<li>1<!-- wp:list -->
-<ul class="wp-block-list"><!-- wp:list-item -->
-<li>a</li>
-<!-- /wp:list-item --></ul>
-<!-- /wp:list --></li>
-<!-- /wp:list-item -->
-
-<!-- wp:list-item -->
-<li></li>
-<!-- /wp:list-item --></ul>
-<!-- /wp:list -->`
-		);
-
-		await page.keyboard.press( 'Backspace' ); // Should be at level 1.
+		await page.keyboard.press( 'Backspace' ); // Should merge into "a".
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
@@ -1065,22 +1046,21 @@ test.describe( 'List (@firefox)', () => {
 <!-- /wp:list -->`
 		);
 
-		await page.keyboard.press( 'Backspace' );
-		await page.keyboard.press( 'Backspace' ); // Should be at level 0.
+		await page.keyboard.press( 'Backspace' ); // Should delete "a".
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul class="wp-block-list"><!-- wp:list-item -->
-<li>1</li>
-<!-- /wp:list-item -->
-
-<!-- wp:list-item -->
+<li>1<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
 
-		await page.keyboard.press( 'Backspace' ); // Should be at level 0.
+		await page.keyboard.press( 'Backspace' ); // Should merge into "1".
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
@@ -1090,13 +1070,248 @@ test.describe( 'List (@firefox)', () => {
 <!-- /wp:list -->`
 		);
 
-		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' ); // Should delete "1".
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
+		);
+
 		await page.keyboard.press( 'Backspace' ); // Should remove list.
 
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 
-		// That's 9 key presses to create the list, and 9 key presses to remove
+		// That's 9 key presses to create the list, and 6 key presses to remove
 		// the list. ;)
+	} );
+
+	test( 'should outdent an empty middle item without adding an item', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+
+		await page.keyboard.type( '* a' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( ' b' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'c' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'ArrowUp' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>a<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>b</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>c</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
+		);
+
+		await page.keyboard.press( 'Shift+Tab' );
+		// Type to also verify the caret stays in the outdented item.
+		await page.keyboard.type( 'x' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>a<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>b</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>x<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>c</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
+		);
+	} );
+
+	test( 'should try to preserve the indentation level of nested items as their parent gets merged', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+
+		await page.keyboard.type( '* a' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( ' b' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( ' c' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'd' );
+		await page.keyboard.press( 'Enter' );
+		// Enter on an empty item outdents it, one level per press.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'e' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'a' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'b' },
+										innerBlocks: [
+											{
+												name: 'core/list',
+												innerBlocks: [
+													{
+														name: 'core/list-item',
+														attributes: {
+															content: 'c',
+														},
+													},
+													{
+														name: 'core/list-item',
+														attributes: {
+															content: 'd',
+														},
+													},
+												],
+											},
+										],
+									},
+								],
+							},
+						],
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'e' },
+					},
+				],
+			},
+		] );
+
+		// Place caret to the right of list-item "c"
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowRight' );
+
+		// Backspace should empty the text of that list-item, and nothing else
+		await page.keyboard.press( 'Backspace' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'a' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'b' },
+										innerBlocks: [
+											{
+												name: 'core/list',
+												innerBlocks: [
+													{
+														name: 'core/list-item',
+														attributes: {
+															content: '',
+														},
+													},
+													{
+														name: 'core/list-item',
+														attributes: {
+															content: 'd',
+														},
+													},
+												],
+											},
+										],
+									},
+								],
+							},
+						],
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'e' },
+					},
+				],
+			},
+		] );
+
+		// Now that the item is empty, backspace merges it into "b", and
+		// "d" keeps its original indentation level as a child of "b".
+		await page.keyboard.press( 'Backspace' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'a' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'b' },
+										innerBlocks: [
+											{
+												name: 'core/list',
+												innerBlocks: [
+													{
+														name: 'core/list-item',
+														attributes: {
+															content: 'd',
+														},
+													},
+												],
+											},
+										],
+									},
+								],
+							},
+						],
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'e' },
+					},
+				],
+			},
+		] );
 	} );
 
 	test( 'should place the caret in the right place with nested list', async ( {
@@ -1104,7 +1319,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* 1' );
 		await page.keyboard.press( 'Enter' );
@@ -1137,7 +1352,7 @@ test.describe( 'List (@firefox)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 
 		await page.keyboard.type( '* 1' );
@@ -1162,7 +1377,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 
 		// Tests the shortcut with a non breaking space.
@@ -1180,7 +1395,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 
 		// Tests the shortcut with a non breaking space.
@@ -1246,7 +1461,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* 1' );
 		await page.keyboard.press( 'Enter' );
@@ -1268,12 +1483,27 @@ test.describe( 'List (@firefox)', () => {
 		);
 	} );
 
+	test( 'remove empty list graciously through UI', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( '* 1' );
+
+		await editor.clickBlockToolbarButton( 'Options' );
+		await page.getByRole( 'menuitem', { name: 'Delete' } ).click();
+
+		expect( await editor.getEditedPostContent() ).toBe( '' );
+	} );
+
 	test( 'should not change the contents when you change the list type to Ordered', async ( {
 		editor,
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* 1' );
 		await page.keyboard.press( 'Enter' );
@@ -1305,7 +1535,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '1. a' );
 		await page.keyboard.press( 'Enter' );
@@ -1364,7 +1594,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* a' );
 		await page.keyboard.press( 'Enter' );
@@ -1409,7 +1639,7 @@ test.describe( 'List (@firefox)', () => {
 
 	test( 'can be exited to selected paragraph', async ( { editor, page } ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* ' );
 		await page.keyboard.press( 'Enter' );
@@ -1615,7 +1845,7 @@ test.describe( 'List (@firefox)', () => {
 		for ( const key of [ 'Backspace', 'Delete' ] ) {
 			test( key, async ( { editor, page, pageUtils } ) => {
 				await editor.canvas
-					.locator( 'role=button[name="Add default block"i]' )
+					.locator( 'role=document[name="Add default block"i]' )
 					.click();
 				await page.keyboard.type( '* ab' );
 				await page.keyboard.press( 'Enter' );
@@ -1694,7 +1924,7 @@ test.describe( 'List (@firefox)', () => {
 		for ( const key of [ 'Backspace', 'Delete' ] ) {
 			test( key, async ( { editor, page, pageUtils } ) => {
 				await editor.canvas
-					.locator( 'role=button[name="Add default block"i]' )
+					.locator( 'role=document[name="Add default block"i]' )
 					.click();
 				await page.keyboard.type( '* ab' );
 				await page.keyboard.press( 'Enter' );
@@ -1767,7 +1997,7 @@ test.describe( 'List (@firefox)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* ab' );
 		await page.keyboard.press( 'Enter' );
@@ -1860,7 +2090,7 @@ test.describe( 'List (@firefox)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* ab' );
 		await page.keyboard.press( 'Enter' );
@@ -1940,7 +2170,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* ab' );
 		await page.keyboard.press( 'Enter' );
@@ -2004,7 +2234,7 @@ test.describe( 'List (@firefox)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* ab' );
 		await page.keyboard.press( 'Enter' );
@@ -2106,7 +2336,7 @@ test.describe( 'List (@firefox)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* one' );
 		await page.keyboard.press( 'Enter' );
@@ -2159,14 +2389,10 @@ test.describe( 'List (@firefox)', () => {
 			editor.canvas.locator( '.is-multi-selected' )
 		).toHaveCount( 2 );
 
-		// Both items, including the nested one, are removed.
+		// Both items, including the nested one, are removed, and with
+		// them the emptied list itself.
 		await page.keyboard.press( 'Backspace' );
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/list',
-				innerBlocks: [],
-			},
-		] );
+		await expect.poll( editor.getBlocks ).toEqual( [] );
 	} );
 
 	test( 'should multi-select the top level items when extending a selection from a nested item to the previous top level item', async ( {
@@ -2174,7 +2400,7 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '* one' );
 		await page.keyboard.press( 'Enter' );
@@ -2221,19 +2447,16 @@ test.describe( 'List (@firefox)', () => {
 		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 
 		// The endpoints are promoted to the top level items, which are
-		// multi-selected as blocks.
+		// multi-selected as blocks. The announcement discloses the list
+		// nested in the second item.
 		await expect( page.locator( '[aria-live="assertive"]' ) ).toHaveText(
-			'2 blocks selected.'
+			'2 blocks selected, 4 including nested blocks.'
 		);
 
-		// Both items, including the nested one, are removed.
+		// Both items, including the nested one, are removed, and with
+		// them the emptied list itself.
 		await page.keyboard.press( 'Backspace' );
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/list',
-				innerBlocks: [],
-			},
-		] );
+		await expect.poll( editor.getBlocks ).toEqual( [] );
 	} );
 
 	test( 'should merge a following paragraph into the outermost list with Delete from a nested item (#77245)', async ( {
@@ -2452,6 +2675,46 @@ test.describe( 'List (@firefox)', () => {
 				],
 			},
 		] );
+	} );
+
+	test( 'should remove an anchored list when deleting its last item', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/list',
+			attributes: { anchor: 'list' },
+			innerBlocks: [
+				{ name: 'core/list-item', attributes: { anchor: 'item' } },
+			],
+		} );
+		// Inserting selects the list container; ArrowDown moves the caret
+		// into the sole empty item.
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.type( 'x' );
+
+		// Typing lands in the sole item, verifying both the setup and the
+		// caret position.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				attributes: { anchor: 'list' },
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'x', anchor: 'item' },
+					},
+				],
+			},
+		] );
+
+		// Delete the text, then the emptied item: the anchors are not
+		// content, so the item and the list are removed together instead
+		// of the item being lifted out as a paragraph first.
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' );
+
+		await expect.poll( editor.getBlocks ).toEqual( [] );
 	} );
 
 	test( 'should leave nested list intact when deleting the parent item', async ( {

@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 1.54.0 (2026-08-26)
+
+### Internal
+
+-   Remove `@wordpress/dataviews` from the list of core modules using private APIs, since importing private APIs is no longer allowed in the package. [#81478](https://github.com/WordPress/gutenberg/pull/81478)
+
+## 1.53.0 (2026-08-12)
+
 ### Internal
 
 -   Remove `@wordpress/content-types` from the list of core modules using private APIs, as part of removing the content types experiment. [#81340](https://github.com/WordPress/gutenberg/pull/81340)
