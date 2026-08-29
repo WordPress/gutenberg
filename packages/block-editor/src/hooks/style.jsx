@@ -1038,15 +1038,7 @@ function useBlockProps( { clientId, name, style } ) {
 		viewportSettings,
 	] );
 
-	usePrivateStyleOverride(
-		clientId
-			? {
-					id: `elements-${ clientId }`,
-					css: styles,
-					clientId,
-			  }
-			: { css: styles }
-	);
+	usePrivateStyleOverride( { css: styles, clientId } );
 
 	return addSaveProps(
 		{ className: blockElementsContainerIdentifier },
