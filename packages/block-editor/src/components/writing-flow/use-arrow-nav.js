@@ -195,7 +195,7 @@ export default function useArrowNav() {
 	return useRefEffect( ( node ) => {
 		// Here a DOMRect is stored while moving the caret vertically so
 		// vertical position of the start position can be restored. This is to
-		// recreate browser behaviour across blocks.
+		// recreate browser behavior across blocks.
 		let verticalRect;
 
 		function onMouseDown() {
@@ -327,9 +327,9 @@ export default function useArrowNav() {
 				return;
 			}
 
-			// When presing any key other than up or down, the initial vertical
+			// When pressing any key other than up or down, the initial vertical
 			// position must ALWAYS be reset. The vertical position is saved so
-			// it can be restored as well as possible on sebsequent vertical
+			// it can be restored as well as possible on subsequent vertical
 			// arrow key presses. It may not always be possible to restore the
 			// exact same position (such as at an empty line), so it wouldn't be
 			// good to compute the position right before any vertical arrow key
