@@ -4,7 +4,7 @@ import { View } from '../../view';
 import { Text } from '../../text';
 import { ContextSystemProvider } from '../index';
 
-const SomeContext = createContext();
+const SomeContext = createContext< number | undefined >( undefined );
 const useSomeContext = () => useContext( SomeContext );
 
 export default {
@@ -39,7 +39,7 @@ const innerContext = {
 
 const InnerContent = memo( () => {
 	const state = useSomeContext();
-	const isEven = state % 2 === 0;
+	const isEven = state !== undefined && state % 2 === 0;
 	return (
 		<View style={ { background: isEven ? 'red' : 'initial' } }>
 			<Text>Card (inside innerContext)</Text>

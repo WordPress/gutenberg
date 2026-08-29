@@ -8,6 +8,7 @@ import {
 import { useSelect } from '@wordpress/data';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import { unlock } from '../lock-unlock';
+import { getGalleryResponsiveFlexCSS } from './responsive-styles';
 
 const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 const { globalStylesDataKey } = unlock( blockEditorPrivateApis );
@@ -40,8 +41,8 @@ function getBlockGapValue( style ) {
 	return style.spacing.blockGap;
 }
 
-export default function GalleryGapCustomProperties( { style, clientId } ) {
-	const selector = `#block-${ clientId }`;
+export default function GalleryFlexStyles( { style, clientId } ) {
+	const selector = `.wp-block-gallery-${ clientId }`;
 	const [ viewportSettings ] = useSettings( 'viewport' );
 	const globalStyles = useSelect(
 		( select ) =>
@@ -57,9 +58,11 @@ export default function GalleryGapCustomProperties( { style, clientId } ) {
 	// values fall back to the Gallery blockGap default.
 	const blockGap =
 		styleBlockGap === undefined ? globalGalleryBlockGap : styleBlockGap;
-	let gap = getGalleryGapCustomPropertyStyle( selector, blockGap );
+	let css = getGalleryGapCustomPropertyStyle( selector, blockGap );
+	const responsiveMediaQueries =
+		getResponsiveMediaQueries( viewportSettings );
 
-	Object.entries( getResponsiveMediaQueries( viewportSettings ) ).forEach(
+	Object.entries( responsiveMediaQueries ).forEach(
 		( [ viewport, mediaQuery ] ) => {
 			const styleViewportBlockGap = getBlockGapValue(
 				style?.[ viewport ]
@@ -78,14 +81,19 @@ export default function GalleryGapCustomProperties( { style, clientId } ) {
 				return;
 			}
 
-			gap += `${ mediaQuery }{${ getGalleryGapCustomPropertyStyle(
+			css += `${ mediaQuery }{${ getGalleryGapCustomPropertyStyle(
 				selector,
 				viewportBlockGap
 			) }}`;
 		}
 	);
+	css += getGalleryResponsiveFlexCSS(
+		selector,
+		style,
+		responsiveMediaQueries
+	);
 
-	useStyleOverride( { css: gap } );
+	useStyleOverride( { css } );
 
 	return null;
 }

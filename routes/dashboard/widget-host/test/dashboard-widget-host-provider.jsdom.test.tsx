@@ -10,11 +10,21 @@ jest.mock( '@wordpress/route', () => {
 	return {
 		Link: forwardRef(
 			(
-				props: { to: string } & Record< string, unknown >,
+				props: {
+					to: string;
+					search?: Record< string, string >;
+				} & Record< string, unknown >,
 				ref: unknown
 			) => {
-				const { to, ...rest } = props;
-				return createElement( 'a', { ...rest, href: to, ref } );
+				const { to, search, ...rest } = props;
+				const query = search
+					? `?${ new URLSearchParams( search ) }`
+					: '';
+				return createElement( 'a', {
+					...rest,
+					href: `${ to }${ query }`,
+					ref,
+				} );
 			}
 		),
 	};
@@ -22,8 +32,10 @@ jest.mock( '@wordpress/route', () => {
 
 function LinkProbe( {
 	linkRef,
+	path = '/reports',
 }: {
 	linkRef: Ref< HTMLAnchorElement >;
+	path?: string;
 } ): React.ReactNode {
 	const { links } = useWidgetHost();
 
@@ -34,7 +46,7 @@ function LinkProbe( {
 	const HostLink = links.Link;
 
 	return (
-		<HostLink ref={ linkRef } path="/reports">
+		<HostLink ref={ linkRef } path={ path }>
 			Reports
 		</HostLink>
 	);
@@ -53,5 +65,23 @@ describe( 'DashboardWidgetHostProvider', () => {
 		const anchor = screen.getByRole( 'link', { name: 'Reports' } );
 		expect( linkRef.current ).toBe( anchor );
 		expect( anchor ).toHaveAttribute( 'href', '/reports' );
+	} );
+
+	it( 'hands the query behind the route to the router as search', () => {
+		render(
+			<DashboardWidgetHostProvider>
+				<LinkProbe
+					linkRef={ createRef< HTMLAnchorElement >() }
+					path="/site-health?status=critical,recommended"
+				/>
+			</DashboardWidgetHostProvider>
+		);
+
+		expect(
+			screen.getByRole( 'link', { name: 'Reports' } )
+		).toHaveAttribute(
+			'href',
+			'/site-health?status=critical%2Crecommended'
+		);
 	} );
 } );
