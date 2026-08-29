@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import deepFreeze from 'deep-freeze';
-
-/**
- * Internal dependencies
- */
 import { insertObject } from '../insert-object';
 import { getSparseArrayLength } from './helpers';
 import { OBJECT_REPLACEMENT_CHARACTER } from '../special-characters';

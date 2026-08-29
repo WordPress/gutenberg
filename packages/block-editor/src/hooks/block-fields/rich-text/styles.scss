@@ -8,7 +8,7 @@
 	margin: 0;
 	background: $white;
 	color: $gray-900;
-	@include input-control( var(--wp-admin-theme-color, #3858e9) );
+	@include input-control;
 	border-color: $gray-600;
 
 	&::placeholder {

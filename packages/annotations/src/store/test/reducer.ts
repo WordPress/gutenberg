@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { annotations } from '../reducer';
 import type { AnnotationAction, AnnotationsState } from '../../types';
 

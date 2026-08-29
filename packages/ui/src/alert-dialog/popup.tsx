@@ -3,31 +3,22 @@ import clsx from 'clsx';
 import { forwardRef, useContext } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import {
-	type ThemeProvider as ThemeProviderType,
-	privateApis as themePrivateApis,
-} from '@wordpress/theme';
-
-import { renderPortalWithChildren } from '../utils/render-portal-with-children';
+import { renderSlotWithChildren } from '../utils/render-slot-with-children';
 import { Button } from '../button';
 import dialogStyles from '../dialog/style.module.css';
-import focusStyles from '../utils/css/focus.module.css';
+import focusStyles from '../utils/css/focus.module.scss';
 import overlayChromeStyles from '../utils/css/overlay-chrome.module.css';
 import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
 import {
 	SCROLL_CONTAINER_ATTR,
 	useOverlayScrollStateAttributes,
 } from '../utils/use-overlay-scroll-state-attributes';
-import { unlock } from '../lock-unlock';
 import { Stack } from '../stack';
 import { Text } from '../text';
 import { AlertDialogContext } from './context';
 import { Portal } from './portal';
 import alertDialogStyles from './style.module.css';
 import type { PopupProps } from './types';
-
-const ThemeProvider: typeof ThemeProviderType =
-	unlock( themePrivateApis ).ThemeProvider;
 
 const Popup = forwardRef< HTMLDivElement, PopupProps >(
 	function AlertDialogPopup(
@@ -97,12 +88,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 		);
 
 		const footerElement = (
-			<div
-				className={ clsx(
-					overlayChromeStyles.footer,
-					alertDialogStyles[ 'footer-column' ]
-				) }
-			>
+			<div className={ alertDialogStyles[ 'footer-column' ] }>
 				<Stack
 					direction="row"
 					gap="sm"
@@ -138,47 +124,45 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 		const portalChildren = (
 			<>
 				<_AlertDialog.Backdrop className={ dialogStyles.backdrop } />
-				<ThemeProvider>
-					<_AlertDialog.Popup
-						ref={ mergedRef }
+				<_AlertDialog.Popup
+					ref={ mergedRef }
+					className={ clsx(
+						dialogStyles.popup,
+						className,
+						dialogStyles[ 'is-medium' ]
+					) }
+					initialFocus={ resolvedInitialFocus }
+					finalFocus={ finalFocus }
+					{ ...props }
+					data-wp-ui-overlay-modal=""
+				>
+					{ stickyHeader && headerElement }
+					<div
+						ref={ scrollStateRef }
 						className={ clsx(
-							dialogStyles.popup,
-							className,
-							dialogStyles[ 'is-medium' ]
+							overlayChromeStyles.content,
+							focusStyles[ 'outset-ring--focus-visible' ]
 						) }
-						initialFocus={ resolvedInitialFocus }
-						finalFocus={ finalFocus }
-						{ ...props }
-						data-wp-ui-overlay-modal=""
+						onScroll={ onScroll }
 					>
-						{ stickyHeader && headerElement }
-						<div
-							ref={ scrollStateRef }
-							className={ clsx(
-								overlayChromeStyles.content,
-								focusStyles[ 'outset-ring--focus-visible' ]
-							) }
-							onScroll={ onScroll }
-						>
-							{ ! stickyHeader && headerElement }
-							{ description && (
-								<Text
-									variant="body-md"
-									render={ <_AlertDialog.Description /> }
-								>
-									{ description }
-								</Text>
-							) }
-							{ children }
-							{ ! stickyFooter && footerElement }
-						</div>
-						{ stickyFooter && footerElement }
-					</_AlertDialog.Popup>
-				</ThemeProvider>
+						{ ! stickyHeader && headerElement }
+						{ description && (
+							<Text
+								variant="body-md"
+								render={ <_AlertDialog.Description /> }
+							>
+								{ description }
+							</Text>
+						) }
+						{ children }
+						{ ! stickyFooter && footerElement }
+					</div>
+					{ stickyFooter && footerElement }
+				</_AlertDialog.Popup>
 			</>
 		);
 
-		return renderPortalWithChildren( portal, <Portal />, portalChildren );
+		return renderSlotWithChildren( portal, <Portal />, portalChildren );
 	}
 );
 

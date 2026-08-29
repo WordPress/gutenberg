@@ -1,44 +1,38 @@
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	ComboboxControl,
 	Modal,
 	Notice,
 	TextControl,
-	TextareaControl,
+	TextareaControl as WCTextareaControl,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
-import {
-	privateApis as blocksPrivateApis,
-	store as blocksStore,
-} from '@wordpress/blocks';
+import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
-import { saveGuidelines } from '../api';
-import { store as coreGuidelinesStore } from '../store';
-import { unlock } from '../../lock-unlock';
+import { blockSlug, saveGuidelineRow, deleteGuidelineRow } from '../data';
+import type { ContentBlock, GuidelineRow, GuidelineQuery } from '../types';
 import './block-guideline-modal.scss';
-
-const { isContentBlock } = unlock( blocksPrivateApis );
 
 interface BlockGuidelineModalProps {
 	closeModal: () => void;
 	initialBlock?: string;
+	contentBlocks: ContentBlock[];
+	bySlug: Record< string, GuidelineRow >;
+	query: GuidelineQuery;
+	onRemoved?: () => void;
 }
 
 export default function BlockGuidelineModal( {
 	closeModal,
 	initialBlock,
+	contentBlocks,
+	bySlug,
+	query,
+	onRemoved,
 }: BlockGuidelineModalProps ) {
 	const [ selectedBlock, setSelectedBlock ] = useState< string | undefined >(
 		initialBlock
@@ -49,50 +43,34 @@ export default function BlockGuidelineModal( {
 	const [ showRemoveConfirmation, setShowRemoveConfirmation ] =
 		useState( false );
 
-	const blockGuidelines = useSelect(
-		( select ) => select( coreGuidelinesStore ).getBlockGuidelines(),
-		[]
-	);
-
 	const isEditing = !! initialBlock;
 
-	const currentGuideline = blockGuidelines[ selectedBlock ] ?? '';
+	const currentGuideline = selectedBlock
+		? bySlug[ blockSlug( selectedBlock ) ]?.content ?? ''
+		: '';
 	const [ guidelineText, setGuidelineText ] = useState( currentGuideline );
 
-	const blockOptions = useSelect(
-		// @ts-ignore
-		( select ) => select( blocksStore ).getBlockTypes(),
-		[]
-	);
-
 	const availableBlockOptions = useMemo( () => {
-		const set = new Set( Object.keys( blockGuidelines ) );
-		if ( initialBlock ) {
-			set.delete( initialBlock );
-		}
-		if ( selectedBlock ) {
-			set.delete( selectedBlock );
-		}
-
-		return blockOptions
+		return contentBlocks
 			.filter(
 				( block ) =>
-					isContentBlock( block.name ) && ! set.has( block.name )
+					! bySlug[ blockSlug( block.name ) ] ||
+					block.name === selectedBlock
 			)
+			.filter( ( block ) => block.name !== initialBlock )
 			.map( ( block ) => ( {
 				value: block.name,
 				label: block.title,
 			} ) );
-	}, [ blockGuidelines, blockOptions, initialBlock, selectedBlock ] );
+	}, [ contentBlocks, bySlug, initialBlock, selectedBlock ] );
 
 	const selectedBlockLabel = useMemo(
 		() =>
-			blockOptions.find( ( block ) => block.name === selectedBlock )
+			contentBlocks.find( ( block ) => block.name === selectedBlock )
 				?.title || '',
-		[ blockOptions, selectedBlock ]
+		[ contentBlocks, selectedBlock ]
 	);
 
-	const { setBlockGuideline } = useDispatch( coreGuidelinesStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	const handleSave = ( value: string ) => {
@@ -102,29 +80,45 @@ export default function BlockGuidelineModal( {
 		}
 
 		setIsSaving( true );
-		const oldValue = blockGuidelines[ selectedBlock ];
-		setBlockGuideline( selectedBlock, value );
-		saveGuidelines()
+		const slug = blockSlug( selectedBlock );
+		const existingId = bySlug[ slug ]?.id;
+
+		let operation: Promise< void >;
+		if ( value ) {
+			operation = saveGuidelineRow(
+				slug,
+				selectedBlock,
+				value,
+				existingId,
+				query
+			);
+		} else if ( existingId ) {
+			operation = deleteGuidelineRow( existingId );
+		} else {
+			operation = Promise.resolve();
+		}
+
+		operation
 			.then( () => {
 				setError( null );
 				createSuccessNotice(
 					value
-						? __( 'Guidelines saved.' )
-						: __( 'Guidelines removed.' ),
+						? __( 'Guideline saved.' )
+						: __( 'Guideline removed.' ),
 					{ type: 'snackbar' }
 				);
+				if ( ! value && existingId ) {
+					onRemoved?.();
+				}
 				closeModal();
 			} )
-			.catch( ( e: Error ) => {
-				setError( e.message );
-				setBlockGuideline( selectedBlock, oldValue );
-			} )
+			.catch( ( e: Error ) => setError( e.message ) )
 			.finally( () => setIsSaving( false ) );
 	};
 
 	const canSubmit = selectedBlock && guidelineText.trim().length > 0;
 
-	let submitButtonLabel: string = __( 'Save guidelines' );
+	let submitButtonLabel: string = __( 'Save' );
 	if ( isSaving ) {
 		submitButtonLabel = __( 'Saving…' );
 	}
@@ -132,15 +126,12 @@ export default function BlockGuidelineModal( {
 	return (
 		<Modal
 			className="block-guideline-modal"
-			title={
-				isEditing ? __( 'Edit guidelines' ) : __( 'Add guidelines' )
-			}
+			title={ isEditing ? __( 'Edit guideline' ) : __( 'Add guideline' ) }
 			onRequestClose={ closeModal }
 		>
 			<VStack spacing={ 4 }>
 				{ isEditing ? (
 					<TextControl
-						__next40pxDefaultSize
 						label={ __( 'Block' ) }
 						value={ selectedBlockLabel }
 						onChange={ () => {} }
@@ -148,7 +139,6 @@ export default function BlockGuidelineModal( {
 					/>
 				) : (
 					<ComboboxControl
-						__next40pxDefaultSize
 						label={ __( 'Block' ) }
 						options={ availableBlockOptions }
 						value={ selectedBlock }
@@ -158,7 +148,7 @@ export default function BlockGuidelineModal( {
 						placeholder={ __( 'Search for a block…' ) }
 					/>
 				) }
-				<TextareaControl
+				<WCTextareaControl
 					label={ __( 'Guideline text' ) }
 					value={ guidelineText }
 					onChange={ setGuidelineText }
@@ -189,6 +179,7 @@ export default function BlockGuidelineModal( {
 							disabled={ isSaving }
 							accessibleWhenDisabled
 							type="button"
+							__next40pxDefaultSize
 						>
 							{ __( 'Remove' ) }
 						</Button>
@@ -199,6 +190,7 @@ export default function BlockGuidelineModal( {
 						disabled={ ! canSubmit || isSaving }
 						isBusy={ isSaving }
 						accessibleWhenDisabled
+						__next40pxDefaultSize
 					>
 						{ submitButtonLabel }
 					</Button>
@@ -206,11 +198,9 @@ export default function BlockGuidelineModal( {
 			</VStack>
 			<ConfirmDialog
 				isOpen={ showRemoveConfirmation }
-				title={ __( 'Remove block guidelines' ) }
+				title={ __( 'Remove block guideline' ) }
 				__experimentalHideHeader={ false }
 				onConfirm={ () => {
-					// We need to pass an empty string to remove the guideline.
-					// This is because the API will only remove the guideline if the value is an empty string.
 					handleSave( '' );
 					setShowRemoveConfirmation( false );
 				} }
@@ -222,7 +212,7 @@ export default function BlockGuidelineModal( {
 				{ sprintf(
 					/* translators: %s: Block name. */
 					__(
-						'You are about to remove the block guidelines for the %s block. This can be undone from revision history.'
+						'You are about to remove the block guideline for the %s block.'
 					),
 					selectedBlockLabel
 				) }

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import moveInterfaceEnableItems from '../move-interface-enable-items';
 
 describe( 'moveInterfaceEnableItems', () => {

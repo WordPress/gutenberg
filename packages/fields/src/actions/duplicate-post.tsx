@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf, _x } from '@wordpress/i18n';
@@ -10,12 +7,8 @@ import {
 	Button,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
-	__experimentalInputControl as InputControl,
+	__experimentalInputControl as WCInputControl,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import type { BasePost, CoreDataError } from '../types';
 import { getItemTitle } from './utils';
 
@@ -98,7 +91,7 @@ const duplicatePost: Action< BasePost > = {
 				);
 			assignableProperties.forEach( ( property ) => {
 				if ( item.hasOwnProperty( property ) ) {
-					// @ts-ignore
+					// @ts-expect-error `property` is a dynamic string key on both objects.
 					newItemObject[ property ] = item[ property ];
 				}
 			} );
@@ -152,8 +145,7 @@ const duplicatePost: Action< BasePost > = {
 							) }
 						</div>
 					) }
-					<InputControl
-						__next40pxDefaultSize
+					<WCInputControl
 						label={ __( 'Title' ) }
 						placeholder={ __( 'No title' ) }
 						value={ getItemTitle( item ) }

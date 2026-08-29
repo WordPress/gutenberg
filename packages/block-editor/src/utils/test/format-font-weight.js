@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { formatFontWeight } from '../format-font-weight';
 
 describe( 'formatFontWeight', () => {

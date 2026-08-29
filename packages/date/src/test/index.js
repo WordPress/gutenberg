@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import momentLib from 'moment';
-
-/**
- * Internal dependencies
- */
 import {
 	getSettings,
 	date as dateNoI18n,

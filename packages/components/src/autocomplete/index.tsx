@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	renderToString,
 	useEffect,
@@ -15,16 +12,12 @@ import {
 	insert,
 	isCollapsed,
 	getTextContent,
+	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
 import { speak } from '@wordpress/a11y';
-import { isAppleOS } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
+import { isAppleOS, withIgnoreIMEEvents } from '@wordpress/keycodes';
 import { AutocompleterUI } from './autocompleter-ui';
 import { getAutocompleteMatch } from './get-autocomplete-match';
-import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 import type {
 	AutocompleteAction,
 	AutocompleteProps,
@@ -36,6 +29,9 @@ import type {
 	UseAutocompleteProps,
 } from './types';
 import getNodeText from '../utils/get-node-text';
+import { unlock } from '../lock-unlock';
+
+const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
 const EMPTY_FILTERED_OPTIONS: KeyedOption[] = [];
 
@@ -375,7 +371,11 @@ export function useLastDifferentValue(
 	return history.current[ 0 ];
 }
 
-export function useAutocompleteProps( options: UseAutocompleteProps ) {
+// The popover is anchored to the element this hook's own `ref` lands on, so it
+// owns `contentRef` and callers don't provide one.
+export function useAutocompleteProps(
+	options: Omit< UseAutocompleteProps, 'contentRef' >
+) {
 	const ref = useRef< HTMLElement >( null );
 	const onKeyDownRef =
 		useRef< ( event: KeyboardEvent ) => void >( undefined );
@@ -390,13 +390,23 @@ export function useAutocompleteProps( options: UseAutocompleteProps ) {
 	const mergedRefs = useMergeRefs( [
 		ref,
 		useRefEffect( ( element: HTMLElement ) => {
-			function _onKeyDown( event: KeyboardEvent ) {
-				onKeyDownRef.current?.( event );
+			function _onKeyDown( event: Event ) {
+				onKeyDownRef.current?.( event as KeyboardEvent );
 			}
-			element.addEventListener( 'keydown', _onKeyDown );
-			return () => {
-				element.removeEventListener( 'keydown', _onKeyDown );
-			};
+			// Capture phase. When the autocomplete popover is open,
+			// Up/Down/Enter/Escape must navigate the completion list —
+			// they shouldn't be consumed by ancestor handlers (e.g.
+			// block-editor's writing-flow) for block navigation, block
+			// splitting, or "move out of parent" actions. Those handlers
+			// fire at bubble phase and gate on `event.defaultPrevented`,
+			// so firing in capture lets us preventDefault first when the
+			// popover is active.
+			return subscribeOwnedListener(
+				element,
+				'keydown',
+				_onKeyDown,
+				true
+			);
 		}, [] ),
 	] );
 
@@ -407,12 +417,21 @@ export function useAutocompleteProps( options: UseAutocompleteProps ) {
 		return { ref: mergedRefs };
 	}
 
+	// `aria-owns` and `aria-controls` point at the same list: either one lets
+	// `aria-activedescendant` resolve to an option rendered outside this
+	// element, and assistive technology support differs between them.
+	//
+	// No `aria-expanded`: consumers are `textbox` elements, which don't
+	// support it; that would mean `role="combobox"`, which in turn doesn't
+	// support the `aria-multiline` these fields set.
 	return {
 		ref: mergedRefs,
 		children: popover,
-		'aria-autocomplete': listBoxId ? 'list' : undefined,
+		'aria-autocomplete': listBoxId ? ( 'list' as const ) : undefined,
+		'aria-haspopup': listBoxId ? ( 'listbox' as const ) : undefined,
+		'aria-controls': listBoxId,
 		'aria-owns': listBoxId,
-		'aria-activedescendant': activeId,
+		'aria-activedescendant': activeId ?? undefined,
 	};
 }
 
