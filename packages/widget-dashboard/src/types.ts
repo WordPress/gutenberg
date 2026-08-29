@@ -112,18 +112,19 @@ export interface WidgetContextValue {
 export type WidgetGridModel = 'grid' | 'masonry';
 
 /**
- * Maximum column count for the widget dashboard on wide containers.
- * Not user-configurable; container width steps the count down to two
- * and one column at fixed breakpoints.
+ * Default and maximum column count for the widget dashboard on wide
+ * containers. A host may lower it through `gridSettings.columns`; container
+ * width then steps the count down to two and one column at fixed
+ * breakpoints. Not a user-facing setting.
  */
 export const WIDGET_DASHBOARD_COLUMN_COUNT = 4;
 
 /**
  * Settings common to every grid model. Column count is resolved from
- * the dashboard container width (see
- * `utils/resolve-dashboard-column-count`). `columns` and `minColumnWidth`
- * on this type remain for persisted payloads and `@wordpress/grid`
- * compatibility; the dashboard ignores user-facing values for both.
+ * the host's cap and the dashboard container width (see
+ * `utils/resolve-dashboard-column-count`). `minColumnWidth` remains for
+ * persisted payloads and `@wordpress/grid` compatibility; the dashboard
+ * ignores it.
  *
  * `spacing` is intentionally absent: the gap between tiles is
  * presentational and lives with the design-system theme/density, not
@@ -132,8 +133,10 @@ export const WIDGET_DASHBOARD_COLUMN_COUNT = 4;
  */
 interface BaseWidgetGridSettings {
 	/**
-	 * Target column count (cap). The dashboard always uses
-	 * {@link WIDGET_DASHBOARD_COLUMN_COUNT}; persisted values are ignored.
+	 * Column cap on wide containers, `1` to
+	 * {@link WIDGET_DASHBOARD_COLUMN_COUNT}. Values outside that range, or
+	 * absent, resolve to the constant. Container width steps the effective
+	 * count down from the cap.
 	 */
 	columns?: number;
 

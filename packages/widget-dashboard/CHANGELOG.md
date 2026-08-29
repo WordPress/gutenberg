@@ -18,6 +18,13 @@
     registered type be inserted
     ([#81967](https://github.com/WordPress/gutenberg/pull/81967)).
 
+### Enhancements
+
+-   `gridSettings.columns` now lowers the column cap on wide containers, from
+    `1` to `WIDGET_DASHBOARD_COLUMN_COUNT`; the responsive steps scale from
+    the cap. Defaults are unchanged: `DEFAULT_GRID` keeps four columns
+    ([#82173](https://github.com/WordPress/gutenberg/issues/82173)).
+
 ### Internal
 
 -   Remove unused dependency `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
