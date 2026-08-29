@@ -57,18 +57,45 @@ test.describe( 'HEIC upload EXIF preservation', () => {
 		const standIn = readFileSync(
 			join( ASSETS_DIR, '1024x768_e2e_test_image_size.jpeg' )
 		).toString( 'base64' );
-		await page.addInitScript( ( dataUrl: string ) => {
+		await page.addInitScript( ( base64: string ) => {
+			// Decoded up front rather than fetched from a data: URL so the
+			// stand-in cannot fail for reasons of its own.
+			const binary = atob( base64 );
+			const bytes = new Uint8Array( binary.length );
+			for ( let i = 0; i < binary.length; i++ ) {
+				bytes[ i ] = binary.charCodeAt( i );
+			}
+			const standInBlob = new Blob( [ bytes ], { type: 'image/jpeg' } );
+
+			// Every type the shim is handed, so a miss can be diagnosed.
+			const seen: unknown[] = [];
+			( window as unknown as Record< string, unknown > ).__heicShimTypes =
+				seen;
+
 			const original = window.createImageBitmap.bind( window );
 			window.createImageBitmap = ( async (
 				source: ImageBitmapSource,
 				...rest: unknown[]
 			) => {
-				if ( source instanceof Blob && source.type === 'image/heic' ) {
-					source = await ( await fetch( dataUrl ) ).blob();
+				/*
+				 * Chromium types an upload from the platform, so the same
+				 * fixture arrives as `image/heic` on macOS and `image/heif`
+				 * on Linux. Match the family rather than one spelling.
+				 */
+				const type = ( source as { type?: unknown } )?.type;
+				seen.push( type );
+				if (
+					typeof type === 'string' &&
+					type.startsWith( 'image/hei' )
+				) {
+					source = standInBlob;
 				}
-				return ( original as any )( source, ...rest );
+				return ( original as ( ...args: unknown[] ) => unknown )(
+					source,
+					...rest
+				);
 			} ) as typeof createImageBitmap;
-		}, `data:image/jpeg;base64,${ standIn }` );
+		}, standIn );
 
 		await admin.createNewPost();
 		await skipIfClientSideMediaInactive( page, test );
@@ -98,9 +125,27 @@ test.describe( 'HEIC upload EXIF preservation', () => {
 		const image = imageBlock.getByRole( 'img', {
 			name: 'This image has an empty alt attribute',
 		} );
-		await expect( image ).toHaveAttribute( 'src', /^https?:\/\/.*\.jpg$/, {
-			timeout: 60_000,
-		} );
+		try {
+			await expect( image ).toHaveAttribute(
+				'src',
+				/^https?:\/\/.*\.jpg$/,
+				{ timeout: 60_000 }
+			);
+		} catch ( error ) {
+			// A conversion failure is always reported as a decode error,
+			// whatever went wrong, so say what the stand-in was offered.
+			const seen = await page.evaluate(
+				() =>
+					( window as unknown as Record< string, unknown > )
+						.__heicShimTypes
+			);
+			throw new Error(
+				`${ ( error as Error ).message }\n\n` +
+					`createImageBitmap was called with: ${ JSON.stringify(
+						seen
+					) }`
+			);
+		}
 		await page.waitForFunction(
 			() =>
 				window.wp.data.select( 'core/upload-media' ).getItems()
