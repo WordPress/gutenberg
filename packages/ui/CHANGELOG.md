@@ -9,7 +9,7 @@
 
 ### New Features
 
--   Add `CheckboxControl` component.
+-   Add `CheckboxControl` component ([#82213](https://github.com/WordPress/gutenberg/pull/82213)).
 
 ### Enhancements
 

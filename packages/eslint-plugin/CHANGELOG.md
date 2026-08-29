@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Update `use-recommended-components` rule to mark `CheckboxControl` from `@wordpress/ui` as recommended.
+-   Update `use-recommended-components` rule to mark `CheckboxControl` from `@wordpress/ui` as recommended ([#82213](https://github.com/WordPress/gutenberg/pull/82213)).
 
 ### Bug Fixes
 
