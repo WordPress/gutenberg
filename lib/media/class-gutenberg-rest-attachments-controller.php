@@ -1496,6 +1496,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				$metadata[ self::META_KEY_SOURCE_IMAGE ] ?? null,
 				$metadata['animated_video'] ?? null,
 				$metadata['animated_video_poster'] ?? null,
+				$metadata[ self::META_KEY_OPTIMIZED_VIDEO ] ?? null,
 			);
 
 			if ( ! empty( $metadata['sizes'] ) && is_array( $metadata['sizes'] ) ) {
