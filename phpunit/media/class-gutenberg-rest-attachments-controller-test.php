@@ -453,6 +453,49 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	}
 
 	/**
+	 * Storing the companion's name on finalize consumes its sideload record,
+	 * like every other name a request is allowed to store.
+	 *
+	 * @covers ::finalize_item
+	 * @covers ::get_sideloaded_file_names
+	 */
+	public function test_finalize_consumes_the_optimized_video_provenance_record() {
+		wp_set_current_user( self::$admin_id );
+
+		$attachment_id = $this->create_video_attachment_for_sideload();
+
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
+		$request->set_header( 'Content-Type', 'video/mp4' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=small-video-optimized.mp4' );
+		$request->set_param( 'image_size', 'optimized-video' );
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/uploads/small-video.mp4' ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status(), 'Sideloading the transcoded companion should succeed.' );
+		$companion = $response->get_data();
+		$this->assertNotEmpty(
+			get_post_meta( $attachment_id, Gutenberg_REST_Attachments_Controller::META_KEY_SIDELOAD_FILE_NAME ),
+			'The sideload should record the companion name.'
+		);
+
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/finalize" );
+		$request->set_param( 'sub_sizes', array( $companion ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status(), 'Finalizing with the companion should succeed.' );
+		$this->assertSame(
+			$companion['file'],
+			wp_get_attachment_metadata( $attachment_id )['optimized_video'],
+			'The companion name should be stored in the attachment metadata.'
+		);
+		$this->assertSame(
+			array(),
+			get_post_meta( $attachment_id, Gutenberg_REST_Attachments_Controller::META_KEY_SIDELOAD_FILE_NAME ),
+			'Storing the companion name should consume its sideload record.'
+		);
+	}
+
+	/**
 	 * The video exemption is scoped to the transcoded companion: every other
 	 * size still needs an image or PDF parent, since a video has no sub-sizes.
 	 *
