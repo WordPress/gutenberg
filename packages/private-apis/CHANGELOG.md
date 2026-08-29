@@ -4,7 +4,7 @@
 
 ### Internal
 
--   Remove `@wordpress/admin-ui` from the list of core modules using private APIs.
+-   Remove `@wordpress/admin-ui` from the list of core modules using private APIs. [#82205](https://github.com/WordPress/gutenberg/pull/82205)
 
 ## 1.54.0 (2026-08-26)
 
