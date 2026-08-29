@@ -7,8 +7,6 @@ import styles from './style.module.css';
 import type { RadioProps } from './types';
 
 /**
- * A radio button primitive.
- *
  * Must be rendered inside a RadioGroup.
  */
 export const Radio = forwardRef< HTMLSpanElement, RadioProps >( function Radio(

@@ -6,7 +6,6 @@ const meta: Meta< typeof Radio > = {
 	title: 'Design System/Components/Form/Primitives/Radio',
 	component: Radio,
 	parameters: {
-		// FIXME: Stories show the radio primitive without a visible label (aria-toggle-field-name).
 		// See: https://github.com/WordPress/gutenberg/issues/81596
 		a11y: { test: 'todo' },
 		componentStatus: {
