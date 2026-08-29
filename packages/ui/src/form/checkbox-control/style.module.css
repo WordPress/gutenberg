@@ -16,6 +16,8 @@
 		.checkbox-wrapper {
 			display: flex;
 			align-items: center;
+			/* Size the wrapper to one label line so the checkbox centers on the first line. */
+			height: 1lh;
 			line-height: var(--wp-ui-checkbox-control-label-line-height);
 		}
 

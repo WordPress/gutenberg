@@ -43,10 +43,6 @@ export const CheckboxControl = forwardRef<
 		<Field.Root name={ name } className={ clsx( styles.root, className ) }>
 			<Field.Item render={ ITEM_RENDER }>
 				<div className={ styles[ 'checkbox-wrapper' ] }>
-					{ /* The zero-width space allows to use the same line height for both
-						the checkbox wrapper and the label, ensuring that the first line of the
-						label and the checkbox are always vertically centered */ }
-					&#8203;
 					<Checkbox
 						ref={ ref }
 						className={ styles.checkbox }
