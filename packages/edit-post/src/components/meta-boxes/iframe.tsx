@@ -30,16 +30,19 @@ export default function MetaBoxesIframe( {
 		[ isSide ]
 	);
 
-	if ( ! src || ! isVisible ) {
+	if ( ! src ) {
 		return null;
 	}
 
+	// Hidden rather than unmounted: the iframe document reports which meta
+	// boxes exist, which is what decides visibility in the first place.
 	return (
 		<iframe
 			className={ clsx(
 				'edit-post-meta-boxes-iframe',
 				`is-${ location }`
 			) }
+			style={ isVisible ? undefined : { display: 'none' } }
 			name={ getMetaBoxesIframeName( location ) }
 			title={ __( 'Meta Boxes' ) }
 			src={ src }

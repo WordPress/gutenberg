@@ -58,70 +58,9 @@ function gutenberg_meta_box_iframe_locations() {
 	return array( 'normal', 'advanced' );
 }
 
-/**
- * Skips rendering the meta boxes on the block editor page; the iframes
- * render them. The listing core would have computed from this array is
- * dispatched from the footer, after core dispatches the empty one.
- *
- * @param array $wp_meta_boxes Global meta box state.
- * @return array An empty array, so that nothing renders.
- */
-function gutenberg_meta_box_iframe_remove_parent_boxes( $wp_meta_boxes ) {
-	global $current_screen;
-
-	if ( ! is_array( $wp_meta_boxes ) || ! $current_screen ) {
-		return $wp_meta_boxes;
-	}
-
-	// The same computation as in the_block_editor_meta_boxes().
-	$locations               = array( 'side', 'normal', 'advanced' );
-	$priorities              = array( 'high', 'sorted', 'core', 'default', 'low' );
-	$meta_boxes_per_location = array();
-	foreach ( $locations as $location ) {
-		$meta_boxes_per_location[ $location ] = array();
-
-		if ( ! isset( $wp_meta_boxes[ $current_screen->id ][ $location ] ) ) {
-			continue;
-		}
-
-		foreach ( $priorities as $priority ) {
-			if ( ! isset( $wp_meta_boxes[ $current_screen->id ][ $location ][ $priority ] ) ) {
-				continue;
-			}
-
-			$meta_boxes = (array) $wp_meta_boxes[ $current_screen->id ][ $location ][ $priority ];
-			foreach ( $meta_boxes as $meta_box ) {
-				if ( false === $meta_box || ! $meta_box['title'] ) {
-					continue;
-				}
-
-				if ( ! empty( $meta_box['args']['__back_compat_meta_box'] ) ) {
-					continue;
-				}
-
-				$meta_boxes_per_location[ $location ][] = array(
-					'id'    => $meta_box['id'],
-					'title' => $meta_box['title'],
-				);
-			}
-		}
-	}
-
-	$script = 'window._wpLoadBlockEditor && window._wpLoadBlockEditor.then( function() {
-		wp.data.dispatch( \'core/edit-post\' ).setAvailableMetaBoxesPerLocation( ' . wp_json_encode( $meta_boxes_per_location, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ) . ' );
-	} );';
-
-	add_action(
-		'admin_print_footer_scripts',
-		function () use ( $script ) {
-			printf( "<script>\n%s\n</script>\n", $script );
-		},
-		99
-	);
-
-	return array();
-}
-add_filter( 'filter_block_editor_meta_boxes', 'gutenberg_meta_box_iframe_remove_parent_boxes', PHP_INT_MAX );
+// The block editor page renders no meta boxes; the iframes render them
+// and report them to the editor's store.
+add_filter( 'filter_block_editor_meta_boxes', '__return_empty_array', PHP_INT_MAX );
 
 /**
  * Renders the loader page: an admin iframe document with only the post

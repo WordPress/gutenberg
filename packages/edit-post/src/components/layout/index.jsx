@@ -161,6 +161,11 @@ function MetaBoxesMain() {
 		if ( noticeContainer ) {
 			observer.observe( noticeContainer );
 		}
+		// The pane mounts hidden until an iframe reports meta boxes, so the
+		// handle measures 0 until it appears.
+		if ( resizeHandle ) {
+			observer.observe( resizeHandle );
+		}
 		return () => observer.disconnect();
 	}, [] );
 	const metaBoxesMainRef = useRef();
@@ -255,10 +260,6 @@ function MetaBoxesMain() {
 		{ keyboardDisplacement: 20, filterTaps: true }
 	);
 
-	if ( ! hasAnyVisible ) {
-		return;
-	}
-
 	const contents = (
 		<div
 			// The class name 'edit-post-layout__metaboxes' is retained because some plugins use it.
@@ -333,7 +334,11 @@ function MetaBoxesMain() {
 				'edit-post-meta-boxes-main',
 				! isShort && 'is-resizable'
 			) }
-			style={ { height: usedHeight } }
+			// Hidden rather than unmounted when no boxes are visible: the
+			// iframe document reports which meta boxes exist.
+			style={
+				hasAnyVisible ? { height: usedHeight } : { display: 'none' }
+			}
 		>
 			<div className="edit-post-meta-boxes-main__presenter">
 				{ toggle }
