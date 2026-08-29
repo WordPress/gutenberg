@@ -1,13 +1,15 @@
-'use strict';
-/* eslint-disable jest/no-conditional-expect */
-const path = require( 'path' );
-const { homedir } = require( 'os' );
+import { createRequire } from 'node:module';
+import path from 'node:path';
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
+const require = createRequire( import.meta.url );
+const os = require( 'node:os' );
+const homedir = vi.spyOn( os, 'homedir' );
 const { ValidationError } = require( '../validate-config' );
 const { parseSourceString } = require( '../parse-source-string' );
 
-jest.mock( 'os', () => ( {
-	homedir: jest.fn(),
-} ) );
+afterAll( () => {
+	vi.restoreAllMocks();
+} );
 
 describe( 'parseSourceString', () => {
 	const options = {
@@ -144,4 +146,3 @@ describe( 'parseSourceString', () => {
 		} );
 	} );
 } );
-/* eslint-enable jest/no-conditional-expect */

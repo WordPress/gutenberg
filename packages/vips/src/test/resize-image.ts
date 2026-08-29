@@ -1,48 +1,66 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import type VipsFactory from 'wasm-vips';
 import { resizeImage } from '../';
 import type { ImageSizeCrop } from '../types';
 
-const mockThumbnailBuffer = jest.fn( () => new MockImage() );
-const mockCrop = jest.fn( () => new MockImage() );
-const mockResize = jest.fn( () => new MockImage() );
-const mockNewFromBuffer = jest.fn( () => new MockImage() );
-const mockWriteToBuffer = jest.fn( () => ( {
-	buffer: '',
-} ) );
+const {
+	MockVipsImage,
+	mockCrop,
+	mockResize,
+	mockState,
+	mockThumbnailBuffer,
+	mockWriteToBuffer,
+} = vi.hoisted( () => {
+	const state = { bitdepth: 8 };
+	const writeToBufferMock = vi.fn( () => ( {
+		buffer: '',
+	} ) );
 
-// Controls the `heif-bitdepth` value reported by the mocked source image so
-// tests can exercise both the standard (8-bit) and high-bit-depth code paths.
-let mockBitdepth = 8;
+	class ImageMock {
+		width = 100;
+		height = 100;
+		pageHeight = 100;
+		crop = cropMock;
+		resize = resizeMock;
+		writeToBuffer = writeToBufferMock;
+		getInt = vi.fn( ( name: string ) =>
+			'heif-bitdepth' === name ? state.bitdepth : 0
+		);
+	}
 
-class MockImage {
-	width = 100;
-	height = 100;
-	pageHeight = 100;
-	crop = mockCrop;
-	resize = mockResize;
-	writeToBuffer = mockWriteToBuffer;
-	getInt = jest.fn( ( name: string ) =>
-		'heif-bitdepth' === name ? mockBitdepth : 0
-	);
-}
+	const thumbnailBufferMock = vi.fn( () => new ImageMock() );
+	const cropMock = vi.fn( () => new ImageMock() );
+	const resizeMock = vi.fn( () => new ImageMock() );
+	const newFromBufferMock = vi.fn( () => new ImageMock() );
 
-class MockVipsImage {
-	static thumbnailBuffer = mockThumbnailBuffer;
-	static newFromBuffer = mockNewFromBuffer;
-}
+	class VipsImageMock {
+		static thumbnailBuffer = thumbnailBufferMock;
+		static newFromBuffer = newFromBufferMock;
+	}
 
-jest.mock( 'wasm-vips', () =>
-	jest.fn( () => ( {
+	return {
+		MockVipsImage: VipsImageMock,
+		mockCrop: cropMock,
+		mockResize: resizeMock,
+		mockState: state,
+		mockThumbnailBuffer: thumbnailBufferMock,
+		mockWriteToBuffer: writeToBufferMock,
+	};
+} );
+
+vi.mock( import( 'wasm-vips' ), () => ( {
+	default: vi.fn( () => ( {
 		Image: MockVipsImage,
 		Cache: {
-			max: jest.fn(),
+			max: vi.fn(),
 		},
-	} ) )
-);
+	} ) ) as unknown as typeof VipsFactory,
+} ) );
 
 describe( 'resizeImage', () => {
 	afterEach( () => {
-		jest.clearAllMocks();
-		mockBitdepth = 8;
+		vi.clearAllMocks();
+		mockState.bitdepth = 8;
 	} );
 
 	it( 'resizes without crop', async () => {
@@ -259,7 +277,7 @@ describe( 'resizeImage', () => {
 
 	describe( 'high-bit-depth AVIF', () => {
 		it( 'preserves bit depth when resizing a 10-bit AVIF without crop', async () => {
-			mockBitdepth = 10;
+			mockState.bitdepth = 10;
 			const avifFile = new File( [ '<BLOB>' ], 'example.avif', {
 				type: 'image/avif',
 			} );
@@ -282,7 +300,7 @@ describe( 'resizeImage', () => {
 		} );
 
 		it( 'centre-crops a 12-bit AVIF while preserving bit depth', async () => {
-			mockBitdepth = 12;
+			mockState.bitdepth = 12;
 			const avifFile = new File( [ '<BLOB>' ], 'example.avif', {
 				type: 'image/avif',
 			} );
@@ -304,7 +322,7 @@ describe( 'resizeImage', () => {
 		} );
 
 		it( 'crops a 10-bit AVIF to a position while preserving bit depth', async () => {
-			mockBitdepth = 10;
+			mockState.bitdepth = 10;
 			const avifFile = new File( [ '<BLOB>' ], 'example.avif', {
 				type: 'image/avif',
 			} );
@@ -328,7 +346,7 @@ describe( 'resizeImage', () => {
 		} );
 
 		it( 'uses the standard thumbnail path for an 8-bit AVIF', async () => {
-			mockBitdepth = 8;
+			mockState.bitdepth = 8;
 			const avifFile = new File( [ '<BLOB>' ], 'example.avif', {
 				type: 'image/avif',
 			} );
@@ -392,7 +410,7 @@ describe( 'resizeImage', () => {
 
 	describe( 'image_max_bit_depth', () => {
 		it( 'caps a 12-bit AVIF at 10-bit', async () => {
-			mockBitdepth = 12;
+			mockState.bitdepth = 12;
 			const avifFile = new File( [ '<BLOB>' ], 'example.avif', {
 				type: 'image/avif',
 			} );
@@ -419,7 +437,7 @@ describe( 'resizeImage', () => {
 		} );
 
 		it( 'snaps an unsupported cap down to the nearest valid depth', async () => {
-			mockBitdepth = 12;
+			mockState.bitdepth = 12;
 			const avifFile = new File( [ '<BLOB>' ], 'example.avif', {
 				type: 'image/avif',
 			} );
@@ -443,7 +461,7 @@ describe( 'resizeImage', () => {
 		} );
 
 		it( 'flattens a 10-bit AVIF via the thumbnail path when capped at 8-bit', async () => {
-			mockBitdepth = 10;
+			mockState.bitdepth = 10;
 			const avifFile = new File( [ '<BLOB>' ], 'example.avif', {
 				type: 'image/avif',
 			} );
@@ -471,7 +489,7 @@ describe( 'resizeImage', () => {
 		} );
 
 		it( 'ignores the cap for sources at or below it', async () => {
-			mockBitdepth = 10;
+			mockState.bitdepth = 10;
 			const avifFile = new File( [ '<BLOB>' ], 'example.avif', {
 				type: 'image/avif',
 			} );

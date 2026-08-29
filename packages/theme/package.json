@@ -99,7 +99,6 @@
 		"@testing-library/jest-dom": "^6.9.1",
 		"@testing-library/react": "^16.3.2",
 		"@testing-library/user-event": "^14.6.1",
-		"@types/jest": "^30.0.0",
 		"@types/node": "^20.19.39",
 		"@wordpress/validation-tools": "file:../../tools/validation",
 		"esbuild": "^0.27.2",
@@ -107,7 +106,8 @@
 		"lightningcss": "^1.33.0",
 		"prettier": "npm:wp-prettier@^3.0.3",
 		"storybook": "^10.5.3",
-		"stylelint": "^16.26.1"
+		"stylelint": "^16.26.1",
+		"vitest": "^4.1.10"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

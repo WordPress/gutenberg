@@ -10,12 +10,16 @@ import {
 } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { promisify } from 'node:util';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 import { setupSkills } from '../setup-skills.mjs';
 
 const execFileAsync = promisify( execFile );
-const setupScriptSource = path.join( __dirname, '../setup-skills.mjs' );
+const setupScriptSource = path.join(
+	path.dirname( fileURLToPath( import.meta.url ) ),
+	'../setup-skills.mjs'
+);
 const temporaryRoots = [];
 
 afterEach( async () => {
@@ -122,7 +126,7 @@ describe( 'setupSkills', () => {
 		);
 		await createSkill( repositoryRoot, 'release' );
 
-		const confirm = jest.fn();
+		const confirm = vi.fn();
 		const generated = await setupSkills( {
 			repositoryRoot,
 			confirm,
@@ -149,7 +153,7 @@ describe( 'setupSkills', () => {
 		const repositoryRoot = await createRepository();
 		await setupSkills( { repositoryRoot } );
 		await createFloatingSkill( repositoryRoot, 'private' );
-		const confirm = jest.fn();
+		const confirm = vi.fn();
 
 		const generated = await setupSkills( {
 			repositoryRoot,

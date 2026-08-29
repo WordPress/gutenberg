@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
-/**
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import Vips from 'wasm-vips';
+
+/*
  * Loads the real `wasm-vips` build to exercise the actual AVIF decoder.
  *
  * Unlike the other tests in this package, this is an integration test: it does
@@ -13,9 +15,16 @@ import { join } from 'node:path';
  * AVIF images (kleisauke/wasm-vips#118). Earlier builds threw "error in tile"
  * decode failures on the same files.
  */
-const Vips = require( 'wasm-vips' );
 
-const FIXTURES = join( __dirname, 'fixtures' );
+/**
+ * Returns a fixture URL relative to this ESM test module.
+ *
+ * @param file Fixture filename.
+ *
+ * @return Fixture URL.
+ */
+const getFixtureUrl = ( file: string ) =>
+	new URL( `./fixtures/${ file }`, import.meta.url );
 
 describe( 'wasm-vips high-bit-depth AVIF decoding', () => {
 	let vips: Awaited< ReturnType< typeof Vips > >;
@@ -32,7 +41,7 @@ describe( 'wasm-vips high-bit-depth AVIF decoding', () => {
 		[ '10-bit', 'highbitdepth-10bit.avif' ],
 		[ '12-bit', 'highbitdepth-12bit.avif' ],
 	] )( 'decodes a %s AVIF image into a 16-bit image', ( _label, file ) => {
-		const buffer = readFileSync( join( FIXTURES, file ) );
+		const buffer = readFileSync( getFixtureUrl( file ) );
 
 		const image = vips.Image.newFromBuffer( buffer );
 
@@ -47,7 +56,7 @@ describe( 'wasm-vips high-bit-depth AVIF decoding', () => {
 	} );
 
 	it( 'decodes a standard 8-bit AVIF image into an 8-bit image', () => {
-		const buffer = readFileSync( join( FIXTURES, 'standard-8bit.avif' ) );
+		const buffer = readFileSync( getFixtureUrl( 'standard-8bit.avif' ) );
 
 		const image = vips.Image.newFromBuffer( buffer );
 
@@ -77,7 +86,7 @@ describe( 'wasm-vips high-bit-depth AVIF decoding', () => {
 		] )(
 			'keeps a %s AVIF high-bit-depth through resize and re-encode',
 			( _label, file, depth ) => {
-				const buffer = readFileSync( join( FIXTURES, file ) );
+				const buffer = readFileSync( getFixtureUrl( file ) );
 
 				// `thumbnail` flattens samples to 8-bit sRGB...
 				const flattened = vips.Image.thumbnailBuffer( buffer, 32, {
@@ -118,7 +127,7 @@ describe( 'wasm-vips high-bit-depth AVIF decoding', () => {
 			// would be inflated to 12-bit (larger, not "similar") unless the
 			// original depth is written explicitly.
 			const buffer = readFileSync(
-				join( FIXTURES, 'highbitdepth-10bit.avif' )
+				getFixtureUrl( 'highbitdepth-10bit.avif' )
 			);
 			const resized = vips.Image.newFromBuffer( buffer ).resize( 0.5 );
 

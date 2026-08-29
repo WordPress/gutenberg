@@ -28,6 +28,7 @@
  * sideways during fine rotation would have been caught by this test —
  * the center would agree (symmetric bug) but the corners would drift.
  */
+import { describe, expect, it } from 'vitest';
 import { mat2d, vec2 } from 'gl-matrix';
 import {
 	createCamera,
