@@ -1,7 +1,13 @@
 import { effect } from '@preact/signals';
+import { describe, expect, it, vi } from 'vitest';
 import { proxifyState, peek, deepMerge } from '../';
 import { hasPropSignal } from '../state';
 import { getProxyFromObject } from '../registry';
+
+const trackEffect = ( callback: () => unknown ) =>
+	effect( () => {
+		callback();
+	} );
 
 describe( 'Interactivity API', () => {
 	describe( 'deepMerge', () => {
@@ -302,15 +308,15 @@ describe( 'Interactivity API', () => {
 			const source = { a: 2, b: { x: 20, y: 30 }, c: 3 };
 			const result = proxifyState< any >( 'test', {} );
 
-			const spyA = jest.fn( () => result.a );
-			effect( spyA );
+			const spyA = vi.fn( () => result.a );
+			trackEffect( spyA );
 
 			expect( spyA ).toHaveBeenCalledTimes( 1 );
 
 			deepMerge( result, target );
 
-			const spyBx = jest.fn( () => result.b.x );
-			effect( spyBx );
+			const spyBx = vi.fn( () => result.b.x );
+			trackEffect( spyBx );
 			expect( spyA ).toHaveBeenCalledTimes( 2 );
 			expect( spyBx ).toHaveBeenCalledTimes( 1 );
 
@@ -333,8 +339,8 @@ describe( 'Interactivity API', () => {
 			const source = { a: 3, b: 4 };
 			const result = proxifyState< any >( 'test', {} );
 
-			const spy = jest.fn( () => ( result.a, result.b ) );
-			effect( spy );
+			const spy = vi.fn( () => ( result.a, result.b ) );
+			trackEffect( spy );
 
 			expect( spy ).toHaveBeenCalledTimes( 1 );
 
@@ -352,10 +358,10 @@ describe( 'Interactivity API', () => {
 			const source = { a: 1, b: 2, c: 3 };
 
 			let keys: any;
-			const spy = jest.fn( () => {
+			const spy = vi.fn( () => {
 				keys = Object.keys( target );
 			} );
-			effect( spy );
+			trackEffect( spy );
 
 			expect( spy ).toHaveBeenCalledTimes( 1 );
 
@@ -369,10 +375,10 @@ describe( 'Interactivity API', () => {
 			const target: any = proxifyState( 'test', {} );
 
 			let deepValue: any;
-			const spy = jest.fn( () => {
+			const spy = vi.fn( () => {
 				deepValue = target.a?.b?.c?.d;
 			} );
-			effect( spy );
+			trackEffect( spy );
 
 			// Initial call, the deep value is undefined
 			expect( spy ).toHaveBeenCalledTimes( 1 );
@@ -400,8 +406,8 @@ describe( 'Interactivity API', () => {
 			const target: any = proxifyState( 'test', { message: 'hello' } );
 
 			let message: any;
-			const spy = jest.fn( () => ( message = target.message ) );
-			effect( spy );
+			const spy = vi.fn( () => ( message = target.message ) );
+			trackEffect( spy );
 
 			expect( spy ).toHaveBeenCalledTimes( 1 );
 			expect( message ).toBe( 'hello' );
@@ -426,8 +432,8 @@ describe( 'Interactivity API', () => {
 			const target: any = proxifyState( 'test', { message: 'hello' } );
 
 			let message: any;
-			const spy = jest.fn( () => ( message = target.message ) );
-			effect( spy );
+			const spy = vi.fn( () => ( message = target.message ) );
+			trackEffect( spy );
 
 			expect( spy ).toHaveBeenCalledTimes( 1 );
 			expect( message ).toBe( 'hello' );
@@ -452,11 +458,11 @@ describe( 'Interactivity API', () => {
 				},
 			} );
 
-			const getterSpy = jest.spyOn( target, 'message', 'get' );
+			const getterSpy = vi.spyOn( target, 'message', 'get' );
 
 			let message: any;
-			const spy = jest.fn( () => ( message = target.message ) );
-			effect( spy );
+			const spy = vi.fn( () => ( message = target.message ) );
+			trackEffect( spy );
 
 			expect( spy ).toHaveBeenCalledTimes( 1 );
 			expect( message ).toBe( 'hello' );
@@ -481,10 +487,10 @@ describe( 'Interactivity API', () => {
 			const target: any = proxifyState( 'test', {} );
 
 			let deepValue: any;
-			const spy = jest.fn( () => {
+			const spy = vi.fn( () => {
 				deepValue = target.array?.[ 0 ];
 			} );
-			effect( spy );
+			trackEffect( spy );
 
 			// Initial call, the deep value is undefined
 			expect( spy ).toHaveBeenCalledTimes( 1 );
@@ -512,8 +518,8 @@ describe( 'Interactivity API', () => {
 			} );
 
 			let double: any;
-			const spy = jest.fn( () => ( double = target.double ) );
-			effect( spy );
+			const spy = vi.fn( () => ( double = target.double ) );
+			trackEffect( spy );
 
 			expect( spy ).toHaveBeenCalledTimes( 1 );
 			expect( double ).toBe( 4 );
@@ -546,8 +552,8 @@ describe( 'Interactivity API', () => {
 			} );
 
 			let double: any;
-			const spy = jest.fn( () => ( double = target.double ) );
-			effect( spy );
+			const spy = vi.fn( () => ( double = target.double ) );
+			trackEffect( spy );
 
 			expect( spy ).toHaveBeenCalledTimes( 1 );
 			expect( double ).toBe( 4 );
@@ -579,8 +585,8 @@ describe( 'Interactivity API', () => {
 			} );
 
 			let double: any;
-			const spy = jest.fn( () => ( double = target.double ) );
-			effect( spy );
+			const spy = vi.fn( () => ( double = target.double ) );
+			trackEffect( spy );
 
 			expect( spy ).toHaveBeenCalledTimes( 1 );
 			expect( double ).toBe( 4 );

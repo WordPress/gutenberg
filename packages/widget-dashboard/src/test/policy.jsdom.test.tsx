@@ -1,4 +1,5 @@
-import '@testing-library/jest-dom';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import '@testing-library/jest-dom/vitest';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentType } from 'react';
@@ -19,11 +20,14 @@ import type {
 	DashboardWidget,
 } from '../types';
 
-jest.mock( '../components/widget-attributes/use-inline-fit', () => ( {
-	useInlineFit: jest.fn(),
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockResizeObserver();
+
+vi.mock( import( '../components/widget-attributes/use-inline-fit' ), () => ( {
+	useInlineFit: vi.fn(),
 } ) );
 
-const mockedUseInlineFit = jest.mocked( useInlineFit );
+const mockedUseInlineFit = vi.mocked( useInlineFit );
 
 function TestWidget( {
 	attributes,
@@ -225,7 +229,7 @@ describe( 'WidgetDashboard.Policy instance operations', () => {
 	} );
 
 	it( 'asks with the placed widget and its type', async () => {
-		const canPerform = jest.fn< boolean, [ unknown ] >( () => true );
+		const canPerform = vi.fn< CanPerformDashboardOperation >( () => true );
 		render( <Harness canPerform={ canPerform } editMode /> );
 		await screen.findByTestId( 'label' );
 

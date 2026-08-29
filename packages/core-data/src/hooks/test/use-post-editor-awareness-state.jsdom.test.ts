@@ -1,3 +1,12 @@
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	test,
+	vi,
+	type Mock,
+} from 'vitest';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import {
 	useActiveCollaborators,
@@ -17,16 +26,16 @@ import type {
 import type { SelectionCursor } from '../../types';
 
 // Mock the sync module
-jest.mock( '../../sync', () => ( {
-	getSyncManager: jest.fn(),
+vi.mock( import( '../../sync' ), () => ( {
+	getSyncManager: vi.fn(),
 } ) );
 
 const mockPostContentBlocks = [
 	{ clientId: 'block-1', name: 'core/paragraph', innerBlocks: [] },
 ];
 
-jest.mock( '../../awareness/block-lookup', () => ( {
-	usePostContentBlocks: jest.fn( () => mockPostContentBlocks ),
+vi.mock( import( '../../awareness/block-lookup' ), () => ( {
+	usePostContentBlocks: vi.fn( () => mockPostContentBlocks ),
 } ) );
 
 const mockAvatarUrls = {
@@ -65,17 +74,17 @@ const createMockDebugData = (): YDocDebugData => ( {
 
 describe( 'use-post-editor-awareness-state hooks', () => {
 	let mockAwareness: {
-		setUp: jest.Mock;
-		getCurrentState: jest.Mock;
-		onStateChange: jest.Mock;
-		convertSelectionStateToAbsolute: jest.Mock;
-		getDebugData: jest.Mock;
+		setUp: Mock;
+		getCurrentState: Mock;
+		onStateChange: Mock;
+		convertSelectionStateToAbsolute: Mock;
+		getDebugData: Mock;
 		doc: {
-			getMap: jest.Mock;
+			getMap: Mock;
 		};
 	};
 	let mockSyncManager: {
-		getAwareness: jest.Mock;
+		getAwareness: Mock;
 	};
 	let stateChangeCallback:
 		| ( ( newState: PostEditorAwarenessState[] ) => void )
@@ -93,28 +102,28 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		mockRecordMapData = {};
 
 		const mockStateMap = {
-			get: jest.fn( ( key: string ) => mockStateMapData[ key ] ),
-			observe: jest.fn( ( observer: typeof stateMapObserver ) => {
+			get: vi.fn( ( key: string ) => mockStateMapData[ key ] ),
+			observe: vi.fn( ( observer: typeof stateMapObserver ) => {
 				stateMapObserver = observer;
 			} ),
-			unobserve: jest.fn(),
+			unobserve: vi.fn(),
 		};
 
 		const mockRecordMap = {
-			get: jest.fn( ( key: string ) => mockRecordMapData[ key ] ),
+			get: vi.fn( ( key: string ) => mockRecordMapData[ key ] ),
 		};
 
 		mockAwareness = {
-			setUp: jest.fn(),
-			getCurrentState: jest.fn().mockReturnValue( [] ),
-			onStateChange: jest.fn( ( callback ) => {
+			setUp: vi.fn(),
+			getCurrentState: vi.fn().mockReturnValue( [] ),
+			onStateChange: vi.fn( ( callback ) => {
 				stateChangeCallback = callback;
-				return jest.fn(); // unsubscribe function
+				return vi.fn(); // unsubscribe function
 			} ),
-			convertSelectionStateToAbsolute: jest.fn().mockReturnValue( null ),
-			getDebugData: jest.fn().mockReturnValue( createMockDebugData() ),
+			convertSelectionStateToAbsolute: vi.fn().mockReturnValue( null ),
+			getDebugData: vi.fn().mockReturnValue( createMockDebugData() ),
 			doc: {
-				getMap: jest.fn( ( name: string ) => {
+				getMap: vi.fn( ( name: string ) => {
 					if ( name === 'state' ) {
 						return mockStateMap;
 					}
@@ -127,14 +136,14 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		};
 
 		mockSyncManager = {
-			getAwareness: jest.fn().mockReturnValue( mockAwareness ),
+			getAwareness: vi.fn().mockReturnValue( mockAwareness ),
 		};
 
-		( getSyncManager as jest.Mock ).mockReturnValue( mockSyncManager );
+		( getSyncManager as Mock ).mockReturnValue( mockSyncManager );
 	} );
 
 	afterEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	describe( 'useActiveUsers', () => {
@@ -157,7 +166,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		} );
 
 		test( 'should return empty array when getSyncManager returns undefined', () => {
-			( getSyncManager as jest.Mock ).mockReturnValue( undefined );
+			( getSyncManager as Mock ).mockReturnValue( undefined );
 
 			const { result } = renderHook( () =>
 				useActiveCollaborators( 123, 'post' )
@@ -247,7 +256,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		} );
 
 		test( 'should unsubscribe when postId changes', () => {
-			const unsubscribe = jest.fn();
+			const unsubscribe = vi.fn();
 			mockAwareness.onStateChange.mockReturnValue( unsubscribe );
 
 			const { rerender } = renderHook(
@@ -263,7 +272,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		} );
 
 		test( 'should unsubscribe when postType changes', () => {
-			const unsubscribe = jest.fn();
+			const unsubscribe = vi.fn();
 			mockAwareness.onStateChange.mockReturnValue( unsubscribe );
 
 			const { rerender } = renderHook(
@@ -456,7 +465,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 
 	describe( 'hook cleanup', () => {
 		test( 'should unsubscribe on unmount', () => {
-			const unsubscribe = jest.fn();
+			const unsubscribe = vi.fn();
 			mockAwareness.onStateChange.mockReturnValue( unsubscribe );
 
 			const { unmount } = renderHook( () =>
@@ -566,7 +575,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		} );
 
 		test( 'should not fire on initial mount', () => {
-			const callback = jest.fn();
+			const callback = vi.fn();
 			mockAwareness.getCurrentState.mockReturnValue( [ me, alice ] );
 
 			renderHook( () => useOnCollaboratorJoin( 123, 'post', callback ) );
@@ -575,7 +584,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		} );
 
 		test( 'should not fire when collaborators load after initially empty state', async () => {
-			const callback = jest.fn();
+			const callback = vi.fn();
 			mockAwareness.getCurrentState.mockReturnValue( [] );
 
 			renderHook( () => useOnCollaboratorJoin( 123, 'post', callback ) );
@@ -591,7 +600,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		} );
 
 		test( 'should fire callback when a new collaborator joins', async () => {
-			const callback = jest.fn();
+			const callback = vi.fn();
 			mockAwareness.getCurrentState.mockReturnValue( [ me ] );
 
 			renderHook( () => useOnCollaboratorJoin( 123, 'post', callback ) );
@@ -607,7 +616,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		} );
 
 		test( 'should not fire callback for the current user', async () => {
-			const callback = jest.fn();
+			const callback = vi.fn();
 			mockAwareness.getCurrentState.mockReturnValue( [] );
 
 			renderHook( () => useOnCollaboratorJoin( 123, 'post', callback ) );
@@ -628,7 +637,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		} );
 
 		test( 'should not fire when postId is null', () => {
-			const callback = jest.fn();
+			const callback = vi.fn();
 
 			renderHook( () => useOnCollaboratorJoin( null, 'post', callback ) );
 
@@ -658,7 +667,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		} );
 
 		test( 'should fire callback when a connected collaborator disconnects', async () => {
-			const callback = jest.fn();
+			const callback = vi.fn();
 			mockAwareness.getCurrentState.mockReturnValue( [ me, alice ] );
 
 			renderHook( () => useOnCollaboratorLeave( 123, 'post', callback ) );
@@ -677,7 +686,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		} );
 
 		test( 'should fire callback when a connected collaborator disappears from the list', async () => {
-			const callback = jest.fn();
+			const callback = vi.fn();
 			mockAwareness.getCurrentState.mockReturnValue( [ me, alice ] );
 
 			renderHook( () => useOnCollaboratorLeave( 123, 'post', callback ) );
@@ -693,7 +702,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		} );
 
 		test( 'should not fire callback when an already-disconnected collaborator is removed', async () => {
-			const callback = jest.fn();
+			const callback = vi.fn();
 			const disconnectedAlice = { ...alice, isConnected: false };
 			mockAwareness.getCurrentState.mockReturnValue( [
 				me,
@@ -713,7 +722,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		} );
 
 		test( 'should not fire callback for the current user disconnecting', async () => {
-			const callback = jest.fn();
+			const callback = vi.fn();
 			mockAwareness.getCurrentState.mockReturnValue( [ me, alice ] );
 
 			renderHook( () => useOnCollaboratorLeave( 123, 'post', callback ) );
@@ -732,7 +741,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		} );
 
 		test( 'should not fire on initial mount', () => {
-			const callback = jest.fn();
+			const callback = vi.fn();
 			mockAwareness.getCurrentState.mockReturnValue( [ me, alice ] );
 
 			renderHook( () => useOnCollaboratorLeave( 123, 'post', callback ) );
@@ -761,7 +770,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		} );
 
 		test( 'should fire callback when a remote collaborator saves', async () => {
-			const callback = jest.fn();
+			const callback = vi.fn();
 			mockAwareness.getCurrentState.mockReturnValue( [ me, alice ] );
 
 			renderHook( () => useOnPostSave( 123, 'post', callback ) );
@@ -794,7 +803,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		} );
 
 		test( 'should pass previous save event on subsequent saves', async () => {
-			const callback = jest.fn();
+			const callback = vi.fn();
 			mockAwareness.getCurrentState.mockReturnValue( [ me, alice ] );
 
 			renderHook( () => useOnPostSave( 123, 'post', callback ) );
@@ -851,7 +860,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		} );
 
 		test( 'should not fire callback when the current user saves', async () => {
-			const callback = jest.fn();
+			const callback = vi.fn();
 			mockAwareness.getCurrentState.mockReturnValue( [ me, alice ] );
 
 			renderHook( () => useOnPostSave( 123, 'post', callback ) );
@@ -876,7 +885,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		} );
 
 		test( 'should not fire callback when saver is not in the collaborator list', async () => {
-			const callback = jest.fn();
+			const callback = vi.fn();
 			mockAwareness.getCurrentState.mockReturnValue( [ me ] );
 
 			renderHook( () => useOnPostSave( 123, 'post', callback ) );
@@ -901,7 +910,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		} );
 
 		test( 'should not fire duplicate callbacks for the same savedAt timestamp', async () => {
-			const callback = jest.fn();
+			const callback = vi.fn();
 			mockAwareness.getCurrentState.mockReturnValue( [ me, alice ] );
 
 			renderHook( () => useOnPostSave( 123, 'post', callback ) );
@@ -936,7 +945,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		} );
 
 		test( 'should not fire when postId is null', () => {
-			const callback = jest.fn();
+			const callback = vi.fn();
 
 			renderHook( () => useOnPostSave( null, 'post', callback ) );
 

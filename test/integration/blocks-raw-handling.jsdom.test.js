@@ -1,5 +1,7 @@
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 import {
 	createBlock,
 	getBlockContent,
@@ -9,6 +11,11 @@ import {
 	serialize,
 } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
+import '../../packages/editor/src/hooks';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
+const currentDirectory = path.dirname( fileURLToPath( import.meta.url ) );
 
 function readFile( filePath ) {
 	return fs.existsSync( filePath )
@@ -18,8 +25,6 @@ function readFile( filePath ) {
 
 describe( 'Blocks raw handling', () => {
 	beforeAll( () => {
-		// Load all hooks that modify blocks.
-		require( '../../packages/editor/src/hooks' );
 		registerCoreBlocks();
 		registerBlockType( 'test/gallery', {
 			apiVersion: 3,
@@ -445,23 +450,22 @@ describe( 'Blocks raw handling', () => {
 			'slack-paragraphs',
 			'mixed-content',
 		].forEach( ( type ) => {
-			// eslint-disable-next-line jest/valid-title
 			it( type, () => {
 				const HTML = readFile(
 					path.join(
-						__dirname,
+						currentDirectory,
 						`fixtures/documents/${ type }-in.html`
 					)
 				);
 				const plainText = readFile(
 					path.join(
-						__dirname,
+						currentDirectory,
 						`fixtures/documents/${ type }-in.txt`
 					)
 				);
 				const output = readFile(
 					path.join(
-						__dirname,
+						currentDirectory,
 						`fixtures/documents/${ type }-out.html`
 					)
 				);
@@ -498,7 +502,7 @@ describe( 'Blocks raw handling', () => {
 		it( 'should remove extra blank lines', () => {
 			const HTML = readFile(
 				path.join(
-					__dirname,
+					currentDirectory,
 					'fixtures/documents/google-docs-blank-lines.html'
 				)
 			);
@@ -508,7 +512,7 @@ describe( 'Blocks raw handling', () => {
 
 		it( 'should strip windows data', () => {
 			const HTML = readFile(
-				path.join( __dirname, 'fixtures/documents/windows.html' )
+				path.join( currentDirectory, 'fixtures/documents/windows.html' )
 			);
 			expect( serialize( pasteHandler( { HTML } ) ) ).toMatchSnapshot();
 			expect( console ).toHaveLogged();
@@ -517,7 +521,7 @@ describe( 'Blocks raw handling', () => {
 		it( 'should strip HTML formatting space from inline text', () => {
 			const HTML = readFile(
 				path.join(
-					__dirname,
+					currentDirectory,
 					'fixtures/documents/inline-with-html-formatting-space.html'
 				)
 			);
@@ -530,14 +534,20 @@ describe( 'Blocks raw handling', () => {
 describe( 'rawHandler', () => {
 	it( 'should convert HTML post to blocks with minimal content changes', () => {
 		const HTML = readFile(
-			path.join( __dirname, 'fixtures/documents/wordpress-convert.html' )
+			path.join(
+				currentDirectory,
+				'fixtures/documents/wordpress-convert.html'
+			)
 		);
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
 
 	it( 'should convert a caption shortcode', () => {
 		const HTML = readFile(
-			path.join( __dirname, 'fixtures/documents/shortcode-caption.html' )
+			path.join(
+				currentDirectory,
+				'fixtures/documents/shortcode-caption.html'
+			)
 		);
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
@@ -545,7 +555,7 @@ describe( 'rawHandler', () => {
 	it( 'should convert a caption shortcode with link', () => {
 		const HTML = readFile(
 			path.join(
-				__dirname,
+				currentDirectory,
 				'fixtures/documents/shortcode-caption-with-link.html'
 			)
 		);
@@ -555,7 +565,7 @@ describe( 'rawHandler', () => {
 	it( 'should convert a caption shortcode with caption', () => {
 		const HTML = readFile(
 			path.join(
-				__dirname,
+				currentDirectory,
 				'fixtures/documents/shortcode-caption-with-caption-link.html'
 			)
 		);
@@ -565,7 +575,7 @@ describe( 'rawHandler', () => {
 	it( 'should convert a list with attributes', () => {
 		const HTML = readFile(
 			path.join(
-				__dirname,
+				currentDirectory,
 				'fixtures/documents/list-with-attributes.html'
 			)
 		);

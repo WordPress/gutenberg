@@ -1,16 +1,21 @@
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { ReactNode } from 'react';
+import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { AiPluginCallout } from '../ai-plugin-callout';
 
-jest.mock( '@wordpress/a11y', () => ( {
-	speak: jest.fn(),
-} ) );
+vi.mock(
+	import( '@wordpress/a11y' ),
+	() =>
+		( {
+			speak: vi.fn(),
+		} ) as unknown as typeof import('@wordpress/a11y')
+);
 
-jest.mock( '@wordpress/components', () => {
-	const { createElement, forwardRef } =
-		jest.requireActual( '@wordpress/element' );
+vi.mock( import( '@wordpress/components' ), async () => {
+	const { createElement, forwardRef } = await import( '@wordpress/element' );
 
 	return {
 		Button: forwardRef(
@@ -22,7 +27,7 @@ jest.mock( '@wordpress/components', () => {
 					disabled,
 				}: {
 					href?: string;
-					children: unknown;
+					children: ReactNode;
 					onClick?: () => void;
 					disabled?: boolean;
 				},
@@ -41,56 +46,80 @@ jest.mock( '@wordpress/components', () => {
 			children,
 		}: {
 			href: string;
-			children: unknown;
+			children: ReactNode;
 		} ) => createElement( 'a', { href }, children ),
-	};
+	} as unknown as typeof import('@wordpress/components');
 } );
 
-jest.mock( '@wordpress/core-data', () => ( {
-	store: 'core',
-} ) );
+vi.mock(
+	import( '@wordpress/core-data' ),
+	() =>
+		( {
+			store: 'core',
+		} ) as unknown as typeof import('@wordpress/core-data')
+);
 
-jest.mock( '@wordpress/data', () => ( {
-	useDispatch: jest.fn(),
-	useSelect: jest.fn(),
-	createSelector: jest.fn( ( fn ) => fn ),
-	createRegistrySelector: jest.fn( ( fn ) => fn ),
-	createReduxStore: jest.fn( () => ( {} ) ),
-	combineReducers: jest.fn(
-		( reducers ) =>
-			( state = {}, action: unknown ) => {
-				const newState: Record< string, unknown > = {};
+vi.mock(
+	import( '@wordpress/data' ),
+	() =>
+		( {
+			useDispatch: vi.fn(),
+			useSelect: vi.fn(),
+			createSelector: vi.fn( ( fn ) => fn ),
+			createRegistrySelector: vi.fn( ( fn ) => fn ),
+			createReduxStore: vi.fn( () => ( {} ) ),
+			combineReducers: vi.fn(
+				(
+					reducers: Record<
+						string,
+						( state: unknown, action: unknown ) => unknown
+					>
+				) =>
+					(
+						state: Record< string, unknown > = {},
+						action: unknown
+					) => {
+						const newState: Record< string, unknown > = {};
 
-				Object.keys( reducers ).forEach( ( key ) => {
-					newState[ key ] = reducers[ key ](
-						( state as Record< string, unknown > )[ key ],
-						action
-					);
-				} );
+						Object.keys( reducers ).forEach( ( key ) => {
+							newState[ key ] = reducers[ key ](
+								state[ key ],
+								action
+							);
+						} );
 
-				return newState;
-			}
-	),
-	register: jest.fn(),
-	keyedReducer: jest.fn( () => ( reducer: unknown ) => reducer ),
-} ) );
+						return newState;
+					}
+			),
+			register: vi.fn(),
+			keyedReducer: vi.fn( () => ( reducer: unknown ) => reducer ),
+		} ) as unknown as typeof import('@wordpress/data')
+);
 
-jest.mock( '../default-connectors', () => ( {
-	getConnectorData: jest.fn( () => ( {
-		openai: {
-			type: 'ai_provider',
-			authentication: {
-				method: 'api_key',
-				settingName: 'connectors_ai_openai_api_key',
-				isConnected: false,
-			},
-		},
-	} ) ),
-} ) );
+vi.mock(
+	import( '../default-connectors' ),
+	() =>
+		( {
+			getConnectorData: vi.fn( () => ( {
+				openai: {
+					type: 'ai_provider',
+					authentication: {
+						method: 'api_key',
+						settingName: 'connectors_ai_openai_api_key',
+						isConnected: false,
+					},
+				},
+			} ) ),
+		} ) as unknown as typeof import('../default-connectors')
+);
 
-jest.mock( '../wp-logo-decoration', () => ( {
-	WpLogoDecoration: () => null,
-} ) );
+vi.mock(
+	import( '../wp-logo-decoration' ),
+	() =>
+		( {
+			WpLogoDecoration: () => null,
+		} ) as unknown as typeof import('../wp-logo-decoration')
+);
 
 type StoreState = {
 	canCreate: boolean;
@@ -99,16 +128,18 @@ type StoreState = {
 	siteSettings?: Record< string, string >;
 };
 
-const mockSaveEntityRecord = jest.fn();
-const mockCreateSuccessNotice = jest.fn();
-const mockCreateErrorNotice = jest.fn();
+const mockSaveEntityRecord = vi.fn();
+const mockCreateSuccessNotice = vi.fn();
+const mockCreateErrorNotice = vi.fn();
+const mockedUseSelect = vi.mocked( useSelect ) as Mock;
+const mockedUseDispatch = vi.mocked( useDispatch ) as Mock;
 
 describe( 'AiPluginCallout', () => {
 	let storeState: StoreState;
 	let selectorStore: {
-		canUser: jest.Mock;
-		getEntityRecord: jest.Mock;
-		hasFinishedResolution: jest.Mock;
+		canUser: Mock;
+		getEntityRecord: Mock;
+		hasFinishedResolution: Mock;
 	};
 
 	beforeEach( () => {
@@ -123,8 +154,8 @@ describe( 'AiPluginCallout', () => {
 		};
 
 		selectorStore = {
-			canUser: jest.fn( () => storeState.canCreate ),
-			getEntityRecord: jest.fn(
+			canUser: vi.fn( () => storeState.canCreate ),
+			getEntityRecord: vi.fn(
 				( kind: string, name: string, id?: string ) => {
 					if ( kind === 'root' && name === 'site' ) {
 						return storeState.siteSettings;
@@ -141,12 +172,12 @@ describe( 'AiPluginCallout', () => {
 					return undefined;
 				}
 			),
-			hasFinishedResolution: jest.fn(
+			hasFinishedResolution: vi.fn(
 				() => storeState.hasFinishedResolution
 			),
 		};
 
-		( useSelect as jest.Mock ).mockImplementation(
+		mockedUseSelect.mockImplementation(
 			( mapSelect: ( select: () => typeof selectorStore ) => unknown ) =>
 				mapSelect( () => selectorStore )
 		);
@@ -155,7 +186,7 @@ describe( 'AiPluginCallout', () => {
 		mockSaveEntityRecord.mockResolvedValue( undefined );
 		mockCreateSuccessNotice.mockReset();
 		mockCreateErrorNotice.mockReset();
-		( useDispatch as jest.Mock ).mockReturnValue( {
+		mockedUseDispatch.mockReturnValue( {
 			saveEntityRecord: mockSaveEntityRecord,
 			createSuccessNotice: mockCreateSuccessNotice,
 			createErrorNotice: mockCreateErrorNotice,

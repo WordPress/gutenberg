@@ -1,19 +1,20 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { act, render, screen } from '@testing-library/react';
 import { click } from '@ariakit/test';
 import { useEffect, useState } from '@wordpress/element';
 import SnackbarList from '../list';
 
-jest.mock( '@wordpress/compose', () => ( {
-	...jest.requireActual( '@wordpress/compose' ),
+vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
 	useReducedMotion: () => false,
 } ) );
 
-window.scrollTo = jest.fn();
+window.scrollTo = vi.fn();
 
 describe( 'SnackbarList', () => {
 	afterEach( () => {
-		jest.resetAllMocks();
-		jest.useRealTimers();
+		vi.resetAllMocks();
+		vi.useRealTimers();
 	} );
 
 	it( 'should get focus after a snackbar is dismissed', async () => {
@@ -45,8 +46,8 @@ describe( 'SnackbarList', () => {
 	} );
 
 	it( 'should restart auto-dismissal when a notice is replaced with the same ID', async () => {
-		jest.useFakeTimers();
-		const onRemove = jest.fn();
+		vi.useFakeTimers();
+		const onRemove = vi.fn();
 		const notice = {
 			id: 'ID_1',
 			content: 'A collaborator joined.',
@@ -83,17 +84,17 @@ describe( 'SnackbarList', () => {
 
 		render( <RecreatedNotice /> );
 
-		await act( async () => jest.advanceTimersByTime( 6000 ) );
+		await act( async () => vi.advanceTimersByTime( 6000 ) );
 		expect( onRemove ).toHaveBeenCalledTimes( 1 );
 
 		// Recreate the notice before its 100ms exit animation completes.
-		await act( async () => jest.advanceTimersByTime( 50 ) );
+		await act( async () => vi.advanceTimersByTime( 50 ) );
 
 		expect( screen.getByTestId( 'snackbar' ) ).toHaveTextContent(
 			notice.content
 		);
 
-		await act( async () => jest.advanceTimersByTime( 6000 ) );
+		await act( async () => vi.advanceTimersByTime( 6000 ) );
 		expect( onRemove ).toHaveBeenCalledTimes( 2 );
 	} );
 } );

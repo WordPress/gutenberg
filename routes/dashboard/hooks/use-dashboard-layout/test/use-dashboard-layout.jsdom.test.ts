@@ -1,13 +1,21 @@
 import { act, renderHook } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
 import { dispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import type { DashboardWidget } from '@wordpress/widget-dashboard';
 import { useDashboardLayout } from '../';
 
-jest.mock( '@wordpress/api-fetch' );
+vi.mock( import( '@wordpress/api-fetch' ), async ( importOriginal ) => {
+	const original = await importOriginal();
 
-const mockedApiFetch = apiFetch as unknown as jest.Mock;
+	return {
+		...original,
+		default: vi.fn(),
+	} as unknown as typeof original;
+} );
+
+const mockedApiFetch = vi.mocked( apiFetch );
 
 const SCOPE = 'core/dashboard';
 const KEY = 'dashboardLayout';

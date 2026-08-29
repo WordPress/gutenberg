@@ -1,3 +1,12 @@
+import {
+	afterAll,
+	afterEach,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+} from 'vitest';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import { select, dispatch } from '@wordpress/data';
 import { store } from '../';

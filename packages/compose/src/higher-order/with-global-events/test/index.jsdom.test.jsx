@@ -1,20 +1,23 @@
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { Component } from '@wordpress/element';
 import withGlobalEvents from '../';
 import Listener from '../listener';
 
-jest.mock( '../listener', () => {
-	const ActualListener = jest.requireActual( '../listener' ).default;
+vi.mock( import( '../listener' ), async ( importOriginal ) => {
+	const { default: ActualListener } = await importOriginal();
 
-	return class extends ActualListener {
-		constructor() {
-			super( ...arguments );
+	return {
+		default: class extends ActualListener {
+			constructor() {
+				super( ...arguments );
 
-			this.constructor._instance = this;
+				this.constructor._instance = this;
 
-			jest.spyOn( this, 'add' );
-			jest.spyOn( this, 'remove' );
-		}
+				vi.spyOn( this, 'add' );
+				vi.spyOn( this, 'remove' );
+			}
+		},
 	};
 } );
 
@@ -31,11 +34,11 @@ describe( 'withGlobalEvents', () => {
 	}
 
 	beforeAll( () => {
-		jest.spyOn( OriginalComponent.prototype, 'handleResize' );
+		vi.spyOn( OriginalComponent.prototype, 'handleResize' );
 	} );
 
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	it( 'renders with original component', () => {
@@ -67,7 +70,7 @@ describe( 'withGlobalEvents', () => {
 		const EnhancedComponent = withGlobalEvents( {
 			resize: 'handleResize',
 		} )( OriginalComponent );
-		const onResize = jest.fn();
+		const onResize = vi.fn();
 
 		render(
 			<EnhancedComponent ref={ () => {} } onResize={ onResize }>

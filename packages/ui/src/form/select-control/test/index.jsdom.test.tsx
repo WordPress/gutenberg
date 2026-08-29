@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
@@ -125,7 +126,7 @@ describe( 'SelectControl', () => {
 	describe( 'Form data behavior', () => {
 		it( 'submits correct form data when option is selected with custom name', async () => {
 			const user = userEvent.setup();
-			const handleSubmit = jest.fn(
+			const handleSubmit = vi.fn(
 				( event: React.FormEvent< HTMLFormElement > ) => {
 					event.preventDefault();
 					return new FormData( event.currentTarget );
@@ -166,7 +167,7 @@ describe( 'SelectControl', () => {
 
 		it( 'submits form data with default value when no selection is made', async () => {
 			const user = userEvent.setup();
-			const handleSubmit = jest.fn(
+			const handleSubmit = vi.fn(
 				( event: React.FormEvent< HTMLFormElement > ) => {
 					event.preventDefault();
 					return new FormData( event.currentTarget );

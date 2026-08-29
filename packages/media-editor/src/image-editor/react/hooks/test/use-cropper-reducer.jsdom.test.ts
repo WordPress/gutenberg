@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useCropperReducer } from '../use-cropper-reducer';
 import { DEFAULT_STATE } from '../../../core/constants';

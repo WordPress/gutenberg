@@ -1,9 +1,15 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import PresetInputControl from '../index';
 
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
+globalThis.wpVitest.mockVisibleElements();
+globalThis.wpVitest.mockScrollIntoView();
+
 describe( 'PresetInputControl', () => {
-	const mockOnChange = jest.fn();
+	const mockOnChange = vi.fn();
 
 	const defaultProps = {
 		ariaLabel: 'Spacing control',
@@ -19,7 +25,7 @@ describe( 'PresetInputControl', () => {
 	];
 
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	it( 'renders preset selection controls', () => {

@@ -1,8 +1,11 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
 import UnitControl from '..';
 import { CSS_UNITS, parseQuantityAndUnitFromRawValue } from '../utils';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 const getInput = ( {
 	isInputTypeText = false,
@@ -125,7 +128,7 @@ describe( 'UnitControl', () => {
 	describe( 'Value', () => {
 		it( 'should update value on change', async () => {
 			const user = userEvent.setup();
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			render( <UnitControl value="50px" onChange={ onChangeSpy } /> );
 
@@ -146,7 +149,7 @@ describe( 'UnitControl', () => {
 
 		it( 'should increment value on UP press', async () => {
 			const user = userEvent.setup();
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			render( <UnitControl value="50px" onChange={ onChangeSpy } /> );
 
@@ -162,7 +165,7 @@ describe( 'UnitControl', () => {
 
 		it( 'should increment value on UP + SHIFT press, with step', async () => {
 			const user = userEvent.setup();
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			render( <UnitControl value="50px" onChange={ onChangeSpy } /> );
 
@@ -178,7 +181,7 @@ describe( 'UnitControl', () => {
 
 		it( 'should decrement value on DOWN press', async () => {
 			const user = userEvent.setup();
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			render( <UnitControl value={ 50 } onChange={ onChangeSpy } /> );
 
@@ -194,7 +197,7 @@ describe( 'UnitControl', () => {
 
 		it( 'should decrement value on DOWN + SHIFT press, with step', async () => {
 			const user = userEvent.setup();
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			render( <UnitControl value={ 50 } onChange={ onChangeSpy } /> );
 
@@ -210,7 +213,7 @@ describe( 'UnitControl', () => {
 
 		it( 'should cancel change when ESCAPE key is pressed', async () => {
 			const user = userEvent.setup();
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			render(
 				<UnitControl
@@ -237,8 +240,8 @@ describe( 'UnitControl', () => {
 		it( 'should run onBlur callback when quantity input is blurred', async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
-			const onBlurSpy = jest.fn();
+			const onChangeSpy = vi.fn();
+			const onBlurSpy = vi.fn();
 
 			render(
 				<UnitControl
@@ -267,7 +270,7 @@ describe( 'UnitControl', () => {
 		it( 'should invoke onChange when isPressEnterToChange is true and the input is blurred with an uncommitted value', async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			render(
 				<UnitControl
@@ -299,7 +302,7 @@ describe( 'UnitControl', () => {
 		it( 'should update value correctly when typed and blurred when a single unit is passed', async () => {
 			const user = userEvent.setup();
 
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 			render(
 				<>
 					<button>Click me</button>
@@ -332,8 +335,8 @@ describe( 'UnitControl', () => {
 	describe( 'Unit', () => {
 		it( 'should update unit value on change', async () => {
 			const user = userEvent.setup();
-			const onChangeSpy = jest.fn();
-			const onUnitChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
+			const onUnitChangeSpy = vi.fn();
 
 			render(
 				<UnitControl
@@ -381,7 +384,7 @@ describe( 'UnitControl', () => {
 
 		it( 'should reset value on unit change, if unit has default value', async () => {
 			const user = userEvent.setup();
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			const units = [
 				{ value: 'pt', label: 'pt', default: 25 },
@@ -417,7 +420,7 @@ describe( 'UnitControl', () => {
 
 		it( 'should not reset value on unit change, if disabled', async () => {
 			const user = userEvent.setup();
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			const units = [
 				{ value: 'pt', label: 'pt', default: 25 },
@@ -453,7 +456,7 @@ describe( 'UnitControl', () => {
 
 		it( 'should set correct unit if single units', async () => {
 			const user = userEvent.setup();
-			const onChangeSpy = jest.fn();
+			const onChangeSpy = vi.fn();
 
 			render(
 				<UnitControl
@@ -530,8 +533,8 @@ describe( 'UnitControl', () => {
 		it( 'should run onBlur callback when the unit select is blurred', async () => {
 			const user = userEvent.setup();
 
-			const onUnitChangeSpy = jest.fn();
-			const onBlurSpy = jest.fn();
+			const onUnitChangeSpy = vi.fn();
+			const onBlurSpy = vi.fn();
 
 			render(
 				<UnitControl
@@ -600,8 +603,8 @@ describe( 'UnitControl', () => {
 			'should move focus from the input to the unit select when typing the first character of %p',
 			async ( testUnit ) => {
 				const user = userEvent.setup();
-				const onChangeSpy = jest.fn();
-				const onUnitChangeSpy = jest.fn();
+				const onChangeSpy = vi.fn();
+				const onUnitChangeSpy = vi.fn();
 
 				render(
 					<UnitControl

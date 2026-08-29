@@ -17,12 +17,19 @@
  * The tests ensure that when the BorderRadiusControl is refactored to use
  * PresetInputControl, the existing user experience and behavior is preserved.
  */
+
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import BorderRadiusControl from '../index';
 
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
+globalThis.wpVitest.mockVisibleElements();
+globalThis.wpVitest.mockScrollIntoView();
+
 describe( 'BorderRadiusControl', () => {
-	const mockOnChange = jest.fn();
+	const mockOnChange = vi.fn();
 	const mockPresets = {
 		default: [
 			{ name: 'None', slug: '0', size: 0 },

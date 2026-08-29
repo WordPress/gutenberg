@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { createRef, useEffect } from '@wordpress/element';
 import { useDeprioritizedInitialFocus } from '../use-deprioritized-initial-focus';

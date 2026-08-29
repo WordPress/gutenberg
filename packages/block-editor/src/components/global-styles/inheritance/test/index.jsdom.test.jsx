@@ -1,3 +1,4 @@
+import { describe, expect, test, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { click } from '@ariakit/test';
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
@@ -6,6 +7,8 @@ import {
 	InheritanceResetButton,
 	InheritanceToolsPanelItem,
 } from '../';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 describe( 'InheritanceResetButton', () => {
 	test( 'renders an always-visible reset button labelled for the inherited value', () => {
@@ -18,7 +21,7 @@ describe( 'InheritanceResetButton', () => {
 	} );
 
 	test( 'invokes the reset handler when activated', async () => {
-		const onResetToInherited = jest.fn();
+		const onResetToInherited = vi.fn();
 		render(
 			<InheritanceResetButton onResetToInherited={ onResetToInherited } />
 		);
@@ -230,7 +233,7 @@ describe( 'InheritanceToolsPanelItem local-override reset dot', () => {
 	} );
 
 	test( 'the reset dot invokes the deselect handler', async () => {
-		const onDeselect = jest.fn();
+		const onDeselect = vi.fn();
 		renderItem( { hasLocalOverride: true, onDeselect } );
 		await click(
 			screen.getByRole( 'button', { name: 'Reset to inherited value' } )

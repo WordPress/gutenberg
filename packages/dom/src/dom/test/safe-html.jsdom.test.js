@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import safeHTML from '../safe-html';
 
 describe( 'safeHTML', () => {

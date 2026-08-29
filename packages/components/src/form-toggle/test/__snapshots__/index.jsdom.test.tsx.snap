@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`FormToggle basic rendering should render a span element with an unchecked checkbox 1`] = `
+exports[`FormToggle > basic rendering > should render a span element with an unchecked checkbox 1`] = `
 <div>
   <span
     class="components-form-toggle"
@@ -19,7 +19,7 @@ exports[`FormToggle basic rendering should render a span element with an uncheck
 </div>
 `;
 
-exports[`FormToggle basic rendering should render an id prop for the input checkbox 1`] = `
+exports[`FormToggle > basic rendering > should render an id prop for the input checkbox 1`] = `
 Snapshot Diff:
 - First value
 + Second value
@@ -38,7 +38,7 @@ Snapshot Diff:
       />
 `;
 
-exports[`FormToggle basic rendering should render with an additional className 1`] = `
+exports[`FormToggle > basic rendering > should render with an additional className 1`] = `
 Snapshot Diff:
 - First value
 + Second value

@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { select, dispatch } from '@wordpress/data';
 import { uploadMedia } from '@wordpress/media-utils';
 import mediaUpload from '../';
@@ -7,19 +8,19 @@ import {
 	reset,
 } from '../../../components/upload-progress-snackbar/tracker';
 
-jest.mock( '@wordpress/media-utils', () => ( {
-	uploadMedia: jest.fn(),
+vi.mock( '@wordpress/media-utils', () => ( {
+	uploadMedia: vi.fn(),
 } ) );
 
 // The module under test only reaches the stores through `select`/`dispatch`,
 // so they stand in for the whole data layer here - importing the real editor
 // store pulls in most of the editor.
-jest.mock( '@wordpress/data', () => ( {
-	select: jest.fn(),
-	dispatch: jest.fn(),
+vi.mock( '@wordpress/data', () => ( {
+	select: vi.fn(),
+	dispatch: vi.fn(),
 } ) );
-jest.mock( '@wordpress/core-data', () => ( { store: 'core' } ) );
-jest.mock( '../../../store', () => ( { store: 'core/editor' } ) );
+vi.mock( '@wordpress/core-data', () => ( { store: 'core' } ) );
+vi.mock( '../../../store', () => ( { store: 'core/editor' } ) );
 
 function file( name ) {
 	return new window.File( [ 'x' ], name, { type: 'image/png' } );
@@ -34,11 +35,11 @@ describe( 'mediaUpload', () => {
 			getEditorSettings: () => ( {} ),
 		} );
 		dispatch.mockReturnValue( {
-			receiveEntityRecords: jest.fn(),
-			lockPostSaving: jest.fn(),
-			unlockPostSaving: jest.fn(),
-			lockPostAutosaving: jest.fn(),
-			unlockPostAutosaving: jest.fn(),
+			receiveEntityRecords: vi.fn(),
+			lockPostSaving: vi.fn(),
+			unlockPostSaving: vi.fn(),
+			lockPostAutosaving: vi.fn(),
+			unlockPostAutosaving: vi.fn(),
 		} );
 	} );
 
@@ -67,7 +68,7 @@ describe( 'mediaUpload', () => {
 	} );
 
 	it( 'refuses a batch of more than one file for a caller that only takes one', () => {
-		const onError = jest.fn();
+		const onError = vi.fn();
 
 		mediaUpload( {
 			filesList: [ file( 'a.png' ), file( 'b.png' ), file( 'c.png' ) ],

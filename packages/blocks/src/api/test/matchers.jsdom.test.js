@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { parse } from 'hpq';
 import { renderToString } from '@wordpress/element';
 import * as sources from '../matchers';

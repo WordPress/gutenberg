@@ -1,6 +1,9 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import BorderPanel from '../border-panel';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 // The inheritance treatment sits behind the
 // `gutenberg-global-styles-inheritance-ui` experiment. Turn it on so these
@@ -222,7 +225,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 		} );
 
 		it( 'does not invoke onChange on mount when only an inherited radius is present (display-without-commit)', () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const inheritedValue = { border: { radius: '8px' } };
 
 			render(
@@ -240,7 +243,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 
 		it( 'commits a typed local radius override without copying any inherited values (strip-not-copy)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const inheritedValue = {
 				border: { radius: '8px' },
 				shadow: 'var:preset|shadow|soft',
@@ -269,7 +272,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 
 		it( 'does not bake the inherited border color/style/width into the local override when only a radius is set', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const inheritedValue = {
 				border: {
 					color: '#000000',
@@ -349,7 +352,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 			// renders the blue dot) even though the user never
 			// customised the radius.
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const inheritedValue = {
 				border: {
 					color: '#000000',
@@ -386,7 +389,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 		} );
 
 		it( 'does not invoke onChange on mount when only an inherited border is present', () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const inheritedValue = {
 				border: {
 					color: '#000000',
@@ -434,7 +437,7 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 		} );
 
 		it( 'does not invoke onChange on mount when only an inherited shadow is present', () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const inheritedValue = {
 				shadow: 'var:preset|shadow|soft',
 			};
@@ -560,7 +563,7 @@ describe( 'BorderPanel — shadow preset persistence', () => {
 
 	it( 'persists a theme preset as a preset reference when custom presets also exist', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<BorderPanel
@@ -584,7 +587,7 @@ describe( 'BorderPanel — shadow preset persistence', () => {
 
 	it( 'persists a default preset as a preset reference when custom presets also exist', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<BorderPanel
@@ -608,7 +611,7 @@ describe( 'BorderPanel — shadow preset persistence', () => {
 
 	it( 'persists a custom preset as a preset reference', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<BorderPanel
@@ -632,7 +635,7 @@ describe( 'BorderPanel — shadow preset persistence', () => {
 
 	it( 'persists the unset entry as a literal value, not a preset reference', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<BorderPanel
@@ -653,7 +656,7 @@ describe( 'BorderPanel — shadow preset persistence', () => {
 
 	it( 'does not reference default presets the theme has opted out of', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<BorderPanel
@@ -688,7 +691,7 @@ describe( 'BorderPanel — shadow preset persistence', () => {
 
 	it( 'offers only the most specific preset when a slug is defined twice', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		// Custom preset slugs are generated as `shadow-<n>` from the custom
 		// presets alone, so they can collide with a theme preset's slug.
@@ -734,7 +737,7 @@ describe( 'BorderPanel — shadow preset persistence', () => {
 
 	it( 'references the most specific origin when two presets share a value', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		// A custom preset starts out with the same value as the `natural`
 		// default one, so this is the state right after adding one.

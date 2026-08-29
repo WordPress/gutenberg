@@ -1,6 +1,9 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ValidatedInputControl } from '../components';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 describe( 'Shows a deprecation warning', () => {
 	it( 'ValidatedInputControl', () => {

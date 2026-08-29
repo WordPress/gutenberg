@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { createRef } from '@wordpress/element';
 import * as Fieldset from '../';

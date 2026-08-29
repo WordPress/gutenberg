@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { getNamedNodeMapAsObject, toHTML, fromDOM } from '../node';
 
 describe( 'getNamedNodeMapAsObject', () => {

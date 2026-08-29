@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { elementShouldBeHidden } from '../aria-helper';
 
 describe( 'aria-helper', () => {
