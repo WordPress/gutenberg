@@ -6886,7 +6886,7 @@
 	},
 	"packages/editor/src/components/post-status/index.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 2
+			"count": 1
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
