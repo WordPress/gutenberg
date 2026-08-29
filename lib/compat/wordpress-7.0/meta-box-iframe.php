@@ -161,36 +161,52 @@ function gutenberg_meta_box_iframe_remove_parent_boxes( $wp_meta_boxes ) {
 add_filter( 'filter_block_editor_meta_boxes', 'gutenberg_meta_box_iframe_remove_parent_boxes', PHP_INT_MAX );
 
 /**
- * Removes scripts that only make sense when the classic screen is the editor.
+ * Renders the loader page: an admin iframe document with only the post
+ * form and the requested meta boxes, reusing the same core functions the
+ * classic edit screen is built from.
+ *
+ * @param bool    $replace Whether the editor is already replaced.
+ * @param WP_Post $post    The post being edited.
+ * @return bool Whether the editor is replaced.
  */
-function gutenberg_meta_box_iframe_dequeue_scripts() {
+function gutenberg_meta_box_iframe_render_page( $replace, $post ) {
 	if ( ! gutenberg_is_meta_box_iframe_request() ) {
-		return;
+		return $replace;
 	}
 
-	// The classic autosave would submit the hidden title and content fields.
-	wp_dequeue_script( 'autosave' );
-
-	// Scrolls the page for a content editor that the iframe does not show.
-	wp_dequeue_script( 'editor-expand' );
-}
-add_action( 'admin_enqueue_scripts', 'gutenberg_meta_box_iframe_dequeue_scripts', PHP_INT_MAX );
-
-/**
- * Prints a hidden submit button the editor saves the meta boxes with. It
- * skips constraint validation, which would abort on invalid fields in
- * hidden boxes, and the bootstrap cancels the submission itself.
- */
-function gutenberg_meta_box_iframe_print_submitter() {
-	if ( ! gutenberg_is_meta_box_iframe_request() ) {
-		return;
+	// WP_Screen::get() applies this filter while the current screen is
+	// still being set up; render on the later call from post.php.
+	if ( ! get_current_screen() ) {
+		return true;
 	}
-	echo '<button type="submit" id="gutenberg-meta-box-submitter" formnovalidate hidden></button>';
+
+	require_once ABSPATH . 'wp-admin/includes/meta-boxes.php';
+	register_and_do_post_meta_boxes( $post );
+
+	wp_enqueue_style( 'wp-admin' );
+	wp_enqueue_style( 'colors' );
+	wp_enqueue_script( 'post' );
+	wp_enqueue_media( array( 'post' => $post ) );
+
+	iframe_header();
+	?>
+	<form name="post" action="post.php" method="post" id="post">
+		<button type="submit" id="gutenberg-meta-box-submitter" formnovalidate hidden></button>
+		<?php
+		the_block_editor_meta_box_post_form_hidden_fields( $post );
+		foreach ( gutenberg_meta_box_iframe_locations() as $location ) {
+			do_meta_boxes( get_current_screen(), $location, $post );
+		}
+		?>
+	</form>
+	<?php
+	iframe_footer();
+	exit;
 }
-add_action( 'edit_form_top', 'gutenberg_meta_box_iframe_print_submitter' );
+add_filter( 'replace_editor', 'gutenberg_meta_box_iframe_render_page', 10, 2 );
 
 /**
- * Prints styles that trim the classic screen down to the meta boxes.
+ * Prints styles that adapt the loader page to its iframe.
  */
 function gutenberg_meta_box_iframe_print_styles() {
 	if ( ! gutenberg_is_meta_box_iframe_request() ) {
@@ -199,77 +215,20 @@ function gutenberg_meta_box_iframe_print_styles() {
 	$is_side = in_array( 'side', gutenberg_meta_box_iframe_locations(), true );
 	?>
 	<style id="gutenberg-meta-box-iframe-styles">
-		#adminmenumain,
-		#wpadminbar,
-		#wpfooter,
-		#screen-meta,
-		#screen-meta-links,
-		#post-body-content,
-		.wrap > h1,
-		.page-title-action,
-		.wrap > .notice,
-		.wrap > .updated,
-		.wrap > .error,
-		#lost-connection-notice {
-			display: none !important;
+		body.iframe {
+			margin: 12px;
 		}
-		html.wp-toolbar {
-			padding-top: 0;
-		}
-		#wpcontent {
-			margin-left: 0 !important;
-			padding-left: 12px;
-		}
-		#wpbody-content {
-			padding-bottom: 12px !important;
-		}
-		.wrap {
-			margin: 12px 12px 0 0;
-		}
-		/* Stack the columns; each iframe provides a single column. */
-		#poststuff {
-			padding-top: 0;
-			min-width: 0;
-		}
-		#poststuff #post-body.columns-2 {
-			margin-right: 0;
-		}
-		#poststuff #post-body.columns-2 #postbox-container-1,
-		#post-body #postbox-container-1 {
-			float: none;
-			margin-right: 0;
-			width: auto;
-		}
-		#post-body #postbox-container-1 .meta-box-sortables {
+		.meta-box-sortables {
 			min-height: 0 !important;
-			width: auto !important;
-		}
-		#post-body #postbox-container-1 .postbox {
-			width: auto !important;
-		}
-		#post-body #postbox-container-2 {
-			float: none;
-			width: 100%;
 		}
 		<?php if ( $is_side ) : ?>
-		/* The sidebar iframe sizes itself to its content, so the document
-		 * height must follow the content instead of the viewport, and the
-		 * desktop minimum widths must not apply at the sidebar width. */
+		/* The sidebar iframe sizes itself to its content. */
 		html,
-		body {
+		body.iframe {
 			overflow: hidden;
 			height: auto !important;
 			min-height: 0 !important;
 			min-width: 0 !important;
-		}
-		#wpcontent {
-			padding-left: 0;
-		}
-		#wpbody-content {
-			padding-bottom: 0 !important;
-		}
-		.wrap {
-			margin: 12px;
 		}
 		<?php endif; ?>
 	</style>
