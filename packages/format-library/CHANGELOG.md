@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Prevent Highlight format toolbar from crashing when switching to Edit as HTML with background-only formatting active. ([#72897](https://github.com/WordPress/gutenberg/issues/72897))
+
 ### Internal
 
 -   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
