@@ -1,0 +1,62 @@
+[
+	{
+		"name": "core/columns",
+		"isValid": true,
+		"attributes": {
+			"isStackedOnMobile": true,
+			"backgroundColor": "secondary"
+		},
+		"innerBlocks": [
+			{
+				"name": "core/column",
+				"isValid": true,
+				"attributes": {},
+				"innerBlocks": [
+					{
+						"name": "core/paragraph",
+						"isValid": true,
+						"attributes": {
+							"content": "Column One, Paragraph One",
+							"dropCap": false
+						},
+						"innerBlocks": []
+					},
+					{
+						"name": "core/paragraph",
+						"isValid": true,
+						"attributes": {
+							"content": "Column One, Paragraph Two",
+							"dropCap": false
+						},
+						"innerBlocks": []
+					}
+				]
+			},
+			{
+				"name": "core/column",
+				"isValid": true,
+				"attributes": {},
+				"innerBlocks": [
+					{
+						"name": "core/paragraph",
+						"isValid": true,
+						"attributes": {
+							"content": "Column Two, Paragraph One",
+							"dropCap": false
+						},
+						"innerBlocks": []
+					},
+					{
+						"name": "core/paragraph",
+						"isValid": true,
+						"attributes": {
+							"content": "Column Three, Paragraph One",
+							"dropCap": false
+						},
+						"innerBlocks": []
+					}
+				]
+			}
+		]
+	}
+]

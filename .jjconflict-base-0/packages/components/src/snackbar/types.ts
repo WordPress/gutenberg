@@ -1,0 +1,65 @@
+import type { RefObject, ReactNode } from 'react';
+import type { NoticeProps, NoticeAction } from '../notice/types';
+
+type SnackbarOnlyProps = {
+	/**
+	 * The icon to render in the snackbar.
+	 *
+	 * @default null
+	 */
+	icon?: ReactNode;
+	/**
+	 * Whether to require user action to dismiss the snackbar.
+	 * By default, this is dismissed on a timeout, without user interaction:
+	 * after 6 seconds, or after 10 seconds when the snackbar has an action.
+	 *
+	 * @default false
+	 */
+	explicitDismiss?: boolean;
+	/**
+	 * A ref to the list that contains the snackbar.
+	 */
+	listRef?: RefObject< HTMLDivElement | null >;
+};
+
+export type SnackbarProps = Pick<
+	NoticeProps,
+	| 'className'
+	| 'children'
+	| 'spokenMessage'
+	| 'onRemove'
+	| 'politeness'
+	| 'onDismiss'
+> &
+	SnackbarOnlyProps & {
+		/**
+		 * An array of action objects. Each member object should contain:
+		 *
+		 * - `label`: `string` containing the text of the button/link
+		 * - `url`: `string` OR `onClick`: `( event: SyntheticEvent ) => void` to specify
+		 *    what the action does.
+		 *
+		 * The default appearance of an action button is inferred based on whether
+		 * `url` or `onClick` are provided, rendering the button as a link if
+		 * appropriate. If both props are provided, `url` takes precedence, and the
+		 * action button will render as an anchor tag.
+		 *
+		 * @default []
+		 */
+		actions?: Array<
+			Pick< NoticeAction, 'label' | 'url' | 'onClick' > & {
+				openInNewTab?: boolean;
+			}
+		>;
+	};
+
+export type SnackbarListProps = {
+	notices: Array<
+		Omit< SnackbarProps, 'children' > & {
+			id: string;
+			content: string;
+		}
+	>;
+	onRemove: ( id: string ) => void;
+	children?: ReactNode;
+};

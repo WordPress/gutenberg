@@ -1,0 +1,14 @@
+[
+	{
+		"name": "core/post-navigation-link",
+		"isValid": true,
+		"attributes": {
+			"type": "next",
+			"showTitle": false,
+			"linkLabel": false,
+			"arrow": "none",
+			"taxonomy": ""
+		},
+		"innerBlocks": []
+	}
+]

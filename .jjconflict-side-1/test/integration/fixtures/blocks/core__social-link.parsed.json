@@ -1,0 +1,12 @@
+[
+	{
+		"blockName": "core/social-link",
+		"attrs": {
+			"service": "spotify",
+			"url": "https://example.com/"
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	}
+]

@@ -1,0 +1,29 @@
+.wp-block-post-navigation-link {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+
+	.wp-block-post-navigation-link__arrow-previous {
+		display: inline-block;
+		margin-right: 1ch;
+		// chevron(`»`) symbol doesn't need the mirroring by us.
+		&:not(.is-arrow-chevron) {
+			// Flip for RTL.
+			transform: scaleX(1) #{"/*rtl:scaleX(-1);*/"}; // This points the arrow right for LTR and left for RTL.
+		}
+	}
+
+	.wp-block-post-navigation-link__arrow-next {
+		display: inline-block;
+		margin-left: 1ch;
+		// chevron(`»`) symbol doesn't need the mirroring by us.
+		&:not(.is-arrow-chevron) {
+			// Flip for RTL.
+			transform: scaleX(1) #{"/*rtl:scaleX(-1);*/"}; // This points the arrow right for LTR and left for RTL.
+		}
+	}
+
+	&.has-text-align-right[style*="writing-mode: vertical-rl"],
+	&.has-text-align-left[style*="writing-mode: vertical-lr"] {
+		rotate: 180deg;
+	}
+}

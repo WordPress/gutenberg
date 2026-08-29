@@ -1,0 +1,12 @@
+[
+	{
+		"name": "core/separator",
+		"isValid": true,
+		"attributes": {
+			"backgroundColor": "accent",
+			"opacity": "css",
+			"tagName": "hr"
+		},
+		"innerBlocks": []
+	}
+]

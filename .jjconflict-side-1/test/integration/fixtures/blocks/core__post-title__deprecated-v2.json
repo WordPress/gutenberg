@@ -1,0 +1,50 @@
+[
+	{
+		"name": "core/post-title",
+		"isValid": true,
+		"attributes": {
+			"level": 2,
+			"isLink": false,
+			"rel": "",
+			"linkTarget": "_self",
+			"style": {
+				"typography": {
+					"textAlign": "left"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/post-title",
+		"isValid": true,
+		"attributes": {
+			"level": 2,
+			"isLink": false,
+			"rel": "",
+			"linkTarget": "_self",
+			"style": {
+				"typography": {
+					"textAlign": "center"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/post-title",
+		"isValid": true,
+		"attributes": {
+			"level": 2,
+			"isLink": false,
+			"rel": "",
+			"linkTarget": "_self",
+			"style": {
+				"typography": {
+					"textAlign": "right"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

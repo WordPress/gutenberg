@@ -1,0 +1,30 @@
+const wpRules = require( '../rules' );
+
+const wpPlugin = { rules: wpRules };
+
+module.exports = [
+	{
+		plugins: {
+			'@wordpress': wpPlugin,
+		},
+		rules: {
+			'@wordpress/no-unused-vars-before-return': 'error',
+			'@wordpress/no-base-control-with-label-without-id': 'error',
+			'@wordpress/no-unguarded-get-range-at': 'error',
+			'@wordpress/no-global-active-element': 'error',
+			'@wordpress/no-global-get-selection': 'error',
+			'@wordpress/no-unsafe-render-order': 'error',
+			'@wordpress/no-setting-ds-tokens': 'error',
+			'@wordpress/no-unknown-ds-tokens': 'error',
+			'@wordpress/no-unsafe-wp-apis': 'error',
+			'@wordpress/no-wp-process-env': 'error',
+		},
+	},
+	{
+		files: [ '**/*.test.{js,jsx}', '**/test/*.{js,jsx}' ],
+		rules: {
+			'@wordpress/no-global-active-element': 'off',
+			'@wordpress/no-global-get-selection': 'off',
+		},
+	},
+];

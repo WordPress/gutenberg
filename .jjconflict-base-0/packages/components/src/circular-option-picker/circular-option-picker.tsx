@@ -1,0 +1,219 @@
+import clsx from 'clsx';
+import { useInstanceId } from '@wordpress/compose';
+import { isRTL } from '@wordpress/i18n';
+import { useMemo, useState } from '@wordpress/element';
+import { CircularOptionPickerContext } from './circular-option-picker-context';
+import { Composite } from '../composite';
+import type {
+	CircularOptionPickerProps,
+	ListboxCircularOptionPickerProps,
+	ButtonsCircularOptionPickerProps,
+} from './types';
+import { Option } from './circular-option-picker-option';
+import { OptionGroup } from './circular-option-picker-option-group';
+import {
+	ButtonAction,
+	DropdownLinkAction,
+} from './circular-option-picker-actions';
+import {
+	resolveCircularOptionPickerPresentation,
+	warnIfCircularOptionPickerAsButtonsIsSet,
+} from './utils';
+
+/**
+ *`CircularOptionPicker` is a component that displays a set of options as circular buttons.
+ *
+ * ```jsx
+ * import { CircularOptionPicker } from '../circular-option-picker';
+ * import { useState } from '@wordpress/element';
+ *
+ * const Example = () => {
+ * 	const [ currentColor, setCurrentColor ] = useState();
+ * 	const colors = [
+ * 		{ color: '#f00', name: 'Red' },
+ * 		{ color: '#0f0', name: 'Green' },
+ * 		{ color: '#00f', name: 'Blue' },
+ * 	];
+ * 	const colorOptions = (
+ * 		<>
+ * 			{ colors.map( ( { color, name }, index ) => {
+ * 				return (
+ * 					<CircularOptionPicker.Option
+ * 						key={ `${ color }-${ index }` }
+ * 						tooltipText={ name }
+ * 						style={ { backgroundColor: color, color } }
+ * 						isSelected={ index === currentColor }
+ * 						onClick={ () => setCurrentColor( index ) }
+ * 					/>
+ * 				);
+ * 			} ) }
+ * 		</>
+ * 	);
+ * 	return (
+ * 		<CircularOptionPicker
+ * 				options={ colorOptions }
+ * 				actions={
+ * 					<CircularOptionPicker.ButtonAction
+ * 						onClick={ () => setCurrentColor( undefined ) }
+ * 					>
+ * 						{ 'Clear' }
+ * 					</CircularOptionPicker.ButtonAction>
+ * 				}
+ * 			/>
+ * 	);
+ * };
+ * ```
+ */
+
+function ListboxCircularOptionPicker(
+	props: ListboxCircularOptionPickerProps
+) {
+	const {
+		actions,
+		options,
+		baseId,
+		className,
+		loop = true,
+		children,
+		...additionalProps
+	} = props;
+
+	const [ activeId, setActiveId ] = useState< string | null | undefined >(
+		undefined
+	);
+
+	const contextValue = useMemo(
+		() => ( {
+			baseId,
+			activeId,
+			setActiveId,
+			presentation: 'listbox' as const,
+		} ),
+		[ baseId, activeId, setActiveId ]
+	);
+
+	return (
+		<div className={ className }>
+			<CircularOptionPickerContext.Provider value={ contextValue }>
+				<Composite
+					{ ...additionalProps }
+					id={ baseId }
+					focusLoop={ loop }
+					rtl={ isRTL() }
+					role="listbox"
+					activeId={ activeId }
+					setActiveId={ setActiveId }
+				>
+					{ options }
+				</Composite>
+				{ children }
+				{ actions }
+			</CircularOptionPickerContext.Provider>
+		</div>
+	);
+}
+
+function ButtonsCircularOptionPicker(
+	props: ButtonsCircularOptionPickerProps
+) {
+	const {
+		actions,
+		options,
+		children,
+		baseId,
+		presentation,
+		...additionalProps
+	} = props;
+
+	const contextValue = useMemo(
+		() => ( {
+			baseId,
+			presentation,
+		} ),
+		[ baseId, presentation ]
+	);
+
+	return (
+		<div { ...additionalProps } role="group" id={ baseId }>
+			<CircularOptionPickerContext.Provider value={ contextValue }>
+				{ options }
+				{ children }
+				{ actions }
+			</CircularOptionPickerContext.Provider>
+		</div>
+	);
+}
+
+function CircularOptionPicker( props: CircularOptionPickerProps ) {
+	const {
+		asButtons,
+		presentation,
+		loop,
+		actions: actionsProp,
+		options: optionsProp,
+		children,
+		className,
+		...additionalProps
+	} = props;
+	warnIfCircularOptionPickerAsButtonsIsSet(
+		'CircularOptionPicker',
+		asButtons
+	);
+	const resolvedPresentation = resolveCircularOptionPickerPresentation(
+		presentation,
+		asButtons
+	);
+
+	const baseId = useInstanceId(
+		CircularOptionPicker,
+		'components-circular-option-picker',
+		additionalProps.id
+	);
+
+	const actions = actionsProp ? (
+		<div className="components-circular-option-picker__custom-clear-wrapper">
+			{ actionsProp }
+		</div>
+	) : undefined;
+
+	const options = (
+		<div className="components-circular-option-picker__swatches">
+			{ optionsProp }
+		</div>
+	);
+
+	const sharedProps = {
+		baseId,
+		className: clsx( 'components-circular-option-picker', className ),
+		actions,
+		options,
+		children,
+	};
+
+	if ( resolvedPresentation === 'listbox' ) {
+		return (
+			<ListboxCircularOptionPicker
+				{ ...additionalProps }
+				{ ...sharedProps }
+				loop={ loop }
+			/>
+		);
+	}
+
+	return (
+		<ButtonsCircularOptionPicker
+			{ ...additionalProps }
+			{ ...sharedProps }
+			presentation={ resolvedPresentation }
+		/>
+	);
+}
+
+CircularOptionPicker.Option = Option;
+CircularOptionPicker.OptionGroup = OptionGroup;
+CircularOptionPicker.ButtonAction = ButtonAction;
+CircularOptionPicker.DropdownLinkAction = DropdownLinkAction;
+
+CircularOptionPicker.displayName = 'CircularOptionPicker';
+
+export default CircularOptionPicker;

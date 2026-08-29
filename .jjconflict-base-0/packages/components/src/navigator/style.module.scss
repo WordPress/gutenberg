@@ -1,0 +1,89 @@
+.wrapper {
+	position: relative;
+	// Prevent horizontal overflow while animating screen transitions.
+	overflow-x: clip;
+	// Isolate this subtree's layout calculations for better performance.
+	contain: layout;
+	display: grid;
+	grid-template-columns: 1fr;
+	grid-template-rows: 1fr;
+	align-items: start;
+}
+
+.screen {
+	// Keep horizontal overflow accessible.
+	overflow-x: auto;
+	// Do not exceed a height set on the navigator.
+	max-height: 100%;
+	box-sizing: border-box;
+	position: relative;
+	grid-column: 1 / -1;
+	grid-row: 1 / -1;
+}
+
+@keyframes fade-in {
+	from {
+		opacity: 0;
+	}
+}
+@keyframes fade-out {
+	to {
+		opacity: 0;
+	}
+}
+@keyframes slide-from-right {
+	from {
+		transform: translateX(100px);
+	}
+}
+@keyframes slide-to-left {
+	to {
+		transform: translateX(-80px);
+	}
+}
+@keyframes slide-from-left {
+	from {
+		transform: translateX(-100px);
+	}
+}
+@keyframes slide-to-right {
+	to {
+		transform: translateX(80px);
+	}
+}
+
+$fade-duration: 70ms;
+$slide-duration: 300ms; // Keep aligned with the fallback timeouts in animation.ts.
+$slide-easing: cubic-bezier(0.33, 0, 0, 1);
+
+.screen-animation {
+	z-index: 1;
+	&[data-animation-type="out"] {
+		z-index: 0;
+	}
+
+	@media not (prefers-reduced-motion) {
+		&:not([data-skip-animation]) {
+			&[data-animation-direction="end"][data-animation-type="in"] {
+				animation:
+					$fade-duration linear 70ms both fade-in,
+					$slide-duration $slide-easing both slide-from-right;
+			}
+			&[data-animation-direction="end"][data-animation-type="out"] {
+				animation:
+					$fade-duration linear 40ms both fade-out,
+					$slide-duration $slide-easing both slide-to-left;
+			}
+			&[data-animation-direction="start"][data-animation-type="in"] {
+				animation:
+					$fade-duration linear 70ms both fade-in,
+					$slide-duration $slide-easing both slide-from-left;
+			}
+			&[data-animation-direction="start"][data-animation-type="out"] {
+				animation:
+					$fade-duration linear 40ms both fade-out,
+					$slide-duration $slide-easing both slide-to-right;
+			}
+		}
+	}
+}
