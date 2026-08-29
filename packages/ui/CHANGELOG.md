@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Add `Radio` form primitive.
+-   Add `Radio` form primitive ([#82214](https://github.com/WordPress/gutenberg/pull/82214)).
 
 ### Breaking Changes
 
