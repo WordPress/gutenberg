@@ -1,14 +1,4 @@
 {
-	"packages/admin-ui/src/lock-unlock.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/admin-ui/src/stories/with-router.tsx": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/block-directory/src/components/block-ratings/index.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1

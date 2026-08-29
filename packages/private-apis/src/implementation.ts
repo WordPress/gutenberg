@@ -10,7 +10,6 @@
  * The list of core modules allowed to opt-in to the private APIs.
  */
 const CORE_MODULES_USING_PRIVATE_APIS = [
-	'@wordpress/admin-ui',
 	'@wordpress/api-fetch',
 	'@wordpress/block-directory',
 	'@wordpress/block-editor',

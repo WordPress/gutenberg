@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Stop opting into `@wordpress/private-apis`. Storybook's router decorator uses `@tanstack/react-router` directly.
+
 ## 2.9.0 (2026-08-26)
 
 ### Bug Fixes

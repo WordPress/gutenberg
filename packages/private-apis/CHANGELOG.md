@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Remove `@wordpress/admin-ui` from the list of core modules using private APIs.
+
 ## 1.54.0 (2026-08-26)
 
 ### Internal
