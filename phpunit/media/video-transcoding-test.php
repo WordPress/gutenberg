@@ -102,17 +102,15 @@ class Video_Transcoding_Test extends WP_UnitTestCase {
 
 	/**
 	 * The keep-original preference defaults to true and is filterable.
+	 *
+	 * @covers ::gutenberg_video_transcoding_keep_original
 	 */
 	public function test_keep_original_filter_defaults_true_and_is_filterable(): void {
-		$this->assertTrue(
-			(bool) apply_filters( 'gutenberg_video_transcoding_keep_original', true )
-		);
+		$this->assertTrue( gutenberg_video_transcoding_keep_original() );
 
 		add_filter( 'gutenberg_video_transcoding_keep_original', '__return_false' );
 
-		$this->assertFalse(
-			(bool) apply_filters( 'gutenberg_video_transcoding_keep_original', true )
-		);
+		$this->assertFalse( gutenberg_video_transcoding_keep_original() );
 
 		remove_filter( 'gutenberg_video_transcoding_keep_original', '__return_false' );
 	}

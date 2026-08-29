@@ -73,21 +73,21 @@ function gutenberg_delete_optimized_video( int $post_id ): bool {
 add_action( 'delete_attachment', 'gutenberg_delete_optimized_video' );
 
 /**
- * Exposes the "keep original video" preference to the editor.
+ * Whether the original video upload is kept when a video is transcoded.
  *
  * By default the original video upload is kept and the transcoded, web-safe
  * version is served as a companion. Developers can return false from the
  * `gutenberg_video_transcoding_keep_original` filter to transcode before
  * upload instead, so only the optimized file is stored.
  *
- * The resolved value is exposed as `window.__videoTranscodingKeepOriginal`,
- * read by the block editor's media upload settings.
+ * The value reaches the editor as `video_keep_original` on the REST API root
+ * index (see gutenberg_media_processing_filter_rest_index()).
+ *
+ * @since 24.0.0
+ *
+ * @return bool Whether to keep the original video upload.
  */
-function gutenberg_set_video_transcoding_keep_original_flag(): void {
-	if ( ! gutenberg_is_client_side_media_processing_enabled() ) {
-		return;
-	}
-
+function gutenberg_video_transcoding_keep_original(): bool {
 	/**
 	 * Filters whether to keep the original video upload when transcoding.
 	 *
@@ -96,17 +96,9 @@ function gutenberg_set_video_transcoding_keep_original_flag(): void {
 	 * false, the video is transcoded before upload so only the optimized file
 	 * is stored.
 	 *
-	 * @since 21.9.0
+	 * @since 24.0.0
 	 *
 	 * @param bool $keep_original Whether to keep the original video upload.
 	 */
-	$keep_original = (bool) apply_filters( 'gutenberg_video_transcoding_keep_original', true );
-
-	wp_add_inline_script(
-		'wp-block-editor',
-		'window.__videoTranscodingKeepOriginal = ' . ( $keep_original ? 'true' : 'false' ) . ';',
-		'before'
-	);
+	return (bool) apply_filters( 'gutenberg_video_transcoding_keep_original', true );
 }
-
-add_action( 'admin_init', 'gutenberg_set_video_transcoding_keep_original_flag' );

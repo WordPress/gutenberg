@@ -199,6 +199,7 @@ function gutenberg_media_processing_filter_rest_index( WP_REST_Response $respons
 		$response->data['image_size_threshold'] = $image_size_threshold;
 		$response->data['image_strip_meta']     = $image_strip_meta;
 		$response->data['image_max_bit_depth']  = $image_max_bit_depth;
+		$response->data['video_keep_original']  = gutenberg_video_transcoding_keep_original();
 	}
 
 	return $response;

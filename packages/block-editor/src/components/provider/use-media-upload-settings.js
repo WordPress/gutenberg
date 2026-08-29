@@ -20,15 +20,7 @@ function useMediaUploadSettings( settings = {} ) {
 			bigImageSizeThreshold: settings.bigImageSizeThreshold,
 			imageStripMeta: settings.imageStripMeta,
 			imageMaxBitDepth: settings.imageMaxBitDepth,
-			/*
-			 * Developer opt-out for keeping the original video upload, exposed
-			 * by lib/media/video-transcoding.php. When false, videos are
-			 * transcoded before upload so only the optimized file is stored.
-			 */
-			videoKeepOriginal:
-				typeof window !== 'undefined'
-					? window.__videoTranscodingKeepOriginal
-					: undefined,
+			videoKeepOriginal: settings.videoKeepOriginal,
 		} ),
 		[ settings ]
 	);

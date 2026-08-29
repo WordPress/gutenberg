@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Read the `video_keep_original` setting from the REST API index into the block editor settings as `videoKeepOriginal`, so the upload pipeline knows whether to keep the original video upload alongside its web-safe transcode ([#79375](https://github.com/WordPress/gutenberg/pull/79375)).
+
 ### Internal
 
 -   Remove unused dependencies `@wordpress/reusable-blocks`, `client-zip` and `fast-deep-equal` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
