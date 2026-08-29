@@ -32,6 +32,9 @@ jest.mock( '../utils/video-conversion', () => {
 	const actual = jest.requireActual( '../utils/video-conversion' );
 	return {
 		convertGifToVideo: jest.fn(),
+		// Never settles: keeps an item parked in TranscodeVideo so the
+		// concurrency gate can be exercised.
+		transcodeVideo: jest.fn( () => new Promise( () => {} ) ),
 		cancelGifToVideoOperations: jest.fn( () => Promise.resolve( true ) ),
 		terminateVideoConversionWorker: jest.fn(),
 		isUnsupportedConversionError: actual.isUnsupportedConversionError,
@@ -992,6 +995,84 @@ describe( 'actions', () => {
 						parent.id
 					)
 				).toBeDefined();
+			} );
+
+			it( 'keeps the parent video when its only child is a failed optimized-video companion', async () => {
+				const mediaDelete = jest.fn().mockResolvedValue( undefined );
+				const parentOnError = jest.fn();
+				unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+					mediaDelete,
+				} );
+
+				// A video never accumulates sub-sizes, so its transcoded
+				// companion is always the sole child with nothing else to
+				// count as a partial success.
+				const { parent, child } = setUpParentAndChild( {
+					parentOnError,
+					imageSize: 'optimized-video',
+				} );
+
+				await registry
+					.dispatch( uploadStore )
+					.cancelItem(
+						child!.id,
+						new Error( 'transcoding failed' ),
+						true
+					);
+
+				expect( mediaDelete ).not.toHaveBeenCalled();
+				expect( parentOnError ).not.toHaveBeenCalled();
+				expect(
+					unlock( registry.select( uploadStore ) ).getItem(
+						parent.id
+					)
+				).toBeDefined();
+			} );
+		} );
+
+		describe( 'video processing concurrency gate', () => {
+			it( 'starts the next queued video transcode when an active one is cancelled', async () => {
+				unlock( registry.dispatch( uploadStore ) ).resumeQueue();
+
+				const operations = [
+					[ OperationType.TranscodeVideo, { outputFormat: 'mp4' } ],
+					OperationType.Upload,
+				] as const;
+
+				unlock( registry.dispatch( uploadStore ) ).addItem( {
+					file: new File( [ 'a' ], 'a.mov', {
+						type: 'video/quicktime',
+					} ),
+					operations: [ ...operations ],
+				} );
+				unlock( registry.dispatch( uploadStore ) ).addItem( {
+					file: new File( [ 'b' ], 'b.mov', {
+						type: 'video/quicktime',
+					} ),
+					operations: [ ...operations ],
+				} );
+
+				const [ first, second ] = unlock(
+					registry.select( uploadStore )
+				).getAllItems();
+
+				// Only one transcode may run at a time: the second item waits.
+				expect( first.currentOperation ).toBe(
+					OperationType.TranscodeVideo
+				);
+				expect( second.currentOperation ).toBeUndefined();
+
+				await registry
+					.dispatch( uploadStore )
+					.cancelItem( first.id, new Error( 'transcoding failed' ) );
+
+				// Cancelling the active transcode frees the slot for the
+				// waiting item, just as finishing it would.
+				expect(
+					unlock( registry.select( uploadStore ) ).getItem(
+						second.id
+					)?.currentOperation
+				).toBe( OperationType.TranscodeVideo );
 			} );
 		} );
 	} );

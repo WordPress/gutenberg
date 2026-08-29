@@ -101,6 +101,19 @@ export const WEB_SAFE_VIDEO_CODECS: readonly string[] = [
  * Default maximum dimension (longest edge) in pixels for transcoded videos.
  *
  * Videos whose longest edge exceeds this are downscaled. Mirrors the
- * `media-experiments` default and is filterable on the server.
+ * `media-experiments` default; overridable through the `bigVideoSizeThreshold`
+ * store setting.
  */
 export const DEFAULT_VIDEO_SIZE_THRESHOLD = 1920;
+
+/**
+ * Sideload sizes that are optional companions of an already-uploaded
+ * attachment: the animated-GIF video and its poster, and the web-safe
+ * transcode of a video. The parent attachment is complete without them, so a
+ * failed companion must never be treated as a failure of the parent.
+ */
+export const OPTIONAL_COMPANION_IMAGE_SIZES: readonly string[] = [
+	'animated_video',
+	'animated_video_poster',
+	'optimized-video',
+];
