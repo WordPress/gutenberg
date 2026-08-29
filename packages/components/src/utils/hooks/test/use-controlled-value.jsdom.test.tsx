@@ -1,7 +1,9 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { useControlledValue } from '../use-controlled-value';
 
-function Input( props ) {
+type InputProps = Parameters< typeof useControlledValue< string > >[ 0 ];
+
+function Input( props: InputProps ) {
 	const [ value, setValue ] = useControlledValue( props );
 	return (
 		<input

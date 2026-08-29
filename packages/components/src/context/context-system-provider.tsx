@@ -1,6 +1,7 @@
 import deepmerge from 'deepmerge';
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import { isPlainObject } from 'is-plain-object';
+import type { ReactNode } from 'react';
 import {
 	createContext,
 	useContext,
@@ -11,9 +12,12 @@ import {
 import warn from '@wordpress/warning';
 import { useUpdateEffect } from '../utils';
 
-export const ComponentsContext = createContext(
-	/** @type {Record<string, any>} */ ( {} )
-);
+type ContextSystemValue = Record<
+	string,
+	Record< string, unknown > | undefined
+>;
+
+export const ComponentsContext = createContext< ContextSystemValue >( {} );
 ComponentsContext.displayName = 'ComponentsContext';
 
 export const useComponentsContext = () => useContext( ComponentsContext );
@@ -27,7 +31,11 @@ export const useComponentsContext = () => useContext( ComponentsContext );
  * @param {Record<string, any>} props.value
  * @return {Record<string, any>} The consolidated value.
  */
-function useContextSystemBridge( { value } ) {
+function useContextSystemBridge( {
+	value,
+}: {
+	value?: ContextSystemValue;
+} ): ContextSystemValue {
 	const parentContext = useComponentsContext();
 
 	const valueRef = useRef( value );
@@ -82,7 +90,13 @@ function useContextSystemBridge( { value } ) {
  * @param {T}               options.value    Props to render into connected components.
  * @return {React.JSX.Element} A Provider wrapped component.
  */
-const BaseContextSystemProvider = ( { children, value } ) => {
+const BaseContextSystemProvider = ( {
+	children,
+	value,
+}: {
+	children: ReactNode;
+	value?: ContextSystemValue;
+} ) => {
 	const contextValue = useContextSystemBridge( { value } );
 
 	return (

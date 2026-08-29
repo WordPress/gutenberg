@@ -14,7 +14,9 @@ jest.mock( '@emotion/utils', () => ( {
 	insertStyles: jest.fn(),
 } ) );
 
-function Example( { args } ) {
+type CxArg = Parameters< ReturnType< typeof useCx > >[ number ];
+
+function Example( { args }: { args: CxArg[] } ) {
 	const cx = useCx();
 
 	return <div className={ cx( ...args ) } />;
