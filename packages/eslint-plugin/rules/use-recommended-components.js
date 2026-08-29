@@ -20,7 +20,6 @@ const ALLOWLIST = {
 			'Badge',
 			'Calendar',
 			'Card',
-			'CheckboxControl',
 			'Collapsible',
 			'CollapsibleCard',
 			'ControlWithError',

@@ -6,18 +6,11 @@ import {
 } from '../../stories/shared';
 
 const meta: Meta< typeof CheckboxControl > = {
-	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/CheckboxControl',
 	component: CheckboxControl,
 	argTypes: {
 		checked: { control: false },
 		onCheckedChange: { action: 'onCheckedChange' },
-	},
-	parameters: {
-		componentStatus: {
-			status: 'recommended',
-			whereUsed: 'global',
-		},
 	},
 };
 export default meta;
