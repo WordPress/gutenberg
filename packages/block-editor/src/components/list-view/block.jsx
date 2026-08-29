@@ -431,11 +431,12 @@ function ListViewBlock( {
 	const selectEditorBlock = useCallback(
 		( event ) => {
 			// For keyboard activation (Enter/Space on a link), transfer focus
-			// to the canvas with the caret at the end of the block.
-			// For mouse clicks, keep focus in the list view so that subsequent
-			// keyboard operations (arrow navigation, copy/paste) still work.
+			// to the canvas at the default initial position (start of the first
+			// field). For mouse clicks, keep focus in the list view so that
+			// subsequent keyboard operations (arrow navigation, copy/paste)
+			// still work.
 			const isKeyboardActivation = event?.detail === 0;
-			selectBlock( event, clientId, isKeyboardActivation ? -1 : null );
+			selectBlock( event, clientId, isKeyboardActivation ? 0 : null );
 			event.preventDefault();
 		},
 		[ clientId, selectBlock ]
