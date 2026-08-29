@@ -245,7 +245,6 @@ export async function getVideoMetadata( file: File ): Promise< {
 	width: number;
 	height: number;
 	bitrate: number;
-	duration: number;
 } > {
 	const { getVideoMetadata: read } = await loadVideoConversionModule();
 	return read( file );

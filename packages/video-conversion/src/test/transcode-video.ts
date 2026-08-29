@@ -10,18 +10,21 @@ let mockTrack: {
 	width: number;
 	height: number;
 	bitrate: number;
-	duration: number;
 } | null = {
 	codec: 'avc',
 	width: 1280,
 	height: 720,
 	bitrate: 4_000_000,
-	duration: 12,
 };
 
 // Records the options passed to Conversion.init so tests can assert on the
-// resolved video options (codec, bitrate, dimensions, hardwareAcceleration).
+// resolved video options (codec, bitrate, dimensions, hardwareAcceleration)
+// and the audio options.
 let mockConversionVideoOptions: Record< string, unknown > | undefined;
+let mockConversionAudioOptions: Record< string, unknown > | undefined;
+
+// Tracks the fake Conversion reports as discarded after init.
+let mockDiscardedTracks: { track: { isAudioTrack: () => boolean } }[] = [];
 
 const mockExecute = jest.fn().mockResolvedValue( undefined );
 const mockCancel = jest.fn().mockResolvedValue( undefined );
@@ -47,7 +50,6 @@ jest.mock( 'mediabunny', () => ( {
 					averagePacketRate: 30,
 					packetCount: 360,
 				} ),
-				computeDuration: async () => track.duration,
 			};
 		}
 	},
@@ -60,9 +62,18 @@ jest.mock( 'mediabunny', () => ( {
 		}
 	},
 	Conversion: {
-		init: async ( options: { video: Record< string, unknown > } ) => {
+		init: async ( options: {
+			video: Record< string, unknown >;
+			audio: Record< string, unknown >;
+		} ) => {
 			mockConversionVideoOptions = options.video;
-			return { execute: mockExecute, cancel: mockCancel };
+			mockConversionAudioOptions = options.audio;
+			return {
+				execute: mockExecute,
+				cancel: mockCancel,
+				isValid: true,
+				discardedTracks: mockDiscardedTracks,
+			};
 		},
 	},
 	BlobSource: class {},
@@ -84,9 +95,10 @@ beforeEach( () => {
 		width: 1280,
 		height: 720,
 		bitrate: 4_000_000,
-		duration: 12,
 	};
 	mockConversionVideoOptions = undefined;
+	mockConversionAudioOptions = undefined;
+	mockDiscardedTracks = [];
 	mockExecute.mockClear();
 	mockCancel.mockClear();
 	mockCanEncodeVideo.mockReset();
@@ -120,13 +132,39 @@ describe( 'transcodeVideo', () => {
 		expect( mockConversionVideoOptions?.codec ).toBe( 'vp9' );
 	} );
 
+	it( 'requests the audio codec browsers play in each container', async () => {
+		// Left to mediabunny, any codec the container can hold would be
+		// copied through (e.g. Vorbis into MP4), which browsers cannot play.
+		await transcodeVideo( 'item-mp4-audio', VIDEO_BUFFER, 'video/mp4' );
+		expect( mockConversionAudioOptions?.codec ).toBe( 'aac' );
+
+		await transcodeVideo( 'item-webm-audio', VIDEO_BUFFER, 'video/webm' );
+		expect( mockConversionAudioOptions?.codec ).toBe( 'opus' );
+	} );
+
+	it( 'throws an Unsupported error instead of producing a silent video', async () => {
+		// An audio track mediabunny cannot decode (AC-3, DTS) is dropped
+		// while the conversion stays valid; the original must be kept.
+		mockDiscardedTracks = [ { track: { isAudioTrack: () => true } } ];
+		await expect(
+			transcodeVideo( 'item-mute', VIDEO_BUFFER, 'video/mp4' )
+		).rejects.toThrow( new RegExp( `^${ UNSUPPORTED_ERROR_PREFIX }` ) );
+		expect( mockExecute ).not.toHaveBeenCalled();
+		expect( mockCancel ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'proceeds when only a non-audio track is discarded', async () => {
+		mockDiscardedTracks = [ { track: { isAudioTrack: () => false } } ];
+		await transcodeVideo( 'item-subs', VIDEO_BUFFER, 'video/mp4' );
+		expect( mockExecute ).toHaveBeenCalledTimes( 1 );
+	} );
+
 	it( 'caps the longest edge when maxDimensions is exceeded', async () => {
 		mockTrack = {
 			codec: 'avc',
 			width: 3840,
 			height: 2160,
 			bitrate: 4_000_000,
-			duration: 12,
 		};
 		await transcodeVideo( 'item-big', VIDEO_BUFFER, 'video/mp4', {
 			maxDimensions: 1920,
@@ -177,7 +215,6 @@ describe( 'transcodeVideo', () => {
 			width: 3840,
 			height: 2160,
 			bitrate: 4_000_000,
-			duration: 12,
 		};
 
 		await transcodeVideo( 'item-probe', VIDEO_BUFFER, 'video/mp4', {
@@ -194,14 +231,13 @@ describe( 'transcodeVideo', () => {
 } );
 
 describe( 'getVideoMetadata', () => {
-	it( 'reads codec, dimensions, bitrate and duration from the primary track', async () => {
+	it( 'reads codec, dimensions and bitrate from the primary track', async () => {
 		const metadata = await getVideoMetadata( VIDEO_BUFFER );
 		expect( metadata ).toEqual( {
 			codec: 'avc',
 			width: 1280,
 			height: 720,
 			bitrate: 4_000_000,
-			duration: 12,
 		} );
 	} );
 

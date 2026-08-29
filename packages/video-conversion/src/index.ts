@@ -13,6 +13,7 @@ import {
 	ALL_FORMATS,
 	type Quality,
 	type VideoCodec,
+	type ConversionAudioOptions,
 	type ConversionVideoOptions,
 } from 'mediabunny';
 import type { ItemId, VideoMetadata, TranscodeVideoOptions } from './types.ts';
@@ -377,8 +378,8 @@ export async function convertGifToVideo(
  *
  * Only the container headers are read (not the full media), so this is cheap
  * enough to run on every upload to decide whether the video is already
- * web-safe. Bitrate and duration are best-effort: if they cannot be computed
- * they are returned as 0, and the format/dimension checks still suffice.
+ * web-safe. The bitrate is best-effort: if it cannot be computed it is
+ * returned as 0, and the format/dimension checks still suffice.
  *
  * Accepts the video as a Blob/File so the bytes are read here in the worker.
  * An ArrayBuffer is still accepted for direct callers and tests.
@@ -407,20 +408,21 @@ export async function getVideoMetadata(
 	] );
 
 	let bitrate = 0;
-	let duration = 0;
 	try {
 		/*
 		 * Sample a subset of packets for the bitrate estimate to keep this
 		 * fast; an exact figure is not needed for the eligibility decision.
+		 * Nothing here walks the whole file: a full duration scan of a
+		 * container without an index (e.g. a MediaRecorder WebM) would read
+		 * every byte before the transcode decision is even made.
 		 */
 		const stats = await track.computePacketStats( 100 );
 		bitrate = stats.averageBitrate;
-		duration = await track.computeDuration();
 	} catch {
-		// Bitrate/duration are best-effort; leave them at 0.
+		// The bitrate is best-effort; leave it at 0.
 	}
 
-	return { codec, width, height, bitrate, duration };
+	return { codec, width, height, bitrate };
 }
 
 /**
@@ -469,6 +471,14 @@ export async function transcodeVideo(
 
 		const isWebm = outputMimeType === 'video/webm';
 		const codec: VideoCodec = isWebm ? 'vp9' : 'avc';
+		/*
+		 * Name the audio codec browsers play in each container. Left
+		 * unspecified, mediabunny copies any audio codec the container can
+		 * hold (e.g. Vorbis in MP4), which browsers then cannot play.
+		 */
+		const audioOptions: ConversionAudioOptions = {
+			codec: isWebm ? 'opus' : 'aac',
+		};
 
 		const blob = source instanceof Blob ? source : new Blob( [ source ] );
 		const input = new Input( {
@@ -552,11 +562,33 @@ export async function transcodeVideo(
 			input,
 			output,
 			video: videoOptions,
+			audio: audioOptions,
 		} );
 
 		if ( ! inProgressOperations.has( id ) ) {
 			await conversion.cancel();
 			throw new Error( 'Operation cancelled' );
+		}
+
+		/*
+		 * mediabunny drops a track it cannot decode or re-encode (say AC-3 or
+		 * DTS audio) and still reports the conversion as valid, because the
+		 * container needs no audio. A silent companion would then play by
+		 * default in place of a perfectly good original, so treat lost audio
+		 * as unsupported and let the caller keep the original.
+		 */
+		const lostAudio = conversion.discardedTracks.some( ( discarded ) =>
+			discarded.track.isAudioTrack()
+		);
+		if ( ! conversion.isValid || lostAudio ) {
+			await conversion.cancel();
+			throw new Error(
+				`${ UNSUPPORTED_ERROR_PREFIX }: ${
+					lostAudio
+						? 'audio track cannot be converted'
+						: 'conversion is not valid'
+				}`
+			);
 		}
 
 		await conversion.execute();

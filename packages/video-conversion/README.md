@@ -66,7 +66,7 @@ Conversion cost is roughly proportional to the total number of decoded pixels. 3
 
 Reads metadata from a video file's primary video track.
 
-Only the container headers are read (not the full media), so this is cheap enough to run on every upload to decide whether the video is already web-safe. Bitrate and duration are best-effort: if they cannot be computed they are returned as 0, and the format/dimension checks still suffice.
+Only the container headers are read (not the full media), so this is cheap enough to run on every upload to decide whether the video is already web-safe. The bitrate is best-effort: if it cannot be computed it is returned as 0, and the format/dimension checks still suffice.
 
 Accepts the video as a Blob/File so the bytes are read here in the worker. An ArrayBuffer is still accepted for direct callers and tests.
 

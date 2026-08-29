@@ -16,8 +16,6 @@ export interface VideoMetadata {
 	height: number;
 	/** Average bitrate in bits per second (0 if it could not be computed). */
 	bitrate: number;
-	/** Duration in seconds (0 if it could not be computed). */
-	duration: number;
 }
 
 /**
