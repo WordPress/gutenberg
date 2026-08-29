@@ -35,11 +35,11 @@ describe( 'addFallbackToVar', () => {
 
 	it( 'escapes quotes in fallback values when escapeQuotes is true', () => {
 		expect(
-			addFallbackToVar( 'var(--wpds-typography-font-family-mono)', {
+			addFallbackToVar( "'var(--wpds-typography-font-family-mono)'", {
 				escapeQuotes: true,
 			} )
 		).toBe(
-			'var(--wpds-typography-font-family-mono, \\"Menlo\\", \\"Consolas\\", monaco, monospace)'
+			'\'var(--wpds-typography-font-family-mono, \\"Menlo\\", \\"Consolas\\", monaco, monospace)\''
 		);
 	} );
 } );

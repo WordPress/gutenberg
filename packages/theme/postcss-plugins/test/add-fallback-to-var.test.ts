@@ -99,6 +99,18 @@ describe( 'addFallbackToVar', () => {
 		expect( second ).toBe( first );
 	} );
 
+	it( 'leaves var()-like text inside quoted CSS strings untouched', () => {
+		expect(
+			addFallbackToVar( '"var(--wpds-border-radius-sm)"', mockFallbacks )
+		).toBe( '"var(--wpds-border-radius-sm)"' );
+		expect(
+			addFallbackToVar(
+				'content: "var(--wpds-border-radius-sm)"',
+				mockFallbacks
+			)
+		).toBe( 'content: "var(--wpds-border-radius-sm)"' );
+	} );
+
 	describe( 'escapeQuotes', () => {
 		it( 'does not escape quotes by default', () => {
 			expect(
@@ -114,12 +126,12 @@ describe( 'addFallbackToVar', () => {
 		it( 'escapes double quotes when enabled', () => {
 			expect(
 				addFallbackToVar(
-					'var(--wpds-typography-font-family-mono)',
+					"'var(--wpds-typography-font-family-mono)'",
 					mockFallbacks,
 					{ escapeQuotes: true }
 				)
 			).toBe(
-				'var(--wpds-typography-font-family-mono, \\"Menlo\\", \\"Consolas\\", monaco, monospace)'
+				'\'var(--wpds-typography-font-family-mono, \\"Menlo\\", \\"Consolas\\", monaco, monospace)\''
 			);
 		} );
 
@@ -128,23 +140,55 @@ describe( 'addFallbackToVar', () => {
 				'--wpds-test-token': `"double" and 'single'`,
 			};
 			const result = addFallbackToVar(
-				'var(--wpds-test-token)',
+				"'var(--wpds-test-token)'",
 				fallbacks,
 				{ escapeQuotes: true }
 			);
 			expect( result ).toBe(
-				`var(--wpds-test-token, \\"double\\" and \\'single\\')`
+				"'var(--wpds-test-token, \\\"double\\\" and \\'single\\')'"
 			);
 		} );
 
 		it( 'leaves values without quotes unchanged when enabled', () => {
 			expect(
 				addFallbackToVar(
-					'var(--wpds-border-radius-sm)',
+					"'var(--wpds-border-radius-sm)'",
 					mockFallbacks,
 					{ escapeQuotes: true }
 				)
-			).toBe( 'var(--wpds-border-radius-sm, 2px)' );
+			).toBe( "'var(--wpds-border-radius-sm, 2px)'" );
+		} );
+
+		it( 'leaves var() references inside JS comments untouched', () => {
+			const source =
+				'// var(--wpds-border-radius-sm)\nconst x = "plain";';
+			expect(
+				addFallbackToVar( source, mockFallbacks, {
+					escapeQuotes: true,
+				} )
+			).toBe( source );
+		} );
+
+		it( 'transforms var() references inside JS string literals', () => {
+			expect(
+				addFallbackToVar(
+					"const styles = 'var(--wpds-border-radius-sm)';",
+					mockFallbacks,
+					{ escapeQuotes: true }
+				)
+			).toBe( "const styles = 'var(--wpds-border-radius-sm, 2px)';" );
+		} );
+
+		it( 'leaves var()-like text inside quoted CSS within JS strings untouched', () => {
+			expect(
+				addFallbackToVar(
+					'const styles = \'content: "var(--wpds-border-radius-sm)"\';',
+					mockFallbacks,
+					{ escapeQuotes: true }
+				)
+			).toBe(
+				'const styles = \'content: "var(--wpds-border-radius-sm)"\';'
+			);
 		} );
 	} );
 } );

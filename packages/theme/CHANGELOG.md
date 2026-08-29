@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Token fallback plugins now ignore `var(--wpds-*)` text inside quoted CSS strings and JS comments. ([#82169](https://github.com/WordPress/gutenberg/issues/82169))
+
 ### Documentation
 
 -   Explain how consumers define light and dark themes through `ThemeProvider` color seeds ([#82039](https://github.com/WordPress/gutenberg/pull/82039)).
