@@ -1,18 +1,18 @@
 // eslint-disable-next-line import/no-extraneous-dependencies -- The owning test workspaces declare Vitest.
 import 'vitest';
 
-interface GutenbergVitestMatchers< R = unknown > {
-	toBePositionedPopover: () => R;
-	toHaveErrored: () => R;
-	toHaveErroredWith: ( ...args: unknown[] ) => R;
-	toHaveInformed: () => R;
-	toHaveInformedWith: ( ...args: unknown[] ) => R;
-	toHaveLogged: () => R;
-	toHaveLoggedWith: ( ...args: unknown[] ) => R;
-	toHaveWarned: () => R;
-	toHaveWarnedWith: ( ...args: unknown[] ) => R;
-	toMatchDiffSnapshot: ( expected: unknown ) => R;
-	toMatchStyleDiffSnapshot: ( expected: Element | null ) => R;
+interface GutenbergVitestMatchers {
+	toBePositionedPopover: () => void;
+	toHaveErrored: () => void;
+	toHaveErroredWith: ( ...args: unknown[] ) => void;
+	toHaveInformed: () => void;
+	toHaveInformedWith: ( ...args: unknown[] ) => void;
+	toHaveLogged: () => void;
+	toHaveLoggedWith: ( ...args: unknown[] ) => void;
+	toHaveWarned: () => void;
+	toHaveWarnedWith: ( ...args: unknown[] ) => void;
+	toMatchDiffSnapshot: ( expected: unknown ) => void;
+	toMatchStyleDiffSnapshot: ( expected: Element | null ) => void;
 }
 
 interface GutenbergVitestEnvironment {
@@ -30,6 +30,6 @@ declare global {
 }
 
 declare module 'vitest' {
-	interface Assertion< T = any > extends GutenbergVitestMatchers< T > {}
-	interface AsymmetricMatchersContaining extends GutenbergVitestMatchers {}
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	interface Matchers< T = any > extends GutenbergVitestMatchers {}
 }
