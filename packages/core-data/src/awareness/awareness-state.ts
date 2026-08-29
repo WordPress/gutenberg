@@ -143,7 +143,8 @@ export abstract class AwarenessState<
 	 * value -- even if it hasn't yet been set on the awareness instance.
 	 */
 	private myThrottledState: Partial< State > = {};
-	private throttleTimeouts: Map< string, NodeJS.Timeout > = new Map();
+	private throttleTimeouts: Map< string, ReturnType< typeof setTimeout > > =
+		new Map();
 
 	/** CUSTOM METHODS */
 

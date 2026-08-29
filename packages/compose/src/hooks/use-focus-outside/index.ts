@@ -148,7 +148,7 @@ export default function useFocusOutside(
 			return;
 		}
 
-		blurCheckTimeoutIdRef.current = setTimeout( () => {
+		blurCheckTimeoutIdRef.current = window.setTimeout( () => {
 			// If document is not focused then focus should remain
 			// inside the wrapped component and therefore we cancel
 			// this blur event thereby leaving focus in place.

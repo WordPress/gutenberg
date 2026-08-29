@@ -1,6 +1,7 @@
 import { dispatch, select, subscribe } from '@wordpress/data';
 import { Y } from '@wordpress/sync';
-// @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment -- Package builds lack declarations that the Vitest type graph provides.
+// @ts-ignore `@wordpress/block-editor` does not expose type declarations for its entry point.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { BaseAwarenessState, baseEqualityFieldChecks } from './base-awareness';
 import { isCollaboratorInfo } from './utils';
@@ -74,7 +75,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 		// in the subscription.
 		let selectionStart = getSelectionStart();
 		let selectionEnd = getSelectionEnd();
-		let localCursorTimeout: NodeJS.Timeout | null = null;
+		let localCursorTimeout: ReturnType< typeof setTimeout > | null = null;
 
 		// During rapid selection changes (e.g. undo restoring content and
 		// selection), the debounce discards intermediate events. If we use the

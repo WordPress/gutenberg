@@ -210,7 +210,8 @@ export const registerPostTypeSchema =
 			canCreate &&
 			duplicatePost;
 
-		// @ts-expect-error `globalThis` has no index signature for this build-time global.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment -- The Vitest type graph declares this build-time global, but package builds do not.
+		// @ts-ignore `globalThis` has no index signature for this build-time global.
 		if ( ! globalThis.IS_GUTENBERG_PLUGIN ) {
 			// Outside Gutenberg, disable duplication except for wp_template.
 			if ( 'wp_template' !== postTypeConfig.slug ) {

@@ -1,5 +1,6 @@
 import { dispatch, select } from '@wordpress/data';
-// @ts-expect-error No exported types.
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment -- Package builds lack declarations that the Vitest type graph provides.
+// @ts-ignore `@wordpress/block-editor` does not expose type declarations for its entry point.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { isUnmodifiedBlock } from '@wordpress/blocks';
 import { type CRDTDoc, Y } from '@wordpress/sync';
