@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { get } from '../selectors';
 
 describe( 'selectors', () => {

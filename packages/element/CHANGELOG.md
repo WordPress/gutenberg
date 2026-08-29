@@ -2,6 +2,59 @@
 
 ## Unreleased
 
+### Internal
+
+-   Remove unused dependency `@wordpress/deprecated` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
+
+## 8.6.0 (2026-08-26)
+
+### Bug Fixes
+
+-   `serialize`/`renderToString`: Render `memo`-wrapped components instead of serializing them to an empty string ([#81986](https://github.com/WordPress/gutenberg/pull/81986)).
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 8.5.0 (2026-08-12)
+
+## 8.4.0 (2026-07-29)
+
+### Bug Fixes
+
+-   `createInterpolateElement`: Warn and stop interpolating instead of throwing when an unmatched closing tag is present ([#60843](https://github.com/WordPress/gutenberg/issues/60843)).
+
+## 8.3.0 (2026-07-14)
+
+### Breaking Changes
+
+-   Move `react` and `react-dom` from `dependencies` to `peerDependencies`. Consumers must now provide `react` and `react-dom` themselves. `@types/react` and `@types/react-dom` become optional peer dependencies ([#80053](https://github.com/WordPress/gutenberg/pull/80053)).
+
+## 8.2.0 (2026-07-01)
+
+## 8.1.0 (2026-06-24)
+
+## 8.0.1 (2026-06-16)
+
+## 8.0.0 (2026-06-10)
+
+### Breaking Changes
+
+-   Revert React back to v18 [#78940](https://github.com/WordPress/gutenberg/pull/78940).
+
+## 7.0.0 (2026-05-27)
+
+### Breaking Changes
+
+-   Updated dependencies to React 19.2.4 ([#61521](https://github.com/WordPress/gutenberg/pull/61521)).
+-   Removed the `render`, `hydrate` and `unmountComponentAtNode` exports that have been deprecated since WordPress 6.2 after upgrade to React 18 ([#61521](https://github.com/WordPress/gutenberg/pull/61521)).
+
+### New Features
+
+-   Added new `react` exports: `Activity`, `use`, `useActionState`, `useEffectEvent`, and `useOptimistic` ([#61521](https://github.com/WordPress/gutenberg/pull/61521)).
+-   Added new `react-dom` exports: `useFormStatus`, `preconnect`, `prefetchDNS`, `preinit`, `preinitModule`, `preload`, and `preloadModule` ([#61521](https://github.com/WordPress/gutenberg/pull/61521)).
+
 ## 6.46.0 (2026-05-14)
 
 ## 6.45.0 (2026-04-29)

@@ -6,10 +6,6 @@
  * are from the REST API's edit context, which includes edit-only fields like
  * permalink_template, generated_slug, and missing_image_sizes.
  */
-
-/**
- * Internal dependencies
- */
 import type { Attachment } from '../attachment';
 import imageAttachmentFixture from './fixtures/attachment-image.json';
 import zipAttachmentFixture from './fixtures/attachment-zip.json';

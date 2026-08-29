@@ -1,16 +1,8 @@
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const fs = require( 'fs/promises' );
 const os = require( 'os' );
 const { randomUUID } = require( 'crypto' );
-
 /** @typedef {import('@playwright/test').Page} Page */
-
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -257,6 +249,10 @@ test.describe( 'Cover', () => {
 			'.components-resizable-box__handle-bottom'
 		);
 
+		// Ensure the resize handle is in view before measuring its bounding box,
+		// so the cached coordinates match the actual position during the drag.
+		await coverBlockResizeHandle.scrollIntoViewIfNeeded();
+
 		// Establish the existing bounding boxes for the Cover block
 		// and the Cover block's resizing handle.
 		const coverBlockBox = await coverBlock.boundingBox();
@@ -266,16 +262,16 @@ test.describe( 'Cover', () => {
 		expect( coverBlockResizeHandleBox.height ).toBeTruthy();
 
 		// Increase the Cover block height by 100px.
-		await coverBlockResizeHandle.hover();
+		// Move the mouse to the handle's center, press, then drag exactly 100px down.
+		// This avoids the off-by-half-handle-height bug that arises from using
+		// `handleBox.y + 100` (top + 100) while the mouse starts at the center.
+		const handleCenterX =
+			coverBlockResizeHandleBox.x + coverBlockResizeHandleBox.width / 2;
+		const handleCenterY =
+			coverBlockResizeHandleBox.y + coverBlockResizeHandleBox.height / 2;
+		await page.mouse.move( handleCenterX, handleCenterY );
 		await page.mouse.down();
-
-		// Counter-intuitively, the mouse movement calculation should not be made using the
-		// Cover block's bounding box, but rather based on the coordinates of the
-		// resize handle.
-		await page.mouse.move(
-			coverBlockResizeHandleBox.x + coverBlockResizeHandleBox.width / 2,
-			coverBlockResizeHandleBox.y + 100
-		);
+		await page.mouse.move( handleCenterX, handleCenterY + 100 );
 		await page.mouse.up();
 
 		const newCoverBlockBox = await coverBlock.boundingBox();
@@ -407,11 +403,18 @@ test.describe( 'Cover', () => {
 
 		await editor.selectBlocks( coverBlock );
 
-		const focalPointLeft = page.getByRole( 'spinbutton', {
+		// The focal point picker renders as a `legend`-labelled group, so both
+		// spinbuttons are resolved through it.
+		const focalPointGroup = page.getByRole( 'group', {
+			name: 'Focal point',
+		} );
+		await expect( focalPointGroup ).toBeVisible();
+
+		const focalPointLeft = focalPointGroup.getByRole( 'spinbutton', {
 			name: 'Focal point left position',
 		} );
 
-		const focalPointTop = page.getByRole( 'spinbutton', {
+		const focalPointTop = focalPointGroup.getByRole( 'spinbutton', {
 			name: 'Focal point top position',
 		} );
 
@@ -564,6 +567,41 @@ test.describe( 'Cover', () => {
 
 		const overlay = coverBlock.locator( '.wp-block-cover__background' );
 		await expect( overlay ).toBeVisible();
+	} );
+
+	test( 'hides overlay controls when a viewport style state is selected', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/cover' } );
+		const coverBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Cover',
+		} );
+		await coverBlock.getByRole( 'button', { name: 'Black' } ).click();
+
+		await editor.selectBlocks( coverBlock );
+		await editor.openDocumentSettingsSidebar();
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await openStylesTabIfAvailable( editorSettings );
+
+		const overlayControl = editorSettings.getByRole( 'button', {
+			name: 'Overlay',
+		} );
+		await expect( overlayControl ).toBeVisible();
+
+		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
+		await page
+			.getByRole( 'menuitemcheckbox', { name: 'Responsive styles' } )
+			.click();
+		await page.getByRole( 'menuitemradio', { name: 'Tablet' } ).click();
+		await page.keyboard.press( 'Escape' );
+
+		await expect( overlayControl ).toBeHidden();
+		await expect(
+			editorSettings.getByRole( 'slider', { name: 'Overlay opacity' } )
+		).toBeHidden();
 	} );
 } );
 

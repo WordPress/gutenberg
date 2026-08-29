@@ -47,7 +47,6 @@ const MyBorderBoxControl = () => {
 
 	return (
 		<BorderBoxControl
-			__next40pxDefaultSize
 			colors={ colors }
 			label={ __( 'Borders' ) }
 			onChange={ onChange }
@@ -131,19 +130,11 @@ The available base placements are 'top', 'right', 'bottom', 'left'. Each of thes
 
 -   Required: No
 
-### `popoverOffset`: `number`
+### `popoverOffset`: `number | { mainAxis?: number; crossAxis?: number }`
 
-The space between the popover and the control wrapper.
-
--   Required: No
-
-### `size`: `string`
-
-Size of the control.
+The space between the popover and the control wrapper. A number displaces the popover along its main axis; pass an object to also displace it along its cross axis.
 
 -   Required: No
--   Default: `default`
--   Allowed values: `default`, `__unstable-large`
 
 ### `value`: `Object`
 
@@ -166,10 +157,3 @@ const splitBorders = {
 ```
 
 -   Required: No
-
-### `__next40pxDefaultSize`: `boolean`
-
-Start opting into the larger default height that will become the default size in a future version.
-
--   Required: No
--   Default: `false`

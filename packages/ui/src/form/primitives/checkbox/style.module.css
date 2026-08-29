@@ -1,0 +1,54 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.root {
+			--wp-ui-checkbox-input-size: 16px;
+
+			position: relative;
+			display: inline-block;
+			flex-shrink: 0;
+			width: var(--wp-ui-checkbox-input-size);
+			height: var(--wp-ui-checkbox-input-size);
+			border-radius: var(--wpds-border-radius-sm);
+			border:
+				var(--wpds-border-width-xs) solid
+				var(--wpds-color-stroke-interactive-neutral);
+			padding: 0;
+			background-color: var(--wpds-color-background-interactive-neutral-weak);
+
+			&:not([data-disabled]) {
+				cursor: var(--wpds-cursor-control);
+			}
+
+			[data-highlighted] &,
+			&:hover {
+				border-color: var(--wpds-color-stroke-interactive-neutral-active);
+			}
+
+			&[aria-checked="true"],
+			&[aria-checked="mixed"] {
+				border-color: transparent;
+				background-color: var(--wpds-color-background-interactive-brand-strong);
+				color: var(--wpds-color-foreground-interactive-brand-strong);
+			}
+
+			&[data-disabled] {
+				background-color: var(--wpds-color-background-interactive-neutral-weak-disabled);
+				border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+				color: var(--wpds-color-foreground-interactive-neutral-disabled);
+
+				@media (forced-colors: active) {
+					color: GrayText;
+					border-color: GrayText;
+				}
+			}
+		}
+
+		.indicator-icon {
+			/* Ignore the border width and take up the full 16px */
+			position: absolute;
+			inset: calc(0px - var(--wpds-border-width-xs));
+		}
+	}
+}

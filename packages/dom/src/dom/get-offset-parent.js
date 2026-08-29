@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import getComputedStyle from './get-computed-style';
 
 /**

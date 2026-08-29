@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { removeItems } from '../actions';
 
 describe( 'removeItems', () => {

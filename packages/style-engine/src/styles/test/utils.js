@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { camelCaseJoin, getCSSValueFromRawStyle, upperFirst } from '../utils';
 
 describe( 'utils', () => {

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState, useCallback, useEffect, useRef } from '@wordpress/element';
 import {
 	Button,
@@ -24,12 +17,8 @@ import {
 	cloudUpload,
 	download as downloadIcon,
 } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { Cropper } from '../react/components/cropper';
-import { useCropperState } from '../react/hooks/use-cropper-state';
+import { useCropperReducer } from '../react/hooks/use-cropper-reducer';
 import {
 	MAX_ZOOM,
 	MAX_ROTATION_OFFSET,
@@ -142,7 +131,7 @@ type Story = StoryObj< typeof Cropper >;
  * Default story. Basic cropper with a sample image, no controls.
  */
 const DefaultComponent = () => {
-	const controller = useCropperState();
+	const controller = useCropperReducer();
 
 	return (
 		<div>
@@ -159,6 +148,11 @@ const DefaultComponent = () => {
 };
 
 export const Default: Story = {
+	parameters: {
+		// FIXME: Image credit text and its link fail color-contrast.
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	render: DefaultComponent,
 };
 
@@ -166,7 +160,7 @@ export const Default: Story = {
  * Full interactive demo with controls.
  */
 const WithControlsComponent = () => {
-	const controller = useCropperState();
+	const controller = useCropperReducer();
 	const {
 		state,
 		setRotation,
@@ -395,8 +389,6 @@ const WithControlsComponent = () => {
 					</FlexItem>
 					<FlexItem>
 						<SelectControl
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label="Aspect ratio"
 							hideLabelFromVision
 							value={ aspectRatioValue }
@@ -411,7 +403,6 @@ const WithControlsComponent = () => {
 					</FlexItem>
 					<FlexItem>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label="Freeform"
 							checked={ freeformCrop }
 							onChange={ setFreeformCrop }
@@ -419,8 +410,6 @@ const WithControlsComponent = () => {
 					</FlexItem>
 					<FlexItem>
 						<SelectControl
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label="Grid"
 							hideLabelFromVision
 							value={ gridMode }
@@ -453,8 +442,6 @@ const WithControlsComponent = () => {
 				</Flex>
 				<div className="image-editor-story__sliders">
 					<RangeControl
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label="Fine rotation"
 						min={ -MAX_ROTATION_OFFSET }
 						max={ MAX_ROTATION_OFFSET }
@@ -463,8 +450,6 @@ const WithControlsComponent = () => {
 						onChange={ handleRotationSlider }
 					/>
 					<RangeControl
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label="Zoom"
 						min={ getMinZoom( state ) }
 						max={ MAX_ZOOM }
@@ -531,6 +516,11 @@ const WithControlsComponent = () => {
 };
 
 export const WithControls: Story = {
+	parameters: {
+		// FIXME: The state dump scrolls once its content overflows, and is not keyboard-accessible (scrollable-region-focusable). Whether it overflows depends on the numbers rendered, so this appears intermittently.
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	render: WithControlsComponent,
 };
 
@@ -544,7 +534,7 @@ export const WithControls: Story = {
  * or verify the camera and render paths agree.
  */
 const DebugComponent = () => {
-	const controller = useCropperState();
+	const controller = useCropperReducer();
 	const {
 		state,
 		setRotation,
@@ -816,7 +806,6 @@ const DebugComponent = () => {
 					</FlexItem>
 					<FlexItem>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label="Freeform"
 							checked={ freeformCrop }
 							onChange={ setFreeformCrop }
@@ -837,8 +826,6 @@ const DebugComponent = () => {
 					</FlexItem>
 					<FlexItem>
 						<SelectControl
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label="Format"
 							hideLabelFromVision
 							value={ exportFormat as 'image/jpeg' }
@@ -873,8 +860,6 @@ const DebugComponent = () => {
 				</Flex>
 				<div className="image-editor-story__sliders">
 					<RangeControl
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label="Fine rotation"
 						min={ -MAX_ROTATION_OFFSET }
 						max={ MAX_ROTATION_OFFSET }
@@ -883,8 +868,6 @@ const DebugComponent = () => {
 						onChange={ handleRotationSlider }
 					/>
 					<RangeControl
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label="Zoom"
 						min={ getMinZoom( state ) }
 						max={ MAX_ZOOM }
@@ -1080,5 +1063,10 @@ aspect ratio: ${ ( sourceRegion.width / sourceRegion.height ).toFixed( 2 ) }
 };
 
 export const Debug: Story = {
+	parameters: {
+		// FIXME: Image credit text and its link fail color-contrast.
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	render: DebugComponent,
 };

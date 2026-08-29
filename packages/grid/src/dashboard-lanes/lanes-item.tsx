@@ -1,21 +1,11 @@
-/**
- * External dependencies
- */
 import { useSortable } from '@dnd-kit/sortable';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useState, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
+import actionableAreaStyles from '../shared/actionable-area-slot.module.css';
 import ResizeHandle from '../shared/resize-handle';
-import { LANES_DATA_KEY } from './use-lane-placement';
-import type { ResizeSnapSize } from '../shared/resize-snap';
+import { clampResizeDelta, type ResizeSnapSize } from '../shared/resize-snap';
+import { GRID_ITEM_DATA_KEY } from '../shared/grid-item-key';
 import type { ResizeDelta, ResizeHandleRenderProps } from '../shared/types';
 import styles from './lanes-item.module.css';
 
@@ -38,7 +28,7 @@ function getItemCursor(
 export type LanesItemProps = {
 	/**
 	 * Item key. Forwarded to dnd-kit and emitted as the
-	 * `data-lanes-key` attribute the hook reads to map measured DOM
+	 * `data-wp-grid-item-key` attribute the hook reads to map measured DOM
 	 * nodes back to logical items.
 	 */
 	itemKey: string;
@@ -57,10 +47,33 @@ export type LanesItemProps = {
 	disabled?: boolean;
 
 	/**
+	 * Whether the item can be dragged. Combined with `disabled`.
+	 *
+	 * @default true
+	 */
+	draggable?: boolean;
+
+	/**
+	 * Whether the item can be resized. Combined with `disabled`.
+	 *
+	 * @default true
+	 */
+	resizable?: boolean;
+
+	/**
 	 * Whether any tile in the surface is currently being dragged or
-	 * resized. Used to mute `actionableArea` content with `inert`.
+	 * resized. Drives the drag activator cursor.
 	 */
 	interacting?: boolean;
+
+	/**
+	 * Whether a tile drag is in progress. Mutes each tile's
+	 * `actionableArea` with `inert` so hovers on other tiles' controls
+	 * do not steal the gesture.
+	 *
+	 * @default false
+	 */
+	dragging?: boolean;
 
 	children: React.ReactNode;
 
@@ -73,6 +86,17 @@ export type LanesItemProps = {
 	 */
 	resizeSnapPreview?: ResizeSnapSize | null;
 
+	/**
+	 * Minimum tile width while resizing, in pixels (one column track).
+	 */
+	minResizeWidthPx: number;
+
+	/**
+	 * Maximum tile width while resizing, in pixels. Omitted when the
+	 * item declares no width limit.
+	 */
+	maxResizeWidthPx?: number;
+
 	onResizeEnd: () => void;
 
 	renderResizeHandle?: React.ComponentType< ResizeHandleRenderProps >;
@@ -82,13 +106,18 @@ export function LanesItem( {
 	itemKey,
 	placementStyle,
 	disabled = false,
+	draggable = true,
+	resizable = true,
 	interacting = false,
 	children,
 	actionableArea = null,
 	onResize,
 	onResizeEnd,
 	resizeSnapPreview = null,
+	minResizeWidthPx,
+	maxResizeWidthPx,
 	renderResizeHandle,
+	dragging = false,
 }: LanesItemProps ) {
 	const [ resizeDelta, setResizeDelta ] = useState< ResizeDelta | null >(
 		null
@@ -100,6 +129,8 @@ export function LanesItem( {
 	const itemRef = useRef< HTMLDivElement >( null );
 	const contentRef = useRef< HTMLDivElement >( null );
 
+	const dragDisabled = disabled || ! draggable;
+	const resizeDisabled = disabled || ! resizable;
 	const {
 		attributes,
 		listeners,
@@ -108,7 +139,7 @@ export function LanesItem( {
 		isDragging,
 	} = useSortable( {
 		id: itemKey,
-		disabled,
+		disabled: dragDisabled,
 	} );
 	const mergedRef = useMergeRefs( [ itemRef, setNodeRef ] );
 	const contentMergedRef = useMergeRefs( [ contentRef ] );
@@ -126,11 +157,21 @@ export function LanesItem( {
 	);
 
 	const handleResize = ( delta: ResizeDelta ) => {
-		const clamped = { width: delta.width, height: 0 };
 		const contentNode = contentRef.current;
-		if ( contentNode && ! initialContentSize ) {
+		let baselineSize = initialContentSize;
+		if ( contentNode && ! baselineSize ) {
 			const { width, height } = contentNode.getBoundingClientRect();
-			setInitialContentSize( { width, height } );
+			baselineSize = { width, height };
+			setInitialContentSize( baselineSize );
+		}
+		let clamped: ResizeDelta = { width: delta.width, height: 0 };
+		if ( baselineSize ) {
+			clamped = clampResizeDelta(
+				clamped,
+				baselineSize,
+				{ width: minResizeWidthPx },
+				{ width: maxResizeWidthPx }
+			);
 		}
 		setResizeDelta( clamped );
 		onResize( itemKey, clamped );
@@ -164,14 +205,19 @@ export function LanesItem( {
 			ref={ mergedRef }
 			className={ itemClassName }
 			style={ style }
-			{ ...{ [ LANES_DATA_KEY ]: itemKey } }
+			{ ...{ [ GRID_ITEM_DATA_KEY ]: itemKey } }
+			data-wp-grid-item-resizing={ isResizing || undefined }
 		>
 			{ actionableArea ? (
 				<div
-					style={ { display: 'contents' } }
-					{ ...( interacting ? { inert: '' } : {} ) }
+					className={ actionableAreaStyles[ 'actionable-area-slot' ] }
 				>
-					{ actionableArea }
+					<div
+						style={ { display: 'contents' } }
+						{ ...( dragging ? { inert: '' } : {} ) }
+					>
+						{ actionableArea }
+					</div>
 				</div>
 			) : null }
 
@@ -181,7 +227,7 @@ export function LanesItem( {
 				{ ...listeners }
 				style={ {
 					height: '100%',
-					cursor: getItemCursor( disabled, interacting ),
+					cursor: getItemCursor( dragDisabled, interacting ),
 				} }
 			>
 				<div
@@ -190,7 +236,7 @@ export function LanesItem( {
 					style={ continuousContentStyle }
 				>
 					{ children }
-					{ ! disabled && (
+					{ ! resizeDisabled && (
 						<ResizeHandle
 							itemId={ itemKey }
 							verticalResizable={ false }

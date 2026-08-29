@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { assertIsDefined } from '../utils/assert-is-defined';
 
 describe( 'assertIsDefined', () => {

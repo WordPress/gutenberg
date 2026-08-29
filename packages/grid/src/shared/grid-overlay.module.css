@@ -2,7 +2,7 @@
 	position: absolute;
 	inset: 0;
 	display: grid;
-	gap: var(--wpds-dimension-gap-md);
+	gap: var(--wp-grid-gap, var(--wpds-dimension-gap-xl));
 	pointer-events: none;
 	opacity: 0;
 	visibility: hidden;
@@ -69,7 +69,7 @@
 .column {
 	display: flex;
 	flex-direction: column;
-	gap: var(--wpds-dimension-gap-md);
+	gap: var(--wp-grid-gap, var(--wpds-dimension-gap-xl));
 	min-width: 0;
 }
 
@@ -78,5 +78,5 @@
 	height: var(--wp-grid-overlay-row-height);
 	box-sizing: border-box;
 	border-radius: var(--wpds-border-radius-lg);
-	background-color: var(--wp-grid-overlay-tile-bg, var(--wpds-color-bg-surface-neutral-weak));
+	background-color: var(--wp-grid-overlay-tile-bg, var(--wpds-color-background-surface-neutral-weak));
 }

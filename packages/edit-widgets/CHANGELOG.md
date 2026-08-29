@@ -2,6 +2,45 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Prevent an error in `canInsertBlockInWidgetArea` when no widget area blocks are present.
+
+### Internal
+
+-   Remove unused dependency `@wordpress/reusable-blocks` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+## 6.54.0 (2026-08-26)
+
+## 6.53.0 (2026-08-12)
+
+### Enhancements
+
+-   Wrap the widgets editor layout in `ThemeProvider`, seeded with the active admin color scheme primary color ([#81173](https://github.com/WordPress/gutenberg/pull/81173)).
+
+### Bug Fixes
+
+-   Header toolbar: Fix icon button focus styles to use the design system `outset-ring__focus` mixin ([#81176](https://github.com/WordPress/gutenberg/pull/81176)).
+
+## 6.52.0 (2026-07-29)
+
+## 6.51.0 (2026-07-14)
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 6.50.0 (2026-07-01)
+
+## 6.49.0 (2026-06-24)
+
+## 6.48.1 (2026-06-16)
+
+## 6.48.0 (2026-06-10)
+
+## 6.47.0 (2026-05-27)
+
 ## 6.46.0 (2026-05-14)
 
 ## 6.45.0 (2026-04-29)

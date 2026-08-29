@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { expect, test } from '@playwright/test';
-
-/**
- * Internal dependencies
- */
 import {
 	gotoStoryId,
 	getAllPropsPermutations,

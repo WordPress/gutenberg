@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import {
 	useContext,
 	useMemo,
 	forwardRef,
 	useCallback,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import type { PopoverProps } from './types';
 import * as Styled from './styles';

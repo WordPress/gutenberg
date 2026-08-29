@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { camelCase } from 'change-case';
-
-/**
- * WordPress dependencies
- */
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
 import { STORE_NAME } from './name';
 import { additionalEntityConfigLoaders, DEFAULT_ENTITY_KEY } from './entities';
 import { getSyncManager } from './sync';
@@ -25,10 +14,12 @@ import {
 	RECEIVE_INTERMEDIATE_RESULTS,
 	isNumericID,
 	normalizeQueryForResolution,
+	saveCRDTDoc,
+	getPaginationMeta,
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
 import { restoreSelection, getSelectionHistory } from './utils/crdt-selection';
-import { parsedBlocksCache, getCacheKey } from './parsed-blocks-cache';
+import { setCachedBlocks } from './parsed-blocks-cache';
 
 /**
  * Requests authors from the REST API.
@@ -182,19 +173,34 @@ export const getEntityRecord =
 					} );
 
 				// Share the parsed blocks with `useEntityBlockEditor` so the
-				// editor doesn't re-parse the same `content` string.
+				// editor doesn't re-parse the same `content` string. The cache
+				// remembers which block types the parse ran against, so an
+				// entry computed before they register is discarded, not served.
 				if (
 					recordWithTransients.blocks &&
 					typeof recordWithTransients.content?.raw === 'string'
 				) {
-					parsedBlocksCache.set( getCacheKey( kind, name, key ), {
-						content: recordWithTransients.content.raw,
-						blocks: recordWithTransients.blocks,
-					} );
+					setCachedBlocks(
+						kind,
+						name,
+						key,
+						recordWithTransients.content.raw,
+						recordWithTransients.blocks
+					);
 				}
 
+				const syncManager =
+					select?.isCollaborationSupported?.() === false
+						? undefined
+						: getSyncManager();
+
 				// Load the entity record for syncing. Do not await promise.
-				void getSyncManager()?.load(
+				// NOTE: when this resolver runs before block types register,
+				// `recordWithTransients.blocks` was parsed as empty. The cache
+				// above discards such an entry; the sync manager receives it
+				// as-is, and seeding a collaborative document from it is an
+				// open problem of the collaboration path.
+				void syncManager?.load(
 					entityConfig.syncConfig,
 					objectType,
 					objectId,
@@ -250,9 +256,15 @@ export const getEntityRecord =
 						// persistence. As we add support for syncing additional entity,
 						// we'll need to revisit where persisted CRDT documents are stored.
 						persistCRDTDoc: () => {
-							resolveSelect
+							if (
+								! entityConfig.syncConfig?.supportsPersistence
+							) {
+								return;
+							}
+
+							return resolveSelect
 								.getEditedEntityRecord( kind, name, key )
-								.then( ( editedRecord ) => {
+								.then( async ( editedRecord ) => {
 									// Don't persist the CRDT document if the record is still an
 									// auto-draft or if the entity does not support meta.
 									const { meta, status } = editedRecord;
@@ -260,14 +272,14 @@ export const getEntityRecord =
 										return;
 									}
 
-									// Trigger a save to persist the CRDT document. The entity's
-									// pre-persist hooks will create the persisted CRDT document
-									// and apply it to the record's meta.
-									dispatch.saveEntityRecord(
-										kind,
-										name,
-										editedRecord,
-										{ __unstableSkipSyncUpdate: true }
+									const entityIdKey =
+										entityConfig.key || DEFAULT_ENTITY_KEY;
+									const entityId =
+										editedRecord[ entityIdKey ];
+
+									await saveCRDTDoc(
+										`${ kind }/${ name }`,
+										entityId
 									);
 								} );
 						},
@@ -281,6 +293,11 @@ export const getEntityRecord =
 									selectionHistory
 								);
 							}
+						},
+						onUndoStackChange: ( undoState ) => {
+							dispatch.__unstableNotifySyncUndoManagerChange(
+								undoState
+							);
 						},
 						restoreUndoMeta: ( ydoc, meta ) => {
 							const selectionHistory =
@@ -430,14 +447,7 @@ export const getEntityRecords =
 			if ( entityConfig.supportsPagination && query.per_page !== -1 ) {
 				const response = await apiFetch( { path, parse: false } );
 				records = Object.values( await response.json() );
-				meta = {
-					totalItems: parseInt(
-						response.headers.get( 'X-WP-Total' )
-					),
-					totalPages: parseInt(
-						response.headers.get( 'X-WP-TotalPages' )
-					),
-				};
+				meta = getPaginationMeta( response.headers );
 			} else if (
 				query.per_page === -1 &&
 				query[ RECEIVE_INTERMEDIATE_RESULTS ] === true
@@ -452,15 +462,14 @@ export const getEntityRecords =
 					} );
 					const pageRecords = Object.values( await response.json() );
 
-					totalPages = parseInt(
-						response.headers.get( 'X-WP-TotalPages' )
-					);
+					const pageMeta = getPaginationMeta( response.headers );
+					// An endpoint that doesn't paginate answers the first
+					// request with the whole collection.
+					totalPages = pageMeta.totalPages ?? 1;
 
 					if ( ! meta ) {
 						meta = {
-							totalItems: parseInt(
-								response.headers.get( 'X-WP-Total' )
-							),
+							totalItems: pageMeta.totalItems,
 							totalPages: 1,
 						};
 					}
@@ -1027,10 +1036,14 @@ export const getDefaultTemplateId =
 	};
 
 getDefaultTemplateId.shouldInvalidate = ( action ) => {
+	// Only invalidate on real saves; `persistedEdits` is absent on
+	// initial fetches so the kickoff's own site read doesn't wipe
+	// the just-resolved template id.
 	return (
 		action.type === 'RECEIVE_ITEMS' &&
 		action.kind === 'root' &&
-		action.name === 'site'
+		action.name === 'site' &&
+		!! action.persistedEdits
 	);
 };
 
@@ -1046,7 +1059,7 @@ getDefaultTemplateId.shouldInvalidate = ( action ) => {
  */
 export const getRevisions =
 	( kind, name, recordKey, query = {} ) =>
-	async ( { dispatch, registry, resolveSelect } ) => {
+	async ( { dispatch, resolveSelect } ) => {
 		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
@@ -1099,9 +1112,9 @@ export const getRevisions =
 			if ( response ) {
 				if ( isPaginated ) {
 					records = Object.values( await response.json() );
-					meta.totalItems = parseInt(
-						response.headers.get( 'X-WP-Total' )
-					);
+					meta.totalItems = getPaginationMeta(
+						response.headers
+					).totalItems;
 				} else {
 					records = Object.values( response );
 				}
@@ -1121,37 +1134,31 @@ export const getRevisions =
 					} );
 				}
 
-				registry.batch( () => {
-					dispatch.receiveRevisions(
+				await dispatch.receiveRevisions(
+					kind,
+					name,
+					recordKey,
+					records,
+					query,
+					false,
+					meta
+				);
+
+				// Mark individual getRevision resolutions as done so that
+				// subsequent getRevision calls skip redundant API fetches.
+				const key = entityConfig.revisionKey || DEFAULT_ENTITY_KEY;
+				const normalizedQuery = normalizeQueryForResolution( rawQuery );
+				const resolutionsArgs = records
+					.filter( ( record ) => record[ key ] )
+					.map( ( record ) => [
 						kind,
 						name,
 						recordKey,
-						records,
-						query,
-						false,
-						meta
-					);
+						record[ key ],
+						normalizedQuery,
+					] );
 
-					// Mark individual getRevision resolutions as done so that
-					// subsequent getRevision calls skip redundant API fetches.
-					const key = entityConfig.revisionKey || DEFAULT_ENTITY_KEY;
-					const normalizedQuery =
-						normalizeQueryForResolution( rawQuery );
-					const resolutionsArgs = records
-						.filter( ( record ) => record[ key ] )
-						.map( ( record ) => [
-							kind,
-							name,
-							recordKey,
-							record[ key ],
-							normalizedQuery,
-						] );
-
-					dispatch.finishResolutions(
-						'getRevision',
-						resolutionsArgs
-					);
-				} );
+				dispatch.finishResolutions( 'getRevision', resolutionsArgs );
 			}
 		} finally {
 			dispatch.__unstableReleaseStoreLock( lock );
@@ -1240,7 +1247,7 @@ export const getRevision =
 			}
 
 			if ( record ) {
-				dispatch.receiveRevisions(
+				await dispatch.receiveRevisions(
 					kind,
 					name,
 					recordKey,
@@ -1339,14 +1346,24 @@ export const getEditorAssets =
 /**
  * Requests view config for a given entity type from the REST API.
  *
- * @param {string} kind Entity kind.
- * @param {string} name Entity name.
+ * @param {string}    kind           Entity kind.
+ * @param {string}    name           Entity name.
+ * @param {?Object}   options        Optional options.
+ * @param {?string[]} options.fields Optional subset of top-level config
+ *                                   properties to request, mapped to the REST
+ *                                   API `_fields` parameter. When omitted, the
+ *                                   full config is requested.
  */
 export const getViewConfig =
-	( kind, name ) =>
+	( kind, name, options = {} ) =>
 	async ( { dispatch } ) => {
+		const query = { kind, name };
+		const fields = getNormalizedCommaSeparable( options.fields );
+		if ( fields?.length ) {
+			query._fields = fields.join( ',' );
+		}
 		const config = await apiFetch( {
-			path: addQueryArgs( '/wp/v2/view-config', { kind, name } ),
+			path: addQueryArgs( '/wp/v2/view-config', query ),
 		} );
 		dispatch.receiveViewConfig( kind, name, config );
 	};

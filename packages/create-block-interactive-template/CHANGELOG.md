@@ -1,5 +1,18 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
+## Unreleased
+
+## 2.54.0 (2026-08-26)
+
+## 2.53.0 (2026-08-12)
+
+
+## 2.52.0 (2026-07-29)
+
+## 2.51.0 (2026-07-14)
+
+## 2.50.0 (2026-07-01)
+
 ## 2.8.0 (2024-09-19)
 
 ### Enhancements
