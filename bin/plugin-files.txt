@@ -1,0 +1,12 @@
+# Files and directories that make up the Gutenberg plugin. Used by
+# bin/build-plugin-zip.sh and the performance tests workflow.
+gutenberg.php
+lib
+packages/block-serialization-default-parser/*.php
+packages/icons/src/manifest.php
+packages/icons/src/library/*.svg
+build
+build-module
+readme.txt
+changelog.txt
+README.md

@@ -12,6 +12,7 @@
 
 ### Internal
 
+-   Update bundled Jest packages to 30.5.0 ([#82181](https://github.com/WordPress/gutenberg/pull/82181)).
 -   Remove unused dependency `jest-environment-node` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 
 ## 34.2.0 (2026-08-26)

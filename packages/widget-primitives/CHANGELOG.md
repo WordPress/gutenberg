@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Documentation
+
+-   `WidgetHostLinks.match`: the in-app route it returns carries the
+    route's query when the href has one; docblock, README, Storybook page
+    and seam diagram say so
+    ([#82066](https://github.com/WordPress/gutenberg/pull/82066)).
+
 ## 0.6.0 (2026-08-26)
 
 ### New Features

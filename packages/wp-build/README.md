@@ -59,6 +59,13 @@ Generated CSS module output skips automatic style injection when `NODE_ENV` is
 modern CSS features, so tests that need actual styles in the DOM should
 run in a browser environment.
 
+## Browser support
+
+JavaScript and CSS builds use [Browserslist](https://github.com/browserslist/browserslist)
+when specifying build targets. You can either [provide your own](https://github.com/browserslist/browserslist#config-file),
+or the default [`@wordpress/browserslist-config`](https://www.npmjs.com/package/@wordpress/browserslist-config)
+will be used to follow [WordPress browser support](https://make.wordpress.org/core/handbook/best-practices/browser-support/).
+
 ## Package Configuration
 
 Configure your `package.json` with the following optional fields:

@@ -1,6 +1,6 @@
 const fs = require( 'fs' );
 const path = require( 'path' );
-const glob = require( 'glob' ).sync;
+const { globSync } = require( 'glob' );
 const mkdirp = require( 'mkdirp' ).mkdirp.sync;
 const rimraf = require( 'rimraf' ).sync;
 const webpack = require( 'webpack' );
@@ -85,9 +85,10 @@ describe.each( /** @type {const} */ ( [ 'scripts', 'modules' ] ) )(
 					);
 				}
 
-				const assetFiles = glob(
-					`${ outputDirectory }/+(*.asset|assets).@(json|php)`
-				);
+				const assetFiles = globSync( '+(*.asset|assets).@(json|php)', {
+					cwd: outputDirectory,
+					absolute: true,
+				} ).sort();
 
 				expect( assetFiles.length ).toBeGreaterThan( 0 );
 
