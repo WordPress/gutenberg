@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { formatTestErrorMessage, renderReport } from '../markdown';
 import type { ReportedFlakyTest } from '../types';
 

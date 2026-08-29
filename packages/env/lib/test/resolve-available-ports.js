@@ -1,15 +1,21 @@
-'use strict';
+import { createRequire } from 'node:module';
+import { afterAll, afterEach, describe, expect, it, vi } from 'vitest';
+const require = createRequire( import.meta.url );
+const portUtils = require( '../port-utils' );
+const findAvailablePort = vi.spyOn( portUtils, 'findAvailablePort' );
+const isPortAvailable = vi.spyOn( portUtils, 'isPortAvailable' );
 const {
 	createPortResolver,
 	resolveConfigPorts,
 } = require( '../resolve-available-ports' );
-const { findAvailablePort, isPortAvailable } = require( '../port-utils' );
 
-jest.mock( '../port-utils' );
+afterAll( () => {
+	vi.restoreAllMocks();
+} );
 
 describe( 'resolve-available-ports', () => {
 	afterEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	describe( 'createPortResolver', () => {

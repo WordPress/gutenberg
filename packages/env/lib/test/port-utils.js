@@ -1,5 +1,8 @@
-'use strict';
-const net = require( 'net' );
+import { createRequire } from 'node:module';
+import { afterAll, afterEach, describe, expect, it, vi } from 'vitest';
+const require = createRequire( import.meta.url );
+const net = require( 'node:net' );
+vi.spyOn( net, 'createServer' );
 const {
 	isPortAvailable,
 	findAvailablePort,
@@ -7,11 +10,13 @@ const {
 	DEFAULT_MAX_PORT,
 } = require( '../port-utils' );
 
-jest.mock( 'net' );
+afterAll( () => {
+	vi.restoreAllMocks();
+} );
 
 describe( 'port-utils', () => {
 	afterEach( () => {
-		jest.restoreAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	/**
@@ -25,7 +30,7 @@ describe( 'port-utils', () => {
 			let errorCb, listenCb;
 
 			const server = {
-				once: jest.fn( ( event, cb ) => {
+				once: vi.fn( ( event, cb ) => {
 					if ( event === 'error' ) {
 						errorCb = cb;
 					}
@@ -33,7 +38,7 @@ describe( 'port-utils', () => {
 						listenCb = cb;
 					}
 				} ),
-				listen: jest.fn( ( port ) => {
+				listen: vi.fn( ( port ) => {
 					if ( isAvailable( port ) ) {
 						server.close.mockImplementation( ( cb ) => cb() );
 						listenCb();
@@ -41,7 +46,7 @@ describe( 'port-utils', () => {
 						errorCb( { code: 'EADDRINUSE' } );
 					}
 				} ),
-				close: jest.fn(),
+				close: vi.fn(),
 			};
 
 			return server;
@@ -65,15 +70,15 @@ describe( 'port-utils', () => {
 			net.createServer.mockImplementation( () => {
 				let errorCb;
 				const server = {
-					once: jest.fn( ( event, cb ) => {
+					once: vi.fn( ( event, cb ) => {
 						if ( event === 'error' ) {
 							errorCb = cb;
 						}
 					} ),
-					listen: jest.fn( () => {
+					listen: vi.fn( () => {
 						errorCb( { code: 'EACCES' } );
 					} ),
-					close: jest.fn(),
+					close: vi.fn(),
 				};
 				return server;
 			} );
