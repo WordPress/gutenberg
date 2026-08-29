@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import BorderBoxControlLinkedButton from '../border-box-control-linked-button';
 import BorderBoxControlSplitControls from '../border-box-control-split-controls';
 import { BorderControl } from '../../border-control';
@@ -17,7 +10,6 @@ import { VisuallyHidden } from '../../visually-hidden';
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { useBorderBoxControl } from './hook';
-
 import type { BorderBoxControlProps } from '../types';
 import type {
 	LabelProps,
@@ -59,7 +51,6 @@ const UnconnectedBorderBoxControl = (
 		onSplitChange,
 		popoverPlacement,
 		popoverOffset,
-		size,
 		splitValue,
 		toggleLinked,
 		wrapperClassName,
@@ -112,14 +103,10 @@ const UnconnectedBorderBoxControl = (
 						shouldSanitizeBorder={ false } // This component will handle that.
 						value={ linkedValue }
 						withSlider
-						width={
-							size === '__unstable-large' ? '116px' : '110px'
-						}
+						width="116px"
 						__experimentalIsRenderedInSidebar={
 							__experimentalIsRenderedInSidebar
 						}
-						__shouldNotWarnDeprecated36pxSize
-						size={ size }
 					/>
 				) : (
 					<BorderBoxControlSplitControls
@@ -134,13 +121,11 @@ const UnconnectedBorderBoxControl = (
 						__experimentalIsRenderedInSidebar={
 							__experimentalIsRenderedInSidebar
 						}
-						size={ size }
 					/>
 				) }
 				<BorderBoxControlLinkedButton
 					onClick={ toggleLinked }
 					isLinked={ isLinked }
-					size={ size }
 				/>
 			</View>
 		</View>
@@ -176,7 +161,6 @@ const UnconnectedBorderBoxControl = (
  *
  * 	return (
  * 		<BorderBoxControl
- * 			__next40pxDefaultSize
  * 			colors={ colors }
  * 			label={ __( 'Borders' ) }
  * 			onChange={ onChange }

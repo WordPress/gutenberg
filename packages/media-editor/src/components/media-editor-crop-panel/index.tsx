@@ -1,24 +1,9 @@
-/**
- * WordPress dependencies
- */
-import {
-	RangeControl,
-	SelectControl,
-	ToggleControl,
-} from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
-import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import { useCropper } from '../../image-editor';
-import {
-	DEFAULT_ASPECT_RATIOS,
-	MAX_ZOOM,
-	MIN_ZOOM,
-	ORIGINAL_ASPECT_RATIO,
-} from '../../image-editor/core/constants';
+import { SelectControl } from '@wordpress/components';
+import { Stack, VisuallyHidden } from '@wordpress/ui';
+import { __ } from '@wordpress/i18n';
+import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
+import MediaEditorImageControls from '../media-editor-image-controls';
+import type { AspectRatioPreset } from '../../image-editor/core/constants';
 
 export interface MediaEditorCropPanelProps {
 	/**
@@ -29,96 +14,45 @@ export interface MediaEditorCropPanelProps {
 	aspectRatioValue: string;
 	/** Setter for the aspect-ratio preset value. */
 	onAspectRatioChange: ( value: string ) => void;
-	/** Whether the cropper is in freeform (resize-handle) mode. */
-	freeformCrop: boolean;
-	/** Setter for freeform mode. */
-	onFreeformChange: ( value: boolean ) => void;
+	/** Aspect-ratio presets to display in the selector. */
+	aspectRatioOptions: AspectRatioPreset[];
 }
 
 /**
- * Resolve an aspect-ratio preset value into a number suitable for
- * `<Cropper aspectRatio=...>`. Returns `undefined` for Free (no lock).
- *
- * @param value            Preset value as a string.
- * @param imageAspectRatio Image's natural width / height — used for
- *                         the Original preset.
- */
-export function resolveAspectRatio(
-	value: string,
-	imageAspectRatio: number | null
-): number | undefined {
-	const num = parseFloat( value );
-	if ( num === 0 ) {
-		return undefined;
-	}
-	if ( num === ORIGINAL_ASPECT_RATIO && imageAspectRatio ) {
-		return imageAspectRatio;
-	}
-	if ( num > 0 ) {
-		return num;
-	}
-	return undefined;
-}
-
-/**
- * Sidebar panel for crop-shape controls — aspect-ratio presets and
- * freeform toggle. The tactile verbs (rotate, flip) live in the
- * bottom toolbar instead.
+ * Sidebar panel for crop controls: rotate, flip and zoom above the
+ * aspect-ratio selector. Rendered where the panel docks; below that the
+ * transform controls sit under the canvas instead, placed by the editor.
  * @param props
  * @param props.aspectRatioValue
  * @param props.onAspectRatioChange
- * @param props.freeformCrop
- * @param props.onFreeformChange
+ * @param props.aspectRatioOptions
  */
 export default function MediaEditorCropPanel( {
 	aspectRatioValue,
 	onAspectRatioChange,
-	freeformCrop,
-	onFreeformChange,
+	aspectRatioOptions,
 }: MediaEditorCropPanelProps ) {
-	const { state, setZoom } = useCropper();
-
 	return (
-		<Stack direction="column" gap="md">
-			<RangeControl
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
-				label={ __( 'Zoom' ) }
-				min={ MIN_ZOOM }
-				max={ MAX_ZOOM }
-				step={ 0.1 }
-				value={ state.zoom }
-				onChange={ ( value ) =>
-					setZoom( typeof value === 'number' ? value : MIN_ZOOM )
-				}
-				renderTooltipContent={ ( value ) => {
-					const zoom = typeof value === 'number' ? value : MIN_ZOOM;
-					return sprintf(
-						/* translators: %d: zoom level as a percentage. */
-						__( '%d%%' ),
-						Math.round( zoom * 100 )
-					);
-				} }
-			/>
+		// Tag the whole panel as a crop-control region so the modal's
+		// Cmd+Z handler doesn't mistake the SelectControl input for a
+		// metadata field (which would suppress undo).
+		<Stack
+			direction="column"
+			gap="xl"
+			{ ...{ [ CROP_CONTROL_ATTR ]: true } }
+		>
+			<VisuallyHidden render={ <h2 /> }>
+				{ __( 'Crop options' ) }
+			</VisuallyHidden>
+			<MediaEditorImageControls withLabels />
 			<SelectControl
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
 				label={ __( 'Aspect ratio' ) }
 				value={ aspectRatioValue }
 				onChange={ onAspectRatioChange }
-				options={ DEFAULT_ASPECT_RATIOS.map( ( preset ) => ( {
+				options={ aspectRatioOptions.map( ( preset ) => ( {
 					label: preset.label,
 					value: preset.value.toString(),
 				} ) ) }
-			/>
-			<ToggleControl
-				__nextHasNoMarginBottom
-				label={ __( 'Freeform crop' ) }
-				help={ __(
-					'Drag the crop edges to resize freely. When off, the crop is fixed to the selected ratio.'
-				) }
-				checked={ freeformCrop }
-				onChange={ onFreeformChange }
 			/>
 		</Stack>
 	);

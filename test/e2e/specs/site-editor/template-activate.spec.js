@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Template Activate', () => {
@@ -18,6 +15,12 @@ test.describe( 'Template Activate', () => {
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
+		// The templates endpoint lists templates for the active theme, and
+		// the last test switches to twentytwentyfive. Switch back first so
+		// the home template created under emptytheme is found and deleted;
+		// left behind, it replaces the front page of every later emptytheme
+		// suite on the same site.
+		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
 		await requestUtils.activateTheme( 'twentytwentyone' );
@@ -77,7 +80,12 @@ test.describe( 'Template Activate', () => {
 			.first()
 			.click();
 
-		await expect( editor.canvas.getByText( 'gutenberg' ) ).toBeVisible();
+		// The site title, rendered by the header template part. Exact, so a
+		// site tagline containing the word does not make the locator
+		// ambiguous.
+		await expect(
+			editor.canvas.getByText( 'gutenberg', { exact: true } )
+		).toBeVisible();
 
 		await editor.insertBlock( {
 			name: 'core/paragraph',

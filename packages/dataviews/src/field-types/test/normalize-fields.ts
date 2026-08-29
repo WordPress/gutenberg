@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import normalizeFields from '../index';
 import type { Field } from '../../types';
 
@@ -294,7 +291,7 @@ describe( 'normalizeFields: default getValue', () => {
 				{
 					id: 'user',
 					filterBy: {
-						// @ts-ignore
+						// @ts-expect-error `invalid` and `operator` are not members of the `Operator` union.
 						operators: [ 'invalid', 'operator' ],
 					},
 				},
@@ -325,7 +322,7 @@ describe( 'normalizeFields: default getValue', () => {
 					type: 'integer',
 					filterBy: {
 						isPrimary: true,
-						// @ts-ignore
+						// @ts-expect-error `invalid` is not a member of the `Operator` union.
 						operators: [ 'invalid', 'lessThan' ],
 					},
 				},
@@ -374,12 +371,22 @@ describe( 'normalizeFields: default getValue', () => {
 						max: 10,
 					},
 				},
+				{
+					id: 'opensAt',
+					type: 'time',
+					isValid: {
+						min: 1,
+						max: 10,
+					},
+				},
 			];
 			const normalizedFields = normalizeFields( fields );
 			expect( normalizedFields[ 0 ].isValid.min ).toBeUndefined();
 			expect( normalizedFields[ 0 ].isValid.max ).toBeUndefined();
 			expect( normalizedFields[ 1 ].isValid.min ).toBeUndefined();
 			expect( normalizedFields[ 1 ].isValid.max ).toBeUndefined();
+			expect( normalizedFields[ 2 ].isValid.min ).toBeUndefined();
+			expect( normalizedFields[ 2 ].isValid.max ).toBeUndefined();
 		} );
 	} );
 

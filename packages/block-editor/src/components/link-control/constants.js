@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 
 // Used as a unique identifier for the "Create" option within search results.

@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import type { BlockType } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { scopeSelector } from '../utils/common';
 import { getValueFromObjectPath } from '../utils/object';
 

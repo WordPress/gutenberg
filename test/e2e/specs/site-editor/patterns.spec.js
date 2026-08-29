@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const {
 	test: base,
 	expect,
@@ -72,7 +69,7 @@ test.describe( 'Patterns', () => {
 		).toBeVisible();
 
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'My pattern' );
 

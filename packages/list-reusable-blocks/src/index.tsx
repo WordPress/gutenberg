@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { createRoot, StrictMode } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import ImportDropdown from './components/import-dropdown';
 import exportReusableBlock from './utils/export';
 

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
-import { useMemo, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import * as styles from '../styles';
+import { useState } from '@wordpress/element';
+import styles from '../style.module.scss';
 import {
 	getBorderDiff,
 	getCommonBorder,
@@ -18,9 +11,6 @@ import {
 } from '../utils';
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
-import { useCx } from '../../utils/hooks/use-cx';
-import { maybeWarnDeprecated36pxSize } from '../../utils/deprecated-36px-size';
-
 import type { Border } from '../../border-control/types';
 import type { Borders, BorderSide, BorderBoxControlProps } from '../types';
 
@@ -33,21 +23,13 @@ export function useBorderBoxControl(
 		onChange,
 		enableAlpha = false,
 		enableStyle = true,
-		size = 'default',
 		value,
 		__experimentalIsRenderedInSidebar = false,
-		__next40pxDefaultSize,
+		// Deprecated props, no longer used.
+		size: _size,
+		__next40pxDefaultSize: _next40pxDefaultSize,
 		...otherProps
 	} = useContextSystem( props, 'BorderBoxControl' );
-
-	maybeWarnDeprecated36pxSize( {
-		componentName: 'BorderBoxControl',
-		__next40pxDefaultSize,
-		size,
-	} );
-
-	const computedSize =
-		size === 'default' && __next40pxDefaultSize ? '__unstable-large' : size;
 
 	const mixedBorders = hasMixedBorders( value );
 	const splitBorders = hasSplitBorders( value );
@@ -117,22 +99,12 @@ export function useBorderBoxControl(
 		}
 	};
 
-	const cx = useCx();
-	const classes = useMemo( () => {
-		return cx( styles.borderBoxControl, className );
-	}, [ cx, className ] );
-
-	const linkedControlClassName = useMemo( () => {
-		return cx( styles.linkedBorderControl() );
-	}, [ cx ] );
-
-	const wrapperClassName = useMemo( () => {
-		return cx( styles.wrapper );
-	}, [ cx ] );
+	const linkedControlClassName = styles[ 'linked-border-control' ];
+	const wrapperClassName = styles.wrapper;
 
 	return {
 		...otherProps,
-		className: classes,
+		className,
 		colors,
 		disableUnits: mixedBorders && ! hasWidthValue,
 		enableAlpha,
@@ -144,7 +116,6 @@ export function useBorderBoxControl(
 		onSplitChange,
 		toggleLinked,
 		linkedValue,
-		size: computedSize,
 		splitValue,
 		wrapperClassName,
 		__experimentalIsRenderedInSidebar,

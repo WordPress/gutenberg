@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { pencil, drawerRight } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
@@ -8,10 +5,6 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { addQueryArgs } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { PATTERN_TYPES } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import type { FontFamilyPreset } from '@wordpress/global-styles-engine';
 import type { FontFamily, FontFace } from '@wordpress/core-data';
 

@@ -32,7 +32,7 @@
 }
 
 .block-editor-responsive-block-control__label {
-	font-weight: 600;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 	margin-bottom: 0.6em;
 	margin-left: -3px; // visual compensation
 }

@@ -1,22 +1,26 @@
 // Mock `matchMedia` so that all animations are skipped,
 // since js-dom does not fully support CSS animations.
 // Example: https://github.com/jsdom/jsdom/issues/3239
-const originalMatchMedia = window.matchMedia;
-const mockedMatchMedia = jest.fn( ( query ) => {
-	if ( /prefers-reduced-motion/.test( query ) ) {
-		return {
-			...originalMatchMedia( query ),
-			matches: true,
-		};
-	}
+//
+// Skip entirely when there is no `window`.
+if ( typeof window !== 'undefined' ) {
+	const originalMatchMedia = window.matchMedia;
+	const mockedMatchMedia = jest.fn( ( query ) => {
+		if ( /prefers-reduced-motion/.test( query ) ) {
+			return {
+				...originalMatchMedia( query ),
+				matches: true,
+			};
+		}
 
-	return originalMatchMedia( query );
-} );
+		return originalMatchMedia( query );
+	} );
 
-beforeAll( () => {
-	window.matchMedia = jest.fn( mockedMatchMedia );
-} );
+	beforeAll( () => {
+		window.matchMedia = jest.fn( mockedMatchMedia );
+	} );
 
-afterAll( () => {
-	window.matchMedia = originalMatchMedia;
-} );
+	afterAll( () => {
+		window.matchMedia = originalMatchMedia;
+	} );
+}
