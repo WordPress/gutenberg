@@ -1,3 +1,5 @@
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
+
 /**
  * Mock response value for a successful fetch.
  *
@@ -16,10 +18,10 @@ describe( 'apiFetch', () => {
 	beforeEach( async () => {
 		// Reset the `apiFetch` module before each test to clear
 		// internal variables (middlewares, fetch handler, etc.).
-		jest.resetModules();
+		vi.resetModules();
 		apiFetch = ( await import( '../' ) ).default;
 
-		globalThis.fetch = jest.fn();
+		globalThis.fetch = vi.fn();
 	} );
 
 	afterAll( () => {
@@ -329,7 +331,7 @@ describe( 'apiFetch', () => {
 	} );
 
 	it( 'should not use the default fetch handler when using a custom fetch handler', async () => {
-		const customFetchHandler = jest.fn();
+		const customFetchHandler = vi.fn();
 
 		apiFetch.setFetchHandler( customFetchHandler );
 
@@ -355,7 +357,7 @@ describe( 'apiFetch', () => {
 		} );
 
 		// Set a custom fetch handler to avoid using the default fetch handler.
-		apiFetch.setFetchHandler( jest.fn() );
+		apiFetch.setFetchHandler( vi.fn() );
 
 		await apiFetch( expectedOptions );
 	} );

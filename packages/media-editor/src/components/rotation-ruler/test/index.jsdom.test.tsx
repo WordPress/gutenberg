@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { pxToValueDelta, clampValue, quantize } from '../use-ruler-drag';
@@ -53,7 +54,7 @@ describe( 'RotationRuler', () => {
 
 	it( 'fires onChange with value + step on ArrowRight', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 		render(
 			<RotationRuler
 				value={ 0 }
@@ -70,7 +71,7 @@ describe( 'RotationRuler', () => {
 
 	it( 'fires onChange with value + step / 2 on Shift+ArrowRight', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 		render(
 			<RotationRuler
 				value={ 0 }
@@ -85,7 +86,7 @@ describe( 'RotationRuler', () => {
 	} );
 
 	it( 'stops an in-flight drag when it becomes disabled', () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 		const props = {
 			value: 0,
 			onChange,
@@ -121,7 +122,7 @@ describe( 'RotationRuler', () => {
 
 	it( 'does not fire onChange when disabled', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 		render(
 			<RotationRuler
 				value={ 0 }

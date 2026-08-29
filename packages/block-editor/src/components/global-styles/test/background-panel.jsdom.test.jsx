@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import BackgroundPanel, {
@@ -6,6 +7,10 @@ import BackgroundPanel, {
 	hasBackgroundColorValue,
 	hasLegacyColorGradientValue,
 } from '../background-panel';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
+globalThis.wpVitest.mockResizeObserver();
 
 // The inheritance treatment sits behind the
 // `gutenberg-global-styles-inheritance-ui` experiment. Turn it on so these
@@ -165,7 +170,7 @@ describe( 'BackgroundPanel — duplicate gradient preset slug identity', () => {
 
 	it( 'commits the inherited preset slug when accepting the preselected inherited gradient', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<BackgroundPanel
@@ -202,7 +207,7 @@ describe( 'BackgroundPanel — duplicate gradient preset slug identity', () => {
 				} }
 				inheritedValue={ {} }
 				settings={ duplicateGradientSettings }
-				onChange={ jest.fn() }
+				onChange={ vi.fn() }
 				panelId="test-panel"
 			/>
 		);
@@ -256,7 +261,7 @@ describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 						'linear-gradient(135deg, rgb(74, 0, 224) 0%, rgb(142, 45, 226) 100%)',
 				},
 			};
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			render(
 				<BackgroundPanel
@@ -322,7 +327,7 @@ describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 					},
 				},
 			};
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			render(
 				<BackgroundPanel
@@ -365,7 +370,7 @@ describe( 'BackgroundPanel — inherited Global Styles label treatment', () => {
 					},
 				},
 			};
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			render(
 				<BackgroundPanel

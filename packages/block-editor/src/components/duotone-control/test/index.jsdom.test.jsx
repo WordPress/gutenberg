@@ -1,6 +1,9 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import DuotoneControl from '../';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 // Adding two custom duotones in Global Styles seeds both from the palette's
 // darkest and lightest colors, so two presets holding the same pair is the
@@ -32,7 +35,7 @@ async function openControl( user ) {
 describe( 'DuotoneControl', () => {
 	it( 'reports the slug of the duplicate that was picked', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<DuotoneControl
@@ -64,7 +67,7 @@ describe( 'DuotoneControl', () => {
 				colorPalette={ COLOR_PALETTE }
 				value={ [ '#000000', '#ffffff' ] }
 				selectedSlug="custom-duotone-2"
-				onChange={ jest.fn() }
+				onChange={ vi.fn() }
 			/>
 		);
 		await openControl( user );
@@ -85,7 +88,7 @@ describe( 'DuotoneControl', () => {
 				duotonePalette={ DUPLICATE_PALETTE }
 				colorPalette={ COLOR_PALETTE }
 				value={ [ '#000000', '#ffffff' ] }
-				onChange={ jest.fn() }
+				onChange={ vi.fn() }
 			/>
 		);
 		await openControl( user );

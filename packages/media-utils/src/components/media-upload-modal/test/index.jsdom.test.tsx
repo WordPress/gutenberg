@@ -1,11 +1,24 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+	type Mock,
+} from 'vitest';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { MediaUploadModal } from '../index';
 import { unlock } from '../../../lock-unlock';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
+globalThis.wpVitest.mockResizeObserver();
 
 const preferenceKey = 'dataviews-postType-attachment-media-modal';
 
@@ -18,9 +31,10 @@ const POST_TYPES: Record< string, unknown > = {
 	cpt: { labels: {} },
 };
 
-jest.mock( '@wordpress/core-data', () => {
-	const { __dangerousOptInToUnstableAPIsOnlyForCoreModules } =
-		jest.requireActual( '@wordpress/private-apis' );
+vi.mock( import( '@wordpress/core-data' ), async () => {
+	const { __dangerousOptInToUnstableAPIsOnlyForCoreModules } = await import(
+		'@wordpress/private-apis'
+	);
 	const { lock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
 		'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
 		'@wordpress/core-data'
@@ -28,7 +42,7 @@ jest.mock( '@wordpress/core-data', () => {
 	// Keep the private API contract real while replacing only the data hook.
 	const privateApis = {};
 	lock( privateApis, {
-		useEntityRecordsWithPermissions: jest.fn(),
+		useEntityRecordsWithPermissions: vi.fn(),
 	} );
 
 	return {
@@ -36,11 +50,11 @@ jest.mock( '@wordpress/core-data', () => {
 		store: {
 			name: 'core',
 		},
-	};
+	} as unknown as typeof import('@wordpress/core-data');
 } );
 
 const mockUseEntityRecordsWithPermissions = unlock( coreDataPrivateApis )
-	.useEntityRecordsWithPermissions as jest.Mock;
+	.useEntityRecordsWithPermissions as Mock;
 
 const IMAGE_RECORDS = [
 	{
@@ -97,8 +111,8 @@ function renderModal(
 			.set( 'core/views', preferenceKey, persistedView );
 	}
 
-	const onSelect = jest.fn();
-	const onClose = jest.fn();
+	const onSelect = vi.fn();
+	const onClose = vi.fn();
 
 	const view = render(
 		<RegistryProvider value={ registry }>
@@ -139,7 +153,7 @@ describe( 'MediaUploadModal', () => {
 	} );
 
 	afterEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 		// The popover fallback container is appended to `document.body`, outside
 		// the tree Testing Library cleans up. Left in place, the next modal to
 		// open marks it `aria-hidden` — hiding the popovers that later tests

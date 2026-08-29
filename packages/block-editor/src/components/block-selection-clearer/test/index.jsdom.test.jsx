@@ -1,31 +1,28 @@
+import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { useDispatch, useSelect } from '@wordpress/data';
 import BlockSelectionClearer from '../';
 
 const defaultUseSelectValues = {
-	hasSelectedBlock: jest.fn().mockReturnValue( false ),
-	hasMultiSelection: jest.fn().mockReturnValue( false ),
-	getSettings: jest.fn().mockReturnValue( {
+	hasSelectedBlock: vi.fn().mockReturnValue( false ),
+	hasMultiSelection: vi.fn().mockReturnValue( false ),
+	getSettings: vi.fn().mockReturnValue( {
 		clearBlockSelection: true,
 	} ),
 };
 
-jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
-	useDispatch: jest.fn(),
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useDispatch: vi.fn(),
+	useSelect: vi.fn(),
 } ) );
-
-jest.mock( '@wordpress/data/src/components/use-select', () => {
-	// This allows us to tweak the returned value on each test.
-	const mock = jest.fn();
-	return mock;
-} );
 
 describe( 'BlockSelectionClearer component', () => {
 	it( 'should clear the selected block when a selected block exists', () => {
-		const mockClearSelectedBlock = jest.fn();
+		const mockClearSelectedBlock = vi.fn();
 		useSelect.mockImplementation( () => ( {
 			...defaultUseSelectValues,
-			hasSelectedBlock: jest.fn().mockReturnValue( true ),
+			hasSelectedBlock: vi.fn().mockReturnValue( true ),
 		} ) );
 		useDispatch.mockImplementation( () => ( {
 			clearSelectedBlock: mockClearSelectedBlock,
@@ -43,10 +40,10 @@ describe( 'BlockSelectionClearer component', () => {
 	} );
 
 	it( 'should clear the selected block when multiple blocks are selected', () => {
-		const mockClearSelectedBlock = jest.fn();
+		const mockClearSelectedBlock = vi.fn();
 		useSelect.mockImplementation( () => ( {
 			...defaultUseSelectValues,
-			hasMultiSelection: jest.fn().mockReturnValue( true ),
+			hasMultiSelection: vi.fn().mockReturnValue( true ),
 		} ) );
 		useDispatch.mockImplementation( () => ( {
 			clearSelectedBlock: mockClearSelectedBlock,
@@ -64,7 +61,7 @@ describe( 'BlockSelectionClearer component', () => {
 	} );
 
 	it( 'should not clear the block selection when no blocks are selected', () => {
-		const mockClearSelectedBlock = jest.fn();
+		const mockClearSelectedBlock = vi.fn();
 		useSelect.mockImplementation( () => defaultUseSelectValues );
 		useDispatch.mockImplementation( () => ( {
 			clearSelectedBlock: mockClearSelectedBlock,
@@ -82,11 +79,11 @@ describe( 'BlockSelectionClearer component', () => {
 	} );
 
 	it( 'should not clear the block selection when the feature is disabled', () => {
-		const mockClearSelectedBlock = jest.fn();
+		const mockClearSelectedBlock = vi.fn();
 		useSelect.mockImplementation( () => ( {
 			...defaultUseSelectValues,
-			hasSelectedBlock: jest.fn().mockReturnValue( true ),
-			getSettings: jest.fn().mockReturnValue( {
+			hasSelectedBlock: vi.fn().mockReturnValue( true ),
+			getSettings: vi.fn().mockReturnValue( {
 				clearBlockSelection: false,
 			} ),
 		} ) );

@@ -1,5 +1,8 @@
+import { describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import RangeControl from '../';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 const getRangeInput = (): HTMLInputElement => screen.getByRole( 'slider' );
 const getNumberInput = (): HTMLInputElement => screen.getByRole( 'spinbutton' );
@@ -11,7 +14,7 @@ const fireChangeEvent = ( input: HTMLInputElement, value?: number | string ) =>
 describe( 'RangeControl', () => {
 	describe( '#render()', () => {
 		it( 'should trigger change callback with numeric value', () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			render( <RangeControl onChange={ onChange } /> );
 
@@ -76,7 +79,7 @@ describe( 'RangeControl', () => {
 		} );
 
 		it( 'should not call onChange if new value is invalid', () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			render(
 				<RangeControl onChange={ onChange } min={ 10 } max={ 20 } />
 			);
@@ -90,7 +93,7 @@ describe( 'RangeControl', () => {
 		} );
 
 		it( 'should keep invalid values in number input until loss of focus', () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			render(
 				<RangeControl onChange={ onChange } min={ -1 } max={ 1 } />
 			);
@@ -141,7 +144,7 @@ describe( 'RangeControl', () => {
 		} );
 
 		it( 'should take into account the step starting from min', () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			render(
 				<RangeControl
 					onChange={ onChange }
@@ -286,7 +289,7 @@ describe( 'RangeControl', () => {
 
 	describe( 'reset', () => {
 		it( 'should clear the input value when clicking the reset button', () => {
-			const spy = jest.fn();
+			const spy = vi.fn();
 			render( <RangeControl allowReset onChange={ spy } /> );
 
 			const resetButton = getResetButton();
@@ -310,7 +313,7 @@ describe( 'RangeControl', () => {
 		} );
 
 		it( 'should reset to the `initialPosition` value when clicking the reset button', () => {
-			const spy = jest.fn();
+			const spy = vi.fn();
 			render(
 				<RangeControl
 					allowReset
@@ -339,7 +342,7 @@ describe( 'RangeControl', () => {
 		} );
 
 		it( 'should reset to the `resetFallbackValue` value when clicking the reset button', () => {
-			const spy = jest.fn();
+			const spy = vi.fn();
 			render(
 				<RangeControl
 					initialPosition={ 10 }

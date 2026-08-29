@@ -1,8 +1,19 @@
+import {
+	afterAll,
+	afterEach,
+	beforeAll,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import timezoneMock from 'timezone-mock';
 import { getSettings, setSettings, type DateSettings } from '@wordpress/date';
 import DateTimePicker from '..';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 describe( 'DateTimePicker', () => {
 	let originalSettings: DateSettings;
@@ -20,7 +31,7 @@ describe( 'DateTimePicker', () => {
 	} );
 
 	afterEach( () => {
-		jest.restoreAllMocks();
+		vi.restoreAllMocks();
 		timezoneMock.unregister();
 	} );
 
@@ -30,7 +41,7 @@ describe( 'DateTimePicker', () => {
 
 	it( 'should display and select dates correctly when timezones match', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		timezoneMock.register( 'US/Eastern' );
 
@@ -120,7 +131,7 @@ describe( 'DateTimePicker', () => {
 				} ) => {
 					it( 'should display and select dates correctly', async () => {
 						const user = userEvent.setup();
-						const onChange = jest.fn();
+						const onChange = vi.fn();
 
 						timezoneMock.register( timezone );
 
@@ -196,7 +207,7 @@ describe( 'DateTimePicker', () => {
 
 	describe( 'input types with timezone variations', () => {
 		afterEach( () => {
-			jest.useRealTimers();
+			vi.useRealTimers();
 			timezoneMock.unregister();
 		} );
 
@@ -268,16 +279,14 @@ describe( 'DateTimePicker', () => {
 					// set initial dates.
 					let user: ReturnType< typeof userEvent.setup >;
 					if ( initialDate === undefined ) {
-						jest.useFakeTimers();
-						jest.setSystemTime( Date.UTC( 2025, 10, 16, 1, 0, 0 ) );
-						user = userEvent.setup( {
-							advanceTimers: jest.advanceTimersByTime,
-						} );
+						vi.useFakeTimers( { toFake: [ 'Date' ] } );
+						vi.setSystemTime( Date.UTC( 2025, 10, 16, 1, 0, 0 ) );
+						user = userEvent.setup();
 					} else {
 						user = userEvent.setup();
 					}
 
-					const onChange = jest.fn();
+					const onChange = vi.fn();
 					const { rerender } = render(
 						<DateTimePicker
 							currentDate={ initialDate }
@@ -392,7 +401,7 @@ describe( 'DateTimePicker', () => {
 
 	it( 'should preserve time when changing date', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		timezoneMock.register( 'UTC' );
 

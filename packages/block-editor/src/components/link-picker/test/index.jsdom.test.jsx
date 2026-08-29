@@ -1,27 +1,27 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, within, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useSelect } from '@wordpress/data';
 import { LinkPicker } from '../';
 
-const mockFetchSearchSuggestions = jest.fn();
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
+const mockFetchSearchSuggestions = vi.fn();
 
 // Mock useSelect for search suggestions
-jest.mock( '@wordpress/data/src/components/use-select', () => {
-	const mock = jest.fn();
-	return mock;
-} );
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useDispatch: () => ( { saveEntityRecords: vi.fn() } ),
+	useSelect: vi.fn(),
+} ) );
 
 useSelect.mockImplementation( () => ( {
 	fetchSearchSuggestions: mockFetchSearchSuggestions,
 } ) );
 
-jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
-	useDispatch: () => ( { saveEntityRecords: jest.fn() } ),
-} ) );
-
-jest.mock( '@wordpress/compose', () => ( {
-	...jest.requireActual( '@wordpress/compose' ),
-	useReducedMotion: jest.fn( () => true ),
+vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useReducedMotion: vi.fn( () => true ),
 } ) );
 
 // Helper to create mock suggestions
@@ -66,7 +66,7 @@ describe( 'LinkPicker', () => {
 			render(
 				<LinkPicker
 					preview={ createMockPreview() }
-					onSelect={ jest.fn() }
+					onSelect={ vi.fn() }
 					label="Link"
 				/>
 			);
@@ -85,7 +85,7 @@ describe( 'LinkPicker', () => {
 						url: 'example.com',
 						badges: [],
 					} }
-					onSelect={ jest.fn() }
+					onSelect={ vi.fn() }
 					label="Link"
 				/>
 			);
@@ -104,7 +104,7 @@ describe( 'LinkPicker', () => {
 						url: 'example.com',
 						badges: [ { label: 'Page', intent: 'default' } ],
 					} }
-					onSelect={ jest.fn() }
+					onSelect={ vi.fn() }
 					label="Link"
 				/>
 			);
@@ -124,7 +124,7 @@ describe( 'LinkPicker', () => {
 						image: 'https://example.com/image.jpg',
 						badges: [ { label: 'Page', intent: 'default' } ],
 					} }
-					onSelect={ jest.fn() }
+					onSelect={ vi.fn() }
 					label="Link"
 				/>
 			);
@@ -144,7 +144,7 @@ describe( 'LinkPicker', () => {
 			render(
 				<LinkPicker
 					preview={ createMockPreview( { url: 'example.com' } ) }
-					onSelect={ jest.fn() }
+					onSelect={ vi.fn() }
 					label="Link to"
 				/>
 			);
@@ -156,7 +156,7 @@ describe( 'LinkPicker', () => {
 			render(
 				<LinkPicker
 					preview={ createMockPreview( { url: 'example.com' } ) }
-					onSelect={ jest.fn() }
+					onSelect={ vi.fn() }
 					label="Link"
 					help="Synced with the selected page."
 				/>
@@ -175,7 +175,7 @@ describe( 'LinkPicker', () => {
 			render(
 				<LinkPicker
 					preview={ createMockPreview( { url: 'example.com' } ) }
-					onSelect={ jest.fn() }
+					onSelect={ vi.fn() }
 					label="Link"
 				/>
 			);
@@ -202,7 +202,7 @@ describe( 'LinkPicker', () => {
 			render(
 				<LinkPicker
 					preview={ createMockPreview( { url: 'example.com' } ) }
-					onSelect={ jest.fn() }
+					onSelect={ vi.fn() }
 					label="Link"
 				/>
 			);
@@ -226,7 +226,7 @@ describe( 'LinkPicker', () => {
 			render(
 				<LinkPicker
 					preview={ createMockPreview( { url: 'example.com' } ) }
-					onSelect={ jest.fn() }
+					onSelect={ vi.fn() }
 					label="Link"
 				/>
 			);
@@ -263,7 +263,7 @@ describe( 'LinkPicker', () => {
 			render(
 				<LinkPicker
 					preview={ createMockPreview( { url: 'example.com' } ) }
-					onSelect={ jest.fn() }
+					onSelect={ vi.fn() }
 					label="Link"
 					help="This is help text"
 				/>
@@ -284,7 +284,7 @@ describe( 'LinkPicker', () => {
 			render(
 				<LinkPicker
 					preview={ createMockPreview( { url: 'example.com' } ) }
-					onSelect={ jest.fn() }
+					onSelect={ vi.fn() }
 					label="Link"
 				/>
 			);
@@ -299,7 +299,7 @@ describe( 'LinkPicker', () => {
 	describe( 'Selection behavior', () => {
 		it( 'should call onSelect with suggestion data when a suggestion is selected', async () => {
 			const user = userEvent.setup();
-			const onSelect = jest.fn();
+			const onSelect = vi.fn();
 
 			render(
 				<LinkPicker
@@ -348,7 +348,7 @@ describe( 'LinkPicker', () => {
 			render(
 				<LinkPicker
 					preview={ createMockPreview() }
-					onSelect={ jest.fn() }
+					onSelect={ vi.fn() }
 					label="Link"
 				/>
 			);
@@ -392,7 +392,7 @@ describe( 'LinkPicker', () => {
 			render(
 				<LinkPicker
 					preview={ createMockPreview() }
-					onSelect={ jest.fn() }
+					onSelect={ vi.fn() }
 					suggestionsQuery={ customQuery }
 					label="Link"
 				/>
@@ -423,7 +423,7 @@ describe( 'LinkPicker', () => {
 	describe( 'Integration scenarios', () => {
 		it( 'should handle changing from empty link to entity link', async () => {
 			const user = userEvent.setup();
-			const onSelect = jest.fn();
+			const onSelect = vi.fn();
 
 			render(
 				<LinkPicker

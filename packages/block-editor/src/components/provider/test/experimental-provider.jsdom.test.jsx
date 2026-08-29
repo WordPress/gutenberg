@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import { useRegistry, useSelect } from '@wordpress/data';
 import { BlockEditorProvider, ExperimentalBlockEditorProvider } from '../';
@@ -63,7 +64,7 @@ describe( 'BlockEditorProvider', () => {
 		expect( settings ).toHaveProperty( 'stableSetting' );
 	} );
 	it( 'preserves deprecated getters incoming from the settings reducer', async () => {
-		const consoleWarn = jest
+		const consoleWarn = vi
 			.spyOn( global.console, 'warn' )
 			.mockImplementation();
 

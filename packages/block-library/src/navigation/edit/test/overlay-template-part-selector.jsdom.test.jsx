@@ -1,42 +1,45 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useEntityRecords } from '@wordpress/core-data';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import OverlayTemplatePartSelector from '../overlay-template-part-selector';
 import useCreateOverlayTemplatePart from '../use-create-overlay';
 
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
 // Mock useEntityRecords
-jest.mock( '@wordpress/core-data', () => ( {
-	useEntityRecords: jest.fn(),
+vi.mock( import( '@wordpress/core-data' ), () => ( {
+	useEntityRecords: vi.fn(),
 	store: {},
 } ) );
 
 // Mock useCreateOverlayTemplatePart hook
-jest.mock( '../use-create-overlay', () => ( {
+vi.mock( import( '../use-create-overlay' ), () => ( {
 	__esModule: true,
-	default: jest.fn(),
+	default: vi.fn(),
 } ) );
 
 // Mock useDispatch and useSelect specifically to avoid needing to set up full data store
-jest.mock( '@wordpress/data', () => ( {
-	useDispatch: jest.fn(),
-	useSelect: jest.fn(),
-	createSelector: jest.fn( ( fn ) => fn ),
-	createRegistrySelector: jest.fn( ( fn ) => fn ),
-	createReduxStore: jest.fn( () => ( {} ) ),
-	combineReducers: jest.fn( ( reducers ) => ( state = {}, action ) => {
+vi.mock( import( '@wordpress/data' ), () => ( {
+	useDispatch: vi.fn(),
+	useSelect: vi.fn(),
+	createSelector: vi.fn( ( fn ) => fn ),
+	createRegistrySelector: vi.fn( ( fn ) => fn ),
+	createReduxStore: vi.fn( () => ( {} ) ),
+	combineReducers: vi.fn( ( reducers ) => ( state = {}, action ) => {
 		const newState = {};
 		Object.keys( reducers ).forEach( ( key ) => {
 			newState[ key ] = reducers[ key ]( state[ key ], action );
 		} );
 		return newState;
 	} ),
-	register: jest.fn(),
-	keyedReducer: jest.fn( () => ( reducer ) => reducer ),
+	register: vi.fn(),
+	keyedReducer: vi.fn( () => ( reducer ) => reducer ),
 } ) );
 
-const mockSetAttributes = jest.fn();
-const mockOnNavigateToEntityRecord = jest.fn();
+const mockSetAttributes = vi.fn();
+const mockOnNavigateToEntityRecord = vi.fn();
 
 const defaultProps = {
 	overlay: undefined,
@@ -75,12 +78,11 @@ const templatePartOtherArea = {
 };
 
 describe( 'OverlayTemplatePartSelector', () => {
-	const mockCreateOverlayTemplatePart = jest.fn();
-	const mockCreateErrorNotice = jest.fn();
-	const { useSelect } = require( '@wordpress/data' );
+	const mockCreateOverlayTemplatePart = vi.fn();
+	const mockCreateErrorNotice = vi.fn();
 
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 		useEntityRecords.mockReturnValue( {
 			records: [],
 			isResolving: false,

@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Composite } from '@wordpress/components';
@@ -5,11 +6,11 @@ import { useSelect } from '@wordpress/data';
 import DownloadableBlockListItem from '../';
 import { plugin } from '../../test/fixtures';
 
-jest.mock( '@wordpress/data/src/components/use-select', () => {
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
 	// This allows us to tweak the returned value on each test.
-	const mock = jest.fn();
-	return mock;
-} );
+	useSelect: vi.fn(),
+} ) );
 
 function renderItem( props ) {
 	return render(
@@ -26,7 +27,7 @@ describe( 'DownloadableBlockListItem', () => {
 			isInstallable: true,
 		} ) );
 
-		renderItem( { onClick: jest.fn(), item: plugin } );
+		renderItem( { onClick: vi.fn(), item: plugin } );
 		const author = screen.queryByText( `by ${ plugin.author }` );
 		const description = screen.queryByText( plugin.description );
 		expect( author ).toBeInTheDocument();
@@ -39,7 +40,7 @@ describe( 'DownloadableBlockListItem', () => {
 			isInstallable: true,
 		} ) );
 
-		renderItem( { onClick: jest.fn(), item: plugin } );
+		renderItem( { onClick: vi.fn(), item: plugin } );
 		const statusLabel = screen.queryByText( 'Installing…' );
 		expect( statusLabel ).toBeInTheDocument();
 	} );
@@ -50,7 +51,7 @@ describe( 'DownloadableBlockListItem', () => {
 			isInstallable: false,
 		} ) );
 
-		renderItem( { onClick: jest.fn(), item: plugin } );
+		renderItem( { onClick: vi.fn(), item: plugin } );
 		const button = screen.getByRole( 'option' );
 		// Keeping it false to avoid focus loss and disable it using aria-disabled.
 		expect( button ).toBeEnabled();
@@ -64,7 +65,7 @@ describe( 'DownloadableBlockListItem', () => {
 			isInstalling: false,
 			isInstallable: true,
 		} ) );
-		const onClick = jest.fn();
+		const onClick = vi.fn();
 		renderItem( { onClick, item: plugin } );
 
 		await user.click( screen.getByRole( 'option' ) );

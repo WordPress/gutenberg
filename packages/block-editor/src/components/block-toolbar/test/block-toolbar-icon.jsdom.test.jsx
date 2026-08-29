@@ -1,10 +1,11 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { useSelect } from '@wordpress/data';
 import { paragraph } from '@wordpress/icons';
 import BlockToolbarIcon from '../block-toolbar-icon';
 
-jest.mock( '@wordpress/blocks', () => {
-	const actualImplementation = jest.requireActual( '@wordpress/blocks' );
+vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => {
+	const actualImplementation = await importOriginal();
 	return {
 		...actualImplementation,
 		getBlockType: ( name ) => ( {
@@ -14,34 +15,39 @@ jest.mock( '@wordpress/blocks', () => {
 		} ),
 	};
 } );
-jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
-jest.mock( '../../../lock-unlock', () => ( {
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useSelect: vi.fn(),
+} ) );
+vi.mock( import( '../../../lock-unlock' ), () => ( {
 	unlock: ( value ) => ( {
-		registerPrivateActions: jest.fn(),
-		registerPrivateSelectors: jest.fn(),
+		registerPrivateActions: vi.fn(),
+		registerPrivateSelectors: vi.fn(),
 		...value,
 	} ),
 } ) );
-jest.mock( '../../block-title/use-block-display-title', () =>
-	jest.fn().mockReturnValue( 'Block Name' )
-);
-jest.mock( '../../block-icon', () =>
-	jest.fn( ( { icon } ) => <span data-testid="block-icon">{ icon }</span> )
-);
-jest.mock( '../../block-switcher', () =>
-	jest.fn( ( { children } ) => (
+vi.mock( import( '../../block-title/use-block-display-title' ), () => ( {
+	default: vi.fn().mockReturnValue( 'Block Name' ),
+} ) );
+vi.mock( import( '../../block-icon' ), () => ( {
+	default: vi.fn( ( { icon } ) => (
+		<span data-testid="block-icon">{ icon }</span>
+	) ),
+} ) );
+vi.mock( import( '../../block-switcher' ), () => ( {
+	default: vi.fn( ( { children } ) => (
 		<div data-testid="block-switcher">{ children }</div>
-	) )
-);
-jest.mock( '../pattern-overrides-dropdown', () =>
-	jest.fn( ( { clientIds } ) => (
+	) ),
+} ) );
+vi.mock( import( '../pattern-overrides-dropdown' ), () => ( {
+	default: vi.fn( ( { clientIds } ) => (
 		<div data-testid="pattern-overrides-dropdown">
 			{ clientIds.length === 1
 				? 'Block Name'
 				: 'Multiple blocks selected' }
 		</div>
-	) )
-);
+	) ),
+} ) );
 
 describe( 'BlockToolbarIcon', () => {
 	const defaultProps = {
@@ -76,7 +82,7 @@ describe( 'BlockToolbarIcon', () => {
 	};
 
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	describe( 'when variant is "switcher"', () => {

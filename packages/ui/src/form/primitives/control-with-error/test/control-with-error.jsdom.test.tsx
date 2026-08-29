@@ -1,4 +1,11 @@
-import { render, screen, waitFor, act } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+	render,
+	screen,
+	waitFor,
+	act,
+	fireEvent,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
 	forwardRef,
@@ -47,6 +54,8 @@ const ValidatedInputControl = forwardRef<
 	);
 } );
 
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
 describe( 'ControlWithError', () => {
 	describe( 'label cloning', () => {
 		it( 'should pass string labels as strings when appending the required indicator', () => {
@@ -61,11 +70,13 @@ describe( 'ControlWithError', () => {
 
 	describe( 'Async Validation', () => {
 		beforeEach( () => {
-			jest.useFakeTimers();
+			vi.useFakeTimers( {
+				toFake: [ 'clearTimeout', 'setTimeout' ],
+			} );
 		} );
 
 		afterEach( () => {
-			jest.useRealTimers();
+			vi.useRealTimers();
 		} );
 
 		const AsyncValidatedInputControl = ( {
@@ -125,49 +136,35 @@ describe( 'ControlWithError', () => {
 			);
 		};
 
-		it( 'should not show "validating" state if it takes less than 1000ms', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+		it( 'should not show "validating" state if it takes less than 1000ms', () => {
 			render( <AsyncValidatedInputControl serverDelayMs={ 500 } /> );
 
 			const input = screen.getByRole( 'textbox' );
 
-			await user.type( input, 'valid text' );
-
-			// Blur to trigger validation
-			await user.tab();
+			fireEvent.change( input, { target: { value: 'valid text' } } );
+			fireEvent.blur( input );
 
 			// Fast-forward to right before the server response
-			act( () => jest.advanceTimersByTime( 499 ) );
+			act( () => vi.advanceTimersByTime( 499 ) );
 
 			// The validating state should not be shown
-			await waitFor( () => {
-				expect(
-					screen.queryByText( 'Validating...' )
-				).not.toBeInTheDocument();
-			} );
+			expect(
+				screen.queryByText( 'Validating...' )
+			).not.toBeInTheDocument();
 
 			// Fast-forward past the server delay to show validation result
-			act( () => jest.advanceTimersByTime( 1 ) );
+			act( () => vi.advanceTimersByTime( 1 ) );
 
-			await waitFor( () => {
-				expect( screen.getByText( 'Validated' ) ).toBeVisible();
-			} );
+			expect( screen.getByText( 'Validated' ) ).toBeVisible();
 		} );
 
-		it( 'should show "validating" state if it takes more than 1000ms', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+		it( 'should show "validating" state if it takes more than 1000ms', () => {
 			render( <AsyncValidatedInputControl serverDelayMs={ 1200 } /> );
 
 			const input = screen.getByRole( 'textbox' );
 
-			await user.type( input, 'valid text' );
-
-			// Blur to trigger validation
-			await user.tab();
+			fireEvent.change( input, { target: { value: 'valid text' } } );
+			fireEvent.blur( input );
 
 			// Initially, no validating message should be shown (before 1s delay)
 			expect(
@@ -175,98 +172,77 @@ describe( 'ControlWithError', () => {
 			).not.toBeInTheDocument();
 
 			// Fast-forward past the 1s delay to show validating state
-			act( () => jest.advanceTimersByTime( 1000 ) );
+			act( () => vi.advanceTimersByTime( 1000 ) );
 
-			await waitFor( () => {
-				expect( screen.getByText( 'Validating...' ) ).toBeVisible();
-			} );
+			expect( screen.getByText( 'Validating...' ) ).toBeVisible();
 
 			// Fast-forward past the server delay to show validation result
-			act( () => jest.advanceTimersByTime( 200 ) );
+			act( () => vi.advanceTimersByTime( 200 ) );
 
-			await waitFor( () => {
-				expect( screen.getByText( 'Validated' ) ).toBeVisible();
-			} );
+			expect( screen.getByText( 'Validated' ) ).toBeVisible();
 
 			// Test error case
-			await user.clear( input );
-			await user.type( input, 'error' );
+			fireEvent.change( input, { target: { value: 'error' } } );
+			fireEvent.blur( input );
 
-			// Blur to trigger validation
-			await user.tab();
+			act( () => vi.advanceTimersByTime( 1000 ) );
 
-			act( () => jest.advanceTimersByTime( 1000 ) );
+			expect( screen.getByText( 'Validating...' ) ).toBeVisible();
 
-			await waitFor( () => {
-				expect( screen.getByText( 'Validating...' ) ).toBeVisible();
-			} );
+			act( () => vi.advanceTimersByTime( 200 ) );
 
-			act( () => jest.advanceTimersByTime( 200 ) );
-
-			await waitFor( () => {
-				expect(
-					screen.getByText( 'The word "error" is not allowed.' )
-				).toBeVisible();
-			} );
+			expect(
+				screen.getByText( 'The word "error" is not allowed.' )
+			).toBeVisible();
 
 			// Test editing after error
-			await user.type( input, '{backspace}' );
+			fireEvent.change( input, { target: { value: 'erro' } } );
 
-			act( () => jest.advanceTimersByTime( 1000 ) );
+			act( () => vi.advanceTimersByTime( 1000 ) );
 
-			await waitFor( () => {
-				expect( screen.getByText( 'Validating...' ) ).toBeVisible();
-			} );
+			expect( screen.getByText( 'Validating...' ) ).toBeVisible();
 
-			act( () => jest.advanceTimersByTime( 200 ) );
+			act( () => vi.advanceTimersByTime( 200 ) );
 
-			await waitFor( () => {
-				expect( screen.getByText( 'Validated' ) ).toBeVisible();
-			} );
+			expect( screen.getByText( 'Validated' ) ).toBeVisible();
 		} );
 
-		it( 'should not show a "valid" state until the server response is received, even if locally valid', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+		it( 'should not show a "valid" state until the server response is received, even if locally valid', () => {
 			render(
 				<AsyncValidatedInputControl serverDelayMs={ 1200 } required />
 			);
 
 			const input = screen.getByRole( 'textbox' );
 
-			await user.type( input, 'valid text' );
+			fireEvent.change( input, { target: { value: 'valid text' } } );
+			fireEvent.blur( input );
+			act( () => vi.advanceTimersByTime( 1200 ) );
 
-			await user.tab();
-			act( () => jest.advanceTimersByTime( 1200 ) );
+			expect( screen.getByText( 'Validated' ) ).toBeVisible();
 
-			await waitFor( () => {
-				expect( screen.getByText( 'Validated' ) ).toBeVisible();
-			} );
+			fireEvent.change( input, { target: { value: '' } } );
 
-			await user.clear( input );
+			act( () => vi.advanceTimersByTime( 1000 ) );
 
-			act( () => jest.advanceTimersByTime( 1000 ) );
-
-			await waitFor( () => {
-				expect(
-					screen.getByText( 'Constraints not satisfied' )
-				).toBeVisible();
-			} );
-
-			await user.type( input, 'error' );
-
-			act( () => jest.advanceTimersByTime( 200 ) );
-
+			expect( screen.getByText( 'Validating...' ) ).toBeVisible();
 			expect( screen.queryByText( 'Validated' ) ).not.toBeInTheDocument();
 
-			act( () => jest.advanceTimersByTime( 1000 ) );
+			act( () => vi.advanceTimersByTime( 200 ) );
 
-			await waitFor( () => {
-				expect(
-					screen.getByText( 'The word "error" is not allowed.' )
-				).toBeVisible();
-			} );
+			expect(
+				screen.getByText( 'Constraints not satisfied' )
+			).toBeVisible();
+
+			fireEvent.change( input, { target: { value: 'error' } } );
+
+			act( () => vi.advanceTimersByTime( 1000 ) );
+			expect( screen.queryByText( 'Validated' ) ).not.toBeInTheDocument();
+
+			act( () => vi.advanceTimersByTime( 200 ) );
+
+			expect(
+				screen.getByText( 'The word "error" is not allowed.' )
+			).toBeVisible();
 		} );
 	} );
 
@@ -346,7 +322,7 @@ describe( 'ControlWithError', () => {
 
 		it( 'should show custom validity messages regardless of "touched" state if parent form is submitted', async () => {
 			const user = userEvent.setup();
-			const onSubmit = jest.fn();
+			const onSubmit = vi.fn();
 			render(
 				<form onSubmit={ onSubmit }>
 					<CustomValidatedInputControl label="Text" />

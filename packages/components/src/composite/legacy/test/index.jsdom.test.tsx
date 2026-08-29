@@ -1,4 +1,14 @@
 import {
+	afterAll,
+	beforeAll,
+	describe,
+	expect,
+	it,
+	test,
+	vi,
+	type MockInstance,
+} from 'vitest';
+import {
 	queryByAttribute,
 	render,
 	screen,
@@ -16,12 +26,12 @@ import {
 // page down. Without this, nothing has a height, and so paging up
 // and down doesn't behave as expected in tests.
 
-let clientHeightSpy: jest.SpiedGetter<
-	typeof HTMLElement.prototype.clientHeight
+let clientHeightSpy: MockInstance<
+	() => typeof HTMLElement.prototype.clientHeight
 >;
 
 beforeAll( () => {
-	clientHeightSpy = jest
+	clientHeightSpy = vi
 		.spyOn( HTMLElement.prototype, 'clientHeight', 'get' )
 		.mockImplementation( function getClientHeight( this: HTMLElement ) {
 			if ( this.tagName === 'BODY' ) {
