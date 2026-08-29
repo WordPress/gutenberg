@@ -260,12 +260,30 @@
   props:
       - __nextHasNoMarginBottom
       - checked
+      - className
+      - defaultChecked
+      - description
+      - details
       - disabled
+      - form
       - heading
       - help
+      - hideLabelFromVision
+      - id
       - indeterminate
+      - inputRef
       - label
+      - name
+      - nativeButton
       - onChange
+      - onCheckedChange
+      - parent
+      - readOnly
+      - render
+      - required
+      - style
+      - uncheckedValue
+      - value
 - name: Collapsible.Root
   props:
       - children
