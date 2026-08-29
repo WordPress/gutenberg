@@ -15,7 +15,6 @@
 		{ "path": "../core-data/tsconfig.build.json" },
 		{ "path": "../data" },
 		{ "path": "../dataviews/tsconfig.build.json" },
-		{ "path": "../date" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons/tsconfig.build.json" },
@@ -28,7 +27,7 @@
 	// Listed files have pre-existing type errors; include them once fixed.
 	"exclude": [
 		"**/benchmark",
-		"src/components/media-editor-modal/test/index.tsx",
-		"src/image-editor/react/components/stencils/test/rectangle-stencil.tsx"
+		"src/components/media-editor-modal/test/index.jsdom.test.tsx",
+		"src/image-editor/react/components/stencils/test/rectangle-stencil.jsdom.test.tsx"
 	]
 }

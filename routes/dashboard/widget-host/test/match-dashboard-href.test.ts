@@ -67,10 +67,73 @@ describe( 'matchDashboardHref', () => {
 		).toBeNull();
 	} );
 
-	it( 'rejects a p that carries its own query string', () => {
+	it( 'keeps the query a p carries, for the route to read as search', () => {
 		expect(
 			matchDashboardHref(
-				'admin.php?page=dashboard&p=/reports?period=7d',
+				'admin.php?page=dashboard&p=%2Freports%3Fperiod%3D7d',
+				BASE
+			)
+		).toBe( '/reports?period=7d' );
+	} );
+
+	it( 'keeps a comma-separated list, which both navigations read as text', () => {
+		expect(
+			matchDashboardHref(
+				'admin.php?page=dashboard&p=%2Fsite-health%3Fstatus%3Dcritical%2Crecommended',
+				BASE
+			)
+		).toBe( '/site-health?status=critical,recommended' );
+	} );
+
+	it( 'rejects a p query with a repeated key', () => {
+		expect(
+			matchDashboardHref(
+				'admin.php?page=dashboard&p=%2Fposts%3Fstatus%3Ddraft%26status%3Dpending',
+				BASE
+			)
+		).toBeNull();
+	} );
+
+	it( 'rejects a p query value the router reads as a number', () => {
+		expect(
+			matchDashboardHref(
+				'admin.php?page=dashboard&p=%2Fposts%3Fauthor%3D12',
+				BASE
+			)
+		).toBeNull();
+	} );
+
+	it( 'rejects a p query value the router reads as a boolean', () => {
+		expect(
+			matchDashboardHref(
+				'admin.php?page=dashboard&p=%2Fposts%3Fsticky%3Dtrue',
+				BASE
+			)
+		).toBeNull();
+	} );
+
+	it( 'rejects a p query value the router reads as JSON', () => {
+		expect(
+			matchDashboardHref(
+				'admin.php?page=dashboard&p=%2Fposts%3Fview%3D%7B%22type%22%3A%22table%22%7D',
+				BASE
+			)
+		).toBeNull();
+	} );
+
+	it( 'rejects a p query value the router reads as a quoted string', () => {
+		expect(
+			matchDashboardHref(
+				'admin.php?page=dashboard&p=%2Fposts%3Fq%3D%227%22',
+				BASE
+			)
+		).toBeNull();
+	} );
+
+	it( 'rejects a p that is only a query', () => {
+		expect(
+			matchDashboardHref(
+				'admin.php?page=dashboard&p=%3Fperiod%3D7d',
 				BASE
 			)
 		).toBeNull();
