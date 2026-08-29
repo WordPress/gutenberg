@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   Client-side media processing: Refuse a batch of more than one file when the caller only takes one, such as a Cover block placeholder, matching what the server-side upload path already did. Every dropped file was uploaded instead, and the block kept whichever one finished last ([#82041](https://github.com/WordPress/gutenberg/issues/82041)).
+-   `ListView`: On keyboard activation, focus the start of the first field instead of the end of the last. A Table no longer focuses its last cell. Clicking a List View item still keeps focus in the list ([#81964](https://github.com/WordPress/gutenberg/pull/81964)).
 
 ### Enhancements
 
