@@ -2,22 +2,28 @@ import { createElement } from '@wordpress/element';
 import { render, screen } from '@testing-library/react';
 import { textColor } from '../index';
 
-jest.mock( '@wordpress/block-editor', () => ( {
-	...jest.requireActual( '@wordpress/block-editor' ),
-	useSettings: () => [
-		true,
-		[ { color: '#3858e9', name: 'vivid-cyan-blue' } ],
-	],
-	RichTextToolbarButton: ( { title, onClick } ) =>
-		createElement(
-			'button',
-			{
-				type: 'button',
-				onClick,
-			},
-			title
-		),
-} ) );
+jest.mock( '@wordpress/block-editor', () => {
+	const {
+		createElement: mockCreateElement,
+	} = require( '@wordpress/element' );
+
+	return {
+		...jest.requireActual( '@wordpress/block-editor' ),
+		useSettings: () => [
+			true,
+			[ { color: '#3858e9', name: 'vivid-cyan-blue' } ],
+		],
+		RichTextToolbarButton: ( { title, onClick } ) =>
+			mockCreateElement(
+				'button',
+				{
+					type: 'button',
+					onClick,
+				},
+				title
+			),
+	};
+} );
 
 const TextColorEdit = textColor.edit;
 

@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Prevent Highlight format toolbar from crashing when switching to Edit as HTML with background-only formatting active. ([#72897](https://github.com/WordPress/gutenberg/issues/72897))
+-   Prevent Highlight format toolbar from crashing when switching to Edit as HTML with background-only formatting active. ([#82215](https://github.com/WordPress/gutenberg/pull/82215))
 
 ### Internal
 
