@@ -115,5 +115,5 @@ export const DEFAULT_VIDEO_SIZE_THRESHOLD = 1920;
 export const OPTIONAL_COMPANION_IMAGE_SIZES: readonly string[] = [
 	'animated_video',
 	'animated_video_poster',
-	'optimized-video',
+	'optimized_video',
 ];

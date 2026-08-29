@@ -1307,7 +1307,7 @@ describe( 'private actions', () => {
 			expect( sideload.parentId ).toBe( 'video-1' );
 			expect( sideload.additionalData ).toMatchObject( {
 				post: 42,
-				image_size: 'optimized-video',
+				image_size: 'optimized_video',
 				convert_format: false,
 			} );
 			expect( sideload.operations ).toEqual( [

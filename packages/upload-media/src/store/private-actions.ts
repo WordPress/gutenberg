@@ -1814,7 +1814,7 @@ export function transcodeVideoItem(
  *
  * Runs after the original video has uploaded (operations
  * `Upload → GenerateVideoCompanion → Finalize`). The transcoded video is
- * sideloaded under the `optimized-video` image size and recorded in
+ * sideloaded under the `optimized_video` image size and recorded in
  * attachment metadata as `optimized_video`; the original stays the primary
  * attachment and the editor points the block's playback src at the companion.
  * Mirrors the animated-GIF companion flow.
@@ -1845,7 +1845,7 @@ export function generateVideoCompanion( id: QueueItemId ) {
 				parentId: item.id,
 				additionalData: {
 					post: attachment.id,
-					image_size: 'optimized-video',
+					image_size: 'optimized_video',
 					convert_format: false,
 				},
 				operations: [

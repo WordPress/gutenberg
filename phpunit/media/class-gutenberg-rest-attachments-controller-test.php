@@ -440,7 +440,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
 		$request->set_header( 'Content-Type', 'video/mp4' );
 		$request->set_header( 'Content-Disposition', 'attachment; filename=small-video-optimized.mp4' );
-		$request->set_param( 'image_size', 'optimized-video' );
+		$request->set_param( 'image_size', 'optimized_video' );
 		$request->set_body( file_get_contents( DIR_TESTDATA . '/uploads/small-video.mp4' ) );
 
 		$response = rest_get_server()->dispatch( $request );
@@ -448,7 +448,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$this->assertSame( 200, $response->get_status(), 'Sideloading the transcoded companion should succeed.' );
 
 		$data = $response->get_data();
-		$this->assertSame( 'optimized-video', $data['image_size'] );
+		$this->assertSame( 'optimized_video', $data['image_size'] );
 		$this->assertStringEndsWith( '.mp4', $data['file'] );
 	}
 
@@ -467,7 +467,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
 		$request->set_header( 'Content-Type', 'video/mp4' );
 		$request->set_header( 'Content-Disposition', 'attachment; filename=small-video-optimized.mp4' );
-		$request->set_param( 'image_size', 'optimized-video' );
+		$request->set_param( 'image_size', 'optimized_video' );
 		$request->set_body( file_get_contents( DIR_TESTDATA . '/uploads/small-video.mp4' ) );
 		$response = rest_get_server()->dispatch( $request );
 

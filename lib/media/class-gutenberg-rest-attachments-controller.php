@@ -72,7 +72,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 *
 	 * @var string
 	 */
-	const IMAGE_SIZE_OPTIMIZED_VIDEO = 'optimized-video';
+	const IMAGE_SIZE_OPTIMIZED_VIDEO = 'optimized_video';
 
 	/**
 	 * Metadata key holding the basename of the web-safe transcoded video.
@@ -938,7 +938,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 * @return true|WP_Error True if valid, WP_Error if invalid.
 	 */
 	private function validate_image_dimensions( int $width, int $height, $image_size, int $attachment_id ) {
-		// 'animated_video' and 'optimized-video' companion files are videos,
+		// 'animated_video' and 'optimized_video' companion files are videos,
 		// not images. Skip *all* dimension checks (the caller passes (0, 0)
 		// for these so the positive-dimension assertion below would otherwise
 		// fire).
@@ -1208,7 +1208,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		// validated against the stored attachment size (it must match it or be
 		// its transpose).
 		//
-		// 'animated_video' and 'optimized-video' companions are video files
+		// 'animated_video' and 'optimized_video' companions are video files
 		// (MP4/WebM); the image
 		// helpers can't read their dimensions and would falsely report the
 		// upload as "corrupted or unsupported". Source-format originals

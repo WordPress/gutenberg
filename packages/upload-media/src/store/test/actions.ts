@@ -997,7 +997,7 @@ describe( 'actions', () => {
 				).toBeDefined();
 			} );
 
-			it( 'keeps the parent video when its only child is a failed optimized-video companion', async () => {
+			it( 'keeps the parent video when its only child is a failed optimized_video companion', async () => {
 				const mediaDelete = jest.fn().mockResolvedValue( undefined );
 				const parentOnError = jest.fn();
 				unlock( registry.dispatch( uploadStore ) ).updateSettings( {
@@ -1009,7 +1009,7 @@ describe( 'actions', () => {
 				// count as a partial success.
 				const { parent, child } = setUpParentAndChild( {
 					parentOnError,
-					imageSize: 'optimized-video',
+					imageSize: 'optimized_video',
 				} );
 
 				await registry
