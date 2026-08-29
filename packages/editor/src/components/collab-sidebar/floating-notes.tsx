@@ -1,3 +1,4 @@
+import type { ComponentProps, RefObject } from 'react';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
@@ -18,17 +19,24 @@ export const { Slot: FloatingNotesSlot, Fill: FloatingNotesFill } =
 // overlapping it.
 const DIVIDER_WIDTH = 1;
 
+type CanvasWidths = {
+	canvasWidth: number;
+	editorWidth: number;
+};
+
 /**
  * Measures the width of the editor canvas and of the surrounding editor
  * container, and keeps the floating notes overlay aligned with the visible
  * canvas edge by insetting it by the canvas scrollbar width (a runtime
  * measurement CSS can't read).
  *
- * @param {Object} overlayRef Ref to the floating notes overlay element.
- * @return {Object} The current canvas and editor widths, in pixels.
+ * @param overlayRef Ref to the floating notes overlay element.
+ * @return The current canvas and editor widths, in pixels.
  */
-function useCanvasWidths( overlayRef ) {
-	const [ widths, setWidths ] = useState( {
+function useCanvasWidths(
+	overlayRef: RefObject< HTMLDivElement | null >
+): CanvasWidths {
+	const [ widths, setWidths ] = useState< CanvasWidths >( {
 		canvasWidth: Infinity,
 		editorWidth: Infinity,
 	} );
@@ -38,10 +46,14 @@ function useCanvasWidths( overlayRef ) {
 		if ( ! overlay ) {
 			return;
 		}
-		const editor = overlay.closest( '.editor-visual-editor' );
-		const iframe = editor?.querySelector( 'iframe[name="editor-canvas"]' );
+		const editor = overlay.closest< HTMLElement >(
+			'.editor-visual-editor'
+		);
+		const iframe = editor?.querySelector< HTMLIFrameElement >(
+			'iframe[name="editor-canvas"]'
+		);
 
-		let resizeObserver;
+		let resizeObserver: ResizeObserver | undefined;
 
 		const sync = () => {
 			const view = iframe?.contentWindow;
@@ -106,8 +118,15 @@ function useCanvasWidths( overlayRef ) {
 	return widths;
 }
 
-export function FloatingNotes( { notes, sidebarRef } ) {
-	const overlayRef = useRef( null );
+type FloatingNotesProps = {
+	/** The notes to render in the floating panel. */
+	notes: ComponentProps< typeof Notes >[ 'notes' ];
+	/** Ref to the "All notes" sidebar, used to move focus between surfaces. */
+	sidebarRef: ComponentProps< typeof Notes >[ 'sidebarRef' ];
+};
+
+export function FloatingNotes( { notes, sidebarRef }: FloatingNotesProps ) {
+	const overlayRef = useRef< HTMLDivElement >( null );
 	const isDevicePreview = useSelect(
 		( select ) => select( editorStore ).getDeviceType() !== 'Desktop',
 		[]
