@@ -1,11 +1,12 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { ReactNode } from 'react';
 import { Component, createPortal, useState } from '@wordpress/element';
 import { registerStyle } from '@wordpress/style-runtime';
 import { Slot, Fill, Provider, useSlotFills } from '../';
 
-function IframePortal( { children } ) {
-	const [ iframe, setIframe ] = useState( null );
+function IframePortal( { children }: { children: ReactNode } ) {
+	const [ iframe, setIframe ] = useState< HTMLIFrameElement | null >( null );
 	const body = iframe?.contentDocument?.body;
 
 	return (
@@ -15,9 +16,14 @@ function IframePortal( { children } ) {
 	);
 }
 
-class Filler extends Component {
-	constructor() {
-		super( ...arguments );
+type FillerProps = {
+	name: string;
+	text?: string;
+};
+
+class Filler extends Component< FillerProps, { num: number } > {
+	constructor( props: FillerProps ) {
+		super( props );
 
 		this.state = {
 			num: 1,
@@ -121,7 +127,7 @@ describe( 'Slot', () => {
 				<div>
 					<Slot name="chicken">
 						{ ( fills ) =>
-							[ ...fills ].length ? (
+							( fills as ReactNode[] ).length ? (
 								<blockquote>{ fills }</blockquote>
 							) : null
 						}
@@ -290,7 +296,8 @@ describe( 'Slot', () => {
 
 	describe( 'cross-document styles', () => {
 		afterEach( () => {
-			delete globalThis.__wpStyleRuntime;
+			delete ( globalThis as { __wpStyleRuntime?: unknown } )
+				.__wpStyleRuntime;
 			document.head.innerHTML = '';
 		} );
 
@@ -315,13 +322,14 @@ describe( 'Slot', () => {
 				</Provider>
 			);
 			const iframeDocument =
-				screen.getByTitle( 'Slot document' ).contentDocument;
+				screen.getByTitle< HTMLIFrameElement >( 'Slot document' )
+					.contentDocument!;
 
 			const styledElement = within( iframeDocument.body ).getByText(
 				'Styled content'
 			);
 			expect(
-				iframeDocument.defaultView.getComputedStyle( styledElement )
+				iframeDocument.defaultView!.getComputedStyle( styledElement )
 					.padding
 			).toBe( '32px' );
 		} );

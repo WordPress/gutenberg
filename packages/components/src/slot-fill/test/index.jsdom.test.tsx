@@ -79,7 +79,7 @@ describe( 'createSlotFill', () => {
 
 	test( 'should forward ref to the slot when using bubblesVirtually', () => {
 		const TestSlotFill = createSlotFill( 'TestRefSlot' );
-		const ref = createRef();
+		const ref = createRef< HTMLElement >();
 
 		render(
 			<SlotFillProvider>
@@ -91,12 +91,12 @@ describe( 'createSlotFill', () => {
 		);
 
 		expect( ref.current ).not.toBeNull();
-		expect( ref.current.tagName ).toBe( 'DIV' );
+		expect( ref.current!.tagName ).toBe( 'DIV' );
 	} );
 
 	test( 'should forward ref without bubblesVirtually (ref stays null for fragment-based slot)', () => {
 		const TestSlotFill = createSlotFill( 'TestRefSlotBase' );
-		const ref = createRef();
+		const ref = createRef< HTMLElement >();
 
 		render(
 			<SlotFillProvider>
