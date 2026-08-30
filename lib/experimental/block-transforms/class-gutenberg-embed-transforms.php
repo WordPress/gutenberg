@@ -46,7 +46,13 @@ class Gutenberg_Embed_Transforms {
 	 * @return array[] Providers keyed by slug.
 	 */
 	private static function get_providers() {
-		return array(
+		static $providers = null;
+
+		if ( null !== $providers ) {
+			return $providers;
+		}
+
+		$providers = array(
 			'twitter'       => array(
 				'patterns'   => array(
 					'#^https?:\/\/(www\.)?twitter\.com\/.+#i',
@@ -337,6 +343,8 @@ class Gutenberg_Embed_Transforms {
 				'type'       => 'rich',
 			),
 		);
+
+		return $providers;
 	}
 
 	/**
@@ -346,7 +354,7 @@ class Gutenberg_Embed_Transforms {
 	 * @return array|null Parsed block array, or null when the element is not a standalone URL.
 	 */
 	public static function convert( $element ) {
-		if ( ! self::is_available() || 'p' !== $element->tag_name ) {
+		if ( 'p' !== $element->tag_name || ! self::is_available() ) {
 			return null;
 		}
 
@@ -356,7 +364,19 @@ class Gutenberg_Embed_Transforms {
 			return null;
 		}
 
-		return self::create_block( $url, $element->get_attribute( 'class' ) );
+		/*
+		 * Read the way `get_block_supports_attributes()` reads them for every
+		 * other block: `get_attribute()` answers `true` for a valueless
+		 * attribute, which is no class at all, not a class named "1".
+		 */
+		$class_names = $element->get_class_names();
+		$anchor      = $element->get_attribute( 'id' );
+
+		return self::create_block(
+			$url,
+			array() === $class_names ? null : implode( ' ', $class_names ),
+			is_string( $anchor ) && '' !== $anchor ? $anchor : null
+		);
 	}
 
 	/**
@@ -434,15 +454,21 @@ class Gutenberg_Embed_Transforms {
 	 * @return string Rewritten URL.
 	 */
 	private static function rewrite_x_to_twitter( $url ) {
-		// The authority the editor reads, which holds the port and any
-		// credentials, so only a bare `x.com` address is rewritten.
-		if ( ! preg_match( '/^[^\/\s:]+:(?:\/\/)?\/?([^\/\s#?]+)[\/#?]{0,1}\S*$/', $url, $matches ) || 'x.com' !== $matches[1] ) {
-			return $url;
-		}
-
 		$parts = wp_parse_url( $url );
 
-		if ( ! is_array( $parts ) ) {
+		/*
+		 * Only a bare `x.com` authority is rewritten: a port or credentials
+		 * mean the address is not the one the editor rewrites, and the
+		 * editor's comparison is exact, so the host's case is too.
+		 */
+		if (
+			! is_array( $parts )
+			|| ! isset( $parts['host'] )
+			|| 'x.com' !== $parts['host']
+			|| isset( $parts['port'] )
+			|| isset( $parts['user'] )
+			|| isset( $parts['pass'] )
+		) {
 			return $url;
 		}
 
@@ -487,9 +513,10 @@ class Gutenberg_Embed_Transforms {
 	 *
 	 * @param string      $url        URL to embed.
 	 * @param string|null $class_name Class the source element carried.
+	 * @param string|null $anchor     Id the source element carried.
 	 * @return array Parsed block array.
 	 */
-	private static function create_block( $url, $class_name ) {
+	private static function create_block( $url, $class_name, $anchor = null ) {
 		$provider = self::find_provider( $url );
 		$values   = array( 'url' => $url );
 
@@ -508,9 +535,16 @@ class Gutenberg_Embed_Transforms {
 			$attributes['className'] = $class_name;
 		}
 
+		// The block declares `anchor` support, so the source's `id` survives
+		// the same way it does for every other converted block.
+		if ( null !== $anchor ) {
+			$attributes['anchor'] = $anchor;
+		}
+
 		$markup = sprintf(
-			'<figure class="%s"><div class="wp-block-embed__wrapper">%s</div></figure>',
+			'<figure class="%s"%s><div class="wp-block-embed__wrapper">%s</div></figure>',
 			esc_attr( implode( ' ', self::prepare_class_names( $attributes ) ) ),
+			null === $anchor ? '' : ' id="' . esc_attr( $anchor ) . '"',
 			"\n" . self::escape_text( $url ) . "\n"
 		);
 

@@ -101,10 +101,20 @@ class Gutenberg_Shortcode_Transforms {
 				continue;
 			}
 
-			$pattern = self::regexp( $transform['tag'] );
+			/*
+			 * A transform may declare one tag or a list of aliases. The first
+			 * alias whose pattern matches is the one the shortcode is read
+			 * with, the same as `segmentHTMLToShortcodeBlock()` in
+			 * `@wordpress/blocks`.
+			 */
+			foreach ( (array) $transform['tag'] as $tag ) {
+				$pattern = self::regexp( $tag );
 
-			if ( null !== $pattern && preg_match( $pattern, $html ) ) {
-				return $transform;
+				if ( null !== $pattern && preg_match( $pattern, $html ) ) {
+					$transform['tag'] = $tag;
+
+					return $transform;
+				}
 			}
 		}
 
@@ -186,7 +196,15 @@ class Gutenberg_Shortcode_Transforms {
 	 */
 	private static function read_attribute( $definition, $shortcode ) {
 		if ( 'shortcodeText' === $definition['source'] ) {
-			return $shortcode['text'];
+			/*
+			 * The matched text as the editor stores it: classic content
+			 * arrives wrapped in the paragraphs `wpautop()` added, which the
+			 * block saves back verbatim. `createShortcodeAttributes()` in
+			 * `@wordpress/blocks` reads the same source as
+			 * `removep( autop( text ) )`, so the round trip here has to match
+			 * or the two runtimes store different post content.
+			 */
+			return self::remove_paragraphs( wpautop( $shortcode['text'] ) );
 		}
 
 		if ( 'shortcodeAttribute' !== $definition['source'] || ! isset( $definition['attribute'] ) ) {
@@ -202,6 +220,166 @@ class Gutenberg_Shortcode_Transforms {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Replaces `<p>` tags with two line breaks — the opposite of `wpautop()`.
+	 *
+	 * A line-for-line port of `removep()` in `@wordpress/autop`, so that a
+	 * `shortcodeText` attribute reads the same on the server as in the editor.
+	 *
+	 * @param string $html Markup to strip paragraph tags from.
+	 * @return string The content with stripped paragraph tags.
+	 */
+	private static function remove_paragraphs( $html ) {
+		$blocklist           = 'blockquote|ul|ol|li|dl|dt|dd|table|thead|tbody|tfoot|tr|th|td|h[1-6]|fieldset|figure';
+		$blocklist1          = $blocklist . '|div|p';
+		$blocklist2          = $blocklist . '|pre';
+		$preserve            = array();
+		$preserve_linebreaks = false;
+		$preserve_br         = false;
+
+		if ( ! is_string( $html ) || '' === $html ) {
+			return '';
+		}
+
+		// Protect script and style tags.
+		if ( false !== strpos( $html, '<script' ) || false !== strpos( $html, '<style' ) ) {
+			$html = preg_replace_callback(
+				'/<(script|style)[^>]*>[\s\S]*?<\/\1>/',
+				static function ( $matches ) use ( &$preserve ) {
+					$preserve[] = $matches[0];
+
+					return '<wp-preserve>';
+				},
+				$html
+			);
+		}
+
+		// Protect pre tags.
+		if ( false !== strpos( $html, '<pre' ) ) {
+			$preserve_linebreaks = true;
+
+			$html = preg_replace_callback(
+				'/<pre[^>]*>[\s\S]+?<\/pre>/',
+				static function ( $matches ) {
+					$tag = preg_replace( '/<br ?\/?>(\r\n|\n)?/', '<wp-line-break>', $matches[0] );
+					$tag = preg_replace( '/<\/?p( [^>]*)?>(\r\n|\n)?/', '<wp-line-break>', $tag );
+
+					return preg_replace( '/\r?\n/', '<wp-line-break>', $tag );
+				},
+				$html
+			);
+		}
+
+		// Remove line breaks but keep <br> tags inside image captions.
+		if ( false !== strpos( $html, '[caption' ) ) {
+			$preserve_br = true;
+
+			$html = preg_replace_callback(
+				'/\[caption[\s\S]+?\[\/caption\]/',
+				static function ( $matches ) {
+					$tag = preg_replace( '/<br([^>]*)>/', '<wp-temp-br$1>', $matches[0] );
+
+					return preg_replace( '/[\r\n\t]+/', '', $tag, 1 );
+				},
+				$html
+			);
+		}
+
+		// Normalize white space characters before and after block tags.
+		$html = preg_replace( '/\s*<\/(' . $blocklist1 . ')>\s*/', '</$1>' . "\n", $html );
+		$html = preg_replace( '/\s*<((?:' . $blocklist1 . ')(?: [^>]*)?)>/', "\n" . '<$1>', $html );
+
+		// Mark </p> if it has any attributes.
+		$html = preg_replace( '/(<p [^>]+>[\s\S]*?)<\/p>/', '$1</p#>', $html );
+
+		// Preserve the first <p> inside a <div>.
+		$html = preg_replace( '/<div( [^>]*)?>\s*<p>/i', '<div$1>' . "\n\n", $html );
+
+		// Remove paragraph tags.
+		$html = preg_replace( '/\s*<p>/i', '', $html );
+		$html = preg_replace( '/\s*<\/p>\s*/i', "\n\n", $html );
+
+		// Normalize white space chars and remove multiple line breaks.
+		$html = preg_replace( '/\n[\s\x{00A0}]+\n/u', "\n\n", $html );
+
+		// Replace <br> tags with line breaks.
+		$html = preg_replace_callback(
+			'/(\s*)<br ?\/?>\s*/i',
+			static function ( $matches ) {
+				return '' !== $matches[1] && false !== strpos( $matches[1], "\n" ) ? "\n\n" : "\n";
+			},
+			$html
+		);
+
+		// Fix line breaks around <div>.
+		$html = preg_replace( '/\s*<div/', "\n" . '<div', $html );
+		$html = preg_replace( '/<\/div>\s*/', '</div>' . "\n", $html );
+
+		// Fix line breaks around caption shortcodes.
+		$html = preg_replace( '/\s*\[caption([^\[]+)\[\/caption\]\s*/i', "\n\n" . '[caption$1[/caption]' . "\n\n", $html );
+		$html = preg_replace( '/caption\]\n\n+\[caption/', 'caption]' . "\n\n" . '[caption', $html );
+
+		// Pad block elements tags with a line break.
+		$html = preg_replace( '/\s*<((?:' . $blocklist2 . ')(?: [^>]*)?)\s*>/', "\n" . '<$1>', $html );
+		$html = preg_replace( '/\s*<\/(' . $blocklist2 . ')>\s*/', '</$1>' . "\n", $html );
+
+		// Indent <li>, <dt> and <dd> tags.
+		$html = preg_replace( '/<((li|dt|dd)[^>]*)>/', ' ' . "\t" . '<$1>', $html );
+
+		// Fix line breaks around <select> and <option>.
+		if ( false !== strpos( $html, '<option' ) ) {
+			$html = preg_replace( '/\s*<option/', "\n" . '<option', $html );
+			$html = preg_replace( '/\s*<\/select>/', "\n" . '</select>', $html );
+		}
+
+		// Pad <hr> with two line breaks.
+		if ( false !== strpos( $html, '<hr' ) ) {
+			$html = preg_replace( '/\s*<hr( [^>]*)?>\s*/', "\n\n" . '<hr$1>' . "\n\n", $html );
+		}
+
+		// Remove line breaks in <object> tags.
+		if ( false !== strpos( $html, '<object' ) ) {
+			$html = preg_replace_callback(
+				'/<object[\s\S]+?<\/object>/',
+				static function ( $matches ) {
+					return preg_replace( '/[\r\n]+/', '', $matches[0] );
+				},
+				$html
+			);
+		}
+
+		// Unmark special paragraph closing tags.
+		$html = str_replace( '</p#>', '</p>' . "\n", $html );
+
+		// Pad remaining <p> tags with a line break.
+		$html = preg_replace( '/\s*(<p [^>]+>[\s\S]*?<\/p>)/', "\n" . '$1', $html );
+
+		// Trim.
+		$html = preg_replace( '/^\s+/', '', $html );
+		$html = preg_replace( '/[\s\x{00A0}]+$/u', '', $html );
+
+		if ( $preserve_linebreaks ) {
+			$html = str_replace( '<wp-line-break>', "\n", $html );
+		}
+
+		if ( $preserve_br ) {
+			$html = preg_replace( '/<wp-temp-br([^>]*)>/', '<br$1>', $html );
+		}
+
+		// Restore preserved tags.
+		if ( array() !== $preserve ) {
+			$html = preg_replace_callback(
+				'/<wp-preserve>/',
+				static function () use ( &$preserve ) {
+					return array_shift( $preserve );
+				},
+				$html
+			);
+		}
+
+		return $html;
 	}
 
 	/**
@@ -242,11 +420,15 @@ class Gutenberg_Shortcode_Transforms {
 	private static function regexp( $tag ) {
 		static $checked = array();
 
-		if ( ! isset( $checked[ $tag ] ) ) {
-			$checked[ $tag ] = self::is_usable_tag( $tag );
+		// A non-string cannot index the cache, so it shares a per-type slot —
+		// checked once, reported once — rather than throwing a TypeError.
+		$key = is_string( $tag ) ? $tag : "\0" . gettype( $tag );
+
+		if ( ! isset( $checked[ $key ] ) ) {
+			$checked[ $key ] = self::is_usable_tag( $tag );
 		}
 
-		if ( ! $checked[ $tag ] ) {
+		if ( ! $checked[ $key ] ) {
 			return null;
 		}
 
@@ -257,13 +439,18 @@ class Gutenberg_Shortcode_Transforms {
 	 * Writes a tag into the shortcode pattern.
 	 *
 	 * The same pattern `regexp()` in `@wordpress/shortcode` builds, so the two
-	 * runtimes match the same text and number their groups the same way.
+	 * runtimes match the same text and number their groups the same way. The
+	 * content atoms are possessive (`*+`), as in core's `get_shortcode_regex()`,
+	 * which JavaScript cannot express: a run of non-brackets is always followed
+	 * by a bracket or the end, so giving characters back can never produce a
+	 * match and the possessive form matches the same text without the
+	 * pathological backtracking.
 	 *
 	 * @param string $tag Shortcode tag, or a pattern matching several.
 	 * @return string Regular expression, which may or may not compile.
 	 */
 	private static function compose_regexp( $tag ) {
-		return '#\[(\[?)(' . $tag . ')(?![\w-])([^\]\/]*(?:\/(?!\])[^\]\/]*)*?)(?:(\/)\]|\](?:([^\[]*(?:\[(?!\/\2\])[^\[]*)*)(\[\/\2\]))?)(\]?)#s';
+		return '#\[(\[?)(' . $tag . ')(?![\w-])([^\]\/]*(?:\/(?!\])[^\]\/]*)*?)(?:(\/)\]|\](?:([^\[]*+(?:\[(?!\/\2\])[^\[]*+)*+)(\[\/\2\]))?)(\]?)#s';
 	}
 
 	/**
@@ -281,7 +468,9 @@ class Gutenberg_Shortcode_Transforms {
 	private static function is_usable_tag( $tag ) {
 		$reason = '';
 
-		if ( ! is_string( $tag ) || '' === $tag ) {
+		if ( ! is_string( $tag ) ) {
+			$reason = __( 'it is not a string', 'gutenberg' );
+		} elseif ( '' === $tag ) {
 			$reason = __( 'it is empty', 'gutenberg' );
 		} elseif ( false !== strpos( $tag, '#' ) ) {
 			$reason = __( 'it contains a "#"', 'gutenberg' );
@@ -304,7 +493,7 @@ class Gutenberg_Shortcode_Transforms {
 				is_string( $tag ) ? $tag : gettype( $tag ),
 				$reason
 			),
-			'23.8.0'
+			'23.9.0'
 		);
 
 		return false;

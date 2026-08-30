@@ -85,6 +85,25 @@ class Gutenberg_HTML_To_Blocks {
 	const FALLBACK_BLOCK = 'core/html';
 
 	/**
+	 * The `children` token naming the phrasing content schema in `block.json`.
+	 *
+	 * @var string
+	 */
+	const PHRASING_TOKEN = 'phrasing';
+
+	/**
+	 * Internal `children` marker for the nested phrasing schema.
+	 *
+	 * A text-level wrapper allows every text-level element except itself, so
+	 * the schema cannot be written out once: it is resolved per element. The
+	 * marker starts with a NUL byte so no `block.json` string can collide
+	 * with it.
+	 *
+	 * @var string
+	 */
+	const NESTED_PHRASING = "\0nested-phrasing";
+
+	/**
 	 * Converts HTML into a list of blocks.
 	 *
 	 * @param string $html HTML to convert.
@@ -289,7 +308,10 @@ class Gutenberg_HTML_To_Blocks {
 		}
 
 		if ( ! isset( $supports['customClassName'] ) || false !== $supports['customClassName'] ) {
-			$class_names = $element->get_class_names();
+			// The generated class is the support's to re-add, not a custom
+			// class, so markup that already carries it does not keep it here.
+			$generated   = wp_get_block_default_classname( $block_type->name );
+			$class_names = array_values( array_diff( $element->get_class_names(), array( $generated ) ) );
 
 			if ( array() !== $class_names ) {
 				$attributes['className'] = implode( ' ', $class_names );
@@ -343,8 +365,25 @@ class Gutenberg_HTML_To_Blocks {
 	 * @return void
 	 */
 	private static function set_attribute_path( &$attributes, $path, $value ) {
-		$steps = explode( '.', $path );
-		$last  = array_pop( $steps );
+		$steps = explode( '.', (string) $path );
+
+		// An empty step would write into an attribute named "", which no
+		// block declares and the editor cannot read back.
+		if ( in_array( '', $steps, true ) ) {
+			_doing_it_wrong(
+				__METHOD__,
+				sprintf(
+					/* translators: %s: Attribute path declared by a transform, for example "style.typography.textAlign". */
+					__( 'The attribute path "%s" has an empty step, so no attribute can be written.', 'gutenberg' ),
+					(string) $path
+				),
+				'23.9.0'
+			);
+
+			return;
+		}
+
+		$last = array_pop( $steps );
 
 		$target = &$attributes;
 
@@ -545,6 +584,7 @@ class Gutenberg_HTML_To_Blocks {
 		 */
 		$classes = array_merge(
 			self::get_block_supports_classes( $block_type, $attributes ),
+			self::get_declared_wrapper_classes( $transform ),
 			$keep_classes ? $element->get_class_names() : array()
 		);
 		$classes = array_values( array_unique( $classes ) );
@@ -583,6 +623,31 @@ class Gutenberg_HTML_To_Blocks {
 			'opening' => $opening,
 			'closing' => $closing,
 		);
+	}
+
+	/**
+	 * Returns the constant classes a transform declares for its wrapper.
+	 *
+	 * A block whose `save()` writes a class the server cannot derive — one
+	 * standing for a default attribute value, such as the Separator's
+	 * `has-alpha-channel-opacity` — declares it under
+	 * `serverConversion.classes`, so converted markup matches what `save()`
+	 * produces rather than an older deprecation.
+	 *
+	 * @param array $transform Transform that matched the element.
+	 * @return string[] Class names.
+	 */
+	private static function get_declared_wrapper_classes( $transform ) {
+		if (
+			! isset( $transform['serverConversion'] )
+			|| ! is_array( $transform['serverConversion'] )
+			|| ! isset( $transform['serverConversion']['classes'] )
+			|| ! is_array( $transform['serverConversion']['classes'] )
+		) {
+			return array();
+		}
+
+		return array_values( array_filter( $transform['serverConversion']['classes'], 'is_string' ) );
 	}
 
 	/**
@@ -652,12 +717,9 @@ class Gutenberg_HTML_To_Blocks {
 			return;
 		}
 
-		$children = $entry['children'];
+		$children = self::resolve_children_schema( $element->tag_name, $entry['children'] );
 
-		/*
-		 * `*` allows anything, and inline content is carried verbatim by the
-		 * rich text and HTML attribute sources, so neither needs filtering.
-		 */
+		// `*` allows anything, so there is nothing to filter.
 		if ( ! is_array( $children ) ) {
 			return;
 		}
@@ -665,6 +727,152 @@ class Gutenberg_HTML_To_Blocks {
 		foreach ( $element->children as $child ) {
 			self::filter_node( $child, $children );
 		}
+	}
+
+	/**
+	 * Resolves a `children` schema value into the tags it stands for.
+	 *
+	 * `"phrasing"` is the one token `block.json` can write, naming the same
+	 * schema `getPhrasingContentSchema()` builds for the editor; anything the
+	 * schema forbids — a `span`, a `script`, an event handler attribute — has
+	 * to be filtered here exactly as the editor filters it, or markup the
+	 * editor would clean survives into stored post content.
+	 *
+	 * @param string $tag      Tag of the element whose children are described.
+	 * @param mixed  $children Declared `children` value.
+	 * @return mixed The resolved schema array, or the value as declared.
+	 */
+	private static function resolve_children_schema( $tag, $children ) {
+		if ( self::PHRASING_TOKEN === $children ) {
+			return self::get_phrasing_content_schema();
+		}
+
+		if ( self::NESTED_PHRASING === $children ) {
+			return self::get_nested_phrasing_schema( $tag );
+		}
+
+		return $children;
+	}
+
+	/**
+	 * Returns the phrasing content schema.
+	 *
+	 * A port of `getPhrasingContentSchema()` in `@wordpress/dom` — the
+	 * text-level semantic elements plus embedded content, each restricted to
+	 * the attributes the editor keeps. `span` is deliberately absent so that
+	 * filtering unwraps it.
+	 *
+	 * @return array[] Schema, keyed by tag name.
+	 */
+	private static function get_phrasing_content_schema() {
+		static $schema = null;
+
+		if ( null !== $schema ) {
+			return $schema;
+		}
+
+		$schema = array_merge(
+			self::get_text_level_schema( null ),
+			array(
+				'audio'  => array( 'attributes' => array( 'src', 'preload', 'autoplay', 'mediagroup', 'loop', 'muted' ) ),
+				'canvas' => array( 'attributes' => array( 'width', 'height' ) ),
+				'embed'  => array( 'attributes' => array( 'src', 'type', 'width', 'height' ) ),
+				'img'    => self::get_image_schema(),
+				'object' => array( 'attributes' => array( 'data', 'type', 'name', 'usemap', 'form', 'width', 'height' ) ),
+				'video'  => array( 'attributes' => array( 'src', 'poster', 'preload', 'playsinline', 'autoplay', 'mediagroup', 'loop', 'muted', 'controls', 'width', 'height' ) ),
+				'math'   => array(
+					'attributes' => array( 'display', 'xmlns' ),
+					'children'   => '*',
+				),
+			)
+		);
+
+		return $schema;
+	}
+
+	/**
+	 * Returns what a text-level wrapper may hold: every text-level element
+	 * except itself, plus an image.
+	 *
+	 * The editor expresses this as a cyclic object graph; PHP arrays cannot
+	 * cycle, so each wrapper's children carry the `NESTED_PHRASING` marker and
+	 * are resolved one level at a time.
+	 *
+	 * @param string $except Tag to leave out, so a wrapper cannot nest in itself.
+	 * @return array[] Schema, keyed by tag name.
+	 */
+	private static function get_nested_phrasing_schema( $except ) {
+		static $memo = array();
+
+		if ( isset( $memo[ $except ] ) ) {
+			return $memo[ $except ];
+		}
+
+		$schema = self::get_text_level_schema( $except );
+
+		$schema['img'] = self::get_image_schema();
+
+		$memo[ $except ] = $schema;
+
+		return $schema;
+	}
+
+	/**
+	 * Returns the text-level semantic elements and their kept attributes.
+	 *
+	 * @param string|null $except Tag to leave out, or null for all of them.
+	 * @return array[] Schema, keyed by tag name.
+	 */
+	private static function get_text_level_schema( $except ) {
+		$nested = array( 'children' => self::NESTED_PHRASING );
+
+		$schema = array(
+			'strong' => $nested,
+			'em'     => $nested,
+			's'      => $nested,
+			'del'    => $nested,
+			'ins'    => $nested,
+			'a'      => $nested + array( 'attributes' => array( 'href', 'target', 'rel', 'id' ) ),
+			'code'   => $nested,
+			'abbr'   => $nested + array( 'attributes' => array( 'title' ) ),
+			'sub'    => $nested,
+			'sup'    => $nested,
+			'br'     => array(),
+			'small'  => $nested,
+			'q'      => $nested + array( 'attributes' => array( 'cite' ) ),
+			'dfn'    => $nested + array( 'attributes' => array( 'title' ) ),
+			'data'   => $nested + array( 'attributes' => array( 'value' ) ),
+			'time'   => $nested + array( 'attributes' => array( 'datetime' ) ),
+			'var'    => $nested,
+			'samp'   => $nested,
+			'kbd'    => $nested,
+			'i'      => $nested,
+			'b'      => $nested,
+			'u'      => $nested,
+			'mark'   => $nested,
+			'ruby'   => $nested,
+			'rt'     => $nested,
+			'rp'     => $nested,
+			'bdi'    => $nested + array( 'attributes' => array( 'dir' ) ),
+			'bdo'    => $nested + array( 'attributes' => array( 'dir' ) ),
+			'wbr'    => array(),
+			'#text'  => array(),
+		);
+
+		if ( null !== $except ) {
+			unset( $schema[ $except ] );
+		}
+
+		return $schema;
+	}
+
+	/**
+	 * Returns the schema entry for an image inside phrasing content.
+	 *
+	 * @return array Schema entry.
+	 */
+	private static function get_image_schema() {
+		return array( 'attributes' => array( 'alt', 'src', 'srcset', 'usemap', 'ismap', 'width', 'height' ) );
 	}
 
 	/**
@@ -676,7 +884,7 @@ class Gutenberg_HTML_To_Blocks {
 	 */
 	private static function filter_node( $node, $schema ) {
 		if ( Gutenberg_HTML_Element::TEXT === $node->type ) {
-			if ( ! isset( $schema['#text'] ) && '' !== trim( $node->text ) ) {
+			if ( ! isset( $schema['#text'] ) && ! self::is_blank_text( $node->text ) ) {
 				$node->remove();
 			}
 
@@ -885,20 +1093,48 @@ class Gutenberg_HTML_To_Blocks {
 			return true;
 		}
 
-		$allowed = self::get_schema_attributes( $schema[ $element->tag_name ] );
+		$entry   = $schema[ $element->tag_name ];
+		$allowed = self::get_schema_attributes( $entry );
 
 		// A schema keeping every attribute has nothing to say about them.
 		if ( null === $allowed ) {
 			return true;
 		}
 
+		$allowed_classes = isset( $entry['classes'] ) && is_array( $entry['classes'] )
+			? array_values( array_filter( $entry['classes'], 'is_string' ) )
+			: null;
+
+		// `*` keeps every class, the same as not listing them at all.
+		if ( null !== $allowed_classes && in_array( '*', $allowed_classes, true ) ) {
+			$allowed_classes = null;
+		}
+
 		foreach ( array_keys( $element->attributes ) as $name ) {
 			/*
-			 * `class` and `id` are written by the `customClassName` and
-			 * `anchor` supports rather than by the block, so a schema does not
-			 * have to name them.
+			 * `id` is written back by the `anchor` support rather than by the
+			 * block, so a schema does not have to name it. `class` works the
+			 * same way through `customClassName` — unless the schema lists the
+			 * classes the block reads meaning into, in which case a class
+			 * outside that list is content the conversion would demote to a
+			 * custom class, such as an alignment the editor's transform turns
+			 * into an attribute.
 			 */
-			if ( 'class' === $name || 'id' === $name ) {
+			if ( 'id' === $name ) {
+				continue;
+			}
+
+			if ( 'class' === $name ) {
+				if ( null === $allowed_classes ) {
+					continue;
+				}
+
+				foreach ( $element->get_class_names() as $class_name ) {
+					if ( ! in_array( $class_name, $allowed_classes, true ) ) {
+						return false;
+					}
+				}
+
 				continue;
 			}
 
@@ -916,22 +1152,23 @@ class Gutenberg_HTML_To_Blocks {
 	 * A transform reaches `WP_Block_Type::$transforms` from a `block.json`
 	 * file as often as from PHP, and JSON has no functions: a string there is
 	 * a mistake, not a callback, and PHP would resolve it to whatever global
-	 * function happens to bear that name. Only a callback that could not have
-	 * come out of JSON is called.
+	 * function happens to bear that name. JSON spells a static method just as
+	 * easily — `["Some_Class", "some_method"]` — so a two-string array is
+	 * refused the same way. Only a callback JSON cannot express — a closure,
+	 * or a bound object method — is called.
 	 *
 	 * @param mixed $callback Value declared for `isMatch` or `transform`.
 	 * @return bool Whether it may be called.
 	 */
 	private static function is_transform_callback( $callback ) {
-		if ( is_string( $callback ) ) {
+		$named = is_string( $callback )
+			|| ( is_array( $callback ) && isset( $callback[0] ) && ! is_object( $callback[0] ) );
+
+		if ( $named ) {
 			_doing_it_wrong(
 				__METHOD__,
-				sprintf(
-					/* translators: %s: Name written where a callback belongs. */
-					__( 'A block transform cannot name its callback as text ("%s"). Declare what the transform does in `block.json`, or register the block from PHP with a callback.', 'gutenberg' ),
-					$callback
-				),
-				'23.8.0'
+				__( 'A block transform cannot reference its callback by name, because a name can be written into `block.json` and data must not choose what runs. Register the block from PHP with a closure to attach one.', 'gutenberg' ),
+				'23.9.0'
 			);
 
 			return false;
@@ -962,44 +1199,88 @@ class Gutenberg_HTML_To_Blocks {
 	 * @return void
 	 */
 	private static function convert_special_comments( $root ) {
-		$source   = $root->children;
+		$hoisted        = array();
+		$root->children = self::convert_comments_below( $root, true, $hoisted );
+
+		foreach ( $root->children as $child ) {
+			$child->parent = $root;
+		}
+	}
+
+	/**
+	 * Converts the special comments below one element.
+	 *
+	 * A marker whose parent is a paragraph splits that paragraph where it
+	 * stands. A marker anywhere else is hoisted to the top level — only
+	 * top-level elements become blocks, so a marker left inside another
+	 * element would be swallowed into whichever block claims its container —
+	 * and lands right after the top-level element it was found in.
+	 *
+	 * @param Gutenberg_HTML_Element   $element Element whose children to convert.
+	 * @param bool                     $at_root Whether the element is the fragment root.
+	 * @param Gutenberg_HTML_Element[] $hoisted Collects the markers that belong further up, added to.
+	 * @return Gutenberg_HTML_Element[] New children for the element.
+	 */
+	private static function convert_comments_below( $element, $at_root, &$hoisted ) {
+		$source   = $element->children;
 		$children = array();
 		$consumed = array();
+
+		// A marker stays at this level when it can become a block here (the
+		// root) or when it is about to split its paragraph.
+		$keep_markers = $at_root || 'p' === $element->tag_name;
 
 		foreach ( $source as $index => $child ) {
 			if ( isset( $consumed[ $index ] ) ) {
 				continue;
 			}
 
-			if ( Gutenberg_HTML_Element::ELEMENT === $child->type ) {
-				self::convert_special_comments( $child );
+			if ( Gutenberg_HTML_Element::COMMENT === $child->type ) {
+				$marker = self::special_comment_element( $child, $source, $index, $consumed );
 
-				if ( 'p' === $child->tag_name ) {
-					foreach ( self::split_on_special_comments( $child ) as $piece ) {
-						$children[] = $piece;
-					}
-					continue;
+				if ( null === $marker ) {
+					$children[] = $child;
+				} elseif ( $keep_markers ) {
+					$children[] = $marker;
+				} else {
+					$hoisted[] = $marker;
 				}
 
+				continue;
+			}
+
+			if ( Gutenberg_HTML_Element::ELEMENT !== $child->type ) {
 				$children[] = $child;
 				continue;
 			}
 
-			if ( Gutenberg_HTML_Element::COMMENT !== $child->type ) {
-				$children[] = $child;
-				continue;
+			$bubbled         = array();
+			$child->children = self::convert_comments_below( $child, false, $bubbled );
+
+			foreach ( $child->children as $grandchild ) {
+				$grandchild->parent = $child;
 			}
 
-			$element = self::special_comment_element( $child, $source, $index, $consumed );
+			if ( 'p' === $child->tag_name ) {
+				foreach ( self::split_on_special_comments( $child ) as $piece ) {
+					$children[] = $piece;
+				}
+			} else {
+				$children[] = $child;
+			}
 
-			$children[] = null === $element ? $child : $element;
+			if ( $at_root ) {
+				foreach ( $bubbled as $marker ) {
+					$children[] = $marker;
+				}
+			} else {
+				foreach ( $bubbled as $marker ) {
+					$hoisted[] = $marker;
+				}
+			}
 		}
 
-		foreach ( $children as $child ) {
-			$child->parent = $root;
-		}
-
-		$root->children = $children;
+		return $children;
 	}
 
 	/**
@@ -1012,12 +1293,18 @@ class Gutenberg_HTML_To_Blocks {
 	 * @return Gutenberg_HTML_Element|null Element to stand in for the comment, or null when it is not a special comment.
 	 */
 	private static function special_comment_element( $comment, $siblings, $index, &$consumed ) {
-		$text = trim( $comment->text );
+		/*
+		 * The text is compared as written, not trimmed: the editor's
+		 * `specialCommentConverter` reads `nodeValue` verbatim, so
+		 * `<!-- more -->` is a plain comment on both sides and
+		 * `<!--morefoo-->` is a More block with custom text on both sides.
+		 */
+		$text = $comment->text;
 
 		if ( 'nextpage' === $text ) {
 			$attributes = array( 'data-block' => 'core/nextpage' );
 			$markup     = '<!--nextpage-->';
-		} elseif ( 'more' === $text || 0 === strpos( $text, 'more ' ) ) {
+		} elseif ( 0 === strpos( $text, 'more' ) ) {
 			$attributes = array( 'data-block' => 'core/more' );
 			$custom     = trim( substr( $text, 4 ) );
 			$markup     = '' === $custom ? '<!--more-->' : '<!--more ' . $custom . '-->';
@@ -1037,7 +1324,7 @@ class Gutenberg_HTML_To_Blocks {
 
 				if (
 					Gutenberg_HTML_Element::COMMENT === $sibling->type
-					&& 'noteaser' === trim( $sibling->text )
+					&& 'noteaser' === $sibling->text
 				) {
 					$attributes['data-no-teaser'] = '';
 					$consumed[ $at ]              = true;
@@ -1080,7 +1367,7 @@ class Gutenberg_HTML_To_Blocks {
 				&& null !== $child->get_attribute( 'data-block' )
 			) {
 				if ( array() !== $run ) {
-					$pieces[] = self::paragraph_from( $paragraph, $run );
+					$pieces[] = self::paragraph_from( $run );
 					$run      = array();
 				}
 
@@ -1096,7 +1383,7 @@ class Gutenberg_HTML_To_Blocks {
 		}
 
 		if ( array() !== $run ) {
-			$pieces[] = self::paragraph_from( $paragraph, $run );
+			$pieces[] = self::paragraph_from( $run );
 		}
 
 		return $pieces;
@@ -1105,13 +1392,16 @@ class Gutenberg_HTML_To_Blocks {
 	/**
 	 * Builds one side of a split paragraph.
 	 *
-	 * @param Gutenberg_HTML_Element   $paragraph Paragraph being split, whose markup the piece keeps.
-	 * @param Gutenberg_HTML_Element[] $children  Nodes the piece holds.
+	 * The piece is a bare `<p>`, as the editor builds it with
+	 * `createElement( 'p' )`: carrying the source paragraph's own opening tag
+	 * would write its `id` onto every piece, leaving a duplicate DOM id in
+	 * the post.
+	 *
+	 * @param Gutenberg_HTML_Element[] $children Nodes the piece holds.
 	 * @return Gutenberg_HTML_Element Paragraph holding those nodes.
 	 */
-	private static function paragraph_from( $paragraph, $children ) {
+	private static function paragraph_from( $children ) {
 		$piece = Gutenberg_HTML_Element::create_element( 'p' );
-		$piece->set_opening_tag( $paragraph->get_opening_tag() );
 
 		foreach ( $children as $child ) {
 			$piece->append_child( $child );
@@ -1124,143 +1414,173 @@ class Gutenberg_HTML_To_Blocks {
 	 * Wraps media in a figure so media blocks can match it, taking it out of a
 	 * paragraph or division first where the editor would.
 	 *
-	 * The counterpart of `figureContentReducer` in `@wordpress/blocks`.
+	 * The counterpart of `figureContentReducer` in `@wordpress/blocks`, which
+	 * the editor runs over every node: media anywhere in the tree is
+	 * considered, its nearest `p` or `div` ancestor decides whether it comes
+	 * out, and an image alone inside an anchor travels with the anchor. Unlike
+	 * the editor, the media is only wrapped when a registered transform claims
+	 * the resulting figure, so markup no block converts keeps its shape.
 	 *
-	 * @param Gutenberg_HTML_Element $root Element whose children to rewrite.
+	 * @param Gutenberg_HTML_Element $root Fragment root.
 	 * @return void
 	 */
 	private static function wrap_figure_content( $root ) {
-		$children = array();
+		foreach ( self::collect_figure_content( $root ) as $node ) {
+			$target = $node;
+			$parent = $node->parent;
 
-		foreach ( $root->children as $child ) {
-			if ( Gutenberg_HTML_Element::ELEMENT !== $child->type || 'figure' === $child->tag_name ) {
-				$children[] = $child;
-				continue;
+			/*
+			 * The Image block saves `figure > a > img`, so an image that is
+			 * the whole of an anchor takes the anchor with it — the editor's
+			 * `canHaveAnchor()` case, which counts every child node the way
+			 * `childNodes` does.
+			 */
+			if (
+				'img' === $node->tag_name
+				&& $parent instanceof Gutenberg_HTML_Element
+				&& Gutenberg_HTML_Element::ELEMENT === $parent->type
+				&& 'a' === $parent->tag_name
+				&& 1 === count( $parent->children )
+			) {
+				$target = $parent;
 			}
 
-			if ( self::is_figure_content( $child ) ) {
-				$children[] = self::claims_as_figure( $child, $root )
-					? self::wrap_in_figure( $child, $root )
-					: $child;
-				continue;
-			}
+			$wrapper = self::closest_paragraph_or_division( $target, $root );
 
-			if ( in_array( $child->tag_name, array( 'p', 'div' ), true ) ) {
-				foreach ( self::take_figure_content( $child ) as $node ) {
-					$children[] = self::wrap_in_figure( $node, $root );
+			if ( null !== $wrapper ) {
+				$aligned = array_intersect(
+					$node->get_class_names(),
+					array( 'alignleft', 'aligncenter', 'alignright' )
+				);
+
+				// Media reading as part of a sentence stays in the sentence:
+				// it only comes out when it is aligned, or when the wrapper
+				// holds no text of its own.
+				if ( array() === $aligned && ! self::is_blank_text( $wrapper->get_text_content() ) ) {
+					continue;
 				}
-
-				$children[] = $child;
-				continue;
 			}
 
-			self::wrap_figure_content( $child );
-
-			$children[] = $child;
+			self::promote_to_figure( $target, $wrapper );
 		}
-
-		$root->children = $children;
 	}
 
 	/**
-	 * Removes the media a paragraph or division only carries, so it can become
-	 * a block of its own.
+	 * Collects the media elements below a node, in document order.
 	 *
-	 * Media stays where it is when it reads as part of a sentence: the editor
-	 * takes it out only when it is aligned, or when the wrapper holds no text.
+	 * Media already inside a `figure` stays with it, so those subtrees are not
+	 * searched, and media is not searched for more media inside itself.
 	 *
-	 * @param Gutenberg_HTML_Element $wrapper Element to take media out of.
-	 * @return Gutenberg_HTML_Element[] The media taken out, in document order.
+	 * @param Gutenberg_HTML_Element $node Node to search below.
+	 * @return Gutenberg_HTML_Element[] Media elements.
 	 */
-	private static function take_figure_content( $wrapper ) {
-		$has_text = '' !== trim( $wrapper->get_text_content() );
-		$taken    = array();
+	private static function collect_figure_content( $node ) {
+		$media = array();
 
-		foreach ( $wrapper->child_elements() as $child ) {
-			if ( ! self::is_figure_content( $child ) ) {
+		foreach ( $node->children as $child ) {
+			if ( Gutenberg_HTML_Element::ELEMENT !== $child->type || 'figure' === $child->tag_name ) {
 				continue;
 			}
 
-			$media   = 'a' === $child->tag_name ? $child->child_elements()[0] : $child;
-			$aligned = array_intersect(
-				$media->get_class_names(),
-				array( 'alignleft', 'aligncenter', 'alignright' )
-			);
-
-			if ( ! $aligned && $has_text ) {
+			if ( in_array( $child->tag_name, self::FIGURE_CONTENT, true ) ) {
+				$media[] = $child;
 				continue;
 			}
 
-			if ( self::claims_as_figure( $child, $wrapper ) ) {
-				$taken[] = $child;
+			$media = array_merge( $media, self::collect_figure_content( $child ) );
+		}
+
+		return $media;
+	}
+
+	/**
+	 * Returns the nearest `p` or `div` ancestor, or null.
+	 *
+	 * The counterpart of the editor's `closest( 'p,div' )` call.
+	 *
+	 * @param Gutenberg_HTML_Element $node Node whose ancestors to walk.
+	 * @param Gutenberg_HTML_Element $root Fragment root, which is not an element of the document.
+	 * @return Gutenberg_HTML_Element|null Wrapping paragraph or division, or null.
+	 */
+	private static function closest_paragraph_or_division( $node, $root ) {
+		for ( $ancestor = $node->parent; null !== $ancestor && $root !== $ancestor; $ancestor = $ancestor->parent ) {
+			if (
+				Gutenberg_HTML_Element::ELEMENT === $ancestor->type
+				&& in_array( $ancestor->tag_name, array( 'p', 'div' ), true )
+			) {
+				return $ancestor;
 			}
 		}
 
-		foreach ( $taken as $node ) {
-			$node->remove();
+		return null;
+	}
+
+	/**
+	 * Wraps media in a figure and moves it before its wrapper, when a
+	 * registered transform claims the result.
+	 *
+	 * The figure is built and matched once: kept when a transform claims it,
+	 * unwound without having touched the tree when none does.
+	 *
+	 * @param Gutenberg_HTML_Element      $target  Media, or the anchor holding it.
+	 * @param Gutenberg_HTML_Element|null $wrapper Paragraph or division to move it out of, or null to wrap the media where it stands.
+	 * @return void
+	 */
+	private static function promote_to_figure( $target, $wrapper ) {
+		$source      = $target->parent;
+		$destination = null === $wrapper ? $source : $wrapper->parent;
+
+		if ( null === $source || null === $destination ) {
+			return;
 		}
 
-		return $taken;
-	}
-
-	/**
-	 * Determines whether any transform would convert media once it is wrapped
-	 * in a figure.
-	 *
-	 * Wrapping media no block converts would leave markup the source never had,
-	 * so the answer decides whether to wrap it at all. The element is left
-	 * exactly as it was found either way.
-	 *
-	 * @param Gutenberg_HTML_Element $node     Media to test.
-	 * @param Gutenberg_HTML_Element $ancestor Element the figure would belong to.
-	 * @return bool Whether a transform claims the wrapped media.
-	 */
-	private static function claims_as_figure( $node, $ancestor ) {
-		$was    = $node->parent;
-		$figure = self::wrap_in_figure( $node, $ancestor );
-		$claims = null !== self::find_transform( $figure );
-
-		$node->parent = $was;
-
-		return $claims;
-	}
-
-	/**
-	 * Wraps an element in a figure.
-	 *
-	 * @param Gutenberg_HTML_Element $node      Element to wrap.
-	 * @param Gutenberg_HTML_Element $ancestor  Element the figure belongs to.
-	 * @return Gutenberg_HTML_Element The figure.
-	 */
-	private static function wrap_in_figure( $node, $ancestor ) {
 		$figure             = Gutenberg_HTML_Element::create_element( 'figure' );
-		$figure->children[] = $node;
-		$node->parent       = $figure;
-		$figure->parent     = $ancestor;
+		$figure->children[] = $target;
+		$figure->parent     = $destination;
+		$target->parent     = $figure;
 
-		return $figure;
-	}
+		if ( null === self::find_transform( $figure ) ) {
+			// Unclaimed: the tree was never changed, so only the probe's own
+			// parent pointer needs unwinding.
+			$target->parent = $source;
 
-	/**
-	 * Determines whether an element is media that belongs inside a figure.
-	 *
-	 * @param Gutenberg_HTML_Element $element Element to test.
-	 * @return bool Whether the element is figure content.
-	 */
-	private static function is_figure_content( $element ) {
-		if ( in_array( $element->tag_name, self::FIGURE_CONTENT, true ) ) {
-			return true;
+			return;
 		}
 
-		if ( 'a' !== $element->tag_name ) {
-			return false;
+		// Detach the media from where it stood.
+		$position = null;
+
+		foreach ( $source->children as $index => $child ) {
+			if ( $child === $target ) {
+				array_splice( $source->children, $index, 1 );
+				$position = $index;
+				break;
+			}
 		}
 
-		$elements = $element->child_elements();
+		if ( null === $position ) {
+			$target->parent = $source;
 
-		return 1 === count( $elements )
-			&& in_array( $elements[0]->tag_name, self::FIGURE_CONTENT, true )
-			&& '' === trim( $element->get_text_content() );
+			return;
+		}
+
+		// With no wrapper the figure stands where the media stood; with one it
+		// goes immediately before the wrapper, as the editor inserts it.
+		if ( null === $wrapper ) {
+			array_splice( $source->children, $position, 0, array( $figure ) );
+
+			return;
+		}
+
+		foreach ( $destination->children as $index => $child ) {
+			if ( $child === $wrapper ) {
+				array_splice( $destination->children, $index, 0, array( $figure ) );
+
+				return;
+			}
+		}
+
+		$destination->children[] = $figure;
 	}
 
 	/**
@@ -1285,7 +1605,7 @@ class Gutenberg_HTML_To_Blocks {
 			$child = $children[ $at ];
 
 			if ( Gutenberg_HTML_Element::TEXT === $child->type ) {
-				if ( '' === trim( $child->text ) ) {
+				if ( self::is_blank_text( $child->text ) ) {
 					continue;
 				}
 
@@ -1334,6 +1654,20 @@ class Gutenberg_HTML_To_Blocks {
 		}
 
 		$root->children = $blocks;
+	}
+
+	/**
+	 * Determines whether text reads as blank.
+	 *
+	 * The same characters the editor's `isEmpty()` treats as blank —
+	 * JavaScript's `trim()` strips the no-break space, PHP's does not, and a
+	 * stray `&nbsp;` between blocks is everywhere in classic content.
+	 *
+	 * @param string $text Text to test.
+	 * @return bool Whether the text is blank.
+	 */
+	private static function is_blank_text( $text ) {
+		return 1 === preg_match( '/^[ \f\n\r\t\v\x{00A0}]*+$/u', $text );
 	}
 
 	/**

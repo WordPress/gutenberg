@@ -469,9 +469,22 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 					),
 				),
 				'<ol><li>One</li></ol>',
-				// The editor derives no value at all from markup without the
-				// attribute, rather than `false`.
-				array(),
+				// The editor's `toBooleanAttributeMatcher()` derives `false`
+				// from markup without the attribute.
+				array( 'reversed' => false ),
+			),
+			'boolean without target' => array(
+				array(
+					'reversed' => array(
+						'type'      => 'boolean',
+						'source'    => 'attribute',
+						'selector'  => 'ol',
+						'attribute' => 'reversed',
+					),
+				),
+				'<ul><li>One</li></ul>',
+				// Unmatched selector reads as `false` too, not as no value.
+				array( 'reversed' => false ),
 			),
 			'tag source'             => array(
 				array(
@@ -547,6 +560,15 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 			'id'                   => array( '#intro', '<p id="intro">One</p>', true ),
 			'attribute presence'   => array( 'a[href]', '<a href="/x">One</a>', true ),
 			'attribute value'      => array( 'wp-block[data-block="core/more"]', '<wp-block data-block="core/more"></wp-block>', true ),
+			'attribute prefix'     => array( 'a[href^="https"]', '<a href="https://example.com">One</a>', true ),
+			'attribute suffix'     => array( 'a[href$=".pdf"]', '<a href="/files/a.pdf">One</a>', true ),
+			'attribute substring'  => array( 'a[href*="example"]', '<a href="https://example.com">One</a>', true ),
+			'attribute dash'       => array( 'p[lang|="en"]', '<p lang="en-GB">One</p>', true ),
+			'attribute dash exact' => array( 'p[lang|=en]', '<p lang="en">One</p>', true ),
+			// A valueless attribute has the empty string for its DOM value.
+			'valueless equality'   => array( 'p[data-x=""]', '<p data-x>One</p>', true ),
+			// `^=`, `$=` and `*=` with an empty string match nothing, per CSS.
+			'empty prefix'         => array( 'a[href^=""]', '<a href="https://example.com">One</a>', false ),
 			'has descendant'       => array( 'figure:has(img)', '<figure><a><img src="/a.png" /></a></figure>', true ),
 			'has direct child'     => array( 'pre:has(> code)', '<pre><code>One</code></pre>', true ),
 			'has direct child not' => array( 'pre:has(> code)', '<pre><span><code>One</code></span></pre>', false ),
@@ -595,9 +617,8 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 			'unsupported in a list'   => array( 'p, :is(h1)', '<p>One</p>' ),
 			'adjacent sibling'        => array( 'p + p', '<p>One</p>' ),
 			'general sibling'         => array( 'p ~ p', '<p>One</p>' ),
-			'prefix operator'         => array( 'a[href^="https"]', '<a href="https://example.com">One</a>' ),
-			'suffix operator'         => array( 'a[href$=".pdf"]', '<a href="a.pdf">One</a>' ),
-			'substring operator'      => array( 'a[href*="example"]', '<a href="example.com">One</a>' ),
+			'case-insensitivity flag' => array( 'a[href="x" i]', '<a href="x">One</a>' ),
+			'unknown operator'        => array( 'a[href!="x"]', '<a href="y">One</a>' ),
 			'unclosed bracket'        => array( 'p[data-x', '<p data-x="1">One</p>' ),
 			'unclosed parenthesis'    => array( 'p:has(', '<p><span>One</span></p>' ),
 		);
@@ -1211,8 +1232,9 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 	}
 
 	public function test_refuses_a_transform_callback_written_as_text() {
-		// `block.json` is JSON, so a callback there can only be a string, and
-		// PHP would resolve it to whatever global function bears that name.
+		// `block.json` is JSON, and JSON can spell a callback name as a
+		// string; PHP would resolve it to whatever global function bears
+		// that name.
 		$this->setExpectedIncorrectUsage( 'Gutenberg_HTML_To_Blocks::is_transform_callback' );
 
 		$this->register(
@@ -1234,6 +1256,56 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 		$blocks = gutenberg_html_to_blocks( '<aside>One</aside>' );
 
 		$this->assertSame( 'core/html', $blocks[0]['blockName'] );
+	}
+
+	public function test_refuses_a_transform_callback_written_as_a_static_method() {
+		// JSON spells `["Some_Class", "some_method"]` as easily as a string,
+		// and decoding it out of a `block.json` file must not hand the
+		// conversion an arbitrary static method to call.
+		$this->setExpectedIncorrectUsage( 'Gutenberg_HTML_To_Blocks::is_transform_callback' );
+
+		self::$static_callback_calls = 0;
+
+		$this->register(
+			'test/static-callback',
+			array(
+				'attributes' => array(),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'      => 'raw',
+							'selector'  => 'aside',
+							'transform' => array( __CLASS__, 'record_static_callback' ),
+						),
+					),
+				),
+			)
+		);
+
+		$blocks = gutenberg_html_to_blocks( '<aside>One</aside>' );
+
+		// The transform still matches — its generic conversion runs — but the
+		// named static method is never called.
+		$this->assertSame( 'test/static-callback', $blocks[0]['blockName'] );
+		$this->assertSame( 0, self::$static_callback_calls );
+	}
+
+	/**
+	 * How often the refused static callback ran, which must stay zero.
+	 *
+	 * @var int
+	 */
+	public static $static_callback_calls = 0;
+
+	/**
+	 * Stands in for a static method a `block.json` file could name.
+	 *
+	 * @return null
+	 */
+	public static function record_static_callback() {
+		++self::$static_callback_calls;
+
+		return null;
 	}
 
 	public function test_refuses_an_attribute_source_naming_no_attribute() {
@@ -1473,7 +1545,7 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 		$this->assertSame( 'test/picture', $aligned[0]['blockName'] );
 	}
 
-	public function test_omits_an_absent_boolean_attribute() {
+	public function test_reads_an_absent_boolean_attribute_as_false() {
 		$this->register(
 			'test/list',
 			array(
@@ -1485,6 +1557,8 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 						array(
 							'type'       => 'raw',
 							'selector'   => 'ol',
+							// Ahead of the List block, which also claims `ol`.
+							'priority'   => 5,
 							'attributes' => array(
 								'reversed' => array(
 									'type'      => 'boolean',
@@ -1501,8 +1575,9 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 
 		$plain = gutenberg_html_to_blocks( '<ol><li>One</li></ol>' );
 
-		// The editor derives no value at all from markup without the attribute.
-		$this->assertArrayNotHasKey( 'reversed', $plain[0]['attrs'] );
+		// The editor's `toBooleanAttributeMatcher()` derives `false` from
+		// markup without the attribute, so the server has to as well.
+		$this->assertFalse( $plain[0]['attrs']['reversed'] );
 
 		$reversed = gutenberg_html_to_blocks( '<ol reversed><li>One</li></ol>' );
 

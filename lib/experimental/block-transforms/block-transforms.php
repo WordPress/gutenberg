@@ -19,6 +19,11 @@
  * @return array Filtered block type settings.
  */
 function gutenberg_register_block_transforms_from_metadata( $settings, $metadata ) {
+	// Core copies the field itself once `WP_Block_Type` declares it.
+	if ( property_exists( 'WP_Block_Type', 'transforms' ) ) {
+		return $settings;
+	}
+
 	if ( isset( $metadata['transforms'] ) && is_array( $metadata['transforms'] ) ) {
 		$settings['transforms'] = $metadata['transforms'];
 	}
@@ -32,18 +37,25 @@ add_filter( 'block_type_metadata_settings', 'gutenberg_register_block_transforms
  *
  * `get_block_editor_server_block_settings()` picks a fixed list of block type
  * fields and offers no filter, so the field travels in a bootstrap call of its
- * own. The block store keeps the definition it already has and takes only
- * `transforms` from a later call, which leaves everything core sent untouched
- * and makes this a no-op once core sends `transforms` itself.
+ * own. The block store keeps the definition it already has and takes only what
+ * it lacks from a later call, which leaves everything core sent untouched. A
+ * core that declares `WP_Block_Type::$transforms` sends the field in its own
+ * bootstrap, so this one is skipped rather than shipping the payload twice.
  *
  * @return void
  */
 function gutenberg_bootstrap_block_transforms() {
+	if ( property_exists( 'WP_Block_Type', 'transforms' ) ) {
+		return;
+	}
+
 	$definitions = array();
 
 	foreach ( WP_Block_Type_Registry::get_instance()->get_all_registered() as $block_type ) {
-		if ( ! empty( $block_type->transforms ) ) {
-			$definitions[ $block_type->name ] = array( 'transforms' => $block_type->transforms );
+		if ( ! empty( $block_type->transforms ) && is_array( $block_type->transforms ) ) {
+			$definitions[ $block_type->name ] = array(
+				'transforms' => gutenberg_prepare_transforms_for_editor( $block_type->transforms ),
+			);
 		}
 	}
 
@@ -57,6 +69,55 @@ function gutenberg_bootstrap_block_transforms() {
 	);
 }
 add_action( 'enqueue_block_editor_assets', 'gutenberg_bootstrap_block_transforms' );
+
+/**
+ * Keeps the parts of a block type's transforms the editor can read.
+ *
+ * A block registered from PHP may attach `isMatch` and `transform` callables,
+ * which JSON cannot express: `wp_json_encode()` writes a closure as `{}`, and
+ * the editor, handed `{}` where it expects a function, would throw on every
+ * paste. The callables stay server-side, where they run; only data travels.
+ *
+ * @param array $transforms Transforms declaration.
+ * @return array The declaration with everything JSON cannot express removed.
+ */
+function gutenberg_prepare_transforms_for_editor( $transforms ) {
+	foreach ( array( 'from', 'to' ) as $direction ) {
+		if ( ! isset( $transforms[ $direction ] ) || ! is_array( $transforms[ $direction ] ) ) {
+			continue;
+		}
+
+		foreach ( $transforms[ $direction ] as $at => $transform ) {
+			if ( ! is_array( $transform ) ) {
+				continue;
+			}
+
+			unset( $transform['isMatch'], $transform['transform'] );
+
+			$transforms[ $direction ][ $at ] = gutenberg_remove_transform_objects( $transform );
+		}
+	}
+
+	return $transforms;
+}
+
+/**
+ * Removes the object values JSON cannot carry from transform data.
+ *
+ * @param array $value Transform data.
+ * @return array The data without objects or closures.
+ */
+function gutenberg_remove_transform_objects( $value ) {
+	foreach ( $value as $key => $entry ) {
+		if ( is_object( $entry ) ) {
+			unset( $value[ $key ] );
+		} elseif ( is_array( $entry ) ) {
+			$value[ $key ] = gutenberg_remove_transform_objects( $entry );
+		}
+	}
+
+	return $value;
+}
 
 /**
  * Reports which blocks a server-side conversion can produce.

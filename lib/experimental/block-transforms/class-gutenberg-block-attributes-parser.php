@@ -66,7 +66,18 @@ class Gutenberg_Block_Attributes_Parser {
 		 * one.
 		 */
 		if ( isset( $schema['map'] ) && is_array( $schema['map'] ) ) {
-			$key   = is_scalar( $value ) ? (string) $value : '';
+			/*
+			 * JSON has no boolean keys, so a boolean value looks its map key up
+			 * under the spelling JSON can write — "true"/"false" — which is
+			 * also how the editor's `String()` coercion spells it. PHP's own
+			 * cast would give "1" and "".
+			 */
+			if ( is_bool( $value ) ) {
+				$key = $value ? 'true' : 'false';
+			} else {
+				$key = is_scalar( $value ) ? (string) $value : '';
+			}
+
 			$value = array_key_exists( $key, $schema['map'] ) ? $schema['map'][ $key ] : null;
 		}
 
@@ -157,6 +168,20 @@ class Gutenberg_Block_Attributes_Parser {
 
 		$target = null === $selector ? $element : $element->closest_self_or_descendant( $selector );
 
+		/*
+		 * A boolean attribute reads as its presence even when the selector
+		 * matches nothing at all — `toBooleanAttributeMatcher()` turns an
+		 * unmatched read into `false`, not into no value.
+		 */
+		if (
+			null === $target
+			&& 'attribute' === $source
+			&& isset( $schema['type'] )
+			&& 'boolean' === $schema['type']
+		) {
+			return false;
+		}
+
 		if ( null === $target ) {
 			return null;
 		}
@@ -170,7 +195,7 @@ class Gutenberg_Block_Attributes_Parser {
 					_doing_it_wrong(
 						__METHOD__,
 						__( 'An "attribute" block attribute source has to name the attribute it reads.', 'gutenberg' ),
-						'23.8.0'
+						'23.9.0'
 					);
 
 					return null;
@@ -180,11 +205,12 @@ class Gutenberg_Block_Attributes_Parser {
 				$type  = isset( $schema['type'] ) ? $schema['type'] : null;
 
 				/*
-				 * An absent boolean attribute has no value rather than `false`,
-				 * which is what the editor derives from the same markup.
+				 * A boolean attribute reads as its presence: `true` when the
+				 * markup carries it, `false` when it does not — the same as
+				 * the editor's `toBooleanAttributeMatcher()`.
 				 */
 				if ( 'boolean' === $type ) {
-					return null === $value ? null : true;
+					return null !== $value;
 				}
 
 				if ( null === $value ) {
@@ -251,7 +277,7 @@ class Gutenberg_Block_Attributes_Parser {
 				__( 'The "%s" block attribute source is not supported on the server.', 'gutenberg' ),
 				$source
 			),
-			'23.8.0'
+			'23.9.0'
 		);
 
 		return null;
@@ -259,6 +285,13 @@ class Gutenberg_Block_Attributes_Parser {
 
 	/**
 	 * Reads one declaration out of an element's inline styles.
+	 *
+	 * Mirrors what the editor reads through the CSSOM: the winning declaration
+	 * for the property — a later one replaces an earlier one unless the
+	 * earlier one is `!important` — with the priority reported separately
+	 * rather than as part of the value, and bare keyword values lowercased the
+	 * way serialization spells them. Values that are not bare keywords —
+	 * lengths, URLs, quoted strings — are left as written.
 	 *
 	 * @param Gutenberg_HTML_Element $element  Element to read.
 	 * @param string|null            $property CSS property name, as it is written in the style attribute.
@@ -275,7 +308,12 @@ class Gutenberg_Block_Attributes_Parser {
 			return null;
 		}
 
-		foreach ( explode( ';', $style ) as $declaration ) {
+		$value     = null;
+		$important = false;
+
+		// Split on `;` only outside parentheses, so a value such as
+		// `url(data:image/png;base64,…)` keeps its semicolons.
+		foreach ( preg_split( '/;(?![^(]*\))/', $style ) as $declaration ) {
 			$parts = explode( ':', $declaration, 2 );
 
 			if ( 2 !== count( $parts ) ) {
@@ -286,12 +324,26 @@ class Gutenberg_Block_Attributes_Parser {
 				continue;
 			}
 
-			$value = trim( $parts[1] );
+			$candidate    = trim( $parts[1] );
+			$is_important = (bool) preg_match( '/!\s*important\s*$/i', $candidate );
 
-			return '' === $value ? null : $value;
+			if ( $is_important ) {
+				$candidate = trim( preg_replace( '/!\s*important\s*$/i', '', $candidate ) );
+			}
+
+			if ( null !== $value && $important && ! $is_important ) {
+				continue;
+			}
+
+			if ( preg_match( '/^-?[a-zA-Z][a-zA-Z0-9-]*$/', $candidate ) ) {
+				$candidate = strtolower( $candidate );
+			}
+
+			$value     = $candidate;
+			$important = $is_important;
 		}
 
-		return null;
+		return '' === $value ? null : $value;
 	}
 
 	/**

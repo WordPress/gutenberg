@@ -405,8 +405,11 @@ class Gutenberg_HTML_Element {
 	/**
 	 * Removes every attribute except the named ones.
 	 *
-	 * The opening tag is rebuilt rather than edited in place so no gap is left
-	 * where an attribute used to be.
+	 * The dropped attributes are removed from the original opening tag rather
+	 * than the kept ones written into a new one: `set_attribute()` re-escapes
+	 * every value it writes — rejecting a URI whose escaping comes back empty,
+	 * such as a `data:` URL, and re-encoding entities — so a kept attribute
+	 * would not survive byte for byte.
 	 *
 	 * @param string[] $names Attribute names to keep.
 	 * @return void
@@ -429,17 +432,26 @@ class Gutenberg_HTML_Element {
 			return;
 		}
 
-		$processor = new WP_HTML_Tag_Processor( '<' . $this->tag_name . '>' );
+		$processor = new WP_HTML_Tag_Processor( $this->opening_html );
 
 		if ( ! $processor->next_tag() ) {
 			return;
 		}
 
-		foreach ( $kept as $name => $value ) {
-			$processor->set_attribute( $name, $value );
+		foreach ( array_keys( $this->attributes ) as $name ) {
+			if ( ! isset( $kept[ $name ] ) ) {
+				$processor->remove_attribute( $name );
+			}
 		}
 
-		$this->opening_html = $processor->get_updated_html();
+		/*
+		 * `remove_attribute()` leaves the whitespace that stood around the
+		 * attribute. A gap before the closing bracket is trimmed so a tag
+		 * whose last attribute was removed still reads as it would have been
+		 * written; a quoted value cannot be touched, because its closing
+		 * quote stands between it and the bracket.
+		 */
+		$this->opening_html = preg_replace( '/\s+(\/?>)$/', '$1', $processor->get_updated_html() );
 		$this->attributes   = $kept;
 	}
 
@@ -637,16 +649,48 @@ class Gutenberg_HTML_Element {
 				continue;
 			}
 
-			if ( '~=' === $attribute['operator'] ) {
-				$values = is_string( $value ) ? preg_split( '/\s+/', trim( $value ) ) : array();
-				if ( ! in_array( $attribute['value'], $values, true ) ) {
-					return false;
-				}
-				continue;
-			}
+			// A valueless attribute has the empty string for its DOM value,
+			// which is what a selector compares against.
+			$actual   = true === $value ? '' : $value;
+			$expected = $attribute['value'];
 
-			if ( $attribute['value'] !== $value ) {
-				return false;
+			switch ( $attribute['operator'] ) {
+				case '~=':
+					$tokens = '' === trim( $actual ) ? array() : preg_split( '/\s+/', trim( $actual ) );
+
+					if ( ! in_array( $expected, $tokens, true ) ) {
+						return false;
+					}
+					break;
+
+				case '^=':
+					if ( '' === $expected || 0 !== strpos( $actual, $expected ) ) {
+						return false;
+					}
+					break;
+
+				case '$=':
+					if ( '' === $expected || substr( $actual, -strlen( $expected ) ) !== $expected ) {
+						return false;
+					}
+					break;
+
+				case '*=':
+					if ( '' === $expected || false === strpos( $actual, $expected ) ) {
+						return false;
+					}
+					break;
+
+				case '|=':
+					if ( $expected !== $actual && 0 !== strpos( $actual, $expected . '-' ) ) {
+						return false;
+					}
+					break;
+
+				default:
+					if ( $expected !== $actual ) {
+						return false;
+					}
 			}
 		}
 
@@ -713,9 +757,10 @@ class Gutenberg_HTML_Element {
 	 * Parses a selector list into complex selectors.
 	 *
 	 * Supports the subset of CSS needed by block attribute sources and raw block
-	 * transforms: type, universal, class, ID and attribute selectors, the
-	 * descendant and child combinators, and the `:has()`, `:not()` and
-	 * `:only-child` pseudo-classes.
+	 * transforms: type, universal, class, ID and attribute selectors — presence
+	 * and the `=`, `~=`, `^=`, `$=`, `*=` and `|=` operators — the descendant
+	 * and child combinators, and the `:has()`, `:not()` and `:only-child`
+	 * pseudo-classes.
 	 *
 	 * A selector list that uses anything outside that subset is rejected whole, so
 	 * it matches nothing rather than silently matching more than it names.
@@ -750,7 +795,7 @@ class Gutenberg_HTML_Element {
 					__( 'The "%s" selector uses CSS that is not supported on the server, so it matches nothing.', 'gutenberg' ),
 					$selector
 				),
-				'23.8.0'
+				'23.9.0'
 			);
 		}
 
@@ -968,7 +1013,7 @@ class Gutenberg_HTML_Element {
 	 * @return array|null Parsed attribute selector, or null when it uses an unsupported operator.
 	 */
 	private static function parse_attribute_selector( $selector ) {
-		if ( ! preg_match( '/^\s*([a-zA-Z_:][a-zA-Z0-9_:.-]*)\s*(?:(\S?=)(.*))?$/', $selector, $matches ) ) {
+		if ( ! preg_match( '/^\s*([a-zA-Z_:][a-zA-Z0-9_:.-]*)\s*(?:([~^$*|]?=)(.*))?$/', $selector, $matches ) ) {
 			return null;
 		}
 
@@ -980,11 +1025,18 @@ class Gutenberg_HTML_Element {
 			);
 		}
 
-		if ( '=' !== $matches[2] && '~=' !== $matches[2] ) {
+		$value = trim( $matches[3] );
+
+		/*
+		 * A case-sensitivity flag is not supported. Rejecting the selector
+		 * makes it match nothing with a notice; parsing the flag into the
+		 * value would make it match nothing silently. A quoted value always
+		 * ends in its quote, so a trailing whitespace-separated `i` or `s`
+		 * can only be a flag.
+		 */
+		if ( preg_match( '/\s[iIsS]$/', $value ) ) {
 			return null;
 		}
-
-		$value = trim( $matches[3] );
 
 		if ( strlen( $value ) > 1 ) {
 			$first = $value[0];
