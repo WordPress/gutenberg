@@ -219,7 +219,7 @@ class Gutenberg_Block_Attributes_Parser {
 			return $values;
 		}
 
-	/*
+		/*
 		 * The editor resolves a top-level selector against the element itself
 		 * as well as its descendants, but a `query` sub-selector runs through
 		 * `querySelector()` on each matched item, which never matches the

@@ -1088,7 +1088,7 @@ class Gutenberg_HTML_Element {
 					return null;
 				}
 
-			$argument = trim( substr( $selector, $open + 1, $close - $open - 1 ) );
+				$argument = trim( substr( $selector, $open + 1, $close - $open - 1 ) );
 				$scope    = '';
 
 				if ( 0 === strpos( $argument, '>' ) ) {

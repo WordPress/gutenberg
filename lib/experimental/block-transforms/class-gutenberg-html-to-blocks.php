@@ -282,7 +282,7 @@ class Gutenberg_HTML_To_Blocks {
 			$attributes = array_merge( $attributes, self::resolve_transform_attributes( $transform['attributes'], $element ) );
 		}
 
-	/*
+		/*
 		 * The support-derived values win over declared ones, as they do in the
 		 * editor, whose `nodeToBlock()` writes the element's class and id onto
 		 * whatever the transform produced.
