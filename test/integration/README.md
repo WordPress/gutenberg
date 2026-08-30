@@ -17,6 +17,9 @@ Unlike unit tests that test individual functions in isolation, these tests exerc
 | `is-valid-block.jsdom.test.js` | Tests block validation with editor hooks applied |
 | `shortcode-converter.jsdom.test.js` | Tests shortcode-to-block conversion |
 | `non-matched-tags-handling.jsdom.test.js` | Tests handling of unrecognized HTML tags during paste |
+| `blocks-transforms-metadata.jsdom.test.js` | Tests raw handling driven by transforms declared in `block.json` |
+| `embed-provider-table.test.js` | Keeps the PHP embed provider table in sync with `embed/variations.js` |
+| `phrasing-content-schema.test.js` | Keeps the PHP phrasing content list in sync with `@wordpress/dom` |
 
 ## Running the Tests
 

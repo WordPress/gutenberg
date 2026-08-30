@@ -97,6 +97,8 @@ describe( 'Transforms declared in block metadata', () => {
 	} );
 
 	it( 'converts a heading, whose matching is declared and level is mapped', () => {
+		// The block's own generated class is not a custom class, so it does
+		// not survive into `className`.
 		expect(
 			serialize(
 				rawHandler( {
@@ -104,7 +106,7 @@ describe( 'Transforms declared in block metadata', () => {
 				} )
 			)
 		).toBe(
-			'<!-- wp:heading {"level":3,"className":"wp-block-heading"} -->\n' +
+			'<!-- wp:heading {"level":3} -->\n' +
 				'<h3 class="wp-block-heading">My Heading</h3>\n' +
 				'<!-- /wp:heading -->'
 		);
@@ -274,10 +276,12 @@ describe( 'Transforms declared in block metadata', () => {
 			serialize( pasteHandler( { HTML, mode: 'BLOCKS' } ) );
 
 		it( 'drops the attributes a declared schema allows only outside a paste', () => {
-			// The declared schema reads `{ "default": [ "style", "id" ], "paste": [] }`.
+			// The declared schema reads `{ "default": [ "style", "id" ], "paste": [] }`,
+			// so the inline style goes; the `id` survives as the block's
+			// `anchor`, which the anchor support keeps even on paste.
 			expect( paste( '<h2 id="x" style="color:red">Hi</h2>' ) ).toBe(
-				'<!-- wp:heading -->\n' +
-					'<h2 class="wp-block-heading">Hi</h2>\n' +
+				'<!-- wp:heading {"anchor":"x"} -->\n' +
+					'<h2 id="x" class="wp-block-heading">Hi</h2>\n' +
 					'<!-- /wp:heading -->'
 			);
 

@@ -504,7 +504,7 @@ See [the variations documentation](/docs/reference-guides/block-api/block-variat
 -   Optional
 -   Localized: No
 -   Property: `transforms`
--   Since: Experimental
+-   Since: `Experimental`
 
 ```json
 {
@@ -545,11 +545,11 @@ Common keys:
 
 Keys for a `raw` transform:
 
--   `selector` (`string`): a CSS selector matched against each top-level element of the source markup. Type, universal, class, ID and attribute selectors are supported, along with the descendant and child combinators and the `:has()`, `:not()` and `:only-child` pseudo-classes.
+-   `selector` (`string`): a CSS selector matched against each top-level element of the source markup. Type, universal, class, ID and attribute selectors are supported — attribute presence and the `=`, `~=`, `^=`, `$=`, `*=` and `|=` operators — along with the descendant and child combinators and the `:has()`, `:not()` and `:only-child` pseudo-classes.
 -   `schema` (`object`): the content schema describing which markup survives conversion. Write `"phrasing"` where the phrasing content schema belongs, `{ "default": [], "paste": [] }` where the allowed attributes differ when pasting, and `"attributes": "*"` where they do not matter — which is what a `serverConversion` schema writes for an element whose attributes the transform strips anyway.
 -   `sourceAttributes` (`boolean`, default `true`): whether to derive the block's attributes from the matched markup using the block's own attribute sources.
 -   `innerBlocks` (`boolean|string`, default `false`): which of the matched element's content becomes inner blocks. `true` converts all of it; a CSS selector converts only the matching child elements and leaves the rest with the block.
--   `serverConversion` (`false|object`): what the server may build from the matched markup. A block whose `save` rebuilds its markup rather than wrapping the source cannot be produced outside the editor at all and declares `false`. One that can reproduce some shapes and not others declares `{ "requires": <content schema> }`, naming the content it is able to save back; markup carrying anything else is left alone instead of converted into a block the editor would flag. The schema names the wrapper's attributes as well as its content, so a List block that can save `start` and `reversed` back but not `type` leaves `<ol type="A">` alone rather than converting it and losing the numbering. `class` and `id` never have to be named, because the `customClassName` and `anchor` supports write them.
+-   `serverConversion` (`false|object`): what the server may build from the matched markup. A block whose `save` rebuilds its markup rather than wrapping the source cannot be produced outside the editor at all and declares `false`. One that can reproduce some shapes and not others declares `{ "requires": <content schema> }`, naming the content it is able to save back; markup carrying anything else is left alone instead of converted into a block the editor would flag. The schema names the wrapper's attributes as well as its content, so a List block that can save `start` and `reversed` back but not `type` leaves `<ol type="A">` alone rather than converting it and losing the numbering. `id` never has to be named, because the `anchor` support writes it; nor does `class`, unless the schema entry lists `classes` — the class names the block can write back — in which case markup carrying any other class is left alone, the way the Image block leaves markup whose class names carry an alignment or an attachment ID. A block whose `save` writes a class the server cannot derive, such as the Separator's `has-alpha-channel-opacity` standing for a default attribute value, declares it under `serverConversion.classes` so converted markup matches what `save` produces.
 
 An `attributes` value is used as given, unless it is an object declaring a `source`, in which case it is read from the matched markup the way a block attribute would be. Such a value may also carry a `map` of sourced value to attribute value, which is how the Heading block turns a tag name into a level:
 

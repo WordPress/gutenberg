@@ -76,7 +76,9 @@ const AGREED = [
  *
  * These carry the legacy attributes a block cannot hold, so the two runtimes
  * read different attributes out of them even though neither produces anything
- * the editor flags.
+ * the editor flags. A media shortcode such as `[gallery]` goes further: its
+ * transform exists only in JavaScript, so the editor builds a Gallery block
+ * where the server leaves a Shortcode block — different blocks, both valid.
  */
 const LEGACY = [
 	'<p style="text-align:center">Centered.</p>',
