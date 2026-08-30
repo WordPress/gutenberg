@@ -9,7 +9,7 @@
  * plugin build time by `tools/build-scripts/copy-emojibase-data.mjs`.
  *
  * @package gutenberg
- * @since   7.1.0
+ * @since   7.2.0
  */
 
 /**
@@ -21,7 +21,7 @@
  * gives npm consumers of the editor package the same documented
  * boundary: provide the settings, get the full picker.
  *
- * @since 7.1.0
+ * @since 7.2.0
  *
  * @param array $settings Existing block editor settings.
  * @return array Updated block editor settings.
@@ -45,7 +45,7 @@ add_filter( 'block_editor_settings_all', 'gutenberg_add_emojibase_settings' );
  * WordPress compatibility layer does not polyfill `mb_ord()` on all
  * supported versions. Returns an empty string for invalid UTF-8.
  *
- * @since 7.1.0
+ * @since 7.2.0
  *
  * @param string $emoji Emoji character.
  * @return string Uppercase four-digit-padded hex code-points joined by
@@ -105,7 +105,7 @@ function gutenberg_emoji_to_hexcode( $emoji ) {
  * Seeded with the curated reaction emojis so the full picker shows
  * the same translated label as the curated quick-row.
  *
- * @since 7.1.0
+ * @since 7.2.0
  *
  * @return array Map of `hexcode => translated label`.
  */
@@ -133,7 +133,7 @@ function gutenberg_get_emoji_picker_label_overrides() {
 	 * and U+FE0F stripped (matching Emojibase's own `hexcode` field),
 	 * e.g. `2764` for ❤️ and `00A9` for ©️.
 	 *
-	 * @since 7.1.0
+	 * @since 7.2.0
 	 *
 	 * @param array $overrides Map of `hexcode => translated label`.
 	 */
