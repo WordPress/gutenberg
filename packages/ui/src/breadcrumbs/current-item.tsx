@@ -67,6 +67,7 @@ const CurrentItem = forwardRef< HTMLSpanElement, CurrentItemProps >(
 		return (
 			<li
 				className={ clsx(
+					defenseStyles.li,
 					styles.item,
 					styles[ 'current-item' ],
 					shouldTruncateCurrent &&

@@ -859,7 +859,6 @@ describe( 'Menu', () => {
 				</Menu.Root>
 			)
 		).toThrow( 'Menu.ItemLabel must be the first direct child' );
-		// @ts-expect-error Provided by the @wordpress/jest-console environment.
 		expect( console ).toHaveErrored();
 	} );
 
@@ -878,7 +877,6 @@ describe( 'Menu', () => {
 				</Menu.Root>
 			)
 		).toThrow( 'Menu.ItemLabel must be the first direct child' );
-		// @ts-expect-error Provided by the @wordpress/jest-console environment.
 		expect( console ).toHaveErrored();
 	} );
 

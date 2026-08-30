@@ -111,6 +111,11 @@
 			inline-size: var(--wpds-dimension-size-sm);
 			block-size: var(--wpds-dimension-size-sm);
 		}
+
+		.root .list {
+			--_gcd-ol-padding-block: var(--wp-ui-breadcrumbs-focus-ring-space);
+			--_gcd-ol-padding-inline: var(--wp-ui-breadcrumbs-focus-ring-space);
+		}
 	}
 
 	@layer compositions {

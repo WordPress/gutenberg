@@ -6,6 +6,7 @@ import type { ForwardedRef } from 'react';
 import { Link } from '../link';
 import * as Menu from '../menu';
 import * as Tooltip from '../tooltip';
+import defenseStyles from '../utils/css/global-css-defense.module.css';
 import { useBreadcrumbItemRenderContext } from './context';
 import { enforceRenderProps } from './enforce-render-props';
 import { Separator } from './separator';
@@ -22,10 +23,10 @@ function VisibleLinkItem( {
 	className,
 	forwardedRef,
 	href,
+	openInNewTab,
 	render,
 	onBlur,
 	onFocus,
-	target,
 	...props
 }: LinkItemImplementationProps ) {
 	const {
@@ -40,18 +41,10 @@ function VisibleLinkItem( {
 	);
 	const mergedRef = useMergeRefs( [ forwardedRef, setElement ] );
 	const isTruncated = useIsTruncated( element, measurementVersion );
-	const enforcedRender = enforceRenderProps(
-		render ??
-			( target !== undefined ? (
-				/* eslint-disable-next-line jsx-a11y/anchor-has-content, jsx-a11y/anchor-is-valid -- Link clones this template with the required href and accessible content. */
-				<a />
-			) : undefined ),
-		{
-			'aria-current': undefined,
-			href,
-			...( target !== undefined && { target } ),
-		}
-	);
+	const enforcedRender = enforceRenderProps( render, {
+		'aria-current': undefined,
+		href,
+	} );
 	const linkProps = mergeProps< 'a' >(
 		{ ...props, onBlur, onFocus },
 		{
@@ -67,13 +60,14 @@ function VisibleLinkItem( {
 		<Link
 			{ ...linkProps }
 			ref={ mergedRef }
+			openInNewTab={ openInNewTab }
 			render={ enforcedRender }
 			tone="neutral"
 		/>
 	);
 
 	return (
-		<li className={ styles.item }>
+		<li className={ clsx( defenseStyles.li, styles.item ) }>
 			{ showSeparator && <Separator /> }
 			<Tooltip.Root disabled={ ! isTruncated }>
 				<Tooltip.Trigger render={ link } />
@@ -87,30 +81,18 @@ function OverflowLinkItem( {
 	children,
 	forwardedRef,
 	href,
+	openInNewTab,
 	render,
-	target,
 	...props
 }: LinkItemImplementationProps ) {
-	let resolvedRender = render;
-	if ( typeof render === 'function' && target === undefined ) {
-		const renderFunction = render;
-		resolvedRender = ( ...args: Parameters< typeof renderFunction > ) => {
-			const [ renderProps, ...rest ] = args;
-			const renderPropsWithoutTarget = { ...renderProps };
-			Reflect.deleteProperty( renderPropsWithoutTarget, 'target' );
-
-			return renderFunction( renderPropsWithoutTarget, ...rest );
-		};
-	}
 	const enforcedRender = enforceRenderProps(
-		resolvedRender ?? (
+		render ?? (
 			/* eslint-disable-next-line jsx-a11y/anchor-has-content, jsx-a11y/anchor-is-valid -- Menu.LinkItem clones this template with the required href and accessible content. */
 			<a />
 		),
 		{
 			'aria-current': undefined,
 			href,
-			...( target !== undefined && { target } ),
 		}
 	);
 
@@ -120,6 +102,7 @@ function OverflowLinkItem( {
 			ref={ forwardedRef as ForwardedRef< Element > }
 			closeOnClick
 			href={ href }
+			openInNewTab={ openInNewTab }
 			render={ enforcedRender }
 		>
 			<Menu.ItemLabel>{ children }</Menu.ItemLabel>

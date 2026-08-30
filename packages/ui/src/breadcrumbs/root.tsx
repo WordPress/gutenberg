@@ -16,6 +16,7 @@ import { Button } from '../button';
 import * as Menu from '../menu';
 import type { RootProps as MenuRootProps } from '../menu/types';
 import * as Tooltip from '../tooltip';
+import defenseStyles from '../utils/css/global-css-defense.module.css';
 import resetStyles from '../utils/css/resets.module.css';
 import { BreadcrumbItemRenderContext } from './context';
 import { CurrentItem } from './current-item';
@@ -552,7 +553,7 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbsRoot(
 		<>
 			{ rootLink && renderVisibleItem( rootLink ) }
 			{ collapsedItems.length > 0 && (
-				<li className={ styles.item }>
+				<li className={ clsx( defenseStyles.li, styles.item ) }>
 					{ visiblePosition++ > 0 && <Separator /> }
 					<Menu.Root onOpenChange={ handleMenuOpenChange }>
 						<Tooltip.Root disabled={ menuOpen }>
@@ -609,7 +610,10 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbsRoot(
 	const inertProps = { inert: '' } as Record< string, string >;
 	const componentContent = (
 		<>
-			<ol ref={ visibleListRef } className={ styles.list }>
+			<ol
+				ref={ visibleListRef }
+				className={ clsx( defenseStyles.ol, styles.list ) }
+			>
 				{ visibleListContent }
 			</ol>
 			<div

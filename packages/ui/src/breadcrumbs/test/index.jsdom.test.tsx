@@ -322,7 +322,6 @@ describe( 'Breadcrumbs', () => {
 
 		it( 'passes complete link props through a custom renderer', () => {
 			const href = '/settings/general?section=writing#defaults';
-			const target = 'docs-frame';
 			const renderLink = jest.fn(
 				( {
 					children: linkChildren,
@@ -338,8 +337,8 @@ describe( 'Breadcrumbs', () => {
 				<Breadcrumbs.Root>
 					<Breadcrumbs.LinkItem
 						href={ href }
+						openInNewTab
 						render={ renderLink }
-						target={ target }
 					>
 						General
 					</Breadcrumbs.LinkItem>
@@ -347,9 +346,14 @@ describe( 'Breadcrumbs', () => {
 				</Breadcrumbs.Root>
 			);
 
-			const link = screen.getByRole( 'link', { name: 'General' } );
+			const link = screen.getByRole( 'link', {
+				name: 'General (opens in a new tab)',
+			} );
 			expect( link ).toHaveAttribute( 'href', href );
-			expect( link ).toHaveAttribute( 'target', target );
+			expect( link ).toHaveAttribute( 'target', '_blank' );
+			expect(
+				screen.getByLabelText( '(opens in a new tab)' )
+			).toBeVisible();
 			expect( link ).toHaveAttribute( 'data-router-link' );
 			expect( renderLink ).toHaveBeenCalled();
 		} );
@@ -449,7 +453,6 @@ describe( 'Breadcrumbs', () => {
 					</Breadcrumbs.Root>
 				)
 			).toThrow( /only accepts/ );
-			// @ts-expect-error -- Matcher provided by @wordpress/jest-console.
 			expect( console ).toHaveErrored();
 		} );
 
@@ -463,7 +466,6 @@ describe( 'Breadcrumbs', () => {
 					</Breadcrumbs.Root>
 				)
 			).toThrow( /at least one/ );
-			// @ts-expect-error -- Matcher provided by @wordpress/jest-console.
 			expect( console ).toHaveErrored();
 		} );
 
@@ -502,7 +504,6 @@ describe( 'Breadcrumbs', () => {
 					</Breadcrumbs.Root>
 				)
 			).toThrow( /must be the final child/ );
-			// @ts-expect-error -- Matcher provided by @wordpress/jest-console.
 			expect( console ).toHaveErrored();
 		} );
 
@@ -530,7 +531,6 @@ describe( 'Breadcrumbs', () => {
 					</Breadcrumbs.Root>
 				)
 			).toThrow( /non-empty text label/ );
-			// @ts-expect-error -- Matcher provided by @wordpress/jest-console.
 			expect( console ).toHaveErrored();
 		} );
 
@@ -550,7 +550,6 @@ describe( 'Breadcrumbs', () => {
 					</Breadcrumbs.Root>
 				)
 			).toThrow( /stable React keys/ );
-			// @ts-expect-error -- Matcher provided by @wordpress/jest-console.
 			expect( console ).toHaveErrored();
 		} );
 	} );
@@ -731,7 +730,7 @@ describe( 'Breadcrumbs', () => {
 					children: linkChildren,
 					...linkProps
 				}: HTMLAttributes< HTMLElement > ) => (
-					<a data-router-link target="docs-frame" { ...linkProps }>
+					<a data-router-link { ...linkProps }>
 						{ linkChildren }
 					</a>
 				)
@@ -741,6 +740,7 @@ describe( 'Breadcrumbs', () => {
 				<Breadcrumbs.Root>
 					<Breadcrumbs.LinkItem
 						href="/settings?tab=writing#defaults"
+						openInNewTab
 						render={ renderLink }
 					>
 						Settings
@@ -756,14 +756,17 @@ describe( 'Breadcrumbs', () => {
 			);
 			act( flushAllAnimationFrames );
 			const menuLink = await screen.findByRole( 'menuitem', {
-				name: 'Settings',
+				name: 'Settings (opens in a new tab)',
 			} );
 			expect( menuLink ).toHaveAttribute(
 				'href',
 				'/settings?tab=writing#defaults'
 			);
 			expect( menuLink ).toHaveAttribute( 'data-router-link' );
-			expect( menuLink ).toHaveAttribute( 'target', 'docs-frame' );
+			expect( menuLink ).toHaveAttribute( 'target', '_blank' );
+			expect(
+				screen.getByLabelText( '(opens in a new tab)' )
+			).toBeVisible();
 		} );
 
 		it( 'freezes the visible and menu collections while open', async () => {

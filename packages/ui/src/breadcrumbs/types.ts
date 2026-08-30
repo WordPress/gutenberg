@@ -12,12 +12,20 @@ export interface RootProps extends Omit< ComponentProps< 'nav' >, 'children' > {
 export interface LinkItemProps
 	extends Omit<
 		ComponentProps< 'a' >,
-		'aria-current' | 'children' | 'href'
+		'aria-current' | 'children' | 'href' | 'target'
 	> {
 	/**
 	 * The complete browser-compatible destination for the ancestor page.
 	 */
 	href: string;
+
+	/**
+	 * Whether to open the link in a new browser tab.
+	 * When true, sets `target="_blank"` and appends a visual arrow indicator.
+	 *
+	 * @default false
+	 */
+	openInNewTab?: boolean;
 
 	/**
 	 * The plain-text breadcrumb label.

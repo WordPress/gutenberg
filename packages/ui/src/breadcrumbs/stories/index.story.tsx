@@ -6,7 +6,6 @@ import * as Breadcrumbs from '../';
 const meta: Meta< typeof Breadcrumbs.Root > = {
 	title: 'Design System/Components/Breadcrumbs',
 	component: Breadcrumbs.Root,
-	tags: [ 'manifest' ],
 	subcomponents: {
 		'Breadcrumbs.LinkItem': Breadcrumbs.LinkItem,
 		'Breadcrumbs.CurrentItem': Breadcrumbs.CurrentItem,
@@ -27,9 +26,9 @@ export default meta;
 
 type Story = StoryObj< typeof Breadcrumbs.Root >;
 
-function ExampleTrail() {
+function ExampleTrail( { ariaLabel = 'Breadcrumbs' }: { ariaLabel?: string } ) {
 	return (
-		<Breadcrumbs.Root>
+		<Breadcrumbs.Root aria-label={ ariaLabel }>
 			<Breadcrumbs.LinkItem href="/">Dashboard</Breadcrumbs.LinkItem>
 			<Breadcrumbs.LinkItem href="/products">
 				Products
@@ -67,7 +66,9 @@ export const ResponsiveStates: Story = {
 					key={ width }
 					style={ { inlineSize: width, maxInlineSize: '100%' } }
 				>
-					<ExampleTrail />
+					<ExampleTrail
+						ariaLabel={ `Breadcrumbs at ${ width } pixels` }
+					/>
 				</div>
 			) ) }
 		</div>
