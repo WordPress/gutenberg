@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import {
 	createBlock,
 	getBlockTransforms,
@@ -11,6 +13,7 @@ import {
 	unstable__bootstrapServerSideBlockDefinitions,
 } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
+import { autop, removep } from '@wordpress/autop';
 
 /**
  * The fields `get_block_editor_server_block_settings()` sends to the editor.
@@ -131,6 +134,39 @@ describe( 'Transforms declared in block metadata', () => {
 		] );
 	} );
 
+	it( 'leaves no gap between the code and preformatted matchers', () => {
+		// The two split `<pre>` between them: markup the Code block declines
+		// — anything more than a lone `<code>` — belongs to Preformatted, or
+		// pasting it would produce no block at all.
+		const [ trailing ] = rawHandler( {
+			HTML: '<pre><code>echo 1;</code> tail</pre>',
+		} );
+		expect( trailing.name ).toBe( 'core/preformatted' );
+
+		// Blank text around the `<code>` does not defeat the Code block.
+		const [ padded ] = rawHandler( {
+			HTML: '<pre>  <code>echo 2;</code>\n</pre>',
+		} );
+		expect( padded.name ).toBe( 'core/code' );
+	} );
+
+	it( 'splits a container around a more comment', () => {
+		const blocks = rawHandler( {
+			HTML: '<div>Intro<!--more-->Rest</div>',
+		} );
+
+		expect( blocks.map( ( { name } ) => name ) ).toEqual( [
+			'core/html',
+			'core/more',
+			'core/html',
+		] );
+		expect( serialize( blocks ) ).toBe(
+			'<!-- wp:html -->\n<div>Intro</div>\n<!-- /wp:html -->\n\n' +
+				'<!-- wp:more -->\n<!--more-->\n<!-- /wp:more -->\n\n' +
+				'<!-- wp:html -->\n<div>Rest</div>\n<!-- /wp:html -->'
+		);
+	} );
+
 	it( 'converts a list into list items', () => {
 		const [ list ] = rawHandler( {
 			HTML: '<ul><li>One</li><li>Two</li></ul>',
@@ -186,6 +222,60 @@ describe( 'Transforms declared in block metadata', () => {
 
 		expect( preformatted.name ).toBe( 'core/preformatted' );
 		expect( preformatted.attributes.className ).toBe( 'my-custom' );
+	} );
+
+	it( 'coerces a declared numeric attribute against the shared grammar', () => {
+		const name = 'test/sized';
+
+		// Declared in metadata, as a `block.json` transform arrives.
+		unstable__bootstrapServerSideBlockDefinitions( {
+			[ name ]: {
+				apiVersion: 3,
+				title: 'Sized',
+				category: 'text',
+				attributes: { size: { type: 'number' } },
+				transforms: {
+					from: [
+						{
+							type: 'raw',
+							selector: 'aside',
+							priority: 1,
+							attributes: {
+								size: {
+									type: 'number',
+									source: 'attribute',
+									selector: 'aside',
+									attribute: 'data-size',
+								},
+							},
+						},
+					],
+				},
+			},
+		} );
+
+		registerBlockType( name, {
+			title: 'Sized',
+			category: 'text',
+			save: () => null,
+		} );
+
+		const attributesOf = ( html ) =>
+			rawHandler( { HTML: html } )[ 0 ].attributes;
+
+		expect( attributesOf( '<aside data-size="600">x</aside>' ).size ).toBe(
+			600
+		);
+		expect(
+			attributesOf( '<aside data-size="4.5e1">x</aside>' ).size
+		).toBe( 45 );
+		// The strict grammar has no whitespace: `Number()` would accept the
+		// padded value, and the server would refuse it.
+		expect(
+			attributesOf( '<aside data-size=" 600">x</aside>' ).size
+		).toBeUndefined();
+
+		unregisterBlockType( name );
 	} );
 
 	it( 'keeps declared transforms when a block is registered by name', () => {
@@ -305,4 +395,31 @@ describe( 'Transforms declared in block metadata', () => {
 			expect( console ).toHaveLogged();
 		} );
 	} );
+} );
+
+describe( 'the text a shortcode transform stores', () => {
+	/**
+	 * `createShortcodeAttributes()` reads `shortcodeText` as
+	 * `removep( autop( text ) )`, and the server reads it as
+	 * `remove_paragraphs( wpautop( text ) )`. The fixture pins the round trip
+	 * for both runtimes: `phpunit/experimental/block-transforms-test.php`
+	 * asserts the same `expected` strings, so a change to either port that
+	 * drifts from the other fails one of the two suites.
+	 */
+	const cases = JSON.parse(
+		fs.readFileSync(
+			path.join(
+				__dirname,
+				'fixtures/block-transforms/removep-parity.json'
+			),
+			'utf8'
+		)
+	);
+
+	it.each( cases )(
+		'reads $input the same as the server',
+		( { input, expected } ) => {
+			expect( removep( autop( input ) ) ).toBe( expected );
+		}
+	);
 } );

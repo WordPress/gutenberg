@@ -509,6 +509,21 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 				'<h1>Title</h1>',
 				array( 'content' => 'none' ),
 			),
+			'numeric string'         => array(
+				array(
+					'width' => array(
+						'type'      => 'number',
+						'source'    => 'attribute',
+						'selector'  => 'img',
+						'attribute' => 'width',
+					),
+				),
+				'<figure><img src="/a.png" width="600" /></figure>',
+				// A block's own attributes are read uncoerced on both
+				// runtimes, so the string fails the number type and drops
+				// out. Only a transform's declared attributes coerce.
+				array(),
+			),
 			'query source'           => array(
 				array(
 					'rows' => array(
@@ -621,6 +636,10 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 			'unknown operator'        => array( 'a[href!="x"]', '<a href="y">One</a>' ),
 			'unclosed bracket'        => array( 'p[data-x', '<p data-x="1">One</p>' ),
 			'unclosed parenthesis'    => array( 'p:has(', '<p><span>One</span></p>' ),
+			// `:not()` takes a complex selector in CSS; the editor's engine
+			// takes only compound ones, so a combinator inside must refuse
+			// loudly rather than match as if it were not there.
+			'relative argument'       => array( 'div:not(> p)', '<div>One</div>' ),
 		);
 	}
 
@@ -943,7 +962,7 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 	 */
 	public static function data_special_comments() {
 		return array(
-			'between paragraphs'        => array(
+			'between paragraphs'          => array(
 				'<p>Before</p><!--more--><p>After</p>',
 				array(
 					array( 'core/paragraph', '<p>Before</p>' ),
@@ -951,7 +970,7 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 					array( 'core/paragraph', '<p>After</p>' ),
 				),
 			),
-			'inside a paragraph'        => array(
+			'inside a paragraph'          => array(
 				'<p>Before<!--more-->After</p>',
 				array(
 					array( 'core/paragraph', '<p>Before</p>' ),
@@ -959,11 +978,11 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 					array( 'core/paragraph', '<p>After</p>' ),
 				),
 			),
-			'alone in a paragraph'      => array(
+			'alone in a paragraph'        => array(
 				'<p><!--more--></p>',
 				array( array( 'core/more', '<!--more-->' ) ),
 			),
-			'between text'              => array(
+			'between text'                => array(
 				'Text<!--more-->More',
 				array(
 					array( 'core/paragraph', '<p>Text</p>' ),
@@ -971,7 +990,7 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 					array( 'core/paragraph', '<p>More</p>' ),
 				),
 			),
-			'no teaser'                 => array(
+			'no teaser'                   => array(
 				"<p>Before</p><!--more-->\n<!--noteaser-->\n<p>After</p>",
 				array(
 					array( 'core/paragraph', '<p>Before</p>' ),
@@ -979,7 +998,7 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 					array( 'core/paragraph', '<p>After</p>' ),
 				),
 			),
-			'custom text'               => array(
+			'custom text'                 => array(
 				'<p>Before</p><!--more Read on--><p>After</p>',
 				array(
 					array( 'core/paragraph', '<p>Before</p>' ),
@@ -987,12 +1006,44 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 					array( 'core/paragraph', '<p>After</p>' ),
 				),
 			),
-			'page break in a paragraph' => array(
+			'page break in a paragraph'   => array(
 				'<p>Before<!--nextpage-->After</p>',
 				array(
 					array( 'core/paragraph', '<p>Before</p>' ),
 					array( 'core/nextpage', '<!--nextpage-->' ),
 					array( 'core/paragraph', '<p>After</p>' ),
+				),
+			),
+			'inside a division'           => array(
+				// Only top-level elements become blocks, so the marker splits
+				// its container instead of being swallowed into it.
+				'<div><p>Intro</p><!--more--><p>Rest</p></div>',
+				array(
+					array( 'core/html', '<div><p>Intro</p></div>' ),
+					array( 'core/more', '<!--more-->' ),
+					array( 'core/html', '<div><p>Rest</p></div>' ),
+				),
+			),
+			'nested containers'           => array(
+				'<section><div><h2>a</h2><!--more--><h2>b</h2></div></section>',
+				array(
+					array( 'core/html', '<section><div><h2>a</h2></div></section>' ),
+					array( 'core/more', '<!--more-->' ),
+					array( 'core/html', '<section><div><h2>b</h2></div></section>' ),
+				),
+			),
+			'alone in a division'         => array(
+				'<div><!--more--></div>',
+				array( array( 'core/more', '<!--more-->' ) ),
+			),
+			'paragraph halves built bare' => array(
+				// As the editor builds them, with `createElement( 'p' )`:
+				// keeping the source markup would duplicate its `id`.
+				'<p id="intro">Teaser<!--more-->Rest.</p>',
+				array(
+					array( 'core/paragraph', '<p>Teaser</p>' ),
+					array( 'core/more', '<!--more-->' ),
+					array( 'core/paragraph', '<p>Rest.</p>' ),
 				),
 			),
 		);
@@ -1235,7 +1286,7 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 		// `block.json` is JSON, and JSON can spell a callback name as a
 		// string; PHP would resolve it to whatever global function bears
 		// that name.
-		$this->setExpectedIncorrectUsage( 'Gutenberg_HTML_To_Blocks::is_transform_callback' );
+		$this->setExpectedIncorrectUsage( 'Gutenberg_Block_Transforms::is_runnable_callback' );
 
 		$this->register(
 			'test/named-callback',
@@ -1262,7 +1313,7 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 		// JSON spells `["Some_Class", "some_method"]` as easily as a string,
 		// and decoding it out of a `block.json` file must not hand the
 		// conversion an arbitrary static method to call.
-		$this->setExpectedIncorrectUsage( 'Gutenberg_HTML_To_Blocks::is_transform_callback' );
+		$this->setExpectedIncorrectUsage( 'Gutenberg_Block_Transforms::is_runnable_callback' );
 
 		self::$static_callback_calls = 0;
 
@@ -2244,6 +2295,551 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 
 	public function test_reports_that_a_conversion_can_produce_an_embed() {
 		$this->assertContains( 'core/embed', gutenberg_get_block_conversion_support()['converts'] );
+	}
+
+	/**
+	 * `createShortcodeAttributes()` in the editor reads `shortcodeText` as
+	 * `removep( autop( text ) )`; the server reads it as
+	 * `remove_paragraphs( wpautop( text ) )`. Both runtimes assert this
+	 * fixture, so a change to either port that drifts from the other fails
+	 * one of the two suites. The editor's half lives in
+	 * `test/integration/blocks-transforms-metadata.jsdom.test.js`.
+	 *
+	 * @dataProvider data_removep_parity
+	 *
+	 * @param string $input    Shortcode text as matched in classic content.
+	 * @param string $expected Text the attribute stores.
+	 */
+	public function test_strips_shortcode_paragraphs_the_same_as_the_editor( $input, $expected ) {
+		$remove_paragraphs = $this->accessible_method( 'Gutenberg_Shortcode_Transforms', 'remove_paragraphs' );
+
+		$this->assertSame( $expected, $remove_paragraphs->invoke( null, wpautop( $input ) ) );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public static function data_removep_parity() {
+		$cases = json_decode(
+			file_get_contents( gutenberg_dir_path() . 'test/integration/fixtures/block-transforms/removep-parity.json' ),
+			true
+		);
+
+		$data = array();
+
+		foreach ( $cases as $at => $case ) {
+			$label                       = str_replace( array( "\n", '"' ), array( '\n', "'" ), substr( $case['input'], 0, 40 ) );
+			$data[ $at . ': ' . $label ] = array( $case['input'], $case['expected'] );
+		}
+
+		return $data;
+	}
+
+	/**
+	 * The full phrasing content schema — attributes and nesting, not only tag
+	 * names — held against the fixture the editor's
+	 * `test/integration/phrasing-content-schema.test.js` asserts too.
+	 */
+	public function test_phrasing_schema_matches_the_shared_fixture() {
+		$fixture = json_decode(
+			file_get_contents( gutenberg_dir_path() . 'test/integration/fixtures/block-transforms/phrasing-content-schema.json' ),
+			true
+		);
+
+		$schema  = $this->accessible_method( 'Gutenberg_HTML_To_Blocks', 'get_phrasing_content_schema' )->invoke( null );
+		$resolve = $this->accessible_method( 'Gutenberg_HTML_To_Blocks', 'resolve_children_schema' );
+
+		$text_level = $fixture['textLevel'];
+		$childless  = $fixture['childless'];
+
+		$expected_tags = array_merge( array_keys( $text_level ), array_keys( $fixture['embedded'] ) );
+		$actual_tags   = array_keys( $schema );
+		sort( $expected_tags );
+		sort( $actual_tags );
+
+		$this->assertSame( $expected_tags, $actual_tags );
+
+		foreach ( array( $text_level, $fixture['embedded'] ) as $group ) {
+			foreach ( $group as $tag => $definition ) {
+				$declared = isset( $definition['attributes'] ) ? $definition['attributes'] : null;
+				$actual   = isset( $schema[ $tag ]['attributes'] ) ? $schema[ $tag ]['attributes'] : null;
+
+				$this->assertSame( array( $tag => $declared ), array( $tag => $actual ) );
+			}
+		}
+
+		foreach ( array_keys( $text_level ) as $tag ) {
+			if ( in_array( $tag, $childless, true ) ) {
+				$this->assertArrayNotHasKey( 'children', $schema[ $tag ] );
+				continue;
+			}
+
+			$children = $resolve->invoke( null, $tag, $schema[ $tag ]['children'] );
+
+			$expected_children = array_merge( array_diff( array_keys( $text_level ), array( $tag ) ), array( 'img' ) );
+			$actual_children   = array_keys( $children );
+			sort( $expected_children );
+			sort( $actual_children );
+
+			$this->assertSame( array( $tag => $expected_children ), array( $tag => $actual_children ) );
+		}
+
+		// The nesting recurses one level at a time, each element excluding
+		// only itself: `strong > em > strong` is allowed, `strong > strong`
+		// is not.
+		$strong_children = $resolve->invoke( null, 'strong', $schema['strong']['children'] );
+		$em_children     = $resolve->invoke( null, 'em', $strong_children['em']['children'] );
+
+		$this->assertArrayHasKey( 'strong', $em_children );
+		$this->assertArrayNotHasKey( 'strong', $strong_children );
+
+		$this->assertSame( '*', $schema['math']['children'] );
+	}
+
+	public function test_keeps_shortcode_content_that_is_not_utf8() {
+		$this->register_shortcode_block( array() );
+
+		/*
+		 * Latin-1 bytes, as legacy content still carries: a `u`-modifier
+		 * pattern returns null on them, which must not cascade into losing
+		 * the content.
+		 */
+		$blocks = gutenberg_html_to_blocks( "<p>[testmedia]Caf\xE9 au lait[/testmedia]</p>" );
+
+		// `text` reads from the block's own markup, so it is implied there
+		// rather than written into the delimiter.
+		$this->assertSame( 'test/media', $blocks[0]['blockName'] );
+		$this->assertSame( "[testmedia]Caf\xE9 au lait[/testmedia]", $blocks[0]['innerHTML'] );
+	}
+
+	public function test_honours_a_shortcode_is_match_callback() {
+		$this->register(
+			'test/clip',
+			array(
+				'attributes' => array(
+					'text' => array(
+						'type'   => 'string',
+						'source' => 'raw',
+					),
+				),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'       => 'shortcode',
+							'tag'        => 'clip',
+							'isMatch'    => static function ( $attributes ) {
+								return isset( $attributes['named']['src'] );
+							},
+							'attributes' => array(
+								'text' => array(
+									'type'   => 'string',
+									'source' => 'shortcodeText',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$matched = gutenberg_html_to_blocks( '<p>[clip src="a.mp3"]</p>' );
+
+		$this->assertSame( 'test/clip', $matched[0]['blockName'] );
+
+		// Declined, the shortcode falls through to the next transform that
+		// wants it — the Shortcode block's, exactly as the editor's
+		// `segmentHTMLToShortcodeBlock` falls back.
+		$declined = gutenberg_html_to_blocks( '<p>[clip]</p>' );
+
+		$this->assertSame( 'core/shortcode', $declined[0]['blockName'] );
+		$this->assertSame( '[clip]', $declined[0]['innerHTML'] );
+	}
+
+	public function test_refuses_a_shortcode_is_match_written_as_text() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_Block_Transforms::is_runnable_callback' );
+
+		$this->register(
+			'test/named-match',
+			array(
+				'attributes' => array(
+					'text' => array(
+						'type'   => 'string',
+						'source' => 'raw',
+					),
+				),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'       => 'shortcode',
+							'tag'        => 'namedmatch',
+							// A name can be written into `block.json`, and
+							// data must not choose what runs.
+							'isMatch'    => 'is_string',
+							'attributes' => array(
+								'text' => array(
+									'type'   => 'string',
+									'source' => 'shortcodeText',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		/*
+		 * The refused callable is ignored, not honoured: the transform still
+		 * matches, exactly as the editor's `typeof isMatch === 'function'`
+		 * guard reads a non-function. Only the gate is lost, never to a
+		 * callable named by data.
+		 */
+		$blocks = gutenberg_html_to_blocks( '<p>[namedmatch]</p>' );
+
+		$this->assertSame( 'test/named-match', $blocks[0]['blockName'] );
+	}
+
+	public function test_falls_back_to_the_default_for_an_invalid_shortcode_attribute() {
+		$this->register_shortcode_block(
+			array(
+				'src' => array(
+					'type'      => 'number',
+					'source'    => 'shortcodeAttribute',
+					'attribute' => 'id',
+					'default'   => 99,
+				),
+			)
+		);
+
+		// The editor validates a shortcode-sourced value against its declared
+		// type the same as any other sourced value.
+		$blocks = gutenberg_html_to_blocks( '<p>[testmedia id="abc"]</p>' );
+
+		$this->assertSame( 'test/media', $blocks[0]['blockName'] );
+		$this->assertSame( 99, $blocks[0]['attrs']['src'] );
+	}
+
+	public function test_coerces_a_declared_numeric_attribute_strictly() {
+		$this->register(
+			'test/sized',
+			array(
+				'attributes' => array(
+					'size' => array( 'type' => 'number' ),
+				),
+				'supports'   => array( 'className' => false ),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'       => 'raw',
+							'selector'   => 'aside',
+							'priority'   => 1,
+							'attributes' => array(
+								'size' => array(
+									'type'      => 'number',
+									'source'    => 'attribute',
+									'selector'  => 'aside',
+									'attribute' => 'data-size',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$converted = gutenberg_html_to_blocks( '<aside data-size="600">x</aside>' );
+		$this->assertSame( 600, $converted[0]['attrs']['size'] );
+
+		// One grammar on both runtimes: exponents are numbers, and an
+		// integral result is stored as an integer, as `JSON.stringify` would
+		// write it.
+		$exponent = gutenberg_html_to_blocks( '<aside data-size="4.5e1">x</aside>' );
+		$this->assertSame( 45, $exponent[0]['attrs']['size'] );
+
+		// `is_numeric()` in PHP 8 and `Number()` both take the padded string;
+		// the shared grammar refuses it on both runtimes.
+		$padded = gutenberg_html_to_blocks( '<aside data-size=" 600">x</aside>' );
+		$this->assertArrayNotHasKey( 'size', $padded[0]['attrs'] );
+	}
+
+	public function test_keeps_single_spaces_between_kept_attributes() {
+		$this->register(
+			'test/spacing',
+			array(
+				'attributes' => array(
+					'first' => array(
+						'type'      => 'string',
+						'source'    => 'attribute',
+						'selector'  => 'aside',
+						'attribute' => 'data-a',
+					),
+					'third' => array(
+						'type'      => 'string',
+						'source'    => 'attribute',
+						'selector'  => 'aside',
+						'attribute' => 'data-c',
+					),
+				),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'     => 'raw',
+							'selector' => 'aside',
+						),
+					),
+				),
+			)
+		);
+
+		// Dropping `data-b` must not leave a double space behind, nor a
+		// straggler before the bracket when the last attribute goes.
+		$blocks = gutenberg_html_to_blocks( '<aside data-a="1" data-b="2" data-c="3">x</aside>' );
+
+		$this->assertSame( '<aside class="wp-block-test-spacing" data-a="1" data-c="3">x</aside>', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_warns_for_a_selector_that_is_not_a_string() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_HTML_Element::parse_selector_list' );
+
+		$this->register(
+			'test/mistyped',
+			array(
+				'attributes' => array(),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'     => 'raw',
+							// An array where a string belongs — a mistake a
+							// `block.json` can hold, so it cannot fatal.
+							'selector' => array( 'p' ),
+						),
+					),
+				),
+			)
+		);
+
+		$blocks = gutenberg_html_to_blocks( '<p>One</p>' );
+
+		$this->assertSame( 'core/paragraph', $blocks[0]['blockName'] );
+	}
+
+	public function test_lets_a_declared_transform_outrank_the_embed() {
+		$this->register(
+			'test/linkgrab',
+			array(
+				'attributes' => array(
+					'content' => array(
+						'type'     => 'string',
+						'source'   => 'html',
+						'selector' => 'p',
+					),
+				),
+				'supports'   => array( 'className' => false ),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'     => 'raw',
+							'selector' => 'p',
+							'priority' => 5,
+						),
+					),
+				),
+			)
+		);
+
+		// The editor consults the embed matcher at priority 10; a transform
+		// declaring a lower number outranks it there, so it has to here.
+		$blocks = gutenberg_html_to_blocks( '<p>https://youtu.be/abc123</p>' );
+
+		$this->assertSame( 'test/linkgrab', $blocks[0]['blockName'] );
+	}
+
+	public function test_prefers_the_embed_over_a_default_priority_transform() {
+		$this->register(
+			'test/tenner',
+			array(
+				'attributes' => array(
+					'content' => array(
+						'type'     => 'string',
+						'source'   => 'html',
+						'selector' => 'p',
+					),
+				),
+				'supports'   => array( 'className' => false ),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'     => 'raw',
+							'selector' => 'p',
+							'priority' => 10,
+						),
+					),
+				),
+			)
+		);
+
+		$blocks = gutenberg_html_to_blocks( '<p>https://youtu.be/abc123</p>' );
+
+		$this->assertSame( 'core/embed', $blocks[0]['blockName'] );
+	}
+
+	public function test_reads_supports_attributes_from_markup_over_declared_values() {
+		$this->register(
+			'test/anchored',
+			array(
+				'attributes' => array(),
+				'supports'   => array(
+					'anchor'    => true,
+					'className' => false,
+				),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'       => 'raw',
+							'selector'   => 'aside',
+							'priority'   => 1,
+							'attributes' => array( 'anchor' => 'declared' ),
+						),
+					),
+				),
+			)
+		);
+
+		// `nodeToBlock()` writes the node-derived supports over the sourced
+		// attributes, so what the markup says wins over what the transform
+		// declares.
+		$from_markup = gutenberg_html_to_blocks( '<aside id="from-markup">x</aside>' );
+		$this->assertSame( 'from-markup', $from_markup[0]['attrs']['anchor'] );
+
+		$declared_only = gutenberg_html_to_blocks( '<aside>x</aside>' );
+		$this->assertSame( 'declared', $declared_only[0]['attrs']['anchor'] );
+	}
+
+	public function test_keeps_only_the_classes_a_schema_declares() {
+		$this->register(
+			'test/captioned',
+			array(
+				'attributes' => array(),
+				'supports'   => array( 'className' => false ),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'     => 'raw',
+							'selector' => 'aside',
+							'priority' => 1,
+							'schema'   => array(
+								'aside' => array(
+									'children' => array(
+										'#text' => array(),
+										'b'     => array(
+											'classes'  => array( 'keep-me' ),
+											'children' => array( '#text' => array() ),
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		// `cleanNodeList()` keeps the classes a schema names and strips the
+		// rest, separately from the attribute list.
+		$blocks = gutenberg_html_to_blocks( '<aside><b class="keep-me drop-me">Marked</b> tail</aside>' );
+
+		$this->assertSame( 'test/captioned', $blocks[0]['blockName'] );
+		$this->assertSame( '<aside><b class="keep-me">Marked</b> tail</aside>', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_keeps_every_class_a_schema_wildcards() {
+		$this->register(
+			'test/classy',
+			array(
+				'attributes' => array(),
+				'supports'   => array( 'className' => false ),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'     => 'raw',
+							'selector' => 'aside',
+							'priority' => 1,
+							'schema'   => array(
+								'aside' => array(
+									'children' => array(
+										'#text' => array(),
+										'b'     => array(
+											'classes'  => array( '*' ),
+											'children' => array( '#text' => array() ),
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$blocks = gutenberg_html_to_blocks( '<aside><b class="one two">Marked</b></aside>' );
+
+		$this->assertSame( '<aside><b class="one two">Marked</b></aside>', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_reads_the_last_non_empty_style_declaration() {
+		$this->register(
+			'test/tinted',
+			array(
+				'attributes' => array(
+					'shade' => array( 'type' => 'string' ),
+				),
+				'supports'   => array( 'className' => false ),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'       => 'raw',
+							'selector'   => 'aside',
+							'priority'   => 1,
+							'attributes' => array(
+								'shade' => array(
+									'type'     => 'string',
+									'source'   => 'style',
+									'property' => 'color',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		// CSSOM never records a declaration without a value, so a trailing
+		// empty one must not clobber the value that stands.
+		$blocks = gutenberg_html_to_blocks( '<aside style="color:red;color:">x</aside>' );
+
+		$this->assertSame( 'red', $blocks[0]['attrs']['shade'] );
+	}
+
+	/**
+	 * Returns a reflection of a private method, made invocable on every
+	 * supported PHP version.
+	 *
+	 * `ReflectionMethod::setAccessible()` is needed until 8.1.0, redundant as
+	 * of 8.1.0, and deprecated as of 8.5.0.
+	 *
+	 * @param string $class_name  Class the method belongs to.
+	 * @param string $method_name Method name.
+	 * @return ReflectionMethod The reflected method.
+	 */
+	private function accessible_method( $class_name, $method_name ) {
+		$method = new ReflectionMethod( $class_name, $method_name );
+
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
+
+		return $method;
 	}
 
 	/**

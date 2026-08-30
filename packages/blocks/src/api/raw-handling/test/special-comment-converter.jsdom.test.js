@@ -101,6 +101,63 @@ describe( 'specialCommentConverter', () => {
 		} );
 	} );
 
+	describe( 'when the comment is inside another container', () => {
+		it( 'should split the container around the block', () => {
+			const output = deepFilterHTML(
+				'<div>First<!--more-->Second</div>',
+				[ specialCommentConverter ]
+			);
+			expect( output ).toEqual(
+				'<div>First</div><wp-block data-block="core/more"></wp-block><div>Second</div>'
+			);
+		} );
+		it( 'should keep the container markup on both halves', () => {
+			const output = deepFilterHTML(
+				'<div class="wrap">First<!--more-->Second</div>',
+				[ specialCommentConverter ]
+			);
+			expect( output ).toEqual(
+				'<div class="wrap">First</div><wp-block data-block="core/more"></wp-block><div class="wrap">Second</div>'
+			);
+		} );
+		it( 'should build the halves of a paragraph bare', () => {
+			// As the editor always has: `createElement( 'p' )`, so an `id`
+			// does not turn into a duplicate DOM id on every half.
+			const output = deepFilterHTML(
+				'<p id="intro">First<!--more-->Second</p>',
+				[ specialCommentConverter ]
+			);
+			expect( output ).toEqual(
+				'<p>First</p><wp-block data-block="core/more"></wp-block><p>Second</p>'
+			);
+		} );
+		it( 'should split every container up to the top level', () => {
+			const output = deepFilterHTML(
+				'<section><div><h2>a</h2><!--more--><h2>b</h2></div></section>',
+				[ specialCommentConverter ]
+			);
+			expect( output ).toEqual(
+				'<section><div><h2>a</h2></div></section><wp-block data-block="core/more"></wp-block><section><div><h2>b</h2></div></section>'
+			);
+		} );
+		it( 'should drop a half that would be empty', () => {
+			expect(
+				deepFilterHTML( '<div><!--more--></div>', [
+					specialCommentConverter,
+				] )
+			).toEqual( '<wp-block data-block="core/more"></wp-block>' );
+		} );
+		it( 'should split one container around two blocks', () => {
+			const output = deepFilterHTML(
+				'<div>a<!--more-->b<!--nextpage-->c</div>',
+				[ specialCommentConverter ]
+			);
+			expect( output ).toEqual(
+				'<div>a</div><wp-block data-block="core/more"></wp-block><div>b</div><wp-block data-block="core/nextpage"></wp-block><div>c</div>'
+			);
+		} );
+	} );
+
 	describe( 'when tags have been reformatted', () => {
 		it( 'should parse special comments', () => {
 			const output = deepFilterHTML(

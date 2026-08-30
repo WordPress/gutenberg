@@ -28,6 +28,16 @@ describe( 'mergeBlockTransforms', () => {
 		expect( mergeBlockTransforms( undefined, undefined ) ).toBeUndefined();
 	} );
 
+	it( 'tolerates `null`, which settings have always been allowed to hold', () => {
+		const client = { from: [ { type: 'raw', selector: 'p' } ] };
+
+		expect( mergeBlockTransforms( null, client ) ).toEqual( client );
+		expect( mergeBlockTransforms( null, null ) ).toBeUndefined();
+		expect(
+			mergeBlockTransforms( { from: [ { type: 'raw' } ] }, null ).from
+		).toHaveLength( 1 );
+	} );
+
 	it( 'carries over keys that are not a direction', () => {
 		const client = { supportedMobileTransforms: [ 'core/paragraph' ] };
 
@@ -157,6 +167,25 @@ describe( 'normalizeMetadataTransforms', () => {
 		).toEqual( { p: { children: phrasingContentSchema } } );
 	} );
 
+	it( 'drops a declared transform of a type that is nothing without its function', () => {
+		const { from } = normalizeMetadataTransforms(
+			{
+				from: [
+					{ type: 'enter', regExp: '^-{3,}$' },
+					{ type: 'files' },
+					{ type: 'prefix', prefix: '>' },
+					{ type: 'raw', selector: 'hr' },
+				],
+			},
+			'core/separator'
+		);
+
+		// Handing the husk to the editor would leave the paste and input
+		// handlers calling a `transform` that is not there.
+		expect( from ).toHaveLength( 1 );
+		expect( from[ 0 ].type ).toBe( 'raw' );
+	} );
+
 	it( 'expands a block transform naming several blocks into one per block', () => {
 		const { to } = normalizeMetadataTransforms(
 			{
@@ -218,6 +247,42 @@ describe( 'block transforms declared in metadata', () => {
 
 		expect( result.name ).toBe( target );
 		expect( result.attributes.title ).toBe( 'Hello' );
+	} );
+} );
+
+describe( 'a configuration passed as metadata', () => {
+	const name = 'test/config-as-metadata';
+
+	afterEach( () => {
+		unregisterBlockType( name );
+	} );
+
+	it( 'runs its transform functions verbatim', () => {
+		// `registerBlockType( config, config )` has always worked; the
+		// transforms of such a config are runnable exactly as written, so
+		// normalizing must not swap them for generated stand-ins.
+		const transform = jest.fn( () => null );
+		const isMatch = jest.fn( () => true );
+		const config = {
+			name,
+			apiVersion: 3,
+			title: 'Config as metadata',
+			category: 'text',
+			attributes: {},
+			transforms: {
+				from: [
+					{ type: 'raw', selector: 'marquee', transform, isMatch },
+				],
+			},
+			save: () => null,
+		};
+
+		registerBlockType( config, config );
+
+		const [ raw ] = getBlockType( name ).transforms.from;
+
+		expect( raw.transform ).toBe( transform );
+		expect( raw.isMatch ).toBe( isMatch );
 	} );
 } );
 
@@ -334,6 +399,36 @@ describe( 'transforms declared in metadata after a server bootstrap', () => {
 		unstable__bootstrapServerSideBlockDefinitions( {
 			[ name ]: {
 				transforms: { from: [ { type: 'raw', selector: 'aside' } ] },
+			},
+		} );
+
+		registerBlockType( name, {
+			title: 'Bootstrapped',
+			category: 'text',
+			save: () => null,
+		} );
+
+		const blockType = getBlockType( name );
+
+		expect( blockType.title ).toBe( 'Bootstrapped' );
+		expect( blockType.transforms.from[ 0 ].selector ).toBe( 'aside' );
+	} );
+
+	it( 'keeps declared transforms sent before the main bootstrap', () => {
+		// The two bootstrap calls carry no ordering guarantee, so the
+		// transforms have to survive arriving first as well as last.
+		unstable__bootstrapServerSideBlockDefinitions( {
+			[ name ]: {
+				transforms: { from: [ { type: 'raw', selector: 'aside' } ] },
+			},
+		} );
+
+		unstable__bootstrapServerSideBlockDefinitions( {
+			[ name ]: {
+				apiVersion: 3,
+				title: 'Bootstrapped',
+				category: 'text',
+				attributes: {},
 			},
 		} );
 

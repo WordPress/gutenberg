@@ -48,3 +48,72 @@ describe( 'phrasing content', () => {
 		} );
 	} );
 } );
+
+describe( 'phrasing content schema', () => {
+	/**
+	 * The full schema — attributes and nesting, not just tag names — pinned by
+	 * `fixtures/block-transforms/phrasing-content-schema.json`, which
+	 * `Gutenberg_Block_Transforms_Test` holds against the server's
+	 * `get_phrasing_content_schema()`. A change to either copy that does not
+	 * touch the fixture fails here or there.
+	 */
+	const fixture = JSON.parse(
+		fs.readFileSync(
+			path.join(
+				__dirname,
+				'fixtures/block-transforms/phrasing-content-schema.json'
+			),
+			'utf8'
+		)
+	);
+	const schema = getPhrasingContentSchema();
+	const textLevelTags = Object.keys( fixture.textLevel );
+
+	it( 'contains the text-level and embedded elements, nothing else', () => {
+		expect( Object.keys( schema ).sort() ).toEqual(
+			[ ...textLevelTags, ...Object.keys( fixture.embedded ) ].sort()
+		);
+	} );
+
+	it( 'keeps the attributes the fixture declares', () => {
+		[ fixture.textLevel, fixture.embedded ].forEach( ( group ) => {
+			Object.entries( group ).forEach( ( [ tag, definition ] ) => {
+				expect( {
+					[ tag ]: schema[ tag ].attributes,
+				} ).toEqual( { [ tag ]: definition.attributes } );
+			} );
+		} );
+	} );
+
+	it( 'nests every text-level element in every other, plus an image', () => {
+		textLevelTags
+			.filter( ( tag ) => ! fixture.childless.includes( tag ) )
+			.forEach( ( tag ) => {
+				const children = schema[ tag ].children;
+				const expected = [
+					...textLevelTags.filter( ( other ) => other !== tag ),
+					'img',
+				];
+
+				expect( { [ tag ]: Object.keys( children ).sort() } ).toEqual( {
+					[ tag ]: expected.sort(),
+				} );
+			} );
+
+		// The nesting recurses: an element excludes only itself, one level at
+		// a time, so `strong > em > strong` is allowed while `strong > strong`
+		// is not.
+		expect( schema.strong.children.em.children.strong ).toBeDefined();
+		expect( schema.strong.children.strong ).toBeUndefined();
+	} );
+
+	it( 'gives the childless elements no children', () => {
+		fixture.childless.forEach( ( tag ) => {
+			expect( schema[ tag ].children ).toBeUndefined();
+		} );
+	} );
+
+	it( 'lets math hold anything', () => {
+		expect( schema.math.children ).toBe( '*' );
+	} );
+} );
