@@ -3,6 +3,7 @@ import { getPhrasingContentSchema } from '@wordpress/dom';
 import warning from '@wordpress/warning';
 import { createBlock } from './factory';
 import { matchesSelector } from './matches-selector';
+import { getRawTransforms } from './raw-handling/get-raw-transforms';
 import { nodeToBlock } from './raw-handling/html-to-blocks';
 import {
 	getBlockAttributes,
@@ -137,14 +138,17 @@ function resolveAttributeValue( value: unknown, node: Element ): unknown {
 
 	let sourced =
 		'style' === declaration.source
-			? readStyleProperty( node, declaration.property )
+			? readStyleProperty(
+					resolveSelectorTarget( node, declaration.selector ),
+					declaration.property
+			  )
 			: readSourcedValue( declaration, node );
 
 	/*
 	 * An HTML attribute is always a string. The server-side parser coerces a
 	 * numeric one to the number its declared type asks for, so the editor has
-	 * to as well — matching `is_numeric()`, not `Number()`, whose looser
-	 * grammar would accept what the server rejects.
+	 * to as well — against the shared grammar, not `Number()`, whose looser
+	 * one would accept what the server rejects.
 	 */
 	if (
 		'attribute' === declaration.source &&
@@ -184,10 +188,14 @@ function resolveAttributeValue( value: unknown, node: Element ): unknown {
 }
 
 /**
- * The strings PHP's `is_numeric()` accepts, so both runtimes coerce the same
- * attribute values.
+ * The numeric grammar both runtimes share, so a declared `number` attribute
+ * coerces identically wherever the conversion runs. Deliberately stricter
+ * than `Number()` or PHP's `is_numeric()`: no surrounding whitespace, no
+ * hex or binary notation, no `Infinity` — those differ between engines and
+ * PHP versions, so accepting them would make the result depend on the
+ * runtime.
  */
-const NUMERIC_STRING = /^\s*[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?\s*$/;
+const NUMERIC_STRING = /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/;
 
 /**
  * Reads a declared attribute out of the matched markup.
@@ -226,6 +234,34 @@ function readSourcedValue(
 }
 
 /**
+ * Resolves a declared selector against the matched element itself or a
+ * descendant, the way the server-side parser resolves it.
+ *
+ * @param node     Element the transform matched.
+ * @param selector Declared selector, if any.
+ *
+ * @return The element to read from, or null when the selector matches nothing.
+ */
+function resolveSelectorTarget(
+	node: Element,
+	selector: unknown
+): Element | null {
+	if ( typeof selector !== 'string' || '' === selector ) {
+		return node;
+	}
+
+	if ( matchesSelector( node, selector ) ) {
+		return node;
+	}
+
+	try {
+		return node.querySelector( selector );
+	} catch {
+		return null;
+	}
+}
+
+/**
  * Reads one declaration out of an element's inline styles.
  *
  * @param node     Element to read.
@@ -234,10 +270,10 @@ function readSourcedValue(
  * @return The value, or undefined when the element does not set it.
  */
 function readStyleProperty(
-	node: Element,
+	node: Element | null,
 	property: unknown
 ): string | undefined {
-	if ( typeof property !== 'string' ) {
+	if ( ! node || typeof property !== 'string' ) {
 		return undefined;
 	}
 
@@ -312,10 +348,14 @@ function createRawTransform(
 	}
 
 	return ( node: Element, handler: Function ) => {
-		// Inner blocks are taken out of a copy, so the caller's node is left
-		// alone; a transform extracting none reads the node as it is.
+		/*
+		 * Inner blocks are taken out of a copy, so the caller's node is left
+		 * alone; a transform extracting none reads the node as it is, and one
+		 * extracting everything needs only the empty shell, not a deep copy
+		 * it would immediately clear.
+		 */
 		const sourceNode = convertsInnerBlocks
-			? ( node.cloneNode( true ) as Element )
+			? ( node.cloneNode( typeof innerBlocks === 'string' ) as Element )
 			: node;
 		let innerBlockList: unknown[] = [];
 
@@ -337,8 +377,9 @@ function createRawTransform(
 			const matched = Array.from( sourceNode.children ).filter(
 				( child ) => matchesSelector( child, innerBlocks )
 			);
+			const rawTransforms = getRawTransforms();
 			innerBlockList = matched.flatMap( ( child ) =>
-				nodeToBlock( child, handler as any )
+				nodeToBlock( child, handler as any, rawTransforms )
 			);
 			matched.forEach( ( child ) => child.remove() );
 		}
@@ -380,6 +421,19 @@ function createShortcodeAttributes( attributes: unknown ) {
 	return Object.fromEntries(
 		Object.entries( attributes as Record< string, any > ).map(
 			( [ name, definition ] ) => {
+				// Only a function can read a shortcode: anything else — a
+				// callable name that travelled through JSON, say — must not
+				// reach the converter that calls it.
+				if (
+					definition &&
+					typeof definition === 'object' &&
+					'shortcode' in definition &&
+					typeof definition.shortcode !== 'function'
+				) {
+					const { shortcode, ...safe } = definition;
+					definition = safe;
+				}
+
 				const { source, attribute, ...rest } = definition ?? {};
 
 				if ( 'shortcodeText' === source ) {
@@ -520,9 +574,43 @@ function normalizeTransform(
 		} ) );
 	}
 
-	// Any other type is carried through as declared: `enter`, `files` and
-	// `prefix` need nothing resolving.
+	/*
+	 * An `enter`, `files` or `prefix` transform is nothing without its
+	 * `transform` function, which JSON cannot carry — the published schema
+	 * does not admit these types — so a declared husk is dropped rather than
+	 * handed to editor code that would call what is not there. Anything else
+	 * unknown is carried through as declared.
+	 */
+	if ( [ 'enter', 'files', 'prefix' ].includes( transform.type ) ) {
+		return [];
+	}
+
 	return [ { ...transform } ];
+}
+
+/**
+ * Determines whether a transforms declaration carries function values.
+ *
+ * Functions cannot come out of `block.json`: their presence means JavaScript
+ * configuration was passed where metadata belongs — commonly
+ * `registerBlockType( config, config )` — and those transforms are runnable
+ * exactly as written, where normalizing would replace them with generated
+ * stand-ins.
+ *
+ * @param value Transforms declaration, or part of one.
+ *
+ * @return Whether a function appears anywhere in it.
+ */
+export function holdsFunctionTransforms( value: unknown ): boolean {
+	if ( typeof value === 'function' ) {
+		return true;
+	}
+
+	if ( ! value || typeof value !== 'object' ) {
+		return false;
+	}
+
+	return Object.values( value ).some( holdsFunctionTransforms );
 }
 
 /**
@@ -572,9 +660,14 @@ export function mergeBlockTransforms(
 	metadataTransforms: Record< string, DeclarativeTransform[] > = {},
 	clientTransforms: Record< string, DeclarativeTransform[] > = {}
 ): Record< string, DeclarativeTransform[] > | undefined {
+	// A parameter default does not apply to `null`, which settings have
+	// always been allowed to spell `transforms` as.
+	metadataTransforms = metadataTransforms ?? {};
+	clientTransforms = clientTransforms ?? {};
+
 	const directions = new Set( [
-		...Object.keys( metadataTransforms ?? {} ),
-		...Object.keys( clientTransforms ?? {} ),
+		...Object.keys( metadataTransforms ),
+		...Object.keys( clientTransforms ),
 	] );
 
 	// Leave a block that declares no transforms exactly as it was.

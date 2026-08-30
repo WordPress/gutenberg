@@ -2,7 +2,10 @@ import { select, dispatch } from '@wordpress/data';
 import { _x } from '@wordpress/i18n';
 import warning from '@wordpress/warning';
 import i18nBlockSchema from './i18n-block.json';
-import { normalizeMetadataTransforms } from './metadata-transforms';
+import {
+	holdsFunctionTransforms,
+	normalizeMetadataTransforms,
+} from './metadata-transforms';
 import { store as blocksStore } from '../store';
 import { unlock } from '../lock-unlock';
 import type {
@@ -60,15 +63,28 @@ function withNormalizedTransforms(
 	definition: Record< string, unknown >,
 	transforms: unknown
 ): Record< string, unknown > {
-	return transforms
-		? {
-				...definition,
-				transforms: normalizeMetadataTransforms(
-					transforms as any,
-					name
-				),
-		  }
-		: definition;
+	if ( ! transforms ) {
+		return definition;
+	}
+
+	/*
+	 * Functions cannot come out of `block.json`. Their presence means
+	 * JavaScript configuration was passed where metadata belongs — commonly
+	 * `registerBlockType( config, config )` — and those transforms are
+	 * runnable exactly as written: normalizing would swap the authored
+	 * functions for generated stand-ins that source nothing.
+	 */
+	if ( holdsFunctionTransforms( transforms ) ) {
+		return {
+			...definition,
+			transforms,
+		};
+	}
+
+	return {
+		...definition,
+		transforms: normalizeMetadataTransforms( transforms as any, name ),
+	};
 }
 
 /**

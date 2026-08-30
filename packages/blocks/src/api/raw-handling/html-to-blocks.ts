@@ -8,18 +8,20 @@ import type { Block, RawHandler } from '../../types';
 /**
  * Converts a single element into the block whose raw transform claims it.
  *
- * @param node    Element to convert.
- * @param handler The handler calling the conversion: either rawHandler
- *                or pasteHandler.
+ * @param node       Element to convert.
+ * @param handler    The handler calling the conversion: either rawHandler
+ *                   or pasteHandler.
+ * @param transforms The raw transforms to match against, so a caller
+ *                   converting many nodes gathers them once.
  *
  * @return The block the element becomes — or several, when a transform
  *          written in JavaScript returns more than one.
  */
 export function nodeToBlock(
 	node: Element,
-	handler: RawHandler
+	handler: RawHandler,
+	transforms: ReturnType< typeof getRawTransforms > = getRawTransforms()
 ): Block | Block[] {
-	const transforms = getRawTransforms();
 	const rawTransform = findTransform( transforms, ( transform ) =>
 		transform.isMatch( node )
 	);
@@ -100,7 +102,11 @@ export function htmlToBlocks( html: string, handler: RawHandler ): Block[] {
 
 	doc.body.innerHTML = html;
 
+	// Gathered once: the list rebuilds transform objects from the store on
+	// every call, which a many-node conversion has no reason to repeat.
+	const transforms = getRawTransforms();
+
 	return Array.from( doc.body.children ).flatMap( ( node ) =>
-		nodeToBlock( node, handler )
+		nodeToBlock( node, handler, transforms )
 	);
 }

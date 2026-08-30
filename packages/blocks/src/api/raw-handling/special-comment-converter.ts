@@ -31,69 +31,56 @@ export default function specialCommentConverter(
 
 	const block = createBlock( node, doc );
 
-	// If our `<!--more-->` comment is in the middle of a paragraph, we should
-	// split the paragraph in two and insert the more block in between. If it's
-	// inside an empty paragraph, we should still move it out of the paragraph
-	// and remove the paragraph. If there's no paragraph, fall back to simply
-	// replacing the comment.
-	if ( ! node.parentNode || node.parentNode.nodeName !== 'P' ) {
-		/*
-		 * The block has to reach the top level: `htmlToBlocks` visits only
-		 * `body`'s children, so a marker left inside another element would be
-		 * swallowed into whichever block claims its container. It lands right
-		 * after the top-level element it was found in.
-		 */
-		let topAncestor: Node = node;
+	// The block takes the comment's place, and then has to reach the top
+	// level: `htmlToBlocks` visits only `body`'s children, so a marker left
+	// inside another element would be swallowed into whichever block claims
+	// its container. Every container on the way up is split where the marker
+	// stood, so nothing around it is reordered: a paragraph splits into bare
+	// halves, as it always has, and any other container splits into halves
+	// that keep its own markup. Empty halves are dropped.
+	node.parentNode?.insertBefore( block, node );
+	remove( node as Element );
 
-		while (
-			topAncestor.parentNode &&
-			topAncestor.parentNode !== doc.body
-		) {
-			topAncestor = topAncestor.parentNode;
+	const buildHalf = ( container: Element, nodes: Node[] ): Element | null => {
+		if ( ! nodes.length ) {
+			return null;
 		}
 
-		if ( topAncestor === node ) {
-			// The comment already sits at the top level, so the block simply
-			// stands where it stood.
-			node.parentNode?.insertBefore( block, node );
-		} else {
-			topAncestor.parentNode?.insertBefore(
-				block,
-				topAncestor.nextSibling
-			);
+		const half =
+			container.nodeName === 'P'
+				? doc.createElement( 'p' )
+				: ( container.cloneNode( false ) as Element );
+
+		nodes.forEach( ( child ) => half.appendChild( child ) );
+
+		return half;
+	};
+
+	let container = block.parentNode as Element | null;
+
+	while ( container && container !== doc.body && container.parentNode ) {
+		const parentOfContainer = container.parentNode;
+		const childNodes = Array.from( container.childNodes );
+		const at = childNodes.indexOf( block as ChildNode );
+		const before = buildHalf( container, childNodes.slice( 0, at ) );
+		const after = buildHalf( container, childNodes.slice( at + 1 ) );
+
+		if ( before ) {
+			parentOfContainer.insertBefore( before, container );
 		}
 
-		remove( node as Element );
-	} else {
-		const childNodes = Array.from( node.parentNode.childNodes );
-		const nodeIndex = childNodes.indexOf( node as ChildNode );
-		const wrapperNode = node.parentNode.parentNode || doc.body;
+		parentOfContainer.insertBefore( block, container );
 
-		const paragraphBuilder = (
-			acc: HTMLElement | null,
-			child: Node
-		): HTMLElement => {
-			if ( ! acc ) {
-				acc = doc.createElement( 'p' );
-			}
+		if ( after ) {
+			parentOfContainer.insertBefore( after, container );
+		}
 
-			acc.appendChild( child );
+		remove( container as Element );
 
-			return acc;
-		};
-
-		// Split the original parent node and insert our more block
-		[
-			childNodes.slice( 0, nodeIndex ).reduce( paragraphBuilder, null ),
-			block,
-			childNodes.slice( nodeIndex + 1 ).reduce( paragraphBuilder, null ),
-		].forEach(
-			( element ) =>
-				element && wrapperNode.insertBefore( element, node.parentNode )
-		);
-
-		// Remove the old parent paragraph
-		remove( node.parentNode );
+		container =
+			parentOfContainer === doc.body
+				? null
+				: ( parentOfContainer as Element );
 	}
 }
 
