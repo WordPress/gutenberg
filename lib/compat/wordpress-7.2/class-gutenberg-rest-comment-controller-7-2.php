@@ -1,15 +1,15 @@
 <?php
 /**
- * REST API comment controller with reaction support for WordPress 7.1 compatibility.
+ * REST API comment controller with reaction support for WordPress 7.2 compatibility.
  *
  * Extends the 6.9 comment controller to add support for the 'reaction'
  * comment type, enabling emoji reactions on notes.
  *
  * @package gutenberg
- * @since   7.1.0
+ * @since   7.2.0
  */
 
-class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller {
+class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller {
 
 	/**
 	 * Retrieves the comment schema, adding reaction_summary.
@@ -17,7 +17,7 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 	 * Extends the parent schema with a read-only `reaction_summary`
 	 * property exposing aggregated reaction counts for each note.
 	 *
-	 * @since 7.1.0
+	 * @since 7.2.0
 	 *
 	 * @return array Item schema data.
 	 */
@@ -216,7 +216,7 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 	 * the post. Give reactions the same restriction core gives notes: never
 	 * public, readable only by their author or users who can edit the comment.
 	 *
-	 * @since 7.1.0
+	 * @since 7.2.0
 	 *
 	 * @param WP_Comment      $comment Comment object.
 	 * @param WP_REST_Request $request Request data to check.
@@ -252,7 +252,7 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 	 * another user, move it to a note on a post they cannot edit, or store a
 	 * duplicate or invalid slug. Toggling a reaction off is a delete.
 	 *
-	 * @since 7.1.0
+	 * @since 7.2.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has access to update the item, error object otherwise.
@@ -414,7 +414,7 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 	 * Extends the 6.9 implementation to support 'reaction' comment type
 	 * with validation for parent note, valid emoji slugs, and uniqueness.
 	 *
-	 * @since 7.1.0
+	 * @since 7.2.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or error object on failure.
@@ -749,7 +749,7 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 	 * Populated by get_items() to avoid N+1 queries when returning
 	 * multiple note comments.
 	 *
-	 * @since 7.1.0
+	 * @since 7.2.0
 	 * @var array|null
 	 */
 	protected $reaction_summaries = null;
@@ -760,7 +760,7 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 	 * Extends the parent to pre-fetch reaction summaries for all returned
 	 * note comments in a single batch query, avoiding N+1 queries.
 	 *
-	 * @since 7.1.0
+	 * @since 7.2.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or error object on failure.
@@ -824,7 +824,7 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 	 * Runs a single aggregated query to build summaries for all notes,
 	 * avoiding N+1 queries in prepare_item_for_response().
 	 *
-	 * @since 7.1.0
+	 * @since 7.2.0
 	 *
 	 * @param int[] $note_ids Array of note comment IDs.
 	 */
@@ -905,7 +905,7 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 	 *
 	 * Extends the parent to include reaction_summary for note comments.
 	 *
-	 * @since 7.1.0
+	 * @since 7.2.0
 	 *
 	 * @param WP_Comment      $item    Comment object.
 	 * @param WP_REST_Request $request Request object.
@@ -940,7 +940,7 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 	 * Extends the 6.9 implementation to also allow reaction content
 	 * (emoji slugs are always valid content).
 	 *
-	 * @since 7.1.0
+	 * @since 7.2.0
 	 *
 	 * @param array $prepared_comment The prepared comment data.
 	 * @return bool True if the content is allowed, false otherwise.
@@ -956,13 +956,13 @@ class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller 
 }
 
 /**
- * Registers the Gutenberg REST comment controller for WordPress 7.1 compatibility.
+ * Registers the Gutenberg REST comment controller for WordPress 7.2 compatibility.
  *
- * Replaces the 6.9 controller registration to use the 7.1 controller
+ * Replaces the 6.9 controller registration to use the 7.2 controller
  * which adds reaction support.
  */
-function gutenberg_register_comment_controller_7_1() {
-	$controller = new Gutenberg_REST_Comment_Controller_7_1();
+function gutenberg_register_comment_controller_7_2() {
+	$controller = new Gutenberg_REST_Comment_Controller_7_2();
 	$controller->register_routes();
 }
-add_action( 'rest_api_init', 'gutenberg_register_comment_controller_7_1' );
+add_action( 'rest_api_init', 'gutenberg_register_comment_controller_7_2' );
