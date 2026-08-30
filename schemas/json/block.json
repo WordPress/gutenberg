@@ -1244,11 +1244,6 @@
 									"type": "string"
 								}
 							},
-							"oembedType": {
-								"description": "The oEmbed resource type this variation’s provider is known to answer with, read by the server-side conversion. Omit it for a provider serving more than one kind of media, whose type depends on the URL.",
-								"type": "string",
-								"enum": [ "rich", "video", "photo", "link" ]
-							},
 							"innerBlocks": {
 								"description": "Initial configuration of nested blocks.",
 								"type": "array",

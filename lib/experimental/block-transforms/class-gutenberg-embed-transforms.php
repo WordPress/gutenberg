@@ -40,13 +40,12 @@ class Gutenberg_Embed_Transforms {
 	 * same way `matchesPatterns()` compiles them in the editor — and the
 	 * `attributes` the matched block stores.
 	 *
-	 * `oembedType` has no meaning in the editor, which learns a URL's oEmbed
-	 * type from the provider's response once the preview loads. Conversion
-	 * cannot wait for that, so a variation may declare the type its provider
-	 * is known to answer with. Providers serving more than one kind of media
-	 * answer differently per URL and declare none: the editor fills the type
-	 * in when the post is next opened, the same as it would for a provider it
-	 * does not recognise.
+	 * Among those attributes may be the oEmbed `type` the provider is known
+	 * to answer with. The editor confirms it from the provider's response
+	 * once the preview loads, which conversion cannot wait for. Providers
+	 * serving more than one kind of media answer differently per URL and
+	 * declare none: the editor fills the type in when the post is next
+	 * opened, the same as it would for a provider it does not recognise.
 	 *
 	 * @return array[] Providers keyed by variation name.
 	 */
@@ -81,16 +80,10 @@ class Gutenberg_Embed_Transforms {
 				continue;
 			}
 
-			$provider = array(
+			$providers[ $variation['name'] ] = array(
 				'patterns'   => $patterns,
 				'attributes' => isset( $variation['attributes'] ) && is_array( $variation['attributes'] ) ? $variation['attributes'] : array(),
 			);
-
-			if ( isset( $variation['oembedType'] ) && is_string( $variation['oembedType'] ) ) {
-				$provider['type'] = $variation['oembedType'];
-			}
-
-			$providers[ $variation['name'] ] = $provider;
 		}
 
 		return $providers;
@@ -307,10 +300,6 @@ class Gutenberg_Embed_Transforms {
 	private static function create_block( $url, $class_name, $anchor = null ) {
 		$provider = self::find_provider( $url );
 		$values   = array( 'url' => $url );
-
-		if ( isset( $provider['type'] ) ) {
-			$values['type'] = $provider['type'];
-		}
 
 		if ( null !== $provider ) {
 			$values = array_merge( $values, $provider['attributes'] );

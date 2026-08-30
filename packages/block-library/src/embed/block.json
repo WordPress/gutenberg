@@ -59,9 +59,9 @@
 			"patterns": [ "^https?://(www\\.)?twitter\\.com/.+" ],
 			"attributes": {
 				"providerNameSlug": "twitter",
-				"responsive": true
-			},
-			"oembedType": "rich"
+				"responsive": true,
+				"type": "rich"
+			}
 		},
 		{
 			"name": "youtube",
@@ -74,9 +74,9 @@
 			],
 			"attributes": {
 				"providerNameSlug": "youtube",
-				"responsive": true
-			},
-			"oembedType": "video"
+				"responsive": true,
+				"type": "video"
+			}
 		},
 		{
 			"name": "facebook",
@@ -120,9 +120,9 @@
 			"patterns": [ "^https?://(www\\.)?soundcloud\\.com/.+" ],
 			"attributes": {
 				"providerNameSlug": "soundcloud",
-				"responsive": true
-			},
-			"oembedType": "rich"
+				"responsive": true,
+				"type": "rich"
+			}
 		},
 		{
 			"name": "spotify",
@@ -132,9 +132,9 @@
 			"patterns": [ "^https?://(open|play)\\.spotify\\.com/.+" ],
 			"attributes": {
 				"providerNameSlug": "spotify",
-				"responsive": true
-			},
-			"oembedType": "rich"
+				"responsive": true,
+				"type": "rich"
+			}
 		},
 		{
 			"name": "flickr",
@@ -158,9 +158,9 @@
 			"patterns": [ "^https?://(www\\.)?vimeo\\.com/.+" ],
 			"attributes": {
 				"providerNameSlug": "vimeo",
-				"responsive": true
-			},
-			"oembedType": "video"
+				"responsive": true,
+				"type": "video"
+			}
 		},
 		{
 			"name": "animoto",
@@ -169,9 +169,9 @@
 			"patterns": [ "^https?://(www\\.)?(animoto|video214)\\.com/.+" ],
 			"attributes": {
 				"providerNameSlug": "animoto",
-				"responsive": true
-			},
-			"oembedType": "video"
+				"responsive": true,
+				"type": "video"
+			}
 		},
 		{
 			"name": "cloudup",
@@ -204,9 +204,9 @@
 			],
 			"attributes": {
 				"providerNameSlug": "crowdsignal",
-				"responsive": true
-			},
-			"oembedType": "rich"
+				"responsive": true,
+				"type": "rich"
+			}
 		},
 		{
 			"name": "dailymotion",
@@ -216,9 +216,9 @@
 			"patterns": [ "^https?://(www\\.)?dailymotion\\.com/.+" ],
 			"attributes": {
 				"providerNameSlug": "dailymotion",
-				"responsive": true
-			},
-			"oembedType": "video"
+				"responsive": true,
+				"type": "video"
+			}
 		},
 		{
 			"name": "imgur",
@@ -227,9 +227,9 @@
 			"patterns": [ "^https?://(.+\\.)?imgur\\.com/.+" ],
 			"attributes": {
 				"providerNameSlug": "imgur",
-				"responsive": true
-			},
-			"oembedType": "rich"
+				"responsive": true,
+				"type": "rich"
+			}
 		},
 		{
 			"name": "issuu",
@@ -238,9 +238,9 @@
 			"patterns": [ "^https?://(www\\.)?issuu\\.com/.+" ],
 			"attributes": {
 				"providerNameSlug": "issuu",
-				"responsive": true
-			},
-			"oembedType": "rich"
+				"responsive": true,
+				"type": "rich"
+			}
 		},
 		{
 			"name": "kickstarter",
@@ -252,9 +252,9 @@
 			],
 			"attributes": {
 				"providerNameSlug": "kickstarter",
-				"responsive": true
-			},
-			"oembedType": "rich"
+				"responsive": true,
+				"type": "rich"
+			}
 		},
 		{
 			"name": "mixcloud",
@@ -264,9 +264,9 @@
 			"patterns": [ "^https?://(www\\.)?mixcloud\\.com/.+" ],
 			"attributes": {
 				"providerNameSlug": "mixcloud",
-				"responsive": true
-			},
-			"oembedType": "rich"
+				"responsive": true,
+				"type": "rich"
+			}
 		},
 		{
 			"name": "pocket-casts",
@@ -276,9 +276,9 @@
 			"patterns": [ "^https://pca.st/\\w+" ],
 			"attributes": {
 				"providerNameSlug": "pocket-casts",
-				"responsive": true
-			},
-			"oembedType": "rich"
+				"responsive": true,
+				"type": "rich"
+			}
 		},
 		{
 			"name": "reddit",
@@ -287,9 +287,9 @@
 			"patterns": [ "^https?://(www\\.)?reddit\\.com/.+" ],
 			"attributes": {
 				"providerNameSlug": "reddit",
-				"responsive": true
-			},
-			"oembedType": "rich"
+				"responsive": true,
+				"type": "rich"
+			}
 		},
 		{
 			"name": "reverbnation",
@@ -298,9 +298,9 @@
 			"patterns": [ "^https?://(www\\.)?reverbnation\\.com/.+" ],
 			"attributes": {
 				"providerNameSlug": "reverbnation",
-				"responsive": true
-			},
-			"oembedType": "rich"
+				"responsive": true,
+				"type": "rich"
+			}
 		},
 		{
 			"name": "scribd",
@@ -309,9 +309,9 @@
 			"patterns": [ "^https?://(www\\.)?scribd\\.com/.+" ],
 			"attributes": {
 				"providerNameSlug": "scribd",
-				"responsive": true
-			},
-			"oembedType": "rich"
+				"responsive": true,
+				"type": "rich"
+			}
 		},
 		{
 			"name": "smugmug",
@@ -331,9 +331,9 @@
 			"patterns": [ "^https?://(www\\.)?speakerdeck\\.com/.+" ],
 			"attributes": {
 				"providerNameSlug": "speaker-deck",
-				"responsive": true
-			},
-			"oembedType": "rich"
+				"responsive": true,
+				"type": "rich"
+			}
 		},
 		{
 			"name": "tiktok",
@@ -343,9 +343,9 @@
 			"patterns": [ "^https?://(www\\.)?tiktok\\.com/.+" ],
 			"attributes": {
 				"providerNameSlug": "tiktok",
-				"responsive": true
-			},
-			"oembedType": "video"
+				"responsive": true,
+				"type": "video"
+			}
 		},
 		{
 			"name": "ted",
@@ -354,9 +354,9 @@
 			"patterns": [ "^https?://(www\\.|embed\\.)?ted\\.com/.+" ],
 			"attributes": {
 				"providerNameSlug": "ted",
-				"responsive": true
-			},
-			"oembedType": "video"
+				"responsive": true,
+				"type": "video"
+			}
 		},
 		{
 			"name": "tumblr",
@@ -366,9 +366,9 @@
 			"patterns": [ "^https?://(.+)\\.tumblr\\.com/.+" ],
 			"attributes": {
 				"providerNameSlug": "tumblr",
-				"responsive": true
-			},
-			"oembedType": "rich"
+				"responsive": true,
+				"type": "rich"
+			}
 		},
 		{
 			"name": "videopress",
@@ -378,9 +378,9 @@
 			"patterns": [ "^https?://videopress\\.com/.+" ],
 			"attributes": {
 				"providerNameSlug": "videopress",
-				"responsive": true
-			},
-			"oembedType": "video"
+				"responsive": true,
+				"type": "video"
+			}
 		},
 		{
 			"name": "wordpress-tv",
@@ -389,9 +389,9 @@
 			"patterns": [ "^https?://wordpress\\.tv/.+" ],
 			"attributes": {
 				"providerNameSlug": "wordpress-tv",
-				"responsive": true
-			},
-			"oembedType": "video"
+				"responsive": true,
+				"type": "video"
+			}
 		},
 		{
 			"name": "amazon-kindle",
@@ -403,9 +403,9 @@
 				"^https?://(www\\.)?(a\\.co|z\\.cn)/.+"
 			],
 			"attributes": {
-				"providerNameSlug": "amazon-kindle"
-			},
-			"oembedType": "rich"
+				"providerNameSlug": "amazon-kindle",
+				"type": "rich"
+			}
 		},
 		{
 			"name": "pinterest",
@@ -416,9 +416,9 @@
 				"^https?://([a-z]{2}|www)\\.pinterest\\.com(\\.(au|mx))?/.*"
 			],
 			"attributes": {
-				"providerNameSlug": "pinterest"
-			},
-			"oembedType": "rich"
+				"providerNameSlug": "pinterest",
+				"type": "rich"
+			}
 		},
 		{
 			"name": "wolfram-cloud",
@@ -427,9 +427,9 @@
 			"patterns": [ "^https?://(www\\.)?wolframcloud\\.com/obj/.+" ],
 			"attributes": {
 				"providerNameSlug": "wolfram-cloud",
-				"responsive": true
-			},
-			"oembedType": "rich"
+				"responsive": true,
+				"type": "rich"
+			}
 		},
 		{
 			"name": "bluesky",
@@ -437,9 +437,9 @@
 			"description": "Embed a Bluesky post.",
 			"patterns": [ "^https?://bsky\\.app/profile/.+/post/.+" ],
 			"attributes": {
-				"providerNameSlug": "bluesky"
-			},
-			"oembedType": "rich"
+				"providerNameSlug": "bluesky",
+				"type": "rich"
+			}
 		}
 	],
 	"editorStyle": "wp-block-embed-editor",

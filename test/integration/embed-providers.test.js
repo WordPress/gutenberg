@@ -64,16 +64,16 @@ describe( 'The embed providers declared in block.json', () => {
 	it( 'records only oEmbed types the block can save', () => {
 		// `save` writes the type into a class name, so a value the editor
 		// would never produce would be markup it cannot validate.
-		for ( const { oembedType } of declared ) {
+		for ( const { attributes } of declared ) {
 			expect( [ undefined, 'rich', 'photo', 'video', 'link' ] ).toContain(
-				oembedType
+				attributes?.type
 			);
 		}
 	} );
 
 	it( 'declares a type only for a provider a pattern can attribute', () => {
-		for ( const { name, patterns, oembedType } of declared ) {
-			if ( undefined === oembedType ) {
+		for ( const { name, patterns, attributes } of declared ) {
+			if ( undefined === attributes?.type ) {
 				continue;
 			}
 

@@ -2384,8 +2384,8 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 				'attributes' => array(
 					'providerNameSlug' => 'example-videos',
 					'responsive'       => true,
+					'type'             => 'video',
 				),
-				'oembedType' => 'video',
 			);
 
 			return $variations;
