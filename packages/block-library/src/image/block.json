@@ -165,6 +165,7 @@
 				"serverConversion": {
 					"requires": {
 						"figure": {
+							"classes": [ "wp-block-image" ],
 							"children": {
 								"img": {
 									"attributes": [ "src", "alt", "title" ]

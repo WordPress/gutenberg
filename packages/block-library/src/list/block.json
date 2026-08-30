@@ -29,7 +29,8 @@
 			"type": "number"
 		},
 		"reversed": {
-			"type": "boolean"
+			"type": "boolean",
+			"default": false
 		},
 		"placeholder": {
 			"type": "string"
@@ -130,6 +131,18 @@
 						"source": "attribute",
 						"selector": "ol",
 						"attribute": "reversed"
+					},
+					"type": {
+						"type": "string",
+						"source": "attribute",
+						"selector": "ol",
+						"attribute": "type",
+						"map": {
+							"A": "upper-alpha",
+							"a": "lower-alpha",
+							"I": "upper-roman",
+							"i": "lower-roman"
+						}
 					}
 				}
 			}

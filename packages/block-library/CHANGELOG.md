@@ -17,6 +17,10 @@
 -   Paragraph, Heading: Read a `text-align` written as inline CSS through the block's declared transform, so an alignment survives conversion outside the editor as well as in it ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
 -   List: Leave an `<ol>` carrying a `type` or an inline style as Custom HTML rather than converting it into a list that has lost the numbering style ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
 -   More: Read the `<!--noteaser-->` marker through the block's declared transform, which is the last thing its JavaScript transform was needed for ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+-   Separator: Declare the `has-alpha-channel-opacity` class the block's `save` writes for its default opacity, so a separator converted on the server matches the current markup instead of the deprecated CSS-opacity form ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+-   Code: Match the same markup in the editor as on the server — a `<pre>` whose only element child is a `<code>` with nothing but whitespace around it — so indented markup converts to a Code block on both, and a `<pre>` holding real text besides its `<code>` becomes Preformatted instead of dropping that text ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+-   Image: Keep a JavaScript `isMatch` beside the declared `figure:has(img)` selector, because selector engines disagree about `:has()`; and decline server conversion for a `<figure>` carrying class names, which the editor's transform reads meaning into ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+-   List: Declare `reversed` with its `false` default and the `type` attribute's keyword mapping, so both runtimes read the same values out of list markup ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
 
 ### Internal
 

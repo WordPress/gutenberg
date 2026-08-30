@@ -49,6 +49,9 @@
 				"name": "from-raw",
 				"type": "raw",
 				"selector": "hr",
+				"serverConversion": {
+					"classes": [ "has-alpha-channel-opacity" ]
+				},
 				"schema": {
 					"hr": {}
 				}
