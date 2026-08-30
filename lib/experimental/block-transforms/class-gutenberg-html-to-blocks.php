@@ -709,26 +709,28 @@ class Gutenberg_HTML_To_Blocks {
 	 * it. Only the content is filtered: the wrapper's own attributes are
 	 * decided by what the block's `save` puts back on it.
 	 *
-	 * @param Gutenberg_HTML_Element $element Matched element.
-	 * @param array                  $schema  Content schema declared by the transform.
+	 * @param Gutenberg_HTML_Element $element    Matched element.
+	 * @param array                  $schema     Content schema declared by the transform.
+	 * @param bool                   $conforming Optional. Whether the schema is a `requires` conformance probe. Default false.
 	 * @return void
 	 */
-	private static function apply_content_schema( $element, $schema ) {
+	private static function apply_content_schema( $element, $schema, $conforming = false ) {
 		if ( ! isset( $schema[ $element->tag_name ] ) || ! is_array( $schema[ $element->tag_name ] ) ) {
 			return;
 		}
 
-		self::filter_children( $element, $schema[ $element->tag_name ] );
+		self::filter_children( $element, $schema[ $element->tag_name ], $conforming );
 	}
 
 	/**
 	 * Filters an element's children against the schema entry describing it.
 	 *
-	 * @param Gutenberg_HTML_Element $element Element whose children to filter.
-	 * @param array                  $entry   Schema entry for the element.
+	 * @param Gutenberg_HTML_Element $element    Element whose children to filter.
+	 * @param array                  $entry      Schema entry for the element.
+	 * @param bool                   $conforming Optional. Whether the schema is a `requires` conformance probe. Default false.
 	 * @return void
 	 */
-	private static function filter_children( $element, $entry ) {
+	private static function filter_children( $element, $entry, $conforming = false ) {
 		if ( ! array_key_exists( 'children', $entry ) ) {
 			$element->children = array();
 
@@ -743,7 +745,7 @@ class Gutenberg_HTML_To_Blocks {
 		}
 
 		foreach ( $element->children as $child ) {
-			self::filter_node( $child, $children );
+			self::filter_node( $child, $children, $conforming );
 		}
 	}
 
@@ -896,11 +898,12 @@ class Gutenberg_HTML_To_Blocks {
 	/**
 	 * Keeps, cleans or unwraps a single node according to a schema.
 	 *
-	 * @param Gutenberg_HTML_Element $node   Node to filter.
-	 * @param array                  $schema Schema the node's parent allows.
+	 * @param Gutenberg_HTML_Element $node       Node to filter.
+	 * @param array                  $schema     Schema the node's parent allows.
+	 * @param bool                   $conforming Optional. Whether the schema is a `requires` conformance probe. Default false.
 	 * @return void
 	 */
-	private static function filter_node( $node, $schema ) {
+	private static function filter_node( $node, $schema, $conforming = false ) {
 		if ( Gutenberg_HTML_Element::TEXT === $node->type ) {
 			if ( ! isset( $schema['#text'] ) && ! self::is_blank_text( $node->text ) ) {
 				$node->remove();
@@ -916,7 +919,7 @@ class Gutenberg_HTML_To_Blocks {
 		if ( ! isset( $schema[ $node->tag_name ] ) || ! is_array( $schema[ $node->tag_name ] ) ) {
 			// An element the schema does not name keeps its content but loses itself.
 			foreach ( $node->children as $child ) {
-				self::filter_node( $child, $schema );
+				self::filter_node( $child, $schema, $conforming );
 			}
 
 			$node->unwrap();
@@ -932,15 +935,25 @@ class Gutenberg_HTML_To_Blocks {
 		 * attribute never falls to the attribute list; the schema's `classes`
 		 * decide which class names survive — none do when the schema names
 		 * none — and they decide it even for an entry keeping every other
-		 * attribute with `*`.
+		 * attribute with `*`. A `requires` probe reads two spellings
+		 * differently, both meaning a class cannot count against what `save`
+		 * reproduces: `*` says this element's attributes do not matter, the
+		 * block's own schema strips them anyway, and `class` in the attribute
+		 * list says `save` writes the class back.
 		 */
-		self::filter_classes( $node, $entry );
+		$class_conforms = $conforming
+			&& ! isset( $entry['classes'] )
+			&& ( null === $attributes || in_array( 'class', $attributes, true ) );
+
+		if ( ! $class_conforms ) {
+			self::filter_classes( $node, $entry );
+		}
 
 		if ( null !== $attributes ) {
 			$node->keep_attributes( array_merge( $attributes, array( 'class' ) ) );
 		}
 
-		self::filter_children( $node, $entry );
+		self::filter_children( $node, $entry, $conforming );
 	}
 
 	/**
@@ -1148,7 +1161,7 @@ class Gutenberg_HTML_To_Blocks {
 
 		$before = $copy->get_inner_html();
 
-		self::apply_content_schema( $copy, $schema );
+		self::apply_content_schema( $copy, $schema, true );
 
 		return $before === $copy->get_inner_html();
 	}

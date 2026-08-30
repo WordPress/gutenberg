@@ -2881,6 +2881,34 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 		$this->assertSame( '<aside><b>M</b></aside>', $blocks[0]['innerHTML'] );
 	}
 
+	public function test_conformance_reads_no_class_into_a_wildcarded_element() {
+		/*
+		 * The Code block requires a lone `<code>` whose attributes, spelled
+		 * `*`, do not matter: its own schema strips them anyway. A language
+		 * class must not count against what `save` reproduces, or every
+		 * highlighted snippet in classic content lands in Preformatted.
+		 */
+		$blocks = gutenberg_html_to_blocks( '<pre><code class="language-js">const a = 1;</code></pre>' );
+
+		$this->assertSame( 'core/code', $blocks[0]['blockName'] );
+		$this->assertSame( '<pre class="wp-block-code"><code>const a = 1;</code></pre>', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_conformance_accepts_a_class_the_block_saves_back() {
+		/*
+		 * The Image block's `requires` lists `class` among the attributes of
+		 * the link, because `save` writes `linkClass` back onto it — so a
+		 * classed link is content the conversion can reproduce, not a reason
+		 * to leave the figure alone.
+		 */
+		$blocks = gutenberg_html_to_blocks(
+			'<figure><a class="custom-link" href="https://example.com/page"><img src="https://example.com/a.png" alt="A"></a></figure>'
+		);
+
+		$this->assertSame( 'core/image', $blocks[0]['blockName'] );
+		$this->assertStringContainsString( '<a class="custom-link"', $blocks[0]['innerHTML'] );
+	}
+
 	public function test_reads_a_contextual_attribute_wildcard() {
 		$this->register(
 			'test/ctx-star',
