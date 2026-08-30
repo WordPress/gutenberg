@@ -403,6 +403,38 @@ class Gutenberg_HTML_Element {
 	}
 
 	/**
+	 * Replaces the class names on this element.
+	 *
+	 * An empty list removes the `class` attribute entirely, as the editor's
+	 * `cleanNodeList()` removes it once no class survives its filtering.
+	 *
+	 * @param string[] $class_names Class names to keep.
+	 * @return void
+	 */
+	public function set_class_names( $class_names ) {
+		if ( self::ELEMENT !== $this->type ) {
+			return;
+		}
+
+		$processor = new WP_HTML_Tag_Processor( $this->opening_html );
+
+		if ( ! $processor->next_tag() ) {
+			return;
+		}
+
+		if ( array() === $class_names ) {
+			$processor->remove_attribute( 'class' );
+			unset( $this->attributes['class'] );
+		} else {
+			$value = implode( ' ', $class_names );
+			$processor->set_attribute( 'class', $value );
+			$this->attributes['class'] = $value;
+		}
+
+		$this->opening_html = self::normalize_tag_whitespace( $processor->get_updated_html() );
+	}
+
+	/**
 	 * Removes every attribute except the named ones.
 	 *
 	 * The dropped attributes are removed from the original opening tag rather
@@ -444,15 +476,72 @@ class Gutenberg_HTML_Element {
 			}
 		}
 
-		/*
-		 * `remove_attribute()` leaves the whitespace that stood around the
-		 * attribute. A gap before the closing bracket is trimmed so a tag
-		 * whose last attribute was removed still reads as it would have been
-		 * written; a quoted value cannot be touched, because its closing
-		 * quote stands between it and the bracket.
-		 */
-		$this->opening_html = preg_replace( '/\s+(\/?>)$/', '$1', $processor->get_updated_html() );
+		$this->opening_html = self::normalize_tag_whitespace( $processor->get_updated_html() );
 		$this->attributes   = $kept;
+	}
+
+	/**
+	 * Collapses the gaps attribute removal leaves in an opening tag.
+	 *
+	 * `remove_attribute()` keeps the whitespace that stood around the removed
+	 * attribute, so a tag can end up with a doubled space between attributes
+	 * or a gap before its closing bracket — differences the DOM
+	 * serialization the editor stores never shows. Only the gaps are
+	 * touched: a lone space survives as written, and quoted values are
+	 * copied verbatim.
+	 *
+	 * @param string $html Opening tag markup.
+	 * @return string The markup without doubled or trailing gaps.
+	 */
+	private static function normalize_tag_whitespace( $html ) {
+		$length = strlen( $html );
+		$out    = '';
+		$quote  = null;
+
+		for ( $at = 0; $at < $length; $at++ ) {
+			$character = $html[ $at ];
+
+			if ( null !== $quote ) {
+				$out .= $character;
+
+				if ( $character === $quote ) {
+					$quote = null;
+				}
+
+				continue;
+			}
+
+			if ( '"' === $character || "'" === $character ) {
+				$quote = $character;
+				$out  .= $character;
+				continue;
+			}
+
+			if ( false !== strpos( " \t\n\r\f", $character ) ) {
+				$run = 1;
+
+				while ( $at + 1 < $length && false !== strpos( " \t\n\r\f", $html[ $at + 1 ] ) ) {
+					++$at;
+					++$run;
+				}
+
+				$next = $at + 1 < $length ? $html[ $at + 1 ] : '';
+
+				// A gap before the closing bracket is dropped entirely; a
+				// run between attributes becomes one space; a lone space
+				// that was always there stays as written.
+				if ( '>' === $next ) {
+					continue;
+				}
+
+				$out .= 1 === $run ? $character : ' ';
+				continue;
+			}
+
+			$out .= $character;
+		}
+
+		return $out;
 	}
 
 	/**
@@ -769,6 +858,22 @@ class Gutenberg_HTML_Element {
 	 * @return array[]|null Parsed complex selectors, or null when unsupported.
 	 */
 	private static function parse_selector_list( $selector ) {
+		if ( ! is_string( $selector ) ) {
+			static $warned_non_string = false;
+
+			// A non-string cannot index the cache — or name a selector.
+			if ( ! $warned_non_string ) {
+				$warned_non_string = true;
+				_doing_it_wrong(
+					__METHOD__,
+					__( 'A selector has to be a string, so this one matches nothing.', 'gutenberg' ),
+					'23.9.0'
+				);
+			}
+
+			return null;
+		}
+
 		if ( array_key_exists( $selector, self::$selector_cache ) ) {
 			return self::$selector_cache[ $selector ];
 		}
@@ -983,12 +1088,21 @@ class Gutenberg_HTML_Element {
 					return null;
 				}
 
-				$argument = trim( substr( $selector, $open + 1, $close - $open - 1 ) );
+			$argument = trim( substr( $selector, $open + 1, $close - $open - 1 ) );
 				$scope    = '';
 
 				if ( 0 === strpos( $argument, '>' ) ) {
 					$scope    = '>';
 					$argument = trim( substr( $argument, 1 ) );
+				}
+
+				/*
+				 * `:has()` takes a relative selector; `:not()` does not —
+				 * `Element.matches()` throws on `:not(> p)` — so accepting it
+				 * here would match markup only on the server.
+				 */
+				if ( 'not' === $matches[1] && '' !== $scope ) {
+					return null;
 				}
 
 				$compound[ $matches[1] ][] = array(

@@ -57,7 +57,7 @@ class Gutenberg_Block_Attributes_Parser {
 	 * @return mixed Attribute value, or null when the attribute has no value.
 	 */
 	public static function parse_single( $schema, $element ) {
-		$value = self::apply_source( $schema, $element );
+		$value = self::coerce_declared_number( self::apply_source( $schema, $element ), $schema );
 
 		/*
 		 * A `map` turns the sourced value into the one the block declares, such
@@ -81,6 +81,58 @@ class Gutenberg_Block_Attributes_Parser {
 			$value = array_key_exists( $key, $schema['map'] ) ? $schema['map'][ $key ] : null;
 		}
 
+		if ( ! self::is_valid_by_type( $value, $schema ) || ! self::is_valid_by_enum( $value, $schema ) ) {
+			return null;
+		}
+
+		return $value;
+	}
+
+	/**
+	 * Coerces a numeric attribute string for a declared transform attribute.
+	 *
+	 * HTML attributes are always strings. The editor coerces a declared
+	 * override's numeric string — and only there: a block's own attributes
+	 * are read uncoerced by `getBlockAttributes()` on both runtimes — using
+	 * one strict grammar, so the same value converts on every PHP version
+	 * rather than following `is_numeric()`, whose whitespace rules changed
+	 * in PHP 8.
+	 *
+	 * @param mixed $value  Sourced value.
+	 * @param array $schema Attribute definition.
+	 * @return mixed The value, as a number when the definition asks for one.
+	 */
+	private static function coerce_declared_number( $value, $schema ) {
+		$type = isset( $schema['type'] ) ? $schema['type'] : null;
+
+		if ( ( 'number' !== $type && 'integer' !== $type ) || ! is_string( $value ) ) {
+			return $value;
+		}
+
+		if ( ! isset( $schema['source'] ) || 'attribute' !== $schema['source'] ) {
+			return $value;
+		}
+
+		if ( ! preg_match( '/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/D', $value ) ) {
+			return $value;
+		}
+
+		$number = (float) $value;
+
+		return (float) (int) $number === $number ? (int) $number : $number;
+	}
+
+	/**
+	 * Validates a value against an attribute definition's type and enum.
+	 *
+	 * The same check every sourced attribute goes through, exposed for the
+	 * paths that read values by other means, such as shortcode sources.
+	 *
+	 * @param mixed $value  Value to validate.
+	 * @param array $schema Attribute definition.
+	 * @return mixed The value, or null when it does not satisfy the definition.
+	 */
+	public static function validate( $value, $schema ) {
 		if ( ! self::is_valid_by_type( $value, $schema ) || ! self::is_valid_by_enum( $value, $schema ) ) {
 			return null;
 		}
@@ -122,11 +174,12 @@ class Gutenberg_Block_Attributes_Parser {
 	/**
 	 * Applies a single attribute source to an element.
 	 *
-	 * @param array                  $schema  Attribute definition.
-	 * @param Gutenberg_HTML_Element $element Element to read from.
+	 * @param array                  $schema       Attribute definition.
+	 * @param Gutenberg_HTML_Element $element      Element to read from.
+	 * @param bool                   $within_query Whether the value is a `query` sub-attribute, whose selector never matches the item itself.
 	 * @return mixed Sourced value, or null when nothing matched.
 	 */
-	private static function apply_source( $schema, $element ) {
+	private static function apply_source( $schema, $element, $within_query = false ) {
 		$selector = isset( $schema['selector'] ) ? $schema['selector'] : null;
 		$source   = isset( $schema['source'] ) ? $schema['source'] : null;
 
@@ -145,7 +198,7 @@ class Gutenberg_Block_Attributes_Parser {
 				$item = array();
 
 				foreach ( $sub_schema as $sub_name => $sub_attribute ) {
-					$sub_value = self::apply_source( $sub_attribute, $match );
+					$sub_value = self::apply_source( $sub_attribute, $match, true );
 
 					if ( ! self::is_valid_by_type( $sub_value, $sub_attribute ) || ! self::is_valid_by_enum( $sub_value, $sub_attribute ) ) {
 						$sub_value = null;
@@ -166,7 +219,15 @@ class Gutenberg_Block_Attributes_Parser {
 			return $values;
 		}
 
-		$target = null === $selector ? $element : $element->closest_self_or_descendant( $selector );
+	/*
+		 * The editor resolves a top-level selector against the element itself
+		 * as well as its descendants, but a `query` sub-selector runs through
+		 * `querySelector()` on each matched item, which never matches the
+		 * item itself — so the server reads the same element the editor reads.
+		 */
+		$target = null === $selector
+			? $element
+			: ( $within_query ? $element->query_selector( $selector ) : $element->closest_self_or_descendant( $selector ) );
 
 		/*
 		 * A boolean attribute reads as its presence even when the selector
@@ -217,19 +278,7 @@ class Gutenberg_Block_Attributes_Parser {
 					return null;
 				}
 
-				$value = true === $value ? '' : $value;
-
-				/*
-				 * HTML attributes are always strings. The editor leaves the
-				 * coercion to each transform; declared sources can do it here.
-				 */
-				if ( ( 'number' === $type || 'integer' === $type ) && is_numeric( $value ) ) {
-					$number = $value + 0;
-
-					return is_float( $number ) && (float) (int) $number === $number ? (int) $number : $number;
-				}
-
-				return $value;
+				return true === $value ? '' : $value;
 
 			case 'html':
 				if ( ! empty( $schema['multiline'] ) ) {
@@ -331,6 +380,12 @@ class Gutenberg_Block_Attributes_Parser {
 				$candidate = trim( preg_replace( '/!\s*important\s*$/i', '', $candidate ) );
 			}
 
+			// An empty declaration is invalid CSS: the CSSOM drops it, so it
+			// cannot clobber an earlier valid value here either.
+			if ( '' === $candidate ) {
+				continue;
+			}
+
 			if ( null !== $value && $important && ! $is_important ) {
 				continue;
 			}
@@ -408,6 +463,12 @@ class Gutenberg_Block_Attributes_Parser {
 					break;
 
 				case 'integer':
+					// `Number.isInteger()` accepts an integral float.
+					if ( is_int( $value ) || ( is_float( $value ) && (float) (int) $value === $value ) ) {
+						return true;
+					}
+					break;
+
 				case 'number':
 					if ( is_int( $value ) || is_float( $value ) ) {
 						return true;

@@ -224,20 +224,23 @@ class Gutenberg_HTML_To_Blocks {
 	 * @return array Parsed block array.
 	 */
 	private static function convert_element( $element ) {
+		$transform = self::find_transform( $element );
+
 		/*
 		 * The Embed block matches on the text of a paragraph rather than on a
-		 * selector, so it is the one transform `block.json` cannot describe and
-		 * the one this reads from somewhere else. It is tried first because the
-		 * transform it stands in for outranks the Paragraph block's, which is
-		 * the only other one claiming a paragraph.
+		 * selector, so it is the one transform `block.json` cannot describe
+		 * and the one consulted from somewhere else. In the editor it competes
+		 * at the default priority, so here it yields to a declared transform
+		 * that outranks it and pre-empts the rest — among them the Paragraph
+		 * block's, which declares a larger number.
 		 */
-		$embed = Gutenberg_Embed_Transforms::convert( $element );
+		if ( null === $transform || self::transform_priority( $transform ) >= 10 ) {
+			$embed = Gutenberg_Embed_Transforms::convert( $element );
 
-		if ( null !== $embed ) {
-			return $embed;
+			if ( null !== $embed ) {
+				return $embed;
+			}
 		}
-
-		$transform = self::find_transform( $element );
 
 		if ( null === $transform ) {
 			return self::create_fallback_block( $element );
@@ -279,7 +282,12 @@ class Gutenberg_HTML_To_Blocks {
 			$attributes = array_merge( $attributes, self::resolve_transform_attributes( $transform['attributes'], $element ) );
 		}
 
-		$attributes = array_merge( self::get_block_supports_attributes( $block_type, $element ), $attributes );
+	/*
+		 * The support-derived values win over declared ones, as they do in the
+		 * editor, whose `nodeToBlock()` writes the element's class and id onto
+		 * whatever the transform produced.
+		 */
+		$attributes = array_merge( $attributes, self::get_block_supports_attributes( $block_type, $element ) );
 
 		return self::create_block( $block_type, $transform, $attributes, $element, $inner_blocks );
 	}
@@ -910,10 +918,59 @@ class Gutenberg_HTML_To_Blocks {
 		$attributes = self::get_schema_attributes( $entry );
 
 		if ( null !== $attributes ) {
-			$node->keep_attributes( $attributes );
+			/*
+			 * `class` follows its own rule, as it does in `cleanNodeList()`:
+			 * the attribute never falls to the attribute list; the schema's
+			 * `classes` decide which class names survive, and none do when
+			 * the schema names none.
+			 */
+			self::filter_classes( $node, $entry, $attributes );
+			$node->keep_attributes( array_merge( $attributes, array( 'class' ) ) );
 		}
 
 		self::filter_children( $node, $entry );
+	}
+
+	/**
+	 * Removes the class names a schema entry does not allow.
+	 *
+	 * The editor's `cleanNodeList()` keeps a class name when it matches an
+	 * entry in the schema's `classes` — `*` keeps them all — and removes the
+	 * attribute when nothing survives. Listing `class` under `attributes`
+	 * reads as allowing every class, which is how a `requires` schema spells
+	 * it in JSON, where `classes` patterns cannot be written.
+	 *
+	 * @param Gutenberg_HTML_Element $node       Element to filter.
+	 * @param array                  $entry      Schema entry for the element.
+	 * @param string[]               $attributes Attribute names the entry allows.
+	 * @return void
+	 */
+	private static function filter_classes( $node, $entry, $attributes ) {
+		$current = $node->get_class_names();
+
+		if ( array() === $current ) {
+			return;
+		}
+
+		if ( in_array( 'class', $attributes, true ) ) {
+			return;
+		}
+
+		$allowed = isset( $entry['classes'] ) && is_array( $entry['classes'] )
+			? array_values( array_filter( $entry['classes'], 'is_string' ) )
+			: array();
+
+		if ( in_array( '*', $allowed, true ) ) {
+			return;
+		}
+
+		$kept = array_values( array_intersect( $current, $allowed ) );
+
+		if ( $kept === $current ) {
+			return;
+		}
+
+		$node->set_class_names( $kept );
 	}
 
 	/**
@@ -1011,6 +1068,18 @@ class Gutenberg_HTML_To_Blocks {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Returns the priority a transform competes at.
+	 *
+	 * @param array $transform Transform to read.
+	 * @return int|float Declared priority, or the default of 10.
+	 */
+	private static function transform_priority( $transform ) {
+		return isset( $transform['priority'] ) && is_numeric( $transform['priority'] )
+			? $transform['priority'] + 0
+			: 10;
 	}
 
 	/**
@@ -1149,32 +1218,14 @@ class Gutenberg_HTML_To_Blocks {
 	/**
 	 * Determines whether a transform's callback may be called.
 	 *
-	 * A transform reaches `WP_Block_Type::$transforms` from a `block.json`
-	 * file as often as from PHP, and JSON has no functions: a string there is
-	 * a mistake, not a callback, and PHP would resolve it to whatever global
-	 * function happens to bear that name. JSON spells a static method just as
-	 * easily — `["Some_Class", "some_method"]` — so a two-string array is
-	 * refused the same way. Only a callback JSON cannot express — a closure,
-	 * or a bound object method — is called.
+	 * See `Gutenberg_Block_Transforms::is_runnable_callback()` for what is
+	 * refused and why.
 	 *
 	 * @param mixed $callback Value declared for `isMatch` or `transform`.
 	 * @return bool Whether it may be called.
 	 */
 	private static function is_transform_callback( $callback ) {
-		$named = is_string( $callback )
-			|| ( is_array( $callback ) && isset( $callback[0] ) && ! is_object( $callback[0] ) );
-
-		if ( $named ) {
-			_doing_it_wrong(
-				__METHOD__,
-				__( 'A block transform cannot reference its callback by name, because a name can be written into `block.json` and data must not choose what runs. Register the block from PHP with a closure to attach one.', 'gutenberg' ),
-				'23.9.0'
-			);
-
-			return false;
-		}
-
-		return is_callable( $callback );
+		return Gutenberg_Block_Transforms::is_runnable_callback( $callback );
 	}
 
 	/**
@@ -1191,16 +1242,20 @@ class Gutenberg_HTML_To_Blocks {
 	/**
 	 * Replaces `<!--more-->` and `<!--nextpage-->` with elements blocks can match.
 	 *
-	 * The counterpart of `specialCommentConverter` in `@wordpress/blocks`: a
-	 * marker inside a paragraph splits it rather than staying in its text, and
-	 * a `<!--more-->` takes any following `<!--noteaser-->` with it.
+	 * The counterpart of `specialCommentConverter` in `@wordpress/blocks`. A
+	 * marker has to reach the top level — only top-level elements become
+	 * blocks — without reordering anything around it, so every container
+	 * between the marker and the top is split where the marker stood, the way
+	 * the editor splits a paragraph: `<div>a<!--more-->b</div>` becomes two
+	 * halves of the division with the marker between them. Empty halves are
+	 * dropped, as the editor drops a split paragraph's empty side, and a
+	 * `<!--more-->` takes any following `<!--noteaser-->` with it.
 	 *
 	 * @param Gutenberg_HTML_Element $root Fragment root.
 	 * @return void
 	 */
 	private static function convert_special_comments( $root ) {
-		$hoisted        = array();
-		$root->children = self::convert_comments_below( $root, true, $hoisted );
+		$root->children = self::convert_comments_splitting( $root );
 
 		foreach ( $root->children as $child ) {
 			$child->parent = $root;
@@ -1208,27 +1263,19 @@ class Gutenberg_HTML_To_Blocks {
 	}
 
 	/**
-	 * Converts the special comments below one element.
+	 * Converts the special comments among an element's children.
 	 *
-	 * A marker whose parent is a paragraph splits that paragraph where it
-	 * stands. A marker anywhere else is hoisted to the top level — only
-	 * top-level elements become blocks, so a marker left inside another
-	 * element would be swallowed into whichever block claims its container —
-	 * and lands right after the top-level element it was found in.
+	 * Markers converted below a child element surface as that child's
+	 * replacement nodes, so at this level every marker stands directly in the
+	 * returned list.
 	 *
-	 * @param Gutenberg_HTML_Element   $element Element whose children to convert.
-	 * @param bool                     $at_root Whether the element is the fragment root.
-	 * @param Gutenberg_HTML_Element[] $hoisted Collects the markers that belong further up, added to.
-	 * @return Gutenberg_HTML_Element[] New children for the element.
+	 * @param Gutenberg_HTML_Element $element Element whose children to convert.
+	 * @return Gutenberg_HTML_Element[] Converted children, markers standing among them.
 	 */
-	private static function convert_comments_below( $element, $at_root, &$hoisted ) {
+	private static function convert_comments_splitting( $element ) {
 		$source   = $element->children;
-		$children = array();
 		$consumed = array();
-
-		// A marker stays at this level when it can become a block here (the
-		// root) or when it is about to split its paragraph.
-		$keep_markers = $at_root || 'p' === $element->tag_name;
+		$out      = array();
 
 		foreach ( $source as $index => $child ) {
 			if ( isset( $consumed[ $index ] ) ) {
@@ -1238,49 +1285,113 @@ class Gutenberg_HTML_To_Blocks {
 			if ( Gutenberg_HTML_Element::COMMENT === $child->type ) {
 				$marker = self::special_comment_element( $child, $source, $index, $consumed );
 
-				if ( null === $marker ) {
-					$children[] = $child;
-				} elseif ( $keep_markers ) {
-					$children[] = $marker;
-				} else {
-					$hoisted[] = $marker;
-				}
-
+				$out[] = null === $marker ? $child : $marker;
 				continue;
 			}
 
 			if ( Gutenberg_HTML_Element::ELEMENT !== $child->type ) {
-				$children[] = $child;
+				$out[] = $child;
 				continue;
 			}
 
-			$bubbled         = array();
-			$child->children = self::convert_comments_below( $child, false, $bubbled );
-
-			foreach ( $child->children as $grandchild ) {
-				$grandchild->parent = $child;
-			}
-
-			if ( 'p' === $child->tag_name ) {
-				foreach ( self::split_on_special_comments( $child ) as $piece ) {
-					$children[] = $piece;
-				}
-			} else {
-				$children[] = $child;
-			}
-
-			if ( $at_root ) {
-				foreach ( $bubbled as $marker ) {
-					$children[] = $marker;
-				}
-			} else {
-				foreach ( $bubbled as $marker ) {
-					$hoisted[] = $marker;
-				}
+			foreach ( self::split_element_on_markers( $child ) as $node ) {
+				$out[] = $node;
 			}
 		}
 
-		return $children;
+		return $out;
+	}
+
+	/**
+	 * Splits an element around the markers converted inside it.
+	 *
+	 * @param Gutenberg_HTML_Element $element Element to convert and split.
+	 * @return Gutenberg_HTML_Element[] The element itself when it holds no marker, otherwise its halves with the markers between them.
+	 */
+	private static function split_element_on_markers( $element ) {
+		$children = self::convert_comments_splitting( $element );
+
+		if ( 'p' === $element->tag_name ) {
+			$element->children = $children;
+
+			foreach ( $children as $child ) {
+				$child->parent = $element;
+			}
+
+			return self::split_on_special_comments( $element );
+		}
+
+		$segments = array( array() );
+		$markers  = array();
+
+		foreach ( $children as $child ) {
+			if ( self::is_marker_element( $child ) ) {
+				$markers[]  = $child;
+				$segments[] = array();
+				continue;
+			}
+
+			$segments[ count( $segments ) - 1 ][] = $child;
+		}
+
+		if ( array() === $markers ) {
+			$element->children = $children;
+
+			foreach ( $children as $child ) {
+				$child->parent = $element;
+			}
+
+			return array( $element );
+		}
+
+		$pieces = array();
+
+		foreach ( $segments as $at => $segment ) {
+			if ( array() !== $segment ) {
+				$pieces[] = self::container_from( $element, $segment );
+			}
+
+			if ( isset( $markers[ $at ] ) ) {
+				$pieces[] = $markers[ $at ];
+			}
+		}
+
+		return $pieces;
+	}
+
+	/**
+	 * Determines whether a node is the element standing in for a marker.
+	 *
+	 * @param Gutenberg_HTML_Element $node Node to test.
+	 * @return bool Whether the node is a marker element.
+	 */
+	private static function is_marker_element( $node ) {
+		return Gutenberg_HTML_Element::ELEMENT === $node->type
+			&& 'wp-block' === $node->tag_name
+			&& null !== $node->get_attribute( 'data-block' );
+	}
+
+	/**
+	 * Builds one half of a split container.
+	 *
+	 * The half keeps the source container's own markup — its halves usually
+	 * end up as Custom HTML, where the attributes are content — unlike a
+	 * split paragraph, whose halves the editor builds bare.
+	 *
+	 * @param Gutenberg_HTML_Element   $element  Container being split.
+	 * @param Gutenberg_HTML_Element[] $children Nodes the half holds.
+	 * @return Gutenberg_HTML_Element Container holding those nodes.
+	 */
+	private static function container_from( $element, $children ) {
+		$piece = Gutenberg_HTML_Element::create_element( $element->tag_name, $element->attributes );
+		$piece->set_opening_tag( $element->get_opening_tag() );
+		$piece->set_closing_tag( $element->get_closing_tag() );
+
+		foreach ( $children as $child ) {
+			$piece->append_child( $child );
+		}
+
+		return $piece;
 	}
 
 	/**

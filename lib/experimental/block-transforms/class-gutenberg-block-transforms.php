@@ -195,6 +195,36 @@ class Gutenberg_Block_Transforms {
 	}
 
 	/**
+	 * Determines whether a transform's callback may be called.
+	 *
+	 * A transform reaches `WP_Block_Type::$transforms` from a `block.json`
+	 * file as often as from PHP, and JSON has no functions: a string there is
+	 * a mistake, not a callback, and PHP would resolve it to whatever global
+	 * function happens to bear that name. JSON spells a static method just as
+	 * easily, so a two-string array is refused the same way. Only a callback
+	 * JSON cannot express — a closure, or a bound object method — is called.
+	 *
+	 * @param mixed $callback Value declared for `isMatch` or `transform`.
+	 * @return bool Whether it may be called.
+	 */
+	public static function is_runnable_callback( $callback ) {
+		$named = is_string( $callback )
+			|| ( is_array( $callback ) && isset( $callback[0] ) && ! is_object( $callback[0] ) );
+
+		if ( $named ) {
+			_doing_it_wrong(
+				__METHOD__,
+				__( 'A block transform cannot reference its callback by name, because a name can be written into `block.json` and data must not choose what runs. Register the block from PHP with a closure to attach one.', 'gutenberg' ),
+				'23.9.0'
+			);
+
+			return false;
+		}
+
+		return is_callable( $callback );
+	}
+
+	/**
 	 * Returns the attributes worth writing into a block's delimiter.
 	 *
 	 * An attribute the block sources from its own markup is read back out of

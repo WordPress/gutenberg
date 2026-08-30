@@ -92,10 +92,40 @@ function gutenberg_prepare_transforms_for_editor( $transforms ) {
 				continue;
 			}
 
+			/*
+			 * An `enter`, `files` or `prefix` transform is nothing without
+			 * its `transform` function, and a function cannot travel: sending
+			 * the husk would leave editor code that calls it unguarded — the
+			 * file-drop handler, the input rules — holding a non-function.
+			 */
+			if ( isset( $transform['type'] ) && in_array( $transform['type'], array( 'enter', 'files', 'prefix' ), true ) ) {
+				unset( $transforms[ $direction ][ $at ] );
+				continue;
+			}
+
 			unset( $transform['isMatch'], $transform['transform'] );
+
+			// A schema can only be declared as an object; a string names a
+			// PHP callable, which stays server-side like the rest.
+			if ( isset( $transform['schema'] ) && is_string( $transform['schema'] ) ) {
+				unset( $transform['schema'] );
+			}
+
+			// A `shortcode` reader on an attribute definition is the
+			// JavaScript API's function spelling; declared attributes use
+			// `source` instead.
+			if ( isset( $transform['attributes'] ) && is_array( $transform['attributes'] ) ) {
+				foreach ( $transform['attributes'] as $name => $definition ) {
+					if ( is_array( $definition ) ) {
+						unset( $transform['attributes'][ $name ]['shortcode'] );
+					}
+				}
+			}
 
 			$transforms[ $direction ][ $at ] = gutenberg_remove_transform_objects( $transform );
 		}
+
+		$transforms[ $direction ] = array_values( $transforms[ $direction ] );
 	}
 
 	return $transforms;

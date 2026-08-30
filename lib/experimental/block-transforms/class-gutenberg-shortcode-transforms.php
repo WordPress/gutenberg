@@ -65,6 +65,21 @@ class Gutenberg_Shortcode_Transforms {
 			return self::segment( $html, $last_index );
 		}
 
+		/*
+		 * A PHP-registered transform may attach an `isMatch` callable, which
+		 * the editor calls with the shortcode's parsed attributes; a refusal
+		 * leaves the shortcode to the next transform that wants it.
+		 */
+		if (
+			isset( $transform['isMatch'] )
+			&& Gutenberg_Block_Transforms::is_runnable_callback( $transform['isMatch'] )
+			&& ! call_user_func( $transform['isMatch'], $shortcode['attrs'] )
+		) {
+			$excluded_block_names[] = $transform['blockName'];
+
+			return self::segment( $html, $offset, $excluded_block_names );
+		}
+
 		$block = self::create_block( $transform, $shortcode );
 
 		if ( null === $block ) {
@@ -160,6 +175,18 @@ class Gutenberg_Shortcode_Transforms {
 			}
 
 			$value = self::read_attribute( $definition, $shortcode );
+
+			/*
+			 * The editor validates a sourced shortcode value against the
+			 * declared `type` and `enum` and falls back to the declared
+			 * default, so the server has to as well or the two runtimes
+			 * store different attribute values.
+			 */
+			$value = Gutenberg_Block_Attributes_Parser::validate( $value, $definition );
+
+			if ( null === $value && isset( $definition['default'] ) ) {
+				$value = $definition['default'];
+			}
 
 			if ( null !== $value ) {
 				$attributes[ $name ] = $value;
@@ -301,8 +328,16 @@ class Gutenberg_Shortcode_Transforms {
 		$html = preg_replace( '/\s*<p>/i', '', $html );
 		$html = preg_replace( '/\s*<\/p>\s*/i', "\n\n", $html );
 
-		// Normalize white space chars and remove multiple line breaks.
-		$html = preg_replace( '/\n[\s\x{00A0}]+\n/u', "\n\n", $html );
+		/*
+		 * Normalize white space chars and remove multiple line breaks. The
+		 * pattern needs the `u` modifier for the no-break space, and a `u`
+		 * pattern returns null for a subject that is not valid UTF-8 — legacy
+		 * Latin-1 content, say — where the content has to survive rather than
+		 * cascade into an empty string. ASCII white space, whose bytes never
+		 * occur inside a multibyte character, is still normalized then.
+		 */
+		$normalized = preg_replace( '/\n[\s\x{00A0}]+\n/u', "\n\n", $html );
+		$html       = null === $normalized ? preg_replace( '/\n\s+\n/', "\n\n", $html ) : $normalized;
 
 		// Replace <br> tags with line breaks.
 		$html = preg_replace_callback(
@@ -356,9 +391,10 @@ class Gutenberg_Shortcode_Transforms {
 		// Pad remaining <p> tags with a line break.
 		$html = preg_replace( '/\s*(<p [^>]+>[\s\S]*?<\/p>)/', "\n" . '$1', $html );
 
-		// Trim.
-		$html = preg_replace( '/^\s+/', '', $html );
-		$html = preg_replace( '/[\s\x{00A0}]+$/u', '', $html );
+		// Trim. The `u` pattern returns null for invalid UTF-8; see above.
+		$html       = preg_replace( '/^\s+/', '', $html );
+		$normalized = preg_replace( '/[\s\x{00A0}]+$/u', '', $html );
+		$html       = null === $normalized ? preg_replace( '/\s+$/', '', $html ) : $normalized;
 
 		if ( $preserve_linebreaks ) {
 			$html = str_replace( '<wp-line-break>', "\n", $html );
