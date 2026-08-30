@@ -20630,7 +20630,7 @@
 							"type": "suite",
 							"tests": [
 								{
-									"title": "should intialize correct active tab based on zoom level",
+									"title": "should initialize correct active tab based on zoom level",
 									"attempts": [
 										{
 											"duration": 5982
