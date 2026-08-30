@@ -21,7 +21,9 @@
 				"blocks": {
 					"description": "For a `block` transform, the block types it converts from (under `from`) or to (under `to`). Under `from`, `*` matches any block.",
 					"type": "array",
-					"items": { "type": "string" }
+					"items": {
+						"type": "string"
+					}
 				},
 				"selector": {
 					"description": "For a `raw` transform, a CSS selector matched against each top-level element of the source markup.\n\nType, universal, class, ID and attribute selectors are supported — attribute presence and the `=`, `~=`, `^=`, `$=`, `*=` and `|=` operators — along with the descendant and child combinators and the `:has()`, `:not()` and `:only-child` pseudo-classes.",
@@ -45,7 +47,9 @@
 					"description": "Whether the transform can run outside the editor, where a block's `save` is not available and the source markup is wrapped instead.\n\nSet to `false` for a block whose `save` rewrites the markup rather than wrapping it, which the server cannot reproduce at all. Set to an object with a `requires` content schema for a block that can reproduce some markup and not the rest: markup already matching that schema is converted, and markup carrying anything else is left alone. Either way the markup stays as it was rather than becoming a block that would not validate.",
 					"default": true,
 					"oneOf": [
-						{ "type": "boolean" },
+						{
+							"type": "boolean"
+						},
 						{
 							"type": "object",
 							"properties": {
@@ -56,7 +60,9 @@
 								"classes": {
 									"description": "Class names the block's `save` writes for the converted markup that the server cannot derive, such as one standing for a default attribute value. They are added to the wrapper so converted markup matches what `save` produces.",
 									"type": "array",
-									"items": { "type": "string" }
+									"items": {
+										"type": "string"
+									}
 								}
 							},
 							"additionalProperties": false
@@ -66,13 +72,25 @@
 				"attributes": {
 					"description": "Attribute values for the resulting block.\n\nFor a `raw` transform, an object of values applied over any sourced attributes. A value is used as given, unless it is an object declaring a `source`, in which case it is read from the matched markup the way a block attribute would be, optionally passed through a `map` of sourced value to attribute value. A name may be a dotted path, such as `style.typography.textAlign`, to write into a nested attribute rather than replace it. Besides the sources a block attribute may use, `\"source\": \"style\"` reads the named `property` out of the element's inline styles.\n\nFor a `block` transform, either `\"all\"` to carry every attribute across, or an object mapping each new attribute name to the name it takes its value from.\n\nFor a `shortcode` transform, an object of attributes read out of the matched shortcode: `\"source\": \"shortcodeText\"` takes the shortcode as it was written, and `\"source\": \"shortcodeAttribute\"` takes the named `attribute`, or the first one present when it names several.",
 					"oneOf": [
-						{ "type": "string", "enum": [ "all" ] },
-						{ "type": "object" }
+						{
+							"type": "string",
+							"enum": [ "all" ]
+						},
+						{
+							"type": "object"
+						}
 					]
 				},
 				"innerBlocks": {
 					"description": "For a `raw` transform, which of the matched element's content becomes inner blocks: `true` for all of it, or a CSS selector matching the child elements to convert. Content that does not become an inner block stays with the block.",
-					"anyOf": [ { "type": "boolean" }, { "type": "string" } ],
+					"anyOf": [
+						{
+							"type": "boolean"
+						},
+						{
+							"type": "string"
+						}
+					],
 					"default": false
 				}
 			},
@@ -226,9 +244,15 @@
 							"type": "array",
 							"items": {
 								"oneOf": [
-									{ "type": "boolean" },
-									{ "type": "number" },
-									{ "type": "string" }
+									{
+										"type": "boolean"
+									},
+									{
+										"type": "number"
+									},
+									{
+										"type": "string"
+									}
 								]
 							}
 						},
@@ -271,8 +295,12 @@
 						}
 					},
 					"anyOf": [
-						{ "required": [ "type" ] },
-						{ "required": [ "enum" ] }
+						{
+							"required": [ "type" ]
+						},
+						{
+							"required": [ "enum" ]
+						}
 					]
 				}
 			},
@@ -494,7 +522,9 @@
 				"layout": {
 					"description": "This value only applies to blocks that are containers for inner blocks. If set to `true` the layout type will be `flow`. For other layout types it's necessary to set the `type` explicitly inside the `default` object.",
 					"oneOf": [
-						{ "type": "boolean" },
+						{
+							"type": "boolean"
+						},
 						{
 							"type": "object",
 							"properties": {
@@ -815,11 +845,21 @@
 						{
 							"type": "object",
 							"properties": {
-								"root": { "type": "string" },
-								"color": { "type": "string" },
-								"radius": { "type": "string" },
-								"style": { "type": "string" },
-								"width": { "type": "string" }
+								"root": {
+									"type": "string"
+								},
+								"color": {
+									"type": "string"
+								},
+								"radius": {
+									"type": "string"
+								},
+								"style": {
+									"type": "string"
+								},
+								"width": {
+									"type": "string"
+								}
 							}
 						}
 					]
@@ -833,9 +873,15 @@
 						{
 							"type": "object",
 							"properties": {
-								"root": { "type": "string" },
-								"text": { "type": "string" },
-								"background": { "type": "string" }
+								"root": {
+									"type": "string"
+								},
+								"text": {
+									"type": "string"
+								},
+								"background": {
+									"type": "string"
+								}
 							}
 						}
 					]
@@ -849,12 +895,24 @@
 						{
 							"type": "object",
 							"properties": {
-								"root": { "type": "string" },
-								"aspectRatio": { "type": "string" },
-								"height": { "type": "string" },
-								"minHeight": { "type": "string" },
-								"minWidth": { "type": "string" },
-								"width": { "type": "string" }
+								"root": {
+									"type": "string"
+								},
+								"aspectRatio": {
+									"type": "string"
+								},
+								"height": {
+									"type": "string"
+								},
+								"minHeight": {
+									"type": "string"
+								},
+								"minWidth": {
+									"type": "string"
+								},
+								"width": {
+									"type": "string"
+								}
 							}
 						}
 					]
@@ -868,10 +926,18 @@
 						{
 							"type": "object",
 							"properties": {
-								"root": { "type": "string" },
-								"blockGap": { "type": "string" },
-								"padding": { "type": "string" },
-								"margin": { "type": "string" }
+								"root": {
+									"type": "string"
+								},
+								"blockGap": {
+									"type": "string"
+								},
+								"padding": {
+									"type": "string"
+								},
+								"margin": {
+									"type": "string"
+								}
 							}
 						}
 					]
@@ -885,16 +951,36 @@
 						{
 							"type": "object",
 							"properties": {
-								"root": { "type": "string" },
-								"fontFamily": { "type": "string" },
-								"fontSize": { "type": "string" },
-								"fontStyle": { "type": "string" },
-								"fontWeight": { "type": "string" },
-								"lineHeight": { "type": "string" },
-								"letterSpacing": { "type": "string" },
-								"textDecoration": { "type": "string" },
-								"textIndent": { "type": "string" },
-								"textTransform": { "type": "string" }
+								"root": {
+									"type": "string"
+								},
+								"fontFamily": {
+									"type": "string"
+								},
+								"fontSize": {
+									"type": "string"
+								},
+								"fontStyle": {
+									"type": "string"
+								},
+								"fontWeight": {
+									"type": "string"
+								},
+								"lineHeight": {
+									"type": "string"
+								},
+								"letterSpacing": {
+									"type": "string"
+								},
+								"textDecoration": {
+									"type": "string"
+								},
+								"textIndent": {
+									"type": "string"
+								},
+								"textTransform": {
+									"type": "string"
+								}
 							}
 						}
 					]
@@ -908,7 +994,9 @@
 						{
 							"type": "object",
 							"properties": {
-								"root": { "type": "string" }
+								"root": {
+									"type": "string"
+								}
 							}
 						}
 					]
@@ -1078,12 +1166,16 @@
 				"from": {
 					"description": "Transforms that produce this block from other content.",
 					"type": "array",
-					"items": { "$ref": "#/definitions/blockTransform" }
+					"items": {
+						"$ref": "#/definitions/blockTransform"
+					}
 				},
 				"to": {
 					"description": "Transforms that turn this block into another one.",
 					"type": "array",
-					"items": { "$ref": "#/definitions/blockTransform" }
+					"items": {
+						"$ref": "#/definitions/blockTransform"
+					}
 				}
 			},
 			"additionalProperties": false
@@ -1144,6 +1236,18 @@
 							"attributes": {
 								"description": "Values that override block attributes.",
 								"type": "object"
+							},
+							"patterns": {
+								"description": "Regular expression sources, without delimiters or flags, matched case-insensitively against a URL to attribute it to this variation. Read by blocks that match URLs, such as Embed, in the editor and by the server-side conversion alike.",
+								"type": "array",
+								"items": {
+									"type": "string"
+								}
+							},
+							"oembedType": {
+								"description": "The oEmbed resource type this variation’s provider is known to answer with, read by the server-side conversion. Omit it for a provider serving more than one kind of media, whose type depends on the URL.",
+								"type": "string",
+								"enum": [ "rich", "video", "photo", "link" ]
 							},
 							"innerBlocks": {
 								"description": "Initial configuration of nested blocks.",

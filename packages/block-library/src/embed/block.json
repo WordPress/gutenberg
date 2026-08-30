@@ -50,6 +50,398 @@
 			"clientNavigation": true
 		}
 	},
+	"variations": [
+		{
+			"name": "twitter",
+			"title": "X Embed",
+			"description": "Embed an X post.",
+			"keywords": [ "x", "twitter", "tweet", "social" ],
+			"patterns": [ "^https?://(www\\.)?twitter\\.com/.+" ],
+			"attributes": {
+				"providerNameSlug": "twitter",
+				"responsive": true
+			},
+			"oembedType": "rich"
+		},
+		{
+			"name": "youtube",
+			"title": "YouTube Embed",
+			"description": "Embed a YouTube video.",
+			"keywords": [ "music", "video" ],
+			"patterns": [
+				"^https?://((m|www)\\.)?youtube\\.com/.+",
+				"^https?://youtu\\.be/.+"
+			],
+			"attributes": {
+				"providerNameSlug": "youtube",
+				"responsive": true
+			},
+			"oembedType": "video"
+		},
+		{
+			"name": "facebook",
+			"title": "Facebook Embed",
+			"description": "Embed a Facebook post.",
+			"keywords": [ "social" ],
+			"scope": [ "block" ],
+			"patterns": [],
+			"attributes": {
+				"providerNameSlug": "facebook",
+				"previewable": false,
+				"responsive": true
+			}
+		},
+		{
+			"name": "instagram",
+			"title": "Instagram Embed",
+			"description": "Embed an Instagram post.",
+			"keywords": [ "image", "social" ],
+			"scope": [ "block" ],
+			"patterns": [],
+			"attributes": {
+				"providerNameSlug": "instagram",
+				"responsive": true
+			}
+		},
+		{
+			"name": "wordpress",
+			"title": "WordPress Embed",
+			"description": "Embed a WordPress post.",
+			"keywords": [ "post", "blog" ],
+			"attributes": {
+				"providerNameSlug": "wordpress"
+			}
+		},
+		{
+			"name": "soundcloud",
+			"title": "SoundCloud Embed",
+			"description": "Embed SoundCloud content.",
+			"keywords": [ "music", "audio" ],
+			"patterns": [ "^https?://(www\\.)?soundcloud\\.com/.+" ],
+			"attributes": {
+				"providerNameSlug": "soundcloud",
+				"responsive": true
+			},
+			"oembedType": "rich"
+		},
+		{
+			"name": "spotify",
+			"title": "Spotify Embed",
+			"description": "Embed Spotify content.",
+			"keywords": [ "music", "audio" ],
+			"patterns": [ "^https?://(open|play)\\.spotify\\.com/.+" ],
+			"attributes": {
+				"providerNameSlug": "spotify",
+				"responsive": true
+			},
+			"oembedType": "rich"
+		},
+		{
+			"name": "flickr",
+			"title": "Flickr Embed",
+			"description": "Embed Flickr content.",
+			"keywords": [ "image" ],
+			"patterns": [
+				"^https?://(www\\.)?flickr\\.com/.+",
+				"^https?://flic\\.kr/.+"
+			],
+			"attributes": {
+				"providerNameSlug": "flickr",
+				"responsive": true
+			}
+		},
+		{
+			"name": "vimeo",
+			"title": "Vimeo Embed",
+			"description": "Embed a Vimeo video.",
+			"keywords": [ "video" ],
+			"patterns": [ "^https?://(www\\.)?vimeo\\.com/.+" ],
+			"attributes": {
+				"providerNameSlug": "vimeo",
+				"responsive": true
+			},
+			"oembedType": "video"
+		},
+		{
+			"name": "animoto",
+			"title": "Animoto Embed",
+			"description": "Embed an Animoto video.",
+			"patterns": [ "^https?://(www\\.)?(animoto|video214)\\.com/.+" ],
+			"attributes": {
+				"providerNameSlug": "animoto",
+				"responsive": true
+			},
+			"oembedType": "video"
+		},
+		{
+			"name": "cloudup",
+			"title": "Cloudup Embed",
+			"description": "Embed Cloudup content.",
+			"patterns": [ "^https?://cloudup\\.com/.+" ],
+			"attributes": {
+				"providerNameSlug": "cloudup",
+				"responsive": true
+			}
+		},
+		{
+			"name": "collegehumor",
+			"title": "CollegeHumor Embed",
+			"description": "Embed CollegeHumor content.",
+			"scope": [ "block" ],
+			"patterns": [],
+			"attributes": {
+				"providerNameSlug": "collegehumor",
+				"responsive": true
+			}
+		},
+		{
+			"name": "crowdsignal",
+			"title": "Crowdsignal Embed",
+			"description": "Embed Crowdsignal (formerly Polldaddy) content.",
+			"keywords": [ "polldaddy", "survey" ],
+			"patterns": [
+				"^https?://((.+\\.)?polldaddy\\.com|poll\\.fm|.+\\.crowdsignal\\.net|.+\\.survey\\.fm)/.+"
+			],
+			"attributes": {
+				"providerNameSlug": "crowdsignal",
+				"responsive": true
+			},
+			"oembedType": "rich"
+		},
+		{
+			"name": "dailymotion",
+			"title": "Dailymotion Embed",
+			"description": "Embed a Dailymotion video.",
+			"keywords": [ "video" ],
+			"patterns": [ "^https?://(www\\.)?dailymotion\\.com/.+" ],
+			"attributes": {
+				"providerNameSlug": "dailymotion",
+				"responsive": true
+			},
+			"oembedType": "video"
+		},
+		{
+			"name": "imgur",
+			"title": "Imgur Embed",
+			"description": "Embed Imgur content.",
+			"patterns": [ "^https?://(.+\\.)?imgur\\.com/.+" ],
+			"attributes": {
+				"providerNameSlug": "imgur",
+				"responsive": true
+			},
+			"oembedType": "rich"
+		},
+		{
+			"name": "issuu",
+			"title": "Issuu Embed",
+			"description": "Embed Issuu content.",
+			"patterns": [ "^https?://(www\\.)?issuu\\.com/.+" ],
+			"attributes": {
+				"providerNameSlug": "issuu",
+				"responsive": true
+			},
+			"oembedType": "rich"
+		},
+		{
+			"name": "kickstarter",
+			"title": "Kickstarter Embed",
+			"description": "Embed Kickstarter content.",
+			"patterns": [
+				"^https?://(www\\.)?kickstarter\\.com/.+",
+				"^https?://kck\\.st/.+"
+			],
+			"attributes": {
+				"providerNameSlug": "kickstarter",
+				"responsive": true
+			},
+			"oembedType": "rich"
+		},
+		{
+			"name": "mixcloud",
+			"title": "Mixcloud Embed",
+			"description": "Embed Mixcloud content.",
+			"keywords": [ "music", "audio" ],
+			"patterns": [ "^https?://(www\\.)?mixcloud\\.com/.+" ],
+			"attributes": {
+				"providerNameSlug": "mixcloud",
+				"responsive": true
+			},
+			"oembedType": "rich"
+		},
+		{
+			"name": "pocket-casts",
+			"title": "Pocket Casts Embed",
+			"description": "Embed a podcast player from Pocket Casts.",
+			"keywords": [ "podcast", "audio" ],
+			"patterns": [ "^https://pca.st/\\w+" ],
+			"attributes": {
+				"providerNameSlug": "pocket-casts",
+				"responsive": true
+			},
+			"oembedType": "rich"
+		},
+		{
+			"name": "reddit",
+			"title": "Reddit Embed",
+			"description": "Embed a Reddit thread.",
+			"patterns": [ "^https?://(www\\.)?reddit\\.com/.+" ],
+			"attributes": {
+				"providerNameSlug": "reddit",
+				"responsive": true
+			},
+			"oembedType": "rich"
+		},
+		{
+			"name": "reverbnation",
+			"title": "ReverbNation Embed",
+			"description": "Embed ReverbNation content.",
+			"patterns": [ "^https?://(www\\.)?reverbnation\\.com/.+" ],
+			"attributes": {
+				"providerNameSlug": "reverbnation",
+				"responsive": true
+			},
+			"oembedType": "rich"
+		},
+		{
+			"name": "scribd",
+			"title": "Scribd Embed",
+			"description": "Embed Scribd content.",
+			"patterns": [ "^https?://(www\\.)?scribd\\.com/.+" ],
+			"attributes": {
+				"providerNameSlug": "scribd",
+				"responsive": true
+			},
+			"oembedType": "rich"
+		},
+		{
+			"name": "smugmug",
+			"title": "SmugMug Embed",
+			"description": "Embed SmugMug content.",
+			"patterns": [ "^https?://(.+\\.)?smugmug\\.com/.*" ],
+			"attributes": {
+				"providerNameSlug": "smugmug",
+				"previewable": false,
+				"responsive": true
+			}
+		},
+		{
+			"name": "speaker-deck",
+			"title": "Speaker Deck Embed",
+			"description": "Embed Speaker Deck content.",
+			"patterns": [ "^https?://(www\\.)?speakerdeck\\.com/.+" ],
+			"attributes": {
+				"providerNameSlug": "speaker-deck",
+				"responsive": true
+			},
+			"oembedType": "rich"
+		},
+		{
+			"name": "tiktok",
+			"title": "TikTok Embed",
+			"description": "Embed a TikTok video.",
+			"keywords": [ "video" ],
+			"patterns": [ "^https?://(www\\.)?tiktok\\.com/.+" ],
+			"attributes": {
+				"providerNameSlug": "tiktok",
+				"responsive": true
+			},
+			"oembedType": "video"
+		},
+		{
+			"name": "ted",
+			"title": "TED Embed",
+			"description": "Embed a TED video.",
+			"patterns": [ "^https?://(www\\.|embed\\.)?ted\\.com/.+" ],
+			"attributes": {
+				"providerNameSlug": "ted",
+				"responsive": true
+			},
+			"oembedType": "video"
+		},
+		{
+			"name": "tumblr",
+			"title": "Tumblr Embed",
+			"description": "Embed a Tumblr post.",
+			"keywords": [ "social" ],
+			"patterns": [ "^https?://(.+)\\.tumblr\\.com/.+" ],
+			"attributes": {
+				"providerNameSlug": "tumblr",
+				"responsive": true
+			},
+			"oembedType": "rich"
+		},
+		{
+			"name": "videopress",
+			"title": "VideoPress Embed",
+			"description": "Embed a VideoPress video.",
+			"keywords": [ "video" ],
+			"patterns": [ "^https?://videopress\\.com/.+" ],
+			"attributes": {
+				"providerNameSlug": "videopress",
+				"responsive": true
+			},
+			"oembedType": "video"
+		},
+		{
+			"name": "wordpress-tv",
+			"title": "WordPress.tv Embed",
+			"description": "Embed a WordPress.tv video.",
+			"patterns": [ "^https?://wordpress\\.tv/.+" ],
+			"attributes": {
+				"providerNameSlug": "wordpress-tv",
+				"responsive": true
+			},
+			"oembedType": "video"
+		},
+		{
+			"name": "amazon-kindle",
+			"title": "Amazon Kindle Embed",
+			"description": "Embed Amazon Kindle content.",
+			"keywords": [ "ebook" ],
+			"patterns": [
+				"^https?://([a-z0-9-]+\\.)?(amazon|amzn)(\\.[a-z]{2,4})+/.+",
+				"^https?://(www\\.)?(a\\.co|z\\.cn)/.+"
+			],
+			"attributes": {
+				"providerNameSlug": "amazon-kindle"
+			},
+			"oembedType": "rich"
+		},
+		{
+			"name": "pinterest",
+			"title": "Pinterest Embed",
+			"description": "Embed Pinterest pins, boards, and profiles.",
+			"keywords": [ "social", "bookmark" ],
+			"patterns": [
+				"^https?://([a-z]{2}|www)\\.pinterest\\.com(\\.(au|mx))?/.*"
+			],
+			"attributes": {
+				"providerNameSlug": "pinterest"
+			},
+			"oembedType": "rich"
+		},
+		{
+			"name": "wolfram-cloud",
+			"title": "Wolfram Embed",
+			"description": "Embed Wolfram notebook content.",
+			"patterns": [ "^https?://(www\\.)?wolframcloud\\.com/obj/.+" ],
+			"attributes": {
+				"providerNameSlug": "wolfram-cloud",
+				"responsive": true
+			},
+			"oembedType": "rich"
+		},
+		{
+			"name": "bluesky",
+			"title": "Bluesky Embed",
+			"description": "Embed a Bluesky post.",
+			"patterns": [ "^https?://bsky\\.app/profile/.+/post/.+" ],
+			"attributes": {
+				"providerNameSlug": "bluesky"
+			},
+			"oembedType": "rich"
+		}
+	],
 	"editorStyle": "wp-block-embed-editor",
 	"style": "wp-block-embed"
 }

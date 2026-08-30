@@ -9,15 +9,18 @@
  * Turns a paragraph holding nothing but a URL into an Embed block.
  *
  * Every other block here is converted by the `raw` transform its `block.json`
- * declares, so the server and the editor read one description. The Embed block
- * matches on the text of a paragraph rather than on a selector, and the class
- * names its `save` writes come from the provider list in
- * `packages/block-library/src/embed/variations.js`, so what it would need from
- * `block.json` is not a selector but that list.
+ * declares. The Embed block matches on the text of a paragraph rather than on
+ * a selector, so what it declares instead is its provider list: each block
+ * variation carries the URL `patterns` that attribute an address to it, and
+ * both this conversion and the editor's `findMoreSuitableBlock()` read the
+ * same declaration. A provider registered from PHP — a variation added
+ * through the `get_block_type_variations` filter — is matched here the same
+ * as a declared one.
  *
- * This is therefore a second implementation of one transform, deliberately
- * kept to one file. `test/integration/embed-provider-table.test.js` fails when
- * the table below and the variations drift apart.
+ * What cannot be declared is how a URL is read: that a paragraph holds one
+ * address and nothing else, the file extensions that disqualify it, and the
+ * `x.com` rewrite. Those stay here, matching the transform the block
+ * registers in JavaScript.
  *
  * @access private
  */
@@ -32,319 +35,104 @@ class Gutenberg_Embed_Transforms {
 	/**
 	 * Returns the embed providers, in the order the editor tries them.
 	 *
-	 * `patterns` and `attributes` mirror the block variations the editor
-	 * matches a URL against, and are checked against them by a unit test.
+	 * Each provider is a block variation declaring URL `patterns` — regular
+	 * expression sources without delimiters, matched case-insensitively, the
+	 * same way `matchesPatterns()` compiles them in the editor — and the
+	 * `attributes` the matched block stores.
 	 *
-	 * `type` has no counterpart there. The editor learns a URL's oEmbed type
-	 * from the provider's response once the preview loads, which conversion
-	 * cannot wait for, so the type each provider is known to answer with is
-	 * recorded here instead. Providers serving more than one kind of media
-	 * answer differently per URL and carry no type at all: the editor fills it
+	 * `oembedType` has no meaning in the editor, which learns a URL's oEmbed
+	 * type from the provider's response once the preview loads. Conversion
+	 * cannot wait for that, so a variation may declare the type its provider
+	 * is known to answer with. Providers serving more than one kind of media
+	 * answer differently per URL and declare none: the editor fills the type
 	 * in when the post is next opened, the same as it would for a provider it
 	 * does not recognise.
 	 *
-	 * @return array[] Providers keyed by slug.
+	 * @return array[] Providers keyed by variation name.
 	 */
 	private static function get_providers() {
-		static $providers = null;
+		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( self::BLOCK_NAME );
+		$providers  = array();
 
-		if ( null !== $providers ) {
+		if ( ! $block_type instanceof WP_Block_Type || ! is_array( $block_type->variations ) ) {
 			return $providers;
 		}
 
-		$providers = array(
-			'twitter'       => array(
-				'patterns'   => array(
-					'#^https?:\/\/(www\.)?twitter\.com\/.+#i',
-				),
-				'attributes' => array(
-					'providerNameSlug' => 'twitter',
-					'responsive'       => true,
-				),
-				'type'       => 'rich',
-			),
-			'youtube'       => array(
-				'patterns'   => array(
-					'#^https?:\/\/((m|www)\.)?youtube\.com\/.+#i',
-					'#^https?:\/\/youtu\.be\/.+#i',
-				),
-				'attributes' => array(
-					'providerNameSlug' => 'youtube',
-					'responsive'       => true,
-				),
-				'type'       => 'video',
-			),
-			'soundcloud'    => array(
-				'patterns'   => array(
-					'#^https?:\/\/(www\.)?soundcloud\.com\/.+#i',
-				),
-				'attributes' => array(
-					'providerNameSlug' => 'soundcloud',
-					'responsive'       => true,
-				),
-				'type'       => 'rich',
-			),
-			'spotify'       => array(
-				'patterns'   => array(
-					'#^https?:\/\/(open|play)\.spotify\.com\/.+#i',
-				),
-				'attributes' => array(
-					'providerNameSlug' => 'spotify',
-					'responsive'       => true,
-				),
-				'type'       => 'rich',
-			),
-			'flickr'        => array(
-				'patterns'   => array(
-					'#^https?:\/\/(www\.)?flickr\.com\/.+#i',
-					'#^https?:\/\/flic\.kr\/.+#i',
-				),
-				'attributes' => array(
-					'providerNameSlug' => 'flickr',
-					'responsive'       => true,
-				),
-			),
-			'vimeo'         => array(
-				'patterns'   => array(
-					'#^https?:\/\/(www\.)?vimeo\.com\/.+#i',
-				),
-				'attributes' => array(
-					'providerNameSlug' => 'vimeo',
-					'responsive'       => true,
-				),
-				'type'       => 'video',
-			),
-			'animoto'       => array(
-				'patterns'   => array(
-					'#^https?:\/\/(www\.)?(animoto|video214)\.com\/.+#i',
-				),
-				'attributes' => array(
-					'providerNameSlug' => 'animoto',
-					'responsive'       => true,
-				),
-				'type'       => 'video',
-			),
-			'cloudup'       => array(
-				'patterns'   => array(
-					'#^https?:\/\/cloudup\.com\/.+#i',
-				),
-				'attributes' => array(
-					'providerNameSlug' => 'cloudup',
-					'responsive'       => true,
-				),
-			),
-			'crowdsignal'   => array(
-				'patterns'   => array(
-					'#^https?:\/\/((.+\.)?polldaddy\.com|poll\.fm|.+\.crowdsignal\.net|.+\.survey\.fm)\/.+#i',
-				),
-				'attributes' => array(
-					'providerNameSlug' => 'crowdsignal',
-					'responsive'       => true,
-				),
-				'type'       => 'rich',
-			),
-			'dailymotion'   => array(
-				'patterns'   => array(
-					'#^https?:\/\/(www\.)?dailymotion\.com\/.+#i',
-				),
-				'attributes' => array(
-					'providerNameSlug' => 'dailymotion',
-					'responsive'       => true,
-				),
-				'type'       => 'video',
-			),
-			'imgur'         => array(
-				'patterns'   => array(
-					'#^https?:\/\/(.+\.)?imgur\.com\/.+#i',
-				),
-				'attributes' => array(
-					'providerNameSlug' => 'imgur',
-					'responsive'       => true,
-				),
-				'type'       => 'rich',
-			),
-			'issuu'         => array(
-				'patterns'   => array(
-					'#^https?:\/\/(www\.)?issuu\.com\/.+#i',
-				),
-				'attributes' => array(
-					'providerNameSlug' => 'issuu',
-					'responsive'       => true,
-				),
-				'type'       => 'rich',
-			),
-			'kickstarter'   => array(
-				'patterns'   => array(
-					'#^https?:\/\/(www\.)?kickstarter\.com\/.+#i',
-					'#^https?:\/\/kck\.st\/.+#i',
-				),
-				'attributes' => array(
-					'providerNameSlug' => 'kickstarter',
-					'responsive'       => true,
-				),
-				'type'       => 'rich',
-			),
-			'mixcloud'      => array(
-				'patterns'   => array(
-					'#^https?:\/\/(www\.)?mixcloud\.com\/.+#i',
-				),
-				'attributes' => array(
-					'providerNameSlug' => 'mixcloud',
-					'responsive'       => true,
-				),
-				'type'       => 'rich',
-			),
-			'pocket-casts'  => array(
-				'patterns'   => array(
-					'#^https:\/\/pca.st\/\w+#i',
-				),
-				'attributes' => array(
-					'providerNameSlug' => 'pocket-casts',
-					'responsive'       => true,
-				),
-				'type'       => 'rich',
-			),
-			'reddit'        => array(
-				'patterns'   => array(
-					'#^https?:\/\/(www\.)?reddit\.com\/.+#i',
-				),
-				'attributes' => array(
-					'providerNameSlug' => 'reddit',
-					'responsive'       => true,
-				),
-				'type'       => 'rich',
-			),
-			'reverbnation'  => array(
-				'patterns'   => array(
-					'#^https?:\/\/(www\.)?reverbnation\.com\/.+#i',
-				),
-				'attributes' => array(
-					'providerNameSlug' => 'reverbnation',
-					'responsive'       => true,
-				),
-				'type'       => 'rich',
-			),
-			'scribd'        => array(
-				'patterns'   => array(
-					'#^https?:\/\/(www\.)?scribd\.com\/.+#i',
-				),
-				'attributes' => array(
-					'providerNameSlug' => 'scribd',
-					'responsive'       => true,
-				),
-				'type'       => 'rich',
-			),
-			'smugmug'       => array(
-				'patterns'   => array(
-					'#^https?:\/\/(.+\.)?smugmug\.com\/.*#i',
-				),
-				'attributes' => array(
-					'providerNameSlug' => 'smugmug',
-					'previewable'      => false,
-					'responsive'       => true,
-				),
-			),
-			'speaker-deck'  => array(
-				'patterns'   => array(
-					'#^https?:\/\/(www\.)?speakerdeck\.com\/.+#i',
-				),
-				'attributes' => array(
-					'providerNameSlug' => 'speaker-deck',
-					'responsive'       => true,
-				),
-				'type'       => 'rich',
-			),
-			'tiktok'        => array(
-				'patterns'   => array(
-					'#^https?:\/\/(www\.)?tiktok\.com\/.+#i',
-				),
-				'attributes' => array(
-					'providerNameSlug' => 'tiktok',
-					'responsive'       => true,
-				),
-				'type'       => 'video',
-			),
-			'ted'           => array(
-				'patterns'   => array(
-					'#^https?:\/\/(www\.|embed\.)?ted\.com\/.+#i',
-				),
-				'attributes' => array(
-					'providerNameSlug' => 'ted',
-					'responsive'       => true,
-				),
-				'type'       => 'video',
-			),
-			'tumblr'        => array(
-				'patterns'   => array(
-					'#^https?:\/\/(.+)\.tumblr\.com\/.+#i',
-				),
-				'attributes' => array(
-					'providerNameSlug' => 'tumblr',
-					'responsive'       => true,
-				),
-				'type'       => 'rich',
-			),
-			'videopress'    => array(
-				'patterns'   => array(
-					'#^https?:\/\/videopress\.com\/.+#i',
-				),
-				'attributes' => array(
-					'providerNameSlug' => 'videopress',
-					'responsive'       => true,
-				),
-				'type'       => 'video',
-			),
-			'wordpress-tv'  => array(
-				'patterns'   => array(
-					'#^https?:\/\/wordpress\.tv\/.+#i',
-				),
-				'attributes' => array(
-					'providerNameSlug' => 'wordpress-tv',
-					'responsive'       => true,
-				),
-				'type'       => 'video',
-			),
-			'amazon-kindle' => array(
-				'patterns'   => array(
-					'#^https?:\/\/([a-z0-9-]+\.)?(amazon|amzn)(\.[a-z]{2,4})+\/.+#i',
-					'#^https?:\/\/(www\.)?(a\.co|z\.cn)\/.+#i',
-				),
-				'attributes' => array(
-					'providerNameSlug' => 'amazon-kindle',
-				),
-				'type'       => 'rich',
-			),
-			'pinterest'     => array(
-				'patterns'   => array(
-					'#^https?:\/\/([a-z]{2}|www)\.pinterest\.com(\.(au|mx))?\/.*#i',
-				),
-				'attributes' => array(
-					'providerNameSlug' => 'pinterest',
-				),
-				'type'       => 'rich',
-			),
-			'wolfram-cloud' => array(
-				'patterns'   => array(
-					'#^https?:\/\/(www\.)?wolframcloud\.com\/obj\/.+#i',
-				),
-				'attributes' => array(
-					'providerNameSlug' => 'wolfram-cloud',
-					'responsive'       => true,
-				),
-				'type'       => 'rich',
-			),
-			'bluesky'       => array(
-				'patterns'   => array(
-					'#^https?:\/\/bsky\.app\/profile\/.+\/post\/.+#i',
-				),
-				'attributes' => array(
-					'providerNameSlug' => 'bluesky',
-				),
-				'type'       => 'rich',
-			),
-		);
+		foreach ( $block_type->variations as $variation ) {
+			if (
+				! is_array( $variation )
+				|| ! isset( $variation['name'] ) || ! is_string( $variation['name'] )
+				|| empty( $variation['patterns'] ) || ! is_array( $variation['patterns'] )
+			) {
+				continue;
+			}
+
+			$patterns = array();
+
+			foreach ( $variation['patterns'] as $pattern ) {
+				$compiled = self::compile_pattern( $pattern );
+
+				if ( null !== $compiled ) {
+					$patterns[] = $compiled;
+				}
+			}
+
+			if ( array() === $patterns ) {
+				continue;
+			}
+
+			$provider = array(
+				'patterns'   => $patterns,
+				'attributes' => isset( $variation['attributes'] ) && is_array( $variation['attributes'] ) ? $variation['attributes'] : array(),
+			);
+
+			if ( isset( $variation['oembedType'] ) && is_string( $variation['oembedType'] ) ) {
+				$provider['type'] = $variation['oembedType'];
+			}
+
+			$providers[ $variation['name'] ] = $provider;
+		}
 
 		return $providers;
+	}
+
+	/**
+	 * Compiles a declared URL pattern, or refuses it.
+	 *
+	 * A pattern that does not compile matches nothing rather than taking the
+	 * conversion down, and is warned about once, the way an unsupported
+	 * selector is.
+	 *
+	 * @param mixed $pattern Declared pattern.
+	 * @return string|null Compiled pattern, or null when it cannot be used.
+	 */
+	private static function compile_pattern( $pattern ) {
+		static $checked = array();
+
+		if ( ! is_string( $pattern ) || '' === $pattern ) {
+			return null;
+		}
+
+		$compiled = '#' . str_replace( '#', '\\#', $pattern ) . '#i';
+
+		if ( ! array_key_exists( $pattern, $checked ) ) {
+			// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- An invalid pattern raises a warning as well as returning false; the warning is replaced with `_doing_it_wrong()` below.
+			$checked[ $pattern ] = false !== @preg_match( $compiled, '' );
+
+			if ( ! $checked[ $pattern ] ) {
+				_doing_it_wrong(
+					__METHOD__,
+					sprintf(
+						/* translators: %s: URL pattern, for example "^https?://example\\.com/.+". */
+						__( 'The "%s" pattern is not a valid regular expression, so it matches nothing.', 'gutenberg' ),
+						$pattern
+					),
+					'23.9.0'
+				);
+			}
+		}
+
+		return $checked[ $pattern ] ? $compiled : null;
 	}
 
 	/**

@@ -2347,6 +2347,99 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 		$this->assertContains( 'core/embed', gutenberg_get_block_conversion_support()['converts'] );
 	}
 
+	public function test_compiles_every_declared_provider_pattern() {
+		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( 'core/embed' );
+		$compile    = $this->accessible_method( 'Gutenberg_Embed_Transforms', 'compile_pattern' );
+		$patterns   = 0;
+
+		foreach ( (array) $block_type->variations as $variation ) {
+			if ( empty( $variation['patterns'] ) ) {
+				continue;
+			}
+
+			foreach ( $variation['patterns'] as $pattern ) {
+				$this->assertNotNull(
+					$compile->invoke( null, $pattern ),
+					$variation['name'] . ': ' . $pattern
+				);
+
+				++$patterns;
+			}
+		}
+
+		// An empty declaration would pass every assertion above.
+		$this->assertGreaterThan( 0, $patterns );
+	}
+
+	public function test_converts_a_provider_registered_through_the_variations_filter() {
+		$add_provider = static function ( $variations, $block_type ) {
+			if ( 'core/embed' !== $block_type->name ) {
+				return $variations;
+			}
+
+			$variations[] = array(
+				'name'       => 'example-videos',
+				'title'      => 'Example Videos Embed',
+				'patterns'   => array( '^https://videos\\.example\\.com/.+' ),
+				'attributes' => array(
+					'providerNameSlug' => 'example-videos',
+					'responsive'       => true,
+				),
+				'oembedType' => 'video',
+			);
+
+			return $variations;
+		};
+
+		add_filter( 'get_block_type_variations', $add_provider, 10, 2 );
+
+		try {
+			$blocks = gutenberg_html_to_blocks( '<p>https://videos.example.com/watch/1</p>' );
+		} finally {
+			remove_filter( 'get_block_type_variations', $add_provider );
+		}
+
+		// A provider registered from PHP is matched exactly as a declared
+		// one: the point of reading the block's own variations.
+		$this->assertSame( 'core/embed', $blocks[0]['blockName'] );
+		$this->assertSame( 'example-videos', $blocks[0]['attrs']['providerNameSlug'] );
+		$this->assertSame( 'video', $blocks[0]['attrs']['type'] );
+		$this->assertStringContainsString( 'is-provider-example-videos', $blocks[0]['innerHTML'] );
+		$this->assertStringContainsString( 'is-type-video', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_refuses_a_provider_pattern_that_does_not_compile() {
+		$this->setExpectedIncorrectUsage( 'Gutenberg_Embed_Transforms::compile_pattern' );
+
+		$broken = static function ( $variations, $block_type ) {
+			if ( 'core/embed' !== $block_type->name ) {
+				return $variations;
+			}
+
+			$variations[] = array(
+				'name'       => 'broken-provider',
+				'title'      => 'Broken Provider Embed',
+				'patterns'   => array( '^https://broken(\\.example' ),
+				'attributes' => array( 'providerNameSlug' => 'broken-provider' ),
+			);
+
+			return $variations;
+		};
+
+		add_filter( 'get_block_type_variations', $broken, 10, 2 );
+
+		try {
+			$blocks = gutenberg_html_to_blocks( '<p>https://broken.example/x</p>' );
+		} finally {
+			remove_filter( 'get_block_type_variations', $broken );
+		}
+
+		// The pattern matches nothing rather than taking the conversion
+		// down; the URL still becomes an embed the way any unclaimed one does.
+		$this->assertSame( 'core/embed', $blocks[0]['blockName'] );
+		$this->assertArrayNotHasKey( 'providerNameSlug', $blocks[0]['attrs'] );
+	}
+
 	/**
 	 * `createShortcodeAttributes()` in the editor reads `shortcodeText` as
 	 * `removep( autop( text ) )`; the server reads it as
