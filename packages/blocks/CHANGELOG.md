@@ -20,6 +20,12 @@
 -   `rawHandler` keeps the matched element's classes on a block whose transform is only declared in `block.json`, which previously dropped them ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
 -   A `<!--more-->` or `<!--nextpage-->` that is not inside a paragraph no longer disappears during raw handling ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
 -   `getBlockAttributes` no longer breaks when a block has no content to parse, such as a self-closing shortcode: missing content is treated as empty markup instead of reaching the attribute matchers ([#81831](https://github.com/WordPress/gutenberg/pull/81831)).
+-   An invalid or unsupported CSS selector on a declared `raw` transform now warns and matches nothing, instead of the selector engine's error aborting the whole paste or conversion ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+-   `rawHandler` keeps the classes rule consistent with the server: the block's own generated class is no longer written into `className`, an empty `class` attribute sets nothing, a block opting out of `customClassName` keeps nothing, and an `id` becomes the block's `anchor` when the block supports one ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+-   A `<!--more-->` or `<!--nextpage-->` nested inside another element is hoisted out to become a block during raw handling, instead of being swallowed into a Custom HTML block ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+-   A declared transform attribute with `"source": "attribute"` and a numeric `type` now coerces the attribute string to a number, matching the server-side parser; its `map` result is validated against the declared `type` and `enum` the same way ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+-   A declared transform extracting inner blocks with a selector converts the matched children in place, so a child selector such as the List Item's `ol > li` can match them ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+-   A declared content schema's `"attributes": "*"` now keeps every attribute in the editor too, rather than being read as a list of characters ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
 
 ## 15.27.0 (2026-08-26)
 

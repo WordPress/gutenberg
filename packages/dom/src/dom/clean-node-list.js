@@ -65,15 +65,19 @@ export default function cleanNodeList( nodeList, doc, schema, inline ) {
 					}
 
 					if ( node.hasAttributes() ) {
-						// Strip invalid attributes.
-						Array.from( node.attributes ).forEach( ( { name } ) => {
-							if (
-								name !== 'class' &&
-								! attributes.includes( name )
-							) {
-								node.removeAttribute( name );
-							}
-						} );
+						// Strip invalid attributes. `'*'` keeps them all.
+						if ( attributes !== '*' ) {
+							Array.from( node.attributes ).forEach(
+								( { name } ) => {
+									if (
+										name !== 'class' &&
+										! attributes.includes( name )
+									) {
+										node.removeAttribute( name );
+									}
+								}
+							);
+						}
 
 						// Strip invalid classes.
 						// In jsdom-jscore, 'node.classList' can be undefined.

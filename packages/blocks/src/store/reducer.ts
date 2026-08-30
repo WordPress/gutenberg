@@ -68,25 +68,29 @@ function bootstrappedBlockTypes(
 			const serverDefinition = state[ name ];
 
 			/*
-			 * A definition already in place wins, because it was initialized
-			 * from the server. Transforms are the exception: a server that
-			 * predates them sends a definition without any, and the block's
-			 * own `block.json` is then the only place they can come from.
+			 * A definition already in place wins key by key, because it was
+			 * initialized from the server; keys it never sent — such as
+			 * `transforms` from a server that predates them — are filled in
+			 * from the block's own `block.json`. Merging by key also keeps
+			 * the order of the bootstrap calls from mattering: whichever
+			 * arrives first, the union is the same.
 			 */
 			if ( serverDefinition ) {
+				const merged = {
+					...newDefinition,
+					...serverDefinition,
+				} as Partial< BlockType >;
+
 				if (
-					! ( 'transforms' in newDefinition ) ||
-					'transforms' in serverDefinition
+					Object.keys( merged ).length ===
+					Object.keys( serverDefinition ).length
 				) {
 					return state;
 				}
 
 				return {
 					...state,
-					[ name ]: {
-						...serverDefinition,
-						transforms: newDefinition.transforms,
-					} as Partial< BlockType >,
+					[ name ]: merged,
 				};
 			}
 

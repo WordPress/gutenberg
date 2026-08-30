@@ -3,6 +3,7 @@ import { getPhrasingContentSchema } from '@wordpress/dom';
 import warning from '@wordpress/warning';
 import { createBlock } from './factory';
 import { matchesSelector } from './matches-selector';
+import { nodeToBlock } from './raw-handling/html-to-blocks';
 import {
 	getBlockAttributes,
 	isValidByEnum,
@@ -134,16 +135,37 @@ function resolveAttributeValue( value: unknown, node: Element ): unknown {
 
 	const declaration = value as DeclarativeTransform;
 
-	const sourced =
+	let sourced =
 		'style' === declaration.source
 			? readStyleProperty( node, declaration.property )
 			: readSourcedValue( declaration, node );
 
-	// A `map` turns a sourced value into one the block declares, such as a
-	// heading tag name into a heading level.
+	/*
+	 * An HTML attribute is always a string. The server-side parser coerces a
+	 * numeric one to the number its declared type asks for, so the editor has
+	 * to as well — matching `is_numeric()`, not `Number()`, whose looser
+	 * grammar would accept what the server rejects.
+	 */
+	if (
+		'attribute' === declaration.source &&
+		( 'number' === declaration.type || 'integer' === declaration.type ) &&
+		typeof sourced === 'string' &&
+		NUMERIC_STRING.test( sourced )
+	) {
+		sourced = Number( sourced );
+	}
+
+	/*
+	 * A `map` turns a sourced value into one the block declares, such as a
+	 * heading tag name into a heading level. The mapped value is validated
+	 * below the same as a plain sourced one, as the server validates it.
+	 */
 	const lookup = declaration.map;
 	if ( lookup && typeof lookup === 'object' ) {
-		return Object.prototype.hasOwnProperty.call( lookup, sourced as string )
+		sourced = Object.prototype.hasOwnProperty.call(
+			lookup,
+			sourced as string
+		)
 			? lookup[ sourced as string ]
 			: undefined;
 	}
@@ -160,6 +182,12 @@ function resolveAttributeValue( value: unknown, node: Element ): unknown {
 
 	return sourced;
 }
+
+/**
+ * The strings PHP's `is_numeric()` accepts, so both runtimes coerce the same
+ * attribute values.
+ */
+const NUMERIC_STRING = /^\s*[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?\s*$/;
 
 /**
  * Reads a declared attribute out of the matched markup.
@@ -284,8 +312,11 @@ function createRawTransform(
 	}
 
 	return ( node: Element, handler: Function ) => {
-		// Inner blocks are taken out of a copy so the caller's node is left alone.
-		const sourceNode = node.cloneNode( true ) as Element;
+		// Inner blocks are taken out of a copy, so the caller's node is left
+		// alone; a transform extracting none reads the node as it is.
+		const sourceNode = convertsInnerBlocks
+			? ( node.cloneNode( true ) as Element )
+			: node;
 		let innerBlockList: unknown[] = [];
 
 		const toBlocks = ( html: string ) => {
@@ -297,11 +328,17 @@ function createRawTransform(
 			innerBlockList = toBlocks( node.innerHTML );
 			sourceNode.innerHTML = '';
 		} else if ( typeof innerBlocks === 'string' ) {
+			/*
+			 * The matched children are converted where they stand, in the
+			 * copy: re-parsed on their own they would lose their parent, and
+			 * a child selector such as the List Item's `ol > li` could never
+			 * match its own block again.
+			 */
 			const matched = Array.from( sourceNode.children ).filter(
 				( child ) => matchesSelector( child, innerBlocks )
 			);
 			innerBlockList = matched.flatMap( ( child ) =>
-				toBlocks( child.outerHTML )
+				nodeToBlock( child, handler as any )
 			);
 			matched.forEach( ( child ) => child.remove() );
 		}

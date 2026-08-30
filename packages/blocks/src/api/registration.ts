@@ -35,21 +35,40 @@ export function unstable__bootstrapServerSideBlockDefinitions(
 ): void {
 	const { addBootstrappedBlockType } = unlock( dispatch( blocksStore ) );
 	for ( const [ name, blockType ] of Object.entries( definitions ) ) {
-		// Transforms arrive as they are declared in `block.json`, which is not
-		// the shape the editor runs them in.
 		addBootstrappedBlockType(
 			name,
-			blockType.transforms
-				? {
-						...blockType,
-						transforms: normalizeMetadataTransforms(
-							blockType.transforms as any,
-							name
-						),
-				  }
-				: blockType
+			withNormalizedTransforms( name, blockType, blockType.transforms )
 		);
 	}
+}
+
+/**
+ * Replaces a definition's transforms with the shape the editor runs them in.
+ *
+ * Transforms arrive as they are declared in `block.json`; every path into the
+ * bootstrapped store normalizes them the same way, so the store only ever
+ * holds runnable ones.
+ *
+ * @param name       Block name.
+ * @param definition Block definition to bootstrap.
+ * @param transforms The declared transforms, wherever the caller reads them from.
+ *
+ * @return The definition, with any transforms normalized.
+ */
+function withNormalizedTransforms(
+	name: string,
+	definition: Record< string, unknown >,
+	transforms: unknown
+): Record< string, unknown > {
+	return transforms
+		? {
+				...definition,
+				transforms: normalizeMetadataTransforms(
+					transforms as any,
+					name
+				),
+		  }
+		: definition;
 }
 
 /**
@@ -194,15 +213,11 @@ export function registerBlockType<
 		 */
 		addBootstrappedBlockType(
 			name,
-			blockNameOrMetadata.transforms
-				? {
-						...metadata,
-						transforms: normalizeMetadataTransforms(
-							blockNameOrMetadata.transforms as any,
-							name
-						),
-				  }
-				: metadata
+			withNormalizedTransforms(
+				name,
+				metadata,
+				blockNameOrMetadata.transforms
+			)
 		);
 	}
 

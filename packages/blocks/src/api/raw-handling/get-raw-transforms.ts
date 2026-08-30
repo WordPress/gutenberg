@@ -15,10 +15,14 @@ export function getRawTransforms(): RawTransform[] {
 		)
 		.map( ( transform ) => ( {
 			...transform,
+			// Only a function is callable: a PHP-registered callable that
+			// travelled through JSON arrives as `{}` or `[ 'Class', 'method' ]`,
+			// both truthy, and calling either would throw on every paste.
 			isMatch:
-				transform.isMatch ??
-				( ( node: Element ) =>
-					!! transform.selector &&
-					matchesSelector( node, transform.selector ) ),
+				typeof transform.isMatch === 'function'
+					? transform.isMatch
+					: ( node: Element ) =>
+							!! transform.selector &&
+							matchesSelector( node, transform.selector ),
 		} ) );
 }

@@ -37,10 +37,32 @@ export default function specialCommentConverter(
 	// and remove the paragraph. If there's no paragraph, fall back to simply
 	// replacing the comment.
 	if ( ! node.parentNode || node.parentNode.nodeName !== 'P' ) {
-		// The block stands where the comment stood. `replace()` from
-		// `@wordpress/dom` inserts after the comment's *parent* instead, which
-		// drops the block out of the document when that parent is the body.
-		node.parentNode?.insertBefore( block, node );
+		/*
+		 * The block has to reach the top level: `htmlToBlocks` visits only
+		 * `body`'s children, so a marker left inside another element would be
+		 * swallowed into whichever block claims its container. It lands right
+		 * after the top-level element it was found in.
+		 */
+		let topAncestor: Node = node;
+
+		while (
+			topAncestor.parentNode &&
+			topAncestor.parentNode !== doc.body
+		) {
+			topAncestor = topAncestor.parentNode;
+		}
+
+		if ( topAncestor === node ) {
+			// The comment already sits at the top level, so the block simply
+			// stands where it stood.
+			node.parentNode?.insertBefore( block, node );
+		} else {
+			topAncestor.parentNode?.insertBefore(
+				block,
+				topAncestor.nextSibling
+			);
+		}
+
 		remove( node as Element );
 	} else {
 		const childNodes = Array.from( node.parentNode.childNodes );
