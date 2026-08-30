@@ -169,6 +169,11 @@ jobs:
                   # and the job doesn't need the install speed.
                   package-manager-cache: false
 
+            - name: Pin npm version for consistency
+              run: |
+                  npm install --global npm@10
+                  npm --version
+
             - name: npm install
               # Not the setup-node composite action: its cached node_modules
               # path skips `prepare` scripts, and bundling from source needs
