@@ -167,6 +167,28 @@ describe( 'Transforms declared in block metadata', () => {
 		);
 	} );
 
+	it( 'orders media around a more comment as the markup had them', () => {
+		// Media before the marker leaves its container before the split, whose
+		// emptied halves are dropped; media after it leaves the half the split
+		// made, which stays behind empty.
+		const before = rawHandler( {
+			HTML: '<div><img src="/a.png"><!--more--></div>',
+		} );
+		expect( before.map( ( { name } ) => name ) ).toEqual( [
+			'core/image',
+			'core/more',
+		] );
+
+		const after = rawHandler( {
+			HTML: '<div><!--more--><img src="/a.png"></div>',
+		} );
+		expect( after.map( ( { name } ) => name ) ).toEqual( [
+			'core/more',
+			'core/image',
+			'core/html',
+		] );
+	} );
+
 	it( 'converts a list into list items', () => {
 		const [ list ] = rawHandler( {
 			HTML: '<ul><li>One</li><li>Two</li></ul>',
@@ -273,6 +295,11 @@ describe( 'Transforms declared in block metadata', () => {
 		// padded value, and the server would refuse it.
 		expect(
 			attributesOf( '<aside data-size=" 600">x</aside>' ).size
+		).toBeUndefined();
+		// A magnitude past the float range coerces to Infinity, which JSON
+		// cannot write, so it falls out as type-invalid on both runtimes.
+		expect(
+			attributesOf( '<aside data-size="1e309">x</aside>' ).size
 		).toBeUndefined();
 
 		unregisterBlockType( name );

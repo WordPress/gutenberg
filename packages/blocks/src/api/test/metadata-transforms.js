@@ -93,6 +93,16 @@ describe( 'resolveDeclaredContentSchema', () => {
 		).toEqual( { p: { attributes: [] } } );
 	} );
 
+	it( 'lets a contextual list resolve to the wildcard', () => {
+		const schema = {
+			b: { attributes: { default: '*', paste: [] } },
+		};
+
+		expect(
+			resolveDeclaredContentSchema( schema, { isPaste: false } )
+		).toEqual( { b: { attributes: '*' } } );
+	} );
+
 	it( 'leaves a plain attribute list and a wildcard alone', () => {
 		const schema = {
 			blockquote: { children: '*' },
@@ -279,10 +289,13 @@ describe( 'a configuration passed as metadata', () => {
 
 		registerBlockType( config, config );
 
-		const [ raw ] = getBlockType( name ).transforms.from;
+		const { from } = getBlockType( name ).transforms;
 
-		expect( raw.transform ).toBe( transform );
-		expect( raw.isMatch ).toBe( isMatch );
+		// One transform, not the same one twice: both copies of the
+		// configuration hold the very same entry.
+		expect( from ).toHaveLength( 1 );
+		expect( from[ 0 ].transform ).toBe( transform );
+		expect( from[ 0 ].isMatch ).toBe( isMatch );
 	} );
 } );
 

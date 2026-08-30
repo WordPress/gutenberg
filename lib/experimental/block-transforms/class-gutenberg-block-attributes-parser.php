@@ -119,6 +119,12 @@ class Gutenberg_Block_Attributes_Parser {
 
 		$number = (float) $value;
 
+		// A magnitude past the float range coerces to infinity, which JSON
+		// cannot write; the string stays and falls out as type-invalid.
+		if ( ! is_finite( $number ) ) {
+			return $value;
+		}
+
 		return (float) (int) $number === $number ? (int) $number : $number;
 	}
 
@@ -191,8 +197,20 @@ class Gutenberg_Block_Attributes_Parser {
 
 		if ( 'query' === $source ) {
 			$sub_schema = isset( $schema['query'] ) ? $schema['query'] : array();
-			$matches    = null === $selector ? array( $element ) : self::query_all( $element, $selector );
 			$values     = array();
+
+			/*
+			 * A nested query runs through `querySelectorAll()` on the matched
+			 * item in the editor, which never matches the item itself; only a
+			 * top-level query considers the element it starts from.
+			 */
+			if ( null === $selector ) {
+				$matches = array( $element );
+			} elseif ( $within_query ) {
+				$matches = $element->query_selector_all( $selector );
+			} else {
+				$matches = self::query_all( $element, $selector );
+			}
 
 			foreach ( $matches as $match ) {
 				$item = array();

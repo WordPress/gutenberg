@@ -524,6 +524,37 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 				// out. Only a transform's declared attributes coerce.
 				array(),
 			),
+			'nested query'           => array(
+				array(
+					'rows' => array(
+						'type'     => 'array',
+						'source'   => 'query',
+						'selector' => 'div',
+						'query'    => array(
+							'inner' => array(
+								'type'     => 'array',
+								'source'   => 'query',
+								'selector' => 'div',
+								'query'    => array(
+									'txt' => array(
+										'type'   => 'string',
+										'source' => 'text',
+									),
+								),
+							),
+						),
+					),
+				),
+				'<section><div>outer<div>inner</div></div></section>',
+				// A nested query runs through `querySelectorAll()` on each
+				// matched item, which never matches the item itself.
+				array(
+					'rows' => array(
+						array( 'inner' => array( array( 'txt' => 'inner' ) ) ),
+						array( 'inner' => array() ),
+					),
+				),
+			),
 			'query source'           => array(
 				array(
 					'rows' => array(
@@ -1035,6 +1066,25 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 			'alone in a division'         => array(
 				'<div><!--more--></div>',
 				array( array( 'core/more', '<!--more-->' ) ),
+			),
+			'media before the marker'     => array(
+				// The editor promotes the image out before the marker splits
+				// the division, whose emptied halves are then dropped.
+				'<div><img src="x.png"><!--more--></div>',
+				array(
+					array( 'core/image', '<figure class="wp-block-image"><img src="x.png"></figure>' ),
+					array( 'core/more', '<!--more-->' ),
+				),
+			),
+			'media after the marker'      => array(
+				// Split first, then promoted out of the half the split made,
+				// which stays behind empty, exactly as the editor leaves it.
+				'<div><!--more--><img src="x.png"></div>',
+				array(
+					array( 'core/more', '<!--more-->' ),
+					array( 'core/image', '<figure class="wp-block-image"><img src="x.png"></figure>' ),
+					array( 'core/html', '<div></div>' ),
+				),
 			),
 			'paragraph halves built bare' => array(
 				// As the editor builds them, with `createElement( 'p' )`:
@@ -2561,6 +2611,11 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 		// the shared grammar refuses it on both runtimes.
 		$padded = gutenberg_html_to_blocks( '<aside data-size=" 600">x</aside>' );
 		$this->assertArrayNotHasKey( 'size', $padded[0]['attrs'] );
+
+		// A magnitude past the float range coerces to infinity, which JSON
+		// cannot write, so it falls out as type-invalid on both runtimes.
+		$overflow = gutenberg_html_to_blocks( '<aside data-size="1e309">x</aside>' );
+		$this->assertArrayNotHasKey( 'size', $overflow[0]['attrs'] );
 	}
 
 	public function test_keeps_single_spaces_between_kept_attributes() {
@@ -2751,6 +2806,118 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 
 		$this->assertSame( 'test/captioned', $blocks[0]['blockName'] );
 		$this->assertSame( '<aside><b class="keep-me">Marked</b> tail</aside>', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_filters_classes_even_when_every_attribute_is_kept() {
+		$this->register(
+			'test/starred',
+			array(
+				'attributes' => array(),
+				'supports'   => array( 'className' => false ),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'     => 'raw',
+							'selector' => 'aside',
+							'priority' => 1,
+							'schema'   => array(
+								'aside' => array(
+									'children' => array(
+										'#text' => array(),
+										'b'     => array(
+											'attributes' => '*',
+											'classes'    => array( 'keep-me' ),
+											'children'   => array( '#text' => array() ),
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		// `cleanNodeList()` skips only the attribute stripping for `*`; the
+		// declared classes still decide which class names survive.
+		$blocks = gutenberg_html_to_blocks( '<aside><b class="keep-me drop-me" data-x="1">M</b> t</aside>' );
+
+		$this->assertSame( '<aside><b class="keep-me" data-x="1">M</b> t</aside>', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_reads_no_class_meaning_into_the_attribute_list() {
+		$this->register(
+			'test/class-attr',
+			array(
+				'attributes' => array(),
+				'supports'   => array( 'className' => false ),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'     => 'raw',
+							'selector' => 'aside',
+							'priority' => 1,
+							'schema'   => array(
+								'aside' => array(
+									'children' => array(
+										'#text' => array(),
+										'b'     => array(
+											'attributes' => array( 'class' ),
+											'children'   => array( '#text' => array() ),
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		// Only `classes` governs class names in `cleanNodeList()`; listing
+		// `class` under `attributes` does not keep any.
+		$blocks = gutenberg_html_to_blocks( '<aside><b class="one two">M</b></aside>' );
+
+		$this->assertSame( '<aside><b>M</b></aside>', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_reads_a_contextual_attribute_wildcard() {
+		$this->register(
+			'test/ctx-star',
+			array(
+				'attributes' => array(),
+				'supports'   => array( 'className' => false ),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'     => 'raw',
+							'selector' => 'aside',
+							'priority' => 1,
+							'schema'   => array(
+								'aside' => array(
+									'children' => array(
+										'#text' => array(),
+										'b'     => array(
+											'attributes' => array(
+												'default' => '*',
+												'paste'   => array(),
+											),
+											'children'   => array( '#text' => array() ),
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		// The conversion context resolves to `default`, which may itself be
+		// the keep-everything wildcard.
+		$blocks = gutenberg_html_to_blocks( '<aside><b data-x="1" title="t">M</b></aside>' );
+
+		$this->assertSame( '<aside><b data-x="1" title="t">M</b></aside>', $blocks[0]['innerHTML'] );
 	}
 
 	public function test_keeps_every_class_a_schema_wildcards() {

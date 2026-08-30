@@ -200,6 +200,16 @@ class Gutenberg_HTML_To_Blocks {
 			return array( self::create_fallback_block_from_html( $html ) );
 		}
 
+		/*
+		 * The editor's `deepFilter` visits nodes in document order, so media
+		 * standing before a `<!--more-->` leaves its container before the
+		 * marker splits it — the emptied halves are dropped — while media
+		 * after the marker leaves the half the split made, which stays. Two
+		 * passes around the splitting reproduce that order: first the media
+		 * no marker precedes, then, once the markers have split their
+		 * containers, the rest.
+		 */
+		self::wrap_figure_content( $root, true );
 		self::convert_special_comments( $root );
 		self::wrap_figure_content( $root );
 		self::normalise( $root );
@@ -917,14 +927,16 @@ class Gutenberg_HTML_To_Blocks {
 		$entry      = $schema[ $node->tag_name ];
 		$attributes = self::get_schema_attributes( $entry );
 
+		/*
+		 * `class` follows its own rule, as it does in `cleanNodeList()`: the
+		 * attribute never falls to the attribute list; the schema's `classes`
+		 * decide which class names survive — none do when the schema names
+		 * none — and they decide it even for an entry keeping every other
+		 * attribute with `*`.
+		 */
+		self::filter_classes( $node, $entry );
+
 		if ( null !== $attributes ) {
-			/*
-			 * `class` follows its own rule, as it does in `cleanNodeList()`:
-			 * the attribute never falls to the attribute list; the schema's
-			 * `classes` decide which class names survive, and none do when
-			 * the schema names none.
-			 */
-			self::filter_classes( $node, $entry, $attributes );
 			$node->keep_attributes( array_merge( $attributes, array( 'class' ) ) );
 		}
 
@@ -936,23 +948,17 @@ class Gutenberg_HTML_To_Blocks {
 	 *
 	 * The editor's `cleanNodeList()` keeps a class name when it matches an
 	 * entry in the schema's `classes` — `*` keeps them all — and removes the
-	 * attribute when nothing survives. Listing `class` under `attributes`
-	 * reads as allowing every class, which is how a `requires` schema spells
-	 * it in JSON, where `classes` patterns cannot be written.
+	 * attribute when nothing survives. `classes` alone governs them: listing
+	 * `class` under `attributes` has no effect there, so it has none here.
 	 *
-	 * @param Gutenberg_HTML_Element $node       Element to filter.
-	 * @param array                  $entry      Schema entry for the element.
-	 * @param string[]               $attributes Attribute names the entry allows.
+	 * @param Gutenberg_HTML_Element $node  Element to filter.
+	 * @param array                  $entry Schema entry for the element.
 	 * @return void
 	 */
-	private static function filter_classes( $node, $entry, $attributes ) {
+	private static function filter_classes( $node, $entry ) {
 		$current = $node->get_class_names();
 
 		if ( array() === $current ) {
-			return;
-		}
-
-		if ( in_array( 'class', $attributes, true ) ) {
 			return;
 		}
 
@@ -989,15 +995,17 @@ class Gutenberg_HTML_To_Blocks {
 
 		$attributes = $entry['attributes'];
 
+		// An entry that varies by context lists the conversion's set under
+		// `default`, which may itself be `*`.
+		if ( is_array( $attributes ) && isset( $attributes['default'] ) ) {
+			$attributes = $attributes['default'];
+		}
+
 		// `*` says the attributes here do not matter, which is what a block
 		// declaring what it can save back writes when its own schema strips
 		// them anyway.
 		if ( '*' === $attributes ) {
 			return null;
-		}
-
-		if ( isset( $attributes['default'] ) ) {
-			$attributes = $attributes['default'];
 		}
 
 		return is_array( $attributes ) ? array_values( array_filter( $attributes, 'is_string' ) ) : array();
@@ -1165,11 +1173,6 @@ class Gutenberg_HTML_To_Blocks {
 		$entry   = $schema[ $element->tag_name ];
 		$allowed = self::get_schema_attributes( $entry );
 
-		// A schema keeping every attribute has nothing to say about them.
-		if ( null === $allowed ) {
-			return true;
-		}
-
 		$allowed_classes = isset( $entry['classes'] ) && is_array( $entry['classes'] )
 			? array_values( array_filter( $entry['classes'], 'is_string' ) )
 			: null;
@@ -1207,7 +1210,9 @@ class Gutenberg_HTML_To_Blocks {
 				continue;
 			}
 
-			if ( ! in_array( $name, $allowed, true ) ) {
+			// A schema keeping every attribute with `*` has nothing to say
+			// about this one; its `classes`, checked above, still bind.
+			if ( null !== $allowed && ! in_array( $name, $allowed, true ) ) {
 				return false;
 			}
 		}
@@ -1532,11 +1537,18 @@ class Gutenberg_HTML_To_Blocks {
 	 * the editor, the media is only wrapped when a registered transform claims
 	 * the resulting figure, so markup no block converts keeps its shape.
 	 *
-	 * @param Gutenberg_HTML_Element $root Fragment root.
+	 * @param Gutenberg_HTML_Element $root               Fragment root.
+	 * @param bool                   $until_first_marker Optional. Keep only the media no special comment precedes. Default false.
 	 * @return void
 	 */
-	private static function wrap_figure_content( $root ) {
-		foreach ( self::collect_figure_content( $root ) as $node ) {
+	private static function wrap_figure_content( $root, $until_first_marker = false ) {
+		$media = self::collect_figure_content( $root );
+
+		if ( $until_first_marker ) {
+			$media = self::media_before_any_marker( $root, $media );
+		}
+
+		foreach ( $media as $node ) {
 			$target = $node;
 			$parent = $node->parent;
 
@@ -1602,6 +1614,56 @@ class Gutenberg_HTML_To_Blocks {
 		}
 
 		return $media;
+	}
+
+	/**
+	 * Keeps the media elements no special comment precedes in document order.
+	 *
+	 * The editor visits both in one pass, so a marker only rearranges what
+	 * comes after it.
+	 *
+	 * @param Gutenberg_HTML_Element   $root  Fragment root.
+	 * @param Gutenberg_HTML_Element[] $media Collected media elements.
+	 * @return Gutenberg_HTML_Element[] The media standing before every marker.
+	 */
+	private static function media_before_any_marker( $root, $media ) {
+		$kept = array();
+		$seen = false;
+
+		self::walk_media_and_markers( $root, $media, $seen, $kept );
+
+		return $kept;
+	}
+
+	/**
+	 * Walks the tree in document order, keeping media until a marker is seen.
+	 *
+	 * @param Gutenberg_HTML_Element   $node  Node whose children to walk.
+	 * @param Gutenberg_HTML_Element[] $media Collected media elements.
+	 * @param bool                     $seen  Whether a special comment was passed.
+	 * @param Gutenberg_HTML_Element[] $kept  Media collected so far.
+	 * @return void
+	 */
+	private static function walk_media_and_markers( $node, $media, &$seen, &$kept ) {
+		foreach ( $node->children as $child ) {
+			if (
+				Gutenberg_HTML_Element::COMMENT === $child->type
+				&& ( 'nextpage' === $child->text || 0 === strpos( $child->text, 'more' ) )
+			) {
+				$seen = true;
+				continue;
+			}
+
+			if ( Gutenberg_HTML_Element::ELEMENT !== $child->type ) {
+				continue;
+			}
+
+			if ( ! $seen && in_array( $child, $media, true ) ) {
+				$kept[] = $child;
+			}
+
+			self::walk_media_and_markers( $child, $media, $seen, $kept );
+		}
 	}
 
 	/**

@@ -156,7 +156,13 @@ function resolveAttributeValue( value: unknown, node: Element ): unknown {
 		typeof sourced === 'string' &&
 		NUMERIC_STRING.test( sourced )
 	) {
-		sourced = Number( sourced );
+		const coerced = Number( sourced );
+
+		// A magnitude past the float range coerces to Infinity, which JSON
+		// cannot write; the string stays and falls out as type-invalid.
+		if ( Number.isFinite( coerced ) ) {
+			sourced = coerced;
+		}
 	}
 
 	/*
@@ -722,7 +728,10 @@ export function mergeBlockTransforms(
 					...result[ index ],
 					...clientTransform,
 				};
-			} else {
+			} else if ( ! result.includes( clientTransform ) ) {
+				// The very same object on both sides is one configuration
+				// passed as metadata and settings alike —
+				// `registerBlockType( config, config )` — not two transforms.
 				result.push( clientTransform );
 			}
 		} );
