@@ -192,6 +192,18 @@ function responsiveStatesAreEqual(
 	);
 }
 
+function itemKeysAreEqual(
+	current: BreadcrumbItemDescriptor[],
+	next: BreadcrumbItemDescriptor[]
+) {
+	return (
+		current.length === next.length &&
+		current.every(
+			( item, index ) => item.itemKey === next[ index ].itemKey
+		)
+	);
+}
+
 function getContentBoxInlineSize( element: HTMLElement ) {
 	const computedStyles = getComputedStyle( element );
 	const shorthandValues = computedStyles.paddingInline
@@ -286,7 +298,11 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbsRoot(
 				return;
 			}
 
-			if ( isOverflowTriggerFocused ) {
+			if (
+				isOverflowTriggerFocused &&
+				( next.collapsedKeys.length === 0 ||
+					! itemKeysAreEqual( frozenItemsRef.current, items ) )
+			) {
 				pendingStateRef.current = next;
 				return;
 			}
@@ -296,7 +312,7 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbsRoot(
 				responsiveStatesAreEqual( current, next ) ? current : next
 			);
 		},
-		[ isOverflowTriggerFocused, menuOpen ]
+		[ isOverflowTriggerFocused, items, menuOpen ]
 	);
 
 	useIsomorphicLayoutEffect( () => {

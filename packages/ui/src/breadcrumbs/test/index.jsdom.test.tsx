@@ -845,6 +845,30 @@ describe( 'Breadcrumbs', () => {
 			expect( screen.getAllByRole( 'link' ) ).toHaveLength( 2 );
 		} );
 
+		it( 'recalculates collapsed items when the overflow trigger remains focused during resize', async () => {
+			availableWidth = 140;
+			labelWidths.set( 'Section', 80 );
+			renderDefaultTrail();
+			const trigger = screen.getByRole( 'button', {
+				name: 'Show 1 hidden breadcrumb item',
+			} );
+
+			act( () => trigger.focus() );
+			await screen.findByText( 'Show 1 hidden breadcrumb item' );
+			availableWidth = 100;
+			notifyResize();
+
+			expect( trigger ).toHaveFocus();
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Show 2 hidden breadcrumb items',
+				} )
+			).toBe( trigger );
+			expect(
+				screen.queryByRole( 'link', { name: 'Home' } )
+			).not.toBeInTheDocument();
+		} );
+
 		it( 'discards a deferred layout when newer geometry supersedes it', async () => {
 			availableWidth = 140;
 			labelWidths.set( 'Section', 80 );
