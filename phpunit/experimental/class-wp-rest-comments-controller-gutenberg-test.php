@@ -876,7 +876,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	public function test_schema_includes_reaction_summary() {
-		$controller = new Gutenberg_REST_Comment_Controller_7_1();
+		$controller = new Gutenberg_REST_Comment_Controller_7_2();
 		$schema     = $controller->get_item_schema();
 
 		$this->assertArrayHasKey( 'reaction_summary', $schema['properties'] );
