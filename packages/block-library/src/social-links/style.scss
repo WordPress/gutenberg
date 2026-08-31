@@ -42,12 +42,6 @@
 		font-size: 16px; // 16 makes for a quarter-padding that keeps the icon centered.
 	}
 
-	// Normal/default.
-	&,
-	&.has-normal-icon-size {
-		font-size: 24px;
-	}
-
 	// Large.
 	&.has-large-icon-size {
 		font-size: 36px;
