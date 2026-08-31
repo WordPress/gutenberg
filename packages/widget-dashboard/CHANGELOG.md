@@ -49,6 +49,12 @@
     absent, so locks keyed on the type do not fire
     ([#82256](https://github.com/WordPress/gutenberg/pull/82256)).
 
+### Enhancements
+
+-   Widget header: the title carries a `title` attribute, so a title the
+    row clips can still be read on hover
+    ([#PR](https://github.com/WordPress/gutenberg/pull/PR)).
+
 ### Internal
 
 -   Remove unused dependency `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).

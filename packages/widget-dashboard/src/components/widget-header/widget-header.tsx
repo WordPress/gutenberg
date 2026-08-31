@@ -150,6 +150,7 @@ export function WidgetHeader( {
 						id={ titleId }
 						render={ <h2 /> }
 						className={ styles.title }
+						title={ widgetType.title }
 					>
 						{ widgetType.title }
 					</Card.Title>
