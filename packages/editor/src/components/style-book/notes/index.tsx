@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { useMemo, useRef } from '@wordpress/element';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { comment as commentIcon } from '@wordpress/icons';
 import PluginSidebar from '../../plugin-sidebar';
@@ -7,6 +7,7 @@ import { STYLE_BOOK_NOTES_SIDEBAR } from '../../collab-sidebar/constants';
 import { getExamples } from '../examples';
 import { useMultiOriginPalettes } from '../index';
 import { getAnchorLabels } from './anchors';
+import { useStyleBookNotesContext } from './context';
 import { StyleBookNotesPanel } from './sidebar';
 import { useStyleBookNoteThreads } from './use-style-book-note-threads';
 import { useStyleBookNotesEnabled } from './use-style-book-notes-enabled';
@@ -97,6 +98,19 @@ export default function StyleBookNotes(): React.JSX.Element | null {
 	const { globalStylesId, isEnabled } = useStyleBookNotesEnabled( {
 		enabled: showStylebook && ! isRevisions,
 	} );
+
+	/*
+	 * The provider outlives the Style Book, so an anchor left behind would
+	 * arm a form - or highlight an example - the next time it is opened,
+	 * without anyone having asked for it.
+	 */
+	const { setPendingAnchor, setActiveAnchor } = useStyleBookNotesContext();
+	useEffect( () => {
+		if ( ! showStylebook ) {
+			setPendingAnchor( null );
+			setActiveAnchor( null );
+		}
+	}, [ showStylebook, setPendingAnchor, setActiveAnchor ] );
 
 	if ( ! showStylebook || isRevisions || ! isEnabled ) {
 		return null;

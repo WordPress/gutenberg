@@ -135,6 +135,82 @@ test.describe( 'Style Book notes', () => {
 		).toBeVisible();
 	} );
 
+	test( 'adds a second note to an example that already has one', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await openStyleBook( { admin, editor, page } );
+
+		await styleBookFrame( page )
+			.getByRole( 'button', { name: 'Add note on Headings' } )
+			.click();
+
+		const sidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await sidebar
+			.getByRole( 'textbox', { name: 'New note on Headings' } )
+			.fill( 'First note.' );
+		await sidebar.getByRole( 'button', { name: 'Add note' } ).click();
+		await expect( sidebar.getByText( 'First note.' ) ).toBeVisible();
+
+		/*
+		 * The canvas button now points at the notes the example has, so a
+		 * second one is started from that example's group in the sidebar.
+		 */
+		await sidebar
+			.getByRole( 'button', { name: 'Add note on Headings' } )
+			.click();
+
+		const secondInput = sidebar.getByRole( 'textbox', {
+			name: 'New note on Headings',
+		} );
+		await expect( secondInput ).toBeFocused();
+		await secondInput.fill( 'Second note.' );
+		await sidebar
+			.getByRole( 'treeitem', { name: 'New note on Headings' } )
+			.getByRole( 'button', { name: 'Add note' } )
+			.click();
+
+		await expect( sidebar.getByText( 'First note.' ) ).toBeVisible();
+		await expect( sidebar.getByText( 'Second note.' ) ).toBeVisible();
+		await expect(
+			styleBookFrame( page ).getByRole( 'button', {
+				name: '2 notes on Headings',
+			} )
+		).toBeVisible();
+	} );
+
+	test( 'closing the notes sidebar leaves the Style Book standing', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await openStyleBook( { admin, editor, page } );
+
+		await styleBookFrame( page )
+			.getByRole( 'button', { name: 'Add note on Headings' } )
+			.click();
+		const sidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await expect( sidebar ).toBeVisible();
+
+		await sidebar
+			.getByRole( 'button', { name: 'Close Style Book notes' } )
+			.click();
+
+		// The notes were about the Style Book, so closing them is a return to
+		// Styles rather than a departure from it.
+		await expect(
+			page.locator( 'role=region[name="Style Book"i]' )
+		).toBeVisible();
+		await expect(
+			page.getByRole( 'button', { name: 'Style Book', pressed: true } )
+		).toBeVisible();
+	} );
+
 	test( 'stores the note on global styles with the example as its anchor', async ( {
 		admin,
 		editor,

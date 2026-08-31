@@ -1,13 +1,15 @@
 import { Fragment, useEffect, useMemo, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { Button } from '@wordpress/components';
+import { plus } from '@wordpress/icons';
 import { Stack, Text } from '@wordpress/ui';
 import { NoteThread } from '../../collab-sidebar/note-thread';
 import { NoteCard } from '../../collab-sidebar/note-card';
 import { NoteForm } from '../../collab-sidebar/note-form';
 import { useNoteActions } from '../../collab-sidebar/hooks';
 import { focusNoteThread } from '../../collab-sidebar/utils';
-import { NOTE_ANCHOR_META } from './anchors';
+import { NOTE_ANCHOR_META, UNKNOWN_ANCHOR } from './anchors';
 import type { StyleBookNoteGroup, StyleBookNoteThread } from './anchors';
 import { useStyleBookNotesContext } from './context';
 import { store as editorStore } from '../../../store';
@@ -49,7 +51,6 @@ export function StyleBookNotesPanel( {
 		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
 		[]
 	);
-	const isSubmittingRef = useRef( false );
 	const addNoteRef = useRef< HTMLDivElement | null >( null );
 
 	/*
@@ -150,6 +151,7 @@ export function StyleBookNotesPanel( {
 			event.key === 'Escape'
 		) {
 			selectNote( undefined );
+			setActiveAnchor( null );
 			focusNoteThread( thread.id, sidebarRef.current );
 		} else if (
 			event.key === 'ArrowDown' &&
@@ -181,6 +183,26 @@ export function StyleBookNotesPanel( {
 
 	const hasContent = orderedThreads.length > 0 || !! pendingAnchor;
 
+	/*
+	 * Rendered instead of the tree rather than inside it: a tree owns tree
+	 * items, and there are none to own until the first note is written.
+	 */
+	if ( ! hasContent ) {
+		return (
+			<div className="editor-collab-sidebar-panel editor-style-book-notes">
+				<Text
+					variant="body-sm"
+					className="editor-style-book-notes__empty"
+					render={ <p /> }
+				>
+					{ __(
+						'No notes yet. Select "Add note" on any example in the Style Book to leave one.'
+					) }
+				</Text>
+			</div>
+		);
+	}
+
 	return (
 		<Stack
 			className="editor-collab-sidebar-panel editor-style-book-notes"
@@ -195,48 +217,50 @@ export function StyleBookNotesPanel( {
 			} }
 			aria-label={ __( 'Style Book notes' ) }
 		>
-			{ ! hasContent && (
-				<Text
-					variant="body-sm"
-					className="editor-style-book-notes__empty"
-					render={ <p /> }
-				>
-					{ __(
-						'No notes yet. Select "Add note" on any example in the Style Book to leave one.'
-					) }
-				</Text>
-			) }
 			{ !! pendingAnchor && (
+				/*
+				 * Keyed by the anchor so switching examples starts a fresh
+				 * draft: `NoteForm` holds the text in state, and reusing the
+				 * instance would file what was typed for one example against
+				 * another.
+				 */
 				<div
+					key={ pendingAnchor }
 					ref={ addNoteRef }
 					className="editor-style-book-notes__add-note"
+					role="treeitem"
+					tabIndex={ 0 }
+					aria-label={
+						pendingLabel
+							? sprintf(
+									// translators: %s: Style Book example title, e.g. "Button".
+									__( 'New note on %s' ),
+									pendingLabel
+							  )
+							: __( 'New note' )
+					}
 				>
 					<NoteCard>
 						<NoteForm
 							onSubmit={ async ( inputComment: string ) => {
-								isSubmittingRef.current = true;
-								try {
-									/*
-									 * The create action resolves `undefined` when
-									 * the save fails (it surfaces its own error
-									 * notice); keep the form open so the draft is
-									 * not lost.
-									 */
-									const savedRecord = await onCreate( {
-										content: inputComment,
-									} );
-									if ( savedRecord ) {
-										setPendingAnchor( null );
-										selectNote( savedRecord.id );
-										focusNoteThread(
-											savedRecord.id,
-											sidebarRef.current
-										);
-									}
-									return savedRecord;
-								} finally {
-									isSubmittingRef.current = false;
+								/*
+								 * The create action resolves `undefined` when
+								 * the save fails (it surfaces its own error
+								 * notice); keep the form open so the draft is
+								 * not lost.
+								 */
+								const savedRecord = await onCreate( {
+									content: inputComment,
+								} );
+								if ( savedRecord ) {
+									setPendingAnchor( null );
+									selectNote( savedRecord.id );
+									focusNoteThread(
+										savedRecord.id,
+										sidebarRef.current
+									);
 								}
+								return savedRecord;
 							} }
 							onCancel={ () => setPendingAnchor( null ) }
 							labels={ {
@@ -261,14 +285,50 @@ export function StyleBookNotesPanel( {
 				);
 
 				return (
-					<Fragment key={ group.anchor }>
-						<Text
-							variant="heading-sm"
-							className="editor-style-book-notes__group-title"
-							render={ <h3 /> }
+					<Stack
+						key={ group.anchor }
+						role="group"
+						aria-label={ group.label }
+						direction="column"
+						gap="md"
+						justify="flex-start"
+					>
+						<Stack
+							direction="row"
+							align="center"
+							justify="space-between"
+							gap="sm"
 						>
-							{ group.label }
-						</Text>
+							<Text
+								variant="heading-sm"
+								className="editor-style-book-notes__group-title"
+								render={ <h3 /> }
+							>
+								{ group.label }
+							</Text>
+							{ /*
+							 * An example that already has a note still needs a
+							 * way to take another one: its canvas button has
+							 * become a link to the notes it has. The unknown
+							 * bucket gets none - there is no example on screen
+							 * to anchor a new note to.
+							 */ }
+							{ group.anchor !== UNKNOWN_ANCHOR && (
+								<Button
+									size="small"
+									icon={ plus }
+									className="editor-style-book-notes__add-note-button"
+									label={ sprintf(
+										// translators: %s: Style Book example title, e.g. "Button".
+										__( 'Add note on %s' ),
+										group.label
+									) }
+									onClick={ () =>
+										setPendingAnchor( group.anchor )
+									}
+								/>
+							) }
+						</Stack>
 						{ group.threads.map( ( thread, index ) => (
 							<Fragment key={ thread.id }>
 								{ index === firstResolvedIndex && (
@@ -296,6 +356,7 @@ export function StyleBookNotesPanel( {
 									onSelect={ () =>
 										setActiveAnchor( group.anchor )
 									}
+									onDeselect={ () => setActiveAnchor( null ) }
 									isSelected={ selectedNote === thread.id }
 									sidebarRef={ sidebarRef }
 									onKeyDown={ (
@@ -311,7 +372,7 @@ export function StyleBookNotesPanel( {
 								/>
 							</Fragment>
 						) ) }
-					</Fragment>
+					</Stack>
 				);
 			} ) }
 		</Stack>

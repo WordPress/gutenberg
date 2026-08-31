@@ -49,6 +49,7 @@ const { useBlockElement } = unlock( blockEditorPrivateApis );
  * @param {string}   [props.anchorLabel] What the note points at, when it is not
  *                                       a block.
  * @param {Function} [props.onSelect]    Called when the thread is selected.
+ * @param {Function} [props.onDeselect]  Called when the thread is deselected.
  * @return {React.JSX.Element} The thread.
  */
 export function NoteThread( {
@@ -62,6 +63,7 @@ export function NoteThread( {
 	onKeyDown,
 	anchorLabel,
 	onSelect,
+	onDeselect,
 } ) {
 	const isFloating = !! floating;
 	const { toggleBlockHighlight, selectBlock, toggleBlockSpotlight } = unlock(
@@ -165,6 +167,7 @@ export function NoteThread( {
 	function onDeselectNote() {
 		selectNote( undefined );
 		toggleBlockSpotlight( note.blockClientId, false );
+		onDeselect?.();
 	}
 
 	function handleResolve() {
