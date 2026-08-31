@@ -144,10 +144,11 @@ describe( 'useAdvancedCropControls', () => {
 			useAdvancedCropControls( { freeformCrop: true, aspectRatio: 2 } )
 		);
 
-		if ( ! result.current.isReady ) {
+		const controls = result.current;
+		if ( ! controls.isReady ) {
 			throw new Error( 'expected controls to be ready' );
 		}
-		act( () => result.current.onEdit( 'width', 600 ) );
+		act( () => controls.onEdit( 'width', 600 ) );
 
 		expect( mockSetCropRect ).toHaveBeenCalledTimes( 1 );
 		expect( mockSettleCrop ).not.toHaveBeenCalled();
@@ -158,10 +159,11 @@ describe( 'useAdvancedCropControls', () => {
 			useAdvancedCropControls( { freeformCrop: true, aspectRatio: 2 } )
 		);
 
-		if ( ! result.current.isReady ) {
+		const controls = result.current;
+		if ( ! controls.isReady ) {
 			throw new Error( 'expected controls to be ready' );
 		}
-		act( () => result.current.onPreview( 'width', 600 ) );
+		act( () => controls.onPreview( 'width', 600 ) );
 
 		expect( mockSetPreviewCropRect ).toHaveBeenCalledTimes( 1 );
 		expect( mockSetCropRect ).not.toHaveBeenCalled();
@@ -173,10 +175,11 @@ describe( 'useAdvancedCropControls', () => {
 			useAdvancedCropControls( { freeformCrop: true } )
 		);
 
-		if ( ! result.current.isReady ) {
+		const controls = result.current;
+		if ( ! controls.isReady ) {
 			throw new Error( 'expected controls to be ready' );
 		}
-		act( () => result.current.onEditEnd() );
+		act( () => controls.onEditEnd() );
 
 		expect( mockSettleCrop ).toHaveBeenCalledTimes( 1 );
 	} );
@@ -186,11 +189,12 @@ describe( 'useAdvancedCropControls', () => {
 			useAdvancedCropControls( { freeformCrop: true } )
 		);
 
-		if ( ! result.current.isReady ) {
+		const controls = result.current;
+		if ( ! controls.isReady ) {
 			throw new Error( 'expected controls to be ready' );
 		}
-		act( () => result.current.fineRotation.onEdit( 12.5 ) );
-		act( () => result.current.fineRotation.onEditEnd() );
+		act( () => controls.fineRotation.onEdit( 12.5 ) );
+		act( () => controls.fineRotation.onEditEnd() );
 
 		expect( mockSetRotation ).toHaveBeenCalledWith( 12.5 );
 	} );
@@ -200,10 +204,11 @@ describe( 'useAdvancedCropControls', () => {
 			useAdvancedCropControls( { freeformCrop: true } )
 		);
 
-		if ( ! result.current.isReady ) {
+		const controls = result.current;
+		if ( ! controls.isReady ) {
 			throw new Error( 'expected controls to be ready' );
 		}
-		act( () => result.current.fineRotation.onEdit( 60 ) );
+		act( () => controls.fineRotation.onEdit( 60 ) );
 
 		expect( mockSetRotation ).toHaveBeenCalledWith( 44.99 );
 	} );
@@ -213,14 +218,15 @@ describe( 'useAdvancedCropControls', () => {
 			useAdvancedCropControls( { freeformCrop: true } )
 		);
 
-		if ( ! result.current.isReady ) {
+		const controls = result.current;
+		if ( ! controls.isReady ) {
 			throw new Error( 'expected controls to be ready' );
 		}
-		act( () => result.current.onSessionStart() );
+		act( () => controls.onSessionStart() );
 		expect( mockBeginGesture ).toHaveBeenCalledTimes( 1 );
 		expect( mockEndGesture ).not.toHaveBeenCalled();
 
-		act( () => result.current.onSessionEnd() );
+		act( () => controls.onSessionEnd() );
 		expect( mockEndGesture ).toHaveBeenCalledTimes( 1 );
 	} );
 } );
