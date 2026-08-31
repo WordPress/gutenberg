@@ -9,6 +9,7 @@ export type SectionScope = 'commit' | 'pr-state';
 
 export type SectionDefinition = {
 	id: string;
+	/* Led by an emoji, so a reader can pick out their section at a glance. */
 	heading: string;
 	scope: SectionScope;
 	/** Maximum characters of rendered body before the section is truncated. */
@@ -23,43 +24,43 @@ export type SectionDefinition = {
 export const SECTIONS: SectionDefinition[] = [
 	{
 		id: 'welcome',
-		heading: 'Welcome',
+		heading: '👋 Welcome',
 		scope: 'pr-state',
 		budget: 2000,
 	},
 	{
 		id: 'props',
-		heading: 'Props',
+		heading: '🎉 Props',
 		scope: 'pr-state',
 		budget: 8000,
 	},
 	{
 		id: 'labels',
-		heading: 'Labels',
+		heading: '🏷️ Labels',
 		scope: 'pr-state',
 		budget: 2000,
 	},
 	{
 		id: 'account-link',
-		heading: 'WordPress.org profile',
+		heading: '🔗 WordPress.org profile',
 		scope: 'pr-state',
 		budget: 2000,
 	},
 	{
 		id: 'bundle-size',
-		heading: 'Bundle size',
+		heading: '📦 Bundle size',
 		scope: 'commit',
 		budget: 12000,
 	},
 	{
 		id: 'performance',
-		heading: 'Performance',
+		heading: '⚡ Performance',
 		scope: 'commit',
 		budget: 12000,
 	},
 	{
 		id: 'flaky-tests',
-		heading: 'Flaky tests',
+		heading: '🏁 Flaky tests',
 		scope: 'commit',
 		budget: 16000,
 	},

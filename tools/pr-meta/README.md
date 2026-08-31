@@ -47,7 +47,7 @@ The job also needs `actions/checkout` before `uses: ./tools/pr-meta`, since a lo
 
 ## Adding a section
 
-Add it to `SECTIONS` in `src/sections.ts` with an id, heading, scope and character budget. The budgets must sum, with the headings and markers, to less than GitHub's 65536-character comment limit; a test covers that.
+Add it to `SECTIONS` in `src/sections.ts` with an id, heading, scope and character budget. Headings lead with an emoji, so a reader scanning a comment of seven sections can find theirs without reading any of them. The budgets must sum, with the headings and markers, to less than GitHub's 65536-character comment limit; a test covers that.
 
 `scope` decides how staleness is handled. `commit` sections describe one commit, carry its SHA, and are rejected if they arrive from a rerun of an older one. `pr-state` sections describe the pull request as it currently is and carry no SHA.
 

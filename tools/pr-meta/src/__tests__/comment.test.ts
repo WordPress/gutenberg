@@ -27,7 +27,7 @@ describe( 'mergeSection', () => {
 		} );
 
 		expect( body ).toContain( COMMENT_MARKER );
-		expect( body ).toContain( '#### Labels' );
+		expect( body ).toContain( `#### ${ getSection( 'labels' )!.heading }` );
 		expect( body ).toContain( 'Missing a type label.' );
 	} );
 
@@ -412,7 +412,8 @@ describe( 'repeated writes', () => {
 			)
 		);
 
-		expect( comment.match( /#### Props/g ) ).toHaveLength( 1 );
+		const heading = `#### ${ getSection( 'props' )!.heading }`;
+		expect( comment.split( heading ) ).toHaveLength( 2 );
 		expect( parseSections( comment )[ 0 ].body ).toBe( 'Props.' );
 	} );
 
