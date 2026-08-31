@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `InterfaceSkeleton`: Keep focused publish and save navigation regions at full height when their panels are closed ([#81395](https://github.com/WordPress/gutenberg/pull/81395)).
+
 ### Internal
 
 -   `ComplementaryAreaMoreMenuItem`: Stop passing a `selectedIcon`. The component the item renders as shows the selection ([#81564](https://github.com/WordPress/gutenberg/pull/81564)).
@@ -26,7 +30,6 @@
 -   `ComplementaryArea`: Remove incorrect `aria-expanded` attribute from the "Pin to toolbar" toggle button, which already exposes its state via `aria-pressed` ([#79874](https://github.com/WordPress/gutenberg/pull/79874)).
 -   `InterfaceSkeleton`: Increase the footer height from 24px to 32px to prevent the focus ring from being clipped ([#81145](https://github.com/WordPress/gutenberg/pull/81145)).
 -   `InterfaceSkeleton`: Stop the secondary sidebar from animating itself into place on page load when it is already open, for example with the "Always open List View" preference enabled ([#81362](https://github.com/WordPress/gutenberg/pull/81362)).
--   `InterfaceSkeleton`: Keep focused publish and save navigation regions at full height when their panels are closed ([#81395](https://github.com/WordPress/gutenberg/pull/81395)).
 
 ### Internal
 
