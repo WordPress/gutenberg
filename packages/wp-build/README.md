@@ -59,6 +59,13 @@ Generated CSS module output skips automatic style injection when `NODE_ENV` is
 modern CSS features, so tests that need actual styles in the DOM should
 run in a browser environment.
 
+## Browser support
+
+JavaScript and CSS builds use [Browserslist](https://github.com/browserslist/browserslist)
+when specifying build targets. You can either [provide your own](https://github.com/browserslist/browserslist#config-file),
+or the default [`@wordpress/browserslist-config`](https://www.npmjs.com/package/@wordpress/browserslist-config)
+will be used to follow [WordPress browser support](https://make.wordpress.org/core/handbook/best-practices/browser-support/).
+
 ## Package Configuration
 
 Configure your `package.json` with the following optional fields:
@@ -301,6 +308,12 @@ This generates two page modes:
 -   `build/pages.php` - Loader for all pages
 
 Each mode provides route/menu registration functions and a render callback. Routes are automatically registered for both modes.
+
+**Boot module:**
+
+Pages boot through the `@wordpress/boot` script module, which ships with WordPress Core 7.0+ and the Gutenberg plugin. Plugins do not need their own `packages/boot`.
+
+The generated page files use a plugin-local `build/modules/boot/index.min.asset.php` if it exists, and Core's copy in `wp-includes/js/dist/script-modules/boot/` otherwise. If neither is available, the page enqueues nothing and shows only the "This screen requires JavaScript" notice.
 
 **Registering a menu item for WP-Admin mode:**
 

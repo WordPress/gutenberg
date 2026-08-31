@@ -28,6 +28,8 @@ import {
 	renderTemplateToString,
 } from './php-generator.mjs';
 import { getPackageInfo, getPackageInfoFromFile } from './package-utils.mjs';
+import { getBrowserslistQueries } from './browserslist.mjs';
+import { getSourceFileGlob, isTestSourceFile } from './source-files.mjs';
 import { createWordpressExternalsPlugin } from './wordpress-externals-plugin.mjs';
 import {
 	getAllRoutes,
@@ -46,6 +48,14 @@ import {
 	generateWorkerCode,
 } from './worker-build.mjs';
 
+/**
+ * Resolve the ESBuild target from the project's Browserslist config.
+ *
+ * @return {string[]} ESBuild target strings.
+ */
+function getEsbuildTarget() {
+	return browserslistToEsbuild( getBrowserslistQueries() );
+}
 // Optional dependency: @wordpress/theme provides plugins that inject fallback
 // values for design system tokens. Fails gracefully when the package is not
 // installed (it is an optional peerDependency).
@@ -53,11 +63,9 @@ let dsTokenFallbacks;
 let dsTokenFallbacksJs;
 try {
 	const { default: postcssPlugin } = await import(
-		// eslint-disable-next-line import/no-unresolved
 		'@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks'
 	);
 	const { default: esbuildPlugin } = await import(
-		// eslint-disable-next-line import/no-unresolved
 		'@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks'
 	);
 	dsTokenFallbacks = postcssPlugin;
@@ -70,17 +78,12 @@ const ROOT_DIR = process.cwd();
 const PACKAGES_DIR = path.join( ROOT_DIR, 'packages' );
 const BUILD_DIR = path.join( ROOT_DIR, 'build' );
 
-const SOURCE_EXTENSIONS = '{js,mjs,ts,tsx}';
 const ASSET_EXTENSIONS = 'json';
 const IGNORE_PATTERNS = [
 	'**/benchmark/**',
 	'**/{__mocks__,__tests__,test}/**',
 	'**/{storybook,stories}/**',
 	'**/*.{spec,test}.*',
-];
-const TEST_FILE_PATTERNS = [
-	/\/(benchmark|__mocks__|__tests__|test|storybook|stories)\/.+/,
-	/\.(spec|test)\.(js|ts|tsx)$/,
 ];
 
 /**
@@ -593,7 +596,7 @@ async function bundlePackage( packageName, options = {} ) {
 	if ( packageJson.wpScript ) {
 		const entryPoint = resolveEntryPoint( packageDir, packageJson );
 		const outputDir = path.join( BUILD_DIR, 'scripts', packageName );
-		const target = browserslistToEsbuild();
+		const target = getEsbuildTarget();
 
 		// Check if package matches the namespace and should expose a global
 		const packageFullName = packageJson.name;
@@ -690,7 +693,7 @@ async function bundlePackage( packageName, options = {} ) {
 	}
 
 	if ( packageJson.wpScriptModuleExports ) {
-		const target = browserslistToEsbuild();
+		const target = getEsbuildTarget();
 		const rootBuildModuleDir = path.join(
 			BUILD_DIR,
 			'modules',
@@ -1359,7 +1362,7 @@ async function transpilePackage( packageName ) {
 		);
 	}
 
-	const srcFiles = await glob( `src/**/*.${ SOURCE_EXTENSIONS }`, {
+	const srcFiles = await glob( getSourceFileGlob( 'src/**/*' ), {
 		cwd: packageDir,
 		ignore: IGNORE_PATTERNS,
 		absolute: true,
@@ -1374,7 +1377,7 @@ async function transpilePackage( packageName ) {
 	const buildDir = path.join( packageDir, 'build' );
 	const buildModuleDir = path.join( packageDir, 'build-module' );
 	const srcDir = path.join( packageDir, 'src' );
-	const target = browserslistToEsbuild();
+	const target = getEsbuildTarget();
 
 	const builds = [];
 
@@ -1486,7 +1489,6 @@ async function transpilePackage( packageName ) {
 				target,
 				jsx: 'automatic',
 				jsxImportSource: 'react',
-				loader: { '.js': 'jsx' },
 				plugins,
 			} )
 		);
@@ -1520,7 +1522,6 @@ async function transpilePackage( packageName ) {
 				target,
 				jsx: 'automatic',
 				jsxImportSource: 'react',
-				loader: { '.js': 'jsx' },
 				plugins,
 			} )
 		);
@@ -1629,7 +1630,11 @@ async function compileStyles( packageName ) {
 							const ltrResult = await postcss(
 								[
 									dsTokenFallbacks,
-									autoprefixer( { grid: true } ),
+									autoprefixer( {
+										grid: true,
+										overrideBrowserslist:
+											getBrowserslistQueries(),
+									} ),
 								].filter( Boolean )
 							).process( source, { from: undefined } );
 
@@ -1680,7 +1685,7 @@ function isPackageSourceFile( filename ) {
 		return false;
 	}
 
-	if ( TEST_FILE_PATTERNS.some( ( regex ) => regex.test( relativePath ) ) ) {
+	if ( isTestSourceFile( relativePath ) ) {
 		return false;
 	}
 
@@ -1737,7 +1742,7 @@ async function buildRoute( routeName ) {
 
 	// Build route.js if it exists
 	if ( files.hasRoute ) {
-		const routeEntryPoints = await glob( `route.${ SOURCE_EXTENSIONS }`, {
+		const routeEntryPoints = await glob( getSourceFileGlob( 'route' ), {
 			cwd: routeDir,
 			absolute: true,
 		} );
@@ -1750,7 +1755,7 @@ async function buildRoute( routeName ) {
 					outfile: path.join( outputDir, 'route.min.js' ),
 					bundle: true,
 					format: 'esm',
-					target: browserslistToEsbuild(),
+					target: getEsbuildTarget(),
 					minify: true,
 					define: getDefine( false ),
 					plugins: [
@@ -1768,7 +1773,7 @@ async function buildRoute( routeName ) {
 					outfile: path.join( outputDir, 'route.js' ),
 					bundle: true,
 					format: 'esm',
-					target: browserslistToEsbuild(),
+					target: getEsbuildTarget(),
 					minify: false,
 					define: getDefine( true ),
 					plugins: [
@@ -1801,7 +1806,7 @@ async function buildRoute( routeName ) {
 				outfile: path.join( outputDir, 'content.min.js' ),
 				bundle: true,
 				format: 'esm',
-				target: browserslistToEsbuild(),
+				target: getEsbuildTarget(),
 				minify: true,
 				define: getDefine( false ),
 				plugins: [
@@ -1819,7 +1824,7 @@ async function buildRoute( routeName ) {
 				outfile: path.join( outputDir, 'content.js' ),
 				bundle: true,
 				format: 'esm',
-				target: browserslistToEsbuild(),
+				target: getEsbuildTarget(),
 				minify: false,
 				define: getDefine( true ),
 				plugins: [
@@ -1900,7 +1905,7 @@ async function buildWidget( widgetName ) {
 
 	// Build render.js if it exists
 	if ( files.hasRender ) {
-		const renderEntryPoints = await glob( `render.${ SOURCE_EXTENSIONS }`, {
+		const renderEntryPoints = await glob( getSourceFileGlob( 'render' ), {
 			cwd: widgetDir,
 			absolute: true,
 		} );
@@ -1913,7 +1918,7 @@ async function buildWidget( widgetName ) {
 					outfile: path.join( outputDir, 'render.min.js' ),
 					bundle: true,
 					format: 'esm',
-					target: browserslistToEsbuild(),
+					target: getEsbuildTarget(),
 					minify: true,
 					define: getDefine( false ),
 					plugins: [
@@ -1931,7 +1936,7 @@ async function buildWidget( widgetName ) {
 					outfile: path.join( outputDir, 'render.js' ),
 					bundle: true,
 					format: 'esm',
-					target: browserslistToEsbuild(),
+					target: getEsbuildTarget(),
 					minify: false,
 					define: getDefine( true ),
 					plugins: [
@@ -1950,7 +1955,7 @@ async function buildWidget( widgetName ) {
 
 	// Build widget.js if it exists
 	if ( files.hasWidget ) {
-		const widgetEntryPoints = await glob( `widget.${ SOURCE_EXTENSIONS }`, {
+		const widgetEntryPoints = await glob( getSourceFileGlob( 'widget' ), {
 			cwd: widgetDir,
 			absolute: true,
 		} );
@@ -1963,7 +1968,7 @@ async function buildWidget( widgetName ) {
 					outfile: path.join( outputDir, 'widget.min.js' ),
 					bundle: true,
 					format: 'esm',
-					target: browserslistToEsbuild(),
+					target: getEsbuildTarget(),
 					minify: true,
 					define: getDefine( false ),
 					plugins: [
@@ -1981,7 +1986,7 @@ async function buildWidget( widgetName ) {
 					outfile: path.join( outputDir, 'widget.js' ),
 					bundle: true,
 					format: 'esm',
-					target: browserslistToEsbuild(),
+					target: getEsbuildTarget(),
 					minify: false,
 					define: getDefine( true ),
 					plugins: [
@@ -2629,7 +2634,7 @@ async function watchMode() {
 	const watcher = chokidar.watch( watchPaths, {
 		ignored: [
 			'**/{__mocks__,__tests__,test,storybook,stories}/**',
-			'**/*.{spec,test}.{js,ts,tsx}',
+			getSourceFileGlob( '**/*.{spec,test}' ),
 			// Avoid rebuild loops: worker packages write bundled WASM/JS back
 			// into src/worker-code.ts during each build (e.g. @wordpress/vips).
 			'**/worker-code.ts',
