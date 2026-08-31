@@ -59,7 +59,10 @@
 	flex-direction: column;
 }
 
-.media-editor__sidebar-panel .media-editor-crop-advanced-panel {
+// The Advanced disclosure sits in the sidebar's scrolling pane, which
+// already carries the gutter, so drop `PanelBody`'s own frame and let the
+// title space itself from the fields it opens onto.
+.media-editor__panel .media-editor-crop-advanced-panel {
 	border-bottom: none;
 	padding: 0;
 	&.is-opened {
