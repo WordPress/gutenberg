@@ -170,6 +170,60 @@ describe( 'DataViews component', () => {
 		expect( screen.getByText( 'No results' ) ).toBeInTheDocument();
 	} );
 
+	it( 'should show "No results" if data is empty on a page past the first one', () => {
+		render(
+			<DataViewWrapper
+				data={ [] }
+				paginationInfo={ { totalItems: 0, totalPages: 0 } }
+				view={ { ...DEFAULT_VIEW, page: 5 } }
+			/>
+		);
+		expect( screen.getByText( 'No results' ) ).toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', { name: 'Go to the first page' } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'should offer going to the first page when the page is out of bounds', async () => {
+		const user = userEvent.setup();
+		// Three items, one per page: page 5 is out of bounds.
+		render(
+			<DataViewWrapper
+				view={ { ...DEFAULT_VIEW, page: 5, perPage: 1 } }
+			/>
+		);
+		expect(
+			screen.getByText( 'No results on this page' )
+		).toBeInTheDocument();
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Go to the first page' } )
+		);
+
+		expect( screen.getByText( 'Hello World' ) ).toBeInTheDocument();
+		expect(
+			screen.queryByText( 'No results on this page' )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'should offer going to the first page when the page is out of bounds and the totals are unknown', () => {
+		// A request for a page past the last one may be rejected, in which
+		// case the consumer does not know the totals.
+		render(
+			<DataViewWrapper
+				data={ [] }
+				paginationInfo={ { totalItems: null, totalPages: null } as any }
+				view={ { ...DEFAULT_VIEW, page: 5 } }
+			/>
+		);
+		expect(
+			screen.getByText( 'No results on this page' )
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: 'Go to the first page' } )
+		).toBeInTheDocument();
+	} );
+
 	it( 'should filter results by "search" text, if field has enableGlobalSearch set to true', async () => {
 		const fieldsWithSearch = [
 			{
