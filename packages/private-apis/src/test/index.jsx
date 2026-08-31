@@ -1,5 +1,15 @@
+import fs from 'fs';
+import path from 'path';
 import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '../';
-import { resetAllowedCoreModules, allowCoreModule } from '../implementation';
+import {
+	resetAllowedCoreModules,
+	allowCoreModule,
+	resetWarnedDeprecatedModules,
+	DEPRECATED_CORE_MODULES,
+} from '../implementation';
+
+// eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair
+/* eslint-disable @wordpress/wp-global-usage */
 
 beforeEach( () => {
 	resetAllowedCoreModules();
@@ -285,5 +295,94 @@ describe( 'Specific use-cases of sharing private APIs', () => {
 		 * ```
 		 */
 		expect( unlock( DataTable ) ).toBe( PrivateDataTable );
+	} );
+} );
+
+describe( 'Deprecated core modules', () => {
+	const initialScriptDebug = globalThis.SCRIPT_DEBUG;
+
+	beforeEach( () => {
+		globalThis.SCRIPT_DEBUG = true;
+		resetWarnedDeprecatedModules();
+	} );
+
+	afterEach( () => {
+		globalThis.SCRIPT_DEBUG = initialScriptDebug;
+	} );
+
+	it( 'Should grant access to unstable APIs and log a deprecation warning', () => {
+		const unstableAPIs = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
+			requiredConsent,
+			'@wordpress/dataviews'
+		);
+		expect( console ).toHaveWarned();
+		expect( unstableAPIs.lock ).toEqual( expect.any( Function ) );
+		expect( unstableAPIs.unlock ).toEqual( expect.any( Function ) );
+	} );
+
+	it( 'Should still require the consent string', () => {
+		expect( () => {
+			__dangerousOptInToUnstableAPIsOnlyForCoreModules(
+				'',
+				'@wordpress/dataviews'
+			);
+		} ).toThrow( /without confirming you know the consequences/ );
+	} );
+
+	it( 'Should log the deprecation warning only once per module', () => {
+		__dangerousOptInToUnstableAPIsOnlyForCoreModules(
+			requiredConsent,
+			'@wordpress/dataviews'
+		);
+		__dangerousOptInToUnstableAPIsOnlyForCoreModules(
+			requiredConsent,
+			'@wordpress/dataviews'
+		);
+		expect( console ).toHaveWarned();
+		// eslint-disable-next-line no-console
+		expect( console.warn ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'Should not log a deprecation warning when SCRIPT_DEBUG is disabled', () => {
+		globalThis.SCRIPT_DEBUG = false;
+		const unstableAPIs = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
+			requiredConsent,
+			'@wordpress/dataviews'
+		);
+		expect( unstableAPIs.lock ).toEqual( expect.any( Function ) );
+	} );
+
+	it( 'Should be removed when the WordPress version scheduled for their removal is reached', () => {
+		// The newest lib/compat/wordpress-X.Y directory marks the WordPress
+		// release Gutenberg is currently targeting.
+		const compatDir = path.join( __dirname, '../../../../lib/compat' );
+		const targetedVersion = fs
+			.readdirSync( compatDir )
+			.map( ( name ) => name.match( /^wordpress-(\d+)\.(\d+)$/ ) )
+			.filter( Boolean )
+			.map( ( match ) => [ Number( match[ 1 ] ), Number( match[ 2 ] ) ] )
+			.sort( ( a, b ) => a[ 0 ] - b[ 0 ] || a[ 1 ] - b[ 1 ] )
+			.pop();
+
+		const dueForRemoval = [];
+		for ( const [ moduleName, { removal } ] of Object.entries(
+			DEPRECATED_CORE_MODULES
+		) ) {
+			const [ major, minor ] = removal.split( '.' ).map( Number );
+			const isReached =
+				targetedVersion[ 0 ] > major ||
+				( targetedVersion[ 0 ] === major &&
+					targetedVersion[ 1 ] >= minor );
+			if ( isReached ) {
+				dueForRemoval.push(
+					`The "${ moduleName }" entry in DEPRECATED_CORE_MODULES was scheduled ` +
+						`for removal in WordPress ${ removal }, and the ` +
+						`${ targetedVersion[ 0 ] }.${ targetedVersion[ 1 ] } release cycle has started. ` +
+						`Remove the entry and its deprecation warning, unless old copies of the ` +
+						`module are still in significant use by plugins.`
+				);
+			}
+		}
+		expect( dueForRemoval ).toEqual( [] );
 	} );
 } );
