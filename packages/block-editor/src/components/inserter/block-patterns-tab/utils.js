@@ -63,7 +63,7 @@ export function getPopulatedCategories( patterns, allCategories ) {
 	) {
 		categories.push( {
 			name: 'uncategorized',
-			label: _x( 'Uncategorized' ),
+			label: __( 'Uncategorized' ),
 		} );
 	}
 
