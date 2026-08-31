@@ -8,7 +8,7 @@
 
 ### Bug Fixes
 
--   `PostLockedModal`: Show the modal while real-time collaboration is enabled when the post's edit lock belongs to an editor without collaboration support, such as the classic editor or a page builder. Those sessions do not merge changes, so suppressing the modal let two people edit at once and the second save overwrote the first ([#76172](https://github.com/WordPress/gutenberg/issues/76172)).
+-   `PostLockedModal`: Show the modal while real-time collaboration is enabled when the post's edit lock belongs to an editor without collaboration support, such as the classic editor or a page builder. Those sessions do not merge changes, so suppressing the modal let two people edit at once and the second save overwrote the first ([#82245](https://github.com/WordPress/gutenberg/pull/82245)).
 -   `EditorInterface`: Apply the `showListViewByDefault` preference when the editor enters edit mode, so every editor built on the package honors it — including the extensible site editor, which previously ignored it. The logic moves here from `edit-post` and `edit-site`.
 -   `StylesCanvas`: In preview mode, render edge to edge without the close button and Escape handler. There the canvas is the whole surface rather than a frame opened over an editing session, and whatever opened it owns closing it.
 
