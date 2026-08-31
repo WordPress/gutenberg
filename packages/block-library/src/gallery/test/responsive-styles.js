@@ -1,5 +1,5 @@
 import {
-	getGalleryResponsiveFlexCSS,
+	getGalleryResponsiveCSS,
 	getUpdatedGalleryStyle,
 } from '../responsive-styles';
 
@@ -8,7 +8,7 @@ const MEDIA_QUERIES = {
 	'@mobile': '@media (width <= 480px)',
 };
 
-describe( 'Gallery responsive Flex styles', () => {
+describe( 'Gallery responsive styles', () => {
 	it( 'updates crop to fit for the active viewport', () => {
 		expect(
 			getUpdatedGalleryStyle( {
@@ -50,7 +50,7 @@ describe( 'Gallery responsive Flex styles', () => {
 	} );
 
 	it( 'applies a viewport-specific column count', () => {
-		const css = getGalleryResponsiveFlexCSS(
+		const css = getGalleryResponsiveCSS(
 			'#block-test',
 			{
 				'@mobile': {
@@ -74,7 +74,7 @@ describe( 'Gallery responsive Flex styles', () => {
 	] )(
 		'applies crop to fit set to %s for a viewport',
 		( imageCrop, objectFitRule, wrapperDisplayRule ) => {
-			const css = getGalleryResponsiveFlexCSS(
+			const css = getGalleryResponsiveCSS(
 				'#block-test',
 				{
 					'@tablet': {
@@ -89,16 +89,70 @@ describe( 'Gallery responsive Flex styles', () => {
 		}
 	);
 
+	it( 'removes a viewport aspect ratio that matches the base value', () => {
+		expect(
+			getUpdatedGalleryStyle( {
+				style: { '@mobile': { aspectRatio: '4/3', columns: 1 } },
+				viewport: '@mobile',
+				baseSettings: { aspectRatio: '16/9' },
+				settings: { aspectRatio: '16/9' },
+			} )
+		).toEqual( { '@mobile': { columns: 1 } } );
+	} );
+
+	it( 'applies a viewport-specific aspect ratio in every Gallery layout', () => {
+		const css = getGalleryResponsiveCSS(
+			'#block-test',
+			{ '@mobile': { aspectRatio: '16/9' } },
+			MEDIA_QUERIES
+		);
+
+		expect( css ).toContain( '@media (width <= 480px)' );
+		expect( css ).toContain( 'aspect-ratio:16/9 !important' );
+		expect( css ).toContain( 'object-fit:cover !important' );
+		// Columns and cropping are Flex-only, but an aspect ratio applies to
+		// the images whichever layout the Gallery uses.
+		expect( css ).not.toContain( 'is-layout-flex' );
+	} );
+
+	it( 'cancels the base aspect ratio for a viewport set to Original', () => {
+		const css = getGalleryResponsiveCSS(
+			'#block-test',
+			{ '@tablet': { aspectRatio: 'auto' } },
+			MEDIA_QUERIES
+		);
+
+		// `auto` would override the `width`/`height` presentational hint a
+		// lazy-loaded image relies on for its placeholder ratio, so the
+		// declaration is rolled out of the cascade instead.
+		expect( css ).toContain( 'aspect-ratio:revert-layer !important' );
+		expect( css ).not.toContain( 'aspect-ratio:auto' );
+		// The base `object-fit` is left in place so a cropped Gallery keeps
+		// cropping at this viewport.
+		expect( css ).not.toContain( 'object-fit' );
+	} );
+
 	it( 'ignores malformed viewport Gallery values', () => {
-		const css = getGalleryResponsiveFlexCSS(
+		const css = getGalleryResponsiveCSS(
 			'#block-test',
 			{
 				'@tablet': {
 					columns: '3',
 					imageCrop: 'false',
+					aspectRatio: 16 / 9,
 				},
 				'@mobile': [],
 			},
+			MEDIA_QUERIES
+		);
+
+		expect( css ).toBe( '' );
+	} );
+
+	it( 'ignores an aspect ratio that would break out of the generated rule', () => {
+		const css = getGalleryResponsiveCSS(
+			'#block-test',
+			{ '@mobile': { aspectRatio: '16/9;} body{display:none;' } },
 			MEDIA_QUERIES
 		);
 

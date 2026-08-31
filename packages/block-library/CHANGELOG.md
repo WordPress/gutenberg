@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Gallery: Support viewport-specific aspect ratios, in every Gallery layout and in dynamic galleries.
+
 ### Bug Fixes
 
 -   Tabs: Activate the tab that a URL hash points into, so an anchor set on a block inside a tab panel can be reached. Anchor links followed after the page has loaded are handled too, matching the Accordion block ([#81744](https://github.com/WordPress/gutenberg/pull/81744)).
