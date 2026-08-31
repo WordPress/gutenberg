@@ -26,7 +26,7 @@ describe( 'validateFileSize', () => {
 		);
 	} );
 
-	it( 'should error if the file is is greater than the maximum', () => {
+	it( 'should error if the file is greater than the maximum', () => {
 		expect( () => {
 			validateFileSize( imageFile, 2 );
 		} ).toThrow(

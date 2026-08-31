@@ -1,6 +1,11 @@
 import clsx from 'clsx';
-import { usePrevious } from '@wordpress/compose';
-import { useCallback, useEffect, useLayoutEffect } from '@wordpress/element';
+import { useEvent, usePrevious } from '@wordpress/compose';
+import {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+} from '@wordpress/element';
 import styles from '../style.module.scss';
 import { useToolsPanelContext } from '../context';
 import type { WordPressComponentProps } from '../../context';
@@ -14,6 +19,7 @@ export function useToolsPanelItem(
 ) {
 	const {
 		className,
+		defaultShown,
 		hasValue,
 		isShownByDefault = false,
 		label,
@@ -21,6 +27,7 @@ export function useToolsPanelItem(
 		resetAllFilter = noop,
 		onDeselect,
 		onSelect,
+		onShownChange,
 		...otherProps
 	} = useContextSystem( props, 'ToolsPanelItem' );
 
@@ -46,6 +53,28 @@ export function useToolsPanelItem(
 	// resetAllFilter is a new function on every render, so do not add it as a
 	// dependency to the useCallback hook! If needed, we should use a ref.
 	const resetAllFilterCallback = useCallback( resetAllFilter, [ panelId ] );
+
+	// `defaultShown` seeds an item's visibility when it registers, and is
+	// deliberately not reactive. Holding it in a ref keeps it out of the
+	// registration effect below, so a change on its own cannot deregister and
+	// re-register the item, which would discard the visibility the user chose
+	// from the menu.
+	//
+	// The ref still tracks the latest value, so that a re-registration caused
+	// by something else, such as `panelId` changing, seeds from the current
+	// preference rather than a stale one.
+	const defaultShownRef = useRef( defaultShown );
+	// Declared before the registration effect below so that it has already
+	// run by the time that effect reads the ref in the same commit.
+	useLayoutEffect( () => {
+		defaultShownRef.current = defaultShown;
+	} );
+
+	// `onShownChange` is also a new function on every render. `useEvent` gives
+	// the item a stable callback to register, so it isn't re-registered on
+	// each render, while the panel still invokes the latest one.
+	const onShownChangeCallback = useEvent( onShownChange );
+
 	const previousPanelId = usePrevious( currentPanelId );
 
 	const hasMatchingPanel =
@@ -60,9 +89,11 @@ export function useToolsPanelItem(
 	useLayoutEffect( () => {
 		if ( hasMatchingPanel && previousPanelId !== null ) {
 			registerPanelItem( {
+				defaultShown: defaultShownRef.current,
 				hasValue: hasValueCallback,
 				isShownByDefault,
 				label,
+				onShownChange: onShownChangeCallback,
 				panelId,
 			} );
 		}
@@ -81,6 +112,7 @@ export function useToolsPanelItem(
 		isShownByDefault,
 		label,
 		hasValueCallback,
+		onShownChangeCallback,
 		panelId,
 		previousPanelId,
 		registerPanelItem,
@@ -130,13 +162,25 @@ export function useToolsPanelItem(
 		isShownByDefault,
 	] );
 
+	// An item has no menu entry until it registers with the panel, so on that
+	// first render its previous checked state is `undefined` rather than `false`.
+	// Items that register already shown — because they have a value, or because
+	// `defaultShown` was set — must not be treated as though the user had just
+	// selected them from the menu.
+	const wasRegistered = wasMenuItemChecked !== undefined;
+
 	// Determine if the panel item's corresponding menu is being toggled and
 	// trigger appropriate callback if it is.
 	useEffect( () => {
 		// We check whether this item is currently registered as items rendered
 		// via fills can persist through the parent panel being remounted.
 		// See: https://github.com/WordPress/gutenberg/pull/45673
-		if ( ! isRegistered || isResetting || ! hasMatchingPanel ) {
+		if (
+			! isRegistered ||
+			! wasRegistered ||
+			isResetting ||
+			! hasMatchingPanel
+		) {
 			return;
 		}
 
@@ -154,6 +198,7 @@ export function useToolsPanelItem(
 		isResetting,
 		isValueSet,
 		wasMenuItemChecked,
+		wasRegistered,
 		onSelect,
 		onDeselect,
 	] );

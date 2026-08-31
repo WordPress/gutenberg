@@ -58,7 +58,7 @@ export function getVitestTests( discoveredTests, manifest ) {
 	].sort();
 }
 
-export function getVitestProjectName( testPath ) {
+export function getTestEnvironmentName( testPath ) {
 	if ( BROWSER_TEST_PATH_PATTERN.test( testPath ) ) {
 		return 'browser';
 	}
@@ -76,7 +76,7 @@ export function getVitestTestsByProject( discoveredTests, manifest ) {
 	);
 
 	for ( const testPath of getVitestTests( discoveredTests, manifest ) ) {
-		testsByProject[ getVitestProjectName( testPath ) ].push( testPath );
+		testsByProject[ getTestEnvironmentName( testPath ) ].push( testPath );
 	}
 
 	return testsByProject;
