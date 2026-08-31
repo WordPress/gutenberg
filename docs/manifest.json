@@ -3222,6 +3222,12 @@
 		"parent": "code"
 	},
 	{
+		"title": "PR Freshness Check",
+		"slug": "pr-freshness",
+		"markdown_source": "../docs/contributors/code/pr-freshness.md",
+		"parent": "code"
+	},
+	{
 		"title": "Agents and Skills",
 		"slug": "agents-and-skills",
 		"markdown_source": "../docs/contributors/code/agents-and-skills.md",
