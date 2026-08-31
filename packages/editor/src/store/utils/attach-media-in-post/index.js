@@ -3,6 +3,20 @@ import getMediaIdsInBlocks from './media-ids-in-blocks';
 import invalidateAttachmentResolutions from './invalidate-attachment-resolutions';
 
 /**
+ * Most images a single save will attach. Past this the post is left alone.
+ *
+ * 100 is the REST API's own `per_page` maximum, so looking the images up is
+ * always one request, and asking about that many keeps the query around 2KB —
+ * inside every server's URL limit. It also matches `MAX_IMAGES` in the Gallery
+ * block's dynamic source, the other place the editor bounds a media query.
+ *
+ * Somebody will eventually put a thousand images in a post. Attaching them would
+ * mean a thousand requests going out at once, and this is a background
+ * convenience — it shouldn't be the reason a save falls over.
+ */
+const MAX_MEDIA_TO_ATTACH = 100;
+
+/**
  * Logs a failure rather than putting it in the message. A failed `apiFetch`
  * isn't always an `Error` — often it's a plain object — so writing it into a
  * string would print "[object Object]".
@@ -43,6 +57,14 @@ async function attach( registry, { id: postId, type: postType, blocks } ) {
 	const mediaIds = getMediaIdsInBlocks( blocks );
 
 	if ( ! mediaIds.length ) {
+		return;
+	}
+
+	if ( mediaIds.length > MAX_MEDIA_TO_ATTACH ) {
+		// eslint-disable-next-line no-console
+		console.warn(
+			`Not attaching media: the post has more than ${ MAX_MEDIA_TO_ATTACH } images.`
+		);
 		return;
 	}
 

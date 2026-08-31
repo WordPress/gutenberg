@@ -217,6 +217,35 @@ describe( 'attachMediaInPost', () => {
 		expect( saveEntityRecord ).not.toHaveBeenCalled();
 	} );
 
+	/**
+	 * Somebody will put a thousand images in a post one day. Attaching them
+	 * would mean a thousand requests at once, for a background convenience.
+	 */
+	it( 'attaches nothing when the post has too many images', async () => {
+		const { registry, getEntityRecords } = createRegistry();
+		const tooMany = Array.from( { length: 101 }, ( _, index ) =>
+			imageBlock( index + 1 )
+		);
+
+		await attachMediaInPost( registry, post( tooMany ) );
+
+		expect( getEntityRecords ).not.toHaveBeenCalled();
+		expect( console ).toHaveWarned();
+	} );
+
+	it( 'still attaches right up to the limit', async () => {
+		const atLimit = Array.from( { length: 100 }, ( _, index ) =>
+			imageBlock( index + 1 )
+		);
+		const { registry, getEntityRecords } = createRegistry( {
+			media: [ { id: 1, post: null } ],
+		} );
+
+		await attachMediaInPost( registry, post( atLimit ) );
+
+		expect( getEntityRecords ).toHaveBeenCalled();
+	} );
+
 	it( 'does not look up the post type when the post has no media', async () => {
 		const { registry, getPostType } = createRegistry();
 
