@@ -65,14 +65,15 @@ function NoteMenuItem( {
 
 /**
  * "Add note" item for a multi-block selection. The single-block variant keys off
- * one block's validity; a cross-block selection has none, so this is a plain item
- * that opens the form for the whole range. It shows the same new-note shortcut,
- * which also targets the selection when several blocks are selected.
+ * one block's validity; this applies the same rules across the whole selection,
+ * since a note anchors to every block the selection spans. It shows the same
+ * new-note shortcut, which also targets the selection when several blocks are
+ * selected.
  *
  * @param props
  * @param props.onClick           Opens the new-note form for the selection.
  * @param props.isDistractionFree Whether distraction-free mode is on.
- * @return The menu item.
+ * @return The menu item, or null when no block in the selection can carry one.
  */
 function SelectionNoteMenuItem( {
 	onClick,
@@ -81,6 +82,21 @@ function SelectionNoteMenuItem( {
 	onClick?: () => void;
 	isDistractionFree?: boolean;
 } ) {
+	const { hasUnsupportedBlock, hasClassicBlock } = useSelect( ( select ) => {
+		const { getMultiSelectedBlockClientIds, getBlockName, isBlockValid } =
+			select( blockEditorStore );
+		const clientIds: string[] = getMultiSelectedBlockClientIds();
+		return {
+			hasUnsupportedBlock: clientIds.some(
+				( id ) =>
+					! isBlockValid( id ) ||
+					getBlockName( id ) === getUnregisteredTypeHandlerName()
+			),
+			hasClassicBlock: clientIds.some(
+				( id ) => getBlockName( id ) === 'core/freeform'
+			),
+		};
+	}, [] );
 	const shortcut = useSelect(
 		( select ) =>
 			select( keyboardShortcutsStore ).getShortcutRepresentation(
@@ -89,16 +105,27 @@ function SelectionNoteMenuItem( {
 		[]
 	);
 
+	// An invalid or unregistered block in the range can't carry an anchor, and
+	// the note would span it silently; hide the entry as the single-block
+	// variant does.
+	if ( hasUnsupportedBlock ) {
+		return null;
+	}
+
+	let infoText;
+
+	if ( isDistractionFree ) {
+		infoText = __( 'Notes are disabled in distraction free mode.' );
+	} else if ( hasClassicBlock ) {
+		infoText = __( 'Convert to blocks to add notes.' );
+	}
+
 	return (
 		<MenuItem
 			onClick={ onClick }
 			aria-haspopup="dialog"
-			disabled={ isDistractionFree }
-			info={
-				isDistractionFree
-					? __( 'Notes are disabled in distraction free mode.' )
-					: undefined
-			}
+			disabled={ isDistractionFree || hasClassicBlock }
+			info={ infoText }
 			shortcut={ shortcut ?? undefined }
 		>
 			{ __( 'Add note' ) }

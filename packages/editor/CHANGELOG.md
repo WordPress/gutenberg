@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Notes: Support notes that span several adjacent blocks, so feedback that runs from one block into the next can be left as a single note. The note is anchored in every block it covers, and selecting, resolving, or deleting it applies across the whole span ([#80009](https://github.com/WordPress/gutenberg/pull/80009)).
+
 ### Internal
 
 -   Remove unused dependencies `@wordpress/reusable-blocks`, `client-zip` and `fast-deep-equal` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).

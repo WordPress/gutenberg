@@ -2265,6 +2265,38 @@ test.describe( 'Block Notes', () => {
 			await expect( blocks.nth( 1 ) ).toHaveCSS( 'opacity', '1' );
 		} );
 
+		test( 'disables "Add note" when the selection includes a classic block', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Alpha block.' },
+			} );
+			await editor.insertBlock( { name: 'core/freeform' } );
+
+			// A note anchors to every block the selection spans, so a classic
+			// block anywhere in the range disables the entry the same way it
+			// does when that block is selected on its own.
+			await page.evaluate( () => {
+				const { dispatch, select } = window.wp.data;
+				const ids = select( 'core/block-editor' ).getBlockOrder();
+				dispatch( 'core/block-editor' ).multiSelect(
+					ids[ 0 ],
+					ids[ 1 ]
+				);
+			} );
+
+			await editor.clickBlockToolbarButton( 'Options' );
+			const menuItem = page
+				.getByRole( 'menu', { name: 'Options' } )
+				.getByRole( 'menuitem', { name: 'Add note' } );
+			await expect( menuItem ).toBeDisabled();
+			await expect(
+				page.getByText( 'Convert to blocks to add notes.' )
+			).toBeVisible();
+		} );
+
 		test( 'opens the existing note from a block the note merely spans', async ( {
 			editor,
 			page,
@@ -2336,7 +2368,8 @@ test.describe( 'Block Notes', () => {
 
 			// Anchoring writes every spanned block in a single dispatch, so one
 			// undo removes the whole anchor rather than leaving the note
-			// half-attached to the blocks it was written to first.
+			// half-attached to the blocks it was written to first. Guards the
+			// guarantee itself, not just the dispatch that provides it.
 			await editor.canvas
 				.getByRole( 'document', { name: 'Block: Paragraph' } )
 				.first()

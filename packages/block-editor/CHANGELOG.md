@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Block settings menu: Render the private note slot for a multi-block selection as well as a single block, passing the number of selected blocks through `fillProps` so the fill can offer an entry for the whole selection ([#80009](https://github.com/WordPress/gutenberg/pull/80009)).
+
 ### Internal
 
 -   Remove unused dependencies `@wordpress/escape-html`, `@wordpress/wordcount` and `deepmerge` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
