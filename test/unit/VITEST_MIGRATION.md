@@ -29,12 +29,17 @@ When changing test ownership:
     Chromium with
     `npm exec --workspace @wordpress/unit-tests -- playwright install chromium`.
 -   New Jest tests require no migration metadata; runner discovery picks them up
-    automatically.
+    automatically. Their filenames still select the environment: Node by
+    default or JSDOM through `*.jsdom.test.*`. A new `*.browser.test.*` must be
+    assigned to Vitest so it can run in Browser Mode.
+-   Do not use per-file Jest or Vitest environment overrides. The filename is
+    the single source of truth.
 -   Run `npm test` for the complete lint and unit-test suite. For focused
     migration validation, run `npm run test:unit:routing`,
     `npm run test:unit:conventions`, `npm run test:unit`, and
     `npm run test:unit:vitest` together.
 
 The routing validator fails when a test is missing, owned by both runners, or
-not assigned to the expected Vitest migration entry. It also rejects invalid
-manifest entries and static/executable discovery mismatches.
+not assigned to the expected Vitest migration entry. It also rejects per-file
+environment overrides, invalid manifest entries, and static/executable
+discovery mismatches.

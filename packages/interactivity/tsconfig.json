@@ -5,10 +5,10 @@
 	// Listed files have pre-existing type errors; include them once fixed.
 	"exclude": [
 		"**/benchmark",
-		"src/proxies/test/context-proxy.ts",
-		"src/proxies/test/state-proxy.ts",
-		"src/proxies/test/store-proxy.ts",
-		"src/test/utils.ts",
-		"src/test/vdom.ts"
+		"src/proxies/test/context-proxy.jsdom.test.ts",
+		"src/proxies/test/state-proxy.jsdom.test.ts",
+		"src/proxies/test/store-proxy.jsdom.test.ts",
+		"src/test/utils.jsdom.test.ts",
+		"src/test/vdom.jsdom.test.ts"
 	]
 }

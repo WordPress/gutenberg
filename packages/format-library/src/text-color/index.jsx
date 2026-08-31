@@ -17,6 +17,10 @@ const title = __( 'Highlight' );
 const EMPTY_ARRAY = [];
 
 function getComputedStyleProperty( element, property ) {
+	if ( ! element ) {
+		return;
+	}
+
 	const { ownerDocument } = element;
 	const { defaultView } = ownerDocument;
 	const style = defaultView.getComputedStyle( element );
