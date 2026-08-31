@@ -61,7 +61,7 @@ function toMenuItems( fills: ReactNode ) {
 		const label = <Menu.ItemLabel>{ null }</Menu.ItemLabel>;
 		const render = fill as ComponentProps< typeof Menu.Item >[ 'render' ];
 
-		return fill.props.href ? (
+		return fill.props.href !== undefined ? (
 			<Menu.LinkItem aria-labelledby="" render={ render }>
 				{ label }
 			</Menu.LinkItem>

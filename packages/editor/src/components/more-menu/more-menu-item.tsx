@@ -125,14 +125,15 @@ function UnforwardedMoreMenuItem(
 	// `aria-checked`.
 	const checked =
 		isSelected ?? ( ariaChecked === true || ariaChecked === 'true' );
+	const isMixed = isSelected === undefined && ariaChecked === 'mixed';
 
-	if ( role === 'menuitemcheckbox' ) {
+	if ( role === 'menuitemcheckbox' && ! isMixed ) {
 		return (
 			<Menu.CheckboxItem
 				ref={ ref }
 				checked={ checked }
 				closeOnClick
-				onCheckedChange={ () => onClick?.() }
+				onClick={ onClick }
 				prefix={ prefix }
 				shortcut={ itemShortcut }
 				{ ...props }
@@ -161,9 +162,12 @@ function UnforwardedMoreMenuItem(
 	}
 
 	// `Menu.RadioItem` only works inside a `Menu.RadioGroup`, which a fill
-	// cannot join, so pass the role and state on instead.
-	const radioProps =
-		role === 'menuitemradio' ? { role, 'aria-checked': checked } : {};
+	// cannot join, and `Menu.CheckboxItem` has no mixed state. Both fall back
+	// to a plain item carrying the role and the state itself.
+	const checkableProps =
+		role === 'menuitemradio' || role === 'menuitemcheckbox'
+			? { role, 'aria-checked': isMixed ? ( 'mixed' as const ) : checked }
+			: {};
 
 	return (
 		<Menu.Item
@@ -171,7 +175,7 @@ function UnforwardedMoreMenuItem(
 			prefix={ prefix }
 			shortcut={ itemShortcut }
 			onClick={ onClick }
-			{ ...radioProps }
+			{ ...checkableProps }
 			{ ...props }
 		>
 			{ label }

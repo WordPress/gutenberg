@@ -106,7 +106,25 @@ describe( 'MoreMenuItem', () => {
 			).toBeChecked();
 		} );
 
-		it( 'runs the click handler of a checkbox', async () => {
+		it( 'keeps a checkbox of a mixed state a checkbox', async () => {
+			const user = userEvent.setup();
+			renderMenu(
+				<MoreMenuItem role="menuitemcheckbox" aria-checked="mixed">
+					Sidebar
+				</MoreMenuItem>
+			);
+			await openMenu( user );
+
+			const item = screen.getByRole( 'menuitemcheckbox', {
+				name: 'Sidebar',
+			} );
+
+			// `toBePartiallyChecked` only knows the `checkbox` role.
+			// eslint-disable-next-line jest-dom/prefer-checked
+			expect( item ).toHaveAttribute( 'aria-checked', 'mixed' );
+		} );
+
+		it( 'runs the click handler of a checkbox with the event', async () => {
 			const user = userEvent.setup();
 			const onClick = jest.fn();
 			renderMenu(
@@ -122,6 +140,9 @@ describe( 'MoreMenuItem', () => {
 			await user.click( screen.getByRole( 'menuitemcheckbox' ) );
 
 			expect( onClick ).toHaveBeenCalledTimes( 1 );
+			expect( onClick ).toHaveBeenCalledWith(
+				expect.objectContaining( { type: 'click' } )
+			);
 		} );
 
 		it( 'leaves a checkbox without a click handler alone', async () => {

@@ -78,6 +78,17 @@ describe( 'MoreMenuGroup', () => {
 		).toHaveAttribute( 'href', 'https://wordpress.org' );
 	} );
 
+	it( 'adopts a legacy link item of an empty address as a link item', async () => {
+		const user = userEvent.setup();
+
+		renderMenu( <LinkMenuItem href="">Legacy link</LinkMenuItem> );
+		await openMenu( user );
+
+		expect(
+			screen.getByRole( 'menuitem', { name: 'Legacy link' } )
+		).toHaveAttribute( 'href', '' );
+	} );
+
 	it( 'skips fills rendering nothing', async () => {
 		const user = userEvent.setup();
 		const NothingMenuItem = forwardRef( () => null );
