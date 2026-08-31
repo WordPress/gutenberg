@@ -246,6 +246,7 @@
 		.item-label {
 			min-width: 0;
 			overflow-wrap: anywhere;
+			text-wrap: pretty;
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-md);
 			line-height: var(--wpds-typography-line-height-sm);
@@ -260,6 +261,7 @@
 			font-weight: var(--wpds-typography-font-weight-default);
 			color: var(--wpds-color-foreground-content-neutral-weak);
 			overflow-wrap: anywhere;
+			text-wrap: pretty;
 			/* For better optical alignment and spacing */
 			padding-block-end: var(--wpds-dimension-padding-xs);
 		}
