@@ -6,6 +6,7 @@ const { rimraf } = require( 'rimraf' );
 const { loadConfig } = require( '../config' );
 const { executeLifecycleScript } = require( '../execute-lifecycle-script' );
 const { getRuntime, getSavedRuntime, saveRuntime } = require( '../runtime' );
+const { setCache } = require( '../cache' );
 
 /**
  * @typedef {import('../config').WPConfig} WPConfig
@@ -114,6 +115,12 @@ module.exports = async function start( {
 
 		// Save the runtime type after successful start.
 		await saveRuntime( runtimeName, config.workDirectoryPath );
+
+		// Record the project directory so that `wp-env prune` can later
+		// identify which environments belong to which projects.
+		await setCache( 'configPath', config.configDirectoryPath, {
+			workDirectoryPath: config.workDirectoryPath,
+		} );
 	} catch ( error ) {
 		// Attempt to stop any partially-started environment so that
 		// processes do not linger after a failed start.

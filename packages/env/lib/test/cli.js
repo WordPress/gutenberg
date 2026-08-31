@@ -21,6 +21,7 @@ jest.mock( '../env', () => {
 		run: jest.fn( Promise.resolve.bind( Promise ) ),
 		destroy: jest.fn( Promise.resolve.bind( Promise ) ),
 		cleanup: jest.fn( Promise.resolve.bind( Promise ) ),
+		prune: jest.fn( Promise.resolve.bind( Promise ) ),
 		ValidationError: actual.ValidationError,
 		LifecycleScriptError: actual.LifecycleScriptError,
 	};
@@ -124,6 +125,18 @@ describe( 'env cli', () => {
 	it( 'parses cleanup commands with --force flag.', () => {
 		cli().parse( [ 'cleanup', '--force' ] );
 		const { force } = env.cleanup.mock.calls[ 0 ][ 0 ];
+		expect( force ).toBe( true );
+	} );
+
+	it( 'parses prune commands.', () => {
+		cli().parse( [ 'prune' ] );
+		const { spinner, force } = env.prune.mock.calls[ 0 ][ 0 ];
+		expect( spinner.text ).toBe( '' );
+		expect( force ).toBe( false );
+	} );
+	it( 'parses prune commands with --force flag.', () => {
+		cli().parse( [ 'prune', '--force' ] );
+		const { force } = env.prune.mock.calls[ 0 ][ 0 ];
 		expect( force ).toBe( true );
 	} );
 

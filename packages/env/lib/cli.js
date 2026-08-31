@@ -292,6 +292,18 @@ module.exports = function cli() {
 		withSpinner( env.cleanup )
 	);
 	yargs.command(
+		'prune',
+		chalk`{bold.red Prunes} orphaned wp-env environments. Scans the wp-env cache directory, identifies environments whose original project directory no longer exists, tears down all associated Docker resources, and removes the stale cache directories.`,
+		( args ) => {
+			args.option( 'force', {
+				type: 'boolean',
+				describe: 'Skip the confirmation prompt.',
+				default: false,
+			} );
+		},
+		withSpinner( env.prune )
+	);
+	yargs.command(
 		'status',
 		'Get the status of the wp-env environment including URLs, ports, and configuration.',
 		( args ) => {

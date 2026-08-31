@@ -297,6 +297,14 @@ class DockerRuntime {
 			} );
 		}
 
+		// Record Docker-specific runtime metadata so that `wp-env prune` can
+		// later identify and clean up associated Docker artefacts.
+		await setCache(
+			'runtimeOptions',
+			{ dockerImageNamespace: path.basename( workDirectoryPath ) },
+			{ workDirectoryPath }
+		);
+
 		// Get port information for the result message
 		const siteUrl = fullConfig.env.development.config.WP_SITEURL;
 
