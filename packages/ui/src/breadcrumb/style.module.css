@@ -115,4 +115,9 @@
 		}
 	}
 
+	@layer compositions {
+		.overflow-trigger {
+			--wp-ui-button-min-width: unset;
+		}
+	}
 }

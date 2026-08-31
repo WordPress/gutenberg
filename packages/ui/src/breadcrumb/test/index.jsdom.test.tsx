@@ -13,7 +13,7 @@ type ResizeObserverRecord = {
 
 const DEFAULT_LABEL_WIDTH = 30;
 const NEW_TAB_INDICATOR_WIDTH = 20;
-const OVERFLOW_TRIGGER_WIDTH = 44;
+const OVERFLOW_TRIGGER_WIDTH = 30;
 const SEPARATOR_WIDTH = 10;
 
 describe( 'Breadcrumb', () => {
@@ -1030,7 +1030,7 @@ describe( 'Breadcrumb', () => {
 		} );
 
 		it( 'moves focus to overflow when the focused link collapses without changing the collapsed count', async () => {
-			availableWidth = 144;
+			availableWidth = 130;
 			labelWidths.set( 'Home', 50 );
 			labelWidths.set( 'Section', 50 );
 			const { container } = render(
