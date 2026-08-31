@@ -123,6 +123,7 @@ function block_core_page_list_build_css_colors( $attributes, $context ) {
 
 	return $colors;
 }
+
 /**
  * Outputs Page list markup from an array of pages with nested children.
  *
@@ -136,10 +137,15 @@ function block_core_page_list_build_css_colors( $attributes, $context ) {
  * @param array   $active_page_ancestor_ids An array of ancestor ids for active page.
  * @param array   $colors Color information for overlay styles.
  * @param integer $depth The nesting depth.
+ * @param string  $block_css_classes  Full set of classes that would have been on the omitted
+ *                                    wrapper (from get_block_wrapper_attributes()), applied to the
+ *                                    top-level <li> elements instead when nested inside a Submenu.
+ * @param string  $block_inline_styles Full set of inline styles that would have been on the omitted
+ *                                     wrapper, applied to the top-level <li> elements instead.
  *
  * @return string List markup.
  */
-function block_core_page_list_render_nested_page_list( $submenu_visibility, $show_submenu_icons, $is_navigation_child, $nested_pages, $is_nested, $active_page_ancestor_ids = array(), $colors = array(), $depth = 0 ) {
+function block_core_page_list_render_nested_page_list( $submenu_visibility, $show_submenu_icons, $is_navigation_child, $nested_pages, $is_nested, $active_page_ancestor_ids = array(), $colors = array(), $depth = 0, $block_css_classes = '', $block_inline_styles = '' ) {
 	if ( empty( $nested_pages ) ) {
 		return;
 	}
@@ -152,9 +158,9 @@ function block_core_page_list_render_nested_page_list( $submenu_visibility, $sho
 	$open_always   = 'always' === $submenu_visibility;
 
 	foreach ( (array) $nested_pages as $page ) {
-		$css_class       = $page['is_active'] ? ' current-menu-item' : '';
-		$aria_current    = $page['is_active'] ? ' aria-current="page"' : '';
-		$style_attribute = '';
+		$css_class          = $page['is_active'] ? ' current-menu-item' : '';
+		$aria_current       = $page['is_active'] ? ' aria-current="page"' : '';
+		$style_declarations = array();
 
 		$css_class .= in_array( $page['page_id'], $active_page_ancestor_ids, true ) ? ' current-menu-ancestor' : '';
 		if ( isset( $page['children'] ) ) {
@@ -181,9 +187,19 @@ function block_core_page_list_render_nested_page_list( $submenu_visibility, $sho
 		if ( ( ( 0 < $depth && ! $is_nested ) || $is_nested ) && isset( $colors['overlay_css_classes'], $colors['overlay_inline_styles'] ) ) {
 			$css_class .= ' ' . trim( implode( ' ', $colors['overlay_css_classes'] ) );
 			if ( '' !== $colors['overlay_inline_styles'] ) {
-				$style_attribute = sprintf( ' style="%s"', esc_attr( $colors['overlay_inline_styles'] ) );
+				$style_declarations[] = trim( $colors['overlay_inline_styles'] );
 			}
 		}
+
+		if ( 0 === $depth && $is_nested ) {
+			if ( '' !== $block_css_classes ) {
+				$css_class .= ' ' . trim( $block_css_classes );
+			}
+			if ( '' !== $block_inline_styles ) {
+				$style_declarations[] = trim( $block_inline_styles );
+			}
+		}
+		$style_attribute = ! empty( $style_declarations ) ? sprintf( ' style="%s"', esc_attr( implode( ' ', $style_declarations ) ) ) : '';
 
 		if ( (int) $page['page_id'] === $front_page_id ) {
 			$css_class .= ' menu-item-home';
@@ -336,13 +352,35 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 
 	$wrapper_markup = $is_nested ? '%2$s' : '<ul %1$s>%2$s</ul>';
 
-	$items_markup = block_core_page_list_render_nested_page_list( $submenu_visibility, $show_submenu_icons, $is_navigation_child, $nested_pages, $is_nested, $active_page_ancestor_ids, $colors );
-
-	$wrapper_attributes = get_block_wrapper_attributes(
+	$wrapper_attributes  = get_block_wrapper_attributes(
 		array(
 			'class' => $css_classes,
 			'style' => $style_attribute,
 		)
+	);
+	$block_css_classes   = '';
+	$block_inline_styles = '';
+
+	if ( $is_nested ) {
+		if ( preg_match( '/class="([^"]*)"/', $wrapper_attributes, $class_matches ) ) {
+			$block_css_classes = html_entity_decode( $class_matches[1] );
+		}
+		if ( preg_match( '/style="([^"]*)"/', $wrapper_attributes, $style_matches ) ) {
+			$block_inline_styles = html_entity_decode( $style_matches[1] );
+		}
+	}
+
+	$items_markup = block_core_page_list_render_nested_page_list(
+		$submenu_visibility,
+		$show_submenu_icons,
+		$is_navigation_child,
+		$nested_pages,
+		$is_nested,
+		$active_page_ancestor_ids,
+		$colors,
+		0,
+		$block_css_classes,
+		$block_inline_styles
 	);
 
 	return sprintf(
