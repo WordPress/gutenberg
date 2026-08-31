@@ -9,6 +9,15 @@
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
+		justify-content: var(--breadcrumbs-justify-content, flex-start);
+	}
+
+	&.has-text-align-center ol {
+		--breadcrumbs-justify-content: center;
+	}
+
+	&.has-text-align-right ol {
+		--breadcrumbs-justify-content: flex-end;
 	}
 
 	li {
