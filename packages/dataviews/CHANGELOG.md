@@ -10,7 +10,7 @@
 
 ### Bug Fix
 
--   DataViews filters: Update the style to include the wrapper for the search so it won't introduce unintended side effects ([#82128](https://github.com/WordPress/gutenberg/pull/82128)).
+-   DataViews: Scope the search field's fixed width to the default UI search row ([#82128](https://github.com/WordPress/gutenberg/pull/82128)).
 
 ## 18.1.0 (2026-08-26)
 
