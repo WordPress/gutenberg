@@ -562,10 +562,11 @@ function MediaEditorContent( {
 	}, [ id, invalidateResolution ] );
 
 	// Restore-original: the lineage root the edited attachment descends from,
-	// exposed by the server on `media_details.original_attachment`. Fetch its
+	// exposed by the server as the root-level `original_attachment` field
+	// on the attachment (edit context). Fetch its
 	// record for the natural dimensions the cropper needs to seed itself (the
 	// field itself carries only the id and url).
-	const originalAttachment = media?.media_details?.original_attachment;
+	const originalAttachment = media?.original_attachment;
 	const originalId: number | undefined = originalAttachment?.attachment_id;
 	const originalRecord = useSelect(
 		( select ) =>
