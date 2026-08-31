@@ -32,7 +32,7 @@ describe( 'flags warnings when deprecated media queries are found', () => {
 
 	it( 'flags correct number of warnings', () => {
 		return result.then( ( data ) =>
-			expect( data.results[ 0 ].warnings ).toHaveLength( 1 )
+			expect( data.results[ 0 ].warnings ).toHaveLength( 8 )
 		);
 	} );
 
