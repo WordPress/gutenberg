@@ -30,7 +30,11 @@ import type {
 } from '@wordpress/widget-primitives';
 import { useDashboardInternalContext } from '../context/dashboard-context';
 import { WidgetDashboard } from '../widget-dashboard';
-import type { CanPerformDashboardOperation, DashboardWidget } from '../types';
+import type {
+	CanPerformDashboardOperation,
+	DashboardInstanceOperation,
+	DashboardWidget,
+} from '../types';
 
 /*
  * Stories run without WordPress, so both halves of the demo widget are
@@ -42,6 +46,12 @@ interface SnapshotAttributes {
 	metric?: 'views' | 'visitors' | 'orders';
 	period?: 'day' | 'week' | 'month';
 	label?: string;
+
+	/*
+	 * Free-form line rendered above the metric. The enforcement story uses
+	 * it so each tile states its own instance lock.
+	 */
+	note?: string;
 }
 
 const METRICS: {
@@ -79,6 +89,7 @@ function TrafficSnapshotWidget( {
 		metric = 'views',
 		period = 'week',
 		label = 'Traffic',
+		note,
 	} = attributes ?? {};
 
 	const metricLabel =
@@ -96,6 +107,19 @@ function TrafficSnapshotWidget( {
 				color: 'var(--wpds-color-foreground-content-neutral)',
 			} }
 		>
+			{ note && (
+				<span
+					style={ {
+						color: 'var(--wpds-color-foreground-content-neutral-weak)',
+						fontSize: 'var(--wpds-typography-font-size-xs)',
+						fontWeight:
+							'var(--wpds-typography-font-weight-emphasis)',
+						textTransform: 'uppercase',
+					} }
+				>
+					{ note }
+				</span>
+			) }
 			<strong
 				style={ {
 					fontSize: 'var(--wpds-typography-font-size-2xl)',
@@ -791,38 +815,60 @@ Nested policies compose restrictively; without a policy, every operation is allo
 };
 
 /*
- * Staging-enforcement demo. Every control the chrome offers already asks
- * the policy, so these triggers do what only a composed trigger can:
- * write to the engine's staging directly through the internal context.
+ * Staging-enforcement demo. Three tiles carry one instance lock each and
+ * the goal tile is free. Customize mode shows the locks on the chrome;
+ * the rogue triggers do what only a composed trigger can: write to the
+ * engine's staging directly through the internal context.
  */
-const LOCKED_UUID = 'locked-snapshot';
+const TILE_LOCKS: Record< string, DashboardInstanceOperation[] > = {
+	'pinned-snapshot': [ 'move' ],
+	'fixed-size-snapshot': [ 'resize' ],
+	'protected-snapshot': [ 'remove', 'edit' ],
+};
 
 const ENFORCEMENT_LAYOUT: DashboardWidget[] = [
-	{
-		uuid: LOCKED_UUID,
-		type: 'demo/traffic-snapshot',
-		attributes: {
-			metric: 'views',
-			period: 'week',
-			label: 'Locked by policy',
-		},
-		placement: { width: 2, height: 1 },
-	},
-	{
-		uuid: 'free-snapshot',
-		type: 'demo/traffic-snapshot',
-		attributes: { metric: 'visitors', period: 'month', label: 'Free' },
-		placement: { width: 1, height: 1 },
-	},
 	{
 		uuid: 'free-goal',
 		type: 'demo/goal-progress',
 		attributes: { metric: 'revenue', target: '5000' },
 		placement: { width: 1, height: 1 },
 	},
+	{
+		uuid: 'pinned-snapshot',
+		type: 'demo/traffic-snapshot',
+		attributes: {
+			metric: 'views',
+			period: 'week',
+			label: 'Traffic',
+			note: 'Pinned: cannot be moved',
+		},
+		placement: { width: 2, height: 1 },
+	},
+	{
+		uuid: 'fixed-size-snapshot',
+		type: 'demo/traffic-snapshot',
+		attributes: {
+			metric: 'visitors',
+			period: 'month',
+			label: 'Audience',
+			note: 'Cannot be resized',
+		},
+		placement: { width: 1, height: 1 },
+	},
+	{
+		uuid: 'protected-snapshot',
+		type: 'demo/traffic-snapshot',
+		attributes: {
+			metric: 'orders',
+			period: 'day',
+			label: 'Orders',
+			note: 'Cannot be removed or edited',
+		},
+		placement: { width: 1, height: 1 },
+	},
 ];
 
-/* Locks the first tile completely; rejects inserting Goal Progress. */
+/* One lock set per tile; inserting Goal Progress is rejected. */
 const enforcementPolicy: CanPerformDashboardOperation = ( request ) => {
 	if ( request.operation === 'insert' ) {
 		return request.widgetType.name !== goalProgressWidgetType.name;
@@ -830,7 +876,7 @@ const enforcementPolicy: CanPerformDashboardOperation = ( request ) => {
 	if ( request.operation === 'customize' ) {
 		return true;
 	}
-	return request.widget.uuid !== LOCKED_UUID;
+	return ! TILE_LOCKS[ request.widget.uuid ]?.includes( request.operation );
 };
 
 let stagedInstances = 0;
@@ -852,7 +898,6 @@ function RogueTriggers() {
 				display: 'flex',
 				flexWrap: 'wrap',
 				gap: 'var(--wpds-dimension-gap-xs)',
-				marginBlockEnd: 'var(--wpds-dimension-gap-md)',
 			} }
 		>
 			<Button
@@ -868,12 +913,12 @@ function RogueTriggers() {
 				onClick={ () =>
 					onLayoutChange(
 						layout.filter(
-							( widget ) => widget.uuid !== LOCKED_UUID
+							( widget ) => widget.uuid !== 'protected-snapshot'
 						)
 					)
 				}
 			>
-				Remove the locked tile
+				Remove the protected tile
 			</Button>
 			<Button
 				variant="secondary"
@@ -929,7 +974,7 @@ function RogueTriggers() {
 					insert( {
 						type: 'demo/traffic-snapshot',
 						attributes: {
-							metric: 'orders',
+							metric: 'views',
 							period: 'day',
 							label: 'Staged',
 						},
@@ -953,6 +998,7 @@ function RogueTriggers() {
 function StagingEnforcementStory() {
 	const [ layout, setLayout ] =
 		useState< DashboardWidget[] >( ENFORCEMENT_LAYOUT );
+	const [ editMode, setEditMode ] = useState( false );
 
 	return (
 		<WidgetDashboard.Policy canPerform={ enforcementPolicy }>
@@ -963,10 +1009,24 @@ function StagingEnforcementStory() {
 				] }
 				layout={ layout }
 				onLayoutChange={ setLayout }
+				editMode={ editMode }
+				onEditChange={ setEditMode }
 				resolveWidgetModule={ resolveDemoModule }
 				gridSettings={ { model: 'grid', rowHeight: 200 } }
 			>
-				<RogueTriggers />
+				<div
+					style={ {
+						display: 'flex',
+						flexWrap: 'wrap',
+						alignItems: 'flex-start',
+						justifyContent: 'space-between',
+						gap: 'var(--wpds-dimension-gap-md)',
+						marginBlockEnd: 'var(--wpds-dimension-gap-md)',
+					} }
+				>
+					<RogueTriggers />
+					<WidgetDashboard.Actions />
+				</div>
 				<WidgetDashboard.Widgets />
 			</WidgetDashboard>
 		</WidgetDashboard.Policy>
@@ -979,9 +1039,9 @@ export const StagingEnforcement: StoryObj< typeof WidgetDashboard > = {
 		docs: {
 			description: {
 				story: `
-Every control the chrome offers already asks the policy, so a denied operation never reaches the staging layer through the UI. The buttons in this story bypass the chrome and write to the engine's staging directly, which is what the staging enforcement exists for.
+Three tiles carry one instance lock each and state it in their body: **Pinned** (second position) cannot move, **Fixed size** cannot resize, **Protected** cannot be removed or edited; the goal tile is free. Enter Customize to see the locks on the chrome: the pinned tile refuses to drag and holds its index while the others reorder around it, the fixed-size tile offers no resize handle or width menu, the protected tile has no Remove control, and the inserter rejects Goal Progress.
 
-The policy locks the first tile completely and rejects inserting Goal Progress widgets. The locked tile holds its place, width, and label while the free tiles change; the rejected insertion never lands, the allowed one does.
+The buttons bypass the chrome and write to the engine's staging directly, which is what the staging enforcement exists for: reversing holds Pinned in its position, the width sweep skips Fixed size, the rename skips Protected, removing Protected re-asserts it, and the rejected insertion never lands while the allowed one does.
 `,
 			},
 		},
