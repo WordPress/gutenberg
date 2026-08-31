@@ -31,6 +31,13 @@
 	// when rows later receive the is-displacement-up or is-displacement-down class.
 	transform: translateY(0);
 
+   // The transform above makes each row its own stacking context, so the focus
+   // ring cannot escape it. Lift the focused row above the siblings that would
+   // otherwise paint over it.
+   &:focus-within {
+    	z-index: 1;
+   }
+
 	&.is-draggable,
 	&.is-draggable .block-editor-list-view-block-contents {
 		cursor: grab;
@@ -91,12 +98,16 @@
 	&.is-selected .components-button.has-icon {
 		color: $white;
 	}
+	// The selected row background uses the same color as the focus ring, so fill
+	// the outline offset gap with white to keep the two apart.
 	&.is-selected .block-editor-list-view-block-contents:focus::after {
 		@include outset-ring__focus();
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) #{ $white };
 	}
 	&.is-selected.is-synced .block-editor-list-view-block-contents:focus::after {
 		--focus-color: var(--wp-block-synced-color);
 		@include outset-ring__focus();
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) #{ $white };
 	}
 	&.is-selected .block-editor-list-view-block__menu:focus,
 	&.is-selected.is-synced .block-editor-list-view-block__menu:focus {
