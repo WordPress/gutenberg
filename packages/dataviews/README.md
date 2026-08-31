@@ -264,7 +264,7 @@ Properties:
 
 -   `density`: one of `comfortable`, `balanced`, or `compact`. Configures the size and spacing of the layout.
 -   `enableMoving`: whether the table columns should display moving controls.
--   `styles`: additional `width`, `maxWidth`, `minWidth`, `align` styles for each field column. The `align` property accepts `'start'`, `'center'`, or `'end'`.
+-   `styles`: additional `width`, `maxWidth`, `minWidth`, `align` styles for the columns listed in `fields`, keyed by field id. The `align` property accepts `'start'`, `'center'`, or `'end'`. These styles are not applied to the primary column (the one that renders `titleField`, `mediaField`, and `descriptionField`): the table sizes every other column to fit its content and gives the primary column whatever width is left, so a `width` or `maxWidth` set on it would not be honored by the browser's table layout. Long titles are truncated instead.
 -   `aspectRatio` (`table` only): one of the preset ratios `'1/1'`, `'4/3'`, `'3/4'`, `'3/2'`, `'2/3'`, `'16/9'`, or `'9/16'`, applied to the primary column's media preview. Defaults to `'1/1'`.
 
 **For column alignment (`align` property), follow these guidelines:**

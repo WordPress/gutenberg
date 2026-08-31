@@ -386,6 +386,12 @@ interface ViewBase {
 	startPosition?: number;
 }
 
+/**
+ * Sizing and alignment for one table column. Applies to the columns listed in
+ * `fields`; the primary column (`titleField`, `mediaField`, `descriptionField`)
+ * is sized by the table itself, taking the width the other columns leave over,
+ * so styles keyed by those field ids are ignored.
+ */
 export interface ColumnStyle {
 	/**
 	 * The width of the field column.
@@ -438,7 +444,8 @@ export interface ViewTable extends ViewBase {
 	 */
 	layout?: {
 		/**
-		 * The styles for the columns.
+		 * The styles for the columns listed in `fields`, keyed by field id.
+		 * Not applied to the primary column; see `ColumnStyle`.
 		 */
 		styles?: Record< string, ColumnStyle >;
 
@@ -583,7 +590,8 @@ export interface ViewPickerTable extends ViewBase {
 	 */
 	layout?: {
 		/**
-		 * The styles for the columns.
+		 * The styles for the columns listed in `fields`, keyed by field id.
+		 * Not applied to the primary column; see `ColumnStyle`.
 		 */
 		styles?: Record< string, ColumnStyle >;
 
