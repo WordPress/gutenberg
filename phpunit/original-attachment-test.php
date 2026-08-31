@@ -67,10 +67,29 @@ class Gutenberg_Original_Attachment_Filter_Test extends WP_UnitTestCase {
 		$this->assertSame( $original, gutenberg_get_original_attachment_id( $child ) );
 	}
 
-	public function test_no_original_attachment_id_omits_field_from_response() {
-		$id   = $this->make_attachment();
-		$data = $this->get_response_data( $id );
-		$this->assertArrayNotHasKey( 'original_attachment', $data );
+	public function test_no_lineage_returns_zero_and_no_link() {
+		$id      = $this->make_attachment();
+		$request = new WP_REST_Request( 'GET', '/wp/v2/media/' . $id );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_do_request( $request );
+
+		$this->assertSame( 0, $response->get_data()['original_attachment'] );
+		$this->assertArrayNotHasKey(
+			'https://api.w.org/original-attachment',
+			$response->get_links()
+		);
+	}
+
+	public function test_field_is_registered_in_schema() {
+		// Ensure `rest_api_init` has fired so the field is registered.
+		rest_get_server();
+
+		$controller = new WP_REST_Attachments_Controller( 'attachment' );
+		$properties = $controller->get_item_schema()['properties'];
+
+		$this->assertArrayHasKey( 'original_attachment', $properties );
+		$this->assertSame( 'integer', $properties['original_attachment']['type'] );
+		$this->assertSame( array( 'edit' ), $properties['original_attachment']['context'] );
 	}
 
 	public function test_recorded_original_id_surfaces_in_response() {
@@ -109,20 +128,27 @@ class Gutenberg_Original_Attachment_Filter_Test extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_view_context_omits_field() {
+	public function test_view_context_omits_field_and_link() {
 		$original = $this->make_attachment();
 		$child    = $this->make_attachment( $original );
 
-		$data = $this->get_response_data( $child, 'view' );
-		$this->assertArrayNotHasKey( 'original_attachment', $data );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/media/' . $child );
+		$request->set_param( 'context', 'view' );
+		$response = rest_do_request( $request );
+
+		$this->assertArrayNotHasKey( 'original_attachment', $response->get_data() );
+		$this->assertArrayNotHasKey(
+			'https://api.w.org/original-attachment',
+			$response->get_links()
+		);
 	}
 
-	public function test_self_referencing_original_id_is_omitted() {
+	public function test_self_referencing_original_id_returns_zero() {
 		$id = $this->make_attachment();
 		update_post_meta( $id, GUTENBERG_ORIGINAL_ATTACHMENT_ID_META_KEY, $id );
 
 		$data = $this->get_response_data( $id );
-		$this->assertArrayNotHasKey( 'original_attachment', $data );
+		$this->assertSame( 0, $data['original_attachment'] );
 	}
 
 	public function test_edit_hook_inherits_grandparent_original() {
