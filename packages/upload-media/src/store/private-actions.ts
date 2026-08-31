@@ -901,7 +901,7 @@ export function prepareItem( id: QueueItemId ) {
 						message: unsupported
 							? getHeicUnsupportedMessage()
 							: __(
-									'This HEIC image could not be converted. It may be damaged. Try converting it to JPEG before uploading.'
+									'This HEIC image could not be converted. Try converting it to JPEG before uploading.'
 							  ),
 						file,
 						cause: error instanceof Error ? error : undefined,
