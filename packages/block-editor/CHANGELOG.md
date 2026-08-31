@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Pass the `videoKeepOriginal` media upload setting through to the upload pipeline, so a site can opt out of keeping the original video file alongside its web-safe transcode ([#79375](https://github.com/WordPress/gutenberg/pull/79375)).
+
 ### Internal
 
 -   Remove unused dependencies `@wordpress/escape-html`, `@wordpress/wordcount` and `deepmerge` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).

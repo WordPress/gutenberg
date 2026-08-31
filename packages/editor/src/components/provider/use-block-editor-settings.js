@@ -133,6 +133,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		bigImageSizeThreshold,
 		imageStripMeta,
 		imageMaxBitDepth,
+		videoKeepOriginal,
 		allowRightClickOverrides,
 		blockTypes,
 		focusMode,
@@ -211,6 +212,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				bigImageSizeThreshold: baseData?.image_size_threshold,
 				imageStripMeta: baseData?.image_strip_meta,
 				imageMaxBitDepth: baseData?.image_max_bit_depth,
+				videoKeepOriginal: baseData?.video_keep_original,
 				allowRightClickOverrides: get(
 					'core',
 					'allowRightClickOverrides'
@@ -367,6 +369,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			bigImageSizeThreshold,
 			imageStripMeta,
 			imageMaxBitDepth,
+			videoKeepOriginal,
 			allowedBlockTypes,
 			allowRightClickOverrides,
 			focusMode,
@@ -492,6 +495,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		bigImageSizeThreshold,
 		imageStripMeta,
 		imageMaxBitDepth,
+		videoKeepOriginal,
 		isNavigationOverlayContext,
 	] );
 }

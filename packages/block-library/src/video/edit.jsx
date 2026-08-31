@@ -16,7 +16,8 @@ import {
 } from '@wordpress/block-editor';
 import { useRef, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { video as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { prependHTTPS } from '@wordpress/url';
@@ -31,6 +32,8 @@ import Tracks from './tracks';
 import { Caption } from '../utils/caption';
 import PosterImage from '../utils/poster-image';
 import { isGifVariation } from './variations';
+import VideoOriginalControl from './video-original-control';
+import { companionUrl } from './companion-url';
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
 
@@ -55,6 +58,12 @@ function VideoEdit( {
 	const aspectRatio =
 		width && height ? `${ width } / ${ height }` : undefined;
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
+	/*
+	 * Attachment whose web-safe companion should replace the block's src once
+	 * its record is known. Set when a video is chosen from the Media Library,
+	 * whose selection object carries no `media_details`.
+	 */
+	const [ pendingCompanionId, setPendingCompanionId ] = useState();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const blockEditingMode = useBlockEditingMode();
 	const hasNonContentControls = blockEditingMode === 'default';
@@ -72,6 +81,33 @@ function VideoEdit( {
 			videoPlayer.current.load();
 		}
 	}, [ poster ] );
+
+	const pendingCompanionSrc = useSelect(
+		( select ) => {
+			if ( ! pendingCompanionId || pendingCompanionId !== id ) {
+				return undefined;
+			}
+			const record = select( coreStore ).getEntityRecord(
+				'postType',
+				'attachment',
+				id,
+				{ context: 'view' }
+			);
+			const companion = record?.media_details?.optimized_video;
+			return companion && record.source_url
+				? companionUrl( record.source_url, companion )
+				: undefined;
+		},
+		[ pendingCompanionId, id ]
+	);
+
+	useEffect( () => {
+		if ( ! pendingCompanionSrc ) {
+			return;
+		}
+		setPendingCompanionId( undefined );
+		setAttributes( { src: pendingCompanionSrc } );
+	}, [ pendingCompanionSrc, setAttributes ] );
 
 	// The GIF variation plays like an animated GIF in the editor (the playback
 	// attributes are applied to the preview <video> below). Regular videos do
@@ -106,11 +142,32 @@ function VideoEdit( {
 			return;
 		}
 
+		/*
+		 * Prefer the web-safe transcoded companion when available: the
+		 * original video stays the attachment (media.id) but the block plays
+		 * the optimized version. `media_details.optimized_video` is only set
+		 * on transcoded video attachments, so its presence is a sufficient
+		 * signal to swap the playback source. The author can switch back to
+		 * the original from the toolbar (see VideoOriginalControl).
+		 *
+		 * An upload arrives as a REST record with `media_details`; a Media
+		 * Library pick does not, so the swap waits for the attachment record.
+		 */
+		let nextSrc = media.url;
+		if ( media.media_details?.optimized_video ) {
+			nextSrc = companionUrl(
+				media.url,
+				media.media_details.optimized_video
+			);
+		} else if ( media.id && ! media.media_details ) {
+			setPendingCompanionId( media.id );
+		}
+
 		// Sets the block's attribute and updates the edit component from the
 		// selected media.
 		setAttributes( {
 			blob: undefined,
-			src: media.url,
+			src: nextSrc,
 			id: media.id,
 			poster:
 				media.image?.src !== media.icon ? media.image?.src : undefined,
@@ -212,6 +269,12 @@ function VideoEdit( {
 							variant="toolbar"
 						/>
 					</BlockControls>
+					{ ! isGif && (
+						<VideoOriginalControl
+							attributes={ attributes }
+							setAttributes={ setAttributes }
+						/>
+					) }
 				</>
 			) }
 			{ ! isGif && (

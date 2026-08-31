@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Request the `video_keep_original` field on the base site entity so the editor receives the video transcoding keep-original setting ([#79375](https://github.com/WordPress/gutenberg/pull/79375)).
+
 ### Internal
 
 -   Remove unused dependency `@wordpress/is-shallow-equal` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).

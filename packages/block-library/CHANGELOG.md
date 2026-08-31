@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Video: Play the web-safe transcoded companion when the uploaded video has one, and add a toolbar control to switch playback back to the original file ([#79375](https://github.com/WordPress/gutenberg/pull/79375)).
+
 ### Bug Fixes
 
 -   Tabs: Activate the tab that a URL hash points into, so an anchor set on a block inside a tab panel can be reached. Anchor links followed after the page has loaded are handled too, matching the Accordion block ([#81744](https://github.com/WordPress/gutenberg/pull/81744)).
