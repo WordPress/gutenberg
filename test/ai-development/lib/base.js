@@ -1,43 +1,19 @@
 /**
  * Setup shared by every evaluation spec.
  */
-import { fileURLToPath } from 'node:url';
 import defaultTest from './default-test.js';
 import { agentEnvironment } from './environment.js';
 import { workspace } from './paths.js';
 import { permissions, sandbox } from './sandbox.js';
 
-// Resolved from this file rather than written relative to a spec, so it does
-// not depend on which config file pulled the setup in.
-const workspaceExtension = fileURLToPath(
-	new URL( './workspace.mjs', import.meta.url )
-);
-
 /** @type {Partial<import('promptfoo').UnifiedConfig>} */
 export default {
-	// Promptfoo records an OpenTelemetry trace of each row: the tools the agent
-	// invoked and the shell commands it ran. `trajectory:*` assertions match
-	// against that trace.
-	tracing: {
-		enabled: true,
-		failOnReceiverStartFailure: true,
-		// Claude calls its shell tool Bash, so declare it as a command tool
-		// name for Promptfoo's trajectory steps to pick up.
-		commandToolNames: [ 'Bash' ],
-		otlp: {
-			http: {
-				enabled: true,
-				host: '127.0.0.1',
-				port: 4318,
-				acceptFormats: [ 'json' ],
-			},
-		},
-	},
-
 	// Lifecycle hooks, as `file://path:exportName`. Promptfoo calls the named
 	// export for beforeAll, beforeEach, afterEach and afterAll; ours builds the
 	// workspace once, rolls it back between rows, and removes it at the end.
-	extensions: [ `file://${ workspaceExtension }:extensionHook` ],
+	// Promptfoo resolves these from the config in `specs/<suite>`. A relative
+	// path also avoids the drive-letter colon its validator rejects on Windows.
+	extensions: [ 'file://../../lib/workspace.mjs:extensionHook' ],
 
 	// The agents under test. Every provider runs every case, so adding one
 	// gives a column per agent in the results rather than a separate run.

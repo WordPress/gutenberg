@@ -35,8 +35,17 @@ export const sourceRoot = path.resolve( libraryDirectory, '../../..' );
  */
 export const workspace = path.join(
 	fs.realpathSync( os.tmpdir() ),
-	'gutenberg-agent-eval'
+	`gutenberg-agent-eval-${ process.pid }`
 );
+
+/**
+ * A trusted copy of the workspace's Git metadata.
+ *
+ * The evaluated agent can change `.git`, so host-side Git restores this copy
+ * before it stages, inspects, or resets the workspace. It sits outside the
+ * working directory, where the sandbox prevents the agent from changing it.
+ */
+export const trustedGitDirectory = `${ workspace }.git`;
 
 /**
  * Names the workspace's first commit.

@@ -80,15 +80,23 @@ function reference( file ) {
  *
  * @param {Object} context Assertion context.
  * @param {string} match   Path fragment identifying the file.
- * @return {{ attempts: number, output: string }} What came back.
+ * @return {Object}          What came back.
  */
 function readBack( context, match ) {
-	const calls = ( context.metadata?.toolCalls || [] ).filter( ( tool ) =>
+	const calls = context.metadata?.toolCalls || [];
+	const matchingCalls = calls.filter( ( tool ) =>
 		JSON.stringify( tool.input ).includes( match )
 	);
 
 	return {
-		attempts: calls.length,
+		// Keep the path match only for diagnostics. A command can read a file
+		// without naming it, for example after `cd` or through a glob.
+		attempts: matchingCalls.length,
+		successfulAttempts: matchingCalls.filter( ( call ) => ! call.is_error )
+			.length,
+		// Scan every successful tool result for content evidence. Promptfoo can
+		// truncate long results, so a large file may need several reads for all
+		// landmarks to survive in metadata.
 		output: calls
 			.filter( ( call ) => ! call.is_error )
 			.map( ( call ) => String( call.output ) )
@@ -109,9 +117,17 @@ export function assertRead( file, metric ) {
 	return {
 		type: 'javascript',
 		value: ( output, context ) => {
-			const { attempts, output: read } = readBack( context, match );
+			const {
+				attempts,
+				successfulAttempts,
+				output: read,
+			} = readBack( context, match );
+			const missing = expected.filter(
+				( landmark ) => ! read.includes( landmark )
+			);
+			const found = expected.length - missing.length;
 
-			if ( ! attempts ) {
+			if ( ! attempts && ! found ) {
 				return {
 					pass: false,
 					score: 0,
@@ -119,7 +135,7 @@ export function assertRead( file, metric ) {
 				};
 			}
 
-			if ( ! read ) {
+			if ( attempts && ! successfulAttempts ) {
 				return {
 					pass: false,
 					score: 0,
@@ -127,18 +143,14 @@ export function assertRead( file, metric ) {
 				};
 			}
 
-			const missing = expected.filter(
-				( landmark ) => ! read.includes( landmark )
-			);
-
 			// Scored by how much of the file came back, so the metric
 			// separates an agent that skims the guidance from one that
 			// ignores it. Passing still needs all of it.
 			return {
 				pass: ! missing.length,
-				score: ( expected.length - missing.length ) / expected.length,
+				score: found / expected.length,
 				reason: missing.length
-					? `Read ${ expected.length - missing.length } of ${
+					? `Read ${ found } of ${
 							expected.length
 					  } landmarks in ${ file }, missing "${ missing[ 0 ].slice(
 							0,
@@ -162,12 +174,12 @@ export function assertRead( file, metric ) {
  * @return {Object} A Promptfoo assertion.
  */
 export function assertNotRead( file, metric ) {
-	const { match, landmarks: expected } = reference( file );
+	const { landmarks: expected } = reference( file );
 
 	return {
 		type: 'javascript',
 		value: ( output, context ) => {
-			const { output: read } = readBack( context, match );
+			const { output: read } = readBack( context, '' );
 			const seen = expected.filter( ( landmark ) =>
 				read.includes( landmark )
 			);

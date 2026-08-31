@@ -7,7 +7,7 @@ import { workspace } from './paths.js';
  */
 export default {
 	options: {
-		// Prepended to every task to revent agent from wasting tokens
+		// Prepended to every task to prevent the agent from wasting tokens
 		// trying to boot an environment the workspace does not have.
 		prefix: `This task runs in an isolated evaluation workspace and
 npm is not available. Do not try to build. Do not start or try to start wp-env,

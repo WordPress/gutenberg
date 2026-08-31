@@ -22,16 +22,18 @@ export const sandbox = {
 	allowUnsandboxedCommands: false,
 	// Prevent the agent from reaching the internet.
 	network: { allowedDomains: [] },
+	credentials: {
+		// Promptfoo captures this key before applying `config.env`, then adds it
+		// back to the SDK child. Deny it at the Bash sandbox boundary as well.
+		envVars: [ { name: 'ANTHROPIC_API_KEY', mode: 'deny' } ],
+	},
 	// Writes need no rules. A sandboxed command can write to the working
 	// directory and the session temp directory and nowhere else, and the
 	// working directory is the workspace.
 	filesystem: {
-		// Reads are the other way round, allowed everywhere by default, so they
-		// are confined by denying instead.
-		denyRead: [ homeDirectory, sourceRoot ],
-		// The workspace sits outside both denied paths already; this covers a
-		// temp directory that happens to fall inside one, because for sandbox
-		// paths the narrower rule wins.
+		// Reads are allowed everywhere by default. Deny the host root, then
+		// re-open only the workspace. For sandbox paths the narrower rule wins.
+		denyRead: [ '/' ],
 		allowRead: [ workspace ],
 	},
 };

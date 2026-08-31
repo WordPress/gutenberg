@@ -69,6 +69,14 @@ test( 'a file read in pieces counts as read', () => {
 	assert.equal( verdict.pass, true, verdict.reason );
 } );
 
+test( 'a file read through a glob counts as read', () => {
+	const verdict = grade( assertRead( REFERENCE, 'read' ), [
+		call( 'cat .claude/skills/testing/references/*.md', CONTENTS ),
+	] );
+
+	assert.equal( verdict.pass, true, verdict.reason );
+} );
+
 test( 'reading only the top does not count as read', () => {
 	const verdict = grade( assertRead( REFERENCE, 'read' ), [
 		call( `head -6 ${ workspacePath }`, LINES.slice( 0, 6 ).join( '\n' ) ),
@@ -140,6 +148,15 @@ test( 'naming a file without reading it counts as skipped', () => {
 test( 'reading a file it should have skipped fails', () => {
 	const verdict = grade( assertNotRead( REFERENCE, 'skipped' ), [
 		call( `cat ${ workspacePath }`, CONTENTS ),
+	] );
+
+	assert.equal( verdict.pass, false );
+	assert.match( verdict.reason, /Read/ );
+} );
+
+test( 'reading a file after changing directory fails the skipped check', () => {
+	const verdict = grade( assertNotRead( REFERENCE, 'skipped' ), [
+		call( 'cd .claude/skills/testing/references && cat e2e.md', CONTENTS ),
 	] );
 
 	assert.equal( verdict.pass, false );

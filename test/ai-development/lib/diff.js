@@ -7,19 +7,8 @@
  *
  * @see https://www.promptfoo.dev/docs/guides/evaluate-coding-agents/
  */
-import { execFile } from 'node:child_process';
-import { promisify } from 'node:util';
+import { git, restoreTrustedGitMetadata } from './git.mjs';
 import { baseTag, workspace } from './paths.js';
-
-const execFileAsync = promisify( execFile );
-
-async function git( args ) {
-	const { stdout } = await execFileAsync( 'git', args, {
-		cwd: workspace,
-		maxBuffer: 50 * 1024 * 1024,
-	} );
-	return stdout.trimEnd();
-}
 
 /**
  * Promptfoo transform: takes the agent's response, returns it with the diff.
@@ -28,26 +17,37 @@ async function git( args ) {
  * @return {Promise<string>} That response, followed by what it actually changed.
  */
 export default async function withWorkspaceChanges( output ) {
+	// The agent can edit `.git/config` and `.gitattributes`. Restore the Git
+	// directory captured before the agent ran, so staging cannot execute a
+	// repository-local clean filter or any other agent-supplied Git config.
+	await restoreTrustedGitMetadata();
+
 	// Stage everything first, so files the agent created appear in the diff.
-	await git( [ 'add', '--all' ] );
+	await git( workspace, [ 'add', '--all' ], 50 * 1024 * 1024 );
 
 	// All changed filenames against the starting point
-	const status = await git( [
+	const { stdout: statusOutput } = await git( workspace, [
 		'diff',
 		'--cached',
 		'--name-status',
 		baseTag,
 	] );
 	// Full diff of the agent's work against the base tag
-	const diff = await git( [ 'diff', '--cached', baseTag ] );
+	const { stdout: diffOutput } = await git(
+		workspace,
+		[ 'diff', '--cached', baseTag ],
+		50 * 1024 * 1024
+	);
+	const status = statusOutput.trimEnd();
+	const diff = diffOutput.trimEnd();
 
 	return `${ output }
 
 ---
 
 The following is the state of the workspace after the agent finished. It was
-read from the repository itself using git, not reported by the agent. Where the agent 
-and the following report disagree, the following evidence is the source of truth to 
+read from the repository itself using git, not reported by the agent. Where the agent
+and the following report disagree, the following evidence is the source of truth to
 be trusted.
 
 ## Changed files

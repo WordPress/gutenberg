@@ -27,36 +27,19 @@ import path from 'node:path';
 import { promisify } from 'node:util';
 // The repository's own skill-catalog generator, so this cannot drift from it.
 import { setupSkills } from '../../../tools/agents/setup-skills.mjs';
-import { baseTag, sourceRoot, workspace } from './paths.js';
+import {
+	git,
+	restoreTrustedGitMetadata,
+	saveTrustedGitMetadata,
+} from './git.mjs';
+import {
+	baseTag,
+	sourceRoot,
+	trustedGitDirectory,
+	workspace,
+} from './paths.js';
 
 const execFileAsync = promisify( execFile );
-
-const gitEnvironment = {
-	...process.env,
-	GIT_AUTHOR_NAME: 'Gutenberg Agent Eval',
-	GIT_AUTHOR_EMAIL: 'gutenberg-agent-eval@example.com',
-	GIT_COMMITTER_NAME: 'Gutenberg Agent Eval',
-	GIT_COMMITTER_EMAIL: 'gutenberg-agent-eval@example.com',
-};
-
-async function git( cwd, args ) {
-	try {
-		return await execFileAsync( 'git', args, {
-			cwd,
-			env: gitEnvironment,
-			maxBuffer: 10 * 1024 * 1024,
-		} );
-	} catch ( error ) {
-		// `execFile` reports only the command it ran, and Promptfoo then wraps
-		// that again, so a failure arrives with nothing to act on. Say what Git
-		// said, and where.
-		throw new Error(
-			`git ${ args.join( ' ' ) } failed in ${ cwd } (exit ${
-				error.code
-			})\n${ error.stderr || '(no output)' }`
-		);
-	}
-}
 
 /**
  * Resolves what the workspace is built from: what you are working on,
@@ -134,22 +117,26 @@ async function createWorkspace() {
 	// Both the diff and the rollback compare against this tag rather than HEAD;
 	// see `baseTag` in `paths.js`.
 	await git( workspace, [ 'tag', baseTag ] );
+	await saveTrustedGitMetadata();
 }
 
 /**
  * Returns the workspace to the state the row before it started from.
  *
- * `clean` deliberately omits `-x`: the generated `.claude/skills` is ignored by
- * Git, and removing it would leave every later row without the repository's
- * skills.
+ * The agent can modify both tracked and ignored files, including the generated
+ * `.claude/skills` tree. Restore trusted Git metadata, remove all changes, and
+ * regenerate that ignored catalog before another row starts.
  */
 async function resetWorkspace() {
+	await restoreTrustedGitMetadata();
 	await git( workspace, [ 'reset', '--quiet', '--hard', baseTag ] );
-	await git( workspace, [ 'clean', '--quiet', '-fd' ] );
+	await git( workspace, [ 'clean', '--quiet', '-fdx' ] );
+	await setupSkills( { repositoryRoot: workspace } );
 }
 
 async function removeWorkspace() {
 	await fs.rm( workspace, { recursive: true, force: true } );
+	await fs.rm( trustedGitDirectory, { recursive: true, force: true } );
 }
 
 /**
@@ -161,6 +148,12 @@ async function removeWorkspace() {
 export async function extensionHook( hookName ) {
 	if ( hookName === 'beforeAll' ) {
 		await createWorkspace();
+	}
+
+	// Promptfoo catches an `afterEach` failure and can continue. Resetting at
+	// the start of every row makes a clean base a precondition for that row.
+	if ( hookName === 'beforeEach' ) {
+		await resetWorkspace();
 	}
 
 	if ( hookName === 'afterEach' ) {
