@@ -15,6 +15,11 @@ export default meta;
  * When several controls share one visible group label, use a fieldset
  * legend for the group. Give each `InputControl` its own `label` and set
  * `hideLabelFromVision` so only the group label stays visible.
+ *
+ * Hide a control's label only when other visible text still identifies that
+ * control, and include that text in the `label`. The unit suffixes start
+ * each accessible name (`lb, pounds`) so voice-control users can speak the
+ * text they see.
  */
 export const LabelingComposedComponents: StoryObj = {
 	render: function Template() {
@@ -23,7 +28,7 @@ export const LabelingComposedComponents: StoryObj = {
 				<Fieldset.Legend>Shipping weight</Fieldset.Legend>
 				<Stack direction="row" gap="sm">
 					<InputControl
-						label="Pounds"
+						label="lb, pounds"
 						hideLabelFromVision
 						type="number"
 						suffix={
@@ -31,7 +36,7 @@ export const LabelingComposedComponents: StoryObj = {
 						}
 					/>
 					<InputControl
-						label="Ounces"
+						label="oz, ounces"
 						hideLabelFromVision
 						type="number"
 						suffix={
