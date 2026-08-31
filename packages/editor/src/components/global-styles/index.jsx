@@ -2,9 +2,15 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { GlobalStylesUI } from '@wordpress/global-styles-ui';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { uploadMedia } from '@wordpress/media-utils';
 import { GlobalStylesBlockLink } from './block-link';
 import { useGlobalStyles } from './hooks';
+import { unlock } from '../../lock-unlock';
+
+const { globalStylesDataKey, globalStylesLinksDataKey } = unlock(
+	blockEditorPrivateApis
+);
 
 /**
  * Hook to fetch server CSS and settings for BlockEditorProvider that are not Global Styles.
@@ -87,6 +93,7 @@ export default function GlobalStylesUIWrapper( {
 	const {
 		user: userConfig,
 		base: baseConfig,
+		merged: mergedConfig,
 		setUser: setUserConfig,
 		isReady,
 	} = useGlobalStyles();
@@ -97,6 +104,21 @@ export default function GlobalStylesUIWrapper( {
 		responsiveEditingEnabled,
 		blockStatesEditingEnabled,
 	} = useServerData( settings );
+
+	/*
+	 * The Global Styles panels resolve `ref` pointers and theme-relative
+	 * (`file:./…`) URLs against these settings keys. GlobalStylesUI wraps
+	 * its screens in its own BlockEditorProvider, which cannot read them
+	 * from the editor's provider, so supply them here.
+	 */
+	const serverSettingsWithGlobalStyles = useMemo(
+		() => ( {
+			...serverSettings,
+			[ globalStylesDataKey ]: mergedConfig?.styles ?? {},
+			[ globalStylesLinksDataKey ]: mergedConfig?._links ?? {},
+		} ),
+		[ serverSettings, mergedConfig ]
+	);
 
 	// Show loading state while data is being fetched
 	if ( ! isReady ) {
@@ -113,7 +135,7 @@ export default function GlobalStylesUIWrapper( {
 				onPathChange={ onPathChange }
 				fontLibraryEnabled={ fontLibraryEnabled }
 				serverCSS={ serverCSS }
-				serverSettings={ serverSettings }
+				serverSettings={ serverSettingsWithGlobalStyles }
 				selectedViewport={ selectedViewport }
 				showResponsiveStateControls={
 					showResponsiveStateControls && responsiveEditingEnabled

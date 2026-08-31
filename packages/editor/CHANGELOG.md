@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+-   Global Styles: Supply the global styles data and theme-file links to the sidebar's own block editor provider, so the background image panels can resolve theme-relative (`file:./…`) URLs for thumbnails and the focal point picker ([#82230](https://github.com/WordPress/gutenberg/pull/82230)).
 -   `EditorInterface`: Apply the `showListViewByDefault` preference when the editor enters edit mode, so every editor built on the package honors it — including the extensible site editor, which previously ignored it. The logic moves here from `edit-post` and `edit-site`.
 -   `StylesCanvas`: In preview mode, render edge to edge without the close button and Escape handler. There the canvas is the whole surface rather than a frame opened over an editing session, and whatever opened it owns closing it.
 
