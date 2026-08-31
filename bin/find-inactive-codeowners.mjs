@@ -7,6 +7,20 @@ const INACTIVE_DELAY_IN_MS = 1.577e10; // 6 months
 const PR_LIMIT = 100;
 
 /**
+ * Files that are routinely touched by release and tooling chores.
+ * Changes limited to these should not count as package activity.
+ */
+const CHORE_FILE_PATTERN =
+	/(?:^|\/)(?:package(?:-lock)?\.json|CHANGELOG\.md|tsconfig(?:\.[^/]+)?\.json|\.eslintrc\.json)$/;
+
+/**
+ * Commits touching at least this many top-level package roots are treated as
+ * monorepo-wide chores (releases, eslint migrations, etc.) rather than
+ * evidence that a specific owned path had meaningful activity.
+ */
+const MONOREPO_CHORE_ROOT_THRESHOLD = 10;
+
+/**
  * Returns true if the username is a GitHub username (i.e. not a team).
  * @param {string} username
  * @return {boolean} Whether the username is a GitHub username.
@@ -64,21 +78,61 @@ async function readCommandOutput( command, args ) {
 }
 
 /**
- * Returns true if git history has any commit touching the path since searchDate.
+ * Returns a coarse package root used to detect monorepo-wide commits.
+ * @param {string} filePath
+ * @return {string} Package root path segment.
+ */
+const getPackageRoot = ( filePath ) => {
+	const match = filePath.match(
+		/^(packages\/[^/]+|lib|bin|docs|test\/[^/]+|tools|schemas|phpunit|routes\/[^/]+)/
+	);
+	return match?.[ 1 ] ?? filePath.split( '/' )[ 0 ];
+};
+
+/**
+ * Returns true if git history has meaningful commits touching the path since
+ * searchDate. Release metadata and monorepo-wide chores are ignored.
  * @param {string} pattern
  * @param {string} searchDate
  * @return {Promise<boolean>} Whether the path had activity.
  */
 async function hasPathActivity( pattern, searchDate ) {
-	const output = await readCommandOutput( 'git', [
+	const shaOutput = await readCommandOutput( 'git', [
 		'log',
 		`--since=${ searchDate }`,
-		'-1',
 		'--format=%H',
 		'--',
 		...pathToGitPathspecs( pattern ),
 	] );
-	return output.trim().length > 0;
+	const shas = shaOutput.trim().split( '\n' ).filter( Boolean );
+
+	for ( const sha of shas ) {
+		const filesOutput = await readCommandOutput( 'git', [
+			'diff-tree',
+			'--no-commit-id',
+			'--name-only',
+			'-r',
+			sha,
+		] );
+		const files = filesOutput.trim().split( '\n' ).filter( Boolean );
+		const hasSubstantivePathChange = files.some(
+			( filePath ) =>
+				matchesPattern( filePath, pattern ) &&
+				! CHORE_FILE_PATTERN.test( filePath )
+		);
+		if ( ! hasSubstantivePathChange ) {
+			continue;
+		}
+
+		const packageRoots = new Set( files.map( getPackageRoot ) );
+		if ( packageRoots.size >= MONOREPO_CHORE_ROOT_THRESHOLD ) {
+			continue;
+		}
+
+		return true;
+	}
+
+	return false;
 }
 
 const content = await readFile( CODEOWNERS_FILE, 'utf-8' );
