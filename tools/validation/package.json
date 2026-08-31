@@ -37,6 +37,7 @@
 		"access": "public"
 	},
 	"scripts": {
+		"check-doc-image-hosting": "node ./check-doc-image-hosting.mjs",
 		"check-installed-deps": "node ./check-installed-deps.mjs",
 		"check-licenses": "node ./check-licenses.mjs",
 		"check-private-apis": "node ./check-private-apis.mjs",
