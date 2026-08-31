@@ -1,11 +1,14 @@
 import { createContext, useContext } from '@wordpress/element';
+import type { Ref } from 'react';
 
 type BreadcrumbItemRenderContextValue = {
 	itemKey: string;
+	measurementRef?: Ref< HTMLSpanElement >;
 	measurementVersion: number;
-	mode: 'visible' | 'overflow';
+	mode: 'measurement' | 'overflow' | 'visible';
 	onLinkBlur: ( itemKey: string ) => void;
 	onLinkFocus: ( itemKey: string ) => void;
+	separatorRef?: Ref< HTMLSpanElement >;
 	showSeparator: boolean;
 	shouldTruncateCurrent: boolean;
 };

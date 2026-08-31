@@ -120,15 +120,26 @@ describe( 'Breadcrumb', () => {
 					return SEPARATOR_WIDTH;
 				}
 				if ( element.classList.contains( 'style-label' ) ) {
+					const intrinsicWidthElement = element.querySelector(
+						'[data-intrinsic-width]'
+					);
+					const intrinsicWidth = Number.parseFloat(
+						intrinsicWidthElement?.getAttribute(
+							'data-intrinsic-width'
+						) ?? ''
+					);
 					const indicatorWidth = element.matches(
 						'[target="_blank"]'
 					)
 						? NEW_TAB_INDICATOR_WIDTH
 						: 0;
-					return (
-						( labelWidths.get( element.textContent ?? '' ) ??
-							DEFAULT_LABEL_WIDTH ) + indicatorWidth
+					const configuredLabelWidth = labelWidths.get(
+						element.textContent ?? ''
 					);
+					const labelWidth = Number.isNaN( intrinsicWidth )
+						? configuredLabelWidth ?? DEFAULT_LABEL_WIDTH
+						: intrinsicWidth;
+					return labelWidth + indicatorWidth;
 				}
 				return 0;
 			},
@@ -451,6 +462,60 @@ describe( 'Breadcrumb', () => {
 				fontSize: '20px',
 				letterSpacing: '3px',
 			} );
+		} );
+
+		it( 'collapses items based on custom-rendered link widths', () => {
+			availableWidth = 110;
+
+			render(
+				<Breadcrumb.Root>
+					<Breadcrumb.LinkItem
+						href="/"
+						render={ ( renderProps ) => (
+							<a { ...renderProps }>
+								<span data-intrinsic-width="90">
+									{ renderProps.children }
+								</span>
+							</a>
+						) }
+					>
+						Home
+					</Breadcrumb.LinkItem>
+					<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
+			);
+
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Show 1 hidden breadcrumb item',
+				} )
+			).toBeInTheDocument();
+		} );
+
+		it( 'keeps custom renderer refs on the visible item', () => {
+			const renderRef = createRef< HTMLAnchorElement >();
+			const { container } = render(
+				<Breadcrumb.Root>
+					<Breadcrumb.LinkItem
+						href="/"
+						render={
+							<a ref={ renderRef } href="/">
+								Home
+							</a>
+						}
+					>
+						Home
+					</Breadcrumb.LinkItem>
+					<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
+			);
+
+			const visibleLink = screen.getByRole( 'link', { name: 'Home' } );
+			const measurementTree =
+				container.querySelector( '.style-measurement' );
+
+			expect( renderRef.current ).toBe( visibleLink );
+			expect( measurementTree ).not.toContainElement( renderRef.current );
 		} );
 	} );
 

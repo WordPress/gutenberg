@@ -6,9 +6,13 @@ import type { ForwardedRef } from 'react';
 import { Link } from '../link';
 import * as Menu from '../menu';
 import * as Tooltip from '../tooltip';
-import defenseStyles from '../utils/css/global-css-defense.module.css';
 import { useBreadcrumbItemRenderContext } from './context';
 import { enforceRenderProps } from './enforce-render-props';
+import { Item } from './item';
+import {
+	getMeasurementProps,
+	getMeasurementRender,
+} from './measurement-render';
 import { Separator } from './separator';
 import styles from './style.module.css';
 import type { LinkItemProps } from './types';
@@ -17,6 +21,8 @@ import { useIsTruncated } from './use-is-truncated';
 type LinkItemImplementationProps = LinkItemProps & {
 	forwardedRef: ForwardedRef< HTMLAnchorElement >;
 };
+
+const MEASUREMENT_RENDER = <span />;
 
 function VisibleLinkItem( {
 	children,
@@ -67,13 +73,61 @@ function VisibleLinkItem( {
 	);
 
 	return (
-		<li className={ clsx( defenseStyles.li, styles.item ) }>
+		<Item>
 			{ showSeparator && <Separator /> }
 			<Tooltip.Root disabled={ ! isTruncated }>
 				<Tooltip.Trigger render={ link } />
 				{ isTruncated && <Tooltip.Popup>{ children }</Tooltip.Popup> }
 			</Tooltip.Root>
-		</li>
+		</Item>
+	);
+}
+
+function MeasurementLinkItem( {
+	children,
+	className,
+	href,
+	openInNewTab,
+	render,
+	style,
+	...props
+}: LinkItemProps ) {
+	const { measurementRef, separatorRef, showSeparator } =
+		useBreadcrumbItemRenderContext();
+	const enforcedRender = enforceRenderProps(
+		getMeasurementRender( render ?? MEASUREMENT_RENDER ),
+		{
+			'aria-current': undefined,
+			href: render ? href : undefined,
+		}
+	);
+
+	return (
+		<Item measurement>
+			{ showSeparator && <Separator ref={ separatorRef } /> }
+			<span
+				ref={ measurementRef }
+				className={ styles[ 'measurement-content' ] }
+			>
+				<Link
+					{ ...getMeasurementProps( props ) }
+					className={ clsx(
+						styles.label,
+						styles.link,
+						styles[ 'measurement-label' ],
+						className
+					) }
+					href={ render ? href : undefined }
+					openInNewTab={ openInNewTab }
+					render={ enforcedRender }
+					style={ style }
+					tabIndex={ -1 }
+					tone="neutral"
+				>
+					{ children }
+				</Link>
+			</span>
+		</Item>
 	);
 }
 
@@ -120,11 +174,15 @@ const LinkItem = forwardRef< HTMLAnchorElement, LinkItemProps >(
 	function BreadcrumbLinkItem( props, ref ) {
 		const { mode } = useBreadcrumbItemRenderContext();
 
-		return mode === 'overflow' ? (
-			<OverflowLinkItem { ...props } forwardedRef={ ref } />
-		) : (
-			<VisibleLinkItem { ...props } forwardedRef={ ref } />
-		);
+		if ( mode === 'measurement' ) {
+			return <MeasurementLinkItem { ...props } />;
+		}
+
+		if ( mode === 'overflow' ) {
+			return <OverflowLinkItem { ...props } forwardedRef={ ref } />;
+		}
+
+		return <VisibleLinkItem { ...props } forwardedRef={ ref } />;
 	}
 );
 

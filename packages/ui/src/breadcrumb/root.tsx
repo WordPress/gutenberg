@@ -11,9 +11,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import type { CSSProperties, ReactElement, ReactNode } from 'react';
-import { Button } from '../button';
-import { Link } from '../link';
+import type { ReactElement, ReactNode } from 'react';
 import * as Menu from '../menu';
 import type { RootProps as MenuRootProps } from '../menu/types';
 import * as Tooltip from '../tooltip';
@@ -22,8 +20,10 @@ import resetStyles from '../utils/css/resets.module.css';
 import { BreadcrumbItemRenderContext } from './context';
 import { CurrentItem } from './current-item';
 import { enforceRenderProps } from './enforce-render-props';
+import { Item } from './item';
 import { getCollapsedLayout } from './layout';
 import { LinkItem } from './link-item';
+import { OverflowTriggerButton } from './overflow-trigger-button';
 import { Separator } from './separator';
 import styles from './style.module.css';
 import type { CurrentItemProps, LinkItemProps, RootProps } from './types';
@@ -32,10 +32,6 @@ type BreadcrumbItemDescriptor = {
 	element: ReactElement< LinkItemProps | CurrentItemProps >;
 	itemKey: string;
 	kind: 'link' | 'current';
-	label: string;
-	measurementClassName?: string;
-	openInNewTab: boolean;
-	measurementStyle?: CSSProperties;
 };
 
 type ResponsiveState = {
@@ -128,29 +124,10 @@ function getBreadcrumbItems( children: ReactNode ) {
 			return;
 		}
 
-		const renderElement = isValidElement< {
-			className?: string;
-			style?: CSSProperties;
-		} >( child.props.render )
-			? child.props.render
-			: undefined;
-
 		items.push( {
 			element: child,
 			itemKey: String( child.key ?? `item-${ index }` ),
 			kind,
-			label,
-			measurementClassName: clsx(
-				child.props.className,
-				renderElement?.props.className
-			),
-			openInNewTab:
-				kind === 'link' &&
-				( child.props as LinkItemProps ).openInNewTab === true,
-			measurementStyle: {
-				...child.props.style,
-				...renderElement?.props.style,
-			},
 		} );
 	} );
 
@@ -558,7 +535,7 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 		<>
 			{ rootLink && renderVisibleItem( rootLink ) }
 			{ collapsedItems.length > 0 && (
-				<li className={ clsx( defenseStyles.li, styles.item ) }>
+				<Item>
 					{ visiblePosition++ > 0 && <Separator /> }
 					<Menu.Root onOpenChange={ handleMenuOpenChange }>
 						<Tooltip.Root disabled={ menuOpen }>
@@ -571,13 +548,7 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 								}
 								render={
 									<Tooltip.Trigger
-										render={
-											<Button
-												size="small"
-												tone="neutral"
-												variant="minimal"
-											/>
-										}
+										render={ <OverflowTriggerButton /> }
 									/>
 								}
 							>
@@ -604,7 +575,7 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 							) ) }
 						</Menu.Popup>
 					</Menu.Root>
-				</li>
+				</Item>
 			) }
 			{ remainingVisibleLinks.map( renderVisibleItem ) }
 			{ displayedCurrentItem &&
@@ -630,24 +601,11 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 					className={ styles[ 'measurement-row' ] }
 				>
 					{ items.map( ( item, index ) => (
-						<span
-							key={ item.itemKey }
-							className={ styles[ 'measurement-item' ] }
-						>
-							{ index > 0 && (
-								<span
-									ref={
-										index === 1
-											? intrinsicSeparatorRef
-											: undefined
-									}
-									className={ styles.separator }
-								>
-									/
-								</span>
-							) }
-							<span
-								ref={ ( element ) => {
+						<BreadcrumbItemRenderContext.Provider
+							key={ `measurement-${ item.itemKey }` }
+							value={ {
+								itemKey: item.itemKey,
+								measurementRef: ( element ) => {
 									if ( element ) {
 										intrinsicItemRefs.current.set(
 											item.itemKey,
@@ -658,50 +616,29 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 											item.itemKey
 										);
 									}
-								} }
-								className={ styles[ 'measurement-content' ] }
-							>
-								{ item.kind === 'link' ? (
-									<Link
-										className={ clsx(
-											styles.label,
-											styles[ 'measurement-label' ],
-											item.measurementClassName
-										) }
-										openInNewTab={ item.openInNewTab }
-										render={ <span /> }
-										style={ item.measurementStyle }
-										tabIndex={ -1 }
-									>
-										{ item.label }
-									</Link>
-								) : (
-									<span
-										className={ clsx(
-											styles.label,
-											styles[ 'measurement-label' ],
-											item.measurementClassName
-										) }
-										style={ item.measurementStyle }
-									>
-										{ item.label }
-									</span>
-								) }
-							</span>
-						</span>
+								},
+								measurementVersion,
+								mode: 'measurement',
+								onLinkBlur: () => {},
+								onLinkFocus: () => {},
+								separatorRef:
+									index === 1
+										? intrinsicSeparatorRef
+										: undefined,
+								showSeparator: index > 0,
+								shouldTruncateCurrent: false,
+							} }
+						>
+							{ item.element }
+						</BreadcrumbItemRenderContext.Provider>
 					) ) }
 				</div>
-				<Button
+				<OverflowTriggerButton
 					className={ styles[ 'measurement-overflow-trigger' ] }
 					nativeButton={ false }
 					render={ <span ref={ intrinsicOverflowTriggerRef } /> }
-					size="small"
 					tabIndex={ -1 }
-					tone="neutral"
-					variant="minimal"
-				>
-					…
-				</Button>
+				/>
 			</div>
 		</>
 	);
