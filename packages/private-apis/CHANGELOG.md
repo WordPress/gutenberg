@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Deprecations
+
+-   Deprecate the `@wordpress/dataviews` opt-in: it still works so that copies published to npm before v18 keep loading, but logs a warning when `SCRIPT_DEBUG` is enabled. Scheduled for removal in WordPress 7.4. [#82231](https://github.com/WordPress/gutenberg/pull/82231)
+
 ### Bug fixes
 
 -   Restore `@wordpress/dataviews` in the list of core modules allowed to use private APIs. DataViews copies published to npm before the private API cleanup opt in at module load, so plugin bundles embedding them throw without the entry. [#82221](https://github.com/WordPress/gutenberg/pull/82221)
