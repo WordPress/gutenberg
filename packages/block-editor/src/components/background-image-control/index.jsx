@@ -282,6 +282,7 @@ function BackgroundImageControls( {
 	displayInPanel,
 	defaultValues,
 	containerRef,
+	resolvedURL,
 } ) {
 	const [ isUploading, setIsUploading ] = useState( false );
 	const { getSettings } = useSelect( blockEditorStore );
@@ -412,7 +413,8 @@ function BackgroundImageControls( {
 	// display usefully nor re-apply without breaking the image, and removing
 	// an inherited image stores the `'none'` sentinel string.
 	const currentURL = /^https?:\/\//.test( rawURL ?? '' ) ? rawURL : undefined;
-	const imgLabel = title || getFilename( url ) || __( 'Image' );
+	const displayURL = resolvedURL ?? url;
+	const imgLabel = title || getFilename( displayURL ) || __( 'Image' );
 
 	return (
 		<div className="block-editor-global-styles-background-panel__image-tools-panel-item">
@@ -432,7 +434,7 @@ function BackgroundImageControls( {
 				} }
 				name={
 					<InspectorImagePreviewItem
-						imgUrl={ url }
+						imgUrl={ displayURL }
 						filename={ title }
 						label={ imgLabel }
 					/>
@@ -471,6 +473,7 @@ function BackgroundSizeControls( {
 	style,
 	inheritedValue,
 	defaultValues,
+	resolvedURL,
 } ) {
 	/*
 	 * Read local and inherited values separately so each sub-control can
@@ -490,8 +493,9 @@ function BackgroundSizeControls( {
 	const sizeValue = localSizeValue || inheritedSizeValue;
 	const repeatValue = localRepeatValue || inheritedRepeatValue;
 	const imageValue =
-		style?.background?.backgroundImage?.url ||
-		inheritedValue?.background?.backgroundImage?.url;
+		resolvedURL ??
+		( style?.background?.backgroundImage?.url ||
+			inheritedValue?.background?.backgroundImage?.url );
 	const isUploadedImage = style?.background?.backgroundImage?.id;
 	const positionValue = localPositionValue || inheritedPositionValue;
 	const attachmentValue = localAttachmentValue || inheritedAttachmentValue;
@@ -733,6 +737,24 @@ export default function BackgroundImagePanel( {
 	const { title, url } = value?.background?.backgroundImage || {
 		...resolvedInheritedValue?.background?.backgroundImage,
 	};
+
+	const localImage = value?.background?.backgroundImage;
+	/*
+	 * Resolves a theme-relative `file:./…` URL to its absolute theme URI, for
+	 * display only (thumbnails, focal point). `getResolvedValue` writes the
+	 * resolved URL onto the object it is given, so pass a copy to keep the
+	 * stored value theme-relative.
+	 */
+	const resolvedURL = useMemo(
+		() =>
+			typeof localImage === 'object' && localImage?.url
+				? getResolvedValue(
+						{ ...localImage },
+						{ styles: globalStyles, _links }
+				  )?.url
+				: undefined,
+		[ localImage, globalStyles, _links ]
+	);
 	const localHasImageValue = hasBackgroundImageValue( value );
 	const hasImageValue =
 		localHasImageValue || hasBackgroundImageValue( resolvedInheritedValue );
@@ -773,7 +795,7 @@ export default function BackgroundImagePanel( {
 				<BackgroundControlsPanel
 					label={ title }
 					filename={ title }
-					url={ url }
+					url={ resolvedURL ?? url }
 					onToggle={ setIsDropDownOpen }
 					hasImageValue={ hasImageValue }
 					hasLocalOverride={ hasLocalOverride }
@@ -793,12 +815,14 @@ export default function BackgroundImagePanel( {
 							onRemoveImage={ () => setIsDropDownOpen( false ) }
 							defaultValues={ defaultValues }
 							containerRef={ containerRef }
+							resolvedURL={ resolvedURL }
 						/>
 						<BackgroundSizeControls
 							onChange={ onChange }
 							style={ value }
 							defaultValues={ defaultValues }
 							inheritedValue={ resolvedInheritedValue }
+							resolvedURL={ resolvedURL }
 						/>
 					</VStack>
 				</BackgroundControlsPanel>
@@ -814,6 +838,7 @@ export default function BackgroundImagePanel( {
 					} }
 					onRemoveImage={ () => setIsDropDownOpen( false ) }
 					containerRef={ containerRef }
+					resolvedURL={ resolvedURL }
 				/>
 			) }
 		</div>
