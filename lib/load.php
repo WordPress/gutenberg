@@ -75,6 +75,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.2/view-config-api.php';
 	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-view-config-controller-7-2.php';
 	require __DIR__ . '/compat/wordpress-7.2/rest-api.php';
+	require __DIR__ . '/compat/wordpress-7.2/original-attachment.php';
 
 	// Real-time collaboration.
 	require __DIR__ . '/experimental/collaboration/class-gutenberg-rest-autosaves-controller.php';
@@ -132,7 +133,6 @@ require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/kses.php';
-require __DIR__ . '/experimental/media/original-attachment.php';
 require __DIR__ . '/experimental/script-modules.php';
 require __DIR__ . '/experimental/pages/site-editor.php';
 require __DIR__ . '/experimental/collaboration/meta-box-rtc-compat.php';
