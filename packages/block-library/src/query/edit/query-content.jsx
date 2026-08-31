@@ -8,7 +8,7 @@ import {
 	useInnerBlocksProps,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { __, _n, sprintf } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import EnhancedPaginationControl from './inspector-controls/enhanced-pagination-control';
@@ -145,22 +145,26 @@ export default function QueryContent( {
 		if ( enhancedPagination && unsupportedBlocks.length ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( { enhancedPagination: false } );
-			createNotice(
-				'info',
-				sprintf(
-					/* translators: %s: A comma-separated list of block titles. */
-					_n(
-						`"Reload full page" was enabled because this block isn't supported: %s. To avoid full page reloads, remove it, then turn the setting off again.`,
-						`"Reload full page" was enabled because these blocks aren't supported: %s. To avoid full page reloads, remove them, then turn the setting off again.`,
-						unsupportedBlocks.length
-					),
-					unsupportedBlocks.join( ', ' )
-				),
-				{
-					type: 'snackbar',
-					id: 'query-enhanced-pagination-disabled',
-				}
-			);
+			const message =
+				unsupportedBlocks.length === 1
+					? sprintf(
+							/* translators: %s: The title of the block that isn't supported. */
+							__(
+								`"Reload full page" was enabled because this block isn't supported: %s.`
+							),
+							unsupportedBlocks[ 0 ]
+					  )
+					: sprintf(
+							/* translators: %s: A comma-separated list of block titles. */
+							__(
+								`"Reload full page" was enabled because these blocks aren't supported: %s.`
+							),
+							unsupportedBlocks.join( ', ' )
+					  );
+			createNotice( 'info', message, {
+				type: 'snackbar',
+				id: 'query-enhanced-pagination-disabled',
+			} );
 		}
 	}, [
 		enhancedPagination,
