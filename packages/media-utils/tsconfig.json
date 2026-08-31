@@ -25,6 +25,6 @@
 	// Listed files have pre-existing type errors; include them once fixed.
 	"exclude": [
 		"**/benchmark",
-		"src/components/media-upload-modal/test/index.test.tsx"
+		"src/components/media-upload-modal/test/index.jsdom.test.tsx"
 	]
 }

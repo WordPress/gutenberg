@@ -2,8 +2,13 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `@wordpress/build` no longer parses JSX syntax in `.js` source files. Rename these files to `.jsx` or `.tsx` before building ([#82189](https://github.com/WordPress/gutenberg/pull/82189)).
+
 ### Enhancements
 
+-   Target `@wordpress/browserslist-config` for JavaScript and CSS when the project has no Browserslist config, instead of Browserslist's implicit defaults ([#82179](https://github.com/WordPress/gutenberg/pull/82179)).
 -   Transpile `.jsx` package, route, and widget source files alongside the existing JavaScript and TypeScript extensions, and ignore JSX tests during watch rebuilds ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
 
 ### Bug Fixes

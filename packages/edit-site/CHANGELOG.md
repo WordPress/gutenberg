@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add New Template: Use the Button component's focus ring instead of the legacy `box-shadow` ones ([#80138](https://github.com/WordPress/gutenberg/issues/80138)).
+
+### Bug Fixes
+
+-   `SidebarNavigationItem`: Stop forcing `style={ { fill: 'currentcolor' } }` on the icon. The explicit override was clobbering stroke-based icons' intrinsic styling. Colour is inherited via CSS `color` and the icon's own declared fills/strokes. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+-   `AddNewTemplate`: Preserve the admin theme color on the Author template icon after it became stroke-based. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+
 ### Internal
 
 -   Remove the `showListViewByDefault` handling from `useAdaptEditorToCanvas`; the `editor` package now applies the preference on the preview ↔ edit transition itself.
