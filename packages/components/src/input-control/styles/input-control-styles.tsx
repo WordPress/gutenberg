@@ -113,6 +113,11 @@ export const Container = styled.div< ContainerProps >`
 
 	${ containerDisabledStyles }
 	${ containerWidthStyles }
+
+	.block-library-template-part__selection-search &,
+    .block-library-query-pattern__selection-search & {
+		width: 20%;
+	}
 `;
 
 type InputProps = {
