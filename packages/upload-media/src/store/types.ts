@@ -334,6 +334,9 @@ export enum OperationType {
 	Finalize = 'FINALIZE',
 	// UltraHDR operations
 	DetectUltraHdr = 'DETECT_ULTRAHDR',
+	// Video poster operations
+	AddPoster = 'ADD_POSTER',
+	UploadPoster = 'UPLOAD_POSTER',
 }
 
 /**
