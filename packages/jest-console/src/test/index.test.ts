@@ -1,6 +1,36 @@
 /* eslint-disable no-console */
-import '../matchers';
+import {
+	afterAll,
+	afterEach as vitestAfterEach,
+	beforeAll as vitestBeforeAll,
+	beforeEach as vitestBeforeEach,
+	describe,
+	expect as vitestExpect,
+	it,
+	test,
+	vi,
+} from 'vitest';
+import { spyOn as jestSpyOn } from 'jest-mock';
 import type { ExtendedMock } from '../types';
+
+declare global {
+	const afterEach: typeof vitestAfterEach;
+	const beforeAll: typeof vitestBeforeAll;
+	const beforeEach: typeof vitestBeforeEach;
+	const expect: typeof vitestExpect;
+	const jest: { spyOn: typeof jestSpyOn };
+}
+
+vi.restoreAllMocks();
+vi.stubGlobal( 'afterEach', vitestAfterEach );
+vi.stubGlobal( 'beforeAll', vitestBeforeAll );
+vi.stubGlobal( 'beforeEach', vitestBeforeEach );
+vi.stubGlobal( 'expect', vitestExpect );
+vi.stubGlobal( 'jest', { spyOn: jestSpyOn } );
+
+await import( '../index' );
+
+afterAll( () => vi.unstubAllGlobals() );
 
 // The matchers replace the console methods with counting spies.
 function getSpy( methodName: 'error' | 'info' | 'log' | 'warn' ) {
@@ -20,26 +50,26 @@ describe( 'jest-console', () => {
 		test( `${ matcherName } works`, () => {
 			console[ methodName ]( message );
 
-			expect( console )[ matcherName ]();
+			vitestExpect( console )[ matcherName ]();
 		} );
 
 		test( `${ matcherName } works when not called`, () => {
-			expect( console ).not[ matcherName ]();
-			expect( () => expect( console )[ matcherName ]() ).toThrow(
-				'Expected mock function to be called.'
-			);
+			vitestExpect( console ).not[ matcherName ]();
+			vitestExpect( () =>
+				vitestExpect( console )[ matcherName ]()
+			).toThrow( 'Expected mock function to be called.' );
 		} );
 
 		test( `${ matcherNameWith } works with arguments that match`, () => {
 			console[ methodName ]( message );
 
-			expect( console )[ matcherNameWith ]( message );
+			vitestExpect( console )[ matcherNameWith ]( message );
 		} );
 
 		test( `${ matcherNameWith } works when not called`, () => {
-			expect( console ).not[ matcherNameWith ]( message );
-			expect( () =>
-				expect( console )[ matcherNameWith ]( message )
+			vitestExpect( console ).not[ matcherNameWith ]( message );
+			vitestExpect( () =>
+				vitestExpect( console )[ matcherNameWith ]( message )
 			).toThrow(
 				/Expected mock function to be called with:.*but it was called with:/s
 			);
@@ -49,9 +79,9 @@ describe( 'jest-console', () => {
 			console[ methodName ]( 'Unknown message.' );
 			console[ methodName ]( message, 'Unknown param.' );
 
-			expect( console ).not[ matcherNameWith ]( message );
-			expect( () =>
-				expect( console )[ matcherNameWith ]( message )
+			vitestExpect( console ).not[ matcherNameWith ]( message );
+			vitestExpect( () =>
+				vitestExpect( console )[ matcherNameWith ]( message )
 			).toThrow(
 				/Expected mock function to be called with:.*but it was called with:.*Unknown param./s
 			);
@@ -60,33 +90,31 @@ describe( 'jest-console', () => {
 		test( 'assertions number gets incremented after every matcher call', () => {
 			const spy = getSpy( methodName );
 
-			expect( spy.assertionsNumber ).toBe( 0 );
+			vitestExpect( spy.assertionsNumber ).toBe( 0 );
 
 			console[ methodName ]( message );
 
-			expect( console )[ matcherName ]();
-			expect( spy.assertionsNumber ).toBe( 1 );
+			vitestExpect( console )[ matcherName ]();
+			vitestExpect( spy.assertionsNumber ).toBe( 1 );
 
-			expect( console )[ matcherNameWith ]( message );
-			expect( spy.assertionsNumber ).toBe( 2 );
+			vitestExpect( console )[ matcherNameWith ]( message );
+			vitestExpect( spy.assertionsNumber ).toBe( 2 );
 		} );
 
 		describe( 'lifecycle', () => {
-			beforeAll( () => {
+			vitestBeforeAll( () => {
 				// Disable reason:
 				// This is a difficult one to test, since the matcher's
 				// own lifecycle is defined to run before ours. Infer
 				// that we're being watched by testing the console
 				// method as being a spy.
-				// eslint-disable-next-line jest/no-standalone-expect
-				expect(
+				vitestExpect(
 					getSpy( methodName ).assertionsNumber
 				).toBeGreaterThanOrEqual( 0 );
 			} );
 
 			// Disable reason:
 			// See beforeAll implementation and explanation added there.
-			// eslint-disable-next-line jest/expect-expect
 			it( 'captures logging in lifecycle', () => {} );
 		} );
 	} );
