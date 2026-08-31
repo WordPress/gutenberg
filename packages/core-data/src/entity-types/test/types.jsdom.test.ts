@@ -346,18 +346,12 @@ describe( 'Entity record types', () => {
 				{ context: 'view' }
 			);
 			true satisfies Expect< typeof inline, Post< 'view' > | undefined >;
-			/*
-			 * `password` is dropped from a view record, but `raw` is not:
-			 * `OmitNevers` only recurses into a property whose type has an
-			 * index signature, which `RenderedText` does not. It survives as
-			 * `never`, so reading it compiles and yields nothing usable.
-			 */
 			// @ts-expect-error -- `password` is edit-only.
 			inline?.password;
-			true satisfies Expect<
-				NonNullable< typeof inline >[ 'title' ][ 'raw' ],
-				never
-			>;
+			// @ts-expect-error -- `raw` is edit-only, so a view record omits it.
+			inline?.title.raw;
+			// `rendered` is serialised in every context.
+			inline?.title.rendered satisfies string | undefined;
 
 			// The reusable-object case, which is what regressed before.
 			const query = { context: 'view' };
@@ -374,16 +368,12 @@ describe( 'Entity record types', () => {
 			// @ts-expect-error -- `password` is edit-only, so it is unreadable.
 			reused?.password;
 			/*
-			 * `RenderedText` has always modelled `raw` as `never` outside
-			 * `edit` rather than removing it, so `never | string` collapses to
-			 * `string` across the union and `title.raw` stays readable. That
-			 * is how contextual fields nested in an interface have always
-			 * behaved; asserted here so a change to it is deliberate.
+			 * `raw` is dropped from the contexts that do not serialise it, so
+			 * it is absent from the union rather than surviving as `never` and
+			 * collapsing back to `string`.
 			 */
-			true satisfies Expect<
-				NonNullable< typeof reused >[ 'title' ][ 'raw' ],
-				string
-			>;
+			// @ts-expect-error -- the request may be `view`, which omits `raw`.
+			reused?.title.raw;
 			// `rendered` is on every context, so it stays readable.
 			reused?.title.rendered satisfies string | undefined;
 

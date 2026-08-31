@@ -106,8 +106,14 @@ export type OmitNevers<
  * in `post_content` but those comments are stripped out when
  * rendering to a page view. Similarly, plugins might modify
  * content or replace shortcodes.
+ *
+ * `raw` is dropped outside the edit context rather than left as `never`.
+ * `OmitNevers` only recurses into a property whose type has an index
+ * signature, which an interface does not, so a `never` left here would survive
+ * on the record -- and across a union of contexts `never | string` collapses
+ * back to `string`, letting callers read a field the response can omit.
  */
-export interface RenderedText< C extends Context > {
+export type RenderedText< C extends Context > = OmitNevers< {
 	/**
 	 * The source string which will be rendered on page views.
 	 */
@@ -116,7 +122,7 @@ export interface RenderedText< C extends Context > {
 	 * The output of the raw source after processing and filtering on the server.
 	 */
 	rendered: string;
-}
+} >;
 
 /**
  * Updatable<EntityRecord> is a type describing Edited Entity Records. They are like
