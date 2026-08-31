@@ -100,6 +100,9 @@ function register_block_core_footnotes_post_meta() {
 					'single'            => true,
 					'type'              => 'string',
 					'revisions_enabled' => true,
+					'auth_callback'     => static function( $allowed, $meta_key, $post_id ) {
+						return current_user_can( 'edit_post', $post_id );
+					},
 				)
 			);
 		}
@@ -141,3 +144,21 @@ function wp_get_footnotes_from_revision( $revision_field, $field, $revision ) {
 	return get_metadata( 'post', $revision->ID, $field, true );
 }
 add_filter( '_wp_post_revision_field_footnotes', 'wp_get_footnotes_from_revision', 10, 3 );
+
+/**
+ * Filters the protected meta keys to hide the footnotes meta field from the
+ * Custom Fields meta box.
+ *
+ * @since 6.7.0
+ *
+ * @param bool   $protected Whether the key is protected.
+ * @param string $meta_key  The meta key.
+ * @return bool Whether the key is protected.
+ */
+function block_core_footnotes_is_protected_meta( $protected, $meta_key ) {
+	if ( 'footnotes' === $meta_key ) {
+		return true;
+	}
+	return $protected;
+}
+add_filter( 'is_protected_meta', 'block_core_footnotes_is_protected_meta', 10, 2 );
