@@ -38,7 +38,7 @@ function gutenberg_get_block_style_variation_name_from_class( $class_string ) {
 	}
 
 	preg_match_all( '/\bis-style-(?!default)(\S+)\b/', $class_string, $matches );
-	return $matches[1] ?? null;
+	return ! empty( $matches[1] ) ? $matches[1] : null;
 }
 
 /**
