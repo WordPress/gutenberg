@@ -14,6 +14,7 @@ import {
 	RichTextToolbarButton,
 	MediaUploadCheck,
 } from '@wordpress/block-editor';
+import { updateActiveInlineImage } from './utils';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
@@ -73,25 +74,13 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 			<form
 				className="block-editor-format-toolbar__image-container-content"
 				onSubmit={ ( event ) => {
-					const newReplacements = value.replacements.slice();
-
-					newReplacements[ value.start ] = {
-						type: name,
-						attributes: {
-							...activeObjectAttributes,
-							style: editedWidth
-								? `width: ${ editedWidth }px;`
-								: '',
-							alt: editedAlt,
-						},
-					};
-
-					onChange( {
-						...value,
-						replacements: newReplacements,
-					} );
-
 					event.preventDefault();
+					onChange(
+						updateActiveInlineImage( value, {
+							width: editedWidth,
+							alt: editedAlt,
+						} )
+					);
 				} }
 			>
 				<Stack direction="column" gap="lg">
@@ -160,6 +149,10 @@ function Edit( {
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				value={ getCurrentImageId( activeObjectAttributes ) }
 				onSelect={ ( { id, url, alt, width: imgWidth } ) => {
+					const current = isObjectActive
+						? value.replacements[ value.start ]
+						: undefined;
+
 					onChange(
 						insertObject( value, {
 							type: name,
@@ -172,6 +165,10 @@ function Edit( {
 								url,
 								alt,
 							},
+							...( current?.unregisteredAttributes && {
+								unregisteredAttributes:
+									current.unregisteredAttributes,
+							} ),
 						} )
 					);
 					onFocus();
