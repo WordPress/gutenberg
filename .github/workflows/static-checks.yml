@@ -69,9 +69,7 @@ jobs:
                   cache: npm
 
             - name: Pin npm version for consistency
-              run: |
-                  npm install --global npm@10
-                  npm --version
+              uses: ./.github/setup-npm
 
             - name: npm install
               # A "full" install is executed, since `npm ci` does not always exit
@@ -170,9 +168,7 @@ jobs:
                   package-manager-cache: false
 
             - name: Pin npm version for consistency
-              run: |
-                  npm install --global npm@10
-                  npm --version
+              uses: ./.github/setup-npm
 
             - name: npm install
               # Not the setup-node composite action: its cached node_modules

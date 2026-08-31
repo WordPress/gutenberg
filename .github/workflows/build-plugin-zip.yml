@@ -247,9 +247,7 @@ jobs:
                   check-latest: true
 
             - name: Pin npm version for consistency
-              run: |
-                  npm install --global npm@10
-                  npm --version
+              uses: ./.github/setup-npm
 
             - name: Configure build for wordpress-develop
               if: ${{ ! matrix.IS_GUTENBERG_PLUGIN }}
@@ -570,9 +568,9 @@ jobs:
                   check-latest: true
 
             - name: Pin npm version for consistency
-              run: |
-                  npm install --global npm@10
-                  npm --version
+              uses: ./main/.github/setup-npm
+              with:
+                  working-directory: main
 
             - name: Publish packages to npm ("latest" dist-tag)
               run: |
