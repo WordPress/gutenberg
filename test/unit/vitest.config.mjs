@@ -4,7 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { playwright } from '@vitest/browser-playwright';
 import react from '@vitejs/plugin-react-swc';
-import globPackage from 'glob';
+import { globSync } from 'glob';
 import commonjs from 'vite-plugin-commonjs';
 import { defineConfig } from 'vitest/config';
 import {
@@ -33,7 +33,6 @@ const vitestTests = getVitestTestsByProject(
 	discoverTestFiles( ROOT_DIR ),
 	testMigration
 );
-const { sync: glob } = globPackage;
 const styleMockAlias = {
 	find: /^.*\.(?:css|scss)$/,
 	replacement: path.join( ROOT_DIR, 'test/unit/config/style-mock.vitest.js' ),
@@ -64,12 +63,15 @@ if (
 process.chdir( ROOT_DIR );
 process.env.TZ = 'UTC';
 
-const transpiledPackageNames = glob(
-	path.join( ROOT_DIR, 'packages/*/src/index.{js,ts,tsx}' )
-).map( ( fileName ) => {
-	const relative = path.relative( ROOT_DIR, fileName );
-	return relative.split( path.sep )[ 1 ];
-} );
+const transpiledPackageNames = globSync(
+	'packages/*/src/index.{js,jsx,ts,tsx}',
+	{ cwd: ROOT_DIR, absolute: true }
+)
+	.sort()
+	.map( ( fileName ) => {
+		const relative = path.relative( ROOT_DIR, fileName );
+		return relative.split( path.sep )[ 1 ];
+	} );
 
 export default defineConfig( {
 	root: ROOT_DIR,
@@ -146,7 +148,7 @@ export default defineConfig( {
 				find: /^@wordpress\/block-library\/build-module\/(.*)\.mjs$/,
 				replacement: path.join(
 					ROOT_DIR,
-					'packages/block-library/src/$1.js'
+					'packages/block-library/src/$1'
 				),
 			},
 			{

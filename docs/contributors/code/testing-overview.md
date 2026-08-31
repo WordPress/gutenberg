@@ -39,6 +39,8 @@ During the Jest-to-Vitest migration, run both `npm run test:unit` and `npm run t
 
 Keep your tests in a `test` folder in your working directory. The test file should have the same name as the test subject file.
 
+Use `*.jsdom.test.*` for tests that only require a virtual DOM. Use `*.browser.test.*` for tests that require Vitest Browser Mode. Leave Node-compatible test names without an environment suffix. The filename selects the test environment in both Jest and Vitest. During the migration, the manifest only selects the runner. Do not use per-file environment overrides.
+
 ```
 +-- test
 |   +-- bar.js
@@ -291,11 +293,11 @@ test( 'fires onChange when a new value is typed', async () => {
 
 ### Integration testing for block UI
 
-Integration testing is defined as a type of testing where different parts are tested as a group. In this case, the parts that we want to test are the different components that are required to be rendered for a specific block or editor logic. In the end, they are very similar to unit tests as they are run with the same command using the Jest library. The main difference is that for the integration tests the blocks are run within a [`special instance of the block editor`](https://github.com/WordPress/gutenberg/blob/trunk/test/integration/helpers/integration-test-editor.js#L60).
+Integration testing is defined as a type of testing where different parts are tested as a group. In this case, the parts that we want to test are the different components that are required to be rendered for a specific block or editor logic. In the end, they are very similar to unit tests as they are run with the same command using the Jest library. The main difference is that for the integration tests the blocks are run within a [`special instance of the block editor`](https://github.com/WordPress/gutenberg/blob/trunk/test/integration/helpers/integration-test-editor.jsx#L60).
 
 The advantage of this approach is that the bulk of a block editor's functionality (block toolbar and inspector panel interactions, etc.) can be tested without having to fire up the full e2e test framework. This means the tests can run much faster and more reliably. It is suggested that as much of a block's UI functionality as possible is covered with integration tests, with e2e tests used for interactions that require a full browser environment, eg. file uploads, drag and drop, etc.
 
-[`The Cover block`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/cover/test/edit.js) is an example of a block that uses this level of testing to provide coverage for a large percentage of the editor interactions.
+[`The Cover block`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/cover/test/edit.jsdom.test.js) is an example of a block that uses this level of testing to provide coverage for a large percentage of the editor interactions.
 
 To set up a jest file for integration tests:
 

@@ -4,9 +4,9 @@ import type {
 } from '@wordpress/widget-primitives';
 
 /**
- * Resolves the in-app route path of a link action. `download` and
- * `openInNewTab` targets always keep the plain anchor: both mean a new
- * document, which a client-side navigation cannot deliver.
+ * Resolves the in-app route path of a link action. `download` (any value
+ * but `false`) and `openInNewTab` keep the plain anchor: both mean a new
+ * document.
  *
  * @param {WidgetHostLinks | undefined} links  The host's `links` capability.
  * @param {WidgetAction}                action The action whose target to resolve.
@@ -16,7 +16,10 @@ export function getActionRoute(
 	links: WidgetHostLinks | undefined,
 	action: WidgetAction
 ): string | null {
-	if ( ! links || action.download || action.openInNewTab ) {
+	const isDownload =
+		action.download !== undefined && action.download !== false;
+
+	if ( ! links || isDownload || action.openInNewTab ) {
 		return null;
 	}
 
