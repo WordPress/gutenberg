@@ -3,6 +3,7 @@ const path = require( 'node:path' );
 const {
 	resolveBranches,
 	resolveShards,
+	computeBuildKey,
 	getTestedUpToMajor,
 	REFERENCE_COMMIT,
 } = require( '../resolve-performance-branches.mjs' );
@@ -34,23 +35,47 @@ describe( 'resolveBranches', () => {
 			} )
 		).toEqual( {
 			branches: [
-				{ name: sha, ref: sha, artifact: `plugin-${ sha }` },
-				{ name: 'trunk', ref: baseSha, artifact: 'plugin-trunk' },
+				{ name: sha, ref: sha, artifact: `plugin-${ sha }`, sha },
+				{
+					name: 'trunk',
+					ref: baseSha,
+					artifact: 'plugin-trunk',
+					sha: baseSha,
+					reusable: true,
+				},
 			],
 			wpVersion: '',
 		} );
 	} );
 
+	it( 'does not reuse a build for a base branch that is not trunk', () => {
+		const { branches } = resolveBranches( {
+			event: 'pull_request',
+			sha,
+			wpMajor: '7.1',
+			refExists,
+			baseSha,
+			baseRef: 'release/24.0',
+		} );
+		expect( branches[ 1 ].reusable ).toBeUndefined();
+	} );
+
 	it( 'compares a push with the reference commit on the tested WP version', () => {
 		expect(
-			resolveBranches( { event: 'push', sha, wpMajor: '7.1', refExists } )
+			resolveBranches( {
+				event: 'push',
+				sha,
+				wpMajor: '7.1',
+				refExists,
+			} )
 		).toEqual( {
 			branches: [
-				{ name: sha, ref: sha, artifact: `plugin-${ sha }` },
+				{ name: sha, ref: sha, artifact: `plugin-${ sha }`, sha },
 				{
 					name: REFERENCE_COMMIT,
 					ref: REFERENCE_COMMIT,
 					artifact: `plugin-${ REFERENCE_COMMIT }`,
+					sha: REFERENCE_COMMIT,
 				},
 			],
 			wpVersion: '7.1',
@@ -68,7 +93,11 @@ describe( 'resolveBranches', () => {
 			} )
 		).toEqual( {
 			branches: [
-				{ name: 'wp/7.1', ref: 'wp/7.1', artifact: 'plugin-wp-7-1' },
+				{
+					name: 'wp/7.1',
+					ref: 'wp/7.1',
+					artifact: 'plugin-wp-7-1',
+				},
 				{
 					name: 'release/23.9',
 					ref: 'release/23.9',
@@ -140,8 +169,16 @@ describe( 'resolveBranches', () => {
 			} )
 		).toEqual( {
 			branches: [
-				{ name: 'trunk', ref: 'trunk', artifact: 'plugin-trunk' },
-				{ name: 'v23.8.0', ref: 'v23.8.0', artifact: 'plugin-v23-8-0' },
+				{
+					name: 'trunk',
+					ref: 'trunk',
+					artifact: 'plugin-trunk',
+				},
+				{
+					name: 'v23.8.0',
+					ref: 'v23.8.0',
+					artifact: 'plugin-v23-8-0',
+				},
 			],
 			wpVersion: '7.0',
 		} );
@@ -192,6 +229,26 @@ describe( 'resolveBranches', () => {
 				refExists,
 			} )
 		).toThrow( 'Unsupported event' );
+	} );
+} );
+
+describe( 'computeBuildKey', () => {
+	it( 'changes with the packaged files', () => {
+		expect( computeBuildKey( 'lib build', 'workflow' ) ).not.toBe(
+			computeBuildKey( 'lib build readme.txt', 'workflow' )
+		);
+	} );
+
+	it( 'changes with the workflow that builds and packages', () => {
+		expect( computeBuildKey( 'lib build', 'workflow' ) ).not.toBe(
+			computeBuildKey( 'lib build', 'workflow with a new step' )
+		);
+	} );
+
+	it( 'is stable for the same inputs', () => {
+		expect( computeBuildKey( 'lib build', 'workflow' ) ).toBe(
+			computeBuildKey( 'lib build', 'workflow' )
+		);
 	} );
 } );
 
