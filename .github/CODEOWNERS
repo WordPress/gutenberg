@@ -19,7 +19,7 @@
 # Duotone
 /lib/block-supports/duotone.php
 /packages/block-editor/src/components/duotone-control
-/packages/block-editor/src/hooks/duotone.jsx			@sgomes
+/packages/block-editor/src/hooks/duotone.jsx
 /packages/components/src/duotone-picker
 
 # Editor
@@ -58,21 +58,21 @@
 /tools                                          @manzoorwanijk
 /tools/eslint/suppressions.json
 /tools/stylelint/stylelint-suppressions.json
-/packages/babel-plugin-import-jsx-pragma        @ntwb @ajitbohra
-/packages/babel-plugin-makepot                  @ntwb @ajitbohra
+/packages/babel-plugin-import-jsx-pragma
+/packages/babel-plugin-makepot
 /packages/babel-preset-default
-/packages/browserslist-config                   @ntwb @ajitbohra
+/packages/browserslist-config
 /packages/create-block
-/packages/create-block-tutorial-template        @ryanwelcher
+/packages/create-block-tutorial-template
 /packages/dependency-extraction-webpack-plugin
 /packages/docgen
 /packages/e2e-tests
 /packages/e2e-test-utils-playwright
 /packages/eslint-plugin
-/packages/jest-console                          @ntwb @ajitbohra
+/packages/jest-console
 /packages/jest-preset-default
-/packages/npm-package-json-lint-config          @ntwb @ajitbohra
-/packages/postcss-themes                        @ntwb @ajitbohra
+/packages/npm-package-json-lint-config
+/packages/postcss-themes
 /packages/prettier-config
 /packages/scripts
 /packages/stylelint-config
@@ -141,6 +141,6 @@
 /lib/block-supports/layout.php                  @tellthemachines
 /lib/class-wp-theme-json-gutenberg.php          @tellthemachines
 /lib/compat/*/html-api                          @dmsnell
-/lib/experimental/rest-api.php                  @timothybjacobs
+/lib/experimental/rest-api.php
 /lib/experimental/class-wp-rest-*
 /lib/experimental/class-wp-rest-block-editor-settings-controller.php
