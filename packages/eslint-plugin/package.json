@@ -51,7 +51,7 @@
 		"eslint-config-prettier": "^10.0.0",
 		"eslint-import-resolver-typescript": "^4.4.4",
 		"eslint-plugin-import": "^2.32.0",
-		"eslint-plugin-jest": "^29.16.0",
+		"eslint-plugin-jest": "^29.16.5",
 		"eslint-plugin-jsdoc": "^50.0.0",
 		"eslint-plugin-jsx-a11y": "^6.10.0",
 		"eslint-plugin-playwright": "^2.1.0",
@@ -65,7 +65,7 @@
 	"devDependencies": {
 		"@types/eslint": "^9",
 		"@types/estree": "^1.0.8",
-		"@typescript-eslint/parser": "^8.57.1",
+		"@typescript-eslint/parser": "^8.68.0",
 		"eslint": "^10.0.0",
 		"typescript": "npm:@typescript/typescript6@^6.0.2"
 	},

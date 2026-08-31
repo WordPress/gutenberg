@@ -22,7 +22,7 @@ function writeJson( path, contents ) {
  * given packages.
  *
  * @param {Object} repo          Repository description.
- * @param {Object} repo.packages Package name to `{ tsconfigs, dependencies }`.
+ * @param {Object} repo.packages Package name to `{ tsconfigs, dependencies, devDependencies }`.
  * @param {Object} [repo.routes] Route name to `{ tsconfigs, dependencies, devDependencies, manifest }`.
  * @param {Array}  repo.build    References of the build solution.
  * @param {Array}  repo.root     References of the root solution.
@@ -69,15 +69,17 @@ function createRepo( { packages, routes, build, root } ) {
 		}
 	}
 
-	for ( const [ name, { tsconfigs, dependencies } ] of Object.entries(
-		packages
-	) ) {
+	for ( const [
+		name,
+		{ tsconfigs, dependencies, devDependencies },
+	] of Object.entries( packages ) ) {
 		const packageDir = join( repoRoot, 'packages', name );
 		mkdirSync( packageDir, { recursive: true } );
 		writeJson( join( packageDir, 'package.json' ), {
 			name: `@wordpress/${ name }`,
 			version: '1.0.0',
 			...( dependencies && { dependencies } ),
+			...( devDependencies && { devDependencies } ),
 		} );
 		for ( const [ fileName, tsconfig ] of Object.entries( tsconfigs ) ) {
 			const { references = [], ...rest } = Array.isArray( tsconfig )
@@ -828,4 +830,46 @@ test( 'passes when a route test project covers the test files', () => {
 	);
 	expect( stderr ).toBe( '' );
 	expect( status ).toBe( 0 );
+} );
+
+test( 'fails when a package references a package that is not a dependency', () => {
+	const result = runValidator(
+		createRepo( {
+			packages: {
+				blob: splitPackage,
+				blocks: {
+					tsconfigs: {
+						'tsconfig.json': [ '../blob/tsconfig.build.json' ],
+					},
+				},
+			},
+			build: [ 'packages/blob/tsconfig.build.json', 'packages/blocks' ],
+			root: [ './tsconfig.build.json', 'packages/blob' ],
+		} )
+	);
+
+	expect( result.status ).not.toBe( 0 );
+	expect( result.stderr ).toContain(
+		'Reference to "packages/blob" in packages/blocks/tsconfig.json without a dependency on "@wordpress/blob"'
+	);
+} );
+
+test( 'passes when a reference is backed by a devDependency', () => {
+	const result = runValidator(
+		createRepo( {
+			packages: {
+				blob: splitPackage,
+				blocks: {
+					tsconfigs: {
+						'tsconfig.json': [ '../blob/tsconfig.build.json' ],
+					},
+					devDependencies: { '@wordpress/blob': 'file:../blob' },
+				},
+			},
+			build: [ 'packages/blob/tsconfig.build.json', 'packages/blocks' ],
+			root: [ './tsconfig.build.json', 'packages/blob' ],
+		} )
+	);
+
+	expect( result.status ).toBe( 0 );
 } );
