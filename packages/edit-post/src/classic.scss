@@ -5,7 +5,7 @@
 // Specificity is kept at this level as many classic themes output
 // rules like figure { margin: 0; } which would break centering.
 // These rules should also not apply to direct children of flex layout blocks.
-.editor-styles-wrapper :where(:not(.is-layout-flex, .is-layout-grid)) > .wp-block {
+.editor-styles-wrapper :where(:not(.is-layout-flex, .is-layout-grid)) > .wp-block:where(:not(.wp-block-list .wp-block-list)) {
 	margin-left: auto;
 	margin-right: auto;
 }
