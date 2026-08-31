@@ -1,4 +1,11 @@
-import { isValidHref, getFormatBoundary } from '../utils';
+import {
+	isValidHref,
+	getFormatBoundary,
+	hasInlineReplacements,
+	createLinkTextValueFromDisplayTitle,
+} from '../utils';
+
+const OBJECT_REPLACEMENT_CHARACTER = '\ufffc';
 
 describe( 'isValidHref', () => {
 	it( 'returns true if the href cannot be recognised as a url or an anchor link', () => {
@@ -451,6 +458,115 @@ describe( 'getFormatBoundary', () => {
 		).toEqual( {
 			start: 0,
 			end: 5,
+		} );
+	} );
+} );
+
+describe( 'hasInlineReplacements', () => {
+	it( 'returns true when the value includes inline replacements', () => {
+		expect(
+			hasInlineReplacements( {
+				text: `a${ OBJECT_REPLACEMENT_CHARACTER }b`,
+				replacements: [ undefined, { type: 'core/image' } ],
+			} )
+		).toBe( true );
+	} );
+
+	it( 'returns false when the value has no inline replacements', () => {
+		expect(
+			hasInlineReplacements( {
+				text: 'abc',
+				replacements: [],
+			} )
+		).toBe( false );
+	} );
+} );
+
+describe( 'createLinkTextValueFromDisplayTitle', () => {
+	const imageReplacement = {
+		type: 'core/image',
+		attributes: {
+			url: 'https://example.com/image.jpg',
+		},
+	};
+
+	it( 'returns plain text when there are no inline replacements', () => {
+		expect(
+			createLinkTextValueFromDisplayTitle(
+				{
+					text: 'Hello',
+					formats: [],
+					replacements: [],
+				},
+				'Hi'
+			)
+		).toEqual( {
+			text: 'Hi',
+			formats: [],
+			replacements: [],
+		} );
+	} );
+
+	it( 'prepends display text for image-only links', () => {
+		expect(
+			createLinkTextValueFromDisplayTitle(
+				{
+					text: OBJECT_REPLACEMENT_CHARACTER,
+					formats: [ [] ],
+					replacements: [ imageReplacement ],
+				},
+				'Click here'
+			)
+		).toEqual( {
+			text: `Click here${ OBJECT_REPLACEMENT_CHARACTER }`,
+			formats: [ ...Array( 'Click here'.length ).fill( undefined ), [] ],
+			replacements: [
+				...Array( 'Click here'.length ).fill( undefined ),
+				imageReplacement,
+			],
+		} );
+	} );
+
+	it( 'preserves inline replacements when editing mixed link text', () => {
+		expect(
+			createLinkTextValueFromDisplayTitle(
+				{
+					text: `Hello${ OBJECT_REPLACEMENT_CHARACTER } world`,
+					formats: [],
+					replacements: [
+						undefined,
+						undefined,
+						undefined,
+						undefined,
+						undefined,
+						imageReplacement,
+						undefined,
+						undefined,
+						undefined,
+						undefined,
+						undefined,
+						undefined,
+						undefined,
+					],
+				},
+				'Hi world'
+			)
+		).toEqual( {
+			text: `Hi${ OBJECT_REPLACEMENT_CHARACTER } world`,
+			formats: Array(
+				`Hi${ OBJECT_REPLACEMENT_CHARACTER } world`.length
+			).fill( undefined ),
+			replacements: [
+				undefined,
+				undefined,
+				imageReplacement,
+				undefined,
+				undefined,
+				undefined,
+				undefined,
+				undefined,
+				undefined,
+			],
 		} );
 	} );
 } );

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Link UI: hide inline image placeholders from the editable link title and preserve inline images when updating link text. ([#82206](https://github.com/WordPress/gutenberg/pull/82206))
+
 ### Internal
 
 -   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).

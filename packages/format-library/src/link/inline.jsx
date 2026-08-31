@@ -14,13 +14,20 @@ import {
 	split,
 	concat,
 	useAnchor,
+	getTextContent,
 } from '@wordpress/rich-text';
 import {
 	LinkControl,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { createLinkFormat, isValidHref, getFormatBoundary } from './utils';
+import {
+	createLinkFormat,
+	isValidHref,
+	getFormatBoundary,
+	hasInlineReplacements,
+	createLinkTextValueFromDisplayTitle,
+} from './utils';
 import { link as settings } from './index';
 import CSSClassesSettingComponent from './css-classes-setting';
 
@@ -57,7 +64,8 @@ function InlineLinkUI( {
 } ) {
 	const richLinkTextValue = getRichTextValueFromSelection( value, isActive );
 
-	// Get the text content minus any HTML tags.
+	// Omit object replacement characters from the editable link title.
+	const linkDisplayTitle = getTextContent( richLinkTextValue );
 	const richTextText = richLinkTextValue.text;
 
 	const { selectionChange } = useDispatch( blockEditorStore );
@@ -84,7 +92,7 @@ function InlineLinkUI( {
 			id: activeAttributes.id,
 			opensInNewTab: activeAttributes.target === '_blank',
 			nofollow: activeAttributes.rel?.includes( 'nofollow' ),
-			title: richTextText,
+			title: linkDisplayTitle,
 			cssClasses: activeAttributes.class,
 		} ),
 		[
@@ -94,7 +102,7 @@ function InlineLinkUI( {
 			activeAttributes.target,
 			activeAttributes.type,
 			activeAttributes.url,
-			richTextText,
+			linkDisplayTitle,
 		]
 	);
 
@@ -128,7 +136,8 @@ function InlineLinkUI( {
 			cssClasses: nextValue.cssClasses,
 		} );
 
-		const newText = nextValue.title || newUrl;
+		const submittedDisplayTitle = nextValue.title ?? linkDisplayTitle;
+		const newText = submittedDisplayTitle || newUrl;
 
 		// Scenario: we have any active text selection or an active format.
 		let newValue;
@@ -157,7 +166,7 @@ function InlineLinkUI( {
 			} );
 
 			return;
-		} else if ( newText === richTextText ) {
+		} else if ( submittedDisplayTitle === linkDisplayTitle ) {
 			// Use explicit format boundaries rather than relying on
 			// the current selection which may be collapsed or
 			// misaligned after external value changes.
@@ -173,11 +182,20 @@ function InlineLinkUI( {
 		} else {
 			// Scenario: Editing an existing link.
 
-			// Create new RichText value for the new text in order that we
-			// can apply formats to it.
-			newValue = create( { text: newText } );
-			// Apply the new Link format to this new text value.
-			newValue = applyFormat( newValue, linkFormat, 0, newText.length );
+			const newTextValue = hasInlineReplacements( richLinkTextValue )
+				? createLinkTextValueFromDisplayTitle(
+						richLinkTextValue,
+						submittedDisplayTitle
+				  )
+				: create( { text: submittedDisplayTitle } );
+
+			// Apply the new Link format to the updated text value.
+			newValue = applyFormat(
+				newTextValue,
+				linkFormat,
+				0,
+				newTextValue.text.length
+			);
 
 			// Get the boundaries of the active link format.
 			const boundary = getFormatBoundary( value, {
