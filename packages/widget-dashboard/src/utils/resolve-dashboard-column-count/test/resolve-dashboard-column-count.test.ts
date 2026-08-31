@@ -21,10 +21,10 @@ describe( 'resolveDashboardColumnCap', () => {
 		).toBe( WIDGET_DASHBOARD_COLUMN_COUNT );
 	} );
 
-	it( 'never raises the count above the package default', () => {
+	it( 'renders counts above the package default as asked', () => {
 		expect(
 			resolveDashboardColumnCap( WIDGET_DASHBOARD_COLUMN_COUNT + 2 )
-		).toBe( WIDGET_DASHBOARD_COLUMN_COUNT );
+		).toBe( WIDGET_DASHBOARD_COLUMN_COUNT + 2 );
 	} );
 
 	it( 'never drops below one column', () => {
@@ -116,6 +116,16 @@ describe( 'resolveDashboardColumnCount', () => {
 				)
 			).toBe( 1 );
 			expect( resolveDashboardColumnCount( 1200, 1 ) ).toBe( 1 );
+		} );
+
+		it( 'uses a count above the default on wide containers', () => {
+			expect( resolveDashboardColumnCount( 1200, 6 ) ).toBe( 6 );
+			expect(
+				resolveDashboardColumnCount(
+					WIDGET_DASHBOARD_CONTAINER_BREAKPOINT_TWO_COLUMNS - 1,
+					6
+				)
+			).toBe( 2 );
 		} );
 
 		it( 'keeps a cap of two flat across the middle and wide bands', () => {

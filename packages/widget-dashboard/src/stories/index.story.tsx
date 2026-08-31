@@ -27,6 +27,8 @@ import type {
 	WidgetRenderProps,
 	WidgetType,
 } from '@wordpress/widget-primitives';
+import { ROW_HEIGHT_PRESETS } from '../utils/row-height-presets';
+import type { RowHeightPreset } from '../utils/row-height-presets';
 import { WidgetDashboard } from '../widget-dashboard';
 import type { CanPerformDashboardOperation, DashboardWidget } from '../types';
 
@@ -782,6 +784,127 @@ Switch the \`profile\` control. A Viewer gets no Customize button, no attribute 
 Switch the section, then open "Add widget": the listing follows the section, even while open; the excluded types keep rendering where already placed because the \`widgetTypes\` registry never changes.
 
 Nested policies compose restrictively; without a policy, every operation is allowed. See the **Policy** page for the contract.
+`,
+			},
+		},
+	},
+};
+
+// A fuller board than INITIAL_LAYOUT: a hero spanning the whole first row at
+// any column count (the grid clamps the span), then a rank of small tiles so
+// the columns control visibly repacks them.
+const GRID_SETTINGS_LAYOUT: DashboardWidget[] = [
+	{
+		uuid: 'grid-settings-traffic-week',
+		type: 'demo/traffic-snapshot',
+		attributes: { metric: 'views', period: 'week', label: 'Traffic' },
+		placement: { width: 2, height: 1, order: 1 },
+	},
+	{
+		uuid: 'grid-settings-goal-revenue',
+		type: 'demo/goal-progress',
+		attributes: { metric: 'revenue', target: '5000' },
+		placement: { width: 1, height: 1, order: 2 },
+	},
+	{
+		uuid: 'grid-settings-audience-tall',
+		type: 'demo/traffic-snapshot',
+		attributes: { metric: 'visitors', period: 'month', label: 'Audience' },
+		placement: { width: 1, height: 2, order: 3 },
+	},
+	{
+		uuid: 'grid-settings-goal-orders',
+		type: 'demo/goal-progress',
+		attributes: { metric: 'orders', target: '1000' },
+		placement: { width: 2, height: 1, order: 4 },
+	},
+	{
+		uuid: 'grid-settings-traffic-day',
+		type: 'demo/traffic-snapshot',
+		attributes: { metric: 'views', period: 'day', label: 'Today' },
+		placement: { width: 1, height: 1, order: 5 },
+	},
+	{
+		uuid: 'grid-settings-goal-stretch',
+		type: 'demo/goal-progress',
+		attributes: { metric: 'revenue', target: '10000' },
+		placement: { width: 1, height: 1, order: 6 },
+	},
+];
+
+type GridSettingsStoryProps = {
+	columns: number;
+	model: 'grid' | 'masonry';
+	rowHeight: RowHeightPreset;
+};
+
+function GridSettingsStory( {
+	columns,
+	model,
+	rowHeight,
+}: GridSettingsStoryProps ) {
+	const [ layout, setLayout ] =
+		useState< DashboardWidget[] >( GRID_SETTINGS_LAYOUT );
+	const [ editMode, setEditMode ] = useState( false );
+
+	return (
+		<WidgetDashboard
+			widgetTypes={ [
+				trafficSnapshotWidgetType,
+				goalProgressWidgetType,
+			] }
+			layout={ layout }
+			onLayoutChange={ setLayout }
+			editMode={ editMode }
+			onEditChange={ setEditMode }
+			resolveWidgetModule={ resolveDemoModule }
+			gridSettings={ {
+				model,
+				columns,
+				rowHeight: ROW_HEIGHT_PRESETS[ rowHeight ],
+			} }
+		>
+			<Page
+				title="Dashboard"
+				subTitle={ `Standard grid, ${ columns } columns on a wide container, stepping down to 2 and then one as it narrows.` }
+				actions={ <WidgetDashboard.Actions /> }
+				showSidebarToggle={ false }
+				hasPadding
+			>
+				<WidgetDashboard.Widgets />
+			</Page>
+		</WidgetDashboard>
+	);
+}
+
+export const GridSettings: StoryObj< GridSettingsStoryProps > = {
+	render: ( args ) => <GridSettingsStory { ...args } />,
+	args: {
+		columns: 4,
+		model: 'grid',
+		rowHeight: 'medium',
+	},
+	argTypes: {
+		columns: {
+			control: { type: 'range', min: 1, max: 12, step: 1 },
+			description:
+				'Wide-container column count. The host decides; the package only floors it at one.',
+		},
+		model: {
+			control: 'radio',
+			options: [ 'grid', 'masonry' ],
+		},
+		rowHeight: {
+			control: 'radio',
+			options: Object.keys( ROW_HEIGHT_PRESETS ),
+		},
+	},
+	parameters: {
+		controls: { include: [ 'columns', 'model', 'rowHeight' ] },
+		docs: {
+			description: {
+				story: `
+The \`gridSettings\` prop carries the host's layout decisions. \`columns\` sets the wide-container count — \`WIDGET_DASHBOARD_COLUMN_COUNT\` is only the default when the host sets nothing — and container width steps the effective count down to \`min( 2, count )\` and then one as it narrows. Drag the columns control; resize the canvas to watch the steps.
 `,
 			},
 		},

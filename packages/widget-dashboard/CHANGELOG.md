@@ -20,10 +20,12 @@
 
 ### Enhancements
 
--   `gridSettings.columns` now lowers the column cap on wide containers, from
-    `1` to `WIDGET_DASHBOARD_COLUMN_COUNT`; the responsive steps scale from
-    the cap. Defaults are unchanged: `DEFAULT_GRID` keeps four columns
-    ([#82204](https://github.com/WordPress/gutenberg/pull/82204)).
+-   `gridSettings.columns` now sets the wide-container column count (floored,
+    with a floor of one); the responsive steps scale from it.
+    `WIDGET_DASHBOARD_COLUMN_COUNT` is the default when the host sets
+    nothing, and the wp-admin dashboard pins it where it reads its stored
+    settings, so preferences persisted by the removed Columns control stay
+    inert ([#82204](https://github.com/WordPress/gutenberg/pull/82204)).
 
 ### Internal
 

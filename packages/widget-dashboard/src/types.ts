@@ -112,10 +112,10 @@ export interface WidgetContextValue {
 export type WidgetGridModel = 'grid' | 'masonry';
 
 /**
- * Default and maximum column count for the widget dashboard on wide
- * containers. A host may lower it through `gridSettings.columns`; container
- * width then steps the effective count down at fixed breakpoints: the cap,
- * then `min( 2, cap )`, then one column. Not a user-facing setting.
+ * Column count used on wide containers when the host sets no
+ * `gridSettings.columns`. A default, not a ceiling: the package renders
+ * whatever count the host asks for. The four-column wp-admin dashboard is
+ * that page's own decision, pinned where it reads its stored settings.
  */
 export const WIDGET_DASHBOARD_COLUMN_COUNT = 4;
 
@@ -133,11 +133,11 @@ export const WIDGET_DASHBOARD_COLUMN_COUNT = 4;
  */
 interface BaseWidgetGridSettings {
 	/**
-	 * Column cap on wide containers. A finite value is floored and clamped
-	 * between `1` and {@link WIDGET_DASHBOARD_COLUMN_COUNT}; an absent or
-	 * non-finite value resolves to the constant. Container width steps the
-	 * effective count down from the cap: `min( 2, cap )` in the middle band,
-	 * one column below it.
+	 * Column count on wide containers. A finite value is floored, with a
+	 * floor of one and no ceiling; an absent or non-finite value resolves to
+	 * {@link WIDGET_DASHBOARD_COLUMN_COUNT}. Container width steps the
+	 * effective count down: `min( 2, count )` in the middle band, one
+	 * column below it.
 	 */
 	columns?: number;
 

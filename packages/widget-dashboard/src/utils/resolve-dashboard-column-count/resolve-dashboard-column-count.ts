@@ -13,22 +13,20 @@ export const WIDGET_DASHBOARD_CONTAINER_BREAKPOINT_ONE_COLUMN = 600;
 export const WIDGET_DASHBOARD_CONTAINER_BREAKPOINT_TWO_COLUMNS = 960;
 
 /**
- * Resolves the column cap a host asked for. A finite value is floored and
- * clamped between one and {@link WIDGET_DASHBOARD_COLUMN_COUNT}; an absent
- * or non-finite value resolves to the package default.
+ * Resolves the wide-container column count a host asked for. A finite value
+ * is floored, with a floor of one and no ceiling: how many columns a surface
+ * can carry is the host's decision, not the package's. An absent or
+ * non-finite value resolves to {@link WIDGET_DASHBOARD_COLUMN_COUNT}.
  *
  * @param columns Host-provided `gridSettings.columns`, if any.
- * @return Column cap for wide containers.
+ * @return Column count for wide containers.
  */
 export function resolveDashboardColumnCap( columns?: number ): number {
 	if ( typeof columns !== 'number' || ! Number.isFinite( columns ) ) {
 		return WIDGET_DASHBOARD_COLUMN_COUNT;
 	}
 
-	return Math.min(
-		WIDGET_DASHBOARD_COLUMN_COUNT,
-		Math.max( 1, Math.floor( columns ) )
-	);
+	return Math.max( 1, Math.floor( columns ) );
 }
 
 /**
