@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Math: Declare `interactivity.clientNavigation` support. The block's front end output is static markup, and without the declaration a Math block inside a Query block forced full page reloads on pagination ([#82248](https://github.com/WordPress/gutenberg/pull/82248)).
+
 ### Bug Fixes
 
 -   Tabs: Activate the tab that a URL hash points into, so an anchor set on a block inside a tab panel can be reached. Anchor links followed after the page has loaded are handled too, matching the Accordion block ([#81744](https://github.com/WordPress/gutenberg/pull/81744)).

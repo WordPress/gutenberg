@@ -104,6 +104,16 @@ export type ToolsPanelHeaderProps = {
 
 export type ToolsPanelItem = {
 	/**
+	 * For optional items only, this determines whether the item is shown on
+	 * first render even when `hasValue()` returns `false`.
+	 *
+	 * An item is always shown while it has a value, so this only controls the
+	 * initial state of items without one.
+	 *
+	 * @default false
+	 */
+	defaultShown?: boolean;
+	/**
 	 * This is called when building the `ToolsPanel` menu to determine the
 	 * item's initial checked state.
 	 */
@@ -125,6 +135,27 @@ export type ToolsPanelItem = {
 	 * panel.
 	 */
 	label: string;
+	/**
+	 * A callback executed when the user shows or hides the item via the
+	 * `ToolsPanel` menu, passed `true` when it was shown and `false` when it
+	 * was hidden.
+	 *
+	 * Unlike `onDeselect`, this fires whether or not the item has a value, and
+	 * only in response to an explicit menu action. Visibility changes with
+	 * another cause do not trigger it, such as an item becoming visible
+	 * because it received a value or because `defaultShown` was set, or
+	 * hiding because `Reset all` ran.
+	 *
+	 * Items flagged with `isShownByDefault` are always visible and stay so when
+	 * toggled off, so this is never called for them.
+	 *
+	 * A single menu action may also call `onSelect` or `onDeselect`, which are
+	 * unchanged. Showing an item without a value calls this with `true` and
+	 * `onSelect`; hiding an item that has a value calls this with `false` and
+	 * `onDeselect`. Use this callback to track visibility and `onDeselect` to
+	 * reset a value, rather than treating them as interchangeable.
+	 */
+	onShownChange?: ( isShown: boolean ) => void;
 	/**
 	 * Panel items will ensure they are only registering with their intended panel
 	 * by comparing the `panelId` props set on both the item and the panel itself,
