@@ -61,7 +61,7 @@ import {
 import useImageSizes from './use-image-sizes';
 import useGetNewImages from './use-get-new-images';
 import useGetMedia from './use-get-media';
-import GalleryFlexStyles from './flex-styles';
+import GalleryStyles from './gallery-styles';
 import useDynamicGallery from './use-dynamic-gallery';
 import { GallerySourcePanel, GalleryDynamicView } from './dynamic-gallery';
 import { getDynamicSource, ATTACHED_MEDIA } from './dynamic-source';
@@ -268,6 +268,10 @@ export default function GalleryEdit( props ) {
 		: {};
 	const baseColumns = isValidGalleryColumns( columns ) ? columns : undefined;
 	const baseImageCrop = typeof imageCrop === 'boolean' ? imageCrop : true;
+	// Normalized so a Gallery with no aspect ratio and one explicitly set to
+	// Original compare equal, and a viewport override matching either is
+	// dropped rather than stored.
+	const baseAspectRatio = aspectRatio || 'auto';
 	const hasViewportColumns =
 		isViewportStyleState &&
 		Object.hasOwn( viewportStyle, 'columns' ) &&
@@ -276,12 +280,24 @@ export default function GalleryEdit( props ) {
 		isViewportStyleState &&
 		Object.hasOwn( viewportStyle, 'imageCrop' ) &&
 		typeof viewportStyle.imageCrop === 'boolean';
+	// `'auto'` is a value here rather than the absence of one: it cancels a
+	// base aspect ratio for this viewport. Any stored ratio counts as a value,
+	// so the control reports what the block holds; whether a ratio can be
+	// emitted as CSS is decided when the responsive styles are generated.
+	const hasViewportAspectRatio =
+		isViewportStyleState &&
+		Object.hasOwn( viewportStyle, 'aspectRatio' ) &&
+		typeof viewportStyle.aspectRatio === 'string' &&
+		!! viewportStyle.aspectRatio;
 	const activeColumns = hasViewportColumns
 		? viewportStyle.columns
 		: baseColumns;
 	const activeImageCrop = hasViewportImageCrop
 		? viewportStyle.imageCrop
 		: baseImageCrop;
+	const activeAspectRatio = hasViewportAspectRatio
+		? viewportStyle.aspectRatio
+		: baseAspectRatio;
 
 	const images = useMemo(
 		() =>
@@ -574,7 +590,7 @@ export default function GalleryEdit( props ) {
 		);
 	}
 
-	function setGalleryFlexSettings( settings ) {
+	function setGallerySettings( settings ) {
 		if ( ! isViewportStyleState ) {
 			setAttributes( settings );
 			return;
@@ -587,6 +603,7 @@ export default function GalleryEdit( props ) {
 				baseSettings: {
 					columns: baseColumns,
 					imageCrop: baseImageCrop,
+					aspectRatio: baseAspectRatio,
 				},
 				settings,
 			} ),
@@ -594,11 +611,11 @@ export default function GalleryEdit( props ) {
 	}
 
 	function setColumnsNumber( value ) {
-		setGalleryFlexSettings( { columns: value } );
+		setGallerySettings( { columns: value } );
 	}
 
 	function toggleImageCrop() {
-		setGalleryFlexSettings( { imageCrop: ! activeImageCrop } );
+		setGallerySettings( { imageCrop: ! activeImageCrop } );
 	}
 
 	function toggleRandomOrder() {
@@ -663,31 +680,56 @@ export default function GalleryEdit( props ) {
 		);
 	}
 
+	/**
+	 * Sets the Gallery's aspect ratio.
+	 *
+	 * The base value is pushed down to the images, which carry it as an inline
+	 * style. A viewport value is instead stored on the Gallery and rendered
+	 * from its responsive CSS, which overrides that inline style for the
+	 * viewport only — and so covers dynamic galleries, where there are no inner
+	 * image blocks to push anything to.
+	 *
+	 * @param {string|undefined} value Aspect ratio to set. In a viewport state
+	 *                                 `'auto'` is an override that cancels the
+	 *                                 base ratio, while `undefined` removes the
+	 *                                 override so the base value applies again.
+	 */
 	function setAspectRatio( value ) {
-		setAttributes( { aspectRatio: value } );
+		if ( isViewportStyleState ) {
+			setGallerySettings( { aspectRatio: value } );
+		} else {
+			const cleanValue = ! value || value === 'auto' ? undefined : value;
+			setAttributes( { aspectRatio: value ?? 'auto' } );
 
-		// Update all inner image blocks with the new aspect ratio
-		const changedAttributes = {};
-		const blocks = [];
+			// Update all inner image blocks with the new aspect ratio
+			const changedAttributes = {};
+			const blocks = [];
 
-		getBlock( clientId ).innerBlocks.forEach( ( block ) => {
-			blocks.push( block.clientId );
-			changedAttributes[ block.clientId ] = {
-				aspectRatio: value === 'auto' ? undefined : value,
-			};
-		} );
+			getBlock( clientId ).innerBlocks.forEach( ( block ) => {
+				blocks.push( block.clientId );
+				changedAttributes[ block.clientId ] = {
+					aspectRatio: cleanValue,
+					// Ensure object-fit: cover is applied when aspect-ratio is set,
+					// regardless of gallery layout and crop to fit status.
+					scale: cleanValue ? 'cover' : undefined,
+				};
+			} );
 
-		updateBlockAttributes( blocks, changedAttributes, true );
+			updateBlockAttributes( blocks, changedAttributes, true );
+		}
 
+		// Removing a viewport override restores the base value, so the notice
+		// reports the ratio the images end up with either way.
+		const noticeValue = value ?? baseAspectRatio;
 		const aspectRatioText = aspectRatioOptions.find(
-			( option ) => option.value === value
+			( option ) => option.value === noticeValue
 		);
 
 		createSuccessNotice(
 			sprintf(
 				/* translators: %s: aspect ratio setting */
 				__( 'All gallery images updated to aspect ratio: %s' ),
-				aspectRatioText?.label || value
+				aspectRatioText?.label || noticeValue
 			),
 			{
 				id: 'gallery-attributes-aspectRatio',
@@ -805,12 +847,16 @@ export default function GalleryEdit( props ) {
 	}
 
 	const hasLinkTo = linkTo && linkTo !== 'none';
+	// Columns and crop to fit are Flex-only, so a Gallery in another layout has
+	// viewport settings to show only when aspect ratios are available. Without
+	// this the viewport Settings panel would render empty.
+	const hasViewportSettings = isFlexLayout || aspectRatioOptions.length > 1;
 
 	return (
 		<>
 			<InspectorControls
 				group={
-					isViewportStyleState && isFlexLayout
+					isViewportStyleState && hasViewportSettings
 						? 'viewport'
 						: 'default'
 				}
@@ -826,9 +872,10 @@ export default function GalleryEdit( props ) {
 					label={ __( 'Settings' ) }
 					resetAll={ () => {
 						if ( isViewportStyleState ) {
-							setGalleryFlexSettings( {
+							setGallerySettings( {
 								columns: undefined,
 								imageCrop: undefined,
+								aspectRatio: undefined,
 							} );
 							return;
 						}
@@ -919,7 +966,7 @@ export default function GalleryEdit( props ) {
 									: ! activeImageCrop
 							}
 							onDeselect={ () =>
-								setGalleryFlexSettings( {
+								setGallerySettings( {
 									imageCrop: isViewportStyleState
 										? undefined
 										: true,
@@ -963,27 +1010,35 @@ export default function GalleryEdit( props ) {
 							/>
 						</ToolsPanelItem>
 					) }
-					{ ! isViewportStyleState &&
-						aspectRatioOptions.length > 1 && (
-							<ToolsPanelItem
-								hasValue={ () =>
-									!! aspectRatio && aspectRatio !== 'auto'
-								}
+					{ aspectRatioOptions.length > 1 && (
+						<ToolsPanelItem
+							hasValue={ () =>
+								isViewportStyleState
+									? hasViewportAspectRatio
+									: activeAspectRatio !== 'auto'
+							}
+							label={ __( 'Aspect ratio' ) }
+							onDeselect={ () =>
+								// In a viewport state this clears the override
+								// so the base ratio applies again, rather than
+								// overriding it with Original.
+								setAspectRatio(
+									isViewportStyleState ? undefined : 'auto'
+								)
+							}
+							isShownByDefault
+						>
+							<SelectControl
 								label={ __( 'Aspect ratio' ) }
-								onDeselect={ () => setAspectRatio( 'auto' ) }
-								isShownByDefault
-							>
-								<SelectControl
-									label={ __( 'Aspect ratio' ) }
-									help={ __(
-										'Set a consistent aspect ratio for all images in the gallery.'
-									) }
-									value={ aspectRatio }
-									options={ aspectRatioOptions }
-									onChange={ setAspectRatio }
-								/>
-							</ToolsPanelItem>
-						) }
+								help={ __(
+									'Set a consistent aspect ratio for all images in the gallery.'
+								) }
+								value={ activeAspectRatio }
+								options={ aspectRatioOptions }
+								onChange={ setAspectRatio }
+							/>
+						</ToolsPanelItem>
+					) }
 					{ ! isViewportStyleState &&
 						lightboxSetting?.allowEditing &&
 						hasLightboxImages && (
@@ -1077,12 +1132,11 @@ export default function GalleryEdit( props ) {
 						/>
 					</BlockControls>
 				) }
-				{ isFlexLayout && (
-					<GalleryFlexStyles
-						style={ attributes.style }
-						clientId={ clientId }
-					/>
-				) }
+				<GalleryStyles
+					style={ attributes.style }
+					clientId={ clientId }
+					isFlexLayout={ isFlexLayout }
+				/>
 			</>
 			{ isDynamic ? (
 				<GalleryDynamicView

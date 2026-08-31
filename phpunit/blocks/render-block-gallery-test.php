@@ -358,6 +358,83 @@ class Tests_Blocks_Render_Gallery extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'width:100%', $stylesheet );
 	}
 
+	public function test_static_gallery_outputs_viewport_aspect_ratio_style_in_any_layout() {
+		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
+
+		// A Grid Gallery: the column and crop rules don't apply to it, but the
+		// aspect ratio does, so it still needs the per-instance stylesheet.
+		$output     = do_blocks(
+			'<!-- wp:gallery {"layout":{"type":"grid"},"style":{"@mobile":{"aspectRatio":"16/9"}}} --><figure class="wp-block-gallery has-nested-images"><!-- wp:image --><figure class="wp-block-image"><img alt=""/></figure><!-- /wp:image --></figure><!-- /wp:gallery -->'
+		);
+		$stylesheet = gutenberg_style_engine_get_stylesheet_from_context(
+			'block-supports',
+			array( 'prettify' => false )
+		);
+
+		$this->assertMatchesRegularExpression( '/\bwp-block-gallery-\d+\b/', $output );
+		$this->assertStringContainsString( '@media (width <= 480px)', $stylesheet );
+		$this->assertStringContainsString( 'aspect-ratio:16/9 !important', $stylesheet );
+		$this->assertStringContainsString( 'object-fit:cover !important', $stylesheet );
+		$this->assertStringNotContainsString( 'is-layout-flex', $stylesheet );
+	}
+
+	public function test_dynamic_gallery_outputs_viewport_aspect_ratio_style() {
+		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
+
+		// A dynamic gallery has no inner image blocks to carry the ratio, so
+		// the Gallery's own responsive CSS has to supply it.
+		$output     = $this->render_in_loop(
+			'<!-- wp:gallery {"dynamicContent":{"source":"core/attached-media"},"style":{"@tablet":{"aspectRatio":"4/3"}}} /-->'
+		);
+		$stylesheet = gutenberg_style_engine_get_stylesheet_from_context(
+			'block-supports',
+			array( 'prettify' => false )
+		);
+
+		$this->assertMatchesRegularExpression( '/\bwp-block-gallery-\d+\b/', $output );
+		$this->assertStringContainsString( '@media (480px < width <= 782px)', $stylesheet );
+		$this->assertStringContainsString( 'aspect-ratio:4/3 !important', $stylesheet );
+	}
+
+	public function test_static_gallery_cancels_base_aspect_ratio_for_viewport() {
+		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
+
+		do_blocks(
+			'<!-- wp:gallery {"aspectRatio":"16/9","style":{"@mobile":{"aspectRatio":"auto"}}} --><figure class="wp-block-gallery has-nested-images"><!-- wp:image --><figure class="wp-block-image"><img alt=""/></figure><!-- /wp:image --></figure><!-- /wp:gallery -->'
+		);
+		$stylesheet = gutenberg_style_engine_get_stylesheet_from_context(
+			'block-supports',
+			array( 'prettify' => false )
+		);
+
+		/*
+		 * `auto` would override the `width`/`height` presentational hint a
+		 * lazy-loaded image relies on for its placeholder ratio, collapsing it to
+		 * zero height until it loads, so the declaration is rolled out of the
+		 * cascade instead.
+		 */
+		$this->assertStringContainsString( 'aspect-ratio:revert-layer !important', $stylesheet );
+		$this->assertStringNotContainsString( 'aspect-ratio:auto', $stylesheet );
+	}
+
+	public function test_static_gallery_ignores_unsafe_viewport_aspect_ratio() {
+		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
+
+		// The value is interpolated into a generated rule rather than an inline
+		// style, so anything that isn't a plain ratio is dropped instead of
+		// being emitted and closing the rule early.
+		do_blocks(
+			'<!-- wp:gallery {"style":{"@mobile":{"aspectRatio":"16/9;} body{display:none;"}}} --><figure class="wp-block-gallery has-nested-images"><!-- wp:image --><figure class="wp-block-image"><img alt=""/></figure><!-- /wp:image --></figure><!-- /wp:gallery -->'
+		);
+		$stylesheet = gutenberg_style_engine_get_stylesheet_from_context(
+			'block-supports',
+			array( 'prettify' => false )
+		);
+
+		$this->assertStringNotContainsString( 'aspect-ratio', $stylesheet );
+		$this->assertStringNotContainsString( 'display:none', $stylesheet );
+	}
+
 	public function test_static_gallery_outputs_viewport_crop_style() {
 		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
 
