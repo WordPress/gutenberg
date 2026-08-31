@@ -38,12 +38,6 @@ if ( file_exists( $constants_file ) && ! defined( 'GUTENBERG_VERSION' ) ) {
  * @return bool True when the experiment is enabled.
  */
 function gutenberg_is_experiment_enabled( $name ) {
-	// Special handling for active_templates - check if the active_templates option exists.
-	// This is not stored in the experiments array but as a separate option.
-	if ( 'active_templates' === $name ) {
-		return is_array( get_option( 'active_templates' ) );
-	}
-
 	$experiments = get_option( 'gutenberg-experiments' );
 	return ! empty( $experiments[ $name ] );
 }
@@ -59,10 +53,8 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-revisions-controller.php';
 	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-block-patterns-controller-7-0.php';
 	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-templates-controller-7-0.php';
-	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-static-templates-controller.php';
 	require __DIR__ . '/compat/wordpress-7.0/class-wp-icons-registry.php';
 	require __DIR__ . '/compat/wordpress-7.0/class-wp-rest-icons-controller.php';
-	require __DIR__ . '/compat/wordpress-7.0/template-activate.php';
 	require __DIR__ . '/compat/wordpress-7.0/rest-api.php';
 	require __DIR__ . '/compat/wordpress-7.0/global-styles.php';
 

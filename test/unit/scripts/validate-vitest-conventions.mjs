@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import globPackage from 'glob';
+import { globSync } from 'glob';
 import {
 	discoverTestFiles,
 	getVitestTestsByProject,
@@ -14,7 +14,6 @@ import {
 	validateVitestPolicyExceptions,
 } from './vitest-policy-rules.mjs';
 
-const { sync: glob } = globPackage;
 const ROOT_DIR = path.resolve(
 	path.dirname( fileURLToPath( import.meta.url ) ),
 	'../../..'
@@ -41,11 +40,11 @@ const jsdomTests = new Set( vitestTestsByProject.jsdom );
 const browserTests = new Set( vitestTestsByProject.browser );
 const vitestInfrastructure = [
 	'test/unit/vitest.config.mjs',
-	...glob( 'test/unit/config/**/*.vitest*.{js,jsx,mjs,ts,tsx}', {
+	...globSync( 'test/unit/config/**/*.vitest*.{js,jsx,mjs,ts,tsx}', {
 		cwd: ROOT_DIR,
 		nodir: true,
 	} ),
-	...glob( 'test/unit/scripts/*.mjs', {
+	...globSync( 'test/unit/scripts/*.mjs', {
 		cwd: ROOT_DIR,
 		nodir: true,
 	} ),
