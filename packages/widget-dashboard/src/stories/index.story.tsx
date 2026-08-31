@@ -10,6 +10,7 @@ import '@wordpress/components/build-style/style.css';
 // eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '@wordpress/dataviews/build-style/style.css';
 import { Page } from '@wordpress/admin-ui';
+import { Button } from '@wordpress/components';
 import {
 	forwardRef,
 	useCallback,
@@ -27,6 +28,7 @@ import type {
 	WidgetRenderProps,
 	WidgetType,
 } from '@wordpress/widget-primitives';
+import { useDashboardInternalContext } from '../context/dashboard-context';
 import { WidgetDashboard } from '../widget-dashboard';
 import type { CanPerformDashboardOperation, DashboardWidget } from '../types';
 
@@ -782,6 +784,204 @@ Switch the \`profile\` control. A Viewer gets no Customize button, no attribute 
 Switch the section, then open "Add widget": the listing follows the section, even while open; the excluded types keep rendering where already placed because the \`widgetTypes\` registry never changes.
 
 Nested policies compose restrictively; without a policy, every operation is allowed. See the **Policy** page for the contract.
+`,
+			},
+		},
+	},
+};
+
+/*
+ * Staging-enforcement demo. Every control the chrome offers already asks
+ * the policy, so these triggers do what only a composed trigger can:
+ * write to the engine's staging directly through the internal context.
+ */
+const LOCKED_UUID = 'locked-snapshot';
+
+const ENFORCEMENT_LAYOUT: DashboardWidget[] = [
+	{
+		uuid: LOCKED_UUID,
+		type: 'demo/traffic-snapshot',
+		attributes: {
+			metric: 'views',
+			period: 'week',
+			label: 'Locked by policy',
+		},
+		placement: { width: 2, height: 1 },
+	},
+	{
+		uuid: 'free-snapshot',
+		type: 'demo/traffic-snapshot',
+		attributes: { metric: 'visitors', period: 'month', label: 'Free' },
+		placement: { width: 1, height: 1 },
+	},
+	{
+		uuid: 'free-goal',
+		type: 'demo/goal-progress',
+		attributes: { metric: 'revenue', target: '5000' },
+		placement: { width: 1, height: 1 },
+	},
+];
+
+/* Locks the first tile completely; rejects inserting Goal Progress. */
+const enforcementPolicy: CanPerformDashboardOperation = ( request ) => {
+	if ( request.operation === 'insert' ) {
+		return request.widgetType.name !== goalProgressWidgetType.name;
+	}
+	if ( request.operation === 'customize' ) {
+		return true;
+	}
+	return request.widget.uuid !== LOCKED_UUID;
+};
+
+let stagedInstances = 0;
+
+function RogueTriggers() {
+	const { layout, onLayoutChange } = useDashboardInternalContext();
+
+	const insert = ( widget: Omit< DashboardWidget, 'uuid' > ) => {
+		stagedInstances += 1;
+		onLayoutChange( [
+			...layout,
+			{ ...widget, uuid: `staged-${ stagedInstances }` },
+		] );
+	};
+
+	return (
+		<div
+			style={ {
+				display: 'flex',
+				flexWrap: 'wrap',
+				gap: 'var(--wpds-dimension-gap-xs)',
+				marginBlockEnd: 'var(--wpds-dimension-gap-md)',
+			} }
+		>
+			<Button
+				variant="secondary"
+				size="compact"
+				onClick={ () => onLayoutChange( [ ...layout ].reverse() ) }
+			>
+				Reverse the order
+			</Button>
+			<Button
+				variant="secondary"
+				size="compact"
+				onClick={ () =>
+					onLayoutChange(
+						layout.filter(
+							( widget ) => widget.uuid !== LOCKED_UUID
+						)
+					)
+				}
+			>
+				Remove the locked tile
+			</Button>
+			<Button
+				variant="secondary"
+				size="compact"
+				onClick={ () =>
+					onLayoutChange(
+						layout.map( ( widget ) => ( {
+							...widget,
+							placement: { ...widget.placement, width: 4 },
+						} ) )
+					)
+				}
+			>
+				Set every width to 4
+			</Button>
+			<Button
+				variant="secondary"
+				size="compact"
+				onClick={ () =>
+					onLayoutChange(
+						layout.map( ( widget ) => ( {
+							...widget,
+							attributes: {
+								...( widget.attributes as Record<
+									string,
+									unknown
+								> ),
+								label: 'Hijacked',
+							},
+						} ) )
+					)
+				}
+			>
+				Rename every label
+			</Button>
+			<Button
+				variant="secondary"
+				size="compact"
+				onClick={ () =>
+					insert( {
+						type: 'demo/goal-progress',
+						attributes: { metric: 'orders', target: '1000' },
+						placement: { width: 1, height: 1 },
+					} )
+				}
+			>
+				Insert a goal (rejected)
+			</Button>
+			<Button
+				variant="secondary"
+				size="compact"
+				onClick={ () =>
+					insert( {
+						type: 'demo/traffic-snapshot',
+						attributes: {
+							metric: 'orders',
+							period: 'day',
+							label: 'Staged',
+						},
+						placement: { width: 1, height: 1 },
+					} )
+				}
+			>
+				Insert a snapshot (allowed)
+			</Button>
+			<Button
+				variant="secondary"
+				size="compact"
+				onClick={ () => onLayoutChange( ENFORCEMENT_LAYOUT ) }
+			>
+				Stage the initial layout
+			</Button>
+		</div>
+	);
+}
+
+function StagingEnforcementStory() {
+	const [ layout, setLayout ] =
+		useState< DashboardWidget[] >( ENFORCEMENT_LAYOUT );
+
+	return (
+		<WidgetDashboard.Policy canPerform={ enforcementPolicy }>
+			<WidgetDashboard
+				widgetTypes={ [
+					trafficSnapshotWidgetType,
+					goalProgressWidgetType,
+				] }
+				layout={ layout }
+				onLayoutChange={ setLayout }
+				resolveWidgetModule={ resolveDemoModule }
+				gridSettings={ { model: 'grid', rowHeight: 200 } }
+			>
+				<RogueTriggers />
+				<WidgetDashboard.Widgets />
+			</WidgetDashboard>
+		</WidgetDashboard.Policy>
+	);
+}
+
+export const StagingEnforcement: StoryObj< typeof WidgetDashboard > = {
+	render: () => <StagingEnforcementStory />,
+	parameters: {
+		docs: {
+			description: {
+				story: `
+Every control the chrome offers already asks the policy, so a denied operation never reaches the staging layer through the UI. The buttons in this story bypass the chrome and write to the engine's staging directly, which is what the staging enforcement exists for.
+
+The policy locks the first tile completely and rejects inserting Goal Progress widgets. The locked tile holds its place, width, and label while the free tiles change; the rejected insertion never lands, the allowed one does.
 `,
 			},
 		},
