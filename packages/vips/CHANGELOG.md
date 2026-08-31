@@ -22,11 +22,12 @@
 
 ### Breaking Changes
 
-- `resizeImage`, `compressImage`, and `convertImageFormat` now accept their optional parameters (`quality`, `interlaced`, `smartCrop`, `stripMeta`, `maxBitdepth`) as a single trailing `options` object instead of positional arguments ([#80328](https://github.com/WordPress/gutenberg/issues/80328)).
+-   `resizeImage`, `compressImage`, and `convertImageFormat` now accept their optional parameters (`quality`, `interlaced`, `smartCrop`, `stripMeta`, `maxBitdepth`) as a single trailing `options` object instead of positional arguments ([#80328](https://github.com/WordPress/gutenberg/issues/80328)).
 
 ### Enhancements
 
-- Add optional `stripMeta` and `maxBitdepth` options to `resizeImage`, `compressImage`, and `convertImageFormat`, so callers can keep all image metadata and cap the output bit depth, mirroring WordPress core's `image_strip_meta` and `image_max_bit_depth` filters ([#80216](https://github.com/WordPress/gutenberg/issues/80216)).
+-   Add optional `stripMeta` and `maxBitdepth` options to `resizeImage`, `compressImage`, and `convertImageFormat`, so callers can keep all image metadata and cap the output bit depth, mirroring WordPress core's `image_strip_meta` and `image_max_bit_depth` filters ([#80216](https://github.com/WordPress/gutenberg/issues/80216)).
+-   Add an optional `preserveAnimation` option to `resizeImage`, letting uncropped resizes of animated images keep their animation (with tuned, fast GIF encoding settings) instead of flattening to the first frame. Animations whose decoded frames would not fit the WASM heap still flatten, so the resize degrades instead of failing ([#80383](https://github.com/WordPress/gutenberg/issues/80383)).
 
 ### Bug Fixes
 

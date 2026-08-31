@@ -55,6 +55,13 @@ export interface ResizeImageOptions {
 	 * Defaults to 16.
 	 */
 	maxBitdepth?: number;
+	/**
+	 * Whether animated images should keep their animation when resized,
+	 * from the `wp_generate_animated_image_subsizes` filter. Only applies
+	 * to uncropped resizes; cropped sizes always flatten to the first
+	 * frame. Defaults to false (matching WordPress core).
+	 */
+	preserveAnimation?: boolean;
 }
 
 /**
@@ -191,6 +198,22 @@ export interface SaveOptions< T extends string > {
 	 * flattening them to 8-bit.
 	 */
 	bitdepth?: number;
+	/**
+	 * Maximum inter-frame error for transparency.
+	 *
+	 * Pixels that differ from the previous frame by less than this are
+	 * rendered as transparent, improving compression at slight quality cost.
+	 * Only used by gifsave; do not provide for any other type!
+	 */
+	interframe_maxerror?: number;
+	/**
+	 * Maximum inter-palette error for palette reuse.
+	 *
+	 * Frames whose palette is within this distance of the previous frame's
+	 * reuse it, avoiding a costly palette recomputation per frame.
+	 * Only used by gifsave; do not provide for any other type!
+	 */
+	interpalette_maxerror?: number;
 }
 
 export interface ThumbnailOptions {

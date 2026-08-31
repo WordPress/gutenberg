@@ -13,10 +13,18 @@ const mockWriteToBuffer = jest.fn( () => ( {
 // tests can exercise both the standard (8-bit) and high-bit-depth code paths.
 let mockBitdepth = 8;
 
+// Controls the dimensions reported by the mocked source image. `height` is the
+// full "toilet roll" height of an image loaded with `[n=-1]`, so
+// `height / pageHeight` is the frame count, which drives the animation memory
+// estimate.
+let mockWidth = 100;
+let mockHeight = 100;
+let mockPageHeight = 100;
+
 class MockImage {
-	width = 100;
-	height = 100;
-	pageHeight = 100;
+	width = mockWidth;
+	height = mockHeight;
+	pageHeight = mockPageHeight;
 	crop = mockCrop;
 	resize = mockResize;
 	writeToBuffer = mockWriteToBuffer;
@@ -43,6 +51,9 @@ describe( 'resizeImage', () => {
 	afterEach( () => {
 		jest.clearAllMocks();
 		mockBitdepth = 8;
+		mockWidth = 100;
+		mockHeight = 100;
+		mockPageHeight = 100;
 	} );
 
 	it( 'resizes without crop', async () => {
@@ -96,16 +107,194 @@ describe( 'resizeImage', () => {
 		} );
 
 		/*
-		 * Sub-sizes of animated images are static, generated from the first
-		 * frame, matching WordPress core's server-side behavior. All frames
-		 * must NOT be loaded (no `option_string: '[n=-1]'`), which used to
-		 * re-encode a full animated GIF per sub-size.
+		 * Sub-sizes of animated images are static by default, generated from
+		 * the first frame, matching WordPress core's server-side behavior.
+		 * All frames must NOT be loaded (no `option_string: '[n=-1]'`), which
+		 * used to re-encode a full animated GIF per sub-size.
 		 */
 		expect( mockThumbnailBuffer ).toHaveBeenCalledWith( buffer, 100, {
 			height: 100,
 			size: 'down',
 		} );
 		expect( mockCrop ).not.toHaveBeenCalled();
+	} );
+
+	describe( 'preserveAnimation', () => {
+		it( 'loads all frames and tunes gifsave for uncropped animated resizes', async () => {
+			const gifFile = new File( [ '<BLOB>' ], 'example.gif', {
+				lastModified: 1234567891,
+				type: 'image/gif',
+			} );
+			const buffer = await gifFile.arrayBuffer();
+
+			// Three frames stacked into one 300px-tall image.
+			mockHeight = 300;
+
+			await resizeImage(
+				'itemId',
+				buffer,
+				'image/gif',
+				{
+					width: 100,
+					height: 100,
+				},
+				{ preserveAnimation: true }
+			);
+
+			expect( mockThumbnailBuffer ).toHaveBeenCalledWith( buffer, 100, {
+				height: 100,
+				size: 'down',
+				option_string: '[n=-1]',
+			} );
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.gif',
+				expect.objectContaining( {
+					effort: 2,
+					interframe_maxerror: 8,
+					interpalette_maxerror: 16,
+				} )
+			);
+		} );
+
+		it( 'flattens cropped sizes to the first frame', async () => {
+			const gifFile = new File( [ '<BLOB>' ], 'example.gif', {
+				lastModified: 1234567891,
+				type: 'image/gif',
+			} );
+			const buffer = await gifFile.arrayBuffer();
+
+			await resizeImage(
+				'itemId',
+				buffer,
+				'image/gif',
+				{
+					width: 100,
+					height: 100,
+					crop: true,
+				},
+				{ preserveAnimation: true }
+			);
+
+			expect( mockThumbnailBuffer ).toHaveBeenCalledWith( buffer, 100, {
+				height: 100,
+				crop: 'centre',
+				size: 'down',
+			} );
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.gif',
+				expect.not.objectContaining( {
+					interframe_maxerror: expect.anything(),
+				} )
+			);
+		} );
+
+		it( 'leaves gifsave at its defaults for a static GIF', async () => {
+			const gifFile = new File( [ '<BLOB>' ], 'example.gif', {
+				lastModified: 1234567891,
+				type: 'image/gif',
+			} );
+			const buffer = await gifFile.arrayBuffer();
+
+			/*
+			 * The mocked image reports a single frame (height === pageHeight).
+			 * The inter-frame and inter-palette tolerances are meaningless for
+			 * one frame, so a static GIF uploaded to an opted-in site must not
+			 * pay libvips' default `effort` in worse compression.
+			 */
+			await resizeImage(
+				'itemId',
+				buffer,
+				'image/gif',
+				{
+					width: 100,
+					height: 100,
+				},
+				{ preserveAnimation: true }
+			);
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.gif',
+				expect.not.objectContaining( {
+					effort: expect.anything(),
+				} )
+			);
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.gif',
+				expect.not.objectContaining( {
+					interframe_maxerror: expect.anything(),
+				} )
+			);
+		} );
+
+		it( 'falls back to the first frame when the animation exceeds the memory budget', async () => {
+			const gifFile = new File( [ '<BLOB>' ], 'example.gif', {
+				lastModified: 1234567891,
+				type: 'image/gif',
+			} );
+			const buffer = await gifFile.arrayBuffer();
+
+			/*
+			 * A 1200x900 GIF is only ~4 MB decoded as a single frame, but 150
+			 * frames of it need ~650 MB, which does not fit the 1 GiB WASM
+			 * heap. Such an animation must flatten rather than abort the
+			 * upload.
+			 */
+			mockWidth = 1200;
+			mockPageHeight = 900;
+			mockHeight = 900 * 150;
+
+			await resizeImage(
+				'itemId',
+				buffer,
+				'image/gif',
+				{
+					width: 100,
+					height: 100,
+				},
+				{ preserveAnimation: true }
+			);
+
+			expect( mockThumbnailBuffer ).toHaveBeenCalledWith( buffer, 100, {
+				height: 100,
+				size: 'down',
+			} );
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.gif',
+				expect.not.objectContaining( {
+					interframe_maxerror: expect.anything(),
+				} )
+			);
+		} );
+
+		it( 'has no effect on still image formats', async () => {
+			const jpegFile = new File( [ '<BLOB>' ], 'example.jpg', {
+				lastModified: 1234567891,
+				type: 'image/jpeg',
+			} );
+			const buffer = await jpegFile.arrayBuffer();
+
+			await resizeImage(
+				'itemId',
+				buffer,
+				'image/jpeg',
+				{
+					width: 100,
+					height: 100,
+				},
+				{ preserveAnimation: true }
+			);
+
+			expect( mockThumbnailBuffer ).toHaveBeenCalledWith( buffer, 100, {
+				height: 100,
+				size: 'down',
+			} );
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.jpeg',
+				expect.not.objectContaining( {
+					interframe_maxerror: expect.anything(),
+				} )
+			);
+		} );
 	} );
 
 	it( 'resizes with center crop', async () => {

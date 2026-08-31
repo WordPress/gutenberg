@@ -28,6 +28,27 @@ let cleanup: () => void;
 let vipsPromise: Promise< typeof Vips > | undefined;
 
 /**
+ * Estimated bytes of WASM memory required per decoded pixel.
+ *
+ * A decoded image needs roughly width * height * 4 bytes (RGBA), plus working
+ * buffers while vips resizes and re-encodes it. Four bytes per pixel is a
+ * deliberately conservative lower bound.
+ */
+const BYTES_PER_PIXEL = 4;
+
+/**
+ * Memory budget (in bytes) for decoding every frame of an animated image.
+ *
+ * wasm-vips runs in a fixed 1 GiB WASM heap that cannot grow (wasm-vips 0.0.18
+ * builds with `INITIAL_MEMORY` === `MAXIMUM_MEMORY` === 1 GiB), so an
+ * animation loaded with `[n=-1]` — every frame stacked into one tall image —
+ * costs roughly frames * width * pageHeight * 4 bytes. A long animation of
+ * otherwise modest dimensions therefore exhausts the heap even though a single
+ * frame is small. ~0.5 GiB leaves headroom for the resize and re-encode steps.
+ */
+const ANIMATION_MEMORY_BUDGET = 0.5 * 1024 * 1024 * 1024;
+
+/**
  * Caches Blob URLs created for inlined WASM binaries.
  *
  * The WASM binaries are inlined as `Uint8Array` values at build time. wasm-vips
@@ -555,14 +576,24 @@ function resizeHighBitDepth<
  * decode the gain map alongside the base image, and `jpegsave*` delegates
  * to `uhdrsave*` on output when a gain map is attached.
  *
- * Sub-sizes of animated images are generated from the first frame only,
- * matching WordPress core's server-side behavior: both GD and Imagick
- * flatten animated images when resizing, and `wp_calculate_image_srcset()`
- * prevents flattened sub-sizes and the animated full-size image from mixing
- * in a srcset. Loading all frames (`[n=-1]`) would re-encode a full animated
- * GIF per sub-size, which takes tens of seconds for long animations and can
- * produce sub-sizes larger than the original file.
+ * Sub-sizes of animated images are generated from the first frame only
+ * by default, matching WordPress core's server-side behavior: both GD and
+ * Imagick flatten animated images when resizing, and
+ * `wp_calculate_image_srcset()` prevents flattened sub-sizes and the
+ * animated full-size image from mixing in a srcset. Loading all frames
+ * (`[n=-1]`) re-encodes a full animated GIF per sub-size, which takes tens
+ * of seconds for long animations and can produce sub-sizes larger than the
+ * original file.
  * See https://github.com/WordPress/gutenberg/issues/80266.
+ *
+ * Sites can opt into animated sub-sizes via the
+ * `wp_generate_animated_image_subsizes` filter, carried here as the
+ * `preserveAnimation` option. Cropped sizes always flatten to the first
+ * frame (per-frame cropping is not supported), also matching the
+ * pre-existing behavior. Animations whose decoded frames would not fit the
+ * WASM heap also flatten to the first frame, so an opted-in site gets a
+ * static sub-size rather than a failed upload.
+ * See https://github.com/WordPress/gutenberg/issues/80383.
  *
  * @param id      Item ID.
  * @param buffer  Original file buffer.
@@ -589,6 +620,7 @@ export async function resizeImage(
 		quality = 0.82,
 		stripMeta = true,
 		maxBitdepth = 16,
+		preserveAnimation = false,
 	} = options;
 	const ext = type.split( '/' )[ 1 ];
 
@@ -597,6 +629,14 @@ export async function resizeImage(
 	try {
 		const vips = await getVips();
 
+		let strOptions = '';
+		const loadOptions: LoadOptions< typeof type > = {};
+
+		if ( preserveAnimation && supportsAnimation( type ) && ! resize.crop ) {
+			strOptions = '[n=-1]';
+			( loadOptions as LoadOptions< typeof type > ).n = -1;
+		}
+
 		// TODO: Report progress, see https://github.com/swissspidy/media-experiments/issues/327.
 		const onProgress = () => {
 			if ( ! inProgressOperations.has( id ) ) {
@@ -604,7 +644,28 @@ export async function resizeImage(
 			}
 		};
 
-		let image = vips.Image.newFromBuffer( buffer );
+		let image = vips.Image.newFromBuffer( buffer, strOptions, loadOptions );
+
+		/*
+		 * Decoding is lazy, so the frame count is known before any pixels are
+		 * materialized. `[n=-1]` stacks every frame into one tall image, which
+		 * for a long animation needs far more memory than the single-frame
+		 * dimensions suggest. Rather than let the resize abort the whole
+		 * upload when that exceeds the WASM heap, fall back to a first-frame
+		 * sub-size, which is what this image would have produced before the
+		 * `wp_generate_animated_image_subsizes` opt-in.
+		 */
+		let frames = 1;
+		if ( strOptions ) {
+			frames = image.pageHeight > 0 ? image.height / image.pageHeight : 1;
+			const estimatedBytes =
+				image.width * image.pageHeight * frames * BYTES_PER_PIXEL;
+			if ( estimatedBytes > ANIMATION_MEMORY_BUDGET ) {
+				strOptions = '';
+				frames = 1;
+				image = vips.Image.newFromBuffer( buffer, strOptions, {} );
+			}
+		}
 
 		image.onProgress = onProgress;
 
@@ -640,6 +701,9 @@ export async function resizeImage(
 					resized.onProgress = onProgress;
 					return resized;
 				}
+				if ( strOptions ) {
+					thumbnailOptions.option_string = strOptions;
+				}
 				const thumb = vips.Image.thumbnailBuffer(
 					buffer,
 					resizeWidth,
@@ -656,6 +720,27 @@ export async function resizeImage(
 			saveBitdepth,
 			stripMeta
 		);
+
+		/*
+		 * When writing an animated GIF, tune gifsave for speed and size:
+		 * per-frame palette quantization dominates the re-encode cost, and
+		 * the defaults can produce sub-sizes larger than the original file.
+		 * Lower effort plus allowing slight inter-frame/inter-palette error
+		 * is 4-8x faster and eliminates the size bloat, with no visible
+		 * quality difference at sub-size dimensions.
+		 *
+		 * This is keyed off the frame count rather than the opt-in: the
+		 * inter-frame and inter-palette tolerances mean nothing for a single
+		 * frame, so a static GIF would only pay the lower effort in worse
+		 * compression.
+		 * See https://github.com/WordPress/gutenberg/issues/80266.
+		 */
+		if ( frames > 1 && 'image/gif' === type ) {
+			saveOptions.effort = 2;
+			saveOptions.interframe_maxerror = 8;
+			saveOptions.interpalette_maxerror = 16;
+		}
+
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
 
 		const result = {

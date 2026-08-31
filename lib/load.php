@@ -125,6 +125,9 @@ require __DIR__ . '/compat/wordpress-7.1/media.php';
 require __DIR__ . '/compat/wordpress-7.1/preload.php';
 require __DIR__ . '/compat/wordpress-7.1/icons.php';
 
+// WordPress 7.2 compat.
+require __DIR__ . '/compat/wordpress-7.2/preload.php';
+
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/blocks.php';
