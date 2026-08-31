@@ -253,8 +253,6 @@ function ValidatedDateControl< Item >( {
 			return;
 		}
 
-		// Only consider "blurred from the component" if focus has fully left the wrapping div.
-		// This prevents unnecessary blurs from components with multiple focusable elements.
 		if (
 			! event.relatedTarget ||
 			! event.currentTarget.contains( event.relatedTarget )
