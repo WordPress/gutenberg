@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Search: Match the published search-button icon to the stroke-based icon used in the editor. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
 -   Math: Declare `interactivity.clientNavigation` support. The block's front end output is static markup, and without the declaration a Math block inside a Query block forced full page reloads on pagination ([#82248](https://github.com/WordPress/gutenberg/pull/82248)).
 
 ### Bug Fixes
