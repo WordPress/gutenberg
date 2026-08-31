@@ -55,3 +55,10 @@ A function that receives the new value of the input.
 
 The current value of the input. The value represents an angle in degrees
 and should be a value between 0 and 360.
+
+### `className`
+
+  - Type: `string`
+  - Required: No
+
+A string of classes to be added to the control component.

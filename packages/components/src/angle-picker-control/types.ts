@@ -23,6 +23,10 @@ export type AnglePickerControlProps = {
 	 * and should be a value between 0 and 360.
 	 */
 	value: number | string;
+	/**
+	 * Additional classes to apply to the angle picker.
+	 */
+	className?: string;
 };
 
 export type AngleCircleProps = Pick<
