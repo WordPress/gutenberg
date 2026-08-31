@@ -211,6 +211,27 @@ export async function latestStatus( oid ) {
 	return data.repository.object?.status?.context ?? null;
 }
 
+/**
+ * Creates or force-updates the baseline tag ref via the API, so the workflow
+ * needs no persisted git credentials.
+ *
+ * @param {string}  sha    Commit SHA the tag should point at.
+ * @param {boolean} create Create the ref instead of updating it.
+ */
+export async function updateTagRef( sha, create ) {
+	if ( create ) {
+		await api( `/repos/${ REPO }/git/refs`, {
+			method: 'POST',
+			body: JSON.stringify( { ref: TAG_REF, sha } ),
+		} );
+		return;
+	}
+	await api( `/repos/${ REPO }/git/refs/tags/${ TAG }`, {
+		method: 'PATCH',
+		body: JSON.stringify( { sha, force: true } ),
+	} );
+}
+
 let writesThisRun = 0;
 let writesThisMinute = 0;
 let minuteWindowStart = Date.now();

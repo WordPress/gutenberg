@@ -51,6 +51,7 @@ jobs:
               with:
                   ref: trunk
                   fetch-depth: 100
+                  persist-credentials: false
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
@@ -80,6 +81,7 @@ jobs:
               with:
                   ref: trunk
                   fetch-depth: 0
+                  persist-credentials: false
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
@@ -109,6 +111,7 @@ jobs:
               with:
                   ref: trunk
                   fetch-depth: 0
+                  persist-credentials: false
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node

@@ -5,7 +5,6 @@
  * markers changed or a move is forced, then optionally fans out.
  */
 import {
-	TAG,
 	MARKER_PATHS,
 	FORCE_LABEL,
 	REPO,
@@ -15,6 +14,7 @@ import {
 	fetchTag,
 	resolveBaseline,
 	isAncestor,
+	updateTagRef,
 } from './utils.mjs';
 import { fanout } from './fanout.mjs';
 
@@ -84,8 +84,7 @@ export async function moveBaseline( options ) {
 		const head = ( await git.revparse( [ 'HEAD' ] ) ).trim();
 		console.log( `Seeding baseline at ${ head }.` );
 		if ( ! dryRun ) {
-			await git.raw( [ 'tag', TAG, head ] );
-			await git.push( [ 'origin', TAG ] );
+			await updateTagRef( head, true );
 		}
 		// A dry-run seed creates no tag; the fan-out would have nothing to read.
 		if ( thenFanout && ! dryRun ) {
@@ -130,8 +129,7 @@ export async function moveBaseline( options ) {
 
 	console.log( `Moving baseline: ${ baseline } -> ${ head }` );
 	if ( ! dryRun ) {
-		await git.raw( [ 'tag', '--force', TAG, head ] );
-		await git.push( [ 'origin', TAG, '--force' ] );
+		await updateTagRef( head, false );
 	}
 	if ( thenFanout ) {
 		await fanout( { ...options, mode: 'flip', bootstrapWindow: 0 } );
