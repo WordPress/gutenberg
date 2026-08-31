@@ -12,11 +12,11 @@ Unlike unit tests that test individual functions in isolation, these tests exerc
 | `blocks-schema.test.js` | Validates all `block.json` files in the repo against the JSON schema |
 | `theme-schema.test.js` | Validates all `theme.json` files in the repo against the JSON schema |
 | `wp-env-schema.test.js` | Validates `.wp-env.json` against the JSON schema |
-| `blocks-raw-handling.test.js` | Tests raw paste/HTML handling across the full block pipeline |
-| `full-content/full-content.test.js` | Tests full block serialization round-trips using fixtures |
-| `is-valid-block.test.js` | Tests block validation with editor hooks applied |
-| `shortcode-converter.test.js` | Tests shortcode-to-block conversion |
-| `non-matched-tags-handling.test.js` | Tests handling of unrecognized HTML tags during paste |
+| `blocks-raw-handling.jsdom.test.js` | Tests raw paste/HTML handling across the full block pipeline |
+| `full-content/full-content.jsdom.test.js` | Tests full block serialization round-trips using fixtures |
+| `is-valid-block.jsdom.test.js` | Tests block validation with editor hooks applied |
+| `shortcode-converter.jsdom.test.js` | Tests shortcode-to-block conversion |
+| `non-matched-tags-handling.jsdom.test.js` | Tests handling of unrecognized HTML tags during paste |
 
 ## Running the Tests
 
@@ -42,7 +42,7 @@ npm run test:unit -- test/integration/blocks-schema.test.js
 
 ### Block fixtures
 
-The `fixtures/blocks/` directory contains serialized block fixtures used by `full-content.test.js` to verify that blocks serialize and parse correctly.
+The `fixtures/blocks/` directory contains serialized block fixtures used by `full-content.jsdom.test.js` to verify that blocks serialize and parse correctly.
 
 To generate missing fixtures:
 

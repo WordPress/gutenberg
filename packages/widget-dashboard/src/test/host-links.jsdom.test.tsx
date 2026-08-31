@@ -71,12 +71,27 @@ describe( 'host links across the chrome compositions', () => {
 				href: MATCHED_HREF,
 			},
 			{
+				id: 'snapshot',
+				label: 'Download snapshot',
+				relevance: 'high',
+				href: MATCHED_HREF,
+				download: '',
+			},
+			{
 				id: 'export',
 				label: 'Export data',
 				relevance: 'medium',
 				icon: <svg />,
-				href: 'files/export.csv',
+				href: MATCHED_HREF,
 				download: 'export.csv',
+			},
+			{
+				id: 'docs',
+				label: 'Documentation',
+				relevance: 'medium',
+				icon: <svg />,
+				href: MATCHED_HREF,
+				openInNewTab: true,
 			},
 		];
 
@@ -113,13 +128,41 @@ describe( 'host links across the chrome compositions', () => {
 			expect( receivedRef ).toContain( true );
 		} );
 
+		/*
+		 * These targets match; only the modifiers keep the plain anchor.
+		 */
 		it( 'keeps the plain anchor and the download for a download action', () => {
 			const { links } = createHost();
 			renderWithHost( <WidgetFooter actions={ footerActions } />, links );
 
 			const link = screen.getByRole( 'link', { name: 'Export data' } );
 			expect( link ).not.toHaveAttribute( 'data-host-link' );
+			expect( link ).toHaveAttribute( 'href', MATCHED_HREF );
 			expect( link ).toHaveAttribute( 'download', 'export.csv' );
+		} );
+
+		it( 'keeps the plain anchor for an empty-string download', () => {
+			const { links } = createHost();
+			renderWithHost( <WidgetFooter actions={ footerActions } />, links );
+
+			const link = screen.getByRole( 'link', {
+				name: 'Download snapshot',
+			} );
+			expect( link ).not.toHaveAttribute( 'data-host-link' );
+			expect( link ).toHaveAttribute( 'href', MATCHED_HREF );
+			expect( link ).toHaveAttribute( 'download', '' );
+		} );
+
+		it( 'keeps the plain anchor for a new-tab action', () => {
+			const { links } = createHost();
+			renderWithHost( <WidgetFooter actions={ footerActions } />, links );
+
+			const link = screen.getByRole( 'link', {
+				name: 'Documentation (opens in a new tab)',
+			} );
+			expect( link ).not.toHaveAttribute( 'data-host-link' );
+			expect( link ).toHaveAttribute( 'href', MATCHED_HREF );
+			expect( link ).toHaveAttribute( 'target', '_blank' );
 		} );
 
 		/*
@@ -143,19 +186,28 @@ describe( 'host links across the chrome compositions', () => {
 	} );
 
 	describe( 'WidgetActions menu', () => {
+		/*
+		 * Every target matches; only the modifiers keep the plain anchor.
+		 */
 		const menuActions: WidgetAction[] = [
 			{ id: 'report', label: 'See report', href: MATCHED_HREF },
 			{
 				id: 'external',
 				label: 'External guide',
-				href: 'https://example.com/guide',
+				href: MATCHED_HREF,
 				openInNewTab: true,
 			},
 			{
 				id: 'export',
 				label: 'Export data',
-				href: 'files/export.csv',
+				href: MATCHED_HREF,
 				download: 'export.csv',
+			},
+			{
+				id: 'snapshot',
+				label: 'Download snapshot',
+				href: MATCHED_HREF,
+				download: '',
 			},
 		];
 
@@ -177,13 +229,22 @@ describe( 'host links across the chrome compositions', () => {
 				name: /External guide/,
 			} );
 			expect( external ).not.toHaveAttribute( 'data-host-link' );
+			expect( external ).toHaveAttribute( 'href', MATCHED_HREF );
 			expect( external ).toHaveAttribute( 'target', '_blank' );
 
 			const download = screen.getByRole( 'menuitem', {
 				name: 'Export data',
 			} );
 			expect( download ).not.toHaveAttribute( 'data-host-link' );
+			expect( download ).toHaveAttribute( 'href', MATCHED_HREF );
 			expect( download ).toHaveAttribute( 'download', 'export.csv' );
+
+			const snapshot = screen.getByRole( 'menuitem', {
+				name: 'Download snapshot',
+			} );
+			expect( snapshot ).not.toHaveAttribute( 'data-host-link' );
+			expect( snapshot ).toHaveAttribute( 'href', MATCHED_HREF );
+			expect( snapshot ).toHaveAttribute( 'download', '' );
 		} );
 
 		/*
