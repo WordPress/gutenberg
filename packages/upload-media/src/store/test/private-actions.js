@@ -23,6 +23,7 @@ import {
 	convertGifToVideo,
 	terminateVideoConversionWorker,
 } from '../utils/video-conversion';
+import { canvasConvertToJpeg, HeicUnsupportedError } from '../../canvas-utils';
 
 // Mock @wordpress/blob
 jest.mock( '@wordpress/blob', () => ( {
@@ -44,6 +45,17 @@ jest.mock( '../utils', () => {
 		cloneFile: actual.cloneFile,
 		convertBlobToFile: actual.convertBlobToFile,
 		renameFile: actual.renameFile,
+	};
+} );
+
+// Mock the HEIC conversion so prepareItem's failure branch can be driven.
+// HeicUnsupportedError is kept real: prepareItem tells the two failures apart
+// with instanceof, so a stubbed class would make the test pass vacuously.
+jest.mock( '../../canvas-utils', () => {
+	const actual = jest.requireActual( '../../canvas-utils' );
+	return {
+		canvasConvertToJpeg: jest.fn(),
+		HeicUnsupportedError: actual.HeicUnsupportedError,
 	};
 } );
 
@@ -707,6 +719,61 @@ describe( 'private actions', () => {
 			expect(
 				flattenOperations( dispatchedOperations || [] )
 			).not.toContain( OperationType.TranscodeGif );
+		} );
+	} );
+
+	describe( 'prepareItem HEIC conversion failures', () => {
+		async function runPrepareItem() {
+			const file = new File( [ 'data' ], 'IMG_1982.heic', {
+				type: 'image/heic',
+			} );
+			const item = { id: 'heic-id', file, additionalData: {} };
+
+			const dispatch = () => {};
+			dispatch.cancelItem = jest.fn();
+			dispatch.finishOperation = jest.fn();
+
+			const select = {
+				getItem: () => item,
+				getSettings: () => ( {} ),
+			};
+
+			await prepareItem( 'heic-id' )( { select, dispatch } );
+
+			return dispatch;
+		}
+
+		it( 'reports a browser with no HEIC decoder as a decode error', async () => {
+			canvasConvertToJpeg.mockRejectedValue(
+				new HeicUnsupportedError( 'No decoder here' )
+			);
+
+			const dispatch = await runPrepareItem();
+
+			expect( dispatch.cancelItem ).toHaveBeenCalledWith(
+				'heic-id',
+				expect.objectContaining( {
+					code: ErrorCode.HEIC_DECODE_ERROR,
+				} )
+			);
+		} );
+
+		it( 'reports a failed decode as a processing error, not a missing decoder', async () => {
+			// A damaged file, an out-of-memory canvas and a null 2d context
+			// all land here. None of them says the browser cannot read HEIC,
+			// so none should send the user off to install another one.
+			const cause = new Error( 'Corrupt image data' );
+			canvasConvertToJpeg.mockRejectedValue( cause );
+
+			const dispatch = await runPrepareItem();
+
+			expect( dispatch.cancelItem ).toHaveBeenCalledWith(
+				'heic-id',
+				expect.objectContaining( {
+					code: ErrorCode.IMAGE_TRANSCODING_ERROR,
+					cause,
+				} )
+			);
 		} );
 	} );
 
