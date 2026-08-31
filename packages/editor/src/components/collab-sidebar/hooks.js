@@ -1,6 +1,7 @@
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 import {
+	useCallback,
 	useState,
 	useEffect,
 	useMemo,
@@ -13,6 +14,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
+import apiFetch from '@wordpress/api-fetch';
 import { getScrollContainer } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as interfaceStore } from '@wordpress/interface';
@@ -49,6 +51,22 @@ export function useNoteThreads( postId ) {
 		queryArgs,
 		{ enabled: !! postId && typeof postId === 'number' }
 	);
+
+	// Build reactionsMap from the reaction_summary field on each note.
+	// Shape: { [noteId]: { [emojiSlug]: { count, reacted, my_reaction_id } } }
+	const reactionsMap = useMemo( () => {
+		if ( ! threads || threads.length === 0 ) {
+			return {};
+		}
+
+		const map = {};
+		threads.forEach( ( thread ) => {
+			if ( thread.reaction_summary ) {
+				map[ thread.id ] = thread.reaction_summary;
+			}
+		} );
+		return map;
+	}, [ threads ] );
 
 	const { getBlockAttributes } = useSelect( blockEditorStore );
 	const { clientIds } = useSelect( ( select ) => {
@@ -166,6 +184,7 @@ export function useNoteThreads( postId ) {
 	return {
 		notes,
 		unresolvedNotes,
+		reactionsMap,
 	};
 }
 
@@ -267,9 +286,46 @@ function clearInlineNoteMarker(
 	}
 }
 
-export function useNoteActions() {
+/**
+ * Folds a completed reaction toggle into a cached note record.
+ *
+ * Used to keep `reaction_summary` usable when the refetch that would
+ * normally replace it fails: without it, the next toggle reads a stale
+ * `reacted` / `my_reaction_id` pair and takes the wrong branch.
+ *
+ * @param {Object} note              The cached note record.
+ * @param {string} emoji             The reaction storage slug that changed.
+ * @param {number} [addedReactionId] The new reaction's comment ID when one was
+ *                                   added; omitted when one was removed.
+ * @return {Object} The note with an updated `reaction_summary`.
+ */
+function applyReactionDelta( note, emoji, addedReactionId ) {
+	const summary = { ...( note.reaction_summary || {} ) };
+	const entry = summary[ emoji ];
+
+	if ( addedReactionId ) {
+		summary[ emoji ] = {
+			count: ( entry?.count || 0 ) + 1,
+			reacted: true,
+			my_reaction_id: addedReactionId,
+		};
+	} else if ( entry ) {
+		const count = entry.count - 1;
+		if ( count > 0 ) {
+			summary[ emoji ] = { count, reacted: false };
+		} else {
+			delete summary[ emoji ];
+		}
+	}
+
+	return { ...note, reaction_summary: summary };
+}
+
+export function useNoteActions( reactionsMap = {} ) {
 	const { createNotice } = useDispatch( noticesStore );
-	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
+	const { saveEntityRecord, deleteEntityRecord, receiveEntityRecords } =
+		useDispatch( coreStore );
+	const { getEntityRecord } = useSelect( coreStore );
 	const { getCurrentPostId } = useSelect( editorStore );
 	const {
 		getBlockAttributes,
@@ -503,7 +559,104 @@ export function useNoteActions() {
 		}
 	};
 
-	return { onCreate, onEdit, onDelete };
+	const onToggleReaction = useCallback(
+		async ( { commentId, emoji } ) => {
+			// Check if the user already reacted via reaction_summary.
+			const noteReactions = reactionsMap[ commentId ] || {};
+			const emojiData = noteReactions[ emoji ];
+			const isRemoving = !! (
+				emojiData?.reacted && emojiData?.my_reaction_id
+			);
+			let addedReactionId;
+
+			try {
+				if ( isRemoving ) {
+					// Force-delete the reaction comment rather than
+					// trashing it (the WP REST default). Reactions
+					// don't have a trash workflow, and a trashed
+					// reaction would otherwise linger in `wp_comments`
+					// indefinitely each time the user toggles it off.
+					await deleteEntityRecord(
+						'root',
+						'comment',
+						emojiData.my_reaction_id,
+						{ force: true },
+						{ throwOnError: true }
+					);
+				} else {
+					// Add a new reaction as a comment record.
+					const saved = await saveEntityRecord(
+						'root',
+						'comment',
+						{
+							post: getCurrentPostId(),
+							type: 'reaction',
+							parent: commentId,
+							content: emoji,
+							status: 'approve',
+						},
+						{ throwOnError: true }
+					);
+					addedReactionId = saved?.id;
+				}
+			} catch ( error ) {
+				onError( error );
+				return;
+			}
+
+			// `reaction_summary` is computed server-side and cached on the
+			// parent note's entity record. Mutating a reaction comment
+			// doesn't invalidate that field, so a subsequent toggle would
+			// read stale `reacted` / `my_reaction_id` data and route into
+			// the wrong branch (deleting an already-removed comment).
+			//
+			// The mutation has landed, so fold its known effect into the
+			// cached record first. That keeps the next toggle correct even
+			// if the refetch below never succeeds.
+			const cached = getEntityRecord( 'root', 'comment', commentId );
+			if ( cached ) {
+				receiveEntityRecords( 'root', 'comment', [
+					applyReactionDelta(
+						cached,
+						emoji,
+						isRemoving ? undefined : addedReactionId
+					),
+				] );
+			}
+
+			// Then refetch the parent note (1 record) for the authoritative
+			// summary, which also picks up other users' reactions.
+			// `receiveEntityRecords` with no `query` arg updates the
+			// per-record cache, which the list selector reads through by ID
+			// — so the LIST view picks up the fresh `reaction_summary`
+			// without re-fetching every other note on the post.
+			try {
+				const refreshed = await apiFetch( {
+					path: `/wp/v2/comments/${ commentId }`,
+				} );
+				receiveEntityRecords( 'root', 'comment', [ refreshed ] );
+			} catch {
+				// The toggle itself succeeded and the local delta above
+				// already keeps this note's reactions consistent, so there
+				// is nothing to report; the next load reconciles the rest.
+			}
+		},
+		[
+			reactionsMap,
+			deleteEntityRecord,
+			saveEntityRecord,
+			getCurrentPostId,
+			getEntityRecord,
+			receiveEntityRecords,
+		]
+	);
+
+	return {
+		onCreate,
+		onEdit,
+		onDelete,
+		onToggleReaction,
+	};
 }
 
 export function useEnableFloatingSidebar( enabled = false ) {

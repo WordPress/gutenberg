@@ -6,11 +6,13 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 // eslint-disable-next-line @wordpress/use-recommended-components
-import { Button as UIButton } from '@wordpress/ui';
+import { Stack, Button as UIButton } from '@wordpress/ui';
+import { ThemeProvider } from '@wordpress/theme';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { moreVertical, published } from '@wordpress/icons';
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
+import ReactionDisplay, { AddReactionButton } from './reaction-display';
 import { unlock } from '../../lock-unlock';
 
 const { Menu } = unlock( componentsPrivateApis );
@@ -53,6 +55,9 @@ export function Note( {
 	onEditNote,
 	onDeleteNote,
 	onResolve,
+	onToggleReaction,
+	reactions,
+	isThreadResolved = false,
 } ) {
 	const [ actionState, setActionState ] = useState( null );
 	const actionButtonRef = useRef( null );
@@ -211,6 +216,44 @@ export function Note( {
 			role={ note.parent !== 0 ? 'treeitem' : undefined }
 		>
 			{ body }
+			{ isSelected && (
+				// The editor sets `cornerRadius="none"`, but reactions read
+				// as badges rather than controls, so the row opts into the
+				// pill shape the Design System's `pronounced` preset gives a
+				// small Button.
+				<ThemeProvider cornerRadius="pronounced">
+					<Stack
+						direction="row"
+						gap="xs"
+						justify="flex-start"
+						// The pills wrap onto further rows; without this the
+						// trigger stretches to the full wrapped height.
+						align="flex-start"
+					>
+						<AddReactionButton
+							noteId={ note.id }
+							disabled={ isThreadResolved }
+							onToggleReaction={ ( emoji ) =>
+								onToggleReaction?.( {
+									commentId: note.id,
+									emoji,
+								} )
+							}
+						/>
+						<ReactionDisplay
+							noteId={ note.id }
+							reactions={ reactions }
+							disabled={ isThreadResolved }
+							onToggleReaction={ ( emoji ) =>
+								onToggleReaction?.( {
+									commentId: note.id,
+									emoji,
+								} )
+							}
+						/>
+					</Stack>
+				</ThemeProvider>
+			) }
 			{ actionState === 'delete' && (
 				<ConfirmDialog
 					isOpen
