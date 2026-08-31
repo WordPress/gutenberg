@@ -86,7 +86,7 @@ describe( 'AddReactionButton', () => {
 										group: 0,
 									},
 							  ]
-							: { groups: [ { order: 0, message: 'Smileys' } ] }
+							: {}
 					),
 			} as unknown as Response )
 		);
@@ -168,14 +168,7 @@ describe( 'AddReactionButton', () => {
 												group: 0,
 											},
 									  ]
-									: {
-											groups: [
-												{
-													order: 0,
-													message: 'Smileys',
-												},
-											],
-									  }
+									: {}
 							),
 				  } as unknown as Response )
 		);

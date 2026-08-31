@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
  * Copy Emojibase locale data into `build/emojibase-data/` so the emoji
- * picker fetches labels and category names same-origin rather than
- * inlining them into the JS bundle. One locale is fetched per editor
- * session, so the disk cost is not a network cost.
+ * picker fetches labels same-origin rather than inlining them into the
+ * JS bundle. One locale is fetched per editor session, so the disk cost
+ * is not a network cost.
  *
  * Runs from `tools/build-scripts/build.mjs` after wp-build populates
  * `build/`. Exits 0 when emojibase-data is missing: the editor degrades
@@ -37,8 +37,12 @@ function resolveEmojibaseDir() {
 
 const DEST_DIR = path.join( ROOT_DIR, 'build', 'emojibase-data' );
 
-// Only these two are fetched; the rest of the ~49MB package is skipped.
-const FILES = [ 'data.json', 'messages.json' ];
+/*
+ * Only this one is fetched; the rest of the ~49MB package is skipped.
+ * Category headings come from Unicode's own group names, translated in
+ * the picker, so `messages.json` is not copied.
+ */
+const FILES = [ 'data.json' ];
 
 /*
  * Every locale Emojibase translates. Must stay in sync with

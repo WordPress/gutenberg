@@ -8,6 +8,7 @@ import { dispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import EmojiPicker, {
 	chunkRows,
+	getGroupLabel,
 	groupEmojis,
 	searchEmojis,
 } from '../emoji-picker';
@@ -66,6 +67,30 @@ describe( 'resolveEmojibaseLocale', () => {
 	} );
 } );
 
+describe( 'getGroupLabel', () => {
+	/*
+	 * Verbatim from the `# group:` lines of Unicode's `emoji-test.txt`,
+	 * in its order. Component (2) is omitted: `groupEmojis` drops it.
+	 */
+	it( "uses Unicode's own category names", () => {
+		expect( [ 0, 1, 3, 4, 5, 6, 7, 8, 9 ].map( getGroupLabel ) ).toEqual( [
+			'Smileys & Emotion',
+			'People & Body',
+			'Animals & Nature',
+			'Food & Drink',
+			'Travel & Places',
+			'Activities',
+			'Objects',
+			'Symbols',
+			'Flags',
+		] );
+	} );
+
+	it( 'returns an empty heading for an unknown group', () => {
+		expect( getGroupLabel( 42 ) ).toBe( '' );
+	} );
+} );
+
 describe( 'groupEmojis', () => {
 	it( 'returns empty array for empty input', () => {
 		expect( groupEmojis( [] ) ).toEqual( [] );
@@ -80,6 +105,17 @@ describe( 'groupEmojis', () => {
 		expect( out ).toHaveLength( 1 );
 		expect( out[ 0 ].emojis ).toHaveLength( 1 );
 		expect( out[ 0 ].emojis[ 0 ].hexcode ).toBe( '1F44B' );
+	} );
+
+	it( 'skips the Component group, which is not pickable on its own', () => {
+		const data: EmojibaseEntry[] = [
+			{ hexcode: '1F44B', emoji: '👋', group: 1 },
+			// Skin-tone swatches and hair modifiers only ever combine.
+			{ hexcode: '1F3FB', emoji: '🏻', group: 2 },
+			{ hexcode: '1F9B0', emoji: '🦰', group: 2 },
+		];
+		const out = groupEmojis( data );
+		expect( out.map( ( g ) => g.key ) ).toEqual( [ 1 ] );
 	} );
 
 	it( 'buckets emojis by group and sorts groups numerically', () => {
@@ -241,7 +277,7 @@ describe( 'EmojiPicker search announcements', () => {
 										group: 0,
 									},
 							  ]
-							: { groups: [ { order: 0, message: 'Smileys' } ] }
+							: {}
 					),
 			} as unknown as Response )
 		);
@@ -266,8 +302,9 @@ describe( 'EmojiPicker search announcements', () => {
 
 		// While browsing, each category is a rowgroup labelled by its
 		// visible heading, so cell-by-cell navigation has group context.
+		// The heading is Unicode's own name for the group.
 		expect(
-			screen.getByRole( 'rowgroup', { name: 'Smileys' } )
+			screen.getByRole( 'rowgroup', { name: 'Smileys & Emotion' } )
 		).toBeVisible();
 
 		// While searching, results collapse into one flat grid with no

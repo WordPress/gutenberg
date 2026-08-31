@@ -38,10 +38,57 @@ export const SKIN_TONE_PREFERENCE_KEY = 'emojiPickerSkinTone';
 
 const COLUMNS = 8;
 
+/*
+ * Unicode's Component group holds the skin-tone swatches and hair
+ * modifiers, which only ever combine with another emoji. They are not
+ * pickable on their own, so the group is dropped rather than shown as a
+ * row of bare swatches.
+ */
+const COMPONENT_GROUP = 2;
+
+/**
+ * Unicode's own name for an emoji group, taken verbatim from the
+ * `# group:` lines of `emoji-test.txt`. Emojibase indexes the same groups
+ * by `group` / `order` but ships its English names lowercased and
+ * pluralized ("smileys & emotion", "components"), and cases the other
+ * locales inconsistently, so the headings are translated here rather than
+ * read from its `messages.json`.
+ *
+ * Resolved per render so the strings are looked up after the editor's
+ * translations have loaded.
+ *
+ * @param key Emojibase `group` key.
+ * @return The category heading, or an empty string for an unknown group.
+ */
+export function getGroupLabel( key: number ): string {
+	switch ( key ) {
+		case 0:
+			return __( 'Smileys & Emotion' );
+		case 1:
+			return __( 'People & Body' );
+		case 3:
+			return __( 'Animals & Nature' );
+		case 4:
+			return __( 'Food & Drink' );
+		case 5:
+			return __( 'Travel & Places' );
+		case 6:
+			return __( 'Activities' );
+		case 7:
+			return __( 'Objects' );
+		case 8:
+			return __( 'Symbols' );
+		case 9:
+			return __( 'Flags' );
+		default:
+			return '';
+	}
+}
+
 /**
  * Group emoji records by their Emojibase `group` key, preserving
- * Emojibase's natural ordering (which follows Unicode CLDR). Entries
- * with no `group` (e.g. component code points) are skipped.
+ * Emojibase's natural ordering (which follows Unicode). Entries with no
+ * `group`, and the Component group, are skipped.
  *
  * @param data Emoji records from `data.json`.
  * @return Ordered category buckets.
@@ -49,7 +96,10 @@ const COLUMNS = 8;
 export function groupEmojis( data: EmojibaseEntry[] ): EmojiGroup[] {
 	const buckets = new Map< number, EmojibaseEntry[] >();
 	for ( const entry of data ) {
-		if ( typeof entry.group !== 'number' ) {
+		if (
+			typeof entry.group !== 'number' ||
+			entry.group === COMPONENT_GROUP
+		) {
 			continue;
 		}
 		if ( ! buckets.has( entry.group ) ) {
@@ -132,10 +182,7 @@ export function searchEmojis(
 export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 	const { baseUrl, labelOverrides } = useEmojibaseConfig();
 	const [ locale ] = useState( detectLocale );
-	const { data, messages, isLoading, error } = useEmojibaseData(
-		baseUrl,
-		locale
-	);
+	const { data, isLoading, error } = useEmojibaseData( baseUrl, locale );
 	const [ query, setQuery ] = useState( '' );
 	const viewportRef = useRef< HTMLDivElement >( null );
 	const searchRef = useRef< HTMLInputElement >( null );
@@ -173,16 +220,6 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 		() => ( data ? groupEmojis( data ) : [] ),
 		[ data ]
 	);
-
-	const groupLabelByKey = useMemo( () => {
-		const map = new Map< number, string >();
-		if ( messages?.groups ) {
-			for ( const g of messages.groups ) {
-				map.set( g.order, g.message );
-			}
-		}
-		return map;
-	}, [ messages ] );
 
 	const visibleGroups = useMemo( () => {
 		if ( ! groups.length ) {
@@ -414,8 +451,7 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 									role="rowgroup"
 								>
 									<Composite.GroupLabel className="editor-collab-sidebar-panel__picker-category">
-										{ groupLabelByKey.get( group.key ) ||
-											'' }
+										{ getGroupLabel( group.key ) }
 									</Composite.GroupLabel>
 									{ group.rows.map( ( row, rowIndex ) =>
 										renderRow(

@@ -65,26 +65,10 @@ export interface EmojibaseEntry {
 }
 
 /**
- * A single group heading from the Emojibase `messages.json` dataset.
- */
-export interface EmojibaseGroupMessage {
-	order: number;
-	message: string;
-}
-
-/**
- * The subset of the Emojibase `messages.json` dataset the picker reads.
- */
-export interface EmojibaseMessages {
-	groups?: EmojibaseGroupMessage[];
-}
-
-/**
  * A loaded Emojibase dataset for a single locale.
  */
 export interface EmojibaseDataset {
 	data: EmojibaseEntry[];
-	messages: EmojibaseMessages;
 }
 
 /**
@@ -92,7 +76,6 @@ export interface EmojibaseDataset {
  */
 export interface EmojibaseDataState {
 	data: EmojibaseEntry[] | null;
-	messages: EmojibaseMessages | null;
 	isLoading: boolean;
 	error: Error | null;
 }
@@ -183,9 +166,10 @@ const dataCache = new Map< string, EmojibaseDataset >();
 const inflight = new Map< string, Promise< EmojibaseDataset > >();
 
 /**
- * Fetch and cache Emojibase `data.json` + `messages.json` for a given
- * locale. Resolves with `{ data, messages }` or rejects on a network
- * error so callers can render an error/empty state.
+ * Fetch and cache the Emojibase `data.json` for a given locale. Resolves
+ * with `{ data }` or rejects on a network error so callers can render an
+ * error/empty state. Category headings come from Unicode's own group
+ * names in the picker, so `messages.json` is never fetched.
  *
  * @param baseUrl Same-origin base URL for the emojibase-data
  *                directory (e.g. plugin's `build/emojibase-data`).
@@ -203,22 +187,15 @@ export function loadEmojibaseData(
 	if ( inflight.has( cacheKey ) ) {
 		return inflight.get( cacheKey ) as Promise< EmojibaseDataset >;
 	}
-	const promise = Promise.all( [
-		fetch( `${ baseUrl }/${ locale }/data.json` ).then( ( r ) => {
+	const promise = fetch( `${ baseUrl }/${ locale }/data.json` )
+		.then( ( r ) => {
 			if ( ! r.ok ) {
 				throw new Error( `Failed to load ${ locale }/data.json` );
 			}
 			return r.json() as Promise< EmojibaseEntry[] >;
-		} ),
-		fetch( `${ baseUrl }/${ locale }/messages.json` ).then( ( r ) => {
-			if ( ! r.ok ) {
-				throw new Error( `Failed to load ${ locale }/messages.json` );
-			}
-			return r.json() as Promise< EmojibaseMessages >;
-		} ),
-	] )
-		.then( ( [ data, messages ] ) => {
-			const value: EmojibaseDataset = { data, messages };
+		} )
+		.then( ( data ) => {
+			const value: EmojibaseDataset = { data };
 			dataCache.set( cacheKey, value );
 			inflight.delete( cacheKey );
 			return value;
@@ -246,7 +223,6 @@ export function useEmojibaseData(
 		const cached = dataCache.get( `${ baseUrl }|${ locale }` );
 		return {
 			data: cached?.data || null,
-			messages: cached?.messages || null,
 			isLoading: ! cached,
 			error: null,
 		};
@@ -261,7 +237,6 @@ export function useEmojibaseData(
 		if ( cached ) {
 			setState( {
 				data: cached.data,
-				messages: cached.messages,
 				isLoading: false,
 				error: null,
 			} );
@@ -269,13 +244,12 @@ export function useEmojibaseData(
 		}
 		setState( ( prev ) => ( { ...prev, isLoading: true, error: null } ) );
 		loadEmojibaseData( baseUrl, locale )
-			.then( ( { data, messages } ) => {
+			.then( ( { data } ) => {
 				if ( cancelled ) {
 					return;
 				}
 				setState( {
 					data,
-					messages,
 					isLoading: false,
 					error: null,
 				} );
@@ -286,7 +260,6 @@ export function useEmojibaseData(
 				}
 				setState( {
 					data: null,
-					messages: null,
 					isLoading: false,
 					error,
 				} );
