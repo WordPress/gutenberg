@@ -840,3 +840,88 @@ function gutenberg_get_block_templates( $output, $query = array(), $template_typ
 	 */
 	return apply_filters( 'get_block_templates', $query_result, $query, $template_type );
 }
+
+/**
+ * Registers post-type- and taxonomy-specific templates as default (reserved)
+ * template types.
+ *
+ * When a theme template file follows the template hierarchy naming convention
+ * for a registered post type or taxonomy (e.g. `archive-event.html`,
+ * `single-event.html`, `taxonomy-genre.html`) but carries no explicit
+ * `postTypes` metadata, `get_block_templates()` treats it as a generic custom
+ * template and offers it for every post type. As a result an archive template
+ * can wrongly appear in a singular post's template picker.
+ *
+ * Registering these hierarchy slugs as default template types marks them as
+ * reserved, so they are no longer mistaken for generic custom templates. This
+ * mirrors core's dynamic handling of post-format templates in
+ * `get_default_block_template_types()`, extending it to custom post types and
+ * taxonomies. Because the filter runs for both core's `get_block_templates()`
+ * and Gutenberg's `gutenberg_get_block_templates()`, it fixes both code paths.
+ *
+ * @see https://github.com/WordPress/gutenberg/issues/79696
+ *
+ * @param array $default_template_types The default template types.
+ * @return array The default template types, extended with post-type- and
+ *               taxonomy-specific entries.
+ */
+function gutenberg_extend_default_template_types_with_registered_types( $default_template_types ) {
+	if ( ! is_array( $default_template_types ) ) {
+		return $default_template_types;
+	}
+
+	$post_types = get_post_types( array( 'public' => true ), 'objects' );
+	foreach ( $post_types as $post_type ) {
+		$singular_name = ! empty( $post_type->labels->singular_name ) ? $post_type->labels->singular_name : $post_type->name;
+		$plural_name   = ! empty( $post_type->labels->name ) ? $post_type->labels->name : $post_type->name;
+
+		$default_template_types[ 'single-' . $post_type->name ] = array(
+			'title'       => sprintf(
+				/* translators: %s: Post type singular name. */
+				_x( 'Single item: %s', 'Template name' ),
+				$singular_name
+			),
+			'description' => sprintf(
+				/* translators: %s: Post type singular name. */
+				__( 'Displays a single item of the "%s" post type.', 'gutenberg' ),
+				$singular_name
+			),
+		);
+
+		if ( $post_type->has_archive ) {
+			$default_template_types[ 'archive-' . $post_type->name ] = array(
+				'title'       => sprintf(
+					/* translators: %s: Post type plural name. */
+					_x( 'Archive: %s', 'Template name' ),
+					$plural_name
+				),
+				'description' => sprintf(
+					/* translators: %s: Post type plural name. */
+					__( 'Displays the archive of the "%s" post type.', 'gutenberg' ),
+					$plural_name
+				),
+			);
+		}
+	}
+
+	$taxonomies = get_taxonomies( array( 'public' => true ), 'objects' );
+	foreach ( $taxonomies as $taxonomy ) {
+		$singular_name = ! empty( $taxonomy->labels->singular_name ) ? $taxonomy->labels->singular_name : $taxonomy->name;
+
+		$default_template_types[ 'taxonomy-' . $taxonomy->name ] = array(
+			'title'       => sprintf(
+				/* translators: %s: Taxonomy singular name. */
+				_x( 'Taxonomy: %s', 'Template name' ),
+				$singular_name
+			),
+			'description' => sprintf(
+				/* translators: %s: Taxonomy singular name. */
+				__( 'Displays the archive for a "%s" taxonomy term.', 'gutenberg' ),
+				$singular_name
+			),
+		);
+	}
+
+	return $default_template_types;
+}
+add_filter( 'default_template_types', 'gutenberg_extend_default_template_types_with_registered_types' );
