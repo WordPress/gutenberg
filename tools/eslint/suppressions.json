@@ -4886,11 +4886,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/tools-panel/tools-panel/hook.ts": {
-		"react-hooks/refs": {
-			"count": 2
-		}
-	},
 	"packages/components/src/tree-grid/cell.tsx": {
 		"react-hooks/refs": {
 			"count": 1

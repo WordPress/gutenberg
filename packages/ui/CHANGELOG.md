@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a responsive `Breadcrumb` navigation component. ([#80425](https://github.com/WordPress/gutenberg/pull/80425))
+
 ### Breaking Changes
 
 -   `Autocomplete.Popup`, `Combobox.Popup`, `Select.Popup`, `SearchableChipSelect`, and `SearchableChipSelectControl`: The popup now defaults to a fixed anchor width. Use `popupWidth="content"` to restore content-sized width between the anchor and available viewport bounds ([#82087](https://github.com/WordPress/gutenberg/pull/82087)).
@@ -10,6 +14,7 @@
 ### Enhancements
 
 -   `Autocomplete.Popup`, `Combobox.Popup`, `SearchableChipSelect`, `SearchableChipSelectControl`, `Select.Popup`, and `SelectControl`: Add `popupWidth` prop with preset width constraints (`anchor`, `content`, `sm`, `md`, `lg`, and `available`) for the item popup. `SelectControl` defaults to `content` to preserve prior popup sizing ([#82087](https://github.com/WordPress/gutenberg/pull/82087)).
+-   `Menu`: Use `Text` for item labels and descriptions to share typography and apply `text-wrap: pretty`. ([#82237](https://github.com/WordPress/gutenberg/pull/82237))
 -   `Text`: Apply `text-wrap: pretty` by default to improve line wrapping. ([#82133](https://github.com/WordPress/gutenberg/pull/82133))
 
 ### Bug Fixes
