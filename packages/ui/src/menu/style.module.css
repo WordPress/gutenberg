@@ -244,12 +244,16 @@
 		}
 
 		.item-label {
+			--_gcd-heading-color: currentColor;
+
 			min-width: 0;
 			overflow-wrap: anywhere;
 			color: inherit;
 		}
 
 		.item-description {
+			--_gcd-heading-color: var(--wpds-color-foreground-content-neutral-weak);
+
 			color: var(--wpds-color-foreground-content-neutral-weak);
 			overflow-wrap: anywhere;
 			/* For better optical alignment and spacing */
@@ -323,6 +327,8 @@
 		.item[aria-disabled="true"] .item-shortcut,
 		.item[aria-disabled="true"] .item-trailing,
 		.item[aria-disabled="true"] .item-selection-indicator {
+			--_gcd-heading-color: currentColor;
+
 			color: inherit;
 		}
 	}
