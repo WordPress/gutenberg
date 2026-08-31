@@ -34,20 +34,31 @@ function NotesSidebar( { postId } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const sidebarRef = useRef( null );
 
-	const { clientId, noteId, isClassicBlock } = useSelect( ( select ) => {
-		const { getBlockAttributes, getSelectedBlockClientId, getBlockName } =
-			select( blockEditorStore );
-		const _clientId = getSelectedBlockClientId();
-		return {
-			clientId: _clientId,
-			noteId: _clientId
-				? getBlockAttributes( _clientId )?.metadata?.noteId
-				: null,
-			isClassicBlock: _clientId
-				? getBlockName( _clientId ) === 'core/freeform'
-				: false,
-		};
-	}, [] );
+	const { clientId, noteId, isClassicBlock, canEditBlock } = useSelect(
+		( select ) => {
+			const {
+				getBlockAttributes,
+				getSelectedBlockClientId,
+				getBlockName,
+				canEditBlock: _canEditBlock,
+			} = select( blockEditorStore );
+			const _clientId = getSelectedBlockClientId();
+			return {
+				clientId: _clientId,
+				noteId: _clientId
+					? getBlockAttributes( _clientId )?.metadata?.noteId
+					: null,
+				isClassicBlock: _clientId
+					? getBlockName( _clientId ) === 'core/freeform'
+					: false,
+				// Adding a note writes `metadata.noteId` to the block, so the
+				// affordance follows the same permission as the menu item it
+				// replaced: blocks locked against editing do not offer it.
+				canEditBlock: _clientId ? _canEditBlock( _clientId ) : false,
+			};
+		},
+		[]
+	);
 
 	const { isDistractionFree } = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
@@ -180,7 +191,7 @@ function NotesSidebar( { postId } ) {
 					onClick={ () => openNoteForBlock( clientId ) }
 				/>
 			) }
-			{ !! clientId && (
+			{ !! clientId && canEditBlock && (
 				<AddNoteToolbarButton
 					clientId={ clientId }
 					isOpen={ selectedNoteId === 'new' }

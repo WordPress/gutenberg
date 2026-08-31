@@ -43,16 +43,22 @@ function NoteToolbarButton( {
 		return null;
 	}
 
+	/*
+	 * The reason a classic block cannot take a note belongs in the description,
+	 * not the label: the button has to keep answering to "Add note" so screen
+	 * reader users and tests can still find it while it is disabled.
+	 */
 	const isDisabled = block?.name === 'core/freeform';
-	const label = isDisabled
+	const description = isDisabled
 		? __( 'Convert to blocks to add notes.' )
-		: __( 'Add note' );
+		: undefined;
 
 	return (
 		<ToolbarButton
 			className="editor-add-note-toolbar-button"
 			icon={ commentIcon }
-			label={ label }
+			label={ __( 'Add note' ) }
+			description={ description }
 			onClick={ onClick }
 			aria-haspopup="dialog"
 			aria-expanded={ isOpen }

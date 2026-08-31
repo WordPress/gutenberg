@@ -38,7 +38,7 @@ collab-sidebar/
 ```
 NotesSidebarContainer (index.jsx)         - gates on post type support
  └── NotesSidebar (index.jsx)             - owns sidebarRef + useNoteThreads + sidebar registration
-      ├── AddNoteToolbarButton           - slot fill in the block toolbar (rendered when block has no thread)
+      ├── AddNoteToolbarButton           - slot fill in the block toolbar (rendered for any editable block)
       ├── NoteAvatarIndicator            - slot fill in the block toolbar (per-thread avatars, rendered when block has a thread)
       ├── PluginSidebar (all-notes)      - full sidebar
       │    └── Notes (notes.jsx)          - owns outer Stack + aria-label + useNoteActions + keyboard nav
