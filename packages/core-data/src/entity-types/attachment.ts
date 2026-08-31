@@ -206,17 +206,11 @@ declare module './base-entity-records' {
 			 */
 			post: ContextualField< number | null, 'view' | 'edit', C >;
 			/**
-			 * The lineage root this attachment was edited from. Present only
-			 * when the attachment was created by editing another image.
+			 * The id of the lineage root this attachment was edited from.
+			 * Present only when the attachment was created by editing another
+			 * image. Embeddable via the `wp:original-attachment` link.
 			 */
-			original_attachment?: ContextualField<
-				{
-					attachment_id: number;
-					source_url: string;
-				},
-				'edit',
-				C
-			>;
+			original_attachment?: ContextualField< number, 'edit', C >;
 			/**
 			 * URL to the original attachment file.
 			 */
