@@ -80,12 +80,11 @@ async function run() {
 	/*
 	 * Every write re-renders every section, including the footers marking a
 	 * commit-scoped result as no longer current, so the head is needed
-	 * whatever this section's own scope is. Losing it only blocks a
-	 * commit-scoped write, which `mergeSection` refuses without one.
+	 * whatever this section's own scope is. Letting a failure through to the
+	 * outer handler skips the write: rendering without it would present every
+	 * stale result as current.
 	 */
-	const headSha = await api
-		.getHeadSha( prNumber )
-		.catch( () => undefined as string | undefined );
+	const headSha = await api.getHeadSha( prNumber );
 
 	const {
 		body: merged,
