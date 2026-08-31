@@ -246,7 +246,7 @@ jobs:
                   node-version-file: '.nvmrc'
                   check-latest: true
 
-            - name: Pin npm version for consistency
+            - name: Set up npm
               uses: ./.github/setup-npm
 
             - name: Configure build for wordpress-develop
@@ -567,7 +567,7 @@ jobs:
                   registry-url: 'https://registry.npmjs.org'
                   check-latest: true
 
-            - name: Pin npm version for consistency
+            - name: Set up npm
               uses: ./main/.github/setup-npm
               with:
                   working-directory: main

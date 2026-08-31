@@ -68,7 +68,7 @@ jobs:
                   node-version: ${{ matrix.node }}
                   cache: npm
 
-            - name: Pin npm version for consistency
+            - name: Set up npm
               uses: ./.github/setup-npm
 
             - name: npm install
@@ -167,7 +167,7 @@ jobs:
                   # and the job doesn't need the install speed.
                   package-manager-cache: false
 
-            - name: Pin npm version for consistency
+            - name: Set up npm
               uses: ./.github/setup-npm
 
             - name: npm install

@@ -20,7 +20,7 @@ runs:
                   package-lock.json
                   patches/**
 
-        - name: Pin npm version for consistency
+        - name: Set up npm
           uses: ./.github/setup-npm
 
         - name: Get Node.js and npm version

@@ -83,7 +83,7 @@ jobs:
                   registry-url: 'https://registry.npmjs.org'
                   check-latest: true
 
-            - name: Pin npm version for consistency
+            - name: Set up npm
               uses: ./cli/.github/setup-npm
               with:
                   working-directory: cli
