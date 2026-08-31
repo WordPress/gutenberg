@@ -1,0 +1,18 @@
+[
+	{
+		"name": "core/search",
+		"isValid": true,
+		"attributes": {
+			"label": "Search",
+			"showLabel": true,
+			"placeholder": "",
+			"width": 50,
+			"buttonText": "Search",
+			"buttonPosition": "button-outside",
+			"buttonUseIcon": false,
+			"query": {},
+			"tagName": ""
+		},
+		"innerBlocks": []
+	}
+]

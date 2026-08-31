@@ -28,7 +28,7 @@ class Render_Block_Search_Test extends WP_UnitTestCase {
 	 * @covers ::gutenberg_styles_for_block_core_search
 	 */
 	public function test_no_width_renders_no_width_style() {
-		$this->assertStringNotContainsString( 'width:', $this->get_wrapper_style( array() ) );
+		$this->assertStringNotContainsString( 'width: ', $this->get_wrapper_style( array() ) );
 	}
 
 	/**
@@ -90,7 +90,25 @@ class Render_Block_Search_Test extends WP_UnitTestCase {
 	public function test_legacy_width_attribute_without_a_unit_is_ignored() {
 		$attributes = array( 'width' => 50 );
 
-		$this->assertStringNotContainsString( 'width:', $this->get_wrapper_style( $attributes ) );
+		$this->assertStringNotContainsString( 'width: ', $this->get_wrapper_style( $attributes ) );
+	}
+
+	/**
+	 * The Width control's leftmost step is labelled "None" and writes the
+	 * string '0', which means no width rather than a zero-width field.
+	 *
+	 * @covers ::gutenberg_styles_for_block_core_search
+	 */
+	public function test_block_support_width_of_zero_renders_no_width_style() {
+		$attributes = array(
+			'style' => array(
+				'dimensions' => array(
+					'width' => '0',
+				),
+			),
+		);
+
+		$this->assertStringNotContainsString( 'width: ', $this->get_wrapper_style( $attributes ) );
 	}
 
 	/**
@@ -111,5 +129,24 @@ class Render_Block_Search_Test extends WP_UnitTestCase {
 
 		$this->assertStringContainsString( 'width: 350px', $style );
 		$this->assertStringNotContainsString( 'width: 50%', $style );
+	}
+
+	/**
+	 * `dimensions` opts out of serializing `width`, so the block wrapper must
+	 * not pick it up alongside the inside wrapper that the block styles itself.
+	 *
+	 * @covers ::gutenberg_render_block_core_search
+	 */
+	public function test_width_is_applied_to_the_inside_wrapper_only() {
+		$html = do_blocks( '<!-- wp:search {"style":{"dimensions":{"width":"350px"}}} /-->' );
+
+		$this->assertMatchesRegularExpression(
+			'/<div class="wp-block-search__inside-wrapper"[^>]*style="[^"]*width: 350px/',
+			$html
+		);
+		$this->assertDoesNotMatchRegularExpression(
+			'/<(?:form|search)[^>]*style="[^"]*width/',
+			$html
+		);
 	}
 }
