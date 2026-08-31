@@ -244,20 +244,16 @@
 		}
 
 		.item-label {
+			--_gcd-heading-color: currentColor;
+
 			min-width: 0;
 			overflow-wrap: anywhere;
-			font-family: var(--wpds-typography-font-family-body);
-			font-size: var(--wpds-typography-font-size-md);
-			line-height: var(--wpds-typography-line-height-sm);
-			font-weight: var(--wpds-typography-font-weight-default);
 			color: inherit;
 		}
 
 		.item-description {
-			font-family: var(--wpds-typography-font-family-body);
-			font-size: var(--wpds-typography-font-size-sm);
-			line-height: var(--wpds-typography-line-height-xs);
-			font-weight: var(--wpds-typography-font-weight-default);
+			--_gcd-heading-color: var(--wpds-color-foreground-content-neutral-weak);
+
 			color: var(--wpds-color-foreground-content-neutral-weak);
 			overflow-wrap: anywhere;
 			/* For better optical alignment and spacing */
@@ -331,6 +327,8 @@
 		.item[aria-disabled="true"] .item-shortcut,
 		.item[aria-disabled="true"] .item-trailing,
 		.item[aria-disabled="true"] .item-selection-indicator {
+			--_gcd-heading-color: currentColor;
+
 			color: inherit;
 		}
 	}
