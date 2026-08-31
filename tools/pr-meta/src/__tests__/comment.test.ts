@@ -461,3 +461,50 @@ describe( 'comment limit', () => {
 		expect( merged ).toContain( 'Props.' );
 	} );
 } );
+
+describe( 'collapsing', () => {
+	it( 'folds a section long enough to warrant it', () => {
+		const merged = bodyOf(
+			mergeSection(
+				undefined,
+				{ id: 'performance', body: 'Tables.', sha: HEAD },
+				HEAD
+			)
+		);
+
+		expect( merged ).toContain(
+			`<summary>${ getSection( 'performance' )!.summary }</summary>`
+		);
+	} );
+
+	it( 'leaves a short section open', () => {
+		const merged = bodyOf(
+			mergeSection( undefined, { id: 'labels', body: 'Warning.' } )
+		);
+
+		expect( merged ).not.toContain( '<details>' );
+	} );
+
+	/* The fold sits outside the delimiters, so it cannot nest into itself. */
+	it( 'folds once however many times the comment is written', () => {
+		let comment = bodyOf(
+			mergeSection(
+				undefined,
+				{ id: 'flaky-tests', body: 'Traces.', sha: HEAD },
+				HEAD
+			)
+		);
+		comment = bodyOf(
+			mergeSection( comment, { id: 'props', body: 'Props.' }, HEAD )
+		);
+		comment = bodyOf(
+			mergeSection( comment, { id: 'labels', body: 'Warning.' }, HEAD )
+		);
+
+		expect( comment.match( /<details>/g ) ).toHaveLength( 1 );
+		expect(
+			parseSections( comment ).find( ( s ) => s.id === 'flaky-tests' )
+				?.body
+		).toBe( 'Traces.' );
+	} );
+} );

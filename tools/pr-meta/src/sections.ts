@@ -14,6 +14,8 @@ export type SectionDefinition = {
 	scope: SectionScope;
 	/** Maximum characters of rendered body before the section is truncated. */
 	budget: number;
+	/** Label for a section long enough to collapse. Omitted leaves it open. */
+	summary?: string;
 };
 
 /*
@@ -57,12 +59,14 @@ export const SECTIONS: SectionDefinition[] = [
 		heading: '⚡ Performance',
 		scope: 'commit',
 		budget: 12000,
+		summary: 'Show the results',
 	},
 	{
 		id: 'flaky-tests',
 		heading: '🏁 Flaky tests',
 		scope: 'commit',
 		budget: 16000,
+		summary: 'Show the failures',
 	},
 ];
 

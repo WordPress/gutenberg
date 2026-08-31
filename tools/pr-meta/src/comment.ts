@@ -142,15 +142,20 @@ function renderSection(
 		section.runUrl
 	);
 
+	const delimited = `${ open }\n${ body }\n${ close }`;
+
 	/*
-	 * The heading and the footer sit outside the delimiters. Everything
-	 * between them is read back verbatim as the body, so decorations kept
-	 * inside would be re-rendered on top of themselves at every write.
+	 * The heading, the fold and the footer all sit outside the delimiters.
+	 * Everything between them is read back verbatim as the body, so a
+	 * decoration kept inside would be re-rendered on top of itself at every
+	 * write. The blank lines are what let GitHub render markdown inside the
+	 * fold.
 	 */
-	return `${ heading }${ open }\n${ body }\n${ close }${ renderFooter(
-		section,
-		headSha
-	) }`;
+	const content = definition?.summary
+		? `<details>\n<summary>${ definition.summary }</summary>\n\n${ delimited }\n\n</details>`
+		: delimited;
+
+	return `${ heading }${ content }${ renderFooter( section, headSha ) }`;
 }
 
 /**
