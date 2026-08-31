@@ -55,6 +55,46 @@ function MyComponent() {
 	return <Foo />;
 }`,
 		},
+		{
+			code: `
+function example() {
+    const [ h, m, s ] = getTime();
+
+    if (h > 0) {
+        return \`\${ h }:\${ m }\`;
+    }
+
+    if (m > 0) {
+        return \`\${ m }:\${ s }\`;
+    }
+
+    return \`0:\${ s }\`;
+}`,
+		},
+		{
+			code: `
+function example() {
+    const [ h, , s ] = getTime();
+
+    if (h > 0) {
+        return h;
+    }
+
+    return s;
+}`,
+		},
+		{
+			code: `
+function example() {
+    const [ h, m ] = getTime();
+
+    if (h > 0) {
+        return h;
+    }
+
+    return m;
+}`,
+		},
 	],
 	invalid: [
 		{
@@ -121,6 +161,74 @@ function example() {
 	return number + foo + bar;
 }`,
 			options: [ { excludePattern: '^do' } ],
+			errors: [
+				{
+					message:
+						'Variables should not be assigned until just prior its first reference. An early return statement may leave this variable unused.',
+				},
+			],
+		},
+		{
+			code: `
+function example() {
+    const [ x ] = getThing();
+    if ( number > 10 ) {
+        return number + 1;
+    }
+
+    return x;
+}`,
+			errors: [
+				{
+					message:
+						'Variables should not be assigned until just prior its first reference. An early return statement may leave this variable unused.',
+				},
+			],
+		},
+		{
+			code: `
+function example() {
+    const [ x, ] = getThing();
+    if ( number > 10 ) {
+        return number + 1;
+    }
+
+    return x;
+}`,
+			errors: [
+				{
+					message:
+						'Variables should not be assigned until just prior its first reference. An early return statement may leave this variable unused.',
+				},
+			],
+		},
+		{
+			code: `
+function example() {
+    const [ , x ] = getThing();
+    if ( number > 10 ) {
+        return number + 1;
+    }
+
+    return x;
+}`,
+			errors: [
+				{
+					message:
+						'Variables should not be assigned until just prior its first reference. An early return statement may leave this variable unused.',
+				},
+			],
+		},
+		{
+			code: `
+function example() {
+    const [ , , z ] = getThing();
+    if ( number > 10 ) {
+        return number + 1;
+    }
+
+    return z;
+}`,
 			errors: [
 				{
 					message:
