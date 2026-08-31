@@ -8,6 +8,7 @@ The following sections will walk you through the existing block APIs:
 -   [API Versions](/docs/reference-guides/block-api/block-api-versions/README.md)
 -   [Attributes](/docs/reference-guides/block-api/block-attributes.md)
 -   [Bindings](/docs/reference-guides/block-api/block-bindings.md)
+-   [Block Hooks](/docs/reference-guides/block-api/block-hooks.md)
 -   [Context](/docs/reference-guides/block-api/block-context.md)
 -   [Deprecation](/docs/reference-guides/block-api/block-deprecation.md)
 -   [Edit and Save](/docs/reference-guides/block-api/block-edit-save.md)
