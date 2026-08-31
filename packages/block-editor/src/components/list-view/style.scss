@@ -102,12 +102,12 @@
 	// the outline offset gap with white to keep the two apart.
 	&.is-selected .block-editor-list-view-block-contents:focus::after {
 		@include outset-ring__focus();
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) #{ $white };
+		box-shadow: 0 0 0 1px #{ $white };
 	}
 	&.is-selected.is-synced .block-editor-list-view-block-contents:focus::after {
 		--focus-color: var(--wp-block-synced-color);
 		@include outset-ring__focus();
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) #{ $white };
+		box-shadow: 0 0 0 1px #{ $white };
 	}
 	&.is-selected .block-editor-list-view-block__menu:focus,
 	&.is-selected.is-synced .block-editor-list-view-block__menu:focus {
