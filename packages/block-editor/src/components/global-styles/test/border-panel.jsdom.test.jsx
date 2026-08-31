@@ -54,6 +54,7 @@ const settingsAll = {
 };
 
 const shadowOnlySettings = { shadow: settingsAll.shadow };
+const borderOnlySettings = { border: settingsAll.border };
 
 describe( 'BorderPanel — panel and control labels', () => {
 	it( 'titles the panel "Borders" when border and shadow controls are available', () => {
@@ -87,6 +88,52 @@ describe( 'BorderPanel — panel and control labels', () => {
 		expect(
 			screen.getByRole( 'heading', { name: 'Borders' } )
 		).toBeInTheDocument();
+	} );
+
+	it( 'labels the border control, and puts its unlink toggle in that label row, when no shadow control is available', () => {
+		// The case that motivated the change: with no Shadow control to
+		// disambiguate it from, the Border label used to be hidden, which left
+		// its unlink toggle beside the inputs while the Radius one sat in a
+		// label row. Both now share the same layout.
+		render(
+			<BorderPanel
+				value={ {} }
+				settings={ borderOnlySettings }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		expect( screen.getByText( 'Border' ) ).toBeInTheDocument();
+
+		// `getAllByRole` returns document order, so the toggle preceding the
+		// border color/style picker is what places it in the label row rather
+		// than alongside the inputs.
+		const buttons = screen.getAllByRole( 'button' );
+		expect(
+			buttons.indexOf( screen.getByLabelText( 'Unlink sides' ) )
+		).toBeLessThan(
+			buttons.indexOf(
+				screen.getByLabelText( /Border color( and style)* picker/ )
+			)
+		);
+	} );
+
+	it( 'labels the border control when the inheritance indicators are off', () => {
+		// Global Styles renders the panel without the inheritance treatment.
+		// That used to be the other half of the condition hiding the label, so
+		// a border-only panel showed no label there either.
+		render(
+			<BorderPanel
+				value={ {} }
+				settings={ borderOnlySettings }
+				onChange={ () => {} }
+				panelId="test-panel"
+				showInheritanceLabelIndicators={ false }
+			/>
+		);
+
+		expect( screen.getByText( 'Border' ) ).toBeInTheDocument();
 	} );
 
 	it( 'labels the shadow control even when no border control is available', () => {
