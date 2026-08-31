@@ -1,6 +1,10 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 const { EXPERIMENTS, EDITOR_CONTEXTS, openPostSummary } = require( './utils' );
 
+/*
+ * Net-new coverage for the fields of the DataForm summary: there is no
+ * classic spec this file supersedes.
+ */
 test.describe( 'Post Summary', () => {
 	test.beforeEach( async ( { requestUtils } ) => {
 		await requestUtils.setGutenbergExperiments( EXPERIMENTS );
@@ -235,5 +239,326 @@ test.describe( 'Post Summary', () => {
 					.locator( '..' ),
 			};
 		}
+	} );
+
+	test.describe( 'post status', () => {
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllPosts();
+		} );
+
+		test( 'shows Draft for a new post before it has been saved', async ( {
+			admin,
+			editor,
+			page,
+		} ) => {
+			await admin.createNewPost();
+			const summary = await openPostSummary( { editor, page } );
+
+			// A new post is an `auto-draft`, which should be presented as
+			// a Draft.
+			const editButton = summary.getByRole( 'button', {
+				name: 'Edit Status',
+			} );
+			await expect( editButton ).toHaveAccessibleDescription( 'Draft' );
+
+			await editButton.click();
+			await expect(
+				page.getByRole( 'radio', { name: 'Draft' } )
+			).toBeChecked();
+		} );
+
+		test( 'clears the date when a scheduled post is switched to draft', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			const scheduledDate = new Date();
+			scheduledDate.setDate( 15 );
+			scheduledDate.setMonth( scheduledDate.getMonth() + 1 );
+			const post = await requestUtils.createPost( {
+				title: 'Scheduled post',
+				status: 'publish',
+				date_gmt: scheduledDate.toISOString(),
+				content: `<!-- wp:paragraph -->\n<p>Scheduled content</p>\n<!-- /wp:paragraph -->`,
+			} );
+			await admin.editPost( post.id );
+
+			const summary = await openPostSummary( { editor, page } );
+			await summary
+				.getByRole( 'button', { name: 'Edit Status' } )
+				.click();
+			await expect(
+				page.getByRole( 'radio', { name: 'Scheduled' } )
+			).toBeChecked();
+
+			await page.getByRole( 'radio', { name: 'Draft' } ).click();
+
+			await expect
+				.poll( () =>
+					page.evaluate( () =>
+						window.wp.data
+							.select( 'core/editor' )
+							.getEditedPostAttribute( 'date' )
+					)
+				)
+				.toBeNull();
+		} );
+
+		test( 'clears the password when a post is made private', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			const post = await requestUtils.createPost( {
+				title: 'Password protected post',
+				status: 'publish',
+				password: 'enchilada',
+				content: `<!-- wp:paragraph -->\n<p>Password protected content</p>\n<!-- /wp:paragraph -->`,
+			} );
+			await admin.editPost( post.id );
+
+			const summary = await openPostSummary( { editor, page } );
+			await summary
+				.getByRole( 'button', { name: 'Edit Status' } )
+				.click();
+			await expect(
+				page.getByRole( 'checkbox', { name: 'Password protected' } )
+			).toBeChecked();
+			await expect(
+				page.getByRole( 'textbox', { name: 'Password' } )
+			).toHaveValue( 'enchilada' );
+
+			await page.getByRole( 'radio', { name: 'Private' } ).click();
+
+			// The password field is not visible for private posts, and making
+			// a post private also clears its password.
+			await expect(
+				page.getByRole( 'checkbox', { name: 'Password protected' } )
+			).toBeHidden();
+			await expect
+				.poll( () =>
+					page.evaluate( () =>
+						window.wp.data
+							.select( 'core/editor' )
+							.getEditedPostAttribute( 'password' )
+					)
+				)
+				.toBe( '' );
+		} );
+	} );
+
+	test.describe( 'post author', () => {
+		let secondAuthor;
+
+		test.beforeAll( async ( { requestUtils } ) => {
+			secondAuthor = await requestUtils.createUser( {
+				username: 'secondauthor',
+				email: 'secondauthor@example.com',
+				password: 'secondauthorpassword',
+				roles: [ 'author' ],
+			} );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllUsers();
+		} );
+
+		test( 'changes the author from the summary panel', async ( {
+			admin,
+			editor,
+			page,
+		} ) => {
+			await admin.createNewPost();
+			const summary = await openPostSummary( { editor, page } );
+
+			await expect(
+				summary.getByText( 'admin', { exact: true } )
+			).toBeVisible();
+
+			await summary
+				.getByRole( 'button', { name: 'Edit Author' } )
+				.click();
+			await page
+				.getByRole( 'combobox', { name: 'Author' } )
+				.selectOption( { label: 'secondauthor' } );
+			await page.keyboard.press( 'Escape' );
+
+			await expect(
+				summary.getByText( 'secondauthor', { exact: true } )
+			).toBeVisible();
+			await expect
+				.poll( () =>
+					page.evaluate( () =>
+						window.wp.data
+							.select( 'core/editor' )
+							.getEditedPostAttribute( 'author' )
+					)
+				)
+				.toBe( secondAuthor.id );
+		} );
+	} );
+
+	test.describe( 'post excerpt', () => {
+		test( 'sets the excerpt from the summary panel', async ( {
+			admin,
+			editor,
+			page,
+		} ) => {
+			await admin.createNewPost();
+			const summary = await openPostSummary( { editor, page } );
+
+			await expect(
+				summary.getByText( 'Add an excerpt', { exact: true } )
+			).toBeVisible();
+
+			await summary
+				.getByRole( 'button', { name: 'Edit Excerpt' } )
+				.click();
+			await page
+				.getByRole( 'textbox', { name: 'Excerpt' } )
+				.fill( 'A DataForm excerpt.' );
+			await page.keyboard.press( 'Escape' );
+
+			await expect(
+				summary.getByText( 'A DataForm excerpt.', { exact: true } )
+			).toBeVisible();
+			await expect
+				.poll( () =>
+					page.evaluate( () =>
+						window.wp.data
+							.select( 'core/editor' )
+							.getEditedPostAttribute( 'excerpt' )
+					)
+				)
+				.toBe( 'A DataForm excerpt.' );
+		} );
+	} );
+
+	test.describe( 'post discussion', () => {
+		test( 'closes comments and pingbacks from the summary panel', async ( {
+			admin,
+			editor,
+			page,
+		} ) => {
+			await admin.createNewPost();
+			const summary = await openPostSummary( { editor, page } );
+
+			await summary
+				.getByRole( 'button', { name: 'Edit Discussion' } )
+				.click();
+
+			const comments = page.getByRole( 'radiogroup', {
+				name: 'Comments',
+			} );
+			await expect(
+				comments.getByRole( 'radio', { name: 'Open' } )
+			).toBeChecked();
+			await comments.getByRole( 'radio', { name: 'Closed' } ).click();
+
+			const pingbacks = page.getByRole( 'checkbox', {
+				name: 'Enable pingbacks & trackbacks',
+			} );
+			await expect( pingbacks ).toBeChecked();
+			await pingbacks.click();
+			await page.keyboard.press( 'Escape' );
+
+			await expect(
+				summary.getByText( 'Closed', { exact: true } )
+			).toBeVisible();
+			await expect
+				.poll( () =>
+					page.evaluate( () => {
+						const { getEditedPostAttribute } =
+							window.wp.data.select( 'core/editor' );
+						return {
+							comment_status:
+								getEditedPostAttribute( 'comment_status' ),
+							ping_status:
+								getEditedPostAttribute( 'ping_status' ),
+						};
+					} )
+				)
+				.toEqual( { comment_status: 'closed', ping_status: 'closed' } );
+		} );
+	} );
+
+	test.describe( 'post parent', () => {
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllPages();
+		} );
+
+		test( 'sets the parent of a page from the summary panel', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			await requestUtils.createPage( {
+				title: 'Parent page',
+				status: 'publish',
+			} );
+			await admin.createNewPost( { postType: 'page' } );
+			const summary = await openPostSummary( { editor, page } );
+
+			await expect(
+				summary.getByText( 'None', { exact: true } )
+			).toBeVisible();
+
+			await summary
+				.getByRole( 'button', { name: 'Edit Parent' } )
+				.click();
+			await page.getByRole( 'combobox', { name: 'Parent' } ).click();
+			await page
+				.getByRole( 'listbox' )
+				.getByRole( 'option', { name: 'Parent page' } )
+				.click();
+			await page.keyboard.press( 'Escape' );
+
+			await expect(
+				summary.getByText( 'Parent page', { exact: true } )
+			).toBeVisible();
+		} );
+	} );
+
+	test.describe( 'post format', () => {
+		test( 'changes the format from the summary panel', async ( {
+			admin,
+			editor,
+			page,
+		} ) => {
+			await admin.createNewPost();
+			const summary = await openPostSummary( { editor, page } );
+
+			await expect(
+				summary.getByText( 'Standard', { exact: true } )
+			).toBeVisible();
+
+			await summary
+				.getByRole( 'button', { name: 'Edit Format' } )
+				.click();
+			const formats = page.getByRole( 'radiogroup', {
+				name: 'Format',
+			} );
+			await expect(
+				formats.getByRole( 'radio', { name: 'Standard' } )
+			).toBeChecked();
+			await formats.getByRole( 'radio', { name: 'Image' } ).click();
+			await page.keyboard.press( 'Escape' );
+
+			await expect(
+				summary.getByText( 'Image', { exact: true } )
+			).toBeVisible();
+			await expect
+				.poll( () =>
+					page.evaluate( () =>
+						window.wp.data
+							.select( 'core/editor' )
+							.getEditedPostAttribute( 'format' )
+					)
+				)
+				.toBe( 'image' );
+		} );
 	} );
 } );
