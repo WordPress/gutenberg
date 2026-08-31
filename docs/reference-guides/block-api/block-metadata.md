@@ -173,6 +173,8 @@ An implementation should expect and tolerate unknown categories, providing some 
 
 Setting `parent` lets a block require that it is only available when nested within the specified blocks. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
 
+When `parent` is omitted, the block has no parent restriction and can be inserted anywhere insertion is otherwise allowed. An empty array is not the same as omitting the property: it matches no parent, including the root, so the block cannot be inserted anywhere and does not appear in the inserter. The only exception is a container that explicitly lists the block in its own [`allowedBlocks`](#allowed-blocks), which takes precedence.
+
 ### Ancestor
 
 -   Type: `string[]`
