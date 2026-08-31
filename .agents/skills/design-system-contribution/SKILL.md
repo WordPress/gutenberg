@@ -42,7 +42,7 @@ an unchanged public capability. Still follow the repository's required package
 changelog policy for production code changes.
 
 If a published package can run with a dependency supplied separately by
-WordPress, also apply the
+WordPress, apply the
 [`package-runtime-compatibility`](../package-runtime-compatibility/SKILL.md)
 skill before implementation.
 

@@ -143,10 +143,10 @@ consumer implications. Verify CSS and interaction behaviour in a browser where
 unit tests cannot establish cascade order, focus geometry, or portal behaviour.
 
 When a Design System package is bundled while one or more dependencies are
-supplied separately by WordPress, follow the general
+supplied separately by WordPress, follow the
 [cross-version package compatibility procedure](/packages/README.md#maintaining-cross-version-compatibility).
-Assess every supported entrypoint and version pairing before removing or
-changing the dependency contract.
+Check each supported entrypoint and version pairing before changing or removing
+the dependency contract.
 
 Before declaring package work complete, follow the applicable package source
 guidance and account for each relevant contract surface: public

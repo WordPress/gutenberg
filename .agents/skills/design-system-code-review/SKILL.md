@@ -35,7 +35,7 @@ For either classification, use the public guide's
 and inspect only the surfaces applicable to the change.
 
 If a published package can run with a dependency supplied separately by
-WordPress, also apply the
+WordPress, apply the
 [`package-runtime-compatibility`](../package-runtime-compatibility/SKILL.md)
 skill before concluding the review.
 
