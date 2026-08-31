@@ -19,7 +19,7 @@ const RAW_RESULTS_FILE_SUFFIX = '.performance-results.raw.json';
 const RESULTS_FILE_SUFFIX = '.performance-results.json';
 /*
  * Read from the CLI's own checkout, so every branch under test builds with the
- * npm version trunk pins rather than whichever npm the runner happens to ship.
+ * npm version trunk requires rather than whichever npm the runner happens to ship.
  */
 const NPM_VERSION = devEngines.packageManager.version;
 

@@ -1,18 +1,20 @@
 name: 'Set up npm'
-description: 'Installs the npm version pinned in the devEngines field of package.json, so every job resolves dependencies identically.'
+description: 'Installs the npm version required by the devEngines field of package.json, so every job resolves dependencies identically.'
 
 inputs:
     working-directory:
-        description: 'Optional. The directory holding the package.json to read the npm version from. Defaults to the workspace root.'
+        description: 'Optional. The directory holding the package.json to read the required npm version from. Defaults to the workspace root.'
         required: false
         default: '.'
 
 runs:
     using: 'composite'
     steps:
-        - name: Pin npm version for consistency
+        - name: Install npm
           run: |
-              npm install --global "npm@$(node -p "require('./package.json').devEngines.packageManager.version")"
+              NPM_VERSION="$(node -p "require('./package.json').devEngines.packageManager.version")"
+              echo "Required npm version: $NPM_VERSION"
+              npm install --global "npm@$NPM_VERSION"
               echo "npm: v$(npm --version)"
           working-directory: ${{ inputs.working-directory }}
           shell: bash
