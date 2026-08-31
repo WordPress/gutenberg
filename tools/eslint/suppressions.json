@@ -7126,7 +7126,7 @@
 			"count": 4
 		}
 	},
-	"packages/editor/src/components/suggestion-mode/test/auto-save.tsx": {
+	"packages/editor/src/components/suggestion-mode/test/auto-save.jsdom.test.tsx": {
 		"react-hooks/globals": {
 			"count": 1
 		}
