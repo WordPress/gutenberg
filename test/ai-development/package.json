@@ -25,8 +25,19 @@
 	},
 	"type": "module",
 	"devDependencies": {
-		"@anthropic-ai/claude-agent-sdk": "^0.3.201",
-		"promptfoo": "^0.121.19"
+		"@anthropic-ai/claude-agent-sdk": "^0.3.251",
+		"promptfoo": "0.122.1"
+	},
+	"overrides": {
+		"@huggingface/transformers": {
+			"sharp": "0.35.4"
+		},
+		"onnxruntime-node": {
+			"adm-zip": "0.6.0"
+		}
+	},
+	"publishConfig": {
+		"access": "public"
 	},
 	"scripts": {
 		"check:node": "node lib/check-node.mjs",

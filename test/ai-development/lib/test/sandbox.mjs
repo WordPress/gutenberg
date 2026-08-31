@@ -1,3 +1,8 @@
+/*
+ * Promptfoo is installed from this test package's standalone lockfile, not the
+ * repository's root lockfile.
+ */
+/* eslint import/no-unresolved: off */
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';

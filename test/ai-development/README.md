@@ -95,6 +95,13 @@ This package is deliberately not one of the root workspaces: Promptfoo's
 dependency tree is large and only needed by people running evals, so it keeps
 its own lockfile and install step.
 
+Promptfoo is pinned to `0.122.1` because `0.122.2` adds a dependency affected
+by [GHSA-jmr9-qjv8-65gv](https://github.com/advisories/GHSA-jmr9-qjv8-65gv).
+The package overrides also update two optional local-transformer dependencies to
+releases that fix [GHSA-xcpc-8h2w-3j85](https://github.com/advisories/GHSA-xcpc-8h2w-3j85)
+and [GHSA-f88m-g3jw-g9cj](https://github.com/advisories/GHSA-f88m-g3jw-g9cj).
+The CI job fails if a high-severity advisory returns.
+
 It also needs a newer Node than the repository — see `.nvmrc`.
 
 ```bash
