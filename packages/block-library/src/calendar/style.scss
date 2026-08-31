@@ -1,9 +1,23 @@
 @use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
 
 .wp-block-calendar {
 	text-align: center;
-	// Padding is on the wrapper; border-box keeps that width predictable.
 	box-sizing: border-box;
+
+	th,
+	td {
+		padding: 0.25em;
+		border: 1px solid;
+	}
+
+	th {
+		font-weight: 400;
+	}
+
+	caption {
+		background-color: inherit;
+	}
 
 	table {
 		width: 100%;
@@ -18,38 +32,104 @@
 		}
 	}
 
-	// Instance background is on the wrapper; let it show through header cells.
-	&.has-background th {
-		background-color: transparent;
-	}
-
-	th {
-		font-weight: 400;
-	}
-
-	caption {
-		background-color: inherit;
-	}
-
 	// Default text color only. Do not pin border-color here: Global Styles
 	// text color targets the table and does not add `has-text-color`, so a
 	// `$gray-300` border would stay grey instead of following the text.
 	:where(table:not(.has-text-color)) {
 		color: #40464d;
 	}
-}
 
-// Zero specificity so Global Styles (`:root :where(...)`) always wins, even
-// when block-library CSS loads after the global stylesheet (editor + Playground).
-// Default `border: 1px solid` uses currentColor so borders follow text color
-// (instance `has-text-color` and Global Styles on the table).
-:where(.wp-block-calendar th, .wp-block-calendar td) {
-	padding: 0.25em;
-	border: 1px solid;
+	// Border styles
+	//
+	// Custom border selections are applied to the table element. Cells inherit
+	// border color, style, and width from the table, matching the Table block.
+	.has-border-color {
+		> *,
+		tr,
+		th,
+		td {
+			border-color: inherit;
+		}
+	}
+
+	table[style*="border-top-color"],
+	table.has-border-color.has-individual-borders {
+		> *,
+		tr:first-child {
+			border-top-color: inherit;
+
+			th,
+			td {
+				border-top-color: inherit;
+			}
+		}
+
+		tr:not(:first-child) {
+			border-top-color: currentColor;
+		}
+	}
+
+	table[style*="border-right-color"],
+	table.has-border-color.has-individual-borders {
+		> *,
+		tr,
+		th,
+		td:last-child {
+			border-right-color: inherit;
+		}
+	}
+
+	table[style*="border-bottom-color"],
+	table.has-border-color.has-individual-borders {
+		> *,
+		tr:last-child {
+			border-bottom-color: inherit;
+
+			th,
+			td {
+				border-bottom-color: inherit;
+			}
+		}
+
+		tr:not(:last-child) {
+			border-bottom-color: currentColor;
+		}
+	}
+
+	table[style*="border-left-color"],
+	table.has-border-color.has-individual-borders {
+		> *,
+		tr,
+		th,
+		td:first-child {
+			border-left-color: inherit;
+		}
+	}
+
+	table[style*="border-style"],
+	table.has-border-color {
+		> *,
+		tr,
+		th,
+		td {
+			border-style: inherit;
+		}
+	}
+
+	table[style*="border-width"],
+	table.has-border-color {
+		> *,
+		tr,
+		th,
+		td {
+			border-width: inherit;
+			border-style: inherit;
+		}
+	}
 }
 
 // Keep the hard-coded header background color for backward compatibility.
 // Global Styles also targets `th` (see block.json selectors.color.background).
-:where(.wp-block-calendar:not(.has-background) table:not(.has-background) th) {
+:where(.wp-block-calendar table:not(.has-background) th) {
 	background: $gray-300;
 }

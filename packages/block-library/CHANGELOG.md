@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Calendar: Add border support and spacing support. ([#64345](https://github.com/WordPress/gutenberg/pull/64345)).
+
 ### Bug Fixes
 
 -   Tabs: Activate the tab that a URL hash points into, so an anchor set on a block inside a tab panel can be reached. Anchor links followed after the page has loaded are handled too, matching the Accordion block ([#81744](https://github.com/WordPress/gutenberg/pull/81744)).
@@ -32,7 +36,6 @@
 
 -   Columns: Add transforms between Columns and the Row variation that preserve column widths through flex child sizing controls.
 -   Gallery: Add an opt-in Grid layout while preserving the existing Flex layout for current galleries.([#81909](https://github.com/WordPress/gutenberg/pull/81909)).
--   Calendar: Add border support and spacing support. ([#64345](https://github.com/WordPress/gutenberg/pull/64345)).
 
 ### Bug Fixes
 

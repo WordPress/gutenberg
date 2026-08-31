@@ -4,7 +4,7 @@
 	"name": "core/calendar",
 	"title": "Calendar",
 	"category": "widgets",
-	"description": "A calendar of your site’s posts.",
+	"description": "A calendar of your site's posts.",
 	"keywords": [ "posts", "archive" ],
 	"textdomain": "default",
 	"attributes": {
@@ -62,10 +62,11 @@
 	},
 	"style": "wp-block-calendar",
 	"selectors": {
-		"border": ".wp-block-calendar th, .wp-block-calendar td",
+		"border": ".wp-block-calendar table",
+		"spacing": ".wp-block-calendar",
 		"color": {
 			"text": ".wp-block-calendar table",
-			"background": ".wp-block-calendar, .wp-block-calendar th"
+			"background": ".wp-block-calendar table, .wp-block-calendar th"
 		}
 	}
 }

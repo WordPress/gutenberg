@@ -12,6 +12,7 @@
  * @group blocks
  */
 class Tests_Blocks_Render_Calendar extends WP_UnitTestCase {
+
 	/**
 	 * @var int
 	 */
@@ -43,7 +44,11 @@ class Tests_Blocks_Render_Calendar extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 
-		$this->original_block_supports      = WP_Block_Supports::$block_to_render;
+		if ( class_exists( 'WP_Style_Engine_CSS_Rules_Store_Gutenberg' ) ) {
+			WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
+		}
+
+		$this->original_block_supports       = WP_Block_Supports::$block_to_render;
 		WP_Block_Supports::$block_to_render = array(
 			'blockName' => 'core/calendar',
 			'attrs'     => array(),
@@ -72,37 +77,47 @@ class Tests_Blocks_Render_Calendar extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers ::gutenberg_block_core_calendar_get_block_gap_css
+	 * @covers ::gutenberg_block_core_calendar_normalize_gap_value
 	 */
-	public function test_block_gap_css_converts_spacing_preset_to_custom_property() {
-		$css = gutenberg_block_core_calendar_get_block_gap_css(
-			array(
-				'style' => array(
-					'spacing' => array(
-						'blockGap' => 'var:preset|spacing|40',
-					),
-				),
-			)
-		);
+	public function test_normalize_gap_value_converts_spacing_preset_to_custom_property() {
+		$css = gutenberg_block_core_calendar_normalize_gap_value( 'var:preset|spacing|40' );
 
 		$this->assertSame( 'var(--wp--preset--spacing--40)', $css );
 	}
 
 	/**
-	 * @covers ::gutenberg_block_core_calendar_get_block_gap_css
+	 * @covers ::gutenberg_block_core_calendar_normalize_gap_value
 	 */
-	public function test_block_gap_css_rejects_unsafe_values() {
-		$css = gutenberg_block_core_calendar_get_block_gap_css(
+	public function test_normalize_gap_value_rejects_unsafe_values() {
+		$css = gutenberg_block_core_calendar_normalize_gap_value( '1px) url(https://example.com)' );
+
+		$this->assertSame( '', $css );
+	}
+
+	/**
+	 * @covers ::gutenberg_block_core_calendar_get_block_gap_style_rules
+	 */
+	public function test_block_gap_style_rules_use_instance_value() {
+		$rules = gutenberg_block_core_calendar_get_block_gap_style_rules(
 			array(
 				'style' => array(
 					'spacing' => array(
-						'blockGap' => '1px) url(https://example.com)',
+						'blockGap' => '2rem',
 					),
 				),
 			)
 		);
 
-		$this->assertSame( '', $css );
+		$this->assertSame( '2rem', $rules[0]['value'] );
+	}
+
+	/**
+	 * @covers ::gutenberg_block_core_calendar_get_block_gap_style_rules
+	 */
+	public function test_block_gap_style_rules_ignore_global_styles_without_instance_value() {
+		$rules = gutenberg_block_core_calendar_get_block_gap_style_rules( array() );
+
+		$this->assertSame( array(), $rules );
 	}
 
 	/**
@@ -144,7 +159,29 @@ class Tests_Blocks_Render_Calendar extends WP_UnitTestCase {
 	/**
 	 * @covers ::gutenberg_render_block_core_calendar
 	 */
-	public function test_render_applies_custom_borders_to_date_and_pad_cells() {
+	public function test_render_applies_background_to_table_not_wrapper() {
+		$html = gutenberg_render_block_core_calendar(
+			array(
+				'style' => array(
+					'color' => array(
+						'background' => '#eeeeee',
+					),
+				),
+			)
+		);
+
+		$processor = new WP_HTML_Tag_Processor( $html );
+		$processor->next_tag( 'DIV' );
+		$this->assertStringNotContainsString( 'has-background', (string) $processor->get_attribute( 'class' ) );
+
+		$processor->next_tag( 'TABLE' );
+		$this->assertStringContainsString( 'background-color:#eeeeee', (string) $processor->get_attribute( 'style' ) );
+	}
+
+	/**
+	 * @covers ::gutenberg_render_block_core_calendar
+	 */
+	public function test_render_applies_custom_borders_to_table_only() {
 		$html = gutenberg_render_block_core_calendar(
 			array(
 				'style' => array(
@@ -158,9 +195,37 @@ class Tests_Blocks_Render_Calendar extends WP_UnitTestCase {
 		);
 
 		$processor = new WP_HTML_Tag_Processor( $html );
+		$processor->next_tag( 'TABLE' );
+		$table_style = (string) $processor->get_attribute( 'style' );
+
+		$this->assertStringContainsString( '3px', $table_style );
+		$this->assertStringContainsString( 'border', $table_style );
+
 		while ( $processor->next_tag( 'TD' ) ) {
-			$this->assertStringContainsString( '3px', (string) $processor->get_attribute( 'style' ) );
+			$this->assertSame( '', (string) $processor->get_attribute( 'style' ) );
 		}
+	}
+
+	/**
+	 * @covers ::gutenberg_block_core_calendar_has_split_borders
+	 */
+	public function test_has_split_borders_detects_per_side_values() {
+		$this->assertTrue(
+			gutenberg_block_core_calendar_has_split_borders(
+				array(
+					'top' => array(
+						'width' => '2px',
+					),
+				)
+			)
+		);
+		$this->assertFalse(
+			gutenberg_block_core_calendar_has_split_borders(
+				array(
+					'width' => '2px',
+				)
+			)
+		);
 	}
 
 	/**
@@ -180,7 +245,10 @@ class Tests_Blocks_Render_Calendar extends WP_UnitTestCase {
 		$processor = new WP_HTML_Tag_Processor( $html );
 		$processor->next_tag( 'CAPTION' );
 
-		$this->assertStringContainsString( 'margin-bottom:2rem', (string) $processor->get_attribute( 'style' ) );
+		$this->assertStringContainsString(
+			'margin-bottom:2rem',
+			(string) $processor->get_attribute( 'style' )
+		);
 	}
 
 	/**

@@ -1991,10 +1991,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Calendar Global Styles background must reach the wrapper (for padding) and
-	 * header cells (the grey th fallback does not see a has-background class).
+	 * Calendar Global Styles background must reach the table and header cells.
 	 */
-	public function test_get_stylesheet_calendar_background_targets_wrapper_and_header_cells() {
+	public function test_get_stylesheet_calendar_background_targets_table_and_header_cells() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -2011,15 +2010,15 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
-		$this->assertStringContainsString( '.wp-block-calendar', $stylesheet );
+		$this->assertStringContainsString( '.wp-block-calendar table', $stylesheet );
 		$this->assertStringContainsString( '.wp-block-calendar th', $stylesheet );
 		$this->assertStringContainsString( 'background-color: green', $stylesheet );
 	}
 
 	/**
-	 * Custom Calendar borders from Global Styles target every cell, including pad cells.
+	 * Custom Calendar borders from Global Styles target the table element.
 	 */
-	public function test_get_stylesheet_calendar_border_targets_all_cells() {
+	public function test_get_stylesheet_calendar_border_targets_table() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -2038,8 +2037,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
-		$this->assertStringContainsString( '.wp-block-calendar td', $stylesheet );
-		$this->assertStringNotContainsString( 'td:not(.pad)', $stylesheet );
+		$this->assertStringContainsString( '.wp-block-calendar table', $stylesheet );
+		$this->assertStringNotContainsString( '.wp-block-calendar td', $stylesheet );
 	}
 
 	/**

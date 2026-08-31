@@ -43,8 +43,7 @@ function render_block_core_calendar( $attributes ) {
 		}
 	}
 
-	// Text is skip-serialized onto the table (#42029). Background is
-	// skip-serialized too, then applied on the wrapper so padding is filled.
+	// Text and background are skip-serialized onto the table (#42029).
 	$style_attributes = ( isset( $attributes['style'] ) && is_array( $attributes['style'] ) )
 		? $attributes['style']
 		: array();
@@ -58,17 +57,11 @@ function render_block_core_calendar( $attributes ) {
 	$custom_text_color          = $color_styles['text'] ?? null;
 	$color_block_styles['text'] = $preset_text_color ? $preset_text_color : $custom_text_color;
 
-	$preset_background_color = array_key_exists( 'backgroundColor', $attributes )
+	$preset_background_color          = array_key_exists( 'backgroundColor', $attributes )
 		? "var:preset|color|{$attributes['backgroundColor']}"
 		: null;
-	$custom_background_color = $color_styles['background'] ?? null;
-	$background_block_styles = array(
-		'background' => $preset_background_color ? $preset_background_color : $custom_background_color,
-	);
-	$background_engine       = wp_style_engine_get_styles(
-		array( 'color' => $background_block_styles ),
-		array( 'convert_vars_to_classnames' => true )
-	);
+	$custom_background_color          = $color_styles['background'] ?? null;
+	$color_block_styles['background'] = $preset_background_color ? $preset_background_color : $custom_background_color;
 
 	$styles        = wp_style_engine_get_styles( array( 'color' => $color_block_styles ), array( 'convert_vars_to_classnames' => true ) );
 	$inline_styles = $styles['css'] ?? '';
@@ -80,8 +73,6 @@ function render_block_core_calendar( $attributes ) {
 		$classnames[] = 'has-link-color';
 	}
 
-	$block_gap_css = block_core_calendar_get_block_gap_css( $attributes );
-
 	$border_block_styles = ( isset( $style_attributes['border'] ) && is_array( $style_attributes['border'] ) )
 		? $style_attributes['border']
 		: array();
@@ -90,11 +81,16 @@ function render_block_core_calendar( $attributes ) {
 		$border_block_styles['color'] = "var:preset|color|{$attributes['borderColor']}";
 	}
 
-	// Generate border styles and classes.
-	$border_engine  = wp_style_engine_get_styles( array( 'border' => $border_block_styles ), array( 'convert_vars_to_classnames' => true ) );
-	$border_styles  = $border_engine['css'] ?? '';
-	$border_classes = empty( $border_engine['classnames'] ) ? array() : explode( ' ', $border_engine['classnames'] );
-	$calendar       = get_calendar( true, false );
+	$border_engine       = wp_style_engine_get_styles( array( 'border' => $border_block_styles ), array( 'convert_vars_to_classnames' => true ) );
+	$border_styles       = $border_engine['css'] ?? '';
+	$border_classes      = empty( $border_engine['classnames'] ) ? array() : explode( ' ', $border_engine['classnames'] );
+	$has_split_borders    = block_core_calendar_has_split_borders( $border_block_styles );
+	$block_gap_rules      = block_core_calendar_get_block_gap_style_rules( $attributes );
+	$base_block_gap_css   = block_core_calendar_get_base_block_gap_css( $block_gap_rules );
+	$responsive_gap_rules = block_core_calendar_get_responsive_block_gap_style_rules( $block_gap_rules );
+	$wrapper_extra        = block_core_calendar_get_block_gap_wrapper_attributes( $responsive_gap_rules );
+
+	$calendar = get_calendar( true, false );
 
 	if ( empty( $calendar ) ) {
 		$calendar = '';
@@ -105,43 +101,38 @@ function render_block_core_calendar( $attributes ) {
 	while ( $processor->next_tag() ) {
 		$tag_name = $processor->get_tag();
 
-		// Apply text color classes and styles to the main table.
 		if ( 'TABLE' === $tag_name ) {
 			block_core_calendar_merge_style_attribute( $processor, $inline_styles );
+			block_core_calendar_merge_style_attribute( $processor, $border_styles );
 
 			foreach ( $classnames as $classname ) {
 				if ( ! empty( $classname ) ) {
 					$processor->add_class( $classname );
 				}
 			}
-		}
 
-		if ( 'CAPTION' === $tag_name && '' !== $block_gap_css ) {
-			block_core_calendar_merge_style_attribute( $processor, 'margin-bottom:' . $block_gap_css );
-		}
-
-		// Default CSS outlines every cell. A chosen border applies to all cells,
-		// including leading/trailing pad cells.
-		if ( 'TH' === $tag_name || 'TD' === $tag_name ) {
 			foreach ( $border_classes as $border_class ) {
 				if ( ! empty( $border_class ) ) {
 					$processor->add_class( $border_class );
 				}
 			}
 
-			block_core_calendar_merge_style_attribute( $processor, $border_styles );
+			if ( $has_split_borders ) {
+				$processor->add_class( 'has-individual-borders' );
+			}
+		}
+
+		if ( 'CAPTION' === $tag_name && '' !== $base_block_gap_css ) {
+			block_core_calendar_merge_style_attribute( $processor, 'margin-bottom:' . $base_block_gap_css );
 		}
 	}
 
 	$calendar = $processor->get_updated_html();
 
-	$wrapper_extra = array();
-	if ( ! empty( $background_engine['classnames'] ) ) {
-		$wrapper_extra['class'] = $background_engine['classnames'];
+	if ( ! empty( $responsive_gap_rules ) ) {
+		block_core_calendar_enqueue_rendered_styles();
 	}
-	if ( ! empty( $background_engine['css'] ) ) {
-		$wrapper_extra['style'] = $background_engine['css'];
-	}
+
 	$wrapper_attributes = get_block_wrapper_attributes( $wrapper_extra );
 	$output             = sprintf(
 		'<div %1$s>%2$s</div>',
@@ -195,32 +186,194 @@ function block_core_calendar_merge_style_attribute( $processor, $additional_css 
 }
 
 /**
- * Returns a CSS value for the Calendar block's blockGap, used as space between
- * the month/year caption and the date grid.
+ * Enqueues styles registered during Calendar block rendering.
  *
- * Instance styles win over Global Styles. Block-level blockGap is not emitted
- * by layout styles (Calendar has no layout support), so Global Styles are read
- * here and applied as caption margin-bottom.
+ * Dynamic blocks render after `wp_enqueue_scripts`, so block-supports styles
+ * must be enqueued from the render callback to appear on the frontend.
+ *
+ * @since 7.1.0
+ */
+function block_core_calendar_enqueue_rendered_styles() {
+	static $did_enqueue = false;
+
+	if ( $did_enqueue || ! function_exists( 'gutenberg_enqueue_stored_styles' ) ) {
+		return;
+	}
+
+	gutenberg_enqueue_stored_styles();
+	$did_enqueue = true;
+}
+
+/**
+ * Returns the base (non-responsive) blockGap value.
+ *
+ * @since 7.1.0
+ *
+ * @param array $block_gap_rules Resolved block gap rules.
+ * @return string CSS gap value, or an empty string when unset.
+ */
+function block_core_calendar_get_base_block_gap_css( $block_gap_rules ) {
+	foreach ( $block_gap_rules as $block_gap_rule ) {
+		if ( empty( $block_gap_rule['rules_group'] ) ) {
+			return $block_gap_rule['value'];
+		}
+	}
+
+	return '';
+}
+
+/**
+ * Returns responsive blockGap rules that require the style engine.
+ *
+ * @since 7.1.0
+ *
+ * @param array $block_gap_rules Resolved block gap rules.
+ * @return array[]
+ */
+function block_core_calendar_get_responsive_block_gap_style_rules( $block_gap_rules ) {
+	$responsive_gap_rules = array();
+
+	foreach ( $block_gap_rules as $block_gap_rule ) {
+		if ( ! empty( $block_gap_rule['rules_group'] ) ) {
+			$responsive_gap_rules[] = $block_gap_rule;
+		}
+	}
+
+	return $responsive_gap_rules;
+}
+
+/**
+ * Registers responsive instance blockGap styles and returns wrapper attributes.
+ *
+ * Base blockGap is output inline on the caption so server-side render previews
+ * in the editor update immediately. Responsive values use the style engine.
+ *
+ * @since 7.1.0
+ *
+ * @param array $responsive_gap_rules Responsive block gap rules.
+ * @return array Wrapper attributes to pass to get_block_wrapper_attributes().
+ */
+function block_core_calendar_get_block_gap_wrapper_attributes( $responsive_gap_rules ) {
+	if ( empty( $responsive_gap_rules ) ) {
+		return array();
+	}
+
+	$unique_class = wp_unique_id( 'wp-block-calendar-' );
+	$selector     = ".wp-block-calendar.{$unique_class} table caption";
+	$css_rules    = array();
+
+	foreach ( $responsive_gap_rules as $responsive_gap_rule ) {
+		$css_rules[] = array(
+			'selector'     => $selector,
+			'declarations' => array(
+				'margin-bottom' => $responsive_gap_rule['value'],
+			),
+			'rules_group'  => $responsive_gap_rule['rules_group'],
+		);
+	}
+
+	wp_style_engine_get_stylesheet_from_css_rules(
+		$css_rules,
+		array(
+			'context' => 'block-supports',
+		)
+	);
+
+	return array(
+		'class' => $unique_class,
+	);
+}
+
+/**
+ * Builds blockGap style rules for the Calendar block caption spacing.
+ *
+ * Only instance values are supported. Global Styles blockGap is not applied
+ * because the Calendar block does not have layout support.
  *
  * @since 7.1.0
  *
  * @param array $attributes Block attributes.
- * @return string CSS gap value, or an empty string when unset or unsafe.
+ * @return array[] {
+ *     @type string      $value       Sanitized CSS gap value.
+ *     @type string|null $rules_group Optional CSS rules group, such as a media query.
+ * }
  */
-function block_core_calendar_get_block_gap_css( $attributes ) {
-	$style   = ( isset( $attributes['style'] ) && is_array( $attributes['style'] ) )
+function block_core_calendar_get_block_gap_style_rules( $attributes ) {
+	$style_attr = ( isset( $attributes['style'] ) && is_array( $attributes['style'] ) )
 		? $attributes['style']
 		: array();
-	$spacing = ( isset( $style['spacing'] ) && is_array( $style['spacing'] ) )
-		? $style['spacing']
-		: array();
-	$gap     = $spacing['blockGap'] ?? null;
 
-	if ( ( null === $gap || '' === $gap ) && function_exists( 'wp_get_global_styles' ) ) {
-		$gap = wp_get_global_styles(
-			array( 'spacing', 'blockGap' ),
-			array( 'block_name' => 'core/calendar' )
+	if (
+		defined( 'IS_GUTENBERG_PLUGIN' ) &&
+		IS_GUTENBERG_PLUGIN &&
+		function_exists( 'gutenberg_resolve_style_state_aliases' )
+	) {
+		$style_attr = gutenberg_resolve_style_state_aliases( $style_attr, 'core/calendar' );
+	}
+
+	$block_gap_rules = array();
+	$spacing         = ( isset( $style_attr['spacing'] ) && is_array( $style_attr['spacing'] ) )
+		? $style_attr['spacing']
+		: array();
+
+	if ( array_key_exists( 'blockGap', $spacing ) ) {
+		$base_gap_css = block_core_calendar_normalize_gap_value( $spacing['blockGap'] );
+
+		if ( '' !== $base_gap_css ) {
+			$block_gap_rules[] = array(
+				'value' => $base_gap_css,
+			);
+		}
+	}
+
+	$global_settings          = wp_get_global_settings();
+	$viewport_settings        = $global_settings['viewport'] ?? null;
+	$responsive_media_queries = array();
+
+	foreach ( array( 'WP_Theme_JSON_Gutenberg', 'WP_Theme_JSON' ) as $theme_json_class_name ) {
+		if ( method_exists( $theme_json_class_name, 'get_viewport_media_queries' ) ) {
+			$responsive_media_queries = $theme_json_class_name::get_viewport_media_queries( $viewport_settings );
+			break;
+		}
+	}
+
+	foreach ( $responsive_media_queries as $breakpoint => $media_query ) {
+		$viewport_style = $style_attr[ $breakpoint ] ?? null;
+
+		if (
+			! is_array( $viewport_style ) ||
+			! is_array( $viewport_style['spacing'] ?? null ) ||
+			! array_key_exists( 'blockGap', $viewport_style['spacing'] )
+		) {
+			continue;
+		}
+
+		$viewport_gap_css = block_core_calendar_normalize_gap_value( $viewport_style['spacing']['blockGap'] );
+
+		if ( '' === $viewport_gap_css ) {
+			continue;
+		}
+
+		$block_gap_rules[] = array(
+			'value'       => $viewport_gap_css,
+			'rules_group' => $media_query,
 		);
+	}
+
+	return $block_gap_rules;
+}
+
+/**
+ * Normalizes a blockGap value to a CSS-ready string.
+ *
+ * @since 7.1.0
+ *
+ * @param mixed $gap Block gap value.
+ * @return string CSS gap value, or an empty string when unset or unsafe.
+ */
+function block_core_calendar_normalize_gap_value( $gap ) {
+	if ( function_exists( 'gutenberg_sanitize_block_gap_value' ) ) {
+		$gap = gutenberg_sanitize_block_gap_value( $gap );
 	}
 
 	if ( is_array( $gap ) ) {
@@ -229,7 +382,7 @@ function block_core_calendar_get_block_gap_css( $attributes ) {
 
 	$gap = is_string( $gap ) ? $gap : '';
 
-	if ( '' === $gap || preg_match( '%[\\\(&=}]|/\*%', $gap ) ) {
+	if ( '' === $gap ) {
 		return '';
 	}
 
@@ -240,6 +393,28 @@ function block_core_calendar_get_block_gap_css( $attributes ) {
 	}
 
 	return $gap;
+}
+
+/**
+ * Whether the block uses per-side border selections.
+ *
+ * @since 7.1.0
+ *
+ * @param array $border_block_styles Border styles from block attributes.
+ * @return bool
+ */
+function block_core_calendar_has_split_borders( $border_block_styles ) {
+	if ( ! is_array( $border_block_styles ) || empty( $border_block_styles ) ) {
+		return false;
+	}
+
+	foreach ( array( 'top', 'right', 'bottom', 'left' ) as $side ) {
+		if ( isset( $border_block_styles[ $side ] ) ) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 /**

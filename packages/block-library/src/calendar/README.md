@@ -41,10 +41,11 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 
 _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
 
-- **border**: `.wp-block-calendar th, .wp-block-calendar td`
+- **border**: `.wp-block-calendar table`
+- **spacing**: `.wp-block-calendar`
 - **color**:
   - text: `.wp-block-calendar table`
-  - background: `.wp-block-calendar, .wp-block-calendar th`
+  - background: `.wp-block-calendar table, .wp-block-calendar th`
 
 ## Block Markup
 
