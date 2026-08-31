@@ -45,7 +45,7 @@ Therefore, choose a directory to place the block plugin or optionally create a n
 </div>
 
 ```bash
-npx @wordpress/create-block@latest copyright-date-block --variant=dynamic
+npx @wordpress/create-block@latest copyright-date-block --variant dynamic
 cd copyright-date-block
 ```
 
