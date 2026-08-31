@@ -31,7 +31,7 @@ jobs:
                 node: ['24', '26']
                 os: ['macos-15', 'ubuntu-24.04', 'windows-2025']
                 exclude:
-                    # On PRs: Only test Node 24 on Ubuntu
+                    # Only test Node 24 on Ubuntu for pull requests.
                     - event: 'pull_request'
                       node: '26'
                     - event: 'pull_request'
