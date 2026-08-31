@@ -1,4 +1,6 @@
 import {
+	applyReleaseChangelogCommit,
+	backportCommitsToBranch,
 	finalizePreparedNpmRelease,
 	getNpmReleasePackages,
 	getNpmReleaseGitRecoveryCommands,
@@ -13,6 +15,7 @@ import {
 	runNpmPublishPreflight,
 	runNpmReleasePhase,
 	runPackagesRelease,
+	verifyBackportedChangelogs,
 	verifyRemotePackageTags,
 } from '../packages';
 
@@ -77,14 +80,13 @@ describe( 'finalizePreparedNpmRelease', () => {
 		async ( releaseType, pluginReleaseBranch, expectedBranches ) => {
 			const config = { releaseType };
 			const backportCommitsToBranchFn = jest.fn();
-			const commits = [ 'changelog-sha', 'publish-sha' ];
 
 			await finalizePreparedNpmRelease(
 				config,
 				{
-					changelogCommit: commits[ 0 ],
+					changelogCommit: 'changelog-sha',
 					pluginReleaseBranch,
-					publishCommit: commits[ 1 ],
+					publishCommit: 'publish-sha',
 				},
 				{ backportCommitsToBranchFn }
 			);
@@ -92,12 +94,628 @@ describe( 'finalizePreparedNpmRelease', () => {
 			expect( backportCommitsToBranchFn.mock.calls ).toEqual(
 				expectedBranches.map( ( branch ) => [
 					branch,
-					commits,
+					{
+						changelogCommit: 'changelog-sha',
+						publishCommit: 'publish-sha',
+					},
 					config,
 				] )
 			);
 		}
 	);
+
+	it( 'still backports to the remaining branches when one branch fails', async () => {
+		const config = { releaseType: 'latest' };
+		const backportCommitsToBranchFn = jest
+			.fn()
+			.mockRejectedValueOnce( new Error( 'trunk cherry-pick conflict' ) )
+			.mockResolvedValueOnce();
+
+		await expect(
+			finalizePreparedNpmRelease(
+				config,
+				{
+					changelogCommit: 'changelog-sha',
+					pluginReleaseBranch: 'release/23.5',
+					publishCommit: 'publish-sha',
+				},
+				{ backportCommitsToBranchFn }
+			)
+		).rejects.toThrow(
+			'Backporting failed for "trunk": trunk cherry-pick conflict'
+		);
+
+		expect( backportCommitsToBranchFn ).toHaveBeenCalledTimes( 2 );
+		expect( backportCommitsToBranchFn.mock.calls[ 1 ][ 0 ] ).toBe(
+			'release/23.5'
+		);
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'reports structured failure details while continuing with the remaining branches', async () => {
+		const backportCommitsToBranchFn = jest
+			.fn()
+			.mockRejectedValueOnce( {
+				code: 'GIT_CONFLICT',
+				message: 'could not apply changelog commit',
+			} )
+			.mockResolvedValueOnce();
+
+		await expect(
+			finalizePreparedNpmRelease(
+				{ releaseType: 'latest' },
+				{
+					changelogCommit: 'changelog-sha',
+					pluginReleaseBranch: 'release/23.5',
+					publishCommit: 'publish-sha',
+				},
+				{ backportCommitsToBranchFn }
+			)
+		).rejects.toThrow(
+			'Backporting failed for "trunk": could not apply changelog commit (GIT_CONFLICT)'
+		);
+
+		expect( backportCommitsToBranchFn ).toHaveBeenCalledTimes( 2 );
+		expect( console ).toHaveLogged();
+	} );
+} );
+
+describe( 'backportCommitsToBranch', () => {
+	const createGit = () => ( {
+		fetch: jest.fn().mockResolvedValue(),
+		push: jest.fn().mockResolvedValue(),
+		raw: jest.fn().mockResolvedValue( '' ),
+	} );
+
+	const getRawCallOrder = ( git, matcher ) => {
+		const callIndex = git.raw.mock.calls.findIndex( matcher );
+		expect( callIndex ).toBeGreaterThan( -1 );
+		return git.raw.mock.invocationCallOrder[ callIndex ];
+	};
+
+	it( 'applies the changelog commit, cherry-picks the publish commit, and verifies before pushing', async () => {
+		const git = createGit();
+		const applyReleaseChangelogCommitFn = jest.fn();
+		const verifyBackportedChangelogsFn = jest.fn();
+
+		await backportCommitsToBranch(
+			'trunk',
+			{ changelogCommit: 'changelog-sha', publishCommit: 'publish-sha' },
+			{ gitWorkingDirectoryPath: '/repo', interactive: false },
+			{ applyReleaseChangelogCommitFn, git, verifyBackportedChangelogsFn }
+		);
+
+		expect( git.fetch ).toHaveBeenCalledWith( 'origin', 'trunk' );
+		expect( git.raw ).toHaveBeenCalledWith(
+			'checkout',
+			'-B',
+			'trunk',
+			'origin/trunk'
+		);
+		expect( git.raw ).toHaveBeenCalledWith(
+			'reset',
+			'--hard',
+			'origin/trunk'
+		);
+		expect( applyReleaseChangelogCommitFn ).toHaveBeenCalledWith(
+			{
+				changelogCommit: 'changelog-sha',
+				gitWorkingDirectoryPath: '/repo',
+			},
+			{ git }
+		);
+		expect( git.raw ).toHaveBeenCalledWith(
+			'-c',
+			'rerere.enabled=false',
+			'cherry-pick',
+			'publish-sha'
+		);
+		expect( verifyBackportedChangelogsFn ).toHaveBeenCalledWith(
+			{
+				branchName: 'trunk',
+				gitWorkingDirectoryPath: '/repo',
+				releaseCommit: 'publish-sha',
+			},
+			{ git }
+		);
+		expect( git.push ).toHaveBeenCalledWith( 'origin', 'trunk' );
+		expect(
+			getRawCallOrder( git, ( args ) => args.includes( 'checkout' ) )
+		).toBeLessThan(
+			applyReleaseChangelogCommitFn.mock.invocationCallOrder[ 0 ]
+		);
+		expect(
+			applyReleaseChangelogCommitFn.mock.invocationCallOrder[ 0 ]
+		).toBeLessThan(
+			getRawCallOrder( git, ( args ) => args.includes( 'cherry-pick' ) )
+		);
+		expect(
+			verifyBackportedChangelogsFn.mock.invocationCallOrder[ 0 ]
+		).toBeLessThan( git.push.mock.invocationCallOrder[ 0 ] );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'verifies against the changelog commit when there is no publish commit', async () => {
+		const git = createGit();
+		const applyReleaseChangelogCommitFn = jest.fn();
+		const verifyBackportedChangelogsFn = jest.fn();
+
+		await backportCommitsToBranch(
+			'trunk',
+			{ changelogCommit: 'changelog-sha', publishCommit: undefined },
+			{ gitWorkingDirectoryPath: '/repo', interactive: false },
+			{ applyReleaseChangelogCommitFn, git, verifyBackportedChangelogsFn }
+		);
+
+		expect(
+			git.raw.mock.calls.some( ( args ) =>
+				args.includes( 'cherry-pick' )
+			)
+		).toBe( false );
+		expect( verifyBackportedChangelogsFn ).toHaveBeenCalledWith(
+			expect.objectContaining( { releaseCommit: 'changelog-sha' } ),
+			{ git }
+		);
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'does nothing when there are no commits to backport', async () => {
+		const git = createGit();
+
+		await backportCommitsToBranch(
+			'trunk',
+			{ changelogCommit: undefined, publishCommit: undefined },
+			{ gitWorkingDirectoryPath: '/repo', interactive: false },
+			{ git }
+		);
+
+		expect( git.fetch ).not.toHaveBeenCalled();
+		expect( git.push ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does not push and restores the working copy when verification fails', async () => {
+		const git = createGit();
+		const applyReleaseChangelogCommitFn = jest.fn();
+		const verifyBackportedChangelogsFn = jest
+			.fn()
+			.mockRejectedValue(
+				new Error( 'Released changelog sections on "trunk" differ' )
+			);
+
+		await expect(
+			backportCommitsToBranch(
+				'trunk',
+				{
+					changelogCommit: 'changelog-sha',
+					publishCommit: 'publish-sha',
+				},
+				{ gitWorkingDirectoryPath: '/repo', interactive: false },
+				{
+					applyReleaseChangelogCommitFn,
+					git,
+					verifyBackportedChangelogsFn,
+				}
+			)
+		).rejects.toThrow( 'Released changelog sections on "trunk" differ' );
+
+		expect( git.push ).not.toHaveBeenCalled();
+		expect( git.raw ).toHaveBeenCalledWith( 'cherry-pick', '--abort' );
+		// The cleanup reset is in place, unlike the targeted reset that syncs
+		// the branch to the remote tip during setup.
+		expect( git.raw ).toHaveBeenCalledWith( 'reset', '--hard' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'does not push and cleans the working copy when the branch setup fails', async () => {
+		const git = createGit();
+		git.raw.mockImplementation( async ( ...args ) => {
+			if ( args[ 0 ] === 'checkout' && args[ 1 ] === '-B' ) {
+				throw new Error( 'cannot update the branch ref' );
+			}
+			return '';
+		} );
+		const verifyBackportedChangelogsFn = jest.fn();
+
+		await expect(
+			backportCommitsToBranch(
+				'trunk',
+				{
+					changelogCommit: 'changelog-sha',
+					publishCommit: 'publish-sha',
+				},
+				{ gitWorkingDirectoryPath: '/repo', interactive: false },
+				{
+					applyReleaseChangelogCommitFn: jest.fn(),
+					git,
+					verifyBackportedChangelogsFn,
+				}
+			)
+		).rejects.toThrow( 'cannot update the branch ref' );
+
+		expect( git.push ).not.toHaveBeenCalled();
+		expect( verifyBackportedChangelogsFn ).not.toHaveBeenCalled();
+		expect( git.raw ).toHaveBeenCalledWith( 'reset', '--hard' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'reports both the backport and cleanup failures when reset fails', async () => {
+		const git = createGit();
+		git.raw.mockImplementation( async ( ...args ) => {
+			// Only the in-place cleanup reset fails; the setup reset targeting
+			// the remote tip succeeds.
+			if ( args[ 0 ] === 'reset' && args.length === 2 ) {
+				throw { code: 'LOCKED', message: 'cannot lock index' };
+			}
+			return '';
+		} );
+
+		await expect(
+			backportCommitsToBranch(
+				'trunk',
+				{
+					changelogCommit: 'changelog-sha',
+					publishCommit: 'publish-sha',
+				},
+				{ gitWorkingDirectoryPath: '/repo', interactive: false },
+				{
+					applyReleaseChangelogCommitFn: jest.fn(),
+					git,
+					verifyBackportedChangelogsFn: jest
+						.fn()
+						.mockRejectedValue(
+							new Error( 'verification failed' )
+						),
+				}
+			)
+		).rejects.toThrow(
+			'Backporting to "trunk" failed, and cleaning the working copy also failed: cannot lock index (LOCKED). Original failure: verification failed'
+		);
+
+		expect( git.push ).not.toHaveBeenCalled();
+		expect( console ).toHaveLogged();
+	} );
+} );
+
+describe( 'applyReleaseChangelogCommit', () => {
+	const RELEASE_BASE = `# Changelog
+
+## Unreleased
+
+### Bug Fixes
+
+-   Shipped fix. ([#1](https://github.com/WordPress/gutenberg/pull/1))
+
+## 17.9.0 (2026-07-29)
+`;
+	const PUBLISHED = RELEASE_BASE.replace(
+		'## Unreleased',
+		'## Unreleased\n\n## 18.0.0 (2026-08-12)'
+	);
+	const BRANCH = RELEASE_BASE.replace(
+		'-   Shipped fix. ([#1](https://github.com/WordPress/gutenberg/pull/1))',
+		'-   Shipped fix. ([#1](https://github.com/WordPress/gutenberg/pull/1))\n' +
+			'-   Landed during publish. ([#9](https://github.com/WordPress/gutenberg/pull/9))'
+	);
+
+	const createGit = ( { cherryPickError, unmergedPaths = [] } = {} ) => ( {
+		raw: jest.fn( async ( ...args ) => {
+			const command = args.join( ' ' );
+			if ( command === 'diff --name-only changelog-sha^ changelog-sha' ) {
+				return 'packages/data/CHANGELOG.md\npackages/data/package.json\n';
+			}
+			if (
+				command ===
+				'-c rerere.enabled=false cherry-pick --no-commit changelog-sha'
+			) {
+				if ( cherryPickError ) {
+					throw cherryPickError;
+				}
+				return '';
+			}
+			if ( command === 'diff --name-only --diff-filter=U' ) {
+				return unmergedPaths.join( '\n' ) + '\n';
+			}
+			if (
+				command === 'show changelog-sha^:packages/data/CHANGELOG.md'
+			) {
+				return RELEASE_BASE;
+			}
+			if ( command === 'show changelog-sha:packages/data/CHANGELOG.md' ) {
+				return PUBLISHED;
+			}
+			if ( command === 'show HEAD:packages/data/CHANGELOG.md' ) {
+				return BRANCH;
+			}
+			return '';
+		} ),
+	} );
+
+	it( 'recomputes the released changelogs and commits with the original metadata', async () => {
+		const git = createGit();
+		const writeFileFn = jest.fn();
+
+		await applyReleaseChangelogCommit(
+			{
+				changelogCommit: 'changelog-sha',
+				gitWorkingDirectoryPath: '/repo',
+			},
+			{ git, writeFileFn }
+		);
+
+		expect( writeFileFn ).toHaveBeenCalledTimes( 1 );
+		const [ writtenPath, writtenContent ] = writeFileFn.mock.calls[ 0 ];
+		expect( writtenPath ).toBe( '/repo/packages/data/CHANGELOG.md' );
+		// The entry that landed on the target branch during publication stays
+		// under `## Unreleased` instead of the published version section.
+		expect( writtenContent ).toContain( `## Unreleased
+
+### Bug Fixes
+
+-   Landed during publish. ([#9](https://github.com/WordPress/gutenberg/pull/9))
+
+## 18.0.0 (2026-08-12)
+` );
+		expect( git.raw ).toHaveBeenCalledWith(
+			'add',
+			'--',
+			'packages/data/CHANGELOG.md'
+		);
+		expect( git.raw ).toHaveBeenCalledWith(
+			'commit',
+			'-C',
+			'changelog-sha'
+		);
+	} );
+
+	it( 'continues past cherry-pick conflicts limited to package changelogs', async () => {
+		const git = createGit( {
+			cherryPickError: new Error( 'could not apply changelog-sha' ),
+			unmergedPaths: [ 'packages/data/CHANGELOG.md' ],
+		} );
+		const writeFileFn = jest.fn();
+
+		await applyReleaseChangelogCommit(
+			{
+				changelogCommit: 'changelog-sha',
+				gitWorkingDirectoryPath: '/repo',
+			},
+			{ git, writeFileFn }
+		);
+
+		expect( writeFileFn ).toHaveBeenCalledTimes( 1 );
+		expect( git.raw ).toHaveBeenCalledWith(
+			'commit',
+			'-C',
+			'changelog-sha'
+		);
+	} );
+
+	it( 'fails when the cherry-pick conflicts outside package changelogs', async () => {
+		const git = createGit( {
+			cherryPickError: new Error( 'could not apply changelog-sha' ),
+			unmergedPaths: [ 'packages/data/package.json' ],
+		} );
+		const writeFileFn = jest.fn();
+
+		await expect(
+			applyReleaseChangelogCommit(
+				{
+					changelogCommit: 'changelog-sha',
+					gitWorkingDirectoryPath: '/repo',
+				},
+				{ git, writeFileFn }
+			)
+		).rejects.toThrow(
+			'Cherry-picking changelog-sha conflicted outside package changelogs (packages/data/package.json); resolve the backport manually.'
+		);
+
+		expect( writeFileFn ).not.toHaveBeenCalled();
+	} );
+
+	it( 'rethrows cherry-pick failures that are not content conflicts', async () => {
+		const git = createGit( {
+			cherryPickError: new Error( 'bad object changelog-sha' ),
+		} );
+
+		await expect(
+			applyReleaseChangelogCommit(
+				{
+					changelogCommit: 'changelog-sha',
+					gitWorkingDirectoryPath: '/repo',
+				},
+				{ git, writeFileFn: jest.fn() }
+			)
+		).rejects.toThrow( 'bad object changelog-sha' );
+	} );
+
+	it( 'refuses to backport a commit that modifies no package changelogs', async () => {
+		const git = {
+			raw: jest.fn().mockResolvedValue( 'packages/data/package.json\n' ),
+		};
+
+		await expect(
+			applyReleaseChangelogCommit(
+				{
+					changelogCommit: 'changelog-sha',
+					gitWorkingDirectoryPath: '/repo',
+				},
+				{ git, writeFileFn: jest.fn() }
+			)
+		).rejects.toThrow(
+			'Found no package changelogs modified by changelog-sha; refusing to backport it as a changelog commit.'
+		);
+	} );
+} );
+
+describe( 'verifyBackportedChangelogs', () => {
+	const RELEASED = '## 18.0.0 (2026-08-12)\n\n-   Shipped. ([#1](x))\n';
+
+	it( 'passes when the released sections match the release byte for byte', async () => {
+		const git = {
+			raw: jest.fn( async ( ...args ) => {
+				if ( args[ 0 ] === 'ls-tree' ) {
+					return 'packages/data/CHANGELOG.md\npackages/data/package.json\n';
+				}
+				if ( args[ 0 ] === 'show' ) {
+					const prefix =
+						args[ 1 ] === 'HEAD:packages/data/CHANGELOG.md'
+							? '# Changelog\n\n## Unreleased\n\n-   New. ([#9](x))\n\n'
+							: '# Changelog\n\n## Unreleased\n\n';
+					return prefix + RELEASED;
+				}
+				return '';
+			} ),
+		};
+
+		await expect(
+			verifyBackportedChangelogs(
+				{
+					branchName: 'trunk',
+					gitWorkingDirectoryPath: '/repo',
+					releaseCommit: 'publish-sha',
+				},
+				{ git }
+			)
+		).resolves.toBeUndefined();
+
+		expect( git.raw ).toHaveBeenCalledWith(
+			'ls-tree',
+			'-r',
+			'--name-only',
+			'publish-sha',
+			'--',
+			'packages'
+		);
+	} );
+
+	it( 'fails when an entry moved into a published version section', async () => {
+		const git = {
+			raw: jest.fn( async ( ...args ) => {
+				if ( args[ 0 ] === 'ls-tree' ) {
+					return 'packages/data/CHANGELOG.md\n';
+				}
+				if ( args[ 1 ] === 'HEAD:packages/data/CHANGELOG.md' ) {
+					return (
+						'# Changelog\n\n## Unreleased\n\n' +
+						'## 18.0.0 (2026-08-12)\n\n-   Landed during publish. ([#9](x))\n-   Shipped. ([#1](x))\n'
+					);
+				}
+				return '# Changelog\n\n## Unreleased\n\n' + RELEASED;
+			} ),
+		};
+
+		await expect(
+			verifyBackportedChangelogs(
+				{
+					branchName: 'trunk',
+					gitWorkingDirectoryPath: '/repo',
+					releaseCommit: 'publish-sha',
+				},
+				{ git }
+			)
+		).rejects.toThrow(
+			'Released changelog sections on "trunk" do not match the published release for:\n' +
+				'  - packages/data/CHANGELOG.md\n' +
+				'An entry moved into or out of a published version section. The backport was not pushed.'
+		);
+	} );
+
+	it( 'fails loudly when it finds no changelogs to verify', async () => {
+		const git = { raw: jest.fn().mockResolvedValue( '\n' ) };
+
+		await expect(
+			verifyBackportedChangelogs(
+				{
+					branchName: 'trunk',
+					gitWorkingDirectoryPath: '/repo',
+					releaseCommit: 'publish-sha',
+				},
+				{ git }
+			)
+		).rejects.toThrow(
+			'Found no package changelogs in publish-sha to verify; refusing to push the backport to "trunk".'
+		);
+	} );
+
+	it( 'skips changelogs that have never published a release', async () => {
+		const git = {
+			raw: jest.fn( async ( ...args ) => {
+				if ( args[ 0 ] === 'ls-tree' ) {
+					return 'packages/connectors/CHANGELOG.md\npackages/data/CHANGELOG.md\n';
+				}
+				if (
+					args[ 1 ].endsWith( 'packages/connectors/CHANGELOG.md' )
+				) {
+					return '# Changelog\n\n## Unreleased\n';
+				}
+				return '# Changelog\n\n## Unreleased\n\n' + RELEASED;
+			} ),
+		};
+
+		await expect(
+			verifyBackportedChangelogs(
+				{
+					branchName: 'trunk',
+					gitWorkingDirectoryPath: '/repo',
+					releaseCommit: 'publish-sha',
+				},
+				{ git }
+			)
+		).resolves.toBeUndefined();
+
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'propagates failures reading a changelog that exists on the target branch', async () => {
+		const git = {
+			raw: jest.fn( async ( ...args ) => {
+				if ( args[ 0 ] === 'ls-tree' ) {
+					return 'packages/data/CHANGELOG.md\n';
+				}
+				if ( args[ 1 ] === 'HEAD:packages/data/CHANGELOG.md' ) {
+					throw new Error( 'unable to read object' );
+				}
+				return '# Changelog\n\n## Unreleased\n\n' + RELEASED;
+			} ),
+		};
+
+		await expect(
+			verifyBackportedChangelogs(
+				{
+					branchName: 'trunk',
+					gitWorkingDirectoryPath: '/repo',
+					releaseCommit: 'publish-sha',
+				},
+				{ git }
+			)
+		).rejects.toThrow( 'unable to read object' );
+	} );
+
+	it( 'skips changelogs that do not exist on the target branch', async () => {
+		const git = {
+			raw: jest.fn( async ( ...args ) => {
+				if ( args[ 0 ] === 'ls-tree' ) {
+					return args[ 3 ] === 'HEAD'
+						? ''
+						: 'packages/removed/CHANGELOG.md\n';
+				}
+				return '# Changelog\n\n## Unreleased\n\n' + RELEASED;
+			} ),
+		};
+
+		await expect(
+			verifyBackportedChangelogs(
+				{
+					branchName: 'trunk',
+					gitWorkingDirectoryPath: '/repo',
+					releaseCommit: 'publish-sha',
+				},
+				{ git }
+			)
+		).resolves.toBeUndefined();
+
+		expect( console ).toHaveLogged();
+	} );
 } );
 
 describe( 'runPackagesRelease', () => {

@@ -18,11 +18,37 @@ const {
 	calculateVersionBumpFromChangelog,
 	findPluginReleaseBranchName,
 } = require( './common' );
+const {
+	getReleasedChangelogSection,
+	isPackageChangelogPath,
+	recomputeBackportedChangelog,
+} = require( '../lib/released-changelog' );
 const pluginConfig = require( '../config' );
 
 const NPM_RELEASE_PHASE_ATTEMPTS = 3;
 // Keep tag pushes small enough that GitHub ruleset validation handles each phase predictably.
 const NPM_RELEASE_TAG_PUSH_BATCH_SIZE = 25;
+
+/**
+ * Returns an actionable message for an unknown thrown value.
+ *
+ * @param {*} error Thrown value.
+ *
+ * @return {string} Error message, including an error code when available.
+ */
+function getErrorMessage( error ) {
+	if ( typeof error === 'string' && error ) {
+		return error;
+	}
+	if ( error && typeof error === 'object' ) {
+		const message =
+			typeof error.message === 'string' && error.message
+				? error.message
+				: 'Unknown error';
+		return error.code ? `${ message } (${ error.code })` : message;
+	}
+	return 'Unknown error';
+}
 
 /**
  * Release type names.
@@ -1084,26 +1110,275 @@ async function finalizePreparedNpmRelease(
 		return;
 	}
 
-	const commits = [ changelogCommit, publishCommit ].filter( Boolean );
-	await backportCommitsToBranchFn( 'trunk', commits, config );
+	const branchNames = [ 'trunk' ];
 	if ( config.releaseType === 'latest' && pluginReleaseBranch ) {
-		await backportCommitsToBranchFn( pluginReleaseBranch, commits, config );
+		branchNames.push( pluginReleaseBranch );
+	}
+
+	// The backports are independent: a failure on one branch must not cancel
+	// the other branch's backport.
+	const failures = [];
+	for ( const branchName of branchNames ) {
+		try {
+			await backportCommitsToBranchFn(
+				branchName,
+				{ changelogCommit, publishCommit },
+				config
+			);
+		} catch ( error ) {
+			log(
+				`>> Backporting to "${ branchName }" failed: ${ getErrorMessage(
+					error
+				) }`
+			);
+			failures.push( { branchName, error } );
+		}
+	}
+
+	if ( failures.length ) {
+		throw new Error(
+			'Backporting failed for ' +
+				failures
+					.map(
+						( { branchName, error } ) =>
+							`"${ branchName }": ${ getErrorMessage( error ) }`
+					)
+					.join( '; ' )
+		);
 	}
 }
 
 /**
- * Backports commits from the release branch to the selected branch.
+ * Applies the release's changelog rewrite to the currently checked out
+ * branch.
  *
- * @param {string}           branchName Selected branch name.
- * @param {string[]}         commits    The list of commits to backport.
- * @param {WPPackagesConfig} config     Command config.
+ * The changelog commit is replayed with `git cherry-pick --no-commit` for its
+ * `package.json` changes, but the package changelogs it touched are not
+ * trusted to git's textual merge: when the target branch gained changelog
+ * entries during publication, that merge silently files them under the
+ * just-published version heading (and only conflicts for packages whose
+ * `## Unreleased` section was empty). Every touched changelog is instead
+ * recomputed structurally from the release base, the released content, and
+ * the target branch tip.
+ *
+ * @param {Object}   options                         Options.
+ * @param {string}   options.changelogCommit         Changelog commit hash.
+ * @param {string}   options.gitWorkingDirectoryPath Git working directory path.
+ * @param {Object}   deps                            Dependencies.
+ * @param {Object}   deps.git                        Git client.
+ * @param {Function} deps.writeFileFn                File writer.
+ */
+async function applyReleaseChangelogCommit(
+	{ changelogCommit, gitWorkingDirectoryPath },
+	deps = {}
+) {
+	const {
+		git = SimpleGit( gitWorkingDirectoryPath ),
+		writeFileFn = fs.promises.writeFile,
+	} = deps;
+
+	const changelogPaths = (
+		await git.raw(
+			'diff',
+			'--name-only',
+			`${ changelogCommit }^`,
+			changelogCommit
+		)
+	)
+		.split( '\n' )
+		.filter( isPackageChangelogPath );
+
+	if ( changelogPaths.length === 0 ) {
+		throw new Error(
+			`Found no package changelogs modified by ${ changelogCommit }; refusing to backport it as a changelog commit.`
+		);
+	}
+
+	let cherryPickError = null;
+	try {
+		// Disable `rerere` so a resolution recorded on this machine cannot be
+		// replayed silently into a release backport.
+		await git.raw(
+			'-c',
+			'rerere.enabled=false',
+			'cherry-pick',
+			'--no-commit',
+			changelogCommit
+		);
+	} catch ( error ) {
+		cherryPickError = error;
+	}
+
+	if ( cherryPickError ) {
+		const unmergedPaths = (
+			await git.raw( 'diff', '--name-only', '--diff-filter=U' )
+		)
+			.split( '\n' )
+			.filter( Boolean );
+		if ( unmergedPaths.length === 0 ) {
+			throw cherryPickError;
+		}
+		const unexpectedPaths = unmergedPaths.filter(
+			( filePath ) => ! isPackageChangelogPath( filePath )
+		);
+		if ( unexpectedPaths.length ) {
+			throw new Error(
+				`Cherry-picking ${ changelogCommit } conflicted outside package changelogs (${ unexpectedPaths.join(
+					', '
+				) }); resolve the backport manually.`
+			);
+		}
+		// Conflicted package changelogs are recomputed below, together with
+		// the ones git merged without complaint.
+	}
+
+	for ( const changelogPath of changelogPaths ) {
+		const showFile = ( treeish ) =>
+			git.raw( 'show', `${ treeish }:${ changelogPath }` );
+		let branchContent;
+		try {
+			branchContent = await showFile( 'HEAD' );
+		} catch {
+			throw new Error(
+				`${ changelogPath } was rewritten by the release but does not exist on the target branch; resolve the backport manually.`
+			);
+		}
+		const recomputedContent = recomputeBackportedChangelog( {
+			base: await showFile( `${ changelogCommit }^` ),
+			branch: branchContent,
+			filePath: changelogPath,
+			published: await showFile( changelogCommit ),
+		} );
+		await writeFileFn(
+			path.join( gitWorkingDirectoryPath, changelogPath ),
+			recomputedContent
+		);
+	}
+
+	await git.raw( 'add', '--', ...changelogPaths );
+	// Reuse the changelog commit's message and authorship.
+	await git.raw( 'commit', '-C', changelogCommit );
+}
+
+/**
+ * Verifies that the backport did not move any changelog entry into or out of
+ * a published version section: for every package changelog in the release,
+ * the released portion at the branch tip must be byte-identical to the
+ * released content. Changelogs with nothing published to protect are skipped:
+ * those without a single version heading in the release, and those that no
+ * longer exist on the target branch.
+ *
+ * @param {Object} options                         Options.
+ * @param {string} options.branchName              Target branch name.
+ * @param {string} options.gitWorkingDirectoryPath Git working directory path.
+ * @param {string} options.releaseCommit           Release commit hash to
+ *                                                 verify against.
+ * @param {Object} deps                            Dependencies.
+ * @param {Object} deps.git                        Git client.
+ */
+async function verifyBackportedChangelogs(
+	{ branchName, gitWorkingDirectoryPath, releaseCommit },
+	deps = {}
+) {
+	const { git = SimpleGit( gitWorkingDirectoryPath ) } = deps;
+	const changelogPaths = (
+		await git.raw(
+			'ls-tree',
+			'-r',
+			'--name-only',
+			releaseCommit,
+			'--',
+			'packages'
+		)
+	)
+		.split( '\n' )
+		.filter( isPackageChangelogPath );
+	if ( changelogPaths.length === 0 ) {
+		throw new Error(
+			`Found no package changelogs in ${ releaseCommit } to verify; refusing to push the backport to "${ branchName }".`
+		);
+	}
+	const branchChangelogPaths = new Set(
+		(
+			await git.raw(
+				'ls-tree',
+				'-r',
+				'--name-only',
+				'HEAD',
+				'--',
+				'packages'
+			)
+		)
+			.split( '\n' )
+			.filter( isPackageChangelogPath )
+	);
+
+	const mismatchedPaths = [];
+	for ( const changelogPath of changelogPaths ) {
+		const releasedSection = getReleasedChangelogSection(
+			await git.raw( 'show', `${ releaseCommit }:${ changelogPath }` )
+		);
+		if ( releasedSection === '' ) {
+			// Without a version heading the package has never published a
+			// release, so there is no published section to protect.
+			log(
+				`>> Skipping released changelog verification for ${ changelogPath }: it has no released versions.`
+			);
+			continue;
+		}
+		if ( ! branchChangelogPaths.has( changelogPath ) ) {
+			// A package removed on the target branch has no changelog to
+			// corrupt.
+			log(
+				`>> Skipping released changelog verification for ${ changelogPath }: the file does not exist on "${ branchName }".`
+			);
+			continue;
+		}
+		const branchContent = await git.raw(
+			'show',
+			`HEAD:${ changelogPath }`
+		);
+		if (
+			getReleasedChangelogSection( branchContent ) !== releasedSection
+		) {
+			mismatchedPaths.push( changelogPath );
+		}
+	}
+
+	if ( mismatchedPaths.length ) {
+		throw new Error(
+			`Released changelog sections on "${ branchName }" do not match the published release for:\n` +
+				mismatchedPaths
+					.map( ( changelogPath ) => `  - ${ changelogPath }` )
+					.join( '\n' ) +
+				'\nAn entry moved into or out of a published version section. The backport was not pushed.'
+		);
+	}
+}
+
+/**
+ * Backports the release commits from the release branch to the selected
+ * branch, then verifies the released changelog sections before pushing.
+ *
+ * @param {string}           branchName              Selected branch name.
+ * @param {Object}           commits                 Commits to backport.
+ * @param {?string}          commits.changelogCommit Changelog commit hash.
+ * @param {?string}          commits.publishCommit   Version commit hash.
+ * @param {WPPackagesConfig} config                  Command config.
+ * @param {Object}           deps                    Dependencies.
  */
 async function backportCommitsToBranch(
 	branchName,
-	commits,
-	{ abortMessage, gitWorkingDirectoryPath, interactive }
+	{ changelogCommit, publishCommit },
+	{ abortMessage, gitWorkingDirectoryPath, interactive },
+	deps = {}
 ) {
-	if ( commits.length === 0 ) {
+	const {
+		applyReleaseChangelogCommitFn = applyReleaseChangelogCommit,
+		git = SimpleGit( gitWorkingDirectoryPath ),
+		verifyBackportedChangelogsFn = verifyBackportedChangelogs,
+	} = deps;
+	if ( ! changelogCommit && ! publishCommit ) {
 		return;
 	}
 
@@ -1117,23 +1392,64 @@ async function backportCommitsToBranch(
 
 	log( `>> Backporting commits to "${ branchName }".` );
 
-	const repo = SimpleGit( gitWorkingDirectoryPath );
-
 	/*
-	 * Reset any local changes and replace them with the origin branch's copy.
+	 * Force the local branch to exactly the remote tip instead of pulling, so
+	 * that a diverged local branch or debris left by an interrupted earlier
+	 * run can never be merged into the backport that gets pushed.
 	 *
-	 * Perform an additional fetch to ensure that when we push our changes that
-	 * it's very unlikely that new commits could have appeared at the origin
-	 * HEAD between when we started running this script and now when we're
-	 * pushing our changes back upstream.
+	 * Fetching immediately before the work also makes it very unlikely that
+	 * new commits appear at the origin HEAD between when this script started
+	 * and when the backport is pushed back upstream.
 	 */
-	await repo.fetch().checkout( branchName ).pull( 'origin', branchName );
+	await git.fetch( 'origin', branchName );
 
-	for ( const commitHash of commits ) {
-		await repo.raw( 'cherry-pick', commitHash );
+	try {
+		await git.raw( 'checkout', '-B', branchName, `origin/${ branchName }` );
+		await git.raw( 'reset', '--hard', `origin/${ branchName }` );
+		if ( changelogCommit ) {
+			await applyReleaseChangelogCommitFn(
+				{ changelogCommit, gitWorkingDirectoryPath },
+				{ git }
+			);
+		}
+		if ( publishCommit ) {
+			await git.raw(
+				'-c',
+				'rerere.enabled=false',
+				'cherry-pick',
+				publishCommit
+			);
+		}
+		await verifyBackportedChangelogsFn(
+			{
+				branchName,
+				gitWorkingDirectoryPath,
+				releaseCommit: publishCommit || changelogCommit,
+			},
+			{ git }
+		);
+	} catch ( error ) {
+		// Leave the working copy clean so this branch's failure cannot poison
+		// the next backport target.
+		await git.raw( 'cherry-pick', '--abort' ).catch( () => {} );
+		try {
+			/*
+			 * Reset in place: the failure may predate `checkout -B`, leaving
+			 * HEAD on another branch that a targeted reset would move. The
+			 * next run's `checkout -B` re-syncs this branch ref anyway.
+			 */
+			await git.raw( 'reset', '--hard' );
+		} catch ( cleanupError ) {
+			throw new Error(
+				`Backporting to "${ branchName }" failed, and cleaning the working copy also failed: ${ getErrorMessage(
+					cleanupError
+				) }. Original failure: ${ getErrorMessage( error ) }`
+			);
+		}
+		throw error;
 	}
 
-	await repo.push( 'origin', branchName );
+	await git.push( 'origin', branchName );
 
 	log( `>> Backporting successfully finished.` );
 }
@@ -1289,6 +1605,8 @@ async function publishNpmNext( options ) {
 }
 
 module.exports = {
+	applyReleaseChangelogCommit,
+	backportCommitsToBranch,
 	finalizePreparedNpmRelease,
 	getNpmReleasePackages,
 	getNpmReleaseGitRecoveryCommands,
@@ -1308,5 +1626,6 @@ module.exports = {
 	runNpmPublishPreflight,
 	runNpmReleasePhase,
 	runPackagesRelease,
+	verifyBackportedChangelogs,
 	verifyRemotePackageTags,
 };
