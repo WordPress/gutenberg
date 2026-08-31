@@ -20,7 +20,7 @@
 -   `WidgetDashboard.Policy` governs `reset`: the Reset to default entry in
     the overflow menu, the `core/dashboard/reset-to-default` command, and
     the confirmation prompt are hidden while the policy denies it
-    ([#82007](https://github.com/WordPress/gutenberg/issues/82007)).
+    ([#82255](https://github.com/WordPress/gutenberg/pull/82255)).
 
 ### Internal
 
