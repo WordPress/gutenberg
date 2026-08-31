@@ -8,13 +8,12 @@ import {
 } from '@wordpress/icons';
 import { removeFormat } from '@wordpress/rich-text';
 import { default as InlineColorUI, getActiveColors } from './inline';
+import { getAvailableHighlightColors } from './utils';
 
 export const transparentValue = 'rgba(0, 0, 0, 0)';
 
 const name = 'core/text-color';
 const title = __( 'Highlight' );
-
-const EMPTY_ARRAY = [];
 
 function getComputedStyleProperty( element, property ) {
 	if ( ! element ) {
@@ -58,10 +57,26 @@ function TextColorEdit( {
 	activeAttributes,
 	contentRef,
 } ) {
-	const [ allowCustomControl, colors = EMPTY_ARRAY ] = useSettings(
+	const [
+		defaultColors,
+		themeColors,
+		customColors,
+		enableCustomColors,
+		enableDefaultColors,
+	] = useSettings(
+		'color.palette.default',
+		'color.palette.theme',
+		'color.palette.custom',
 		'color.custom',
-		'color.palette'
+		'color.defaultPalette'
 	);
+	const { colors, hasColorsToChoose } = getAvailableHighlightColors( {
+		themeColors,
+		defaultColors,
+		customColors,
+		enableCustomColors,
+		enableDefaultColors,
+	} );
 	const [ isAddingColor, setIsAddingColor ] = useState( false );
 	const colorIndicatorStyle = useMemo(
 		() =>
@@ -72,7 +87,6 @@ function TextColorEdit( {
 		[ contentRef, value, colors ]
 	);
 
-	const hasColorsToChoose = !! colors.length || allowCustomControl;
 	if ( ! hasColorsToChoose && ! isActive ) {
 		return null;
 	}
