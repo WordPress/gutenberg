@@ -34,6 +34,7 @@
 
 ### Enhancements
 
+-   Group: Add an aspect ratio control to the Group block and its Row, Stack, and Grid variations. The control is hidden by default, and content taller than the ratio expands the block rather than overflowing it.
 -   Columns: Add transforms between Columns and the Row variation that preserve column widths through flex child sizing controls.
 -   Gallery: Add an opt-in Grid layout while preserving the existing Flex layout for current galleries.([#81909](https://github.com/WordPress/gutenberg/pull/81909)).
 

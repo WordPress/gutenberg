@@ -54,8 +54,12 @@
 			}
 		},
 		"dimensions": {
+			"aspectRatio": true,
 			"minHeight": true,
-			"minWidth": true
+			"minWidth": true,
+			"__experimentalDefaultControls": {
+				"aspectRatio": false
+			}
 		},
 		"__experimentalBorder": {
 			"color": true,
