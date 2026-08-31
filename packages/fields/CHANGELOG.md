@@ -32,6 +32,7 @@
 ### Bug Fixes
 
 -   `MediaEdit`: Decode HTML entities when displaying attachment titles. ([#81269](https://github.com/WordPress/gutenberg/pull/81269))
+-   `viewPostRevisions`: Open the visual revisions view in the site editor instead of the classic revisions screen ([#78424](https://github.com/WordPress/gutenberg/pull/78424)).
 
 ### Internal
 

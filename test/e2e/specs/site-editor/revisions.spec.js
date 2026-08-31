@@ -164,4 +164,65 @@ test.describe( 'Site editor revisions shareable URLs', () => {
 			null
 		);
 	} );
+
+	test( 'should open the newest revision from the pages list action', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const post = await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/pages',
+			data: {
+				title: 'Revisions action page',
+				content:
+					'<!-- wp:paragraph --><p>Original content</p><!-- /wp:paragraph -->',
+				status: 'publish',
+			},
+		} );
+		await requestUtils.rest( {
+			method: 'POST',
+			path: `/wp/v2/pages/${ post.id }`,
+			data: {
+				content:
+					'<!-- wp:paragraph --><p>First revision</p><!-- /wp:paragraph -->',
+			},
+		} );
+		await requestUtils.rest( {
+			method: 'POST',
+			path: `/wp/v2/pages/${ post.id }`,
+			data: {
+				content:
+					'<!-- wp:paragraph --><p>Second revision</p><!-- /wp:paragraph -->',
+			},
+		} );
+
+		const revisions = await requestUtils.rest( {
+			path: `/wp/v2/pages/${ post.id }/revisions`,
+		} );
+		const newestRevisionId = revisions[ 0 ].id;
+
+		// Open the pages list directly. Clicking through the navigation panel
+		// races with it rendering.
+		await admin.visitSiteEditor( { postType: 'page' } );
+		await page
+			.getByRole( 'row', { name: 'Revisions action page' } )
+			.getByLabel( 'Actions' )
+			.click();
+		await page.getByRole( 'menuitem', { name: 'View revisions' } ).click();
+
+		await expect(
+			page.getByRole( 'button', { name: 'Restore' } )
+		).toBeVisible();
+
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Modified block: Paragraph',
+			} )
+		).toContainText( 'Second revision' );
+		expect( new URL( page.url() ).searchParams.get( 'revision' ) ).toBe(
+			String( newestRevisionId )
+		);
+	} );
 } );
