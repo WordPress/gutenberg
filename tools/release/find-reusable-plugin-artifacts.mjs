@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 /**
- * Finds plugin builds an earlier run already published, so a commit is not built twice.
- * Takes the `branches` output of resolve-performance-branches.mjs and writes it back with
- * `reuseRunId` set. Every failure falls through to a normal build.
+ * Takes the `branches` of resolve-performance-branches.mjs and writes them back with the
+ * `reuseRunId` that already holds a build for them. Any failure falls through to a build.
  */
 import fs from 'node:fs';
 import { parseArgs } from 'node:util';
@@ -16,9 +15,6 @@ const TRUSTED_EVENT = 'push';
 const TRUSTED_BRANCH = 'trunk';
 const WORKFLOW = 'performance.yml';
 
-// How many recent trunk runs to scan when the artifact is looked up by name.
-const RUNS_SCANNED = 10;
-
 const REQUEST_TIMEOUT_MS = 10_000;
 
 /*
@@ -30,45 +26,9 @@ const LOOKUP_BUDGET_MS = 60_000;
 /**
  * @typedef {{ id: number, event: string, head_branch: string }} Run
  * @typedef {{ name: string, expired: boolean, workflow_run?: { id: number } }} Artifact
- * @typedef {{ name: string, sha?: string, reuse?: string, reuseRunId?: number }} Branch
+ * @typedef {{ name: string, sha?: string, reusable?: boolean, reuseRunId?: number }} Branch
  * @typedef {( path: string ) => Promise<any>} Request
  */
-
-/**
- * @param {Run} run
- * @return {boolean} Whether the run may serve a plugin to another run.
- */
-export function isTrustedRun( run ) {
-	return (
-		!! run &&
-		run.event === TRUSTED_EVENT &&
-		run.head_branch === TRUSTED_BRANCH
-	);
-}
-
-/**
- * @param {Array<{ run: Run, artifacts: Artifact[] }>} candidates   Runs newest first.
- * @param {string}                                     artifactName Name to look for.
- * @return {number|undefined} Id of the run to download from.
- */
-export function selectReusableArtifact( candidates, artifactName ) {
-	for ( const { run, artifacts } of candidates ) {
-		if ( ! isTrustedRun( run ) ) {
-			continue;
-		}
-		const artifact = ( artifacts || [] ).find(
-			( candidate ) =>
-				candidate.name === artifactName &&
-				! candidate.expired &&
-				// Guards against an artifact listed under a run it does not belong to.
-				( candidate.workflow_run?.id ?? run.id ) === run.id
-		);
-		if ( artifact ) {
-			return run.id;
-		}
-	}
-	return undefined;
-}
 
 /**
  * @param {string} repository Owner and name of the repository.
@@ -103,34 +63,41 @@ export function createRequest( repository, token ) {
  * @return {Promise<number|undefined>} Id of the run holding a reusable plugin.
  */
 async function findRun( branch, request ) {
-	if ( ! branch.sha || ! branch.reuse ) {
+	if ( ! branch.sha || ! branch.reusable ) {
 		return undefined;
 	}
-	const artifactName = `plugin-${ branch.sha }`;
+	const name = `plugin-${ branch.sha }`;
 	const query = new URLSearchParams( {
 		event: TRUSTED_EVENT,
 		branch: TRUSTED_BRANCH,
-		per_page: String( branch.reuse === 'sha' ? 5 : RUNS_SCANNED ),
+		head_sha: branch.sha,
+		per_page: '5',
 	} );
-	// The reference commit heads no run of its own; recent runs republish its plugin.
-	if ( branch.reuse === 'sha' ) {
-		query.set( 'head_sha', branch.sha );
-	}
 	const { workflow_runs: runs = [] } = await request(
 		`/actions/workflows/${ WORKFLOW }/runs?${ query }`
 	);
 
-	for ( const run of runs.filter( isTrustedRun ) ) {
+	for ( const run of runs ) {
+		// The query filters already, but the answer decides what the tests measure.
+		if (
+			run.event !== TRUSTED_EVENT ||
+			run.head_branch !== TRUSTED_BRANCH
+		) {
+			continue;
+		}
 		// Asking for one name keeps the response small and avoids paginating.
 		const { artifacts = [] } = await request(
-			`/actions/runs/${ run.id }/artifacts?name=${ artifactName }`
+			`/actions/runs/${ run.id }/artifacts?name=${ name }`
 		);
-		const runId = selectReusableArtifact(
-			[ { run, artifacts } ],
-			artifactName
+		const found = artifacts.some(
+			( artifact ) =>
+				artifact.name === name &&
+				! artifact.expired &&
+				// Guards against an artifact listed under a run it does not belong to.
+				( artifact.workflow_run?.id ?? run.id ) === run.id
 		);
-		if ( runId ) {
-			return runId;
+		if ( found ) {
+			return run.id;
 		}
 	}
 	return undefined;

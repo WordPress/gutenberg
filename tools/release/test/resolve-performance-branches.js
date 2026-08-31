@@ -10,8 +10,7 @@ const {
 
 const sha = 'a'.repeat( 40 );
 const baseSha = 'b'.repeat( 40 );
-const releaseSha = 'c'.repeat( 40 );
-const resolveRef = () => releaseSha;
+const refExists = () => true;
 
 describe( 'getTestedUpToMajor', () => {
 	it( 'returns major.minor', () => {
@@ -30,7 +29,7 @@ describe( 'resolveBranches', () => {
 				event: 'pull_request',
 				sha,
 				wpMajor: '7.1',
-				resolveRef,
+				refExists,
 				baseSha,
 				baseRef: 'trunk',
 			} )
@@ -42,7 +41,7 @@ describe( 'resolveBranches', () => {
 					ref: baseSha,
 					artifact: 'plugin-trunk',
 					sha: baseSha,
-					reuse: 'sha',
+					reusable: true,
 				},
 			],
 			wpVersion: '',
@@ -54,11 +53,11 @@ describe( 'resolveBranches', () => {
 			event: 'pull_request',
 			sha,
 			wpMajor: '7.1',
-			resolveRef,
+			refExists,
 			baseSha,
 			baseRef: 'release/24.0',
 		} );
-		expect( branches[ 1 ].reuse ).toBeUndefined();
+		expect( branches[ 1 ].reusable ).toBeUndefined();
 	} );
 
 	it( 'compares a push with the reference commit on the tested WP version', () => {
@@ -67,7 +66,7 @@ describe( 'resolveBranches', () => {
 				event: 'push',
 				sha,
 				wpMajor: '7.1',
-				resolveRef,
+				refExists,
 			} )
 		).toEqual( {
 			branches: [
@@ -77,7 +76,6 @@ describe( 'resolveBranches', () => {
 					ref: REFERENCE_COMMIT,
 					artifact: `plugin-${ REFERENCE_COMMIT }`,
 					sha: REFERENCE_COMMIT,
-					reuse: 'name',
 				},
 			],
 			wpVersion: '7.1',
@@ -90,7 +88,7 @@ describe( 'resolveBranches', () => {
 				event: 'release',
 				sha,
 				wpMajor: '7.1',
-				resolveRef,
+				refExists,
 				releaseTag: 'v24.0.0-rc.1',
 			} )
 		).toEqual( {
@@ -99,19 +97,16 @@ describe( 'resolveBranches', () => {
 					name: 'wp/7.1',
 					ref: 'wp/7.1',
 					artifact: 'plugin-wp-7-1',
-					sha: releaseSha,
 				},
 				{
 					name: 'release/23.9',
 					ref: 'release/23.9',
 					artifact: 'plugin-release-23-9',
-					sha: releaseSha,
 				},
 				{
 					name: 'release/24.0',
 					ref: 'release/24.0',
 					artifact: 'plugin-release-24-0',
-					sha: releaseSha,
 				},
 			],
 			wpVersion: '7.1',
@@ -124,7 +119,7 @@ describe( 'resolveBranches', () => {
 				event: 'release',
 				sha,
 				wpMajor: '7.1',
-				resolveRef,
+				refExists,
 				releaseTag: 'v24.0',
 			} )
 		).toThrow( "Release tag 'v24.0' does not resolve" );
@@ -136,9 +131,9 @@ describe( 'resolveBranches', () => {
 			event: 'release',
 			sha,
 			wpMajor: '7.1',
-			resolveRef: ( ref, kind ) => {
+			refExists: ( ref, kind ) => {
 				seen.push( `${ kind }:${ ref }` );
-				return releaseSha;
+				return true;
 			},
 			releaseTag: 'v24.0.0',
 		} );
@@ -156,8 +151,7 @@ describe( 'resolveBranches', () => {
 				event: 'release',
 				sha,
 				wpMajor: '7.1',
-				resolveRef: ( ref ) =>
-					ref === 'release/23.9' ? '' : releaseSha,
+				refExists: ( ref ) => ref !== 'release/23.9',
 				releaseTag: 'v24.0.0',
 			} )
 		).toThrow( "previous release branch 'release/23.9'" );
@@ -169,7 +163,7 @@ describe( 'resolveBranches', () => {
 				event: 'workflow_dispatch',
 				sha,
 				wpMajor: '7.1',
-				resolveRef,
+				refExists,
 				inputBranches: ' trunk, v23.8.0 ,,',
 				inputWpVersion: '7.0',
 			} )
@@ -179,35 +173,15 @@ describe( 'resolveBranches', () => {
 					name: 'trunk',
 					ref: 'trunk',
 					artifact: 'plugin-trunk',
-					sha: releaseSha,
 				},
 				{
 					name: 'v23.8.0',
 					ref: 'v23.8.0',
 					artifact: 'plugin-v23-8-0',
-					sha: releaseSha,
 				},
 			],
 			wpVersion: '7.0',
 		} );
-	} );
-
-	it( 'builds a manual ref that does not resolve, without reusing it', () => {
-		const { branches } = resolveBranches( {
-			event: 'workflow_dispatch',
-			sha,
-			wpMajor: '7.1',
-			resolveRef: () => '',
-			inputBranches: 'trunk,my-branch',
-		} );
-		expect( branches.map( ( item ) => item.sha ) ).toEqual( [
-			undefined,
-			undefined,
-		] );
-		expect( branches.map( ( item ) => item.ref ) ).toEqual( [
-			'trunk',
-			'my-branch',
-		] );
 	} );
 
 	it( 'rejects manual runs with fewer than two branches', () => {
@@ -216,7 +190,7 @@ describe( 'resolveBranches', () => {
 				event: 'workflow_dispatch',
 				sha,
 				wpMajor: '7.1',
-				resolveRef,
+				refExists,
 				inputBranches: 'trunk,',
 			} )
 		).toThrow( 'at least two branches' );
@@ -228,7 +202,7 @@ describe( 'resolveBranches', () => {
 				event: 'workflow_dispatch',
 				sha,
 				wpMajor: '7.1',
-				resolveRef,
+				refExists,
 				inputBranches: 'wp/6.9,wp-6.9',
 			} )
 		).toThrow( 'plugin-wp-6-9' );
@@ -240,7 +214,7 @@ describe( 'resolveBranches', () => {
 				event: 'release',
 				sha,
 				wpMajor: '7.1',
-				resolveRef: ( ref ) => ( ref === 'wp/7.1' ? '' : releaseSha ),
+				refExists: ( ref ) => ref !== 'wp/7.1',
 				releaseTag: 'v24.0.0',
 			} )
 		).toThrow( "WordPress branch 'wp/7.1'" );
@@ -252,7 +226,7 @@ describe( 'resolveBranches', () => {
 				event: 'schedule',
 				sha,
 				wpMajor: '7.1',
-				resolveRef,
+				refExists,
 			} )
 		).toThrow( 'Unsupported event' );
 	} );

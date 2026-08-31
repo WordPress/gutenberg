@@ -1,8 +1,9 @@
-const {
-	isTrustedRun,
-	selectReusableArtifact,
-	findReusableRuns,
-} = require( '../find-reusable-plugin-artifacts.mjs' );
+const { findReusableRuns } = require( '../find-reusable-plugin-artifacts.mjs' );
+
+const sha = 'a'.repeat( 40 );
+const runsPath = `/actions/workflows/performance.yml/runs?event=push&branch=trunk&head_sha=${ sha }&per_page=5`;
+const artifactsPath = ( id ) =>
+	`/actions/runs/${ id }/artifacts?name=plugin-${ sha }`;
 
 const run = ( overrides = {} ) => ( {
 	id: 1,
@@ -11,143 +12,101 @@ const run = ( overrides = {} ) => ( {
 	...overrides,
 } );
 const artifact = ( overrides = {} ) => ( {
-	name: 'plugin-abc',
+	name: `plugin-${ sha }`,
 	expired: false,
 	workflow_run: { id: 1 },
 	...overrides,
 } );
 
-describe( 'isTrustedRun', () => {
-	it( 'trusts a push to trunk', () => {
-		expect( isTrustedRun( run() ) ).toBe( true );
-	} );
+const request = ( responses ) => {
+	const paths = [];
+	const fake = ( path ) => {
+		paths.push( path );
+		return responses[ path ]
+			? Promise.resolve( responses[ path ] )
+			: Promise.reject( new Error( `Unexpected ${ path }` ) );
+	};
+	fake.paths = paths;
+	return fake;
+};
 
-	it( 'does not trust another event or another branch', () => {
-		expect( isTrustedRun( run( { event: 'pull_request' } ) ) ).toBe(
-			false
-		);
-		expect( isTrustedRun( run( { head_branch: 'release/24.0' } ) ) ).toBe(
-			false
-		);
-		expect( isTrustedRun( undefined ) ).toBe( false );
-	} );
-} );
-
-describe( 'selectReusableArtifact', () => {
-	it( 'returns the run holding the artifact', () => {
-		expect(
-			selectReusableArtifact(
-				[ { run: run(), artifacts: [ artifact() ] } ],
-				'plugin-abc'
-			)
-		).toBe( 1 );
-	} );
-
-	it( 'takes the first run that has it', () => {
-		expect(
-			selectReusableArtifact(
-				[
-					{ run: run( { id: 2 } ), artifacts: [] },
-					{
-						run: run( { id: 3 } ),
-						artifacts: [ artifact( { workflow_run: { id: 3 } } ) ],
-					},
-				],
-				'plugin-abc'
-			)
-		).toBe( 3 );
-	} );
-
-	it( 'skips untrusted runs even when they have the artifact', () => {
-		expect(
-			selectReusableArtifact(
-				[
-					{
-						run: run( { event: 'workflow_dispatch' } ),
-						artifacts: [ artifact() ],
-					},
-				],
-				'plugin-abc'
-			)
-		).toBeUndefined();
-	} );
-
-	it( 'skips expired artifacts, other names and other runs', () => {
-		const candidates = [
-			{
-				run: run(),
-				artifacts: [
-					artifact( { expired: true } ),
-					artifact( { name: 'plugin-def' } ),
-					artifact( { workflow_run: { id: 99 } } ),
-				],
-			},
-		];
-		expect(
-			selectReusableArtifact( candidates, 'plugin-abc' )
-		).toBeUndefined();
-	} );
-
-	it( 'handles runs without an artifact list', () => {
-		expect(
-			selectReusableArtifact(
-				[ { run: run(), artifacts: undefined } ],
-				'plugin-abc'
-			)
-		).toBeUndefined();
-	} );
+const base = ( overrides = {} ) => ( {
+	name: 'trunk',
+	sha,
+	reusable: true,
+	...overrides,
 } );
 
 describe( 'findReusableRuns', () => {
-	const sha = 'a'.repeat( 40 );
-	const request = ( responses ) => {
-		const paths = [];
-		const fake = ( path ) => {
-			paths.push( path );
-			const response = responses[ path ];
-			if ( ! response ) {
-				return Promise.reject( new Error( `Unexpected ${ path }` ) );
-			}
-			return Promise.resolve( response );
-		};
-		fake.paths = paths;
-		return fake;
-	};
-
 	it( 'finds the run that built the commit', async () => {
 		const fake = request( {
-			[ `/actions/workflows/performance.yml/runs?event=push&branch=trunk&per_page=5&head_sha=${ sha }` ]:
-				{ workflow_runs: [ run() ] },
-			[ `/actions/runs/1/artifacts?name=plugin-${ sha }` ]: {
-				artifacts: [ artifact( { name: `plugin-${ sha }` } ) ],
-			},
+			[ runsPath ]: { workflow_runs: [ run() ] },
+			[ artifactsPath( 1 ) ]: { artifacts: [ artifact() ] },
 		} );
-		const [ branch ] = await findReusableRuns(
-			[ { name: 'trunk', sha, reuse: 'sha' } ],
-			fake
-		);
+		const [ branch ] = await findReusableRuns( [ base() ], fake );
 		expect( branch.reuseRunId ).toBe( 1 );
 		expect( console ).toHaveLogged();
 	} );
 
-	it( 'scans recent runs when it looks the artifact up by name', async () => {
+	it( 'takes the first run that has the artifact', async () => {
 		const fake = request( {
-			'/actions/workflows/performance.yml/runs?event=push&branch=trunk&per_page=10':
-				{ workflow_runs: [ run( { id: 7 } ) ] },
-			[ `/actions/runs/7/artifacts?name=plugin-${ sha }` ]: {
+			[ runsPath ]: { workflow_runs: [ run(), run( { id: 2 } ) ] },
+			[ artifactsPath( 1 ) ]: { artifacts: [] },
+			[ artifactsPath( 2 ) ]: {
+				artifacts: [ artifact( { workflow_run: { id: 2 } } ) ],
+			},
+		} );
+		const [ branch ] = await findReusableRuns( [ base() ], fake );
+		expect( branch.reuseRunId ).toBe( 2 );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'skips a run that was not a push', async () => {
+		const fake = request( {
+			[ runsPath ]: {
+				workflow_runs: [ run( { event: 'workflow_dispatch' } ) ],
+			},
+		} );
+		const [ branch ] = await findReusableRuns( [ base() ], fake );
+		expect( branch.reuseRunId ).toBeUndefined();
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'skips a run that was not on trunk', async () => {
+		const fake = request( {
+			[ runsPath ]: {
+				workflow_runs: [ run( { head_branch: 'release/24.0' } ) ],
+			},
+		} );
+		const [ branch ] = await findReusableRuns( [ base() ], fake );
+		expect( branch.reuseRunId ).toBeUndefined();
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'skips an artifact with another name', async () => {
+		const fake = request( {
+			[ runsPath ]: { workflow_runs: [ run() ] },
+			[ artifactsPath( 1 ) ]: {
+				artifacts: [ artifact( { name: 'plugin-trunk' } ) ],
+			},
+		} );
+		const [ branch ] = await findReusableRuns( [ base() ], fake );
+		expect( branch.reuseRunId ).toBeUndefined();
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'skips an expired artifact and one belonging to another run', async () => {
+		const fake = request( {
+			[ runsPath ]: { workflow_runs: [ run() ] },
+			[ artifactsPath( 1 ) ]: {
 				artifacts: [
-					artifact( {
-						name: `plugin-${ sha }`,
-						workflow_run: { id: 7 },
-					} ),
+					artifact( { expired: true } ),
+					artifact( { workflow_run: { id: 99 } } ),
 				],
 			},
 		} );
-		const [ branch ] = await findReusableRuns(
-			[ { name: 'reference', sha, reuse: 'name' } ],
-			fake
-		);
-		expect( branch.reuseRunId ).toBe( 7 );
+		const [ branch ] = await findReusableRuns( [ base() ], fake );
+		expect( branch.reuseRunId ).toBeUndefined();
 		expect( console ).toHaveLogged();
 	} );
 
@@ -156,7 +115,7 @@ describe( 'findReusableRuns', () => {
 		const branches = await findReusableRuns(
 			[
 				{ name: 'head', sha },
-				{ name: 'wp/7.1', reuse: 'sha' },
+				{ name: 'wp/7.1', reusable: true },
 			],
 			fake
 		);
@@ -167,62 +126,41 @@ describe( 'findReusableRuns', () => {
 		expect( console ).toHaveLogged();
 	} );
 
-	it( 'builds when the API fails, without failing the other branches', async () => {
-		const fake = request( {
-			'/actions/workflows/performance.yml/runs?event=push&branch=trunk&per_page=10':
-				{ workflow_runs: [] },
-		} );
-		const branches = await findReusableRuns(
-			[
-				{ name: 'trunk', sha, reuse: 'sha' },
-				{ name: 'reference', sha, reuse: 'name' },
-			],
-			fake
-		);
-		expect( branches.map( ( { reuseRunId } ) => reuseRunId ) ).toEqual( [
-			undefined,
-			undefined,
-		] );
+	it( 'builds when the API fails', async () => {
+		const fake = request( {} );
+		const [ branch ] = await findReusableRuns( [ base() ], fake );
+		expect( branch.reuseRunId ).toBeUndefined();
 		expect( console ).toHaveLogged();
 	} );
 
 	it( 'builds when a response is malformed', async () => {
-		const fake = request( {
-			[ `/actions/workflows/performance.yml/runs?event=push&branch=trunk&per_page=5&head_sha=${ sha }` ]:
-				{},
-		} );
-		const [ branch ] = await findReusableRuns(
-			[ { name: 'trunk', sha, reuse: 'sha' } ],
-			fake
-		);
+		const fake = request( { [ runsPath ]: {} } );
+		const [ branch ] = await findReusableRuns( [ base() ], fake );
 		expect( branch.reuseRunId ).toBeUndefined();
 		expect( console ).toHaveLogged();
 	} );
 
 	it( 'stops mid branch once it runs out of time', async () => {
-		const fake = request( {
-			[ `/actions/workflows/performance.yml/runs?event=push&branch=trunk&per_page=5&head_sha=${ sha }` ]:
-				{ workflow_runs: [ run() ] },
-		} );
+		const fake = request( { [ runsPath ]: { workflow_runs: [ run() ] } } );
 		const slow = ( path ) =>
 			new Promise( ( resolve ) => setTimeout( resolve, 20 ) ).then( () =>
 				fake( path )
 			);
 		const [ branch ] = await findReusableRuns(
-			[ { name: 'trunk', sha, reuse: 'sha' } ],
+			[ base() ],
 			slow,
 			Date.now() + 10
 		);
 		expect( branch.reuseRunId ).toBeUndefined();
 		// The first request went out, the artifact lookup did not.
-		expect( fake.paths ).toHaveLength( 1 );
+		expect( fake.paths ).toEqual( [ runsPath ] );
 		expect( console ).toHaveLogged();
 	} );
 
-	it( 'stops looking once it runs out of time', async () => {
+	it( 'does not look anything up once the budget is gone', async () => {
 		const fake = request( {} );
 		const [ branch ] = await findReusableRuns(
-			[ { name: 'trunk', sha, reuse: 'sha' } ],
+			[ base() ],
 			fake,
 			Date.now() - 1
 		);

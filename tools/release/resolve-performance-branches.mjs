@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Resolves the branches and the suite shards the performance workflow runs for a GitHub event.
- * Writes `branches` (`{ name, ref, artifact, sha?, reuse? }[]`), `shards` (`{ shard, suites }[]`),
+ * Writes `branches` (`{ name, ref, artifact, sha?, reusable? }[]`), `shards` (`{ shard, suites }[]`),
  * `wp-version`, `plugin-files` (space separated globs from bin/plugin-files.txt) and `build-key`
  * to `$GITHUB_OUTPUT`.
  */
@@ -19,9 +19,6 @@ import { sanitizeBranchName } from './lib/sanitize-branch-name.js';
 export const REFERENCE_COMMIT = '28d414f1327652e2b49e784ddc12098768991c62';
 
 const SHA_PATTERN = /^[0-9a-f]{40}$/;
-
-// A ref that origin will not resolve promptly is built by name, as it was before.
-const LS_REMOTE_TIMEOUT_MS = 30_000;
 
 /*
  * Suites grouped into CI jobs that run in parallel, balanced by their duration.
@@ -64,21 +61,18 @@ export function resolveShards( suites ) {
 }
 
 /**
- * @param {string}        name  Branch label shown in the results.
- * @param {string}        ref   Git ref to build.
- * @param {'sha'|'name'=} reuse How to find a plugin an earlier run built for `ref`: `sha` looks
- *                              up the trunk push run for that commit, `name` scans recent trunk
- *                              push runs for the artifact. Omitted when the build is not reusable.
- * @param {string=}       sha   Commit `ref` points at, when it is not a commit itself.
+ * @param {string}   name     Branch label shown in the results.
+ * @param {string}   ref      Git ref to build.
+ * @param {boolean=} reusable Whether a trunk push run may have built this commit already.
  */
-function branch( name, ref = name, reuse = undefined, sha = ref ) {
+function branch( name, ref = name, reusable = undefined ) {
 	return {
 		name,
 		ref,
 		artifact: `plugin-${ sanitizeBranchName( name ) }`,
-		// What actually gets built, so a moving ref cannot change under the run.
-		sha: SHA_PATTERN.test( sha ) ? sha : undefined,
-		reuse,
+		// Only a commit can be reused; a branch or a tag moves.
+		sha: SHA_PATTERN.test( ref ) ? ref : undefined,
+		reusable,
 	};
 }
 
@@ -110,22 +104,22 @@ export function getTestedUpToMajor( readme ) {
 }
 
 /**
- * @typedef {'tag' | 'head' | 'any'} RefKind
- * @typedef {(ref: string, kind: RefKind) => string} RefResolver
+ * @typedef {'tag' | 'head'} RefKind
+ * @typedef {(ref: string, kind: RefKind) => boolean} RefExists
  */
 
 /**
  * @typedef ResolveOptions
  *
- * @property {string}      event          GitHub event name.
- * @property {string}      sha            Commit that triggered the workflow.
- * @property {string}      wpMajor        The `Tested up to` version from readme.txt.
- * @property {RefResolver} resolveRef     Commit a ref points at on origin, empty when there is none.
- * @property {string=}     baseSha        Pull request base commit.
- * @property {string=}     baseRef        Pull request base branch name.
- * @property {string=}     releaseTag     Release tag name.
- * @property {string=}     inputBranches  `workflow_dispatch` branches input.
- * @property {string=}     inputWpVersion `workflow_dispatch` WP version input.
+ * @property {string}    event          GitHub event name.
+ * @property {string}    sha            Commit that triggered the workflow.
+ * @property {string}    wpMajor        The `Tested up to` version from readme.txt.
+ * @property {RefExists} refExists      Whether a tag or branch exists on origin.
+ * @property {string=}   baseSha        Pull request base commit.
+ * @property {string=}   baseRef        Pull request base branch name.
+ * @property {string=}   releaseTag     Release tag name.
+ * @property {string=}   inputBranches  `workflow_dispatch` branches input.
+ * @property {string=}   inputWpVersion `workflow_dispatch` WP version input.
  */
 
 /**
@@ -150,7 +144,7 @@ export function resolveBranches( options ) {
  * @param {ResolveOptions} options
  */
 function resolveBranchesForEvent( options ) {
-	const { event, sha, wpMajor, resolveRef } = options;
+	const { event, sha, wpMajor, refExists } = options;
 
 	switch ( event ) {
 		case 'pull_request':
@@ -167,7 +161,7 @@ function resolveBranchesForEvent( options ) {
 						 * trunk PR has usually been built already. Other base branches
 						 * are never built by a push run.
 						 */
-						options.baseRef === 'trunk' ? 'sha' : undefined
+						options.baseRef === 'trunk' || undefined
 					),
 				],
 				wpVersion: '',
@@ -175,14 +169,7 @@ function resolveBranchesForEvent( options ) {
 
 		case 'push':
 			return {
-				branches: [
-					branch( sha ),
-					/*
-					 * The reference commit is not the head of any run, so it is found by
-					 * artifact name among recent trunk runs, each of which republishes it.
-					 */
-					branch( REFERENCE_COMMIT, REFERENCE_COMMIT, 'name' ),
-				],
+				branches: [ branch( sha ), branch( REFERENCE_COMMIT ) ],
 				wpVersion: wpMajor,
 			};
 
@@ -201,25 +188,24 @@ function resolveBranchesForEvent( options ) {
 				previousBase10 % 10
 			}`;
 			const wp = `wp/${ wpMajor }`;
-			/** @type {Record<string, string>} */
-			const commits = {};
 			for ( const [ ref, kind, description ] of [
 				[ tag, 'tag', 'release tag' ],
 				[ current, 'head', 'current release branch' ],
 				[ previous, 'head', 'previous release branch' ],
 				[ wp, 'head', 'WordPress branch' ],
 			] ) {
-				commits[ ref ] = resolveRef( ref, kind );
-				if ( ! commits[ ref ] ) {
+				if ( ! refExists( ref, kind ) ) {
 					throw new Error(
 						`Expected ${ description } '${ ref }' to exist in the Gutenberg repository.`
 					);
 				}
 			}
 			return {
-				branches: [ wp, previous, current ].map( ( ref ) =>
-					branch( ref, ref, undefined, commits[ ref ] )
-				),
+				branches: [
+					branch( wp ),
+					branch( previous ),
+					branch( current ),
+				],
 				wpVersion: wpMajor,
 			};
 		}
@@ -233,9 +219,7 @@ function resolveBranchesForEvent( options ) {
 				throw new Error( 'Need at least two branches to compare.' );
 			}
 			return {
-				branches: names.map( ( name ) =>
-					branch( name, name, undefined, resolveRef( name, 'any' ) )
-				),
+				branches: names.map( ( name ) => branch( name ) ),
 				wpVersion: options.inputWpVersion || '',
 			};
 		}
@@ -256,36 +240,24 @@ function main() {
 		event: env.GITHUB_EVENT_NAME || '',
 		sha: env.GITHUB_SHA || '',
 		wpMajor: getTestedUpToMajor( fs.readFileSync( 'readme.txt', 'utf8' ) ),
-		resolveRef: ( ref, kind ) => {
-			if ( SHA_PATTERN.test( ref ) ) {
-				return ref;
-			}
-			const filter = { tag: [ '--tags' ], head: [ '--heads' ], any: [] }[
-				kind
-			];
+		refExists: ( ref, kind ) => {
 			try {
-				const lines = execFileSync(
+				execFileSync(
 					'git',
 					[
 						'ls-remote',
 						'--exit-code',
-						...filter,
+						kind === 'tag' ? '--tags' : '--heads',
 						'origin',
 						ref,
-						// An annotated tag needs peeling to the commit it points at.
-						`${ ref }^{}`,
 					],
-					{ encoding: 'utf8', timeout: LS_REMOTE_TIMEOUT_MS }
-				)
-					.trim()
-					.split( '\n' );
-				const line =
-					lines.find( ( candidate ) =>
-						candidate.endsWith( '^{}' )
-					) || lines[ 0 ];
-				return line.split( /\s/ )[ 0 ] || '';
+					{
+						stdio: 'ignore',
+					}
+				);
+				return true;
 			} catch {
-				return '';
+				return false;
 			}
 		},
 		baseSha: env.BASE_SHA,

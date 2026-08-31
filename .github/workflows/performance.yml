@@ -90,6 +90,29 @@ jobs:
                 branch: ${{ fromJSON( needs.prepare.outputs.branches ) }}
 
         steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  ref: ${{ matrix.branch.ref }}
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            # Runs before the plugin is reused so the toolchain it would have been built
+            # with is known, and so a rejected download still has everything to build.
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
+            # Describes the plugin this job would produce. It travels with the artifact, and
+            # a downloaded plugin is only reused when its own manifest is identical.
+            - name: Describe this build
+              env:
+                  MANIFEST: ${{ runner.temp }}/perf-build.json
+                  BUILD_KEY: ${{ needs.prepare.outputs.build-key }}
+                  BUILD_SHA: ${{ matrix.branch.sha }}
+              run: |
+                  jq -n --arg sha "$BUILD_SHA" --arg buildKey "$BUILD_KEY" \
+                    --arg node "$(node -v)" --arg npm "$(npm -v)" \
+                    --arg image "${ImageOS:-}" '$ARGS.named' | tee "$MANIFEST"
+
             # Downloads into a staging directory: a partial download must not survive into
             # the plugin a fresh build packages.
             - name: Download the plugin an earlier run built
@@ -110,30 +133,18 @@ jobs:
               env:
                   DOWNLOAD_DIR: ${{ runner.temp }}/download
                   PLUGIN_DIR: ${{ runner.temp }}/plugin
-                  BUILD_KEY: ${{ needs.prepare.outputs.build-key }}
+                  MANIFEST: ${{ runner.temp }}/perf-build.json
                   BUILD_SHA: ${{ matrix.branch.sha }}
               run: |
                   # A missing or malformed manifest has to build, not fail the job.
-                  key=$( jq -r '.buildKey // empty' "$DOWNLOAD_DIR/perf-build.json" 2>/dev/null || true )
-                  sha=$( jq -r '.sha // empty' "$DOWNLOAD_DIR/perf-build.json" 2>/dev/null || true )
-                  if [[ -f "$DOWNLOAD_DIR/gutenberg.php" && "$key" == "$BUILD_KEY" && "$sha" == "$BUILD_SHA" ]]; then
+                  downloaded=$( jq -S . "$DOWNLOAD_DIR/perf-build.json" 2>/dev/null || echo '{}' )
+                  if [[ -f "$DOWNLOAD_DIR/gutenberg.php" ]] &&
+                     diff <( echo "$downloaded" ) <( jq -S . "$MANIFEST" ); then
                     mv "$DOWNLOAD_DIR" "$PLUGIN_DIR"
                     echo "ok=true" >> "$GITHUB_OUTPUT"
                   else
-                    echo "::notice::Building $BUILD_SHA; the downloaded plugin did not match this run."
+                    echo "::notice::Building $BUILD_SHA; the downloaded plugin does not match this run."
                   fi
-
-            # The resolved commit, so a moving branch cannot change under the run.
-            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-              if: steps.reused.outputs.ok != 'true'
-              with:
-                  ref: ${{ matrix.branch.sha || matrix.branch.ref }}
-                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
-                  persist-credentials: false
-
-            - name: Setup Node.js and install dependencies
-              if: steps.reused.outputs.ok != 'true'
-              uses: ./.github/setup-node
 
             - name: Build
               if: steps.reused.outputs.ok != 'true'
@@ -146,8 +157,7 @@ jobs:
               env:
                   PLUGIN_DIR: ${{ runner.temp }}/plugin
                   PLUGIN_FILES: ${{ needs.prepare.outputs.plugin-files }}
-                  BUILD_KEY: ${{ needs.prepare.outputs.build-key }}
-                  BUILD_SHA: ${{ matrix.branch.sha }}
+                  MANIFEST: ${{ runner.temp }}/perf-build.json
               run: |
                   mkdir -p "$PLUGIN_DIR"
                   # post-content.php is gone from trunk but refs up to WP 6.x still require it from lib/demo.php.
@@ -155,10 +165,7 @@ jobs:
                   tar --ignore-failed-read -cf - $PLUGIN_FILES post-content.php \
                     | tar -xf - -C "$PLUGIN_DIR"
                   test -f "$PLUGIN_DIR/gutenberg.php"
-                  # Travels with the plugin so a later run can tell what it is downloading.
-                  jq -n --arg sha "$BUILD_SHA" --arg buildKey "$BUILD_KEY" \
-                    --arg node "$(node -v)" --arg npm "$(npm -v)" --arg image "${ImageOS:-}" \
-                    '$ARGS.named' > "$PLUGIN_DIR/perf-build.json"
+                  cp "$MANIFEST" "$PLUGIN_DIR/perf-build.json"
 
             - name: Upload plugin
               uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
