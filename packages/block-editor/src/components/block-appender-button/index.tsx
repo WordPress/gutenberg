@@ -8,15 +8,17 @@ import { canAppendBlocks } from './can-append';
 
 /**
  * Adds a block at the end of the selected block's own list, the job the
- * appender in the corner of a filled container used to do.
+ * appender in the corner of a filled container used to do. Renders
+ * nothing when the block takes no appended blocks.
  *
- * @param {Object} props          Component props.
- * @param {string} props.clientId The selected block client ID.
- *
- * @return {Component|null} The button, or nothing when the block takes no
- *                          appended blocks.
+ * @param props          Component props.
+ * @param props.clientId The selected block client ID.
  */
-export default function BlockAppenderButton( { clientId } ) {
+export default function BlockAppenderButton( {
+	clientId,
+}: {
+	clientId: string;
+} ) {
 	// The parent selector's inserter already adds a block next to the
 	// selected one; a second plus button in the same toolbar would be
 	// two ways to add a block, a row apart.
@@ -42,6 +44,12 @@ export default function BlockAppenderButton( { clientId } ) {
 				disabled,
 				blockTitle,
 				hasSingleBlockType,
+			}: {
+				onToggle: () => void;
+				isOpen: boolean;
+				disabled: boolean;
+				blockTitle: string;
+				hasSingleBlockType: boolean;
 			} ) => (
 				<ToolbarButton
 					className="block-editor-block-appender-button"
