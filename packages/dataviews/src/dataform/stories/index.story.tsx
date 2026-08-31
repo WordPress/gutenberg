@@ -13,6 +13,7 @@ import VisibilityComponent from './visibility';
 const meta = {
 	tags: [ 'manifest' ],
 	title: 'DataViews/DataForm',
+	id: 'dataviews-dataform',
 	component: DataForm,
 };
 export default meta;

@@ -11,6 +11,7 @@ import type { StorybookConfig } from '@storybook/react-vite';
 import dsTokenFallbacks from '@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks';
 import dsTokenFallbacksJs from '@wordpress/theme/vite-plugins/vite-ds-token-fallbacks';
 import babel from './vite-babel-plugin.js';
+import { storyGlobs } from './story-globs.js';
 
 /**
  * @see https://storybook.js.org/docs/faq#how-do-i-fix-module-resolution-in-special-environments
@@ -23,39 +24,11 @@ function getAbsolutePath( packageName: string ) {
 
 const { NODE_ENV = 'development' } = process.env;
 
-const stories = [
-	'./stories/playground/**/*.story.@(jsx|tsx)',
-	'./stories/**/*.mdx',
-	'./stories/design-system/**/*.story.@(ts|tsx)',
-	'../packages/block-editor/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
-	'../packages/editor/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
-	'../packages/global-styles-ui/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
-	'../packages/components/src/**/stories/*.story.@(jsx|tsx)',
-	'../packages/components/src/**/stories/*.mdx',
-	'../packages/icons/src/**/stories/*.story.@(js|tsx|mdx)',
-	'./stories/icons/**/*.story.@(ts|tsx)',
-	'../packages/dataviews/src/**/stories/*.story.@(js|tsx|mdx)',
-	'../packages/fields/src/**/stories/*.story.@(js|tsx|mdx)',
-	'../packages/image-cropper/src/**/stories/*.story.@(js|tsx|mdx)',
-	'../packages/media-editor/src/**/stories/*.story.@(js|tsx|mdx)',
-	'../packages/media-fields/src/**/stories/*.story.@(js|tsx|mdx)',
-	'../packages/theme/src/**/stories/*.mdx',
-	'../packages/theme/src/**/stories/*.story.@(tsx|mdx)',
-	'../packages/grid/src/**/stories/*.story.@(ts|tsx)',
-	'../packages/widget-primitives/src/**/stories/*.mdx',
-	'../packages/widget-primitives/src/**/stories/*.story.@(ts|tsx)',
-	'../packages/widget-dashboard/src/**/stories/*.mdx',
-	'../packages/widget-dashboard/src/**/stories/*.story.@(ts|tsx)',
-	'../packages/ui/src/**/stories/*.mdx',
-	'../packages/ui/src/**/stories/*.story.@(ts|tsx)',
-	'../packages/admin-ui/src/**/stories/*.story.@(ts|tsx)',
-];
-
 const config: StorybookConfig = {
 	core: {
 		disableTelemetry: true,
 	},
-	stories,
+	stories: storyGlobs,
 	staticDirs: [ './static' ],
 	addons: [
 		{

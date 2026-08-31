@@ -4,6 +4,7 @@ import { Popover } from '@wordpress/ui';
 
 export default {
 	title: 'Playground/Debug fixtures/Popover with SlotFill',
+	id: 'playground-debug-fixtures-popover-with-slotfill',
 	component: Popover.Root,
 };
 

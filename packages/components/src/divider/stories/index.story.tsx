@@ -6,6 +6,7 @@ import { Flex } from '../../flex';
 const meta: Meta< typeof Divider > = {
 	component: Divider,
 	title: 'Components/Divider',
+	id: 'components-divider',
 	argTypes: {
 		margin: {
 			control: { type: 'text' },

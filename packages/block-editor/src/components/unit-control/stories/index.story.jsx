@@ -3,6 +3,7 @@ import UnitControl from '../';
 
 const meta = {
 	title: 'BlockEditor/UnitControl',
+	id: 'blockeditor-unitcontrol',
 	component: UnitControl,
 	parameters: {
 		docs: {

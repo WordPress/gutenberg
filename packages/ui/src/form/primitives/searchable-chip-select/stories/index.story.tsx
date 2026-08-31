@@ -11,6 +11,7 @@ import { ITEMS } from './fixtures';
 const meta: Meta< typeof SearchableChipSelect > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/Primitives/SearchableChipSelect',
+	id: 'design-system-components-form-primitives-searchablechipselect',
 	component: SearchableChipSelect,
 	// Temporary: Due to an upstream bug, render the root explicitly so the
 	// components manifest extractor can resolve props from the JSX.

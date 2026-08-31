@@ -11,6 +11,7 @@ const blocks = [ createBlock( 'core/paragraph' ) ];
 
 const meta = {
 	title: 'BlockEditor/BlockTitle',
+	id: 'blockeditor-blocktitle',
 	component: BlockTitle,
 	parameters: {
 		docs: {

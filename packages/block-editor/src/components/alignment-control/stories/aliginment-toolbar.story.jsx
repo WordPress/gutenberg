@@ -6,6 +6,7 @@ import { AlignmentToolbar } from '..';
  */
 const meta = {
 	title: 'BlockEditor/AlignmentToolbar',
+	id: 'blockeditor-alignmenttoolbar',
 	component: AlignmentToolbar,
 	argTypes: {
 		value: {

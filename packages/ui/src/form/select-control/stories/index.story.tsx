@@ -9,6 +9,7 @@ import {
 
 const meta: Meta< typeof SelectControl > = {
 	title: 'Design System/Components/Form/SelectControl',
+	id: 'design-system-components-form-selectcontrol',
 	component: SelectControl,
 	subcomponents: {
 		'SelectControl.Group': SelectControl.Group,

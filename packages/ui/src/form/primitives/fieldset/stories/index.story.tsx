@@ -5,6 +5,7 @@ import { DETAILS_EXAMPLE } from '../../../stories/shared';
 const meta: Meta< typeof Fieldset.Root > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/Primitives/Fieldset',
+	id: 'design-system-components-form-primitives-fieldset',
 	component: Fieldset.Root,
 	// Temporary: Due to an upstream bug, render the root explicitly so the
 	// components manifest extractor can resolve props from the JSX.

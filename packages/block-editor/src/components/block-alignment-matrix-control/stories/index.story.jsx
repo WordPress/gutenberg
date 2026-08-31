@@ -3,6 +3,7 @@ import BlockAlignmentMatrixControl from '../';
 
 const meta = {
 	title: 'BlockEditor/BlockAlignmentMatrixControl',
+	id: 'blockeditor-blockalignmentmatrixcontrol',
 	component: BlockAlignmentMatrixControl,
 	parameters: {
 		docs: {

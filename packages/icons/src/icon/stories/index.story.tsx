@@ -6,7 +6,9 @@ import * as icons from '../../';
 
 const meta = {
 	component: Icon,
+	// Keep in sync with `storybook/stories/icons/library.story.tsx`
 	title: 'Icons/Icon',
+	id: 'icons-icon',
 	parameters: {
 		controls: { hideNoControlsWarning: true },
 	},

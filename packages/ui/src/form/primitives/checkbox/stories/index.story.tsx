@@ -3,6 +3,7 @@ import { Checkbox } from '../';
 
 const meta: Meta< typeof Checkbox > = {
 	title: 'Design System/Components/Form/Primitives/Checkbox',
+	id: 'design-system-components-form-primitives-checkbox',
 	component: Checkbox,
 	parameters: {
 		// FIXME: Stories show the checkbox primitive without a visible label (aria-toggle-field-name).

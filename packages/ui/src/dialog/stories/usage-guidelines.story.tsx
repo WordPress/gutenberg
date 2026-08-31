@@ -8,6 +8,7 @@ import * as Dialog from '../index';
 
 const meta: Meta = {
 	title: 'Design System/Components/Dialog/Usage Guidelines',
+	id: 'design-system-components-dialog-usage-guidelines',
 	parameters: {
 		controls: { disable: true },
 	},

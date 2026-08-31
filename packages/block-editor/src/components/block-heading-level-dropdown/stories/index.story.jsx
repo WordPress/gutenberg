@@ -3,6 +3,7 @@ import HeadingLevelDropdown from '../';
 
 const meta = {
 	title: 'BlockEditor/HeadingLevelDropdown',
+	id: 'blockeditor-headingleveldropdown',
 	component: HeadingLevelDropdown,
 	parameters: {
 		docs: {

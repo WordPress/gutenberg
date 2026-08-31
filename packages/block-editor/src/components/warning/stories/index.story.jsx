@@ -4,6 +4,7 @@ import Warning from '../';
 
 const meta = {
 	title: 'BlockEditor/Warning',
+	id: 'blockeditor-warning',
 	component: Warning,
 	parameters: {
 		docs: {

@@ -3,6 +3,7 @@ import BorderRadiusControl from '../';
 
 const meta = {
 	title: 'BlockEditor/BorderRadiusControl',
+	id: 'blockeditor-borderradiuscontrol',
 	component: BorderRadiusControl,
 	parameters: {
 		docs: {

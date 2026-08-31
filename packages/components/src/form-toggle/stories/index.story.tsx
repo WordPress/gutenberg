@@ -6,6 +6,7 @@ const meta: Meta< typeof FormToggle > = {
 	tags: [ 'manifest' ],
 	component: FormToggle,
 	title: 'Components/FormToggle',
+	id: 'components-formtoggle',
 	argTypes: {
 		onChange: {
 			action: 'onChange',

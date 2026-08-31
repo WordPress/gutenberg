@@ -3,6 +3,7 @@ import TextTransformControl from '../';
 
 const meta = {
 	title: 'BlockEditor/TextTransformControl',
+	id: 'blockeditor-texttransformcontrol',
 	component: TextTransformControl,
 	parameters: {
 		docs: {

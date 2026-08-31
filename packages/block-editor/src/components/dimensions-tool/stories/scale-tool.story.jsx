@@ -7,6 +7,7 @@ import ScaleTool from '../scale-tool';
 
 export default {
 	title: 'BlockEditor/DimensionsTool/ScaleTool',
+	id: 'blockeditor-dimensionstool-scaletool',
 	component: ScaleTool,
 	tags: [ 'status-private' ],
 	argTypes: {

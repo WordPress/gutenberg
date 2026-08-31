@@ -54,6 +54,7 @@ const authorFieldForStory: Field< any > = {
 
 export default {
 	title: 'Fields/Base Fields',
+	id: 'fields-base-fields',
 	component: DataForm,
 };
 

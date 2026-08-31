@@ -19,6 +19,7 @@ import {
 const meta: Meta< typeof Autocomplete.Root > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/Primitives/Autocomplete',
+	id: 'design-system-components-form-primitives-autocomplete',
 	component: Autocomplete.Root,
 	subcomponents: {
 		'Autocomplete.Portal': Autocomplete.Portal,
