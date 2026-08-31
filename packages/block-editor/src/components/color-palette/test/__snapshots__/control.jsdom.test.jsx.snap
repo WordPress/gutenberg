@@ -107,7 +107,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
                         />
                         <svg
                           aria-hidden="true"
-                          fill="#000"
+                          color="#000"
                           focusable="false"
                           height="24"
                           stroke="currentColor"
