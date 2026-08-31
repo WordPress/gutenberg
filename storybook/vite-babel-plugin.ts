@@ -29,7 +29,7 @@ export default async function babelPlugin(
 			}
 
 			const parserPlugins: NonNullable< ParserOptions[ 'plugins' ] > = [];
-			if ( ! filePath.endsWith( '.ts' ) ) {
+			if ( /\.[jt]sx$/.test( filePath ) ) {
 				parserPlugins.push( 'jsx' );
 			}
 			if ( /\.tsx?$/.test( filePath ) ) {

@@ -34,6 +34,10 @@ A tool to compare performance across multiple branches/tags/commits is provided.
 npm exec release-cli -- perf trunk v8.1.0 v8.0.0
 ```
 
+On pull requests, the base branch column (for example `trunk`) is measured at the commit the pull request is based on, not at the current tip of the branch, so both columns match what the merge commit was built from.
+
+Pass `--suites` with a comma separated list of spec names (`test/performance/specs/*.spec.js` without the extension) to run a subset of the suites. The CI workflow uses it to split the suites into shards that run in parallel, each shard measuring all branches on the same runner. It also builds the plugins once in a separate job and passes them to each shard with `--plugins-dir <dir>` (a prebuilt plugin per branch in `<dir>/<sanitized branch name>`), which makes the command use the current checkout as the test runner instead of cloning and building.
+
 To get the most accurate results, it's is important to use the exact same version of the tests and environment (theme...) when running the tests, the only thing that need to be different between the branches is the Gutenberg plugin version (or branch used to build the plugin).
 
 To achieve that the command first prepares the following folder structure:
@@ -77,7 +81,7 @@ Gutenberg supports only two WP versions, this impacts the performance job in two
 
  - The base WP version used to run the performance job needs to be updated, when the minimum version supported by Gutenberg changes. In order to do that, we rely on the `Tested up to` flag of the plugin's `readme.txt` file. So each time that flag is changed, the version used for the performance job is changed as well.
 
- - Updating the WP version used for performance jobs means that there's a high chance that the reference commit used for performance test stability becomes incompatible with the WP version that is used. So every time, the `Tested up to` flag is updated in the `readme.txt` is changed, we also have to update the reference commit that is used in `.github/workflows/performance.yml`.
+ - Updating the WP version used for performance jobs means that there's a high chance that the reference commit used for performance test stability becomes incompatible with the WP version that is used. So every time, the `Tested up to` flag is updated in the `readme.txt` is changed, we also have to update the reference commit that is used in `tools/release/resolve-performance-branches.mjs`.
 
 The new reference commit hash that is chosen needs to meet the following requirements:
 

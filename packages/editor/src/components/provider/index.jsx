@@ -16,7 +16,6 @@ import {
 	BlockContextProvider,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 import { createBlock } from '@wordpress/blocks';
 import withRegistryProvider from './with-registry-provider';
@@ -348,7 +347,6 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			},
 			[ editEntityRecord, post.type, post.id ]
 		);
-		const { removeNotice } = useDispatch( noticesStore );
 
 		// Ideally this should be synced on each change and not just something you do once.
 		useLayoutEffect( () => {
@@ -379,16 +377,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		// Synchronizes the active post with the state
 		useEffect( () => {
 			setEditedPost( post.type, post.id );
-			if (
-				typeof window !== 'undefined' &&
-				window.__experimentalTemplateActivate
-			) {
-				// Clear any notices dependent on the post context.
-				removeNotice( 'template-activate-notice' );
-			}
-
 			return () => setEditedPost( null, null );
-		}, [ post.type, post.id, setEditedPost, removeNotice ] );
+		}, [ post.type, post.id, setEditedPost ] );
 
 		// Opens the entity at the width it asks for. Keyed on the entity as well
 		// as the width, so that moving to another one leaves a width set from

@@ -33,28 +33,13 @@ const renamePost: Action< PostWithPermissions > = {
 			return false;
 		}
 
-		// Non-database template cannot be edited.
-		if (
-			post.type === 'wp_template' &&
-			typeof post.id === 'string' &&
-			window?.__experimentalTemplateActivate
-		) {
-			return false;
-		}
-
-		const specialChecks = [ 'wp_template', 'wp_template_part' ];
-
-		if ( ! window?.__experimentalTemplateActivate ) {
-			specialChecks.push( 'wp_template' );
-		}
-
 		// Templates, template parts and patterns have special checks for renaming.
-		if ( ! specialChecks.includes( post.type ) ) {
+		if ( ! [ 'wp_template', 'wp_template_part' ].includes( post.type ) ) {
 			return post.permissions?.update;
 		}
 
 		// In the case of templates, we can only rename custom templates.
-		if ( isTemplate( post ) && ! window?.__experimentalTemplateActivate ) {
+		if ( isTemplate( post ) ) {
 			return (
 				isTemplateRemovable( post ) &&
 				post.is_custom &&
