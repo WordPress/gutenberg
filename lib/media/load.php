@@ -299,11 +299,16 @@ function gutenberg_get_chromium_major_version(): ?int {
 }
 
 /**
- * Enables cross-origin isolation in the block editor.
+ * Enables cross-origin isolation on admin pages.
  *
  * Required for enabling SharedArrayBuffer for WebAssembly-based
  * media processing in the editor. Uses Document-Isolation-Policy
  * on supported browsers (Chromium 137+).
+ *
+ * Applied to all admin pages so that navigations between editor pages
+ * and other admin screens (site editor, template operations, pattern
+ * editing) remain in the same agent cluster, preserving cross-window
+ * communication.
  */
 function gutenberg_set_up_cross_origin_isolation() {
 	// Re-check the filter at action time, since other plugins (loaded after Gutenberg)
@@ -312,20 +317,17 @@ function gutenberg_set_up_cross_origin_isolation() {
 		return;
 	}
 
-	$screen = get_current_screen();
-
-	if ( ! $screen ) {
-		return;
-	}
-
-	if ( ! $screen->is_block_editor() && 'site-editor' !== $screen->id && ! ( 'widgets' === $screen->id && wp_use_widgets_block_editor() ) ) {
+	// Cross-origin isolation is not needed if users can't upload files anyway.
+	if ( ! current_user_can( 'upload_files' ) ) {
 		return;
 	}
 
 	// Skip when rendering the classic-theme home route, which shows the site
 	// preview in an iframe and must reach its `contentDocument` to neutralize
 	// interactive elements — DIP would block that.
-	if ( 'site-editor' === $screen->id && ! wp_is_block_theme() && ( ! isset( $_GET['p'] ) || '/' === $_GET['p'] ) ) {
+	global $pagenow;
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if ( 'site-editor.php' === $pagenow && ! wp_is_block_theme() && ( ! isset( $_GET['p'] ) || '/' === $_GET['p'] ) ) {
 		return;
 	}
 
@@ -337,30 +339,14 @@ function gutenberg_set_up_cross_origin_isolation() {
 		return;
 	}
 
-	$user_id = get_current_user_id();
-	if ( ! $user_id ) {
-		return;
-	}
-
-	// Cross-origin isolation is not needed if users can't upload files anyway.
-	if ( ! user_can( $user_id, 'upload_files' ) ) {
-		return;
-	}
-
 	gutenberg_start_cross_origin_isolation_output_buffer();
 }
 
-add_action( 'load-post.php', 'gutenberg_set_up_cross_origin_isolation' );
-add_action( 'load-post-new.php', 'gutenberg_set_up_cross_origin_isolation' );
-add_action( 'load-site-editor.php', 'gutenberg_set_up_cross_origin_isolation' );
-add_action( 'load-widgets.php', 'gutenberg_set_up_cross_origin_isolation' );
+add_action( 'admin_init', 'gutenberg_set_up_cross_origin_isolation' );
 
 // Remove core's COEP/COOP-based cross-origin isolation in favor of
 // Gutenberg's DIP-based approach, which also skips third-party editors.
-remove_action( 'load-post.php', 'wp_set_up_cross_origin_isolation' );
-remove_action( 'load-post-new.php', 'wp_set_up_cross_origin_isolation' );
-remove_action( 'load-site-editor.php', 'wp_set_up_cross_origin_isolation' );
-remove_action( 'load-widgets.php', 'wp_set_up_cross_origin_isolation' );
+remove_action( 'admin_init', 'wp_set_up_cross_origin_isolation' );
 
 /**
  * Sends the Document-Isolation-Policy header for cross-origin isolation.
