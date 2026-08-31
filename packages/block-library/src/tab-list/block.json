@@ -55,7 +55,7 @@
 			},
 			"allowVerticalAlignment": false,
 			"allowOrientation": false,
-			"allowWrap": false
+			"allowWrap": true
 		},
 		"spacing": {
 			"padding": true,
