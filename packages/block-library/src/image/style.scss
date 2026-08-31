@@ -15,12 +15,16 @@
 		box-sizing: border-box;
 
 		@media not (prefers-reduced-motion) {
+			& {
+				transition: opacity 0.4s ease;
+			}
+
 			&.hide {
-				visibility: hidden;
+				opacity: 0;
 			}
 
 			&.show {
-				animation: show-content-image 0.4s;
+				opacity: 1;
 			}
 		}
 	}
