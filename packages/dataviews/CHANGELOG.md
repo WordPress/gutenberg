@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   DataViews: Show "No results on this page" and a "Go to the first page" link, instead of the generic "No results", when the view's page is past the last one — such as a stale `pageNumber` in the URL — so the empty state does not suggest the query matches nothing ([#80840](https://github.com/WordPress/gutenberg/issues/80840)).
+-   DataViews: Show "No results on this page" and a "Go to the first page" link, instead of the generic "No results", when the view's page is out of bounds (below the first page or past the last one) — such as a stale `pageNumber` in the URL — so the empty state does not suggest the query matches nothing ([#80840](https://github.com/WordPress/gutenberg/issues/80840)).
 
 ### Internal
 

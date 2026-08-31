@@ -13,34 +13,32 @@ type DataViewsLayoutProps = {
 };
 
 /**
- * Whether the view asks for a page past the last one, so an empty result
- * does not mean there is no data for the current query.
+ * Whether the view asks for a page that does not exist — before the first
+ * one or past the last one — so an empty result does not mean there is no
+ * data for the current query.
  *
  * @param view                      The current view.
  * @param paginationInfo            The totals reported by the consumer.
- * @param paginationInfo.totalItems The total number of items, if known.
  * @param paginationInfo.totalPages The total number of pages, if known.
  * @return Whether the current page is out of bounds.
  */
 function isPageOutOfBounds(
 	view: View,
-	paginationInfo: {
-		totalItems: number | null;
-		totalPages: number | null;
-	}
+	paginationInfo: { totalPages: number | null }
 ): boolean {
 	const page = view.page ?? 1;
-	if ( page <= 1 ) {
-		return false;
-	}
-	const { totalItems, totalPages } = paginationInfo;
-	// Totals are unknown when a request for a page past the last one is
-	// rejected, e.g. the REST API answers with an error instead of the
-	// (empty) collection and its totals.
-	if ( totalItems === null || totalItems === undefined ) {
+	if ( page < 1 ) {
 		return true;
 	}
-	return totalItems > 0 && page > ( totalPages ?? 0 );
+	const { totalPages } = paginationInfo;
+	// Totals are unknown when a request for a page past the last one is
+	// rejected, e.g. the REST API answers with an error instead of the
+	// (empty) collection and its totals. The first page always exists.
+	if ( totalPages === null || totalPages === undefined ) {
+		return page > 1;
+	}
+	// There is always a first page, even when there are no items.
+	return page > Math.max( totalPages, 1 );
 }
 
 function DefaultEmpty() {

@@ -170,7 +170,7 @@ describe( 'DataViews component', () => {
 		expect( screen.getByText( 'No results' ) ).toBeInTheDocument();
 	} );
 
-	it( 'should show "No results" if data is empty on a page past the first one', () => {
+	it( 'should offer going to the first page when the page is past the last one and there are no items', () => {
 		render(
 			<DataViewWrapper
 				data={ [] }
@@ -178,9 +178,28 @@ describe( 'DataViews component', () => {
 				view={ { ...DEFAULT_VIEW, page: 5 } }
 			/>
 		);
-		expect( screen.getByText( 'No results' ) ).toBeInTheDocument();
 		expect(
-			screen.queryByRole( 'button', { name: 'Go to the first page' } )
+			screen.getByText( 'No results on this page' )
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: 'Go to the first page' } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'should offer going to the first page when the page is below the first one', async () => {
+		const user = userEvent.setup();
+		render( <DataViewWrapper view={ { ...DEFAULT_VIEW, page: 0 } } /> );
+		expect(
+			screen.getByText( 'No results on this page' )
+		).toBeInTheDocument();
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Go to the first page' } )
+		);
+
+		expect( screen.getByText( 'Hello World' ) ).toBeInTheDocument();
+		expect(
+			screen.queryByText( 'No results on this page' )
 		).not.toBeInTheDocument();
 	} );
 
