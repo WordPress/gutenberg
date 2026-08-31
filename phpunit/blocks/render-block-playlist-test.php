@@ -522,4 +522,51 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 		$this->assertCount( 3, $context['tracks'] );
 		$this->assertSame( array( 'track-0', 'track-1', 'track-2' ), $context['tracks'] );
 	}
+
+	/**
+	 * The tracklist is a composite widget: the arrow keys move focus between
+	 * the tracks, and only the focused one is in the tab sequence. The tabindex
+	 * itself is applied on hydration, so this only covers the directives and
+	 * the context they read from.
+	 *
+	 * @covers ::render_block_core_playlist
+	 */
+	public function test_tracklist_is_a_single_tab_stop() {
+		$markup = $this->build_playlist_markup(
+			array(),
+			array(
+				array(
+					'id'    => 1,
+					'title' => 'Song One',
+					'src'   => 'http://example.com/song1.mp3',
+				),
+				array(
+					'id'    => 2,
+					'title' => 'Song Two',
+					'src'   => 'http://example.com/song2.mp3',
+				),
+				array(
+					'id'    => 3,
+					'title' => 'Song Three',
+					'src'   => 'http://example.com/song3.mp3',
+				),
+			)
+		);
+
+		$output = do_blocks( $markup );
+		$p      = new WP_HTML_Tag_Processor( $output );
+		$p->next_tag( 'figure' );
+
+		$context = json_decode( $p->get_attribute( 'data-wp-context' ), true );
+		$this->assertSame( 'track-0', $context['focusedId'] );
+
+		$button_count = 0;
+		while ( $p->next_tag( array( 'class_name' => 'wp-block-playlist-track__button' ) ) ) {
+			++$button_count;
+			$this->assertSame( 'actions.moveFocusToTrack', $p->get_attribute( 'data-wp-on--keydown' ) );
+			$this->assertSame( 'state.trackTabIndex', $p->get_attribute( 'data-wp-bind--tabindex' ) );
+		}
+
+		$this->assertSame( 3, $button_count );
+	}
 }

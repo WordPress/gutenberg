@@ -241,6 +241,92 @@ test.describe( 'Playlist block', () => {
 		await expect( playerArtwork ).toHaveCount( 0 );
 	} );
 
+	test( 'tracks can be browsed with the arrow keys on the frontend', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		const titles = [ 'First Song', 'Second Song', 'Third Song' ];
+		const trackComments = titles
+			.map( ( title, index ) =>
+				JSON.stringify( {
+					id: uploadedAudio.id,
+					uniqueId: `arrow-key-track-${ index }`,
+					src: uploadedAudio.source_url,
+					title,
+					artist: 'Test Artist',
+					length: '0:12',
+				} )
+			)
+			.map(
+				( attributes ) => `<!-- wp:playlist-track ${ attributes } /-->`
+			);
+		const post = await requestUtils.createPost( {
+			title: 'Playlist arrow key navigation',
+			status: 'publish',
+			content: [
+				'<!-- wp:playlist {"currentTrack":"arrow-key-track-0"} -->',
+				'<figure class="wp-block-playlist">',
+				'<ol class="wp-block-playlist__tracklist wp-block-playlist__tracklist-show-numbers">',
+				...trackComments,
+				'</ol></figure>',
+				'<!-- /wp:playlist -->',
+			].join( '' ),
+		} );
+
+		await page.goto( post.link );
+
+		const trackButtons = titles.map( ( title ) =>
+			page.getByRole( 'button', { name: new RegExp( title ) } )
+		);
+
+		// The tracklist is a single tab stop: only the first track is in the
+		// tab sequence.
+		await expect( trackButtons[ 0 ] ).toHaveAttribute( 'tabindex', '0' );
+		await expect( trackButtons[ 1 ] ).toHaveAttribute( 'tabindex', '-1' );
+		await expect( trackButtons[ 2 ] ).toHaveAttribute( 'tabindex', '-1' );
+
+		await trackButtons[ 0 ].focus();
+
+		await page.keyboard.press( 'ArrowDown' );
+		await expect( trackButtons[ 1 ] ).toBeFocused();
+
+		await page.keyboard.press( 'ArrowUp' );
+		await expect( trackButtons[ 0 ] ).toBeFocused();
+
+		// Navigation wraps around at both ends.
+		await page.keyboard.press( 'ArrowUp' );
+		await expect( trackButtons[ 2 ] ).toBeFocused();
+
+		await page.keyboard.press( 'Home' );
+		await expect( trackButtons[ 0 ] ).toBeFocused();
+
+		await page.keyboard.press( 'End' );
+		await expect( trackButtons[ 2 ] ).toBeFocused();
+
+		// Moving focus does not select the track: the first one is still
+		// current.
+		await expect( trackButtons[ 0 ] ).toHaveAttribute(
+			'aria-current',
+			'true'
+		);
+
+		// The tab stop follows focus, so leaving and re-entering the tracklist
+		// returns to the same track.
+		await expect( trackButtons[ 2 ] ).toHaveAttribute( 'tabindex', '0' );
+		await expect( trackButtons[ 0 ] ).toHaveAttribute( 'tabindex', '-1' );
+
+		// Enter selects the focused track.
+		await page.keyboard.press( 'Enter' );
+		await expect( trackButtons[ 2 ] ).toHaveAttribute(
+			'aria-current',
+			'true'
+		);
+		await expect( trackButtons[ 0 ] ).toHaveAttribute(
+			'aria-current',
+			'false'
+		);
+	} );
+
 	test( 'keeps the playlist when the only added track fails to upload', async ( {
 		admin,
 		editor,

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Playlist: Make the tracklist keyboard navigable on the frontend. The list is now a single tab stop, the arrow keys and Home/End move focus between tracks, and Enter or Space plays the focused track ([#81513](https://github.com/WordPress/gutenberg/pull/81513)).
+
 ### Bug Fixes
 
 -   Tabs: Activate the tab that a URL hash points into, so an anchor set on a block inside a tab panel can be reached. Anchor links followed after the page has loaded are handled too, matching the Accordion block ([#81744](https://github.com/WordPress/gutenberg/pull/81744)).
