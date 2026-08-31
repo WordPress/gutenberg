@@ -2,8 +2,22 @@
 
 ## Unreleased
 
+### Documentation
+
+-   `WidgetHostLinks.match`: the in-app route it returns carries the
+    route's query when the href has one; docblock, README, Storybook page
+    and seam diagram say so
+    ([#82066](https://github.com/WordPress/gutenberg/pull/82066)).
+
+## 0.6.0 (2026-08-26)
+
 ### New Features
 
+-   `WidgetHostProvider` / `useWidgetHost`: the seam through which a host
+    provides capabilities to the widgets it renders, merged over the
+    inherited value. First capability: `links`, in-app route recognition
+    (`match`) plus the host router's link primitive
+    ([#81740](https://github.com/WordPress/gutenberg/pull/81740)).
 -   `WidgetRelevance` gains a `'medium'` tier between `'high'` and `'low'`,
     for persistent but compact visibility
     ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
@@ -17,6 +31,12 @@
 -   `useWidgetTypes` holds the icon slot with the stand-in while an action's
     icon reference resolves; an unresolvable reference clears it
     ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
+
+### Documentation
+
+-   Add a Widget host doc page: the capability seam and the `links`
+    contract, with the consumption rules link actions follow
+    ([#81740](https://github.com/WordPress/gutenberg/pull/81740)).
 
 ### Internal
 
