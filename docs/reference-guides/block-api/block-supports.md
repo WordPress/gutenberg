@@ -178,26 +178,31 @@ _**Note:** Since WordPress 6.5._
 -   Subproperties
     -   `backgroundImage`: type `boolean`, default value `false`
     -   `backgroundSize`: type `boolean`, default value `false`
+    -   `gradient`: type `boolean`, default value `false`
 
 This value signals that a block supports some of the CSS style properties related to background. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/global-settings-and-styles.md#opt-in-into-ui-controls).
 
-`backgroundImage` adds UI controls which allow the user to select a background image.
-`backgroundSize` adds the FocalPointPicker to pick the position of the background image and allow the user to select the background size (cover, contain, fixed).
+`backgroundImage` adds UI controls that let the user select or remove a background image.
+`backgroundSize` adds the rest of the background image controls. This includes the focal point picker for `background-position`, a fixed background toggle for `background-attachment`, size controls for `background-size`, and a repeat toggle for `background-repeat`.
+`gradient` adds background gradient controls.
 
 ```js
 supports: {
 	background: {
-		backgroundImage: true // Enable background image control.
-		backgroundSize: true // Enable background image + size control.
+		backgroundImage: true; // Enable background image control.
+		backgroundSize: true; // Enable background image other controls.
+		gradient: true; // Enable background gradient control.
 	}
 }
 ```
+
+The generated background styles are applied to the block wrapper. For static blocks, use the object returned by `useBlockProps()` and `useBlockProps.save()`. For dynamic blocks, output the result of `get_block_wrapper_attributes()` on the wrapper element.
 
 When a block declares support for a specific background property, its attributes definition is extended to include the `style` attribute.
 
 When a background image is selected, the image data is stored in the `style.background.backgroundImage`.
 
-When a background images is selected and its position or size are changed, the background-position is stored in the `style.background.backgroundPosition` and its background-size in `style.background.backgroundSize` attribute.
+When a background image is selected and its related controls are changed, the values are stored in `style.background.backgroundPosition`, `style.background.backgroundRepeat`, `style.background.backgroundSize`, and `style.background.backgroundAttachment`.
 
 -   `style`: an attribute of `object` type with no default assigned. This is added when `backgroundImage` or `backgroundSize` support is declared. It stores the custom values set by the user.
     -   `background`: an attribute of `object` type.
@@ -207,19 +212,63 @@ When a background images is selected and its position or size are changed, the b
             - `source`: type `string`, at the moment the only value is `file`
             - `title`: type `string`, title of the media attachment
         - `backgroundPosition`: an attribute of `string` type, defining the background images position, selected by FocalPointPicker and used in CSS as the [`background-position`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-position) value.
-        - `backgroundSize`: an attribute of `string` type. defining the CSS [`background-size`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-size) value.
+        - `backgroundRepeat`: an attribute of `string` type, defining the CSS [`background-repeat`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-repeat) value.
+        - `backgroundSize`: an attribute of `string` type, defining the CSS [`background-size`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-size) value.
+        - `backgroundAttachment`: an attribute of `string` type, defining the CSS [`background-attachment`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-attachment) value.
+
+For the complete background style schema used by Global Styles and `theme.json`, see the [theme.json background reference](/docs/reference-guides/theme-json-reference/theme-json-living.md#background).
+
+For example, a block can enable the UI in `block.json` like this:
+
+```json
+{
+	"supports": {
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true
+		}
+	}
+}
+```
 
 The block can apply a default background image, position and size by specifying its own attribute with a default. For example:
 
 ```js
 attributes: {
     style: {
+        type: 'object',
+        default: {
+            background: {
+                backgroundImage: {
+                    url: 'IMAGE_URL',
+                },
+                backgroundPosition: '50% 50%',
+                backgroundRepeat: 'no-repeat',
+                backgroundSize: 'cover',
+                backgroundAttachment: 'scroll',
+            }
+        }
+    }
+}
+```
+
+The resulting `style.background` object can look like this:
+
+```js
+attributes: {
+    style: {
         background: {
             backgroundImage: {
-				"url":"IMAGE_URL"
-			}
-			backgroundPosition:"50% 50%",
-            backgroundSize: "cover"
+                url: 'IMAGE_URL',
+                id: 123,
+                source: 'file',
+                title: 'Example image',
+            },
+            backgroundPosition: '50% 50%',
+            backgroundRepeat: 'no-repeat',
+            backgroundSize: 'cover',
+            backgroundAttachment: 'scroll',
         }
     }
 }
