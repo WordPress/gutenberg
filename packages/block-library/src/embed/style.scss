@@ -48,6 +48,11 @@
 	position: relative;
 }
 
+.is-provider-pocket-casts .wp-block-embed__wrapper div {
+	max-width: 100% !important;
+	max-height: 350px !important;
+}
+
 // Add responsiveness to embeds with aspect ratios.
 .wp-embed-responsive .wp-has-aspect-ratio {
 	.wp-block-embed__wrapper::before {
