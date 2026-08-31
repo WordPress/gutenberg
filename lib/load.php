@@ -82,6 +82,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	// WordPress 7.2 compat.
 	require __DIR__ . '/compat/wordpress-7.2/view-config-api.php';
 	require __DIR__ . '/compat/wordpress-7.2/note-reactions.php';
+	require __DIR__ . '/compat/wordpress-7.2/emojibase-data.php';
 	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-comment-controller-7-2.php';
 
 	// Real-time collaboration.

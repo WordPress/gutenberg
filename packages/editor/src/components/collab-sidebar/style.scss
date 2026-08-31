@@ -300,6 +300,7 @@ mark.wp-note {
 	padding: $grid-unit-05;
 }
 
+
 .editor-collab-sidebar-panel__emoji-picker {
 	display: flex;
 	// The emoji list is filterable server-side, so it can grow well
@@ -319,6 +320,10 @@ mark.wp-note {
 	overflow-y: auto;
 }
 
+// 32px emoji targets: compact density matching peer pickers and the
+// editor's compact button size. Clears the WCAG 2.2 AA 24px minimum
+// (2.5.8) but not the AAA 44px target (2.5.5), at which an 8-column grid
+// would outgrow the sidebar-anchored popover.
 .editor-collab-sidebar-panel__emoji-option {
 	// Pin the track to 32px so the `max-width` above lands exactly 8 emoji
 	// per row; the compact Button's own padding and minimum size would
@@ -328,6 +333,177 @@ mark.wp-note {
 	padding: 0;
 	font-size: 18px;
 	justify-content: center;
+}
+
+// Curated fallback shown when the full picker's module or dataset fails.
+.editor-collab-sidebar-panel__picker-fallback-note {
+	display: flex;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-xs);
+	padding-top: var(--wpds-dimension-padding-xs);
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	font-size: var(--wpds-typography-font-size-xs);
+}
+
+// Width comes from the picker below, so the wrapper fits it via Popover's
+// default `width: min-content`; sizing the wrapper instead leaves slack.
+//
+// `contentClassName` lands on the outer `.components-popover`, while
+// Dropdown's 8px padding lives on `.components-popover__content`. Zero it
+// so the picker manages its own padding. Surface, radius, and elevation
+// stay at the popover defaults.
+.editor-collab-sidebar-panel__picker-popover {
+	.components-popover__content {
+		padding: 0;
+	}
+}
+
+.editor-collab-sidebar-panel__picker {
+	// Grid geometry derived once from the tokens, so the width below can
+	// never disagree with the rendered cells, gaps, and padding.
+	// `scrollbar-gutter: stable` reserves a width CSS cannot read, so
+	// budget ~17px; overlay-scrollbar platforms just get a roomier
+	// viewport.
+	--emoji-picker-cell-size: var(--wpds-dimension-size-md);
+	--emoji-picker-gap: var(--wpds-dimension-gap-xs);
+	--emoji-picker-viewport-padding: var(--wpds-dimension-padding-xs);
+	--emoji-picker-scrollbar-allowance: 17px;
+
+	display: flex;
+	flex-direction: column;
+	// The 8-column grid plus the reserved scrollbar gutter, so buttons
+	// don't shrink under flex pressure once a scrollbar appears.
+	width: calc(8 * var(--emoji-picker-cell-size) + 7 * var(--emoji-picker-gap) + 2 * var(--emoji-picker-viewport-padding) + var(--emoji-picker-scrollbar-allowance));
+	height: 320px;
+	font-family: var(--wpds-typography-font-family-body);
+	font-size: var(--wpds-typography-font-size-sm);
+	color: var(--wpds-color-foreground-content-neutral);
+	isolation: isolate;
+}
+
+// Search field with the skin-tone toggle beside it.
+.editor-collab-sidebar-panel__picker-search {
+	display: flex;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-xs);
+	padding: var(--wpds-dimension-padding-sm);
+
+	.components-search-control {
+		flex: 1;
+		margin: 0;
+	}
+}
+
+.editor-collab-sidebar-panel__skin-tone-toggle {
+	flex-shrink: 0;
+	// Fixed square, so the toggle doesn't grow with its emoji content.
+	width: var(--emoji-picker-cell-size);
+	padding: 0;
+	font-size: 18px;
+	justify-content: center;
+}
+
+.editor-collab-sidebar-panel__skin-tone-menu {
+	padding: var(--wpds-dimension-padding-sm);
+	font-family: var(--wpds-typography-font-family-body);
+}
+
+.editor-collab-sidebar-panel__skin-tone-heading {
+	padding-bottom: var(--wpds-dimension-padding-sm);
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	font-size: var(--wpds-typography-font-size-xs);
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+}
+
+.editor-collab-sidebar-panel__skin-tone-options {
+	display: flex;
+	gap: var(--wpds-dimension-gap-xs);
+}
+
+.editor-collab-sidebar-panel__skin-tone-option {
+	// In its own flyout, outside the picker's scope, so read the token here.
+	width: var(--wpds-dimension-size-md);
+	font-size: 18px;
+	justify-content: center;
+
+	&[aria-selected="true"] {
+		background-color: var(--wpds-color-background-interactive-neutral-weak-active);
+	}
+}
+
+.editor-collab-sidebar-panel__picker-viewport {
+	flex: 1;
+	overflow: auto;
+	// Reserved always, so the grid doesn't shift when scrolling kicks in.
+	scrollbar-gutter: stable;
+	position: relative;
+	padding-inline: var(--emoji-picker-viewport-padding);
+}
+
+.editor-collab-sidebar-panel__picker-status {
+	display: grid;
+	place-items: center;
+	height: 100%;
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
+.editor-collab-sidebar-panel__picker-list {
+	padding-bottom: var(--wpds-dimension-padding-sm);
+}
+
+.editor-collab-sidebar-panel__picker-category {
+	position: sticky;
+	top: 0;
+	padding: var(--wpds-dimension-padding-sm);
+	// `.components-popover` paints `$white`, not a token, and rows must
+	// scroll behind exactly that color. Move both together if it changes.
+	background-color: $white;
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	font-size: var(--wpds-typography-font-size-xs);
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+	z-index: 1;
+}
+
+.editor-collab-sidebar-panel__picker-row {
+	display: flex;
+	gap: var(--emoji-picker-gap);
+	// Skip offscreen rows so the ~250-row list mounts quickly; the
+	// intrinsic-size hint matches the real row height to keep scroll
+	// geometry accurate.
+	content-visibility: auto;
+	contain-intrinsic-size: auto var(--emoji-picker-cell-size);
+}
+
+.editor-collab-sidebar-panel__picker-emoji {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: var(--emoji-picker-cell-size);
+	height: var(--emoji-picker-cell-size);
+	padding: 0;
+	border: 0;
+	border-radius: var(--wpds-border-radius-sm);
+	background: transparent;
+	cursor: var(--wpds-cursor-control);
+	font-size: 18px;
+	line-height: 1;
+	// Keep a keyboard-scrolled cell clear of the sticky category header.
+	scroll-margin-block: $grid-unit-40 $grid-unit-05;
+
+	// Only highlight the roving-tabindex cell while it holds focus: the
+	// composite keeps `data-active-item` set when focus is elsewhere, and
+	// a highlight without focus reads as a phantom selection.
+	&:hover,
+	&[data-active-item]:focus {
+		background-color: var(--wpds-color-background-interactive-neutral-weak-active);
+	}
+
+	&:focus-visible {
+		// Inset, not the standard outset ring: `content-visibility: auto`
+		// clips ink overflow at the row box, which would cut its edges.
+		outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+		outline-offset: calc(-1 * var(--wpds-border-width-focus));
+	}
 }
 
 // Mention chips, both in the note input and the rendered note content. A

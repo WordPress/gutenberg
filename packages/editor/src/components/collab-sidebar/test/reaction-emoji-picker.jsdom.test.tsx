@@ -4,6 +4,9 @@ import { dispatch } from '@wordpress/data';
 // @ts-expect-error - No type declarations available for @wordpress/block-editor.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import ReactionEmojiPicker, {
+	emojiToHexKey,
+	emojiToStorageKey,
+	hexKeyToEmoji,
 	REACTION_EMOJIS,
 	buildEmojiBySlugMap,
 } from '../reaction-emoji-picker';
@@ -100,5 +103,79 @@ describe( 'ReactionEmojiPicker', () => {
 				REACTION_EMOJIS.length
 			);
 		} );
+	} );
+} );
+
+describe( 'emojiToHexKey', () => {
+	it( 'zero-pads code points to Emojibase hexcode width', () => {
+		expect( emojiToHexKey( '©️' ) ).toBe( '00a9' );
+		expect( emojiToHexKey( '®️' ) ).toBe( '00ae' );
+		expect( emojiToHexKey( '0️⃣' ) ).toBe( '0030-20e3' );
+	} );
+
+	it( 'strips the variation selector', () => {
+		expect( emojiToHexKey( '❤️' ) ).toBe( '2764' );
+		expect( emojiToHexKey( '❤️‍🔥' ) ).toBe( '2764-200d-1f525' );
+	} );
+
+	it( 'leaves already wide code points unpadded', () => {
+		expect( emojiToHexKey( '👍' ) ).toBe( '1f44d' );
+		expect( emojiToHexKey( '👨‍💻' ) ).toBe( '1f468-200d-1f4bb' );
+	} );
+
+	it( 'returns an empty string for non-emoji input', () => {
+		expect( emojiToHexKey( '' ) ).toBe( '' );
+		expect( emojiToHexKey( undefined as unknown as string ) ).toBe( '' );
+	} );
+} );
+
+describe( 'hexKeyToEmoji', () => {
+	it( 're-qualifies text-presentation emoji so they render in colour', () => {
+		expect( hexKeyToEmoji( '2764' ) ).toBe( '❤️' );
+		expect( hexKeyToEmoji( '263a' ) ).toBe( '☺️' );
+		expect( hexKeyToEmoji( '00a9' ) ).toBe( '©️' );
+		expect( hexKeyToEmoji( '0030-20e3' ) ).toBe( '0️⃣' );
+	} );
+
+	it( 're-qualifies components inside a ZWJ sequence', () => {
+		expect( hexKeyToEmoji( '2764-200d-1f525' ) ).toBe( '❤️‍🔥' );
+		expect( hexKeyToEmoji( '1f9d4-200d-2642' ) ).toBe( '🧔‍♂️' );
+	} );
+
+	it( 'leaves emoji-presentation code points unqualified', () => {
+		expect( hexKeyToEmoji( '1f44d' ) ).toBe( '👍' );
+		expect( hexKeyToEmoji( '1f468-200d-1f4bb' ) ).toBe( '👨‍💻' );
+	} );
+
+	it( 'omits the selector before a skin-tone modifier', () => {
+		expect( hexKeyToEmoji( '270c-1f3fb' ) ).toBe( '✌🏻' );
+	} );
+
+	it( 'reads legacy unpadded keys', () => {
+		expect( hexKeyToEmoji( 'a9' ) ).toBe( '©️' );
+	} );
+
+	it( 'returns the input unchanged when it is not a hex key', () => {
+		expect( hexKeyToEmoji( 'heart' ) ).toBe( 'heart' );
+		expect( hexKeyToEmoji( 'ffffff' ) ).toBe( 'ffffff' );
+	} );
+
+	it( 'round-trips every emoji it produces a key for', () => {
+		const emojis = [ '❤️', '☺️', '©️', '0️⃣', '❤️‍🔥', '🧔‍♂️', '👍', '✌🏻' ];
+		emojis.forEach( ( emoji ) => {
+			expect( hexKeyToEmoji( emojiToHexKey( emoji ) ) ).toBe( emoji );
+		} );
+	} );
+} );
+
+describe( 'emojiToStorageKey', () => {
+	it( 'collapses a curated emoji to its slug', () => {
+		expect( emojiToStorageKey( '❤️' ) ).toBe( 'heart' );
+		expect( emojiToStorageKey( '❤' ) ).toBe( 'heart' );
+	} );
+
+	it( 'falls back to the padded hex key for other emoji', () => {
+		expect( emojiToStorageKey( '👍' ) ).toBe( '1f44d' );
+		expect( emojiToStorageKey( '©️' ) ).toBe( '00a9' );
 	} );
 } );

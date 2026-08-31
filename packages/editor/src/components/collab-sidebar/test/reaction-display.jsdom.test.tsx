@@ -1,7 +1,10 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import apiFetch from '@wordpress/api-fetch';
-import ReactionDisplay, { AddReactionButton } from '../reaction-display';
+import { dispatch } from '@wordpress/data';
+// @ts-expect-error - No type declarations available for @wordpress/block-editor.
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import ReactionDisplay, { invalidateReactionNames } from '../reaction-display';
 
 jest.mock( '@wordpress/api-fetch', () => jest.fn() );
 
@@ -93,6 +96,70 @@ describe( 'ReactionDisplay', () => {
 		).toHaveTextContent( 'custom' );
 	} );
 
+	it( 'resolves the emoji name from the Emojibase dataset once the user reaches the pill', async () => {
+		dispatch( blockEditorStore ).updateSettings( {
+			noteEmojibaseUrl: 'https://example.test/emojibase',
+		} );
+		const originalFetch = global.fetch;
+		global.fetch = jest.fn( ( url: RequestInfo | URL ) =>
+			Promise.resolve( {
+				ok: true,
+				json: () =>
+					Promise.resolve(
+						String( url ).includes( 'data.json' )
+							? [
+									{
+										hexcode: '1F44D',
+										emoji: '👍',
+										label: 'thumbs up',
+										group: 0,
+									},
+							  ]
+							: { groups: [] }
+					),
+			} as unknown as Response )
+		);
+
+		try {
+			render(
+				<ReactionDisplay
+					noteId={ uniqueNoteId }
+					reactions={ {
+						'1f44d': {
+							count: 2,
+							reacted: false,
+							my_reaction_id: 0,
+						},
+					} }
+					onToggleReaction={ () => {} }
+				/>
+			);
+
+			// The dataset is ~775KB, so it stays unfetched while the pill
+			// merely renders; the emoji character stands in for the label.
+			const pill = await screen.findByRole( 'button', {
+				name: '👍, 2 reactions',
+			} );
+			expect( global.fetch ).not.toHaveBeenCalled();
+
+			// Reaching the pill is what asks for the tooltip, and the
+			// accessible name then uses the Emojibase label.
+			await userEvent.hover( pill );
+			expect(
+				await screen.findByRole( 'button', {
+					name: 'thumbs up, 2 reactions',
+				} )
+			).toHaveTextContent( '👍' );
+		} finally {
+			global.fetch = originalFetch;
+			act( () => {
+				dispatch( blockEditorStore ).updateSettings( {
+					noteEmojibaseUrl: undefined,
+				} );
+			} );
+		}
+	} );
+
 	it( 'calls onToggleReaction with the slug when a pill is clicked', async () => {
 		const user = userEvent.setup();
 		const onToggleReaction = jest.fn();
@@ -163,11 +230,83 @@ describe( 'ReactionDisplay', () => {
 		await waitFor( () =>
 			expect(
 				screen.getByRole( 'button', {
-					name: 'Alice reacted with Heart emoji',
+					name: 'Alice reacted with Heart',
 				} )
 			).toBeVisible()
 		);
 		expect( apiFetch ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'stops showing invalidated reactor names while the refetch runs', async () => {
+		const user = userEvent.setup();
+		const noteId = uniqueNoteId;
+		mockApiFetch.mockResolvedValue( [
+			{ author_name: 'Alice', content: { raw: 'heart' } },
+		] );
+		const { rerender } = render(
+			<ReactionDisplay
+				noteId={ noteId }
+				reactions={ {
+					heart: { count: 1, reacted: false, my_reaction_id: 0 },
+				} }
+				onToggleReaction={ () => {} }
+			/>
+		);
+
+		const pill = screen.getByRole( 'button', {
+			name: 'Heart, 1 reaction',
+		} );
+		await user.hover( pill );
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Alice reacted with Heart',
+				} )
+			).toBeVisible()
+		);
+
+		// Someone adds the same reaction from the full picker, which
+		// invalidates the cached names but cannot reach this pill's state.
+		invalidateReactionNames( noteId, 'heart' );
+		let resolveRefetch!: ( names: unknown[] ) => void;
+		mockApiFetch.mockImplementation(
+			() =>
+				new Promise( ( resolve ) => {
+					resolveRefetch = resolve;
+				} )
+		);
+		rerender(
+			<ReactionDisplay
+				noteId={ noteId }
+				reactions={ {
+					heart: { count: 2, reacted: false, my_reaction_id: 0 },
+				} }
+				onToggleReaction={ () => {} }
+			/>
+		);
+
+		await user.unhover( pill );
+		await user.hover( pill );
+
+		// The refetch is still in flight: the label must not claim Alice
+		// is the only reactor against a count of two.
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'button', { name: 'Heart, 2 reactions' } )
+			).toBeVisible()
+		);
+
+		await act( async () => {
+			resolveRefetch( [
+				{ author_name: 'Alice', content: { raw: 'heart' } },
+				{ author_name: 'Bob', content: { raw: 'heart' } },
+			] );
+		} );
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Alice and Bob reacted with Heart',
+			} )
+		).toBeVisible();
 	} );
 
 	it( 'formats two and three-plus reactor names GitHub-style', async () => {
@@ -194,10 +333,102 @@ describe( 'ReactionDisplay', () => {
 		await waitFor( () =>
 			expect(
 				screen.getByRole( 'button', {
-					name: 'Alice, Bob, and 1 other reacted with Heart emoji',
+					name: 'Alice, Bob, and 1 other reacted with Heart',
 				} )
 			).toBeVisible()
 		);
+	} );
+
+	it( 'updates the reactor tooltip when the emoji label resolves after the names', async () => {
+		// Pin the race between the two requests behind a hex-key pill's
+		// tooltip: when the reactor names resolve first, the tooltip is
+		// formatted with the emoji-character fallback label, and it must
+		// re-derive once the Emojibase dataset supplies the real label.
+		// A distinct base URL keeps the module-level dataset cache from
+		// earlier tests out of the way.
+		dispatch( blockEditorStore ).updateSettings( {
+			noteEmojibaseUrl: 'https://example.test/emojibase-race',
+		} );
+		const originalFetch = global.fetch;
+		let resolveDataset!: () => void;
+		const datasetGate = new Promise< void >( ( resolve ) => {
+			resolveDataset = resolve;
+		} );
+		global.fetch = jest.fn( ( url: RequestInfo | URL ) =>
+			datasetGate.then(
+				() =>
+					( {
+						ok: true,
+						json: () =>
+							Promise.resolve(
+								String( url ).includes( 'data.json' )
+									? [
+											{
+												hexcode: '1F44D',
+												emoji: '👍',
+												label: 'thumbs up',
+												group: 0,
+											},
+									  ]
+									: { groups: [] }
+							),
+					} ) as unknown as Response
+			)
+		);
+		mockApiFetch.mockResolvedValue( [
+			{ author_name: 'Alice', content: { raw: '1f44d' } },
+		] );
+
+		try {
+			const user = userEvent.setup();
+			render(
+				<ReactionDisplay
+					noteId={ uniqueNoteId }
+					reactions={ {
+						'1f44d': {
+							count: 1,
+							reacted: false,
+							my_reaction_id: 0,
+						},
+					} }
+					onToggleReaction={ () => {} }
+				/>
+			);
+
+			await user.hover(
+				screen.getByRole( 'button', { name: '👍, 1 reaction' } )
+			);
+			// Names resolved first: the tooltip uses the emoji-character
+			// fallback label while the dataset request is still pending.
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'button', {
+						name: 'Alice reacted with 👍',
+					} )
+				).toBeVisible()
+			);
+
+			await act( async () => {
+				resolveDataset();
+			} );
+			// The dataset label arrived after the names: the already
+			// visible tooltip must pick it up, not stay frozen on the
+			// fallback.
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'button', {
+						name: 'Alice reacted with thumbs up',
+					} )
+				).toBeVisible()
+			);
+		} finally {
+			global.fetch = originalFetch;
+			act( () => {
+				dispatch( blockEditorStore ).updateSettings( {
+					noteEmojibaseUrl: undefined,
+				} );
+			} );
+		}
 	} );
 
 	it( 'walks every page of reactions before naming reactors', async () => {
@@ -230,7 +461,7 @@ describe( 'ReactionDisplay', () => {
 		await waitFor( () =>
 			expect(
 				screen.getByRole( 'button', {
-					name: 'Alice reacted with Heart emoji',
+					name: 'Alice reacted with Heart',
 				} )
 			).toBeVisible()
 		);
@@ -312,53 +543,5 @@ describe( 'ReactionDisplay', () => {
 		expect(
 			screen.getByRole( 'button', { name: 'Heart, 1 reaction' } )
 		).toBeVisible();
-	} );
-} );
-
-describe( 'AddReactionButton', () => {
-	beforeEach( () => {
-		uniqueNoteId += 1;
-		mockApiFetch.mockReset();
-		mockApiFetch.mockRejectedValue( new Error( 'not mocked' ) );
-	} );
-
-	it( 'opens the curated picker and toggles the chosen reaction', async () => {
-		const user = userEvent.setup();
-		const onToggleReaction = jest.fn();
-		render(
-			<AddReactionButton
-				noteId={ uniqueNoteId }
-				onToggleReaction={ onToggleReaction }
-			/>
-		);
-
-		await user.click(
-			screen.getByRole( 'button', { name: 'Add reaction' } )
-		);
-		await user.click(
-			await screen.findByRole( 'button', { name: 'Rocket' } )
-		);
-
-		expect( onToggleReaction ).toHaveBeenCalledTimes( 1 );
-		expect( onToggleReaction ).toHaveBeenCalledWith( 'rocket' );
-	} );
-
-	it( 'stays focusable but inert when disabled', async () => {
-		const user = userEvent.setup();
-		render(
-			<AddReactionButton
-				noteId={ uniqueNoteId }
-				disabled
-				onToggleReaction={ () => {} }
-			/>
-		);
-
-		const button = screen.getByRole( 'button', { name: 'Add reaction' } );
-		expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
-
-		await user.click( button );
-		expect(
-			screen.queryByRole( 'button', { name: 'Rocket' } )
-		).not.toBeInTheDocument();
 	} );
 } );
