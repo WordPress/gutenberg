@@ -7,6 +7,9 @@
 	// Shouldn't be needed but it looks
 	// like the popover is impacted by the block gap margin.
 	margin: 0 !important;
+	@media (max-width: #{ ($break-medium - 1) }) {
+		z-index: -1;
+	}
 
 	// Allow clicking through the toolbar holder.
 	pointer-events: none;
