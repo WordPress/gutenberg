@@ -1903,12 +1903,24 @@ const canInsertBlockTypeUnmemoized = (
 		);
 	}
 
-	const canInsert =
+	let canInsert =
 		hasBlockAllowedAncestor &&
 		( ( hasParentAllowedBlock === null &&
 			hasBlockAllowedParent === null ) ||
 			hasParentAllowedBlock === true ||
 			hasBlockAllowedParent === true );
+
+	const isUniqueInParent = hasBlockSupport( blockType.name, 'uniqueWithin' );
+
+	if ( isUniqueInParent ) {
+		const siblingBlocks = getBlocks( state, rootClientId );
+		const alreadyExistsInParent = siblingBlocks.some(
+			( block ) => block.name === blockType.name
+		);
+		if ( alreadyExistsInParent ) {
+			canInsert = false;
+		}
+	}
 
 	if ( ! canInsert ) {
 		return canInsert;
@@ -2330,13 +2342,14 @@ const calculateFrecency = ( time, count ) => {
  * in a specific context. It's used for building items for Inserter and available
  * block Transforms list.
  *
- * @param {Object} state              Editor state.
- * @param {Object} options            Options object for handling the building of a block type.
- * @param {string} options.buildScope The scope for which the item is going to be used.
+ * @param {Object}  state              Editor state.
+ * @param {Object}  options            Options object for handling the building of a block type.
+ * @param {string}  options.buildScope The scope for which the item is going to be used.
+ * @param {?string} rootClientId
  * @return {Function} Function returns an item to be shown in a specific context (Inserter|Transforms list).
  */
 const buildBlockTypeItem =
-	( state, { buildScope = 'inserter' } ) =>
+	( state, { buildScope = 'inserter' }, rootClientId ) =>
 	( blockType ) => {
 		const id = blockType.name;
 
@@ -2346,6 +2359,20 @@ const buildBlockTypeItem =
 				state,
 				getClientIdsWithDescendants( state )
 			).some( ( { name } ) => name === blockType.name );
+		}
+		const isUniqueInParent = hasBlockSupport(
+			blockType.name,
+			'uniqueWithin'
+		);
+
+		if ( isUniqueInParent ) {
+			const siblingBlocks = getBlocks( state, rootClientId );
+			const alreadyExistsInParent = siblingBlocks.some(
+				( block ) => block.name === blockType.name
+			);
+			if ( alreadyExistsInParent ) {
+				isDisabled = true;
+			}
 		}
 
 		const { time, count = 0 } = getInsertUsage( state, id ) || {};
@@ -2484,9 +2511,13 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 						.map( buildReusableBlockInserterItem )
 				: [];
 
-			const buildBlockTypeInserterItem = buildBlockTypeItem( state, {
-				buildScope: 'inserter',
-			} );
+			const buildBlockTypeInserterItem = buildBlockTypeItem(
+				state,
+				{
+					buildScope: 'inserter',
+				},
+				rootClientId
+			);
 
 			let blockTypeInserterItems = getBlockTypes()
 				.filter( ( blockType ) =>
@@ -2615,6 +2646,7 @@ export const getBlockTransformItems = createRegistrySelector( ( select ) =>
 				: [ blocks ];
 			const buildBlockTypeTransformItem = buildBlockTypeItem( state, {
 				buildScope: 'transform',
+				rootClientId,
 			} );
 			const blockTypeTransformItems = getBlockTypes()
 				.filter( ( blockType ) =>
