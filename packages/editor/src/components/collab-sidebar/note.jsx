@@ -6,13 +6,13 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 // eslint-disable-next-line @wordpress/use-recommended-components
-import { Stack, Button as UIButton } from '@wordpress/ui';
+import { Button as UIButton } from '@wordpress/ui';
 import { ThemeProvider } from '@wordpress/theme';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { moreVertical, published } from '@wordpress/icons';
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
-import ReactionDisplay from './reaction-display';
+import ReactionDisplay, { getReactedSlugs } from './reaction-display';
 import { AddReactionButton } from './add-reaction-picker';
 import { unlock } from '../../lock-unlock';
 
@@ -86,6 +86,7 @@ export function Note( {
 	}, [ rawContent ] );
 
 	const canResolve = note.parent === 0;
+	const hasReactions = getReactedSlugs( reactions ).length > 0;
 	const isResolutionNote =
 		note.type === 'note' &&
 		note.meta &&
@@ -193,6 +194,25 @@ export function Note( {
 
 	const actions = isSelected ? (
 		<>
+			{ /*
+			 * The trigger joins the note's other icon actions rather than
+			 * sitting on a row of its own, so a note nobody has reacted to
+			 * costs no vertical space at all. The stylesheet then keeps it
+			 * faded until the thread is hovered or reached by keyboard.
+			 */ }
+			{ onToggleReaction && (
+				<AddReactionButton
+					noteId={ note.id }
+					disabled={ isThreadResolved }
+					variant="minimal"
+					onToggleReaction={ ( emoji ) =>
+						onToggleReaction( {
+							commentId: note.id,
+							emoji,
+						} )
+					}
+				/>
+			) }
 			{ canResolve && onResolve && (
 				<Button
 					label={ _x( 'Resolve', 'Mark note as resolved' ) }
@@ -217,42 +237,26 @@ export function Note( {
 			role={ note.parent !== 0 ? 'treeitem' : undefined }
 		>
 			{ body }
-			{ isSelected && (
+			{ hasReactions && (
 				// The editor sets `cornerRadius="none"`, but reactions read
 				// as badges rather than controls, so the row opts into the
 				// pill shape the Design System's `pronounced` preset gives a
 				// small Button.
+				//
+				// Reactions are information about the note, so unlike the
+				// other actions they stay visible on an unselected thread.
 				<ThemeProvider cornerRadius="pronounced">
-					<Stack
-						direction="row"
-						gap="sm"
-						justify="flex-start"
-						// The pills wrap onto further rows; without this the
-						// trigger stretches to the full wrapped height.
-						align="flex-start"
-					>
-						<AddReactionButton
-							noteId={ note.id }
-							disabled={ isThreadResolved }
-							onToggleReaction={ ( emoji ) =>
-								onToggleReaction?.( {
-									commentId: note.id,
-									emoji,
-								} )
-							}
-						/>
-						<ReactionDisplay
-							noteId={ note.id }
-							reactions={ reactions }
-							disabled={ isThreadResolved }
-							onToggleReaction={ ( emoji ) =>
-								onToggleReaction?.( {
-									commentId: note.id,
-									emoji,
-								} )
-							}
-						/>
-					</Stack>
+					<ReactionDisplay
+						noteId={ note.id }
+						reactions={ reactions }
+						disabled={ isThreadResolved }
+						onToggleReaction={ ( emoji ) =>
+							onToggleReaction?.( {
+								commentId: note.id,
+								emoji,
+							} )
+						}
+					/>
 				</ThemeProvider>
 			) }
 			{ actionState === 'delete' && (

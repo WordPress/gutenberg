@@ -269,6 +269,36 @@ mark.wp-note {
 	display: flex;
 }
 
+// The trigger sits among the note's other icon actions and stays out of the
+// way until the note is hovered, so reacting costs no standing real estate.
+//
+// Only where a pointer can hover: a touch device would otherwise be left
+// with a control it has no way to reveal.
+@media (hover: hover) {
+	.editor-collab-sidebar-panel__add-reaction {
+		// Fading rather than removing keeps the button in the tab order and
+		// keeps the action row from reflowing as the pointer moves over it.
+		opacity: 0;
+		transition: opacity 0.1s ease-out;
+
+		@media (prefers-reduced-motion: reduce) {
+			transition: none;
+		}
+	}
+
+	.editor-collab-sidebar-panel__thread:hover
+	.editor-collab-sidebar-panel__add-reaction,
+	// Reveal on the trigger itself rather than on the thread: the thread is
+	// `tabIndex={ 0 }`, so a thread-level `:focus-within` would hold for as
+	// long as the note is selected and the fade would never take effect.
+	.editor-collab-sidebar-panel__add-reaction:focus-within,
+	// While the picker is open the pointer is over the popover, not the
+	// thread, and focus has moved into the popover's own portal.
+	.editor-collab-sidebar-panel__add-reaction:has([aria-expanded="true"]) {
+		opacity: 1;
+	}
+}
+
 .editor-collab-sidebar-panel__reaction-button {
 	// The glyph and its count are one unit, closer than the Button's
 	// default gap between an icon and a label.

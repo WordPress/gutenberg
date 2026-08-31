@@ -70,7 +70,7 @@ function hasUserReacted(
  * @param reactions The reactions summary (keyed by slug).
  * @return Array of slugs with reactions.
  */
-function getReactedSlugs(
+export function getReactedSlugs(
 	reactions: ReactionSummary | null | undefined
 ): string[] {
 	if ( ! reactions ) {

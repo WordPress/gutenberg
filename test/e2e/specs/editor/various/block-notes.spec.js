@@ -1203,6 +1203,79 @@ test.describe( 'Block Notes', () => {
 			).toBeVisible();
 		} );
 
+		test( 'the add-reaction trigger stays out of the way until hovered', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing the hover trigger' },
+				comment: 'Test comment for the hover trigger',
+			} );
+
+			const trigger = page.locator(
+				'.editor-collab-sidebar-panel__add-reaction'
+			);
+			const thread = page.locator(
+				'.editor-collab-sidebar-panel__thread'
+			);
+
+			// The trigger lives among the note's other icon actions, so a
+			// note nobody has reacted to has no reaction row at all.
+			await expect(
+				page
+					.locator( '.editor-collab-sidebar-panel__note-actions' )
+					.getByRole( 'button', { name: 'Add reaction' } )
+			).toHaveCount( 1 );
+			await expect(
+				page.locator( '.editor-collab-sidebar-panel__reaction-button' )
+			).toHaveCount( 0 );
+
+			// Park the pointer outside the sidebar: adding the note leaves it
+			// over the thread, which would hold the trigger open.
+			await page.mouse.move( 0, 0 );
+			await expect( trigger ).toHaveCSS( 'opacity', '0' );
+
+			await thread.hover();
+			await expect( trigger ).toHaveCSS( 'opacity', '1' );
+
+			// Keyboard reaches it too: the reveal hangs off the trigger, not
+			// the thread, which stays focused for as long as it is selected.
+			await page.mouse.move( 0, 0 );
+			await expect( trigger ).toHaveCSS( 'opacity', '0' );
+			await page.getByRole( 'button', { name: 'Add reaction' } ).focus();
+			await expect( trigger ).toHaveCSS( 'opacity', '1' );
+		} );
+
+		test( 'reactions stay visible once the thread is deselected', async ( {
+			page,
+			editor,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing deselected reactions' },
+				comment: 'Test comment for deselected reactions',
+			} );
+
+			await blockNoteUtils.addReactionToComment( 'Heart' );
+			const reactionButton = page.getByRole( 'button', {
+				name: /Heart/,
+			} );
+			await expect( reactionButton ).toBeVisible();
+
+			// Focus the title to deselect the block and the note. The pills
+			// carry information about the note, so unlike its actions they
+			// survive being deselected.
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.focus();
+			await expect(
+				page.getByRole( 'button', { name: 'Add reaction' } )
+			).toHaveCount( 0 );
+			await expect( reactionButton ).toBeVisible();
+		} );
+
 		test.describe( 'Emojibase dataset unavailable', () => {
 			test.beforeAll( async ( { requestUtils } ) => {
 				await requestUtils.activatePlugin(
