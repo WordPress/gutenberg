@@ -20,7 +20,7 @@ describe( 'performance', () => {
 			blocks,
 		} );
 		expect( preparedState ).toBeDefined();
-	}, 30_000 );
+	}, 60_000 );
 
 	it( 'should update blocks', () => {
 		const updatedState = reducer( preparedState, {

@@ -76,8 +76,11 @@
 		"uuid": "^14.0.0"
 	},
 	"devDependencies": {
+		"@jest/globals": "^30.5.0",
 		"@testing-library/dom": "^10.4.1",
 		"@testing-library/react": "^16.3.2",
+		"@types/jest": "^30.0.0",
+		"@types/node": "^20.19.39",
 		"@wordpress/block-library": "file:../block-library",
 		"deep-freeze": "^0.0.1",
 		"vitest": "^4.1.10"
