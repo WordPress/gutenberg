@@ -242,6 +242,44 @@
 	}
 }
 
+.global-styles-ui-spacing-presets__list {
+	padding: 0 variables.$grid-unit-20;
+}
+
+.global-styles-ui-spacing-presets__edit {
+	padding: 0 variables.$grid-unit-20 variables.$grid-unit-30;
+}
+
+// Spacing preview styles
+.global-styles-ui-spacing-preview {
+	padding: variables.$grid-unit-40;
+	min-height: 100px;
+	margin-bottom: variables.$grid-unit-20;
+	background: colors.$gray-100;
+	border-radius: variables.$radius-small;
+	text-align: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+	overflow: hidden;
+}
+
+.global-styles-ui-spacing-preview__box {
+	background-color: var(--wp-admin-theme-color);
+	border-radius: variables.$radius-small;
+	min-width: variables.$grid-unit-05;
+	min-height: variables.$grid-unit-05;
+}
+
+.global-styles-ui-spacing-preview__value {
+	position: absolute;
+	bottom: variables.$grid-unit-10;
+	right: variables.$grid-unit-15;
+	font-size: variables.$font-size-small;
+	color: colors.$gray-700;
+}
+
 .global-styles-ui-sidebar__navigator-provider {
 	height: 100%;
 }

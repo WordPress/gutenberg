@@ -27,6 +27,7 @@ const translationMap: TranslationMap = {
 	'settings.typography': __( 'Typography' ),
 	'settings.shadow': __( 'Shadow' ),
 	'settings.layout': __( 'Layout' ),
+	'settings.spacing': __( 'Spacing' ),
 	'styles.color': __( 'Colors' ),
 	'styles.spacing': __( 'Spacing' ),
 	'styles.background': __( 'Background' ),
