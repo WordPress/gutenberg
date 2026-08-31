@@ -79,10 +79,29 @@ class Gutenberg_Original_Attachment_Filter_Test extends WP_UnitTestCase {
 
 		$data = $this->get_response_data( $child );
 		$this->assertArrayHasKey( 'original_attachment', $data );
-		$this->assertSame( $original, $data['original_attachment']['attachment_id'] );
+		$this->assertSame( $original, $data['original_attachment'] );
+	}
+
+	public function test_original_attachment_link_is_embeddable() {
+		$original = $this->make_attachment();
+		$child    = $this->make_attachment( $original );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/media/' . $child );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_do_request( $request );
+
+		$links = $response->get_links();
+		$this->assertArrayHasKey( 'https://api.w.org/original-attachment', $links );
+
+		$link = $links['https://api.w.org/original-attachment'][0];
+		$this->assertStringEndsWith( '/wp/v2/media/' . $original, $link['href'] );
+		$this->assertTrue( $link['attributes']['embeddable'] );
+
+		// The curie-compacted rel hydrates under `_embedded` with `?_embed`.
+		$embedded = rest_get_server()->response_to_data( $response, true );
 		$this->assertSame(
-			wp_get_attachment_url( $original ),
-			$data['original_attachment']['source_url']
+			$original,
+			$embedded['_embedded']['wp:original-attachment'][0]['id']
 		);
 	}
 
