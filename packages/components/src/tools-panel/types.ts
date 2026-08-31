@@ -192,8 +192,8 @@ export type ToolsPanelItemProps = ToolsPanelItem & {
 };
 
 /**
- * The shape of an item as it is held in `ToolsPanel` state. It extends the
- * public item props with the data the panel needs but that isn't part of the
+ * The shape of an item as it is held in `ToolsPanel` state. It extends
+ * `ToolsPanelItem` with the data the panel needs but that isn't part of the
  * item's own API surface.
  */
 export type RegisteredToolsPanelItem = ToolsPanelItem & {
@@ -225,7 +225,9 @@ export type ToolsPanelContext = {
 		value: boolean,
 		label: string,
 		/**
-		 * Ignored. The group is derived from the item's `isShownByDefault`.
+		 * Ignored, and kept only so that existing three argument callers
+		 * still typecheck. The group a value lands in now follows from the
+		 * registered item's `isShownByDefault` rather than from the caller.
 		 */
 		group?: ToolsPanelMenuItemKey
 	) => void;

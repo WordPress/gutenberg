@@ -123,6 +123,7 @@ function menuItemValuesReducer(
 			// inheriting what an item it replaces recorded under the same
 			// label. Clearing here rather than on deregistration covers both
 			// orderings, since the two are not guaranteed to arrive in one.
+			// Relies on re-registering also re-reporting the value.
 			if ( ! values.hasOwnProperty( action.item.label ) ) {
 				return values;
 			}
@@ -151,11 +152,18 @@ function menuItemValuesReducer(
 			// place, since `onDeselect` and `resetAllFilter` are optional and
 			// `resetAll` need not cover every attribute. Each item reports its
 			// value again if the reset changed it.
+			const hidden = state.panelItems.filter(
+				( item ) =>
+					! item.isShownByDefault && values[ item.label ] !== false
+			);
+
+			if ( ! hidden.length ) {
+				return values;
+			}
+
 			const next = { ...values };
-			state.panelItems.forEach( ( item ) => {
-				if ( ! item.isShownByDefault ) {
-					next[ item.label ] = false;
-				}
+			hidden.forEach( ( { label } ) => {
+				next[ label ] = false;
 			} );
 			return next;
 		}
@@ -284,19 +292,16 @@ export function useToolsPanel(
 			panelItems.map( ( item ) => [ item.label, item ] )
 		);
 
-		const add = ( item: RegisteredToolsPanelItem ) => {
-			result[ getMenuGroup( item ) ][ item.label ] =
-				menuItemValues[ item.label ] ?? getSeedValue( item );
-		};
-
+		// `menuItemOrder` holds every registered label, so it alone drives
+		// the menu.
 		menuItemOrder.forEach( ( label ) => {
 			const item = byLabel.get( label );
-			if ( item ) {
-				add( item );
-				byLabel.delete( label );
+			if ( ! item ) {
+				return;
 			}
+			result[ getMenuGroup( item ) ][ label ] =
+				menuItemValues[ label ] ?? getSeedValue( item );
 		} );
-		byLabel.forEach( add );
 
 		return result;
 	}, [ panelItems, menuItemOrder, menuItemValues ] );
