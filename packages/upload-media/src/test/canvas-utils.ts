@@ -1,4 +1,4 @@
-import { canvasConvertToJpeg } from '../canvas-utils';
+import { canvasConvertToJpeg, HeicUnsupportedError } from '../canvas-utils';
 import { getHeicUnsupportedMessage } from '../heic-support';
 
 describe( 'canvasConvertToJpeg', () => {
@@ -162,7 +162,38 @@ describe( 'canvasConvertToJpeg', () => {
 			} );
 
 			await expect( canvasConvertToJpeg( file ) ).rejects.toThrow(
-				getHeicUnsupportedMessage()
+				HeicUnsupportedError
+			);
+		} );
+
+		it( 'should not report a failed decode as unsupported', async () => {
+			// Strategy 1 rejects, as it does for any HEIC in Chromium.
+			global.createImageBitmap = jest
+				.fn()
+				.mockRejectedValue( new Error( 'Unsupported format' ) );
+
+			// Strategy 2 supports the type, so the browser can decode HEIC.
+			// The decode itself fails, which a damaged file does.
+			( global as any ).ImageDecoder = jest
+				.fn()
+				.mockImplementation( () => ( {
+					decode: jest
+						.fn()
+						.mockRejectedValue( new Error( 'Corrupt image data' ) ),
+					close: jest.fn(),
+				} ) );
+			( global as any ).ImageDecoder.isTypeSupported = jest
+				.fn()
+				.mockResolvedValue( true );
+
+			const file = new File( [ 'data' ], 'photo.heic', {
+				type: 'image/heic',
+			} );
+
+			const rejection = canvasConvertToJpeg( file );
+			await expect( rejection ).rejects.toThrow( 'Corrupt image data' );
+			await expect( rejection ).rejects.not.toBeInstanceOf(
+				HeicUnsupportedError
 			);
 		} );
 
@@ -185,7 +216,7 @@ describe( 'canvasConvertToJpeg', () => {
 			} );
 
 			await expect( canvasConvertToJpeg( file ) ).rejects.toThrow(
-				getHeicUnsupportedMessage()
+				HeicUnsupportedError
 			);
 
 			expect(

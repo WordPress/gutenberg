@@ -3,6 +3,15 @@ import { parseHeic } from './heic-parser';
 import { getHeicUnsupportedMessage } from './heic-support';
 
 /**
+ * Raised when no decoding strategy could be used at all.
+ *
+ * Separates "nothing here can decode HEIC" from a decode that was attempted
+ * and failed: only the former says anything about the browser's codecs, and
+ * the caller words the two differently.
+ */
+export class HeicUnsupportedError extends Error {}
+
+/**
  * Converts an image file to JPEG using the browser's native decoder and canvas.
  *
  * Tries three decoding strategies:
@@ -163,7 +172,7 @@ export async function canvasConvertToJpeg(
 		}
 	}
 
-	throw new Error( getHeicUnsupportedMessage() );
+	throw new HeicUnsupportedError( getHeicUnsupportedMessage() );
 }
 
 /**
