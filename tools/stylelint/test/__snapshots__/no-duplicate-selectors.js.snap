@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
-exports[`flags warnings when duplicate selectors are found snapshot matches warnings 1`] = `
+exports[`flags warnings when duplicate selectors are found in css snapshot matches warnings 1`] = `
 [
   {
     "column": 1,

@@ -1,11 +1,11 @@
 const utils = require( './utils' );
 const getStylelintResult = utils.getStylelintResult;
 
-describe( 'flags no warnings when no duplicate selectors are found', () => {
+describe( 'flags no warnings when no duplicate selectors are found in scss', () => {
 	let result;
 
 	beforeEach( () => {
-		result = getStylelintResult( './no-duplicate-selectors-valid.css' );
+		result = getStylelintResult( './no-duplicate-selectors-valid.scss' );
 	} );
 
 	it( 'did not error', () => {
@@ -19,7 +19,7 @@ describe( 'flags no warnings when no duplicate selectors are found', () => {
 	} );
 } );
 
-describe( 'flags warnings when duplicate selectors are found', () => {
+describe( 'flags warnings when duplicate selectors are found in css', () => {
 	let result;
 
 	beforeEach( () => {

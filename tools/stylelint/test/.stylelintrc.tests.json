@@ -1,0 +1,13 @@
+{
+	"rules": {},
+	"overrides": [
+		{
+			"files": [ "*.scss", "**/*.scss" ],
+			"extends": "../config.js"
+		},
+		{
+			"files": [ "*.css", "**/*.css" ],
+			"extends": "../config.js"
+		}
+	]
+}
