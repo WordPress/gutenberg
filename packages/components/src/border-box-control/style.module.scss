@@ -16,16 +16,18 @@
 }
 
 /* The label row the linked/unlinked toggle joins when a visible label is
-   rendered. Metrics match `.components-border-radius-control__header` so the
-   two controls' toggles line up in the inspector. */
+   rendered. Laid out as a content-driven grid like `BoxControl`'s label row, so
+   a label that wraps grows the row rather than overflowing a fixed height. */
 .header {
-	height: $grid-unit-20;
-	margin-bottom: $grid-unit-15;
+	/* The row is as tall as the toggle (24px, `Button` `size="small"`), so 4px
+	   here leaves the same 28px between label and inputs as the sibling
+	   controls, which instead pair a fixed 16px row with a 12px margin. */
+	margin-bottom: $grid-unit-05;
 
 	/* The label (a `BaseControl.VisualLabel`, so a `span`) supplies its own
 	   bottom margin as the gap to the input below. In the header row that gap
-	   comes from the row itself, and the margin would knock the vertically
-	   centered label off center. */
+	   comes from the row itself, and the margin would both pull the vertically
+	   centred label off centre and pad the row out once the label wraps. */
 	> span {
 		margin-bottom: 0;
 	}

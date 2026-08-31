@@ -5,7 +5,7 @@ import BorderBoxControlLinkedButton from '../border-box-control-linked-button';
 import BorderBoxControlSplitControls from '../border-box-control-split-controls';
 import { BorderControl } from '../../border-control';
 import BaseControl from '../../base-control';
-import { HStack } from '../../h-stack';
+import { Grid } from '../../grid';
 import { View } from '../../view';
 import { VisuallyHidden } from '../../visually-hidden';
 import type { WordPressComponentProps } from '../../context';
@@ -93,7 +93,12 @@ const UnconnectedBorderBoxControl = (
 				// The toggle shares the label's row so that it lines up with
 				// the equivalent toggle on sibling controls, e.g. the border
 				// radius one.
-				<HStack className={ headerClassName }>
+				<Grid
+					className={ headerClassName }
+					columns={ 2 }
+					templateColumns="1fr min-content"
+					alignment="center"
+				>
 					<BorderLabel
 						label={ label }
 						hideLabelFromVision={ hideLabelFromVision }
@@ -102,7 +107,7 @@ const UnconnectedBorderBoxControl = (
 						onClick={ toggleLinked }
 						isLinked={ isLinked }
 					/>
-				</HStack>
+				</Grid>
 			) : (
 				<BorderLabel
 					label={ label }
