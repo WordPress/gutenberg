@@ -3,16 +3,17 @@ import getMediaIdsInBlocks from './media-ids-in-blocks';
 import invalidateAttachmentResolutions from './invalidate-attachment-resolutions';
 
 /**
- * Most images a single save will attach. Past this the post is left alone.
+ * Max number of images a single save will attach. Past this the post is left alone.
  *
  * 100 is the REST API's own `per_page` maximum, so looking the images up is
- * always one request, and asking about that many keeps the query around 2KB —
+ * always one request, and having a cap to requests keeps the query around 2KB —
  * inside every server's URL limit. It also matches `MAX_IMAGES` in the Gallery
  * block's dynamic source, the other place the editor bounds a media query.
  *
- * Somebody will eventually put a thousand images in a post. Attaching them would
- * mean a thousand requests going out at once, and this is a background
- * convenience — it shouldn't be the reason a save falls over.
+ * This guards against an inevitable edge case of someone creating a post with
+ * hundreds of unattached images. Attaching them would mean hundreds of requests
+ * going out at once. And the feature is really a background convenience, it
+ * should not be the reason for a save to fail.
  */
 const MAX_MEDIA_TO_ATTACH = 100;
 
@@ -29,9 +30,10 @@ function warnAttachFailed( reason ) {
 }
 
 /**
- * When a post is saved, attaches any images in its content that aren't already
- * attached to a post. Uploading an image into a post has always done this;
- * picking one from the Media Library never has.
+ * When a post is saved, attach any images in the post content that aren't already
+ * attached to a post. Uploading an image into a post has always done this,
+ * but selecting existing images in the block editor historically hasn't.
+ * This feature closes a gap between the block editor and the classic editor.
  *
  * @param {Object}   registry    A `@wordpress/data` registry.
  * @param {Object}   post        The post that was saved.
@@ -69,8 +71,7 @@ async function attach( registry, { id: postId, type: postType, blocks } ) {
 	}
 
 	// Templates and the like have no front end of their own, so an image can't
-	// really belong to one — and `savePost` saves those too. Checked after the
-	// block scan, so a post with no images costs nothing.
+	// really belong to one — and `savePost` saves those too.
 	const postTypeObject = await registry
 		.resolveSelect( coreStore )
 		.getPostType( postType );
@@ -89,9 +90,8 @@ async function attach( registry, { id: postId, type: postType, blocks } ) {
 			per_page: -1,
 		} );
 
-	// Only fill in a blank parent. An image can belong to one post at a time, so
-	// attaching one that's already taken would quietly remove it from the post
-	// it came from. WordPress writes "not attached" as `null`, never `0`.
+	// Only fill in an empty parent. An image can only belong to one post at a time,
+	// so attaching one that's already taken would quietly remove it from its post.
 	const unattached = ( media ?? [] ).filter( ( item ) => ! item.post );
 
 	if ( ! unattached.length ) {
