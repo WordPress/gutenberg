@@ -256,7 +256,7 @@ An application or plugin can bundle a published package while WordPress supplies
 
 Use this procedure before changing a published package contract or shared runtime code such as a registration, allowlist, opt-in gate, or compatibility bridge. Start with each documented entrypoint and build output. Check package metadata, build configuration, dependency extraction, and generated asset data to learn which dependencies the package bundles and which ones WordPress supplies. Do not infer this from the package name.
 
-Some dependencies must share one runtime identity. Private API locks, contexts, registries, symbols, and other singletons fall into this group. Two copies can expose the same exports and still be incompatible.
+Some package state must share one runtime identity. React context objects, private API locks, registries, symbols, and other singletons fall into this group. If two package copies each create a React context, a Provider from one copy cannot provide a value to a consumer using the other, even when both copies use the same React instance. Two copies can expose the same exports and still be incompatible.
 
 If the package's public API changes, test representative existing consumer code against the candidate package. Compile the published types, build the consumer, and exercise the changed behaviour. Updating repository call sites proves that the new API works. It does not prove that existing consumers still work or have a clear migration path.
 
@@ -280,7 +280,7 @@ For each supported pairing and entrypoint, check these layers where applicable:
 1. Install the exact dependency versions together in an isolated consumer.
 2. Compile against their published TypeScript declarations.
 3. Build each supported entrypoint with its actual bundling and WordPress dependency extraction configuration.
-4. Verify the corresponding WordPress runtime exports, module-load gates, and shared identity.
+4. Verify the corresponding WordPress runtime exports, module-load gates, and shared identities such as React context objects.
 5. Exercise the affected behaviour, including any compatibility route.
 
 Mark each layer as `pass`, `fail`, or `unverified`. Current repository source proves only the new/new pairing for its current build. A mock can test which branch capability detection selects. It cannot reproduce dependency extraction, duplicate package identity, or an older WordPress runtime.
