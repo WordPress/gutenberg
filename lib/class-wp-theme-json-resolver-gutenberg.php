@@ -602,8 +602,10 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			_deprecated_argument( __FUNCTION__, '5.9.0' );
 		}
 
-		$result = new WP_Theme_JSON_Gutenberg();
-		$result->merge( static::get_core_data() );
+		$result    = new WP_Theme_JSON_Gutenberg();
+		$core_data = static::resolve_core_block_default_conflicts( static::get_core_data(), static::get_theme_data() );
+
+		$result->merge( $core_data );
 		if ( 'default' === $origin ) {
 			return $result;
 		}
@@ -1000,5 +1002,35 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Resolves conflicts between core block default settings and the active theme settings.
+	 *
+	 * @param WP_Theme_JSON_Gutenberg $core_data  Core theme data object.
+	 * @param WP_Theme_JSON_Gutenberg $theme_data Active theme data object.
+	 *
+	 * @return WP_Theme_JSON_Gutenberg Potentially adjusted core data object.
+	 */
+	private static function resolve_core_block_default_conflicts( $core_data, $theme_data ) {
+		$core_raw  = $core_data->get_raw_data();
+		$theme_raw = $theme_data->get_raw_data();
+
+		$global_border_radius = isset( $theme_raw['settings']['border']['radius'] )
+			? $theme_raw['settings']['border']['radius']
+			: null;
+
+		// If theme disables global border radius and doesn't override the block, remove it from core.
+		if (
+			false === $global_border_radius &&
+			isset( $core_raw['settings']['blocks']['core/button']['border']['radius'] ) &&
+			true === $core_raw['settings']['blocks']['core/button']['border']['radius'] &&
+			! isset( $theme_raw['settings']['blocks']['core/button']['border']['radius'] )
+		) {
+			unset( $core_raw['settings']['blocks']['core/button']['border']['radius'] );
+			return new WP_Theme_JSON_Gutenberg( $core_raw );
+		}
+
+		return $core_data;
 	}
 }
