@@ -25,7 +25,8 @@
 		},
 		"packageManager": {
 			"name": "npm",
-			"version": ">=10.2.3"
+			"version": "^10.2.3",
+			"onFail": "warn"
 		}
 	},
 	"wpPlugin": {
