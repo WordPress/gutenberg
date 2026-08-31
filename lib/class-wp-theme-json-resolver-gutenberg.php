@@ -831,6 +831,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *
 	 * @since 6.6.0
 	 * @since 6.7.0 Added support for resolving block styles.
+	 * @since 6.9.0 Added support for resolving element styles.
 	 *
 	 * @param WP_Theme_JSON_Gutenberg $theme_json A theme json instance.
 	 * @return array An array of resolved paths.
@@ -865,6 +866,33 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 					$resolved_theme_uri['type'] = $file_type['type'];
 				}
 				$resolved_theme_uris[] = $resolved_theme_uri;
+		}
+
+		// Element styles.
+		if ( ! empty( $theme_json_data['styles']['elements'] ) ) {
+			foreach ( $theme_json_data['styles']['elements'] as $element_name => $element_styles ) {
+				if ( ! isset( $element_styles['background']['backgroundImage']['url'] ) ) {
+					continue;
+				}
+				$background_image_url = $element_styles['background']['backgroundImage']['url'] ?? null;
+				if (
+					isset( $background_image_url ) &&
+					is_string( $background_image_url ) &&
+					// Skip if the src doesn't start with the placeholder, as there's nothing to replace.
+					str_starts_with( $background_image_url, $placeholder ) ) {
+					$file_type          = wp_check_filetype( $background_image_url );
+					$src_url            = str_replace( $placeholder, '', $background_image_url );
+					$resolved_theme_uri = array(
+						'name'   => $background_image_url,
+						'href'   => sanitize_url( get_theme_file_uri( $src_url ) ),
+						'target' => "styles.elements.{$element_name}.background.backgroundImage.url",
+					);
+					if ( isset( $file_type['type'] ) ) {
+						$resolved_theme_uri['type'] = $file_type['type'];
+					}
+					$resolved_theme_uris[] = $resolved_theme_uri;
+				}
+			}
 		}
 
 		// Block styles.
