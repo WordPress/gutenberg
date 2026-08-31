@@ -194,15 +194,38 @@ const results = await Promise.all(
 			return null;
 		}
 
+		const reviewedPaths = new Set(
+			paths.filter( ( path ) =>
+				prs.some( ( pr ) =>
+					pr.files?.some( ( file ) =>
+						matchesPattern( file.path, path )
+					)
+				)
+			)
+		);
+		const hasProvenEngagement = reviewedPaths.size > 0;
+		const ownsActivePath = paths.some( ( path ) =>
+			activePaths.has( path )
+		);
+
 		const inactivePaths = paths.filter( ( path ) => {
-			// Stable/unmodified paths aren't evidence of inactive ownership.
-			if ( ! activePaths.has( path ) ) {
+			if ( reviewedPaths.has( path ) ) {
 				return false;
 			}
 
-			return ! prs.some( ( pr ) =>
-				pr.files?.some( ( file ) => matchesPattern( file.path, path ) )
-			);
+			// Paths with real changes and no review are inactive ownership.
+			if ( activePaths.has( path ) ) {
+				return true;
+			}
+
+			// Quiet paths only stay assigned when we still have reason to
+			// trust participation: either the owner reviewed somewhere else
+			// they own, or they own no active paths to judge against.
+			if ( hasProvenEngagement || ! ownsActivePath ) {
+				return false;
+			}
+
+			return true;
 		} );
 
 		return inactivePaths.length > 0 ? [ username, inactivePaths ] : null;
