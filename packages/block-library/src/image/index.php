@@ -357,6 +357,7 @@ function block_core_image_print_lightbox_overlay() {
 			data-wp-bind--aria-modal="state.ariaModal"
 			data-wp-class--active="state.overlayEnabled"
 			data-wp-class--show-closing-animation="state.overlayOpened"
+			data-wp-class--has-navigation="state.hasNavigation"
 			data-wp-watch---focus="callbacks.setOverlayFocus"
 			data-wp-watch---inert="callbacks.setInertElements"
 			data-wp-on--keydown="actions.handleKeydown"
@@ -377,12 +378,12 @@ function block_core_image_print_lightbox_overlay() {
 					<span class="wp-lightbox-navigation-icon" data-wp-bind--hidden="!state.hasNavigationIcon">{$prev_button_icon}</span>
 					<span class="wp-lightbox-navigation-text" data-wp-bind--hidden="!state.hasNavigationText">{$prev_button_text}</span>
 				</button>
-				<div class="lightbox-image-container">
+				<div class="lightbox-image-container" data-wp-on--click="actions.handleImageContainerClick">
 					<figure data-wp-bind--class="state.selectedImage.figureClassNames" data-wp-bind--style="state.figureStyles">
 						<img data-wp-bind--alt="state.selectedImage.alt" data-wp-bind--class="state.selectedImage.imgClassNames" data-wp-bind--style="state.imgStyles" data-wp-bind--src="state.selectedImage.currentSrc">
 					</figure>
 				</div>
-				<div class="lightbox-image-container">
+				<div class="lightbox-image-container" data-wp-on--click="actions.handleImageContainerClick">
 					<figure data-wp-bind--class="state.selectedImage.figureClassNames" data-wp-bind--style="state.figureStyles">
 						<img
 							data-wp-bind--alt="state.selectedImage.alt"
