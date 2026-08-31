@@ -38,6 +38,9 @@ test.describe( 'Dataviews List Layout', () => {
 	} );
 
 	test( 'Items list is reachable via TAB', async ( { page } ) => {
+		// Make sure the items have loaded before reaching for the 1st item in the list.
+		await expect( page.getByRole( 'grid' ) ).toBeVisible();
+
 		// Start the sequence on the search component.
 		await page.getByRole( 'searchbox', { name: 'Search' } ).click();
 
@@ -66,6 +69,9 @@ test.describe( 'Dataviews List Layout', () => {
 	test( 'Navigates from items list to preview via TAB, and vice versa', async ( {
 		page,
 	} ) => {
+		// Make sure the items have loaded before reaching for the 1st item in the list.
+		await expect( page.getByRole( 'grid' ) ).toBeVisible();
+
 		// Start the sequence on the search component.
 		await page.getByRole( 'searchbox', { name: 'Search' } ).click();
 
@@ -98,6 +104,9 @@ test.describe( 'Dataviews List Layout', () => {
 	test( 'Navigates the items list via UP/DOWN arrow keys', async ( {
 		page,
 	} ) => {
+		// Make sure the items have loaded before reaching for the 1st item in the list.
+		await expect( page.getByRole( 'grid' ) ).toBeVisible();
+
 		// Start the sequence on the search component.
 		await page.getByRole( 'searchbox', { name: 'Search' } ).click();
 
@@ -118,6 +127,9 @@ test.describe( 'Dataviews List Layout', () => {
 	test( 'Actions are reachable via RIGHT/LEFT arrow keys', async ( {
 		page,
 	} ) => {
+		// Make sure the items have loaded before reaching for the 1st item in the list.
+		await expect( page.getByRole( 'grid' ) ).toBeVisible();
+
 		// Start the sequence on the search component.
 		await page.getByRole( 'searchbox', { name: 'Search' } ).click();
 
@@ -182,6 +194,9 @@ test.describe( 'Dataviews List Layout', () => {
 	test( 'Navigates the list via UP/DOWN arrow keys from action buttons', async ( {
 		page,
 	} ) => {
+		// Make sure the items have loaded before reaching for the 1st item in the list.
+		await expect( page.getByRole( 'grid' ) ).toBeVisible();
+
 		// Start the sequence on the search component.
 		await page.getByRole( 'searchbox', { name: 'Search' } ).click();
 
