@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add JPEG XL (JXL) as a client-side supported MIME type and output format. The vips-jxl.wasm module is loaded lazily on first use via `vipsEnsureJxlSupport()`, keeping it out of the default bundle.
+-   Convert uploaded JPEG XL (JXL) images to JPEG client-side via vips, since JXL is not yet broadly web-compatible (most browsers cannot display it and the server cannot read it). The original `.jxl` is preserved as a companion file alongside the JPEG derivative, mirroring how HEIC uploads are handled.
+
 ### Internal
 
 -   Add a private `getFailureCount` selector, a running tally of top-level items cancelled because they failed. Failed items leave the queue just like successful ones, so this is the only record that an upload did not make it ([#81132](https://github.com/WordPress/gutenberg/issues/81132)).

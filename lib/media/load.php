@@ -47,6 +47,94 @@ function gutenberg_add_heic_upload_mimes( array $mimes ): array {
 add_filter( 'upload_mimes', 'gutenberg_add_heic_upload_mimes' );
 
 /**
+ * Registers JPEG XL (JXL) as an allowed upload MIME type.
+ *
+ * JXL images are decoded to JPEG client-side via VIPS/WASM and the JPEG is
+ * uploaded; the original .jxl is preserved as a companion file. WordPress core
+ * does not include image/jxl in its default MIME list, so without this filter
+ * the editor's allowed-types check rejects the original .jxl before it can be
+ * converted, and the companion sideload is rejected by the server.
+ *
+ * @param array $mimes Allowed MIME types (extension => type).
+ * @return array Modified MIME types.
+ */
+function gutenberg_add_jxl_upload_mimes( array $mimes ): array {
+	$mimes['jxl'] = 'image/jxl';
+	return $mimes;
+}
+
+add_filter( 'upload_mimes', 'gutenberg_add_jxl_upload_mimes' );
+
+/**
+ * Determines whether a file is a JPEG XL image by inspecting its magic bytes.
+ *
+ * JXL files come in two flavors: a naked codestream (starts with 0xFF 0x0A)
+ * and an ISOBMFF container (starts with the 12-byte JXL box signature).
+ *
+ * @param string $file Full path to the file.
+ * @return bool Whether the file is a JPEG XL image.
+ */
+function gutenberg_is_jxl_file( string $file ): bool {
+	// Suppress the warning when the file is missing or unreadable; the false
+	// return is handled below, matching the core wp_is_jxl_file() backport.
+	$handle = @fopen( $file, 'rb' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+	if ( ! $handle ) {
+		return false;
+	}
+
+	$bytes = fread( $handle, 12 );
+	fclose( $handle );
+
+	if ( ! is_string( $bytes ) || strlen( $bytes ) < 2 ) {
+		return false;
+	}
+
+	// Naked JXL codestream.
+	if ( "\xFF\x0A" === substr( $bytes, 0, 2 ) ) {
+		return true;
+	}
+
+	// JXL ISOBMFF container ("....JXL \r\n\x87\n").
+	if ( "\x00\x00\x00\x0C\x4A\x58\x4C\x20\x0D\x0A\x87\x0A" === $bytes ) {
+		return true;
+	}
+
+	return false;
+}
+
+/**
+ * Restores the JPEG XL MIME type during upload validation.
+ *
+ * fileinfo reports JXL as image/x-jxl (and getimagesize() cannot identify it
+ * at all), so WordPress core's wp_check_filetype_and_ext() rejects the upload
+ * because the detected MIME type does not match the registered image/jxl type.
+ * When the file is genuinely a JPEG XL (verified via its magic bytes), restore
+ * the expected extension and MIME type so the upload is allowed.
+ *
+ * @param array  $data     Values for the extension, MIME type, and corrected filename.
+ * @param string $file     Full path to the file.
+ * @param string $filename The name of the file.
+ * @return array Filtered values for the extension, MIME type, and corrected filename.
+ */
+function gutenberg_filter_jxl_filetype_and_ext( array $data, string $file, string $filename ): array {
+	// Leave already-recognized files untouched.
+	if ( ! empty( $data['type'] ) ) {
+		return $data;
+	}
+
+	$ext = strtolower( pathinfo( $filename, PATHINFO_EXTENSION ) );
+
+	if ( 'jxl' === $ext && gutenberg_is_jxl_file( $file ) ) {
+		$data['ext']  = 'jxl';
+		$data['type'] = 'image/jxl';
+	}
+
+	return $data;
+}
+
+add_filter( 'wp_check_filetype_and_ext', 'gutenberg_filter_jxl_filetype_and_ext', 10, 3 );
+
+/**
  * Overrides the REST controller for the attachment post type.
  *
  * @param array  $args      Array of arguments for registering a post type.
@@ -220,10 +308,10 @@ add_action( 'admin_init', 'gutenberg_set_client_side_media_processing_flag' );
  * Deletes the source-format companion file when its attachment is deleted.
  *
  * When the client-side media flow sideloads a source-format original (such as
- * a HEIC file) alongside a web-viewable derivative, the original's filename is
- * recorded in the 'source_image' metadata key. WordPress only tracks
- * 'original_image' in wp_delete_attachment_files(), so without this hook the
- * companion file would linger on disk after the attachment is deleted.
+ * a HEIC or JPEG XL file) alongside a web-viewable derivative, the original's
+ * filename is recorded in the 'source_image' metadata key. WordPress only
+ * tracks 'original_image' in wp_delete_attachment_files(), so without this hook
+ * the companion file would linger on disk after the attachment is deleted.
  *
  * @param int $post_id Attachment ID being deleted.
  * @return bool Whether a companion file was deleted.

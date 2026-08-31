@@ -77,6 +77,17 @@ export function getErrorMessage(
 			),
 			action: getHeicConversionAdvice(),
 		},
+		[ ErrorCode.JXL_DECODE_ERROR ]: {
+			title: __( 'JPEG XL decode failed' ),
+			description: sprintf(
+				/* translators: %s: file name */
+				__( 'Failed to decode JPEG XL file "%s".' ),
+				fileName
+			),
+			action: __(
+				'The file may be corrupted or use a JPEG XL feature that is not supported. Try a different file.'
+			),
+		},
 		[ ErrorCode.IMAGE_TRANSCODING_ERROR ]: {
 			title: __( 'Image processing failed' ),
 			description: sprintf(

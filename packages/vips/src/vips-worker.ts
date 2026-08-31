@@ -182,6 +182,75 @@ export async function vipsCancelOperations( id: ItemId ): Promise< boolean > {
 }
 
 /**
+ * Cached promise for the lazily loaded vips-jxl.wasm bytes.
+ *
+ * The JXL WASM module is dynamically imported the first time a JXL image
+ * is processed, keeping it out of the worker's static bundle. Subsequent
+ * calls reuse the cached promise.
+ */
+let jxlWasmBytesPromise: Promise< ArrayBuffer > | undefined;
+
+/**
+ * The worker API the JXL bytes were last handed to.
+ *
+ * JXL support is worker-side state established by an RPC, so it does not
+ * survive a worker recycle. Tracking the recipient lets `vipsEnsureJxlSupport`
+ * detect a replaced worker and re-send, instead of assuming a single
+ * successful call covers the rest of the session.
+ */
+let jxlWasmRecipient: Remote< WorkerAPI > | undefined;
+
+/**
+ * Ensures JXL support is available in the vips worker.
+ *
+ * Dynamically imports `wasm-vips/vips-jxl.wasm` on the main thread (which
+ * the bundler splits into a separate chunk so it is only downloaded when
+ * needed) and RPCs the resulting bytes to the worker. The worker wraps them
+ * in a Blob URL and re-initializes vips with the JXL dynamic library on the
+ * next operation.
+ *
+ * Safe to call multiple times: the download is cached, and the RPC is
+ * repeated only when the worker has been replaced since the last call.
+ */
+export async function vipsEnsureJxlSupport(): Promise< void > {
+	if ( ! jxlWasmBytesPromise ) {
+		jxlWasmBytesPromise = ( async () => {
+			// Externalized script module — the JXL WASM lives in its own
+			// `@wordpress/vips/jxl-wasm` bundle (~3 MB) that is only
+			// fetched by the browser on this dynamic import.
+			const mod = await import( '@wordpress/vips/jxl-wasm' );
+			const bytes = mod.default as Uint8Array< ArrayBuffer >;
+			// Hand the RPC layer a bare ArrayBuffer: it only recognises those
+			// as transferable, and walks any other object key by key — which
+			// for ~3 MB of image codec means millions of main-thread
+			// allocations per call. `slice` also detaches this copy from the
+			// module's own bytes, so transferring it cannot empty the cache.
+			return bytes.buffer.slice(
+				bytes.byteOffset,
+				bytes.byteOffset + bytes.byteLength
+			);
+		} )().catch( ( error ) => {
+			// Do not cache the failure: a transient network error fetching the
+			// chunk would otherwise disable JXL for the rest of the session.
+			jxlWasmBytesPromise = undefined;
+			throw error;
+		} );
+	}
+
+	const bytes = await jxlWasmBytesPromise;
+	const api = getWorkerAPI();
+
+	if ( jxlWasmRecipient === api ) {
+		return;
+	}
+
+	// The buffer is transferred, so hand over a fresh copy each time and keep
+	// the cached original intact for the next worker.
+	await api.setJxlWasm( bytes.slice( 0 ) );
+	jxlWasmRecipient = api;
+}
+
+/**
  * Terminates the vips worker if it exists.
  * Call this to free up resources when vips processing is no longer needed.
  */
@@ -195,4 +264,7 @@ export function terminateVipsWorker(): void {
 		URL.revokeObjectURL( workerBlobUrl );
 		workerBlobUrl = undefined;
 	}
+	// The downloaded bytes stay cached - only the worker-side state is gone,
+	// and vipsEnsureJxlSupport re-sends it when it sees a new worker.
+	jxlWasmRecipient = undefined;
 }

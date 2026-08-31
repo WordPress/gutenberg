@@ -28,13 +28,59 @@ let cleanup: () => void;
 let vipsPromise: Promise< typeof Vips > | undefined;
 
 /**
+ * Inlined bytes of the lazily loaded vips-jxl.wasm module.
+ *
+ * JXL support is loaded on demand the first time a JXL image is processed.
+ * The bytes are produced by dynamically importing `wasm-vips/vips-jxl.wasm`
+ * in the main thread (where the bundler can split it into its own chunk) and
+ * sent here via RPC. Kept out of the worker bundle so the worker stays small
+ * when JXL is unused.
+ */
+let jxlWasmBytes: ArrayBuffer | undefined;
+
+/**
+ * Whether the current vips instance was initialized with JXL dynamic library.
+ *
+ * If JXL becomes available after vips was already initialized without it,
+ * the existing instance is discarded so the next call reinitializes with
+ * JXL support included.
+ */
+let vipsInitializedWithJxl = false;
+
+/**
+ * Counter identifying the current vips initialization attempt.
+ *
+ * A failed init must only clear `vipsPromise` if it is still the current one;
+ * a later attempt may already have replaced it.
+ */
+let vipsInitGeneration = 0;
+
+/**
+ * Sets the inlined bytes of the vips-jxl.wasm module.
+ *
+ * Call this from the main thread before processing a JXL image. The bytes
+ * come from the lazily loaded `wasm-vips/vips-jxl.wasm` module; they are
+ * wrapped in a Blob URL on demand (see `getWasmUrl`).
+ *
+ * Takes a bare `ArrayBuffer` rather than a typed array so the RPC layer
+ * recognises it as transferable: comctx only fast-paths `ArrayBuffer` and
+ * `Array`, and walks anything else key by key, which for a multi-megabyte
+ * typed array means millions of allocations on the calling thread.
+ *
+ * @param bytes Inlined bytes of the vips-jxl.wasm module.
+ */
+export function setJxlWasm( bytes: ArrayBuffer ): void {
+	jxlWasmBytes = bytes;
+}
+
+/**
  * Caches Blob URLs created for inlined WASM binaries.
  *
  * The WASM binaries are inlined as `Uint8Array` values at build time. wasm-vips
  * loads them (including the HEIF dynamic library) by fetching a URL, so the
  * bytes are wrapped in a Blob URL the first time each is requested.
  */
-const wasmUrls = new WeakMap< Uint8Array< ArrayBuffer >, string >();
+const wasmUrls = new WeakMap< object, string >();
 
 /**
  * Returns a Blob URL for an inlined WASM binary, creating it on first use.
@@ -42,7 +88,7 @@ const wasmUrls = new WeakMap< Uint8Array< ArrayBuffer >, string >();
  * @param bytes The inlined WASM binary.
  * @return A Blob URL pointing at the binary.
  */
-function getWasmUrl( bytes: Uint8Array< ArrayBuffer > ): string {
+function getWasmUrl( bytes: Uint8Array< ArrayBuffer > | ArrayBuffer ): string {
 	let url = wasmUrls.get( bytes );
 	if ( ! url ) {
 		url = URL.createObjectURL(
@@ -56,50 +102,101 @@ function getWasmUrl( bytes: Uint8Array< ArrayBuffer > ): string {
 /**
  * Instantiates and returns a new vips instance.
  *
- * Reuses any existing instance.
+ * Reuses any existing instance. If a JXL WASM URL has been set but the
+ * current instance was initialized without it, the instance is discarded
+ * and recreated with JXL dynamic library support.
  */
 async function getVips(): Promise< typeof Vips > {
+	// If JXL is now available but vips was initialized without it, discard the
+	// existing instance so the next init picks up the dynamic library. Shut it
+	// down first: a wasm-vips instance holds a large WASM heap that would
+	// otherwise be stranded for the lifetime of the worker.
+	if ( jxlWasmBytes && vipsPromise && ! vipsInitializedWithJxl ) {
+		const staleVips = vipsPromise;
+		vipsPromise = undefined;
+		try {
+			( await staleVips ).shutdown();
+		} catch {
+			// Nothing to reclaim if the stale instance never came up.
+		}
+	}
+
 	if ( vipsPromise ) {
 		return await vipsPromise;
 	}
 
-	vipsPromise = Vips( {
-		// Load HEIF dynamic module for HEIF/HEIC and AVIF format support.
-		// JXL is omitted as WordPress Core does not currently support it.
-		// It can be re-added when Core adds JXL support.
-		dynamicLibraries: [ 'vips-heif.wasm' ],
-		locateFile: ( fileName: string ) => {
-			// WASM files are inlined as a Uint8Array at build time and exposed
-			// here as Blob URLs. This eliminates the need for separate file
-			// downloads and avoids issues with hosts not serving WASM files
-			// with correct MIME types, while keeping the inlined bytes
-			// compressible (see the build-time binary encoding).
-			if ( fileName.endsWith( 'vips.wasm' ) ) {
-				return getWasmUrl( VipsModule );
-			} else if ( fileName.endsWith( 'vips-heif.wasm' ) ) {
-				return getWasmUrl( VipsHeifModule );
-			}
-			return fileName;
-		},
-		preRun: ( module: EmscriptenModule ) => {
-			// https://github.com/kleisauke/wasm-vips/issues/13#issuecomment-1073246828
-			module.setAutoDeleteLater( true );
-			module.setDelayFunction( ( fn: () => void ) => {
-				cleanup = fn;
-			} );
-		},
-		// Redirect wasm-vips internal stdout/stderr to prevent console errors
-		// (e.g. AVIF codec warnings that are not actionable for users).
-		// Set globalThis.__vipsDebug to a function to capture this output during development.
-		print: ( text: string ) => {
-			( globalThis as any ).__vipsDebug?.( text );
-		},
-		printErr: ( text: string ) => {
-			( globalThis as any ).__vipsDebug?.( text );
-		},
-	} );
+	const withJxl = Boolean( jxlWasmBytes );
+	const dynamicLibraries = [ 'vips-heif.wasm' ];
+	if ( withJxl ) {
+		dynamicLibraries.push( 'vips-jxl.wasm' );
+	}
 
-	const vipsInstance = await vipsPromise;
+	const initGeneration = ++vipsInitGeneration;
+
+	const instancePromise: Promise< typeof Vips > = ( async () => {
+		try {
+			const instance = await Vips( {
+				// Load HEIF dynamic module for HEIF/HEIC and AVIF format support.
+				// JXL is loaded on demand when a JXL image is processed, via
+				// setJxlWasm() which is called from the main thread after the
+				// `wasm-vips/vips-jxl.wasm` module is dynamically imported.
+				dynamicLibraries,
+				locateFile: ( fileName: string ) => {
+					// WASM files are inlined as a Uint8Array at build time and exposed
+					// here as Blob URLs. This eliminates the need for separate file
+					// downloads and avoids issues with hosts not serving WASM files
+					// with correct MIME types, while keeping the inlined bytes
+					// compressible (see the build-time binary encoding).
+					if ( fileName.endsWith( 'vips.wasm' ) ) {
+						return getWasmUrl( VipsModule );
+					} else if ( fileName.endsWith( 'vips-heif.wasm' ) ) {
+						return getWasmUrl( VipsHeifModule );
+					} else if (
+						fileName.endsWith( 'vips-jxl.wasm' ) &&
+						jxlWasmBytes
+					) {
+						return getWasmUrl( jxlWasmBytes );
+					}
+					return fileName;
+				},
+				preRun: ( module: EmscriptenModule ) => {
+					// https://github.com/kleisauke/wasm-vips/issues/13#issuecomment-1073246828
+					module.setAutoDeleteLater( true );
+					module.setDelayFunction( ( fn: () => void ) => {
+						cleanup = fn;
+					} );
+				},
+				// Redirect wasm-vips internal stdout/stderr to prevent console errors
+				// (e.g. AVIF codec warnings that are not actionable for users).
+				// Set globalThis.__vipsDebug to a function to capture this output during development.
+				print: ( text: string ) => {
+					( globalThis as any ).__vipsDebug?.( text );
+				},
+				printErr: ( text: string ) => {
+					( globalThis as any ).__vipsDebug?.( text );
+				},
+			} );
+
+			// Only now is the instance known to carry JXL support. Recording
+			// it earlier would let a failed JXL init latch the flag on, and
+			// the reset above - which requires the flag to be off - could
+			// never discard the broken instance.
+			vipsInitializedWithJxl = withJxl;
+			return instance;
+		} catch ( error ) {
+			// Drop the rejected promise so the next call retries instead of
+			// replaying this failure for the rest of the worker's life.
+			if ( vipsInitGeneration === initGeneration ) {
+				vipsPromise = undefined;
+				vipsInitializedWithJxl = false;
+			}
+			throw error;
+		}
+	} )();
+
+	vipsPromise = instancePromise;
+
+	const vipsInstance = await instancePromise;
 
 	// Disable the operation cache to prevent out-of-memory crashes
 	// during repeated image processing. libvips caches results from
@@ -224,6 +321,12 @@ export async function convertImageFormat(
 					maxBitdepth
 				);
 			}
+		}
+
+		// JXL default effort of 7 is too slow for interactive use.
+		// Use 3 for a good balance of speed and compression.
+		if ( 'image/jxl' === outputType ) {
+			saveOptions.effort = 3;
 		}
 
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
@@ -481,6 +584,12 @@ function buildSaveOptions(
 		if ( bitdepth > 8 ) {
 			saveOptions.bitdepth = bitdepth;
 		}
+	}
+
+	// JXL default effort of 7 is too slow for interactive use.
+	// Use 3 for a good balance of speed and compression.
+	if ( 'image/jxl' === type ) {
+		saveOptions.effort = 3;
 	}
 
 	return saveOptions;
@@ -899,4 +1008,5 @@ export {
 	hasTransparency as vipsHasTransparency,
 	getUltraHdrInfo as vipsGetUltraHdrInfo,
 	cancelOperations as vipsCancelOperations,
+	setJxlWasm as vipsSetJxlWasm,
 };
