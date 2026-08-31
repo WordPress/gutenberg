@@ -14,7 +14,7 @@ Instances are placed through `@wordpress/grid`. The consumer owns the committed 
 
 ## Two modes
 
-The dashboard reads in _Normal_ and edits in _Customize_; a consumer capability determines whether _Customize_ is offered at all.
+The dashboard reads in _Normal_ and edits in _Customize_; the application's policy decides whether _Customize_ is offered at all (see _Policy_).
 
 -   **Normal.** Instances render with their chrome. High-relevance attributes may be edited inline in the header, without opening a separate surface.
 -   **Customize.** The layout becomes editable: reorder by drag, resize, insert through a modal, and open per-instance settings.

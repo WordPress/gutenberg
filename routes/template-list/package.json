@@ -9,7 +9,6 @@
 	"dependencies": {
 		"@wordpress/admin-ui": "file:../../packages/admin-ui",
 		"@wordpress/base-styles": "file:../../packages/base-styles",
-		"@wordpress/block-editor": "file:../../packages/block-editor",
 		"@wordpress/components": "file:../../packages/components",
 		"@wordpress/compose": "file:../../packages/compose",
 		"@wordpress/core-data": "file:../../packages/core-data",
@@ -22,7 +21,6 @@
 		"@wordpress/html-entities": "file:../../packages/html-entities",
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/icons": "file:../../packages/icons",
-		"@wordpress/keycodes": "file:../../packages/keycodes",
 		"@wordpress/lazy-editor": "file:../../packages/lazy-editor",
 		"@wordpress/routes-lock-unlock": "file:../lock-unlock",
 		"@wordpress/route": "file:../../packages/route",
@@ -30,7 +28,6 @@
 		"@wordpress/url": "file:../../packages/url",
 		"@wordpress/views": "file:../../packages/views",
 		"change-case": "^4.1.2",
-		"clsx": "^2.1.1",
-		"dequal": "^2.0.3"
+		"clsx": "^2.1.1"
 	}
 }
