@@ -682,9 +682,9 @@ function findNoteThread( noteId, container, additionalSelector ) {
 /**
  * Focus a note thread (or a descendant) and scroll it into view.
  *
- * @param {string}       noteId             Note thread ID.
- * @param {?HTMLElement} container          Container to search within.
- * @param {string}       additionalSelector Optional descendant selector.
+ * @param {number|string} noteId               Note thread ID.
+ * @param {?HTMLElement}  container            Container to search within.
+ * @param {string}        [additionalSelector] Optional descendant selector.
  */
 export function focusNoteThread( noteId, container, additionalSelector ) {
 	return findNoteThread( noteId, container, additionalSelector ).then(

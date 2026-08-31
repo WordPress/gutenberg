@@ -264,11 +264,13 @@ function clearInlineNoteMarker(
  * `postId` and `getCreateExtra` instead. Block-attribute wiring is skipped in
  * that case because there is no block to write to.
  *
- * @param {Object}   [options]
- * @param {number}   [options.postId]         Post to store notes against.
- *                                            Defaults to the edited post.
- * @param {Function} [options.getCreateExtra] Returns extra fields to merge into
- *                                            the create payload, e.g. anchor meta.
+ * @param {Object}        [options]
+ * @param {number|string} [options.postId]         Post to store notes
+ *                                                 against. Defaults to the
+ *                                                 edited post.
+ * @param {Function}      [options.getCreateExtra] Returns extra fields to
+ *                                                 merge into the create
+ *                                                 payload, e.g. anchor meta.
  * @return {{ onCreate: Function, onEdit: Function, onDelete: Function }} Actions.
  */
 export function useNoteActions( { postId, getCreateExtra } = {} ) {

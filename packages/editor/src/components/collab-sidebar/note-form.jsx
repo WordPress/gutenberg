@@ -32,7 +32,7 @@ const ALLOWED_NOTE_FORMATS = [
 
 const NOTE_COMPLETERS = [ noteMentionCompleter ];
 
-export function NoteForm( { onSubmit, onCancel, note, labels } ) {
+export function NoteForm( { onSubmit, onCancel, note = undefined, labels } ) {
 	const [ inputComment, setInputComment ] = useState(
 		note?.content?.raw ?? ''
 	);
