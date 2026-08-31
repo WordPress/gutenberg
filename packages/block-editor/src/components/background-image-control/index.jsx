@@ -403,10 +403,15 @@ function BackgroundImageControls( {
 	const canRemove = ! hasValue && hasBackgroundImageValue( inheritedValue );
 	// theme.json accepts a plain string for `backgroundImage`; the editor
 	// stores an object with a `url`. Resolve either for the URL field.
-	const currentURL =
+	const rawURL =
 		typeof style?.background?.backgroundImage === 'string'
 			? style.background.backgroundImage
 			: url;
+	// Offer only absolute `http(s)` addresses to the URL field. A theme.json
+	// value can be theme-relative (`file:./…`), which the field could neither
+	// display usefully nor re-apply without breaking the image, and removing
+	// an inherited image stores the `'none'` sentinel string.
+	const currentURL = /^https?:\/\//.test( rawURL ?? '' ) ? rawURL : undefined;
 	const imgLabel = title || getFilename( url ) || __( 'Image' );
 
 	return (
