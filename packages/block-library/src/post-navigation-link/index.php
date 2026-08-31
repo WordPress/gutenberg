@@ -36,9 +36,10 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 		)
 	);
 	// Set default values.
-	$format = '%link';
-	$link   = 'next' === $navigation_type ? _x( 'Next', 'label for next post link' ) : _x( 'Previous', 'label for previous post link' );
-	$label  = '';
+	$format       = '%link';
+	$link         = 'next' === $navigation_type ? _x( 'Next', 'label for next post link' ) : _x( 'Previous', 'label for previous post link' );
+	$label        = '';
+	$arrow_markup = '';
 
 	// Only use hardcoded values here, otherwise we need to add escaping where these values are used.
 	$arrow_map = array(
@@ -60,6 +61,15 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 		$link  = $label;
 	}
 
+	// Display arrows.
+	if ( isset( $attributes['arrow'] ) && 'none' !== $attributes['arrow'] && isset( $arrow_map[ $attributes['arrow'] ] ) ) {
+		// Get the arrow based on the navigation type.
+		$arrow = $arrow_map[ $attributes['arrow'] ][ $navigation_type ];
+
+		// Create the arrow markup.
+		$arrow_markup = '<span class="wp-block-post-navigation-link__arrow-' . $navigation_type . ' is-arrow-' . $attributes['arrow'] . '" aria-hidden="true">' . $arrow . '</span>';
+	}
+
 	// If we want to also show the page title, make the page title a link and prepend the label.
 	if ( isset( $attributes['showTitle'] ) && $attributes['showTitle'] ) {
 		/*
@@ -68,13 +78,25 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 		 */
 		if ( ! $attributes['linkLabel'] ) {
 			if ( $label ) {
+				/**
+				 * If the label link option is not enabled and there is a custom label, display it before the title.
+				 * If only label is provided, label & arrow won't be a part of the link.
+				 */
 				$format = '<span class="post-navigation-link__label">' . wp_kses_post( $label ) . '</span> %link';
+				$format = 'next' === $navigation_type ? $format . $arrow_markup : $arrow_markup . $format;
+				$link   = '%title';
+			} else {
+				/*
+				 * If the label link option is not enabled and there is no custom label, display the title only.
+				 * Since title & arrow are part of the link, we add arrow to the title.
+				 */
+				$link = '<span class="post-navigation-link__title">%title</span>';
+				$link = 'next' === $navigation_type ? $link . $arrow_markup : $arrow_markup . $link;
 			}
-			$link = '%title';
 		} elseif ( isset( $attributes['linkLabel'] ) && $attributes['linkLabel'] ) {
 			// If the label link option is enabled and there is a custom label, display it before the title.
 			if ( $label ) {
-				$link = '<span class="post-navigation-link__label">' . wp_kses_post( $label ) . '</span> <span class="post-navigation-link__title">%title</span>';
+				$link = '<span class="post-navigation-link__label">' . wp_kses_post( $label ) . '</span> %title';
 			} else {
 				/*
 				 * If the label link option is enabled and there is no custom label,
@@ -87,18 +109,13 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 					'%title'
 				);
 			}
-		}
-	}
 
-	// Display arrows.
-	if ( isset( $attributes['arrow'] ) && 'none' !== $attributes['arrow'] && isset( $arrow_map[ $attributes['arrow'] ] ) ) {
-		$arrow = $arrow_map[ $attributes['arrow'] ][ $navigation_type ];
-
-		if ( 'next' === $navigation_type ) {
-			$format = '%link<span class="wp-block-post-navigation-link__arrow-next is-arrow-' . $attributes['arrow'] . '" aria-hidden="true">' . $arrow . '</span>';
-		} else {
-			$format = '<span class="wp-block-post-navigation-link__arrow-previous is-arrow-' . $attributes['arrow'] . '" aria-hidden="true">' . $arrow . '</span>%link';
+			// Prepend or append the arrow based on the navigation type.
+			$link = 'next' === $navigation_type ? $link . $arrow_markup : $arrow_markup . $link;
 		}
+	} else {
+		// If we don't want to show the page title, only show the arrow.
+		$link = 'next' === $navigation_type ? $link . $arrow_markup : $arrow_markup . $link;
 	}
 
 	/*
