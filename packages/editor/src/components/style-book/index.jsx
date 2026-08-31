@@ -257,6 +257,45 @@ function StyleBook(
 		[ examples ]
 	);
 
+	/*
+	 * A note can be anchored to an example on a tab other than the one on
+	 * screen. The scroll and the highlight both run inside the mounted panel,
+	 * so without following the anchor to its tab, selecting such a note does
+	 * nothing the user can see.
+	 */
+	const anchorTab = useMemo( () => {
+		if ( ! highlightedAnchor ) {
+			return undefined;
+		}
+
+		const hasAnchor = ( category ) =>
+			!! category &&
+			( !! category.examples?.some(
+				( example ) => example.name === highlightedAnchor
+			) ||
+				!! category.subcategories?.some( hasAnchor ) );
+
+		return tabs.find( ( tab ) => {
+			const categoryDefinition = getTopLevelStyleBookCategories().find(
+				( category ) => category.slug === tab.slug
+			);
+			return (
+				!! categoryDefinition &&
+				hasAnchor(
+					getExamplesByCategory( categoryDefinition, examples )
+				)
+			);
+		} )?.slug;
+	}, [ highlightedAnchor, tabs, examples ] );
+
+	const [ activeTab, setActiveTab ] = useState();
+
+	useEffect( () => {
+		if ( anchorTab ) {
+			setActiveTab( anchorTab );
+		}
+	}, [ anchorTab ] );
+
 	const examplesForSinglePageUse = getExamplesForSinglePageUse( examples );
 
 	const { base: baseConfig } = useGlobalStyles();
@@ -301,7 +340,8 @@ function StyleBook(
 			{ showTabs ? (
 				<Tabs.Root
 					className="editor-style-book__tabs"
-					defaultValue={ tabs[ 0 ]?.slug }
+					value={ activeTab ?? tabs[ 0 ]?.slug }
+					onValueChange={ ( value ) => setActiveTab( value ) }
 				>
 					<div className="editor-style-book__tablist-container">
 						<Tabs.List>
