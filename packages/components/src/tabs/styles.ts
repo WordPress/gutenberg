@@ -8,6 +8,7 @@ export const StyledTabList = styled( Ariakit.TabList )`
 	display: flex;
 	align-items: stretch;
 	overflow-x: auto;
+	padding-bottom: 3px;
 
 	&[aria-orientation='vertical'] {
 		flex-direction: column;
