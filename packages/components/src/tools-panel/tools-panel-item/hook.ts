@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { usePrevious } from '@wordpress/compose';
+import { useEvent, usePrevious } from '@wordpress/compose';
 import {
 	useCallback,
 	useEffect,
@@ -70,17 +70,10 @@ export function useToolsPanelItem(
 		defaultShownRef.current = defaultShown;
 	} );
 
-	// `onShownChange` is also a new function on every render. Holding it in a
-	// ref lets the item register a stable callback, so it isn't re-registered
-	// on each render, while the panel still invokes the latest one.
-	const onShownChangeRef = useRef( onShownChange );
-	useEffect( () => {
-		onShownChangeRef.current = onShownChange;
-	} );
-	const onShownChangeCallback = useCallback(
-		( isShown: boolean ) => onShownChangeRef.current?.( isShown ),
-		[]
-	);
+	// `onShownChange` is also a new function on every render. `useEvent` gives
+	// the item a stable callback to register, so it isn't re-registered on
+	// each render, while the panel still invokes the latest one.
+	const onShownChangeCallback = useEvent( onShownChange );
 
 	const previousPanelId = usePrevious( currentPanelId );
 
