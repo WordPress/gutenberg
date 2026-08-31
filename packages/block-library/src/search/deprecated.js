@@ -1,7 +1,8 @@
 /**
  * The search block stored its width as a number plus a separate unit
  * (`width: 50`, `widthUnit: '%'`) before adopting the `dimensions.width` block
- * support. Move both into the single CSS length the support expects.
+ * support. Move both into the single CSS length the support expects, unless a
+ * block support width is already set.
  *
  * @param {Object} attributes Block attributes.
  *
@@ -10,7 +11,10 @@
 const migrateWidth = ( attributes ) => {
 	const { width, widthUnit, ...otherAttributes } = attributes;
 
-	if ( ! width || ! widthUnit ) {
+	// A block that already carries a block support width keeps it. The server
+	// reads `style.dimensions.width` before the legacy attributes, so the
+	// editor has to resolve the two the same way.
+	if ( ! width || ! widthUnit || otherAttributes.style?.dimensions?.width ) {
 		return otherAttributes;
 	}
 

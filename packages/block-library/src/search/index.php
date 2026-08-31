@@ -375,7 +375,14 @@ function block_core_search_get_width( $attributes ) {
 			return "var(--wp--preset--dimension--$slug)";
 		}
 
-		return $width;
+		/*
+		 * The Width control's leftmost step is labelled "None" and writes the
+		 * string '0'. That means "no width set", not a zero-width field, so it
+		 * is skipped here the same way the legacy attributes below are.
+		 */
+		if ( '0' !== $width ) {
+			return $width;
+		}
 	}
 
 	// Fall back to the pre-block-support attributes.

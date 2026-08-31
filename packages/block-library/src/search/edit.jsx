@@ -24,7 +24,6 @@ import { __ } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { speak } from '@wordpress/a11y';
 import { Path, SVG } from '@wordpress/primitives';
-import { MIN_WIDTH } from './utils.js';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 // Help text describing each wrapper element option. Kept local to the block
@@ -549,7 +548,10 @@ export default function SearchEdit( {
 
 				<ResizableBox
 					size={ {
-						width: resolvedWidth || 'auto',
+						width:
+							! resolvedWidth || '0' === resolvedWidth
+								? 'auto'
+								: resolvedWidth,
 						height: 'auto',
 					} }
 					className={ clsx(
@@ -559,7 +561,6 @@ export default function SearchEdit( {
 							: undefined
 					) }
 					style={ getWrapperStyles() }
-					minWidth={ MIN_WIDTH }
 					enable={ getResizableSides() }
 					onResizeStart={ ( event, direction, elt ) => {
 						// Pin the current rendered width in pixels so dragging
