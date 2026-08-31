@@ -79,10 +79,8 @@ export function chunkRows( emojis: EmojibaseEntry[] ): EmojibaseEntry[][] {
 }
 
 /**
- * Run a case-insensitive search over the emoji label and Emojibase
- * tags, applying any per-emoji label override before matching so users
- * searching for an overridden label still get the expected hit.
- * Returns the unfiltered list when the query is empty.
+ * Case-insensitive search over emoji labels and Emojibase tags. Returns
+ * the unfiltered list when the query is empty.
  *
  * @param emojis    Emoji records.
  * @param query     Search query.
@@ -99,11 +97,10 @@ export function searchEmojis(
 		return emojis;
 	}
 	return emojis.filter( ( entry ) => {
-		// Match against both the overridden label (if any) and the
-		// original Emojibase label so a user searching in either name
-		// still finds the emoji — useful when an English-language user
-		// types "red heart" against a "Heart" override, or a translator
-		// types the local-language label against the English fallback.
+		/*
+		 * Match both the override and the original Emojibase label, so
+		 * searching either name finds the emoji.
+		 */
 		const override = getOverrideLabel( overrides, entry.hexcode );
 		if ( override && override.toLowerCase().includes( trimmed ) ) {
 			return true;
@@ -123,12 +120,9 @@ export function searchEmojis(
 }
 
 /**
- * Full searchable emoji picker built from WPDS components
- * (`SearchControl`, `Composite`) and styled with WPDS tokens. Emoji
- * data and labels come from Emojibase per-locale files served
- * same-origin from the `noteEmojibaseUrl` block editor setting; UI
- * chrome strings go through `@wordpress/i18n` so GlotPress can
- * translate them.
+ * Full searchable emoji picker. Emoji data and labels come from the
+ * per-locale Emojibase files at `noteEmojibaseUrl`; UI chrome strings go
+ * through `@wordpress/i18n`.
  *
  * @param props          Component props.
  * @param props.onSelect Called with the selected emoji character.
@@ -157,18 +151,17 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 	);
 	const { set: setPreference } = useDispatch( preferencesStore );
 
-	// Focus the search field on mount. The picker usually renders after
-	// the popover has already run its own focus-on-mount pass (the lazy
-	// chunk and Emojibase data resolve later), so without this focus
-	// would stay on the interim loading state's container.
+	/*
+	 * The popover runs its focus-on-mount pass before the lazy chunk and
+	 * dataset resolve, so focus would otherwise stay on the loading state.
+	 */
 	useEffect( () => {
 		searchRef.current?.focus();
 	}, [] );
 
 	/**
-	 * Resolve the user-facing label for an emoji record. Prefers the
-	 * server-supplied override (typically a `__()`-translated string for
-	 * locales Emojibase doesn't cover) over the Emojibase data label.
+	 * Resolve an emoji's label, preferring the server-supplied override
+	 * over the Emojibase one.
 	 *
 	 * @param entry Emojibase emoji record.
 	 * @return The label to render and use as the accessible name.
@@ -224,9 +217,10 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 
 	const isSearching = !! query.trim();
 
-	// Search results render as one flat grid: per-category sections would
-	// leave sparse, ragged rows (keyboard dead-ends when arrowing across
-	// column gaps) and mostly-empty category headers.
+	/*
+	 * One flat grid: per-category sections would leave ragged rows that
+	 * dead-end keyboard navigation, under mostly-empty headers.
+	 */
 	const searchRows = useMemo(
 		() =>
 			isSearching
@@ -235,8 +229,7 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 		[ isSearching, visibleGroups ]
 	);
 
-	// Index base records by their normalized hex key so the stored
-	// frequently-used keys can be resolved back to full emoji records.
+	// Resolves stored frequently-used hex keys back to full records.
 	const recordByHexKey = useMemo( () => {
 		const map = new Map< string, EmojibaseEntry >();
 		for ( const entry of data || [] ) {
@@ -247,8 +240,7 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 		return map;
 	}, [ data ] );
 
-	// The "Frequently used" section only shows while browsing; during a
-	// search it would just duplicate hits from the category results.
+	// Hidden during search, where it would duplicate the category hits.
 	const frequentRows = useMemo( () => {
 		if ( query.trim() ) {
 			return [];
@@ -262,35 +254,35 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 		);
 	}, [ frequentKeys, recordByHexKey, query ] );
 
-	// Transient states are announced through the `@wordpress/a11y`
-	// announcer — its live regions exist before these messages — because
-	// a live region mounted together with its content is not reliably
-	// announced. The visible status nodes below intentionally carry no
-	// live-region roles for the same reason.
+	/*
+	 * Announced via the `@wordpress/a11y` announcer, whose live regions
+	 * already exist: a live region mounted together with its content is
+	 * not reliably announced. Hence no live-region roles below either.
+	 */
 	useEffect( () => {
 		if ( isLoading ) {
 			speak( __( 'Loading…' ) );
 		}
 	}, [ isLoading ] );
 
-	// Dataset failures bubble to the parent, which swaps in the curated
-	// fallback picker so adding a reaction keeps working.
+	// The parent swaps in the curated picker so reacting keeps working.
 	useEffect( () => {
 		if ( error ) {
 			onError?.();
 		}
 	}, [ error, onError ] );
 
-	// Announce result counts during search so screen readers stay in sync
-	// with the visible grid as the user types. Debounced (matching the
-	// block-inserter search pattern) so fast typing announces only the
-	// settled result, not every intermediate count.
+	/*
+	 * Debounced, as in the block inserter, so fast typing announces the
+	 * settled result rather than every intermediate count.
+	 */
 	const debouncedSpeak = useDebounce( speak, 500 );
 	useEffect( () => {
 		if ( ! query.trim() || isLoading ) {
-			// Drop a count still queued from the previous query: clearing
-			// the field restores the full grid, and announcing "1 emoji
-			// found." half a second later describes what is no longer there.
+			/*
+			 * Drop a count queued from the previous query: clearing the
+			 * field restores the full grid, so it no longer applies.
+			 */
 			debouncedSpeak.cancel();
 			return;
 		}
@@ -304,8 +296,7 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 		debouncedSpeak( message );
 	}, [ query, matchCount, isLoading, debouncedSpeak ] );
 
-	// Reset scroll position when the search query changes so the user
-	// always sees the top match instead of a stale scroll offset.
+	// Show the top match rather than a stale scroll offset.
 	useEffect( () => {
 		if ( viewportRef.current ) {
 			viewportRef.current.scrollTop = 0;
@@ -317,9 +308,8 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 	}
 
 	/**
-	 * Render one grid row of emoji, applying the user's skin tone
-	 * preference and recording usage on selection. Shared between the
-	 * "Frequently used" section and the category sections.
+	 * Render one grid row, applying the user's skin tone preference and
+	 * recording usage on selection.
 	 *
 	 * @param row    Emoji records for the row.
 	 * @param rowKey React key for the row.
@@ -332,9 +322,10 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 			className="editor-collab-sidebar-panel__picker-row"
 		>
 			{ row.map( ( emoji ) => {
-				// Swap in the skin-tone variant for display and
-				// selection; the base record still drives search
-				// matching, usage tracking, and the grid key.
+				/*
+				 * The variant is shown and selected; the base record
+				 * still drives search, usage, and the grid key.
+				 */
 				const display = applySkinTone( emoji, skinTone );
 				return (
 					<Composite.Item
@@ -394,10 +385,11 @@ export default function EmojiPicker( { onSelect, onError }: EmojiPickerProps ) {
 					<Composite
 						role="grid"
 						aria-label={ _x( 'Emoji', 'emoji picker grid label' ) }
-						// A trailing partial row is expected (results rarely
-						// fill a multiple of 8): shift focus to the nearest
-						// cell instead of dead-ending when arrowing down
-						// into a missing column.
+						/*
+						 * Results rarely fill a whole last row, so arrowing
+						 * down into a missing column shifts to the nearest
+						 * cell instead of dead-ending.
+						 */
 						focusShift
 						className="editor-collab-sidebar-panel__picker-list"
 					>

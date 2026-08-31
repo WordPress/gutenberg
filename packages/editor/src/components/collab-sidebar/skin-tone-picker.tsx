@@ -24,14 +24,10 @@ interface SkinToneMenuProps extends SkinTonePickerProps {
 }
 
 /**
- * The six selectable skin tones, in display order. Tone `0` is the
- * default (yellow) presentation — the emoji's base form — and sits
- * leftmost so the default is an explicit, selectable option rather
- * than just the absence of a choice. Tones 1–5 match the Emojibase
- * `tone` values (Fitzpatrick types 1-2 through 6).
- *
- * Every swatch renders the same exemplar emoji (the raised hand) so
- * the only difference between options is the tone itself.
+ * The six skin tones in display order. Tone `0` is the default yellow
+ * presentation, listed first so it is an explicit choice rather than the
+ * absence of one; 1-5 match the Emojibase `tone` values. Every swatch uses
+ * the same exemplar emoji so only the tone differs.
  */
 export const SKIN_TONES: SkinToneOption[] = [
 	{ tone: 0, emoji: '✋', label: __( 'Default skin tone' ) },
@@ -43,12 +39,9 @@ export const SKIN_TONES: SkinToneOption[] = [
 ];
 
 /**
- * Resolve the record to display for an emoji at the given skin tone.
- * Returns the matching entry from the emoji's Emojibase `skins` list,
- * or the base entry when the tone is default (0), the emoji has no
- * skin variants, or the only variants are mixed-tone combinations
- * (whose `tone` is an array and can't be produced by a single-tone
- * preference).
+ * The record to display for an emoji at a given skin tone. Falls back to
+ * the base entry for tone 0, for emoji without variants, and for
+ * mixed-tone variants, which a single-tone preference cannot produce.
  *
  * @param entry Emojibase emoji record.
  * @param tone  Selected tone, 0 (default) through 5.
@@ -86,18 +79,17 @@ function SkinToneMenu( {
 		SKIN_TONES[ 0 ];
 	const selectedOptionId = optionId( current.tone );
 
-	// Per the APG listbox pattern, focus lands on the selected option
-	// (not the first) when the listbox receives focus. The popover's own
-	// focus-on-mount and the composite's `defaultActiveId` race against
-	// item registration, so move focus explicitly once on mount;
-	// focusing the option also makes it the composite's active item.
+	/*
+	 * Per the APG listbox pattern focus lands on the selected option. The
+	 * popover's focus-on-mount and the composite's `defaultActiveId` race
+	 * against item registration, so move focus explicitly on mount.
+	 */
 	useEffect( () => {
 		document.getElementById( selectedOptionId )?.focus();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
-	// With the popover's focus-on-mount disabled, its automatic focus
-	// return is disabled too — restore focus to the toggle on unmount.
+	// Disabling the popover's focus-on-mount also disables its focus return.
 	const focusReturnRef = useFocusReturn();
 
 	return (
@@ -113,10 +105,10 @@ function SkinToneMenu( {
 			</div>
 			<Composite
 				role="listbox"
-				// `orientation` only configures the composite store's
-				// arrow-key handling; it is not rendered to the DOM, so
-				// the ARIA attribute must be set explicitly for assistive
-				// technology to know the options run horizontally.
+				/*
+				 * `orientation` only configures arrow-key handling and is
+				 * not rendered, so set the ARIA attribute explicitly.
+				 */
 				orientation="horizontal"
 				aria-orientation="horizontal"
 				aria-labelledby={ headingId }
@@ -150,10 +142,8 @@ function SkinToneMenu( {
 }
 
 /**
- * Skin tone selector for the emoji picker: a persistent toggle showing
- * the currently selected tone (a raised hand in that tone), opening a
- * flyout of six exemplar swatches under an explicit heading. Selecting
- * a swatch calls `onChange` with the tone number and closes the flyout.
+ * Skin tone selector: a toggle showing the selected tone, opening a flyout
+ * of six swatches under a heading.
  *
  * @param props          Component props.
  * @param props.value    The selected tone, 0–5.
@@ -167,8 +157,7 @@ export default function SkinTonePicker( {
 		SkinTonePicker,
 		'editor-collab-sidebar-panel__skin-tone'
 	);
-	// Mirrors the id `SkinToneMenu` assigns to its heading, so the popup
-	// container can take its accessible name from the visible heading.
+	// Mirrors `SkinToneMenu`'s heading id, to name the popup container.
 	const headingId = `${ baseId }-heading`;
 	const current =
 		SKIN_TONES.find( ( option ) => option.tone === value ) ||
@@ -178,16 +167,14 @@ export default function SkinTonePicker( {
 		<Dropdown
 			popoverProps={ {
 				placement: 'bottom-end',
-				// The flyout wraps a visible heading plus the listbox (a
-				// heading can't live inside a listbox), so the popup
-				// container itself is exposed as a named non-modal dialog
-				// rather than an unnamed generic wrapper.
+				/*
+				 * A heading can't live inside a listbox, so the wrapper is
+				 * exposed as a named non-modal dialog.
+				 */
 				role: 'dialog',
 				'aria-labelledby': headingId,
 			} }
-			// The menu moves focus to the *selected* swatch on mount (per
-			// the APG listbox pattern); the popover's own first-element
-			// focus would land on the first swatch instead.
+			// The menu focuses the selected swatch; this would focus the first.
 			focusOnMount={ false }
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button

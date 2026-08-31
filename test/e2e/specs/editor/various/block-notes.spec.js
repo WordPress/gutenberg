@@ -1191,8 +1191,7 @@ test.describe( 'Block Notes', () => {
 
 			await blockNoteUtils.waitForFullPicker();
 
-			// Navigate with arrow keys and select. The picker grid moves
-			// the roving tabindex with ArrowRight.
+			// The picker grid moves the roving tabindex with ArrowRight.
 			const firstEmoji = page.getByRole( 'gridcell' ).first();
 			await firstEmoji.focus();
 			await page.keyboard.press( 'ArrowRight' );
@@ -1381,7 +1380,6 @@ test.describe( 'Block Notes', () => {
 
 			await blockNoteUtils.waitForFullPicker();
 
-			// The search field is present.
 			await expect(
 				page.getByPlaceholder( 'Search emoji' )
 			).toBeVisible();
@@ -1398,10 +1396,10 @@ test.describe( 'Block Notes', () => {
 			} );
 
 			// Open the full picker and click the plain heart specifically.
-			// "Heart" is a label-overridden curated reaction; the helper's
-			// regex-based gridcell lookup would otherwise pick up the
-			// first "heart"-containing label (e.g. "smiling face with
-			// hearts") instead of the curated red heart.
+			/*
+			 * "Heart" is label-overridden, and the helper's regex lookup
+			 * would otherwise match "smiling face with hearts" first.
+			 */
 			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
 			await blockNoteUtils.waitForFullPicker();
 			await page.getByPlaceholder( 'Search emoji' ).fill( 'Heart' );
@@ -1409,9 +1407,10 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'gridcell', { name: 'Heart', exact: true } )
 				.click();
 
-			// The same reaction button shape that the curated row produces
-			// — contains the heart emoji and a count of 1. If storage
-			// normalization were broken we'd get a stray hex-key button.
+			/*
+			 * The same button the curated row produces. Broken storage
+			 * normalization would leave a stray hex-key button instead.
+			 */
 			const reactionButton = page.locator(
 				'.editor-collab-sidebar-panel__reaction-button'
 			);
@@ -1526,11 +1525,10 @@ test.describe( 'Block Notes', () => {
 				.getByPlaceholder( 'Search emoji' )
 				.fill( 'zzzzzznoresults' );
 
-			// The grid is replaced by an empty-state status message…
+			// The grid is replaced by an empty-state status message.
 			await expect(
 				page.locator( '.editor-collab-sidebar-panel__picker-status' )
 			).toContainText( 'No emoji found.' );
-			// …and no gridcells remain in the DOM.
 			await expect(
 				page.locator( '.editor-collab-sidebar-panel__picker-emoji' )
 			).toHaveCount( 0 );
@@ -1557,9 +1555,7 @@ test.describe( 'Block Notes', () => {
 			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
 			await blockNoteUtils.waitForFullPicker();
 
-			// The section leads the grid, seeded with the curated
-			// reaction set (the red heart carries the "Heart" label
-			// override), so it has content before any recorded picks.
+			// Seeded with the curated set, so it has content before any picks.
 			const frequentSection = page
 				.locator( '.editor-collab-sidebar-panel__picker-list > div' )
 				.filter( { hasText: 'Frequently used' } )
@@ -1588,13 +1584,11 @@ test.describe( 'Block Notes', () => {
 			await page.getByPlaceholder( 'Search emoji' ).fill( 'avocado' );
 			await expect( page.getByText( 'Frequently used' ) ).toBeHidden();
 
-			// Pick it…
 			await page
 				.getByRole( 'gridcell', { name: 'avocado', exact: true } )
 				.click();
 
-			// …and on reopening the picker, the recorded pick has joined
-			// the Frequently used section.
+			// On reopening, the pick has joined the Frequently used section.
 			await page.getByRole( 'button', { name: 'Add reaction' } ).click();
 			await blockNoteUtils.waitForFullPicker();
 			await expect(

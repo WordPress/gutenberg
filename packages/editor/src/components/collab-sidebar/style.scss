@@ -320,12 +320,10 @@ mark.wp-note {
 	overflow-y: auto;
 }
 
-// Emoji targets (quick row, skin-tone swatches, full-picker grid cells)
-// are 32px squares: an intentional compact density matching peer emoji
-// pickers (GitHub, Slack) and the editor's compact button size. This
-// clears the WCAG 2.2 AA 24px minimum (2.5.8) but not the AAA 44px
-// target of 2.5.5 (Enhanced) — at 44px an 8-column grid would exceed
-// the sidebar-anchored popover's practical width.
+// 32px emoji targets: compact density matching peer pickers and the
+// editor's compact button size. Clears the WCAG 2.2 AA 24px minimum
+// (2.5.8) but not the AAA 44px target (2.5.5), at which an 8-column grid
+// would outgrow the sidebar-anchored popover.
 .editor-collab-sidebar-panel__emoji-option {
 	// Pin the track to 32px so the `max-width` above lands exactly 8 emoji
 	// per row; the compact Button's own padding and minimum size would
@@ -337,8 +335,7 @@ mark.wp-note {
 	justify-content: center;
 }
 
-// Curated fallback shown when the full picker's module or dataset
-// fails to load: the quick row stays usable, with a retry affordance.
+// Curated fallback shown when the full picker's module or dataset fails.
 .editor-collab-sidebar-panel__picker-fallback-note {
 	display: flex;
 	align-items: center;
@@ -348,18 +345,13 @@ mark.wp-note {
 	font-size: var(--wpds-typography-font-size-xs);
 }
 
-// Full picker popover: width is driven by the picker itself (below) so
-// the popover wrapper fits its content via Popover's default
-// `width: min-content`. Setting width on the wrapper instead leaves
-// horizontal slack between the picker and the popover edge.
+// Width comes from the picker below, so the wrapper fits it via Popover's
+// default `width: min-content`; sizing the wrapper instead leaves slack.
 //
-// `contentClassName` from `Dropdown` lands on the outer
-// `.components-popover` wrapper. The inner `.components-popover__content`
-// is where Dropdown's default 8px padding lives — zero it out here so
-// the picker can manage its own internal padding (search margin,
-// viewport padding-inline, list padding-bottom) without an extra ring
-// of empty surface around it. Surface, radius, and elevation are the
-// popover defaults so the picker matches every other editor popover.
+// `contentClassName` lands on the outer `.components-popover`, while
+// Dropdown's 8px padding lives on `.components-popover__content`. Zero it
+// so the picker manages its own padding. Surface, radius, and elevation
+// stay at the popover defaults.
 .editor-collab-sidebar-panel__picker-popover {
 	.components-popover__content {
 		padding: 0;
@@ -367,14 +359,11 @@ mark.wp-note {
 }
 
 .editor-collab-sidebar-panel__picker {
-	// Shared grid geometry, derived once from the WPDS tokens so the
-	// width calculation below can never disagree with the rendered
-	// cells, gaps, and padding. The scrollbar allowance is a deliberate,
-	// isolated estimate: `scrollbar-gutter: stable` reserves the real
-	// scrollbar width at layout time, but that width isn't readable
-	// from CSS, so the popover budgets ~17px (the common classic
-	// scrollbar; overlay-scrollbar platforms reserve nothing and simply
-	// get a slightly roomier viewport).
+	// Grid geometry derived once from the tokens, so the width below can
+	// never disagree with the rendered cells, gaps, and padding.
+	// `scrollbar-gutter: stable` reserves a width CSS cannot read, so
+	// budget ~17px; overlay-scrollbar platforms just get a roomier
+	// viewport.
 	--emoji-picker-cell-size: var(--wpds-dimension-size-md);
 	--emoji-picker-gap: var(--wpds-dimension-gap-xs);
 	--emoji-picker-viewport-padding: var(--wpds-dimension-padding-xs);
@@ -382,10 +371,8 @@ mark.wp-note {
 
 	display: flex;
 	flex-direction: column;
-	// Width sized to the 8-column emoji grid plus the viewport's
-	// reserved scrollbar gutter, so the popover wraps the visible
-	// emoji area without buttons shrinking under flex pressure when
-	// the scrollbar is present.
+	// The 8-column grid plus the reserved scrollbar gutter, so buttons
+	// don't shrink under flex pressure once a scrollbar appears.
 	width: calc(8 * var(--emoji-picker-cell-size) + 7 * var(--emoji-picker-gap) + 2 * var(--emoji-picker-viewport-padding) + var(--emoji-picker-scrollbar-allowance));
 	height: 320px;
 	font-family: var(--wpds-typography-font-family-body);
@@ -394,8 +381,7 @@ mark.wp-note {
 	isolation: isolate;
 }
 
-// Search field with the persistent skin-tone toggle beside it, so the
-// current tone is always visible while the picker is open.
+// Search field with the skin-tone toggle beside it.
 .editor-collab-sidebar-panel__picker-search {
 	display: flex;
 	align-items: center;
@@ -410,9 +396,7 @@ mark.wp-note {
 
 .editor-collab-sidebar-panel__skin-tone-toggle {
 	flex-shrink: 0;
-	// A fixed square matching the emoji grid cells, so the toggle keeps
-	// the compact icon-button footprint instead of growing with its
-	// emoji text content.
+	// Fixed square, so the toggle doesn't grow with its emoji content.
 	width: var(--emoji-picker-cell-size);
 	padding: 0;
 	font-size: 18px;
@@ -437,8 +421,7 @@ mark.wp-note {
 }
 
 .editor-collab-sidebar-panel__skin-tone-option {
-	// Rendered in its own flyout popover, outside the picker's scope,
-	// so this reads the WPDS size token directly.
+	// In its own flyout, outside the picker's scope, so read the token here.
 	width: var(--wpds-dimension-size-md);
 	font-size: 18px;
 	justify-content: center;
@@ -451,8 +434,7 @@ mark.wp-note {
 .editor-collab-sidebar-panel__picker-viewport {
 	flex: 1;
 	overflow: auto;
-	// Always reserve scrollbar space so the emoji grid doesn't shift
-	// or shrink when content height crosses the scroll threshold.
+	// Reserved always, so the grid doesn't shift when scrolling kicks in.
 	scrollbar-gutter: stable;
 	position: relative;
 	padding-inline: var(--emoji-picker-viewport-padding);
@@ -473,11 +455,8 @@ mark.wp-note {
 	position: sticky;
 	top: 0;
 	padding: var(--wpds-dimension-padding-sm);
-	// Match the popover's surface: `.components-popover` paints `$white`
-	// (not a WPDS token), and rows scrolling underneath must disappear
-	// behind exactly that color — a token here could drift from the
-	// actual popover background. Swap both together if the popover
-	// surface ever moves to a token.
+	// `.components-popover` paints `$white`, not a token, and rows must
+	// scroll behind exactly that color. Move both together if it changes.
 	background-color: $white;
 	color: var(--wpds-color-foreground-content-neutral-weak);
 	font-size: var(--wpds-typography-font-size-xs);
@@ -488,9 +467,9 @@ mark.wp-note {
 .editor-collab-sidebar-panel__picker-row {
 	display: flex;
 	gap: var(--emoji-picker-gap);
-	// Skip rendering offscreen rows so the full ~250-row list mounts
-	// quickly. The intrinsic-size hint matches the actual button row
-	// height so scroll geometry stays accurate.
+	// Skip offscreen rows so the ~250-row list mounts quickly; the
+	// intrinsic-size hint matches the real row height to keep scroll
+	// geometry accurate.
 	content-visibility: auto;
 	contain-intrinsic-size: auto var(--emoji-picker-cell-size);
 }
@@ -508,26 +487,20 @@ mark.wp-note {
 	cursor: var(--wpds-cursor-control);
 	font-size: 18px;
 	line-height: 1;
-	// Keep the focused cell clear of the sticky category header (and
-	// give the focus ring breathing room at the bottom edge) when
-	// keyboard navigation scrolls it into view.
+	// Keep a keyboard-scrolled cell clear of the sticky category header.
 	scroll-margin-block: $grid-unit-40 $grid-unit-05;
 
-	// Highlight the cell under the pointer and the cell the roving
-	// tabindex is on — but only while it actually holds focus. The
-	// composite keeps `data-active-item` on the last active cell even
-	// when focus is elsewhere (e.g. the search field on open), and a
-	// highlight without focus reads as a phantom selection.
+	// Only highlight the roving-tabindex cell while it holds focus: the
+	// composite keeps `data-active-item` set when focus is elsewhere, and
+	// a highlight without focus reads as a phantom selection.
 	&:hover,
 	&[data-active-item]:focus {
 		background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 	}
 
 	&:focus-visible {
-		// An inset ring instead of the standard outset ring: grid rows
-		// use `content-visibility: auto`, whose paint containment clips
-		// ink overflow at the row box — an outset ring loses its top and
-		// bottom edges (and its left edge on first-column cells).
+		// Inset, not the standard outset ring: `content-visibility: auto`
+		// clips ink overflow at the row box, which would cut its edges.
 		outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
 		outline-offset: calc(-1 * var(--wpds-border-width-focus));
 	}

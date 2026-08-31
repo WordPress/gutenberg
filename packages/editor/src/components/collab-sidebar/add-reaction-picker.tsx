@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react';
 import { __ } from '@wordpress/i18n';
 import { Button, Dropdown } from '@wordpress/components';
-// `IconButton` is not yet on the recommended list while the Design System
-// reviews its consistency alongside `@wordpress/components` (see
-// WordPress/gutenberg#76135). It is used here deliberately so the trigger
-// matches the reaction pills it sits beside.
+/*
+ * `IconButton` is pending Design System review (WordPress/gutenberg#76135);
+ * used here so the trigger matches the reaction pills beside it.
+ */
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { IconButton } from '@wordpress/ui';
 import { SVG, Path } from '@wordpress/primitives';
@@ -48,35 +48,24 @@ const smileyIcon = (
 	</SVG>
 );
 
-/**
- * Load the full emoji picker module. Shared between the lazy component
- * and the hover/focus prefetch so both resolve through the same module
- * request.
- */
+// Shared by the lazy component and the prefetch, so both hit one request.
 function loadEmojiPicker() {
 	return import( './emoji-picker' );
 }
 
 /**
- * Lazy-load the full emoji picker, so its module body runs the first
- * time a user opens (or hovers) the add-reaction trigger in a session
- * rather than on every editor load. The Emojibase JSON dataset is
- * fetched separately on first open.
+ * Lazy-load the full picker so its module body runs on first hover or open
+ * rather than on every editor load.
  *
- * Whether this also defers a *download* depends on the bundler. npm
- * consumers who code-split get a separate chunk; the WordPress plugin
- * build does not, because `wpScript` packages are bundled as a single
- * IIFE (`packages/wp-build/lib/build.mjs`) and esbuild cannot split that
- * format -- there, esbuild inlines the module behind a lazy initializer
- * inside `wp-editor.js`.
+ * Whether a *download* is also deferred depends on the bundler: npm
+ * consumers who code-split get a chunk, while the plugin build bundles
+ * `wpScript` packages as one IIFE that esbuild cannot split.
  */
 const FullEmojiPicker = lazy( loadEmojiPicker );
 
 /**
- * Warm the full picker before it opens: resolve the lazy picker module
- * and start fetching the Emojibase dataset for the active locale. Both
- * loaders cache, so calling this repeatedly (every hover) is free after
- * the first invocation.
+ * Warm the picker before it opens. Both loaders cache, so repeat calls on
+ * every hover are free.
  *
  * @param baseUrl Same-origin URL of the Emojibase dataset directory.
  */
@@ -87,17 +76,15 @@ function prefetchFullPicker( baseUrl: string | null ): void {
 	}
 }
 
-// `Dropdown`'s popover renders through the active `Popover.Slot` when
-// one exists (falling back to a `<body>`-level container), so either
-// way it escapes the `overflow: hidden` chain on the collab sidebar
-// (`.interface-interface-skeleton__sidebar`,
-// `.editor-collab-sidebar`, `.editor-collab-sidebar-panel`).
+/*
+ * `Dropdown`'s popover renders through `Popover.Slot` or a `<body>`-level
+ * container, so either way it escapes the sidebar's `overflow: hidden`.
+ */
 const POPOVER_PROPS = { placement: 'bottom-end' } as const;
 
 /**
- * Visible loading state shown while the lazy picker chunk resolves.
- * The announcement goes through the `@wordpress/a11y` announcer — its
- * live regions exist before this message — because a live region
+ * Loading state for the lazy picker chunk. Announced via the
+ * `@wordpress/a11y` announcer, whose live regions already exist: one
  * mounted together with its content is not reliably announced.
  */
 function PickerLoading() {
@@ -119,12 +106,9 @@ interface PickerErrorBoundaryProps {
 }
 
 /**
- * Catches render-time failures from the lazy picker — most notably a
- * rejected chunk import, which `Suspense` does not handle — and defers
- * to the parent, which swaps in the curated fallback picker. A rejected
- * import only happens where the picker is a real chunk (see
- * `FullEmojiPicker`); everywhere else this still guards a throw from the
- * picker's own render.
+ * Catches render-time failures from the lazy picker, including a rejected
+ * chunk import that `Suspense` does not handle, so the parent can swap in
+ * the curated fallback.
  */
 class PickerErrorBoundary extends Component< PickerErrorBoundaryProps > {
 	state = { hasError: false };
@@ -149,18 +133,12 @@ interface AddReactionButtonProps {
 }
 
 /**
- * Standalone add-reaction button. Opens the full searchable emoji
- * picker directly; its "Frequently used" section is seeded with the
- * curated reaction set, so the previous quick-row picks stay one click
- * away.
+ * Standalone add-reaction button, opening the full searchable picker with
+ * its "Frequently used" section seeded from the curated set.
  *
- * The full picker only renders when the `noteEmojibaseUrl` block
- * editor setting is present — the Gutenberg plugin injects it via the
- * `block_editor_settings_all` PHP filter, and npm consumers of the
- * editor package opt in by passing the same setting with a URL
- * pointing at a self-hosted emojibase dataset. Without it — or when
- * the picker module or its dataset fails to load — the curated quick
- * row is offered instead, so adding a reaction keeps working.
+ * The full picker needs the `noteEmojibaseUrl` editor setting. Without it,
+ * or when the module or dataset fails to load, the curated quick row is
+ * offered instead so adding a reaction keeps working.
  *
  * @param props                  Component props.
  * @param props.noteId           The parent note comment ID.
@@ -182,9 +160,10 @@ export function AddReactionButton( {
 	const { baseUrl } = useEmojibaseConfig();
 	const hasFullPicker = !! baseUrl;
 	const [ pickerFailed, setPickerFailed ] = useState( false );
-	// A rejected `lazy()` memoizes its failure, so retrying needs a
-	// fresh lazy component. The module request itself is cached by the
-	// bundler once it succeeds, so replacements resolve instantly.
+	/*
+	 * A rejected `lazy()` memoizes its failure, so a retry needs a fresh
+	 * component; the underlying module request stays cached.
+	 */
 	const [ LazyPicker, setLazyPicker ] = useState( () => FullEmojiPicker );
 	const [ retryKey, setRetryKey ] = useState( 0 );
 
@@ -201,8 +180,7 @@ export function AddReactionButton( {
 
 	const retryFullPicker = () => {
 		setLazyPicker( () => lazy( loadEmojiPicker ) );
-		// Remount the error boundary so a caught chunk failure is
-		// cleared along with the failed state.
+		// Remount the error boundary to clear a caught chunk failure.
 		setRetryKey( ( key ) => key + 1 );
 		setPickerFailed( false );
 	};
@@ -214,11 +192,11 @@ export function AddReactionButton( {
 			className="editor-collab-sidebar-panel__add-reaction"
 			popoverProps={ {
 				...POPOVER_PROPS,
-				// The popup wraps a searchbox, a nested popup trigger, and
-				// a grid (full picker) or a listbox (curated fallback), and
-				// the popover constrains tabbing within it — expose it as a
-				// named non-modal dialog instead of an unnamed generic
-				// container so screen readers announce where focus landed.
+				/*
+				 * The popover constrains tabbing, so name it as a
+				 * non-modal dialog rather than leave screen readers with
+				 * an unnamed generic container.
+				 */
 				role: 'dialog',
 				'aria-label': __( 'Add reaction' ),
 			} }
@@ -239,11 +217,7 @@ export function AddReactionButton( {
 					aria-expanded={ isOpen }
 					disabled={ disabled }
 					onClick={ onToggle }
-					// Warm up the picker while the user is still
-					// deciding: hovering or focusing the trigger starts
-					// loading the lazy picker module and the Emojibase
-					// dataset, so the popover usually opens fully
-					// populated.
+					// Warm the picker so the popover opens populated.
 					onMouseEnter={
 						hasFullPicker
 							? () => prefetchFullPicker( baseUrl )
@@ -259,16 +233,15 @@ export function AddReactionButton( {
 			renderContent={ ( { onClose } ) => {
 				const pickReaction = ( slug: string ) => {
 					onClose();
-					// Invalidate cached tooltip names since adding this
-					// reaction changes the set of users for the slug.
+					// Adding a reaction changes the slug's reactor list.
 					invalidateReactionNames( noteId, slug );
 					onToggleReaction( slug );
 				};
 				const pickCurated = ( slug: string ) => {
-					// Keep counting picks toward the full picker's
-					// "Frequently used" section so the history is
-					// warm if the site later provides an Emojibase
-					// URL.
+					/*
+					 * Still count picks, so "Frequently used" is warm if
+					 * the site later serves an Emojibase URL.
+					 */
 					recordUse(
 						emojiToHexKey( emojiBySlug.get( slug )?.emoji ?? '' )
 					);
@@ -304,11 +277,11 @@ export function AddReactionButton( {
 						<Suspense fallback={ <PickerLoading /> }>
 							<LazyPicker
 								onSelect={ ( emoji ) =>
-									// Match against the filtered curated
-									// list, not just the defaults, so a
-									// filter-provided emoji picked here
-									// stores under the same slug as a
-									// quick-row pick.
+									/*
+									 * Match the filtered list, not the
+									 * defaults, so a filter-provided
+									 * emoji stores under the same slug.
+									 */
 									pickReaction(
 										emojiToStorageKey( emoji, emojis )
 									)

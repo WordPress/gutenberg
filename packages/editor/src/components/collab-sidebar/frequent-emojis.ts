@@ -17,27 +17,18 @@ export interface FrequentEmojiEntry {
 }
 
 /**
- * Preference key (in the `core` scope) storing the user's frequently
- * used emoji as an ordered array of `{ key, count }` entries, where
- * `key` is the normalized hex key of the base (untoned) emoji and
- * `count` is how many times it has been picked. The array is kept
- * sorted by count (descending) with ties broken by recency, and capped
- * at `MAX_FREQUENT_EMOJIS`.
+ * Preference key (`core` scope) storing frequently used emoji as
+ * `{ key, count }` entries, sorted by count with recency breaking ties and
+ * capped at `MAX_FREQUENT_EMOJIS`.
  */
 export const FREQUENT_EMOJIS_PREFERENCE_KEY = 'emojiPickerFrequentEmojis';
 
-/**
- * Cap on stored frequently-used emoji: four rows of the picker's
- * 8-column grid. Once full, the least used entry is discarded when a
- * new emoji is picked.
- */
+// Four rows of the picker's 8-column grid.
 export const MAX_FREQUENT_EMOJIS = 32;
 
 /**
- * Hex keys of the curated reaction set, used to seed the
- * frequently-used section before the user has picked anything. The
- * seeds are never persisted — they are appended at display time and
- * fall away as real usage fills the list.
+ * Seeds the frequently-used section before any picks. Never persisted:
+ * appended at display time, and they fall away as usage fills the list.
  */
 export const DEFAULT_FREQUENT_EMOJI_KEYS = REACTION_EMOJIS.map( ( entry ) =>
 	emojiToHexKey( entry.emoji )
@@ -66,12 +57,9 @@ function sanitizeEntries( entries: unknown ): FrequentEmojiEntry[] {
 }
 
 /**
- * Return a new usage list with one more use of `key` recorded. The
- * bumped entry is placed ahead of entries with the same or a lower
- * count (frequency first, recency as the tie-break). When the list
- * exceeds `MAX_FREQUENT_EMOJIS`, the least used entry — other than the
- * one just recorded — is discarded, so a newly picked emoji always
- * makes it into the list.
+ * Record one more use of `key`, placing it ahead of entries with the same
+ * or a lower count. Over the cap, the least used entry other than the one
+ * just recorded is discarded, so a new pick always lands.
  *
  * @param entries Current `{ key, count }` entries.
  * @param key     Normalized hex key of the picked emoji.
@@ -90,8 +78,7 @@ export function recordEmojiUse(
 	const index = next.findIndex( ( e ) => e.count <= count );
 	next.splice( index === -1 ? next.length : index, 0, { key, count } );
 	while ( next.length > MAX_FREQUENT_EMOJIS ) {
-		// Evict from the tail (lowest count, least recent among ties),
-		// skipping the just-recorded key.
+		// Evict from the tail, skipping the just-recorded key.
 		let evictIndex = next.length - 1;
 		if ( next[ evictIndex ].key === key ) {
 			evictIndex -= 1;
@@ -102,10 +89,8 @@ export function recordEmojiUse(
 }
 
 /**
- * Resolve the ordered list of hex keys to show in the "Frequently
- * used" section: recorded usage first (already sorted by frequency),
- * padded with the curated default reactions the user hasn't recorded
- * yet, capped at `MAX_FREQUENT_EMOJIS`.
+ * Hex keys for the "Frequently used" section: recorded usage first, padded
+ * with unrecorded curated defaults, capped at `MAX_FREQUENT_EMOJIS`.
  *
  * @param entries     Stored `{ key, count }` entries.
  * @param defaultKeys Hex keys used to seed the list before usage fills it.
@@ -127,10 +112,9 @@ export function getFrequentEmojiKeys(
 }
 
 /**
- * Hook exposing the persisted frequently-used emoji list and a
- * `recordUse` callback. Usage is stored per user through the
- * preferences store (`core` scope), the same channel as the skin tone
- * preference, so it follows the user across sessions and browsers.
+ * The persisted frequently-used list and a `recordUse` callback. Usage is
+ * stored per user in the preferences store, so it follows them across
+ * sessions and browsers.
  *
  * @return The display-ready hex keys and the usage recorder.
  */
@@ -139,9 +123,10 @@ export function useFrequentEmojis(): {
 	recordUse: ( key: string ) => void;
 } {
 	const registry = useRegistry();
-	// Seed from the filtered curated list (not just the shipped
-	// defaults) so a site using the `gutenberg_note_reaction_emojis`
-	// filter sees its own reaction set before usage fills the list.
+	/*
+	 * Seed from the filtered list, not the shipped defaults, so a site
+	 * using `gutenberg_note_reaction_emojis` sees its own set.
+	 */
 	const emojis = useReactionEmojis();
 	const frequentKeys = useSelect(
 		( select ) =>
@@ -156,8 +141,7 @@ export function useFrequentEmojis(): {
 	);
 	const recordUse = useCallback(
 		( key: string ) => {
-			// Read the latest stored value at call time so back-to-back
-			// picks never clobber each other through a stale closure.
+			// Read at call time so back-to-back picks don't clobber.
 			const entries = registry
 				.select( preferencesStore )
 				.get( 'core', FREQUENT_EMOJIS_PREFERENCE_KEY );

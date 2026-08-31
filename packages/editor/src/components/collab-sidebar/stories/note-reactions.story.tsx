@@ -14,10 +14,8 @@ import { AddReactionButton } from '../add-reaction-picker';
 type ReactionSummary = Record< string, { count: number; reacted: boolean } >;
 
 /**
- * Sample reaction summary, keyed by reaction slug. Curated reactions are
- * stored under their named slug ("heart"); reactions picked from the
- * full emoji picker are stored under a hex-codepoint key ("1f338" is 🌸)
- * and have their tooltip label resolved from the Emojibase dataset.
+ * Sample summary covering both storage forms: a curated slug ("heart") and
+ * a full-picker hex key ("1f338" is 🌸).
  */
 const INITIAL_REACTIONS: ReactionSummary = {
 	heart: { count: 2, reacted: true },
@@ -25,15 +23,11 @@ const INITIAL_REACTIONS: ReactionSummary = {
 };
 
 /**
- * The complete Notes reaction row as rendered in the collab sidebar
- * (see `note.js`): the smiley button opens the curated 5-emoji quick
- * row, whose trailing `+` option swaps in the full searchable emoji
- * picker, and existing reactions render as toggleable count pills.
+ * The Notes reaction row as rendered in the collab sidebar: an add button
+ * opening the picker, plus toggleable count pills.
  *
- * State is simulated locally so picking an emoji from either view
- * adds/toggles a pill just like it does against a real site. User-name
- * tooltips fall back to plain counts because there is no REST API in
- * Storybook.
+ * State is simulated locally. Tooltips fall back to plain counts, since
+ * Storybook has no REST API.
  *
  * @param props                  Component props.
  * @param props.onToggleReaction Called with the slug of the toggled reaction.

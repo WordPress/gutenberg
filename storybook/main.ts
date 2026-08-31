@@ -23,16 +23,12 @@ function getAbsolutePath( packageName: string ) {
 
 /**
  * Serve the English Emojibase dataset for the Editor/EmojiPicker story,
- * mirroring the `build/emojibase-data/<locale>/` layout the Gutenberg
- * plugin exposes via the `noteEmojibaseUrl` editor setting. Only `en` is
- * mapped (the story pins the document language) to keep the published
- * Storybook artifact small.
+ * mirroring the `build/emojibase-data/<locale>/` layout. Only `en` is
+ * mapped, to keep the published Storybook artifact small.
  *
- * The path is resolved rather than hardcoded to `node_modules/`, matching
- * `tools/build-scripts/copy-emojibase-data.mjs`: the package is declared
- * by the `tools/build-scripts` workspace, so a non-hoisted install would
- * otherwise leave Storybook pointing at a directory that isn't there.
- * A missing package costs the story its data, not the whole Storybook.
+ * Resolved rather than hardcoded to `node_modules/`, since the package is
+ * declared by the `tools/build-scripts` workspace and a non-hoisted
+ * install would otherwise point at a missing directory.
  */
 function emojibaseStaticDirs() {
 	try {

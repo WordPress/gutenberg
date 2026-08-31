@@ -6,16 +6,12 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import EmojiPicker from '../emoji-picker';
 
 /**
- * The full searchable emoji picker used by Notes reactions in the
- * collab sidebar. It renders an 8-column grid of all Emojibase emoji
- * grouped by category, with a search field filtering on labels and
- * tags.
+ * The full searchable emoji picker used by Notes reactions: an 8-column
+ * grid grouped by category, filtered by label and tag search.
  *
- * The component reads its dataset from the `noteEmojibaseUrl` block
- * editor setting (populated by the Gutenberg plugin server-side). In
- * Storybook the English dataset is served from a static directory
- * mapped in `storybook/main.ts`, and the document language is pinned
- * to `en` so locale detection is deterministic.
+ * The dataset comes from the `noteEmojibaseUrl` editor setting. Storybook
+ * serves the English one from a static directory mapped in
+ * `storybook/main.ts`, with the document language pinned to `en`.
  */
 const meta: Meta< typeof EmojiPicker > = {
 	title: 'Editor/EmojiPicker',

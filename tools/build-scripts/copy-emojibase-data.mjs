@@ -1,15 +1,13 @@
 #!/usr/bin/env node
 /**
- * Copy Emojibase locale data into Gutenberg's `build/emojibase-data/`
- * directory so the editor's emoji picker can fetch translated emoji
- * labels and category names same-origin without inlining the data into
- * the JS bundle. Files are loaded per-locale at runtime (one locale per
- * editor session), so the disk cost on the build artifact does not
- * translate into a network cost for users.
+ * Copy Emojibase locale data into `build/emojibase-data/` so the emoji
+ * picker fetches labels and category names same-origin rather than
+ * inlining them into the JS bundle. One locale is fetched per editor
+ * session, so the disk cost is not a network cost.
  *
- * Runs as a step in `tools/build-scripts/build.mjs`, after wp-build has
- * populated `build/`. Exits 0 even when emojibase-data is missing — the
- * editor gracefully degrades by hiding the "More emojis" trigger.
+ * Runs from `tools/build-scripts/build.mjs` after wp-build populates
+ * `build/`. Exits 0 when emojibase-data is missing: the editor degrades
+ * by hiding the "More emojis" trigger.
  */
 
 import { mkdir, copyFile } from 'fs/promises';
@@ -22,11 +20,11 @@ const require = createRequire( import.meta.url );
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 const ROOT_DIR = path.resolve( __dirname, '../..' );
 
-// Resolve emojibase-data via node module resolution so this works whether
-// the dependency is hoisted to the repo root or nested in this workspace.
-// An unresolvable module is the same "not installed" case the copy step
-// skips over, so it must not escape as a module-resolution throw and take
-// the whole plugin build down with it.
+/*
+ * Resolved through node so a hoisted or nested install both work. An
+ * unresolvable module is the same "not installed" case the copy step
+ * skips, so it must not throw and take the plugin build down with it.
+ */
 const SRC_DIR = resolveEmojibaseDir();
 
 function resolveEmojibaseDir() {
@@ -39,15 +37,16 @@ function resolveEmojibaseDir() {
 
 const DEST_DIR = path.join( ROOT_DIR, 'build', 'emojibase-data' );
 
-// We only ever fetch data.json and messages.json. Shipping just those
-// two files per locale keeps the rest of the upstream package
-// (~50MB unpacked) out of the plugin distribution.
+// Only these two are fetched; the rest of the ~49MB package is skipped.
 const FILES = [ 'data.json', 'messages.json' ];
 
-// All locales Emojibase ships translated data for. Keep in sync with
-// `EMOJIBASE_LOCALES` in `packages/editor/src/components/collab-sidebar/
-// emojibase-data.js`. Each locale adds ~85KB gzipped on disk; only the
-// active locale is fetched per editor session.
+/*
+ * Every locale Emojibase translates. Must stay in sync with
+ * `EMOJIBASE_LOCALES` in
+ * `packages/editor/src/components/collab-sidebar/emojibase-data.ts`.
+ * Each locale costs ~780KB on disk (~22MB total), ~95KB gzipped over the
+ * wire, and only the active one is fetched per editor session.
+ */
 const LOCALES = [
 	'bn',
 	'da',

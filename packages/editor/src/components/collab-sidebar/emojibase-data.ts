@@ -3,36 +3,24 @@ import { useSelect } from '@wordpress/data';
 // @ts-expect-error - No type declarations available for @wordpress/block-editor
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
-/**
- * Emojibase data loading shared between the full emoji picker (lazy
- * loaded) and the reaction pills (eager, label lookups only). This
- * module stays dependency-light so importing it eagerly doesn't pull
- * the picker UI into the main bundle; the heavy part — the per-locale
- * JSON dataset — is only ever fetched on demand.
+/*
+ * Emojibase loading shared by the full picker (lazy) and the reaction
+ * pills (eager, labels only). Kept dependency-light so importing it does
+ * not pull the picker UI into the main bundle.
  */
 
 /**
  * Emojibase configuration read from the block editor settings.
  */
 export interface EmojibaseConfig {
-	/**
-	 * Same-origin base URL of the Emojibase dataset directory, or null
-	 * when the site doesn't provide one (the full picker is unavailable).
-	 */
+	// Null when the site serves no dataset, which hides the full picker.
 	baseUrl: string | null;
-	/**
-	 * Per-emoji label overrides keyed by Emojibase hexcode, or null.
-	 */
 	labelOverrides: Record< string, string > | null;
 }
 
 /**
  * Read the Emojibase configuration from the block editor settings. The
- * Gutenberg plugin populates the `noteEmojibaseUrl` and
- * `noteEmojiLabelOverrides` settings server-side (via the
- * `block_editor_settings_all` filter); npm consumers of the editor
- * package opt in by providing the same settings, with the URL pointing
- * at a self-hosted Emojibase dataset.
+ * plugin sets these server-side; npm consumers supply them themselves.
  *
  * @return The Emojibase base URL and label overrides.
  */
@@ -59,13 +47,12 @@ export interface EmojibaseSkin {
 	hexcode: string;
 	emoji: string;
 	label?: string;
-	// A single Fitzpatrick tone, or an array for mixed-tone combinations.
+	// One Fitzpatrick tone, or an array for mixed-tone combinations.
 	tone?: number | number[];
 }
 
 /**
- * A subset of the Emojibase emoji record shape, covering the fields the
- * picker and reaction pills read.
+ * The subset of an Emojibase record the picker and pills read.
  */
 export interface EmojibaseEntry {
 	hexcode: string;
@@ -110,11 +97,9 @@ export interface EmojibaseDataState {
 	error: Error | null;
 }
 
-/**
- * Locales for which Emojibase ships translated labels and tags. Built
- * from the directory listing of the `emojibase-data` npm package, kept
- * in sync with the `LOCALES` set copied by
- * `tools/build-scripts/copy-emojibase-data.mjs`.
+/*
+ * Locales Emojibase ships translated labels for. Must stay in sync with
+ * `LOCALES` in `tools/build-scripts/copy-emojibase-data.mjs`.
  */
 export const EMOJIBASE_LOCALES = new Set( [
 	'bn',
@@ -163,9 +148,10 @@ export function resolveEmojibaseLocale( raw: string ): string {
 	if ( EMOJIBASE_LOCALES.has( normalized ) ) {
 		return normalized;
 	}
-	// Special-case Traditional Chinese variants. Must run before the
-	// language-portion fallback, since `zh` is itself a supported locale
-	// and would otherwise swallow `zh-tw`/`zh-hk`/`zh-mo`.
+	/*
+	 * Must precede the language-portion fallback: `zh` is itself a
+	 * supported locale and would otherwise swallow these.
+	 */
 	if ( [ 'zh-tw', 'zh-hk', 'zh-mo' ].includes( normalized ) ) {
 		return 'zh-hant';
 	}
@@ -314,11 +300,9 @@ export function useEmojibaseData(
 }
 
 /**
- * Normalize an Emojibase hexcode (`2764-FE0F`) to the reaction storage
- * key form: lowercase, zero-padded to four digits, with variation
- * selector U+FE0F segments removed (`2764`). Must agree with
- * `emojiToHexKey()` in `reaction-emoji-picker.tsx` -- the two meet
- * whenever a stored reaction is looked up in the dataset.
+ * Normalize an Emojibase hexcode (`2764-FE0F`) to the reaction storage key
+ * form: lowercase, four-digit padded, U+FE0F stripped (`2764`). Must agree
+ * with `emojiToHexKey()` in `reaction-emoji-picker.tsx`.
  *
  * @param hexcode Emojibase hexcode.
  * @return Normalized hex key.
@@ -338,12 +322,9 @@ const labelMapCache = new Map< string, Map< string, string > >();
 /**
  * Look up a site's label override for an Emojibase entry.
  *
- * The server writes override keys in normalized form -- U+FE0F stripped
- * and zero-padded (see `gutenberg_emoji_picker_label_overrides`) --
- * while a quarter of Emojibase's own `hexcode` values keep the selector
- * (`2764-FE0F-200D-1F525` for ❤️‍🔥). Matching the raw hexcode first keeps
- * an override written against the dataset working; the normalized form
- * catches the server's.
+ * Emojibase hexcodes may keep U+FE0F (`2764-FE0F-200D-1F525`) while the
+ * server writes keys normalized without it, so try the raw hexcode first
+ * and the normalized form second.
  *
  * @param overrides Map of `hexcode => translated label`, or null.
  * @param hexcode   The entry's Emojibase hexcode.
@@ -363,10 +344,9 @@ export function getOverrideLabel(
 }
 
 /**
- * Build (and cache) a Map from normalized hex key to user-facing emoji
- * label for a loaded dataset, applying any per-site label overrides.
- * The overrides are page-static (they come from the editor settings),
- * so the cache is keyed by dataset alone.
+ * Build (and cache) a normalized-hex-key to label Map for a dataset,
+ * applying per-site overrides. Overrides come from editor settings and are
+ * page-static, so the cache is keyed by dataset alone.
  *
  * @param cacheKey  `baseUrl|locale` cache key.
  * @param data      Emojibase emoji records.
@@ -394,9 +374,7 @@ function buildLabelMap(
 			continue;
 		}
 		indexEntry( entry.hexcode, entry.label );
-		// Skin-tone variants are stored under their own hex keys when
-		// picked with a non-default skin tone preference, so index them
-		// too for reaction pill tooltips.
+		// Non-default skin tones are stored under their own hex keys.
 		if ( Array.isArray( entry.skins ) ) {
 			for ( const skin of entry.skins ) {
 				if ( skin.hexcode && skin.label ) {
@@ -437,18 +415,12 @@ export function getCachedEmojiLabel(
 }
 
 /**
- * React hook resolving the user-facing label for a hex-key reaction
- * (a pick from the full emoji picker), so reaction pill tooltips can
- * show the emoji name just like curated reactions do.
- *
- * An already-loaded dataset resolves synchronously from the module
- * cache, shared with the full picker. Fetching one that isn't loaded
- * waits for `load`: the per-locale dataset is ~775KB of JSON, too much
- * to pull down and parse just because a note happens to carry a
- * full-picker reaction. Callers pass the same signal that fetches the
- * rest of the tooltip, so the cost lands when the tooltip is wanted.
- * Until then the pill falls back to the emoji character, which assistive
- * technology announces by its own Unicode name.
+ * Resolve the label for a hex-key reaction so its pill tooltip reads like a
+ * curated one. A loaded dataset resolves from the module cache; otherwise
+ * the fetch waits for `load`, since the dataset is ~775KB and should not be
+ * pulled just because a note carries a full-picker reaction. Until then the
+ * emoji character stands in, which assistive technology announces by its
+ * Unicode name.
  *
  * @param hexKey  Normalized reaction hex key, e.g. `1f44d`.
  * @param enabled Whether resolution should run (false for curated

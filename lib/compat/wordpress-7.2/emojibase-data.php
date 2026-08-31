@@ -1,25 +1,19 @@
 <?php
 /**
- * Exposes a same-origin URL for the bundled Emojibase data so the
- * editor's emoji picker (used by the Notes feature) can fetch its
- * dataset without contacting an external CDN and without inflating the
- * editor JS bundle.
+ * Exposes a same-origin URL for the bundled Emojibase data, so the Notes
+ * emoji picker fetches its dataset without an external CDN.
  *
- * The data files are copied into `build/emojibase-data/{locale}/` at
- * plugin build time by `tools/build-scripts/copy-emojibase-data.mjs`.
+ * `tools/build-scripts/copy-emojibase-data.mjs` copies the files into
+ * `build/emojibase-data/{locale}/` at plugin build time.
  *
  * @package gutenberg
  * @since   7.2.0
  */
 
 /**
- * Injects the Emojibase dataset URL and per-emoji label overrides into
- * the block editor settings, where the Notes emoji picker in
- * `@wordpress/editor` reads them (`noteEmojibaseUrl` and
- * `noteEmojiLabelOverrides`). Using the settings pipeline (rather than
- * a page global) keeps the configuration scoped to the editor and
- * gives npm consumers of the editor package the same documented
- * boundary: provide the settings, get the full picker.
+ * Injects the Emojibase dataset URL and per-emoji label overrides into the
+ * block editor settings, where the Notes picker reads them. npm consumers
+ * of `@wordpress/editor` opt in by supplying the same two settings.
  *
  * @since 7.2.0
  *
@@ -34,16 +28,13 @@ function gutenberg_add_emojibase_settings( $settings ) {
 add_filter( 'block_editor_settings_all', 'gutenberg_add_emojibase_settings' );
 
 /**
- * Convert an emoji character to the uppercase hex code-point sequence
- * Emojibase uses as its `hexcode` key. Strips Variation Selector-16
- * (U+FE0F) so qualified and unqualified presentations collapse to the
- * same key, and zero-pads each code point to four digits (`00A9`, not
- * `A9`), both matching Emojibase's own normalization.
+ * Convert an emoji character to Emojibase's uppercase `hexcode` form:
+ * Variation Selector-16 stripped and each code point padded to four
+ * digits (`00A9`, not `A9`).
  *
- * Decodes UTF-8 byte-by-byte rather than via `mb_ord()`: the `mbstring`
- * extension is recommended but not required by WordPress, and the
- * WordPress compatibility layer does not polyfill `mb_ord()` on all
- * supported versions. Returns an empty string for invalid UTF-8.
+ * Decodes UTF-8 by hand because `mbstring` is recommended but not
+ * required by WordPress, and `mb_ord()` is not polyfilled on all
+ * supported versions.
  *
  * @since 7.2.0
  *
@@ -92,18 +83,11 @@ function gutenberg_emoji_to_hexcode( $emoji ) {
 }
 
 /**
- * Builds the per-emoji label override map exposed to the editor's
- * emoji picker.
+ * Builds the per-emoji label override map exposed to the editor's picker.
  *
- * Emojibase ships translated labels for 28 locales; for the long tail
- * of WordPress-supported locales, those labels stay in English. The
- * filter below lets sites and plugins fill the gap on a per-emoji
- * basis (typically for the small set of emojis they care about most).
- * The map is keyed by uppercase Emojibase hex codes so it merges
- * cleanly over the per-locale `data.json`.
- *
- * Seeded with the curated reaction emojis so the full picker shows
- * the same translated label as the curated quick-row.
+ * Emojibase translates labels for 28 locales only; the filter below lets
+ * sites fill the gap for the emojis they care about. Seeded with the
+ * curated reactions so both rows show the same label.
  *
  * @since 7.2.0
  *
@@ -126,12 +110,9 @@ function gutenberg_get_emoji_picker_label_overrides() {
 	/**
 	 * Filters the emoji label overrides exposed to the Notes picker.
 	 *
-	 * Use this to translate emoji labels for locales the upstream
-	 * Emojibase dataset has not translated yet, or to override the
-	 * default label for specific emojis. Map keys are uppercase hex
-	 * code-point sequences, each code point zero-padded to four digits
-	 * and U+FE0F stripped (matching Emojibase's own `hexcode` field),
-	 * e.g. `2764` for ❤️ and `00A9` for ©️.
+	 * Keys are uppercase Emojibase `hexcode` values: each code point
+	 * zero-padded to four digits with U+FE0F stripped, e.g. `2764` for
+	 * ❤️ and `00A9` for ©️.
 	 *
 	 * @since 7.2.0
 	 *
@@ -142,9 +123,7 @@ function gutenberg_get_emoji_picker_label_overrides() {
 		$defaults
 	);
 
-	// Coerce defensively: a misbehaving filter callback that returns
-	// non-string values would otherwise crash the picker's JS-side
-	// label handling (`label.toLowerCase()` in searchEmojis()).
+	// A non-string label would crash `label.toLowerCase()` in searchEmojis().
 	$overrides = is_array( $overrides ) ? $overrides : array();
 	return array_filter( $overrides, 'is_string' );
 }

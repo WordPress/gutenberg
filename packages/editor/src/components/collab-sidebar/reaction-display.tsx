@@ -1,10 +1,9 @@
 import type { MouseEvent } from 'react';
 import { __, sprintf, _n } from '@wordpress/i18n';
-// `Button` is not yet on the recommended list while the Design System
-// reviews its consistency alongside `@wordpress/components` (see
-// WordPress/gutenberg#76135). It is used here deliberately: the reaction
-// pills need the Design System's pill shape and quiet neutral treatment
-// rather than a bespoke stylesheet.
+/*
+ * `Button` is pending Design System review (WordPress/gutenberg#76135);
+ * used here for its pill shape and quiet neutral treatment.
+ */
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Button, Stack, Tooltip } from '@wordpress/ui';
 import { useState, useCallback, useMemo } from '@wordpress/element';
@@ -17,10 +16,6 @@ import {
 } from './reaction-emoji-picker';
 import { useEmojiLabel } from './emojibase-data';
 
-/**
- * A single slug's entry in the reaction summary: how many reactions it
- * has and whether the current user is among them.
- */
 interface ReactionSummaryEntry {
 	count: number;
 	reacted?: boolean;
@@ -176,9 +171,8 @@ async function fetchNoteReactions(
 const reactionNamesCache: Record< string, string[] > = {};
 
 /**
- * Drop the cached reactor names for a note/slug pair. Called whenever a
- * reaction is added or removed, since that changes the set of users the
- * tooltip lists.
+ * Drop the cached reactor names for a note/slug pair, so the next tooltip
+ * refetches them.
  *
  * @param noteId The parent note comment ID.
  * @param slug   The reaction slug.
@@ -225,21 +219,19 @@ function ReactionButton( {
 }: ReactionButtonProps ) {
 	const [ names, setNames ] = useState< string[] | null >( null );
 	const [ isFetching, setIsFetching ] = useState( false );
-	// Whether the user has reached this pill (hover or keyboard focus).
-	// Gates the Emojibase fetch below onto the same moment that fetches
-	// the reactor names, keeping the dataset off the sidebar's first
-	// render.
+	// Hover or keyboard focus, which gates the Emojibase fetch below.
 	const [ isReached, setIsReached ] = useState( false );
-	// Reactions picked from the full picker are stored as hex keys and
-	// carry no curated label; resolve their name from the Emojibase
-	// dataset so tooltips read "thumbs up" rather than echoing the "👍"
-	// character. Falls back to the emoji character until resolved.
+	/*
+	 * Full-picker reactions are stored as hex keys with no curated label,
+	 * so resolve one from Emojibase; until it arrives the emoji character
+	 * stands in.
+	 */
 	const resolvedLabel = useEmojiLabel( slug, ! emojiLabel, isReached );
 	const label = emojiLabel || resolvedLabel || emoji;
-	// Derive the tooltip from the fetched names and the *current* label
-	// rather than storing a formatted string: the names request and the
-	// Emojibase label request race, and a stored string would freeze
-	// whichever label happened to be resolved first.
+	/*
+	 * Derived, not stored: the names and label requests race, and a stored
+	 * string would freeze whichever resolved first.
+	 */
 	const tooltipText =
 		names && names.length > 0 ? formatReactionTooltip( names, label ) : '';
 
@@ -255,10 +247,11 @@ function ReactionButton( {
 			return;
 		}
 
-		// A cache miss on a pill that already listed names means the
-		// entry was invalidated -- someone added or removed this
-		// reaction. Drop the old list rather than showing it against the
-		// new count for the length of the refetch.
+		/*
+		 * A miss on a pill that already listed names means it was
+		 * invalidated; drop the stale list rather than show it against
+		 * the new count while refetching.
+		 */
 		setNames( null );
 		setIsFetching( true );
 		fetchNoteReactions( noteId )
@@ -334,8 +327,6 @@ function ReactionButton( {
 									)
 									?.focus();
 							}
-							// Invalidate cached names since the reaction set
-							// is changing.
 							invalidateReactionNames( noteId, slug );
 							setNames( null );
 							onToggleReaction( slug );
@@ -392,8 +383,7 @@ export default function ReactionDisplay( {
 	}
 
 	return (
-		// `sm` gap: a pressed pill is a solid fill, and at the `xs` gap
-		// two of them side by side read as one bar rather than two pills.
+		// `sm`: at `xs` two adjacent pressed pills read as one solid bar.
 		<Stack direction="row" gap="sm" justify="flex-start" wrap="wrap">
 			{ reactedSlugs.map( ( slug ) => {
 				const count = getReactionCount( reactions, slug );
