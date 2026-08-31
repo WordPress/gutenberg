@@ -9,14 +9,8 @@ import {
 import { ITEMS } from './fixtures';
 
 const meta: Meta< typeof SearchableSelect > = {
-	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/Primitives/SearchableSelect',
 	component: SearchableSelect,
-	// Temporary: Due to an upstream bug, render the root explicitly so the
-	// components manifest extractor can resolve props from the JSX.
-	//
-	// See: https://github.com/storybookjs/storybook/issues/34877
-	render: ( args ) => <SearchableSelect { ...args } />,
 	subcomponents: {
 		'SearchableSelect.Group': SearchableSelect.Group,
 		'SearchableSelect.GroupLabel': SearchableSelect.GroupLabel,
