@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { HandlePosition } from '../../../core/stencil-math';
 import type { StencilProps } from '../../../core/types';
 import { RectangleStencil } from './rectangle-stencil';

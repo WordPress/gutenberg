@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { CircleStencil } from '../circle-stencil';
 import type { NormalizedRect, Size } from '../../../../core/types';
 
