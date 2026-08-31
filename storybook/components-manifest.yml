@@ -1257,7 +1257,6 @@
       - filter
       - filteredItems
       - form
-      - grid
       - highlightItemOnHover
       - id
       - inline

@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { ItemPopupWidthProps } from '../../../utils/css/item-popup';
 import type {
 	ComboboxCollectionProps,
@@ -147,7 +148,7 @@ export function normalizeRootItems(
 
 export type SearchableSelectProps = Omit<
 	ComboboxRootProps< Item, false >,
-	'children' | 'items' | 'multiple'
+	'children' | 'items' | 'multiple' | 'grid'
 > &
 	ItemPopupWidthProps &
 	Pick<
@@ -172,16 +173,20 @@ export type SearchableSelectProps = Omit<
 		/**
 		 * The custom trigger content to use instead of the default.
 		 *
+		 * The callback receives `null` when nothing is selected.
+		 *
 		 * ```jsx
-		 * triggerContent={ ( value ) => (
-		 *   <span>
-		 *     <Icon icon={ wordpress } />
-		 *     { value.label }
-		 *   </span>
-		 * ) }
+		 * triggerContent={ ( value ) =>
+		 *   value ? (
+		 *     <span>
+		 *       <Icon icon={ wordpress } />
+		 *       { value.label }
+		 *     </span>
+		 *   ) : null
+		 * }
 		 * ```
 		 */
-		triggerContent?: ComboboxTriggerProps[ 'children' ];
+		triggerContent?: ( ( value: Item | null ) => ReactNode ) | ReactNode;
 		/**
 		 * The custom content to use instead of the default empty state,
 		 * which shows whenever there are no matching items.

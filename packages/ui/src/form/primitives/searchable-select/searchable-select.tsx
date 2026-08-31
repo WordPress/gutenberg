@@ -77,9 +77,16 @@ export const SearchableSelect = forwardRef<
 				{ triggerContent }
 			</Combobox.Trigger>
 
-			<Combobox.Popup popupWidth={ popupWidth }>
+			<Combobox.Popup
+				popupWidth={ popupWidth }
+				aria-label={ ariaLabel }
+				aria-labelledby={ ariaLabelledby }
+			>
 				<div className={ styles[ 'input-wrapper' ] }>
-					<Combobox.Input placeholder={ searchPlaceholder } />
+					<Combobox.Input
+						placeholder={ searchPlaceholder }
+						aria-label={ searchPlaceholder }
+					/>
 				</div>
 				<Combobox.Empty>{ emptyContent }</Combobox.Empty>
 				<Combobox.List>

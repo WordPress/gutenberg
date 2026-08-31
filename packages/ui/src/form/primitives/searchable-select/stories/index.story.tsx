@@ -77,9 +77,8 @@ const CustomFruitItem = ( { label }: { label: string } ) => (
 export const WithCustomTriggerAndItems: Story = {
 	args: {
 		...Default.args,
-		triggerContent: ( item: ( typeof ITEMS )[ 0 ] ) => (
-			<CustomFruitItem label={ item.label } />
-		),
+		triggerContent: ( item: ( typeof ITEMS )[ 0 ] | null ) =>
+			item ? <CustomFruitItem label={ item.label } /> : null,
 		children: ( item: ( typeof ITEMS )[ 0 ] ) => (
 			<SearchableSelect.Item key={ item.value } value={ item }>
 				😋 { item.label }

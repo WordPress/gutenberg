@@ -47,40 +47,96 @@ describe( 'SearchableSelect', () => {
 		expect( ref.current ).toBeInstanceOf( HTMLButtonElement );
 	} );
 
-	it( 'passes aria-label and aria-describedby props to the appropriate components', () => {
+	it( 'passes aria-label and aria-describedby props to the appropriate components', async () => {
+		const user = userEvent.setup();
+
 		render(
 			<>
 				<SearchableSelect
 					aria-label="My label"
 					aria-describedby="searchable-select-description"
+					items={ ITEMS }
 				/>
 				{ /* eslint-disable-next-line no-restricted-syntax -- stable test ids */ }
 				<p id="searchable-select-description">My description</p>
 			</>
 		);
 
+		const trigger = screen.getByRole( 'combobox', {
+			name: 'My label',
+			description: 'My description',
+		} );
+		expect( trigger ).toBeVisible();
+
+		await user.click( trigger );
+
 		expect(
-			screen.getByRole( 'combobox', {
-				name: 'My label',
-				description: 'My description',
-			} )
+			await screen.findByRole( 'dialog', { name: 'My label' } )
 		).toBeVisible();
 	} );
 
-	it( 'passes aria-labelledby prop to the appropriate component', () => {
+	it( 'passes aria-labelledby prop to the appropriate component', async () => {
+		const user = userEvent.setup();
+
 		render(
 			<>
 				{ /* eslint-disable-next-line no-restricted-syntax -- stable test ids */ }
 				<p id="searchable-select-label">My label</p>
-				<SearchableSelect aria-labelledby="searchable-select-label" />
+				<SearchableSelect
+					aria-labelledby="searchable-select-label"
+					items={ ITEMS }
+				/>
 			</>
 		);
 
+		const trigger = screen.getByRole( 'combobox', {
+			name: 'My label',
+		} );
+		expect( trigger ).toBeVisible();
+
+		await user.click( trigger );
+
 		expect(
-			screen.getByRole( 'combobox', {
-				name: 'My label',
-			} )
+			await screen.findByRole( 'dialog', { name: 'My label' } )
 		).toBeVisible();
+	} );
+
+	it( 'names the search input from searchPlaceholder', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<SearchableSelect
+				aria-label="Fruit"
+				items={ ITEMS }
+				searchPlaceholder="Find fruit"
+			/>
+		);
+
+		await user.click( screen.getByRole( 'combobox', { name: 'Fruit' } ) );
+
+		const input = await screen.findByPlaceholderText( 'Find fruit' );
+		expect( input ).toBeVisible();
+		expect( input ).toHaveAccessibleName( 'Find fruit' );
+	} );
+
+	it( 'does not throw when triggerContent receives a null value', () => {
+		render(
+			<SearchableSelect
+				aria-label="Fruit"
+				items={ ITEMS }
+				triggerContent={ ( value: Item | null ) =>
+					value ? (
+						<span>{ value.label }</span>
+					) : (
+						<span>Choose fruit</span>
+					)
+				}
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'combobox', { name: 'Fruit' } )
+		).toHaveTextContent( 'Choose fruit' );
 	} );
 
 	it( 'renders flat items with the default renderer', async () => {
