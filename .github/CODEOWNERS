@@ -7,8 +7,8 @@
 
 # Data
 /packages/api-fetch
-/packages/core-data
-/packages/data
+/packages/core-data                             @Mamaduka
+/packages/data                                  @Mamaduka
 /packages/redux-routine
 /packages/data-controls
 
