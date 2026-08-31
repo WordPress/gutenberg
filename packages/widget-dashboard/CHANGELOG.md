@@ -22,7 +22,7 @@
 
 -   Widget header: the title carries a `title` attribute, so a title the
     row clips can still be read on hover
-    ([#PR](https://github.com/WordPress/gutenberg/pull/PR)).
+    ([#82226](https://github.com/WordPress/gutenberg/pull/82226)).
 
 ### Internal
 
