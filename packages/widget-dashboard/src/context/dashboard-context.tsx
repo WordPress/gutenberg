@@ -14,6 +14,7 @@ import type {
 	WidgetType,
 } from '@wordpress/widget-primitives';
 import { DEFAULT_GRID } from '../utils/default-grid';
+import { enforceLayoutPolicy } from '../utils/enforce-layout-policy';
 import { normalizeGridSettings } from '../utils/normalize-grid-settings';
 import { DEFAULT_ROW_HEIGHT } from '../utils/row-height-presets';
 import { useDashboardPolicy } from '../components/dashboard-policy';
@@ -218,37 +219,19 @@ export function WidgetDashboardProvider( {
 		[ policy ]
 	);
 
-	// Every mutation stages through here. Instances the policy locks against
-	// removal are re-asserted right after the nearest preceding instance that
-	// survived, so no composed trigger can drop or displace them.
+	// Every mutation stages through here, diffed against the current
+	// staging so every change the policy denies is re-asserted before it
+	// lands: what the interface hides, the staging layer rejects.
 	const stageLayout = useCallback(
 		( next: DashboardWidget[] ) => {
-			setStagingLayout( ( previous ) => {
-				const staged = [ ...next ];
-				let insertAt = 0;
-				previous.forEach( ( widget ) => {
-					const position = staged.findIndex(
-						( { uuid } ) => uuid === widget.uuid
-					);
-					if ( position !== -1 ) {
-						insertAt = position + 1;
-						return;
-					}
-					const removable = canPerform( {
-						operation: 'remove',
-						widget,
-						widgetType: widgetTypes.find(
-							( type ) => type.name === widget.type
-						),
-					} );
-					if ( removable ) {
-						return;
-					}
-					staged.splice( insertAt, 0, widget );
-					insertAt += 1;
-				} );
-				return staged.length === next.length ? next : staged;
-			} );
+			setStagingLayout( ( previous ) =>
+				enforceLayoutPolicy( {
+					previous,
+					next,
+					canPerform,
+					widgetTypes,
+				} )
+			);
 		},
 		[ canPerform, widgetTypes ]
 	);

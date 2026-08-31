@@ -18,6 +18,14 @@
     registered type be inserted
     ([#81967](https://github.com/WordPress/gutenberg/pull/81967)).
 
+### Enhancements
+
+-   The staging layer enforces the policy on every instance operation,
+    whichever trigger staged the mutation: a denied `move` holds the
+    instance's index, a denied `resize` keeps its spans, a denied `edit`
+    keeps its attributes, and a new instance of a rejected type is
+    dropped ([#82005](https://github.com/WordPress/gutenberg/issues/82005)).
+
 ### Internal
 
 -   Remove unused dependency `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
