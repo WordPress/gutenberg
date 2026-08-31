@@ -38,6 +38,7 @@
 		{ "path": "packages/media-editor" },
 		{ "path": "packages/media-fields" },
 		{ "path": "packages/media-utils" },
+		{ "path": "packages/notes-preview" },
 		{ "path": "packages/notices" },
 		{ "path": "packages/preferences" },
 		{ "path": "packages/priority-queue" },

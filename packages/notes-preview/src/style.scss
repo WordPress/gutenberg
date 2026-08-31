@@ -1,0 +1,480 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+/**
+ * Review rail for notes on a post preview.
+ *
+ * The rail is a review tool sitting beside somebody else's design, so it takes
+ * nothing from the theme and gives nothing back: every property the cards rely
+ * on is stated here, and the page keeps its own styling untouched. Layout
+ * follows the editor's notes sidebar - grey cards, white when selected, author
+ * colour on the avatar - so a note looks the same wherever it is read.
+ */
+
+$notes-rail-width: 336px;
+$notes-rail-breakpoint: 1100px;
+
+// Reserve the rail's width so the theme reflows rather than sliding underneath.
+html.wp-notes-preview-active {
+	@media (min-width: $notes-rail-breakpoint) {
+		margin-inline-end: $notes-rail-width;
+	}
+}
+
+// Defined on the wrapper so the rail, the indicators over the page and the
+// mobile toggle all share one accent.
+.wp-notes-preview-root {
+	--wp-notes-preview-accent: #3858e9;
+}
+
+.wp-notes-preview {
+	position: fixed;
+	// The admin bar is fixed over the viewport; the board measures it.
+	inset-block-start: var(--wp-notes-preview-admin-bar, 0);
+	inset-block-end: 0;
+	inset-inline-end: 0;
+	z-index: 99998;
+	display: flex;
+	flex-direction: column;
+	width: $notes-rail-width;
+	background: $white;
+	border-inline-start: $border-width solid $gray-300;
+	box-sizing: border-box;
+
+	// Stated rather than inherited: a theme's body font, size or line height
+	// would otherwise reflow the cards.
+	font-family: -apple-system, blinkmacsystemfont, "Segoe UI", roboto, oxygen-sans, ubuntu, cantarell, "Helvetica Neue", sans-serif;
+	font-size: 13px;
+	line-height: 1.5;
+	color: $gray-900;
+	text-align: start;
+
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+
+	p {
+		margin: 0 0 0.6em;
+		font-size: inherit;
+		line-height: inherit;
+		color: inherit;
+
+		&:last-child {
+			margin-block-end: 0;
+		}
+	}
+
+	@media (max-width: #{$notes-rail-breakpoint - 1px}) {
+		transform: translateX(100%);
+		transition: transform 0.2s ease-in-out;
+
+		&.is-open {
+			transform: none;
+			box-shadow: $elevation-medium;
+		}
+	}
+}
+
+/**
+ * Header. Pinned, so the count and the resolved toggle stay reachable however
+ * far down the post the reader has scrolled.
+ */
+.wp-notes-preview__header {
+	display: flex;
+	flex: 0 0 auto;
+	align-items: center;
+	gap: $grid-unit-10;
+	padding: $grid-unit-15 $grid-unit-20;
+	border-block-end: $border-width solid $gray-300;
+}
+
+.wp-notes-preview__title {
+	margin: 0;
+	padding: 0;
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1.5;
+	color: inherit;
+}
+
+.wp-notes-preview__count {
+	color: $gray-700;
+}
+
+.wp-notes-preview__notice {
+	flex: 0 0 auto;
+	padding: $grid-unit-10 $grid-unit-20;
+	border-block-end: $border-width solid $gray-300;
+	background: $gray-100;
+	color: $gray-700;
+	font-size: 12px;
+}
+
+/**
+ * The board. Cards are placed in document space by the layout module and the
+ * whole board is translated as the page scrolls, so each card tracks the words
+ * it is about.
+ */
+.wp-notes-preview__scroller {
+	position: relative;
+	flex: 1 1 auto;
+	overflow: hidden;
+}
+
+.wp-notes-preview__board {
+	position: relative;
+	padding-block: $grid-unit-15;
+}
+
+.wp-notes-preview-root.is-floating .wp-notes-preview__board {
+	padding-block: 0;
+	transform: translateY(var(--wp-notes-preview-scroll, 0));
+	will-change: transform;
+}
+
+// Without alignment - narrow viewports - the rail is an ordinary scrolling list.
+.wp-notes-preview-root:not(.is-floating) .wp-notes-preview__scroller {
+	overflow-y: auto;
+}
+
+.wp-notes-preview__thread {
+	position: relative;
+	margin: 0 $grid-unit-20 $grid-unit-15;
+	padding: $grid-unit-20;
+	border: $border-width solid $gray-300;
+	border-radius: $radius-large;
+	background: $gray-100;
+	// stylelint-disable-next-line declaration-property-value-disallowed-list -- var( --wpds-cursor-control ) is defined by the admin styles, which a front-end preview does not load.
+	cursor: pointer;
+	transition: background-color 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
+
+	&:hover {
+		background: $white;
+	}
+
+	// A thread whose block was deleted has nothing to line up with; it keeps
+	// its place in the list rather than disappearing.
+	&.is-unanchored {
+		cursor: default;
+		opacity: 0.7;
+	}
+
+	&.is-selected {
+		z-index: 1;
+		background: $white;
+		box-shadow: $elevation-medium;
+
+		// Ties the card to its highlight and its author's avatar.
+		&::before {
+			content: "";
+			position: absolute;
+			inset-block: -$border-width;
+			inset-inline-start: -$border-width;
+			width: 3px;
+			border-start-start-radius: $radius-large;
+			border-end-start-radius: $radius-large;
+			background: var(--wp-notes-preview-author-color, var(--wp-notes-preview-accent));
+		}
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--wp-notes-preview-accent);
+		outline-offset: 1px;
+	}
+}
+
+.wp-notes-preview-root.is-floating .wp-notes-preview__thread {
+	position: absolute;
+	inset-inline: $grid-unit-20;
+	margin: 0;
+	// Long threads on short posts still need their reply box reachable.
+	max-height: 90vh;
+	overflow-y: auto;
+}
+
+/**
+ * Byline, content and replies.
+ */
+.wp-notes-preview__byline {
+	display: flex;
+	align-items: center;
+	gap: $grid-unit-10;
+	margin-block-end: $grid-unit-10;
+}
+
+.wp-notes-preview__avatar {
+	flex-shrink: 0;
+	width: 24px;
+	height: 24px;
+	padding: 1px;
+	border: 2px solid var(--wp-notes-preview-author-color, $gray-300);
+	border-radius: $radius-round;
+	background: $white;
+}
+
+.wp-notes-preview__author {
+	font-weight: 600;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.wp-notes-preview__time {
+	margin-inline-start: auto;
+	flex-shrink: 0;
+	color: $gray-700;
+	font-size: 12px;
+}
+
+.wp-notes-preview__content {
+	overflow-wrap: break-word;
+
+	a {
+		color: var(--wp-notes-preview-accent);
+	}
+
+	code {
+		padding: 0 2px;
+		border-radius: 2px;
+		background: $gray-200;
+		font-family: menlo, consolas, monaco, monospace;
+		font-size: 0.9em;
+	}
+}
+
+.wp-notes-preview__replies {
+	margin: $grid-unit-15 0 0;
+	padding: $grid-unit-15 0 0;
+	border-block-start: $border-width solid $gray-300;
+	list-style: none;
+
+	> li + li {
+		margin-block-start: $grid-unit-15;
+	}
+}
+
+.wp-notes-preview__mention,
+.wp-note-mention {
+	display: inline;
+	padding: 0 3px;
+	border-radius: 2px;
+	background: rgba(56, 88, 233, 0.1);
+	color: var(--wp-notes-preview-accent);
+	font-weight: 600;
+}
+
+/**
+ * Reply form. Only the selected thread offers one, which keeps the rail quiet
+ * and makes the selection meaningful.
+ */
+.wp-notes-preview__reply-form {
+	display: none;
+	margin-block-start: $grid-unit-15;
+}
+
+.wp-notes-preview__thread.is-selected .wp-notes-preview__reply-form {
+	display: block;
+}
+
+.wp-notes-preview__textarea {
+	display: block;
+	width: 100%;
+	min-height: 60px;
+	margin: 0 0 $grid-unit-10;
+	padding: $grid-unit-10;
+	border: $border-width solid $gray-400;
+	border-radius: $radius-small;
+	background: $white;
+	color: inherit;
+	font-family: inherit;
+	font-size: inherit;
+	line-height: inherit;
+	resize: vertical;
+
+	&:focus {
+		border-color: var(--wp-notes-preview-accent);
+		outline: 1px solid var(--wp-notes-preview-accent);
+	}
+}
+
+.wp-notes-preview__actions {
+	display: flex;
+	align-items: center;
+	gap: $grid-unit-10;
+}
+
+.wp-notes-preview__button {
+	padding: 6px 12px;
+	border: $border-width solid transparent;
+	border-radius: $radius-small;
+	background: var(--wp-notes-preview-accent);
+	color: $white;
+	font-family: inherit;
+	font-size: 13px;
+	line-height: 1.5;
+	// stylelint-disable-next-line declaration-property-value-disallowed-list -- var( --wpds-cursor-control ) is defined by the admin styles, which a front-end preview does not load.
+	cursor: pointer;
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: default;
+	}
+
+	&.is-tertiary {
+		background: transparent;
+		color: var(--wp-notes-preview-accent);
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--wp-notes-preview-accent);
+		outline-offset: 1px;
+	}
+}
+
+.wp-notes-preview__error {
+	margin-block-start: $grid-unit-10;
+	color: $alert-red;
+	font-size: 12px;
+}
+
+.wp-notes-preview__empty {
+	padding: $grid-unit-30 $grid-unit-20;
+	color: $gray-700;
+	text-align: center;
+}
+
+/**
+ * Resolved threads, kept out of the aligned board so they never push an open
+ * thread out of position. The header toggle slides them over the board.
+ */
+.wp-notes-preview__resolved {
+	position: absolute;
+	inset: 0;
+	z-index: 4;
+	display: none;
+	overflow-y: auto;
+	padding-block: $grid-unit-15;
+	background: $white;
+}
+
+.wp-notes-preview.show-resolved .wp-notes-preview__resolved {
+	display: block;
+}
+
+.wp-notes-preview__resolution {
+	margin-block-start: $grid-unit-10;
+	color: $gray-700;
+	font-style: italic;
+	font-size: 12px;
+}
+
+/**
+ * Mobile toggle.
+ */
+.wp-notes-preview-toggle {
+	position: fixed;
+	inset-block-end: $grid-unit-20;
+	inset-inline-end: $grid-unit-20;
+	z-index: 99999;
+	display: none;
+	align-items: center;
+	gap: $grid-unit-05;
+	padding: 10px 16px;
+	border: 0;
+	border-radius: $radius-full;
+	background: var(--wp-notes-preview-accent, #3858e9);
+	box-shadow: $elevation-medium;
+	color: $white;
+	font-family: -apple-system, blinkmacsystemfont, "Segoe UI", roboto, sans-serif;
+	font-size: 13px;
+	// stylelint-disable-next-line declaration-property-value-disallowed-list -- var( --wpds-cursor-control ) is defined by the admin styles, which a front-end preview does not load.
+	cursor: pointer;
+
+	@media (max-width: #{$notes-rail-breakpoint - 1px}) {
+		display: flex;
+	}
+}
+
+/**
+ * On the page itself: the indicator layer and the anchors.
+ */
+// A zero-sized layer at the document origin: each indicator is then placed in
+// document coordinates taken from the block it belongs to, which is the only
+// thing that survives arbitrary theme layouts.
+.wp-notes-preview__indicators {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 0;
+	height: 0;
+	z-index: 99997;
+	pointer-events: none;
+}
+
+.wp-notes-preview__indicator {
+	position: absolute;
+	display: flex;
+	align-items: center;
+	padding: 2px;
+	border: 0;
+	border-radius: $radius-full;
+	background: transparent;
+	// stylelint-disable-next-line declaration-property-value-disallowed-list -- var( --wpds-cursor-control ) is defined by the admin styles, which a front-end preview does not load.
+	cursor: pointer;
+	pointer-events: auto;
+
+	&:focus-visible {
+		outline: 2px solid var(--wp-notes-preview-accent, #3858e9);
+		outline-offset: 2px;
+	}
+}
+
+.wp-notes-preview__indicator-avatar {
+	width: 24px;
+	height: 24px;
+	margin-inline-start: -8px;
+	padding: 1px;
+	border: 2px solid $gray-300;
+	border-radius: $radius-round;
+	background-color: $white;
+	background-position: center;
+	background-size: cover;
+	box-sizing: border-box;
+
+	&:first-child {
+		margin-inline-start: 0;
+	}
+}
+
+.wp-notes-preview__indicator-overflow {
+	margin-inline-start: 4px;
+	color: $gray-700;
+	font-size: 12px;
+	font-weight: 600;
+}
+
+// Inline note markers. The per-author tint is printed by PHP; this only undoes
+// the browser's yellow default and carries the shared transition.
+mark.wp-note {
+	background-color: transparent;
+	color: inherit;
+	border-radius: 1px;
+	transition: background-color 0.1s ease-in-out;
+}
+
+// The block a selected note belongs to.
+[data-wp-note-id].is-note-selected {
+	outline: 2px solid var(--wp-notes-preview-author-color, #3858e9);
+	outline-offset: 3px;
+	border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.wp-notes-preview,
+	.wp-notes-preview__thread,
+	mark.wp-note {
+		transition: none;
+	}
+}
