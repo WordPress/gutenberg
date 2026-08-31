@@ -95,9 +95,19 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 		$arrow = $arrow_map[ $attributes['arrow'] ][ $navigation_type ];
 
 		if ( 'next' === $navigation_type ) {
-			$format = '%link<span class="wp-block-post-navigation-link__arrow-next is-arrow-' . $attributes['arrow'] . '" aria-hidden="true">' . $arrow . '</span>';
+			$link = sprintf(
+				'<span class="post-navigation-link__title">%s</span><span class="wp-block-post-navigation-link__arrow-next is-arrow-%s" aria-hidden="true">%s</span>',
+				$link,
+				esc_attr( $attributes['arrow'] ),
+				esc_html( $arrow )
+			);
 		} else {
-			$format = '<span class="wp-block-post-navigation-link__arrow-previous is-arrow-' . $attributes['arrow'] . '" aria-hidden="true">' . $arrow . '</span>%link';
+			$link = sprintf(
+				'<span class="wp-block-post-navigation-link__arrow-previous is-arrow-%s" aria-hidden="true">%s</span><span class="post-navigation-link__title">%s</span>',
+				esc_attr( $attributes['arrow'] ),
+				esc_html( $arrow ),
+				$link
+			);
 		}
 	}
 
