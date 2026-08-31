@@ -47,6 +47,10 @@ $navigation-icon-size: 24px;
 	.wp-block-navigation-item__content {
 		display: block;
 		z-index: 1;
+
+		&:not([href]) {
+			cursor: pointer;
+		}
 	}
 
 	// This rule needs extra specificity so that it inherits the correct color from its parent.
