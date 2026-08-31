@@ -169,16 +169,27 @@ async function build() {
 				output: 'build/scripts/widgets/blocks/blocks-manifest.php',
 			},
 		];
+
+		// Check if building for WordPress Core to exclude experimental blocks
+		const hasWordPressCoreArg = process.argv.includes(
+			'IS_WORDPRESS_CORE=true'
+		);
+
 		for ( const { input, output } of blocksDirs ) {
-			await exec(
-				'wp-scripts',
-				[
-					'build-blocks-manifest',
-					`--input=${ input }`,
-					`--output=${ output }`,
-				],
-				{ silent: true }
-			);
+			const manifestArgs = [
+				'build-blocks-manifest',
+				`--input=${ input }`,
+				`--output=${ output }`,
+			];
+
+			// Exclude experimental blocks when building for WordPress Core
+			if ( globalThis.IS_WORDPRESS_CORE ) {
+				manifestArgs.push( '--exclude-experimental' );
+			} else if ( hasWordPressCoreArg ) {
+				manifestArgs.push( '--exclude-experimental' );
+			}
+
+			await exec( 'wp-scripts', manifestArgs, { silent: true } );
 		}
 
 		console.log( '\n📦 Building workspace :wp targets...' );

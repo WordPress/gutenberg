@@ -10,6 +10,8 @@ const defaultInputDir = 'build';
 const inputDir = getArgFromCLI( '--input' ) || defaultInputDir;
 const defaultOutputFile = path.join( inputDir, 'blocks-manifest.php' );
 const outputFile = getArgFromCLI( '--output' ) || defaultOutputFile;
+const excludeExperimental =
+	getArgFromCLI( '--exclude-experimental' ) !== undefined;
 
 const resolvedInputDir = path.resolve( process.cwd(), inputDir );
 if ( ! fs.existsSync( resolvedInputDir ) ) {
@@ -30,6 +32,12 @@ const blocks = {};
 
 blockJsonFiles.forEach( ( file ) => {
 	const blockJson = JSON.parse( fs.readFileSync( file, 'utf8' ) );
+
+	// Skip experimental blocks if --exclude-experimental flag is set
+	if ( excludeExperimental && blockJson.__experimental === true ) {
+		return;
+	}
+
 	const directoryName = path.basename( path.dirname( file ) );
 	blocks[ directoryName ] = blockJson;
 } );

@@ -1,0 +1,10 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"__experimental": true,
+	"name": "my-plugin/experimental-block",
+	"title": "Experimental Block",
+	"category": "text",
+	"icon": "beaker",
+	"description": "An experimental block for testing."
+}
