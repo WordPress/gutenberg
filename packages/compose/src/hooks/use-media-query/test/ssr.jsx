@@ -1,6 +1,3 @@
-/**
- * @jest-environment node
- */
 import { renderToString } from 'react-dom/server';
 import useMediaQuery from '../';
 import useViewportMatch from '../../use-viewport-match';

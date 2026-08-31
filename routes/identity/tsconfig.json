@@ -7,7 +7,7 @@
 		"noEmit": true,
 		"emitDeclarationOnly": false,
 		"composite": false,
-		"types": []
+		"types": [ "style-imports" ]
 	},
 	"references": [
 		{ "path": "../../packages/admin-ui/tsconfig.build.json" },

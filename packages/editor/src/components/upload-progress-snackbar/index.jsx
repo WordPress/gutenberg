@@ -6,7 +6,11 @@ import { store as uploadStore } from '@wordpress/upload-media';
 import { store as noticesStore } from '@wordpress/notices';
 import { Icon as WCIcon, Spinner } from '@wordpress/components';
 import { check } from '@wordpress/icons';
-import { useTracker } from './tracker';
+import {
+	useTracker,
+	getFailureCount as getTrackedFailureCount,
+} from './tracker';
+import { unlock } from '../../lock-unlock';
 
 const NOTICE_ID = 'upload-progress';
 
@@ -72,10 +76,14 @@ export const UPLOAD_DONE = (
  * @return {null} This component renders nothing — it only manages a notice.
  */
 export default function UploadProgressSnackbar() {
-	const items = useSelect(
-		( select ) => select( uploadStore ).getItems(),
-		[]
-	);
+	const { items, csmFailureCount } = useSelect( ( select ) => {
+		const { getItems } = select( uploadStore );
+		const { getFailureCount } = unlock( select( uploadStore ) );
+		return {
+			items: getItems(),
+			csmFailureCount: getFailureCount(),
+		};
+	}, [] );
 	const tracker = useTracker();
 
 	// CSM path: originals in the upload-media queue (subsizes excluded). Memoized
@@ -110,6 +118,11 @@ export default function UploadProgressSnackbar() {
 	const dismissedRef = useRef( false );
 	const wasUploadingRef = useRef( false );
 
+	// Both failure tallies only ever grow, so the failures belonging to the
+	// current batch are whatever has accrued since it started. Recorded when
+	// the batch begins, read back when the queue drains.
+	const failuresAtStartRef = useRef( 0 );
+
 	// Timeout that removes the completion-state (checkmark) notice after a
 	// brief display. Held so a new upload can cancel it.
 	const completionTimeoutRef = useRef( null );
@@ -123,9 +136,11 @@ export default function UploadProgressSnackbar() {
 
 	useEffect( () => {
 		const isUploading = remaining > 0;
+		const failures = csmFailureCount + getTrackedFailureCount();
 
 		if ( isUploading && ! wasUploadingRef.current ) {
 			dismissedRef.current = false;
+			failuresAtStartRef.current = failures;
 			speak( __( 'Media upload started' ), 'polite' );
 			// A new batch started during the completion display: cancel the
 			// pending dismissal so the snackbar transitions straight back
@@ -137,28 +152,61 @@ export default function UploadProgressSnackbar() {
 				peakRef.current = 0;
 			}
 		} else if ( ! isUploading && wasUploadingRef.current ) {
-			speak( __( 'Media upload complete' ), 'polite' );
+			// The queue drains the same way whether an item uploaded or
+			// failed, so the batch is only "complete" for the files that
+			// actually made it (see gutenberg#81132).
+			const total = peakRef.current;
+			const failed = Math.min(
+				total,
+				failures - failuresAtStartRef.current
+			);
+			const uploaded = total - failed;
 
-			if ( ! dismissedRef.current ) {
-				createNotice( 'info', __( 'Upload complete' ), {
-					id: NOTICE_ID,
-					type: 'snackbar',
-					isDismissible: false,
-					explicitDismiss: false,
-					speak: false,
-					icon: UPLOAD_DONE,
-					onDismiss: () => {
-						dismissedRef.current = true;
-					},
-				} );
-
-				completionTimeoutRef.current = setTimeout( () => {
-					removeNotice( NOTICE_ID );
-					completionTimeoutRef.current = null;
-					peakRef.current = 0;
-				}, COMPLETION_DISPLAY_MS );
-			} else {
+			if ( uploaded === 0 ) {
+				// Nothing uploaded: the per-file errors already say so, and a
+				// completion snackbar next to them would contradict them. Take
+				// down the progress notice rather than replacing it.
+				speak( __( 'Media upload failed' ), 'polite' );
+				removeNotice( NOTICE_ID );
 				peakRef.current = 0;
+			} else {
+				const isFullSuccess = failed === 0;
+				const content = isFullSuccess
+					? __( 'Upload complete' )
+					: sprintf(
+							/* translators: 1: number of files uploaded, 2: number of files in the batch. */
+							__( 'Uploaded %1$d of %2$d' ),
+							uploaded,
+							total
+					  );
+
+				speak(
+					isFullSuccess ? __( 'Media upload complete' ) : content,
+					'polite'
+				);
+
+				if ( ! dismissedRef.current ) {
+					createNotice( 'info', content, {
+						id: NOTICE_ID,
+						type: 'snackbar',
+						isDismissible: false,
+						explicitDismiss: false,
+						speak: false,
+						// No checkmark on a partial batch — some of it failed.
+						icon: isFullSuccess ? UPLOAD_DONE : undefined,
+						onDismiss: () => {
+							dismissedRef.current = true;
+						},
+					} );
+
+					completionTimeoutRef.current = setTimeout( () => {
+						removeNotice( NOTICE_ID );
+						completionTimeoutRef.current = null;
+						peakRef.current = 0;
+					}, COMPLETION_DISPLAY_MS );
+				} else {
+					peakRef.current = 0;
+				}
 			}
 		}
 
@@ -213,6 +261,7 @@ export default function UploadProgressSnackbar() {
 		remaining,
 		sessionTotal,
 		csmOriginals,
+		csmFailureCount,
 		tracker,
 		createNotice,
 		removeNotice,
