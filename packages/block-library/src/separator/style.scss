@@ -6,6 +6,13 @@
 	border-left: none;
 	border-right: none;
 	border-bottom: none;
+
+	// Use background-color instead of border to avoid alpha stacking issues.
+	&.has-background:not(.is-style-dots) {
+		border: none !important;
+		background-color: currentColor;
+		height: 1px;
+	}
 }
 
 // Dots block style variation
