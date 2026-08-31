@@ -116,6 +116,45 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 		$content = $get_link_function( $format, $link );
 	}
 
+	if ( empty( $content ) ) {
+		$label_text = 'next' === $navigation_type ? __( 'Next' ) : __( 'Previous' );
+
+		// Setup arrow if needed
+		$arrow_html = '';
+		if ( isset( $attributes['arrow'] ) && 'none' !== $attributes['arrow'] && isset( $arrow_map[ $attributes['arrow'] ] ) ) {
+			$arrow = $arrow_map[ $attributes['arrow'] ][ $navigation_type ];
+
+			if ( 'next' === $navigation_type ) {
+				$arrow_html = sprintf(
+					'<span class="wp-block-post-navigation-link__arrow-next is-arrow-%1$s" aria-hidden="true">%2$s</span>',
+					esc_attr( $attributes['arrow'] ),
+					esc_html( $arrow )
+				);
+			} else {
+				$arrow_html = sprintf(
+					'<span class="wp-block-post-navigation-link__arrow-previous is-arrow-%1$s" aria-hidden="true">%2$s</span>',
+					esc_attr( $attributes['arrow'] ),
+					esc_html( $arrow )
+				);
+			}
+		}
+
+		// Build content with arrow and label
+		if ( 'next' === $navigation_type ) {
+			$content = sprintf(
+				'<span class="post-navigation-link__no-post">%1$s%2$s</span>',
+				esc_html( $label_text ),
+				$arrow_html
+			);
+		} else {
+			$content = sprintf(
+				'<span class="post-navigation-link__no-post">%1$s%2$s</span>',
+				$arrow_html,
+				esc_html( $label_text )
+			);
+		}
+	}
+
 	return sprintf(
 		'<div %1$s>%2$s</div>',
 		$wrapper_attributes,
