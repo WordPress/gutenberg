@@ -477,9 +477,6 @@ const v5 = {
 	supports: {
 		align: true,
 	},
-	isEligible( { linkTo } ) {
-		return ! linkTo || linkTo === 'attachment' || linkTo === 'media';
-	},
 	migrate( attributes ) {
 		return runV2Migration( attributes );
 	},
