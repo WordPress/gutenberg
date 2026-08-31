@@ -516,4 +516,53 @@ describe( 'normalizeFields: default getValue', () => {
 			} );
 		} );
 	} );
+
+	describe( 'sort', () => {
+		it( 'uses field.sort when provided and passes extracted values', () => {
+			const itemA = { measurements: { height: 120 } };
+			const itemB = { measurements: { height: 80 } };
+			const customSort = jest.fn( ( a, b, direction ) =>
+				direction === 'asc' ? a - b : b - a
+			);
+			const fields: Field< typeof itemA >[] = [
+				{
+					id: 'height',
+					type: 'number',
+					getValue: ( { item } ) => item.measurements.height,
+					sort: customSort,
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+
+			const result = normalizedFields[ 0 ].sort( itemA, itemB, 'asc' );
+			expect( customSort ).toHaveBeenCalledWith( 120, 80, 'asc' );
+			expect( result ).toBe( 40 );
+		} );
+
+		it( 'falls back to fieldType.sort when field.sort is not provided', () => {
+			const itemA = { score: 10 };
+			const itemB = { score: 25 };
+			const fields: Field< typeof itemA >[] = [
+				{
+					id: 'score',
+					type: 'number',
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+
+			const resultAsc = normalizedFields[ 0 ].sort(
+				itemA,
+				itemB,
+				'asc'
+			);
+			expect( resultAsc ).toBe( -15 );
+
+			const resultDesc = normalizedFields[ 0 ].sort(
+				itemA,
+				itemB,
+				'desc'
+			);
+			expect( resultDesc ).toBe( 15 );
+		} );
+	} );
 } );
