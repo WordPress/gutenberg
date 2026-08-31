@@ -1,0 +1,11 @@
+{
+	"version": 3,
+	"title": "Post Terms Variation",
+	"slug": "post-terms-variation",
+	"blockTypes": [ "core/post-terms" ],
+	"styles": {
+		"color": {
+			"text": "rgb(255, 0, 128)"
+		}
+	}
+}
