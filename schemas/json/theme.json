@@ -3442,6 +3442,18 @@
 			"description": "Description of the styles variation.",
 			"type": "string"
 		},
+		"author": {
+			"description": "Name of the theme author.",
+			"type": "string"
+		},
+		"authorURI": {
+			"description": "URI to the theme author's WordPress profile or website.",
+			"type": "string"
+		},
+		"styleURI": {
+			"description": "URI to the theme's documentation or repository.",
+			"type": "string"
+		},
 		"blockTypes": {
 			"description": "List of block types that can use the block style variation this theme.json file represents.",
 			"type": "array",
