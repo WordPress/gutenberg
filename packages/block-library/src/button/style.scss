@@ -7,7 +7,8 @@ $blocks-block__margin: 0.5em;
 	cursor: pointer;
 	display: inline-block;
 	text-align: center;
-	overflow-wrap: break-word;
+	// stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- overflow-wrap doesn't work well if a link is wrapped in the div, so use word-break here.
+	word-break: break-word;
 	box-sizing: border-box;
 	height: 100%;
 	align-content: center;
