@@ -25,9 +25,6 @@ type CurrentItemImplementationProps = CurrentItemProps & {
 
 const MEASUREMENT_RENDER = <span />;
 
-/**
- * Renders the current, non-navigable page in a breadcrumb trail.
- */
 function VisibleCurrentItem( {
 	children,
 	className,
@@ -142,6 +139,9 @@ function MeasurementCurrentItem( {
 	);
 }
 
+/**
+ * Renders the current, non-navigable page in a breadcrumb trail.
+ */
 const CurrentItem = forwardRef< HTMLSpanElement, CurrentItemProps >(
 	function BreadcrumbCurrentItem( props, ref ) {
 		const { mode } = useBreadcrumbItemRenderContext();
