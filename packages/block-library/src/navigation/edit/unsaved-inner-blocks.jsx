@@ -11,7 +11,7 @@ const EMPTY_OBJECT = {};
 export default function UnsavedInnerBlocks( {
 	blocks,
 	createNavigationMenu,
-	hasSelection,
+	shouldAutoSave,
 } ) {
 	const originalBlocksRef = useRef();
 
@@ -44,7 +44,9 @@ export default function UnsavedInnerBlocks( {
 			className: 'wp-block-navigation__container',
 		},
 		{
-			renderAppender: hasSelection ? undefined : false,
+			// No on-canvas appender, matching a menu backed by a
+			// wp_navigation entity.
+			renderAppender: false,
 			defaultBlock: DEFAULT_BLOCK,
 			directInsert: true,
 		}
@@ -88,7 +90,7 @@ export default function UnsavedInnerBlocks( {
 			isDisabled ||
 			isSaving ||
 			! hasResolvedAllNavigationMenus ||
-			! hasSelection ||
+			! shouldAutoSave ||
 			! innerBlocksAreDirty
 		) {
 			return;
@@ -102,7 +104,7 @@ export default function UnsavedInnerBlocks( {
 		isSaving,
 		hasResolvedAllNavigationMenus,
 		innerBlocksAreDirty,
-		hasSelection,
+		shouldAutoSave,
 	] );
 
 	const Wrapper = isSaving ? Disabled : 'div';

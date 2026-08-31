@@ -1,9 +1,8 @@
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __, _x, sprintf } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
-import { plus } from '@wordpress/icons';
 import useBlockDisplayInformation from '../use-block-display-information';
 import BlockIcon from '../block-icon';
 import Inserter from '../inserter';
@@ -108,37 +107,16 @@ export default function BlockParentSelector() {
 						clientId={ nextSiblingClientId }
 						isAppender={ ! nextSiblingClientId }
 						__experimentalIsQuick
-						renderToggle={ ( {
-							onToggle,
-							isOpen,
-							disabled,
-							blockTitle,
-							hasSingleBlockType,
-						} ) => (
-							<ToolbarButton
-								className="block-editor-block-parent-selector__inserter"
-								onClick={ onToggle }
-								aria-expanded={ isOpen }
-								disabled={ disabled }
-								label={
-									hasSingleBlockType
-										? sprintf(
-												// translators: %s: the name of the block when there is only one
-												_x(
-													'Add %s',
-													'directly add the only allowed block'
-												),
-												blockTitle.toLowerCase()
-										  )
-										: _x(
-												'Add block',
-												'Generic label for block inserter button'
-										  )
-								}
-								showTooltip
-								icon={ plus }
-							/>
-						) }
+						// InserterToggle supplies the icon, the disabled and
+						// aria wiring, and the label — including a block's own
+						// appender label, so the toolbar and the on-canvas
+						// appender name the same action the same way.
+						toggleProps={ {
+							as: ToolbarButton,
+							className:
+								'block-editor-inserter__toggle block-editor-block-parent-selector__inserter',
+							showTooltip: true,
+						} }
 					/>
 				</ToolbarGroup>
 			) }

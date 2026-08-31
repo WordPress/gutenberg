@@ -1,61 +1,19 @@
 import { useEntityBlockEditor } from '@wordpress/core-data';
-import {
-	useInnerBlocksProps,
-	InnerBlocks,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { useInnerBlocksProps } from '@wordpress/block-editor';
 import { useMemo } from '@wordpress/element';
 import PlaceholderPreview from './placeholder/placeholder-preview';
 import { DEFAULT_BLOCK, PRIORITIZED_INSERTER_BLOCKS } from '../constants';
 
 export default function NavigationInnerBlocks( {
-	clientId,
 	hasCustomPlaceholder,
+	isSelected,
 	orientation,
 	templateLock,
 } ) {
-	const {
-		isImmediateParentOfSelectedBlock,
-		selectedBlockHasChildren,
-		isSelected,
-		hasSelectedDescendant,
-	} = useSelect(
-		( select ) => {
-			const {
-				getBlockCount,
-				hasSelectedInnerBlock,
-				getSelectedBlockClientId,
-			} = select( blockEditorStore );
-			const selectedBlockId = getSelectedBlockClientId();
-
-			return {
-				isImmediateParentOfSelectedBlock: hasSelectedInnerBlock(
-					clientId,
-					false
-				),
-				selectedBlockHasChildren: !! getBlockCount( selectedBlockId ),
-				hasSelectedDescendant: hasSelectedInnerBlock( clientId, true ),
-
-				// This prop is already available but computing it here ensures it's
-				// fresh compared to isImmediateParentOfSelectedBlock.
-				isSelected: selectedBlockId === clientId,
-			};
-		},
-		[ clientId ]
-	);
-
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		'wp_navigation'
 	);
-
-	// When the block is selected itself or has a top level item selected that
-	// doesn't itself have children, show the standard appender. Else show no
-	// appender.
-	const parentOrChildHasSelection =
-		isSelected ||
-		( isImmediateParentOfSelectedBlock && ! selectedBlockHasChildren );
 
 	const placeholder = useMemo( () => <PlaceholderPreview />, [] );
 
@@ -63,8 +21,8 @@ export default function NavigationInnerBlocks( {
 
 	// If there is a `ref` attribute pointing to a `wp_navigation` but
 	// that menu has no **items** (i.e. empty) then show a placeholder.
-	// The block must also be selected else the placeholder will display
-	// alongside the appender.
+	// While the block is selected the toolbar offers "Add page", so the
+	// placeholder would only be telling the user what to do next.
 	const showPlaceholder =
 		! hasCustomPlaceholder && ! hasMenuItems && ! isSelected;
 
@@ -82,20 +40,10 @@ export default function NavigationInnerBlocks( {
 			orientation,
 			templateLock,
 
-			// As an exception to other blocks which feature nesting, show
-			// the block appender even when a child block is selected.
-			// This should be a temporary fix, to be replaced by improvements to
-			// the sibling inserter.
-			// See https://github.com/WordPress/gutenberg/issues/37572.
-			renderAppender:
-				isSelected ||
-				( isImmediateParentOfSelectedBlock &&
-					! selectedBlockHasChildren ) ||
-				hasSelectedDescendant ||
-				// Show the appender while dragging to allow inserting element between item and the appender.
-				parentOrChildHasSelection
-					? InnerBlocks.ButtonBlockAppender
-					: false,
+			// No on-canvas appender: `defaultBlock` and `directInsert` above
+			// are what the toolbar's "Add page" inserts, and what pressing
+			// Enter at the end of an item adds.
+			renderAppender: false,
 			placeholder: showPlaceholder ? placeholder : undefined,
 			__experimentalCaptureToolbars: true,
 			__unstableDisableLayoutClassNames: true,

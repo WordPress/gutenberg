@@ -14,6 +14,7 @@ import {
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 	useBlockEditingMode,
+	Inserter,
 	BlockControls,
 } from '@wordpress/block-editor';
 import {
@@ -35,8 +36,6 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
-import { page } from '@wordpress/icons';
-import { createBlock } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
 import useNavigationMenu from '../use-navigation-menu';
 import Placeholder from './placeholder';
@@ -65,10 +64,7 @@ import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { isWithinNavigationOverlay } from '../../utils/is-within-overlay';
 import useLayoutCustomProperties from './use-layout-custom-properties';
-import {
-	DEFAULT_BLOCK,
-	NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
-} from '../constants';
+import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../constants';
 
 const { isNavigationPostEditorKey } = unlock( blockEditorPrivateApis );
 
@@ -77,36 +73,33 @@ const { isNavigationPostEditorKey } = unlock( blockEditorPrivateApis );
  *
  * @param {Object} props          Component props.
  * @param {string} props.clientId Block client ID.
- * @return {React.JSX.Element} The Add page button component or null if not applicable.
+ * @return {React.JSX.Element|null} The Add page button, or null when editing is disabled.
  */
 function NavigationAddPageButton( { clientId } ) {
-	const { insertBlock } = useDispatch( blockEditorStore );
-	const { getBlockCount } = useSelect( blockEditorStore );
+	const blockEditingMode = useBlockEditingMode();
 
-	const onAddPage = useCallback( () => {
-		// Get the current number of blocks to insert at the end
-		const blockCount = getBlockCount( clientId );
+	if ( blockEditingMode === 'disabled' ) {
+		return null;
+	}
 
-		// Create a new navigation link block (default block)
-		const newBlock = createBlock( DEFAULT_BLOCK.name, {
-			kind: DEFAULT_BLOCK.attributes.kind,
-			type: DEFAULT_BLOCK.attributes.type,
-		} );
-
-		// Insert the block at the end of the navigation
-		insertBlock( newBlock, blockCount, clientId );
-	}, [ clientId, insertBlock, getBlockCount ] );
-
+	// The inner blocks declare `defaultBlock` + `directInsert`, so `Inserter`
+	// renders as a one-click button that appends that block — no popover — and
+	// brings the screen-reader announcement, the allowed-blocks/lock check and
+	// adjacent-attribute inheritance with it.
 	return (
 		<BlockControls>
 			<ToolbarGroup>
-				<ToolbarButton
-					name="add-page"
-					icon={ page }
-					onClick={ onAddPage }
-				>
-					{ __( 'Add page' ) }
-				</ToolbarButton>
+				<Inserter
+					rootClientId={ clientId }
+					isAppender
+					toggleProps={ {
+						as: ToolbarButton,
+						name: 'add-page',
+						icon: undefined,
+						label: __( 'Add page' ),
+						children: __( 'Add page' ),
+					} }
+				/>
 			</ToolbarGroup>
 		</BlockControls>
 	);
@@ -976,6 +969,7 @@ function Navigation( {
 					blockEditingMode={ blockEditingMode }
 				/>
 				{ blockEditingMode === 'default' && stylingInspectorControls }
+				<NavigationAddPageButton clientId={ clientId } />
 				<TagName
 					{ ...blockProps }
 					aria-describedby={
@@ -1001,7 +995,9 @@ function Navigation( {
 						<UnsavedInnerBlocks
 							createNavigationMenu={ createNavigationMenu }
 							blocks={ uncontrolledInnerBlocks }
-							hasSelection={ isSelected || isInnerBlockSelected }
+							shouldAutoSave={
+								isSelected || isInnerBlockSelected
+							}
 						/>
 					</ResponsiveWrapper>
 				</TagName>
@@ -1101,10 +1097,7 @@ function Navigation( {
 			{ blockEditingMode === 'default' && stylingInspectorControls }
 			<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
 				<RecursionProvider uniqueId={ recursionId }>
-					{ blockEditingMode === 'contentOnly' &&
-						isEntityAvailable && (
-							<NavigationAddPageButton clientId={ clientId } />
-						) }
+					<NavigationAddPageButton clientId={ clientId } />
 					{ blockEditingMode === 'default' && isEntityAvailable && (
 						<InspectorControls group="advanced">
 							{ hasResolvedCanUserUpdateNavigationMenu &&
@@ -1169,7 +1162,7 @@ function Navigation( {
 								>
 									{ isEntityAvailable && (
 										<NavigationInnerBlocks
-											clientId={ clientId }
+											isSelected={ isSelected }
 											hasCustomPlaceholder={
 												!! CustomPlaceholder
 											}

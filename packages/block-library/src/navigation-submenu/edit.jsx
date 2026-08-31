@@ -5,7 +5,7 @@ import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
-	InnerBlocks,
+	Inserter,
 	InspectorControls,
 	useInnerBlocksProps,
 	RichText,
@@ -109,7 +109,6 @@ export default function NavigationSubmenuEdit( {
 	const {
 		parentCount,
 		isParentOfSelectedBlock,
-		isImmediateParentOfSelectedBlock,
 		hasChildren,
 		selectedBlockHasChildren,
 		onlyDescendantIsEmptyLink,
@@ -149,10 +148,6 @@ export default function NavigationSubmenuEdit( {
 				isParentOfSelectedBlock: hasSelectedInnerBlock(
 					clientId,
 					true
-				),
-				isImmediateParentOfSelectedBlock: hasSelectedInnerBlock(
-					clientId,
-					false
 				),
 				hasChildren: !! getBlockCount( clientId ),
 				selectedBlockHasChildren: !! selectedBlockChildren?.length,
@@ -271,14 +266,9 @@ export default function NavigationSubmenuEdit( {
 		// see: https://github.com/WordPress/gutenberg/pull/34615.
 		__experimentalCaptureToolbars: true,
 
-		renderAppender:
-			isSelected ||
-			( isImmediateParentOfSelectedBlock &&
-				! selectedBlockHasChildren ) ||
-			// Show the appender while dragging to allow inserting element between item and the appender.
-			hasChildren
-				? InnerBlocks.ButtonBlockAppender
-				: false,
+		// No on-canvas appender: the toolbar's "Add submenu page" adds items
+		// to this submenu.
+		renderAppender: false,
 	} );
 
 	const ParentElement = openSubmenusOnClick ? 'button' : 'a';
@@ -324,6 +314,22 @@ export default function NavigationSubmenuEdit( {
 						onClick={ transformToLink }
 						className="wp-block-navigation__submenu__revert"
 						disabled={ ! canConvertToLink }
+					/>
+				</ToolbarGroup>
+				<ToolbarGroup>
+					{ /* `defaultBlock` + `directInsert` below make this a
+					     one-click append into this submenu, rather than the
+					     Navigation block that the parent selector targets. */ }
+					<Inserter
+						rootClientId={ clientId }
+						isAppender
+						toggleProps={ {
+							as: ToolbarButton,
+							name: 'add-submenu-page',
+							icon: undefined,
+							label: __( 'Add submenu page' ),
+							children: __( 'Add submenu page' ),
+						} }
 					/>
 				</ToolbarGroup>
 			</BlockControls>
