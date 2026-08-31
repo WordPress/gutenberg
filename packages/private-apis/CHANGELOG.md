@@ -3,8 +3,8 @@
 ## Unreleased
 
 ### Internal
-
--   Remove `@wordpress/admin-ui` from the list of core modules using private APIs. [#82205](https://github.com/WordPress/gutenberg/pull/82205)
+-   Restore `@wordpress/dataviews` in the list of core modules allowed to use private APIs. DataViews copies published to npm before the private API cleanup opt in at module load, so plugin bundles embedding them throw without the entry. [#82221](https://github.com/WordPress/gutenberg/pull/82221)
+-   Document that `@wordpress/admin-ui` must remain in the list of core modules allowed to use private APIs. Older npm copies opt in at module load, so plugin bundles embedding them throw without the entry. [#82205](https://github.com/WordPress/gutenberg/pull/82205)
 
 ## 1.54.0 (2026-08-26)
 

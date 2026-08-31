@@ -10,12 +10,18 @@ const {
 	getFilesFromDir,
 } = require( '../lib/utils' );
 const config = require( '../config' );
+const { devEngines } = require( '../../../package.json' );
 const { sanitizeBranchName } = require( '../lib/sanitize-branch-name' );
 
 const ARTIFACTS_PATH =
 	process.env.WP_ARTIFACTS_PATH || path.join( process.cwd(), 'artifacts' );
 const RAW_RESULTS_FILE_SUFFIX = '.performance-results.raw.json';
 const RESULTS_FILE_SUFFIX = '.performance-results.json';
+/*
+ * Read from the CLI's own checkout, so every branch under test builds with the
+ * npm version trunk requires rather than whichever npm the runner happens to ship.
+ */
+const NPM_VERSION = devEngines.packageManager.version;
 
 /**
  * @typedef WPPerformanceCommandOptions
@@ -379,7 +385,7 @@ async function runPerformanceTests( branches, options ) {
 
 		logAtIndent( 2, 'Installing dependencies and building' );
 		await runShellScript(
-			`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm install --global npm@10 && npm ci && npm run build --workspace @wordpress/e2e-test-utils-playwright && npx playwright install chromium --with-deps"`,
+			`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm install --global npm@'${ NPM_VERSION }' && npm ci && npm run build --workspace @wordpress/e2e-test-utils-playwright && npx playwright install chromium --with-deps"`,
 			testRunnerDir
 		);
 	}
@@ -465,7 +471,7 @@ async function runPerformanceTests( branches, options ) {
 
 			logAtIndent( 3, 'Installing dependencies and building' );
 			await runShellScript(
-				`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm install --global npm@10 && npm ci && (npm run build -- --skip-types || npm run build)"`,
+				`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm install --global npm@'${ NPM_VERSION }' && npm ci && (npm run build -- --skip-types || npm run build)"`,
 				buildDir
 			);
 		}
