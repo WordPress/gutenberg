@@ -95,19 +95,48 @@ export function useInBetweenInserter() {
 				const offsetLeft = event.clientX;
 
 				const children = Array.from( event.target.children );
-				let element = children.find( ( blockEl ) => {
-					const blockElRect = blockEl.getBoundingClientRect();
-					return (
-						( blockEl.classList.contains( 'wp-block' ) &&
-							orientation === 'vertical' &&
-							blockElRect.top > offsetTop ) ||
-						( blockEl.classList.contains( 'wp-block' ) &&
-							orientation === 'horizontal' &&
-							( isRTL()
-								? blockElRect.right < offsetLeft
-								: blockElRect.left > offsetLeft ) )
+				let element;
+
+				if ( orientation === 'horizontal' ) {
+					// Build candidates: only direct children that are .wp-block
+					const candidates = children
+						.filter( ( blockEl ) =>
+							blockEl.classList.contains( 'wp-block' )
+						)
+						.map( ( blockEl ) => ( {
+							el: blockEl,
+							rect: blockEl.getBoundingClientRect(),
+						} ) );
+
+					// Prefer tiles that overlap the mouse Y (same visual row).
+					const rowCandidates = candidates.filter(
+						( c ) =>
+							offsetTop >= c.rect.top &&
+							offsetTop <= c.rect.bottom
 					);
-				} );
+
+					const findCandidate = ( list ) =>
+						list.find( ( c ) =>
+							isRTL()
+								? c.rect.right < offsetLeft
+								: c.rect.left > offsetLeft
+						);
+
+					// Pick same-row candidate first, fallback to any candidate.
+					const match =
+						findCandidate( rowCandidates ) ||
+						findCandidate( candidates );
+					element = match ? match.el : undefined;
+				} else {
+					// Vertical orientation.
+					element = children.find( ( blockEl ) => {
+						if ( ! blockEl.classList.contains( 'wp-block' ) ) {
+							return false;
+						}
+						const blockElRect = blockEl.getBoundingClientRect();
+						return blockElRect.top > offsetTop;
+					} );
+				}
 
 				if ( ! element ) {
 					hideInsertionPoint();
