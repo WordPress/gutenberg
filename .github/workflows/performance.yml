@@ -109,9 +109,16 @@ jobs:
                   BUILD_KEY: ${{ needs.prepare.outputs.build-key }}
                   BUILD_SHA: ${{ matrix.branch.sha }}
               run: |
+                  # The revision matters, not just the family: GitHub updates the hosted
+                  # image regularly. A runner that does not name both is unidentifiable, so
+                  # it keys on this attempt instead, which nothing else can match.
+                  image="run-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+                  if [[ -n "${ImageOS:-}" && -n "${ImageVersion:-}" ]]; then
+                    image="$ImageOS-$ImageVersion"
+                  fi
                   jq -n --arg sha "$BUILD_SHA" --arg buildKey "$BUILD_KEY" \
-                    --arg node "$(node -v)" --arg npm "$(npm -v)" \
-                    --arg image "${ImageOS:-}" '$ARGS.named' | tee "$MANIFEST"
+                    --arg node "$(node -v)" --arg npm "$(npm -v)" --arg image "$image" \
+                    '$ARGS.named' | tee "$MANIFEST"
 
             # Downloads into a staging directory: a partial download must not survive into
             # the plugin a fresh build packages.
