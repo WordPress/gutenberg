@@ -105,8 +105,8 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 	 * The dynamic portion of the function name, `$navigation_type`,
 	 * Refers to the type of adjacency, 'next' or 'previous'.
 	 *
-	 * @see https://developer.wordpress.org/reference/functions/get_previous_post_link/
-	 * @see https://developer.wordpress.org/reference/functions/get_next_post_link/
+	 * @link https://developer.wordpress.org/reference/functions/get_previous_post_link/
+	 * @link https://developer.wordpress.org/reference/functions/get_next_post_link/
 	 */
 	$get_link_function = "get_{$navigation_type}_post_link";
 
