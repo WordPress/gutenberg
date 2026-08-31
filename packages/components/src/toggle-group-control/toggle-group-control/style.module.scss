@@ -38,6 +38,16 @@
 		/* Hide when dimensions are unset (0) */
 		opacity: min(1, max(0, var(--selected-width, 0), var(--selected-height, 0)));
 	}
+
+	&[aria-disabled="true"] {
+		&::before {
+			opacity: calc(min(1, max(0, var(--selected-width, 0), var(--selected-height, 0))) * 0.4);
+		}
+
+		button {
+			pointer-events: none;
+		}
+	}
 }
 
 .has-border {
@@ -45,7 +55,7 @@
 }
 
 .has-enclosing-borders {
-	&:hover {
+	&:hover:not([aria-disabled="true"]) {
 		border-color: $components-color-gray-400;
 	}
 

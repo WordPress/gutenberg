@@ -63,6 +63,9 @@ function ToggleGroupControlOptionBase(
 		...otherButtonProps
 	} = buttonProps;
 
+	const isOptionDisabled = Boolean(
+		toggleGroupControlContext.disabled || disabled
+	);
 	const isPressed = toggleGroupControlContext.value === value;
 	const labelClasses = clsx(
 		styles.label,
@@ -109,7 +112,7 @@ function ToggleGroupControlOptionBase(
 				{ isDeselectable ? (
 					<button
 						{ ...commonProps }
-						disabled={ disabled }
+						disabled={ isOptionDisabled }
 						aria-pressed={ isPressed }
 						type="button"
 						onClick={ buttonOnClick }
@@ -120,7 +123,7 @@ function ToggleGroupControlOptionBase(
 					</button>
 				) : (
 					<Ariakit.Radio
-						disabled={ disabled }
+						disabled={ isOptionDisabled }
 						onFocusVisible={ () => {
 							const selectedValueIsEmpty =
 								toggleGroupControlContext.value === null ||
