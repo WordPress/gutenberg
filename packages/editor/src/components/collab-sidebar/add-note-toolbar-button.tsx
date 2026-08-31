@@ -3,6 +3,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
+	// @ts-expect-error `@wordpress/block-editor` has no type declarations.
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { getUnregisteredTypeHandlerName } from '@wordpress/blocks';
@@ -12,7 +13,17 @@ import { unlock } from '../../lock-unlock';
 
 const { NoteIconToolbarSlotFill } = unlock( blockEditorPrivateApis );
 
-function NoteToolbarButton( { clientId, isOpen, onClick } ) {
+type NoteToolbarButtonProps = {
+	clientId: string;
+	isOpen: boolean;
+	onClick: () => void;
+};
+
+function NoteToolbarButton( {
+	clientId,
+	isOpen,
+	onClick,
+}: NoteToolbarButtonProps ) {
 	const block = useSelect(
 		( select ) => select( blockEditorStore ).getBlock( clientId ),
 		[ clientId ]
@@ -47,13 +58,23 @@ function NoteToolbarButton( { clientId, isOpen, onClick } ) {
 			aria-expanded={ isOpen }
 			isPressed={ isOpen }
 			disabled={ isDisabled }
-			shortcut={ shortcut }
+			shortcut={ shortcut ?? undefined }
 			showTooltip
 		/>
 	);
 }
 
-export function AddNoteToolbarButton( { clientId, isOpen, onClick } ) {
+type AddNoteToolbarButtonProps = {
+	clientId: string;
+	isOpen: boolean;
+	onClick: ( clientId: string ) => void;
+};
+
+export function AddNoteToolbarButton( {
+	clientId,
+	isOpen,
+	onClick,
+}: AddNoteToolbarButtonProps ) {
 	return (
 		<NoteIconToolbarSlotFill.Fill>
 			<NoteToolbarButton
