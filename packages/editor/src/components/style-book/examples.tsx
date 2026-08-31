@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import type { Block } from '@wordpress/blocks';
 import {
@@ -9,10 +6,6 @@ import {
 	getBlockFromExample,
 	createBlock,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import type { BlockExample, ColorOrigin, MultiOriginPalettes } from './types';
 import ColorExamples from './color-examples';
 import DuotoneExamples from './duotone-examples';

@@ -1,20 +1,9 @@
-/**
- * WordPress dependencies
- */
 import {
 	createReduxStore,
 	createRegistry,
 	RegistryProvider,
 } from '@wordpress/data';
-
-/**
- * External dependencies
- */
 import { render, screen, waitFor } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import useQuerySelect from '../use-query-select';
 
 /* eslint-disable @wordpress/wp-global-usage */

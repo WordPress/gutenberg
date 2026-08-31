@@ -1,12 +1,8 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-
-/**
- * Internal dependencies
- */
-const { recordRequests } = require( './record-requests' );
+const {
+	recordRequests,
+	waitForRequestsToSettle,
+} = require( './record-requests' );
 
 test.describe( 'Preload', () => {
 	let pageId;
@@ -14,6 +10,11 @@ test.describe( 'Preload', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.resetPreferences();
+		// Posts left behind by earlier specs change the startup requests:
+		// with at least one post, emptytheme's index template query loop
+		// renders the Post Excerpt block, whose editor component fetches
+		// /wp/v2/types/post?context=edit.
+		await requestUtils.deleteAllPosts();
 		const pg = await requestUtils.createPage( {
 			content:
 				'<!-- wp:heading -->\n<h2 class="wp-block-heading">Hello</h2>\n<!-- /wp:heading -->',
@@ -39,8 +40,7 @@ test.describe( 'Preload', () => {
 			.locator( '[data-block]' )
 			.first()
 			.waitFor();
-		// eslint-disable-next-line playwright/no-networkidle
-		await page.waitForLoadState( 'networkidle' );
+		await waitForRequestsToSettle( requests );
 		stop();
 
 		// `POST /wp/v2/users/me` (preferences persistence) occasionally
@@ -72,8 +72,7 @@ test.describe( 'Preload', () => {
 			.getByRole( 'document', { name: 'Block: Heading' } )
 			.filter( { hasText: 'Hello' } )
 			.waitFor();
-		// eslint-disable-next-line playwright/no-networkidle
-		await page.waitForLoadState( 'networkidle' );
+		await waitForRequestsToSettle( requests );
 		stop();
 
 		// `POST /wp/v2/users/me` (preferences persistence) occasionally

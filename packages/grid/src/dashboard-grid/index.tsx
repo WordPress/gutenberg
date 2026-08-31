@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import {
 	DndContext,
 	DragOverlay,
@@ -16,10 +13,6 @@ import {
 } from '@dnd-kit/sortable';
 import type { DragMoveEvent, DragStartEvent } from '@dnd-kit/core';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useResizeObserver, useEvent, useMergeRefs } from '@wordpress/compose';
 import {
 	forwardRef,
@@ -31,10 +24,6 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { GridItem } from './grid-item';
 import { GridOverlay } from '../shared/grid-overlay';
 import { gridSpanToPixelSize } from '../shared/resize-snap';
@@ -54,7 +43,7 @@ import styles from './grid.module.css';
 
 const dashboardDragDropAnimation = createDashboardDragDropAnimation(
 	styles[ 'drag-preview-frame' ],
-	styles.dragPreviewFrameExiting
+	styles[ 'is-exiting' ]
 );
 
 // Fallback gap in pixels for math that runs before the computed gap
@@ -145,9 +134,9 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		} | null >( null );
 		// Mirror of `temporaryLayout` read synchronously on drag end —
 		// the state update from `handleDragMove` may still be batched.
-		const latestLayoutRef = useRef< DashboardGridLayoutItem[] | undefined >(
-			undefined
-		);
+		const latestLayoutRef = useRef<
+			DashboardGridLayoutItem[] | undefined
+		>();
 		// Cursor center at the last applied reorder. Used to skip the
 		// cascade of re-measured `onDragMove` events after a layout
 		// change, when the cursor has not actually moved.
@@ -315,13 +304,10 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 
 					// Strip `actionableArea` so it does not leak to the DOM;
 					// the grid lifts it to a slot separately.
-					const typedChild = child as React.ReactElement< {
-						actionableArea?: React.ReactNode;
-					} >;
-					const { actionableArea } = typedChild.props;
+					const { actionableArea } = child.props;
 					const stripped =
 						actionableArea !== undefined
-							? cloneElement( typedChild, {
+							? cloneElement( child, {
 									actionableArea: undefined,
 							  } )
 							: child;
@@ -571,15 +557,11 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				</div>
 			) : null;
 
-		// Edit-mode background visual. Default paints row-marker tiles
-		// per column; a consumer can replace it via `renderGridOverlay`
-		// while reusing the resolved column count, row height, and row
-		// count. `'auto'` collapses to `undefined` for the overlay so
-		// row markers are omitted when the row height is content-driven.
-		// Rendered unconditionally so the overlay can cross-fade on
-		// edit-mode toggles; `isActive` drives the opacity transition
-		// inside the overlay. Memoized so drag/resize re-renders skip
-		// reconciliation while inputs are stable.
+		// Edit-mode background. Rendered unconditionally so it can
+		// cross-fade on edit-mode toggles (`isActive` drives the
+		// transition); memoized so drag/resize re-renders skip it while
+		// inputs are stable. A numeric `rowHeight` adds row markers;
+		// `'auto'` collapses to `undefined` and omits them.
 		const Overlay = renderGridOverlay ?? GridOverlay;
 		const overlayRowHeight =
 			typeof rowHeight === 'number' ? rowHeight : undefined;

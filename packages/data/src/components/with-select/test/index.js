@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { compose } from '@wordpress/compose';
-import { Component, createRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import { Component, createRef, forwardRef } from '@wordpress/element';
 import withSelect from '../';
 import withDispatch from '../../with-dispatch';
 import { createRegistry } from '../../../registry';
@@ -636,11 +625,11 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		const OriginalComponent = ( { value, ref } ) => (
+		const OriginalComponent = forwardRef( ( { value }, ref ) => (
 			<div ref={ ref } role="status">
 				{ value }
 			</div>
-		);
+		) );
 
 		const DataBoundComponent = withSelect( ( _select ) => ( {
 			value: _select( 'demo' ).getValue(),

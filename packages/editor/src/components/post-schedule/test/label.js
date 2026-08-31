@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { getSettings, setSettings } from '@wordpress/date';
-
-/**
- * Internal dependencies
- */
 import { getFullPostScheduleLabel, getPostScheduleLabel } from '../label';
 
 describe( 'getFullPostScheduleLabel', () => {

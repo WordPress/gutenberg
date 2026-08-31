@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { DashboardLanes } from '..';
 import type { DashboardLanesLayoutItem } from '../types';
 import type { GridOverlayRenderProps } from '../../shared/types';
@@ -68,23 +57,23 @@ type Story = StoryObj< typeof DashboardLanes >;
 type Tone = 'brand' | 'info' | 'success' | 'warning' | 'error' | 'neutral';
 
 const bgTokens: Record< Tone, string > = {
-	brand: 'var(--wpds-color-bg-surface-brand)',
-	info: 'var(--wpds-color-bg-surface-info)',
-	success: 'var(--wpds-color-bg-surface-success)',
-	warning: 'var(--wpds-color-bg-surface-warning)',
-	error: 'var(--wpds-color-bg-surface-error)',
-	neutral: 'var(--wpds-color-bg-surface-neutral-weak)',
+	brand: 'var(--wpds-color-background-surface-brand)',
+	info: 'var(--wpds-color-background-surface-info)',
+	success: 'var(--wpds-color-background-surface-success)',
+	warning: 'var(--wpds-color-background-surface-warning)',
+	error: 'var(--wpds-color-background-surface-error)',
+	neutral: 'var(--wpds-color-background-surface-neutral-weak)',
 };
 
 const fgTokens: Record< Tone, string > = {
 	// `brand` has no dedicated fg-content token in the design system,
 	// so neutral content reads safely against the brand surface tint.
-	brand: 'var(--wpds-color-fg-content-neutral)',
-	info: 'var(--wpds-color-fg-content-info)',
-	success: 'var(--wpds-color-fg-content-success)',
-	warning: 'var(--wpds-color-fg-content-warning)',
-	error: 'var(--wpds-color-fg-content-error)',
-	neutral: 'var(--wpds-color-fg-content-neutral)',
+	brand: 'var(--wpds-color-foreground-content-neutral)',
+	info: 'var(--wpds-color-foreground-content-info)',
+	success: 'var(--wpds-color-foreground-content-success)',
+	warning: 'var(--wpds-color-foreground-content-warning)',
+	error: 'var(--wpds-color-foreground-content-error)',
+	neutral: 'var(--wpds-color-foreground-content-neutral)',
 };
 
 function Tile( {
@@ -198,6 +187,11 @@ export const Default: Story = {
  * frame to see the lane count adapt.
  */
 export const Responsive: Story = {
+	parameters: {
+		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	args: {
 		minColumnWidth: 200,
 		layout: [
@@ -227,6 +221,11 @@ export const Responsive: Story = {
  * tiles below `minColumnWidth`.
  */
 export const Layered: Story = {
+	parameters: {
+		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	args: {
 		columns: 4,
 		minColumnWidth: 200,
@@ -255,6 +254,11 @@ export const Layered: Story = {
  * lanes.
  */
 export const Spanning: Story = {
+	parameters: {
+		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	args: {
 		columns: 4,
 		layout: [
@@ -298,6 +302,11 @@ export const Spanning: Story = {
  * story below for a full override example.
  */
 export const EditMode: Story = {
+	parameters: {
+		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	args: {
 		columns: 4,
 		editMode: true,
@@ -397,7 +406,7 @@ function NumberedLanesOverlay( { columns, isActive }: GridOverlayRenderProps ) {
 				transition: isActive
 					? 'opacity 200ms ease, visibility 0s linear 0s'
 					: 'opacity 200ms ease, visibility 0s linear 200ms',
-				backgroundImage: `repeating-linear-gradient(135deg, color-mix(in srgb, var(--wpds-color-bg-surface-info) 24%, transparent) 0 6px, transparent 6px 12px)`,
+				backgroundImage: `repeating-linear-gradient(135deg, color-mix(in srgb, var(--wpds-color-background-surface-info) 24%, transparent) 0 6px, transparent 6px 12px)`,
 			} }
 		>
 			{ Array.from( { length: columns } ).map( ( _, i ) => (
@@ -407,7 +416,7 @@ function NumberedLanesOverlay( { columns, isActive }: GridOverlayRenderProps ) {
 						outline:
 							'1px dashed var(--wpds-color-stroke-surface-info)',
 						backgroundColor:
-							'color-mix(in srgb, var(--wpds-color-bg-surface-info) 10%, transparent)',
+							'color-mix(in srgb, var(--wpds-color-background-surface-info) 10%, transparent)',
 						position: 'relative',
 					} }
 				>
@@ -419,8 +428,9 @@ function NumberedLanesOverlay( { columns, isActive }: GridOverlayRenderProps ) {
 							fontSize: 10,
 							padding: '1px 6px',
 							borderRadius: 2,
-							background: 'var(--wpds-color-bg-surface-info)',
-							color: 'var(--wpds-color-fg-content-info)',
+							background:
+								'var(--wpds-color-background-surface-info)',
+							color: 'var(--wpds-color-foreground-content-info)',
 							fontFamily:
 								'var(--wpds-typography-font-family-mono)',
 						} }
@@ -443,6 +453,11 @@ function NumberedLanesOverlay( { columns, isActive }: GridOverlayRenderProps ) {
  * entirely while keeping `editMode` interactions on.
  */
 export const CustomGridOverlayStory: Story = {
+	parameters: {
+		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	name: 'Custom Grid Overlay',
 	args: {
 		columns: 4,

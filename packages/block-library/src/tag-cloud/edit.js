@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Flex,
 	FlexItem,
@@ -24,10 +21,6 @@ import {
 import { store as coreStore } from '@wordpress/core-data';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { useDisabled } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
 
@@ -139,7 +132,6 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
 					isShownByDefault
 				>
 					<SelectControl
-						__next40pxDefaultSize
 						label={ __( 'Taxonomy' ) }
 						options={ getTaxonomyOptions() }
 						value={ taxonomy }
@@ -175,7 +167,6 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
 								units={ units }
 								min={ MIN_FONT_SIZE }
 								max={ MAX_FONT_SIZE }
-								size="__unstable-large"
 							/>
 						</FlexItem>
 						<FlexItem isBlock>
@@ -191,7 +182,6 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
 								units={ units }
 								min={ MIN_FONT_SIZE }
 								max={ MAX_FONT_SIZE }
-								size="__unstable-large"
 							/>
 						</FlexItem>
 					</Flex>
@@ -203,7 +193,6 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
 					isShownByDefault
 				>
 					<RangeControl
-						__next40pxDefaultSize
 						label={ __( 'Number of tags' ) }
 						value={ numberOfTags }
 						onChange={ ( value ) =>

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { isViewportMatch } from '../selectors';
 
 describe( 'selectors', () => {

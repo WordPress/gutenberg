@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import {
@@ -22,10 +15,6 @@ import {
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import {
 	useCanEditEntity,
 	useToolsPanelDropdownMenuProps,
@@ -248,7 +237,6 @@ export default function PostExcerptEditor( props ) {
 						isShownByDefault
 					>
 						<RangeControl
-							__next40pxDefaultSize
 							label={ __( 'Max number of words' ) }
 							value={ excerptLength }
 							onChange={ ( value ) => {

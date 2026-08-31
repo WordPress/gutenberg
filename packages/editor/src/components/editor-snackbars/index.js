@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
 import { SnackbarNotices } from '@wordpress/notices';
 

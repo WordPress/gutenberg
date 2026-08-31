@@ -1,7 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useEffect, useState } from '@wordpress/element';
 import * as Combobox from '../index';
-import { ITEMS, type FixtureItem } from './fixtures';
+import {
+	ITEMS,
+	GROUPED_ITEMS,
+	type FixtureGroup,
+	type FixtureItem,
+} from './fixtures';
 
 const meta: Meta< typeof Combobox.Root > = {
 	title: 'Design System/Components/Form/Primitives/Combobox',
@@ -11,11 +16,14 @@ const meta: Meta< typeof Combobox.Root > = {
 		'Combobox.Portal': Combobox.Portal,
 		'Combobox.Positioner': Combobox.Positioner,
 		'Combobox.Popup': Combobox.Popup,
+		'Combobox.InputGroup': Combobox.InputGroup,
 		'Combobox.Input': Combobox.Input,
 		'Combobox.List': Combobox.List,
 		'Combobox.ListBody': Combobox.ListBody,
 		'Combobox.ListFooter': Combobox.ListFooter,
 		'Combobox.Collection': Combobox.Collection,
+		'Combobox.Group': Combobox.Group,
+		'Combobox.GroupLabel': Combobox.GroupLabel,
 		'Combobox.Item': Combobox.Item,
 		'Combobox.Value': Combobox.Value,
 		'Combobox.Chips': Combobox.Chips,
@@ -24,6 +32,10 @@ const meta: Meta< typeof Combobox.Root > = {
 		'Combobox.Clear': Combobox.Clear,
 	},
 	parameters: {
+		// FIXME: The trigger has no visible label and relies on aria-label
+		// (button-name).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
 		componentStatus: {
 			status: 'use-with-caution',
 			whereUsed: 'global',
@@ -43,31 +55,29 @@ const inputWrapperStyle = {
 export const Default: Story = {
 	args: {
 		items: ITEMS,
-		children: (
-			<>
-				<Combobox.Trigger />
-				<Combobox.Popup>
-					<div style={ inputWrapperStyle }>
-						<Combobox.Input placeholder="Search" />
-					</div>
-					<Combobox.Empty>No results found.</Combobox.Empty>
-					<Combobox.List>
-						<Combobox.ListBody>
-							<Combobox.Collection>
-								{ ( item: FixtureItem ) => (
-									<Combobox.Item
-										key={ item.value }
-										value={ item }
-									>
-										{ item.label }
-									</Combobox.Item>
-								) }
-							</Combobox.Collection>
-						</Combobox.ListBody>
-					</Combobox.List>
-				</Combobox.Popup>
-			</>
-		),
+		children: [
+			<Combobox.Trigger key="trigger" />,
+			<Combobox.Popup key="popup">
+				<div style={ inputWrapperStyle }>
+					<Combobox.Input placeholder="Search" />
+				</div>
+				<Combobox.Empty>No results found.</Combobox.Empty>
+				<Combobox.List>
+					<Combobox.ListBody>
+						<Combobox.Collection>
+							{ ( item: FixtureItem ) => (
+								<Combobox.Item
+									key={ item.value }
+									value={ item }
+								>
+									{ item.label }
+								</Combobox.Item>
+							) }
+						</Combobox.Collection>
+					</Combobox.ListBody>
+				</Combobox.List>
+			</Combobox.Popup>,
+		],
 	},
 };
 
@@ -75,32 +85,29 @@ export const Compact: Story = {
 	args: {
 		defaultValue: ITEMS[ 0 ],
 		items: ITEMS,
-		children: (
-			<>
-				<Combobox.Trigger size="compact" />
-				<Combobox.Popup>
-					<div style={ inputWrapperStyle }>
-						<Combobox.Input placeholder="Search" />
-					</div>
-					<Combobox.Empty>No results found.</Combobox.Empty>
-					<Combobox.List>
-						<Combobox.ListBody>
-							<Combobox.Collection>
-								{ ( item: FixtureItem ) => (
-									<Combobox.Item
-										key={ item.value }
-										value={ item }
-										size="compact"
-									>
-										{ item.label }
-									</Combobox.Item>
-								) }
-							</Combobox.Collection>
-						</Combobox.ListBody>
-					</Combobox.List>
-				</Combobox.Popup>
-			</>
-		),
+		children: [
+			<Combobox.Trigger size="compact" key="trigger" />,
+			<Combobox.Popup key="popup">
+				<div style={ inputWrapperStyle }>
+					<Combobox.Input placeholder="Search" />
+				</div>
+				<Combobox.Empty>No results found.</Combobox.Empty>
+				<Combobox.List>
+					<Combobox.ListBody>
+						<Combobox.Collection>
+							{ ( item: FixtureItem ) => (
+								<Combobox.Item
+									key={ item.value }
+									value={ item }
+								>
+									{ item.label }
+								</Combobox.Item>
+							) }
+						</Combobox.Collection>
+					</Combobox.ListBody>
+				</Combobox.List>
+			</Combobox.Popup>,
+		],
 	},
 };
 
@@ -112,37 +119,54 @@ export const Compact: Story = {
  * To do this, omit the `Popup` and enable the `inline` prop on the `Root`.
  */
 export const DetachedInline: Story = {
+	parameters: {
+		// The input keeps focus and arrow keys move through the options, so
+		// the scrollable list is reachable by keyboard.
+		a11y: {
+			// Storybook merges parameters, so `test` must be set here to
+			// override the warning-only default from `meta`.
+			test: 'error',
+			config: {
+				rules: [
+					{ id: 'scrollable-region-focusable', enabled: false },
+				],
+			},
+		},
+	},
 	args: {
 		items: ITEMS,
 		multiple: true,
 		inline: true,
-		children: (
-			<>
-				<Combobox.Input placeholder="Search" />
-				<div
-					style={ {
-						minHeight: '200px',
-						maxHeight: '200px',
-						marginTop: 8,
-						overflow: 'auto',
-					} }
-				>
-					<Combobox.Empty>No results found.</Combobox.Empty>
-					<Combobox.List>
-						<Combobox.Collection>
-							{ ( item: FixtureItem ) => (
-								<Combobox.Item
-									key={ item.value }
-									value={ item }
-								>
-									{ item.label }
-								</Combobox.Item>
-							) }
-						</Combobox.Collection>
-					</Combobox.List>
-				</div>
-			</>
-		),
+		// `inline` requires `open` so the input references the visible list
+		// with `aria-controls`.
+		open: true,
+		children: [
+			<Combobox.Input
+				aria-label="Search items"
+				placeholder="Search items"
+				key="input"
+			/>,
+			<div
+				style={ {
+					minHeight: '200px',
+					maxHeight: '200px',
+					marginTop: 8,
+					overflow: 'auto',
+				} }
+				key="div"
+			>
+				<Combobox.Empty>No results found.</Combobox.Empty>
+				<Combobox.List>
+					<Combobox.Collection>
+						{ ( item: FixtureItem ) => (
+							<Combobox.Item key={ item.value } value={ item }>
+								{ item.label }
+							</Combobox.Item>
+						) }
+					</Combobox.Collection>
+				</Combobox.List>
+			</div>,
+		],
 	},
 };
 
@@ -280,66 +304,110 @@ export const WithCustomTriggerAndItem: Story = {
 	args: {
 		items: ITEMS,
 		defaultValue: ITEMS[ 0 ],
-		children: (
-			<>
-				<Combobox.Trigger>
-					{ ( item: FixtureItem ) => (
-						<span
+		children: [
+			<Combobox.Trigger key="trigger">
+				{ ( item: FixtureItem ) => (
+					<span
+						style={ {
+							display: 'flex',
+							alignItems: 'center',
+							gap: 8,
+						} }
+					>
+						<img
+							src={ `https://gravatar.com/avatar/?d=initials&name=${ item.value }` }
+							alt=""
+							width="20"
 							style={ {
-								display: 'flex',
-								alignItems: 'center',
-								gap: 8,
+								borderRadius: '50%',
 							} }
-						>
-							<img
-								src={ `https://gravatar.com/avatar/?d=initials&name=${ item.value }` }
-								alt=""
-								width="20"
-								style={ {
-									borderRadius: '50%',
-								} }
-							/>
-							{ item.label }
-						</span>
-					) }
-				</Combobox.Trigger>
-				<Combobox.Popup>
-					<div style={ inputWrapperStyle }>
-						<Combobox.Input placeholder="Search" />
-					</div>
-					<Combobox.List>
-						<Combobox.ListBody>
-							<Combobox.Collection>
-								{ ( item: FixtureItem ) => (
-									<Combobox.Item
-										key={ item.value }
-										value={ item }
-										aria-describedby={ `description-${ item.value }` }
+						/>
+
+						{ item.label }
+					</span>
+				) }
+			</Combobox.Trigger>,
+			<Combobox.Popup key="popup">
+				<div style={ inputWrapperStyle }>
+					<Combobox.Input placeholder="Search" />
+				</div>
+				<Combobox.List>
+					<Combobox.ListBody>
+						<Combobox.Collection>
+							{ ( item: FixtureItem ) => (
+								<Combobox.Item
+									key={ item.value }
+									value={ item }
+									aria-describedby={ `description-${ item.value }` }
+								>
+									<div
+										style={ {
+											display: 'flex',
+											alignItems: 'center',
+											justifyContent: 'space-between',
+											flexGrow: 1,
+										} }
 									>
-										<div
-											style={ {
-												display: 'flex',
-												alignItems: 'center',
-												justifyContent: 'space-between',
-												flexGrow: 1,
-											} }
+										<span>{ item.label }</span>
+										<span
+											id={ `description-${ item.value }` }
+											aria-hidden="true"
 										>
-											<span>{ item.label }</span>
-											<span
-												id={ `description-${ item.value }` }
-												aria-hidden="true"
+											99 in stock
+										</span>
+									</div>
+								</Combobox.Item>
+							) }
+						</Combobox.Collection>
+					</Combobox.ListBody>
+				</Combobox.List>
+			</Combobox.Popup>,
+		],
+	},
+};
+
+/**
+ * Options can be organized into labeled groups with `Combobox.Group`
+ * and `Combobox.GroupLabel`.
+ */
+export const Grouped: Story = {
+	args: {
+		items: GROUPED_ITEMS,
+		children: [
+			<Combobox.Trigger key="trigger" />,
+			<Combobox.Popup key="popup">
+				<div style={ inputWrapperStyle }>
+					<Combobox.Input placeholder="Search" />
+				</div>
+				<Combobox.Empty>No results found.</Combobox.Empty>
+				<Combobox.List>
+					<Combobox.ListBody>
+						<Combobox.Collection>
+							{ ( group: FixtureGroup ) => (
+								<Combobox.Group
+									key={ group.label }
+									items={ group.items }
+								>
+									<Combobox.GroupLabel>
+										{ group.label }
+									</Combobox.GroupLabel>
+									<Combobox.Collection>
+										{ ( item: FixtureItem ) => (
+											<Combobox.Item
+												key={ item.value }
+												value={ item }
 											>
-												99 in stock
-											</span>
-										</div>
-									</Combobox.Item>
-								) }
-							</Combobox.Collection>
-						</Combobox.ListBody>
-					</Combobox.List>
-				</Combobox.Popup>
-			</>
-		),
+												{ item.label }
+											</Combobox.Item>
+										) }
+									</Combobox.Collection>
+								</Combobox.Group>
+							) }
+						</Combobox.Collection>
+					</Combobox.ListBody>
+				</Combobox.List>
+			</Combobox.Popup>,
+		],
 	},
 };
 
@@ -362,37 +430,36 @@ export const WithCustomZIndex: Story = {
 	args: {
 		defaultValue: ITEMS[ 0 ],
 		items: ITEMS,
-		children: (
-			<>
-				<Combobox.Trigger />
-				<Combobox.Popup
-					positioner={
-						<Combobox.Positioner
-							style={ {
-								'--wp-ui-combobox-z-index': '9999',
-							} }
-						/>
-					}
-				>
-					<div style={ inputWrapperStyle }>
-						<Combobox.Input placeholder="Search" />
-					</div>
-					<Combobox.List>
-						<Combobox.ListBody>
-							<Combobox.Collection>
-								{ ( item: FixtureItem ) => (
-									<Combobox.Item
-										key={ item.value }
-										value={ item }
-									>
-										{ item.label }
-									</Combobox.Item>
-								) }
-							</Combobox.Collection>
-						</Combobox.ListBody>
-					</Combobox.List>
-				</Combobox.Popup>
-			</>
-		),
+		children: [
+			<Combobox.Trigger key="trigger" />,
+			<Combobox.Popup
+				positioner={
+					<Combobox.Positioner
+						style={ {
+							'--wp-ui-combobox-z-index': '9999',
+						} }
+					/>
+				}
+				key="popup"
+			>
+				<div style={ inputWrapperStyle }>
+					<Combobox.Input placeholder="Search" />
+				</div>
+				<Combobox.List>
+					<Combobox.ListBody>
+						<Combobox.Collection>
+							{ ( item: FixtureItem ) => (
+								<Combobox.Item
+									key={ item.value }
+									value={ item }
+								>
+									{ item.label }
+								</Combobox.Item>
+							) }
+						</Combobox.Collection>
+					</Combobox.ListBody>
+				</Combobox.List>
+			</Combobox.Popup>,
+		],
 	},
 };

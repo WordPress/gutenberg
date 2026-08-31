@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 import { paramCase as kebabCase } from 'change-case';
 import { downloadZip } from 'client-zip';
-
-/**
- * WordPress dependencies
- */
 import { downloadBlob } from '@wordpress/blob';
 import { __ } from '@wordpress/i18n';
 import { download } from '@wordpress/icons';
 import type { Action } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
 import type { Pattern } from '../types';
 import { getItemTitle } from './utils';
 

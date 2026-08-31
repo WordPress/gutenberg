@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import domReady from '@wordpress/dom-ready';
-
-/**
- * Internal dependencies
- */
 import { setup, speak } from '../';
 import clear from '../shared/clear';
 import filterMessage from '../shared/filter-message';

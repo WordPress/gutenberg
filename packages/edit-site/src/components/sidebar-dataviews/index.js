@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import {
@@ -14,14 +11,12 @@ import {
 } from '@wordpress/icons';
 import { useViewConfig } from '@wordpress/views';
 import { addQueryArgs } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 
 const { useLocation } = unlock( routerPrivateApis );
+
+const VIEW_CONFIG_FIELDS = [ 'view_list' ];
 
 const SLUG_TO_ICON = {
 	all: pages,
@@ -47,6 +42,7 @@ export default function DataViewsSidebarContent( {
 	const { view_list: viewList } = useViewConfig( {
 		kind: 'postType',
 		name: postType,
+		fields: VIEW_CONFIG_FIELDS,
 	} );
 	if ( ! postType ) {
 		return null;

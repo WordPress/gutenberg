@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useBlockProps, getSpacingPresetCssVar } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {

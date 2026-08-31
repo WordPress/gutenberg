@@ -1,25 +1,10 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { Placeholder, SandBox } from '@wordpress/components';
 import { BlockIcon } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 import { getAuthority } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { getPhotoHtml } from './util';
-
-/**
- * Internal dependencies
- */
 import WpEmbedPreview from './wp-embed-preview';
 
 export default function EmbedPreview( {

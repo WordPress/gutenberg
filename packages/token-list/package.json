@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/token-list",
-	"version": "3.47.0",
+	"version": "3.53.0",
 	"description": "Constructable, plain JavaScript DOMTokenList implementation, supporting non-browser runtimes.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -39,10 +39,12 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"wpScriptDefaultExport": true,
 	"types": "build-types",
+	"devDependencies": {
+		"@types/jest": "^30.0.0"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

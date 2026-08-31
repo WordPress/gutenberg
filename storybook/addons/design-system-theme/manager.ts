@@ -8,8 +8,6 @@ import {
 	TooltipMessage,
 	TooltipLinkList,
 } from 'storybook/internal/components';
-import { storyIdMatchesDesignSystemTheme } from '../../decorators/utils/design-system-theme-story-matchers';
-
 interface ThemeOption {
 	id: string;
 	title: string;
@@ -31,6 +29,14 @@ const COLOR_OPTIONS: ThemeOption[] = [
 const CURSOR_CONTROL_OPTIONS: ThemeOption[] = [
 	{ id: 'default', title: 'Default' },
 	{ id: 'pointer', title: 'Pointer' },
+];
+
+const CORNER_RADIUS_OPTIONS: ThemeOption[] = [
+	{ id: '', title: 'Default' },
+	{ id: 'none', title: 'None' },
+	{ id: 'subtle', title: 'Subtle' },
+	{ id: 'moderate', title: 'Moderate' },
+	{ id: 'pronounced', title: 'Pronounced' },
 ];
 
 function ThemeTooltipMessage( {
@@ -69,6 +75,11 @@ const ThemeTool = () => {
 			title: 'Cursor control',
 			globalName: 'dsCursorControl',
 			options: CURSOR_CONTROL_OPTIONS,
+		} ),
+		createElement( ThemeTooltipMessage, {
+			title: 'Corner radius',
+			globalName: 'dsCornerRadius',
+			options: CORNER_RADIUS_OPTIONS,
 		} )
 	);
 
@@ -92,8 +103,7 @@ addons.register( ADDON_ID, () => {
 	addons.add( `${ ADDON_ID }/tool`, {
 		type: types.TOOL,
 		title: 'Design System Theme',
-		match: ( { storyId, viewMode } ) =>
-			storyIdMatchesDesignSystemTheme( storyId ) &&
+		match: ( { viewMode } ) =>
 			( [ 'story', 'docs' ] as any[] ).includes( viewMode ),
 		render: ThemeTool,
 	} );

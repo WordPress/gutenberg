@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { createSelector } from '@wordpress/data';
 import {
 	displayShortcut,
 	shortcutAriaLabel,
 	rawShortcut,
 } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import type { ShortcutKeyCombination } from './actions';
 
 interface ShortcutState {

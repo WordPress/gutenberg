@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { ZWNBSP, OBJECT_REPLACEMENT_CHARACTER } from '../../special-characters';
 
 export function getSparseArrayLength( array ) {
@@ -685,8 +682,6 @@ export const specWithRegistration = [
 					{
 						type: 'my-plugin/link',
 						tagName: 'a',
-						attributes: {},
-						unregisteredAttributes: {},
 					},
 				],
 			],
@@ -710,7 +705,6 @@ export const specWithRegistration = [
 					{
 						type: 'my-plugin/link',
 						tagName: 'a',
-						attributes: {},
 						unregisteredAttributes: {
 							class: 'test',
 						},
@@ -737,7 +731,6 @@ export const specWithRegistration = [
 					{
 						type: 'core/link',
 						tagName: 'a',
-						attributes: {},
 						unregisteredAttributes: {
 							class: 'custom-format',
 						},
@@ -803,8 +796,6 @@ export const specWithRegistration = [
 					{
 						type: 'my-plugin/link',
 						tagName: 'a',
-						attributes: {},
-						unregisteredAttributes: {},
 					},
 				],
 			],
@@ -829,8 +820,6 @@ export const specWithRegistration = [
 				{
 					type: 'my-plugin/non-editable',
 					tagName: 'a',
-					attributes: {},
-					unregisteredAttributes: {},
 					innerHTML: 'a',
 				},
 			],

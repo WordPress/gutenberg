@@ -1,13 +1,10 @@
-/**
- * WordPress dependencies
- */
-import { isBlobURL } from '@wordpress/blob';
+import clsx from 'clsx';
 import {
 	ExternalLink,
 	FocalPointPicker,
 	ResizableBox,
 	Spinner,
-	TextareaControl,
+	TextareaControl as WCTextareaControl,
 	TextControl,
 	CheckboxControl,
 	ToolbarButton,
@@ -34,7 +31,6 @@ import {
 	MediaReplaceFlow,
 	store as blockEditorStore,
 	useSettings,
-	__experimentalImageEditor as ImageEditor,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	privateApis as blockEditorPrivateApis,
@@ -54,16 +50,18 @@ import { getBlockBindingsSource, switchToBlockType } from '@wordpress/blocks';
 import { crop, overlayText, upload, chevronDown } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 import { createUpgradedEmbedBlock } from '../embed/util';
 import { isExternalImage } from './edit';
 import { Caption } from '../utils/caption';
 import { MediaControl } from '../utils/media-control';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import {
+	getActiveDimensionValue,
+	getDimensionResetAttributes,
+	getDimensionUpdateAttributes,
+	getStyleStateKey,
+} from '../utils/style-state';
 import { useOpenImageMediaEditorModal } from './use-open-image-media-editor-modal';
 import {
 	MIN_SIZE,
@@ -73,9 +71,13 @@ import {
 } from './constants';
 import { evalAspectRatio, mediaPosition } from './utils';
 
-const { DimensionsTool, ResolutionTool, mediaEditKey } = unlock(
-	blockEditorPrivateApis
-);
+const {
+	DimensionsTool,
+	isDefaultBlockStyleState,
+	ResolutionTool,
+	mediaEditKey,
+	mediaSideloadFromUrlKey,
+} = unlock( blockEditorPrivateApis );
 
 const scaleOptions = [
 	{
@@ -183,7 +185,7 @@ function ContentOnlyControls( {
 					variant="toolbar"
 				>
 					<div className="wp-block-image__toolbar_content_textarea__container">
-						<TextareaControl
+						<WCTextareaControl
 							className="wp-block-image__toolbar_content_textarea"
 							label={ __( 'Alternative text' ) }
 							value={ attributes.alt || '' }
@@ -227,7 +229,6 @@ function ContentOnlyControls( {
 				>
 					<div className="wp-block-image__toolbar_content_textarea__container">
 						<TextControl
-							__next40pxDefaultSize
 							className="wp-block-image__toolbar_content_textarea"
 							label={ __( 'Title attribute' ) }
 							value={ attributes.title || '' }
@@ -383,6 +384,12 @@ export default function Image( {
 	);
 	const { getBlock, getSettings } = useSelect( blockEditorStore );
 	const cropButtonRef = useRef();
+	// URL of a freshly generated file (crop/rotate result) from the media
+	// editor that the browser may not have finished loading; cleared by the
+	// <img> load/error handlers, or by the settle effect below when the
+	// rendered image already shows it.
+	const [ pendingSwapUrl, setPendingSwapUrl ] = useState();
+	const isSwappingMedia = !! pendingSwapUrl;
 	const handleMediaEditorModalClose = useCallback(
 		() => cropButtonRef.current?.focus(),
 		[]
@@ -391,6 +398,7 @@ export default function Image( {
 		attributes,
 		setAttributes,
 		onClose: handleMediaEditorModalClose,
+		onUrlChange: setPendingSwapUrl,
 	} );
 
 	const {
@@ -408,8 +416,6 @@ export default function Image( {
 		{ loadedNaturalWidth, loadedNaturalHeight },
 		setLoadedNaturalSize,
 	] = useState( {} );
-	const [ isEditingImage, setIsEditingImage ] = useState( false );
-	const [ externalBlob, setExternalBlob ] = useState();
 	const [ hasImageErrored, setHasImageErrored ] = useState( false );
 	const hasNonContentControls = blockEditingMode === 'default';
 	const isContentOnlyMode = blockEditingMode === 'contentOnly';
@@ -456,31 +462,16 @@ export default function Image( {
 		__unstableMarkNextChangeAsNotPersistent,
 	] );
 
-	// If an image is externally hosted, try to fetch the image data. This may
-	// fail if the image host doesn't allow CORS with the domain. If it works,
-	// we can enable a button in the toolbar to upload the image.
-	useEffect( () => {
-		if (
-			! isExternalImage( id, url ) ||
-			! isSingleSelected ||
-			! getSettings().mediaUpload
-		) {
-			setExternalBlob();
-			return;
-		}
-
-		if ( externalBlob ) {
-			return;
-		}
-
-		window
-			// Avoid cache, which seems to help avoid CORS problems.
-			.fetch( url.includes( '?' ) ? url : url + '?' )
-			.then( ( response ) => response.blob() )
-			.then( ( blob ) => setExternalBlob( blob ) )
-			// Do nothing, cannot upload.
-			.catch( () => {} );
-	}, [ id, url, isSingleSelected, externalBlob, getSettings ] );
+	/*
+	 * Externally hosted images can be uploaded to the media library. The
+	 * server sideloads the URL (see mediaSideloadFromUrl), so this works even
+	 * when the editor is cross-origin isolated and the browser cannot read the
+	 * cross-origin image's bytes itself.
+	 */
+	const canUploadExternalImage =
+		isSingleSelected &&
+		isExternalImage( id, url ) &&
+		!! getSettings()[ mediaSideloadFromUrlKey ];
 
 	// Get naturalWidth and naturalHeight from image, and fall back to loaded natural
 	// width and height. This resolves an issue in Safari where the loaded natural
@@ -495,18 +486,34 @@ export default function Image( {
 		};
 	}, [ loadedNaturalWidth, loadedNaturalHeight, imageElement?.complete ] );
 
+	// A media editor update can be undone or superseded before its
+	// attributes land, leaving the rendered image untouched. No load event
+	// fires in that case, so clear the pending swap whenever the rendered
+	// image already shows the pending URL.
+	useEffect( () => {
+		if (
+			pendingSwapUrl &&
+			pendingSwapUrl === url &&
+			imageElement?.complete
+		) {
+			setPendingSwapUrl( undefined );
+		}
+	}, [ pendingSwapUrl, url, imageElement ] );
+
 	function onImageError() {
+		setPendingSwapUrl( undefined );
 		setHasImageErrored( true );
 
 		// Check if there's an embed block that handles this URL, e.g., instagram URL.
 		// See: https://github.com/WordPress/gutenberg/pull/11472
 		const embedBlock = createUpgradedEmbedBlock( { attributes: { url } } );
-		if ( undefined !== embedBlock ) {
+		if ( undefined !== embedBlock && onReplace ) {
 			onReplace( embedBlock );
 		}
 	}
 
 	function onImageLoad( event ) {
+		setPendingSwapUrl( undefined );
 		setHasImageErrored( false );
 		setLoadedNaturalSize( {
 			loadedNaturalWidth: event.target?.naturalWidth,
@@ -597,42 +604,23 @@ export default function Image( {
 	}
 
 	function uploadExternal() {
-		const { mediaUpload } = getSettings();
-		if ( ! mediaUpload ) {
+		const mediaSideloadFromUrl = getSettings()[ mediaSideloadFromUrlKey ];
+		if ( ! mediaSideloadFromUrl ) {
 			return;
 		}
-		let notified = false;
-		mediaUpload( {
-			filesList: [ externalBlob ],
-			onFileChange( [ img ] ) {
+		mediaSideloadFromUrl( {
+			url,
+			onSuccess( img ) {
 				onSelectImage( img );
-
-				if ( isBlobURL( img.url ) ) {
-					return;
-				}
-
-				// With client-side media processing, onFileChange fires
-				// for each generated sub-size. Only show the notice once.
-				if ( ! notified ) {
-					notified = true;
-					setExternalBlob();
-					createSuccessNotice( __( 'Image uploaded.' ), {
-						type: 'snackbar',
-					} );
-				}
+				createSuccessNotice( __( 'Image uploaded.' ), {
+					type: 'snackbar',
+				} );
 			},
-			allowedTypes: ALLOWED_MEDIA_TYPES,
 			onError( message ) {
 				createErrorNotice( message, { type: 'snackbar' } );
 			},
 		} );
 	}
-
-	useEffect( () => {
-		if ( ! isSingleSelected ) {
-			setIsEditingImage( false );
-		}
-	}, [ isSingleSelected ] );
 
 	const canEditImage =
 		id &&
@@ -643,8 +631,9 @@ export default function Image( {
 	const allowCrop =
 		isSingleSelected &&
 		canEditImage &&
-		! isEditingImage &&
-		! isContentOnlyMode;
+		!! openImageMediaEditorModal &&
+		! isContentOnlyMode &&
+		! isUploading;
 
 	function switchToCover() {
 		replaceBlocks(
@@ -654,8 +643,8 @@ export default function Image( {
 	}
 
 	// TODO: Can allow more units after figuring out how they should interact
-	// with the ResizableBox and ImageEditor components. Calculations later on
-	// for those components are currently assuming px units.
+	// with the ResizableBox component. Calculations later on for that
+	// component are currently assuming px units.
 	const dimensionsUnitsOptions = useCustomUnits( {
 		availableUnits: [ 'px' ],
 	} );
@@ -673,14 +662,67 @@ export default function Image( {
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
+	const selectedStyleState = useSelect(
+		( select ) => {
+			if ( ! isSingleSelected ) {
+				return undefined;
+			}
+			const { getSelectedBlockStyleState } = unlock(
+				select( blockEditorStore )
+			);
+			return getSelectedBlockStyleState( clientId );
+		},
+		[ clientId, isSingleSelected ]
+	);
+	const hasSelectedStyleState =
+		! isDefaultBlockStyleState( selectedStyleState );
+	const selectedStyleStateKey = getStyleStateKey( selectedStyleState );
+	const activeWidth = getActiveDimensionValue( {
+		attributes,
+		selectedState: selectedStyleState,
+		hasSelectedStyleState,
+		attributeKey: 'width',
+	} );
+	const activeHeight = getActiveDimensionValue( {
+		attributes,
+		selectedState: selectedStyleState,
+		hasSelectedStyleState,
+		attributeKey: 'height',
+	} );
+	const activeAspectRatio = getActiveDimensionValue( {
+		attributes,
+		selectedState: selectedStyleState,
+		hasSelectedStyleState,
+		attributeKey: 'aspectRatio',
+	} );
+	const activeScale = getActiveDimensionValue( {
+		attributes,
+		selectedState: selectedStyleState,
+		hasSelectedStyleState,
+		attributeKey: 'scale',
+		styleKey: 'objectFit',
+	} );
+	const setDimensionAttributes = ( nextDimensions ) => {
+		setAttributes(
+			getDimensionUpdateAttributes( {
+				style: attributes.style,
+				selectedState: selectedStyleState,
+				hasSelectedStyleState,
+				nextDimensions,
+				dimensionKeyMap: { scale: 'objectFit' },
+			} )
+		);
+	};
+
 	const dimensionsControl =
 		showDimensionsControls &&
 		( SIZED_LAYOUTS.includes( parentLayoutType ) ? (
 			<DimensionsTool
+				key={ selectedStyleStateKey }
 				panelId={ clientId }
-				value={ { aspectRatio } }
+				value={ { aspectRatio: activeAspectRatio, scale: activeScale } }
 				onChange={ ( { aspectRatio: newAspectRatio } ) => {
-					setAttributes( {
+					setDimensionAttributes( {
 						aspectRatio: newAspectRatio,
 						scale: 'cover',
 					} );
@@ -690,26 +732,29 @@ export default function Image( {
 			/>
 		) : (
 			<DimensionsTool
+				key={ selectedStyleStateKey }
 				panelId={ clientId }
-				value={ { width, height, scale, aspectRatio } }
+				value={ {
+					width: activeWidth,
+					height: activeHeight,
+					scale: activeScale,
+					aspectRatio: activeAspectRatio,
+				} }
 				onChange={ ( {
 					width: newWidth,
 					height: newHeight,
 					scale: newScale,
 					aspectRatio: newAspectRatio,
 				} ) => {
-					// Rebuilding the object forces setting `undefined`
-					// for values that are removed since setAttributes
-					// doesn't do anything with keys that aren't set.
-					setAttributes( {
+					setDimensionAttributes( {
 						// CSS includes `height: auto`, but we need
 						// `width: auto` to fix the aspect ratio when
 						// only height is set due to the width and
 						// height attributes set via the server.
 						width: ! newWidth && newHeight ? 'auto' : newWidth,
 						height: newHeight,
-						scale: newScale,
 						aspectRatio: newAspectRatio,
+						scale: newScale,
 					} );
 				} }
 				defaultScale="cover"
@@ -742,14 +787,11 @@ export default function Image( {
 		lockTitleControls = false,
 		lockTitleControlsMessage,
 		hideCaptionControls = false,
-		hasSelectedStyleState = false,
 	} = useSelect(
 		( select ) => {
 			if ( ! isSingleSelected ) {
 				return {};
 			}
-			const { hasSelectedStyleState: hasSelectedBlockStyleState } =
-				unlock( select( blockEditorStore ) );
 			const {
 				url: urlBinding,
 				alt: altBinding,
@@ -767,7 +809,6 @@ export default function Image( {
 				titleBinding?.source
 			);
 			return {
-				hasSelectedStyleState: hasSelectedBlockStyleState( clientId ),
 				lockUrlControls:
 					!! urlBinding &&
 					! urlBindingSource?.canUserEditValue?.( {
@@ -812,7 +853,6 @@ export default function Image( {
 		},
 		[
 			arePatternOverridesEnabled,
-			clientId,
 			context,
 			isSingleSelected,
 			metadata?.bindings,
@@ -821,7 +861,6 @@ export default function Image( {
 
 	const showUrlInput =
 		isSingleSelected &&
-		! isEditingImage &&
 		! lockHrefControls &&
 		! lockUrlControls &&
 		! isDecorative;
@@ -831,10 +870,9 @@ export default function Image( {
 
 	const showBlockControls = showUrlInput || allowCrop || showCoverControls;
 
-	const mediaReplaceFlow = isSingleSelected &&
-		! isEditingImage &&
-		! lockUrlControls && (
-			// For contentOnly mode, put this button in its own area so it has borders around it.
+	const mediaControls = isSingleSelected && ! lockUrlControls && (
+		<>
+			{ /* For contentOnly mode, put this button in its own area so it has borders around it. */ }
 			<BlockControls group={ isContentOnlyMode ? 'inline' : 'other' }>
 				<MediaReplaceFlow
 					mediaId={ id }
@@ -848,7 +886,8 @@ export default function Image( {
 					variant="toolbar"
 				/>
 			</BlockControls>
-		);
+		</>
+	);
 
 	const hasDataFormBlockFields =
 		window?.__experimentalContentOnlyInspectorFields;
@@ -876,16 +915,14 @@ export default function Image( {
 					{ allowCrop && (
 						<ToolbarButton
 							ref={ cropButtonRef }
-							onClick={
-								openImageMediaEditorModal
-									? openImageMediaEditorModal
-									: () => setIsEditingImage( true )
-							}
-							aria-haspopup={
-								openImageMediaEditorModal ? 'dialog' : undefined
-							}
+							onClick={ openImageMediaEditorModal }
+							aria-haspopup="dialog"
 							icon={ crop }
-							label={ __( 'Crop' ) }
+							label={ __( 'Edit image' ) }
+							// Disable rather than hide while the edited image
+							// loads, so the button keeps focus when the modal
+							// closes instead of dropping it to the canvas.
+							disabled={ isSwappingMedia }
 						/>
 					) }
 					{ showCoverControls && (
@@ -897,7 +934,7 @@ export default function Image( {
 					) }
 				</BlockControls>
 			) }
-			{ isSingleSelected && externalBlob && (
+			{ canUploadExternalImage && (
 				<BlockControls>
 					<ToolbarGroup>
 						<ToolbarButton
@@ -969,7 +1006,7 @@ export default function Image( {
 									setAttributes( { alt: undefined } )
 								}
 							>
-								<TextareaControl
+								<WCTextareaControl
 									label={ __( 'Alternative text' ) }
 									value={ alt || '' }
 									onChange={ updateAlt }
@@ -1018,47 +1055,52 @@ export default function Image( {
 					</ToolsPanel>
 				</InspectorControls>
 			) }
-			{ ! hasSelectedStyleState && (
-				<InspectorControls
-					group="dimensions"
-					resetAllFilter={ ( attrs ) => ( {
-						...attrs,
-						aspectRatio: undefined,
-						width: undefined,
-						height: undefined,
-						scale: undefined,
-						focalPoint: undefined,
-					} ) }
-				>
-					{ dimensionsControl }
-					{ url && scale && (
-						<ToolsPanelItem
+			<InspectorControls
+				group="dimensions"
+				resetAllFilter={ ( attrs ) => {
+					return getDimensionResetAttributes( {
+						attributes: attrs,
+						selectedState: selectedStyleState,
+						hasSelectedStyleState,
+						keys: [ 'aspectRatio', 'height', 'objectFit', 'width' ],
+						defaultAttributes: {
+							aspectRatio: undefined,
+							width: undefined,
+							height: undefined,
+							scale: undefined,
+							focalPoint: undefined,
+						},
+					} );
+				} }
+			>
+				{ dimensionsControl }
+				{ ! hasSelectedStyleState && url && scale && (
+					<ToolsPanelItem
+						label={ __( 'Focal point' ) }
+						isShownByDefault
+						hasValue={ () => !! focalPoint }
+						onDeselect={ () =>
+							setAttributes( {
+								focalPoint: undefined,
+							} )
+						}
+						panelId={ clientId }
+					>
+						<FocalPointPicker
 							label={ __( 'Focal point' ) }
-							isShownByDefault
-							hasValue={ () => !! focalPoint }
-							onDeselect={ () =>
+							url={ url }
+							value={ focalPoint }
+							onDragStart={ imperativeFocalPointPreview }
+							onDrag={ imperativeFocalPointPreview }
+							onChange={ ( newFocalPoint ) =>
 								setAttributes( {
-									focalPoint: undefined,
+									focalPoint: newFocalPoint,
 								} )
 							}
-							panelId={ clientId }
-						>
-							<FocalPointPicker
-								label={ __( 'Focal point' ) }
-								url={ url }
-								value={ focalPoint }
-								onDragStart={ imperativeFocalPointPreview }
-								onDrag={ imperativeFocalPointPreview }
-								onChange={ ( newFocalPoint ) =>
-									setAttributes( {
-										focalPoint: newFocalPoint,
-									} )
-								}
-							/>
-						</ToolsPanelItem>
-					) }
-				</InspectorControls>
-			) }
+						/>
+					</ToolsPanelItem>
+				) }
+			</InspectorControls>
 			{ !! imageSizeOptions.length && (
 				<InspectorControls>
 					<ToolsPanel
@@ -1077,7 +1119,6 @@ export default function Image( {
 			) }
 			<InspectorControls group="advanced">
 				<TextControl
-					__next40pxDefaultSize
 					label={ __( 'Title attribute' ) }
 					value={ title || '' }
 					onChange={ onSetTitle }
@@ -1130,108 +1171,90 @@ export default function Image( {
 
 	const borderProps = useBorderProps( attributes );
 	const shadowProps = getShadowClassesAndStyles( attributes );
-	const isRounded = attributes.className?.includes( 'is-style-rounded' );
 
 	const { postType, postId, queryId } = context;
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 
-	let img =
-		temporaryURL && hasImageErrored ? (
-			// Show a placeholder during upload when the blob URL can't be loaded. This can
-			// happen when the user uploads a HEIC image in a browser that doesn't support them.
-			<Placeholder
-				className="wp-block-image__placeholder"
-				withIllustration
-			>
-				<Spinner />
-			</Placeholder>
-		) : (
-			<>
-				<img
-					src={ temporaryURL || url }
-					alt={ defaultedAlt }
-					onError={ onImageError }
-					onLoad={ onImageLoad }
-					ref={ setRefs }
-					className={ borderProps.className }
-					width={ naturalWidth }
-					height={ naturalHeight }
-					style={ {
-						aspectRatio,
-						...( resizeDelta
-							? {
-									width: pixelSize.width + resizeDelta.width,
-									height:
-										pixelSize.height + resizeDelta.height,
-							  }
-							: ( () => {
-									const style = {};
-									if ( width === 'auto' ) {
-										style.width = 'auto';
-									} else if (
-										width !== undefined &&
-										width !== null
-									) {
-										style.width =
-											typeof width === 'number'
-												? `${ width }px`
-												: width;
-									}
-									if (
-										height === 'auto' ||
-										height === undefined ||
-										height === null
-									) {
-										style.height = 'auto';
-									} else {
-										style.height =
-											typeof height === 'number'
-												? `${ height }px`
-												: height;
-									}
-									return style;
-							  } )() ),
-						objectFit: scale,
-						objectPosition:
-							focalPoint && scale
-								? mediaPosition( focalPoint )
-								: undefined,
-						...borderProps.style,
-						...shadowProps.style,
-					} }
-				/>
-				{ isUploading && <Spinner /> }
-			</>
-		);
-
-	if ( canEditImage && isEditingImage ) {
-		img = (
-			<ImageWrapper href={ href }>
-				<ImageEditor
-					id={ id }
-					url={ url }
-					{ ...pixelSize }
-					naturalHeight={ naturalHeight }
-					naturalWidth={ naturalWidth }
-					onSaveImage={ ( imageAttributes ) =>
-						setAttributes( imageAttributes )
-					}
-					onFinishEditing={ () => {
-						setIsEditingImage( false );
-					} }
-					borderProps={ isRounded ? undefined : borderProps }
-				/>
-			</ImageWrapper>
-		);
-	} else {
-		img = <ImageWrapper href={ href }>{ img }</ImageWrapper>;
-	}
+	const img = (
+		<ImageWrapper href={ href }>
+			{ temporaryURL && hasImageErrored ? (
+				// Show a placeholder during upload when the blob URL can't be loaded. This can
+				// happen when the user uploads a HEIC image in a browser that doesn't support them.
+				<Placeholder
+					className="wp-block-image__placeholder"
+					withIllustration
+				>
+					<Spinner />
+				</Placeholder>
+			) : (
+				<>
+					<img
+						src={ temporaryURL || url }
+						alt={ defaultedAlt }
+						onError={ onImageError }
+						onLoad={ onImageLoad }
+						ref={ setRefs }
+						className={ clsx( borderProps.className, {
+							'is-swapping-media': isSwappingMedia,
+						} ) }
+						width={ naturalWidth }
+						height={ naturalHeight }
+						style={ {
+							aspectRatio,
+							...( resizeDelta
+								? {
+										width:
+											pixelSize.width + resizeDelta.width,
+										height:
+											pixelSize.height +
+											resizeDelta.height,
+								  }
+								: ( () => {
+										const style = {};
+										if ( width === 'auto' ) {
+											style.width = 'auto';
+										} else if (
+											width !== undefined &&
+											width !== null
+										) {
+											style.width =
+												typeof width === 'number'
+													? `${ width }px`
+													: width;
+										}
+										if (
+											height === 'auto' ||
+											height === undefined ||
+											height === null
+										) {
+											style.height = 'auto';
+										} else {
+											style.height =
+												typeof height === 'number'
+													? `${ height }px`
+													: height;
+										}
+										return style;
+								  } )() ),
+							objectFit: scale,
+							objectPosition:
+								focalPoint && scale
+									? mediaPosition( focalPoint )
+									: undefined,
+							...borderProps.style,
+							...shadowProps.style,
+						} }
+					/>
+					{ ( isUploading || isSwappingMedia ) && <Spinner /> }
+				</>
+			) }
+		</ImageWrapper>
+	);
 
 	let resizableBox;
 	if (
 		isResizable &&
 		isSingleSelected &&
-		! isEditingImage &&
 		! isUploading &&
 		! SIZED_LAYOUTS.includes( parentLayoutType )
 	) {
@@ -1356,7 +1379,7 @@ export default function Image( {
 	if ( ! url && ! temporaryURL ) {
 		return (
 			<>
-				{ mediaReplaceFlow }
+				{ mediaControls }
 				{ controls }
 			</>
 		);
@@ -1391,7 +1414,7 @@ export default function Image( {
 
 	return (
 		<>
-			{ mediaReplaceFlow }
+			{ mediaControls }
 			{ controls }
 			{ featuredImageControl }
 			{ img }

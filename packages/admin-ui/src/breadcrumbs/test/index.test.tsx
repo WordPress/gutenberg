@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { Breadcrumbs } from '..';
 
 jest.mock( '@wordpress/route', () => ( {
@@ -28,6 +21,7 @@ describe( 'Breadcrumbs', () => {
 					/>
 				)
 			).toThrow( /item "Home" is missing a `to` prop/ );
+			expect( console ).toHaveErrored();
 		} );
 
 		it( 'should throw for the first preceding item missing `to`', () => {
@@ -42,6 +36,7 @@ describe( 'Breadcrumbs', () => {
 					/>
 				)
 			).toThrow( /item "Home" is missing a `to` prop/ );
+			expect( console ).toHaveErrored();
 		} );
 
 		it( 'should not throw when all preceding items have `to`', () => {

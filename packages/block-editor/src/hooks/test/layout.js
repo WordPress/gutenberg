@@ -1,9 +1,37 @@
-/**
- * Internal dependencies
- */
-import { getResetLayout, getResponsiveLayoutStyles } from '../layout';
+import {
+	getLayoutStateOverrides,
+	getResetLayout,
+	getResponsiveLayoutStyles,
+	hasLayoutPanelControls,
+} from '../layout';
+import { getLayoutType } from '../../layouts';
 
 describe( 'layout', () => {
+	describe( 'hasLayoutPanelControls()', () => {
+		it( 'does not show the layout panel when every flex layout control is disabled', () => {
+			expect(
+				hasLayoutPanelControls( {
+					layoutType: getLayoutType( 'flex' ),
+					constrainedType: getLayoutType( 'constrained' ),
+					layoutBlockSupport: {
+						allowSwitching: false,
+						allowInheriting: false,
+						allowEditing: true,
+						allowOrientation: false,
+						allowJustification: false,
+						allowVerticalAlignment: false,
+						allowWrap: false,
+						allowSizingOnChildren: true,
+						default: { type: 'flex' },
+					},
+					showInheritToggle: false,
+					showLayoutTypeSwitcher: false,
+					displayControlsForLegacyLayouts: false,
+				} )
+			).toBe( false );
+		} );
+	} );
+
 	describe( 'getResetLayout()', () => {
 		it( 'should reset to variation layout defaults', () => {
 			const layout = getResetLayout(
@@ -46,13 +74,35 @@ describe( 'layout', () => {
 		} );
 	} );
 
+	describe( 'getLayoutStateOverrides()', () => {
+		it( 'preserves explicit unsets for layout values inherited from the default state', () => {
+			expect(
+				getLayoutStateOverrides(
+					{ type: 'grid', columnCount: undefined },
+					{ type: 'grid', columnCount: 3 }
+				)
+			).toEqual( {
+				columnCount: null,
+			} );
+		} );
+
+		it( 'removes undefined layout values that are not inherited from the default state', () => {
+			expect(
+				getLayoutStateOverrides(
+					{ type: 'grid', columnCount: undefined },
+					{ type: 'grid' }
+				)
+			).toBeUndefined();
+		} );
+	} );
+
 	describe( 'getResponsiveLayoutStyles()', () => {
 		it( 'generates responsive block gap styles for flow layouts', () => {
 			expect(
 				getResponsiveLayoutStyles( {
 					attributes: {
 						style: {
-							mobile: {
+							'@mobile': {
 								spacing: {
 									blockGap: '12px',
 								},
@@ -74,7 +124,7 @@ describe( 'layout', () => {
 				getResponsiveLayoutStyles( {
 					attributes: {
 						style: {
-							mobile: {
+							'@mobile': {
 								spacing: {
 									blockGap: '12px',
 								},
@@ -96,7 +146,7 @@ describe( 'layout', () => {
 				getResponsiveLayoutStyles( {
 					attributes: {
 						style: {
-							mobile: {
+							'@mobile': {
 								layout: {
 									minimumColumnWidth: '8rem',
 								},
@@ -118,7 +168,7 @@ describe( 'layout', () => {
 				getResponsiveLayoutStyles( {
 					attributes: {
 						style: {
-							mobile: {
+							'@mobile': {
 								layout: {
 									columnCount: 3,
 								},
@@ -135,12 +185,60 @@ describe( 'layout', () => {
 			);
 		} );
 
+		it( 'generates responsive auto grid columns when column count is unset', () => {
+			expect(
+				getResponsiveLayoutStyles( {
+					attributes: {
+						style: {
+							'@mobile': {
+								layout: {
+									columnCount: null,
+								},
+							},
+						},
+					},
+					blockName: 'core/group',
+					selector: '.wp-container-test',
+					layout: { type: 'grid', columnCount: 3 },
+					hasBlockGapSupport: true,
+				} )
+			).toBe(
+				'@media (width <= 480px){.wp-container-test { grid-template-columns: repeat(auto-fill, minmax(min(12rem, 100%), 1fr)); container-type: inline-size; }}'
+			);
+		} );
+
+		it( 'generates responsive constrained size resets when content width is unset', () => {
+			const result = getResponsiveLayoutStyles( {
+				attributes: {
+					style: {
+						'@mobile': {
+							layout: {
+								contentSize: null,
+							},
+						},
+					},
+				},
+				blockName: 'core/group',
+				selector: '.wp-container-test',
+				layout: { type: 'constrained', contentSize: '800px' },
+				hasBlockGapSupport: true,
+			} );
+
+			expect( result ).toContain( '@media (width <= 480px)' );
+			expect( result ).toContain(
+				'max-width: var(--wp--style--global--content-size, none);'
+			);
+			expect( result ).toContain(
+				'max-width: var(--wp--style--global--wide-size, none);'
+			);
+		} );
+
 		it( 'keeps responsive grid column overrides when block gap is also changed', () => {
 			expect(
 				getResponsiveLayoutStyles( {
 					attributes: {
 						style: {
-							mobile: {
+							'@mobile': {
 								layout: {
 									columnCount: 3,
 								},
@@ -165,7 +263,7 @@ describe( 'layout', () => {
 				getResponsiveLayoutStyles( {
 					attributes: {
 						style: {
-							tablet: {
+							'@tablet': {
 								spacing: {
 									blockGap: '12px',
 								},

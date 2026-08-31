@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import { click, type, press } from '@ariakit/test';
-
-/**
- * Internal dependencies
- */
 import PaletteEdit, {
 	getNameAndSlugForPosition,
 	deduplicateElementSlugs,
@@ -98,6 +91,47 @@ describe( 'getNameAndSlugForPosition', () => {
 			slug: 'test-color-151',
 		} );
 	} );
+
+	test( 'should return a duotone name and slug for the duotone variant', () => {
+		const slugPrefix = 'custom-';
+		const elements: PaletteElement[] = [];
+
+		expect(
+			getNameAndSlugForPosition( elements, slugPrefix, 'duotone' )
+		).toEqual( {
+			name: 'Duotone 1',
+			slug: 'custom-duotone-1',
+		} );
+	} );
+
+	test( 'should increment the duotone slug id independently of colors', () => {
+		const slugPrefix = 'custom-';
+		const elements = [
+			{
+				slug: 'custom-duotone-1',
+				colors: [ '#000000', '#ffffff' ],
+				name: 'Duotone 1',
+			},
+			{
+				slug: 'custom-duotone-4',
+				colors: [ '#8c00b7', '#fcff41' ],
+				name: 'Duotone 4',
+			},
+			// A color preset sharing the prefix must not affect the count.
+			{
+				slug: 'custom-color-99',
+				color: '#ffffff',
+				name: 'Color 99',
+			},
+		];
+
+		expect(
+			getNameAndSlugForPosition( elements, slugPrefix, 'duotone' )
+		).toEqual( {
+			name: 'Duotone 5',
+			slug: 'custom-duotone-5',
+		} );
+	} );
 } );
 
 describe( 'deduplicateElementSlugs', () => {
@@ -171,6 +205,18 @@ describe( 'PaletteEdit', () => {
 			slug: 'midnight',
 		},
 	];
+	const duotones = [
+		{
+			colors: [ '#8c00b7', '#fcff41' ],
+			name: 'Purple and yellow',
+			slug: 'purple-yellow',
+		},
+		{
+			colors: [ '#000097', '#ff4747' ],
+			name: 'Blue and red',
+			slug: 'blue-red',
+		},
+	];
 
 	it( 'shows heading label', () => {
 		render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
@@ -197,6 +243,80 @@ describe( 'PaletteEdit', () => {
 				level: 5,
 				name: 'Test label',
 			} )
+		).toBeVisible();
+	} );
+
+	it.each( [
+		{
+			name: 'color',
+			props: { colors },
+			buttonName: 'Primary',
+			editorRole: 'textbox' as const,
+			editorName: 'Hex color',
+		},
+		{
+			name: 'gradient',
+			props: { gradients },
+			buttonName: 'Gradient: Pale ocean',
+			editorRole: 'combobox' as const,
+			editorName: 'Type',
+		},
+		{
+			name: 'duotone',
+			props: { duotones, colorPalette: colors },
+			buttonName: 'Duotone: Purple and yellow',
+			editorRole: 'button' as const,
+			editorName: /Shadows/,
+		},
+	] )(
+		'shows $name swatches as named command buttons that open the editor',
+		async ( { props, buttonName, editorRole, editorName } ) => {
+			render( <PaletteEdit { ...defaultProps } { ...props } /> );
+
+			const group = screen.getByRole( 'group', { name: 'Test label' } );
+			const swatch = within( group ).getByRole( 'button', {
+				name: buttonName,
+			} );
+			expect(
+				within( group ).queryByRole( 'listbox' )
+			).not.toBeInTheDocument();
+			expect(
+				within( group ).queryByRole( 'option' )
+			).not.toBeInTheDocument();
+			expect( swatch.tagName ).toBe( 'BUTTON' );
+			expect( swatch ).not.toHaveAttribute( 'aria-pressed' );
+
+			await click( swatch );
+			expect(
+				screen.getByRole( editorRole, { name: editorName } )
+			).toBeVisible();
+		}
+	);
+
+	it( 'tabs between command swatches and opens one with Space', async () => {
+		render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
+
+		const primary = screen.getByRole( 'button', { name: 'Primary' } );
+		const secondary = screen.getByRole( 'button', { name: 'Secondary' } );
+		primary.focus();
+
+		await press.Tab();
+		expect( secondary ).toHaveFocus();
+
+		await press.Space();
+		expect(
+			screen.getByRole( 'textbox', { name: 'Hex color' } )
+		).toBeVisible();
+	} );
+
+	it( 'opens a command swatch with Enter', async () => {
+		render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
+
+		screen.getByRole( 'button', { name: 'Primary' } ).focus();
+		await press.Enter();
+
+		expect(
+			screen.getByRole( 'textbox', { name: 'Hex color' } )
 		).toBeVisible();
 	} );
 
@@ -317,6 +437,143 @@ describe( 'PaletteEdit', () => {
 						'linear-gradient(135deg, rgba(6, 147, 227, 1) 0%, rgb(155, 81, 224) 100%)',
 					name: 'Color 1',
 					slug: 'color-1',
+				},
+			] );
+		} );
+	} );
+
+	it( 'calls the `onChange` with the new duotone appended, seeded from the color palette', async () => {
+		const onChange = jest.fn();
+
+		render(
+			<PaletteEdit
+				{ ...defaultProps }
+				duotones={ duotones }
+				colorPalette={ colors }
+				onChange={ onChange }
+			/>
+		);
+
+		await click(
+			screen.getByRole( 'button', {
+				name: 'Add duotone',
+			} )
+		);
+
+		await waitFor( () => {
+			expect( onChange ).toHaveBeenCalledWith( [
+				...duotones,
+				{
+					// The darkest and lightest colors of `colors`.
+					colors: [ '#0000ff', '#1a4548' ],
+					name: 'Duotone 1',
+					slug: 'duotone-1',
+				},
+			] );
+		} );
+	} );
+
+	it( 'ignores palette colors a duotone cannot be built from when adding one', async () => {
+		const onChange = jest.fn();
+
+		render(
+			<PaletteEdit
+				{ ...defaultProps }
+				duotones={ duotones }
+				colorPalette={ [
+					...colors,
+					// Twenty Twenty-Five ships a color like this. `colord`
+					// cannot parse it and treats it as black, which would
+					// otherwise win as the duotone's shadow color and produce a
+					// duotone that cannot be rendered.
+					{
+						color: 'color-mix(in srgb, currentColor 20%, transparent)',
+						name: 'Contrast overlay',
+						slug: 'contrast-overlay',
+					},
+				] }
+				onChange={ onChange }
+			/>
+		);
+
+		await click(
+			screen.getByRole( 'button', {
+				name: 'Add duotone',
+			} )
+		);
+
+		await waitFor( () => {
+			expect( onChange ).toHaveBeenCalledWith( [
+				...duotones,
+				{
+					colors: [ '#0000ff', '#1a4548' ],
+					name: 'Duotone 1',
+					slug: 'duotone-1',
+				},
+			] );
+		} );
+	} );
+
+	// The front end parses duotone colors with a PHP port of colord that only
+	// accepts hex, `rgb()` and `hsl()`, so a named color saved as-is would
+	// render in the editor and be dropped on the front end.
+	it( 'normalizes palette colors to hex when adding a duotone', async () => {
+		const onChange = jest.fn();
+
+		render(
+			<PaletteEdit
+				{ ...defaultProps }
+				duotones={ duotones }
+				colorPalette={ [
+					{ color: 'black', name: 'Black', slug: 'black' },
+					{ color: 'white', name: 'White', slug: 'white' },
+				] }
+				onChange={ onChange }
+			/>
+		);
+
+		await click(
+			screen.getByRole( 'button', {
+				name: 'Add duotone',
+			} )
+		);
+
+		await waitFor( () => {
+			expect( onChange ).toHaveBeenCalledWith( [
+				...duotones,
+				{
+					colors: [ '#000000', '#ffffff' ],
+					name: 'Duotone 1',
+					slug: 'duotone-1',
+				},
+			] );
+		} );
+	} );
+
+	it( 'falls back to black and white when adding a duotone without a color palette', async () => {
+		const onChange = jest.fn();
+
+		render(
+			<PaletteEdit
+				{ ...defaultProps }
+				duotones={ duotones }
+				onChange={ onChange }
+			/>
+		);
+
+		await click(
+			screen.getByRole( 'button', {
+				name: 'Add duotone',
+			} )
+		);
+
+		await waitFor( () => {
+			expect( onChange ).toHaveBeenCalledWith( [
+				...duotones,
+				{
+					colors: [ '#000', '#fff' ],
+					name: 'Duotone 1',
+					slug: 'duotone-1',
 				},
 			] );
 		} );
@@ -465,6 +722,116 @@ describe( 'PaletteEdit', () => {
 						'radial-gradient(rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%)',
 				},
 				gradients[ 1 ],
+			] );
+		} );
+	} );
+
+	it( 'can update duotone palette value', async () => {
+		const onChange = jest.fn();
+
+		render(
+			<PaletteEdit
+				{ ...defaultProps }
+				duotones={ duotones }
+				colorPalette={ colors }
+				onChange={ onChange }
+			/>
+		);
+
+		await click( screen.getByLabelText( 'Duotone: Blue and red' ) );
+		await click( screen.getByRole( 'button', { name: /Shadows/ } ) );
+		await click( screen.getByRole( 'option', { name: 'Primary' } ) );
+
+		await waitFor( () => {
+			expect( onChange ).toHaveBeenCalledWith( [
+				duotones[ 0 ],
+				{
+					...duotones[ 1 ],
+					colors: [ '#1a4548', duotones[ 1 ].colors[ 1 ] ],
+				},
+			] );
+		} );
+	} );
+
+	// The same filtering and normalization that applies when adding a duotone
+	// has to apply when editing one, or the shadows and highlights picker can
+	// offer a color the saved duotone cannot be built from.
+	it( 'hides unusable colors and saves named ones as hex when editing a duotone', async () => {
+		const onChange = jest.fn();
+
+		render(
+			<PaletteEdit
+				{ ...defaultProps }
+				duotones={ duotones }
+				colorPalette={ [
+					{
+						color: 'black',
+						name: 'Named black',
+						slug: 'named-black',
+					},
+					{
+						color: 'color-mix(in srgb, currentColor 20%, transparent)',
+						name: 'Contrast overlay',
+						slug: 'contrast-overlay',
+					},
+				] }
+				onChange={ onChange }
+			/>
+		);
+
+		await click( screen.getByLabelText( 'Duotone: Blue and red' ) );
+		await click( screen.getByRole( 'button', { name: /Shadows/ } ) );
+
+		// The unusable color must not be offered at all.
+		expect(
+			screen.queryByRole( 'option', { name: 'Contrast overlay' } )
+		).not.toBeInTheDocument();
+
+		await click( screen.getByRole( 'option', { name: 'Named black' } ) );
+
+		await waitFor( () => {
+			expect( onChange ).toHaveBeenCalledWith( [
+				duotones[ 0 ],
+				{
+					...duotones[ 1 ],
+					colors: [ '#000000', duotones[ 1 ].colors[ 1 ] ],
+				},
+			] );
+		} );
+	} );
+
+	// Adding two duotones with the `+` button seeds both from the palette's
+	// darkest and lightest colors, so duplicate values are the normal case
+	// rather than an edge one. The duotone that was clicked has to be the one
+	// that gets edited.
+	it( 'updates the clicked duotone when two share the same colors', async () => {
+		const onChange = jest.fn();
+		const twins = [
+			{ colors: [ '#000000', '#ffffff' ], name: 'First', slug: 'first' },
+			{
+				colors: [ '#000000', '#ffffff' ],
+				name: 'Second',
+				slug: 'second',
+			},
+		];
+
+		render(
+			<PaletteEdit
+				{ ...defaultProps }
+				duotones={ twins }
+				colorPalette={ colors }
+				onChange={ onChange }
+			/>
+		);
+
+		await click( screen.getByLabelText( 'Duotone: Second' ) );
+		await click( screen.getByRole( 'button', { name: /Shadows/ } ) );
+		await click( screen.getByRole( 'option', { name: 'Primary' } ) );
+
+		await waitFor( () => {
+			expect( onChange ).toHaveBeenCalledWith( [
+				twins[ 0 ],
+				{ ...twins[ 1 ], colors: [ '#1a4548', '#ffffff' ] },
 			] );
 		} );
 	} );

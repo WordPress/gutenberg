@@ -1,18 +1,12 @@
-/**
- * External dependencies
+/*
+ * `diffWordsWithSpace` preserves the v4-style per-word output. v6+
+ * stopped treating whitespace as a token in `diffWords`, which coalesces
+ * adjacent word changes into a single removed/added pair.
  */
-import { diffWords } from 'diff/lib/diff/word';
-
-/**
- * WordPress dependencies
- */
+import { diffWordsWithSpace } from 'diff';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import RevisionDiffPanel from '../revision-diff-panel';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
@@ -31,6 +25,16 @@ function stringifyValue( value ) {
 		return JSON.stringify( value, null, 2 );
 	}
 	return String( value );
+}
+
+/**
+ * Determines whether a meta value should be treated as empty.
+ *
+ * @param {string} str The stringified value.
+ * @return {boolean} Whether the value is effectively empty.
+ */
+function isEmptyMeta( str ) {
+	return ! str || str === '[]' || str === '{}';
 }
 
 /**
@@ -67,11 +71,11 @@ export default function RevisionFieldsDiffPanel() {
 			const revStr = stringifyValue( revisionMeta[ key ] );
 			const prevStr = stringifyValue( previousMeta[ key ] );
 
-			if ( ! revStr && ! prevStr ) {
+			if ( isEmptyMeta( revStr ) && isEmptyMeta( prevStr ) ) {
 				continue;
 			}
 
-			result[ key ] = diffWords( prevStr, revStr );
+			result[ key ] = diffWordsWithSpace( prevStr, revStr );
 		}
 
 		if ( Object.keys( result ).length === 0 ) {
@@ -86,6 +90,7 @@ export default function RevisionFieldsDiffPanel() {
 			title={ __( 'Meta' ) }
 			entries={ entries }
 			initialOpen={ false }
+			className="editor-revision-meta-diff__content"
 		/>
 	);
 }

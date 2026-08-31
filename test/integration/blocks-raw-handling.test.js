@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import fs from 'fs';
 import path from 'path';
-
-/**
- * WordPress dependencies
- */
 import {
 	createBlock,
 	getBlockContent,
@@ -125,6 +118,26 @@ describe( 'Blocks raw handling', () => {
 		} );
 
 		expect( filtered ).toBe( '<em>test</em>' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should preserve spaces inside whitespace-only inline elements', () => {
+		const filtered = pasteHandler( {
+			HTML: 'The<em> </em>quick<span> </span>brown',
+			mode: 'INLINE',
+		} );
+
+		expect( filtered ).toBe( 'The quick brown' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should still remove empty inline elements', () => {
+		const filtered = pasteHandler( {
+			HTML: 'a<em></em>b',
+			mode: 'INLINE',
+		} );
+
+		expect( filtered ).toBe( 'ab' );
 		expect( console ).toHaveLogged();
 	} );
 
@@ -414,6 +427,7 @@ describe( 'Blocks raw handling', () => {
 			'google-docs-table-with-rowspan',
 			'google-docs-table-with-comments',
 			'google-docs-with-comments',
+			'google-docs-link-spacing',
 			'ms-word',
 			'ms-word-list',
 			'ms-word-styled',

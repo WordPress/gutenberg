@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/preferences",
-	"version": "4.47.0",
+	"version": "4.53.0",
 	"description": "Utilities for managing WordPress preferences.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -41,9 +41,8 @@
 			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json",
-		"./build-style/": "./build-style/"
+		"./build-style/*": "./build-style/*"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"types": "build-types",
 	"wpScriptExtraDependencies": [
@@ -51,7 +50,6 @@
 	],
 	"sideEffects": false,
 	"dependencies": {
-		"@types/react": "^19.2.13",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/components": "file:../components",
@@ -64,9 +62,18 @@
 		"@wordpress/private-apis": "file:../private-apis",
 		"clsx": "^2.1.1"
 	},
+	"devDependencies": {
+		"@types/jest": "^30.0.0"
+	},
 	"peerDependencies": {
-		"react": "^19.2.4",
-		"react-dom": "^19.2.4"
+		"@types/react": "^18 || ^19",
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

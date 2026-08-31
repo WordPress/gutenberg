@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { dispatch, select } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import PostPublishButton from '../';
 import { store as editorStore } from '../../../store';
 
@@ -80,6 +69,19 @@ describe( 'PostPublishButton', () => {
 			mockSelector( 'isEditedPostPublishable', true );
 			mockSelector( 'isEditedPostSaveable', true );
 			mockSelector( 'isPostSavingLocked', true );
+
+			render( <PostPublishButton /> );
+
+			expect( screen.getByRole( 'button' ) ).toHaveAttribute(
+				'aria-disabled',
+				'true'
+			);
+		} );
+
+		it( 'should be true if a non-post entity is being saved', () => {
+			mockSelector( 'isEditedPostPublishable', true );
+			mockSelector( 'isEditedPostSaveable', true );
+			mockSelector( 'isSavingNonPostEntityChanges', true );
 
 			render( <PostPublishButton /> );
 

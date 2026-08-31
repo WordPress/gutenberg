@@ -193,6 +193,10 @@ export interface SpacingSettings {
  */
 export interface GlobalStylesSettings {
 	useRootPaddingAwareAlignments?: boolean;
+	viewport?: {
+		mobile?: string;
+		tablet?: string;
+	};
 	typography?: TypographySettings;
 	layout?: LayoutSettings;
 	spacing?: SpacingSettings;
@@ -249,7 +253,7 @@ export interface GlobalStylesStyles {
 	spacing?: {
 		padding?: UnresolvedValue | Record< string, UnresolvedValue >;
 		margin?: UnresolvedValue | Record< string, UnresolvedValue >;
-		blockGap?: string;
+		blockGap?: string | { top: string; left: string };
 	};
 	background?: BackgroundStyle;
 	border?: {

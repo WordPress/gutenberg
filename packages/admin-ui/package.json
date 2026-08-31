@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/admin-ui",
-	"version": "2.2.0",
+	"version": "2.8.0",
 	"description": "Generic components to be used in the Admin UI.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -39,13 +39,11 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"types": "build-types",
 	"sideEffects": [
 		"src/**/*.module.css"
 	],
 	"dependencies": {
-		"@types/react": "^19.2.13",
 		"@wordpress/components": "file:../components",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
@@ -55,8 +53,23 @@
 		"@wordpress/ui": "file:../ui",
 		"clsx": "^2.1.1"
 	},
+	"devDependencies": {
+		"@storybook/react-vite": "^10.5.3",
+		"@testing-library/dom": "^10.4.1",
+		"@testing-library/jest-dom": "^6.9.1",
+		"@testing-library/react": "^16.3.2",
+		"@types/jest": "^30.0.0",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/jest-console": "file:../jest-console"
+	},
 	"peerDependencies": {
-		"react": "^19.2.4"
+		"@types/react": "^18 || ^19",
+		"react": "^18 || ^19"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalVStack as VStack,
@@ -14,14 +11,9 @@ import {
 } from '@wordpress/components';
 import { useMemo, useRef } from '@wordpress/element';
 import { shadow as shadowIcon, Icon, check, reset } from '@wordpress/icons';
-
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
 import { Tooltip } from '@wordpress/ui';
+import { InheritanceResetButton } from './inheritance';
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -33,13 +25,27 @@ const EMPTY_ARRAY = [];
 
 export function ShadowPopoverContainer( { shadow, onShadowChange, settings } ) {
 	const shadows = useShadowPresets( settings );
+	const presets = useMemo( () => {
+		if ( ! shadows.length ) {
+			return shadows;
+		}
+		// The entry that clears the shadow is a display-only affordance with no
+		// counterpart in `theme.json`. It is added here rather than in
+		// `useShadowPresets` so that callers mapping a value back to a preset
+		// never mistake it for one and persist a reference to a CSS variable
+		// that is never output.
+		return [
+			{ name: __( 'Unset' ), slug: 'unset', shadow: 'none' },
+			...shadows,
+		];
+	}, [ shadows ] );
 
 	return (
 		<div className="block-editor-global-styles__shadow-popover-container">
 			<VStack spacing={ 4 }>
 				<Heading level={ 5 }>{ __( 'Drop shadow' ) }</Heading>
 				<ShadowPresets
-					presets={ shadows }
+					presets={ presets }
 					activeShadow={ shadow }
 					onSelect={ onShadowChange }
 				/>
@@ -120,7 +126,15 @@ export function ShadowIndicator( { type, label, isActive, onSelect, shadow } ) {
 	);
 }
 
-export function ShadowPopover( { shadow, onShadowChange, settings } ) {
+export function ShadowPopover( {
+	shadow,
+	onShadowChange,
+	settings,
+	className,
+	hasLocalValue = !! shadow,
+	hasLocalOverride = false,
+	onReset,
+} ) {
 	const popoverProps = {
 		placement: 'left-start',
 		offset: 36,
@@ -130,8 +144,15 @@ export function ShadowPopover( { shadow, onShadowChange, settings } ) {
 	return (
 		<Dropdown
 			popoverProps={ popoverProps }
-			className="block-editor-global-styles__shadow-dropdown"
-			renderToggle={ renderShadowToggle( shadow, onShadowChange ) }
+			className={ clsx(
+				'block-editor-global-styles__shadow-dropdown',
+				className
+			) }
+			renderToggle={ renderShadowToggle( shadow, onShadowChange, {
+				hasLocalValue,
+				hasLocalOverride,
+				onReset: onReset ?? ( () => onShadowChange( undefined ) ),
+			} ) }
 			renderContent={ () => (
 				<DropdownContentWrapper paddingSize="medium">
 					<ShadowPopoverContainer
@@ -145,7 +166,8 @@ export function ShadowPopover( { shadow, onShadowChange, settings } ) {
 	);
 }
 
-function renderShadowToggle( shadow, onShadowChange ) {
+function renderShadowToggle( shadow, onShadowChange, resetConfig ) {
+	const { hasLocalValue, hasLocalOverride, onReset } = resetConfig;
 	return function ShadowToggle( { onToggle, isOpen } ) {
 		const shadowButtonRef = useRef( undefined );
 
@@ -159,20 +181,13 @@ function renderShadowToggle( shadow, onShadowChange ) {
 			ref: shadowButtonRef,
 		};
 
-		const removeButtonProps = {
-			onClick: () => {
-				if ( isOpen ) {
-					onToggle();
-				}
-				onShadowChange( undefined );
-				// Return focus to parent button.
-				shadowButtonRef.current?.focus();
-			},
-			className: clsx(
-				'block-editor-global-styles__shadow-editor__remove-button',
-				{ 'is-open': isOpen }
-			),
-			label: __( 'Remove' ),
+		const handleReset = () => {
+			if ( isOpen ) {
+				onToggle();
+			}
+			onReset();
+			// Return focus to parent button.
+			shadowButtonRef.current?.focus();
 		};
 
 		return (
@@ -187,19 +202,39 @@ function renderShadowToggle( shadow, onShadowChange ) {
 						<FlexItem>{ __( 'Drop shadow' ) }</FlexItem>
 					</HStack>
 				</Button>
-				{ !! shadow && (
-					<Button
-						__next40pxDefaultSize
-						size="small"
-						icon={ reset }
-						{ ...removeButtonProps }
-					/>
-				) }
+				{ hasLocalValue &&
+					( hasLocalOverride ? (
+						<InheritanceResetButton
+							className="block-editor-global-styles__shadow-editor__remove-button"
+							onResetToInherited={ handleReset }
+						/>
+					) : (
+						<Button
+							__next40pxDefaultSize
+							size="small"
+							icon={ reset }
+							label={ __( 'Remove' ) }
+							className="block-editor-global-styles__shadow-editor__remove-button"
+							onClick={ handleReset }
+						/>
+					) ) }
 			</>
 		);
 	};
 }
 
+/**
+ * Returns the available shadow presets, from every origin, in the order they
+ * are presented to the user.
+ *
+ * This is the single source of truth for which presets exist: it backs both the
+ * popover's preset list and the mapping of a chosen shadow back to the preset
+ * it came from, so what is shown and what is stored cannot drift apart.
+ *
+ * @param {Object} settings Theme.json settings for the current context.
+ *
+ * @return {Array} The shadow presets.
+ */
 export function useShadowPresets( settings ) {
 	return useMemo( () => {
 		if ( ! settings?.shadow ) {
@@ -212,21 +247,22 @@ export function useShadowPresets( settings ) {
 			theme: themeShadows,
 			custom: customShadows,
 		} = settings?.shadow?.presets ?? {};
-		const unsetShadow = {
-			name: __( 'Unset' ),
-			slug: 'unset',
-			shadow: 'none',
-		};
 
-		const shadowPresets = [
+		const allPresets = [
 			...( ( defaultPresetsEnabled && defaultShadows ) || EMPTY_ARRAY ),
 			...( themeShadows || EMPTY_ARRAY ),
 			...( customShadows || EMPTY_ARRAY ),
 		];
-		if ( shadowPresets.length ) {
-			shadowPresets.unshift( unsetShadow );
-		}
 
-		return shadowPresets;
+		// More than one origin can define the same slug, but only the most
+		// specific definition is output as a CSS variable. Keeping the ones it
+		// overrides would offer swatches that apply a different shadow than
+		// the one they show.
+		return allPresets.filter(
+			( preset, index ) =>
+				allPresets.findLastIndex(
+					( { slug } ) => slug === preset.slug
+				) === index
+		);
 	}, [ settings ] );
 }

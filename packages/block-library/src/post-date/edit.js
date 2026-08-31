@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import {
@@ -30,10 +27,6 @@ import { pencil } from '@wordpress/icons';
 import { DOWN } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
@@ -210,7 +203,7 @@ export default function PostDateEdit( props ) {
 					<ToolsPanelItem
 						hasValue={ () => isLink !== false }
 						label={
-							postType?.labels.singular_name
+							postType?.labels?.singular_name
 								? sprintf(
 										// translators: %s: Name of the post type e.g: "post".
 										__( 'Link to %s' ),
@@ -223,7 +216,7 @@ export default function PostDateEdit( props ) {
 					>
 						<ToggleControl
 							label={
-								postType?.labels.singular_name
+								postType?.labels?.singular_name
 									? sprintf(
 											// translators: %s: Name of the post type e.g: "post".
 											__( 'Link to %s' ),

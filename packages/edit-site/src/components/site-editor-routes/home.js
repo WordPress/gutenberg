@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
 import SidebarNavigationScreenUnsupported from '../sidebar-navigation-screen-unsupported';
 import Editor from '../editor';
@@ -28,7 +25,7 @@ export const homeRoute = {
 				<Editor isHomeRoute />
 			) : undefined;
 		},
-		mobile( { siteData } ) {
+		mobileSidebar( { siteData } ) {
 			if ( ! isThemeDataLoaded( siteData ) ) {
 				return <></>;
 			}

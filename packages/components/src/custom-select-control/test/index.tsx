@@ -1,23 +1,12 @@
-/**
- * External dependencies
- */
 import { screen } from '@testing-library/react';
 import { click, press, sleep, type, waitFor } from '@ariakit/test';
 import { render } from '@ariakit/test/react';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import _CustomSelectControl from '..';
 
 const UncontrolledCustomSelectControl = (
 	props: React.ComponentProps< typeof _CustomSelectControl >
-) => <_CustomSelectControl __next40pxDefaultSize { ...props } />;
+) => <_CustomSelectControl { ...props } />;
 
 const customClassName = 'amber-skies';
 const customStyles = {
@@ -483,7 +472,7 @@ describe.each( [
 			const customSelect = screen.getByRole( 'listbox', {
 				name: props.label,
 			} );
-			expect( customSelect ).toHaveFocus();
+			await waitFor( () => expect( customSelect ).toHaveFocus() );
 			await press.Enter();
 
 			expect( onKeyDown ).toHaveBeenCalledTimes( 0 );
@@ -691,6 +680,29 @@ describe.each( [
 				`Currently selected: ${ props.options[ 0 ].name }`
 			);
 		} );
+	} );
+} );
+
+describe( 'Legacy size support', () => {
+	it( 'treats __unstable-large the same as default', async () => {
+		const options = [ { key: 'one', name: 'One' } ];
+
+		await render(
+			<UncontrolledCustomSelectControl label="Test" options={ options } />
+		);
+		await render(
+			<UncontrolledCustomSelectControl
+				label="Test"
+				options={ options }
+				// @ts-expect-error testing legacy runtime support for removed size type
+				size="__unstable-large"
+			/>
+		);
+
+		const comboboxes = screen.getAllByRole( 'combobox' );
+		const [ defaultCombobox, legacyCombobox ] = comboboxes;
+
+		expect( legacyCombobox ).toMatchStyleDiffSnapshot( defaultCombobox );
 	} );
 } );
 

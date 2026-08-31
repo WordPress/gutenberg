@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/api-fetch",
-	"version": "7.47.0",
+	"version": "7.53.0",
 	"description": "Utility to make WordPress REST API requests.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -40,7 +40,6 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"wpScriptDefaultExport": true,
 	"types": "build-types",
@@ -48,6 +47,9 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/url": "file:../url"
+	},
+	"devDependencies": {
+		"@types/jest": "^30.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

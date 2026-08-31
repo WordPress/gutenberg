@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { cloneElement, Children } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { ResponsiveWrapperProps } from './types';
 
 /**
@@ -45,20 +34,16 @@ function ResponsiveWrapper( {
 		aspectRatio = `${ naturalWidth } / ${ naturalHeight }`;
 	}
 
-	const ch = children as React.ReactElement<
-		Pick< React.HTMLAttributes< Element >, 'className' | 'style' >
-	>;
-
 	return (
 		<TagName className="components-responsive-wrapper">
 			<div>
-				{ cloneElement( ch, {
+				{ cloneElement( children, {
 					className: clsx(
 						'components-responsive-wrapper__content',
-						ch.props.className
+						children.props.className
 					),
 					style: {
-						...ch.props.style,
+						...children.props.style,
 						aspectRatio,
 					},
 				} ) }

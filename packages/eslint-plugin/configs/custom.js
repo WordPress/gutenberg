@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const wpRules = require( '../rules' );
 
 const wpPlugin = { rules: wpRules };
@@ -21,14 +18,6 @@ module.exports = [
 			'@wordpress/no-unknown-ds-tokens': 'error',
 			'@wordpress/no-unsafe-wp-apis': 'error',
 			'@wordpress/no-wp-process-env': 'error',
-		},
-	},
-	{
-		files: [ '**/*.native.js' ],
-		rules: {
-			'@wordpress/no-base-control-with-label-without-id': 'off',
-			'@wordpress/i18n-no-flanking-whitespace': 'error',
-			'@wordpress/i18n-hyphenated-range': 'error',
 		},
 	},
 	{

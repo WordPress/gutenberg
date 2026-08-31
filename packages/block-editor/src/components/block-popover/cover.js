@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useState, useMemo, forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { PrivateBlockPopover } from '.';
 

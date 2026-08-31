@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen, waitFor } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import useDisabled from '../';
 
 describe( 'useDisabled', () => {
@@ -37,9 +26,9 @@ describe( 'useDisabled', () => {
 		const link = screen.getByRole( 'link' );
 		const p = screen.getByRole( 'document' );
 
-		expect( input ).toHaveAttribute( 'inert' );
-		expect( link ).toHaveAttribute( 'inert' );
-		expect( p ).toHaveAttribute( 'inert' );
+		expect( input ).toHaveAttribute( 'inert', 'true' );
+		expect( link ).toHaveAttribute( 'inert', 'true' );
+		expect( p ).toHaveAttribute( 'inert', 'true' );
 	} );
 
 	it( 'will disable an element rendered in an update to the component', async () => {
@@ -52,7 +41,7 @@ describe( 'useDisabled', () => {
 
 		const button = screen.getByText( 'Button' );
 		await waitFor( () => {
-			expect( button ).toHaveAttribute( 'inert' );
+			expect( button ).toHaveAttribute( 'inert', 'true' );
 		} );
 	} );
 } );

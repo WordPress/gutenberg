@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { validateMimeTypeForUser } from '../validate-mime-type-for-user';
 import { UploadError } from '../upload-error';
 

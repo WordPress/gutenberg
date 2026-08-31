@@ -22,7 +22,7 @@
 }
 
 .block-directory-compact-list__item-title {
-	font-weight: $font-weight-medium;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 }
 
 .block-directory-compact-list__item-author {

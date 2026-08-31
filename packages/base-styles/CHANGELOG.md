@@ -4,6 +4,55 @@
 
 ### Breaking Changes
 
+-   Remove the `input-style__focus` mixin. Use `outset-ring__focus` instead ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
+
+### Enhancements
+
+-   `input-control`: Use `outset-ring__focus` for focus styling, WPDS tokens for border styling, and a hover border treatment aligned with `@wordpress/ui`. If you also define custom `:focus` box-shadow styles on the same selector, remove them to avoid duplicate focus rings ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
+-   `outset-ring__focus`: Use a `--focus-color` fallback in the outline instead of declaring the custom property locally, so ancestor overrides apply correctly ([#81242](https://github.com/WordPress/gutenberg/pull/81242)).
+
+## 12.1.0 (2026-08-12)
+
+
+## 12.0.0 (2026-07-29)
+
+### Breaking Changes
+
+-   Remove the `$accent-color` parameter from `input-control` and `input-style__focus`. Focus styling now uses `--wp-admin-theme-color` internally ([#80595](https://github.com/WordPress/gutenberg/pull/80595)).
+
+### Enhancements
+
+-   `outset-ring__focus`: Allow overriding the focus ring color via the `--focus-color` custom property ([#80587](https://github.com/WordPress/gutenberg/pull/80587)).
+
+### Bug Fixes
+
+-   Lower the editor z-index of left/right aligned blocks below sticky and fixed position blocks, so floated blocks no longer cover stuck blocks while scrolling ([#80749](https://github.com/WordPress/gutenberg/pull/80749)).
+
+### Internal
+
+-   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).
+
+## 11.0.0 (2026-07-14)
+
+### Breaking Changes
+
+-   Remove `$font-weight-regular` and `$font-weight-medium`. Use `var(--wpds-typography-font-weight-default)` or `var(--wpds-typography-font-weight-emphasis)` based on the intended emphasis ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
+
+### Enhancements
+
+-   Use semantic `@wordpress/theme` font-weight tokens in typography mixins, and align the legacy font-family variables with the theme typography tokens ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
+-   Add `outset-ring__focus` mixin for outline-based focus rings using `--wpds-*` design tokens ([#78698](https://github.com/WordPress/gutenberg/pull/78698), [#80082](https://github.com/WordPress/gutenberg/pull/80082)).
+
+## 10.2.0 (2026-07-01)
+
+## 10.1.0 (2026-06-24)
+
+## 10.0.1 (2026-06-16)
+
+## 10.0.0 (2026-06-10)
+
+### Breaking Changes
+
 -   Remove the following entries from the `z-index()` helper ([#77773](https://github.com/WordPress/gutenberg/pull/77773)):
    -   `.nux-dot-tip`
 

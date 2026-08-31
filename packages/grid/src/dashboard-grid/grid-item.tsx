@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { useSortable } from '@dnd-kit/sortable';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useState, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import actionableAreaStyles from '../shared/actionable-area-slot.module.css';
 import { GRID_ITEM_DATA_KEY } from '../shared/grid-item-key';
 import ResizeHandle from '../shared/resize-handle';
@@ -154,7 +143,7 @@ export function GridItem( {
 				>
 					<div
 						style={ { display: 'contents' } }
-						inert={ dragging || undefined }
+						{ ...( dragging ? { inert: '' } : {} ) }
 					>
 						{ actionableArea }
 					</div>

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { selectorArgsToStateKey } from '../utils';
 
 describe( 'selectorArgsToStateKey', () => {

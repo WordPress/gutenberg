@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { privateApis as routePrivateApis } from '@wordpress/route';
 import { SnackbarNotices } from '@wordpress/notices';
 import { useViewportMatch, useReducedMotion } from '@wordpress/compose';
@@ -16,23 +9,22 @@ import {
 	SlotFillProvider,
 } from '@wordpress/components';
 import { menu } from '@wordpress/icons';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Page } from '@wordpress/admin-ui';
-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+import { UnsavedChangesWarning } from '@wordpress/editor';
+import { Page, getAdminThemeColors } from '@wordpress/admin-ui';
 import { Tooltip } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
+import { ThemeProvider } from '@wordpress/theme';
 import Sidebar from '../sidebar';
 import SavePanel from '../save-panel';
 import CanvasRenderer from '../canvas-renderer';
+import ErrorBoundary from '../error-boundary';
+import PluginArea from '../plugin-area';
 import useRouteTitle from '../app/use-route-title';
 import { unlock } from '../../lock-unlock';
 import type { CanvasData } from '../../store/types';
-import './style.scss';
-import { UserThemeProvider } from '../user-theme-provider';
+import useSyncBodyBackground from './use-sync-body-background';
+import styles from './style.module.scss';
 
 const { useLocation, useMatches, Outlet } = unlock( routePrivateApis );
 
@@ -59,19 +51,32 @@ export default function Root() {
 		setIsMobileSidebarOpen( false );
 	}, [ location.pathname, isMobileViewport ] );
 
+	const themeColors = useMemo( getAdminThemeColors, [] );
+
+	const layoutRef = useSyncBodyBackground();
+
 	return (
 		<SlotFillProvider>
 			<Tooltip.Provider>
-				<UserThemeProvider isRoot color={ { bg: '#f8f8f8' } }>
-					<UserThemeProvider color={ { bg: '#1d2327' } }>
+				<PluginArea />
+				<ThemeProvider
+					isRoot
+					color={ { ...themeColors, background: '#f8f8f8' } }
+				>
+					<ThemeProvider color={ themeColors }>
 						<div
-							className={ clsx( 'boot-layout', {
-								'has-canvas': !! canvas || canvas === null,
-								'has-full-canvas': isFullScreen,
+							ref={ layoutRef }
+							className={ clsx( styles.layout, {
+								[ styles[ 'has-canvas' ] ]:
+									!! canvas || canvas === null,
+								[ styles[ 'has-full-canvas' ] ]: isFullScreen,
 							} ) }
 						>
+							<UnsavedChangesWarning />
 							<SavePanel />
-							<SnackbarNotices className="boot-notices__snackbar" />
+							<SnackbarNotices
+								className={ styles[ 'notices-snackbar' ] }
+							/>
 							{ isMobileViewport && (
 								<Page.SidebarToggleFill>
 									<Button
@@ -100,7 +105,9 @@ export default function Root() {
 													: 0.2,
 												ease: 'easeOut',
 											} }
-											className="boot-layout__sidebar-backdrop"
+											className={
+												styles[ 'sidebar-backdrop' ]
+											}
 											onClick={ () =>
 												setIsMobileSidebarOpen( false )
 											}
@@ -135,7 +142,10 @@ export default function Root() {
 													: 0.2,
 												ease: 'easeOut',
 											} }
-											className="boot-layout__sidebar is-mobile"
+											className={ clsx(
+												styles.sidebar,
+												styles[ 'is-mobile' ]
+											) }
 										>
 											<Sidebar />
 										</motion.div>
@@ -143,28 +153,38 @@ export default function Root() {
 							</AnimatePresence>
 							{ /* Desktop Sidebar */ }
 							{ ! isMobileViewport && ! isFullScreen && (
-								<div className="boot-layout__sidebar">
+								<div className={ styles.sidebar }>
 									<Sidebar />
 								</div>
 							) }
-							<div className="boot-layout__surfaces">
-								<UserThemeProvider color={ { bg: '#ffffff' } }>
+							<div className={ styles.surfaces }>
+								<ThemeProvider
+									color={ {
+										...themeColors,
+										background: '#ffffff',
+									} }
+								>
 									<Outlet />
 									{ /* Render Canvas in Root to prevent remounting on route changes */ }
 									{ ( canvas || canvas === null ) && (
 										<div
-											className={ clsx(
-												'boot-layout__canvas',
-												{
-													'has-mobile-drawer':
-														canvas?.isPreview &&
-														isMobileViewport,
-												}
-											) }
+											className={ clsx( styles.canvas, {
+												[ styles[
+													'has-mobile-drawer'
+												] ]:
+													canvas?.isPreview &&
+													isMobileViewport,
+											} ) }
 										>
 											{ canvas?.isPreview &&
 												isMobileViewport && (
-													<div className="boot-layout__mobile-sidebar-drawer">
+													<div
+														className={
+															styles[
+																'mobile-sidebar-drawer'
+															]
+														}
+													>
 														<Button
 															icon={ menu }
 															onClick={ () =>
@@ -179,19 +199,21 @@ export default function Root() {
 														/>
 													</div>
 												) }
-											<CanvasRenderer
-												canvas={ canvas }
-												routeContentModule={
-													routeContentModule
-												}
-											/>
+											<ErrorBoundary>
+												<CanvasRenderer
+													canvas={ canvas }
+													routeContentModule={
+														routeContentModule
+													}
+												/>
+											</ErrorBoundary>
 										</div>
 									) }
-								</UserThemeProvider>
+								</ThemeProvider>
 							</div>
 						</div>
-					</UserThemeProvider>
-				</UserThemeProvider>
+					</ThemeProvider>
+				</ThemeProvider>
 			</Tooltip.Provider>
 		</SlotFillProvider>
 	);

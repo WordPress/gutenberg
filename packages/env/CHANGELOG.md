@@ -2,6 +2,34 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Update git sources to the latest commit when `--update` is passed. Previously, a source pointing at a branch (such as `"core": "WordPress/WordPress"`) stayed at the commit it was first cloned at, no matter how many times it was updated.
+-   Do not fail `wp-env start` when Docker images cannot be pulled (e.g., the Docker registry is unreachable); fall back to locally cached images and show a notice instead. ([#81631](https://github.com/WordPress/gutenberg/issues/81631))
+
+## 11.13.0 (2026-08-12)
+
+
+## 11.12.0 (2026-07-29)
+
+## 11.11.0 (2026-07-14)
+
+## 11.10.0 (2026-07-01)
+
+## 11.9.0 (2026-06-24)
+
+## 11.8.1 (2026-06-16)
+
+## 11.8.0 (2026-06-10)
+
+### Enhancements
+
+-   Use partial clones (`--filter=blob:none`) when downloading git sources and the PHPUnit test suite to reduce download size. ([#78918](https://github.com/WordPress/gutenberg/pull/78918))
+
+### Bug Fixes
+
+-   Replace `extract-zip` with `adm-zip` to fix silent hang on Node 24.16.0 (libuv 1.52.1) when downloading URL-based zip sources. ([#78762](https://github.com/WordPress/gutenberg/issues/78762))
+
 ## 11.7.0 (2026-05-27)
 
 ## 11.6.0 (2026-05-14)

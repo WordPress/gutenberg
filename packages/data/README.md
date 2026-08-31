@@ -500,9 +500,11 @@ _Returns_
 
 Creates a memoized selector that caches the computed values according to the array of "dependants" and the selector parameters, and recomputes the values only when any of them changes.
 
-_Related_
+See The documentation for the `rememo` package from which the `createSelector` function is reexported.
 
--   The documentation for the `rememo` package from which the `createSelector` function is reexported.
+_Type_
+
+-   `( selector: S, getDependants: GetDependants ) => S & EnhancedSelector`
 
 ### dispatch
 
@@ -528,6 +530,14 @@ _Parameters_
 _Returns_
 
 -   `DispatchReturn< StoreNameOrDescriptor >`: Object containing the action creators.
+
+### EnhancedSelector
+
+Undocumented declaration.
+
+### GetDependants
+
+Undocumented declaration.
 
 ### keyedReducer
 

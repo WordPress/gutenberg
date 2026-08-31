@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getFontStylesAndWeights } from '../get-font-styles-and-weights';
 
 describe( 'getFontStylesAndWeights', () => {

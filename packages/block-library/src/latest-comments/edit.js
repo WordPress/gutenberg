@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
 	RangeControl,
@@ -13,10 +10,6 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { useDisabled } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
 
@@ -114,7 +107,6 @@ export default function LatestComments( { attributes, setAttributes, name } ) {
 						isShownByDefault
 					>
 						<SelectControl
-							__next40pxDefaultSize
 							label={ __( 'Display content' ) }
 							value={ displayContent }
 							options={ [
@@ -139,7 +131,6 @@ export default function LatestComments( { attributes, setAttributes, name } ) {
 						isShownByDefault
 					>
 						<RangeControl
-							__next40pxDefaultSize
 							label={ __( 'Number of comments' ) }
 							value={ commentsToShow }
 							onChange={ ( value ) =>

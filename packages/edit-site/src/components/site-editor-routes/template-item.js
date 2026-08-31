@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import Editor from '../editor';
 import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
 import SidebarNavigationScreenUnsupported from '../sidebar-navigation-screen-unsupported';
@@ -17,16 +14,7 @@ const areas = {
 			<SidebarNavigationScreenUnsupported />
 		);
 	},
-	mobile( { siteData } ) {
-		if ( ! isThemeDataLoaded( siteData ) ) {
-			return <></>;
-		}
-		return siteData.currentTheme.is_block_theme ? (
-			<Editor />
-		) : (
-			<SidebarNavigationScreenUnsupported />
-		);
-	},
+	// Also rendered on mobile, where this route is only reached at canvas=edit.
 	preview( { siteData } ) {
 		if ( ! isThemeDataLoaded( siteData ) ) {
 			return null;

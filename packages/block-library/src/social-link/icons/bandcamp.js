@@ -1,7 +1,3 @@
-/**
- * WordPress dependencies
- */
-
 import { Path, SVG } from '@wordpress/primitives';
 
 export const BandcampIcon = () => (

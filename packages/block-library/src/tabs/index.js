@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { tabs as icon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import initBlock from '../utils/init-block';
 import edit from './edit';
 import save from './save';
@@ -16,22 +9,20 @@ const { name } = metadata;
 
 export { metadata, name };
 
+const TEMPLATE = [ [ 'core/tab-list' ], [ 'core/tab-panels' ] ];
+
 export const settings = {
 	icon,
 	example: {
 		innerBlocks: [
 			{
 				name: 'core/tab-list',
-				innerBlocks: [
-					{
-						name: 'core/tab',
-						attributes: { anchor: 'tab-1-button' },
-					},
-					{
-						name: 'core/tab',
-						attributes: { anchor: 'tab-2-button' },
-					},
-				],
+				attributes: {
+					tabs: [
+						{ label: __( 'Tab 1' ) },
+						{ label: __( 'Tab 2' ) },
+					],
+				},
 			},
 			{
 				name: 'core/tab-panels',
@@ -59,6 +50,8 @@ export const settings = {
 			},
 		],
 	},
+	// Initial tab/panel creation is delegated to the tab-panels template, applied when its inner blocks are empty.
+	template: TEMPLATE,
 	edit,
 	save,
 };

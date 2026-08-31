@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import {
 	useCallback,
 	useLayoutEffect,
 	useRef,
 	useState,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { ItemExitOverlayRect } from './item-exit-overlay';
 import type { RectSnapshot } from './use-layout-shift-animation';
 
