@@ -13,6 +13,7 @@ import {
 import { __, _n, sprintf } from '@wordpress/i18n';
 import type { CSSProperties, ReactElement, ReactNode } from 'react';
 import { Button } from '../button';
+import { Link } from '../link';
 import * as Menu from '../menu';
 import type { RootProps as MenuRootProps } from '../menu/types';
 import * as Tooltip from '../tooltip';
@@ -564,7 +565,6 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 							<Menu.Trigger
 								ref={ overflowTriggerRef }
 								aria-label={ overflowLabel }
-								className={ styles[ 'overflow-trigger' ] }
 								onBlur={ handleOverflowTriggerBlur }
 								onFocus={ () =>
 									setIsOverflowTriggerFocused( true )
@@ -661,29 +661,47 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 								} }
 								className={ styles[ 'measurement-content' ] }
 							>
-								<span
-									className={ clsx(
-										styles.label,
-										styles[ 'measurement-label' ],
-										item.measurementClassName
-									) }
-									data-open-in-new-tab={
-										item.openInNewTab ? '' : undefined
-									}
-									style={ item.measurementStyle }
-								>
-									{ item.label }
-								</span>
+								{ item.kind === 'link' ? (
+									<Link
+										className={ clsx(
+											styles.label,
+											styles[ 'measurement-label' ],
+											item.measurementClassName
+										) }
+										openInNewTab={ item.openInNewTab }
+										render={ <span /> }
+										style={ item.measurementStyle }
+										tabIndex={ -1 }
+									>
+										{ item.label }
+									</Link>
+								) : (
+									<span
+										className={ clsx(
+											styles.label,
+											styles[ 'measurement-label' ],
+											item.measurementClassName
+										) }
+										style={ item.measurementStyle }
+									>
+										{ item.label }
+									</span>
+								) }
 							</span>
 						</span>
 					) ) }
 				</div>
-				<span
-					ref={ intrinsicOverflowTriggerRef }
+				<Button
 					className={ styles[ 'measurement-overflow-trigger' ] }
+					nativeButton={ false }
+					render={ <span ref={ intrinsicOverflowTriggerRef } /> }
+					size="small"
+					tabIndex={ -1 }
+					tone="neutral"
+					variant="minimal"
 				>
 					…
-				</span>
+				</Button>
 			</div>
 		</>
 	);

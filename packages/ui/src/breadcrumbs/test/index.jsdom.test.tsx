@@ -1,5 +1,5 @@
 /* eslint-disable testing-library/no-container, testing-library/no-node-access -- Measurement behavior requires access to the hidden intrinsic tree and element geometry. */
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
 import type { HTMLAttributes } from 'react';
@@ -120,11 +120,11 @@ describe( 'Breadcrumb', () => {
 					return SEPARATOR_WIDTH;
 				}
 				if ( element.classList.contains( 'style-label' ) ) {
-					const indicatorWidth =
-						element.matches( 'a[target="_blank"]' ) ||
-						element.hasAttribute( 'data-open-in-new-tab' )
-							? NEW_TAB_INDICATOR_WIDTH
-							: 0;
+					const indicatorWidth = element.matches(
+						'[target="_blank"]'
+					)
+						? NEW_TAB_INDICATOR_WIDTH
+						: 0;
 					return (
 						( labelWidths.get( element.textContent ?? '' ) ??
 							DEFAULT_LABEL_WIDTH ) + indicatorWidth
@@ -283,6 +283,16 @@ describe( 'Breadcrumb', () => {
 			expect(
 				measurementTree?.querySelector( 'a, button, nav' )
 			).toBeNull();
+			expect(
+				measurementTree?.querySelector(
+					'.style-measurement-label.style-link'
+				)
+			).toHaveProperty( 'tagName', 'SPAN' );
+			expect(
+				measurementTree?.querySelector(
+					'.style-measurement-overflow-trigger'
+				)
+			).toHaveProperty( 'tagName', 'SPAN' );
 			expect( screen.getAllByRole( 'link' ) ).toHaveLength( 2 );
 			expect( screen.getAllByRole( 'navigation' ) ).toHaveLength( 1 );
 		} );
@@ -358,7 +368,7 @@ describe( 'Breadcrumb', () => {
 			expect( link ).toHaveAttribute( 'href', href );
 			expect( link ).toHaveAttribute( 'target', '_blank' );
 			expect(
-				screen.getByLabelText( '(opens in a new tab)' )
+				within( link ).getByLabelText( '(opens in a new tab)' )
 			).toBeVisible();
 			expect( link ).toHaveAttribute( 'data-router-link' );
 			expect( renderLink ).toHaveBeenCalled();
@@ -741,7 +751,7 @@ describe( 'Breadcrumb', () => {
 			expect( menuLink ).toHaveAttribute( 'data-router-link' );
 			expect( menuLink ).toHaveAttribute( 'target', '_blank' );
 			expect(
-				screen.getByLabelText( '(opens in a new tab)' )
+				within( menuLink ).getByLabelText( '(opens in a new tab)' )
 			).toBeVisible();
 		} );
 

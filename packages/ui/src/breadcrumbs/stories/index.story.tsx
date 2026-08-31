@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect, waitFor, within } from 'storybook/test';
+import { expect, waitFor } from 'storybook/test';
 import { forwardRef } from '@wordpress/element';
 import type { ComponentProps } from 'react';
 import * as Breadcrumb from '../';
@@ -73,15 +73,48 @@ export const ResponsiveStates: Story = {
 		</div>
 	),
 	play: async ( { canvasElement } ) => {
-		const canvas = within( canvasElement );
 		await waitFor( () => {
-			const triggers = canvas.getAllByRole( 'button', {
-				name: /hidden breadcrumb/,
-			} );
-			for ( const trigger of triggers ) {
-				const { width, height } = trigger.getBoundingClientRect();
-				expect( width ).toBe( 44 );
-				expect( height ).toBe( 44 );
+			const focusableItems =
+				canvasElement.querySelectorAll< HTMLElement >(
+					'ol a, ol button, ol [aria-current="page"][tabindex="0"]'
+				);
+			expect( focusableItems.length ).toBeGreaterThan( 0 );
+
+			for ( const item of focusableItems ) {
+				item.focus();
+				expect( item ).toHaveFocus();
+
+				const itemRect = item.getBoundingClientRect();
+				const list = item.closest( 'ol' );
+				const styles = getComputedStyle( item );
+				const ringSize =
+					Number.parseFloat( styles.outlineWidth ) +
+					Number.parseFloat( styles.outlineOffset );
+
+				expect( list ).not.toBeNull();
+				if ( ! list ) {
+					continue;
+				}
+				const listRect = list.getBoundingClientRect();
+
+				if ( item.tagName === 'BUTTON' ) {
+					expect( itemRect.height ).toBe( 24 );
+					expect( itemRect.width ).toBeGreaterThanOrEqual( 24 );
+				}
+				expect( listRect.height ).toBe( 32 );
+				expect( ringSize ).toBeGreaterThan( 0 );
+				expect( itemRect.top - ringSize ).toBeGreaterThanOrEqual(
+					listRect.top
+				);
+				expect( itemRect.bottom + ringSize ).toBeLessThanOrEqual(
+					listRect.bottom
+				);
+				expect( itemRect.left - ringSize ).toBeGreaterThanOrEqual(
+					listRect.left
+				);
+				expect( itemRect.right + ringSize ).toBeLessThanOrEqual(
+					listRect.right
+				);
 			}
 		} );
 	},
