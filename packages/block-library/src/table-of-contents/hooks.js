@@ -57,15 +57,7 @@ function getLatestHeadings( select, clientId ) {
 
 	/** The page (of a paginated post) a heading will be part of. */
 	let headingPage = 1;
-	let headingPageLink = null;
-
-	// If the core/editor store is available, we can add permalinks to the
-	// generated table of contents.
-	if ( typeof permalink === 'string' ) {
-		headingPageLink = isPaginated
-			? addQueryArgs( permalink, { page: headingPage } )
-			: permalink;
-	}
+	let headingPageLink = '';
 
 	for ( const blockClientId of allBlockClientIds ) {
 		const blockName = getBlockName( blockClientId );
@@ -112,9 +104,7 @@ function getLatestHeadings( select, clientId ) {
 						)
 					),
 					level: headingAttributes.level,
-					link: canBeLinked
-						? `${ headingPageLink }#${ headingAttributes.anchor }`
-						: null,
+					link: canBeLinked ? `#${ headingAttributes.anchor }` : null,
 				} );
 			}
 		}
