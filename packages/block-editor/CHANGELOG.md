@@ -11,7 +11,9 @@
 
 -   Block List Appender: Show the appender button as a drop target when dragging a block over an empty container such as a Column, restoring the reveal that the `visibility`-to-`opacity` migration left behind ([#77852](https://github.com/WordPress/gutenberg/pull/77852)).
 -   Inserter: Keep the hovered block preview inside the viewport, so a tall preview in a short window is no longer clipped ([#82060](https://github.com/WordPress/gutenberg/pull/82060)).
+-   Element styles: Register each block's element-style CSS override with the block's `clientId`, so the editor orders them by block position instead of registration order. A parent's link color re-registered after a child's (e.g. by resetting and re-picking it) no longer overrides the child's own link color in the canvas ([#77833](https://github.com/WordPress/gutenberg/pull/77833)).
 -   Client-side media processing: Refuse a batch of more than one file when the caller only takes one, such as a Cover block placeholder, matching what the server-side upload path already did. Every dropped file was uploaded instead, and the block kept whichever one finished last ([#82041](https://github.com/WordPress/gutenberg/issues/82041)).
+-   `BlockVariationPicker`: Set icon colors with `color` so stroke-based variation icons retain their intended unfilled appearance, while keeping a non-important `fill` fallback for third-party icons that do not use `currentColor`. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 
 ### Internal
 
@@ -50,6 +52,7 @@
 -   `useInsertionPoint`: Leave the insertion cue alone when it belongs to the in-between inserter. The cue is shared state and the in-between inserter mounts inside its popover, so the sidebar inserter hiding it tore down the inline inserter that had just been opened ([#76241](https://github.com/WordPress/gutenberg/pull/76241)).
 -   `BorderPanel`: Match a chosen drop shadow against the presets from every origin rather than the first origin that defines any, so theme and default presets keep being stored as `var:preset|shadow|<slug>` once a custom preset exists ([#81346](https://github.com/WordPress/gutenberg/pull/81346)).
 -   `InserterMenu`: Cancel the animation frame that focuses the active tab when the menu unmounts before it runs, so an unmount right after mount no longer throws [#81918](https://github.com/WordPress/gutenberg/pull/81918).
+-   `ListView`: On keyboard activation, focus the start of the first field instead of the end of the last. A Table no longer focuses its last cell. Clicking a List View item still keeps focus in the list ([#81964](https://github.com/WordPress/gutenberg/pull/81964)).
 
 ### Internal
 

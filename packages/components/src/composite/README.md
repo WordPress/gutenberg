@@ -136,7 +136,7 @@ Allows the component to be rendered as a different HTML element or React compone
 
 Makes the component a focusable element. When this element gains keyboard focus, it gets a `data-focus-visible` attribute and triggers the `onFocusVisible` prop.
 
-The component supports the `disabled` prop even for those elements not supporting the native `disabled` attribute. Disabled elements may be still accessible via keyboard by using the the `accessibleWhenDisabled` prop.
+The component supports the `disabled` prop even for those elements not supporting the native `disabled` attribute. Disabled elements may be still accessible via keyboard by using the `accessibleWhenDisabled` prop.
 
 Non-native focusable elements will lose their focusability entirely. However, native focusable elements will retain their inherent focusability.
 

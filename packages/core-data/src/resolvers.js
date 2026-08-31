@@ -1005,7 +1005,7 @@ export const getDefaultTemplateId =
 		const template = await apiFetch( {
 			path: addQueryArgs( '/wp/v2/templates/lookup', query ),
 		} );
-		// Wait for the the entities config to be loaded, otherwise receiving
+		// Wait for the entities config to be loaded, otherwise receiving
 		// the template as an entity will not work.
 		await resolveSelect.getEntitiesConfig( 'postType' );
 		// When active_templates experiment is enabled, use numeric wp_id if it
