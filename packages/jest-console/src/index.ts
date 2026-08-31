@@ -1,6 +1,26 @@
+import type { spyOn as jestSpyOn } from 'jest-mock';
 import './matchers';
 import supportedMatchers from './supported-matchers';
 import type { ExtendedMock } from './types';
+
+type MatcherName = `toHave${ 'Errored' | 'Informed' | 'Logged' | 'Warned' }`;
+type ConsoleMatchers = Record< MatcherName, () => void >;
+
+const {
+	afterEach: registerAfterEach,
+	beforeAll: registerBeforeAll,
+	beforeEach: registerBeforeEach,
+	expect: expectConsole,
+	jest: jestGlobals,
+} = globalThis as unknown as {
+	afterEach: ( callback: () => unknown ) => void;
+	beforeAll: ( callback: () => unknown ) => void;
+	beforeEach: ( callback: () => unknown ) => void;
+	expect: ( received: Console ) => ConsoleMatchers & {
+		not: ConsoleMatchers;
+	};
+	jest: { spyOn: typeof jestSpyOn };
+};
 
 /**
  * Sets spy on the console object's method to make it possible to fail test when method called without assertion.
@@ -9,7 +29,7 @@ import type { ExtendedMock } from './types';
  */
 const setConsoleMethodSpy = ( args: [ string, string ] ) => {
 	const [ methodName, matcherName ] = args;
-	const spy = jest
+	const spy = jestGlobals
 		.spyOn( console, methodName as 'error' | 'info' | 'log' | 'warn' )
 		.mockName( `console.${ methodName }` ) as ExtendedMock;
 
@@ -27,25 +47,20 @@ const setConsoleMethodSpy = ( args: [ string, string ] ) => {
 	function assertExpectedCalls() {
 		if ( spy.assertionsNumber === 0 && spy.mock.calls.length > 0 ) {
 			// Using 'as' to satisfy TypeScript compiler about the matcher name.
-			type MatcherName = `toHave${
-				| 'Errored'
-				| 'Informed'
-				| 'Logged'
-				| 'Warned' }`;
 			const name = matcherName as MatcherName;
 
-			expect( console ).not[ name ]();
+			expectConsole( console ).not[ name ]();
 		}
 	}
 
-	beforeAll( resetSpy );
+	registerBeforeAll( resetSpy );
 
-	beforeEach( () => {
+	registerBeforeEach( () => {
 		assertExpectedCalls();
 		resetSpy();
 	} );
 
-	afterEach( assertExpectedCalls );
+	registerAfterEach( assertExpectedCalls );
 };
 
 Object.entries( supportedMatchers ).forEach( setConsoleMethodSpy );

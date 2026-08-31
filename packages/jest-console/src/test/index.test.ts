@@ -13,14 +13,6 @@ import {
 import { spyOn as jestSpyOn } from 'jest-mock';
 import type { ExtendedMock } from '../types';
 
-declare global {
-	const afterEach: typeof vitestAfterEach;
-	const beforeAll: typeof vitestBeforeAll;
-	const beforeEach: typeof vitestBeforeEach;
-	const expect: typeof vitestExpect;
-	const jest: { spyOn: typeof jestSpyOn };
-}
-
 vi.restoreAllMocks();
 vi.stubGlobal( 'afterEach', vitestAfterEach );
 vi.stubGlobal( 'beforeAll', vitestBeforeAll );
