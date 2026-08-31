@@ -82,11 +82,11 @@ declare module './base-entity-records' {
 					/**
 					 * Whether the content is protected with a password.
 					 */
-					is_protected: boolean;
+					protected: boolean;
 					/**
 					 * Version of the content block format used by the pattern.
 					 */
-					block_version: ContextualField< string, 'edit', C >;
+					block_version: ContextualField< number, 'edit', C >;
 				},
 				'view' | 'edit',
 				C
@@ -98,14 +98,19 @@ declare module './base-entity-records' {
 				protected: boolean;
 			};
 			/**
-			 * Meta fields. `wp_pattern_sync_status` is registered by core on
-			 * this post type; an absent value means the pattern is fully
-			 * synced.
+			 * Whether the pattern is synced, and how.
+			 *
+			 * Registered as post meta, but `WP_REST_Blocks_Controller` lifts it
+			 * to the top level of the response and removes it from `meta`, in
+			 * every context. An empty string means the pattern is fully synced.
+			 */
+			wp_pattern_sync_status: '' | 'partial' | 'unsynced';
+			/**
+			 * Meta fields. `wp_pattern_sync_status` is registered on this post
+			 * type but is served at the top level instead, so it is not here.
 			 */
 			meta: ContextualField<
-				{
-					wp_pattern_sync_status?: 'partial' | 'unsynced';
-				} & Record< string, unknown >,
+				Record< string, unknown >,
 				'view' | 'edit',
 				C
 			>;
