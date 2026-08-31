@@ -135,7 +135,6 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-settings-menu-controls/README.md
  *
  * @param {Object} props Fill props.
- * @return {Element} Element.
  */
 function BlockSettingsMenuControls( { ...props } ) {
 	return (
