@@ -23,7 +23,7 @@ final class ForbiddenFunctionsAndClassesSniff implements Sniff {
 
 	/**
 	 * Holds regular expressions for classes whose usage is forbidden.
-	 * Note that declaring functions with names matching these regular expressions is still permitted.
+	 * Note that declaring classes with names matching these regular expressions is still permitted.
 	 * Useful for enforcing security or architectural constraints.
 	 *
 	 * @var array Array of regex patterns for forbidden classes.
