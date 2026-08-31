@@ -2388,6 +2388,12 @@
 		"parent": "packages-create-block"
 	},
 	{
+		"title": "@wordpress/create-project",
+		"slug": "packages-create-project",
+		"markdown_source": "../packages/create-project/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/customize-widgets",
 		"slug": "packages-customize-widgets",
 		"markdown_source": "../packages/customize-widgets/README.md",
