@@ -1,5 +1,9 @@
 @use "@wordpress/base-styles/variables" as *;
 
+p.wp-block-paragraph {
+	overflow-wrap: break-word;
+}
+
 .is-small-text {
 	font-size: 0.875em;
 }
