@@ -53,10 +53,12 @@ class RequestUtils {
 		user,
 		storageStatePath,
 		baseURL = WP_BASE_URL,
+		closeConnections = false,
 	}: {
 		user?: User;
 		storageStatePath?: string;
 		baseURL?: string;
+		closeConnections?: boolean;
 	} ) {
 		let storageState: StorageState | undefined;
 		if ( storageStatePath ) {
@@ -82,6 +84,11 @@ class RequestUtils {
 
 		const requestContext = await request.newContext( {
 			baseURL,
+			extraHTTPHeaders: closeConnections
+				? {
+						Connection: 'close',
+				  }
+				: undefined,
 			storageState: storageState && {
 				cookies: storageState.cookies,
 				origins: [],

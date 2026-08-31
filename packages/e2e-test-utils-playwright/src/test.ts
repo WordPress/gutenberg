@@ -180,6 +180,10 @@ const test = base.extend<
 			const requestUtils = await RequestUtils.setup( {
 				baseURL: workerInfo.project.use.baseURL,
 				storageStatePath: STORAGE_STATE_PATH,
+				// This worker-scoped instance can remain idle longer than the
+				// wp-env server's keep-alive timeout during browser interactions.
+				// Avoid reusing sockets that the server may have closed.
+				closeConnections: true,
 			} );
 
 			await use( requestUtils );
