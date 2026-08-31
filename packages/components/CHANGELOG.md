@@ -14,6 +14,7 @@
 -   `Icon`: Merge a consumer-supplied `style` prop with the icon's intrinsic styles instead of replacing them, so styles like `fill: none` on stroke-based icons survive unless the consumer overrides the same property explicitly. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 -   `ItemGroup`: Drop the blanket `path { fill: currentColor }` rule that was overriding stroke-based icons' intended fill via inheritance bypass. Paths without an explicit fill still inherit `currentColor` from the surrounding SVG. Custom paths that specify a fill now retain it instead of being overridden by ItemGroup. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 -   `Tip`: Preserve the intended yellow color after its icon became stroke-based. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+-   `MenuItemsChoice`: Type `onHover` as optional, matching the component's default and its own usage example ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
 
 ### Internal
 
@@ -54,7 +55,6 @@
 
 -   `PaletteEdit`: Expose color, gradient, and duotone swatches as command buttons because activating them opens an editor instead of selecting a value. Add a `presentation` prop to `CircularOptionPicker`, `ColorPalette`, `GradientPicker`, and `DuotonePicker`, and deprecate `asButtons` in favor of `presentation="toggle-buttons"` ([#82023](https://github.com/WordPress/gutenberg/pull/82023)).
 -   `ConfirmDialog`: Preserve `title` as the dialog's accessible name when the header is hidden ([#81847](https://github.com/WordPress/gutenberg/pull/81847)).
--   `MenuItemsChoice`: Type `onHover` as optional, matching the component's default and its own usage example ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
 -   `DuotonePicker`: Do not render the custom controls wrapper when `disableCustomDuotone` is set, so a read-only picker no longer adds trailing padding below its swatches ([#81605](https://github.com/WordPress/gutenberg/pull/81605)).
 -   `DuotonePicker`: Stop the duotone bar offering to move its control points. It announced that arrow keys and dragging change the gradient position, but a duotone is two colors with no positions, so the move was discarded. `CustomGradientBar` gains a `disablePositioning` prop for this ([#81850](https://github.com/WordPress/gutenberg/pull/81850)).
 -   `Modal`: Prevent an Escape key press that dismisses the modal from propagating to underlying overlays. ([#81785](https://github.com/WordPress/gutenberg/pull/81785))
