@@ -348,6 +348,84 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Renders a group block with the given block style variation applied.
+	 *
+	 * @param string $variation Block style variation slug.
+	 *
+	 * @return array The parsed block after the block style variation support has run.
+	 */
+	private function render_group_with_variation( $variation ) {
+		return gutenberg_render_block_style_variation_support_styles(
+			array(
+				'blockName' => 'core/group',
+				'attrs'     => array( 'className' => "is-style-$variation" ),
+			)
+		);
+	}
+
+	/**
+	 * Tests that consecutive blocks using the same block style variation share a
+	 * single instance class, so the identical stylesheet is only emitted once.
+	 *
+	 * @covers ::gutenberg_render_block_style_variation_support_styles
+	 */
+	public function test_block_style_variation_reuses_instance_for_consecutive_blocks() {
+		switch_theme( 'block-theme' );
+
+		/*
+		 * Render a different variation first so the reuse cache is primed with a
+		 * known value regardless of what earlier tests left behind.
+		 */
+		$this->render_group_with_variation( 'block-style-variation-b' );
+
+		// Start counting emitted stylesheets from here.
+		$GLOBALS['wp_styles'] = null;
+
+		$first  = $this->render_group_with_variation( 'block-style-variation-a' );
+		$second = $this->render_group_with_variation( 'block-style-variation-a' );
+
+		$this->assertSame(
+			$first['attrs']['className'],
+			$second['attrs']['className'],
+			'Consecutive blocks using the same variation should share one instance class'
+		);
+
+		$this->assertCount(
+			1,
+			wp_styles()->get_data( 'block-style-variation-styles', 'after' ),
+			'The variation stylesheet should only be emitted once for consecutive identical variations'
+		);
+	}
+
+	/**
+	 * Tests that a variation interrupted by a different one gets a fresh instance
+	 * class. Variation selectors are wrapped in `:where()`, so they all share the
+	 * same specificity and source order alone decides which rule wins. Reusing an
+	 * earlier class here would move it in the cascade.
+	 *
+	 * @covers ::gutenberg_render_block_style_variation_support_styles
+	 */
+	public function test_block_style_variation_does_not_reuse_instance_across_a_different_variation() {
+		switch_theme( 'block-theme' );
+
+		$first  = $this->render_group_with_variation( 'block-style-variation-a' );
+		$second = $this->render_group_with_variation( 'block-style-variation-b' );
+		$third  = $this->render_group_with_variation( 'block-style-variation-a' );
+
+		$this->assertNotSame(
+			$first['attrs']['className'],
+			$third['attrs']['className'],
+			'A variation separated by a different variation should get a fresh instance class'
+		);
+
+		$this->assertNotSame(
+			$first['attrs']['className'],
+			$second['attrs']['className'],
+			'Different variations should never share an instance class'
+		);
+	}
+
+	/**
 	 * Tests that a non-string `className` attribute does not cause a fatal
 	 * error and the block content is returned unmodified.
 	 *
