@@ -705,7 +705,12 @@ export default function GalleryEdit( props ) {
 		// linkTo attribute must be saved so blocks don't break when changing image_default_link_type in options.php.
 		// That option stores 'file' or 'post', which this block calls 'media'
 		// and 'attachment', so normalize it before storing it.
-		if ( ! storedLinkTo ) {
+		//
+		// Only for a gallery with no images. Images take their link from this
+		// value as they are added, so a gallery that already has some may link
+		// somewhere the option doesn't name, and storing the option would make
+		// the Link control describe the images wrongly.
+		if ( ! storedLinkTo && ! hasImages ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
 				linkTo:
@@ -714,7 +719,7 @@ export default function GalleryEdit( props ) {
 					) || LINK_DESTINATION_NONE,
 			} );
 		}
-	}, [ storedLinkTo ] );
+	}, [ storedLinkTo, hasImages ] );
 
 	const hasImageIds = hasImages && images.some( ( image ) => !! image.id );
 	const imagesUploading = images.some(
