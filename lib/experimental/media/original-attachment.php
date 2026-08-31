@@ -85,12 +85,14 @@ add_filter( 'wp_edited_image_metadata', 'gutenberg_record_original_attachment_id
  * Filter `rest_prepare_attachment` to expose the original attachment.
  *
  * Reads `_wp_attachment_original_id` postmeta (written by the
- * `wp_edited_image_metadata` hook above) and adds the resolved
- * attachment id and URL as a root-level `original_attachment` field.
- * Root-level rather than inside `media_details` because it describes
- * a relationship between attachments (like `post`, the parent post),
- * not a property of the media file. Absent for attachments with no
- * edit lineage.
+ * `wp_edited_image_metadata` hook above) and exposes the resolved id
+ * as a root-level `original_attachment` field: a bare id like
+ * `featured_media`, with an accompanying embeddable
+ * `wp:original-attachment` link so clients can hydrate the full
+ * attachment via `?_embed`. Root-level rather than inside
+ * `media_details` because it describes a relationship between
+ * attachments (like `post`, the parent post), not a property of the
+ * media file. Absent for attachments with no edit lineage.
  *
  * Only emitted in the `edit` context: the lineage is an editor
  * concern (the Restore-original action), and scoping it here avoids
@@ -118,19 +120,24 @@ function gutenberg_add_original_attachment_to_response( $response, $post, $reque
 		return $response;
 	}
 
-	// Skip when the original is unreachable (deleted, missing file).
-	// Emitting `source_url: false` would feed a non-string to the
-	// client cropper.
+	// Skip when the original is unreachable (deleted, missing file):
+	// don't advertise a restore target that cannot load.
 	$source_url = wp_get_attachment_url( $original_id );
 	if ( ! is_string( $source_url ) || '' === $source_url ) {
 		return $response;
 	}
 
-	$data['original_attachment'] = array(
-		'attachment_id' => $original_id,
-		'source_url'    => $source_url,
-	);
+	$data['original_attachment'] = $original_id;
 	$response->set_data( $data );
+
+	// Mirror `featured_media`: expose the relationship as an
+	// embeddable link so clients can hydrate the original attachment
+	// with `?_embed`.
+	$response->add_link(
+		'https://api.w.org/original-attachment',
+		rest_url( 'wp/v2/media/' . $original_id ),
+		array( 'embeddable' => true )
+	);
 
 	return $response;
 }
