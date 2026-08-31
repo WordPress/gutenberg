@@ -906,6 +906,48 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => '<div class="wp-block-group is-layout-flow wp-block-group-is-layout-flow"><div class="wp-block-group__header">Header</div><p>Inner block</p></div>',
 			),
+			'special atomic element preceding inner blocks does not receive layout classes' => array(
+				'args'            => array(
+					'block_content' => '<div class="wp-block-group"><textarea class="wp-block-group__note">Note</textarea><p>Inner block</p></div>',
+					'block'         => array(
+						'blockName'    => 'core/group',
+						'attrs'        => array(
+							'layout' => array(
+								'type' => 'default',
+							),
+						),
+						'innerBlocks'  => array(),
+						'innerHTML'    => '<div class="wp-block-group"><textarea class="wp-block-group__note">Note</textarea><p>Inner block</p></div>',
+						'innerContent' => array(
+							'<div class="wp-block-group"><textarea class="wp-block-group__note">Note</textarea>',
+							null,
+							'</div>',
+						),
+					),
+				),
+				'expected_output' => '<div class="wp-block-group is-layout-flow wp-block-group-is-layout-flow"><textarea class="wp-block-group__note">Note</textarea><p>Inner block</p></div>',
+			),
+			'inner wrapper targeted when rendered classes are reordered and extended' => array(
+				'args'            => array(
+					'block_content' => '<div class="wp-block-group"><div class="extra alignwide wp-block-group__inner-wrapper"><p>Inner block</p></div></div>',
+					'block'         => array(
+						'blockName'    => 'core/group',
+						'attrs'        => array(
+							'layout' => array(
+								'type' => 'default',
+							),
+						),
+						'innerBlocks'  => array(),
+						'innerHTML'    => '<div class="wp-block-group"><div class="wp-block-group__inner-wrapper alignwide"><p>Inner block</p></div></div>',
+						'innerContent' => array(
+							'<div class="wp-block-group"><div class="wp-block-group__inner-wrapper alignwide">',
+							null,
+							'</div></div>',
+						),
+					),
+				),
+				'expected_output' => '<div class="wp-block-group"><div class="extra alignwide wp-block-group__inner-wrapper is-layout-flow wp-block-group-is-layout-flow"><p>Inner block</p></div></div>',
+			),
 		);
 	}
 

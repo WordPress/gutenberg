@@ -1380,20 +1380,23 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	}
 
 	/*
-	 * Attempts to refer to the inner-block wrapping element by its class attribute.
+	 * Attempts to refer to the inner-block wrapping element by its class names.
 	 *
 	 * When examining a block's inner content, if a block has inner blocks, then
 	 * the first content item will likely be a text (HTML) chunk immediately
-	 * preceding the inner blocks. The last HTML tag in that chunk would then be
-	 * an opening tag for an element that wraps the inner blocks.
+	 * preceding the inner blocks. If there is an element wrapping those inner
+	 * blocks, it should open in this first chunk and remain open when the chunk
+	 * ends. Sibling elements that fully open and close within the chunk precede
+	 * the inner blocks and should not receive layout class names.
 	 *
 	 * There's no reliable way to associate this wrapper in $block_content because
 	 * it may have changed during the rendering pipeline (as inner contents is
 	 * provided before rendering) and through previous filters. In many cases,
-	 * however, the `class` attribute will be a good-enough identifier, so this
-	 * code finds the last tag in that chunk and stores the `class` attribute
-	 * so that it can be used later when working through the rendered block output
-	 * to identify the wrapping element and add the remaining class names to it.
+	 * however, the original class names will be a good-enough identifier. This
+	 * code finds the last still-open tag in the first chunk with class names,
+	 * then uses those class names later when working through the rendered block
+	 * output to identify the likely wrapping element and add the remaining class
+	 * names to it.
 	 *
 	 * It's also possible that no inner block wrapper even exists. If that's the
 	 * case this code could apply the class names to an invalid element.
@@ -1412,46 +1415,61 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	 *         </figure>
 	 *     HTML;
 	 *
-	 * Although it is possible that the original block-wrapper classes are changed in $block_content
-	 * from how they appear in $block['innerContent'], it's likely that the original class attributes
-	 * are still present in the wrapper as they are in this example. Frequently, additional classes
-	 * will also be present; rarely should classes be removed.
+	 * Although it is possible that the original block-wrapper classes are changed
+	 * in $block_content from how they appear in $block['innerContent'], it's
+	 * likely that the original class names are still present in the wrapper as
+	 * they are in this example. Frequently, additional classes will also be
+	 * present; rarely should classes be removed.
 	 *
-	 * @todo Find a better way to match the first inner block. If it's possible to identify where the
-	 *        first inner block starts, then it will be possible to find the last tag before it starts
-	 *        and then that tag, if an opening tag, can be solidly identified as a wrapping element.
-	 *        Can some unique value or class or ID be added to the inner blocks when they process
-	 *        so that they can be extracted here safely without guessing? Can the block rendering function
-	 *        return information about where the rendered inner blocks start?
+	 * @todo Find a better way to identify the element wrapping the inner blocks. If it's possible to
+	 *        identify where the first rendered inner block starts, then it may be possible to inspect
+	 *        the open element stack at that point and choose the nearest still-open ancestor as the
+	 *        wrapper. Looking only at the last tag before the first inner block is insufficient because
+	 *        sibling elements, such as a Details block's SUMMARY, can precede the inner blocks inside
+	 *        the same wrapper. Can some unique value or class or ID be added to the inner blocks when
+	 *        they process so that they can be extracted here safely without guessing? Can the block
+	 *        rendering function return information about where the rendered inner blocks start?
 	 *
-	 * @var string|null
+	 * @var string[]|null
 	 */
 	$inner_block_wrapper_classes = null;
 	$first_chunk                 = $block['innerContent'][0] ?? null;
 	if ( is_string( $first_chunk ) && count( $block['innerContent'] ) > 1 ) {
-		$first_chunk_processor = new WP_HTML_Tag_Processor( $first_chunk );
+		$first_chunk_processor = WP_HTML_Processor::create_fragment(
+			$first_chunk . '<wp-inner-block-boundary data-wp-inner-block-boundary="true"></wp-inner-block-boundary>'
+		);
 		/*
 		 * Use a stack to track open elements as tags are visited. Void elements
-		 * (those without a matching closing tag) are excluded so they don't
-		 * accumulate on the stack. At the end of the chunk, every element still
-		 * on the stack is unclosed — meaning its closing tag lives in a later
-		 * innerContent entry alongside the inner blocks, which makes it the
-		 * inner-block container. Elements that open and close within this chunk
-		 * are siblings that precede the inner blocks and should be ignored.
-		 * The last unclosed element with a class attribute is the best candidate
-		 * for the inner-block wrapper.
+		 * and other tags that aren't expecting a closer are excluded so they don't
+		 * accumulate on the stack. At the end of the chunk, every element still on
+		 * the stack is unclosed, meaning its closing tag lives in a later innerContent
+		 * entry alongside the inner blocks. Elements that open and close within this
+		 * chunk are siblings that precede the inner blocks and should be ignored.
+		 * The last unclosed element with a class attribute is the best candidate for
+		 * the inner-block wrapper.
 		 */
 		$tag_stack = array();
-		while ( $first_chunk_processor->next_tag( array( 'tag_closers' => 'visit' ) ) ) {
+		while ( $first_chunk_processor && $first_chunk_processor->next_tag( array( 'tag_closers' => 'visit' ) ) ) {
+			if (
+				! $first_chunk_processor->is_tag_closer() &&
+				'WP-INNER-BLOCK-BOUNDARY' === $first_chunk_processor->get_token_name() &&
+				'true' === $first_chunk_processor->get_attribute( 'data-wp-inner-block-boundary' )
+			) {
+				break;
+			}
+
 			if ( $first_chunk_processor->is_tag_closer() ) {
 				array_pop( $tag_stack );
-			} elseif ( ! WP_HTML_Processor::is_void( $first_chunk_processor->get_tag() ) ) {
-				$tag_stack[] = $first_chunk_processor->get_attribute( 'class' );
+			} elseif ( $first_chunk_processor->expects_closer() ) {
+				$class_list  = $first_chunk_processor->class_list();
+				$tag_stack[] = null === $class_list
+					? null
+					: array_values( iterator_to_array( $class_list ) );
 			}
 		}
-		foreach ( array_reverse( $tag_stack ) as $class_attribute ) {
-			if ( is_string( $class_attribute ) && ! empty( $class_attribute ) ) {
-				$inner_block_wrapper_classes = $class_attribute;
+		foreach ( array_reverse( $tag_stack ) as $class_list ) {
+			if ( is_array( $class_list ) && ! empty( $class_list ) ) {
+				$inner_block_wrapper_classes = $class_list;
 				break;
 			}
 		}
@@ -1460,9 +1478,9 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	/*
 	 * If necessary, advance to what is likely to be an inner block wrapper tag.
 	 *
-	 * This advances until it finds the first tag containing the original class
-	 * attribute from above. If none is found it will scan to the end of the block
-	 * and fail to add any class names.
+	 * This advances until it finds the first tag containing all of the original
+	 * class names from above. If none is found it will scan to the end of the
+	 * block and fail to add any class names.
 	 *
 	 * If there is no block wrapper it won't advance at all, in which case the
 	 * class names will be added to the first and outermost tag of the block.
@@ -1474,8 +1492,15 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			break;
 		}
 
-		$class_attribute = $processor->get_attribute( 'class' );
-		if ( is_string( $class_attribute ) && str_contains( $class_attribute, $inner_block_wrapper_classes ) ) {
+		$has_all_classes = true;
+		foreach ( $inner_block_wrapper_classes as $class_name ) {
+			if ( ! $processor->has_class( $class_name ) ) {
+				$has_all_classes = false;
+				break;
+			}
+		}
+
+		if ( $has_all_classes ) {
 			break;
 		}
 	} while ( $processor->next_tag() );
