@@ -1,0 +1,43 @@
+.linked-border-control {
+	/* Preserve the original `&&` specificity so this beats BorderControl's margin reset. */
+	&#{&} {
+		flex: 1;
+		margin-inline-end: 24px;
+	}
+}
+
+.wrapper {
+	position: relative;
+}
+
+.linked-button {
+	position: absolute;
+	top: 8px;
+	inset-inline-end: 0;
+	line-height: 0;
+}
+
+.visualizer {
+	position: absolute;
+	top: 20px;
+	bottom: 20px;
+	inset-inline: 39px;
+	border-top: var(--wp-components-border-box-visualizer-top);
+	border-bottom: var(--wp-components-border-box-visualizer-bottom);
+	border-inline-start: var(--wp-components-border-box-visualizer-start);
+	border-inline-end: var(--wp-components-border-box-visualizer-end);
+}
+
+.split-controls {
+	position: relative;
+	flex: 1;
+}
+
+.centered-border-control {
+	grid-column: span 2;
+	margin: 0 auto;
+}
+
+.right-border-control {
+	margin-inline-start: auto;
+}

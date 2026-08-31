@@ -4,17 +4,13 @@ import {
 	ColorIndicator,
 	ColorPicker,
 	Dropdown,
-	privateApis,
-	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 } from '@wordpress/components';
+import { InputLayout, ValidatedInputControl } from '@wordpress/ui';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import type { DataFormControlProps } from '../../types';
-import { unlock } from '../../lock-unlock';
 import getCustomValidity from './utils/get-custom-validity';
-
-const { ValidatedInputControl } = unlock( privateApis );
 
 const ColorPickerDropdown = ( {
 	color,
@@ -88,19 +84,24 @@ export default function Color< Item >( {
 			label={ label }
 			placeholder={ placeholder }
 			value={ value }
-			help={ description }
-			onChange={ handleInputChange }
+			description={
+				typeof description === 'string' ? description : undefined
+			}
+			details={
+				typeof description === 'string' ? undefined : description
+			}
+			onValueChange={ handleInputChange }
 			hideLabelFromVision={ hideLabelFromVision }
 			type="text"
 			disabled={ disabled }
 			prefix={
-				<InputControlPrefixWrapper variant="control">
+				<InputLayout.Slot padding="minimal">
 					<ColorPickerDropdown
 						color={ value }
 						onColorChange={ handleColorChange }
 						disabled={ disabled }
 					/>
-				</InputControlPrefixWrapper>
+				</InputLayout.Slot>
 			}
 		/>
 	);
