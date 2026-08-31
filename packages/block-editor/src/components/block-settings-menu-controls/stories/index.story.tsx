@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import BlockSettingsMenuControls from '../';
 
 /**
@@ -40,6 +37,11 @@ const meta = {
 
 export default meta;
 
+type SlotArgs = {
+	clientIds: string[];
+	fillProps: { onClose: () => void };
+};
+
 /**
  * Default Story
  */
@@ -50,7 +52,7 @@ export const Default = {
 			onClose: () => {},
 		},
 	},
-	render: function Template( { clientIds, fillProps } ) {
+	render: function Template( { clientIds, fillProps }: SlotArgs ) {
 		return (
 			<BlockSettingsMenuControls.Slot
 				clientIds={ clientIds }
