@@ -150,3 +150,14 @@ export const isRTL = i18n.isRTL.bind( i18n );
  * @return {boolean} Whether the translation exists or not.
  */
 export const hasTranslation = i18n.hasTranslation.bind( i18n );
+
+/**
+ * Format a number according to the current locale.
+ *
+ * @param number     The number to format.
+ * @param [decimals] The number of decimal places to include.
+ *
+ * @return The formatted number as a string.
+ */
+export const numberFormatI18n = ( number: number, decimals = 0 ) =>
+	i18n.numberFormatI18n( number, decimals, 'default' );

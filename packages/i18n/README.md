@@ -85,6 +85,19 @@ _Returns_
 
 -   `boolean`: Whether locale is RTL.
 
+### numberFormatI18n
+
+Format a number according to the current locale.
+
+_Parameters_
+
+-   _number_ `number`: The number to format.
+-   _decimals_ The number of decimal places to include.
+
+_Returns_
+
+-   The formatted number as a string.
+
 ### resetLocaleData
 
 Resets all current Tannin instance locale data and sets the specified locale data for the domain. Accepts data in a Jed-formatted JSON object shape.
