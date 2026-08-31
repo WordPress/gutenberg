@@ -309,6 +309,49 @@ describe( 'Entity record types', () => {
 		};
 	} );
 
+	describe( 'the inferred content field matches the REST schema', () => {
+		() => {
+			/*
+			 * The map makes `Post` and `Page` the default result for these
+			 * pairs, so their fields are now what a consumer reads without
+			 * naming a type. Core serialises `content.protected` as a boolean
+			 * and `content.block_version` as an integer, the latter only in
+			 * the edit context.
+			 */
+			const post = select( coreStore ).getEntityRecord(
+				'postType',
+				'post',
+				1
+			);
+			post?.content.protected satisfies boolean | undefined;
+			post?.content.block_version satisfies number | undefined;
+			// @ts-expect-error -- Core serialises `protected`, not `is_protected`.
+			post?.content.is_protected;
+
+			const page = select( coreStore ).getEntityRecord(
+				'postType',
+				'page',
+				1
+			);
+			page?.content.protected satisfies boolean | undefined;
+			page?.content.block_version satisfies number | undefined;
+			// @ts-expect-error -- Core serialises `protected`, not `is_protected`.
+			page?.content.is_protected;
+
+			// `block_version` is edit-only, so a view request drops it.
+			const viewPost = select( coreStore ).getEntityRecord(
+				'postType',
+				'post',
+				1,
+				{ context: 'view' }
+			);
+			viewPost?.content.protected satisfies boolean | undefined;
+			// @ts-expect-error -- `block_version` is edit-only, so a view
+			// record drops it.
+			viewPost?.content.block_version;
+		};
+	} );
+
 	describe( 'getEntityRecords infers the record list through select()', () => {
 		() => {
 			const posts = select( coreStore ).getEntityRecords(

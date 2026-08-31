@@ -77,11 +77,11 @@ declare module './base-entity-records' {
 					/**
 					 * Whether the content is protected with a password.
 					 */
-					is_protected: boolean;
+					protected: boolean;
 					/**
-					 * Version of the content block format used by the page.
+					 * Version of the content block format used by the post.
 					 */
-					block_version: ContextualField< string, 'edit', C >;
+					block_version: ContextualField< number, 'edit', C >;
 				},
 				'view' | 'edit',
 				C
