@@ -118,8 +118,7 @@ function hasAssociatedLayoutBox( element ) {
 	return true;
 }
 
-// The following jsdom-targeted setup is skipped when a test opts into
-// `@jest-environment node` so SSR-style tests can run under this config.
+// The following jsdom-targeted setup is skipped for Node tests.
 if ( typeof window !== 'undefined' ) {
 	// jsdom lacks Element.getAnimations (needed by Base UI ScrollArea ≥1.3)
 	if ( ! global.HTMLElement.prototype.getAnimations ) {
@@ -209,9 +208,9 @@ global.File = FilePolyfill;
  * @see https://github.com/testing-library/user-event/pull/1265
  *
  * Kept at the module top-level so babel-jest hoists it above imports. The
- * factory falls back to a passthrough when there is no DOM (`@jest-environment
- * node`), since the real `@testing-library/user-event` requires a browser-like
- * global and the prototype patching would also fail.
+ * factory falls back to a passthrough when there is no DOM, since the real
+ * `@testing-library/user-event` requires a browser-like global and the
+ * prototype patching would also fail.
  */
 jest.mock( '@testing-library/user-event', () => {
 	if ( typeof globalThis.window === 'undefined' ) {
