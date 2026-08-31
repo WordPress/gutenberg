@@ -1,3 +1,4 @@
+/* eslint-disable testing-library/render-result-naming-convention */
 import { describe, expect, it } from 'vitest';
 import {
 	Component,
@@ -756,3 +757,5 @@ describe( 'renderStyle()', () => {
 		} );
 	} );
 } );
+
+/* eslint-enable testing-library/render-result-naming-convention */

@@ -1,4 +1,4 @@
-import type { spyOn as jestSpyOn } from 'jest-mock';
+import { spyOn } from 'jest-mock';
 import './matchers';
 import supportedMatchers from './supported-matchers';
 import type { ExtendedMock } from './types';
@@ -11,7 +11,6 @@ const {
 	beforeAll: registerBeforeAll,
 	beforeEach: registerBeforeEach,
 	expect: expectConsole,
-	jest: jestGlobals,
 } = globalThis as unknown as {
 	afterEach: ( callback: () => unknown ) => void;
 	beforeAll: ( callback: () => unknown ) => void;
@@ -19,7 +18,6 @@ const {
 	expect: ( received: Console ) => ConsoleMatchers & {
 		not: ConsoleMatchers;
 	};
-	jest: { spyOn: typeof jestSpyOn };
 };
 
 /**
@@ -29,9 +27,10 @@ const {
  */
 const setConsoleMethodSpy = ( args: [ string, string ] ) => {
 	const [ methodName, matcherName ] = args;
-	const spy = jestGlobals
-		.spyOn( console, methodName as 'error' | 'info' | 'log' | 'warn' )
-		.mockName( `console.${ methodName }` ) as ExtendedMock;
+	const spy = spyOn(
+		console,
+		methodName as 'error' | 'info' | 'log' | 'warn'
+	).mockName( `console.${ methodName }` ) as ExtendedMock;
 
 	/**
 	 * Resets the spy to its initial state.

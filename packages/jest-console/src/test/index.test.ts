@@ -10,7 +10,6 @@ import {
 	test,
 	vi,
 } from 'vitest';
-import { spyOn as jestSpyOn } from 'jest-mock';
 import type { ExtendedMock } from '../types';
 
 vi.restoreAllMocks();
@@ -18,7 +17,6 @@ vi.stubGlobal( 'afterEach', vitestAfterEach );
 vi.stubGlobal( 'beforeAll', vitestBeforeAll );
 vi.stubGlobal( 'beforeEach', vitestBeforeEach );
 vi.stubGlobal( 'expect', vitestExpect );
-vi.stubGlobal( 'jest', { spyOn: jestSpyOn } );
 
 await import( '../index' );
 
