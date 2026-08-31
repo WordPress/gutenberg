@@ -12,6 +12,7 @@ describe( 'reducer', () => {
 		it( 'adds an item to the queue', () => {
 			const initialState: State = {
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -33,6 +34,7 @@ describe( 'reducer', () => {
 
 			expect( state ).toEqual( {
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: expect.any( Function ),
@@ -55,6 +57,7 @@ describe( 'reducer', () => {
 		it( 'removes an item from the queue', () => {
 			const initialState: State = {
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -78,6 +81,7 @@ describe( 'reducer', () => {
 
 			expect( state ).toEqual( {
 				queueStatus: 'active',
+				failureCount: 1,
 				blobUrls: {},
 				settings: {
 					mediaUpload: expect.any( Function ),
@@ -95,12 +99,61 @@ describe( 'reducer', () => {
 				],
 			} );
 		} );
+
+		it( 'does not count a sub-size failure as a failed upload', () => {
+			const initialState: State = {
+				queueStatus: 'active',
+				failureCount: 0,
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Processing,
+					} as QueueItem,
+					{
+						id: '1-thumb',
+						parentId: '1',
+						status: ItemStatus.Processing,
+					} as QueueItem,
+				],
+			};
+			const state = reducer( initialState, {
+				type: Type.Cancel,
+				id: '1-thumb',
+				error: new Error(),
+			} );
+
+			expect( state.failureCount ).toBe( 0 );
+		} );
+
+		it( 'does not count a cancellation for an item that already left the queue', () => {
+			const initialState: State = {
+				queueStatus: 'active',
+				failureCount: 2,
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+				queue: [],
+			};
+			const state = reducer( initialState, {
+				type: Type.Cancel,
+				id: '1',
+				error: new Error(),
+			} );
+
+			expect( state.failureCount ).toBe( 2 );
+		} );
 	} );
 
 	describe( `${ Type.Remove }`, () => {
 		it( 'removes an item from the queue', () => {
 			const initialState: State = {
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -123,6 +176,7 @@ describe( 'reducer', () => {
 
 			expect( state ).toEqual( {
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: expect.any( Function ),
@@ -141,6 +195,7 @@ describe( 'reducer', () => {
 		it( 'appends operations to the list', () => {
 			const initialState: State = {
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -161,6 +216,7 @@ describe( 'reducer', () => {
 
 			expect( state ).toEqual( {
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: expect.any( Function ),
@@ -183,6 +239,7 @@ describe( 'reducer', () => {
 		it( 'marks an item as processing', () => {
 			const initialState: State = {
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -208,6 +265,7 @@ describe( 'reducer', () => {
 
 			expect( state ).toEqual( {
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: expect.any( Function ),
@@ -233,6 +291,7 @@ describe( 'reducer', () => {
 		it( 'marks an item as processing', () => {
 			const initialState: State = {
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -256,6 +315,7 @@ describe( 'reducer', () => {
 
 			expect( state ).toEqual( {
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: expect.any( Function ),
@@ -278,6 +338,7 @@ describe( 'reducer', () => {
 		it( 'pauses a specific item', () => {
 			const initialState: State = {
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -307,6 +368,7 @@ describe( 'reducer', () => {
 		it( 'resumes a paused item', () => {
 			const initialState: State = {
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -331,6 +393,7 @@ describe( 'reducer', () => {
 		it( 'retries a failed item', () => {
 			const initialState: State = {
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -357,6 +420,7 @@ describe( 'reducer', () => {
 		it( 'increments retry count on subsequent retries', () => {
 			const initialState: State = {
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -383,6 +447,7 @@ describe( 'reducer', () => {
 			oldController.abort();
 			const initialState: State = {
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -418,6 +483,7 @@ describe( 'reducer', () => {
 		it( 'sets item status to PendingRetry', () => {
 			const initialState: State = {
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -443,6 +509,7 @@ describe( 'reducer', () => {
 		it( 'sets error from action', () => {
 			const initialState: State = {
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -469,6 +536,7 @@ describe( 'reducer', () => {
 		it( 'does not modify other items in queue', () => {
 			const initialState: State = {
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -502,6 +570,7 @@ describe( 'reducer', () => {
 		it( 'transitions queueStatus from active to paused', () => {
 			const initialState: State = {
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -518,6 +587,7 @@ describe( 'reducer', () => {
 		it( 'is idempotent when queue is already paused', () => {
 			const initialState: State = {
 				queueStatus: 'paused',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -534,6 +604,7 @@ describe( 'reducer', () => {
 		it( 'preserves other state fields', () => {
 			const initialState: State = {
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: { '1': [ 'blob:foo' ] },
 				settings: {
 					mediaUpload: jest.fn(),
@@ -558,6 +629,7 @@ describe( 'reducer', () => {
 		it( 'transitions queueStatus from paused to active', () => {
 			const initialState: State = {
 				queueStatus: 'paused',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -574,6 +646,7 @@ describe( 'reducer', () => {
 		it( 'is idempotent when queue is already active', () => {
 			const initialState: State = {
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -590,6 +663,7 @@ describe( 'reducer', () => {
 		it( 'preserves item statuses', () => {
 			const initialState: State = {
 				queueStatus: 'paused',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -618,6 +692,7 @@ describe( 'reducer', () => {
 		it( 'updates the progress of an item', () => {
 			const initialState: State = {
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
