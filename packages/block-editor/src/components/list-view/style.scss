@@ -31,12 +31,12 @@
 	// when rows later receive the is-displacement-up or is-displacement-down class.
 	transform: translateY(0);
 
-   // The transform above makes each row its own stacking context, so the focus
-   // ring cannot escape it. Lift the focused row above the siblings that would
-   // otherwise paint over it.
-   &:focus-within {
-    	z-index: 1;
-   }
+	// The transform above makes each row its own stacking context, so the focus
+	// ring cannot escape it. Lift the focused row above the siblings that would
+	// otherwise paint over it.
+	&:focus-within {
+		z-index: 1;
+	}
 
 	&.is-draggable,
 	&.is-draggable .block-editor-list-view-block-contents {
