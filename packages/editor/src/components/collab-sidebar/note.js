@@ -1,6 +1,11 @@
 import clsx from 'clsx';
-import { useRef, useState, useLayoutEffect } from '@wordpress/element';
-import { useInstanceId } from '@wordpress/compose';
+import {
+	useCallback,
+	useRef,
+	useState,
+	useLayoutEffect,
+} from '@wordpress/element';
+import { useInstanceId, useResizeObserver } from '@wordpress/compose';
 import {
 	__experimentalConfirmDialog as ConfirmDialog,
 	Button,
@@ -11,6 +16,7 @@ import { Button as UIButton } from '@wordpress/ui';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { moreVertical, published } from '@wordpress/icons';
 import { NoteCard } from './note-card';
+import { truncateToFit } from './truncate-content';
 import { NoteForm } from './note-form';
 import { unlock } from '../../lock-unlock';
 
@@ -58,11 +64,18 @@ export function Note( {
 	const [ actionState, setActionState ] = useState( null );
 	const actionButtonRef = useRef( null );
 
-	const commentRef = useRef( null );
+	const [ contentElement, setContentElement ] = useState( null );
+	// The same element, for the imperative reads and writes below.
+	const contentRef = useRef( null );
 	const rawContent = note?.content?.raw;
 	const [ prevContent, setPrevContent ] = useState( rawContent );
 	const [ isExpanded, setIsExpanded ] = useState( false );
-	const [ isOverflowing, setIsOverflowing ] = useState( false );
+	/*
+	 * `null` while the content still has to be measured, `false` once it is
+	 * known to fit, and the truncated markup once it is known not to.
+	 */
+	const [ collapsedContent, setCollapsedContent ] = useState( null );
+	const isOverflowing = typeof collapsedContent === 'string';
 	const contentId = useInstanceId(
 		Note,
 		'editor-collab-sidebar-note-content'
@@ -72,17 +85,71 @@ export function Note( {
 	if ( prevContent !== rawContent ) {
 		setPrevContent( rawContent );
 		setIsExpanded( false );
+		setCollapsedContent( null );
 	}
 
-	// Measure the (clamped) content to decide whether the toggle is needed.
+	/*
+	 * Cut the collapsed note down to the text that actually fits. Truncating
+	 * rather than clipping keeps hidden text out of the tab order and out of
+	 * the accessibility tree, so "Show more" hides what it says it hides.
+	 */
 	useLayoutEffect( () => {
-		const commentElement = commentRef.current;
-		if ( commentElement ) {
-			setIsOverflowing(
-				commentElement.scrollHeight > commentElement.clientHeight
-			);
+		if ( collapsedContent !== null || isExpanded || ! contentElement ) {
+			return;
 		}
-	}, [ rawContent ] );
+		// The element holds the full content on the render that lands here.
+		setCollapsedContent( truncateToFit( contentElement ) ?? false );
+	}, [ collapsedContent, isExpanded, contentElement ] );
+
+	/*
+	 * The cut depends on how the text wraps, so a narrower or wider sidebar
+	 * has to be measured again. Height changes are ignored, since truncating
+	 * changes the height itself.
+	 */
+	const measuredWidthRef = useRef( null );
+	const observeWidth = useResizeObserver( ( entries ) => {
+		const width = entries[ 0 ]?.contentRect.width;
+		if (
+			measuredWidthRef.current !== null &&
+			width !== measuredWidthRef.current
+		) {
+			setCollapsedContent( null );
+		}
+		measuredWidthRef.current = width;
+	} );
+	const setContentRef = useCallback(
+		( node ) => {
+			contentRef.current = node;
+			setContentElement( node );
+			observeWidth( node );
+		},
+		[ observeWidth ]
+	);
+
+	/*
+	 * The toggle sits below the text it reveals, so expanding from the button
+	 * would leave a screen reader reading backwards to reach the start of the
+	 * note. Move the reading position to the content instead.
+	 */
+	const shouldFocusContentRef = useRef( false );
+	useLayoutEffect( () => {
+		if ( isExpanded && shouldFocusContentRef.current ) {
+			shouldFocusContentRef.current = false;
+			contentElement?.focus();
+		}
+	}, [ isExpanded, contentElement ] );
+
+	/*
+	 * Whatever the truncation left behind is still clamped, and text can
+	 * reflow past the clamp afterwards, when a web font swaps in for example.
+	 * Reset the offset a browser may have scrolled to reach that text, so a
+	 * re-collapsed note opens on its first lines rather than a middle slice.
+	 */
+	useLayoutEffect( () => {
+		if ( ! isExpanded && contentRef.current ) {
+			contentRef.current.scrollTop = 0;
+		}
+	}, [ isExpanded, collapsedContent, contentElement ] );
 
 	const canResolve = note.parent === 0;
 	const isResolutionNote =
@@ -177,22 +244,36 @@ export function Note( {
 			content = note?.content?.rendered;
 		}
 
+		const collapsed = ! isExpanded && isOverflowing;
 		body = (
 			<div
-				ref={ commentRef }
+				ref={ setContentRef }
 				id={ contentId }
+				// Not a tab stop; a target for the toggle to move focus to.
+				tabIndex={ -1 }
 				className={ clsx( 'editor-collab-sidebar-panel__note-content', {
 					'editor-collab-sidebar-panel__resolution-text':
 						isResolutionNote,
 					'is-collapsed': ! isExpanded,
 				} ) }
 				/*
-				 * Collapsing is visual only, so links clipped by the clamp stay
-				 * in the tab order. Expand when focus reaches one of them so
-				 * focus is never left on content the user cannot see.
+				 * Truncation is measured once, so text can still reflow past
+				 * the clamp afterwards. Expand if focus reaches something left
+				 * below it, rather than leaving focus out of sight.
 				 */
-				onFocusCapture={ () => setIsExpanded( true ) }
-				dangerouslySetInnerHTML={ { __html: content ?? '' } }
+				onFocusCapture={ ( event ) => {
+					if (
+						contentElement &&
+						event.target !== contentElement &&
+						event.target.getBoundingClientRect().bottom >
+							contentElement.getBoundingClientRect().bottom
+					) {
+						setIsExpanded( true );
+					}
+				} }
+				dangerouslySetInnerHTML={ {
+					__html: ( collapsed ? collapsedContent : content ) ?? '',
+				} }
 			/>
 		);
 	}
@@ -243,7 +324,10 @@ export function Note( {
 					size="small"
 					aria-expanded={ isExpanded }
 					aria-controls={ contentId }
-					onClick={ () => setIsExpanded( ! isExpanded ) }
+					onClick={ () => {
+						shouldFocusContentRef.current = ! isExpanded;
+						setIsExpanded( ! isExpanded );
+					} }
 				>
 					{ ! isExpanded ? __( 'Show more' ) : __( 'Show less' ) }
 				</UIButton>

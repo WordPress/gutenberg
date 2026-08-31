@@ -2160,7 +2160,7 @@ test.describe( 'Block Notes', () => {
 			await expect( noteContent ).not.toHaveClass( /is-collapsed/ );
 		} );
 
-		test( 'expands when focus reaches a link hidden by the collapse', async ( {
+		test( 'keeps the hidden part of the note out of the document', async ( {
 			editor,
 			page,
 		} ) => {
@@ -2168,22 +2168,39 @@ test.describe( 'Block Notes', () => {
 				{ editor, page },
 				`${ LONG_NOTE } https://wordpress.org `
 			);
-			const clippedLink = noteContent.getByRole( 'link' );
+			const link = noteContent.getByRole( 'link' );
 
 			await expect( noteContent ).toHaveClass( /is-collapsed/ );
+			/*
+			 * The collapse truncates rather than clips, so the link past the
+			 * cut is not in the tab order and not in the accessibility tree.
+			 */
+			await expect( link ).toBeHidden();
+			await expect( noteContent ).toContainText( '…' );
+
+			await page.getByRole( 'button', { name: 'Show more' } ).click();
+
+			await expect( link ).toBeVisible();
+			await expect( noteContent ).toContainText( 'wordpress.org' );
+		} );
+
+		test( 'moves focus to the note text when it is expanded', async ( {
+			editor,
+			page,
+		} ) => {
+			const noteContent = await addLongNote(
+				{ editor, page },
+				LONG_NOTE
+			);
 
 			/*
-			 * The collapse is visual only, so the link stays focusable while it
-			 * is clipped. Focusing it must expand the note rather than leave
-			 * focus on content the user cannot see.
+			 * The toggle sits below the text it reveals, so leaving focus on
+			 * it would make a screen reader read the note backwards.
 			 */
-			await clippedLink.focus();
+			await page.getByRole( 'button', { name: 'Show more' } ).click();
 
-			await expect( noteContent ).not.toHaveClass( /is-collapsed/ );
-			await expect( clippedLink ).toBeInViewport();
-			await expect(
-				page.getByRole( 'button', { name: 'Show less' } )
-			).toHaveAttribute( 'aria-expanded', 'true' );
+			await expect( noteContent ).toBeFocused();
+			await expect( noteContent ).toContainText( LONG_NOTE );
 		} );
 	} );
 } );

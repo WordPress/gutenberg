@@ -95,6 +95,16 @@
 .editor-collab-sidebar-panel__note-content {
 	overflow-wrap: break-word;
 
+	/*
+	 * Expanding a long note moves focus here, so the move needs to be visible.
+	 * The text is not a control, so only a deliberate keyboard route to it is
+	 * marked.
+	 */
+	&:focus-visible {
+		outline: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
+		outline-offset: $grid-unit-05;
+	}
+
 	p:first-child {
 		margin-top: 0;
 	}
@@ -104,15 +114,18 @@
 	}
 
 	/*
-	 * Clamp long notes to three lines. `max-height` is used in place of
-	 * `line-clamp`, whose exposure to the accessibility tree is still
-	 * settling and varies between screen readers. See
+	 * Long notes are truncated to three lines in JS, so this is the backstop
+	 * for text that reflows past the cut afterwards. `max-height` is used in
+	 * place of `line-clamp`, whose exposure to the accessibility tree is
+	 * still settling and varies between screen readers. See
 	 * https://github.com/WordPress/gutenberg/issues/81458.
 	 */
 	&.is-collapsed {
-		/* Fallback for browsers without the `lh` unit. */
-		max-height: 4.5em;
-		max-height: calc(3 * 1lh);
+		/*
+		 * The height of three lines, measured from the rendered line boxes.
+		 * The fallback covers the paint before that measurement lands.
+		 */
+		max-height: var(--wp-note-collapsed-height, 4.5em);
 		overflow: hidden;
 	}
 }
