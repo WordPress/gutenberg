@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Math: Declare `interactivity.clientNavigation` support. The block's front end output is static markup, and without the declaration a Math block inside a Query block forced full page reloads on pagination ([#](https://github.com/WordPress/gutenberg/pull/)).
+-   Math: Declare `interactivity.clientNavigation` support. The block's front end output is static markup, and without the declaration a Math block inside a Query block forced full page reloads on pagination ([#82248](https://github.com/WordPress/gutenberg/pull/82248)).
 
 ### Bug Fixes
 
