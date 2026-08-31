@@ -252,7 +252,7 @@ The exported kit for handling them:
 -   `DEFAULT_GRID` — canonical default settings, applied when `gridSettings` is omitted.
 -   `normalizeGridSettings( settings, defaultRowHeight )` — coerces legacy freeform row heights to the nearest preset. Run it over stored payloads before passing them in.
 -   `ROW_HEIGHT_PRESETS` / `DEFAULT_ROW_HEIGHT` — the row-height presets (`small`, `medium`, `large`) that `rowHeight` values normalize to.
--   `WIDGET_DASHBOARD_COLUMN_COUNT` — default and maximum column count on wide containers. `gridSettings.columns` lowers it (`1` to the constant; anything else resolves to the constant). The effective count steps down from container width: the cap at `960px` and above, two below that, one below `600px`.
+-   `WIDGET_DASHBOARD_COLUMN_COUNT` — default and maximum column count on wide containers. `gridSettings.columns` lowers it: a finite value is floored and clamped between `1` and the constant, anything else resolves to the constant. The effective count steps down from container width: the cap at `960px` and above, `min( 2, cap )` below that, one column below `600px`.
 
 ```tsx
 <WidgetDashboard

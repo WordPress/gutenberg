@@ -114,8 +114,8 @@ export type WidgetGridModel = 'grid' | 'masonry';
 /**
  * Default and maximum column count for the widget dashboard on wide
  * containers. A host may lower it through `gridSettings.columns`; container
- * width then steps the count down to two and one column at fixed
- * breakpoints. Not a user-facing setting.
+ * width then steps the effective count down at fixed breakpoints: the cap,
+ * then `min( 2, cap )`, then one column. Not a user-facing setting.
  */
 export const WIDGET_DASHBOARD_COLUMN_COUNT = 4;
 
@@ -133,10 +133,11 @@ export const WIDGET_DASHBOARD_COLUMN_COUNT = 4;
  */
 interface BaseWidgetGridSettings {
 	/**
-	 * Column cap on wide containers, `1` to
-	 * {@link WIDGET_DASHBOARD_COLUMN_COUNT}. Values outside that range, or
-	 * absent, resolve to the constant. Container width steps the effective
-	 * count down from the cap.
+	 * Column cap on wide containers. A finite value is floored and clamped
+	 * between `1` and {@link WIDGET_DASHBOARD_COLUMN_COUNT}; an absent or
+	 * non-finite value resolves to the constant. Container width steps the
+	 * effective count down from the cap: `min( 2, cap )` in the middle band,
+	 * one column below it.
 	 */
 	columns?: number;
 

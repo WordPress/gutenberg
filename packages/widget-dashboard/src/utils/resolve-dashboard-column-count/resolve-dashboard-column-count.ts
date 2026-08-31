@@ -13,9 +13,9 @@ export const WIDGET_DASHBOARD_CONTAINER_BREAKPOINT_ONE_COLUMN = 600;
 export const WIDGET_DASHBOARD_CONTAINER_BREAKPOINT_TWO_COLUMNS = 960;
 
 /**
- * Resolves the column cap a host asked for. The cap can only lower the
- * count: anything above {@link WIDGET_DASHBOARD_COLUMN_COUNT}, below one,
- * or not a finite number falls back to the package default.
+ * Resolves the column cap a host asked for. A finite value is floored and
+ * clamped between one and {@link WIDGET_DASHBOARD_COLUMN_COUNT}; an absent
+ * or non-finite value resolves to the package default.
  *
  * @param columns Host-provided `gridSettings.columns`, if any.
  * @return Column cap for wide containers.
