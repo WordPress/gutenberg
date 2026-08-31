@@ -3,7 +3,7 @@ import { Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { styles, seen, backup } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useViewportMatch, usePrevious } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
@@ -44,6 +44,7 @@ export default function GlobalStylesSidebar() {
 		editorSettings,
 		styleStateViewport,
 		isDistractionFree,
+		isVisualEditorMode,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
@@ -80,11 +81,13 @@ export default function GlobalStylesSidebar() {
 				select( blockEditorStore )
 			).getStyleStateViewport(),
 			isDistractionFree: _isDistractionFree,
+			isVisualEditorMode: _isVisualEditorMode,
 		};
 	}, [] );
 	const { setStylesPath, setShowStylebook, resetStylesNavigation } = unlock(
 		useDispatch( editorStore )
 	);
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 
 	// Derive state from path and showStylebook
@@ -95,10 +98,22 @@ export default function GlobalStylesSidebar() {
 
 	const previousActiveArea = usePrevious( activeComplementaryArea );
 
+	/*
+	 * Closing the notes sidebar leaves no complementary area open at all,
+	 * which otherwise reads as leaving Styles. Styles is reopened instead, so
+	 * the Style Book the notes were about stays on screen; the flag keeps that
+	 * reopening from being mistaken for a fresh entry below.
+	 */
+	const isReturningFromNotesRef = useRef( false );
+
 	// Reset navigation when the sidebar opens, but only on a fresh entry into
 	// Styles - coming back from the notes sidebar is a return, not an opening,
 	// and resetting there would close the Style Book the notes are about.
 	useEffect( () => {
+		if ( isReturningFromNotesRef.current ) {
+			isReturningFromNotesRef.current = false;
+			return;
+		}
 		if (
 			activeComplementaryArea === GLOBAL_STYLES_SIDEBAR &&
 			! STYLES_COMPLEMENTARY_AREAS.includes( previousActiveArea )
@@ -108,10 +123,31 @@ export default function GlobalStylesSidebar() {
 	}, [ activeComplementaryArea, previousActiveArea, resetStylesNavigation ] );
 
 	useEffect( () => {
-		if ( shouldResetNavigation ) {
-			resetStylesNavigation();
+		if ( ! shouldResetNavigation ) {
+			return;
 		}
-	}, [ shouldResetNavigation, resetStylesNavigation ] );
+
+		if (
+			! activeComplementaryArea &&
+			previousActiveArea === STYLE_BOOK_NOTES_SIDEBAR &&
+			showStylebook &&
+			isVisualEditorMode
+		) {
+			isReturningFromNotesRef.current = true;
+			enableComplementaryArea( 'core', GLOBAL_STYLES_SIDEBAR );
+			return;
+		}
+
+		resetStylesNavigation();
+	}, [
+		shouldResetNavigation,
+		resetStylesNavigation,
+		activeComplementaryArea,
+		previousActiveArea,
+		showStylebook,
+		isVisualEditorMode,
+		enableComplementaryArea,
+	] );
 
 	const { setIsListViewOpened } = useDispatch( editorStore );
 
