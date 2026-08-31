@@ -95,7 +95,11 @@ class Gutenberg_Image_Editor_Mask_Test extends WP_UnitTestCase {
 		$controller = new Gutenberg_REST_Attachments_Controller_7_1( 'attachment' );
 
 		$method = new ReflectionMethod( $controller, 'get_edit_media_item_args' );
-		$method->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			// Required to invoke the protected method before PHP 8.1; a
+			// deprecated no-op from PHP 8.5.
+			$method->setAccessible( true );
+		}
 		$args = $method->invoke( $controller );
 
 		$this->assertArrayHasKey( 'modifiers', $args );
@@ -158,8 +162,6 @@ class Gutenberg_Image_Editor_Mask_Test extends WP_UnitTestCase {
 		// Center is inside the circle: opaque (alpha 0).
 		$center_alpha = ( imagecolorat( $image, (int) ( $width / 2 ), (int) ( $height / 2 ) ) >> 24 ) & 0x7F;
 		$this->assertSame( 0, $center_alpha, 'Center pixels should be opaque.' );
-
-		imagedestroy( $image );
 	}
 
 	/**
@@ -211,8 +213,6 @@ class Gutenberg_Image_Editor_Mask_Test extends WP_UnitTestCase {
 
 		// Center: inside the circle, opaque.
 		$this->assertSame( 0, $alpha_at( (int) ( $width / 2 ), (int) ( $height / 2 ) ), 'Center pixels should be opaque.' );
-
-		imagedestroy( $image );
 	}
 
 	/**
