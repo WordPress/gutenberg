@@ -48,7 +48,7 @@ class Tests_Blocks_Render_Calendar extends WP_UnitTestCase {
 			WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
 		}
 
-		$this->original_block_supports       = WP_Block_Supports::$block_to_render;
+		$this->original_block_supports      = WP_Block_Supports::$block_to_render;
 		WP_Block_Supports::$block_to_render = array(
 			'blockName' => 'core/calendar',
 			'attrs'     => array(),

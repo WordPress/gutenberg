@@ -81,9 +81,9 @@ function render_block_core_calendar( $attributes ) {
 		$border_block_styles['color'] = "var:preset|color|{$attributes['borderColor']}";
 	}
 
-	$border_engine       = wp_style_engine_get_styles( array( 'border' => $border_block_styles ), array( 'convert_vars_to_classnames' => true ) );
-	$border_styles       = $border_engine['css'] ?? '';
-	$border_classes      = empty( $border_engine['classnames'] ) ? array() : explode( ' ', $border_engine['classnames'] );
+	$border_engine        = wp_style_engine_get_styles( array( 'border' => $border_block_styles ), array( 'convert_vars_to_classnames' => true ) );
+	$border_styles        = $border_engine['css'] ?? '';
+	$border_classes       = empty( $border_engine['classnames'] ) ? array() : explode( ' ', $border_engine['classnames'] );
 	$has_split_borders    = block_core_calendar_has_split_borders( $border_block_styles );
 	$block_gap_rules      = block_core_calendar_get_block_gap_style_rules( $attributes );
 	$base_block_gap_css   = block_core_calendar_get_base_block_gap_css( $block_gap_rules );
@@ -196,7 +196,7 @@ function block_core_calendar_merge_style_attribute( $processor, $additional_css 
 function block_core_calendar_enqueue_rendered_styles() {
 	static $did_enqueue = false;
 
-	if ( $did_enqueue || ! function_exists( 'gutenberg_enqueue_stored_styles' ) ) {
+	if ( $did_enqueue ) {
 		return;
 	}
 
@@ -372,7 +372,7 @@ function block_core_calendar_get_block_gap_style_rules( $attributes ) {
  * @return string CSS gap value, or an empty string when unset or unsafe.
  */
 function block_core_calendar_normalize_gap_value( $gap ) {
-	if ( function_exists( 'gutenberg_sanitize_block_gap_value' ) ) {
+	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN && function_exists( 'gutenberg_sanitize_block_gap_value' ) ) {
 		$gap = gutenberg_sanitize_block_gap_value( $gap );
 	}
 
