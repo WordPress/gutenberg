@@ -520,6 +520,10 @@ describe( 'Post actions', () => {
 					name: 'attachment',
 					baseURL: '/wp/v2/media',
 					rawAttributes: [ 'title', 'excerpt', 'content' ],
+					// As `loadPostTypeEntities` configures it. Without this the
+					// resolver takes its unpaginated branch, which isn't the one
+					// that runs in the editor.
+					supportsPagination: true,
 				},
 			] );
 			registry

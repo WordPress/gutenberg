@@ -81,13 +81,12 @@ async function attach( registry, { id: postId, type: postType, blocks } ) {
 	}
 
 	// `resolveSelect` waits for the data. A plain `select` would start the
-	// request and return `undefined` straight away. This is one request for the
-	// whole post: `fetch-all-middleware` turns `per_page: -1` into 100.
+	// request and return `undefined` straight away.
 	const media = await registry
 		.resolveSelect( coreStore )
 		.getEntityRecords( 'postType', 'attachment', {
 			include: mediaIds,
-			per_page: -1,
+			per_page: MAX_MEDIA_TO_ATTACH,
 		} );
 
 	// Only fill in an empty parent. An image can only belong to one post at a time,
