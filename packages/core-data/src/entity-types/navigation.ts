@@ -20,6 +20,11 @@ declare module './base-entity-records' {
 		 * `public => false`, and both `permalink_template` and
 		 * `generated_slug` are gated on the post type being viewable and
 		 * public, so neither is present either.
+		 *
+		 * `WP_Navigation_Fallback` then widens the schema for this post type:
+		 * `status` and `content` gain the embed context, as do `content.raw`,
+		 * `content.rendered`, `content.block_version` and `title.raw`, which
+		 * the posts controller would otherwise keep out of an embed response.
 		 */
 		export interface Navigation< C extends Context > {
 			/**
@@ -57,7 +62,7 @@ declare module './base-entity-records' {
 			/**
 			 * A named status for the navigation menu.
 			 */
-			status: ContextualField< PostStatus, 'view' | 'edit', C >;
+			status: ContextualField< PostStatus, 'view' | 'edit' | 'embed', C >;
 			/**
 			 * Type of post.
 			 */
@@ -69,22 +74,38 @@ declare module './base-entity-records' {
 			/**
 			 * The title for the navigation menu.
 			 */
-			title: RenderedText< C >;
+			title: {
+				raw: ContextualField< string, 'edit' | 'embed', C >;
+				rendered: string;
+			};
 			/**
 			 * The content for the navigation menu.
 			 */
 			content: ContextualField<
-				RenderedText< C > & {
+				{
+					/**
+					 * The source markup, exposed in the embed context as well
+					 * as edit.
+					 */
+					raw: ContextualField< string, 'edit' | 'embed', C >;
+					/**
+					 * The markup after processing and filtering on the server.
+					 */
+					rendered: string;
 					/**
 					 * Whether the content is protected with a password.
 					 */
-					is_protected: boolean;
+					protected: boolean;
 					/**
 					 * Version of the content block format used by the menu.
 					 */
-					block_version: ContextualField< string, 'edit', C >;
+					block_version: ContextualField<
+						number,
+						'edit' | 'embed',
+						C
+					>;
 				},
-				'view' | 'edit',
+				'view' | 'edit' | 'embed',
 				C
 			>;
 		}
