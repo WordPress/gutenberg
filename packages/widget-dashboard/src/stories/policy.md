@@ -85,4 +85,4 @@ const canPerform = useMemo< CanPerformDashboardOperation >(
 </WidgetDashboard.Policy>;
 ```
 
-See the _Policy_ story in the Playground: three user profiles (Viewer, Arranger, Owner) and a section-scoped inserter, composed inside an admin `Page`.
+See the _Policy_ story in the Playground: three user profiles (Viewer, Arranger, Owner) and a section-scoped inserter, composed inside an admin `Page`. The command palette is mounted there as well; press ⌘K to check which commands each profile keeps.
