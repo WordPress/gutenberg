@@ -253,7 +253,7 @@ export const AsyncItems: Story = {
 	render: function Template( args ) {
 		const [ loading, setLoading ] = useState( false );
 		const [ items, setItems ] = useState< FixtureItem[] >( [] );
-		const [ value, setValue ] = useState< unknown >();
+		const [ value, setValue ] = useState< FixtureItem | undefined >();
 		const [ open, setOpen ] = useState( false );
 		const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
 
@@ -263,7 +263,11 @@ export const AsyncItems: Story = {
 				items={ items }
 				value={ value }
 				open={ open }
-				onValueChange={ setValue }
+				onValueChange={ ( newValue ) => {
+					setValue(
+						( newValue ?? undefined ) as FixtureItem | undefined
+					);
+				} }
 				onOpenChange={ ( nextOpen ) => {
 					setOpen( nextOpen );
 					if ( ! nextOpen ) {
