@@ -44,6 +44,10 @@
 
 -   `DataViews` and `DataViewsPicker`: move the view back to the last available page when it points past the end of the collection, for instance after deleting the only item of the last page ([#82244](https://github.com/WordPress/gutenberg/pull/82244)).
 
+### Documentation
+
+-   DataViews: Document that the `layout.styles` of the `table` and `pickerTable` views applies to the columns listed in `fields` and not to the primary column, which takes the width the other columns leave over. Fix the swapped `maxWidth`/`minWidth` descriptions of `ColumnStyle` ([#82238](https://github.com/WordPress/gutenberg/pull/82238)).
+
 ### Internal
 
 -   Remove unused dependency `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
@@ -202,6 +206,7 @@
 -   DataForm panel layout: remove button/dropdown-specific overrides from `.dataforms-layouts-panel__field-control`; those overrides are no longer needed. [#79275](https://github.com/WordPress/gutenberg/pull/79275)
 -   DataForm panel layout: align `label-side` gap with the regular layout by using `--wpds-dimension-gap-sm` (8px). [#79311](https://github.com/WordPress/gutenberg/pull/79311)
 
+
 ### Documentation
 
 -   Fix `overriden` typo to `overridden` in README. ([#79331](https://github.com/WordPress/gutenberg/pull/79331))
@@ -227,6 +232,7 @@
 ### Code Quality
 
 -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
 
 ### Documentation
 
