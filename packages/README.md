@@ -254,6 +254,8 @@ It's very important to have a good plan for what a new package will include. All
 
 A plugin can bundle one `@wordpress/*` package while loading its dependencies from WordPress. The bundled package and its WordPress dependencies can then come from different releases.
 
+For example, a plugin might bundle a newer `@wordpress/dataviews` package but run on a WordPress version that provides an older `@wordpress/components` package. The reverse can also happen: an older plugin bundle can run on a newer WordPress version.
+
 Before changing an API or dependency in this setup:
 
 -   Confirm which packages the application bundles and which ones WordPress supplies.
