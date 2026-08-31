@@ -411,7 +411,7 @@ export function findRichTextAttributeKey(
  * @param value Block attribute value.
  * @return Text length.
  */
-function getAttributeTextLength( value: unknown ): number {
+export function getAttributeTextLength( value: unknown ): number {
 	let html = null;
 	if ( value instanceof RichTextData ) {
 		html = value.toHTMLString();
@@ -686,6 +686,75 @@ export function pickPrimaryNote( threads: Thread[] ): Thread | null {
 }
 
 /**
+ * Every thread anchored to a block, in list order.
+ *
+ * A note that spans several blocks lists its id in each of their
+ * `metadata.noteId`, so its avatar indicator renders on all of them - but the
+ * thread itself is anchored (and emitted) once, at the topmost block. Matching
+ * on the anchor alone would therefore find nothing for the second and later
+ * blocks of a multi-block note, so match against the full span and fall back to
+ * the anchor for threads materialized without one.
+ *
+ * @param threads  Root threads to search.
+ * @param clientId Block to find threads for.
+ * @return Matching threads.
+ */
+export function getThreadsForBlock(
+	threads: Thread[],
+	clientId: string
+): Thread[] {
+	return threads.filter( ( thread ) =>
+		thread.blockClientIds?.length
+			? thread.blockClientIds.includes( clientId )
+			: thread.blockClientId === clientId
+	);
+}
+
+/**
+ * Whether a note's spanned blocks are an unbroken run of siblings.
+ *
+ * The block editor's selection is a *range* - `multiSelect( first, last )`
+ * takes in every sibling between the endpoints - so it can only express a
+ * note's span faithfully when that span has no gaps. A gap appears when a block
+ * is inserted between two spanned blocks, or when one block's `metadata.noteId`
+ * is cleared while its neighbours keep theirs.
+ *
+ * @param clientIds                      Spanned blocks, in document order.
+ * @param selectors                      Block editor selectors.
+ * @param selectors.getBlockRootClientId
+ * @param selectors.getBlockOrder
+ * @return Whether the run can be multi-selected without over-selecting.
+ */
+function isContiguousSiblingRun(
+	clientIds: string[],
+	{
+		getBlockRootClientId,
+		getBlockOrder,
+	}: {
+		getBlockRootClientId: ( clientId: string ) => string | null;
+		getBlockOrder: ( rootClientId?: string | null ) => string[];
+	}
+): boolean {
+	const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
+	if (
+		clientIds.some(
+			( clientId ) => getBlockRootClientId( clientId ) !== rootClientId
+		)
+	) {
+		return false;
+	}
+
+	const order = getBlockOrder( rootClientId );
+	const firstIndex = order.indexOf( clientIds[ 0 ] );
+	if ( firstIndex === -1 ) {
+		return false;
+	}
+	return clientIds.every(
+		( clientId, i ) => order[ firstIndex + i ] === clientId
+	);
+}
+
+/**
  * Selects the block or blocks a note is anchored to.
  *
  * A note that spans several blocks is multi-selected so that every block it
@@ -693,16 +762,20 @@ export function pickPrimaryNote( threads: Thread[] ): Thread | null {
  * Selection never moves focus into the canvas: `selectBlock` and `multiSelect`
  * both treat a `null` initial position as "don't focus".
  *
- * @param thread              Root thread with `blockClientIds`.
- * @param actions             Block editor actions.
+ * @param thread                       Root thread with `blockClientIds`.
+ * @param actions                      Block editor actions and selectors.
  * @param actions.selectBlock
  * @param actions.multiSelect
+ * @param actions.getBlockRootClientId Optional; enables the gap check.
+ * @param actions.getBlockOrder        Optional; enables the gap check.
  */
 export function selectNoteBlocks(
 	thread: Thread,
 	{
 		selectBlock,
 		multiSelect,
+		getBlockRootClientId,
+		getBlockOrder,
 	}: {
 		selectBlock: ( clientId: string, initialPosition?: unknown ) => void;
 		multiSelect: (
@@ -710,6 +783,8 @@ export function selectNoteBlocks(
 			end: string,
 			initialPosition?: unknown
 		) => void;
+		getBlockRootClientId?: ( clientId: string ) => string | null;
+		getBlockOrder?: ( rootClientId?: string | null ) => string[];
 	}
 ) {
 	const clientIds = thread?.blockClientIds?.length
@@ -727,8 +802,20 @@ export function selectNoteBlocks(
 	if ( clientIds.length > 1 ) {
 		/*
 		 * `multiSelect` is a no-op when the blocks don't share a parent, in
-		 * which case the anchor selected above remains the selection.
+		 * which case the anchor selected above remains the selection. When the
+		 * span has a gap, selecting the range would light a block the note does
+		 * not cover, so keep the anchor-only selection instead.
 		 */
+		if (
+			getBlockRootClientId &&
+			getBlockOrder &&
+			! isContiguousSiblingRun( clientIds, {
+				getBlockRootClientId,
+				getBlockOrder,
+			} )
+		) {
+			return;
+		}
 		multiSelect( clientIds[ 0 ], clientIds[ clientIds.length - 1 ], null );
 	}
 }

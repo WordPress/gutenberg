@@ -2265,6 +2265,96 @@ test.describe( 'Block Notes', () => {
 			await expect( blocks.nth( 1 ) ).toHaveCSS( 'opacity', '1' );
 		} );
 
+		test( 'opens the existing note from a block the note merely spans', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Alpha block.' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Beta block.' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Gamma block.' },
+			} );
+			await addMultiBlockNote( { editor, page }, 3, 'Shared thread' );
+
+			const sidebar = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			await page.keyboard.press( 'Escape' );
+
+			// Click into the *last* spanned block, which carries the note id in
+			// its metadata but is not the note's anchor.
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.nth( 2 )
+				.click();
+
+			await page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'View notes' } )
+				.click();
+
+			// The existing thread opens; a blank "new note" form must not.
+			await expect(
+				sidebar.getByRole( 'treeitem', { name: 'Note: Shared thread' } )
+			).toHaveAttribute( 'aria-expanded', 'true' );
+			await expect(
+				sidebar.getByRole( 'textbox', {
+					name: 'New note',
+					exact: true,
+				} )
+			).toBeHidden();
+		} );
+
+		test( 'undoes the whole multi-block anchor in one step', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Alpha block.' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Beta block.' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Gamma block.' },
+			} );
+			await addMultiBlockNote( { editor, page }, 3, 'One undo step' );
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				3
+			);
+
+			// Anchoring writes every spanned block in a single dispatch, so one
+			// undo removes the whole anchor rather than leaving the note
+			// half-attached to the blocks it was written to first.
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.first()
+				.click();
+			await pageUtils.pressKeys( 'primary+z' );
+
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				0
+			);
+			const noteIds = await page.evaluate( () =>
+				window.wp.data
+					.select( 'core/block-editor' )
+					.getBlocks()
+					.map( ( block ) => block.attributes.metadata?.noteId )
+			);
+			expect( noteIds ).toEqual( [ undefined, undefined, undefined ] );
+		} );
+
 		test( 'keeps every spanned block lit for a note spanning three blocks', async ( {
 			editor,
 			page,

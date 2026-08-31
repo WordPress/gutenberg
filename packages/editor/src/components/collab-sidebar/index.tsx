@@ -24,6 +24,7 @@ import { useGlobalStyles } from '../global-styles';
 import { useEnableFloatingSidebar, useNoteThreads } from './hooks';
 import {
 	getNoteIdsFromMetadata,
+	getThreadsForBlock,
 	pickPrimaryNote,
 	readMultiBlockSelection,
 } from './utils';
@@ -93,6 +94,8 @@ function NotesSidebar( { postId }: { postId: number } ) {
 			( unresolvedNotes.length > 0 || selectedNoteId !== undefined )
 	);
 
+	// Resolves to whether the note sidebar actually opened. Callers that stash
+	// state for the form to consume use this to clean up when it did not.
 	async function focusNote( {
 		targetClientId,
 		noteId: targetNoteId,
@@ -101,9 +104,9 @@ function NotesSidebar( { postId }: { postId: number } ) {
 		targetClientId?: string | null;
 		noteId?: number | 'new';
 		isApproved?: boolean;
-	} ) {
+	} ): Promise< boolean > {
 		if ( ! targetClientId ) {
-			return;
+			return false;
 		}
 
 		const prevArea = await getActiveComplementaryArea( 'core' );
@@ -119,7 +122,7 @@ function NotesSidebar( { postId }: { postId: number } ) {
 		const currentArea = await getActiveComplementaryArea( 'core' );
 		// Bail out if the current active area is not one of note sidebars.
 		if ( ! SIDEBARS.includes( currentArea ) ) {
-			return;
+			return false;
 		}
 
 		// A special case for the List View, where block selection isn't required to trigger an action.
@@ -127,13 +130,14 @@ function NotesSidebar( { postId }: { postId: number } ) {
 		selectBlock( targetClientId, null );
 		toggleBlockSpotlight( targetClientId, true );
 		selectNote( targetNoteId, { focus: true } );
+		return true;
 	}
 
 	function openNoteForBlock( targetClientId: string ) {
-		// A block can carry multiple threads; surface the most relevant.
-		const blockThreads = notes.filter(
-			( thread ) => thread.blockClientId === targetClientId
-		);
+		// A block can carry multiple threads; surface the most relevant. A
+		// multi-block note is anchored at its topmost block but its indicator
+		// renders on every block it spans, so match on the whole span.
+		const blockThreads = getThreadsForBlock( notes, targetClientId );
 		const target = pickPrimaryNote( blockThreads );
 		return focusNote( {
 			targetClientId,
@@ -157,16 +161,22 @@ function NotesSidebar( { postId }: { postId: number } ) {
 	// marking across every block once the note is saved.
 	function addNewNoteForSelection() {
 		const segments = readMultiBlockSelection( blockEditorSelectors );
+		// A selection whose endpoints sit at different nesting depths reports a
+		// single ancestor client id, so there are no cross-block segments to
+		// mark; fall back to a block-level note on that ancestor.
 		const anchorClientId =
 			segments?.[ 0 ]?.clientId ??
-			blockEditorSelectors.getSelectedBlockClientId();
-		// Stash the segments in a dedicated store field so the reactive
-		// `selectNote` calls that follow (focus reset, block-transition sync)
-		// can't clobber them before the save resolves.
-		setPendingNoteSegments( segments );
+			blockEditorSelectors.getSelectedBlockClientId() ??
+			blockEditorSelectors.getSelectedBlockClientIds()?.[ 0 ];
 		if ( ! anchorClientId ) {
 			return;
 		}
+		// Stash the segments in a dedicated store field so the reactive
+		// `selectNote` calls that follow (focus reset, block-transition sync)
+		// can't clobber them before the save resolves. They are consumed by
+		// `onCreate`, or cleared when the form is dismissed - but the form only
+		// mounts if the sidebar opens, so clear them here when it does not.
+		setPendingNoteSegments( segments );
 		// Collapse the cross-block selection to the anchor block first, then open
 		// the form on the next frames once that selection - and the focus the
 		// editor moves onto the block - has settled. Opening it in the same tick
@@ -174,12 +184,16 @@ function NotesSidebar( { postId }: { postId: number } ) {
 		// handler keeps the form open through that, but deferring lets the input
 		// keep focus so the user can type right away.
 		selectBlock( anchorClientId, null );
-		const openForm = () =>
-			focusNote( {
+		const openForm = async () => {
+			const opened = await focusNote( {
 				targetClientId: anchorClientId,
 				noteId: 'new',
 				isApproved: false,
 			} );
+			if ( ! opened ) {
+				setPendingNoteSegments( null );
+			}
+		};
 		window.requestAnimationFrame( () =>
 			window.requestAnimationFrame( openForm )
 		);

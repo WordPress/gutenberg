@@ -27,6 +27,7 @@ import {
 	applyNoteFormat,
 	calculateNotePositions,
 	findNoteInBlock,
+	getAttributeTextLength,
 	getInlineMarkerStart,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
@@ -245,6 +246,17 @@ function readInlineSelection(
 }
 
 /**
+ * The block-editor `updateBlockAttributes` action. Passing a list of client ids
+ * with `uniqueByBlock` writes several blocks in one dispatch - and so in one
+ * undo step - with `attributes` keyed by client id.
+ */
+type UpdateBlockAttributes = (
+	clientIds: string | string[],
+	attributes: BlockAttributes | Record< string, BlockAttributes >,
+	options?: { uniqueByBlock?: boolean }
+) => void;
+
+/**
  * Wrap a rich-text range with a core/note marker. Returns a new
  * RichTextData ready to write back into block attributes, or null when the
  * incoming value isn't a rich-text instance (legacy/string attributes).
@@ -293,11 +305,9 @@ function clearInlineNoteMarker(
 	getBlockAttributes: (
 		clientId: string
 	) => BlockAttributes | null | undefined,
-	updateBlockAttributes: (
-		clientId: string,
-		attributes: BlockAttributes
-	) => void
+	updateBlockAttributes: UpdateBlockAttributes
 ) {
+	const attributesByClientId: Record< string, BlockAttributes > = {};
 	for ( const clientId of getClientIdsWithDescendants() ) {
 		const attributes = getBlockAttributes( clientId );
 		const found = findNoteInBlock( attributes, noteId );
@@ -309,8 +319,17 @@ function clearInlineNoteMarker(
 			noteId
 		);
 		if ( next ) {
-			updateBlockAttributes( clientId, { [ found.attributeKey ]: next } );
+			attributesByClientId[ clientId ] = {
+				[ found.attributeKey ]: next,
+			};
 		}
+	}
+	// One dispatch, so clearing a multi-block note's markers is one undo step.
+	const clientIds = Object.keys( attributesByClientId );
+	if ( clientIds.length > 0 ) {
+		updateBlockAttributes( clientIds, attributesByClientId, {
+			uniqueByBlock: true,
+		} );
 	}
 }
 
@@ -422,6 +441,8 @@ export function useNoteActions() {
 			 * https://github.com/WordPress/gutenberg/issues/74751.
 			 */
 			if ( ! parent && savedRecord?.id ) {
+				const attributesByClientId: Record< string, BlockAttributes > =
+					{};
 				for ( const segment of segments ) {
 					const { clientId, attributeKey, start, end } = segment;
 					if ( ! clientId ) {
@@ -441,18 +462,43 @@ export function useNoteActions() {
 					// later edits; edge/interior blocks with no range stay
 					// block-level (metadata only).
 					if ( attributeKey && start !== null && end !== null ) {
-						const wrapped = wrapInlineNote(
-							attributes?.[ attributeKey ],
-							savedRecord.id,
-							start,
-							end
-						);
+						/*
+						 * The offsets were captured before the save; the block
+						 * may have been edited during the round-trip, so clamp
+						 * them to the text as it stands now rather than writing
+						 * format runs past its end.
+						 */
+						const value = attributes?.[ attributeKey ];
+						const length = getAttributeTextLength( value );
+						const safeStart = Math.min( start, length );
+						const safeEnd = Math.min( end, length );
+						const wrapped =
+							safeEnd > safeStart
+								? wrapInlineNote(
+										value,
+										savedRecord.id,
+										safeStart,
+										safeEnd
+								  )
+								: null;
 						if ( wrapped ) {
 							newAttributes[ attributeKey ] = wrapped;
 						}
 					}
 
-					updateBlockAttributes( clientId, newAttributes );
+					attributesByClientId[ clientId ] = newAttributes;
+				}
+
+				/*
+				 * One dispatch for every spanned block, so anchoring a
+				 * multi-block note is a single undo step. Undoing it must not
+				 * leave the note attached to some of its blocks.
+				 */
+				const clientIds = Object.keys( attributesByClientId );
+				if ( clientIds.length > 0 ) {
+					updateBlockAttributes( clientIds, attributesByClientId, {
+						uniqueByBlock: true,
+					} );
 				}
 			}
 
@@ -585,9 +631,12 @@ export function useNoteActions() {
 			// Strip the note's anchor from every block it spans: remove the id
 			// from metadata and remove the inline marker (if any). A multi-block
 			// note lives in several blocks, so scan them all rather than a single
-			// anchor. Each block's metadata + marker fold into one attribute
-			// update so it's a single undo step per block.
+			// anchor. Metadata and marker fold into one attribute update, and
+			// every block into one dispatch, so removing the anchor is a single
+			// undo step however many blocks the note covered.
 			if ( ! note.parent ) {
+				const attributesByClientId: Record< string, BlockAttributes > =
+					{};
 				for ( const clientId of getClientIdsWithDescendants() ) {
 					const attributes = getBlockAttributes( clientId );
 					const hasMetadataId = getNoteIdsFromMetadata(
@@ -615,7 +664,13 @@ export function useNoteActions() {
 							newAttributes[ found.attributeKey ] = next;
 						}
 					}
-					updateBlockAttributes( clientId, newAttributes );
+					attributesByClientId[ clientId ] = newAttributes;
+				}
+				const clientIds = Object.keys( attributesByClientId );
+				if ( clientIds.length > 0 ) {
+					updateBlockAttributes( clientIds, attributesByClientId, {
+						uniqueByBlock: true,
+					} );
 				}
 			}
 

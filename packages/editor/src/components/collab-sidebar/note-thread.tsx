@@ -83,6 +83,11 @@ export function NoteThread( {
 		multiSelect,
 		toggleBlockSpotlight,
 	} = unlock( useDispatch( blockEditorStore ) );
+	// Bound selectors, read imperatively by `selectNoteBlocks` to tell an
+	// unbroken span from one with a gap. Passing the store descriptor doesn't
+	// subscribe this component to store changes.
+	const { getBlockRootClientId, getBlockOrder } =
+		useSelect( blockEditorStore );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
 	const relatedBlockElement = useBlockElement( note.blockClientId );
@@ -171,7 +176,12 @@ export function NoteThread( {
 		selectNote( note.id );
 		focusNoteThread( note.id, sidebarRef.current );
 		toggleBlockSpotlight( note.blockClientId, true );
-		selectNoteBlocks( note, { selectBlock, multiSelect } );
+		selectNoteBlocks( note, {
+			selectBlock,
+			multiSelect,
+			getBlockRootClientId,
+			getBlockOrder,
+		} );
 	}
 
 	function onDeselectNote() {

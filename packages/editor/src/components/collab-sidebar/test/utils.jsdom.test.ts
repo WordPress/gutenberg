@@ -19,6 +19,8 @@ import {
 	removeNoteIdFromMetadata,
 	calculateNotePositions,
 	pickPrimaryNote,
+	getThreadsForBlock,
+	selectNoteBlocks,
 	BLOCK_LEVEL_NOTE_START,
 	getInlineMarkerStart,
 	getNoteMarkerSelector,
@@ -1233,5 +1235,151 @@ describe( 'getNoteMarkerSelector / noteFormat', () => {
 		marker.setAttribute( noteFormat.attributes[ 'data-id' ], '7' );
 
 		expect( marker.matches( getNoteMarkerSelector( 7 ) ) ).toBe( true );
+	} );
+} );
+
+describe( 'getThreadsForBlock', () => {
+	it( 'returns an empty list when no thread touches the block', () => {
+		const threads = [
+			{ id: 1, blockClientId: 'a', blockClientIds: [ 'a' ] },
+		];
+		expect( getThreadsForBlock( threads, 'z' ) ).toEqual( [] );
+	} );
+
+	it( 'matches a single-block note on its anchor', () => {
+		const threads = [
+			{ id: 1, blockClientId: 'a', blockClientIds: [ 'a' ] },
+		];
+		expect( getThreadsForBlock( threads, 'a' ) ).toEqual( [
+			threads[ 0 ],
+		] );
+	} );
+
+	it( 'matches a multi-block note on every block it spans, not just the anchor', () => {
+		const threads = [
+			{ id: 1, blockClientId: 'a', blockClientIds: [ 'a', 'b', 'c' ] },
+		];
+		expect( getThreadsForBlock( threads, 'a' ) ).toEqual( [
+			threads[ 0 ],
+		] );
+		expect( getThreadsForBlock( threads, 'b' ) ).toEqual( [
+			threads[ 0 ],
+		] );
+		expect( getThreadsForBlock( threads, 'c' ) ).toEqual( [
+			threads[ 0 ],
+		] );
+	} );
+
+	it( 'falls back to blockClientId when blockClientIds is missing', () => {
+		const threads = [ { id: 1, blockClientId: 'a' } ];
+		expect( getThreadsForBlock( threads, 'a' ) ).toEqual( [
+			threads[ 0 ],
+		] );
+		expect( getThreadsForBlock( threads, 'b' ) ).toEqual( [] );
+	} );
+
+	it( 'ignores orphaned threads with no anchor at all', () => {
+		const threads = [ { id: 1, blockClientId: null, blockClientIds: [] } ];
+		expect( getThreadsForBlock( threads, 'a' ) ).toEqual( [] );
+	} );
+
+	it( 'returns every thread touching the block, in list order', () => {
+		const threads = [
+			{ id: 1, blockClientId: 'a', blockClientIds: [ 'a', 'b' ] },
+			{ id: 2, blockClientId: 'b', blockClientIds: [ 'b' ] },
+			{ id: 3, blockClientId: 'c', blockClientIds: [ 'c' ] },
+		];
+		expect( getThreadsForBlock( threads, 'b' ) ).toEqual( [
+			threads[ 0 ],
+			threads[ 1 ],
+		] );
+	} );
+} );
+
+describe( 'selectNoteBlocks', () => {
+	const orderSelectors = ( order: string[] ) => ( {
+		getBlockRootClientId: () => '',
+		getBlockOrder: () => order,
+	} );
+
+	it( 'does nothing when the thread has no anchor', () => {
+		const selectBlock = jest.fn();
+		const multiSelect = jest.fn();
+		selectNoteBlocks(
+			{ id: 1, blockClientId: null, blockClientIds: [] },
+			{ selectBlock, multiSelect }
+		);
+		expect( selectBlock ).not.toHaveBeenCalled();
+		expect( multiSelect ).not.toHaveBeenCalled();
+	} );
+
+	it( 'selects the single block of a single-block note', () => {
+		const selectBlock = jest.fn();
+		const multiSelect = jest.fn();
+		selectNoteBlocks(
+			{ id: 1, blockClientId: 'a', blockClientIds: [ 'a' ] },
+			{ selectBlock, multiSelect }
+		);
+		expect( selectBlock ).toHaveBeenCalledWith( 'a', null );
+		expect( multiSelect ).not.toHaveBeenCalled();
+	} );
+
+	it( 'multi-selects a contiguous run of spanned blocks', () => {
+		const selectBlock = jest.fn();
+		const multiSelect = jest.fn();
+		selectNoteBlocks(
+			{ id: 1, blockClientId: 'a', blockClientIds: [ 'a', 'b', 'c' ] },
+			{
+				selectBlock,
+				multiSelect,
+				...orderSelectors( [ 'a', 'b', 'c', 'd' ] ),
+			}
+		);
+		expect( selectBlock ).toHaveBeenCalledWith( 'a', null );
+		expect( multiSelect ).toHaveBeenCalledWith( 'a', 'c', null );
+	} );
+
+	it( 'does not multi-select across a block the note does not span', () => {
+		const selectBlock = jest.fn();
+		const multiSelect = jest.fn();
+		// 'x' was inserted between two spanned blocks; multi-selecting a..c
+		// would light it up as part of the note.
+		selectNoteBlocks(
+			{ id: 1, blockClientId: 'a', blockClientIds: [ 'a', 'c' ] },
+			{
+				selectBlock,
+				multiSelect,
+				...orderSelectors( [ 'a', 'x', 'c' ] ),
+			}
+		);
+		expect( selectBlock ).toHaveBeenCalledWith( 'a', null );
+		expect( multiSelect ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does not multi-select when the spanned blocks are not siblings', () => {
+		const selectBlock = jest.fn();
+		const multiSelect = jest.fn();
+		selectNoteBlocks(
+			{ id: 1, blockClientId: 'a', blockClientIds: [ 'a', 'b' ] },
+			{
+				selectBlock,
+				multiSelect,
+				getBlockRootClientId: ( clientId: string ) =>
+					clientId === 'a' ? '' : 'group',
+				getBlockOrder: () => [ 'a', 'b' ],
+			}
+		);
+		expect( selectBlock ).toHaveBeenCalledWith( 'a', null );
+		expect( multiSelect ).not.toHaveBeenCalled();
+	} );
+
+	it( 'multi-selects without order selectors, preserving prior behaviour', () => {
+		const selectBlock = jest.fn();
+		const multiSelect = jest.fn();
+		selectNoteBlocks(
+			{ id: 1, blockClientId: 'a', blockClientIds: [ 'a', 'c' ] },
+			{ selectBlock, multiSelect }
+		);
+		expect( multiSelect ).toHaveBeenCalledWith( 'a', 'c', null );
 	} );
 } );

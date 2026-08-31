@@ -41,6 +41,11 @@ export function Notes( {
 	const { selectBlock, multiSelect, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
 	);
+	// Bound selectors, read imperatively by `selectNoteBlocks` to tell an
+	// unbroken span from one with a gap. Passing the store descriptor doesn't
+	// subscribe this component to store changes.
+	const { getBlockRootClientId, getBlockOrder } =
+		useSelect( blockEditorStore );
 
 	const { noteId, selectedBlockClientId, orderedBlockIds } = useSelect(
 		( select ) => {
@@ -143,6 +148,8 @@ export function Notes( {
 				selectNoteBlocks( adjacentThread, {
 					selectBlock,
 					multiSelect,
+					getBlockRootClientId,
+					getBlockOrder,
 				} );
 			}
 		} else {
@@ -219,7 +226,12 @@ export function Notes( {
 			// Expand thread.
 			selectNote( thread.id );
 			if ( !! thread.blockClientId ) {
-				selectNoteBlocks( thread, { selectBlock, multiSelect } );
+				selectNoteBlocks( thread, {
+					selectBlock,
+					multiSelect,
+					getBlockRootClientId,
+					getBlockOrder,
+				} );
 				toggleBlockSpotlight( thread.blockClientId, true );
 			}
 		} else if (
