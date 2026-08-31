@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   New `isHeicFile` export, which recognizes a HEIC/HEIF image from its own file header rather than from the MIME type a browser infers from the file name ([#81707](https://github.com/WordPress/gutenberg/issues/81707)).
+
+### Bug Fixes
+
+-   A HEIC photo whose extension says `.jpg` or `.png` is now recognized from its own file header and converted like any other HEIC file, instead of being uploaded as undecodable bytes that leave the upload stuck without ever completing or reporting an error ([#81707](https://github.com/WordPress/gutenberg/issues/81707)).
+
 ### Internal
 
 -   Add a private `getFailureCount` selector, a running tally of top-level items cancelled because they failed. Failed items leave the queue just like successful ones, so this is the only record that an upload did not make it ([#81132](https://github.com/WordPress/gutenberg/issues/81132)).
