@@ -82,59 +82,92 @@ function gutenberg_record_original_attachment_id( $new_image_meta, $new_attachme
 add_filter( 'wp_edited_image_metadata', 'gutenberg_record_original_attachment_id', 10, 3 );
 
 /**
- * Filter `rest_prepare_attachment` to expose the original attachment.
+ * Registers `original_attachment` as a REST field on the attachment
+ * schema.
  *
- * Reads `_wp_attachment_original_id` postmeta (written by the
- * `wp_edited_image_metadata` hook above) and exposes the resolved id
- * as a root-level `original_attachment` field: a bare id like
- * `featured_media`, with an accompanying embeddable
- * `wp:original-attachment` link so clients can hydrate the full
- * attachment via `?_embed`. Root-level rather than inside
- * `media_details` because it describes a relationship between
- * attachments (like `post`, the parent post), not a property of the
- * media file. Absent for attachments with no edit lineage.
- *
- * Only emitted in the `edit` context: the lineage is an editor
- * concern (the Restore-original action), and scoping it here avoids
+ * The value is the id of the lineage root the attachment was edited
+ * from, or `0` when it has no edit lineage — mirroring
+ * `featured_media`, where `0` means "none". Registering the field
+ * (rather than injecting it in a response filter) exposes it in the
+ * `OPTIONS /wp/v2/media` schema, integrates with `_fields` filtering,
+ * and lets core strip it outside the `edit` context automatically:
+ * lineage is an editor concern, and scoping it to `edit` avoids
  * disclosing chain relationships to unauthenticated readers and
  * embed consumers.
  *
  * The `/edit` route registers no `context` argument, so the 201
- * response from `edit_media_item` itself never carries this field.
- * Clients must refetch the new attachment with `?context=edit`.
+ * response from `edit_media_item` itself resolves to the default
+ * `view` context and never carries this field. Clients must refetch
+ * the new attachment with `?context=edit`.
+ */
+function gutenberg_register_original_attachment_field() {
+	register_rest_field(
+		'attachment',
+		'original_attachment',
+		array(
+			'get_callback' => 'gutenberg_get_original_attachment_field',
+			'schema'       => array(
+				'description' => __( 'The ID of the original attachment this attachment was edited from, or 0 when it was not created by editing another attachment.', 'gutenberg' ),
+				'type'        => 'integer',
+				'context'     => array( 'edit' ),
+				'readonly'    => true,
+			),
+		)
+	);
+}
+add_action( 'rest_api_init', 'gutenberg_register_original_attachment_field' );
+
+/**
+ * Resolves the `original_attachment` field value for a REST response.
+ *
+ * Trusts the stored meta rather than verifying the original still
+ * exists: the `delete_attachment` cleanup below keeps it accurate,
+ * and a consumer fetching a dangling id (e.g. an original sitting in
+ * the trash) simply gets no record.
+ *
+ * @param array $attachment Prepared attachment response data.
+ * @return int The lineage root id, or 0 when there is no lineage.
+ */
+function gutenberg_get_original_attachment_field( $attachment ) {
+	$attachment_id = isset( $attachment['id'] ) ? (int) $attachment['id'] : 0;
+	if ( $attachment_id <= 0 ) {
+		return 0;
+	}
+
+	$original_id = gutenberg_get_original_attachment_id( $attachment_id );
+
+	return $original_id === $attachment_id ? 0 : $original_id;
+}
+
+/**
+ * Filter `rest_prepare_attachment` to add the `wp:original-attachment`
+ * link for attachments with an edit lineage.
+ *
+ * `register_rest_field` has no mechanism for links, so the link rides
+ * a response filter while the field itself is registered above. Only
+ * added in the `edit` context, matching the field's schema context.
  *
  * @param WP_REST_Response $response REST response.
  * @param WP_Post          $post     Attachment post.
  * @param WP_REST_Request  $request  REST request.
  * @return WP_REST_Response
  */
-function gutenberg_add_original_attachment_to_response( $response, $post, $request ) {
+function gutenberg_add_original_attachment_link( $response, $post, $request ) {
 	if ( 'edit' !== $request['context'] ) {
 		return $response;
 	}
-
-	$data = $response->get_data();
 
 	$original_id = gutenberg_get_original_attachment_id( $post->ID );
 	if ( $original_id === (int) $post->ID ) {
 		return $response;
 	}
 
-	// Trust the stored meta rather than verifying the original here:
-	// the `delete_attachment` cleanup below keeps it accurate, and a
-	// consumer fetching a dangling id (e.g. an original sitting in the
-	// trash) simply gets no record. Verifying would cost an uncached
-	// meta query per derivative on every list request.
-	$data['original_attachment'] = $original_id;
-	$response->set_data( $data );
-
-	// Mirror `featured_media`: expose the relationship as an
-	// embeddable link so clients can hydrate the original attachment
-	// with `?_embed`. Core fires `rest_prepare_attachment` twice per
-	// attachment — once from the posts controller's
-	// `prepare_item_for_response()` and again from the attachments
-	// controller wrapping it — and `add_link()` appends
-	// unconditionally, so guard against adding the link twice.
+	// Mirror `featured_media`: an embeddable link so clients can
+	// hydrate the original attachment with `?_embed`. Core fires
+	// `rest_prepare_attachment` twice per attachment — once from the
+	// posts controller's `prepare_item_for_response()` and again from
+	// the attachments controller wrapping it — and `add_link()`
+	// appends unconditionally, so guard against adding it twice.
 	$rel   = 'https://api.w.org/original-attachment';
 	$links = $response->get_links();
 	if ( ! isset( $links[ $rel ] ) ) {
@@ -147,7 +180,7 @@ function gutenberg_add_original_attachment_to_response( $response, $post, $reque
 
 	return $response;
 }
-add_filter( 'rest_prepare_attachment', 'gutenberg_add_original_attachment_to_response', 10, 3 );
+add_filter( 'rest_prepare_attachment', 'gutenberg_add_original_attachment_link', 10, 3 );
 
 /**
  * Clear `_wp_attachment_original_id` from descendants when their
