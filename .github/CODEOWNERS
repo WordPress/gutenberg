@@ -1,6 +1,6 @@
 # Documentation
 /docs                                           @juanmaguitar @fabiankaegy
-/packages/interactivity/docs
+/packages/interactivity/docs                    @juanmaguitar
 
 # Schemas
 /schemas/json
@@ -140,7 +140,7 @@
 /lib                                            @spacedmonkey
 /lib/block-supports/layout.php                  @tellthemachines
 /lib/class-wp-theme-json-gutenberg.php          @tellthemachines
-/lib/compat/*/html-api
-/lib/experimental/rest-api.php
+/lib/compat/*/html-api                          @dmsnell
+/lib/experimental/rest-api.php                  @timothybjacobs
 /lib/experimental/class-wp-rest-*
 /lib/experimental/class-wp-rest-block-editor-settings-controller.php
