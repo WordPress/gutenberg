@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Keep a query's `totalItems` in sync when records are removed from it, so the page count is correct after a deletion instead of only after the next fetch.
+-   Keep a query's `totalItems` in sync when records are removed from it, so the page count is correct after a deletion instead of only after the next fetch ([#82244](https://github.com/WordPress/gutenberg/pull/82244)).
 
 ### Internal
 
