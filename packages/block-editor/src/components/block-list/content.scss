@@ -313,13 +313,11 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 }
 
 .wp-site-blocks > [data-align="left"] {
-	float: left;
 	margin-right: 2em;
 }
 
 .wp-site-blocks > [data-align="right"] {
-	float: right;
-	margin-left: 2em;
+	margin-left: auto !important;
 }
 
 .wp-site-blocks > [data-align="center"] {

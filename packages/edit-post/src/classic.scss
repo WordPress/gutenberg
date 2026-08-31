@@ -49,7 +49,7 @@ html :where(.wp-block) {
 		width: 100%;
 
 		// When images are floated, the block itself should collapse to zero height.
-		height: 0;
+		height: auto;
 
 		&::before {
 			content: none;
@@ -59,7 +59,6 @@ html :where(.wp-block) {
 	// Left.
 	&[data-align="left"] > * {
 		/*!rtl:begin:ignore*/
-		float: left;
 		margin-right: 2em;
 		/*!rtl:end:ignore*/
 	}
@@ -67,8 +66,7 @@ html :where(.wp-block) {
 	// Right.
 	&[data-align="right"] > * {
 		/*!rtl:begin:ignore*/
-		float: right;
-		margin-left: 2em;
+		margin-left: auto !important;
 		/*!rtl:end:ignore*/
 	}
 
