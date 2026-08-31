@@ -2096,6 +2096,243 @@ test.describe( 'Block Notes', () => {
 			await expect( textbox ).toBeFocused();
 		} );
 	} );
+
+	test.describe( 'Locked notes', () => {
+		let postId;
+
+		/**
+		 * Locks every note action on the seeded post.
+		 *
+		 * @param {import('@wordpress/e2e-test-utils-playwright').RequestUtils} requestUtils
+		 */
+		async function lockPost( requestUtils ) {
+			await requestUtils.rest( {
+				method: 'POST',
+				path: `/wp/v2/posts/${ postId }`,
+				data: { meta: { _wp_notes_locked: true } },
+			} );
+		}
+
+		/*
+		 * Notes are seeded before the lock goes on: a locked post rejects note
+		 * creation, so the order is not interchangeable.
+		 */
+		test.beforeEach( async ( { requestUtils } ) => {
+			const post = await requestUtils.rest( {
+				method: 'POST',
+				path: '/wp/v2/posts',
+				data: {
+					title: 'A locked post',
+					status: 'publish',
+					content:
+						'<!-- wp:paragraph --><p>First</p><!-- /wp:paragraph -->\n\n<!-- wp:paragraph --><p>Second</p><!-- /wp:paragraph -->',
+				},
+			} );
+			postId = post.id;
+
+			const noteIds = [];
+			for ( const content of [ 'First note', 'Second note' ] ) {
+				const note = await requestUtils.rest( {
+					method: 'POST',
+					path: '/wp/v2/comments',
+					data: {
+						post: postId,
+						type: 'note',
+						content,
+						status: 'hold',
+					},
+				} );
+				noteIds.push( note.id );
+			}
+
+			// Anchor each note to a block so the threads render as normal
+			// notes rather than orphans of a deleted block.
+			await requestUtils.rest( {
+				method: 'POST',
+				path: `/wp/v2/posts/${ postId }`,
+				data: {
+					content: `<!-- wp:paragraph {"metadata":{"noteId":${ noteIds[ 0 ] }}} --><p>First</p><!-- /wp:paragraph -->\n\n<!-- wp:paragraph {"metadata":{"noteId":${ noteIds[ 1 ] }}} --><p>Second</p><!-- /wp:paragraph -->`,
+				},
+			} );
+		} );
+
+		test.afterEach( async ( { requestUtils } ) => {
+			await requestUtils.rest( {
+				method: 'DELETE',
+				path: `/wp/v2/posts/${ postId }`,
+				params: { force: true },
+			} );
+		} );
+
+		test( 'removes every note affordance while keeping notes readable', async ( {
+			admin,
+			editor,
+			page,
+			pageUtils,
+			requestUtils,
+			blockNoteUtils,
+		} ) => {
+			await lockPost( requestUtils );
+			await admin.editPost( postId );
+
+			// The lock reaches the editor through the settings snapshot, not
+			// only through the post entity's meta.
+			expect(
+				await page.evaluate(
+					() =>
+						window.wp.data
+							.select( 'core/editor' )
+							.getEditorSettings().lockedNoteActions
+				)
+			).toEqual( [ 'create', 'reply', 'edit', 'resolve', 'delete' ] );
+
+			await editor.selectBlocks(
+				editor.canvas
+					.getByRole( 'document', { name: 'Block: Paragraph' } )
+					.first()
+			);
+			await editor.clickBlockToolbarButton( 'Options' );
+			const addNote = page
+				.getByRole( 'menu', { name: 'Options' } )
+				.getByRole( 'menuitem', { name: 'Add note' } );
+			await expect( addNote ).toBeDisabled();
+			await expect( addNote ).toContainText(
+				'Notes are locked for this post.'
+			);
+			await page.keyboard.press( 'Escape' );
+
+			// The keyboard shortcut opens nothing either.
+			await pageUtils.pressKeys( 'primaryAlt+M' );
+			await expect(
+				page.getByRole( 'textbox', { name: 'New note', exact: true } )
+			).toBeHidden();
+
+			await blockNoteUtils.openBlockNoteSidebar();
+			const sidebar = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+
+			await expect(
+				sidebar.getByText(
+					'Notes are locked for this post. Existing notes are read-only.'
+				)
+			).toBeVisible();
+
+			const thread = sidebar.getByRole( 'treeitem', {
+				name: 'Note: First note',
+			} );
+			await expect( thread ).toBeVisible();
+			await thread.click();
+
+			await expect(
+				sidebar.getByRole( 'button', { name: 'Resolve' } )
+			).toBeHidden();
+			await expect(
+				sidebar.getByRole( 'button', { name: 'Actions' } )
+			).toBeHidden();
+			await expect(
+				sidebar.getByRole( 'textbox', { name: /^Reply to note/ } )
+			).toBeHidden();
+		} );
+
+		test( 'keeps a locked thread list navigable by keyboard', async ( {
+			admin,
+			page,
+			requestUtils,
+			blockNoteUtils,
+		} ) => {
+			await lockPost( requestUtils );
+			await admin.editPost( postId );
+			await blockNoteUtils.openBlockNoteSidebar();
+
+			const sidebar = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			const first = sidebar.getByRole( 'treeitem', {
+				name: 'Note: First note',
+			} );
+			const second = sidebar.getByRole( 'treeitem', {
+				name: 'Note: Second note',
+			} );
+
+			await first.focus();
+			await page.keyboard.press( 'ArrowDown' );
+			await expect( second ).toBeFocused();
+
+			await page.keyboard.press( 'Enter' );
+			await expect( second ).toHaveAttribute( 'aria-expanded', 'true' );
+		} );
+
+		test( 'rejects a mutation attempted from an editor that predates the lock', async ( {
+			admin,
+			page,
+			requestUtils,
+			blockNoteUtils,
+		} ) => {
+			await admin.editPost( postId );
+			await blockNoteUtils.openBlockNoteSidebar();
+
+			const sidebar = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			const thread = sidebar.getByRole( 'treeitem', {
+				name: 'Note: First note',
+			} );
+			await thread.click();
+
+			// Lock out of band, leaving the open editor's snapshot stale.
+			await lockPost( requestUtils );
+
+			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Delete' );
+			await page
+				.getByRole( 'dialog' )
+				.getByRole( 'button', { name: 'Delete' } )
+				.click();
+
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Notes are locked for this post.' } )
+			).toBeVisible();
+			await expect( thread ).toBeVisible();
+		} );
+
+		test( 'keeps a typed note when the lock lands mid-draft', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			await admin.editPost( postId );
+			await editor.selectBlocks(
+				editor.canvas
+					.getByRole( 'document', { name: 'Block: Paragraph' } )
+					.first()
+			);
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+
+			const textbox = page.getByRole( 'textbox', {
+				name: 'New note',
+				exact: true,
+			} );
+			await textbox.pressSequentially( 'Worth keeping.' );
+
+			await lockPost( requestUtils );
+
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Notes are locked for this post.' } )
+			).toBeVisible();
+			// The rejection must not take the draft down with it.
+			await expect( textbox ).toHaveText( 'Worth keeping.' );
+		} );
+	} );
 } );
 
 class BlockNoteUtils {

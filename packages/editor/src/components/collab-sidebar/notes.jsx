@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useMemo, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { Notice } from '@wordpress/components';
 import { Stack, Text } from '@wordpress/ui';
 import {
 	store as blockEditorStore,
@@ -14,6 +15,7 @@ import {
 	pickPrimaryNote,
 } from './utils';
 import { useFloatingBoard, useNoteActions } from './hooks';
+import { useNoteLock } from './use-note-lock';
 import { AddNote } from './add-note';
 import { store as editorStore } from '../../store';
 
@@ -29,6 +31,7 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 	const { selectBlock, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
 	);
+	const { isFullyLocked } = useNoteLock();
 
 	const { noteId, selectedBlockClientId, orderedBlockIds } = useSelect(
 		( select ) => {
@@ -248,77 +251,99 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 		  );
 
 	return (
-		<Stack
-			className="editor-collab-sidebar-panel"
-			style={ styles }
-			role="tree"
-			direction="column"
-			gap="md"
-			justify="flex-start"
-			ref={ ( node ) => {
-				// Sometimes previous sidebar unmounts after the new one mounts.
-				// This ensures we always have the latest reference.
-				if ( node ) {
-					sidebarRef.current = node;
-				}
-			} }
-			aria-label={
-				isFloating ? __( 'Unresolved notes' ) : __( 'All notes' )
-			}
-		>
-			{ ! hasThreads && ! isFloating ? (
-				<AddNote onSubmit={ onAddReply } sidebarRef={ sidebarRef } />
-			) : (
-				<>
-					{ ! isFloating && selectedNote === 'new' && (
-						<AddNote
-							onSubmit={ onAddReply }
-							sidebarRef={ sidebarRef }
-						/>
+		<>
+			{ isFullyLocked && ! isFloating && (
+				/*
+				 * Rendered outside the tree so the list keeps only treeitem
+				 * children. The floating sidebar sits over the canvas and has
+				 * no room for it, so the notice lives in "All notes" only.
+				 */
+				<Notice status="info" isDismissible={ false }>
+					{ __(
+						'Notes are locked for this post. Existing notes are read-only.'
 					) }
-					{ threads.map( ( thread, index ) => (
-						<Fragment key={ thread.id }>
-							{ index === firstResolvedIndex && (
-								<Stack
-									direction="row"
-									align="center"
-									justify="center"
-									gap="sm"
-									className="editor-collab-sidebar-panel__status-separator"
-								>
-									<Text variant="heading-sm" render={ <p /> }>
-										{ __( 'Resolved' ) }
-									</Text>
-								</Stack>
-							) }
-							<NoteThread
-								note={ thread }
-								onAddReply={ onAddReply }
-								onDeleteNote={ handleDelete }
-								onEditNote={ onEditNote }
-								isSelected={ selectedNote === thread.id }
-								sidebarRef={ sidebarRef }
-								floating={
-									isFloating
-										? {
-												y: notePositions[ thread.id ],
-												registerThread,
-												unregisterThread,
-										  }
-										: undefined
-								}
-								onKeyDown={ ( event ) =>
-									navigate(
-										event,
-										thread,
-										selectedNote === thread.id
-									)
-								}
-							/>
-						</Fragment>
-					) ) }
-				</>
+				</Notice>
 			) }
-		</Stack>
+			<Stack
+				className="editor-collab-sidebar-panel"
+				style={ styles }
+				role="tree"
+				direction="column"
+				gap="md"
+				justify="flex-start"
+				ref={ ( node ) => {
+					// Sometimes previous sidebar unmounts after the new one mounts.
+					// This ensures we always have the latest reference.
+					if ( node ) {
+						sidebarRef.current = node;
+					}
+				} }
+				aria-label={
+					isFloating ? __( 'Unresolved notes' ) : __( 'All notes' )
+				}
+			>
+				{ ! hasThreads && ! isFloating ? (
+					<AddNote
+						onSubmit={ onAddReply }
+						sidebarRef={ sidebarRef }
+					/>
+				) : (
+					<>
+						{ ! isFloating && selectedNote === 'new' && (
+							<AddNote
+								onSubmit={ onAddReply }
+								sidebarRef={ sidebarRef }
+							/>
+						) }
+						{ threads.map( ( thread, index ) => (
+							<Fragment key={ thread.id }>
+								{ index === firstResolvedIndex && (
+									<Stack
+										direction="row"
+										align="center"
+										justify="center"
+										gap="sm"
+										className="editor-collab-sidebar-panel__status-separator"
+									>
+										<Text
+											variant="heading-sm"
+											render={ <p /> }
+										>
+											{ __( 'Resolved' ) }
+										</Text>
+									</Stack>
+								) }
+								<NoteThread
+									note={ thread }
+									onAddReply={ onAddReply }
+									onDeleteNote={ handleDelete }
+									onEditNote={ onEditNote }
+									isSelected={ selectedNote === thread.id }
+									sidebarRef={ sidebarRef }
+									floating={
+										isFloating
+											? {
+													y: notePositions[
+														thread.id
+													],
+													registerThread,
+													unregisterThread,
+											  }
+											: undefined
+									}
+									onKeyDown={ ( event ) =>
+										navigate(
+											event,
+											thread,
+											selectedNote === thread.id
+										)
+									}
+								/>
+							</Fragment>
+						) ) }
+					</>
+				) }
+			</Stack>
+		</>
 	);
 }

@@ -20,6 +20,7 @@
 ### New Features
 
 -   Add a private `SiteExport` menu item, moved from `edit-site`. It offers downloading the theme with the user's changes, only while editing a template or a template part — the entities the exported theme is made of ([#81992](https://github.com/WordPress/gutenberg/pull/81992)).
+-   Notes: Honour a per-action note lock. The notes sidebar now hides or disables the affordances the server reports as locked through the `lockedNoteActions` editor setting, and shows a notice on a fully locked post ([#72724](https://github.com/WordPress/gutenberg/issues/72724)).
 
 ### Enhancements
 

@@ -73,6 +73,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 
 	// WordPress 7.2 compat.
 	require __DIR__ . '/compat/wordpress-7.2/view-config-api.php';
+	require __DIR__ . '/compat/wordpress-7.2/notes-locking.php';
 
 	// Real-time collaboration.
 	require __DIR__ . '/experimental/collaboration/class-gutenberg-rest-autosaves-controller.php';
