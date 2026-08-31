@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Update `use-recommended-components` rule to prefer `@wordpress/ui` `Field` over legacy `@wordpress/components` `BaseControl` ([#82095](https://github.com/WordPress/gutenberg/pull/82095)).
+-   Update `use-recommended-components` rule to prefer `@wordpress/ui` `Field` and `Fieldset` over legacy `@wordpress/components` `BaseControl` ([#82095](https://github.com/WordPress/gutenberg/pull/82095)).
 
 ### Bug Fixes
 

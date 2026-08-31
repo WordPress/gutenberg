@@ -21,7 +21,7 @@ const meta: Meta< typeof BaseControl > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Use [`Field`](?path=/docs/design-system-components-form-primitives-field--docs) from `@wordpress/ui` instead. For a purely visual label outside `Field.Root`, use `Field.VisualLabel`.',
+			notes: 'Use [`Field`](?path=/docs/design-system-components-form-primitives-field--docs) from `@wordpress/ui` instead. For a purely visual label outside `Field.Root`, use `Field.VisualLabel`. For a group legend, use [`Fieldset`](?path=/docs/design-system-components-form-primitives-fieldset--docs) and `Fieldset.Legend`.',
 		},
 	},
 };
