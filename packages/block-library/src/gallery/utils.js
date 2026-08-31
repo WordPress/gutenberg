@@ -72,7 +72,7 @@ export function getHrefAndDestination(
 }
 
 /**
- * Translates a link destination stored by WordPress into the value the Gallery
+ * Normalizes a link destination stored by WordPress into the value the Gallery
  * block uses. WordPress records the site-wide default in the
  * `image_default_link_type` option as `file` or `post`; the block calls the
  * same two destinations `media` and `attachment`. Any other value, including

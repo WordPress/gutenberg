@@ -171,12 +171,10 @@ export default function GalleryEdit( props ) {
 		aspectRatio,
 		layout,
 	} = attributes;
-	// Galleries saved before this value was translated, and galleries created by
+	// Galleries saved before this value was normalized, and galleries created by
 	// older versions of this block, hold WordPress' 'file' and 'post' rather than
-	// this block's 'media' and 'attachment'. Translate on the way in so the rest
-	// of the component only deals with this block's own values. What is stored
-	// stays as it is: rewriting it would change posts nobody asked us to change,
-	// and the front end reads the stored value through the same translation.
+	// this block's 'media' and 'attachment'. Normalize on the way in so the rest
+	// of the component only deals with this block's own values. What is stored stays as it is.
 	const linkTo = normalizeLinkTo( storedLinkTo );
 	const isFlexLayout = isGalleryFlexLayout( layout );
 	const previousLayoutRef = useRef( layout );
@@ -706,7 +704,7 @@ export default function GalleryEdit( props ) {
 	useEffect( () => {
 		// linkTo attribute must be saved so blocks don't break when changing image_default_link_type in options.php.
 		// That option stores 'file' or 'post', which this block calls 'media'
-		// and 'attachment', so translate it before storing it.
+		// and 'attachment', so normalize it before storing it.
 		if ( ! storedLinkTo ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {

@@ -1,7 +1,7 @@
 import { getHrefAndDestination, normalizeLinkTo } from '../utils';
 
 describe( 'normalizeLinkTo', () => {
-	it( 'translates the values WordPress stores in image_default_link_type', () => {
+	it( 'normalizes the values WordPress stores in image_default_link_type', () => {
 		expect( normalizeLinkTo( 'file' ) ).toBe( 'media' );
 		expect( normalizeLinkTo( 'post' ) ).toBe( 'attachment' );
 	} );
