@@ -41,7 +41,7 @@ jobs:
                       os: 'ubuntu-24.04'
                       annotations: true
                 exclude:
-                    # On PRs: Only test Node 24 on Ubuntu and Windows
+                    # Only test Node 24 on Ubuntu and Windows for pull requests.
                     - event: 'pull_request'
                       node: '26'
                     - event: 'pull_request'

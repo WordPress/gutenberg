@@ -38,7 +38,7 @@ jobs:
                 node: ['24', '26']
                 shard: ['1/4', '2/4', '3/4', '4/4']
                 exclude:
-                    # On PRs: Only test Node 24
+                    # Only test Node 24 for pull requests.
                     - event: 'pull_request'
                       node: '26'
 
