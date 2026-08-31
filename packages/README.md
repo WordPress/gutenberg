@@ -257,12 +257,13 @@ more of its dependencies are supplied separately by WordPress. The bundle and
 its runtime dependencies can then update on different schedules. A current
 Gutenberg checkout tests only one of the resulting version combinations.
 
-Before changing or removing a dependency contract, inspect every documented
-entrypoint and build output. Use package metadata, build configuration,
-dependency extraction, and generated asset data to identify which dependencies
-are bundled, externally supplied, or can be deployed either way. Also identify
-identity-sensitive dependencies such as private API locks, contexts,
-registries, symbols, and other singletons. Two runtime copies can be
+Before changing a published package contract or a shared runtime contract such
+as a registration, allowlist, opt-in gate, or compatibility bridge, inspect
+every documented entrypoint and build output. Use package metadata, build
+configuration, dependency extraction, and generated asset data to identify
+which dependencies are bundled, externally supplied, or can be deployed either
+way. Also identify identity-sensitive dependencies such as private API locks,
+contexts, registries, symbols, and other singletons. Two runtime copies can be
 incompatible even when their exports have the same shape.
 
 For a change to the package's own public API, verify representative existing
@@ -285,8 +286,12 @@ An affected dependency that always ships in the same artifact does not create
 a cross-version cell. The package's own public API still needs the direct
 consumer check above.
 
-Use the last published version before the change as the old package baseline.
-Include earlier versions when the declared support window requires them. Build
+Use the last published version before the change as the initial old package
+baseline. Trace which earlier versions still use the changed route, then search
+maintained downstream plugins and applications for bundles built from them. A
+new package release does not update an already-built bundle. Include every
+affected version required by the support window or a maintained downstream
+consumer, and name the version or entrypoint consumers must migrate to. Build
 the new side from the candidate change rather than treating unbuilt source as a
 published artifact. Resolve external dependencies from the WordPress versions
 the consumer supports, and verify what those runtimes actually ship instead of
@@ -299,7 +304,8 @@ layer:
 2. Compile against their published TypeScript declarations.
 3. Build each supported entrypoint with its actual bundling and WordPress
    dependency extraction configuration.
-4. Verify the corresponding WordPress runtime exports and shared identity.
+4. Verify the corresponding WordPress runtime exports, module-load gates, and
+   shared identity.
 5. Exercise the affected behaviour, including any compatibility route.
 
 Record each layer as `pass`, `fail`, or `unverified`. Current repository source
@@ -328,10 +334,17 @@ Centralize the fallback or adapter in the consuming package. Treat removal of
 the provider bridge and consumer fallback as separate release events, and
 remove each only after its supported pairings no longer need it.
 
+A scheduled removal version is a review point, not evidence that affected
+bundles have disappeared. At that point, repeat the downstream consumer and
+release-channel audit before deleting the bridge.
+
 Verify the overlap with the real artifacts and runtime. An identity-bound route,
 such as a private API lock, can still fail across duplicate package copies even
 when the provider retains the export. In that case, use a different adapter or
 make the supported entrypoint or version change explicit.
+
+A replacement package version or entrypoint helps only consumers that rebuild
+with it. It does not change bundles that are already deployed.
 
 Two incidents show different forms of this problem:
 
@@ -346,10 +359,14 @@ Two incidents show different forms of this problem:
 -   The [DataViews cleanup discussion in #81230](https://github.com/WordPress/gutenberg/issues/81230#issuecomment-5358110498)
     shows that an older bundled `@wordpress/dataviews` can still request a
     private `@wordpress/components` API after a newer WordPress runtime removes
-    it. A bundled `@wordpress/private-apis` copy also cannot unlock an object
-    created by a different runtime copy. DataViews has a `/wp` entrypoint that
-    bundles a different dependency set, so each supported entrypoint needs its
-    own topology assessment.
+    it. [#82221](https://github.com/WordPress/gutenberg/pull/82221) had to restore
+    the DataViews private API opt-in because older bundles call it when the
+    module loads. Restoring that access gate does not restore private APIs
+    removed from other runtime packages. A bundled `@wordpress/private-apis`
+    copy also cannot unlock an object created by a different runtime copy.
+    DataViews has a `/wp` entrypoint that bundles a different dependency set,
+    but moving to it or a newer package version requires downstream consumers
+    to rebuild. Each supported entrypoint needs its own topology assessment.
 
 A private API bridge does not become a supported consumer contract. Keep or add
 the smallest centralized compatibility route when a required pairing fails,
