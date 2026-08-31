@@ -53,8 +53,8 @@
 	grid-row: 1;
 	/*rtl:end:ignore*/
 	padding: 0 8% 0 8%;
-	// stylelint-disable-next-line property-no-deprecated -- Pending review of overflow-wrap alternative.
-	word-wrap: break-word;
+	// stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- Pending review of overflow-wrap alternative.
+	word-break: break-word;
 }
 
 .wp-block-media-text.has-media-on-the-right > .wp-block-media-text__media {
