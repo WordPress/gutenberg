@@ -371,6 +371,12 @@ const LayoutPanelComponent = ( {
 					id: 'discussion',
 					label: 'Discussion',
 					children: [ 'comment_status', 'ping_status' ],
+					layout: getPanelLayoutFromStoryArgs( {
+						summary: [ 'discussion' ],
+						labelPosition,
+						openAs,
+						editVisibility,
+					} ),
 				},
 				{
 					id: 'address1',
