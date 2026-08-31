@@ -92,6 +92,9 @@ class Gutenberg_Original_Attachment_Filter_Test extends WP_UnitTestCase {
 
 		$links = $response->get_links();
 		$this->assertArrayHasKey( 'https://api.w.org/original-attachment', $links );
+		// `rest_prepare_attachment` fires twice per attachment; the
+		// filter must not add the link twice.
+		$this->assertCount( 1, $links['https://api.w.org/original-attachment'] );
 
 		$link = $links['https://api.w.org/original-attachment'][0];
 		$this->assertStringEndsWith( '/wp/v2/media/' . $original, $link['href'] );
@@ -99,6 +102,7 @@ class Gutenberg_Original_Attachment_Filter_Test extends WP_UnitTestCase {
 
 		// The curie-compacted rel hydrates under `_embedded` with `?_embed`.
 		$embedded = rest_get_server()->response_to_data( $response, true );
+		$this->assertCount( 1, $embedded['_embedded']['wp:original-attachment'] );
 		$this->assertSame(
 			$original,
 			$embedded['_embedded']['wp:original-attachment'][0]['id']
