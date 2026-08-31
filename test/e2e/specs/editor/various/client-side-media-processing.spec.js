@@ -799,6 +799,64 @@ test.describe( 'Client-side media processing', () => {
 		await page.unroute( '**/wp/v2/media**' );
 	} );
 
+	test( 'reports a server failure in plain language', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+	} ) => {
+		/*
+		 * Answer the create request with a 500 carrying an HTML body, which
+		 * is what a PHP fatal or a server that cannot write its temporary
+		 * files produces. `apiFetch` cannot read that as a REST error, so it
+		 * rejects with its internal `invalid_json` code — and the editor used
+		 * to show that verbatim as "The response is not a valid JSON
+		 * response." (see gutenberg#81711).
+		 */
+		await page.route( '**/wp/v2/media**', async ( route ) => {
+			const request = route.request();
+			const isCreate =
+				request.method() === 'POST' &&
+				/\/wp\/v2\/media(\?|$)/.test( request.url() );
+			if ( isCreate ) {
+				await route.fulfill( {
+					status: 500,
+					contentType: 'text/html',
+					body: '<html><body>Fatal error: allowed memory size exhausted</body></html>',
+				} );
+				return;
+			}
+			await route.continue();
+		} );
+
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		const uniqueName = await mediaProcessingUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			'1024x768_e2e_test_image_size.jpeg'
+		);
+
+		const snackbars = page.locator( '.components-snackbar' );
+
+		// The message names the file and offers a way forward.
+		const errorSnackbar = snackbars.filter( {
+			hasText: /failed to upload/i,
+		} );
+		await expect( errorSnackbar ).toBeVisible( { timeout: 30_000 } );
+		await expect( errorSnackbar ).toContainText( uniqueName );
+
+		// The REST client's internals must not reach the user.
+		await expect(
+			snackbars.filter( { hasText: /valid JSON/i } )
+		).toBeHidden();
+
+		await page.unroute( '**/wp/v2/media**' );
+	} );
+
 	test( 'recovers when the image processing worker crashes mid-upload', async ( {
 		page,
 		editor,

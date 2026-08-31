@@ -15,16 +15,12 @@
 		{ "path": "../data" },
 		{ "path": "../date" },
 		{ "path": "../deprecated/tsconfig.build.json" },
-		{ "path": "../dom" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons/tsconfig.build.json" },
 		{ "path": "../kebab-case" },
 		{ "path": "../keycodes/tsconfig.build.json" },
-		{ "path": "../primitives" },
-		{ "path": "../theme/tsconfig.build.json" },
 		{ "path": "../ui/tsconfig.build.json" },
-		{ "path": "../url" },
 		{ "path": "../warning" }
 	]
 }

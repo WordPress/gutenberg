@@ -36,8 +36,10 @@
 	},
 	"dependencies": {
 		"@emotion/babel-plugin": "^11.13.5",
+		"@wordpress/browserslist-config": "file:../browserslist-config",
 		"@wordpress/style-runtime": "file:../style-runtime",
 		"autoprefixer": "^10.4.21",
+		"browserslist": "^4.28.4",
 		"browserslist-to-esbuild": "^2.1.1",
 		"change-case": "^4.1.2",
 		"chokidar": "^4.0.0",
@@ -59,7 +61,7 @@
 		"@wordpress/boot": ">=0.3.0 <1.0.0",
 		"@wordpress/private-apis": "^1.0.0",
 		"@wordpress/route": ">=0.2.0 <1.0.0",
-		"@wordpress/theme": ">=0.8.0 <2.0.0"
+		"@wordpress/theme": ">=0.8.0 <3.0.0"
 	},
 	"peerDependenciesMeta": {
 		"@wordpress/boot": {
