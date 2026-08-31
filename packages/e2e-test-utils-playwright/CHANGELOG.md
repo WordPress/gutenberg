@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   `setGutenbergExperiments`: Remove the special handling for the removed `active_templates` experiment.
+
 ## 1.54.0 (2026-08-26)
 
 ## 1.53.0 (2026-08-12)
