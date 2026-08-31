@@ -29,26 +29,31 @@ export async function check( { headSha, dryRun } ) {
 	await fetchTag();
 	await git.fetch( [ '--no-tags', 'origin', headSha ] );
 
-	/* Deepen until a merge base is computable or history is complete. */
+	/*
+	 * Deepen until a merge base is found or history is complete. An empty
+	 * merge-base result is indistinguishable from insufficient depth, so keep
+	 * deepening while shallow; exit codes are unreliable (see isAncestor).
+	 */
 	for (;;) {
-		try {
-			await git.raw( [ 'merge-base', TAG_REF, headSha ] );
+		const base = await git
+			.raw( [ 'merge-base', TAG_REF, headSha ] )
+			.catch( () => '' );
+		if ( base.trim() ) {
 			break;
-		} catch {
-			const shallow = (
-				await git.raw( [ 'rev-parse', '--is-shallow-repository' ] )
-			).trim();
-			if ( shallow !== 'true' ) {
-				break;
-			}
-			await git.fetch( [
-				'--no-tags',
-				'--deepen=500',
-				'origin',
-				'trunk',
-				headSha,
-			] );
 		}
+		const shallow = (
+			await git.raw( [ 'rev-parse', '--is-shallow-repository' ] )
+		).trim();
+		if ( shallow !== 'true' ) {
+			break;
+		}
+		await git.fetch( [
+			'--no-tags',
+			'--deepen=500',
+			'origin',
+			'trunk',
+			headSha,
+		] );
 	}
 
 	// Re-read the tag just before deciding to shrink the tag-move race window.

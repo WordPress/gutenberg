@@ -143,17 +143,18 @@ export async function resolveBaseline() {
  * @return {Promise<boolean>} Whether ancestor is an ancestor of descendant.
  */
 export async function isAncestor( ancestor, descendant ) {
-	try {
-		await git.raw( [
-			'merge-base',
-			'--is-ancestor',
-			ancestor,
-			descendant,
-		] );
-		return true;
-	} catch {
-		return false;
-	}
+	/*
+	 * Never trust exit codes here: `merge-base --is-ancestor` exits 1 with an
+	 * empty stderr, which simple-git resolves instead of rejecting. Compare
+	 * the merge base against the ancestor commit instead.
+	 */
+	const ancestorSha = (
+		await git.raw( [ 'rev-parse', `${ ancestor }^{commit}` ] )
+	).trim();
+	const base = await git
+		.raw( [ 'merge-base', ancestorSha, descendant ] )
+		.catch( () => '' );
+	return base.trim() === ancestorSha;
 }
 
 /**
