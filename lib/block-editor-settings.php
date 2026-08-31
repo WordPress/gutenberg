@@ -121,6 +121,10 @@ function gutenberg_get_block_editor_settings( $settings ) {
 
 	$settings['canEditCSS'] = current_user_can( 'edit_css' );
 
+	if ( ! isset( $settings['fontLibraryEnabled'] ) ) {
+		$settings['fontLibraryEnabled'] = current_theme_supports( 'font-library' );
+	}
+
 	return $settings;
 }
 add_filter( 'block_editor_settings_all', 'gutenberg_get_block_editor_settings', 0 );
