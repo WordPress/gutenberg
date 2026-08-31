@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   DataForm: Remove the minimum row height from the `regular` layout, so rows size to their content. [#82052](https://github.com/WordPress/gutenberg/pull/82052)
+
 ### Internal
 
 -   Remove unused dependency `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
