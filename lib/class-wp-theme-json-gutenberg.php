@@ -1451,7 +1451,7 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	protected static function append_to_selector( $selector, $to_append ) {
 		if ( ! str_contains( $selector, ',' ) ) {
-			return $selector . $to_append;
+			return trim( $selector, " \t\n" ) . $to_append;
 		}
 
 		/**
@@ -1474,7 +1474,7 @@ class WP_Theme_JSON_Gutenberg {
 		 * @link https://www.w3.org/TR/css-syntax-3/#parse-comma-separated-list-of-component-values
 		 */
 		if ( strlen( $selector ) === strcspn( $selector, '/\'"(<\\' ) ) {
-			return str_replace( ',', $to_append . ',', $selector ) . $to_append;
+			return preg_replace( '~[ \t\n]*,[ \t\n]*~', "{$to_append}, ", trim( $selector, " \t\n" ) ) . $to_append;
 		}
 
 		$new_selectors = array();
@@ -1500,7 +1500,7 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	protected static function prepend_to_selector( $selector, $to_prepend ) {
 		if ( ! str_contains( $selector, ',' ) ) {
-			return $to_prepend . $selector;
+			return $to_prepend . trim( $selector, " \t\n" );
 		}
 
 		/**
@@ -1523,7 +1523,7 @@ class WP_Theme_JSON_Gutenberg {
 		 * @link https://www.w3.org/TR/css-syntax-3/#parse-comma-separated-list-of-component-values
 		 */
 		if ( strlen( $selector ) === strcspn( $selector, '/\'"(<\\' ) ) {
-			return $to_prepend . str_replace( ',', ',' . $to_prepend, $selector );
+			return $to_prepend . preg_replace( '~[ \t\n]*,[ \t\n]*~', ", {$to_prepend}", trim( $selector, " \t\n" ) );
 		}
 
 		$new_selectors = array();
