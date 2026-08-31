@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `BackgroundImageControl`: Support setting the background image from a URL, through the URL field in the media replace popover ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+
 ### Internal
 
 -   Remove unused dependencies `@wordpress/escape-html`, `@wordpress/wordcount` and `deepmerge` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
