@@ -9,7 +9,7 @@ const PAGE_SIZE = 20;
  *
  * @param {Array}  currentCategoryPatterns An array of the current patterns to display.
  * @param {string} currentCategory         The currently selected category.
- * @param {Object} scrollContainerRef      Ref of container to to find scroll container for when moving between pages.
+ * @param {Object} scrollContainerRef      Ref of container to find scroll container for when moving between pages.
  * @param {string} currentFilter           The currently search filter.
  *
  * @return {Object} Returns the relevant paging values. (totalItems, categoryPatternsList, numPages, changePage, currentPage)

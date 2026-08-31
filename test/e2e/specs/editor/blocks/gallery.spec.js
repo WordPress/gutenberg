@@ -152,6 +152,129 @@ test.describe( 'Gallery', () => {
 			);
 	} );
 
+	test( 'Grid layout uses native controls without Gallery Flex child styles', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/gallery',
+			attributes: {
+				caption: 'Gallery caption',
+				columns: 2,
+				imageCrop: true,
+				layout: { type: 'flex' },
+			},
+			innerBlocks: [
+				{
+					name: 'core/image',
+					attributes: {
+						id: uploadedMedia.id,
+						url: uploadedMedia.source_url,
+						caption: 'Image caption',
+					},
+				},
+				{
+					name: 'core/image',
+					attributes: {
+						id: uploadedMedia.id,
+						url: uploadedMedia.source_url,
+					},
+				},
+			],
+		} );
+
+		const gallery = editor.canvas.locator( '.wp-block-gallery' );
+		await editor.selectBlocks( gallery );
+		await editor.openDocumentSettingsSidebar();
+		await page
+			.getByRole( 'radio', { name: 'Transform to Gallery Grid' } )
+			.click();
+
+		await expect(
+			page.getByRole( 'radio', { name: 'Gallery Grid' } )
+		).toBeChecked();
+		await page.getByRole( 'tab', { name: 'Settings' } ).click();
+		await expect( page.getByLabel( 'Crop images to fit' ) ).toHaveCount(
+			0
+		);
+		await page.getByRole( 'tab', { name: 'Styles' } ).click();
+		await expect( page.getByText( 'Max. columns' ) ).toBeVisible();
+
+		await expect( gallery ).toHaveClass( /is-layout-grid/ );
+		await expect( gallery ).not.toHaveClass( /columns-2|is-cropped/ );
+
+		const image = gallery.locator( '.wp-block-image' ).first();
+		const imageCaption = image.locator( 'figcaption' );
+		const galleryCaption = gallery.locator(
+			':scope > .blocks-gallery-caption'
+		);
+
+		expect(
+			await image.evaluate(
+				( element ) => window.getComputedStyle( element ).display
+			)
+		).not.toBe( 'flex' );
+		expect(
+			await imageCaption.evaluate(
+				( element ) => window.getComputedStyle( element ).position
+			)
+		).toBe( 'absolute' );
+		expect(
+			await galleryCaption.evaluate(
+				( element ) => window.getComputedStyle( element ).gridColumnEnd
+			)
+		).toBe( '-1' );
+
+		await editor.insertBlock( {
+			name: 'core/gallery',
+			attributes: { layout: { type: 'grid' } },
+		} );
+		const emptyGalleryPlaceholder = editor.canvas
+			.locator( '.wp-block-gallery' )
+			.last()
+			.locator( '.block-editor-media-placeholder' );
+		expect(
+			await emptyGalleryPlaceholder.evaluate(
+				( element ) => window.getComputedStyle( element ).gridColumnEnd
+			)
+		).toBe( '-1' );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		const renderedGallery = page
+			.locator( '.wp-block-gallery.is-layout-grid' )
+			.first();
+		await expect( renderedGallery ).not.toHaveClass(
+			/columns-2|is-cropped|wp-block-gallery-\d+/
+		);
+		expect(
+			await renderedGallery
+				.locator( '.wp-block-image' )
+				.first()
+				.evaluate(
+					( element ) => window.getComputedStyle( element ).display
+				)
+		).not.toBe( 'flex' );
+		expect(
+			await renderedGallery
+				.locator( '.wp-block-image figcaption' )
+				.evaluate(
+					( element ) => window.getComputedStyle( element ).position
+				)
+		).toBe( 'absolute' );
+		expect(
+			await renderedGallery
+				.locator( ':scope > .blocks-gallery-caption' )
+				.evaluate(
+					( element ) =>
+						window.getComputedStyle( element ).gridColumnEnd
+				)
+		).toBe( '-1' );
+	} );
+
 	test( "uploaded images' captions can be edited", async ( {
 		admin,
 		editor,
