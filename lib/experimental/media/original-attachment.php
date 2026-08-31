@@ -86,9 +86,11 @@ add_filter( 'wp_edited_image_metadata', 'gutenberg_record_original_attachment_id
  *
  * Reads `_wp_attachment_original_id` postmeta (written by the
  * `wp_edited_image_metadata` hook above) and adds the resolved
- * attachment id and URL to the response under
- * `media_details.original_attachment`. Absent for attachments with
- * no edit lineage.
+ * attachment id and URL as a root-level `original_attachment` field.
+ * Root-level rather than inside `media_details` because it describes
+ * a relationship between attachments (like `post`, the parent post),
+ * not a property of the media file. Absent for attachments with no
+ * edit lineage.
  *
  * Only emitted in the `edit` context: the lineage is an editor
  * concern (the Restore-original action), and scoping it here avoids
@@ -110,9 +112,6 @@ function gutenberg_add_original_attachment_to_response( $response, $post, $reque
 	}
 
 	$data = $response->get_data();
-	if ( empty( $data['media_details'] ) || ! is_array( $data['media_details'] ) ) {
-		return $response;
-	}
 
 	$original_id = gutenberg_get_original_attachment_id( $post->ID );
 	if ( $original_id === (int) $post->ID ) {
@@ -127,7 +126,7 @@ function gutenberg_add_original_attachment_to_response( $response, $post, $reque
 		return $response;
 	}
 
-	$data['media_details']['original_attachment'] = array(
+	$data['original_attachment'] = array(
 		'attachment_id' => $original_id,
 		'source_url'    => $source_url,
 	);

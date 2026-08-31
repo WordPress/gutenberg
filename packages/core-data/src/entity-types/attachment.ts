@@ -18,10 +18,6 @@ interface MediaDetails {
 	sizes?: { [ key: string ]: Size };
 	image_meta?: ImageMeta;
 	original_image?: string;
-	original_attachment?: {
-		attachment_id: number;
-		source_url: string;
-	};
 	// Audio/video metadata
 	bitrate?: number;
 	mime_type?: string;
@@ -209,6 +205,18 @@ declare module './base-entity-records' {
 			 * The ID for the associated post of the attachment.
 			 */
 			post: ContextualField< number | null, 'view' | 'edit', C >;
+			/**
+			 * The lineage root this attachment was edited from. Present only
+			 * when the attachment was created by editing another image.
+			 */
+			original_attachment?: ContextualField<
+				{
+					attachment_id: number;
+					source_url: string;
+				},
+				'edit',
+				C
+			>;
 			/**
 			 * URL to the original attachment file.
 			 */
