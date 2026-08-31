@@ -120,24 +120,30 @@ function gutenberg_add_original_attachment_to_response( $response, $post, $reque
 		return $response;
 	}
 
-	// Skip when the original is unreachable (deleted, missing file):
-	// don't advertise a restore target that cannot load.
-	$source_url = wp_get_attachment_url( $original_id );
-	if ( ! is_string( $source_url ) || '' === $source_url ) {
-		return $response;
-	}
-
+	// Trust the stored meta rather than verifying the original here:
+	// the `delete_attachment` cleanup below keeps it accurate, and a
+	// consumer fetching a dangling id (e.g. an original sitting in the
+	// trash) simply gets no record. Verifying would cost an uncached
+	// meta query per derivative on every list request.
 	$data['original_attachment'] = $original_id;
 	$response->set_data( $data );
 
 	// Mirror `featured_media`: expose the relationship as an
 	// embeddable link so clients can hydrate the original attachment
-	// with `?_embed`.
-	$response->add_link(
-		'https://api.w.org/original-attachment',
-		rest_url( 'wp/v2/media/' . $original_id ),
-		array( 'embeddable' => true )
-	);
+	// with `?_embed`. Core fires `rest_prepare_attachment` twice per
+	// attachment — once from the posts controller's
+	// `prepare_item_for_response()` and again from the attachments
+	// controller wrapping it — and `add_link()` appends
+	// unconditionally, so guard against adding the link twice.
+	$rel   = 'https://api.w.org/original-attachment';
+	$links = $response->get_links();
+	if ( ! isset( $links[ $rel ] ) ) {
+		$response->add_link(
+			$rel,
+			rest_url( 'wp/v2/media/' . $original_id ),
+			array( 'embeddable' => true )
+		);
+	}
 
 	return $response;
 }
@@ -148,10 +154,10 @@ add_filter( 'rest_prepare_attachment', 'gutenberg_add_original_attachment_to_res
  * original is deleted.
  *
  * Without this, descendants would carry a dangling pointer at a
- * recycled attachment id. The REST filter already skips emitting the
- * field when the URL doesn't resolve, but cleaning up the stored meta
- * keeps the database accurate and prevents the field from
- * resurrecting if the deleted id is later reused.
+ * recycled attachment id. The REST filter trusts this meta without
+ * verifying the original still exists, so this cleanup is what keeps
+ * the exposed field accurate and prevents it from pointing at an
+ * unrelated attachment if the deleted id is later reused.
  *
  * Runs on hard delete only: with `MEDIA_TRASH`, trashing fires no
  * `delete_attachment`, so descendants keep pointing at a trashed
