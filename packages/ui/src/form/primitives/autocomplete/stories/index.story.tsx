@@ -4,6 +4,7 @@ import { useRef, useState } from '@wordpress/element';
 import { search } from '@wordpress/icons';
 import * as Autocomplete from '../index';
 import { Icon } from '../../../../icon';
+import { Spinner } from '../../../../spinner';
 import { Input } from '../../input';
 import { InputLayout } from '../../input-layout';
 import {
@@ -127,11 +128,16 @@ export const OpenOnlyOnMatch: Story = {
 	},
 };
 
+/**
+ * Fetches matching items asynchronously. Keep `Status` mounted and change its
+ * children. Use `Empty` for no results.
+ */
 export const AsyncItems: Story = {
 	render: function Template( args ) {
 		const [ query, setQuery ] = useState( '' );
 		const [ loading, setLoading ] = useState( false );
 		const [ results, setResults ] = useState< typeof URLS >( [] );
+		const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
 
 		return (
 			<Autocomplete.Root
@@ -141,7 +147,9 @@ export const AsyncItems: Story = {
 				onValueChange={ ( newValue ) => {
 					setQuery( newValue );
 					setLoading( true );
-					setTimeout( () => {
+					setResults( [] );
+					clearTimeout( timeoutRef.current );
+					timeoutRef.current = setTimeout( () => {
 						setResults(
 							URLS.filter( ( item ) =>
 								item.value
@@ -156,7 +164,12 @@ export const AsyncItems: Story = {
 				<Autocomplete.Input placeholder="Enter a URL" />
 				<Autocomplete.Popup>
 					<Autocomplete.Status>
-						{ loading ? 'Loading...' : null }
+						{ loading ? (
+							<>
+								<Spinner />
+								Loading…
+							</>
+						) : null }
 					</Autocomplete.Status>
 					<Autocomplete.Empty>
 						{ loading ? null : 'No matching items.' }

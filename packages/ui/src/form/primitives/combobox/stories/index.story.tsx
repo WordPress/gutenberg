@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useEffect, useState } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import * as Combobox from '../index';
+import { Spinner } from '../../../../spinner';
 import {
 	ITEMS,
 	GROUPED_ITEMS,
@@ -243,28 +244,40 @@ export const Creatable: Story = {
 	},
 };
 
+/**
+ * Loads the item list asynchronously. Keep `Status` mounted and change its
+ * children. Use `Empty` for no results.
+ */
 export const AsyncItems: Story = {
 	render: function Template( args ) {
-		const [ loading, setLoading ] = useState( true );
+		const [ loading, setLoading ] = useState( false );
 		const [ items, setItems ] = useState< FixtureItem[] >( [] );
 		const [ value, setValue ] = useState< unknown >();
-
-		useEffect( () => {
-			const timeout = setTimeout( () => {
-				setItems( ITEMS );
-				setValue( ITEMS[ 0 ] );
-				setLoading( false );
-			}, 3000 );
-
-			return () => clearTimeout( timeout );
-		}, [] );
+		const [ open, setOpen ] = useState( false );
+		const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
 
 		return (
 			<Combobox.Root
 				{ ...args }
 				items={ items }
 				value={ value }
+				open={ open }
 				onValueChange={ setValue }
+				onOpenChange={ ( nextOpen ) => {
+					setOpen( nextOpen );
+					if ( ! nextOpen ) {
+						clearTimeout( timeoutRef.current );
+						return;
+					}
+					setLoading( true );
+					setItems( [] );
+					clearTimeout( timeoutRef.current );
+					timeoutRef.current = setTimeout( () => {
+						setItems( ITEMS );
+						setValue( ( current ) => current ?? ITEMS[ 0 ] );
+						setLoading( false );
+					}, 500 );
+				} }
 			>
 				<Combobox.Trigger />
 				<Combobox.Popup>
@@ -272,7 +285,12 @@ export const AsyncItems: Story = {
 						<Combobox.Input placeholder="Search" />
 					</div>
 					<Combobox.Status>
-						{ loading ? 'Loading...' : null }
+						{ loading ? (
+							<>
+								<Spinner />
+								Loading…
+							</>
+						) : null }
 					</Combobox.Status>
 					<Combobox.Empty>
 						{ loading ? null : 'No results found.' }

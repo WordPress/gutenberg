@@ -166,6 +166,7 @@
 			grid-area: main;
 			display: flex;
 			align-items: center;
+			gap: var(--wpds-dimension-gap-xs);
 			min-height: var(--wp-ui-popup-empty-min-height);
 			padding-inline: var(--wp-ui-popup-empty-padding-inline);
 			font-family: var(--wpds-typography-font-family-body);
