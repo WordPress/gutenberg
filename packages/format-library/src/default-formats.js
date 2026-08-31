@@ -13,6 +13,7 @@ import { unknown } from './unknown';
 import { language } from './language';
 import { math } from './math';
 import { nonBreakingSpace } from './non-breaking-space';
+import { lineBreakWbr, softHyphen } from './line-break';
 
 export default [
 	bold,
@@ -30,4 +31,6 @@ export default [
 	language,
 	math,
 	nonBreakingSpace,
+	lineBreakWbr,
+	softHyphen,
 ];
