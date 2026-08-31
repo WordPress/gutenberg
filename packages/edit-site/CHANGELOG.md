@@ -34,6 +34,8 @@
 
 ### Internal
 
+-   Seed content-surface `ThemeProvider` backgrounds with `#fcfcfc` instead of `#ffffff`, matching the design system default and preserving room for stronger and weaker neutral surface tokens ([#81646](https://github.com/WordPress/gutenberg/pull/81646)).
+
 -   Stop rendering `EditorKeyboardShortcutsRegister`, which the editor provider now renders itself ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).
 
 ### Bug Fixes
