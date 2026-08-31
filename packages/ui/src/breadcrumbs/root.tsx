@@ -33,6 +33,7 @@ type BreadcrumbItemDescriptor = {
 	kind: 'link' | 'current';
 	label: string;
 	measurementClassName?: string;
+	openInNewTab: boolean;
 	measurementStyle?: CSSProperties;
 };
 
@@ -59,7 +60,7 @@ function validateNestedArrayKeys( children: ReactNode ) {
 		for ( const arrayChild of child ) {
 			if ( isValidElement( arrayChild ) && arrayChild.key === null ) {
 				throw new Error(
-					'Breadcrumbs: Items rendered from an array need stable React keys.'
+					'Breadcrumb: Items rendered from an array need stable React keys.'
 				);
 			}
 		}
@@ -79,7 +80,7 @@ function getBreadcrumbItems( children: ReactNode ) {
 		if ( ! isValidElement< LinkItemProps | CurrentItemProps >( child ) ) {
 			if ( process.env.NODE_ENV !== 'production' ) {
 				throw new Error(
-					'Breadcrumbs: <Breadcrumbs.Root> only accepts <Breadcrumbs.LinkItem> and <Breadcrumbs.CurrentItem> as direct children.'
+					'Breadcrumb: <Breadcrumb.Root> only accepts <Breadcrumb.LinkItem> and <Breadcrumb.CurrentItem> as direct children.'
 				);
 			}
 			return;
@@ -95,7 +96,7 @@ function getBreadcrumbItems( children: ReactNode ) {
 		if ( ! kind ) {
 			if ( process.env.NODE_ENV !== 'production' ) {
 				throw new Error(
-					'Breadcrumbs: <Breadcrumbs.Root> only accepts <Breadcrumbs.LinkItem> and <Breadcrumbs.CurrentItem> as direct children.'
+					'Breadcrumb: <Breadcrumb.Root> only accepts <Breadcrumb.LinkItem> and <Breadcrumb.CurrentItem> as direct children.'
 				);
 			}
 			return;
@@ -105,7 +106,7 @@ function getBreadcrumbItems( children: ReactNode ) {
 		if ( typeof label !== 'string' || ! label.trim() ) {
 			if ( process.env.NODE_ENV !== 'production' ) {
 				throw new Error(
-					`Breadcrumbs: <Breadcrumbs.${
+					`Breadcrumb: <Breadcrumb.${
 						kind === 'link' ? 'LinkItem' : 'CurrentItem'
 					}> requires a non-empty text label.`
 				);
@@ -120,7 +121,7 @@ function getBreadcrumbItems( children: ReactNode ) {
 		) {
 			if ( process.env.NODE_ENV !== 'production' ) {
 				throw new Error(
-					'Breadcrumbs: <Breadcrumbs.LinkItem> requires a usable `href`.'
+					'Breadcrumb: <Breadcrumb.LinkItem> requires a usable `href`.'
 				);
 			}
 			return;
@@ -142,6 +143,9 @@ function getBreadcrumbItems( children: ReactNode ) {
 				child.props.className,
 				renderElement?.props.className
 			),
+			openInNewTab:
+				kind === 'link' &&
+				( child.props as LinkItemProps ).openInNewTab === true,
 			measurementStyle: {
 				...child.props.style,
 				...renderElement?.props.style,
@@ -157,22 +161,22 @@ function getBreadcrumbItems( children: ReactNode ) {
 
 		if ( linkItems.length === 0 ) {
 			throw new Error(
-				'Breadcrumbs: <Breadcrumbs.Root> requires at least one <Breadcrumbs.LinkItem>.'
+				'Breadcrumb: <Breadcrumb.Root> requires at least one <Breadcrumb.LinkItem>.'
 			);
 		}
 		if ( currentItems.length === 0 ) {
 			throw new Error(
-				'Breadcrumbs: <Breadcrumbs.Root> requires one final <Breadcrumbs.CurrentItem>.'
+				'Breadcrumb: <Breadcrumb.Root> requires one final <Breadcrumb.CurrentItem>.'
 			);
 		}
 		if ( currentItems.length > 1 ) {
 			throw new Error(
-				'Breadcrumbs: <Breadcrumbs.Root> accepts exactly one <Breadcrumbs.CurrentItem>.'
+				'Breadcrumb: <Breadcrumb.Root> accepts exactly one <Breadcrumb.CurrentItem>.'
 			);
 		}
 		if ( items.at( -1 )?.kind !== 'current' ) {
 			throw new Error(
-				'Breadcrumbs: <Breadcrumbs.CurrentItem> must be the final child of <Breadcrumbs.Root>.'
+				'Breadcrumb: <Breadcrumb.CurrentItem> must be the final child of <Breadcrumb.Root>.'
 			);
 		}
 	}
@@ -235,13 +239,13 @@ function getContentBoxInlineSize( element: HTMLElement ) {
  * ancestors that do not fit into an accessible overflow menu.
  *
  * ```jsx
- * <Breadcrumbs.Root aria-label="Breadcrumbs">
- *   <Breadcrumbs.LinkItem href="/">Dashboard</Breadcrumbs.LinkItem>
- *   <Breadcrumbs.CurrentItem>Settings</Breadcrumbs.CurrentItem>
- * </Breadcrumbs.Root>
+ * <Breadcrumb.Root aria-label="Breadcrumbs">
+ *   <Breadcrumb.LinkItem href="/">Dashboard</Breadcrumb.LinkItem>
+ *   <Breadcrumb.CurrentItem>Settings</Breadcrumb.CurrentItem>
+ * </Breadcrumb.Root>
  * ```
  */
-const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbsRoot(
+const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 	{
 		'aria-label': ariaLabel,
 		'aria-labelledby': ariaLabelledBy,
@@ -449,7 +453,7 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbsRoot(
 			focusOverflowAfterLayoutRef.current = false;
 			overflowTriggerRef.current.focus();
 		}
-	}, [ responsiveState.collapsedKeys.length ] );
+	}, [ responsiveState.collapsedKeys ] );
 
 	const applyPendingResponsiveState = useCallback( () => {
 		if ( ! pendingStateRef.current ) {
@@ -663,6 +667,9 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbsRoot(
 										styles[ 'measurement-label' ],
 										item.measurementClassName
 									) }
+									data-open-in-new-tab={
+										item.openInNewTab ? '' : undefined
+									}
 									style={ item.measurementStyle }
 								>
 									{ item.label }
@@ -717,6 +724,6 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbsRoot(
 	return root;
 } );
 
-Root.displayName = 'Breadcrumbs.Root';
+Root.displayName = 'Breadcrumb.Root';
 
 export { Root };

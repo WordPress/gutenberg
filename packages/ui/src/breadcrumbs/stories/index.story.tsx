@@ -1,14 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, waitFor, within } from 'storybook/test';
 import { forwardRef } from '@wordpress/element';
 import type { ComponentProps } from 'react';
-import * as Breadcrumbs from '../';
+import * as Breadcrumb from '../';
 
-const meta: Meta< typeof Breadcrumbs.Root > = {
-	title: 'Design System/Components/Breadcrumbs',
-	component: Breadcrumbs.Root,
+const meta: Meta< typeof Breadcrumb.Root > = {
+	title: 'Design System/Components/Breadcrumb',
+	component: Breadcrumb.Root,
 	subcomponents: {
-		'Breadcrumbs.LinkItem': Breadcrumbs.LinkItem,
-		'Breadcrumbs.CurrentItem': Breadcrumbs.CurrentItem,
+		'Breadcrumb.LinkItem': Breadcrumb.LinkItem,
+		'Breadcrumb.CurrentItem': Breadcrumb.CurrentItem,
 	},
 	argTypes: {
 		children: { control: false },
@@ -24,23 +25,21 @@ const meta: Meta< typeof Breadcrumbs.Root > = {
 
 export default meta;
 
-type Story = StoryObj< typeof Breadcrumbs.Root >;
+type Story = StoryObj< typeof Breadcrumb.Root >;
 
 function ExampleTrail( { ariaLabel = 'Breadcrumbs' }: { ariaLabel?: string } ) {
 	return (
-		<Breadcrumbs.Root aria-label={ ariaLabel }>
-			<Breadcrumbs.LinkItem href="/">Dashboard</Breadcrumbs.LinkItem>
-			<Breadcrumbs.LinkItem href="/products">
-				Products
-			</Breadcrumbs.LinkItem>
-			<Breadcrumbs.LinkItem href="/products/themes">
+		<Breadcrumb.Root aria-label={ ariaLabel }>
+			<Breadcrumb.LinkItem href="/">Dashboard</Breadcrumb.LinkItem>
+			<Breadcrumb.LinkItem href="/products">Products</Breadcrumb.LinkItem>
+			<Breadcrumb.LinkItem href="/products/themes">
 				Themes
-			</Breadcrumbs.LinkItem>
-			<Breadcrumbs.LinkItem href="/products/themes/twentytwentyfive">
+			</Breadcrumb.LinkItem>
+			<Breadcrumb.LinkItem href="/products/themes/twentytwentyfive">
 				Twenty Twenty-Five
-			</Breadcrumbs.LinkItem>
-			<Breadcrumbs.CurrentItem>Style variations</Breadcrumbs.CurrentItem>
-		</Breadcrumbs.Root>
+			</Breadcrumb.LinkItem>
+			<Breadcrumb.CurrentItem>Style variations</Breadcrumb.CurrentItem>
+		</Breadcrumb.Root>
 	);
 }
 
@@ -73,25 +72,36 @@ export const ResponsiveStates: Story = {
 			) ) }
 		</div>
 	),
+	play: async ( { canvasElement } ) => {
+		const canvas = within( canvasElement );
+		await waitFor( () => {
+			const triggers = canvas.getAllByRole( 'button', {
+				name: /hidden breadcrumb/,
+			} );
+			for ( const trigger of triggers ) {
+				const { width, height } = trigger.getBoundingClientRect();
+				expect( width ).toBe( 44 );
+				expect( height ).toBe( 44 );
+			}
+		} );
+	},
 };
 
 export const LongLabelsAndRtl: Story = {
 	render: () => (
 		<div dir="rtl" style={ { inlineSize: 420, maxInlineSize: '100%' } }>
-			<Breadcrumbs.Root aria-label="مسار التنقل">
-				<Breadcrumbs.LinkItem href="/">
-					لوحة التحكم
-				</Breadcrumbs.LinkItem>
-				<Breadcrumbs.LinkItem href="/appearance">
+			<Breadcrumb.Root aria-label="مسار التنقل">
+				<Breadcrumb.LinkItem href="/">لوحة التحكم</Breadcrumb.LinkItem>
+				<Breadcrumb.LinkItem href="/appearance">
 					المظهر وإعدادات التخصيص
-				</Breadcrumbs.LinkItem>
-				<Breadcrumbs.LinkItem href="/appearance/themes">
+				</Breadcrumb.LinkItem>
+				<Breadcrumb.LinkItem href="/appearance/themes">
 					القوالب المثبتة على هذا الموقع
-				</Breadcrumbs.LinkItem>
-				<Breadcrumbs.CurrentItem>
+				</Breadcrumb.LinkItem>
+				<Breadcrumb.CurrentItem>
 					إعدادات القالب الحالي وتخصيص أنماط العرض
-				</Breadcrumbs.CurrentItem>
-			</Breadcrumbs.Root>
+				</Breadcrumb.CurrentItem>
+			</Breadcrumb.Root>
 		</div>
 	),
 };
@@ -108,17 +118,17 @@ const RouterLink = forwardRef< HTMLAnchorElement, ComponentProps< 'a' > >(
 
 export const RouterLinkComposition: Story = {
 	render: () => (
-		<Breadcrumbs.Root>
-			<Breadcrumbs.LinkItem href="/" render={ <RouterLink /> }>
+		<Breadcrumb.Root>
+			<Breadcrumb.LinkItem href="/" render={ <RouterLink /> }>
 				Dashboard
-			</Breadcrumbs.LinkItem>
-			<Breadcrumbs.LinkItem
+			</Breadcrumb.LinkItem>
+			<Breadcrumb.LinkItem
 				href="/settings?section=writing#defaults"
 				render={ <RouterLink /> }
 			>
 				Writing settings
-			</Breadcrumbs.LinkItem>
-			<Breadcrumbs.CurrentItem>Defaults</Breadcrumbs.CurrentItem>
-		</Breadcrumbs.Root>
+			</Breadcrumb.LinkItem>
+			<Breadcrumb.CurrentItem>Defaults</Breadcrumb.CurrentItem>
+		</Breadcrumb.Root>
 	),
 };

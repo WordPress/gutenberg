@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Add a responsive `Breadcrumbs` navigation component. ([#80425](https://github.com/WordPress/gutenberg/pull/80425))
+-   Add a responsive `Breadcrumb` navigation component. ([#80425](https://github.com/WordPress/gutenberg/pull/80425))
 
 ### Breaking Changes
 

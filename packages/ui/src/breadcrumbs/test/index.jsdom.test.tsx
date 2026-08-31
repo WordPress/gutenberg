@@ -3,7 +3,7 @@ import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
 import type { HTMLAttributes } from 'react';
-import * as Breadcrumbs from '../index';
+import * as Breadcrumb from '../index';
 
 type ResizeObserverRecord = {
 	callback: ResizeObserverCallback;
@@ -12,10 +12,11 @@ type ResizeObserverRecord = {
 };
 
 const DEFAULT_LABEL_WIDTH = 30;
-const OVERFLOW_TRIGGER_WIDTH = 24;
+const NEW_TAB_INDICATOR_WIDTH = 20;
+const OVERFLOW_TRIGGER_WIDTH = 44;
 const SEPARATOR_WIDTH = 10;
 
-describe( 'Breadcrumbs', () => {
+describe( 'Breadcrumb', () => {
 	let availableWidth: number;
 	let listAvailableWidth: number | null;
 	let labelWidths: Map< string, number >;
@@ -119,9 +120,14 @@ describe( 'Breadcrumbs', () => {
 					return SEPARATOR_WIDTH;
 				}
 				if ( element.classList.contains( 'style-label' ) ) {
+					const indicatorWidth =
+						element.matches( 'a[target="_blank"]' ) ||
+						element.hasAttribute( 'data-open-in-new-tab' )
+							? NEW_TAB_INDICATOR_WIDTH
+							: 0;
 					return (
-						labelWidths.get( element.textContent ?? '' ) ??
-						DEFAULT_LABEL_WIDTH
+						( labelWidths.get( element.textContent ?? '' ) ??
+							DEFAULT_LABEL_WIDTH ) + indicatorWidth
 					);
 				}
 				return 0;
@@ -231,13 +237,13 @@ describe( 'Breadcrumbs', () => {
 
 	function renderDefaultTrail() {
 		return render(
-			<Breadcrumbs.Root>
-				<Breadcrumbs.LinkItem href="/">Home</Breadcrumbs.LinkItem>
-				<Breadcrumbs.LinkItem href="/section">
+			<Breadcrumb.Root>
+				<Breadcrumb.LinkItem href="/">Home</Breadcrumb.LinkItem>
+				<Breadcrumb.LinkItem href="/section">
 					Section
-				</Breadcrumbs.LinkItem>
-				<Breadcrumbs.CurrentItem>Current</Breadcrumbs.CurrentItem>
-			</Breadcrumbs.Root>
+				</Breadcrumb.LinkItem>
+				<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
+			</Breadcrumb.Root>
 		);
 	}
 
@@ -283,13 +289,13 @@ describe( 'Breadcrumbs', () => {
 
 		it( 'preserves required semantics when Root uses a custom renderer', () => {
 			render(
-				<Breadcrumbs.Root
+				<Breadcrumb.Root
 					aria-label="Location"
 					render={ <div role="presentation" /> }
 				>
-					<Breadcrumbs.LinkItem href="/">Home</Breadcrumbs.LinkItem>
-					<Breadcrumbs.CurrentItem>Current</Breadcrumbs.CurrentItem>
-				</Breadcrumbs.Root>
+					<Breadcrumb.LinkItem href="/">Home</Breadcrumb.LinkItem>
+					<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
 			);
 
 			const navigation = screen.getByRole( 'navigation', {
@@ -305,14 +311,14 @@ describe( 'Breadcrumbs', () => {
 			const currentRef = createRef< HTMLSpanElement >();
 
 			render(
-				<Breadcrumbs.Root ref={ rootRef }>
-					<Breadcrumbs.LinkItem ref={ linkRef } href="/">
+				<Breadcrumb.Root ref={ rootRef }>
+					<Breadcrumb.LinkItem ref={ linkRef } href="/">
 						Home
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.CurrentItem ref={ currentRef }>
+					</Breadcrumb.LinkItem>
+					<Breadcrumb.CurrentItem ref={ currentRef }>
 						Current
-					</Breadcrumbs.CurrentItem>
-				</Breadcrumbs.Root>
+					</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
 			);
 
 			expect( rootRef.current?.tagName ).toBe( 'NAV' );
@@ -334,16 +340,16 @@ describe( 'Breadcrumbs', () => {
 			);
 
 			render(
-				<Breadcrumbs.Root>
-					<Breadcrumbs.LinkItem
+				<Breadcrumb.Root>
+					<Breadcrumb.LinkItem
 						href={ href }
 						openInNewTab
 						render={ renderLink }
 					>
 						General
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.CurrentItem>Current</Breadcrumbs.CurrentItem>
-				</Breadcrumbs.Root>
+					</Breadcrumb.LinkItem>
+					<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
 			);
 
 			const link = screen.getByRole( 'link', {
@@ -360,8 +366,8 @@ describe( 'Breadcrumbs', () => {
 
 		it( 'does not let custom renderers override required item semantics', () => {
 			render(
-				<Breadcrumbs.Root>
-					<Breadcrumbs.LinkItem
+				<Breadcrumb.Root>
+					<Breadcrumb.LinkItem
 						href="/required"
 						render={ ( renderProps ) => (
 							<a
@@ -374,8 +380,8 @@ describe( 'Breadcrumbs', () => {
 						) }
 					>
 						Ancestor
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.CurrentItem
+					</Breadcrumb.LinkItem>
+					<Breadcrumb.CurrentItem
 						render={ ( renderProps ) => (
 							<a
 								{ ...renderProps }
@@ -388,8 +394,8 @@ describe( 'Breadcrumbs', () => {
 						) }
 					>
 						Current
-					</Breadcrumbs.CurrentItem>
-				</Breadcrumbs.Root>
+					</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
 			);
 
 			const ancestor = screen.getByRole( 'link', { name: 'Ancestor' } );
@@ -406,8 +412,8 @@ describe( 'Breadcrumbs', () => {
 
 		it( 'mirrors consumer styling into intrinsic measurements', () => {
 			const { container } = render(
-				<Breadcrumbs.Root>
-					<Breadcrumbs.LinkItem
+				<Breadcrumb.Root>
+					<Breadcrumb.LinkItem
 						className="item-class"
 						href="/"
 						render={
@@ -422,9 +428,9 @@ describe( 'Breadcrumbs', () => {
 						style={ { fontSize: '20px' } }
 					>
 						Home
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.CurrentItem>Current</Breadcrumbs.CurrentItem>
-				</Breadcrumbs.Root>
+					</Breadcrumb.LinkItem>
+					<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
 			);
 
 			const measurement = container.querySelector(
@@ -442,15 +448,11 @@ describe( 'Breadcrumbs', () => {
 		it( 'rejects unsupported direct children', () => {
 			expect( () =>
 				render(
-					<Breadcrumbs.Root>
+					<Breadcrumb.Root>
 						<div>Invalid</div>
-						<Breadcrumbs.LinkItem href="/">
-							Home
-						</Breadcrumbs.LinkItem>
-						<Breadcrumbs.CurrentItem>
-							Current
-						</Breadcrumbs.CurrentItem>
-					</Breadcrumbs.Root>
+						<Breadcrumb.LinkItem href="/">Home</Breadcrumb.LinkItem>
+						<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
+					</Breadcrumb.Root>
 				)
 			).toThrow( /only accepts/ );
 			expect( console ).toHaveErrored();
@@ -459,11 +461,9 @@ describe( 'Breadcrumbs', () => {
 		it( 'requires at least one ancestor link', () => {
 			expect( () =>
 				render(
-					<Breadcrumbs.Root>
-						<Breadcrumbs.CurrentItem>
-							Current
-						</Breadcrumbs.CurrentItem>
-					</Breadcrumbs.Root>
+					<Breadcrumb.Root>
+						<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
+					</Breadcrumb.Root>
 				)
 			).toThrow( /at least one/ );
 			expect( console ).toHaveErrored();
@@ -472,36 +472,28 @@ describe( 'Breadcrumbs', () => {
 		it( 'requires exactly one final current item', () => {
 			expect( () =>
 				render(
-					<Breadcrumbs.Root>
-						<Breadcrumbs.LinkItem href="/">
-							Home
-						</Breadcrumbs.LinkItem>
-					</Breadcrumbs.Root>
+					<Breadcrumb.Root>
+						<Breadcrumb.LinkItem href="/">Home</Breadcrumb.LinkItem>
+					</Breadcrumb.Root>
 				)
 			).toThrow( /requires one final/ );
 
 			expect( () =>
 				render(
-					<Breadcrumbs.Root>
-						<Breadcrumbs.LinkItem href="/">
-							Home
-						</Breadcrumbs.LinkItem>
-						<Breadcrumbs.CurrentItem>One</Breadcrumbs.CurrentItem>
-						<Breadcrumbs.CurrentItem>Two</Breadcrumbs.CurrentItem>
-					</Breadcrumbs.Root>
+					<Breadcrumb.Root>
+						<Breadcrumb.LinkItem href="/">Home</Breadcrumb.LinkItem>
+						<Breadcrumb.CurrentItem>One</Breadcrumb.CurrentItem>
+						<Breadcrumb.CurrentItem>Two</Breadcrumb.CurrentItem>
+					</Breadcrumb.Root>
 				)
 			).toThrow( /exactly one/ );
 
 			expect( () =>
 				render(
-					<Breadcrumbs.Root>
-						<Breadcrumbs.CurrentItem>
-							Current
-						</Breadcrumbs.CurrentItem>
-						<Breadcrumbs.LinkItem href="/">
-							Home
-						</Breadcrumbs.LinkItem>
-					</Breadcrumbs.Root>
+					<Breadcrumb.Root>
+						<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
+						<Breadcrumb.LinkItem href="/">Home</Breadcrumb.LinkItem>
+					</Breadcrumb.Root>
 				)
 			).toThrow( /must be the final child/ );
 			expect( console ).toHaveErrored();
@@ -510,25 +502,19 @@ describe( 'Breadcrumbs', () => {
 		it( 'requires usable href and text labels', () => {
 			expect( () =>
 				render(
-					<Breadcrumbs.Root>
-						<Breadcrumbs.LinkItem href="">
-							Home
-						</Breadcrumbs.LinkItem>
-						<Breadcrumbs.CurrentItem>
-							Current
-						</Breadcrumbs.CurrentItem>
-					</Breadcrumbs.Root>
+					<Breadcrumb.Root>
+						<Breadcrumb.LinkItem href="">Home</Breadcrumb.LinkItem>
+						<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
+					</Breadcrumb.Root>
 				)
 			).toThrow( /usable `href`/ );
 
 			expect( () =>
 				render(
-					<Breadcrumbs.Root>
-						<Breadcrumbs.LinkItem href="/"> </Breadcrumbs.LinkItem>
-						<Breadcrumbs.CurrentItem>
-							Current
-						</Breadcrumbs.CurrentItem>
-					</Breadcrumbs.Root>
+					<Breadcrumb.Root>
+						<Breadcrumb.LinkItem href="/"> </Breadcrumb.LinkItem>
+						<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
+					</Breadcrumb.Root>
 				)
 			).toThrow( /non-empty text label/ );
 			expect( console ).toHaveErrored();
@@ -537,17 +523,15 @@ describe( 'Breadcrumbs', () => {
 		it( 'requires stable keys for items rendered from a nested array', () => {
 			expect( () =>
 				render(
-					<Breadcrumbs.Root>
+					<Breadcrumb.Root>
 						{ [
 							// eslint-disable-next-line react/jsx-key -- Missing key is the behavior under test.
-							<Breadcrumbs.LinkItem href="/">
+							<Breadcrumb.LinkItem href="/">
 								Home
-							</Breadcrumbs.LinkItem>,
+							</Breadcrumb.LinkItem>,
 						] }
-						<Breadcrumbs.CurrentItem>
-							Current
-						</Breadcrumbs.CurrentItem>
-					</Breadcrumbs.Root>
+						<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
+					</Breadcrumb.Root>
 				)
 			).toThrow( /stable React keys/ );
 			expect( console ).toHaveErrored();
@@ -575,19 +559,17 @@ describe( 'Breadcrumbs', () => {
 			availableWidth = 164;
 			labelWidths.set( 'Section', 80 );
 			render(
-				<Breadcrumbs.Root>
-					<Breadcrumbs.LinkItem href="/">Home</Breadcrumbs.LinkItem>
-					<Breadcrumbs.LinkItem
+				<Breadcrumb.Root>
+					<Breadcrumb.LinkItem href="/">Home</Breadcrumb.LinkItem>
+					<Breadcrumb.LinkItem
 						href="/section"
 						onClick={ ( event ) => event.preventDefault() }
 					>
 						Section
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.LinkItem href="/page">
-						Page
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.CurrentItem>Current</Breadcrumbs.CurrentItem>
-				</Breadcrumbs.Root>
+					</Breadcrumb.LinkItem>
+					<Breadcrumb.LinkItem href="/page">Page</Breadcrumb.LinkItem>
+					<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
 			);
 
 			expect( screen.getAllByRole( 'link' ) ).toHaveLength( 2 );
@@ -626,19 +608,15 @@ describe( 'Breadcrumbs', () => {
 			labelWidths.set( 'Alpha', 70 );
 			labelWidths.set( 'Beta', 60 );
 			render(
-				<Breadcrumbs.Root>
-					<Breadcrumbs.LinkItem href="/">Home</Breadcrumbs.LinkItem>
-					<Breadcrumbs.LinkItem href="/alpha">
+				<Breadcrumb.Root>
+					<Breadcrumb.LinkItem href="/">Home</Breadcrumb.LinkItem>
+					<Breadcrumb.LinkItem href="/alpha">
 						Alpha
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.LinkItem href="/beta">
-						Beta
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.LinkItem href="/page">
-						Page
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.CurrentItem>Current</Breadcrumbs.CurrentItem>
-				</Breadcrumbs.Root>
+					</Breadcrumb.LinkItem>
+					<Breadcrumb.LinkItem href="/beta">Beta</Breadcrumb.LinkItem>
+					<Breadcrumb.LinkItem href="/page">Page</Breadcrumb.LinkItem>
+					<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
 			);
 
 			const trigger = screen.getByRole( 'button', {
@@ -687,19 +665,17 @@ describe( 'Breadcrumbs', () => {
 			availableWidth = 164;
 			labelWidths.set( 'Section', 80 );
 			render(
-				<Breadcrumbs.Root>
-					<Breadcrumbs.LinkItem href="/">Home</Breadcrumbs.LinkItem>
-					<Breadcrumbs.LinkItem
+				<Breadcrumb.Root>
+					<Breadcrumb.LinkItem href="/">Home</Breadcrumb.LinkItem>
+					<Breadcrumb.LinkItem
 						href="/section"
 						onClick={ handleClick }
 					>
 						Section
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.LinkItem href="/page">
-						Page
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.CurrentItem>Current</Breadcrumbs.CurrentItem>
-				</Breadcrumbs.Root>
+					</Breadcrumb.LinkItem>
+					<Breadcrumb.LinkItem href="/page">Page</Breadcrumb.LinkItem>
+					<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
 			);
 
 			const trigger = screen.getByRole( 'button', {
@@ -737,16 +713,16 @@ describe( 'Breadcrumbs', () => {
 			);
 
 			render(
-				<Breadcrumbs.Root>
-					<Breadcrumbs.LinkItem
+				<Breadcrumb.Root>
+					<Breadcrumb.LinkItem
 						href="/settings?tab=writing#defaults"
 						openInNewTab
 						render={ renderLink }
 					>
 						Settings
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.CurrentItem>Current</Breadcrumbs.CurrentItem>
-				</Breadcrumbs.Root>
+					</Breadcrumb.LinkItem>
+					<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
 			);
 
 			await user.click(
@@ -775,19 +751,15 @@ describe( 'Breadcrumbs', () => {
 			labelWidths.set( 'Alpha', 70 );
 			labelWidths.set( 'Beta', 60 );
 			const { rerender } = render(
-				<Breadcrumbs.Root>
-					<Breadcrumbs.LinkItem href="/">Home</Breadcrumbs.LinkItem>
-					<Breadcrumbs.LinkItem href="/alpha">
+				<Breadcrumb.Root>
+					<Breadcrumb.LinkItem href="/">Home</Breadcrumb.LinkItem>
+					<Breadcrumb.LinkItem href="/alpha">
 						Alpha
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.LinkItem href="/beta">
-						Beta
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.LinkItem href="/page">
-						Page
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.CurrentItem>Current</Breadcrumbs.CurrentItem>
-				</Breadcrumbs.Root>
+					</Breadcrumb.LinkItem>
+					<Breadcrumb.LinkItem href="/beta">Beta</Breadcrumb.LinkItem>
+					<Breadcrumb.LinkItem href="/page">Page</Breadcrumb.LinkItem>
+					<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
 			);
 
 			const trigger = screen.getByRole( 'button', {
@@ -804,12 +776,12 @@ describe( 'Breadcrumbs', () => {
 			expect( screen.getAllByRole( 'menuitem' ) ).toHaveLength( 2 );
 			expect( trigger ).toBeInTheDocument();
 			rerender(
-				<Breadcrumbs.Root>
-					<Breadcrumbs.LinkItem href="/dashboard">
+				<Breadcrumb.Root>
+					<Breadcrumb.LinkItem href="/dashboard">
 						Dashboard
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.CurrentItem>Current</Breadcrumbs.CurrentItem>
-				</Breadcrumbs.Root>
+					</Breadcrumb.LinkItem>
+					<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
 			);
 			expect( screen.getAllByRole( 'menuitem' ) ).toHaveLength( 2 );
 
@@ -896,17 +868,17 @@ describe( 'Breadcrumbs', () => {
 			availableWidth = 140;
 			labelWidths.set( 'Section', 80 );
 			const { rerender } = render(
-				<Breadcrumbs.Root>
-					<Breadcrumbs.LinkItem key="home" href="/">
+				<Breadcrumb.Root>
+					<Breadcrumb.LinkItem key="home" href="/">
 						Home
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.LinkItem key="section" href="/section">
+					</Breadcrumb.LinkItem>
+					<Breadcrumb.LinkItem key="section" href="/section">
 						Section
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.CurrentItem key="current">
+					</Breadcrumb.LinkItem>
+					<Breadcrumb.CurrentItem key="current">
 						Current
-					</Breadcrumbs.CurrentItem>
-				</Breadcrumbs.Root>
+					</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
 			);
 			const trigger = screen.getByRole( 'button', {
 				name: 'Show 1 hidden breadcrumb item',
@@ -916,17 +888,17 @@ describe( 'Breadcrumbs', () => {
 			await screen.findByText( 'Show 1 hidden breadcrumb item' );
 			labelWidths.set( 'Reports', 80 );
 			rerender(
-				<Breadcrumbs.Root>
-					<Breadcrumbs.LinkItem key="dashboard" href="/dashboard">
+				<Breadcrumb.Root>
+					<Breadcrumb.LinkItem key="dashboard" href="/dashboard">
 						Dashboard
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.LinkItem key="reports" href="/reports">
+					</Breadcrumb.LinkItem>
+					<Breadcrumb.LinkItem key="reports" href="/reports">
 						Reports
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.CurrentItem key="current">
+					</Breadcrumb.LinkItem>
+					<Breadcrumb.CurrentItem key="current">
 						Current
-					</Breadcrumbs.CurrentItem>
-				</Breadcrumbs.Root>
+					</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
 			);
 			expect( trigger ).toHaveFocus();
 			expect( trigger ).toBeInTheDocument();
@@ -946,16 +918,14 @@ describe( 'Breadcrumbs', () => {
 			availableWidth = 500;
 			labelWidths.set( 'Beta', 100 );
 			render(
-				<Breadcrumbs.Root>
-					<Breadcrumbs.LinkItem href="/">Home</Breadcrumbs.LinkItem>
-					<Breadcrumbs.LinkItem href="/alpha">
+				<Breadcrumb.Root>
+					<Breadcrumb.LinkItem href="/">Home</Breadcrumb.LinkItem>
+					<Breadcrumb.LinkItem href="/alpha">
 						Alpha
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.LinkItem href="/beta">
-						Beta
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.CurrentItem>Current</Breadcrumbs.CurrentItem>
-				</Breadcrumbs.Root>
+					</Breadcrumb.LinkItem>
+					<Breadcrumb.LinkItem href="/beta">Beta</Breadcrumb.LinkItem>
+					<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
 			);
 
 			const alpha = screen.getByRole( 'link', { name: 'Alpha' } );
@@ -976,6 +946,53 @@ describe( 'Breadcrumbs', () => {
 			} );
 			expect( trigger ).toHaveFocus();
 			await screen.findByText( 'Show 3 hidden breadcrumb items' );
+			act( () => trigger.blur() );
+			await waitFor( () =>
+				expect(
+					screen.queryByRole( 'tooltip' )
+				).not.toBeInTheDocument()
+			);
+		} );
+
+		it( 'moves focus to overflow when the focused link collapses without changing the collapsed count', async () => {
+			availableWidth = 144;
+			labelWidths.set( 'Home', 50 );
+			labelWidths.set( 'Section', 50 );
+			const { container } = render(
+				<Breadcrumb.Root>
+					<Breadcrumb.LinkItem href="/">Home</Breadcrumb.LinkItem>
+					<Breadcrumb.LinkItem href="/section">
+						Section
+					</Breadcrumb.LinkItem>
+					<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
+			);
+			const home = screen.getByRole( 'link', { name: 'Home' } );
+			expect(
+				screen.queryByRole( 'link', { name: 'Section' } )
+			).not.toBeInTheDocument();
+
+			act( () => home.focus() );
+			labelWidths.set( 'Home', 60 );
+			const homeMetric = Array.from(
+				container.querySelectorAll( '.style-measurement-content' )
+			).find( ( element ) => element.textContent === 'Home' );
+			notifyResize( homeMetric );
+
+			const trigger = screen.getByRole( 'button', {
+				name: 'Show 1 hidden breadcrumb item',
+			} );
+			expect( trigger ).toHaveFocus();
+			expect(
+				screen.getByRole( 'link', { name: 'Section' } )
+			).toBeInTheDocument();
+			await screen.findByText( 'Show 1 hidden breadcrumb item' );
+			act( () => trigger.blur() );
+			await waitFor( () =>
+				expect(
+					screen.queryByRole( 'tooltip' )
+				).not.toBeInTheDocument()
+			);
 		} );
 	} );
 
@@ -994,12 +1011,12 @@ describe( 'Breadcrumbs', () => {
 			availableWidth = 70;
 			labelWidths.set( 'A very long current page', 100 );
 			render(
-				<Breadcrumbs.Root>
-					<Breadcrumbs.LinkItem href="/">Home</Breadcrumbs.LinkItem>
-					<Breadcrumbs.CurrentItem>
+				<Breadcrumb.Root>
+					<Breadcrumb.LinkItem href="/">Home</Breadcrumb.LinkItem>
+					<Breadcrumb.CurrentItem>
 						A very long current page
-					</Breadcrumbs.CurrentItem>
-				</Breadcrumbs.Root>
+					</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
 			);
 
 			const current = screen.getByText( 'A very long current page', {
@@ -1033,12 +1050,12 @@ describe( 'Breadcrumbs', () => {
 		it( 'shows the full text for an actually clipped link on focus', async () => {
 			labelWidths.set( 'Constrained ancestor', 100 );
 			render(
-				<Breadcrumbs.Root>
-					<Breadcrumbs.LinkItem href="/" data-constrained="true">
+				<Breadcrumb.Root>
+					<Breadcrumb.LinkItem href="/" data-constrained="true">
 						Constrained ancestor
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.CurrentItem>Current</Breadcrumbs.CurrentItem>
-				</Breadcrumbs.Root>
+					</Breadcrumb.LinkItem>
+					<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
 			);
 
 			const link = screen.getByRole( 'link', {
@@ -1057,12 +1074,12 @@ describe( 'Breadcrumbs', () => {
 			const user = userEvent.setup();
 			labelWidths.set( 'Constrained ancestor', 100 );
 			render(
-				<Breadcrumbs.Root>
-					<Breadcrumbs.LinkItem href="/" data-constrained="true">
+				<Breadcrumb.Root>
+					<Breadcrumb.LinkItem href="/" data-constrained="true">
 						Constrained ancestor
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.CurrentItem>Current</Breadcrumbs.CurrentItem>
-				</Breadcrumbs.Root>
+					</Breadcrumb.LinkItem>
+					<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
 			);
 
 			const link = screen.getByRole( 'link', {
@@ -1110,13 +1127,13 @@ describe( 'Breadcrumbs', () => {
 			listAvailableWidth = 140;
 			labelWidths.set( 'Section', 80 );
 			render(
-				<Breadcrumbs.Root style={ { paddingInline: '180px' } }>
-					<Breadcrumbs.LinkItem href="/">Home</Breadcrumbs.LinkItem>
-					<Breadcrumbs.LinkItem href="/section">
+				<Breadcrumb.Root style={ { paddingInline: '180px' } }>
+					<Breadcrumb.LinkItem href="/">Home</Breadcrumb.LinkItem>
+					<Breadcrumb.LinkItem href="/section">
 						Section
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.CurrentItem>Current</Breadcrumbs.CurrentItem>
-				</Breadcrumbs.Root>
+					</Breadcrumb.LinkItem>
+					<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
 			);
 
 			expect(
@@ -1127,16 +1144,16 @@ describe( 'Breadcrumbs', () => {
 		it( 'includes consumer inline margins in intrinsic item widths', () => {
 			availableWidth = 164;
 			render(
-				<Breadcrumbs.Root>
-					<Breadcrumbs.LinkItem href="/">Home</Breadcrumbs.LinkItem>
-					<Breadcrumbs.LinkItem
+				<Breadcrumb.Root>
+					<Breadcrumb.LinkItem href="/">Home</Breadcrumb.LinkItem>
+					<Breadcrumb.LinkItem
 						href="/section"
 						style={ { marginInline: '30px' } }
 					>
 						Section
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.CurrentItem>Current</Breadcrumbs.CurrentItem>
-				</Breadcrumbs.Root>
+					</Breadcrumb.LinkItem>
+					<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
 			);
 
 			expect(
@@ -1144,37 +1161,55 @@ describe( 'Breadcrumbs', () => {
 			).toBeInTheDocument();
 		} );
 
+		it( 'accounts for the new-tab indicator in intrinsic link widths', () => {
+			availableWidth = 75;
+			render(
+				<Breadcrumb.Root>
+					<Breadcrumb.LinkItem href="/" openInNewTab>
+						Home
+					</Breadcrumb.LinkItem>
+					<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
+			);
+
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Show 1 hidden breadcrumb item',
+				} )
+			).toBeInTheDocument();
+		} );
+
 		it( 'recalculates after items are added and reordered', () => {
 			const { rerender } = render(
-				<Breadcrumbs.Root>
-					<Breadcrumbs.LinkItem key="home" href="/">
+				<Breadcrumb.Root>
+					<Breadcrumb.LinkItem key="home" href="/">
 						Home
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.LinkItem key="section" href="/section">
+					</Breadcrumb.LinkItem>
+					<Breadcrumb.LinkItem key="section" href="/section">
 						Section
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.CurrentItem key="current">
+					</Breadcrumb.LinkItem>
+					<Breadcrumb.CurrentItem key="current">
 						Current
-					</Breadcrumbs.CurrentItem>
-				</Breadcrumbs.Root>
+					</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
 			);
 			const observersBeforeRerender = [ ...resizeObservers ];
 
 			rerender(
-				<Breadcrumbs.Root>
-					<Breadcrumbs.LinkItem key="section" href="/section">
+				<Breadcrumb.Root>
+					<Breadcrumb.LinkItem key="section" href="/section">
 						Section
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.LinkItem key="home" href="/">
+					</Breadcrumb.LinkItem>
+					<Breadcrumb.LinkItem key="home" href="/">
 						Home
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.LinkItem key="archive" href="/archive">
+					</Breadcrumb.LinkItem>
+					<Breadcrumb.LinkItem key="archive" href="/archive">
 						Archive
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.CurrentItem key="current">
+					</Breadcrumb.LinkItem>
+					<Breadcrumb.CurrentItem key="current">
 						Current
-					</Breadcrumbs.CurrentItem>
-				</Breadcrumbs.Root>
+					</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
 			);
 
 			expect(
@@ -1192,17 +1227,17 @@ describe( 'Breadcrumbs', () => {
 			);
 
 			rerender(
-				<Breadcrumbs.Root>
-					<Breadcrumbs.LinkItem key="section" href="/section">
+				<Breadcrumb.Root>
+					<Breadcrumb.LinkItem key="section" href="/section">
 						Section
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.LinkItem key="archive" href="/archive">
+					</Breadcrumb.LinkItem>
+					<Breadcrumb.LinkItem key="archive" href="/archive">
 						Archive
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.CurrentItem key="current">
+					</Breadcrumb.LinkItem>
+					<Breadcrumb.CurrentItem key="current">
 						Current
-					</Breadcrumbs.CurrentItem>
-				</Breadcrumbs.Root>
+					</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
 			);
 			expect(
 				screen
@@ -1211,17 +1246,17 @@ describe( 'Breadcrumbs', () => {
 			).toEqual( [ 'Section', 'Archive' ] );
 
 			rerender(
-				<Breadcrumbs.Root>
-					<Breadcrumbs.LinkItem key="section" href="/projects">
+				<Breadcrumb.Root>
+					<Breadcrumb.LinkItem key="section" href="/projects">
 						Projects
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.LinkItem key="archive" href="/library">
+					</Breadcrumb.LinkItem>
+					<Breadcrumb.LinkItem key="archive" href="/library">
 						Library
-					</Breadcrumbs.LinkItem>
-					<Breadcrumbs.CurrentItem key="current">
+					</Breadcrumb.LinkItem>
+					<Breadcrumb.CurrentItem key="current">
 						Current
-					</Breadcrumbs.CurrentItem>
-				</Breadcrumbs.Root>
+					</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
 			);
 			expect(
 				screen
@@ -1282,10 +1317,10 @@ describe( 'Breadcrumbs', () => {
 			labelWidths.set( 'Home', 20 );
 			labelWidths.set( 'Current', 20 );
 			render(
-				<Breadcrumbs.Root>
-					<Breadcrumbs.LinkItem href="/">Home</Breadcrumbs.LinkItem>
-					<Breadcrumbs.CurrentItem>Current</Breadcrumbs.CurrentItem>
-				</Breadcrumbs.Root>
+				<Breadcrumb.Root>
+					<Breadcrumb.LinkItem href="/">Home</Breadcrumb.LinkItem>
+					<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
 			);
 			expect(
 				screen.queryByRole( 'button', { name: /hidden breadcrumb/ } )

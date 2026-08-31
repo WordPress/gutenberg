@@ -8,7 +8,7 @@ const BASE_METRICS = {
 	separatorWidth: 10,
 };
 
-describe( 'Breadcrumbs responsive layout', () => {
+describe( 'Breadcrumb responsive layout', () => {
 	it( 'shows every item when the complete trail fits', () => {
 		expect( getCollapsedLayout( BASE_METRICS ) ).toEqual( {
 			collapsedIndices: [],

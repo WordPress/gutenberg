@@ -3,8 +3,8 @@ import type { ComponentProps } from '../utils/types';
 
 export interface RootProps extends Omit< ComponentProps< 'nav' >, 'children' > {
 	/**
-	 * `Breadcrumbs.LinkItem` elements followed by one
-	 * `Breadcrumbs.CurrentItem`.
+	 * `Breadcrumb.LinkItem` elements followed by one
+	 * `Breadcrumb.CurrentItem`.
 	 */
 	children: ReactNode;
 }
