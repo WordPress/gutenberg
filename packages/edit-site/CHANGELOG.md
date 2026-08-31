@@ -13,6 +13,7 @@
 
 ### Internal
 
+-   Remove the template activation (`active_templates`) experiment: the Templates page and its sidebar always use the previous (non-activation) implementations ([#82241](https://github.com/WordPress/gutenberg/pull/82241)).
 -   Remove the `showListViewByDefault` handling from `useAdaptEditorToCanvas`; the `editor` package now applies the preference on the preview ↔ edit transition itself.
 -   Remove unused dependencies `@wordpress/blob`, `@wordpress/date`, `@wordpress/escape-html`, etc. ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
