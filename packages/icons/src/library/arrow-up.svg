@@ -1,3 +1,3 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="fill: none" stroke="currentColor" stroke-width="1.5">
-	<path d="M12 19.95L12 4.95M17 9.95L12 4.95L7 9.95" vector-effect="non-scaling-stroke" />
+	<path d="M12 20L12 5M17 10L12 5L7 10" vector-effect="non-scaling-stroke" />
 </svg>
