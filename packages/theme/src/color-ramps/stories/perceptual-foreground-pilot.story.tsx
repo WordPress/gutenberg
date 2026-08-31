@@ -7,8 +7,10 @@ import {
 	EXPERIMENTAL_FOREGROUND_METHODS,
 	buildPerceptualForegroundScale,
 	getPerceptualContrast,
+	getStateColorDifference,
 	type ExperimentalForegroundMethod,
 	type ExperimentalForegroundScale,
+	type ExperimentalForegroundScaleType,
 } from './perceptual-foreground-experiment';
 import styles from './perceptual-foreground-pilot.module.css';
 
@@ -59,22 +61,27 @@ const METHOD_DETAILS: Record<
 	uniform: {
 		label: 'Uniform APCA · fixed Step 5',
 		description:
-			'Preserves seed chroma and uses five equal intervals ending at the legacy strong endpoint.',
+			'Uses five equal intervals ending at the legacy strong endpoint.',
+	},
+	'state-skewed': {
+		label: 'State-skewed APCA · fixed Step 5',
+		description:
+			'Reserves 40% of the APCA range for the resting-to-active transition ending at the legacy strong endpoint.',
 	},
 	'uniform-free-endpoint': {
 		label: 'Uniform APCA · released Step 5',
 		description:
-			'The same chroma-preserving method, using the least-extreme Step 5 that supports useful spacing.',
+			'Uses equal intervals and the least-extreme Step 5 that supports useful spacing.',
 	},
 	'semantic-anchors': {
 		label: 'Semantic anchors',
 		description:
-			'Keeps compliant lower steps and the legacy strong endpoint, then inserts a chroma-preserving resting step.',
+			'Keeps compliant lower steps and the legacy strong endpoint, then inserts a resting step.',
 	},
 	eased: {
 		label: 'Eased APCA',
 		description:
-			'Uses progressively larger chroma-preserving intervals toward the fixed strong endpoint.',
+			'Uses progressively larger intervals toward the fixed strong endpoint.',
 	},
 };
 
@@ -99,6 +106,7 @@ function ForegroundScale( {
 	const contrasts = data.scale.colors.map( ( color ) =>
 		getPerceptualContrast( displayBackground, color )
 	);
+	const stateColorDifference = getStateColorDifference( data.scale.colors );
 
 	return (
 		<section
@@ -107,14 +115,19 @@ function ForegroundScale( {
 		>
 			<div className={ styles[ 'scale-heading' ] }>
 				<h4>{ data.label }</h4>
-				<span
-					className={ styles.status }
-					data-pass={ data.scale.meetsWcagFloors }
-				>
-					{ data.scale.meetsWcagFloors
-						? 'WCAG floors pass'
-						: 'WCAG floor warning' }
-				</span>
+				<div className={ styles[ 'scale-meta' ] }>
+					<span className={ styles[ 'state-difference' ] }>
+						FGS4→5 ΔEOK { stateColorDifference.toFixed( 3 ) }
+					</span>
+					<span
+						className={ styles.status }
+						data-pass={ data.scale.meetsWcagFloors }
+					>
+						{ data.scale.meetsWcagFloors
+							? 'WCAG floors pass'
+							: 'WCAG floor warning' }
+					</span>
+				</div>
 			</div>
 			<div className={ styles.swatches }>
 				{ data.scale.colors.map( ( color, index ) => {
@@ -303,12 +316,14 @@ function buildScaleData( {
 	ramp,
 	backgroundRamp,
 	seed,
+	scaleType,
 }: {
 	label: string;
 	method: ExperimentalForegroundMethod;
 	ramp: RampResult;
 	backgroundRamp: RampResult;
 	seed: string;
+	scaleType: ExperimentalForegroundScaleType;
 } ): ScaleData {
 	return {
 		label,
@@ -317,6 +332,7 @@ function buildScaleData( {
 			ramp,
 			backgroundRamp,
 			seed,
+			scaleType,
 		} ),
 	};
 }
@@ -339,6 +355,7 @@ function VariantCard( {
 			ramp: backgroundRamp,
 			backgroundRamp,
 			seed: backgroundRamp.ramp.surface2,
+			scaleType: 'neutral',
 		} ),
 		buildScaleData( {
 			label: 'Brand',
@@ -346,6 +363,7 @@ function VariantCard( {
 			ramp: primaryRamp,
 			backgroundRamp,
 			seed: primaryRamp.ramp.bgFill1,
+			scaleType: 'accent',
 		} ),
 		buildScaleData( {
 			label: 'Error',
@@ -353,6 +371,7 @@ function VariantCard( {
 			ramp: errorRamp,
 			backgroundRamp,
 			seed: errorRamp.ramp.bgFill1,
+			scaleType: 'accent',
 		} ),
 	] as const;
 
@@ -396,11 +415,16 @@ function PilotComparison() {
 					regression.
 				</p>
 				<p>
-					Every perceptual variant preserves seed chroma where sRGB
-					permits. Only Uniform APCA · released Step 5 removes the
-					legacy endpoint constraint. It targets a seven-point APCA
-					interval, or the largest available interval when space is
-					limited.
+					Neutral scales use the production foreground chroma taper.
+					Brand and error scales preserve seed chroma where sRGB
+					permits. FGS4→5 ΔEOK measures the resting-to-active color
+					difference. State-skewed APCA reserves 40% of the available
+					APCA range for that transition.
+				</p>
+				<p>
+					Only Uniform APCA · released Step 5 removes the legacy
+					endpoint constraint. It targets a seven-point APCA interval,
+					or the largest available interval when space is limited.
 				</p>
 			</header>
 			{ SAMPLE_COMBINATIONS.map( ( combination ) => {

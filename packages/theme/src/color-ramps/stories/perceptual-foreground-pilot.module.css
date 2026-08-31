@@ -59,12 +59,25 @@
 .scale-heading {
 	display: flex;
 	gap: 8px;
-	align-items: center;
+	align-items: start;
 	justify-content: space-between;
 }
 
 .scale-heading h4 {
 	font-size: 13px;
+}
+
+.scale-meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	justify-content: flex-end;
+}
+
+.state-difference {
+	font-size: 10px;
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
 }
 
 .status {
