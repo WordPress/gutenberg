@@ -5603,7 +5603,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * typography etc, that have custom selectors in their related block's
 	 * metadata.
 	 *
-	 * @param object $metadata The related block metadata containing selectors.
+	 * @param array  $metadata The related block metadata containing selectors.
 	 * @param object $node     A merged theme.json node for block or variation.
 	 *
 	 * @return array The style declarations for the node's features with custom
