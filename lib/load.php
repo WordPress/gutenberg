@@ -118,6 +118,7 @@ require __DIR__ . '/compat/wordpress-7.0/kses.php';
 require __DIR__ . '/compat/wordpress-7.0/command-palette.php';
 require __DIR__ . '/compat/wordpress-7.0/script-modules.php';
 require __DIR__ . '/compat/wordpress-7.0/fonts.php';
+require __DIR__ . '/compat/wordpress-7.0/meta-box-iframe.php';
 
 if ( class_exists( '\WordPress\AiClient\AiClient' ) ) {
 	require __DIR__ . '/compat/wordpress-7.0/class-wp-connector-registry.php';

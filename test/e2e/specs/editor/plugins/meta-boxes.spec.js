@@ -50,9 +50,11 @@ test.describe( 'Meta boxes', () => {
 		await page
 			.getByRole( 'button', { name: 'Meta Boxes', exact: true } )
 			.click( { position: { x: 40, y: 10 } } );
-		const field = page.getByRole( 'textbox', {
-			name: 'Test meta box field',
-		} );
+		const field = page
+			.frameLocator( 'iframe[name="gutenberg-meta-boxes"]' )
+			.getByRole( 'textbox', {
+				name: 'Test meta box field',
+			} );
 		await field.click();
 		await page.keyboard.type( 'META' );
 		await expect( field ).toHaveValue( 'META' );

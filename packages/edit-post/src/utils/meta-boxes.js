@@ -1,19 +1,12 @@
 /**
- * Function returning the current Meta Boxes DOM Node in the editor
- * whether the meta box area is opened or not.
- * If the MetaBox Area is visible returns it, and returns the original container instead.
+ * Returns the name of the iframe rendering the given meta box locations.
  *
- * @param {string} location Meta Box location.
+ * @param {string} location `main` or `side`.
  *
- * @return {string} HTML content.
+ * @return {string} The iframe name.
  */
-export const getMetaBoxContainer = ( location ) => {
-	const area = document.querySelector(
-		`.edit-post-meta-boxes-area.is-${ location } .metabox-location-${ location }`
-	);
-	if ( area ) {
-		return area;
-	}
-
-	return document.querySelector( '#metaboxes .metabox-location-' + location );
-};
+export function getMetaBoxesIframeName( location = 'main' ) {
+	return location === 'side'
+		? 'gutenberg-meta-boxes-side'
+		: 'gutenberg-meta-boxes';
+}

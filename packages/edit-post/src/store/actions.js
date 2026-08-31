@@ -9,7 +9,7 @@ import { addAction } from '@wordpress/hooks';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
-import { getMetaBoxContainer } from '../utils/meta-boxes';
+import { getMetaBoxesIframeName } from '../utils/meta-boxes';
 import { unlock } from '../lock-unlock';
 
 const { interfaceStore } = unlock( editorPrivateApis );
@@ -275,15 +275,59 @@ export function setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
  */
 export const requestMetaBoxUpdates =
 	() =>
-	async ( { registry, select, dispatch } ) => {
+	async ( { registry, dispatch } ) => {
 		dispatch( {
 			type: 'REQUEST_META_BOX_UPDATES',
 		} );
 
-		// Saves the wp_editor fields.
-		if ( window.tinyMCE ) {
-			window.tinyMCE.triggerSave();
-		}
+		// The frames have to be found through the elements: under the
+		// editor's Document-Isolation-Policy the frames' browsing context
+		// names are cleared, so `window.frames[ name ]` finds nothing.
+		// A document without the submit button is still loading or failed
+		// to load, so there is nothing to save in it.
+		const submitters = [ 'main', 'side' ]
+			.map( ( location ) =>
+				document.querySelector(
+					`iframe[name="${ getMetaBoxesIframeName( location ) }"]`
+				)
+			)
+			.filter( Boolean )
+			.map( ( iframe ) =>
+				iframe.contentDocument?.getElementById(
+					'gutenberg-meta-box-submitter'
+				)
+			)
+			.filter( Boolean );
+
+		const metaBoxesFormData = submitters.map( ( submitter ) => {
+			// Some meta boxes, including TinyMCE editors, only write their
+			// values into their form fields in a submit handler, so submit
+			// the form with the hidden button the loader page renders for
+			// this. The loader cancels every submission, so the form does
+			// not actually navigate.
+			const { form } = submitter;
+			form.requestSubmit( submitter );
+
+			// The form also holds the title and content fields, which must
+			// not be submitted. Disabled fields are excluded from
+			// `FormData`, so the fields outside the meta boxes are disabled
+			// while the data is constructed.
+			const outsideFields = [ ...form.elements ].filter(
+				( field ) =>
+					! field.disabled &&
+					! field.closest( '.meta-box-sortables .postbox' )
+			);
+			for ( const field of outsideFields ) {
+				field.disabled = true;
+			}
+			try {
+				return new form.ownerDocument.defaultView.FormData( form );
+			} finally {
+				for ( const field of outsideFields ) {
+					field.disabled = false;
+				}
+			}
+		} );
 
 		// We gather the base form data.
 		const baseFormData = new window.FormData(
@@ -309,15 +353,7 @@ export const requestMetaBoxUpdates =
 			post.author ? [ 'post_author', post.author ] : false,
 		].filter( Boolean );
 
-		// We gather all the metaboxes locations.
-		const activeMetaBoxLocations = select.getActiveMetaBoxLocations();
-		const formDataToMerge = [
-			baseFormData,
-			...activeMetaBoxLocations.map(
-				( location ) =>
-					new window.FormData( getMetaBoxContainer( location ) )
-			),
-		];
+		const formDataToMerge = [ baseFormData, ...metaBoxesFormData ];
 
 		// Merge all form data objects into a single one.
 		const formData = formDataToMerge.reduce( ( memo, currentFormData ) => {
@@ -449,7 +485,7 @@ export function __unstableCreateTemplate() {
 let metaBoxesInitialized = false;
 
 /**
- * Initializes WordPress `postboxes` script and the logic for saving meta boxes.
+ * Initializes the logic for saving and refreshing meta boxes.
  */
 export const initializeMetaBoxes =
 	() =>
@@ -465,11 +501,6 @@ export const initializeMetaBoxes =
 		if ( metaBoxesInitialized ) {
 			return;
 		}
-		const postType = registry.select( editorStore ).getCurrentPostType();
-		if ( window.postboxes.page !== postType ) {
-			window.postboxes.add_postbox_toggles( postType );
-		}
-
 		metaBoxesInitialized = true;
 
 		// Save metaboxes on save completion, except for autosaves.

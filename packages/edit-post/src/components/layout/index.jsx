@@ -47,7 +47,7 @@ import EditorInitialization from '../editor-initialization';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import InitPatternModal from '../init-pattern-modal';
 import BrowserURL from '../browser-url';
-import MetaBoxes from '../meta-boxes';
+import MetaBoxesIframe from '../meta-boxes/iframe';
 import PostEditorMoreMenu from '../more-menu';
 import WelcomeGuide from '../welcome-guide';
 import { store as editPostStore } from '../../store';
@@ -125,8 +125,7 @@ function MetaBoxesMain() {
 			!! get( 'core/edit-post', 'metaBoxesMainIsOpen' ),
 			get( 'core/edit-post', 'metaBoxesMainOpenHeight' ),
 			isMetaBoxLocationVisible( 'normal' ) ||
-				isMetaBoxLocationVisible( 'advanced' ) ||
-				isMetaBoxLocationVisible( 'side' ),
+				isMetaBoxLocationVisible( 'advanced' ),
 		];
 	}, [] );
 	const { set: setPreference } = useDispatch( preferencesStore );
@@ -161,6 +160,11 @@ function MetaBoxesMain() {
 		observer.observe( container );
 		if ( noticeContainer ) {
 			observer.observe( noticeContainer );
+		}
+		// The pane mounts hidden until an iframe reports meta boxes, so the
+		// handle measures 0 until it appears.
+		if ( resizeHandle ) {
+			observer.observe( resizeHandle );
 		}
 		return () => observer.disconnect();
 	}, [] );
@@ -256,18 +260,13 @@ function MetaBoxesMain() {
 		{ keyboardDisplacement: 20, filterTaps: true }
 	);
 
-	if ( ! hasAnyVisible ) {
-		return;
-	}
-
 	const contents = (
 		<div
 			// The class name 'edit-post-layout__metaboxes' is retained because some plugins use it.
 			className="edit-post-layout__metaboxes edit-post-meta-boxes-main__liner"
 			hidden={ ! isOpen }
 		>
-			<MetaBoxes location="normal" />
-			<MetaBoxes location="advanced" />
+			<MetaBoxesIframe />
 		</div>
 	);
 
@@ -335,7 +334,11 @@ function MetaBoxesMain() {
 				'edit-post-meta-boxes-main',
 				! isShort && 'is-resizable'
 			) }
-			style={ { height: usedHeight } }
+			// Hidden rather than unmounted when no boxes are visible: the
+			// iframe document reports which meta boxes exist.
+			style={
+				hasAnyVisible ? { height: usedHeight } : { display: 'none' }
+			}
 		>
 			<div className="edit-post-meta-boxes-main__presenter">
 				{ toggle }
@@ -572,7 +575,7 @@ function Layout( {
 								onActionPerformed={ onActionPerformed }
 								extraSidebarPanels={
 									showMetaBoxes && (
-										<MetaBoxes location="side" />
+										<MetaBoxesIframe location="side" />
 									)
 								}
 								extraContent={
