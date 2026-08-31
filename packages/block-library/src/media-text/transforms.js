@@ -5,11 +5,11 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/image' ],
-			transform: ( { alt, url, id, anchor } ) =>
+			transform: ( { alt, url, blob, id, anchor } ) =>
 				createBlock( 'core/media-text', {
 					mediaAlt: alt,
 					mediaId: id,
-					mediaUrl: url,
+					mediaUrl: url ?? blob,
 					mediaType: 'image',
 					anchor,
 				} ),
