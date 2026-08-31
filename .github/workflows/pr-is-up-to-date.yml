@@ -1,0 +1,117 @@
+name: PR freshness
+
+on:
+    pull_request_target:
+        types: [opened, synchronize, reopened, ready_for_review, edited]
+        branches: [trunk]
+    push:
+        branches: [trunk]
+    workflow_dispatch:
+        inputs:
+            move-baseline:
+                description: 'Force-move the baseline tag to current trunk HEAD'
+                type: boolean
+                default: false
+            reconcile:
+                description: 'Re-evaluate and stamp open PRs (bootstrap/repair)'
+                type: boolean
+                default: false
+            bootstrap-window:
+                description: 'Days of PR activity to bootstrap-stamp during reconcile; 0 stamps every open PR'
+                type: number
+                default: 180
+
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
+concurrency:
+    # Serialize per PR, and serialize all baseline moves in one group. Replaced
+    # pending runs are safe: move decisions diff cumulatively from the tag, so
+    # the next push run recovers marker changes and labeled merges alike.
+    group: pr-freshness-${{ github.event_name == 'pull_request_target' && github.event.pull_request.number || 'baseline' }}
+    cancel-in-progress: false
+
+jobs:
+    check-pr:
+        name: Check PR freshness
+        if: github.repository == 'WordPress/gutenberg' && github.event_name == 'pull_request_target'
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+        permissions:
+            contents: read
+            statuses: write
+        env:
+            HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        steps:
+            # Trunk only. PR code is never checked out, built, or executed.
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  ref: trunk
+                  fetch-depth: 100
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
+            - name: Check PR freshness and post status
+              run: npm run --workspace @wordpress/validation-tools pr-freshness -- check --head-sha "$HEAD_SHA"
+
+    move-baseline:
+        name: Move freshness baseline
+        if: >
+            github.repository == 'WordPress/gutenberg' && (
+                github.event_name == 'push' ||
+                (github.event_name == 'workflow_dispatch' && inputs.move-baseline)
+            )
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+        permissions:
+            contents: write
+            statuses: write
+            pull-requests: read
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            FORCE: ${{ github.event_name != 'push' }}
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  ref: trunk
+                  fetch-depth: 0
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
+            - name: Move the baseline tag and fan out
+              run: npm run --workspace @wordpress/validation-tools pr-freshness -- move-baseline --force="$FORCE" --then-fanout
+
+    reconcile:
+        name: Reconcile freshness statuses
+        # needs + always(): a combined dispatch runs move-baseline first, and a
+        # reconcile-only dispatch still runs after move-baseline is skipped.
+        # Workflow-level concurrency does not serialize sibling jobs in a run.
+        needs: [move-baseline]
+        if: always() && github.repository == 'WordPress/gutenberg' && github.event_name == 'workflow_dispatch' && inputs.reconcile
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+        permissions:
+            contents: read
+            statuses: write
+            pull-requests: read
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            BOOTSTRAP_WINDOW: ${{ inputs.bootstrap-window }}
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  ref: trunk
+                  fetch-depth: 0
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
+            - name: Reconcile statuses on open PRs
+              run: npm run --workspace @wordpress/validation-tools pr-freshness -- fanout --mode=reconcile --bootstrap-window="$BOOTSTRAP_WINDOW"
