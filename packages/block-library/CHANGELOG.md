@@ -77,6 +77,7 @@
 -   Playlist: Improve handling of declarative waveform player configuration ([#81342](https://github.com/WordPress/gutenberg/pull/81342)).
 -   Playlist: Update `@arraypress/waveform-player` to `^1.26.0`, disable automatic initialization, and prevent custom SVG icons from being configured through HTML data attributes.
 -   Cover: Pass `'full'` instead of `null` as the featured image size for parallax and repeated backgrounds, so a null array offset is no longer reached on PHP 8.5 ([#81444](https://github.com/WordPress/gutenberg/pull/81444)).
+-   Synced Pattern (`core/block`): Cap the number of pattern expansions per top-level render to prevent memory exhaustion when a pattern references others in a dense, repeated, or "diamond" graph that expands exponentially. A new `block_core_block_render_budget` filter controls the limit (default 10000; return -1 to remove it).
 
 ### Internal
 
