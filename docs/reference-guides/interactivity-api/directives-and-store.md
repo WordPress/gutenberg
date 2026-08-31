@@ -640,6 +640,12 @@ But it can also be used on other elements:
 
 When the list is re-rendered, the Interactivity API will match elements by their keys to determine if an item was added/removed/reordered. Elements without keys might be recreated unnecessarily.
 
+The key only needs to be unique among its **siblings** (the items of the same list). Two elements in different lists may share a key value without issue.
+
+When content is added dynamically with [`renderHTML()`](#renderhtml), elements without `data-wp-key` fall back to their `id` attribute as the key, and — for insertion modes — to an auto-generated key, so adding new items never disrupts the existing ones.
+
+Router navigation matches region content by key too: `data-wp-key` items that don't match anything in the current tree mount fresh, while unkeyed items are matched by position and keep their state. The `id` fallback applies to `renderHTML()` only, so the router does not read `id` as a key.
+
 ### `wp-each`
 
 The `wp-each` directive is intended to render a list of elements. The directive can be used in `<template>` tags, being the value a path to an array stored in the global state or the context. The content inside the `<template>` tag is the template used to render each of the items.
@@ -713,6 +719,47 @@ For server-side rendered lists, another directive called `data-wp-each-child` en
 	<li data-wp-each-child>olá</li>
 </ul>
 ```
+
+## `renderHTML()`
+
+The `renderHTML()` function renders an HTML string into the live DOM, processing all Interactivity API directives on it. It is commonly used to add server-rendered content dynamically — for example, prepend a new post to a feed, load more posts appeneded to the bottom, or a filtered list re-rendered in place.
+
+```js
+import { renderHTML } from '@wordpress/interactivity';
+
+const res = await fetch( '/wp-json/my-plugin/v1/posts' );
+renderHTML( '#feed', await res.text() );
+```
+
+The container can be an element or a CSS selector, and must be inside an island (`[data-wp-interactive]`) or carry its own `data-wp-interactive` attribute. Router regions are supported.
+
+### Modes
+
+The `mode` option controls where the parsed HTML is inserted:
+
+- `append` (default): as the container's last children.
+- `prepend`: as the container's first children.
+- `before`: as siblings immediately before the container.
+- `after`: as siblings immediately after the container.
+- `inner`: replaces the container's children.
+- `replace`: replaces the container itself.
+
+### List identity
+
+When the new content contains repeated elements, the Interactivity API matches them against the existing elements by key, so it can decide whether an item is new, reused, or removed:
+
+1. An explicit `data-wp-key` attribute wins.
+2. Otherwise, the element's `id` attribute is used as the key.
+3. For insertion modes (`prepend`, `before`, `after`), items with neither `data-wp-key` or `id` will get an auto-generated key, so inserting new content never disrupts existing items — they keep their state and their `data-wp-init` callbacks don't re-run.
+
+`append` is safe without any keys. `inner` and `replace` reuse existing elements by position, so same-shape content keeps its state across refreshes; to keep identity across a refresh, the refreshed content must carry the same `data-wp-key` (or `id`) as the current items.
+
+Safest is to always add a `data-wp-key` to the content you inject with `renderHTML()` and to the server-rendered content it joins — the `id` fallback and auto-generated keys are conveniences, not substitutes. Testing is recommended if you rely on the fallbacks.
+
+#### Known limitations
+
+- **Unkeyed refreshes reuse elements, so the new content's init doesn't run.** `inner`/`replace` match content by position when it has no `data-wp-key`/`id`: the existing element is reused and the new content's `data-wp-init` doesn't fire. Content with a key that matches nothing in the current tree mounts fresh (`data-wp-init` runs, state resets) — this includes server-rendered items refreshed with keyed content, and items previously inserted with only an auto-generated key (the auto key is created fresh on every parse, so it can never match an earlier parse's item).
+- **Duplicate deliveries are not deduplicated.** If the same entity arrives twice (e.g. a push race), a second copy is rendered — even with a matching `data-wp-key`/`id`. The key distinguishes items; it does not merge duplicates.
 
 ## Values of directives are references to store properties
 

@@ -1,0 +1,21 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "test/activity-feed",
+	"title": "E2E Interactivity tests - activity feed",
+	"category": "text",
+	"icon": "heart",
+	"description": "",
+	"attributes": {
+		"identity": {
+			"type": "string",
+			"default": "data-wp-key"
+		}
+	},
+	"supports": {
+		"interactivity": true
+	},
+	"textdomain": "e2e-interactivity",
+	"viewScriptModule": "file:./view.js",
+	"render": "file:./render.php"
+}
