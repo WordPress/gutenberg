@@ -53,17 +53,26 @@ const generateMenuItems = ( {
 	const newMenuItems: ToolsPanelMenuItems = emptyMenuItems();
 	const menuItems: ToolsPanelMenuItems = emptyMenuItems();
 
-	panelItems.forEach( ( { hasValue, isShownByDefault, label } ) => {
-		const group = isShownByDefault ? 'default' : 'optional';
+	panelItems.forEach(
+		( { defaultShown, hasValue, isShownByDefault, label } ) => {
+			const group = isShownByDefault ? 'default' : 'optional';
 
-		// If a menu item for this label has already been flagged as customized
-		// (for default controls), or toggled on (for optional controls), do not
-		// overwrite its value as those controls would lose that state.
-		const existingItemValue = currentMenuItems?.[ group ]?.[ label ];
-		const value = existingItemValue ? existingItemValue : hasValue();
+			// Any state a menu item already has is preserved, so that a
+			// control flagged as customized (for default controls) or toggled
+			// on (for optional controls) does not lose it. `false` is state
+			// too, so the nullish check must not treat an item the user hid
+			// as unregistered, otherwise registering any other item would
+			// re-show it.
+			const existingItemValue = currentMenuItems?.[ group ]?.[ label ];
+			// An item is always shown while it has a value. `defaultShown`
+			// only opts an optional item in when it has none.
+			const initialValue =
+				hasValue() || ( ! isShownByDefault && !! defaultShown );
+			const value = existingItemValue ?? initialValue;
 
-		newMenuItems[ group ][ label ] = shouldReset ? false : value;
-	} );
+			newMenuItems[ group ][ label ] = shouldReset ? false : value;
+		}
+	);
 
 	// Loop the known, previously registered items first to maintain menu order.
 	menuItemOrder.forEach( ( key ) => {
@@ -340,9 +349,33 @@ export function useToolsPanel(
 
 	// Toggle the checked state of a menu item which is then used to determine
 	// display of the item within the panel.
-	const toggleItem = useCallback( ( label: string ) => {
-		panelDispatch( { type: 'TOGGLE_VALUE', label } );
-	}, [] );
+	//
+	// The item's `onShownChange` callback is invoked from here rather than in
+	// response to the resulting state change, so that it only ever reports an
+	// explicit menu action by the user.
+	const toggleItem = useCallback(
+		( label: string ) => {
+			const currentItem = panelItems.find(
+				( item ) => item.label === label
+			);
+
+			if ( ! currentItem ) {
+				return;
+			}
+
+			panelDispatch( { type: 'TOGGLE_VALUE', label } );
+
+			// Default items remain visible when toggled off, which resets them
+			// instead of hiding them. Only optional items have a show or hide
+			// transition to report.
+			if ( currentItem.isShownByDefault ) {
+				return;
+			}
+
+			currentItem.onShownChange?.( ! menuItems.optional[ label ] );
+		},
+		[ menuItems, panelItems ]
+	);
 
 	// Resets display of children and executes resetAll callback if available.
 	const resetAllItems = useCallback( () => {
