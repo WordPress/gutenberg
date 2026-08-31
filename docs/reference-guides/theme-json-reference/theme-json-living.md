@@ -150,6 +150,7 @@ Settings related to the lightbox.
 | Property | Description | Type | Default |
 | -------- | ----------- | ---- | ------- |
 | enabled | Defines whether the lightbox is enabled or not. | `boolean` |  |
+| overlayBackgroundColor | The background color of the lightbox overlay. Accepts any valid CSS color value. | `string` |  |
 | allowEditing | Defines whether to show the Lightbox UI in the block editor. If set to `false`, the user won't be able to change the lightbox settings in the block editor. | `boolean` |  |
 
 ---

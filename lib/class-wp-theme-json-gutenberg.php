@@ -448,8 +448,9 @@ class WP_Theme_JSON_Gutenberg {
 			'allowCustomContentAndWideSize' => null,
 		),
 		'lightbox'                      => array(
-			'enabled'      => true,
-			'allowEditing' => true,
+			'enabled'                => true,
+			'allowEditing'           => true,
+			'overlayBackgroundColor' => null,
 		),
 		'position'                      => array(
 			'fixed'  => null,
