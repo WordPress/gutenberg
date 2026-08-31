@@ -169,6 +169,13 @@ module.exports = {
 				],
 			},
 		},
+		{
+			files: [ '**/*.css' ],
+			rules: {
+				// Re-add no-duplicate-selectors rule for CSS because it is disabled by stylelint-config-recommended-scss v17
+				'no-duplicate-selectors': true,
+			},
+		},
 	],
 	reportDescriptionlessDisables: true,
 };
