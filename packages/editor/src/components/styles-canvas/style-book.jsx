@@ -1,4 +1,4 @@
-import { useMemo, forwardRef } from '@wordpress/element';
+import { useCallback, useMemo, forwardRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { useGlobalStylesRevisions } from '@wordpress/global-styles-ui';
 import { store as interfaceStore } from '@wordpress/interface';
@@ -33,26 +33,44 @@ function useStyleBookNoteActions() {
 	 */
 	const { counts } = useStyleBookNoteThreads( { enabled: isEnabled } );
 
-	if ( ! isEnabled ) {
-		return {};
-	}
+	const openNotes = useCallback(
+		( anchor ) => {
+			enableComplementaryArea( 'core', STYLE_BOOK_NOTES_SIDEBAR );
+			setActiveAnchor( anchor );
+		},
+		[ enableComplementaryArea, setActiveAnchor ]
+	);
 
-	const openNotes = ( anchor ) => {
-		enableComplementaryArea( 'core', STYLE_BOOK_NOTES_SIDEBAR );
-		setActiveAnchor( anchor );
-	};
-
-	return {
-		highlightedAnchor: activeAnchor,
-		noteActions: {
+	/*
+	 * The examples are rendered by a memoized component, so these have to hold
+	 * their identity: a new object here re-renders every block preview in the
+	 * Style Book each time the canvas renders.
+	 */
+	const noteActions = useMemo(
+		() => ( {
 			counts,
 			onAddNote: ( anchor ) => {
 				setPendingAnchor( anchor );
 				openNotes( anchor );
 			},
-			onOpenNotes: openNotes,
-		},
-	};
+			/*
+			 * Reviewing existing notes is not the start of a new one, so a form
+			 * left armed for another example is dropped rather than carried
+			 * into a sidebar that is now showing something else.
+			 */
+			onOpenNotes: ( anchor ) => {
+				setPendingAnchor( null );
+				openNotes( anchor );
+			},
+		} ),
+		[ counts, openNotes, setPendingAnchor ]
+	);
+
+	if ( ! isEnabled ) {
+		return {};
+	}
+
+	return { highlightedAnchor: activeAnchor, noteActions };
 }
 
 function StyleBookWithNavigation( {

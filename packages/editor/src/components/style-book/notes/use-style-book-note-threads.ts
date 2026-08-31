@@ -8,6 +8,13 @@ import {
 import { countThreadsByAnchor, groupThreadsByAnchor } from './anchors';
 import type { StyleBookNoteGroup, StyleBookNoteThread } from './anchors';
 
+/*
+ * A fresh `{}` default would give `labels` a new identity on every call, which
+ * defeats the memo below - and with it the memoized `Examples` tree, which
+ * re-renders every block preview in the Style Book.
+ */
+const EMPTY_LABELS: Record< string, string > = {};
+
 type UseStyleBookNoteThreadsOptions = {
 	enabled?: boolean;
 	labels?: Record< string, string >;
@@ -38,7 +45,7 @@ type UseStyleBookNoteThreadsResult = {
  */
 export function useStyleBookNoteThreads( {
 	enabled = true,
-	labels = {},
+	labels = EMPTY_LABELS,
 }: UseStyleBookNoteThreadsOptions = {} ): UseStyleBookNoteThreadsResult {
 	const globalStylesId = useSelect(
 		( select ) =>
