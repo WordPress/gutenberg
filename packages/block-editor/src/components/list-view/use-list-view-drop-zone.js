@@ -191,13 +191,19 @@ const ALLOWED_DROP_EDGES = [ 'top', 'bottom' ];
 /**
  * Given blocks data and the cursor position, compute the drop target.
  *
- * @param {WPListViewDropZoneBlocks} blocksData Data about the blocks in list view.
- * @param {WPPoint}                  position   The point representing the cursor position when dragging.
- * @param {boolean}                  rtl        Whether the editor is in RTL mode.
+ * @param {WPListViewDropZoneBlocks} blocksData            Data about the blocks in list view.
+ * @param {WPPoint}                  position              The point representing the cursor position when dragging.
+ * @param {boolean}                  rtl                   Whether the editor is in RTL mode.
+ * @param {string[]}                 draggedBlockClientIds The client ids of the dragged blocks.
  *
  * @return {WPListViewDropZoneTarget | undefined} An object containing data about the drop target.
  */
-export function getListViewDropTarget( blocksData, position, rtl = false ) {
+export function getListViewDropTarget(
+	blocksData,
+	position,
+	rtl = false,
+	draggedBlockClientIds = []
+) {
 	let candidateEdge;
 	let candidateBlockData;
 	let candidateDistance;
@@ -376,9 +382,25 @@ export function getListViewDropTarget( blocksData, position, rtl = false ) {
 		}
 	}
 
+	const draggedBlocksData = draggedBlockClientIds?.map( ( clientId ) =>
+		blocksData.find( ( blockData ) => blockData.clientId === clientId )
+	);
+
+	// Skip sibling insertion check if block is moving within same parent.
+	const hasSameParent = draggedBlocksData?.some( ( draggedBlock ) =>
+		candidateBlockParents?.find(
+			( blockData ) =>
+				blockData.clientId === draggedBlock.rootClientId &&
+				blockData.nestingLevel === draggedBlock.nestingLevel - 1
+		)
+	);
+
 	// If dropping as a sibling, but block cannot be inserted in
 	// this context, return early.
-	if ( ! candidateBlockData.canInsertDraggedBlocksAsSibling ) {
+	if (
+		! hasSameParent &&
+		! candidateBlockData.canInsertDraggedBlocksAsSibling
+	) {
 		return;
 	}
 
@@ -517,7 +539,8 @@ export default function useListViewDropZone( {
 				const newTarget = getListViewDropTarget(
 					blocksData,
 					position,
-					rtl
+					rtl,
+					draggedBlockClientIds
 				);
 
 				if ( newTarget ) {
