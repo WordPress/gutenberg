@@ -4,6 +4,16 @@
 
 ### Internal
 
+-   Enforce NodeNext module resolution in the build project so future declaration imports are checked against the package's published ESM resolution rules. ([#82088](https://github.com/WordPress/gutenberg/pull/82088))
+
+## 4.0.0 (2026-08-26)
+
+### Breaking Changes
+
+-   Fix published ESM declaration imports for Node-style resolution. TypeScript consumers now require TypeScript 5 or newer. ([#82022](https://github.com/WordPress/gutenberg/pull/82022))
+
+### Internal
+
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
 
 ## 3.1.0 (2026-08-12)

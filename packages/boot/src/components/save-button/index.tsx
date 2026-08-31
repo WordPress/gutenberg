@@ -16,7 +16,7 @@ import {
 	Tooltip,
 	useKeyboardShortcutProps,
 } from '@wordpress/ui';
-import './style.scss';
+import styles from './style.module.scss';
 import useSaveShortcut from '../save-panel/use-save-shortcut';
 
 export default function SaveButton() {
@@ -108,7 +108,7 @@ export default function SaveButton() {
 							disabled={ disabled }
 							accessibleWhenDisabled
 							isBusy={ isSaving }
-							className="boot-save-button"
+							className={ styles[ 'save-button' ] }
 							icon={ isInSavedState ? check : undefined }
 						/>
 					}
@@ -124,7 +124,7 @@ export default function SaveButton() {
 				<Tooltip.Popup>
 					{ hasChanges && <span>{ label }</span> }
 					<KeyboardShortcutDisplay
-						className="boot-save-button__shortcut"
+						className={ styles.shortcut }
 						shortcut={ shortcut }
 					/>
 				</Tooltip.Popup>

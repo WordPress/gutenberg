@@ -186,7 +186,7 @@ export function useIsPostTypeHierarchical( postType ) {
 }
 
 /**
- * List of avaiable options to order by.
+ * List of available options to order by.
  *
  * @param {string} postType The post type to check.
  * @return {OrderByOption[]} List of order options.
