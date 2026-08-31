@@ -1,4 +1,73 @@
 .wp-block-math {
 	overflow-x: auto;
 	overflow-y: hidden;
+
+	// Temml (the LaTeX-to-MathML converter used by this block) emits
+	// MathML that relies on these rules for correct cross-browser layout
+	// of arrays, matrices, and aligned environments. Without them, e.g.
+	// `pmatrix`/`vmatrix`/`aligned` render with incorrect column
+	// alignment and row spacing in Firefox and WebKit.
+	// See: https://github.com/WordPress/gutenberg/issues/80732
+	math {
+		display: inline-flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+
+		> mrow {
+			padding: 0.5ex 0;
+		}
+
+		// This block always renders `<math display="block">`. Keep that
+		// block-level layout instead of letting the inline-flex rule above
+		// override it.
+		&[display="block"] {
+			display: block;
+			width: 100%;
+		}
+	}
+
+	// Array/matrix cell justification.
+	.tml-right {
+		text-align: right;
+		text-align: -webkit-right;
+	}
+
+	.tml-left {
+		text-align: left;
+		text-align: -webkit-left;
+	}
+
+	// Row spacing for `aligned`/`array`-type environments.
+	mtable.tml-jot mtd {
+		padding-top: 0.7ex;
+		padding-bottom: 0.7ex;
+	}
+
+	mtable.tml-small mtd {
+		padding-top: 0.35ex;
+		padding-bottom: 0.35ex;
+	}
+
+	// Firefox does not support the flex-based line-wrapping above, and
+	// needs different row-spacing adjustments.
+	@-moz-document url-prefix() {
+		math {
+			display: inline;
+
+			> mrow {
+				padding: 0;
+			}
+		}
+
+		mtd,
+		mtable.tml-small mtd {
+			padding-top: 0;
+			padding-bottom: 0;
+		}
+
+		mtable.tml-jot mtd {
+			padding-top: 0.2ex;
+			padding-bottom: 0;
+		}
+	}
 }
