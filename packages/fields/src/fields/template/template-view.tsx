@@ -28,15 +28,10 @@ function BlockThemeTemplateView( {
 	field,
 }: DataViewRenderFieldProps< BasePost > ) {
 	const postType = item.type;
-	const slug = item.slug;
 	const postId = item.id;
 	const templateSlug = field.getValue( { item } );
 
-	const defaultTemplateLabel = useDefaultTemplateLabel(
-		postType,
-		postId,
-		slug
-	);
+	const defaultTemplateLabel = useDefaultTemplateLabel( postType, postId );
 
 	const templateLabel = useSelect(
 		( select ) => {
