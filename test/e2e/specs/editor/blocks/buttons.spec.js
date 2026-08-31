@@ -449,7 +449,7 @@ test.describe( 'Buttons', () => {
 		);
 	} );
 
-	test( 'copies attributes when inserting a sibling via the appender', async ( {
+	test( 'copies attributes when inserting a sibling via the toolbar', async ( {
 		editor,
 		page,
 	} ) => {
@@ -479,13 +479,14 @@ test.describe( 'Buttons', () => {
 			.click();
 		await page.getByRole( 'option', { name: 'Vivid red' } ).click();
 
-		// Select the parent Buttons block so the appender is visible.
+		// Select the parent Buttons block so its toolbar is shown.
 		await editor.selectBlocks(
 			editor.canvas.getByRole( 'document', { name: 'Block: Buttons' } )
 		);
 
-		// Insert a sibling via the appender; should auto-insert a button.
-		await editor.canvas
+		// Insert a sibling from the toolbar; should auto-insert a button.
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
 			.getByRole( 'button', { name: 'Add button' } )
 			.click();
 
