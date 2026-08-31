@@ -8,6 +8,7 @@
 }
 
 .editor-revision-fields-diff__removed {
+	background-color: color-mix(in srgb, currentColor 5%, #d63638 15%);
 	text-decoration: line-through;
-	color: #d63638;
+	text-decoration-color: #d63638;
 }
