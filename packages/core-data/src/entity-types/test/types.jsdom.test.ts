@@ -232,6 +232,58 @@ describe( 'Entity record types', () => {
 		};
 	} );
 
+	describe( 'a union of query shapes resolves each member separately', () => {
+		/*
+		 * `keyof` over a union is the intersection of its keys, so a query
+		 * that only carries `context` on one member would otherwise look as
+		 * though it carries none and fall back to `edit`.
+		 */
+		() => {
+			true satisfies Expect<
+				EntityRecordOfQuery<
+					'postType',
+					'post',
+					{ context: 'view' } | { per_page: number }
+				>,
+				Post< 'view' > | Post< 'edit' >
+			>;
+			true satisfies Expect<
+				EntityRecordOfQuery<
+					'postType',
+					'post',
+					{ context: 'view' } | { context: 'embed' }
+				>,
+				Post< 'view' > | Post< 'embed' >
+			>;
+		};
+
+		// The same shape through the public selectors.
+		( query: { context: 'view' } | { per_page: number } ) => {
+			const record = select( coreStore ).getEntityRecord(
+				'postType',
+				'post',
+				1,
+				query
+			);
+			true satisfies Expect<
+				typeof record,
+				Post< 'view' > | Post< 'edit' > | undefined
+			>;
+			// @ts-expect-error -- the request may be `view`, which omits it.
+			record?.password;
+
+			const records = select( coreStore ).getEntityRecords(
+				'postType',
+				'post',
+				query
+			);
+			true satisfies Expect<
+				typeof records,
+				( Post< 'view' > | Post< 'edit' > )[] | null
+			>;
+		};
+	} );
+
 	describe( 'getEntityRecord infers the record through select()', () => {
 		() => {
 			const post = select( coreStore ).getEntityRecord(

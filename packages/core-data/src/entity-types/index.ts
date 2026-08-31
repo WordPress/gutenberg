@@ -313,10 +313,17 @@ type ContextsOf< Requested > = Context extends Requested
  * Only an inline object keeps `context` as a literal: assigning that same
  * object to a variable widens the property to `string` at the declaration,
  * before the call is made. A query with no `context` keeps the default.
+ *
+ * Each member of a union query is resolved on its own, because `keyof` over a
+ * union is the intersection of its keys -- a `{ context: 'view' } | { per_page:
+ * number }` query would otherwise look like it carries no `context` at all and
+ * fall back to `edit`.
  */
-type ContextOfQuery< Query > = 'context' extends keyof Query
-	? ContextsOf< Query[ 'context' & keyof Query ] >
-	: 'edit';
+type ContextOfQuery< Query > = Query extends unknown
+	? 'context' extends keyof Query
+		? ContextsOf< Query[ 'context' & keyof Query ] >
+		: 'edit'
+	: never;
 
 /**
  * Resolves a `kind`/`name` pair to its record in each of the given contexts.
