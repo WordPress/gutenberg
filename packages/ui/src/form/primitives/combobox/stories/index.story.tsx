@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useRef, useState } from '@wordpress/element';
 import * as Combobox from '../index';
 import { Spinner } from '../../../../spinner';
+import { Stack } from '../../../../stack';
 import {
 	ITEMS,
 	GROUPED_ITEMS,
@@ -286,10 +287,10 @@ export const AsyncItems: Story = {
 					</div>
 					<Combobox.Status>
 						{ loading ? (
-							<>
+							<Stack direction="row" gap="sm" align="center">
 								<Spinner />
 								Loading…
-							</>
+							</Stack>
 						) : null }
 					</Combobox.Status>
 					<Combobox.Empty>

@@ -5,6 +5,7 @@ import { search } from '@wordpress/icons';
 import * as Autocomplete from '../index';
 import { Icon } from '../../../../icon';
 import { Spinner } from '../../../../spinner';
+import { Stack } from '../../../../stack';
 import { Input } from '../../input';
 import { InputLayout } from '../../input-layout';
 import {
@@ -165,10 +166,10 @@ export const AsyncItems: Story = {
 				<Autocomplete.Popup>
 					<Autocomplete.Status>
 						{ loading ? (
-							<>
+							<Stack direction="row" gap="sm" align="center">
 								<Spinner />
 								Loading…
-							</>
+							</Stack>
 						) : null }
 					</Autocomplete.Status>
 					<Autocomplete.Empty>
