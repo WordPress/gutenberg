@@ -41,8 +41,10 @@ const meta = {
 				'date',
 				'datetime',
 				'email',
+				'group',
 				'integer',
 				'number',
+				'object',
 				'password',
 				'radio',
 				'select',
@@ -142,6 +144,20 @@ type DataType = {
 	ratingWithIcon?: string;
 	percentageWithSuffix?: string;
 	priceWithBoth?: string;
+	link: {
+		url: string;
+		rel: string;
+		target: string;
+	};
+	address: {
+		street: string;
+		city: string;
+		country: string;
+	};
+	// Flat data for group example (not nested)
+	imageId: string;
+	imageUrl: string;
+	imageCaption: string;
 };
 
 const data: DataType[] = [
@@ -187,6 +203,19 @@ const data: DataType[] = [
 		ratingWithIcon: '4.5',
 		percentageWithSuffix: '85',
 		priceWithBoth: '199.99',
+		link: {
+			url: 'https://wordpress.org',
+			rel: 'noopener',
+			target: '_blank',
+		},
+		address: {
+			street: '123 Main St',
+			city: 'San Francisco',
+			country: 'USA',
+		},
+		imageId: '42',
+		imageUrl: 'https://wordpress.org/image.png',
+		imageCaption: 'A sample image',
 	},
 ];
 
@@ -596,6 +625,84 @@ const fields: Field< DataType >[] = [
 			suffix: USDSuffix,
 		},
 	},
+	{
+		id: 'link',
+		type: 'object',
+		label: 'Link',
+		description: 'Object field with URL, rel, and target properties.',
+		properties: {
+			url: { id: 'url', type: 'url', label: 'URL' },
+			rel: {
+				id: 'rel',
+				type: 'text',
+				label: 'Rel attribute',
+				elements: [
+					// https://html.spec.whatwg.org/multipage/links.html#linkTypes
+					{ label: 'None', value: '' },
+					{ label: 'alternate', value: 'alternate' },
+					{ label: 'author', value: 'author' },
+					{ label: 'bookmark', value: 'bookmark' },
+					{ label: 'external', value: 'external' },
+					{ label: 'help', value: 'help' },
+					{ label: 'license', value: 'license' },
+					{ label: 'next', value: 'next' },
+					{ label: 'nofollow', value: 'nofollow' },
+					{ label: 'noopener', value: 'noopener' },
+					{ label: 'noreferrer', value: 'noreferrer' },
+					{ label: 'opener', value: 'opener' },
+					{ label: 'prev', value: 'prev' },
+					{ label: 'privacy-policy', value: 'privacy-policy' },
+					{ label: 'search', value: 'search' },
+					{ label: 'tag', value: 'tag' },
+					{ label: 'terms-of-service', value: 'terms-of-service' },
+				],
+			},
+			target: {
+				id: 'target',
+				type: 'text',
+				label: 'Target',
+				elements: [
+					// https://html.spec.whatwg.org/multipage/document-sequences.html#navigable-target-names
+					{ label: 'Blank', value: '_blank' },
+					{ label: 'Self', value: '_self' },
+					{ label: 'Parent', value: '_parent' },
+					{ label: 'Top', value: '_top' },
+				],
+			},
+		},
+		render: ( { item } ) => {
+			const {
+				link: { url, rel, target },
+			} = item;
+			return (
+				<a href={ url } rel={ rel } target={ target }>
+					{ url }
+				</a>
+			);
+		},
+	},
+	{
+		id: 'address',
+		type: 'object',
+		label: 'Address',
+		description: 'Object field with street, city, and country properties.',
+		properties: {
+			street: { id: 'street', type: 'text', label: 'Street' },
+			city: { id: 'city', type: 'text', label: 'City' },
+			country: { id: 'country', type: 'text', label: 'Country' },
+		},
+	},
+	{
+		id: 'imageGroup',
+		type: 'group',
+		label: 'Image',
+		description: 'Group field with flat data (not nested).',
+		properties: {
+			imageId: { id: 'imageId', type: 'text', label: 'Image ID' },
+			imageUrl: { id: 'imageUrl', type: 'url', label: 'URL' },
+			imageCaption: { id: 'imageCaption', type: 'text', label: 'Caption' },
+		},
+	},
 ];
 
 type PanelTypes = 'regular' | 'panel';
@@ -609,8 +716,10 @@ type ControlTypes =
 	| 'date'
 	| 'datetime'
 	| 'email'
+	| 'group'
 	| 'integer'
 	| 'number'
+	| 'object'
 	| 'password'
 	| 'radio'
 	| 'select'
@@ -1459,6 +1568,56 @@ export const PasswordComponent = ( {
 	);
 };
 PasswordComponent.storyName = 'password';
+
+export const ObjectComponent = ( {
+	type,
+	Edit,
+	asyncElements,
+}: {
+	type: PanelTypes;
+	Edit: ControlTypes;
+	asyncElements: boolean;
+} ) => {
+	const objectFields = useMemo(
+		() => fields.filter( ( field ) => field.type === 'object' ),
+		[]
+	);
+
+	return (
+		<FieldTypeStory
+			fields={ objectFields }
+			type={ type }
+			Edit={ Edit }
+			asyncElements={ asyncElements }
+		/>
+	);
+};
+ObjectComponent.storyName = 'object';
+
+export const GroupComponent = ( {
+	type,
+	Edit,
+	asyncElements,
+}: {
+	type: PanelTypes;
+	Edit: ControlTypes;
+	asyncElements: boolean;
+} ) => {
+	const groupFields = useMemo(
+		() => fields.filter( ( field ) => field.type === 'group' ),
+		[]
+	);
+
+	return (
+		<FieldTypeStory
+			fields={ groupFields }
+			type={ type }
+			Edit={ Edit }
+			asyncElements={ asyncElements }
+		/>
+	);
+};
+GroupComponent.storyName = 'group';
 
 export const NoTypeComponent = ( {
 	type,

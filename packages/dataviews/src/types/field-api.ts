@@ -72,7 +72,9 @@ export type FieldTypeName =
 	| 'telephone'
 	| 'color'
 	| 'url'
-	| 'array';
+	| 'array'
+	| 'object'
+	| 'group';
 
 export type Rules< Item > = {
 	required?: boolean;
@@ -187,6 +189,12 @@ export type Field< Item > = {
 	 * Type of the field.
 	 */
 	type?: FieldTypeName;
+
+	/**
+	 * Properties definition for object field type.
+	 * Each key in the object represents a nested property with its own field configuration.
+	 */
+	properties?: Record< string, Field< Item > >;
 
 	/**
 	 * The unique identifier of the field.
@@ -395,8 +403,9 @@ export type FormatInteger = {
 
 export type NormalizedField< Item > = Omit<
 	Field< Item >,
-	'Edit' | 'isValid'
+	'Edit' | 'isValid' | 'properties'
 > & {
+	properties: Record< string, NormalizedField< Item > >;
 	label: string;
 	header: string | ReactElement;
 	getValue: ( args: { item: Item } ) => any;
