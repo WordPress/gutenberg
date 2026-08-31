@@ -222,10 +222,11 @@ export async function fanout( { mode, dryRun, bootstrapWindow } ) {
 	console.log(
 		`Fan-out (${ mode }) done: ${ written } written, ${ skipped } skipped, ${ failed } failed.` +
 			( budgetExhausted
-				? ' Write budget exhausted; re-run to continue.'
+				? ' Write budget exhausted; dispatch a reconcile run to continue.'
 				: '' )
 	);
-	if ( failed > 0 ) {
+	// Nonzero exit makes an incomplete or lossy sweep visible in the run list.
+	if ( failed > 0 || budgetExhausted ) {
 		process.exitCode = 1;
 	}
 }

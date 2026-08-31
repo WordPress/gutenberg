@@ -13,10 +13,6 @@ import { fanout } from './fanout.mjs';
 /** @typedef {import('./types.mjs').CommandOptions} CommandOptions */
 
 async function main() {
-	if ( ! hasCredentials() ) {
-		return fail( 'GITHUB_REPOSITORY and GITHUB_TOKEN must be set.' );
-	}
-
 	const { positionals, values } = parseArgs( {
 		allowPositionals: true,
 		options: {
@@ -50,18 +46,18 @@ async function main() {
 		bootstrapWindow,
 	};
 
-	switch ( positionals[ 0 ] ) {
-		case 'check':
-			return check( options );
-		case 'move-baseline':
-			return moveBaseline( options );
-		case 'fanout':
-			return fanout( options );
-		default:
-			return fail(
-				'Usage: pr-freshness <check|move-baseline|fanout> [flags]'
-			);
+	const commands = { check, 'move-baseline': moveBaseline, fanout };
+	const command = commands[ positionals[ 0 ] ?? '' ];
+	if ( ! command ) {
+		return fail(
+			'Usage: pr-freshness <check|move-baseline|fanout> [flags]'
+		);
 	}
+	// Checked late so usage and flag errors do not require credentials.
+	if ( ! hasCredentials() ) {
+		return fail( 'GITHUB_REPOSITORY and GITHUB_TOKEN must be set.' );
+	}
+	return command( options );
 }
 
 main().catch( ( error ) => {
