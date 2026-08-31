@@ -147,7 +147,7 @@
 		cursor: zoom-in;
 	}
 
-	img:hover + button {
+	&:has(img:hover) button {
 		opacity: 1;
 	}
 
