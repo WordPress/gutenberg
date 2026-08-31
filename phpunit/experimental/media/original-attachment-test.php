@@ -70,7 +70,7 @@ class Gutenberg_Original_Attachment_Filter_Test extends WP_UnitTestCase {
 	public function test_no_original_attachment_id_omits_field_from_response() {
 		$id   = $this->make_attachment();
 		$data = $this->get_response_data( $id );
-		$this->assertArrayNotHasKey( 'original_attachment', $data['media_details'] );
+		$this->assertArrayNotHasKey( 'original_attachment', $data );
 	}
 
 	public function test_recorded_original_id_surfaces_in_response() {
@@ -78,11 +78,11 @@ class Gutenberg_Original_Attachment_Filter_Test extends WP_UnitTestCase {
 		$child    = $this->make_attachment( $original );
 
 		$data = $this->get_response_data( $child );
-		$this->assertArrayHasKey( 'original_attachment', $data['media_details'] );
-		$this->assertSame( $original, $data['media_details']['original_attachment']['attachment_id'] );
+		$this->assertArrayHasKey( 'original_attachment', $data );
+		$this->assertSame( $original, $data['original_attachment']['attachment_id'] );
 		$this->assertSame(
 			wp_get_attachment_url( $original ),
-			$data['media_details']['original_attachment']['source_url']
+			$data['original_attachment']['source_url']
 		);
 	}
 
@@ -91,7 +91,7 @@ class Gutenberg_Original_Attachment_Filter_Test extends WP_UnitTestCase {
 		$child    = $this->make_attachment( $original );
 
 		$data = $this->get_response_data( $child, 'view' );
-		$this->assertArrayNotHasKey( 'original_attachment', $data['media_details'] );
+		$this->assertArrayNotHasKey( 'original_attachment', $data );
 	}
 
 	public function test_self_referencing_original_id_is_omitted() {
@@ -99,7 +99,7 @@ class Gutenberg_Original_Attachment_Filter_Test extends WP_UnitTestCase {
 		update_post_meta( $id, GUTENBERG_ORIGINAL_ATTACHMENT_ID_META_KEY, $id );
 
 		$data = $this->get_response_data( $id );
-		$this->assertArrayNotHasKey( 'original_attachment', $data['media_details'] );
+		$this->assertArrayNotHasKey( 'original_attachment', $data );
 	}
 
 	public function test_edit_hook_inherits_grandparent_original() {
