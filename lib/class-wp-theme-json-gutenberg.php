@@ -5779,7 +5779,7 @@ class WP_Theme_JSON_Gutenberg {
 				continue;
 			}
 
-			if ( 0 <= strpos( $style, 'var(' ) ) {
+			if ( false !== strpos( $style, 'var(' ) ) {
 				// find all the variables in the string in the form of var(--variable-name, fallback), with fallback in the second capture group.
 
 				$has_matches = preg_match_all( '/var\(([^),]+)?,?\s?(\S+)?\)/', $style, $var_parts );
