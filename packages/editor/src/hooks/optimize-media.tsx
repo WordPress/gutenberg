@@ -1,8 +1,10 @@
+import type { ComponentType, ReactNode } from 'react';
 import { addFilter } from '@wordpress/hooks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import {
 	InspectorControls,
 	store as blockEditorStore,
+	// @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 } from '@wordpress/block-editor';
 import { PanelBody, Button, Spinner } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -14,13 +16,42 @@ import {
 } from '@wordpress/upload-media';
 import { __ } from '@wordpress/i18n';
 
+declare global {
+	interface Window {
+		__clientSideMediaProcessing?: boolean;
+		__experimentalOptimizeExistingMedia?: boolean;
+	}
+}
+
+/**
+ * The subset of the newly created attachment needed to repoint a block.
+ */
+type OptimizedMedia = {
+	id?: number;
+	url?: string;
+};
+
+/**
+ * Props every block edit component receives that these controls read from.
+ */
+type BlockEditProps = {
+	name: string;
+	clientId: string;
+	isSelected?: boolean;
+	attributes?: Record< string, any >;
+	context?: {
+		postId?: number;
+		postType?: string;
+	};
+};
+
 /**
  * Whether the client-side optimization control should be available.
  *
- * @return {boolean} True when the "Optimize existing media" experiment is on
- *                   and client-side media processing is enabled and supported.
+ * @return True when the "Optimize existing media" experiment is on and
+ *         client-side media processing is enabled and supported.
  */
-function isOptimizationAvailable() {
+function isOptimizationAvailable(): boolean {
 	return (
 		typeof window !== 'undefined' &&
 		Boolean( window.__experimentalOptimizeExistingMedia ) &&
@@ -35,12 +66,18 @@ function isOptimizationAvailable() {
  * Resolves the attachment's full-size original URL, dispatches the
  * client-side optimization, and reports progress and errors via snackbars.
  *
- * @param {Object}   props              Component props.
- * @param {number}   props.attachmentId Attachment ID to optimize.
- * @param {Function} props.onComplete   Called with the new attachment to repoint the block.
- * @return {Component|null} The control, or null when there is nothing to optimize.
+ * @param props              Component props.
+ * @param props.attachmentId Attachment ID to optimize.
+ * @param props.onComplete   Called with the new attachment to repoint the block.
+ * @return The control, or null when there is nothing to optimize.
  */
-function OptimizeControl( { attachmentId, onComplete } ) {
+function OptimizeControl( {
+	attachmentId,
+	onComplete,
+}: {
+	attachmentId?: number;
+	onComplete: ( media: OptimizedMedia ) => void;
+} ): ReactNode {
 	const { optimizeExistingItem } = useDispatch( uploadStore );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
@@ -70,7 +107,7 @@ function OptimizeControl( { attachmentId, onComplete } ) {
 		optimizeExistingItem( {
 			id: attachmentId,
 			url: sourceUrl,
-			onSuccess: ( [ newMedia ] ) => {
+			onSuccess: ( [ newMedia ]: OptimizedMedia[] ) => {
 				if ( newMedia ) {
 					onComplete( newMedia );
 				}
@@ -78,7 +115,7 @@ function OptimizeControl( { attachmentId, onComplete } ) {
 					type: 'snackbar',
 				} );
 			},
-			onError: ( error ) => {
+			onError: ( error: Error ) => {
 				createErrorNotice(
 					error?.message || __( 'Failed to optimize image.' ),
 					{ type: 'snackbar' }
@@ -116,16 +153,19 @@ function OptimizeControl( { attachmentId, onComplete } ) {
  * Control for blocks that store the attachment in `id`/`url` attributes
  * (`core/image`, `core/cover`).
  *
- * @param {Object} props            Block edit props.
- * @param {Object} props.attributes Block attributes.
- * @param {string} props.clientId   Block client ID.
- * @return {Component|null} The control.
+ * @param props            Block edit props.
+ * @param props.attributes Block attributes.
+ * @param props.clientId   Block client ID.
+ * @return The control.
  */
-function AttributeImageControl( { attributes, clientId } ) {
+function AttributeImageControl( {
+	attributes,
+	clientId,
+}: BlockEditProps ): ReactNode {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	return (
 		<OptimizeControl
-			attachmentId={ attributes.id }
+			attachmentId={ attributes?.id }
 			onComplete={ ( media ) =>
 				updateBlockAttributes( clientId, {
 					id: media.id,
@@ -139,14 +179,17 @@ function AttributeImageControl( { attributes, clientId } ) {
 /**
  * Control for the `core/media-text` block.
  *
- * @param {Object} props            Block edit props.
- * @param {Object} props.attributes Block attributes.
- * @param {string} props.clientId   Block client ID.
- * @return {Component|null} The control.
+ * @param props            Block edit props.
+ * @param props.attributes Block attributes.
+ * @param props.clientId   Block client ID.
+ * @return The control.
  */
-function MediaTextControl( { attributes, clientId } ) {
+function MediaTextControl( {
+	attributes,
+	clientId,
+}: BlockEditProps ): ReactNode {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-	if ( attributes.mediaType !== 'image' ) {
+	if ( attributes?.mediaType !== 'image' ) {
 		return null;
 	}
 	return (
@@ -168,21 +211,41 @@ function MediaTextControl( { attributes, clientId } ) {
  * Uses the block's `postId`/`postType` context so each instance (including
  * those inside a query loop) optimizes the correct post's featured image.
  *
- * @param {Object} props         Block edit props.
- * @param {Object} props.context Block context (postId, postType).
- * @return {Component|null} The control.
+ * @param props         Block edit props.
+ * @param props.context Block context (postId, postType).
+ * @return The control.
  */
-function FeaturedImageControl( { context } ) {
+function FeaturedImageControl( { context }: BlockEditProps ): ReactNode {
 	const { postId, postType } = context || {};
+	if ( ! postId || ! postType ) {
+		return null;
+	}
+	return (
+		<FeaturedImageOptimizeControl postId={ postId } postType={ postType } />
+	);
+}
+
+/**
+ * Resolves and optimizes the featured image of a known post.
+ *
+ * @param props          Component props.
+ * @param props.postId   Post ID whose featured image should be optimized.
+ * @param props.postType Post type of that post.
+ * @return The control.
+ */
+function FeaturedImageOptimizeControl( {
+	postId,
+	postType,
+}: {
+	postId: number;
+	postType: string;
+} ): ReactNode {
 	const [ featuredMedia, setFeaturedMedia ] = useEntityProp(
 		'postType',
 		postType,
 		'featured_media',
 		postId
 	);
-	if ( ! postId || ! postType ) {
-		return null;
-	}
 	return (
 		<OptimizeControl
 			attachmentId={ featuredMedia }
@@ -194,26 +257,31 @@ function FeaturedImageControl( { context } ) {
 /**
  * Control for the `core/site-logo` block.
  *
- * @return {Component|null} The control.
+ * @return The control.
  */
-function SiteLogoControl() {
+function SiteLogoControl(): ReactNode {
 	const { editEntityRecord } = useDispatch( coreStore );
 	const siteLogoId = useSelect(
 		( select ) =>
-			select( coreStore ).getEntityRecord( 'root', 'site' )?.site_logo,
+			select( coreStore ).getEntityRecord< { site_logo?: number } >(
+				'root',
+				'site'
+			)?.site_logo,
 		[]
 	);
 	return (
 		<OptimizeControl
 			attachmentId={ siteLogoId }
 			onComplete={ ( media ) =>
-				editEntityRecord( 'root', 'site', { site_logo: media.id } )
+				editEntityRecord( 'root', 'site', undefined, {
+					site_logo: media.id,
+				} )
 			}
 		/>
 	);
 }
 
-const BLOCK_CONTROLS = {
+const BLOCK_CONTROLS: Record< string, ComponentType< BlockEditProps > > = {
 	'core/image': AttributeImageControl,
 	'core/cover': AttributeImageControl,
 	'core/media-text': MediaTextControl,
@@ -224,28 +292,26 @@ const BLOCK_CONTROLS = {
 /**
  * Adds an "Optimize" inspector control to supported media blocks, allowing
  * an already-uploaded image to be re-processed client-side.
- *
- * @param {Component} BlockEdit Original block edit component.
- * @return {Component} Wrapped component.
  */
 const withOptimizeControl = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const BlockControl = BLOCK_CONTROLS[ props.name ];
-		if (
-			! BlockControl ||
-			! props.isSelected ||
-			! isOptimizationAvailable()
-		) {
-			return <BlockEdit { ...props } />;
-		}
+	( BlockEdit: ComponentType< BlockEditProps > ) =>
+		( props: BlockEditProps ) => {
+			const BlockControl = BLOCK_CONTROLS[ props.name ];
+			if (
+				! BlockControl ||
+				! props.isSelected ||
+				! isOptimizationAvailable()
+			) {
+				return <BlockEdit { ...props } />;
+			}
 
-		return (
-			<>
-				<BlockEdit { ...props } />
-				<BlockControl { ...props } />
-			</>
-		);
-	},
+			return (
+				<>
+					<BlockEdit { ...props } />
+					<BlockControl { ...props } />
+				</>
+			);
+		},
 	'withOptimizeControl'
 );
 
