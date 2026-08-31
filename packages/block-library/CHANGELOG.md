@@ -16,6 +16,7 @@
 ### Bug Fixes
 
 -   Accordion Heading: Anchor notes to the selected title text instead of the whole block ([#84497](https://github.com/WordPress/gutenberg/pull/84497)).
+-   Navigation: Keep the flex layout on a Navigation block inserted into a navigation overlay, so block spacing applies to it.
 
 ## 11.2.0 (2026-10-07)
 
