@@ -176,7 +176,8 @@
 		font-size: 12px;
 		line-height: 1.5;
 		white-space: pre-wrap;
-		overflow-wrap: break-word;
+		// stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- Pending review of overflow-wrap alternative.
+		word-break: break-word;
 		color: $gray-900;
 	}
 }

@@ -44,7 +44,8 @@
 	justify-content: center;
 	cursor: var(--wpds-cursor-control);
 	background: transparent;
-	overflow-wrap: break-word;
+	// stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- Pending review of overflow-wrap alternative.
+	word-break: break-word;
 	@media not ( prefers-reduced-motion ) {
 		transition: all 0.05s ease-in-out;
 	}
