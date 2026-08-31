@@ -110,6 +110,11 @@ function gutenberg_initialize_experiments_settings() {
 					'description' => __( 'Enables the Workflow Palette for running workflows composed of abilities, from a unified interface.', 'gutenberg' ),
 				),
 				array(
+					'id'          => 'gutenberg-notes-on-previews',
+					'label'       => __( 'Notes on post previews', 'gutenberg' ),
+					'description' => __( 'Adds the read_post_notes and create_post_notes capabilities, so a site can let reviewers read and reply to notes on a post preview without giving them the ability to edit the post.', 'gutenberg' ),
+				),
+				array(
 					'id'          => 'gutenberg-extensible-site-editor',
 					'label'       => __( 'Extensible Site Editor', 'gutenberg' ),
 					'description' => __( 'Redirects the default site editor (Appearance > Design) to use the extensible site editor page.', 'gutenberg' ),

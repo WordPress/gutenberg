@@ -150,6 +150,10 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-workflow-palette' ) ) {
 	require __DIR__ . '/experimental/workflow-palette.php';
 }
 
+if ( gutenberg_is_experiment_enabled( 'gutenberg-notes-on-previews' ) ) {
+	require __DIR__ . '/experimental/notes-preview.php';
+}
+
 // Load the BC Layer to avoid fatal errors of extenders using the Fonts API.
 // @core-merge: do not merge the BC layer files into WordPress Core.
 require __DIR__ . '/experimental/font-face/bc-layer/class-wp-fonts-provider.php';
