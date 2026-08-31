@@ -427,6 +427,43 @@ describe( 'sortResults', () => {
 		);
 		expect( order ).toEqual( [ 1, 4, 3, 2 ] );
 	} );
+
+	it( 'weight results towards Posts even if less relevant', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'Newspapers',
+				url: 'http://wordpress.local/more-relevant-news/',
+				type: 'page',
+				kind: 'taxonomy',
+			},
+			{
+				id: 2,
+				title: 'News',
+				url: 'http://wordpress.local/most-relevant-news/',
+				type: 'page',
+				kind: 'media',
+			},
+			{
+				id: 3,
+				title: 'Less Relevant News because it has a very long title',
+				url: 'http://wordpress.local/less-relevant-news/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 4,
+				title: 'News',
+				url: 'http://wordpress.local/same-relevant-news/',
+				type: 'page',
+				kind: 'post-type',
+			},
+		];
+		const order = sortResults( results, 'News' ).map(
+			( result ) => result.id
+		);
+		expect( order ).toEqual( [ 4, 2, 3, 1 ] );
+	} );
 } );
 
 describe( 'tokenize', () => {
