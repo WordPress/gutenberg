@@ -22,6 +22,7 @@ describe( 'registerPlugin', () => {
 			name,
 			render: Component,
 			icon,
+			priority: 10,
 		} );
 	} );
 
@@ -136,5 +137,59 @@ describe( 'getPlugins', () => {
 		const scopedPlugins = getPlugins( scope );
 		expect( scopedPlugins ).toHaveLength( 1 );
 		expect( scopedPlugins[ 0 ].name ).toBe( 'scoped' );
+	} );
+
+	it( 'fails to register a plugin with a priority set to an empty string', () => {
+		registerPlugin( 'priority-as-string', {
+			render: () => {},
+			priority: '',
+		} );
+		expect( console ).toHaveErroredWith(
+			'The "priority" property must be a number'
+		);
+	} );
+
+	it( 'fails to register a plugin with a priority set to boolean true', () => {
+		registerPlugin( 'priority-as-string', {
+			render: () => {},
+			priority: true,
+		} );
+		expect( console ).toHaveErroredWith(
+			'The "priority" property must be a number'
+		);
+	} );
+
+	it( 'fails to register a plugin with a priority set to boolean false', () => {
+		registerPlugin( 'priority-as-string', {
+			render: () => {},
+			priority: false,
+		} );
+		expect( console ).toHaveErroredWith(
+			'The "priority" property must be a number'
+		);
+	} );
+
+	it( 'fails to register a plugin with a priority set to an empty string', () => {
+		registerPlugin( 'priority-as-string', {
+			render: () => {},
+			priority: '',
+		} );
+		expect( console ).toHaveErroredWith( 'The "priority" property must be a number' );
+	} );
+
+	it( 'fails to register a plugin with a priority set to boolean true', () => {
+		registerPlugin( 'priority-as-string', {
+			render: () => {},
+			priority: true,
+		} );
+		expect( console ).toHaveErroredWith( 'The "priority" property must be a number' );
+	} );
+
+	it( 'fails to register a plugin with a priority set to boolean false', () => {
+		registerPlugin( 'priority-as-string', {
+			render: () => {},
+			priority: false,
+		} );
+		expect( console ).toHaveErroredWith( 'The "priority" property must be a number' );
 	} );
 } );
