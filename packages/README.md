@@ -252,61 +252,17 @@ It's very important to have a good plan for what a new package will include. All
 
 ## Maintaining cross-version compatibility
 
-An application or plugin can bundle a published package while WordPress supplies one or more of its dependencies. These parts update separately. A Gutenberg checkout that contains only current source does not test all supported combinations.
+An application or plugin can include a published package in its JavaScript bundle while loading that package's dependencies from WordPress. The bundle and WordPress can then use different package versions.
 
-Use this procedure before changing a published package contract or shared runtime code such as a registration, allowlist, opt-in gate, or compatibility bridge. Start with each documented entrypoint and build output. Check package metadata, build configuration, dependency extraction, and generated asset data to learn which dependencies the package bundles and which ones WordPress supplies. Do not infer this from the package name.
+Before changing an API or dependency in this setup:
 
-Some package state must share one runtime identity. React context objects, private API locks, registries, symbols, and other singletons fall into this group. If two package copies each create a React context, a Provider from one copy cannot provide a value to a consumer using the other, even when both copies use the same React instance. Two copies can expose the same exports and still be incompatible.
+-   Confirm which packages the application bundles and which ones WordPress supplies.
+-   Test both mixed-version combinations: the new bundle with each supported WordPress version, and older supported bundles with the new WordPress package.
+-   Keep production public APIs compatible. Follow the [backward compatibility policy](/docs/contributors/code/backward-compatibility.md) if a break is unavoidable.
+-   Do not use private APIs in bundled packages. Private APIs can be removed, but first check that supported bundles no longer depend on them.
+-   Test the built code. Source tests do not cover dependency extraction or separate copies of React contexts and other shared state.
 
-If the package's public API changes, test representative existing consumer code against the candidate package. Compile the published types, build the consumer, and exercise the changed behaviour. Updating repository call sites proves that the new API works. It does not prove that existing consumers still work or have a clear migration path.
-
-When a bundle and its provider ship separately, test these four pairings:
-
-| Published bundled package | Independently supplied dependency | Required result                                                                                                                 |
-| ------------------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| Old                       | Old                               | Preserve the existing baseline.                                                                                                 |
-| Old                       | New                               | The updated dependency preserves the exports, identity, and behaviour used by the published bundle.                             |
-| New                       | Old                               | The new bundle works with each supported WordPress runtime, or the minimum supported WordPress version changes explicitly.       |
-| New                       | New                               | The intended new contract and behaviour work together.                                                                          |
-
-There is no cross-version pairing when the dependency always ships in the same artifact. A public API change still needs the direct consumer test above.
-
-Start with the last release before the change. Then trace earlier releases that still use the old code and search maintained plugins and applications for bundles built from them. Publishing a new package does not update an existing bundle. Include versions required by the support policy and versions found in maintained consumers. For versions outside the support policy, either keep the compatibility route or document the break. Name the version or entrypoint that consumers must move to.
-
-Build the candidate package before testing it. Unbuilt source is not a published artifact. Resolve external dependencies from the WordPress versions that the consumer supports, then check what those versions ship. Locally installed types are not enough.
-
-For each supported pairing and entrypoint, check these layers where applicable:
-
-1. Install the exact dependency versions together in an isolated consumer.
-2. Compile against their published TypeScript declarations.
-3. Build each supported entrypoint with its actual bundling and WordPress dependency extraction configuration.
-4. Verify the corresponding WordPress runtime exports, module-load gates, and shared identities such as React context objects.
-5. Exercise the affected behaviour, including any compatibility route.
-
-Mark each layer as `pass`, `fail`, or `unverified`. Current repository source proves only the new/new pairing for its current build. A mock can test which branch capability detection selects. It cannot reproduce dependency extraction, duplicate package identity, or an older WordPress runtime.
-
-### Use a bidirectional overlap window
-
-If both mixed-version pairings are supported and the old and new routes can coexist, keep both during migration:
-
-1. The provider exposes the new route and keeps the old route as a deprecated, time-bounded bridge. This lets an old bundle run with the new provider.
-2. The new consumer prefers the new route and falls back to the old route through capability detection. This lets a new bundle run with the old provider.
-3. Both packages test their route, prevent new direct use of the deprecated route outside the fallback, and publish through the required release channels before removing either the provider bridge or consumer fallback.
-
-Detect capabilities from the actual exports instead of comparing version strings. Keep the fallback or adapter in one place in the consuming package.
-
-Treat removal of the provider bridge and consumer fallback as separate release events. Each needs its own removal evidence. A scheduled removal version is a review point, not proof that affected bundles have disappeared. Repeat the consumer and release-channel checks before deleting either route.
-
-Test the real built artifacts and runtime. A route tied to package identity, such as a private API lock, can fail across duplicate package copies even when the provider keeps the export. Use a different adapter, or explicitly change the supported entrypoint or version.
-
-A replacement package version or entrypoint helps only consumers that rebuild with it. It does not change bundles that are already deployed.
-
-This has already broken consumers in two different ways:
-
--   The `ThemeProvider` promotion in [#78958](https://github.com/WordPress/gutenberg/pull/78958) made the API public and removed its private route in the same change. Published bundles broke, so [#79594](https://github.com/WordPress/gutenberg/pull/79594) restored the private route. [#79620](https://github.com/WordPress/gutenberg/pull/79620) kept both routes: `@wordpress/theme` exposed the public export and a deprecated private bridge scheduled for removal in WordPress 7.3, while `@wordpress/ui` preferred the public export and used the private route as a capability-detected fallback on older runtimes.
--   The [DataViews cleanup discussion in #81230](https://github.com/WordPress/gutenberg/issues/81230#issuecomment-5358110498) shows that an older bundled `@wordpress/dataviews` can still request a private `@wordpress/components` API after a newer WordPress runtime removes it. [#82221](https://github.com/WordPress/gutenberg/pull/82221) had to restore the DataViews private API opt-in because older bundles call it when the module loads. Restoring that gate does not restore private APIs removed from other runtime packages. A bundled `@wordpress/private-apis` copy also cannot unlock an object created by a different runtime copy. DataViews has a `/wp` entrypoint that bundles a different dependency set, but moving to it or a newer package version requires downstream consumers to rebuild. Test each supported entrypoint separately.
-
-A private API bridge does not become a supported consumer contract. Keep the smallest compatibility route needed by a supported pairing, and remove it only after the replacement has shipped through the required npm and WordPress release channels and all supported pairings pass. Report untested pairings instead of assuming they work. Dropping a supported WordPress version or entrypoint is a release decision and needs migration guidance.
+See [Testing published packages across WordPress versions](/docs/contributors/code/package-runtime-compatibility.md) for the test matrix and release procedure.
 
 ## Maintaining Changelogs
 
