@@ -2,7 +2,7 @@ import { COMMENT_LIMIT, SECTIONS, getSection } from './sections.ts';
 import type { SectionDefinition } from './sections.ts';
 
 export const COMMENT_MARKER = '<!-- gutenberg-pr-meta -->';
-const COMMENT_HEADING = '### PR meta';
+const COMMENT_HEADING = '### 🤖 PR meta 🤖';
 
 export type ParsedSection = {
 	id: string;
