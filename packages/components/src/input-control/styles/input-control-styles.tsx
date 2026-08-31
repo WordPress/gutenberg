@@ -242,6 +242,7 @@ export const Input = styled.input< InputProps >`
 		font-family: inherit;
 		margin: 0;
 		outline: none;
+		touch-action: none;
 		width: 100%;
 
 		${ dragStyles }
