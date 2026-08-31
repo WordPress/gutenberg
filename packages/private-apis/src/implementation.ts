@@ -41,10 +41,6 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/storybook',
 	'@wordpress/sync',
 	'@wordpress/theme',
-	// Do not remove: older `@wordpress/dataviews` versions published to npm
-	// call the opt-in at module load, so a plugin bundling one of those
-	// copies throws at load time if this entry is missing.
-	'@wordpress/dataviews',
 	'@wordpress/fields',
 	'@wordpress/lazy-editor',
 	'@wordpress/media-editor',
@@ -56,6 +52,57 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/views',
 	'@wordpress/widget-dashboard',
 ];
+
+/**
+ * Core modules that no longer use the private APIs but must remain allowed
+ * to opt-in: copies of them published to npm before they stopped using the
+ * private APIs call the opt-in at module load, so a plugin bundling one of
+ * those copies would throw at load time if the module was not allowed.
+ *
+ * Opting in as one of these modules still works, but logs a deprecation
+ * warning when `SCRIPT_DEBUG` is enabled. Each entry documents the WordPress
+ * version scheduled for its removal; a unit test starts failing when the
+ * release cycle of that version begins.
+ */
+const DEPRECATED_CORE_MODULES: Record<
+	string,
+	{ since: string; removal: string; note: string }
+> = {
+	'@wordpress/dataviews': {
+		since: '7.2',
+		removal: '7.4',
+		note: 'Update the `@wordpress/dataviews` npm dependency to version 18.1 or newer, which no longer uses the private APIs.',
+	},
+};
+
+/**
+ * The deprecated modules that already logged a warning, to avoid logging
+ * the same warning more than once.
+ */
+const warnedDeprecatedModules = new Set< string >();
+
+/**
+ * Logs a deprecation warning for a module in `DEPRECATED_CORE_MODULES`,
+ * once per module and only when `SCRIPT_DEBUG` is enabled.
+ *
+ * @param moduleName The name of the deprecated module that opted in.
+ */
+function warnDeprecatedModule( moduleName: string ) {
+	// eslint-disable-next-line @wordpress/wp-global-usage
+	if ( globalThis.SCRIPT_DEBUG !== true ) {
+		return;
+	}
+	if ( warnedDeprecatedModules.has( moduleName ) ) {
+		return;
+	}
+	warnedDeprecatedModules.add( moduleName );
+	const { since, removal, note } = DEPRECATED_CORE_MODULES[ moduleName ];
+	// eslint-disable-next-line no-console
+	console.warn(
+		`The private APIs opt-in of the module "${ moduleName }" is deprecated since WordPress ${ since } ` +
+			`and will stop working in WordPress ${ removal }. ${ note }`
+	);
+}
 
 /*
  * Warning for theme and plugin developers.
@@ -86,7 +133,10 @@ export const __dangerousOptInToUnstableAPIsOnlyForCoreModules = (
 	consent: string,
 	moduleName: string
 ) => {
-	if ( ! CORE_MODULES_USING_PRIVATE_APIS.includes( moduleName ) ) {
+	if (
+		! CORE_MODULES_USING_PRIVATE_APIS.includes( moduleName ) &&
+		! ( moduleName in DEPRECATED_CORE_MODULES )
+	) {
 		throw new Error(
 			`You tried to opt-in to unstable APIs as module "${ moduleName }". ` +
 				'This feature is only for JavaScript modules shipped with WordPress core. ' +
@@ -103,6 +153,10 @@ export const __dangerousOptInToUnstableAPIsOnlyForCoreModules = (
 				'without a warning. If you ignore this error and depend on unstable features, ' +
 				'your product will inevitably break on the next WordPress release.'
 		);
+	}
+
+	if ( moduleName in DEPRECATED_CORE_MODULES ) {
+		warnDeprecatedModule( moduleName );
 	}
 
 	return {
@@ -214,3 +268,13 @@ export function resetAllowedCoreModules() {
 		CORE_MODULES_USING_PRIVATE_APIS.pop();
 	}
 }
+
+/**
+ * Private function to allow the unit tests to trigger
+ * the deprecation warnings again.
+ */
+export function resetWarnedDeprecatedModules() {
+	warnedDeprecatedModules.clear();
+}
+
+export { DEPRECATED_CORE_MODULES };
