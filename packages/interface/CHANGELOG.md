@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Internal
+
+-   Remove unused dependency `@wordpress/a11y` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+## 10.0.0 (2026-08-26)
+
+### Breaking Changes
+
+-   `ActionItem`: `as` now defaults to `MenuItem` instead of `Button` ([#81507](https://github.com/WordPress/gutenberg/pull/81507)).
+-   `ActionItem.Slot`: Remove the `bubblesVirtually` prop ([#81507](https://github.com/WordPress/gutenberg/pull/81507)).
+
+## 9.38.0 (2026-08-12)
+
 ### Enhancements
 
 -   `ComplementaryArea`: Add a `render` prop to replace the default container element with a given React element ([#81054](https://github.com/WordPress/gutenberg/pull/81054)).
@@ -14,6 +28,7 @@
 
 ### Internal
 
+-   `ComplementaryArea`: Take the panel width from the stylesheet instead of a hardcoded inline style, and resolve the exit transition through `AnimatePresence`'s `custom` prop instead of a forced re-render ([#81363](https://github.com/WordPress/gutenberg/pull/81363)).
 -   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
 
 ## 9.37.0 (2026-07-29)

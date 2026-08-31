@@ -3,7 +3,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 async function addTestParagraphBlocks( { editor, page } ) {
 	await test.step( 'add test paragraph blocks', async () => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '1st' );
 		await page.keyboard.press( 'Enter' );

@@ -88,7 +88,7 @@ test.describe( 'Collaboration - auto-draft collaborator autosave retention', () 
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( title );
 		await collaboratorEditor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await collaboratorPage.keyboard.type( marker );
 

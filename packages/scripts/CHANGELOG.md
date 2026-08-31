@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `build`: Strip JavaScript and TypeScript source extensions from legacy positional entry names so generated output uses names such as `index.js` instead of `index.tsx.js` or `index.jsx.js` ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+### Enhancements
+
+-   Include `.jsx` unit tests in the default lint configuration ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+### Internal
+
+-   Remove unused dependency `jest-environment-node` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+
+## 34.2.0 (2026-08-26)
+
+## 34.1.0 (2026-08-12)
+
+### Bug Fixes
+
+-   Set Sass's `charset` option to `false` so production builds no longer emit a UTF-8 BOM in the middle of the extracted CSS ([#81383](https://github.com/WordPress/gutenberg/pull/81383)).
 
 ## 34.0.0 (2026-07-29)
 

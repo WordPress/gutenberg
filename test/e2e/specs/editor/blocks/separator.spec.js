@@ -7,7 +7,7 @@ test.describe( 'Separator', () => {
 
 	test( 'can be created by three dashes', async ( { editor, page } ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		// Should be able to keep typing after the separator transform.
 		await page.keyboard.type( '---a' );

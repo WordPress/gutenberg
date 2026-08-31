@@ -159,6 +159,12 @@ describe( 'actions', () => {
 				getSelectedBlockCount() {
 					return 0;
 				},
+				getMultiSelectedBlockClientIds() {
+					return [];
+				},
+				getClientIdsOfDescendants() {
+					return [];
+				},
 			};
 			const dispatch = jest.fn();
 

@@ -1153,6 +1153,45 @@ describe( 'ToolsPanel', () => {
 			expect( altControlProps.onDeselect ).not.toHaveBeenCalled();
 		} );
 
+		it( 'should not contain menu items for an item belonging to another panel', async () => {
+			// A fill can mount after the panel it is rendered into has already
+			// settled. An item whose `panelId` doesn't match must stay out of
+			// that panel's menu entirely, including out of the value flagging
+			// that populates it.
+			const Panel = ( { withForeign }: { withForeign: boolean } ) => (
+				<ToolsPanel { ...defaultProps } panelId="1234">
+					<ToolsPanelItem
+						label="Mine"
+						panelId="1234"
+						isShownByDefault
+						hasValue={ () => false }
+					>
+						<div>My control</div>
+					</ToolsPanelItem>
+					{ withForeign && (
+						<ToolsPanelItem
+							label="Foreign"
+							panelId="9999"
+							hasValue={ () => true }
+						>
+							<div>Foreign control</div>
+						</ToolsPanelItem>
+					) }
+				</ToolsPanel>
+			);
+
+			// Let the panel settle with only its own item registered, then
+			// bring in an item that belongs to a different panel.
+			const { rerender } = render( <Panel withForeign={ false } /> );
+			rerender( <Panel withForeign /> );
+
+			await openDropdownMenu();
+
+			expect(
+				screen.queryByRole( 'menuitemcheckbox', { name: /Foreign/i } )
+			).not.toBeInTheDocument();
+		} );
+
 		it( 'should not contain orphaned menu items when panelId changes', async () => {
 			// As fills and the panel can update independently this aims to
 			// test that no orphaned items appear registered in the panel menu.

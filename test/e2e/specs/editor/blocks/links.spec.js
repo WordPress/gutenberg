@@ -1245,7 +1245,7 @@ test.describe( 'Links', () => {
 	} ) => {
 		// Create a paragraph with text and select it
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'Link text' );
 
@@ -1267,7 +1267,7 @@ test.describe( 'Links', () => {
 
 		// Verify validation error is shown
 		await expect(
-			page.locator( '.components-validated-control__indicator' )
+			page.getByText( 'Please enter a valid URL.' )
 		).toBeVisible();
 
 		// Verify focus is still on the input

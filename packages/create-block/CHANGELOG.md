@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Internal
+
+-   Remove unused dependency `@wordpress/lazy-import` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+
+## 4.97.0 (2026-08-26)
+
+## 4.96.0 (2026-08-12)
+
 
 ## 4.95.0 (2026-07-29)
 
