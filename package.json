@@ -34,7 +34,10 @@
 		"packageNamespace": "wordpress",
 		"handlePrefix": "wp",
 		"pages": [
-			"font-library",
+			{
+				"id": "font-library",
+				"capability": "edit_theme_options"
+			},
 			"options-connectors",
 			{
 				"id": "dashboard",
