@@ -218,6 +218,12 @@ class DependencyExtractionWebpackPlugin {
 			// This allows us to look for magic comments.
 			chunkFiles.sort().forEach( ( filename ) => {
 				const asset = compilation.getAsset( filename );
+
+				// Prevents the compilation from failing with JS error, let webpack report the not-found files properly.
+				if ( typeof asset.source.buffer !== 'function' ) { 
+					return;
+				}
+				
 				const content = asset.source.buffer();
 
 				const wpMagicComments =
