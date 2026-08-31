@@ -59,6 +59,7 @@
 				"init": [
 					"@wordpress/edit-site-init"
 				],
+				"capability": "upload_files",
 				"experimental": true
 			},
 			{
@@ -66,10 +67,12 @@
 				"init": [
 					"@wordpress/edit-site-init"
 				],
+				"capability": "edit_theme_options",
 				"experimental": true
 			},
 			{
 				"id": "theme-preview",
+				"capability": "switch_themes",
 				"experimental": true
 			}
 		]
