@@ -186,13 +186,13 @@ const filterTokenTransform = new Transform( {
 } );
 
 /**
- * Find default source file (`src/index.{js,ts,tsx}`) in a specified package directory
+ * Find default source file (`src/index.{js,jsx,ts,tsx}`) in a specified package directory
  *
  * @param {string} dir Package directory to search in
  * @return {string} Name of matching file
  */
 function findDefaultSourcePath( dir ) {
-	const defaultPathMatches = glob.sync( 'src/index.{js,ts,tsx}', {
+	const defaultPathMatches = glob.sync( 'src/index.{js,jsx,ts,tsx}', {
 		cwd: dir,
 	} );
 	if ( ! defaultPathMatches.length ) {

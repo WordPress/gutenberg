@@ -1,8 +1,5 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.dev.base.json",
-	"references": [
-		{ "path": "./tsconfig.build.json" },
-		{ "path": "../dom-ready/tsconfig.build.json" }
-	]
+	"references": [ { "path": "./tsconfig.build.json" } ]
 }

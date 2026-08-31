@@ -71,16 +71,13 @@ When creating a new package, you need to provide at least the following. Package
     	"wpScriptModuleExports": "./build-module/index.js",
     	"types": "build-types",
     	"sideEffects": false,
-    	"dependencies": {
-    		"@babel/runtime": "7.25.7"
-    	},
     	"publishConfig": {
     		"access": "public"
     	}
     }
     ```
 
-    This assumes that your code is located in the `src` folder and will be transpiled with `Babel`.
+    This assumes that your code is located in the `src` folder and will be transpiled by the build system.
 
     For production packages that will ship as a WordPress script, include `wpScript: true` in the `package.json` file. This tells the build system to bundle the package for use as a WordPress script.
 

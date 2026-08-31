@@ -8,6 +8,11 @@
     item is pinned: it cannot be dragged and holds its index while the
     other items reorder; a non-resizable item keeps its size
     ([#81967](https://github.com/WordPress/gutenberg/pull/81967)).
+-   `DashboardGrid` and `DashboardLanes` accept `itemLimits`: per-item minimum and maximum tile sizes in pixels (`GridItemLimits`; width-only `GridItemWidthLimits` on lanes), enforced on rendered spans and resize gestures without being written into the layout ([#81899](https://github.com/WordPress/gutenberg/pull/81899)).
+
+### Internal
+
+-   Remove unused dependency `@dnd-kit/utilities` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 
 ## 0.6.0 (2026-08-26)
 
