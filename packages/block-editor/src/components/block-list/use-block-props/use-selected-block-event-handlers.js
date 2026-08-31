@@ -84,7 +84,6 @@ export function useEventHandlers( { clientId, isSelected } ) {
 			 */
 			function onDragStart( event ) {
 				if (
-					node !== event.target ||
 					node.isContentEditable ||
 					node.ownerDocument.activeElement !== node ||
 					hasMultiSelection()

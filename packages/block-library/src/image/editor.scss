@@ -47,6 +47,14 @@ figure.wp-block-image:not(.wp-block) {
 		transform: translate(-50%, -50%);
 		margin: 0;
 	}
+
+	.components-resizable-box__container {
+		pointer-events: none;
+	}
+
+	.components-resizable-box__handle {
+		pointer-events: auto;
+	}
 }
 
 // Shown while image is being uploaded but cannot be previewed.
