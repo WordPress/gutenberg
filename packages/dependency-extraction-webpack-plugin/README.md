@@ -70,12 +70,15 @@ For example:
 // Source file entrypoint.js
 import { Component } from 'react';
 
-// Webpack will produce the output output/entrypoint.js
+// Webpack will produce a JavaScript output file, for example output/entrypoint.js
 /* bundled JavaScript output */
 
-// Webpack will also produce output/entrypoint.asset.php declaring script dependencies
+// Webpack will also produce a matching asset file, for example
+// output/entrypoint.asset.php, declaring script dependencies
 <?php return array('dependencies' => array('react'), 'version' => 'dd4c2dc50d046ed9d4c063a7ca95702f');
 ```
+
+The generated asset file name is based on the emitted JavaScript output file name. For example, if webpack is configured with `output.filename: 'bunny-plugin-[name].min.js'`, an `entrypoint` entry creates `output/bunny-plugin-entrypoint.min.asset.php`.
 
 By default, the following module requests are handled:
 
@@ -137,10 +140,11 @@ For example:
 // Source file entrypoint.js
 import { store, getContext } from '@wordpress/interactivity';
 
-// Webpack will produce the output output/entrypoint.js
+// Webpack will produce a JavaScript output file, for example output/entrypoint.js
 /* bundled JavaScript output */
 
-// Webpack will also produce output/entrypoint.asset.php declaring script dependencies
+// Webpack will also produce a matching asset file, for example
+// output/entrypoint.asset.php, declaring script module dependencies
 <?php return array('dependencies' => array('@wordpress/interactivity'), 'version' => 'dd4c2dc50d046ed9d4c063a7ca95702f');
 ```
 
