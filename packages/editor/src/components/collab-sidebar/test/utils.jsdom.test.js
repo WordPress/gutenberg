@@ -17,6 +17,8 @@ import {
 	removeNoteIdFromMetadata,
 	calculateNotePositions,
 	pickPrimaryNote,
+	pickIndicatorNotes,
+	getThreadParticipants,
 	BLOCK_LEVEL_NOTE_START,
 	getInlineMarkerStart,
 	getNoteMarkerSelector,
@@ -327,6 +329,129 @@ describe( 'pickPrimaryNote', () => {
 			{ id: 2, status: 'approved' },
 		];
 		expect( pickPrimaryNote( threads ) ).toBe( threads[ 0 ] );
+	} );
+} );
+
+describe( 'pickIndicatorNotes', () => {
+	it( 'returns every unresolved thread when some are unresolved', () => {
+		const threads = [
+			{ id: 1, status: 'hold' },
+			{ id: 2, status: 'approved' },
+			{ id: 3, status: 'hold' },
+		];
+		expect( pickIndicatorNotes( threads ) ).toEqual( [
+			threads[ 0 ],
+			threads[ 2 ],
+		] );
+	} );
+
+	it( 'falls back to every thread when none are unresolved', () => {
+		const threads = [
+			{ id: 1, status: 'approved' },
+			{ id: 2, status: 'approved' },
+		];
+		expect( pickIndicatorNotes( threads ) ).toEqual( threads );
+	} );
+
+	it( 'returns an empty list for an empty list', () => {
+		expect( pickIndicatorNotes( [] ) ).toEqual( [] );
+	} );
+} );
+
+describe( 'getThreadParticipants', () => {
+	function makeNote( { id, author, name, date, reply = [] } ) {
+		return {
+			id,
+			author,
+			author_name: name,
+			author_avatar_urls: { 48: `avatar-${ author }` },
+			date,
+			reply,
+		};
+	}
+
+	it( 'collects authors across separate threads on the same block', () => {
+		const threads = [
+			makeNote( {
+				id: 1,
+				author: 10,
+				name: 'Ann',
+				date: '2026-01-01T10:00:00',
+			} ),
+			makeNote( {
+				id: 2,
+				author: 20,
+				name: 'Bob',
+				date: '2026-01-01T11:00:00',
+			} ),
+		];
+		expect( getThreadParticipants( threads ) ).toEqual( [
+			{ id: 10, name: 'Ann', avatar: 'avatar-10' },
+			{ id: 20, name: 'Bob', avatar: 'avatar-20' },
+		] );
+	} );
+
+	it( 'includes repliers and orders participants chronologically', () => {
+		const threads = [
+			makeNote( {
+				id: 1,
+				author: 10,
+				name: 'Ann',
+				date: '2026-01-01T12:00:00',
+				reply: [
+					makeNote( {
+						id: 3,
+						author: 30,
+						name: 'Cal',
+						date: '2026-01-01T13:00:00',
+					} ),
+				],
+			} ),
+			makeNote( {
+				id: 2,
+				author: 20,
+				name: 'Bob',
+				date: '2026-01-01T09:00:00',
+			} ),
+		];
+		expect(
+			getThreadParticipants( threads ).map( ( p ) => p.name )
+		).toEqual( [ 'Bob', 'Ann', 'Cal' ] );
+	} );
+
+	it( 'lists an author once even when present in several threads', () => {
+		const threads = [
+			makeNote( {
+				id: 1,
+				author: 10,
+				name: 'Ann',
+				date: '2026-01-01T10:00:00',
+			} ),
+			makeNote( {
+				id: 2,
+				author: 10,
+				name: 'Ann',
+				date: '2026-01-01T11:00:00',
+			} ),
+		];
+		expect( getThreadParticipants( threads ) ).toHaveLength( 1 );
+	} );
+
+	it( 'skips entries without an author name', () => {
+		const threads = [ { id: 1, author: 10, date: '2026-01-01T10:00:00' } ];
+		expect( getThreadParticipants( threads ) ).toEqual( [] );
+	} );
+
+	it( 'tolerates threads with no replies', () => {
+		const threads = [
+			{
+				id: 1,
+				author: 10,
+				author_name: 'Ann',
+				date: '2026-01-01T10:00:00',
+			},
+		];
+		expect( getThreadParticipants( threads ) ).toHaveLength( 1 );
 	} );
 } );
 
