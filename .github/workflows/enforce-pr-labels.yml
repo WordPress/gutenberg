@@ -72,10 +72,12 @@ jobs:
                   Read more about [Type labels in Gutenberg](https://github.com/WordPress/gutenberg/labels?q=type). If you cannot add labels yourself, a reviewer can do it for you.
                   EOF
 
-            # Runs whatever the check found: an empty section is what clears the
-            # warning once the labels are right.
+            # Runs whatever the check found, since an empty section is what
+            # clears the warning once the labels are right. Not when the check
+            # itself failed: no body file then means "labels are fine", and a
+            # failed API call would erase a warning nothing had disproved.
             - name: Report the result
-              if: ${{ !cancelled() }}
+              if: ${{ !cancelled() && steps.check.outcome == 'success' }}
               uses: ./tools/pr-meta
               with:
                   repo-token: ${{ secrets.GITHUB_TOKEN }}

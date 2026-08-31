@@ -90,13 +90,32 @@ describe( 'Report flaky tests', () => {
 	it( 'should write nothing when the artifact is missing', async () => {
 		mockInputs();
 
+		const missing = Object.assign( new Error( 'ENOENT' ), {
+			code: 'ENOENT',
+		} );
 		const mockedFs = require( 'fs/promises' );
 		mockedFs.readdir.mockImplementationOnce( () =>
-			Promise.reject( new Error( 'ENOENT' ) )
+			Promise.reject( missing )
 		);
 
 		await run();
 
+		expect( mockedFs.writeFile ).not.toHaveBeenCalled();
+	} );
+
+	/* Anything else would clear a report that nothing had disproved. */
+	it( 'should fail rather than report clean when the artifact is unreadable', async () => {
+		mockInputs();
+
+		const denied = Object.assign( new Error( 'EACCES' ), {
+			code: 'EACCES',
+		} );
+		const mockedFs = require( 'fs/promises' );
+		mockedFs.readdir.mockImplementationOnce( () =>
+			Promise.reject( denied )
+		);
+
+		await expect( run() ).rejects.toThrow( 'EACCES' );
 		expect( mockedFs.writeFile ).not.toHaveBeenCalled();
 	} );
 } );

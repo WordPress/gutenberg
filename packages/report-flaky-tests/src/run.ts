@@ -7,10 +7,17 @@ import type { FlakyTestResult, ReportedFlakyTest } from './types.ts';
 async function run() {
 	const artifactPath = core.getInput( 'artifact-path', { required: true } );
 
-	// A clean run produces no artifact at all, which is the ordinary case.
-	const flakyTestsDir = await fs
-		.readdir( artifactPath )
-		.catch( () => [] as string[] );
+	/*
+	 * A clean run produces no artifact at all, which is the ordinary case. Any
+	 * other failure has to surface: reporting it as clean would clear a report
+	 * that nothing had disproved.
+	 */
+	const flakyTestsDir = await fs.readdir( artifactPath ).catch( ( error ) => {
+		if ( error.code === 'ENOENT' ) {
+			return [] as string[];
+		}
+		throw error;
+	} );
 
 	const flakyTests: FlakyTestResult[] = await Promise.all(
 		flakyTestsDir.map( ( filename ) =>

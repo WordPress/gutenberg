@@ -508,3 +508,25 @@ describe( 'collapsing', () => {
 		).toBe( 'Traces.' );
 	} );
 } );
+
+describe( 'rendering other sections', () => {
+	/*
+	 * Every write re-renders every section, so a writer that does not know the
+	 * head would quietly present an old result as current.
+	 */
+	it( 'keeps a stale result marked stale when another section is written', () => {
+		const comment = bodyOf(
+			mergeSection(
+				undefined,
+				{ id: 'bundle-size', body: 'Measured.', sha: OLD },
+				OLD
+			)
+		);
+
+		const merged = bodyOf(
+			mergeSection( comment, { id: 'labels', body: 'Warning.' }, HEAD )
+		);
+
+		expect( merged ).toContain( 'not the current head' );
+	} );
+} );

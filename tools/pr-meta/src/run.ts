@@ -76,11 +76,16 @@ async function run() {
 	}
 
 	const body = resolveBody();
-	/* Needed to clear a commit-scoped section as much as to fill one. */
-	const headSha =
-		definition.scope === 'commit'
-			? await api.getHeadSha( prNumber )
-			: undefined;
+
+	/*
+	 * Every write re-renders every section, including the footers marking a
+	 * commit-scoped result as no longer current, so the head is needed
+	 * whatever this section's own scope is. Losing it only blocks a
+	 * commit-scoped write, which `mergeSection` refuses without one.
+	 */
+	const headSha = await api
+		.getHeadSha( prNumber )
+		.catch( () => undefined as string | undefined );
 
 	const {
 		body: merged,
