@@ -572,6 +572,20 @@ export const getPreviousRevision = createRegistrySelector(
 );
 
 /**
+ * Returns whether the post's edit lock belongs to a collaborative session.
+ *
+ * The classic editor and page builders take the same lock but do not merge
+ * changes, so their locks stay exclusive even while collaboration is enabled.
+ * Defaults to `false` so an unknown lock is treated as exclusive.
+ *
+ * @param {Object} state Global application state.
+ * @return {boolean} Whether the lock belongs to a collaborative session.
+ */
+export function isPostLockCollaborative( state ) {
+	return state.postLock.isCollaborative ?? false;
+}
+
+/**
  * Returns whether the collaboration is enabled for the current post.
  *
  * @return {boolean} Whether collaboration is enabled.
