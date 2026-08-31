@@ -562,12 +562,11 @@ function MediaEditorContent( {
 	}, [ id, invalidateResolution ] );
 
 	// Restore-original: the lineage root the edited attachment descends from,
-	// exposed by the server as the root-level `original_attachment` field
-	// on the attachment (edit context). Fetch its
-	// record for the natural dimensions the cropper needs to seed itself (the
-	// field itself carries only the id and url).
-	const originalAttachment = media?.original_attachment;
-	const originalId: number | undefined = originalAttachment?.attachment_id;
+	// exposed by the server as the root-level `original_attachment` id on the
+	// attachment (edit context, embeddable via the `wp:original-attachment`
+	// link). Fetch the original's record for the URL and natural dimensions
+	// the cropper needs to seed itself.
+	const originalId: number | undefined = media?.original_attachment;
 	const originalRecord = useSelect(
 		( select ) =>
 			originalId
@@ -581,16 +580,19 @@ function MediaEditorContent( {
 	);
 	const originalWidth = Number( originalRecord?.media_details?.width );
 	const originalHeight = Number( originalRecord?.media_details?.height );
+	const originalUrl = originalRecord?.source_url;
 	const originalSource =
-		originalAttachment &&
+		originalId &&
 		originalRecord &&
+		typeof originalUrl === 'string' &&
+		originalUrl.length > 0 &&
 		Number.isFinite( originalWidth ) &&
 		originalWidth > 0 &&
 		Number.isFinite( originalHeight ) &&
 		originalHeight > 0
 			? {
-					id: originalAttachment.attachment_id as number,
-					url: originalAttachment.source_url as string,
+					id: originalId,
+					url: originalUrl,
 					width: originalWidth,
 					height: originalHeight,
 					media: originalRecord,
