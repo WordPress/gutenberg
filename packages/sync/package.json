@@ -54,7 +54,7 @@
 		"yjs": "^13.6.29"
 	},
 	"devDependencies": {
-		"@jest/globals": "^30.4.1",
+		"@jest/globals": "^30.5.0",
 		"@types/jest": "^30.0.0",
 		"@types/node": "^20.19.39"
 	},
