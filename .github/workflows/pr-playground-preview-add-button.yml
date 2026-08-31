@@ -1,0 +1,101 @@
+name: PR Playground Preview - Publish
+
+# Use workflow_run for privileged operations
+# Runs with write permissions and access to secrets
+# Operates on artifacts from the unprivileged build workflow
+on:
+  workflow_run:
+    workflows: ["PR Playground Preview - Build"]
+    types:
+      - completed
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  publish-preview:
+    runs-on: ubuntu-latest
+    # Only run if the build workflow succeeded and was triggered by a pull_request
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success'
+    outputs:
+      artifact-url: ${{ steps.expose.outputs.artifact-url }}
+      artifact-name: ${{ steps.expose.outputs.artifact-name }}
+    steps:
+      - name: Extract PR metadata from artifact name
+        id: pr-metadata
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: ${{ github.event.workflow_run.id }},
+            });
+
+            const artifact = artifacts.data.artifacts.find(a =>
+              a.name.startsWith("gutenberg-plugin-zip-pr")
+            );
+
+            if (!artifact) {
+              throw new Error('Could not find plugin artifact');
+            }
+
+            // Parse: gutenberg-plugin-zip-pr123-abc123def...
+            const match = artifact.name.match(/^gutenberg-plugin-zip-pr(\d+)-(.+)$/);
+            if (!match) {
+              throw new Error(`Could not parse artifact name: ${artifact.name}`);
+            }
+
+            const [, prNumber, commitSha] = match;
+
+            core.setOutput('pr-number', prNumber);
+            core.setOutput('commit-sha', commitSha);
+            core.setOutput('artifact-name', artifact.name);
+
+      - name: Expose built artifact
+        id: expose
+        uses: WordPress/action-wp-playground-pr-preview/.github/actions/expose-artifact-on-public-url@v2
+        with:
+          artifact-name: ${{ steps.pr-metadata.outputs.artifact-name }}
+          artifact-filename: gutenberg.zip
+          pr-number: ${{ steps.pr-metadata.outputs.pr-number }}
+          commit-sha: ${{ steps.pr-metadata.outputs.commit-sha }}
+          artifact-source-run-id: ${{ github.event.workflow_run.id }}
+          artifacts-to-keep: '2'
+
+      - name: Generate Playground blueprint JSON
+        id: blueprint
+        run: |
+          node - <<'NODE' >> "$GITHUB_OUTPUT"
+          const url = process.env.ARTIFACT_URL;
+          if (!url) {
+            throw new Error('ARTIFACT_URL is required');
+          }
+
+          const blueprint = {
+            steps: [
+              {
+                step: 'installPlugin',
+                pluginZipFile: {
+                  resource: 'url',
+                  url,
+                },
+              },
+            ],
+          };
+
+          console.log(`blueprint=${JSON.stringify(blueprint)}`);
+          NODE
+        env:
+          ARTIFACT_URL: ${{ steps.expose.outputs.artifact-url }}
+
+      - name: Post Playground preview button
+        uses: WordPress/action-wp-playground-pr-preview@v2
+        with:
+          mode: append-to-description
+          blueprint: ${{ steps.blueprint.outputs.blueprint }}
+          pr-number: ${{ steps.pr-metadata.outputs.pr-number }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
