@@ -1,6 +1,6 @@
 /**
  * Builds the effective highlight color palette and whether the Highlight
- * toolbar control should be available, matching ColorPalette's origin rules.
+ * control should be available, matching ColorPalette's origin rules.
  *
  * @param {Object}  settings
  * @param {Array}   [settings.themeColors]
@@ -8,7 +8,7 @@
  * @param {Array}   [settings.customColors]
  * @param {boolean} [settings.enableCustomColors]
  * @param {boolean} [settings.enableDefaultColors]
- * @return {{ colors: Array, hasColorsToChoose: boolean }} Available colors and visibility.
+ * @return {{ colors: Array, hasColorsToChoose: boolean }} Available colors and whether the color picker should open.
  */
 export function getAvailableHighlightColors( {
 	themeColors,

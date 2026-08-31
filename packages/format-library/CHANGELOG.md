@@ -5,7 +5,7 @@
 ### Bug Fixes
 
 -   Prevent Highlight format toolbar from crashing when switching to Edit as HTML with background-only formatting active. ([#82215](https://github.com/WordPress/gutenberg/pull/82215))
--   Hide the Highlight format control when theme color palettes and custom colors are disabled. ([#82268](https://github.com/WordPress/gutenberg/pull/82268))
+-   Highlight: Toggle native `<mark>` styling when theme colors are disabled instead of hiding the control or opening an empty color picker. ([#82268](https://github.com/WordPress/gutenberg/pull/82268))
 
 ### Internal
 

@@ -1,7 +1,7 @@
 import { getAvailableHighlightColors } from '../utils';
 
 describe( 'getAvailableHighlightColors', () => {
-	it( 'hides Highlight when palette is empty and custom colors are disabled', () => {
+	it( 'returns no colors when palette is empty and custom colors are disabled', () => {
 		const result = getAvailableHighlightColors( {
 			themeColors: [],
 			defaultColors: [ { slug: 'black', color: '#000' } ],
@@ -28,7 +28,7 @@ describe( 'getAvailableHighlightColors', () => {
 		expect( result.colors ).toEqual( defaults );
 	} );
 
-	it( 'keeps Highlight available when custom colors are enabled', () => {
+	it( 'keeps Highlight available for custom colors when the palette is empty', () => {
 		const result = getAvailableHighlightColors( {
 			themeColors: [],
 			defaultColors: [],

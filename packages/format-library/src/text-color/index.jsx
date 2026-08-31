@@ -6,7 +6,7 @@ import {
 	color as colorIcon,
 	textColor as textColorIcon,
 } from '@wordpress/icons';
-import { removeFormat } from '@wordpress/rich-text';
+import { toggleFormat } from '@wordpress/rich-text';
 import { default as InlineColorUI, getActiveColors } from './inline';
 import { getAvailableHighlightColors } from './utils';
 
@@ -87,10 +87,6 @@ function TextColorEdit( {
 		[ contentRef, value, colors ]
 	);
 
-	if ( ! hasColorsToChoose && ! isActive ) {
-		return null;
-	}
-
 	return (
 		<>
 			<RichTextToolbarButton
@@ -107,11 +103,16 @@ function TextColorEdit( {
 					/>
 				}
 				title={ title }
-				// If has no colors to choose but a color is active remove the color onClick.
 				onClick={
 					hasColorsToChoose
 						? () => setIsAddingColor( true )
-						: () => onChange( removeFormat( value, name ) )
+						: () =>
+								onChange(
+									toggleFormat( value, {
+										type: name,
+										title,
+									} )
+								)
 				}
 				role="menuitemcheckbox"
 			/>
