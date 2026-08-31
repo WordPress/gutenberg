@@ -11,6 +11,7 @@ import { Page } from '@wordpress/admin-ui';
 import type { View, Action, SupportedLayouts } from '@wordpress/dataviews';
 import {
 	store as coreStore,
+	useEntityRecords,
 	privateApis as coreDataPrivateApis,
 } from '@wordpress/core-data';
 import {
@@ -26,6 +27,7 @@ import type { Post } from '@wordpress/core-data';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import {
 	getActiveViewOverrides,
+	viewToCountQuery,
 	viewToQuery,
 	type ViewListEntry,
 	type ViewOverrides,
@@ -48,6 +50,43 @@ function getItemId( item: Post ) {
 
 function getItemLevel( item: Post ) {
 	return ( item as { level?: number } ).level ?? 0;
+}
+
+/**
+ * A view tab, trailing its label with the number of items the view holds so
+ * that the size of each status is legible without switching tabs.
+ *
+ * The count is fetched per tab rather than derived from the list, because the
+ * list only ever holds the records of the active view. It is left out while it
+ * resolves, so that a tab never shows a number that is about to change.
+ *
+ * @param props          Component props.
+ * @param props.entry    The view list entry the tab selects.
+ * @param props.postType The post type being listed.
+ */
+function ViewTab( {
+	entry,
+	postType,
+}: {
+	entry: ViewListEntry;
+	postType: string;
+} ) {
+	const countQuery = useMemo(
+		() => viewToCountQuery( entry, postType ),
+		[ entry, postType ]
+	);
+	const { totalItems } = useEntityRecords( 'postType', postType, countQuery );
+
+	return (
+		<Tabs.Tab tabId={ entry.slug }>
+			{ entry.title }
+			{ typeof totalItems === 'number' && (
+				<span className="routes-post-list__tab-count">
+					{ totalItems.toLocaleString() }
+				</span>
+			) }
+		</Tabs.Tab>
+	);
 }
 
 function PostList() {
@@ -375,12 +414,11 @@ function PostListView( {
 					<Tabs onSelect={ handleTabChange } selectedTabId={ slug }>
 						<Tabs.TabList>
 							{ viewList.map( ( entry ) => (
-								<Tabs.Tab
-									tabId={ entry.slug }
+								<ViewTab
 									key={ entry.slug }
-								>
-									{ entry.title }
-								</Tabs.Tab>
+									entry={ entry }
+									postType={ postType }
+								/>
 							) ) }
 						</Tabs.TabList>
 					</Tabs>

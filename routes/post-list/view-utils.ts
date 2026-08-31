@@ -175,3 +175,29 @@ export function viewToQuery( view: View, postType: string ) {
 
 	return result;
 }
+
+/**
+ * Builds the query that counts the items a view list entry holds.
+ *
+ * The count answers "how many items are in this tab", so it is built from the
+ * entry's own filters alone: the active search, page and sorting are left out,
+ * which also keeps the query stable — and therefore cached — while the user
+ * types in the search field or pages through the list. Only the total is
+ * needed, so it asks for a single record and a single field.
+ *
+ * @param entry    The view list entry to count.
+ * @param postType The post type name.
+ * @return The query to count the entry's items with.
+ */
+export function viewToCountQuery( entry: ViewListEntry, postType: string ) {
+	const query = viewToQuery(
+		{
+			type: 'table',
+			filters: entry.view?.filters ?? [],
+		} as View,
+		postType
+	);
+	// The embedded author and media are only needed to render records.
+	delete query._embed;
+	return { ...query, per_page: 1, page: 1, _fields: 'id' };
+}
