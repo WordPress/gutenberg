@@ -5,6 +5,13 @@ import {
 	useState,
 } from '@wordpress/element';
 
+type StyleBookNotesContextValue = {
+	pendingAnchor: string | null;
+	setPendingAnchor: ( anchor: string | null ) => void;
+	activeAnchor: string | null;
+	setActiveAnchor: ( anchor: string | null ) => void;
+};
+
 /**
  * Shared state between the Style Book canvas and the Style Book notes sidebar.
  *
@@ -19,16 +26,22 @@ import {
  * for it. The sidebar sets `activeAnchor` when a thread is selected, and the
  * canvas scrolls that example into view and highlights it.
  */
-const StyleBookNotesContext = createContext( {
+const StyleBookNotesContext = createContext< StyleBookNotesContextValue >( {
 	pendingAnchor: null,
 	setPendingAnchor: () => {},
 	activeAnchor: null,
 	setActiveAnchor: () => {},
 } );
 
-export function StyleBookNotesProvider( { children } ) {
-	const [ pendingAnchor, setPendingAnchor ] = useState( null );
-	const [ activeAnchor, setActiveAnchor ] = useState( null );
+export function StyleBookNotesProvider( {
+	children,
+}: {
+	children?: React.ReactNode;
+} ) {
+	const [ pendingAnchor, setPendingAnchor ] = useState< string | null >(
+		null
+	);
+	const [ activeAnchor, setActiveAnchor ] = useState< string | null >( null );
 
 	const value = useMemo(
 		() => ( {

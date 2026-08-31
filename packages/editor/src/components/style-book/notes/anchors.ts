@@ -14,10 +14,18 @@ export const NOTE_ANCHOR_META = '_wp_note_anchor';
  */
 export const UNKNOWN_ANCHOR = '__unknown__';
 
-type NoteThread = {
+export type StyleBookNoteThread = {
 	id: number;
 	status: string;
+	parent?: number;
 	meta?: Record< string, unknown >;
+	[ key: string ]: unknown;
+};
+
+export type StyleBookNoteGroup = {
+	anchor: string;
+	label: string;
+	threads: StyleBookNoteThread[];
 };
 
 /**
@@ -26,10 +34,12 @@ type NoteThread = {
  * The meta is a free-form string on the server, so anything that is not a
  * non-empty string is treated as no anchor at all.
  *
- * @param thread Note thread.
+ * @param thread Note thread, if there is one.
  * @return The anchor, or an empty string when the note carries none.
  */
-export function getThreadAnchor( thread: NoteThread ): string {
+export function getThreadAnchor(
+	thread: StyleBookNoteThread | undefined
+): string {
 	const anchor = thread?.meta?.[ NOTE_ANCHOR_META ];
 
 	return typeof anchor === 'string' ? anchor : '';
@@ -48,7 +58,7 @@ export function getThreadAnchor( thread: NoteThread ): string {
  * @return Example name to display title.
  */
 export function getAnchorLabels(
-	examples: BlockExample[]
+	examples: Array< Pick< BlockExample, 'name' | 'title' > >
 ): Record< string, string > {
 	const labels: Record< string, string > = {};
 
@@ -79,10 +89,10 @@ export function getAnchorLabels(
  * @return Ordered groups of threads.
  */
 export function groupThreadsByAnchor(
-	threads: NoteThread[],
+	threads: StyleBookNoteThread[],
 	labels: Record< string, string >
-): Array< { anchor: string; label: string; threads: NoteThread[] } > {
-	const byAnchor = new Map< string, NoteThread[] >();
+): StyleBookNoteGroup[] {
+	const byAnchor = new Map< string, StyleBookNoteThread[] >();
 
 	for ( const thread of threads ) {
 		const anchor = getThreadAnchor( thread );
@@ -93,7 +103,7 @@ export function groupThreadsByAnchor(
 		byAnchor.get( key )!.push( thread );
 	}
 
-	const groups = [];
+	const groups: StyleBookNoteGroup[] = [];
 
 	for ( const anchor of Object.keys( labels ) ) {
 		const anchored = byAnchor.get( anchor );
@@ -128,7 +138,7 @@ export function groupThreadsByAnchor(
  * @return Example name to thread count.
  */
 export function countThreadsByAnchor(
-	threads: NoteThread[]
+	threads: StyleBookNoteThread[]
 ): Record< string, number > {
 	const counts: Record< string, number > = {};
 

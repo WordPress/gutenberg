@@ -1,6 +1,17 @@
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
+type UseStyleBookNotesEnabledOptions = {
+	enabled?: boolean;
+};
+
+type UseStyleBookNotesEnabledResult = {
+	// `core-data` types the global styles id as a string, though the value it
+	// resolves is the `wp_global_styles` post id.
+	globalStylesId: number | string | undefined;
+	isEnabled: boolean;
+};
+
 /**
  * Whether Style Book notes are available at all.
  *
@@ -19,13 +30,14 @@ import { store as coreStore } from '@wordpress/core-data';
  * open, and asking earlier would add requests to every site editor load,
  * whether or not anyone visits the Style Book.
  *
- * @param {Object}  [options]         Options.
- * @param {boolean} [options.enabled] Whether to resolve the answer at all.
- *                                    Defaults to true.
- * @return {{ globalStylesId: number|undefined, isEnabled: boolean }} The post
- * notes are stored on, and whether the feature is available.
+ * @param options
+ * @param options.enabled Whether to resolve the answer at all. Defaults to
+ *                        true.
+ * @return The post notes are stored on, and whether the feature is available.
  */
-export function useStyleBookNotesEnabled( { enabled = true } = {} ) {
+export function useStyleBookNotesEnabled( {
+	enabled = true,
+}: UseStyleBookNotesEnabledOptions = {} ): UseStyleBookNotesEnabledResult {
 	const globalStylesId = useSelect(
 		( select ) =>
 			enabled
@@ -44,10 +56,14 @@ export function useStyleBookNotesEnabled( { enabled = true } = {} ) {
 			/*
 			 * `add_post_type_support()` stores its arguments as an array, so
 			 * the REST `supports.editor` value is `[ { notes: true } ]` rather
-			 * than a bare `true`. Read it the way the comments controller does.
+			 * than a bare `true`. Read it the way the comments controller
+			 * does; `core-data` types `supports` as a map of strings, which
+			 * does not describe that shape.
 			 */
-			const [ editorSupport ] = postType?.supports?.editor ?? [];
-			return !! editorSupport?.notes;
+			const supports = postType?.supports as
+				| Record< string, Array< { notes?: boolean } > >
+				| undefined;
+			return !! supports?.editor?.[ 0 ]?.notes;
 		},
 		[ enabled ]
 	);

@@ -12,10 +12,29 @@ import { useStyleBookNoteThreads } from './use-style-book-note-threads';
 import { useStyleBookNotesEnabled } from './use-style-book-notes-enabled';
 import { store as editorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
+import type { MultiOriginPalettes } from '../types';
 
-function StyleBookNotesSidebar( { globalStylesId } ) {
-	const sidebarRef = useRef( null );
-	const colors = useMultiOriginPalettes();
+/*
+ * `PluginSidebar` forwards anything it does not use itself to
+ * `ComplementaryArea`, but its JSDoc only describes the props it reads, so the
+ * pass-through ones have to be declared for a TypeScript caller.
+ */
+const NotesSidebar = PluginSidebar as React.ComponentType<
+	React.ComponentProps< typeof PluginSidebar > & {
+		identifier: string;
+		header: React.ReactNode;
+		closeLabel: string;
+	}
+>;
+
+function StyleBookNotesSidebar( {
+	globalStylesId,
+}: {
+	globalStylesId: number | string | undefined;
+} ) {
+	const sidebarRef = useRef< HTMLElement | null >( null );
+	// `useMultiOriginPalettes` is JSDoc-typed as a bare `Object`.
+	const colors = useMultiOriginPalettes() as MultiOriginPalettes;
 
 	// The labels come from the examples the Style Book actually renders, so an
 	// anchor pointing at something no longer on screen falls into the "Other
@@ -28,7 +47,7 @@ function StyleBookNotesSidebar( { globalStylesId } ) {
 	const { groups } = useStyleBookNoteThreads( { labels } );
 
 	return (
-		<PluginSidebar
+		<NotesSidebar
 			identifier={ STYLE_BOOK_NOTES_SIDEBAR }
 			name={ STYLE_BOOK_NOTES_SIDEBAR }
 			title={ __( 'Style Book notes' ) }
@@ -46,7 +65,7 @@ function StyleBookNotesSidebar( { globalStylesId } ) {
 				globalStylesId={ globalStylesId }
 				sidebarRef={ sidebarRef }
 			/>
-		</PluginSidebar>
+		</NotesSidebar>
 	);
 }
 
@@ -59,9 +78,9 @@ function StyleBookNotesSidebar( { globalStylesId } ) {
  * sidebar stays out - matching the post editor, which hides notes in revisions
  * mode too.
  *
- * @return {React.JSX.Element|null} The sidebar, or nothing outside the Style Book.
+ * @return The sidebar, or nothing outside the Style Book.
  */
-export default function StyleBookNotes() {
+export default function StyleBookNotes(): React.JSX.Element | null {
 	const { showStylebook, isRevisions } = useSelect( ( select ) => {
 		const { getShowStylebook, getStylesPath } = unlock(
 			select( editorStore )

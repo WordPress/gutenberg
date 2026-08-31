@@ -8,9 +8,17 @@ import { NoteForm } from '../../collab-sidebar/note-form';
 import { useNoteActions } from '../../collab-sidebar/hooks';
 import { focusNoteThread } from '../../collab-sidebar/utils';
 import { NOTE_ANCHOR_META } from './anchors';
+import type { StyleBookNoteGroup, StyleBookNoteThread } from './anchors';
 import { useStyleBookNotesContext } from './context';
 import { store as editorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
+
+type StyleBookNotesPanelProps = {
+	groups: StyleBookNoteGroup[];
+	labels: Record< string, string >;
+	globalStylesId: number | string | undefined;
+	sidebarRef: React.MutableRefObject< HTMLElement | null >;
+};
 
 /**
  * Lists Style Book note threads, grouped under the example each was left on.
@@ -21,19 +29,19 @@ import { unlock } from '../../../lock-unlock';
  * are regenerated on every render. The individual threads are the same
  * component, so replies, editing, resolving and deleting behave identically.
  *
- * @param {Object} props
- * @param {Array}  props.groups         Ordered anchor groups from `useStyleBookNoteThreads`.
- * @param {Object} props.labels         Example name to display title.
- * @param {number} props.globalStylesId Post the notes are stored on.
- * @param {Object} props.sidebarRef     Ref to the scroll container.
- * @return {React.JSX.Element} The notes list.
+ * @param props
+ * @param props.groups         Ordered anchor groups from `useStyleBookNoteThreads`.
+ * @param props.labels         Example name to display title.
+ * @param props.globalStylesId Post the notes are stored on.
+ * @param props.sidebarRef     Ref to the scroll container.
+ * @return The notes list.
  */
 export function StyleBookNotesPanel( {
 	groups,
 	labels,
 	globalStylesId,
 	sidebarRef,
-} ) {
+}: StyleBookNotesPanelProps ): React.JSX.Element {
 	const { pendingAnchor, setPendingAnchor, setActiveAnchor } =
 		useStyleBookNotesContext();
 	const { selectNote } = unlock( useDispatch( editorStore ) );
@@ -42,7 +50,7 @@ export function StyleBookNotesPanel( {
 		[]
 	);
 	const isSubmittingRef = useRef( false );
-	const addNoteRef = useRef( null );
+	const addNoteRef = useRef< HTMLDivElement | null >( null );
 
 	/*
 	 * The request to add a note comes from the canvas, so focus has to follow
@@ -51,7 +59,9 @@ export function StyleBookNotesPanel( {
 	 */
 	useEffect( () => {
 		if ( pendingAnchor ) {
-			addNoteRef.current?.querySelector( '[role="textbox"]' )?.focus();
+			addNoteRef.current
+				?.querySelector< HTMLElement >( '[role="textbox"]' )
+				?.focus();
 		}
 	}, [ pendingAnchor ] );
 
@@ -80,7 +90,7 @@ export function StyleBookNotesPanel( {
 	 */
 	const pendingLabel = pendingAnchor ? labels?.[ pendingAnchor ] : undefined;
 
-	const handleDelete = async ( note ) => {
+	const handleDelete = async ( note: StyleBookNoteThread ) => {
 		const currentIndex = orderedThreads.findIndex(
 			( thread ) => thread.id === note.id
 		);
@@ -94,10 +104,11 @@ export function StyleBookNotesPanel( {
 			return;
 		}
 
-		if ( note.parent !== 0 ) {
+		const parent = note.parent ?? 0;
+		if ( parent !== 0 ) {
 			// Move focus to the parent thread when a reply was deleted.
-			selectNote( note.parent );
-			focusNoteThread( note.parent, sidebarRef.current );
+			selectNote( parent );
+			focusNoteThread( parent, sidebarRef.current );
 			return;
 		}
 
@@ -110,7 +121,12 @@ export function StyleBookNotesPanel( {
 		}
 	};
 
-	const navigate = ( event, thread, anchor, isSelected ) => {
+	const navigate = (
+		event: React.KeyboardEvent< HTMLElement >,
+		thread: StyleBookNoteThread,
+		anchor: string,
+		isSelected: boolean
+	) => {
 		if ( event.defaultPrevented ) {
 			return;
 		}
@@ -172,7 +188,7 @@ export function StyleBookNotesPanel( {
 			direction="column"
 			gap="md"
 			justify="flex-start"
-			ref={ ( node ) => {
+			ref={ ( node: HTMLElement | null ) => {
 				if ( node ) {
 					sidebarRef.current = node;
 				}
@@ -181,7 +197,7 @@ export function StyleBookNotesPanel( {
 		>
 			{ ! hasContent && (
 				<Text
-					variant="muted"
+					variant="body-sm"
 					className="editor-style-book-notes__empty"
 					render={ <p /> }
 				>
@@ -197,7 +213,7 @@ export function StyleBookNotesPanel( {
 				>
 					<NoteCard>
 						<NoteForm
-							onSubmit={ async ( inputComment ) => {
+							onSubmit={ async ( inputComment: string ) => {
 								isSubmittingRef.current = true;
 								try {
 									/*
@@ -282,7 +298,9 @@ export function StyleBookNotesPanel( {
 									}
 									isSelected={ selectedNote === thread.id }
 									sidebarRef={ sidebarRef }
-									onKeyDown={ ( event ) =>
+									onKeyDown={ (
+										event: React.KeyboardEvent< HTMLElement >
+									) =>
 										navigate(
 											event,
 											thread,

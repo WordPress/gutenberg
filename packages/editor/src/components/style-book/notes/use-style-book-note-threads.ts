@@ -6,6 +6,21 @@ import {
 	partitionNoteThreadsByStatus,
 } from '../../collab-sidebar/utils';
 import { countThreadsByAnchor, groupThreadsByAnchor } from './anchors';
+import type { StyleBookNoteGroup, StyleBookNoteThread } from './anchors';
+
+type UseStyleBookNoteThreadsOptions = {
+	enabled?: boolean;
+	labels?: Record< string, string >;
+};
+
+type UseStyleBookNoteThreadsResult = {
+	// `core-data` types the global styles id as a string, though the value it
+	// resolves is the `wp_global_styles` post id.
+	globalStylesId: number | string | undefined;
+	groups: StyleBookNoteGroup[];
+	counts: Record< string, number >;
+	threads: StyleBookNoteThread[];
+};
 
 /**
  * Loads the Style Book notes for the active theme and arranges them by the
@@ -16,20 +31,15 @@ import { countThreadsByAnchor, groupThreadsByAnchor } from './anchors';
  * extra request for it; the comment query is the single request this adds, and
  * it is skipped entirely until that id is known.
  *
- * @param {Object}                 options
- * @param {boolean}                options.enabled Whether to fetch at all.
- * @param {Record<string, string>} options.labels  Example name to display title.
- * @return {{
- *   globalStylesId: number|undefined,
- *   groups: Array<{ anchor: string, label: string, threads: Array }>,
- *   counts: Record<string, number>,
- *   threads: Array,
- * }} Grouped threads, per-example counts and the post they are stored on.
+ * @param options
+ * @param options.enabled Whether to fetch at all.
+ * @param options.labels  Example name to display title.
+ * @return Grouped threads, per-example counts and the post they are stored on.
  */
 export function useStyleBookNoteThreads( {
 	enabled = true,
 	labels = {},
-} = {} ) {
+}: UseStyleBookNoteThreadsOptions = {} ): UseStyleBookNoteThreadsResult {
 	const globalStylesId = useSelect(
 		( select ) =>
 			select( coreStore ).__experimentalGetCurrentGlobalStylesId(),
@@ -50,7 +60,11 @@ export function useStyleBookNoteThreads( {
 
 	const { groups, counts, threads } = useMemo( () => {
 		if ( ! records?.length ) {
-			return { groups: [], counts: {}, threads: [] };
+			return {
+				groups: [] as StyleBookNoteGroup[],
+				counts: {} as Record< string, number >,
+				threads: [] as StyleBookNoteThread[],
+			};
 		}
 
 		const { rootThreads } = materializeNoteThreads( records );

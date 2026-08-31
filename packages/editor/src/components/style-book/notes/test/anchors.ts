@@ -6,14 +6,19 @@ import {
 	getThreadAnchor,
 	groupThreadsByAnchor,
 } from '../anchors';
+import type { StyleBookNoteThread } from '../anchors';
 
-const thread = ( id, anchor, status = 'hold' ) => ( {
+const thread = (
+	id: number,
+	anchor?: unknown,
+	status = 'hold'
+): StyleBookNoteThread => ( {
 	id,
 	status,
 	meta: anchor === undefined ? undefined : { [ NOTE_ANCHOR_META ]: anchor },
 } );
 
-const LABELS = {
+const LABELS: Record< string, string > = {
 	'core/button': 'Button',
 	typography: 'Typography',
 	'theme-colors': 'Colors',
