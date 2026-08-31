@@ -19,7 +19,7 @@
 # Duotone
 /lib/block-supports/duotone.php
 /packages/block-editor/src/components/duotone-control
-/packages/block-editor/src/hooks/duotone.jsx
+/packages/block-editor/src/hooks/duotone.jsx			@sgomes
 /packages/components/src/duotone-picker
 
 # Editor
@@ -28,7 +28,7 @@
 /packages/block-editor                          @ellatrix
 /packages/block-editor/src/hooks                @tellthemachines
 /packages/block-editor/src/layouts              @tellthemachines
-/packages/block-serialization-spec-parser
+/packages/block-serialization-spec-parser       @dmsnell
 /packages/block-serialization-default-parser    @dmsnell
 /packages/blocks
 /packages/edit-post
@@ -58,21 +58,21 @@
 /tools                                          @manzoorwanijk
 /tools/eslint/suppressions.json
 /tools/stylelint/stylelint-suppressions.json
-/packages/babel-plugin-import-jsx-pragma
-/packages/babel-plugin-makepot
+/packages/babel-plugin-import-jsx-pragma        @ntwb @ajitbohra
+/packages/babel-plugin-makepot                  @ntwb @ajitbohra
 /packages/babel-preset-default
-/packages/browserslist-config
+/packages/browserslist-config                   @ntwb @ajitbohra
 /packages/create-block
-/packages/create-block-tutorial-template
+/packages/create-block-tutorial-template        @ryanwelcher
 /packages/dependency-extraction-webpack-plugin
 /packages/docgen
 /packages/e2e-tests
 /packages/e2e-test-utils-playwright
 /packages/eslint-plugin
-/packages/jest-console
+/packages/jest-console                          @ntwb @ajitbohra
 /packages/jest-preset-default
-/packages/npm-package-json-lint-config
-/packages/postcss-themes
+/packages/npm-package-json-lint-config          @ntwb @ajitbohra
+/packages/postcss-themes                        @ntwb @ajitbohra
 /packages/prettier-config
 /packages/scripts
 /packages/stylelint-config
