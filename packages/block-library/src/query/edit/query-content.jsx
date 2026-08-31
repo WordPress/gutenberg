@@ -10,11 +10,11 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as noticesStore } from '@wordpress/notices';
 import EnhancedPaginationControl from './inspector-controls/enhanced-pagination-control';
 import { unlock } from '../../lock-unlock';
 import QueryInspectorControls from './inspector-controls';
-import EnhancedPaginationModal from './enhanced-pagination-modal';
-import { getQueryContextFromTemplate } from '../utils';
+import { getQueryContextFromTemplate, useUnsupportedBlocks } from '../utils';
 import QueryToolbar from './query-toolbar';
 
 const { HTMLElementControl } = unlock( blockEditorPrivateApis );
@@ -41,6 +41,8 @@ export default function QueryContent( {
 		getQueryContextFromTemplate( templateSlug );
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
+	const { createNotice } = useDispatch( noticesStore );
+	const hasUnsupportedBlocks = useUnsupportedBlocks( clientId );
 	const instanceId = useInstanceId( QueryContent );
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps );
@@ -139,6 +141,28 @@ export default function QueryContent( {
 		__unstableMarkNextChangeAsNotPersistent,
 		setAttributes,
 	] );
+	useEffect( () => {
+		if ( enhancedPagination && hasUnsupportedBlocks ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { enhancedPagination: false } );
+			createNotice(
+				'info',
+				__(
+					'"Reload full page" was enabled because a block inside the Query block requires it.'
+				),
+				{
+					type: 'snackbar',
+					id: 'query-enhanced-pagination-disabled',
+				}
+			);
+		}
+	}, [
+		enhancedPagination,
+		hasUnsupportedBlocks,
+		__unstableMarkNextChangeAsNotPersistent,
+		setAttributes,
+		createNotice,
+	] );
 
 	return (
 		<>
@@ -149,11 +173,6 @@ export default function QueryContent( {
 					hasInnerBlocks
 				/>
 			) }
-			<EnhancedPaginationModal
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-				clientId={ clientId }
-			/>
 			<InspectorControls>
 				<QueryInspectorControls
 					name={ name }

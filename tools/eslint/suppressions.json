@@ -3794,14 +3794,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/query/edit/enhanced-pagination-modal.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/query/edit/index.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1

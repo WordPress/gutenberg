@@ -28,12 +28,6 @@
 	}
 }
 
-.wp-block-query__enhanced-pagination-modal {
-	@include break-small() {
-		max-width: $break-mobile;
-	}
-}
-
 .block-editor-block-settings-menu__popover {
 	&.is-expanded {
 		overflow-y: scroll;
