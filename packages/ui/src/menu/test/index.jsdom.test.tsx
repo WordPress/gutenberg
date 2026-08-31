@@ -859,7 +859,6 @@ describe( 'Menu', () => {
 				</Menu.Root>
 			)
 		).toThrow( 'Menu.ItemLabel must be the first direct child' );
-		// @ts-expect-error Provided by the @wordpress/jest-console environment.
 		expect( console ).toHaveErrored();
 	} );
 
@@ -878,7 +877,6 @@ describe( 'Menu', () => {
 				</Menu.Root>
 			)
 		).toThrow( 'Menu.ItemLabel must be the first direct child' );
-		// @ts-expect-error Provided by the @wordpress/jest-console environment.
 		expect( console ).toHaveErrored();
 	} );
 
@@ -1357,10 +1355,10 @@ describe( 'Menu', () => {
 				<Menu.Trigger>Actions</Menu.Trigger>
 				<Menu.Popup>
 					<Menu.Item>
-						<Menu.ItemLabel render={ <strong /> }>
+						<Menu.ItemLabel render={ <h2 /> }>
 							Duplicate
 						</Menu.ItemLabel>
-						<Menu.ItemDescription render={ <em /> }>
+						<Menu.ItemDescription render={ <h3 /> }>
 							Create a separate copy.
 						</Menu.ItemDescription>
 					</Menu.Item>
@@ -1375,9 +1373,9 @@ describe( 'Menu', () => {
 			description: 'Create a separate copy.',
 		} );
 
-		expect( queryItemLabel( item )?.tagName ).toBe( 'STRONG' );
+		expect( queryItemLabel( item )?.tagName ).toBe( 'H2' );
 		expect( screen.getByText( 'Create a separate copy.' ).tagName ).toBe(
-			'EM'
+			'H3'
 		);
 	} );
 
