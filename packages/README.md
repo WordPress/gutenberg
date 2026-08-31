@@ -252,7 +252,7 @@ It's very important to have a good plan for what a new package will include. All
 
 ## Maintaining cross-version compatibility
 
-An application or plugin can include a published package in its JavaScript bundle while loading that package's dependencies from WordPress. The bundle and WordPress can then use different package versions.
+A plugin can bundle one `@wordpress/*` package while loading its dependencies from WordPress. The bundled package and its WordPress dependencies can then come from different releases.
 
 Before changing an API or dependency in this setup:
 
@@ -260,7 +260,7 @@ Before changing an API or dependency in this setup:
 -   Test both mixed-version combinations: the new bundle with each supported WordPress version, and older supported bundles with the new WordPress package.
 -   Keep production public APIs compatible. Follow the [backward compatibility policy](/docs/contributors/code/backward-compatibility.md) if a break is unavoidable.
 -   Do not use private APIs in bundled packages. Private APIs can be removed, but first check that supported bundles no longer depend on them.
--   Test the built code. Source tests do not cover dependency extraction or separate copies of React contexts and other shared state.
+-   Test the built package, not only its source. The built result can load dependencies and shared state differently.
 
 See [Testing published packages across WordPress versions](/docs/contributors/code/package-runtime-compatibility.md) for the test matrix and release procedure.
 
