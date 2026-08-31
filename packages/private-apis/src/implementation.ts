@@ -71,7 +71,7 @@ const DEPRECATED_CORE_MODULES: Record<
 	'@wordpress/dataviews': {
 		since: '7.2',
 		removal: '7.4',
-		note: 'Update the `@wordpress/dataviews` npm dependency to version 18 or newer, which no longer uses the private APIs.',
+		note: 'Update the `@wordpress/dataviews` npm dependency to version 18.1 or newer, which no longer uses the private APIs.',
 	},
 };
 

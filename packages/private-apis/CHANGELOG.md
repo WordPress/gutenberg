@@ -4,7 +4,7 @@
 
 ### Deprecations
 
--   Deprecate the `@wordpress/dataviews` opt-in: it still works so that copies published to npm before v18 keep loading, but logs a warning when `SCRIPT_DEBUG` is enabled. Scheduled for removal in WordPress 7.4. [#82231](https://github.com/WordPress/gutenberg/pull/82231)
+-   Deprecate the `@wordpress/dataviews` opt-in: it still works so that copies published to npm before v18.1 keep loading, but logs a warning when `SCRIPT_DEBUG` is enabled. Scheduled for removal in WordPress 7.4. [#82231](https://github.com/WordPress/gutenberg/pull/82231)
 
 ### Bug fixes
 
