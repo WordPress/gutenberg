@@ -7,10 +7,10 @@
 
 # Data
 /packages/api-fetch
-/packages/core-data                             
-/packages/data                                  
-/packages/redux-routine                         
-/packages/data-controls                         
+/packages/core-data
+/packages/data
+/packages/redux-routine
+/packages/data-controls
 
 # Blocks
 /packages/block-library                         @fabiankaegy
@@ -116,7 +116,7 @@
 /packages/warning
 
 # Extensibility
-/packages/hooks
+/packages/hooks                                 @adamsilverstein
 /packages/plugins
 
 # Rich Text
