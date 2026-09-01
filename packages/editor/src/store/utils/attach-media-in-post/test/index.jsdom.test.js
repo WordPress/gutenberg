@@ -160,9 +160,8 @@ describe( 'attachMediaInPost', () => {
 	} );
 
 	/**
-	 * The lookups can reject on their own — `context=edit` on the media
-	 * collection is a 403 for a contributor — and nothing awaits this function,
-	 * so anything escaping it becomes an unhandled rejection.
+	 * A lookup rejects whenever its request fails, and nothing awaits this
+	 * function, so anything escaping it becomes an unhandled rejection.
 	 */
 	it( 'never rejects when a lookup fails', async () => {
 		const { registry, getEntityRecords } = createRegistry();
@@ -176,7 +175,8 @@ describe( 'attachMediaInPost', () => {
 
 	/**
 	 * Silent to the user is the design; silent to whoever is debugging it is
-	 * not. A contributor using someone else's media gets a 403 here.
+	 * not. Writing to media somebody else uploaded needs `edit_others_posts`,
+	 * which authors and contributors don't have, so a 403 here is expected.
 	 */
 	it( 'logs a failed write without interpolating the reason', async () => {
 		const { registry, saveEntityRecord } = createRegistry( {

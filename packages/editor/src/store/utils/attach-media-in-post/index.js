@@ -49,8 +49,8 @@ export default async function attachMediaInPost( registry, post ) {
 		await attach( registry, post );
 	} catch ( error ) {
 		// Nothing is waiting on this, so an error thrown here would go nowhere.
-		// Either lookup below can fail on its own: someone who can't edit other
-		// people's media gets a 403.
+		// Either lookup below can reject for any of the ordinary reasons a
+		// request fails, and `resolveSelect` passes a failed resolver's error on.
 		warnAttachFailed( error );
 	}
 }
