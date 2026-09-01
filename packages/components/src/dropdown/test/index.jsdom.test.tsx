@@ -47,6 +47,34 @@ const DropdownWithModal = ( {
 	);
 };
 
+const DropdownWithProgrammaticModal = ( {
+	isDialogOpen,
+	onClose,
+}: {
+	isDialogOpen: boolean;
+	onClose: () => void;
+} ) => (
+	<>
+		<Dropdown
+			onClose={ onClose }
+			renderToggle={ ( { isOpen, onToggle } ) => (
+				<button aria-expanded={ isOpen } onClick={ onToggle }>
+					Toggle
+				</button>
+			) }
+			renderContent={ () => <button>Dropdown item</button> }
+		/>
+		{ isDialogOpen && (
+			<Modal
+				title="Programmatic dialog"
+				onRequestClose={ () => undefined }
+			>
+				<p>Programmatic dialog content</p>
+			</Modal>
+		) }
+	</>
+);
+
 describe( 'DropdownContentWrapper', () => {
 	it( 'should apply the small padding class by default', () => {
 		render(
@@ -207,6 +235,74 @@ describe( 'Dropdown', () => {
 		);
 		expect( dialogTrigger ).toHaveFocus();
 		expect( screen.getByText( 'Dropdown item' ) ).toBeInTheDocument();
+	} );
+
+	it( 'should not reuse a stale internal activation for an unrelated dialog', async () => {
+		const user = userEvent.setup();
+		const onClose = jest.fn();
+		const { rerender } = render(
+			<DropdownWithProgrammaticModal
+				isDialogOpen={ false }
+				onClose={ onClose }
+			/>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Toggle' } ) );
+		await user.click(
+			await screen.findByRole( 'button', { name: 'Dropdown item' } )
+		);
+		rerender(
+			<DropdownWithProgrammaticModal isDialogOpen onClose={ onClose } />
+		);
+
+		await screen.findByRole( 'dialog', { name: 'Programmatic dialog' } );
+		await waitFor( () => expect( onClose ).toHaveBeenCalledTimes( 1 ) );
+		expect( screen.queryByText( 'Dropdown item' ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'should close when an iframe activation opens an unrelated dialog', async () => {
+		const user = userEvent.setup();
+		const onClose = jest.fn();
+		const { rerender } = render(
+			<DropdownWithProgrammaticModal
+				isDialogOpen={ false }
+				onClose={ onClose }
+			/>
+		);
+		const iframe = document.createElement( 'iframe' );
+		document.body.appendChild( iframe );
+
+		try {
+			await user.click(
+				screen.getByRole( 'button', { name: 'Toggle' } )
+			);
+			await user.click(
+				await screen.findByRole( 'button', { name: 'Dropdown item' } )
+			);
+
+			const iframeButton =
+				iframe.contentDocument!.createElement( 'button' );
+			iframeButton.addEventListener( 'click', () => {
+				rerender(
+					<DropdownWithProgrammaticModal
+						isDialogOpen
+						onClose={ onClose }
+					/>
+				);
+			} );
+			iframe.contentDocument!.body.appendChild( iframeButton );
+			fireEvent.click( iframeButton );
+
+			await screen.findByRole( 'dialog', {
+				name: 'Programmatic dialog',
+			} );
+			await waitFor( () => expect( onClose ).toHaveBeenCalledTimes( 1 ) );
+			expect(
+				screen.queryByText( 'Dropdown item' )
+			).not.toBeInTheDocument();
+		} finally {
+			iframe.remove();
+		}
 	} );
 
 	it( 'should close when focus moves into an unrelated dialog', async () => {

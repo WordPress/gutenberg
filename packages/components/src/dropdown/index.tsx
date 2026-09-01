@@ -51,7 +51,10 @@ const UnconnectedDropdown = (
 	const [ fallbackPopoverAnchor, setFallbackPopoverAnchor ] =
 		useState< HTMLDivElement | null >( null );
 	const containerRef = useRef< HTMLDivElement >( null );
-	const lastActivationWasInsideRef = useRef( false );
+	const activationWasInsideRef = useRef( false );
+	const dialogBeforeActivationRef = useRef< Element | null >( null );
+	const dialogOpenedByActivationRef = useRef< Element | null >( null );
+	const activationSequenceRef = useRef( 0 );
 
 	const [ isOpen, setIsOpen ] = useControlledValue( {
 		defaultValue: defaultOpen,
@@ -66,34 +69,80 @@ const UnconnectedDropdown = (
 
 		const { ownerDocument } = containerRef.current;
 		const activationEvents = [ 'pointerdown', 'keydown', 'click' ] as const;
-		const resetActivationOrigin = () => {
-			lastActivationWasInsideRef.current = false;
+		const getActiveDialog = () =>
+			ownerDocument.activeElement?.closest( '[role="dialog"]' ) ?? null;
+		const startActivation = () => {
+			activationSequenceRef.current += 1;
+			activationWasInsideRef.current = false;
+			dialogBeforeActivationRef.current = getActiveDialog();
+
+			if (
+				dialogOpenedByActivationRef.current !==
+				dialogBeforeActivationRef.current
+			) {
+				dialogOpenedByActivationRef.current = null;
+			}
+		};
+		const finishActivation = () => {
+			const sequence = activationSequenceRef.current;
+			const activationWasInside = activationWasInsideRef.current;
+			const dialogBeforeActivation = dialogBeforeActivationRef.current;
+			const recordOpenedDialog = () => {
+				if ( sequence !== activationSequenceRef.current ) {
+					return;
+				}
+
+				const activeDialog = getActiveDialog();
+				if ( ! activationWasInside ) {
+					dialogOpenedByActivationRef.current = null;
+				} else if ( activeDialog !== dialogBeforeActivation ) {
+					dialogOpenedByActivationRef.current = activeDialog;
+				} else if (
+					dialogOpenedByActivationRef.current !== activeDialog
+				) {
+					dialogOpenedByActivationRef.current = null;
+				}
+			};
+
+			recordOpenedDialog();
+
+			// Some dialogs move focus in a timer. Check once more on the next
+			// task, before Popover's delayed focus-outside check runs.
+			if (
+				activationWasInside &&
+				! dialogOpenedByActivationRef.current
+			) {
+				ownerDocument.defaultView?.setTimeout( recordOpenedDialog, 0 );
+			}
 		};
 
-		// Native document capture runs before the React capture handlers below.
-		// Events from portaled Popover content still follow the React tree, so
-		// those handlers can mark an activation as internal again.
+		// Native document capture runs before the React capture handlers below,
+		// while document bubble runs after them. Events from portaled Popover
+		// content still follow the React tree, so this records only dialogs that
+		// open during an activation from this Dropdown.
 		for ( const eventName of activationEvents ) {
-			ownerDocument.addEventListener(
-				eventName,
-				resetActivationOrigin,
-				true
-			);
+			ownerDocument.addEventListener( eventName, startActivation, true );
+			ownerDocument.addEventListener( eventName, finishActivation );
 		}
 
 		return () => {
+			activationSequenceRef.current += 1;
 			for ( const eventName of activationEvents ) {
 				ownerDocument.removeEventListener(
 					eventName,
-					resetActivationOrigin,
+					startActivation,
 					true
+				);
+				ownerDocument.removeEventListener(
+					eventName,
+					finishActivation
 				);
 			}
 		};
 	}, [ isOpen ] );
 
 	function recordActivationInside() {
-		lastActivationWasInsideRef.current = true;
+		activationWasInsideRef.current = true;
 	}
 
 	function recordKeyboardActivationInside(
@@ -119,11 +168,13 @@ const UnconnectedDropdown = (
 		const activeElement = ownerDocument?.activeElement;
 		const dialog = activeElement?.closest( '[role="dialog"]' );
 		const isParentDialog = dialog?.contains( containerRef.current );
+		const dialogOpenedByActivation = dialogOpenedByActivationRef.current;
+		dialogOpenedByActivationRef.current = null;
 		if (
 			! containerRef.current.contains( activeElement ) &&
 			( ! dialog ||
 				isParentDialog ||
-				! lastActivationWasInsideRef.current )
+				dialog !== dialogOpenedByActivation )
 		) {
 			close();
 		}
