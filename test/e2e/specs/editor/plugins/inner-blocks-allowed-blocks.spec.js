@@ -143,14 +143,15 @@ test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 			'Select parent block: Allowed Blocks Dynamic'
 		);
 
-		// Insert the image.
-		await blockAppender.click();
+		// The filled container has no appender in the canvas; its
+		// toolbar has an add button instead. Insert the image.
+		await editor.clickBlockToolbarButton( 'Add block' );
 		await blockListBox.getByRole( 'option', { name: 'Image' } ).click();
 
 		await editor.clickBlockToolbarButton(
 			'Select parent block: Allowed Blocks Dynamic'
 		);
-		await blockAppender.click();
+		await editor.clickBlockToolbarButton( 'Add block' );
 
 		// It should display a different allowed block list.
 		await expect( blockListBox.getByRole( 'option' ) ).toHaveText( [
@@ -163,7 +164,7 @@ test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 		await editor.clickBlockToolbarButton(
 			'Select parent block: Allowed Blocks Dynamic'
 		);
-		await blockAppender.click();
+		await editor.clickBlockToolbarButton( 'Add block' );
 
 		// It should display a different allowed block list.
 		await expect( blockListBox.getByRole( 'option' ) ).toHaveText( [
