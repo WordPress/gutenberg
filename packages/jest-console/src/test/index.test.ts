@@ -98,6 +98,7 @@ describe( 'jest-console', () => {
 				// own lifecycle is defined to run before ours. Infer
 				// that we're being watched by testing the console
 				// method as being a spy.
+				// eslint-disable-next-line jest/no-standalone-expect
 				vitestExpect(
 					getSpy( methodName ).assertionsNumber
 				).toBeGreaterThanOrEqual( 0 );
