@@ -1,30 +1,44 @@
 import { createRequire } from 'node:module';
-import { afterAll, beforeEach, describe, expect, it, test, vi } from 'vitest';
+import { beforeEach, describe, expect, it, test, vi } from 'vitest';
 import _pullRequests from './fixtures/pull-requests.json';
 import botPullRequestFixture from './fixtures/bot-pull-requests.json';
 const require = createRequire( import.meta.url );
+const octokitPath = require.resolve( '@octokit/rest' );
 const octokitModule = require( '@octokit/rest' );
-const originalOctokit = octokitModule.Octokit;
 const Octokit = vi.fn();
-octokitModule.Octokit = Octokit;
+const milestonePath = require.resolve( '../../lib/milestone' );
 const milestoneModule = require( '../../lib/milestone' );
-const originalGetMilestoneByTitle = milestoneModule.getMilestoneByTitle;
-const originalGetIssuesByMilestone = milestoneModule.getIssuesByMilestone;
 const getMilestoneByTitle = vi.fn();
 const getIssuesByMilestone = vi.fn();
-milestoneModule.getMilestoneByTitle = getMilestoneByTitle;
-milestoneModule.getIssuesByMilestone = getIssuesByMilestone;
+const loggerPath = require.resolve( '../../lib/logger' );
 const loggerModule = require( '../../lib/logger' );
-const originalLogger = { ...loggerModule };
 const log = vi.fn();
 const warn = vi.fn();
-loggerModule.log = log;
-loggerModule.warn = warn;
-loggerModule.formats = {
-	title: vi.fn( ( message ) => message ),
-	error: vi.fn( ( message ) => message ),
-	warning: vi.fn( ( message ) => message ),
-};
+const changelogPath = require.resolve( '../changelog' );
+let changelog;
+try {
+	require.cache[ octokitPath ].exports = { ...octokitModule, Octokit };
+	require.cache[ milestonePath ].exports = {
+		getMilestoneByTitle,
+		getIssuesByMilestone,
+	};
+	require.cache[ loggerPath ].exports = {
+		log,
+		warn,
+		formats: {
+			title: vi.fn( ( message ) => message ),
+			error: vi.fn( ( message ) => message ),
+			warning: vi.fn( ( message ) => message ),
+			success: vi.fn( ( message ) => message ),
+		},
+	};
+	changelog = require( changelogPath );
+} finally {
+	require.cache[ octokitPath ].exports = octokitModule;
+	require.cache[ milestonePath ].exports = milestoneModule;
+	require.cache[ loggerPath ].exports = loggerModule;
+	delete require.cache[ changelogPath ];
+}
 const {
 	getNormalizedTitle,
 	reword,
@@ -47,15 +61,7 @@ const {
 	createChangelog,
 	fetchAllPullRequests,
 	getManualChangelogInstructions,
-} = require( '../changelog' );
-
-afterAll( () => {
-	octokitModule.Octokit = originalOctokit;
-	milestoneModule.getMilestoneByTitle = originalGetMilestoneByTitle;
-	milestoneModule.getIssuesByMilestone = originalGetIssuesByMilestone;
-	Object.assign( loggerModule, originalLogger );
-	delete require.cache[ require.resolve( '../changelog' ) ];
-} );
+} = changelog;
 
 /**
  * pull-requests.json is a static snapshot of real data from the GitHub API.

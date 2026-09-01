@@ -1,8 +1,10 @@
 import { createRequire } from 'node:module';
-import { afterAll, afterEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 const require = createRequire( import.meta.url );
 const net = require( 'node:net' );
-vi.spyOn( net, 'createServer' );
+const createServer = vi
+	.spyOn( net, 'createServer' )
+	.mockImplementation( () => undefined );
 const {
 	isPortAvailable,
 	findAvailablePort,
@@ -15,8 +17,8 @@ afterAll( () => {
 } );
 
 describe( 'port-utils', () => {
-	afterEach( () => {
-		vi.clearAllMocks();
+	beforeEach( () => {
+		createServer.mockReset().mockImplementation( () => undefined );
 	} );
 
 	/**
@@ -26,7 +28,7 @@ describe( 'port-utils', () => {
 	 * @param {Function} isAvailable A function (port) => boolean.
 	 */
 	function mockPortAvailability( isAvailable ) {
-		net.createServer.mockImplementation( () => {
+		createServer.mockImplementation( () => {
 			let errorCb, listenCb;
 
 			const server = {
@@ -67,7 +69,7 @@ describe( 'port-utils', () => {
 		} );
 
 		it( 'returns false for EACCES error', async () => {
-			net.createServer.mockImplementation( () => {
+			createServer.mockImplementation( () => {
 				let errorCb;
 				const server = {
 					once: vi.fn( ( event, cb ) => {

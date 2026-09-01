@@ -53,10 +53,10 @@ vi.mock(
 vi.mock( import( '../utils/video-conversion' ), async ( importOriginal ) => {
 	const actual = await importOriginal();
 	return {
-		...actual,
 		convertGifToVideo: vi.fn(),
 		cancelGifToVideoOperations: vi.fn( () => Promise.resolve( true ) ),
 		terminateVideoConversionWorker: vi.fn(),
+		isUnsupportedConversionError: actual.isUnsupportedConversionError,
 	};
 } );
 
@@ -1243,7 +1243,7 @@ describe( 'actions', () => {
 			).toHaveLength( 0 );
 
 			// Advance timers — the old retry timer should NOT fire.
-			vi.runOnlyPendingTimers();
+			await vi.runAllTimersAsync();
 
 			// Queue should still be empty (timer was cleared).
 			expect(
@@ -1365,7 +1365,7 @@ describe( 'actions', () => {
 			expect( updatedItem.status ).toBe( ItemStatus.PendingRetry );
 
 			// Fire all timers to trigger executeRetry.
-			vi.runOnlyPendingTimers();
+			await vi.runAllTimersAsync();
 
 			// Item should now be back in Processing status with incremented retryCount.
 			updatedItem = unlock(
@@ -1542,7 +1542,7 @@ describe( 'actions', () => {
 
 			// Advance timers — the old retry timer must NOT re-add or
 			// touch the item.
-			vi.runOnlyPendingTimers();
+			await vi.runAllTimersAsync();
 
 			expect(
 				unlock( registry.select( uploadStore ) ).getAllItems()
@@ -1573,7 +1573,7 @@ describe( 'actions', () => {
 			// executes the retry (incrementing retryCount), then we simulate
 			// another failure.
 			for ( let attempt = 1; attempt <= 3; attempt++ ) {
-				vi.runOnlyPendingTimers();
+				await vi.runAllTimersAsync();
 
 				const inProgress = unlock(
 					registry.select( uploadStore )
@@ -1636,7 +1636,7 @@ describe( 'actions', () => {
 
 			// Fire the retry timer while paused — executeRetry should bail
 			// without mutating state.
-			vi.runOnlyPendingTimers();
+			await vi.runAllTimersAsync();
 
 			const pausedItem = unlock(
 				registry.select( uploadStore )

@@ -3476,7 +3476,7 @@ describe( 'state', () => {
 		it( 'should warn about __unstableIsPreviewMode deprecation', () => {
 			const consoleWarn = vi
 				.spyOn( global.console, 'warn' )
-				.mockImplementation();
+				.mockImplementation( () => {} );
 
 			const settingsObject = settings( undefined, {
 				type: 'UPDATE_SETTINGS',

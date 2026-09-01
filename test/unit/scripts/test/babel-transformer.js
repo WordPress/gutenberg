@@ -68,6 +68,15 @@ describe( 'Babel transformer cache key', () => {
 			);
 
 			expect( secondCacheKey ).not.toBe( firstCacheKey );
+
+			fs.writeFileSync( blockJSONPath, '{"name":"core/example"}' );
+			const restoredCacheKey = transformer.getCacheKey(
+				'block source',
+				blockIndexPath,
+				getTransformOptions()
+			);
+
+			expect( restoredCacheKey ).toBe( firstCacheKey );
 		}
 	);
 } );

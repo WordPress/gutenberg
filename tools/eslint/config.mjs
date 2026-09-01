@@ -10,6 +10,10 @@ import testingLibraryPlugin from 'eslint-plugin-testing-library';
 import jestPlugin from 'eslint-plugin-jest';
 import tseslint from 'typescript-eslint';
 import wpBuildConfig from '../../packages/wp-build/eslint-overrides.cjs';
+import {
+	discoverTestFiles,
+	getTestEnvironmentName,
+} from '../../test/unit/scripts/discover-test-files.mjs';
 const require = createRequire( import.meta.url );
 const rootDir = resolve( import.meta.dirname, '../..' );
 const wpPlugin = require( '@wordpress/eslint-plugin' );
@@ -18,6 +22,9 @@ const testMigration = require(
 );
 
 const vitestTestPatterns = [
+	...discoverTestFiles( rootDir ).filter(
+		( testPath ) => getTestEnvironmentName( testPath ) === 'node'
+	),
 	...testMigration.vitest.files,
 	...testMigration.vitest.directories.flatMap( ( directory ) => [
 		`${ directory }/**/__tests__/**/*.[jt]s?(x)`,

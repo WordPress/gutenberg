@@ -11,8 +11,10 @@ import {
 const require = createRequire( import.meta.url );
 const fs = require( 'node:fs' );
 const os = require( 'node:os' );
-const stat = vi.spyOn( fs.promises, 'stat' );
-const homedir = vi.spyOn( os, 'homedir' );
+const stat = vi
+	.spyOn( fs.promises, 'stat' )
+	.mockImplementation( () => undefined );
+const homedir = vi.spyOn( os, 'homedir' ).mockImplementation( () => undefined );
 const getCacheDirectory = require( '../get-cache-directory' );
 
 afterAll( () => {
@@ -21,7 +23,8 @@ afterAll( () => {
 
 describe( 'getCacheDirectory', () => {
 	beforeEach( () => {
-		vi.clearAllMocks();
+		stat.mockReset().mockImplementation( () => undefined );
+		homedir.mockReset().mockImplementation( () => undefined );
 	} );
 
 	afterEach( () => {

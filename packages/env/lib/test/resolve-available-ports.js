@@ -1,9 +1,13 @@
 import { createRequire } from 'node:module';
-import { afterAll, afterEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 const require = createRequire( import.meta.url );
 const portUtils = require( '../port-utils' );
-const findAvailablePort = vi.spyOn( portUtils, 'findAvailablePort' );
-const isPortAvailable = vi.spyOn( portUtils, 'isPortAvailable' );
+const findAvailablePort = vi
+	.spyOn( portUtils, 'findAvailablePort' )
+	.mockImplementation( () => undefined );
+const isPortAvailable = vi
+	.spyOn( portUtils, 'isPortAvailable' )
+	.mockImplementation( () => undefined );
 const {
 	createPortResolver,
 	resolveConfigPorts,
@@ -14,8 +18,9 @@ afterAll( () => {
 } );
 
 describe( 'resolve-available-ports', () => {
-	afterEach( () => {
-		vi.clearAllMocks();
+	beforeEach( () => {
+		findAvailablePort.mockReset().mockImplementation( () => undefined );
+		isPortAvailable.mockReset().mockImplementation( () => undefined );
 	} );
 
 	describe( 'createPortResolver', () => {

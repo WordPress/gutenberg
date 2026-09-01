@@ -36,12 +36,15 @@ vi.mock( import( '@wordpress/blob' ), () => ( {
 vi.mock( import( '../utils' ), async ( importOriginal ) => {
 	const actual = await importOriginal();
 	return {
-		...actual,
 		vipsHasTransparency: vi.fn(),
 		vipsGetUltraHdrInfo: vi.fn(),
 		vipsRotateImage: vi.fn(),
 		terminateVipsWorker: vi.fn(),
 		maybeRecycleVipsWorker: vi.fn(),
+		isAnimatedGif: actual.isAnimatedGif,
+		cloneFile: actual.cloneFile,
+		convertBlobToFile: actual.convertBlobToFile,
+		renameFile: actual.renameFile,
 	};
 } );
 
@@ -51,10 +54,12 @@ vi.mock( import( '../utils' ), async ( importOriginal ) => {
 vi.mock( import( '../utils/video-conversion' ), async ( importOriginal ) => {
 	const actual = await importOriginal();
 	return {
-		...actual,
 		convertGifToVideo: vi.fn(),
 		cancelGifToVideoOperations: vi.fn(),
 		terminateVideoConversionWorker: vi.fn(),
+		isUnsupportedConversionError: actual.isUnsupportedConversionError,
+		isSizeLimitConversionError: actual.isSizeLimitConversionError,
+		isConversionTimeoutError: actual.isConversionTimeoutError,
 	};
 } );
 

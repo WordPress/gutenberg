@@ -34,7 +34,9 @@ describe( 'selectors', () => {
 				failureCount: 3,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 			};
 

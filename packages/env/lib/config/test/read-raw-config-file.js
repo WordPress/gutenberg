@@ -1,8 +1,10 @@
 import { createRequire } from 'node:module';
-import { afterAll, afterEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 const require = createRequire( import.meta.url );
 const fs = require( 'node:fs' );
-const readFile = vi.spyOn( fs.promises, 'readFile' );
+const readFile = vi
+	.spyOn( fs.promises, 'readFile' )
+	.mockImplementation( () => undefined );
 const readRawConfigFile = require( '../read-raw-config-file' );
 const { ValidationError } = require( '../validate-config' );
 
@@ -11,8 +13,8 @@ afterAll( () => {
 } );
 
 describe( 'readRawConfigFile', () => {
-	afterEach( () => {
-		vi.clearAllMocks();
+	beforeEach( () => {
+		readFile.mockReset().mockImplementation( () => undefined );
 	} );
 
 	it( 'returns null if it cannot find a file', async () => {

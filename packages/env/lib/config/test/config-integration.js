@@ -1,22 +1,12 @@
 import { createRequire } from 'node:module';
-import {
-	afterAll,
-	afterEach,
-	beforeEach,
-	describe,
-	expect,
-	it,
-	vi,
-} from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 const require = createRequire( import.meta.url );
-const dns = require( 'node:dns' );
-const fs = require( 'node:fs' );
-const readFile = vi.spyOn( fs.promises, 'readFile' );
-const stat = vi.spyOn( fs.promises, 'stat' );
-vi.spyOn( fs.promises, 'mkdir' ).mockResolvedValue();
-vi.spyOn( fs.promises, 'writeFile' ).mockResolvedValue();
-const existsSync = vi.spyOn( fs, 'existsSync' );
-const resolveDns = vi.spyOn( dns.promises, 'resolve' );
+const readFile = vi.fn();
+const stat = vi.fn();
+const mkdir = vi.fn();
+const writeFile = vi.fn();
+const existsSync = vi.fn();
+const resolveDns = vi.fn();
 const gotPath = require.resolve( 'got' );
 const originalGot = require( gotPath );
 const got = vi.fn( ( url ) => ( {
@@ -31,30 +21,71 @@ const got = vi.fn( ( url ) => ( {
 		}
 	},
 } ) );
-require.cache[ gotPath ].exports = got;
 const detectDirectoryTypePath = require.resolve( '../detect-directory-type' );
 const originalDetectDirectoryType = require( detectDirectoryTypePath );
 const detectDirectoryType = vi.fn();
-require.cache[ detectDirectoryTypePath ].exports = detectDirectoryType;
-const loadConfig = require( '../load-config' );
-const md5 = require( '../../md5' );
-afterAll( () => {
+const loadConfigPath = require.resolve( '../load-config' );
+const parseConfigPath = require.resolve( '../parse-config' );
+const wordpressPath = require.resolve( '../../wordpress' );
+const cachePath = require.resolve( '../../cache' );
+const getCacheDirectoryPath = require.resolve( '../get-cache-directory' );
+const readRawConfigFilePath = require.resolve( '../read-raw-config-file' );
+const mockedModulePaths = [
+	'fs',
+	'dns',
+	loadConfigPath,
+	parseConfigPath,
+	wordpressPath,
+	cachePath,
+	getCacheDirectoryPath,
+	readRawConfigFilePath,
+];
+const originalModules = new Map(
+	mockedModulePaths.map( ( modulePath ) => [
+		modulePath,
+		require.cache[ modulePath ],
+	] )
+);
+for ( const modulePath of mockedModulePaths ) {
+	delete require.cache[ modulePath ];
+}
+let loadConfig;
+try {
+	require.cache.fs = {
+		exports: {
+			promises: { readFile, stat, mkdir, writeFile },
+			existsSync,
+		},
+	};
+	require.cache.dns = {
+		exports: { promises: { resolve: resolveDns } },
+	};
+	require.cache[ gotPath ].exports = got;
+	require.cache[ detectDirectoryTypePath ].exports = detectDirectoryType;
+	loadConfig = require( loadConfigPath );
+} finally {
+	for ( const [ modulePath, originalModule ] of originalModules ) {
+		if ( originalModule ) {
+			require.cache[ modulePath ] = originalModule;
+		} else {
+			delete require.cache[ modulePath ];
+		}
+	}
 	require.cache[ gotPath ].exports = originalGot;
 	require.cache[ detectDirectoryTypePath ].exports =
 		originalDetectDirectoryType;
-	vi.restoreAllMocks();
-	delete require.cache[ require.resolve( '../load-config' ) ];
-	delete require.cache[ require.resolve( '../parse-config' ) ];
-	delete require.cache[ require.resolve( '../../wordpress' ) ];
-} );
+}
+const md5 = require( '../../md5' );
 
 describe( 'Config Integration', () => {
 	beforeEach( () => {
-		vi.clearAllMocks();
+		readFile.mockReset().mockRejectedValue( { code: 'ENOENT' } );
+		stat.mockReset().mockResolvedValue( true );
+		mkdir.mockReset().mockResolvedValue();
+		writeFile.mockReset().mockResolvedValue();
+		existsSync.mockReset().mockReturnValue( false );
+		resolveDns.mockReset().mockResolvedValue( [ '198.143.164.252' ] );
 		process.env.WP_ENV_HOME = '/cache';
-		stat.mockResolvedValue( true );
-		existsSync.mockReturnValue( false );
-		resolveDns.mockResolvedValue( [ '198.143.164.252' ] );
 		detectDirectoryType.mockResolvedValue( null );
 	} );
 
