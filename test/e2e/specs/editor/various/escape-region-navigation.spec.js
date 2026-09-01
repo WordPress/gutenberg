@@ -47,19 +47,43 @@ test.describe( 'Escape region navigation', () => {
 			)
 			.toBe( 1 );
 
-		// On a region, Escape moves to the next region and Shift+Escape moves
-		// back.
+		// On a region, Escape moves to the next region, which for a selected
+		// block is its toolbar, and Shift+Escape moves back.
 		await page.keyboard.press( 'Escape' );
-		await expect( editorContent ).not.toBeFocused();
-		await expect
-			.poll( () =>
-				page.evaluate( () =>
-					document.activeElement.getAttribute( 'role' )
-				)
-			)
-			.toBe( 'region' );
+		await expect(
+			page.locator( 'role=region[name="Block toolbar"i]' )
+		).toBeFocused();
 		await page.keyboard.press( 'Shift+Escape' );
 		await expect( editorContent ).toBeFocused();
+	} );
+
+	test( 'skips regions that are not visible', async ( { editor, page } ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First' },
+		} );
+		await editor.canvas.getByText( 'First' ).click();
+		await page.keyboard.press( 'Escape' );
+		await expect(
+			page.locator( 'role=region[name="Editor content"i]' )
+		).toBeFocused();
+
+		// Walk the whole cycle back to the starting region: the publish
+		// region, present in the DOM but hidden while its panel is closed,
+		// must never receive focus.
+		const visited = [];
+		for ( let i = 0; i < 8; i++ ) {
+			await page.keyboard.press( 'Escape' );
+			const name = await page.evaluate( () =>
+				document.activeElement.getAttribute( 'aria-label' )
+			);
+			if ( name === 'Editor content' ) {
+				break;
+			}
+			visited.push( name );
+		}
+		expect( visited ).not.toContain( 'Editor publish' );
+		expect( visited.length ).toBeLessThan( 8 );
 	} );
 
 	test( 'steps out onto the wrapping region from the editor chrome', async ( {

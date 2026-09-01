@@ -116,7 +116,6 @@ test.describe( 'Sidebar', () => {
 			.getByRole( 'tab', { selected: true } );
 
 		// A selected block puts the sidebar on the "Block" tab.
-		await page.keyboard.press( 'Escape' );
 		await page.keyboard.press( 'Tab' );
 		await expect( activeTab ).toHaveText( 'Block' );
 		await expect( activeTab ).toBeFocused();

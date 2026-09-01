@@ -4,6 +4,7 @@
 
 ### New Features
 
+-   The floating block toolbar is a labelled region, so region navigation can reach it ([#82310](https://github.com/WordPress/gutenberg/pull/82310)).
 -   `BackgroundImageControl`: Support setting the background image from a URL, through the URL field in the media replace popover ([#82230](https://github.com/WordPress/gutenberg/pull/82230)).
 
 ### Enhancements

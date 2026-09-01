@@ -57,7 +57,15 @@ export function useNavigateRegions( shortcuts: Shortcuts = defaultShortcuts ) {
 			ref.current?.querySelectorAll< HTMLElement >(
 				'[role="region"][tabindex="-1"]'
 			) ?? []
-		);
+		).filter( ( region ) => {
+			// Skip regions the user cannot see, like the panels that keep an
+			// empty wrapper in the DOM while closed. Focus moving to them
+			// makes the focus indicator vanish mid cycle.
+			const { width, height } = region.getBoundingClientRect();
+			return (
+				width > 0 && height > 0 && region.checkVisibility?.() !== false
+			);
+		} );
 		if ( ! regions.length ) {
 			return;
 		}

@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { useDispatch } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 import { useEffect, useRef } from '@wordpress/element';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { PrivateBlockPopover } from '../block-popover';
@@ -58,6 +59,9 @@ export default function BlockToolbarPopover( {
 				resize={ false }
 				{ ...popoverProps }
 				__unstableContentRef={ __unstableContentRef }
+				role="region"
+				aria-label={ __( 'Block toolbar' ) }
+				tabIndex={ -1 }
 			>
 				<PrivateBlockToolbar
 					// If the toolbar is being shown because of being forced

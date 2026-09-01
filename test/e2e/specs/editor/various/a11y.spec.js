@@ -14,7 +14,7 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 		await admin.createNewPost();
 	} );
 
-	test( 'navigating through the Editor regions four times should land on the Editor top bar region', async ( {
+	test( 'navigating through the Editor regions three times should land on the Editor top bar region', async ( {
 		page,
 		pageUtils,
 		editor,
@@ -25,9 +25,8 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 		).toBeFocused();
 		// Navigate to the 'Editor settings' region.
 		await pageUtils.pressKeys( 'ctrl+`' );
-		// Navigate to the 'Editor publish' region.
-		await pageUtils.pressKeys( 'ctrl+`' );
-		// Navigate to the 'Editor footer' region.
+		// Navigate to the 'Editor footer' region. The 'Editor publish'
+		// region is skipped: it is hidden while its panel is closed.
 		await pageUtils.pressKeys( 'ctrl+`' );
 		// Navigate to the 'Editor top bar' region.
 		await pageUtils.pressKeys( 'ctrl+`' );
