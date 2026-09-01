@@ -51,13 +51,14 @@ test.describe( 'Escape region navigation', () => {
 		await page.keyboard.press( 'Escape' );
 		await expect( editorContent ).toBeFocused();
 
-		// On a region, Tab moves to the next region, which for a selected
-		// block is its toolbar, and Shift+Tab moves back.
-		await page.keyboard.press( 'Tab' );
+		// On a region, Tab moves to the next region and Shift+Tab back. The
+		// toolbar of the selected block floats over the content, so it comes
+		// right before it.
+		await page.keyboard.press( 'Shift+Tab' );
 		await expect(
 			page.locator( 'role=region[name="Block toolbar"i]' )
 		).toBeFocused();
-		await page.keyboard.press( 'Shift+Tab' );
+		await page.keyboard.press( 'Tab' );
 		await expect( editorContent ).toBeFocused();
 
 		// Enter goes back into the content, restoring the selection where it
@@ -71,7 +72,10 @@ test.describe( 'Escape region navigation', () => {
 		await expect.poll( () => hasTextSelection( page ) ).toBe( true );
 	} );
 
-	test( 'skips regions that are not visible', async ( { editor, page } ) => {
+	test( 'reaches the publish region and its focus-revealed toggle', async ( {
+		editor,
+		page,
+	} ) => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'First' },
@@ -82,22 +86,30 @@ test.describe( 'Escape region navigation', () => {
 			page.locator( 'role=region[name="Editor content"i]' )
 		).toBeFocused();
 
-		// Walk the whole cycle back to the starting region: the publish
-		// region, present in the DOM but hidden while its panel is closed,
-		// must never receive focus.
-		const visited = [];
+		// Walk the cycle to the publish region: closed, it only holds the
+		// toggle that its own focus reveals, and it must stay reachable.
+		const publishRegion = page.locator(
+			'role=region[name="Editor publish"i]'
+		);
 		for ( let i = 0; i < 8; i++ ) {
 			await page.keyboard.press( 'Tab' );
-			const name = await page.evaluate( () =>
-				document.activeElement.getAttribute( 'aria-label' )
-			);
-			if ( name === 'Editor content' ) {
+			if (
+				await publishRegion
+					.evaluate(
+						( node ) => node === node.ownerDocument.activeElement
+					)
+					.catch( () => false )
+			) {
 				break;
 			}
-			visited.push( name );
 		}
-		expect( visited ).not.toContain( 'Editor publish' );
-		expect( visited.length ).toBeLessThan( 8 );
+		await expect( publishRegion ).toBeFocused();
+
+		// Enter goes onto the toggle the region reveals.
+		await page.keyboard.press( 'Enter' );
+		await expect(
+			page.getByRole( 'button', { name: 'Open publish panel' } )
+		).toBeFocused();
 	} );
 
 	test( 'steps out onto the wrapping region from the editor chrome and back in', async ( {

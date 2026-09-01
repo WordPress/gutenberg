@@ -86,19 +86,36 @@ export function useNavigateRegions( shortcuts: Shortcuts = defaultShortcuts ) {
 	}
 
 	function focusRegion( offset: number ) {
-		const regions = Array.from(
+		const found = Array.from(
 			ref.current?.querySelectorAll< HTMLElement >(
 				'[role="region"][tabindex="-1"]'
 			) ?? []
 		).filter( ( region ) => {
-			// Skip regions the user cannot see, like the panels that keep an
-			// empty wrapper in the DOM while closed. Focus moving to them
-			// makes the focus indicator vanish mid cycle.
+			// Skip regions the user cannot reach anything in: no visible box
+			// and nothing tabbable inside. Regions that only hold controls
+			// revealed on focus, like the closed publish panel's toggle, stay
+			// in the cycle.
 			const { width, height } = region.getBoundingClientRect();
-			return (
-				width > 0 && height > 0 && region.checkVisibility?.() !== false
-			);
+			const hasVisibleBox =
+				width > 0 && height > 0 && region.checkVisibility?.() !== false;
+			return hasVisibleBox || focus.tabbable.find( region ).length > 0;
 		} );
+
+		// A region nested in another, like the block toolbar floating over
+		// the content, comes before its container: it also precedes it
+		// visually. Document order puts containers first, so each nested
+		// region is moved up in a single pass.
+		const regions: HTMLElement[] = [];
+		for ( const region of found ) {
+			const containerIndex = regions.findIndex( ( placed ) =>
+				placed.contains( region )
+			);
+			if ( containerIndex === -1 ) {
+				regions.push( region );
+			} else {
+				regions.splice( containerIndex, 0, region );
+			}
+		}
 		if ( ! regions.length ) {
 			return;
 		}

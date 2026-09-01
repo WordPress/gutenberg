@@ -39,22 +39,31 @@ test.describe( 'Region navigation (@firefox, @webkit)', () => {
 		);
 		await expect( editorTopBar ).toBeFocused();
 
-		// Navigate to next/second region and check that we made it.
+		// Navigate to the next region: the selected block's toolbar floats
+		// over the content, so it comes before it.
+		await page.keyboard.press( 'Control+`' );
+		await expect(
+			page.locator( 'role=region[name="Block toolbar"i]' )
+		).toBeFocused();
+
+		// Navigate on to the content region and check that we made it.
 		await page.keyboard.press( 'Control+`' );
 		const editorContent = page.locator(
 			'role=region[name="Editor content"i]'
 		);
 		await expect( editorContent ).toBeFocused();
 
-		// Navigate to previous/first region and check that we made it.
+		// Navigate two regions back and check that we made it.
 		// Make sure navigating backwards works also with the tilde character,
 		// as browsers interpret the combination of the crtl+shift+backtick keys
 		// and assign it to event.key inconsistently.
 		// See https://github.com/WordPress/gutenberg/pull/45019
-		if ( testInfo.project.name === 'chromium' ) {
-			await page.keyboard.press( 'Control+Shift+`' );
-		} else {
-			await page.keyboard.press( 'Control+Shift+~' );
+		for ( let i = 0; i < 2; i++ ) {
+			if ( testInfo.project.name === 'chromium' ) {
+				await page.keyboard.press( 'Control+Shift+`' );
+			} else {
+				await page.keyboard.press( 'Control+Shift+~' );
+			}
 		}
 
 		await expect( editorTopBar ).toBeFocused();
