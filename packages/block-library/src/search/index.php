@@ -359,7 +359,7 @@ function apply_block_core_search_border_styles( $attributes, $property, &$wrappe
  * attributes, and only moves to the new location once the post is re-opened and
  * re-saved in the editor, so both locations are read here indefinitely.
  *
- * @since 7.1.0
+ * @since 7.2.0
  *
  * @param array $attributes The block attributes.
  *
@@ -377,12 +377,12 @@ function block_core_search_get_width( $attributes ) {
 
 		/*
 		 * The Width control's leftmost step is labelled "None" and writes the
-		 * string '0'. That means "no width set", not a zero-width field, so it
-		 * is skipped here the same way the legacy attributes below are.
+		 * string '0', meaning no width rather than a zero-width field. Either
+		 * way the block support has answered, so a block that still carries the
+		 * legacy attributes does not fall back to them and resurrect a width
+		 * the user has just cleared.
 		 */
-		if ( '0' !== $width ) {
-			return $width;
-		}
+		return '0' === $width ? null : $width;
 	}
 
 	// Fall back to the pre-block-support attributes.

@@ -112,6 +112,26 @@ class Render_Block_Search_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Clearing the width with "None" must not fall back to the legacy
+	 * attributes a block carries until it is re-saved.
+	 *
+	 * @covers ::gutenberg_styles_for_block_core_search
+	 */
+	public function test_block_support_width_of_zero_does_not_fall_back_to_legacy_attributes() {
+		$attributes = array(
+			'width'     => 50,
+			'widthUnit' => '%',
+			'style'     => array(
+				'dimensions' => array(
+					'width' => '0',
+				),
+			),
+		);
+
+		$this->assertStringNotContainsString( 'width: ', $this->get_wrapper_style( $attributes ) );
+	}
+
+	/**
 	 * @covers ::gutenberg_styles_for_block_core_search
 	 */
 	public function test_block_support_width_wins_over_legacy_attributes() {

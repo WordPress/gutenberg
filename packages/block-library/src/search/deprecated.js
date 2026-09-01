@@ -4,6 +4,10 @@
  * support. Move both into the single CSS length the support expects, unless a
  * block support width is already set.
  *
+ * A width with no unit, or a unit with no width, never rendered anything. Both
+ * are dropped rather than guessed at, which leaves the block looking exactly as
+ * it did while clearing the dead attribute.
+ *
  * @param {Object} attributes Block attributes.
  *
  * @return {Object} Block attributes with the width moved under `style`.
@@ -13,7 +17,9 @@ const migrateWidth = ( attributes ) => {
 
 	// A block that already carries a block support width keeps it. The server
 	// reads `style.dimensions.width` before the legacy attributes, so the
-	// editor has to resolve the two the same way.
+	// editor has to resolve the two the same way. Returning without a width
+	// still drops the legacy attributes, which is the point for the shapes
+	// that never rendered.
 	if ( ! width || ! widthUnit || otherAttributes.style?.dimensions?.width ) {
 		return otherAttributes;
 	}
@@ -122,7 +128,8 @@ const v1 = {
 	},
 	migrate: migrateWidth,
 	isEligible( { width, widthUnit } ) {
-		return !! width && !! widthUnit;
+		// Either attribute on its own is dead weight, so migrate to clear it.
+		return width !== undefined || widthUnit !== undefined;
 	},
 	save: () => null,
 };
