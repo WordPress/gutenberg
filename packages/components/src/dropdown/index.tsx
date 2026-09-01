@@ -8,6 +8,14 @@ import { useControlledValue } from '../utils/hooks';
 import Popover from '../popover';
 import type { DropdownProps, DropdownInternalContext } from './types';
 
+type InternalActivation = {
+	sequence: number;
+	dialogsBefore: Map< Document, Element | null >;
+};
+
+const getActiveDialog = ( ownerDocument: Document ) =>
+	ownerDocument.activeElement?.closest( '[role="dialog"]' ) ?? null;
+
 const UnconnectedDropdown = (
 	props: DropdownProps,
 	forwardedRef: ForwardedRef< any >
@@ -51,9 +59,8 @@ const UnconnectedDropdown = (
 	const [ fallbackPopoverAnchor, setFallbackPopoverAnchor ] =
 		useState< HTMLDivElement | null >( null );
 	const containerRef = useRef< HTMLDivElement >( null );
-	const activationWasInsideRef = useRef( false );
-	const dialogBeforeActivationRef = useRef< Element | null >( null );
 	const dialogOpenedByActivationRef = useRef< Element | null >( null );
+	const internalActivationRef = useRef< InternalActivation | null >( null );
 	const activationSequenceRef = useRef( 0 );
 
 	const [ isOpen, setIsOpen ] = useControlledValue( {
@@ -69,60 +76,21 @@ const UnconnectedDropdown = (
 
 		const { ownerDocument } = containerRef.current;
 		const activationEvents = [ 'pointerdown', 'keydown', 'click' ] as const;
-		const getActiveDialog = () =>
-			ownerDocument.activeElement?.closest( '[role="dialog"]' ) ?? null;
 		const startActivation = () => {
 			activationSequenceRef.current += 1;
-			activationWasInsideRef.current = false;
-			dialogBeforeActivationRef.current = getActiveDialog();
-
 			if (
 				dialogOpenedByActivationRef.current !==
-				dialogBeforeActivationRef.current
+				getActiveDialog( ownerDocument )
 			) {
 				dialogOpenedByActivationRef.current = null;
 			}
 		};
-		const finishActivation = () => {
-			const sequence = activationSequenceRef.current;
-			const activationWasInside = activationWasInsideRef.current;
-			const dialogBeforeActivation = dialogBeforeActivationRef.current;
-			const recordOpenedDialog = () => {
-				if ( sequence !== activationSequenceRef.current ) {
-					return;
-				}
 
-				const activeDialog = getActiveDialog();
-				if ( ! activationWasInside ) {
-					dialogOpenedByActivationRef.current = null;
-				} else if ( activeDialog !== dialogBeforeActivation ) {
-					dialogOpenedByActivationRef.current = activeDialog;
-				} else if (
-					dialogOpenedByActivationRef.current !== activeDialog
-				) {
-					dialogOpenedByActivationRef.current = null;
-				}
-			};
-
-			recordOpenedDialog();
-
-			// Some dialogs move focus in a timer. Check once more on the next
-			// task, before Popover's delayed focus-outside check runs.
-			if (
-				activationWasInside &&
-				! dialogOpenedByActivationRef.current
-			) {
-				ownerDocument.defaultView?.setTimeout( recordOpenedDialog, 0 );
-			}
-		};
-
-		// Native document capture runs before the React capture handlers below,
-		// while document bubble runs after them. Events from portaled Popover
-		// content still follow the React tree, so this records only dialogs that
-		// open during an activation from this Dropdown.
+		// Native document capture clears stale provenance before the React
+		// capture handlers below record an internal activation. Events from
+		// portaled Popover content still follow the React tree.
 		for ( const eventName of activationEvents ) {
 			ownerDocument.addEventListener( eventName, startActivation, true );
-			ownerDocument.addEventListener( eventName, finishActivation );
 		}
 
 		return () => {
@@ -133,24 +101,99 @@ const UnconnectedDropdown = (
 					startActivation,
 					true
 				);
-				ownerDocument.removeEventListener(
-					eventName,
-					finishActivation
-				);
 			}
 		};
 	}, [ isOpen ] );
 
-	function recordActivationInside() {
-		activationWasInsideRef.current = true;
+	function startInternalActivation(
+		event: React.SyntheticEvent< HTMLDivElement >
+	) {
+		if ( ! containerRef.current ) {
+			return;
+		}
+
+		const containerDocument = containerRef.current.ownerDocument;
+		const eventDocument = ( event.target as Node | null )?.ownerDocument;
+		const ownerDocuments = [ containerDocument ];
+		if ( eventDocument && eventDocument !== containerDocument ) {
+			ownerDocuments.push( eventDocument );
+		}
+
+		const sequence = ++activationSequenceRef.current;
+		internalActivationRef.current = {
+			sequence,
+			dialogsBefore: new Map(
+				ownerDocuments.map(
+					( ownerDocument ) =>
+						[
+							ownerDocument,
+							getActiveDialog( ownerDocument ),
+						] as const
+				)
+			),
+		};
+
+		const activeDialogIsKnown = ownerDocuments.some(
+			( ownerDocument ) =>
+				getActiveDialog( ownerDocument ) ===
+				dialogOpenedByActivationRef.current
+		);
+		if ( ! activeDialogIsKnown ) {
+			dialogOpenedByActivationRef.current = null;
+		}
+
+		// A target can stop propagation, so do not rely on the React bubble
+		// handler to finalize the activation. The second check supports dialogs
+		// that move focus in a timer before Popover checks focus outside.
+		containerDocument.defaultView?.setTimeout( () => {
+			if ( ! finishInternalActivation() ) {
+				containerDocument.defaultView?.setTimeout(
+					finishInternalActivation,
+					0
+				);
+			}
+		}, 0 );
 	}
 
-	function recordKeyboardActivationInside(
+	function startInternalKeyboardActivation(
 		event: React.KeyboardEvent< HTMLDivElement >
 	) {
 		if ( event.key === 'Enter' || event.key === ' ' ) {
-			recordActivationInside();
+			startInternalActivation( event );
 		}
+	}
+
+	function finishInternalActivation() {
+		const activation = internalActivationRef.current;
+		if (
+			! activation ||
+			activation.sequence !== activationSequenceRef.current
+		) {
+			return false;
+		}
+
+		for ( const [
+			ownerDocument,
+			dialogBefore,
+		] of activation.dialogsBefore ) {
+			const activeDialog = getActiveDialog( ownerDocument );
+			if ( activeDialog && activeDialog !== dialogBefore ) {
+				dialogOpenedByActivationRef.current = activeDialog;
+				return true;
+			}
+		}
+
+		const knownDialogIsStillActive = [
+			...activation.dialogsBefore.keys(),
+		].some(
+			( ownerDocument ) =>
+				getActiveDialog( ownerDocument ) ===
+				dialogOpenedByActivationRef.current
+		);
+		if ( ! knownDialogIsStillActive ) {
+			dialogOpenedByActivationRef.current = null;
+		}
+		return knownDialogIsStillActive;
 	}
 
 	/**
@@ -170,11 +213,14 @@ const UnconnectedDropdown = (
 		const isParentDialog = dialog?.contains( containerRef.current );
 		const dialogOpenedByActivation = dialogOpenedByActivationRef.current;
 		dialogOpenedByActivationRef.current = null;
+		activationSequenceRef.current += 1;
+		const relatedDialogIsActive =
+			!! dialogOpenedByActivation &&
+			getActiveDialog( dialogOpenedByActivation.ownerDocument ) ===
+				dialogOpenedByActivation;
 		if (
 			! containerRef.current.contains( activeElement ) &&
-			( ! dialog ||
-				isParentDialog ||
-				dialog !== dialogOpenedByActivation )
+			( isParentDialog || ! relatedDialogIsActive )
 		) {
 			close();
 		}
@@ -201,9 +247,9 @@ const UnconnectedDropdown = (
 	return (
 		<div
 			className={ className }
-			onClickCapture={ recordActivationInside }
-			onPointerDownCapture={ recordActivationInside }
-			onKeyDownCapture={ recordKeyboardActivationInside }
+			onClickCapture={ startInternalActivation }
+			onPointerDownCapture={ startInternalActivation }
+			onKeyDownCapture={ startInternalKeyboardActivation }
 			ref={ useMergeRefs( [
 				containerRef,
 				forwardedRef,

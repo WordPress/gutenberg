@@ -1,6 +1,12 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+	fireEvent,
+	render,
+	screen,
+	waitFor,
+	within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useState } from '@wordpress/element';
+import { createPortal, useState } from '@wordpress/element';
 import Dropdown from '..';
 import Modal from '../../modal';
 import { DropdownContentWrapper } from '../dropdown-content-wrapper';
@@ -9,13 +15,24 @@ import styles from '../style.module.scss';
 const DropdownWithModal = ( {
 	dialogTriggerLocation,
 	onClose,
+	stopDialogTriggerPropagation = false,
 }: {
 	dialogTriggerLocation: 'inside' | 'outside';
 	onClose?: () => void;
+	stopDialogTriggerPropagation?: boolean;
 } ) => {
 	const [ isDialogOpen, setIsDialogOpen ] = useState( false );
 	const dialogTrigger = (
-		<button onClick={ () => setIsDialogOpen( true ) }>Open dialog</button>
+		<button
+			onClick={ ( event ) => {
+				if ( stopDialogTriggerPropagation ) {
+					event.stopPropagation();
+				}
+				setIsDialogOpen( true );
+			} }
+		>
+			Open dialog
+		</button>
 	);
 
 	return (
@@ -74,6 +91,45 @@ const DropdownWithProgrammaticModal = ( {
 		) }
 	</>
 );
+
+const DropdownWithPortaledModalTrigger = ( {
+	portalContainer,
+	onClose,
+}: {
+	portalContainer: Element;
+	onClose: () => void;
+} ) => {
+	const [ isDialogOpen, setIsDialogOpen ] = useState( false );
+
+	return (
+		<>
+			<Dropdown
+				onClose={ onClose }
+				renderToggle={ ( { isOpen, onToggle } ) => (
+					<button aria-expanded={ isOpen } onClick={ onToggle }>
+						Toggle
+					</button>
+				) }
+				renderContent={ () =>
+					createPortal(
+						<button onClick={ () => setIsDialogOpen( true ) }>
+							Open portaled dialog
+						</button>,
+						portalContainer
+					)
+				}
+			/>
+			{ isDialogOpen && (
+				<Modal
+					title="Portaled dialog"
+					onRequestClose={ () => setIsDialogOpen( false ) }
+				>
+					<p>Portaled dialog content</p>
+				</Modal>
+			) }
+		</>
+	);
+};
 
 describe( 'DropdownContentWrapper', () => {
 	it( 'should apply the small padding class by default', () => {
@@ -235,6 +291,67 @@ describe( 'Dropdown', () => {
 		);
 		expect( dialogTrigger ).toHaveFocus();
 		expect( screen.getByText( 'Dropdown item' ) ).toBeInTheDocument();
+	} );
+
+	it( 'should stay open when a propagation-stopping trigger opens its dialog', async () => {
+		const user = userEvent.setup();
+		const onClose = jest.fn();
+		render(
+			<DropdownWithModal
+				dialogTriggerLocation="inside"
+				onClose={ onClose }
+				stopDialogTriggerPropagation
+			/>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Toggle' } ) );
+		const dialogTrigger = await screen.findByRole( 'button', {
+			name: 'Open dialog',
+		} );
+		await user.click( dialogTrigger );
+
+		await screen.findByRole( 'dialog', { name: 'Dialog' } );
+		await waitFor( () => expect( onClose ).not.toHaveBeenCalled() );
+		expect(
+			screen.getByRole( 'button', { name: 'Toggle', hidden: true } )
+		).toHaveAttribute( 'aria-expanded', 'true' );
+	} );
+
+	it( 'should stay open when a portaled trigger opens its dialog from another document', async () => {
+		const user = userEvent.setup();
+		const onClose = jest.fn();
+		const iframe = document.createElement( 'iframe' );
+		document.body.appendChild( iframe );
+		let unmount: () => void = () => undefined;
+
+		try {
+			( { unmount } = render(
+				<DropdownWithPortaledModalTrigger
+					portalContainer={ iframe.contentDocument!.body }
+					onClose={ onClose }
+				/>
+			) );
+			await user.click(
+				screen.getByRole( 'button', { name: 'Toggle' } )
+			);
+			await user.click(
+				within( iframe.contentDocument!.body ).getByRole( 'button', {
+					name: 'Open portaled dialog',
+				} )
+			);
+
+			await screen.findByRole( 'dialog', { name: 'Portaled dialog' } );
+			await waitFor( () => expect( onClose ).not.toHaveBeenCalled() );
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Toggle',
+					hidden: true,
+				} )
+			).toHaveAttribute( 'aria-expanded', 'true' );
+		} finally {
+			unmount();
+			iframe.remove();
+		}
 	} );
 
 	it( 'should not reuse a stale internal activation for an unrelated dialog', async () => {
