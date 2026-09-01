@@ -47,8 +47,10 @@
 				border-color: transparent;
 			}
 
+			/* Don't show focus ring when the focus is in the prefix or suffix slots */
 			&:has(.input-layout-slot:focus-within) {
-				--_gcd-div-outline: 0 solid transparent;
+				outline: none;
+				--_gcd-div-outline: none;
 			}
 
 			&:hover:not(.is-disabled, :has([data-can-disable-input-layout][data-disabled]), .is-borderless) {
