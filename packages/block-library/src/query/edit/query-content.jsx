@@ -148,7 +148,7 @@ export default function QueryContent( {
 			const message = sprintf(
 				/* translators: %s: A list of block titles. */
 				__(
-					`"Reload full page" was enabled because some blocks aren't supported: %s.`
+					`"Reload full page" was enabled because some blocks inside the Query block aren't supported: %s.`
 				),
 				unsupportedBlocks.join(
 					/* translators: Used between list items, there is a space after the comma. */
