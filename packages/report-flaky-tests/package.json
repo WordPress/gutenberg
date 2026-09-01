@@ -2,7 +2,7 @@
 	"name": "@wordpress/report-flaky-tests",
 	"version": "0.0.0",
 	"private": true,
-	"description": "A GitHub action to report flaky E2E tests as a comment on the pull request.",
+	"description": "A GitHub action to render a report of flaky E2E tests as markdown.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
@@ -35,15 +35,13 @@
 	"types": "build-types",
 	"dependencies": {
 		"@actions/core": "^1.9.1",
-		"@actions/github": "^5.0.1",
 		"@jest/test-result": "^30.5.0",
-		"@octokit/webhooks-types": "^5.8.0",
 		"@playwright/test": "^1.62.1",
 		"jest-message-util": "^30.5.0"
 	},
 	"devDependencies": {
-		"@types/jest": "^30.0.0",
-		"@types/node": "^20.19.39"
+		"@types/node": "^20.19.39",
+		"vitest": "^4.1.10"
 	},
 	"publishConfig": {
 		"access": "public"

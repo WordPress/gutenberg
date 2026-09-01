@@ -1,8 +1,16 @@
-import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import {
+	existsSync,
+	mkdtempSync,
+	readFileSync,
+	rmSync,
+	writeFileSync,
+} from 'node:fs';
+import { createRequire, isBuiltin } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { globSync } from 'glob';
+import typescript from 'typescript';
 import {
 	discoverTestFiles,
 	getVitestTestsByProject,
@@ -161,70 +169,218 @@ if ( violations.length ) {
 
 const commonTypes = [
 	'gutenberg-env',
+	'react',
 	'react-css-custom-properties',
 	'style-imports',
 ];
+
+const require = createRequire( import.meta.url );
+
+/**
+ * Resolve the directories holding the given `@types` packages.
+ *
+ * Non-hoisting installs keep them in the workspace that declares the
+ * dependency, so the repository root is not a reliable type root.
+ *
+ * @param {string[]} typeNames Type package names, without the `@types/` scope.
+ * @return {string[]} Absolute `@types` directories, without duplicates.
+ */
+function resolveTypeRoots( typeNames ) {
+	const typeRoots = new Set();
+
+	for ( const typeName of typeNames ) {
+		try {
+			const packageJsonPath = require.resolve(
+				`@types/${ typeName }/package.json`
+			);
+			typeRoots.add( path.dirname( path.dirname( packageJsonPath ) ) );
+		} catch {
+			// Declared under `typings` rather than by a `@types` package.
+		}
+	}
+
+	return [ ...typeRoots ];
+}
+
+function importsNodeBuiltin( file ) {
+	const source =
+		sourcesByFile.get( file ) ??
+		readFileSync( path.join( ROOT_DIR, file ), 'utf8' );
+	return [
+		...source.matchAll( /(?:from\s+|import\s*\(\s*)['"]([^'"]+)['"]/g ),
+	].some( ( match ) => isBuiltin( match[ 1 ] ) );
+}
+
+function getTypecheckConfigPath( testFile ) {
+	let directory = path.dirname( path.join( ROOT_DIR, testFile ) );
+
+	while ( directory.startsWith( ROOT_DIR ) && directory !== ROOT_DIR ) {
+		for ( const configName of [ 'tsconfig.test.json', 'tsconfig.json' ] ) {
+			const configPath = path.join( directory, configName );
+			if ( existsSync( configPath ) ) {
+				return configPath;
+			}
+		}
+		directory = path.dirname( directory );
+	}
+
+	return path.join( ROOT_DIR, 'tsconfig.base.json' );
+}
+
 let typescriptTestCount = 0;
 
 for ( const projectName of VITEST_PROJECT_NAMES ) {
-	const typescriptTests = vitestTestsByProject[ projectName ].filter(
+	const projectTypescriptTests = vitestTestsByProject[ projectName ].filter(
 		( file ) => /\.tsx?$/.test( file )
 	);
-	if ( ! typescriptTests.length ) {
+	if ( ! projectTypescriptTests.length ) {
 		continue;
 	}
 
-	typescriptTestCount += typescriptTests.length;
-	const configPath = path.join(
-		ROOT_DIR,
-		'test/unit',
-		`.vitest-${ projectName }-typecheck.json`
-	);
-	const needsNodeTypes =
-		projectName === 'node' ||
-		typescriptTests.some( ( file ) =>
-			/[('"]node:/.test( sourcesByFile.get( file ) )
-		);
-	const setupTypeFiles =
-		projectName === 'jsdom'
-			? [
-					path.join(
-						ROOT_DIR,
-						'test/unit/config/testing-library.vitest.js'
-					),
-			  ]
-			: [];
-	const typecheckConfig = {
-		extends: path.join( ROOT_DIR, 'tsconfig.base.json' ),
-		compilerOptions: {
-			checkJs: false,
-			composite: false,
-			emitDeclarationOnly: false,
-			noEmit: true,
-			rootDir: ROOT_DIR,
-			types: [ ...commonTypes, ...( needsNodeTypes ? [ 'node' ] : [] ) ],
-		},
-		files: [
-			...setupTypeFiles,
-			...typescriptTests.map( ( file ) => path.join( ROOT_DIR, file ) ),
-		],
-	};
+	const testsByConfig = new Map();
+	for ( const testFile of projectTypescriptTests ) {
+		const configPath = getTypecheckConfigPath( testFile );
+		const configTests = testsByConfig.get( configPath ) ?? [];
+		configTests.push( testFile );
+		testsByConfig.set( configPath, configTests );
+	}
 
-	try {
-		writeFileSync( configPath, JSON.stringify( typecheckConfig ) );
-		execFileSync(
-			process.execPath,
-			[
+	for ( const [ baseConfigPath, typescriptTests ] of testsByConfig ) {
+		const { config: baseConfig, error: baseConfigError } =
+			typescript.readConfigFile(
+				baseConfigPath,
+				typescript.sys.readFile
+			);
+		if ( baseConfigError ) {
+			throw new Error(
+				typescript.formatDiagnostics( [ baseConfigError ], {
+					getCanonicalFileName: ( fileName ) => fileName,
+					getCurrentDirectory: () => ROOT_DIR,
+					getNewLine: () => '\n',
+				} )
+			);
+		}
+
+		typescriptTestCount += typescriptTests.length;
+		const needsNodeTypes =
+			projectName === 'node' ||
+			typescriptTests.some( importsNodeBuiltin );
+		const temporaryDirectory = mkdtempSync(
+			path.join(
+				path.dirname( baseConfigPath ),
+				`.vitest-${ projectName }-typecheck-`
+			)
+		);
+		const configPath = path.join( temporaryDirectory, 'tsconfig.json' );
+		const compatibilityTypesPath = path.join(
+			temporaryDirectory,
+			'compatibility.d.ts'
+		);
+		const typecheckConfig = {
+			extends: baseConfigPath,
+			compilerOptions: {
+				allowJs: true,
+				allowImportingTsExtensions: true,
+				checkJs: false,
+				composite: false,
+				declaration: true,
+				declarationMap: false,
+				emitDeclarationOnly: false,
+				noEmit: true,
+				rootDir: ROOT_DIR,
+				typeRoots: [
+					path.join( ROOT_DIR, 'typings' ),
+					path.join( ROOT_DIR, 'test/unit/typings' ),
+					...resolveTypeRoots( [ ...commonTypes, 'node' ] ),
+				],
+				types:
+					projectName === 'jsdom'
+						? [
+								...commonTypes,
+								...( needsNodeTypes ? [ 'node' ] : [] ),
+								'gutenberg-vitest-test-env',
+						  ]
+						: [
+								...commonTypes,
+								'node',
+								'gutenberg-vitest-test-env',
+						  ],
+			},
+			// Package configs often include every source, story, and test file.
+			// This validator owns an exact routed-test set, so do not inherit
+			// those broader globs into another Vitest project's typecheck.
+			include: [],
+			exclude: [],
+			references: baseConfig.references?.map( ( reference ) => ( {
+				...reference,
+				path: path.resolve(
+					path.dirname( baseConfigPath ),
+					reference.path
+				),
+			} ) ),
+			files: [
+				compatibilityTypesPath,
+				...( projectName === 'jsdom'
+					? [
+							path.join(
+								ROOT_DIR,
+								'test/unit/config/testing-library.vitest.js'
+							),
+					  ]
+					: [] ),
+				...typescriptTests.map( ( file ) =>
+					path.join( ROOT_DIR, file )
+				),
+			],
+		};
+
+		try {
+			writeFileSync(
+				compatibilityTypesPath,
+				[
+					'declare const global: typeof globalThis;',
+					"declare module '@wordpress/commands';",
+					"declare module '@wordpress/interface';",
+					"declare module 'deep-freeze' { export default function deepFreeze<T>(value: T): T; }",
+				].join( '\n' )
+			);
+			const typecheckArguments = [
 				resolvePackageBin( 'typescript', 'tsc6' ),
 				'--project',
 				configPath,
 				'--pretty',
 				'false',
-			],
-			{ cwd: ROOT_DIR, stdio: 'inherit' }
-		);
-	} finally {
-		rmSync( configPath, { force: true } );
+			];
+			const runTypecheck = () =>
+				spawnSync( process.execPath, typecheckArguments, {
+					cwd: ROOT_DIR,
+					encoding: 'utf8',
+				} );
+			writeFileSync( configPath, JSON.stringify( typecheckConfig ) );
+			let result = runTypecheck();
+
+			const output = `${ result.stdout ?? '' }${ result.stderr ?? '' }`;
+			if ( result.status !== 0 && /TS63(?:05|10)/.test( output ) ) {
+				// A dependency cycle can make TypeScript treat routed tests as
+				// source files owned by a referenced package project. The package
+				// declarations were built before this check, so fall back to normal
+				// module resolution when that project-ownership check fails.
+				typecheckConfig.references = [];
+				writeFileSync( configPath, JSON.stringify( typecheckConfig ) );
+				result = runTypecheck();
+			}
+
+			if ( result.error ) {
+				throw result.error;
+			}
+			if ( result.status !== 0 ) {
+				process.stderr.write( result.stdout ?? '' );
+				process.stderr.write( result.stderr ?? '' );
+				throw new Error( 'TypeScript test graph validation failed.' );
+			}
+		} finally {
+			rmSync( temporaryDirectory, { force: true, recursive: true } );
+		}
 	}
 }
 

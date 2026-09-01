@@ -1,4 +1,6 @@
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { createElement, Component } from '@wordpress/element';
+import '../../store';
 import serialize, {
 	getCommentAttributes,
 	getSaveContent,
@@ -17,11 +19,6 @@ import {
 import { createBlock } from '../';
 
 describe( 'block serializer', () => {
-	beforeAll( () => {
-		// Initialize the block store.
-		require( '../../store' );
-	} );
-
 	afterEach( () => {
 		setFreeformContentHandlerName( undefined );
 		setUnregisteredTypeHandlerName( undefined );

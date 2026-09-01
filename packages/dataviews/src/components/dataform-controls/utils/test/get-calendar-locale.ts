@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import getCalendarLocale from '../get-calendar-locale';
 
 describe( 'getCalendarLocale', () => {

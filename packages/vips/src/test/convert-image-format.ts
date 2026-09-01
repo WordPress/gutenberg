@@ -1,34 +1,44 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import type VipsFactory from 'wasm-vips';
 import { convertImageFormat, compressImage } from '../';
 
-const mockNewFromBuffer = jest.fn( () => new MockImage() );
-const mockWriteToBuffer = jest.fn( () => ( {
-	buffer: '',
-} ) );
+const { MockVipsImage, mockNewFromBuffer } = vi.hoisted( () => {
+	const writeToBufferMock = vi.fn( () => ( {
+		buffer: '',
+	} ) );
 
-class MockImage {
-	width = 100;
-	height = 100;
-	pageHeight = 100;
-	writeToBuffer = mockWriteToBuffer;
-	getInt = jest.fn( () => 0 );
-}
+	class ImageMock {
+		width = 100;
+		height = 100;
+		pageHeight = 100;
+		writeToBuffer = writeToBufferMock;
+		getInt = vi.fn( () => 0 );
+	}
 
-class MockVipsImage {
-	static newFromBuffer = mockNewFromBuffer;
-}
+	const newFromBufferMock = vi.fn( () => new ImageMock() );
 
-jest.mock( 'wasm-vips', () =>
-	jest.fn( () => ( {
+	class VipsImageMock {
+		static newFromBuffer = newFromBufferMock;
+	}
+
+	return {
+		MockVipsImage: VipsImageMock,
+		mockNewFromBuffer: newFromBufferMock,
+	};
+} );
+
+vi.mock( import( 'wasm-vips' ), () => ( {
+	default: vi.fn( () => ( {
 		Image: MockVipsImage,
 		Cache: {
-			max: jest.fn(),
+			max: vi.fn(),
 		},
-	} ) )
-);
+	} ) ) as unknown as typeof VipsFactory,
+} ) );
 
 describe( 'convertImageFormat', () => {
 	afterEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	it( 'loads only the first frame when converting a GIF to JPEG', async () => {

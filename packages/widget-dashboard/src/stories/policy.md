@@ -4,7 +4,7 @@
 This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-The engine knows which operations a user can perform on a dashboard: enter customize mode, insert a widget type, remove, move, resize, or edit an instance. It does not know who the user is or what the application allows. `WidgetDashboard.Policy` is the seam through which the application answers.
+The engine knows which operations a user can perform on a dashboard: enter customize mode, reset the layout to default, insert a widget type, remove, move, resize, or edit an instance. It does not know who the user is or what the application allows. `WidgetDashboard.Policy` is the seam through which the application answers.
 
 ![The engine asks one question per operation via a request that names the operation and its subject. The application, which owns the permission model, answers via the policy seam with a single callback. The engine resolves that answer once, and every surface follows it: the Customize button and the command palette, the inserter, the tile controls, the drag and resize gestures. Widgets are never asked; without edit they render read-only. Without a policy, every operation is allowed.](./assets/policy-seam.svg)
 
@@ -15,6 +15,7 @@ The engine knows which operations a user can perform on a dashboard: enter custo
 ```ts
 type DashboardOperationRequest =
 	| { operation: 'customize' }
+	| { operation: 'reset' }
 	| { operation: 'insert'; widgetType: WidgetType }
 	| {
 			operation: 'remove' | 'move' | 'resize' | 'edit';
@@ -32,6 +33,7 @@ The Customize button, the command palette entries, the tile controls, and the in
 | Operation   | Subject                 | What it gates                                                                                                                                                                                     |
 | ----------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `customize` | none                    | The Customize button, the `core/dashboard/customize` command, the `core/dashboard/add-widgets` command outside edit mode, and the automatic entry into customize mode on an empty layout.         |
+| `reset`     | none                    | The Reset to default entry in the overflow menu, the `core/dashboard/reset-to-default` command, and the confirmation prompt they open. A denied reset is hidden, not disabled.                    |
 | `insert`    | `widgetType`            | Whether the inserter offers the type; a rejected type keeps rendering where already placed. The Add widget button and command show only while some registered type is insertable.                 |
 | `remove`    | `widget`, `widgetType?` | The Remove control in customize mode. The staging layer re-asserts, in place, a locked instance dropped by any trigger.                                                                           |
 | `move`      | `widget`, `widgetType?` | Dragging the tile in customize mode. A denied tile is pinned: it holds its index while the other tiles reorder around it; a change ahead of it can still reflow the cell it lands in.             |
@@ -83,4 +85,4 @@ const canPerform = useMemo< CanPerformDashboardOperation >(
 </WidgetDashboard.Policy>;
 ```
 
-See the _Policy_ story in the Playground: three user profiles (Viewer, Arranger, Owner) and a section-scoped inserter, composed inside an admin `Page`.
+See the _Policy_ story in the Playground: three user profiles (Viewer, Arranger, Owner) and a section-scoped inserter, composed inside an admin `Page`. The command palette is mounted there as well; press ⌘K to check which commands each profile keeps.

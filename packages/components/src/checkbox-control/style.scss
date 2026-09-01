@@ -77,7 +77,7 @@ svg.components-checkbox-control__checked,
 svg.components-checkbox-control__indeterminate {
 	--checkmark-size: var(--checkbox-input-size);
 
-	fill: $white;
+	color: $white;
 	cursor: var(--wpds-cursor-control);
 	position: absolute;
 	left: 50%;
@@ -96,7 +96,7 @@ svg.components-checkbox-control__indeterminate {
 .components-checkbox-control:has(:disabled) {
 	svg.components-checkbox-control__checked,
 	svg.components-checkbox-control__indeterminate {
-		fill: $components-color-gray-400;
+		color: $components-color-gray-400;
 	}
 }
 
