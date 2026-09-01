@@ -482,5 +482,28 @@ describe( 'editor utils', () => {
 				).toEqual( returnedValue );
 			}
 		);
+
+		it( 'returns a copy instead of writing the resolved URL onto the given value', () => {
+			const ruleValue = { url: 'file:./assets/image.jpg' };
+			expect( getResolvedValue( ruleValue, themeJson ) ).toEqual( {
+				url: 'https://wordpress.org/assets/image.jpg',
+			} );
+			expect( ruleValue.url ).toBe( 'file:./assets/image.jpg' );
+		} );
+
+		it( 'does not write the resolved URL into the tree when resolving a ref', () => {
+			const tree = JSON.parse(
+				JSON.stringify( themeJson )
+			) as GlobalStylesConfig;
+			expect(
+				getResolvedValue(
+					{ ref: 'styles.background.backgroundImage' },
+					tree
+				)
+			).toEqual( { url: 'https://wordpress.org/assets/image.jpg' } );
+			expect( tree.styles?.background?.backgroundImage ).toEqual( {
+				url: 'file:./assets/image.jpg',
+			} );
+		} );
 	} );
 } );
