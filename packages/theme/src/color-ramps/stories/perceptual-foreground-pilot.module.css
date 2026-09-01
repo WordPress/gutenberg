@@ -34,6 +34,34 @@
 	font-size: 16px;
 }
 
+.scale-comparison-heading {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.scale-seed {
+	display: inline-flex;
+	gap: 6px;
+	align-items: center;
+	font-size: 12px;
+}
+
+.scale-seed-swatch {
+	box-sizing: border-box;
+	width: 20px;
+	height: 20px;
+	border: 1px solid #949494;
+	border-radius: 4px;
+}
+
+.scale-seed code {
+	font-family: monospace;
+	font-size: 11px;
+}
+
 .approaches {
 	display: grid;
 	grid-auto-columns: minmax(320px, 1fr);

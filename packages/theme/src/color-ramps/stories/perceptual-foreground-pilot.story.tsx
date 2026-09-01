@@ -135,6 +135,7 @@ type Story = StoryObj< PilotComparisonArgs >;
 type ScaleData = {
 	scale: ExperimentalForegroundScale;
 	scaleType: ExperimentalForegroundScaleType;
+	seed: string;
 };
 
 function getSwatchTextColor( color: string ) {
@@ -371,6 +372,7 @@ function buildScaleData( {
 } ): ScaleData {
 	return {
 		scaleType,
+		seed,
 		scale: buildPerceptualForegroundScale( {
 			method,
 			ramp,
@@ -474,9 +476,22 @@ function ScaleComparison( {
 	methods: MethodScaleData[];
 	seedLabel: string;
 } ) {
+	const seed = methods[ 0 ].scales[ comparison.name ].seed;
+
 	return (
 		<section className={ styles[ 'scale-comparison' ] }>
-			<h3>{ comparison.label }</h3>
+			<div className={ styles[ 'scale-comparison-heading' ] }>
+				<h3>{ comparison.label }</h3>
+				<div className={ styles[ 'scale-seed' ] }>
+					<span
+						aria-hidden="true"
+						className={ styles[ 'scale-seed-swatch' ] }
+						style={ { background: seed } }
+					/>
+					<span>Scale seed</span>
+					<code>{ seed }</code>
+				</div>
+			</div>
 			<div
 				aria-label={ `${ seedLabel }, ${ comparison.label } scale approaches` }
 				className={ styles[ 'scale-table-scroll' ] }
