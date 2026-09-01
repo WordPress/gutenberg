@@ -93,8 +93,19 @@ export function useRenderCursors(
 
 	// All DOM position computations live inside useEffect.
 	useEffect( () => {
-		if ( ! overlayElement || ! blockEditorDocument ) {
-			setCursorPositions( [] );
+		const hasOtherCollaborators = sortedUsers.some(
+			( u: ActiveCollaborator ) => ! u.isMe
+		);
+
+		// Bail out before forcing layout when nothing would be rendered:
+		// either the overlay isn't mounted yet, or there are no remote
+		// collaborators (the inner loop would skip "me" too in that case).
+		if (
+			! overlayElement ||
+			! blockEditorDocument ||
+			! hasOtherCollaborators
+		) {
+			setCursorPositions( ( prev ) => ( prev.length === 0 ? prev : [] ) );
 			return;
 		}
 
@@ -107,12 +118,8 @@ export function useRenderCursors(
 
 		const results: CursorData[] = [];
 
-		const hasOtherCollaborators = sortedUsers.some(
-			( u: ActiveCollaborator ) => ! u.isMe
-		);
-
 		sortedUsers.forEach( ( user: ActiveCollaborator ) => {
-			if ( user.isMe && ( ! showOwnCursor || ! hasOtherCollaborators ) ) {
+			if ( user.isMe && ! showOwnCursor ) {
 				return;
 			}
 

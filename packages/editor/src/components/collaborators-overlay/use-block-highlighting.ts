@@ -87,14 +87,25 @@ export function useBlockHighlighting(
 
 	// All DOM mutations and position computations live inside useEffect.
 	useEffect( () => {
-		if ( ! blockEditorDocument ) {
-			setHighlights( [] );
-			return;
-		}
+		const hasOtherCollaborators = userStates.some(
+			( u: ActiveCollaborator ) => ! u.isMe
+		);
 
 		// Capture the ref value so the cleanup closure sees the same Set
 		// even if a later render replaces it.
 		const currentHighlightedIds = highlightedBlockIds.current;
+
+		// Bail out before forcing layout (overlayElement.getBoundingClientRect
+		// below) when nothing would be rendered: the editor document isn't
+		// mounted yet, or there are no remote users to highlight and no
+		// previously-highlighted blocks to clean up.
+		if (
+			! blockEditorDocument ||
+			( ! hasOtherCollaborators && currentHighlightedIds.size === 0 )
+		) {
+			setHighlights( ( prev ) => ( prev.length === 0 ? prev : [] ) );
+			return;
+		}
 
 		type BlockEntry = {
 			blockId: string;
