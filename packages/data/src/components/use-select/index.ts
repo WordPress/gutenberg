@@ -2,10 +2,6 @@
 // in its internal helpers (_useStaticSelect, _useMappingSelect) where
 // hooks are called inside non-hook functions and conditionally dispatched.
 /* eslint-disable react-hooks/rules-of-hooks */
-
-/**
- * WordPress dependencies
- */
 import { createQueue } from '@wordpress/priority-queue';
 import {
 	useRef,
@@ -15,10 +11,6 @@ import {
 	useDebugValue,
 } from '@wordpress/element';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
-
-/**
- * Internal dependencies
- */
 import useRegistry from '../registry-provider/use-registry';
 import useAsyncMode from '../async-mode-provider/use-async-mode';
 import type {

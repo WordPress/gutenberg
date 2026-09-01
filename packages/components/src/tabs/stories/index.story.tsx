@@ -16,6 +16,7 @@ const meta: Meta< typeof Tabs > = {
 		'Tabs.TabList': Tabs.TabList,
 		'Tabs.Tab': Tabs.Tab,
 		'Tabs.TabPanel': Tabs.TabPanel,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Tabs.Context': Tabs.Context,
 	},
 	tags: [ 'status-private' ],
@@ -25,7 +26,7 @@ const meta: Meta< typeof Tabs > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Use `Tabs` from `@wordpress/ui` instead.',
+			notes: 'Use [`Tabs`](?path=/docs/design-system-components-tabs--docs) from `@wordpress/ui` instead.',
 		},
 	},
 	args: {

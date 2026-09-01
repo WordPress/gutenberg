@@ -1,34 +1,21 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-import type { ComponentProps, ReactElement, HTMLAttributes } from 'react';
-
-/**
- * WordPress dependencies
- */
-import {
-	Flex,
-	FlexItem,
-	Composite,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
-import { Stack, Tooltip } from '@wordpress/ui';
+import type {
+	ComponentProps,
+	ReactElement,
+	HTMLAttributes,
+	CSSProperties,
+} from 'react';
+import { Flex, FlexItem, Composite } from '@wordpress/components';
+import { Badge, Stack, Tooltip } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
-import { isAppleOS } from '@wordpress/keycodes';
 import {
 	useCallback,
 	useContext,
 	useRef,
 	forwardRef,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../../../lock-unlock';
+import { MEDIA_ASPECT_RATIOS } from '../../../constants';
 import ItemActions from '../../dataviews-item-actions';
 import DataViewsSelectionCheckbox from '../../dataviews-selection-checkbox';
 import DataViewsContext from '../../dataviews-context';
@@ -42,8 +29,8 @@ import type {
 	ViewGrid as ViewGridType,
 } from '../../../types';
 import type { SetSelection } from '../../../types/private';
+import type { SelectionProps } from '../utils/use-selection-props';
 import { ItemClickWrapper } from '../utils/item-click-wrapper';
-const { Badge: WCBadge } = unlock( componentsPrivateApis );
 import { useGridColumns } from './preview-size-picker';
 import { GridItems } from '../utils/grid-items';
 import {
@@ -185,23 +172,6 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 						'is-selected': hasBulkAction && isSelected,
 					}
 				) }
-				onClickCapture={ ( event ) => {
-					props.onClickCapture?.( event );
-					if ( isAppleOS() ? event.metaKey : event.ctrlKey ) {
-						event.stopPropagation();
-						event.preventDefault();
-						if ( ! hasBulkAction ) {
-							return;
-						}
-						onChangeSelection(
-							isSelected
-								? selection.filter(
-										( itemId ) => id !== itemId
-								  )
-								: [ ...selection, id ]
-						);
-					}
-				} }
 			>
 				<ItemClickWrapper
 					item={ item }
@@ -273,7 +243,8 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 						>
 							{ badgeFields.map( ( field ) => {
 								return (
-									<WCBadge
+									/* @ts-expect-error `Badge` is text-only, but a badge field renders whatever its `render` returns. */
+									<Badge
 										key={ field.id }
 										className="dataviews-view-grid__field-value"
 									>
@@ -281,7 +252,7 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 											item={ item }
 											field={ field }
 										/>
-									</WCBadge>
+									</Badge>
 								);
 							} ) }
 						</Stack>
@@ -359,6 +330,7 @@ interface CompositeGridProps< Item > {
 	) => ReactElement;
 	getItemId: ( item: Item ) => string;
 	actions: Action< Item >[];
+	getSelectionProps: ( id: string ) => SelectionProps;
 }
 
 export default function CompositeGrid< Item >( {
@@ -376,10 +348,28 @@ export default function CompositeGrid< Item >( {
 	renderItemLink,
 	getItemId,
 	actions,
+	getSelectionProps,
 }: CompositeGridProps< Item > ) {
 	const { paginationInfo, resizeObserverRef } =
 		useContext( DataViewsContext );
 	const gridColumns = useGridColumns();
+	// Consumer-configured shape for item previews, validated against the
+	// presets (like `density`) so arbitrary values are ignored, and surfaced
+	// to CSS as a custom property the media field's stylesheet reads. Always
+	// set (with the square default), so an identically-named variable set by
+	// a consumer on an ancestor can't leak into the previews when the view
+	// doesn't configure a ratio.
+	const gridStyle = {
+		'--wp-dataviews-media-aspect-ratio':
+			view.layout?.aspectRatio &&
+			MEDIA_ASPECT_RATIOS.includes( view.layout.aspectRatio )
+				? view.layout.aspectRatio
+				: '1/1',
+	} as CSSProperties;
+	// `mediaFit` is a class rather than a custom property (unlike the aspect
+	// ratio above) because it switches the preview box's background token as
+	// well as its `object-fit`, which a custom property can't do.
+	const isMediaContain = view.layout?.mediaFit === 'contain';
 	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
 	const titleField = fields.find(
 		( field ) => field.id === view?.titleField
@@ -445,16 +435,18 @@ export default function CompositeGrid< Item >( {
 												'compact',
 												'comfortable',
 											].includes( view.layout.density ),
+										'has-media-fit-contain': isMediaContain,
 									}
 								) }
 								previewSize={ view.layout?.previewSize }
+								style={ gridStyle }
 								aria-busy={ isLoading }
 								ref={ resizeObserverRef }
 							/>
 						}
 						role="feed"
 						focusWrap
-						// @ts-ignore
+						// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
 						inert={ inert }
 					>
 						{ /* Render placeholders for unloaded items in first row */ }
@@ -477,6 +469,7 @@ export default function CompositeGrid< Item >( {
 						) }
 						{ data.map( ( item ) => {
 							const itemId = getItemId( item );
+							const selectionProps = getSelectionProps( itemId );
 							// Use position from item for infinite scroll
 							const stablePosition = ( item as any ).position;
 							return (
@@ -498,6 +491,18 @@ export default function CompositeGrid< Item >( {
 											getItemId={ getItemId }
 											item={ item }
 											actions={ actions }
+											onMouseDown={ ( event ) => {
+												props.onMouseDown?.( event );
+												selectionProps.onMouseDown(
+													event
+												);
+											} }
+											onClickCapture={ ( event ) => {
+												props.onClickCapture?.( event );
+												selectionProps.onClickCapture(
+													event
+												);
+											} }
 											mediaField={ mediaField }
 											titleField={ titleField }
 											descriptionField={
@@ -526,18 +531,20 @@ export default function CompositeGrid< Item >( {
 				! isInfiniteScroll && (
 					<Composite
 						role="grid"
+						style={ gridStyle }
 						className={ clsx( 'dataviews-view-grid', className, {
 							[ `has-${ view.layout?.density }-density` ]:
 								view.layout?.density &&
 								[ 'compact', 'comfortable' ].includes(
 									view.layout.density
 								),
+							'has-media-fit-contain': isMediaContain,
 						} ) }
 						focusWrap
 						aria-busy={ isLoading }
 						aria-rowcount={ totalRows }
 						ref={ resizeObserverRef }
-						// @ts-ignore
+						// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
 						inert={ inert }
 					>
 						{ chunk( data, gridColumns ).map( ( row, i ) => (
@@ -561,6 +568,8 @@ export default function CompositeGrid< Item >( {
 							>
 								{ row.map( ( item ) => {
 									const itemId = getItemId( item );
+									const selectionProps =
+										getSelectionProps( itemId );
 									return (
 										<Composite.Item
 											key={ itemId }
@@ -584,6 +593,24 @@ export default function CompositeGrid< Item >( {
 													getItemId={ getItemId }
 													item={ item }
 													actions={ actions }
+													onMouseDown={ ( event ) => {
+														props.onMouseDown?.(
+															event
+														);
+														selectionProps.onMouseDown(
+															event
+														);
+													} }
+													onClickCapture={ (
+														event
+													) => {
+														props.onClickCapture?.(
+															event
+														);
+														selectionProps.onClickCapture(
+															event
+														);
+													} }
 													mediaField={ mediaField }
 													titleField={ titleField }
 													descriptionField={

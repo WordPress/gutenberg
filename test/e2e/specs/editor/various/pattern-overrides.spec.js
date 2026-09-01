@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Pattern Overrides', () => {
@@ -59,16 +56,21 @@ test.describe( 'Pattern Overrides', () => {
 				.click();
 
 			await editor.canvas
-				.getByRole( 'button', { name: 'Add default block' } )
+				.getByRole( 'document', { name: 'Add default block' } )
 				.click();
 			await page.keyboard.type( 'This paragraph can be edited' );
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( "This one can't" );
 
+			// Select the paragraph by clicking it. Focusing it
+			// programmatically does not move focus while the second editable
+			// root paragraph is selected and its wrapper holds focus (a nested
+			// editable element cannot take focus from an editing host
+			// ancestor).
 			await editor.canvas
 				.getByRole( 'document', { name: 'Block: Paragraph' } )
 				.filter( { hasText: 'This paragraph can be edited' } )
-				.focus();
+				.click();
 
 			await editor.clickBlockOptionsMenuItem( 'Rename' );
 			await page
@@ -152,8 +154,14 @@ test.describe( 'Pattern Overrides', () => {
 			} );
 			// Ensure the first pattern is selected.
 			await patternBlocks.first().selectText();
-			await expect( paragraphs.first() ).not.toHaveAttribute( 'inert' );
-			await expect( paragraphs.last() ).toHaveAttribute( 'inert' );
+			await expect( paragraphs.first() ).not.toHaveAttribute(
+				'inert',
+				'true'
+			);
+			await expect( paragraphs.last() ).toHaveAttribute(
+				'inert',
+				'true'
+			);
 
 			await expect( paragraphs.first() ).toHaveText(
 				'This paragraph can be edited'
@@ -490,16 +498,26 @@ test.describe( 'Pattern Overrides', () => {
 
 				// In zoomed out only the pattern block is editable,
 				// as in this scenario it's a section.
-				await expect( patternBlock ).not.toHaveAttribute( 'inert' );
+				await expect( patternBlock ).not.toHaveAttribute(
+					'inert',
+					'true'
+				);
 
 				// Ensure the pattern block is selected before checking the child blocks
 				// to ensure the click-through behavior isn't interfering.
 				await editor.selectBlocks( patternBlock );
 
-				await expect( blockWithOverrides ).toHaveAttribute( 'inert' );
-				await expect( blockWithBindings ).toHaveAttribute( 'inert' );
+				await expect( blockWithOverrides ).toHaveAttribute(
+					'inert',
+					'true'
+				);
+				await expect( blockWithBindings ).toHaveAttribute(
+					'inert',
+					'true'
+				);
 				await expect( blockWithoutOverridesOrBindings ).toHaveAttribute(
-					'inert'
+					'inert',
+					'true'
 				);
 			} );
 
@@ -510,10 +528,17 @@ test.describe( 'Pattern Overrides', () => {
 
 			await test.step( 'Zoomed out - pattern nested in a section', async () => {
 				// None of the pattern is editable in zoomed out when nested in a section.
-				await expect( blockWithOverrides ).toHaveAttribute( 'inert' );
-				await expect( blockWithBindings ).toHaveAttribute( 'inert' );
+				await expect( blockWithOverrides ).toHaveAttribute(
+					'inert',
+					'true'
+				);
+				await expect( blockWithBindings ).toHaveAttribute(
+					'inert',
+					'true'
+				);
 				await expect( blockWithoutOverridesOrBindings ).toHaveAttribute(
-					'inert'
+					'inert',
+					'true'
 				);
 			} );
 		} );

@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 import { isKeyboardEvent } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import { store as keyboardShortcutsStore } from '../store';
 
 /**

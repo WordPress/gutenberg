@@ -106,7 +106,7 @@ $transition-duration: 0.2s;
 	.components-disabled & {
 		.components-form-toggle__track {
 			background-color: $components-color-gray-100;
-			border-color: $components-color-gray-300;
+			border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
 
 			@media ( forced-colors: active ) {
 				border-color: GrayText;

@@ -1,22 +1,11 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { KeyboardEventHandler } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import {
 	__experimentalUseDragging as useDragging,
 	useIsomorphicLayoutEffect,
 } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import Controls from './controls';
 import FocalPoint from './focal-point';
 import Grid from './grid';
@@ -94,6 +83,7 @@ const GRID_OVERLAY_TIMEOUT = 600;
 export function FocalPointPicker( {
 	// Prevent passing to internal component.
 	__nextHasNoMarginBottom: _,
+	__next40pxDefaultSize: _next40pxDefaultSize,
 	autoPlay = true,
 	className,
 	help,
@@ -243,7 +233,6 @@ export function FocalPointPicker( {
 	};
 
 	const classes = clsx( 'components-focal-point-picker-control', className );
-	const Label = hideLabelFromVision ? VisuallyHidden : StyledLabel;
 
 	useUpdateEffect( () => {
 		setShowGridOverlay( true );
@@ -256,7 +245,12 @@ export function FocalPointPicker( {
 
 	return (
 		<Container { ...restProps } as="fieldset" className={ classes }>
-			{ !! label && <Label as="legend">{ label }</Label> }
+			{ !! label &&
+				( hideLabelFromVision ? (
+					<VisuallyHidden as="legend">{ label }</VisuallyHidden>
+				) : (
+					<StyledLabel as="legend">{ label }</StyledLabel>
+				) ) }
 			<MediaWrapper className="components-focal-point-picker-wrapper">
 				<MediaContainer
 					className="components-focal-point-picker"

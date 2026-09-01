@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
-import type { RefObject, ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
+import type { MutableRefObject, ReactNode } from 'react';
 import type { NoticeProps, NoticeAction } from '../notice/types';
 
 type SnackbarOnlyProps = {
@@ -25,7 +18,7 @@ type SnackbarOnlyProps = {
 	/**
 	 * A ref to the list that contains the snackbar.
 	 */
-	listRef?: RefObject< HTMLDivElement | null >;
+	listRef?: MutableRefObject< HTMLDivElement | null >;
 };
 
 export type SnackbarProps = Pick<

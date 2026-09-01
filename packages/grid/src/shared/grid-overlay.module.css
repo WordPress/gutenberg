@@ -78,5 +78,5 @@
 	height: var(--wp-grid-overlay-row-height);
 	box-sizing: border-box;
 	border-radius: var(--wpds-border-radius-lg);
-	background-color: var(--wp-grid-overlay-tile-bg, var(--wpds-color-bg-surface-neutral-weak));
+	background-color: var(--wp-grid-overlay-tile-bg, var(--wpds-color-background-surface-neutral-weak));
 }

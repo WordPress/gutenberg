@@ -2,6 +2,61 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Normalize special characters in exported pattern filenames to prevent broken or unreadable files. ([#77033](https://github.com/WordPress/gutenberg/pull/77033))
+
+### Internal
+
+-   Remove the template activation (`active_templates`) experiment checks from the rename, reset, and duplicate actions ([#82241](https://github.com/WordPress/gutenberg/pull/82241)).
+-   Remove unused dependencies `@wordpress/hooks`, `@wordpress/primitives`, `@wordpress/router`, etc. ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Update a source reference after its JSX file moved to the `.jsx` extension ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+-   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
+
+## 0.46.0 (2026-08-26)
+
+### Enhancements
+
+-   Export `build-style/*`, so the stylesheet can be imported as `@wordpress/fields/build-style/style.css` [#81769](https://github.com/WordPress/gutenberg/pull/81769)).
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81516](https://github.com/WordPress/gutenberg/pull/81516))
+-   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509), [#81514](https://github.com/WordPress/gutenberg/pull/81514), [#81515](https://github.com/WordPress/gutenberg/pull/81515))
+-   `parent`: Narrow the combobox `onChange` handler parameter to `string | null`, following the upstream `ComboboxControl` type fix that removed the accidental `undefined` from the callback type. ([#81568](https://github.com/WordPress/gutenberg/pull/81568))
+-   `CreateTemplatePartModal`: Migrate the `utils` helpers to TypeScript. ([#81808](https://github.com/WordPress/gutenberg/pull/81808))
+-   `MediaEdit`: Render the validity message with `ValidityIndicator` from `@wordpress/ui` instead of hand-rolled markup styled by `@wordpress/components` global class names. The valid state now shows the success icon rather than the error icon. ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574))
+
+## 0.45.0 (2026-08-12)
+
+### Bug Fixes
+
+-   `MediaEdit`: Decode HTML entities when displaying attachment titles. ([#81269](https://github.com/WordPress/gutenberg/pull/81269))
+
+### Internal
+
+-   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
+
+## 0.44.0 (2026-07-29)
+
+## 0.43.0 (2026-07-14)
+
+### Enhancements
+
+-   `Slug`: Use the emphasis font-weight token for help text ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+-   `MediaEdit`: Update validation error message to be announced by screen readers. ([#79600](https://github.com/WordPress/gutenberg/pull/79600))
+
+## 0.42.0 (2026-07-01)
+
+## 0.41.0 (2026-06-24)
+
+## 0.40.1 (2026-06-16)
+
+## 0.40.0 (2026-06-10)
+
 ### Code Quality
 
 -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).

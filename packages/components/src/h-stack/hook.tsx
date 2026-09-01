@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ReactElement } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import { hasConnectNamespace, useContextSystem } from '../context';
 import { FlexItem, useFlex } from '../flex';
@@ -29,7 +22,7 @@ export function useHStack( props: WordPressComponentProps< Props, 'div' > ) {
 		const _isSpacer = hasConnectNamespace( child, [ 'Spacer' ] );
 
 		if ( _isSpacer ) {
-			const childElement = child as ReactElement< typeof FlexItem >;
+			const childElement = child as ReactElement;
 			const _key = childElement.key || `hstack-${ index }`;
 
 			return <FlexItem isBlock key={ _key } { ...childElement.props } />;

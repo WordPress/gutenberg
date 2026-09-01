@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { swatch } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import ColorIndicator from '../color-indicator';
 import Icon from '../icon';
 import { getGradientFromCSSColors } from './utils';

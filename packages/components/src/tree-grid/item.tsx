@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import RovingTabIndexItem from './roving-tab-index-item';
 import type { RovingTabIndexItemProps } from './types';
 

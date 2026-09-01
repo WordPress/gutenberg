@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import memoize from 'memize';
-
-/**
- * WordPress dependencies
- */
 import { useMemo, useSyncExternalStore } from '@wordpress/element';
 import { addAction, removeAction } from '@wordpress/hooks';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
-
-/**
- * Internal dependencies
- */
 import { PluginContextProvider } from '../plugin-context';
 import { PluginErrorBoundary } from '../plugin-error-boundary';
 import { getPlugins } from '../../api';

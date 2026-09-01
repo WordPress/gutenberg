@@ -1,15 +1,11 @@
-/**
- * External dependencies
- */
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import deepFreeze from 'deep-freeze';
-
-/**
- * Internal dependencies
- */
+import '../../store';
 import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
 	cloneBlock,
+	cloneSanitizedBlock,
 	__experimentalCloneSanitizedBlock,
 	getPossibleBlockTransformations,
 	switchToBlockType,
@@ -26,6 +22,7 @@ import {
 	unregisterBlockType,
 	setGroupingBlockName,
 } from '../registration';
+import { logged as warningLoggedSet } from '../../../../warning/src/utils';
 
 const noop = () => {};
 
@@ -42,9 +39,9 @@ describe( 'block factory', () => {
 		title: 'block title',
 	};
 
-	beforeAll( () => {
-		// Load blocks store.
-		require( '../../store' );
+	beforeEach( () => {
+		// Reset warning logging so deduped warnings fire within each test.
+		warningLoggedSet.clear();
 	} );
 
 	afterEach( () => {
@@ -180,6 +177,28 @@ describe( 'block factory', () => {
 			} );
 
 			expect( block.attributes ).toEqual( {} );
+		} );
+
+		it( 'should attach innerContent for the Custom HTML block', () => {
+			registerBlockType( 'core/html', defaultBlockSettings );
+
+			const block = createBlock( 'core/html', {}, [], [ '<div></div>' ] );
+
+			expect( block.innerContent ).toEqual( [ '<div></div>' ] );
+		} );
+
+		it( 'should ignore innerContent and warn for other blocks', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+
+			const block = createBlock(
+				'core/test-block',
+				{},
+				[],
+				[ '<div></div>' ]
+			);
+
+			expect( block.innerContent ).toBeUndefined();
+			expect( console ).toHaveWarned();
 		} );
 	} );
 
@@ -434,8 +453,8 @@ describe( 'block factory', () => {
 		} );
 	} );
 
-	describe( '__experimentalCloneSanitizedBlock', () => {
-		it( 'should sanitize attributes not defined in the block type', () => {
+	describe( 'cloneSanitizedBlock', () => {
+		beforeEach( () => {
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
 				attributes: {
@@ -444,7 +463,21 @@ describe( 'block factory', () => {
 					},
 				},
 			} );
+		} );
 
+		it( 'sanitizes attributes not defined in the block type', () => {
+			const block = createBlock( 'core/test-block', {
+				notDefined: 'not-defined',
+			} );
+
+			const clonedBlock = cloneSanitizedBlock( block, {
+				notDefined2: 'not-defined-2',
+			} );
+
+			expect( clonedBlock.attributes ).toEqual( {} );
+		} );
+
+		it( 'keeps the experimental function as a deprecated alias', () => {
 			const block = createBlock( 'core/test-block', {
 				notDefined: 'not-defined',
 			} );
@@ -454,6 +487,9 @@ describe( 'block factory', () => {
 			} );
 
 			expect( clonedBlock.attributes ).toEqual( {} );
+			expect( console ).toHaveWarnedWith(
+				'__experimentalCloneSanitizedBlock is deprecated since version 7.1. Please use cloneSanitizedBlock instead.'
+			);
 		} );
 	} );
 
@@ -1040,7 +1076,7 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'for a non multiblock transform, the isMatch function receives the source block’s attributes object and the block object as its arguments', () => {
-			const isMatch = jest.fn();
+			const isMatch = vi.fn();
 
 			registerBlockType( 'core/updated-text-block', {
 				apiVersion: 3,
@@ -1075,7 +1111,7 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'for a multiblock transform, the isMatch function receives an array containing every source block’s attributes and an array of source blocks as its arguments', () => {
-			const isMatch = jest.fn();
+			const isMatch = vi.fn();
 
 			registerBlockType( 'core/updated-text-block', {
 				apiVersion: 3,
@@ -1964,7 +2000,7 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'should call "__experimentalConvert" with mixed block types and wildcard', () => {
-			const convertSpy = jest.fn( ( blocks ) => {
+			const convertSpy = vi.fn( ( blocks ) => {
 				const groupInnerBlocks = blocks.map(
 					( { name, attributes, innerBlocks } ) => {
 						return createBlock( name, attributes, innerBlocks );
@@ -1977,7 +2013,7 @@ describe( 'block factory', () => {
 					groupInnerBlocks
 				);
 			} );
-			const transformSpy = jest.fn();
+			const transformSpy = vi.fn();
 
 			registerBlockType( 'core/test-group-block', {
 				apiVersion: 3,
@@ -2028,7 +2064,7 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'should call "__experimentalConvert" with same block types', () => {
-			const convertSpy = jest.fn( ( blocks ) => {
+			const convertSpy = vi.fn( ( blocks ) => {
 				const groupInnerBlocks = blocks.map(
 					( { name, attributes, innerBlocks } ) => {
 						return createBlock( name, attributes, innerBlocks );
@@ -2041,7 +2077,7 @@ describe( 'block factory', () => {
 					groupInnerBlocks
 				);
 			} );
-			const transformSpy = jest.fn();
+			const transformSpy = vi.fn();
 
 			registerBlockType( 'core/test-group-block', {
 				apiVersion: 3,
@@ -2089,7 +2125,7 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'should not call "__experimentalConvert" with non-matching block types', () => {
-			const convertSpy = jest.fn( ( blocks ) => {
+			const convertSpy = vi.fn( ( blocks ) => {
 				const groupInnerBlocks = blocks.map(
 					( { name, attributes, innerBlocks } ) => {
 						return createBlock( name, attributes, innerBlocks );
@@ -2102,7 +2138,7 @@ describe( 'block factory', () => {
 					groupInnerBlocks
 				);
 			} );
-			const transformSpy = jest.fn();
+			const transformSpy = vi.fn();
 
 			registerBlockType( 'core/test-group-block', {
 				apiVersion: 3,
@@ -2150,7 +2186,7 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'should prefer "__experimentalConvert" method over "transform" method when running a transformation', () => {
-			const convertSpy = jest.fn( ( blocks ) => {
+			const convertSpy = vi.fn( ( blocks ) => {
 				const groupInnerBlocks = blocks.map(
 					( { name, attributes, innerBlocks } ) => {
 						return createBlock( name, attributes, innerBlocks );
@@ -2163,7 +2199,7 @@ describe( 'block factory', () => {
 					groupInnerBlocks
 				);
 			} );
-			const transformSpy = jest.fn();
+			const transformSpy = vi.fn();
 
 			registerBlockType( 'core/test-group-block', {
 				apiVersion: 3,

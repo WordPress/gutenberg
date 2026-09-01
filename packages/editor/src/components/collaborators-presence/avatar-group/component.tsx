@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { Children } from '@wordpress/element';
 import { sprintf, _n } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { AvatarGroupProps } from './types';
 
 function AvatarGroup( {

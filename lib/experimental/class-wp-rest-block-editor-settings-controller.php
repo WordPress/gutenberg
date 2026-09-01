@@ -352,8 +352,7 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 			$hook_suffix = 'block-editor-assets';
 
 			// Remove unwanted scripts/styles.
-			remove_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_command_palette_assets', 9 );
-			remove_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_command_palette_assets' );
+			remove_action( 'admin_enqueue_scripts', 'wp_enqueue_command_palette_assets' );
 			remove_action( 'admin_enqueue_scripts', 'wp_auth_check_load' );
 			remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
 			remove_action( 'admin_print_styles', 'print_emoji_styles' );
@@ -399,6 +398,16 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 			wp_enqueue_style( 'wp-block-library' );
 			wp_enqueue_style( 'wp-format-library' );
 			wp_enqueue_media();
+
+			/*
+			 * Block style variations provided by the theme's theme.json
+			 * partials are registered lazily, when the theme JSON resolver
+			 * first runs in a request. Nothing has run it in this REST
+			 * request yet, so prime it — otherwise the block styles registry
+			 * is still empty when `enqueue_editor_block_styles_assets()`
+			 * serializes it into the `wp-block-styles` inline script below.
+			 */
+			WP_Theme_JSON_Resolver_Gutenberg::get_theme_data();
 
 			do_action( 'enqueue_block_editor_assets' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 

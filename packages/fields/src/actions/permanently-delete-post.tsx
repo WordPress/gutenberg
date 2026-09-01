@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
@@ -15,10 +12,6 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
 import { getItemTitle, isTemplateOrTemplatePart } from './utils';
 import type { CoreDataError, PostWithPermissions } from '../types';
 

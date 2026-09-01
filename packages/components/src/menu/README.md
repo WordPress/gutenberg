@@ -19,7 +19,7 @@ component, and the `Menu.Popover` component.
 
 ### `as`
 
- - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | "base" | "bdi" | "bdo" | "big" | "blockquote" | "body" | "br" | "button" | "canvas" | ... 517 more ...`
+ - Type: `any`
  - Required: No
 
 The HTML element or React component to render the component as.
@@ -64,7 +64,7 @@ A callback that gets called when the `open` state changes.
 
 ### `placement`
 
- - Type: `"top" | "bottom" | "left" | "right" | "top-start" | "bottom-start" | "left-start" | "right-start" | "top-end" | "bottom-end" | ...`
+ - Type: `"left" | "right" | "top" | "bottom" | "left-start" | "right-start" | "top-start" | "bottom-start" | "left-end" | "right-end" | ...`
  - Required: No
  - Default: `'bottom-start' for root-level menus, 'right-start' for submenus`
 
@@ -120,7 +120,7 @@ make disabled elements still accessible via keyboard.
 
 ##### `render`
 
- - Type: `ReactElement<unknown, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
+ - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
  - Required: No
 
 Allows the component to be rendered as a different HTML element or React
@@ -245,7 +245,7 @@ The contents of the menu item's prefix, such as an icon.
 
 ##### `render`
 
- - Type: `ReactElement<unknown, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
+ - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
  - Required: No
 
 Allows the component to be rendered as a different HTML element or React
@@ -306,7 +306,7 @@ that don't support the native `disabled` attribute.
 The checked state of the radio menu item when it is initially rendered.
 Use when not wanting to control its checked state.
 
-Note: this prop will be overriden by the `checked` prop, if it is defined.
+Note: this prop will be overridden by the `checked` prop, if it is defined.
 
 ##### `hideOnClick`
 
@@ -329,14 +329,14 @@ The radio item's name.
 
 ##### `onChange`
 
- - Type: `BivariantCallback<(event: ChangeEvent<HTMLInputElement, Element>) => void>`
+ - Type: `BivariantCallback<(event: ChangeEvent<HTMLInputElement>) => void>`
  - Required: No
 
 A function that is called when the checkbox's checked state changes.
 
 ##### `render`
 
- - Type: `ReactElement<unknown, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
+ - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
  - Required: No
 
 Allows the component to be rendered as a different HTML element or React
@@ -404,7 +404,7 @@ that don't support the native `disabled` attribute.
 The checked state of the checkbox menu item when it is initially rendered.
 Use when not wanting to control its checked state.
 
-Note: this prop will be overriden by the `checked` prop, if it is defined.
+Note: this prop will be overridden by the `checked` prop, if it is defined.
 
 ##### `hideOnClick`
 
@@ -427,14 +427,14 @@ The checkbox menu item's name.
 
 ##### `onChange`
 
- - Type: `ChangeEventHandler<HTMLInputElement, HTMLInputElement>`
+ - Type: `ChangeEventHandler<HTMLInputElement>`
  - Required: No
 
 A function that is called when the checkbox's checked state changes.
 
 ##### `render`
 
- - Type: `ReactElement<unknown, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
+ - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
  - Required: No
 
 Allows the component to be rendered as a different HTML element or React
@@ -466,7 +466,7 @@ Renders a menu item's label text. It should be wrapped with `Menu.Item`,
 
 ##### `as`
 
- - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | ...`
+ - Type: `keyof IntrinsicElements | JSXElementConstructor<any>`
  - Required: No
 
 The HTML element or React component to render the component as.
@@ -480,7 +480,7 @@ Renders a menu item's help text. It should be wrapped with `Menu.Item`,
 
 ##### `as`
 
- - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | ...`
+ - Type: `keyof IntrinsicElements | JSXElementConstructor<any>`
  - Required: No
 
 The HTML element or React component to render the component as.
@@ -575,7 +575,7 @@ The contents of the menu item's prefix, such as an icon.
 
 ##### `render`
 
- - Type: `ReactElement<unknown, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
+ - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
  - Required: No
 
 Allows the component to be rendered as a different HTML element or React

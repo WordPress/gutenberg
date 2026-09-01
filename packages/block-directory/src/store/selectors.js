@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
