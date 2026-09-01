@@ -16,6 +16,10 @@ jobs:
             issues: write
             pull-requests: write
         if: ${{ github.repository == 'WordPress/gutenberg' }}
+        outputs:
+            welcome-prompt: ${{ steps.automation.outputs.welcome-prompt }}
+            account-link-prompt: ${{ steps.automation.outputs.first-time-contributor-prompt }}
+            account-link-pr-number: ${{ steps.automation.outputs.first-time-contributor-pr-number }}
 
         steps:
             # Checkout defaults to using the branch which triggered the event, which
@@ -30,5 +34,71 @@ jobs:
               uses: ./.github/setup-node
 
             - uses: ./packages/project-management-automation
+              id: automation
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
+
+    welcome:
+        name: Welcome a first-time contributor
+        needs: pull-request-automation
+        # Only a pull request opened by a first-time contributor gets a welcome.
+        if: ${{ !cancelled() && needs.pull-request-automation.outputs.welcome-prompt }}
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+            pull-requests: write
+        timeout-minutes: 5
+        # Shared with every other writer of this comment. See bundle-size.yml.
+        concurrency:
+            group: pr-meta-${{ github.event.pull_request.number }}
+            cancel-in-progress: false
+            queue: max
+
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  ref: trunk
+                  sparse-checkout: tools/pr-meta
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - uses: ./tools/pr-meta
+              with:
+                  repo-token: ${{ secrets.GITHUB_TOKEN }}
+                  section: welcome
+                  body: ${{ needs.pull-request-automation.outputs.welcome-prompt }}
+                  pr-number: ${{ github.event.pull_request.number }}
+
+    account-link:
+        name: Prompt for a WordPress.org profile
+        needs: pull-request-automation
+        # Only a push that merged a first pull request produces a prompt.
+        if: ${{ !cancelled() && needs.pull-request-automation.outputs.account-link-pr-number }}
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+            pull-requests: write
+        timeout-minutes: 5
+        # Shared with every other writer of this comment. See bundle-size.yml.
+        # A push payload has no `github.event.number`, so the pull request comes
+        # from the job above: keying on an empty value would share one lock with
+        # every unrelated push.
+        concurrency:
+            group: pr-meta-${{ needs.pull-request-automation.outputs.account-link-pr-number }}
+            cancel-in-progress: false
+            queue: max
+
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  ref: trunk
+                  sparse-checkout: tools/pr-meta
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - uses: ./tools/pr-meta
+              with:
+                  repo-token: ${{ secrets.GITHUB_TOKEN }}
+                  section: account-link
+                  body: ${{ needs.pull-request-automation.outputs.account-link-prompt }}
+                  pr-number: ${{ needs.pull-request-automation.outputs.account-link-pr-number }}

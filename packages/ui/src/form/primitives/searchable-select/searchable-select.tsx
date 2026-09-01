@@ -80,7 +80,7 @@ export const SearchableSelect = forwardRef<
 			</Combobox.Trigger>
 
 			<Combobox.Popup
-				popupWidth={ popupWidth }
+				width={ popupWidth }
 				aria-label={ ariaLabel }
 				aria-labelledby={ ariaLabelledby }
 			>
