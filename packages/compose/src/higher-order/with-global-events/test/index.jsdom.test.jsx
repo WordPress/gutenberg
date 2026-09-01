@@ -1,4 +1,4 @@
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { Component } from '@wordpress/element';
 import withGlobalEvents from '../';
@@ -33,12 +33,12 @@ describe( 'withGlobalEvents', () => {
 		}
 	}
 
-	beforeAll( () => {
-		vi.spyOn( OriginalComponent.prototype, 'handleResize' );
-	} );
-
 	beforeEach( () => {
-		vi.clearAllMocks();
+		vi.spyOn( OriginalComponent.prototype, 'handleResize' );
+		if ( Listener._instance ) {
+			vi.spyOn( Listener._instance, 'add' );
+			vi.spyOn( Listener._instance, 'remove' );
+		}
 	} );
 
 	it( 'renders with original component', () => {

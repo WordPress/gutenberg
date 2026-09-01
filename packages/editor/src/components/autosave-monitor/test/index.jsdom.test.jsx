@@ -1,12 +1,4 @@
-import {
-	afterAll,
-	beforeAll,
-	beforeEach,
-	describe,
-	expect,
-	it,
-	vi,
-} from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import { useSelect, useDispatch } from '@wordpress/data';
 import AutosaveMonitor from '../';
@@ -40,15 +32,10 @@ function runAutosaveTimer() {
 }
 
 describe( 'AutosaveMonitor', () => {
-	beforeAll( () => {
+	beforeEach( () => {
 		vi.useFakeTimers();
 		vi.spyOn( global, 'clearInterval' );
 		vi.spyOn( global, 'setInterval' );
-	} );
-
-	afterAll( () => {
-		vi.restoreAllMocks();
-		vi.useRealTimers();
 	} );
 
 	beforeEach( () => {

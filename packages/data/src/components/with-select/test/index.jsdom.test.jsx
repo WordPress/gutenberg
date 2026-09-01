@@ -1,6 +1,14 @@
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import {
+	afterAll,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
 import { compose } from '@wordpress/compose';
 import { Component, createRef, forwardRef } from '@wordpress/element';
 import withSelect from '../';
@@ -128,23 +136,6 @@ describe( 'withSelect', () => {
 	} );
 
 	describe( 'expected behaviour when dispatching actions during mount', () => {
-		const testRegistry = createRegistry();
-		testRegistry.registerStore( 'counter', {
-			reducer: ( state = 0, action ) => {
-				if ( action.type === 'increment' ) {
-					return state + 1;
-				}
-
-				return state;
-			},
-			selectors: {
-				getCount: ( state ) => state,
-			},
-			actions: {
-				increment: () => ( { type: 'increment' } ),
-			},
-		} );
-
 		// @todo Should we allow this behaviour? Side-effects
 		// on mount are discouraged in React (breaks Suspense and React Async Mode)
 		// leaving in place for now under the assumption there's current usage
@@ -165,20 +156,41 @@ describe( 'withSelect', () => {
 			}
 		}
 
-		const renderSpy = vi.spyOn( OriginalComponent.prototype, 'render' );
+		let testRegistry;
+		let renderSpy;
+		let mapSelectToProps;
+		let DataBoundComponent;
 
-		const mapSelectToProps = vi.fn( ( _select ) => ( {
-			count: _select( 'counter' ).getCount(),
-		} ) );
+		beforeEach( () => {
+			testRegistry = createRegistry();
+			testRegistry.registerStore( 'counter', {
+				reducer: ( state = 0, action ) => {
+					if ( action.type === 'increment' ) {
+						return state + 1;
+					}
 
-		const mapDispatchToProps = vi.fn( ( _dispatch ) => ( {
-			increment: _dispatch( 'counter' ).increment,
-		} ) );
+					return state;
+				},
+				selectors: {
+					getCount: ( state ) => state,
+				},
+				actions: {
+					increment: () => ( { type: 'increment' } ),
+				},
+			} );
 
-		const DataBoundComponent = compose( [
-			withSelect( mapSelectToProps ),
-			withDispatch( mapDispatchToProps ),
-		] )( OriginalComponent );
+			renderSpy = vi.spyOn( OriginalComponent.prototype, 'render' );
+			mapSelectToProps = vi.fn( ( _select ) => ( {
+				count: _select( 'counter' ).getCount(),
+			} ) );
+			const mapDispatchToProps = vi.fn( ( _dispatch ) => ( {
+				increment: _dispatch( 'counter' ).increment,
+			} ) );
+			DataBoundComponent = compose( [
+				withSelect( mapSelectToProps ),
+				withDispatch( mapDispatchToProps ),
+			] )( OriginalComponent );
+		} );
 
 		it( 'should rerun if had dispatched action during mount', () => {
 			const { unmount } = render(
@@ -199,6 +211,12 @@ describe( 'withSelect', () => {
 		} );
 
 		it( 'should rerun on unmount and mount', () => {
+			const { unmount } = render(
+				<RegistryProvider value={ testRegistry }>
+					<DataBoundComponent />
+				</RegistryProvider>
+			);
+			unmount();
 			render(
 				<RegistryProvider value={ testRegistry }>
 					<DataBoundComponent />
@@ -206,7 +224,7 @@ describe( 'withSelect', () => {
 			);
 
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '4' );
-			// Expected an additional 3 times because of the unmount and remount:
+			// Expected 6 times across the initial mount and remount:
 			// - 1 on initial render
 			// - 1 on effect before subscription set.
 			// - once for the rerender because of the mapOutput change detected.

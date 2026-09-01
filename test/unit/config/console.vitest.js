@@ -92,9 +92,9 @@ function setConsoleMethodSpy( [ methodName, matcherName ] ) {
 	function resetSpy() {
 		// eslint-disable-next-line no-console
 		if ( console[ methodName ] !== spy ) {
-			spy = vi
-				.spyOn( console, methodName )
-				.mockName( `console.${ methodName }` );
+			spy = vi.fn().mockName( `console.${ methodName }` );
+			// eslint-disable-next-line no-console
+			console[ methodName ] = spy;
 		}
 
 		spy.mockReset();

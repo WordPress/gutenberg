@@ -17,6 +17,8 @@ vi.mock( import( '../shared/filter-message' ), () => ( {
 	default: vi.fn( ( message: string ) => message ),
 } ) );
 
+const domReadyCalledOnImport = vi.mocked( domReady ).mock.calls.length > 0;
+
 describe( 'speak', () => {
 	let containerPolite = document.getElementById( 'a11y-speak-polite' );
 	let containerAssertive = document.getElementById( 'a11y-speak-assertive' );
@@ -28,7 +30,7 @@ describe( 'speak', () => {
 
 	describe( 'on import', () => {
 		it( 'should call domReady', () => {
-			expect( domReady ).toHaveBeenCalled();
+			expect( domReadyCalledOnImport ).toBe( true );
 		} );
 	} );
 

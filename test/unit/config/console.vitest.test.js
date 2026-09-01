@@ -76,9 +76,9 @@ describe( 'Vitest console matchers', () => {
 	} );
 
 	describe( 'when a test restores all mocks', () => {
-		test( 'restores the shared console spies', () => {
+		test( 'keeps the shared console spies active', () => {
 			vi.restoreAllMocks();
-			expect( vi.isMockFunction( console.error ) ).toBe( false );
+			expect( vi.isMockFunction( console.error ) ).toBe( true );
 		} );
 
 		test( 'reinstalls the shared console spies before the next test', () => {

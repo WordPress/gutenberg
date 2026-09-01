@@ -1,12 +1,4 @@
-import {
-	afterAll,
-	afterEach,
-	beforeAll,
-	describe,
-	expect,
-	it,
-	vi,
-} from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
@@ -92,7 +84,7 @@ describe( 'Calendar', () => {
 	let prevMonth: Date;
 	let prevPrevMonth: Date;
 
-	beforeAll( () => {
+	beforeEach( () => {
 		vi.useFakeTimers( { toFake: [ 'Date' ] } );
 		// For consistent tests, set the system time to a fixed date:
 		// Thursday, May 15, 2025, 20:00 UTC
@@ -105,10 +97,6 @@ describe( 'Calendar', () => {
 		nextNextMonth = startOfMonth( addMonths( today, 2 ) );
 		prevMonth = startOfMonth( subMonths( today, 1 ) );
 		prevPrevMonth = startOfMonth( subMonths( today, 2 ) );
-	} );
-
-	afterAll( () => {
-		vi.useRealTimers();
 	} );
 
 	afterEach( async () => {
