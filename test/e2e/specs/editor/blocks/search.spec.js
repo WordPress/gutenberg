@@ -17,6 +17,76 @@ test.describe( 'Search', () => {
 		await requestUtils.deleteAllMenus();
 	} );
 
+	test( 'applies the width to the inside wrapper verbatim, whatever the unit', async ( {
+		editor,
+	} ) => {
+		// The width used to be handed to a ResizableBox, which appended `px`
+		// to any unit it did not recognise and turned `20em` into `20empx`.
+		await editor.insertBlock( {
+			name: 'core/search',
+			attributes: { style: { dimensions: { width: '20em' } } },
+		} );
+
+		const wrapper = editor.canvas.locator(
+			'.wp-block-search__inside-wrapper'
+		);
+
+		await expect( wrapper ).toHaveAttribute( 'style', /width:\s*20em/ );
+	} );
+
+	test( 'leaves the width alone when the block has none set', async ( {
+		editor,
+	} ) => {
+		// An inline width of `auto` would override anything coming from
+		// Global Styles or the stylesheet.
+		await editor.insertBlock( { name: 'core/search' } );
+
+		const wrapper = editor.canvas.locator(
+			'.wp-block-search__inside-wrapper'
+		);
+
+		await expect( wrapper ).not.toHaveAttribute( 'style', /width:/ );
+	} );
+
+	test( 'stores a pixel width after dragging the resize handle', async ( {
+		page,
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/search',
+			attributes: { style: { dimensions: { width: '300px' } } },
+		} );
+
+		const searchBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Search',
+		} );
+		await searchBlock.click();
+
+		const handle = editor.canvas.locator(
+			'.components-resizable-box__handle-right'
+		);
+		await expect( handle ).toBeVisible();
+
+		const handleBox = await handle.boundingBox();
+		await page.mouse.move(
+			handleBox.x + handleBox.width / 2,
+			handleBox.y + handleBox.height / 2
+		);
+		await page.mouse.down();
+		await page.mouse.move(
+			handleBox.x + handleBox.width / 2 - 100,
+			handleBox.y + handleBox.height / 2,
+			{ steps: 10 }
+		);
+		await page.mouse.up();
+
+		const [ block ] = await editor.getBlocks();
+		expect( block.attributes.style.dimensions.width ).toMatch( /^\d+px$/ );
+		expect(
+			parseInt( block.attributes.style.dimensions.width, 10 )
+		).toBeLessThan( 300 );
+	} );
+
 	test( 'should auto-configure itself to sensible defaults when inserted into a Navigation block', async ( {
 		page,
 		editor,

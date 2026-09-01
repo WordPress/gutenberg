@@ -7,6 +7,22 @@
 }
 
 .wp-block-search {
+	// The resize handles are rendered in an overlay so that re-resizable does
+	// not put a width on the wrapper and hide whatever CSS resolved to.
+	.wp-block-search__inside-wrapper {
+		position: relative;
+	}
+
+	.wp-block-search__resizer {
+		// The overlay only carries handles, so it must not intercept clicks
+		// meant for the field or the button.
+		pointer-events: none;
+
+		.components-resizable-box__handle {
+			pointer-events: auto;
+		}
+	}
+
 	:where(.wp-block-search__button) {
 		height: auto;
 		border-radius: initial;

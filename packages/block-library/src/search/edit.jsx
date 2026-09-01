@@ -11,7 +11,9 @@ import {
 	useSettings,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useMemo, useRef } from '@wordpress/element';
+import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
+import { useResizeObserver } from '@wordpress/compose';
+import { kebabCase } from '@wordpress/kebab-case';
 import {
 	SelectControl,
 	ToggleControl,
@@ -123,10 +125,9 @@ export default function SearchEdit( {
 	}
 
 	const colorProps = useColorProps( attributes );
-	const [ fluidTypographySettings, layout, dimensionSizes ] = useSettings(
+	const [ fluidTypographySettings, layout ] = useSettings(
 		'typography.fluid',
-		'layout',
-		'dimensions.dimensionSizes'
+		'layout'
 	);
 	const typographyProps = useTypographyProps( attributes, {
 		typography: {
@@ -144,21 +145,42 @@ export default function SearchEdit( {
 	const searchFieldRef = useRef();
 	const buttonRef = useRef();
 
-	// The width control writes a CSS length, which may be a preset reference.
-	// Resolve it so the resize handles have a real length to work from.
+	// The width is applied to the inside wrapper as a plain CSS length, the
+	// same way `styles_for_block_core_search()` does on the server. Leaving it
+	// to CSS is what lets Global Styles, `em`, `rem` and preset values behave
+	// in the editor the way they do on the front end.
 	const width = style?.dimensions?.width;
-	const resolvedWidth = useMemo( () => {
-		if ( ! width || ! width.startsWith( DIMENSION_PRESET_PREFIX ) ) {
-			return width;
+	const widthStyle = useMemo( () => {
+		// '0' is the Width control's "None" step, not a zero-width field.
+		if ( ! width || '0' === width ) {
+			return undefined;
 		}
-		const slug = width.slice( DIMENSION_PRESET_PREFIX.length );
-		const preset = [
-			...( dimensionSizes?.custom ?? [] ),
-			...( dimensionSizes?.theme ?? [] ),
-			...( dimensionSizes?.default ?? [] ),
-		].find( ( size ) => size.slug === slug );
-		return preset?.size ?? width;
-	}, [ width, dimensionSizes ] );
+		if ( width.startsWith( DIMENSION_PRESET_PREFIX ) ) {
+			const slug = kebabCase(
+				width.slice( DIMENSION_PRESET_PREFIX.length )
+			);
+			return `var(--wp--preset--dimension--${ slug })`;
+		}
+		return width;
+	}, [ width ] );
+
+	// The resize handles sit in an overlay rather than on the wrapper itself.
+	// re-resizable always writes a width to its own element, so anything it
+	// renders in the flow would overwrite whatever CSS resolved to. Measuring
+	// the wrapper and sizing the overlay to match keeps the handles in the
+	// right place without touching the wrapper's own width.
+	const [ wrapperSize, setWrapperSize ] = useState( null );
+	const observeWrapper = useResizeObserver(
+		( [ entry ] ) => {
+			const { offsetWidth, offsetHeight } = entry.target;
+			setWrapperSize( { width: offsetWidth, height: offsetHeight } );
+		},
+		{ box: 'border-box' }
+	);
+
+	// Held while dragging so the wrapper follows the handle without writing an
+	// attribute on every pointer move.
+	const [ temporaryWidth, setTemporaryWidth ] = useState( null );
 
 	const setWidth = ( nextWidth ) => {
 		setAttributes( {
@@ -546,35 +568,47 @@ export default function SearchEdit( {
 					/>
 				) }
 
-				<ResizableBox
-					size={ {
-						width:
-							! resolvedWidth || '0' === resolvedWidth
-								? 'auto'
-								: resolvedWidth,
-						height: 'auto',
-					} }
+				<div
+					ref={ observeWrapper }
 					className={ clsx(
 						'wp-block-search__inside-wrapper',
 						isButtonPositionInside
 							? borderProps.className
 							: undefined
 					) }
-					style={ getWrapperStyles() }
-					enable={ getResizableSides() }
-					onResizeStart={ ( event, direction, elt ) => {
-						// Pin the current rendered width in pixels so dragging
-						// starts from where the block is, whatever unit or
-						// preset it was set with.
-						setWidth( `${ parseInt( elt.offsetWidth, 10 ) }px` );
-						toggleSelection( false );
+					style={ {
+						...getWrapperStyles(),
+						width: temporaryWidth ?? widthStyle,
 					} }
-					onResizeStop={ ( event, direction, elt ) => {
-						setWidth( `${ parseInt( elt.offsetWidth, 10 ) }px` );
-						toggleSelection( true );
-					} }
-					showHandle={ isSelected }
 				>
+					{ isSelected && wrapperSize && (
+						<ResizableBox
+							className="wp-block-search__resizer"
+							size={ wrapperSize }
+							// The wrapper is the positioned ancestor, so the
+							// overlay lines up with it exactly.
+							style={ {
+								position: 'absolute',
+								top: 0,
+								left: 0,
+							} }
+							enable={ getResizableSides() }
+							onResizeStart={ () => toggleSelection( false ) }
+							onResize={ ( event, direction, elt ) =>
+								setTemporaryWidth(
+									`${ parseInt( elt.offsetWidth, 10 ) }px`
+								)
+							}
+							onResizeStop={ ( event, direction, elt ) => {
+								setWidth(
+									`${ parseInt( elt.offsetWidth, 10 ) }px`
+								);
+								setTemporaryWidth( null );
+								toggleSelection( true );
+							} }
+							showHandle
+						/>
+					) }
 					{ ( isButtonPositionInside ||
 						isButtonPositionOutside ||
 						hasOnlyButton ) && (
@@ -585,7 +619,7 @@ export default function SearchEdit( {
 					) }
 
 					{ hasNoButton && renderTextField() }
-				</ResizableBox>
+				</div>
 			</Wrapper>
 		</>
 	);
