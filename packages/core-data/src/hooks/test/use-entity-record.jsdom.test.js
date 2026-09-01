@@ -1,7 +1,8 @@
 import triggerFetch from '@wordpress/api-fetch';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 jest.mock( '@wordpress/api-fetch' );
-import { act, render, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
+import { createElement } from '@wordpress/element';
 import { store as coreDataStore } from '../../index';
 import useEntityRecord from '../use-entity-record';
 
@@ -14,6 +15,12 @@ describe( 'useEntityRecord', () => {
 		triggerFetch.mockReset();
 	} );
 
+	function renderHookWithRegistry( hook, options = {} ) {
+		const Wrapper = ( { children } ) =>
+			createElement( RegistryProvider, { value: registry }, children );
+		return renderHook( hook, { wrapper: Wrapper, ...options } );
+	}
+
 	const TEST_RECORD = { id: 1, hello: 'world' };
 	const TEST_RECORD_RESPONSE = { json: () => Promise.resolve( TEST_RECORD ) };
 
@@ -21,18 +28,11 @@ describe( 'useEntityRecord', () => {
 		// Provide response
 		triggerFetch.mockImplementation( () => TEST_RECORD_RESPONSE );
 
-		let data;
-		const TestComponent = () => {
-			data = useEntityRecord( 'root', 'widget', 1 );
-			return <div />;
-		};
-		render(
-			<RegistryProvider value={ registry }>
-				<TestComponent />
-			</RegistryProvider>
+		const { result } = renderHookWithRegistry( () =>
+			useEntityRecord( 'root', 'widget', 1 )
 		);
 
-		expect( data ).toEqual( {
+		expect( result.current ).toEqual( {
 			edit: expect.any( Function ),
 			editedRecord: false,
 			hasEdits: false,
@@ -53,7 +53,7 @@ describe( 'useEntityRecord', () => {
 			} )
 		);
 
-		expect( data ).toEqual( {
+		expect( result.current ).toEqual( {
 			edit: expect.any( Function ),
 			editedRecord: { hello: 'world', id: 1 },
 			hasEdits: false,
@@ -71,19 +71,12 @@ describe( 'useEntityRecord', () => {
 		// Provide response
 		triggerFetch.mockImplementation( () => TEST_RECORD_RESPONSE );
 
-		let widget;
-		const TestComponent = () => {
-			widget = useEntityRecord( 'root', 'widget', 1 );
-			return <div />;
-		};
-		render(
-			<RegistryProvider value={ registry }>
-				<TestComponent />
-			</RegistryProvider>
+		const { result } = renderHookWithRegistry( () =>
+			useEntityRecord( 'root', 'widget', 1 )
 		);
 
 		await waitFor( () =>
-			expect( widget ).toEqual( {
+			expect( result.current ).toEqual( {
 				edit: expect.any( Function ),
 				editedRecord: { hello: 'world', id: 1 },
 				hasEdits: false,
@@ -98,31 +91,29 @@ describe( 'useEntityRecord', () => {
 		);
 
 		await act( async () => {
-			widget.edit( { hello: 'foo' } );
+			result.current.edit( { hello: 'foo' } );
 		} );
 
-		await waitFor( () => expect( widget.hasEdits ).toEqual( true ) );
+		await waitFor( () =>
+			expect( result.current.hasEdits ).toEqual( true )
+		);
 
-		expect( widget.record ).toEqual( { hello: 'world', id: 1 } );
-		expect( widget.editedRecord ).toEqual( { hello: 'foo', id: 1 } );
-		expect( widget.edits ).toEqual( { hello: 'foo' } );
+		expect( result.current.record ).toEqual( { hello: 'world', id: 1 } );
+		expect( result.current.editedRecord ).toEqual( {
+			hello: 'foo',
+			id: 1,
+		} );
+		expect( result.current.edits ).toEqual( { hello: 'foo' } );
 	} );
 
 	it( 'does not resolve entity record when disabled via options', async () => {
 		triggerFetch.mockImplementation( () => TEST_RECORD_RESPONSE );
 
-		let data;
-		const TestComponent = ( { enabled } ) => {
-			data = useEntityRecord( 'root', 'widget', 1, { enabled } );
-			return <div />;
-		};
-		const UI = ( { enabled } ) => (
-			<RegistryProvider value={ registry }>
-				<TestComponent enabled={ enabled } />
-			</RegistryProvider>
+		const { result, rerender } = renderHookWithRegistry(
+			( { enabled } ) =>
+				useEntityRecord( 'root', 'widget', 1, { enabled } ),
+			{ initialProps: { enabled: true } }
 		);
-
-		const { rerender } = render( <UI enabled /> );
 
 		// A minimum delay for a fetch request. The same delay is used again as a control.
 		await act(
@@ -137,9 +128,9 @@ describe( 'useEntityRecord', () => {
 		// Clear the fetch call history.
 		triggerFetch.mockReset();
 
-		rerender( <UI enabled={ false } /> );
+		rerender( { enabled: false } );
 
-		expect( data ).toEqual( {
+		expect( result.current ).toEqual( {
 			edit: expect.any( Function ),
 			editedRecord: {},
 			hasEdits: false,

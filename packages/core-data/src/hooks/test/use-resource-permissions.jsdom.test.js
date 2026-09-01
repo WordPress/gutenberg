@@ -1,7 +1,8 @@
 import triggerFetch from '@wordpress/api-fetch';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 jest.mock( '@wordpress/api-fetch' );
-import { render, waitFor } from '@testing-library/react';
+import { renderHook, waitFor } from '@testing-library/react';
+import { createElement } from '@wordpress/element';
 import { store as coreDataStore } from '../../index';
 import useResourcePermissions from '../use-resource-permissions';
 
@@ -18,18 +19,17 @@ describe( 'useResourcePermissions', () => {
 		} ) );
 	} );
 
+	function renderHookWithRegistry( hook, options = {} ) {
+		const Wrapper = ( { children } ) =>
+			createElement( RegistryProvider, { value: registry }, children );
+		return renderHook( hook, { wrapper: Wrapper, ...options } );
+	}
+
 	it( 'retrieves the relevant permissions for a key-less resource', async () => {
-		let data;
-		const TestComponent = () => {
-			data = useResourcePermissions( 'widgets' );
-			return <div />;
-		};
-		render(
-			<RegistryProvider value={ registry }>
-				<TestComponent />
-			</RegistryProvider>
+		const { result } = renderHookWithRegistry( () =>
+			useResourcePermissions( 'widgets' )
 		);
-		expect( data ).toEqual( {
+		expect( result.current ).toEqual( {
 			status: 'IDLE',
 			isResolving: false,
 			hasResolved: false,
@@ -38,7 +38,7 @@ describe( 'useResourcePermissions', () => {
 		} );
 
 		await waitFor( () =>
-			expect( data ).toEqual( {
+			expect( result.current ).toEqual( {
 				status: 'SUCCESS',
 				isResolving: false,
 				hasResolved: true,
@@ -49,17 +49,10 @@ describe( 'useResourcePermissions', () => {
 	} );
 
 	it( 'retrieves the relevant permissions for a resource with a key', async () => {
-		let data;
-		const TestComponent = () => {
-			data = useResourcePermissions( 'widgets', 1 );
-			return <div />;
-		};
-		render(
-			<RegistryProvider value={ registry }>
-				<TestComponent />
-			</RegistryProvider>
+		const { result } = renderHookWithRegistry( () =>
+			useResourcePermissions( 'widgets', 1 )
 		);
-		expect( data ).toEqual( {
+		expect( result.current ).toEqual( {
 			status: 'IDLE',
 			isResolving: false,
 			hasResolved: false,
@@ -70,7 +63,7 @@ describe( 'useResourcePermissions', () => {
 		} );
 
 		await waitFor( () =>
-			expect( data ).toEqual( {
+			expect( result.current ).toEqual( {
 				status: 'SUCCESS',
 				isResolving: false,
 				hasResolved: true,
@@ -83,20 +76,13 @@ describe( 'useResourcePermissions', () => {
 	} );
 
 	it( 'retrieves the relevant permissions for a id-less entity', async () => {
-		let data;
-		const TestComponent = () => {
-			data = useResourcePermissions( {
+		const { result } = renderHookWithRegistry( () =>
+			useResourcePermissions( {
 				kind: 'root',
 				name: 'user',
-			} );
-			return <div />;
-		};
-		render(
-			<RegistryProvider value={ registry }>
-				<TestComponent />
-			</RegistryProvider>
+			} )
 		);
-		expect( data ).toEqual( {
+		expect( result.current ).toEqual( {
 			status: 'IDLE',
 			isResolving: false,
 			hasResolved: false,
@@ -105,7 +91,7 @@ describe( 'useResourcePermissions', () => {
 		} );
 
 		await waitFor( () =>
-			expect( data ).toEqual( {
+			expect( result.current ).toEqual( {
 				status: 'SUCCESS',
 				isResolving: false,
 				hasResolved: true,
@@ -116,7 +102,6 @@ describe( 'useResourcePermissions', () => {
 	} );
 
 	it( 'normalizes id-less entity resources before resolving permissions', async () => {
-		let data;
 		triggerFetch.mockImplementation( ( options ) => {
 			if ( options.path === '/wp/v2/types?context=view' ) {
 				return {
@@ -141,22 +126,16 @@ describe( 'useResourcePermissions', () => {
 			);
 		} );
 
-		const TestComponent = () => {
-			data = useResourcePermissions( {
+		const { result } = renderHookWithRegistry( () =>
+			useResourcePermissions( {
 				kind: 'postType',
 				name: 'wp_navigation',
 				id: undefined,
-			} );
-			return <div />;
-		};
-		render(
-			<RegistryProvider value={ registry }>
-				<TestComponent />
-			</RegistryProvider>
+			} )
 		);
 
 		await waitFor( () =>
-			expect( data ).toEqual( {
+			expect( result.current ).toEqual( {
 				status: 'SUCCESS',
 				isResolving: false,
 				hasResolved: true,
@@ -173,21 +152,14 @@ describe( 'useResourcePermissions', () => {
 	} );
 
 	it( 'retrieves the relevant permissions for an entity', async () => {
-		let data;
-		const TestComponent = () => {
-			data = useResourcePermissions( {
+		const { result } = renderHookWithRegistry( () =>
+			useResourcePermissions( {
 				kind: 'root',
 				name: 'user',
 				id: 1,
-			} );
-			return <div />;
-		};
-		render(
-			<RegistryProvider value={ registry }>
-				<TestComponent />
-			</RegistryProvider>
+			} )
 		);
-		expect( data ).toEqual( {
+		expect( result.current ).toEqual( {
 			status: 'IDLE',
 			isResolving: false,
 			hasResolved: false,
@@ -198,7 +170,7 @@ describe( 'useResourcePermissions', () => {
 		} );
 
 		await waitFor( () =>
-			expect( data ).toEqual( {
+			expect( result.current ).toEqual( {
 				status: 'SUCCESS',
 				isResolving: false,
 				hasResolved: true,
@@ -211,20 +183,14 @@ describe( 'useResourcePermissions', () => {
 	} );
 
 	it( 'should warn when called with incorrect arguments signature', () => {
-		const TestComponent = () => {
+		renderHookWithRegistry( () =>
 			useResourcePermissions(
 				{
 					kind: 'root',
 					name: 'user',
 				},
 				1
-			);
-			return null;
-		};
-		render(
-			<RegistryProvider value={ registry }>
-				<TestComponent />
-			</RegistryProvider>
+			)
 		);
 
 		expect( console ).toHaveWarnedWith(

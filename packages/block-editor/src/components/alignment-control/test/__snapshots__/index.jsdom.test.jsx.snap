@@ -18,15 +18,18 @@ exports[`AlignmentUI should allow custom alignment controls to be specified 1`] 
       >
         <svg
           aria-hidden="true"
-          fill="currentColor"
           focusable="false"
           height="24"
+          stroke="currentColor"
+          stroke-width="1.5"
+          style="fill: none;"
           viewBox="0 0 24 24"
           width="24"
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M13 5.5H4V4h9v1.5Zm7 7H4V11h16v1.5Zm-7 7H4V18h9v1.5Z"
+            d="M4 5H13M4 12H20M4 19H13"
+            vector-effect="non-scaling-stroke"
           />
         </svg>
       </button>
@@ -42,15 +45,18 @@ exports[`AlignmentUI should allow custom alignment controls to be specified 1`] 
       >
         <svg
           aria-hidden="true"
-          fill="currentColor"
           focusable="false"
           height="24"
+          stroke="currentColor"
+          stroke-width="1.5"
+          style="fill: none;"
           viewBox="0 0 24 24"
           width="24"
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M7.5 5.5h9V4h-9v1.5Zm-3.5 7h16V11H4v1.5Zm3.5 7h9V18h-9v1.5Z"
+            d="M7.5 5H16.5M4 12H20M7.5 19H16.5"
+            vector-effect="non-scaling-stroke"
           />
         </svg>
       </button>
@@ -75,15 +81,18 @@ exports[`AlignmentUI should match snapshot when controls are hidden 1`] = `
     >
       <svg
         aria-hidden="true"
-        fill="currentColor"
         focusable="false"
         height="24"
+        stroke="currentColor"
+        stroke-width="1.5"
+        style="fill: none;"
         viewBox="0 0 24 24"
         width="24"
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M13 5.5H4V4h9v1.5Zm7 7H4V11h16v1.5Zm-7 7H4V18h9v1.5Z"
+          d="M4 5H13M4 12H20M4 19H13"
+          vector-effect="non-scaling-stroke"
         />
       </svg>
     </button>
@@ -109,15 +118,18 @@ exports[`AlignmentUI should match snapshot when controls are visible 1`] = `
       >
         <svg
           aria-hidden="true"
-          fill="currentColor"
           focusable="false"
           height="24"
+          stroke="currentColor"
+          stroke-width="1.5"
+          style="fill: none;"
           viewBox="0 0 24 24"
           width="24"
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M13 5.5H4V4h9v1.5Zm7 7H4V11h16v1.5Zm-7 7H4V18h9v1.5Z"
+            d="M4 5H13M4 12H20M4 19H13"
+            vector-effect="non-scaling-stroke"
           />
         </svg>
       </button>
@@ -133,15 +145,18 @@ exports[`AlignmentUI should match snapshot when controls are visible 1`] = `
       >
         <svg
           aria-hidden="true"
-          fill="currentColor"
           focusable="false"
           height="24"
+          stroke="currentColor"
+          stroke-width="1.5"
+          style="fill: none;"
           viewBox="0 0 24 24"
           width="24"
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M7.5 5.5h9V4h-9v1.5Zm-3.5 7h16V11H4v1.5Zm3.5 7h9V18h-9v1.5Z"
+            d="M7.5 5H16.5M4 12H20M7.5 19H16.5"
+            vector-effect="non-scaling-stroke"
           />
         </svg>
       </button>
@@ -157,15 +172,18 @@ exports[`AlignmentUI should match snapshot when controls are visible 1`] = `
       >
         <svg
           aria-hidden="true"
-          fill="currentColor"
           focusable="false"
           height="24"
+          stroke="currentColor"
+          stroke-width="1.5"
+          style="fill: none;"
           viewBox="0 0 24 24"
           width="24"
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M11.111 5.5H20V4h-8.889v1.5ZM4 12.5h16V11H4v1.5Zm7.111 7H20V18h-8.889v1.5Z"
+            d="M11 5H20M4 12H20M11 19H20"
+            vector-effect="non-scaling-stroke"
           />
         </svg>
       </button>

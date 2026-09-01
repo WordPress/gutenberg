@@ -48,7 +48,8 @@
 	},
 	"devDependencies": {
 		"@types/jest": "^30.0.0",
-		"@wordpress/jest-console": "file:../jest-console"
+		"@wordpress/jest-console": "file:../jest-console",
+		"vitest": "^4.1.10"
 	},
 	"publishConfig": {
 		"access": "public"

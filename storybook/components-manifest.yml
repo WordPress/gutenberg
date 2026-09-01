@@ -110,11 +110,11 @@
             - className
             - finalFocus
             - initialFocus
-            - popupWidth
             - portal
             - positioner
             - render
             - style
+            - width
       - name: Autocomplete.Portal
         props:
             - className
@@ -140,6 +140,12 @@
             - sticky
             - style
       - name: Autocomplete.Row
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Autocomplete.Status
         props:
             - children
             - className
@@ -616,6 +622,13 @@
             - className
             - hideFromVision
             - nativeLabel
+            - render
+            - style
+            - variant
+      - name: Field.VisualLabel
+        props:
+            - children
+            - className
             - render
             - style
             - variant
