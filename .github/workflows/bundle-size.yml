@@ -56,7 +56,7 @@ jobs:
                   path: ~/.npm
                   key: ${{ runner.os }}-node-${{ matrix.node }}-npm-cache-${{ hashFiles('**/package-lock.json') }}
 
-            - uses: preactjs/compressed-size-action@7d87f60a6b0c7d193b8183ce859ed00b356ea92f # v2.1.0
+            - uses: preactjs/compressed-size-action@f322c295dde06a1cb7ccaef105732dd8a726d1d9 # v2.10.0
               with:
                   repo-token: '${{ secrets.GITHUB_TOKEN }}'
                   pattern: '{build/**/*.js,build/**/*.css}'
