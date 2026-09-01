@@ -41,13 +41,18 @@ describe( 'jest-console', () => {
 			import.meta.dirname,
 			'fixtures/jest-restore-all-mocks.cjs'
 		);
+		const sourceEntryPath = join( import.meta.dirname, '../index.ts' );
 		const config = JSON.stringify( {
 			rootDir: process.cwd(),
-			setupFilesAfterEnv: [
-				require.resolve( '@wordpress/jest-console' ),
-			],
+			setupFilesAfterEnv: [ sourceEntryPath ],
 			testEnvironment: 'node',
 			testRegex: 'jest-restore-all-mocks\\.cjs$',
+			transform: {
+				'^.+\\.m?[jt]sx?$': join(
+					process.cwd(),
+					'test/unit/scripts/babel-transformer.js'
+				),
+			},
 		} );
 		const result = spawnSync(
 			process.execPath,
