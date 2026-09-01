@@ -1,7 +1,5 @@
 import path from 'node:path';
-import globPackage from 'glob';
-
-const { sync: glob } = globPackage;
+import { globSync } from 'glob';
 
 export const TEST_PATTERNS = [
 	'**/__tests__/**/*.[jt]s?(x)',
@@ -34,7 +32,7 @@ export function discoverTestFiles( rootDir ) {
 	return [
 		...new Set(
 			TEST_PATTERNS.flatMap( ( pattern ) =>
-				glob( pattern, {
+				globSync( pattern, {
 					absolute: false,
 					cwd: rootDir,
 					dot: true,
@@ -60,7 +58,7 @@ export function getVitestTests( discoveredTests, manifest ) {
 	].sort();
 }
 
-export function getVitestProjectName( testPath ) {
+export function getTestEnvironmentName( testPath ) {
 	if ( BROWSER_TEST_PATH_PATTERN.test( testPath ) ) {
 		return 'browser';
 	}
@@ -78,7 +76,7 @@ export function getVitestTestsByProject( discoveredTests, manifest ) {
 	);
 
 	for ( const testPath of getVitestTests( discoveredTests, manifest ) ) {
-		testsByProject[ getVitestProjectName( testPath ) ].push( testPath );
+		testsByProject[ getTestEnvironmentName( testPath ) ].push( testPath );
 	}
 
 	return testsByProject;
