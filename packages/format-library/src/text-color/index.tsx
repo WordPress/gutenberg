@@ -118,8 +118,6 @@ function TextColorEdit( {
 				<InlineColorUI
 					name={ name }
 					onClose={ () => setIsAddingColor( false ) }
-					// @ts-expect-error -- InlineColorUI does not have a type for activeAttributes yet.
-					activeAttributes={ activeAttributes }
 					value={ value }
 					onChange={ onChange }
 					contentRef={ contentRef }
