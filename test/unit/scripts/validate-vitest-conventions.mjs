@@ -22,6 +22,7 @@ import {
 	findVitestIsolationOptOuts,
 	validateRoutingScripts,
 	validateVitestCleanupConfig,
+	validateVitestShuffleScripts,
 } from './test-infrastructure-policy.mjs';
 import {
 	validateVitestPolicy,
@@ -147,7 +148,8 @@ const vitestConfig = (
 violations.push(
 	...findVitestIsolationOptOuts( ROOT_DIR ),
 	...validateRoutingScripts( rootPackageJson, unitTestPackageJson ),
-	...validateVitestCleanupConfig( vitestConfig )
+	...validateVitestCleanupConfig( vitestConfig ),
+	...validateVitestShuffleScripts( rootPackageJson, unitTestPackageJson )
 );
 
 const vitestVersions = new Map();

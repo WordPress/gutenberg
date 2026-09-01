@@ -130,9 +130,7 @@ jobs:
                   # by the Jest partition.
                   FK_ENV_NODEJS: ${{ matrix.node }}
               run: |
-                  npm run test:unit:vitest -- \
-                    --sequence.shuffle \
-                    --sequence.seed=80855 \
+                  npm run test:unit:vitest:shuffled -- \
                     --shard="$SHARD" \
                     --passWithNoTests
 
