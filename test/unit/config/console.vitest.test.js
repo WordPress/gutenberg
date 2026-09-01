@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 
 describe( 'Vitest console matchers', () => {
 	describe.each( [
@@ -72,6 +72,26 @@ describe( 'Vitest console matchers', () => {
 			expect(
 				console[ methodName ].assertionsNumber
 			).toBeGreaterThanOrEqual( 0 );
+		} );
+	} );
+
+	describe( 'when a test restores all mocks', () => {
+		test( 'restores the shared console spies', () => {
+			vi.restoreAllMocks();
+			expect( vi.isMockFunction( console.error ) ).toBe( false );
+		} );
+
+		test( 'reinstalls the shared console spies before the next test', () => {
+			for ( const methodName of Object.keys( {
+				error: true,
+				info: true,
+				log: true,
+				warn: true,
+			} ) ) {
+				expect( vi.isMockFunction( console[ methodName ] ) ).toBe(
+					true
+				);
+			}
 		} );
 	} );
 } );

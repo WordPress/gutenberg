@@ -1482,7 +1482,7 @@ describe( 'actions', () => {
 		it( 'warns when setting the deprecated __unstableIsPreviewMode property and sets the stable property instead', () => {
 			const consoleWarn = vi
 				.spyOn( global.console, 'warn' )
-				.mockImplementation();
+				.mockImplementation( () => {} );
 
 			const store = createRegistry().registerStore(
 				blockEditorStoreName,

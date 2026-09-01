@@ -326,7 +326,9 @@ describe( 'useEntityBinding', () => {
 		} );
 
 		it( 'handles invalid kind gracefully in createBinding', () => {
-			const consoleSpy = vi.spyOn( console, 'warn' ).mockImplementation();
+			const consoleSpy = vi
+				.spyOn( console, 'warn' )
+				.mockImplementation( () => {} );
 
 			const attributes = {
 				metadata: {},
