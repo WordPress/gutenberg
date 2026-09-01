@@ -4,7 +4,7 @@ import { removeFormat, slice, isCollapsed } from '@wordpress/rich-text';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { help } from '@wordpress/icons';
 import type { RichTextValue } from '@wordpress/rich-text';
-import type { UnknownEditProps } from '../types';
+import type { FormatEditProps } from '../types';
 
 const name = 'core/unknown';
 const title = __( 'Clear Unknown Formatting' );
@@ -25,7 +25,7 @@ export const unknown = {
 	title,
 	tagName: '*',
 	className: null,
-	edit( { isActive, value, onChange, onFocus }: UnknownEditProps ) {
+	edit( { isActive, value, onChange, onFocus }: FormatEditProps ) {
 		if ( ! isActive && ! selectionContainsUnknownFormats( value ) ) {
 			return null;
 		}

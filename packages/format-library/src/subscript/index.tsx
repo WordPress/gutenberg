@@ -3,7 +3,7 @@ import { toggleFormat } from '@wordpress/rich-text';
 // @ts-expect-error Block Editor not fully typed yet.
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { subscript as subscriptIcon } from '@wordpress/icons';
-import type { SubscriptEditProps } from '../types';
+import type { FormatEditProps } from '../types';
 
 const name = 'core/subscript';
 const title = __( 'Subscript' );
@@ -13,7 +13,7 @@ export const subscript = {
 	title,
 	tagName: 'sub',
 	className: null,
-	edit( { isActive, value, onChange, onFocus }: SubscriptEditProps ) {
+	edit( { isActive, value, onChange, onFocus }: FormatEditProps ) {
 		function onToggle() {
 			onChange( toggleFormat( value, { type: name, title } ) );
 		}

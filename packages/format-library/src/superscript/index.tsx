@@ -3,7 +3,7 @@ import { toggleFormat } from '@wordpress/rich-text';
 // @ts-expect-error Block Editor not fully typed yet.
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { superscript as superscriptIcon } from '@wordpress/icons';
-import type { SuperscriptEditProps } from '../types';
+import type { FormatEditProps } from '../types';
 
 const name = 'core/superscript';
 const title = __( 'Superscript' );
@@ -13,7 +13,7 @@ export const superscript = {
 	title,
 	tagName: 'sup',
 	className: null,
-	edit( { isActive, value, onChange, onFocus }: SuperscriptEditProps ) {
+	edit( { isActive, value, onChange, onFocus }: FormatEditProps ) {
 		function onToggle() {
 			onChange( toggleFormat( value, { type: name, title } ) );
 		}

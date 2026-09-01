@@ -3,7 +3,7 @@ import { toggleFormat } from '@wordpress/rich-text';
 // @ts-expect-error Block Editor not fully typed yet.
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { button } from '@wordpress/icons';
-import type { CodeEditProps } from '../types';
+import type { FormatEditProps } from '../types';
 
 const name = 'core/keyboard';
 const title = __( 'Keyboard input' );
@@ -13,7 +13,7 @@ export const keyboard = {
 	title,
 	tagName: 'kbd',
 	className: null,
-	edit( { isActive, value, onChange, onFocus }: CodeEditProps ) {
+	edit( { isActive, value, onChange, onFocus }: FormatEditProps ) {
 		function onToggle() {
 			onChange( toggleFormat( value, { type: name, title } ) );
 		}

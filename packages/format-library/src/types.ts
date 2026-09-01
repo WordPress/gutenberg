@@ -1,20 +1,28 @@
 import type { RichTextValue } from '@wordpress/rich-text';
 
-interface BaseFormatEditProps {
+/**
+ * The props every format's `edit()` receives from the rich text toolbar.
+ */
+export interface FormatEditProps {
 	isActive: boolean;
 	value: RichTextValue;
 	onChange: ( value: RichTextValue ) => void;
 	onFocus: () => void;
 }
 
-export type BoldEditProps = BaseFormatEditProps & { isVisible?: boolean };
+/**
+ * `FormatEditProps` for the formats whose toolbar button can be hidden.
+ */
+export interface FormatEditWithVisibilityProps extends FormatEditProps {
+	isVisible?: boolean;
+}
 
 export interface NonBreakingSpacePopoverAnchorProps {
 	contentRef: React.RefObject< HTMLElement >;
 }
 
 export type NonBreakingSpaceEditProps = Pick<
-	BaseFormatEditProps,
+	FormatEditProps,
 	'value' | 'onChange'
 > &
 	NonBreakingSpacePopoverAnchorProps;
@@ -51,14 +59,6 @@ export interface EditMathProps {
 	activeObjectAttributes: Record< string, string > | null;
 	contentRef: React.RefObject< HTMLElement >;
 }
-
-export type {
-	BaseFormatEditProps as CodeEditProps,
-	BaseFormatEditProps as StrikethroughEditProps,
-	BaseFormatEditProps as SubscriptEditProps,
-	BaseFormatEditProps as SuperscriptEditProps,
-	BaseFormatEditProps as UnknownEditProps,
-};
 
 /**
  * A colour entry from the `color.palette` theme setting.

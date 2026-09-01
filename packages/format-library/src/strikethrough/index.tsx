@@ -6,7 +6,7 @@ import {
 	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
 import { formatStrikethrough } from '@wordpress/icons';
-import type { StrikethroughEditProps } from '../types';
+import type { FormatEditProps } from '../types';
 
 const name = 'core/strikethrough';
 const title = __( 'Strikethrough' );
@@ -16,7 +16,7 @@ export const strikethrough = {
 	title,
 	tagName: 's',
 	className: null,
-	edit( { isActive, value, onChange, onFocus }: StrikethroughEditProps ) {
+	edit( { isActive, value, onChange, onFocus }: FormatEditProps ) {
 		function onClick() {
 			onChange( toggleFormat( value, { type: name, title } ) );
 			onFocus();

@@ -7,7 +7,7 @@ import {
 } from '@wordpress/block-editor';
 import { code as codeIcon } from '@wordpress/icons';
 import type { RichTextValue } from '@wordpress/rich-text';
-import type { CodeEditProps } from '../types';
+import type { FormatEditProps } from '../types';
 
 const name = 'core/code';
 const title = __( 'Inline code' );
@@ -59,7 +59,7 @@ export const code = {
 		onChange,
 		onFocus,
 		isActive,
-	}: CodeEditProps ): React.ReactNode {
+	}: FormatEditProps ): React.ReactNode {
 		function onClick() {
 			onChange( toggleFormat( value, { type: name, title } ) );
 			onFocus();
