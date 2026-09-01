@@ -1,4 +1,4 @@
-import { useInnerBlocksProps } from '@wordpress/block-editor';
+import { useInnerBlocksProps, InnerBlocks } from '@wordpress/block-editor';
 import { Disabled } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
@@ -44,7 +44,9 @@ export default function UnsavedInnerBlocks( {
 			className: 'wp-block-navigation__container',
 		},
 		{
-			renderAppender: hasSelection ? undefined : false,
+			renderAppender: hasSelection
+				? InnerBlocks.ButtonBlockAppender
+				: false,
 			defaultBlock: DEFAULT_BLOCK,
 			directInsert: true,
 		}
