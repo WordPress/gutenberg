@@ -343,6 +343,14 @@ describe( 'getIssueType', () => {
 
 		expect( result ).toBe( 'Tools' );
 	} );
+
+	it( 'returns the testing type for flaky test fixes', () => {
+		const result = getIssueType( {
+			labels: [ { name: '[Type] Flaky Test' } ],
+		} );
+
+		expect( result ).toBe( 'Tools' );
+	} );
 } );
 
 describe( 'getIssueFeature', () => {
