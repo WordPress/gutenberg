@@ -314,7 +314,7 @@ Registers a new format provided a unique name and an object defining its behavio
 _Parameters_
 
 -   _name_ `string`: Format name.
--   _settings_ `WPFormat`: Format settings.
+-   _settings_ `Omit<WPFormat, 'name'>`: Format settings. `name` is injected from the first argument.
 
 _Returns_
 

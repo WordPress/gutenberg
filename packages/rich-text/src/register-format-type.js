@@ -3,7 +3,7 @@ import { store as richTextStore } from './store';
 /**
  * @typedef {Object} WPFormat
  *
- * @property {string}        [name]        A string identifying the format. Must be
+ * @property {string}        name          A string identifying the format. Must be
  *                                         unique across all registered formats.
  * @property {string}        tagName       The HTML tag this format will wrap the
  *                                         selection with.
@@ -20,8 +20,9 @@ import { store as richTextStore } from './store';
  * Registers a new format provided a unique name and an object defining its
  * behavior.
  *
- * @param {string}   name     Format name.
- * @param {WPFormat} settings Format settings.
+ * @param {string}                 name     Format name.
+ * @param {Omit<WPFormat, 'name'>} settings Format settings. `name` is injected
+ *                                          from the first argument.
  *
  * @return {WPFormat|undefined} The format, if it has been successfully
  *                              registered; otherwise `undefined`.
