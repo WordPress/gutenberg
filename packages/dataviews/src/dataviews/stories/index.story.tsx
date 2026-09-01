@@ -5,6 +5,7 @@ import LayoutTableComponent from './layout-table';
 import LayoutGridComponent from './layout-grid';
 import LayoutListComponent from './layout-list';
 import LayoutCustomComponent from './layout-custom';
+import HierarchicalLevelsComponent from './hierarchical-levels';
 import InfiniteScrollComponent from './infinite-scroll';
 import AsyncInfiniteScrollComponent from './async-infinite-scroll';
 import WithCardComponent from './with-card';
@@ -236,6 +237,27 @@ export const LayoutActivity = {
 
 export const LayoutCustom = {
 	render: LayoutCustomComponent,
+};
+
+/**
+ * Hierarchical data in the table layout. DataViews does not reorder items:
+ * the consumer lists each parent before its children and reports how deep
+ * each item sits through `getItemLevel`; `view.showLevels` turns the
+ * indentation on. Sorting by a field clears `showLevels`, since a sorted list
+ * is no longer in hierarchical order.
+ */
+export const HierarchicalLevels = {
+	render: HierarchicalLevelsComponent,
+	args: {
+		showLevels: true,
+	},
+	argTypes: {
+		showLevels: {
+			control: 'boolean',
+			description:
+				'Whether the table indents each item by its level (`view.showLevels`). The order of the items comes from the data either way',
+		},
+	},
 };
 
 export const Empty = {
