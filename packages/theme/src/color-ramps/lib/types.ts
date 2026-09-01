@@ -24,6 +24,7 @@ export type Ramp = {
 	fgSurface2: string;
 	fgSurface3: string;
 	fgSurface4: string;
+	fgSurface5: string;
 	// Foreground (text, icon) colors on top of bgFill
 	fgFill: string;
 	fgFillInverted: string;
@@ -73,7 +74,45 @@ export type RampStepConfig = {
 	sameAsIfPossible?: keyof Ramp;
 };
 
-export type RampConfig = Record< keyof Ramp, RampStepConfig >;
+export type RampStepsConfig = Record< keyof Ramp, RampStepConfig >;
+
+export type ForegroundRampStep =
+	| 'fgSurface1'
+	| 'fgSurface2'
+	| 'fgSurface3'
+	| 'fgSurface4'
+	| 'fgSurface5';
+
+export type ForegroundScaleConfig = {
+	/** Ramp step whose hue and chroma define the foreground scale. */
+	seed: keyof Ramp;
+	/** Background step used to measure the APCA contrast range. */
+	perceptualReference: keyof Ramp;
+	chroma:
+		| {
+				mode: 'tapered';
+				options: TaperChromaOptions;
+		  }
+		| {
+				mode: 'gamut-relative';
+		  };
+	steps: readonly {
+		name: ForegroundRampStep;
+		/** Position in the APCA contrast range from the first to last step. */
+		progress: number;
+		/** Preserve the base solver's color when it meets every WCAG floor. */
+		preserveAnchor?: boolean;
+		contrast: {
+			references: readonly ( keyof Ramp )[];
+			target: number;
+		};
+	}[];
+};
+
+export type RampConfig = {
+	steps: RampStepsConfig;
+	foregroundScale: ForegroundScaleConfig;
+};
 
 export type RampResult = {
 	ramp: Record< keyof Ramp, string >;

@@ -26,6 +26,7 @@ export function buildBgRamp( seed: string ) {
 const STEP_TO_PIN = 'surface2';
 function getBgRampInfo( ramp: InternalRampResult ): {
 	mainDirection: RampDirection;
+	backgroundRamp: InternalRampResult;
 	pinLightness: {
 		stepName: keyof Ramp;
 		value: number;
@@ -33,6 +34,7 @@ function getBgRampInfo( ramp: InternalRampResult ): {
 } {
 	return {
 		mainDirection: ramp.direction,
+		backgroundRamp: ramp,
 		pinLightness: {
 			stepName: STEP_TO_PIN,
 			value: clampAccentScaleReferenceLightness(
