@@ -6,7 +6,6 @@
 			--_gcd-input-padding:
 				var(--wp-ui-input-padding-block, 0px)
 				var(--wp-ui-input-layout-padding-inline, 0px);
-			--_gcd-input-placeholder-color: var(--wpds-color-foreground-content-neutral-weak);
 
 			padding-block: var(--wp-ui-input-padding-block, 0);
 			padding-inline: var(--wp-ui-input-layout-padding-inline, 0);
@@ -20,7 +19,7 @@
 			line-height: inherit;
 
 			&::placeholder {
-				color: var(--wpds-color-foreground-content-neutral-weak);
+				color: var(--wpds-color-foreground-interactive-neutral-weak);
 			}
 
 			&:disabled,

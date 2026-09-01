@@ -65,7 +65,7 @@
 		}
 
 		&::placeholder {
-			color: var(--_gcd-input-placeholder-color, var(--wpds-color-foreground-content-neutral-weak));
+			color: var(--_gcd-input-placeholder-color, var(--wpds-color-foreground-interactive-neutral-weak));
 		}
 
 		&:disabled::placeholder {
