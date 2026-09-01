@@ -451,7 +451,7 @@ export default function BorderPanel( {
 					showLocalOverrideActionsInLabel={ false }
 					panelId={ panelId }
 				>
-					<BaseControl.VisualLabel as="legend">
+					<BaseControl.VisualLabel>
 						{ __( 'Shadow' ) }
 					</BaseControl.VisualLabel>
 
