@@ -257,10 +257,6 @@ type WalkFn = (
 	formatIndex: number
 ) => ReturnType< typeof walkToBoundary >;
 
-const partialRight =
-	( fn: ( ...args: any[] ) => any, ...partialArgs: any[] ) =>
-	( ...args: any[] ) =>
-		fn( ...args, ...partialArgs );
-
-const walkToStart: WalkFn = partialRight( walkToBoundary, 'backwards' );
-const walkToEnd: WalkFn = partialRight( walkToBoundary, 'forwards' );
+const walkToStart: WalkFn = ( ...args ) =>
+	walkToBoundary( ...args, 'backwards' );
+const walkToEnd: WalkFn = ( ...args ) => walkToBoundary( ...args, 'forwards' );
