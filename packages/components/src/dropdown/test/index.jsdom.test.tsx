@@ -354,6 +354,48 @@ describe( 'Dropdown', () => {
 		}
 	} );
 
+	it( 'should stay open when an iframe dropdown opens a dialog in the parent document', async () => {
+		const user = userEvent.setup();
+		const onClose = jest.fn();
+		const iframe = document.createElement( 'iframe' );
+		document.body.appendChild( iframe );
+		const mountNode = iframe.contentDocument!.createElement( 'div' );
+		iframe.contentDocument!.body.appendChild( mountNode );
+		let unmount: () => void = () => undefined;
+
+		try {
+			( { unmount } = render(
+				<DropdownWithModal
+					dialogTriggerLocation="inside"
+					onClose={ onClose }
+				/>,
+				{ container: mountNode }
+			) );
+			await user.click(
+				within( iframe.contentDocument!.body ).getByRole( 'button', {
+					name: 'Toggle',
+				} )
+			);
+			await user.click(
+				await screen.findByRole( 'button', {
+					name: 'Open dialog',
+				} )
+			);
+
+			await screen.findByRole( 'dialog', { name: 'Dialog' } );
+			await waitFor( () => expect( onClose ).not.toHaveBeenCalled() );
+			expect(
+				within( iframe.contentDocument!.body ).getByRole( 'button', {
+					name: 'Toggle',
+					hidden: true,
+				} )
+			).toHaveAttribute( 'aria-expanded', 'true' );
+		} finally {
+			unmount();
+			iframe.remove();
+		}
+	} );
+
 	it( 'should not reuse a stale internal activation for an unrelated dialog', async () => {
 		const user = userEvent.setup();
 		const onClose = jest.fn();
