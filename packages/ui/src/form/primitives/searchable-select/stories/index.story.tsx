@@ -36,7 +36,6 @@ type Story = StoryObj< typeof SearchableSelect >;
 export const Default: Story = {
 	args: {
 		'aria-label': 'Fruit',
-		defaultValue: ITEMS[ 0 ],
 		items: ITEMS,
 	},
 };
@@ -85,6 +84,7 @@ const CustomFruitItem = ( { label }: { label: string } ) => (
 export const WithCustomTriggerAndItems: Story = {
 	args: {
 		...Default.args,
+		defaultValue: ITEMS[ 0 ],
 		triggerContent: ( item: ( typeof ITEMS )[ 0 ] | null ) =>
 			item ? <CustomFruitItem label={ item.label } /> : null,
 		children: ( item: ( typeof ITEMS )[ 0 ] ) => (
