@@ -1,8 +1,51 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useState } from '@wordpress/element';
 import Dropdown from '..';
+import Modal from '../../modal';
 import { DropdownContentWrapper } from '../dropdown-content-wrapper';
 import styles from '../style.module.scss';
+
+const DropdownWithModal = ( {
+	dialogTriggerLocation,
+	onClose,
+}: {
+	dialogTriggerLocation: 'inside' | 'outside';
+	onClose?: () => void;
+} ) => {
+	const [ isDialogOpen, setIsDialogOpen ] = useState( false );
+	const dialogTrigger = (
+		<button onClick={ () => setIsDialogOpen( true ) }>Open dialog</button>
+	);
+
+	return (
+		<>
+			<Dropdown
+				onClose={ onClose }
+				renderToggle={ ( { isOpen, onToggle } ) => (
+					<button aria-expanded={ isOpen } onClick={ onToggle }>
+						Toggle
+					</button>
+				) }
+				renderContent={ () => (
+					<>
+						<button>Dropdown item</button>
+						{ dialogTriggerLocation === 'inside' && dialogTrigger }
+					</>
+				) }
+			/>
+			{ dialogTriggerLocation === 'outside' && dialogTrigger }
+			{ isDialogOpen && (
+				<Modal
+					title="Dialog"
+					onRequestClose={ () => setIsDialogOpen( false ) }
+				>
+					<p>Dialog content</p>
+				</Modal>
+			) }
+		</>
+	);
+};
 
 describe( 'DropdownContentWrapper', () => {
 	it( 'should apply the small padding class by default', () => {
@@ -122,5 +165,85 @@ describe( 'Dropdown', () => {
 		await user.click( screen.getByRole( 'button', { name: 'close' } ) );
 
 		expect( screen.queryByText( 'test' ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'should close when a dialog opens after an outside activation', async () => {
+		const user = userEvent.setup();
+		const onClose = jest.fn();
+		render(
+			<DropdownWithModal
+				dialogTriggerLocation="outside"
+				onClose={ onClose }
+			/>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Toggle' } ) );
+		await screen.findByRole( 'button', { name: 'Dropdown item' } );
+		await user.click(
+			screen.getByRole( 'button', { name: 'Open dialog' } )
+		);
+
+		await waitFor( () => expect( onClose ).toHaveBeenCalledTimes( 1 ) );
+		expect( screen.queryByText( 'Dropdown item' ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'should stay open and restore focus when its dialog closes', async () => {
+		const user = userEvent.setup();
+		render( <DropdownWithModal dialogTriggerLocation="inside" /> );
+
+		await user.click( screen.getByRole( 'button', { name: 'Toggle' } ) );
+		const dialogTrigger = await screen.findByRole( 'button', {
+			name: 'Open dialog',
+		} );
+		await user.click( dialogTrigger );
+
+		await screen.findByRole( 'dialog' );
+		expect( screen.getByText( 'Dropdown item' ) ).toBeInTheDocument();
+
+		await user.click( screen.getByRole( 'button', { name: 'Close' } ) );
+
+		await waitFor( () =>
+			expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument()
+		);
+		expect( dialogTrigger ).toHaveFocus();
+		expect( screen.getByText( 'Dropdown item' ) ).toBeInTheDocument();
+	} );
+
+	it( 'should close when focus moves into an unrelated dialog', async () => {
+		const user = userEvent.setup();
+		const onClose = jest.fn();
+		render(
+			<>
+				<div role="dialog" aria-label="Existing dialog">
+					<button>Existing dialog item</button>
+				</div>
+				<Dropdown
+					onClose={ onClose }
+					popoverProps={ { constrainTabbing: false } }
+					renderToggle={ ( { isOpen, onToggle } ) => (
+						<button aria-expanded={ isOpen } onClick={ onToggle }>
+							Toggle
+						</button>
+					) }
+					renderContent={ () => <button>Dropdown item</button> }
+				/>
+			</>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Toggle' } ) );
+		const dropdownItem = await screen.findByRole( 'button', {
+			name: 'Dropdown item',
+		} );
+		dropdownItem.focus();
+		expect( dropdownItem ).toHaveFocus();
+		fireEvent.keyDown( dropdownItem, { key: 'Tab' } );
+		const existingDialogItem = screen.getByRole( 'button', {
+			name: 'Existing dialog item',
+		} );
+		existingDialogItem.focus();
+
+		expect( existingDialogItem ).toHaveFocus();
+		await waitFor( () => expect( onClose ).toHaveBeenCalledTimes( 1 ) );
+		expect( screen.queryByText( 'Dropdown item' ) ).not.toBeInTheDocument();
 	} );
 } );

@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-import { useRef, useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
 import { contextConnect, useContextSystem } from '../context';
@@ -51,6 +51,7 @@ const UnconnectedDropdown = (
 	const [ fallbackPopoverAnchor, setFallbackPopoverAnchor ] =
 		useState< HTMLDivElement | null >( null );
 	const containerRef = useRef< HTMLDivElement >( null );
+	const lastActivationWasInsideRef = useRef( false );
 
 	const [ isOpen, setIsOpen ] = useControlledValue( {
 		defaultValue: defaultOpen,
@@ -58,11 +59,56 @@ const UnconnectedDropdown = (
 		onChange: onToggle,
 	} );
 
+	useEffect( () => {
+		if ( ! isOpen || ! containerRef.current ) {
+			return;
+		}
+
+		const { ownerDocument } = containerRef.current;
+		const activationEvents = [ 'pointerdown', 'keydown', 'click' ] as const;
+		const resetActivationOrigin = () => {
+			lastActivationWasInsideRef.current = false;
+		};
+
+		// Native document capture runs before the React capture handlers below.
+		// Events from portaled Popover content still follow the React tree, so
+		// those handlers can mark an activation as internal again.
+		for ( const eventName of activationEvents ) {
+			ownerDocument.addEventListener(
+				eventName,
+				resetActivationOrigin,
+				true
+			);
+		}
+
+		return () => {
+			for ( const eventName of activationEvents ) {
+				ownerDocument.removeEventListener(
+					eventName,
+					resetActivationOrigin,
+					true
+				);
+			}
+		};
+	}, [ isOpen ] );
+
+	function recordActivationInside() {
+		lastActivationWasInsideRef.current = true;
+	}
+
+	function recordKeyboardActivationInside(
+		event: React.KeyboardEvent< HTMLDivElement >
+	) {
+		if ( event.key === 'Enter' || event.key === ' ' ) {
+			recordActivationInside();
+		}
+	}
+
 	/**
 	 * Closes the popover when focus leaves it unless the toggle was pressed or
-	 * focus has moved to a separate dialog. The former is to let the toggle
-	 * handle closing the popover and the latter is to preserve presence in
-	 * case a dialog has opened, allowing focus to return when it's dismissed.
+	 * focus has moved to a dialog opened from the dropdown. The former lets the
+	 * toggle handle closing the popover. The latter preserves presence so focus
+	 * can return when the dialog is dismissed.
 	 */
 	function closeIfFocusOutside() {
 		if ( ! containerRef.current ) {
@@ -70,11 +116,14 @@ const UnconnectedDropdown = (
 		}
 
 		const { ownerDocument } = containerRef.current;
-		const dialog =
-			ownerDocument?.activeElement?.closest( '[role="dialog"]' );
+		const activeElement = ownerDocument?.activeElement;
+		const dialog = activeElement?.closest( '[role="dialog"]' );
+		const isParentDialog = dialog?.contains( containerRef.current );
 		if (
-			! containerRef.current.contains( ownerDocument.activeElement ) &&
-			( ! dialog || dialog.contains( containerRef.current ) )
+			! containerRef.current.contains( activeElement ) &&
+			( ! dialog ||
+				isParentDialog ||
+				! lastActivationWasInsideRef.current )
 		) {
 			close();
 		}
@@ -101,6 +150,9 @@ const UnconnectedDropdown = (
 	return (
 		<div
 			className={ className }
+			onClickCapture={ recordActivationInside }
+			onPointerDownCapture={ recordActivationInside }
+			onKeyDownCapture={ recordKeyboardActivationInside }
 			ref={ useMergeRefs( [
 				containerRef,
 				forwardedRef,
