@@ -1,8 +1,4 @@
-import {
-	useInnerBlocksProps,
-	InnerBlocks,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { useInnerBlocksProps, InnerBlocks } from '@wordpress/block-editor';
 import { Disabled } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
@@ -16,35 +12,7 @@ export default function UnsavedInnerBlocks( {
 	blocks,
 	createNavigationMenu,
 	hasSelection,
-	clientId,
 } ) {
-	const {
-		isImmediateParentOfSelectedBlock,
-		selectedBlockHasChildren,
-		isSelected,
-		hasSelectedDescendant,
-	} = useSelect(
-		( select ) => {
-			const {
-				getBlockCount,
-				hasSelectedInnerBlock,
-				getSelectedBlockClientId,
-			} = select( blockEditorStore );
-			const selectedBlockId = getSelectedBlockClientId();
-
-			return {
-				isImmediateParentOfSelectedBlock: hasSelectedInnerBlock(
-					clientId,
-					false
-				),
-				selectedBlockHasChildren: !! getBlockCount( selectedBlockId ),
-				hasSelectedDescendant: hasSelectedInnerBlock( clientId, true ),
-				isSelected: selectedBlockId === clientId,
-			};
-		},
-		[ clientId ]
-	);
-
 	const originalBlocksRef = useRef();
 
 	useEffect( () => {
@@ -76,13 +44,9 @@ export default function UnsavedInnerBlocks( {
 			className: 'wp-block-navigation__container',
 		},
 		{
-			renderAppender:
-				isSelected ||
-				( isImmediateParentOfSelectedBlock &&
-					! selectedBlockHasChildren ) ||
-				hasSelectedDescendant
-					? InnerBlocks.ButtonBlockAppender
-					: false,
+			renderAppender: hasSelection
+				? InnerBlocks.ButtonBlockAppender
+				: false,
 			defaultBlock: DEFAULT_BLOCK,
 			directInsert: true,
 		}

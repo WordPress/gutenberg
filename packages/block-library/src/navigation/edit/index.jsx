@@ -1002,7 +1002,6 @@ function Navigation( {
 							createNavigationMenu={ createNavigationMenu }
 							blocks={ uncontrolledInnerBlocks }
 							hasSelection={ isSelected || isInnerBlockSelected }
-							clientId={ clientId }
 						/>
 					</ResponsiveWrapper>
 				</TagName>

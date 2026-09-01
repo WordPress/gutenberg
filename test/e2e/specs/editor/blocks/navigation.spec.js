@@ -2205,6 +2205,46 @@ test.describe( 'Navigation block', () => {
 			} );
 		} );
 	} );
+
+	test( 'shows add block appender when selecting navigation link in direct content navigation', async ( {
+		admin,
+		editor,
+		navigation,
+	} ) => {
+		await admin.createNewPost();
+
+		await editor.insertBlock( {
+			name: 'core/navigation',
+			attributes: {
+				overlayMenu: 'never',
+				layout: { type: 'flex', orientation: 'vertical' },
+			},
+			innerBlocks: [
+				{
+					name: 'core/navigation-link',
+					attributes: { label: 'Direct 1', url: '#' },
+				},
+				{
+					name: 'core/navigation-link',
+					attributes: { label: 'Direct 2', url: '#' },
+				},
+			],
+		} );
+
+		const navBlock = navigation.getNavBlock();
+		await expect( navBlock ).toBeVisible();
+
+		const navLink = editor.canvas
+			.getByRole( 'document', { name: 'Block: Custom Link' } )
+			.filter( { hasText: 'Direct 1' } );
+
+		await navLink.click();
+		await expect( navLink ).toHaveClass( /is-selected/ );
+		await expect( navBlock ).toHaveClass( /has-child-selected/ );
+
+		// The appender must remain visible while only a child is selected.
+		await expect( navigation.getNavBlockInserter() ).toBeVisible();
+	} );
 } );
 
 class Navigation {
