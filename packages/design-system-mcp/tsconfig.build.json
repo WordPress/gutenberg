@@ -3,6 +3,8 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"allowImportingTsExtensions": true,
+		"module": "nodenext",
+		"moduleResolution": "nodenext",
 		"types": [ "node" ]
 	}
 }

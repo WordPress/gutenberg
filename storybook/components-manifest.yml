@@ -114,6 +114,7 @@
             - positioner
             - render
             - style
+            - width
       - name: Autocomplete.Portal
         props:
             - className
@@ -618,6 +619,13 @@
             - render
             - style
             - variant
+      - name: Field.VisualLabel
+        props:
+            - children
+            - className
+            - render
+            - style
+            - variant
 - name: Fieldset.Root
   props:
       - children
@@ -1102,6 +1110,7 @@
       - onValueChange
       - open
       - openOnInputClick
+      - popupWidth
       - readOnly
       - ref
       - required
@@ -1193,6 +1202,7 @@
       - onValueChange
       - open
       - openOnInputClick
+      - popupWidth
       - readOnly
       - ref
       - required

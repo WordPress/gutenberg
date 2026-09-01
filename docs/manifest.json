@@ -3036,12 +3036,6 @@
 		"parent": "data"
 	},
 	{
-		"title": "Reusable blocks",
-		"slug": "data-core-reusable-blocks",
-		"markdown_source": "../docs/reference-guides/data/data-core-reusable-blocks.md",
-		"parent": "data"
-	},
-	{
 		"title": "Rich Text",
 		"slug": "data-core-rich-text",
 		"markdown_source": "../docs/reference-guides/data/data-core-rich-text.md",
@@ -3213,6 +3207,12 @@
 		"title": "Managing Packages",
 		"slug": "managing-packages",
 		"markdown_source": "../docs/contributors/code/managing-packages.md",
+		"parent": "code"
+	},
+	{
+		"title": "Testing published packages across WordPress versions",
+		"slug": "package-runtime-compatibility",
+		"markdown_source": "../docs/contributors/code/package-runtime-compatibility.md",
 		"parent": "code"
 	},
 	{

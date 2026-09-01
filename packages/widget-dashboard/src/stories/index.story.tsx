@@ -1,11 +1,26 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import type { ComponentPropsWithoutRef, ComponentType } from 'react';
-// Form controls read these stylesheets, normally enqueued by WordPress.
+import type {
+	ComponentProps,
+	ComponentPropsWithoutRef,
+	ComponentType,
+} from 'react';
+// Form controls and the command palette read these stylesheets, normally
+// enqueued by WordPress.
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
+import '@wordpress/commands/build-style/style.css';
 // eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '@wordpress/components/build-style/style.css';
 // eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '@wordpress/dataviews/build-style/style.css';
-import { forwardRef, useEffect, useState } from '@wordpress/element';
+import { Page } from '@wordpress/admin-ui';
+import { CommandMenu } from '@wordpress/commands';
+import {
+	forwardRef,
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 import { chartBar, download, trendingUp } from '@wordpress/icons';
 import { WidgetHostProvider } from '@wordpress/widget-primitives';
 import type {
@@ -16,8 +31,15 @@ import type {
 	WidgetRenderProps,
 	WidgetType,
 } from '@wordpress/widget-primitives';
+import { ROW_HEIGHT_PRESETS } from '../utils/row-height-presets';
+import type { RowHeightPreset } from '../utils/row-height-presets';
 import { WidgetDashboard } from '../widget-dashboard';
-import type { DashboardWidget } from '../types';
+import type {
+	CanPerformDashboardOperation,
+	DashboardWidget,
+	WidgetGridModel,
+	WidgetGridSettings,
+} from '../types';
 
 /*
  * Stories run without WordPress, so both halves of the demo widget are
@@ -340,7 +362,7 @@ const meta: Meta< typeof WidgetDashboard > = {
 		docs: {
 			description: {
 				component: `
-\`WidgetDashboard\` is the stateless rendering engine for widget dashboards: the consumer owns the \`layout\` state, every mutation flows back through \`onLayoutChange\`, and widget types arrive through the \`widgetTypes\` prop.
+\`WidgetDashboard\` is the stateless rendering engine for widget dashboards: the consumer owns the \`layout\` state, every mutation flows back through \`onLayoutChange\`, and widget types arrive through the \`widgetTypes\` prop. What users may do on it is the application's answer, given through \`WidgetDashboard.Policy\`.
 `,
 			},
 		},
@@ -610,6 +632,360 @@ The footer shows the three materializations side by side:
 - "Export progress" is a download: downloads always keep the plain anchor.
 
 Without the provider the same declarations still work; every action falls back to a plain anchor. Real hosts implement the capability at their route layer with their actual router.
+`,
+			},
+		},
+	},
+};
+
+/*
+ * The policy demo: an application with user profiles and sections. The
+ * profile decides which operations the user may perform; the active section
+ * decides what the inserter offers. The widget types never change.
+ */
+const POLICY_SECTIONS = [
+	{ label: 'All', href: '/analytics', type: null },
+	{
+		label: 'Traffic',
+		href: '/analytics/traffic',
+		type: 'demo/traffic-snapshot',
+	},
+	{ label: 'Goals', href: '/analytics/goals', type: 'demo/goal-progress' },
+] as const;
+
+type PolicySectionHref = ( typeof POLICY_SECTIONS )[ number ][ 'href' ];
+
+const PROFILES = {
+	viewer: {
+		label: 'Viewer',
+		summary: 'reads the dashboard and edits nothing',
+		operations: [] as readonly string[],
+	},
+	arranger: {
+		label: 'Arranger',
+		summary:
+			'may customize, move, and resize; never adds, removes, edits, or resets',
+		operations: [ 'customize', 'move', 'resize' ] as readonly string[],
+	},
+	owner: {
+		label: 'Owner',
+		summary: 'may do everything',
+		operations: 'all' as const,
+	},
+};
+
+type Profile = keyof typeof PROFILES;
+
+type PageLink = NonNullable<
+	NonNullable< ComponentProps< typeof Page >[ 'components' ] >[ 'link' ]
+>;
+
+interface PolicyStoryProps {
+	profile: Profile;
+}
+
+function PolicyStory( { profile }: PolicyStoryProps ) {
+	const [ layout, setLayout ] =
+		useState< DashboardWidget[] >( INITIAL_LAYOUT );
+	const [ editMode, setEditMode ] = useState( false );
+	const [ currentHref, setCurrentHref ] =
+		useState< PolicySectionHref >( '/analytics' );
+
+	const canPerform = useMemo< CanPerformDashboardOperation >( () => {
+		const { operations } = PROFILES[ profile ];
+		const sectionType = POLICY_SECTIONS.find(
+			( section ) => section.href === currentHref
+		)?.type;
+		return ( request ) => {
+			if (
+				operations !== 'all' &&
+				! operations.includes( request.operation )
+			) {
+				return false;
+			}
+			if ( request.operation === 'insert' ) {
+				return ! sectionType || request.widgetType.name === sectionType;
+			}
+			return true;
+		};
+	}, [ profile, currentHref ] );
+
+	// Section links drive local state instead of a router.
+	const link = useCallback< PageLink >(
+		( { href, onClick, children, ...props } ) => (
+			<a
+				{ ...props }
+				href={ href }
+				onClick={ ( event ) => {
+					event.preventDefault();
+					setCurrentHref( href as PolicySectionHref );
+					onClick?.( event );
+				} }
+			>
+				{ children }
+			</a>
+		),
+		[]
+	);
+
+	// Storybook forwards every keydown to its manager (`window.onkeydown`)
+	// without honoring `defaultPrevented`, so its own search would answer
+	// the palette combination too. Stop the event before it leaves the
+	// document; the palette's global shortcut listens on the document as
+	// well, and `stopPropagation` never affects same-target listeners.
+	useEffect( () => {
+		const containPaletteShortcut = ( event: KeyboardEvent ) => {
+			if (
+				( event.metaKey || event.ctrlKey ) &&
+				! event.shiftKey &&
+				! event.altKey &&
+				event.key.toLowerCase() === 'k'
+			) {
+				event.stopPropagation();
+			}
+		};
+		document.addEventListener( 'keydown', containPaletteShortcut );
+		return () =>
+			document.removeEventListener( 'keydown', containPaletteShortcut );
+	}, [] );
+
+	const { label, summary } = PROFILES[ profile ];
+
+	return (
+		<WidgetDashboard.Policy canPerform={ canPerform }>
+			<WidgetDashboard
+				widgetTypes={ [
+					trafficSnapshotWidgetType,
+					goalProgressWidgetType,
+				] }
+				layout={ layout }
+				onLayoutChange={ setLayout }
+				onLayoutReset={ () => setLayout( INITIAL_LAYOUT ) }
+				editMode={ editMode }
+				onEditChange={ setEditMode }
+				resolveWidgetModule={ resolveDemoModule }
+				gridSettings={ { model: 'grid', rowHeight: 200 } }
+			>
+				<Page
+					title="Analytics"
+					subTitle={ `Signed in as ${ label }: ${ summary }. The section scopes what "Add widget" offers.` }
+					actions={ <WidgetDashboard.Actions /> }
+					navigation={ {
+						items: POLICY_SECTIONS.map(
+							( { label: text, href } ) => ( {
+								label: text,
+								href,
+							} )
+						),
+						currentHref,
+						ariaLabel: 'Sections',
+					} }
+					components={ { link } }
+					showSidebarToggle={ false }
+					hasPadding
+				>
+					<WidgetDashboard.Widgets />
+					<WidgetDashboard.Commands />
+					<CommandMenu />
+				</Page>
+			</WidgetDashboard>
+		</WidgetDashboard.Policy>
+	);
+}
+
+export const Policy: StoryObj< PolicyStoryProps > = {
+	render: ( args ) => <PolicyStory { ...args } />,
+	args: {
+		profile: 'owner',
+	},
+	argTypes: {
+		profile: {
+			control: 'select',
+			options: Object.keys( PROFILES ),
+			description:
+				'The user profile the application maps to a policy. Viewer: nothing. Arranger: customize, move, resize. Owner: everything, including reset.',
+		},
+	},
+	parameters: {
+		docs: {
+			description: {
+				story: `
+The application governs the dashboard; the widget types stay untouched. This story mounts \`WidgetDashboard.Policy\` around the dashboard with a \`canPerform\` closing over the signed-in profile and the active section, and composes the dashboard inside an admin \`Page\`: the section links in its navigation, the dashboard actions in its actions slot.
+
+Switch the \`profile\` control. A Viewer gets no Customize button, no Reset to default entry, no attribute controls, and read-only widgets (no \`setAttributes\`). An Arranger enters customize mode and drags or resizes tiles, but has no Add widget trigger, no Reset to default entry, no Remove control, and no attribute editing. An Owner does everything.
+
+The command palette is mounted too: press ⌘K (Ctrl+K outside macOS) and the commands follow the same policy. An Owner sees Customize dashboard, Add dashboard widgets, and Reset dashboard widgets to default; an Arranger keeps Customize dashboard only; a Viewer gets no dashboard commands.
+
+Switch the section, then open "Add widget": the listing follows the section, even while open; the excluded types keep rendering where already placed because the \`widgetTypes\` registry never changes.
+
+Nested policies compose restrictively; without a policy, every operation is allowed. See the **Policy** page for the contract.
+`,
+			},
+		},
+	},
+};
+
+// A fuller board than INITIAL_LAYOUT: a hero spanning the whole first row at
+// any column count (the grid clamps the span), then a rank of small tiles so
+// the columns control visibly repacks them.
+const GRID_SETTINGS_LAYOUT: DashboardWidget[] = [
+	{
+		uuid: 'grid-settings-traffic-week',
+		type: 'demo/traffic-snapshot',
+		attributes: { metric: 'views', period: 'week', label: 'Traffic' },
+		placement: { width: 2, height: 1, order: 1 },
+	},
+	{
+		uuid: 'grid-settings-goal-revenue',
+		type: 'demo/goal-progress',
+		attributes: { metric: 'revenue', target: '5000' },
+		placement: { width: 1, height: 1, order: 2 },
+	},
+	{
+		uuid: 'grid-settings-audience-tall',
+		type: 'demo/traffic-snapshot',
+		attributes: { metric: 'visitors', period: 'month', label: 'Audience' },
+		placement: { width: 1, height: 2, order: 3 },
+	},
+	{
+		uuid: 'grid-settings-goal-orders',
+		type: 'demo/goal-progress',
+		attributes: { metric: 'orders', target: '1000' },
+		placement: { width: 2, height: 1, order: 4 },
+	},
+	{
+		uuid: 'grid-settings-traffic-day',
+		type: 'demo/traffic-snapshot',
+		attributes: { metric: 'views', period: 'day', label: 'Today' },
+		placement: { width: 1, height: 1, order: 5 },
+	},
+	{
+		uuid: 'grid-settings-goal-stretch',
+		type: 'demo/goal-progress',
+		attributes: { metric: 'revenue', target: '10000' },
+		placement: { width: 1, height: 1, order: 6 },
+	},
+];
+
+type GridSettingsStoryProps = {
+	columns: number;
+	model: WidgetGridModel;
+	rowHeight: RowHeightPreset;
+	flowTolerance: number;
+};
+
+// The ladder in words, so the caption tracks the count the story asked for
+// rather than describing the four-column default.
+function describeColumnSteps( columns: number ): string {
+	if ( columns === 1 ) {
+		return 'one column at every width';
+	}
+
+	const middle = Math.min( 2, columns );
+	if ( middle === columns ) {
+		return `${ columns } columns until the container narrows to one`;
+	}
+
+	return `${ columns } columns on a wide container, ${ middle } as it narrows, then one`;
+}
+
+function GridSettingsStory( {
+	columns,
+	model,
+	rowHeight,
+	flowTolerance,
+}: GridSettingsStoryProps ) {
+	const [ layout, setLayout ] =
+		useState< DashboardWidget[] >( GRID_SETTINGS_LAYOUT );
+	const [ editMode, setEditMode ] = useState( false );
+
+	// The settings union is per model: `rowHeight` belongs to the grid and
+	// `flowTolerance` to masonry, so only the active model's field travels.
+	const gridSettings = useMemo< WidgetGridSettings >(
+		() =>
+			model === 'masonry'
+				? { model, columns, flowTolerance }
+				: {
+						model,
+						columns,
+						rowHeight: ROW_HEIGHT_PRESETS[ rowHeight ],
+				  },
+		[ model, columns, flowTolerance, rowHeight ]
+	);
+
+	return (
+		<WidgetDashboard
+			widgetTypes={ [
+				trafficSnapshotWidgetType,
+				goalProgressWidgetType,
+			] }
+			layout={ layout }
+			onLayoutChange={ setLayout }
+			editMode={ editMode }
+			onEditChange={ setEditMode }
+			resolveWidgetModule={ resolveDemoModule }
+			gridSettings={ gridSettings }
+		>
+			<Page
+				title="Dashboard"
+				subTitle={ `${
+					model === 'masonry' ? 'Masonry' : 'Standard grid'
+				}: ${ describeColumnSteps( columns ) }.` }
+				actions={ <WidgetDashboard.Actions /> }
+				showSidebarToggle={ false }
+				hasPadding
+			>
+				<WidgetDashboard.Widgets />
+			</Page>
+		</WidgetDashboard>
+	);
+}
+
+export const GridSettings: StoryObj< GridSettingsStoryProps > = {
+	render: ( args ) => <GridSettingsStory { ...args } />,
+	args: {
+		columns: 4,
+		model: 'grid',
+		rowHeight: 'medium',
+		flowTolerance: 16,
+	},
+	argTypes: {
+		columns: {
+			control: { type: 'range', min: 1, max: 12, step: 1 },
+			description:
+				'Wide-container column count. The host decides; the package only floors it at one.',
+		},
+		model: {
+			control: 'radio',
+			options: [ 'grid', 'masonry' ],
+			description:
+				'The grid model. `grid` gives uniform rows and two-axis spans; `masonry` drives heights from content.',
+		},
+		rowHeight: {
+			control: 'radio',
+			options: Object.keys( ROW_HEIGHT_PRESETS ),
+			description: 'Height of each grid row. Grid model only.',
+			if: { arg: 'model', eq: 'grid' },
+		},
+		flowTolerance: {
+			control: { type: 'range', min: 0, max: 200, step: 4 },
+			description:
+				'Pixel tolerance for source-order tiebreaking between lanes. Masonry model only.',
+			if: { arg: 'model', eq: 'masonry' },
+		},
+	},
+	parameters: {
+		controls: {
+			include: [ 'columns', 'model', 'rowHeight', 'flowTolerance' ],
+		},
+		docs: {
+			description: {
+				story: `
+The \`gridSettings\` prop carries the host's layout decisions. \`columns\` sets the wide-container count (\`WIDGET_DASHBOARD_COLUMN_COUNT\` is only the default when the host sets nothing), and container width steps the effective count down to \`min( 2, count )\` and then one as it narrows. Drag the columns control; resize the canvas to watch the steps.
+
+\`model\` picks the surface, and the per-model field follows it: \`rowHeight\` belongs to \`grid\`, \`flowTolerance\` to \`masonry\`. Only the active one is passed in \`gridSettings\`, and only its control is shown.
+
+Tile spans are stored per widget and do not scale with the count. Raise \`columns\` and every track narrows, so the same spans cover less of the surface. Enter Customize and resize a tile to see it take the new count.
 `,
 			},
 		},

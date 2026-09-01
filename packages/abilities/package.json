@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/abilities",
-	"version": "0.19.0",
+	"version": "0.20.0",
 	"description": "JavaScript client for WordPress Abilities API.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -52,7 +52,8 @@
 		"ajv-formats": "^3.0.1"
 	},
 	"devDependencies": {
-		"@types/jest": "^30.0.0"
+		"@types/jest": "^30.0.0",
+		"vitest": "^4.1.10"
 	},
 	"publishConfig": {
 		"access": "public"

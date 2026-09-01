@@ -2,6 +2,31 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `Popover`: Widen `offset` to also accept an object with separate main and cross axis offsets. The same applies to `BorderBoxControl`'s `popoverOffset` prop ([#82060](https://github.com/WordPress/gutenberg/pull/82060)).
+-   `ToolsPanelItem`: Add `defaultShown` to show an optional item that has no value, and an `onShownChange` callback that fires only when the user toggles the item in the panel's menu ([#78010](https://github.com/WordPress/gutenberg/pull/78010)).
+-   `BorderBoxControl`: render the linked/unlinked toggle in a row alongside the label when a visible label is present, so it lines up with the equivalent toggle on sibling controls. Without a visible label the toggle stays beside the inputs, as before. The visible label is now a `BaseControl.VisualLabel`, so it renders as a `span` rather than a `label` element; it was never associated with an input in either form ([#82163](https://github.com/WordPress/gutenberg/pull/82163)).
+
+### Bug Fixes
+
+-   `ColorPalette`: Apply the computed contrast color to the selected checkmark now that the icon is stroke-based. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
+-   `CheckboxControl`: Color the checked and indeterminate icons with `color` rather than `fill`, so they stay visible now that those icons are stroke-based. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
+-   `Snackbar`: Restart the auto-dismiss timer when a notice is recreated with the same ID during removal ([#81764](https://github.com/WordPress/gutenberg/pull/81764)).
+-   `ToolsPanel`: Stop a panel item whose `panelId` doesn't match the panel from writing its value into that panel's menu, which could leave an orphaned entry in the dropdown ([#82127](https://github.com/WordPress/gutenberg/pull/82127)).
+-   `Icon`: Merge a consumer-supplied `style` prop with the icon's intrinsic styles instead of replacing them, so styles like `fill: none` on stroke-based icons survive unless the consumer overrides the same property explicitly. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+-   `ItemGroup`: Drop the blanket `path { fill: currentColor }` rule that was overriding stroke-based icons' intended fill via inheritance bypass. Paths without an explicit fill still inherit `currentColor` from the surrounding SVG. Custom paths that specify a fill now retain it instead of being overridden by ItemGroup. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+-   `Tip`: Preserve the intended yellow color after its icon became stroke-based. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+
+### Internal
+
+-   Migrate JSX files to TypeScript and remove their ESLint filename suppressions ([#82132](https://github.com/WordPress/gutenberg/pull/82132)).
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+-   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
+-   `ToolsPanel`: Cut the render cascade panel items set off when the selected block changes, and keep a default control resettable when `Reset all` leaves its value in place ([#82180](https://github.com/WordPress/gutenberg/pull/82180)).
+
+## 40.0.0 (2026-08-26)
+
 ### Breaking Changes
 
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:

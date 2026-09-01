@@ -26,9 +26,6 @@ function gutenberg_enable_experiments() {
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-content-only-inspector-fields' ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalContentOnlyInspectorFields = true', 'before' );
 	}
-	if ( gutenberg_is_experiment_enabled( 'active_templates' ) ) {
-		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalTemplateActivate = true', 'before' );
-	}
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-extensible-site-editor' ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalExtensibleSiteEditor = true', 'before' );
 	}

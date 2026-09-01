@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `WelcomeGuide`: Keep the modal close icon white now that it is stroke-based. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
+
+### Internal
+
+-   Remove the `showListViewByDefault` handling from `initializeEditor`; the `editor` package now applies the preference itself.
+-   Remove unused dependencies `@wordpress/a11y`, `@wordpress/dom`, `@wordpress/viewport`, etc. ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+## 8.54.0 (2026-08-26)
+
 ### Internal
 
 -   Stop rendering `EditorKeyboardShortcutsRegister`, which the editor provider now renders itself ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).

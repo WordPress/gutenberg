@@ -4,6 +4,17 @@
 
 ### Bug Fixes
 
+-   Background panels: Resolve theme-relative (`file:./…`) background image URLs and `ref` pointers before rendering thumbnails and the focal point picker. The screens render inside the package's own `BlockEditorProvider`, which cannot carry the private settings the panels previously resolved these against ([#82242](https://github.com/WordPress/gutenberg/pull/82242)).
+
+### Internal
+
+-   Remove unused dependency `change-case` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+
+## 1.21.0 (2026-08-26)
+
+### Bug Fixes
+
+-   Font Library: Leave a `var()` custom property unquoted in the font previews, so a theme that sets `fontFamily` to a custom property previews in the right font ([#82010](https://github.com/WordPress/gutenberg/pull/82010)).
 -   Revisions: close the screen on the first click of the back arrow after a revision has been selected, instead of requiring a second click ([#81897](https://github.com/WordPress/gutenberg/pull/81897)).
 -   Revisions: close the screen after applying a revision, which stopped happening when the screen moved into this package ([#81897](https://github.com/WordPress/gutenberg/pull/81897)).
 -   Color palette panel: do not render the theme colors wrapper when the theme provides no colors, which left an empty gap above the Custom section ([#81894](https://github.com/WordPress/gutenberg/pull/81894)).

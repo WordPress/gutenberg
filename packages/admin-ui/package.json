@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/admin-ui",
-	"version": "2.8.0",
+	"version": "2.9.0",
 	"description": "Generic components to be used in the Admin UI.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -60,7 +60,8 @@
 		"@testing-library/react": "^16.3.2",
 		"@types/jest": "^30.0.0",
 		"@wordpress/icons": "file:../icons",
-		"@wordpress/jest-console": "file:../jest-console"
+		"@wordpress/jest-console": "file:../jest-console",
+		"vitest": "^4.1.10"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",
