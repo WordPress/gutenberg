@@ -28,6 +28,7 @@ export const EXPERIMENTAL_FOREGROUND_METHODS = [
 	'state-skewed',
 	'state-skewed-relative-chroma',
 	'state-skewed-okhsl',
+	'anchored-state-skewed-relative-chroma',
 ] as const;
 
 export type ExperimentalForegroundMethod =
@@ -679,7 +680,10 @@ export function buildPerceptualForegroundScale( {
 	let getColorAtLightness = getChromaPreservingColorForLightness;
 	if ( scaleType === 'neutral' ) {
 		getColorAtLightness = getNeutralColorForLightness;
-	} else if ( method === 'state-skewed-relative-chroma' ) {
+	} else if (
+		method === 'state-skewed-relative-chroma' ||
+		method === 'anchored-state-skewed-relative-chroma'
+	) {
 		getColorAtLightness = createGamutRelativeColorForLightness( seed );
 	} else if ( method === 'state-skewed-okhsl' ) {
 		getColorAtLightness = createOkhslColorForLightness( seed );
@@ -784,6 +788,99 @@ export function buildPerceptualForegroundScale( {
 			  } );
 
 		experimentalColors = [ ...constrainedAnchors, restColor, strongColor ];
+	} else if ( method === 'anchored-state-skewed-relative-chroma' ) {
+		const constrainedAnchors = [
+			currentWeakColor,
+			clampToGamut( ramp.ramp.fgSurface2 ),
+		].map( ( currentAnchor, stepIndex ) => {
+			if (
+				colorMeetsContrastTarget(
+					currentAnchor,
+					stepIndex,
+					ramp,
+					backgroundRamp
+				)
+			) {
+				return currentAnchor;
+			}
+
+			return getFloorColor( {
+				getColorAtLightness: ( _, lightness ) =>
+					getChromaPreservingColorForLightness(
+						currentAnchor,
+						lightness
+					),
+				stepIndex,
+				seed: currentAnchor,
+				weakColor: currentAnchor,
+				strongColor,
+				ramp,
+				backgroundRamp,
+			} );
+		} ) as [ PlainColorObject, PlainColorObject ];
+
+		const weakContrast = getPerceptualContrastMagnitude(
+			displayBackground,
+			constrainedAnchors[ 0 ]
+		);
+		const strongContrast = getPerceptualContrastMagnitude(
+			displayBackground,
+			strongColor
+		);
+		const colors = [ ...constrainedAnchors ];
+
+		for ( const stepIndex of [ 2, 3 ] ) {
+			const previousColor = colors.at( -1 )!;
+			const target =
+				weakContrast +
+				( strongContrast - weakContrast ) *
+					STATE_SKEWED_PROGRESS[ stepIndex ];
+			const previousContrast = getPerceptualContrastMagnitude(
+				displayBackground,
+				previousColor
+			);
+			const candidate =
+				target <= previousContrast
+					? previousColor
+					: findColorAtPerceptualContrast( {
+							displayBackground,
+							getColorAtLightness,
+							seed,
+							weakColor: getColorAtLightness(
+								seed,
+								get( previousColor, [ OKLCH, 'l' ] )
+							),
+							strongColor,
+							target,
+					  } );
+
+			colors.push(
+				colorMeetsContrastTarget(
+					candidate,
+					stepIndex,
+					ramp,
+					backgroundRamp
+				)
+					? candidate
+					: getFloorColor( {
+							getColorAtLightness,
+							stepIndex,
+							seed,
+							weakColor: candidate,
+							strongColor,
+							ramp,
+							backgroundRamp,
+					  } )
+			);
+		}
+
+		experimentalColors = [
+			colors[ 0 ],
+			colors[ 1 ],
+			colors[ 2 ],
+			colors[ 3 ],
+			strongColor,
+		];
 	} else {
 		const initialWeakContrast = getPerceptualContrastMagnitude(
 			displayBackground,

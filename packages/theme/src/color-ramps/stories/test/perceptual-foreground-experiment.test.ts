@@ -1,4 +1,4 @@
-import { get, OKLCH, Okhsl, parse } from 'colorjs.io/fn';
+import { deltaEOK2, get, OKLCH, Okhsl, parse } from 'colorjs.io/fn';
 import { buildAccentRamp, buildBgRamp } from '../..';
 import { clampToGamut, getContrast } from '../../lib/color-utils';
 import { DEFAULT_SEED_COLORS } from '../../lib/constants';
@@ -33,7 +33,8 @@ const EXPERIMENTAL_METHODS = EXPERIMENTAL_FOREGROUND_METHODS.filter(
 const ABSOLUTE_OKLCH_CHROMA_METHODS = EXPERIMENTAL_METHODS.filter(
 	( method ) =>
 		method !== 'state-skewed-relative-chroma' &&
-		method !== 'state-skewed-okhsl'
+		method !== 'state-skewed-okhsl' &&
+		method !== 'anchored-state-skewed-relative-chroma'
 );
 
 function buildScale(
@@ -355,6 +356,77 @@ describe( 'perceptual foreground experiment', () => {
 		{ background: '#fcfcfc', primary: '#ffd700' },
 		{ background: '#1e1e1e', primary: '#00ffff' },
 	] )(
+		"preserves the seed's relative chroma in the anchored tail for $background and $primary",
+		( { background, primary } ) => {
+			const backgroundRamp = buildBgRamp( background );
+			const primaryRamp = buildAccentRamp( primary, backgroundRamp );
+			const seedRelativeChroma = getGamutRelativeChroma(
+				primaryRamp.ramp.bgFill1
+			);
+			const scale = buildScale(
+				'anchored-state-skewed-relative-chroma',
+				primaryRamp,
+				backgroundRamp,
+				primaryRamp.ramp.bgFill1,
+				'accent'
+			);
+
+			for ( const color of scale.colors.slice( 2, -1 ) ) {
+				expect(
+					Math.abs(
+						getGamutRelativeChroma( color ) - seedRelativeChroma
+					)
+				).toBeLessThan( 0.04 );
+			}
+		}
+	);
+
+	it( 'keeps the middle-gray accent anchors close to production', () => {
+		const backgroundRamp = buildBgRamp( '#777777' );
+		const primaryRamp = buildAccentRamp( '#d63638', backgroundRamp );
+		const seed = primaryRamp.ramp.bgFill1;
+		const currentScale = buildScale(
+			'current',
+			primaryRamp,
+			backgroundRamp,
+			seed,
+			'accent'
+		);
+		const globalScale = buildScale(
+			'state-skewed-relative-chroma',
+			primaryRamp,
+			backgroundRamp,
+			seed,
+			'accent'
+		);
+		const anchoredScale = buildScale(
+			'anchored-state-skewed-relative-chroma',
+			primaryRamp,
+			backgroundRamp,
+			seed,
+			'accent'
+		);
+
+		for ( const index of [ 0, 1 ] ) {
+			const anchoredDifference = deltaEOK2(
+				parse( currentScale.colors[ index ] ),
+				parse( anchoredScale.colors[ index ] )
+			);
+			const globalDifference = deltaEOK2(
+				parse( currentScale.colors[ index ] ),
+				parse( globalScale.colors[ index ] )
+			);
+
+			expect( anchoredDifference ).toBeLessThan( 0.03 );
+			expect( anchoredDifference ).toBeLessThan( globalDifference );
+		}
+	} );
+
+	it.each( [
+		{ background: '#4f386e', primary: '#608010' },
+		{ background: '#fcfcfc', primary: '#ffd700' },
+		{ background: '#1e1e1e', primary: '#00ffff' },
+	] )(
 		"preserves the seed's OKHSL saturation and hue for $background and $primary",
 		( { background, primary } ) => {
 			const backgroundRamp = buildBgRamp( background );
@@ -405,6 +477,7 @@ describe( 'perceptual foreground experiment', () => {
 			'state-skewed',
 			'state-skewed-relative-chroma',
 			'state-skewed-okhsl',
+			'anchored-state-skewed-relative-chroma',
 			'semantic-anchors',
 			'eased',
 		] as const ) {
@@ -455,6 +528,7 @@ describe( 'perceptual foreground experiment', () => {
 			'state-skewed',
 			'state-skewed-relative-chroma',
 			'state-skewed-okhsl',
+			'anchored-state-skewed-relative-chroma',
 			'eased',
 		] as const ) {
 			expect(
@@ -502,6 +576,33 @@ describe( 'perceptual foreground experiment', () => {
 		expect(
 			getStateColorDifference( stateSkewedScale.colors )
 		).toBeGreaterThan( getStateColorDifference( uniformScale.colors ) );
+	} );
+
+	it( 'reserves the final 40 percent after keeping the early anchors', () => {
+		const backgroundRamp = buildBgRamp( DEFAULT_SEED_COLORS.background );
+		const seed = backgroundRamp.ramp.surface2;
+		const scale = buildScale(
+			'anchored-state-skewed-relative-chroma',
+			backgroundRamp,
+			backgroundRamp,
+			seed,
+			'neutral'
+		);
+		const contrasts = scale.colors.map( ( color ) =>
+			getPerceptualContrastMagnitude(
+				backgroundRamp.ramp.surface2,
+				color
+			)
+		);
+		const finalInterval = contrasts[ 4 ] - contrasts[ 3 ];
+		const totalRange = contrasts[ 4 ] - contrasts[ 0 ];
+
+		expect( scale.colors.slice( 0, 2 ) ).toEqual( [
+			backgroundRamp.ramp.fgSurface1,
+			backgroundRamp.ramp.fgSurface2,
+		] );
+		expect( scale.colors[ 4 ] ).toBe( backgroundRamp.ramp.fgSurface4 );
+		expect( finalInterval / totalRange ).toBeGreaterThanOrEqual( 0.35 );
 	} );
 
 	it( 'produces the same palette for identical seeds', () => {

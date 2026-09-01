@@ -106,6 +106,11 @@ const METHOD_DETAILS: Record<
 		description:
 			"Uses the same state spacing and fixed Step 5, while Steps 1–4 preserve the seed's OKHSL saturation and hue.",
 	},
+	'anchored-state-skewed-relative-chroma': {
+		label: 'Anchored state-skewed · relative chroma',
+		description:
+			"Keeps production Steps 1–2 when they meet the hard floors, then applies state-skewed spacing and the seed's relative chroma to Steps 3–4.",
+	},
 };
 
 type ScaleData = {
@@ -449,12 +454,14 @@ function VariantCard( {
 						data.scaleType === 'accent' &&
 						( method === 'state-skewed' ||
 							method === 'state-skewed-relative-chroma' ||
-							method === 'state-skewed-okhsl' )
+							method === 'state-skewed-okhsl' ||
+							method === 'anchored-state-skewed-relative-chroma' )
 					}
 					showOkhslSaturation={
 						data.scaleType === 'accent' &&
 						( method === 'state-skewed-relative-chroma' ||
-							method === 'state-skewed-okhsl' )
+							method === 'state-skewed-okhsl' ||
+							method === 'anchored-state-skewed-relative-chroma' )
 					}
 				/>
 			) ) }
@@ -488,13 +495,15 @@ function PilotComparison() {
 				<p>
 					Neutral scales use the production foreground chroma taper.
 					Most brand and error scales preserve absolute seed chroma.
-					The relative-chroma variant preserves the seed&apos;s share
-					of available sRGB chroma across Steps 1–4 instead. The OKHSL
-					variant preserves the seed&apos;s OKHSL saturation and hue.
-					The three state-skewed cards report Gamut chroma. The last
-					two also report OKHSL saturation. FGS4→5 ΔEOK2 measures the
-					resting-to-active color difference. Signed APCA Lc exposes
-					contrast polarity, while its magnitude controls spacing.
+					The global relative-chroma variant preserves the seed&apos;s
+					share of available sRGB chroma across Steps 1–4. The
+					anchored variant keeps production Steps 1–2 and applies
+					relative chroma to Steps 3–4. The OKHSL variant preserves
+					the seed&apos;s OKHSL saturation and hue. The state-skewed
+					cards report Gamut chroma. The last three also report OKHSL
+					saturation. FGS4→5 ΔEOK2 measures the resting-to-active
+					color difference. Signed APCA Lc exposes contrast polarity,
+					while its magnitude controls spacing.
 				</p>
 				<p>
 					Only Uniform APCA · released Step 5 removes the legacy
