@@ -5,6 +5,10 @@
 @use "@wordpress/base-styles/z-index" as *;
 @use "../utils/theme-variables" as *;
 
+body.modal-open {
+	overflow: hidden;
+}
+
 // The scrim behind the modal window.
 .components-modal__screen-overlay {
 	position: fixed;
@@ -200,14 +204,15 @@
 	align-items: center;
 	height: $header-height + $grid-unit-10; // 72px
 	width: 100%;
-	z-index: z-index(".components-modal__header");
+	// Stack above modal content that may overlap the header.
+	z-index: 10;
 	position: absolute;
 	top: 0;
 	left: 0;
 
 	.components-modal__header-heading {
 		font-size: $font-size-x-large;
-		font-weight: 600;
+		font-weight: var(--wpds-typography-font-weight-emphasis);
 	}
 
 	h1 {
@@ -216,7 +221,7 @@
 	}
 
 	.components-modal__content.has-scrolled-content:not(.hide-header) & {
-		border-bottom-color: $gray-300;
+		border-bottom-color: var(--wpds-color-stroke-surface-neutral);
 	}
 
 	& + p {

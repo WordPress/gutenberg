@@ -44,15 +44,17 @@ if ( ! function_exists( 'wp_get_connector' ) ) {
 	 *     @type string $logo_url       Optional. URL to the connector's logo image.
 	 *     @type string $type           The connector type, e.g. 'ai_provider' or 'spam_filtering'.
 	 *     @type array  $authentication {
-	 *         Authentication configuration. When method is 'api_key', includes
-	 *         credentials_url, setting_name, and optionally constant_name and
-	 *         env_var_name. When 'none', only method is present.
+	 *         Authentication configuration. When method is 'api_key' or
+	 *         'application_password', includes credentials_url, setting_name, and
+	 *         optionally constant_name and env_var_name. When 'none', only method
+	 *         is present.
 	 *
-	 *         @type string $method          The authentication method: 'api_key' or 'none'.
+	 *         @type string $method          The authentication method: 'api_key',
+	 *                                       'application_password', or 'none'.
 	 *         @type string $credentials_url Optional. URL where users can obtain API credentials.
-	 *         @type string $setting_name    Optional. The setting name for the API key.
-	 *         @type string $constant_name   Optional. PHP constant name for the API key.
-	 *         @type string $env_var_name    Optional. Environment variable name for the API key.
+	 *         @type string $setting_name    Optional. The setting name for the API key or application-password credentials.
+	 *         @type string $constant_name   Optional. PHP constant name for the API key or application-password credentials.
+	 *         @type string $env_var_name    Optional. Environment variable name for the API key or application-password credentials.
 	 *     }
 	 *     @type array  $plugin         {
 	 *         Optional. Plugin data for install/activate UI.
@@ -69,7 +71,7 @@ if ( ! function_exists( 'wp_get_connector' ) ) {
 	 *     logo_url?: non-empty-string,
 	 *     type: non-empty-string,
 	 *     authentication: array{
-	 *         method: 'api_key'|'none',
+	 *         method: 'api_key'|'application_password'|'none',
 	 *         credentials_url?: non-empty-string,
 	 *         setting_name?: non-empty-string,
 	 *         constant_name?: non-empty-string,
@@ -110,15 +112,17 @@ if ( ! function_exists( 'wp_get_connectors' ) ) {
 	 *         @type string      $logo_url       Optional. URL to the connector's logo image.
 	 *         @type string      $type           The connector type, e.g. 'ai_provider' or 'spam_filtering'.
 	 *         @type array       $authentication {
-	 *             Authentication configuration. When method is 'api_key', includes
-	 *             credentials_url, setting_name, and optionally constant_name and
-	 *             env_var_name. When 'none', only method is present.
+	 *             Authentication configuration. When method is 'api_key' or
+	 *             'application_password', includes credentials_url, setting_name,
+	 *             and optionally constant_name and env_var_name. When 'none', only
+	 *             method is present.
 	 *
-	 *             @type string $method          The authentication method: 'api_key' or 'none'.
+	 *             @type string $method          The authentication method: 'api_key',
+	 *                                           'application_password', or 'none'.
 	 *             @type string $credentials_url Optional. URL where users can obtain API credentials.
-	 *             @type string $setting_name    Optional. The setting name for the API key.
-	 *             @type string $constant_name   Optional. PHP constant name for the API key.
-	 *             @type string $env_var_name    Optional. Environment variable name for the API key.
+	 *             @type string $setting_name    Optional. The setting name for the API key or application-password credentials.
+	 *             @type string $constant_name   Optional. PHP constant name for the API key or application-password credentials.
+	 *             @type string $env_var_name    Optional. Environment variable name for the API key or application-password credentials.
 	 *         }
 	 *         @type array       $plugin         {
 	 *             Optional. Plugin data for install/activate UI.
@@ -136,7 +140,7 @@ if ( ! function_exists( 'wp_get_connectors' ) ) {
 	 *     logo_url?: non-empty-string,
 	 *     type: non-empty-string,
 	 *     authentication: array{
-	 *         method: 'api_key'|'none',
+	 *         method: 'api_key'|'application_password'|'none',
 	 *         credentials_url?: non-empty-string,
 	 *         setting_name?: non-empty-string,
 	 *         constant_name?: non-empty-string,
@@ -205,4 +209,33 @@ if ( ! function_exists( '_wp_connectors_resolve_ai_provider_logo_url' ) ) {
 
 		return null;
 	}
+}
+
+// Priority 11 to run after Core's menu.php sets up the connectors menu.
+add_action( 'admin_menu', '_gutenberg_connectors_add_settings_menu_item', 11 );
+
+/**
+ * Registers the Connectors menu item under Settings.
+ * Removes Core's connectors menu item first to prevent duplication.
+ *
+ * @access private
+ */
+function _gutenberg_connectors_add_settings_menu_item(): void {
+	if ( ! class_exists( '\WordPress\AiClient\AiClient' ) || ! function_exists( 'gutenberg_options_connectors_wp_admin_render_page' ) ) {
+		return;
+	}
+
+	// Remove Core's connectors menu item if it exists.
+	remove_submenu_page( 'options-general.php', 'connectors-wp-admin' );
+	remove_submenu_page( 'options-general.php', 'options-connectors.php' );
+
+	add_submenu_page(
+		'options-general.php',
+		__( 'Connectors', 'gutenberg' ),
+		__( 'Connectors', 'gutenberg' ),
+		'manage_options',
+		'options-connectors-wp-admin',
+		'gutenberg_options_connectors_wp_admin_render_page',
+		1
+	);
 }

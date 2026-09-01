@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Button, ExternalLink } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -13,13 +10,8 @@ import {
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { addQueryArgs } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { getConnectorData } from './default-connectors';
 import { WpLogoDecoration } from './wp-logo-decoration';
-
 import type { PluginStatus } from './use-connector-plugin';
 
 const AI_PLUGIN_SLUG = 'ai';
@@ -255,7 +247,7 @@ export function AiPluginCallout() {
 				<p>
 					{ createInterpolateElement( getMessage(), {
 						strong: <strong />,
-						// @ts-ignore children are injected by createInterpolateElement at runtime.
+						// @ts-expect-error `children` is injected by `createInterpolateElement` at runtime.
 						a: <ExternalLink href={ AI_PLUGIN_URL } />,
 					} ) }
 				</p>

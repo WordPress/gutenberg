@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { patternMatch, findParent } from '../utils/router';
 
 describe( 'patternMatch', () => {

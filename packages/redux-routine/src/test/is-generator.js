@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import isGenerator from '../is-generator';
 
 describe( 'isGenerator', () => {

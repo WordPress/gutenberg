@@ -1,8 +1,4 @@
 #!/usr/bin/env node
-
-/**
- * External dependencies
- */
 import { readFile, writeFile, copyFile, mkdir, unlink } from 'fs/promises';
 import path from 'path';
 import { createHash } from 'node:crypto';
@@ -21,30 +17,6 @@ import cssnano from 'cssnano';
 import babel from 'esbuild-plugin-babel';
 import { camelCase } from 'change-case';
 import { NodePackageImporter } from 'sass-embedded';
-
-// Optional dependency: @wordpress/theme provides plugins that inject fallback
-// values for design system tokens. Fails gracefully when the package is not
-// installed (it is an optional peerDependency).
-let dsTokenFallbacks;
-let dsTokenFallbacksJs;
-try {
-	const { default: postcssPlugin } = await import(
-		// eslint-disable-next-line import/no-unresolved
-		'@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks'
-	);
-	const { default: esbuildPlugin } = await import(
-		// eslint-disable-next-line import/no-unresolved
-		'@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks'
-	);
-	dsTokenFallbacks = postcssPlugin;
-	dsTokenFallbacksJs = esbuildPlugin;
-} catch {
-	// @wordpress/theme is optional; skip token fallbacks if not available.
-}
-
-/**
- * Internal dependencies
- */
 import {
 	groupByDepth,
 	findScriptsToRebundle,
@@ -56,6 +28,8 @@ import {
 	renderTemplateToString,
 } from './php-generator.mjs';
 import { getPackageInfo, getPackageInfoFromFile } from './package-utils.mjs';
+import { getBrowserslistQueries } from './browserslist.mjs';
+import { getSourceFileGlob, isTestSourceFile } from './source-files.mjs';
 import { createWordpressExternalsPlugin } from './wordpress-externals-plugin.mjs';
 import {
 	getAllRoutes,
@@ -74,25 +48,42 @@ import {
 	generateWorkerCode,
 } from './worker-build.mjs';
 
+/**
+ * Resolve the ESBuild target from the project's Browserslist config.
+ *
+ * @return {string[]} ESBuild target strings.
+ */
+function getEsbuildTarget() {
+	return browserslistToEsbuild( getBrowserslistQueries() );
+}
+// Optional dependency: @wordpress/theme provides plugins that inject fallback
+// values for design system tokens. Fails gracefully when the package is not
+// installed (it is an optional peerDependency).
+let dsTokenFallbacks;
+let dsTokenFallbacksJs;
+try {
+	const { default: postcssPlugin } = await import(
+		'@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks'
+	);
+	const { default: esbuildPlugin } = await import(
+		'@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks'
+	);
+	dsTokenFallbacks = postcssPlugin;
+	dsTokenFallbacksJs = esbuildPlugin;
+} catch {
+	// @wordpress/theme is optional; skip token fallbacks if not available.
+}
+
 const ROOT_DIR = process.cwd();
 const PACKAGES_DIR = path.join( ROOT_DIR, 'packages' );
 const BUILD_DIR = path.join( ROOT_DIR, 'build' );
 
-const SOURCE_EXTENSIONS = '{js,mjs,ts,tsx}';
 const ASSET_EXTENSIONS = 'json';
 const IGNORE_PATTERNS = [
 	'**/benchmark/**',
 	'**/{__mocks__,__tests__,test}/**',
 	'**/{storybook,stories}/**',
-	'**/*.native.*',
-	'**/*.ios.*',
-	'**/*.android.*',
 	'**/*.{spec,test}.*',
-];
-const TEST_FILE_PATTERNS = [
-	/\/(benchmark|__mocks__|__tests__|test|storybook|stories)\/.+/,
-	/\.(spec|test)\.(js|ts|tsx)$/,
-	/\.(native|ios|android)\.(js|ts|tsx)$/,
 ];
 
 /**
@@ -311,9 +302,68 @@ function createStyleBundlingPlugins( workingDir ) {
 }
 
 /**
- * Plugin to inline WASM files as base64 data URLs.
- * This eliminates the need for separate WASM file downloads and avoids
- * issues with hosts not serving WASM files with the correct MIME type.
+ * Encode a binary buffer as a compact UTF-8 JavaScript string literal.
+ *
+ * Each byte is emitted as its UTF-8 representation (1 byte for 0x00-0x7F,
+ * 2 bytes for 0x80-0xFF), escaping only the characters that are not valid
+ * unescaped inside a JS string literal. When the source file is parsed as
+ * UTF-8 the resulting string holds one code point (0-255) per original byte,
+ * so it can be decoded back to bytes with `charCodeAt`.
+ *
+ * Unlike base64 (which inflates binary by ~33% and misaligns byte patterns so
+ * it compresses poorly), this encoding preserves the original byte stream and
+ * therefore compresses much better with gzip and brotli. This mirrors
+ * Emscripten's `SINGLE_FILE_BINARY_ENCODE` option.
+ *
+ * @see https://emscripten.org/docs/tools_reference/settings_reference.html#single-file-binary-encode
+ *
+ * @param {Buffer} data Binary data to encode.
+ * @return {string} A JavaScript string literal (including surrounding quotes).
+ */
+function binaryEncode( data ) {
+	// Pick the quote character that needs the fewest escapes.
+	let singleQuotes = 0;
+	let doubleQuotes = 0;
+	for ( const byte of data ) {
+		if ( byte === 0x27 ) {
+			singleQuotes++;
+		} else if ( byte === 0x22 ) {
+			doubleQuotes++;
+		}
+	}
+	const quote = singleQuotes < doubleQuotes ? 0x27 : 0x22;
+
+	const out = [ quote ];
+	for ( const byte of data ) {
+		if ( byte === quote || byte === 0x5c /* \ */ ) {
+			out.push( 0x5c, byte );
+		} else if ( byte === 0x0d /* \r */ ) {
+			out.push( 0x5c, 0x72 );
+		} else if ( byte === 0x0a /* \n */ ) {
+			out.push( 0x5c, 0x6e );
+		} else if ( byte < 0x80 ) {
+			out.push( byte );
+		} else {
+			// Encode 0x80-0xFF as two-byte UTF-8 (code points U+0080-U+00FF).
+			// Arithmetic form of `0xc0 | (byte >> 6)` and `0x80 | (byte & 0x3f)`.
+			out.push(
+				0xc0 + Math.floor( byte / 0x40 ),
+				0x80 + ( byte % 0x40 )
+			);
+		}
+	}
+	out.push( quote );
+
+	return Buffer.from( out ).toString( 'utf8' );
+}
+
+/**
+ * Plugin to inline WASM files into the bundle.
+ *
+ * This eliminates the need for separate WASM file downloads and avoids issues
+ * with hosts not serving WASM files with the correct MIME type. The binary is
+ * embedded using a compact UTF-8 encoding (rather than base64) so it compresses
+ * well, and is decoded back to a `Uint8Array` at runtime.
  *
  * @return {Object} esbuild plugin.
  */
@@ -343,18 +393,23 @@ const wasmInlinePlugin = {
 			return null;
 		} );
 
-		// Load WASM files and convert to base64 data URLs.
+		// Load WASM files, embed them as a compact UTF-8 string, and decode
+		// back to a Uint8Array at runtime.
 		build.onLoad(
 			{ filter: /.*/, namespace: 'wasm-inline' },
 			async ( args ) => {
 				const wasmBuffer = await readFile(
 					args.pluginData.resolvedPath
 				);
-				const base64 = wasmBuffer.toString( 'base64' );
-				const dataUrl = `data:application/wasm;base64,${ base64 }`;
+				const encoded = binaryEncode( wasmBuffer );
 
 				return {
-					contents: `export default "${ dataUrl }";`,
+					contents: `const s = ${ encoded };
+const bytes = new Uint8Array( s.length );
+for ( let i = 0; i < s.length; i++ ) {
+	bytes[ i ] = s.charCodeAt( i );
+}
+export default bytes;`,
 					loader: 'js',
 				};
 			}
@@ -541,7 +596,7 @@ async function bundlePackage( packageName, options = {} ) {
 	if ( packageJson.wpScript ) {
 		const entryPoint = resolveEntryPoint( packageDir, packageJson );
 		const outputDir = path.join( BUILD_DIR, 'scripts', packageName );
-		const target = browserslistToEsbuild();
+		const target = getEsbuildTarget();
 
 		// Check if package matches the namespace and should expose a global
 		const packageFullName = packageJson.name;
@@ -564,12 +619,33 @@ async function bundlePackage( packageName, options = {} ) {
 			globalName,
 		};
 
-		// For packages with default exports, add a footer to properly expose the default
-		if ( packageJson.wpScriptDefaultExport && globalName ) {
-			baseConfig.footer = {
-				js: `if (typeof ${ globalName } === 'object' && ${ globalName }.default) { ${ globalName } = ${ globalName }.default; }`,
-			};
+		/*
+		 * Wrap the bundle in an IIFE so the `'use strict'` directive esbuild emits for the
+		 * (strict) ES module output stays at the function level. Left at the top of the
+		 * file it is a *file-level* directive, which — because load-scripts.php
+		 * concatenates raw file contents — forces strict mode onto any sloppy-mode script
+		 * bundled after it, throwing on e.g. implicit globals. Wrapping confines the
+		 * directive to this bundle. See https://core.trac.wordpress.org/ticket/65515.
+		 */
+		baseConfig.banner = { js: '(function() {' };
+
+		/*
+		 * esbuild's `globalName` assigns onto a locally-declared `var` root (using a
+		 * `window.…` global name would emit `var window`, shadowing the real global), so
+		 * that assignment is trapped inside the wrapper. Re-expose it on the real global
+		 * object in the footer, then close the IIFE.
+		 */
+		let footerJs = '';
+		if ( shouldExposeGlobal ) {
+			const globalMember = camelCase( packageName );
+			// For packages with default exports, expose the default, not the namespace.
+			if ( packageJson.wpScriptDefaultExport ) {
+				footerJs += `if (typeof ${ globalName } === 'object' && ${ globalName }.default) { ${ globalName } = ${ globalName }.default; }\n`;
+			}
+			footerJs += `(window.${ scriptGlobal } ||= {}).${ globalMember } = ${ scriptGlobal }.${ globalMember };\n`;
 		}
+		footerJs += '})();';
+		baseConfig.footer = { js: footerJs };
 
 		const baseBundlePlugins = [
 			momentTimezoneAliasPlugin(),
@@ -617,7 +693,7 @@ async function bundlePackage( packageName, options = {} ) {
 	}
 
 	if ( packageJson.wpScriptModuleExports ) {
-		const target = browserslistToEsbuild();
+		const target = getEsbuildTarget();
 		const rootBuildModuleDir = path.join(
 			BUILD_DIR,
 			'modules',
@@ -654,6 +730,10 @@ async function bundlePackage( packageName, options = {} ) {
 						`${ fileName }.min.js`
 					),
 					bundle: true,
+					// Emit UTF-8 so binary-encoded inlined WASM (e.g. the vips
+					// worker) stays compact; ASCII output would escape high
+					// bytes as \uXXXX and defeat the compression.
+					charset: 'utf8',
 					sourcemap: ! isWasmWorker,
 					format: 'esm',
 					target,
@@ -681,6 +761,7 @@ async function bundlePackage( packageName, options = {} ) {
 							`${ fileName }.js`
 						),
 						bundle: true,
+						charset: 'utf8',
 						sourcemap: true,
 						format: 'esm',
 						target,
@@ -1281,7 +1362,7 @@ async function transpilePackage( packageName ) {
 		);
 	}
 
-	const srcFiles = await glob( `src/**/*.${ SOURCE_EXTENSIONS }`, {
+	const srcFiles = await glob( getSourceFileGlob( 'src/**/*' ), {
 		cwd: packageDir,
 		ignore: IGNORE_PATTERNS,
 		absolute: true,
@@ -1296,7 +1377,7 @@ async function transpilePackage( packageName ) {
 	const buildDir = path.join( packageDir, 'build' );
 	const buildModuleDir = path.join( packageDir, 'build-module' );
 	const srcDir = path.join( packageDir, 'src' );
-	const target = browserslistToEsbuild();
+	const target = getEsbuildTarget();
 
 	const builds = [];
 
@@ -1311,7 +1392,7 @@ async function transpilePackage( packageName ) {
 	const emotionPlugin = babel( {
 		filter: /\.[jt]sx?$/,
 		config: {
-			plugins: [ '@emotion/babel-plugin' ],
+			plugins: [ styleRuntimeRequire.resolve( '@emotion/babel-plugin' ) ],
 		},
 	} );
 	const externalizeAllExceptCssPlugin = {
@@ -1399,13 +1480,15 @@ async function transpilePackage( packageName ) {
 				outbase: srcDir,
 				outExtension: { '.js': '.cjs' },
 				bundle: true,
+				// Emit UTF-8 so binary-encoded inlined WASM stays compact
+				// (ASCII output would escape high bytes as \uXXXX).
+				charset: 'utf8',
 				platform: 'node',
 				format: 'cjs',
 				sourcemap: true,
 				target,
 				jsx: 'automatic',
 				jsxImportSource: 'react',
-				loader: { '.js': 'jsx' },
 				plugins,
 			} )
 		);
@@ -1430,13 +1513,15 @@ async function transpilePackage( packageName ) {
 				outbase: srcDir,
 				outExtension: { '.js': '.mjs' },
 				bundle: true,
+				// Emit UTF-8 so binary-encoded inlined WASM stays compact
+				// (ASCII output would escape high bytes as \uXXXX).
+				charset: 'utf8',
 				platform: 'neutral',
 				format: 'esm',
 				sourcemap: true,
 				target,
 				jsx: 'automatic',
 				jsxImportSource: 'react',
-				loader: { '.js': 'jsx' },
 				plugins,
 			} )
 		);
@@ -1545,7 +1630,11 @@ async function compileStyles( packageName ) {
 							const ltrResult = await postcss(
 								[
 									dsTokenFallbacks,
-									autoprefixer( { grid: true } ),
+									autoprefixer( {
+										grid: true,
+										overrideBrowserslist:
+											getBrowserslistQueries(),
+									} ),
 								].filter( Boolean )
 							).process( source, { from: undefined } );
 
@@ -1596,7 +1685,12 @@ function isPackageSourceFile( filename ) {
 		return false;
 	}
 
-	if ( TEST_FILE_PATTERNS.some( ( regex ) => regex.test( relativePath ) ) ) {
+	if ( isTestSourceFile( relativePath ) ) {
+		return false;
+	}
+
+	// Skip build-generated worker bundles written back into src/.
+	if ( relativePath.endsWith( '/src/worker-code.ts' ) ) {
 		return false;
 	}
 
@@ -1648,7 +1742,7 @@ async function buildRoute( routeName ) {
 
 	// Build route.js if it exists
 	if ( files.hasRoute ) {
-		const routeEntryPoints = await glob( `route.${ SOURCE_EXTENSIONS }`, {
+		const routeEntryPoints = await glob( getSourceFileGlob( 'route' ), {
 			cwd: routeDir,
 			absolute: true,
 		} );
@@ -1661,7 +1755,7 @@ async function buildRoute( routeName ) {
 					outfile: path.join( outputDir, 'route.min.js' ),
 					bundle: true,
 					format: 'esm',
-					target: browserslistToEsbuild(),
+					target: getEsbuildTarget(),
 					minify: true,
 					define: getDefine( false ),
 					plugins: [
@@ -1679,7 +1773,7 @@ async function buildRoute( routeName ) {
 					outfile: path.join( outputDir, 'route.js' ),
 					bundle: true,
 					format: 'esm',
-					target: browserslistToEsbuild(),
+					target: getEsbuildTarget(),
 					minify: false,
 					define: getDefine( true ),
 					plugins: [
@@ -1712,7 +1806,7 @@ async function buildRoute( routeName ) {
 				outfile: path.join( outputDir, 'content.min.js' ),
 				bundle: true,
 				format: 'esm',
-				target: browserslistToEsbuild(),
+				target: getEsbuildTarget(),
 				minify: true,
 				define: getDefine( false ),
 				plugins: [
@@ -1730,7 +1824,7 @@ async function buildRoute( routeName ) {
 				outfile: path.join( outputDir, 'content.js' ),
 				bundle: true,
 				format: 'esm',
-				target: browserslistToEsbuild(),
+				target: getEsbuildTarget(),
 				minify: false,
 				define: getDefine( true ),
 				plugins: [
@@ -1752,14 +1846,31 @@ async function buildRoute( routeName ) {
 }
 
 /**
- * Build all discovered routes.
+ * Build discovered routes.
  *
+ * Routes whose pages are all in `experimentalPageIds` are skipped. Pass an
+ * empty set (the default) to build every route.
+ *
+ * @param {Set<string>} experimentalPageIds Page ids marked experimental.
  * @return {Promise<void>}
  */
-async function buildAllRoutes() {
+async function buildRoutes( experimentalPageIds = new Set() ) {
 	console.log( '\n🚦 Phase 3: Building routes...\n' );
 
-	const routes = getAllRoutes( ROOT_DIR );
+	const allRoutes = getAllRoutes( ROOT_DIR );
+
+	const routes =
+		experimentalPageIds.size === 0
+			? allRoutes
+			: allRoutes.filter( ( routeName ) => {
+					const metadata = getRouteMetadata( ROOT_DIR, routeName );
+					if ( ! metadata?.pages?.length ) {
+						return true;
+					}
+					return metadata.pages.some(
+						( page ) => ! experimentalPageIds.has( page )
+					);
+			  } );
 
 	if ( routes.length === 0 ) {
 		console.log( '   No routes found, skipping.\n' );
@@ -1794,7 +1905,7 @@ async function buildWidget( widgetName ) {
 
 	// Build render.js if it exists
 	if ( files.hasRender ) {
-		const renderEntryPoints = await glob( `render.${ SOURCE_EXTENSIONS }`, {
+		const renderEntryPoints = await glob( getSourceFileGlob( 'render' ), {
 			cwd: widgetDir,
 			absolute: true,
 		} );
@@ -1807,7 +1918,7 @@ async function buildWidget( widgetName ) {
 					outfile: path.join( outputDir, 'render.min.js' ),
 					bundle: true,
 					format: 'esm',
-					target: browserslistToEsbuild(),
+					target: getEsbuildTarget(),
 					minify: true,
 					define: getDefine( false ),
 					plugins: [
@@ -1825,7 +1936,7 @@ async function buildWidget( widgetName ) {
 					outfile: path.join( outputDir, 'render.js' ),
 					bundle: true,
 					format: 'esm',
-					target: browserslistToEsbuild(),
+					target: getEsbuildTarget(),
 					minify: false,
 					define: getDefine( true ),
 					plugins: [
@@ -1844,7 +1955,7 @@ async function buildWidget( widgetName ) {
 
 	// Build widget.js if it exists
 	if ( files.hasWidget ) {
-		const widgetEntryPoints = await glob( `widget.${ SOURCE_EXTENSIONS }`, {
+		const widgetEntryPoints = await glob( getSourceFileGlob( 'widget' ), {
 			cwd: widgetDir,
 			absolute: true,
 		} );
@@ -1857,7 +1968,7 @@ async function buildWidget( widgetName ) {
 					outfile: path.join( outputDir, 'widget.min.js' ),
 					bundle: true,
 					format: 'esm',
-					target: browserslistToEsbuild(),
+					target: getEsbuildTarget(),
 					minify: true,
 					define: getDefine( false ),
 					plugins: [
@@ -1875,7 +1986,7 @@ async function buildWidget( widgetName ) {
 					outfile: path.join( outputDir, 'widget.js' ),
 					bundle: true,
 					format: 'esm',
-					target: browserslistToEsbuild(),
+					target: getEsbuildTarget(),
 					minify: false,
 					define: getDefine( true ),
 					plugins: [
@@ -1928,7 +2039,7 @@ async function buildAllWidgets() {
  * Discover all widgets and collect their registry-facing data.
  * Widgets without a valid widget.json are skipped.
  *
- * @return {Array<{ name: string, dirName: string, hasRender: boolean, hasWidget: boolean }>} Array of widget objects.
+ * @return {Array<{ name: string, dirName: string, title: string | null, description: string | null, help: import('./widget-utils.mjs').WidgetHelpMetadata | null, icon: string | null, actions: import('./widget-utils.mjs').WidgetActionMetadata[] | null, hasRender: boolean, hasWidget: boolean, presentation: string | null, category: string | null, keywords: string[] | null, textdomain: string | null }>} Array of widget objects.
  */
 function collectWidgets() {
 	return getAllWidgets( ROOT_DIR ).flatMap( ( widgetName ) => {
@@ -1947,11 +2058,151 @@ function collectWidgets() {
 			{
 				name: metadata.name,
 				dirName: widgetName,
+				title: metadata.title ?? null,
+				description: metadata.description ?? null,
+				help: metadata.help ?? null,
+				icon: metadata.icon ?? null,
+				actions: metadata.actions ?? null,
 				hasRender: widgetFiles.hasRender,
 				hasWidget: widgetFiles.hasWidget,
+				presentation: metadata.presentation ?? null,
+				category: metadata.category ?? null,
+				keywords: metadata.keywords ?? null,
+				textdomain: metadata.textdomain ?? null,
 			},
 		];
 	} );
+}
+
+/**
+ * Format a value as a single-quoted PHP string literal, escaping backslashes
+ * and single quotes. Returns the PHP literal `null` for empty values so
+ * optional manifest fields stay valid.
+ *
+ * @param {string|null|undefined} value Source value.
+ * @return {string} PHP string literal, or `null`.
+ */
+function toPhpStringLiteral( value ) {
+	if ( value === null || value === undefined || value === '' ) {
+		return 'null';
+	}
+	const escaped = String( value )
+		.replace( /\\/g, '\\\\' )
+		.replace( /'/g, "\\'" );
+	return `'${ escaped }'`;
+}
+
+/**
+ * Format a list of strings as a PHP `array( ... )` of string literals.
+ * Returns the PHP literal `null` when the list is empty or missing.
+ *
+ * @param {string[]|null|undefined} values Source values.
+ * @return {string} PHP array literal, or `null`.
+ */
+function toPhpStringArrayLiteral( values ) {
+	if ( ! Array.isArray( values ) || values.length === 0 ) {
+		return 'null';
+	}
+	return `array( ${ values.map( toPhpStringLiteral ).join( ', ' ) } )`;
+}
+
+/**
+ * Format a widget help note as a PHP array literal. Returns the PHP
+ * literal `null` when the note has no content; links missing a `label`
+ * or `href` are dropped.
+ *
+ * @param {import('./widget-utils.mjs').WidgetHelpMetadata|null|undefined} help Source value.
+ * @return {string} PHP array literal, or `null`.
+ */
+function toPhpHelpLiteral( help ) {
+	if ( ! help || typeof help.content !== 'string' || help.content === '' ) {
+		return 'null';
+	}
+
+	const parts = [ `'content' => ${ toPhpStringLiteral( help.content ) }` ];
+
+	if ( Array.isArray( help.links ) ) {
+		const links = help.links
+			.filter( ( link ) => link && link.label && link.href )
+			.map(
+				( link ) =>
+					`array( 'label' => ${ toPhpStringLiteral(
+						link.label
+					) }, 'href' => ${ toPhpStringLiteral( link.href ) } )`
+			);
+
+		if ( links.length > 0 ) {
+			parts.push( `'links' => array( ${ links.join( ', ' ) } )` );
+		}
+	}
+
+	return `array( ${ parts.join( ', ' ) } )`;
+}
+
+/**
+ * Format a widget's actions as a PHP array literal. Returns the PHP literal
+ * `null` when there are no valid actions; entries missing `id`, `label`, or
+ * `href` are dropped.
+ *
+ * @param {import('./widget-utils.mjs').WidgetActionMetadata[]|null|undefined} actions Source value.
+ * @return {string} PHP array literal, or `null`.
+ */
+function toPhpActionsLiteral( actions ) {
+	if ( ! Array.isArray( actions ) ) {
+		return 'null';
+	}
+
+	const entries = actions
+		.filter(
+			( action ) => action && action.id && action.label && action.href
+		)
+		.map( ( action ) => {
+			const parts = [
+				`'id' => ${ toPhpStringLiteral( action.id ) }`,
+				`'label' => ${ toPhpStringLiteral( action.label ) }`,
+				`'href' => ${ toPhpStringLiteral( action.href ) }`,
+			];
+
+			if ( action.download !== undefined ) {
+				parts.push(
+					typeof action.download === 'boolean'
+						? `'download' => ${
+								action.download ? 'true' : 'false'
+						  }`
+						: `'download' => ${ toPhpStringLiteral(
+								action.download
+						  ) }`
+				);
+			}
+
+			if ( action.openInNewTab !== undefined ) {
+				parts.push(
+					`'openInNewTab' => ${
+						action.openInNewTab ? 'true' : 'false'
+					}`
+				);
+			}
+
+			if ( action.icon !== undefined ) {
+				parts.push(
+					`'icon' => ${ toPhpStringLiteral( action.icon ) }`
+				);
+			}
+
+			if ( action.relevance !== undefined ) {
+				parts.push(
+					`'relevance' => ${ toPhpStringLiteral( action.relevance ) }`
+				);
+			}
+
+			return `array( ${ parts.join( ', ' ) } )`;
+		} );
+
+	if ( entries.length === 0 ) {
+		return 'null';
+	}
+
+	return `array( ${ entries.join( ', ' ) } )`;
 }
 
 /**
@@ -1974,11 +2225,29 @@ async function generateWidgetRegistry( widgets, replacements ) {
 		.map( ( widget ) => {
 			const hasRenderStr = widget.hasRender ? 'true' : 'false';
 			const hasWidgetStr = widget.hasWidget ? 'true' : 'false';
+			const presentationStr = toPhpStringLiteral( widget.presentation );
+			const categoryStr = toPhpStringLiteral( widget.category );
+			const titleStr = toPhpStringLiteral( widget.title );
+			const descriptionStr = toPhpStringLiteral( widget.description );
+			const helpStr = toPhpHelpLiteral( widget.help );
+			const iconStr = toPhpStringLiteral( widget.icon );
+			const actionsStr = toPhpActionsLiteral( widget.actions );
+			const keywordsStr = toPhpStringArrayLiteral( widget.keywords );
+			const textdomainStr = toPhpStringLiteral( widget.textdomain );
 			return `\tarray(
-		'name'       => '${ widget.name }',
-		'dir_name'   => '${ widget.dirName }',
-		'has_render' => ${ hasRenderStr },
-		'has_widget' => ${ hasWidgetStr },
+		'name'         => '${ widget.name }',
+		'dir_name'     => '${ widget.dirName }',
+		'title'        => ${ titleStr },
+		'description'  => ${ descriptionStr },
+		'help'         => ${ helpStr },
+		'icon'         => ${ iconStr },
+		'actions'      => ${ actionsStr },
+		'has_render'   => ${ hasRenderStr },
+		'has_widget'   => ${ hasWidgetStr },
+		'presentation' => ${ presentationStr },
+		'category'     => ${ categoryStr },
+		'keywords'     => ${ keywordsStr },
+		'textdomain'   => ${ textdomainStr },
 	)`;
 		} )
 		.join( ',\n' );
@@ -2080,8 +2349,36 @@ async function buildAll( baseUrlExpression ) {
 		} )
 	);
 
-	// Build routes
-	await buildAllRoutes();
+	// Normalize PAGES config to support both string and object formats
+	const normalizedPages = PAGES.map( ( page ) => {
+		if ( typeof page === 'string' ) {
+			return { id: page, init: [], title: undefined };
+		}
+		return {
+			id: page.id,
+			init: page.init || [],
+			title: page.title || undefined,
+			experimental: page.experimental || false,
+		};
+	} );
+
+	// When building for WordPress Core, exclude experimental pages.
+	const isCoreBuild =
+		boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
+		boolConfigVal( process.env.npm_package_config_IS_WORDPRESS_CORE );
+	const activePages = isCoreBuild
+		? normalizedPages.filter( ( page ) => ! page.experimental )
+		: normalizedPages;
+
+	// In Core builds, skip routes whose pages are all experimental.
+	const experimentalPageIds = isCoreBuild
+		? new Set(
+				normalizedPages
+					.filter( ( page ) => page.experimental )
+					.map( ( page ) => page.id )
+		  )
+		: new Set();
+	await buildRoutes( experimentalPageIds );
 
 	// Build widgets
 	await buildAllWidgets();
@@ -2109,31 +2406,15 @@ async function buildAll( baseUrlExpression ) {
 				path: metadata.path,
 				page,
 				hasRoute: routeFiles.hasRoute,
-				hasContent: routeFiles.hasStage || routeFiles.hasInspector,
+				// Must match the condition that builds `content.js`, which
+				// bundles the canvas alongside the stage and inspector.
+				hasContent:
+					routeFiles.hasStage ||
+					routeFiles.hasInspector ||
+					routeFiles.hasCanvas,
 			};
 		} );
 	} );
-
-	// Normalize PAGES config to support both string and object formats
-	const normalizedPages = PAGES.map( ( page ) => {
-		if ( typeof page === 'string' ) {
-			return { id: page, init: [], title: undefined };
-		}
-		return {
-			id: page.id,
-			init: page.init || [],
-			title: page.title || undefined,
-			experimental: page.experimental || false,
-		};
-	} );
-
-	// When building for WordPress Core, exclude experimental pages.
-	const isCoreBuild =
-		boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
-		boolConfigVal( process.env.npm_package_config_IS_WORDPRESS_CORE );
-	const activePages = isCoreBuild
-		? normalizedPages.filter( ( page ) => ! page.experimental )
-		: normalizedPages;
 
 	const activePageIds = new Set( activePages.map( ( p ) => p.id ) );
 	const activeRoutes = routes.filter( ( r ) => activePageIds.has( r.page ) );
@@ -2353,8 +2634,10 @@ async function watchMode() {
 	const watcher = chokidar.watch( watchPaths, {
 		ignored: [
 			'**/{__mocks__,__tests__,test,storybook,stories}/**',
-			'**/*.{spec,test}.{js,ts,tsx}',
-			'**/*.native.*',
+			getSourceFileGlob( '**/*.{spec,test}' ),
+			// Avoid rebuild loops: worker packages write bundled WASM/JS back
+			// into src/worker-code.ts during each build (e.g. @wordpress/vips).
+			'**/worker-code.ts',
 		],
 		persistent: true,
 		ignoreInitial: true,

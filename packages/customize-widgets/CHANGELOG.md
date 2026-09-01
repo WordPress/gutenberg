@@ -2,6 +2,39 @@
 
 ## Unreleased
 
+### Internal
+
+-   Remove unused dependency `@wordpress/interface` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+## 5.54.0 (2026-08-26)
+
+## 5.53.0 (2026-08-12)
+
+### Enhancements
+
+-   Wrap the Customizer widgets editor in `ThemeProvider`, seeded with the active admin color scheme primary color ([#81174](https://github.com/WordPress/gutenberg/pull/81174)).
+
+## 5.52.0 (2026-07-29)
+
+## 5.51.0 (2026-07-14)
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 5.50.0 (2026-07-01)
+
+## 5.49.0 (2026-06-24)
+
+## 5.48.1 (2026-06-16)
+
+## 5.48.0 (2026-06-10)
+
+## 5.47.0 (2026-05-27)
+
+## 5.46.0 (2026-05-14)
+
 ## 5.45.0 (2026-04-29)
 
 ## 5.44.0 (2026-04-15)

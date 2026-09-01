@@ -1,42 +1,45 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
+	"extends": "../../tsconfig.dev.base.json",
 	"compilerOptions": {
 		"types": [
+			"jest",
 			"gutenberg-env",
 			"gutenberg-test-env",
-			"jest",
+			"react-css-custom-properties",
 			"style-imports"
 		]
 	},
+	"files": [ "global.d.ts" ],
+	"include": [
+		"src/**/test/**/*.ts",
+		"src/**/test/**/*.tsx",
+		"src/**/tests/**/*.ts",
+		"src/**/tests/**/*.tsx",
+		"src/**/__tests__/**/*.ts",
+		"src/**/__tests__/**/*.tsx"
+	],
 	"references": [
-		{ "path": "../a11y" },
-		{ "path": "../compose" },
+		{ "path": "./tsconfig.build.json" },
+		{ "path": "../a11y/tsconfig.build.json" },
+		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../date" },
-		{ "path": "../deprecated" },
+		{ "path": "../deprecated/tsconfig.build.json" },
 		{ "path": "../dom" },
-		{ "path": "../element" },
-		{ "path": "../escape-html" },
+		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../escape-html/tsconfig.build.json" },
 		{ "path": "../hooks" },
-		{ "path": "../html-entities" },
-		{ "path": "../i18n" },
-		{ "path": "../icons" },
-		{ "path": "../is-shallow-equal" },
-		{ "path": "../keycodes" },
+		{ "path": "../html-entities/tsconfig.build.json" },
+		{ "path": "../i18n/tsconfig.build.json" },
+		{ "path": "../icons/tsconfig.build.json" },
+		{ "path": "../is-shallow-equal/tsconfig.build.json" },
+		{ "path": "../kebab-case" },
+		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
-		{ "path": "../react-i18n" },
 		{ "path": "../rich-text" },
-		{ "path": "../style-runtime" },
+		{ "path": "../style-runtime/tsconfig.build.json" },
+		{ "path": "../ui/tsconfig.build.json" },
 		{ "path": "../warning" }
-	],
-	"files": [ "global.d.ts", "storybook.d.ts" ],
-	"exclude": [
-		"src/**/*.android.js",
-		"src/**/*.ios.js",
-		"src/**/*.native.js",
-		"src/**/react-native-*",
-		"src/**/stories/**/*.jsx", // only exclude js files, tsx files should be checked
-		"src/**/test/**/*.js" // only exclude js files, ts{x} files should be checked
 	]
 }

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import './matchers';
 import supportedMatchers from './supported-matchers';
 import type { ExtendedMock } from './types';

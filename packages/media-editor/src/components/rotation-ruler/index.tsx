@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { CSSProperties, KeyboardEvent } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useId, useMemo, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { useRulerDrag, clampValue } from './use-ruler-drag';
 
 export interface RotationRulerProps {
@@ -193,7 +182,12 @@ export default function RotationRuler( props: RotationRulerProps ) {
 	// major (e.g. "-7°") or the major itself when on-major (e.g. "0°").
 	const closestMajor = Math.round( value / MAJOR_INTERVAL ) * MAJOR_INTERVAL;
 	const onMajor = Math.abs( value - closestMajor ) < 0.01;
-	const activeText = onMajor ? `${ closestMajor }${ unit }` : display;
+	// Split the number into sign + digits so the sign is rendered in a
+	// separate span and excluded from the active label's centering, the
+	// same way the unit is.
+	const numberText = onMajor ? `${ closestMajor }` : formatValue( value );
+	const isNegative = numberText.startsWith( '-' );
+	const digits = isNegative ? numberText.slice( 1 ) : numberText;
 	const majorTicks = ticks.filter( ( tick ) => tick.kind === 'major' );
 
 	return (
@@ -258,7 +252,17 @@ export default function RotationRuler( props: RotationRulerProps ) {
 				</svg>
 			</div>
 			<div className="rotation-ruler__active-label" aria-hidden="true">
-				{ activeText }
+				<span className="rotation-ruler__active-label-number">
+					{ isNegative && (
+						<span className="rotation-ruler__active-label-sign">
+							-
+						</span>
+					) }
+					{ digits }
+					<span className="rotation-ruler__active-label-unit">
+						{ unit }
+					</span>
+				</span>
 			</div>
 			<div className="rotation-ruler__pointer" aria-hidden="true" />
 		</div>

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { updateAttributes } from '../update-attributes';
 
 describe( 'updateAttributes', () => {

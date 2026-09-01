@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSyncExternalStore } from '@wordpress/element';
 
 type MQLSubscriber = {
@@ -19,8 +16,11 @@ const EMPTY_SUBSCRIBER: MQLSubscriber = {
 	getValue: () => false,
 };
 
-function getMQLSubscriber( view: Window, query?: string ): MQLSubscriber {
-	if ( ! query || typeof view?.matchMedia !== 'function' ) {
+function getMQLSubscriber(
+	view: Window | undefined,
+	query?: string
+): MQLSubscriber {
+	if ( ! view || ! query || typeof view.matchMedia !== 'function' ) {
 		return EMPTY_SUBSCRIBER;
 	}
 
@@ -75,7 +75,11 @@ function getMQLSubscriber( view: Window, query?: string ): MQLSubscriber {
  */
 export default function useMediaQuery(
 	query?: string,
-	view: Window = window
+	// Resolve the default lazily so SSR (where `window` is undeclared) does not
+	// throw a ReferenceError when this default expression is evaluated.
+	view: Window | undefined = typeof window !== 'undefined'
+		? window
+		: undefined
 ): boolean {
 	const source = getMQLSubscriber( view, query );
 

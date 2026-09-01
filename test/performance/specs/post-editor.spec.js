@@ -1,13 +1,5 @@
 /* eslint-disable playwright/expect-expect */
-
-/**
- * WordPress dependencies
- */
 import { test, Metrics } from '@wordpress/e2e-test-utils-playwright';
-
-/**
- * Internal dependencies
- */
 import { PerfUtils } from '../fixtures';
 import { sum } from '../utils.js';
 
@@ -28,6 +20,8 @@ const results = {
 	typeWithTopToolbar: [],
 	typeContainer: [],
 	focus: [],
+	firstFocus: [],
+	selectAll: [],
 	listViewOpen: [],
 	inserterOpen: [],
 	inserterHover: [],
@@ -55,10 +49,21 @@ test.describe( 'Post Editor Performance', () => {
 	test.describe( 'Loading', () => {
 		let draftId = null;
 
-		test( 'Setup the test post', async ( { admin, perfUtils } ) => {
+		test( 'Setup the test post', async ( {
+			admin,
+			requestUtils,
+			perfUtils,
+		} ) => {
 			await admin.createNewPost();
 			await perfUtils.loadBlocksForLargePost();
 			draftId = await perfUtils.saveDraft();
+
+			// Set preferences via REST so that welcomeGuide and fullscreenMode
+			// are reliably persisted before the timed iterations start.
+			await requestUtils.setPreferences( 'core/edit-post', {
+				welcomeGuide: false,
+				fullscreenMode: false,
+			} );
 		} );
 
 		const samples = 10;
@@ -73,7 +78,9 @@ test.describe( 'Post Editor Performance', () => {
 				await metrics.startTracing();
 
 				// Open the test draft.
-				await admin.editPost( draftId );
+				await admin.page.goto(
+					'wp-admin/post.php?post=' + draftId + '&action=edit'
+				);
 
 				// Wait for the editor canvas iframe's first-contentful-paint
 				// entry. This is the moment the browser actually painted the
@@ -290,10 +297,17 @@ test.describe( 'Post Editor Performance', () => {
 				name: /Block: Paragraph/i,
 			} );
 
+			// The first click also mounts the block inspector, so it costs
+			// about twice a later one and gets its own metric.
 			const samples = 10;
-			const throwaway = 1;
-			const iterations = samples + throwaway;
+			const iterations = samples + 1;
 			for ( let i = 1; i <= iterations; i++ ) {
+				const paragraph = paragraphs.nth( i );
+
+				// Scroll first, so Playwright's auto-scroll on click stays
+				// out of the trace.
+				await paragraph.scrollIntoViewIfNeeded();
+
 				// Wait for the browser to be idle before starting the monitoring.
 				// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
 				await page.waitForTimeout( BROWSER_IDLE_WAIT );
@@ -302,7 +316,7 @@ test.describe( 'Post Editor Performance', () => {
 				await metrics.startTracing();
 
 				// Click the next paragraph.
-				await paragraphs.nth( i ).click();
+				await paragraph.click();
 
 				// Stop tracing. Save just one representative sample.
 				await metrics.stopTracing(
@@ -311,14 +325,77 @@ test.describe( 'Post Editor Performance', () => {
 
 				// Get the durations.
 				const allDurations = metrics.getSelectionEventDurations();
+				const duration = allDurations.reduce(
+					( acc, eventDurations ) => acc + sum( eventDurations ),
+					0
+				);
+
+				// Save the results.
+				if ( i === 1 ) {
+					results.firstFocus.push( duration );
+				} else {
+					results.focus.push( duration );
+				}
+			}
+		} );
+	} );
+
+	test.describe( 'Selecting all blocks', () => {
+		let draftId = null;
+
+		test( 'Set up the test post', async ( { admin, perfUtils } ) => {
+			await admin.createNewPost();
+			await perfUtils.load1000Paragraphs();
+			draftId = await perfUtils.saveDraft();
+		} );
+
+		test( 'Run the test', async ( { admin, page, perfUtils, metrics } ) => {
+			await admin.editPost( draftId );
+			await perfUtils.disableAutosave();
+			const canvas = await perfUtils.getCanvas();
+
+			const paragraphs = canvas.getByRole( 'document', {
+				name: /Block: Paragraph/i,
+			} );
+
+			// Fewer samples than the other metrics take. The comparison runs
+			// this spec against builds that predate the selection fix, where a
+			// single iteration costs seconds, and ten of them exceed the test
+			// timeout.
+			const samples = 3;
+			const throwaway = 1;
+			const iterations = samples + throwaway;
+			for ( let i = 1; i <= iterations; i++ ) {
+				// Put the caret in a paragraph, so the selection is a single
+				// block with a collapsed caret again.
+				await paragraphs.nth( i ).click();
+
+				// The first press selects the contents of the block; only the
+				// second one multi-selects every block.
+				await page.keyboard.press( 'ControlOrMeta+a' );
+
+				// Wait for the browser to be idle before starting the monitoring.
+				// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
+				await page.waitForTimeout( BROWSER_IDLE_WAIT );
+
+				// Start tracing.
+				await metrics.startTracing();
+
+				// Select all blocks.
+				await page.keyboard.press( 'ControlOrMeta+a' );
+
+				// Stop tracing. Save just one representative sample.
+				await metrics.stopTracing(
+					i === Math.floor( iterations / 2 ) &&
+						'post-editor-select-all'
+				);
+
+				// Get the durations.
+				const [ keyDownEvents ] = metrics.getTypingEventDurations();
 
 				// Save the results.
 				if ( i > throwaway ) {
-					results.focus.push(
-						allDurations.reduce( ( acc, eventDurations ) => {
-							return acc + sum( eventDurations );
-						}, 0 )
-					);
+					results.selectAll.push( sum( keyDownEvents ) );
 				}
 			}
 		} );

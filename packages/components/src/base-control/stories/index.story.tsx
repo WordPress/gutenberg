@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import BaseControl, { useBaseControlProps } from '..';
 import Button from '../../button';
 
@@ -28,7 +21,7 @@ const meta: Meta< typeof BaseControl > = {
 		componentStatus: {
 			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Will be superseded by `Field` in `@wordpress/ui`, but continue using for now.',
+			notes: '`BaseControl.VisualLabel` can continue to be used for now. To add labels and descriptions semantically, use [`Field`](?path=/docs/design-system-components-form-primitives-field--docs) in `@wordpress/ui`.',
 		},
 	},
 };

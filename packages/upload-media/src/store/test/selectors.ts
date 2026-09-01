@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import {
 	getItems,
 	isUploading,
@@ -9,11 +6,14 @@ import {
 } from '../selectors';
 import {
 	getActiveUploadCount,
+	getFailureCount,
 	getActiveImageProcessingCount,
+	getActiveVideoProcessingCount,
 	getFailedItems,
 	getItemProgress,
 	getPendingUploads,
 	getPendingImageProcessing,
+	getPendingVideoProcessing,
 	hasPendingItemsByParentId,
 } from '../private-selectors';
 import {
@@ -24,11 +24,28 @@ import {
 } from '../types';
 
 describe( 'selectors', () => {
+	describe( 'getFailureCount', () => {
+		it( 'should return the number of failed uploads', () => {
+			const state: State = {
+				queue: [],
+				queueStatus: 'active',
+				failureCount: 3,
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+			};
+
+			expect( getFailureCount( state ) ).toBe( 3 );
+		} );
+	} );
+
 	describe( 'getItems', () => {
 		it( 'should return empty array by default', () => {
 			const state: State = {
 				queue: [],
 				queueStatus: 'paused',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -54,6 +71,7 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'paused',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -79,6 +97,7 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'paused',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -106,6 +125,7 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'paused',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -138,6 +158,7 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -174,6 +195,7 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -193,6 +215,7 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -221,6 +244,7 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -277,6 +301,7 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -301,6 +326,7 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -333,6 +359,7 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -362,6 +389,7 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -386,6 +414,35 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'video processing selectors', () => {
+		it( 'getActiveVideoProcessingCount counts items transcoding a GIF', () => {
+			const state = {
+				queue: [
+					{ currentOperation: OperationType.TranscodeGif },
+					{ currentOperation: OperationType.Upload },
+					{ currentOperation: OperationType.TranscodeGif },
+				],
+			} as never;
+			expect( getActiveVideoProcessingCount( state ) ).toBe( 2 );
+		} );
+
+		it( 'getPendingVideoProcessing returns items whose next op is TranscodeGif', () => {
+			const state = {
+				queue: [
+					{
+						operations: [ OperationType.TranscodeGif ],
+						currentOperation: undefined,
+					},
+					{
+						operations: [ OperationType.Upload ],
+						currentOperation: undefined,
+					},
+				],
+			} as never;
+			expect( getPendingVideoProcessing( state ) ).toHaveLength( 1 );
+		} );
+	} );
+
 	describe( 'hasPendingItemsByParentId', () => {
 		it( 'should return true if there are items with matching parent ID', () => {
 			const state: State = {
@@ -401,6 +458,7 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'paused',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -424,6 +482,7 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'paused',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),

@@ -5,12 +5,12 @@ import type { Decorator } from '@storybook/react-vite';
 /**
  * Storybook decorator that opts the decorated story into the
  * `@wordpress/ui` compat overlay slot. The cleanup clears the internal
- * flag so navigating to an un-decorated story closes the gate again —
- * `useEnableWpCompatOverlaySlot()` itself is intentionally one-way.
+ * flag on unmount so navigating to an un-decorated story closes the gate
+ * again — `useEnableWpCompatOverlaySlot()` is one-way at runtime.
  *
- * Kept private to the playground stories: the flag is window-level, so
- * applying the decorator to per-component stories would leak the opt-in
- * into sibling stories on the same autodocs page.
+ * Kept private to playground stories: applying it to per-component
+ * stories would leak the window-level flag into sibling stories on the
+ * same autodocs page.
  */
 export const WithWpCompatOverlaySlot: Decorator = ( Story ) => {
 	useEnableWpCompatOverlaySlot();

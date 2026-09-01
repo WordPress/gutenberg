@@ -1,12 +1,9 @@
-/**
- * External dependencies
- */
 import { mkdir, writeFile } from 'fs/promises';
 import { join } from 'path';
 import type { Page, Browser, Frame } from '@playwright/test';
 // resolution-mode support in TypeScript 5.3 will resolve this.
 // See https://devblogs.microsoft.com/typescript/announcing-typescript-5-3-beta/
-// @ts-expect-error
+// @ts-expect-error `web-vitals` is ESM, so a type-only import needs a `resolution-mode`.
 import type { Metric } from 'web-vitals';
 
 type EventType =
@@ -17,11 +14,14 @@ type EventType =
 	| 'keypress'
 	| 'keyup'
 	| 'mouseout'
-	| 'mouseover';
+	| 'mouseover'
+	| 'pointerup'
+	| 'selectionchange';
 
 interface TraceEvent {
 	cat: string;
 	name: string;
+	ts: number;
 	dur?: number;
 	args: {
 		data?: {
@@ -29,6 +29,13 @@ interface TraceEvent {
 		};
 	};
 }
+
+// A traced `EventDispatch`, once filtered down to the events that carry both a
+// duration and an event type.
+type EventDispatch = TraceEvent & {
+	dur: number;
+	args: { data: { type: EventType } };
+};
 
 interface Trace {
 	traceEvents: TraceEvent[];
@@ -286,7 +293,7 @@ export class Metrics {
 	 * @param options Options to pass to `browser.startTracing()`.
 	 */
 	async startTracing( options = {} ) {
-		return await this.browser.startTracing( this.page, {
+		await this.browser.startTracing( this.page, {
 			screenshots: false,
 			categories: [
 				'devtools.timeline',
@@ -297,6 +304,22 @@ export class Metrics {
 			],
 			...options,
 		} );
+
+		// Enabling the V8 sampling profiler queues an isolate interrupt that
+		// logs every function compiled so far. It runs on the next stack
+		// guard check, so its cost would land in the first thing the test
+		// does, which is usually the interaction being measured. Absorb it
+		// here instead. A cross-origin iframe runs in its own isolate and
+		// gets its own interrupt, so every frame needs the warm-up, not just
+		// the main one.
+		await Promise.all(
+			this.page
+				.frames()
+				// A frame can detach between listing and evaluating.
+				.map( ( frame ) =>
+					frame.evaluate( () => {} ).catch( () => {} )
+				)
+		);
 	}
 
 	/**
@@ -337,9 +360,15 @@ export class Metrics {
 			return;
 		}
 
-		// Traces are saved minified. Run bin/resolve-trace-source-maps.js
-		// against a downloaded trace + matching `build/` directory to rewrite
-		// minified `functionName`s back to their source identifiers.
+		// Traces are saved minified. Run the following against a downloaded trace
+		// + matching `build/` directory to rewrite minified `functionName`s back
+		// to their source identifiers:
+		//
+		//   node tools/build-scripts/packages/resolve-trace-source-maps.cjs
+		//
+		// Or via the workspace script:
+		//
+		//   npm run --workspace @wordpress/build-scripts resolve-trace-source-maps -- <trace.json> [--build-dir <dir>]
 		const tracesDir = join( artifactsPath, 'traces' );
 		const filePath = join( tracesDir, `${ name }.trace.json` );
 		await mkdir( tracesDir, { recursive: true } );
@@ -359,13 +388,48 @@ export class Metrics {
 	}
 
 	/**
-	 * @return Durations of all traced `focus` and `focusin` events.
+	 * Selecting a block within an editing host moves only the native
+	 * selection, so `focus`/`focusin` do not fire for those clicks. Event
+	 * types that did not fire are left out: callers sum the durations, and an
+	 * empty list sums to `undefined`, which would poison the total.
+	 *
+	 * The dispatches also nest — a click that moves focus into the editing
+	 * host dispatches `focus`/`focusin` inside the `pointerup` dispatch — so
+	 * each dispatch is clipped to the time not already covered by an earlier
+	 * one. Summing then measures the wall clock instead of counting the
+	 * nested work once per enclosing dispatch.
+	 *
+	 * @return Non-overlapping durations of the traced `focus`, `focusin`,
+	 * `pointerup`, and `selectionchange` dispatches that fired, grouped by
+	 * event type.
 	 */
 	getSelectionEventDurations() {
-		return [
-			this.getEventDurations( 'focus' ),
-			this.getEventDurations( 'focusin' ),
+		const eventTypes: EventType[] = [
+			'focus',
+			'focusin',
+			'pointerup',
+			'selectionchange',
 		];
+		const durations = new Map< EventType, number[] >(
+			eventTypes.map( ( type ): [ EventType, number[] ] => [ type, [] ] )
+		);
+		const dispatches = this.getEventDispatches( eventTypes ).sort(
+			( a, b ) => a.ts - b.ts
+		);
+
+		let coveredUntil = -Infinity;
+		for ( const item of dispatches ) {
+			const end = item.ts + item.dur;
+			const from = Math.max( item.ts, coveredUntil );
+			coveredUntil = Math.max( coveredUntil, end );
+			durations
+				.get( item.args.data.type )!
+				.push( Math.max( 0, end - from ) / 1000 );
+		}
+
+		return [ ...durations.values() ].filter(
+			( eventDurations ) => eventDurations.length
+		);
 	}
 
 	/**
@@ -390,21 +454,30 @@ export class Metrics {
 	 * @return Durations of all events of a given type.
 	 */
 	getEventDurations( eventType: EventType ) {
+		return this.getEventDispatches( [ eventType ] ).map(
+			( item ) => item.dur / 1000
+		);
+	}
+
+	/**
+	 * @param eventTypes Types of event to filter.
+	 * @return The `EventDispatch` trace events of the given types.
+	 */
+	private getEventDispatches( eventTypes: EventType[] ) {
 		if ( this.trace.traceEvents.length === 0 ) {
 			throw new Error(
 				'No trace events found. Did you forget to call stopTracing()?'
 			);
 		}
 
-		return this.trace.traceEvents
-			.filter(
-				( item: TraceEvent ): boolean =>
-					item.cat === 'devtools.timeline' &&
-					item.name === 'EventDispatch' &&
-					item?.args?.data?.type === eventType &&
-					!! item.dur
-			)
-			.map( ( item ) => ( item.dur ? item.dur / 1000 : 0 ) );
+		return this.trace.traceEvents.filter(
+			( item: TraceEvent ): item is EventDispatch =>
+				item.cat === 'devtools.timeline' &&
+				item.name === 'EventDispatch' &&
+				!! item.dur &&
+				!! item.args?.data &&
+				eventTypes.includes( item.args.data.type )
+		);
 	}
 
 	/**

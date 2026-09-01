@@ -1,13 +1,5 @@
 /* eslint-disable playwright/expect-expect */
-
-/**
- * WordPress dependencies
- */
 import { test, Metrics } from '@wordpress/e2e-test-utils-playwright';
-
-/**
- * Internal dependencies
- */
 import { PerfUtils } from '../fixtures';
 
 // See https://github.com/WordPress/gutenberg/issues/51383#issuecomment-1613460429
@@ -70,6 +62,15 @@ test.describe( 'Site Editor Performance', () => {
 			} );
 
 			draftId = page.id;
+
+			// Set preferences via REST so that welcomeGuide is reliably
+			// persisted before the timed iterations start.
+			await requestUtils.setPreferences( 'core/edit-site', {
+				welcomeGuide: false,
+				welcomeGuideStyles: false,
+				welcomeGuidePage: false,
+				welcomeGuideTemplate: false,
+			} );
 		} );
 
 		const samples = 10;
@@ -85,11 +86,11 @@ test.describe( 'Site Editor Performance', () => {
 				await metrics.startTracing();
 
 				// Go to the test draft.
-				await admin.visitSiteEditor( {
-					postId: draftId,
-					postType: 'page',
-					canvas: 'edit',
-				} );
+				await admin.page.goto(
+					'wp-admin/site-editor.php?postId=' +
+						draftId +
+						'&postType=page&canvas=edit'
+				);
 
 				// Wait for the first block.
 				const canvas = await perfUtils.getCanvas();
@@ -360,13 +361,20 @@ test.describe( 'Site Editor Performance', () => {
 
 				await Promise.all(
 					patterns.map( async ( pattern ) => {
+						const option = page.getByRole( 'option', {
+							name: pattern,
+							exact: true,
+						} );
+
+						// The pattern previews are rendered lazily: each
+						// preview's `Editor canvas` iframe is only created once
+						// its list item is scrolled into view. Without this the
+						// off-screen previews never render and the wait below
+						// times out.
+						await option.scrollIntoViewIfNeeded();
+
 						const canvas = await perfUtils.getCanvas(
-							page
-								.getByRole( 'option', {
-									name: pattern,
-									exact: true,
-								} )
-								.getByTitle( 'Editor canvas' )
+							option.getByTitle( 'Editor canvas' )
 						);
 
 						// Wait until the first block is rendered AND all
