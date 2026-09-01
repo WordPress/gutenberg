@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`flags warnings when invalidly positioned declarations are found snapshot matches warnings 1`] = `
+exports[`flags warnings when invalidly positioned declarations are found > snapshot matches warnings 1`] = `
 [
   {
     "column": 1,

@@ -28,6 +28,9 @@
 		"stylelint": "^17.14.1",
 		"stylelint-plugin-logical-css": "^2.1.0"
 	},
+	"devDependencies": {
+		"vitest": "^4.1.10"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

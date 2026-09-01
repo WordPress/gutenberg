@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Code Quality
-
--   Run the stylelint plugin tests in a child process, since stylelint 17 is ESM-only and cannot be loaded from Jest's CommonJS runtime ([#80738](https://github.com/WordPress/gutenberg/pull/80738)).
-
 ### Documentation
 
 -   Explain how consumers define light and dark themes through `ThemeProvider` color seeds ([#82039](https://github.com/WordPress/gutenberg/pull/82039)).
