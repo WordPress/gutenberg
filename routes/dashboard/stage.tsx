@@ -15,6 +15,7 @@ import {
 } from '@wordpress/widget-primitives';
 import { registerDashboardFieldTypes } from './field-types';
 import { useDashboardGridSettings, useDashboardLayout } from './hooks';
+import { DashboardWidgetHostProvider } from './widget-host';
 
 registerDashboardFieldTypes();
 
@@ -58,32 +59,34 @@ function Dashboard() {
 		: __( 'Dashboard' );
 
 	return (
-		<WidgetDashboard
-			widgetTypes={ widgetTypes }
-			isResolvingWidgetTypes={ isResolving }
-			layout={ layout }
-			onLayoutChange={ handleLayoutChange }
-			onLayoutReset={ resetLayout }
-			gridSettings={ gridSettings }
-			editMode={ editMode }
-			onEditChange={ setEditMode }
-		>
-			<Page
-				breadcrumbs={
-					editMode && isMobileViewport ? undefined : (
-						<Breadcrumbs items={ [ { label: pageTitle } ] } />
-					)
-				}
-				ariaLabel={ pageTitle }
-				actions={ <WidgetDashboard.Actions /> }
-				hasPadding
+		<DashboardWidgetHostProvider>
+			<WidgetDashboard
+				widgetTypes={ widgetTypes }
+				isResolvingWidgetTypes={ isResolving }
+				layout={ layout }
+				onLayoutChange={ handleLayoutChange }
+				onLayoutReset={ resetLayout }
+				gridSettings={ gridSettings }
+				editMode={ editMode }
+				onEditChange={ setEditMode }
 			>
-				<WidgetDashboard.NoWidgetsState />
-				<WidgetDashboard.Widgets />
-			</Page>
+				<Page
+					breadcrumbs={
+						editMode && isMobileViewport ? undefined : (
+							<Breadcrumbs items={ [ { label: pageTitle } ] } />
+						)
+					}
+					ariaLabel={ pageTitle }
+					actions={ <WidgetDashboard.Actions /> }
+					hasPadding
+				>
+					<WidgetDashboard.NoWidgetsState />
+					<WidgetDashboard.Widgets />
+				</Page>
 
-			<WidgetDashboard.Commands />
-		</WidgetDashboard>
+				<WidgetDashboard.Commands />
+			</WidgetDashboard>
+		</DashboardWidgetHostProvider>
 	);
 }
 

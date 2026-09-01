@@ -14,7 +14,7 @@
 		{ "path": "../dataviews/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
-		{ "path": "../icons" },
+		{ "path": "../icons/tsconfig.build.json" },
 		{ "path": "../media-fields/tsconfig.build.json" },
 		{ "path": "../notices/tsconfig.build.json" },
 		{ "path": "../private-apis" },

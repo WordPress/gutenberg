@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import {
 	getBlockVisibilityViewportEntries,
 	getViewportCheckboxState,
@@ -76,7 +77,7 @@ describe( 'block-visibility utils', () => {
 
 		it( 'should return null when some blocks are hidden for viewport', () => {
 			// Suppress console.log from getViewportCheckboxState
-			const consoleSpy = jest
+			const consoleSpy = vi
 				.spyOn( console, 'log' )
 				.mockImplementation( () => {} );
 

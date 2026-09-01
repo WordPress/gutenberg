@@ -2,27 +2,85 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   DataForm: a combined form field (one with `children`) is now treated purely as a layout container. Its `id` is no longer resolved against the field definitions: a field sharing that `id` no longer contributes validation rules to the group, and the `panel` layout no longer uses it for the collapsed summary or `readOnly` state, falling back to the group's first leaf child instead ([#82175](https://github.com/WordPress/gutenberg/pull/82175)).
+
+    If a combined field relied on sharing its `id` with a field to pick the panel summary, declare it through `layout.summary` instead. For example, a `discussion` field whose `render` summarizes `comment_status` and `ping_status` together:
+
+    ```js
+    // Before: the summary came from the `discussion` field because the group shares its id.
+    const form = {
+    	layout: { type: 'panel' },
+    	fields: [
+    		{ id: 'discussion', children: [ 'comment_status', 'ping_status' ] },
+    	],
+    };
+
+    // After: the summary field is explicit. Without it, the group would
+    // now be summarized by its first child, `comment_status`.
+    const form = {
+    	layout: { type: 'panel' },
+    	fields: [
+    		{
+    			id: 'discussion',
+    			layout: { type: 'panel', summary: 'discussion' },
+    			children: [ 'comment_status', 'ping_status' ],
+    		},
+    	],
+    };
+    ```
+
+    If a combined field relied on a same-id field's `isValid` rules being applied to the group, move those rules to the child fields.
+
+### Internal
+
+-   Remove unused dependency `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
+-   Note in the `/wp` bundle build script that its singleton externals list must stay in sync with the transitive private API usage check ([#82027](https://github.com/WordPress/gutenberg/pull/82027)).
+
+### Bug Fix
+
+-   Color filter and selected-option icons with `color` rather than `fill`, so they stay visible now that those icons are stroke-based. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
+-   DataViews: Scope the search field's fixed width to the default UI search row ([#82128](https://github.com/WordPress/gutenberg/pull/82128)).
+
+## 18.1.0 (2026-08-26)
+
 ### Enhancements
 
+-   DataViews: Add a `mediaFit` option to the `grid` and `pickerGrid` layouts to fit item previews inside their box (`contain`) instead of cropping them (`cover`), so the media's own aspect ratio stays visible. A fitted preview is letterboxed against a neutral background, so each item still reads as a unit. Consumers can offer this to users as an "Original aspect ratio" toggle in the view options via `config.mediaFitControl` ([#81604](https://github.com/WordPress/gutenberg/pull/81604)).
 -   Validated form controls: Align invalid focus styling for `ComboboxControl` and `FormTokenField` with the design system ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
 -   DataViews filters: Align filter search input focus styling with `outset-ring__focus` ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
 
 ### Bug Fix
 
+-   DataViews: Restore the divider that marks the sticky Actions column when a table layout is horizontally scrollable. It was drawn with a surface background token rather than a stroke one, making it invisible against the table, so nothing indicated there were more properties to scroll to. [#82055](https://github.com/WordPress/gutenberg/pull/82055)
+-   Picker grid layout: Clip item previews to the media box's rounded corners, as the grid layout already does, so an image no longer squares off its corners ([#81604](https://github.com/WordPress/gutenberg/pull/81604)).
+-   DataForm: Keep the displayed calendar month of the `date` and `datetime` controls in sync when the value changes from outside the control, e.g. after an undo, a reset, or switching the edited item. [#81635](https://github.com/WordPress/gutenberg/pull/81635)
+-   DataForms: Fix the `date` and `datetime` controls selecting and highlighting the day next to the one clicked. A site configured with a UTC offset rather than a named timezone reports no timezone the calendar can work in, so it fell back to the browser's while the values stayed anchored to the site's. The `datetime` calendar is now given the site's UTC offset itself — which also keeps the day it marks as today the site's — and a `date` value is treated as a plain calendar day, parsed in the same browser timezone the calendar reads it in. [#81498](https://github.com/WordPress/gutenberg/pull/81498)
 -   Validated form controls: Align invalid focus styling for InputBase-based controls with the design system ([#80417](https://github.com/WordPress/gutenberg/pull/80417)).
 -   DataViews: Prevent the filter operator select focus ring from being clipped. [#80417](https://github.com/WordPress/gutenberg/pull/80417)
 -   DataForm: Send a single update per calendar interaction in the `datetime` control instead of two identical ones. Selecting or clearing a date now reveals the validation message by firing a synthetic `invalid` event on the input, rather than briefly moving focus into it and re-sending the value, and announces it to screen readers since focus stays on the calendar. [#81440](https://github.com/WordPress/gutenberg/pull/81440)
+-   DataForms: Fix focus not returning to a `panel` layout field's edit button after its flyout is opened by clicking the field row. Focus landed on the dropdown's container element instead, so the field could not be reopened with <kbd>Enter</kbd>. The edit button is now the actual dropdown toggle, instead of the row delegating clicks to it. [#80689](https://github.com/WordPress/gutenberg/pull/80689)
+-   DataViews: Pass the site's locale and text direction to the `date`/`datetime` controls' `Calendar` and `RangeCalendar`, so month and weekday names follow the site's language, and an RTL admin gets an RTL calendar, instead of always defaulting to English. [#81592](https://github.com/WordPress/gutenberg/pull/81592)
 
 ### Internal
 
+-   Update `@ariakit/react` to 0.4.37 ([#81080](https://github.com/WordPress/gutenberg/pull/81080)).
+-   DataViews: Replace the private `Menu` from `@wordpress/components` with the `Menu` from `@wordpress/ui` in the item actions, list layout, column header, add-filter, and layout switcher menus. ([#81783](https://github.com/WordPress/gutenberg/pull/81783))
+-   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509), [#81514](https://github.com/WordPress/gutenberg/pull/81514), [#81516](https://github.com/WordPress/gutenberg/pull/81516))
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81515](https://github.com/WordPress/gutenberg/pull/81515))
--   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509), [#81514](https://github.com/WordPress/gutenberg/pull/81514))
 -   DataForm: Narrow the combobox control's `onChange` handler parameter back to `string | null`, following the upstream `ComboboxControl` type fix that removed the accidental `undefined` from the callback type. [#81568](https://github.com/WordPress/gutenberg/pull/81568)
 -   DataForm: Internalize `ValidatedComboboxControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81449](https://github.com/WordPress/gutenberg/pull/81449)
 -   DataForm: Internalize `ValidatedFormTokenField` instead of unlocking it from the `@wordpress/components` private APIs. [#81451](https://github.com/WordPress/gutenberg/pull/81451)
 -   DataForm: Internalize `ValidatedToggleControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81492](https://github.com/WordPress/gutenberg/pull/81492)
 -   DataForm: Internalize `ValidatedToggleGroupControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81450](https://github.com/WordPress/gutenberg/pull/81450)
 -   `ValidatedToggleGroupControl`: Use `--focus-color` for the error focus ring so ancestor overrides apply correctly ([#81242](https://github.com/WordPress/gutenberg/pull/81242)).
+-   DataForms: Simplify the `panel` layout field trigger. The row is now a plain layout container and the edit button owns the click handling, with its hit area stretched over the row for pointer users. Removes the row-level click/keydown handlers and the text-selection guard they needed. [#80689](https://github.com/WordPress/gutenberg/pull/80689)
+-   DataForm: Remove the vendored `ControlWithError` copy in favor of the `ControlWithError` component from `@wordpress/ui`. ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574))
+-   DataForm: Render the `date` control's validity message with `ValidityIndicator` from `@wordpress/ui` instead of hand-rolled markup styled by `@wordpress/components` global class names. ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574))
+-   DataForm: Use `ValidatedInputControl` from `@wordpress/ui` in the `text`, `email`, `telephone`, `url`, `password`, `color`, `datetime`, and `time` controls, instead of unlocking it from the `@wordpress/components` private APIs. Prefixes and suffixes now render in an `InputLayout.Slot` from `@wordpress/ui`. ([#81627](https://github.com/WordPress/gutenberg/pull/81627))
+-   DataForm: Use `ValidatedTextareaControl` from `@wordpress/ui` in the `textarea` control, instead of unlocking it from the `@wordpress/components` private APIs. This was the last private API used by the package, so the `@wordpress/private-apis` dependency is removed. ([#81984](https://github.com/WordPress/gutenberg/pull/81984))
 
 ## 18.0.0 (2026-08-12)
 

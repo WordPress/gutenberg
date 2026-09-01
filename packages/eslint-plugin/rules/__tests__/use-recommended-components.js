@@ -1,5 +1,8 @@
-import { RuleTester } from 'eslint';
+import { describe, expect, it } from 'vitest';
+import configureRuleTester from '../../test-utils/configure-rule-tester';
 import rule, { ALLOWLIST, DENYLIST } from '../use-recommended-components';
+
+const RuleTester = configureRuleTester( { describe, it } );
 
 const ruleTester = new RuleTester( {
 	languageOptions: {
@@ -24,8 +27,12 @@ ruleTester.run( 'use-recommended-components', rule, {
 		"import { Link } from '@wordpress/ui';",
 		"import { Stack } from '@wordpress/ui';",
 		"import { Text } from '@wordpress/ui';",
-		"import { Badge, Icon, Link, Stack, Tabs, Text, Tooltip } from '@wordpress/ui';",
+		"import { Autocomplete, Badge, Field, Fieldset, Icon, Link, Stack, Tabs, Text, Tooltip } from '@wordpress/ui';",
 		"import { Spinner } from '@wordpress/ui';",
+		"import { KeyboardShortcutDescription, KeyboardShortcutDisplay, useKeyboardShortcutProps } from '@wordpress/ui';",
+		"import { ControlWithError } from '@wordpress/ui';",
+		"import { ValidatedInputControl, InputLayout } from '@wordpress/ui';",
+		"import { ValidatedTextareaControl } from '@wordpress/ui';",
 
 		// Unlocked private APIs are only checked for denied names.
 		"import { privateApis } from '@wordpress/components'; import { unlock } from '../../lock-unlock'; const { SomethingElse } = unlock( privateApis );",

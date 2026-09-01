@@ -9,7 +9,7 @@
 		{ "path": "../deprecated/tsconfig.build.json" },
 		{ "path": "../dom" },
 		{ "path": "../element/tsconfig.build.json" },
-		{ "path": "../is-shallow-equal" },
+		{ "path": "../is-shallow-equal/tsconfig.build.json" },
 		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../priority-queue/tsconfig.build.json" },
 		{ "path": "../private-apis" },
@@ -20,7 +20,7 @@
 		"**/benchmark",
 		"src/higher-order/test/pipe.ts",
 		"src/higher-order/test/compose.ts",
-		"src/hooks/use-copy-on-click/test/index.tsx",
+		"src/hooks/use-copy-on-click/test/index.jsdom.test.tsx",
 		"src/utils/debounce/test/index.ts",
 		"src/utils/throttle/test/index.ts"
 	]

@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import getFilteredTemplatePartBlocks from '../get-filtered-template-parts';
 
 const NESTED_BLOCKS = [

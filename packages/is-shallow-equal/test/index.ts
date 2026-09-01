@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import {
 	isShallowEqual,
 	isShallowEqualArrays,
@@ -146,7 +147,7 @@ describe( 'isShallowEqual', () => {
 	} );
 
 	it( 'returns true on arrays that are a copy of each other', () => {
-		const a = [];
+		const a: unknown[] = [];
 		const b = a;
 
 		expect( isShallowEqual( a, b ) ).toBe( true );

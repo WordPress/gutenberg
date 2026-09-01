@@ -1,11 +1,6 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import {
-	type InlineConfig,
-	type PluginOption,
-	mergeConfig,
-	transformWithOxc,
-} from 'vite';
+import { type InlineConfig, type PluginOption, mergeConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import type { StorybookConfig } from '@storybook/react-vite';
 import dsTokenFallbacks from '@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks';
@@ -27,18 +22,18 @@ const stories = [
 	'./stories/playground/**/*.story.@(jsx|tsx)',
 	'./stories/**/*.mdx',
 	'./stories/design-system/**/*.story.@(ts|tsx)',
-	'../packages/block-editor/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
-	'../packages/editor/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
-	'../packages/global-styles-ui/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
+	'../packages/block-editor/src/**/stories/*.story.@(jsx|tsx|mdx)',
+	'../packages/editor/src/**/stories/*.story.@(jsx|tsx|mdx)',
+	'../packages/global-styles-ui/src/**/stories/*.story.@(jsx|tsx|mdx)',
 	'../packages/components/src/**/stories/*.story.@(jsx|tsx)',
 	'../packages/components/src/**/stories/*.mdx',
-	'../packages/icons/src/**/stories/*.story.@(js|tsx|mdx)',
+	'../packages/icons/src/**/stories/*.story.@(tsx|mdx)',
 	'./stories/icons/**/*.story.@(ts|tsx)',
-	'../packages/dataviews/src/**/stories/*.story.@(js|tsx|mdx)',
-	'../packages/fields/src/**/stories/*.story.@(js|tsx|mdx)',
-	'../packages/image-cropper/src/**/stories/*.story.@(js|tsx|mdx)',
-	'../packages/media-editor/src/**/stories/*.story.@(js|tsx|mdx)',
-	'../packages/media-fields/src/**/stories/*.story.@(js|tsx|mdx)',
+	'../packages/dataviews/src/**/stories/*.story.@(tsx|mdx)',
+	'../packages/fields/src/**/stories/*.story.@(tsx|mdx)',
+	'../packages/image-cropper/src/**/stories/*.story.@(tsx|mdx)',
+	'../packages/media-editor/src/**/stories/*.story.@(tsx|mdx)',
+	'../packages/media-fields/src/**/stories/*.story.@(tsx|mdx)',
 	'../packages/theme/src/**/stories/*.mdx',
 	'../packages/theme/src/**/stories/*.story.@(tsx|mdx)',
 	'../packages/grid/src/**/stories/*.story.@(ts|tsx)',
@@ -46,7 +41,6 @@ const stories = [
 	'../packages/widget-primitives/src/**/stories/*.story.@(ts|tsx)',
 	'../packages/widget-dashboard/src/**/stories/*.mdx',
 	'../packages/widget-dashboard/src/**/stories/*.story.@(ts|tsx)',
-	'../routes/dashboard/**/stories/*.story.@(ts|tsx)',
 	'../packages/ui/src/**/stories/*.mdx',
 	'../packages/ui/src/**/stories/*.story.@(ts|tsx)',
 	'../packages/admin-ui/src/**/stories/*.story.@(ts|tsx)',
@@ -69,6 +63,13 @@ const config: StorybookConfig = {
 		import.meta.resolve( './addons/design-system-theme/preset.ts' ),
 	],
 	framework: getAbsolutePath( '@storybook/react-vite' ),
+	tags: {
+		'docs-only': {
+			// Keep stories available to attached MDX while hiding their
+			// standalone pages from the sidebar.
+			excludeFromSidebar: true,
+		},
+	},
 	features: {
 		componentsManifest: NODE_ENV !== 'development',
 		// Use experimental TypeScript LanguageService prop extractor for the
@@ -144,30 +145,6 @@ const config: StorybookConfig = {
 					],
 					plugins: [ getAbsolutePath( '@emotion/babel-plugin' ) ],
 				} ),
-				{
-					name: 'load-js-files-as-jsx',
-					enforce: 'pre',
-					async transform( code: string, id: string ) {
-						if ( ! id.match( /.*\.js$/ ) ) {
-							return null;
-						}
-
-						const result = await transformWithOxc( code, id, {
-							lang: 'jsx',
-							jsx: { runtime: 'automatic' },
-						} );
-
-						for ( const warning of result.warnings ) {
-							this.warn( warning );
-						}
-
-						return {
-							code: result.code,
-							map: result.map,
-							moduleType: 'js',
-						};
-					},
-				},
 				// Stub the vips and wasm-vips packages for Storybook since they use WASM modules that Vite can't handle.
 				{
 					name: 'stub-vips',
@@ -226,6 +203,14 @@ const config: StorybookConfig = {
 				},
 			],
 			build: {
+				// Let the browser discover JavaScript dependencies as it
+				// evaluates each module. Preloading the complete dependency
+				// graph creates hundreds of concurrent requests on first load.
+				modulePreload: false,
+				// Storybook's preview includes its shared runtime and all stories.
+				// Automatic chunk splitting is already enabled; 3.5 MB leaves a
+				// meaningful budget above the current 3.15 MB largest chunk.
+				chunkSizeWarningLimit: 3_500,
 				/**
 				 * Use terser with keep_fnames to preserve component names in source code display.
 				 * Without this, Vite's default minifier mangles component names (e.g., BoxControl -> J)
@@ -239,6 +224,15 @@ const config: StorybookConfig = {
 						keep_fnames: true,
 					},
 				},
+				rolldownOptions: {
+					checks: {
+						// Storybook's legacy `react-docgen` and
+						// `react-docgen-typescript` transforms are expected to
+						// dominate the build. Keep them enabled without emitting
+						// timing warnings.
+						pluginTimings: false,
+					},
+				},
 			},
 			define: {
 				// Ensures that `@wordpress/warning` can properly detect dev mode.
@@ -250,14 +244,33 @@ const config: StorybookConfig = {
 				postcss: {
 					// Vite bundles its own PostCSS, creating a deep
 					// type incompatibility with the top-level PostCSS.
-					plugins: [ dsTokenFallbacks as any ],
-				},
-			},
-			optimizeDeps: {
-				rolldownOptions: {
-					moduleTypes: {
-						'.js': 'tsx',
-					},
+					plugins: [
+						dsTokenFallbacks as any,
+						{
+							// `postcss-modules` turns CSS composed from another module into a
+							// string before it prepends it to the current stylesheet. Parsing
+							// that string discards the declarations' source metadata, which
+							// makes Vite warn even when no asset resolution is needed.
+							postcssPlugin:
+								'supply-composed-css-module-source-fallback',
+							OnceExit( root ) {
+								root.walkDecls( ( declaration ) => {
+									const requiresSourceForAssetResolution =
+										/(?:url|image-set)\(/i.test(
+											declaration.value
+										);
+
+									// The fallback file is unsafe when Vite uses it to resolve assets.
+									if (
+										! declaration.source?.input.file &&
+										! requiresSourceForAssetResolution
+									) {
+										declaration.source = root.source;
+									}
+								} );
+							},
+						},
+					],
 				},
 			},
 		} satisfies InlineConfig );
