@@ -76,11 +76,10 @@
 		}
 	}
 
-	// The background has to be applied to the td, not tr, or border-radius won't work.
-	&.is-selected td {
+	&.is-selected {
 		background: var(--wp-admin-theme-color);
 	}
-	&.is-selected.is-synced td {
+	&.is-selected.is-synced {
 		background: var(--wp-block-synced-color);
 	}
 	&.is-synced:not(.is-selected) .block-editor-list-view-block-contents {
