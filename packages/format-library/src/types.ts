@@ -85,14 +85,7 @@ export interface EditImageProps {
 
 export interface EditLinkProps {
 	isActive: boolean;
-	activeAttributes: {
-		url: string;
-		type?: string;
-		id?: string;
-		target?: string;
-		rel?: string;
-		class?: string;
-	};
+	activeAttributes: LinkFormatAttributes;
 	value: RichTextValue;
 	onChange: ( newValue: RichTextValue ) => void;
 	onFocus: () => void;
@@ -117,14 +110,7 @@ export interface LinkValue {
 
 export interface InlineLinkUIProps {
 	isActive: boolean;
-	activeAttributes: {
-		url: string;
-		type?: string;
-		id?: string;
-		target?: string;
-		rel?: string;
-		class?: string;
-	};
+	activeAttributes: LinkFormatAttributes;
 	value: RichTextValue;
 	onChange: ( newValue: RichTextValue ) => void;
 	onFocusOutside: () => void;
@@ -163,6 +149,9 @@ export interface LinkFormatOptions {
 	cssClasses?: string;
 }
 
+/**
+ * The attributes carried on an active `core/link` format.
+ */
 export type LinkFormatAttributes = {
 	url: string;
 	type?: string;
