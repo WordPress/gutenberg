@@ -54,18 +54,17 @@ function render_block_core_block( $attributes, $content, $block_instance ) {
 
 	/*
 	 * The Shortcode block leaves its shortcode in the markup for `the_content`
-	 * to expand. A synced pattern rendered outside that filter -- in a
-	 * template, for example -- never gets that pass, so expand shortcodes
-	 * here, on the pattern's saved markup and before its blocks are rendered,
-	 * mirroring how `get_the_block_template_html()` processes templates.
-	 * Expanding before block rendering keeps shortcodes confined to what the
-	 * pattern author saved: content that dynamic blocks inject during
-	 * rendering (comment text, post content, pattern overrides) is never
-	 * treated as shortcodes.
+	 * to expand. A synced pattern rendered outside that filter, in a template
+	 * for example, never gets that pass, so expand shortcodes here on the
+	 * pattern's saved markup before its blocks are rendered, the same way
+	 * `get_the_block_template_html()` processes templates. Running the pass
+	 * before block rendering keeps it limited to what the pattern author
+	 * saved, so content that dynamic blocks add while rendering (comment
+	 * text, post content, pattern overrides) is never treated as shortcodes.
 	 *
 	 * Inside `the_content` and `widget_block_content`, which run
-	 * `do_shortcode` after blocks, the extra pass is skipped so escaped
-	 * shortcodes are not expanded twice.
+	 * `do_shortcode` after blocks, this pass is skipped so escaped shortcodes
+	 * are not expanded twice.
 	 */
 	if ( ! doing_filter( 'the_content' ) && ! doing_filter( 'widget_block_content' ) ) {
 		$content = shortcode_unautop( $content );
