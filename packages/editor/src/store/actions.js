@@ -200,6 +200,10 @@ export const savePost =
 		dispatch.editPost( { content }, { undoIgnore: true } );
 
 		const previousRecord = select.getCurrentPost();
+		// Snapshotted alongside the content above, so that attaching media once
+		// the save finishes works from what was saved for the post itself.
+		const savedBlocks = select.getEditorBlocks();
+
 		let edits = {
 			id: previousRecord.id,
 			...registry
@@ -296,9 +300,7 @@ export const savePost =
 			attachMediaInPost( registry, {
 				id: previousRecord.id,
 				type: previousRecord.type,
-				// The post's own blocks, not the ones on screen — see
-				// `attachMediaInPost`. Same source as the content saved above.
-				blocks: select.getEditorBlocks(),
+				blocks: savedBlocks,
 			} );
 		}
 

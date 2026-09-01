@@ -429,9 +429,12 @@ describe( 'Post actions', () => {
 		 * Answers everything `savePost` and the attach need, recording each
 		 * request so the test can assert on what was and wasn't issued.
 		 *
-		 * @param {string[]} requests Collects `METHOD path` for every call.
+		 * @param {string[]} requests         Collects `METHOD path` for every call.
+		 * @param {Function} [duringPostSave] Run while the post's own save is in
+		 *                                    flight, to stand in for the user
+		 *                                    editing before it comes back.
 		 */
-		function setFetchHandler( requests ) {
+		function setFetchHandler( requests, duringPostSave ) {
 			attachedTo = undefined;
 			apiFetch.setFetchHandler( async ( options ) => {
 				const method = getMethod( options );
@@ -470,6 +473,7 @@ describe( 'Post actions', () => {
 					method === 'PUT' &&
 					path.startsWith( `/wp/v2/posts/${ postId }` )
 				) {
+					duringPostSave?.();
 					return { ...imagePost, ...data };
 				}
 				if (
@@ -545,6 +549,47 @@ describe( 'Post actions', () => {
 				},
 			] );
 		}
+
+		/**
+		 * `savePost` reads the post's blocks up front, next to the content it
+		 * sends. An image added while the request is in flight was not part of
+		 * this save, so it waits for the next one.
+		 */
+		it( 'attaches what was saved, not media added mid-save', async () => {
+			const requests = [];
+			const registry = createRegistryWithStores();
+			setFetchHandler( requests, () => {
+				registry.dispatch( editorStore ).editPost( {
+					blocks: [
+						{
+							clientId: 'image-1',
+							name: 'core/image',
+							isValid: true,
+							attributes: { id: 12 },
+							innerBlocks: [],
+						},
+						{
+							clientId: 'image-2',
+							name: 'core/image',
+							isValid: true,
+							attributes: { id: 77 },
+							innerBlocks: [],
+						},
+					],
+				} );
+			} );
+			setUpEditor( registry );
+
+			await registry.dispatch( editorStore ).savePost();
+			await flush();
+
+			expect( hasAttached( requests ) ).toBe( true );
+			expect(
+				requests.some( ( request ) =>
+					request.startsWith( 'PUT /wp/v2/media/77' )
+				)
+			).toBe( false );
+		} );
 
 		it( 'attaches media the post displays', async () => {
 			const requests = [];
