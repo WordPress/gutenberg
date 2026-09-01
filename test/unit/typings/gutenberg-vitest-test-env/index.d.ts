@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-extraneous-dependencies -- The owning test workspaces declare Vitest.
 import 'vitest';
 
 interface GutenbergVitestMatchers {
