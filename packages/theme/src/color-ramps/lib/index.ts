@@ -6,6 +6,7 @@ import {
 	getColorString,
 } from './color-utils.ts';
 import { findColorMeetingRequirements } from './find-color-with-constraints.ts';
+import { buildForegroundScale } from './build-foreground-scale.ts';
 import {
 	sortByDependency,
 	computeBetterFgColorDirection,
@@ -19,6 +20,7 @@ import type {
 	RampDirection,
 	RampConfig,
 	RampResult,
+	RampStepsConfig,
 } from './types.ts';
 import { CONTRAST_EPSILON } from './constants.ts';
 
@@ -46,7 +48,7 @@ function calculateRamp( {
 }: {
 	seed: PlainColorObject;
 	sortedSteps: ( keyof Ramp )[];
-	config: RampConfig;
+	config: RampStepsConfig;
 	mainDir: RampDirection;
 	oppDir: RampDirection;
 	pinLightness?: {
@@ -198,6 +200,7 @@ export function buildRamp(
 	{
 		mainDirection,
 		pinLightness,
+		backgroundRamp,
 		rescaleToFitContrastTargets = true,
 	}: {
 		mainDirection?: RampDirection;
@@ -205,6 +208,7 @@ export function buildRamp(
 			stepName: keyof Ramp;
 			value: number;
 		};
+		backgroundRamp?: RampResult;
 		rescaleToFitContrastTargets?: boolean;
 	} = {}
 ): RampResult {
@@ -236,7 +240,7 @@ export function buildRamp(
 	}
 
 	// Get the correct calculation order based on dependencies
-	const sortedSteps = sortByDependency( config );
+	const sortedSteps = sortByDependency( config.steps );
 
 	// Calculate the ramp with the initial seed.
 	const {
@@ -248,7 +252,7 @@ export function buildRamp(
 	} = calculateRamp( {
 		seed,
 		sortedSteps,
-		config,
+		config: config.steps,
 		mainDir,
 		oppDir,
 		pinLightness,
@@ -258,7 +262,7 @@ export function buildRamp(
 	let bestWarnings = warnings;
 
 	if ( maxDeficit > CONTRAST_EPSILON && rescaleToFitContrastTargets ) {
-		const iterSteps = stepsForStep( maxDeficitStep!, config );
+		const iterSteps = stepsForStep( maxDeficitStep!, config.steps );
 
 		function getSeedForL( l: number ): PlainColorObject {
 			return clampToGamut( set( clone( seed ), [ OKLCH, 'l' ], l ) );
@@ -268,7 +272,7 @@ export function buildRamp(
 			const iterationResults = calculateRamp( {
 				seed: s,
 				sortedSteps: iterSteps,
-				config,
+				config: config.steps,
 				mainDir,
 				oppDir,
 				pinLightness,
@@ -303,7 +307,7 @@ export function buildRamp(
 		const finalResult = calculateRamp( {
 			seed: bestSeed,
 			sortedSteps,
-			config,
+			config: config.steps,
 			mainDir,
 			oppDir,
 			pinLightness,
@@ -321,9 +325,15 @@ export function buildRamp(
 		bestRamp.surface3 = tmpSurface1;
 	}
 
-	return {
+	const rampResult = {
 		ramp: bestRamp,
 		warnings: bestWarnings,
 		direction: mainDir,
 	};
+
+	return buildForegroundScale(
+		rampResult,
+		backgroundRamp ?? rampResult,
+		config.foregroundScale
+	);
 }

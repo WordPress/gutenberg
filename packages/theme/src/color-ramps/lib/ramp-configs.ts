@@ -39,7 +39,9 @@ const ACCENT_SURFACE_TAPER_CHROMA: TaperChromaOptions = {
 	radiusLight: 0.01,
 };
 
-const fgSurface4Config: RampStepConfig = {
+const fgSurface5Config: RampStepConfig = {
+	// Keep the former fgSurface4 endpoint in the base solver. The foreground
+	// scale pass exposes it as fgSurface5 and inserts a new state step before it.
 	contrast: {
 		reference: 'surface3',
 		followDirection: 'main',
@@ -50,7 +52,62 @@ const fgSurface4Config: RampStepConfig = {
 	taperChromaOptions: FG_TAPER_CHROMA,
 };
 
-export const BG_RAMP_CONFIG: RampConfig = {
+const FOREGROUND_SCALE_STEPS = [
+	{
+		name: 'fgSurface1',
+		progress: 0,
+		preserveAnchor: true,
+		contrast: { references: [ 'surface3' ], target: 2 },
+	},
+	{
+		name: 'fgSurface2',
+		progress: 0.2,
+		preserveAnchor: true,
+		contrast: { references: [ 'surface3' ], target: 3 },
+	},
+	{
+		name: 'fgSurface3',
+		// APCA positions this step at 40% of the visible contrast range. WCAG
+		// contrast remains the hard minimum against every listed surface.
+		progress: 0.4,
+		contrast: {
+			references: [ 'surface1', 'surface2', 'surface3' ],
+			target: 4.5,
+		},
+	},
+	{
+		name: 'fgSurface4',
+		// Leave the final 40% of the visible contrast range for the active state.
+		progress: 0.6,
+		contrast: {
+			references: [
+				'surface1',
+				'surface2',
+				'surface3',
+				'surface4',
+				'surface5',
+			],
+			target: 4.5,
+		},
+	},
+	{
+		name: 'fgSurface5',
+		progress: 1,
+		preserveAnchor: true,
+		contrast: {
+			references: [
+				'surface1',
+				'surface2',
+				'surface3',
+				'surface4',
+				'surface5',
+			],
+			target: 4.5,
+		},
+	},
+] as const;
+
+const BG_RAMP_STEPS: RampConfig[ 'steps' ] = {
 	// Surface
 	surface1: {
 		contrast: {
@@ -123,7 +180,7 @@ export const BG_RAMP_CONFIG: RampConfig = {
 			target: 1.2,
 		},
 	},
-	bgFillInverted2: fgSurface4Config,
+	bgFillInverted2: fgSurface5Config,
 	bgFillDark: {
 		contrast: {
 			reference: 'surface3',
@@ -196,7 +253,17 @@ export const BG_RAMP_CONFIG: RampConfig = {
 		lightness: lightnessConstraintForegroundMediumContrast,
 		taperChromaOptions: FG_TAPER_CHROMA,
 	},
-	fgSurface4: fgSurface4Config,
+	fgSurface4: {
+		contrast: {
+			reference: 'surface3',
+			followDirection: 'main',
+			target: 4.5,
+			preferLighter: true,
+		},
+		taperChromaOptions: FG_TAPER_CHROMA,
+		sameAsIfPossible: 'fgSurface5',
+	},
+	fgSurface5: fgSurface5Config,
 	// fgFill
 	fgFill: {
 		contrast: {
@@ -230,77 +297,102 @@ export const BG_RAMP_CONFIG: RampConfig = {
 	},
 };
 
+export const BG_RAMP_CONFIG: RampConfig = {
+	steps: BG_RAMP_STEPS,
+	foregroundScale: {
+		seed: 'surface2',
+		perceptualReference: 'surface2',
+		chroma: {
+			mode: 'tapered',
+			options: FG_TAPER_CHROMA,
+		},
+		steps: FOREGROUND_SCALE_STEPS,
+	},
+};
+
 // BG_RAMP: seed => surface2 => {bgFill, surface3 => all other tokens}
 // ACCENT_RAMP: seed => bgFill1 => surface2 => surface3 => all other tokens
 export const ACCENT_RAMP_CONFIG: RampConfig = {
-	...BG_RAMP_CONFIG,
-	surface1: {
-		...BG_RAMP_CONFIG.surface1,
-		taperChromaOptions: ACCENT_SURFACE_TAPER_CHROMA,
-	},
-	surface2: {
-		contrast: {
-			reference: 'bgFill1',
-			followDirection: 'opposite',
-			target: BG_RAMP_CONFIG.bgFill1.contrast.target,
-			ignoreWhenAdjustingSeed: true,
+	steps: {
+		...BG_RAMP_CONFIG.steps,
+		surface1: {
+			...BG_RAMP_CONFIG.steps.surface1,
+			taperChromaOptions: ACCENT_SURFACE_TAPER_CHROMA,
 		},
-		taperChromaOptions: ACCENT_SURFACE_TAPER_CHROMA,
-	},
-	surface3: {
-		...BG_RAMP_CONFIG.surface3,
-		taperChromaOptions: ACCENT_SURFACE_TAPER_CHROMA,
-	},
-	surface4: {
-		...BG_RAMP_CONFIG.surface4,
-		taperChromaOptions: ACCENT_SURFACE_TAPER_CHROMA,
-	},
-	surface5: {
-		...BG_RAMP_CONFIG.surface5,
-		taperChromaOptions: ACCENT_SURFACE_TAPER_CHROMA,
-	},
-	surface6: {
-		...BG_RAMP_CONFIG.surface6,
-		taperChromaOptions: ACCENT_SURFACE_TAPER_CHROMA,
-	},
-	bgFill1: {
-		contrast: {
-			reference: 'seed',
-			followDirection: 'main',
-			target: 1,
+		surface2: {
+			contrast: {
+				reference: 'bgFill1',
+				followDirection: 'opposite',
+				target: BG_RAMP_CONFIG.steps.bgFill1.contrast.target,
+				ignoreWhenAdjustingSeed: true,
+			},
+			taperChromaOptions: ACCENT_SURFACE_TAPER_CHROMA,
+		},
+		surface3: {
+			...BG_RAMP_CONFIG.steps.surface3,
+			taperChromaOptions: ACCENT_SURFACE_TAPER_CHROMA,
+		},
+		surface4: {
+			...BG_RAMP_CONFIG.steps.surface4,
+			taperChromaOptions: ACCENT_SURFACE_TAPER_CHROMA,
+		},
+		surface5: {
+			...BG_RAMP_CONFIG.steps.surface5,
+			taperChromaOptions: ACCENT_SURFACE_TAPER_CHROMA,
+		},
+		surface6: {
+			...BG_RAMP_CONFIG.steps.surface6,
+			taperChromaOptions: ACCENT_SURFACE_TAPER_CHROMA,
+		},
+		bgFill1: {
+			contrast: {
+				reference: 'seed',
+				followDirection: 'main',
+				target: 1,
+			},
+		},
+		stroke1: {
+			...BG_RAMP_CONFIG.steps.stroke1,
+		},
+		stroke2: {
+			...BG_RAMP_CONFIG.steps.stroke2,
+		},
+		stroke3: {
+			...BG_RAMP_CONFIG.steps.stroke3,
+			sameAsIfPossible: 'fgSurface3',
+			taperChromaOptions: undefined,
+		},
+		stroke4: {
+			...BG_RAMP_CONFIG.steps.stroke4,
+			taperChromaOptions: undefined,
+		},
+		// fgSurface: do not de-saturate
+		fgSurface1: {
+			...BG_RAMP_CONFIG.steps.fgSurface1,
+			taperChromaOptions: undefined,
+		},
+		fgSurface2: {
+			...BG_RAMP_CONFIG.steps.fgSurface2,
+			taperChromaOptions: undefined,
+		},
+		fgSurface3: {
+			...BG_RAMP_CONFIG.steps.fgSurface3,
+			taperChromaOptions: undefined,
+			sameAsIfPossible: 'bgFill1',
+		},
+		fgSurface4: {
+			...BG_RAMP_CONFIG.steps.fgSurface4,
+			taperChromaOptions: undefined,
+		},
+		fgSurface5: {
+			...BG_RAMP_CONFIG.steps.fgSurface5,
+			taperChromaOptions: undefined,
 		},
 	},
-	stroke1: {
-		...BG_RAMP_CONFIG.stroke1,
-	},
-	stroke2: {
-		...BG_RAMP_CONFIG.stroke2,
-	},
-	stroke3: {
-		...BG_RAMP_CONFIG.stroke3,
-		sameAsIfPossible: 'fgSurface3',
-		taperChromaOptions: undefined,
-	},
-	stroke4: {
-		...BG_RAMP_CONFIG.stroke4,
-		taperChromaOptions: undefined,
-	},
-	// fgSurface: do not de-saturate
-	fgSurface1: {
-		...BG_RAMP_CONFIG.fgSurface1,
-		taperChromaOptions: undefined,
-	},
-	fgSurface2: {
-		...BG_RAMP_CONFIG.fgSurface2,
-		taperChromaOptions: undefined,
-	},
-	fgSurface3: {
-		...BG_RAMP_CONFIG.fgSurface3,
-		taperChromaOptions: undefined,
-		sameAsIfPossible: 'bgFill1',
-	},
-	fgSurface4: {
-		...BG_RAMP_CONFIG.fgSurface4,
-		taperChromaOptions: undefined,
+	foregroundScale: {
+		seed: 'bgFill1',
+		perceptualReference: 'surface2',
+		chroma: { mode: 'gamut-relative' },
+		steps: FOREGROUND_SCALE_STEPS,
 	},
 };

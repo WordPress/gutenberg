@@ -8,14 +8,14 @@ import {
 	MAX_BISECTION_ITERATIONS,
 	CONTRAST_EPSILON,
 } from './constants.ts';
-import type { Ramp, RampConfig, RampDirection } from './types.ts';
+import type { Ramp, RampStepsConfig, RampDirection } from './types.ts';
 import { getContrast } from './color-utils.ts';
 
 /**
  * Build a dependency graph from the steps configuration
  * @param config - The steps configuration object
  */
-function buildDependencyGraph( config: RampConfig ): {
+function buildDependencyGraph( config: RampStepsConfig ): {
 	dependencies: Map< keyof Ramp, ( keyof Ramp | 'seed' )[] >;
 	dependents: Map< keyof Ramp | 'seed', ( keyof Ramp )[] >;
 } {
@@ -53,7 +53,7 @@ function buildDependencyGraph( config: RampConfig ): {
  * Topologically sort steps based on their dependencies
  * @param config - The steps configuration object
  */
-export function sortByDependency( config: RampConfig ): ( keyof Ramp )[] {
+export function sortByDependency( config: RampStepsConfig ): ( keyof Ramp )[] {
 	const { dependents } = buildDependencyGraph( config );
 	const result: ( keyof Ramp )[] = [];
 	const visited = new Set< keyof Ramp | 'seed' >();
@@ -101,7 +101,7 @@ export function sortByDependency( config: RampConfig ): ( keyof Ramp )[] {
  */
 export function stepsForStep(
 	stepName: keyof Ramp,
-	config: RampConfig
+	config: RampStepsConfig
 ): ( keyof Ramp )[] {
 	const result = new Set< keyof Ramp >();
 	function visit( step: keyof Ramp | 'seed' ) {
