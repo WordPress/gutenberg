@@ -3,7 +3,8 @@ import {
 	createRegistry,
 	RegistryProvider,
 } from '@wordpress/data';
-import { render, screen, waitFor } from '@testing-library/react';
+import { renderHook, waitFor } from '@testing-library/react';
+import { createElement } from '@wordpress/element';
 import useQuerySelect from '../use-query-select';
 
 /* eslint-disable @wordpress/wp-global-usage */
@@ -31,51 +32,42 @@ describe( 'useQuerySelect', () => {
 		globalThis.SCRIPT_DEBUG = initialScriptDebug;
 	} );
 
-	const getTestComponent = ( mapSelectSpy, dependencyKey ) => ( props ) => {
-		const dependencies = props[ dependencyKey ];
-		mapSelectSpy.mockImplementation( ( select ) => ( {
-			results: select( 'testStore' ).testSelector( props.keyName ),
-		} ) );
-		const data = useQuerySelect( mapSelectSpy, [ dependencies ] );
-		return <div>{ data.results.data }</div>;
-	};
+	function renderHookWithRegistry( hook, options = {} ) {
+		const Wrapper = ( { children } ) =>
+			createElement( RegistryProvider, { value: registry }, children );
+		return renderHook( hook, { wrapper: Wrapper, ...options } );
+	}
 
-	it( 'passes the relevant data to the component', () => {
+	it( 'passes the relevant data to the hook', () => {
+		const renderSpy = jest.fn();
 		const selectSpy = jest.fn();
-		const TestComponent = jest
-			.fn()
-			.mockImplementation( getTestComponent( selectSpy, 'keyName' ) );
-		render(
-			<RegistryProvider value={ registry }>
-				<TestComponent keyName="foo" />
-			</RegistryProvider>
-		);
+
+		const { result } = renderHookWithRegistry( () => {
+			renderSpy();
+			selectSpy.mockImplementation( ( select ) => ( {
+				results: select( 'testStore' ).testSelector( 'foo' ),
+			} ) );
+			return useQuerySelect( selectSpy, [ 'foo' ] );
+		} );
 
 		expect( selectSpy ).toHaveBeenCalledTimes( 1 );
-		expect( TestComponent ).toHaveBeenCalledTimes( 1 );
+		expect( renderSpy ).toHaveBeenCalledTimes( 1 );
 
-		// ensure expected state was rendered
-		expect( screen.getByText( 'bar' ) ).toBeInTheDocument();
+		// ensure the expected state was returned
+		expect( result.current.results.data ).toBe( 'bar' );
 	} );
 
 	it( 'uses memoized selectors', () => {
 		const selectors = [];
-		const TestComponent = jest.fn().mockImplementation( ( props ) => {
-			useQuerySelect(
-				function ( query ) {
-					selectors.push( query( 'testStore' ) );
-					selectors.push( query( 'testStore' ) );
-					return null;
-				},
-				[ props.keyName ]
-			);
-			return <div />;
-		} );
+		const mapSelect = ( query ) => {
+			selectors.push( query( 'testStore' ) );
+			selectors.push( query( 'testStore' ) );
+			return null;
+		};
 
-		render(
-			<RegistryProvider value={ registry }>
-				<TestComponent keyName="foo" />
-			</RegistryProvider>
+		renderHookWithRegistry(
+			( { keyName } ) => useQuerySelect( mapSelect, [ keyName ] ),
+			{ initialProps: { keyName: 'foo' } }
 		);
 
 		// ensure the selectors were properly memoized
@@ -84,10 +76,9 @@ describe( 'useQuerySelect', () => {
 		expect( selectors[ 0 ] ).toBe( selectors[ 1 ] );
 
 		// Re-render
-		render(
-			<RegistryProvider value={ registry }>
-				<TestComponent keyName="bar" />
-			</RegistryProvider>
+		renderHookWithRegistry(
+			( { keyName } ) => useQuerySelect( mapSelect, [ keyName ] ),
+			{ initialProps: { keyName: 'bar' } }
 		);
 
 		// ensure we still got the memoized results after re-rendering
@@ -98,21 +89,11 @@ describe( 'useQuerySelect', () => {
 	} );
 
 	it( 'returns the expected "response" details – no resolvers and arguments', () => {
-		let querySelectData;
-		const TestComponent = jest.fn().mockImplementation( () => {
-			querySelectData = useQuerySelect( function ( query ) {
-				return query( 'testStore' ).getFoo();
-			}, [] );
-			return <div />;
-		} );
-
-		render(
-			<RegistryProvider value={ registry }>
-				<TestComponent />
-			</RegistryProvider>
+		const { result } = renderHookWithRegistry( () =>
+			useQuerySelect( ( query ) => query( 'testStore' ).getFoo(), [] )
 		);
 
-		expect( querySelectData ).toEqual( {
+		expect( result.current ).toEqual( {
 			data: 'bar',
 			isResolving: false,
 			hasResolved: false,
@@ -148,21 +129,16 @@ describe( 'useQuerySelect', () => {
 			} )
 		);
 
-		let querySelectData;
-		const TestComponent = jest.fn().mockImplementation( () => {
-			querySelectData = useQuerySelect( function ( query ) {
-				return query( 'resolverStore' ).getResolvedFoo( 10 );
-			}, [] );
-			return <div />;
-		} );
+		const renderResolvedFoo = () =>
+			renderHookWithRegistry( () =>
+				useQuerySelect(
+					( query ) => query( 'resolverStore' ).getResolvedFoo( 10 ),
+					[]
+				)
+			);
 
 		// Initial render, expect default values
-		render(
-			<RegistryProvider value={ registry }>
-				<TestComponent />
-			</RegistryProvider>
-		);
-		expect( querySelectData ).toEqual( {
+		expect( renderResolvedFoo().result.current ).toEqual( {
 			data: 10,
 			isResolving: false,
 			hasResolved: false,
@@ -171,14 +147,10 @@ describe( 'useQuerySelect', () => {
 		} );
 
 		// Re-render, expect resolved data
-		render(
-			<RegistryProvider value={ registry }>
-				<TestComponent />
-			</RegistryProvider>
-		);
+		const { result } = renderResolvedFoo();
 
 		await waitFor( () =>
-			expect( querySelectData ).toEqual( {
+			expect( result.current ).toEqual( {
 				data: 15,
 				isResolving: false,
 				hasResolved: true,
