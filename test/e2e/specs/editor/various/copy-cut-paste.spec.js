@@ -928,4 +928,302 @@ test.describe( 'Copy/cut/paste', () => {
 			},
 		] );
 	} );
+
+	test( 'should paste copied list items as siblings into another list', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/list',
+			innerBlocks: [
+				{ name: 'core/list-item', attributes: { content: 'one' } },
+				{ name: 'core/list-item', attributes: { content: 'two' } },
+			],
+		} );
+
+		// Multi-select the two whole list items and copy them.
+		await editor.canvas.getByText( 'one' ).click();
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const { getSelectedBlockClientIds, getBlockName } =
+						window.wp.data.select( 'core/block-editor' );
+					return getSelectedBlockClientIds().map( getBlockName );
+				} )
+			)
+			.toEqual( [ 'core/list-item', 'core/list-item' ] );
+		await pageUtils.pressKeys( 'primary+c' );
+
+		// The clipboard holds the items in a list wrapper so the markup is
+		// valid on its own.
+		expect( pageUtils.getClipboardData().html ).toBe( `<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>one</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>two</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->` );
+
+		// Create a second, ordered list by typing, and paste in a fresh
+		// empty item.
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.type( '1. alpha' );
+		await page.keyboard.press( 'Enter' );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		// The pasted wrapper is dropped and the items are inserted as
+		// siblings, not as a nested list; the target list keeps its own
+		// wrapper, staying ordered.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				attributes: { ordered: false },
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'one' },
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'two' },
+					},
+				],
+			},
+			{
+				name: 'core/list',
+				attributes: { ordered: true },
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'alpha' },
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'one' },
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'two' },
+					},
+				],
+			},
+		] );
+	} );
+
+	test( 'should copy a navigation link bare, without its synced menu wrapper', async ( {
+		editor,
+		page,
+		pageUtils,
+		requestUtils,
+	} ) => {
+		const menu = await requestUtils.createNavigationMenu( {
+			title: 'Copy test menu',
+			content:
+				'<!-- wp:navigation-link {"label":"Nav item one","url":"https://wordpress.org","kind":"custom"} /-->',
+		} );
+
+		await editor.insertBlock( {
+			name: 'core/navigation',
+			attributes: { ref: menu.id },
+		} );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+
+		// Select the link within the menu and copy it with a collapsed
+		// selection, which copies the whole block. The first click lands
+		// on the navigation block's overlay and selects the menu; the
+		// second selects the link.
+		await editor.canvas.locator( '[data-type="core/navigation"]' ).click();
+		await editor.canvas.getByText( 'Nav item one' ).click();
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const { getSelectedBlockClientIds, getBlockName } =
+						window.wp.data.select( 'core/block-editor' );
+					return getSelectedBlockClientIds().map( getBlockName );
+				} )
+			)
+			.toEqual( [ 'core/navigation-link' ] );
+		await pageUtils.pressKeys( 'primary+c' );
+
+		// The navigation wrapper does not serialize its inner blocks (the
+		// synced menu entity owns them), so wrapping would lose the copied
+		// link. The clipboard holds the bare link instead.
+		expect( pageUtils.getClipboardData().html ).toBe(
+			'<!-- wp:navigation-link {"label":"Nav item one","url":"https://wordpress.org","kind":"custom"} /-->'
+		);
+
+		await requestUtils.deleteAllMenus();
+	} );
+
+	test( 'should wrap multiple pasted blocks in one required parent', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/columns',
+			innerBlocks: [
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: 'col one' },
+						},
+					],
+				},
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: 'col two' },
+						},
+					],
+				},
+			],
+		} );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+
+		// Shift+click across the columns multi-selects the two whole
+		// column blocks.
+		await editor.canvas.getByText( 'col one' ).click();
+		await editor.canvas
+			.getByText( 'col two' )
+			.click( { modifiers: [ 'Shift' ] } );
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const { getSelectedBlockClientIds, getBlockName } =
+						window.wp.data.select( 'core/block-editor' );
+					return getSelectedBlockClientIds().map( getBlockName );
+				} )
+			)
+			.toEqual( [ 'core/column', 'core/column' ] );
+		await pageUtils.pressKeys( 'primary+c' );
+
+		// The clipboard holds the columns in their wrapper so the markup
+		// is valid on its own.
+		expect( pageUtils.getClipboardData().html ).toBe( `<!-- wp:columns -->
+<div class="wp-block-columns"><!-- wp:column -->
+<div class="wp-block-column"><!-- wp:paragraph -->
+<p>col one</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class="wp-block-column"><!-- wp:paragraph -->
+<p>col two</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns -->` );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Empty block' } )
+			.click();
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const { getSelectedBlock, hasMultiSelection } =
+						window.wp.data.select( 'core/block-editor' );
+					return (
+						! hasMultiSelection() &&
+						getSelectedBlock()?.name === 'core/paragraph'
+					);
+				} )
+			)
+			.toBe( true );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		const columns = {
+			name: 'core/columns',
+			innerBlocks: [
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: 'col one' },
+						},
+					],
+				},
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: 'col two' },
+						},
+					],
+				},
+			],
+		};
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [ columns, columns ] );
+	} );
+
+	test( 'should wrap a pasted block in its required parent', async ( {
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/buttons',
+			innerBlocks: [
+				{
+					name: 'core/button',
+					attributes: { text: 'Click me' },
+				},
+			],
+		} );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+
+		// Select and copy only the inner button, which serializes as a
+		// standalone button that can only be inserted within a buttons
+		// block.
+		// Copying with a collapsed caret copies the whole block.
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Button text' } )
+			.click();
+		await pageUtils.pressKeys( 'primary+c' );
+
+		// The clipboard holds the button in a buttons wrapper so the
+		// markup is valid on its own.
+		expect( pageUtils.getClipboardData().html ).toBe( `<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button">Click me</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->` );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Empty block' } )
+			.click();
+		await pageUtils.pressKeys( 'primary+v' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/buttons',
+				innerBlocks: [
+					{
+						name: 'core/button',
+						attributes: { text: 'Click me' },
+					},
+				],
+			},
+			{
+				name: 'core/buttons',
+				innerBlocks: [
+					{
+						name: 'core/button',
+						attributes: { text: 'Click me' },
+					},
+				],
+			},
+		] );
+	} );
 } );

@@ -6,7 +6,7 @@ import type {
 } from '@playwright/test';
 import { dragFiles } from './drag-files';
 import { isCurrentURL } from './is-current-url';
-import { setClipboardData, pressKeys } from './press-keys';
+import { getClipboardData, setClipboardData, pressKeys } from './press-keys';
 import { setBrowserViewport } from './set-browser-viewport';
 import { emulateNetworkConditions } from './emulate-network-conditions';
 
@@ -39,6 +39,8 @@ class PageUtils {
 		setBrowserViewport.bind( this );
 	/** @borrows setClipboardData as this.setClipboardData */
 	setClipboardData: typeof setClipboardData = setClipboardData.bind( this );
+	/** @borrows getClipboardData as this.getClipboardData */
+	getClipboardData: typeof getClipboardData = getClipboardData.bind( this );
 	/** @borrows emulateNetworkConditions as this.emulateNetworkConditions */
 	emulateNetworkConditions: typeof emulateNetworkConditions =
 		emulateNetworkConditions.bind( this );

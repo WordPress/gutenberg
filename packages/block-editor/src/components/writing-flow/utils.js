@@ -11,8 +11,6 @@ import {
 import { getPasteEventData } from '../../utils/pasting';
 import { store as blockEditorStore } from '../../store';
 
-export const requiresWrapperOnCopy = Symbol( 'requiresWrapperOnCopy' );
-
 /**
  * Sets the clipboard data for the provided blocks, with both HTML and plain
  * text representations.
@@ -31,7 +29,11 @@ export function setClipboardBlocks( event, blocks, registry ) {
 			.select( blocksStore )
 			.getBlockType( firstBlock.name );
 
-		if ( firstBlockType[ requiresWrapperOnCopy ] ) {
+		// A block restricted to specific parent block types cannot stand
+		// alone, so serialize the wrapper along with the blocks. A copied
+		// multi-selection is always a set of same-parent siblings, so the
+		// first block's wrapper is everyone's wrapper.
+		if ( firstBlockType?.parent?.length ) {
 			const { getBlockRootClientId, getBlockName, getBlockAttributes } =
 				registry.select( blockEditorStore );
 			const wrapperBlockClientId = getBlockRootClientId(
@@ -40,11 +42,21 @@ export function setClipboardBlocks( event, blocks, registry ) {
 			const wrapperBlockName = getBlockName( wrapperBlockClientId );
 
 			if ( wrapperBlockName ) {
-				_blocks = createBlock(
+				const wrapped = createBlock(
 					wrapperBlockName,
 					getBlockAttributes( wrapperBlockClientId ),
-					_blocks
+					blocks
 				);
+
+				// Only use the wrapper if it serializes its inner blocks.
+				// A wrapper synced to an entity (a navigation menu)
+				// serializes as a self-closing pointer and would drop the
+				// copied blocks.
+				if (
+					serialize( wrapped ).includes( serialize( firstBlock ) )
+				) {
+					_blocks = wrapped;
+				}
 			}
 		}
 	}

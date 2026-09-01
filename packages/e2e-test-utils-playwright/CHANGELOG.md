@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `PageUtils`: Add `getClipboardData` for asserting the contents of the emulated clipboard, the counterpart of `setClipboardData` ([#80853](https://github.com/WordPress/gutenberg/pull/80853)).
+
 ### Internal
 
 -   `setGutenbergExperiments`: Remove the special handling for the removed `active_templates` experiment ([#82241](https://github.com/WordPress/gutenberg/pull/82241)).

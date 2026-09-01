@@ -32,6 +32,18 @@ export function setClipboardData(
 	};
 }
 
+/**
+ * Gets the clipboard data of the emulated clipboard: the data set with
+ * `setClipboardData`, or captured by the last `pressKeys( 'primary+c' )` or
+ * `pressKeys( 'primary+x' )`.
+ */
+export function getClipboardData( this: PageUtils ) {
+	return {
+		plainText: clipboardDataHolder[ 'text/plain' ],
+		html: clipboardDataHolder[ 'text/html' ],
+	};
+}
+
 async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
 	const output = await page.evaluate(
 		( [ _type, _clipboardData ] ) => {
