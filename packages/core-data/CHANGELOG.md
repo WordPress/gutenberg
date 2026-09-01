@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `useEntityProp`: Add a `coalesceEdits` option that merges consecutive edits into a single undo level, so typing into a text input no longer creates an undo level per keystroke ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+-   `useEntityProp`: Add a `coalesceEdits` option that merges consecutive edits into a single undo level, so typing into a text input no longer creates an undo level per keystroke ([#82275](https://github.com/WordPress/gutenberg/pull/82275)).
 
 ### Internal
 
