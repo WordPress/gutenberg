@@ -51,9 +51,9 @@ export const permissions = {
 	// recent Claude Code, so the `Edit` rules are not redundant. Rules written
 	// against `Write` itself are accepted and never consulted.
 	deny: [
-		`Read(//${ homeDirectory }/**)`,
-		`Read(//${ sourceRoot }/**)`,
-		`Edit(//${ homeDirectory }/**)`,
-		`Edit(//${ sourceRoot }/**)`,
+		`Read(/${ homeDirectory }/**)`,
+		`Read(/${ sourceRoot }/**)`,
+		`Edit(/${ homeDirectory }/**)`,
+		`Edit(/${ sourceRoot }/**)`,
 	],
 };
