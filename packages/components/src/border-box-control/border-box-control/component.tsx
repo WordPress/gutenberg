@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
-import { useMergeRefs } from '@wordpress/compose';
+import { useInstanceId, useMergeRefs } from '@wordpress/compose';
 import BorderBoxControlLinkedButton from '../border-box-control-linked-button';
 import BorderBoxControlSplitControls from '../border-box-control-split-controls';
 import { BorderControl } from '../../border-control';
@@ -17,8 +17,8 @@ import type {
 	BorderControlProps,
 } from '../../border-control/types';
 
-const BorderLabel = ( props: LabelProps ) => {
-	const { label, hideLabelFromVision } = props;
+const BorderLabel = ( props: LabelProps & { id?: string } ) => {
+	const { id, label, hideLabelFromVision } = props;
 
 	if ( ! label ) {
 		return null;
@@ -28,9 +28,11 @@ const BorderLabel = ( props: LabelProps ) => {
 	// the stable `.components-base-control__label` className consumers style
 	// against; `StyledLabel` is an emotion component with a generated one.
 	return hideLabelFromVision ? (
-		<VisuallyHidden as="label">{ label }</VisuallyHidden>
+		<VisuallyHidden as="span" id={ id }>
+			{ label }
+		</VisuallyHidden>
 	) : (
-		<BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel>
+		<BaseControl.VisualLabel id={ id }>{ label }</BaseControl.VisualLabel>
 	);
 };
 
@@ -64,6 +66,13 @@ const UnconnectedBorderBoxControl = (
 		...otherProps
 	} = useBorderBoxControl( props );
 
+	// The label names the group of border controls rather than a single input,
+	// so it is associated via `aria-labelledby` instead of `htmlFor`.
+	const labelId = useInstanceId(
+		BorderBoxControl,
+		'border-box-control-label'
+	);
+
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState< Element | null >(
@@ -88,7 +97,15 @@ const UnconnectedBorderBoxControl = (
 	const mergedRef = useMergeRefs( [ setPopoverAnchor, forwardedRef ] );
 
 	return (
-		<View className={ className } { ...otherProps } ref={ mergedRef }>
+		<View
+			className={ className }
+			// The label describes the group of border controls as a whole, so
+			// the group needs a role for the accessible name to attach to.
+			role={ label ? 'group' : undefined }
+			aria-labelledby={ label ? labelId : undefined }
+			{ ...otherProps }
+			ref={ mergedRef }
+		>
 			{ hasVisibleLabel ? (
 				// The toggle shares the label's row so that it lines up with
 				// the equivalent toggle on sibling controls, e.g. the border
@@ -100,6 +117,7 @@ const UnconnectedBorderBoxControl = (
 					alignment="center"
 				>
 					<BorderLabel
+						id={ labelId }
 						label={ label }
 						hideLabelFromVision={ hideLabelFromVision }
 					/>
@@ -110,6 +128,7 @@ const UnconnectedBorderBoxControl = (
 				</Grid>
 			) : (
 				<BorderLabel
+					id={ labelId }
 					label={ label }
 					hideLabelFromVision={ hideLabelFromVision }
 				/>

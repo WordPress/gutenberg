@@ -126,6 +126,22 @@ describe( 'BorderBoxControl', () => {
 			);
 		} );
 
+		it( 'should give the group of controls an accessible name from the label', () => {
+			render( <TestBorderBoxControl { ...props } /> );
+
+			expect(
+				screen.getByRole( 'group', { name: props.label } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should name the group of controls even when the label is hidden', () => {
+			render( <TestBorderBoxControl { ...props } hideLabelFromVision /> );
+
+			expect(
+				screen.getByRole( 'group', { name: props.label } )
+			).toBeInTheDocument();
+		} );
+
 		it( 'should show correct width value when flat border value provided', () => {
 			render(
 				<TestBorderBoxControl { ...props } value={ defaultBorder } />
