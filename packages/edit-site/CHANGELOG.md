@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+-   `WelcomeGuide`: Keep the modal close icon white on hover now that it is stroke-based. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
 -   `SidebarNavigationItem`: Stop forcing `style={ { fill: 'currentcolor' } }` on the icon. The explicit override was clobbering stroke-based icons' intrinsic styling. Colour is inherited via CSS `color` and the icon's own declared fills/strokes. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 -   `AddNewTemplate`: Preserve the admin theme color on the Author template icon after it became stroke-based. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 
