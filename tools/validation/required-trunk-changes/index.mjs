@@ -1,8 +1,9 @@
 // @ts-check
 
 /**
- * PR freshness tooling: a movable tag (`infra-baseline`) marks the last trunk
- * commit every open PR must contain; statuses embed that SHA to expose staleness.
+ * Required trunk changes tooling: a movable tag (`required-trunk-baseline`)
+ * marks the last trunk commit every open PR must contain; statuses embed that
+ * SHA to expose staleness.
  */
 import { parseArgs } from 'node:util';
 import { fail, hasCredentials } from './utils.mjs';
@@ -40,7 +41,7 @@ async function main() {
 	const command = commands[ positionals[ 0 ] ?? '' ];
 	if ( ! command ) {
 		return fail(
-			'Usage: pr-freshness <check|move-baseline|fanout> [flags]'
+			'Usage: required-trunk-changes <check|move-baseline|fanout> [flags]'
 		);
 	}
 	// Checked late so usage and flag errors do not require credentials.

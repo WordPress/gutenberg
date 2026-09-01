@@ -2,10 +2,10 @@
 
 /**
  * The `move-baseline` subcommand. The baseline moves only through explicit
- * intent: a forced dispatch, or a merged PR carrying the force-refresh label.
+ * intent: a forced dispatch, or a merged PR carrying the required-update label.
  */
 import {
-	FORCE_LABEL,
+	REQUIRE_UPDATE_LABEL,
 	REPO,
 	fail,
 	graphql,
@@ -60,7 +60,7 @@ async function hasLabeledMergeSince( baseline, head ) {
 					}
 				}
 			`,
-			{ owner, name, label: FORCE_LABEL, cursor }
+			{ owner, name, label: REQUIRE_UPDATE_LABEL, cursor }
 		);
 		const page = data.repository.pullRequests;
 		for ( const node of page.nodes ) {

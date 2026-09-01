@@ -3222,9 +3222,9 @@
 		"parent": "code"
 	},
 	{
-		"title": "PR Freshness Check",
-		"slug": "pr-freshness",
-		"markdown_source": "../docs/contributors/code/pr-freshness.md",
+		"title": "Required changes from trunk",
+		"slug": "required-changes-from-trunk",
+		"markdown_source": "../docs/contributors/code/required-changes-from-trunk.md",
 		"parent": "code"
 	},
 	{

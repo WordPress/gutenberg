@@ -1,5 +1,5 @@
 /**
- * Shared JSDoc typedefs for the PR freshness tooling.
+ * Shared JSDoc typedefs for the required trunk changes tooling.
  */
 
 /** @typedef {{ state: 'success' | 'failure', description: string }} StatusPayload */
@@ -10,7 +10,7 @@
  * @property {number}               number     PR number.
  * @property {string}               headRefOid Head commit SHA.
  * @property {boolean}              isDraft    Whether the PR is a draft.
- * @property {ContextStatus | null} status     Latest freshness status, if any.
+ * @property {ContextStatus | null} status     Latest required changes status, if any.
  */
 
 /**

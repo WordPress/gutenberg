@@ -2,7 +2,7 @@
 
 /**
  * The `fanout` subcommand: after a baseline move, flips open PRs whose
- * passing freshness status references an older baseline to failing.
+ * passing required changes status references an older baseline to failing.
  */
 import {
 	CONTEXT,
@@ -58,7 +58,7 @@ const PAGE_QUERY = `
 `;
 
 /**
- * Lists open PRs targeting trunk, with their latest freshness status.
+ * Lists open PRs targeting trunk, with their latest required changes status.
  *
  * @return {Promise<PullRequest[]>} Open pull requests.
  */

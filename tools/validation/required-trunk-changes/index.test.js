@@ -31,14 +31,14 @@ function run( args, env = {} ) {
 test( 'prints usage without requiring credentials', () => {
 	const { status, stderr } = run( [] );
 	expect( status ).toBe( 1 );
-	expect( stderr ).toContain( 'Usage: pr-freshness' );
+	expect( stderr ).toContain( 'Usage: required-trunk-changes' );
 	expect( stderr ).not.toContain( 'GITHUB_REPOSITORY' );
 } );
 
 test( 'rejects an unknown subcommand with usage', () => {
 	const { status, stderr } = run( [ 'frobnicate' ] );
 	expect( status ).toBe( 1 );
-	expect( stderr ).toContain( 'Usage: pr-freshness' );
+	expect( stderr ).toContain( 'Usage: required-trunk-changes' );
 } );
 
 test( 'rejects a non-boolean --force value without requiring credentials', () => {

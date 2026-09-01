@@ -1,4 +1,4 @@
-name: PR freshness
+name: Required changes from trunk
 
 on:
     pull_request_target:
@@ -21,7 +21,7 @@ concurrency:
     # Serialize per PR, and serialize all baseline moves in one group. Replaced
     # pending runs are safe: labeled merges are scanned cumulatively from the
     # tag, so the next run in the group recovers them.
-    group: pr-freshness-${{ github.event_name == 'pull_request_target' && github.event.pull_request.number || 'baseline' }}
+    group: required-trunk-changes-${{ github.event_name == 'pull_request_target' && github.event.pull_request.number || 'baseline' }}
     cancel-in-progress: false
     # The default queue keeps a single pending run, so a trunk push could
     # replace (cancel) a pending forced dispatch; queue: max keeps them all.
@@ -29,7 +29,7 @@ concurrency:
 
 jobs:
     check-pr:
-        name: Check PR freshness
+        name: Check required changes from trunk
         if: github.repository == 'WordPress/gutenberg' && github.event_name == 'pull_request_target'
         runs-on: ubuntu-latest
         timeout-minutes: 15
@@ -50,13 +50,13 @@ jobs:
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
 
-            - name: Check PR freshness and post status
-              run: npm run --workspace @wordpress/validation-tools pr-freshness -- check --head-sha "$HEAD_SHA"
+            - name: Check required changes from trunk and post status
+              run: npm run --workspace @wordpress/validation-tools required-trunk-changes -- check --head-sha "$HEAD_SHA"
 
     move-baseline:
-        name: Move freshness baseline
+        name: Move required trunk baseline
         # The baseline moves only through explicit intent: a dispatch with
-        # move-baseline, or a merged PR carrying the force-refresh label
+        # move-baseline, or a merged PR carrying the required-update label
         # (detected cumulatively on every trunk push). Re-dispatching when the
         # tag is already current re-runs the fan-out, which is the retry path
         # after an interrupted sweep.
@@ -85,4 +85,4 @@ jobs:
               uses: ./.github/setup-node
 
             - name: Move the baseline tag and fan out
-              run: npm run --workspace @wordpress/validation-tools pr-freshness -- move-baseline --force="$FORCE" --then-fanout
+              run: npm run --workspace @wordpress/validation-tools required-trunk-changes -- move-baseline --force="$FORCE" --then-fanout

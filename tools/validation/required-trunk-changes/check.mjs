@@ -1,7 +1,7 @@
 // @ts-check
 
 /**
- * The `check` subcommand: stamps one PR head with its freshness status.
+ * The `check` subcommand: stamps one PR head with its required changes status.
  */
 import {
 	fail,
@@ -24,16 +24,16 @@ export async function check( { headSha, dryRun } ) {
 		return fail( 'The check subcommand requires --head-sha.' );
 	}
 	let baseline = /** @type {string} */ ( await getBaseline() );
-	let fresh = await isAncestor( baseline, headSha );
+	let includesBaseline = await isAncestor( baseline, headSha );
 
 	// Re-read the baseline just before posting to shrink the move race window.
 	const latest = /** @type {string} */ ( await getBaseline() );
 	if ( latest !== baseline ) {
 		baseline = latest;
-		fresh = await isAncestor( baseline, headSha );
+		includesBaseline = await isAncestor( baseline, headSha );
 	}
 
-	const { state, description } = statusFor( fresh, baseline );
+	const { state, description } = statusFor( includesBaseline, baseline );
 
 	/* Statuses are append-only and capped per SHA/context; skip no-op writes. */
 	const current = await latestStatus( headSha );

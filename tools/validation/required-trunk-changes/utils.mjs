@@ -1,21 +1,21 @@
 // @ts-check
 
 /**
- * Shared constants and helpers for the PR freshness tooling: GitHub API
- * access, baseline resolution, and rate-limited commit status writes.
+ * Shared constants and helpers for the required trunk changes tooling: GitHub
+ * API access, baseline resolution, and rate-limited commit status writes.
  */
 
 /** @typedef {import('./types.mjs').StatusPayload} StatusPayload */
 /** @typedef {import('./types.mjs').ContextStatus} ContextStatus */
 
-export const CONTEXT = 'PR is up to date';
-export const TAG = 'infra-baseline';
+export const CONTEXT = 'Required changes from trunk';
+export const TAG = 'required-trunk-baseline';
 const TAG_REF = `refs/tags/${ TAG }`;
 export const REPO = process.env.GITHUB_REPOSITORY ?? '';
 const TOKEN = process.env.GITHUB_TOKEN ?? '';
 const API_ROOT = 'https://api.github.com';
 const DOCS_URL =
-	'https://github.com/WordPress/gutenberg/blob/trunk/docs/contributors/code/pr-freshness.md';
+	'https://github.com/WordPress/gutenberg/blob/trunk/docs/contributors/code/required-changes-from-trunk.md';
 
 export const hasCredentials = () => Boolean( REPO && TOKEN );
 
@@ -23,7 +23,7 @@ export const hasCredentials = () => Boolean( REPO && TOKEN );
 const MAX_WRITES_PER_RUN = 400;
 const MAX_WRITES_PER_MINUTE = 60;
 
-export const FORCE_LABEL = 'Force PR refresh';
+export const REQUIRE_UPDATE_LABEL = 'Require PR update';
 
 /**
  * Prints an error and exits.
@@ -168,27 +168,27 @@ export async function getTrunkHead() {
 }
 
 /**
- * Builds the status payload for a freshness result.
+ * Builds the status payload for a required changes result.
  *
- * @param {boolean} fresh    Whether the PR contains the baseline.
- * @param {string}  baseline Baseline commit SHA.
+ * @param {boolean} includesBaseline Whether the PR contains the baseline.
+ * @param {string}  baseline         Baseline commit SHA.
  * @return {StatusPayload} Status state and description.
  */
-export function statusFor( fresh, baseline ) {
+export function statusFor( includesBaseline, baseline ) {
 	const short = baseline.slice( 0, 7 );
-	return fresh
+	return includesBaseline
 		? {
 				state: 'success',
-				description: `Up to date with baseline ${ short }.`,
+				description: `Includes required trunk changes through ${ short }.`,
 		  }
 		: {
 				state: 'failure',
-				description: `Baseline ${ short }: this PR needs a trunk merge or rebase.`,
+				description: `Merge or rebase trunk to include required changes through ${ short }.`,
 		  };
 }
 
 /**
- * Reads the latest freshness status on a commit.
+ * Reads the latest required changes status on a commit.
  *
  * @param {string} oid Commit SHA.
  * @return {Promise<ContextStatus | null>} Latest status for the context.
