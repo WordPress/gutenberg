@@ -18,6 +18,16 @@
     registered type be inserted
     ([#81967](https://github.com/WordPress/gutenberg/pull/81967)).
 
+### Internal
+
+-   Remove unused dependency `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
+
+### Bug Fixes
+
+-   Keep the plain anchor for a `download: ''` link action
+    ([#82073](https://github.com/WordPress/gutenberg/pull/82073)).
+
 ## 0.6.0 (2026-08-26)
 
 ### New Features

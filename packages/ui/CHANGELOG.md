@@ -2,9 +2,29 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a responsive `Breadcrumb` navigation component. ([#80425](https://github.com/WordPress/gutenberg/pull/80425))
+
 ### Breaking Changes
 
+-   `Autocomplete.Popup`, `Combobox.Popup`, `Select.Popup`, `SearchableChipSelect`, and `SearchableChipSelectControl`: The popup now defaults to a fixed anchor width. Use `popupWidth="content"` to restore content-sized width between the anchor and available viewport bounds ([#82087](https://github.com/WordPress/gutenberg/pull/82087)).
 -   Portaled overlays (`AlertDialog`, `Autocomplete`, `Combobox`, `Dialog`, `Drawer`, `Menu`, `Popover`, and `Select`) now inherit the theme from their portal destination instead of re-emitting the trigger's nearest contextual theme. Default portals use the document root theme; custom portal containers use their DOM ancestry ([#82038](https://github.com/WordPress/gutenberg/pull/82038)).
+
+### Enhancements
+
+-   `Autocomplete.Popup`, `Combobox.Popup`, `SearchableChipSelect`, `SearchableChipSelectControl`, `Select.Popup`, and `SelectControl`: Add `popupWidth` prop with preset width constraints (`anchor`, `content`, `sm`, `md`, `lg`, and `available`) for the item popup. `SelectControl` defaults to `content` to preserve prior popup sizing ([#82087](https://github.com/WordPress/gutenberg/pull/82087)).
+-   `Menu`: Use `Text` for item labels and descriptions to share typography and apply `text-wrap: pretty`. ([#82237](https://github.com/WordPress/gutenberg/pull/82237))
+-   `Text`: Apply `text-wrap: pretty` by default to improve line wrapping. ([#82133](https://github.com/WordPress/gutenberg/pull/82133))
+
+### Bug Fixes
+
+-   `AlertDialog`: Use a neutral tone for the cancel button. ([#82261](https://github.com/WordPress/gutenberg/pull/82261))
+-   `Icon`: Merge a consumer-supplied `style` prop with the icon's intrinsic styles instead of replacing them, so styles like `fill: none` on stroke-based icons survive unless the consumer overrides the same property explicitly. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+
+### Documentation
+
+-   Add a Form best practices Storybook page for labeling composed controls ([#82197](https://github.com/WordPress/gutenberg/pull/82197)).
 
 ## 0.21.0 (2026-08-26)
 

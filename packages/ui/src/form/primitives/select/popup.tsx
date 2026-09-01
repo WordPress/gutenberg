@@ -5,17 +5,22 @@ import { Portal } from './portal';
 import { Positioner } from './positioner';
 import { renderSlotWithChildren } from '../../../utils/render-slot-with-children';
 import itemPopupStyles from '../../../utils/css/item-popup.module.css';
+import { getItemPopupWidthClassName } from '../../../utils/css/item-popup';
 import type { SelectPopupProps } from './types';
 
 export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
 	function Popup(
-		{ className, portal, positioner, children, ...restProps },
+		{ className, portal, positioner, popupWidth, children, ...restProps },
 		ref
 	) {
 		const popupContent = (
 			<_Select.Popup
 				ref={ ref }
-				className={ clsx( itemPopupStyles.popup, className ) }
+				className={ clsx(
+					itemPopupStyles.popup,
+					getItemPopupWidthClassName( popupWidth ),
+					className
+				) }
 				{ ...restProps }
 			>
 				<_Select.List className={ itemPopupStyles.list }>

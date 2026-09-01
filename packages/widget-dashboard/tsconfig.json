@@ -16,7 +16,6 @@
 		{ "path": "../grid/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons/tsconfig.build.json" },
-		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
 		{ "path": "../style-runtime/tsconfig.build.json" },
 		{ "path": "../ui/tsconfig.build.json" },
@@ -24,5 +23,5 @@
 		{ "path": "../widget-primitives/tsconfig.build.json" }
 	],
 	// Listed files have pre-existing type errors; include them once fixed.
-	"exclude": [ "**/benchmark", "src/test/commands.test.tsx" ]
+	"exclude": [ "**/benchmark", "src/test/commands.jsdom.test.tsx" ]
 }

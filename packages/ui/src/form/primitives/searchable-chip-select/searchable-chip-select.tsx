@@ -33,6 +33,7 @@ export const SearchableChipSelect = forwardRef<
 		items,
 		chipsContent,
 		searchPlaceholder = __( 'Search' ),
+		popupWidth,
 		showClearButton = true,
 		clearButtonLabel = __( 'Clear all' ),
 		'aria-label': ariaLabel,
@@ -120,7 +121,7 @@ export const SearchableChipSelect = forwardRef<
 				</Combobox.Chips>
 			</Combobox.InputGroup>
 
-			<Combobox.Popup>
+			<Combobox.Popup popupWidth={ popupWidth }>
 				<Combobox.Empty>{ emptyContent }</Combobox.Empty>
 				<Combobox.List>
 					<Combobox.ListBody>
