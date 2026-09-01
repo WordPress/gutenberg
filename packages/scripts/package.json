@@ -88,7 +88,8 @@
 		"webpack-dev-server": "^5.2.1"
 	},
 	"devDependencies": {
-		"rimraf": "^5.0.10"
+		"rimraf": "^5.0.10",
+		"vitest": "^4.1.10"
 	},
 	"peerDependencies": {
 		"@playwright/test": ">=1",

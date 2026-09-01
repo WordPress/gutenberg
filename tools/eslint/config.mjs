@@ -10,9 +10,36 @@ import testingLibraryPlugin from 'eslint-plugin-testing-library';
 import jestPlugin from 'eslint-plugin-jest';
 import tseslint from 'typescript-eslint';
 import wpBuildConfig from '../../packages/wp-build/eslint-overrides.cjs';
+import {
+	discoverTestFiles,
+	getTestEnvironmentName,
+} from '../../test/unit/scripts/discover-test-files.mjs';
 const require = createRequire( import.meta.url );
 const rootDir = resolve( import.meta.dirname, '../..' );
 const wpPlugin = require( '@wordpress/eslint-plugin' );
+const testMigration = require(
+	join( rootDir, 'test/unit/test-migration.json' )
+);
+
+const vitestTestPatterns = [
+	...discoverTestFiles( rootDir ).filter(
+		( testPath ) => getTestEnvironmentName( testPath ) === 'node'
+	),
+	...testMigration.vitest.files,
+	...testMigration.vitest.directories.flatMap( ( directory ) => [
+		`${ directory }/**/__tests__/**/*.[jt]s?(x)`,
+		`${ directory }/**/test/*.[jt]s?(x)`,
+		`${ directory }/**/?(*.)test.[jt]s?(x)`,
+	] ),
+];
+const vitestJsdomTestPatterns = [
+	...testMigration.vitest.files.filter( ( file ) =>
+		/\.jsdom\.test\.[cm]?[jt]sx?$/.test( file )
+	),
+	...testMigration.vitest.directories.map(
+		( directory ) => `${ directory }/**/*.jsdom.test.[cm]?[jt]s?(x)`
+	),
+];
 // Prefer the installed React version for linting, but fall back to the detected version.
 let reactVersion = 'detect';
 try {
@@ -27,24 +54,26 @@ try {
  * of the same plugin name resolves to a single shared reference.
  *
  * @param {Object[]} configs Flat config array.
- * @return {Object[]} The same array with plugin references deduplicated.
+ * @return {Object[]} Configs with plugin references deduplicated.
  */
 function dedupePlugins( configs ) {
 	/** @type {Record<string,Object>} */
 	const seen = Object.create( null );
-	for ( const config of configs ) {
+	return configs.map( ( config ) => {
 		if ( ! config.plugins ) {
-			continue;
+			return config;
 		}
-		for ( const name of Object.keys( config.plugins ) ) {
+		const plugins = {};
+		for ( const [ name, plugin ] of Object.entries( config.plugins ) ) {
 			if ( name in seen ) {
-				config.plugins[ name ] = seen[ name ];
+				plugins[ name ] = seen[ name ];
 			} else {
-				seen[ name ] = config.plugins[ name ];
+				seen[ name ] = plugin;
+				plugins[ name ] = plugin;
 			}
 		}
-	}
-	return configs;
+		return { ...config, plugins };
+	} );
 }
 
 /**
@@ -503,6 +532,34 @@ export default dedupePlugins( [
 		},
 	},
 
+	// Override: Vitest files — runner-neutral jest-dom and Testing Library rules.
+	{
+		...jestDomPlugin.configs[ 'flat/recommended' ],
+		files: vitestJsdomTestPatterns,
+	},
+	{
+		...testingLibraryPlugin.configs[ 'flat/react' ],
+		files: vitestJsdomTestPatterns,
+	},
+	{
+		plugins: jestPlugin.configs[ 'flat/recommended' ].plugins,
+		files: vitestTestPatterns,
+		settings: {
+			jest: {
+				globalPackage: 'vitest',
+			},
+		},
+		rules: {
+			...jestPlugin.configs[ 'flat/recommended' ].rules,
+			// Preserve existing test patterns while changing runners. These rules
+			// newly flag valid patterns once the globals are imported from Vitest.
+			'jest/no-conditional-expect': 'off',
+			'jest/valid-describe-callback': 'off',
+			'jest/valid-expect-in-promise': 'off',
+			'jest/valid-title': 'off',
+		},
+	},
+
 	// Override: Jest test files (unit tests).
 	...wpPlugin.configs[ 'test-unit' ].map( ( config ) => ( {
 		...config,
@@ -511,7 +568,11 @@ export default dedupePlugins( [
 			'**/test/**/*.{js,jsx}',
 			'**/__tests__/**/*.{js,jsx}',
 		],
-		ignores: [ 'test/e2e/**/*.js', 'test/performance/**/*.js' ],
+		ignores: [
+			'test/e2e/**/*.js',
+			'test/performance/**/*.js',
+			...vitestTestPatterns,
+		],
 	} ) ),
 
 	// Override: Test files — jest-dom, testing-library, jest recommended.
@@ -522,6 +583,7 @@ export default dedupePlugins( [
 			'test/e2e/**/*.[tj]s?(x)',
 			'test/performance/**/*.[tj]s?(x)',
 			'test/storybook-playwright/**/*.[tj]s?(x)',
+			...vitestTestPatterns,
 		],
 	},
 	{
@@ -531,6 +593,7 @@ export default dedupePlugins( [
 			'test/e2e/**/*.[tj]s?(x)',
 			'test/performance/**/*.[tj]s?(x)',
 			'test/storybook-playwright/**/*.[tj]s?(x)',
+			...vitestTestPatterns,
 		],
 	},
 	{
@@ -540,6 +603,7 @@ export default dedupePlugins( [
 			'test/e2e/**/*.[tj]s?(x)',
 			'test/performance/**/*.[tj]s?(x)',
 			'test/storybook-playwright/**/*.[tj]s?(x)',
+			...vitestTestPatterns,
 		],
 		rules: {
 			...jestPlugin.configs[ 'flat/recommended' ].rules,

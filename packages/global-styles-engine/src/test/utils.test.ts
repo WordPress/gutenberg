@@ -2,6 +2,8 @@
  * Tests for utility functions
  * Ported from Gutenberg's utils.js tests
  */
+
+import { describe, expect, it, test } from 'vitest';
 import type { GlobalStylesConfig } from '../types';
 import {
 	getBlockStyleVariationFeatureSelector,

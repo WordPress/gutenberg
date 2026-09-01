@@ -1,4 +1,4 @@
-import * as matchers from '@testing-library/jest-dom/matchers';
+import '@testing-library/jest-dom/vitest';
 // eslint-disable-next-line testing-library/no-manual-cleanup -- Vitest globals are disabled, so Testing Library cannot register cleanup automatically.
 import { cleanup } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll, expect } from 'vitest';
@@ -6,8 +6,6 @@ import './matchers/to-match-diff-snapshot.vitest';
 import './matchers/to-be-positioned-popover.vitest';
 
 let previousIsReactActEnvironment;
-
-expect.extend( matchers );
 
 beforeAll( () => {
 	previousIsReactActEnvironment = globalThis.IS_REACT_ACT_ENVIRONMENT;

@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it } from 'vitest';
 import { didAction } from '@wordpress/hooks';
 import deprecated, { logged } from '..';
 
