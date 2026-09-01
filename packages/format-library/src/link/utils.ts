@@ -75,6 +75,18 @@ export function isValidHref( href: string ): boolean {
 	return true;
 }
 
+/**
+ * Generates the format object that will be applied to the link text.
+ *
+ * @param options
+ * @param options.url              The href of the link.
+ * @param options.type             The type of the link.
+ * @param options.id               The ID of the link.
+ * @param options.opensInNewWindow Whether this link will open in a new window.
+ * @param options.nofollow         Whether this link is marked as no follow relationship.
+ * @param options.cssClasses       The CSS classes to apply to the link.
+ * @return The final format object.
+ */
 export function createLinkFormat( {
 	url,
 	type,

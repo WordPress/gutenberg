@@ -128,30 +128,30 @@ export interface InlineLinkUIProps {
 }
 
 /**
- * Generates the format object that will be applied to the link text.
+ * The options accepted by `createLinkFormat`.
  */
 export interface LinkFormatOptions {
-	/*
+	/**
 	 * The href of the link.
 	 */
 	url: string;
-	/*
+	/**
 	 * The type of the link.
 	 */
 	type?: string;
-	/*
+	/**
 	 * The ID of the link.
 	 */
 	id?: string;
-	/*
+	/**
 	 * Whether this link will open in a new window.
 	 */
 	opensInNewWindow?: boolean;
-	/*
+	/**
 	 * Whether this link is marked as no follow relationship.
 	 */
 	nofollow?: boolean;
-	/*
+	/**
 	 * The CSS classes to apply to the link.
 	 */
 	cssClasses?: string;
