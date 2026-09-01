@@ -191,6 +191,19 @@ export type ToolsPanelItemProps = ToolsPanelItem & {
 	resetAllFilter?: ResetAllFilter;
 };
 
+/**
+ * The shape of an item as it is held in `ToolsPanel` state. It extends
+ * `ToolsPanelItem` with the data the panel needs but that isn't part of the
+ * item's own API surface.
+ */
+export type RegisteredToolsPanelItem = ToolsPanelItem & {
+	/**
+	 * The item's `resetAllFilter`, collected at registration time so the panel
+	 * doesn't need a second round of effects to gather them.
+	 */
+	resetAllFilter?: ResetAllFilter;
+};
+
 export type ToolsPanelMenuItemKey = 'default' | 'optional';
 
 export type ToolsPanelMenuItems = {
@@ -201,13 +214,21 @@ export type ToolsPanelContext = {
 	panelId?: string | null;
 	menuItems: ToolsPanelMenuItems;
 	hasMenuItems: boolean;
-	registerPanelItem: ( item: ToolsPanelItem ) => void;
-	deregisterPanelItem: ( label: string ) => void;
+	registerPanelItem: ( item: RegisteredToolsPanelItem ) => void;
+	deregisterPanelItem: (
+		label: string,
+		item?: RegisteredToolsPanelItem
+	) => void;
 	registerResetAllFilter: ( filter: ResetAllFilter ) => void;
 	deregisterResetAllFilter: ( filter: ResetAllFilter ) => void;
 	flagItemCustomization: (
 		value: boolean,
 		label: string,
+		/**
+		 * Ignored, and kept only so that existing three argument callers
+		 * still typecheck. The group a value lands in now follows from the
+		 * registered item's `isShownByDefault` rather than from the caller.
+		 */
 		group?: ToolsPanelMenuItemKey
 	) => void;
 	isResetting: boolean;
@@ -223,11 +244,4 @@ export type ToolsPanelControlsGroupProps = {
 	itemClassName?: string;
 	items: [ string, boolean ][];
 	toggleItem: ( label: string ) => void;
-};
-
-export type ToolsPanelMenuItemsConfig = {
-	panelItems: ToolsPanelItem[];
-	shouldReset: boolean;
-	currentMenuItems?: ToolsPanelMenuItems;
-	menuItemOrder: string[];
 };
