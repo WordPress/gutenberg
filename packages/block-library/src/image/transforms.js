@@ -172,7 +172,6 @@ const transforms = {
 	from: [
 		{
 			type: 'raw',
-			priority: 9, // Required, to be able to insert an image from URL. See https://github.com/WordPress/gutenberg/pull/74752
 			isMatch: ( node ) =>
 				node.nodeName === 'P' &&
 				/^\s*(https?:\/\/\S+)\s*$/i.test( node.textContent ) &&
