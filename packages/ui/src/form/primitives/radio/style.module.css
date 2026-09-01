@@ -6,10 +6,8 @@
 			--wp-ui-radio-input-size: 16px;
 
 			position: relative;
-			display: inline-flex;
+			display: inline-block;
 			flex-shrink: 0;
-			align-items: center;
-			justify-content: center;
 			width: var(--wp-ui-radio-input-size);
 			height: var(--wp-ui-radio-input-size);
 			border-radius: 50%;
@@ -47,6 +45,10 @@
 		}
 
 		.indicator {
+			/* Out of flow so mounting the disc does not shift the inline baseline. */
+			position: absolute;
+			inset: 0;
+			margin: auto;
 			width: calc(var(--wp-ui-radio-input-size) / 2);
 			height: calc(var(--wp-ui-radio-input-size) / 2);
 			border-radius: 50%;
