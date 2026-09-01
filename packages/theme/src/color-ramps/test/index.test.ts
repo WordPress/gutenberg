@@ -79,6 +79,21 @@ function getPerceptualContrastMagnitude(
 	return Math.abs( contrastAPCA( background, foreground ) );
 }
 
+function expectAccessibleFillStates( ramp: ReturnType< typeof buildRamp > ) {
+	expect( getLuminance( ramp.ramp.bgFill2 ) ).toBeLessThan(
+		getLuminance( ramp.ramp.bgFill1 )
+	);
+	expect(
+		getContrast( ramp.ramp.bgFill1, ramp.ramp.bgFill2 )
+	).toBeGreaterThanOrEqual( 1.2 );
+	expect(
+		getContrast( ramp.ramp.bgFill1, ramp.ramp.fgFill )
+	).toBeGreaterThanOrEqual( 4.5 );
+	expect(
+		getContrast( ramp.ramp.bgFill2, ramp.ramp.fgFill )
+	).toBeGreaterThanOrEqual( 4.5 );
+}
+
 function getForegroundConstraintReferences(
 	stepIndex: number,
 	ramp: ReturnType< typeof buildBgRamp >,
