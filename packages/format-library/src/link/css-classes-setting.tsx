@@ -2,7 +2,7 @@ import { useState } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import {
-	__experimentalInputControl as InputControl,
+	__experimentalInputControl as WCInputControl,
 	CheckboxControl,
 } from '@wordpress/components';
 import { Stack, VisuallyHidden } from '@wordpress/ui';
@@ -77,7 +77,7 @@ const CSSClassesSettingComponent = ( {
 				/>
 				{ isSettingActive && (
 					<div id={ controlledRegionId }>
-						<InputControl
+						<WCInputControl
 							label={ __( 'CSS classes' ) }
 							value={ value?.cssClasses }
 							onChange={ handleSettingChange }

@@ -9,10 +9,15 @@ interface BaseFormatEditProps {
 
 export type BoldEditProps = BaseFormatEditProps & { isVisible?: boolean };
 
+export interface NonBreakingSpacePopoverAnchorProps {
+	contentRef: React.RefObject< HTMLElement >;
+}
+
 export type NonBreakingSpaceEditProps = Pick<
 	BaseFormatEditProps,
 	'value' | 'onChange'
->;
+> &
+	NonBreakingSpacePopoverAnchorProps;
 export interface LanguageEditProps {
 	isActive: boolean;
 	value: RichTextValue;

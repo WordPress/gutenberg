@@ -4,6 +4,13 @@
 
 ### Internal
 
+-   Remove unused dependencies `@wordpress/date` and `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
+
+## 0.19.0 (2026-08-26)
+
+### Internal
+
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
 -   `attached_to`: Narrow the combobox `onChange` handler parameter to `string | null`, following the upstream `ComboboxControl` type fix that removed the accidental `undefined` from the callback type. ([#81568](https://github.com/WordPress/gutenberg/pull/81568))
 

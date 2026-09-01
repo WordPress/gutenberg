@@ -2,6 +2,7 @@ import { v4 as uuid } from 'uuid';
 import { select, dispatch } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { uploadMedia } from '@wordpress/media-utils';
+import { __ } from '@wordpress/i18n';
 import { store as editorStore } from '../../store';
 import {
 	addFiles as trackStart,
@@ -39,6 +40,17 @@ export default function mediaUpload( {
 	multiple = true,
 	isTransportOnly = false,
 } ) {
+	// A caller that takes a single file refuses a multi-file batch outright.
+	// `uploadMedia()` makes the same check, but reports the refusal as one
+	// error for the whole batch, which would leave every other file in it
+	// counted as still in flight by the progress tracker below - and the
+	// tracker folds every later upload into that stuck session
+	// (see gutenberg#82041). Refusing here keeps the batch out of it.
+	if ( ! multiple && filesList.length > 1 ) {
+		onError( __( 'Only one file can be used here.' ) );
+		return;
+	}
+
 	const { receiveEntityRecords } = dispatch( coreDataStore );
 	const { getCurrentPost, getEditorSettings } = select( editorStore );
 	const {

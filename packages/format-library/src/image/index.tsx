@@ -2,7 +2,7 @@ import {
 	Popover,
 	Button,
 	__experimentalNumberControl as NumberControl,
-	TextareaControl,
+	TextareaControl as WCTextareaControl,
 } from '@wordpress/components';
 import { inlineImage } from '@wordpress/icons';
 import { Link, Stack } from '@wordpress/ui';
@@ -114,7 +114,7 @@ function InlineUI( {
 							setEditedWidth( newWidth );
 						} }
 					/>
-					<TextareaControl
+					<WCTextareaControl
 						label={ __( 'Alternative text' ) }
 						value={ editedAlt ?? '' }
 						onChange={ ( newAlt ) => {

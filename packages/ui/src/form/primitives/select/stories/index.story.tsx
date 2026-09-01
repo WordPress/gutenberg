@@ -14,6 +14,10 @@ const meta: Meta< typeof Select.Root > = {
 		'Select.Item': Select.Item,
 	},
 	parameters: {
+		// FIXME: The trigger has no visible label and relies on aria-label
+		// (button-name).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
 		componentStatus: {
 			status: 'use-with-caution',
 			whereUsed: 'global',

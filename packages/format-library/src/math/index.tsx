@@ -9,15 +9,10 @@ import {
 } from '@wordpress/rich-text';
 // @ts-expect-error Block Editor not fully typed yet.
 import { RichTextToolbarButton } from '@wordpress/block-editor';
-import {
-	Popover,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { Popover } from '@wordpress/components';
+import { ValidatedInputControl } from '@wordpress/ui';
 import { math as icon } from '@wordpress/icons';
-import { unlock } from '../lock-unlock';
 import type { InlineUIProps, EditMathProps } from '../types';
-
-const { ValidatedInputControl } = unlock( componentsPrivateApis );
 
 const name = 'core/math';
 const title = __( 'Math' );
@@ -99,7 +94,7 @@ function InlineUI( {
 					customValidity={
 						error ? { type: 'invalid', message: error } : undefined
 					}
-					onChange={ handleLatexChange }
+					onValueChange={ handleLatexChange }
 					placeholder={ __( 'e.g., x^2, \\frac{a}{b}' ) }
 					autoComplete="off"
 					className="block-editor-format-toolbar__math-input"
