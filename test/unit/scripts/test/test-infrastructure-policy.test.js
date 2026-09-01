@@ -20,6 +20,7 @@ import {
 	findVitestIsolationOptOuts,
 	validateRoutingScripts,
 	validateVitestCleanupConfig,
+	validateVitestShuffleScripts,
 } from '../test-infrastructure-policy.mjs';
 
 const temporaryDirectories = [];
@@ -146,6 +147,51 @@ describe( 'test infrastructure policy', () => {
 			'dependency:packages/example/package.json:devDependencies.legacy-test',
 			'dependency:packages/example/package.json:devDependencies.test-runner',
 		] );
+	} );
+
+	it( 'requires deterministic file-order shuffling', () => {
+		const validRootPackageJson = {
+			scripts: {
+				'test:unit:vitest:shuffled':
+					'npm run --workspace @wordpress/unit-tests test:unit:vitest:shuffled --',
+			},
+		};
+		const validUnitTestPackageJson = {
+			scripts: {
+				'test:unit:vitest:shuffled':
+					'npm run test:unit:vitest -- --sequence.shuffle.files --sequence.seed=80855',
+			},
+		};
+
+		expect(
+			validateVitestShuffleScripts(
+				{
+					scripts: {
+						'test:unit:vitest:shuffled':
+							'npm run --workspace @wordpress/unit-tests test:unit:vitest:shuffled',
+					},
+				},
+				validUnitTestPackageJson
+			)
+		).toEqual( [
+			'package.json: scripts.test:unit:vitest:shuffled must be exactly `npm run --workspace @wordpress/unit-tests test:unit:vitest:shuffled --`',
+		] );
+		expect(
+			validateVitestShuffleScripts( validRootPackageJson, {
+				scripts: {
+					'test:unit:vitest:shuffled':
+						'npm run test:unit:vitest -- --sequence.shuffle --sequence.seed=80855',
+				},
+			} )
+		).toEqual( [
+			'test/unit/package.json: scripts.test:unit:vitest:shuffled must be exactly `npm run test:unit:vitest -- --sequence.shuffle.files --sequence.seed=80855`',
+		] );
+		expect(
+			validateVitestShuffleScripts(
+				validRootPackageJson,
+				validUnitTestPackageJson
+			)
+		).toEqual( [] );
 	} );
 } );
 

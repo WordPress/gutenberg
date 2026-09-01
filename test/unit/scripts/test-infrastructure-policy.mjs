@@ -18,6 +18,10 @@ const ISOLATION_OPT_OUT_PATTERN =
 const ROOT_ROUTING_COMMAND =
 	'npm run --workspace @wordpress/unit-tests test:unit:routing --';
 const WORKSPACE_ROUTING_COMMAND = 'node scripts/validate-test-routing.mjs';
+const ROOT_SHUFFLED_COMMAND =
+	'npm run --workspace @wordpress/unit-tests test:unit:vitest:shuffled --';
+const WORKSPACE_SHUFFLED_COMMAND =
+	'npm run test:unit:vitest -- --sequence.shuffle.files --sequence.seed=80855';
 
 function normalizeShellCommand( command ) {
 	return command
@@ -175,6 +179,31 @@ export function validateRoutingScripts( rootPackageJson, unitTestPackageJson ) {
 	) {
 		violations.push(
 			`test/unit/package.json: scripts.test:unit:routing must be exactly \`${ WORKSPACE_ROUTING_COMMAND }\``
+		);
+	}
+
+	return violations;
+}
+
+export function validateVitestShuffleScripts(
+	rootPackageJson,
+	unitTestPackageJson
+) {
+	const violations = [];
+	if (
+		rootPackageJson.scripts?.[ 'test:unit:vitest:shuffled' ] !==
+		ROOT_SHUFFLED_COMMAND
+	) {
+		violations.push(
+			`package.json: scripts.test:unit:vitest:shuffled must be exactly \`${ ROOT_SHUFFLED_COMMAND }\``
+		);
+	}
+	if (
+		unitTestPackageJson.scripts?.[ 'test:unit:vitest:shuffled' ] !==
+		WORKSPACE_SHUFFLED_COMMAND
+	) {
+		violations.push(
+			`test/unit/package.json: scripts.test:unit:vitest:shuffled must be exactly \`${ WORKSPACE_SHUFFLED_COMMAND }\``
 		);
 	}
 
