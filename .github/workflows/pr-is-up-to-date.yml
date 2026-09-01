@@ -23,6 +23,9 @@ concurrency:
     # tag, so the next run in the group recovers them.
     group: pr-freshness-${{ github.event_name == 'pull_request_target' && github.event.pull_request.number || 'baseline' }}
     cancel-in-progress: false
+    # The default queue keeps a single pending run, so a trunk push could
+    # replace (cancel) a pending forced dispatch; queue: max keeps them all.
+    queue: max
 
 jobs:
     check-pr:

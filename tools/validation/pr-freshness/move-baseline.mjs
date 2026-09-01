@@ -28,41 +28,58 @@ import { fanout } from './fanout.mjs';
  */
 async function hasLabeledMergeSince( baseline ) {
 	const [ owner, name ] = REPO.split( '/' );
-	const data = await graphql(
-		`
-			query ($owner: String!, $name: String!, $label: String!) {
-				repository(owner: $owner, name: $name) {
-					pullRequests(
-						labels: [$label]
-						states: MERGED
-						baseRefName: "trunk"
-						first: 50
-						orderBy: { field: UPDATED_AT, direction: DESC }
-					) {
-						nodes {
-							mergeCommit {
-								oid
+	let cursor = null;
+	for (;;) {
+		const data = await graphql(
+			`
+				query (
+					$owner: String!
+					$name: String!
+					$label: String!
+					$cursor: String
+				) {
+					repository(owner: $owner, name: $name) {
+						pullRequests(
+							labels: [$label]
+							states: MERGED
+							baseRefName: "trunk"
+							first: 50
+							after: $cursor
+							orderBy: { field: UPDATED_AT, direction: DESC }
+						) {
+							pageInfo {
+								hasNextPage
+								endCursor
+							}
+							nodes {
+								mergeCommit {
+									oid
+								}
 							}
 						}
 					}
 				}
+			`,
+			{ owner, name, label: FORCE_LABEL, cursor }
+		);
+		const page = data.repository.pullRequests;
+		for ( const node of page.nodes ) {
+			const oid = node.mergeCommit?.oid;
+			if ( ! oid || oid === baseline ) {
+				continue;
 			}
-		`,
-		{ owner, name, label: FORCE_LABEL }
-	);
-	for ( const node of data.repository.pullRequests.nodes ) {
-		const oid = node.mergeCommit?.oid;
-		if ( ! oid || oid === baseline ) {
-			continue;
+			if (
+				( await isAncestor( baseline, oid ) ) &&
+				( await isAncestor( oid, 'HEAD' ) )
+			) {
+				return true;
+			}
 		}
-		if (
-			( await isAncestor( baseline, oid ) ) &&
-			( await isAncestor( oid, 'HEAD' ) )
-		) {
-			return true;
+		if ( ! page.pageInfo.hasNextPage ) {
+			return false;
 		}
+		cursor = page.pageInfo.endCursor;
 	}
-	return false;
 }
 
 /**
