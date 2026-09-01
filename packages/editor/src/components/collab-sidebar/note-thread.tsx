@@ -28,6 +28,7 @@ import {
 	focusNoteThread,
 	getNoteExcerpt,
 	scrollNoteThreadIntoView,
+	getNoteBlockClientIds,
 	selectNoteBlocks,
 } from './utils';
 import type { Thread } from './utils';
@@ -91,10 +92,16 @@ export function NoteThread( {
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
 	const relatedBlockElement = useBlockElement( note.blockClientId );
-	const debouncedToggleBlockHighlight = useDebounce(
-		toggleBlockHighlight,
-		50
-	);
+	/*
+	 * Outline every block the note covers, not just its anchor: a note taken
+	 * across several blocks should light up the whole run it refers to.
+	 */
+	const highlightNoteBlocks = ( isHighlighted: boolean ) => {
+		for ( const blockClientId of getNoteBlockClientIds( note ) ) {
+			toggleBlockHighlight( blockClientId, isHighlighted );
+		}
+	};
+	const debouncedHighlightNoteBlocks = useDebounce( highlightNoteBlocks, 50 );
 	const floatingRef = useRef< HTMLElement | null >( null );
 	const isKeyboardTabbingRef = useRef( false );
 
@@ -139,8 +146,8 @@ export function NoteThread( {
 		// Drop the highlight, unless another note (possibly on the same block) now owns it.
 		if ( ! isNoteFocused ) {
 			// Discard a hover toggle still in flight so it can't re-highlight afterwards.
-			debouncedToggleBlockHighlight.cancel();
-			toggleBlockHighlight( note.blockClientId, false );
+			debouncedHighlightNoteBlocks.cancel();
+			highlightNoteBlocks( false );
 		}
 
 		/*
@@ -154,18 +161,18 @@ export function NoteThread( {
 	} );
 
 	function onMouseEnter() {
-		debouncedToggleBlockHighlight( note.blockClientId, true );
+		debouncedHighlightNoteBlocks( true );
 	}
 
 	function onMouseLeave() {
-		debouncedToggleBlockHighlight( note.blockClientId, false );
+		debouncedHighlightNoteBlocks( false );
 	}
 
 	function onFocus( event: FocusEvent< HTMLElement > ) {
 		// Cancel any pending deselect and highlight the related block.
 		focusOutside.onFocus( event );
-		debouncedToggleBlockHighlight.cancel();
-		toggleBlockHighlight( note.blockClientId, true );
+		debouncedHighlightNoteBlocks.cancel();
+		highlightNoteBlocks( true );
 	}
 
 	function onSelectNote() {

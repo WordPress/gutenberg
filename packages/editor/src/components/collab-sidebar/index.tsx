@@ -25,8 +25,10 @@ import { useEnableFloatingSidebar, useNoteThreads } from './hooks';
 import {
 	getNoteIdsFromMetadata,
 	getThreadsForBlock,
+	getNoteBlockClientIds,
 	pickPrimaryNote,
 	readMultiBlockSelection,
+	selectBlockRun,
 } from './utils';
 import type { Thread } from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
@@ -35,7 +37,7 @@ import { unlock } from '../../lock-unlock';
 function NotesSidebar( { postId }: { postId: number } ) {
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
-	const { toggleBlockSpotlight, selectBlock } = unlock(
+	const { toggleBlockSpotlight, selectBlock, multiSelect } = unlock(
 		useDispatch( blockEditorStore )
 	);
 	const { selectNote, setPendingNoteSegments } = unlock(
@@ -100,10 +102,12 @@ function NotesSidebar( { postId }: { postId: number } ) {
 		targetClientId,
 		noteId: targetNoteId,
 		isApproved,
+		spanClientIds,
 	}: {
 		targetClientId?: string | null;
 		noteId?: number | 'new';
 		isApproved?: boolean;
+		spanClientIds?: string[];
 	} ): Promise< boolean > {
 		if ( ! targetClientId ) {
 			return false;
@@ -125,9 +129,19 @@ function NotesSidebar( { postId }: { postId: number } ) {
 			return false;
 		}
 
-		// A special case for the List View, where block selection isn't required to trigger an action.
-		// The action won't do anything if the block is already selected.
-		selectBlock( targetClientId, null );
+		/*
+		 * A special case for the List View, where block selection isn't
+		 * required to trigger an action. The action won't do anything if the
+		 * block is already selected. A note that spans several blocks selects
+		 * the whole run, so the spotlight leaves every block it covers lit
+		 * rather than just the one the note was opened from.
+		 */
+		selectBlockRun( spanClientIds ?? [ targetClientId ], {
+			selectBlock,
+			multiSelect,
+			getBlockRootClientId: blockEditorSelectors.getBlockRootClientId,
+			getBlockOrder: blockEditorSelectors.getBlockOrder,
+		} );
 		toggleBlockSpotlight( targetClientId, true );
 		selectNote( targetNoteId, { focus: true } );
 		return true;
@@ -143,6 +157,7 @@ function NotesSidebar( { postId }: { postId: number } ) {
 			targetClientId,
 			noteId: target?.id ?? 'new',
 			isApproved: target?.status === 'approved',
+			spanClientIds: target ? getNoteBlockClientIds( target ) : undefined,
 		} );
 	}
 
@@ -189,6 +204,7 @@ function NotesSidebar( { postId }: { postId: number } ) {
 				targetClientId: anchorClientId,
 				noteId: 'new',
 				isApproved: false,
+				spanClientIds: segments?.map( ( segment ) => segment.clientId ),
 			} );
 			if ( ! opened ) {
 				setPendingNoteSegments( null );

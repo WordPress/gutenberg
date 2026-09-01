@@ -755,44 +755,59 @@ function isContiguousSiblingRun(
 }
 
 /**
- * Selects the block or blocks a note is anchored to.
+ * The blocks a note covers, in document order.
+ *
+ * A note that spans several blocks records the whole run in `blockClientIds`;
+ * a single-block note only has `blockClientId`. Callers that light up, outline
+ * or select "the note's blocks" want the run, not just the anchor.
+ *
+ * @param thread Root thread.
+ * @return Client ids the note covers.
+ */
+export function getNoteBlockClientIds( thread: Thread | undefined | null ) {
+	if ( thread?.blockClientIds?.length ) {
+		return thread.blockClientIds;
+	}
+	return [ thread?.blockClientId ].filter(
+		( id ): id is string => typeof id === 'string'
+	);
+}
+
+export type BlockSelectionActions = {
+	selectBlock: ( clientId: string, initialPosition?: unknown ) => void;
+	multiSelect: (
+		start: string,
+		end: string,
+		initialPosition?: unknown
+	) => void;
+	getBlockRootClientId?: ( clientId: string ) => string | null;
+	getBlockOrder?: ( rootClientId?: string | null ) => string[];
+};
+
+/**
+ * Selects a run of blocks, multi-selecting it when it covers more than one.
  *
  * A note that spans several blocks is multi-selected so that every block it
  * covers stays lit while the spotlight is on, rather than only the anchor.
  * Selection never moves focus into the canvas: `selectBlock` and `multiSelect`
  * both treat a `null` initial position as "don't focus".
  *
- * @param thread                       Root thread with `blockClientIds`.
+ * @param clientIds                    Client ids to select, in document order.
  * @param actions                      Block editor actions and selectors.
  * @param actions.selectBlock
  * @param actions.multiSelect
  * @param actions.getBlockRootClientId Optional; enables the gap check.
  * @param actions.getBlockOrder        Optional; enables the gap check.
  */
-export function selectNoteBlocks(
-	thread: Thread,
+export function selectBlockRun(
+	clientIds: string[],
 	{
 		selectBlock,
 		multiSelect,
 		getBlockRootClientId,
 		getBlockOrder,
-	}: {
-		selectBlock: ( clientId: string, initialPosition?: unknown ) => void;
-		multiSelect: (
-			start: string,
-			end: string,
-			initialPosition?: unknown
-		) => void;
-		getBlockRootClientId?: ( clientId: string ) => string | null;
-		getBlockOrder?: ( rootClientId?: string | null ) => string[];
-	}
+	}: BlockSelectionActions
 ) {
-	const clientIds = thread?.blockClientIds?.length
-		? thread.blockClientIds
-		: [ thread?.blockClientId ].filter(
-				( id ): id is string => typeof id === 'string'
-		  );
-
 	if ( clientIds.length === 0 ) {
 		return;
 	}
@@ -818,6 +833,19 @@ export function selectNoteBlocks(
 		}
 		multiSelect( clientIds[ 0 ], clientIds[ clientIds.length - 1 ], null );
 	}
+}
+
+/**
+ * Selects the block or blocks a note is anchored to.
+ *
+ * @param thread  Root thread with `blockClientIds`.
+ * @param actions Block editor actions and selectors.
+ */
+export function selectNoteBlocks(
+	thread: Thread,
+	actions: BlockSelectionActions
+) {
+	selectBlockRun( getNoteBlockClientIds( thread ), actions );
 }
 
 /**

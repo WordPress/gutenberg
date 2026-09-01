@@ -15,6 +15,9 @@ const { isContentBlock } = unlock( blocksPrivateApis );
 
 const identity = ( x ) => x;
 
+// Stable empty reference so an unchanged empty highlight never re-renders.
+const EMPTY_HIGHLIGHT = [];
+
 /**
  * Given an array of blocks, returns an object where each key is a nesting
  * context, the value of which is an array of block client IDs existing within
@@ -1906,28 +1909,35 @@ export function lastBlockAttributesChange( state = null, action ) {
 }
 
 /**
- * Reducer returning current highlighted block.
+ * Reducer returning the currently highlighted blocks.
  *
- * @param {boolean} state  Current highlighted block.
- * @param {Object}  action Dispatched action.
+ * More than one block can be highlighted at a time: a note that spans several
+ * blocks outlines the whole run it covers, not only its anchor.
  *
- * @return {string} Updated state.
+ * @param {string[]} state  Currently highlighted block client ids.
+ * @param {Object}   action Dispatched action.
+ *
+ * @return {string[]} Updated state.
  */
-export function highlightedBlock( state, action ) {
+export function highlightedBlocks( state = EMPTY_HIGHLIGHT, action ) {
 	switch ( action.type ) {
-		case 'TOGGLE_BLOCK_HIGHLIGHT':
+		case 'TOGGLE_BLOCK_HIGHLIGHT': {
 			const { clientId, isHighlighted } = action;
 
 			if ( isHighlighted ) {
-				return clientId;
-			} else if ( state === clientId ) {
-				return null;
+				return state.includes( clientId )
+					? state
+					: [ ...state, clientId ];
 			}
-
-			return state;
+			return state.includes( clientId )
+				? state.filter( ( id ) => id !== clientId )
+				: state;
+		}
 		case 'SELECT_BLOCK':
-			if ( action.clientId !== state ) {
-				return null;
+			// Selecting a block that is not itself highlighted drops the
+			// highlight, the same way it did when only one could be set.
+			if ( state.length && ! state.includes( action.clientId ) ) {
+				return EMPTY_HIGHLIGHT;
 			}
 	}
 
@@ -2439,7 +2449,7 @@ const combinedReducers = combineReducers( {
 	lastBlockAttributesChange,
 	lastFocus,
 	expandedBlock,
-	highlightedBlock,
+	highlightedBlocks,
 	lastBlockInserted,
 	editedContentOnlySection,
 	blockVisibility,

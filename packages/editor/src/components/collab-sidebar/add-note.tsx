@@ -25,10 +25,20 @@ export function AddNote( {
 	sidebarRef: MutableRefObject< HTMLElement | null >;
 	floating?: FloatingPosition;
 } ) {
+	/*
+	 * The form's anchor block. A note taken over several blocks keeps the whole
+	 * run multi-selected so the spotlight leaves every spanned block lit, and
+	 * `getSelectedBlockClientId` reports nothing while a multi-selection is
+	 * live - fall back to the first block of the run, which is the anchor.
+	 */
 	const { clientId } = useSelect( ( select ) => {
-		const { getSelectedBlockClientId } = select( blockEditorStore );
+		const { getSelectedBlockClientId, getSelectedBlockClientIds } =
+			select( blockEditorStore );
 		return {
-			clientId: getSelectedBlockClientId(),
+			clientId:
+				getSelectedBlockClientId() ??
+				getSelectedBlockClientIds()?.[ 0 ] ??
+				null,
 		};
 	}, [] );
 	const selectedNote = useSelect(

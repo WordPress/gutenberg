@@ -2436,6 +2436,129 @@ test.describe( 'Block Notes', () => {
 			await expect( blocks.nth( 1 ) ).toHaveCSS( 'opacity', '1' );
 			await expect( blocks.nth( 2 ) ).toHaveCSS( 'opacity', '1' );
 		} );
+
+		// Four paragraphs, a note over the first three: the fourth is the
+		// control that proves the spotlight is on (it dims) while every
+		// spanned block stays lit.
+		async function insertFourParagraphs( editor ) {
+			for ( const content of [
+				'Alpha block.',
+				'Beta block.',
+				'Gamma block.',
+				'Delta block.',
+			] ) {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: { content },
+				} );
+			}
+		}
+
+		async function expectSpanLitAndRestDimmed( editor ) {
+			const blocks = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await expect(
+				editor.canvas.locator( '.is-root-container' )
+			).toHaveClass( /is-focus-mode/ );
+			await expect( blocks.nth( 0 ) ).toHaveCSS( 'opacity', '1' );
+			await expect( blocks.nth( 1 ) ).toHaveCSS( 'opacity', '1' );
+			await expect( blocks.nth( 2 ) ).toHaveCSS( 'opacity', '1' );
+			await expect( blocks.nth( 3 ) ).toHaveCSS( 'opacity', '0.2' );
+		}
+
+		test( 'keeps every spanned block lit while the new note form is open', async ( {
+			editor,
+			page,
+		} ) => {
+			await insertFourParagraphs( editor );
+
+			await page.evaluate( () => {
+				const { dispatch, select } = window.wp.data;
+				const ids = select( 'core/block-editor' ).getBlockOrder();
+				dispatch( 'core/block-editor' ).selectionChange( {
+					start: {
+						clientId: ids[ 0 ],
+						attributeKey: 'content',
+						offset: 3,
+					},
+					end: {
+						clientId: ids[ 2 ],
+						attributeKey: 'content',
+						offset: 3,
+					},
+				} );
+			} );
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await expect(
+				page.getByRole( 'textbox', { name: 'New note', exact: true } )
+			).toBeFocused();
+
+			// Opening the form spotlights the canvas; the whole selection the
+			// note is being taken over must stay lit, not only its first block.
+			await expectSpanLitAndRestDimmed( editor );
+		} );
+
+		test( 'keeps every spanned block lit when the note is opened from the block toolbar', async ( {
+			editor,
+			page,
+		} ) => {
+			await insertFourParagraphs( editor );
+			await addMultiBlockNote( { editor, page }, 3, 'Toolbar span' );
+
+			const thread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: Toolbar span' } );
+			await expect( thread ).toBeFocused();
+			await page.keyboard.press( 'Escape' );
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+
+			// Click into the middle spanned block, then open the note from
+			// its toolbar indicator.
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.nth( 1 )
+				.click();
+			await page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'View notes' } )
+				.click();
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+
+			await expectSpanLitAndRestDimmed( editor );
+		} );
+
+		test( 'outlines every spanned block when the note is hovered', async ( {
+			editor,
+			page,
+		} ) => {
+			await insertFourParagraphs( editor );
+			await addMultiBlockNote( { editor, page }, 3, 'Hover span' );
+
+			const thread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: Hover span' } );
+			await expect( thread ).toBeFocused();
+			await page.keyboard.press( 'Escape' );
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+
+			const blocks = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+
+			// Hovering the thread outlines every block the note covers.
+			await thread.hover();
+			await expect( blocks.nth( 0 ) ).toHaveClass( /is-highlighted/ );
+			await expect( blocks.nth( 1 ) ).toHaveClass( /is-highlighted/ );
+			await expect( blocks.nth( 2 ) ).toHaveClass( /is-highlighted/ );
+			await expect( blocks.nth( 3 ) ).not.toHaveClass( /is-highlighted/ );
+
+			// Leaving the thread clears the outline from all of them.
+			await page.mouse.move( 0, 0 );
+			await expect( blocks.nth( 0 ) ).not.toHaveClass( /is-highlighted/ );
+			await expect( blocks.nth( 1 ) ).not.toHaveClass( /is-highlighted/ );
+			await expect( blocks.nth( 2 ) ).not.toHaveClass( /is-highlighted/ );
+		} );
 	} );
 } );
 
