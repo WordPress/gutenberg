@@ -7,11 +7,10 @@
 import {
 	FORCE_LABEL,
 	REPO,
-	git,
 	fail,
 	graphql,
-	fetchTag,
-	resolveBaseline,
+	getBaseline,
+	getTrunkHead,
 	isAncestor,
 	updateTagRef,
 } from './utils.mjs';
@@ -24,9 +23,10 @@ import { fanout } from './fanout.mjs';
  * baseline; scanned cumulatively so coalesced push runs lose nothing.
  *
  * @param {string} baseline Baseline commit SHA.
+ * @param {string} head     Trunk head commit SHA.
  * @return {Promise<boolean>} Whether such a merge exists.
  */
-async function hasLabeledMergeSince( baseline ) {
+async function hasLabeledMergeSince( baseline, head ) {
 	const [ owner, name ] = REPO.split( '/' );
 	let cursor = null;
 	for (;;) {
@@ -70,7 +70,7 @@ async function hasLabeledMergeSince( baseline ) {
 			}
 			if (
 				( await isAncestor( baseline, oid ) ) &&
-				( await isAncestor( oid, 'HEAD' ) )
+				( await isAncestor( oid, head ) )
 			) {
 				return true;
 			}
@@ -89,15 +89,16 @@ async function hasLabeledMergeSince( baseline ) {
  */
 export async function moveBaseline( options ) {
 	const { force, thenFanout, dryRun } = options;
+	const baseline = await getBaseline( false );
 
-	if ( ! ( await fetchTag( false ) ) ) {
+	if ( baseline === null ) {
 		if ( force !== 'true' ) {
 			console.log(
 				'No baseline tag exists and no --force; not seeding.'
 			);
 			return;
 		}
-		const head = ( await git.revparse( [ 'HEAD' ] ) ).trim();
+		const head = await getTrunkHead();
 		console.log( `Seeding baseline at ${ head }.` );
 		if ( ! dryRun ) {
 			await updateTagRef( head, true );
@@ -109,8 +110,9 @@ export async function moveBaseline( options ) {
 		return;
 	}
 
-	const baseline = await resolveBaseline();
-	const move = force === 'true' || ( await hasLabeledMergeSince( baseline ) );
+	const head = await getTrunkHead();
+	const move =
+		force === 'true' || ( await hasLabeledMergeSince( baseline, head ) );
 	if ( ! move ) {
 		console.log(
 			'No forced move or labeled merges since the baseline; not moving.'
@@ -118,10 +120,9 @@ export async function moveBaseline( options ) {
 		return;
 	}
 
-	const head = ( await git.revparse( [ 'HEAD' ] ) ).trim();
 	if ( baseline === head ) {
 		/* Re-dispatch retry path: still fan out to flip any stale survivors. */
-		console.log( 'Baseline already points at HEAD.' );
+		console.log( 'Baseline already points at trunk HEAD.' );
 	} else {
 		if ( ! ( await isAncestor( baseline, head ) ) ) {
 			return fail(

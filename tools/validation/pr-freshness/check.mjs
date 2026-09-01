@@ -4,11 +4,8 @@
  * The `check` subcommand: stamps one PR head with its freshness status.
  */
 import {
-	TAG_REF,
-	git,
 	fail,
-	fetchTag,
-	resolveBaseline,
+	getBaseline,
 	isAncestor,
 	statusFor,
 	latestStatus,
@@ -26,40 +23,16 @@ export async function check( { headSha, dryRun } ) {
 	if ( ! headSha ) {
 		return fail( 'The check subcommand requires --head-sha.' );
 	}
-	await fetchTag();
-	await git.fetch( [ '--no-tags', 'origin', headSha ] );
+	let baseline = /** @type {string} */ ( await getBaseline() );
+	let fresh = await isAncestor( baseline, headSha );
 
-	/*
-	 * Deepen until a merge base is found or history is complete. An empty
-	 * merge-base result is indistinguishable from insufficient depth, so keep
-	 * deepening while shallow; exit codes are unreliable (see isAncestor).
-	 */
-	for (;;) {
-		const base = await git
-			.raw( [ 'merge-base', TAG_REF, headSha ] )
-			.catch( () => '' );
-		if ( base.trim() ) {
-			break;
-		}
-		const shallow = (
-			await git.raw( [ 'rev-parse', '--is-shallow-repository' ] )
-		).trim();
-		if ( shallow !== 'true' ) {
-			break;
-		}
-		await git.fetch( [
-			'--no-tags',
-			'--deepen=500',
-			'origin',
-			'trunk',
-			headSha,
-		] );
+	// Re-read the baseline just before posting to shrink the move race window.
+	const latest = /** @type {string} */ ( await getBaseline() );
+	if ( latest !== baseline ) {
+		baseline = latest;
+		fresh = await isAncestor( baseline, headSha );
 	}
 
-	// Re-read the tag just before deciding to shrink the tag-move race window.
-	await fetchTag();
-	const baseline = await resolveBaseline();
-	const fresh = await isAncestor( baseline, headSha );
 	const { state, description } = statusFor( fresh, baseline );
 
 	/* Statuses are append-only and capped per SHA/context; skip no-op writes. */

@@ -1,17 +1,16 @@
 // @ts-check
 
 /**
- * Shared constants and helpers for the PR freshness tooling: git plumbing,
- * GitHub API access, and rate-limited commit status writes.
+ * Shared constants and helpers for the PR freshness tooling: GitHub API
+ * access, baseline resolution, and rate-limited commit status writes.
  */
-import { simpleGit } from 'simple-git';
 
 /** @typedef {import('./types.mjs').StatusPayload} StatusPayload */
 /** @typedef {import('./types.mjs').ContextStatus} ContextStatus */
 
 export const CONTEXT = 'PR is up to date';
 export const TAG = 'infra-baseline';
-export const TAG_REF = `refs/tags/${ TAG }`;
+const TAG_REF = `refs/tags/${ TAG }`;
 export const REPO = process.env.GITHUB_REPOSITORY ?? '';
 const TOKEN = process.env.GITHUB_TOKEN ?? '';
 const API_ROOT = 'https://api.github.com';
@@ -25,8 +24,6 @@ const MAX_WRITES_PER_RUN = 400;
 const MAX_WRITES_PER_MINUTE = 60;
 
 export const FORCE_LABEL = 'Force PR refresh';
-
-export const git = simpleGit();
 
 /**
  * Prints an error and exits.
@@ -42,8 +39,8 @@ export function fail( message ) {
 /**
  * Performs an authenticated GitHub API request.
  *
- * @param {string}                                                               path      Request path.
- * @param {{ method?: string, body?: string, headers?: Record<string, string> }} [options] Fetch options.
+ * @param {string}                                                                                   path      Request path.
+ * @param {{ method?: string, body?: string, headers?: Record<string, string>, allow404?: boolean }} [options] Fetch options.
  * @return {Promise<unknown>} Parsed JSON response.
  */
 async function api( path, options = {} ) {
@@ -61,6 +58,9 @@ async function api( path, options = {} ) {
 				},
 			} );
 			if ( ! response.ok ) {
+				if ( response.status === 404 && options.allow404 ) {
+					return null;
+				}
 				if (
 					RETRYABLE_STATUS.includes( response.status ) &&
 					attempt < MAX_ATTEMPTS
@@ -109,59 +109,62 @@ export async function graphql( query, variables ) {
 }
 
 /**
- * Fetches the baseline tag from origin, forcing an update of the local ref.
+ * Resolves the baseline commit SHA from the tag ref via the API.
  *
- * @param {boolean} [required] Throw when the tag cannot be fetched.
- * @return {Promise<boolean>} Whether the tag exists on origin.
+ * @param {boolean} [required] Throw when the tag does not exist.
+ * @return {Promise<string | null>} Baseline commit SHA, or null when absent.
  */
-export async function fetchTag( required = true ) {
-	try {
-		await git.fetch( [
-			'--no-tags',
-			'origin',
-			`+${ TAG_REF }:${ TAG_REF }`,
-		] );
-		return true;
-	} catch ( error ) {
-		const missing =
-			error instanceof Error &&
-			error.message.includes( "couldn't find remote ref" );
-		if ( ! required && missing ) {
-			return false;
+export async function getBaseline( required = true ) {
+	const ref = /** @type {any} */ (
+		await api( `/repos/${ REPO }/git/ref/tags/${ TAG }`, {
+			allow404: true,
+		} )
+	);
+	if ( ! ref ) {
+		if ( required ) {
+			throw new Error(
+				`The ${ TAG } tag does not exist; seed it via workflow dispatch.`
+			);
 		}
-		throw error;
+		return null;
 	}
+	// Peel defensively; the tag should always be lightweight.
+	if ( ref.object.type === 'tag' ) {
+		const tag = /** @type {any} */ (
+			await api( `/repos/${ REPO }/git/tags/${ ref.object.sha }` )
+		);
+		return tag.object.sha;
+	}
+	return ref.object.sha;
 }
 
 /**
- * Resolves the baseline commit SHA; ^{commit} peels any annotated tag.
+ * Tests commit ancestry via the compare API; no local clone needed.
  *
- * @return {Promise<string>} Baseline commit SHA.
- */
-export async function resolveBaseline() {
-	return ( await git.raw( [ 'rev-parse', `${ TAG_REF }^{commit}` ] ) ).trim();
-}
-
-/**
- * Tests git ancestry.
- *
- * @param {string} ancestor   Candidate ancestor SHA or ref.
- * @param {string} descendant Candidate descendant SHA or ref.
+ * @param {string} ancestor   Candidate ancestor commit SHA.
+ * @param {string} descendant Candidate descendant commit SHA.
  * @return {Promise<boolean>} Whether ancestor is an ancestor of descendant.
  */
 export async function isAncestor( ancestor, descendant ) {
-	/*
-	 * Never trust exit codes here: `merge-base --is-ancestor` exits 1 with an
-	 * empty stderr, which simple-git resolves instead of rejecting. Compare
-	 * the merge base against the ancestor commit instead.
-	 */
-	const ancestorSha = (
-		await git.raw( [ 'rev-parse', `${ ancestor }^{commit}` ] )
-	).trim();
-	const base = await git
-		.raw( [ 'merge-base', ancestorSha, descendant ] )
-		.catch( () => '' );
-	return base.trim() === ancestorSha;
+	const compare = /** @type {any} */ (
+		await api(
+			`/repos/${ REPO }/compare/${ ancestor }...${ descendant }?per_page=1`
+		)
+	);
+	// 'ahead' means descendant builds on ancestor; 'identical' is the edge.
+	return compare.status === 'ahead' || compare.status === 'identical';
+}
+
+/**
+ * Resolves the current trunk head commit SHA.
+ *
+ * @return {Promise<string>} Trunk head SHA.
+ */
+export async function getTrunkHead() {
+	const commit = /** @type {any} */ (
+		await api( `/repos/${ REPO }/commits/trunk` )
+	);
+	return commit.sha;
 }
 
 /**

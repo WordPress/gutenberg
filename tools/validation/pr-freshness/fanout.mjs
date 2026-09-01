@@ -8,8 +8,7 @@ import {
 	CONTEXT,
 	REPO,
 	graphql,
-	fetchTag,
-	resolveBaseline,
+	getBaseline,
 	statusFor,
 	postStatus,
 } from './utils.mjs';
@@ -99,8 +98,7 @@ async function listOpenPRs() {
  * @param {CommandOptions} options Command options.
  */
 export async function fanout( { dryRun } ) {
-	await fetchTag();
-	const baseline = await resolveBaseline();
+	const baseline = /** @type {string} */ ( await getBaseline() );
 	const short = baseline.slice( 0, 7 );
 
 	const prs = await listOpenPRs();
