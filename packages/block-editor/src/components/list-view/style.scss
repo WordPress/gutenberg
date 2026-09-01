@@ -97,6 +97,9 @@
 	&.is-synced:not(.is-selected) .block-editor-list-view-block__menu:focus {
 		--focus-color: var(--wp-block-synced-color);
 		@include outset-ring__focus();
+		// Clear older Button component's default focus box-shadow so only the outline
+		// shows in mixed-version setups.
+		box-shadow: none;
 	}
 	&.is-selected .block-editor-list-view-block-contents,
 	&.is-selected .components-button.has-icon {
@@ -110,6 +113,9 @@
 		--focus-color: #{ $white };
 		@include outset-ring__focus();
 		outline-offset: -2px;
+		// Clear older Button component's default focus box-shadow so only the outline
+		// shows in mixed-version setups.
+		box-shadow: none;
 	}
 
 	// Border radius for corners of the selected item.
