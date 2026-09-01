@@ -79,9 +79,12 @@ function useItemContent(
 		( descriptionId, index ) =>
 			descriptionId ?? `${ generatedDescriptionId }-${ index }`
 	);
-	const itemDescribedBy = [ ariaDescribedBy, ...resolvedDescriptionIds ]
-		.filter( Boolean )
-		.join( ' ' );
+	const itemDescribedBy = Array.from(
+		new Set( [
+			...( ariaDescribedBy?.split( /\s+/ ).filter( Boolean ) ?? [] ),
+			...resolvedDescriptionIds,
+		] )
+	).join( ' ' );
 	let descriptionIndex = 0;
 	// React widens the tuple while mapping; validation preserves the item-child
 	// contract and cloning changes only generated description IDs.

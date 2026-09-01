@@ -908,6 +908,32 @@ describe( 'Menu', () => {
 		);
 	} );
 
+	it( 'deduplicates explicit and item description IDs', async () => {
+		const user = userEvent.setup();
+		const descriptionId = 'save-description';
+
+		render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.Item aria-describedby={ descriptionId }>
+						<Menu.ItemLabel>Save</Menu.ItemLabel>
+						<Menu.ItemDescription id={ descriptionId }>
+							Save the current file.
+						</Menu.ItemDescription>
+					</Menu.Item>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+
+		const item = await screen.findByRole( 'menuitem', { name: 'Save' } );
+
+		expect( item ).toHaveAccessibleDescription( 'Save the current file.' );
+		expect( item ).toHaveAttribute( 'aria-describedby', descriptionId );
+	} );
+
 	it( 'requires an ItemLabel as a direct child of every item', () => {
 		expect( () =>
 			render(
