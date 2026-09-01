@@ -6,6 +6,7 @@ import {
 	CheckboxControl,
 } from '@wordpress/components';
 import { Stack, VisuallyHidden } from '@wordpress/ui';
+import type { CSSClassesSettingProps } from '../types';
 
 /**
  * CSSClassesSettingComponent
@@ -14,24 +15,17 @@ import { Stack, VisuallyHidden } from '@wordpress/ui';
  * is shown when the toggle is enabled or when there is already a value. When
  * toggled off and a value exists, it resets the value to an empty string.
  *
- * @param props                  - Component props.
- * @param props.setting          - Setting configuration object.
- * @param props.value            - Current link value object.
- * @param props.onChange         - Callback when value changes.
- * @param props.setting.id
- * @param props.setting.title
- * @param props.value.cssClasses
+ * @param props          - Component props.
+ * @param props.setting  - Setting configuration object.
+ * @param props.value    - Current link value object.
+ * @param props.onChange - Callback when value changes.
  */
 const CSSClassesSettingComponent = ( {
 	setting,
 	value,
 	onChange,
-}: {
-	setting: { id: string; title: string };
-	value: { cssClasses?: string };
-	onChange: ( newValue: { cssClasses?: string } ) => void;
-} ) => {
-	const hasValue = value ? !! ( value?.cssClasses?.length ?? 0 ) : false;
+}: CSSClassesSettingProps ) => {
+	const hasValue = !! value?.cssClasses?.length;
 	const [ isSettingActive, setIsSettingActive ] = useState( hasValue );
 	const instanceId = useInstanceId( CSSClassesSettingComponent );
 	const controlledRegionId = `css-classes-setting-${ instanceId }`;
