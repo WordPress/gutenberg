@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `useEntityProp`: Add a `coalesceEdits` option that merges consecutive edits into a single undo level, so typing into a text input no longer creates an undo level per keystroke ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+
 ### Internal
 
 -   Remove the template activation (`active_templates`) experiment: drop the `registeredTemplate` entity and the experiment-only `wp_template` endpoint rewrites and query params ([#82241](https://github.com/WordPress/gutenberg/pull/82241)).

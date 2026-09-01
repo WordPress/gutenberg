@@ -1064,6 +1064,8 @@ _Parameters_
 -   _name_ `string`: The entity name.
 -   _prop_ `string`: The property name.
 -   _\_id_ `[number|string]`: An entity ID to use instead of the context-provided one.
+-   _options_ `[Object]`: Hook options.
+-   _options.coalesceEdits_ `[boolean]`: Whether to merge edits made less than a second apart into a single undo level. Use it for text inputs, so that typing does not create an undo level per keystroke.
 
 _Returns_
 
