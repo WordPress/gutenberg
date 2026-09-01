@@ -4,12 +4,16 @@ import type {
 	ComponentPropsWithoutRef,
 	ComponentType,
 } from 'react';
-// Form controls read these stylesheets, normally enqueued by WordPress.
+// Form controls and the command palette read these stylesheets, normally
+// enqueued by WordPress.
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
+import '@wordpress/commands/build-style/style.css';
 // eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '@wordpress/components/build-style/style.css';
 // eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '@wordpress/dataviews/build-style/style.css';
 import { Page } from '@wordpress/admin-ui';
+import { CommandMenu } from '@wordpress/commands';
 import {
 	forwardRef,
 	useCallback,
@@ -653,7 +657,7 @@ const PROFILES = {
 	arranger: {
 		label: 'Arranger',
 		summary:
-			'may customize, move, and resize; never adds, removes, or edits',
+			'may customize, move, and resize; never adds, removes, edits, or resets',
 		operations: [ 'customize', 'move', 'resize' ] as readonly string[],
 	},
 	owner: {
@@ -717,6 +721,27 @@ function PolicyStory( { profile }: PolicyStoryProps ) {
 		[]
 	);
 
+	// Storybook forwards every keydown to its manager (`window.onkeydown`)
+	// without honoring `defaultPrevented`, so its own search would answer
+	// the palette combination too. Stop the event before it leaves the
+	// document; the palette's global shortcut listens on the document as
+	// well, and `stopPropagation` never affects same-target listeners.
+	useEffect( () => {
+		const containPaletteShortcut = ( event: KeyboardEvent ) => {
+			if (
+				( event.metaKey || event.ctrlKey ) &&
+				! event.shiftKey &&
+				! event.altKey &&
+				event.key.toLowerCase() === 'k'
+			) {
+				event.stopPropagation();
+			}
+		};
+		document.addEventListener( 'keydown', containPaletteShortcut );
+		return () =>
+			document.removeEventListener( 'keydown', containPaletteShortcut );
+	}, [] );
+
 	const { label, summary } = PROFILES[ profile ];
 
 	return (
@@ -728,6 +753,7 @@ function PolicyStory( { profile }: PolicyStoryProps ) {
 				] }
 				layout={ layout }
 				onLayoutChange={ setLayout }
+				onLayoutReset={ () => setLayout( INITIAL_LAYOUT ) }
 				editMode={ editMode }
 				onEditChange={ setEditMode }
 				resolveWidgetModule={ resolveDemoModule }
@@ -752,6 +778,8 @@ function PolicyStory( { profile }: PolicyStoryProps ) {
 					hasPadding
 				>
 					<WidgetDashboard.Widgets />
+					<WidgetDashboard.Commands />
+					<CommandMenu />
 				</Page>
 			</WidgetDashboard>
 		</WidgetDashboard.Policy>
@@ -768,7 +796,7 @@ export const Policy: StoryObj< PolicyStoryProps > = {
 			control: 'select',
 			options: Object.keys( PROFILES ),
 			description:
-				'The user profile the application maps to a policy. Viewer: nothing. Arranger: customize, move, resize. Owner: everything.',
+				'The user profile the application maps to a policy. Viewer: nothing. Arranger: customize, move, resize. Owner: everything, including reset.',
 		},
 	},
 	parameters: {
@@ -777,7 +805,9 @@ export const Policy: StoryObj< PolicyStoryProps > = {
 				story: `
 The application governs the dashboard; the widget types stay untouched. This story mounts \`WidgetDashboard.Policy\` around the dashboard with a \`canPerform\` closing over the signed-in profile and the active section, and composes the dashboard inside an admin \`Page\`: the section links in its navigation, the dashboard actions in its actions slot.
 
-Switch the \`profile\` control. A Viewer gets no Customize button, no attribute controls, and read-only widgets (no \`setAttributes\`). An Arranger enters customize mode and drags or resizes tiles, but has no Add widget trigger, no Remove control, and no attribute editing. An Owner does everything.
+Switch the \`profile\` control. A Viewer gets no Customize button, no Reset to default entry, no attribute controls, and read-only widgets (no \`setAttributes\`). An Arranger enters customize mode and drags or resizes tiles, but has no Add widget trigger, no Reset to default entry, no Remove control, and no attribute editing. An Owner does everything.
+
+The command palette is mounted too: press ⌘K (Ctrl+K outside macOS) and the commands follow the same policy. An Owner sees Customize dashboard, Add dashboard widgets, and Reset dashboard widgets to default; an Arranger keeps Customize dashboard only; a Viewer gets no dashboard commands.
 
 Switch the section, then open "Add widget": the listing follows the section, even while open; the excluded types keep rendering where already placed because the \`widgetTypes\` registry never changes.
 

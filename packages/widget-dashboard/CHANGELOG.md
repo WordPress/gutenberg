@@ -17,6 +17,10 @@
 -   The Add widget button and command show only while the policy lets some
     registered type be inserted
     ([#81967](https://github.com/WordPress/gutenberg/pull/81967)).
+-   `WidgetDashboard.Policy` governs `reset`: the Reset to default entry in
+    the overflow menu, the `core/dashboard/reset-to-default` command, and
+    the confirmation prompt are hidden while the policy denies it
+    ([#82255](https://github.com/WordPress/gutenberg/pull/82255)).
 
 ### Internal
 

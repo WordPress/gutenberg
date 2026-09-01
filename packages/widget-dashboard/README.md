@@ -193,6 +193,7 @@ type CanPerformDashboardOperation = (
 
 type DashboardOperationRequest =
 	| { operation: 'customize' }
+	| { operation: 'reset' }
 	| { operation: 'insert'; widgetType: WidgetType }
 	| {
 			operation: 'remove' | 'move' | 'resize' | 'edit';
@@ -225,6 +226,7 @@ Each request names the operation and carries its subject, so a branch on `reques
 | Operation   | Subject                 | What it gates                                                                                                                                                                                     |
 | ----------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `customize` | none                    | The Customize button, the `core/dashboard/customize` command, the `core/dashboard/add-widgets` command outside edit mode, and the automatic entry into customize mode on an empty layout.         |
+| `reset`     | none                    | The Reset to default entry in the overflow menu, the `core/dashboard/reset-to-default` command, and the confirmation prompt they open. A denied reset is hidden, not disabled.                    |
 | `insert`    | `widgetType`            | Whether the inserter offers the type; a rejected type keeps rendering where already placed. The Add widget button and command show only while some registered type is insertable.                 |
 | `remove`    | `widget`, `widgetType?` | The Remove control in customize mode. The staging layer re-asserts, in place, a locked instance dropped by any trigger.                                                                           |
 | `move`      | `widget`, `widgetType?` | Dragging the tile in customize mode. A denied tile is pinned: it holds its index while the other tiles reorder around it; a change ahead of it can still reflow the cell it lands in.             |
