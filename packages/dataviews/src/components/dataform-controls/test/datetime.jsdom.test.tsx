@@ -325,16 +325,20 @@ describe( 'DateTime control', () => {
 			);
 		} );
 
-		it( 'falls back to the UTC offset on a site with a manual offset', () => {
-			setSiteOffset( 14 );
+		// The manual offset reaches Calendar as a raw offset identifier,
+		// which Node 20 rejects — see `supportsOffsetTimeZones`.
+		describeWithOffsetTimeZones( 'on a site with a manual offset', () => {
+			it( 'falls back to the UTC offset', () => {
+				setSiteOffset( 14 );
 
-			render(
-				<DateTimeHarness initialValue="2026-08-15T12:30:00.000Z" />
-			);
+				render(
+					<DateTimeHarness initialValue="2026-08-15T12:30:00.000Z" />
+				);
 
-			expect(
-				screen.getByLabelText( 'Date time' )
-			).toHaveAccessibleDescription( 'Timezone: UTC+14' );
+				expect(
+					screen.getByLabelText( 'Date time' )
+				).toHaveAccessibleDescription( 'Timezone: UTC+14' );
+			} );
 		} );
 
 		it( 'spells out a UTC site timezone for a non-UTC visitor', () => {
