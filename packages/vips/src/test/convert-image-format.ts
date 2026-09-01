@@ -3,6 +3,15 @@
  */
 import { convertImageFormat, compressImage } from '../';
 
+/*
+ * Controls whether the mocked source image reports the `palette` metadata
+ * field, which libvips attaches only for indexed sources.
+ */
+const mockState = { hasPalette: false };
+
+// GType of `gint`. Only whether `getTypeof` returns non-zero matters here.
+const G_TYPE_INT = 24;
+
 const mockNewFromBuffer = jest.fn( () => new MockImage() );
 const mockWriteToBuffer = jest.fn( () => ( {
 	buffer: '',
@@ -13,7 +22,23 @@ class MockImage {
 	height = 100;
 	pageHeight = 100;
 	writeToBuffer = mockWriteToBuffer;
-	getInt = jest.fn( () => 0 );
+	/*
+	 * Mirrors libvips: reading a field the image does not carry throws
+	 * rather than returning a falsy default. The production helpers rely
+	 * on that, so the mock has to throw too or their fallbacks would
+	 * never be exercised.
+	 */
+	getInt = jest.fn( ( name: string ) => {
+		throw new Error( `${ name }: no such field` );
+	} );
+	/*
+	 * libvips only attaches `palette` when the source was indexed, so
+	 * presence is the signal. Absent fields report GType 0 rather than
+	 * throwing.
+	 */
+	getTypeof = jest.fn( ( name: string ) =>
+		'palette' === name && mockState.hasPalette ? G_TYPE_INT : 0
+	);
 }
 
 class MockVipsImage {
@@ -32,6 +57,7 @@ jest.mock( 'wasm-vips', () =>
 describe( 'convertImageFormat', () => {
 	afterEach( () => {
 		jest.clearAllMocks();
+		mockState.hasPalette = false;
 	} );
 
 	it( 'loads only the first frame when converting a GIF to JPEG', async () => {
@@ -96,5 +122,71 @@ describe( 'convertImageFormat', () => {
 		);
 
 		expect( mockNewFromBuffer ).toHaveBeenCalledWith( buffer, '', {} );
+	} );
+
+	describe( 'indexed (palette) PNG', () => {
+		/*
+		 * Regression tests for https://core.trac.wordpress.org/ticket/65922.
+		 * libvips decodes an indexed PNG into RGB(A) pixels, so pngsave has to
+		 * be told to quantise back down. Otherwise compressing or converting
+		 * to PNG rewrites the image as truecolour and inflates it.
+		 */
+		it( 'quantises a compressed indexed PNG back to a palette', async () => {
+			mockState.hasPalette = true;
+			const pngFile = new File( [ '<BLOB>' ], 'example.png', {
+				type: 'image/png',
+			} );
+			const buffer = await pngFile.arrayBuffer();
+
+			await compressImage( 'itemId', buffer, 'image/png' );
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.png',
+				expect.objectContaining( { palette: true } )
+			);
+			// `Q` is pngsave's quantisation quality and only applies once
+			// `palette` is on, so the lossy image quality must not leak in.
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.png',
+				expect.not.objectContaining( { Q: expect.anything() } )
+			);
+		} );
+
+		it( 'leaves a truecolour PNG unquantised', async () => {
+			// libvips attaches `palette` only for an indexed source, so a
+			// truecolour PNG carries no such field.
+			mockState.hasPalette = false;
+			const pngFile = new File( [ '<BLOB>' ], 'example.png', {
+				type: 'image/png',
+			} );
+			const buffer = await pngFile.arrayBuffer();
+
+			await compressImage( 'itemId', buffer, 'image/png' );
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.png',
+				expect.not.objectContaining( { palette: expect.anything() } )
+			);
+		} );
+
+		it( 'does not quantise when converting an indexed source away from PNG', async () => {
+			mockState.hasPalette = true;
+			const pngFile = new File( [ '<BLOB>' ], 'example.png', {
+				type: 'image/png',
+			} );
+			const buffer = await pngFile.arrayBuffer();
+
+			await convertImageFormat(
+				'itemId',
+				buffer,
+				'image/png',
+				'image/webp'
+			);
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.webp',
+				expect.not.objectContaining( { palette: expect.anything() } )
+			);
+		} );
 	} );
 } );

@@ -14,7 +14,18 @@ const mockWriteToBuffer = jest.fn( () => ( {
 
 // Controls the `heif-bitdepth` value reported by the mocked source image so
 // tests can exercise both the standard (8-bit) and high-bit-depth code paths.
-let mockBitdepth = 8;
+/*
+ * Controls the metadata fields reported by the mocked source image.
+ * `undefined` means the field is absent, which is the common case: a JPEG
+ * carries neither `heif-bitdepth` nor `palette`.
+ */
+const mockState: { bitdepth: number | undefined; hasPalette: boolean } = {
+	bitdepth: undefined,
+	hasPalette: false,
+};
+
+// GType of `gint`. Only whether `getTypeof` returns non-zero matters here.
+const G_TYPE_INT = 24;
 
 class MockImage {
 	width = 100;
@@ -23,8 +34,23 @@ class MockImage {
 	crop = mockCrop;
 	resize = mockResize;
 	writeToBuffer = mockWriteToBuffer;
-	getInt = jest.fn( ( name: string ) =>
-		'heif-bitdepth' === name ? mockBitdepth : 0
+	/*
+	 * Mirrors libvips: reading a field the image does not carry throws rather
+	 * than returning a falsy default. The production helpers rely on that, so
+	 * the mock has to throw too or their fallbacks would never be exercised.
+	 */
+	getInt = jest.fn( ( name: string ) => {
+		if ( 'heif-bitdepth' === name && undefined !== mockState.bitdepth ) {
+			return mockState.bitdepth;
+		}
+		throw new Error( `${ name }: no such field` );
+	} );
+	/*
+	 * libvips only attaches `palette` when the source was indexed, so presence
+	 * is the signal. Absent fields report GType 0 rather than throwing.
+	 */
+	getTypeof = jest.fn( ( name: string ) =>
+		'palette' === name && mockState.hasPalette ? G_TYPE_INT : 0
 	);
 }
 
@@ -45,7 +71,8 @@ jest.mock( 'wasm-vips', () =>
 describe( 'resizeImage', () => {
 	afterEach( () => {
 		jest.clearAllMocks();
-		mockBitdepth = 8;
+		mockState.bitdepth = undefined;
+		mockState.hasPalette = false;
 	} );
 
 	it( 'resizes without crop', async () => {
@@ -262,7 +289,7 @@ describe( 'resizeImage', () => {
 
 	describe( 'high-bit-depth AVIF', () => {
 		it( 'preserves bit depth when resizing a 10-bit AVIF without crop', async () => {
-			mockBitdepth = 10;
+			mockState.bitdepth = 10;
 			const avifFile = new File( [ '<BLOB>' ], 'example.avif', {
 				type: 'image/avif',
 			} );
@@ -285,7 +312,7 @@ describe( 'resizeImage', () => {
 		} );
 
 		it( 'centre-crops a 12-bit AVIF while preserving bit depth', async () => {
-			mockBitdepth = 12;
+			mockState.bitdepth = 12;
 			const avifFile = new File( [ '<BLOB>' ], 'example.avif', {
 				type: 'image/avif',
 			} );
@@ -307,7 +334,7 @@ describe( 'resizeImage', () => {
 		} );
 
 		it( 'crops a 10-bit AVIF to a position while preserving bit depth', async () => {
-			mockBitdepth = 10;
+			mockState.bitdepth = 10;
 			const avifFile = new File( [ '<BLOB>' ], 'example.avif', {
 				type: 'image/avif',
 			} );
@@ -331,7 +358,7 @@ describe( 'resizeImage', () => {
 		} );
 
 		it( 'uses the standard thumbnail path for an 8-bit AVIF', async () => {
-			mockBitdepth = 8;
+			mockState.bitdepth = 8;
 			const avifFile = new File( [ '<BLOB>' ], 'example.avif', {
 				type: 'image/avif',
 			} );
@@ -395,7 +422,7 @@ describe( 'resizeImage', () => {
 
 	describe( 'image_max_bit_depth', () => {
 		it( 'caps a 12-bit AVIF at 10-bit', async () => {
-			mockBitdepth = 12;
+			mockState.bitdepth = 12;
 			const avifFile = new File( [ '<BLOB>' ], 'example.avif', {
 				type: 'image/avif',
 			} );
@@ -422,7 +449,7 @@ describe( 'resizeImage', () => {
 		} );
 
 		it( 'snaps an unsupported cap down to the nearest valid depth', async () => {
-			mockBitdepth = 12;
+			mockState.bitdepth = 12;
 			const avifFile = new File( [ '<BLOB>' ], 'example.avif', {
 				type: 'image/avif',
 			} );
@@ -446,7 +473,7 @@ describe( 'resizeImage', () => {
 		} );
 
 		it( 'flattens a 10-bit AVIF via the thumbnail path when capped at 8-bit', async () => {
-			mockBitdepth = 10;
+			mockState.bitdepth = 10;
 			const avifFile = new File( [ '<BLOB>' ], 'example.avif', {
 				type: 'image/avif',
 			} );
@@ -474,7 +501,7 @@ describe( 'resizeImage', () => {
 		} );
 
 		it( 'ignores the cap for sources at or below it', async () => {
-			mockBitdepth = 10;
+			mockState.bitdepth = 10;
 			const avifFile = new File( [ '<BLOB>' ], 'example.avif', {
 				type: 'image/avif',
 			} );
@@ -494,6 +521,76 @@ describe( 'resizeImage', () => {
 			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
 				'.avif',
 				expect.objectContaining( { bitdepth: 10 } )
+			);
+		} );
+	} );
+	describe( 'indexed (palette) PNG', () => {
+		/*
+		 * Regression tests for https://core.trac.wordpress.org/ticket/65922.
+		 * libvips decodes an indexed PNG into RGB(A) pixels, so pngsave has to
+		 * be told to quantise back down. Otherwise every sub-size is written
+		 * as truecolour and can be larger than the indexed original.
+		 */
+		it( 'quantises sub-sizes of an indexed PNG back to a palette', async () => {
+			mockState.hasPalette = true;
+			const pngFile = new File( [ '<BLOB>' ], 'example.png', {
+				type: 'image/png',
+			} );
+			const buffer = await pngFile.arrayBuffer();
+
+			await resizeImage( 'itemId', buffer, 'image/png', {
+				width: 50,
+				height: 50,
+			} );
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.png',
+				expect.objectContaining( { palette: true } )
+			);
+			// `Q` is pngsave's quantisation quality and only applies once
+			// `palette` is on, so the lossy image quality must not leak in.
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.png',
+				expect.not.objectContaining( { Q: expect.anything() } )
+			);
+		} );
+
+		it( 'leaves a truecolour PNG unquantised', async () => {
+			// libvips attaches `palette` only for an indexed source, so a
+			// truecolour PNG carries no such field.
+			mockState.hasPalette = false;
+			const pngFile = new File( [ '<BLOB>' ], 'example.png', {
+				type: 'image/png',
+			} );
+			const buffer = await pngFile.arrayBuffer();
+
+			await resizeImage( 'itemId', buffer, 'image/png', {
+				width: 50,
+				height: 50,
+			} );
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.png',
+				expect.not.objectContaining( { palette: expect.anything() } )
+			);
+		} );
+
+		it( 'does not quantise non-PNG output from an indexed source', async () => {
+			// A GIF is always indexed, but only pngsave takes `palette`.
+			mockState.hasPalette = true;
+			const gifFile = new File( [ '<BLOB>' ], 'example.gif', {
+				type: 'image/gif',
+			} );
+			const buffer = await gifFile.arrayBuffer();
+
+			await resizeImage( 'itemId', buffer, 'image/gif', {
+				width: 50,
+				height: 50,
+			} );
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.gif',
+				expect.not.objectContaining( { palette: expect.anything() } )
 			);
 		} );
 	} );
