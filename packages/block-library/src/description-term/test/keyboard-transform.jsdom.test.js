@@ -1,3 +1,4 @@
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { RichTextData } from '@wordpress/rich-text';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import { TAB } from '@wordpress/keycodes';
@@ -19,13 +20,13 @@ function createTabEvent( { shiftKey = false } = {} ) {
 		metaKey: false,
 		ctrlKey: false,
 		defaultPrevented: false,
-		preventDefault: jest.fn(),
+		preventDefault: vi.fn(),
 	};
 }
 
 function setupTransform( { blockName, content, event } ) {
-	const replaceBlock = jest.fn();
-	const selectionChange = jest.fn();
+	const replaceBlock = vi.fn();
+	const selectionChange = vi.fn();
 	const result = transformDescriptionListItem( {
 		attributes: {
 			content,
