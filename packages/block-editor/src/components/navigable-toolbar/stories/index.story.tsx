@@ -1,3 +1,4 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import {
 	createBlock,
 	getBlockType,
@@ -17,7 +18,11 @@ import WritingFlow from '../../writing-flow';
 const BLOCK_NAME = 'storybook/example';
 const BLOCK_LABELS = [ 'First', 'Second' ];
 
-function ExampleBlockEdit( { attributes } ) {
+function ExampleBlockEdit( {
+	attributes,
+}: {
+	attributes: { content: string };
+} ) {
 	return <p { ...useBlockProps() }>{ attributes.content }</p>;
 }
 
@@ -61,7 +66,7 @@ const storyStyles = `
 	}
 `;
 
-const meta = {
+const meta: Meta< typeof NavigableToolbar > = {
 	title: 'BlockEditor/NavigableToolbar',
 	component: NavigableToolbar,
 	parameters: {
@@ -162,7 +167,7 @@ const meta = {
 
 export default meta;
 
-export const Default = {
+export const Default: StoryObj< typeof NavigableToolbar > = {
 	render: function Template( args ) {
 		return (
 			<NavigableToolbar { ...args }>
