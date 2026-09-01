@@ -45,12 +45,7 @@ export const code = {
 
 		value = remove( value, startIndex, startIndex + 1 );
 		value = remove( value, endIndex, endIndex + 1 );
-		value = applyFormat(
-			value,
-			{ type: name, title },
-			startIndex,
-			endIndex
-		);
+		value = applyFormat( value, { type: name }, startIndex, endIndex );
 
 		return value;
 	},
