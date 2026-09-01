@@ -18,18 +18,13 @@ import { Popover } from '@wordpress/components';
 import { Tabs } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import type { RichTextValue } from '@wordpress/rich-text';
+import type { ColorObject } from '../types';
 import { textColor as settings, transparentValue } from './index';
 
 const TABS = [
 	{ name: 'color', title: __( 'Text' ) },
 	{ name: 'backgroundColor', title: __( 'Background' ) },
 ];
-
-type ColorObject = {
-	slug: string;
-	color: string;
-	name?: string;
-};
 
 function parseCSS( css = '' ): { color?: string; backgroundColor?: string } {
 	return css

@@ -190,8 +190,8 @@ function Edit( {
 					name="link"
 					icon={ linkIcon }
 					title={ isActive ? __( 'Link' ) : title }
-					onClick={ ( event: MouseEvent ) => {
-						addLink( event.currentTarget as HTMLElement );
+					onClick={ ( event: React.MouseEvent< HTMLElement > ) => {
+						addLink( event.currentTarget );
 					} }
 					isActive={ isActive || addingLink }
 					shortcutType="primary"

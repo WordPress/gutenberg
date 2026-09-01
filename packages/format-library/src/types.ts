@@ -60,6 +60,15 @@ export type {
 	BaseFormatEditProps as UnknownEditProps,
 };
 
+/**
+ * A colour entry from the `color.palette` theme setting.
+ */
+export interface ColorObject {
+	slug: string;
+	color: string;
+	name?: string;
+}
+
 export interface EditImageProps {
 	value: RichTextValue;
 	onChange: ( value: RichTextValue ) => void;

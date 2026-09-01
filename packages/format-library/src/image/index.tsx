@@ -176,7 +176,7 @@ function Edit( {
 					alt,
 					width: imgWidth,
 				}: {
-					id: string;
+					id: number;
 					url: string;
 					alt: string;
 					width: number;

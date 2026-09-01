@@ -209,8 +209,6 @@ function InlineLinkUI( {
 				) => RichTextValue[] | undefined
 			 )( value, boundary.start, boundary.start );
 
-			const [ valBefore, valAfter ] = splitValue ?? [];
-
 			// Update the original (full) RichTextValue replacing the
 			// target text with the *new* RichTextValue containing:
 			// 1. The new text content.
@@ -223,13 +221,22 @@ function InlineLinkUI( {
 			// Note original formats will be lost when applying this change.
 			// That is expected behaviour.
 			// See: https://github.com/WordPress/gutenberg/pull/33849#issuecomment-936134179.
-			const newValAfter = replace(
-				valAfter,
-				richTextText,
-				() => newValue
-			);
+			if ( splitValue ) {
+				const [ valBefore, valAfter ] = splitValue;
+				const newValAfter = replace(
+					valAfter,
+					richTextText,
+					() => newValue
+				);
 
-			newValue = concat( valBefore, newValAfter );
+				newValue = concat( valBefore, newValAfter );
+			} else {
+				// `split` returns `undefined` when the value carries no
+				// selection, leaving nothing to split on. Replace within the
+				// full value instead: the targeted-replacement protection
+				// above is unavailable, but the user's edit still applies.
+				newValue = replace( value, richTextText, () => newValue );
+			}
 		}
 
 		onChange( newValue );

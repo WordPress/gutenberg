@@ -12,6 +12,7 @@ import {
 } from '@wordpress/icons';
 import { removeFormat } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';
+import type { ColorObject } from '../types';
 import { default as InlineColorUI, getActiveColors } from './inline';
 
 export const transparentValue = 'rgba(0, 0, 0, 0)';
@@ -19,7 +20,7 @@ export const transparentValue = 'rgba(0, 0, 0, 0)';
 const name = 'core/text-color';
 const title = __( 'Highlight' );
 
-const EMPTY_ARRAY: string[] = [];
+const EMPTY_ARRAY: ColorObject[] = [];
 
 function getComputedStyleProperty( element: HTMLElement, property: string ) {
 	const { ownerDocument } = element;
@@ -39,10 +40,12 @@ function getComputedStyleProperty( element: HTMLElement, property: string ) {
 }
 
 function fillComputedColors(
-	element: HTMLElement,
+	element: HTMLElement | null,
 	{ color, backgroundColor }: { color?: string; backgroundColor?: string }
 ) {
-	if ( ! color && ! backgroundColor ) {
+	// `element` is the editable content element, which is null before the
+	// rich text mounts. There are no computed styles to read without it.
+	if ( ! element || ( ! color && ! backgroundColor ) ) {
 		return;
 	}
 
@@ -76,7 +79,7 @@ function TextColorEdit( {
 	const colorIndicatorStyle = useMemo(
 		() =>
 			fillComputedColors(
-				contentRef.current as HTMLElement,
+				contentRef.current,
 				getActiveColors( value, name, colors )
 			),
 		[ contentRef, value, colors ]
