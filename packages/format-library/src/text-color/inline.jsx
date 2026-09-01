@@ -17,6 +17,7 @@ import { Popover } from '@wordpress/components';
 import { Tabs } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { textColor as settings, transparentValue } from './index';
+import { getHighlightTextColorStyle } from './utils';
 
 const TABS = [
 	{ name: 'color', title: __( 'Text' ) },
@@ -100,6 +101,15 @@ function setColors( value, name, colorSettings, colors ) {
 		} else {
 			styles.push( [ 'color', color ].join( ':' ) );
 		}
+	}
+
+	const textColorStyle = getHighlightTextColorStyle( {
+		color,
+		backgroundColor,
+	} );
+
+	if ( textColorStyle ) {
+		styles.push( textColorStyle );
 	}
 
 	if ( styles.length ) {

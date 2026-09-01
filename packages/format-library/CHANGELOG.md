@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Highlight: Inherit block-level text color when only a background highlight is applied. ([#36532](https://github.com/WordPress/gutenberg/issues/36532))
 -   Prevent Highlight format toolbar from crashing when switching to Edit as HTML with background-only formatting active. ([#82215](https://github.com/WordPress/gutenberg/pull/82215))
 
 ### Internal
