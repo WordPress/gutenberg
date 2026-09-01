@@ -903,7 +903,7 @@ const enforcementPolicy: CanPerformDashboardOperation = ( request ) => {
 	if ( request.operation === 'insert' ) {
 		return request.widgetType.name !== goalProgressWidgetType.name;
 	}
-	if ( request.operation === 'customize' ) {
+	if ( ! ( 'widget' in request ) ) {
 		return true;
 	}
 	return ! TILE_LOCKS[ request.widget.uuid ]?.includes( request.operation );

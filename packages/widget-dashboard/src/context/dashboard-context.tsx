@@ -13,6 +13,7 @@ import type {
 	ResolveWidgetModule,
 	WidgetType,
 } from '@wordpress/widget-primitives';
+import { canonicalizeLayout } from '../utils/canonicalize-layout';
 import { DEFAULT_GRID } from '../utils/default-grid';
 import { enforceLayoutPolicy } from '../utils/enforce-layout-policy';
 import { normalizeGridSettings } from '../utils/normalize-grid-settings';
@@ -45,33 +46,6 @@ const DEFAULT_RESOLVE_WIDGET_MODULE: ResolveWidgetModule = ( moduleId ) =>
  * A single global timer, so editing several widgets settles into one save.
  */
 const AUTO_SAVE_DELAY_MS = 5000;
-
-/**
- * Canonical form of `layout`: widgets sorted by `placement.order` (falling
- * back to array index), then `order` stripped since position now implies it.
- * Used both as the comparison form for `hasUncommittedChanges` (so a change
- * and its undo compare equal) and as the publish form, keeping persisted
- * payloads free of redundant `order` fields.
- *
- * @param {DashboardWidget[]} layout Layout to canonicalize.
- * @return {DashboardWidget[]} Canonicalized layout.
- */
-function canonicalize( layout: DashboardWidget[] ): DashboardWidget[] {
-	const indexed = layout.map( ( widget, index ) => ( {
-		widget,
-		order: widget.placement?.order ?? index,
-	} ) );
-
-	indexed.sort( ( a, b ) => a.order - b.order );
-
-	return indexed.map( ( { widget } ) => {
-		if ( ! widget.placement ) {
-			return widget;
-		}
-		const { order: _stripped, ...placement } = widget.placement;
-		return { ...widget, placement };
-	} );
-}
 
 /**
  * Rich state distributed to every compound component inside `WidgetDashboard`.
@@ -221,16 +195,20 @@ export function WidgetDashboardProvider( {
 
 	// Every mutation stages through here, diffed against the current
 	// staging so every change the policy denies is re-asserted before it
-	// lands: what the interface hides, the staging layer rejects.
+	// lands: what the interface hides, the staging layer rejects. Without
+	// a policy there is nothing to enforce, and staging stays byte-equal
+	// to what the trigger wrote.
 	const stageLayout = useCallback(
 		( next: DashboardWidget[] ) => {
 			setStagingLayout( ( previous ) =>
-				enforceLayoutPolicy( {
-					previous,
-					next,
-					canPerform,
-					widgetTypes,
-				} )
+				canPerform === ALLOW_EVERY_OPERATION
+					? next
+					: enforceLayoutPolicy( {
+							previous,
+							next,
+							canPerform,
+							widgetTypes,
+					  } )
 			);
 		},
 		[ canPerform, widgetTypes ]
@@ -251,8 +229,8 @@ export function WidgetDashboardProvider( {
 	const hasLayoutChanges = useMemo(
 		() =>
 			! fastDeepEqual(
-				canonicalize( committedLayout ),
-				canonicalize( stagingLayout )
+				canonicalizeLayout( committedLayout ),
+				canonicalizeLayout( stagingLayout )
 			),
 		[ committedLayout, stagingLayout ]
 	);
@@ -262,7 +240,7 @@ export function WidgetDashboardProvider( {
 	const commit = useCallback(
 		( options?: CommitOptions ) => {
 			if ( hasLayoutChanges ) {
-				onLayoutChange( canonicalize( stagingLayout ) );
+				onLayoutChange( canonicalizeLayout( stagingLayout ) );
 			}
 
 			if ( options?.exitEditMode !== false ) {

@@ -179,11 +179,7 @@ describe( 'enforceLayoutPolicy', () => {
 				widgetTypes,
 			} );
 
-			expect( result[ 0 ].placement ).toEqual( {
-				width: 1,
-				height: 1,
-				order: 5,
-			} );
+			expect( result[ 0 ].placement ).toEqual( { width: 1, height: 1 } );
 		} );
 
 		it( 'drops spans a denied resize introduced on a bare instance', () => {
@@ -257,13 +253,94 @@ describe( 'enforceLayoutPolicy', () => {
 			expect( result ).toBe( next );
 		} );
 
-		it( 're-asserts the explicit ordering fields when move is denied', () => {
-			const previous = [
-				widget( 'a', { placement: { width: 1, order: 0 } } ),
-			];
+		it( 'reads a reorder the grid expressed through order fields', () => {
+			const previous = [ widget( 'a' ), widget( 'b' ), widget( 'c' ) ];
+			// The grid emits reorders in the old array order with fresh
+			// `order` stamps: "move a after c" while b is pinned.
 			const next = [
-				{ ...previous[ 0 ], placement: { width: 2, order: 7 } },
+				{ ...previous[ 0 ], placement: { order: 2 } },
+				{ ...previous[ 1 ], placement: { order: 1 } },
+				{ ...previous[ 2 ], placement: { order: 0 } },
 			];
+			const pinB: CanPerformDashboardOperation = ( request ) =>
+				! (
+					request.operation === 'move' && request.widget.uuid === 'b'
+				);
+
+			const result = enforceLayoutPolicy( {
+				previous,
+				next,
+				canPerform: pinB,
+				widgetTypes,
+			} );
+
+			expect( uuids( result ) ).toEqual( [ 'c', 'b', 'a' ] );
+			expect( result[ 0 ].placement ).toEqual( {} );
+		} );
+
+		it( 'holds the canonical position through a reorder followed by a removal', () => {
+			const previous = [
+				widget( 'a' ),
+				widget( 'b' ),
+				widget( 'c' ),
+				widget( 'd' ),
+			];
+			const pinB: CanPerformDashboardOperation = ( request ) =>
+				! (
+					request.operation === 'move' && request.widget.uuid === 'b'
+				);
+
+			// Grid emission for "move a after c" while b is pinned.
+			const afterDrag = enforceLayoutPolicy( {
+				previous,
+				next: [
+					{ ...previous[ 0 ], placement: { order: 2 } },
+					{ ...previous[ 1 ], placement: { order: 1 } },
+					{ ...previous[ 2 ], placement: { order: 0 } },
+					{ ...previous[ 3 ], placement: { order: 3 } },
+				],
+				canPerform: pinB,
+				widgetTypes,
+			} );
+
+			expect( uuids( afterDrag ) ).toEqual( [ 'c', 'b', 'a', 'd' ] );
+
+			// Then remove the dragged tile: b keeps its second position.
+			const afterRemoval = enforceLayoutPolicy( {
+				previous: afterDrag,
+				next: afterDrag.filter( ( { uuid } ) => uuid !== 'a' ),
+				canPerform: pinB,
+				widgetTypes,
+			} );
+
+			expect( uuids( afterRemoval ) ).toEqual( [ 'c', 'b', 'd' ] );
+		} );
+
+		it( 're-asserts a move expressed through order fields alone', () => {
+			const previous = [ widget( 'a' ), widget( 'b' ), widget( 'c' ) ];
+			const next = [
+				previous[ 0 ],
+				{ ...previous[ 1 ], placement: { order: 5 } },
+				previous[ 2 ],
+			];
+			const pinB: CanPerformDashboardOperation = ( request ) =>
+				! (
+					request.operation === 'move' && request.widget.uuid === 'b'
+				);
+
+			const result = enforceLayoutPolicy( {
+				previous,
+				next,
+				canPerform: pinB,
+				widgetTypes,
+			} );
+
+			expect( uuids( result ) ).toEqual( [ 'a', 'b', 'c' ] );
+		} );
+
+		it( 'keeps the lane of a move-denied instance', () => {
+			const previous = [ widget( 'a', { placement: { lane: 0 } } ) ];
+			const next = [ { ...previous[ 0 ], placement: { lane: 2 } } ];
 
 			const result = enforceLayoutPolicy( {
 				previous,
@@ -272,7 +349,7 @@ describe( 'enforceLayoutPolicy', () => {
 				widgetTypes,
 			} );
 
-			expect( result[ 0 ].placement ).toEqual( { width: 2, order: 0 } );
+			expect( result[ 0 ].placement ).toEqual( { lane: 0 } );
 		} );
 	} );
 
@@ -334,8 +411,7 @@ describe( 'enforceLayoutPolicy', () => {
 				return request.widgetType.name !== 'test/two';
 			}
 			return ! (
-				request.operation !== 'customize' &&
-				request.widget.uuid === 'locked'
+				'widget' in request && request.widget.uuid === 'locked'
 			);
 		};
 

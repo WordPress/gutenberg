@@ -1,5 +1,6 @@
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import type { WidgetType } from '@wordpress/widget-primitives';
+import { canonicalizeLayout } from './canonicalize-layout';
 import type {
 	CanPerformDashboardOperation,
 	DashboardInstanceOperation,
@@ -9,11 +10,11 @@ import type {
 
 /*
  * Placement fields by facet. `resize` owns the spans; `move` owns the
- * explicit ordering fields. The array position itself is also a `move`
- * facet, enforced by holding the instance's index.
+ * masonry lane pin. Explicit `order` never reaches the diff: both
+ * layouts are canonicalized first, so position IS the array position.
  */
 const SIZE_FIELDS = [ 'width', 'height' ] as const;
-const POSITION_FIELDS = [ 'order', 'lane' ] as const;
+const POSITION_FIELDS = [ 'lane' ] as const;
 
 type PlacementFields = readonly string[];
 
@@ -83,21 +84,29 @@ interface EnforceLayoutPolicyArgs {
  * Per instance: a new instance whose type the policy rejects for
  * `insert` is dropped (an unregistered type passes: there is no type
  * to ask about); denied `edit` keeps the staged `attributes`; denied
- * `resize` keeps the placement spans; denied `move` keeps the explicit
- * ordering fields and holds the instance's index, adjusted for allowed
- * membership changes: the same hold `remove` uses, and the position
- * the grid's pinned items keep. Returns `next` itself when nothing was
- * re-asserted.
+ * `resize` keeps the placement spans; denied `move` keeps the masonry
+ * `lane` and holds the instance's canonical position, adjusted for
+ * allowed membership changes: the same hold `remove` uses, and the
+ * position the grid's pinned items keep.
+ *
+ * Both layouts are canonicalized before the diff (sorted by
+ * `order ?? index` with `order` stripped, as the renderer and the
+ * commit read them), so a move is a move whichever encoding expressed
+ * it. Returns `next` itself when it was already canonical and nothing
+ * was re-asserted.
  *
  * @param {EnforceLayoutPolicyArgs} args The layouts to diff and the policy.
  * @return {DashboardWidget[]} The incoming layout with denied changes re-asserted.
  */
 export function enforceLayoutPolicy( {
-	previous,
-	next,
+	previous: rawPrevious,
+	next: rawNext,
 	canPerform,
 	widgetTypes,
 }: EnforceLayoutPolicyArgs ): DashboardWidget[] {
+	const previous = canonicalizeLayout( rawPrevious );
+	const next = canonicalizeLayout( rawNext );
+
 	const typeOf = ( widget: DashboardWidget ) =>
 		widgetTypes.find( ( type ) => type.name === widget.type );
 	const priorByUuid = new Map(
