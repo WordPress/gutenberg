@@ -43,6 +43,15 @@ export function useNavigateRegions( shortcuts: Shortcuts = defaultShortcuts ) {
 	const ref = useRef< HTMLDivElement >( null );
 	const [ isFocusingRegions, setIsFocusingRegions ] = useState( false );
 
+	function getWrappingRegion() {
+		// Based off the current element, use closest to determine the wrapping region since this operates up the DOM. Also, match tabindex to avoid edge cases with regions we do not want.
+		return (
+			ref.current?.ownerDocument?.activeElement?.closest< HTMLElement >(
+				'[role="region"][tabindex="-1"]'
+			) ?? null
+		);
+	}
+
 	function focusRegion( offset: number ) {
 		const regions = Array.from(
 			ref.current?.querySelectorAll< HTMLElement >(
@@ -53,11 +62,7 @@ export function useNavigateRegions( shortcuts: Shortcuts = defaultShortcuts ) {
 			return;
 		}
 		let nextRegion = regions[ 0 ];
-		// Based off the current element, use closest to determine the wrapping region since this operates up the DOM. Also, match tabindex to avoid edge cases with regions we do not want.
-		const wrappingRegion =
-			ref.current?.ownerDocument?.activeElement?.closest< HTMLElement >(
-				'[role="region"][tabindex="-1"]'
-			);
+		const wrappingRegion = getWrappingRegion();
 		const selectedIndex = wrappingRegion
 			? regions.indexOf( wrappingRegion )
 			: -1;
@@ -91,6 +96,54 @@ export function useNavigateRegions( shortcuts: Shortcuts = defaultShortcuts ) {
 		ref: useMergeRefs( [ ref, clickRef ] ),
 		className: isFocusingRegions ? 'is-focusing-regions' : '',
 		onKeyDown( event: React.KeyboardEvent< HTMLDivElement > ) {
+			// A prevented Escape closed a popover, cancelled an operation, or
+			// stepped out inside the canvas; navigation only gets it after
+			// everything else has passed on it.
+			if ( event.defaultPrevented ) {
+				return;
+			}
+
+			if (
+				event.key === 'Escape' &&
+				! event.ctrlKey &&
+				! event.metaKey &&
+				! event.altKey
+			) {
+				const wrappingRegion = getWrappingRegion();
+
+				if ( ! wrappingRegion ) {
+					return;
+				}
+
+				// Listeners delegated at a document level, among them the
+				// canvas listener undoing an automatic change, run after this
+				// handler for the same press. Waiting a microtask lets every
+				// one of them claim the key first: event dispatch is
+				// synchronous, so by then the native event carries the final
+				// word.
+				const { nativeEvent } = event;
+				const { shiftKey } = event;
+				queueMicrotask( () => {
+					if ( nativeEvent.defaultPrevented ) {
+						return;
+					}
+
+					if (
+						wrappingRegion ===
+						ref.current?.ownerDocument?.activeElement
+					) {
+						// On a region itself, move around: forward, or
+						// backward with Shift.
+						focusRegion( shiftKey ? -1 : 1 );
+					} else {
+						// Anywhere inside a region, step out onto it first.
+						wrappingRegion.focus();
+						setIsFocusingRegions( true );
+					}
+				} );
+				return;
+			}
+
 			if (
 				shortcuts.previous.some( ( { modifier, character } ) => {
 					return isKeyboardEvent[ modifier ]( event, character );
