@@ -46,6 +46,15 @@ class Gutenberg_REST_Revisions_Controller extends WP_REST_Revisions_Controller {
 			$data['author'] = (int) $post->post_author;
 		}
 
+		if ( in_array( 'author_name', $fields, true ) ) {
+			$author              = get_userdata( $post->post_author );
+			$data['author_name'] = $author ? $author->display_name : '';
+		}
+
+		if ( in_array( 'author_avatar_urls', $fields, true ) ) {
+			$data['author_avatar_urls'] = rest_get_avatar_urls( (int) $post->post_author );
+		}
+
 		if ( in_array( 'date', $fields, true ) ) {
 			$data['date'] = $this->prepare_date_response( $post->post_date_gmt, $post->post_date );
 		}
@@ -139,5 +148,57 @@ class Gutenberg_REST_Revisions_Controller extends WP_REST_Revisions_Controller {
 		 * @param WP_REST_Request  $request  Request used to generate the response.
 		 */
 		return apply_filters( 'rest_prepare_revision', $response, $post, $request );
+	}
+
+	/**
+	 * Retrieves the revision's schema, conforming to JSON Schema.
+	 *
+	 * Adds `author_name` and `author_avatar_urls` alongside the existing numeric
+	 * `author` field, mirroring WP_REST_Comments_Controller. This lets a client
+	 * render a revision's author without a follow-up request to
+	 * `/wp/v2/users/<id>`.
+	 *
+	 * @see WP_REST_Comments_Controller::get_item_schema()
+	 *
+	 * @return array Item schema data.
+	 */
+	public function get_item_schema() {
+		if ( $this->schema ) {
+			return $this->add_additional_fields_schema( $this->schema );
+		}
+
+		// Populates $this->schema with the core revision schema.
+		parent::get_item_schema();
+
+		$this->schema['properties']['author_name'] = array(
+			'description' => __( 'Display name for the revision author.', 'gutenberg' ),
+			'type'        => 'string',
+			'context'     => array( 'view', 'edit', 'embed' ),
+			'readonly'    => true,
+		);
+
+		if ( get_option( 'show_avatars' ) ) {
+			$avatar_properties = array();
+
+			foreach ( rest_get_avatar_sizes() as $size ) {
+				$avatar_properties[ $size ] = array(
+					/* translators: %d: Avatar image size in pixels. */
+					'description' => sprintf( __( 'Avatar URL with image size of %d pixels.', 'gutenberg' ), $size ),
+					'type'        => 'string',
+					'format'      => 'uri',
+					'context'     => array( 'view', 'edit', 'embed' ),
+				);
+			}
+
+			$this->schema['properties']['author_avatar_urls'] = array(
+				'description' => __( 'Avatar URLs for the revision author.', 'gutenberg' ),
+				'type'        => 'object',
+				'context'     => array( 'view', 'edit', 'embed' ),
+				'readonly'    => true,
+				'properties'  => $avatar_properties,
+			);
+		}
+
+		return $this->add_additional_fields_schema( $this->schema );
 	}
 }
