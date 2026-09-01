@@ -139,7 +139,13 @@ describe( 'Combobox', () => {
 		expect( chipWithRemoveRef.current ).toBeInstanceOf( HTMLDivElement );
 		expect( clearRef.current ).toBeInstanceOf( HTMLButtonElement );
 		expect( emptyRef.current ).toBeInstanceOf( HTMLDivElement );
+		expect( emptyRef.current ).toHaveAttribute( 'role', 'status' );
+		expect( emptyRef.current ).toHaveAttribute( 'aria-live', 'polite' );
+		expect( emptyRef.current ).toHaveAttribute( 'aria-atomic', 'true' );
 		expect( statusRef.current ).toBeInstanceOf( HTMLDivElement );
+		expect( statusRef.current ).toHaveAttribute( 'role', 'status' );
+		expect( statusRef.current ).toHaveAttribute( 'aria-live', 'polite' );
+		expect( statusRef.current ).toHaveAttribute( 'aria-atomic', 'true' );
 	} );
 
 	it( 'uses a custom positioner', async () => {
