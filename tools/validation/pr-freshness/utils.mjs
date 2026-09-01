@@ -60,23 +60,43 @@ export function fail( message ) {
  * @return {Promise<unknown>} Parsed JSON response.
  */
 async function api( path, options = {} ) {
-	const response = await fetch( `${ API_ROOT }${ path }`, {
-		...options,
-		headers: {
-			Authorization: `Bearer ${ TOKEN }`,
-			Accept: 'application/vnd.github+json',
-			'X-GitHub-Api-Version': '2022-11-28',
-			...options.headers,
-		},
-	} );
-	if ( ! response.ok ) {
-		throw new Error(
-			`GitHub API ${ path } failed: ${
-				response.status
-			} ${ await response.text() }`
-		);
+	const RETRYABLE_STATUS = [ 502, 503, 504 ];
+	const MAX_ATTEMPTS = 3;
+	for ( let attempt = 1; ; attempt++ ) {
+		try {
+			const response = await fetch( `${ API_ROOT }${ path }`, {
+				...options,
+				headers: {
+					Authorization: `Bearer ${ TOKEN }`,
+					Accept: 'application/vnd.github+json',
+					'X-GitHub-Api-Version': '2022-11-28',
+					...options.headers,
+				},
+			} );
+			if ( ! response.ok ) {
+				if (
+					RETRYABLE_STATUS.includes( response.status ) &&
+					attempt < MAX_ATTEMPTS
+				) {
+					throw new TypeError( `retryable ${ response.status }` );
+				}
+				throw new Error(
+					`GitHub API ${ path } failed: ${
+						response.status
+					} ${ await response.text() }`
+				);
+			}
+			return response.json();
+		} catch ( error ) {
+			// Network failures surface from fetch as TypeError with a cause.
+			if ( ! ( error instanceof TypeError ) || attempt >= MAX_ATTEMPTS ) {
+				throw error;
+			}
+			await new Promise( ( resolve ) =>
+				setTimeout( resolve, 2000 * attempt )
+			);
+		}
 	}
-	return response.json();
 }
 
 /**
