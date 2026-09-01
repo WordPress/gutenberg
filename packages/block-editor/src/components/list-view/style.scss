@@ -34,7 +34,8 @@
 	// The transform above makes each row its own stacking context, so the focus
 	// ring cannot escape it. Lift the focused row above the siblings that would
 	// otherwise paint over it.
-	&:focus-within {
+	&:focus-within,
+	&.is-nesting {
 		z-index: 1;
 	}
 
