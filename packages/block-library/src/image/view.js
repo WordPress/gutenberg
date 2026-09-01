@@ -618,14 +618,17 @@ const { state, actions, callbacks } = store(
 					return;
 				}
 
-				const figure = ref.parentElement;
-				const figureWidth = ref.parentElement.clientWidth;
+				// The image is not necessarily a direct child of the figure, as
+				// plugins can wrap it, so it uses the container the button is
+				// positioned against rather than the image's parent element.
+				const figure = ref.closest( '.wp-lightbox-container' );
+				const figureWidth = figure.clientWidth;
 
 				// It needs special handling for the height because a caption will cause
 				// the figure to be taller than the image, which means it needs to
 				// account for that when calculating the placement of the button in the
 				// top right corner of the image.
-				let figureHeight = ref.parentElement.clientHeight;
+				let figureHeight = figure.clientHeight;
 				const caption = figure.querySelector( 'figcaption' );
 				if ( caption ) {
 					const captionComputedStyle =

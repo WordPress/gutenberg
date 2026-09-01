@@ -996,6 +996,74 @@ test.describe( 'Image - lightbox', () => {
 			} );
 			expect( margin ).toBe( '0px' );
 		} );
+
+		// Regression test for https://github.com/WordPress/gutenberg/issues/82283.
+		test.describe( 'when a plugin wraps the image', () => {
+			let largeMedia;
+
+			test.beforeAll( async ( { requestUtils } ) => {
+				largeMedia = await requestUtils.uploadMedia(
+					'./assets/1024x768_e2e_test_image_size.jpeg'
+				);
+				await requestUtils.activatePlugin(
+					'gutenberg-test-image-picture-wrapper'
+				);
+			} );
+
+			test.afterAll( async ( { requestUtils } ) => {
+				await requestUtils.deactivatePlugin(
+					'gutenberg-test-image-picture-wrapper'
+				);
+			} );
+
+			test( 'Trigger button should still be placed inside the figure', async ( {
+				editor,
+				page,
+			} ) => {
+				await editor.setContent( `<!-- wp:image {"id":${ largeMedia.id },"sizeSlug":"full","linkDestination":"none","lightbox":{"enabled":true}} -->
+				<figure class="wp-block-image size-full"><img src="${ largeMedia.source_url }" alt="" class="wp-image-${ largeMedia.id }"/><figcaption class="wp-element-caption">A caption.</figcaption></figure>
+				<!-- /wp:image -->` );
+
+				const postId = await editor.publishPost();
+				await page.setViewportSize( { width: 500, height: 800 } );
+				await page.goto( `/?p=${ postId }` );
+
+				const image = page.locator( '.wp-lightbox-container img' );
+				await expect( image ).toBeVisible();
+				// The button is only positioned once the image has loaded.
+				await expect
+					.poll( () =>
+						page.evaluate(
+							() =>
+								document.querySelector(
+									'button.lightbox-trigger'
+								).style.top
+						)
+					)
+					.not.toBe( '' );
+
+				const figureBox = await page
+					.locator( '.wp-lightbox-container' )
+					.boundingBox();
+				const buttonBox = await page
+					.locator( 'button.lightbox-trigger' )
+					.boundingBox();
+
+				expect( buttonBox.y ).toBeGreaterThanOrEqual( figureBox.y );
+				expect( buttonBox.x + buttonBox.width ).toBeLessThanOrEqual(
+					figureBox.x + figureBox.width
+				);
+
+				// A mispositioned button pushes the page sideways.
+				const { scrollWidth, clientWidth } = await page.evaluate(
+					() => ( {
+						scrollWidth: document.documentElement.scrollWidth,
+						clientWidth: document.documentElement.clientWidth,
+					} )
+				);
+				expect( scrollWidth ).toBe( clientWidth );
+			} );
+		} );
 	} );
 } );
 
