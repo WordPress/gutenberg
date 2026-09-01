@@ -1,7 +1,8 @@
 import triggerFetch from '@wordpress/api-fetch';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 jest.mock( '@wordpress/api-fetch' );
-import { render, waitFor } from '@testing-library/react';
+import { renderHook, waitFor } from '@testing-library/react';
+import { createElement } from '@wordpress/element';
 import { store as coreDataStore } from '../../index';
 import useEntityRecords, {
 	useEntityRecordsWithPermissions,
@@ -15,6 +16,12 @@ describe( 'useEntityRecords', () => {
 		registry.register( coreDataStore );
 	} );
 
+	function renderHookWithRegistry( hook, options = {} ) {
+		const Wrapper = ( { children } ) =>
+			createElement( RegistryProvider, { value: registry }, children );
+		return renderHook( hook, { wrapper: Wrapper, ...options } );
+	}
+
 	const TEST_RECORDS = [
 		{ id: 1, hello: 'world1' },
 		{ id: 2, hello: 'world2' },
@@ -25,18 +32,11 @@ describe( 'useEntityRecords', () => {
 		// Provide response
 		triggerFetch.mockImplementation( () => TEST_RECORDS );
 
-		let data;
-		const TestComponent = () => {
-			data = useEntityRecords( 'root', 'widget', { status: 'draft' } );
-			return <div />;
-		};
-		render(
-			<RegistryProvider value={ registry }>
-				<TestComponent />
-			</RegistryProvider>
+		const { result } = renderHookWithRegistry( () =>
+			useEntityRecords( 'root', 'widget', { status: 'draft' } )
 		);
 
-		expect( data ).toEqual( {
+		expect( result.current ).toEqual( {
 			records: null,
 			hasResolved: false,
 			hasStarted: false,
@@ -53,7 +53,7 @@ describe( 'useEntityRecords', () => {
 			} )
 		);
 
-		expect( data ).toEqual( {
+		expect( result.current ).toEqual( {
 			records: TEST_RECORDS,
 			hasResolved: true,
 			hasStarted: true,
@@ -83,6 +83,12 @@ describe( 'useEntityRecordsWithPermissions', () => {
 		] );
 	} );
 
+	function renderHookWithRegistry( hook, options = {} ) {
+		const Wrapper = ( { children } ) =>
+			createElement( RegistryProvider, { value: registry }, children );
+		return renderHook( hook, { wrapper: Wrapper, ...options } );
+	}
+
 	const TEST_RECORDS = [
 		{ id: 1, title: 'Post 1', slug: 'post-1' },
 		{ id: 2, title: 'Post 2', slug: 'post-2' },
@@ -94,16 +100,10 @@ describe( 'useEntityRecordsWithPermissions', () => {
 		// Mock the API response
 		triggerFetch.mockImplementation( () => TEST_RECORDS );
 
-		const TestComponent = () => {
+		renderHookWithRegistry( () =>
 			useEntityRecordsWithPermissions( 'postType', 'post', {
 				_fields: fieldsFromMock,
-			} );
-			return <div />;
-		};
-		render(
-			<RegistryProvider value={ registry }>
-				<TestComponent />
-			</RegistryProvider>
+			} )
 		);
 
 		// Should inject _links into the _fields parameter
@@ -120,14 +120,8 @@ describe( 'useEntityRecordsWithPermissions', () => {
 		// Mock the API response
 		triggerFetch.mockImplementation( () => TEST_RECORDS );
 
-		const TestComponent = () => {
-			useEntityRecordsWithPermissions( 'postType', 'post', {} );
-			return <div />;
-		};
-		render(
-			<RegistryProvider value={ registry }>
-				<TestComponent />
-			</RegistryProvider>
+		renderHookWithRegistry( () =>
+			useEntityRecordsWithPermissions( 'postType', 'post', {} )
 		);
 
 		// Should not add _fields when not originally provided
@@ -143,16 +137,10 @@ describe( 'useEntityRecordsWithPermissions', () => {
 		triggerFetch.mockImplementation( () => TEST_RECORDS );
 
 		const fieldsWithLinks = fieldsFromMock + ',_links';
-		const TestComponent = () => {
+		renderHookWithRegistry( () =>
 			useEntityRecordsWithPermissions( 'postType', 'post', {
 				_fields: fieldsWithLinks,
-			} );
-			return <div />;
-		};
-		render(
-			<RegistryProvider value={ registry }>
-				<TestComponent />
-			</RegistryProvider>
+			} )
 		);
 
 		// Should not duplicate _links (deduplication working correctly)

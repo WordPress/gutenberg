@@ -263,6 +263,14 @@ jobs:
             - name: Add workflow summary
               run: cat "${WP_ARTIFACTS_PATH}/summary.md" >> "$GITHUB_STEP_SUMMARY"
 
+            - name: Archive performance summary
+              if: success()
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              with:
+                  name: performance-summary-${{ matrix.shard }}
+                  path: ${{ env.WP_ARTIFACTS_PATH }}/summary.md
+                  if-no-files-found: ignore
+
             - name: Archive performance results
               if: success()
               uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -331,6 +339,38 @@ jobs:
                   name: performance-results
                   path: ${{ env.WP_ARTIFACTS_PATH }}/*.performance-results*.json
 
+            - name: Download shard summaries
+              id: download-summaries
+              if: ${{ github.event_name == 'pull_request' }}
+              continue-on-error: true
+              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+              with:
+                  pattern: performance-summary-*
+                  path: ${{ env.WP_ARTIFACTS_PATH }}/summaries
+
+            - name: Merge shard summaries
+              if: ${{ steps.download-summaries.outcome == 'success' }}
+              run: |
+                  mkdir -p pr-meta
+
+                  # Every shard renders the same heading and preamble above its
+                  # own suites, so keep them once and take only the tables from
+                  # each. One directory per shard, ordered by name.
+                  printf 'Client side metrics **exclude** the server response time.\n\n' > pr-meta/body.md
+                  find "${WP_ARTIFACTS_PATH}/summaries" -name summary.md -print0 \
+                    | sort -z \
+                    | xargs -0 sed -e '/^## Performance Test Results$/d' \
+                        -e '/^Please note that client side metrics \*\*exclude\*\* the server response time\.$/d' \
+                    >> pr-meta/body.md
+
+            - name: Upload the performance report
+              if: ${{ steps.download-summaries.outcome == 'success' }}
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              with:
+                  name: pr-meta--performance
+                  path: pr-meta
+                  if-no-files-found: ignore
+
             - name: Publish performance results
               if: github.event_name == 'push'
               env:
@@ -340,3 +380,41 @@ jobs:
                   COMMITTED_AT="$(git show -s "$GITHUB_SHA" --format="%cI")"
                   REFERENCE_COMMIT="$(echo "$BRANCHES" | jq -r '.[1].name')"
                   node tools/release/log-performance-results.js "$CODEHEALTH_PROJECT_TOKEN" trunk "$GITHUB_SHA" "$REFERENCE_COMMIT" "$COMMITTED_AT"
+
+    pr-meta:
+        name: Update PR meta comment
+        needs: results
+        # Runs even when the tests failed, so a stale report is cleared.
+        # Skipped on a fork, whose token cannot write a comment.
+        if: ${{ !cancelled() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+            pull-requests: write
+        timeout-minutes: 5
+        # Shared with every other writer of this comment. See bundle-size.yml.
+        concurrency:
+            group: pr-meta-${{ github.event.number }}
+            cancel-in-progress: false
+            queue: max
+
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  sparse-checkout: tools/pr-meta
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+              continue-on-error: true
+              with:
+                  name: pr-meta--performance
+                  path: pr-meta
+
+            - uses: ./tools/pr-meta
+              with:
+                  repo-token: ${{ secrets.GITHUB_TOKEN }}
+                  section: performance
+                  body-path: pr-meta/body.md
+                  commit-sha: ${{ github.event.pull_request.head.sha }}
+                  run-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

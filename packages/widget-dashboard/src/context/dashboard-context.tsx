@@ -17,6 +17,7 @@ import { canonicalizeLayout } from '../utils/canonicalize-layout';
 import { DEFAULT_GRID } from '../utils/default-grid';
 import { enforceLayoutPolicy } from '../utils/enforce-layout-policy';
 import { normalizeGridSettings } from '../utils/normalize-grid-settings';
+import { resolveDashboardColumnCap } from '../utils/resolve-dashboard-column-count/resolve-dashboard-column-count';
 import { DEFAULT_ROW_HEIGHT } from '../utils/row-height-presets';
 import { useDashboardPolicy } from '../components/dashboard-policy';
 import type {
@@ -24,7 +25,6 @@ import type {
 	WidgetGridSettings,
 	DashboardWidget,
 } from '../types';
-import { WIDGET_DASHBOARD_COLUMN_COUNT } from '../types';
 
 type GridSettingsWithColumns = WidgetGridSettings & { columns: number };
 
@@ -34,7 +34,7 @@ function resolveGridSettings(
 	const normalized = normalizeGridSettings( settings, DEFAULT_ROW_HEIGHT );
 	return {
 		...normalized,
-		columns: WIDGET_DASHBOARD_COLUMN_COUNT,
+		columns: resolveDashboardColumnCap( normalized.columns ),
 	};
 }
 

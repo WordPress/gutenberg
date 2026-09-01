@@ -1,62 +1,26 @@
 import * as core from '@actions/core';
 import { run } from '../run';
 
-const mockPushEventContext = {
-	runId: 100,
-	repo: {
-		owner: 'WordPress',
-		repo: 'gutenberg',
-	},
-	ref: 'refs/heads/trunk',
-	sha: 'commitSHA',
-	eventName: 'push',
-};
-const mockPullRequestEventContext = {
-	runId: 100,
-	repo: {
-		owner: 'WordPress',
-		repo: 'gutenberg',
-	},
-	ref: 'refs/pull/10/merge',
-	sha: 'mergeSHA',
-	eventName: 'pull_request',
-	payload: {
-		number: 10,
-		pull_request: {
-			head: {
-				ref: 'headBranch',
-				sha: 'headSHA',
-			},
-		},
-	},
-};
-const mockGetContext = jest.fn(
-	(): typeof mockPushEventContext | typeof mockPullRequestEventContext =>
-		mockPullRequestEventContext
-);
-jest.mock( '@actions/github', () => ( {
-	get context() {
-		return mockGetContext();
-	},
-} ) );
-
 jest.mock( '@actions/core', () => ( {
 	error: jest.fn(),
 	info: jest.fn(),
 	getInput: jest.fn(),
 } ) );
 
-const mockAPI = {
-	createCommentOnPR: jest.fn(),
-};
-jest.mock( '../github-api', () => ( {
-	GitHubAPI: jest.fn( () => mockAPI ),
-} ) );
-
 jest.mock( 'fs/promises', () => ( {
 	readdir: jest.fn(),
 	readFile: jest.fn(),
+	writeFile: jest.fn(),
+	mkdir: jest.fn(),
 } ) );
+
+function mockInputs() {
+	( core.getInput as jest.Mock )
+		// artifact-path
+		.mockReturnValueOnce( 'flaky-tests' )
+		// output-path
+		.mockReturnValueOnce( 'pr-meta/body.md' );
+}
 
 async function mockFlakyTestsArtifact() {
 	const playwrightFlakyTest = await import(
@@ -66,11 +30,7 @@ async function mockFlakyTestsArtifact() {
 		'../__fixtures__/Should insert new template part on creation.json'
 	).then( ( json ) => json.default );
 
-	( core.getInput as jest.Mock )
-		// token
-		.mockReturnValueOnce( 'repo-token' )
-		// artifact-path
-		.mockReturnValueOnce( 'flaky-tests' );
+	mockInputs();
 
 	// Replacing the cwd for the test for consistent snapshot results.
 	playwrightFlakyTest.path = playwrightFlakyTest.path.replace(
@@ -99,44 +59,63 @@ describe( 'Report flaky tests', () => {
 		jest.clearAllMocks();
 	} );
 
-	it( 'should comment on the pull request', async () => {
+	it( 'should write the report', async () => {
 		await mockFlakyTestsArtifact();
 
-		mockAPI.createCommentOnPR.mockImplementationOnce( () => ( {
-			html_url: 'comment_html_url',
-		} ) );
-
 		await run();
 
-		expect( mockAPI.createCommentOnPR ).toHaveBeenCalledTimes( 1 );
-		expect( mockAPI.createCommentOnPR.mock.calls[ 0 ][ 0 ] ).toBe( 10 );
-		expect(
-			mockAPI.createCommentOnPR.mock.calls[ 0 ][ 1 ]
-		).toMatchSnapshot();
+		const mockedFs = require( 'fs/promises' );
+		expect( mockedFs.writeFile ).toHaveBeenCalledTimes( 1 );
+		expect( mockedFs.writeFile.mock.calls[ 0 ][ 0 ] ).toBe(
+			'pr-meta/body.md'
+		);
+		expect( mockedFs.writeFile.mock.calls[ 0 ][ 1 ] ).toMatchSnapshot();
 	} );
 
-	it( 'should skip events other than pull requests', async () => {
-		mockGetContext.mockImplementation( () => mockPushEventContext );
-
-		await run();
-
-		// It bails out before even reading the artifact.
-		expect( require( 'fs/promises' ).readdir ).not.toHaveBeenCalled();
-		expect( mockAPI.createCommentOnPR ).not.toHaveBeenCalled();
-
-		mockGetContext.mockImplementation( () => mockPullRequestEventContext );
-	} );
-
-	it( 'should not comment when there are no flaky tests', async () => {
-		( core.getInput as jest.Mock )
-			.mockReturnValueOnce( 'repo-token' )
-			.mockReturnValueOnce( 'flaky-tests' );
+	it( 'should write nothing when there are no flaky tests', async () => {
+		mockInputs();
 
 		const mockedFs = require( 'fs/promises' );
 		mockedFs.readdir.mockImplementationOnce( () => Promise.resolve( [] ) );
 
 		await run();
 
-		expect( mockAPI.createCommentOnPR ).not.toHaveBeenCalled();
+		expect( mockedFs.writeFile ).not.toHaveBeenCalled();
+	} );
+
+	/*
+	 * A clean run produces no artifact at all. The writer treats the missing
+	 * file as an empty section, which is what clears a stale report.
+	 */
+	it( 'should write nothing when the artifact is missing', async () => {
+		mockInputs();
+
+		const missing = Object.assign( new Error( 'ENOENT' ), {
+			code: 'ENOENT',
+		} );
+		const mockedFs = require( 'fs/promises' );
+		mockedFs.readdir.mockImplementationOnce( () =>
+			Promise.reject( missing )
+		);
+
+		await run();
+
+		expect( mockedFs.writeFile ).not.toHaveBeenCalled();
+	} );
+
+	/* Anything else would clear a report that nothing had disproved. */
+	it( 'should fail rather than report clean when the artifact is unreadable', async () => {
+		mockInputs();
+
+		const denied = Object.assign( new Error( 'EACCES' ), {
+			code: 'EACCES',
+		} );
+		const mockedFs = require( 'fs/promises' );
+		mockedFs.readdir.mockImplementationOnce( () =>
+			Promise.reject( denied )
+		);
+
+		await expect( run() ).rejects.toThrow( 'EACCES' );
+		expect( mockedFs.writeFile ).not.toHaveBeenCalled();
 	} );
 } );

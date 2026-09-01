@@ -24,6 +24,12 @@
 
 ### Enhancements
 
+-   `gridSettings.columns` now sets the wide-container column count (floored,
+    with a floor of one); the responsive steps scale from it.
+    `WIDGET_DASHBOARD_COLUMN_COUNT` is the default when the host sets
+    nothing, and the wp-admin dashboard pins it where it reads its stored
+    settings, so preferences persisted by the removed Columns control stay
+    inert ([#82204](https://github.com/WordPress/gutenberg/pull/82204)).
 -   The staging layer enforces the policy on every instance operation,
     whichever trigger staged the mutation: a denied `move` holds the
     instance's index, a denied `resize` keeps its spans, a denied `edit`
