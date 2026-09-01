@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { useEvent, usePrevious } from '@wordpress/compose';
+import { useEvent } from '@wordpress/compose';
 import {
 	useCallback,
 	useEffect,
@@ -34,8 +34,6 @@ export function useToolsPanelItem(
 	const {
 		panelId: currentPanelId,
 		menuItems,
-		registerResetAllFilter,
-		deregisterResetAllFilter,
 		registerPanelItem,
 		deregisterPanelItem,
 		flagItemCustomization,
@@ -47,12 +45,14 @@ export function useToolsPanelItem(
 		__experimentalLastVisibleItemClass,
 	} = useToolsPanelContext();
 
-	// hasValue is a new function on every render, so do not add it as a
-	// dependency to the useCallback hook! If needed, we should use a ref.
+	// `hasValue` is a new function every render. It can't use `useEvent`
+	// because the panel calls it while deriving the menu during render, which
+	// `useEvent` forbids, so it stays keyed on the panel it was captured for.
 	const hasValueCallback = useCallback( hasValue, [ panelId ] );
-	// resetAllFilter is a new function on every render, so do not add it as a
-	// dependency to the useCallback hook! If needed, we should use a ref.
-	const resetAllFilterCallback = useCallback( resetAllFilter, [ panelId ] );
+	// `resetAllFilter` only runs from the reset handler, so a stable identity
+	// that always sees the latest props is both safe and more correct than
+	// freezing it per panel.
+	const resetAllFilterCallback = useEvent( resetAllFilter );
 
 	// `defaultShown` seeds an item's visibility when it registers, and is
 	// deliberately not reactive. Holding it in a ref keeps it out of the
@@ -70,110 +70,95 @@ export function useToolsPanelItem(
 		defaultShownRef.current = defaultShown;
 	} );
 
-	// `onShownChange` is also a new function on every render. `useEvent` gives
-	// the item a stable callback to register, so it isn't re-registered on
-	// each render, while the panel still invokes the latest one.
+	// `onShownChange` is a new function every render. `useEvent` gives the item
+	// a stable callback to register, while the panel still invokes the latest.
 	const onShownChangeCallback = useEvent( onShownChange );
 
-	const previousPanelId = usePrevious( currentPanelId );
-
+	// A panel spanning a multi-selection has no id of its own, so every item
+	// belongs to it.
 	const hasMatchingPanel =
 		currentPanelId === panelId || currentPanelId === null;
 
-	// Registering the panel item allows the panel to include it in its
-	// automatically generated menu and determine its initial checked status.
-	//
-	// This is performed in a layout effect to ensure that the panel item
-	// is registered before it is rendered preventing a rendering glitch.
+	// A layout effect so the item is registered before it renders, avoiding a
+	// glitch, and so a whole panel's worth of registrations land in one commit
+	// for React to batch.
 	// See: https://github.com/WordPress/gutenberg/issues/56470
 	useLayoutEffect( () => {
-		if ( hasMatchingPanel && previousPanelId !== null ) {
-			registerPanelItem( {
-				defaultShown: defaultShownRef.current,
-				hasValue: hasValueCallback,
-				isShownByDefault,
-				label,
-				onShownChange: onShownChangeCallback,
-				panelId,
-			} );
+		if ( ! hasMatchingPanel ) {
+			return;
 		}
 
+		const item = {
+			defaultShown: defaultShownRef.current,
+			hasValue: hasValueCallback,
+			isShownByDefault,
+			label,
+			onShownChange: onShownChangeCallback,
+			panelId,
+			resetAllFilter: resetAllFilterCallback,
+		};
+		registerPanelItem( item );
+
+		// Passing the registration back lets the panel ignore this cleanup if
+		// a replacement has already claimed the label, which happens when a
+		// panel switches while its items arrive through a Slot.
 		return () => {
-			if (
-				( previousPanelId === null && !! currentPanelId ) ||
-				currentPanelId === panelId
-			) {
-				deregisterPanelItem( label );
-			}
+			deregisterPanelItem( label, item );
 		};
 	}, [
-		currentPanelId,
+		deregisterPanelItem,
 		hasMatchingPanel,
+		hasValueCallback,
 		isShownByDefault,
 		label,
-		hasValueCallback,
 		onShownChangeCallback,
 		panelId,
-		previousPanelId,
 		registerPanelItem,
-		deregisterPanelItem,
-	] );
-
-	useEffect( () => {
-		if ( hasMatchingPanel ) {
-			registerResetAllFilter( resetAllFilterCallback );
-		}
-		return () => {
-			if ( hasMatchingPanel ) {
-				deregisterResetAllFilter( resetAllFilterCallback );
-			}
-		};
-	}, [
-		registerResetAllFilter,
-		deregisterResetAllFilter,
 		resetAllFilterCallback,
-		hasMatchingPanel,
 	] );
 
-	// Note: `label` is used as a key when building menu item state in
-	// `ToolsPanel`.
 	const menuGroup = isShownByDefault ? 'default' : 'optional';
 	const isMenuItemChecked = menuItems?.[ menuGroup ]?.[ label ];
-	const wasMenuItemChecked = usePrevious( isMenuItemChecked );
-	const isRegistered = menuItems?.[ menuGroup ]?.[ label ] !== undefined;
+	const isRegistered = isMenuItemChecked !== undefined;
+	// Tracks the effect below rather than the render, so renders that leave
+	// the checked state alone can't desync it.
+	const wasMenuItemCheckedRef = useRef< boolean | undefined >( undefined );
 
 	const isValueSet = hasValue();
-	// Notify the panel when an item's value has changed except for optional
-	// items without value because the item should not cause itself to hide.
-	// Items that don't belong to the panel on screen stay silent, otherwise
-	// they would leave an orphaned entry in its menu.
-	useEffect( () => {
+
+	// An optional item losing its value must not hide itself, so only default
+	// items report a value going away. Items belonging to another panel stay
+	// silent or they would leave an orphaned entry in this panel's menu.
+	//
+	// Shares the layout phase with registration above so it runs against an
+	// already registered item and batches with it.
+	useLayoutEffect( () => {
 		if ( ! hasMatchingPanel || ( ! isShownByDefault && ! isValueSet ) ) {
 			return;
 		}
 
-		flagItemCustomization( isValueSet, label, menuGroup );
+		flagItemCustomization( isValueSet, label );
 	}, [
 		hasMatchingPanel,
 		isValueSet,
-		menuGroup,
 		label,
 		flagItemCustomization,
 		isShownByDefault,
 	] );
 
-	// An item has no menu entry until it registers with the panel, so on that
-	// first render its previous checked state is `undefined` rather than `false`.
-	// Items that register already shown — because they have a value, or because
-	// `defaultShown` was set — must not be treated as though the user had just
-	// selected them from the menu.
-	const wasRegistered = wasMenuItemChecked !== undefined;
-
-	// Determine if the panel item's corresponding menu is being toggled and
-	// trigger appropriate callback if it is.
+	// Passive so consumer callbacks don't run before the browser has painted.
 	useEffect( () => {
-		// We check whether this item is currently registered as items rendered
-		// via fills can persist through the parent panel being remounted.
+		const wasMenuItemChecked = wasMenuItemCheckedRef.current;
+		wasMenuItemCheckedRef.current = isMenuItemChecked;
+
+		// An item has no menu entry until it registers, so the first time
+		// through there is no previous checked state. Items that register
+		// already shown, because they have a value or `defaultShown` was set,
+		// must not look as though the user just selected them.
+		const wasRegistered = wasMenuItemChecked !== undefined;
+
+		// Items rendered via fills can outlive a remount of the panel they
+		// belong to, leaving them unregistered.
 		// See: https://github.com/WordPress/gutenberg/pull/45673
 		if (
 			! isRegistered ||
@@ -197,18 +182,13 @@ export function useToolsPanelItem(
 		isRegistered,
 		isResetting,
 		isValueSet,
-		wasMenuItemChecked,
-		wasRegistered,
 		onSelect,
 		onDeselect,
 	] );
 
-	// The item is shown if it is a default control regardless of whether it
-	// has a value. Optional items are shown when they are checked or have
-	// a value.
-	const isShown = isShownByDefault
-		? menuItems?.[ menuGroup ]?.[ label ] !== undefined
-		: isMenuItemChecked;
+	// A default control shows whether or not it has a value; an optional one
+	// shows once checked.
+	const isShown = isShownByDefault ? isRegistered : isMenuItemChecked;
 
 	const shouldApplyPlaceholderStyles = shouldRenderPlaceholder && ! isShown;
 	const classes = clsx(
