@@ -22,6 +22,7 @@
 -   Match the Navigation embed record and current global styles ID types to their REST responses. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
 -   Export `ContextualField` so plugins can describe context-sensitive fields when extending the entity record map. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
 -   `PostStatus` accepts statuses registered by WordPress or plugins while preserving autocomplete for the built-in values. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
+-   `useEntityProp`: Add a `coalesceEdits` option that merges consecutive edits into a single undo level, so typing into a text input no longer creates an undo level per keystroke ([#82275](https://github.com/WordPress/gutenberg/pull/82275)).
 
 ### Internal
 
