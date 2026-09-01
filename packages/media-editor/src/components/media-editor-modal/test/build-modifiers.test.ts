@@ -331,21 +331,29 @@ function outputSizeFor( modifiers: Modifier[], imageSize: Size ): Size {
 describe( 'buildModifiers ↔ Export-camera parity', () => {
 	const rows = buildRows();
 
-	it.each( rows )( '$label', ( { state, u, v } ) => {
-		const modifiers = buildModifiers( state, IMAGE );
+	for ( const { label, state, u, v } of rows ) {
+		it( label, () => {
+			const modifiers = buildModifiers( state, IMAGE );
 
-		// Output canvas is whatever the server would emit: the crop rect
-		// if present, otherwise the full rotated AABB. This makes (u, v)
-		// map to the same *output* pixel on both paths.
-		const outputSize = outputSizeFor( modifiers, IMAGE );
+			// Output canvas is whatever the server would emit: the crop rect
+			// if present, otherwise the full rotated AABB. This makes (u, v)
+			// map to the same *output* pixel on both paths.
+			const outputSize = outputSizeFor( modifiers, IMAGE );
 
-		const exported = exportSourcePixel( state, IMAGE, outputSize, u, v );
-		const server = serverSourcePixel( modifiers, IMAGE, u, v );
+			const exported = exportSourcePixel(
+				state,
+				IMAGE,
+				outputSize,
+				u,
+				v
+			);
+			const server = serverSourcePixel( modifiers, IMAGE, u, v );
 
-		// Tolerance of 1 source pixel. The two paths compose rotations
-		// and scales in different orders, so sub-pixel disagreement is
-		// expected from floating-point. Anything larger is a real bug.
-		expect( server.x ).toBeCloseTo( exported.x, 0 );
-		expect( server.y ).toBeCloseTo( exported.y, 0 );
-	} );
+			// Tolerance of 1 source pixel. The two paths compose rotations
+			// and scales in different orders, so sub-pixel disagreement is
+			// expected from floating-point. Anything larger is a real bug.
+			expect( server.x ).toBeCloseTo( exported.x, 0 );
+			expect( server.y ).toBeCloseTo( exported.y, 0 );
+		} );
+	}
 } );
