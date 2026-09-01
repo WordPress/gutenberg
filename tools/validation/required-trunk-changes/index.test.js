@@ -1,8 +1,8 @@
-/* global expect, test */
-const { spawnSync } = require( 'node:child_process' );
-const { join } = require( 'node:path' );
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import { expect, test } from 'vitest';
 
-const cliPath = join( __dirname, 'index.mjs' );
+const cliPath = fileURLToPath( new URL( './index.mjs', import.meta.url ) );
 
 /**
  * Runs the CLI with the given arguments and environment overrides.
