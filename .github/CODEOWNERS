@@ -76,7 +76,7 @@
 /packages/prettier-config
 /packages/scripts
 /packages/stylelint-config
-/test/php/gutenberg-coding-standards
+/test/php/gutenberg-coding-standards            @anton-vlasenko
 
 # UI Components
 /packages/components                            @WordPress/gutenberg-components
