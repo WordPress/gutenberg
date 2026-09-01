@@ -1,3 +1,4 @@
+import { useState } from '@wordpress/element';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ToolsPanel, ToolsPanelContext, ToolsPanelItem } from '../';
@@ -886,7 +887,8 @@ describe( 'ToolsPanel', () => {
 			expect( context.registerPanelItem ).toHaveBeenCalledTimes( 1 );
 			// deregisterPanelItem is called, given that we have switched panels.
 			expect( context.deregisterPanelItem ).toHaveBeenCalledWith(
-				altControlProps.label
+				altControlProps.label,
+				expect.objectContaining( { label: altControlProps.label } )
 			);
 
 			// Simulate switching back to the original panelId, e.g. by selecting
@@ -965,7 +967,8 @@ describe( 'ToolsPanel', () => {
 			rerender( <TestPanel defaultShown /> );
 
 			expect( context.deregisterPanelItem ).toHaveBeenCalledWith(
-				altControlProps.label
+				altControlProps.label,
+				expect.objectContaining( { label: altControlProps.label } )
 			);
 			// The item registers again with the saved preference rather than
 			// the value it mounted with.
@@ -1019,23 +1022,24 @@ describe( 'ToolsPanel', () => {
 			expect( context.deregisterPanelItem ).not.toHaveBeenCalled();
 
 			// Simulate another multi-selection where the panelId is `null`.
-			// Item should re-register itself after it deregistered as the
-			// multi-selection occurred.
+			// Still matches the panel, so the registration stands rather than
+			// churning through a deregister/register pair.
 			context.panelId = null;
 			rerender( <TestPanel /> );
-			expect( context.registerPanelItem ).toHaveBeenCalledTimes( 2 );
-			expect( context.deregisterPanelItem ).toHaveBeenCalledTimes( 1 );
+			expect( context.registerPanelItem ).toHaveBeenCalledTimes( 1 );
+			expect( context.deregisterPanelItem ).not.toHaveBeenCalled();
 
 			// Simulate a change in panel e.g. back to a single block selection
 			// Where the item's panelId is not a match.
 			context.panelId = '4321';
 			rerender( <TestPanel /> );
 
-			// As the item no longer matches the panelId it should not have
-			// registered again but instead deregistered.
+			// No longer matches, so it has already deregistered. Unmounting
+			// must not deregister again.
+			expect( context.deregisterPanelItem ).toHaveBeenCalledTimes( 1 );
 			unmount();
-			expect( context.registerPanelItem ).toHaveBeenCalledTimes( 2 );
-			expect( context.deregisterPanelItem ).toHaveBeenCalledTimes( 2 );
+			expect( context.registerPanelItem ).toHaveBeenCalledTimes( 1 );
+			expect( context.deregisterPanelItem ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 
@@ -1529,6 +1533,64 @@ describe( 'ToolsPanel', () => {
 			).not.toBeInTheDocument();
 		} );
 
+		it( "should not let a replacement item inherit the outgoing one's state", async () => {
+			// Two blocks can each contribute a control of the same name. When
+			// selection moves between them, the incoming item starts from its
+			// own value rather than the visibility the user chose for the one
+			// it replaced.
+			const SameLabelInTwoPanels = ( {
+				panelId,
+			}: Pick<
+				React.ComponentProps< typeof ToolsPanelItem >,
+				'panelId'
+			> ) => (
+				<SlotFillProvider>
+					<ToolsPanelItems>
+						<ToolsPanelItem
+							label="Shared"
+							panelId="1234"
+							hasValue={ () => false }
+						>
+							<div>Item 1</div>
+						</ToolsPanelItem>
+					</ToolsPanelItems>
+					<ToolsPanelItems>
+						<ToolsPanelItem
+							label="Shared"
+							panelId="9999"
+							hasValue={ () => false }
+						>
+							<div>Item 2</div>
+						</ToolsPanelItem>
+					</ToolsPanelItems>
+					<ToolsPanel { ...defaultProps } panelId={ panelId }>
+						<Slot />
+					</ToolsPanel>
+				</SlotFillProvider>
+			);
+
+			const { rerender } = render(
+				<SameLabelInTwoPanels panelId="1234" />
+			);
+
+			// Show the first block's control.
+			await openDropdownMenu();
+			await selectMenuItem( 'Shared' );
+			expect( screen.getByText( 'Item 1' ) ).toBeInTheDocument();
+
+			// Move to the other block. Its control has no value and was never
+			// shown, so it stays hidden.
+			// The menu stays open across the rerender.
+			rerender( <SameLabelInTwoPanels panelId="9999" /> );
+
+			expect(
+				await screen.findByRole( 'menuitemcheckbox', {
+					name: 'Show Shared',
+				} )
+			).toBeInTheDocument();
+			expect( screen.queryByText( 'Item 2' ) ).not.toBeInTheDocument();
+		} );
+
 		it( 'should not contain orphaned menu items when panelId changes', async () => {
 			// As fills and the panel can update independently this aims to
 			// test that no orphaned items appear registered in the panel menu.
@@ -1667,6 +1729,45 @@ describe( 'ToolsPanel', () => {
 			expect( optionsDisplayedIcon ).not.toHaveAccessibleDescription();
 		} );
 
+		it( 'should pass reset all filters that see the latest props', async () => {
+			let received: unknown[] = [];
+			const ChangingFilter = () => {
+				const [ count, setCount ] = useState( 1 );
+				return (
+					<ToolsPanel
+						label="Panel header"
+						resetAll={ ( filters ) => {
+							received = ( filters ?? [] ).map( ( filter ) =>
+								filter()
+							);
+						} }
+					>
+						<ToolsPanelItem
+							label="Filtered"
+							isShownByDefault
+							hasValue={ () => true }
+							resetAllFilter={ () => count }
+						>
+							<button onClick={ () => setCount( 2 ) }>
+								bump
+							</button>
+						</ToolsPanelItem>
+					</ToolsPanel>
+				);
+			};
+
+			const user = userEvent.setup();
+			render( <ChangingFilter /> );
+
+			// The panelId never changes, which is where a filter frozen at
+			// registration goes stale.
+			await user.click( screen.getByText( 'bump' ) );
+			await openDropdownMenu();
+			await selectMenuItem( 'Reset all' );
+
+			expect( received ).toEqual( [ 2 ] );
+		} );
+
 		it( 'should not call reset all for different panelIds', async () => {
 			const resetItem = jest.fn();
 			const resetItemB = jest.fn();
@@ -1756,6 +1857,48 @@ describe( 'ToolsPanel', () => {
 				'aria-disabled',
 				'true'
 			);
+		} );
+	} );
+
+	describe( 'reset all with values the reset leaves in place', () => {
+		it( 'should keep a default control resettable when its value survives', async () => {
+			// The value arrives after mount, like block library controls whose
+			// `hasValue` closes over an attribute: false at mount, true once
+			// edited. A value read back from registration time misses it.
+			const GainsAValue = () => {
+				const [ hasVal, setHasVal ] = useState( false );
+				return (
+					<ToolsPanel label="Panel header" resetAll={ () => {} }>
+						<ToolsPanelItem
+							label="Survivor"
+							isShownByDefault
+							hasValue={ () => hasVal }
+						>
+							<button onClick={ () => setHasVal( true ) }>
+								set a value
+							</button>
+						</ToolsPanelItem>
+					</ToolsPanel>
+				);
+			};
+
+			const user = userEvent.setup();
+			render( <GainsAValue /> );
+
+			await user.click( screen.getByText( 'set a value' ) );
+			await openDropdownMenu();
+			await selectMenuItem( 'Reset all' );
+
+			// `resetAll` clears nothing here, so the value is still set and
+			// must stay resettable from both menu entries.
+			expect(
+				await screen.findByRole( 'menuitem', { name: 'Reset all' } )
+			).toHaveAttribute( 'aria-disabled', 'false' );
+			expect(
+				await screen.findByRole( 'menuitem', {
+					name: 'Reset Survivor',
+				} )
+			).toBeInTheDocument();
 		} );
 	} );
 

@@ -76,6 +76,42 @@ describe( 'BorderBoxControl', () => {
 			expect( linkedButton ).toBeInTheDocument();
 		} );
 
+		// `getAllByRole` returns document order, so the sign of this offset is
+		// which side of the border inputs the linked button sits on. The color
+		// button is the first of those inputs.
+		const getLinkedButtonOffsetFromColorButton = () => {
+			const buttons = screen.getAllByRole( 'button' );
+			const linkedButtonIndex = buttons.indexOf(
+				screen.getByLabelText( 'Unlink sides' )
+			);
+			const colorButtonIndex = buttons.indexOf(
+				screen.getByLabelText( toggleLabelRegex )
+			);
+
+			// Both queries throw when absent, and `indexOf` gives -1 for a
+			// button outside the list, which would read as "earlier than".
+			expect( linkedButtonIndex ).toBeGreaterThanOrEqual( 0 );
+			expect( colorButtonIndex ).toBeGreaterThanOrEqual( 0 );
+
+			return linkedButtonIndex - colorButtonIndex;
+		};
+
+		it( 'should place the linked button before the border inputs when the label is visible', () => {
+			render( <TestBorderBoxControl { ...props } /> );
+
+			// Sharing the label's row is what lines it up with the equivalent
+			// button on sibling controls such as border radius.
+			expect( getLinkedButtonOffsetFromColorButton() ).toBeLessThan( 0 );
+		} );
+
+		it( 'should place the linked button after the border inputs when the label is hidden', () => {
+			render( <TestBorderBoxControl { ...props } hideLabelFromVision /> );
+
+			expect( getLinkedButtonOffsetFromColorButton() ).toBeGreaterThan(
+				0
+			);
+		} );
+
 		it( 'should hide label', () => {
 			render( <TestBorderBoxControl { ...props } hideLabelFromVision /> );
 

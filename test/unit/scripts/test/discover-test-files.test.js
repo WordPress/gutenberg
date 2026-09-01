@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { getTestEnvironmentName } from '../discover-test-files.mjs';
+import {
+	getTestEnvironmentName,
+	getVitestTestsByProject,
+} from '../discover-test-files.mjs';
 import { sourceHasTestEnvironmentOverride } from '../test-environment-overrides.mjs';
 
 describe( 'getTestEnvironmentName', () => {
@@ -17,6 +20,21 @@ describe( 'getTestEnvironmentName', () => {
 		expect( getTestEnvironmentName( 'example.browser.test.js' ) ).toBe(
 			'browser'
 		);
+	} );
+} );
+
+describe( 'getVitestTestsByProject', () => {
+	it( 'routes new Node tests to Vitest without migration metadata', () => {
+		expect(
+			getVitestTestsByProject(
+				[ 'example.test.ts', 'example.jsdom.test.tsx' ],
+				{ vitest: { directories: [], files: [] } }
+			)
+		).toEqual( {
+			browser: [],
+			jsdom: [],
+			node: [ 'example.test.ts' ],
+		} );
 	} );
 } );
 

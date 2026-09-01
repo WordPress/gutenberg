@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it } from 'vitest';
 import { createRegistry } from '../registry';
 import createReduxStore from '../redux-store';
 import { unlock } from '../lock-unlock';
