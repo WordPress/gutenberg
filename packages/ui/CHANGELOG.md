@@ -9,6 +9,7 @@
 
 ### New Features
 
+-   Add `SearchableSelectControl` ([#80979](https://github.com/WordPress/gutenberg/pull/80979)).
 -   Add `SearchableSelect` form primitive ([#80961](https://github.com/WordPress/gutenberg/pull/80961)).
 
 ### Enhancements
