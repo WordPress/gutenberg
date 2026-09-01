@@ -6,7 +6,7 @@ Add a term to a description list.
 - **Name:** `core/description-term`
 - **Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
 - **API Version:** [3](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/)
-- **Block Type:** [Static](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/) (saved in post content)
+- **Block Type:** Unknown
 
 ## Block Relationships
 
