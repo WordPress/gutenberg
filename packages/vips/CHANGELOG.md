@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `encodePixelsAsJpeg` and its worker counterpart `vipsEncodePixelsAsJpeg`, which encode raw RGBA pixels as a JPEG while copying the EXIF block from the image file they were decoded from ([#82040](https://github.com/WordPress/gutenberg/pull/82040)).
+
 ### Internal
 
 -   Enforce NodeNext module resolution in the build project so future declaration imports are checked against the package's published ESM resolution rules. ([#82088](https://github.com/WordPress/gutenberg/pull/82088))

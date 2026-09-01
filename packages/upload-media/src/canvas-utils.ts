@@ -3,6 +3,17 @@ import { parseHeic } from './heic-parser';
 import { getHeicUnsupportedMessage } from './heic-support';
 
 /**
+ * Encodes a decoded canvas as a JPEG.
+ *
+ * Resolves to null to decline, in which case the canvas's own encoder is used.
+ * A rejection is treated the same way.
+ */
+export type JpegEncoder = (
+	canvas: OffscreenCanvas,
+	quality: number
+) => Promise< Blob | null >;
+
+/**
  * Converts an image file to JPEG using the browser's native decoder and canvas.
  *
  * Tries three decoding strategies:
@@ -16,16 +27,62 @@ import { getHeicUnsupportedMessage } from './heic-support';
  *
  * This avoids shipping our own HEVC decoder, sidestepping patent/licensing concerns.
  *
+ * The decoded pixels are handed to `encode` when given, which lets a caller
+ * produce the JPEG with vips and carry the source file's metadata over; the
+ * canvas's own encoder is the fallback and produces a JPEG without metadata.
+ *
  * @param file    Source image file (e.g., HEIC/HEIF).
  * @param quality JPEG quality (0-1). Default 0.82.
+ * @param encode  Optional JPEG encoder for the decoded pixels.
  * @return JPEG File object.
  */
 export async function canvasConvertToJpeg(
 	file: File,
-	quality = 0.82
+	quality = 0.82,
+	encode?: JpegEncoder
 ): Promise< File > {
-	const baseName = getFileBasename( file.name );
+	const canvas = await decodeToCanvas( file );
+	const jpegBlob = await encodeCanvas( canvas, quality, encode );
 
+	return new File( [ jpegBlob ], `${ getFileBasename( file.name ) }.jpg`, {
+		type: 'image/jpeg',
+	} );
+}
+
+/**
+ * Encodes a canvas as a JPEG, preferring the given encoder.
+ *
+ * @param canvas  Canvas holding the decoded, upright image.
+ * @param quality JPEG quality (0-1).
+ * @param encode  Optional JPEG encoder.
+ * @return JPEG data.
+ */
+async function encodeCanvas(
+	canvas: OffscreenCanvas,
+	quality: number,
+	encode?: JpegEncoder
+): Promise< Blob > {
+	if ( encode ) {
+		try {
+			const encoded = await encode( canvas, quality );
+			if ( encoded ) {
+				return encoded;
+			}
+		} catch {
+			// Fall back to the canvas encoder below.
+		}
+	}
+
+	return canvas.convertToBlob( { type: 'image/jpeg', quality } );
+}
+
+/**
+ * Decodes an image file into an upright canvas, trying each strategy in turn.
+ *
+ * @param file Source image file (e.g., HEIC/HEIF).
+ * @return Canvas holding the decoded image.
+ */
+async function decodeToCanvas( file: File ): Promise< OffscreenCanvas > {
 	// Strategy 1: createImageBitmap + OffscreenCanvas.
 	try {
 		const bitmap = await createImageBitmap( file );
@@ -39,14 +96,7 @@ export async function canvasConvertToJpeg(
 
 			ctx.drawImage( bitmap, 0, 0 );
 
-			const jpegBlob = await canvas.convertToBlob( {
-				type: 'image/jpeg',
-				quality,
-			} );
-
-			return new File( [ jpegBlob ], `${ baseName }.jpg`, {
-				type: 'image/jpeg',
-			} );
+			return canvas;
 		} finally {
 			bitmap.close();
 		}
@@ -80,14 +130,7 @@ export async function canvasConvertToJpeg(
 
 					ctx.drawImage( videoFrame, 0, 0 );
 
-					const jpegBlob = await canvas.convertToBlob( {
-						type: 'image/jpeg',
-						quality,
-					} );
-
-					return new File( [ jpegBlob ], `${ baseName }.jpg`, {
-						type: 'image/jpeg',
-					} );
+					return canvas;
 				} finally {
 					videoFrame.close();
 				}
@@ -140,22 +183,9 @@ export async function canvasConvertToJpeg(
 				// Apply orientation: the native ISOBMFF `irot` transform when
 				// present, otherwise the EXIF orientation tag (libheif applies
 				// the former but ignores the latter for HEIF-family inputs).
-				const outputCanvas =
-					heicData.rotation !== 0
-						? applyRotation( canvas, heicData.rotation )
-						: applyExifOrientation(
-								canvas,
-								heicData.exifOrientation
-						  );
-
-				const jpegBlob = await outputCanvas.convertToBlob( {
-					type: 'image/jpeg',
-					quality,
-				} );
-
-				return new File( [ jpegBlob ], `${ baseName }.jpg`, {
-					type: 'image/jpeg',
-				} );
+				return heicData.rotation !== 0
+					? applyRotation( canvas, heicData.rotation )
+					: applyExifOrientation( canvas, heicData.exifOrientation );
 			}
 		} catch {
 			// VideoDecoder HEVC not available or HEIC parsing failed.

@@ -9,7 +9,7 @@ import {
 	isAnimatedGif,
 	renameFile,
 } from '../utils';
-import { canvasConvertToJpeg } from '../canvas-utils';
+import { canvasConvertToJpeg, type JpegEncoder } from '../canvas-utils';
 import { getHeicUnsupportedMessage } from '../heic-support';
 import { getUnappliedExifOrientation } from '../heic-parser';
 import {
@@ -25,6 +25,7 @@ import {
 	vipsResizeImage,
 	vipsRotateImage,
 	vipsConvertImageFormat,
+	vipsEncodeCanvasAsJpeg,
 	vipsHasTransparency,
 	vipsGetUltraHdrInfo,
 	terminateVipsWorker,
@@ -878,10 +879,30 @@ export function prepareItem( id: QueueItemId ) {
 			// and upload the resulting JPEG. The server then handles it like
 			// any normal JPEG (threshold scaling, sub-sizes, etc.).
 			// This matches iOS behavior where HEIC is converted on the fly.
+			//
+			// When vips is available it encodes the decoded pixels so the
+			// source EXIF block carries over into the JPEG; the canvas
+			// encoder used otherwise produces a JPEG without metadata.
+			const encode: JpegEncoder | undefined = isClientSideMediaSupported()
+				? async ( canvas, quality ) =>
+						exceedsClientProcessingMemory( {
+							width: canvas.width,
+							height: canvas.height,
+							interlaced: false,
+						} )
+							? null
+							: vipsEncodeCanvasAsJpeg(
+									id,
+									canvas,
+									file,
+									quality
+							  )
+				: undefined;
 			try {
 				heicJpeg = await canvasConvertToJpeg(
 					file,
-					settings.imageQuality ?? DEFAULT_OUTPUT_QUALITY
+					settings.imageQuality ?? DEFAULT_OUTPUT_QUALITY,
+					encode
 				);
 			} catch {
 				dispatch.cancelItem(
