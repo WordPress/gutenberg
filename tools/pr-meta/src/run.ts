@@ -14,11 +14,14 @@ function resolvePrNumber(): number | undefined {
 
 	/*
 	 * `number` covers pull_request and pull_request_target, `issue` covers
-	 * issue_comment. A push carries no pull request, so those callers have to
-	 * pass `pr-number` themselves.
+	 * issue_comment, and `pull_request` covers the review events, which carry
+	 * no number of their own. A push has no pull request at all, so those
+	 * callers have to pass `pr-number` themselves.
 	 */
 	const payload = getEventPayload();
-	return payload.number ?? payload.issue?.number;
+	return (
+		payload.number ?? payload.issue?.number ?? payload.pull_request?.number
+	);
 }
 
 export function resolveBody(): string {

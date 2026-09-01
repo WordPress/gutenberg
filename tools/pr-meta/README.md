@@ -49,6 +49,8 @@ The job also needs `actions/checkout` before `uses: ./tools/pr-meta`, since a lo
 
 Add it to `SECTIONS` in `src/sections.ts` with an id, heading, scope and character budget. Headings lead with an emoji, so a reader scanning a comment of seven sections can find theirs without reading any of them. The budgets must sum, with the headings and markers, to less than GitHub's 65536-character comment limit; a test covers that.
 
+A producer renders its markdown without knowing where it will sit, so any headings in a body are demoted to sit below the section heading, with their relative hierarchy kept. Headings inside a code fence are left alone.
+
 A `summary` collapses the section behind a fold labelled with it, for content long enough that it would otherwise push the rest of the comment out of view. Leave it out to keep the section open.
 
 `scope` decides how staleness is handled. `commit` sections describe one commit, carry its SHA, and are rejected if they arrive from a rerun of an older one. `pr-state` sections describe the pull request as it currently is and carry no SHA.
