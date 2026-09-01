@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
 	COMMENT_MARKER,
+	demoteHeadings,
 	isParseable,
 	isPrMetaComment,
 	mergeSection,
@@ -561,5 +562,46 @@ describe( 'rendering other sections', () => {
 		);
 
 		expect( merged ).toContain( 'not the current head' );
+	} );
+} );
+
+describe( 'demoteHeadings', () => {
+	it( 'pushes a props body below its own section heading', () => {
+		const props =
+			'## Unlinked Accounts\n\nSome text.\n\n## Core SVN\n\nMore text.';
+
+		const merged = bodyOf(
+			mergeSection( undefined, { id: 'props', body: props } )
+		);
+
+		expect( merged ).toContain( '##### Unlinked Accounts' );
+		expect( merged ).toContain( '##### Core SVN' );
+		expect( merged ).not.toMatch( /^## Unlinked/m );
+	} );
+
+	it( 'keeps the hierarchy between headings', () => {
+		const body = '# Title\n\nText.\n\n### Deep\n\nText.';
+
+		expect( demoteHeadings( body ) ).toBe(
+			'##### Title\n\nText.\n\n####### Deep\n\nText.'.replace(
+				'#######',
+				'######'
+			)
+		);
+	} );
+
+	it( 'leaves a body that has no headings alone', () => {
+		const body = 'Just text, and a # that is not a heading.';
+
+		expect( demoteHeadings( body ) ).toBe( body );
+	} );
+
+	/* A stack trace can hold anything, including lines that look like headings. */
+	it( 'ignores what looks like a heading inside a code fence', () => {
+		const body = '## Real\n\n```\n# Not a heading\n```';
+
+		expect( demoteHeadings( body ) ).toBe(
+			'##### Real\n\n```\n# Not a heading\n```'
+		);
 	} );
 } );
