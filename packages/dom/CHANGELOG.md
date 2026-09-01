@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--	`safeHTML`: Harden with URI scheme validation and dangerous tag blocklist.
+-   `safeHTML`: Harden with URI scheme validation and dangerous tag blocklist.
 
 ## 4.54.0 (2026-08-26)
 
