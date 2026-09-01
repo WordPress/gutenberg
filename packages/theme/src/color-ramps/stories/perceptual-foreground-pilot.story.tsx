@@ -133,7 +133,6 @@ export default meta;
 type Story = StoryObj< PilotComparisonArgs >;
 
 type ScaleData = {
-	label: string;
 	scale: ExperimentalForegroundScale;
 	scaleType: ExperimentalForegroundScaleType;
 };
@@ -148,108 +147,61 @@ function formatSignedContrast( contrast: number ) {
 	return `${ contrast >= 0 ? '+' : '' }${ contrast.toFixed( 1 ) }`;
 }
 
-function ForegroundScale( {
-	ariaLabel,
+function ScaleCell( {
+	color,
+	contrastMagnitudes,
 	data,
-	displayBackground,
-	showScaleName = true,
+	index,
 	showGamutRelativeChroma,
 	showOkhslSaturation,
+	signedContrasts,
 }: {
-	ariaLabel?: string;
+	color: string;
+	contrastMagnitudes: number[];
 	data: ScaleData;
-	displayBackground: string;
-	showScaleName?: boolean;
+	index: number;
 	showGamutRelativeChroma: boolean;
 	showOkhslSaturation: boolean;
+	signedContrasts: number[];
 } ) {
-	const contrastMagnitudes = data.scale.colors.map( ( color ) =>
-		getPerceptualContrastMagnitude( displayBackground, color )
-	);
-	const signedContrasts = data.scale.colors.map( ( color ) =>
-		getSignedPerceptualContrast( displayBackground, color )
-	);
-	const stateColorDifference = getStateColorDifference( data.scale.colors );
+	const interval =
+		index === 0
+			? undefined
+			: contrastMagnitudes[ index ] - contrastMagnitudes[ index - 1 ];
 
 	return (
-		<section
-			className={ styles.scale }
-			aria-label={ ariaLabel ?? `${ data.label } scale` }
+		<td
+			className={ styles[ 'scale-cell' ] }
+			style={ {
+				background: color,
+				color: getSwatchTextColor( color ),
+			} }
 		>
-			<div className={ styles[ 'scale-heading' ] }>
-				{ showScaleName ? <h4>{ data.label }</h4> : null }
-				<div className={ styles[ 'scale-meta' ] }>
-					<span className={ styles[ 'state-difference' ] }>
-						FGS4→5 ΔEOK2 { stateColorDifference.toFixed( 3 ) }
-					</span>
-					<span
-						className={ styles.status }
-						data-pass={ data.scale.meetsContrastTargets }
-					>
-						{ data.scale.meetsContrastTargets
-							? 'Contrast targets pass'
-							: 'Contrast target warning' }
-					</span>
-				</div>
-			</div>
-			<div className={ styles.swatches }>
-				{ data.scale.colors.map( ( color, index ) => {
-					const interval =
-						index === 0
-							? undefined
-							: contrastMagnitudes[ index ] -
-							  contrastMagnitudes[ index - 1 ];
-
-					return (
-						<div
-							className={ styles.swatch }
-							key={ `${ color }-${ index }` }
-							style={ {
-								background: color,
-								color: getSwatchTextColor( color ),
-							} }
-						>
-							<strong>FGS{ index + 1 }</strong>
-							<code>{ color }</code>
-							<span>
-								Min contrast{ ' ' }
-								{ data.scale.minimumContrasts[ index ].toFixed(
-									2
-								) }{ ' ' }
-								/ { data.scale.contrastTargets[ index ] }
-							</span>
-							<span>
-								APCA Lc{ ' ' }
-								{ formatSignedContrast(
-									signedContrasts[ index ]
-								) }
-							</span>
-							{ showGamutRelativeChroma ? (
-								<span>
-									Gamut chroma{ ' ' }
-									{ (
-										getGamutRelativeChroma( color ) * 100
-									).toFixed( 0 ) }
-									%
-								</span>
-							) : null }
-							{ showOkhslSaturation ? (
-								<span>
-									OKHSL saturation{ ' ' }
-									{ (
-										getOkhslSaturation( color ) * 100
-									).toFixed( 0 ) }
-									%
-								</span>
-							) : null }
-							{ interval === undefined ? null : (
-								<span>Δ |Lc| { interval.toFixed( 1 ) }</span>
-							) }
-						</div>
-					);
-				} ) }
-			</div>
-		</section>
+			<code>{ color }</code>
+			<span>
+				Min contrast{ ' ' }
+				{ data.scale.minimumContrasts[ index ].toFixed( 2 ) } /{ ' ' }
+				{ data.scale.contrastTargets[ index ] }
+			</span>
+			<span>
+				APCA Lc { formatSignedContrast( signedContrasts[ index ] ) }
+			</span>
+			{ showGamutRelativeChroma ? (
+				<span>
+					Gamut chroma{ ' ' }
+					{ ( getGamutRelativeChroma( color ) * 100 ).toFixed( 0 ) }%
+				</span>
+			) : null }
+			{ showOkhslSaturation ? (
+				<span>
+					OKHSL saturation{ ' ' }
+					{ ( getOkhslSaturation( color ) * 100 ).toFixed( 0 ) }%
+				</span>
+			) : null }
+			{ interval === undefined ? null : (
+				<span>Δ |Lc| { interval.toFixed( 1 ) }</span>
+			) }
+		</td>
 	);
 }
 
@@ -405,14 +357,12 @@ function ComponentPanel( {
 }
 
 function buildScaleData( {
-	label,
 	method,
 	ramp,
 	backgroundRamp,
 	seed,
 	scaleType,
 }: {
-	label: string;
 	method: ExperimentalForegroundMethod;
 	ramp: RampResult;
 	backgroundRamp: RampResult;
@@ -420,7 +370,6 @@ function buildScaleData( {
 	scaleType: ExperimentalForegroundScaleType;
 } ): ScaleData {
 	return {
-		label,
 		scaleType,
 		scale: buildPerceptualForegroundScale( {
 			method,
@@ -473,7 +422,6 @@ function buildMethodScaleData( {
 		method,
 		scales: {
 			neutral: buildScaleData( {
-				label: 'Neutral',
 				method,
 				ramp: backgroundRamp,
 				backgroundRamp,
@@ -481,7 +429,6 @@ function buildMethodScaleData( {
 				scaleType: 'neutral',
 			} ),
 			brand: buildScaleData( {
-				label: 'Brand',
 				method,
 				ramp: primaryRamp,
 				backgroundRamp,
@@ -489,7 +436,6 @@ function buildMethodScaleData( {
 				scaleType: 'accent',
 			} ),
 			error: buildScaleData( {
-				label: 'Error',
 				method,
 				ramp: errorRamp,
 				backgroundRamp,
@@ -533,32 +479,113 @@ function ScaleComparison( {
 			<h3>{ comparison.label }</h3>
 			<div
 				aria-label={ `${ seedLabel }, ${ comparison.label } scale approaches` }
-				className={ styles.approaches }
+				className={ styles[ 'scale-table-scroll' ] }
 				role="region"
 				tabIndex={ 0 }
 			>
-				{ methods.map( ( { method, scales } ) => {
-					const data = scales[ comparison.name ];
+				<table
+					aria-label={ `${ seedLabel }, ${ comparison.label } scale comparison` }
+					className={ styles[ 'scale-table' ] }
+				>
+					<thead>
+						<tr>
+							<th scope="col">Approach</th>
+							{ [ 1, 2, 3, 4, 5 ].map( ( step ) => (
+								<th key={ step } scope="col">
+									FGS{ step }
+								</th>
+							) ) }
+						</tr>
+					</thead>
+					<tbody>
+						{ methods.map( ( { method, scales } ) => {
+							const data = scales[ comparison.name ];
+							const contrastMagnitudes = data.scale.colors.map(
+								( color ) =>
+									getPerceptualContrastMagnitude(
+										displayBackground,
+										color
+									)
+							);
+							const signedContrasts = data.scale.colors.map(
+								( color ) =>
+									getSignedPerceptualContrast(
+										displayBackground,
+										color
+									)
+							);
+							const showGamutRelativeChroma =
+								data.scaleType === 'accent' &&
+								GAMUT_CHROMA_METHODS.has( method );
+							const showOkhslSaturation =
+								data.scaleType === 'accent' &&
+								OKHSL_SATURATION_METHODS.has( method );
 
-					return (
-						<ApproachCard key={ method } method={ method }>
-							<ForegroundScale
-								ariaLabel={ `${ seedLabel }, ${ METHOD_DETAILS[ method ].label } ${ data.label } scale` }
-								data={ data }
-								displayBackground={ displayBackground }
-								showGamutRelativeChroma={
-									data.scaleType === 'accent' &&
-									GAMUT_CHROMA_METHODS.has( method )
-								}
-								showOkhslSaturation={
-									data.scaleType === 'accent' &&
-									OKHSL_SATURATION_METHODS.has( method )
-								}
-								showScaleName={ false }
-							/>
-						</ApproachCard>
-					);
-				} ) }
+							return (
+								<tr key={ method }>
+									<th
+										className={ styles[ 'method-cell' ] }
+										scope="row"
+									>
+										<strong>
+											{ METHOD_DETAILS[ method ].label }
+										</strong>
+										<div
+											className={
+												styles[ 'method-meta' ]
+											}
+										>
+											<span
+												className={
+													styles[ 'state-difference' ]
+												}
+											>
+												FGS4→5 ΔEOK2{ ' ' }
+												{ getStateColorDifference(
+													data.scale.colors
+												).toFixed( 3 ) }
+											</span>
+											<span
+												className={ styles.status }
+												data-pass={
+													data.scale
+														.meetsContrastTargets
+												}
+											>
+												{ data.scale
+													.meetsContrastTargets
+													? 'Contrast targets pass'
+													: 'Contrast target warning' }
+											</span>
+										</div>
+									</th>
+									{ data.scale.colors.map(
+										( color, index ) => (
+											<ScaleCell
+												color={ color }
+												contrastMagnitudes={
+													contrastMagnitudes
+												}
+												data={ data }
+												index={ index }
+												key={ `${ color }-${ index }` }
+												showGamutRelativeChroma={
+													showGamutRelativeChroma
+												}
+												showOkhslSaturation={
+													showOkhslSaturation
+												}
+												signedContrasts={
+													signedContrasts
+												}
+											/>
+										)
+									) }
+								</tr>
+							);
+						} ) }
+					</tbody>
+				</table>
 			</div>
 		</section>
 	);
