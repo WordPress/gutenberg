@@ -23,7 +23,7 @@ A widget is a directory under `widgets/`, discovered by convention; there is no 
 ```
 widgets/hello-world/
 ├── widget.json        static metadata (name, title, description, help, icon, actions, keywords, category, presentation, textdomain)
-├── widget.ts          metadata module: default-exports attributes, example
+├── widget.ts          optional metadata module: default-exports attributes, example
 ├── render.tsx         render module: default-exports the React component
 ├── style.module.css   optional, injected at runtime by the build
 └── report.csv         optional static asset; action `href`s resolve it only where `widgets/` ships
@@ -37,7 +37,7 @@ Unlike the other translatable strings, `help` is an object: `content` plus optio
 
 `icon`: a registered icon name (`collection/icon-name`), resolved client-side through the site's Icons API. Malformed names are dropped at registration.
 
-`widget.ts` is the live half of the metadata: values that only exist in JavaScript, such as the `attributes` field schema (including optional `relevance` hints) that hosts feed into `DataForm`.
+`widget.ts` is the live half of the metadata: values that only exist in JavaScript, such as the `attributes` field schema (including optional `relevance` hints) that hosts feed into `DataForm`. It is optional: a widget declared entirely by its manifest ships none, and resolves from its record alone.
 
 Its render component receives the widget's `attributes` and, optionally, `setAttributes`:
 
@@ -73,7 +73,7 @@ The registry exists as a class, rather than having REST read the manifest direct
 
 Everything after the REST record is the job of [`@wordpress/widget-primitives`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/widget-primitives), the contract both widget authors and hosts share. Its full surface (the contract types, the discovery hook, and the render component) is covered in the _Widget Primitives / Introduction_ story. In the pipeline it does two things.
 
-`useWidgetTypes( records )` takes the host-supplied records, imports each record's `widget_module` for the live metadata, and merges it with the record into `WidgetType[]`. The record's `presentation`, `category`, `title`, `description`, `help`, `actions`, and `keywords`, all sourced from `widget.json` (with `title`, `description`, `help`, `actions`, and `keywords` localized server-side), win over the module's value. The record's `icon` is a registered icon name: the hook resolves it through the application-registered resolver (`registerIconResolver`), and the resolved element wins over a module's element. The hook reaches for no store or endpoint; a host such as the dashboard reads its own `widgetModule` core-data entity (backed by `/wp/v2/widget-modules`) and passes the records in.
+`useWidgetTypes( records )` takes the host-supplied records, imports each record's `widget_module` for the live metadata, and merges it with the record into `WidgetType[]`. A record without a metadata module resolves from its own fields, as long as it carries a `render_module`. The record's `presentation`, `category`, `title`, `description`, `help`, `actions`, and `keywords`, all sourced from `widget.json` (with `title`, `description`, `help`, `actions`, and `keywords` localized server-side), win over the module's value. The record's `icon` is a registered icon name: the hook resolves it through the application-registered resolver (`registerIconResolver`), and the resolved element wins over a module's element. The hook reaches for no store or endpoint; a host such as the dashboard reads its own `widgetModule` core-data entity (backed by `/wp/v2/widget-modules`) and passes the records in.
 
 A module's `attributes` may also reference field types by name (`type: 'location'`). The application registers those definitions up front through `registerFieldType()` (the dashboard route registers its own on boot), and `useWidgetTypes` resolves every named reference through that registry while building each `WidgetType`: the registered definition supplies the field's behavior on top of its DataViews `baseType`, and hosts receive plain DataViews fields. The widget declaration stays serializable; resolution happens once, at this boundary.
 
@@ -90,6 +90,9 @@ The dashboard engine ([`@wordpress/widget-dashboard`](https://github.com/WordPre
 -   Owns the layout array and its persistence.
 -   Wraps every instance in its own chrome: header, toolbars, error boundary, Suspense fallback.
 -   Passes `resolveWidgetModule` down through its context, overridable for tests and Storybook.
+-   Provides the `links` host capability at its route layer: an action href it recognizes as one of its own routes mounts the router's link and navigates client-side.
+
+Governance is separate from rendering: a `WidgetDashboard.Policy` mounted above one or several dashboards answers `canPerform` for each operation (entering customize mode, offering a widget type in the inserter, removing, moving, resizing, or editing an instance), without touching the registry that keeps placed widgets rendering.
 
 The same `WidgetType` could be rendered by any other host, and where and how to render belongs entirely to the host. Every host is a consumer of the package, but not every consumer is a host: tests, Storybook, or a picker that only lists widget types consume the same contract without rendering anything.
 

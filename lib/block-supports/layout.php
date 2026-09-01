@@ -843,7 +843,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$row_count         = is_numeric( $row_count_attr ) ? (int) $row_count_attr : null;
 
 		/*
-		 * If the gap value is an array, we use the "left" value because it represents the vertical gap, which
+		 * If the gap value is an array, we use the "left" value because it represents the horizontal gap, which
 		 * is the relevant one for computation of responsive grid columns.
 		 */
 		if ( is_array( $fallback_gap_value ) ) {
@@ -872,10 +872,12 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 					$slug            = _wp_to_kebab_case( substr( $process_value, $index_to_splice ) );
 					$process_value   = "var(--wp--preset--spacing--$slug)";
 				}
+				if ( ! is_array( $gap_value ) || 'left' === $gap_side ) {
+					$responsive_gap_value = $process_value;
+				}
 				$combined_gap_value .= "$process_value ";
 			}
-			$gap_value            = trim( $combined_gap_value );
-			$responsive_gap_value = $gap_value;
+			$gap_value = trim( $combined_gap_value );
 		}
 
 		// Ensure 0 values have a unit so they work in calc().
@@ -1009,8 +1011,6 @@ function gutenberg_unique_id_from_values( array $data, string $prefix = '' ): st
  * @return string                Filtered block content.
  */
 function gutenberg_render_layout_support_flag( $block_content, $block ) {
-	static $global_styles = null;
-
 	$block_type            = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	$block_supports_layout = block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false );
 	$style_attr            = gutenberg_resolve_style_state_aliases(
@@ -1227,10 +1227,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 		// Get default blockGap value from global styles for use in layouts like grid.
 		// Check style variation first, then block-specific styles, then fall back to root styles.
-		$block_name = $block['blockName'] ?? '';
-		if ( null === $global_styles ) {
-			$global_styles = gutenberg_get_global_styles();
-		}
+		$block_name    = $block['blockName'] ?? '';
+		$global_styles = gutenberg_get_global_styles();
 
 		// Check if the block has an active style variation with a blockGap value.
 		// Only check the registry if the className contains a variation class to avoid unnecessary lookups.
