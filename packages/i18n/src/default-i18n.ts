@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { defaultHooks } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
 import { createI18n } from './create-i18n';
 import {
 	LocaleData,

@@ -1,11 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
-// @ts-ignore
+// @ts-expect-error `@wordpress/patterns` is not typed yet.
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import {
 	Button,
@@ -15,11 +12,6 @@ import {
 } from '@wordpress/components';
 import type { Action } from '@wordpress/dataviews';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
-
 import { unlock } from '../lock-unlock';
 import {
 	getItemTitle,
@@ -41,28 +33,13 @@ const renamePost: Action< PostWithPermissions > = {
 			return false;
 		}
 
-		// Non-database template cannot be edited.
-		if (
-			post.type === 'wp_template' &&
-			typeof post.id === 'string' &&
-			window?.__experimentalTemplateActivate
-		) {
-			return false;
-		}
-
-		const specialChecks = [ 'wp_template', 'wp_template_part' ];
-
-		if ( ! window?.__experimentalTemplateActivate ) {
-			specialChecks.push( 'wp_template' );
-		}
-
 		// Templates, template parts and patterns have special checks for renaming.
-		if ( ! specialChecks.includes( post.type ) ) {
+		if ( ! [ 'wp_template', 'wp_template_part' ].includes( post.type ) ) {
 			return post.permissions?.update;
 		}
 
 		// In the case of templates, we can only rename custom templates.
-		if ( isTemplate( post ) && ! window?.__experimentalTemplateActivate ) {
+		if ( isTemplate( post ) ) {
 			return (
 				isTemplateRemovable( post ) &&
 				post.is_custom &&
@@ -119,7 +96,6 @@ const renamePost: Action< PostWithPermissions > = {
 			<form onSubmit={ onRename }>
 				<VStack spacing="5">
 					<TextControl
-						__next40pxDefaultSize
 						label={ __( 'Name' ) }
 						value={ title }
 						onChange={ setTitle }

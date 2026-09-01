@@ -6,16 +6,15 @@
 		"checkJs": false,
 		"strict": false
 	},
-	"references": [ { "path": "../a11y" }, { "path": "../interactivity" } ],
+	"references": [
+		{ "path": "../a11y/tsconfig.build.json" },
+		{ "path": "../interactivity/tsconfig.build.json" }
+	],
 	"exclude": [
-		"**/*.android.js",
-		"**/*.ios.js",
-		"**/*.native.js",
 		"**/benchmark",
 		"build-*/**",
 		"build/**",
 		"**/test/**",
-		"**/react-native-*/**",
 		"src/full-page.ts"
 	]
 }

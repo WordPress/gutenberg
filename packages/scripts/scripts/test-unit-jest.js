@@ -8,15 +8,7 @@ process.env.NODE_ENV = 'test';
 process.on( 'unhandledRejection', ( err ) => {
 	throw err;
 } );
-
-/**
- * External dependencies
- */
 const jest = require( 'jest' );
-
-/**
- * Internal dependencies
- */
 const { getJestOverrideConfigFile, getArgsFromCLI } = require( '../utils' );
 
 const configFile = getJestOverrideConfigFile( 'unit' );

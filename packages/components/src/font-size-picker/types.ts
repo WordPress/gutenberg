@@ -1,4 +1,9 @@
-export type FontSizePickerProps = {
+import type { ToggleGroupControlProps } from '../toggle-group-control/types';
+
+export type FontSizePickerProps = Pick<
+	ToggleGroupControlProps,
+	'__next40pxDefaultSize' | 'size'
+> & {
 	/**
 	 * If `true`, it will not be possible to choose a custom fontSize. The user
 	 * will be forced to pick one of the pre-defined sizes passed in fontSizes.
@@ -74,18 +79,6 @@ export type FontSizePickerProps = {
 	 * @ignore
 	 */
 	__nextHasNoMarginBottom?: boolean;
-	/**
-	 * Start opting into the larger default height that will become the default size in a future version.
-	 *
-	 * @default false
-	 */
-	__next40pxDefaultSize?: boolean;
-	/**
-	 * Size of the control.
-	 *
-	 * @default 'default'
-	 */
-	size?: 'default' | '__unstable-large';
 };
 
 export type FontSize = {
@@ -114,7 +107,7 @@ export type FontSize = {
 
 export type FontSizePickerSelectProps = Pick<
 	FontSizePickerProps,
-	'value' | 'size' | 'valueMode'
+	'value' | 'valueMode'
 > & {
 	fontSizes: NonNullable< FontSizePickerProps[ 'fontSizes' ] >;
 	disableCustomFontSizes: NonNullable<
@@ -125,7 +118,6 @@ export type FontSizePickerSelectProps = Pick<
 		selectedItem?: FontSize
 	) => void;
 	onSelectCustom: () => void;
-	__next40pxDefaultSize: boolean;
 };
 
 export type FontSizePickerSelectOption = {
@@ -137,7 +129,7 @@ export type FontSizePickerSelectOption = {
 
 export type FontSizePickerToggleGroupProps = Pick<
 	FontSizePickerProps,
-	'value' | 'size' | '__next40pxDefaultSize' | 'valueMode'
+	'value' | 'valueMode'
 > & {
 	fontSizes: NonNullable< FontSizePickerProps[ 'fontSizes' ] >;
 	onChange: (

@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type * as Ariakit from '@ariakit/react';
 
 export interface ContextProps {
@@ -258,7 +255,7 @@ export interface CheckboxItemProps {
 	 * The checked state of the checkbox menu item when it is initially rendered.
 	 * Use when not wanting to control its checked state.
 	 *
-	 * Note: this prop will be overriden by the `checked` prop, if it is defined.
+	 * Note: this prop will be overridden by the `checked` prop, if it is defined.
 	 */
 	defaultChecked?: Ariakit.MenuItemCheckboxProps[ 'defaultChecked' ];
 	/**
@@ -321,7 +318,7 @@ export interface RadioItemProps {
 	 * The checked state of the radio menu item when it is initially rendered.
 	 * Use when not wanting to control its checked state.
 	 *
-	 * Note: this prop will be overriden by the `checked` prop, if it is defined.
+	 * Note: this prop will be overridden by the `checked` prop, if it is defined.
 	 */
 	defaultChecked?: Ariakit.MenuItemRadioProps[ 'defaultChecked' ];
 	/**

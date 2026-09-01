@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Activate theme', () => {
@@ -35,14 +32,14 @@ test.describe( 'Activate theme', () => {
 		admin,
 		page,
 	} ) => {
-		// Wait for the loading to complete.
-		await expect( page.locator( '.edit-site-canvas-loader' ) ).toHaveCount(
-			0
-		);
-		// Disable welcome guide to prevent onboarding modal from appearing.
+		// Wait for the Site Editor to load before interacting with the page.
+		await expect(
+			page.getByRole( 'button', { name: 'Activate Emptytheme' } )
+		).toBeVisible();
 		await editor.setPreferences( 'core/edit-site', {
 			welcomeGuide: false,
 		} );
+
 		await editor.canvas.locator( 'body' ).click();
 		await page
 			.getByRole( 'region', { name: 'Editor top bar' } )

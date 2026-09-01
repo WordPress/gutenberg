@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { createInterpolateElement } from '@wordpress/element';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
-
-/**
- * Internal dependencies
- */
 import type { BasePost } from '../../types';
 
 const getFormattedDate = ( dateToDisplay: string | null ) =>

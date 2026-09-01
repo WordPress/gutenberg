@@ -36,3 +36,8 @@ export function __experimentalRichText() {}
  * documentation for more information.
  */
 export type { RichTextValue } from './types';
+
+/**
+ * The callback-Set refs the private event-listener helpers dispatch from.
+ */
+export type { EventListenersProps } from './event-listeners';

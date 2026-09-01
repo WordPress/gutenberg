@@ -987,9 +987,8 @@ class WP_Duotone_Gutenberg {
 		$tags->set_bookmark( 'wrapper-div' );
 		$tags->next_tag();
 
-		$inner_classnames = explode( ' ', $tags->get_attribute( 'class' ) );
-		foreach ( $inner_classnames as $classname ) {
-			if ( 0 === strpos( $classname, 'wp-duotone' ) ) {
+		foreach ( $tags->class_list() as $classname ) {
+			if ( str_starts_with( $classname, 'wp-duotone' ) ) {
 				$tags->remove_class( $classname );
 				$tags->seek( 'wrapper-div' );
 				$tags->add_class( $classname );
