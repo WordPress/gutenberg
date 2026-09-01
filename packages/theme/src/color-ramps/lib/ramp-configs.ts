@@ -169,7 +169,7 @@ const BG_RAMP_STEPS: RampConfig[ 'steps' ] = {
 	bgFill2: {
 		contrast: {
 			reference: 'bgFill1',
-			followDirection: 'main',
+			followDirection: 'darker',
 			target: 1.2,
 		},
 	},
@@ -272,7 +272,6 @@ const BG_RAMP_STEPS: RampConfig[ 'steps' ] = {
 			followDirection: 'best',
 			target: 4.5,
 		},
-		lightness: lightnessConstraintForegroundHighContrast,
 		taperChromaOptions: FG_TAPER_CHROMA,
 	},
 	fgFillInverted: {
