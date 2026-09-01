@@ -104,7 +104,7 @@
 /packages/dom-ready
 /packages/escape-html
 /packages/html-entities
-/packages/i18n
+/packages/i18n                                  @swissspidy
 /packages/is-shallow-equal
 /packages/keyboard-shortcuts
 /packages/keycodes
