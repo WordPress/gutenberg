@@ -6,7 +6,7 @@
 		// what Node's type stripping resolves when the action runs.
 		"allowImportingTsExtensions": true,
 		// The action talks to Node and the runner directly, with no dependencies.
-		"types": [ "jest", "node" ]
+		"types": [ "node" ]
 	},
 	"include": [ "src" ]
 }
