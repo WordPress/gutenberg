@@ -1,7 +1,15 @@
 name: Enforce labels on Pull Request
 on:
     pull_request_target:
-        types: [labeled, unlabeled, ready_for_review, review_requested]
+        types:
+            [
+                opened,
+                reopened,
+                labeled,
+                unlabeled,
+                ready_for_review,
+                review_requested,
+            ]
 
 # Disable permissions for all available scopes by default.
 # Any needed permissions should be configured at the job level.
@@ -9,17 +17,73 @@ permissions: {}
 
 jobs:
     type-related-labels:
+        name: Check the type label
         runs-on: 'ubuntu-24.04'
         if: ${{ github.event.pull_request.state == 'open' }}
         permissions:
+            contents: read
             pull-requests: write
+        timeout-minutes: 5
+        # Shared with every other writer of this comment. See bundle-size.yml.
+        concurrency:
+            group: pr-meta-${{ github.event.number }}
+            cancel-in-progress: false
+            queue: max
+
         steps:
-            - uses: mheap/github-action-required-labels@23e10fde7e062233401931a0eece796cd9bf3177 # v5.6.0
+            # A `pull_request_target` job has a writable token, so it checks out
+            # the base branch it was triggered on, never the pull request's head.
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
-                  mode: exactly
-                  count: 1
-                  labels: '^\[Type\]'
-                  use_regex: true
-                  add_comment: true
-                  message: "**Warning: Type of PR label mismatch**\n\n To merge this PR, it requires {{ errorString }} {{ count }} label indicating the type of PR. Other labels are optional and not being checked here. \n- **Required label**: Any label starting with `[Type]`.\n- **Labels found**: {{ applied }}.\n\nRead more about [Type labels in Gutenberg](https://github.com/WordPress/gutenberg/labels?q=type). Don't worry if you don't have the required permissions to add labels; the PR reviewer should be able to help with the task."
-                  exit_type: failure
+                  sparse-checkout: tools/pr-meta
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Check for a type label
+              id: check
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  PR_NUMBER: ${{ github.event.number }}
+                  REPO: ${{ github.repository }}
+              run: |
+                  mkdir -p pr-meta
+
+                  # Read the labels now rather than from the event payload. Runs
+                  # queue behind each other on the shared lock, so an older one
+                  # can arrive after a newer one already fixed the labels.
+                  type_labels="$(gh api "repos/${REPO}/issues/${PR_NUMBER}/labels" \
+                    --jq '[ .[].name | select( startswith( "[Type]" ) ) ]')"
+                  count="$(printf '%s' "$type_labels" | jq 'length')"
+
+                  if [ "$count" -eq 1 ]; then
+                    echo "ok=true" >> "$GITHUB_OUTPUT"
+                    exit 0
+                  fi
+
+                  echo "ok=false" >> "$GITHUB_OUTPUT"
+                  applied="$(printf '%s' "$type_labels" | jq -r 'if length == 0 then "none" else join( ", " ) end')"
+
+                  cat > pr-meta/body.md <<EOF
+                  This pull request needs exactly one label indicating its type, and has ${count}.
+
+                  - Required: any label starting with \`[Type]\`.
+                  - Found: ${applied}.
+
+                  Read more about [Type labels in Gutenberg](https://github.com/WordPress/gutenberg/labels?q=type). If you cannot add labels yourself, a reviewer can do it for you.
+                  EOF
+
+            # Runs whatever the check found, since an empty section is what
+            # clears the warning once the labels are right. Not when the check
+            # itself failed: no body file then means "labels are fine", and a
+            # failed API call would erase a warning nothing had disproved.
+            - name: Report the result
+              if: ${{ !cancelled() && steps.check.outcome == 'success' }}
+              uses: ./tools/pr-meta
+              with:
+                  repo-token: ${{ secrets.GITHUB_TOKEN }}
+                  section: labels
+                  body-path: pr-meta/body.md
+
+            - name: Require exactly one type label
+              if: ${{ steps.check.outputs.ok != 'true' }}
+              run: exit 1
