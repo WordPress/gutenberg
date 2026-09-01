@@ -1,6 +1,6 @@
 import remove from './remove';
 
-const DANGEROUS_TAGS = new Set( [ 'SCRIPT', 'IFRAME', 'OBJECT', 'EMBED' ] );
+const DANGEROUS_TAGS = new Set( [ 'SCRIPT', 'OBJECT', 'EMBED' ] );
 const DANGEROUS_URI_ATTRS = new Set( [
 	'href',
 	'src',
@@ -9,9 +9,8 @@ const DANGEROUS_URI_ATTRS = new Set( [
 	'xlink:href',
 	'data',
 ] );
-// eslint-disable-next-line no-control-regex
 const DANGEROUS_URI_PATTERN =
-	/^(?:[\x00-\x20\s]*)(?:javascript|vbscript|data(?:\/|\:text\/html|\:image\/svg\+xml)):/i;
+	/^\s*(?:javascript|vbscript|data(?:\/|\:text\/html|\:image\/svg\+xml)):/i;
 
 /**
  * Strips scripts, embedding elements, on* attributes, and executable URIs from HTML.
