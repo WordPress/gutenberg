@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Post editor: Show the inline inserter in the gap between the post title and the first block ([#27540](https://github.com/WordPress/gutenberg/issues/27540)).
+-   Post editor: Show the inline inserter in the gap between the post title and the first block ([#82301](https://github.com/WordPress/gutenberg/pull/82301)).
 
 ### Breaking Changes
 
