@@ -1,8 +1,8 @@
 # Vitest migration routing
 
 Every new JavaScript unit and integration test runs in Vitest. The migration
-manifest in `test-migration.json` contains the remaining legacy Jest tests and
-Jest-only infrastructure while the repository finishes moving them to Vitest.
+manifest in `test-migration.json` contains the exact list of remaining legacy
+Jest tests while the repository finishes moving them to Vitest.
 
 The routing validator derives the current test inventory from both runners and
 the repository's static test-file patterns. It does not depend on a fixed test

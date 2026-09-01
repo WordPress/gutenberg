@@ -106,7 +106,10 @@ describe( 'runner isolation policy', () => {
 	it( 'reports command surfaces that disable module isolation', () => {
 		const rootDir = createTemporaryDirectory();
 		writeJson( path.join( rootDir, 'package.json' ), {
-			scripts: { test: 'vitest --no-isolate' },
+			scripts: {
+				test: 'vitest --no-isolate',
+				'test:browser': 'vitest --browser.isolate=false',
+			},
 		} );
 		mkdirSync( path.join( rootDir, '.github/workflows' ), {
 			recursive: true,
@@ -120,13 +123,14 @@ describe( 'runner isolation policy', () => {
 		);
 		writeFileSync(
 			path.join( rootDir, '.github/actions/run-tests/action.yml' ),
-			"run: 'vitest --isolate false'\n"
+			'run: |-\n  vitest --isolate \\\n    false\n'
 		);
 
 		expect( findVitestIsolationOptOuts( rootDir ) ).toEqual( [
-			".github/actions/run-tests/action.yml:1 disables Vitest module isolation: run: 'vitest --isolate false'",
-			'.github/workflows/test.yml:1 disables Vitest module isolation: run: "vitest --no-isolate"',
+			'.github/actions/run-tests/action.yml:1 disables Vitest module isolation: vitest --isolate false',
+			'.github/workflows/test.yml:1 disables Vitest module isolation: vitest --no-isolate',
 			'package.json:scripts.test disables Vitest module isolation: vitest --no-isolate',
+			'package.json:scripts.test:browser disables Vitest module isolation: vitest --browser.isolate=false',
 		] );
 	} );
 } );
