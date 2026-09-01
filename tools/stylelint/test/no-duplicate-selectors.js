@@ -1,44 +1,42 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { getStylelintResult } from './utils';
 
-describe( 'flags no warnings when no duplicate selectors are found in scss', () => {
+describe( 'allows duplicate selectors in scss', () => {
 	let result;
 
-	beforeEach( () => {
-		result = getStylelintResult( './no-duplicate-selectors-valid.scss' );
+	beforeAll( async () => {
+		result = await getStylelintResult(
+			'./no-duplicate-selectors-valid.scss'
+		);
 	} );
 
 	it( 'did not error', () => {
-		return result.then( ( data ) => expect( data.errored ).toBeFalsy() );
+		expect( result.errored ).toBeFalsy();
 	} );
 
 	it( 'flags no warnings', () => {
-		return result.then( ( data ) =>
-			expect( data.results[ 0 ].warnings ).toHaveLength( 0 )
-		);
+		expect( result.results[ 0 ].warnings ).toHaveLength( 0 );
 	} );
 } );
 
 describe( 'flags warnings when duplicate selectors are found in css', () => {
 	let result;
 
-	beforeEach( () => {
-		result = getStylelintResult( './no-duplicate-selectors-invalid.css' );
+	beforeAll( async () => {
+		result = await getStylelintResult(
+			'./no-duplicate-selectors-invalid.css'
+		);
 	} );
 
 	it( 'did error', () => {
-		return result.then( ( data ) => expect( data.errored ).toBeTruthy() );
+		expect( result.errored ).toBeTruthy();
 	} );
 
 	it( 'flags correct number of warnings', () => {
-		return result.then( ( data ) =>
-			expect( data.results[ 0 ].warnings ).toHaveLength( 1 )
-		);
+		expect( result.results[ 0 ].warnings ).toHaveLength( 1 );
 	} );
 
 	it( 'snapshot matches warnings', () => {
-		return result.then( ( data ) =>
-			expect( data.results[ 0 ].warnings ).toMatchSnapshot()
-		);
+		expect( result.results[ 0 ].warnings ).toMatchSnapshot();
 	} );
 } );

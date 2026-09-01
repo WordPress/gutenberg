@@ -1,5 +1,5 @@
 {
-	"extends": "./.stylelintrc.tests.json",
+	"extends": "../config.js",
 	"overrides": [
 		{
 			"files": [ "*.scss", "**/*.scss" ],
