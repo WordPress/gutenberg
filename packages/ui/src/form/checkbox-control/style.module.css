@@ -29,7 +29,7 @@
 			--wp-ui-field-label-line-height: var(--_wp-ui-checkbox-control-label-line-height);
 		}
 
-		.root:not(:has([data-disabled])) .label {
+		.root:not(:has(.checkbox[data-disabled])) .label {
 			cursor: var(--wpds-cursor-control);
 		}
 	}
