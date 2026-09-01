@@ -619,6 +619,13 @@
             - render
             - style
             - variant
+      - name: Field.VisualLabel
+        props:
+            - children
+            - className
+            - render
+            - style
+            - variant
 - name: Fieldset.Root
   props:
       - children
