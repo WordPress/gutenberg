@@ -6,8 +6,6 @@ const meta: Meta< typeof Radio > = {
 	title: 'Design System/Components/Form/Primitives/Radio',
 	component: Radio,
 	parameters: {
-		// See: https://github.com/WordPress/gutenberg/issues/81596
-		a11y: { test: 'todo' },
 		componentStatus: {
 			status: 'use-with-caution',
 			whereUsed: 'global',
@@ -23,9 +21,10 @@ type Story = StoryObj< typeof Radio >;
 export const Default: Story = {
 	args: {
 		value: 'option',
+		'aria-label': 'Option',
 	},
 	render: ( args ) => (
-		<RadioGroup>
+		<RadioGroup aria-label="Options">
 			<Radio { ...args } />
 		</RadioGroup>
 	),
@@ -33,10 +32,10 @@ export const Default: Story = {
 
 export const Checked: Story = {
 	args: {
-		value: 'option',
+		...Default.args,
 	},
 	render: ( args ) => (
-		<RadioGroup defaultValue="option">
+		<RadioGroup aria-label="Options" defaultValue="option">
 			<Radio { ...args } />
 		</RadioGroup>
 	),
@@ -44,11 +43,11 @@ export const Checked: Story = {
 
 export const Disabled: Story = {
 	args: {
-		value: 'option',
+		...Default.args,
 		disabled: true,
 	},
 	render: ( args ) => (
-		<RadioGroup>
+		<RadioGroup aria-label="Options">
 			<Radio { ...args } />
 		</RadioGroup>
 	),
@@ -56,11 +55,11 @@ export const Disabled: Story = {
 
 export const DisabledChecked: Story = {
 	args: {
-		value: 'option',
+		...Default.args,
 		disabled: true,
 	},
 	render: ( args ) => (
-		<RadioGroup defaultValue="option">
+		<RadioGroup aria-label="Options" defaultValue="option">
 			<Radio { ...args } />
 		</RadioGroup>
 	),
