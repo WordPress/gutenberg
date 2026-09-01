@@ -580,13 +580,22 @@ describe( 'demoteHeadings', () => {
 	} );
 
 	it( 'keeps the hierarchy between headings', () => {
-		const body = '# Title\n\nText.\n\n### Deep\n\nText.';
+		const body = '## Title\n\nText.\n\n### Deep\n\nText.';
 
 		expect( demoteHeadings( body ) ).toBe(
-			'##### Title\n\nText.\n\n####### Deep\n\nText.'.replace(
-				'#######',
-				'######'
-			)
+			'##### Title\n\nText.\n\n###### Deep\n\nText.'
+		);
+	} );
+
+	/*
+	 * Markdown has no seventh level, so a body deep enough to need one loses
+	 * the distinction rather than the demotion.
+	 */
+	it( 'flattens levels a demotion pushes past the sixth', () => {
+		const body = '# One\n\n## Two\n\n### Three';
+
+		expect( demoteHeadings( body ) ).toBe(
+			'##### One\n\n###### Two\n\n###### Three'
 		);
 	} );
 
@@ -597,11 +606,100 @@ describe( 'demoteHeadings', () => {
 	} );
 
 	/* A stack trace can hold anything, including lines that look like headings. */
-	it( 'ignores what looks like a heading inside a code fence', () => {
-		const body = '## Real\n\n```\n# Not a heading\n```';
+	it.each( [
+		[ 'a plain fence', '```', '```' ],
+		[ 'a fence with a language', '```js', '```' ],
+		[ 'a tilde fence', '~~~', '~~~' ],
+	] )( 'ignores what looks like a heading inside %s', ( _, open, close ) => {
+		const body = `## Real\n\n${ open }\n# Not a heading\n${ close }`;
 
 		expect( demoteHeadings( body ) ).toBe(
-			'##### Real\n\n```\n# Not a heading\n```'
+			`##### Real\n\n${ open }\n# Not a heading\n${ close }`
 		);
+	} );
+
+	/* Reading the level by hunting for a space loses the first word. */
+	it( 'keeps the text of a heading separated by a tab', () => {
+		expect( demoteHeadings( '#\tTabbed' ) ).toBe( '#####\tTabbed' );
+	} );
+
+	it( 'leaves a hash that opens no heading alone', () => {
+		expect( demoteHeadings( '## Real\n\n#hashtag' ) ).toBe(
+			'##### Real\n\n#hashtag'
+		);
+	} );
+
+	it( 'caps the demotion at the deepest heading level', () => {
+		expect( demoteHeadings( '# One\n\n###### Six' ) ).toBe(
+			'##### One\n\n###### Six'
+		);
+	} );
+} );
+
+describe( 'ordering a section with no commit', () => {
+	/*
+	 * The list is gathered before its writer takes the lock, so two runs can
+	 * reach the lock in the opposite order to the views they hold.
+	 */
+	it( 'rejects a list gathered by an older run', () => {
+		const comment = bodyOf(
+			mergeSection( undefined, {
+				id: 'props',
+				body: 'Newer list.',
+				generation: 200,
+			} )
+		);
+
+		const result = mergeSection( comment, {
+			id: 'props',
+			body: 'Older list.',
+			generation: 100,
+		} );
+
+		expect( result.body ).toBeUndefined();
+		expect( result.rejected ).toContain( '100' );
+	} );
+
+	it( 'accepts a newer run, and a rerun of the same one', () => {
+		let comment = bodyOf(
+			mergeSection( undefined, {
+				id: 'props',
+				body: 'First.',
+				generation: 100,
+			} )
+		);
+		comment = bodyOf(
+			mergeSection( comment, {
+				id: 'props',
+				body: 'Retry of the same run.',
+				generation: 100,
+			} )
+		);
+		comment = bodyOf(
+			mergeSection( comment, {
+				id: 'props',
+				body: 'Newer run.',
+				generation: 200,
+			} )
+		);
+
+		expect( comment ).toContain( 'Newer run.' );
+	} );
+
+	it( 'does not order a section that a commit already orders', () => {
+		const comment = bodyOf(
+			mergeSection(
+				undefined,
+				{
+					id: 'bundle-size',
+					body: 'Size.',
+					sha: HEAD,
+					generation: 200,
+				},
+				HEAD
+			)
+		);
+
+		expect( parseSections( comment )[ 0 ].generation ).toBeUndefined();
 	} );
 } );

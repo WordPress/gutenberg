@@ -117,10 +117,13 @@ jobs:
             queue: max
 
         steps:
-            # A `pull_request_target` job has a writable token, so it checks out
-            # the base branch it was triggered on, never the pull request's head.
+            # This job holds a writable token, and the review events check out
+            # `refs/pull/N/merge` by default, which carries the pull request's
+            # own code. Pin the action to the default branch so a pull request
+            # cannot supply the code that runs here.
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
+                  ref: ${{ github.event.repository.default_branch }}
                   sparse-checkout: tools/pr-meta
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -130,3 +133,7 @@ jobs:
                   repo-token: ${{ secrets.GITHUB_TOKEN }}
                   section: props
                   body: ${{ needs.props-bot.outputs.comment-body }}
+                  # The list is gathered before this job takes the lock, so two
+                  # runs can queue out of order. Ordering by run keeps the
+                  # newer list.
+                  run-id: ${{ github.run_id }}
