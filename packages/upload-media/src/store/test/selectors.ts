@@ -6,6 +6,7 @@ import {
 } from '../selectors';
 import {
 	getActiveUploadCount,
+	getFailureCount,
 	getActiveImageProcessingCount,
 	getActiveVideoProcessingCount,
 	getFailedItems,
@@ -23,11 +24,28 @@ import {
 } from '../types';
 
 describe( 'selectors', () => {
+	describe( 'getFailureCount', () => {
+		it( 'should return the number of failed uploads', () => {
+			const state: State = {
+				queue: [],
+				queueStatus: 'active',
+				failureCount: 3,
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+			};
+
+			expect( getFailureCount( state ) ).toBe( 3 );
+		} );
+	} );
+
 	describe( 'getItems', () => {
 		it( 'should return empty array by default', () => {
 			const state: State = {
 				queue: [],
 				queueStatus: 'paused',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -53,6 +71,7 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'paused',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -78,6 +97,7 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'paused',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -105,6 +125,7 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'paused',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -137,6 +158,7 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -173,6 +195,7 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -192,6 +215,7 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -220,6 +244,7 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -276,6 +301,7 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -300,6 +326,7 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -332,6 +359,7 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -361,6 +389,7 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -429,6 +458,7 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'paused',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),
@@ -452,6 +482,7 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'paused',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
 					mediaUpload: jest.fn(),

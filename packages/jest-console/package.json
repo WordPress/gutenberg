@@ -41,8 +41,8 @@
 	},
 	"types": "declarations.d.ts",
 	"dependencies": {
-		"jest-matcher-utils": "^30.4.1",
-		"jest-mock": "^30.4.1"
+		"jest-matcher-utils": "^30.5.0",
+		"jest-mock": "^30.5.0"
 	},
 	"devDependencies": {
 		"@types/jest": "^30.0.0"
