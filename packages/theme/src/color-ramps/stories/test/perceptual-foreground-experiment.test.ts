@@ -1,4 +1,4 @@
-import { get, OKLCH, parse } from 'colorjs.io/fn';
+import { get, OKLCH, Okhsl, parse } from 'colorjs.io/fn';
 import { buildAccentRamp, buildBgRamp } from '../..';
 import { clampToGamut, getContrast } from '../../lib/color-utils';
 import { DEFAULT_SEED_COLORS } from '../../lib/constants';
@@ -30,8 +30,10 @@ const EXPERIMENTAL_METHODS = EXPERIMENTAL_FOREGROUND_METHODS.filter(
 	( method ) => method !== 'current'
 );
 
-const ABSOLUTE_CHROMA_METHODS = EXPERIMENTAL_METHODS.filter(
-	( method ) => method !== 'state-skewed-relative-chroma'
+const ABSOLUTE_OKLCH_CHROMA_METHODS = EXPERIMENTAL_METHODS.filter(
+	( method ) =>
+		method !== 'state-skewed-relative-chroma' &&
+		method !== 'state-skewed-okhsl'
 );
 
 function buildScale(
@@ -287,7 +289,7 @@ describe( 'perceptual foreground experiment', () => {
 		const seedChroma = get( seed, [ OKLCH, 'c' ] );
 		const seedHue = get( seed, [ OKLCH, 'h' ] );
 
-		for ( const method of ABSOLUTE_CHROMA_METHODS ) {
+		for ( const method of ABSOLUTE_OKLCH_CHROMA_METHODS ) {
 			const scale = buildScale(
 				method,
 				primaryRamp,
@@ -348,6 +350,38 @@ describe( 'perceptual foreground experiment', () => {
 		}
 	);
 
+	it.each( [
+		{ background: '#4f386e', primary: '#608010' },
+		{ background: '#fcfcfc', primary: '#ffd700' },
+		{ background: '#1e1e1e', primary: '#00ffff' },
+	] )(
+		"preserves the seed's OKHSL saturation and hue for $background and $primary",
+		( { background, primary } ) => {
+			const backgroundRamp = buildBgRamp( background );
+			const primaryRamp = buildAccentRamp( primary, backgroundRamp );
+			const seed = parse( primaryRamp.ramp.bgFill1 );
+			const seedSaturation = get( seed, [ Okhsl, 's' ] );
+			const seedHue = get( seed, [ Okhsl, 'h' ] );
+			const scale = buildScale(
+				'state-skewed-okhsl',
+				primaryRamp,
+				backgroundRamp,
+				primaryRamp.ramp.bgFill1,
+				'accent'
+			);
+
+			for ( const color of scale.colors.slice( 0, -1 ) ) {
+				const parsed = parse( color );
+				expect(
+					Math.abs( get( parsed, [ Okhsl, 's' ] ) - seedSaturation )
+				).toBeLessThan( 0.04 );
+				expect(
+					getHueDifference( get( parsed, [ Okhsl, 'h' ] ), seedHue )
+				).toBeLessThan( 2 );
+			}
+		}
+	);
+
 	it( 'reports APCA polarity separately from its spacing magnitude', () => {
 		const darkOnLight = getSignedPerceptualContrast( '#ffffff', '#000000' );
 		const lightOnDark = getSignedPerceptualContrast( '#000000', '#ffffff' );
@@ -370,6 +404,7 @@ describe( 'perceptual foreground experiment', () => {
 			'uniform',
 			'state-skewed',
 			'state-skewed-relative-chroma',
+			'state-skewed-okhsl',
 			'semantic-anchors',
 			'eased',
 		] as const ) {
@@ -419,6 +454,7 @@ describe( 'perceptual foreground experiment', () => {
 			'uniform',
 			'state-skewed',
 			'state-skewed-relative-chroma',
+			'state-skewed-okhsl',
 			'eased',
 		] as const ) {
 			expect(

@@ -5,6 +5,7 @@ import {
 	OKLab,
 	OKLCH,
 	OKLCH_sRGB as OklchSrgb,
+	Okhsl,
 	parse,
 	sRGB,
 	contrastAPCA,
@@ -26,6 +27,7 @@ export const EXPERIMENTAL_FOREGROUND_METHODS = [
 	'uniform-free-endpoint',
 	'state-skewed',
 	'state-skewed-relative-chroma',
+	'state-skewed-okhsl',
 ] as const;
 
 export type ExperimentalForegroundMethod =
@@ -49,6 +51,7 @@ ColorSpace.register( sRGB );
 ColorSpace.register( OKLab );
 ColorSpace.register( OKLCH );
 ColorSpace.register( OklchSrgb );
+ColorSpace.register( Okhsl );
 
 /**
  * APCA is used only as an experimental perceptual coordinate. WCAG 2.1
@@ -71,6 +74,10 @@ export function getPerceptualContrastMagnitude(
 
 export function getGamutRelativeChroma( color: string | PlainColorObject ) {
 	return get( color, [ OklchSrgb, 'c' ] );
+}
+
+export function getOkhslSaturation( color: string | PlainColorObject ) {
+	return get( color, [ Okhsl, 's' ] );
 }
 
 export function getStateColorDifference(
@@ -116,6 +123,35 @@ function createGamutRelativeColorForLightness(
 			},
 			OKLCH
 		);
+		colorCache.set( lightness, color );
+		return color;
+	};
+}
+
+function createOkhslColorForLightness(
+	seed: PlainColorObject
+): GetColorForLightness {
+	const okhslSeed = to( seed, Okhsl );
+	const saturation = get( okhslSeed, [ Okhsl, 's' ] );
+	const hue = get( okhslSeed, [ Okhsl, 'h' ] );
+	const colorCache = new Map< number, PlainColorObject >();
+
+	return ( _, lightness ) => {
+		const cachedColor = colorCache.get( lightness );
+		if ( cachedColor ) {
+			return cachedColor;
+		}
+
+		// The solver works in OKLCH lightness. Convert the same neutral
+		// lightness to OKHSL's toe-adjusted lightness before restoring the
+		// seed saturation and hue. These direct base-space conversions avoid
+		// repeating Color.js's full conversion-path lookup in the solver loop.
+		const okhslLightness = Okhsl.fromBase!( [ lightness, 0, 0 ] )[ 2 ];
+		const color = {
+			space: OKLab,
+			coords: Okhsl.toBase!( [ hue, saturation, okhslLightness ] ),
+			alpha: seed.alpha,
+		};
 		colorCache.set( lightness, color );
 		return color;
 	};
@@ -645,6 +681,8 @@ export function buildPerceptualForegroundScale( {
 		getColorAtLightness = getNeutralColorForLightness;
 	} else if ( method === 'state-skewed-relative-chroma' ) {
 		getColorAtLightness = createGamutRelativeColorForLightness( seed );
+	} else if ( method === 'state-skewed-okhsl' ) {
+		getColorAtLightness = createOkhslColorForLightness( seed );
 	}
 	if ( method === 'uniform-free-endpoint' ) {
 		const colors = serializeScale(
@@ -761,7 +799,8 @@ export function buildPerceptualForegroundScale( {
 					stepIndex / ( FOREGROUND_CONTRAST_TARGETS.length - 1 );
 				if (
 					method === 'state-skewed' ||
-					method === 'state-skewed-relative-chroma'
+					method === 'state-skewed-relative-chroma' ||
+					method === 'state-skewed-okhsl'
 				) {
 					return STATE_SKEWED_PROGRESS[ stepIndex ];
 				}
