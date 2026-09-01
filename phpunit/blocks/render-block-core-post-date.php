@@ -130,6 +130,62 @@ class Test_Render_Block_Core_Post_Date extends WP_UnitTestCase {
 		$this->assertStringContainsString( $expected_date, $output );
 	}
 
+	/**
+	 * Regression test for https://github.com/WordPress/gutenberg/issues/81084.
+	 *
+	 * A timezone-naive datetime string set manually via the date picker must be
+	 * interpreted as site-local time. Previously, strtotime() assumed UTC and
+	 * wp_date() then applied the site offset again — shifting the displayed time
+	 * by the full UTC offset.
+	 *
+	 * @covers ::render_block_core_post_date
+	 */
+	public function test_render_with_explicit_date_does_not_double_apply_timezone_offset() {
+		$original_timezone = get_option( 'timezone_string' );
+		$original_offset   = get_option( 'gmt_offset' );
+
+		// Use UTC+5:30 — a clearly non-UTC offset where the double-shift is obvious.
+		update_option( 'timezone_string', 'Asia/Kolkata' );
+		update_option( 'gmt_offset', '' );
+
+		try {
+			$attributes = array(
+				// Timezone-naive string, exactly as emitted by DateTimePicker.
+				'datetime' => '2026-07-30T04:30:00',
+				'format'   => 'H:i',
+			);
+
+			$block = new WP_Block(
+				array(
+					'blockName' => 'core/post-date',
+					'attrs'     => $attributes,
+				),
+				array(
+					'postId' => self::$post_id,
+				)
+			);
+
+			$output = $block->render();
+
+			// The rendered time must match the manually-set site-local time.
+			$this->assertStringContainsString(
+				'04:30',
+				$output,
+				'The time should render in site-local time, not UTC.'
+			);
+
+			// Confirm the double-offset value (04:30 + 5:30 = 10:00) is absent.
+			$this->assertStringNotContainsString(
+				'10:00',
+				$output,
+				'The site timezone offset must not be applied twice.'
+			);
+		} finally {
+			update_option( 'timezone_string', $original_timezone );
+			update_option( 'gmt_offset', $original_offset );
+		}
+	}
+
 	public function test_render_modified_date_before_publish_date() {
 		$this->update_post_modified( self::$post_id, '2025-07-01 00:00:00' );
 
