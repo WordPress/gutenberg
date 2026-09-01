@@ -268,10 +268,6 @@ _Parameters_
 
 -   _props_ `Object`: Fill props.
 
-_Returns_
-
--   `Element`: Element.
-
 ### BlockStyles
 
 Undocumented declaration.

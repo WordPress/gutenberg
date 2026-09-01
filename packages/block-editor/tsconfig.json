@@ -42,12 +42,13 @@
 		{ "path": "../warning" }
 	],
 	/*
-	 * The package has no TypeScript tests, and its two stories import
-	 * components the build allowlist does not type yet, so nothing is checked.
+	 * The package has no TypeScript tests, and its stories import components
+	 * the build allowlist does not type yet, so nothing is checked.
 	 */
 	"exclude": [
 		"**/benchmark",
 		"src/components/block-icon/stories/index.story.ts",
+		"src/components/block-settings-menu-controls/stories/index.story.tsx",
 		"src/components/contrast-checker/stories/index.story.ts"
 	]
 }

@@ -17,6 +17,12 @@ import { BlockVisibilityViewportMenuItem } from '../block-visibility';
 
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
 
+/**
+ * @param {Object}        props
+ * @param {Object}        [props.fillProps] Props passed through to the fills.
+ * @param {?( string[] )} [props.clientIds] Client IDs to act upon. Defaults
+ *                                          to the current selection.
+ */
 const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 	const {
 		selectedBlocks,
@@ -129,7 +135,6 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-settings-menu-controls/README.md
  *
  * @param {Object} props Fill props.
- * @return {Element} Element.
  */
 function BlockSettingsMenuControls( { ...props } ) {
 	return (
