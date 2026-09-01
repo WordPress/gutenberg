@@ -1,4 +1,7 @@
 /* eslint-disable no-console */
+import { spawnSync } from 'node:child_process';
+import { createRequire } from 'node:module';
+import { dirname, join } from 'node:path';
 import {
 	afterAll,
 	afterEach as vitestAfterEach,
@@ -11,6 +14,8 @@ import {
 	vi,
 } from 'vitest';
 import type { ExtendedMock } from '../types';
+
+const require = createRequire( import.meta.url );
 
 vi.restoreAllMocks();
 vi.stubGlobal( 'afterEach', vitestAfterEach );
@@ -28,6 +33,42 @@ function getSpy( methodName: 'error' | 'info' | 'log' | 'warn' ) {
 }
 
 describe( 'jest-console', () => {
+	it( 'keeps its spies active when Jest restores runtime mocks', () => {
+		const jestPackageDirectory = dirname(
+			require.resolve( 'jest/package.json' )
+		);
+		const fixturePath = join(
+			import.meta.dirname,
+			'fixtures/jest-restore-all-mocks.cjs'
+		);
+		const config = JSON.stringify( {
+			rootDir: process.cwd(),
+			setupFilesAfterEnv: [
+				require.resolve( '@wordpress/jest-console' ),
+			],
+			testEnvironment: 'node',
+			testRegex: 'jest-restore-all-mocks\\.cjs$',
+		} );
+		const result = spawnSync(
+			process.execPath,
+			[
+				join( jestPackageDirectory, 'bin/jest.js' ),
+				'--config',
+				config,
+				'--runInBand',
+				'--runTestsByPath',
+				fixturePath,
+			],
+			{ encoding: 'utf8' }
+		);
+
+		if ( result.status !== 0 ) {
+			throw new Error( `${ result.stdout }\n${ result.stderr }` );
+		}
+
+		vitestExpect( result.status ).toBe( 0 );
+	} );
+
 	describe.each( [
 		[ 'error', 'toHaveErrored' ],
 		[ 'info', 'toHaveInformed' ],
