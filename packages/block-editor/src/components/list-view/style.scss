@@ -93,6 +93,10 @@
 			--focus-color: var(--wp-block-synced-color);
 		}
 	}
+	&.is-synced:not(.is-selected) .block-editor-list-view-block__menu:focus {
+		--focus-color: var(--wp-block-synced-color);
+		@include outset-ring__focus();
+	}
 	&.is-selected .block-editor-list-view-block-contents,
 	&.is-selected .components-button.has-icon {
 		color: $white;
