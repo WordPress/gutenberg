@@ -300,10 +300,25 @@
 		top: 50%;
 		left: 50%;
 		transform-origin: top left;
-		transform: translate(-50%, -50%);
+		transform: translate(calc(-50% + var(--wp--lightbox-drag-offset, 0px)), -50%);
 		width: var(--wp--lightbox-container-width);
 		height: var(--wp--lightbox-container-height);
 		z-index: 2000001;
+	}
+
+	@media not (prefers-reduced-motion) {
+		// Duration must stay in sync with `SLIDE_TRANSITION_MS` in `view.js`,
+		// which waits for this transition before swapping the image.
+		&.is-animating-slide .lightbox-image-container {
+			transition: transform 220ms cubic-bezier(0.2, 0.7, 0.2, 1);
+		}
+
+		// Higher specificity than the `.zoom.active .lightbox-image-container`
+		// rule below so the post-commit fade overrides the open-zoom animation.
+		&.zoom.active.is-fading-in .lightbox-image-container,
+		&.is-fading-in .lightbox-image-container {
+			animation: lightbox-image-fade-in 150ms ease-out;
+		}
 	}
 
 	.wp-block-image {
@@ -415,6 +430,15 @@
 	}
 	100% {
 		visibility: visible;
+	}
+}
+
+@keyframes lightbox-image-fade-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
 	}
 }
 
