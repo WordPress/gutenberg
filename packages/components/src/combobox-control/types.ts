@@ -75,6 +75,10 @@ export type ComboboxControlProps = Pick<
 	 */
 	onFilterValueChange?: ( value: string ) => void;
 	/**
+	 * Fucntion called when the control loses focus.
+	 */
+	onBlur?: () => void;
+	/**
 	 * The options that can be chosen from.
 	 */
 	options: ComboboxControlOption[];
