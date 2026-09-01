@@ -166,6 +166,15 @@ export function useInBetweenInserter() {
 
 				const index = getBlockIndex( clientId );
 
+				// Don't show the in-between inserter before the first block in
+				// nested block lists. Root-level insertion at index 0 is still
+				// allowed, and the post title gap is handled separately in the
+				// post editor.
+				if ( index === 0 && rootClientId ) {
+					hideInsertionPoint();
+					return;
+				}
+
 				showInsertionPoint( rootClientId, index, {
 					__unstableWithInserter: true,
 				} );
