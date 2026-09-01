@@ -24,6 +24,7 @@
 
 			&:disabled,
 			&[aria-disabled="true"] {
+				--_gcd-input-placeholder-color: var(--wpds-color-foreground-interactive-neutral-disabled);
 				color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
 				&::placeholder {

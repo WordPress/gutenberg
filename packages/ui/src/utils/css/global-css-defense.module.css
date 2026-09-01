@@ -67,10 +67,6 @@
 		&::placeholder {
 			color: var(--_gcd-input-placeholder-color, var(--wpds-color-foreground-interactive-neutral-weak));
 		}
-
-		&:disabled::placeholder {
-			color: var(--_gcd-input-color-disabled, var(--wpds-color-foreground-interactive-neutral-disabled));
-		}
 	}
 
 	&:is(textarea, [type="text"], [type="password"], [type="date"], [type="datetime"], [type="datetime-local"], [type="email"], [type="month"], [type="number"], [type="search"], [type="tel"], [type="time"], [type="url"], [type="week"]) {
