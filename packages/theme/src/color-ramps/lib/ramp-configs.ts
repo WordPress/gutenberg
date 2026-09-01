@@ -169,7 +169,7 @@ const BG_RAMP_STEPS: RampConfig[ 'steps' ] = {
 	bgFill2: {
 		contrast: {
 			reference: 'bgFill1',
-			followDirection: 'main',
+			followDirection: 'darker',
 			target: 1.2,
 		},
 	},
@@ -273,7 +273,6 @@ const BG_RAMP_STEPS: RampConfig[ 'steps' ] = {
 			// Preserve the 4.5:1 WCAG floor after 8-bit sRGB serialization.
 			target: 4.55,
 		},
-		lightness: lightnessConstraintForegroundHighContrast,
 		taperChromaOptions: FG_TAPER_CHROMA,
 	},
 	fgFillInverted: {
