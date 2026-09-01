@@ -13,22 +13,16 @@ export default function EnhancedPaginationControl( {
 		'Reload the full page—instead of just the posts list—when visitors navigate between pages.'
 	);
 	if ( unsupportedBlocks.length ) {
-		help =
-			unsupportedBlocks.length === 1
-				? sprintf(
-						/* translators: %s: The title of the block that isn't supported. */
-						__(
-							`Enhancement disabled because this block isn't supported: %s. Remove it to change this setting.`
-						),
-						unsupportedBlocks[ 0 ]
-				  )
-				: sprintf(
-						/* translators: %s: A comma-separated list of block titles. */
-						__(
-							`Enhancement disabled because these blocks aren't supported: %s. Remove them to change this setting.`
-						),
-						unsupportedBlocks.join( ', ' )
-				  );
+		help = sprintf(
+			/* translators: %s: A list of block titles. */
+			__(
+				`Some blocks aren't supported: %s. Remove them to change this setting.`
+			),
+			unsupportedBlocks.join(
+				/* translators: Used between list items, there is a space after the comma. */
+				__( ', ' ) // eslint-disable-line @wordpress/i18n-no-flanking-whitespace
+			)
+		);
 	}
 
 	return (

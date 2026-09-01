@@ -145,22 +145,16 @@ export default function QueryContent( {
 		if ( enhancedPagination && unsupportedBlocks.length ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( { enhancedPagination: false } );
-			const message =
-				unsupportedBlocks.length === 1
-					? sprintf(
-							/* translators: %s: The title of the block that isn't supported. */
-							__(
-								`"Reload full page" was enabled because this block isn't supported: %s.`
-							),
-							unsupportedBlocks[ 0 ]
-					  )
-					: sprintf(
-							/* translators: %s: A comma-separated list of block titles. */
-							__(
-								`"Reload full page" was enabled because these blocks aren't supported: %s.`
-							),
-							unsupportedBlocks.join( ', ' )
-					  );
+			const message = sprintf(
+				/* translators: %s: A list of block titles. */
+				__(
+					`"Reload full page" was enabled because some blocks aren't supported: %s.`
+				),
+				unsupportedBlocks.join(
+					/* translators: Used between list items, there is a space after the comma. */
+					__( ', ' ) // eslint-disable-line @wordpress/i18n-no-flanking-whitespace
+				)
+			);
 			createNotice( 'info', message, {
 				type: 'snackbar',
 				id: 'query-enhanced-pagination-disabled',
