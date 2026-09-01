@@ -29,11 +29,13 @@ on:
         types:
             - created
 
-# Cancels all previous workflow runs for pull requests that have not completed.
+# Cancels all previous runs for a pull request that have not completed.
 concurrency:
-    # The concurrency group contains the workflow name and the branch name for pull requests
-    # or the commit hash for any other events.
-    group: ${{ github.workflow }}-${{ contains( fromJSON( '["pull_request_target", "pull_request_review", "pull_request_review_comment"]' ), github.event_name ) && github.head_ref || github.sha }}
+    # Keyed by the pull request, which the four events carry in three different
+    # places. `github.sha` would not do: on `issue_comment` it is the default
+    # branch tip, the same value for every issue and pull request in the
+    # repository, so one comment anywhere would cancel every other run.
+    group: ${{ github.workflow }}-${{ github.event.number || github.event.issue.number || github.event.pull_request.number || github.run_id }}
     cancel-in-progress: true
 
 # Disable permissions for all available scopes by default.
@@ -134,6 +136,6 @@ jobs:
                   section: props
                   body: ${{ needs.props-bot.outputs.comment-body }}
                   # The list is gathered before this job takes the lock, so two
-                  # runs can queue out of order. Ordering by run keeps the
-                  # newer list.
-                  run-id: ${{ github.run_id }}
+                  # runs can queue out of order. `run_number` increments with
+                  # every run of this workflow, so the newer list wins.
+                  generation: ${{ github.run_number }}
