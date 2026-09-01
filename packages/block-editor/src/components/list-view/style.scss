@@ -91,23 +91,14 @@
 
 		&:focus::after {
 			--focus-color: var(--wp-block-synced-color);
-			@include outset-ring__focus();
 		}
 	}
 	&.is-selected .block-editor-list-view-block-contents,
 	&.is-selected .components-button.has-icon {
 		color: $white;
 	}
-	// The selected row background uses the same color as the focus ring, so fill
-	// the outline offset gap with white to keep the two apart.
-	&.is-selected .block-editor-list-view-block-contents:focus::after {
-		@include outset-ring__focus();
-		box-shadow: 0 0 0 1px #{ $white };
-	}
 	&.is-selected.is-synced .block-editor-list-view-block-contents:focus::after {
 		--focus-color: var(--wp-block-synced-color);
-		@include outset-ring__focus();
-		box-shadow: 0 0 0 1px #{ $white };
 	}
 	&.is-selected .block-editor-list-view-block__menu:focus,
 	&.is-selected.is-synced .block-editor-list-view-block__menu:focus {
@@ -278,6 +269,8 @@
 			left: 0;
 			border-radius: inherit;
 			@include outset-ring__focus();
+			outline-offset: 1px;
+			box-shadow: 0 0 0 calc(var(--wpds-border-width-focus) + 2px) var(--wpds-color-foreground-interactive-brand-strong);
 			z-index: 2;
 			pointer-events: none;
 		}
