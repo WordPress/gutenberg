@@ -144,6 +144,7 @@
 		"access": "public"
 	},
 	"scripts": {
+		"benchmark:color-ramps": "node --import=esbuild-esm-loader/register benchmark/color-ramps.ts",
 		"build:default-ramps": "node --import=esbuild-esm-loader/register bin/generate-default-ramps/index.ts",
 		"build:tokens": "node --import=esbuild-esm-loader/register bin/generate-primitive-tokens/index.ts && node --import=esbuild-esm-loader/register bin/build-design-tokens/index.ts",
 		"build": "npm run build:tokens && npm run build:default-ramps",
