@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import type { Modal } from '@wordpress/components';
 
 type ModalProps = Parameters< typeof Modal >[ 0 ];

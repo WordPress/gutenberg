@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
-// @ts-expect-error `hpq` does not ship type declarations.
 import { parse as hpqParse } from 'hpq';
+import type { MatcherObj } from 'hpq';
 import memoize from 'memize';
-
-/**
- * WordPress dependencies
- */
 import { applyFilters } from '@wordpress/hooks';
 import { RichTextData } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import {
 	attr,
 	html,
@@ -39,9 +28,9 @@ import type { BlockAttribute, BlockType } from '../../types';
  * @return Enhanced hpq matcher.
  */
 export const toBooleanAttributeMatcher =
-	( matcher: ( value: unknown ) => unknown ) =>
-	( value: unknown ): boolean =>
-		matcher( value ) !== undefined;
+	( matcher: ( domNode: Element ) => unknown ) =>
+	( domNode: Element ): boolean =>
+		matcher( domNode ) !== undefined;
 
 /**
  * Returns true if value is of the given JSON schema type, or false otherwise.
@@ -114,7 +103,7 @@ export function getBlockAttribute(
 	attributeSchema: BlockAttribute,
 	innerDOM: Node,
 	commentAttributes: Record< string, unknown >,
-	innerHTML: string | Node
+	innerHTML: string | Node | undefined
 ): unknown {
 	let value;
 
@@ -205,12 +194,12 @@ export const matcherFromSource = memoize(
 	): ( ( domNode: Element ) => unknown ) | undefined => {
 		switch ( sourceConfig.source ) {
 			case 'attribute': {
-				let matcher = attr(
+				const matcher = attr(
 					sourceConfig.selector,
-					sourceConfig.attribute
+					sourceConfig.attribute!
 				);
 				if ( sourceConfig.type === 'boolean' ) {
-					matcher = toBooleanAttributeMatcher( matcher );
+					return toBooleanAttributeMatcher( matcher );
 				}
 				return matcher;
 			}
@@ -228,6 +217,11 @@ export const matcherFromSource = memoize(
 			case 'node':
 				return node( sourceConfig.selector );
 			case 'query':
+				/*
+				 * Sub-matchers may be undefined for unknown source types. hpq
+				 * tolerates this and matches such keys as undefined, but its
+				 * types don't allow for it.
+				 */
 				const subMatchers = Object.fromEntries(
 					Object.entries( sourceConfig.query! ).map(
 						( [ key, subSourceConfig ] ) => [
@@ -235,12 +229,12 @@ export const matcherFromSource = memoize(
 							matcherFromSource( subSourceConfig ),
 						]
 					)
-				);
-				return query( sourceConfig.selector, subMatchers );
+				) as MatcherObj;
+				return query( sourceConfig.selector!, subMatchers );
 			case 'tag': {
 				const matcher = prop( sourceConfig.selector, 'nodeName' );
-				return ( domNode: Node ) =>
-					( matcher( domNode ) as string )?.toLowerCase();
+				return ( domNode: Element ) =>
+					matcher( domNode )?.toLowerCase();
 			}
 			default:
 				// eslint-disable-next-line no-console
@@ -255,12 +249,20 @@ export const matcherFromSource = memoize(
 /**
  * Parse a HTML string into DOM tree.
  *
+ * Content is missing whenever there is nothing to parse, such as a self-closing
+ * shortcode, and is treated as empty markup: `hpq` hands anything that is not a
+ * string straight to the matcher, so passing it through would give the matchers
+ * a missing node to work with.
+ *
  * @param innerHTML HTML string or already parsed DOM node.
  *
  * @return Parsed DOM node.
  */
-function parseHtml( innerHTML: string | Node ): Node {
-	return hpqParse( innerHTML, ( h: Node ) => h );
+function parseHtml( innerHTML: string | Node | undefined ): Element {
+	return hpqParse(
+		( innerHTML ?? '' ) as string | Element,
+		( h: Element ) => h
+	);
 }
 
 /**
@@ -273,7 +275,7 @@ function parseHtml( innerHTML: string | Node ): Node {
  * @return Attribute value.
  */
 export function parseWithAttributeSchema(
-	innerHTML: string | Node,
+	innerHTML: string | Node | undefined,
 	attributeSchema: BlockAttribute
 ): unknown {
 	return matcherFromSource( attributeSchema )!(
@@ -292,7 +294,7 @@ export function parseWithAttributeSchema(
  */
 export function getBlockAttributes(
 	blockTypeOrName: string | BlockType,
-	innerHTML: string | Node,
+	innerHTML: string | Node | undefined,
 	attributes: Record< string, unknown > = {}
 ): Record< string, unknown > {
 	const doc = parseHtml( innerHTML );

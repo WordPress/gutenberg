@@ -1,11 +1,40 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Buttons', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
+	} );
+
+	test( 'adds a sibling after the selected button from the parent selector', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/buttons',
+			innerBlocks: [
+				{ name: 'core/button', attributes: { text: 'First' } },
+				{ name: 'core/button', attributes: { text: 'Second' } },
+			],
+		} );
+		await editor.canvas
+			.locator( '[data-type="core/button"]' )
+			.first()
+			.click();
+
+		await editor.showBlockToolbar();
+		await page.locator( 'role=button[name="Add button"]' ).click();
+		await page.keyboard.type( 'New' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/buttons',
+				innerBlocks: [
+					{ name: 'core/button', attributes: { text: 'First' } },
+					{ name: 'core/button', attributes: { text: 'New' } },
+					{ name: 'core/button', attributes: { text: 'Second' } },
+				],
+			},
+		] );
 	} );
 
 	test( 'has focus on button content', async ( { editor, page } ) => {
@@ -31,7 +60,7 @@ test.describe( 'Buttons', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/buttons' );
 		await expect(
@@ -476,6 +505,61 @@ test.describe( 'Buttons', () => {
 					{
 						name: 'core/button',
 						attributes: {
+							backgroundColor: 'vivid-red',
+							textColor: 'cyan-bluish-gray',
+						},
+					},
+				],
+			},
+		] );
+	} );
+
+	test( 'copies attributes when adding a sibling with Enter', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/buttons',
+			innerBlocks: [
+				{
+					name: 'core/button',
+					attributes: {
+						text: 'Content',
+						backgroundColor: 'vivid-red',
+						textColor: 'cyan-bluish-gray',
+						anchor: 'first-button',
+					},
+				},
+			],
+		} );
+
+		// Place the caret at the end of the button text and press Enter.
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Button text' } )
+			.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Second' );
+
+		// The new button inherits everything but the content, like a
+		// duplicated block would.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/buttons',
+				innerBlocks: [
+					{
+						name: 'core/button',
+						attributes: {
+							text: 'Content',
+							backgroundColor: 'vivid-red',
+							textColor: 'cyan-bluish-gray',
+							anchor: 'first-button',
+						},
+					},
+					{
+						name: 'core/button',
+						attributes: {
+							text: 'Second',
 							backgroundColor: 'vivid-red',
 							textColor: 'cyan-bluish-gray',
 						},

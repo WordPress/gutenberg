@@ -102,7 +102,18 @@ _Related_
 
 ### BlockBindingsAttributeControl
 
-Internal dependencies
+Renders a control for viewing and editing a block attribute binding.
+
+_Parameters_
+
+-   _root0_ `Object`: Component props.
+-   _root0.attribute_ `string`: The block attribute name.
+-   _root0.binding_ `[Object]`: The current block binding.
+-   _root0.blockName_ `string`: The block type name.
+
+_Returns_
+
+-   `Element`: The block attribute binding control.
 
 ### BlockBindingsSourceFieldsList
 

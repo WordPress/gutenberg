@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { ratioToNumber } from '../aspect-ratio-dropdown';
 
 test( 'ratioToNumber', () => {

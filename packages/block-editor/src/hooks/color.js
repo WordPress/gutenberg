@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport } from '@wordpress/blocks';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import {
 	getColorClassName,
 	getColorObjectByAttributeValues,

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { useState, useCallback, useEffect } from '@wordpress/element';
 import {
@@ -9,10 +6,6 @@ import {
 	usePrevious,
 } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import {
 	getDistanceToNearestEdge,
 	isPointContainedByRect,
@@ -412,14 +405,12 @@ const EXPAND_THROTTLE_OPTIONS = {
  *
  * @param {Object}       props                   Named parameters.
  * @param {?HTMLElement} [props.dropZoneElement] Optional element to be used as the drop zone.
- * @param {Object}       [props.expansionState]  The expansion state of the blocks in the list view.
  * @param {Function}     [props.updateExpansion] Dispatch to update the expansion state of a list of block clientIds.
  *
  * @return {WPListViewDropZoneTarget} The drop target.
  */
 export default function useListViewDropZone( {
 	dropZoneElement,
-	expansionState,
 	updateExpansion,
 } ) {
 	const {
@@ -440,21 +431,18 @@ export default function useListViewDropZone( {
 	const previousRootClientId = usePrevious( targetRootClientId );
 
 	const maybeExpandBlock = useCallback(
-		( _expansionState, _target ) => {
+		( _target ) => {
 			// If the user is attempting to drop a block inside a collapsed block,
 			// that is, using a nesting gesture flagged by 'inside' dropPosition,
-			// expand the block within the list view, if it isn't already.
+			// expand the block within the list view.
 			const { rootClientId } = _target || {};
 			if ( ! rootClientId ) {
 				return;
 			}
-			if (
-				_target?.dropPosition === 'inside' &&
-				! _expansionState[ rootClientId ]
-			) {
+			if ( _target?.dropPosition === 'inside' ) {
 				updateExpansion( {
 					type: 'expand',
-					clientIds: rootClientId,
+					clientIds: [ rootClientId ],
 				} );
 			}
 		},
@@ -478,13 +466,8 @@ export default function useListViewDropZone( {
 			throttledMaybeExpandBlock.cancel();
 			return;
 		}
-		throttledMaybeExpandBlock( expansionState, target );
-	}, [
-		expansionState,
-		previousRootClientId,
-		target,
-		throttledMaybeExpandBlock,
-	] );
+		throttledMaybeExpandBlock( target );
+	}, [ previousRootClientId, target, throttledMaybeExpandBlock ] );
 
 	const draggedBlockClientIds = getDraggedBlockClientIds();
 	const throttled = useThrottle(
@@ -574,7 +557,7 @@ export default function useListViewDropZone( {
 		},
 		onDragOver( event ) {
 			// `currentTarget` is only available while the event is being
-			// handled, so get it now and pass it to the thottled function.
+			// handled, so get it now and pass it to the throttled function.
 			// https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget
 			throttled( event, event.currentTarget );
 		},

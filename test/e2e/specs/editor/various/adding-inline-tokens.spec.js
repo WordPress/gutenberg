@@ -1,14 +1,7 @@
-/**
- * External dependencies
- */
 import { randomUUID } from 'crypto';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'adding inline tokens', () => {
@@ -23,7 +16,7 @@ test.describe( 'adding inline tokens', () => {
 	} ) => {
 		// Create a paragraph.
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 
 		await page.keyboard.type( 'a ' );

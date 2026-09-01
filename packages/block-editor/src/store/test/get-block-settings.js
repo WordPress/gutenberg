@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { addFilter, removeFilter } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
 import { getBlockSettings } from '../get-block-settings';
 
 describe( 'getBlockSettings', () => {

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Modal } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -8,10 +5,6 @@ import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
 import type { Field } from '@wordpress/dataviews';
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
-
-/**
- * Internal dependencies
- */
 import MediaEditor from '../media-editor';
 import type { Media } from '../media-editor-provider';
 import { store as mediaEditorStore } from '../../store';
@@ -31,6 +24,25 @@ interface MediaEditorModalProps {
 	 * always provided by the media editor.
 	 */
 	aspectRatioPresets?: AspectRatioPreset[];
+}
+
+/**
+ * The modal's footer chrome. The fine-rotation ruler and the image controls
+ * both live under the canvas (in `media-editor__content`), never here, so the
+ * footer has one layout at every width: History on the left, Cancel/Save on
+ * the right.
+ */
+function ModalFooter() {
+	return (
+		<div
+			className="media-editor-modal__footer"
+			role="region"
+			aria-label={ __( 'Editor actions' ) }
+		>
+			<MediaEditor.HistoryActions />
+			<MediaEditor.SaveActions />
+		</div>
+	);
 }
 
 export function MediaEditorModal( {
@@ -78,7 +90,6 @@ export function MediaEditorModal( {
 			id={ id }
 			fields={ fields }
 			aspectRatioPresets={ aspectRatioPresets }
-			showCloseButton
 			shouldCloseOnEsc
 			noticesClassName="media-editor-modal__snackbar"
 			noticesPortalElement={ portalElement }
@@ -114,9 +125,6 @@ export function MediaEditorModal( {
 			} }
 			renderFrame={ ( {
 				children,
-				headerActions,
-				footerActions,
-				footerLayout,
 				onRequestClose,
 				onKeyDown,
 				shouldCloseOnClickOutside,
@@ -133,16 +141,12 @@ export function MediaEditorModal( {
 						shouldCloseOnClickOutside={ shouldCloseOnClickOutside }
 						onKeyDown={ onKeyDown }
 						onRequestClose={ onRequestClose }
-						headerActions={ headerActions }
+						headerActions={
+							<MediaEditor.HeaderActions showCloseButton />
+						}
 					>
 						{ children }
-						<div
-							className={ `media-editor-modal__footer is-${ footerLayout }` }
-							role="region"
-							aria-label={ __( 'Editor actions' ) }
-						>
-							{ footerActions }
-						</div>
+						<ModalFooter />
 					</Modal>
 				</ShortcutProvider>
 			) }

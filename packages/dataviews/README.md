@@ -257,12 +257,15 @@ Properties:
 | `styles`       | ✓       | ✓             |        |              |        |            |
 | `badgeFields`  |         |               | ✓      | ✓            |        |            |
 | `previewSize`  |         |               | ✓      | ✓            |        |            |
+| `aspectRatio`  | ✓       |               | ✓      |              |        |            |
+| `mediaFit`     |         |               | ✓      | ✓            |        |            |
 
 `table` and `pickerTable` layouts:
 
 -   `density`: one of `comfortable`, `balanced`, or `compact`. Configures the size and spacing of the layout.
 -   `enableMoving`: whether the table columns should display moving controls.
 -   `styles`: additional `width`, `maxWidth`, `minWidth`, `align` styles for each field column. The `align` property accepts `'start'`, `'center'`, or `'end'`.
+-   `aspectRatio` (`table` only): one of the preset ratios `'1/1'`, `'4/3'`, `'3/4'`, `'3/2'`, `'2/3'`, `'16/9'`, or `'9/16'`, applied to the primary column's media preview. Defaults to `'1/1'`.
 
 **For column alignment (`align` property), follow these guidelines:**
 Right-align (`'end'`) whenever the cell value is fundamentally quantitative—numbers, decimals, currency, percentages—so that digits and decimal points line up, aiding comparison and calculation. Otherwise, default to left-alignment (`'start'`) for all other types (text, codes, labels, dates).
@@ -272,6 +275,8 @@ Right-align (`'end'`) whenever the cell value is fundamentally quantitative—nu
 -   `badgeFields`: a list of field's `id` to render without label and styled as badges.
 -   `density`: one of `comfortable`, `balanced`, or `compact`. Configures the gap between items in the grid.
 -   `previewSize`: a `number` representing the size of the preview.
+-   `aspectRatio` (`grid` only): one of the preset ratios `'1/1'`, `'4/3'`, `'3/4'`, `'3/2'`, `'2/3'`, `'16/9'`, or `'9/16'`, applied uniformly to every item preview, keeping rows aligned. Defaults to `'1/1'`.
+-   `mediaFit`: how the media field fills the preview box, either `'cover'` (crop it to fill) or `'contain'` (fit the whole media inside, letterboxing it so its own aspect ratio stays visible). The box keeps the shape set by `aspectRatio` either way, so rows stay aligned, and takes a neutral background under `'contain'` so a letterboxed preview still reads as a single item. Defaults to `'cover'`. To let users switch this themselves, pass `config={ { mediaFitControl: true } }` to `DataViews` or `DataViewsPicker`, which adds an "Original aspect ratio" toggle to the view options.
 
 `list` layout:
 
@@ -484,9 +489,11 @@ The component receives the following props:
 
 React component to be rendered next to the view config button.
 
-#### `config`: { perPageSizes: number[] }
+#### `config`: { perPageSizes: number[], mediaFitControl?: boolean }
 
 Optional. Pass an object with a list of `perPageSizes` to control the available item counts per page (defaults to `[10, 20, 50, 100]`). `perPageSizes` needs to have a minimum of 2 items and a maximum of 6, otherwise the UI component won't be displayed.
+
+Set `mediaFitControl` to `true` to add an "Original aspect ratio" toggle to the view options of grid layouts, letting users switch item previews between cropped (`cover`) and fitted (`contain`). See the `mediaFit` layout property. It is off by default, since cropping to a uniform shape suits datasets whose previews are already consistent. The control is also hidden when the view renders no media field.
 
 #### `empty`: React node
 
@@ -756,9 +763,9 @@ Example:
 }
 ```
 
-#### `config`: { perPageSizes: number[] }
+#### `config`: { perPageSizes: number[], mediaFitControl?: boolean }
 
-Same as `DataViews`. Optional. Pass an object with a list of `perPageSizes` to control the available item counts per page.
+Same as `DataViews`. Optional. Pass an object with a list of `perPageSizes` to control the available item counts per page, and `mediaFitControl` to offer the "Original aspect ratio" toggle in the view options of grid layouts.
 
 #### `empty`: React node
 
@@ -1759,6 +1766,8 @@ Function that indicates if the field should be visible.
 -   Args
     -   `item`: the data to be processed
 -   Returns a `boolean` indicating if the field should be visible (`true`) or not (`false`).
+
+A field hidden through `isVisible` is not validated: its validation rules are skipped while it is hidden and re-applied when it becomes visible again.
 
 This can be useful to hide fields based on the state of other fields. For example, a `staticHomepage` field can be hidden depending on the value of the `homepageDisplay` field:
 

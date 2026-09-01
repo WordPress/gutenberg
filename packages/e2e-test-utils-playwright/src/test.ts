@@ -1,16 +1,8 @@
 // Playwright fixtures use `use()` which is not a React hook.
-
-/**
- * External dependencies
- */
 import * as path from 'path';
 import { test as base, expect, chromium } from '@playwright/test';
 import type { ConsoleMessage } from '@playwright/test';
 import getPort from 'get-port';
-
-/**
- * Internal dependencies
- */
 import {
 	Admin,
 	Editor,

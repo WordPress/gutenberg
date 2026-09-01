@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { ImageFile } from '../../image-file';
 import { getFileBasename } from '../../utils';
 import type { ImageSizeCrop, QueueItemId } from '../types';

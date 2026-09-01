@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import * as ReactDOM from 'react-dom';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 

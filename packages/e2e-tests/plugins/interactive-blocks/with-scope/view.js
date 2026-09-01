@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store, getContext, withScope } from '@wordpress/interactivity';
 
 store( 'with-scope', {

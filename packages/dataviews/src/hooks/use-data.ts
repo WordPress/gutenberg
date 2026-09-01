@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useState, useEffect, useMemo, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { View } from '../types';
 
 type PaginationInfo = {

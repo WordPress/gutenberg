@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	sidesAll,
@@ -11,10 +8,6 @@ import {
 	sidesTop,
 	sidesVertical,
 } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { getPresetSlug, isValuePreset } from '../preset-input-control/utils';
 
 const SPACING_PRESET_TYPE = 'spacing';

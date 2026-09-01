@@ -1,10 +1,7 @@
-/**
- * External dependencies
- */
 const fs = require( 'fs' );
-const glob = require( 'glob' ).sync;
-const mkdirp = require( 'mkdirp' ).mkdirp.sync;
 const path = require( 'path' );
+const { globSync } = require( 'glob' );
+const mkdirp = require( 'mkdirp' ).mkdirp.sync;
 const rimraf = require( 'rimraf' ).sync;
 const webpack = require( 'webpack' );
 
@@ -33,7 +30,10 @@ describe( 'ReadableJsAssetsWebpackPlugin', () => {
 			webpack( options, ( err ) => {
 				expect( err ).toBeNull();
 
-				const assetFiles = glob( `${ outputDirectory }/*.js` );
+				const assetFiles = globSync( '*.js', {
+					cwd: outputDirectory,
+					absolute: true,
+				} ).sort();
 
 				expect( assetFiles ).toHaveLength( 4 );
 

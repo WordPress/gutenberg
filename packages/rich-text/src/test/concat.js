@@ -1,12 +1,4 @@
-/**
- * External dependencies
- */
 import deepFreeze from 'deep-freeze';
-
-/**
- * Internal dependencies
- */
-
 import { concat } from '../concat';
 import { getSparseArrayLength } from './helpers';
 

@@ -285,7 +285,7 @@ You can start with this workspace settings file:
 
 ### ESLint
 
-[ESLint](https://eslint.org/) statically analyzes the code to find problems. The lint rules are integrated in the continuous integration process and must pass to be able to commit. With an editor integration enabled, ESLint will use the [eslint.config.cjs](https://github.com/WordPress/gutenberg/blob/HEAD/eslint.config.cjs) file in the root of the Gutenberg repository to highlight issues as you develop.
+[ESLint](https://eslint.org/) statically analyzes the code to find problems. The lint rules are integrated in the continuous integration process and must pass to be able to commit. With an editor integration enabled, ESLint will use the [eslint.config.mjs](https://github.com/WordPress/gutenberg/blob/HEAD/eslint.config.mjs) file in the root of the Gutenberg repository to highlight issues as you develop.
 
 If you use Visual Studio Code, use the extension and settings listed in the [Visual Studio Code](#visual-studio-code) section above. For other editors, see the [ESLint editor integration docs](https://eslint.org/docs/user-guide/integrations).
 
@@ -299,4 +299,4 @@ For other editors, see [Prettier's Editor Integration docs](https://prettier.io/
 
 ### TypeScript
 
-**TypeScript** is a typed superset of JavaScript language. The Gutenberg project uses TypeScript via JSDoc to [type check JavaScript files](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html). If you use Visual Studio Code, TypeScript support is built-in, otherwise see [TypeScript Editor Support](https://github.com/Microsoft/TypeScript/wiki/TypeScript-Editor-Support) for editor integrations.
+[**TypeScript**](https://www.typescriptlang.org/) is a typed superset of JavaScript language. The Gutenberg project uses TypeScript to detect type-based errors and improve developer experience through editor integrations. If you use Visual Studio Code, TypeScript support is built-in, otherwise see [TypeScript Editor Support](https://github.com/Microsoft/TypeScript/wiki/TypeScript-Editor-Support) for editor integrations.

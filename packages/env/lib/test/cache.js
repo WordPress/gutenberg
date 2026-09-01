@@ -1,12 +1,5 @@
 'use strict';
-/**
- * External dependencies
- */
 const { readFile, writeFile } = require( 'fs' ).promises;
-
-/**
- * Internal dependencies
- */
 const {
 	didCacheChange,
 	setCache,

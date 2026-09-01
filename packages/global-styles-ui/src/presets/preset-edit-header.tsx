@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalSpacer as Spacer,
 	Button,
@@ -9,10 +6,6 @@ import {
 } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { ScreenHeader } from '../screen-header';
 import { unlock } from '../lock-unlock';
 

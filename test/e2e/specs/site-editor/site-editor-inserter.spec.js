@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Site Editor Inserter', () => {
@@ -82,7 +79,7 @@ test.describe( 'Site Editor Inserter', () => {
 			},
 		} );
 
-		test( 'should intialize correct active tab based on zoom level', async ( {
+		test( 'should initialize correct active tab based on zoom level', async ( {
 			InserterUtils,
 			ZoomUtils,
 		} ) => {

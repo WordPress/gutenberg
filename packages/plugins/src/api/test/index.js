@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { memo } from '@wordpress/element';
 import { registerPlugin, unregisterPlugin, getPlugin, getPlugins } from '../';
 

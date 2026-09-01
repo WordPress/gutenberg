@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { createRegistry } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import { store as interfaceStore } from '../';
 
 function createRegistryWithStores() {

@@ -1,19 +1,19 @@
-/**
- * Node dependencies
- */
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
-import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
+import {
+	discoverTestFiles,
+	findOverlappingVitestProjectTests,
+	getTestEnvironmentName,
+	getVitestTests,
+	getVitestTestsByProject,
+	VITEST_PROJECT_NAMES,
+} from './discover-test-files.mjs';
+import { resolvePackageBin } from './resolve-package-bin.mjs';
+import { sourceHasTestEnvironmentOverride } from './test-environment-overrides.mjs';
 
-/**
- * Internal dependencies
- */
-import { discoverTestFiles, getVitestTests } from './discover-test-files.mjs';
-
-const require = createRequire( import.meta.url );
 const ROOT_DIR = path.resolve(
 	path.dirname( fileURLToPath( import.meta.url ) ),
 	'../../..'
@@ -32,17 +32,6 @@ function normalizeTestPath( testPath ) {
 		.relative( ROOT_DIR, path.resolve( ROOT_DIR, testPath ) )
 		.split( path.sep )
 		.join( '/' );
-}
-
-function resolvePackageBin( packageName ) {
-	const packageJsonPath = require.resolve( `${ packageName }/package.json` );
-	const packageJson = JSON.parse( readFileSync( packageJsonPath, 'utf8' ) );
-	const binPath =
-		typeof packageJson.bin === 'string'
-			? packageJson.bin
-			: packageJson.bin[ packageName ];
-
-	return path.resolve( path.dirname( packageJsonPath ), binPath );
 }
 
 function listTests( packageName, args ) {
@@ -72,6 +61,10 @@ function listTests( packageName, args ) {
 			.trim()
 			.split( /\r?\n/ )
 			.filter( Boolean )
+			.map( ( testPath ) => testPath.replace( /^\[[^\]]+\]\s+/, '' ) )
+			.filter( ( testPath ) =>
+				existsSync( path.resolve( ROOT_DIR, testPath ) )
+			)
 			.map( normalizeTestPath )
 	);
 }
@@ -114,20 +107,101 @@ function isValidManifestPath( testPath, expectedType ) {
 	);
 }
 
-const jestTests = listTests( 'jest', [
-	'--config',
-	JEST_CONFIG,
-	'--listTests',
-] );
-const vitestTests = existsSync( path.join( ROOT_DIR, VITEST_CONFIG ) )
-	? listTests( 'vitest', [
-			'list',
-			'--config',
-			VITEST_CONFIG,
-			'--filesOnly',
-	  ] )
-	: new Set();
 const staticInventory = discoverTestFiles( ROOT_DIR );
+const testsWithEnvironmentOverrides = staticInventory.filter( ( testPath ) =>
+	sourceHasTestEnvironmentOverride(
+		readFileSync( path.join( ROOT_DIR, testPath ), 'utf8' ),
+		testPath
+	)
+);
+assert.deepEqual(
+	testsWithEnvironmentOverrides,
+	[],
+	`Per-file test environment overrides are not allowed; use the filename suffix:\n${ testsWithEnvironmentOverrides.join(
+		'\n'
+	) }`
+);
+const expectedVitestTestsByProject = getVitestTestsByProject(
+	staticInventory,
+	manifest
+);
+const expectedVitestTests = getVitestTests( staticInventory, manifest );
+const expectedVitestTestSet = new Set( expectedVitestTests );
+const expectedJestTestsByProject = Object.fromEntries(
+	[ 'node', 'jsdom' ].map( ( projectName ) => [
+		projectName,
+		staticInventory.filter(
+			( testPath ) =>
+				! expectedVitestTestSet.has( testPath ) &&
+				getTestEnvironmentName( testPath ) === projectName
+		),
+	] )
+);
+const jestTestsByProject = Object.fromEntries(
+	Object.keys( expectedJestTestsByProject ).map( ( projectName ) => [
+		projectName,
+		listTests( 'jest', [
+			'--config',
+			JEST_CONFIG,
+			'--selectProjects',
+			projectName,
+			'--listTests',
+		] ),
+	] )
+);
+for ( const [ projectName, projectTests ] of Object.entries(
+	jestTestsByProject
+) ) {
+	assert.deepEqual(
+		[ ...projectTests ].sort(),
+		expectedJestTestsByProject[ projectName ],
+		`Jest ${ projectName } project discovery does not match filename-based ownership.`
+	);
+}
+const jestTests = new Set(
+	Object.values( jestTestsByProject ).flatMap( ( projectTests ) => [
+		...projectTests,
+	] )
+);
+const vitestTestsByProject = Object.fromEntries(
+	VITEST_PROJECT_NAMES.map( ( projectName ) => [
+		projectName,
+		existsSync( path.join( ROOT_DIR, VITEST_CONFIG ) )
+			? listTests( 'vitest', [
+					'list',
+					'--config',
+					VITEST_CONFIG,
+					'--project',
+					projectName,
+					'--filesOnly',
+					'--passWithNoTests',
+			  ] )
+			: new Set(),
+	] )
+);
+const overlappingVitestProjectTests =
+	findOverlappingVitestProjectTests( vitestTestsByProject );
+assert.deepEqual(
+	overlappingVitestProjectTests,
+	[],
+	`Tests are owned by multiple Vitest projects:\n${ overlappingVitestProjectTests.join(
+		'\n'
+	) }`
+);
+
+for ( const projectName of VITEST_PROJECT_NAMES ) {
+	assert.deepEqual(
+		[ ...vitestTestsByProject[ projectName ] ].sort(),
+		expectedVitestTestsByProject[ projectName ],
+		`Vitest ${ projectName } project discovery does not match filename-based ownership.`
+	);
+}
+
+const vitestTests = new Set(
+	Object.values( vitestTestsByProject ).flatMap( ( projectTests ) => [
+		...projectTests,
+	] )
+);
 
 const migratedTestFiles = manifest.vitest.files;
 const migratedDirectories = manifest.vitest.directories;
@@ -199,7 +273,6 @@ assert.deepEqual(
 	) }`
 );
 
-const expectedVitestTests = getVitestTests( staticInventory, manifest );
 assert.deepEqual(
 	[ ...vitestTests ].sort(),
 	expectedVitestTests,

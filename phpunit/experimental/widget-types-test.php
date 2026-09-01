@@ -265,10 +265,10 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 		$actions = gutenberg_sanitize_widget_actions(
 			array(
 				array(
-					'id'       => 'download-lyrics',
-					'label'    => 'Download lyrics',
-					'href'     => 'hello-dolly-lyrics.txt',
-					'download' => 'hello-dolly-lyrics.txt',
+					'id'       => 'export-metadata',
+					'label'    => 'Export metadata',
+					'href'     => 'widget.json',
+					'download' => 'hello-dolly.json',
 				),
 				array(
 					'id'    => 'health',
@@ -285,10 +285,10 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertCount( 2, $actions );
-		$this->assertSame( 'download-lyrics', $actions[0]['id'] );
-		$this->assertSame( 'hello-dolly-lyrics.txt', $actions[0]['download'] );
+		$this->assertSame( 'export-metadata', $actions[0]['id'] );
+		$this->assertSame( 'hello-dolly.json', $actions[0]['download'] );
 		$this->assertMatchesRegularExpression(
-			'#/widgets/hello-dolly/hello-dolly-lyrics\.txt$#',
+			'#/widgets/hello-dolly/widget\.json$#',
 			$actions[0]['href']
 		);
 		$this->assertSame(
@@ -337,6 +337,109 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 				),
 			),
 			$actions
+		);
+	}
+
+	/**
+	 * Envelope extras: a well-formed icon name and a known relevance ride
+	 * along; malformed values drop the key, never the action.
+	 */
+	public function test_sanitize_widget_actions_envelope_extras() {
+		$actions = gutenberg_sanitize_widget_actions(
+			array(
+				array(
+					'id'        => 'report',
+					'label'     => 'Open report',
+					'href'      => 'https://example.com/report',
+					'icon'      => 'core/chart-bar',
+					'relevance' => 'high',
+				),
+				array(
+					'id'        => 'export',
+					'label'     => 'Export',
+					'href'      => 'https://example.com/export',
+					'relevance' => 'medium',
+				),
+				array(
+					'id'        => 'about',
+					'label'     => 'About',
+					'href'      => 'https://example.com/about',
+					'icon'      => 'Not A Name',
+					'relevance' => 'primary',
+				),
+			)
+		);
+
+		$this->assertSame(
+			array(
+				array(
+					'id'        => 'report',
+					'label'     => 'Open report',
+					'href'      => 'https://example.com/report',
+					'icon'      => 'core/chart-bar',
+					'relevance' => 'high',
+				),
+				array(
+					'id'        => 'export',
+					'label'     => 'Export',
+					'href'      => 'https://example.com/export',
+					'relevance' => 'medium',
+				),
+				array(
+					'id'    => 'about',
+					'label' => 'About',
+					'href'  => 'https://example.com/about',
+				),
+			),
+			$actions
+		);
+	}
+
+	/**
+	 * Every download value but `false` keeps the download: a usable filename
+	 * survives sanitization, anything else falls back to the original name.
+	 */
+	public function test_sanitize_widget_actions_keeps_download_intent() {
+		$href = 'https://wordpress.org/export.csv';
+
+		$actions = gutenberg_sanitize_widget_actions(
+			array(
+				array(
+					'id'       => 'empty',
+					'label'    => 'Empty string',
+					'href'     => $href,
+					'download' => '',
+				),
+				array(
+					'id'       => 'zero',
+					'label'    => 'Zero',
+					'href'     => $href,
+					'download' => '0',
+				),
+				array(
+					'id'       => 'unusable',
+					'label'    => 'Unusable name',
+					'href'     => $href,
+					'download' => '???',
+				),
+				array(
+					'id'       => 'flag',
+					'label'    => 'Boolean true',
+					'href'     => $href,
+					'download' => true,
+				),
+				array(
+					'id'       => 'off',
+					'label'    => 'Boolean false',
+					'href'     => $href,
+					'download' => false,
+				),
+			)
+		);
+
+		$this->assertSame(
+			array( true, '0', true, true, false ),
+			array_column( $actions, 'download' )
 		);
 	}
 

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { keyedReducer } from '../keyed-reducer';
 
 describe( 'keyedReducer', () => {

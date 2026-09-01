@@ -356,132 +356,6 @@
 			]
 		},
 		{
-			"title": "admin/user-post-types.spec.js",
-			"type": "file",
-			"suites": [
-				{
-					"title": "User post types",
-					"type": "suite",
-					"tests": [
-						{
-							"title": "creates a post type and registers it",
-							"attempts": [
-								{
-									"duration": 2680
-								}
-							]
-						},
-						{
-							"title": "deactivating unregisters the post type and activating re-registers it",
-							"attempts": [
-								{
-									"duration": 3764
-								}
-							]
-						},
-						{
-							"title": "editing a post type persists changes to the registered post type",
-							"attempts": [
-								{
-									"duration": 4933
-								}
-							]
-						}
-					]
-				}
-			]
-		},
-		{
-			"title": "admin/user-taxonomies.spec.js",
-			"type": "file",
-			"suites": [
-				{
-					"title": "User taxonomies",
-					"type": "suite",
-					"suites": [
-						{
-							"title": "Edit taxonomy",
-							"type": "suite",
-							"tests": [
-								{
-									"title": "editing a taxonomy persists changes to the registered taxonomy",
-									"attempts": [
-										{
-											"duration": 3331
-										}
-									]
-								},
-								{
-									"title": "turning `Show in REST API` off blocks the taxonomy from the REST API",
-									"attempts": [
-										{
-											"duration": 2122
-										}
-									]
-								},
-								{
-									"title": "turning `Publicly queryable` off blocks the front-end term archive",
-									"attempts": [
-										{
-											"duration": 2122
-										}
-									]
-								},
-								{
-									"title": "turning `Public` off does not cascade to `Show admin UI`",
-									"attempts": [
-										{
-											"duration": 2680
-										}
-									]
-								}
-							]
-						},
-						{
-							"title": "Default term",
-							"type": "suite",
-							"tests": [
-								{
-									"title": "auto-applies the default term, and stops after the toggle is disabled",
-									"attempts": [
-										{
-											"duration": 15221
-										}
-									]
-								},
-								{
-									"title": "renaming the default term creates a new term and preserves the old",
-									"attempts": [
-										{
-											"duration": 15237
-										}
-									]
-								}
-							]
-						}
-					],
-					"tests": [
-						{
-							"title": "creates a taxonomy attached to posts and registers it",
-							"attempts": [
-								{
-									"duration": 2813
-								}
-							]
-						},
-						{
-							"title": "deactivating unregisters the taxonomy and activating re-registers it",
-							"attempts": [
-								{
-									"duration": 3764
-								}
-							]
-						}
-					]
-				}
-			]
-		},
-		{
 			"title": "admin/workflow-palette.spec.js",
 			"type": "file",
 			"suites": [
@@ -20556,50 +20430,6 @@
 			]
 		},
 		{
-			"title": "site-editor/save-entity-record-template-compat.spec.js",
-			"type": "file",
-			"suites": [
-				{
-					"title": "calling saveEntityRecord with a theme template ID",
-					"type": "suite",
-					"tests": [
-						{
-							"title": "should work as expected",
-							"attempts": [
-								{
-									"duration": 6002
-								}
-							]
-						},
-						{
-							"title": "should work as expected for different theme by calling the API directly",
-							"attempts": [
-								{
-									"duration": 5792
-								}
-							]
-						},
-						{
-							"title": "getEntityRecord should work as expected",
-							"attempts": [
-								{
-									"duration": 3300
-								}
-							]
-						},
-						{
-							"title": "getEditedEntityRecord should work as expected",
-							"attempts": [
-								{
-									"duration": 3300
-								}
-							]
-						}
-					]
-				}
-			]
-		},
-		{
 			"title": "site-editor/settings-sidebar.spec.js",
 			"type": "file",
 			"suites": [
@@ -20756,7 +20586,7 @@
 							"type": "suite",
 							"tests": [
 								{
-									"title": "should intialize correct active tab based on zoom level",
+									"title": "should initialize correct active tab based on zoom level",
 									"attempts": [
 										{
 											"duration": 5982
@@ -21022,34 +20852,6 @@
 			]
 		},
 		{
-			"title": "site-editor/template-activate.spec.js",
-			"type": "file",
-			"suites": [
-				{
-					"title": "Template Activate",
-					"type": "suite",
-					"tests": [
-						{
-							"title": "should duplicate and activate",
-							"attempts": [
-								{
-									"duration": 9077
-								}
-							]
-						},
-						{
-							"title": "should deactivate after theme change",
-							"attempts": [
-								{
-									"duration": 8153
-								}
-							]
-						}
-					]
-				}
-			]
-		},
-		{
 			"title": "site-editor/template-hierarchy.spec.js",
 			"type": "file",
 			"suites": [
@@ -21062,34 +20864,6 @@
 							"attempts": [
 								{
 									"duration": 3725
-								}
-							]
-						}
-					]
-				}
-			]
-		},
-		{
-			"title": "site-editor/template-id-format.spec.js",
-			"type": "file",
-			"suites": [
-				{
-					"title": "Template ID Format",
-					"type": "suite",
-					"tests": [
-						{
-							"title": "should open and edit templates correctly when active_templates experiment is enabled",
-							"attempts": [
-								{
-									"duration": 12790
-								}
-							]
-						},
-						{
-							"title": "should open and edit templates correctly when active_templates experiment is disabled",
-							"attempts": [
-								{
-									"duration": 12790
 								}
 							]
 						}
@@ -21206,74 +20980,6 @@
 							"attempts": [
 								{
 									"duration": 4561
-								}
-							]
-						}
-					]
-				}
-			]
-		},
-		{
-			"title": "site-editor/template-registration-activation.spec.js",
-			"type": "file",
-			"suites": [
-				{
-					"title": "Block template registration",
-					"type": "suite",
-					"tests": [
-						{
-							"title": "templates can be registered and edited",
-							"attempts": [
-								{
-									"duration": 9295
-								}
-							]
-						},
-						{
-							"title": "registered templates are available in the Change template screen",
-							"attempts": [
-								{
-									"duration": 4682
-								}
-							]
-						},
-						{
-							"title": "themes can override registered templates",
-							"attempts": [
-								{
-									"duration": 8283
-								}
-							]
-						},
-						{
-							"title": "templates can be deleted if the registered plugin is deactivated",
-							"attempts": [
-								{
-									"duration": 8283
-								}
-							]
-						},
-						{
-							"title": "registered templates can be unregistered",
-							"attempts": [
-								{
-									"duration": 3834
-								}
-							]
-						},
-						{
-							"title": "WP default templates can be overridden by plugins",
-							"attempts": [
-								{
-									"duration": 397
-								}
-							]
-						},
-						{
-							"title": "user-customized templates cannot be overridden by plugins",
-							"attempts": [
-								{
-									"duration": 12866
 								}
 							]
 						}

@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { ATTACHMENT_POST_TYPE } from '../constants';
 
 const AUTO_SAVE_FAILURE_NOTICE = __(
