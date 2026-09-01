@@ -12,7 +12,11 @@ import {
 	setSetting,
 	mergeGlobalStyles,
 } from '@wordpress/global-styles-engine';
-import type { StyleVariation, Color } from '@wordpress/global-styles-engine';
+import type {
+	GlobalStylesConfig,
+	StyleVariation,
+	Color,
+} from '@wordpress/global-styles-engine';
 import { GlobalStylesContext } from './context';
 import { removePropertiesFromObject, isVariationWithProperties } from './utils';
 
@@ -297,7 +301,9 @@ export function useColorRandomizer( blockName?: string ): [ () => void ] | [] {
  *              pointers or theme-relative URLs.
  * @return The style object with its `background` values resolved.
  */
-export function useStyleWithResolvedBackground( style: any ) {
+export function useStyleWithResolvedBackground(
+	style: GlobalStylesConfig[ 'styles' ]
+) {
 	const { merged } = useContext( GlobalStylesContext );
 	return useMemo( () => {
 		if ( ! style?.background ) {
