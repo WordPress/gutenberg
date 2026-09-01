@@ -13,10 +13,12 @@ import { DropdownContentWrapper } from '../dropdown-content-wrapper';
 import styles from '../style.module.scss';
 
 const DropdownWithModal = ( {
+	dialogRole = 'dialog',
 	dialogTriggerLocation,
 	onClose,
 	stopDialogTriggerPropagation = false,
 }: {
+	dialogRole?: 'dialog' | 'alertdialog';
 	dialogTriggerLocation: 'inside' | 'outside';
 	onClose?: () => void;
 	stopDialogTriggerPropagation?: boolean;
@@ -54,11 +56,61 @@ const DropdownWithModal = ( {
 			{ dialogTriggerLocation === 'outside' && dialogTrigger }
 			{ isDialogOpen && (
 				<Modal
+					role={ dialogRole }
 					title="Dialog"
 					onRequestClose={ () => setIsDialogOpen( false ) }
 				>
 					<p>Dialog content</p>
 				</Modal>
+			) }
+		</>
+	);
+};
+
+const DropdownWithSemanticOverlay = ( {
+	overlayType,
+	onClose,
+}: {
+	overlayType: 'native-dialog' | 'native-popover' | 'aria-modal';
+	onClose: () => void;
+} ) => {
+	const [ isOverlayOpen, setIsOverlayOpen ] = useState( false );
+	const overlayContent = (
+		<button ref={ ( element ) => element?.focus() }>Overlay item</button>
+	);
+
+	return (
+		<>
+			<Dropdown
+				onClose={ onClose }
+				renderToggle={ ( { isOpen, onToggle } ) => (
+					<button aria-expanded={ isOpen } onClick={ onToggle }>
+						Toggle
+					</button>
+				) }
+				renderContent={ () => (
+					<>
+						<button>Dropdown item</button>
+						<button onClick={ () => setIsOverlayOpen( true ) }>
+							Open overlay
+						</button>
+					</>
+				) }
+			/>
+			{ isOverlayOpen && overlayType === 'native-dialog' && (
+				<dialog open>{ overlayContent }</dialog>
+			) }
+			{ isOverlayOpen && overlayType === 'native-popover' && (
+				<div
+					ref={ ( element ) =>
+						element?.setAttribute( 'popover', 'manual' )
+					}
+				>
+					{ overlayContent }
+				</div>
+			) }
+			{ isOverlayOpen && overlayType === 'aria-modal' && (
+				<div aria-modal="true">{ overlayContent }</div>
 			) }
 		</>
 	);
@@ -292,6 +344,66 @@ describe( 'Dropdown', () => {
 		expect( dialogTrigger ).toHaveFocus();
 		expect( screen.getByText( 'Dropdown item' ) ).toBeInTheDocument();
 	} );
+
+	it( 'should stay open and restore focus when its alert dialog closes', async () => {
+		const user = userEvent.setup();
+		render(
+			<DropdownWithModal
+				dialogRole="alertdialog"
+				dialogTriggerLocation="inside"
+			/>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Toggle' } ) );
+		const dialogTrigger = await screen.findByRole( 'button', {
+			name: 'Open dialog',
+		} );
+		await user.click( dialogTrigger );
+
+		await screen.findByRole( 'alertdialog' );
+		expect( screen.getByText( 'Dropdown item' ) ).toBeInTheDocument();
+
+		await user.click( screen.getByRole( 'button', { name: 'Close' } ) );
+
+		await waitFor( () =>
+			expect(
+				screen.queryByRole( 'alertdialog' )
+			).not.toBeInTheDocument()
+		);
+		expect( dialogTrigger ).toHaveFocus();
+		expect( screen.getByText( 'Dropdown item' ) ).toBeInTheDocument();
+	} );
+
+	it.each( [
+		[ 'native dialog', 'native-dialog' ],
+		[ 'native popover', 'native-popover' ],
+		[ 'ARIA modal', 'aria-modal' ],
+	] as const )(
+		'should stay open when its %s receives focus',
+		async ( _label, overlayType ) => {
+			const user = userEvent.setup();
+			const onClose = jest.fn();
+			render(
+				<DropdownWithSemanticOverlay
+					overlayType={ overlayType }
+					onClose={ onClose }
+				/>
+			);
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Toggle' } )
+			);
+			await user.click(
+				await screen.findByRole( 'button', {
+					name: 'Open overlay',
+				} )
+			);
+
+			await screen.findByRole( 'button', { name: 'Overlay item' } );
+			await waitFor( () => expect( onClose ).not.toHaveBeenCalled() );
+			expect( screen.getByText( 'Dropdown item' ) ).toBeInTheDocument();
+		}
+	);
 
 	it( 'should stay open when a propagation-stopping trigger opens its dialog', async () => {
 		const user = userEvent.setup();
