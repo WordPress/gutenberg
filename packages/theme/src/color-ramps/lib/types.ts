@@ -37,6 +37,12 @@ export type ContrastRequirement = {
 	/** The reference color against which to calculate the contrast */
 	reference: keyof Ramp | 'seed';
 	/**
+	 * Other colors against which the generated color must meet the same target.
+	 * The solver uses the reference with the least contrast headroom for the
+	 * selected direction.
+	 */
+	additionalReferences?: readonly ( keyof Ramp | 'seed' )[];
+	/**
 	 * Which direction should the algorithm search a matching color in:
 	 * - main: follow the same direction as the ramp's main direction
 	 * - opposite: follow the opposite direction of the ramp

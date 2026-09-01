@@ -22,7 +22,7 @@ import type {
 	RampResult,
 	RampStepsConfig,
 } from './types.ts';
-import { CONTRAST_EPSILON } from './constants.ts';
+import { BLACK, WHITE, CONTRAST_EPSILON } from './constants.ts';
 
 /**
  * Calculate a complete color ramp based on the provided configuration.
@@ -75,12 +75,19 @@ function calculateRamp( {
 			sameAsIfPossible,
 		} = config[ stepName ];
 
-		const referenceColor = calculatedColors.get( contrast.reference );
-		if ( ! referenceColor ) {
-			throw new Error(
-				`Reference color for step ${ stepName } not found: ${ contrast.reference }`
-			);
-		}
+		const referenceNames = [
+			contrast.reference,
+			...( contrast.additionalReferences ?? [] ),
+		];
+		const referenceColors = referenceNames.map( ( referenceName ) => {
+			const referenceColor = calculatedColors.get( referenceName );
+			if ( ! referenceColor ) {
+				throw new Error(
+					`Reference color for step ${ stepName } not found: ${ referenceName }`
+				);
+			}
+			return referenceColor;
+		} );
 
 		// Check if we can reuse color from the `sameAsIfPossible` config option
 		if ( sameAsIfPossible ) {
@@ -91,13 +98,14 @@ function calculateRamp( {
 				);
 			}
 
-			const candidateContrast = getContrast(
-				referenceColor,
-				candidateColor
-			);
 			const adjustedTarget = adjustContrastTarget( contrast.target );
-			// If the candidate meets the contrast requirement, use it
-			if ( candidateContrast >= adjustedTarget ) {
+			const candidateMeetsTarget = referenceColors.every(
+				( referenceColor ) =>
+					getContrast( referenceColor, candidateColor ) >=
+					adjustedTarget
+			);
+			// If the candidate meets every contrast requirement, use it.
+			if ( candidateMeetsTarget ) {
 				// Store the reused color
 				calculatedColors.set( stepName, candidateColor );
 				rampResults[ stepName ] = getColorString( candidateColor );
@@ -107,7 +115,7 @@ function calculateRamp( {
 		}
 
 		function computeDirection(
-			color: string | PlainColorObject,
+			colors: readonly PlainColorObject[],
 			followDirection: FollowDirection
 		): RampDirection {
 			if ( followDirection === 'main' ) {
@@ -120,7 +128,7 @@ function calculateRamp( {
 
 			if ( followDirection === 'best' ) {
 				return computeBetterFgColorDirection(
-					color,
+					colors,
 					contrast.preferLighter
 				).better;
 			}
@@ -129,8 +137,14 @@ function calculateRamp( {
 		}
 
 		const computedDir = computeDirection(
-			referenceColor,
+			referenceColors,
 			contrast.followDirection
+		);
+		const endpoint = computedDir === 'lighter' ? WHITE : BLACK;
+		const referenceColor = referenceColors.reduce( ( tightest, current ) =>
+			getContrast( current, endpoint ) < getContrast( tightest, endpoint )
+				? current
+				: tightest
 		);
 
 		const adjustedTarget = adjustContrastTarget( contrast.target );

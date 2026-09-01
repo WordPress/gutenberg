@@ -15,11 +15,11 @@ export default {
 		'background-interactive-neutral-weak-disabled',
 	],
 	'primary-bgFill1': [ 'background-interactive-brand-strong' ],
+	'primary-bgFill2': [ 'background-interactive-brand-strong-active' ],
 	'primary-fgFill': [
 		'foreground-interactive-brand-strong',
 		'foreground-interactive-brand-strong-active',
 	],
-	'primary-bgFill2': [ 'background-interactive-brand-strong-active' ],
 	'primary-surface4': [ 'background-interactive-brand-weak-active' ],
 	'primary-fgSurface5': [ 'foreground-interactive-brand-active' ],
 	'primary-fgSurface4': [ 'foreground-interactive-brand' ],
@@ -52,11 +52,11 @@ export default {
 	'warning-stroke3': [ 'stroke-surface-warning-strong' ],
 	'warning-stroke1': [ 'stroke-surface-warning' ],
 	'error-bgFill1': [ 'background-interactive-error-strong' ],
+	'error-bgFill2': [ 'background-interactive-error-strong-active' ],
 	'error-fgFill': [
 		'foreground-interactive-error-strong',
 		'foreground-interactive-error-strong-active',
 	],
-	'error-bgFill2': [ 'background-interactive-error-strong-active' ],
 	'error-surface2': [
 		'background-interactive-error-active',
 		'background-surface-error-weak',

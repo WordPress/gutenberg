@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   Generate foreground scales with five perception-aware steps, separating resting and active interactive colors while preserving WCAG contrast floors. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
+-   Generate foreground scales with five perception-aware steps, separate resting and active interactive colors, and keep active fills darker while preserving WCAG contrast floors. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 -   Add a Lightning CSS visitor plugin that injects design system token fallbacks, available as `@wordpress/theme/lightningcss-plugins/lightningcss-ds-token-fallbacks`, with an optional peer range of `>=1.33.0 <2.0.0`. ([#80401](https://github.com/WordPress/gutenberg/pull/80401))
 
 ### Internal

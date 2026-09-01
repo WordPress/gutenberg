@@ -9,8 +9,8 @@ export const DEFAULT_RAMPS: Record<
 		ramp: {
 			surface2: '#fcfcfc',
 			bgFill1: '#555',
-			fgFill: '#f0f0f0',
 			bgFill2: '#484848',
+			fgFill: '#cbcbcb',
 			surface6: '#d6d6d6',
 			surface5: '#e6e6e6',
 			surface4: '#ededed',
@@ -36,12 +36,12 @@ export const DEFAULT_RAMPS: Record<
 	primary: {
 		ramp: {
 			bgFill1: '#3858e9',
-			fgFill: '#eff0f2',
 			bgFill2: '#2e49d9',
+			fgFill: '#e7e8ea',
 			surface2: '#f6f8fe',
 			surface6: '#c7d2ee',
 			surface5: '#dce3f4',
-			surface4: '#e6eaf4',
+			surface4: '#e5eaf6',
 			surface3: '#fff',
 			fgSurface5: '#0b0070',
 			fgSurface4: '#3351e8',
@@ -57,15 +57,15 @@ export const DEFAULT_RAMPS: Record<
 			bgFillInverted2: '#1a1e27',
 			bgFillInverted1: '#13009f',
 			fgFillInverted: '#eff0f2',
-			surface1: '#ecf0fa',
+			surface1: '#ebf0fc',
 		},
 		direction: 'darker',
 	},
 	info: {
 		ramp: {
 			bgFill1: '#0090ff',
-			fgFill: '#1a1f24',
 			bgFill2: '#007fed',
+			fgFill: '#12161b',
 			surface2: '#f3f9ff',
 			surface6: '#bcd5f2',
 			surface5: '#d4e4f7',
@@ -92,8 +92,8 @@ export const DEFAULT_RAMPS: Record<
 	success: {
 		ramp: {
 			bgFill1: '#4ab866',
-			fgFill: '#1b1f1c',
 			bgFill2: '#37a756',
+			fgFill: '#282d29',
 			surface2: '#ebffed',
 			surface6: '#88e89b',
 			surface5: '#b0f3bb',
@@ -120,8 +120,8 @@ export const DEFAULT_RAMPS: Record<
 	caution: {
 		ramp: {
 			bgFill1: '#f0d149',
-			fgFill: '#1f1e1b',
 			bgFill2: '#dcbe2f',
+			fgFill: '#4f4e48',
 			surface2: '#fff9ca',
 			surface6: '#e9d170',
 			surface5: '#f7e28a',
@@ -148,8 +148,8 @@ export const DEFAULT_RAMPS: Record<
 	warning: {
 		ramp: {
 			bgFill1: '#f0b849',
-			fgFill: '#1f1e1b',
 			bgFill2: '#dda633',
+			fgFill: '#45423d',
 			surface2: '#fff7e1',
 			surface6: '#f4cc85',
 			surface5: '#fadead',
@@ -176,12 +176,12 @@ export const DEFAULT_RAMPS: Record<
 	error: {
 		ramp: {
 			bgFill1: '#cc1818',
-			fgFill: '#f2efef',
 			bgFill2: '#b90000',
+			fgFill: '#eae6e6',
 			surface2: '#fff6f5',
 			surface6: '#f3c9c2',
 			surface5: '#f7dbd7',
-			surface4: '#f6e6e3',
+			surface4: '#f8e5e2',
 			surface3: '#fff',
 			fgSurface5: '#470000',
 			fgSurface4: '#be1616',
@@ -193,11 +193,11 @@ export const DEFAULT_RAMPS: Record<
 			stroke2: '#d39c95',
 			stroke1: '#dab1aa',
 			bgFillDark: '#231c1b',
-			fgFillDark: '#f2efef',
+			fgFillDark: '#f3efef',
 			bgFillInverted2: '#231c1b',
 			bgFillInverted1: '#640000',
-			fgFillInverted: '#f2efef',
-			surface1: '#fcece9',
+			fgFillInverted: '#f3efef',
+			surface1: '#feebe8',
 		},
 		direction: 'darker',
 	},
