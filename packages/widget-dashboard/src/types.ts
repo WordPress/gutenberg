@@ -112,18 +112,19 @@ export interface WidgetContextValue {
 export type WidgetGridModel = 'grid' | 'masonry';
 
 /**
- * Maximum column count for the widget dashboard on wide containers.
- * Not user-configurable; container width steps the count down to two
- * and one column at fixed breakpoints.
+ * Column count used on wide containers when the host sets no
+ * `gridSettings.columns`. A default, not a ceiling: the package renders
+ * whatever count the host asks for. The four-column wp-admin dashboard is
+ * that page's own decision, pinned where it reads its stored settings.
  */
 export const WIDGET_DASHBOARD_COLUMN_COUNT = 4;
 
 /**
  * Settings common to every grid model. Column count is resolved from
- * the dashboard container width (see
- * `utils/resolve-dashboard-column-count`). `columns` and `minColumnWidth`
- * on this type remain for persisted payloads and `@wordpress/grid`
- * compatibility; the dashboard ignores user-facing values for both.
+ * the host's cap and the dashboard container width (see
+ * `utils/resolve-dashboard-column-count`). `minColumnWidth` remains for
+ * persisted payloads and `@wordpress/grid` compatibility; the dashboard
+ * ignores it.
  *
  * `spacing` is intentionally absent: the gap between tiles is
  * presentational and lives with the design-system theme/density, not
@@ -132,8 +133,11 @@ export const WIDGET_DASHBOARD_COLUMN_COUNT = 4;
  */
 interface BaseWidgetGridSettings {
 	/**
-	 * Target column count (cap). The dashboard always uses
-	 * {@link WIDGET_DASHBOARD_COLUMN_COUNT}; persisted values are ignored.
+	 * Column count on wide containers. A finite value is floored, with a
+	 * floor of one and no ceiling; an absent or non-finite value resolves to
+	 * {@link WIDGET_DASHBOARD_COLUMN_COUNT}. Container width steps the
+	 * effective count down: `min( 2, count )` in the middle band, one
+	 * column below it.
 	 */
 	columns?: number;
 
@@ -201,12 +205,13 @@ export interface DashboardInstanceOperationRequest {
 
 /**
  * An operation the dashboard asks permission for, with its subject.
- * `customize` is entering customize mode; `insert` is offering a widget
- * type in the inserter; `remove`, `move`, `resize`, and `edit` act on a
- * placed widget.
+ * `customize` is entering customize mode; `reset` is restoring the default
+ * layout; `insert` is offering a widget type in the inserter; `remove`,
+ * `move`, `resize`, and `edit` act on a placed widget.
  */
 export type DashboardOperationRequest =
 	| { operation: 'customize' }
+	| { operation: 'reset' }
 	| { operation: 'insert'; widgetType: WidgetType }
 	| DashboardInstanceOperationRequest;
 

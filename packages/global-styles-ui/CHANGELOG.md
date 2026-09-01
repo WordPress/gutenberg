@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Background panels: Resolve theme-relative (`file:./…`) background image URLs and `ref` pointers before rendering thumbnails and the focal point picker. The screens render inside the package's own `BlockEditorProvider`, which cannot carry the private settings the panels previously resolved these against ([#82242](https://github.com/WordPress/gutenberg/pull/82242)).
+
 ### Internal
 
 -   Remove unused dependency `change-case` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
