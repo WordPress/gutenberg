@@ -2,7 +2,7 @@ import { createRequire } from 'node:module';
 import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 const require = createRequire( import.meta.url );
 const net = require( 'node:net' );
-const createServer = vi
+let createServer = vi
 	.spyOn( net, 'createServer' )
 	.mockImplementation( () => undefined );
 const {
@@ -18,6 +18,7 @@ afterAll( () => {
 
 describe( 'port-utils', () => {
 	beforeEach( () => {
+		createServer = vi.spyOn( net, 'createServer' );
 		createServer.mockReset().mockImplementation( () => undefined );
 	} );
 

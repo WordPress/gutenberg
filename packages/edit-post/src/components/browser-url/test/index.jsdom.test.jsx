@@ -1,14 +1,5 @@
 import { render, act } from '@testing-library/react';
-import {
-	afterAll,
-	afterEach,
-	beforeAll,
-	beforeEach,
-	describe,
-	expect,
-	it,
-	vi,
-} from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useSelect } from '@wordpress/data';
 import { default as BrowserURL, getPostEditURL } from '../';
 
@@ -43,12 +34,9 @@ describe( 'getPostEditURL', () => {
 describe( 'BrowserURL', () => {
 	let replaceStateSpy;
 
-	beforeAll( () => {
-		replaceStateSpy = vi.spyOn( window.history, 'replaceState' );
-	} );
-
 	beforeEach( () => {
 		vi.useFakeTimers();
+		replaceStateSpy = vi.spyOn( window.history, 'replaceState' );
 		window.history.replaceState( {}, '', '/' );
 		replaceStateSpy.mockReset();
 	} );
@@ -56,10 +44,6 @@ describe( 'BrowserURL', () => {
 	afterEach( () => {
 		act( () => vi.runOnlyPendingTimers() );
 		vi.useRealTimers();
-	} );
-
-	afterAll( () => {
-		replaceStateSpy.mockRestore();
 	} );
 
 	it( 'not update URL if post is auto-draft', () => {

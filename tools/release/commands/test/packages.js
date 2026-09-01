@@ -1,7 +1,8 @@
 import { createRequire } from 'node:module';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 const require = createRequire( import.meta.url );
-const {
+const logger = require( '../../lib/logger' );
+let {
 	finalizePreparedNpmRelease,
 	getNpmReleasePackages,
 	getNpmReleaseGitRecoveryCommands,
@@ -17,7 +18,28 @@ const {
 	runNpmReleasePhase,
 	runPackagesRelease,
 	verifyRemotePackageTags,
-} = require( '../packages' );
+} = {};
+
+beforeAll( () => {
+	logger.log = console.log;
+	( {
+		finalizePreparedNpmRelease,
+		getNpmReleasePackages,
+		getNpmReleaseGitRecoveryCommands,
+		getRemoteBranchSha,
+		getRemoteTagShas,
+		getTagPushCommands,
+		getTagRefspec,
+		prepareNpmRelease,
+		publishPackagesToNpm,
+		publishVersionedPackagesToNpm,
+		pushNpmReleaseGitMetadata,
+		runNpmPublishPreflight,
+		runNpmReleasePhase,
+		runPackagesRelease,
+		verifyRemotePackageTags,
+	} = require( '../packages' ) );
+} );
 
 describe( 'prepareNpmRelease', () => {
 	it.each( [

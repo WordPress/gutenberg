@@ -50,3 +50,10 @@ also rejects Vitest isolation opt-outs and global Vitest APIs.
 
 `wpVitest` remains an explicit opt-in for jsdom suites that need hoist-safe
 helpers inside `vi.hoisted()`.
+
+Vitest clears mock call history, resets mock implementations, restores spies,
+resets stubbed globals and environment variables, and restores real timers
+between tests. Tests must configure required mock implementations in their own
+setup hooks. Mutable state held by an imported module is not reset
+automatically; reset it explicitly or use `vi.resetModules()` when a fresh
+module instance is required.

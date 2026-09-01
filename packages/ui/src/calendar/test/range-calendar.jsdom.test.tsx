@@ -1,12 +1,4 @@
-import {
-	afterAll,
-	afterEach,
-	beforeAll,
-	describe,
-	expect,
-	it,
-	vi,
-} from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
 	act,
 	render,
@@ -93,7 +85,7 @@ describe( 'RangeCalendar', () => {
 	let prevMonth: Date;
 	let prevPrevMonth: Date;
 
-	beforeAll( () => {
+	beforeEach( () => {
 		vi.useFakeTimers( { toFake: [ 'Date' ] } );
 		// For consistent tests, set the system time to a fixed date:
 		// Thursday, May 15, 2025, 20:00 UTC
@@ -107,10 +99,6 @@ describe( 'RangeCalendar', () => {
 		nextNextMonth = startOfMonth( addMonths( today, 2 ) );
 		prevMonth = startOfMonth( subMonths( today, 1 ) );
 		prevPrevMonth = startOfMonth( subMonths( today, 2 ) );
-	} );
-
-	afterAll( () => {
-		vi.useRealTimers();
 	} );
 
 	afterEach( async () => {

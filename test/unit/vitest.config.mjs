@@ -21,6 +21,10 @@ const gutenbergEnvSetupFile = path.join(
 	ROOT_DIR,
 	'test/unit/config/gutenberg-env.js'
 );
+const isolationSetupFile = path.join(
+	ROOT_DIR,
+	'test/unit/config/isolation.vitest.js'
+);
 const testMigration = JSON.parse(
 	readFileSync(
 		path.join( ROOT_DIR, 'test/unit/test-migration.json' ),
@@ -166,6 +170,7 @@ export default defineConfig( {
 							ROOT_DIR,
 							'test/unit/config/console.vitest.js'
 						),
+						isolationSetupFile,
 					],
 				},
 			},
@@ -202,6 +207,7 @@ export default defineConfig( {
 							ROOT_DIR,
 							'test/unit/config/testing-library.vitest.js'
 						),
+						isolationSetupFile,
 					],
 				},
 			},
@@ -215,6 +221,7 @@ export default defineConfig( {
 							ROOT_DIR,
 							'test/unit/config/console.vitest.js'
 						),
+						isolationSetupFile,
 					],
 					browser: {
 						enabled: true,
@@ -225,6 +232,7 @@ export default defineConfig( {
 				},
 			},
 		],
+		clearMocks: true,
 		globals: false,
 		includeTaskLocation: true,
 		passWithNoTests: false,
@@ -237,5 +245,7 @@ export default defineConfig( {
 			escapeString: false,
 			printBasicPrototype: false,
 		},
+		unstubEnvs: true,
+		unstubGlobals: true,
 	},
 } );
