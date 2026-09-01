@@ -72,8 +72,8 @@ export interface ColorObject {
 export interface EditImageProps {
 	value: RichTextValue;
 	onChange: ( value: RichTextValue ) => void;
-	onFocus?: () => void;
-	isObjectActive?: boolean;
+	onFocus: () => void;
+	isObjectActive: boolean;
 	activeObjectAttributes: {
 		style?: string;
 		alt?: string | undefined;
@@ -82,6 +82,14 @@ export interface EditImageProps {
 	} | null;
 	contentRef: React.RefObject< HTMLElement >;
 }
+
+/**
+ * The subset of `EditImageProps` the inline image popover actually reads.
+ */
+export type InlineImageUIProps = Pick<
+	EditImageProps,
+	'value' | 'onChange' | 'activeObjectAttributes' | 'contentRef'
+>;
 
 export interface EditLinkProps {
 	isActive: boolean;

@@ -15,7 +15,7 @@ import {
 	MediaUploadCheck,
 	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
-import type { EditImageProps } from '../types';
+import type { EditImageProps, InlineImageUIProps } from '../types';
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 const name = 'core/image';
@@ -61,7 +61,7 @@ function InlineUI( {
 	onChange,
 	activeObjectAttributes,
 	contentRef,
-}: EditImageProps ) {
+}: InlineImageUIProps ) {
 	const style = activeObjectAttributes?.style;
 	const alt = activeObjectAttributes?.alt;
 
@@ -195,7 +195,7 @@ function Edit( {
 							},
 						} )
 					);
-					onFocus?.();
+					onFocus();
 				} }
 				render={ ( { open }: { open: () => void } ) => (
 					<RichTextToolbarButton
