@@ -31,6 +31,7 @@ import {
 } from '../../store/constants';
 import { useZoomOutModeExit } from './use-zoom-out-mode-exit';
 import { usePaddingAppender } from './use-padding-appender';
+import { useTitleGapInserter } from './use-title-gap-inserter';
 import { useEditContentOnlySectionExit } from './use-edit-content-only-section-exit';
 import { SyncConnectionErrorModal } from '../sync-connection-error-modal';
 
@@ -379,6 +380,9 @@ function VisualEditor( {
 	const [ paddingAppenderRef, paddingStyle ] = usePaddingAppender(
 		! isPreview && renderingMode === 'post-only' && ! isDesignPostType
 	);
+	const titleGapInserterRef = useTitleGapInserter(
+		! isPreview && renderingMode === 'post-only' && ! isDesignPostType
+	);
 
 	const shouldConstrainCanvasHeight =
 		enableResizing &&
@@ -444,6 +448,7 @@ function VisualEditor( {
 		} ),
 		useZoomOutModeExit(),
 		paddingAppenderRef,
+		titleGapInserterRef,
 		useEditContentOnlySectionExit(),
 	] );
 

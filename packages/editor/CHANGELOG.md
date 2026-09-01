@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Post editor: Show the inline inserter in the gap between the post title and the first block ([#27540](https://github.com/WordPress/gutenberg/issues/27540)).
+
 ### Breaking Changes
 
 -   `PluginMoreMenuItem`, `PluginSidebarMoreMenuItem`: Items render with the `Menu` component of `@wordpress/ui` instead of `MenuItem`. A link item honors only `target="_blank"`, and a custom `as` has to forward its ref ([#81564](https://github.com/WordPress/gutenberg/pull/81564)).

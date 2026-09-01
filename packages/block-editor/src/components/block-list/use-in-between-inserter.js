@@ -166,13 +166,6 @@ export function useInBetweenInserter() {
 
 				const index = getBlockIndex( clientId );
 
-				// Don't show the in-between inserter before the first block in
-				// the list (preserves the original behaviour).
-				if ( index === 0 ) {
-					hideInsertionPoint();
-					return;
-				}
-
 				showInsertionPoint( rootClientId, index, {
 					__unstableWithInserter: true,
 				} );
