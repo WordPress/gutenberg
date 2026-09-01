@@ -169,7 +169,7 @@ function Edit( {
 				onClick={ onClick }
 				isActive={ isObjectActive }
 			/>
-			{ isObjectActive && latexToMathML && (
+			{ isObjectActive && (
 				<InlineUI
 					value={ value }
 					onChange={ onChange }

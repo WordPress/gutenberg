@@ -45,7 +45,10 @@ export interface InlineUIProps {
 	onChange: ( value: RichTextValue ) => void;
 	activeAttributes: Record< string, string > | null;
 	contentRef: React.RefObject< HTMLElement >;
-	latexToMathML: (
+	/**
+	 * Resolves once `@wordpress/latex-to-mathml` has loaded; undefined until then.
+	 */
+	latexToMathML?: (
 		latex: string,
 		options?: { displayMode?: boolean }
 	) => string;
