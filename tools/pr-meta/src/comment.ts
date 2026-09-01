@@ -47,10 +47,14 @@ export function sanitizeBody( body: string ): string {
 const BODY_HEADING_LEVEL = 5;
 const MAX_HEADING_LEVEL = 6;
 
-/* The hashes and the rest of the line, so neither is reconstructed by hand. */
-const HEADING = /^(#{1,6})(\s.*)$/;
+/*
+ * The hashes and the rest of the line, so neither is reconstructed by hand.
+ * `s` matters: without it a `.` stops at the carriage return of a CRLF body,
+ * so no line would match and the body would be left half demoted.
+ */
+const HEADING = /^( {0,3})(#{1,6})(\s.*|)$/s;
 /* A fence opens on three or more backticks or tildes, indented at most three. */
-const FENCE = /^ {0,3}(`{3,}|~{3,})(.*)$/;
+const FENCE = /^ {0,3}(`{3,}|~{3,})(.*)$/s;
 
 /**
  * Tracks whether a line falls inside a fenced code block.
@@ -112,7 +116,7 @@ export function demoteHeadings( body: string ): string {
 	for ( const line of lines ) {
 		const level = isFenced( line )
 			? undefined
-			: line.match( HEADING )?.[ 1 ].length;
+			: line.match( HEADING )?.[ 2 ].length;
 
 		if ( level !== undefined ) {
 			shallowest = Math.min( shallowest, level );
@@ -135,8 +139,8 @@ export function demoteHeadings( body: string ): string {
 
 			return line.replace(
 				HEADING,
-				( _, hashes, rest ) =>
-					`${ '#'.repeat(
+				( _, indent, hashes, rest ) =>
+					`${ indent }${ '#'.repeat(
 						Math.min( hashes.length + shift, MAX_HEADING_LEVEL )
 					) }${ rest }`
 			);
@@ -285,6 +289,15 @@ function renderSection(
 		definition ?? UNKNOWN_SECTION,
 		section.runUrl
 	);
+
+	/*
+	 * A cleared section stays as a bare pair of markers, invisible in the
+	 * rendered comment but still carrying its generation, so a run that was
+	 * gathered earlier cannot bring the old content back.
+	 */
+	if ( body === '' ) {
+		return `${ open }\n\n${ close }`;
+	}
 
 	const delimited = `${ open }\n${ body }\n${ close }`;
 
@@ -436,26 +449,37 @@ export function mergeSection(
 	const remaining = sections.filter(
 		( section ) => section.id !== update.id
 	);
-	const next = body
-		? [
-				...remaining,
-				{
-					id: update.id,
-					body,
-					sha: definition.scope === 'commit' ? update.sha : undefined,
-					runUrl:
-						definition.scope === 'commit'
-							? update.runUrl
-							: undefined,
-					generation:
-						definition.scope === 'pr-state'
-							? update.generation
-							: undefined,
-				},
-		  ]
-		: remaining;
+	/*
+	 * Clearing keeps the entry when it has a generation to remember, so a
+	 * later, older write is still ordered against it.
+	 */
+	const cleared =
+		definition.scope === 'pr-state' && update.generation !== undefined;
+	const next =
+		body || cleared
+			? [
+					...remaining,
+					{
+						id: update.id,
+						body,
+						sha:
+							definition.scope === 'commit'
+								? update.sha
+								: undefined,
+						runUrl:
+							definition.scope === 'commit'
+								? update.runUrl
+								: undefined,
+						generation:
+							definition.scope === 'pr-state'
+								? update.generation
+								: undefined,
+					},
+			  ]
+			: remaining;
 
-	if ( next.length === 0 ) {
+	/* Markers alone render as nothing, so a comment of them is worth no comment. */
+	if ( next.every( ( section ) => section.body === '' ) ) {
 		return { remove: Boolean( existing ) };
 	}
 
