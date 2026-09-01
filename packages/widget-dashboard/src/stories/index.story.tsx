@@ -31,8 +31,15 @@ import type {
 	WidgetRenderProps,
 	WidgetType,
 } from '@wordpress/widget-primitives';
+import { ROW_HEIGHT_PRESETS } from '../utils/row-height-presets';
+import type { RowHeightPreset } from '../utils/row-height-presets';
 import { WidgetDashboard } from '../widget-dashboard';
-import type { CanPerformDashboardOperation, DashboardWidget } from '../types';
+import type {
+	CanPerformDashboardOperation,
+	DashboardWidget,
+	WidgetGridModel,
+	WidgetGridSettings,
+} from '../types';
 
 /*
  * Stories run without WordPress, so both halves of the demo widget are
@@ -812,6 +819,173 @@ The command palette is mounted too: press ⌘K (Ctrl+K outside macOS) and the co
 Switch the section, then open "Add widget": the listing follows the section, even while open; the excluded types keep rendering where already placed because the \`widgetTypes\` registry never changes.
 
 Nested policies compose restrictively; without a policy, every operation is allowed. See the **Policy** page for the contract.
+`,
+			},
+		},
+	},
+};
+
+// A fuller board than INITIAL_LAYOUT: a hero spanning the whole first row at
+// any column count (the grid clamps the span), then a rank of small tiles so
+// the columns control visibly repacks them.
+const GRID_SETTINGS_LAYOUT: DashboardWidget[] = [
+	{
+		uuid: 'grid-settings-traffic-week',
+		type: 'demo/traffic-snapshot',
+		attributes: { metric: 'views', period: 'week', label: 'Traffic' },
+		placement: { width: 2, height: 1, order: 1 },
+	},
+	{
+		uuid: 'grid-settings-goal-revenue',
+		type: 'demo/goal-progress',
+		attributes: { metric: 'revenue', target: '5000' },
+		placement: { width: 1, height: 1, order: 2 },
+	},
+	{
+		uuid: 'grid-settings-audience-tall',
+		type: 'demo/traffic-snapshot',
+		attributes: { metric: 'visitors', period: 'month', label: 'Audience' },
+		placement: { width: 1, height: 2, order: 3 },
+	},
+	{
+		uuid: 'grid-settings-goal-orders',
+		type: 'demo/goal-progress',
+		attributes: { metric: 'orders', target: '1000' },
+		placement: { width: 2, height: 1, order: 4 },
+	},
+	{
+		uuid: 'grid-settings-traffic-day',
+		type: 'demo/traffic-snapshot',
+		attributes: { metric: 'views', period: 'day', label: 'Today' },
+		placement: { width: 1, height: 1, order: 5 },
+	},
+	{
+		uuid: 'grid-settings-goal-stretch',
+		type: 'demo/goal-progress',
+		attributes: { metric: 'revenue', target: '10000' },
+		placement: { width: 1, height: 1, order: 6 },
+	},
+];
+
+type GridSettingsStoryProps = {
+	columns: number;
+	model: WidgetGridModel;
+	rowHeight: RowHeightPreset;
+	flowTolerance: number;
+};
+
+// The ladder in words, so the caption tracks the count the story asked for
+// rather than describing the four-column default.
+function describeColumnSteps( columns: number ): string {
+	if ( columns === 1 ) {
+		return 'one column at every width';
+	}
+
+	const middle = Math.min( 2, columns );
+	if ( middle === columns ) {
+		return `${ columns } columns until the container narrows to one`;
+	}
+
+	return `${ columns } columns on a wide container, ${ middle } as it narrows, then one`;
+}
+
+function GridSettingsStory( {
+	columns,
+	model,
+	rowHeight,
+	flowTolerance,
+}: GridSettingsStoryProps ) {
+	const [ layout, setLayout ] =
+		useState< DashboardWidget[] >( GRID_SETTINGS_LAYOUT );
+	const [ editMode, setEditMode ] = useState( false );
+
+	// The settings union is per model: `rowHeight` belongs to the grid and
+	// `flowTolerance` to masonry, so only the active model's field travels.
+	const gridSettings = useMemo< WidgetGridSettings >(
+		() =>
+			model === 'masonry'
+				? { model, columns, flowTolerance }
+				: {
+						model,
+						columns,
+						rowHeight: ROW_HEIGHT_PRESETS[ rowHeight ],
+				  },
+		[ model, columns, flowTolerance, rowHeight ]
+	);
+
+	return (
+		<WidgetDashboard
+			widgetTypes={ [
+				trafficSnapshotWidgetType,
+				goalProgressWidgetType,
+			] }
+			layout={ layout }
+			onLayoutChange={ setLayout }
+			editMode={ editMode }
+			onEditChange={ setEditMode }
+			resolveWidgetModule={ resolveDemoModule }
+			gridSettings={ gridSettings }
+		>
+			<Page
+				title="Dashboard"
+				subTitle={ `${
+					model === 'masonry' ? 'Masonry' : 'Standard grid'
+				}: ${ describeColumnSteps( columns ) }.` }
+				actions={ <WidgetDashboard.Actions /> }
+				showSidebarToggle={ false }
+				hasPadding
+			>
+				<WidgetDashboard.Widgets />
+			</Page>
+		</WidgetDashboard>
+	);
+}
+
+export const GridSettings: StoryObj< GridSettingsStoryProps > = {
+	render: ( args ) => <GridSettingsStory { ...args } />,
+	args: {
+		columns: 4,
+		model: 'grid',
+		rowHeight: 'medium',
+		flowTolerance: 16,
+	},
+	argTypes: {
+		columns: {
+			control: { type: 'range', min: 1, max: 12, step: 1 },
+			description:
+				'Wide-container column count. The host decides; the package only floors it at one.',
+		},
+		model: {
+			control: 'radio',
+			options: [ 'grid', 'masonry' ],
+			description:
+				'The grid model. `grid` gives uniform rows and two-axis spans; `masonry` drives heights from content.',
+		},
+		rowHeight: {
+			control: 'radio',
+			options: Object.keys( ROW_HEIGHT_PRESETS ),
+			description: 'Height of each grid row. Grid model only.',
+			if: { arg: 'model', eq: 'grid' },
+		},
+		flowTolerance: {
+			control: { type: 'range', min: 0, max: 200, step: 4 },
+			description:
+				'Pixel tolerance for source-order tiebreaking between lanes. Masonry model only.',
+			if: { arg: 'model', eq: 'masonry' },
+		},
+	},
+	parameters: {
+		controls: {
+			include: [ 'columns', 'model', 'rowHeight', 'flowTolerance' ],
+		},
+		docs: {
+			description: {
+				story: `
+The \`gridSettings\` prop carries the host's layout decisions. \`columns\` sets the wide-container count (\`WIDGET_DASHBOARD_COLUMN_COUNT\` is only the default when the host sets nothing), and container width steps the effective count down to \`min( 2, count )\` and then one as it narrows. Drag the columns control; resize the canvas to watch the steps.
+
+\`model\` picks the surface, and the per-model field follows it: \`rowHeight\` belongs to \`grid\`, \`flowTolerance\` to \`masonry\`. Only the active one is passed in \`gridSettings\`, and only its control is shown.
+
+Tile spans are stored per widget and do not scale with the count. Raise \`columns\` and every track narrows, so the same spans cover less of the surface. Enter Customize and resize a tile to see it take the new count.
 `,
 			},
 		},

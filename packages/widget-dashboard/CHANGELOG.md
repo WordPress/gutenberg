@@ -22,6 +22,15 @@
     the confirmation prompt are hidden while the policy denies it
     ([#82255](https://github.com/WordPress/gutenberg/pull/82255)).
 
+### Enhancements
+
+-   `gridSettings.columns` now sets the wide-container column count (floored,
+    with a floor of one); the responsive steps scale from it.
+    `WIDGET_DASHBOARD_COLUMN_COUNT` is the default when the host sets
+    nothing, and the wp-admin dashboard pins it where it reads its stored
+    settings, so preferences persisted by the removed Columns control stay
+    inert ([#82204](https://github.com/WordPress/gutenberg/pull/82204)).
+
 ### Internal
 
 -   Remove unused dependency `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
