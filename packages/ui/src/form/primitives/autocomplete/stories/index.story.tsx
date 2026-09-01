@@ -1,3 +1,4 @@
+import { Autocomplete as BaseAutocomplete } from '@base-ui/react/autocomplete';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CSSProperties } from 'react';
 import { useRef, useState } from '@wordpress/element';
@@ -152,13 +153,34 @@ function getStatusChildren( {
 		return null;
 	}
 
-	const message = count === 1 ? '1 result found' : `${ count } results found`;
+	const message =
+		count === 1 ? '1 result found.' : `${ count } results found.`;
 
 	if ( visibleCount ) {
 		return message;
 	}
 
 	return <VisuallyHidden>{ message }</VisuallyHidden>;
+}
+
+function AsyncStatus( {
+	loading,
+	visibleCount,
+}: {
+	loading: boolean;
+	visibleCount: boolean;
+} ) {
+	const filteredItems = BaseAutocomplete.useFilteredItems< FixtureItem >();
+
+	return (
+		<Autocomplete.Status>
+			{ getStatusChildren( {
+				loading,
+				count: filteredItems.length,
+				visibleCount,
+			} ) }
+		</Autocomplete.Status>
+	);
 }
 
 function AsyncItemsTemplate( {
@@ -197,13 +219,10 @@ function AsyncItemsTemplate( {
 		>
 			<Autocomplete.Input placeholder="Enter a URL" />
 			<Autocomplete.Popup>
-				<Autocomplete.Status>
-					{ getStatusChildren( {
-						loading,
-						count: results.length,
-						visibleCount,
-					} ) }
-				</Autocomplete.Status>
+				<AsyncStatus
+					loading={ loading }
+					visibleCount={ visibleCount }
+				/>
 				<Autocomplete.Empty>
 					{ loading ? null : 'No matching items.' }
 				</Autocomplete.Empty>

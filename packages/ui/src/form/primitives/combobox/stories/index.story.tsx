@@ -1,3 +1,4 @@
+import { Combobox as BaseCombobox } from '@base-ui/react/combobox';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useRef, useState } from '@wordpress/element';
 import * as Combobox from '../index';
@@ -268,13 +269,34 @@ function getStatusChildren( {
 		return null;
 	}
 
-	const message = count === 1 ? '1 result found' : `${ count } results found`;
+	const message =
+		count === 1 ? '1 result found.' : `${ count } results found.`;
 
 	if ( visibleCount ) {
 		return message;
 	}
 
 	return <VisuallyHidden>{ message }</VisuallyHidden>;
+}
+
+function AsyncStatus( {
+	loading,
+	visibleCount,
+}: {
+	loading: boolean;
+	visibleCount: boolean;
+} ) {
+	const filteredItems = BaseCombobox.useFilteredItems< FixtureItem >();
+
+	return (
+		<Combobox.Status>
+			{ getStatusChildren( {
+				loading,
+				count: filteredItems.length,
+				visibleCount,
+			} ) }
+		</Combobox.Status>
+	);
 }
 
 function AsyncItemsTemplate( {
@@ -322,13 +344,10 @@ function AsyncItemsTemplate( {
 				<div style={ inputWrapperStyle }>
 					<Combobox.Input placeholder="Search" />
 				</div>
-				<Combobox.Status>
-					{ getStatusChildren( {
-						loading,
-						count: items.length,
-						visibleCount,
-					} ) }
-				</Combobox.Status>
+				<AsyncStatus
+					loading={ loading }
+					visibleCount={ visibleCount }
+				/>
 				<Combobox.Empty>
 					{ loading ? null : 'No results found.' }
 				</Combobox.Empty>
