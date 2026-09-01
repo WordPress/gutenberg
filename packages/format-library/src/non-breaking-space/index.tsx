@@ -15,7 +15,7 @@ const title = __( 'Non breaking space' );
 function PopoverAnchor( { contentRef }: NonBreakingSpacePopoverAnchorProps ) {
 	const popoverAnchor = useAnchor( {
 		// eslint-disable-next-line react-hooks/refs
-		editableContentElement: contentRef.current as HTMLElement | null,
+		editableContentElement: contentRef.current,
 		settings: nonBreakingSpace,
 	} );
 

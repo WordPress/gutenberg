@@ -80,8 +80,8 @@ function InlineLanguageUI( {
 }: InlineLanguageUIProps ) {
 	const popoverAnchor = useAnchor( {
 		// eslint-disable-next-line react-hooks/refs
-		editableContentElement: contentRef.current as HTMLElement | null,
-		settings: language as typeof language,
+		editableContentElement: contentRef.current,
+		settings: language,
 	} );
 
 	const [ lang, setLang ] = useState( '' );

@@ -211,7 +211,7 @@ export default function InlineColorUI( {
 	const anchorSettings = { ...settings, isActive };
 	const popoverAnchor = useAnchor( {
 		// eslint-disable-next-line react-hooks/refs
-		editableContentElement: contentRef.current as HTMLElement | null,
+		editableContentElement: contentRef.current,
 		settings: anchorSettings,
 	} );
 

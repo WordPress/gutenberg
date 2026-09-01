@@ -223,11 +223,7 @@ function InlineLinkUI( {
 			// See: https://github.com/WordPress/gutenberg/pull/33849#issuecomment-936134179.
 			if ( splitValue ) {
 				const [ valBefore, valAfter ] = splitValue;
-				const newValAfter = replace(
-					valAfter,
-					richTextText,
-					() => newValue
-				);
+				const newValAfter = replace( valAfter, richTextText, newValue );
 
 				newValue = concat( valBefore, newValAfter );
 			} else {
@@ -235,7 +231,7 @@ function InlineLinkUI( {
 				// selection, leaving nothing to split on. Replace within the
 				// full value instead: the targeted-replacement protection
 				// above is unavailable, but the user's edit still applies.
-				newValue = replace( value, richTextText, () => newValue );
+				newValue = replace( value, richTextText, newValue );
 			}
 		}
 
@@ -271,7 +267,7 @@ function InlineLinkUI( {
 	const anchorSettings = { ...settings, isActive };
 	const popoverAnchor = useAnchor( {
 		// eslint-disable-next-line react-hooks/refs
-		editableContentElement: contentRef.current as HTMLElement | null,
+		editableContentElement: contentRef.current,
 		settings: anchorSettings,
 	} );
 
@@ -315,14 +311,14 @@ function InlineLinkUI( {
 		>
 			<LinkControl
 				value={ linkValue }
-				onChange={ onChangeLink as any }
+				onChange={ onChangeLink }
 				onRemove={ removeLink }
 				hasRichPreviews
 				createSuggestion={ createPageEntity && handleCreate }
 				withCreateSuggestion={ userCanCreatePages }
 				createSuggestionButtonText={ createButtonText }
 				hasTextControl
-				settings={ LINK_SETTINGS as any }
+				settings={ LINK_SETTINGS }
 				showInitialSuggestions
 				suggestionsQuery={ {
 					// always show Pages as initial suggestions
