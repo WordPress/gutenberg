@@ -42,6 +42,9 @@ function getFocusableElements( ref ) {
 // capture the clicks, instead of relying on the focusout event.
 document.addEventListener( 'click', () => {} );
 
+let previousPaddingRight = '';
+let previousPaddingLeft = '';
+
 const { state, actions } = store(
 	'core/navigation',
 	{
@@ -200,6 +203,32 @@ const { state, actions } = store(
 				const { type } = getContext();
 				state.menuOpenedBy[ menuOpenedOn ] = true;
 				if ( type === 'overlay' ) {
+					// Compensate for the scrollbar disappearing to prevent text jumping.
+					if (
+						! document.documentElement.classList.contains(
+							'has-modal-open'
+						)
+					) {
+						const scrollbarWidth =
+							window.innerWidth -
+							document.documentElement.clientWidth;
+
+						if ( scrollbarWidth > 0 ) {
+							const isRTL =
+								document.documentElement.dir === 'rtl' ||
+								document.body.classList.contains( 'rtl' );
+							if ( isRTL ) {
+								previousPaddingLeft =
+									document.body.style.paddingLeft;
+								document.body.style.paddingLeft = `${ scrollbarWidth }px`;
+							} else {
+								previousPaddingRight =
+									document.body.style.paddingRight;
+								document.body.style.paddingRight = `${ scrollbarWidth }px`;
+							}
+						}
+					}
+
 					// Add a `has-modal-open` class to the <html> root.
 					document.documentElement.classList.add( 'has-modal-open' );
 				}
@@ -221,6 +250,8 @@ const { state, actions } = store(
 						document.documentElement.classList.remove(
 							'has-modal-open'
 						);
+						document.body.style.paddingRight = previousPaddingRight;
+						document.body.style.paddingLeft = previousPaddingLeft;
 					}
 				}
 			},
