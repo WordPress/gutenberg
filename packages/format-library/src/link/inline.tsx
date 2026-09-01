@@ -25,7 +25,11 @@ import type { RichTextValue } from '@wordpress/rich-text';
 import { createLinkFormat, isValidHref, getFormatBoundary } from './utils';
 import { link as settings } from './index';
 import CSSClassesSettingComponent from './css-classes-setting';
-import type { InlineLinkUIProps, LinkValue } from '../types';
+import type {
+	InlineLinkUIProps,
+	LinkValue,
+	CSSClassesSettingProps,
+} from '../types';
 
 const LINK_SETTINGS = [
 	...LinkControl.DEFAULT_LINK_SETTINGS,
@@ -37,9 +41,9 @@ const LINK_SETTINGS = [
 		id: 'cssClasses',
 		title: __( 'Additional CSS class(es)' ),
 		render: (
-			setting: { id: string; title: string },
-			value: { cssClasses?: string },
-			onChange: ( newValue: { cssClasses?: string } ) => void
+			setting: CSSClassesSettingProps[ 'setting' ],
+			value: CSSClassesSettingProps[ 'value' ],
+			onChange: CSSClassesSettingProps[ 'onChange' ]
 		) => (
 			<CSSClassesSettingComponent
 				setting={ setting }

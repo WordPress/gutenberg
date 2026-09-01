@@ -11,8 +11,7 @@ import {
 	textColor as textColorIcon,
 } from '@wordpress/icons';
 import { removeFormat } from '@wordpress/rich-text';
-import type { RichTextValue } from '@wordpress/rich-text';
-import type { ColorObject } from '../types';
+import type { ColorObject, TextColorEditProps } from '../types';
 import { default as InlineColorUI, getActiveColors } from './inline';
 
 export const transparentValue = 'rgba(0, 0, 0, 0)';
@@ -64,13 +63,7 @@ function TextColorEdit( {
 	isActive,
 	activeAttributes,
 	contentRef,
-}: {
-	value: RichTextValue;
-	onChange: ( value: RichTextValue ) => void;
-	isActive: boolean;
-	activeAttributes: Record< string, string >;
-	contentRef: React.RefObject< HTMLElement >;
-} ) {
+}: TextColorEditProps ) {
 	const [ allowCustomControl, colors = EMPTY_ARRAY ] = useSettings(
 		'color.custom',
 		'color.palette'

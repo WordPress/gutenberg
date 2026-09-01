@@ -33,6 +33,42 @@ export interface LanguageEditProps {
 	contentRef: React.RefObject< HTMLElement >;
 }
 
+export interface TextColorEditProps extends FormatEditProps {
+	activeAttributes: Record< string, string >;
+	contentRef: React.RefObject< HTMLElement >;
+}
+
+export interface InlineColorUIProps {
+	name: string;
+	onClose: () => void;
+	value: RichTextValue;
+	onChange: ( value: RichTextValue ) => void;
+	contentRef: React.RefObject< HTMLElement >;
+	isActive: boolean;
+}
+
+export interface ColorPickerProps {
+	name: string;
+	property: 'color' | 'backgroundColor';
+	value: RichTextValue;
+	onChange: ( value: RichTextValue ) => void;
+}
+
+/**
+ * The registration object for the `core/language` format.
+ */
+export interface LanguageFormat {
+	name: string;
+	title: string;
+	tagName: string;
+	className: null;
+	attributes: {
+		lang: string;
+		dir: string;
+	};
+	edit: ( props: LanguageEditProps ) => React.ReactNode;
+}
+
 export interface InlineLanguageUIProps {
 	value: RichTextValue;
 	contentRef: React.RefObject< HTMLElement >;
@@ -40,7 +76,7 @@ export interface InlineLanguageUIProps {
 	onClose: () => void;
 }
 
-export interface InlineUIProps {
+export interface InlineMathUIProps {
 	value: RichTextValue;
 	onChange: ( value: RichTextValue ) => void;
 	activeAttributes: Record< string, string > | null;
@@ -79,7 +115,7 @@ export interface EditImageProps {
 	isObjectActive: boolean;
 	activeObjectAttributes: {
 		style?: string;
-		alt?: string | undefined;
+		alt?: string;
 		className?: string;
 		url?: string;
 	} | null;

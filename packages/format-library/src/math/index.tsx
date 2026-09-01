@@ -12,7 +12,7 @@ import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
 import { ValidatedInputControl } from '@wordpress/ui';
 import { math as icon } from '@wordpress/icons';
-import type { InlineUIProps, EditMathProps } from '../types';
+import type { InlineMathUIProps, EditMathProps } from '../types';
 
 const name = 'core/math';
 const title = __( 'Math' );
@@ -23,7 +23,7 @@ function InlineUI( {
 	activeAttributes,
 	contentRef,
 	latexToMathML,
-}: InlineUIProps ) {
+}: InlineMathUIProps ) {
 	const [ latex, setLatex ] = useState(
 		activeAttributes?.[ 'data-latex' ] || ''
 	);

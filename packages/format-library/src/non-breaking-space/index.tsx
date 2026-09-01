@@ -62,6 +62,11 @@ export const nonBreakingSpace = {
 	) => RichTextValue[ 'formats' ] {
 		return ( formats, text ) => {
 			const NBSP = '\u00a0';
+			// Not a complete `RichTextValue`: the callback only receives
+			// `formats` and `text`. The assertion is safe because `applyFormat`
+			// is passed explicit indices (so it never falls back to `start`/
+			// `end`), reads only `formats`, and spreads the rest through
+			// untouched — and only `formats` is read back out below.
 			let record = { formats, text } as RichTextValue;
 			let index = -1;
 

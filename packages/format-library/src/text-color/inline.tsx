@@ -18,7 +18,11 @@ import { Popover } from '@wordpress/components';
 import { Tabs } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import type { RichTextValue } from '@wordpress/rich-text';
-import type { ColorObject } from '../types';
+import type {
+	ColorObject,
+	ColorPickerProps,
+	InlineColorUIProps,
+} from '../types';
 import { textColor as settings, transparentValue } from './index';
 
 const TABS = [
@@ -58,26 +62,20 @@ export function parseClassName(
 ): { color?: string } {
 	return className
 		.split( ' ' )
-		.reduce(
-			(
-				accumulator: { color?: string; backgroundColor?: string },
-				name
-			) => {
-				// `colorSlug` could contain dashes, so simply match the start and end.
-				if ( name.startsWith( 'has-' ) && name.endsWith( '-color' ) ) {
-					const colorSlug = name
-						.replace( /^has-/, '' )
-						.replace( /-color$/, '' );
-					const colorObject = getColorObjectByAttributeValues(
-						colorSettings,
-						colorSlug
-					);
-					accumulator.color = colorObject.color;
-				}
-				return accumulator;
-			},
-			{}
-		);
+		.reduce( ( accumulator: { color?: string }, name ) => {
+			// `colorSlug` could contain dashes, so simply match the start and end.
+			if ( name.startsWith( 'has-' ) && name.endsWith( '-color' ) ) {
+				const colorSlug = name
+					.replace( /^has-/, '' )
+					.replace( /-color$/, '' );
+				const colorObject = getColorObjectByAttributeValues(
+					colorSettings,
+					colorSlug
+				);
+				accumulator.color = colorObject.color;
+			}
+			return accumulator;
+		}, {} );
 }
 
 export function getActiveColors(
@@ -153,17 +151,7 @@ function setColors(
 	return applyFormat( value, { type: name, attributes } );
 }
 
-function ColorPicker( {
-	name,
-	property,
-	value,
-	onChange,
-}: {
-	name: string;
-	property: 'color' | 'backgroundColor';
-	value: RichTextValue;
-	onChange: ( value: RichTextValue ) => void;
-} ) {
+function ColorPicker( { name, property, value, onChange }: ColorPickerProps ) {
 	const colors = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().colors ?? [];
@@ -195,14 +183,7 @@ export default function InlineColorUI( {
 	onClose,
 	contentRef,
 	isActive,
-}: {
-	name: string;
-	value: RichTextValue;
-	onChange: ( value: RichTextValue ) => void;
-	onClose: () => void;
-	contentRef: React.RefObject< HTMLElement >;
-	isActive: boolean;
-} ) {
+}: InlineColorUIProps ) {
 	/*
 	 * `isActive` is not part of `WPFormat`, but `useAnchor` reads it
 	 * dynamically. Hoisting the object out of the call avoids excess property

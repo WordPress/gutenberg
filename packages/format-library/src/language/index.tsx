@@ -11,22 +11,16 @@ import { Stack } from '@wordpress/ui';
 import { useState } from '@wordpress/element';
 import { applyFormat, removeFormat, useAnchor } from '@wordpress/rich-text';
 import { language as languageIcon } from '@wordpress/icons';
-import type { LanguageEditProps, InlineLanguageUIProps } from '../types';
+import type {
+	LanguageEditProps,
+	InlineLanguageUIProps,
+	LanguageFormat,
+} from '../types';
 
 const name = 'core/language';
 const title = __( 'Language' );
 
-export const language: {
-	name: string;
-	title: string;
-	tagName: string;
-	className: null;
-	attributes: {
-		lang: string;
-		dir: string;
-	};
-	edit: ( props: LanguageEditProps ) => React.ReactNode;
-} = {
+export const language = {
 	name,
 	title,
 	tagName: 'bdo',
@@ -36,7 +30,7 @@ export const language: {
 		dir: 'dir',
 	},
 	edit: Edit,
-};
+} satisfies LanguageFormat;
 
 function Edit( { isActive, value, onChange, contentRef }: LanguageEditProps ) {
 	const [ isPopoverVisible, setIsPopoverVisible ] = useState( false );
