@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { UserEvent } from '@testing-library/user-event';
 import type { ComponentProps, ComponentType, ReactNode } from 'react';
+import { describe, expect, it, vi } from 'vitest';
 import { MenuItem } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 // eslint-disable-next-line @wordpress/use-recommended-components
@@ -34,7 +35,7 @@ async function openMenu( user: UserEvent ) {
 describe( 'MoreMenuGroup', () => {
 	it( 'adopts legacy menu items as menu items', async () => {
 		const user = userEvent.setup();
-		const onClick = jest.fn();
+		const onClick = vi.fn();
 
 		renderMenu( <MenuItem onClick={ onClick }>Legacy item</MenuItem> );
 		await openMenu( user );
