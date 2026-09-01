@@ -6,7 +6,7 @@ import {
 	rmSync,
 	writeFileSync,
 } from 'node:fs';
-import { isBuiltin } from 'node:module';
+import { createRequire, isBuiltin } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { globSync } from 'glob';
@@ -174,6 +174,34 @@ const commonTypes = [
 	'style-imports',
 ];
 
+const require = createRequire( import.meta.url );
+
+/**
+ * Resolve the directories holding the given `@types` packages.
+ *
+ * Non-hoisting installs keep them in the workspace that declares the
+ * dependency, so the repository root is not a reliable type root.
+ *
+ * @param {string[]} typeNames Type package names, without the `@types/` scope.
+ * @return {string[]} Absolute `@types` directories, without duplicates.
+ */
+function resolveTypeRoots( typeNames ) {
+	const typeRoots = new Set();
+
+	for ( const typeName of typeNames ) {
+		try {
+			const packageJsonPath = require.resolve(
+				`@types/${ typeName }/package.json`
+			);
+			typeRoots.add( path.dirname( path.dirname( packageJsonPath ) ) );
+		} catch {
+			// Declared under `typings` rather than by a `@types` package.
+		}
+	}
+
+	return [ ...typeRoots ];
+}
+
 function importsNodeBuiltin( file ) {
 	const source =
 		sourcesByFile.get( file ) ??
@@ -262,7 +290,8 @@ for ( const projectName of VITEST_PROJECT_NAMES ) {
 				rootDir: ROOT_DIR,
 				typeRoots: [
 					path.join( ROOT_DIR, 'typings' ),
-					path.join( ROOT_DIR, 'node_modules/@types' ),
+					path.join( ROOT_DIR, 'test/unit/typings' ),
+					...resolveTypeRoots( [ ...commonTypes, 'node' ] ),
 				],
 				types:
 					projectName === 'jsdom'
