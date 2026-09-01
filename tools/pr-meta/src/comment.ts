@@ -40,6 +40,63 @@ export function sanitizeBody( body: string ): string {
 	return body.replace( /<!--(\s*\/?\s*)pr-meta:/g, '&lt;!--$1pr-meta:' );
 }
 
+/** Section headings are `####`, so a body's own headings start below them. */
+const BODY_HEADING_LEVEL = 5;
+const MAX_HEADING_LEVEL = 6;
+
+/**
+ * Pushes a body's own headings below the heading of its section.
+ *
+ * A producer renders its markdown without knowing where it will sit, so props
+ * opens with `## Unlinked Accounts` and would outrank the `#### Props` above
+ * it. Shifting them all by the same amount keeps their hierarchy intact.
+ *
+ * @param body Markdown that may carry its own headings.
+ * @return The same markdown, its headings demoted.
+ */
+export function demoteHeadings( body: string ): string {
+	const lines = body.split( '\n' );
+	const isHeading = ( line: string, fenced: boolean ) =>
+		! fenced && /^#{1,6}\s/.test( line );
+
+	let fenced = false;
+	let shallowest = MAX_HEADING_LEVEL;
+
+	for ( const line of lines ) {
+		if ( /^\s*```/.test( line ) ) {
+			fenced = ! fenced;
+		} else if ( isHeading( line, fenced ) ) {
+			shallowest = Math.min( shallowest, line.indexOf( ' ' ) );
+		}
+	}
+
+	const shift = Math.max( 0, BODY_HEADING_LEVEL - shallowest );
+
+	if ( shift === 0 ) {
+		return body;
+	}
+
+	fenced = false;
+
+	return lines
+		.map( ( line ) => {
+			if ( /^\s*```/.test( line ) ) {
+				fenced = ! fenced;
+			} else if ( isHeading( line, fenced ) ) {
+				const level = Math.min(
+					line.indexOf( ' ' ) + shift,
+					MAX_HEADING_LEVEL
+				);
+				return `${ '#'.repeat( level ) }${ line.slice(
+					line.indexOf( ' ' )
+				) }`;
+			}
+
+			return line;
+		} )
+		.join( '\n' );
+}
+
 function parseAttributes( raw: string ): { sha?: string; runUrl?: string } {
 	const attributes: { sha?: string; runUrl?: string } = {};
 
@@ -302,7 +359,7 @@ export function mergeSection(
 		}
 	}
 
-	const body = sanitizeBody( update.body ).trim();
+	const body = demoteHeadings( sanitizeBody( update.body ) ).trim();
 	const remaining = sections.filter(
 		( section ) => section.id !== update.id
 	);
