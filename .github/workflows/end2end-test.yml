@@ -293,8 +293,10 @@ jobs:
         needs: merge-artifacts
         # Runs on every pull request, including the clean ones: a run with no
         # flaky test uploads no report, and the empty section clears a stale one.
+        # Only when the job above succeeded, though, since a missing report then
+        # means the run was clean rather than that rendering it failed.
         # Skipped on a fork, whose token cannot write a comment.
-        if: ${{ !cancelled() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+        if: ${{ needs.merge-artifacts.result == 'success' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read

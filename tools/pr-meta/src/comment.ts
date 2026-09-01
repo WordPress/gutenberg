@@ -99,11 +99,42 @@ function truncate(
 		return body;
 	}
 
+	const cut = body.slice( 0, definition.budget );
+
+	/*
+	 * Cut at a paragraph break so the break falls between whole items rather
+	 * than mid-sentence, then close whatever the cut left open. A note
+	 * appended inside a fence renders as code, taking its link with it.
+	 */
+	const boundary = cut.lastIndexOf( '\n\n' );
+	const kept = boundary > 0 ? cut.slice( 0, boundary ) : cut;
 	const link = runUrl ? ` [See the full report](${ runUrl }).` : '';
-	return `${ body.slice(
-		0,
-		definition.budget
+
+	return `${ kept }${ closeOpenBlocks(
+		kept
 	) }\n\n<sub>Truncated.${ link }</sub>`;
+}
+
+/**
+ * Closes the code fences and disclosures a truncated body left open.
+ *
+ * @param body A body that has been cut short.
+ * @return The closing markup it needs, if any.
+ */
+function closeOpenBlocks( body: string ): string {
+	const closing = [];
+
+	if ( ( body.match( /^```/gm ) ?? [] ).length % 2 !== 0 ) {
+		closing.push( '```' );
+	}
+
+	const open = ( body.match( /<details>/g ) ?? [] ).length;
+	const closed = ( body.match( /<\/details>/g ) ?? [] ).length;
+	closing.push(
+		...Array( Math.max( open - closed, 0 ) ).fill( '</details>' )
+	);
+
+	return closing.length > 0 ? `\n${ closing.join( '\n' ) }` : '';
 }
 
 function renderFooter( section: ParsedSection, headSha?: string ) {

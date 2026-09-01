@@ -311,6 +311,38 @@ describe( 'sanitizeBody', () => {
 } );
 
 describe( 'budgets', () => {
+	/* A note appended inside a fence renders as code, link and all. */
+	it( 'closes a code fence the cut left open', () => {
+		const definition = getSection( 'flaky-tests' )!;
+		const trace = `<details>\n<summary>A flaky test</summary>\n\n\`\`\`\n${ 'Error: socket hang up\n'.repeat(
+			2000
+		) }\`\`\`\n\n</details>`;
+
+		const merged = bodyOf(
+			mergeSection(
+				undefined,
+				{
+					id: 'flaky-tests',
+					body: trace,
+					sha: HEAD,
+					runUrl: 'https://example.com/run',
+				},
+				HEAD
+			)
+		);
+		const section = parseSections( merged )[ 0 ].body;
+
+		expect( section.length ).toBeLessThanOrEqual( definition.budget + 200 );
+		expect( ( section.match( /^```/gm ) ?? [] ).length % 2 ).toBe( 0 );
+		expect( ( section.match( /<details>/g ) ?? [] ).length ).toBe(
+			( section.match( /<\/details>/g ) ?? [] ).length
+		);
+		// The note and its link land outside the fence, so the link works.
+		expect( section ).toMatch(
+			/<\/details>\n\n<sub>Truncated\. \[See the full report\]/
+		);
+	} );
+
 	it( 'truncates a section that overruns its budget', () => {
 		const definition = getSection( 'flaky-tests' )!;
 		const merged = bodyOf(

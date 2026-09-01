@@ -1,5 +1,5 @@
 name: 'Report flaky tests'
-description: 'Renders a report of flaky tests as markdown'
+description: 'Renders a report of flaky E2E tests as markdown'
 inputs:
     artifact-path:
         description: 'The path of the downloaded artifact'
