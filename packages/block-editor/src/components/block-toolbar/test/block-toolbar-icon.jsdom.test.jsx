@@ -27,26 +27,24 @@ vi.mock( import( '../../../lock-unlock' ), () => ( {
 	} ),
 } ) );
 vi.mock( import( '../../block-title/use-block-display-title' ), () => ( {
-	default: vi.fn().mockReturnValue( 'Block Name' ),
+	default: () => 'Block Name',
 } ) );
 vi.mock( import( '../../block-icon' ), () => ( {
-	default: vi.fn( ( { icon } ) => (
-		<span data-testid="block-icon">{ icon }</span>
-	) ),
+	default: ( { icon } ) => <span data-testid="block-icon">{ icon }</span>,
 } ) );
 vi.mock( import( '../../block-switcher' ), () => ( {
-	default: vi.fn( ( { children } ) => (
+	default: ( { children } ) => (
 		<div data-testid="block-switcher">{ children }</div>
-	) ),
+	),
 } ) );
 vi.mock( import( '../pattern-overrides-dropdown' ), () => ( {
-	default: vi.fn( ( { clientIds } ) => (
+	default: ( { clientIds } ) => (
 		<div data-testid="pattern-overrides-dropdown">
 			{ clientIds.length === 1
 				? 'Block Name'
 				: 'Multiple blocks selected' }
 		</div>
-	) ),
+	),
 } ) );
 
 describe( 'BlockToolbarIcon', () => {

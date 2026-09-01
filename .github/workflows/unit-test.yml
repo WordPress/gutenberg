@@ -131,6 +131,8 @@ jobs:
                   FK_ENV_NODEJS: ${{ matrix.node }}
               run: |
                   npm run test:unit:vitest -- \
+                    --sequence.shuffle \
+                    --sequence.seed=80855 \
                     --shard="$SHARD" \
                     --passWithNoTests
 

@@ -210,9 +210,27 @@ const selectMenuItem = async ( label: string ) => {
 };
 
 describe( 'ToolsPanel', () => {
+	beforeEach( () => {
+		controlProps.hasValue.mockImplementation( () => !! controlValue );
+		controlProps.onDeselect.mockImplementation( () => {
+			controlValue = undefined;
+		} );
+		altControlProps.hasValue.mockImplementation( () => !! altControlValue );
+		nestedControlProps.hasValue.mockImplementation(
+			() => !! nestedControlValue
+		);
+		nestedControlProps.onDeselect.mockImplementation( () => {
+			nestedControlValue = undefined;
+		} );
+		altNestedControlProps.hasValue.mockImplementation(
+			() => !! altNestedControlValue
+		);
+	} );
+
 	afterEach( () => {
 		controlValue = true;
 		altControlValue = false;
+		nestedControlValue = true;
 	} );
 
 	describe( 'basic rendering', () => {

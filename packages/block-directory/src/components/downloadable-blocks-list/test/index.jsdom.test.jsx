@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useSelect } from '@wordpress/data';
 import DownloadableBlocksList from '../';
 import { items } from '../../test/fixtures';
@@ -13,10 +13,12 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
 
 describe( 'DownloadableBlocksList', () => {
 	describe( 'List rendering', () => {
-		useSelect.mockImplementation( () => ( {
-			isLoading: false,
-			isInstallable: true,
-		} ) );
+		beforeEach( () => {
+			useSelect.mockReturnValue( {
+				isLoading: false,
+				isInstallable: true,
+			} );
+		} );
 
 		it( 'should render an empty list', () => {
 			const { container } = render(

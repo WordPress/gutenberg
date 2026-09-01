@@ -235,6 +235,8 @@ export default defineConfig( {
 		clearMocks: true,
 		globals: false,
 		includeTaskLocation: true,
+		isolate: true,
+		mockReset: true,
 		passWithNoTests: false,
 		reporters,
 		sequence: {
@@ -245,6 +247,7 @@ export default defineConfig( {
 			escapeString: false,
 			printBasicPrototype: false,
 		},
+		restoreMocks: true,
 		unstubEnvs: true,
 		unstubGlobals: true,
 	},

@@ -8,7 +8,7 @@ import {
 } from 'node:fs';
 import { createRequire, isBuiltin } from 'node:module';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { globSync } from 'glob';
 import typescript from 'typescript';
 import {
@@ -21,6 +21,7 @@ import { resolveTypeRoots } from './resolve-type-roots.mjs';
 import {
 	findVitestIsolationOptOuts,
 	validateRoutingScripts,
+	validateVitestCleanupConfig,
 } from './test-infrastructure-policy.mjs';
 import {
 	validateVitestPolicy,
@@ -138,9 +139,15 @@ const rootPackageJson = JSON.parse(
 const unitTestPackageJson = JSON.parse(
 	readFileSync( path.join( ROOT_DIR, 'test/unit/package.json' ), 'utf8' )
 );
+const vitestConfig = (
+	await import(
+		pathToFileURL( path.join( ROOT_DIR, 'test/unit/vitest.config.mjs' ) )
+	)
+).default;
 violations.push(
 	...findVitestIsolationOptOuts( ROOT_DIR ),
-	...validateRoutingScripts( rootPackageJson, unitTestPackageJson )
+	...validateRoutingScripts( rootPackageJson, unitTestPackageJson ),
+	...validateVitestCleanupConfig( vitestConfig )
 );
 
 const vitestVersions = new Map();

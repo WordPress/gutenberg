@@ -312,3 +312,51 @@ export function findVitestIsolationOptOuts( rootDir ) {
 		...findWorkflowIsolationOptOuts( rootDir ),
 	].sort();
 }
+
+export function validateVitestCleanupConfig( vitestConfig ) {
+	const violations = [];
+	const requiredOptions = [
+		'clearMocks',
+		'isolate',
+		'mockReset',
+		'restoreMocks',
+		'unstubEnvs',
+		'unstubGlobals',
+	];
+
+	for ( const option of requiredOptions ) {
+		if ( vitestConfig.test?.[ option ] !== true ) {
+			violations.push(
+				`test/unit/vitest.config.mjs: test.${ option } must be true`
+			);
+		}
+	}
+	if ( vitestConfig.test?.globals !== false ) {
+		violations.push(
+			'test/unit/vitest.config.mjs: test.globals must remain false'
+		);
+	}
+
+	for ( const project of vitestConfig.test?.projects ?? [] ) {
+		const projectName = project.test?.name ?? 'unnamed';
+		if ( project.extends !== true ) {
+			violations.push(
+				`test/unit/vitest.config.mjs: ${ projectName } must set extends: true to inherit the shared isolation defaults`
+			);
+		}
+		for ( const option of requiredOptions ) {
+			if ( project.test?.[ option ] === false ) {
+				violations.push(
+					`test/unit/vitest.config.mjs: ${ projectName } overrides test.${ option } with false`
+				);
+			}
+		}
+		if ( project.test?.globals === true ) {
+			violations.push(
+				`test/unit/vitest.config.mjs: ${ projectName } enables global Vitest APIs`
+			);
+		}
+	}
+
+	return violations;
+}

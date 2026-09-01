@@ -1,6 +1,7 @@
 {
 	"browserFireEvent": {},
 	"jsdomBrowserApis": {
+		"test/unit/config/setup-globals.vitest.jsdom.test.js": "This infrastructure regression must exercise the opt-in matchMedia mock in the jsdom project that installs it.",
 		"packages/block-editor/src/utils/test/dom.jsdom.test.jsx": "Uses explicit DOMRect fixtures to test clipping and element-selection algorithms without relying on browser layout.",
 		"packages/components/src/snackbar/test/list.jsdom.test.tsx": "Stubs scrollTo only to satisfy focus side effects; the regression assertion covers deterministic focus transfer, not scrolling.",
 		"packages/components/src/validated-form-controls/test/range-control.jsdom.test.tsx": "Uses requestAnimationFrame only to schedule reportValidity after React state; assertions cover accessible description semantics.",

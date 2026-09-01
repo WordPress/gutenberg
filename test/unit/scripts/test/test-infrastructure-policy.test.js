@@ -19,6 +19,7 @@ import {
 	collectJestInfrastructureEntries,
 	findVitestIsolationOptOuts,
 	validateRoutingScripts,
+	validateVitestCleanupConfig,
 } from '../test-infrastructure-policy.mjs';
 
 const temporaryDirectories = [];
@@ -194,6 +195,39 @@ export default {
 			'vitest.config.mjs:4 must set isolate to the literal value true',
 			'vitest.config.mjs:6 must set isolate to the literal value true',
 		] );
+	} );
+
+	it( 'requires every supported Vitest cleanup default', () => {
+		expect(
+			validateVitestCleanupConfig( {
+				test: { globals: true, projects: [] },
+			} )
+		).toEqual(
+			expect.arrayContaining( [
+				'test/unit/vitest.config.mjs: test.isolate must be true',
+				'test/unit/vitest.config.mjs: test.mockReset must be true',
+				'test/unit/vitest.config.mjs: test.globals must remain false',
+			] )
+		);
+	} );
+
+	it( 'requires every Vitest project to inherit the shared defaults', () => {
+		expect(
+			validateVitestCleanupConfig( {
+				test: {
+					clearMocks: true,
+					globals: false,
+					isolate: true,
+					mockReset: true,
+					restoreMocks: true,
+					unstubEnvs: true,
+					unstubGlobals: true,
+					projects: [ { extends: false, test: { name: 'escape' } } ],
+				},
+			} )
+		).toContain(
+			'test/unit/vitest.config.mjs: escape must set extends: true to inherit the shared isolation defaults'
+		);
 	} );
 } );
 

@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, within, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useSelect } from '@wordpress/data';
+import { useReducedMotion } from '@wordpress/compose';
 import { LinkPicker } from '../';
 
 vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
@@ -13,10 +14,6 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
 	useDispatch: () => ( { saveEntityRecords: vi.fn() } ),
 	useSelect: vi.fn(),
-} ) );
-
-useSelect.mockImplementation( () => ( {
-	fetchSearchSuggestions: mockFetchSearchSuggestions,
 } ) );
 
 vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
@@ -51,6 +48,10 @@ function createMockPreview( {
 }
 
 beforeEach( () => {
+	useReducedMotion.mockReturnValue( true );
+	useSelect.mockImplementation( () => ( {
+		fetchSearchSuggestions: mockFetchSearchSuggestions,
+	} ) );
 	mockFetchSearchSuggestions.mockImplementation( () =>
 		Promise.resolve( createMockSuggestions() )
 	);
