@@ -4,6 +4,7 @@ import type {
 	ComboboxCollectionProps,
 	ComboboxEmptyProps,
 	ComboboxInputProps,
+	ComboboxItemProps,
 	ComboboxRootProps,
 	ComboboxTriggerProps,
 } from '../combobox/types';
@@ -20,6 +21,10 @@ type CreatableItem = Item & { creatable: true };
 export type ItemGroup = {
 	label: string;
 	items: Item[];
+};
+
+export type SearchableSelectItemProps = Omit< ComboboxItemProps, 'value' > & {
+	value: Item;
 };
 
 export function isItemGroup( item: Item | ItemGroup ): item is ItemGroup {

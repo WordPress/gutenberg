@@ -1,4 +1,4 @@
-import { Item } from '../combobox/item';
+import { Item } from './item';
 import { Group } from '../combobox/group';
 import { GroupLabel } from '../combobox/group-label';
 import { Collection } from '../combobox/collection';

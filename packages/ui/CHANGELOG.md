@@ -13,6 +13,7 @@
 
 ### Enhancements
 
+-   `SearchableSelect.Item`: Restrict `value` to `Item` ([#80961](https://github.com/WordPress/gutenberg/pull/80961)).
 -   `SearchableSelect`: Add a `placeholder` prop for empty trigger text ([#80961](https://github.com/WordPress/gutenberg/pull/80961)).
 -   `Autocomplete.Popup`, `Combobox.Popup`, `SearchableChipSelect`, `SearchableChipSelectControl`, `Select.Popup`, and `SelectControl`: Add `popupWidth` prop with preset width constraints (`anchor`, `content`, `sm`, `md`, `lg`, and `available`) for the item popup. `SelectControl` defaults to `content` to preserve prior popup sizing ([#82087](https://github.com/WordPress/gutenberg/pull/82087)).
 
