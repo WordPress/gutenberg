@@ -7,7 +7,7 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { Stack, Text } from '@wordpress/ui';
+import { Text } from '@wordpress/ui';
 import {
 	BlockControls,
 	BlockIcon,
