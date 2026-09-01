@@ -20,20 +20,12 @@ async function main() {
 			// String, not boolean: a boolean option rejects --force=false.
 			force: { type: 'string', default: 'false' },
 			'then-fanout': { type: 'boolean', default: false },
-			mode: { type: 'string' },
 			'dry-run': { type: 'boolean', default: false },
-			'bootstrap-window': { type: 'string', default: '180' },
 		},
 	} );
 
 	if ( values.force !== 'true' && values.force !== 'false' ) {
 		return fail( '--force accepts only "true" or "false".' );
-	}
-	const bootstrapWindow = Number( values[ 'bootstrap-window' ] );
-	if ( ! Number.isFinite( bootstrapWindow ) || bootstrapWindow < 0 ) {
-		return fail(
-			'--bootstrap-window must be a non-negative number of days.'
-		);
 	}
 
 	/** @type {CommandOptions} */
@@ -41,9 +33,7 @@ async function main() {
 		headSha: values[ 'head-sha' ],
 		force: values.force,
 		thenFanout: values[ 'then-fanout' ] ?? false,
-		mode: values.mode,
 		dryRun: values[ 'dry-run' ] ?? false,
-		bootstrapWindow,
 	};
 
 	const commands = { check, 'move-baseline': moveBaseline, fanout };

@@ -9,17 +9,9 @@ on:
     workflow_dispatch:
         inputs:
             move-baseline:
-                description: 'Force-move the baseline tag to current trunk HEAD'
+                description: 'Move the baseline tag to current trunk HEAD and flip stale statuses'
                 type: boolean
                 default: false
-            reconcile:
-                description: 'Re-evaluate and stamp open PRs (bootstrap/repair)'
-                type: boolean
-                default: false
-            bootstrap-window:
-                description: 'Days of PR activity to bootstrap-stamp during reconcile; 0 stamps every open PR'
-                type: number
-                default: 180
 
 # Disable permissions for all available scopes by default.
 # Any needed permissions should be configured at the job level.
@@ -27,9 +19,8 @@ permissions: {}
 
 concurrency:
     # Serialize per PR, and serialize all baseline moves in one group. Replaced
-    # pending runs are safe: move decisions diff cumulatively from the tag and
-    # every dispatch evaluates a move too, so the next run in the group always
-    # recovers marker changes and labeled merges alike.
+    # pending runs are safe: labeled merges are scanned cumulatively from the
+    # tag, so the next run in the group recovers them.
     group: pr-freshness-${{ github.event_name == 'pull_request_target' && github.event.pull_request.number || 'baseline' }}
     cancel-in-progress: false
 
@@ -62,13 +53,15 @@ jobs:
 
     move-baseline:
         name: Move freshness baseline
-        # Runs for EVERY dispatch, not only move-baseline ones: a reconcile-only
-        # dispatch replaces a pending push run in the concurrency queue, so it
-        # must evaluate the cumulative move itself before stamping anything.
+        # The baseline moves only through explicit intent: a dispatch with
+        # move-baseline, or a merged PR carrying the force-refresh label
+        # (detected cumulatively on every trunk push). Re-dispatching when the
+        # tag is already current re-runs the fan-out, which is the retry path
+        # after an interrupted sweep.
         if: >
             github.repository == 'WordPress/gutenberg' && (
                 github.event_name == 'push' ||
-                github.event_name == 'workflow_dispatch'
+                (github.event_name == 'workflow_dispatch' && inputs.move-baseline)
             )
         runs-on: ubuntu-latest
         timeout-minutes: 30
@@ -92,33 +85,3 @@ jobs:
 
             - name: Move the baseline tag and fan out
               run: npm run --workspace @wordpress/validation-tools pr-freshness -- move-baseline --force="$FORCE" --then-fanout
-
-    reconcile:
-        name: Reconcile freshness statuses
-        # needs + always(): a combined dispatch runs move-baseline first, and a
-        # reconcile-only dispatch still runs after move-baseline is skipped.
-        # Workflow-level concurrency does not serialize sibling jobs in a run.
-        needs: [move-baseline]
-        if: always() && github.repository == 'WordPress/gutenberg' && github.event_name == 'workflow_dispatch' && inputs.reconcile
-        runs-on: ubuntu-latest
-        timeout-minutes: 30
-        permissions:
-            contents: read
-            statuses: write
-            pull-requests: read
-        env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            BOOTSTRAP_WINDOW: ${{ inputs.bootstrap-window }}
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-              with:
-                  ref: trunk
-                  fetch-depth: 0
-                  persist-credentials: false
-
-            - name: Setup Node.js and install dependencies
-              uses: ./.github/setup-node
-
-            - name: Reconcile statuses on open PRs
-              run: npm run --workspace @wordpress/validation-tools pr-freshness -- fanout --mode=reconcile --bootstrap-window="$BOOTSTRAP_WINDOW"

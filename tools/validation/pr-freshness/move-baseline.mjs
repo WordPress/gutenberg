@@ -1,11 +1,10 @@
 // @ts-check
 
 /**
- * The `move-baseline` subcommand: moves (or seeds) the baseline tag when
- * markers changed or a move is forced, then optionally fans out.
+ * The `move-baseline` subcommand. The baseline moves only through explicit
+ * intent: a forced dispatch, or a merged PR carrying the force-refresh label.
  */
 import {
-	MARKER_PATHS,
 	FORCE_LABEL,
 	REPO,
 	git,
@@ -67,7 +66,7 @@ async function hasLabeledMergeSince( baseline ) {
 }
 
 /**
- * Moves (or seeds) the baseline tag when markers changed or a move is forced.
+ * Moves (or seeds) the baseline tag when a move is forced or labeled.
  *
  * @param {CommandOptions} options Command options.
  */
@@ -88,50 +87,36 @@ export async function moveBaseline( options ) {
 		}
 		// A dry-run seed creates no tag; the fan-out would have nothing to read.
 		if ( thenFanout && ! dryRun ) {
-			await fanout( { ...options, mode: 'flip', bootstrapWindow: 0 } );
+			await fanout( options );
 		}
 		return;
 	}
 
 	const baseline = await resolveBaseline();
-	let move = force === 'true';
-	if ( ! move ) {
-		/* Diff cumulatively from the baseline so coalesced pushes lose nothing. */
-		const changed = await git.raw( [
-			'diff',
-			'--name-only',
-			`${ baseline }..HEAD`,
-			'--',
-			...MARKER_PATHS,
-		] );
-		move = changed.trim() !== '';
-	}
-	if ( ! move ) {
-		move = await hasLabeledMergeSince( baseline );
-	}
+	const move = force === 'true' || ( await hasLabeledMergeSince( baseline ) );
 	if ( ! move ) {
 		console.log(
-			'No marker changes or labeled merges since the baseline; not moving.'
+			'No forced move or labeled merges since the baseline; not moving.'
 		);
 		return;
 	}
 
 	const head = ( await git.revparse( [ 'HEAD' ] ) ).trim();
 	if ( baseline === head ) {
+		/* Re-dispatch retry path: still fan out to flip any stale survivors. */
 		console.log( 'Baseline already points at HEAD.' );
-		return;
-	}
-	if ( ! ( await isAncestor( baseline, head ) ) ) {
-		return fail(
-			`Refusing to move the baseline: ${ head } does not descend from ${ baseline }.`
-		);
-	}
-
-	console.log( `Moving baseline: ${ baseline } -> ${ head }` );
-	if ( ! dryRun ) {
-		await updateTagRef( head, false );
+	} else {
+		if ( ! ( await isAncestor( baseline, head ) ) ) {
+			return fail(
+				`Refusing to move the baseline: ${ head } does not descend from ${ baseline }.`
+			);
+		}
+		console.log( `Moving baseline: ${ baseline } -> ${ head }` );
+		if ( ! dryRun ) {
+			await updateTagRef( head, false );
+		}
 	}
 	if ( thenFanout ) {
-		await fanout( { ...options, mode: 'flip', bootstrapWindow: 0 } );
+		await fanout( options );
 	}
 }

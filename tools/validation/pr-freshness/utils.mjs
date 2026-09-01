@@ -20,28 +20,6 @@ const DOCS_URL =
 
 export const hasCredentials = () => Boolean( REPO && TOKEN );
 
-/* Paths on trunk whose changes require every open PR to rebase. */
-export const MARKER_PATHS = [
-	// Toolchain and shared CI setup.
-	'.nvmrc',
-	'.github/setup-node',
-	'.github/setup-npm',
-	// Workflows that define required checks; others cannot invalidate PRs.
-	'.github/workflows/static-checks.yml',
-	'.github/workflows/unit-test.yml',
-	'.github/workflows/end2end-test.yml',
-	'.github/workflows/performance.yml',
-	'.github/workflows/build-plugin-zip.yml',
-	'.github/workflows/create-block.yml',
-	// Repo-wide lint, format, and type configuration.
-	'eslint.config.mjs',
-	'prettier.config.mjs',
-	'.stylelintrc.mjs',
-	'phpcs.xml.dist',
-	'tsconfig.json',
-	'tsconfig.base.json',
-];
-
 /* Conservative caps against GITHUB_TOKEN primary and secondary rate limits. */
 const MAX_WRITES_PER_RUN = 400;
 const MAX_WRITES_PER_MINUTE = 60;

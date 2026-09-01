@@ -48,14 +48,8 @@ test( 'rejects a non-boolean --force value without requiring credentials', () =>
 	expect( stderr ).not.toContain( 'GITHUB_REPOSITORY' );
 } );
 
-test( 'rejects a negative --bootstrap-window', () => {
-	const { status, stderr } = run( [ 'fanout', '--bootstrap-window=-1' ] );
-	expect( status ).toBe( 1 );
-	expect( stderr ).toContain( '--bootstrap-window' );
-} );
-
 test( 'requires credentials only for a valid subcommand', () => {
-	const { status, stderr } = run( [ 'fanout', '--mode=flip' ] );
+	const { status, stderr } = run( [ 'fanout' ] );
 	expect( status ).toBe( 1 );
 	expect( stderr ).toContain(
 		'GITHUB_REPOSITORY and GITHUB_TOKEN must be set.'
