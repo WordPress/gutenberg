@@ -36,7 +36,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { page } from '@wordpress/icons';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getBlockSupport } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
 import useNavigationMenu from '../use-navigation-menu';
 import Placeholder from './placeholder';
@@ -592,6 +592,7 @@ function Navigation( {
 			setAttributes( {
 				submenuVisibility: 'always',
 				layout: {
+					...getBlockSupport( 'core/navigation', 'layout' )?.default,
 					...attributes.layout,
 					orientation: 'vertical',
 				},

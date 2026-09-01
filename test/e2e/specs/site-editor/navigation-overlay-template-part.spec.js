@@ -106,6 +106,33 @@ test.describe( 'Navigation Overlay Template Part', () => {
 			await expect( overlayMenuItem ).toBeHidden();
 			await expect( openMenuButton ).toBeFocused();
 		} );
+
+		test( 'As a user I want a navigation block inserted into an overlay to keep the flex layout so block spacing applies', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			await createNavigationOverlay( {
+				admin,
+				editor,
+				page,
+				requestUtils,
+			} );
+
+			await editor.insertBlock( { name: 'core/navigation' } );
+
+			const navigationBlock = editor.canvas
+				.locator( '[data-type="core/navigation"]' )
+				.last();
+
+			// The block mounts with the flex layout already applied, so wait for
+			// the overlay defaults to land before asserting it survived them.
+			await expect( navigationBlock ).toHaveClass( /is-vertical/ );
+			await expect( navigationBlock ).toHaveClass(
+				/wp-block-navigation-is-layout-flex/
+			);
+		} );
 	} );
 
 	test.describe( 'Customization', () => {
