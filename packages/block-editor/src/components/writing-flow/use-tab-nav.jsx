@@ -204,6 +204,15 @@ export default function useTabNav() {
 				return;
 			}
 
+			if (
+				// Bails in case the focus capture elements aren’t present. They
+				// may be omitted to avoid silent tab stops in preview mode.
+				! focusCaptureAfterRef.current ||
+				! focusCaptureBeforeRef.current
+			) {
+				return;
+			}
+
 			if ( event.target?.getAttribute( 'role' ) === 'region' ) {
 				return;
 			}

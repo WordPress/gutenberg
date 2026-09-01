@@ -1,5 +1,16 @@
-import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { createElement } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { UP, DOWN, LEFT, RIGHT, TAB } from '@wordpress/keycodes';
 import { isNavigationCandidate } from '../use-arrow-nav';
+import useTabNav from '../use-tab-nav';
+import { lock } from '../../../lock-unlock';
+
+jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+
+jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
+	useDispatch: jest.fn(),
+} ) );
 
 describe( 'isNavigationCandidate', () => {
 	let elements;
@@ -89,5 +100,78 @@ describe( 'isNavigationCandidate', () => {
 
 			expect( result ).toBe( true );
 		} );
+	} );
+} );
+
+describe( 'useTabNav', () => {
+	// `useTabNav` reads the block editor store selectors and actions through
+	// `unlock()`, so the mocked hook return values have to be locked objects.
+	const toLocked = ( privateData ) => {
+		const object = {};
+		lock( object, privateData );
+		return object;
+	};
+
+	const defaultUseSelectValues = {
+		hasMultiSelection: () => false,
+		getSelectedBlockClientId: () => null,
+		getBlockCount: () => 0,
+		getBlockOrder: () => [],
+		getLastFocus: () => null,
+		getSectionRootClientId: () => null,
+		isZoomOut: () => false,
+	};
+
+	beforeEach( () => {
+		useSelect.mockImplementation( () =>
+			toLocked( defaultUseSelectValues )
+		);
+		useDispatch.mockImplementation( () =>
+			toLocked( { setLastFocus: () => {} } )
+		);
+	} );
+
+	afterEach( () => {
+		jest.clearAllMocks();
+	} );
+
+	// The focus capture elements (`before`/`after`) are omitted in preview mode
+	// to avoid silent tab stops, so both refs are undefined. Rendering only the
+	// writing flow container (without `before`/`after`) reproduces that state.
+	// `createElement` rather than JSX keeps this a `.js` test file.
+	function PreviewModeWritingFlow() {
+		const [ , ref ] = useTabNav();
+		return createElement(
+			'div',
+			{ ref },
+			createElement( 'button', { type: 'button' }, 'First tabbable' )
+		);
+	}
+
+	it( 'does not trap focus when the focus capture elements are absent', () => {
+		render( createElement( PreviewModeWritingFlow ) );
+
+		const button = screen.getByRole( 'button', { name: 'First tabbable' } );
+		button.focus();
+
+		const errorListener = jest.fn();
+		window.addEventListener( 'error', errorListener );
+
+		// Shift+Tab from the first (and only) tabbable element: `findPrevious`
+		// returns `undefined`, which previously matched the undefined capture
+		// refs, cancelling the event and throwing on `undefined.focus()`.
+		let notCancelled;
+		expect( () => {
+			notCancelled = fireEvent.keyDown( button, {
+				keyCode: TAB,
+				shiftKey: true,
+			} );
+		} ).not.toThrow();
+
+		window.removeEventListener( 'error', errorListener );
+
+		expect( errorListener ).not.toHaveBeenCalled();
+		// `preventDefault` was not called, so focus is free to leave the canvas.
+		expect( notCancelled ).toBe( true );
 	} );
 } );
