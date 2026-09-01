@@ -63,7 +63,7 @@ test.describe( 'Block Notes', () => {
 			.click();
 		const thread = page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'treeitem', {
+			.getByRole( 'listitem', {
 				name: 'Note: A test comment',
 			} );
 
@@ -116,7 +116,7 @@ test.describe( 'Block Notes', () => {
 
 		const thread = page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'treeitem', { name: 'Note: Focus test note' } );
+			.getByRole( 'listitem', { name: 'Note: Focus test note' } );
 		const replyTextbox = page.getByRole( 'textbox', { name: 'Reply to' } );
 
 		/*
@@ -192,16 +192,16 @@ test.describe( 'Block Notes', () => {
 
 		const thread = page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'treeitem', {
+			.getByRole( 'listitem', {
 				name: 'Note: Test comment to resolve.',
 			} );
 		await thread.click();
-		await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+		await expect( thread ).toHaveAttribute( 'aria-current', 'true' );
 
 		const resolveButton = page.getByRole( 'button', { name: 'Resolve' } );
 		await resolveButton.click();
 		await expect( thread ).toBeFocused();
-		await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+		await expect( thread ).toHaveAttribute( 'aria-current', 'false' );
 
 		await thread.click();
 		await expect( resolveButton ).toBeDisabled();
@@ -285,12 +285,12 @@ test.describe( 'Block Notes', () => {
 		await expect( separator ).toBeHidden();
 
 		// Resolve the second note.
-		const resolvedThread = sidebar.getByRole( 'treeitem', {
+		const resolvedThread = sidebar.getByRole( 'listitem', {
 			name: 'Note: Note to resolve.',
 		} );
 		await resolvedThread.click();
 		await expect( resolvedThread ).toHaveAttribute(
-			'aria-expanded',
+			'aria-current',
 			'true'
 		);
 		await page.getByRole( 'button', { name: 'Resolve' } ).click();
@@ -318,7 +318,7 @@ test.describe( 'Block Notes', () => {
 		// The orphaned note persists and is flagged as detached, rather than
 		// being auto-deleted or moved into the resolved section.
 		await expect(
-			sidebar.getByRole( 'treeitem', {
+			sidebar.getByRole( 'listitem', {
 				name: 'Original block deleted. Note: Note losing its block.',
 			} )
 		).toBeVisible();
@@ -333,6 +333,57 @@ test.describe( 'Block Notes', () => {
 			'Resolved',
 			'Note to resolve.',
 		] );
+	} );
+
+	test( 'exposes the note threads as a list rather than a tree', async ( {
+		page,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'First block' },
+			comment: 'First note',
+		} );
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Second block' },
+			comment: 'Second note',
+		} );
+
+		const sidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+
+		// The panel is a plain list, so a screen reader stays in browse mode
+		// and its reading keys are free to read the note text.
+		const list = sidebar.getByRole( 'list' );
+		await expect( list ).toBeVisible();
+		await expect( list ).toHaveAccessibleName( 'Unresolved notes' );
+		await expect( sidebar.getByRole( 'tree' ) ).toHaveCount( 0 );
+		await expect( sidebar.getByRole( 'treeitem' ) ).toHaveCount( 0 );
+
+		// Each thread is one item of that list.
+		await expect(
+			list.getByRole( 'listitem', { name: 'Note: First note' } )
+		).toBeVisible();
+		await expect(
+			list.getByRole( 'listitem', { name: 'Note: Second note' } )
+		).toBeVisible();
+
+		// A reply is prose inside its thread, not a nested item of its own.
+		const secondThread = list.getByRole( 'listitem', {
+			name: 'Note: Second note',
+		} );
+		const replyForm = secondThread.getByRole( 'textbox', {
+			name: 'Reply to',
+		} );
+		await replyForm.click();
+		await replyForm.pressSequentially( 'A reply' );
+		await secondThread
+			.getByRole( 'button', { name: 'Reply', exact: true } )
+			.click();
+		await expect( secondThread ).toContainText( 'A reply' );
+		await expect( secondThread.getByRole( 'listitem' ) ).toHaveCount( 0 );
 	} );
 
 	test( 'selecting a block or note marks it as an active', async ( {
@@ -361,11 +412,11 @@ test.describe( 'Block Notes', () => {
 			.getByRole( 'region', {
 				name: 'Editor settings',
 			} )
-			.getByRole( 'tree' );
-		const threads = threadsContainer.getByRole( 'treeitem' );
-		const activeThread = threadsContainer.getByRole( 'treeitem', {
-			expanded: true,
-		} );
+			.getByRole( 'list' );
+		const threads = threadsContainer.getByRole( 'listitem' );
+		const activeThread = threadsContainer.locator(
+			'[aria-current="true"]'
+		);
 		const replyTextbox = activeThread.getByRole( 'textbox', {
 			name: 'Reply to',
 		} );
@@ -413,8 +464,8 @@ test.describe( 'Block Notes', () => {
 
 		const existingThread = page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'tree' )
-			.getByRole( 'treeitem', { name: 'Note: First block comment' } );
+			.getByRole( 'list' )
+			.getByRole( 'listitem', { name: 'Note: First block comment' } );
 
 		// Clicking the existing thread selects it and closes the new-note form.
 		await existingThread.click();
@@ -425,7 +476,7 @@ test.describe( 'Block Notes', () => {
 		 * queued blur callback. It must not clear the newly selected thread.
 		 */
 		await expect( existingThread ).toHaveAttribute(
-			'aria-expanded',
+			'aria-current',
 			'true'
 		);
 	} );
@@ -465,7 +516,7 @@ test.describe( 'Block Notes', () => {
 						.getByRole( 'region', {
 							name: 'Editor settings',
 						} )
-						.getByRole( 'treeitem', {
+						.getByRole( 'listitem', {
 							name: 'Note: Test comment',
 						} );
 
@@ -475,7 +526,7 @@ test.describe( 'Block Notes', () => {
 					await expect(
 						thread,
 						'note should be expanded with $keyToExpand key'
-					).toHaveAttribute( 'aria-expanded', 'true' );
+					).toHaveAttribute( 'aria-current', 'true' );
 
 					// The related block should be selected, but the focus should remain on the note.
 					await expect(
@@ -488,7 +539,7 @@ test.describe( 'Block Notes', () => {
 					await expect(
 						thread,
 						'note should be collapsed with $keyToCollapse key'
-					).toHaveAttribute( 'aria-expanded', 'false' );
+					).toHaveAttribute( 'aria-current', 'false' );
 				} );
 			}
 		);
@@ -512,14 +563,14 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'region', {
 					name: 'Editor settings',
 				} )
-				.getByRole( 'treeitem', {
+				.getByRole( 'listitem', {
 					name: 'Note: One',
 				} );
 			const secondThread = page
 				.getByRole( 'region', {
 					name: 'Editor settings',
 				} )
-				.getByRole( 'treeitem', {
+				.getByRole( 'listitem', {
 					name: 'Note: Two',
 				} );
 
@@ -555,14 +606,14 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'region', {
 					name: 'Editor settings',
 				} )
-				.getByRole( 'treeitem', {
+				.getByRole( 'listitem', {
 					name: 'Note: One',
 				} );
 			const lastThread = page
 				.getByRole( 'region', {
 					name: 'Editor settings',
 				} )
-				.getByRole( 'treeitem', {
+				.getByRole( 'listitem', {
 					name: 'Note: Three',
 				} );
 
@@ -588,16 +639,16 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'region', {
 					name: 'Editor settings',
 				} )
-				.getByRole( 'treeitem', {
+				.getByRole( 'listitem', {
 					name: 'Note: Test comment escape',
 				} );
 
 			await thread.click();
-			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+			await expect( thread ).toHaveAttribute( 'aria-current', 'true' );
 
 			// Collapse the note with Escape key.
 			await page.keyboard.press( 'Escape' );
-			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+			await expect( thread ).toHaveAttribute( 'aria-current', 'false' );
 		} );
 
 		test( 'should keep a note collapsed while editing the same block', async ( {
@@ -613,19 +664,19 @@ test.describe( 'Block Notes', () => {
 
 			const thread = page
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', {
+				.getByRole( 'listitem', {
 					name: 'Note: Sticky collapse note',
 				} );
 
 			await thread.click();
 			await page.keyboard.press( 'Escape' );
-			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+			await expect( thread ).toHaveAttribute( 'aria-current', 'false' );
 
 			await editor.canvas
 				.getByRole( 'document', { name: 'Block: Paragraph' } )
 				.click();
 			await page.keyboard.type( ' edited' );
-			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+			await expect( thread ).toHaveAttribute( 'aria-current', 'false' );
 		} );
 
 		test( 'should collapse a note after canceling note form', async ( {
@@ -642,14 +693,14 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'region', {
 					name: 'Editor settings',
 				} )
-				.getByRole( 'treeitem', {
+				.getByRole( 'listitem', {
 					name: 'Note: Test comment',
 				} );
 
 			await thread.click();
-			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+			await expect( thread ).toHaveAttribute( 'aria-current', 'true' );
 			await thread.getByRole( 'button', { name: 'Cancel' } ).click();
-			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+			await expect( thread ).toHaveAttribute( 'aria-current', 'false' );
 			await expect( thread ).toBeFocused();
 		} );
 
@@ -668,7 +719,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'region', {
 					name: 'Editor settings',
 				} )
-				.getByRole( 'treeitem', {
+				.getByRole( 'listitem', {
 					name: 'Note: Test comment',
 				} );
 			const block = editor.canvas.getByRole( 'document', {
@@ -676,11 +727,11 @@ test.describe( 'Block Notes', () => {
 			} );
 
 			await thread.click();
-			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+			await expect( thread ).toHaveAttribute( 'aria-current', 'true' );
 			await expect( block ).toHaveClass( /is-highlighted/ );
 			await page.keyboard.press( 'Shift+Tab' );
 			await expect( thread ).not.toBeFocused();
-			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+			await expect( thread ).toHaveAttribute( 'aria-current', 'false' );
 			await expect( block ).not.toHaveClass( /is-highlighted/ );
 		} );
 
@@ -698,7 +749,8 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'region', {
 					name: 'Editor settings',
 				} )
-				.getByRole( 'treeitem' )
+				.getByRole( 'list' )
+				.getByRole( 'listitem' )
 				.first();
 
 			await thread.focus();
@@ -750,14 +802,14 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'region', {
 					name: 'Editor settings',
 				} )
-				.getByRole( 'treeitem', {
+				.getByRole( 'listitem', {
 					name: 'Note: Test comment',
 				} );
 
 			await thread
 				.getByRole( 'button', { name: '1 more reply' } )
 				.click();
-			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+			await expect( thread ).toHaveAttribute( 'aria-current', 'true' );
 			await expect( thread ).toBeFocused();
 		} );
 
@@ -783,17 +835,17 @@ test.describe( 'Block Notes', () => {
 			} );
 			const firstThread = page
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', {
+				.getByRole( 'listitem', {
 					name: 'Note: First block comment',
 				} );
 			const secondThread = page
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', {
+				.getByRole( 'listitem', {
 					name: 'Note: Second block comment',
 				} );
 			const thirdThread = page
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', {
+				.getByRole( 'listitem', {
 					name: 'Note: Third block comment',
 				} );
 
@@ -873,7 +925,7 @@ test.describe( 'Block Notes', () => {
 				.click();
 			const thread = page
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', {
+				.getByRole( 'listitem', {
 					name: 'Note: Test comment',
 				} );
 
@@ -893,7 +945,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'region', {
 					name: 'Editor settings',
 				} )
-				.getByRole( 'treeitem', {
+				.getByRole( 'listitem', {
 					name: 'Note: Test comment',
 				} );
 			const addNewCommentButton = thread.getByRole( 'button', {
@@ -925,7 +977,7 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'region', {
 					name: 'Editor settings',
 				} )
-				.getByRole( 'treeitem', {
+				.getByRole( 'listitem', {
 					name: 'Note: Test comment',
 				} );
 			const replyButton = thread.getByRole( 'button', {
@@ -1007,7 +1059,7 @@ test.describe( 'Block Notes', () => {
 			} );
 			const thread = page
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', {
+				.getByRole( 'listitem', {
 					name: 'Note: A test comment',
 				} );
 
@@ -1042,7 +1094,7 @@ test.describe( 'Block Notes', () => {
 			} );
 			const thread = page
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', {
+				.getByRole( 'listitem', {
 					name: 'Note: A test comment',
 				} );
 
@@ -1084,12 +1136,12 @@ test.describe( 'Block Notes', () => {
 				name: 'Editor settings',
 			} );
 			await expect(
-				settings.getByRole( 'treeitem', {
+				settings.getByRole( 'listitem', {
 					name: 'Note: First note on block',
 				} )
 			).toBeVisible();
 			await expect(
-				settings.getByRole( 'treeitem', {
+				settings.getByRole( 'listitem', {
 					name: 'Note: Second note on block',
 				} )
 			).toBeVisible();
@@ -1119,16 +1171,16 @@ test.describe( 'Block Notes', () => {
 				name: 'Editor settings',
 			} );
 			await expect(
-				settings.getByRole( 'treeitem', { name: 'Note: Note to keep' } )
+				settings.getByRole( 'listitem', { name: 'Note: Note to keep' } )
 			).toBeVisible();
 			await expect(
-				settings.getByRole( 'treeitem', {
+				settings.getByRole( 'listitem', {
 					name: 'Note: Note to delete',
 				} )
 			).toBeVisible();
 
 			// Delete the second note.
-			const secondThread = settings.getByRole( 'treeitem', {
+			const secondThread = settings.getByRole( 'listitem', {
 				name: 'Note: Note to delete',
 			} );
 			await secondThread.click();
@@ -1146,10 +1198,10 @@ test.describe( 'Block Notes', () => {
 
 			// First note should still be visible; second should be gone.
 			await expect(
-				settings.getByRole( 'treeitem', { name: 'Note: Note to keep' } )
+				settings.getByRole( 'listitem', { name: 'Note: Note to keep' } )
 			).toBeVisible();
 			await expect(
-				settings.getByRole( 'treeitem', {
+				settings.getByRole( 'listitem', {
 					name: 'Note: Note to delete',
 				} )
 			).toBeHidden();
@@ -1180,7 +1232,7 @@ test.describe( 'Block Notes', () => {
 			} );
 
 			// Resolve Note A.
-			const threadA = settings.getByRole( 'treeitem', {
+			const threadA = settings.getByRole( 'listitem', {
 				name: 'Note: Note A',
 			} );
 			await threadA.click();
@@ -1190,7 +1242,7 @@ test.describe( 'Block Notes', () => {
 			await expect( threadA ).toBeHidden();
 
 			// Note B should still be visible and unresolved (expanded).
-			const threadB = settings.getByRole( 'treeitem', {
+			const threadB = settings.getByRole( 'listitem', {
 				name: 'Note: Note B',
 			} );
 			await expect( threadB ).toBeVisible();
@@ -1221,7 +1273,7 @@ test.describe( 'Block Notes', () => {
 			} );
 
 			// Resolve the first note.
-			const firstThread = settings.getByRole( 'treeitem', {
+			const firstThread = settings.getByRole( 'listitem', {
 				name: 'Note: First note',
 			} );
 			await firstThread.click();
@@ -1242,11 +1294,11 @@ test.describe( 'Block Notes', () => {
 				.click();
 
 			// The second (unresolved) note should be the active one.
-			const secondThread = settings.getByRole( 'treeitem', {
+			const secondThread = settings.getByRole( 'listitem', {
 				name: 'Note: Second note',
 			} );
 			await expect( secondThread ).toHaveAttribute(
-				'aria-expanded',
+				'aria-current',
 				'true'
 			);
 		} );
@@ -1427,7 +1479,7 @@ test.describe( 'Block Notes', () => {
 
 			const thread = page
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', { name: 'Note: Anchored to text' } );
+				.getByRole( 'listitem', { name: 'Note: Anchored to text' } );
 			await expect( thread ).toBeVisible();
 
 			// Remove the marked text. The marker disappears, but the note must
@@ -1612,7 +1664,7 @@ test.describe( 'Block Notes', () => {
 			// stronger active alpha (≈0x80/255) via the selected-note rule.
 			await page
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', { name: 'Note: Pick me' } )
+				.getByRole( 'listitem', { name: 'Note: Pick me' } )
 				.click();
 
 			await expect.poll( alphaOf ).toBeGreaterThan( 0.4 );
@@ -1661,10 +1713,10 @@ test.describe( 'Block Notes', () => {
 			const settings = page.getByRole( 'region', {
 				name: 'Editor settings',
 			} );
-			const alphaThread = settings.getByRole( 'treeitem', {
+			const alphaThread = settings.getByRole( 'listitem', {
 				name: 'Note: Alpha note',
 			} );
-			const charlieThread = settings.getByRole( 'treeitem', {
+			const charlieThread = settings.getByRole( 'listitem', {
 				name: 'Note: Charlie note',
 			} );
 			const alphaMark = editor.canvas
@@ -1676,7 +1728,7 @@ test.describe( 'Block Notes', () => {
 
 			// Creating a note selects it, so the last-added note starts selected.
 			await expect( alphaThread ).toHaveAttribute(
-				'aria-expanded',
+				'aria-current',
 				'true'
 			);
 
@@ -1684,21 +1736,21 @@ test.describe( 'Block Notes', () => {
 			// note; clicking between the two markers flips the selection.
 			await charlieMark.click();
 			await expect( charlieThread ).toHaveAttribute(
-				'aria-expanded',
+				'aria-current',
 				'true'
 			);
 			await expect( alphaThread ).toHaveAttribute(
-				'aria-expanded',
+				'aria-current',
 				'false'
 			);
 
 			await alphaMark.click();
 			await expect( alphaThread ).toHaveAttribute(
-				'aria-expanded',
+				'aria-current',
 				'true'
 			);
 			await expect( charlieThread ).toHaveAttribute(
-				'aria-expanded',
+				'aria-current',
 				'false'
 			);
 		} );
@@ -1764,7 +1816,7 @@ test.describe( 'Block Notes', () => {
 
 				// The inline "Add note" flow activates the floating notes
 				// sidebar, so the saved thread renders as a floating panel.
-				const thread = page.getByRole( 'treeitem', {
+				const thread = page.getByRole( 'listitem', {
 					name: 'Note: Align me',
 				} );
 				await expect( thread ).toHaveClass( /is-floating/ );
@@ -2072,7 +2124,8 @@ test.describe( 'Block Notes', () => {
 			 */
 			const savedChip = page
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem' )
+				.getByRole( 'list' )
+				.getByRole( 'listitem' )
 				.locator( 'span.wp-note-mention' );
 			await expect( savedChip ).toHaveText( '@Mentionable Teammate' );
 			await expect( savedChip ).toHaveClass( mentionClasses );
@@ -2194,7 +2247,7 @@ class BlockNoteUtils {
 		await expect(
 			this.#page
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', { name: `Note: ${ content }` } )
+				.getByRole( 'listitem', { name: `Note: ${ content }` } )
 		).toBeVisible();
 	}
 
