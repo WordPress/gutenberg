@@ -17,18 +17,6 @@ import {
 } from './perceptual-foreground-experiment';
 import styles from './perceptual-foreground-pilot.module.css';
 
-const meta = {
-	title: 'Design System/Theme/Theme Provider/Perceptual Foreground Pilot',
-	parameters: {
-		controls: { disable: true },
-		docs: { canvas: { sourceState: 'hidden' } },
-	},
-} satisfies Meta;
-
-export default meta;
-
-type Story = StoryObj< typeof meta >;
-
 const SAMPLE_COMBINATIONS = [
 	{
 		label: 'Default light',
@@ -113,6 +101,37 @@ const METHOD_DETAILS: Record<
 	},
 };
 
+type PilotComparisonArgs = {
+	approaches: ExperimentalForegroundMethod[];
+};
+
+const meta = {
+	title: 'Design System/Theme/Theme Provider/Perceptual Foreground Pilot',
+	parameters: {
+		controls: { expanded: true },
+		docs: { canvas: { sourceState: 'hidden' } },
+	},
+	argTypes: {
+		approaches: {
+			control: {
+				type: 'inline-check',
+				labels: Object.fromEntries(
+					EXPERIMENTAL_FOREGROUND_METHODS.map( ( method ) => [
+						method,
+						METHOD_DETAILS[ method ].label,
+					] )
+				),
+			},
+			description: 'Approaches shown in each scale comparison.',
+			options: EXPERIMENTAL_FOREGROUND_METHODS,
+		},
+	},
+} satisfies Meta< PilotComparisonArgs >;
+
+export default meta;
+
+type Story = StoryObj< PilotComparisonArgs >;
+
 type ScaleData = {
 	label: string;
 	scale: ExperimentalForegroundScale;
@@ -130,13 +149,17 @@ function formatSignedContrast( contrast: number ) {
 }
 
 function ForegroundScale( {
+	ariaLabel,
 	data,
 	displayBackground,
+	showScaleName = true,
 	showGamutRelativeChroma,
 	showOkhslSaturation,
 }: {
+	ariaLabel?: string;
 	data: ScaleData;
 	displayBackground: string;
+	showScaleName?: boolean;
 	showGamutRelativeChroma: boolean;
 	showOkhslSaturation: boolean;
 } ) {
@@ -151,10 +174,10 @@ function ForegroundScale( {
 	return (
 		<section
 			className={ styles.scale }
-			aria-label={ `${ data.label } scale` }
+			aria-label={ ariaLabel ?? `${ data.label } scale` }
 		>
 			<div className={ styles[ 'scale-heading' ] }>
-				<h4>{ data.label }</h4>
+				{ showScaleName ? <h4>{ data.label }</h4> : null }
 				<div className={ styles[ 'scale-meta' ] }>
 					<span className={ styles[ 'state-difference' ] }>
 						FGS4→5 ΔEOK2 { stateColorDifference.toFixed( 3 ) }
@@ -236,13 +259,16 @@ function ComponentPanel( {
 	brand,
 	error,
 	method,
+	seedLabel,
 }: {
 	backgroundRamp: RampResult;
 	neutral: ExperimentalForegroundScale;
 	brand: ExperimentalForegroundScale;
 	error: ExperimentalForegroundScale;
 	method: ExperimentalForegroundMethod;
+	seedLabel: string;
 } ) {
+	const approachLabel = METHOD_DETAILS[ method ].label;
 	const pilotStyles = {
 		'--pilot-surface': backgroundRamp.ramp.surface2,
 		'--pilot-border': backgroundRamp.ramp.stroke2,
@@ -260,7 +286,7 @@ function ComponentPanel( {
 
 	return (
 		<section
-			aria-label={ `${ METHOD_DETAILS[ method ].label } component examples` }
+			aria-label={ `${ seedLabel }, ${ approachLabel } component examples` }
 			className={ styles[ 'component-panel' ] }
 			style={ pilotStyles }
 		>
@@ -304,7 +330,9 @@ function ComponentPanel( {
 				</a>
 			</p>
 
-			<nav aria-label="Example view switcher">
+			<nav
+				aria-label={ `${ seedLabel }, ${ approachLabel } view switcher` }
+			>
 				<ul className={ styles[ 'view-switcher' ] }>
 					<li>
 						<a
@@ -326,7 +354,10 @@ function ComponentPanel( {
 				</ul>
 			</nav>
 
-			<nav aria-label="Example menu" className={ styles.menu }>
+			<nav
+				aria-label={ `${ seedLabel }, ${ approachLabel } menu` }
+				className={ styles.menu }
+			>
 				<strong className={ styles[ 'menu-label' ] }>Appearance</strong>
 				<ul>
 					<li>
@@ -401,7 +432,33 @@ function buildScaleData( {
 	};
 }
 
-function VariantCard( {
+type ScaleName = 'neutral' | 'brand' | 'error';
+
+type MethodScaleData = {
+	method: ExperimentalForegroundMethod;
+	scales: Record< ScaleName, ScaleData >;
+};
+
+const SCALE_COMPARISONS = [
+	{ label: 'Neutral', name: 'neutral' },
+	{ label: 'Brand', name: 'brand' },
+	{ label: 'Error', name: 'error' },
+] as const;
+
+const GAMUT_CHROMA_METHODS = new Set< ExperimentalForegroundMethod >( [
+	'state-skewed',
+	'state-skewed-relative-chroma',
+	'state-skewed-okhsl',
+	'anchored-state-skewed-relative-chroma',
+] );
+
+const OKHSL_SATURATION_METHODS = new Set< ExperimentalForegroundMethod >( [
+	'state-skewed-relative-chroma',
+	'state-skewed-okhsl',
+	'anchored-state-skewed-relative-chroma',
+] );
+
+function buildMethodScaleData( {
 	method,
 	backgroundRamp,
 	primaryRamp,
@@ -411,72 +468,162 @@ function VariantCard( {
 	backgroundRamp: RampResult;
 	primaryRamp: RampResult;
 	errorRamp: RampResult;
-} ) {
-	const scales = [
-		buildScaleData( {
-			label: 'Neutral',
-			method,
-			ramp: backgroundRamp,
-			backgroundRamp,
-			seed: backgroundRamp.ramp.surface2,
-			scaleType: 'neutral',
-		} ),
-		buildScaleData( {
-			label: 'Brand',
-			method,
-			ramp: primaryRamp,
-			backgroundRamp,
-			seed: primaryRamp.ramp.bgFill1,
-			scaleType: 'accent',
-		} ),
-		buildScaleData( {
-			label: 'Error',
-			method,
-			ramp: errorRamp,
-			backgroundRamp,
-			seed: errorRamp.ramp.bgFill1,
-			scaleType: 'accent',
-		} ),
-	] as const;
+} ): MethodScaleData {
+	return {
+		method,
+		scales: {
+			neutral: buildScaleData( {
+				label: 'Neutral',
+				method,
+				ramp: backgroundRamp,
+				backgroundRamp,
+				seed: backgroundRamp.ramp.surface2,
+				scaleType: 'neutral',
+			} ),
+			brand: buildScaleData( {
+				label: 'Brand',
+				method,
+				ramp: primaryRamp,
+				backgroundRamp,
+				seed: primaryRamp.ramp.bgFill1,
+				scaleType: 'accent',
+			} ),
+			error: buildScaleData( {
+				label: 'Error',
+				method,
+				ramp: errorRamp,
+				backgroundRamp,
+				seed: errorRamp.ramp.bgFill1,
+				scaleType: 'accent',
+			} ),
+		},
+	};
+}
 
+function ApproachCard( {
+	children,
+	method,
+}: {
+	children: React.ReactNode;
+	method: ExperimentalForegroundMethod;
+} ) {
 	return (
-		<article className={ styles[ 'variant-card' ] }>
+		<article className={ styles[ 'approach-card' ] }>
 			<header>
-				<h3>{ METHOD_DETAILS[ method ].label }</h3>
-				<p>{ METHOD_DETAILS[ method ].description }</p>
+				<h4>{ METHOD_DETAILS[ method ].label }</h4>
 			</header>
-			{ scales.map( ( data ) => (
-				<ForegroundScale
-					data={ data }
-					displayBackground={ backgroundRamp.ramp.surface2 }
-					key={ data.label }
-					showGamutRelativeChroma={
-						data.scaleType === 'accent' &&
-						( method === 'state-skewed' ||
-							method === 'state-skewed-relative-chroma' ||
-							method === 'state-skewed-okhsl' ||
-							method === 'anchored-state-skewed-relative-chroma' )
-					}
-					showOkhslSaturation={
-						data.scaleType === 'accent' &&
-						( method === 'state-skewed-relative-chroma' ||
-							method === 'state-skewed-okhsl' ||
-							method === 'anchored-state-skewed-relative-chroma' )
-					}
-				/>
-			) ) }
-			<ComponentPanel
-				backgroundRamp={ backgroundRamp }
-				brand={ scales[ 1 ].scale }
-				error={ scales[ 2 ].scale }
-				method={ method }
-				neutral={ scales[ 0 ].scale }
-			/>
+			{ children }
 		</article>
 	);
 }
 
-function PilotComparison() {
+function ScaleComparison( {
+	comparison,
+	displayBackground,
+	methods,
+	seedLabel,
+}: {
+	comparison: ( typeof SCALE_COMPARISONS )[ number ];
+	displayBackground: string;
+	methods: MethodScaleData[];
+	seedLabel: string;
+} ) {
+	return (
+		<section className={ styles[ 'scale-comparison' ] }>
+			<h3>{ comparison.label }</h3>
+			<div
+				aria-label={ `${ seedLabel }, ${ comparison.label } scale approaches` }
+				className={ styles.approaches }
+				role="region"
+				tabIndex={ 0 }
+			>
+				{ methods.map( ( { method, scales } ) => {
+					const data = scales[ comparison.name ];
+
+					return (
+						<ApproachCard key={ method } method={ method }>
+							<ForegroundScale
+								ariaLabel={ `${ seedLabel }, ${ METHOD_DETAILS[ method ].label } ${ data.label } scale` }
+								data={ data }
+								displayBackground={ displayBackground }
+								showGamutRelativeChroma={
+									data.scaleType === 'accent' &&
+									GAMUT_CHROMA_METHODS.has( method )
+								}
+								showOkhslSaturation={
+									data.scaleType === 'accent' &&
+									OKHSL_SATURATION_METHODS.has( method )
+								}
+								showScaleName={ false }
+							/>
+						</ApproachCard>
+					);
+				} ) }
+			</div>
+		</section>
+	);
+}
+
+function ComponentComparison( {
+	backgroundRamp,
+	methods,
+	seedLabel,
+}: {
+	backgroundRamp: RampResult;
+	methods: MethodScaleData[];
+	seedLabel: string;
+} ) {
+	return (
+		<section className={ styles[ 'scale-comparison' ] }>
+			<h3>Representative components</h3>
+			<div
+				aria-label={ `${ seedLabel }, representative component approaches` }
+				className={ styles.approaches }
+				role="region"
+				tabIndex={ 0 }
+			>
+				{ methods.map( ( { method, scales } ) => (
+					<ApproachCard key={ method } method={ method }>
+						<ComponentPanel
+							backgroundRamp={ backgroundRamp }
+							brand={ scales.brand.scale }
+							error={ scales.error.scale }
+							method={ method }
+							neutral={ scales.neutral.scale }
+							seedLabel={ seedLabel }
+						/>
+					</ApproachCard>
+				) ) }
+			</div>
+		</section>
+	);
+}
+
+function ApproachDescriptions( {
+	methods,
+}: {
+	methods: ExperimentalForegroundMethod[];
+} ) {
+	return (
+		<details className={ styles[ 'approach-descriptions' ] }>
+			<summary>Approach descriptions</summary>
+			<dl>
+				{ methods.map( ( method ) => (
+					<div key={ method }>
+						<dt>{ METHOD_DETAILS[ method ].label }</dt>
+						<dd>{ METHOD_DETAILS[ method ].description }</dd>
+					</div>
+				) ) }
+			</dl>
+		</details>
+	);
+}
+
+function PilotComparison( { approaches }: PilotComparisonArgs ) {
+	const visibleMethods = EXPERIMENTAL_FOREGROUND_METHODS.filter( ( method ) =>
+		approaches.includes( method )
+	);
+
 	return (
 		<div className={ styles.page }>
 			<header className={ styles.introduction }>
@@ -510,51 +657,83 @@ function PilotComparison() {
 					endpoint constraint. It targets a seven-point APCA interval,
 					or the largest available interval when space is limited.
 				</p>
+				<p>
+					Use the Approaches control to show or hide methods. Each
+					scale keeps the methods ordered from the current control to
+					the latest iteration.
+				</p>
 			</header>
-			{ SAMPLE_COMBINATIONS.map( ( combination ) => {
-				const backgroundRamp = buildBgRamp( combination.background );
-				const primaryRamp = buildAccentRamp(
-					combination.primary,
-					backgroundRamp
-				);
-				const errorRamp = buildAccentRamp(
-					DEFAULT_SEED_COLORS.error,
-					backgroundRamp
-				);
+			{ visibleMethods.length === 0 ? (
+				<p className={ styles[ 'empty-state' ] }>
+					Select at least one approach in the Controls panel.
+				</p>
+			) : null }
+			{ visibleMethods.length > 0 ? (
+				<ApproachDescriptions methods={ visibleMethods } />
+			) : null }
+			{ visibleMethods.length > 0
+				? SAMPLE_COMBINATIONS.map( ( combination ) => {
+						const backgroundRamp = buildBgRamp(
+							combination.background
+						);
+						const primaryRamp = buildAccentRamp(
+							combination.primary,
+							backgroundRamp
+						);
+						const errorRamp = buildAccentRamp(
+							DEFAULT_SEED_COLORS.error,
+							backgroundRamp
+						);
+						const methods = visibleMethods.map( ( method ) =>
+							buildMethodScaleData( {
+								backgroundRamp,
+								errorRamp,
+								method,
+								primaryRamp,
+							} )
+						);
 
-				return (
-					<section
-						className={ styles[ 'seed-section' ] }
-						key={ combination.label }
-					>
-						<header>
-							<h2>{ combination.label }</h2>
-							<p>
-								Background{ ' ' }
-								<code>{ combination.background }</code> ·
-								Primary <code>{ combination.primary }</code>
-							</p>
-						</header>
-						<div className={ styles.variants }>
-							{ EXPERIMENTAL_FOREGROUND_METHODS.map(
-								( method ) => (
-									<VariantCard
-										backgroundRamp={ backgroundRamp }
-										errorRamp={ errorRamp }
-										key={ method }
-										method={ method }
-										primaryRamp={ primaryRamp }
+						return (
+							<section
+								className={ styles[ 'seed-section' ] }
+								key={ combination.label }
+							>
+								<header>
+									<h2>{ combination.label }</h2>
+									<p>
+										Background{ ' ' }
+										<code>{ combination.background }</code>{ ' ' }
+										· Primary{ ' ' }
+										<code>{ combination.primary }</code>
+									</p>
+								</header>
+								{ SCALE_COMPARISONS.map( ( comparison ) => (
+									<ScaleComparison
+										comparison={ comparison }
+										displayBackground={
+											backgroundRamp.ramp.surface2
+										}
+										key={ comparison.name }
+										methods={ methods }
+										seedLabel={ combination.label }
 									/>
-								)
-							) }
-						</div>
-					</section>
-				);
-			} ) }
+								) ) }
+								<ComponentComparison
+									backgroundRamp={ backgroundRamp }
+									methods={ methods }
+									seedLabel={ combination.label }
+								/>
+							</section>
+						);
+				  } )
+				: null }
 		</div>
 	);
 }
 
 export const Comparison: Story = {
-	render: () => <PilotComparison />,
+	args: {
+		approaches: [ ...EXPERIMENTAL_FOREGROUND_METHODS ],
+	},
+	render: ( args ) => <PilotComparison { ...args } />,
 };

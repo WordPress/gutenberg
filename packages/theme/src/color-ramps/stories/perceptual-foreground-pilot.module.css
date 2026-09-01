@@ -14,41 +14,59 @@
 .introduction p,
 .seed-section h2,
 .seed-section p,
-.variant-card h3,
-.variant-card h4 {
+.scale-comparison h3,
+.approach-card h4 {
 	margin: 0;
 }
 
 .seed-section {
 	display: grid;
-	gap: 12px;
+	gap: 24px;
 }
 
-.variants {
+.scale-comparison {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-	gap: 12px;
-	align-items: start;
-}
-
-.variant-card {
-	display: grid;
-	gap: 16px;
+	gap: 8px;
 	min-width: 0;
-	padding: 16px;
+}
+
+.scale-comparison h3 {
+	font-size: 16px;
+}
+
+.approaches {
+	display: grid;
+	grid-auto-columns: minmax(320px, 1fr);
+	grid-auto-flow: column;
+	gap: 12px;
+	padding-block-end: 8px;
+	overflow-x: auto;
+	overscroll-behavior-inline: contain;
+}
+
+.approaches:focus-visible {
+	outline: 2px solid currentColor;
+	outline-offset: 2px;
+}
+
+.approach-card {
+	display: grid;
+	gap: 8px;
+	min-width: 0;
+	padding: 12px;
 	border: 1px solid #dcdcde;
 	border-radius: 8px;
 }
 
-.variant-card > header {
+.approach-card > header {
 	display: grid;
-	gap: 4px;
+	min-height: 2.6em;
+	align-content: start;
 }
 
-.variant-card > header p {
-	min-height: 3em;
-	font-size: 12px;
-	line-height: 1.5;
+.approach-card h4 {
+	font-size: 13px;
+	line-height: 1.3;
 }
 
 .scale {
@@ -71,7 +89,7 @@
 	display: flex;
 	flex-wrap: wrap;
 	gap: 4px;
-	justify-content: flex-end;
+	justify-content: flex-start;
 }
 
 .state-difference {
@@ -120,6 +138,47 @@
 .swatch code {
 	font-family: monospace;
 	font-size: 9px;
+}
+
+.approach-descriptions {
+	display: grid;
+	gap: 12px;
+	padding: 12px;
+	border: 1px solid #dcdcde;
+	border-radius: 8px;
+}
+
+.approach-descriptions summary {
+	cursor: var(--wpds-cursor-control);
+	font-weight: 600;
+}
+
+.approach-descriptions dl,
+.approach-descriptions dl > div {
+	display: grid;
+	gap: 8px;
+}
+
+.approach-descriptions dl {
+	margin: 0;
+}
+
+.approach-descriptions dl > div {
+	grid-template-columns: minmax(180px, 1fr) 3fr;
+}
+
+.approach-descriptions dt {
+	font-weight: 600;
+}
+
+.approach-descriptions dd {
+	margin: 0;
+}
+
+.empty-state {
+	padding: 16px;
+	border: 1px solid #dcdcde;
+	border-radius: 8px;
 }
 
 .component-panel {
