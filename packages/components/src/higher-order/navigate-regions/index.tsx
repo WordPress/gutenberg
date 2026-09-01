@@ -6,6 +6,7 @@ import {
 } from '@wordpress/compose';
 import { isKeyboardEvent } from '@wordpress/keycodes';
 import type { WPKeycodeModifier } from '@wordpress/keycodes';
+import { focus } from '@wordpress/dom';
 
 const defaultShortcuts = {
 	previous: [
@@ -42,6 +43,38 @@ type Shortcuts = {
 export function useNavigateRegions( shortcuts: Shortcuts = defaultShortcuts ) {
 	const ref = useRef< HTMLDivElement >( null );
 	const [ isFocusingRegions, setIsFocusingRegions ] = useState( false );
+	const lastFocusPerRegion = useRef(
+		new WeakMap< HTMLElement, HTMLElement >()
+	);
+
+	// The active element, descending into same-origin frames: within them,
+	// the document only reports the frame element itself as active.
+	function getDeepActiveElement() {
+		let element = ref.current?.ownerDocument?.activeElement ?? null;
+		while ( element?.tagName === 'IFRAME' ) {
+			const inner = ( element as HTMLIFrameElement ).contentDocument
+				?.activeElement;
+			if ( ! inner ) {
+				break;
+			}
+			element = inner;
+		}
+		// Frame documents are other realms, so no instanceof checks here.
+		return ( element as HTMLElement | null ) ?? null;
+	}
+
+	// Whether the element sits inside the region, crossing same-origin frame
+	// boundaries upwards.
+	function isInsideRegion( region: HTMLElement, element: HTMLElement ) {
+		let node: Element | null = element;
+		while ( node ) {
+			if ( region.contains( node ) ) {
+				return true;
+			}
+			node = node.ownerDocument?.defaultView?.frameElement ?? null;
+		}
+		return false;
+	}
 
 	function getWrappingRegion() {
 		// Based off the current element, use closest to determine the wrapping region since this operates up the DOM. Also, match tabindex to avoid edge cases with regions we do not want.
@@ -104,18 +137,25 @@ export function useNavigateRegions( shortcuts: Shortcuts = defaultShortcuts ) {
 		ref: useMergeRefs( [ ref, clickRef ] ),
 		className: isFocusingRegions ? 'is-focusing-regions' : '',
 		onKeyDown( event: React.KeyboardEvent< HTMLDivElement > ) {
-			// A prevented Escape closed a popover, cancelled an operation, or
-			// stepped out inside the canvas; navigation only gets it after
-			// everything else has passed on it.
+			// A prevented key closed a popover, cancelled an operation, or
+			// was otherwise claimed; navigation only gets it after everything
+			// else has passed on it.
 			if ( event.defaultPrevented ) {
 				return;
 			}
+
+			const activeElement = ref.current?.ownerDocument?.activeElement;
+			const isOnRegion =
+				activeElement instanceof HTMLElement &&
+				activeElement.matches( '[role="region"][tabindex="-1"]' ) &&
+				ref.current?.contains( activeElement );
 
 			if (
 				event.key === 'Escape' &&
 				! event.ctrlKey &&
 				! event.metaKey &&
-				! event.altKey
+				! event.altKey &&
+				! isOnRegion
 			) {
 				const wrappingRegion = getWrappingRegion();
 
@@ -130,25 +170,81 @@ export function useNavigateRegions( shortcuts: Shortcuts = defaultShortcuts ) {
 				// synchronous, so by then the native event carries the final
 				// word.
 				const { nativeEvent } = event;
-				const { shiftKey } = event;
 				queueMicrotask( () => {
 					if ( nativeEvent.defaultPrevented ) {
 						return;
 					}
 
-					if (
-						wrappingRegion ===
-						ref.current?.ownerDocument?.activeElement
-					) {
-						// On a region itself, move around: forward, or
-						// backward with Shift.
-						focusRegion( shiftKey ? -1 : 1 );
-					} else {
-						// Anywhere inside a region, step out onto it first.
-						wrappingRegion.focus();
-						setIsFocusingRegions( true );
+					// Remember where focus came from, so Enter can go back.
+					const previous = getDeepActiveElement();
+					if ( previous ) {
+						lastFocusPerRegion.current.set(
+							wrappingRegion,
+							previous
+						);
 					}
+					wrappingRegion.focus();
+					setIsFocusingRegions( true );
 				} );
+				return;
+			}
+
+			if (
+				isOnRegion &&
+				event.key === 'Tab' &&
+				! event.ctrlKey &&
+				! event.metaKey &&
+				! event.altKey
+			) {
+				// On a region, the page's focus stops are the regions, so Tab
+				// moves between them: forward, or backward with Shift.
+				event.preventDefault();
+				focusRegion( event.shiftKey ? -1 : 1 );
+				return;
+			}
+
+			if (
+				isOnRegion &&
+				event.key === 'Enter' &&
+				! event.ctrlKey &&
+				! event.metaKey &&
+				! event.altKey &&
+				! event.shiftKey
+			) {
+				event.preventDefault();
+
+				// Enter goes back to where focus was when Escape stepped out
+				// of this region, when that place still exists.
+				const remembered =
+					lastFocusPerRegion.current.get( activeElement );
+				if (
+					remembered?.isConnected &&
+					isInsideRegion( activeElement, remembered )
+				) {
+					remembered.focus();
+					return;
+				}
+
+				// Otherwise onto the region's first tabbable, descending into
+				// a same-origin frame.
+				let target: HTMLElement | undefined = focus.tabbable.find(
+					activeElement
+				)[ 0 ] as HTMLElement | undefined;
+				while ( target?.tagName === 'IFRAME' ) {
+					const frameDocument = ( target as HTMLIFrameElement )
+						.contentDocument;
+					if ( ! frameDocument?.body ) {
+						break;
+					}
+					const inner = focus.tabbable.find(
+						frameDocument.body
+					)[ 0 ] as HTMLElement | undefined;
+					if ( ! inner ) {
+						break;
+					}
+					target = inner;
+				}
+				target?.focus();
 				return;
 			}
 

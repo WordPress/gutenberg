@@ -47,14 +47,28 @@ test.describe( 'Escape region navigation', () => {
 			)
 			.toBe( 1 );
 
-		// On a region, Escape moves to the next region, which for a selected
-		// block is its toolbar, and Shift+Escape moves back.
+		// On a region, Escape does nothing further: there is nowhere higher.
 		await page.keyboard.press( 'Escape' );
+		await expect( editorContent ).toBeFocused();
+
+		// On a region, Tab moves to the next region, which for a selected
+		// block is its toolbar, and Shift+Tab moves back.
+		await page.keyboard.press( 'Tab' );
 		await expect(
 			page.locator( 'role=region[name="Block toolbar"i]' )
 		).toBeFocused();
-		await page.keyboard.press( 'Shift+Escape' );
+		await page.keyboard.press( 'Shift+Tab' );
 		await expect( editorContent ).toBeFocused();
+
+		// Enter goes back into the content, restoring the selection where it
+		// was left.
+		await page.keyboard.press( 'Enter' );
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} )
+		).toBeFocused();
+		await expect.poll( () => hasTextSelection( page ) ).toBe( true );
 	} );
 
 	test( 'skips regions that are not visible', async ( { editor, page } ) => {
@@ -73,7 +87,7 @@ test.describe( 'Escape region navigation', () => {
 		// must never receive focus.
 		const visited = [];
 		for ( let i = 0; i < 8; i++ ) {
-			await page.keyboard.press( 'Escape' );
+			await page.keyboard.press( 'Tab' );
 			const name = await page.evaluate( () =>
 				document.activeElement.getAttribute( 'aria-label' )
 			);
@@ -86,7 +100,7 @@ test.describe( 'Escape region navigation', () => {
 		expect( visited.length ).toBeLessThan( 8 );
 	} );
 
-	test( 'steps out onto the wrapping region from the editor chrome', async ( {
+	test( 'steps out onto the wrapping region from the editor chrome and back in', async ( {
 		page,
 	} ) => {
 		// Move focus into the top bar, on the inserter toggle.
@@ -95,6 +109,12 @@ test.describe( 'Escape region navigation', () => {
 		await page.keyboard.press( 'Escape' );
 		await expect(
 			page.locator( 'role=region[name="Editor top bar"i]' )
+		).toBeFocused();
+
+		// Enter goes into the region, onto its first tabbable.
+		await page.keyboard.press( 'Enter' );
+		await expect(
+			page.getByRole( 'button', { name: 'Block Inserter' } )
 		).toBeFocused();
 	} );
 

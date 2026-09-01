@@ -78,8 +78,9 @@ test.describe( 'Sidebar', () => {
 		// Region navigate to Sidebar.
 		await pageUtils.pressKeys( 'ctrl+`' );
 
-		// Tab lands at first (presumed selected) option "Post".
-		await page.keyboard.press( 'Tab' );
+		// Enter goes into the region and lands at first (presumed selected)
+		// option "Post".
+		await page.keyboard.press( 'Enter' );
 
 		const activeTab = page
 			.getByRole( 'region', {

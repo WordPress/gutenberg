@@ -142,13 +142,15 @@ test.describe( 'Navigating the block hierarchy', () => {
 		const slider = page.getByRole( 'slider', { name: 'Columns' } );
 		// Ensure the block is selected and slider control is visible in the inspector.
 		await expect( slider ).toBeVisible();
-		await pageUtils.pressKeys( 'Tab', { times: 5 } );
+		await pageUtils.pressKeys( 'Enter' );
+		await pageUtils.pressKeys( 'Tab', { times: 4 } );
 		await expect( slider ).toBeFocused();
 		await page.keyboard.press( 'ArrowRight' );
 
 		// Navigate to the third column in the columns block via List View.
 		await pageUtils.pressKeys( 'ctrlShift+`', { times: 2 } );
-		await pageUtils.pressKeys( 'Tab', { times: 3 } );
+		await pageUtils.pressKeys( 'Enter' );
+		await pageUtils.pressKeys( 'Tab', { times: 2 } );
 		await pageUtils.pressKeys( 'ArrowDown', { times: 4 } );
 
 		// Insert text in the last column block.

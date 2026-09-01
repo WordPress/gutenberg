@@ -33,8 +33,8 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 
 		// This test assumes the Editor is not in Fullscreen mode. Check the
 		// first tabbable element within the 'Editor top bar' region is the
-		// 'Block Inserter' button.
-		await pageUtils.pressKeys( 'Tab' );
+		// 'Block Inserter' button. Enter goes into the focused region.
+		await pageUtils.pressKeys( 'Enter' );
 		await expect(
 			page.locator( 'role=button[name=/Block Inserter/i]' )
 		).toBeFocused();
