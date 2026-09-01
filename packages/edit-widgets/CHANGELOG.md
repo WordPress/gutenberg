@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   `WelcomeGuide`: Keep the modal close icon white on hover now that it is stroke-based. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
 -   Prevent an error in `canInsertBlockInWidgetArea` when no widget area blocks are present.
 
 ### Internal

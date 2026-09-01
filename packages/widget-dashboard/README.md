@@ -193,6 +193,7 @@ type CanPerformDashboardOperation = (
 
 type DashboardOperationRequest =
 	| { operation: 'customize' }
+	| { operation: 'reset' }
 	| { operation: 'insert'; widgetType: WidgetType }
 	| {
 			operation: 'remove' | 'move' | 'resize' | 'edit';
@@ -225,6 +226,7 @@ Each request names the operation and carries its subject, so a branch on `reques
 | Operation   | Subject                 | What it gates                                                                                                                                                                                     |
 | ----------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `customize` | none                    | The Customize button, the `core/dashboard/customize` command, the `core/dashboard/add-widgets` command outside edit mode, and the automatic entry into customize mode on an empty layout.         |
+| `reset`     | none                    | The Reset to default entry in the overflow menu, the `core/dashboard/reset-to-default` command, and the confirmation prompt they open. A denied reset is hidden, not disabled.                    |
 | `insert`    | `widgetType`            | Whether the inserter offers the type; a rejected type keeps rendering where already placed. The Add widget button and command show only while some registered type is insertable.                 |
 | `remove`    | `widget`, `widgetType?` | The Remove control in customize mode. The staging layer re-asserts, in place, a locked instance dropped by any trigger.                                                                           |
 | `move`      | `widget`, `widgetType?` | Dragging the tile in customize mode. A denied tile is pinned: it holds its index while the other tiles reorder around it; a change ahead of it can still reflow the cell it lands in.             |
@@ -252,7 +254,7 @@ The exported kit for handling them:
 -   `DEFAULT_GRID` — canonical default settings, applied when `gridSettings` is omitted.
 -   `normalizeGridSettings( settings, defaultRowHeight )` — coerces legacy freeform row heights to the nearest preset. Run it over stored payloads before passing them in.
 -   `ROW_HEIGHT_PRESETS` / `DEFAULT_ROW_HEIGHT` — the row-height presets (`small`, `medium`, `large`) that `rowHeight` values normalize to.
--   `WIDGET_DASHBOARD_COLUMN_COUNT` — maximum column count on wide containers. The effective count steps down from container width; persisted `columns` values are ignored.
+-   `WIDGET_DASHBOARD_COLUMN_COUNT` — column count used on wide containers when the host sets no `gridSettings.columns`. A default, not a ceiling: a finite `columns` is floored, with a floor of `1`, and rendered as asked. The effective count steps down from container width: the count at `960px` and above, `min( 2, count )` below that, one column below `600px`.
 
 ```tsx
 <WidgetDashboard

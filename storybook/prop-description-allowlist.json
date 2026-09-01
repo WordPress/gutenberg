@@ -17,6 +17,7 @@
 	"Autocomplete.Root>Autocomplete.Popup",
 	"Autocomplete.Root>Autocomplete.Popup:children",
 	"Autocomplete.Root>Autocomplete.Row:children",
+	"Autocomplete.Root>Autocomplete.Status:children",
 	"Autocomplete.Root>Autocomplete.Value",
 	"Autocomplete.Root>Autocomplete.Value:children",
 	"BaseControl:className",

@@ -34,6 +34,8 @@ For either classification, use the public guide's
 [package completion gate](../../../docs/contributors/design/design-system-packages.md#change-a-package-safely)
 and inspect only the surfaces applicable to the change.
 
+If a published package can run with a dependency supplied separately by WordPress, apply the [`package-runtime-compatibility`](../package-runtime-compatibility/SKILL.md) skill before concluding the review.
+
 Use browser evidence when source or class assertions cannot establish visual,
 focus, motion, or layout parity.
 

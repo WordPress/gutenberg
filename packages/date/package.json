@@ -46,6 +46,9 @@
 		"moment": "^2.29.4",
 		"moment-timezone": "^0.5.40"
 	},
+	"devDependencies": {
+		"vitest": "^4.1.10"
+	},
 	"publishConfig": {
 		"access": "public"
 	}
