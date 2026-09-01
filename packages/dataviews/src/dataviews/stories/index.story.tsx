@@ -239,13 +239,6 @@ export const LayoutCustom = {
 	render: LayoutCustomComponent,
 };
 
-/**
- * Hierarchical data in the table layout. DataViews does not reorder items:
- * the consumer lists each parent before its children and reports how deep
- * each item sits through `getItemLevel`; `view.showLevels` turns the
- * indentation on. Sorting by a field clears `showLevels`, since a sorted list
- * is no longer in hierarchical order.
- */
 export const HierarchicalLevels = {
 	render: HierarchicalLevelsComponent,
 	args: {
