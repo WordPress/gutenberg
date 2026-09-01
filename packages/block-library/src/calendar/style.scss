@@ -3,12 +3,11 @@
 
 .wp-block-calendar {
 	text-align: center;
-	box-sizing: border-box;
 
 	th,
 	td {
 		padding: 0.25em;
-		border: 1px solid;
+		border: $border-width solid;
 	}
 
 	th {
@@ -39,11 +38,11 @@
 		color: #40464d;
 	}
 
-	// Border styles
+	// Border Styles
 	//
-	// Custom border selections are applied to the table element. Cells inherit
-	// border color, style, and width from the table, matching the Table block.
-	.has-border-color {
+	// Allow any custom border color, style or width selections to be inherited
+	// from the table element that receives the border support props.
+	table.has-border-color {
 		> *,
 		tr,
 		th,
@@ -52,8 +51,7 @@
 		}
 	}
 
-	table[style*="border-top-color"],
-	table.has-border-color.has-individual-borders {
+	table[style*="border-top-color"] {
 		> *,
 		tr:first-child {
 			border-top-color: inherit;
@@ -69,8 +67,7 @@
 		}
 	}
 
-	table[style*="border-right-color"],
-	table.has-border-color.has-individual-borders {
+	table[style*="border-right-color"] {
 		> *,
 		tr,
 		th,
@@ -79,8 +76,7 @@
 		}
 	}
 
-	table[style*="border-bottom-color"],
-	table.has-border-color.has-individual-borders {
+	table[style*="border-bottom-color"] {
 		> *,
 		tr:last-child {
 			border-bottom-color: inherit;
@@ -96,8 +92,7 @@
 		}
 	}
 
-	table[style*="border-left-color"],
-	table.has-border-color.has-individual-borders {
+	table[style*="border-left-color"] {
 		> *,
 		tr,
 		th,
@@ -106,8 +101,7 @@
 		}
 	}
 
-	table[style*="border-style"],
-	table.has-border-color {
+	table[style*="border-style"] {
 		> *,
 		tr,
 		th,
@@ -116,8 +110,7 @@
 		}
 	}
 
-	table[style*="border-width"],
-	table.has-border-color {
+	table[style*="border-width"] {
 		> *,
 		tr,
 		th,

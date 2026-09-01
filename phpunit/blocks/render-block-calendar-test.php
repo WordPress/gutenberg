@@ -7,23 +7,29 @@
  */
 
 /**
- * Tests for the Calendar block.
+ * Tests for the Calendar block render callback.
  *
  * @group blocks
  */
 class Tests_Blocks_Render_Calendar extends WP_UnitTestCase {
 
 	/**
+	 * Published post used to satisfy the has-published-posts check.
+	 *
 	 * @var int
 	 */
-	protected static $post_id;
+	private static $post_id;
 
 	/**
+	 * Fixture returned by the get_calendar filter.
+	 *
 	 * @var string
 	 */
 	private $calendar_markup;
 
 	/**
+	 * Original WP_Block_Supports::$block_to_render value.
+	 *
 	 * @var array|null
 	 */
 	private $original_block_supports;
@@ -56,7 +62,7 @@ class Tests_Blocks_Render_Calendar extends WP_UnitTestCase {
 
 		update_option( 'wp_calendar_block_has_published_posts', true );
 
-		$this->calendar_markup = '<table class="wp-calendar-table" style="display:table"><caption>August 2026</caption><thead><tr><th>Mon</th></tr></thead><tbody><tr><td class="pad">&nbsp;</td><td>1</td></tr></tbody></table>';
+		$this->calendar_markup = '<table class="wp-calendar-table" style="display:table"><caption>August 2026</caption><thead><tr><th>Mon</th></tr></thead><tbody><tr><td>&nbsp;</td><td>1</td></tr></tbody></table>';
 		add_filter( 'get_calendar', array( $this, 'filter_get_calendar' ) );
 	}
 
@@ -95,10 +101,10 @@ class Tests_Blocks_Render_Calendar extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers ::gutenberg_block_core_calendar_get_block_gap_style_rules
+	 * @covers ::gutenberg_block_core_calendar_get_block_gap_css
 	 */
-	public function test_block_gap_style_rules_use_instance_value() {
-		$rules = gutenberg_block_core_calendar_get_block_gap_style_rules(
+	public function test_get_block_gap_css_returns_instance_value() {
+		$css = gutenberg_block_core_calendar_get_block_gap_css(
 			array(
 				'style' => array(
 					'spacing' => array(
@@ -108,28 +114,28 @@ class Tests_Blocks_Render_Calendar extends WP_UnitTestCase {
 			)
 		);
 
-		$this->assertSame( '2rem', $rules[0]['value'] );
+		$this->assertSame( '2rem', $css );
 	}
 
 	/**
-	 * @covers ::gutenberg_block_core_calendar_get_block_gap_style_rules
+	 * @covers ::gutenberg_block_core_calendar_get_block_gap_css
 	 */
-	public function test_block_gap_style_rules_ignore_global_styles_without_instance_value() {
-		$rules = gutenberg_block_core_calendar_get_block_gap_style_rules( array() );
+	public function test_get_block_gap_css_returns_empty_without_instance_value() {
+		$css = gutenberg_block_core_calendar_get_block_gap_css( array() );
 
-		$this->assertSame( array(), $rules );
+		$this->assertSame( '', $css );
 	}
 
 	/**
 	 * @covers ::gutenberg_block_core_calendar_merge_style_attribute
 	 */
 	public function test_merge_style_attribute_keeps_existing_declarations() {
-		$processor = new WP_HTML_Tag_Processor( '<table style="display:table"></table>' );
+		$processor = new WP_HTML_Tag_Processor( '<table style="display:table">' );
 		$processor->next_tag();
 		gutenberg_block_core_calendar_merge_style_attribute( $processor, 'color:#111111' );
 
 		$this->assertSame(
-			'<table style="display:table;color:#111111"></table>',
+			'<table style="display:table;color:#111111">',
 			$processor->get_updated_html()
 		);
 	}
@@ -207,25 +213,32 @@ class Tests_Blocks_Render_Calendar extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers ::gutenberg_block_core_calendar_has_split_borders
+	 * @covers ::gutenberg_render_block_core_calendar
 	 */
-	public function test_has_split_borders_detects_per_side_values() {
-		$this->assertTrue(
-			gutenberg_block_core_calendar_has_split_borders(
-				array(
-					'top' => array(
-						'width' => '2px',
+	public function test_render_applies_per_side_borders_to_table_only() {
+		$html = gutenberg_render_block_core_calendar(
+			array(
+				'style' => array(
+					'border' => array(
+						'top' => array(
+							'width' => '2px',
+							'color' => '#111111',
+							'style' => 'solid',
+						),
 					),
-				)
+				),
 			)
 		);
-		$this->assertFalse(
-			gutenberg_block_core_calendar_has_split_borders(
-				array(
-					'width' => '2px',
-				)
-			)
-		);
+
+		$processor = new WP_HTML_Tag_Processor( $html );
+		$processor->next_tag( 'TABLE' );
+		$table_style = (string) $processor->get_attribute( 'style' );
+
+		$this->assertStringContainsString( 'border', $table_style );
+
+		while ( $processor->next_tag( 'TD' ) ) {
+			$this->assertSame( '', (string) $processor->get_attribute( 'style' ) );
+		}
 	}
 
 	/**
