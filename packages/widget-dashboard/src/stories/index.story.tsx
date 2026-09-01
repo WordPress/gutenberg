@@ -16,13 +16,15 @@ import { Page } from '@wordpress/admin-ui';
 import { Button } from '@wordpress/components';
 import { CommandMenu } from '@wordpress/commands';
 import {
+	createContext,
 	forwardRef,
 	useCallback,
+	useContext,
 	useEffect,
 	useMemo,
 	useState,
 } from '@wordpress/element';
-import { chartBar, download, trendingUp } from '@wordpress/icons';
+import { chartBar, download, lockOutline, trendingUp } from '@wordpress/icons';
 import { WidgetHostProvider } from '@wordpress/widget-primitives';
 import type {
 	ResolveWidgetModule,
@@ -33,6 +35,7 @@ import type {
 	WidgetType,
 } from '@wordpress/widget-primitives';
 import { useDashboardInternalContext } from '../context/dashboard-context';
+import { useWidgetContext } from '../context/widget-context';
 import { WidgetDashboard } from '../widget-dashboard';
 import type {
 	CanPerformDashboardOperation,
@@ -50,12 +53,6 @@ interface SnapshotAttributes {
 	metric?: 'views' | 'visitors' | 'orders';
 	period?: 'day' | 'week' | 'month';
 	label?: string;
-
-	/*
-	 * Free-form line rendered above the metric. The enforcement story uses
-	 * it so each tile states its own instance lock.
-	 */
-	note?: string;
 }
 
 const METRICS: {
@@ -93,7 +90,6 @@ function TrafficSnapshotWidget( {
 		metric = 'views',
 		period = 'week',
 		label = 'Traffic',
-		note,
 	} = attributes ?? {};
 
 	const metricLabel =
@@ -111,19 +107,6 @@ function TrafficSnapshotWidget( {
 				color: 'var(--wpds-color-foreground-content-neutral)',
 			} }
 		>
-			{ note && (
-				<span
-					style={ {
-						color: 'var(--wpds-color-foreground-content-neutral-weak)',
-						fontSize: 'var(--wpds-typography-font-size-xs)',
-						fontWeight:
-							'var(--wpds-typography-font-weight-emphasis)',
-						textTransform: 'uppercase',
-					} }
-				>
-					{ note }
-				</span>
-			) }
 			<strong
 				style={ {
 					fontSize: 'var(--wpds-typography-font-size-2xl)',
@@ -333,13 +316,23 @@ const goalProgressWidgetType: WidgetType = {
 };
 
 // What `import( widget.renderModule )` resolves to in a real host.
-const resolveDemoModule: ResolveWidgetModule = async ( moduleId ) => ( {
-	default: ( moduleId === goalProgressWidgetType.renderModule
-		? GoalProgressWidget
-		: TrafficSnapshotWidget ) as ComponentType<
-		WidgetRenderProps< unknown >
-	>,
-} );
+const resolveDemoModule: ResolveWidgetModule = async ( moduleId ) => {
+	let component: ComponentType< WidgetRenderProps< unknown > >;
+	if ( moduleId === goalProgressWidgetType.renderModule ) {
+		component = GoalProgressWidget as ComponentType<
+			WidgetRenderProps< unknown >
+		>;
+	} else if ( moduleId === lockCardWidgetType.renderModule ) {
+		component = LockCardWidget as ComponentType<
+			WidgetRenderProps< unknown >
+		>;
+	} else {
+		component = TrafficSnapshotWidget as ComponentType<
+			WidgetRenderProps< unknown >
+		>;
+	}
+	return { default: component };
+};
 
 // The snapshot type at two widths, plus a one-column goal tile whose
 // attributes are all promoted, so the header presentations can be compared
@@ -845,69 +838,147 @@ Nested policies compose restrictively; without a policy, every operation is allo
 };
 
 /*
- * Staging-enforcement demo. Three tiles carry one instance lock each and
- * the goal tile is free. Customize mode shows the locks on the chrome;
- * the rogue triggers do what only a composed trigger can: write to the
- * engine's staging directly through the internal context.
+ * Staging-enforcement demo. Every tile is a lock card showing its live
+ * canonical position and one chip per instance operation, and the story
+ * controls edit each card's denied operations. Customize mode shows the
+ * locks on the chrome; the rogue triggers do what only a composed
+ * trigger can: write to the engine's staging directly through the
+ * internal context.
  */
-const TILE_LOCKS: Record< string, DashboardInstanceOperation[] > = {
-	'pinned-snapshot': [ 'move' ],
-	'fixed-size-snapshot': [ 'resize' ],
-	'protected-snapshot': [ 'remove', 'edit' ],
+const INSTANCE_OPERATIONS: DashboardInstanceOperation[] = [
+	'move',
+	'resize',
+	'remove',
+	'edit',
+];
+
+type TileLocks = Record< string, DashboardInstanceOperation[] | undefined >;
+
+/* Demo plumbing so the cards re-render when the controls change. */
+const TileLocksContext = createContext< TileLocks >( {} );
+
+/* Stable instance name from the uuid: `card-alpha` reads as `Alpha`. */
+const cardName = ( uuid: string ) => {
+	const raw = uuid.replace( /^card-/, '' ).replace( /-/g, ' ' );
+	return raw.charAt( 0 ).toUpperCase() + raw.slice( 1 );
+};
+
+/*
+ * Reads the demo's lock map by its own uuid purely to visualize it; real
+ * widgets never see the policy.
+ */
+function LockCardWidget( {
+	attributes,
+}: WidgetRenderProps< { label?: string } > ) {
+	const { label = 'Card' } = attributes ?? {};
+	const widget = useWidgetContext();
+	const locks = useContext( TileLocksContext )[ widget?.uuid ?? '' ] ?? [];
+
+	return (
+		<div
+			style={ {
+				display: 'grid',
+				gap: 'var(--wpds-dimension-gap-xs)',
+				alignContent: 'center',
+				height: '100%',
+				color: 'var(--wpds-color-foreground-content-neutral)',
+			} }
+		>
+			<strong
+				style={ {
+					fontSize: 'var(--wpds-typography-font-size-2xl)',
+				} }
+			>
+				{ `#${ ( widget?.index ?? 0 ) + 1 } · ${ cardName(
+					widget?.uuid ?? ''
+				) }` }
+			</strong>
+			<span
+				style={ {
+					color: 'var(--wpds-color-foreground-content-neutral-weak)',
+					fontSize: 'var(--wpds-typography-font-size-sm)',
+				} }
+			>
+				{ `Label: ${ label }` }
+			</span>
+			<div
+				style={ {
+					display: 'flex',
+					flexWrap: 'wrap',
+					gap: 'var(--wpds-dimension-gap-xs)',
+					fontSize: 'var(--wpds-typography-font-size-xs)',
+					fontWeight: 'var(--wpds-typography-font-weight-emphasis)',
+					textTransform: 'uppercase',
+				} }
+			>
+				{ INSTANCE_OPERATIONS.map( ( operation ) => {
+					const denied = locks.includes( operation );
+					return (
+						<span
+							key={ operation }
+							style={ {
+								backgroundColor: denied
+									? 'var(--wpds-color-background-surface-error-weak)'
+									: 'var(--wpds-color-background-surface-success-weak)',
+								borderRadius: 'var(--wpds-border-radius-sm)',
+								color: denied
+									? 'var(--wpds-color-foreground-content-error)'
+									: 'var(--wpds-color-foreground-content-success)',
+								paddingInline:
+									'var(--wpds-dimension-padding-xs)',
+							} }
+						>
+							{ `${ denied ? '✕' : '✓' } ${ operation }` }
+						</span>
+					);
+				} ) }
+			</div>
+		</div>
+	);
+}
+
+const lockCardWidgetType: WidgetType = {
+	apiVersion: 1,
+	name: 'demo/lock-card',
+	title: 'Lock Card',
+	description:
+		'Shows its canonical position and which operations the policy allows on it.',
+	icon: lockOutline,
+	renderModule: 'demo/widgets/lock-card/render',
+	attributes: [
+		{ id: 'label', label: 'Label', type: 'text', relevance: 'high' },
+	] as WidgetType[ 'attributes' ],
+	example: {
+		attributes: { label: 'Example' },
+	},
 };
 
 const ENFORCEMENT_LAYOUT: DashboardWidget[] = [
 	{
-		uuid: 'free-goal',
-		type: 'demo/goal-progress',
-		attributes: { metric: 'revenue', target: '5000' },
+		uuid: 'card-alpha',
+		type: 'demo/lock-card',
+		attributes: { label: 'Alpha' },
 		placement: { width: 1, height: 1 },
 	},
 	{
-		uuid: 'pinned-snapshot',
-		type: 'demo/traffic-snapshot',
-		attributes: {
-			metric: 'views',
-			period: 'week',
-			label: 'Traffic',
-			note: 'Pinned: cannot be moved',
-		},
+		uuid: 'card-bravo',
+		type: 'demo/lock-card',
+		attributes: { label: 'Bravo' },
 		placement: { width: 2, height: 1 },
 	},
 	{
-		uuid: 'fixed-size-snapshot',
-		type: 'demo/traffic-snapshot',
-		attributes: {
-			metric: 'visitors',
-			period: 'month',
-			label: 'Audience',
-			note: 'Cannot be resized',
-		},
+		uuid: 'card-charlie',
+		type: 'demo/lock-card',
+		attributes: { label: 'Charlie' },
 		placement: { width: 1, height: 1 },
 	},
 	{
-		uuid: 'protected-snapshot',
-		type: 'demo/traffic-snapshot',
-		attributes: {
-			metric: 'orders',
-			period: 'day',
-			label: 'Orders',
-			note: 'Cannot be removed or edited',
-		},
+		uuid: 'card-delta',
+		type: 'demo/lock-card',
+		attributes: { label: 'Delta' },
 		placement: { width: 1, height: 1 },
 	},
 ];
-
-/* One lock set per tile; inserting Goal Progress is rejected. */
-const enforcementPolicy: CanPerformDashboardOperation = ( request ) => {
-	if ( request.operation === 'insert' ) {
-		return request.widgetType.name !== goalProgressWidgetType.name;
-	}
-	if ( ! ( 'widget' in request ) ) {
-		return true;
-	}
-	return ! TILE_LOCKS[ request.widget.uuid ]?.includes( request.operation );
-};
 
 let stagedInstances = 0;
 
@@ -943,12 +1014,12 @@ function RogueTriggers() {
 				onClick={ () =>
 					onLayoutChange(
 						layout.filter(
-							( widget ) => widget.uuid !== 'protected-snapshot'
+							( widget ) => widget.uuid !== 'card-delta'
 						)
 					)
 				}
 			>
-				Remove the protected tile
+				Remove the Delta card
 			</Button>
 			<Button
 				variant="secondary"
@@ -1002,17 +1073,13 @@ function RogueTriggers() {
 				size="compact"
 				onClick={ () =>
 					insert( {
-						type: 'demo/traffic-snapshot',
-						attributes: {
-							metric: 'views',
-							period: 'day',
-							label: 'Staged',
-						},
+						type: 'demo/lock-card',
+						attributes: { label: 'Staged' },
 						placement: { width: 1, height: 1 },
 					} )
 				}
 			>
-				Insert a snapshot (allowed)
+				Insert a card (allowed)
 			</Button>
 			<Button
 				variant="secondary"
@@ -1025,53 +1092,123 @@ function RogueTriggers() {
 	);
 }
 
-function StagingEnforcementStory() {
+interface StagingEnforcementArgs {
+	alpha?: DashboardInstanceOperation[];
+	bravo?: DashboardInstanceOperation[];
+	charlie?: DashboardInstanceOperation[];
+	delta?: DashboardInstanceOperation[];
+}
+
+function StagingEnforcementStory( {
+	alpha = [],
+	bravo = [],
+	charlie = [],
+	delta = [],
+}: StagingEnforcementArgs ) {
 	const [ layout, setLayout ] =
 		useState< DashboardWidget[] >( ENFORCEMENT_LAYOUT );
 	const [ editMode, setEditMode ] = useState( false );
 
+	const tileLocks = useMemo< TileLocks >(
+		() => ( {
+			'card-alpha': alpha,
+			'card-bravo': bravo,
+			'card-charlie': charlie,
+			'card-delta': delta,
+		} ),
+		[ alpha, bravo, charlie, delta ]
+	);
+
+	// Inserting Goal Progress is rejected; instance operations follow
+	// the per-card locks from the story controls.
+	const canPerform = useMemo< CanPerformDashboardOperation >(
+		() => ( request ) => {
+			if ( request.operation === 'insert' ) {
+				return request.widgetType.name !== goalProgressWidgetType.name;
+			}
+			if ( ! ( 'widget' in request ) ) {
+				return true;
+			}
+			return ! tileLocks[ request.widget.uuid ]?.includes(
+				request.operation
+			);
+		},
+		[ tileLocks ]
+	);
+
 	return (
-		<WidgetDashboard.Policy canPerform={ enforcementPolicy }>
-			<WidgetDashboard
-				widgetTypes={ [
-					trafficSnapshotWidgetType,
-					goalProgressWidgetType,
-				] }
-				layout={ layout }
-				onLayoutChange={ setLayout }
-				editMode={ editMode }
-				onEditChange={ setEditMode }
-				resolveWidgetModule={ resolveDemoModule }
-				gridSettings={ { model: 'grid', rowHeight: 200 } }
-			>
-				<div
-					style={ {
-						display: 'flex',
-						flexWrap: 'wrap',
-						alignItems: 'flex-start',
-						justifyContent: 'space-between',
-						gap: 'var(--wpds-dimension-gap-md)',
-						marginBlockEnd: 'var(--wpds-dimension-gap-md)',
-					} }
+		<TileLocksContext.Provider value={ tileLocks }>
+			<WidgetDashboard.Policy canPerform={ canPerform }>
+				<WidgetDashboard
+					widgetTypes={ [
+						lockCardWidgetType,
+						goalProgressWidgetType,
+					] }
+					layout={ layout }
+					onLayoutChange={ setLayout }
+					editMode={ editMode }
+					onEditChange={ setEditMode }
+					resolveWidgetModule={ resolveDemoModule }
+					gridSettings={ { model: 'grid', rowHeight: 200 } }
 				>
-					<RogueTriggers />
-					<WidgetDashboard.Actions />
-				</div>
-				<WidgetDashboard.Widgets />
-			</WidgetDashboard>
-		</WidgetDashboard.Policy>
+					<div
+						style={ {
+							display: 'flex',
+							flexWrap: 'wrap',
+							alignItems: 'flex-start',
+							justifyContent: 'space-between',
+							gap: 'var(--wpds-dimension-gap-md)',
+							marginBlockEnd: 'var(--wpds-dimension-gap-md)',
+						} }
+					>
+						<RogueTriggers />
+						<WidgetDashboard.Actions />
+					</div>
+					<WidgetDashboard.Widgets />
+				</WidgetDashboard>
+			</WidgetDashboard.Policy>
+		</TileLocksContext.Provider>
 	);
 }
 
-export const StagingEnforcement: StoryObj< typeof WidgetDashboard > = {
-	render: () => <StagingEnforcementStory />,
+const lockControl = {
+	control: 'check' as const,
+	options: INSTANCE_OPERATIONS,
+};
+
+export const StagingEnforcement: StoryObj< StagingEnforcementArgs > = {
+	render: ( args ) => <StagingEnforcementStory { ...args } />,
+	args: {
+		alpha: [],
+		bravo: [ 'move' ],
+		charlie: [ 'resize' ],
+		delta: [ 'remove', 'edit' ],
+	},
+	argTypes: {
+		alpha: {
+			...lockControl,
+			description: 'Operations denied on the Alpha card.',
+		},
+		bravo: {
+			...lockControl,
+			description: 'Operations denied on the Bravo card.',
+		},
+		charlie: {
+			...lockControl,
+			description: 'Operations denied on the Charlie card.',
+		},
+		delta: {
+			...lockControl,
+			description: 'Operations denied on the Delta card.',
+		},
+	},
 	parameters: {
 		docs: {
 			description: {
 				story: `
-Three tiles carry one instance lock each and state it in their body: **Pinned** (second position) cannot move, **Fixed size** cannot resize, **Protected** cannot be removed or edited; the goal tile is free. Enter Customize to see the locks on the chrome: the pinned tile refuses to drag and holds its index while the others reorder around it, the fixed-size tile offers no resize handle or width menu, the protected tile has no Remove control, and the inserter rejects Goal Progress.
+Every tile is a **Lock Card**: it shows its live position in the canonical order and one chip per instance operation, ✓ when the policy allows it and ✕ when it denies it. The controls edit each card's denied operations; by default Bravo cannot move, Charlie cannot resize, Delta cannot be removed or edited, and Alpha is free. Enter Customize to see the same locks on the chrome: a move-denied card refuses to drag and holds its position while the others reorder around it, a resize-denied card offers no resize handle or width menu, a remove-denied card has no Remove control, and the inserter rejects Goal Progress.
 
-The buttons bypass the chrome and write to the engine's staging directly, which is what the staging enforcement exists for: reversing holds Pinned in its position, the width sweep skips Fixed size, the rename skips Protected, removing Protected re-asserts it, and the rejected insertion never lands while the allowed one does.
+The buttons bypass the chrome and write to the engine's staging directly, which is what the staging enforcement exists for: with the default locks, reversing holds Bravo in place, the width sweep skips Charlie, the rename skips Delta, and removing Delta re-asserts it, while the rejected insertion never lands and the allowed one does. Relax a lock from the controls and the same trigger goes through.
 `,
 			},
 		},
