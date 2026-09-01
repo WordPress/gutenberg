@@ -166,7 +166,7 @@ jobs:
                   # dimension so flakiness.io keeps a separate history per Node
                   # version in the matrix.
                   FK_ENV_NODEJS: ${{ matrix.node }}
-              run: npm run test:unit:date -- --ci --maxWorkers="$(nproc)" --cacheDirectory="$HOME/.jest-cache"
+              run: npm run test:unit:date -- --maxWorkers="$(nproc)"
 
     compute-previous-wordpress-version:
         name: Compute previous WordPress version

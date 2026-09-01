@@ -1,19 +1,30 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { run } from '../run.ts';
-import { GitHubAPI } from '../github-api.ts';
 
-jest.mock( '../github-api.ts', () => ( {
-	GitHubAPI: jest.fn(),
+const api = vi.hoisted( () => ( {
+	getHeadSha: vi.fn(),
+	findComment: vi.fn(),
+	createComment: vi.fn(),
+	updateComment: vi.fn(),
+	deleteComment: vi.fn(),
 } ) );
 
-const HEAD = 'a'.repeat( 40 );
+vi.mock( import( '../github-api.ts' ), async ( importOriginal ) => {
+	const original = await importOriginal();
 
-const api = {
-	getHeadSha: jest.fn(),
-	findComment: jest.fn(),
-	createComment: jest.fn(),
-	updateComment: jest.fn(),
-	deleteComment: jest.fn(),
-};
+	return {
+		...original,
+		GitHubAPI: vi.fn(
+			class MockGitHubAPI {
+				constructor() {
+					return api;
+				}
+			}
+		) as unknown as typeof original.GitHubAPI,
+	};
+} );
+
+const HEAD = 'a'.repeat( 40 );
 
 function withInputs( inputs: Record< string, string > ) {
 	for ( const [ name, value ] of Object.entries( inputs ) ) {
@@ -23,8 +34,9 @@ function withInputs( inputs: Record< string, string > ) {
 
 describe( 'run', () => {
 	beforeEach( () => {
-		jest.clearAllMocks();
-		( GitHubAPI as jest.Mock ).mockImplementation( () => api );
+		for ( const mock of Object.values( api ) ) {
+			mock.mockReset();
+		}
 		process.env.GITHUB_REPOSITORY = 'WordPress/gutenberg';
 		api.getHeadSha.mockResolvedValue( HEAD );
 		api.findComment.mockResolvedValue( undefined );

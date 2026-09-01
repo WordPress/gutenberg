@@ -2,6 +2,37 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   DataForm: a combined form field (one with `children`) is now treated purely as a layout container. Its `id` is no longer resolved against the field definitions: a field sharing that `id` no longer contributes validation rules to the group, and the `panel` layout no longer uses it for the collapsed summary or `readOnly` state, falling back to the group's first leaf child instead ([#82175](https://github.com/WordPress/gutenberg/pull/82175)).
+
+    If a combined field relied on sharing its `id` with a field to pick the panel summary, declare it through `layout.summary` instead. For example, a `discussion` field whose `render` summarizes `comment_status` and `ping_status` together:
+
+    ```js
+    // Before: the summary came from the `discussion` field because the group shares its id.
+    const form = {
+    	layout: { type: 'panel' },
+    	fields: [
+    		{ id: 'discussion', children: [ 'comment_status', 'ping_status' ] },
+    	],
+    };
+
+    // After: the summary field is explicit. Without it, the group would
+    // now be summarized by its first child, `comment_status`.
+    const form = {
+    	layout: { type: 'panel' },
+    	fields: [
+    		{
+    			id: 'discussion',
+    			layout: { type: 'panel', summary: 'discussion' },
+    			children: [ 'comment_status', 'ping_status' ],
+    		},
+    	],
+    };
+    ```
+
+    If a combined field relied on a same-id field's `isValid` rules being applied to the group, move those rules to the child fields.
+
 ### Internal
 
 -   Remove unused dependency `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).

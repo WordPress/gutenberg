@@ -1,10 +1,29 @@
-import { setOutput } from '@actions/core';
-import firstTimeContributorAccountLink from '../';
-import hasWordPressProfile from '../../../has-wordpress-profile';
-
-jest.mock( '../../../has-wordpress-profile', () => jest.fn() );
-jest.mock( '@actions/core', () => ( { setOutput: jest.fn() } ) );
-
+import { createRequire } from 'node:module';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+const require = createRequire( import.meta.url );
+const actionsCorePath = require.resolve( '@actions/core' );
+const originalActionsCore = require( actionsCorePath );
+const setOutput = vi.fn();
+const hasWordPressProfile = vi.fn();
+const hasWordPressProfilePath = require.resolve(
+	'../../../has-wordpress-profile'
+);
+const originalHasWordPressProfile = require( hasWordPressProfilePath );
+const taskPath = require.resolve( '../' );
+let firstTimeContributorAccountLink;
+try {
+	require.cache[ actionsCorePath ].exports = {
+		...originalActionsCore,
+		setOutput,
+	};
+	require.cache[ hasWordPressProfilePath ].exports = hasWordPressProfile;
+	firstTimeContributorAccountLink = require( taskPath );
+} finally {
+	require.cache[ actionsCorePath ].exports = originalActionsCore;
+	require.cache[ hasWordPressProfilePath ].exports =
+		originalHasWordPressProfile;
+	delete require.cache[ taskPath ];
+}
 const botUser = {
 	data: {
 		name: 'Ghost',
@@ -58,10 +77,10 @@ describe( 'firstTimeContributorAccountLink', () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn(),
+					listCommits: vi.fn(),
 				},
 				users: {
-					getByUsername: jest.fn( () => humanUser ),
+					getByUsername: vi.fn( () => humanUser ),
 				},
 			},
 		};
@@ -90,10 +109,10 @@ describe( 'firstTimeContributorAccountLink', () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn(),
+					listCommits: vi.fn(),
 				},
 				users: {
-					getByUsername: jest.fn( () => humanUser ),
+					getByUsername: vi.fn( () => humanUser ),
 				},
 			},
 		};
@@ -108,11 +127,11 @@ describe( 'firstTimeContributorAccountLink', () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn(),
+					listCommits: vi.fn(),
 				},
 				users: {
 					// Return a bot when `getByUsername` is called.
-					getByUsername: jest.fn( () => botUser ),
+					getByUsername: vi.fn( () => botUser ),
 				},
 			},
 		};
@@ -129,7 +148,7 @@ describe( 'firstTimeContributorAccountLink', () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn( () =>
+					listCommits: vi.fn( () =>
 						Promise.resolve( {
 							data: [
 								{
@@ -143,7 +162,7 @@ describe( 'firstTimeContributorAccountLink', () => {
 					),
 				},
 				users: {
-					getByUsername: jest.fn( () => humanUser ),
+					getByUsername: vi.fn( () => humanUser ),
 				},
 			},
 		};
@@ -165,7 +184,7 @@ describe( 'firstTimeContributorAccountLink', () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn( () =>
+					listCommits: vi.fn( () =>
 						Promise.resolve( {
 							data: [
 								{
@@ -176,7 +195,7 @@ describe( 'firstTimeContributorAccountLink', () => {
 					),
 				},
 				users: {
-					getByUsername: jest.fn( () => humanUser ),
+					getByUsername: vi.fn( () => humanUser ),
 				},
 			},
 		};
@@ -202,7 +221,7 @@ describe( 'firstTimeContributorAccountLink', () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn( () =>
+					listCommits: vi.fn( () =>
 						Promise.resolve( {
 							data: [
 								{
@@ -213,7 +232,7 @@ describe( 'firstTimeContributorAccountLink', () => {
 					),
 				},
 				users: {
-					getByUsername: jest.fn( () => humanUser ),
+					getByUsername: vi.fn( () => humanUser ),
 				},
 			},
 		};

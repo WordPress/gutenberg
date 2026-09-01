@@ -147,7 +147,8 @@
 		"@testing-library/user-event": "^14.6.1",
 		"@wordpress/integration-tests": "file:../../test/integration",
 		"@wordpress/stylelint-tools": "file:../../tools/stylelint",
-		"deep-freeze": "^0.0.1"
+		"deep-freeze": "^0.0.1",
+		"vitest": "^4.1.10"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",
