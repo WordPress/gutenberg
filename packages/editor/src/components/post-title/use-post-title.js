@@ -1,4 +1,5 @@
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
+import { useEntityProp } from '@wordpress/core-data';
 import { store as editorStore } from '../../store';
 
 /**
@@ -7,18 +8,22 @@ import { store as editorStore } from '../../store';
  * @return {Object} An object containing the current title and a function to update the title.
  */
 export default function usePostTitle() {
-	const { editPost } = useDispatch( editorStore );
-	const { title } = useSelect( ( select ) => {
-		const { getEditedPostAttribute } = select( editorStore );
+	const { postType, postId } = useSelect( ( select ) => {
+		const { getCurrentPostType, getCurrentPostId } = select( editorStore );
 
 		return {
-			title: getEditedPostAttribute( 'title' ),
+			postType: getCurrentPostType(),
+			postId: getCurrentPostId(),
 		};
 	}, [] );
 
-	function updateTitle( newTitle ) {
-		editPost( { title: newTitle } );
-	}
+	const [ title, setTitle ] = useEntityProp(
+		'postType',
+		postType,
+		'title',
+		postId,
+		{ coalesceEdits: true }
+	);
 
-	return { title, setTitle: updateTitle };
+	return { title, setTitle };
 }
