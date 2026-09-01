@@ -35,6 +35,10 @@
 
 -   Exclude the JavaScript tests and story from the build project so their declarations are not published. ([#81516](https://github.com/WordPress/gutenberg/pull/81516))
 
+### Bug Fixes
+
+-   Font Library: Keep deactivated theme font variants listed in the font details view so they can be activated again, and count them in the family card's "N of M active" text. Deactivating a variant removes it from the user's global styles, so the modal previously looked fonts up in the activated fonts only, and an unchecked variant (or a fully deactivated family) vanished ([#82091](https://github.com/WordPress/gutenberg/pull/82091)).
+
 ## 1.20.0 (2026-08-12)
 
 ### Internal

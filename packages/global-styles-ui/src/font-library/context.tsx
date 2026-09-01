@@ -86,6 +86,13 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 		Record< string, FontFamilyPreset[] > | undefined
 	>( 'typography.fontFamilies' );
 
+	// The theme.json font families, before any user activation/deactivation is
+	// applied. Deactivating a font removes it from the user's global styles, so
+	// this is the only complete list of the fonts a theme provides.
+	const [ baseFontFamilies ] = useSetting<
+		Record< string, FontFamilyPreset[] > | undefined
+	>( 'typography.fontFamilies', undefined, 'base' );
+
 	/*
 	 * Save the font families to the database.
 
@@ -133,6 +140,20 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 				.sort( ( a, b ) => a.name.localeCompare( b.name ) )
 		: [];
 
+	// The theme fonts as declared by the theme, merged with the ones the user
+	// has activated. Deactivating a variant removes it from the user's global
+	// styles, so `themeFonts` alone can't describe the full set of variants a
+	// theme offers. Merging (rather than replacing) keeps fonts that only an
+	// applied style variation defines, and unions the variants of both.
+	const baseThemeFonts = baseFontFamilies?.theme
+		? mergeFontFamilies(
+				baseFontFamilies.theme.map( ( f ) =>
+					setUIValuesNeeded( f, { source: 'theme' } )
+				),
+				themeFonts
+		  ).sort( ( a, b ) => a.name.localeCompare( b.name ) )
+		: themeFonts;
+
 	const customFonts = fontFamilies?.custom
 		? fontFamilies.custom
 				.map( ( f ) => setUIValuesNeeded( f, { source: 'custom' } ) )
@@ -158,7 +179,8 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 			return;
 		}
 
-		const fonts = font.source === 'theme' ? themeFonts : baseCustomFonts;
+		const fonts =
+			font.source === 'theme' ? baseThemeFonts : baseCustomFonts;
 
 		// Tries to find the font in the installed fonts
 		const fontSelected = fonts.find( ( f ) => f.slug === font.slug );
