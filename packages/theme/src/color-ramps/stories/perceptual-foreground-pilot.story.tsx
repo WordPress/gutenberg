@@ -75,21 +75,6 @@ const METHOD_DETAILS: Record<
 		description:
 			'Uses five equal intervals ending at the legacy strong endpoint.',
 	},
-	'state-skewed': {
-		label: 'State-skewed APCA · fixed Step 5',
-		description:
-			'Reserves 40% of the APCA range for the resting-to-active transition ending at the legacy strong endpoint.',
-	},
-	'state-skewed-relative-chroma': {
-		label: 'State-skewed APCA · relative chroma',
-		description:
-			"Uses the same state spacing and fixed Step 5, while Steps 1–4 preserve the seed's share of available sRGB chroma.",
-	},
-	'uniform-free-endpoint': {
-		label: 'Uniform APCA · released Step 5',
-		description:
-			'Uses equal intervals and the least-extreme Step 5 that supports useful spacing.',
-	},
 	'semantic-anchors': {
 		label: 'Semantic anchors',
 		description:
@@ -99,6 +84,21 @@ const METHOD_DETAILS: Record<
 		label: 'Eased APCA',
 		description:
 			'Uses progressively larger intervals toward the fixed strong endpoint.',
+	},
+	'uniform-free-endpoint': {
+		label: 'Uniform APCA · released Step 5',
+		description:
+			'Uses equal intervals and the least-extreme Step 5 that supports useful spacing.',
+	},
+	'state-skewed': {
+		label: 'State-skewed APCA · fixed Step 5',
+		description:
+			'Reserves 40% of the APCA range for the resting-to-active transition ending at the legacy strong endpoint.',
+	},
+	'state-skewed-relative-chroma': {
+		label: 'State-skewed APCA · relative chroma',
+		description:
+			"Uses the same state spacing and fixed Step 5, while Steps 1–4 preserve the seed's share of available sRGB chroma.",
 	},
 };
 

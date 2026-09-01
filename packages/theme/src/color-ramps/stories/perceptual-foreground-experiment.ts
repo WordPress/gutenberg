@@ -21,11 +21,11 @@ import { solveWithBisect } from '../lib/utils';
 export const EXPERIMENTAL_FOREGROUND_METHODS = [
 	'current',
 	'uniform',
-	'state-skewed',
-	'state-skewed-relative-chroma',
-	'uniform-free-endpoint',
 	'semantic-anchors',
 	'eased',
+	'uniform-free-endpoint',
+	'state-skewed',
+	'state-skewed-relative-chroma',
 ] as const;
 
 export type ExperimentalForegroundMethod =
