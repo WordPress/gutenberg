@@ -417,10 +417,6 @@ test.describe( 'Change detection', () => {
 			.getByRole( 'menu' )
 			.getByRole( 'menuitem', { name: 'Trash' } )
 			.click();
-		await page
-			.getByRole( 'dialog' )
-			.getByRole( 'button', { name: 'Trash' } )
-			.click();
 
 		await expect( page ).toHaveURL( 'wp-admin/edit.php?post_type=post' );
 	} );
