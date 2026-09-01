@@ -221,7 +221,13 @@ describe( 'DateTime control', () => {
 
 		it( 'should start a datetime selected from the calendar at midnight', async () => {
 			setSiteOffset( -8 );
-			const user = userEvent.setup();
+			// Freeze the clock: with no value the calendar opens on the
+			// current month, and the day clicked below must be in it.
+			jest.useFakeTimers();
+			jest.setSystemTime( new Date( '2026-08-15T12:00:00.000Z' ) );
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
 
 			render( <DateTimeHarness initialValue="" /> );
 
