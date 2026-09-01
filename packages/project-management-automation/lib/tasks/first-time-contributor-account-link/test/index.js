@@ -1,7 +1,9 @@
+import { setOutput } from '@actions/core';
 import firstTimeContributorAccountLink from '../';
 import hasWordPressProfile from '../../../has-wordpress-profile';
 
 jest.mock( '../../../has-wordpress-profile', () => jest.fn() );
+jest.mock( '@actions/core', () => ( { setOutput: jest.fn() } ) );
 
 const botUser = {
 	data: {
@@ -22,6 +24,7 @@ const humanUser = {
 
 describe( 'firstTimeContributorAccountLink', () => {
 	beforeEach( () => {
+		setOutput.mockReset();
 		hasWordPressProfile.mockReset();
 	} );
 
@@ -142,9 +145,6 @@ describe( 'firstTimeContributorAccountLink', () => {
 				users: {
 					getByUsername: jest.fn( () => humanUser ),
 				},
-				issues: {
-					createComment: jest.fn(),
-				},
 			},
 		};
 
@@ -158,7 +158,7 @@ describe( 'firstTimeContributorAccountLink', () => {
 			repo: 'gutenberg',
 			author: 'ghost',
 		} );
-		expect( octokit.rest.issues.createComment ).not.toHaveBeenCalled();
+		expect( setOutput ).not.toHaveBeenCalled();
 	} );
 
 	it( 'aborts if the request to retrieve WordPress.org user profile fails', async () => {
@@ -178,9 +178,6 @@ describe( 'firstTimeContributorAccountLink', () => {
 				users: {
 					getByUsername: jest.fn( () => humanUser ),
 				},
-				issues: {
-					createComment: jest.fn(),
-				},
 			},
 		};
 
@@ -198,7 +195,7 @@ describe( 'firstTimeContributorAccountLink', () => {
 			repo: 'gutenberg',
 			author: 'ghost',
 		} );
-		expect( octokit.rest.issues.createComment ).not.toHaveBeenCalled();
+		expect( setOutput ).not.toHaveBeenCalled();
 	} );
 
 	it( 'prompts the user to link their GitHub account to their WordPress.org profile', async () => {
@@ -218,9 +215,6 @@ describe( 'firstTimeContributorAccountLink', () => {
 				users: {
 					getByUsername: jest.fn( () => humanUser ),
 				},
-				issues: {
-					createComment: jest.fn(),
-				},
 			},
 		};
 
@@ -236,11 +230,13 @@ describe( 'firstTimeContributorAccountLink', () => {
 			repo: 'gutenberg',
 			author: 'ghost',
 		} );
-		expect( octokit.rest.issues.createComment ).toHaveBeenCalledWith( {
-			owner: 'WordPress',
-			repo: 'gutenberg',
-			issue_number: 123,
-			body: expect.stringMatching( /^Congratulations/ ),
-		} );
+		expect( setOutput ).toHaveBeenCalledWith(
+			'first-time-contributor-prompt',
+			expect.stringMatching( /^Congratulations/ )
+		);
+		expect( setOutput ).toHaveBeenCalledWith(
+			'first-time-contributor-pr-number',
+			123
+		);
 	} );
 } );
