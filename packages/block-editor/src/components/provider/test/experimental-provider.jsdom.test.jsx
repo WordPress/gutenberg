@@ -66,7 +66,7 @@ describe( 'BlockEditorProvider', () => {
 	it( 'preserves deprecated getters incoming from the settings reducer', async () => {
 		const consoleWarn = vi
 			.spyOn( global.console, 'warn' )
-			.mockImplementation();
+			.mockImplementation( () => {} );
 
 		const { container } = render(
 			<BlockEditorProvider

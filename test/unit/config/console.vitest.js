@@ -87,11 +87,16 @@ expect.extend(
 );
 
 function setConsoleMethodSpy( [ methodName, matcherName ] ) {
-	const spy = vi
-		.spyOn( console, methodName )
-		.mockName( `console.${ methodName }` );
+	let spy;
 
 	function resetSpy() {
+		// eslint-disable-next-line no-console
+		if ( console[ methodName ] !== spy ) {
+			spy = vi
+				.spyOn( console, methodName )
+				.mockName( `console.${ methodName }` );
+		}
+
 		spy.mockReset();
 		spy.mockImplementation( () => undefined );
 		spy.assertionsNumber = 0;

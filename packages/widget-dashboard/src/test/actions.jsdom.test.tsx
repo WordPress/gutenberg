@@ -7,7 +7,10 @@ import type { WidgetType } from '@wordpress/widget-primitives';
 import { WidgetDashboard } from '../widget-dashboard';
 import type { CanPerformDashboardOperation, DashboardWidget } from '../types';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+vi.hoisted( () => {
+	globalThis.wpVitest.mockMatchMedia();
+	globalThis.wpVitest.mockCSSSupports();
+} );
 
 const widgetTypes: WidgetType[] = [];
 

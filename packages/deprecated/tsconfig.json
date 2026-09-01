@@ -1,8 +1,9 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.dev.base.json",
-	// Ambient declarations for the custom matchers of @wordpress/jest-console.
-	"files": [ "../jest-console/declarations.d.ts" ],
+	"compilerOptions": {
+		"types": [ "gutenberg-vitest-test-env" ]
+	},
 	"references": [
 		{ "path": "./tsconfig.build.json" },
 		{ "path": "../hooks" }
