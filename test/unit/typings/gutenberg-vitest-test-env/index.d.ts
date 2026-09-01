@@ -1,4 +1,5 @@
 import 'vitest';
+import type { TestingLibraryMatchers } from '@testing-library/jest-dom/matchers';
 
 interface GutenbergVitestMatchers {
 	toBePositionedPopover: () => void;
@@ -29,6 +30,7 @@ declare global {
 }
 
 declare module 'vitest' {
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	interface Matchers< T = any > extends GutenbergVitestMatchers {}
+	interface Matchers< T = any >
+		extends GutenbergVitestMatchers,
+			TestingLibraryMatchers< T, void > {}
 }
