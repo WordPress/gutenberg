@@ -141,20 +141,20 @@
 		cursor: var(--wpds-cursor-control);
 
 		svg {
-			fill: var(--wpds-color-foreground-interactive-neutral);
+			color: var(--wpds-color-foreground-interactive-neutral);
 		}
 
 		&:hover,
 		&:focus {
 			background: var(--wpds-color-background-interactive-neutral-weak-active);
 			svg {
-				fill: var(--wpds-color-foreground-interactive-neutral-active);
+				color: var(--wpds-color-foreground-interactive-neutral-active);
 			}
 		}
 
 		&.has-values {
 			svg {
-				fill: var(--wpds-color-foreground-interactive-brand);
+				color: var(--wpds-color-foreground-interactive-brand);
 			}
 			&:hover {
 				background: var(--wpds-color-background-interactive-brand-weak-active);
@@ -311,7 +311,7 @@
 			svg {
 				--checkmark-size: var(--checkbox-size);
 
-				fill: var(--wpds-color-foreground-interactive-neutral-strong);
+				color: var(--wpds-color-foreground-interactive-neutral-strong);
 				position: absolute;
 				left: 50%;
 				top: 50%;

@@ -41,6 +41,7 @@
 
 ### Bug Fix
 
+-   Color filter and selected-option icons with `color` rather than `fill`, so they stay visible now that those icons are stroke-based. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
 -   DataViews: Scope the search field's fixed width to the default UI search row ([#82128](https://github.com/WordPress/gutenberg/pull/82128)).
 
 ## 18.1.0 (2026-08-26)
