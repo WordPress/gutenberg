@@ -110,11 +110,11 @@
             - className
             - finalFocus
             - initialFocus
-            - popupWidth
             - portal
             - positioner
             - render
             - style
+            - width
       - name: Autocomplete.Portal
         props:
             - className
