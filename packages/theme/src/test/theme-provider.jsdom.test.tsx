@@ -34,8 +34,8 @@ const BORDER_RADIUS_SM = '--wpds-border-radius-sm';
 const PRIMARY = '#1e90ff';
 const OTHER_PRIMARY = '#8e44ad';
 const BACKGROUND = '#f8f8f8';
-const INACCESSIBLE_PRIMARY = '#608010';
-const INACCESSIBLE_BACKGROUND = '#4f386e';
+const FORMER_WARNING_PRIMARY = '#608010';
+const FORMER_WARNING_BACKGROUND = '#4f386e';
 const ACCESSIBLE_PRIMARY = '#3858e9';
 const ACCESSIBLE_BACKGROUND = '#fcfcfc';
 
@@ -168,7 +168,7 @@ describe( 'ThemeProvider', () => {
 		expect( onColorWarnings ).not.toHaveBeenCalled();
 	} );
 
-	it( 'reports color warnings through the callback', () => {
+	it( 'does not report warnings for accessible active fill pairs', () => {
 		const onColorWarnings = jest.fn<
 			void,
 			[ readonly ThemeProviderColorWarning[] ]
@@ -176,33 +176,14 @@ describe( 'ThemeProvider', () => {
 		const { rerender } = render(
 			<ThemeProvider
 				color={ {
-					primary: INACCESSIBLE_PRIMARY,
-					background: INACCESSIBLE_BACKGROUND,
+					primary: FORMER_WARNING_PRIMARY,
+					background: FORMER_WARNING_BACKGROUND,
 				} }
 				onColorWarnings={ onColorWarnings }
 			/>
 		);
 
-		const warning = onColorWarnings.mock.calls[ 0 ][ 0 ].find(
-			( item ) =>
-				item.type === 'contrast' &&
-				item.backgroundToken ===
-					'background.interactive.brand-strong-active'
-		);
-
-		expect( warning ).toEqual(
-			expect.objectContaining( {
-				type: 'contrast',
-				backgroundToken: 'background.interactive.brand-strong-active',
-				foregroundToken: 'foreground.interactive.brand-strong-active',
-				requiredContrast: 4.5,
-			} )
-		);
-		expect(
-			warning?.type === 'contrast'
-				? warning.achievedContrast
-				: Number.POSITIVE_INFINITY
-		).toBeLessThan( 4.5 );
+		expect( onColorWarnings ).toHaveBeenCalledWith( [] );
 
 		onColorWarnings.mockClear();
 		rerender(

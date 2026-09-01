@@ -3,6 +3,7 @@ import {
 	contrastAPCA,
 	deltaEOK2,
 	get,
+	getLuminance,
 	serialize,
 	to,
 	HSL,
@@ -44,6 +45,21 @@ function getPerceptualContrastMagnitude(
 	foreground: string
 ) {
 	return Math.abs( contrastAPCA( background, foreground ) );
+}
+
+function expectAccessibleFillStates( ramp: ReturnType< typeof buildRamp > ) {
+	expect( getLuminance( ramp.ramp.bgFill2 ) ).toBeLessThan(
+		getLuminance( ramp.ramp.bgFill1 )
+	);
+	expect(
+		getContrast( ramp.ramp.bgFill1, ramp.ramp.bgFill2 )
+	).toBeGreaterThanOrEqual( 1.2 );
+	expect(
+		getContrast( ramp.ramp.bgFill1, ramp.ramp.fgFill )
+	).toBeGreaterThanOrEqual( 4.5 );
+	expect(
+		getContrast( ramp.ramp.bgFill2, ramp.ramp.fgFill )
+	).toBeGreaterThanOrEqual( 4.5 );
 }
 
 function getForegroundConstraintReferences(
@@ -104,6 +120,7 @@ describe( 'buildRamps', () => {
 				const ramp = buildRamp( bg, BG_RAMP_CONFIG );
 				const seedOriginal = getColorString( bg );
 				const seedComputed = getColorString( ramp.ramp.surface2 );
+				expectAccessibleFillStates( ramp );
 
 				return {
 					input: {
@@ -171,6 +188,7 @@ describe( 'buildRamps', () => {
 					const ramp = buildRamp( primary, ACCENT_RAMP_CONFIG, o );
 					const seedOriginal = getColorString( primary );
 					const seedComputed = getColorString( ramp.ramp.bgFill1 );
+					expectAccessibleFillStates( ramp );
 
 					return {
 						input: {
@@ -297,18 +315,64 @@ describe( 'buildRamps', () => {
 		}
 	);
 
-	it( 'includes active fills when checking accessible combinations', () => {
-		const bgRamp = buildBgRamp( '#4f386e' );
-		const accentRamp = buildAccentRamp( '#608010', bgRamp );
+	it.each( [
+		{ background: '#1e1e1e', primary: '#3858e9' },
+		{ background: '#4f386e', primary: '#608010' },
+		{ background: '#5b534d', primary: '#916745' },
+	] )(
+		'keeps active fills darker and both foreground pairs accessible for $background and $primary',
+		( { background, primary } ) => {
+			const backgroundRamp = buildBgRamp( background );
+			const ramps = [
+				backgroundRamp,
+				buildAccentRamp( primary, backgroundRamp ),
+				buildAccentRamp( DEFAULT_SEED_COLORS.error, backgroundRamp ),
+			];
 
-		expect( checkAccessibleCombinations( { bgRamp: accentRamp } ) ).toEqual(
-			expect.arrayContaining( [
-				expect.objectContaining( {
-					bgName: 'bgFill2',
-					fgName: 'fgFill',
-					unmetContrast: 4.5,
-				} ),
-			] )
+			for ( const ramp of ramps ) {
+				expect( ramp.warnings ).toBeUndefined();
+				expectAccessibleFillStates( ramp );
+				expect(
+					checkAccessibleCombinations( { bgRamp: ramp } )
+				).not.toEqual(
+					expect.arrayContaining( [
+						expect.objectContaining( {
+							bgName: 'bgFill2',
+							fgName: 'fgFill',
+						} ),
+					] )
+				);
+			}
+		}
+	);
+
+	it( 'minimally adjusts an accent seed at the fill foreground polarity boundary', () => {
+		const seed = '#85767a';
+		const accentRamp = buildAccentRamp(
+			seed,
+			buildBgRamp( DEFAULT_SEED_COLORS.background )
 		);
+		const seedLightness = get( seed, [ OklchSrgb, 'l' ] );
+		const adjustedLightness = get( accentRamp.ramp.bgFill1, [
+			OklchSrgb,
+			'l',
+		] );
+
+		expect( accentRamp.ramp.bgFill1 ).not.toBe( seed );
+		expect( Math.abs( adjustedLightness - seedLightness ) ).toBeLessThan(
+			0.02
+		);
+		expect(
+			getContrast( accentRamp.ramp.bgFill1, accentRamp.ramp.fgFill )
+		).toBeGreaterThanOrEqual( 4.5 );
+		expect(
+			getContrast( accentRamp.ramp.bgFill2, accentRamp.ramp.fgFill )
+		).toBeGreaterThanOrEqual( 4.5 );
+		expect( getLuminance( accentRamp.ramp.bgFill2 ) ).toBeLessThan(
+			getLuminance( accentRamp.ramp.bgFill1 )
+		);
+		expect(
+			getContrast( accentRamp.ramp.bgFill1, accentRamp.ramp.bgFill2 )
+		).toBeGreaterThanOrEqual( 1.2 );
 	} );
 } );
