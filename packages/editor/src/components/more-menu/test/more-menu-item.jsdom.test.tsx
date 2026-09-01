@@ -187,6 +187,18 @@ describe( 'MoreMenuItem', () => {
 		} );
 	} );
 
+	describe( 'the legacy label', () => {
+		it( 'labels an item without children', async () => {
+			const user = userEvent.setup();
+			renderMenu( <MoreMenuItem label="Sidebar" /> );
+			await openMenu( user );
+
+			expect(
+				screen.getByRole( 'menuitem', { name: 'Sidebar' } )
+			).toBeVisible();
+		} );
+	} );
+
 	describe( 'shortcuts', () => {
 		it( 'displays a shortcut given as a string', async () => {
 			const user = userEvent.setup();

@@ -52,6 +52,13 @@ type MoreMenuItemProps = Omit<
 	isSelected?: boolean;
 
 	/**
+	 * Accessible name of the item.
+	 *
+	 * @deprecated Pass the label as `children`, or set an `aria-label`.
+	 */
+	label?: string;
+
+	/**
 	 * Callback invoked when the item is selected.
 	 */
 	onClick?: ( event?: MouseEvent< HTMLElement > ) => void;
@@ -100,11 +107,13 @@ function adaptShortcut( shortcut?: LegacyShortcut ) {
 function UnforwardedMoreMenuItem(
 	{
 		'aria-checked': ariaChecked,
+		'aria-label': ariaLabel,
 		children,
 		href,
 		icon,
 		info,
 		isSelected,
+		label,
 		onClick,
 		role,
 		shortcut,
@@ -113,7 +122,9 @@ function UnforwardedMoreMenuItem(
 	}: MoreMenuItemProps,
 	ref: ForwardedRef< HTMLDivElement >
 ) {
-	const label = <Menu.ItemLabel>{ children }</Menu.ItemLabel>;
+	// `label` named the legacy item. The menu's own `label` is typeahead text.
+	const itemLabel = <Menu.ItemLabel>{ children ?? label }</Menu.ItemLabel>;
+	const itemAriaLabel = ariaLabel ?? label;
 	const description = info ? (
 		<Menu.ItemDescription>{ info }</Menu.ItemDescription>
 	) : null;
@@ -131,6 +142,7 @@ function UnforwardedMoreMenuItem(
 		return (
 			<Menu.CheckboxItem
 				ref={ ref }
+				aria-label={ itemAriaLabel }
 				checked={ checked }
 				closeOnClick
 				onClick={ onClick }
@@ -138,7 +150,7 @@ function UnforwardedMoreMenuItem(
 				shortcut={ itemShortcut }
 				{ ...props }
 			>
-				{ label }
+				{ itemLabel }
 				{ description }
 			</Menu.CheckboxItem>
 		);
@@ -148,6 +160,7 @@ function UnforwardedMoreMenuItem(
 		return (
 			<Menu.LinkItem
 				ref={ ref }
+				aria-label={ itemAriaLabel }
 				href={ href }
 				prefix={ prefix }
 				shortcut={ itemShortcut }
@@ -155,7 +168,7 @@ function UnforwardedMoreMenuItem(
 				onClick={ onClick }
 				{ ...props }
 			>
-				{ label }
+				{ itemLabel }
 				{ description }
 			</Menu.LinkItem>
 		);
@@ -172,13 +185,14 @@ function UnforwardedMoreMenuItem(
 	return (
 		<Menu.Item
 			ref={ ref }
+			aria-label={ itemAriaLabel }
 			prefix={ prefix }
 			shortcut={ itemShortcut }
 			onClick={ onClick }
 			{ ...checkableProps }
 			{ ...props }
 		>
-			{ label }
+			{ itemLabel }
 			{ description }
 		</Menu.Item>
 	);
