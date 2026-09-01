@@ -67,7 +67,8 @@
 		"@types/estree": "^1.0.8",
 		"@typescript-eslint/parser": "^8.68.0",
 		"eslint": "^10.0.0",
-		"typescript": "npm:@typescript/typescript6@^6.0.2"
+		"typescript": "npm:@typescript/typescript6@^6.0.2",
+		"vitest": "^4.1.10"
 	},
 	"peerDependencies": {
 		"@babel/core": ">=7",
