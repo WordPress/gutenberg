@@ -9,7 +9,7 @@
  * Renders the `core/block` block on server.
  *
  * @since 5.0.0
- * @since 7.0.0 Shortcodes in the pattern's saved markup are expanded when the
+ * @since 7.2.0 Shortcodes in the pattern's saved markup are expanded when the
  *              pattern is rendered outside `the_content` and `widget_block_content`.
  *
  * @global WP_Embed $wp_embed
