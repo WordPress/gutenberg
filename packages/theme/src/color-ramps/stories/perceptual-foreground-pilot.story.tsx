@@ -6,7 +6,9 @@ import type { RampResult } from '../lib/types';
 import {
 	EXPERIMENTAL_FOREGROUND_METHODS,
 	buildPerceptualForegroundScale,
-	getPerceptualContrast,
+	getGamutRelativeChroma,
+	getPerceptualContrastMagnitude,
+	getSignedPerceptualContrast,
 	getStateColorDifference,
 	type ExperimentalForegroundMethod,
 	type ExperimentalForegroundScale,
@@ -47,6 +49,16 @@ const SAMPLE_COMBINATIONS = [
 		background: '#777777',
 		primary: '#d63638',
 	},
+	{
+		label: 'Yellow gamut edge',
+		background: '#fcfcfc',
+		primary: '#ffd700',
+	},
+	{
+		label: 'Cyan gamut edge',
+		background: '#1e1e1e',
+		primary: '#00ffff',
+	},
 ] as const;
 
 const METHOD_DETAILS: Record<
@@ -68,6 +80,11 @@ const METHOD_DETAILS: Record<
 		description:
 			'Reserves 40% of the APCA range for the resting-to-active transition ending at the legacy strong endpoint.',
 	},
+	'state-skewed-relative-chroma': {
+		label: 'State-skewed APCA · relative chroma',
+		description:
+			"Uses the same state spacing and fixed Step 5, while Steps 1–4 preserve the seed's share of available sRGB chroma.",
+	},
 	'uniform-free-endpoint': {
 		label: 'Uniform APCA · released Step 5',
 		description:
@@ -88,6 +105,7 @@ const METHOD_DETAILS: Record<
 type ScaleData = {
 	label: string;
 	scale: ExperimentalForegroundScale;
+	scaleType: ExperimentalForegroundScaleType;
 };
 
 function getSwatchTextColor( color: string ) {
@@ -96,15 +114,24 @@ function getSwatchTextColor( color: string ) {
 		: '#ffffff';
 }
 
+function formatSignedContrast( contrast: number ) {
+	return `${ contrast >= 0 ? '+' : '' }${ contrast.toFixed( 1 ) }`;
+}
+
 function ForegroundScale( {
 	data,
 	displayBackground,
+	showGamutRelativeChroma,
 }: {
 	data: ScaleData;
 	displayBackground: string;
+	showGamutRelativeChroma: boolean;
 } ) {
-	const contrasts = data.scale.colors.map( ( color ) =>
-		getPerceptualContrast( displayBackground, color )
+	const contrastMagnitudes = data.scale.colors.map( ( color ) =>
+		getPerceptualContrastMagnitude( displayBackground, color )
+	);
+	const signedContrasts = data.scale.colors.map( ( color ) =>
+		getSignedPerceptualContrast( displayBackground, color )
 	);
 	const stateColorDifference = getStateColorDifference( data.scale.colors );
 
@@ -117,15 +144,15 @@ function ForegroundScale( {
 				<h4>{ data.label }</h4>
 				<div className={ styles[ 'scale-meta' ] }>
 					<span className={ styles[ 'state-difference' ] }>
-						FGS4→5 ΔEOK { stateColorDifference.toFixed( 3 ) }
+						FGS4→5 ΔEOK2 { stateColorDifference.toFixed( 3 ) }
 					</span>
 					<span
 						className={ styles.status }
-						data-pass={ data.scale.meetsWcagFloors }
+						data-pass={ data.scale.meetsContrastTargets }
 					>
-						{ data.scale.meetsWcagFloors
-							? 'WCAG floors pass'
-							: 'WCAG floor warning' }
+						{ data.scale.meetsContrastTargets
+							? 'Contrast targets pass'
+							: 'Contrast target warning' }
 					</span>
 				</div>
 			</div>
@@ -134,7 +161,8 @@ function ForegroundScale( {
 					const interval =
 						index === 0
 							? undefined
-							: contrasts[ index ] - contrasts[ index - 1 ];
+							: contrastMagnitudes[ index ] -
+							  contrastMagnitudes[ index - 1 ];
 
 					return (
 						<div
@@ -148,16 +176,29 @@ function ForegroundScale( {
 							<strong>FGS{ index + 1 }</strong>
 							<code>{ color }</code>
 							<span>
-								Min WCAG{ ' ' }
-								{ data.scale.minimumWcagContrasts[
-									index
-								].toFixed( 2 ) }
+								Min contrast{ ' ' }
+								{ data.scale.minimumContrasts[ index ].toFixed(
+									2
+								) }{ ' ' }
+								/ { data.scale.contrastTargets[ index ] }
 							</span>
 							<span>
-								APCA { contrasts[ index ].toFixed( 1 ) }
+								APCA Lc{ ' ' }
+								{ formatSignedContrast(
+									signedContrasts[ index ]
+								) }
 							</span>
+							{ showGamutRelativeChroma ? (
+								<span>
+									Gamut chroma{ ' ' }
+									{ (
+										getGamutRelativeChroma( color ) * 100
+									).toFixed( 0 ) }
+									%
+								</span>
+							) : null }
 							{ interval === undefined ? null : (
-								<span>Δ { interval.toFixed( 1 ) }</span>
+								<span>Δ |Lc| { interval.toFixed( 1 ) }</span>
 							) }
 						</div>
 					);
@@ -327,6 +368,7 @@ function buildScaleData( {
 } ): ScaleData {
 	return {
 		label,
+		scaleType,
 		scale: buildPerceptualForegroundScale( {
 			method,
 			ramp,
@@ -386,6 +428,11 @@ function VariantCard( {
 					data={ data }
 					displayBackground={ backgroundRamp.ramp.surface2 }
 					key={ data.label }
+					showGamutRelativeChroma={
+						data.scaleType === 'accent' &&
+						( method === 'state-skewed' ||
+							method === 'state-skewed-relative-chroma' )
+					}
 				/>
 			) ) }
 			<ComponentPanel
@@ -405,9 +452,10 @@ function PilotComparison() {
 			<header className={ styles.introduction }>
 				<h1>Perceptual foreground scale pilot</h1>
 				<p>
-					APCA controls experimental spacing only. WCAG contrast
-					remains a hard constraint against every reference surface
-					assigned to a step.
+					APCA controls experimental spacing only. WCAG 2.1 contrast
+					ratios measure hard role targets against every reference
+					surface assigned to a step. The 2:1 and 3:1 targets are
+					design targets, not general text-conformance thresholds.
 				</p>
 				<p>
 					Control warnings identify values that miss this pilot&apos;s
@@ -416,10 +464,13 @@ function PilotComparison() {
 				</p>
 				<p>
 					Neutral scales use the production foreground chroma taper.
-					Brand and error scales preserve seed chroma where sRGB
-					permits. FGS4→5 ΔEOK measures the resting-to-active color
-					difference. State-skewed APCA reserves 40% of the available
-					APCA range for that transition.
+					Most brand and error scales preserve absolute seed chroma.
+					The relative-chroma variant preserves the seed&apos;s share
+					of available sRGB chroma across Steps 1–4 instead. The two
+					state-skewed cards report that share as Gamut chroma. FGS4→5
+					ΔEOK2 measures the resting-to-active color difference.
+					Signed APCA Lc exposes contrast polarity, while its
+					magnitude controls spacing.
 				</p>
 				<p>
 					Only Uniform APCA · released Step 5 removes the legacy

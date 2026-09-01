@@ -6,7 +6,9 @@ import type { RampResult } from '../../lib/types';
 import {
 	EXPERIMENTAL_FOREGROUND_METHODS,
 	buildPerceptualForegroundScale,
-	getPerceptualContrast,
+	getGamutRelativeChroma,
+	getPerceptualContrastMagnitude,
+	getSignedPerceptualContrast,
 	getStateColorDifference,
 	type ExperimentalForegroundMethod,
 	type ExperimentalForegroundScaleType,
@@ -20,10 +22,16 @@ const SAMPLE_COMBINATIONS = [
 	{ background: '#1e1e1e', primary: DEFAULT_SEED_COLORS.primary },
 	{ background: '#4f386e', primary: '#608010' },
 	{ background: '#777777', primary: '#d63638' },
+	{ background: '#fcfcfc', primary: '#ffd700' },
+	{ background: '#1e1e1e', primary: '#00ffff' },
 ] as const;
 
 const EXPERIMENTAL_METHODS = EXPERIMENTAL_FOREGROUND_METHODS.filter(
 	( method ) => method !== 'current'
+);
+
+const ABSOLUTE_CHROMA_METHODS = EXPERIMENTAL_METHODS.filter(
+	( method ) => method !== 'state-skewed-relative-chroma'
 );
 
 function buildScale(
@@ -47,6 +55,12 @@ function getTotalChroma( colors: readonly string[] ) {
 		( total, color ) => total + get( parse( color ), [ OKLCH, 'c' ] ),
 		0
 	);
+}
+
+function getHueDifference( first: number, second: number ) {
+	const difference = Math.abs( first - second ) % 360;
+
+	return Math.min( difference, 360 - difference );
 }
 
 function getConstraintReferences(
@@ -118,7 +132,7 @@ describe( 'perceptual foreground experiment', () => {
 						seed,
 						scaleType
 					).colors.map( ( color ) =>
-						getPerceptualContrast(
+						getPerceptualContrastMagnitude(
 							backgroundRamp.ramp.surface2,
 							color
 						)
@@ -133,7 +147,7 @@ describe( 'perceptual foreground experiment', () => {
 	);
 
 	it.each( SAMPLE_COMBINATIONS )(
-		'meets every foreground WCAG floor for $background and $primary',
+		'meets every foreground contrast target for $background and $primary',
 		( { background, primary } ) => {
 			const backgroundRamp = buildBgRamp( background );
 			const primaryRamp = buildAccentRamp( primary, backgroundRamp );
@@ -141,7 +155,6 @@ describe( 'perceptual foreground experiment', () => {
 				DEFAULT_SEED_COLORS.error,
 				backgroundRamp
 			);
-			const floors = [ 2, 3, 4.5, 4.5, 4.5 ];
 			const violations: string[] = [];
 
 			for ( const method of EXPERIMENTAL_METHODS ) {
@@ -165,7 +178,7 @@ describe( 'perceptual foreground experiment', () => {
 							backgroundRamp
 						) ) {
 							const contrast = getContrast( reference, color );
-							if ( contrast < floors[ index ] ) {
+							if ( contrast < scale.contrastTargets[ index ] ) {
 								violations.push(
 									`${ method } step ${
 										index + 1
@@ -195,7 +208,10 @@ describe( 'perceptual foreground experiment', () => {
 				'neutral'
 			);
 			const contrasts = scale.colors.map( ( color ) =>
-				getPerceptualContrast( backgroundRamp.ramp.surface2, color )
+				getPerceptualContrastMagnitude(
+					backgroundRamp.ramp.surface2,
+					color
+				)
 			);
 			const intervals = contrasts
 				.slice( 1 )
@@ -228,7 +244,7 @@ describe( 'perceptual foreground experiment', () => {
 		expect( scale.colors[ 3 ] ).not.toBe( scale.colors[ 4 ] );
 	} );
 
-	it( 'uses the neutral chroma taper for every perceptual method', () => {
+	it( 'uses the neutral chroma taper at every Ectoplasm step', () => {
 		const backgroundRamp = buildBgRamp( '#4f386e' );
 
 		for ( const method of EXPERIMENTAL_METHODS ) {
@@ -247,20 +263,31 @@ describe( 'perceptual foreground experiment', () => {
 				'accent'
 			);
 
+			for ( const [ index, color ] of neutralScale.colors.entries() ) {
+				expect(
+					get( parse( color ), [ OKLCH, 'c' ] )
+				).toBeLessThanOrEqual(
+					get( parse( untaperedScale.colors[ index ] ), [
+						OKLCH,
+						'c',
+					] )
+				);
+			}
+
 			expect( getTotalChroma( neutralScale.colors ) ).toBeLessThan(
 				getTotalChroma( untaperedScale.colors )
 			);
 		}
 	} );
 
-	it( 'preserves accent chroma for every perceptual method', () => {
-		const backgroundRamp = buildBgRamp( '#777777' );
-		const primaryRamp = buildAccentRamp( '#d63638', backgroundRamp );
+	it( 'preserves accent chroma and hue at every Ectoplasm intermediate step', () => {
+		const backgroundRamp = buildBgRamp( '#4f386e' );
+		const primaryRamp = buildAccentRamp( '#608010', backgroundRamp );
 		const seed = parse( primaryRamp.ramp.bgFill1 );
 		const seedChroma = get( seed, [ OKLCH, 'c' ] );
 		const seedHue = get( seed, [ OKLCH, 'h' ] );
 
-		for ( const method of EXPERIMENTAL_METHODS ) {
+		for ( const method of ABSOLUTE_CHROMA_METHODS ) {
 			const scale = buildScale(
 				method,
 				primaryRamp,
@@ -268,32 +295,68 @@ describe( 'perceptual foreground experiment', () => {
 				primaryRamp.ramp.bgFill1,
 				'accent'
 			);
-			const chromaTotals = scale.colors.slice( 0, -1 ).reduce(
-				( totals, color ) => {
-					const parsed = parse( color );
-					const expected = clampToGamut( {
-						space: OKLCH,
-						coords: [
-							get( parsed, [ OKLCH, 'l' ] ),
-							seedChroma,
-							seedHue,
-						],
-						alpha: seed.alpha ?? null,
-					} );
+			for ( const color of scale.colors.slice( 0, -1 ) ) {
+				const parsed = parse( color );
+				const expected = clampToGamut( {
+					space: OKLCH,
+					coords: [
+						get( parsed, [ OKLCH, 'l' ] ),
+						seedChroma,
+						seedHue,
+					],
+					alpha: seed.alpha ?? null,
+				} );
+				const expectedChroma = get( expected, [ OKLCH, 'c' ] );
 
-					return {
-						actual: totals.actual + get( parsed, [ OKLCH, 'c' ] ),
-						expected:
-							totals.expected + get( expected, [ OKLCH, 'c' ] ),
-					};
-				},
-				{ actual: 0, expected: 0 }
+				expect(
+					get( parsed, [ OKLCH, 'c' ] ) / expectedChroma
+				).toBeGreaterThan( 0.9 );
+				expect(
+					getHueDifference( get( parsed, [ OKLCH, 'h' ] ), seedHue )
+				).toBeLessThan( 2 );
+			}
+		}
+	} );
+
+	it.each( [
+		{ background: '#4f386e', primary: '#608010' },
+		{ background: '#fcfcfc', primary: '#ffd700' },
+		{ background: '#1e1e1e', primary: '#00ffff' },
+	] )(
+		"preserves the seed's relative chroma for $background and $primary",
+		( { background, primary } ) => {
+			const backgroundRamp = buildBgRamp( background );
+			const primaryRamp = buildAccentRamp( primary, backgroundRamp );
+			const seedRelativeChroma = getGamutRelativeChroma(
+				primaryRamp.ramp.bgFill1
+			);
+			const scale = buildScale(
+				'state-skewed-relative-chroma',
+				primaryRamp,
+				backgroundRamp,
+				primaryRamp.ramp.bgFill1,
+				'accent'
 			);
 
-			expect(
-				chromaTotals.actual / chromaTotals.expected
-			).toBeGreaterThan( 0.9 );
+			for ( const color of scale.colors.slice( 0, -1 ) ) {
+				expect(
+					Math.abs(
+						getGamutRelativeChroma( color ) - seedRelativeChroma
+					)
+				).toBeLessThan( 0.04 );
+			}
 		}
+	);
+
+	it( 'reports APCA polarity separately from its spacing magnitude', () => {
+		const darkOnLight = getSignedPerceptualContrast( '#ffffff', '#000000' );
+		const lightOnDark = getSignedPerceptualContrast( '#000000', '#ffffff' );
+
+		expect( darkOnLight ).toBeGreaterThan( 0 );
+		expect( lightOnDark ).toBeLessThan( 0 );
+		expect( getPerceptualContrastMagnitude( '#ffffff', '#000000' ) ).toBe(
+			Math.abs( darkOnLight )
+		);
 	} );
 
 	it( 'isolates endpoint release to the uniform free-endpoint variant', () => {
@@ -306,6 +369,7 @@ describe( 'perceptual foreground experiment', () => {
 		for ( const method of [
 			'uniform',
 			'state-skewed',
+			'state-skewed-relative-chroma',
 			'semantic-anchors',
 			'eased',
 		] as const ) {
@@ -332,16 +396,41 @@ describe( 'perceptual foreground experiment', () => {
 			primaryRamp.ramp.fgSurface4
 		);
 		expect(
-			getPerceptualContrast(
+			getPerceptualContrastMagnitude(
 				backgroundRamp.ramp.surface2,
 				releasedScale.colors[ 4 ]
 			)
 		).toBeLessThan(
-			getPerceptualContrast(
+			getPerceptualContrastMagnitude(
 				backgroundRamp.ramp.surface2,
 				primaryRamp.ramp.fgSurface4
 			)
 		);
+	} );
+
+	it( 'preserves the legacy Step 5 in the floating-point regression case', () => {
+		const backgroundRamp = buildBgRamp( '#000040' );
+		const primaryRamp = buildAccentRamp(
+			DEFAULT_SEED_COLORS.primary,
+			backgroundRamp
+		);
+
+		for ( const method of [
+			'uniform',
+			'state-skewed',
+			'state-skewed-relative-chroma',
+			'eased',
+		] as const ) {
+			expect(
+				buildScale(
+					method,
+					primaryRamp,
+					backgroundRamp,
+					primaryRamp.ramp.bgFill1,
+					'accent'
+				).colors[ 4 ]
+			).toBe( primaryRamp.ramp.fgSurface4 );
+		}
 	} );
 
 	it( 'reserves more state difference in the state-skewed fixed-endpoint variant', () => {
@@ -362,7 +451,10 @@ describe( 'perceptual foreground experiment', () => {
 			'neutral'
 		);
 		const contrasts = stateSkewedScale.colors.map( ( color ) =>
-			getPerceptualContrast( backgroundRamp.ramp.surface2, color )
+			getPerceptualContrastMagnitude(
+				backgroundRamp.ramp.surface2,
+				color
+			)
 		);
 		const finalInterval = contrasts[ 4 ] - contrasts[ 3 ];
 		const totalRange = contrasts[ 4 ] - contrasts[ 0 ];
