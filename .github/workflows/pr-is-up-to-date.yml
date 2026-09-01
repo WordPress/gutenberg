@@ -27,8 +27,9 @@ permissions: {}
 
 concurrency:
     # Serialize per PR, and serialize all baseline moves in one group. Replaced
-    # pending runs are safe: move decisions diff cumulatively from the tag, so
-    # the next push run recovers marker changes and labeled merges alike.
+    # pending runs are safe: move decisions diff cumulatively from the tag and
+    # every dispatch evaluates a move too, so the next run in the group always
+    # recovers marker changes and labeled merges alike.
     group: pr-freshness-${{ github.event_name == 'pull_request_target' && github.event.pull_request.number || 'baseline' }}
     cancel-in-progress: false
 
@@ -61,10 +62,13 @@ jobs:
 
     move-baseline:
         name: Move freshness baseline
+        # Runs for EVERY dispatch, not only move-baseline ones: a reconcile-only
+        # dispatch replaces a pending push run in the concurrency queue, so it
+        # must evaluate the cumulative move itself before stamping anything.
         if: >
             github.repository == 'WordPress/gutenberg' && (
                 github.event_name == 'push' ||
-                (github.event_name == 'workflow_dispatch' && inputs.move-baseline)
+                github.event_name == 'workflow_dispatch'
             )
         runs-on: ubuntu-latest
         timeout-minutes: 30
@@ -74,7 +78,7 @@ jobs:
             pull-requests: read
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            FORCE: ${{ github.event_name != 'push' }}
+            FORCE: ${{ github.event_name == 'workflow_dispatch' && inputs.move-baseline }}
         steps:
             - name: Checkout repository
               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
