@@ -274,7 +274,7 @@
 			border-radius: inherit;
 			@include outset-ring__focus();
 			outline-offset: 1px;
-			box-shadow: 0 0 0 calc(var(--wpds-border-width-focus) + 2px) var(--wpds-color-foreground-interactive-brand-strong);
+			box-shadow: 0 0 0 calc(var(--wpds-border-width-focus) + 2px) $white;
 			z-index: 2;
 			pointer-events: none;
 		}
