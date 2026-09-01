@@ -3,7 +3,13 @@
 	"compilerOptions": {
 		"allowJs": true,
 		"paths": {
+			"@wordpress/commands": [
+				"./typings/untyped-packages/wordpress-commands.d.ts"
+			],
 			"@wordpress/block-editor": [
+				"./typings/untyped-packages/any-module.d.ts"
+			],
+			"@wordpress/block-library": [
 				"./typings/untyped-packages/any-module.d.ts"
 			],
 			"@wordpress/patterns": [
@@ -50,6 +56,10 @@
 		"**/benchmark",
 		"packages/*/build-*/**",
 		"packages/*/build/**",
-		"**/test/**"
+		"**/test/**",
+		"**/tests/**",
+		"**/__tests__/**",
+		"**/stories/**",
+		"**/*.story.*"
 	]
 }

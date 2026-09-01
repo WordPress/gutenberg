@@ -11,6 +11,7 @@ import {
 	privateApis as routePrivateApis,
 } from '@wordpress/route';
 import { store as bootStore } from '../../store';
+import { isValidViewport } from './viewport';
 import { unlock } from '../../lock-unlock';
 
 const { useCanGoBack, useRouter } = unlock( routePrivateApis );
@@ -31,6 +32,7 @@ type Navigate = ( options: {
 interface NavigateParams {
 	postType: string;
 	postId: string;
+	viewport?: string;
 }
 
 /**
@@ -88,6 +90,16 @@ export default function useNavigateToEntityRecord() {
 			}
 
 			/*
+			 * An entity can ask to be edited at a particular width — a
+			 * navigation overlay meant for mobile. The width is where the entity
+			 * opens, not something the entity being left carries away: a width
+			 * set from the device preview is view state, and an entity that asks
+			 * for none opens at the default.
+			 */
+			const requestedViewport = params.viewport?.toLowerCase();
+			const hasRequestedViewport = isValidViewport( requestedViewport );
+
+			/*
 			 * `focusMode` marks the entity as one navigated into rather than
 			 * opened directly, which is what offers the way back out. The search
 			 * is replaced rather than extended so the block stashed above stays
@@ -96,7 +108,15 @@ export default function useNavigateToEntityRecord() {
 			const to = getEntityLink( params.postType, params.postId );
 
 			if ( to ) {
-				navigate( { to, search: () => ( { focusMode: true } ) } );
+				navigate( {
+					to,
+					search: () => ( {
+						focusMode: true,
+						...( hasRequestedViewport
+							? { viewport: requestedViewport }
+							: {} ),
+					} ),
+				} );
 			}
 		},
 		[ navigate, registry, getEntityLink ]

@@ -4,16 +4,69 @@
 
 ### New Features
 
+-   `WidgetDashboard.Policy`: a provider that governs the dashboards below
+    it through `canPerform( request )`. Operations: `customize` (the
+    Customize button and the matching commands), `insert` (what the
+    inserter offers; a rejected type keeps rendering where already
+    placed), and per instance `remove`, `move`, `resize`, and `edit`
+    (the tile controls and gestures; a widget denied `edit` receives no
+    `setAttributes`). Nested policies compose restrictively. Exports the
+    `DashboardOperationRequest`, `DashboardInstanceOperation`,
+    `DashboardInstanceOperationRequest`, and `CanPerformDashboardOperation`
+    types ([#81967](https://github.com/WordPress/gutenberg/pull/81967)).
+-   The Add widget button and command show only while the policy lets some
+    registered type be inserted
+    ([#81967](https://github.com/WordPress/gutenberg/pull/81967)).
+-   `WidgetDashboard.Policy` governs `reset`: the Reset to default entry in
+    the overflow menu, the `core/dashboard/reset-to-default` command, and
+    the confirmation prompt are hidden while the policy denies it
+    ([#82255](https://github.com/WordPress/gutenberg/pull/82255)).
+
+### Enhancements
+
+-   `gridSettings.columns` now sets the wide-container column count (floored,
+    with a floor of one); the responsive steps scale from it.
+    `WIDGET_DASHBOARD_COLUMN_COUNT` is the default when the host sets
+    nothing, and the wp-admin dashboard pins it where it reads its stored
+    settings, so preferences persisted by the removed Columns control stay
+    inert ([#82204](https://github.com/WordPress/gutenberg/pull/82204)).
+
+### Internal
+
+-   Remove unused dependency `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
+
+### Bug Fixes
+
+-   Keep the plain anchor for a `download: ''` link action
+    ([#82073](https://github.com/WordPress/gutenberg/pull/82073)).
+
+## 0.6.0 (2026-08-26)
+
+### New Features
+
 -   Widget chrome footer: `relevance: 'high'` actions mount as leading text
     links (declared icon as prefix) in a persistent strip under the widget
     body, `'medium'` as trailing compact affordances (icon-only with a
     declared icon); the "More" menu keeps the rest, and full-bleed widgets
     keep every action in the menu
     ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
+-   A link action whose target the host recognizes as one of its own routes
+    (the `links` capability from `useWidgetHost`) mounts the host router's
+    link and navigates client-side; `download` and `openInNewTab` keep the
+    plain anchor ([#81740](https://github.com/WordPress/gutenberg/pull/81740)).
+
+### Documentation
+
+-   Add a `HostLinks` story: a demo host whose `links` capability turns an
+    in-app action target into a client-side route link, beside a plain
+    anchor and a download
+    ([#81740](https://github.com/WordPress/gutenberg/pull/81740)).
 
 ### Internal
 
--   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509))
+-   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509), [#81515](https://github.com/WordPress/gutenberg/pull/81515), [#81516](https://github.com/WordPress/gutenberg/pull/81516), [#81518](https://github.com/WordPress/gutenberg/pull/81518))
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
 
 ## 0.5.0 (2026-08-12)
 

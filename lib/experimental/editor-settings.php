@@ -9,6 +9,8 @@
  * Sets a global JS variable used to trigger the availability of each Gutenberg Experiment.
  */
 function gutenberg_enable_experiments() {
+	global $pagenow;
+
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-color-randomizer' ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableColorRandomizer = true', 'before' );
 	}
@@ -24,9 +26,6 @@ function gutenberg_enable_experiments() {
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-content-only-inspector-fields' ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalContentOnlyInspectorFields = true', 'before' );
 	}
-	if ( gutenberg_is_experiment_enabled( 'active_templates' ) ) {
-		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalTemplateActivate = true', 'before' );
-	}
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-extensible-site-editor' ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalExtensibleSiteEditor = true', 'before' );
 	}
@@ -38,6 +37,18 @@ function gutenberg_enable_experiments() {
 	}
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-dashboard-widgets' ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalDashboardWidgets = true', 'before' );
+	}
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-real-time-collaboration' ) ) {
+		$collaboration_enabled = ! (
+			'site-editor.php' === $pagenow ||
+			( 'admin.php' === $pagenow && isset( $_GET['page'] ) && 'site-editor-v2' === $_GET['page'] )
+		);
+
+		wp_add_inline_script(
+			'wp-core-data',
+			'window.__experimentalEnableRealTimeCollaboration = ' . wp_json_encode( $collaboration_enabled ) . ';',
+			'before'
+		);
 	}
 }
 
