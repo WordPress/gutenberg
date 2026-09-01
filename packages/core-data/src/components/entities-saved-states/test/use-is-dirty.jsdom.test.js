@@ -1,49 +1,52 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
+import { useSelect } from '@wordpress/data';
 import { useIsDirty } from '../hooks/use-is-dirty';
 
 vi.mock( '@wordpress/data', () => {
 	return {
-		useSelect: vi.fn().mockImplementation( ( fn ) => {
-			const select = () => {
-				return {
-					__experimentalGetDirtyEntityRecords: vi
-						.fn()
-						.mockReturnValue( [
-							{
-								kind: 'root',
-								name: 'site',
-								title: 'title',
-								property: 'property',
-							},
-							{
-								kind: 'postType',
-								name: 'post',
-								title: 'title',
-								property: 'property',
-							},
-						] ),
-					getEntityRecordEdits: vi.fn().mockReturnValue( {
-						title: 'My Site',
-						description: 'My Tagline',
-						site_logo: 123,
-						site_icon: 456,
-					} ),
-					getEntityConfig: vi.fn().mockReturnValue( {
-						meta: {
-							labels: {
-								title: 'Site Title',
-								description: 'Site Tagline',
-								site_logo: 'Site Logo',
-								site_icon: 'Site Icon',
-							},
-						},
-					} ),
-				};
-			};
-			return fn( select );
-		} ),
+		useSelect: vi.fn(),
 	};
+} );
+
+beforeEach( () => {
+	useSelect.mockImplementation( ( fn ) => {
+		const select = () => {
+			return {
+				__experimentalGetDirtyEntityRecords: vi.fn().mockReturnValue( [
+					{
+						kind: 'root',
+						name: 'site',
+						title: 'title',
+						property: 'property',
+					},
+					{
+						kind: 'postType',
+						name: 'post',
+						title: 'title',
+						property: 'property',
+					},
+				] ),
+				getEntityRecordEdits: vi.fn().mockReturnValue( {
+					title: 'My Site',
+					description: 'My Tagline',
+					site_logo: 123,
+					site_icon: 456,
+				} ),
+				getEntityConfig: vi.fn().mockReturnValue( {
+					meta: {
+						labels: {
+							title: 'Site Title',
+							description: 'Site Tagline',
+							site_logo: 'Site Logo',
+							site_icon: 'Site Icon',
+						},
+					},
+				} ),
+			};
+		};
+		return fn( select );
+	} );
 } );
 
 describe( 'useIsDirty', () => {

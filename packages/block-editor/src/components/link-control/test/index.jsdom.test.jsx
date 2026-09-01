@@ -19,6 +19,7 @@ import userEvent from '@testing-library/user-event';
 import { SlotFillProvider } from '@wordpress/components';
 import { useState, createElement } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
+import { useReducedMotion } from '@wordpress/compose';
 import LinkControl from '../';
 import {
 	fauxEntitySuggestions,
@@ -60,17 +61,17 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
 	useDispatch: () => ( { saveEntityRecords: vi.fn() } ),
 	useSelect: vi.fn(),
 } ) );
-useSelect.mockImplementation( () => ( {
-	fetchSearchSuggestions: mockFetchSearchSuggestions,
-	fetchRichUrlData: mockFetchRichUrlData,
-} ) );
-
 vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
 	useReducedMotion: vi.fn( () => true ),
 } ) );
 
 beforeEach( () => {
+	useReducedMotion.mockReturnValue( true );
+	useSelect.mockImplementation( () => ( {
+		fetchSearchSuggestions: mockFetchSearchSuggestions,
+		fetchRichUrlData: mockFetchRichUrlData,
+	} ) );
 	// Setup a DOM element as a render target.
 	mockFetchSearchSuggestions.mockImplementation( fetchFauxEntitySuggestions );
 } );

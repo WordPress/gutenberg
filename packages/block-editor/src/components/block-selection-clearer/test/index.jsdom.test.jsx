@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { useDispatch, useSelect } from '@wordpress/data';
 import BlockSelectionClearer from '../';
@@ -18,6 +18,14 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
 } ) );
 
 describe( 'BlockSelectionClearer component', () => {
+	beforeEach( () => {
+		defaultUseSelectValues.hasSelectedBlock.mockReturnValue( false );
+		defaultUseSelectValues.hasMultiSelection.mockReturnValue( false );
+		defaultUseSelectValues.getSettings.mockReturnValue( {
+			clearBlockSelection: true,
+		} );
+	} );
+
 	it( 'should clear the selected block when a selected block exists', () => {
 		const mockClearSelectedBlock = vi.fn();
 		useSelect.mockImplementation( () => ( {

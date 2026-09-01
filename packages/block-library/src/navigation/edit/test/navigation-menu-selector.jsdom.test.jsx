@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useEntityRecords } from '@wordpress/core-data';
@@ -15,10 +15,6 @@ vi.mock( import( '@wordpress/core-data' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
 	useEntityRecords: vi.fn(),
 } ) );
-
-useEntityRecords.mockReturnValue( {
-	records: [],
-} );
 
 const navigationMenu1 = {
 	id: 1,
@@ -64,6 +60,18 @@ const classicMenusFixture = [
 ];
 
 describe( 'NavigationMenuSelector', () => {
+	beforeEach( () => {
+		useNavigationMenu.mockReturnValue( {
+			navigationMenus: [],
+			hasResolvedNavigationMenus: true,
+			canUserCreateNavigationMenus: true,
+			canSwitchNavigationMenu: true,
+		} );
+		useEntityRecords.mockReturnValue( {
+			records: [],
+		} );
+	} );
+
 	describe( 'Toggle', () => {
 		it( 'should show dropdown toggle with loading message when menus have not resolved', async () => {
 			useNavigationMenu.mockReturnValue( {

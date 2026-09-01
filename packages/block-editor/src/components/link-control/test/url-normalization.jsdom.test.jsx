@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { SlotFillProvider } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+import { useReducedMotion } from '@wordpress/compose';
 import LinkControl from '../';
 import { fetchFauxEntitySuggestions } from './fixtures';
 
@@ -16,16 +17,16 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
 	useSelect: vi.fn(),
 } ) );
 
-useSelect.mockImplementation( () => ( {
-	fetchSearchSuggestions: mockFetchSearchSuggestions,
-} ) );
-
 vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
 	useReducedMotion: vi.fn( () => true ),
 } ) );
 
 beforeEach( () => {
+	useReducedMotion.mockReturnValue( true );
+	useSelect.mockImplementation( () => ( {
+		fetchSearchSuggestions: mockFetchSearchSuggestions,
+	} ) );
 	mockFetchSearchSuggestions.mockImplementation( fetchFauxEntitySuggestions );
 } );
 
