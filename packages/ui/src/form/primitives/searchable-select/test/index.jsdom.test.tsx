@@ -119,6 +119,28 @@ describe( 'SearchableSelect', () => {
 		expect( input ).toHaveAccessibleName( 'Find fruit' );
 	} );
 
+	it( 'renders a default trigger placeholder when no value is selected', () => {
+		render( <SearchableSelect items={ ITEMS } /> );
+
+		const trigger = screen.getByRole( 'combobox' );
+		expect( trigger ).toBeVisible();
+		expect( trigger ).toHaveTextContent( 'Select' );
+	} );
+
+	it( 'renders custom placeholder text when no value is selected', () => {
+		render(
+			<SearchableSelect
+				aria-label="Fruit"
+				items={ ITEMS }
+				placeholder="Choose a fruit"
+			/>
+		);
+
+		const trigger = screen.getByRole( 'combobox', { name: 'Fruit' } );
+		expect( trigger ).toBeVisible();
+		expect( trigger ).toHaveTextContent( 'Choose a fruit' );
+	} );
+
 	it( 'does not throw when triggerContent receives a null value', () => {
 		render(
 			<SearchableSelect

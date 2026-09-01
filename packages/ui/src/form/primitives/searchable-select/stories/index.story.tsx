@@ -41,6 +41,20 @@ export const Default: Story = {
 	},
 };
 
+/**
+ * When no value is selected, the trigger shows the default placeholder text.
+ *
+ * Use the `placeholder` prop to customize text shown.
+ * Prefer a concise label without a trailing ellipsis.
+ */
+export const WithCustomPlaceholder: Story = {
+	args: {
+		'aria-label': 'Fruit',
+		items: ITEMS,
+		placeholder: 'Choose an item',
+	},
+};
+
 const CustomFruitItem = ( { label }: { label: string } ) => (
 	<span
 		style={ {

@@ -51,6 +51,7 @@ export const SearchableSelect = forwardRef<
 		children,
 		emptyContent = __( 'No results found.' ),
 		items,
+		placeholder,
 		triggerContent,
 		searchPlaceholder = __( 'Search' ),
 		popupWidth,
@@ -70,6 +71,7 @@ export const SearchableSelect = forwardRef<
 		<Combobox.Root< Item, false > items={ comboboxItems } { ...restProps }>
 			<Combobox.Trigger
 				ref={ ref }
+				placeholder={ placeholder }
 				aria-label={ ariaLabel }
 				aria-labelledby={ ariaLabelledby }
 				aria-describedby={ ariaDescribedby }

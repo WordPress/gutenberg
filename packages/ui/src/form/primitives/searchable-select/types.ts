@@ -171,6 +171,13 @@ export type SearchableSelectProps = Omit<
 		 */
 		children?: ComboboxCollectionProps[ 'children' ];
 		/**
+		 * Text to show when no value is selected. This is overridden by `triggerContent`
+		 * if specified, or by a null item's label in `items`.
+		 *
+		 * @default __( 'Select' )
+		 */
+		placeholder?: ComboboxTriggerProps[ 'placeholder' ];
+		/**
 		 * The custom trigger content to use instead of the default.
 		 *
 		 * The callback receives `null` when nothing is selected.
