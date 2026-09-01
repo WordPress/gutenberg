@@ -2,8 +2,22 @@
 	width: 100%;
 }
 
-.wp-block-avatar.aligncenter {
-	.components-resizable-box__container {
-		margin: 0 auto;
+.wp-block-avatar {
+	&.aligncenter {
+		.components-resizable-box__container {
+			margin: 0 auto;
+		}
+	}
+
+	&.alignleft {
+		.components-resizable-box__container {
+			margin-right: auto;
+		}
+	}
+
+	&.alignright {
+		.components-resizable-box__container {
+			margin-left: auto;
+		}
 	}
 }
