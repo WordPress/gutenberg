@@ -352,6 +352,49 @@ describe( 'Entity record types', () => {
 		};
 	} );
 
+	describe( 'the template field follows the REST schema', () => {
+		() => {
+			/*
+			 * The posts controller registers `template` outside the supports
+			 * loop, so it is on every post type in the view and edit
+			 * contexts. Neither `WP_REST_Blocks_Controller` nor
+			 * `WP_Navigation_Fallback` removes it.
+			 */
+			const pattern = select( coreStore ).getEntityRecord(
+				'postType',
+				'wp_block',
+				1
+			);
+			pattern?.template satisfies string | undefined;
+
+			const navigation = select( coreStore ).getEntityRecord(
+				'postType',
+				'wp_navigation',
+				1
+			);
+			navigation?.template satisfies string | undefined;
+
+			const viewNavigation = select( coreStore ).getEntityRecord(
+				'postType',
+				'wp_navigation',
+				1,
+				{ context: 'view' }
+			);
+			viewNavigation?.template satisfies string | undefined;
+
+			// `template` is out of the embed context, which the navigation
+			// fallback does not widen.
+			const embedNavigation = select( coreStore ).getEntityRecord(
+				'postType',
+				'wp_navigation',
+				1,
+				{ context: 'embed' }
+			);
+			// @ts-expect-error -- `template` is view- and edit-only.
+			embedNavigation?.template;
+		};
+	} );
+
 	describe( 'getEntityRecords infers the record list through select()', () => {
 		() => {
 			const posts = select( coreStore ).getEntityRecords(

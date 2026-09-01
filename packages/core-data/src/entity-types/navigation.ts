@@ -15,10 +15,11 @@ declare module './base-entity-records' {
 		 * `wp_navigation` is registered with `supports` limited to `title`,
 		 * `editor` and `revisions`, so the posts controller omits the fields
 		 * gated on the other supports -- there is no `author`, `excerpt`,
-		 * `featured_media`, `comment_status`, `ping_status`, `menu_order`,
-		 * `meta` or `template` on this record. The post type is registered
-		 * `public => false`, and both `permalink_template` and
-		 * `generated_slug` are gated on the post type being viewable and
+		 * `featured_media`, `comment_status`, `ping_status`, `menu_order` or
+		 * `meta` on this record. `template` is not gated on a support, so the
+		 * controller adds it to every post type, including this one. The post
+		 * type is registered `public => false`, and both `permalink_template`
+		 * and `generated_slug` are gated on the post type being viewable and
 		 * public, so neither is present either.
 		 *
 		 * `WP_Navigation_Fallback` then widens the schema for this post type:
@@ -108,6 +109,10 @@ declare module './base-entity-records' {
 				'view' | 'edit' | 'embed',
 				C
 			>;
+			/**
+			 * The theme file to use to display the navigation menu.
+			 */
+			template: ContextualField< string, 'view' | 'edit', C >;
 		}
 	}
 }

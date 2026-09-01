@@ -74,8 +74,7 @@ export function AiPluginCallout() {
 			aiProviderSettingNames.some(
 				( name ) => !! siteSettings?.[ name ]
 			);
-
-		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+		// eslint-disable-next-line @wordpress/no-unused-vars-before-return -- the call triggers resolution and must precede the early return
 		const plugin = store.getEntityRecord( 'root', 'plugin', AI_PLUGIN_ID );
 
 		const hasFinished = store.hasFinishedResolution( 'getEntityRecord', [

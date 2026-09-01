@@ -14,10 +14,12 @@ declare module './base-entity-records' {
 		 *
 		 * `wp_block` supports `title`, `excerpt`, `editor`, `revisions` and
 		 * `custom-fields`, so the posts controller omits `author`,
-		 * `featured_media`, `comment_status`, `ping_status`, `menu_order` and
-		 * `template`. The post type is registered `public => false`, and both
-		 * `permalink_template` and `generated_slug` are gated on the post type
-		 * being viewable and public, so neither is on this record either.
+		 * `featured_media`, `comment_status`, `ping_status` and `menu_order`.
+		 * `template` is not gated on a support, so the controller adds it to
+		 * every post type, including this one. The post type is registered
+		 * `public => false`, and both `permalink_template` and
+		 * `generated_slug` are gated on the post type being viewable and
+		 * public, so neither is on this record either.
 		 *
 		 * `WP_REST_Blocks_Controller` then reshapes `title` and `content`: it
 		 * exposes `raw` in the view context as well as edit, and removes
@@ -114,6 +116,10 @@ declare module './base-entity-records' {
 				'view' | 'edit',
 				C
 			>;
+			/**
+			 * The theme file to use to display the pattern.
+			 */
+			template: ContextualField< string, 'view' | 'edit', C >;
 		}
 	}
 }
