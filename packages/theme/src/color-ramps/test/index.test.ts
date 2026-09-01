@@ -52,6 +52,59 @@ function expectAccessibleFillStates( ramp: ReturnType< typeof buildRamp > ) {
 	).toBeGreaterThanOrEqual( 4.5 );
 }
 
+const foregroundSteps = [
+	'fgSurface1',
+	'fgSurface2',
+	'fgSurface3',
+	'fgSurface4',
+	'fgSurface5',
+] as const;
+
+const perceptualSampleCombinations = [
+	{
+		background: DEFAULT_SEED_COLORS.background,
+		primary: DEFAULT_SEED_COLORS.primary,
+	},
+	{ background: '#1e1e1e', primary: DEFAULT_SEED_COLORS.primary },
+	{ background: '#4f386e', primary: '#608010' },
+	{ background: '#777777', primary: '#d63638' },
+	{ background: '#fcfcfc', primary: '#ffd700' },
+	{ background: '#1e1e1e', primary: '#00ffff' },
+] as const;
+
+function getPerceptualContrastMagnitude(
+	background: string,
+	foreground: string
+) {
+	return Math.abs( contrastAPCA( background, foreground ) );
+}
+
+function getForegroundConstraintReferences(
+	stepIndex: number,
+	ramp: ReturnType< typeof buildBgRamp >,
+	backgroundRamp: ReturnType< typeof buildBgRamp >
+) {
+	let surfaceNames: readonly ( keyof typeof ramp.ramp )[];
+	if ( stepIndex < 2 ) {
+		surfaceNames = [ 'surface3' ];
+	} else if ( stepIndex < 3 ) {
+		surfaceNames = [ 'surface1', 'surface2', 'surface3' ];
+	} else {
+		surfaceNames = [
+			'surface1',
+			'surface2',
+			'surface3',
+			'surface4',
+			'surface5',
+		];
+	}
+
+	return [
+		...surfaceNames.map( ( name ) => ramp.ramp[ name ] ),
+		...surfaceNames.map( ( name ) => backgroundRamp.ramp[ name ] ),
+	];
+}
+
 describe( 'buildRamps', () => {
 	it( 'restores the weak intent background colors', () => {
 		const bgRamp = buildBgRamp( DEFAULT_SEED_COLORS.background );
