@@ -3,6 +3,7 @@ import { useRef, useState } from '@wordpress/element';
 import * as Combobox from '../index';
 import { Spinner } from '../../../../spinner';
 import { Stack } from '../../../../stack';
+import { VisuallyHidden } from '../../../../visually-hidden';
 import {
 	ITEMS,
 	GROUPED_ITEMS,
@@ -245,78 +246,128 @@ export const Creatable: Story = {
 	},
 };
 
+function getStatusChildren( {
+	loading,
+	count,
+	visibleCount,
+}: {
+	loading: boolean;
+	count: number;
+	visibleCount: boolean;
+} ) {
+	if ( loading ) {
+		return (
+			<Stack direction="row" gap="sm" align="center">
+				<Spinner />
+				Loading…
+			</Stack>
+		);
+	}
+
+	if ( count === 0 ) {
+		return null;
+	}
+
+	const message = count === 1 ? '1 result found' : `${ count } results found`;
+
+	if ( visibleCount ) {
+		return message;
+	}
+
+	return <VisuallyHidden>{ message }</VisuallyHidden>;
+}
+
+function AsyncItemsTemplate( {
+	args,
+	visibleCount,
+}: {
+	args: Story[ 'args' ];
+	visibleCount: boolean;
+} ) {
+	const [ loading, setLoading ] = useState( false );
+	const [ items, setItems ] = useState< FixtureItem[] >( [] );
+	const [ value, setValue ] = useState< FixtureItem | undefined >();
+	const [ open, setOpen ] = useState( false );
+	const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
+
+	return (
+		<Combobox.Root
+			{ ...args }
+			items={ items }
+			value={ value }
+			open={ open }
+			onValueChange={ ( newValue ) => {
+				setValue(
+					( newValue ?? undefined ) as FixtureItem | undefined
+				);
+			} }
+			onOpenChange={ ( nextOpen ) => {
+				setOpen( nextOpen );
+				if ( ! nextOpen ) {
+					clearTimeout( timeoutRef.current );
+					return;
+				}
+				setLoading( true );
+				setItems( [] );
+				clearTimeout( timeoutRef.current );
+				timeoutRef.current = setTimeout( () => {
+					setItems( ITEMS );
+					setValue( ( current ) => current ?? ITEMS[ 0 ] );
+					setLoading( false );
+				}, 500 );
+			} }
+		>
+			<Combobox.Trigger />
+			<Combobox.Popup>
+				<div style={ inputWrapperStyle }>
+					<Combobox.Input placeholder="Search" />
+				</div>
+				<Combobox.Status>
+					{ getStatusChildren( {
+						loading,
+						count: items.length,
+						visibleCount,
+					} ) }
+				</Combobox.Status>
+				<Combobox.Empty>
+					{ loading ? null : 'No results found.' }
+				</Combobox.Empty>
+				<Combobox.List>
+					<Combobox.ListBody>
+						<Combobox.Collection>
+							{ ( item: FixtureItem ) => (
+								<Combobox.Item
+									key={ item.value }
+									value={ item }
+								>
+									{ item.label }
+								</Combobox.Item>
+							) }
+						</Combobox.Collection>
+					</Combobox.ListBody>
+				</Combobox.List>
+			</Combobox.Popup>
+		</Combobox.Root>
+	);
+}
+
 /**
- * Loads the item list asynchronously. Keep `Status` mounted and change its
- * children. Use `Empty` for no results.
+ * Loads the item list asynchronously. Keep `Status` mounted. It shows
+ * loading, then a visually hidden result count. Use `Empty` for no results.
  */
 export const AsyncItems: Story = {
 	render: function Template( args ) {
-		const [ loading, setLoading ] = useState( false );
-		const [ items, setItems ] = useState< FixtureItem[] >( [] );
-		const [ value, setValue ] = useState< FixtureItem | undefined >();
-		const [ open, setOpen ] = useState( false );
-		const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
+		return <AsyncItemsTemplate args={ args } visibleCount={ false } />;
+	},
+};
 
-		return (
-			<Combobox.Root
-				{ ...args }
-				items={ items }
-				value={ value }
-				open={ open }
-				onValueChange={ ( newValue ) => {
-					setValue(
-						( newValue ?? undefined ) as FixtureItem | undefined
-					);
-				} }
-				onOpenChange={ ( nextOpen ) => {
-					setOpen( nextOpen );
-					if ( ! nextOpen ) {
-						clearTimeout( timeoutRef.current );
-						return;
-					}
-					setLoading( true );
-					setItems( [] );
-					clearTimeout( timeoutRef.current );
-					timeoutRef.current = setTimeout( () => {
-						setItems( ITEMS );
-						setValue( ( current ) => current ?? ITEMS[ 0 ] );
-						setLoading( false );
-					}, 500 );
-				} }
-			>
-				<Combobox.Trigger />
-				<Combobox.Popup>
-					<div style={ inputWrapperStyle }>
-						<Combobox.Input placeholder="Search" />
-					</div>
-					<Combobox.Status>
-						{ loading ? (
-							<Stack direction="row" gap="sm" align="center">
-								<Spinner />
-								Loading…
-							</Stack>
-						) : null }
-					</Combobox.Status>
-					<Combobox.Empty>
-						{ loading ? null : 'No results found.' }
-					</Combobox.Empty>
-					<Combobox.List>
-						<Combobox.ListBody>
-							<Combobox.Collection>
-								{ ( item: FixtureItem ) => (
-									<Combobox.Item
-										key={ item.value }
-										value={ item }
-									>
-										{ item.label }
-									</Combobox.Item>
-								) }
-							</Combobox.Collection>
-						</Combobox.ListBody>
-					</Combobox.List>
-				</Combobox.Popup>
-			</Combobox.Root>
-		);
+/**
+ * Same async pattern as `AsyncItems`, with the result count visible in the
+ * popup.
+ */
+export const AsyncItemsVisibleCount: Story = {
+	render: function Template( args ) {
+		return <AsyncItemsTemplate args={ args } visibleCount />;
 	},
 };
 

@@ -6,6 +6,7 @@ import * as Autocomplete from '../index';
 import { Icon } from '../../../../icon';
 import { Spinner } from '../../../../spinner';
 import { Stack } from '../../../../stack';
+import { VisuallyHidden } from '../../../../visually-hidden';
 import { Input } from '../../input';
 import { InputLayout } from '../../input-layout';
 import {
@@ -129,69 +130,119 @@ export const OpenOnlyOnMatch: Story = {
 	},
 };
 
+function getStatusChildren( {
+	loading,
+	count,
+	visibleCount,
+}: {
+	loading: boolean;
+	count: number;
+	visibleCount: boolean;
+} ) {
+	if ( loading ) {
+		return (
+			<Stack direction="row" gap="sm" align="center">
+				<Spinner />
+				Loading…
+			</Stack>
+		);
+	}
+
+	if ( count === 0 ) {
+		return null;
+	}
+
+	const message = count === 1 ? '1 result found' : `${ count } results found`;
+
+	if ( visibleCount ) {
+		return message;
+	}
+
+	return <VisuallyHidden>{ message }</VisuallyHidden>;
+}
+
+function AsyncItemsTemplate( {
+	args,
+	visibleCount,
+}: {
+	args: Story[ 'args' ];
+	visibleCount: boolean;
+} ) {
+	const [ query, setQuery ] = useState( '' );
+	const [ loading, setLoading ] = useState( false );
+	const [ results, setResults ] = useState< typeof URLS >( [] );
+	const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
+
+	return (
+		<Autocomplete.Root
+			{ ...args }
+			items={ results }
+			value={ query }
+			onValueChange={ ( newValue ) => {
+				setQuery( newValue );
+				setLoading( true );
+				setResults( [] );
+				clearTimeout( timeoutRef.current );
+				timeoutRef.current = setTimeout( () => {
+					setResults(
+						URLS.filter( ( item ) =>
+							item.value
+								.toLowerCase()
+								.includes( newValue.toLowerCase() )
+						)
+					);
+					setLoading( false );
+				}, 500 );
+			} }
+		>
+			<Autocomplete.Input placeholder="Enter a URL" />
+			<Autocomplete.Popup>
+				<Autocomplete.Status>
+					{ getStatusChildren( {
+						loading,
+						count: results.length,
+						visibleCount,
+					} ) }
+				</Autocomplete.Status>
+				<Autocomplete.Empty>
+					{ loading ? null : 'No matching items.' }
+				</Autocomplete.Empty>
+				<Autocomplete.List>
+					<Autocomplete.ListBody>
+						<Autocomplete.Collection>
+							{ ( item: FixtureItem ) => (
+								<Autocomplete.Item
+									key={ item.id }
+									value={ item }
+								>
+									{ item.value }
+								</Autocomplete.Item>
+							) }
+						</Autocomplete.Collection>
+					</Autocomplete.ListBody>
+				</Autocomplete.List>
+			</Autocomplete.Popup>
+		</Autocomplete.Root>
+	);
+}
+
 /**
- * Fetches matching items asynchronously. Keep `Status` mounted and change its
- * children. Use `Empty` for no results.
+ * Fetches matching items asynchronously. Keep `Status` mounted. It shows
+ * loading, then a visually hidden result count. Use `Empty` for no results.
  */
 export const AsyncItems: Story = {
 	render: function Template( args ) {
-		const [ query, setQuery ] = useState( '' );
-		const [ loading, setLoading ] = useState( false );
-		const [ results, setResults ] = useState< typeof URLS >( [] );
-		const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
+		return <AsyncItemsTemplate args={ args } visibleCount={ false } />;
+	},
+};
 
-		return (
-			<Autocomplete.Root
-				{ ...args }
-				items={ results }
-				value={ query }
-				onValueChange={ ( newValue ) => {
-					setQuery( newValue );
-					setLoading( true );
-					setResults( [] );
-					clearTimeout( timeoutRef.current );
-					timeoutRef.current = setTimeout( () => {
-						setResults(
-							URLS.filter( ( item ) =>
-								item.value
-									.toLowerCase()
-									.includes( newValue.toLowerCase() )
-							)
-						);
-						setLoading( false );
-					}, 500 );
-				} }
-			>
-				<Autocomplete.Input placeholder="Enter a URL" />
-				<Autocomplete.Popup>
-					<Autocomplete.Status>
-						{ loading ? (
-							<Stack direction="row" gap="sm" align="center">
-								<Spinner />
-								Loading…
-							</Stack>
-						) : null }
-					</Autocomplete.Status>
-					<Autocomplete.Empty>
-						{ loading ? null : 'No matching items.' }
-					</Autocomplete.Empty>
-					<Autocomplete.List>
-						<Autocomplete.ListBody>
-							<Autocomplete.Collection>
-								{ ( item: FixtureItem ) => (
-									<Autocomplete.Item
-										key={ item.id }
-										value={ item }
-									>
-										{ item.value }
-									</Autocomplete.Item>
-								) }
-							</Autocomplete.Collection>
-						</Autocomplete.ListBody>
-					</Autocomplete.List>
-				</Autocomplete.Popup>
-			</Autocomplete.Root>
-		);
+/**
+ * Same async pattern as `AsyncItems`, with the result count visible in the
+ * popup.
+ */
+export const AsyncItemsVisibleCount: Story = {
+	render: function Template( args ) {
+		return <AsyncItemsTemplate args={ args } visibleCount />;
 	},
 };
 
