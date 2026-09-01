@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Copy/cut/paste', () => {
@@ -14,7 +11,7 @@ test.describe( 'Copy/cut/paste', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'Copy - collapsed selection' );
 		await page.keyboard.press( 'Enter' );
@@ -34,7 +31,7 @@ test.describe( 'Copy/cut/paste', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'Cut - collapsed selection' );
 		await page.keyboard.press( 'Enter' );
@@ -92,7 +89,7 @@ test.describe( 'Copy/cut/paste', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 
 		await page.keyboard.type( 'First block' );
@@ -182,7 +179,7 @@ test.describe( 'Copy/cut/paste', () => {
 			() => window.e2eTestPasteOnce
 		);
 
-		expect( blocksUpdated.length ).toEqual( 1 );
+		expect( blocksUpdated ).toHaveLength( 1 );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -236,7 +233,7 @@ test.describe( 'Copy/cut/paste', () => {
 			() => window.e2eTestPasteOnce
 		);
 
-		expect( blocksUpdated.length ).toEqual( 1 );
+		expect( blocksUpdated ).toHaveLength( 1 );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -246,7 +243,7 @@ test.describe( 'Copy/cut/paste', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'A block' );
 		await page.keyboard.press( 'Enter' );
@@ -279,7 +276,7 @@ test.describe( 'Copy/cut/paste', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'A block' );
 		await editor.insertBlock( { name: 'core/spacer' } );
@@ -313,7 +310,7 @@ test.describe( 'Copy/cut/paste', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'A block' );
 		await page.keyboard.press( 'Enter' );
@@ -346,7 +343,7 @@ test.describe( 'Copy/cut/paste', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'A block' );
 		await editor.insertBlock( { name: 'core/spacer' } );
@@ -374,7 +371,7 @@ test.describe( 'Copy/cut/paste', () => {
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	test( 'should cut partial selection and merge like a normal `delete` - not forward ', async ( {
+	test( 'should cut partial selection and merge like a normal `delete` - not forward', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -405,7 +402,7 @@ test.describe( 'Copy/cut/paste', () => {
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	test( 'should paste plain text in plain text context when cross block selection is copied ', async ( {
+	test( 'should paste plain text in plain text context when cross block selection is copied', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -686,6 +683,29 @@ test.describe( 'Copy/cut/paste', () => {
 		] );
 	} );
 
+	test( 'should undo embed on paste', async ( { pageUtils, editor } ) => {
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		pageUtils.setClipboardData( {
+			plainText: 'https://www.youtube.com/watch?v=FcTLMTyD2DU',
+			html: 'https://www.youtube.com/watch?v=FcTLMTyD2DU',
+		} );
+		await pageUtils.pressKeys( 'primary+v' );
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{ name: 'core/embed' },
+		] );
+
+		await pageUtils.pressKeys( 'primary+z' );
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content:
+						'<a href="https://www.youtube.com/watch?v=FcTLMTyD2DU">https://www.youtube.com/watch?v=FcTLMTyD2DU</a>',
+				},
+			},
+		] );
+	} );
+
 	test( 'should not link selection for non http(s) protocol', async ( {
 		pageUtils,
 		editor,
@@ -791,6 +811,22 @@ test.describe( 'Copy/cut/paste', () => {
 		] );
 	} );
 
+	// See https://github.com/WordPress/gutenberg/issues/28149
+	test( 'should not convert pasted date string into an ordered list', async ( {
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		pageUtils.setClipboardData( { plainText: '4. May 2026' } );
+		await pageUtils.pressKeys( 'primary+v' );
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '4. May 2026' },
+			},
+		] );
+	} );
+
 	test( 'should replace the default block on paste when the content is unmodified', async ( {
 		editor,
 		pageUtils,
@@ -822,6 +858,73 @@ test.describe( 'Copy/cut/paste', () => {
 					content: 'AB',
 					level: 2,
 				},
+			},
+		] );
+	} );
+
+	test( 'should copy the block when its entire text is selected', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: { content: 'A heading', level: 3 },
+		} );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+
+		await editor.canvas.getByText( 'A heading' ).click();
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+c' );
+
+		// Pasting into an empty paragraph inserts the heading, proving
+		// the clipboard holds the block, not bare text.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Empty block' } )
+			.click();
+		await pageUtils.pressKeys( 'primary+v' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/heading',
+				attributes: { content: 'A heading', level: 3 },
+			},
+			{
+				name: 'core/heading',
+				attributes: { content: 'A heading', level: 3 },
+			},
+		] );
+
+		// Pasting into existing text inserts the text inline instead of
+		// splitting the paragraph.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'existing ' },
+		} );
+		await editor.canvas.getByText( 'existing' ).click();
+		await page.keyboard.press( 'ArrowDown' );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/heading' },
+			{ name: 'core/heading' },
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'existing A heading' },
+			},
+		] );
+
+		// Pasting over an entirely selected block replaces it, like
+		// pasting into an empty block.
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/heading' },
+			{ name: 'core/heading' },
+			{
+				name: 'core/heading',
+				attributes: { content: 'A heading', level: 3 },
 			},
 		] );
 	} );

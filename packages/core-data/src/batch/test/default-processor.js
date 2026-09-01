@@ -1,14 +1,8 @@
-/**
- * WordPress dependencies
- */
+import { describe, expect, it, vi } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
 import defaultProcessor from '../default-processor';
 
-jest.mock( '@wordpress/api-fetch' );
+vi.mock( '@wordpress/api-fetch' );
 
 describe( 'defaultProcessor', () => {
 	const preflightResponse = {

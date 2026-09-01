@@ -7,8 +7,8 @@
 			"size": 85,
 			"isLink": true,
 			"linkTarget": "_self",
-			"borderColor": "vivid-red",
 			"align": "right",
+			"borderColor": "vivid-red",
 			"style": {
 				"spacing": {
 					"margin": {

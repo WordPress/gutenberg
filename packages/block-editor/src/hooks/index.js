@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import {
 	createBlockEditFilter,
 	createBlockListBlockFilter,
@@ -38,7 +35,7 @@ import blockBindingsPanel from './block-bindings';
 import listView from './list-view';
 import './block-renaming';
 import './grid-visualizer';
-import autoInspectorControls from './auto-inspector-controls';
+import AutoRegisterControls from './auto-inspector-controls';
 
 createBlockEditFilter(
 	[
@@ -58,7 +55,7 @@ createBlockEditFilter(
 		allowedBlocks,
 		blockFields,
 		listView,
-		autoInspectorControls,
+		AutoRegisterControls,
 	].filter( Boolean )
 );
 createBlockListBlockFilter( [
@@ -94,6 +91,7 @@ createBlockSaveFilter( [
 ] );
 
 export { useCustomSides } from './dimensions';
+export { getDimensionsClassesAndStyles } from './use-dimensions-props';
 export { useLayoutClasses, useLayoutStyles } from './layout';
 export { getBorderClassesAndStyles, useBorderProps } from './use-border-props';
 export { getShadowClassesAndStyles } from './use-shadow-props';
@@ -104,5 +102,5 @@ export { getGapCSSValue } from './gap';
 export { useCachedTruthy } from './use-cached-truthy';
 export { setBackgroundStyleDefaults } from './background';
 export { useZoomOut } from './use-zoom-out';
-export { __unstableBlockStyleVariationOverridesWithConfig } from './block-style-variation';
+export { BlockStyleVariationOverridesWithConfig } from './block-style-variation';
 export { useStyleOverride } from './utils';

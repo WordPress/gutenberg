@@ -1,23 +1,16 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import BorderBoxControlLinkedButton from '../border-box-control-linked-button';
 import BorderBoxControlSplitControls from '../border-box-control-split-controls';
 import { BorderControl } from '../../border-control';
-import { StyledLabel } from '../../base-control/styles/base-control-styles';
+import BaseControl from '../../base-control';
+import { Grid } from '../../grid';
 import { View } from '../../view';
 import { VisuallyHidden } from '../../visually-hidden';
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { useBorderBoxControl } from './hook';
-
 import type { BorderBoxControlProps } from '../types';
 import type {
 	LabelProps,
@@ -31,10 +24,13 @@ const BorderLabel = ( props: LabelProps ) => {
 		return null;
 	}
 
+	// The visible label is rendered as `BaseControl.VisualLabel` so it carries
+	// the stable `.components-base-control__label` className consumers style
+	// against; `StyledLabel` is an emotion component with a generated one.
 	return hideLabelFromVision ? (
 		<VisuallyHidden as="label">{ label }</VisuallyHidden>
 	) : (
-		<StyledLabel>{ label }</StyledLabel>
+		<BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel>
 	);
 };
 
@@ -50,6 +46,8 @@ const UnconnectedBorderBoxControl = (
 		enableAlpha,
 		enableStyle,
 		hasMixedBorders,
+		hasVisibleLabel,
+		headerClassName,
 		hideLabelFromVision,
 		isLinked,
 		label,
@@ -59,7 +57,6 @@ const UnconnectedBorderBoxControl = (
 		onSplitChange,
 		popoverPlacement,
 		popoverOffset,
-		size,
 		splitValue,
 		toggleLinked,
 		wrapperClassName,
@@ -89,12 +86,34 @@ const UnconnectedBorderBoxControl = (
 		);
 
 	const mergedRef = useMergeRefs( [ setPopoverAnchor, forwardedRef ] );
+
 	return (
 		<View className={ className } { ...otherProps } ref={ mergedRef }>
-			<BorderLabel
-				label={ label }
-				hideLabelFromVision={ hideLabelFromVision }
-			/>
+			{ hasVisibleLabel ? (
+				// The toggle shares the label's row so that it lines up with
+				// the equivalent toggle on sibling controls, e.g. the border
+				// radius one.
+				<Grid
+					className={ headerClassName }
+					columns={ 2 }
+					templateColumns="1fr min-content"
+					alignment="center"
+				>
+					<BorderLabel
+						label={ label }
+						hideLabelFromVision={ hideLabelFromVision }
+					/>
+					<BorderBoxControlLinkedButton
+						onClick={ toggleLinked }
+						isLinked={ isLinked }
+					/>
+				</Grid>
+			) : (
+				<BorderLabel
+					label={ label }
+					hideLabelFromVision={ hideLabelFromVision }
+				/>
+			) }
 			<View className={ wrapperClassName }>
 				{ isLinked ? (
 					<BorderControl
@@ -112,14 +131,10 @@ const UnconnectedBorderBoxControl = (
 						shouldSanitizeBorder={ false } // This component will handle that.
 						value={ linkedValue }
 						withSlider
-						width={
-							size === '__unstable-large' ? '116px' : '110px'
-						}
+						width="116px"
 						__experimentalIsRenderedInSidebar={
 							__experimentalIsRenderedInSidebar
 						}
-						__shouldNotWarnDeprecated36pxSize
-						size={ size }
 					/>
 				) : (
 					<BorderBoxControlSplitControls
@@ -134,14 +149,16 @@ const UnconnectedBorderBoxControl = (
 						__experimentalIsRenderedInSidebar={
 							__experimentalIsRenderedInSidebar
 						}
-						size={ size }
 					/>
 				) }
-				<BorderBoxControlLinkedButton
-					onClick={ toggleLinked }
-					isLinked={ isLinked }
-					size={ size }
-				/>
+				{ /* With no label row to join, the toggle sits alongside the
+				     inputs instead. */ }
+				{ ! hasVisibleLabel && (
+					<BorderBoxControlLinkedButton
+						onClick={ toggleLinked }
+						isLinked={ isLinked }
+					/>
+				) }
 			</View>
 		</View>
 	);
@@ -176,7 +193,6 @@ const UnconnectedBorderBoxControl = (
  *
  * 	return (
  * 		<BorderBoxControl
- * 			__next40pxDefaultSize
  * 			colors={ colors }
  * 			label={ __( 'Borders' ) }
  * 			onChange={ onChange }

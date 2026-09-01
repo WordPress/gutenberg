@@ -2,9 +2,6 @@
 /** @typedef {import('estree').Node} Node */
 /** @typedef {import('estree').SourceLocation} SourceLocation */
 
-const DEPENDENCY_BLOCK_PATTERN =
-	/^\*?\n \* (External|Node|WordPress|Internal) dependencies\n $/;
-
 /** @type {import('eslint').Rule.RuleModule} */
 module.exports = {
 	meta: {
@@ -22,7 +19,8 @@ module.exports = {
 	},
 	create( context ) {
 		const mode = context.options[ 0 ] || 'always';
-		const comments = context.getSourceCode().getAllComments();
+		const sourceCode = context.sourceCode;
+		const comments = sourceCode.getAllComments();
 
 		/**
 		 * Locality classification of an import, one of "External",
@@ -111,9 +109,8 @@ module.exports = {
 		 * @return {boolean} Whether comment node is a dependency block.
 		 */
 		function isDependencyBlock( node ) {
-			return (
-				node.type === 'Block' &&
-				DEPENDENCY_BLOCK_PATTERN.test( node.value )
+			return [ 'External', 'WordPress', 'Internal' ].some( ( locality ) =>
+				isLocalityDependencyBlock( node, locality )
 			);
 		}
 
@@ -194,9 +191,7 @@ module.exports = {
 										return null;
 									}
 
-									const text = context
-										.getSourceCode()
-										.getText();
+									const text = sourceCode.getText();
 
 									// Trim preceding and trailing newlines.
 									let [ start, end ] = comment.range;

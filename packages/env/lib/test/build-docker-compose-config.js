@@ -1,9 +1,27 @@
-'use strict';
-/**
- * Internal dependencies
- */
+import { createRequire } from 'node:module';
+import { afterAll, describe, expect, it, vi } from 'vitest';
+const require = createRequire( import.meta.url );
+const getHostUserPath = require.resolve( '../runtime/docker/get-host-user' );
+const originalGetHostUser = require( getHostUserPath );
+const getHostUser = vi.fn( () => ( {
+	name: 'test',
+	uid: 1,
+	gid: 2,
+	fullUser: '1:2',
+} ) );
+require.cache[ getHostUserPath ].exports = getHostUser;
 const buildDockerComposeConfig = require( '../runtime/docker/build-docker-compose-config' );
-const getHostUser = require( '../runtime/docker/get-host-user' );
+const {
+	wordpressDockerFileContents,
+	getLoopbackPortConfig,
+} = require( '../runtime/docker/docker-config' );
+
+afterAll( () => {
+	require.cache[ getHostUserPath ].exports = originalGetHostUser;
+	delete require.cache[
+		require.resolve( '../runtime/docker/build-docker-compose-config' )
+	];
+} );
 
 // The basic config keys which build docker compose config requires.
 const CONFIG = {
@@ -13,16 +31,6 @@ const CONFIG = {
 	port: 8888,
 	configDirectoryPath: '/path/to/config',
 };
-
-jest.mock( '../runtime/docker/get-host-user', () => jest.fn() );
-getHostUser.mockImplementation( () => {
-	return {
-		name: 'test',
-		uid: 1,
-		gid: 2,
-		fullUser: '1:2',
-	};
-} );
 
 describe( 'buildDockerComposeConfig', () => {
 	it( 'should map directories before individual sources', () => {
@@ -213,5 +221,111 @@ describe( 'buildDockerComposeConfig', () => {
 		expect( config.services[ 'tests-wordpress' ].depends_on ).toEqual( {
 			'tests-mysql': { condition: 'service_healthy' },
 		} );
+	} );
+
+	describe( 'testsEnvironment', () => {
+		it( 'should omit tests services when testsEnvironment is false', () => {
+			const dockerConfig = buildDockerComposeConfig( {
+				testsEnvironment: false,
+				workDirectoryPath: '/path',
+				env: {
+					development: CONFIG,
+					tests: CONFIG,
+				},
+			} );
+
+			// Development services should exist.
+			expect( dockerConfig.services.mysql ).toBeDefined();
+			expect( dockerConfig.services.wordpress ).toBeDefined();
+			expect( dockerConfig.services.cli ).toBeDefined();
+			expect( dockerConfig.services.phpmyadmin ).toBeDefined();
+
+			// Tests services should not exist.
+			expect( dockerConfig.services[ 'tests-mysql' ] ).toBeUndefined();
+			expect(
+				dockerConfig.services[ 'tests-wordpress' ]
+			).toBeUndefined();
+			expect( dockerConfig.services[ 'tests-cli' ] ).toBeUndefined();
+			expect(
+				dockerConfig.services[ 'tests-phpmyadmin' ]
+			).toBeUndefined();
+		} );
+
+		it( 'should omit tests volumes when testsEnvironment is false', () => {
+			const dockerConfig = buildDockerComposeConfig( {
+				testsEnvironment: false,
+				workDirectoryPath: '/path',
+				env: {
+					development: CONFIG,
+					tests: CONFIG,
+				},
+			} );
+
+			// Development volumes should exist.
+			expect( dockerConfig.volumes.wordpress ).toBeDefined();
+			expect( dockerConfig.volumes.mysql ).toBeDefined();
+			expect( dockerConfig.volumes[ 'user-home' ] ).toBeDefined();
+
+			// Tests volumes should not exist.
+			expect( dockerConfig.volumes[ 'tests-wordpress' ] ).toBeUndefined();
+			expect( dockerConfig.volumes[ 'mysql-test' ] ).toBeUndefined();
+			expect( dockerConfig.volumes[ 'tests-user-home' ] ).toBeUndefined();
+		} );
+
+		it( 'should include tests services by default', () => {
+			const dockerConfig = buildDockerComposeConfig( {
+				workDirectoryPath: '/path',
+				env: {
+					development: CONFIG,
+					tests: CONFIG,
+				},
+			} );
+
+			expect( dockerConfig.services[ 'tests-mysql' ] ).toBeDefined();
+			expect( dockerConfig.services[ 'tests-wordpress' ] ).toBeDefined();
+			expect( dockerConfig.services[ 'tests-cli' ] ).toBeDefined();
+		} );
+	} );
+} );
+
+describe( 'getLoopbackPortConfig', () => {
+	it( 'returns Apache Listen and VirtualHost edits for a non-default port using an anchored sed pattern', () => {
+		const out = getLoopbackPortConfig( 8888 );
+		expect( out ).toContain( 'Listen 8888' );
+		expect( out ).toContain( '/etc/apache2/ports.conf' );
+		expect( out ).toContain( '<VirtualHost *:80 *:8888>' );
+		expect( out ).toContain(
+			'/etc/apache2/sites-enabled/000-default.conf'
+		);
+		// Guard against a future "simplification" to a greedy s/80/.../g
+		// that would also match e.g. unrelated "80" substrings.
+		expect( out ).not.toMatch( /s\|80\|/ );
+		expect( out ).toMatch( /s\|<VirtualHost \\\*:80>\|/ );
+	} );
+
+	it( 'returns an empty string for port 80 (Apache already listens there)', () => {
+		expect( getLoopbackPortConfig( 80 ) ).toBe( '' );
+	} );
+
+	it( 'returns an empty string for port 443 (wp-env does not configure SSL)', () => {
+		expect( getLoopbackPortConfig( 443 ) ).toBe( '' );
+	} );
+} );
+
+describe( 'wordpressDockerFileContents', () => {
+	it( 'injects the resolved per-environment port into the generated Dockerfile', () => {
+		const config = {
+			xdebug: 'off',
+			spx: 'off',
+			env: {
+				development: { port: 8888, phpVersion: null },
+				tests: { port: 8889, phpVersion: null },
+			},
+		};
+		const dockerfile = wordpressDockerFileContents( 'tests', config );
+		// Proves getLoopbackPortConfig is wired in AND that each environment
+		// uses its own port (not the development port).
+		expect( dockerfile ).toContain( 'Listen 8889' );
+		expect( dockerfile ).not.toContain( 'Listen 8888' );
 	} );
 } );

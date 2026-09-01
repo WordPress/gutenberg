@@ -1,7 +1,5 @@
-/**
- * Internal dependencies
- */
 import {
+	type AccumulateSubSizeAction,
 	type AddAction,
 	type AddOperationsAction,
 	type CacheBlobUrlAction,
@@ -17,13 +15,18 @@ import {
 	type ResumeQueueAction,
 	type RetryItemAction,
 	type RevokeBlobUrlsAction,
+	type ScheduleRetryAction,
 	type State,
 	Type,
 	type UnknownAction,
 	type UpdateProgressAction,
 	type UpdateSettingsAction,
 } from './types';
-import { DEFAULT_MAX_CONCURRENT_UPLOADS } from './constants';
+import {
+	DEFAULT_MAX_CONCURRENT_UPLOADS,
+	DEFAULT_MAX_CONCURRENT_IMAGE_PROCESSING,
+	DEFAULT_RETRY_SETTINGS,
+} from './constants';
 
 const noop = () => {};
 
@@ -34,14 +37,19 @@ const DEFAULT_STATE: State = {
 	settings: {
 		mediaUpload: noop,
 		maxConcurrentUploads: DEFAULT_MAX_CONCURRENT_UPLOADS,
+		maxConcurrentImageProcessing: DEFAULT_MAX_CONCURRENT_IMAGE_PROCESSING,
+		retry: { ...DEFAULT_RETRY_SETTINGS },
 	},
+	failureCount: 0,
 };
 
 type Action =
+	| AccumulateSubSizeAction
 	| AddAction
 	| RemoveAction
 	| CancelAction
 	| RetryItemAction
+	| ScheduleRetryAction
 	| PauseItemAction
 	| ResumeItemAction
 	| PauseQueueAction
@@ -108,9 +116,22 @@ function reducer(
 				queue: [ ...state.queue, action.item ],
 			};
 
-		case Type.Cancel:
+		case Type.Cancel: {
+			/*
+			 * Only top-level items count as failures. A sub-size that fails on
+			 * its own does not stop the attachment from being uploaded, and a
+			 * sub-size failure bad enough to sink the whole attachment cancels
+			 * the parent too - which is the cancellation counted here.
+			 */
+			const cancelled = state.queue.find(
+				( item ) => item.id === action.id
+			);
 			return {
 				...state,
+				failureCount:
+					cancelled && ! cancelled.parentId
+						? state.failureCount + 1
+						: state.failureCount,
 				queue: state.queue.map(
 					( item ): QueueItem =>
 						item.id === action.id
@@ -121,6 +142,7 @@ function reducer(
 							: item
 				),
 			};
+		}
 
 		case Type.RetryItem:
 			return {
@@ -133,6 +155,25 @@ function reducer(
 									status: ItemStatus.Processing,
 									error: undefined,
 									retryCount: ( item.retryCount ?? 0 ) + 1,
+									abortController: new AbortController(),
+							  }
+							: item
+				),
+			};
+
+		case Type.ScheduleRetry:
+			return {
+				...state,
+				queue: state.queue.map(
+					( item ): QueueItem =>
+						item.id === action.id
+							? {
+									...item,
+									status: ItemStatus.PendingRetry,
+									error: action.error,
+									retryCount: action.retryCount,
+									nextRetryTimestamp:
+										action.nextRetryTimestamp,
 							  }
 							: item
 				),
@@ -242,6 +283,23 @@ function reducer(
 							? {
 									...item,
 									progress: action.progress,
+							  }
+							: item
+				),
+			};
+
+		case Type.AccumulateSubSize:
+			return {
+				...state,
+				queue: state.queue.map(
+					( item ): QueueItem =>
+						item.id === action.id
+							? {
+									...item,
+									subSizes: [
+										...( item.subSizes || [] ),
+										action.subSize,
+									],
 							  }
 							: item
 				),

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -16,6 +13,7 @@ test.use( {
 
 test.describe( 'Style Revisions', () => {
 	let stylesPostId;
+
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.activateTheme( 'emptytheme' ),
@@ -25,12 +23,12 @@ test.describe( 'Style Revisions', () => {
 		stylesPostId = await requestUtils.getCurrentThemeGlobalStylesPostId();
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-	} );
-
 	test.beforeEach( async ( { admin } ) => {
 		await admin.visitSiteEditor();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test( 'should display revisions UI when there is 1 revision', async ( {
@@ -75,9 +73,9 @@ test.describe( 'Style Revisions', () => {
 	} ) => {
 		await editor.canvas.locator( 'body' ).click();
 		await userGlobalStylesRevisions.openStylesPanel();
-		await page.getByRole( 'button', { name: 'Colors' } ).click();
+		await page.getByRole( 'button', { name: 'Background styles' } ).click();
 		await page
-			.getByRole( 'button', { name: 'Background', exact: true } )
+			.getByRole( 'button', { name: 'Color', exact: true } )
 			.click();
 		await page
 			.getByRole( 'option', { name: 'Luminous vivid amber' } )
@@ -206,6 +204,54 @@ test.describe( 'Style Revisions', () => {
 		).toBeHidden();
 	} );
 
+	test( 'should close the revisions panel with a single click of Back after selecting a revision', async ( {
+		page,
+		editor,
+		userGlobalStylesRevisions,
+	} ) => {
+		await editor.canvas.locator( 'body' ).click();
+		await userGlobalStylesRevisions.openStylesPanel();
+		await page.getByRole( 'button', { name: 'Revisions' } ).click();
+
+		// Selecting a revision puts its id in the path (`/revisions/12`).
+		await page
+			.getByRole( 'option', { name: /^Changes saved by / } )
+			.last()
+			.click();
+
+		await page.getByRole( 'button', { name: 'Back', exact: true } ).click();
+
+		await expect(
+			page.getByLabel( 'Global styles revisions list' )
+		).toBeHidden();
+	} );
+
+	test( 'should close the revisions panel after applying a revision', async ( {
+		page,
+		editor,
+		userGlobalStylesRevisions,
+	} ) => {
+		await editor.canvas.locator( 'body' ).click();
+		await userGlobalStylesRevisions.openStylesPanel();
+		await page.getByRole( 'button', { name: 'Revisions' } ).click();
+
+		await page
+			.getByLabel( 'Global styles revisions list' )
+			.getByRole( 'option' )
+			.last()
+			.click();
+
+		await page
+			.getByRole( 'button', {
+				name: 'Apply the selected revision to your site.',
+			} )
+			.click();
+
+		await expect(
+			page.getByLabel( 'Global styles revisions list' )
+		).toBeHidden();
+	} );
+
 	test( 'should close revisions panel and leave style book open if activated', async ( {
 		page,
 		editor,
@@ -226,7 +272,7 @@ test.describe( 'Style Revisions', () => {
 			page.getByLabel( 'Global styles revisions list' )
 		).toBeVisible();
 
-		await page.click( 'role=button[name="Back"]' );
+		await page.getByRole( 'button', { name: 'Back', exact: true } ).click();
 
 		await expect(
 			page.getByLabel( 'Global styles revisions list' )

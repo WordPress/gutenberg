@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 
 const variations = [
@@ -69,6 +66,16 @@ const variations = [
 		isDefault: true,
 		scope: [ 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) => blockAttributes?.type === 'number',
+	},
+	{
+		name: 'hidden',
+		title: __( 'Hidden Input' ),
+		icon: 'visibility',
+		description: __( 'A hidden input field.' ),
+		attributes: { type: 'hidden' },
+		isDefault: true,
+		scope: [ 'inserter', 'transform' ],
+		isActive: ( blockAttributes ) => blockAttributes?.type === 'hidden',
 	},
 ];
 

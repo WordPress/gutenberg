@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -32,14 +29,18 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		// See: https://github.com/WordPress/gutenberg/issues/18928
 		await writingFlowUtils.addDemoContent();
 
-		const activeElementLocator = editor.canvas.locator( ':focus' );
+		// The element owning the caret: the focused element, or the selected
+		// block while a focused editing host owns the selection.
+		const activeElementLocator = editor.canvas.locator(
+			'body:not(:focus) :focus, body:focus .is-selected'
+		);
 
 		// Arrow up into nested context focuses last text input.
 		await page.keyboard.press( 'ArrowUp' );
 		await expect
 			.poll( writingFlowUtils.getActiveBlockName )
 			.toBe( 'core/paragraph' );
-		await expect( activeElementLocator ).toBeFocused();
+		await expect( activeElementLocator ).toHaveCount( 1 );
 		await expect( activeElementLocator ).toHaveText( '2nd col' );
 
 		// Arrow up in inner blocks should navigate through (1) column wrapper,
@@ -49,12 +50,6 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 			.poll( writingFlowUtils.getActiveBlockName )
 			.toBe( 'core/column' );
 		await page.keyboard.press( 'ArrowUp' );
-		const activeElementBlockType = await editor.canvas
-			.locator( ':root' )
-			.evaluate( () =>
-				document.activeElement.getAttribute( 'data-type' )
-			);
-		expect( activeElementBlockType ).toBe( 'core/columns' );
 		await expect
 			.poll( writingFlowUtils.getActiveBlockName )
 			.toBe( 'core/columns' );
@@ -65,7 +60,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await expect
 			.poll( writingFlowUtils.getActiveBlockName )
 			.toBe( 'core/paragraph' );
-		await expect( activeElementLocator ).toBeFocused();
+		await expect( activeElementLocator ).toHaveCount( 1 );
 		await expect( activeElementLocator ).toHaveText( 'First paragraph' );
 
 		expect( await editor.getBlocks() ).toMatchObject( [
@@ -104,6 +99,37 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 				attributes: { content: 'Second paragraph' },
 			},
 		] );
+	} );
+
+	test( 'should not select list wrapper when pressing arrow up from list', async ( {
+		editor,
+		page,
+		writingFlowUtils,
+	} ) => {
+		// Insert a paragraph block first.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First paragraph' },
+		} );
+
+		// Insert a list block.
+		await editor.insertBlock( { name: 'core/list' } );
+		await page.keyboard.type( 'List item' );
+
+		// The caret is now inside the list item.
+		// Press ArrowUp - should skip the list wrapper and go to the paragraph.
+		await page.keyboard.press( 'ArrowUp' );
+
+		// Verify we're in the paragraph, NOT the list wrapper.
+		await expect
+			.poll( writingFlowUtils.getActiveBlockName )
+			.toBe( 'core/paragraph' );
+
+		// Verify the element owning the caret has the paragraph content.
+		const activeElementLocator = editor.canvas.locator(
+			'body:not(:focus) :focus, body:focus .is-selected'
+		);
+		await expect( activeElementLocator ).toHaveText( 'First paragraph' );
 	} );
 
 	test( 'should navigate around inline boundaries', async ( {
@@ -525,6 +551,31 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		] );
 	} );
 
+	// Regression test for https://github.com/WordPress/gutenberg/issues/72053.
+	test( 'should navigate contenteditable with border radius', async ( {
+		editor,
+		page,
+	} ) => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await editor.canvas.locator( ':root' ).evaluate( () => {
+			document.activeElement.style.borderRadius = '50px';
+		} );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.type( '1' );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '1' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '' },
+			},
+		] );
+	} );
+
 	test( 'should not prematurely multi-select', async ( {
 		editor,
 		page,
@@ -788,6 +839,34 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 	} );
 
+	test( 'should place the caret at the click position when clicking a block that is not selected', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'First' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Second' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: 'Second' } },
+		] );
+
+		// Click the first paragraph. The click lands at the center of the
+		// paragraph element, past the end of the short text, so the caret
+		// must be placed at the end of the text.
+		await editor.canvas.locator( 'p:text("First")' ).click();
+		await page.keyboard.type( '!' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First!' } },
+			{ name: 'core/paragraph', attributes: { content: 'Second' } },
+		] );
+	} );
+
 	test( 'should not have a dead zone between blocks (lower)', async ( {
 		editor,
 		page,
@@ -842,7 +921,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 			page.getByRole( 'option', { name: 'Image', selected: true } )
 		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
-		await editor.clickBlockToolbarButton( 'Align' );
+		await editor.clickBlockToolbarButton( 'Align block' );
 
 		const wideButton = page.locator(
 			'role=menuitemradio[name="Wide width"i]'
@@ -1001,7 +1080,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 <!-- /wp:paragraph -->` );
 	} );
 
-	test( 'should move to the start of the first line on ArrowUp (-firefox)', async ( {
+	test( 'should move to the start of the first line on ArrowUp', async ( {
 		page,
 		editor,
 	} ) => {
@@ -1033,6 +1112,86 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await expect(
 			editor.canvas.locator( 'role=document[name="Block: Paragraph"i]' )
 		).toHaveText( /^\.a+$/ );
+	} );
+
+	test( 'should not scroll the page when moving the caret within a block taller than the viewport', async ( {
+		page,
+		editor,
+	} ) => {
+		const lines = Array.from(
+			{ length: 70 },
+			( _, i ) => `line ${ i + 1 }`
+		).join( '\n' );
+		await editor.insertBlock( {
+			name: 'core/code',
+			attributes: { content: lines },
+		} );
+
+		const frame = page.frame( { name: 'editor-canvas' } );
+
+		// Scroll the middle of the code block into view and click there.
+		await frame.evaluate( () => {
+			const code = document.querySelector( '[data-type="core/code"]' );
+			const rect = code.getBoundingClientRect();
+			const middle =
+				rect.top + document.documentElement.scrollTop + rect.height / 2;
+			document.documentElement.scrollTop =
+				middle - window.innerHeight / 2;
+		} );
+		const codeBox = await editor.canvas
+			.locator( '[data-type="core/code"] code' )
+			.boundingBox();
+		await page.mouse.click(
+			codeBox.x + 60,
+			codeBox.y + codeBox.height / 2
+		);
+
+		const getCaretLine = () =>
+			frame.evaluate( () =>
+				parseInt(
+					document
+						.getSelection()
+						.focusNode?.textContent.match( /line (\d+)/ )?.[ 1 ],
+					10
+				)
+			);
+		const lineBefore = await getCaretLine();
+
+		// Without a caret the line reads are NaN and the final assertion
+		// would compare NaN to NaN, which passes.
+		expect( lineBefore ).toBeGreaterThan( 1 );
+
+		// Record every scroll movement for a second. Moving the caret
+		// within the block must not scroll the page: the caret stays
+		// within the viewport.
+		const scrollWatcher = frame.evaluate(
+			() =>
+				new Promise( ( resolve ) => {
+					const positions = [];
+					// Capture phase so scrolls of nested containers are
+					// caught too, not only the document.
+					document.addEventListener(
+						'scroll',
+						( event ) => {
+							positions.push(
+								event.target === document
+									? document.documentElement.scrollTop
+									: event.target.scrollTop
+							);
+						},
+						true
+					);
+					setTimeout( () => resolve( positions ), 1000 );
+				} )
+		);
+
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowUp' );
+
+		// The caret moved down one line net (down, down, up).
+		await expect.poll( getCaretLine ).toBe( lineBefore + 1 );
+		expect( await scrollWatcher ).toEqual( [] );
 	} );
 
 	test( 'should vertically move the caret from corner to corner (-webkit)', async ( {
@@ -1155,6 +1314,131 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
 		).not.toBeFocused();
 	} );
+
+	test( 'should show format toolbar when selecting text from the left edge of a block', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
+
+		// Deselect the block.
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
+		);
+
+		const paragraphBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		const box = await paragraphBlock.boundingBox();
+
+		// Start the drag from just before the left edge of the paragraph
+		// (on the block wrapper padding) and drag into the text.
+		const startX = box.x - 5;
+		const startY = box.y + box.height / 2;
+		const endX = box.x + box.width / 2;
+		const endY = startY;
+
+		await page.mouse.move( startX, startY );
+		await page.mouse.down();
+		await page.mouse.move( endX, endY, { steps: 10 } );
+		await page.mouse.up();
+
+		// The Bold button should be visible in the inline block toolbar.
+		await expect(
+			page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Bold' } )
+		).toBeVisible();
+	} );
+
+	// Regression test: ArrowDown should not skip over a paragraph that contains
+	// a link. See https://github.com/WordPress/gutenberg/issues/77473.
+	test( 'should not skip paragraph with link when navigating down with ArrowDown', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'a' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: '<a href="#">a</a>' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'a' },
+		} );
+
+		// Position cursor at the start of the first paragraph.
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i]' )
+			.first()
+			.click();
+		await page.keyboard.press( 'Home' );
+
+		// ArrowDown should move to the second paragraph (with the link),
+		// not skip over it to the third.
+		await page.keyboard.press( 'ArrowDown' );
+
+		// The element owning the caret should be the second paragraph, which
+		// contains a link.
+		const focusedElement = editor.canvas.locator(
+			'body:not(:focus) :focus, body:focus .is-selected'
+		);
+		await expect( focusedElement.locator( 'a[href="#"]' ) ).toBeVisible();
+	} );
+
+	test( 'inserts the container default block on Enter on a selected block', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/gallery',
+			innerBlocks: [
+				{
+					name: 'core/image',
+					attributes: {
+						url: 'data:image/gif;base64,R0lGODlhAQABAAAAACw=',
+					},
+				},
+				{
+					name: 'core/image',
+					attributes: {
+						url: 'data:image/gif;base64,R0lGODlhAQABAAAAACw=',
+					},
+				},
+			],
+		} );
+
+		const firstImage = editor.canvas
+			.getByRole( 'document', { name: 'Block: Image' } )
+			.first();
+		await editor.selectBlocks( firstImage );
+		await expect( firstImage ).toBeFocused();
+
+		// A gallery defines the image as its default block, so Enter
+		// inserts a new empty image after the selected one.
+		await page.keyboard.press( 'Enter' );
+
+		await expect
+			.poll( () =>
+				editor.getBlocks().then( ( [ gallery ] ) =>
+					gallery.innerBlocks.map( ( { name, attributes } ) => ( {
+						name,
+						hasUrl: !! attributes.url,
+					} ) )
+				)
+			)
+			.toEqual( [
+				{ name: 'core/image', hasUrl: true },
+				{ name: 'core/image', hasUrl: false },
+				{ name: 'core/image', hasUrl: true },
+			] );
+	} );
 } );
 
 class WritingFlowUtils {
@@ -1186,12 +1470,16 @@ class WritingFlowUtils {
 		await this.editor.canvas
 			.locator( 'role=button[name="Two columns; equal split"i]' )
 			.click();
-		await this.editor.canvas
-			.locator( '.is-selected >> role=button[name="Add block"i]' )
+
+		const firstColumn = this.editor.canvas.getByRole( 'document', {
+			name: 'Block: Column (1 of 2)',
+		} );
+		await firstColumn.focus();
+		await firstColumn.getByRole( 'button', { name: 'Add block' } ).click();
+		await this.page
+			.getByRole( 'listbox', { name: 'Blocks' } )
+			.getByRole( 'option', { name: 'Paragraph' } )
 			.click();
-		await this.page.click(
-			'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
-		);
 		await this.page.keyboard.type( '1st col' ); // If this text is too long, it may wrap to a new line and cause test failure. That's why we're using "1st" instead of "First" here.
 
 		await this.editor.canvas
@@ -1200,9 +1488,10 @@ class WritingFlowUtils {
 		await this.editor.canvas
 			.locator( 'role=button[name="Add block"i]' )
 			.click();
-		await this.page.click(
-			'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
-		);
+		await this.page
+			.getByRole( 'listbox', { name: 'Blocks' } )
+			.getByRole( 'option', { name: 'Paragraph' } )
+			.click();
 		await this.page.keyboard.type( '2nd col' ); // If this text is too long, it may wrap to a new line and cause test failure. That's why we're using "2nd" instead of "Second" here.
 		await this.editor.showBlockToolbar();
 		await this.page.keyboard.press( 'Shift+Tab' ); // Move to toolbar to select parent

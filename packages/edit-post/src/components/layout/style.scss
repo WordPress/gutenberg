@@ -39,7 +39,7 @@
 	}
 
 	> button[aria-expanded] {
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 		width: 100%;
 		display: flex;
 		justify-content: space-between;
@@ -120,13 +120,6 @@
 	isolation: isolate;
 }
 
-// Adjust the position of the notices
-.components-editor-notices__snackbar {
-	position: fixed;
-	right: 0;
-	bottom: 24px;
-	padding-left: 24px;
-	padding-right: 24px;
+.edit-post-layout__snackbar {
+	@include snackbar-container();
 }
-
-@include editor-left(".edit-post-layout .components-editor-notices__snackbar");

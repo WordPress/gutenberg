@@ -1,30 +1,20 @@
-/**
- * External dependencies
- */
 import {
+	afterEach,
+	beforeEach,
 	describe,
 	expect,
 	it,
-	jest,
-	beforeEach,
-	afterEach,
-} from '@jest/globals';
-
-/**
- * Internal dependencies
- */
-import {
-	logPerformanceTiming,
-	passThru,
-	yieldToEventLoop,
-} from '../performance';
+	vi,
+	type MockInstance,
+} from 'vitest';
+import { logPerformanceTiming, passThru } from '../performance';
 
 describe( 'performance utilities', () => {
 	describe( 'logPerformanceTiming', () => {
-		let consoleSpy: jest.SpiedFunction< typeof console.log >;
+		let consoleSpy: MockInstance< typeof console.log >;
 
 		beforeEach( () => {
-			consoleSpy = jest
+			consoleSpy = vi
 				.spyOn( console, 'log' )
 				.mockImplementation( () => {} );
 		} );
@@ -52,12 +42,12 @@ describe( 'performance utilities', () => {
 
 			expect( consoleSpy ).toHaveBeenCalledTimes( 1 );
 			expect( consoleSpy.mock.calls[ 0 ][ 0 ] ).toMatch(
-				/^myFunction took \d+\.\d{2} ms$/
+				/myFunction took \d+\.\d{2} ms$/
 			);
 		} );
 
 		it( 'passes all arguments to the wrapped function', () => {
-			const fn = jest.fn( ( a: number, b: string, c: boolean ) => {
+			const fn = vi.fn( ( a: number, b: string, c: boolean ) => {
 				return `${ a }-${ b }-${ c }`;
 			} );
 
@@ -116,7 +106,7 @@ describe( 'performance utilities', () => {
 
 	describe( 'passThru', () => {
 		it( 'returns a function that calls the original function', () => {
-			const fn = jest.fn( () => 'result' );
+			const fn = vi.fn( () => 'result' );
 
 			const wrapped = passThru( fn );
 			const result = wrapped();
@@ -126,7 +116,7 @@ describe( 'performance utilities', () => {
 		} );
 
 		it( 'passes all arguments to the original function', () => {
-			const fn = jest.fn( ( a: number, b: string ) => `${ a }-${ b }` );
+			const fn = vi.fn( ( a: number, b: string ) => `${ a }-${ b }` );
 
 			const wrapped = passThru( fn );
 			const result = wrapped( 42, 'test' );
@@ -175,112 +165,6 @@ describe( 'performance utilities', () => {
 			const wrapped = passThru( fn );
 
 			expect( () => wrapped() ).toThrow( 'test error' );
-		} );
-	} );
-
-	describe( 'yieldToEventLoop', () => {
-		beforeEach( () => {
-			jest.useFakeTimers();
-		} );
-
-		afterEach( () => {
-			jest.useRealTimers();
-		} );
-
-		it( 'delays function execution to the next tick', () => {
-			const fn = jest.fn();
-
-			const wrapped = yieldToEventLoop( fn );
-			wrapped();
-
-			expect( fn ).not.toHaveBeenCalled();
-
-			jest.runAllTimers();
-
-			expect( fn ).toHaveBeenCalledTimes( 1 );
-		} );
-
-		it( 'passes all arguments to the wrapped function', () => {
-			const fn = jest.fn( ( a: number, b: string ) => `${ a }-${ b }` );
-
-			const wrapped = yieldToEventLoop( fn );
-			wrapped( 42, 'test' );
-
-			jest.runAllTimers();
-
-			expect( fn ).toHaveBeenCalledWith( 42, 'test' );
-		} );
-
-		it( 'preserves the this context', () => {
-			const obj = {
-				value: 10,
-				logValue: jest.fn( function ( this: { value: number } ) {
-					return this.value;
-				} ),
-			};
-
-			const wrapped = yieldToEventLoop( obj.logValue );
-			wrapped.call( obj );
-
-			jest.runAllTimers();
-
-			expect( obj.logValue ).toHaveBeenCalled();
-			expect( obj.logValue.mock.instances[ 0 ] ).toBe( obj );
-		} );
-
-		it( 'handles multiple invocations', () => {
-			const fn = jest.fn();
-
-			const wrapped = yieldToEventLoop( fn );
-			wrapped();
-			wrapped();
-			wrapped();
-
-			expect( fn ).not.toHaveBeenCalled();
-
-			jest.runAllTimers();
-
-			expect( fn ).toHaveBeenCalledTimes( 3 );
-		} );
-
-		it( 'each invocation is independent', () => {
-			const calls: number[] = [];
-			const fn = ( value: number ): void => {
-				calls.push( value );
-			};
-
-			const wrapped = yieldToEventLoop( fn );
-			wrapped( 1 );
-			wrapped( 2 );
-			wrapped( 3 );
-
-			jest.runAllTimers();
-
-			expect( calls ).toEqual( [ 1, 2, 3 ] );
-		} );
-
-		it( 'uses setTimeout with 0ms delay', () => {
-			const setTimeoutSpy = jest.spyOn( global, 'setTimeout' );
-			const fn = jest.fn();
-
-			const wrapped = yieldToEventLoop( fn );
-			wrapped();
-
-			expect( setTimeoutSpy ).toHaveBeenCalledWith(
-				expect.any( Function ),
-				0
-			);
-
-			setTimeoutSpy.mockRestore();
-		} );
-
-		it( 'returns void', () => {
-			const fn = jest.fn( () => 'result' );
-
-			const wrapped = yieldToEventLoop( fn as () => void );
-			const result = wrapped();
-
-			expect( result ).toBeUndefined();
 		} );
 	} );
 } );

@@ -1,23 +1,14 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	DropZone,
-	Icon,
+	Icon as WCIcon,
 	Spinner,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalTruncate as Truncate,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	BaseControl,
-	Tooltip,
-	VisuallyHidden,
 } from '@wordpress/components';
 import { isBlobURL, getBlobTypeByURL } from '@wordpress/blob';
 import { store as coreStore, type Attachment } from '@wordpress/core-data';
@@ -30,28 +21,26 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
 import {
 	archive,
 	audio,
 	video,
 	file,
 	closeSmall,
-	error as errorIcon,
 	chevronUp,
 	chevronDown,
 	chevronLeft,
 	chevronRight,
 } from '@wordpress/icons';
+import { VisuallyHidden, Tooltip, ValidityIndicator } from '@wordpress/ui';
+import { speak } from '@wordpress/a11y';
 import {
 	MediaUpload,
 	uploadMedia,
 	privateApis as mediaUtilsPrivateApis,
 } from '@wordpress/media-utils';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import type { MediaEditProps } from '../../types';
 import useMovingAnimation from './use-moving-animation';
@@ -193,9 +182,10 @@ function MediaPickerButton( {
 		return mediaPickerButton;
 	}
 	return (
-		<Tooltip text={ label } placement="top">
-			{ mediaPickerButton }
-		</Tooltip>
+		<Tooltip.Root>
+			<Tooltip.Trigger render={ mediaPickerButton } />
+			<Tooltip.Popup>{ label }</Tooltip.Popup>
+		</Tooltip.Root>
 	);
 }
 
@@ -211,7 +201,7 @@ const archiveMimeTypes = [
 function MediaTitle( { attachment }: { attachment: Attachment< 'view' > } ) {
 	return (
 		<Truncate className="fields__media-edit-filename">
-			{ attachment.title.rendered }
+			{ decodeEntities( attachment.title.rendered ) }
 		</Truncate>
 	);
 }
@@ -291,13 +281,13 @@ function MediaPreview( { attachment }: { attachment: MediaEditAttachment } ) {
 			/>
 		);
 	} else if ( mimeType.startsWith( 'audio' ) ) {
-		return <Icon icon={ audio } />;
+		return <WCIcon icon={ audio } />;
 	} else if ( mimeType.startsWith( 'video' ) ) {
-		return <Icon icon={ video } />;
+		return <WCIcon icon={ video } />;
 	} else if ( archiveMimeTypes.includes( mimeType ) ) {
-		return <Icon icon={ archive } />;
+		return <WCIcon icon={ archive } />;
 	}
-	return <Icon icon={ file } />;
+	return <WCIcon icon={ file } />;
 }
 
 type MediaEditAttachment = Attachment< 'view' > | BlobItem;
@@ -355,9 +345,11 @@ function ExpandedMediaEditAttachments( {
 									? sprintf(
 											/* translators: %s: The title of the media item. */
 											__( 'Replace %s' ),
-											(
-												attachment as Attachment< 'view' >
-											 ).title.rendered
+											decodeEntities(
+												(
+													attachment as Attachment< 'view' >
+												 ).title.rendered
+											)
 									  )
 									: __( 'Replace' )
 							}
@@ -567,12 +559,12 @@ function CompactMediaEditAttachments( {
  * @param {Item}                 props.data                  - The item being edited.
  * @param {Object}               props.field                 - The field configuration with getValue and setValue methods.
  * @param {Function}             props.onChange              - Callback function when the media selection changes.
- * @param {string[]}             [props.allowedTypes]        - Array of allowed media types. Default `['image']`.
+ * @param {string[]}             [props.allowedTypes]        - Array of allowed media types. Use `['*']` to allow all file types. Default `['image']`.
  * @param {boolean}              [props.multiple]            - Whether to allow multiple media selections. Default `false`.
  * @param {boolean}              [props.hideLabelFromVision] - Whether the label should be hidden from vision.
  * @param {boolean}              [props.isExpanded]          - Whether to render in an expanded form. Default `false`.
  *
- * @return {JSX.Element} The media edit control component.
+ * @return {React.JSX.Element} The media edit control component.
  *
  * @example
  * ```tsx
@@ -627,7 +619,7 @@ export default function MediaEdit< Item >( {
 			const normalizedValue = normalizeValue( value );
 			// Sorted IDs ensure stable cache key, avoiding
 			// unnecessary new requests on reorder.
-			const sortedIds = [ ...normalizedValue ].sort( ( a, b ) => a - b );
+			const sortedIds = normalizedValue.toSorted( ( a, b ) => a - b );
 			const { getEntityRecords } = select( coreStore );
 			return getEntityRecords( 'postType', 'attachment', {
 				include: sortedIds,
@@ -677,7 +669,7 @@ export default function MediaEdit< Item >( {
 	// handler as `setTargetItemId()` would open the modal with stale
 	// `value`/`multiple` props. Setting a pending flag defers the open
 	// until after the next render when props are up to date.
-	const openModalRef = useRef< ( () => void ) | null >( null );
+	const openModalRef = useRef< () => void >( undefined );
 	const [ pendingOpen, setPendingOpen ] = useState( false );
 	const [ blobs, setBlobs ] = useState< string[] >( [] );
 	useEffect( () => {
@@ -838,6 +830,13 @@ export default function MediaEdit< Item >( {
 			setCustomValidity( undefined );
 		}
 	}, [ isTouched, field.isValid, validity ] );
+
+	useEffect( () => {
+		if ( isTouched && customValidity?.message ) {
+			speak( customValidity.message );
+		}
+	}, [ isTouched, customValidity?.message ] );
+
 	const onBlur = useCallback(
 		( event: React.FocusEvent< HTMLElement > ) => {
 			if ( isTouched ) {
@@ -914,7 +913,7 @@ export default function MediaEdit< Item >( {
 							<VStack spacing={ 2 }>
 								{ field.label &&
 									( hideLabelFromVision ? (
-										<VisuallyHidden as="legend">
+										<VisuallyHidden render={ <legend /> }>
 											{ field.label }
 										</VisuallyHidden>
 									) : (
@@ -937,9 +936,12 @@ export default function MediaEdit< Item >( {
 									setTargetItemId={ setTargetItemId }
 								/>
 								{ field.description && (
-									<Text variant="muted">
+									<WCText
+										variant="muted"
+										className="fields__media-edit-description"
+									>
 										{ field.description }
-									</Text>
+									</WCText>
 								) }
 							</VStack>
 						);
@@ -958,25 +960,10 @@ export default function MediaEdit< Item >( {
 				/>
 			</VisuallyHidden>
 			{ customValidity && (
-				<div aria-live="polite">
-					<p
-						className={ clsx(
-							'components-validated-control__indicator',
-							{
-								'is-invalid': customValidity.type === 'invalid',
-								'is-valid': customValidity.type === 'valid',
-							}
-						) }
-					>
-						<Icon
-							className="components-validated-control__indicator-icon"
-							icon={ errorIcon }
-							size={ 16 }
-							fill="currentColor"
-						/>
-						{ customValidity.message }
-					</p>
-				</div>
+				<ValidityIndicator
+					type={ customValidity.type }
+					message={ customValidity.message }
+				/>
 			) }
 		</div>
 	);

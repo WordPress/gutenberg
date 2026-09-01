@@ -9,31 +9,74 @@
  * Returns the submenu visibility value with backward compatibility
  * for the deprecated openSubmenusOnClick attribute.
  *
- * NOTE: Keep this function in sync with getSubmenuVisibility in
- * packages/block-library/src/navigation/utils/get-submenu-visibility.js
- *
  * This function centralizes the migration logic from the boolean
  * openSubmenusOnClick to the new submenuVisibility enum.
  *
- * @since 6.9.0
+ * Backward compatibility: WordPress applies default attribute values, so submenuVisibility
+ * will always have a value even for legacy blocks. We check the legacy openSubmenusOnClick
+ * attribute first to preserve original behavior for blocks saved before the migration.
+ *
+ * @since 7.0.0
  *
  * @param array $attributes Block attributes containing submenuVisibility and/or openSubmenusOnClick.
  * @return string The visibility mode: 'hover', 'click', or 'always'.
  */
 function block_core_navigation_get_submenu_visibility( $attributes ) {
-	$submenu_visibility     = $attributes['submenuVisibility'] ?? null;
-	$open_submenus_on_click = $attributes['openSubmenusOnClick'] ?? null;
+	$deprecated_open_submenus_on_click = $attributes['openSubmenusOnClick'] ?? null;
 
-	// If new attribute is set, use it.
-	if ( null !== $submenu_visibility ) {
-		return $submenu_visibility;
+	// For backward compatibility, prioritize the legacy attribute if present.
+	// Legacy blocks have openSubmenusOnClick in the database. Since WordPress applies
+	// default values, submenuVisibility will also have a value, but we check the legacy
+	// attribute first to preserve the original behavior. If the block has been updated
+	// and saved in the editor, then the deprecated attribute will be replaced by submenuVisibility.
+	if ( null !== $deprecated_open_submenus_on_click ) {
+		// Convert boolean to string: true -> 'click', false -> 'hover'.
+		return ! empty( $deprecated_open_submenus_on_click ) ? 'click' : 'hover';
 	}
 
-	// Fall back to old attribute for backward compatibility.
-	// openSubmenusOnClick: true  -> 'click'
-	// openSubmenusOnClick: false -> 'hover'
-	// openSubmenusOnClick: null  -> 'hover' (default)
-	return ! empty( $open_submenus_on_click ) ? 'click' : 'hover';
+	$submenu_visibility = $attributes['submenuVisibility'] ?? null;
+
+	// Use submenuVisibility for migrated/new blocks (where openSubmenusOnClick is null).
+	return $submenu_visibility ?? 'hover';
+}
+
+/**
+ * Returns the custom properties used by the Navigation block for a layout.
+ *
+ * @since 7.1.0
+ *
+ * @param array $layout Layout configuration.
+ * @return array Navigation layout custom property declarations.
+ */
+function block_core_navigation_get_layout_custom_property_declarations( $layout ) {
+	$justification_values = array(
+		'left'          => 'flex-start',
+		'center'        => 'center',
+		'right'         => 'flex-end',
+		'space-between' => 'space-between',
+	);
+	$justify_content      = is_array( $layout ) ? ( $layout['justifyContent'] ?? 'left' ) : 'left';
+	if ( ! is_string( $justify_content ) || ! isset( $justification_values[ $justify_content ] ) ) {
+		$justify_content = 'left';
+	}
+
+	$justification = $justification_values[ $justify_content ];
+	$is_vertical   = is_array( $layout ) && 'vertical' === ( $layout['orientation'] ?? null );
+	$align         = 'center';
+	$justify       = $justification;
+
+	if ( $is_vertical ) {
+		$align   = in_array( $justify_content, array( 'center', 'right' ), true ) ? $justification : 'flex-start';
+		$justify = 'left' === $justify_content ? 'initial' : $justification;
+	}
+
+	return array(
+		'--navigation-layout-justification-setting' => $justification,
+		'--navigation-layout-direction'             => $is_vertical ? 'column' : 'row',
+		'--navigation-layout-wrap'                  => is_array( $layout ) && 'nowrap' === ( $layout['flexWrap'] ?? null ) ? 'nowrap' : 'wrap',
+		'--navigation-layout-justify'               => $justify,
+		'--navigation-layout-align'                 => $align,
+	);
 }
 
 /**
@@ -236,8 +279,14 @@ class WP_Navigation_Block_Renderer {
 
 		foreach ( $inner_blocks as $inner_block ) {
 			$inner_block_markup = static::get_markup_for_inner_block( $inner_block );
-			$p                  = new WP_HTML_Tag_Processor( $inner_block_markup );
-			$is_list_item       = $p->next_tag( 'LI' );
+			// Skip hidden blocks (e.g. hidden via block visibility) that render
+			// as an empty string. Without this check, empty markup is mistaken
+			// for a non-list-item and incorrectly closes the open <ul>.
+			if ( '' === $inner_block_markup ) {
+				continue;
+			}
+			$p            = new WP_HTML_Tag_Processor( $inner_block_markup );
+			$is_list_item = $p->next_tag( 'LI' );
 
 			if ( $is_list_item && ! $is_list_open ) {
 				$is_list_open       = true;
@@ -421,7 +470,11 @@ class WP_Navigation_Block_Renderer {
 			$full_template_part_id = $theme . '//' . $slug;
 			$block_template        = get_block_file_template( $full_template_part_id, 'wp_template_part' );
 			if ( isset( $block_template->content ) ) {
-				$parsed_blocks = parse_blocks( $block_template->content );
+				// Expand shortcodes before parsing blocks, matching the order in
+				// `render_block_core_template_part()`.
+				$content       = shortcode_unautop( $block_template->content );
+				$content       = do_shortcode( $content );
+				$parsed_blocks = parse_blocks( $content );
 				$blocks        = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
 				// Disable overlay menu for any navigation blocks within the overlay to prevent nested overlays.
 				$blocks = static::disable_overlay_menu_for_nested_navigation_blocks( $blocks );
@@ -445,6 +498,12 @@ class WP_Navigation_Block_Renderer {
 		// Re-serialize, and run Block Hooks algorithm to inject hooked blocks.
 		$markup = serialize_blocks( $blocks );
 		$markup = apply_block_hooks_to_content_from_post_object( $markup, $template_part_post );
+
+		// Expand shortcodes before parsing blocks, matching the order in
+		// `render_block_core_template_part()`.
+		$markup = shortcode_unautop( $markup );
+		$markup = do_shortcode( $markup );
+
 		$blocks = parse_blocks( $markup );
 
 		// Disable overlay menu for any navigation blocks within the overlay to prevent nested overlays.
@@ -562,12 +621,13 @@ class WP_Navigation_Block_Renderer {
 			'space-between' => 'items-justified-space-between',
 		);
 
-		$layout_class = '';
+		$layout_class        = '';
+		$nav_justify_content = $attributes['layout']['justifyContent'] ?? null;
 		if (
-			isset( $attributes['layout']['justifyContent'] ) &&
-			isset( $layout_justification[ $attributes['layout']['justifyContent'] ] )
+			is_string( $nav_justify_content ) &&
+			isset( $layout_justification[ $nav_justify_content ] )
 		) {
-			$layout_class .= $layout_justification[ $attributes['layout']['justifyContent'] ];
+			$layout_class .= $layout_justification[ $nav_justify_content ];
 		}
 		if ( isset( $attributes['layout']['orientation'] ) && 'vertical' === $attributes['layout']['orientation'] ) {
 			$layout_class .= ' is-vertical';
@@ -629,9 +689,14 @@ class WP_Navigation_Block_Renderer {
 	 * @since 7.0.0
 	 *
 	 * @param bool  $is_hidden_by_default Whether the responsive menu is hidden by default.
-	 * @param bool  $has_custom_overlay Whether a custom overlay is used.
-	 * @param array $colors The colors array.
+	 * @param bool  $has_custom_overlay   Whether a custom overlay is used.
+	 * @param array $colors               The colors array.
 	 * @return array Returns the responsive container classes.
+	 *
+	 * @phpstan-param array{
+	 *     overlay_css_classes: list<string>,
+	 *     ...
+	 * } $colors
 	 */
 	private static function get_responsive_container_classes( $is_hidden_by_default, $has_custom_overlay, $colors ) {
 		$responsive_container_classes = array( 'wp-block-navigation__responsive-container' );
@@ -656,8 +721,14 @@ class WP_Navigation_Block_Renderer {
 	 *
 	 * @since 7.0.0
 	 *
-	 * @param array $colors The colors array.
+	 * @param bool  $has_custom_overlay Whether a custom overlay is used.
+	 * @param array $colors             The colors array.
 	 * @return string Returns the overlay inline styles.
+	 *
+	 * @phpstan-param array{
+	 *     overlay_inline_styles: string,
+	 *     ...
+	 * } $colors
 	 */
 	private static function get_overlay_inline_styles( $has_custom_overlay, $colors ) {
 		$overlay_inline_styles = $has_custom_overlay ? '' : esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) );
@@ -693,19 +764,21 @@ class WP_Navigation_Block_Renderer {
 		if ( ! empty( $attributes['overlay'] ) ) {
 			// Get blocks from the overlay template part.
 			$overlay_blocks = static::get_overlay_blocks_from_template_part( $attributes['overlay'], $attributes );
-			// Check if overlay contains a navigation-overlay-close block.
-			$has_custom_overlay_close_block = block_core_navigation_block_tree_has_block_type(
-				$overlay_blocks,
-				'core/navigation-overlay-close',
-				array( 'core/navigation' ) // Skip navigation blocks, as they cannot contain an overlay close block
-			);
 			// Render template part blocks directly without navigation container wrapper.
 			$overlay_blocks_html = static::get_template_part_blocks_html( $overlay_blocks );
+			// Check if overlay contains a navigation-overlay-close block (detect in rendered HTML so it works with patterns).
+			$has_custom_overlay_close_block = block_core_navigation_overlay_html_has_close_block( $overlay_blocks_html );
 			// Add Interactivity API directives to the overlay close block if present.
 			if ( $has_custom_overlay_close_block && $is_interactive ) {
 				$tags                = new WP_HTML_Tag_Processor( $overlay_blocks_html );
 				$overlay_blocks_html = block_core_navigation_add_directives_to_overlay_close( $tags );
 			}
+			// Images in the overlay are hidden until the menu is opened. Pre-set
+			// fetchpriority="low" so that when wp_filter_content_tags() processes the
+			// parent template part, it sees the attribute already present and calls
+			// wp_get_loading_optimization_attributes() with fetchpriority="low", which both prevents
+			// fetchpriority="high" from being added and stops the LCP counter from being incremented.
+			$overlay_blocks_html = block_core_navigation_set_overlay_image_fetch_priority( $overlay_blocks_html );
 		}
 
 		$has_custom_overlay = ! empty( $overlay_blocks_html );
@@ -1085,6 +1158,28 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 }
 
 /**
+ * Checks if the overlay HTML contains a navigation-overlay-close block.
+ *
+ * Uses WP_HTML_Tag_Processor to detect the close button in rendered output,
+ * so it works when the overlay uses patterns (pattern content is rendered at
+ * output time, not in the block tree).
+ *
+ * @since 7.0.0
+ *
+ * @param string $html The rendered overlay HTML.
+ * @return bool True if a close button element is found.
+ */
+function block_core_navigation_overlay_html_has_close_block( $html ) {
+	$tags = new WP_HTML_Tag_Processor( $html );
+	return $tags->next_tag(
+		array(
+			'tag_name'   => 'BUTTON',
+			'class_name' => 'wp-block-navigation-overlay-close',
+		)
+	);
+}
+
+/**
  * Add Interactivity API directives to the navigation-overlay-close block
  * markup using the Tag Processor.
  *
@@ -1103,6 +1198,25 @@ function block_core_navigation_add_directives_to_overlay_close( $tags ) {
 	) ) {
 		// Add the same close directive as the default close button.
 		$tags->set_attribute( 'data-wp-on--click', 'actions.closeMenuOnClick' );
+	}
+	return $tags->get_updated_html();
+}
+
+/**
+ * Sets fetchpriority="low" on all IMG tags within the navigation overlay.
+ *
+ * Images in the overlay are hidden until the menu is opened, so they should
+ * not compete with any actual LCP element image on the page.
+ *
+ * @since 7.0.0
+ *
+ * @param string $overlay_blocks_html The rendered HTML of the overlay blocks.
+ * @return string Modified HTML with fetchpriority="low" on all IMG tags.
+ */
+function block_core_navigation_set_overlay_image_fetch_priority( string $overlay_blocks_html ): string {
+	$tags = new WP_HTML_Tag_Processor( $overlay_blocks_html );
+	while ( $tags->next_tag( 'IMG' ) ) {
+		$tags->set_attribute( 'fetchpriority', 'low' );
 	}
 	return $tags->get_updated_html();
 }
@@ -1142,8 +1256,8 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 		$open_on_hover       = 'hover' === $computed_visibility;
 
 		if ( $open_on_hover ) {
-			$tags->set_attribute( 'data-wp-on--mouseenter', 'actions.openMenuOnHover' );
-			$tags->set_attribute( 'data-wp-on--mouseleave', 'actions.closeMenuOnHover' );
+			$tags->set_attribute( 'data-wp-on--pointerenter', 'actions.openMenuOnHover' );
+			$tags->set_attribute( 'data-wp-on--pointerleave', 'actions.closeMenuOnHover' );
 		}
 
 		// Add directives to the toggle submenu button.
@@ -1154,7 +1268,7 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 			)
 		) ) {
 			$tags->set_attribute( 'data-wp-on--click', 'actions.toggleMenuOnClick' );
-			$tags->set_attribute( 'data-wp-bind--aria-expanded', 'state.isMenuOpen' );
+			$tags->set_attribute( 'data-wp-bind--aria-expanded', 'state.isSubmenuOpen' );
 			// The `aria-expanded` attribute for SSR is already added in the submenu block.
 		}
 		// Add directives to the submenu.
@@ -1295,17 +1409,6 @@ function block_core_navigation_build_css_font_sizes( $attributes ) {
 	}
 
 	return $font_sizes;
-}
-
-/**
- * Returns the top-level submenu SVG chevron icon.
- *
- * @since 5.9.0
- *
- * @return string
- */
-function block_core_navigation_render_submenu_icon() {
-	return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg>';
 }
 
 /**
@@ -1510,6 +1613,135 @@ function register_block_core_navigation() {
 }
 
 add_action( 'init', 'register_block_core_navigation' );
+
+/**
+ * Adds Navigation block support classes to inner list containers.
+ *
+ * State block support adds the generated `wp-states-*` class to the outer
+ * block wrapper. The Navigation block renders its menu items inside an inner
+ * `wp-block-navigation__container` list, so the same state class is also needed
+ * there for state styles to apply directly to the menu list.
+ *
+ * Navigation also uses layout classes on its outer wrapper to define custom
+ * properties consumed by its inner containers. Viewport layout styles cannot
+ * change those classes, so equivalent custom properties and a scoping class
+ * are generated for each configured viewport layout.
+ *
+ * Currently this is required as a workaround because of how difficult it is for nav
+ * child blocks to inherit styles through the complex responsive nav block html. The
+ * bug in https://github.com/WordPress/gutenberg/issues/62690 also prevents inheritance.
+ *
+ * @since 7.1.0
+ *
+ * @param string $block_content The block content.
+ * @param array  $block         The full block, including name and attributes.
+ * @return string The updated block content.
+ */
+function block_core_navigation_add_support_classes_to_container( $block_content, $block ) {
+	if ( 'core/navigation' !== ( $block['blockName'] ?? null ) || empty( $block_content ) ) {
+		return $block_content;
+	}
+
+	$attributes = is_array( $block['attrs'] ?? null ) ? $block['attrs'] : array();
+	$style      = is_array( $attributes['style'] ?? null ) ? $attributes['style'] : array();
+	if (
+		defined( 'IS_GUTENBERG_PLUGIN' ) &&
+		IS_GUTENBERG_PLUGIN &&
+		function_exists( 'gutenberg_resolve_style_state_aliases' )
+	) {
+		$style = gutenberg_resolve_style_state_aliases( $style, 'core/navigation' );
+	}
+
+	$global_settings          = wp_get_global_settings();
+	$viewport_settings        = $global_settings['viewport'] ?? null;
+	$responsive_media_queries = array();
+	if ( method_exists( 'WP_Theme_JSON_Gutenberg', 'get_viewport_media_queries' ) ) {
+		$responsive_media_queries = WP_Theme_JSON_Gutenberg::get_viewport_media_queries( $viewport_settings );
+	} elseif ( method_exists( 'WP_Theme_JSON', 'get_viewport_media_queries' ) ) {
+		$responsive_media_queries = WP_Theme_JSON::get_viewport_media_queries( $viewport_settings );
+	}
+
+	$styles      = array();
+	$base_layout = is_array( $attributes['layout'] ?? null ) ? $attributes['layout'] : array();
+	foreach ( $responsive_media_queries as $breakpoint => $media_query ) {
+		$viewport_style  = is_array( $style[ $breakpoint ] ?? null ) ? $style[ $breakpoint ] : array();
+		$viewport_layout = is_array( $viewport_style['layout'] ?? null ) ? $viewport_style['layout'] : array();
+		if ( empty( $viewport_layout ) ) {
+			continue;
+		}
+
+		$styles[] = array(
+			'declarations' => block_core_navigation_get_layout_custom_property_declarations(
+				array_replace( $base_layout, $viewport_layout )
+			),
+			'rules_group'  => $media_query,
+		);
+	}
+
+	$processor = new WP_HTML_Tag_Processor( $block_content );
+	if ( ! $processor->next_tag() ) {
+		return $block_content;
+	}
+
+	$class_attribute = $processor->get_attribute( 'class' );
+	$state_class     = null;
+	if ( is_string( $class_attribute ) && preg_match( '/\bwp-states-[a-f0-9]{8}\b/', $class_attribute, $matches ) ) {
+		$state_class = $matches[0];
+	}
+
+	$layout_class = null;
+	if ( ! empty( $styles ) ) {
+		$layout_class = wp_unique_id( 'wp-block-navigation-' );
+		// The inner selector includes both Navigation classes so it overrides the
+		// default layout custom properties set by `.wp-block-navigation.items-*`.
+		$selector = ".wp-block-navigation.{$layout_class},.wp-block-navigation.wp-block-navigation__container.{$layout_class}";
+		foreach ( $styles as &$style_rule ) {
+			$style_rule['selector'] = $selector;
+		}
+		unset( $style_rule );
+
+		$processor->add_class( $layout_class );
+		wp_style_engine_get_stylesheet_from_css_rules(
+			$styles,
+			array( 'context' => 'block-supports' )
+		);
+	}
+
+	if ( null === $state_class && null === $layout_class ) {
+		return $block_content;
+	}
+
+	while ( $processor->next_tag() ) {
+		// Custom overlay content can include nested Navigation blocks.
+		// Avoid applying the outer Navigation classes to an inner nav block.
+		if ( $processor->has_class( 'wp-block-navigation' ) && ! $processor->has_class( 'wp-block-navigation__container' ) ) {
+			break;
+		}
+
+		if ( ! $processor->has_class( 'wp-block-navigation__container' ) ) {
+			continue;
+		}
+
+		if ( null !== $layout_class ) {
+			$processor->add_class( $layout_class );
+		}
+
+		if ( null === $state_class ) {
+			continue;
+		}
+
+		$class_attribute = $processor->get_attribute( 'class' );
+		if ( is_string( $class_attribute ) && preg_match( '/\bwp-states-[a-f0-9]{8}\b/', $class_attribute ) ) {
+			continue;
+		}
+
+		$processor->add_class( $state_class );
+	}
+
+	return $processor->get_updated_html();
+}
+
+add_filter( 'render_block', 'block_core_navigation_add_support_classes_to_container', 11, 2 );
 
 /**
  * Filter that changes the parsed attribute values of navigation blocks contain typographic presets to contain the values directly.

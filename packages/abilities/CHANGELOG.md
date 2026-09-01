@@ -2,6 +2,46 @@
 
 ## Unreleased
 
+### Internal
+
+-   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
+
+## 0.20.0 (2026-08-26)
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81517](https://github.com/WordPress/gutenberg/pull/81517))
+
+## 0.19.0 (2026-08-12)
+
+## 0.18.0 (2026-07-29)
+
+## 0.17.0 (2026-07-14)
+
+## 0.16.0 (2026-07-01)
+
+## 0.15.0 (2026-06-24)
+
+## 0.14.1 (2026-06-16)
+
+## 0.14.0 (2026-06-10)
+
+## 0.13.0 (2026-05-27)
+
+## 0.12.0 (2026-05-14)
+
+## 0.11.0 (2026-04-29)
+
+## 0.10.0 (2026-04-15)
+
+## 0.9.0 (2026-04-01)
+
+## 0.8.0 (2026-03-18)
+
+## 0.7.0 (2026-03-04)
+
+## 0.6.0 (2026-02-18)
+
 ## 0.5.0 (2026-01-29)
 
 ## 0.4.0 (2026-01-16)

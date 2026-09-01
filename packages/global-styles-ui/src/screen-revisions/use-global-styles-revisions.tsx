@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import {
 	store as coreStore,
 	type GlobalStylesRevision,
 } from '@wordpress/core-data';
 import { useContext, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { GlobalStylesContext } from '../context';
 import type { Revision, User } from './types';
 
@@ -67,7 +60,6 @@ export default function useGlobalStylesRevisions( {
 				getRevisions,
 				__experimentalGetCurrentGlobalStylesId,
 				getEntityRecord,
-				// @ts-expect-error
 				isResolving,
 			} = select( coreStore );
 			const dirtyEntityRecords =

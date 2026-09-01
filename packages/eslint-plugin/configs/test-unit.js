@@ -1,9 +1,13 @@
-module.exports = {
-	extends: [ 'plugin:jest/recommended' ],
-	rules: {
-		'jest/expect-expect': [
-			'error',
-			{ assertFunctionNames: [ 'expect', 'measurePerformance' ] },
-		],
+const jestPlugin = require( 'eslint-plugin-jest' );
+
+module.exports = [
+	jestPlugin.configs[ 'flat/recommended' ],
+	{
+		rules: {
+			'jest/expect-expect': [
+				'error',
+				{ assertFunctionNames: [ 'expect', 'measurePerformance' ] },
+			],
+		},
 	},
-};
+];

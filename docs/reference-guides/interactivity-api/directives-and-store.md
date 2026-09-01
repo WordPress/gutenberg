@@ -94,7 +94,7 @@ The `wp-interactive` directive "activates" the interactivity for the DOM element
 ```
 
 <div class="callout callout-info">
-  The use of <code>data-wp-interactive</code> is a requirement for the Interactivity API "engine" to work. In the following examples the <code>data-wp-interactive</code> has not been added for the sake of simplicity. Also, the <code>data-wp-interactive</code> directive will be injected automatically in the future.
+  The use of <code>data-wp-interactive</code> is a requirement for the Interactivity API "engine" to work. In the following examples the <code>data-wp-interactive</code> has not been added for the sake of simplicity.
 </div>
 
 ### `wp-context`
@@ -195,7 +195,7 @@ The `wp-bind` will do different things when the DOM element is applied, dependin
 
 -   If the value is `true`, the attribute is added: `<div attribute>`
 -   If the value is `false`, the attribute is removed: `<div>`
--   If the value is a string, the attribute is added with its value assigned: `<div attribute="value"`
+-   If the value is a string, the attribute is added with its value assigned: `<div attribute="value">`
 -   If the attribute name starts with `aria-` or `data-` and the value is boolean (either `true` or `false`), the attribute is added to the DOM with the boolean value assigned as a string: `<div aria-attribute="true">`
 
 ### `wp-class`
@@ -355,10 +355,8 @@ The returned value is used to change the inner content of the element: `<div>val
 
 This directive runs code on dispatched DOM events like `click` or `keyup`. The syntax is `data-wp-on--[event]` (like `data-wp-on--click` or `data-wp-on--keyup`).
 
-```php
-<button data-wp-on--click="actions.logTime" >
-  Click Me!
-</button>
+```html
+<button data-wp-on--click="actions.logTime">Click Me!</button>
 ```
 
 <details>
@@ -367,7 +365,7 @@ This directive runs code on dispatched DOM events like `click` or `keyup`. The s
 ```js
 store( 'myPlugin', {
 	actions: {
-		logTime: ( event ) => {
+		logTime: () => {
 			console.log( new Date() );
 		},
 	},
@@ -392,7 +390,7 @@ This directive allows you to attach global window events like `resize`, `copy`, 
 
 The syntax of this directive is `data-wp-on-window--[window-event]` (like `data-wp-on-window--resize` or `data-wp-on-window--languagechange`).
 
-```php
+```html
 <div data-wp-on-window--resize="callbacks.logWidth"></div>
 ```
 
@@ -425,7 +423,7 @@ This directive allows you to attach global document events like `scroll`, `mouse
 
 The syntax of this directive is `data-wp-on-document--[document-event]` (like `data-wp-on-document--keydown` or `data-wp-on-document--selectionchange`).
 
-```php
+```html
 <div data-wp-on-document--keydown="callbacks.logKeydown"></div>
 ```
 
@@ -450,7 +448,9 @@ The callback passed as the reference receives [the event](https://developer.mozi
 
 It runs a callback **when the node is created and runs it again when the state or context changes**.
 
-You can attach several side effects to the same DOM element by using the syntax `data-wp-watch--[unique-id]`.
+You can attach several side effects to the same DOM element by using the syntax `data-wp-watch---[unique-id]` (note the three hyphens before the unique ID).
+
+> **Deprecation notice:** The two-hyphen syntax `data-wp-watch--[unique-id]` is deprecated and will stop working in WordPress 7.1. Use three hyphens (`---`) for unique IDs.
 
 The `unique-id` doesn't need to be unique globally. It just needs to be different from the other unique IDs of the `wp-watch` directives of that DOM element.
 
@@ -502,11 +502,15 @@ As a reference, some use cases for this directive may be:
 -   Setting the focus on an element with `.focus()`.
 -   Changing the state or context when certain conditions are met
 
+If you need a similar reactive callback that is not tied to a specific DOM element but runs at the store level, you can use the [`watch()` function](#watch).
+
 ### `wp-init`
 
 This directive runs a callback **only when the node is created**.
 
-You can attach several `wp-init` to the same DOM element by using the syntax `data-wp-init--[unique-id]`.
+You can attach several `wp-init` to the same DOM element by using the syntax `data-wp-init---[unique-id]` (note the three hyphens before the unique ID).
+
+> **Deprecation notice:** The two-hyphen syntax `data-wp-init--[unique-id]` is deprecated and will stop working in WordPress 7.1. Use three hyphens (`---`) for unique IDs.
 
 The `unique-id` doesn't need to be unique globally. It just needs to be different from the other unique IDs of the `wp-init` directives of that DOM element.
 
@@ -520,8 +524,8 @@ Here's another example with several `wp-init` directives on the same DOM element
 
 ```html
 <form
-	data-wp-init--log="callbacks.logTimeInit"
-	data-wp-init--focus="callbacks.focusFirstElement"
+	data-wp-init---log="callbacks.logTimeInit"
+	data-wp-init---focus="callbacks.focusFirstElement"
 >
 	<input type="text" />
 </form>
@@ -533,14 +537,14 @@ Here's another example with several `wp-init` directives on the same DOM element
 ```js
 import { store, getElement } from '@wordpress/interactivity';
 
-store( "myPlugin", {
-  callbacks: {
-    logTimeInit: () => console.log( `Init at ` + new Date() ),
-    focusFirstElement: () => {
-      const { ref } = getElement();
-      ref.querySelector( 'input:first-child' ).focus(),
-    },
-  },
+store( 'myPlugin', {
+	callbacks: {
+		logTimeInit: () => console.log( `Init at ` + new Date() ),
+		focusFirstElement: () => {
+			const { ref } = getElement();
+			ref.querySelector( 'input:first-child' ).focus();
+		},
+	},
 } );
 ```
 
@@ -554,7 +558,9 @@ This directive runs the passed callback **during the node's render execution**.
 
 You can use and compose hooks like `useState`, `useWatch`, or `useEffect` inside the passed callback and create your own logic, providing more flexibility than previous directives.
 
-You can attach several `wp-run` to the same DOM element by using the syntax `data-wp-run--[unique-id]`.
+You can attach several `wp-run` to the same DOM element by using the syntax `data-wp-run---[unique-id]` (note the three hyphens before the unique ID).
+
+> **Deprecation notice:** The two-hyphen syntax `data-wp-run--[unique-id]` is deprecated and will stop working in WordPress 7.1. Use three hyphens (`---`) for unique IDs.
 
 The `unique-id` doesn't need to be unique globally. It just needs to be different from the other unique IDs of the `wp-run` directives of that DOM element.
 
@@ -830,14 +836,14 @@ If the action is async and needs to await a long delay.
 
 -   The user clicks the first button.
 -   The scope points to the first context, where `isOpen: true`.
--   The first access to `state.isOpen` is correct because `getContext` returns the current scope.
+-   The first access to `state.isOpen` is correct because `state.isOpen` is a getter that calls `getContext()`, which returns the context for the current scope.
 -   The action starts awaiting a long delay.
 -   Before the action resumes, the user clicks the second button.
 -   The scope is changed to the second context, where `isOpen: false`.
--   The first access to `state.isOpen` is correct because `getContext` returns the current scope.
+-   The first access to `state.isOpen` in the second action is correct because `getContext()` returns the context for the current scope.
 -   The second action starts awaiting a long delay.
 -   The first action finishes awaiting and resumes its execution.
--   The second access to `state.isOpen` of the first action is incorrect, because `getContext` now returns the wrong scope.
+-   The second access to `state.isOpen` of the first action is incorrect, because the scope was changed by the second button click, so `getContext()` now returns the wrong context.
 
 We need to be able to know when async actions start awaiting and resume operations, so we can restore the proper scope, and that's what generators do.
 
@@ -881,7 +887,6 @@ store( 'myPlugin', {
 ```
 
 You may notice the use of the [`withSyncEvent()`](#withsyncevent) utility function in this example. This is necessary due to an ongoing effort to handle store actions asynchronously by default, unless they require synchronous event access (which this example does due to the call to `event.preventDefault()`). Otherwise a deprecation warning will be triggered, and in a future release the behavior will change accordingly.
-
 
 #### Side Effects
 
@@ -1162,7 +1167,7 @@ The code will log:
 This function is analogous to `getContext()`, but with 2 key differences:
 
 1. Whenever [`actions.navigate()`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity-router/#actions) from [`@wordpress/interactivity-router`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity-router/) is called, the object returned by `getServerContext()` is updated. This is useful when you want to update the context of a block based on **new** context coming from the page loaded via `actions.navigate()`. This new context is embedded in the HTML of the page loaded via `actions.navigate()`.
-2. The object returned by `getServerContext()` is read-only.
+2. The object returned by `getServerContext()` is a deep clone (snapshot) of the server context, so modifying it will not affect the original server data.
 
 The server context cannot be directly used in directives, but you can use callbacks to subscribe to its changes.
 
@@ -1193,8 +1198,7 @@ Retrieves the server state of an interactive region.
 
 This function serves the same purpose as `getServerContext()`, but it returns the **state** instead of the **context**.
 
-The object returned is read-only, and includes the state defined in PHP with `wp_interactivity_state()`. When using [`actions.navigate()`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity-router/#actions) from [`@wordpress/interactivity-router`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity-router/), the object returned by `getServerState()` is updated to reflect the changes in its properties, without affecting the state returned by `store()`. Directives can subscribe to those changes to update the state if needed.
-
+The object returned is a deep clone (snapshot) of the server state, so modifying it will not affect the original server data. It includes the state defined in PHP with `wp_interactivity_state()`. When using [`actions.navigate()`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity-router/#actions) from [`@wordpress/interactivity-router`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity-router/), the object returned by `getServerState()` is updated to reflect the changes in its properties, without affecting the state returned by `store()`. Directives can subscribe to those changes to update the state if needed.
 
 ```js
 const serverState = getServerState( 'namespace' );
@@ -1220,7 +1224,7 @@ const { state } = store( 'myStore', {
 
 During navigation, the data returned by both `getServerContext()` and `getServerState()` is fully replaced with the values from the new page. In contrast, the related client data (context or state) is "soft merged"—existing client-side properties are preserved, and only new properties from the server are added. This ensures that new blocks or components introduced by navigation can initialize with server-provided values, while client-side changes made by users remain intact. If you need to update existing client properties with data from the server (i.e., overwrite values), call `getServerContext()` or `getServerState()` within your callbacks and manually overwrite the relevant properties.
 
-If you subscribe to any value returned by `getServerContext()` or `getServerState()` within a callback, that callback will be invoked on every navigation event—regardless of whether that value have changed. This makes it possible to reliably reset or update client-side data as needed whenever navigation occurs.
+If you subscribe to any value returned by `getServerContext()` or `getServerState()` within a callback, that callback will be invoked on every navigation event—regardless of whether that value has changed. This makes it possible to reliably reset or update client-side data as needed whenever navigation occurs.
 
 ### withScope()
 
@@ -1251,10 +1255,10 @@ Actions that require synchronous access to the `event` object need to use the `w
 
 Only very specific event methods and properties require synchronous access, so it is advised to only use `withSyncEvent()` when necessary. The following event methods and properties require synchronous access:
 
-* `event.currentTarget`
-* `event.preventDefault()`
-* `event.stopImmediatePropagation()`
-* `event.stopPropagation()`
+-   `event.currentTarget`
+-   `event.preventDefault()`
+-   `event.stopImmediatePropagation()`
+-   `event.stopPropagation()`
 
 Here is an example, where one action requires synchronous event access while the other actions do not:
 
@@ -1292,20 +1296,79 @@ store( 'myPlugin', {
 		// Combining withSyncEvent with a generator function for async operations.
 		navigate: withSyncEvent( function* ( event ) {
 			event.preventDefault();
-			const { actions } = yield import( '@wordpress/interactivity-router' );
+			const { actions } = yield import(
+				'@wordpress/interactivity-router'
+			);
 			yield actions.navigate( event.target.href );
 		} ),
 	},
 } );
 ```
 
+### watch()
+
+Subscribes to changes in any signal accessed inside the callback, re-running the callback whenever those signals change. Returns a cleanup function to stop watching.
+
+Unlike `data-wp-watch`, which is a directive tied to a DOM element's lifecycle, the `watch()` function is a programmatic API that can be used anywhere in your JavaScript code, independently of the DOM.
+
+```js
+import { store, watch } from '@wordpress/interactivity';
+
+const { state } = store( 'myPlugin', {
+	state: {
+		counter: 0,
+	},
+	actions: {
+		increment: () => {
+			state.counter++;
+		},
+	},
+} );
+
+// Watch for changes to any state accessed inside the callback.
+watch( () => {
+	console.log( 'Counter is ' + state.counter );
+} );
+
+// The callback runs immediately and logs "Counter is 0".
+// Each time `state.counter` changes, it will re-run.
+```
+
+The `watch()` function returns an `unwatch` function that, when called, stops the watcher and prevents further re-runs:
+
+```js
+const unwatch = watch( () => {
+	console.log( 'Counter is ' + state.counter );
+} );
+
+// At a later point, when you want to stop watching:
+unwatch();
+```
+
+The callback passed to `watch()` can also return a cleanup function. This cleanup function runs just before the callback re-executes due to a signal change, and also when the watcher is disposed of via `unwatch()`:
+
+```js
+const unwatch = watch( () => {
+	const handler = () => {
+		/* ... */
+	};
+	document.addEventListener( 'click', handler );
+
+	// This cleanup runs before the next re-execution, or when
+	// `unwatch()` is called.
+	return () => {
+		document.removeEventListener( 'click', handler );
+	};
+} );
+```
+
 ## Server functions
 
-The Interactivity API comes with handy functions that allow you to initialize and reference configuration options on the server. This is necessary to feed the initial data that the Server Directive Processing will use to modify the HTML markup before it's send to the browser. It is also a great way to leverage many of WordPress's APIs, like nonces, AJAX, and translations.
+The Interactivity API comes with handy functions that allow you to initialize and reference configuration options on the server. This is necessary to feed the initial data that the Server Directive Processing will use to modify the HTML markup before it's sent to the browser. It is also a great way to leverage many of WordPress's APIs, like nonces, AJAX, and translations.
 
 ### wp_interactivity_config
 
-`wp_interactivity_config` allows to set or get a configuration array, referenced to a store namespace.
+`wp_interactivity_config` allows you to set or get a configuration array, referenced to a store namespace.
 The configuration is also available on the client, but it is static information.
 
 Consider it a global setting for interactions of a site, that won't be updated on user interactions.

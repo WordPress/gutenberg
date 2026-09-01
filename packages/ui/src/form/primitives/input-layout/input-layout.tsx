@@ -1,9 +1,9 @@
 import clsx from 'clsx';
-import { forwardRef } from '@wordpress/element';
+import { Children, forwardRef } from '@wordpress/element';
+import defenseStyles from '../../../utils/css/global-css-defense.module.css';
 import resetStyles from '../../../utils/css/resets.module.css';
 import styles from './style.module.css';
 import type { InputLayoutProps } from './types';
-import { SlotContextProvider } from './context';
 
 /**
  * A low-level component that handles the visual layout of an input-like field,
@@ -27,6 +27,7 @@ export const InputLayout = forwardRef< HTMLDivElement, InputLayoutProps >(
 			<div
 				ref={ ref }
 				className={ clsx(
+					defenseStyles.div,
 					resetStyles[ 'box-sizing' ],
 					styles[ 'input-layout' ],
 					styles[ `is-size-${ size }` ],
@@ -36,13 +37,23 @@ export const InputLayout = forwardRef< HTMLDivElement, InputLayoutProps >(
 				) }
 				{ ...restProps }
 			>
-				<SlotContextProvider type="prefix">
-					{ prefix }
-				</SlotContextProvider>
+				{ Children.count( prefix ) > 0 && (
+					<div
+						className={ styles[ 'slot-wrapper' ] }
+						data-slot-type="prefix"
+					>
+						{ prefix }
+					</div>
+				) }
 				{ children }
-				<SlotContextProvider type="suffix">
-					{ suffix }
-				</SlotContextProvider>
+				{ Children.count( suffix ) > 0 && (
+					<div
+						className={ styles[ 'slot-wrapper' ] }
+						data-slot-type="suffix"
+					>
+						{ suffix }
+					</div>
+				) }
 			</div>
 		);
 	}

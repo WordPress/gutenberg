@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useState, useMemo, useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import DataViews from '../index';
 import { LAYOUT_LIST } from '../../constants';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
@@ -63,12 +56,11 @@ export const LayoutTableComponent = ( {
 	}, [ view ] );
 	return (
 		<div
-			style={
-				{
-					maxWidth: fullWidth ? undefined : '400px',
-					'--wp-dataviews-color-background': backgroundColor,
-				} as React.CSSProperties
-			}
+			style={ {
+				height: '100%',
+				maxWidth: fullWidth ? undefined : '400px',
+				'--wp-dataviews-color-background': backgroundColor,
+			} }
 		>
 			<DataViews
 				getItemId={ ( item ) => item.id.toString() }
@@ -99,7 +91,7 @@ export const LayoutTableComponent = ( {
 				) }
 				isItemClickable={ () => hasClickableItems }
 				defaultLayouts={ {
-					[ LAYOUT_LIST ]: {},
+					[ LAYOUT_LIST ]: true,
 				} }
 				config={ { perPageSizes } }
 			/>
