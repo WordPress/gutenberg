@@ -5,7 +5,7 @@ const DEFAULT_BLOCK = {
 };
 
 export default function Edit() {
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps< HTMLDListElement >();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		defaultBlock: DEFAULT_BLOCK,
 		directInsert: true,
