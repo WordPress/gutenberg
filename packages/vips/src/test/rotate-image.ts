@@ -1,3 +1,5 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type VipsFactory from 'wasm-vips';
 import { rotateImage } from '../';
 
 /**
@@ -7,85 +9,94 @@ import { rotateImage } from '../';
  * returns the same image instance so chained calls (e.g. `flipHor().rot90()`)
  * are captured in order.
  */
-let calls: string[];
-let removed: string[];
-
-/*
- * Controls whether the mocked source image reports the `palette` metadata
- * field, which libvips attaches only for indexed sources.
- */
-let mockHasPalette = false;
-
-// GType of `gint`. Only whether `getTypeof` returns non-zero matters here.
-const G_TYPE_INT = 24;
-
-const mockWriteToBuffer = jest.fn( () => ( {
-	buffer: new ArrayBuffer( 0 ),
-} ) );
-
-class MockImage {
-	width = 100;
-	height = 100;
-	pageHeight = 100;
-	onProgress = () => {};
-	kill = false;
-
-	flipHor = jest.fn( () => {
-		calls.push( 'flipHor' );
-		return this;
-	} );
-	flipVer = jest.fn( () => {
-		calls.push( 'flipVer' );
-		return this;
-	} );
-	rot90 = jest.fn( () => {
-		calls.push( 'rot90' );
-		return this;
-	} );
-	rot180 = jest.fn( () => {
-		calls.push( 'rot180' );
-		return this;
-	} );
-	rot270 = jest.fn( () => {
-		calls.push( 'rot270' );
-		return this;
-	} );
-	remove = jest.fn( ( field: string ) => {
-		removed.push( field );
-		return true;
-	} );
-	writeToBuffer = mockWriteToBuffer;
+const { MockVipsImage, mockState, mockWriteToBuffer } = vi.hoisted( () => {
 	/*
-	 * libvips only attaches `palette` when the source was indexed, so presence
-	 * is the signal. Absent fields report GType 0.
+	 * `hasPalette` controls whether the mocked source image reports the
+	 * `palette` metadata field, which libvips attaches only for indexed sources.
 	 */
-	getTypeof = jest.fn( ( name: string ) =>
-		'palette' === name && mockHasPalette ? G_TYPE_INT : 0
-	);
-}
+	const state = {
+		calls: [] as string[],
+		removed: [] as string[],
+		hasPalette: false,
+	};
 
-class MockVipsImage {
-	static newFromBuffer = jest.fn( () => new MockImage() );
-}
+	// GType of `gint`. Only whether `getTypeof` returns non-zero matters here.
+	const G_TYPE_INT = 24;
 
-jest.mock( 'wasm-vips', () =>
-	jest.fn( () => ( {
+	const writeToBufferMock = vi.fn( () => ( {
+		buffer: new ArrayBuffer( 0 ),
+	} ) );
+
+	class ImageMock {
+		width = 100;
+		height = 100;
+		pageHeight = 100;
+		onProgress = () => {};
+		kill = false;
+
+		flipHor = vi.fn( () => {
+			state.calls.push( 'flipHor' );
+			return this;
+		} );
+		flipVer = vi.fn( () => {
+			state.calls.push( 'flipVer' );
+			return this;
+		} );
+		rot90 = vi.fn( () => {
+			state.calls.push( 'rot90' );
+			return this;
+		} );
+		rot180 = vi.fn( () => {
+			state.calls.push( 'rot180' );
+			return this;
+		} );
+		rot270 = vi.fn( () => {
+			state.calls.push( 'rot270' );
+			return this;
+		} );
+		remove = vi.fn( ( field: string ) => {
+			state.removed.push( field );
+			return true;
+		} );
+		writeToBuffer = writeToBufferMock;
+		/*
+		 * libvips only attaches `palette` when the source was indexed, so presence
+		 * is the signal. Absent fields report GType 0.
+		 */
+		getTypeof = vi.fn( ( name: string ) =>
+			'palette' === name && state.hasPalette ? G_TYPE_INT : 0
+		);
+	}
+
+	class VipsImageMock {
+		static newFromBuffer = vi.fn( () => new ImageMock() );
+	}
+
+	return {
+		MockVipsImage: VipsImageMock,
+		mockState: state,
+		mockWriteToBuffer: writeToBufferMock,
+	};
+} );
+
+vi.mock( import( 'wasm-vips' ), () => ( {
+	default: vi.fn( () => ( {
 		Image: MockVipsImage,
 		Cache: {
-			max: jest.fn(),
+			max: vi.fn(),
 		},
-	} ) )
-);
+	} ) ) as unknown as typeof VipsFactory,
+} ) );
 
 describe( 'rotateImage', () => {
 	beforeEach( () => {
-		calls = [];
-		removed = [];
-		mockHasPalette = false;
+		mockState.calls = [];
+		mockState.removed = [];
+		mockState.hasPalette = false;
 	} );
 
 	afterEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	async function rotate( orientation: number ) {
@@ -114,14 +125,14 @@ describe( 'rotateImage', () => {
 		async ( orientation, expected ) => {
 			await rotate( orientation );
 
-			expect( calls ).toEqual( expected );
+			expect( mockState.calls ).toEqual( expected );
 		}
 	);
 
 	it( 'strips the EXIF orientation tag after rotating', async () => {
 		await rotate( 6 );
 
-		expect( removed ).toContain( 'orientation' );
+		expect( mockState.removed ).toContain( 'orientation' );
 	} );
 
 	describe( 'indexed (palette) PNG', () => {
@@ -142,7 +153,7 @@ describe( 'rotateImage', () => {
 		}
 
 		it( 'quantises a rotated indexed PNG back to a palette', async () => {
-			mockHasPalette = true;
+			mockState.hasPalette = true;
 
 			await rotatePng( 6 );
 
@@ -155,7 +166,7 @@ describe( 'rotateImage', () => {
 		it( 'leaves a rotated truecolour PNG unquantised', async () => {
 			// libvips attaches `palette` only for an indexed source, so a
 			// truecolour PNG carries no such field.
-			mockHasPalette = false;
+			mockState.hasPalette = false;
 
 			await rotatePng( 6 );
 
@@ -167,7 +178,7 @@ describe( 'rotateImage', () => {
 
 		it( 'does not quantise a rotated non-PNG', async () => {
 			// A GIF is indexed too, but only pngsave takes `palette`.
-			mockHasPalette = true;
+			mockState.hasPalette = true;
 			const file = new File( [ '<BLOB>' ], 'example.gif', {
 				type: 'image/gif',
 			} );

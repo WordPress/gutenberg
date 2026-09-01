@@ -18,6 +18,9 @@ const wasmVipsEntry = pathToFileURL(
 	)
 ).href;
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const {
+	skipIfClientSideMediaInactive,
+} = require( './client-side-media-utils' );
 
 /**
  * Probes a remote JPEG for an embedded UltraHDR gain map.
@@ -134,41 +137,12 @@ class MediaProcessingUtils {
 
 	/**
 	 * Skip the test unless the client-side media processing pipeline is the
-	 * active upload path. This mirrors the gate used in the editor's
-	 * media-upload util: the global flag must be set AND the browser must
-	 * meet the feature detection requirements (cross-origin isolation,
-	 * SharedArrayBuffer, Web Workers, WebAssembly).
+	 * active upload path.
 	 *
-	 * @param {import('@playwright/test').TestInfo} testInstance The test object for skipping.
+	 * @param {import('@playwright/test').TestType} testInstance The test object for skipping.
 	 */
 	async skipIfClientSideMediaInactive( testInstance ) {
-		const isActive = await this.page.evaluate( () => {
-			if ( ! window.__clientSideMediaProcessing ) {
-				return false;
-			}
-			// Prefer the package's own detection when available so the
-			// gate stays in sync with the editor's runtime decision.
-			if (
-				window.wp?.uploadMedia &&
-				typeof window.wp.uploadMedia.isClientSideMediaSupported ===
-					'function'
-			) {
-				return window.wp.uploadMedia.isClientSideMediaSupported();
-			}
-			// Fall back to the core preconditions for CSM. These are the
-			// signals the package's feature detection inspects first.
-			return (
-				window.crossOriginIsolated === true &&
-				typeof SharedArrayBuffer !== 'undefined' &&
-				typeof WebAssembly !== 'undefined' &&
-				typeof Worker !== 'undefined'
-			);
-		} );
-
-		testInstance.skip(
-			! isActive,
-			'Client-side media processing is not active in this environment'
-		);
+		await skipIfClientSideMediaInactive( this.page, testInstance );
 	}
 
 	/**
@@ -918,6 +892,64 @@ test.describe( 'Client-side media processing', () => {
 
 		// Initial attempt plus the configured number of retries.
 		expect( createAttempts ).toBe( maxRetryAttempts + 1 );
+
+		await page.unroute( '**/wp/v2/media**' );
+	} );
+
+	test( 'reports a server failure in plain language', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+	} ) => {
+		/*
+		 * Answer the create request with a 500 carrying an HTML body, which
+		 * is what a PHP fatal or a server that cannot write its temporary
+		 * files produces. `apiFetch` cannot read that as a REST error, so it
+		 * rejects with its internal `invalid_json` code — and the editor used
+		 * to show that verbatim as "The response is not a valid JSON
+		 * response." (see gutenberg#81711).
+		 */
+		await page.route( '**/wp/v2/media**', async ( route ) => {
+			const request = route.request();
+			const isCreate =
+				request.method() === 'POST' &&
+				/\/wp\/v2\/media(\?|$)/.test( request.url() );
+			if ( isCreate ) {
+				await route.fulfill( {
+					status: 500,
+					contentType: 'text/html',
+					body: '<html><body>Fatal error: allowed memory size exhausted</body></html>',
+				} );
+				return;
+			}
+			await route.continue();
+		} );
+
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		const uniqueName = await mediaProcessingUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			'1024x768_e2e_test_image_size.jpeg'
+		);
+
+		const snackbars = page.locator( '.components-snackbar' );
+
+		// The message names the file and offers a way forward.
+		const errorSnackbar = snackbars.filter( {
+			hasText: /failed to upload/i,
+		} );
+		await expect( errorSnackbar ).toBeVisible( { timeout: 30_000 } );
+		await expect( errorSnackbar ).toContainText( uniqueName );
+
+		// The REST client's internals must not reach the user.
+		await expect(
+			snackbars.filter( { hasText: /valid JSON/i } )
+		).toBeHidden();
 
 		await page.unroute( '**/wp/v2/media**' );
 	} );

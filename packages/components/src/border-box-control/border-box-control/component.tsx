@@ -4,7 +4,8 @@ import { useMergeRefs } from '@wordpress/compose';
 import BorderBoxControlLinkedButton from '../border-box-control-linked-button';
 import BorderBoxControlSplitControls from '../border-box-control-split-controls';
 import { BorderControl } from '../../border-control';
-import { StyledLabel } from '../../base-control/styles/base-control-styles';
+import BaseControl from '../../base-control';
+import { Grid } from '../../grid';
 import { View } from '../../view';
 import { VisuallyHidden } from '../../visually-hidden';
 import type { WordPressComponentProps } from '../../context';
@@ -23,10 +24,13 @@ const BorderLabel = ( props: LabelProps ) => {
 		return null;
 	}
 
+	// The visible label is rendered as `BaseControl.VisualLabel` so it carries
+	// the stable `.components-base-control__label` className consumers style
+	// against; `StyledLabel` is an emotion component with a generated one.
 	return hideLabelFromVision ? (
 		<VisuallyHidden as="label">{ label }</VisuallyHidden>
 	) : (
-		<StyledLabel>{ label }</StyledLabel>
+		<BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel>
 	);
 };
 
@@ -42,6 +46,8 @@ const UnconnectedBorderBoxControl = (
 		enableAlpha,
 		enableStyle,
 		hasMixedBorders,
+		hasVisibleLabel,
+		headerClassName,
 		hideLabelFromVision,
 		isLinked,
 		label,
@@ -80,12 +86,34 @@ const UnconnectedBorderBoxControl = (
 		);
 
 	const mergedRef = useMergeRefs( [ setPopoverAnchor, forwardedRef ] );
+
 	return (
 		<View className={ className } { ...otherProps } ref={ mergedRef }>
-			<BorderLabel
-				label={ label }
-				hideLabelFromVision={ hideLabelFromVision }
-			/>
+			{ hasVisibleLabel ? (
+				// The toggle shares the label's row so that it lines up with
+				// the equivalent toggle on sibling controls, e.g. the border
+				// radius one.
+				<Grid
+					className={ headerClassName }
+					columns={ 2 }
+					templateColumns="1fr min-content"
+					alignment="center"
+				>
+					<BorderLabel
+						label={ label }
+						hideLabelFromVision={ hideLabelFromVision }
+					/>
+					<BorderBoxControlLinkedButton
+						onClick={ toggleLinked }
+						isLinked={ isLinked }
+					/>
+				</Grid>
+			) : (
+				<BorderLabel
+					label={ label }
+					hideLabelFromVision={ hideLabelFromVision }
+				/>
+			) }
 			<View className={ wrapperClassName }>
 				{ isLinked ? (
 					<BorderControl
@@ -123,10 +151,14 @@ const UnconnectedBorderBoxControl = (
 						}
 					/>
 				) }
-				<BorderBoxControlLinkedButton
-					onClick={ toggleLinked }
-					isLinked={ isLinked }
-				/>
+				{ /* With no label row to join, the toggle sits alongside the
+				     inputs instead. */ }
+				{ ! hasVisibleLabel && (
+					<BorderBoxControlLinkedButton
+						onClick={ toggleLinked }
+						isLinked={ isLinked }
+					/>
+				) }
 			</View>
 		</View>
 	);

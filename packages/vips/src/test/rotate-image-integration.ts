@@ -1,8 +1,6 @@
-/**
- * @jest-environment node
- */
 import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import type VipsFactory from 'wasm-vips';
 import { rotateImage } from '../';
 
 /**
@@ -31,17 +29,31 @@ import { rotateImage } from '../';
  * See https://github.com/WordPress/gutenberg/issues/79383.
  */
 
-jest.mock( 'wasm-vips', () => {
-	const RealVips = jest.requireActual( 'wasm-vips' );
-	return jest.fn( ( options: Record< string, unknown > = {} ) =>
-		RealVips( { dynamicLibraries: options.dynamicLibraries } )
-	);
+vi.mock( import( 'wasm-vips' ), async ( importOriginal ) => {
+	const original = await importOriginal();
+
+	return {
+		...original,
+		default: vi.fn( ( options: { dynamicLibraries?: string[] } = {} ) =>
+			original.default( {
+				dynamicLibraries: options.dynamicLibraries,
+			} )
+		) as unknown as typeof original.default,
+	};
 } );
 
-const FIXTURES = join( __dirname, 'fixtures' );
+/**
+ * Returns a fixture URL relative to this ESM test module.
+ *
+ * @param file Fixture filename.
+ *
+ * @return Fixture URL.
+ */
+const getFixtureUrl = ( file: string ) =>
+	new URL( `./fixtures/${ file }`, import.meta.url );
 
 const loadFixture = ( file: string ): ArrayBuffer => {
-	const contents = readFileSync( join( FIXTURES, file ) );
+	const contents = readFileSync( getFixtureUrl( file ) );
 	return contents.buffer.slice(
 		contents.byteOffset,
 		contents.byteOffset + contents.byteLength
@@ -65,10 +77,12 @@ const PNG_COLOR_TYPE_INDEXED = 3;
 const pngColorType = ( bytes: Uint8Array ): number => bytes[ 25 ];
 
 describe( 'rotateImage EXIF orientation fixtures', () => {
-	let vips: any;
+	let vips: Awaited< ReturnType< typeof VipsFactory > >;
 
 	beforeAll( async () => {
-		const Vips = jest.requireActual( 'wasm-vips' );
+		const { default: Vips } = await vi.importActual< {
+			default: typeof VipsFactory;
+		} >( 'wasm-vips' );
 		vips = await Vips( { dynamicLibraries: [ 'vips-heif.wasm' ] } );
 	} );
 
@@ -131,7 +145,9 @@ describe( 'rotateImage EXIF orientation fixtures', () => {
 			expect( result.width ).toBe( width );
 			expect( result.height ).toBe( height );
 
-			const rotated = vips.Image.newFromBuffer( result.buffer );
+			const rotated = vips.Image.newFromBuffer(
+				result.buffer as ArrayBuffer
+			);
 			expect( rotated.width ).toBe( width );
 			expect( rotated.height ).toBe( height );
 
@@ -191,7 +207,9 @@ describe( 'rotateImage EXIF orientation fixtures', () => {
 				6
 			);
 
-			const rotated = vips.Image.newFromBuffer( result.buffer );
+			const rotated = vips.Image.newFromBuffer(
+				result.buffer as ArrayBuffer
+			);
 			expect( reportedOrientation( rotated ) ).toBe( 1 );
 			rotated.delete();
 		}

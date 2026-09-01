@@ -1,58 +1,73 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import type VipsFactory from 'wasm-vips';
 import { convertImageFormat, compressImage } from '../';
 
-const mockNewFromBuffer = jest.fn( () => new MockImage() );
-const mockWriteToBuffer = jest.fn( () => ( {
-	buffer: '',
-} ) );
+const { MockVipsImage, mockNewFromBuffer, mockState, mockWriteToBuffer } =
+	vi.hoisted( () => {
+		/*
+		 * Controls whether the mocked source image reports the `palette` metadata
+		 * field, which libvips attaches only for indexed sources.
+		 */
+		const state = { hasPalette: false };
 
-/*
- * Controls whether the mocked source image reports the `palette` metadata
- * field, which libvips attaches only for indexed sources.
- */
-let mockHasPalette = false;
+		// GType of `gint`. Only whether `getTypeof` returns non-zero matters here.
+		const G_TYPE_INT = 24;
 
-// GType of `gint`. Only whether `getTypeof` returns non-zero matters here.
-const G_TYPE_INT = 24;
+		const writeToBufferMock = vi.fn( () => ( {
+			buffer: '',
+		} ) );
 
-class MockImage {
-	width = 100;
-	height = 100;
-	pageHeight = 100;
-	writeToBuffer = mockWriteToBuffer;
-	/*
-	 * Mirrors libvips: reading a field the image does not carry throws rather
-	 * than returning a falsy default. The production helpers rely on that, so
-	 * the mock has to throw too or their fallbacks would never be exercised.
-	 */
-	getInt = jest.fn( ( name: string ) => {
-		throw new Error( `${ name }: no such field` );
+		class ImageMock {
+			width = 100;
+			height = 100;
+			pageHeight = 100;
+			writeToBuffer = writeToBufferMock;
+			/*
+			 * Mirrors libvips: reading a field the image does not carry throws
+			 * rather than returning a falsy default. The production helpers rely
+			 * on that, so the mock has to throw too or their fallbacks would
+			 * never be exercised.
+			 */
+			getInt = vi.fn( ( name: string ) => {
+				throw new Error( `${ name }: no such field` );
+			} );
+			/*
+			 * libvips only attaches `palette` when the source was indexed, so
+			 * presence is the signal. Absent fields report GType 0 rather than
+			 * throwing.
+			 */
+			getTypeof = vi.fn( ( name: string ) =>
+				'palette' === name && state.hasPalette ? G_TYPE_INT : 0
+			);
+		}
+
+		const newFromBufferMock = vi.fn( () => new ImageMock() );
+
+		class VipsImageMock {
+			static newFromBuffer = newFromBufferMock;
+		}
+
+		return {
+			MockVipsImage: VipsImageMock,
+			mockNewFromBuffer: newFromBufferMock,
+			mockState: state,
+			mockWriteToBuffer: writeToBufferMock,
+		};
 	} );
-	/*
-	 * libvips only attaches `palette` when the source was indexed, so presence
-	 * is the signal. Absent fields report GType 0 rather than throwing.
-	 */
-	getTypeof = jest.fn( ( name: string ) =>
-		'palette' === name && mockHasPalette ? G_TYPE_INT : 0
-	);
-}
 
-class MockVipsImage {
-	static newFromBuffer = mockNewFromBuffer;
-}
-
-jest.mock( 'wasm-vips', () =>
-	jest.fn( () => ( {
+vi.mock( import( 'wasm-vips' ), () => ( {
+	default: vi.fn( () => ( {
 		Image: MockVipsImage,
 		Cache: {
-			max: jest.fn(),
+			max: vi.fn(),
 		},
-	} ) )
-);
+	} ) ) as unknown as typeof VipsFactory,
+} ) );
 
 describe( 'convertImageFormat', () => {
 	afterEach( () => {
-		jest.clearAllMocks();
-		mockHasPalette = false;
+		vi.clearAllMocks();
+		mockState.hasPalette = false;
 	} );
 
 	it( 'loads only the first frame when converting a GIF to JPEG', async () => {
@@ -127,7 +142,7 @@ describe( 'convertImageFormat', () => {
 		 * to PNG rewrites the image as truecolour and inflates it.
 		 */
 		it( 'quantises a compressed indexed PNG back to a palette', async () => {
-			mockHasPalette = true;
+			mockState.hasPalette = true;
 			const pngFile = new File( [ '<BLOB>' ], 'example.png', {
 				type: 'image/png',
 			} );
@@ -150,7 +165,7 @@ describe( 'convertImageFormat', () => {
 		it( 'leaves a truecolour PNG unquantised', async () => {
 			// libvips attaches `palette` only for an indexed source, so a
 			// truecolour PNG carries no such field.
-			mockHasPalette = false;
+			mockState.hasPalette = false;
 			const pngFile = new File( [ '<BLOB>' ], 'example.png', {
 				type: 'image/png',
 			} );
@@ -165,7 +180,7 @@ describe( 'convertImageFormat', () => {
 		} );
 
 		it( 'does not quantise when converting an indexed source away from PNG', async () => {
-			mockHasPalette = true;
+			mockState.hasPalette = true;
 			const pngFile = new File( [ '<BLOB>' ], 'example.png', {
 				type: 'image/png',
 			} );

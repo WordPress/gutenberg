@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
 	isUnsupportedConversionError,
 	isSizeLimitConversionError,
@@ -79,21 +80,21 @@ describe( 'isConversionTimeoutError', () => {
 
 /*
  * The remaining functions wrap the lazily-imported
- * @wordpress/video-conversion/worker module (mapped to a jest stub via
- * moduleNameMapper). Each test starts from a fresh module registry so the
- * module-level "has the worker loaded yet?" state is deterministic.
+ * @wordpress/video-conversion/worker module (mapped to a test stub by the
+ * Vitest configuration). Each test starts from a fresh module registry so
+ * the module-level "has the worker loaded yet?" state is deterministic.
  */
 describe( 'convertGifToVideo', () => {
 	beforeEach( () => {
-		jest.resetModules();
+		vi.resetModules();
 	} );
 
 	it( 'delegates to the worker and wraps mp4 output in a named File', async () => {
-		const worker = require( '@wordpress/video-conversion/worker' );
+		const worker = await import( '@wordpress/video-conversion/worker' );
 		const buffer = new ArrayBuffer( 8 );
-		worker.convertGifToVideo.mockResolvedValue( buffer );
+		vi.mocked( worker.convertGifToVideo ).mockResolvedValue( buffer );
 
-		const { convertGifToVideo } = require( '../video-conversion' );
+		const { convertGifToVideo } = await import( '../video-conversion' );
 		const gif = new File(
 			[ new Uint8Array( [ 1, 2, 3 ] ) ],
 			'my-anim.gif',
@@ -123,10 +124,12 @@ describe( 'convertGifToVideo', () => {
 	} );
 
 	it( 'uses a .webm extension for webm output', async () => {
-		const worker = require( '@wordpress/video-conversion/worker' );
-		worker.convertGifToVideo.mockResolvedValue( new ArrayBuffer( 4 ) );
+		const worker = await import( '@wordpress/video-conversion/worker' );
+		vi.mocked( worker.convertGifToVideo ).mockResolvedValue(
+			new ArrayBuffer( 4 )
+		);
 
-		const { convertGifToVideo } = require( '../video-conversion' );
+		const { convertGifToVideo } = await import( '../video-conversion' );
 		const gif = new File( [ new Uint8Array( [ 0 ] ) ], 'clip.gif', {
 			type: 'image/gif',
 		} );
@@ -145,10 +148,12 @@ describe( 'convertGifToVideo', () => {
 	} );
 
 	it( 'defaults to a .mp4 extension for any non-webm output type', async () => {
-		const worker = require( '@wordpress/video-conversion/worker' );
-		worker.convertGifToVideo.mockResolvedValue( new ArrayBuffer( 4 ) );
+		const worker = await import( '@wordpress/video-conversion/worker' );
+		vi.mocked( worker.convertGifToVideo ).mockResolvedValue(
+			new ArrayBuffer( 4 )
+		);
 
-		const { convertGifToVideo } = require( '../video-conversion' );
+		const { convertGifToVideo } = await import( '../video-conversion' );
 		const gif = new File( [ new Uint8Array( [ 0 ] ) ], 'clip.gif', {
 			type: 'image/gif',
 		} );
@@ -164,13 +169,34 @@ describe( 'convertGifToVideo', () => {
 } );
 
 describe( 'convertGifToVideo timeout', () => {
-	beforeEach( () => {
-		jest.resetModules();
-		jest.useFakeTimers();
+	let worker: typeof import('@wordpress/video-conversion/worker');
+	let convertGifToVideo: typeof import('../video-conversion').convertGifToVideo;
+
+	beforeEach( async () => {
+		vi.resetModules();
+
+		/*
+		 * Resolve the production module's lazy worker import before switching
+		 * to fake timers. Vitest's module loader schedules work through the
+		 * real event loop, so awaiting the first import while timers are faked
+		 * would make the test race the loader rather than the conversion timer
+		 * under test.
+		 */
+		worker = await import( '@wordpress/video-conversion/worker' );
+		vi.mocked( worker.convertGifToVideo ).mockResolvedValue(
+			new ArrayBuffer( 0 )
+		);
+		( { convertGifToVideo } = await import( '../video-conversion' ) );
+		await convertGifToVideo( 'warmup', makeGif(), 'video/mp4', {
+			timeout: 0,
+		} );
+
+		vi.clearAllMocks();
+		vi.useFakeTimers();
 	} );
 
 	afterEach( () => {
-		jest.useRealTimers();
+		vi.useRealTimers();
 	} );
 
 	function makeGif() {
@@ -179,20 +205,36 @@ describe( 'convertGifToVideo timeout', () => {
 		} );
 	}
 
-	it( 'abandons a conversion that exceeds the default 30s timeout and cancels the worker', async () => {
-		const worker = require( '@wordpress/video-conversion/worker' );
-		// A conversion that never settles, like a huge GIF churning away.
-		worker.convertGifToVideo.mockReturnValue( new Promise( () => {} ) );
-		worker.cancelGifToVideoOperations.mockResolvedValue( true );
+	async function waitForWorkerCall(
+		workerModule: typeof import('@wordpress/video-conversion/worker')
+	) {
+		for (
+			let attempts = 0;
+			attempts < 10 &&
+			! vi.mocked( workerModule.convertGifToVideo ).mock.calls.length;
+			attempts++
+		) {
+			await Promise.resolve();
+		}
+		expect( workerModule.convertGifToVideo ).toHaveBeenCalled();
+	}
 
-		const { convertGifToVideo } = require( '../video-conversion' );
+	it( 'abandons a conversion that exceeds the default 30s timeout and cancels the worker', async () => {
+		// A conversion that never settles, like a huge GIF churning away.
+		vi.mocked( worker.convertGifToVideo ).mockReturnValue(
+			new Promise( () => {} )
+		);
+		vi.mocked( worker.cancelGifToVideoOperations ).mockResolvedValue(
+			true
+		);
 
 		const promise = convertGifToVideo( 'item-1', makeGif(), 'video/mp4' );
 		// Attach a handler before advancing time so the rejection is never
 		// reported as unhandled.
 		promise.catch( () => {} );
+		await waitForWorkerCall( worker );
 
-		await jest.advanceTimersByTimeAsync( 30_000 );
+		vi.advanceTimersByTime( 30_000 );
 
 		// The exact message is the isConversionTimeoutError contract.
 		await expect( promise ).rejects.toThrow(
@@ -206,57 +248,57 @@ describe( 'convertGifToVideo timeout', () => {
 	} );
 
 	it( 'does not time out a conversion that finishes in time', async () => {
-		const worker = require( '@wordpress/video-conversion/worker' );
-		worker.convertGifToVideo.mockResolvedValue( new ArrayBuffer( 4 ) );
-
-		const { convertGifToVideo } = require( '../video-conversion' );
+		vi.mocked( worker.convertGifToVideo ).mockResolvedValue(
+			new ArrayBuffer( 4 )
+		);
 
 		const promise = convertGifToVideo( 'item-2', makeGif(), 'video/mp4' );
-		await jest.advanceTimersByTimeAsync( 0 );
+		await waitForWorkerCall( worker );
+		vi.advanceTimersByTime( 0 );
 		const result = await promise;
 
 		expect( result ).toBeInstanceOf( File );
 		expect( worker.cancelGifToVideoOperations ).not.toHaveBeenCalled();
 		// The timeout timer was cleared; nothing left pending.
-		expect( jest.getTimerCount() ).toBe( 0 );
+		expect( vi.getTimerCount() ).toBe( 0 );
 	} );
 
 	it( 'honors a custom timeout', async () => {
-		const worker = require( '@wordpress/video-conversion/worker' );
-		worker.convertGifToVideo.mockReturnValue( new Promise( () => {} ) );
-		worker.cancelGifToVideoOperations.mockResolvedValue( true );
-
-		const { convertGifToVideo } = require( '../video-conversion' );
+		vi.mocked( worker.convertGifToVideo ).mockReturnValue(
+			new Promise( () => {} )
+		);
+		vi.mocked( worker.cancelGifToVideoOperations ).mockResolvedValue(
+			true
+		);
 
 		const promise = convertGifToVideo( 'item-3', makeGif(), 'video/mp4', {
 			timeout: 5_000,
 		} );
 		promise.catch( () => {} );
+		await waitForWorkerCall( worker );
 
-		await jest.advanceTimersByTimeAsync( 5_000 );
+		vi.advanceTimersByTime( 5_000 );
 
 		await expect( promise ).rejects.toThrow( /timed out/i );
 	} );
 
 	it( 'treats a timeout of 0 as disabled', async () => {
-		const worker = require( '@wordpress/video-conversion/worker' );
 		let resolveConversion: ( buffer: ArrayBuffer ) => void = () => {};
-		worker.convertGifToVideo.mockReturnValue(
+		vi.mocked( worker.convertGifToVideo ).mockReturnValue(
 			new Promise( ( resolve ) => {
 				resolveConversion = resolve;
 			} )
 		);
 
-		const { convertGifToVideo } = require( '../video-conversion' );
-
 		const promise = convertGifToVideo( 'item-4', makeGif(), 'video/mp4', {
 			timeout: 0,
 		} );
+		await waitForWorkerCall( worker );
 
 		// Way past the default timeout: nothing should reject because no
 		// timer was ever set.
-		await jest.advanceTimersByTimeAsync( 120_000 );
-		expect( jest.getTimerCount() ).toBe( 0 );
+		vi.advanceTimersByTime( 120_000 );
+		expect( vi.getTimerCount() ).toBe( 0 );
 
 		resolveConversion( new ArrayBuffer( 4 ) );
 		const result = await promise;
@@ -267,12 +309,14 @@ describe( 'convertGifToVideo timeout', () => {
 
 describe( 'cancelGifToVideoOperations', () => {
 	beforeEach( () => {
-		jest.resetModules();
+		vi.resetModules();
 	} );
 
 	it( 'returns false when the worker module has not been loaded yet', async () => {
-		const worker = require( '@wordpress/video-conversion/worker' );
-		const { cancelGifToVideoOperations } = require( '../video-conversion' );
+		const worker = await import( '@wordpress/video-conversion/worker' );
+		const { cancelGifToVideoOperations } = await import(
+			'../video-conversion'
+		);
 
 		await expect( cancelGifToVideoOperations( 'item-1' ) ).resolves.toBe(
 			false
@@ -281,14 +325,17 @@ describe( 'cancelGifToVideoOperations', () => {
 	} );
 
 	it( 'delegates to the worker once the module is loaded', async () => {
-		const worker = require( '@wordpress/video-conversion/worker' );
-		worker.convertGifToVideo.mockResolvedValue( new ArrayBuffer( 4 ) );
-		worker.cancelGifToVideoOperations.mockResolvedValue( true );
+		const worker = await import( '@wordpress/video-conversion/worker' );
+		vi.mocked( worker.convertGifToVideo ).mockResolvedValue(
+			new ArrayBuffer( 4 )
+		);
+		vi.mocked( worker.cancelGifToVideoOperations ).mockResolvedValue(
+			true
+		);
 
-		const {
-			convertGifToVideo,
-			cancelGifToVideoOperations,
-		} = require( '../video-conversion' );
+		const { convertGifToVideo, cancelGifToVideoOperations } = await import(
+			'../video-conversion'
+		);
 
 		// Trigger a conversion to lazily load (and cache) the worker module.
 		await convertGifToVideo(
@@ -308,14 +355,17 @@ describe( 'cancelGifToVideoOperations', () => {
 	} );
 
 	it( 'delegates a cancel issued while the worker is still loading', async () => {
-		const worker = require( '@wordpress/video-conversion/worker' );
-		worker.convertGifToVideo.mockResolvedValue( new ArrayBuffer( 4 ) );
-		worker.cancelGifToVideoOperations.mockResolvedValue( true );
+		const worker = await import( '@wordpress/video-conversion/worker' );
+		vi.mocked( worker.convertGifToVideo ).mockResolvedValue(
+			new ArrayBuffer( 4 )
+		);
+		vi.mocked( worker.cancelGifToVideoOperations ).mockResolvedValue(
+			true
+		);
 
-		const {
-			convertGifToVideo,
-			cancelGifToVideoOperations,
-		} = require( '../video-conversion' );
+		const { convertGifToVideo, cancelGifToVideoOperations } = await import(
+			'../video-conversion'
+		);
 
 		/*
 		 * Start a conversion but do NOT await it: the worker module is now
@@ -343,27 +393,27 @@ describe( 'cancelGifToVideoOperations', () => {
 
 describe( 'terminateVideoConversionWorker', () => {
 	beforeEach( () => {
-		jest.resetModules();
+		vi.resetModules();
 	} );
 
-	it( 'is a no-op when the worker module has not been loaded yet', () => {
-		const worker = require( '@wordpress/video-conversion/worker' );
-		const {
-			terminateVideoConversionWorker,
-		} = require( '../video-conversion' );
+	it( 'is a no-op when the worker module has not been loaded yet', async () => {
+		const worker = await import( '@wordpress/video-conversion/worker' );
+		const { terminateVideoConversionWorker } = await import(
+			'../video-conversion'
+		);
 
 		expect( () => terminateVideoConversionWorker() ).not.toThrow();
 		expect( worker.terminateVideoConversionWorker ).not.toHaveBeenCalled();
 	} );
 
 	it( 'terminates the worker once the module is loaded', async () => {
-		const worker = require( '@wordpress/video-conversion/worker' );
-		worker.convertGifToVideo.mockResolvedValue( new ArrayBuffer( 4 ) );
+		const worker = await import( '@wordpress/video-conversion/worker' );
+		vi.mocked( worker.convertGifToVideo ).mockResolvedValue(
+			new ArrayBuffer( 4 )
+		);
 
-		const {
-			convertGifToVideo,
-			terminateVideoConversionWorker,
-		} = require( '../video-conversion' );
+		const { convertGifToVideo, terminateVideoConversionWorker } =
+			await import( '../video-conversion' );
 
 		await convertGifToVideo(
 			'item-1',

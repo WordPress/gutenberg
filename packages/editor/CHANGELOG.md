@@ -2,22 +2,54 @@
 
 ## Unreleased
 
-### Enhancements
+### Breaking Changes
 
--   Commands: Add a command palette entry that opens the current post on the front end once it is published, labelled with the post type's `view_item` label ([#66720](https://github.com/WordPress/gutenberg/pull/66720)).
+-   `PluginMoreMenuItem`, `PluginSidebarMoreMenuItem`: Items render with the `Menu` component of `@wordpress/ui` instead of `MenuItem`. A link item honors only `target="_blank"`, and a custom `as` has to forward its ref ([#81564](https://github.com/WordPress/gutenberg/pull/81564)).
 
 ### Bug Fixes
 
+-   Attach media an Image or Gallery block displays to the post on save, when it is not already attached to another post, matching what uploading into that post has always done ([#81977](https://github.com/WordPress/gutenberg/pull/81977)).
+-   Color the welcome guide's hovered button icon with `color` rather than `fill`, so stroke-based icons follow it. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
+-   `EditorInterface`: Apply the `showListViewByDefault` preference when the editor enters edit mode, so every editor built on the package honors it — including the extensible site editor, which previously ignored it. The logic moves here from `edit-post` and `edit-site`.
+-   `StylesCanvas`: In preview mode, render edge to edge without the close button and Escape handler. There the canvas is the whole surface rather than a frame opened over an editing session, and whatever opened it owns closing it.
+-   Upload progress snackbar: Stop announcing "Upload complete" for a batch in which everything failed. The snackbar treated the queue draining as success, so a failed upload showed a completion checkmark right next to its own error. A batch that fails outright now just takes the progress snackbar down, and a partly failed one reports "Uploaded 3 of 5" ([#81132](https://github.com/WordPress/gutenberg/issues/81132)).
+-   `mediaUpload`: Refuse a batch of more than one file before registering it with the upload progress snackbar when the caller only takes one, such as a Cover block placeholder. `uploadMedia()` reported the refusal as a single error, leaving the rest of the batch counted as uploading forever - and every later upload in the session was folded into that stuck notice ([#82041](https://github.com/WordPress/gutenberg/issues/82041)).
+
+### Internal
+
+-   Remove the template activation (`active_templates`) experiment: the post-save activation notice, the "Edit template" auto-activation, and template duplication in the actions list ([#82241](https://github.com/WordPress/gutenberg/pull/82241)).
+-   Remove unused dependencies `@wordpress/reusable-blocks`, `client-zip` and `fast-deep-equal` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+## 14.54.0 (2026-08-26)
+
+### New Features
+
+-   Add a private `SiteExport` menu item, moved from `edit-site`. It offers downloading the theme with the user's changes, only while editing a template or a template part — the entities the exported theme is made of ([#81992](https://github.com/WordPress/gutenberg/pull/81992)).
+
+### Enhancements
+
+-   Commands: Add a command palette entry that opens the current post on the front end once it is published, labelled with the post type's `view_item` label ([#66720](https://github.com/WordPress/gutenberg/pull/66720)).
+-   Pre-publish panel: Remove the "Visibility" and "Publish" headings that repeated the title of the panel containing them. The publish date's reset action, which lived in the removed header, becomes a "Reset" button below the date picker, disabled but still focusable while the post is set to publish immediately ([#81806](https://github.com/WordPress/gutenberg/pull/81806)).
+
+### Bug Fixes
+
+-   `__unstableSaveForPreview`: Mark the options object and its `forceIsAutosaveable` flag as optional, matching the neighbouring `autosave` action. Both defaulted at runtime but the published types required them ([#81858](https://github.com/WordPress/gutenberg/pull/81858)).
 -   Register the editor and block editor keyboard shortcuts from the editor provider, so shortcuts work for consumers that mount the editor without rendering `EditorKeyboardShortcutsRegister` themselves ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).
 -   Header: Allow the Back button column to grow when "Show button text labels" is enabled so the label is not obscured by the following controls ([#81701](https://github.com/WordPress/gutenberg/pull/81701)).
 -   Notes: Stop forcing capitalization of the user name in a note byline, so the name is shown as the user set it ([#81788](https://github.com/WordPress/gutenberg/pull/81788)).
 -   Device Preview: Center the editor canvas with the canvas container's own flex alignment rather than the canvas's auto margins, which were conditional on the resize handles being active. Switching from the mobile or tablet preview back to desktop no longer expands the canvas from the left edge ([#81484](https://github.com/WordPress/gutenberg/pull/81484)).
 -   `PostSchedule`: Announce the new publish date to screen readers when the date is changed ([#81629](https://github.com/WordPress/gutenberg/pull/81629)).
+-   Start page/template pattern modals: Align the footer actions with the modal content's padding, so the footer no longer overflows the modal width ([#82021](https://github.com/WordPress/gutenberg/pull/82021)).
 
 ### Internal
 
 -   Check the `window.__experimentalEnableRealTimeCollaboration` flag set by the Real-Time Collaboration experiment, instead of `window._wpCollaborationEnabled`, when determining whether collaboration is enabled for the current post ([#80658](https://github.com/WordPress/gutenberg/pull/80658)).
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81515](https://github.com/WordPress/gutenberg/pull/81515))
+
+### Enhancements
+
+-   Add an `initialViewport` prop to the editor provider, setting the width each entity opens at from the breakpoints the theme defines, so a host no longer has to dispatch `setDeviceType` from outside the provider and race the settings it reads ([#81750](https://github.com/WordPress/gutenberg/pull/81750)).
 
 ## 14.53.0 (2026-08-12)
 

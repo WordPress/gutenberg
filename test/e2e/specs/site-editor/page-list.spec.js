@@ -69,6 +69,13 @@ test.describe( 'Page List', () => {
 					const TEST_IMAGE_FILE_PATH =
 						'./assets/10x10_e2e_test_image_z9T8jK.png';
 
+					// The media modal opens on the "Media Library" tab once
+					// the library has items (e.g. after a previous upload),
+					// so make sure the upload tab is the active one.
+					await mediaLibrary
+						.getByRole( 'tab', { name: 'Upload files' } )
+						.click();
+
 					const fileChooserPromise =
 						page.waitForEvent( 'filechooser' );
 					await mediaLibrary.getByText( 'Select files' ).click();
@@ -474,6 +481,91 @@ test.describe( 'Page List', () => {
 		// 		await expect( status ).toBeVisible();
 		// 	}
 		// } );
+
+		test.describe( 'Field trigger', () => {
+			const getStatusField = ( page ) => {
+				const editButton = page.getByRole( 'button', {
+					name: 'Edit Status',
+				} );
+				return { editButton, row: editButton.locator( '..' ) };
+			};
+
+			test( 'opens the flyout when clicking anywhere on the row', async ( {
+				page,
+			} ) => {
+				const { editButton, row } = getStatusField( page );
+				const box = await row.boundingBox();
+
+				// Click the value area, away from the edit button.
+				await page.mouse.click(
+					box.x + box.width * 0.5,
+					box.y + box.height / 2
+				);
+
+				await expect(
+					page.getByRole( 'radio', { name: 'Draft' } )
+				).toBeVisible();
+				await expect( editButton ).toHaveAttribute(
+					'aria-expanded',
+					'true'
+				);
+			} );
+
+			test( 'returns focus to the edit button when the flyout is dismissed', async ( {
+				page,
+			} ) => {
+				const { editButton, row } = getStatusField( page );
+				const box = await row.boundingBox();
+				await page.mouse.click(
+					box.x + box.width * 0.5,
+					box.y + box.height / 2
+				);
+				await expect(
+					page.getByRole( 'radio', { name: 'Draft' } )
+				).toBeVisible();
+
+				await page.keyboard.press( 'Escape' );
+
+				await expect(
+					page.getByRole( 'radio', { name: 'Draft' } )
+				).toBeHidden();
+				await expect( editButton ).toBeFocused();
+
+				// Focus landing back on the trigger is what lets the field be
+				// reopened from the keyboard.
+				await page.keyboard.press( 'Enter' );
+				await expect(
+					page.getByRole( 'radio', { name: 'Draft' } )
+				).toBeVisible();
+			} );
+
+			test( 'keeps the flyout usable after double-clicking a field row', async ( {
+				page,
+			} ) => {
+				const { row } = getStatusField( page );
+				const box = await row.boundingBox();
+				const x = box.x + box.width * 0.5;
+				const y = box.y + box.height / 2;
+
+				// A double click used to leave a text selection behind, which
+				// made every later click on a row a no-op. See #79348. It now
+				// toggles the flyout twice, leaving it closed.
+				await page.mouse.dblclick( x, y );
+				await expect(
+					page.getByRole( 'radio', { name: 'Draft' } )
+				).toBeHidden();
+
+				const dateEditButton = page.getByRole( 'button', {
+					name: 'Edit Date',
+				} );
+				await dateEditButton.click();
+
+				await expect( dateEditButton ).toHaveAttribute(
+					'aria-expanded',
+					'true'
+				);
+			} );
+		} );
 	} );
 
 	test.describe( 'Quick Edit Date Timezone Consistency', () => {

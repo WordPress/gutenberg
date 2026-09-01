@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Require Node.js `^20.19.0 || >=22.13.0` and upgrade the bundled Stylelint to `^17.14.1` ([#80738](https://github.com/WordPress/gutenberg/pull/80738)).
+
+### Bug Fixes
+
+-   `build`: Strip JavaScript and TypeScript source extensions from legacy positional entry names so generated output uses names such as `index.js` instead of `index.tsx.js` or `index.jsx.js` ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+### Enhancements
+
+-   Include `.jsx` unit tests in the default lint configuration ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+### Internal
+
+-   Update bundled Jest packages to 30.5.0 ([#82181](https://github.com/WordPress/gutenberg/pull/82181)).
+-   Remove unused dependency `jest-environment-node` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+
+## 34.2.0 (2026-08-26)
+
 ## 34.1.0 (2026-08-12)
 
 ### Bug Fixes
@@ -16,7 +35,7 @@
 
 ### Enhancements
 
-- 	`format`: Detect `prettier.config.mjs` so the bundled default config is not used when one is present ([#80422](https://github.com/WordPress/gutenberg/pull/80422)).
+-   `format`: Detect `prettier.config.mjs` so the bundled default config is not used when one is present ([#80422](https://github.com/WordPress/gutenberg/pull/80422)).
 
 ## 33.0.0 (2026-07-14)
 
