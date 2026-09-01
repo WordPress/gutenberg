@@ -1,7 +1,25 @@
 import { __ } from '@wordpress/i18n';
 import { RichText, useBlockProps } from '@wordpress/block-editor';
 import { useMergeRefs } from '@wordpress/compose';
-import useKeyboardTransform from '../description-term/use-keyboard-transform';
+import type { BlockEditProps, Block } from '@wordpress/blocks';
+import type { RichTextData } from '@wordpress/rich-text';
+import useKeyboardTransform from './use-keyboard-transform';
+
+type DescriptionListItemAttributes = {
+	content: string | RichTextData;
+	placeholder?: string;
+};
+
+type DescriptionListItemEditProps =
+	BlockEditProps< DescriptionListItemAttributes > & {
+		mergeBlocks?: ( clientIdA: string, clientIdB: string ) => void;
+		onReplace?: (
+			blocks: Block[],
+			indexToSelect?: number,
+			initialPosition?: number
+		) => void;
+		onRemove?: () => void;
+	};
 
 export default function Edit( {
 	attributes,
@@ -10,12 +28,12 @@ export default function Edit( {
 	onReplace,
 	onRemove,
 	clientId,
-} ) {
+}: DescriptionListItemEditProps ) {
 	const { content, placeholder } = attributes;
 	const blockProps = useBlockProps();
 	const keyboardTransformRef = useKeyboardTransform( {
 		attributes,
-		blockName: 'core/description-detail',
+		blockName: 'core/description-term',
 		clientId,
 	} );
 	const ref = useMergeRefs( [ blockProps.ref, keyboardTransformRef ] );
@@ -23,17 +41,17 @@ export default function Edit( {
 	return (
 		<RichText
 			identifier="content"
-			tagName="dd"
+			tagName="dt"
 			{ ...blockProps }
 			ref={ ref }
 			value={ content }
-			onChange={ ( newContent ) =>
+			onChange={ ( newContent: string ) =>
 				setAttributes( { content: newContent } )
 			}
 			onMerge={ mergeBlocks }
 			onReplace={ onReplace }
 			onRemove={ onRemove }
-			placeholder={ placeholder || __( 'Description' ) }
+			placeholder={ placeholder || __( 'Term' ) }
 		/>
 	);
 }
