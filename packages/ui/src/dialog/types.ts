@@ -6,18 +6,13 @@ import type { ComponentProps } from '../utils/types';
 
 export type PortalProps = ComponentProps< typeof _Dialog.Portal >;
 
-export interface RootProps
-	extends Pick<
-		_Dialog.Root.Props,
-		| 'open'
-		| 'onOpenChange'
-		| 'onOpenChangeComplete'
-		| 'defaultOpen'
-		| 'modal'
-		| 'disablePointerDismissal'
-	> {
+export interface RootProps extends Omit< _Dialog.Root.Props, 'children' > {
 	/**
-	 * The content to be rendered inside the component.
+	 * The dialog sub-components (`Dialog.Trigger`, `Dialog.Popup`, etc.).
+	 *
+	 * The wrapper consumes `children` directly to set up the dialog's modal
+	 * context, so the render-function form of `children` supported by the
+	 * underlying `Dialog.Root` from `@base-ui/react` is not exposed.
 	 */
 	children?: ReactNode;
 }
@@ -29,9 +24,7 @@ export interface TriggerProps extends ComponentProps< 'button' > {
 	children?: ReactNode;
 }
 
-export interface PopupProps
-	extends ComponentProps< 'div' >,
-		Pick< _Dialog.Popup.Props, 'initialFocus' | 'finalFocus' > {
+export interface PopupProps extends ComponentProps< typeof _Dialog.Popup > {
 	/**
 	 * The content to be rendered inside the component.
 	 */

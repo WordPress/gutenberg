@@ -6,30 +6,13 @@ import type { ComponentProps } from '../utils/types';
 
 export type PortalProps = ComponentProps< typeof _Drawer.Portal >;
 
-export interface RootProps
-	extends Pick<
-		_Drawer.Root.Props,
-		| 'open'
-		| 'onOpenChange'
-		| 'onOpenChangeComplete'
-		| 'defaultOpen'
-		| 'modal'
-		| 'disablePointerDismissal'
-	> {
+export interface RootProps extends Omit< _Drawer.Root.Props, 'children' > {
 	/**
-	 * The edge the drawer slides in from, and the direction used to dismiss it
-	 * via swipe gesture.
+	 * The drawer sub-components (`Drawer.Trigger`, `Drawer.Popup`, etc.).
 	 *
-	 * - `'left'` / `'right'`: side drawers; swipe horizontally to dismiss.
-	 * - `'down'`: bottom sheet; swipe down to dismiss.
-	 * - `'up'`: top drawer; swipe up to dismiss.
-	 *
-	 * @default 'left'
-	 */
-	swipeDirection?: _Drawer.Root.Props[ 'swipeDirection' ];
-
-	/**
-	 * The content to be rendered inside the component.
+	 * The wrapper consumes `children` directly to set up the drawer's modal
+	 * context, so the render-function form of `children` supported by the
+	 * underlying `Drawer.Root` from `@base-ui/react` is not exposed.
 	 */
 	children?: ReactNode;
 }
@@ -41,9 +24,7 @@ export interface TriggerProps extends ComponentProps< 'button' > {
 	children?: ReactNode;
 }
 
-export interface PopupProps
-	extends ComponentProps< 'div' >,
-		Pick< _Drawer.Popup.Props, 'initialFocus' | 'finalFocus' > {
+export interface PopupProps extends ComponentProps< typeof _Drawer.Popup > {
 	/**
 	 * The content to be rendered inside the component.
 	 */

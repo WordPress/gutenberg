@@ -61,8 +61,7 @@ export interface TriggerProps extends ComponentProps< 'button' > {
 }
 
 export interface PopupProps
-	extends ComponentProps< 'div' >,
-		Pick< _AlertDialog.Popup.Props, 'initialFocus' | 'finalFocus' > {
+	extends ComponentProps< typeof _AlertDialog.Popup > {
 	/**
 	 * Optional portal element, typically `<AlertDialog.Portal />` with
 	 * custom `container`, `className`, or `style`. Overlay content is
