@@ -41,7 +41,7 @@ permissions:
     pull-requests: write
 ```
 
-**`if: ${{ !cancelled() }}`**, so a failed producer still clears its section instead of leaving a stale one behind.
+**A deliberate answer to producer failure.** Use `if: ${{ !cancelled() }}` where a missing result reliably means "nothing to report", so a failed producer clears its section rather than leaving a stale one. Where a missing result is instead indistinguishable from a failure, require the producer to have succeeded, as the props and flaky tests writers do; clearing there would erase something nothing had disproved.
 
 The job also needs `actions/checkout` before `uses: ./tools/pr-meta`, since a local action needs the repository on disk. `sparse-checkout: tools/pr-meta` is enough. Under `pull_request_target` the checkout must stay on the base ref, never the pull request's head.
 
