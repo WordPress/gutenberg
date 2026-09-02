@@ -1089,6 +1089,7 @@ test.describe( 'Image - dimensions forced by global styles', () => {
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.resetThemeGlobalStyles();
 		await requestUtils.deleteAllMedia();
+		await requestUtils.deleteAllPosts();
 	} );
 
 	test( 'preserves the aspect ratio when only the width is set', async ( {
