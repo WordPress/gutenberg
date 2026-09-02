@@ -107,15 +107,14 @@ export function getSyncedImageBlockAttributes(
  *
  * WordPress skips generating a sub-size larger than the file itself, so the
  * selected size may not exist on the edited image; fall back to full when it
- * doesn't, as selecting a new image does.
+ * doesn't.
  *
  * @param {string|undefined} sizeSlug   The block's currently selected size.
  * @param {Object}           attachment The new attachment record.
- * @param {string|undefined} fullUrl    URL of the new attachment's full size.
  *
  * @return {Object|undefined} Attributes to apply, if any.
  */
-function getNewAttachmentSizeAttributes( sizeSlug, attachment, fullUrl ) {
+function getNewAttachmentSizeAttributes( sizeSlug, attachment ) {
 	const sizes = attachment.media_details?.sizes;
 
 	if ( ! sizeSlug || sizeSlug === DEFAULT_MEDIA_SIZE_SLUG || ! sizes ) {
@@ -124,9 +123,15 @@ function getNewAttachmentSizeAttributes( sizeSlug, attachment, fullUrl ) {
 
 	const sizeUrl = sizes[ sizeSlug ]?.source_url;
 
-	return sizeUrl
-		? { url: sizeUrl }
-		: { url: fullUrl, sizeSlug: DEFAULT_MEDIA_SIZE_SLUG };
+	if ( sizeUrl ) {
+		return { url: sizeUrl };
+	}
+
+	const fullUrl = attachment.source_url ?? sizes.full?.source_url;
+
+	return fullUrl
+		? { url: fullUrl, sizeSlug: DEFAULT_MEDIA_SIZE_SLUG }
+		: undefined;
 }
 
 /**
@@ -173,16 +178,13 @@ function getNewAttachmentLinkAttributes( linkDestination, attachment ) {
  *
  * @param {Object}           blockAttributes The block's current attributes.
  * @param {Object|undefined} attachment      The new attachment record.
- * @param {string|undefined} fullUrl         URL of the new attachment's full
- *                                           size.
  *
  * @return {Object|undefined} Attributes to apply, or undefined when the
  *                            attachment record isn't known yet.
  */
 export function getNewAttachmentImageBlockAttributes(
 	blockAttributes,
-	attachment,
-	fullUrl
+	attachment
 ) {
 	if ( ! attachment ) {
 		return undefined;
@@ -191,8 +193,7 @@ export function getNewAttachmentImageBlockAttributes(
 	return {
 		...getNewAttachmentSizeAttributes(
 			blockAttributes.sizeSlug,
-			attachment,
-			fullUrl
+			attachment
 		),
 		...getNewAttachmentLinkAttributes(
 			blockAttributes.linkDestination,
@@ -419,8 +420,7 @@ export function useOpenImageMediaEditorModal( {
 					const derivedAttributes =
 						getNewAttachmentImageBlockAttributes(
 							latestBlockAttributes,
-							attachmentRecord,
-							nextAttributes.url
+							attachmentRecord
 						);
 
 					if ( derivedAttributes ) {

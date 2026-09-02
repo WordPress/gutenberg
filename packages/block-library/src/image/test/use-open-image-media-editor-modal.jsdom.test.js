@@ -1112,8 +1112,7 @@ describe( 'getNewAttachmentImageBlockAttributes', () => {
 		expect(
 			getNewAttachmentImageBlockAttributes(
 				{ sizeSlug: 'medium' },
-				croppedAttachment,
-				'cropped.jpg'
+				croppedAttachment
 			)
 		).toEqual( { url: 'cropped-300x200.jpg' } );
 	} );
@@ -1122,26 +1121,48 @@ describe( 'getNewAttachmentImageBlockAttributes', () => {
 		expect(
 			getNewAttachmentImageBlockAttributes(
 				{ sizeSlug: 'large' },
-				croppedAttachment,
-				'cropped.jpg'
+				croppedAttachment
 			)
 		).toEqual( { url: 'cropped.jpg', sizeSlug: 'full' } );
+	} );
+
+	it( 'falls back to full when the edited image is too small for any sub-size', () => {
+		// Cropping below the smallest registered size leaves
+		// `media_details.sizes` empty, so the block has to fall back to the
+		// file itself and stop reporting a size it no longer has.
+		expect(
+			getNewAttachmentImageBlockAttributes(
+				{ sizeSlug: 'medium' },
+				{
+					id: 2,
+					source_url: 'cropped-103x45.jpg',
+					media_details: { width: 103, height: 45, sizes: {} },
+				}
+			)
+		).toEqual( {
+			url: 'cropped-103x45.jpg',
+			sizeSlug: 'full',
+		} );
+	} );
+
+	it( 'makes no change when no full-size URL is available', () => {
+		expect(
+			getNewAttachmentImageBlockAttributes(
+				{ sizeSlug: 'large' },
+				{ id: 2, media_details: { sizes: { medium: {} } } }
+			)
+		).toEqual( {} );
 	} );
 
 	it( 'makes no change for the full size or an unset size', () => {
 		expect(
 			getNewAttachmentImageBlockAttributes(
 				{ sizeSlug: 'full' },
-				croppedAttachment,
-				'cropped.jpg'
+				croppedAttachment
 			)
 		).toEqual( {} );
 		expect(
-			getNewAttachmentImageBlockAttributes(
-				{},
-				croppedAttachment,
-				'cropped.jpg'
-			)
+			getNewAttachmentImageBlockAttributes( {}, croppedAttachment )
 		).toEqual( {} );
 	} );
 
@@ -1149,8 +1170,7 @@ describe( 'getNewAttachmentImageBlockAttributes', () => {
 		expect(
 			getNewAttachmentImageBlockAttributes(
 				{ sizeSlug: 'medium' },
-				{ id: 2 },
-				'cropped.jpg'
+				{ id: 2 }
 			)
 		).toEqual( {} );
 	} );
@@ -1159,8 +1179,7 @@ describe( 'getNewAttachmentImageBlockAttributes', () => {
 		expect(
 			getNewAttachmentImageBlockAttributes(
 				{ sizeSlug: 'medium' },
-				undefined,
-				'cropped.jpg'
+				undefined
 			)
 		).toBeUndefined();
 	} );
@@ -1169,8 +1188,7 @@ describe( 'getNewAttachmentImageBlockAttributes', () => {
 		expect(
 			getNewAttachmentImageBlockAttributes(
 				{ sizeSlug: 'medium', linkDestination: 'media' },
-				croppedAttachment,
-				'cropped.jpg'
+				croppedAttachment
 			)
 		).toEqual( {
 			url: 'cropped-300x200.jpg',
@@ -1182,8 +1200,7 @@ describe( 'getNewAttachmentImageBlockAttributes', () => {
 		expect(
 			getNewAttachmentImageBlockAttributes(
 				{ linkDestination: 'attachment' },
-				croppedAttachment,
-				'cropped.jpg'
+				croppedAttachment
 			)
 		).toEqual( { href: 'https://example.com/cropped/' } );
 	} );
@@ -1192,23 +1209,17 @@ describe( 'getNewAttachmentImageBlockAttributes', () => {
 		expect(
 			getNewAttachmentImageBlockAttributes(
 				{ linkDestination: 'custom' },
-				croppedAttachment,
-				'cropped.jpg'
+				croppedAttachment
 			)
 		).toEqual( {} );
 		expect(
 			getNewAttachmentImageBlockAttributes(
 				{ linkDestination: 'none' },
-				croppedAttachment,
-				'cropped.jpg'
+				croppedAttachment
 			)
 		).toEqual( {} );
 		expect(
-			getNewAttachmentImageBlockAttributes(
-				{},
-				croppedAttachment,
-				'cropped.jpg'
-			)
+			getNewAttachmentImageBlockAttributes( {}, croppedAttachment )
 		).toEqual( {} );
 	} );
 
@@ -1216,15 +1227,13 @@ describe( 'getNewAttachmentImageBlockAttributes', () => {
 		expect(
 			getNewAttachmentImageBlockAttributes(
 				{ linkDestination: 'media' },
-				{ id: 2 },
-				'cropped.jpg'
+				{ id: 2 }
 			)
 		).toEqual( {} );
 		expect(
 			getNewAttachmentImageBlockAttributes(
 				{ linkDestination: 'attachment' },
-				{ id: 2 },
-				'cropped.jpg'
+				{ id: 2 }
 			)
 		).toEqual( {} );
 	} );
