@@ -7,6 +7,15 @@ import { store as blockEditorStore } from '../../store';
 import { isInSameBlock, isInsideRootBlock } from '../../utils/dom';
 import { unlock } from '../../lock-unlock';
 
+/**
+ * Keeps the element positioned within the viewport, so focussing it never
+ * scrolls the page. Fixed positioning once made Safari build an oversized
+ * compositing layer for the scrollable canvas, which is why keydown handlers
+ * prevented the scrolling instead, but current Safari sizes the layer
+ * correctly.
+ */
+const PREVENT_SCROLL_ON_FOCUS = { position: 'fixed' };
+
 export default function useTabNav() {
 	const containerRef = /** @type {typeof useRef<HTMLElement>} */ ( useRef )();
 	const focusCaptureBeforeRef = useRef();
@@ -90,6 +99,7 @@ export default function useTabNav() {
 			ref={ focusCaptureBeforeRef }
 			tabIndex="0"
 			onFocus={ onFocusCapture }
+			style={ PREVENT_SCROLL_ON_FOCUS }
 		/>
 	);
 
@@ -98,6 +108,7 @@ export default function useTabNav() {
 			ref={ focusCaptureAfterRef }
 			tabIndex="0"
 			onFocus={ onFocusCapture }
+			style={ PREVENT_SCROLL_ON_FOCUS }
 		/>
 	);
 
@@ -162,10 +173,7 @@ export default function useTabNav() {
 			// (moving focus to the next tabbable element).
 			noCaptureRef.current = true;
 
-			// Focusing the focus capture element, which is located above and
-			// below the editor, should not scroll the page all the way up or
-			// down.
-			next.current.focus( { preventScroll: true } );
+			next.current.focus();
 		}
 
 		function onFocusOut( event ) {
@@ -191,47 +199,9 @@ export default function useTabNav() {
 			}
 		}
 
-		// When tabbing back to an element in block list, this event handler prevents scrolling if the
-		// focus capture divs (before/after) are outside of the viewport. (For example shift+tab back to a paragraph
-		// when focus is on a sidebar element. This prevents the scrollable writing area from jumping either to the
-		// top or bottom of the document.
-		//
-		// Note that it isn't possible to disable scrolling in the onFocus event. We need to intercept this
-		// earlier in the keypress handler, and call focus( { preventScroll: true } ) instead.
-		// https://developer.mozilla.org/en-US/docs/Web/API/HTMLOrForeignElement/focus#parameters
-		function preventScrollOnTab( event ) {
-			if ( event.keyCode !== TAB ) {
-				return;
-			}
-
-			if ( event.target?.getAttribute( 'role' ) === 'region' ) {
-				return;
-			}
-
-			if ( containerRef.current === event.target ) {
-				return;
-			}
-
-			const isShift = event.shiftKey;
-			const direction = isShift ? 'findPrevious' : 'findNext';
-			const target = focus.tabbable[ direction ]( event.target );
-			// Only do something when the next tabbable is a focus capture div (before/after)
-			if (
-				target === focusCaptureBeforeRef.current ||
-				target === focusCaptureAfterRef.current
-			) {
-				event.preventDefault();
-				target.focus( { preventScroll: true } );
-			}
-		}
-
-		const { ownerDocument } = node;
-		const { defaultView } = ownerDocument;
-		defaultView.addEventListener( 'keydown', preventScrollOnTab );
 		node.addEventListener( 'keydown', onKeyDown );
 		node.addEventListener( 'focusout', onFocusOut );
 		return () => {
-			defaultView.removeEventListener( 'keydown', preventScrollOnTab );
 			node.removeEventListener( 'keydown', onKeyDown );
 			node.removeEventListener( 'focusout', onFocusOut );
 		};
