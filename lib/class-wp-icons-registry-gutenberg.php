@@ -16,11 +16,13 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	 * @param array  $icon_properties {
 	 *     List of properties for the icon.
 	 *
-	 *     @type string $label     Required. A human-readable label for the icon.
-	 *     @type string $content   Optional. SVG markup for the icon.
-	 *                             If not provided, the content will be retrieved from the `file_path` if set.
-	 *                             If both `content` and `file_path` are not set, the icon will not be registered.
-	 *     @type string $file_path Optional. The full path to the file containing the icon content.
+	 *     @type string   $label     Required. A human-readable label for the icon.
+	 *     @type string   $content   Optional. SVG markup for the icon.
+	 *                               If not provided, the content will be retrieved from the `file_path` if set.
+	 *                               If both `content` and `file_path` are not set, the icon will not be registered.
+	 *     @type string   $file_path Optional. The full path to the file containing the icon content.
+	 *     @type string[] $keywords  Optional. Additional search terms for the icon, matched by
+	 *                               `get_registered_icons()` alongside the name and label.
 	 * }
 	 * @return bool True if the icon was registered with success and false otherwise.
 	 */
@@ -63,7 +65,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			return false;
 		}
 
-		$allowed_keys = array_fill_keys( array( 'label', 'content', 'file_path' ), 1 );
+		$allowed_keys = array_fill_keys( array( 'label', 'content', 'file_path', 'keywords' ), 1 );
 		foreach ( array_keys( $icon_properties ) as $key ) {
 			if ( ! array_key_exists( $key, $allowed_keys ) ) {
 				_doing_it_wrong(
@@ -99,6 +101,28 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 				'7.0.0'
 			);
 			return false;
+		}
+
+		if ( isset( $icon_properties['keywords'] ) ) {
+			if ( ! is_array( $icon_properties['keywords'] ) ) {
+				_doing_it_wrong(
+					__METHOD__,
+					__( 'Icon keywords must be an array of strings.', 'gutenberg' ),
+					'7.1.0'
+				);
+				return false;
+			}
+
+			foreach ( $icon_properties['keywords'] as $keyword ) {
+				if ( ! is_string( $keyword ) ) {
+					_doing_it_wrong(
+						__METHOD__,
+						__( 'Icon keywords must be an array of strings.', 'gutenberg' ),
+						'7.1.0'
+					);
+					return false;
+				}
+			}
 		}
 
 		if (
@@ -230,16 +254,45 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	}
 
 	/**
-	 * Modified to also search in icon labels
+	 * Determines whether an icon matches a search term.
+	 *
+	 * The term is matched case-insensitively against the icon's name, its label,
+	 * and any of its keywords.
+	 *
+	 * @param array  $icon   Registered icon properties.
+	 * @param string $search Search term.
+	 * @return bool True if the icon matches the search term, false otherwise.
+	 */
+	protected function icon_matches_search( $icon, $search ) {
+		if ( false !== stripos( $icon['name'], $search ) ) {
+			return true;
+		}
+
+		if ( false !== stripos( $icon['label'], $search ) ) {
+			return true;
+		}
+
+		foreach ( $icon['keywords'] ?? array() as $keyword ) {
+			if ( false !== stripos( $keyword, $search ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Modified to also search in icon labels and keywords.
+	 *
+	 * @param string $search Optional. Search term matched against each icon's name,
+	 *                       label, and keywords. Default empty string, which returns
+	 *                       every registered icon.
 	 */
 	public function get_registered_icons( $search = '' ) {
 		$icons = array();
 
 		foreach ( $this->registered_icons as $icon ) {
-			if ( ! empty( $search )
-				&& false === stripos( $icon['name'], $search )
-				&& false === stripos( $icon['label'], $search )
-			) {
+			if ( ! empty( $search ) && ! $this->icon_matches_search( $icon, $search ) ) {
 				continue;
 			}
 
@@ -269,6 +322,9 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 						continue;
 					}
 					$icon_properties = array( 'label' => $icon['label'] );
+					if ( ! empty( $icon['keywords'] ) ) {
+						$icon_properties['keywords'] = $icon['keywords'];
+					}
 					if ( ! empty( $icon['content'] ) ) {
 						$icon_properties['content'] = $icon['content'];
 					} elseif ( ! empty( $icon['file_path'] ) ) {

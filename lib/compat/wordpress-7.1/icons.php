@@ -118,6 +118,21 @@ function gutenberg_register_default_icons() {
 		return;
 	}
 
+	/*
+	 * Make sure the Gutenberg registry is the active one before registering, since
+	 * only it accepts Gutenberg-only icon properties such as `keywords`; the base
+	 * registry rejects them as invalid and would register no icon at all.
+	 * `gutenberg_override_wp_icons_registry()` normally takes care of this earlier
+	 * on `init`, but the singleton can be reset, for instance between test suites.
+	 *
+	 * The class is only loaded alongside the REST controllers, so fall back to
+	 * registering without keywords when it is unavailable.
+	 */
+	$supports_keywords = class_exists( 'WP_Icons_Registry_Gutenberg' );
+	if ( $supports_keywords ) {
+		WP_Icons_Registry_Gutenberg::get_instance();
+	}
+
 	foreach ( $collection as $icon_name => $icon_data ) {
 		if (
 			empty( $icon_data['filePath'] )
@@ -131,13 +146,17 @@ function gutenberg_register_default_icons() {
 			return;
 		}
 
-		wp_register_icon(
-			'core/' . $icon_name,
-			array(
-				'label'     => $icon_data['label'],
-				'file_path' => $icons_directory . $icon_data['filePath'],
-			)
+		$icon_properties = array(
+			'label'     => $icon_data['label'],
+			'file_path' => $icons_directory . $icon_data['filePath'],
 		);
+
+		// Keywords are optional, so only pass them through when present.
+		if ( $supports_keywords && ! empty( $icon_data['keywords'] ) && is_array( $icon_data['keywords'] ) ) {
+			$icon_properties['keywords'] = $icon_data['keywords'];
+		}
+
+		wp_register_icon( 'core/' . $icon_name, $icon_properties );
 	}
 }
 

@@ -432,4 +432,188 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 		$this->assertFalse( $result );
 		$this->assertFalse( $this->registry->is_registered( $name ) );
 	}
+
+	/**
+	 * Should register an icon that provides a valid `keywords` array.
+	 */
+	public function test_register_icon_with_keywords() {
+		$name = 'test-collection/with-keywords';
+
+		$result = $this->register(
+			$name,
+			array(
+				'label'    => 'Icon',
+				'content'  => '<svg></svg>',
+				'keywords' => array( 'alpha', 'beta' ),
+			)
+		);
+
+		$this->assertTrue( $result );
+
+		$icon = $this->registry->get_registered_icon( $name );
+		$this->assertSame( array( 'alpha', 'beta' ), $icon['keywords'] );
+	}
+
+	/**
+	 * Should register an icon that omits `keywords`, since the property is optional.
+	 */
+	public function test_register_icon_without_keywords() {
+		$name = 'test-collection/without-keywords';
+
+		$result = $this->register(
+			$name,
+			array(
+				'label'   => 'Icon',
+				'content' => '<svg></svg>',
+			)
+		);
+
+		$this->assertTrue( $result );
+
+		$icon = $this->registry->get_registered_icon( $name );
+		$this->assertArrayNotHasKey( 'keywords', $icon );
+	}
+
+	/**
+	 * Provides values that are not an array of strings.
+	 *
+	 * @return array<string, array{0: mixed}>
+	 */
+	public function data_invalid_keywords() {
+		return array(
+			'a string'             => array( 'alpha' ),
+			'an integer'           => array( 5 ),
+			'an array of integers' => array( array( 1, 2 ) ),
+			'a mixed array'        => array( array( 'alpha', 5 ) ),
+			'a nested array'       => array( array( array( 'alpha' ) ) ),
+			'an array of null'     => array( array( null ) ),
+		);
+	}
+
+	/**
+	 * Should fail to register an icon whose `keywords` is not an array of strings.
+	 *
+	 * @dataProvider data_invalid_keywords
+	 * @expectedIncorrectUsage WP_Icons_Registry_Gutenberg::register
+	 *
+	 * @param mixed $keywords Invalid keywords candidate.
+	 */
+	public function test_register_icon_with_invalid_keywords( $keywords ) {
+		$name = 'test-collection/invalid-keywords';
+
+		$result = $this->register(
+			$name,
+			array(
+				'label'    => 'Icon',
+				'content'  => '<svg></svg>',
+				'keywords' => $keywords,
+			)
+		);
+
+		$this->assertFalse( $result );
+		$this->assertFalse( $this->registry->is_registered( $name ) );
+	}
+
+	/**
+	 * Should match an icon by keyword when neither its name nor its label match.
+	 */
+	public function test_get_registered_icons_matches_keywords() {
+		$this->register(
+			'test-collection/dove',
+			array(
+				'label'    => 'Dove',
+				'content'  => '<svg></svg>',
+				'keywords' => array( 'peace' ),
+			)
+		);
+		$this->register(
+			'test-collection/anvil',
+			array(
+				'label'   => 'Anvil',
+				'content' => '<svg></svg>',
+			)
+		);
+
+		/*
+		 * The search term is deliberately absent from both the name and the label,
+		 * so a match can only come from the keywords.
+		 */
+		$icon = $this->registry->get_registered_icon( 'test-collection/dove' );
+		$this->assertStringNotContainsStringIgnoringCase( 'peace', $icon['name'] );
+		$this->assertStringNotContainsStringIgnoringCase( 'peace', $icon['label'] );
+
+		$names = array_column( $this->registry->get_registered_icons( 'peace' ), 'name' );
+
+		$this->assertContains(
+			'test-collection/dove',
+			$names,
+			'Search results should include an icon matched only by its keyword'
+		);
+		$this->assertNotContains(
+			'test-collection/anvil',
+			$names,
+			'Search results should exclude an icon that matches on no property'
+		);
+	}
+
+	/**
+	 * Should match keywords case-insensitively, as names and labels are.
+	 */
+	public function test_get_registered_icons_matches_keywords_case_insensitively() {
+		$this->register(
+			'test-collection/dove',
+			array(
+				'label'    => 'Dove',
+				'content'  => '<svg></svg>',
+				'keywords' => array( 'peace' ),
+			)
+		);
+
+		$names = array_column( $this->registry->get_registered_icons( 'PEACE' ), 'name' );
+
+		$this->assertContains( 'test-collection/dove', $names );
+	}
+
+	/**
+	 * Should not drop a third-party icon's keywords when an existing base registry
+	 * is upgraded to the Gutenberg registry.
+	 */
+	public function test_get_instance_preserves_keywords_when_upgrading_base_registry() {
+		// Build a base registry without invoking the constructor, which would
+		// register the core icons from the core manifest.
+		$base = ( new ReflectionClass( WP_Icons_Registry::class ) )->newInstanceWithoutConstructor();
+
+		$icons_property = new ReflectionProperty( WP_Icons_Registry::class, 'registered_icons' );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$icons_property->setAccessible( true );
+		}
+		$icons_property->setValue(
+			$base,
+			array(
+				'test-collection/dove' => array(
+					'name'       => 'test-collection/dove',
+					'collection' => 'test-collection',
+					'label'      => 'Dove',
+					'content'    => '<svg></svg>',
+					'keywords'   => array( 'peace' ),
+				),
+			)
+		);
+
+		$instance_property = new ReflectionProperty( WP_Icons_Registry_Gutenberg::class, 'instance' );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$instance_property->setAccessible( true );
+		}
+		$instance_property->setValue( null, $base );
+
+		$upgraded = WP_Icons_Registry_Gutenberg::get_instance();
+
+		$this->assertInstanceOf( WP_Icons_Registry_Gutenberg::class, $upgraded );
+
+		$icon = $upgraded->get_registered_icon( 'test-collection/dove' );
+		$this->assertSame( array( 'peace' ), $icon['keywords'] );
+
+		$names = array_column( $upgraded->get_registered_icons( 'peace' ), 'name' );
+		$this->assertContains( 'test-collection/dove', $names );
+	}
 }

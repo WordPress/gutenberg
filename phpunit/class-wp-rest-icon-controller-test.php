@@ -183,6 +183,23 @@ class WP_Test_REST_Icons_Controller extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Test that GET /wp/v2/icons/?search=%s searches icon keywords too.
+	 */
+	public function test_get_items_search_includes_keywords() {
+		wp_set_current_user( self::$editor_id );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/icons' );
+
+		// 'hamburger' is only found in the *keywords* for core/menu.
+		$request->set_param( 'search', 'hamburger' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertEquals( array( 'core/menu' ), array_column( $data, 'name' ) );
+	}
+
+	/**
 	 * Test that search is case-insensitive.
 	 */
 	public function test_get_items_search_case_insensitive() {

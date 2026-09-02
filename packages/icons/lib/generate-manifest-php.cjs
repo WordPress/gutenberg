@@ -43,8 +43,21 @@ function generatePHPArray( manifest ) {
 		const label = escapePHPString( item.label );
 		const filePath = escapePHPString( item.filePath );
 
+		// Keywords are optional, and are localized like labels since they are
+		// matched against user-entered search terms.
+		const keywords = item.keywords?.length
+			? `\n\t\t'keywords' => array( ${ item.keywords
+					.map(
+						( keyword ) =>
+							`_x( '${ escapePHPString(
+								keyword
+							) }', 'icon keyword', 'gutenberg' )`
+					)
+					.join( ', ' ) } ),`
+			: '';
+
 		return `${ key } => array(
-		'label'    => _x( '${ label }', 'icon label', 'gutenberg' ),
+		'label'    => _x( '${ label }', 'icon label', 'gutenberg' ),${ keywords }
 		'filePath' => '${ filePath }',
 	),`;
 	} );
