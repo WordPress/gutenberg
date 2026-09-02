@@ -1,3 +1,4 @@
+import deprecated from '@wordpress/deprecated';
 import { usePluginContext } from '@wordpress/plugins';
 import { ActionItem } from '@wordpress/interface';
 
@@ -39,11 +40,23 @@ import { ActionItem } from '@wordpress/interface';
  */
 export default function PluginPreviewMenuItem( props ) {
 	const context = usePluginContext();
+	// `as` was never part of the contract. It is dropped so that it does not
+	// reach the item the menu renders.
+	const { as, ...itemProps } = props;
+
+	if ( as ) {
+		deprecated( 'The `as` prop of wp.editor.PluginPreviewMenuItem', {
+			since: '7.2',
+			version: '7.4',
+			hint: 'The menu renders the item itself.',
+		} );
+	}
+
 	return (
 		<ActionItem
 			name="core/plugin-preview-menu"
-			icon={ props.icon || context.icon }
-			{ ...props }
+			icon={ itemProps.icon || context.icon }
+			{ ...itemProps }
 		/>
 	);
 }

@@ -4,7 +4,11 @@
 
 ### Breaking Changes
 
--   `PluginMoreMenuItem`, `PluginSidebarMoreMenuItem`: Items render with the `Menu` component of `@wordpress/ui` instead of `MenuItem`. A link item honors only `target="_blank"`, and a custom `as` has to forward its ref ([#81564](https://github.com/WordPress/gutenberg/pull/81564)).
+-   `PluginMoreMenuItem`, `PluginSidebarMoreMenuItem`: Items render with the `Menu` component of `@wordpress/ui` instead of `MenuItem`. A link item honors only `target="_blank"` ([#81564](https://github.com/WordPress/gutenberg/pull/81564)).
+
+### Deprecations
+
+-   `PluginMoreMenuItem`, `PluginSidebarMoreMenuItem`, `PluginPreviewMenuItem`: Deprecate the `as` prop. It was never a documented part of these components, and the menu now renders the item itself. The prop is ignored ([#82319](https://github.com/WordPress/gutenberg/pull/82319)).
 
 ### Bug Fixes
 
