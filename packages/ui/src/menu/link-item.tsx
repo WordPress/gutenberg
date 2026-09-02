@@ -2,6 +2,8 @@ import { Menu as _Menu } from '@base-ui/react/menu';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { external } from '@wordpress/icons';
+import { Icon } from '../icon';
 import defenseStyles from '../utils/css/global-css-defense.module.css';
 import resetStyles from '../utils/css/resets.module.css';
 import styles from './style.module.css';
@@ -37,7 +39,9 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 				/* translators: accessibility text appended to link text */
 				__( '(opens in a new tab)' )
 			}
-		/>
+		>
+			<Icon icon={ external } size={ 16 } aria-hidden="true" />
+		</span>
 	) : null;
 	const {
 		contentChildren,

@@ -300,19 +300,11 @@
 		}
 
 		.external-link-indicator {
-			display: inline-block;
-			line-height: 1;
+			display: inline-flex;
+			align-items: center;
 			margin-inline-start: var(--wpds-dimension-gap-xs);
-			font-weight: var(--wpds-typography-font-weight-default);
 			text-decoration: none;
-		}
-
-		.external-link-indicator::after {
-			content: "\2197";
-		}
-
-		.external-link-indicator:dir(rtl)::after {
-			content: "\2196";
+			vertical-align: middle;
 		}
 
 		.item[data-highlighted]:not([aria-disabled="true"]) .item-prefix,
