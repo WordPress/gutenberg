@@ -105,6 +105,8 @@ const HierarchicalLevelsComponent = ( {
 			view={ view }
 			onChangeView={ setView }
 			fields={ fields }
+			// Levels are only supported by the table layout for now.
+			defaultLayouts={ { table: true } }
 		/>
 	);
 };
