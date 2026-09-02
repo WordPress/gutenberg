@@ -19,7 +19,7 @@ export async function openPreviewPage( this: Editor ): Promise< Page > {
 	const [ previewPage ] = await Promise.all( [
 		this.context.waitForEvent( 'page' ),
 		this.page
-			.getByRole( 'menuitem', { name: 'Preview in new tab' } )
+			.getByRole( 'menuitem', { name: 'Preview (opens in a new tab)' } )
 			.click(),
 	] );
 

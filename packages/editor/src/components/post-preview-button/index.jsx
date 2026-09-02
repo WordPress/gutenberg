@@ -250,7 +250,7 @@ export function PostPreviewMenuItem( { forceIsAutosaveable, onPreview } ) {
 
 	const { disabled, href, onClick, target } = previewProps;
 	const label = (
-		<Menu.ItemLabel>{ __( 'Preview in new tab' ) }</Menu.ItemLabel>
+		<Menu.ItemLabel>{ _x( 'Preview', 'imperative verb' ) }</Menu.ItemLabel>
 	);
 
 	// There is nothing to preview until the post is saveable, so the item

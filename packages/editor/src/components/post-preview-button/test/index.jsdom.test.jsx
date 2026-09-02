@@ -156,7 +156,7 @@ describe( 'PostPreviewButton', () => {
 		await openMenu( user );
 
 		const menuItem = screen.getByRole( 'menuitem', {
-			name: 'Preview in new tab (opens in a new tab)',
+			name: 'Preview (opens in a new tab)',
 		} );
 		expect( menuItem.tagName ).toBe( 'A' );
 		expect( menuItem ).toHaveAttribute( 'href', url );
