@@ -2,6 +2,7 @@ import { act, renderHook } from '@testing-library/react';
 import { useRegistry, useSelect } from '@wordpress/data';
 import {
 	getImageBlockMetadataFromAttachment,
+	getNewAttachmentImageBlockAttributes,
 	getSyncedImageBlockAttributes,
 	useOpenImageMediaEditorModal,
 } from '../use-open-image-media-editor-modal';
@@ -389,6 +390,203 @@ describe( 'useOpenImageMediaEditorModal', () => {
 			url: 'cropped.jpg',
 			alt: 'Updated alt',
 			caption: 'Updated caption',
+		} );
+	} );
+
+	it( 'keeps the selected image size when the edit created a new attachment', async () => {
+		const originalAttachment = {
+			id: 1,
+			alt_text: '',
+			caption: { raw: '' },
+		};
+		const croppedAttachment = {
+			id: 2,
+			alt_text: '',
+			caption: { raw: '' },
+			media_details: {
+				sizes: {
+					medium: { source_url: 'cropped-300x200.jpg' },
+					full: { source_url: 'cropped.jpg' },
+				},
+			},
+		};
+		const onUrlChange = jest.fn();
+		const { setAttributes } = await runModalUpdate( {
+			attributes: {
+				id: 1,
+				url: 'original-300x200.jpg',
+				alt: '',
+				caption: '',
+				sizeSlug: 'medium',
+			},
+			registryOptions: {
+				getEditedEntityRecord: ( kind, name, attachmentId ) =>
+					attachmentId === 1 ? originalAttachment : croppedAttachment,
+				resolveGetEntityRecord: () => croppedAttachment,
+			},
+			updatePayload: { id: 2, url: 'cropped.jpg' },
+			hookOptions: { onUrlChange },
+		} );
+
+		expect( setAttributes ).toHaveBeenCalledTimes( 1 );
+		expect( setAttributes ).toHaveBeenCalledWith( {
+			id: 2,
+			url: 'cropped-300x200.jpg',
+		} );
+		expect( onUrlChange ).toHaveBeenCalledWith( 'cropped-300x200.jpg' );
+	} );
+
+	it( 'resolves the selected image size when the new attachment is not cached', async () => {
+		const originalAttachment = {
+			id: 1,
+			alt_text: '',
+			caption: { raw: '' },
+		};
+		const croppedAttachment = {
+			id: 2,
+			alt_text: '',
+			caption: { raw: '' },
+			media_details: {
+				sizes: {
+					medium: { source_url: 'cropped-300x200.jpg' },
+					full: { source_url: 'cropped.jpg' },
+				},
+			},
+		};
+		const { setAttributes } = await runModalUpdate( {
+			attributes: {
+				id: 1,
+				url: 'original-300x200.jpg',
+				alt: '',
+				caption: '',
+				sizeSlug: 'medium',
+			},
+			registryOptions: {
+				getEditedEntityRecord: ( kind, name, attachmentId ) =>
+					attachmentId === 1 ? originalAttachment : undefined,
+				resolveGetEntityRecord: ( kind, name, attachmentId ) =>
+					attachmentId === 2 ? croppedAttachment : undefined,
+			},
+			updatePayload: { id: 2, url: 'cropped.jpg' },
+		} );
+
+		expect( setAttributes ).toHaveBeenCalledTimes( 1 );
+		expect( setAttributes ).toHaveBeenCalledWith( {
+			id: 2,
+			url: 'cropped-300x200.jpg',
+		} );
+	} );
+
+	it( 'falls back to the full size when the edited image has no such size', async () => {
+		const originalAttachment = {
+			id: 1,
+			alt_text: '',
+			caption: { raw: '' },
+		};
+		const croppedAttachment = {
+			id: 2,
+			alt_text: '',
+			caption: { raw: '' },
+			media_details: {
+				sizes: {
+					full: { source_url: 'cropped.jpg' },
+				},
+			},
+		};
+		const { setAttributes } = await runModalUpdate( {
+			attributes: {
+				id: 1,
+				url: 'original-300x200.jpg',
+				alt: '',
+				caption: '',
+				sizeSlug: 'medium',
+			},
+			registryOptions: {
+				getEditedEntityRecord: ( kind, name, attachmentId ) =>
+					attachmentId === 1 ? originalAttachment : croppedAttachment,
+				resolveGetEntityRecord: () => croppedAttachment,
+			},
+			updatePayload: { id: 2, url: 'cropped.jpg' },
+		} );
+
+		expect( setAttributes ).toHaveBeenCalledTimes( 1 );
+		expect( setAttributes ).toHaveBeenCalledWith( {
+			id: 2,
+			url: 'cropped.jpg',
+			sizeSlug: 'full',
+		} );
+	} );
+
+	it( 'points a media file link at the edited image', async () => {
+		const originalAttachment = {
+			id: 1,
+			alt_text: '',
+			caption: { raw: '' },
+		};
+		const croppedAttachment = {
+			id: 2,
+			alt_text: '',
+			caption: { raw: '' },
+			source_url: 'cropped.jpg',
+		};
+		const { setAttributes } = await runModalUpdate( {
+			attributes: {
+				id: 1,
+				url: 'original.jpg',
+				alt: '',
+				caption: '',
+				href: 'original.jpg',
+				linkDestination: 'media',
+			},
+			registryOptions: {
+				getEditedEntityRecord: ( kind, name, attachmentId ) =>
+					attachmentId === 1 ? originalAttachment : croppedAttachment,
+				resolveGetEntityRecord: () => croppedAttachment,
+			},
+			updatePayload: { id: 2, url: 'cropped.jpg' },
+		} );
+
+		expect( setAttributes ).toHaveBeenCalledTimes( 1 );
+		expect( setAttributes ).toHaveBeenCalledWith( {
+			id: 2,
+			url: 'cropped.jpg',
+			href: 'cropped.jpg',
+		} );
+	} );
+
+	it( 'leaves a custom link alone after an edit', async () => {
+		const originalAttachment = {
+			id: 1,
+			alt_text: '',
+			caption: { raw: '' },
+		};
+		const croppedAttachment = {
+			id: 2,
+			alt_text: '',
+			caption: { raw: '' },
+			source_url: 'cropped.jpg',
+		};
+		const { setAttributes } = await runModalUpdate( {
+			attributes: {
+				id: 1,
+				url: 'original.jpg',
+				alt: '',
+				caption: '',
+				href: 'https://example.com/somewhere/',
+				linkDestination: 'custom',
+			},
+			registryOptions: {
+				getEditedEntityRecord: ( kind, name, attachmentId ) =>
+					attachmentId === 1 ? originalAttachment : croppedAttachment,
+				resolveGetEntityRecord: () => croppedAttachment,
+			},
+			updatePayload: { id: 2, url: 'cropped.jpg' },
+		} );
+
+		expect( setAttributes ).toHaveBeenCalledTimes( 1 );
+		expect( setAttributes ).toHaveBeenCalledWith( {
+			id: 2,
+			url: 'cropped.jpg',
 		} );
 	} );
 
@@ -920,6 +1118,141 @@ describe( 'getSyncedImageBlockAttributes', () => {
 					alt_text: 'Updated alt',
 					caption: { raw: 'Updated caption' },
 				}
+			)
+		).toEqual( {} );
+	} );
+} );
+
+describe( 'getNewAttachmentImageBlockAttributes', () => {
+	const croppedAttachment = {
+		id: 2,
+		source_url: 'cropped.jpg',
+		link: 'https://example.com/cropped/',
+		media_details: {
+			sizes: {
+				medium: { source_url: 'cropped-300x200.jpg' },
+				full: { source_url: 'cropped.jpg' },
+			},
+		},
+	};
+
+	it( 'points the URL at the selected size on the new attachment', () => {
+		expect(
+			getNewAttachmentImageBlockAttributes(
+				{ sizeSlug: 'medium' },
+				croppedAttachment,
+				'cropped.jpg'
+			)
+		).toEqual( { url: 'cropped-300x200.jpg' } );
+	} );
+
+	it( 'falls back to full when the new attachment lacks the selected size', () => {
+		expect(
+			getNewAttachmentImageBlockAttributes(
+				{ sizeSlug: 'large' },
+				croppedAttachment,
+				'cropped.jpg'
+			)
+		).toEqual( { url: 'cropped.jpg', sizeSlug: 'full' } );
+	} );
+
+	it( 'makes no change for the full size or an unset size', () => {
+		expect(
+			getNewAttachmentImageBlockAttributes(
+				{ sizeSlug: 'full' },
+				croppedAttachment,
+				'cropped.jpg'
+			)
+		).toEqual( {} );
+		expect(
+			getNewAttachmentImageBlockAttributes(
+				{},
+				croppedAttachment,
+				'cropped.jpg'
+			)
+		).toEqual( {} );
+	} );
+
+	it( 'makes no change when the attachment sizes are unknown', () => {
+		expect(
+			getNewAttachmentImageBlockAttributes(
+				{ sizeSlug: 'medium' },
+				{ id: 2 },
+				'cropped.jpg'
+			)
+		).toEqual( {} );
+	} );
+
+	it( 'makes no change when the attachment record is unknown', () => {
+		expect(
+			getNewAttachmentImageBlockAttributes(
+				{ sizeSlug: 'medium' },
+				undefined,
+				'cropped.jpg'
+			)
+		).toBeUndefined();
+	} );
+
+	it( 'points a media file link at the new attachment file', () => {
+		expect(
+			getNewAttachmentImageBlockAttributes(
+				{ sizeSlug: 'medium', linkDestination: 'media' },
+				croppedAttachment,
+				'cropped.jpg'
+			)
+		).toEqual( {
+			url: 'cropped-300x200.jpg',
+			href: 'cropped.jpg',
+		} );
+	} );
+
+	it( 'points an attachment page link at the new attachment page', () => {
+		expect(
+			getNewAttachmentImageBlockAttributes(
+				{ linkDestination: 'attachment' },
+				croppedAttachment,
+				'cropped.jpg'
+			)
+		).toEqual( { href: 'https://example.com/cropped/' } );
+	} );
+
+	it( 'leaves custom and absent links alone', () => {
+		expect(
+			getNewAttachmentImageBlockAttributes(
+				{ linkDestination: 'custom' },
+				croppedAttachment,
+				'cropped.jpg'
+			)
+		).toEqual( {} );
+		expect(
+			getNewAttachmentImageBlockAttributes(
+				{ linkDestination: 'none' },
+				croppedAttachment,
+				'cropped.jpg'
+			)
+		).toEqual( {} );
+		expect(
+			getNewAttachmentImageBlockAttributes(
+				{},
+				croppedAttachment,
+				'cropped.jpg'
+			)
+		).toEqual( {} );
+	} );
+
+	it( 'keeps the existing link when the new attachment record lacks it', () => {
+		expect(
+			getNewAttachmentImageBlockAttributes(
+				{ linkDestination: 'media' },
+				{ id: 2 },
+				'cropped.jpg'
+			)
+		).toEqual( {} );
+		expect(
+			getNewAttachmentImageBlockAttributes(
+				{ linkDestination: 'attachment' },
+				{ id: 2 },
+				'cropped.jpg'
 			)
 		).toEqual( {} );
 	} );

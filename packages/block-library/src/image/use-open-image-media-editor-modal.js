@@ -7,6 +7,11 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { useRegistry, useSelect } from '@wordpress/data';
 import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { unlock } from '../lock-unlock';
+import {
+	DEFAULT_MEDIA_SIZE_SLUG,
+	LINK_DESTINATION_ATTACHMENT,
+	LINK_DESTINATION_MEDIA,
+} from './constants';
 
 function normalizeImageBlockCaption( caption ) {
 	if ( typeof caption !== 'string' ) {
@@ -96,6 +101,106 @@ export function getSyncedImageBlockAttributes(
 	return syncedAttributes;
 }
 
+/**
+ * Resolves the attributes needed to keep the selected image size on a new
+ * attachment.
+ *
+ * WordPress skips generating a sub-size larger than the file itself, so the
+ * selected size may not exist on the edited image; fall back to full when it
+ * doesn't, as selecting a new image does.
+ *
+ * @param {string|undefined} sizeSlug   The block's currently selected size.
+ * @param {Object}           attachment The new attachment record.
+ * @param {string|undefined} fullUrl    URL of the new attachment's full size.
+ *
+ * @return {Object|undefined} Attributes to apply, if any.
+ */
+function getNewAttachmentSizeAttributes( sizeSlug, attachment, fullUrl ) {
+	const sizes = attachment.media_details?.sizes;
+
+	if ( ! sizeSlug || sizeSlug === DEFAULT_MEDIA_SIZE_SLUG || ! sizes ) {
+		return undefined;
+	}
+
+	const sizeUrl = sizes[ sizeSlug ]?.source_url;
+
+	return sizeUrl
+		? { url: sizeUrl }
+		: { url: fullUrl, sizeSlug: DEFAULT_MEDIA_SIZE_SLUG };
+}
+
+/**
+ * Resolves the link attributes needed to keep the block's link pointing at the
+ * new attachment.
+ *
+ * Only the destinations derived from the attachment follow the edited image. A
+ * `custom` link is the user's own URL and a `none` link has nothing to point
+ * at, so both are left alone. When the record doesn't carry the field, the
+ * existing link is kept rather than cleared.
+ *
+ * @param {string|undefined} linkDestination The block's link destination.
+ * @param {Object}           attachment      The new attachment record.
+ *
+ * @return {Object|undefined} Attributes to apply, if any.
+ */
+function getNewAttachmentLinkAttributes( linkDestination, attachment ) {
+	// Media file links point at the full-size file, independently of the size
+	// the block renders.
+	if ( linkDestination === LINK_DESTINATION_MEDIA ) {
+		return attachment.source_url
+			? { href: attachment.source_url }
+			: undefined;
+	}
+
+	if ( linkDestination === LINK_DESTINATION_ATTACHMENT ) {
+		return attachment.link ? { href: attachment.link } : undefined;
+	}
+
+	return undefined;
+}
+
+/**
+ * Resolves the block attributes that are derived from the attachment, for an
+ * edit that saved to a different one.
+ *
+ * Editing media (crop, rotate, flip) creates a new attachment with its own
+ * generated sub-sizes and its own attachment page, and the media editor
+ * reports the full-size file. Without re-deriving these, the size control
+ * keeps reporting e.g. "Medium" while the block renders the full-size image,
+ * and a "Media file" or "Attachment page" link still points at the image as it
+ * was before the edit. Everything else the user set on the block — dimensions,
+ * lightbox, title, custom links — is left untouched.
+ *
+ * @param {Object}           blockAttributes The block's current attributes.
+ * @param {Object|undefined} attachment      The new attachment record.
+ * @param {string|undefined} fullUrl         URL of the new attachment's full
+ *                                           size.
+ *
+ * @return {Object|undefined} Attributes to apply, or undefined when the
+ *                            attachment record isn't known yet.
+ */
+export function getNewAttachmentImageBlockAttributes(
+	blockAttributes,
+	attachment,
+	fullUrl
+) {
+	if ( ! attachment ) {
+		return undefined;
+	}
+
+	return {
+		...getNewAttachmentSizeAttributes(
+			blockAttributes.sizeSlug,
+			attachment,
+			fullUrl
+		),
+		...getNewAttachmentLinkAttributes(
+			blockAttributes.linkDestination,
+			attachment
+		),
+	};
+}
+
 const { openMediaEditorModalKey } = unlock( blockEditorPrivateApis );
 
 function getAttachmentFallbackForEmptyBlockMetadata( { alt, caption } ) {
@@ -134,8 +239,10 @@ export function useOpenImageMediaEditorModal( {
 } ) {
 	// Keep this hook private to the Image block and pass the block attributes
 	// object so the callsite stays compact. Destructure only the attributes
-	// currently used for metadata sync; add more here if the sync policy grows.
-	const { id, url, alt, caption } = attributes;
+	// the update needs to read — those synced from the attachment's metadata,
+	// and those derived from which attachment the block points at; add more
+	// here if the sync policy grows.
+	const { id, url, alt, caption, sizeSlug, linkDestination } = attributes;
 	const registry = useRegistry();
 	const openMediaEditorModal = useSelect(
 		( select ) =>
@@ -151,6 +258,8 @@ export function useOpenImageMediaEditorModal( {
 		url,
 		alt,
 		caption: caption?.toString(),
+		sizeSlug,
+		linkDestination,
 	} );
 	// Snapshot of the attachment's metadata taken just before the modal opens,
 	// used as the baseline for detecting what changed during the editing session.
@@ -165,8 +274,10 @@ export function useOpenImageMediaEditorModal( {
 			url,
 			alt,
 			caption: caption?.toString(),
+			sizeSlug,
+			linkDestination,
 		};
-	}, [ alt, caption, id, url ] );
+	}, [ alt, caption, id, linkDestination, sizeSlug, url ] );
 
 	// Reads the cached attachment record. The `attachment` postType entity
 	// fetches with `context: 'edit'` by default, so `getEditedEntityRecord`
@@ -237,9 +348,29 @@ export function useOpenImageMediaEditorModal( {
 
 			const currentBlockAttributes = blockAttributesRef.current;
 
-			if ( newId !== currentBlockAttributes.id ) {
+			const isNewAttachment = newId !== currentBlockAttributes.id;
+			// Whether the attachment-derived attributes were re-resolved from
+			// the cached record; when they weren't, the freshly resolved
+			// record below gets a second chance.
+			let hasResolvedNewAttachment = false;
+
+			if ( isNewAttachment ) {
+				const fullUrl = newUrl ?? currentBlockAttributes.url;
+
 				nextAttributes.id = newId;
-				nextAttributes.url = newUrl ?? currentBlockAttributes.url;
+				nextAttributes.url = fullUrl;
+
+				const derivedAttributes = getNewAttachmentImageBlockAttributes(
+					currentBlockAttributes,
+					getCachedAttachmentRecord( newId ),
+					fullUrl
+				);
+
+				if ( derivedAttributes ) {
+					Object.assign( nextAttributes, derivedAttributes );
+					hasResolvedNewAttachment = true;
+				}
+
 				if ( nextAttributes.url !== currentBlockAttributes.url ) {
 					// The block is about to point at a freshly generated file
 					// the browser hasn't loaded yet; let the caller show a
@@ -248,8 +379,7 @@ export function useOpenImageMediaEditorModal( {
 				}
 				blockAttributesRef.current = {
 					...blockAttributesRef.current,
-					id: nextAttributes.id,
-					url: nextAttributes.url,
+					...nextAttributes,
 				};
 			}
 
@@ -284,6 +414,28 @@ export function useOpenImageMediaEditorModal( {
 				if ( Object.keys( resolvedMetadataAttributes ).length ) {
 					Object.assign( nextAttributes, resolvedMetadataAttributes );
 				}
+
+				// The new attachment wasn't cached yet when the update came
+				// in, so its size and link couldn't be derived from it then.
+				if ( isNewAttachment && ! hasResolvedNewAttachment ) {
+					const derivedAttributes =
+						getNewAttachmentImageBlockAttributes(
+							latestBlockAttributes,
+							resolvedAttachment,
+							nextAttributes.url
+						);
+
+					if ( derivedAttributes ) {
+						Object.assign( nextAttributes, derivedAttributes );
+
+						if (
+							derivedAttributes.url &&
+							derivedAttributes.url !== latestBlockAttributes.url
+						) {
+							onUrlChange?.( derivedAttributes.url );
+						}
+					}
+				}
 			}
 
 			if ( Object.keys( nextAttributes ).length ) {
@@ -294,7 +446,12 @@ export function useOpenImageMediaEditorModal( {
 				setAttributes( nextAttributes );
 			}
 		},
-		[ onUrlChange, resolveFreshAttachmentRecord, setAttributes ]
+		[
+			getCachedAttachmentRecord,
+			onUrlChange,
+			resolveFreshAttachmentRecord,
+			setAttributes,
+		]
 	);
 
 	const openImageMediaEditorModal = useCallback( async () => {
