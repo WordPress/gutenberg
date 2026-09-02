@@ -287,15 +287,20 @@ mark.wp-note {
 	// Until the note has a reaction to show, the trigger is the whole row, and
 	// it floats over the note's last line rather than making every note taller
 	// for an option nobody has taken up. Once a reaction lands, the row drops
-	// into the flow and the trigger keeps its place at the head of it.
+	// into the flow and the trigger takes its place at the head of it.
+	//
+	// Against the right edge rather than the left, where the row itself sits:
+	// a paragraph's last line rarely reaches the right edge, so the trigger
+	// lands on the run-out instead of on the words.
 	&.is-floating {
 		position: absolute;
 		bottom: 0;
-		left: 0;
+		right: 0;
 
-		// It sits on top of the note's own text, so it needs its own ground.
-		// On the trigger rather than the row: the row is always opaque, and a
-		// white patch would blank out the text under a trigger at rest.
+		// A short last line still leaves it over text, so it needs its own
+		// ground. On the trigger rather than the row: the row is always
+		// opaque, and a white patch would blank out the text under a trigger
+		// at rest.
 		.editor-collab-sidebar-panel__add-reaction {
 			background-color: $white;
 			border-radius: $radius-full;
