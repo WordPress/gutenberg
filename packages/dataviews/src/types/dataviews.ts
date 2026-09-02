@@ -10,6 +10,11 @@ import type {
 import type { SetSelection } from './private';
 import type { MEDIA_ASPECT_RATIOS } from '../constants';
 
+/**
+ * An item with an intrinsic string `id` property. When the dataset's items
+ * conform to this shape, the `getItemId` prop becomes optional and the `id`
+ * property is used by default.
+ */
 export type ItemWithId = { id: string };
 
 export type DataViewsProps< Item > = {
