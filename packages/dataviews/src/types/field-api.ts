@@ -772,9 +772,9 @@ export type DataFormControlProps< Item > = {
 		 * (datetime control).
 		 */
 		compact?: boolean;
-		// Rich text control options.
 		/**
 		 * CSS class name applied to the rich text control.
+		 * Rich text control options.
 		 */
 		className?: string;
 		/**

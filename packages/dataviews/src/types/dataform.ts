@@ -167,7 +167,7 @@ export type NormalizedPanelLayout = {
  * is visible: always, or only when the card is collapsed (the default).
  */
 export type CardSummaryField =
-	| PanelSummaryField // Basic usage: string or string[]
+	| PanelSummaryField
 	| Array<
 			| string
 			| {
@@ -210,16 +210,18 @@ export type CardLayout =
 			 */
 			withHeader: false;
 
-			// isOpened cannot be false if withHeader is false as well.
-			// Otherwise, the card would not be visible.
 			/**
 			 * Whether the card's content is displayed.
+			 *
+			 * isOpened cannot be false if withHeader is false as well;
+			 * otherwise, the card would not be visible.
 			 */
 			isOpened?: true;
 
-			// isCollapsible cannot be true if withHeader is false as well.
 			/**
 			 * Whether the card's content can be collapsed.
+			 *
+			 * isCollapsible cannot be true if withHeader is false as well.
 			 */
 			isCollapsible?: false;
 	  }
@@ -265,22 +267,23 @@ export type NormalizedCardLayout =
 			 */
 			withHeader: false;
 
-			// isOpened cannot be false if withHeader is false as well.
-			// Otherwise, the card would not be visible.
 			/**
 			 * Whether the card's content is displayed.
+			 *
+			 * isOpened cannot be false if withHeader is false as well;
+			 * otherwise, the card would not be visible.
 			 */
 			isOpened: true;
 
-			// Summary is an empty array
 			/**
 			 * The fields displayed as summary in the card's header.
 			 */
 			summary: [];
 
-			// If no header, the card should not be collapsible.
 			/**
 			 * Whether the card's content can be collapsed.
+			 *
+			 * If no header, the card should not be collapsible.
 			 */
 			isCollapsible: false;
 	  }
