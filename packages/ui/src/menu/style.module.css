@@ -202,6 +202,12 @@
 			}
 		}
 
+		.item:has(.item-description) .item-selection-indicator {
+			align-self: start;
+			/* Center the indicator on the first label line. */
+			height: 1lh;
+		}
+
 		.radio-selection-icon {
 			width: var(--wpds-dimension-size-xs);
 			height: var(--wpds-dimension-size-xs);
