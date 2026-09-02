@@ -742,6 +742,23 @@ describe( 'Entity record types', () => {
 				typeof typedRecords,
 				Post< 'edit' >[] | null
 			>;
+
+			// The explicit generic also overrides a pair the map covers.
+			const asserted = select( coreStore ).getEntityRecord<
+				Page< 'view' >
+			>( 'postType', 'post', 1 );
+			true satisfies Expect<
+				typeof asserted,
+				Page< 'view' > | undefined
+			>;
+
+			const assertedRecords = select( coreStore ).getEntityRecords<
+				Page< 'view' >
+			>( 'postType', 'post' );
+			true satisfies Expect<
+				typeof assertedRecords,
+				Page< 'view' >[] | null
+			>;
 		};
 	} );
 
