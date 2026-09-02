@@ -41,10 +41,16 @@ export default function useTabNav() {
 	} = unlock( useSelect( blockEditorStore ) );
 	const { setLastFocus } = unlock( useDispatch( blockEditorStore ) );
 
-	// The canvas is a single stop in the page's tab order: the two stop
-	// elements sit on either side of it, and going in is an explicit action
-	// on them. Focus returns to the place it last left the canvas from.
+	// The canvas is a single stop in the page's tab order, and going in is
+	// an explicit action on it. Focus returns to the place it last left the
+	// canvas from.
 	function enterCanvas( fromAfter ) {
+		// Focus the canvas window before any element in it: entering starts
+		// from the stop in the parent document, and Firefox does not move
+		// window focus for a cross-document `element.focus()`, leaving the
+		// caret restored but every key stranded in the parent.
+		containerRef.current.ownerDocument.defaultView.focus();
+
 		if ( hasMultiSelection() ) {
 			containerRef.current.focus();
 			return;
