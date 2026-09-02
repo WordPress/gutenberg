@@ -185,7 +185,7 @@
 
 .component-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
 	gap: 12px;
 }
 
@@ -204,22 +204,72 @@
 	color: var(--pilot-fg-weak);
 }
 
-.button-row {
-	gap: 8px;
+.state-list,
+.state-sample {
+	display: grid;
 }
 
-.button-row button {
+.state-list {
+	gap: 14px;
+}
+
+.state-sample {
+	gap: 6px;
+}
+
+.state-label {
+	color: var(--pilot-fg-weak);
+	font-size: 11px;
+	font-weight: 600;
+}
+
+.button-row {
+	gap: 6px;
+}
+
+.state-button {
+	display: inline-flex;
+	box-sizing: border-box;
+	align-items: center;
+	justify-content: center;
+	min-width: 58px;
 	min-height: 32px;
 	padding: 5px 9px;
-	border: 0;
-	border-radius: 4px;
+	border: 1px solid transparent;
+	border-radius: var(--wpds-border-radius-sm);
 	font: inherit;
-	cursor: var(--wpds-cursor-control);
+	font-size: 11px;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 }
 
-.button-row button:focus-visible {
+.state-button[data-state="focus"] {
 	outline: 2px solid var(--pilot-focus);
 	outline-offset: 2px;
+}
+
+.tabs-row {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: stretch;
+	border-block-end: 1px solid var(--pilot-border);
+}
+
+.tab-state {
+	display: inline-flex;
+	box-sizing: border-box;
+	align-items: center;
+	justify-content: center;
+	min-height: 40px;
+	margin-block-end: -1px;
+	padding: 8px 10px;
+	border-block-end: 2px solid transparent;
+	font-size: 11px;
+}
+
+.tab-state[data-state="focus"] {
+	border-radius: var(--wpds-border-radius-sm);
+	outline: 2px solid var(--pilot-focus);
+	outline-offset: -4px;
 }
 
 .component-note {
