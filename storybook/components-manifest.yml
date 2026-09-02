@@ -145,6 +145,12 @@
             - className
             - render
             - style
+      - name: Autocomplete.Status
+        props:
+            - children
+            - className
+            - render
+            - style
       - name: Autocomplete.Value
         props:
             - children
@@ -616,6 +622,13 @@
             - className
             - hideFromVision
             - nativeLabel
+            - render
+            - style
+            - variant
+      - name: Field.VisualLabel
+        props:
+            - children
+            - className
             - render
             - style
             - variant
