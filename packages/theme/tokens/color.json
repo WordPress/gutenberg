@@ -1343,7 +1343,7 @@
 		"foreground": {
 			"content": {
 				"neutral": {
-					"$value": "{wpds-color.primitive.bg.fgSurface5}",
+					"$value": "{wpds-color.primitive.bg.fgSurface4}",
 					"$description": "Foreground color for content like text with normal emphasis."
 				},
 				"neutral-weak": {
@@ -1351,7 +1351,7 @@
 					"$description": "Foreground color for content like text with weak emphasis."
 				},
 				"success": {
-					"$value": "{wpds-color.primitive.success.fgSurface5}",
+					"$value": "{wpds-color.primitive.success.fgSurface4}",
 					"$description": "Foreground color for content like text with success tone and normal emphasis."
 				},
 				"success-weak": {
@@ -1359,7 +1359,7 @@
 					"$description": "Foreground color for content like text with success tone and weak emphasis."
 				},
 				"info": {
-					"$value": "{wpds-color.primitive.info.fgSurface5}",
+					"$value": "{wpds-color.primitive.info.fgSurface4}",
 					"$description": "Foreground color for content like text with info tone and normal emphasis."
 				},
 				"info-weak": {
@@ -1367,7 +1367,7 @@
 					"$description": "Foreground color for content like text with info tone and weak emphasis."
 				},
 				"warning": {
-					"$value": "{wpds-color.primitive.warning.fgSurface5}",
+					"$value": "{wpds-color.primitive.warning.fgSurface4}",
 					"$description": "Foreground color for content like text with warning tone and normal emphasis."
 				},
 				"warning-weak": {
@@ -1375,7 +1375,7 @@
 					"$description": "Foreground color for content like text with warning tone and weak emphasis."
 				},
 				"caution": {
-					"$value": "{wpds-color.primitive.caution.fgSurface5}",
+					"$value": "{wpds-color.primitive.caution.fgSurface4}",
 					"$description": "Foreground color for content like text with caution tone and normal emphasis."
 				},
 				"caution-weak": {
@@ -1383,7 +1383,7 @@
 					"$description": "Foreground color for content like text with caution tone and weak emphasis."
 				},
 				"error": {
-					"$value": "{wpds-color.primitive.error.fgSurface5}",
+					"$value": "{wpds-color.primitive.error.fgSurface4}",
 					"$description": "Foreground color for content like text with error tone and normal emphasis."
 				},
 				"error-weak": {
