@@ -1,5 +1,5 @@
 {
-	"extends": "../../tsconfig.base.json",
+	"extends": "@wordpress/config-tools/tsconfig/base.json",
 	"compilerOptions": {
 		"declarationDir": "build-types",
 		"rootDir": "src"

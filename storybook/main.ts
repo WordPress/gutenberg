@@ -94,7 +94,7 @@ const config: StorybookConfig = {
 			// `__docgenInfo` block per component (one from source, one from the
 			// declaration file) that clobbers source-derived descriptions.
 			// Separate `tsconfig.json` is used instead of `compilerOptions` to
-			// allow the rest of the base `tsconfig.base.json` to be inherited.
+			// allow the rest of the shared base config to be inherited.
 			tsconfigPath: path.join(
 				import.meta.dirname,
 				'tsconfig.docgen.json'
