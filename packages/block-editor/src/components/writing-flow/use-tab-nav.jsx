@@ -37,8 +37,6 @@ export default function useTabNav() {
 		getLastFocus,
 		getSectionRootClientId,
 		isZoomOut,
-		didAutomaticChange,
-		getSettings,
 	} = unlock( useSelect( blockEditorStore ) );
 	const { setLastFocus } = unlock( useDispatch( blockEditorStore ) );
 
@@ -61,8 +59,7 @@ export default function useTabNav() {
 			if ( getLastFocus()?.current ) {
 				getLastFocus().current.focus();
 			} else {
-				// Handles when the last focus has not been set yet, or has
-				// been cleared by new blocks being added via the inserter.
+				// Handles when the last focus has not been set yet, or has been cleared by new blocks being added via the inserter.
 				containerRef.current
 					.querySelector(
 						`[data-block="${ getSelectedBlockClientId() }"]`
@@ -72,14 +69,12 @@ export default function useTabNav() {
 			return;
 		}
 
-		// In "compose" mode without a selected ID, place focus on the
-		// section root when entering the canvas.
+		// In "compose" mode without a selected ID, we want to place focus on the section root when tabbing to the canvas.
 		if ( isZoomOut() ) {
 			const sectionRootClientId = getSectionRootClientId();
 			const sectionBlocks = getBlockOrder( sectionRootClientId );
 
-			// If we have a section within the section root, focus the first
-			// one.
+			// If we have section within the section root, focus the first one.
 			if ( sectionBlocks.length ) {
 				containerRef.current
 					.querySelector( `[data-block="${ sectionBlocks[ 0 ] }"]` )
@@ -91,6 +86,7 @@ export default function useTabNav() {
 					.querySelector( `[data-block="${ sectionRootClientId }"]` )
 					.focus();
 			} else {
+				// If we don't have any section root, focus the canvas.
 				containerRef.current.focus();
 			}
 			return;
@@ -169,7 +165,11 @@ export default function useTabNav() {
 			ref={ focusCaptureAfterRef }
 			tabIndex="0"
 			className="block-editor-writing-flow__canvas-stop-redirect"
-			onFocus={ () => focusCaptureBeforeRef.current?.focus() }
+			onFocus={ () =>
+				focusCaptureBeforeRef.current?.focus( {
+					preventScroll: true,
+				} )
+			}
 		/>
 	);
 
@@ -177,18 +177,6 @@ export default function useTabNav() {
 		function onKeyDown( event ) {
 			if ( event.defaultPrevented ) {
 				return;
-			}
-
-			// Escape or Backspace right after an automatic change, like `* `
-			// turning into a list, undoes that change. This needs nothing
-			// from the element the key landed on, only the store.
-			if ( event.key === 'Escape' || event.key === 'Backspace' ) {
-				const { __experimentalUndo } = getSettings();
-				if ( __experimentalUndo && didAutomaticChange() ) {
-					event.preventDefault();
-					__experimentalUndo();
-					return;
-				}
 			}
 
 			// Escape steps out of the canvas onto its stop. Every handler
@@ -219,10 +207,10 @@ export default function useTabNav() {
 				return;
 			}
 
-			// Bails in case the focus capture elements aren’t present. They
-			// may be omitted to avoid silent tab stops in preview mode.
-			// See: https://github.com/WordPress/gutenberg/pull/59317
 			if (
+				// Bails in case the focus capture elements aren’t present. They
+				// may be omitted to avoid silent tab stops in preview mode.
+				// See: https://github.com/WordPress/gutenberg/pull/59317
 				! focusCaptureAfterRef.current ||
 				! focusCaptureBeforeRef.current
 			) {
@@ -290,9 +278,52 @@ export default function useTabNav() {
 			}
 		}
 
+		// When tabbing back to an element in block list, this event handler prevents scrolling if the
+		// focus capture divs (before/after) are outside of the viewport. (For example shift+tab back to a paragraph
+		// when focus is on a sidebar element. This prevents the scrollable writing area from jumping either to the
+		// top or bottom of the document.
+		//
+		// Note that it isn't possible to disable scrolling in the onFocus event. We need to intercept this
+		// earlier in the keypress handler, and call focus( { preventScroll: true } ) instead.
+		// https://developer.mozilla.org/en-US/docs/Web/API/HTMLOrForeignElement/focus#parameters
+		function preventScrollOnTab( event ) {
+			// The canvas skip in `onKeyDown` may have already moved focus.
+			if ( event.defaultPrevented ) {
+				return;
+			}
+
+			if ( event.keyCode !== TAB ) {
+				return;
+			}
+
+			if ( event.target?.getAttribute( 'role' ) === 'region' ) {
+				return;
+			}
+
+			if ( containerRef.current === event.target ) {
+				return;
+			}
+
+			const isShift = event.shiftKey;
+			const direction = isShift ? 'findPrevious' : 'findNext';
+			const target = focus.tabbable[ direction ]( event.target );
+			// Only do something when the next tabbable is a focus capture div (before/after)
+			if (
+				target === focusCaptureBeforeRef.current ||
+				target === focusCaptureAfterRef.current
+			) {
+				event.preventDefault();
+				target.focus( { preventScroll: true } );
+			}
+		}
+
+		const { ownerDocument } = node;
+		const { defaultView } = ownerDocument;
+		defaultView.addEventListener( 'keydown', preventScrollOnTab );
 		node.addEventListener( 'keydown', onKeyDown );
 		node.addEventListener( 'focusout', onFocusOut );
 		return () => {
+			defaultView.removeEventListener( 'keydown', preventScrollOnTab );
 			node.removeEventListener( 'keydown', onKeyDown );
 			node.removeEventListener( 'focusout', onFocusOut );
 		};

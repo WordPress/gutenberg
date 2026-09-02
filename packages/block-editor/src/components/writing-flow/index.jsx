@@ -7,6 +7,7 @@ import useEditableRoot from './use-editable-root';
 import useHomeEnd from './use-home-end';
 import useMultiSelection from './use-multi-selection';
 import useTabNav from './use-tab-nav';
+import useUndoAutomaticChange from './use-undo-automatic-change';
 import useArrowNav from './use-arrow-nav';
 import { usePreviewModeNav } from './use-preview-mode-nav';
 import useSelectAll from './use-select-all';
@@ -29,6 +30,7 @@ export function useWritingFlow() {
 		before,
 		useMergeRefs( [
 			ref,
+			useUndoAutomaticChange(),
 			useEditableRootEventHandlers(),
 			useClipboardHandler(),
 			useInput(),
