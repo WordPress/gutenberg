@@ -54,3 +54,16 @@ declare module './base-entity-records' {
 export type GlobalStyles< C extends Context = 'edit' > = OmitNevers<
 	_BaseEntityRecords.GlobalStyles< C >
 >;
+
+/**
+ * Fields accepted when updating a global styles record.
+ *
+ * The REST API returns the title as raw and rendered text, but also accepts a
+ * plain string when updating it.
+ */
+export type GlobalStylesUpdate = Omit<
+	Partial< GlobalStyles< 'edit' > >,
+	'title'
+> & {
+	title?: GlobalStyles< 'edit' >[ 'title' ] | string;
+};

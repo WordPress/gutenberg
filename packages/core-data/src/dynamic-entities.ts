@@ -89,9 +89,11 @@ type DeleteRecordsHttpQuery = Record< string, any >;
 
 export type SaveActions = {
 	[ Key in `save${ keyof WPEntityTypes }` ]: (
-		data: Partial<
-			WPEntityTypes[ Key extends `save${ infer E }` ? E : never ]
-		>,
+		data: Key extends 'saveGlobalStyles'
+			? ET.GlobalStylesUpdate
+			: Partial<
+					WPEntityTypes[ Key extends `save${ infer E }` ? E : never ]
+			  >,
 		options?: ActionOptions
 	) => Promise< void >;
 };

@@ -1,5 +1,6 @@
 import type {
 	Context,
+	ContextualField,
 	OmitNevers,
 	PostStatus,
 	RenderedText,
@@ -14,7 +15,7 @@ import type {
 	CollectionFontFace,
 } from './font-collection';
 import type { FontFamily, FontFace, WpFontFamily } from './font-family';
-import type { GlobalStyles } from './global-styles';
+import type { GlobalStyles, GlobalStylesUpdate } from './global-styles';
 import type { GlobalStylesRevision } from './global-styles-revision';
 import type { Icon } from './icon';
 import type { MenuLocation } from './menu-location';
@@ -49,10 +50,12 @@ export type {
 	CollectionFontFamily,
 	Comment,
 	Context,
+	ContextualField,
 	FontCollection,
 	FontFace,
 	FontFamily,
 	GlobalStyles,
+	GlobalStylesUpdate,
 	GlobalStylesRevision,
 	Icon,
 	MenuLocation,
@@ -448,18 +451,33 @@ type EntityRecordInContexts<
  * `context` selects which fields the REST API serialises, so a `'view'`
  * request must not be typed with the edit-context fields.
  *
- * `_fields` is deliberately not modelled. Narrowing to the named fields makes
- * the type rigid for what is a small number of call sites, and the useful
- * shape there varies per consumer. Call sites that request a subset and want
- * that reflected should say so locally -- with `Pick`, or their own interface
- * -- rather than have it imposed here.
+ * `_fields` can omit any field, including nested fields. The exact selection
+ * is not inferred from the query, but a request that includes `_fields`
+ * returns a recursively partial record so omitted data cannot be read as if
+ * it were present.
  */
 export type EntityRecordOfQuery<
 	Kind extends EntityKind,
 	Name extends EntityNameOf< Kind >,
 	Query,
-> = EntityRecordInContexts<
-	Kind,
-	Name,
-	ContextOfQuery< Query, DefaultContextOf< Kind, Name > >
->;
+> = Query extends unknown
+	? '_fields' extends keyof Query
+		? DeepPartial<
+				EntityRecordInContexts<
+					Kind,
+					Name,
+					ContextOfQuery< Query, DefaultContextOf< Kind, Name > >
+				>
+		  >
+		: EntityRecordInContexts<
+				Kind,
+				Name,
+				ContextOfQuery< Query, DefaultContextOf< Kind, Name > >
+		  >
+	: never;
+
+type DeepPartial< T > = T extends readonly unknown[]
+	? T
+	: T extends object
+	? { [ K in keyof T ]?: DeepPartial< T[ K ] > }
+	: T;

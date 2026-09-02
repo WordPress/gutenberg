@@ -18,11 +18,14 @@
 import { dispatch, select, resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '../../index';
 import type {
+	Context,
+	ContextualField,
 	DefaultContextOf,
+	EntityRecord,
 	EntityRecordOf,
 	EntityRecordOfQuery,
+	OmitNevers,
 } from '../index';
-import type { Context, ContextualField, OmitNevers } from '../helpers';
 import type { Attachment } from '../attachment';
 import type { Base } from '../base';
 import type { Comment } from '../comment';
@@ -54,6 +57,7 @@ type Expect< A, B > = [ A ] extends [ B ]
  * leaving only the fields all three serialise readable.
  */
 type PostInAnyContext = Post< 'view' > | Post< 'edit' > | Post< 'embed' >;
+type UnknownEntityRecord = EntityRecord< any > | Partial< EntityRecord< any > >;
 
 interface Product< C extends Context > {
 	id: number;
@@ -83,7 +87,7 @@ type Coupon< C extends Context > = OmitNevers< {
  * to the rest of the suite. They deliberately avoid the names asserted to be
  * unknown below.
  */
-declare module '../index' {
+declare module '@wordpress/core-data' {
 	// A name added to a kind that already exists. Merging into
 	// `EntityRecordTypes` itself would fail with TS2717, because merged
 	// interface properties have to have identical types.
@@ -234,15 +238,16 @@ describe( 'Entity record types', () => {
 				>,
 				PostInAnyContext
 			>;
-			// The declared type of the selectors' own `query` parameter.
-			true satisfies Expect<
-				EntityRecordOfQuery<
-					'postType',
-					'post',
-					Record< string, any >
-				>,
-				PostInAnyContext
+			// The selectors' broad query type can contain `_fields`, so its
+			// record is conservatively partial.
+			const broadlyQueried = {} as EntityRecordOfQuery<
+				'postType',
+				'post',
+				Record< string, any >
 			>;
+			broadlyQueried.title?.rendered satisfies string | undefined;
+			// @ts-expect-error -- a broad query may omit `title`.
+			broadlyQueried.title.rendered;
 			// Each context reaches the record separately: `ContextualField`
 			// distributes over the contexts a field is available in, not over
 			// `C`, so `Post< 'view' | 'embed' >` would carry the edit fields.
@@ -443,8 +448,11 @@ describe( 'Entity record types', () => {
 			const actions = dispatch( coreStore );
 			true satisfies Expect<
 				Parameters< typeof actions.saveGlobalStyles >[ 0 ],
-				Partial< GlobalStyles< 'edit' > >
+				Omit< Partial< GlobalStyles< 'edit' > >, 'title' > & {
+					title?: GlobalStyles< 'edit' >[ 'title' ] | string;
+				}
 			>;
+			actions.saveGlobalStyles( { title: 'My variation' } );
 		};
 	} );
 
@@ -609,22 +617,27 @@ describe( 'Entity record types', () => {
 		};
 	} );
 
-	describe( '`_fields` keeps the complete record', () => {
+	describe( '`_fields` returns a partial record', () => {
 		() => {
-			/*
-			 * `_fields` is deliberately not modelled -- narrowing to the named
-			 * fields makes the type rigid for a small number of call sites, and
-			 * the useful shape there varies per consumer. A call site that
-			 * wants the subset reflected says so locally. This asserts the
-			 * current behaviour so a future change to it is deliberate.
-			 */
 			const post = select( coreStore ).getEntityRecord(
 				'postType',
 				'post',
 				1,
 				{ _fields: 'id,slug' }
 			);
-			true satisfies Expect< typeof post, Post< 'edit' > | undefined >;
+			post?.id satisfies number | undefined;
+			post?.title?.raw satisfies string | undefined;
+			// @ts-expect-error -- `_fields` can omit `title` entirely.
+			post?.title.raw;
+
+			const posts = select( coreStore ).getEntityRecords(
+				'postType',
+				'post',
+				{ _fields: 'id,slug' }
+			);
+			posts?.[ 0 ].title?.raw satisfies string | undefined;
+			// @ts-expect-error -- `_fields` can omit `title` entirely.
+			posts?.[ 0 ].title.raw;
 
 			// `_fields` alongside a context still resolves the context.
 			const view = select( coreStore ).getEntityRecord(
@@ -633,12 +646,14 @@ describe( 'Entity record types', () => {
 				1,
 				{ context: 'view', _fields: 'id,slug' }
 			);
-			true satisfies Expect< typeof view, Post< 'view' > | undefined >;
+			view?.title?.rendered satisfies string | undefined;
+			// @ts-expect-error -- `_fields` can omit `title` entirely.
+			view?.title.rendered;
 		};
 	} );
 
 	describe( 'an unknown pair falls back to the wider overload', () => {
-		() => {
+		async () => {
 			// Entities registered at runtime are not in the map, so the
 			// selector keeps resolving to the broad union rather than erroring.
 			const record = select( coreStore ).getEntityRecord(
@@ -646,8 +661,37 @@ describe( 'Entity record types', () => {
 				'order',
 				1
 			);
+			true satisfies Expect<
+				typeof record,
+				UnknownEntityRecord | undefined
+			>;
 			// @ts-expect-error -- the union has no `password` on every member.
 			record?.password;
+
+			const records = select( coreStore ).getEntityRecords(
+				'myPlugin',
+				'order'
+			);
+			true satisfies Expect<
+				typeof records,
+				UnknownEntityRecord[] | null
+			>;
+
+			const promisedRecord = await resolveSelect(
+				coreStore
+			).getEntityRecord( 'myPlugin', 'order', 1 );
+			true satisfies Expect<
+				typeof promisedRecord,
+				UnknownEntityRecord | undefined
+			>;
+
+			const promisedRecords = await resolveSelect(
+				coreStore
+			).getEntityRecords( 'myPlugin', 'order' );
+			true satisfies Expect<
+				typeof promisedRecords,
+				UnknownEntityRecord[] | null
+			>;
 
 			// The explicit generic is still honoured for those call sites.
 			const typed = select( coreStore ).getEntityRecord< Post< 'edit' > >(
@@ -656,6 +700,14 @@ describe( 'Entity record types', () => {
 				1
 			);
 			true satisfies Expect< typeof typed, Post< 'edit' > | undefined >;
+
+			const typedRecords = select( coreStore ).getEntityRecords<
+				Post< 'edit' >
+			>( 'myPlugin', 'order' );
+			true satisfies Expect<
+				typeof typedRecords,
+				Post< 'edit' >[] | null
+			>;
 		};
 	} );
 
