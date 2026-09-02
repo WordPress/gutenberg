@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useRef } from '@wordpress/element';
-import { contrastAPCA, deltaEOK2 } from 'colorjs.io/fn';
+import { contrastAPCA, deltaEOK2, get, OKLCH } from 'colorjs.io/fn';
 import { checkAccessibleCombinations } from '..';
 import { getContrast } from '../lib/color-utils';
 import { DEFAULT_SEED_COLORS } from '../lib/constants';
@@ -27,8 +27,23 @@ const SAMPLE_COMBINATIONS = [
 	},
 	{
 		label: 'Ectoplasm stress case',
-		background: '#4f386e',
-		primary: '#608010',
+		background: '#413256',
+		primary: '#a3b745',
+	},
+	{
+		label: 'Blue admin scheme',
+		background: '#3876a8',
+		primary: '#437aa8',
+	},
+	{
+		label: 'Ocean admin scheme',
+		background: '#5f787f',
+		primary: '#567958',
+	},
+	{
+		label: 'Sunrise admin scheme',
+		background: '#cc4541',
+		primary: '#ad631e',
 	},
 	{
 		label: 'Middle-gray polarity boundary',
@@ -65,6 +80,11 @@ const METHOD_DETAILS: Record<
 		label: 'Role-specific hybrid',
 		description:
 			'Uses APCA for foreground readability, OKLab color difference for surfaces and states, and relative chroma for accents.',
+	},
+	'pinned-role-hybrid': {
+		label: 'Pinned-seed role hybrid',
+		description:
+			'Pins the supplied color at its semantic anchor, then redirects neighboring surfaces and fills when the original polarity has no contrast headroom.',
 	},
 };
 
@@ -192,6 +212,7 @@ function getScaleMetrics(
 	isAccent: boolean,
 	seed: string
 ) {
+	const anchor = isAccent ? ramp.ramp.bgFill1 : ramp.ramp.surface2;
 	const displayBackground = backgroundRamp.ramp.surface2;
 	const currentForegroundContrast = Math.abs(
 		contrastAPCA( displayBackground, ramp.ramp.fgSurface4 )
@@ -218,6 +239,9 @@ function getScaleMetrics(
 
 	return {
 		failures,
+		anchorDifference: deltaEOK2( seed, anchor ),
+		anchorLightnessShift:
+			get( anchor, [ OKLCH, 'l' ] ) - get( seed, [ OKLCH, 'l' ] ),
 		fillDifference: deltaEOK2( ramp.ramp.bgFill1, ramp.ramp.bgFill2 ),
 		foregroundDifference: deltaEOK2(
 			ramp.ramp.fgSurface4,
@@ -267,6 +291,21 @@ function MethodSummary( {
 				{ metrics.failures === 0
 					? 'WCAG gates pass'
 					: `${ metrics.failures } WCAG failures` }
+			</span>
+			<span
+				className={ styles[ 'anchor-status' ] }
+				data-preserved={ metrics.anchorDifference <= 0.002 }
+			>
+				{ metrics.anchorDifference <= 0.002
+					? 'Seed preserved'
+					: `Seed moved ΔE ${ metrics.anchorDifference.toFixed(
+							3
+					  ) }` }
+			</span>
+			<span>Anchor ΔL { metrics.anchorLightnessShift.toFixed( 3 ) }</span>
+			<span>
+				Foreground polarity:{ ' ' }
+				{ ramp.direction === 'lighter' ? 'light' : 'dark' }
 			</span>
 			<span>Fill ΔE { metrics.fillDifference.toFixed( 3 ) }</span>
 			<span>FGS4→5 ΔE { metrics.foregroundDifference.toFixed( 3 ) }</span>
@@ -367,6 +406,10 @@ function ScaleTable( {
 						{ methods.map( ( method ) => {
 							const methodRamps = rampsByMethod.get( method )!;
 							const ramp = methodRamps[ scaleName ];
+							const anchorStep =
+								scaleName === 'background'
+									? 'surface2'
+									: 'bgFill1';
 							return (
 								<tr key={ method }>
 									<th scope="row">
@@ -395,6 +438,23 @@ function ScaleTable( {
 												} }
 												title={ `${ step.name }: ${ color }` }
 											>
+												{ step.name === anchorStep ? (
+													<span
+														className={
+															styles[
+																'seed-anchor'
+															]
+														}
+														style={ {
+															background: seed,
+															color: getSwatchTextColor(
+																seed
+															),
+														} }
+													>
+														Input seed
+													</span>
+												) : null }
 												<code>{ color }</code>
 											</td>
 										);
@@ -566,6 +626,7 @@ export const Comparison: Story = {
 					<p>
 						Compare each complete neutral, brand, and error ramp by
 						step. WCAG ratios remain hard gates in every approach.
+						Use the Approaches control to hide or show table rows.
 					</p>
 				</header>
 				{ methods.length === 0 ? (
