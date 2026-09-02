@@ -73,7 +73,7 @@ jobs:
               # It's not necessary to run the full build, since Jest can interpret
               # source files with `babel-jest`. Some packages have their own custom
               # build tasks, however. These must be run.
-              run: npx lerna run build
+              run: npm exec --no -- lerna run build
 
             - name: Run the remaining Jest partition
               env:
@@ -136,7 +136,7 @@ jobs:
               # It's not necessary to run the full build, since Jest can interpret
               # source files with `babel-jest`. Some packages have their own custom
               # build tasks, however. These must be run.
-              run: npx lerna run build
+              run: npm exec --no -- lerna run build
 
             - name: Run the date tests
               env:
