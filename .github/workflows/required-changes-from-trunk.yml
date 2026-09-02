@@ -29,7 +29,7 @@ concurrency:
 
 jobs:
     check-pr:
-        name: Check required changes from trunk
+        name: Report required trunk changes status
         if: github.repository == 'WordPress/gutenberg' && github.event_name == 'pull_request_target'
         runs-on: ubuntu-latest
         timeout-minutes: 15
