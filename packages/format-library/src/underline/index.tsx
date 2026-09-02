@@ -3,7 +3,9 @@ import { toggleFormat } from '@wordpress/rich-text';
 import {
 	RichTextShortcut,
 	__unstableRichTextInputEvent,
+	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
+import type { FormatEditProps } from '../types';
 
 const name = 'core/underline';
 const title = __( 'Underline' );
@@ -16,7 +18,7 @@ export const underline = {
 	attributes: {
 		style: 'style',
 	},
-	edit( { value, onChange } ) {
+	edit( { value, onChange }: FormatEditProps ) {
 		const onToggle = () => {
 			onChange(
 				toggleFormat( value, {

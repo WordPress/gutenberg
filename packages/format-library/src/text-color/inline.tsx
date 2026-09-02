@@ -12,10 +12,17 @@ import {
 	getColorObjectByColorValue,
 	getColorObjectByAttributeValues,
 	store as blockEditorStore,
+	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
 import { Tabs } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
+import type { RichTextValue } from '@wordpress/rich-text';
+import type {
+	ColorObject,
+	ColorPickerProps,
+	InlineColorUIProps,
+} from '../types';
 import { textColor as settings, transparentValue } from './index';
 
 const TABS = [
@@ -23,42 +30,62 @@ const TABS = [
 	{ name: 'backgroundColor', title: __( 'Background' ) },
 ];
 
-function parseCSS( css = '' ) {
-	return css.split( ';' ).reduce( ( accumulator, rule ) => {
-		if ( rule ) {
-			const [ property, value ] = rule.split( ':' );
-			if ( property === 'color' ) {
-				accumulator.color = value;
-			}
-			if (
-				property === 'background-color' &&
-				value !== transparentValue
-			) {
-				accumulator.backgroundColor = value;
-			}
-		}
-		return accumulator;
-	}, {} );
+function parseCSS( css = '' ): { color?: string; backgroundColor?: string } {
+	return css
+		.split( ';' )
+		.reduce(
+			(
+				accumulator: { color?: string; backgroundColor?: string },
+				rule
+			) => {
+				if ( rule ) {
+					const [ property, value ] = rule.split( ':' );
+					if ( property === 'color' ) {
+						accumulator.color = value;
+					}
+					if (
+						property === 'background-color' &&
+						value !== transparentValue
+					) {
+						accumulator.backgroundColor = value;
+					}
+				}
+				return accumulator;
+			},
+			{}
+		);
 }
 
-export function parseClassName( className = '', colorSettings ) {
-	return className.split( ' ' ).reduce( ( accumulator, name ) => {
-		// `colorSlug` could contain dashes, so simply match the start and end.
-		if ( name.startsWith( 'has-' ) && name.endsWith( '-color' ) ) {
-			const colorSlug = name
-				.replace( /^has-/, '' )
-				.replace( /-color$/, '' );
-			const colorObject = getColorObjectByAttributeValues(
-				colorSettings,
-				colorSlug
-			);
-			accumulator.color = colorObject.color;
-		}
-		return accumulator;
-	}, {} );
+export function parseClassName(
+	className = '',
+	colorSettings: ColorObject[]
+): { color?: string } {
+	return className
+		.split( ' ' )
+		.reduce( ( accumulator: { color?: string }, name ) => {
+			// `colorSlug` could contain dashes, so simply match the start and end.
+			if ( name.startsWith( 'has-' ) && name.endsWith( '-color' ) ) {
+				const colorSlug = name
+					.replace( /^has-/, '' )
+					.replace( /-color$/, '' );
+				const colorObject = getColorObjectByAttributeValues(
+					colorSettings,
+					colorSlug
+				);
+				accumulator.color = colorObject.color;
+			}
+			return accumulator;
+		}, {} );
 }
 
-export function getActiveColors( value, name, colorSettings ) {
+export function getActiveColors(
+	value: RichTextValue,
+	name: string,
+	colorSettings: ColorObject[]
+): {
+	color?: string;
+	backgroundColor?: string;
+} {
 	const activeColorFormat = getActiveFormat( value, name );
 
 	if ( ! activeColorFormat ) {
@@ -66,12 +93,17 @@ export function getActiveColors( value, name, colorSettings ) {
 	}
 
 	return {
-		...parseCSS( activeColorFormat.attributes.style ),
-		...parseClassName( activeColorFormat.attributes.class, colorSettings ),
+		...parseCSS( activeColorFormat.attributes?.style ),
+		...parseClassName( activeColorFormat.attributes?.class, colorSettings ),
 	};
 }
 
-function setColors( value, name, colorSettings, colors ) {
+function setColors(
+	value: RichTextValue,
+	name: string,
+	colorSettings: ColorObject[],
+	colors: { color?: string; backgroundColor?: string }
+) {
 	const { color, backgroundColor } = {
 		...getActiveColors( value, name, colorSettings ),
 		...colors,
@@ -81,9 +113,9 @@ function setColors( value, name, colorSettings, colors ) {
 		return removeFormat( value, name );
 	}
 
-	const styles = [];
-	const classNames = [];
-	const attributes = {};
+	const styles: string[] = [];
+	const classNames: string[] = [];
+	const attributes: { style?: string; class?: string } = {};
 
 	if ( backgroundColor ) {
 		styles.push( [ 'background-color', backgroundColor ].join( ':' ) );
@@ -95,8 +127,15 @@ function setColors( value, name, colorSettings, colors ) {
 	if ( color ) {
 		const colorObject = getColorObjectByColorValue( colorSettings, color );
 
-		if ( colorObject ) {
-			classNames.push( getColorClassName( 'color', colorObject.slug ) );
+		if ( colorObject && colorObject.slug ) {
+			const colorClassName = getColorClassName(
+				'color',
+				colorObject.slug
+			);
+
+			if ( colorClassName ) {
+				classNames.push( colorClassName );
+			}
 		} else {
 			styles.push( [ 'color', color ].join( ':' ) );
 		}
@@ -112,7 +151,7 @@ function setColors( value, name, colorSettings, colors ) {
 	return applyFormat( value, { type: name, attributes } );
 }
 
-function ColorPicker( { name, property, value, onChange } ) {
+function ColorPicker( { name, property, value, onChange }: ColorPickerProps ) {
 	const colors = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().colors ?? [];
@@ -125,7 +164,7 @@ function ColorPicker( { name, property, value, onChange } ) {
 	return (
 		<ColorPalette
 			value={ activeColors[ property ] }
-			onChange={ ( color ) => {
+			onChange={ ( color: string | undefined ) => {
 				onChange(
 					setColors( value, name, colors, { [ property ]: color } )
 				);
@@ -144,10 +183,17 @@ export default function InlineColorUI( {
 	onClose,
 	contentRef,
 	isActive,
-} ) {
+}: InlineColorUIProps ) {
+	/*
+	 * `isActive` is not part of `WPFormat`, but `useAnchor` reads it
+	 * dynamically. Hoisting the object out of the call avoids excess property
+	 * checking, which only applies to object literals passed inline.
+	 */
+	const anchorSettings = { ...settings, isActive };
 	const popoverAnchor = useAnchor( {
+		// eslint-disable-next-line react-hooks/refs
 		editableContentElement: contentRef.current,
-		settings: { ...settings, isActive },
+		settings: anchorSettings,
 	} );
 
 	return (
@@ -172,7 +218,7 @@ export default function InlineColorUI( {
 					>
 						<ColorPicker
 							name={ name }
-							property={ tab.name }
+							property={ tab.name as 'color' | 'backgroundColor' }
 							value={ value }
 							onChange={ onChange }
 						/>

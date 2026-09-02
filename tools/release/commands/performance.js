@@ -18,10 +18,10 @@ const ARTIFACTS_PATH =
 const RAW_RESULTS_FILE_SUFFIX = '.performance-results.raw.json';
 const RESULTS_FILE_SUFFIX = '.performance-results.json';
 /*
- * Read from the CLI's own checkout, so every branch under test builds with the
- * npm version trunk requires rather than whichever npm the runner happens to ship.
+ * Read from the CLI's own checkout so every branch under test builds with the npm
+ * version trunk requires, narrowed to that major so a new one cannot land mid-run.
  */
-const NPM_VERSION = devEngines.packageManager.version;
+const NPM_VERSION = devEngines.packageManager.version.replace( '>=', '^' );
 
 /**
  * @typedef WPPerformanceCommandOptions
