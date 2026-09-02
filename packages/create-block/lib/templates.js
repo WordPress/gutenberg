@@ -1,12 +1,11 @@
-const { existsSync } = require( 'fs' );
+const { existsSync, rmSync } = require( 'fs' );
 const { mkdtemp, readFile } = require( 'fs' ).promises;
 const { tmpdir } = require( 'os' );
 const { join, resolve } = require( 'path' );
 const inquirer = require( '@inquirer/prompts' );
-const { command } = require( 'execa' );
-const glob = require( 'fast-glob' );
+const { x } = require( 'tinyexec' );
+const { glob } = require( 'tinyglobby' );
 const npmPackageArg = require( 'npm-package-arg' );
-const rimraf = require( 'rimraf' ).sync;
 const CLIError = require( './cli-error' );
 const { info } = require( './log' );
 const prompts = require( './prompts' );
@@ -73,6 +72,7 @@ const getOutputTemplates = async ( outputTemplatesPath ) => {
 	const outputTemplatesFiles = await glob( '**/*.mustache', {
 		cwd: outputTemplatesPath,
 		dot: true,
+		expandDirectories: false,
 	} );
 	return Object.fromEntries(
 		await Promise.all(
@@ -110,7 +110,7 @@ const getOutputAssets = async ( outputAssetsPath ) => {
 
 const externalTemplateExists = async ( templateName ) => {
 	try {
-		await command( `npm view ${ templateName }` );
+		await x( 'npm', [ 'view', templateName ], { throwOnError: true } );
 	} catch {
 		return false;
 	}
@@ -240,8 +240,11 @@ const getProjectTemplate = async ( templateName ) => {
 
 		tempCwd = await mkdtemp( join( tmpdir(), 'wp-create-block-' ) );
 
-		await command( `npm install ${ templateName } --no-save`, {
-			cwd: tempCwd,
+		await x( 'npm', [ 'install', templateName, '--no-save' ], {
+			throwOnError: true,
+			nodeOpions: {
+				cwd: tempCwd,
+			},
 		} );
 
 		const { name } = npmPackageArg( templateName );
@@ -262,7 +265,7 @@ const getProjectTemplate = async ( templateName ) => {
 		}
 	} finally {
 		if ( tempCwd ) {
-			rimraf( tempCwd );
+			rmSync( tempCwd, { recursive: true, force: true } );
 		}
 	}
 };
