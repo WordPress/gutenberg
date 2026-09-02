@@ -3,12 +3,12 @@ import { __, sprintf, _n } from '@wordpress/i18n';
 import {
 	Button,
 	FlexItem,
-	privateApis as componentsPrivateApis,
 	SearchControl,
 	__experimentalHStack as HStack,
 	__experimentalText as WCText,
 } from '@wordpress/components';
-import { VisuallyHidden } from '@wordpress/ui';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+import { Menu, VisuallyHidden } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import {
 	useState,
@@ -43,8 +43,6 @@ const {
 	useHasColorPanel,
 	useHasBackgroundPanel,
 } = unlock( blockEditorPrivateApis );
-
-const { Menu } = unlock( componentsPrivateApis );
 
 /**
  * Whether a value, or anything nested inside it, holds a real user value.
@@ -322,8 +320,8 @@ function ScreenBlockList() {
 					placeholder={ __( 'Search' ) }
 					size="compact"
 				/>
-				<Menu>
-					<Menu.TriggerButton
+				<Menu.Root>
+					<Menu.Trigger
 						render={
 							<Button
 								size="compact"
@@ -333,31 +331,26 @@ function ScreenBlockList() {
 							/>
 						}
 					/>
-					<Menu.Popover>
-						<Menu.RadioItem
-							name="global-styles-block-filter"
-							value="all"
-							checked={ styleFilter === 'all' }
-							onChange={ () => setStyleFilter( 'all' ) }
-							hideOnClick
+					<Menu.Popup>
+						<Menu.RadioGroup
+							value={ styleFilter }
+							onValueChange={ ( value: StyleFilter ) =>
+								setStyleFilter( value )
+							}
 						>
-							<Menu.ItemLabel>
-								{ __( 'All blocks' ) }
-							</Menu.ItemLabel>
-						</Menu.RadioItem>
-						<Menu.RadioItem
-							name="global-styles-block-filter"
-							value="customized"
-							checked={ styleFilter === 'customized' }
-							onChange={ () => setStyleFilter( 'customized' ) }
-							hideOnClick
-						>
-							<Menu.ItemLabel>
-								{ __( 'Customized' ) }
-							</Menu.ItemLabel>
-						</Menu.RadioItem>
-					</Menu.Popover>
-				</Menu>
+							<Menu.RadioItem value="all" closeOnClick>
+								<Menu.ItemLabel>
+									{ __( 'All blocks' ) }
+								</Menu.ItemLabel>
+							</Menu.RadioItem>
+							<Menu.RadioItem value="customized" closeOnClick>
+								<Menu.ItemLabel>
+									{ __( 'Customized' ) }
+								</Menu.ItemLabel>
+							</Menu.RadioItem>
+						</Menu.RadioGroup>
+					</Menu.Popup>
+				</Menu.Root>
 			</HStack>
 			<MemoizedBlockList
 				filterValue={ deferredFilterValue }

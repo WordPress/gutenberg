@@ -2,14 +2,11 @@ import {
 	__experimentalSpacer as Spacer,
 	Button,
 	FlexItem,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
-import { Stack } from '@wordpress/ui';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+import { Menu, Stack } from '@wordpress/ui';
 import { ScreenHeader } from '../screen-header';
-import { unlock } from '../lock-unlock';
-
-const { Menu } = unlock( componentsPrivateApis );
 
 export interface PresetEditHeaderMenuItem {
 	label: string;
@@ -36,8 +33,8 @@ export default function PresetEditHeader( {
 			{ menuItems.length > 0 && (
 				<FlexItem>
 					<Spacer marginTop={ 2 } marginBottom={ 0 } paddingX={ 4 }>
-						<Menu>
-							<Menu.TriggerButton
+						<Menu.Root>
+							<Menu.Trigger
 								render={
 									<Button
 										size="small"
@@ -46,7 +43,7 @@ export default function PresetEditHeader( {
 									/>
 								}
 							/>
-							<Menu.Popover>
+							<Menu.Popup>
 								{ menuItems.map( ( item ) => (
 									<Menu.Item
 										key={ item.label }
@@ -58,8 +55,8 @@ export default function PresetEditHeader( {
 										</Menu.ItemLabel>
 									</Menu.Item>
 								) ) }
-							</Menu.Popover>
-						</Menu>
+							</Menu.Popup>
+						</Menu.Root>
 					</Spacer>
 				</FlexItem>
 			) }
