@@ -368,9 +368,12 @@ jobs:
                   commit-sha: ${{ github.event.pull_request.head.sha }}
                   run-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
-    # Always runs, so it can be the required check while the jobs above are path-filtered
-    # away. `needs` must list every job that would otherwise still be running: the gate fails
-    # rather than pass a job it never evaluated. `build` settles before the shards do.
+    # Runs on every event, so it can be the workflow's only required status check while the
+    # jobs above are path-filtered away.
+    #
+    # `needs` lists every preceding job that should be checked. `--ignore` names the rest:
+    # this job itself, and the housekeeping that runs alongside it. A job in neither list
+    # fails the gate if it has not finished, rather than pass unevaluated.
     e2e-gate:
         name: End-to-End Tests Gate
         runs-on: 'ubuntu-24.04'
@@ -381,6 +384,7 @@ jobs:
         needs:
             [
                 detect-relevant-changes,
+                build,
                 e2e-playwright,
                 e2e-playwright-rtc-websocket,
             ]
