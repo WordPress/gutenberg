@@ -1,11 +1,11 @@
 import { renderToString } from '@wordpress/element';
-import { Button, MenuItem, Path, SVG } from '@wordpress/components';
+import { Button, Path, SVG } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { applyFilters } from '@wordpress/hooks';
 import { store as coreStore } from '@wordpress/core-data';
-import { external } from '@wordpress/icons';
-import { VisuallyHidden } from '@wordpress/ui';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Menu, VisuallyHidden } from '@wordpress/ui';
 import { store as editorStore } from '../../store';
 
 function buildInterstitialMarkup() {
@@ -248,10 +248,30 @@ export function PostPreviewMenuItem( { forceIsAutosaveable, onPreview } ) {
 		return null;
 	}
 
+	const { disabled, href, onClick, target } = previewProps;
+	const label = (
+		<Menu.ItemLabel>{ __( 'Preview in new tab' ) }</Menu.ItemLabel>
+	);
+
+	// There is nothing to preview until the post is saveable, so the item
+	// drops its address, the way the button variant does.
+	if ( disabled ) {
+		return <Menu.Item disabled>{ label }</Menu.Item>;
+	}
+
 	return (
-		<MenuItem icon={ external } { ...previewProps }>
-			{ __( 'Preview in new tab' ) }
-		</MenuItem>
+		// The preview reuses a window of its own rather than the anonymous tab
+		// `openInNewTab` targets, so the address of that window overrides it.
+		<Menu.LinkItem
+			href={ href }
+			onClick={ onClick }
+			openInNewTab
+			closeOnClick
+			/* eslint-disable-next-line jsx-a11y/anchor-is-valid, jsx-a11y/anchor-has-content -- The item supplies the address and the content. */
+			render={ <a target={ target } /> }
+		>
+			{ label }
+		</Menu.LinkItem>
 	);
 }
 

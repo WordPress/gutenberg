@@ -9,6 +9,7 @@
 ### Deprecations
 
 -   `PluginMoreMenuItem`, `PluginSidebarMoreMenuItem`, `PluginPreviewMenuItem`: Deprecate the `as` prop, which reached the item only because these components forward every extra prop. The menu now renders the item itself, so the prop is ignored ([#82319](https://github.com/WordPress/gutenberg/pull/82319)).
+-   `PluginPreviewMenuItem`: The View menu renders with the `Menu` component of `@wordpress/ui`, so a link item honors only `target="_blank"`, as in the Options menu ([#82321](https://github.com/WordPress/gutenberg/pull/82321)).
 
 ### Enhancements
 
