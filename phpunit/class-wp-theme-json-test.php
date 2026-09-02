@@ -1967,7 +1967,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$expected = 'textarea::placeholder, input:where([type=email],[type=number],[type=password],[type=search],[type=text],[type=tel],[type=url])::placeholder{font-style: italic;}';
+		$expected = ':root :where(textarea, input:where([type=email],[type=number],[type=password],[type=search],[type=text],[type=tel],[type=url]))::placeholder{font-style: italic;}';
 
 		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
 	}
@@ -2018,7 +2018,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		unregister_block_style( 'core/group', 'section-1' );
 
 		$focus       = '@media (width <= 480px){:root :where(.wp-block-group.is-style-section-1 textarea:focus, .wp-block-group.is-style-section-1 input:where([type=email],[type=number],[type=password],[type=search],[type=text],[type=tel],[type=url]):focus){color: blue;}}';
-		$placeholder = '@media (width <= 480px){.wp-block-group.is-style-section-1 textarea::placeholder, .wp-block-group.is-style-section-1 input:where([type=email],[type=number],[type=password],[type=search],[type=text],[type=tel],[type=url])::placeholder{color: green;}}';
+		$placeholder = '@media (width <= 480px){:root :where(.wp-block-group.is-style-section-1 textarea, .wp-block-group.is-style-section-1 input:where([type=email],[type=number],[type=password],[type=search],[type=text],[type=tel],[type=url]))::placeholder{color: green;}}';
 
 		$this->assertStringContainsString( $focus, $actual );
 		$this->assertStringContainsString( $placeholder, $actual );

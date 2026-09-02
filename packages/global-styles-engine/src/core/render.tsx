@@ -1014,6 +1014,32 @@ function isPseudoElementSelector( selectorSuffix?: string ): boolean {
 }
 
 /**
+ * Builds the specificity-capped selector for a pseudo selector rule.
+ *
+ * Pseudo-classes are appended to each part of the base selector inside the
+ * `:root :where()` wrapper, e.g. `:root :where(a:hover)`. Pseudo-elements are
+ * not valid inside `:where()`, so they are appended after the wrapper instead,
+ * e.g. `:root :where(textarea, input)::placeholder`, which keeps the same
+ * specificity regardless of where the element styles are defined.
+ *
+ * @param baseSelector   Selector without the pseudo selector.
+ * @param pseudoSelector Pseudo selector to apply, e.g. ':hover' or '::placeholder'.
+ * @return The selector to use for the rule.
+ */
+function getPseudoRuleSelector(
+	baseSelector: string,
+	pseudoSelector: string
+): string {
+	if ( isPseudoElementSelector( pseudoSelector ) ) {
+		return `:root :where(${ baseSelector })${ pseudoSelector }`;
+	}
+	return `:root :where(${ appendToSelector(
+		baseSelector,
+		pseudoSelector
+	) })`;
+}
+
+/**
  * Creates style nodes for configured responsive breakpoint states.
  *
  * Breakpoint nodes render feature-level, base, and pseudo declarations through
@@ -1677,19 +1703,17 @@ function renderStylesNode(
 		Object.entries( featureDeclarations ).forEach(
 			( [ featureSelector, declarations ] ) => {
 				if ( declarations.length ) {
-					let selectorForRule = variationName
+					const selectorForRule = variationName
 						? getBlockStyleVariationFeatureSelector(
 								variationName,
 								featureSelector
 						  )
 						: featureSelector;
-					selectorForRule = selectorSuffix
-						? appendToSelector( selectorForRule, selectorSuffix )
-						: selectorForRule;
-					const featureRuleSelector = isPseudoElementSelector(
-						selectorSuffix
-					)
-						? selectorForRule
+					const featureRuleSelector = selectorSuffix
+						? getPseudoRuleSelector(
+								selectorForRule,
+								selectorSuffix
+						  )
 						: `:root :where(${ selectorForRule })`;
 					const rules = declarations.join( ';' );
 					ruleset += `${ featureRuleSelector }{${ rules };}`;
@@ -1739,10 +1763,12 @@ function renderStylesNode(
 		disableRootPadding
 	);
 	if ( styleDeclarations?.length ) {
-		const generalSelector =
-			skipSelectorWrapper || isPseudoElementSelector( selectorSuffix )
-				? effectiveSelector
-				: `:root :where(${ effectiveSelector })`;
+		let generalSelector = `:root :where(${ effectiveSelector })`;
+		if ( skipSelectorWrapper ) {
+			generalSelector = effectiveSelector;
+		} else if ( selectorSuffix ) {
+			generalSelector = getPseudoRuleSelector( selector, selectorSuffix );
+		}
 		ruleset += `${ generalSelector }{${ styleDeclarations.join( ';' ) };}`;
 	}
 	if ( styles?.css ) {

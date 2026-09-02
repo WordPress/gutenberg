@@ -849,15 +849,15 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
-		it( 'renders text input placeholder typography styles outside :where()', () => {
+		it( 'renders text input placeholder typography styles with the pseudo-element after :where()', () => {
 			const css = transformTextInputStyles( {
 				'::placeholder': { typography: { fontStyle: 'italic' } },
 			} );
 
 			expect( css ).toEqual(
-				`${ textInputSelectorWith(
-					'::placeholder'
-				) }{font-style: italic;}`
+				`:root :where(${ textInputSelectorWith(
+					''
+				) })::placeholder{font-style: italic;}`
 			);
 		} );
 
@@ -1675,7 +1675,7 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
-		it( 'keeps responsive style variation pseudo-element selectors outside the :where() wrapper', () => {
+		it( 'appends responsive style variation pseudo-element selectors after the :where() wrapper', () => {
 			const tree = {
 				styles: {
 					blocks: {
@@ -1738,9 +1738,9 @@ describe( 'global styles renderer', () => {
 				) }){color: blue;}}`
 			);
 			expect( result ).toContain(
-				`@media (width <= 480px){${ scoped(
-					'::placeholder'
-				) }{color: green;}}`
+				`@media (width <= 480px){:root :where(${ scoped(
+					''
+				) })::placeholder{color: green;}}`
 			);
 		} );
 
