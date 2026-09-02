@@ -462,9 +462,12 @@ jobs:
                   commit-sha: ${{ github.event.pull_request.head.sha }}
                   run-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
-    # Always runs, so it can be the required check while the comparison above is path-filtered
-    # away. `needs` must list every job that would otherwise still be running: the status check fails
-    # rather than pass a job it never evaluated.
+    # Runs on every event, so it can be the workflow's only required status check while the
+    # comparison above is path-filtered away.
+    #
+    # `needs` lists every preceding job that should be checked. `--ignore` names the rest:
+    # this job itself, and the housekeeping that runs alongside it. A job in neither list
+    # fails the status check if it has not finished, rather than pass unevaluated.
     performance-status-check:
         name: Performance Tests - Status Check
         runs-on: 'ubuntu-24.04'
@@ -472,18 +475,17 @@ jobs:
         permissions:
             contents: read
             actions: read
-        needs: [detect-relevant-changes, results]
+        needs: [detect-relevant-changes, prepare, build, performance, results]
         if: ${{ ! cancelled() && github.repository == 'WordPress/gutenberg' }}
         steps:
-            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   sparse-checkout: .github/workflows/scripts
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
 
-            # This job is still running while it evaluates the rest, so it exempts itself.
-            # `Update PR meta comment` runs alongside it and only writes a comment.
-            - name: Fail if any required job did not pass
+            - name: Check for any failures of required jobs
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: node .github/workflows/scripts/ci-status-check.js --ignore 'Performance Tests - Status Check,Update PR meta comment'
