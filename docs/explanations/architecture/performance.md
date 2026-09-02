@@ -30,7 +30,7 @@ Based on the idea that **when editing a given block, it is very rare that an upd
 
 A tool to compare performance across multiple branches/tags/commits is provided. You can run it locally like so: `npm exec --no release-cli -- perf [branches]`, example:
 
-```
+```sh
 npm exec --no release-cli -- perf trunk v8.1.0 v8.0.0
 ```
 

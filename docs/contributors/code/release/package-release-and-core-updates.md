@@ -134,6 +134,7 @@ Whilst waiting for the GitHub actions build for `wp/latest`[branch to pass](http
 2. `npm ci`
 3. `npm exec --no -- lerna updated`
    Example:
+
    ```shell
    npm exec --no -- lerna updated
    @wordpress/e2e-tests

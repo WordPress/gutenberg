@@ -636,13 +636,13 @@ This gives you the result for the current branch/code on the running environment
 
 In addition to that, you can also compare the metrics across branches (or tags or commits) by running the following command `npm exec --no release-cli -- perf [branches]`, example:
 
-```
+```sh
 npm exec --no release-cli -- perf trunk v8.1.0 v8.0.0
 ```
 
 Finally, you can pass an additional `--tests-branch` argument to specify which branch's performance test files you'd like to run. This is particularly useful when modifying/extending the perf tests:
 
-```
+```sh
 npm exec --no release-cli -- perf trunk v8.1.0 v8.0.0 --tests-branch add/perf-tests-coverage
 ```
 
