@@ -16,6 +16,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { resolvePackageBin } from '../resolve-package-bin.mjs';
 import { resolveTypeRoots } from '../resolve-type-roots.mjs';
 import {
+	collectJestInfrastructureEntries,
 	findVitestIsolationOptOuts,
 	validateRoutingScripts,
 } from '../test-infrastructure-policy.mjs';
@@ -100,6 +101,51 @@ describe( 'test infrastructure policy', () => {
 			)
 		).toEqual( [] );
 	} );
+
+	it( 'inventories Jest-only configuration, dependencies, and commands', () => {
+		const files = [
+			'.github/workflows/test.yml',
+			'packages/example/jest.config.js',
+			'packages/example/package.json',
+		];
+		const sources = {
+			'.github/workflows/test.yml':
+				'"run": npm run test:unit:debug -- --runInBand\n',
+			'packages/example/jest.config.js': 'module.exports = {};\n',
+			'packages/example/package.json': JSON.stringify( {
+				jest: {},
+				devDependencies: {
+					'@jest/globals': '^30.0.0',
+					'@testing-library/jest-dom': '^6.9.1',
+					'@types/jest': '^30.0.0',
+					'legacy-test': 'npm:@types/jest@^30.0.0',
+					'test-runner': 'npm:jest@^30.0.0',
+				},
+				scripts: {
+					test: 'wp-scripts test-unit-js --config jest.config.js',
+					vitest: 'npm run test:unit:vitest',
+					watch: 'npm run test:unit:watch',
+				},
+			} ),
+		};
+
+		expect(
+			collectJestInfrastructureEntries(
+				files,
+				( file ) => sources[ file ] ?? null
+			)
+		).toEqual( [
+			'command:.github/workflows/test.yml=npm run test:unit:debug -- --runInBand',
+			'command:packages/example/package.json:scripts.test=wp-scripts test-unit-js --config jest.config.js',
+			'command:packages/example/package.json:scripts.watch=npm run test:unit:watch',
+			'config:packages/example/jest.config.js',
+			'config:packages/example/package.json:jest',
+			'dependency:packages/example/package.json:devDependencies.@jest/globals',
+			'dependency:packages/example/package.json:devDependencies.@types/jest',
+			'dependency:packages/example/package.json:devDependencies.legacy-test',
+			'dependency:packages/example/package.json:devDependencies.test-runner',
+		] );
+	} );
 } );
 
 describe( 'runner isolation policy', () => {
@@ -118,8 +164,22 @@ describe( 'runner isolation policy', () => {
 			recursive: true,
 		} );
 		writeFileSync(
+			path.join( rootDir, 'vitest.config.mjs' ),
+			`const isolate = true;
+export default {
+	test: {
+		isolate,
+		projects: [
+			{ test: { browser: { [ 'isolate' ]: false } } },
+			{ test: { isolate: true } },
+		],
+	},
+};
+`
+		);
+		writeFileSync(
 			path.join( rootDir, '.github/workflows/test.yml' ),
-			'run: "vitest --no-isolate"\n'
+			'\'run\': "vitest --no-isolate"\n'
 		);
 		writeFileSync(
 			path.join( rootDir, '.github/actions/run-tests/action.yml' ),
@@ -131,6 +191,8 @@ describe( 'runner isolation policy', () => {
 			'.github/workflows/test.yml:1 disables Vitest module isolation: vitest --no-isolate',
 			'package.json:scripts.test disables Vitest module isolation: vitest --no-isolate',
 			'package.json:scripts.test:browser disables Vitest module isolation: vitest --browser.isolate=false',
+			'vitest.config.mjs:4 must set isolate to the literal value true',
+			'vitest.config.mjs:6 must set isolate to the literal value true',
 		] );
 	} );
 } );
