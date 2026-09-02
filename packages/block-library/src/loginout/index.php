@@ -38,7 +38,7 @@ function render_block_core_loginout( $attributes ) {
 	/**
 	 * Filters the HTML output of the Log In/Log Out link.
 	 *
-	 * @since x.x.x
+	 * @since 7.2.0
 	 *
 	 * @param string $link The HTML link content.
 	 */
