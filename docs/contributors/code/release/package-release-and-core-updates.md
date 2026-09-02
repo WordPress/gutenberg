@@ -90,7 +90,8 @@ For the record, the manual process would look like the following:
 
 1. Check out the WordPress branch used before (example `wp/5.2`).
 2. `git pull`.
-3. Run the `npm exec --no -- lerna publish patch --no-private --dist-tag wp-5.2` command (see more in [package release process]) but when asked for the version numbers to choose for each package, (assuming the package versions are written using this format `major.minor.patch`) make sure to bump only the `patch` version number. For example, if the last published package version for this WordPress branch was `5.6.0`, choose `5.6.1` as a version.
+3. Install npm dependencies with `npm ci`.
+4. Run the `npm exec --no -- lerna publish patch --no-private --dist-tag wp-5.2` command (see more in [package release process]) but when asked for the version numbers to choose for each package, (assuming the package versions are written using this format `major.minor.patch`) make sure to bump only the `patch` version number. For example, if the last published package version for this WordPress branch was `5.6.0`, choose `5.6.1` as a version.
 
 **Note:** For WordPress `5.0` and WordPress `5.1`, a different release process was used. This means that when choosing npm package versions targeting these two releases, you won't be able to use the next `patch` version number as it may have been already used. You should use the "metadata" modifier for these. For example, if the last published package version for this WordPress branch was `5.6.1`, choose `5.6.1+patch.1` as a version.
 
@@ -119,7 +120,8 @@ Open a terminal and perform the following steps:
 Before porting commits check that the `wp/latest` branch does not have any outstanding packages waiting to be published:
 
 1. `git checkout wp/latest`
-2. `npm exec --no -- lerna updated`
+2. `npm ci`
+3. `npm exec --no -- lerna updated`
 
 Now _cherry-pick_ the commits from `trunk` to `wp/latest`, use `-m 1 commithash` if the commit was a pull request merge commit:
 
@@ -129,7 +131,8 @@ Now _cherry-pick_ the commits from `trunk` to `wp/latest`, use `-m 1 commithash`
 Whilst waiting for the GitHub actions build for `wp/latest`[branch to pass](https://github.com/WordPress/gutenberg/actions?query=branch%3Awp%2Ftrunk), identify and begin updating the `CHANGELOG.md` files:
 
 1. `git checkout wp/latest`
-2. `npm exec --no -- lerna updated`
+2. `npm ci`
+3. `npm exec --no -- lerna updated`
    Example:
    ```shell
    npm exec --no -- lerna updated
