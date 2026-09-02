@@ -224,7 +224,7 @@ class WP_Test_REST_Icons_Controller extends WP_Test_REST_TestCase {
 	public function test_get_items_response_keywords_defaults_to_empty_array() {
 		wp_set_current_user( self::$editor_id );
 
-		WP_Icons_Registry::get_instance()->register(
+		wp_register_icon(
 			'core/no-keywords',
 			array(
 				'label'   => 'No Keywords',
@@ -241,7 +241,7 @@ class WP_Test_REST_Icons_Controller extends WP_Test_REST_TestCase {
 		$this->assertCount( 1, $data );
 		$this->assertSame( array(), $data[0]['keywords'] );
 
-		WP_Icons_Registry::get_instance()->unregister( 'core/no-keywords' );
+		wp_unregister_icon( 'core/no-keywords' );
 	}
 
 	/**
