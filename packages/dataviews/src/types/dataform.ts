@@ -365,7 +365,9 @@ export type DetailsLayout = {
 	type: 'details';
 
 	/**
-	 * The text displayed as the clickable summary of the details element.
+	 * The id of the field whose rendered value is displayed as the clickable
+	 * summary of the details element. When omitted, the summary falls back
+	 * to the form field's label or to "More details".
 	 */
 	summary?: string;
 };
@@ -380,7 +382,10 @@ export type NormalizedDetailsLayout = {
 	type: 'details';
 
 	/**
-	 * The text displayed as the clickable summary of the details element.
+	 * The id of the field whose rendered value is displayed as the clickable
+	 * summary of the details element. An empty string when no summary field
+	 * is configured, in which case the form field's label or "More details"
+	 * is displayed instead.
 	 */
 	summary: string;
 };
