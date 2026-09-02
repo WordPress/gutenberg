@@ -7,7 +7,7 @@ import { useReducedMotion } from '@wordpress/compose';
 import LinkControl from '../';
 import { fetchFauxEntitySuggestions } from './fixtures';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 const mockFetchSearchSuggestions = vi.fn();
 

@@ -5,7 +5,7 @@ import { useState } from '@wordpress/element';
 import UnitControl from '..';
 import { CSS_UNITS, parseQuantityAndUnitFromRawValue } from '../utils';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 const getInput = ( {
 	isInputTypeText = false,

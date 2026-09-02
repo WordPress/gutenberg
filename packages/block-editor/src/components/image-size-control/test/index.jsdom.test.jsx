@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ImageSizeControl from '../index';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 globalThis.wpVitest.mockResizeObserver();
 

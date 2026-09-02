@@ -5,7 +5,7 @@ import { useSelect } from '@wordpress/data';
 import { useReducedMotion } from '@wordpress/compose';
 import { LinkPicker } from '../';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 const mockFetchSearchSuggestions = vi.fn();
 

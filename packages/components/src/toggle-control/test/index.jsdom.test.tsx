@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import ToggleControl from '..';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 describe( 'ToggleControl', () => {
 	it( 'should label the toggle', () => {

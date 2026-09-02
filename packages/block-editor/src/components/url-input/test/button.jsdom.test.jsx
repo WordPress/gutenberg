@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
 import URLInputButton from '../button';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 describe( 'URLInputButton', () => {
 	it( 'should render a `Insert link` button and not be pressed when `url` is not provided', () => {

@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
 	render,
 	screen,
@@ -7,7 +7,7 @@ import {
 } from '@testing-library/react';
 import ColorPaletteControl from '../control';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 const noop = () => {};
 

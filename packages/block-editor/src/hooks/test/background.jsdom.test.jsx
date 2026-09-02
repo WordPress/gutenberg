@@ -10,7 +10,7 @@ import {
 } from '../background';
 import { BackgroundToolsPanel } from '../../components/global-styles/background-panel';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 describe( 'background', () => {
 	describe( 'backgroundResetAllFilter', () => {

@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { useId } from '@wordpress/element';
 import { BorderBoxControl } from '..';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 const colors = [
 	{ name: 'Gray', color: '#f6f7f7' },

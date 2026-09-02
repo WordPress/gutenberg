@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import _Picker from '..';
 import type { FocalPointPickerProps } from '../types';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 type Log = { name: string; args: unknown[] };
 type EventLogger = ( name: string, args: unknown[] ) => void;

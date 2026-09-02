@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { click, render as renderAriakit } from '@ariakit/test/react';
 import TypographyPanel from '../typography-panel';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 // Coverage for `TypographyPanel` with the `gutenberg-global-styles-inheritance-ui`
 // experiment off, which is what WordPress Core gets. Deleted rather than set to

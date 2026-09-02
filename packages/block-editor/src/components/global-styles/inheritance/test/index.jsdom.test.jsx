@@ -8,7 +8,7 @@ import {
 	InheritanceToolsPanelItem,
 } from '../';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 describe( 'InheritanceResetButton', () => {
 	test( 'renders an always-visible reset button labelled for the inherited value', () => {

@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { render, renderHook, screen } from '@testing-library/react';
 import { click, render as renderAriakit } from '@ariakit/test/react';
 import ColorPanel, {
@@ -11,7 +11,7 @@ import ColorPanel, {
 	useHasCaptionPanel,
 } from '../color-panel';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 globalThis.wpVitest.mockResizeObserver();
 

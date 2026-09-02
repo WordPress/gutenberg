@@ -3,7 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { Navigator, useNavigator } from '@wordpress/components';
 import { ScreenHeader } from '../screen-header';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 function CurrentPath() {
 	const { location } = useNavigator();

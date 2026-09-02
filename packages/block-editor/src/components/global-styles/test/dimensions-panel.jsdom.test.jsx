@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
 import DimensionsPanel from '../dimensions-panel';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 // The inheritance treatment sits behind the
 // `gutenberg-global-styles-inheritance-ui` experiment. Turn it on so these

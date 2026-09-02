@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import GradientPicker from '..';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 const GRADIENT_A =
 	'linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)';

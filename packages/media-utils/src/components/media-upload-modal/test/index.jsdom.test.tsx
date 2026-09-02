@@ -16,7 +16,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { MediaUploadModal } from '../index';
 import { unlock } from '../../../lock-unlock';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 globalThis.wpVitest.mockResizeObserver();
 

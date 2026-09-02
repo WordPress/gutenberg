@@ -6,7 +6,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import OverlayTemplatePartSelector from '../overlay-template-part-selector';
 import useCreateOverlayTemplatePart from '../use-create-overlay';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 // Mock useEntityRecords
 vi.mock( import( '@wordpress/core-data' ), () => ( {

@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
 import ColorPalette from '..';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 const EXAMPLE_COLORS = [
 	{ name: 'red', color: '#f00' },

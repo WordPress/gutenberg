@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
 import RadioControl from '../';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 const ControlledRadioControl = ( {
 	...props

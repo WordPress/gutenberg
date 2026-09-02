@@ -11,7 +11,7 @@ import { BorderControl } from '../';
 import type { Border, BorderControlProps } from '../types';
 import { COLORS } from '../../utils';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 globalThis.wpVitest.mockResizeObserver();
 

@@ -1,9 +1,9 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ValidatedFormTokenField } from '../form-token-field';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 describe( 'ValidatedFormTokenField', () => {
 	it( 'should preserve the built-in howto description', () => {

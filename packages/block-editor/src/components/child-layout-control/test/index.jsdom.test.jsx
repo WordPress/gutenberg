@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import ChildLayoutControl from '../';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 globalThis.wpVitest.mockResizeObserver();
 

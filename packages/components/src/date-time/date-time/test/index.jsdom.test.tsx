@@ -13,7 +13,7 @@ import timezoneMock from 'timezone-mock';
 import { getSettings, setSettings, type DateSettings } from '@wordpress/date';
 import DateTimePicker from '..';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 describe( 'DateTimePicker', () => {
 	let originalSettings: DateSettings;

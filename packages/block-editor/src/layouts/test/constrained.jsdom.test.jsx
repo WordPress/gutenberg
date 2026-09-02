@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import constrained from '../constrained';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 const ConstrainedLayoutInspectorControls = constrained.inspectorControls;
 const PANEL_ID = 'test-panel';

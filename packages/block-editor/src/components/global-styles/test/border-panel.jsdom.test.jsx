@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import BorderPanel from '../border-panel';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 // The inheritance treatment sits behind the
 // `gutenberg-global-styles-inheritance-ui` experiment. Turn it on so these

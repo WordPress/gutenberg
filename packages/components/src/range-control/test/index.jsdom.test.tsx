@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import RangeControl from '../';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 const getRangeInput = (): HTMLInputElement => screen.getByRole( 'slider' );
 const getNumberInput = (): HTMLInputElement => screen.getByRole( 'spinbutton' );

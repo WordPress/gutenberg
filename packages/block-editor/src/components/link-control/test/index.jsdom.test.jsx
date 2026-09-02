@@ -28,7 +28,7 @@ import {
 } from './fixtures';
 import { expectValidatedInputControlDeprecationIfCalled } from '../../url-input/test/fixtures/validated-input-control-deprecation';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 globalThis.wpVitest.mockScrollIntoView();
 globalThis.wpVitest.mockVisibleElements();
