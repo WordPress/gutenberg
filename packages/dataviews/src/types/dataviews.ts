@@ -388,9 +388,11 @@ interface ViewBase {
 
 /**
  * Sizing and alignment for one table column. Applies to the columns listed in
- * `fields`; the primary column (`titleField`, `mediaField`, `descriptionField`)
- * is sized by the table itself, taking the width the other columns leave over,
- * so styles keyed by those field ids are ignored.
+ * `fields`; neither the `table` nor the `pickerTable` layout applies it to the
+ * primary column (`titleField`, `mediaField`, `descriptionField`), so styles
+ * keyed by those field ids are ignored. In the `table` layout the primary
+ * column is sized by the table itself, taking the width the other columns
+ * leave over.
  */
 export interface ColumnStyle {
 	/**

@@ -517,7 +517,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 			'type'       => 'object',
 			'properties' => array(
 				'styles'       => array(
-					'description'          => __( 'Column styles keyed by field id, for the columns listed in the view fields. The primary column (title, media, and description fields) takes the width left over by the other columns and ignores these styles.', 'gutenberg' ),
+					'description'          => __( 'Column styles keyed by field id, for the columns listed in the view fields. The primary column (title, media, and description fields) ignores these styles; in the table layout it takes the width left over by the other columns.', 'gutenberg' ),
 					'type'                 => 'object',
 					'additionalProperties' => $this->get_column_style_schema(),
 				),
