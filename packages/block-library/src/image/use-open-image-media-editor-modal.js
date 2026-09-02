@@ -383,6 +383,14 @@ export function useOpenImageMediaEditorModal( {
 					return;
 				}
 
+				// A failed refetch returns nothing, which would leave the
+				// block pointing at the new file while its size and link
+				// still describe the old one. The record the media editor
+				// received when it saved is already in the store, so fall
+				// back to that rather than half-updating the block.
+				const attachmentRecord =
+					resolvedAttachment ?? getCachedAttachmentRecord( newId );
+
 				const latestBlockAttributes = blockAttributesRef.current;
 
 				// Sync alt text and caption back to the block only when
@@ -396,7 +404,7 @@ export function useOpenImageMediaEditorModal( {
 						getSyncedImageBlockAttributes(
 							latestBlockAttributes,
 							originalAttachment,
-							resolvedAttachment
+							attachmentRecord
 						);
 
 					if ( Object.keys( resolvedMetadataAttributes ).length ) {
@@ -411,7 +419,7 @@ export function useOpenImageMediaEditorModal( {
 					const derivedAttributes =
 						getNewAttachmentImageBlockAttributes(
 							latestBlockAttributes,
-							resolvedAttachment,
+							attachmentRecord,
 							nextAttributes.url
 						);
 
@@ -444,7 +452,12 @@ export function useOpenImageMediaEditorModal( {
 				setAttributes( nextAttributes );
 			}
 		},
-		[ onUrlChange, resolveFreshAttachmentRecord, setAttributes ]
+		[
+			getCachedAttachmentRecord,
+			onUrlChange,
+			resolveFreshAttachmentRecord,
+			setAttributes,
+		]
 	);
 
 	const openImageMediaEditorModal = useCallback( async () => {

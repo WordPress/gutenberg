@@ -474,6 +474,44 @@ describe( 'useOpenImageMediaEditorModal', () => {
 		expect( onUrlChange ).toHaveBeenLastCalledWith( 'cropped-300x200.jpg' );
 	} );
 
+	it( 'falls back to the saved record when the refetch fails', async () => {
+		const { setAttributes } = await runModalUpdate( {
+			attributes: {
+				id: 1,
+				url: 'original-300x200.jpg',
+				alt: '',
+				caption: '',
+				sizeSlug: 'medium',
+				href: 'original.jpg',
+				linkDestination: 'media',
+			},
+			registryOptions: {
+				// The media editor put the saved record in the store, so it
+				// is cached even though refetching it fails.
+				getEditedEntityRecord: ( kind, name, attachmentId ) =>
+					attachmentId === ORIGINAL_ATTACHMENT.id
+						? ORIGINAL_ATTACHMENT
+						: CROPPED_ATTACHMENT,
+				resolveGetEntityRecord: ( kind, name, attachmentId ) => {
+					if ( attachmentId === CROPPED_ATTACHMENT.id ) {
+						throw new Error( 'Network error' );
+					}
+					return undefined;
+				},
+			},
+			updatePayload: CROP_UPDATE,
+		} );
+
+		// The size and link still follow the edited image, rather than the
+		// block half-updating to the new file at its old settings.
+		expect( setAttributes ).toHaveBeenCalledTimes( 1 );
+		expect( setAttributes ).toHaveBeenCalledWith( {
+			id: 2,
+			url: 'cropped-300x200.jpg',
+			href: 'cropped.jpg',
+		} );
+	} );
+
 	it( 'derives the size of the edited image without a metadata baseline', async () => {
 		const { setAttributes, registry } = await runModalUpdate( {
 			// Custom metadata leaves the block with no fallback baseline, and
