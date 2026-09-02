@@ -9,6 +9,7 @@ import {
 	// @ts-expect-error `@wordpress/block-editor` has no type declarations.
 } from '@wordpress/block-editor';
 import { useAnchor } from '@wordpress/rich-text';
+import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { hasNoteFormatInRange, readInlineSelection } from './utils';
 
@@ -41,7 +42,8 @@ type FloatingAddNoteProps = {
  * The inline range the floating button would attach a note to, or null when
  * the button should stay hidden: the selection is collapsed, spans blocks,
  * isn't inside a rich-text attribute, already overlaps a `core/note` marker
- * (the note format syncs the sidebar to that note on its own).
+ * (the note format syncs the sidebar to that note on its own), or the new-note
+ * form is already open for it.
  */
 function useFloatingButtonSelection(): InlineSelection | null {
 	return useSelect( ( select ) => {
@@ -53,6 +55,13 @@ function useFloatingButtonSelection(): InlineSelection | null {
 		} = select( blockEditorStore );
 
 		if ( hasMultiSelection() ) {
+			return null;
+		}
+
+		// The selection persists while the user types in the sidebar form, so
+		// without this the button would keep floating over the text after it
+		// has done its job.
+		if ( unlock( select( editorStore ) ).getSelectedNote() === 'new' ) {
 			return null;
 		}
 

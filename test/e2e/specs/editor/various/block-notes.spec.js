@@ -1743,6 +1743,9 @@ test.describe( 'Block Notes', () => {
 			// Clicking it opens the new-note form, and saving wraps only the
 			// selected text: the click must not disturb the selection.
 			await floatingButton.click();
+			// Once the form is open the button has done its job and goes away,
+			// even though the selection it captured is still in the store.
+			await expect( floatingButton ).toBeHidden();
 			await page
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Just this word' );
