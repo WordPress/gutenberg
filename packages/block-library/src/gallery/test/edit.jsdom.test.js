@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { beforeEach, describe, expect, test } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createBlock, registerBlockType } from '@wordpress/blocks';
@@ -15,7 +15,7 @@ import {
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { unlock } from '../../lock-unlock';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 globalThis.wpVitest.mockResizeObserver();
 
 const IMAGE_ATTRIBUTES = {

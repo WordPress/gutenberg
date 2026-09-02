@@ -6,7 +6,7 @@ import BoxControl from '..';
 import type { BoxControlProps, BoxControlValue } from '../types';
 import styles from '../style.module.scss';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 // Since `BoxControlProps` is a the result of type unions, we need to use
 // a distributive version of the standard `Omit` utility.

@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
 import FontSizePicker from '../';
 import type { FontSize } from '../types';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 globalThis.wpVitest.mockResizeObserver();
 

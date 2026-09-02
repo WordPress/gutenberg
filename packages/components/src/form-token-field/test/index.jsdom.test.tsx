@@ -12,7 +12,7 @@ import { useState } from '@wordpress/element';
 import { logged } from '@wordpress/deprecated';
 import FormTokenField from '../';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 globalThis.wpVitest.mockScrollIntoView();
 

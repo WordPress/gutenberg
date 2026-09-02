@@ -5,7 +5,7 @@ import { render } from '@ariakit/test/react';
 import FontSizePickerSelect from '../font-size-picker-select';
 import type { FontSize } from '../types';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 describe( 'FontSizePickerSelect', () => {
 	const fontSizes: FontSize[] = [

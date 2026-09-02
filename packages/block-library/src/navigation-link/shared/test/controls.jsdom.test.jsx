@@ -4,7 +4,7 @@ import { Controls } from '../controls';
 import { useEntityBinding } from '../use-entity-binding';
 import { useIsInvalidLink } from '../use-is-invalid-link';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 // Mock the updateAttributes function
 let mockUpdateAttributes;

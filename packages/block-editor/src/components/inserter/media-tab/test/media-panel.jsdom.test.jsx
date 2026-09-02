@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MediaCategoryPanel } from '../media-panel';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 // Keep the panel's data + async surface out of the test: return a small,
 // non-empty result set so the grid (and the detach affordance) render.

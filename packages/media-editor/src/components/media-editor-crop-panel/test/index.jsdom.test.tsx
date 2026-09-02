@@ -5,7 +5,7 @@ import type { MediaEditorCropPanelProps } from '..';
 import { MediaEditorStateProvider } from '../../../state';
 import type { CropperState } from '../../../image-editor';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 function setupCropPanel(
 	overrides: Partial< MediaEditorCropPanelProps > = {},

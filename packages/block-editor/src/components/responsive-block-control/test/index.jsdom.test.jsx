@@ -5,7 +5,7 @@ import { Fragment, useState } from '@wordpress/element';
 import { SelectControl } from '@wordpress/components';
 import ResponsiveBlockControl from '../index';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 const inputId = 'input-12345678';
 

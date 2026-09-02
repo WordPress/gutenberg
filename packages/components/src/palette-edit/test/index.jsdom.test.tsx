@@ -7,7 +7,7 @@ import PaletteEdit, {
 } from '..';
 import type { PaletteElement } from '../types';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 const noop = () => {};
 

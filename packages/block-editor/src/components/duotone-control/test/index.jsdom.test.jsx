@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import DuotoneControl from '../';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 // Adding two custom duotones in Global Styles seeds both from the palette's
 // darkest and lightest colors, so two presets holding the same pair is the

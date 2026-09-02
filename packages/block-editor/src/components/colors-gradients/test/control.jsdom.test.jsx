@@ -3,7 +3,7 @@ import { screen } from '@testing-library/react';
 import { click, render } from '@ariakit/test/react';
 import ColorGradientControl from '../control';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 globalThis.wpVitest.mockResizeObserver();
 

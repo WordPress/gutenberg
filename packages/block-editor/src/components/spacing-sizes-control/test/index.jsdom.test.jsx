@@ -27,7 +27,7 @@ import { useSelect } from '@wordpress/data';
 import SpacingSizesControl from '../index';
 import useSpacingSizes from '../hooks/use-spacing-sizes';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 globalThis.wpVitest.mockVisibleElements();
 globalThis.wpVitest.mockScrollIntoView();

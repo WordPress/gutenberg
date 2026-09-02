@@ -5,7 +5,7 @@ import { useState } from '@wordpress/element';
 import BaseCheckboxControl from '..';
 import type { CheckboxControlProps } from '../types';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 const noop = () => {};
 

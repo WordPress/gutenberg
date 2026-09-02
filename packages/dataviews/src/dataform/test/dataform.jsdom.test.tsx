@@ -7,7 +7,7 @@ import { getSettings, setSettings } from '@wordpress/date';
 import Dataform from '../index';
 import useFormValidity from '../../hooks/use-form-validity';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 vi.mock( import( '@wordpress/a11y' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),

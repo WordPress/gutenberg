@@ -5,7 +5,7 @@ import { useState } from '@wordpress/element';
 import _NumberControl from '..';
 import type { NumberControlProps } from '../types';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 const NumberControl = (
 	props: React.ComponentProps< typeof _NumberControl >

@@ -5,7 +5,7 @@ import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
 import DimensionsTool from '../';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 globalThis.wpVitest.mockResizeObserver();
 

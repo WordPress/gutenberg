@@ -8,7 +8,7 @@ import BackgroundPanel, {
 	hasLegacyColorGradientValue,
 } from '../background-panel';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 globalThis.wpVitest.mockResizeObserver();
 

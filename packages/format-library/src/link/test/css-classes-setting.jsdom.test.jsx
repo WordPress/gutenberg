@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CSSClassesSettingComponent from '../css-classes-setting';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 describe( 'CSSClassesSettingComponent', () => {
 	it( 'renders checkbox and hides input by default when no value', async () => {

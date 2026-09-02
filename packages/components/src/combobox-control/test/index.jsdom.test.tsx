@@ -5,7 +5,7 @@ import { useState } from '@wordpress/element';
 import _ComboboxControl from '..';
 import type { ComboboxControlOption, ComboboxControlProps } from '../types';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 globalThis.wpVitest.mockScrollIntoView();
 

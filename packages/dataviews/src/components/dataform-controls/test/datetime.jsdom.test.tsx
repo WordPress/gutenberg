@@ -12,7 +12,7 @@ vi.mock(
 	() => ( { speak: vi.fn() } ) as unknown as typeof import('@wordpress/a11y')
 );
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 const noop = () => {};
 

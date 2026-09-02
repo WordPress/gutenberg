@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import grid from '../grid';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 const GridLayoutInspectorControls = grid.inspectorControls;
 const PANEL_ID = 'test-panel';

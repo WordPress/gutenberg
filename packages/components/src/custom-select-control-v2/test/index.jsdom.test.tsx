@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
 import UncontrolledCustomSelectControlV2 from '..';
 import type { CustomSelectProps } from '../types';
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 const items = [
 	{

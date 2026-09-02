@@ -54,7 +54,7 @@ const ValidatedInputControl = forwardRef<
 	);
 } );
 
-vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+globalThis.wpVitest.mockMatchMedia();
 
 describe( 'ControlWithError', () => {
 	describe( 'label cloning', () => {
