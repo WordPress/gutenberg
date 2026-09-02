@@ -109,23 +109,18 @@ export async function graphql( query, variables ) {
 }
 
 /**
- * Resolves the baseline commit SHA from the tag ref via the API.
+ * Resolves the baseline commit SHA from the tag ref via the API. A missing tag
+ * is not an error: it means nothing is required of open PRs yet.
  *
- * @param {boolean} [required] Throw when the tag does not exist.
  * @return {Promise<string | null>} Baseline commit SHA, or null when absent.
  */
-export async function getBaseline( required = true ) {
+export async function getBaseline() {
 	const ref = /** @type {any} */ (
 		await api( `/repos/${ REPO }/git/ref/tags/${ TAG }`, {
 			allow404: true,
 		} )
 	);
 	if ( ! ref ) {
-		if ( required ) {
-			throw new Error(
-				`The ${ TAG } tag does not exist; seed it via workflow dispatch.`
-			);
-		}
 		return null;
 	}
 	// Peel defensively; the tag should always be lightweight.
