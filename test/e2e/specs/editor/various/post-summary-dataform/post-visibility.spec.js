@@ -57,19 +57,12 @@ test.describe( 'Post visibility (DataForm inspector)', () => {
 
 		const summary = await openPostSummary( { editor, page } );
 
-		// Set a publish date for the next month.
+		// Set a publish date for the next year.
 		await summary.getByRole( 'button', { name: 'Edit Date' } ).click();
-		const nextMonth = new Date();
-		nextMonth.setDate( 15 );
-		nextMonth.setMonth( nextMonth.getMonth() + 1 );
-		const pad = ( number ) => String( number ).padStart( 2, '0' );
+		const nextYear = new Date().getFullYear() + 1;
 		await page
 			.getByLabel( 'Date time' )
-			.fill(
-				`${ nextMonth.getFullYear() }-${ pad(
-					nextMonth.getMonth() + 1
-				) }-${ pad( nextMonth.getDate() ) }T10:00`
-			);
+			.fill( `${ nextYear }-03-15T10:00` );
 		await page.keyboard.press( 'Escape' );
 
 		await summary.getByRole( 'button', { name: 'Edit Status' } ).click();
