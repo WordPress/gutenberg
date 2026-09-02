@@ -220,13 +220,14 @@ const VALID_ELEMENT_PSEUDO_SELECTORS: Record< string, string[] > = {
 		':focus-visible',
 		':active',
 	],
-	// Validation states follow focus states so validation styles win when declarations overlap.
+	// Validation states come before focus states because unconstrained inputs
+	// always match `:valid`, so user action styles must be output last to win.
 	textInput: [
-		':focus',
-		':focus-visible',
 		':required',
 		':valid',
 		':invalid',
+		':focus',
+		':focus-visible',
 		'::placeholder',
 	],
 };

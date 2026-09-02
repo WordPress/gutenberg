@@ -861,19 +861,23 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
-		it( 'outputs invalid after focus so validation color wins when both states match', () => {
+		it( 'outputs focus after validation states so focus color wins when both states match', () => {
 			const css = transformTextInputStyles( {
-				':invalid': { color: { text: 'red' } },
 				':focus': { color: { text: 'blue' } },
+				':valid': { color: { text: 'green' } },
+				':invalid': { color: { text: 'red' } },
 			} );
 
 			expect( css ).toEqual(
 				`:root :where(${ textInputSelectorWith(
-					':focus'
-				) }){color: blue;}` +
+					':valid'
+				) }){color: green;}` +
 					`:root :where(${ textInputSelectorWith(
 						':invalid'
-					) }){color: red;}`
+					) }){color: red;}` +
+					`:root :where(${ textInputSelectorWith(
+						':focus'
+					) }){color: blue;}`
 			);
 		} );
 

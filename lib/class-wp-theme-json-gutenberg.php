@@ -603,7 +603,9 @@ class WP_Theme_JSON_Gutenberg {
 	 * Defines which pseudo selectors are enabled for which elements.
 	 *
 	 * The selector order controls the cascade when multiple states match. Link and button
-	 * selectors follow the LVHA order, with focus-visible immediately after focus.
+	 * selectors follow the LVHA order, with focus-visible immediately after focus. Text input
+	 * validation states come before the focus states because unconstrained inputs always
+	 * match `:valid`, so user action styles must be output last to win.
 	 *
 	 * See https://core.trac.wordpress.org/ticket/56928.
 	 * Note: this will affect both top-level and block-level elements.
@@ -616,8 +618,7 @@ class WP_Theme_JSON_Gutenberg {
 	const VALID_ELEMENT_PSEUDO_SELECTORS = array(
 		'link'      => array( ':link', ':any-link', ':visited', ':hover', ':focus', ':focus-visible', ':active' ),
 		'button'    => array( ':link', ':any-link', ':visited', ':hover', ':focus', ':focus-visible', ':active' ),
-		// Validation states follow focus states so validation styles win when declarations overlap.
-		'textInput' => array( ':focus', ':focus-visible', ':required', ':valid', ':invalid', '::placeholder' ),
+		'textInput' => array( ':required', ':valid', ':invalid', ':focus', ':focus-visible', '::placeholder' ),
 	);
 
 	/**
