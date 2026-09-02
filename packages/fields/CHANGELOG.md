@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Append an ellipsis (`…`) to the labels of the actions that open a dialog requiring further input or confirmation (`Delete…`, `Trash…`, `Permanently delete…`, `Rename…`, `Duplicate…`, `Reset…`, `Order…`), following the menu ellipsis guideline. The dialog titles keep the ellipsis-free wording. ([#81994](https://github.com/WordPress/gutenberg/pull/81994))
+-   `trashPost`: Make the action a secondary one, so it no longer renders as a quick action button in DataViews rows: it opens a confirmation dialog, and quick actions should act immediately ([#81994](https://github.com/WordPress/gutenberg/pull/81994)).
 
 ### Bug Fixes
 
