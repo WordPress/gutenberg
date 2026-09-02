@@ -5,6 +5,7 @@ import { useSelect } from '@wordpress/data';
 import { Spinner } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { useStylesId } from '../../hooks/use-styles-id';
+import { useTemplateId } from '../../hooks/use-template-id';
 import { useEditorSettings } from '../../hooks/use-editor-settings';
 import { useEditorAssets } from '../../hooks/use-editor-assets';
 import { unlock } from '../../lock-unlock';
@@ -64,22 +65,10 @@ export function Editor( {
 	const resolvedPostId = postId || homePage?.postId;
 
 	// Resolve template ID from post type/ID
-	const templateId = useSelect(
-		( select ) => {
-			if ( ! resolvedPostType || ! resolvedPostId ) {
-				return undefined;
-			}
-			if ( resolvedPostType === 'wp_template' ) {
-				return resolvedPostId;
-			}
-			// Use private API to get template ID for this post
-			return unlock( select( coreDataStore ) ).getTemplateId(
-				resolvedPostType,
-				resolvedPostId
-			);
-		},
-		[ resolvedPostType, resolvedPostId ]
-	);
+	const templateId = useTemplateId( {
+		postType: resolvedPostType,
+		postId: resolvedPostId,
+	} );
 
 	// Resolve styles ID from template
 	const stylesId = useStylesId( { templateId } );
