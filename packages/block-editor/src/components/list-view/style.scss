@@ -83,6 +83,17 @@
 	&.is-selected.is-synced td {
 		background: var(--wp-block-synced-color);
 	}
+	@media (forced-colors: active) {
+		&.is-selected td,
+		&.is-selected.is-synced td {
+			background: SelectedItem;
+		}
+
+		&.is-selected .block-editor-list-view-block-contents,
+		&.is-selected .components-button.has-icon {
+			color: SelectedItemText;
+		}
+	}
 	&.is-synced:not(.is-selected) .block-editor-list-view-block-contents {
 		&:hover,
 		&:focus,
