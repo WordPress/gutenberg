@@ -10,6 +10,9 @@
  * The list of core modules allowed to opt-in to the private APIs.
  */
 const CORE_MODULES_USING_PRIVATE_APIS = [
+	// Do not remove: older `@wordpress/admin-ui` versions published to npm
+	// call the opt-in at module load, so a plugin bundling one of those
+	// copies throws at load time if this entry is missing.
 	'@wordpress/admin-ui',
 	'@wordpress/api-fetch',
 	'@wordpress/block-directory',
