@@ -792,6 +792,7 @@ describe( 'Entity record types', () => {
 				'view'
 			>;
 			true satisfies Expect< DefaultContextOf< 'root', 'icon' >, 'view' >;
+			true satisfies Expect< DefaultContextOf< 'root', 'site' >, 'view' >;
 
 			// The default reaches the selectors, so a view-default entity is
 			// not typed with the edit record.

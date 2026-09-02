@@ -20,6 +20,7 @@ import type {
 	CollectionFontFamily,
 	FontFace,
 	FontFamily,
+	WpFontFamily,
 } from '@wordpress/core-data';
 import { fetchInstallFontFamily } from './api';
 import {
@@ -237,11 +238,15 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 				// Get the font family if it already exists.
 				const fontFamilyRecords = await resolveSelect(
 					coreStore
-				).getEntityRecords( 'postType', 'wp_font_family', {
-					slug: fontFamilyToInstall.slug,
-					per_page: 1,
-					_embed: true,
-				} );
+				).getEntityRecords< WpFontFamily >(
+					'postType',
+					'wp_font_family',
+					{
+						slug: fontFamilyToInstall.slug,
+						per_page: 1,
+						_embed: true,
+					}
+				);
 
 				const fontFamilyPost =
 					fontFamilyRecords && fontFamilyRecords.length > 0
