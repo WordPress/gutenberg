@@ -1755,6 +1755,15 @@ test.describe( 'Block Notes', () => {
 			await expect( mark ).toHaveCount( 1 );
 			await expect( mark ).toHaveText( 'brave' );
 
+			// Saving moves focus to the new thread once it renders. Wait for
+			// that before clicking back into the canvas, or the late focus
+			// move would steal the keystrokes that make the next selection.
+			await expect(
+				page
+					.getByRole( 'treeitem' )
+					.filter( { hasText: 'Just this word' } )
+			).toBeFocused();
+
 			// Re-selecting text that already carries a note hides the button;
 			// the note format syncs the sidebar to that note instead. Waiting
 			// for the block-level button first rules out a stale one from the
