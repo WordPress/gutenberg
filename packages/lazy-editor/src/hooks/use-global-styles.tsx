@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';

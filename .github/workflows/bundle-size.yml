@@ -47,6 +47,7 @@ jobs:
         permissions:
             contents: read
             pull-requests: write
+        timeout-minutes: 15
 
         steps:
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -62,10 +63,8 @@ jobs:
                   check-latest: true
                   cache: npm
 
-            - name: Pin npm version for consistency
-              run: |
-                  npm install --global npm@10
-                  npm --version
+            - name: Set up npm
+              uses: ./.github/setup-npm
 
             - uses: preactjs/compressed-size-action@f322c295dde06a1cb7ccaef105732dd8a726d1d9 # v2.10.0
               with:
@@ -73,4 +72,4 @@ jobs:
                   repo-token: '${{ secrets.GITHUB_TOKEN }}'
                   pattern: '{build/scripts/**/*.min.js,build/styles/**/*.css,build/modules/**/*.min.js}'
                   clean-script: 'distclean'
-                  build-script: 'build -- --skip-types'
+                  build-script: 'build'

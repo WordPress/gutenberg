@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * Internal dependencies
- */
 import styles from '../style.module.scss';
 import { useToolsPanelContext } from '../context';
 import type { WordPressComponentProps } from '../../context';

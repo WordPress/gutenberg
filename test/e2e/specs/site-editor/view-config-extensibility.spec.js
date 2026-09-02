@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const PLUGIN_SLUG = 'gutenberg-test-view-config-extensibility';

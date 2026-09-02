@@ -1446,6 +1446,12 @@
 		"parent": "theme-json-reference"
 	},
 	{
+		"title": "View Configuration Reference",
+		"slug": "view-config-reference",
+		"markdown_source": "../docs/reference-guides/view-config-reference.md",
+		"parent": "reference-guides"
+	},
+	{
 		"title": "Component Reference",
 		"slug": "components",
 		"markdown_source": "../packages/components/README.md",
@@ -1509,18 +1515,6 @@
 		"title": "Button",
 		"slug": "button",
 		"markdown_source": "../packages/components/src/button/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "DateCalendar",
-		"slug": "date-calendar",
-		"markdown_source": "../packages/components/src/calendar/date-calendar/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "DateRangeCalendar",
-		"slug": "date-range-calendar",
-		"markdown_source": "../packages/components/src/calendar/date-range-calendar/README.md",
 		"parent": "components"
 	},
 	{
@@ -2616,6 +2610,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/kebab-case",
+		"slug": "packages-kebab-case",
+		"markdown_source": "../packages/kebab-case/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/keyboard-shortcuts",
 		"slug": "packages-keyboard-shortcuts",
 		"markdown_source": "../packages/keyboard-shortcuts/README.md",
@@ -3036,12 +3036,6 @@
 		"parent": "data"
 	},
 	{
-		"title": "Reusable blocks",
-		"slug": "data-core-reusable-blocks",
-		"markdown_source": "../docs/reference-guides/data/data-core-reusable-blocks.md",
-		"parent": "data"
-	},
-	{
 		"title": "Rich Text",
 		"slug": "data-core-rich-text",
 		"markdown_source": "../docs/reference-guides/data/data-core-rich-text.md",
@@ -3216,6 +3210,12 @@
 		"parent": "code"
 	},
 	{
+		"title": "Testing published packages across WordPress versions",
+		"slug": "package-runtime-compatibility",
+		"markdown_source": "../docs/contributors/code/package-runtime-compatibility.md",
+		"parent": "code"
+	},
+	{
 		"title": "Workspace Development",
 		"slug": "workspace-development",
 		"markdown_source": "../docs/contributors/code/workspace-development.md",
@@ -3274,6 +3274,12 @@
 		"slug": "design",
 		"markdown_source": "../docs/contributors/design/README.md",
 		"parent": "contributors"
+	},
+	{
+		"title": "Working with WordPress Design System packages",
+		"slug": "design-system-packages",
+		"markdown_source": "../docs/contributors/design/design-system-packages.md",
+		"parent": "design"
 	},
 	{
 		"title": "Blocks are the Interface",

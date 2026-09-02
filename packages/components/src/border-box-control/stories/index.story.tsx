@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import type { ComponentProps } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Button from '../../button';
 import { BorderBoxControl } from '../';
 
@@ -69,7 +58,7 @@ const Template: StoryFn< typeof BorderBoxControl > = ( props ) => {
 					borderBottom: 'none',
 				} }
 			/>
-			<p style={ { color: '#aaa', fontSize: '0.9em' } }>
+			<p style={ { color: '#6c6c6c', fontSize: '0.9em' } }>
 				The BorderBoxControl is intended to be used within a component
 				that will provide reset controls. The button below is only for
 				convenience.
@@ -89,4 +78,14 @@ Default.args = {
 	colors,
 	label: 'Borders',
 	enableStyle: true,
+};
+
+/**
+ * With no visible label there is no label row for the linked/unlinked toggle to
+ * join, so it is rendered alongside the border inputs instead.
+ */
+export const WithoutLabel = Template.bind( {} );
+WithoutLabel.args = {
+	...Default.args,
+	label: undefined,
 };

@@ -48,7 +48,7 @@ function gutenberg_initialize_experiments_settings() {
 				array(
 					'id'          => 'gutenberg-media-editor',
 					'label'       => __( 'Media Editor (Route)', 'gutenberg' ),
-					'description' => __( 'Enables a dedicated route-based media editor screen for editing media items (metadata and content).', 'gutenberg' ),
+					'description' => __( 'Replaces the core Edit Media screen with a dedicated route-based media editor for editing media items (metadata and content).', 'gutenberg' ),
 				),
 				array(
 					'id'          => 'gutenberg-dataviews-media-modal',
@@ -85,14 +85,13 @@ function gutenberg_initialize_experiments_settings() {
 			),
 		),
 		array(
-			'slug'  => 'templates',
-			'label' => _x( 'Templates', 'experiments group name', 'gutenberg' ),
+			'slug'  => 'real-time-collaboration',
+			'label' => _x( 'Real-Time Collaboration', 'experiments group name', 'gutenberg' ),
 			'items' => array(
 				array(
-					'id'             => 'active_templates',
-					'label'          => __( 'Template Activation', 'gutenberg' ),
-					'description'    => __( 'Allows multiple templates of the same type to be created, of which one can be active at a time. (Warning: when you deactivate this experiment, it is best to delete all created templates except for the active ones.)', 'gutenberg' ),
-					'separateOption' => true,
+					'id'          => 'gutenberg-real-time-collaboration',
+					'label'       => __( 'Enable real-time collaboration', 'gutenberg' ),
+					'description' => __( 'Allows multiple people to edit the same post at the same time.', 'gutenberg' ),
 				),
 			),
 		),
@@ -121,11 +120,6 @@ function gutenberg_initialize_experiments_settings() {
 					'description' => __( 'Enables the Guidelines page under Settings and the experimental knowledge storage (wp_knowledge).', 'gutenberg' ),
 				),
 				array(
-					'id'          => 'gutenberg-content-types',
-					'label'       => __( 'Content types', 'gutenberg' ),
-					'description' => __( 'Enables a UI for creating and managing custom taxonomies and custom post types under Settings.', 'gutenberg' ),
-				),
-				array(
 					'id'          => 'gutenberg-dashboard-widgets',
 					'label'       => __( 'New Dashboard experience', 'gutenberg' ),
 					'description' => __( 'Enables a new dashboard experience with resizable, reorderable widgets that plugins can register and users can personalize.', 'gutenberg' ),
@@ -150,14 +144,6 @@ function gutenberg_initialize_experiments_settings() {
 				'group'       => $group['slug'],
 				'group_label' => $group['label'],
 			);
-
-			// Metadata-only entry: values for separateOption experiments live in
-			// their own option (e.g. `active_templates`). Surfaced here so the UI
-			// can render them from the settings schema.
-			if ( ! empty( $experiment['separateOption'] ) ) {
-				$property['separate_option'] = true;
-				$property['option_name']     = $experiment['id'];
-			}
 
 			$properties[ $experiment['id'] ] = $property;
 		}

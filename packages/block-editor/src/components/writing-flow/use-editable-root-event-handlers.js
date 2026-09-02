@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
 import { BlockRefs } from '../provider/block-refs-provider';

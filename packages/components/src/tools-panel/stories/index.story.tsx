@@ -1,26 +1,11 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import styled from '@emotion/styled';
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import {
 	ToggleGroupControl,
 	ToggleGroupControlOption,
 } from '../../toggle-group-control';
-
-/**
- * Internal dependencies
- */
 import { ToolsPanel, ToolsPanelItem } from '..';
 import Panel from '../../panel';
 import UnitControl from '../../unit-control';

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
 import type { Action, Field } from '@wordpress/dataviews';
 import { doAction } from '@wordpress/hooks';
@@ -63,20 +60,10 @@ import {
 	mediaDimensionsField,
 	mimeTypeField,
 } from '@wordpress/media-fields';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import { ATTACHMENT_POST_TYPE, DESIGN_POST_TYPES } from '../../store/constants';
 import postPreviewField from '../fields/content-preview';
 import { unlock } from '../../lock-unlock';
-
-declare global {
-	interface Window {
-		__experimentalTemplateActivate?: boolean;
-	}
-}
 
 /**
  * Check if a post type supports editor notes.
@@ -211,26 +198,15 @@ export const registerPostTypeSchema =
 			.getEditorSettings();
 
 		let canDuplicate =
-			! [ 'wp_block', 'wp_template_part' ].includes(
+			! [ 'wp_block', 'wp_template_part', 'wp_template' ].includes(
 				postTypeConfig.slug
 			) &&
 			canCreate &&
 			duplicatePost;
 
-		// @ts-ignore
+		// @ts-expect-error `globalThis` has no index signature for this build-time global.
 		if ( ! globalThis.IS_GUTENBERG_PLUGIN ) {
-			// Outside Gutenberg, disable duplication except for wp_template.
-			if ( 'wp_template' !== postTypeConfig.slug ) {
-				canDuplicate = undefined;
-			}
-		}
-
-		// When template activation experiment is disabled, templates cannot be duplicated.
-		// @ts-ignore
-		if (
-			postTypeConfig.slug === 'wp_template' &&
-			! window?.__experimentalTemplateActivate
-		) {
+			// Outside Gutenberg, disable duplication.
 			canDuplicate = undefined;
 		}
 
@@ -239,7 +215,6 @@ export const registerPostTypeSchema =
 			!! postTypeConfig.supports?.revisions
 				? viewPostRevisions
 				: undefined,
-			// @ts-ignore
 			canDuplicate,
 			postTypeConfig.slug === 'wp_template_part' &&
 			canCreate &&

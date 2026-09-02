@@ -24,6 +24,28 @@ concurrency:
 permissions: {}
 
 jobs:
+    unit-js-routing:
+        name: JavaScript test routing
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+              with:
+                  node-version: '20'
+
+            - name: Validate JavaScript test routing
+              run: npm run test:unit:routing
+
     unit-js:
         name: JavaScript (Node.js ${{ matrix.node }}) ${{ matrix.shard }}
         runs-on: 'ubuntu-24.04'
@@ -56,13 +78,26 @@ jobs:
               with:
                   node-version: ${{ matrix.node }}
 
+            - name: Detect Browser Mode tests
+              id: browser-tests
+              run: |
+                  FOUND="$(node test/unit/scripts/has-browser-tests-for-shard.mjs "${{ matrix.shard }}")"
+                  echo "found=$FOUND" >> "$GITHUB_OUTPUT"
+
+            - name: Install Chromium for Browser Mode tests
+              if: ${{ steps.browser-tests.outputs.found == 'true' }}
+              uses: ./.github/setup-playwright
+              with:
+                  workspace: '@wordpress/unit-tests'
+                  browsers: chromium
+
             - name: Run build scripts
               # It's not necessary to run the full build, since Jest can interpret
               # source files with `babel-jest`. Some packages have their own custom
               # build tasks, however. These must be run.
               run: npx lerna run build
 
-            - name: Running the tests
+            - name: Run the remaining Jest partition
               env:
                   SHARD: ${{ matrix.shard }}
                   # Record the Node.js major as a custom flakiness environment
@@ -74,7 +109,19 @@ jobs:
                     --ci \
                     --maxWorkers="$(nproc)" \
                     --shard="$SHARD" \
-                    --cacheDirectory="$HOME/.jest-cache"
+                    --cacheDirectory="$HOME/.jest-cache" \
+                    --passWithNoTests
+
+            - name: Run the migrated Vitest partition
+              env:
+                  SHARD: ${{ matrix.shard }}
+                  # Preserve the same Flakiness.io environment identity used
+                  # by the Jest partition.
+                  FK_ENV_NODEJS: ${{ matrix.node }}
+              run: |
+                  npm run test:unit:vitest -- \
+                    --shard="$SHARD" \
+                    --passWithNoTests
 
     unit-js-date:
         name: JavaScript Date Tests (Node.js ${{ matrix.node }})
@@ -163,7 +210,7 @@ jobs:
               uses: ./.github/setup-node
 
             - name: Run build scripts
-              run: npm run build -- --skip-types
+              run: npm run build
 
             - name: Upload built JavaScript assets
               uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

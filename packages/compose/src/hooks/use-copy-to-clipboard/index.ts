@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useRef, useLayoutEffect } from '@wordpress/element';
 import type { MutableRefObject, RefCallback } from 'react';
-
-/**
- * Internal dependencies
- */
 import useRefEffect from '../use-ref-effect';
 
 /**

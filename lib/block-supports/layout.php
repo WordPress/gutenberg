@@ -284,15 +284,35 @@ function gutenberg_get_layout_container_values( $layout ) {
  * Regex for CSS value borrowed from `safecss_filter_attr`, used here to only match
  * against the value, not the CSS attribute.
  *
- * @param string|array|null $gap_value Block gap value.
- * @return string|array|null Sanitized block gap value.
+ * Numeric zero is converted to a string because it is valid CSS without a unit.
+ * Other non-string values are rejected.
+ *
+ * @param mixed $gap_value Block gap value.
+ * @return string|string[]|null Sanitized block gap value.
  */
 function gutenberg_sanitize_block_gap_value( $gap_value ) {
 	if ( is_array( $gap_value ) ) {
 		foreach ( $gap_value as $key => $value ) {
-			$gap_value[ $key ] = ! is_scalar( $value ) || ( $value && preg_match( '%[\\\(&=}]|/\*%', (string) $value ) ) ? null : $value;
+			$sanitized_value = gutenberg_sanitize_block_gap_value( $value );
+			if ( ! is_string( $sanitized_value ) ) {
+				unset( $gap_value[ $key ] );
+				continue;
+			}
+			$gap_value[ $key ] = $sanitized_value;
 		}
-		return $gap_value;
+		return empty( $gap_value ) ? null : $gap_value;
+	}
+
+	if ( ( is_int( $gap_value ) || is_float( $gap_value ) ) && 0.0 === (float) $gap_value ) {
+		return '0';
+	}
+
+	if ( ! is_string( $gap_value ) ) {
+		return null;
+	}
+
+	if ( '' === trim( $gap_value ) ) {
+		return null;
 	}
 
 	return $gap_value && preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ? null : $gap_value;
@@ -360,8 +380,17 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
 		}
 	}
 
-	$column_start = $child_layout['columnStart'] ?? null;
-	$column_span  = $child_layout['columnSpan'] ?? null;
+	/*
+	 * Grid line numbers and spans are whole numbers. The editor stores them as numbers, but
+	 * content saved by WordPress 6.3 to 6.6 stored them as numeric strings, and that
+	 * migration only runs when a block is parsed in JavaScript, so the front end still sees
+	 * strings. Accept any numeric value and cast it, and treat anything else as absent
+	 * because it can't render as valid CSS.
+	 */
+	$column_start_attr = $child_layout['columnStart'] ?? null;
+	$column_start      = is_numeric( $column_start_attr ) ? (int) $column_start_attr : null;
+	$column_span_attr  = $child_layout['columnSpan'] ?? null;
+	$column_span       = is_numeric( $column_span_attr ) ? (int) $column_span_attr : null;
 	if ( null === $viewport_overrides || $has_viewport_property_override( 'columnStart' ) || $has_viewport_property_override( 'columnSpan' ) ) {
 		if ( $column_start && $column_span ) {
 			$child_layout_declarations['grid-column'] = "$column_start / span $column_span";
@@ -372,8 +401,10 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
 		}
 	}
 
-	$row_start = $child_layout['rowStart'] ?? null;
-	$row_span  = $child_layout['rowSpan'] ?? null;
+	$row_start_attr = $child_layout['rowStart'] ?? null;
+	$row_start      = is_numeric( $row_start_attr ) ? (int) $row_start_attr : null;
+	$row_span_attr  = $child_layout['rowSpan'] ?? null;
+	$row_span       = is_numeric( $row_span_attr ) ? (int) $row_span_attr : null;
 	if ( null === $viewport_overrides || $has_viewport_property_override( 'rowStart' ) || $has_viewport_property_override( 'rowSpan' ) ) {
 		if ( $row_start && $row_span ) {
 			$child_layout_declarations['grid-row'] = "$row_start / span $row_span";
@@ -391,8 +422,9 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
 		);
 	}
 
-	$minimum_column_width = $parent_layout['minimumColumnWidth'] ?? null;
-	$column_count         = $parent_layout['columnCount'] ?? null;
+	$minimum_column_width_attr = $parent_layout['minimumColumnWidth'] ?? null;
+	$minimum_column_width      = is_string( $minimum_column_width_attr ) ? $minimum_column_width_attr : null;
+	$column_count              = $parent_layout['columnCount'] ?? null;
 
 	/*
 	 * If columnSpan or columnStart is set, and the parent grid is responsive, i.e. if it has a minimumColumnWidth set,
@@ -460,18 +492,25 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
 /**
  * Generates the CSS corresponding to the provided layout.
  *
- * @param string               $selector                      CSS selector.
- * @param array                $layout                        Layout object. The one that is passed has already checked
- *                                                            the existence of default block layout.
- * @param bool                 $has_block_gap_support         Optional. Whether the theme has support for the block gap. Default false.
- * @param string|string[]|null $gap_value                     Optional. The block gap value to apply. Default null.
- * @param bool                 $should_skip_gap_serialization Optional. Whether to skip applying the user-defined value set in the editor. Default false.
- * @param string|array         $fallback_gap_value            Optional. The block gap value to apply. If it's an array expected properties are "top" and/or "left". Default '0.5em'.
- * @param array|null           $block_spacing                 Optional. Custom spacing set on the block. Default null.
- * @param array                $options                       Optional. Extra options for internal callers. Default empty array.
+ * @param string                         $selector                      CSS selector.
+ * @param array                          $layout                        Layout object. The one that is passed has already checked
+ *                                                                       the existence of default block layout.
+ * @param bool                           $has_block_gap_support         Optional. Whether the theme has support for the block gap. Default false.
+ * @param string|string[]|int|float|null $gap_value                     Optional. The block gap value to apply. Only zero is accepted as a
+ *                                                                       numeric value. Default null.
+ * @param bool                           $should_skip_gap_serialization Optional. Whether to skip applying the user-defined value set in the
+ *                                                                       editor. Default false.
+ * @param string|string[]|int|float|null $fallback_gap_value            Optional. The fallback block gap value to apply. Only zero is accepted
+ *                                                                       as a numeric value. Default '0.5em'.
+ * @param array|null                     $block_spacing                 Optional. Custom spacing set on the block. Default null.
+ * @param array                          $options                       Optional. Extra options for internal callers. Default empty array.
  * @return string CSS styles, or empty string.
  */
 function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null, $should_skip_gap_serialization = false, $fallback_gap_value = '0.5em', $block_spacing = null, $options = array() ) {
+	// Normalize here as well as at external data boundaries because this function has direct callers.
+	$gap_value          = gutenberg_sanitize_block_gap_value( $gap_value );
+	$fallback_gap_value = gutenberg_sanitize_block_gap_value( $fallback_gap_value ) ?? '0.5em';
+
 	$base_layout             = is_array( $layout ) ? $layout : array();
 	$viewport_overrides      = $options['viewport_overrides'] ?? null;
 	$layout_for_styles       = null === $viewport_overrides ? $base_layout : array_replace( $base_layout, $viewport_overrides );
@@ -520,9 +559,14 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			}
 		}
 	} elseif ( 'constrained' === $layout_type ) {
-		$content_size    = $layout_for_styles['contentSize'] ?? '';
-		$wide_size       = $layout_for_styles['wideSize'] ?? '';
-		$justify_content = $layout_for_styles['justifyContent'] ?? 'center';
+		// The schemas and editor UI only produce strings here, so treat a non-string
+		// value as absent rather than casting it — it couldn't render as valid CSS anyway.
+		$content_size_attr    = $layout_for_styles['contentSize'] ?? null;
+		$content_size         = is_string( $content_size_attr ) ? $content_size_attr : '';
+		$wide_size_attr       = $layout_for_styles['wideSize'] ?? null;
+		$wide_size            = is_string( $wide_size_attr ) ? $wide_size_attr : '';
+		$justify_content_attr = $layout_for_styles['justifyContent'] ?? null;
+		$justify_content      = is_string( $justify_content_attr ) ? $justify_content_attr : 'center';
 
 		// Check if viewport-specific ("override") values exist. Null values are valid and mean the user cleared a value inherited from the default viewport.
 		$has_justify_content_override = null !== $viewport_overrides && $has_viewport_property_override( 'justifyContent' );
@@ -733,7 +777,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			}
 			$gap_value = trim( $combined_gap_value );
 
-			if ( null !== $gap_value && ! $should_skip_gap_serialization ) {
+			if ( '' !== $gap_value && ! $should_skip_gap_serialization ) {
 				$layout_styles[] = array(
 					'selector'     => $selector,
 					'declarations' => array( 'gap' => $gap_value ),
@@ -741,23 +785,26 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			}
 		}
 
+		$flex_justify_content    = $layout_for_styles['justifyContent'] ?? null;
+		$flex_vertical_alignment = $layout_for_styles['verticalAlignment'] ?? null;
+
 		if ( 'horizontal' === $layout_orientation ) {
 			/*
 			 * Add this style only if is not empty for backwards compatibility,
 			 * since we intend to convert blocks that had flex layout implemented
 			 * by custom css.
 			 */
-			if ( $should_output_flex_justification && ! empty( $layout_for_styles['justifyContent'] ) && array_key_exists( $layout_for_styles['justifyContent'], $justify_content_options ) ) {
+			if ( $should_output_flex_justification && ! empty( $flex_justify_content ) && is_string( $flex_justify_content ) && array_key_exists( $flex_justify_content, $justify_content_options ) ) {
 				$layout_styles[] = array(
 					'selector'     => $selector,
-					'declarations' => array( 'justify-content' => $justify_content_options[ $layout_for_styles['justifyContent'] ] ),
+					'declarations' => array( 'justify-content' => $justify_content_options[ $flex_justify_content ] ),
 				);
 			}
 
-			if ( $should_output_flex_alignment && ! empty( $layout_for_styles['verticalAlignment'] ) && array_key_exists( $layout_for_styles['verticalAlignment'], $vertical_alignment_options ) ) {
+			if ( $should_output_flex_alignment && ! empty( $flex_vertical_alignment ) && is_string( $flex_vertical_alignment ) && array_key_exists( $flex_vertical_alignment, $vertical_alignment_options ) ) {
 				$layout_styles[] = array(
 					'selector'     => $selector,
-					'declarations' => array( 'align-items' => $vertical_alignment_options[ $layout_for_styles['verticalAlignment'] ] ),
+					'declarations' => array( 'align-items' => $vertical_alignment_options[ $flex_vertical_alignment ] ),
 				);
 			}
 		} else {
@@ -767,10 +814,10 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 					'declarations' => array( 'flex-direction' => 'column' ),
 				);
 			}
-			if ( $should_output_flex_justification && ! empty( $layout_for_styles['justifyContent'] ) && array_key_exists( $layout_for_styles['justifyContent'], $justify_content_options ) ) {
+			if ( $should_output_flex_justification && ! empty( $flex_justify_content ) && is_string( $flex_justify_content ) && array_key_exists( $flex_justify_content, $justify_content_options ) ) {
 				$layout_styles[] = array(
 					'selector'     => $selector,
-					'declarations' => array( 'align-items' => $justify_content_options[ $layout_for_styles['justifyContent'] ] ),
+					'declarations' => array( 'align-items' => $justify_content_options[ $flex_justify_content ] ),
 				);
 			} elseif ( $should_output_flex_justification ) {
 				$layout_styles[] = array(
@@ -778,16 +825,25 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 					'declarations' => array( 'align-items' => 'flex-start' ),
 				);
 			}
-			if ( $should_output_flex_alignment && ! empty( $layout_for_styles['verticalAlignment'] ) && array_key_exists( $layout_for_styles['verticalAlignment'], $vertical_alignment_options ) ) {
+			if ( $should_output_flex_alignment && ! empty( $flex_vertical_alignment ) && is_string( $flex_vertical_alignment ) && array_key_exists( $flex_vertical_alignment, $vertical_alignment_options ) ) {
 				$layout_styles[] = array(
 					'selector'     => $selector,
-					'declarations' => array( 'justify-content' => $vertical_alignment_options[ $layout_for_styles['verticalAlignment'] ] ),
+					'declarations' => array( 'justify-content' => $vertical_alignment_options[ $flex_vertical_alignment ] ),
 				);
 			}
 		}
 	} elseif ( 'grid' === $layout_type ) {
 		/*
-		 * If the gap value is an array, we use the "left" value because it represents the vertical gap, which
+		 * Column and row counts are whole numbers, for the same reason as the grid line
+		 * numbers in gutenberg_get_child_layout_style_rules().
+		 */
+		$column_count_attr = $layout_for_styles['columnCount'] ?? null;
+		$column_count      = is_numeric( $column_count_attr ) ? (int) $column_count_attr : null;
+		$row_count_attr    = $layout_for_styles['rowCount'] ?? null;
+		$row_count         = is_numeric( $row_count_attr ) ? (int) $row_count_attr : null;
+
+		/*
+		 * If the gap value is an array, we use the "left" value because it represents the horizontal gap, which
 		 * is the relevant one for computation of responsive grid columns.
 		 */
 		if ( is_array( $fallback_gap_value ) ) {
@@ -816,10 +872,12 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 					$slug            = _wp_to_kebab_case( substr( $process_value, $index_to_splice ) );
 					$process_value   = "var(--wp--preset--spacing--$slug)";
 				}
+				if ( ! is_array( $gap_value ) || 'left' === $gap_side ) {
+					$responsive_gap_value = $process_value;
+				}
 				$combined_gap_value .= "$process_value ";
 			}
-			$gap_value            = trim( $combined_gap_value );
-			$responsive_gap_value = $gap_value;
+			$gap_value = trim( $combined_gap_value );
 		}
 
 		// Ensure 0 values have a unit so they work in calc().
@@ -831,12 +889,12 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		 * value for any of the grid properties.
 		 */
 		$should_output_grid_columns = null === $viewport_overrides || $has_viewport_property_override( 'minimumColumnWidth' ) || $has_viewport_property_override( 'columnCount' ) || $has_viewport_property_override( 'autoFit' );
-		$uses_gap_in_grid_columns   = ! empty( $layout_for_styles['columnCount'] ) && ! empty( $layout_for_styles['minimumColumnWidth'] );
+		$uses_gap_in_grid_columns   = ! empty( $column_count ) && ! empty( $layout_for_styles['minimumColumnWidth'] );
 		if ( $has_block_gap_override && $uses_gap_in_grid_columns ) {
 			$should_output_grid_columns = true;
 		}
 
-		$should_output_grid_rows = ( null === $viewport_overrides || $has_viewport_property_override( 'rowCount' ) ) && ! empty( $layout_for_styles['columnCount'] ) && ! empty( $layout_for_styles['rowCount'] );
+		$should_output_grid_rows = ( null === $viewport_overrides || $has_viewport_property_override( 'rowCount' ) ) && ! empty( $column_count ) && ! empty( $row_count );
 		$grid_declarations       = array();
 
 		/* When enabled, columns stretch to fill the available space using
@@ -844,11 +902,11 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		 */
 		$auto_placement = ! empty( $layout_for_styles['autoFit'] ) ? 'auto-fit' : 'auto-fill';
 
-		if ( $should_output_grid_columns && ! empty( $layout_for_styles['columnCount'] ) && ! empty( $layout_for_styles['minimumColumnWidth'] ) ) {
-			$max_value                                  = 'max(min(' . $layout_for_styles['minimumColumnWidth'] . ', 100%), (100% - (' . $responsive_gap_value . ' * (' . $layout_for_styles['columnCount'] . ' - 1))) /' . $layout_for_styles['columnCount'] . ')';
+		if ( $should_output_grid_columns && ! empty( $column_count ) && ! empty( $layout_for_styles['minimumColumnWidth'] ) ) {
+			$max_value                                  = 'max(min(' . $layout_for_styles['minimumColumnWidth'] . ', 100%), (100% - (' . $responsive_gap_value . ' * (' . $column_count . ' - 1))) /' . $column_count . ')';
 			$grid_declarations['grid-template-columns'] = 'repeat(' . $auto_placement . ', minmax(' . $max_value . ', 1fr))';
-		} elseif ( $should_output_grid_columns && ! empty( $layout_for_styles['columnCount'] ) ) {
-			$grid_declarations['grid-template-columns'] = 'repeat(' . $layout_for_styles['columnCount'] . ', minmax(0, 1fr))';
+		} elseif ( $should_output_grid_columns && ! empty( $column_count ) ) {
+			$grid_declarations['grid-template-columns'] = 'repeat(' . $column_count . ', minmax(0, 1fr))';
 		} elseif ( $should_output_grid_columns ) {
 			$minimum_column_width                       = ! empty( $layout_for_styles['minimumColumnWidth'] ) ? $layout_for_styles['minimumColumnWidth'] : '12rem';
 			$grid_declarations['grid-template-columns'] = 'repeat(' . $auto_placement . ', minmax(min(' . $minimum_column_width . ', 100%), 1fr))';
@@ -856,7 +914,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 
 		if ( ! empty( $grid_declarations ) ) {
 			$base_has_container_type = empty( $base_layout['columnCount'] ) || ( ! empty( $base_layout['columnCount'] ) && ! empty( $base_layout['minimumColumnWidth'] ) );
-			if ( empty( $layout_for_styles['columnCount'] ) || ! empty( $layout_for_styles['minimumColumnWidth'] ) ) {
+			if ( empty( $column_count ) || ! empty( $layout_for_styles['minimumColumnWidth'] ) ) {
 				if ( null === $viewport_overrides || ! $base_has_container_type ) {
 					$grid_declarations['container-type'] = 'inline-size';
 				}
@@ -870,7 +928,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		if ( $should_output_grid_rows ) {
 			$layout_styles[] = array(
 				'selector'     => $selector,
-				'declarations' => array( 'grid-template-rows' => 'repeat(' . $layout_for_styles['rowCount'] . ', minmax(1rem, auto))' ),
+				'declarations' => array( 'grid-template-rows' => 'repeat(' . $row_count . ', minmax(1rem, auto))' ),
 			);
 		}
 
@@ -953,8 +1011,6 @@ function gutenberg_unique_id_from_values( array $data, string $prefix = '' ): st
  * @return string                Filtered block content.
  */
 function gutenberg_render_layout_support_flag( $block_content, $block ) {
-	static $global_styles = null;
-
 	$block_type            = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	$block_supports_layout = block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false );
 	$style_attr            = gutenberg_resolve_style_state_aliases(
@@ -1121,20 +1177,23 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	 * not intended to provide an extended set of classes to match all block layout attributes
 	 * here.
 	 */
-	if ( ! empty( $block['attrs']['layout']['orientation'] ) ) {
-		$class_names[] = 'is-' . sanitize_title( $block['attrs']['layout']['orientation'] );
+	$orientation = $block['attrs']['layout']['orientation'] ?? null;
+	if ( ! empty( $orientation ) && is_string( $orientation ) ) {
+		$class_names[] = 'is-' . sanitize_title( $orientation );
 	}
 
-	if ( ! empty( $block['attrs']['layout']['justifyContent'] ) ) {
-		$class_names[] = 'is-content-justification-' . sanitize_title( $block['attrs']['layout']['justifyContent'] );
+	$justify_content = $block['attrs']['layout']['justifyContent'] ?? null;
+	if ( ! empty( $justify_content ) && is_string( $justify_content ) ) {
+		$class_names[] = 'is-content-justification-' . sanitize_title( $justify_content );
 	}
 
-	if ( ! empty( $block['attrs']['layout']['flexWrap'] ) && 'nowrap' === $block['attrs']['layout']['flexWrap'] ) {
+	$flex_wrap = $block['attrs']['layout']['flexWrap'] ?? null;
+	if ( ! empty( $flex_wrap ) && 'nowrap' === $flex_wrap ) {
 		$class_names[] = 'is-nowrap';
 	}
 
 	// Get classname for layout type.
-	if ( isset( $used_layout['type'] ) ) {
+	if ( isset( $used_layout['type'] ) && is_string( $used_layout['type'] ) ) {
 		$layout_classname = $layout_definitions[ $used_layout['type'] ]['className'] ?? '';
 	} else {
 		$layout_classname = $layout_definitions['default']['className'] ?? '';
@@ -1152,7 +1211,9 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 		$gap_value = gutenberg_sanitize_block_gap_value( $block['attrs']['style']['spacing']['blockGap'] ?? null );
 
-		$fallback_gap_value = $block_type->supports['spacing']['blockGap']['__experimentalDefault'] ?? '0.5em';
+		$fallback_gap_value = gutenberg_sanitize_block_gap_value(
+			$block_type->supports['spacing']['blockGap']['__experimentalDefault'] ?? null
+		) ?? '0.5em';
 		$block_spacing      = $block['attrs']['style']['spacing'] ?? null;
 
 		/*
@@ -1166,10 +1227,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 		// Get default blockGap value from global styles for use in layouts like grid.
 		// Check style variation first, then block-specific styles, then fall back to root styles.
-		$block_name = $block['blockName'] ?? '';
-		if ( null === $global_styles ) {
-			$global_styles = gutenberg_get_global_styles();
-		}
+		$block_name    = $block['blockName'] ?? '';
+		$global_styles = gutenberg_get_global_styles();
 
 		// Check if the block has an active style variation with a blockGap value.
 		// Only check the registry if the className contains a variation class to avoid unnecessary lookups.
@@ -1186,7 +1245,19 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			}
 		}
 
-		$global_block_gap_value = $variation_block_gap_value ?? $global_styles['blocks'][ $block_name ]['spacing']['blockGap'] ?? $global_styles['spacing']['blockGap'] ?? null;
+		$global_block_gap_candidates = array(
+			$variation_block_gap_value,
+			$global_styles['blocks'][ $block_name ]['spacing']['blockGap'] ?? null,
+			$global_styles['spacing']['blockGap'] ?? null,
+		);
+		$global_block_gap_value      = null;
+		foreach ( $global_block_gap_candidates as $candidate_gap_value ) {
+			$candidate_gap_value = gutenberg_sanitize_block_gap_value( $candidate_gap_value );
+			if ( null !== $candidate_gap_value ) {
+				$global_block_gap_value = $candidate_gap_value;
+				break;
+			}
+		}
 
 		if ( null !== $global_block_gap_value ) {
 			$fallback_gap_value = $global_block_gap_value;
@@ -1459,7 +1530,8 @@ add_filter( 'render_block', 'gutenberg_render_layout_support_flag', 10, 2 );
  * @return string                Filtered block content.
  */
 function gutenberg_restore_group_inner_container( $block_content, $block ) {
-	$tag_name                         = $block['attrs']['tagName'] ?? 'div';
+	$tag_name_attr                    = $block['attrs']['tagName'] ?? null;
+	$tag_name                         = is_string( $tag_name_attr ) ? $tag_name_attr : 'div';
 	$group_with_inner_container_regex = sprintf(
 		'/(^\s*<%1$s\b[^>]*wp-block-group(\s|")[^>]*>)(\s*<div\b[^>]*wp-block-group__inner-container(\s|")[^>]*>)((.|\S|\s)*)/U',
 		preg_quote( $tag_name, '/' )

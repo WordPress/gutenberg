@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
@@ -10,12 +7,8 @@ import {
 	Button,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
-	__experimentalInputControl as InputControl,
+	__experimentalInputControl as WCInputControl,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import type { CoreDataError, BasePost } from '../types';
 
 interface RenderModalProps< Item > {
@@ -92,7 +85,7 @@ function ReorderModal( {
 						'Determines the order of pages. Pages with the same order value are sorted alphabetically. Negative order values are supported.'
 					) }
 				</div>
-				<InputControl
+				<WCInputControl
 					label={ __( 'Order' ) }
 					type="number"
 					value={

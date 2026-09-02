@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getSibling } from './utils';
 
 function isFormattingSpace( character: string ): boolean {

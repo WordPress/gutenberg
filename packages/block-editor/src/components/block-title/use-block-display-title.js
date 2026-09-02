@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import {
 	__experimentalGetBlockLabel as getBlockLabel,
 	store as blocksStore,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 
 /**

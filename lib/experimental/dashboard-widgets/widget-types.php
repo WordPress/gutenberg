@@ -165,9 +165,12 @@ function gutenberg_resolve_widget_action_href( $href, $dir_name ) {
 
 /**
  * Sanitizes widget actions to `id` / `label` / `href` (via `esc_url_raw()`),
- * plus optional `download` / `openInNewTab`. Drops incomplete or unsafe
- * entries; dropped hrefs are reported through `_doing_it_wrong()`. With
- * `$dir_name`, resolves widget-local file hrefs first.
+ * plus optional `download` / `openInNewTab` / `icon` / `relevance`. Drops
+ * incomplete or unsafe entries; dropped hrefs are reported through
+ * `_doing_it_wrong()`. With `$dir_name`, resolves widget-local file hrefs
+ * first. A malformed `icon` or `relevance` drops the key, never the action;
+ * a `download` filename that sanitizes to nothing becomes `true`, the
+ * download under its original name.
  *
  * This is the registration gate for manifest-sourced widget types. Definitions
  * registered only on the client do not pass through it; any future CPT/API
@@ -223,10 +226,12 @@ function gutenberg_sanitize_widget_actions( $actions, $dir_name = '' ) {
 			if ( is_bool( $action['download'] ) ) {
 				$entry['download'] = $action['download'];
 			} else {
-				$filename = sanitize_file_name( (string) $action['download'] );
-				if ( $filename ) {
-					$entry['download'] = $filename;
-				}
+				/*
+				 * A filename that sanitizes to nothing keeps the download
+				 * under the original name; only `false` means navigation.
+				 */
+				$filename          = sanitize_file_name( (string) $action['download'] );
+				$entry['download'] = '' !== $filename ? $filename : true;
 			}
 		}
 
@@ -234,10 +239,41 @@ function gutenberg_sanitize_widget_actions( $actions, $dir_name = '' ) {
 			$entry['openInNewTab'] = (bool) $action['openInNewTab'];
 		}
 
+		if ( isset( $action['icon'] ) ) {
+			$icon = gutenberg_sanitize_widget_icon( $action['icon'] );
+			if ( $icon ) {
+				$entry['icon'] = $icon;
+			}
+		}
+
+		if ( isset( $action['relevance'] ) && in_array( $action['relevance'], array( 'high', 'medium', 'low' ), true ) ) {
+			$entry['relevance'] = $action['relevance'];
+		}
+
 		$sanitized[] = $entry;
 	}
 
 	return $sanitized ? $sanitized : null;
+}
+
+/**
+ * Constrains a widget icon reference to a registered icon name
+ * (`collection/icon-name`). Anything else drops silently, so authoring
+ * forms not accepted yet degrade to no icon rather than warn.
+ *
+ * @param string|null $icon Icon reference from the build manifest.
+ * @return string|null The icon name, or null when the shape does not match.
+ */
+function gutenberg_sanitize_widget_icon( $icon ) {
+	if ( ! is_string( $icon ) || '' === $icon ) {
+		return null;
+	}
+
+	if ( ! preg_match( '#^[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?/[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?$#', $icon ) ) {
+		return null;
+	}
+
+	return $icon;
 }
 
 /**
@@ -273,6 +309,7 @@ function gutenberg_register_widget_types() {
 				'title'         => $widget['title'] ?? null,
 				'description'   => $widget['description'] ?? null,
 				'help'          => gutenberg_sanitize_widget_help( $widget['help'] ?? null ),
+				'icon'          => gutenberg_sanitize_widget_icon( $widget['icon'] ?? null ),
 				'actions'       => gutenberg_sanitize_widget_actions(
 					$widget['actions'] ?? null,
 					$widget['dir_name'] ?? ''

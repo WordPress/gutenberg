@@ -1,14 +1,7 @@
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const webpack = require( 'webpack' );
 const json2php = require( 'json2php' );
 const { createHash } = webpack.util;
-
-/**
- * Internal dependencies
- */
 const {
 	defaultRequestToExternal,
 	defaultRequestToExternalModule,

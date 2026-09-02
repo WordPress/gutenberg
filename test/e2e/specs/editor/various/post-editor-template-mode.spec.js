@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -267,7 +264,9 @@ class PostEditorTemplateMode {
 	}
 
 	async saveTemplateWithoutPublishing() {
-		await this.page.click( 'role=button[name="Back"i]' );
+		await this.page
+			.getByRole( 'button', { name: 'Back', exact: true } )
+			.click();
 		await this.page
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'Save', exact: true } )

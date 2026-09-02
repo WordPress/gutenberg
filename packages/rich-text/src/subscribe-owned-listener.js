@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { privateApis as composePrivateApis } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { ownsSelection } from './owns-selection';
 import { unlock } from './lock-unlock';
 

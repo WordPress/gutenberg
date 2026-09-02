@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
 import {
 	__unstableSerializeAndClean,
 	parse,
@@ -19,10 +12,6 @@ import {
 	type SyncConfig,
 	Y,
 } from '@wordpress/sync';
-
-/**
- * Internal dependencies
- */
 import { BaseAwareness } from '../awareness/base-awareness';
 import {
 	type Block,

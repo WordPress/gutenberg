@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, isRTL, sprintf } from '@wordpress/i18n';
 import {
@@ -12,9 +9,7 @@ import {
 	formatListBullets,
 	listView,
 	external,
-	keyboard,
 	symbol,
-	page,
 	layout,
 	rotateRight,
 	rotateLeft,
@@ -26,10 +21,6 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 import {
@@ -94,6 +85,9 @@ const getEditorCommandLoader = () =>
 			isFocusMode,
 			isPreviewMode,
 			isViewable,
+			isPublished,
+			viewLink,
+			viewItemLabel,
 			isCodeEditingEnabled,
 			isRichEditingEnabled,
 			isPublishSidebarEnabled,
@@ -101,10 +95,16 @@ const getEditorCommandLoader = () =>
 			disableContentOnlyForTemplateParts,
 		} = useSelect( ( select ) => {
 			const { get } = select( preferencesStore );
-			const { isListViewOpened, getCurrentPostType, getEditorSettings } =
-				select( editorStore );
+			const {
+				isListViewOpened,
+				getCurrentPostType,
+				getEditorSettings,
+				getEditedPostAttribute,
+				isCurrentPostPublished,
+			} = select( editorStore );
 			const { getSettings } = select( blockEditorStore );
 			const { getPostType } = select( coreStore );
+			const postType = getPostType( getCurrentPostType() );
 
 			return {
 				editorMode: get( 'core', 'editorMode' ) ?? 'visual',
@@ -113,8 +113,10 @@ const getEditorCommandLoader = () =>
 				isDistractionFree: get( 'core', 'distractionFree' ),
 				isFocusMode: get( 'core', 'focusMode' ),
 				isPreviewMode: getSettings().isPreviewMode,
-				isViewable:
-					getPostType( getCurrentPostType() )?.viewable ?? false,
+				isViewable: postType?.viewable ?? false,
+				isPublished: isCurrentPostPublished(),
+				viewLink: getEditedPostAttribute( 'link' ),
+				viewItemLabel: postType?.labels?.view_item,
 				isCodeEditingEnabled: getEditorSettings().codeEditingEnabled,
 				isRichEditingEnabled: getEditorSettings().richEditingEnabled,
 				isPublishSidebarEnabled:
@@ -160,7 +162,6 @@ const getEditorCommandLoader = () =>
 		commands.push( {
 			name: 'core/open-shortcut-help',
 			label: __( 'Keyboard shortcuts' ),
-			icon: keyboard,
 			category: 'view',
 			callback: ( { close } ) => {
 				close();
@@ -348,6 +349,19 @@ const getEditorCommandLoader = () =>
 					window.open( link, `wp-preview-${ postId }` );
 				},
 			} );
+
+			if ( isPublished && viewLink ) {
+				commands.push( {
+					name: 'core/view-link',
+					label: viewItemLabel || __( 'View post' ),
+					icon: external,
+					category: 'view',
+					callback: ( { close } ) => {
+						close();
+						window.open( viewLink, '_blank' );
+					},
+				} );
+			}
 		}
 
 		return {

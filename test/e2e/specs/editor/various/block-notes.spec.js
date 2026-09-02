@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -1018,7 +1015,7 @@ test.describe( 'Block Notes', () => {
 			await pageUtils.pressKeys( 'primary+Enter' );
 			await expect(
 				textbox,
-				`doesn't sumbit an empty form and focus remains in the textbox`
+				`doesn't submit an empty form and focus remains in the textbox`
 			).toBeFocused();
 
 			await textbox.pressSequentially( 'A test comment' );

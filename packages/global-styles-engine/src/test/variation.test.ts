@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getVariationStyle } from '../variation';
 
 describe( 'getVariationStyle', () => {

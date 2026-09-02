@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import DataViews from '../index';
 import LayoutActivityComponent from './layout-activity';
 import LayoutTableComponent from './layout-table';
@@ -18,18 +11,12 @@ import WithCardComponent from './with-card';
 import FreeCompositionComponent from './free-composition';
 import MinimalUIComponent from './minimal-ui';
 import EmptyComponent from './empty';
-
 import './style.css';
 
 const meta = {
 	tags: [ 'manifest' ],
 	title: 'DataViews/DataViews',
 	component: DataViews,
-	// Temporary: Due to an upstream bug, render the root explicitly so the
-	// components manifest extractor can resolve props from the JSX.
-	//
-	// See: https://github.com/storybookjs/storybook/issues/34877
-	render: ( args ) => <DataViews { ...args } />,
 	args: {
 		containerHeight: 'auto',
 	},
@@ -104,11 +91,18 @@ export const LayoutTable = {
 };
 
 export const LayoutGrid = {
+	parameters: {
+		// FIXME: Grid media buttons lack names (button-name).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	render: LayoutGridComponent,
 	args: {
 		groupBy: false,
 		groupByLabel: true,
 		hasClickableItems: true,
+		mediaFit: 'cover',
+		mediaFitControl: true,
 		perPageSizes: [ 10, 25, 50, 100 ],
 		showMedia: true,
 	},
@@ -129,6 +123,17 @@ export const LayoutGrid = {
 		hasClickableItems: {
 			control: 'boolean',
 			description: 'Are the items clickable',
+		},
+		mediaFit: {
+			control: 'select',
+			options: [ 'cover', 'contain' ],
+			description:
+				'How the media field fills the preview box: cropped to fill it ("cover") or fitted inside it ("contain"), letterboxing the media so its own aspect ratio stays visible',
+		},
+		mediaFitControl: {
+			control: 'boolean',
+			description:
+				'Whether the view options offer the "Original aspect ratio" toggle, letting users switch the media fit themselves',
 		},
 		perPageSizes: {
 			control: 'object',
@@ -252,6 +257,11 @@ export const Empty = {
 };
 
 export const MinimalUI = {
+	parameters: {
+		// FIXME: Scroll region is not keyboard-accessible (scrollable-region-focusable).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	render: MinimalUIComponent,
 	argTypes: {
 		layout: {
@@ -293,6 +303,9 @@ export const InfiniteScroll = {
 export const AsyncInfiniteScroll = {
 	render: AsyncInfiniteScrollComponent,
 	parameters: {
+		// FIXME: List items lack a required parent (aria-required-parent).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
 		// Fill the viewport so the list bottom is the window bottom.
 		containerHeight: 'calc(100vh - 2rem)',
 	},

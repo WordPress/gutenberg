@@ -1,9 +1,7 @@
-/**
- * External dependencies
- */
 import { createRequire } from 'module';
 import { join, resolve } from 'path';
 import globals from 'globals';
+import { globSync } from 'glob';
 import eslintCommentsPlugin from '@eslint-community/eslint-plugin-eslint-comments';
 import storybookPlugin from 'eslint-plugin-storybook';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
@@ -12,11 +10,9 @@ import testingLibraryPlugin from 'eslint-plugin-testing-library';
 import jestPlugin from 'eslint-plugin-jest';
 import tseslint from 'typescript-eslint';
 import wpBuildConfig from '../../packages/wp-build/eslint-overrides.cjs';
-
 const require = createRequire( import.meta.url );
 const rootDir = resolve( import.meta.dirname, '../..' );
 const wpPlugin = require( '@wordpress/eslint-plugin' );
-
 // Prefer the installed React version for linting, but fall back to the detected version.
 let reactVersion = 'detect';
 try {
@@ -66,10 +62,27 @@ const developmentFiles = [
 ];
 
 // All files from packages that have types provided with TypeScript.
-const glob = require( 'glob' ).sync;
-const typedFiles = glob( 'packages/*/package.json', { cwd: rootDir } )
+const typedFiles = globSync( 'packages/*/package.json', {
+	cwd: rootDir,
+	posix: true,
+} )
+	.sort()
 	.filter( ( fileName ) => require( join( rootDir, fileName ) ).types )
-	.map( ( fileName ) => fileName.replace( 'package.json', '**/*.js' ) );
+	.map( ( fileName ) => fileName.replace( 'package.json', '**/*.{js,jsx}' ) );
+
+// All files from bundled packages: packages not registered as WordPress
+// scripts or script modules, which plugins therefore compile into their own
+// bundles when importing them via npm.
+const bundledPackageFiles = globSync( 'packages/*/package.json', {
+	cwd: rootDir,
+	posix: true,
+} )
+	.sort()
+	.filter( ( fileName ) => {
+		const pkg = require( join( rootDir, fileName ) );
+		return ! pkg.wpScript && ! pkg.wpScriptModuleExports;
+	} )
+	.map( ( fileName ) => fileName.replace( 'package.json', '**' ) );
 
 const restrictedImports = [
 	{
@@ -129,6 +142,21 @@ const restrictedImports = [
 	},
 ];
 
+// Restrictions applied to every bundled package: a plugin bundling such a
+// package compiles a second copy of private-apis, which cannot unlock objects
+// locked by the WordPress copy and throws at runtime. Existing usage is
+// grandfathered in `tools/eslint/suppressions.json` and may only shrink.
+const privateApisRestrictedImport = {
+	name: '@wordpress/private-apis',
+	message:
+		'Bundled packages may be compiled into plugin bundles via npm, where a second copy of private-apis cannot unlock objects locked by the WordPress copy and throws at runtime.',
+};
+const lockUnlockRestrictedPattern = {
+	group: [ '**/lock-unlock', '**/lock-unlock.*' ],
+	message:
+		'This module wraps @wordpress/private-apis, which bundled packages must not depend on: a plugin bundling this package compiles a second copy of private-apis that cannot unlock objects locked by the WordPress copy and throws at runtime.',
+};
+
 const useIsomorphicLayoutEffectRestrictedImport = {
 	name: '@wordpress/element',
 	importNames: [ 'useLayoutEffect' ],
@@ -146,8 +174,12 @@ const UI_RESTRICTED_IMPORTS = {
 			( { name } ) => name !== '@base-ui/react'
 		),
 		useIsomorphicLayoutEffectRestrictedImport,
+		// `@wordpress/ui` is a bundled package, but its overrides below would
+		// replace the bundled-packages override, so the restriction is
+		// re-applied here.
+		privateApisRestrictedImport,
 	],
-	patterns: [],
+	patterns: [ lockUnlockRestrictedPattern ],
 };
 
 const restrictedSyntax = [
@@ -245,6 +277,8 @@ export default dedupePlugins( [
 			'example-*/',
 		],
 	},
+	// ESLint's default file discovery does not include JSX files.
+	{ files: [ '**/*.jsx' ] },
 
 	// Base recommended config from @wordpress/eslint-plugin.
 	...wpPlugin.configs.recommended,
@@ -281,6 +315,20 @@ export default dedupePlugins( [
 			'import/resolver': require.resolve( './import-resolver.cjs' ),
 		},
 		rules: {
+			/*
+			 * `@ts-ignore` keeps silently passing even after the error it was
+			 * added for is gone. Require `@ts-expect-error` instead, along with
+			 * a description explaining why the suppression is needed.
+			 */
+			'@typescript-eslint/ban-ts-comment': [
+				'error',
+				{
+					'ts-expect-error': 'allow-with-description',
+					'ts-ignore': true,
+					'ts-nocheck': true,
+					'ts-check': false,
+				},
+			],
 			'react/jsx-boolean-value': 'error',
 			'react/jsx-curly-brace-presence': [
 				'error',
@@ -308,12 +356,28 @@ export default dedupePlugins( [
 						Autocomplete: 'WCAutocomplete',
 						Badge: 'WCBadge',
 						Icon: 'WCIcon',
+						__experimentalInputControl: 'WCInputControl',
+						TextareaControl: 'WCTextareaControl',
 						Tooltip: 'WCTooltip',
 					},
 				},
 			],
+			'@wordpress/dependency-group': [ 'error', 'never' ],
 			'import/default': 'error',
 			'import/named': 'error',
+			'import/order': [
+				'error',
+				{
+					groups: [
+						'builtin', // Node.js built-in modules
+						'external', // npm packages
+						'internal', // Aliased modules
+						[ 'parent', 'sibling', 'index' ], // Relative imports
+					],
+					'newlines-between': 'never',
+					warnOnUnassignedImports: true,
+				},
+			],
 			'no-restricted-imports': [
 				'error',
 				{
@@ -329,6 +393,10 @@ export default dedupePlugins( [
 				{
 					definedTags: [ 'jest-environment' ],
 				},
+			],
+			'react/jsx-filename-extension': [
+				'error',
+				{ extensions: [ '.tsx' ] },
 			],
 			'react-hooks/config': [
 				'error',
@@ -393,9 +461,9 @@ export default dedupePlugins( [
 
 	// Override: Package source files — forbid raw SVG elements.
 	{
-		files: [ 'packages/**/*.js' ],
+		files: [ 'packages/**/*.{js,jsx}' ],
 		ignores: [
-			'packages/block-library/src/*/save.js',
+			'packages/block-library/src/*/save.{js,jsx}',
 			...developmentFiles,
 		],
 		rules: {
@@ -440,8 +508,8 @@ export default dedupePlugins( [
 		...config,
 		files: [
 			'packages/jest*/**/*.js',
-			'**/test/**/*.js',
-			'**/__tests__/**/*.js',
+			'**/test/**/*.{js,jsx}',
+			'**/__tests__/**/*.{js,jsx}',
 		],
 		ignores: [ 'test/e2e/**/*.js', 'test/performance/**/*.js' ],
 	} ) ),
@@ -610,20 +678,6 @@ export default dedupePlugins( [
 		rules: {
 			'react-hooks/rules-of-hooks': 'off',
 			'react-hooks/static-components': 'off',
-		},
-	},
-
-	// Override: Storybook + components — enforce JSX file extensions.
-	{
-		files: [
-			'**/@(storybook|stories)/**',
-			'packages/components/src/**/*.tsx',
-		],
-		rules: {
-			'react/jsx-filename-extension': [
-				'error',
-				{ extensions: [ '.jsx', '.tsx' ] },
-			],
 		},
 	},
 
@@ -816,6 +870,35 @@ export default dedupePlugins( [
 		},
 	},
 
+	// Override: bundled packages — restrict private-apis imports, both direct
+	// and via each package's local `lock-unlock` wrapper module.
+	// `packages/ui` is excluded because this entry would replace its more
+	// specific overrides above; it gets the same restriction through
+	// `UI_RESTRICTED_IMPORTS`. `packages/e2e-test-utils-playwright` is
+	// excluded so its own `no-restricted-imports` override above (uuid) keeps
+	// applying; as Node-only test tooling it cannot hit this hazard.
+	{
+		files: bundledPackageFiles.filter(
+			( files ) =>
+				! [
+					'packages/ui/**',
+					'packages/e2e-test-utils-playwright/**',
+				].includes( files )
+		),
+		rules: {
+			'no-restricted-imports': [
+				'error',
+				{
+					paths: [
+						...restrictedImports,
+						privateApisRestrictedImport,
+					],
+					patterns: [ lockUnlockRestrictedPattern ],
+				},
+			],
+		},
+	},
+
 	// Override: edit-post, edit-site — restrict interface imports.
 	{
 		files: [ 'packages/edit-post/**', 'packages/edit-site/**' ],
@@ -849,19 +932,6 @@ export default dedupePlugins( [
 		files: [ 'packages/interactivity*/src/**' ],
 		rules: {
 			'react/react-in-jsx-scope': 'error',
-		},
-	},
-
-	// Override: Packages which have eliminated dependency grouping comments
-	// and explicitly prevent new additions.
-	{
-		files: [
-			'packages/design-system-mcp/**',
-			'packages/ui/**',
-			'packages/theme/**',
-		],
-		rules: {
-			'@wordpress/dependency-group': [ 'error', 'never' ],
 		},
 	},
 
@@ -924,7 +994,7 @@ export default dedupePlugins( [
 		files: [
 			'packages/block-editor/src/components/inserter/media-tab/hooks.js',
 			'packages/block-editor/src/components/use-paste-styles/index.js',
-			'packages/block-library/src/pattern/edit.js',
+			'packages/block-library/src/pattern/edit.jsx',
 			'packages/components/src/sandbox/index.tsx',
 		],
 		rules: {

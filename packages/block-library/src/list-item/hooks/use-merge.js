@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useRegistry, useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { isUnmodifiedBlock, switchToBlockType } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import useOutdentListItem from './use-outdent-list-item';
 
 export default function useMerge( clientId, onMerge ) {
@@ -16,6 +9,7 @@ export default function useMerge( clientId, onMerge ) {
 		getPreviousBlockClientId,
 		getNextBlockClientId,
 		getBlockOrder,
+		getBlockIndex,
 		getBlockRootClientId,
 		getBlockName,
 		getBlock,
@@ -67,6 +61,18 @@ export default function useMerge( clientId, onMerge ) {
 							clientIdB,
 							clientIdA
 						);
+					} else if (
+						getParentListItemId( clientIdB ) === clientIdA
+					) {
+						// Merging into the parent item's own line: the
+						// children take the item's place in its list, one
+						// level up, since their line moved there.
+						moveBlocksToPosition(
+							getBlockOrder( nestedListClientId ),
+							nestedListClientId,
+							getBlockRootClientId( clientIdB ),
+							getBlockIndex( clientIdB ) + 1
+						);
 					} else {
 						moveBlocksToPosition(
 							getBlockOrder( nestedListClientId ),
@@ -75,7 +81,13 @@ export default function useMerge( clientId, onMerge ) {
 						);
 					}
 				}
+				const listId = getBlockRootClientId( clientIdB );
 				mergeBlocks( clientIdA, clientIdB );
+				// Merging the last item of a nested list into its parent
+				// line leaves the list block empty.
+				if ( ! getBlockOrder( listId ).length ) {
+					removeBlock( listId, false );
+				}
 			} );
 		}
 
@@ -133,22 +145,22 @@ export default function useMerge( clientId, onMerge ) {
 						}
 					}
 				}
-			} else if ( getParentListItemId( nextBlockClientId ) ) {
-				outdentListItem( nextBlockClientId );
 			} else {
 				mergeWithNested( clientId, nextBlockClientId );
 			}
 		} else {
-			// Merging is only done from the top level. For lowel levels, the
-			// list item is outdented instead.
-			if ( getParentListItemId( clientId ) ) {
-				outdentListItem( clientId );
-				return;
-			}
+			// Merge into the previous line: the trailing item of the
+			// previous sibling, or the parent item's own line for a first
+			// child.
 			const previousBlockClientId = getPreviousBlockClientId( clientId );
 			if ( previousBlockClientId ) {
 				const trailingId = getTrailingId( previousBlockClientId );
 				mergeWithNested( trailingId, clientId );
+				return;
+			}
+			const parentListItemId = getParentListItemId( clientId );
+			if ( parentListItemId ) {
+				mergeWithNested( parentListItemId, clientId );
 				return;
 			}
 

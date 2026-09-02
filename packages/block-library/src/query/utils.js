@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
@@ -189,7 +186,7 @@ export function useIsPostTypeHierarchical( postType ) {
 }
 
 /**
- * List of avaiable options to order by.
+ * List of available options to order by.
  *
  * @param {string} postType The post type to check.
  * @return {OrderByOption[]} List of order options.

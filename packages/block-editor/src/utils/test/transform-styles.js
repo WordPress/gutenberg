@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import transformStyles from '../transform-styles';
 
 describe( 'transformStyles', () => {

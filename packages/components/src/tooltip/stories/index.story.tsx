@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { shortcutAriaLabel } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import Tooltip from '..';
 import Button from '../../button';
 

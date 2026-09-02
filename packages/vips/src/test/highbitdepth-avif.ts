@@ -1,13 +1,5 @@
-/**
- * @jest-environment node
- */
-
-/**
- * External dependencies
- */
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-
 /**
  * Loads the real `wasm-vips` build to exercise the actual AVIF decoder.
  *

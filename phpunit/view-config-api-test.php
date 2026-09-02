@@ -66,7 +66,7 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 	 * Tears down each test.
 	 */
 	public function tear_down() {
-		remove_all_filters( 'get_entity_view_config_postType_unregistered_cpt' );
+		remove_all_filters( 'get_entity_view_config_posttype_unregistered_cpt' );
 		remove_all_filters( 'get_entity_view_config_custom_kind_custom_name' );
 		parent::tear_down();
 	}
@@ -142,6 +142,28 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 				'name' => 'custom_name',
 			),
 			$received_entity
+		);
+	}
+
+	/**
+	 * The dynamic filter name lowercases the entity kind and name.
+	 */
+	public function test_filter_hook_name_is_lowercased() {
+		$called = false;
+		add_filter(
+			'get_entity_view_config_posttype_unregistered_cpt',
+			function ( $data ) use ( &$called ) {
+				$called = true;
+				return $data;
+			}
+		);
+
+		gutenberg_get_entity_view_config( 'postType', 'Unregistered_CPT' );
+
+		$this->assertTrue( $called );
+		$this->assertSame(
+			'get_entity_view_config_posttype_unregistered_cpt',
+			gutenberg_get_entity_view_config_hook_name( 'postType', 'Unregistered_CPT' )
 		);
 	}
 

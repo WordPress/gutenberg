@@ -246,10 +246,8 @@ jobs:
                   node-version-file: '.nvmrc'
                   check-latest: true
 
-            - name: Pin npm version for consistency
-              run: |
-                  npm install --global npm@10
-                  npm --version
+            - name: Set up npm
+              uses: ./.github/setup-npm
 
             - name: Configure build for wordpress-develop
               if: ${{ ! matrix.IS_GUTENBERG_PLUGIN }}
@@ -339,7 +337,7 @@ jobs:
               run: tar -czf ${{ runner.temp }}/gutenberg.tar.gz . && mv ${{ runner.temp }}/gutenberg.tar.gz .
 
             - name: Login to GitHub Container Registry
-              uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
+              uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
               with:
                   registry: ghcr.io
                   username: ${{ github.actor }}
@@ -569,10 +567,10 @@ jobs:
                   registry-url: 'https://registry.npmjs.org'
                   check-latest: true
 
-            - name: Pin npm version for consistency
-              run: |
-                  npm install --global npm@10
-                  npm --version
+            - name: Set up npm
+              uses: ./main/.github/setup-npm
+              with:
+                  working-directory: main
 
             - name: Publish packages to npm ("latest" dist-tag)
               run: |
