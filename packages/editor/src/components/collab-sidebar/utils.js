@@ -134,6 +134,28 @@ export function addNoteIdToMetadata( metadata, noteId ) {
 const NOTE_FORMAT_TYPE = 'core/note';
 
 /**
+ * Parse a block attribute value into its per-character format stacks, but
+ * only when it can hold a `core/note` marker: a `RichTextData` or an HTML
+ * string that mentions `wp-note`. Anything else (or marker-free content)
+ * returns null so callers can skip the parse.
+ *
+ * @param {*} value Block attribute value (RichTextData, string, or other).
+ * @return {?Array} Format stacks per character, or null.
+ */
+function getNoteMarkerFormats( value ) {
+	let html = null;
+	if ( value instanceof RichTextData ) {
+		html = value.toHTMLString();
+	} else if ( typeof value === 'string' ) {
+		html = value;
+	}
+	if ( ! html || html.indexOf( 'wp-note' ) === -1 ) {
+		return null;
+	}
+	return create( { html } ).formats;
+}
+
+/**
  * Search a rich-text value for a `core/note` marker matching `noteId` and
  * return its character range. Used to derive an inline note's anchor from
  * the in-content marker (resilient to edits) rather than stale offset meta.
@@ -146,18 +168,11 @@ export function findNoteRange( value, noteId ) {
 	if ( noteId === undefined || noteId === null ) {
 		return null;
 	}
-	let html = null;
-	if ( value instanceof RichTextData ) {
-		html = value.toHTMLString();
-	} else if ( typeof value === 'string' ) {
-		html = value;
-	}
-	if ( ! html || html.indexOf( 'wp-note' ) === -1 ) {
+	const formats = getNoteMarkerFormats( value );
+	if ( ! formats ) {
 		return null;
 	}
 	const target = String( noteId );
-	const record = create( { html } );
-	const formats = record.formats;
 	let start = -1;
 	for ( let i = 0; i < formats.length; i++ ) {
 		const stack = formats[ i ];
@@ -179,6 +194,67 @@ export function findNoteRange( value, noteId ) {
 		return { start, end: formats.length };
 	}
 	return null;
+}
+
+/**
+ * Whether any `core/note` marker covers an offset inside the given range.
+ * Lets the floating add-note button stay hidden when the selection already
+ * sits on an inline note, which the note format's caret sync handles instead.
+ *
+ * @param {*}      value Block attribute value (RichTextData, string, or other).
+ * @param {number} start Range start offset.
+ * @param {number} end   Range end offset.
+ * @return {boolean} True when the range overlaps a `core/note` marker.
+ */
+export function hasNoteFormatInRange( value, start, end ) {
+	if ( ! Number.isInteger( start ) || ! Number.isInteger( end ) ) {
+		return false;
+	}
+	const formats = getNoteMarkerFormats( value );
+	if ( ! formats ) {
+		return false;
+	}
+	const lo = Math.min( start, end );
+	const hi = Math.min( Math.max( start, end ), formats.length );
+	for ( let i = lo; i < hi; i++ ) {
+		if ( formats[ i ]?.some( ( f ) => f.type === NOTE_FORMAT_TYPE ) ) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
+ * Read an inline selection from block-editor selection state, returning
+ * normalized anchor data when a non-collapsed selection sits inside a single
+ * rich-text attribute. Returns null for block-level or collapsed selections.
+ *
+ * @param {Object} start Selection start (from `getSelectionStart`).
+ * @param {Object} end   Selection end (from `getSelectionEnd`).
+ * @return {?{clientId: string, attributeKey: string, start: number, end: number}} Normalized inline range, or null.
+ */
+export function readInlineSelection( start, end ) {
+	if (
+		! start?.clientId ||
+		start.clientId !== end?.clientId ||
+		! start.attributeKey ||
+		start.offset === undefined ||
+		end.offset === undefined ||
+		start.offset === end.offset
+	) {
+		return null;
+	}
+	// Normalize direction so callers don't have to think about reversed ranges.
+	const [ startOffset, endOffset ] =
+		start.offset < end.offset
+			? [ start.offset, end.offset ]
+			: [ end.offset, start.offset ];
+	return {
+		clientId: start.clientId,
+		attributeKey: start.attributeKey,
+		start: startOffset,
+		end: endOffset,
+	};
 }
 
 /**
