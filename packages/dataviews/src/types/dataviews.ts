@@ -392,7 +392,7 @@ interface ViewBase {
  * primary column (`titleField`, `mediaField`, `descriptionField`), so styles
  * keyed by those field ids are ignored. In the `table` layout the primary
  * column is sized by the table itself, taking the width the other columns
- * leave over.
+ * leave over; without a primary column, the last column in `fields` does.
  */
 export interface ColumnStyle {
 	/**
