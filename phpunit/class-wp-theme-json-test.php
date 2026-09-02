@@ -7771,6 +7771,63 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that a block style variation declaring `spacing.blockGap` emits a layout
+	 * gap rule scoped to the variation.
+	 *
+	 * The variation node carries the variation slug in its `name`, which
+	 * `get_layout_styles()` reads as a block name. A slug is never a registered block,
+	 * so without care the layout rules for every variation are dropped.
+	 *
+	 * @covers WP_Theme_JSON_Gutenberg::get_styles_for_block
+	 */
+	public function test_block_style_variation_with_block_gap_emits_layout_styles() {
+		$registry = WP_Block_Styles_Registry::get_instance();
+		$registry->register( 'core/group', array( 'name' => 'custom-group' ) );
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'spacing' => array(
+						'blockGap' => true,
+					),
+				),
+				'styles'   => array(
+					'blocks' => array(
+						'core/group' => array(
+							'variations' => array(
+								'custom-group' => array(
+									'spacing' => array(
+										'blockGap' => '3em',
+									),
+								),
+							),
+						),
+					),
+				),
+			),
+			'blocks'
+		);
+
+		$stylesheet = $theme_json->get_stylesheet(
+			array( 'styles' ),
+			array( 'custom' ),
+			array(
+				'include_block_style_variations' => true,
+				'skip_root_layout_styles'        => true,
+			)
+		);
+
+		$registry->unregister( 'core/group', 'custom-group' );
+
+		$this->assertStringContainsString(
+			':root :where(.wp-block-group.is-style-custom-group.wp-block-group-is-layout-flex){gap: 3em;}',
+			$stylesheet,
+			'The variation should emit a gap rule scoped to itself.'
+		);
+	}
+
+	/**
 	 * This test covers `get_block_nodes` with the `$include_node_paths_only` option.
 	 * When `true`, `$include_node_paths_only` should return only the paths of the block nodes.
 	 */

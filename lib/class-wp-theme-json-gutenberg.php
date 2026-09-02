@@ -3879,8 +3879,17 @@ class WP_Theme_JSON_Gutenberg {
 				// Only store if the variation has blockGap defined.
 				if ( isset( $style_variation_node['spacing']['blockGap'] ) ) {
 					// Append block selector to the variation selector for proper targeting.
-					$variation_metadata_with_selector                                = $style_variation;
-					$variation_metadata_with_selector['selector']                    = $style_variation['selector'] . $block_metadata['css'];
+					$variation_metadata_with_selector             = $style_variation;
+					$variation_metadata_with_selector['selector'] = $style_variation['selector'] . $block_metadata['css'];
+
+					/*
+					 * `get_layout_styles()` reads `name` as a block name and returns early when
+					 * that block has no layout support. A variation node's `name` is the variation
+					 * slug, which is never a registered block, so leaving it here discards every
+					 * variation gap rule.
+					 */
+					unset( $variation_metadata_with_selector['name'] );
+
 					$style_variation_layout_metadata[ $style_variation['selector'] ] = array(
 						'metadata' => $variation_metadata_with_selector,
 						'node'     => $style_variation_node,
