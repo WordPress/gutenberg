@@ -1,9 +1,10 @@
 import { render } from '@testing-library/react';
 import { speak } from '@wordpress/a11y';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as Notice from '../index';
 
-jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
-const mockedSpeak = jest.mocked( speak );
+vi.mock( '@wordpress/a11y', () => ( { speak: vi.fn() } ) );
+const mockedSpeak = vi.mocked( speak );
 
 describe( 'Notice spoken messages', () => {
 	beforeEach( () => {
