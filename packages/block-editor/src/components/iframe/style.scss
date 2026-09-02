@@ -12,6 +12,8 @@
 
 .block-editor-iframe__scale-container {
 	height: 100%;
+	/* The anchor for the focus ring and hint of the canvas stop inside. */
+	position: relative;
 }
 
 .block-editor-iframe__scale-container.is-zoomed-out {

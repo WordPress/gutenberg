@@ -22,7 +22,8 @@ const PREVENT_SCROLL_ON_FOCUS = {
 
 export default function useTabNav() {
 	const containerRef = /** @type {typeof useRef<HTMLElement>} */ ( useRef )();
-	const canvasStopRef = useRef();
+	const focusCaptureBeforeRef = useRef();
+	const focusCaptureAfterRef = useRef();
 	const hintId = useInstanceId(
 		useTabNav,
 		'block-editor-writing-flow__canvas-stop-hint'
@@ -130,39 +131,18 @@ export default function useTabNav() {
 			return;
 		}
 
-		// Tab forwards leaves the wrapper naturally: the stop is its last
-		// element. Backwards, sequential order would walk into the content,
-		// so move focus to the last tabbable before the wrapper instead.
-		if ( key === 'Tab' && event.shiftKey ) {
+		// Backwards, Tab leaves the canvas naturally: the stop is the first
+		// element before it. Forwards, sequential order would walk into the
+		// content, so move focus to the first tabbable past the canvas.
+		if ( key === 'Tab' && ! event.shiftKey ) {
 			event.preventDefault();
-			focus.tabbable
-				.findPrevious( event.currentTarget.parentElement )
-				?.focus();
+			focus.tabbable.findNext( focusCaptureAfterRef.current )?.focus();
 		}
 	}
 
-	// The wrapper is not a stop of its own: focus arriving from outside,
-	// which sequential navigation only delivers travelling forwards, is
-	// forwarded to the stop after the content. Backwards, the stop is the
-	// wrapper's last tabbable and catches focus by itself.
-	function onWrapperFocus( event ) {
-		if (
-			event.target === event.currentTarget &&
-			! event.currentTarget.contains( event.relatedTarget )
-		) {
-			canvasStopRef.current?.focus();
-		}
-	}
-
-	const wrapperProps = {
-		className: 'block-editor-writing-flow__canvas-wrapper',
-		tabIndex: '0',
-		onFocus: onWrapperFocus,
-	};
-
-	const stop = (
+	const before = (
 		<div
-			ref={ canvasStopRef }
+			ref={ focusCaptureBeforeRef }
 			tabIndex="0"
 			role="button"
 			aria-label={ __( 'Editor canvas' ) }
@@ -180,6 +160,17 @@ export default function useTabNav() {
 				{ __( 'Press Enter to edit the document' ) }
 			</div>
 		</div>
+	);
+
+	// Focus arriving behind the canvas is forwarded to the stop before it,
+	// so the canvas has one stop, reached from either direction.
+	const after = (
+		<div
+			ref={ focusCaptureAfterRef }
+			tabIndex="0"
+			className="block-editor-writing-flow__canvas-stop-redirect"
+			onFocus={ () => focusCaptureBeforeRef.current?.focus() }
+		/>
 	);
 
 	const ref = useRefEffect( ( node ) => {
@@ -210,9 +201,11 @@ export default function useTabNav() {
 				! event.metaKey &&
 				! event.altKey
 			) {
-				if ( canvasStopRef.current ) {
+				if ( focusCaptureBeforeRef.current ) {
 					event.preventDefault();
-					canvasStopRef.current.focus( { preventScroll: true } );
+					focusCaptureBeforeRef.current.focus( {
+						preventScroll: true,
+					} );
 				}
 				return;
 			}
@@ -226,10 +219,13 @@ export default function useTabNav() {
 				return;
 			}
 
-			// Bails in case the stop isn’t present. It may be omitted to
-			// avoid a silent tab stop in preview mode.
+			// Bails in case the focus capture elements aren’t present. They
+			// may be omitted to avoid silent tab stops in preview mode.
 			// See: https://github.com/WordPress/gutenberg/pull/59317
-			if ( ! canvasStopRef.current ) {
+			if (
+				! focusCaptureAfterRef.current ||
+				! focusCaptureBeforeRef.current
+			) {
 				return;
 			}
 
@@ -262,14 +258,12 @@ export default function useTabNav() {
 				return;
 			}
 
-			// Tab out of the canvas: forwards past the stop, backwards past
-			// the wrapper, without stopping on either.
+			// Tab out of the canvas: move focus past the element on the side
+			// being tabbed towards, without stopping on it.
 			event.preventDefault();
 			const outside = isShift
-				? focus.tabbable.findPrevious(
-						canvasStopRef.current.parentElement
-				  )
-				: focus.tabbable.findNext( canvasStopRef.current );
+				? focus.tabbable.findPrevious( focusCaptureBeforeRef.current )
+				: focus.tabbable.findNext( focusCaptureAfterRef.current );
 			outside?.focus();
 		}
 
@@ -306,5 +300,5 @@ export default function useTabNav() {
 
 	const mergedRefs = useMergeRefs( [ containerRef, ref ] );
 
-	return [ wrapperProps, mergedRefs, stop ];
+	return [ before, mergedRefs, after ];
 }

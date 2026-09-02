@@ -1,23 +1,27 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
 
-/* The wrapper contains the canvas and the stop after it, and anchors the
-   focus ring and hint drawn by the focused stop. In the iframed editor it
-   sits between the scale container and the frame, so it passes the full
-   height down. */
-.block-editor-writing-flow__canvas-wrapper {
-	position: relative;
-	height: 100%;
-}
-
 .block-editor-writing-flow__canvas-stop {
+	/* The anchor for the focus ring and the hint. In the iframed editor the
+	   positioned scale container is the anchor instead, so both stretch over
+	   the canvas box rather than this zero-size element. */
+	position: relative;
 	outline: none;
 }
 
-/* The stop element is zero-size, so its focus indication is drawn around
-   the wrapper box it stands for: an overlay rather than an outline on the
-   frame, which Safari can paint underneath the frame's content. */
-.block-editor-writing-flow__canvas-stop:focus::after {
+.block-editor-iframe__scale-container > .block-editor-writing-flow__canvas-stop {
+	position: static;
+}
+
+.block-editor-writing-flow__canvas-stop-redirect {
+	outline: none;
+}
+
+/* The stop element is zero-size, so its focus indication is drawn around the
+   canvas it stands for, right after it. For the frame it is an overlay
+   stretched over the positioned scale container: Safari paints an outline on
+   a frame element underneath the frame's content. */
+.block-editor-iframe__scale-container > .block-editor-writing-flow__canvas-stop:focus::after {
 	content: "";
 	position: absolute;
 	inset: 0;
@@ -26,8 +30,13 @@
 	border: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
 }
 
+.block-editor-writing-flow__canvas-stop:focus + .block-editor-writing-flow {
+	outline: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
+	outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
+}
+
 /* Styled like a tooltip; shown while the stop is focused, at the top of the
-   wrapper. Doubles as the stop's description for assistive technologies. */
+   canvas. Doubles as the stop's description for assistive technologies. */
 .block-editor-writing-flow__canvas-stop-hint {
 	display: none;
 	position: absolute;
