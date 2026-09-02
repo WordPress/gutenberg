@@ -55,7 +55,7 @@ jobs:
     build:
         name: Build
         runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
-        needs: [ detect-relevant-changes ]
+        needs: [detect-relevant-changes]
         permissions:
             contents: read
         if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
@@ -245,7 +245,12 @@ jobs:
     merge-artifacts:
         name: Merge Artifacts
         if: ${{ ! cancelled() && ( github.event_name != 'pull_request' || needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
-        needs: [ detect-relevant-changes, e2e-playwright, e2e-playwright-rtc-websocket ]
+        needs:
+            [
+                detect-relevant-changes,
+                e2e-playwright,
+                e2e-playwright-rtc-websocket,
+            ]
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
@@ -381,7 +386,7 @@ jobs:
         if: ${{ ! cancelled() && ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) }}
         steps:
             - name: Checkout repository
-               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   sparse-checkout: .github/workflows/scripts
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
