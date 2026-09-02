@@ -46,8 +46,8 @@ export function taperChroma(
 	const kDark = options.kDark ?? 0.85;
 	const achromaEpsilon = options.achromaEpsilon ?? 0.005;
 
-	const cSeed = Math.max( 0, get( seed, [ OKLCH, 'c' ] ) );
-	let hSeed = get( seed, [ OKLCH, 'h' ] );
+	const cSeed = Math.max( 0, seed.coords[ 1 ] ?? 0 );
+	let hSeed = seed.coords[ 2 ];
 
 	const chromaIsTiny = cSeed < achromaEpsilon;
 	const hueIsInvalid = hSeed === null || ! Number.isFinite( hSeed );
@@ -66,11 +66,17 @@ export function taperChroma(
 	}
 
 	// Capacity at seed and target
-	const lSeed = clamp01( get( seed, [ OKLCH, 'l' ] ) );
-	const cmaxSeed = maxInGamutChromaAtLH( lSeed, hSeed, gamut, cUpperBound );
+	const lSeed = clamp01( seed.coords[ 0 ] ?? 0 );
+	const resolvedHue = hSeed as number;
+	const cmaxSeed = maxInGamutChromaAtLH(
+		lSeed,
+		resolvedHue,
+		gamut,
+		cUpperBound
+	);
 	const cmaxTarget = maxInGamutChromaAtLH(
 		clamp01( lTarget ),
-		hSeed,
+		resolvedHue,
 		gamut,
 		cUpperBound
 	);
@@ -100,7 +106,12 @@ export function taperChroma(
 	return { l: lOut, c: cPlanned };
 }
 
-/* ---------------- helpers ---------------- */
+/* ---------------- helpers & caches ---------------- */
+
+const MAX_CACHED_CHROMA_CAPACITIES = 2_048;
+// Exact keys preserve deterministic output. Rounded buckets can return a
+// capacity calculated for an earlier, slightly different color.
+const maxChromaCache = new WeakMap< ColorSpace, Map< string, number > >();
 
 function clamp01( x: number ): number {
 	if ( x < 0 ) {
@@ -167,6 +178,17 @@ function maxInGamutChromaAtLH(
 	gamutSpace: ColorSpace,
 	cap: number
 ): number {
+	let gamutCache = maxChromaCache.get( gamutSpace );
+	if ( ! gamutCache ) {
+		gamutCache = new Map();
+		maxChromaCache.set( gamutSpace, gamutCache );
+	}
+	const cacheKey = `${ l }|${ h }|${ cap }`;
+	const cachedChroma = gamutCache.get( cacheKey );
+	if ( cachedChroma !== undefined ) {
+		return cachedChroma;
+	}
+
 	// Construct a color with maximum chroma.
 	const probe: PlainColorObject = {
 		space: OKLCH,
@@ -176,6 +198,15 @@ function maxInGamutChromaAtLH(
 
 	// Let `toGamut` reduce the chroma to the gamut maximum.
 	const clamped = toGamutCSS( probe, { space: gamutSpace } );
+	const chroma = get( clamped, [ OKLCH, 'c' ] );
 
-	return get( clamped, [ OKLCH, 'c' ] );
+	if ( gamutCache.size >= MAX_CACHED_CHROMA_CAPACITIES ) {
+		const oldestKey = gamutCache.keys().next().value;
+		if ( oldestKey !== undefined ) {
+			gamutCache.delete( oldestKey );
+		}
+	}
+	gamutCache.set( cacheKey, chroma );
+
+	return chroma;
 }

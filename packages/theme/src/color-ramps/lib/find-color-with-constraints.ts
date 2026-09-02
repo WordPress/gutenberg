@@ -60,10 +60,12 @@ export function findColorMeetingRequirements(
 			achieved: 1,
 		};
 	}
+	const seedChroma = get( seed, [ OKLCH, 'c' ] );
+	const seedHue = get( seed, [ OKLCH, 'h' ] );
 
 	function getColorForL( l: number ): PlainColorObject {
 		let newL = l;
-		let newC = get( seed, [ OKLCH, 'c' ] );
+		let newC = seedChroma;
 
 		if ( taperChromaOptions ) {
 			const tapered = taperChroma( seed, newL, taperChromaOptions );
@@ -79,7 +81,7 @@ export function findColorMeetingRequirements(
 
 		return clampToGamut( {
 			space: OKLCH,
-			coords: [ newL, newC, get( seed, [ OKLCH, 'h' ] ) ],
+			coords: [ newL, newC, seedHue ],
 			alpha: seed.alpha,
 		} );
 	}

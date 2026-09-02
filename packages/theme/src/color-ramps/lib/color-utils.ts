@@ -4,13 +4,18 @@ import {
 	to,
 	toGamut,
 	serialize,
-	contrastWCAG21,
+	getLuminance,
 	sRGB,
 	OKLCH,
 	type PlainColorObject,
 } from 'colorjs.io/fn';
 
 const ALLOWED_SEED_COLOR_SPACES = [ sRGB ];
+const MAX_CACHED_LUMINANCES = 2_048;
+const luminanceCache = new Map< string, number >();
+const objectLuminanceCache = new WeakMap< PlainColorObject, number >();
+
+ColorSpace.register( sRGB );
 
 /**
  * Get string representation of a color.
@@ -19,7 +24,6 @@ const ALLOWED_SEED_COLOR_SPACES = [ sRGB ];
  * @return String representation
  */
 export function getColorString( color: string | PlainColorObject ): string {
-	ColorSpace.register( sRGB );
 	const rgbRounded = serialize( to( color, sRGB ) );
 	return serialize( rgbRounded, { format: 'hex' } );
 }
@@ -34,8 +38,61 @@ export function getContrast(
 	colorA: string | PlainColorObject,
 	colorB: string | PlainColorObject
 ): number {
-	ColorSpace.register( sRGB );
-	return contrastWCAG21( colorA, colorB );
+	return getContrastFromLuminances(
+		getRelativeLuminance( colorA ),
+		getRelativeLuminance( colorB )
+	);
+}
+
+/**
+ * Return a color's non-negative relative luminance. Serialized colors use a
+ * bounded cache because every accent ramp references the same surfaces. Ramp
+ * color objects are immutable and use a weak cache so they can be collected.
+ *
+ * @param color Color to measure.
+ */
+export function getRelativeLuminance(
+	color: string | PlainColorObject
+): number {
+	if ( typeof color !== 'string' ) {
+		const cachedLuminance = objectLuminanceCache.get( color );
+		if ( cachedLuminance !== undefined ) {
+			return cachedLuminance;
+		}
+		const luminance = Math.max( getLuminance( color ), 0 );
+		objectLuminanceCache.set( color, luminance );
+		return luminance;
+	}
+
+	const cachedLuminance = luminanceCache.get( color );
+	if ( cachedLuminance !== undefined ) {
+		return cachedLuminance;
+	}
+
+	const luminance = Math.max( getLuminance( color ), 0 );
+	if ( luminanceCache.size >= MAX_CACHED_LUMINANCES ) {
+		const oldestKey = luminanceCache.keys().next().value;
+		if ( oldestKey !== undefined ) {
+			luminanceCache.delete( oldestKey );
+		}
+	}
+	luminanceCache.set( color, luminance );
+	return luminance;
+}
+
+/**
+ * Calculate a WCAG 2.1 contrast ratio from precomputed relative luminances.
+ *
+ * @param first  First relative luminance.
+ * @param second Second relative luminance.
+ */
+export function getContrastFromLuminances(
+	first: number,
+	second: number
+): number {
+	return first > second
+		? ( first + 0.05 ) / ( second + 0.05 )
+		: ( second + 0.05 ) / ( first + 0.05 );
 }
 
 /**
@@ -49,10 +106,6 @@ export function getContrast(
  * @throws If `seed` is not an sRGB-parseable, fully opaque string.
  */
 export function assertValidSeedColor( seed: string ): void {
-	ALLOWED_SEED_COLOR_SPACES.forEach( ( space ) =>
-		ColorSpace.register( space )
-	);
-
 	let parsedColor: ReturnType< typeof parse >;
 	try {
 		parsedColor = parse( seed );
@@ -84,6 +137,5 @@ export function assertValidSeedColor( seed: string ): void {
  * @param c A `PlainColorObject`, or an sRGB-parseable string.
  */
 export function clampToGamut( c: string | PlainColorObject ) {
-	ColorSpace.register( sRGB );
 	return to( toGamut( c, { space: sRGB, method: 'css' } ), OKLCH );
 }
