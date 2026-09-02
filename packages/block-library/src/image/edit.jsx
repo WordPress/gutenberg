@@ -151,6 +151,15 @@ export function ImageEdit( {
 			explicitDismiss: true,
 		} );
 		setTemporaryURL();
+
+		// Keep an existing image when a replacement upload fails. Clearing the
+		// URL would drop the block into a placeholder that still carries the
+		// previous dimensions, which looks broken for small heights.
+		if ( url && ! isBlobURL( url ) ) {
+			setAttributes( { blob: undefined } );
+			return;
+		}
+
 		setAttributes( {
 			src: undefined,
 			id: undefined,
