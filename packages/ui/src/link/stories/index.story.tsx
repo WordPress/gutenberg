@@ -29,7 +29,7 @@ export const OpenInNewTab: Story = {
 	args: {
 		children: 'Visit WordPress.org',
 		href: 'https://wordpress.org',
-		target: '_blank',
+		openInNewTab: true,
 	},
 };
 
