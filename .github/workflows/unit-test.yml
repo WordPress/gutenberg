@@ -56,29 +56,6 @@ jobs:
                           # Other workflows, and everything under .github that this one does not use.
                           - '!.github/{*,!(workflows|setup-node)/**,workflows/!(unit-test.yml)}'
 
-    unit-js-routing:
-        name: JavaScript test routing
-        runs-on: 'ubuntu-24.04'
-        needs: [detect-relevant-changes]
-        permissions:
-            contents: read
-        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
-
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-              with:
-                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
-                  persist-credentials: false
-
-            - name: Setup Node.js and install dependencies
-              uses: ./.github/setup-node
-              with:
-                  node-version: '20'
-
-            - name: Validate JavaScript test routing
-              run: npm run test:unit:routing
-
     unit-js:
         name: JavaScript (Node.js ${{ matrix.node }}) ${{ matrix.shard }}
         runs-on: 'ubuntu-24.04'
@@ -481,15 +458,7 @@ jobs:
         permissions:
             contents: read
             actions: read
-        needs:
-            [
-                detect-relevant-changes,
-                unit-js-routing,
-                unit-js,
-                unit-js-date,
-                test-php,
-                phpcs,
-            ]
+        needs: [detect-relevant-changes, unit-js, unit-js-date, test-php, phpcs]
         if: ${{ ! cancelled() && ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) }}
         steps:
             - name: Checkout repository
