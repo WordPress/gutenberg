@@ -3,7 +3,43 @@ import DataViews from '../index';
 import { LAYOUT_TABLE } from '../../constants';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import type { View } from '../../types';
-import { hierarchicalData, hierarchicalFields } from './fixtures-hierarchy';
+import {
+	hierarchicalData,
+	hierarchicalFields,
+	type CelestialBody,
+} from './fixtures-hierarchy';
+
+/**
+ * Orders a flat list depth-first so that each item sits right below its
+ * parent. Siblings keep the relative order they had in the input, so the
+ * list should already be sorted the way the consumer wants siblings sorted.
+ * Items whose parent is not in the list (filtered out, for example) are
+ * treated as roots.
+ *
+ * This is what the WordPress REST API does for `orderby_hierarchy`.
+ */
+function sortByHierarchy( items: CelestialBody[] ): CelestialBody[] {
+	const ids = new Set( items.map( ( item ) => item.id ) );
+	const childrenByParent = new Map< string | null, CelestialBody[] >();
+	items.forEach( ( item ) => {
+		const parent =
+			item.parent !== null && ids.has( item.parent ) ? item.parent : null;
+		childrenByParent.set( parent, [
+			...( childrenByParent.get( parent ) ?? [] ),
+			item,
+		] );
+	} );
+
+	const result: CelestialBody[] = [];
+	const visit = ( parent: string | null ) => {
+		( childrenByParent.get( parent ) ?? [] ).forEach( ( item ) => {
+			result.push( item );
+			visit( item.id );
+		} );
+	};
+	visit( null );
+	return result;
+}
 
 const HierarchicalLevelsComponent = ( {
 	showLevels = true,
@@ -35,11 +71,26 @@ const HierarchicalLevelsComponent = ( {
 	}, [ showLevels ] );
 
 	const { data, paginationInfo } = useMemo( () => {
-		return filterSortAndPaginate(
+		// Filter and sort first, then order by hierarchy, then paginate.
+		// The sort decides the order of siblings; the hierarchy places each
+		// item below its parent.
+		const { data: sortedData } = filterSortAndPaginate(
 			hierarchicalData,
-			view,
+			{ ...view, page: undefined, perPage: undefined },
 			hierarchicalFields
 		);
+		const orderedData = view.showLevels
+			? sortByHierarchy( sortedData )
+			: sortedData;
+		const page = view.page ?? 1;
+		const perPage = view.perPage ?? orderedData.length;
+		return {
+			data: orderedData.slice( ( page - 1 ) * perPage, page * perPage ),
+			paginationInfo: {
+				totalItems: orderedData.length,
+				totalPages: Math.ceil( orderedData.length / perPage ),
+			},
+		};
 	}, [ view ] );
 
 	return (

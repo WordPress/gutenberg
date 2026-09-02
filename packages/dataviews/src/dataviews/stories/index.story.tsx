@@ -248,7 +248,7 @@ export const HierarchicalLevels = {
 		showLevels: {
 			control: 'boolean',
 			description:
-				'Whether the table indents each item by its level (`view.showLevels`). The order of the items comes from the data either way',
+				'Whether the table indents each item by its level (`view.showLevels`). When enabled, each item is placed below its parent; when disabled, items follow the sort order only',
 		},
 	},
 };
