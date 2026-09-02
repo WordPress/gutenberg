@@ -723,7 +723,7 @@ function SeedCombination( {
 
 export const Comparison: Story = {
 	args: {
-		approaches: [ 'anchored', 'pinned-role-hybrid' ],
+		approaches: [ 'anchored', 'role-hybrid', 'pinned-role-hybrid' ],
 	},
 	render: ( { approaches } ) => {
 		const methods = EXPERIMENTAL_RAMP_METHODS.filter( ( method ) =>
