@@ -124,7 +124,7 @@ describe( 'ThemeProvider', () => {
 		expect( readProp( provider, SURFACE_BG ) ).toBe( BACKGROUND );
 	} );
 
-	it( 'maps resting and active neutral foregrounds to separate scale steps', () => {
+	it( 'maps normal content and resting neutral foregrounds to the same scale step', () => {
 		render(
 			<ThemeProvider color={ { background: BACKGROUND } }>
 				<div data-testid="child">x</div>
@@ -138,7 +138,7 @@ describe( 'ThemeProvider', () => {
 			FOREGROUND_NEUTRAL_ACTIVE
 		);
 
-		expect( activeForeground ).toBe(
+		expect( restingForeground ).toBe(
 			readProp( provider, FOREGROUND_CONTENT_NEUTRAL )
 		);
 		expect( activeForeground ).toBe(

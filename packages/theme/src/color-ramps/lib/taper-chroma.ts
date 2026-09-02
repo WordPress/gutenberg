@@ -67,8 +67,8 @@ export function taperChroma(
 
 	// Capacity at seed and target
 	const lSeed = clamp01( get( seed, [ OKLCH, 'l' ] ) );
-	const cmaxSeed = getCachedMaxChromaAtLH( lSeed, hSeed, gamut, cUpperBound );
-	const cmaxTarget = getCachedMaxChromaAtLH(
+	const cmaxSeed = maxInGamutChromaAtLH( lSeed, hSeed, gamut, cUpperBound );
+	const cmaxTarget = maxInGamutChromaAtLH(
 		clamp01( lTarget ),
 		hSeed,
 		gamut,
@@ -100,7 +100,7 @@ export function taperChroma(
 	return { l: lOut, c: cPlanned };
 }
 
-/* ---------------- helpers & caches ---------------- */
+/* ---------------- helpers ---------------- */
 
 function clamp01( x: number ): number {
 	if ( x < 0 ) {
@@ -152,40 +152,6 @@ function continuousTaper(
 	const u = opts.radiusDark > 0 ? Math.abs( d ) / opts.radiusDark : 1;
 	const w = raisedCosine( u > 1 ? 1 : u );
 	return 1 - ( 1 - opts.kDark ) * w;
-}
-
-/* ---- chroma-capacity queries with small caches ---- */
-
-const maxChromaCache = new Map< string, number >();
-function keyMax( l: number, h: number, gamut: string, cap: number ): string {
-	// Quantize to keep cache compact
-	const lq = quantize( l, 0.05 );
-	const hq = quantize( normalizeHue( h ), 10 );
-	const cq = quantize( cap, 0.05 );
-	return `${ gamut }|L:${ lq }|H:${ hq }|cap:${ cq }`;
-}
-
-function quantize( x: number, step: number ): number {
-	const k = Math.round( x / step );
-	return k * step;
-}
-
-function getCachedMaxChromaAtLH(
-	l: number,
-	h: number,
-	gamutSpace: ColorSpace,
-	cap: number
-): number {
-	const gamut = gamutSpace.id;
-	const key = keyMax( l, h, gamut, cap );
-	const hit = maxChromaCache.get( key );
-	if ( typeof hit === 'number' ) {
-		return hit;
-	}
-
-	const computed = maxInGamutChromaAtLH( l, h, gamutSpace, cap );
-	maxChromaCache.set( key, computed );
-	return computed;
 }
 
 /**

@@ -145,10 +145,9 @@
 	},
 	"scripts": {
 		"benchmark:color-ramps": "node --import=esbuild-esm-loader/register benchmark/color-ramps.ts",
-		"benchmark:perceptual-ramps": "node --import=esbuild-esm-loader/register benchmark/perceptual-ramp-experiments.ts",
 		"build:default-ramps": "node --import=esbuild-esm-loader/register bin/generate-default-ramps/index.ts",
 		"build:tokens": "node --import=esbuild-esm-loader/register bin/generate-primitive-tokens/index.ts && node --import=esbuild-esm-loader/register bin/build-design-tokens/index.ts",
-		"build": "npm run build:tokens && npm run build:default-ramps",
+		"build": "npm run build:default-ramps && npm run build:tokens",
 		"lint:package-contents": "wp-validate-package-contents . --disallow-path src",
 		"postbuild": "prettier --write tokens/color.json tokens/modes prebuilt src/prebuilt src/color-ramps/lib/default-ramps.ts docs ../base-styles/internal/_wpds-token-fallbacks.scss"
 	}

@@ -7,6 +7,7 @@ import {
 } from './color-utils.ts';
 import { findColorMeetingRequirements } from './find-color-with-constraints.ts';
 import { buildForegroundScale } from './build-foreground-scale.ts';
+import { buildPerceptualSteps } from './build-perceptual-steps.ts';
 import {
 	sortByDependency,
 	computeBetterFgColorDirection,
@@ -339,11 +340,14 @@ export function buildRamp(
 		bestRamp.surface3 = tmpSurface1;
 	}
 
-	const rampResult = {
-		ramp: bestRamp,
-		warnings: bestWarnings,
-		direction: mainDir,
-	};
+	const rampResult = buildPerceptualSteps(
+		{
+			ramp: bestRamp,
+			warnings: bestWarnings,
+			direction: mainDir,
+		},
+		backgroundRamp
+	);
 
 	return buildForegroundScale(
 		rampResult,
