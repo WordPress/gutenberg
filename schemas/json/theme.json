@@ -201,6 +201,33 @@
 										"required": [ "slug", "gradient" ],
 										"additionalProperties": false
 									}
+								},
+								"duotone": {
+									"description": "Dark-scheme duotone presets. Slugs override matching entries in `duotone`. Each generates an additional SVG filter and a gated `--wp--preset--duotone--{slug}` override.",
+									"type": "array",
+									"items": {
+										"type": "object",
+										"properties": {
+											"name": {
+												"description": "Name of the duotone preset, translatable.",
+												"type": "string"
+											},
+											"slug": {
+												"description": "Kebab-case identifier matching a base duotone slug.",
+												"type": "string"
+											},
+											"colors": {
+												"description": "List of colors from dark to light for the dark scheme.",
+												"type": "array",
+												"items": {
+													"description": "CSS hex or rgb string.",
+													"type": "string"
+												}
+											}
+										},
+										"required": [ "slug", "colors" ],
+										"additionalProperties": false
+									}
 								}
 							},
 							"additionalProperties": false
@@ -252,6 +279,33 @@
 											}
 										},
 										"required": [ "slug", "gradient" ],
+										"additionalProperties": false
+									}
+								},
+								"duotone": {
+									"description": "Light-scheme duotone presets. Slugs override matching entries in `duotone`. Each generates an additional SVG filter and a gated `--wp--preset--duotone--{slug}` override.",
+									"type": "array",
+									"items": {
+										"type": "object",
+										"properties": {
+											"name": {
+												"description": "Name of the duotone preset, translatable.",
+												"type": "string"
+											},
+											"slug": {
+												"description": "Kebab-case identifier matching a base duotone slug.",
+												"type": "string"
+											},
+											"colors": {
+												"description": "List of colors from dark to light for the light scheme.",
+												"type": "array",
+												"items": {
+													"description": "CSS hex or rgb string.",
+													"type": "string"
+												}
+											}
+										},
+										"required": [ "slug", "colors" ],
 										"additionalProperties": false
 									}
 								}
