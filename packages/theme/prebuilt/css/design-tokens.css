@@ -110,27 +110,27 @@
 	/* Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb), in their disabled state. */
 	--wpds-color-background-thumb-neutral-weak-disabled: #dbdbdb;
 	/* Foreground color for content like text with normal emphasis. */
-	--wpds-color-foreground-content-neutral: #141414;
+	--wpds-color-foreground-content-neutral: #505050;
 	/* Foreground color for content like text with weak emphasis. */
 	--wpds-color-foreground-content-neutral-weak: #737373;
 	/* Foreground color for content like text with success tone and normal emphasis. */
-	--wpds-color-foreground-content-success: #041708;
+	--wpds-color-foreground-content-success: #215b2f;
 	/* Foreground color for content like text with success tone and weak emphasis. */
 	--wpds-color-foreground-content-success-weak: #307e44;
 	/* Foreground color for content like text with info tone and normal emphasis. */
-	--wpds-color-foreground-content-info: #00132a;
+	--wpds-color-foreground-content-info: #005092;
 	/* Foreground color for content like text with info tone and weak emphasis. */
 	--wpds-color-foreground-content-info-weak: #0070c8;
 	/* Foreground color for content like text with warning tone and normal emphasis. */
-	--wpds-color-foreground-content-warning: #1b1203;
+	--wpds-color-foreground-content-warning: #654c19;
 	/* Foreground color for content like text with warning tone and weak emphasis. */
 	--wpds-color-foreground-content-warning-weak: #886726;
 	/* Foreground color for content like text with caution tone and normal emphasis. */
-	--wpds-color-foreground-content-caution: #181402;
+	--wpds-color-foreground-content-caution: #5c4f16;
 	/* Foreground color for content like text with caution tone and weak emphasis. */
 	--wpds-color-foreground-content-caution-weak: #7d6c22;
 	/* Foreground color for content like text with error tone and normal emphasis. */
-	--wpds-color-foreground-content-error: #260101;
+	--wpds-color-foreground-content-error: #980f0f;
 	/* Foreground color for content like text with error tone and weak emphasis. */
 	--wpds-color-foreground-content-error-weak: #d91a1a;
 	/* Foreground color for interactive elements with neutral tone and normal emphasis. */
