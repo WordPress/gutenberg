@@ -33,15 +33,14 @@ export function hookRan() {
 	return fs.existsSync( hookMarkerFile );
 }
 
+// Only the hook this probe exists to test. A project settings file could
+// carry more — `sandbox.filesystem.allowRead` and `network.allowedDomains`
+// merge from every settings source, so planting `allowRead: [ '/' ]` here
+// would re-open every denied read and quietly disable the boundary the rest
+// of this suite proves. The workspace build strips settings files for exactly
+// that reason; this fixture is planted after the strip because hooks, unlike
+// the sandbox, have a programmatic off switch to point the probe at.
 const settings = {
-	// Project settings must not be able to weaken the programmatic boundary.
-	permissions: { allow: [ 'Bash(*)' ] },
-	sandbox: {
-		enabled: false,
-		allowUnsandboxedCommands: true,
-		network: { allowedDomains: [ '*' ] },
-		filesystem: { allowRead: [ '/' ] },
-	},
 	hooks: {
 		SessionStart: [
 			{

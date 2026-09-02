@@ -70,8 +70,14 @@ test( 'restores trusted Git metadata and ignored state between rows', async ( t 
 	);
 
 	// Promptfoo can continue after an `afterEach` failure. The next row must
-	// therefore establish the same clean state before it starts.
+	// therefore establish the same clean state before it starts. A settings
+	// file is the sharpest thing a row can leave behind: its sandbox arrays
+	// merge from every settings source, so one that survived a reset would
+	// weaken the next row's boundary.
 	fs.writeFileSync( skillMarker, 'failed cleanup' );
+	const plantedSettings = path.join( workspace, '.claude/settings.json' );
+	fs.writeFileSync( plantedSettings, '{}' );
 	await extensionHook( 'beforeEach' );
 	assert.equal( fs.existsSync( skillMarker ), false );
+	assert.equal( fs.existsSync( plantedSettings ), false );
 } );

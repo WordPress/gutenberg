@@ -97,6 +97,20 @@ async function createWorkspace() {
 		force: true,
 	} );
 
+	// A project settings file merges into the sandbox configuration:
+	// `filesystem.allowRead` and `network.allowedDomains` are honored from
+	// every settings source, so a branch under evaluation that force-added
+	// `.claude/settings.json` could re-open reads and the network for its own
+	// evaluation. Hooks have a programmatic off switch (`disableAllHooks`);
+	// sandbox weakening does not, so the files are removed before the base
+	// commit is made, which also keeps them out of every rollback.
+	for ( const file of [
+		'.claude/settings.json',
+		'.claude/settings.local.json',
+	] ) {
+		await fs.rm( path.join( workspace, file ), { force: true } );
+	}
+
 	// A real checkout gets `.claude/skills` from `npm run agents:setup`. It is
 	// ignored by Git, so it is absent from the archive, and the workspace never
 	// runs npm — without it the repository's skills are inert files that
