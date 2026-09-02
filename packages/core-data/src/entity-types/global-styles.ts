@@ -58,12 +58,11 @@ export type GlobalStyles< C extends Context = 'edit' > = OmitNevers<
 /**
  * Fields accepted when updating a global styles record.
  *
+ * Updates target an existing record, so its ID is required.
  * The REST API returns the title as raw and rendered text, but also accepts a
  * plain string when updating it.
  */
-export type GlobalStylesUpdate = Omit<
-	Partial< GlobalStyles< 'edit' > >,
-	'title'
-> & {
-	title?: GlobalStyles< 'edit' >[ 'title' ] | string;
-};
+export type GlobalStylesUpdate = Pick< GlobalStyles< 'edit' >, 'id' > &
+	Omit< Partial< GlobalStyles< 'edit' > >, 'id' | 'title' > & {
+		title?: GlobalStyles< 'edit' >[ 'title' ] | string;
+	};

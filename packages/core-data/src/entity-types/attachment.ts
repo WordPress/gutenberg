@@ -180,7 +180,7 @@ declare module './base-entity-records' {
 			/**
 			 * The attachment caption.
 			 */
-			caption: ContextualField< RenderedText< C >, 'edit', C >;
+			caption: RenderedText< C >;
 			/**
 			 * The attachment description.
 			 */

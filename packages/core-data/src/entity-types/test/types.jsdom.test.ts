@@ -448,11 +448,31 @@ describe( 'Entity record types', () => {
 			const actions = dispatch( coreStore );
 			true satisfies Expect<
 				Parameters< typeof actions.saveGlobalStyles >[ 0 ],
-				Omit< Partial< GlobalStyles< 'edit' > >, 'title' > & {
-					title?: GlobalStyles< 'edit' >[ 'title' ] | string;
-				}
+				Pick< GlobalStyles< 'edit' >, 'id' > &
+					Omit<
+						Partial< GlobalStyles< 'edit' > >,
+						'id' | 'title'
+					> & {
+						title?: GlobalStyles< 'edit' >[ 'title' ] | string;
+					}
 			>;
+			actions.saveGlobalStyles( { id: 1, title: 'My variation' } );
+			// @ts-expect-error -- the update route requires the record ID.
 			actions.saveGlobalStyles( { title: 'My variation' } );
+		};
+	} );
+
+	describe( 'the attachment caption follows the REST schema', () => {
+		() => {
+			const attachment = select( coreStore ).getEntityRecord(
+				'postType',
+				'attachment',
+				1,
+				{ context: 'view' }
+			);
+			attachment?.caption.rendered satisfies string | undefined;
+			// @ts-expect-error -- only edit responses contain the raw caption.
+			attachment?.caption.raw;
 		};
 	} );
 
