@@ -28,6 +28,9 @@ concurrency:
 permissions: {}
 
 jobs:
+    # Analyzes the list of files modified in a pull request to detect any changes that could
+    # potentially impact performance metrics. A series of ignore patterns are used in place of
+    # an include list to ensure tests run even if the list of filters happen to become stale.
     detect-relevant-changes:
         name: Detect changes relevant to performance testing
         runs-on: 'ubuntu-24.04'
@@ -37,8 +40,6 @@ jobs:
         outputs:
             relevant: ${{ steps.filter.outputs.relevant }}
         steps:
-            # `predicate-quantifier: every` makes this true as soon as one changed file
-            # matches no pattern, so an unrecognised path always runs the suite.
             - name: Check for changes that may impact performance metrics
               id: filter
               if: ${{ github.event_name == 'pull_request' }}
