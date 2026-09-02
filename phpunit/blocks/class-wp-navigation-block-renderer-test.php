@@ -431,4 +431,35 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'Hello, World!', $output, 'Shortcode inside the navigation overlay should be expanded.' );
 		$this->assertStringNotContainsString( '[gb_test_overlay_shortcode]', $output, 'Raw shortcode token should not appear in the overlay output.' );
 	}
+
+	/**
+	 * Test that the submenu detection of one navigation block is not reused for the
+	 * next navigation block rendered in the same request.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers WP_Navigation_Block_Renderer::render
+	 *
+	 * @see https://github.com/WordPress/gutenberg/issues/82288
+	 */
+	public function test_submenu_detection_is_not_shared_between_navigation_blocks() {
+		$view_module = '@wordpress/block-library/navigation/view';
+		wp_dequeue_script_module( $view_module );
+
+		// A navigation with a submenu that is not interactive by itself.
+		do_blocks(
+			'<!-- wp:navigation {"showSubmenuIcon":false,"openSubmenusOnClick":false,"overlayMenu":"never"} -->' .
+			'<!-- wp:navigation-submenu {"label":"More","url":"/more"} --><!-- wp:navigation-link {"label":"Deep","url":"/deep"} /--><!-- /wp:navigation-submenu -->' .
+			'<!-- /wp:navigation -->'
+		);
+		$this->assertNotContains( $view_module, wp_script_modules()->get_queue(), 'A non-interactive navigation with a submenu should not enqueue the view module.' );
+
+		// A navigation without submenus rendered afterwards in the same request.
+		do_blocks(
+			'<!-- wp:navigation {"showSubmenuIcon":true,"overlayMenu":"never"} -->' .
+			'<!-- wp:navigation-link {"label":"Home","url":"/"} /-->' .
+			'<!-- /wp:navigation -->'
+		);
+		$this->assertNotContains( $view_module, wp_script_modules()->get_queue(), 'A navigation without submenus should not enqueue the view module because a previous navigation had a submenu.' );
+	}
 }
