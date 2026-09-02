@@ -669,6 +669,16 @@ describe( 'Entity record types', () => {
 			view?.title?.rendered satisfies string | undefined;
 			// @ts-expect-error -- `_fields` can omit `title` entirely.
 			view?.title.rendered;
+
+			const collection = select( coreStore ).getEntityRecord(
+				'root',
+				'fontCollection',
+				'google-fonts',
+				{ _fields: 'categories.slug' }
+			);
+			collection?.categories?.[ 0 ].slug satisfies string | undefined;
+			// @ts-expect-error -- `_fields` can omit fields inside array elements.
+			collection?.categories?.[ 0 ].name.toUpperCase();
 		};
 	} );
 
