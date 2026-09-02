@@ -50,6 +50,30 @@ export const sandbox = {
 };
 
 /**
+ * An absolute host directory as a permission rule denying a tool inside it.
+ *
+ * Rule patterns need `//` to mean the filesystem root — a single slash anchors
+ * at the settings source instead — and Claude Code matches them in POSIX form:
+ * on Windows `C:\Users\alice` matches as `/c/Users/alice`, with the drive
+ * letter lowercased and every separator a forward slash. Composing the rule
+ * from the OS path directly would produce a pattern that matches nothing
+ * there.
+ *
+ * @see https://code.claude.com/docs/en/permissions
+ *
+ * @param {string} tool      Tool the rule denies, `Read` or `Edit`.
+ * @param {string} directory Absolute path the rule covers.
+ * @return {string} The rule.
+ */
+export function pathRule( tool, directory ) {
+	const posixDirectory = directory
+		.replaceAll( '\\', '/' )
+		.replace( /^([A-Za-z]):/, ( _, drive ) => `/${ drive.toLowerCase() }` )
+		.replace( /^\//, '' );
+	return `${ tool }(//${ posixDirectory }/**)`;
+}
+
+/**
  * Covers the tools the sandbox does not: `Edit`, `Write`, and the file-reading
  * commands Claude Code recognises in Bash.
  */
@@ -62,9 +86,9 @@ export const permissions = {
 	// recent Claude Code, so the `Edit` rules are not redundant. Rules written
 	// against `Write` itself are accepted and never consulted.
 	deny: [
-		`Read(/${ homeDirectory }/**)`,
-		`Read(/${ sourceRoot }/**)`,
-		`Edit(/${ homeDirectory }/**)`,
-		`Edit(/${ sourceRoot }/**)`,
+		pathRule( 'Read', homeDirectory ),
+		pathRule( 'Read', sourceRoot ),
+		pathRule( 'Edit', homeDirectory ),
+		pathRule( 'Edit', sourceRoot ),
 	],
 };

@@ -9,7 +9,7 @@ import path from 'node:path';
 import test from 'node:test';
 import { loadApiProvider } from 'promptfoo';
 import { workspace } from '../paths.js';
-import { permissions, sandbox } from '../sandbox.js';
+import { pathRule, permissions, sandbox } from '../sandbox.js';
 import {
 	checkoutMarkerFile,
 	homeMarkerFile,
@@ -46,7 +46,22 @@ test( 'permission rules are anchored as absolute paths', () => {
 	// and three parse as a settings-relative pattern that matches nothing.
 	for ( const rule of permissions.deny ) {
 		assert.match( rule, /^(Read|Edit)\(\/\/[^/]/ );
+		assert.doesNotMatch( rule, /\\|:/, `${ rule } is not in POSIX form` );
 	}
+} );
+
+test( 'a rule renders the path the way Claude Code matches it', () => {
+	// Claude Code matches patterns in POSIX form; on Windows `C:\Users\alice`
+	// matches as `/c/Users/alice`. Exercised directly, so the Windows shape is
+	// covered on every platform.
+	assert.equal(
+		pathRule( 'Read', 'C:\\Users\\runneradmin' ),
+		'Read(//c/Users/runneradmin/**)'
+	);
+	assert.equal(
+		pathRule( 'Edit', '/Users/alice' ),
+		'Edit(//Users/alice/**)'
+	);
 } );
 
 test( 'loading the sandbox config does not create host canaries', () => {
