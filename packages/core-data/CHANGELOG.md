@@ -5,6 +5,8 @@
 ### Breaking Changes
 
 -   The entity record selectors infer the record from their `kind` and `name` arguments with a `const` type parameter. TypeScript consumers now require TypeScript 5 or newer. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
+-   `Post` and `Page` now match the REST schema: `content.is_protected` is replaced by `content.protected`, and `content.block_version` is typed as a `number` rather than a `string`. Rename any read of `content.is_protected`, and drop annotations or casts that treated `block_version` as a string. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
+-   `RenderedText` omits `raw` outside the edit context instead of typing it as `never`, so a record requested with `context: 'view'` or `context: 'embed'` no longer exposes `title.raw` or `content.raw`. Read `rendered` in those contexts, or request the record with `context: 'edit'`. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
 
 ### Bug Fixes
 
