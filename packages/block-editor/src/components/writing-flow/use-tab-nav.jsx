@@ -8,13 +8,16 @@ import { isInSameBlock, isInsideRootBlock } from '../../utils/dom';
 import { unlock } from '../../lock-unlock';
 
 /**
- * Keeps the element positioned within the viewport, so focussing it never
- * scrolls the page. Fixed positioning once made Safari build an oversized
- * compositing layer for the scrollable canvas, which is why keydown handlers
- * prevented the scrolling instead, but current Safari sizes the layer
- * correctly.
+ * Spans the element over the canvas, so it is always at least partially in
+ * view and focussing it never scrolls the content. Fixed positioning would
+ * achieve that too, but makes Safari composite the scrollable canvas on a
+ * layer sized to the whole document instead of the visible pane.
  */
-const PREVENT_SCROLL_ON_FOCUS = { position: 'fixed' };
+const PREVENT_SCROLL_ON_FOCUS = {
+	position: 'absolute',
+	inset: 0,
+	pointerEvents: 'none',
+};
 
 export default function useTabNav() {
 	const containerRef = /** @type {typeof useRef<HTMLElement>} */ ( useRef )();
