@@ -20,6 +20,7 @@ process.emitWarning(
 	'DeprecationWarning'
 );
 
+const esGlobals = require( 'globals' ).es2025;
 const plugin = require( '../' );
 
 /**
@@ -135,19 +136,24 @@ function flatToEslintrc( flatConfigs ) {
 	const result = {
 		plugins: [ ...pluginNames ],
 		rules,
+		/*
+		 * Flat config implies `ecmaVersion: 'latest'`, `sourceType: 'module'`
+		 * and the matching ES globals; eslintrc defaults to ES5 script with
+		 * none of them.
+		 */
+		globals: { ...esGlobals, ...globals },
+		parserOptions: {
+			ecmaVersion: 'latest',
+			sourceType: 'module',
+			...parserOptions,
+		},
 	};
 
-	if ( Object.keys( globals ).length > 0 ) {
-		result.globals = globals;
-	}
 	if ( Object.keys( settings ).length > 0 ) {
 		result.settings = settings;
 	}
 	if ( parser ) {
 		result.parser = parser;
-	}
-	if ( Object.keys( parserOptions ).length > 0 ) {
-		result.parserOptions = parserOptions;
 	}
 	if ( overrides.length > 0 ) {
 		result.overrides = overrides;
