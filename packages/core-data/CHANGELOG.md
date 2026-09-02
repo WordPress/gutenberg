@@ -9,6 +9,7 @@
 -   `Type.supports`, `WpTemplate.has_theme_file`, `WpTemplate.is_custom`, and `WpTemplatePart.has_theme_file` now match the REST schema. Support values are `true` or argument arrays, and the template flags are booleans. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
 -   The `getGlobalStyles` and `saveGlobalStyles` shortcuts now use `GlobalStyles` instead of the unrelated `GlobalStylesRevision` record. `saveGlobalStyles` requires the record ID and accepts a plain string title, matching the REST API update route and schema. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
 -   `RenderedText` omits `raw` outside the edit context instead of typing it as `never`, so a record requested with `context: 'view'` or `context: 'embed'` no longer exposes `title.raw` or `content.raw`. Read `rendered` in those contexts, or request the record with `context: 'edit'`. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
+-   The inferred `Plugin`, `PostStatusObject`, `Taxonomy`, `Theme`, and `NavMenu` records now match their REST schemas: plugin authors are strings, edit-only status and taxonomy fields are omitted in other contexts, theme tag arrays and inactive-theme support data are represented accurately, and menus no longer expose the unrelated menu-item `object_id`. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
 
 ### Bug Fixes
 

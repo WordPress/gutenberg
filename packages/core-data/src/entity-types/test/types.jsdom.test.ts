@@ -432,6 +432,79 @@ describe( 'Entity record types', () => {
 		};
 	} );
 
+	it( 'the inferred root records match their REST schemas', () => {
+		() => {
+			const plugin = select( coreStore ).getEntityRecord(
+				'root',
+				'plugin',
+				'gutenberg/gutenberg'
+			);
+			plugin?.author satisfies string | undefined;
+			// @ts-expect-error -- Core serialises the author as a string.
+			plugin?.author.name;
+
+			const viewStatus = select( coreStore ).getEntityRecord(
+				'root',
+				'status',
+				'publish',
+				{ context: 'view' }
+			);
+			viewStatus?.public satisfies boolean | undefined;
+			viewStatus?.queryable satisfies boolean | undefined;
+			viewStatus?.date_floating satisfies boolean | undefined;
+			// @ts-expect-error -- these status fields are edit-only.
+			viewStatus?.private;
+			// @ts-expect-error -- these status fields are edit-only.
+			viewStatus?.protected;
+			// @ts-expect-error -- these status fields are edit-only.
+			viewStatus?.show_in_list;
+
+			const embedStatus = select( coreStore ).getEntityRecord(
+				'root',
+				'status',
+				'publish',
+				{ context: 'embed' }
+			);
+			embedStatus?.name satisfies string | undefined;
+			embedStatus?.slug satisfies string | undefined;
+			// @ts-expect-error -- `public` is limited to view and edit.
+			embedStatus?.public;
+			// @ts-expect-error -- `queryable` is limited to view and edit.
+			embedStatus?.queryable;
+			// @ts-expect-error -- `date_floating` is limited to view and edit.
+			embedStatus?.date_floating;
+
+			const viewTaxonomy = select( coreStore ).getEntityRecord(
+				'root',
+				'taxonomy',
+				'category',
+				{ context: 'view' }
+			);
+			viewTaxonomy?.name satisfies string | undefined;
+			// @ts-expect-error -- taxonomy visibility is edit-only.
+			viewTaxonomy?.visibility;
+
+			const theme = select( coreStore ).getEntityRecord(
+				'root',
+				'theme',
+				'twentytwentysix'
+			);
+			theme?.tags.raw satisfies string[] | undefined;
+			theme?.tags.rendered satisfies string | undefined;
+			theme?.theme_supports?.formats satisfies string[] | undefined;
+			// @ts-expect-error -- inactive themes omit `theme_supports`.
+			theme?.theme_supports.formats;
+
+			const menu = select( coreStore ).getEntityRecord(
+				'root',
+				'menu',
+				1
+			);
+			// @ts-expect-error -- menus do not expose the menu-item `object_id`.
+			menu?.object_id;
+		};
+	} );
+
 	it( 'the global styles shortcuts use the entity record shape', () => {
 		() => {
 			const globalStyles = select( coreStore ).getGlobalStyles( 1 );
