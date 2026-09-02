@@ -1,0 +1,10 @@
+[
+	{
+		"name": "core/description-detail",
+		"isValid": true,
+		"attributes": {
+			"content": "Description"
+		},
+		"innerBlocks": []
+	}
+]

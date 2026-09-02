@@ -2,7 +2,15 @@
 
 ## Unreleased
 
+<<<<<<< HEAD
+### New Features
+
+-   Add Description List, Description Term, and Description Detail blocks.
+
+### Internal
+=======
 ### Enhancements
+>>>>>>> upstream/trunk
 
 -   Math: Declare `interactivity.clientNavigation` support. The block's front end output is static markup, and without the declaration a Math block inside a Query block forced full page reloads on pagination ([#82248](https://github.com/WordPress/gutenberg/pull/82248)).
 -   Query: Show a snackbar notice instead of a blocking modal when "Reload full page" is turned on automatically because a block inside the Query block doesn't support client-side navigation ([#82246](https://github.com/WordPress/gutenberg/pull/82246)).
