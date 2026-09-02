@@ -2,32 +2,54 @@ import { render as baseRender, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { SlotFillProvider } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+import { createElement } from '@wordpress/element';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import Link, {
 	getLinkSettings,
 	getUpdatedLinkAttributes,
 	NEW_TAB_TARGET,
 } from '../link';
 
-const mockFetchSearchSuggestions = jest.fn( () => Promise.resolve( [] ) );
+const mockFetchSearchSuggestions = vi.fn( () => Promise.resolve( [] ) );
 
-jest.mock( '@wordpress/data/src/components/use-select', () => {
-	// This allows us to tweak the returned value on each test.
-	const mock = jest.fn();
-	return mock;
-} );
+// Mock the hook module itself so the returned value can be tweaked per test.
+vi.mock( '@wordpress/data/src/components/use-select', () => ( {
+	default: vi.fn(),
+} ) );
 useSelect.mockImplementation( () => ( {
 	fetchSearchSuggestions: mockFetchSearchSuggestions,
 	fetchRichUrlData: undefined,
 } ) );
 
-jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
-	useDispatch: () => ( { saveEntityRecords: jest.fn() } ),
+vi.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
+	useDispatch: () => ( { saveEntityRecords: vi.fn() } ),
 } ) );
 
-jest.mock( '@wordpress/compose', () => ( {
-	...jest.requireActual( '@wordpress/compose' ),
-	useReducedMotion: jest.fn( () => true ),
+vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useReducedMotion: vi.fn( () => true ),
 } ) );
+
+beforeAll( () => {
+	// The link settings drawer reads `window.matchMedia`, which JSDOM lacks.
+	vi.stubGlobal(
+		'matchMedia',
+		vi.fn( ( query ) => ( {
+			matches: false,
+			media: query,
+			onchange: null,
+			addListener: vi.fn(),
+			removeListener: vi.fn(),
+			addEventListener: vi.fn(),
+			removeEventListener: vi.fn(),
+			dispatchEvent: vi.fn(),
+		} ) )
+	);
+} );
+
+afterAll( () => {
+	vi.unstubAllGlobals();
+} );
 
 function render( ui ) {
 	return baseRender( ui, { wrapper: SlotFillProvider } );
@@ -145,11 +167,11 @@ describe( 'getLinkSettings', () => {
 describe( 'Link field control', () => {
 	it( 'renders the field label and the current URL', () => {
 		render(
-			<Link
-				data={ { url: 'https://example.com' } }
-				field={ linkField }
-				onChange={ jest.fn() }
-			/>
+			createElement( Link, {
+				data: { url: 'https://example.com' },
+				field: linkField,
+				onChange: vi.fn(),
+			} )
 		);
 
 		expect( screen.getByRole( 'button', { name: 'Link' } ) ).toBeVisible();
@@ -160,15 +182,15 @@ describe( 'Link field control', () => {
 		const user = userEvent.setup();
 
 		render(
-			<Link
-				data={ {
+			createElement( Link, {
+				data: {
 					url: 'https://example.com',
 					rel: 'noopener',
 					linkTarget: NEW_TAB_TARGET,
-				} }
-				field={ linkField }
-				onChange={ jest.fn() }
-			/>
+				},
+				field: linkField,
+				onChange: vi.fn(),
+			} )
 		);
 
 		await openLinkSettingsDrawer( user );
@@ -186,18 +208,18 @@ describe( 'Link field control', () => {
 		const user = userEvent.setup();
 
 		render(
-			<Link
-				data={ {
+			createElement( Link, {
+				data: {
 					url: 'https://example.com',
 					rel: 'noopener nofollow',
 					linkTarget: NEW_TAB_TARGET,
-				} }
-				field={ linkField }
-				onChange={ jest.fn() }
-				config={ {
+				},
+				field: linkField,
+				onChange: vi.fn(),
+				config: {
 					settings: [ 'opensInNewTab', 'nofollow' ],
-				} }
-			/>
+				},
+			} )
 		);
 
 		await openLinkSettingsDrawer( user );
