@@ -18,7 +18,16 @@ export interface AvatarUrls {
 export type MediaType = 'image' | 'file';
 export type CommentingStatus = 'open' | 'closed';
 export type PingStatus = 'open' | 'closed';
-export type PostStatus = 'publish' | 'future' | 'draft' | 'pending' | 'private';
+export type PostStatus =
+	| 'publish'
+	| 'future'
+	| 'draft'
+	| 'pending'
+	| 'private'
+	| 'trash'
+	| 'auto-draft'
+	| 'inherit'
+	| ( string & {} );
 export type PostFormat =
 	| 'standard'
 	| 'aside'
