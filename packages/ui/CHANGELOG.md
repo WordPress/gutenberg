@@ -17,6 +17,7 @@
 
 ### Enhancements
 
+-   `Checkbox`: Read `--wp-ui-checkbox-input-size` from ancestors through a `var()` fallback instead of assigning the default on the control.
 -   `AlertDialog`, `Dialog`, `Drawer`, `Popover`, and `Tooltip`: Derive Trigger props from the corresponding Base UI components. ([#81824](https://github.com/WordPress/gutenberg/pull/81824))
 -   `Autocomplete.Status`, `Combobox.Status`: Add a `Status` subcomponent that announces async list status to screen readers. Item popups give Status its own collapsing grid row so a visible result count sits above the list without overlaying items ([#82195](https://github.com/WordPress/gutenberg/pull/82195)).
 -   `Autocomplete.Popup`, `Combobox.Popup`, `SearchableChipSelect`, `SearchableChipSelectControl`, `Select.Popup`, and `SelectControl`: Add `width` on Popups and `popupWidth` on composites, with preset width constraints (`anchor`, `content`, `sm`, `md`, `lg`, and `available`) for the item popup. `SelectControl` defaults to `content` to preserve prior popup sizing ([#82087](https://github.com/WordPress/gutenberg/pull/82087), [#82193](https://github.com/WordPress/gutenberg/pull/82193)).
@@ -32,6 +33,7 @@
 
 ### Documentation
 
+-   Document that public `--wp-ui-*` defaults belong in `var()` fallbacks, so ancestor styles can override them.
 -   Add a Form best practices Storybook page for labeling composed controls ([#82197](https://github.com/WordPress/gutenberg/pull/82197)).
 
 ## 0.21.0 (2026-08-26)

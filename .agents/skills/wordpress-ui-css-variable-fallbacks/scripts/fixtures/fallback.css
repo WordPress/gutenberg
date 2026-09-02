@@ -1,0 +1,4 @@
+.root {
+	width: var(--wp-ui-checkbox-input-size, 16px);
+	height: var(--wp-ui-checkbox-input-size, 16px);
+}

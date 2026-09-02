@@ -345,6 +345,39 @@ When the override also `composes` the primitive it extends, keep the override in
 }
 ```
 
+### Public `--wp-ui-*` defaults
+
+CSS custom properties prefixed with `--wp-ui-` are public API. They inherit. If a component assigns `--wp-ui-*` on the class that uses it, that assignment overwrites any ancestor value. Theming from a wrapper then does nothing.
+
+Put the default in the `var()` fallback. Do not assign the public custom property on the consuming class.
+
+```css
+/* Wrong: the local assignment wins over an ancestor. */
+.root {
+	--wp-ui-checkbox-input-size: 16px;
+	width: var( --wp-ui-checkbox-input-size );
+}
+
+/* Right: an ancestor `--wp-ui-checkbox-input-size` is used when set. */
+.root {
+	width: var( --wp-ui-checkbox-input-size, 16px );
+	height: var( --wp-ui-checkbox-input-size, 16px );
+}
+```
+
+Do not write `--wp-ui-x: var(--wp-ui-x, fallback)`. That is a cycle. The specified value on the element refers to itself, not to the inherited value.
+
+Private `--_*` and `--_gcd-*` assignments are implementation details. When they read a public `--wp-ui-*` value, pass the same fallback:
+
+```css
+--_gcd-button-font-size: var(
+	--wp-ui-button-font-size,
+	var( --wpds-typography-font-size-md )
+);
+```
+
+This is separate from [state handling](#custom-properties-and-state-styles). State selectors still set CSS properties, not custom properties.
+
 ### Custom Properties and State Styles
 
 When components expose CSS custom properties (variables) for theming or composition, care must be taken to separate **configurable values** from **state handling**. Getting this wrong can silently break styles when components are composed across CSS layers.
@@ -353,22 +386,20 @@ When components expose CSS custom properties (variables) for theming or composit
 
 > **Custom properties = configurable values. CSS properties = state machine.**
 
-Define custom properties for each visual "slot" (default, active/hover, disabled, etc.) and assign them to design tokens or other values. In state selectors (`:hover`, `:active`, `:focus`, `[data-disabled]`, etc.), set **CSS properties** (like `background-color`, `color`) to reference the appropriate custom property for that state — do **not** reassign the custom property itself.
+Give each visual slot (default, hover, disabled) its own public custom property. Read each one through `var()` with a fallback, as in Public `--wp-ui-*` defaults above. In state selectors (`:hover`, `:active`, `:focus`, `[data-disabled]`, etc.), set **CSS properties** (like `background-color`, `color`) to that slot's custom property. Do not reassign the custom property itself.
 
 In CSS cascade layers, a rule in a higher-priority layer always wins over a lower-priority layer regardless of selector specificity. If a component reassigns a custom property inside a state selector, a higher layer that overrides that same custom property will win unconditionally — the state-based reassignment in the lower layer becomes dead code.
 
 #### Do this
 
-Define a separate custom property per state, and use CSS property declarations in state selectors:
+Use a separate public custom property per state. Read each one through `var()` with a fallback, and set CSS properties in state selectors:
 
 ```css
 .button {
-	--button-bg: blue;
-	--button-bg-hover: darkblue;
-	background-color: var( --button-bg );
+	background-color: var( --wp-ui-button-background-color, blue );
 
 	&:hover {
-		background-color: var( --button-bg-hover );
+		background-color: var( --wp-ui-button-background-color-active, darkblue );
 	}
 }
 ```
@@ -381,16 +412,16 @@ Do not reassign the same custom property in state selectors:
 
 ```css
 .button {
-	--button-bg: blue;
-	background-color: var( --button-bg );
+	--wp-ui-button-background-color: blue;
+	background-color: var( --wp-ui-button-background-color );
 
 	&:hover {
-		--button-bg: darkblue;
+		--wp-ui-button-background-color: darkblue;
 	}
 }
 ```
 
-If a higher layer sets `.special-button { --button-bg: red; }`, that override wins over the hover reassignment (layer precedence trumps specificity). The hover state will show `red` instead of `darkblue`, and there is no way for the lower layer to recover.
+If a higher layer sets `.special-button { --wp-ui-button-background-color: red; }`, that override wins over the hover reassignment (layer precedence trumps specificity). The hover state will show `red` instead of `darkblue`, and there is no way for the lower layer to recover.
 
 ### Disabled State Styling
 
