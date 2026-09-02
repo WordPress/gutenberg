@@ -20,7 +20,11 @@ import {
 import { ACCENT_RAMP_CONFIG, BG_RAMP_CONFIG } from '../lib/ramp-configs';
 import { taperChroma } from '../lib/taper-chroma';
 import type { Ramp, RampResult } from '../lib/types';
-import { solveWithBisect } from '../lib/utils';
+import { buildRamp } from '../lib/index';
+import {
+	clampAccentScaleReferenceLightness,
+	solveWithBisect,
+} from '../lib/utils';
 
 ColorSpace.register( sRGB );
 ColorSpace.register( OKLab );
@@ -31,6 +35,7 @@ export const EXPERIMENTAL_RAMP_METHODS = [
 	'anchored',
 	'apca-all',
 	'role-hybrid',
+	'pinned-role-hybrid',
 ] as const;
 
 export type ExperimentalRampMethod =
@@ -48,6 +53,14 @@ type ChromaMode = 'absolute' | 'relative' | 'tapered';
 type GetColorAtLightness = ( lightness: number ) => PlainColorObject;
 
 const SURFACE_STEPS = [ 'surface4', 'surface5', 'surface6' ] as const;
+const PINNED_SURFACE_STEPS = [
+	'surface1',
+	'surface3',
+	'surface4',
+	'surface5',
+	'surface6',
+] as const;
+const PINNED_SURFACE_PROGRESS = [ 0.15, 0.3, 0.55, 0.75, 1 ] as const;
 const STROKE_STEPS = [ 'stroke1', 'stroke2', 'stroke3', 'stroke4' ] as const;
 const SURFACE_PROGRESS = [ 1 / 3, 2 / 3, 1 ] as const;
 const STROKE_PROGRESS = [ 0, 1 / 3, 2 / 3, 1 ] as const;
@@ -58,6 +71,8 @@ const SERIALIZED_ACTIVE_FILL_WCAG_TARGET =
 	BG_RAMP_CONFIG.steps.bgFill2.contrast.target + UNIVERSAL_CONTRAST_TOPUP;
 const SERIALIZED_STROKE_WCAG_TARGET =
 	BG_RAMP_CONFIG.steps.stroke3.contrast.target + UNIVERSAL_CONTRAST_TOPUP;
+const SERIALIZED_SURFACE_FOREGROUND_WCAG_TARGET =
+	4.5 + UNIVERSAL_CONTRAST_TOPUP;
 
 function getMetric(
 	metric: PerceptualMetric,
@@ -189,7 +204,9 @@ function getRampChromaMode(
 	if ( family === 'neutral' ) {
 		return 'tapered';
 	}
-	return method === 'role-hybrid' ? 'relative' : 'absolute';
+	return method === 'role-hybrid' || method === 'pinned-role-hybrid'
+		? 'relative'
+		: 'absolute';
 }
 
 function rebuildProgression( {
@@ -407,6 +424,137 @@ function rebuildElevationPair( {
 	return nextRamp;
 }
 
+function rebuildPinnedSurfaceLane( {
+	ramp,
+	direction,
+	seed,
+	mode,
+}: {
+	ramp: Record< keyof Ramp, string >;
+	direction: RampResult[ 'direction' ];
+	seed: string;
+	mode: ChromaMode;
+} ) {
+	const getColorAtLightness = createColorAtLightness( seed, mode );
+	const foregroundEndpoint = getColorAtLightness(
+		direction === 'lighter' ? 1 : 0
+	);
+	const constrainedSurfaces = [
+		'surface1',
+		'surface2',
+		'surface3',
+		'surface4',
+		'surface5',
+	] as const;
+
+	if (
+		constrainedSurfaces.every(
+			( step ) =>
+				getContrast( ramp[ step ], foregroundEndpoint ) >=
+				SERIALIZED_SURFACE_FOREGROUND_WCAG_TARGET
+		)
+	) {
+		return ramp;
+	}
+
+	const reference = prepareMetricReference( 'delta-e', ramp.surface2 );
+	const startLightness = get( ramp.surface2, [ OKLCH, 'l' ] );
+	const endLightness = direction === 'lighter' ? 0 : 1;
+	const maximumDifference = Math.max(
+		...PINNED_SURFACE_STEPS.map( ( step ) =>
+			getMetric( 'delta-e', reference, ramp[ step ] )
+		)
+	);
+	const nextRamp = { ...ramp };
+
+	PINNED_SURFACE_STEPS.forEach( ( step, index ) => {
+		nextRamp[ step ] = getColorString(
+			findColorAtMetric( {
+				metric: 'delta-e',
+				reference,
+				getColorAtLightness,
+				startLightness,
+				endLightness,
+				target: maximumDifference * PINNED_SURFACE_PROGRESS[ index ],
+			} )
+		);
+	} );
+
+	return nextRamp;
+}
+
+function findColorAtWcagContrast( {
+	reference,
+	getColorAtLightness,
+	startLightness,
+	endLightness,
+	target,
+}: {
+	reference: string;
+	getColorAtLightness: GetColorAtLightness;
+	startLightness: number;
+	endLightness: number;
+	target: number;
+} ) {
+	const startColor = getColorAtLightness( startLightness );
+	const startDelta = Math.log(
+		getContrast( reference, startColor ) / target
+	);
+
+	if ( startDelta >= 0 ) {
+		return startColor;
+	}
+
+	const endColor = getColorAtLightness( endLightness );
+	const endDelta = Math.log( getContrast( reference, endColor ) / target );
+	if ( endDelta < 0 ) {
+		return endColor;
+	}
+
+	return solveWithBisect(
+		getColorAtLightness,
+		( color ) => Math.log( getContrast( reference, color ) / target ),
+		startLightness,
+		startDelta,
+		endLightness,
+		endDelta
+	);
+}
+
+function createRoomForDarkerActiveFill( {
+	ramp,
+	seed,
+	mode,
+}: {
+	ramp: Record< keyof Ramp, string >;
+	seed: string;
+	mode: ChromaMode;
+} ) {
+	if (
+		getContrast( ramp.bgFill1, ramp.bgFill2 ) >=
+		SERIALIZED_ACTIVE_FILL_WCAG_TARGET
+	) {
+		return ramp;
+	}
+
+	const getColorAtLightness = createColorAtLightness( seed, mode );
+	const nextRamp = { ...ramp };
+	nextRamp.bgFill1 = getColorString(
+		findColorAtWcagContrast( {
+			reference: ramp.surface2,
+			getColorAtLightness,
+			startLightness: get( ramp.surface2, [ OKLCH, 'l' ] ),
+			endLightness: 1,
+			target:
+				BG_RAMP_CONFIG.steps.bgFill1.contrast.target +
+				UNIVERSAL_CONTRAST_TOPUP,
+		} )
+	);
+	nextRamp.bgFill2 = nextRamp.bgFill1;
+
+	return nextRamp;
+}
+
 function rebuildActiveFill( {
 	ramp,
 	method,
@@ -506,6 +654,14 @@ function rebuildRamp( {
 		mode,
 		taperOptions: BG_RAMP_CONFIG.steps.surface4.taperChromaOptions,
 	} );
+	if ( method === 'pinned-role-hybrid' ) {
+		nextRamp = rebuildPinnedSurfaceLane( {
+			ramp: nextRamp,
+			direction: ramp.direction,
+			seed,
+			mode,
+		} );
+	}
 	nextRamp = rebuildProgression( {
 		ramp: nextRamp,
 		referenceName: 'surface3',
@@ -529,6 +685,21 @@ function rebuildRamp( {
 		seed,
 		mode,
 	} );
+	if ( method === 'pinned-role-hybrid' && family === 'neutral' ) {
+		const fillRamp = createRoomForDarkerActiveFill( {
+			ramp: nextRamp,
+			seed,
+			mode,
+		} );
+		if ( fillRamp !== nextRamp ) {
+			nextRamp = rebuildActiveFill( {
+				ramp: fillRamp,
+				method,
+				seed,
+				mode,
+			} );
+		}
+	}
 
 	const intermediateResult: RampResult = {
 		...ramp,
@@ -552,7 +723,12 @@ function buildExperimentalBackground(
 	method: ExperimentalRampMethod,
 	background: string
 ) {
-	const anchored = buildBgRamp( background );
+	const anchored =
+		method === 'pinned-role-hybrid'
+			? buildRamp( background, BG_RAMP_CONFIG, {
+					rescaleToFitContrastTargets: false,
+			  } )
+			: buildBgRamp( background );
 	if ( method === 'anchored' ) {
 		return anchored;
 	}
@@ -570,7 +746,21 @@ function buildExperimentalAccent(
 	seed: string,
 	backgroundRamp: RampResult
 ) {
-	const anchored = buildAccentRamp( seed, backgroundRamp );
+	const anchored =
+		method === 'pinned-role-hybrid'
+			? buildRamp( seed, ACCENT_RAMP_CONFIG, {
+					backgroundRamp,
+					mainDirection: backgroundRamp.direction,
+					pinLightness: {
+						stepName: 'surface2',
+						value: clampAccentScaleReferenceLightness(
+							get( backgroundRamp.ramp.surface2, [ OKLCH, 'l' ] ),
+							backgroundRamp.direction
+						),
+					},
+					rescaleToFitContrastTargets: false,
+			  } )
+			: buildAccentRamp( seed, backgroundRamp );
 	if ( method === 'anchored' ) {
 		return anchored;
 	}
