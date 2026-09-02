@@ -38,65 +38,88 @@ class Gutenberg_Shortcode_Transforms {
 	 * @return array Markup strings and parsed block arrays, in document order.
 	 */
 	public static function segment( $html, $offset = 0, $excluded_block_names = array() ) {
-		$transform = self::find_transform( $html, $excluded_block_names );
-
-		if ( null === $transform ) {
-			return array( $html );
-		}
-
-		$shortcode = self::next( $transform['tag'], $html, $offset );
-
-		if ( null === $shortcode ) {
-			return array( $html );
-		}
-
-		$last_index = $shortcode['index'] + strlen( $shortcode['text'] );
-		$before     = substr( $html, 0, $shortcode['index'] );
-		$after      = substr( $html, $last_index );
+		$pieces = array();
 
 		/*
-		 * A shortcode reading as part of a sentence stays in the sentence.
-		 * Only one holding markup of its own, or standing on its own line,
-		 * becomes a block.
+		 * The markup is walked rather than recursed into: a post with a
+		 * bracketed word in every paragraph, or a caption after every image,
+		 * would otherwise keep a copy of the remainder alive for each one.
 		 */
-		$holds_markup = isset( $shortcode['content'] ) && false !== strpos( $shortcode['content'], '<' );
+		while ( true ) {
+			$transform = self::find_transform( $html, $excluded_block_names );
 
-		if ( ! $holds_markup && ! ( preg_match( self::BEFORE_LINE, $before ) && preg_match( self::AFTER_LINE, $after ) ) ) {
-			return self::segment( $html, $last_index );
-		}
+			if ( null === $transform ) {
+				break;
+			}
 
-		/*
-		 * A PHP-registered transform may attach an `isMatch` callable, which
-		 * the editor calls with the shortcode's parsed attributes; a refusal
-		 * leaves the shortcode to the next transform that wants it.
-		 */
-		if (
-			isset( $transform['isMatch'] )
-			&& Gutenberg_Block_Transforms::is_runnable_callback( $transform['isMatch'] )
-			&& ! call_user_func( $transform['isMatch'], $shortcode['attrs'] )
-		) {
-			$excluded_block_names[] = $transform['blockName'];
+			$shortcode = self::next( $transform['tag'], $html, $offset );
 
-			return self::segment( $html, $offset, $excluded_block_names );
-		}
+			if ( null === $shortcode ) {
+				break;
+			}
 
-		$block = self::create_block( $transform, $shortcode );
+			$last_index = $shortcode['index'] + strlen( $shortcode['text'] );
+			$before     = substr( $html, 0, $shortcode['index'] );
+			$after      = substr( $html, $last_index );
 
-		if ( null === $block ) {
 			/*
-			 * The block is not registered, or rebuilds its own markup, so the
-			 * shortcode is left for the next transform that wants it.
+			 * A shortcode reading as part of a sentence stays in the sentence.
+			 * Only one holding markup of its own, or standing on its own line,
+			 * becomes a block. The search goes on past it, with the exclusions
+			 * reset as `segmentHTMLToShortcodeBlock()` resets them.
 			 */
-			$excluded_block_names[] = $transform['blockName'];
+			$holds_markup = isset( $shortcode['content'] ) && false !== strpos( $shortcode['content'], '<' );
 
-			return self::segment( $html, $offset, $excluded_block_names );
+			if ( ! $holds_markup && ! ( preg_match( self::BEFORE_LINE, $before ) && preg_match( self::AFTER_LINE, $after ) ) ) {
+				$offset               = $last_index;
+				$excluded_block_names = array();
+				continue;
+			}
+
+			/*
+			 * A PHP-registered transform may attach an `isMatch` callable, which
+			 * the editor calls with the shortcode's parsed attributes; a refusal
+			 * leaves the shortcode to the next transform that wants it.
+			 */
+			if (
+				isset( $transform['isMatch'] )
+				&& Gutenberg_Block_Transforms::is_runnable_callback( $transform['isMatch'] )
+				&& ! call_user_func( $transform['isMatch'], $shortcode['attrs'] )
+			) {
+				$excluded_block_names[] = $transform['blockName'];
+				continue;
+			}
+
+			$block = self::create_block( $transform, $shortcode );
+
+			if ( null === $block ) {
+				/*
+				 * The block is not registered, or rebuilds its own markup, so the
+				 * shortcode is left for the next transform that wants it.
+				 */
+				$excluded_block_names[] = $transform['blockName'];
+				continue;
+			}
+
+			/*
+			 * The run before the block holds no shortcode of this tag, so
+			 * segmenting it recurses at most once per registered transform
+			 * however long the markup is; the run after it is walked on here.
+			 */
+			foreach ( self::segment( preg_replace( self::BEFORE_LINE, '', $before ) ) as $piece ) {
+				$pieces[] = $piece;
+			}
+
+			$pieces[] = $block;
+
+			$html                 = preg_replace( self::AFTER_LINE, '', $after );
+			$offset               = 0;
+			$excluded_block_names = array();
 		}
 
-		return array_merge(
-			self::segment( preg_replace( self::BEFORE_LINE, '', $before ) ),
-			array( $block ),
-			self::segment( preg_replace( self::AFTER_LINE, '', $after ) )
-		);
+		$pieces[] = $html;
+
+		return $pieces;
 	}
 
 	/**
@@ -193,24 +216,27 @@ class Gutenberg_Shortcode_Transforms {
 			}
 		}
 
-		$markup = self::raw_markup( $block_type, $attributes );
-
 		/*
 		 * A block rebuilding its markup from attributes cannot be produced
 		 * without its `save`, the same as a raw transform whose block rewrites
-		 * the source. Declining leaves the shortcode to the next transform
+		 * the source; one rendering on the server, or saving a single raw
+		 * attribute, can. Declining leaves the shortcode to the next transform
 		 * that wants it, which is the Shortcode block.
 		 */
+		$markup = Gutenberg_Block_Transforms::server_markup( $block_type, $attributes );
+
 		if ( null === $markup ) {
 			return null;
 		}
+
+		$markup = Gutenberg_HTML_Element::strip_block_delimiters( $markup );
 
 		return array(
 			'blockName'    => $block_type->name,
 			'attrs'        => Gutenberg_Block_Transforms::remove_implied_attributes( $block_type, $attributes ),
 			'innerBlocks'  => array(),
 			'innerHTML'    => $markup,
-			'innerContent' => array( $markup ),
+			'innerContent' => '' === $markup ? array() : array( $markup ),
 		);
 	}
 
@@ -416,32 +442,6 @@ class Gutenberg_Shortcode_Transforms {
 		}
 
 		return $html;
-	}
-
-	/**
-	 * Returns the markup a block saves for a shortcode, or null.
-	 *
-	 * A block sourcing an attribute with `raw` saves that attribute and nothing
-	 * else, which is what the Shortcode block does with the shortcode's own
-	 * text. That is the one shape the server can write without running a
-	 * block's `save`.
-	 *
-	 * @param WP_Block_Type $block_type Block type.
-	 * @param array         $attributes Attribute values.
-	 * @return string|null Saved markup, or null when the block rebuilds its own.
-	 */
-	private static function raw_markup( $block_type, $attributes ) {
-		foreach ( (array) $block_type->attributes as $name => $definition ) {
-			if (
-				isset( $definition['source'], $attributes[ $name ] )
-				&& 'raw' === $definition['source']
-				&& is_string( $attributes[ $name ] )
-			) {
-				return $attributes[ $name ];
-			}
-		}
-
-		return null;
 	}
 
 	/**

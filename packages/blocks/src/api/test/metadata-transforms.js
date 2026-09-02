@@ -298,6 +298,43 @@ describe( 'a configuration passed as metadata', () => {
 		expect( from[ 0 ].transform ).toBe( transform );
 		expect( from[ 0 ].isMatch ).toBe( isMatch );
 	} );
+
+	it( 'registers transforms written as data once as well', () => {
+		// Without a function, normalizing makes new objects of the declared
+		// entries, so identity cannot tell the two copies apart: the
+		// settings side has to know it is offering the same set.
+		const config = {
+			name,
+			apiVersion: 3,
+			title: 'Config as metadata',
+			category: 'text',
+			attributes: {},
+			transforms: {
+				from: [ { type: 'raw', selector: 'marquee' } ],
+			},
+			save: () => null,
+		};
+
+		registerBlockType( config, config );
+
+		const { from } = getBlockType( name ).transforms;
+
+		expect( from ).toHaveLength( 1 );
+		expect( from[ 0 ].selector ).toBe( 'marquee' );
+	} );
+
+	it( 'leaves a block registering no transforms without the key', () => {
+		registerBlockType( name, {
+			apiVersion: 3,
+			title: 'No transforms',
+			category: 'text',
+			attributes: {},
+			save: () => null,
+		} );
+
+		// As before declared and registered transforms were merged here.
+		expect( 'transforms' in getBlockType( name ) ).toBe( false );
+	} );
 } );
 
 describe( 'transforms declared in metadata after a server bootstrap', () => {

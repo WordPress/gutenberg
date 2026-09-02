@@ -47,8 +47,9 @@ export function nodeToBlock(
 
 	// A raw transform may return several blocks, in which case it is unclear
 	// which of them the node's class and id belong on, so only the
-	// single-block case carries them.
-	if ( Array.isArray( block ) ) {
+	// single-block case carries them. It may also return nothing, to leave
+	// the node alone, and there is nothing to carry them then.
+	if ( ! block || Array.isArray( block ) ) {
 		return block;
 	}
 

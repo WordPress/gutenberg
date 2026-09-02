@@ -67,6 +67,19 @@ class Gutenberg_HTML_Element {
 	public $text = '';
 
 	/**
+	 * Whether the server declined to convert this node.
+	 *
+	 * Set on media the editor would lift out into a figure, or on the paragraph
+	 * or division it would lift it out of, when no block claims that figure.
+	 * Converting the node anyway would run it through a transform whose schema
+	 * strips what the declining block could not save back, so it is kept as it
+	 * stands instead.
+	 *
+	 * @var bool
+	 */
+	public $declined = false;
+
+	/**
 	 * Serialization of this node's opening tag, or of the whole node for
 	 * non-element nodes.
 	 *
@@ -105,6 +118,57 @@ class Gutenberg_HTML_Element {
 		$root->type = self::OTHER;
 		$stack      = array( $root );
 
+		try {
+			self::read_tokens( $processor, $root, $stack );
+		} catch ( Exception $e ) {
+			/*
+			 * WordPress 6.9 lets the exception its processor raises on markup
+			 * nested deeper than it has bookmarks for escape; later versions
+			 * turn it into a parse error. Either way the markup could not be
+			 * read, which the caller keeps whole.
+			 */
+			return null;
+		}
+
+		if ( null !== $processor->get_last_error() ) {
+			return null;
+		}
+
+		/*
+		 * An element cut off by the end of the markup — a `<textarea>` or a
+		 * `<script>` never closed — has content the processor never handed
+		 * over, so the markup was not read to its end either. A comment cut
+		 * off the same way is the one thing a browser also reads as running
+		 * to the end, holding nothing, so it is the one thing dropped.
+		 */
+		if ( $processor->paused_at_incomplete_token() && ! self::ends_in_a_comment( $html ) ) {
+			return null;
+		}
+
+		return $root;
+	}
+
+	/**
+	 * Determines whether markup ends inside a comment that is never closed.
+	 *
+	 * @param string $html Markup to test.
+	 * @return bool Whether the last comment opened is never closed.
+	 */
+	private static function ends_in_a_comment( $html ) {
+		$opened = strrpos( $html, '<!--' );
+
+		return false !== $opened && false === strpos( $html, '-->', $opened + 4 );
+	}
+
+	/**
+	 * Reads every token into a tree.
+	 *
+	 * @param WP_HTML_Processor        $processor Processor positioned before the first token.
+	 * @param Gutenberg_HTML_Element   $root      Fragment root.
+	 * @param Gutenberg_HTML_Element[] $stack     Open elements, the root first.
+	 * @return void
+	 */
+	private static function read_tokens( $processor, $root, $stack ) {
 		while ( $processor->next_token() ) {
 			$token_type = $processor->get_token_type();
 			$parent     = $stack[ count( $stack ) - 1 ];
@@ -155,19 +219,69 @@ class Gutenberg_HTML_Element {
 			} elseif ( '#comment' === $token_type ) {
 				$node->type = self::COMMENT;
 				$node->text = (string) $processor->get_full_comment_text();
+
+				/*
+				 * A comment shaped like a block delimiter — a `<!-- /wp:html -->`
+				 * left over from some earlier conversion — would be read as
+				 * one again once the converted markup is parsed, and swallow
+				 * or split the blocks around it. It renders nothing, so it
+				 * is dropped rather than carried into any block.
+				 */
+				if ( self::is_block_delimiter( $node->text ) ) {
+					continue;
+				}
 			} else {
 				$node->type = self::OTHER;
 			}
 
 			$node->opening_html = $processor->serialize_token();
+
+			/*
+			 * WordPress 6.9 serializes the text inside an `iframe`, `noembed`
+			 * or `noframes` as nothing at all; it is raw text, so the text
+			 * itself is its serialization.
+			 */
+			if (
+				self::TEXT === $node->type
+				&& '' === $node->opening_html
+				&& '' !== $node->text
+				&& self::ELEMENT === $parent->type
+				&& in_array( $parent->tag_name, array( 'iframe', 'noembed', 'noframes' ), true )
+			) {
+				$node->opening_html = $node->text;
+			}
+
 			$parent->children[] = $node;
 		}
+	}
 
-		if ( null !== $processor->get_last_error() ) {
-			return null;
-		}
+	/**
+	 * Determines whether comment text reads as a block delimiter.
+	 *
+	 * The block grammar accepts any whitespace after the `<!--`, so this has
+	 * to as well: `strpos( $html, '<!-- wp:' )` alone lets a tabbed opener or
+	 * a lone closer through.
+	 *
+	 * @param string $text Comment text, without its delimiters.
+	 * @return bool Whether `parse_blocks()` would read it as a delimiter.
+	 */
+	public static function is_block_delimiter( $text ) {
+		return 1 === preg_match( '/^\s+\/?wp:[a-z]/', $text );
+	}
 
-		return $root;
+	/**
+	 * Removes the comments shaped like block delimiters from markup.
+	 *
+	 * The string-level counterpart of the check `from_html()` makes, for the
+	 * markup that is kept whole without being read into a tree.
+	 *
+	 * @param string $html Markup to clean.
+	 * @return string Markup without delimiter-shaped comments.
+	 */
+	public static function strip_block_delimiters( $html ) {
+		$stripped = preg_replace( '/<!--\s+\/?wp:.*?-->/s', '', $html );
+
+		return null === $stripped ? $html : $stripped;
 	}
 
 	/**
@@ -825,21 +939,64 @@ class Gutenberg_HTML_Element {
 	/**
 	 * Determines whether a `:has()` argument matches anything below this node.
 	 *
+	 * The argument is a relative selector, read from this node the way
+	 * `Element.matches()` reads it: its first compound has to match a child
+	 * (`:has(> a > img)`) or a descendant (`:has(a img)`) of this node rather
+	 * than of anything above it, and each further compound continues from the
+	 * element the one before it matched.
+	 *
 	 * @param array $selector Parsed relative selector with `scope` and `selector` keys.
 	 * @return bool Whether a descendant matches.
 	 */
 	private function has_matching_descendant( $selector ) {
-		if ( '>' === $selector['scope'] ) {
-			foreach ( $this->child_elements() as $child ) {
-				if ( $child->matches( $selector['selector'] ) ) {
-					return true;
-				}
-			}
+		$selector_list = self::parse_selector_list( $selector['selector'] );
 
+		if ( null === $selector_list ) {
 			return false;
 		}
 
-		return null !== $this->query_selector( $selector['selector'] );
+		$combinator = '>' === $selector['scope'] ? '>' : ' ';
+
+		foreach ( $selector_list as $complex ) {
+			if ( $this->matches_relative_selector( $complex, 0, $combinator ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Walks down the tree matching the parts of a relative selector in turn.
+	 *
+	 * @param array  $complex    Parsed complex selector, in source order.
+	 * @param int    $index      Index of the part to match next.
+	 * @param string $combinator Combinator joining that part to this node: `>` for a child, a space for any descendant.
+	 * @return bool Whether an element below this node matches the rest of the selector.
+	 */
+	private function matches_relative_selector( $complex, $index, $combinator ) {
+		if ( ! isset( $complex[ $index ] ) ) {
+			return true;
+		}
+
+		$compound = $complex[ $index ]['compound'];
+		$next     = isset( $complex[ $index + 1 ] ) ? $complex[ $index + 1 ]['combinator'] : null;
+
+		foreach ( $this->child_elements() as $child ) {
+			if (
+				$child->matches_compound_selector( $compound )
+				&& $child->matches_relative_selector( $complex, $index + 1, $next )
+			) {
+				return true;
+			}
+
+			// A descendant combinator lets the part match further down.
+			if ( ' ' === $combinator && $child->matches_relative_selector( $complex, $index, $combinator ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

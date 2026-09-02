@@ -2,7 +2,7 @@ import { autop, removep } from '@wordpress/autop';
 import { getPhrasingContentSchema } from '@wordpress/dom';
 import warning from '@wordpress/warning';
 import { createBlock } from './factory';
-import { matchesSelector } from './matches-selector';
+import { isValidSelector, matchesSelector } from './matches-selector';
 import { getRawTransforms } from './raw-handling/get-raw-transforms';
 import { nodeToBlock } from './raw-handling/html-to-blocks';
 import {
@@ -74,11 +74,20 @@ function resolveContentSchema( schema: unknown, args: SchemaArgs ): unknown {
 				];
 			}
 
-			if (
-				'attributes' === key ||
-				'require' === key ||
-				'classes' === key
-			) {
+			if ( 'require' === key ) {
+				return [
+					key,
+					Array.isArray( value )
+						? value.filter(
+								( selector ) =>
+									typeof selector === 'string' &&
+									isValidSelector( selector )
+						  )
+						: value,
+				];
+			}
+
+			if ( 'attributes' === key || 'classes' === key ) {
 				return [ key, value ];
 			}
 

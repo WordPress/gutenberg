@@ -545,7 +545,7 @@ Common keys:
 
 Keys for a `raw` transform:
 
--   `selector` (`string`): a CSS selector matched against each top-level element of the source markup. Type, universal, class, ID and attribute selectors are supported — attribute presence and the `=`, `~=`, `^=`, `$=`, `*=` and `|=` operators — along with the descendant and child combinators and the `:has()`, `:not()` and `:only-child` pseudo-classes.
+-   `selector` (`string`): a CSS selector matched against each top-level element of the source markup, or a comma-separated list of them. Type, universal, class, ID and attribute selectors are supported — attribute presence and the `=`, `~=`, `^=`, `$=`, `*=` and `|=` operators — along with the descendant and child combinators and the `:has()`, `:not()` and `:only-child` pseudo-classes.
 -   `schema` (`object`): the content schema describing which markup survives conversion. Write `"phrasing"` where the phrasing content schema belongs, `{ "default": [], "paste": [] }` where the allowed attributes differ when pasting, and `"attributes": "*"` where they do not matter — which is what a `serverConversion` schema writes for an element whose attributes the transform strips anyway.
 -   `sourceAttributes` (`boolean`, default `true`): whether to derive the block's attributes from the matched markup using the block's own attribute sources.
 -   `innerBlocks` (`boolean|string`, default `false`): which of the matched element's content becomes inner blocks. `true` converts all of it; a CSS selector converts only the matching child elements and leaves the rest with the block.

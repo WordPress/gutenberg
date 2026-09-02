@@ -80,6 +80,17 @@ export const processBlockType =
 	} ): BlockType | undefined => {
 		const bootstrappedBlockType = select.getBootstrappedBlockType( name );
 
+		/*
+		 * A block declares transforms in `block.json`, which reaches here
+		 * bootstrapped, and may register more from JavaScript. Both describe
+		 * the same block, so the merged result is the more complete of the
+		 * two rather than whichever arrived last.
+		 */
+		const transforms = mergeBlockTransforms(
+			bootstrappedBlockType?.transforms,
+			blockSettings?.transforms
+		);
+
 		const blockType = {
 			apiVersion: 1,
 			name,
@@ -104,16 +115,9 @@ export const processBlockType =
 					? blockSettings.variations
 					: []
 			),
-			/*
-			 * A block declares transforms in `block.json`, which reaches here
-			 * bootstrapped, and may register more from JavaScript. Both
-			 * describe the same block, so the merged result is the more
-			 * complete of the two rather than whichever arrived last.
-			 */
-			transforms: mergeBlockTransforms(
-				bootstrappedBlockType?.transforms,
-				blockSettings?.transforms
-			),
+			// A block with no transforms on either side has no key for them,
+			// as before they were merged here.
+			...( transforms ? { transforms } : {} ),
 		};
 
 		// If the block is registering attributes as null or undefined, warn and default to empty object.

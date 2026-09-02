@@ -22,3 +22,31 @@ export function matchesSelector( node: Element, selector: string ): boolean {
 		return false;
 	}
 }
+
+/**
+ * Determines whether a selector declared in a block's `block.json` is valid
+ * CSS, reporting one that is not.
+ *
+ * A declared `require` selector reaches `querySelector()` in the paste
+ * handler's content filter, which would throw out of every paste holding the
+ * element it belongs to, so an invalid one is dropped at registration.
+ *
+ * @param selector CSS selector.
+ *
+ * @return Whether the selector can be used.
+ */
+export function isValidSelector( selector: string ): boolean {
+	if ( typeof document === 'undefined' ) {
+		return true;
+	}
+
+	try {
+		document.createDocumentFragment().querySelector( selector );
+		return true;
+	} catch {
+		warning(
+			`The "${ selector }" selector declared by a block is not valid CSS, so it is ignored.`
+		);
+		return false;
+	}
+}

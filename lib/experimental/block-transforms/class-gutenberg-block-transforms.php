@@ -14,8 +14,9 @@
  * A transform produces the target block's attributes. It does not produce the
  * target block's saved markup, which only its JavaScript `save()` can generate.
  * Conversion is therefore refused for a target that saves markup, and allowed
- * for a target that renders on the server, whose serialization is complete
- * without any.
+ * for a target that renders on the server and reads nothing out of its own
+ * markup, whose serialization is complete without any — see `server_markup()`
+ * for the line and for what it cannot see.
  *
  * @access private
  */
@@ -29,6 +30,10 @@ class Gutenberg_Block_Transforms {
 	 * @return array[]|null Parsed block arrays, or null when no transform applies.
 	 */
 	public static function switch_block_type( $blocks, $target_name ) {
+		if ( ! is_array( $blocks ) ) {
+			return null;
+		}
+
 		// A single parsed block carries a `blockName`, which is null for classic
 		// content, so the key has to be looked for rather than its value.
 		$blocks = array_key_exists( 'blockName', $blocks ) ? array( $blocks ) : array_values( $blocks );
@@ -61,18 +66,9 @@ class Gutenberg_Block_Transforms {
 			return null;
 		}
 
-		$transform = self::find_transform( $source_type, $target_type );
+		$transform = self::find_transform( $source_type, $target_type, $blocks );
 
 		if ( null === $transform ) {
-			return null;
-		}
-
-		/*
-		 * Only the target's attributes can be derived here. A block that saves
-		 * markup needs its `save()` to produce any, so converting to one would
-		 * lose the content it is supposed to carry.
-		 */
-		if ( ! $target_type->is_dynamic() ) {
 			return null;
 		}
 
@@ -81,17 +77,73 @@ class Gutenberg_Block_Transforms {
 			$blocks[0]['attrs']
 		);
 
-		$inner_blocks = isset( $blocks[0]['innerBlocks'] ) ? $blocks[0]['innerBlocks'] : array();
+		/*
+		 * Only the target's attributes can be derived here. A block that saves
+		 * markup needs its `save()` to produce any, so converting to one would
+		 * lose the content it is supposed to carry.
+		 */
+		$markup = self::server_markup( $target_type, $attributes );
+
+		if ( null === $markup ) {
+			return null;
+		}
+
+		$inner_blocks  = isset( $blocks[0]['innerBlocks'] ) ? $blocks[0]['innerBlocks'] : array();
+		$inner_content = array_fill( 0, count( $inner_blocks ), null );
+
+		if ( '' !== $markup ) {
+			$inner_content[] = $markup;
+		}
 
 		return array(
 			array(
 				'blockName'    => $target_name,
-				'attrs'        => $attributes,
+				'attrs'        => self::remove_implied_attributes( $target_type, $attributes ),
 				'innerBlocks'  => $inner_blocks,
-				'innerHTML'    => '',
-				'innerContent' => array_fill( 0, count( $inner_blocks ), null ),
+				'innerHTML'    => $markup,
+				'innerContent' => $inner_content,
 			),
 		);
+	}
+
+	/**
+	 * Returns the markup a block serializes with on the server, or null.
+	 *
+	 * A transform produces a block's attributes and not its saved markup, which
+	 * only its JavaScript `save()` can generate. Two kinds of block need none
+	 * of it: one that renders on the server and reads nothing out of its own
+	 * markup, whose serialization is complete without any, and one whose whole
+	 * content is a single `raw` attribute — the Shortcode and Custom HTML
+	 * blocks — which saves that value verbatim. Every other block is refused.
+	 *
+	 * What cannot be told apart from here is a block that renders on the
+	 * server and still saves wrapper markup its attributes do not describe:
+	 * it looks exactly like one saving none, and comes out without it.
+	 *
+	 * @param WP_Block_Type $block_type Block type.
+	 * @param array         $attributes Attributes the block is built with.
+	 * @return string|null Markup, possibly empty, or null when only `save()` could produce it.
+	 */
+	public static function server_markup( $block_type, $attributes ) {
+		$sourced = array();
+
+		foreach ( (array) $block_type->attributes as $name => $definition ) {
+			if ( is_array( $definition ) && isset( $definition['source'] ) && 'meta' !== $definition['source'] ) {
+				$sourced[ $name ] = $definition['source'];
+			}
+		}
+
+		if ( 1 === count( $sourced ) && 'raw' === reset( $sourced ) ) {
+			$name = key( $sourced );
+
+			return isset( $attributes[ $name ] ) && is_string( $attributes[ $name ] ) ? $attributes[ $name ] : '';
+		}
+
+		if ( array() === $sourced && $block_type->is_dynamic() ) {
+			return '';
+		}
+
+		return null;
 	}
 
 	/**
@@ -102,15 +154,30 @@ class Gutenberg_Block_Transforms {
 	 *
 	 * @param WP_Block_Type $source_type Block type being converted.
 	 * @param WP_Block_Type $target_type Block type to convert to.
+	 * @param array[]       $blocks      Parsed blocks being converted.
 	 * @return array|null Matching transform, or null.
 	 */
-	private static function find_transform( $source_type, $target_type ) {
+	private static function find_transform( $source_type, $target_type, $blocks ) {
 		$candidates = array_merge(
 			self::get_block_transforms( $source_type, 'to', $target_type->name ),
 			self::get_block_transforms( $target_type, 'from', $source_type->name )
 		);
 
-		return isset( $candidates[0] ) ? $candidates[0] : null;
+		foreach ( $candidates as $candidate ) {
+			// A transform registered from PHP may decide per block, as the
+			// editor lets one do; a declared transform has nothing to decide.
+			if (
+				isset( $candidate['isMatch'] )
+				&& self::is_runnable_callback( $candidate['isMatch'] )
+				&& ! call_user_func( $candidate['isMatch'], $blocks[0]['attrs'], $blocks[0] )
+			) {
+				continue;
+			}
+
+			return $candidate;
+		}
+
+		return null;
 	}
 
 	/**

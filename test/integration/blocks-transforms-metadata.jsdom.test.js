@@ -305,6 +305,79 @@ describe( 'Transforms declared in block metadata', () => {
 		unregisterBlockType( name );
 	} );
 
+	it( 'leaves a node alone when a raw transform returns nothing', () => {
+		const name = 'test/skipper';
+
+		registerBlockType( name, {
+			apiVersion: 3,
+			title: 'Skipper',
+			category: 'text',
+			supports: { anchor: true },
+			attributes: {},
+			transforms: {
+				from: [
+					{
+						type: 'raw',
+						selector: 'aside',
+						transform: () => undefined,
+					},
+				],
+			},
+			save: () => null,
+		} );
+
+		// The transform declines the node, `id` and all: there is no block
+		// to carry the anchor, and nothing to throw over.
+		expect( rawHandler( { HTML: '<aside id="a">x</aside>' } ) ).toEqual(
+			[]
+		);
+
+		unregisterBlockType( name );
+	} );
+
+	it( 'ignores a declared require selector that is not valid CSS', () => {
+		const name = 'test/required';
+
+		registerBlockType(
+			{
+				name,
+				title: 'Required',
+				category: 'text',
+				attributes: {},
+				transforms: {
+					from: [
+						{
+							type: 'raw',
+							selector: 'aside',
+							schema: {
+								aside: {
+									children: { p: {} },
+									require: [ 'p:::bad', 'p' ],
+								},
+							},
+						},
+					],
+				},
+			},
+			{ save: () => null }
+		);
+
+		// The paste handler's content filter hands the selector to
+		// `querySelector()`, which would otherwise throw out of every paste
+		// holding an aside.
+		expect( () =>
+			pasteHandler( {
+				HTML: '<aside><p>x</p></aside>',
+				mode: 'BLOCKS',
+			} )
+		).not.toThrow();
+
+		expect( console ).toHaveWarned();
+		expect( console ).toHaveLogged();
+
+		unregisterBlockType( name );
+	} );
+
 	it( 'keeps declared transforms when a block is registered by name', () => {
 		const name = 'test/registered-by-name';
 

@@ -161,7 +161,14 @@ class Gutenberg_Block_Attributes_Parser {
 		if ( null === $source ) {
 			$value = isset( $comment_attributes[ $name ] ) ? $comment_attributes[ $name ] : null;
 		} elseif ( 'raw' === $source ) {
-			$value = $element->get_inner_html();
+			/*
+			 * The editor reads `raw` off the markup it was handed whole: a
+			 * matched element's outer markup, or the fragment a block's
+			 * attributes are read from.
+			 */
+			$value = Gutenberg_HTML_Element::ELEMENT === $element->type
+				? $element->get_outer_html()
+				: $element->get_inner_html();
 		} else {
 			$value = self::apply_source( $schema, $element );
 		}
@@ -261,8 +268,10 @@ class Gutenberg_Block_Attributes_Parser {
 			return false;
 		}
 
+		// Rich text reads as empty rather than absent when nothing matches,
+		// as `RichTextData.empty()` does in the editor.
 		if ( null === $target ) {
-			return null;
+			return 'rich-text' === $source ? '' : null;
 		}
 
 		switch ( $source ) {
@@ -331,7 +340,8 @@ class Gutenberg_Block_Attributes_Parser {
 				return $html;
 
 			case 'text':
-				return trim( preg_replace( '/[\r\n\t ]+/', ' ', $target->get_text_content() ) );
+				// `textContent`, whitespace and all, as the editor reads it.
+				return $target->get_text_content();
 
 			case 'tag':
 				return $target->tag_name;

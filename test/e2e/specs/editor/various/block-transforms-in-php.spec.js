@@ -74,31 +74,37 @@ const AGREED = [
 	'<div><h2>Inside</h2><p>Also inside.</p></div>',
 	'<section><h2>Section</h2><p>Body.</p></section>',
 	'Just some text.',
+
+	// Legacy attributes: the ones a block support reads are kept the same
+	// way on both sides, and the ones nothing reads are dropped on both.
+	'<p style="text-align:center">Centered.</p>',
+	'<h2 id="ingredients">Anchored</h2>',
+	'<hr class="is-style-dots" />',
+	'<pre class="brush: php"><code>echo 1;</code></pre>',
+	'<p dir="rtl" title="tip" data-legacy="1">Attributes everywhere.</p>',
+
+	// An image standing alone in a paragraph comes out into a block of its
+	// own on both sides, leaving the paragraph behind empty.
+	'<p><img src="https://example.com/a.png" alt="A" /></p>',
 ];
 
 /**
  * Markup that must convert without producing an invalid block, whatever block
  * it lands on.
  *
- * These carry the legacy attributes a block cannot hold, so the two runtimes
- * read different attributes out of them even though neither produces anything
- * the editor flags. A media shortcode such as `[gallery]` goes further: its
- * transform exists only in JavaScript, so the editor builds a Gallery block
- * where the server leaves a Shortcode block — different blocks, both valid.
+ * The two runtimes read different attributes out of these, or land on
+ * different blocks, without either producing anything the editor flags.
  */
 const LEGACY = [
-	'<p style="text-align:center">Centered.</p>',
+	// `isDecorative` and `linkDestination` are derived inside the Image
+	// block's transform function, which only the editor runs.
 	'<figure><img src="https://example.com/a.png" alt="A" /><figcaption>A caption</figcaption></figure>',
 	'<figure><a href="https://example.com/page"><img src="https://example.com/a.png" alt="A" /></a></figure>',
-	'<p><img src="https://example.com/a.png" alt="A" /></p>',
-	'<p>[gallery ids="1,2,3"]</p>',
-	'<p dir="rtl" title="tip" data-legacy="1">Attributes everywhere.</p>',
-	'<h2 id="ingredients">Anchored</h2>',
-	'<hr class="is-style-dots" />',
 
-	// A block whose declared transform is only a selector has no place to put
-	// the class the editor copies off the wrapper, so only the server keeps it.
-	'<pre class="brush: php"><code>echo 1;</code></pre>',
+	// A media shortcode's transform exists only in JavaScript, so the editor
+	// builds a Gallery block where the server leaves a Shortcode block —
+	// different blocks, both valid.
+	'<p>[gallery ids="1,2,3"]</p>',
 
 	// Markup the HTML API refuses to parse, which is kept whole rather than
 	// dropped. The browser fosters the stray text out of the table instead,
@@ -143,11 +149,14 @@ const EMBEDS = [
 
 /**
  * Markup the server will not convert: a block that rebuilds its markup on save
- * whatever the source, and one whose source carries more than it can save back.
+ * whatever the source, and one whose source carries more than it can save
+ * back — in the figure it would save, and in the paragraph the classic editor
+ * put it in, where the editor lifts it out and the server keeps it whole.
  */
 const DECLINED = [
 	'<table><caption>Amounts</caption><tbody><tr><td colspan="2">Flour</td></tr></tbody></table>',
 	'<figure><img class="alignnone size-medium wp-image-9" src="https://example.com/a.png" alt="A" width="300" height="200" /></figure>',
+	'<p><img class="alignleft size-medium wp-image-10" src="https://example.com/b.png" alt="B" width="300" height="200" /></p>',
 ];
 
 /**
@@ -408,6 +417,7 @@ test.describe( 'Block transforms declared in block.json', () => {
 		expect( blocks.map( ( block ) => block.name ) ).toEqual( [
 			'core/html',
 			'core/html',
+			'core/html',
 		] );
 		expect(
 			blocks
@@ -416,6 +426,9 @@ test.describe( 'Block transforms declared in block.json', () => {
 		).toEqual( [] );
 		expect( markup ).toContain( '<caption>Amounts</caption>' );
 		expect( markup ).toContain( 'wp-image-9' );
+		expect( markup ).toContain(
+			'<p><img class="alignleft size-medium wp-image-10"'
+		);
 	} );
 
 	test( 'settle after a round trip through the editor', async ( {

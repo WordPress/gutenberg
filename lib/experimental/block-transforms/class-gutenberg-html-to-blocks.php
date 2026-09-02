@@ -209,9 +209,9 @@ class Gutenberg_HTML_To_Blocks {
 		 * no marker precedes, then, once the markers have split their
 		 * containers, the rest.
 		 */
-		self::wrap_figure_content( $root, true );
+		$judged = self::wrap_figure_content( $root, true );
 		self::convert_special_comments( $root );
-		self::wrap_figure_content( $root );
+		self::wrap_figure_content( $root, false, $judged );
 		self::normalise( $root );
 
 		$blocks = array();
@@ -234,6 +234,13 @@ class Gutenberg_HTML_To_Blocks {
 	 * @return array Parsed block array.
 	 */
 	private static function convert_element( $element ) {
+		// Media no block claims, where the editor would have lifted it out
+		// into a figure: kept as it stands rather than stripped by the block
+		// that would otherwise claim its wrapper.
+		if ( $element->declined ) {
+			return self::create_fallback_block( $element );
+		}
+
 		$transform = self::find_transform( $element );
 
 		/*
@@ -479,8 +486,8 @@ class Gutenberg_HTML_To_Blocks {
 	 * @return array Parsed block array.
 	 */
 	private static function create_block( $block_type, $transform, $attributes, $element, $inner_blocks ) {
-		$attributes = Gutenberg_Block_Transforms::remove_implied_attributes( $block_type, $attributes );
 		$markup     = self::prepare_wrapper_markup( $block_type, $transform, $element, $attributes );
+		$attributes = Gutenberg_Block_Transforms::remove_implied_attributes( $block_type, $attributes );
 
 		if ( array() === $inner_blocks || array() === $inner_blocks['blocks'] ) {
 			$outer = $markup['opening'] . $element->get_inner_html() . $markup['closing'];
@@ -546,6 +553,8 @@ class Gutenberg_HTML_To_Blocks {
 	 * @return array Parsed block array.
 	 */
 	private static function create_fallback_block_from_html( $html ) {
+		$html = Gutenberg_HTML_Element::strip_block_delimiters( $html );
+
 		return array(
 			'blockName'    => self::FALLBACK_BLOCK,
 			'attrs'        => array(),
@@ -619,12 +628,20 @@ class Gutenberg_HTML_To_Blocks {
 			}
 		}
 
-		foreach ( self::get_wrapper_attributes( $block_type, $transform, $element ) as $name ) {
-			$value = $source->get_attribute( $name );
+		/*
+		 * Written from the values the block read rather than copied from the
+		 * source: `save` writes an attribute back from the block's value, so
+		 * one the parser normalised — `start="03"` read as 3 — or refused
+		 * would otherwise leave the wrapper disagreeing with the block.
+		 */
+		foreach ( self::get_wrapper_attributes( $block_type, $transform, $element ) as $name => $key ) {
+			$value = isset( $attributes[ $key ] ) ? $attributes[ $key ] : null;
 
-			if ( null !== $value ) {
-				$rebuilt_attributes[ $name ] = $value;
+			if ( null === $value || false === $value || is_array( $value ) ) {
+				continue;
 			}
+
+			$rebuilt_attributes[ $name ] = true === $value ? true : (string) $value;
 		}
 
 		$rebuilt = new WP_HTML_Tag_Processor( '<' . $element->tag_name . '>' );
@@ -744,9 +761,21 @@ class Gutenberg_HTML_To_Blocks {
 			return;
 		}
 
+		/*
+		 * The list of children is rebuilt once rather than spliced for each
+		 * node dropped or unwrapped: a paragraph of thousands of styled words
+		 * out of a word processor would otherwise take quadratic time.
+		 */
+		$kept = array();
+
 		foreach ( $element->children as $child ) {
-			self::filter_node( $child, $children, $conforming );
+			foreach ( self::filter_node( $child, $children, $conforming ) as $node ) {
+				$node->parent = $element;
+				$kept[]       = $node;
+			}
 		}
+
+		$element->children = $kept;
 	}
 
 	/**
@@ -901,30 +930,44 @@ class Gutenberg_HTML_To_Blocks {
 	 * @param Gutenberg_HTML_Element $node       Node to filter.
 	 * @param array                  $schema     Schema the node's parent allows.
 	 * @param bool                   $conforming Optional. Whether the schema is a `requires` conformance probe. Default false.
-	 * @return void
+	 * @return Gutenberg_HTML_Element[] The nodes standing in the node's place: itself, what it held, or nothing.
 	 */
 	private static function filter_node( $node, $schema, $conforming = false ) {
 		if ( Gutenberg_HTML_Element::TEXT === $node->type ) {
 			if ( ! isset( $schema['#text'] ) && ! self::is_blank_text( $node->text ) ) {
-				$node->remove();
+				return array();
 			}
 
-			return;
+			return array( $node );
+		}
+
+		/*
+		 * A comment is markup `save` never writes back, and the editor's rich
+		 * text drops one when it reads the content around it; kept here, it
+		 * would fail validation against what `save` produces.
+		 */
+		if ( Gutenberg_HTML_Element::COMMENT === $node->type ) {
+			return array();
 		}
 
 		if ( Gutenberg_HTML_Element::ELEMENT !== $node->type ) {
-			return;
+			return array( $node );
 		}
 
 		if ( ! isset( $schema[ $node->tag_name ] ) || ! is_array( $schema[ $node->tag_name ] ) ) {
 			// An element the schema does not name keeps its content but loses itself.
+			$unwrapped = array();
+
 			foreach ( $node->children as $child ) {
-				self::filter_node( $child, $schema, $conforming );
+				foreach ( self::filter_node( $child, $schema, $conforming ) as $kept ) {
+					$unwrapped[] = $kept;
+				}
 			}
 
-			$node->unwrap();
+			$node->children = array();
+			$node->parent   = null;
 
-			return;
+			return $unwrapped;
 		}
 
 		$entry      = $schema[ $node->tag_name ];
@@ -954,6 +997,8 @@ class Gutenberg_HTML_To_Blocks {
 		}
 
 		self::filter_children( $node, $entry, $conforming );
+
+		return array( $node );
 	}
 
 	/**
@@ -1033,7 +1078,7 @@ class Gutenberg_HTML_To_Blocks {
 	 * @param WP_Block_Type          $block_type Block type.
 	 * @param array                  $transform  Transform that matched the element.
 	 * @param Gutenberg_HTML_Element $element    Matched element.
-	 * @return string[] Attribute names, lowercased.
+	 * @return string[] Block attribute names, keyed by the lowercased wrapper attribute each is read from.
 	 */
 	private static function get_wrapper_attributes( $block_type, $transform, $element ) {
 		$definitions = (array) $block_type->attributes;
@@ -1044,12 +1089,12 @@ class Gutenberg_HTML_To_Blocks {
 
 		$names = array();
 
-		foreach ( $definitions as $definition ) {
+		foreach ( $definitions as $key => $definition ) {
 			if ( ! is_array( $definition ) || ! isset( $definition['source'], $definition['attribute'] ) ) {
 				continue;
 			}
 
-			if ( 'attribute' !== $definition['source'] ) {
+			if ( 'attribute' !== $definition['source'] || ! is_string( $definition['attribute'] ) ) {
 				continue;
 			}
 
@@ -1057,10 +1102,10 @@ class Gutenberg_HTML_To_Blocks {
 				continue;
 			}
 
-			$names[] = strtolower( $definition['attribute'] );
+			$names[ strtolower( $definition['attribute'] ) ] = $key;
 		}
 
-		return array_values( array_unique( $names ) );
+		return $names;
 	}
 
 	/**
@@ -1131,7 +1176,77 @@ class Gutenberg_HTML_To_Blocks {
 			return false;
 		}
 
-		return ! self::content_already_conforms( $element, $declared['requires'] );
+		if ( ! self::content_already_conforms( $element, $declared['requires'] ) ) {
+			return true;
+		}
+
+		return self::repeats_a_single_source( $transform, $element );
+	}
+
+	/**
+	 * Determines whether an element repeats what a block reads once.
+	 *
+	 * A source other than `query` reads the first element its selector
+	 * matches, and `save` writes that one back. A second match — two images
+	 * in one figure, two captions — is markup the block cannot save, however
+	 * well each conforms on its own. Inner blocks are read on their own, so
+	 * their subtrees do not count.
+	 *
+	 * @param array                  $transform Transform to test.
+	 * @param Gutenberg_HTML_Element $element   Element being converted.
+	 * @return bool Whether some single-valued source matches more than once.
+	 */
+	private static function repeats_a_single_source( $transform, $element ) {
+		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $transform['blockName'] );
+
+		if ( ! $block_type instanceof WP_Block_Type ) {
+			return false;
+		}
+
+		$inner = isset( $transform['innerBlocks'] ) ? $transform['innerBlocks'] : null;
+
+		foreach ( (array) $block_type->attributes as $definition ) {
+			if (
+				! is_array( $definition )
+				|| ! isset( $definition['source'], $definition['selector'] )
+				|| ! is_string( $definition['selector'] )
+				|| ! in_array( $definition['source'], array( 'attribute', 'html', 'rich-text', 'text' ), true )
+			) {
+				continue;
+			}
+
+			if ( self::count_matches( $element, $definition['selector'], $inner ) > 1 ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Counts the elements matching a selector, the element itself included.
+	 *
+	 * @param Gutenberg_HTML_Element $element Element to count within.
+	 * @param string                 $selector Selector to match.
+	 * @param string|bool|null       $inner    Declared `innerBlocks`: a selector for the children read as blocks of their own, or true when all of the content is.
+	 * @return int Number of matches outside the inner blocks.
+	 */
+	private static function count_matches( $element, $selector, $inner ) {
+		$count = $element->matches( $selector ) ? 1 : 0;
+
+		if ( true === $inner ) {
+			return $count;
+		}
+
+		foreach ( $element->child_elements() as $child ) {
+			if ( is_string( $inner ) && $child->matches( $inner ) ) {
+				continue;
+			}
+
+			$count += self::count_matches( $child, $selector, $inner );
+		}
+
+		return $count;
 	}
 
 	/**
@@ -1159,11 +1274,32 @@ class Gutenberg_HTML_To_Blocks {
 			return false;
 		}
 
+		// A comment says nothing about what the block can save: `save` writes
+		// none back, and the content filter drops them either way.
+		self::remove_comments( $copy );
+
 		$before = $copy->get_inner_html();
 
 		self::apply_content_schema( $copy, $schema, true );
 
 		return $before === $copy->get_inner_html();
+	}
+
+	/**
+	 * Removes every comment below a node.
+	 *
+	 * @param Gutenberg_HTML_Element $node Node to clean.
+	 * @return void
+	 */
+	private static function remove_comments( $node ) {
+		foreach ( $node->children as $child ) {
+			if ( Gutenberg_HTML_Element::COMMENT === $child->type ) {
+				$child->remove();
+				continue;
+			}
+
+			self::remove_comments( $child );
+		}
 	}
 
 	/**
@@ -1550,16 +1686,31 @@ class Gutenberg_HTML_To_Blocks {
 	 * the editor, the media is only wrapped when a registered transform claims
 	 * the resulting figure, so markup no block converts keeps its shape.
 	 *
-	 * @param Gutenberg_HTML_Element $root               Fragment root.
-	 * @param bool                   $until_first_marker Optional. Keep only the media no special comment precedes. Default false.
-	 * @return void
+	 * @param Gutenberg_HTML_Element   $root               Fragment root.
+	 * @param bool                     $until_first_marker Optional. Keep only the media no special comment precedes. Default false.
+	 * @param Gutenberg_HTML_Element[] $judged             Optional. Media an earlier pass already judged, which this one leaves alone. Default empty.
+	 * @return Gutenberg_HTML_Element[] The media this pass judged.
 	 */
-	private static function wrap_figure_content( $root, $until_first_marker = false ) {
+	private static function wrap_figure_content( $root, $until_first_marker = false, $judged = array() ) {
 		$media = self::collect_figure_content( $root );
 
 		if ( $until_first_marker ) {
 			$media = self::media_before_any_marker( $root, $media );
 		}
+
+		/*
+		 * The editor visits each node once, so media the first pass left in
+		 * a container that held text is not looked at again after a marker
+		 * splits that container and leaves it in an emptied half.
+		 */
+		$media = array_values(
+			array_filter(
+				$media,
+				static function ( $node ) use ( $judged ) {
+					return ! in_array( $node, $judged, true );
+				}
+			)
+		);
 
 		foreach ( $media as $node ) {
 			$target = $node;
@@ -1599,6 +1750,8 @@ class Gutenberg_HTML_To_Blocks {
 
 			self::promote_to_figure( $target, $wrapper );
 		}
+
+		return $media;
 	}
 
 	/**
@@ -1730,6 +1883,16 @@ class Gutenberg_HTML_To_Blocks {
 			// parent pointer needs unwinding.
 			$target->parent = $source;
 
+			/*
+			 * The editor would have made a block of this media, attachment
+			 * class and all. Leaving it where it stands would hand it to the
+			 * block claiming its wrapper instead, whose content schema strips
+			 * the very attributes the declining block could not save back —
+			 * so the wrapper, or the bare media, is kept as it is.
+			 */
+			$kept           = null === $wrapper ? $target : $wrapper;
+			$kept->declined = true;
+
 			return;
 		}
 
@@ -1795,7 +1958,7 @@ class Gutenberg_HTML_To_Blocks {
 					continue;
 				}
 
-				self::open_paragraph( $blocks )->append_child( $child );
+				self::adopt( self::open_paragraph( $blocks ), $child );
 				continue;
 			}
 
@@ -1818,7 +1981,7 @@ class Gutenberg_HTML_To_Blocks {
 				// A `<br>` only survives inside a paragraph that has content.
 				$last = self::last_block( $blocks );
 				if ( null !== $last && 'p' === $last->tag_name && array() !== $last->children ) {
-					$last->append_child( $child );
+					self::adopt( $last, $child );
 				}
 
 				continue;
@@ -1826,9 +1989,10 @@ class Gutenberg_HTML_To_Blocks {
 
 			if (
 				'p' !== $child->tag_name
+				&& ! $child->declined
 				&& in_array( $child->tag_name, self::PHRASING_CONTENT, true )
 			) {
-				self::open_paragraph( $blocks )->append_child( $child );
+				self::adopt( self::open_paragraph( $blocks ), $child );
 				continue;
 			}
 
@@ -1840,6 +2004,22 @@ class Gutenberg_HTML_To_Blocks {
 		}
 
 		$root->children = $blocks;
+	}
+
+	/**
+	 * Moves a root-level node into a paragraph.
+	 *
+	 * The root's children are rebuilt once `normalise()` is done, so the node
+	 * is not taken out of them here: doing that for each of thousands of
+	 * lines is what made long classic posts quadratic to read.
+	 *
+	 * @param Gutenberg_HTML_Element $paragraph Paragraph to append to.
+	 * @param Gutenberg_HTML_Element $node      Root-level node to move.
+	 * @return void
+	 */
+	private static function adopt( $paragraph, $node ) {
+		$node->parent          = $paragraph;
+		$paragraph->children[] = $node;
 	}
 
 	/**

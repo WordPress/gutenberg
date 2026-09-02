@@ -26,7 +26,7 @@
 					}
 				},
 				"selector": {
-					"description": "For a `raw` transform, a CSS selector matched against each top-level element of the source markup.\n\nType, universal, class, ID and attribute selectors are supported — attribute presence and the `=`, `~=`, `^=`, `$=`, `*=` and `|=` operators — along with the descendant and child combinators and the `:has()`, `:not()` and `:only-child` pseudo-classes.",
+					"description": "For a `raw` transform, a CSS selector matched against each top-level element of the source markup, or a comma-separated list of them.\n\nType, universal, class, ID and attribute selectors are supported — attribute presence and the `=`, `~=`, `^=`, `$=`, `*=` and `|=` operators — along with the descendant and child combinators and the `:has()`, `:not()` and `:only-child` pseudo-classes.",
 					"type": "string"
 				},
 				"priority": {

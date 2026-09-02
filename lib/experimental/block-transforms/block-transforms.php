@@ -24,13 +24,34 @@ function gutenberg_register_block_transforms_from_metadata( $settings, $metadata
 		return $settings;
 	}
 
+	return gutenberg_add_declared_block_transforms( $settings, $metadata );
+}
+add_filter( 'block_type_metadata_settings', 'gutenberg_register_block_transforms_from_metadata', 10, 2 );
+
+/**
+ * Adds a block's declared transforms to its registration settings.
+ *
+ * Settings passed to `register_block_type()` win over the declaration, as they
+ * do for every field core reads from `block.json` itself: the arguments are
+ * merged over the metadata before the filter this serves runs, so a transform
+ * registered from PHP — one carrying an `isMatch` closure, say — is kept
+ * rather than replaced by the declared list.
+ *
+ * @param array $settings Block type settings.
+ * @param array $metadata Raw `block.json` metadata.
+ * @return array Settings carrying the declared transforms, unless they already carried some.
+ */
+function gutenberg_add_declared_block_transforms( $settings, $metadata ) {
+	if ( isset( $settings['transforms'] ) ) {
+		return $settings;
+	}
+
 	if ( isset( $metadata['transforms'] ) && is_array( $metadata['transforms'] ) ) {
 		$settings['transforms'] = $metadata['transforms'];
 	}
 
 	return $settings;
 }
-add_filter( 'block_type_metadata_settings', 'gutenberg_register_block_transforms_from_metadata', 10, 2 );
 
 /**
  * Sends the transforms block types declare to the editor.

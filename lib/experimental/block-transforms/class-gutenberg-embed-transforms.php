@@ -106,7 +106,9 @@ class Gutenberg_Embed_Transforms {
 			return null;
 		}
 
-		$compiled = '#' . str_replace( '#', '\\#', $pattern ) . '#i';
+		// A `#` the pattern escapes for itself stays as written; one after
+		// an even run of backslashes is bare, since those escape each other.
+		$compiled = '#' . preg_replace( '/(?<!\\\\)((?:\\\\\\\\)*)#/', '$1\\#', $pattern ) . '#i';
 
 		if ( ! array_key_exists( $pattern, $checked ) ) {
 			// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- An invalid pattern raises a warning as well as returning false; the warning is replaced with `_doing_it_wrong()` below.

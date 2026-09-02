@@ -235,6 +235,19 @@ export function registerBlockType<
 				blockNameOrMetadata.transforms
 			)
 		);
+
+		/*
+		 * One configuration passed as metadata and settings alike —
+		 * `registerBlockType( config, config )` — carries its transforms on
+		 * both sides. They are one set, bootstrapped just above, so the
+		 * settings do not offer them again to be merged as a second.
+		 */
+		if (
+			settings?.transforms &&
+			settings.transforms === blockNameOrMetadata.transforms
+		) {
+			settings = { ...settings, transforms: undefined };
+		}
 	}
 
 	addUnprocessedBlockType( name, settings );

@@ -616,6 +616,10 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 			// `^=`, `$=` and `*=` with an empty string match nothing, per CSS.
 			'empty prefix'         => array( 'a[href^=""]', '<a href="https://example.com">One</a>', false ),
 			'has descendant'       => array( 'figure:has(img)', '<figure><a><img src="/a.png" /></a></figure>', true ),
+			'has child chain'      => array( 'figure:has(> a > img)', '<figure><a><img src="/a.png" /></a></figure>', true ),
+			'has child chain miss' => array( 'figure:has(> a > img)', '<figure><img src="/a.png" /></figure>', false ),
+			'has descendant chain' => array( 'div:has(> p span)', '<div><p><em><span>x</span></em></p></div>', true ),
+			'has chain not direct' => array( 'div:has(> p > span)', '<div><p><em><span>x</span></em></p></div>', false ),
 			'has direct child'     => array( 'pre:has(> code)', '<pre><code>One</code></pre>', true ),
 			'has direct child not' => array( 'pre:has(> code)', '<pre><span><code>One</code></span></pre>', false ),
 			'not'                  => array( 'pre:not(:has(> code))', '<pre>One</pre>', true ),
@@ -1969,6 +1973,62 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'wp-image-9', $blocks[0]['innerHTML'] );
 	}
 
+	/**
+	 * @dataProvider data_declined_media_the_editor_would_lift
+	 *
+	 * @param string $html Markup to convert.
+	 */
+	public function test_keeps_declined_media_where_the_editor_would_lift_it( $html ) {
+		/*
+		 * The editor lifts an image standing alone in a paragraph, or aligned,
+		 * or bare at the root, into a figure and makes an Image block of it,
+		 * attachment class and size included. Image declines this one on the
+		 * server, and converting the paragraph instead would strip the class
+		 * the block reads its attachment from, so the markup is kept whole.
+		 */
+		$blocks = gutenberg_html_to_blocks( $html );
+
+		$this->assertCount( 1, $blocks );
+		$this->assertSame( 'core/html', $blocks[0]['blockName'] );
+		$this->assertStringContainsString( 'wp-image-9', $blocks[0]['innerHTML'] );
+		$this->assertStringContainsString( 'width="300"', $blocks[0]['innerHTML'] );
+		$this->assertStringNotContainsString( '<figure', $blocks[0]['innerHTML'] );
+	}
+
+	public static function data_declined_media_the_editor_would_lift() {
+		return array(
+			'alone in a paragraph'  => array( '<p><img class="alignnone size-medium wp-image-9" src="/a.png" alt="A" width="300" height="200"></p>' ),
+			'linked in a paragraph' => array( '<p><a href="/a.png"><img class="size-medium wp-image-9" src="/a.png" alt="A" width="300" height="200"></a></p>' ),
+			'aligned beside text'   => array( '<p><img class="aligncenter wp-image-9" src="/a.png" alt="A" width="300" height="200"> Caption</p>' ),
+			'alone in a division'   => array( '<div><img class="wp-image-9" src="/a.png" alt="A" width="300" height="200"></div>' ),
+		);
+	}
+
+	public function test_keeps_declined_media_bare_at_the_root_out_of_a_paragraph() {
+		// Phrasing content at the root is wrapped in a paragraph, which this
+		// image would otherwise be, losing its class the same way.
+		$blocks = gutenberg_html_to_blocks( 'Before<img class="wp-image-9" src="/a.png" alt="A" width="300" height="200">After' );
+
+		$this->assertSame(
+			array( 'core/paragraph', 'core/html', 'core/paragraph' ),
+			array_column( $blocks, 'blockName' )
+		);
+		$this->assertSame( '<img ', substr( $blocks[1]['innerHTML'], 0, 5 ) );
+		$this->assertStringContainsString( 'wp-image-9', $blocks[1]['innerHTML'] );
+	}
+
+	public function test_still_lifts_declined_media_once_a_block_claims_it() {
+		// The same paragraph converts as soon as the image is one the block
+		// can save back, so declining is decided per image rather than per
+		// paragraph shape.
+		$blocks = gutenberg_html_to_blocks( '<p><img src="/a.png" alt="A"></p>' );
+
+		$this->assertSame(
+			array( 'core/image', 'core/paragraph' ),
+			array_column( $blocks, 'blockName' )
+		);
+	}
+
 	public function test_converts_only_the_markup_a_conditional_transform_declares() {
 		$this->register(
 			'test/note',
@@ -3120,6 +3180,432 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 	 * @param string $method_name Method name.
 	 * @return ReflectionMethod The reflected method.
 	 */
+	public function test_reads_a_has_argument_from_the_element_it_qualifies() {
+		$root    = Gutenberg_HTML_Element::from_html( '<div><section><span>x</span></section></div>' );
+		$section = $root->query_selector( 'section' );
+
+		// The division stands above the section rather than below it, which
+		// `Element.matches()` does not count either.
+		$this->assertFalse( $section->matches( 'section:has(div span)' ) );
+		$this->assertTrue( $section->matches( 'section:has(span)' ) );
+	}
+
+	public function test_writes_wrapper_attributes_from_the_values_the_block_read() {
+		// `save` writes `start` back from the number the block holds, so the
+		// wrapper has to carry that spelling rather than the source's.
+		$blocks = gutenberg_html_to_blocks( '<ol start="03"><li>a</li></ol>' );
+
+		$this->assertSame( 3, $blocks[0]['attrs']['start'] );
+		$this->assertStringContainsString( ' start="3"', $blocks[0]['innerHTML'] );
+		$this->assertStringNotContainsString( '"03"', $blocks[0]['innerHTML'] );
+
+		// A value the block refuses is not one it would write back either.
+		$blocks = gutenberg_html_to_blocks( '<ol start="abc"><li>a</li></ol>' );
+
+		$this->assertArrayNotHasKey( 'start', $blocks[0]['attrs'] );
+		$this->assertStringNotContainsString( 'start=', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_leaves_a_figure_holding_more_than_the_block_reads() {
+		// A single-valued source reads the first match and `save` writes that
+		// one back, so a second image or caption is content the block loses.
+		foreach (
+			array(
+				'<figure><img src="/a.png" alt="A"><img src="/b.png" alt="B"></figure>',
+				'<figure><img src="/a.png" alt="A"><figcaption>One</figcaption><figcaption>Two</figcaption></figure>',
+			) as $html
+		) {
+			$blocks = gutenberg_html_to_blocks( $html );
+
+			$this->assertSame( 'core/html', $blocks[0]['blockName'] );
+			$this->assertSame( $html, $blocks[0]['innerHTML'] );
+		}
+
+		// Nested lists are inner blocks read on their own, so a list holding
+		// several of them repeats nothing.
+		$blocks = gutenberg_html_to_blocks( '<ol start="2"><li>a<ol start="3"><li>b</li></ol></li><li>c<ol><li>d</li></ol></li></ol>' );
+
+		$this->assertSame( 'core/list', $blocks[0]['blockName'] );
+		$this->assertCount( 2, $blocks[0]['innerBlocks'] );
+	}
+
+	public function test_leaves_media_the_first_pass_judged_where_it_stood() {
+		/*
+		 * The editor visits the image once, while its paragraph still holds
+		 * text, and does not look again after the marker splits the paragraph
+		 * and leaves the image alone in one half.
+		 */
+		$blocks = gutenberg_html_to_blocks( '<p><img src="/a.png" alt="A"><!--more-->Rest.</p>' );
+
+		$this->assertSame(
+			array( 'core/paragraph', 'core/more', 'core/paragraph' ),
+			array_column( $blocks, 'blockName' )
+		);
+		$this->assertStringContainsString( '<img', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_drops_comments_from_converted_content() {
+		// `save` writes no comment back, and the editor's rich text drops
+		// them when it reads the content, so kept ones would fail validation.
+		$blocks = gutenberg_html_to_blocks( '<pre><code>a</code><!-- c --></pre>' );
+
+		$this->assertSame( 'core/code', $blocks[0]['blockName'] );
+		$this->assertStringNotContainsString( '<!--', $blocks[0]['innerHTML'] );
+
+		$blocks = gutenberg_html_to_blocks( '<p>a<!-- x -->b</p>' );
+
+		$this->assertSame( '<p>ab</p>', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_reads_an_unmatched_rich_text_source_as_empty() {
+		$attributes = gutenberg_get_block_attributes_from_html( 'core/image', '<figure><img src="/a.png" alt="A"></figure>' );
+
+		// `RichTextData.empty()`, as the editor reads a caption that is not there.
+		$this->assertSame( '', $attributes['caption'] );
+	}
+
+	public function test_reads_raw_and_text_sources_as_the_editor_does() {
+		$this->register(
+			'test/verbatim',
+			array(
+				'attributes' => array(
+					'markup' => array(
+						'type'   => 'string',
+						'source' => 'raw',
+					),
+					'words'  => array(
+						'type'     => 'string',
+						'source'   => 'text',
+						'selector' => 'aside',
+					),
+				),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'     => 'raw',
+							'selector' => 'aside',
+						),
+					),
+				),
+			)
+		);
+
+		$html    = "<aside>  Two \n words </aside>";
+		$element = Gutenberg_HTML_Element::from_html( $html )->children[0];
+		$read    = Gutenberg_Block_Attributes_Parser::parse(
+			WP_Block_Type_Registry::get_instance()->get_registered( 'test/verbatim' ),
+			$element
+		);
+
+		// `getBlockAttributes()` is handed a matched node's outer markup, and
+		// `textContent` keeps its whitespace.
+		$this->assertSame( $html, $read['markup'] );
+		$this->assertSame( "  Two \n words ", $read['words'] );
+
+		// A fragment read on its own is read whole.
+		$this->assertSame( '<aside>x</aside>', gutenberg_get_block_attributes_from_html( 'test/verbatim', '<aside>x</aside>' )['markup'] );
+	}
+
+	public function test_refuses_a_dynamic_target_that_reads_its_own_markup() {
+		$this->register_dynamic( 'test/source', array() );
+		$this->register_dynamic(
+			'test/titled',
+			array(
+				'attributes' => array(
+					'content' => array(
+						'type'     => 'rich-text',
+						'source'   => 'rich-text',
+						'selector' => 'h2',
+					),
+				),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'   => 'block',
+							'blocks' => array( 'test/source' ),
+						),
+					),
+				),
+			)
+		);
+
+		$this->assertNull(
+			gutenberg_switch_block_type( $this->parsed_block( 'test/source' ), 'test/titled' ),
+			'A block that renders on the server may still read its content out of markup only save() writes.'
+		);
+	}
+
+	public function test_produces_a_target_saving_one_raw_attribute() {
+		$this->register_dynamic( 'test/source', array( 'attributes' => array( 'code' => array( 'type' => 'string' ) ) ) );
+		$this->register(
+			'test/verbatim-target',
+			array(
+				'attributes' => array(
+					'text' => array(
+						'type'   => 'string',
+						'source' => 'raw',
+					),
+				),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'       => 'block',
+							'blocks'     => array( 'test/source' ),
+							'attributes' => array( 'text' => 'code' ),
+						),
+					),
+				),
+			)
+		);
+
+		$blocks = gutenberg_switch_block_type( $this->parsed_block( 'test/source', array( 'code' => '[x]' ) ), 'test/verbatim-target' );
+
+		// The raw attribute is the block's content, as the Shortcode block saves it.
+		$this->assertSame( '[x]', $blocks[0]['innerHTML'] );
+		$this->assertSame( array( '[x]' ), $blocks[0]['innerContent'] );
+		$this->assertSame( array(), $blocks[0]['attrs'] );
+	}
+
+	public function test_refuses_blocks_that_are_not_parsed_blocks() {
+		$this->register_dynamic( 'test/target', array() );
+
+		$this->assertNull( gutenberg_switch_block_type( 'text', 'test/target' ) );
+	}
+
+	public function test_honours_a_block_transform_is_match_registered_from_php() {
+		$this->register_dynamic( 'test/source', array( 'attributes' => array( 'kind' => array( 'type' => 'string' ) ) ) );
+		$this->register_dynamic(
+			'test/target',
+			array(
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'    => 'block',
+							'blocks'  => array( 'test/source' ),
+							'isMatch' => static function ( $attributes ) {
+								return isset( $attributes['kind'] ) && 'yes' === $attributes['kind'];
+							},
+						),
+					),
+				),
+			)
+		);
+
+		$this->assertNull( gutenberg_switch_block_type( $this->parsed_block( 'test/source', array( 'kind' => 'no' ) ), 'test/target' ) );
+
+		$blocks = gutenberg_switch_block_type( $this->parsed_block( 'test/source', array( 'kind' => 'yes' ) ), 'test/target' );
+
+		$this->assertSame( 'test/target', $blocks[0]['blockName'] );
+	}
+
+	public function test_converts_a_shortcode_into_a_block_that_renders_on_the_server() {
+		$this->register_dynamic(
+			'test/form',
+			array(
+				'attributes' => array( 'id' => array( 'type' => 'string' ) ),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'       => 'shortcode',
+							'tag'        => 'myform',
+							'attributes' => array(
+								'id' => array(
+									'type'      => 'string',
+									'source'    => 'shortcodeAttribute',
+									'attribute' => 'id',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$blocks = gutenberg_html_to_blocks( '<p>[myform id="5"]</p>' );
+
+		// Its serialization is complete without markup, so the editor's
+		// `createBlock()` and this agree on the block.
+		$this->assertSame( 'test/form', $blocks[0]['blockName'] );
+		$this->assertSame( array( 'id' => '5' ), $blocks[0]['attrs'] );
+		$this->assertSame( '', $blocks[0]['innerHTML'] );
+		$this->assertSame( array(), $blocks[0]['innerContent'] );
+	}
+
+	public function test_leaves_a_shortcode_whose_block_reads_its_own_markup() {
+		$this->register_dynamic(
+			'test/form',
+			array(
+				'attributes' => array(
+					'label' => array(
+						'type'     => 'string',
+						'source'   => 'text',
+						'selector' => 'label',
+					),
+				),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type' => 'shortcode',
+							'tag'  => 'myform',
+						),
+					),
+				),
+			)
+		);
+
+		$blocks = gutenberg_html_to_blocks( '<p>[myform]</p>' );
+
+		$this->assertSame( 'core/shortcode', $blocks[0]['blockName'] );
+	}
+
+	public function test_keeps_transforms_registered_from_php_over_declared_ones() {
+		$registered = array(
+			'from' => array(
+				array(
+					'type'     => 'raw',
+					'selector' => 'aside',
+					'isMatch'  => static function () {
+						return true;
+					},
+				),
+			),
+		);
+		$declared   = array(
+			'from' => array(
+				array(
+					'type'     => 'raw',
+					'selector' => 'aside',
+				),
+			),
+		);
+
+		// The arguments passed to `register_block_type()` are merged over the
+		// metadata before the filter runs, as they are for every other field.
+		$settings = gutenberg_add_declared_block_transforms( array( 'transforms' => $registered ), array( 'transforms' => $declared ) );
+
+		$this->assertSame( $registered, $settings['transforms'] );
+
+		$settings = gutenberg_add_declared_block_transforms( array(), array( 'transforms' => $declared ) );
+
+		$this->assertSame( $declared, $settings['transforms'] );
+	}
+
+	public function test_compiles_a_provider_pattern_escaping_its_own_hash() {
+		$add_provider = static function ( $variations, $block_type ) {
+			if ( 'core/embed' !== $block_type->name ) {
+				return $variations;
+			}
+
+			$variations[] = array(
+				'name'       => 'hashy',
+				'title'      => 'Hashy Embed',
+				'patterns'   => array( '^https://hashy\\.example/\\#/.+' ),
+				'attributes' => array( 'providerNameSlug' => 'hashy' ),
+			);
+
+			return $variations;
+		};
+
+		add_filter( 'get_block_type_variations', $add_provider, 10, 2 );
+
+		try {
+			$blocks = gutenberg_html_to_blocks( '<p>https://hashy.example/#/abc</p>' );
+		} finally {
+			remove_filter( 'get_block_type_variations', $add_provider );
+		}
+
+		// `RegExp` accepts `\#`, so the server has to as well.
+		$this->assertSame( 'hashy', $blocks[0]['attrs']['providerNameSlug'] );
+	}
+
+	/**
+	 * @dataProvider data_delimiter_shaped_comments
+	 *
+	 * @param string $html Markup holding a comment shaped like a block delimiter.
+	 */
+	public function test_drops_comments_shaped_like_block_delimiters( $html ) {
+		/*
+		 * Carried into a block, such a comment would be read as a delimiter
+		 * again once the converted markup is parsed, and swallow or split the
+		 * blocks around it. It renders nothing, so nothing is lost.
+		 */
+		$blocks = gutenberg_html_to_blocks( $html );
+		$markup = gutenberg_html_to_block_markup( $html );
+
+		$this->assertStringNotContainsString( 'wp:', str_replace( array( '<!-- wp:', '<!-- /wp:' ), '', $markup ) );
+		$this->assertSame(
+			array_column( $blocks, 'blockName' ),
+			array_column( parse_blocks( $markup ), 'blockName' ),
+			'Parsing the converted markup has to give the blocks it was serialized from.'
+		);
+	}
+
+	public static function data_delimiter_shaped_comments() {
+		return array(
+			'closer in a paragraph'       => array( '<p>a<!-- /wp:paragraph -->b</p>' ),
+			'tabbed opener in a division' => array( "<div><!--\twp:paragraph -->y</div>" ),
+			'closer in a list item'       => array( '<ul><li>a<!-- /wp:list-item -->b</li></ul>' ),
+			'opener in a shortcode'       => array( "<p>[gallery ids=\"1\"]<!--\twp:x -->[/gallery]</p>" ),
+			'closer in unreadable markup' => array( '<table>text<tr><td>a<!-- /wp:html --></td></tr></table>' ),
+		);
+	}
+
+	public function test_keeps_markup_cut_off_by_its_end_whole() {
+		// A `<textarea>` never closed runs to the end of the markup in a
+		// browser, holding text the HTML API never hands over.
+		$blocks = gutenberg_html_to_blocks( '<p>a</p><textarea>unclosed' );
+
+		$this->assertCount( 1, $blocks );
+		$this->assertSame( 'core/html', $blocks[0]['blockName'] );
+		$this->assertStringContainsString( '<textarea>unclosed', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_keeps_the_text_inside_an_iframe() {
+		// WordPress 6.9 serializes it as nothing at all.
+		$blocks = gutenberg_html_to_blocks( '<iframe src="https://example.com/">fallback &lt;b&gt;</iframe>' );
+
+		$this->assertStringContainsString( '>fallback &lt;b&gt;</iframe>', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_reads_deeply_nested_markup_without_running_out_of_room() {
+		// WordPress 6.9 gives its processor a hundred bookmarks and lets it
+		// throw past that; a theme's nested divisions come close enough.
+		$html   = '<p>Intro</p>' . str_repeat( '<div class="row"><div class="col">', 60 ) . '<p>x</p>' . str_repeat( '</div></div>', 60 ) . '<p>Outro</p>';
+		$blocks = gutenberg_html_to_blocks( $html );
+
+		$this->assertSame( 'core/paragraph', $blocks[0]['blockName'] );
+		$this->assertSame( 'core/paragraph', $blocks[ count( $blocks ) - 1 ]['blockName'] );
+	}
+
+	public function test_converts_a_long_post_of_bracketed_words_within_bounds() {
+		// Every `[sic]` and `[1]` in prose is a Shortcode block candidate,
+		// which used to keep a copy of the rest of the post per candidate.
+		$html   = str_repeat( '<p>Some text [applause] and more text after it.</p>' . "\n", 2000 );
+		$before = memory_get_peak_usage();
+		$blocks = gutenberg_html_to_blocks( $html );
+
+		$this->assertCount( 2000, $blocks );
+		$this->assertSame( 'core/paragraph', $blocks[1999]['blockName'] );
+		$this->assertLessThan( 32 * 1024 * 1024, memory_get_peak_usage() - $before );
+	}
+
+	/**
+	 * Builds a parsed block array of the kind `parse_blocks()` returns.
+	 *
+	 * @param string $name       Block name.
+	 * @param array  $attributes Optional. Block attributes. Default empty.
+	 * @return array Parsed block array.
+	 */
+	private function parsed_block( $name, $attributes = array() ) {
+		return array(
+			'blockName'    => $name,
+			'attrs'        => $attributes,
+			'innerBlocks'  => array(),
+			'innerHTML'    => '',
+			'innerContent' => array(),
+		);
+	}
+
 	private function accessible_method( $class_name, $method_name ) {
 		$method = new ReflectionMethod( $class_name, $method_name );
 
