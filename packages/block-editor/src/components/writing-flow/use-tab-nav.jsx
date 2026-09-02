@@ -38,6 +38,8 @@ export default function useTabNav() {
 		getLastFocus,
 		getSectionRootClientId,
 		isZoomOut,
+		didAutomaticChange,
+		getSettings,
 	} = unlock( useSelect( blockEditorStore ) );
 	const { setLastFocus } = unlock( useDispatch( blockEditorStore ) );
 
@@ -144,15 +146,14 @@ export default function useTabNav() {
 	// description for assistive technologies.
 	const hint = __( 'Press Enter to edit the document' );
 
-	// The Escape press that steps focus out of the canvas is re-dispatched on
-	// the frame element for keyboard shortcuts. That copy arrives after focus
-	// has landed on the stop, so it would dismiss the tooltip it just
-	// revealed. A press on the stop itself is trusted and still dismisses.
-	function keepTooltipOnStepOut( open, details ) {
+	// An Escape press that another handler already claimed, like the step
+	// out of the canvas that revealed this tooltip, should not also dismiss
+	// the tooltip.
+	function ignoreClaimedEscape( open, details ) {
 		if (
 			! open &&
 			details.reason === 'escape-key' &&
-			details.event?.isTrusted === false
+			details.event?.defaultPrevented
 		) {
 			details.cancel();
 		}
@@ -174,7 +175,7 @@ export default function useTabNav() {
 	}
 
 	const before = (
-		<Tooltip.Root onOpenChange={ keepTooltipOnStepOut }>
+		<Tooltip.Root onOpenChange={ ignoreClaimedEscape }>
 			<Tooltip.Trigger
 				render={
 					<div
@@ -201,7 +202,7 @@ export default function useTabNav() {
 	);
 
 	const after = (
-		<Tooltip.Root onOpenChange={ keepTooltipOnStepOut }>
+		<Tooltip.Root onOpenChange={ ignoreClaimedEscape }>
 			<Tooltip.Trigger
 				render={
 					<div
@@ -243,25 +244,31 @@ export default function useTabNav() {
 				return;
 			}
 
-			// Escape steps out of the canvas onto the stop before it.
-			// Listeners delegated at a document level, among them the canvas
-			// listener undoing an automatic change, run after this handler
-			// for the same press. Waiting a microtask lets every one of them
-			// claim the key first: event dispatch is synchronous, so by then
-			// the event carries the final word.
+			// Escape or Backspace right after an automatic change, like `* `
+			// turning into a list, undoes that change. This needs nothing
+			// from the element the key landed on, only the store.
+			if ( event.key === 'Escape' || event.key === 'Backspace' ) {
+				const { __experimentalUndo } = getSettings();
+				if ( __experimentalUndo && didAutomaticChange() ) {
+					event.preventDefault();
+					__experimentalUndo();
+					return;
+				}
+			}
+
+			// Escape steps out of the canvas onto the stop before it. Every
+			// handler with a stronger claim on the key runs earlier, either
+			// deeper in the tree or in the capture phase, so an unclaimed
+			// key here means the key is free.
 			if (
 				event.key === 'Escape' &&
 				! event.ctrlKey &&
 				! event.metaKey &&
 				! event.altKey
 			) {
-				queueMicrotask( () => {
-					if ( event.defaultPrevented ) {
-						return;
-					}
-					focusCaptureBeforeRef.current?.focus( {
-						preventScroll: true,
-					} );
+				event.preventDefault();
+				focusCaptureBeforeRef.current?.focus( {
+					preventScroll: true,
 				} );
 				return;
 			}
