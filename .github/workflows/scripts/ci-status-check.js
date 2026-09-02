@@ -22,7 +22,17 @@ const PASSING_CONCLUSIONS = [ 'success', 'skipped' ];
 
 // A job that just finished can still read as running, so let the API settle.
 const ATTEMPTS = 5;
-const RETRY_DELAY_MS = 10000;
+const RETRY_BASE_DELAY_MS = 3000;
+
+/**
+ * The delay before an attempt, doubling each time: 3s, 6s, 12s, 24s.
+ *
+ * @param {number} attempt The attempt that just failed, counting from 1.
+ * @return {number} Delay in milliseconds.
+ */
+function retryDelay( attempt ) {
+	return RETRY_BASE_DELAY_MS * 2 ** ( attempt - 1 );
+}
 
 const { GITHUB_REPOSITORY, GITHUB_RUN_ID, GITHUB_TOKEN } = process.env;
 
@@ -120,7 +130,7 @@ async function fetchEvaluatedJobs() {
 				throw error;
 			}
 			console.log( `${ error.message } Retrying.` );
-			await sleep( RETRY_DELAY_MS );
+			await sleep( retryDelay( attempt ) );
 			continue;
 		}
 
@@ -146,7 +156,7 @@ async function fetchEvaluatedJobs() {
 			throw new Error( `${ running.length } job(s) had not finished.` );
 		}
 
-		await sleep( RETRY_DELAY_MS );
+		await sleep( retryDelay( attempt ) );
 	}
 }
 
