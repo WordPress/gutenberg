@@ -158,6 +158,21 @@ export default function useTabNav() {
 		}
 	}
 
+	// The focus ring is drawn around the canvas the stops stand for, through
+	// a class on their shared parent. Safari does not reliably recompute
+	// `:has(:focus)`, so the class is toggled here instead.
+	function onStopFocus( event ) {
+		event.currentTarget.parentElement?.classList.add(
+			'has-canvas-stop-focus'
+		);
+	}
+
+	function onStopBlur( event ) {
+		event.currentTarget.parentElement?.classList.remove(
+			'has-canvas-stop-focus'
+		);
+	}
+
 	const before = (
 		<Tooltip.Root onOpenChange={ keepTooltipOnStepOut }>
 			<Tooltip.Trigger
@@ -170,6 +185,8 @@ export default function useTabNav() {
 						aria-describedby={ `${ hintId }-before` }
 						className="block-editor-writing-flow__canvas-stop"
 						onKeyDown={ ( event ) => onStopKeyDown( event, false ) }
+						onFocus={ onStopFocus }
+						onBlur={ onStopBlur }
 					>
 						<VisuallyHidden id={ `${ hintId }-before` }>
 							{ hint }
@@ -195,6 +212,8 @@ export default function useTabNav() {
 						aria-describedby={ `${ hintId }-after` }
 						className="block-editor-writing-flow__canvas-stop"
 						onKeyDown={ ( event ) => onStopKeyDown( event, true ) }
+						onFocus={ onStopFocus }
+						onBlur={ onStopBlur }
 					>
 						<VisuallyHidden id={ `${ hintId }-after` }>
 							{ hint }
