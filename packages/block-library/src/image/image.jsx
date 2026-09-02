@@ -316,7 +316,7 @@ export default function Image( {
 		setOffsetTop( imageElement?.offsetTop ?? 0 );
 	}, [ imageElement ] );
 	const setRefs = useMergeRefs( [ setImageElement, setResizeObserved ] );
-	const { allowResize = true } = context;
+	const { allowResize = true, imageCrop = false } = context;
 
 	const { image, attachmentResolutionError } = useSelect(
 		( select ) => {
@@ -1222,17 +1222,23 @@ export default function Image( {
 													? `${ width }px`
 													: width;
 										}
-										if (
-											height === 'auto' ||
-											height === undefined ||
-											height === null
-										) {
+										if ( height === 'auto' ) {
 											style.height = 'auto';
-										} else {
+										} else if (
+											height !== undefined &&
+											height !== null
+										) {
 											style.height =
 												typeof height === 'number'
 													? `${ height }px`
 													: height;
+										} else if ( ! imageCrop ) {
+											// Default to `height: auto` so a
+											// theme that sets an explicit height
+											// on images can't squish them. Inside
+											// a cropped gallery the gallery's own
+											// CSS controls the height instead.
+											style.height = 'auto';
 										}
 										return style;
 								  } )() ),

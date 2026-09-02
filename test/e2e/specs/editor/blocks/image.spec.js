@@ -1058,6 +1058,67 @@ test.describe( 'Image - Site editor', () => {
 	} );
 } );
 
+// Regression test for https://github.com/WordPress/gutenberg/pull/70575.
+test.describe( 'Image - dimensions forced by global styles', () => {
+	let uploadedMedia;
+
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllMedia();
+		uploadedMedia = await requestUtils.uploadMedia(
+			'./assets/200x150_e2e_test_image_opaque.png'
+		);
+
+		// Mimic a theme that forces a fixed height on image blocks. The
+		// top-level custom CSS is prefixed with `:root :where(body)`, giving
+		// it higher specificity than the block's own `height: auto` rule.
+		const stylesPostId =
+			await requestUtils.getCurrentThemeGlobalStylesPostId();
+		await requestUtils.rest( {
+			method: 'POST',
+			path: `/wp/v2/global-styles/${ stylesPostId }`,
+			data: {
+				id: stylesPostId,
+				styles: {
+					css: '.wp-block-image img { height: 100px; }',
+				},
+			},
+		} );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.resetThemeGlobalStyles();
+		await requestUtils.deleteAllMedia();
+	} );
+
+	test( 'preserves the aspect ratio when only the width is set', async ( {
+		admin,
+		editor,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				id: uploadedMedia.id,
+				url: uploadedMedia.source_url,
+				sizeSlug: 'full',
+				width: '200px',
+			},
+		} );
+
+		const image = editor.canvas.locator(
+			'role=document[name="Block: Image"i] >> role=img'
+		);
+		await expect( image ).toBeVisible();
+		await image.evaluate( ( img ) => img.decode() );
+
+		const box = await image.boundingBox();
+		// The 200x150 image displayed at 200px wide keeps its 4:3 aspect
+		// ratio (150px tall) instead of being squished to the 100px height
+		// forced by global styles.
+		expect( box.width / box.height ).toBeCloseTo( 4 / 3, 1 );
+	} );
+} );
+
 class ImageBlockUtils {
 	constructor( { page } ) {
 		/** @type {Page} */

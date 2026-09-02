@@ -400,6 +400,69 @@ test.describe( 'Gallery', () => {
 		);
 		expect( numbers ).not.toEqual( imageAltTexts );
 	} );
+
+	// Regression test for https://github.com/WordPress/gutenberg/issues/82252.
+	test( 'crops linked images to a uniform height in the editor canvas', async ( {
+		admin,
+		editor,
+		requestUtils,
+	} ) => {
+		const landscapeMedia = await requestUtils.uploadMedia(
+			'./assets/200x150_e2e_test_image_opaque.png'
+		);
+		const squareMedia = await requestUtils.uploadMedia(
+			'./assets/10x10_e2e_test_image_z9T8jK.png'
+		);
+
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/gallery',
+			attributes: {
+				linkTo: 'media',
+			},
+			innerBlocks: [
+				{
+					name: 'core/image',
+					attributes: {
+						id: landscapeMedia.id,
+						url: landscapeMedia.source_url,
+						sizeSlug: 'full',
+						linkDestination: 'media',
+						href: landscapeMedia.source_url,
+					},
+				},
+				{
+					name: 'core/image',
+					attributes: {
+						id: squareMedia.id,
+						url: squareMedia.source_url,
+						sizeSlug: 'full',
+						linkDestination: 'media',
+						href: squareMedia.source_url,
+					},
+				},
+			],
+		} );
+
+		const images = editor.canvas.locator(
+			'role=document[name="Block: Gallery"i] >> role=img'
+		);
+		await expect( images ).toHaveCount( 2 );
+
+		// With cropping enabled, both images in the row render at the same
+		// height. Poll so the assertion waits for both images to finish
+		// loading and for the layout to settle.
+		await expect
+			.poll( async () => {
+				const landscapeBox = await images.nth( 0 ).boundingBox();
+				const squareBox = await images.nth( 1 ).boundingBox();
+				if ( ! landscapeBox || ! squareBox ) {
+					return Number.POSITIVE_INFINITY;
+				}
+				return Math.abs( landscapeBox.height - squareBox.height );
+			} )
+			.toBeLessThanOrEqual( 1 );
+	} );
 } );
 
 class GalleryBlockUtils {
