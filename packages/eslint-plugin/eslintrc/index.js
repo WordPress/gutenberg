@@ -20,7 +20,7 @@ process.emitWarning(
 	'DeprecationWarning'
 );
 
-const esGlobals = require( 'globals' ).es2025;
+const esGlobals = require( 'globals' ).builtin;
 const plugin = require( '../' );
 
 /**
