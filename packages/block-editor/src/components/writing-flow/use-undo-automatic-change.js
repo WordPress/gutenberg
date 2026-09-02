@@ -32,14 +32,9 @@ export default function useUndoAutomaticChange() {
 	}
 
 	return useRefEffect( ( element ) => {
-		// The undo claims the key ahead of fallbacks such as the Escape step
-		// out of the canvas, which listen in the bubble phase and yield to
-		// `defaultPrevented`.
-		element.addEventListener( 'keydown', onKeyDown, { capture: true } );
+		element.addEventListener( 'keydown', onKeyDown );
 		return () => {
-			element.removeEventListener( 'keydown', onKeyDown, {
-				capture: true,
-			} );
+			element.removeEventListener( 'keydown', onKeyDown );
 		};
 	}, [] );
 }

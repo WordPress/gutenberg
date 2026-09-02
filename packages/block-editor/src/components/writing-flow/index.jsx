@@ -29,8 +29,11 @@ export function useWritingFlow() {
 	return [
 		before,
 		useMergeRefs( [
-			ref,
+			// Same-node listeners run in registration order, and the undo of
+			// an automatic change must claim Escape before the tab-nav
+			// listeners step out of the canvas.
 			useUndoAutomaticChange(),
+			ref,
 			useEditableRootEventHandlers(),
 			useClipboardHandler(),
 			useInput(),
