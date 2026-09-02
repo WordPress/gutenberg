@@ -140,15 +140,15 @@
 	/* Foreground color for content like text with info tone and weak emphasis. */
 	--wpds-color-foreground-content-info-weak: #0069d5;
 	/* Foreground color for content like text with normal emphasis. */
-	--wpds-color-foreground-content-neutral: #141414;
+	--wpds-color-foreground-content-neutral: #505050;
 	/* Foreground color for content like text with weak emphasis. */
 	--wpds-color-foreground-content-neutral-weak: #737373;
 	/* Foreground color for content like text with success tone and normal emphasis. */
-	--wpds-color-foreground-content-success: #041708;
+	--wpds-color-foreground-content-success: #215b2f;
 	/* Foreground color for content like text with success tone and weak emphasis. */
 	--wpds-color-foreground-content-success-weak: #007e2e;
 	/* Foreground color for content like text with warning tone and normal emphasis. */
-	--wpds-color-foreground-content-warning: #1b1203;
+	--wpds-color-foreground-content-warning: #654c19;
 	/* Foreground color for content like text with warning tone and weak emphasis. */
 	--wpds-color-foreground-content-warning-weak: #906200;
 	/* Foreground color for interactive elements with brand tone and normal emphasis. */
