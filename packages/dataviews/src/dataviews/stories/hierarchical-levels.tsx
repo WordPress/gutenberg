@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import DataViews from '../index';
 import { LAYOUT_TABLE } from '../../constants';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
@@ -6,42 +6,58 @@ import type { View } from '../../types';
 import { data as allData, fields, type SpaceObject } from './fixtures';
 
 /**
- * Orders a flat list depth-first so that each item sits right below its
- * parent. Siblings keep the relative order they had in the input, so the
- * list should already be sorted the way the consumer wants siblings sorted.
+ * Simulates what the WordPress REST API does for `orderby_hierarchy` (see
+ * Gutenberg_Hierarchical_Sort in lib/experimental): filter and sort the whole
+ * list first, then order it depth-first so that each item sits right below
+ * its parent, then paginate.
  *
- * Items whose parent is not in the list (filtered out, for example) come
- * after all the root trees, grouped by parent. They keep their own level,
- * so they stay indented as deep as they really are.
- *
- * This is what the WordPress REST API does for `orderby_hierarchy`. See
- * Gutenberg_Hierarchical_Sort in lib/experimental.
+ * Siblings keep the sort order. Items whose parent is not in the filtered
+ * list come after all the root trees, grouped by parent, and keep their own
+ * level so they stay indented as deep as they really are.
  */
-function sortByHierarchy( items: SpaceObject[] ): SpaceObject[] {
-	// Children grouped by parent, in the order the parents first appear.
-	const childrenByParent = new Map< number | null, SpaceObject[] >();
-	items.forEach( ( item ) => {
-		childrenByParent.set( item.parent, [
-			...( childrenByParent.get( item.parent ) ?? [] ),
-			item,
-		] );
-	} );
+function sortByHierarchy( items: SpaceObject[], view: View ) {
+	const { data: sortedItems } = filterSortAndPaginate(
+		items,
+		{ ...view, page: undefined, perPage: undefined },
+		fields
+	);
 
-	const result: SpaceObject[] = [];
-	const visit = ( parent: number | null ) => {
-		( childrenByParent.get( parent ) ?? [] ).forEach( ( item ) => {
-			result.push( item );
-			visit( item.id );
+	let orderedItems = sortedItems;
+	if ( view.showLevels ) {
+		// Children grouped by parent, in the order the parents first appear.
+		const childrenByParent = new Map< number | null, SpaceObject[] >();
+		sortedItems.forEach( ( item ) => {
+			childrenByParent.set( item.parent, [
+				...( childrenByParent.get( item.parent ) ?? [] ),
+				item,
+			] );
 		} );
-		// Once visited, a group must not be emitted again as an orphan group.
-		childrenByParent.delete( parent );
-	};
 
-	// Roots and their descendants first.
-	visit( null );
-	// Then the items whose parent is not in the list, grouped by parent.
-	Array.from( childrenByParent.keys() ).forEach( visit );
-	return result;
+		orderedItems = [];
+		const visit = ( parent: number | null ) => {
+			( childrenByParent.get( parent ) ?? [] ).forEach( ( item ) => {
+				orderedItems.push( item );
+				visit( item.id );
+			} );
+			// Once visited, a group must not be emitted again as an orphan group.
+			childrenByParent.delete( parent );
+		};
+
+		// Roots and their descendants first.
+		visit( null );
+		// Then the items whose parent is not in the list, grouped by parent.
+		Array.from( childrenByParent.keys() ).forEach( visit );
+	}
+
+	const page = view.page ?? 1;
+	const perPage = view.perPage ?? orderedItems.length;
+	return {
+		data: orderedItems.slice( ( page - 1 ) * perPage, page * perPage ),
+		paginationInfo: {
+			totalItems: orderedItems.length,
+			totalPages: Math.ceil( orderedItems.length / perPage ),
+		},
+	};
 }
 
 const HierarchicalLevelsComponent = ( {
@@ -73,28 +89,7 @@ const HierarchicalLevelsComponent = ( {
 		} ) );
 	}, [ showLevels ] );
 
-	const { data, paginationInfo } = useMemo( () => {
-		// Filter and sort first, then order by hierarchy, then paginate.
-		// The sort decides the order of siblings; the hierarchy places each
-		// item below its parent.
-		const { data: sortedData } = filterSortAndPaginate(
-			allData,
-			{ ...view, page: undefined, perPage: undefined },
-			fields
-		);
-		const orderedData = view.showLevels
-			? sortByHierarchy( sortedData )
-			: sortedData;
-		const page = view.page ?? 1;
-		const perPage = view.perPage ?? orderedData.length;
-		return {
-			data: orderedData.slice( ( page - 1 ) * perPage, page * perPage ),
-			paginationInfo: {
-				totalItems: orderedData.length,
-				totalPages: Math.ceil( orderedData.length / perPage ),
-			},
-		};
-	}, [ view ] );
+	const { data, paginationInfo } = sortByHierarchy( allData, view );
 
 	return (
 		<DataViews
