@@ -3,10 +3,14 @@ import type {
 	ItemId,
 	ImageSizeCrop,
 	ConvertImageOptions,
+	EditImageOptions,
+	ImageEditModifier,
 	ResizeImageOptions,
 } from './types.ts';
 import type { WorkerAPI } from './worker.ts';
 import { workerCode } from './worker-code.ts';
+
+export type { EditImageOptions, ImageEditModifier } from './types.ts';
 
 /**
  * The worker instance, lazily created on first use.
@@ -168,6 +172,35 @@ export async function vipsRotateImage(
 } > {
 	const api = getWorkerAPI();
 	return api.rotateImage( id, buffer, type, orientation );
+}
+
+/**
+ * Applies a list of edits (flip, rotate, crop) to an image using vips in a
+ * worker.
+ *
+ * Any pending EXIF orientation is applied first. UltraHDR JPEGs keep their
+ * gain map, which is transformed in step with the base image.
+ *
+ * @param id        Item ID.
+ * @param buffer    Original file buffer.
+ * @param type      Mime type.
+ * @param modifiers Edits to apply, in order.
+ * @param options   Edit options.
+ * @return Edited file data plus the new dimensions.
+ */
+export async function vipsEditImage(
+	id: ItemId,
+	buffer: ArrayBuffer,
+	type: string,
+	modifiers: ImageEditModifier[],
+	options: EditImageOptions = {}
+): Promise< {
+	buffer: ArrayBuffer | ArrayBufferLike;
+	width: number;
+	height: number;
+} > {
+	const api = getWorkerAPI();
+	return api.editImage( id, buffer, type, modifiers, options );
 }
 
 /**
