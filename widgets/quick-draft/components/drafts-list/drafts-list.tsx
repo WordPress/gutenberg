@@ -24,7 +24,12 @@ type FeaturedMedia = {
 type DraftPost = {
 	id: number;
 	title: { rendered: string };
-	date: string;
+	/*
+	 * The REST schema allows a null date. A draft created through the UI
+	 * always has one, but a record inserted without `post_date` does not, and
+	 * both date helpers below would render a bogus relative time for it.
+	 */
+	date: string | null;
 	_embedded?: {
 		'wp:featuredmedia'?: FeaturedMedia[];
 	};
@@ -134,6 +139,10 @@ function DraftTitle( {
 }
 
 function DraftDate( { post }: { post: DraftPost } ) {
+	if ( ! post.date ) {
+		return null;
+	}
+
 	const fullDate = dateI18n( getSettings().formats.datetime, post.date );
 
 	return (
@@ -158,9 +167,7 @@ export function DraftsList() {
 	const { drafts, isLoading } = useSelect( ( select ) => {
 		const { getEntityRecords, hasFinishedResolution } =
 			select( coreDataStore );
-		const records = getEntityRecords( 'postType', 'post', DRAFTS_QUERY ) as
-			| DraftPost[]
-			| null;
+		const records = getEntityRecords( 'postType', 'post', DRAFTS_QUERY );
 
 		return {
 			drafts: records ?? [],

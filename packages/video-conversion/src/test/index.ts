@@ -1,10 +1,4 @@
-import {
-	convertGifToVideo,
-	cancelOperations,
-	UNSUPPORTED_ERROR_PREFIX,
-	SIZE_LIMIT_ERROR_PREFIX,
-	DEFAULT_MAX_TOTAL_PIXELS,
-} from '../index';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Configurable decoded-frame dimensions; the default (10x10) is even so the
 // canvas/resize path is skipped. Tests set odd values to exercise it.
@@ -87,10 +81,12 @@ class FakeReplacementVideoFrame {
 const mockAddedSamples: Array< {
 	init: { timestamp: number; duration: number };
 } > = [];
-const mockCanEncodeVideo = jest.fn().mockResolvedValue( true );
+const mockCanEncodeVideo = vi
+	.fn< ( ...args: unknown[] ) => Promise< boolean > >()
+	.mockResolvedValue( true );
 // Default VideoSampleSource.add implementation; tests can override it,
 // e.g. to make it reject and exercise frame-cleanup error paths.
-const mockSourceAdd = jest.fn(
+const mockSourceAdd = vi.fn(
 	async ( sample: { init: { timestamp: number; duration: number } } ) => {
 		mockAddedSamples.push( sample );
 	}
@@ -108,50 +104,65 @@ let mockVideoSamples: Array< { closed: boolean } > = [];
 // encoding configuration.
 let mockVideoSampleSourceOpts: Array< Record< string, unknown > > = [];
 
-jest.mock( 'mediabunny', () => ( {
-	Output: class {
-		opts: { target: { buffer: ArrayBuffer | null } };
-		constructor( opts: { target: { buffer: ArrayBuffer | null } } ) {
-			this.opts = opts;
-		}
-		addVideoTrack() {}
-		async start() {}
-		async finalize() {
-			this.opts.target.buffer = new Uint8Array( [ 1, 2, 3 ] ).buffer;
-		}
-	},
-	BufferTarget: class {
-		buffer: ArrayBuffer | null = null;
-	},
-	Mp4OutputFormat: class {},
-	WebMOutputFormat: class {},
-	VideoSampleSource: class {
-		constructor( opts: Record< string, unknown > ) {
-			mockVideoSampleSourceOpts.push( opts );
-		}
-		add( sample: { init: { timestamp: number; duration: number } } ) {
-			return mockSourceAdd( sample );
-		}
-	},
-	VideoSample: class {
-		frame: unknown;
-		init: { timestamp: number; duration: number };
-		closed = false;
-		constructor(
-			frame: unknown,
-			init: { timestamp: number; duration: number }
-		) {
-			this.frame = frame;
-			this.init = init;
-			mockVideoSamples.push( this );
-		}
-		close() {
-			this.closed = true;
-		}
-	},
-	QUALITY_HIGH: 'quality-high',
-	canEncodeVideo: ( ...args: unknown[] ) => mockCanEncodeVideo( ...args ),
-} ) );
+vi.doMock( import( 'mediabunny' ), async ( importOriginal ) => {
+	const original = await importOriginal();
+
+	return {
+		...original,
+		Output: class {
+			opts: { target: { buffer: ArrayBuffer | null } };
+			constructor( opts: { target: { buffer: ArrayBuffer | null } } ) {
+				this.opts = opts;
+			}
+			addVideoTrack() {}
+			async start() {}
+			async finalize() {
+				this.opts.target.buffer = new Uint8Array( [ 1, 2, 3 ] ).buffer;
+			}
+		} as unknown as typeof original.Output,
+		BufferTarget: class {
+			buffer: ArrayBuffer | null = null;
+		} as unknown as typeof original.BufferTarget,
+		Mp4OutputFormat: class {} as unknown as typeof original.Mp4OutputFormat,
+		WebMOutputFormat:
+			class {} as unknown as typeof original.WebMOutputFormat,
+		VideoSampleSource: class {
+			constructor( opts: Record< string, unknown > ) {
+				mockVideoSampleSourceOpts.push( opts );
+			}
+			add( sample: { init: { timestamp: number; duration: number } } ) {
+				return mockSourceAdd( sample );
+			}
+		} as unknown as typeof original.VideoSampleSource,
+		VideoSample: class {
+			frame: unknown;
+			init: { timestamp: number; duration: number };
+			closed = false;
+			constructor(
+				frame: unknown,
+				init: { timestamp: number; duration: number }
+			) {
+				this.frame = frame;
+				this.init = init;
+				mockVideoSamples.push( this );
+			}
+			close() {
+				this.closed = true;
+			}
+		} as unknown as typeof original.VideoSample,
+		QUALITY_HIGH: 'quality-high' as unknown as typeof original.QUALITY_HIGH,
+		canEncodeVideo:
+			mockCanEncodeVideo as unknown as typeof original.canEncodeVideo,
+	};
+} );
+
+const {
+	convertGifToVideo,
+	cancelOperations,
+	UNSUPPORTED_ERROR_PREFIX,
+	SIZE_LIMIT_ERROR_PREFIX,
+	DEFAULT_MAX_TOTAL_PIXELS,
+} = await import( '../index' );
 
 beforeEach( () => {
 	mockAddedSamples.length = 0;

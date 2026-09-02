@@ -115,3 +115,14 @@ p.p {
 	border-radius: var(--_gcd-a-border-radius, 0);
 	transition: var(--_gcd-a-transition, none);
 }
+
+.ol {
+	margin: var(--_gcd-ol-margin, 0);
+	padding-block: var(--_gcd-ol-padding-block, 0);
+	padding-inline: var(--_gcd-ol-padding-inline, 0);
+	list-style: var(--_gcd-ol-list-style, none);
+}
+
+.li {
+	margin: var(--_gcd-li-margin, 0);
+}

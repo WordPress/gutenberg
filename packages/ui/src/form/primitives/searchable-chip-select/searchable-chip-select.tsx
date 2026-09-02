@@ -121,7 +121,7 @@ export const SearchableChipSelect = forwardRef<
 				</Combobox.Chips>
 			</Combobox.InputGroup>
 
-			<Combobox.Popup popupWidth={ popupWidth }>
+			<Combobox.Popup width={ popupWidth }>
 				<Combobox.Empty>{ emptyContent }</Combobox.Empty>
 				<Combobox.List>
 					<Combobox.ListBody>

@@ -95,6 +95,7 @@
 	min-width: 0;
 
 	// Prevent long unbroken words from overflowing.
+	// stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- Pending review of overflow-wrap alternative.
 	word-break: break-word; // For back-compat.
 	overflow-wrap: break-word; // New standard.
 

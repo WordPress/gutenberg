@@ -3210,9 +3210,21 @@
 		"parent": "code"
 	},
 	{
+		"title": "Testing published packages across WordPress versions",
+		"slug": "package-runtime-compatibility",
+		"markdown_source": "../docs/contributors/code/package-runtime-compatibility.md",
+		"parent": "code"
+	},
+	{
 		"title": "Workspace Development",
 		"slug": "workspace-development",
 		"markdown_source": "../docs/contributors/code/workspace-development.md",
+		"parent": "code"
+	},
+	{
+		"title": "Required changes from trunk",
+		"slug": "required-changes-from-trunk",
+		"markdown_source": "../docs/contributors/code/required-changes-from-trunk.md",
 		"parent": "code"
 	},
 	{

@@ -1,4 +1,5 @@
 import { transformSync } from '@babel/core';
+import { describe, expect, it } from 'vitest';
 import plugin from '../';
 
 describe( 'babel-plugin-import-jsx-pragma', () => {
