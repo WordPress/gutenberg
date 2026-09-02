@@ -7,10 +7,10 @@
 
 /**
  * @typedef PullRequest
- * @property {number}               number     PR number.
- * @property {string}               headRefOid Head commit SHA.
- * @property {boolean}              isDraft    Whether the PR is a draft.
- * @property {ContextStatus | null} status     Latest required changes status, if any.
+ * @property {number}               number        PR number.
+ * @property {string}               headRefOid    Head commit SHA.
+ * @property {string | null}        committedDate Head commit date, ISO 8601.
+ * @property {ContextStatus | null} status        Latest required changes status, if any.
  */
 
 /**

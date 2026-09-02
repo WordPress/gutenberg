@@ -1,14 +1,15 @@
 // @ts-check
 
 /**
- * The `fanout` subcommand: after a baseline move, flips open PRs whose
- * passing required changes status references an older baseline to failing.
+ * The `fanout` subcommand: brings every open PR's required changes status up
+ * to date with the current baseline, stamping PRs that carry no status yet.
  */
 import {
 	CONTEXT,
 	REPO,
 	graphql,
 	getBaseline,
+	isAncestor,
 	statusFor,
 	postStatus,
 } from './utils.mjs';
@@ -38,10 +39,10 @@ const PAGE_QUERY = `
 				nodes {
 					number
 					headRefOid
-					isDraft
 					commits(last: 1) {
 						nodes {
 							commit {
+								committedDate
 								status {
 									context(name: $context) {
 										state
@@ -76,12 +77,12 @@ async function listOpenPRs() {
 		} );
 		const page = data.repository.pullRequests;
 		for ( const node of page.nodes ) {
+			const commit = node.commits.nodes[ 0 ]?.commit;
 			prs.push( {
 				number: node.number,
 				headRefOid: node.headRefOid,
-				isDraft: node.isDraft,
-				status:
-					node.commits.nodes[ 0 ]?.commit?.status?.context ?? null,
+				committedDate: commit?.committedDate ?? null,
+				status: commit?.status?.context ?? null,
 			} );
 		}
 		if ( ! page.pageInfo.hasNextPage ) {
@@ -93,13 +94,43 @@ async function listOpenPRs() {
 }
 
 /**
- * Flips stale passing statuses to failing against the current baseline.
+ * Reads a commit's date, used as a cheap ancestry bound.
+ *
+ * @param {string} oid Commit SHA.
+ * @return {Promise<string>} Commit date, ISO 8601.
+ */
+async function commitDate( oid ) {
+	const [ owner, name ] = REPO.split( '/' );
+	const data = await graphql(
+		`
+			query ($owner: String!, $name: String!, $oid: GitObjectID!) {
+				repository(owner: $owner, name: $name) {
+					object(oid: $oid) {
+						... on Commit {
+							committedDate
+						}
+					}
+				}
+			}
+		`,
+		{ owner, name, oid }
+	);
+	return data.repository.object.committedDate;
+}
+
+/**
+ * Brings every open PR's status in line with the current baseline.
  *
  * @param {CommandOptions} options Command options.
  */
 export async function fanout( { dryRun } ) {
-	const baseline = /** @type {string} */ ( await getBaseline() );
+	const baseline = await getBaseline();
+	if ( baseline === null ) {
+		console.log( 'No baseline tag; nothing to fan out.' );
+		return;
+	}
 	const short = baseline.slice( 0, 7 );
+	const baselineDate = await commitDate( baseline );
 
 	const prs = await listOpenPRs();
 	console.log( `Baseline ${ baseline }; ${ prs.length } open PRs.` );
@@ -110,19 +141,20 @@ export async function fanout( { dryRun } ) {
 	let budgetExhausted = false;
 
 	for ( const pr of prs ) {
-		/* Drafts cannot merge, and ready_for_review re-stamps them. */
-		if ( pr.isDraft ) {
+		/* Both descriptions embed the baseline; anything else needs a stamp. */
+		if ( pr.status?.description?.includes( short ) ) {
 			skipped++;
 			continue;
 		}
-		const stale =
-			pr.status?.state === 'SUCCESS' &&
-			! pr.status.description?.includes( short );
-		if ( ! stale ) {
-			skipped++;
-			continue;
-		}
-		const { state, description } = statusFor( false, baseline );
+		/*
+		 * A head committed before the baseline cannot contain it, which spares
+		 * a compare call for all but the PRs updated since the baseline moved.
+		 */
+		const includesBaseline =
+			pr.committedDate && pr.committedDate < baselineDate
+				? false
+				: await isAncestor( baseline, pr.headRefOid );
+		const { state, description } = statusFor( includesBaseline, baseline );
 		try {
 			if (
 				! ( await postStatus(
