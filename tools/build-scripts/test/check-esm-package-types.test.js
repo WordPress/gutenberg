@@ -1,6 +1,7 @@
 import { access, mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import { afterEach, expect, test, vi } from 'vitest';
 import {
 	classifyTypeScriptDiagnostics,
 	getCssEntrypoints,
@@ -85,7 +86,7 @@ test( 'continues package packing after a failure', () => {
 		{ packageJson: { name: 'second' } },
 	];
 	const failure = new Error( 'Inspection failed' );
-	const inspectPackage = jest
+	const inspectPackage = vi
 		.fn()
 		.mockImplementationOnce( () => {
 			throw failure;
