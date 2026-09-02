@@ -156,8 +156,8 @@ export default function useTabNav() {
 		<div
 			ref={ focusCaptureAfterRef }
 			tabIndex="0"
-			style={ PREVENT_SCROLL_ON_FOCUS }
 			onFocus={ onFocusCapture }
+			style={ PREVENT_SCROLL_ON_FOCUS }
 		/>
 	);
 
