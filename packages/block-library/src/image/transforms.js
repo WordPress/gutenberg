@@ -360,6 +360,7 @@ const transforms = {
 					src: companion.src,
 					poster: companion.poster,
 					caption,
+					isGif: true,
 					controls: false,
 					loop: true,
 					autoplay: true,

@@ -2,28 +2,16 @@ import { __ } from '@wordpress/i18n';
 import { video as videoIcon } from '@wordpress/icons';
 
 /**
- * Whether a set of Video block attributes describes a GIF-behaving video: a
- * muted, looping, autoplaying, inline video with no controls. An animated GIF
- * uploaded through the editor is converted to a video and presented with these
- * attributes so it plays like the original GIF.
+ * Whether a set of Video block attributes describes a GIF variation.
+ * Uses an explicit `isGif` flag instead of inferring from autoplay/loop/controls
+ * attributes so manually setting those options does not reclassify a regular video.
  *
- * @param {Object}  attributes             Video block attributes.
- * @param {boolean} attributes.controls    Whether playback controls are shown.
- * @param {boolean} attributes.loop        Whether the video loops.
- * @param {boolean} attributes.autoplay    Whether the video autoplays.
- * @param {boolean} attributes.muted       Whether the video is muted.
- * @param {boolean} attributes.playsInline Whether the video plays inline.
+ * @param {Object}  attributes       Video block attributes.
+ * @param {boolean} [attributes.isGif] Whether the block is a GIF variation.
  *
  * @return {boolean} Whether the attributes describe a GIF-behaving video.
  */
-export const isGifVariation = ( {
-	controls,
-	loop,
-	autoplay,
-	muted,
-	playsInline,
-} = {} ) =>
-	controls === false && !! loop && !! autoplay && !! muted && !! playsInline;
+export const isGifVariation = ( { isGif } = {} ) => !! isGif;
 
 const variations = [
 	{
@@ -33,7 +21,7 @@ const variations = [
 			'A video with customizable playback and interaction controls.'
 		),
 		icon: videoIcon,
-		attributes: { controls: true },
+		attributes: { controls: true, isGif: false },
 		isActive: ( blockAttributes ) => ! isGifVariation( blockAttributes ),
 		// Not offered in the inserter; used to label a regular video and to
 		// switch a GIF back to a standard video.
@@ -48,6 +36,7 @@ const variations = [
 		icon: videoIcon,
 		keywords: [ __( 'animated' ), 'gif' ],
 		attributes: {
+			isGif: true,
 			controls: false,
 			loop: true,
 			autoplay: true,
