@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "23.9.0-rc.1",
+	"version": "23.9.0",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -25,8 +25,8 @@
 		},
 		"packageManager": {
 			"name": "npm",
-			"version": "^10.2.3",
-			"onFail": "warn"
+			"version": ">=10.2.3",
+			"onFail": "error"
 		}
 	},
 	"wpPlugin": {
@@ -181,7 +181,7 @@
 		"test:unit:vitest": "npm run --workspace @wordpress/unit-tests test:unit:vitest --",
 		"test:unit:vitest:update": "npm run --workspace @wordpress/unit-tests test:unit:vitest:update --",
 		"test:unit:vitest:watch": "npm run --workspace @wordpress/unit-tests test:unit:vitest:watch --",
-		"test:unit:routing": "npm run --workspace @wordpress/unit-tests test:unit:routing",
+		"test:unit:routing": "npm run --workspace @wordpress/unit-tests test:unit:routing --",
 		"test:unit:date": "bash ./bin/unit-test-date.sh",
 		"test:unit:debug": "npm run --workspace @wordpress/unit-tests test:unit:debug --",
 		"test:unit:profile": "npm run --workspace @wordpress/unit-tests test:unit:profile --",

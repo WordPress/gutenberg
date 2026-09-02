@@ -145,6 +145,12 @@
             - className
             - render
             - style
+      - name: Autocomplete.Status
+        props:
+            - children
+            - className
+            - render
+            - style
       - name: Autocomplete.Value
         props:
             - children
@@ -1489,6 +1495,10 @@
         props:
             - children
             - className
+            - closeDelay
+            - closeOnClick
+            - delay
+            - disabled
             - render
             - style
 - name: TreeGrid

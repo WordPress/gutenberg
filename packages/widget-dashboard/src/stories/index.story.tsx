@@ -314,13 +314,19 @@ const goalProgressWidgetType: WidgetType = {
 };
 
 // What `import( widget.renderModule )` resolves to in a real host.
-const resolveDemoModule: ResolveWidgetModule = async ( moduleId ) => ( {
-	default: ( moduleId === goalProgressWidgetType.renderModule
-		? GoalProgressWidget
-		: TrafficSnapshotWidget ) as ComponentType<
-		WidgetRenderProps< unknown >
-	>,
-} );
+const resolveDemoModule: ResolveWidgetModule = async ( moduleId ) => {
+	let component: ComponentType< WidgetRenderProps< unknown > >;
+	if ( moduleId === goalProgressWidgetType.renderModule ) {
+		component = GoalProgressWidget as ComponentType<
+			WidgetRenderProps< unknown >
+		>;
+	} else {
+		component = TrafficSnapshotWidget as ComponentType<
+			WidgetRenderProps< unknown >
+		>;
+	}
+	return { default: component };
+};
 
 // The snapshot type at two widths, plus a one-column goal tile whose
 // attributes are all promoted, so the header presentations can be compared
