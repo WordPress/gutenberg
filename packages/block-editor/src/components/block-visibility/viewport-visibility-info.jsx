@@ -1,5 +1,4 @@
-import { Icon as WCIcon } from '@wordpress/components';
-import { Badge, Stack } from '@wordpress/ui';
+import { Badge, Icon, Stack } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { unseen } from '@wordpress/icons';
@@ -126,7 +125,7 @@ export default function ViewportVisibilityInfo( { clientId } ) {
 			gap="xs"
 			align="center"
 		>
-			<WCIcon icon={ unseen } />
+			<Icon icon={ unseen } />
 			<Badge intent="informational">{ label }</Badge>
 		</Stack>
 	);
