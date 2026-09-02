@@ -92,16 +92,7 @@ export function useNavigateRegions( shortcuts: Shortcuts = defaultShortcuts ) {
 			ref.current?.querySelectorAll< HTMLElement >(
 				'[role="region"][tabindex="-1"]'
 			) ?? []
-		).filter( ( region ) => {
-			// Skip regions the user cannot reach anything in: no visible box
-			// and nothing tabbable inside. Regions that only hold controls
-			// revealed on focus, like the closed publish panel's toggle, stay
-			// in the cycle.
-			const { width, height } = region.getBoundingClientRect();
-			const hasVisibleBox =
-				width > 0 && height > 0 && region.checkVisibility?.() !== false;
-			return hasVisibleBox || focus.tabbable.find( region ).length > 0;
-		} );
+		);
 		if ( ! regions.length ) {
 			return;
 		}
