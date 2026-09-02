@@ -1,14 +1,8 @@
 import { __ } from '@wordpress/i18n';
-import {
-	Popover,
-	Toolbar,
-	ToolbarButton,
-	ToolbarGroup,
-	SVG,
-	Path,
-} from '@wordpress/components';
+import { Button, Popover } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
+import { comment as commentIcon } from '@wordpress/icons';
 import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
@@ -44,22 +38,10 @@ type FloatingAddNoteProps = {
 };
 
 /**
- * Comment bubble with a plus in the middle: the "start a note" affordance,
- * mirroring the on-select entry point in Google Docs. Composed locally rather
- * than added to `@wordpress/icons` since it's specific to this entry point.
- */
-const addNoteIcon = (
-	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-		<Path d="M18 4H6c-1.1 0-2 .9-2 2v12.9c0 .6.5 1.1 1.1 1.1.3 0 .5-.1.8-.3L8.5 17H18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm.5 11c0 .3-.2.5-.5.5H7.9l-2.4 2.4V6c0-.3.2-.5.5-.5h12c.3 0 .5.2.5.5v9z" />
-		<Path d="M11.25 6.75h1.5v2.75h2.75v1.5h-2.75v2.75h-1.5v-2.75H8.5v-1.5h2.75z" />
-	</SVG>
-);
-
-/**
  * The inline range the floating button would attach a note to, or null when
  * the button should stay hidden: the selection is collapsed, spans blocks,
- * isn't inside a rich-text attribute, or already overlaps a `core/note`
- * marker (the note format syncs the sidebar to that note on its own).
+ * isn't inside a rich-text attribute, already overlaps a `core/note` marker
+ * (the note format syncs the sidebar to that note on its own).
  */
 function useFloatingButtonSelection(): InlineSelection | null {
 	return useSelect( ( select ) => {
@@ -128,47 +110,61 @@ export function FloatingAddNote( { onClick }: FloatingAddNoteProps ) {
 	const blockElement: HTMLElement | null = useBlockElement(
 		inlineSelection?.clientId
 	);
-	const popoverAnchor = useAnchor( {
+	const selectionAnchor = useAnchor( {
 		editableContentElement: blockElement,
 	} );
 
-	if ( ! isReady || ! inlineSelection || ! popoverAnchor ) {
+	// Anchor in the margin beside the block, on the selected line: the
+	// Google Docs placement. Anywhere inside the content column either covers
+	// neighbouring text or, on a first line, lands on the block toolbar.
+	const marginAnchor = useMemo( () => {
+		if ( ! selectionAnchor || ! blockElement ) {
+			return null;
+		}
+		const { ownerDocument } = blockElement;
+		return {
+			ownerDocument,
+			contextElement: blockElement,
+			getBoundingClientRect() {
+				const { top, height } = selectionAnchor.getBoundingClientRect();
+				const { right } = blockElement.getBoundingClientRect();
+				const DOMRect =
+					ownerDocument.defaultView?.DOMRect ?? window.DOMRect;
+				return new DOMRect( right, top, 0, height );
+			},
+		};
+	}, [ selectionAnchor, blockElement ] );
+
+	if ( ! isReady || ! inlineSelection || ! marginAnchor ) {
 		return null;
 	}
 
 	return (
 		<Popover
-			// Top-right of the selection reads as the natural continuation
-			// point of what was just highlighted; the popover flips below
-			// when the selection sits flush against the block toolbar.
-			placement="top-end"
+			placement="right"
 			offset={ 8 }
 			focusOnMount={ false }
-			anchor={ popoverAnchor }
-			// The toolbar frame is the only visible surface, matching the
-			// block toolbar, which renders its popover with this variant too.
-			variant="unstyled"
+			anchor={ marginAnchor }
+			// The high-contrast frame the block toolbar uses.
+			variant="toolbar"
 			// The slot the inline rich-text popovers use, so the button is
 			// clipped to the canvas and shifts to stay inside it instead of
 			// floating over the header or footer chrome.
 			__unstableSlotName="__unstable-block-tools-after"
 			className="editor-collab-sidebar__floating-add-note"
 		>
-			<Toolbar label={ __( 'Notes' ) }>
-				<ToolbarGroup>
-					<ToolbarButton
-						icon={ addNoteIcon }
-						label={ __( 'Add note' ) }
-						// Keep focus in the editor: the captured rich-text
-						// selection in the block-editor store must survive
-						// until `useNoteActions.onCreate` reads it.
-						onMouseDown={ ( event: React.MouseEvent ) =>
-							event.preventDefault()
-						}
-						onClick={ () => onClick( inlineSelection.clientId ) }
-					/>
-				</ToolbarGroup>
-			</Toolbar>
+			<Button
+				icon={ commentIcon }
+				label={ __( 'Add note' ) }
+				size="compact"
+				// Keep focus in the editor: the captured rich-text selection
+				// in the block-editor store must survive until
+				// `useNoteActions.onCreate` reads it.
+				onMouseDown={ ( event: React.MouseEvent ) =>
+					event.preventDefault()
+				}
+				onClick={ () => onClick( inlineSelection.clientId ) }
+			/>
 		</Popover>
 	);
 }

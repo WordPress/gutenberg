@@ -1717,7 +1717,7 @@ test.describe( 'Block Notes', () => {
 				name: 'Block: Paragraph',
 			} );
 			const floatingButton = page
-				.getByRole( 'toolbar', { name: 'Notes' } )
+				.locator( '.editor-collab-sidebar__floating-add-note' )
 				.getByRole( 'button', { name: 'Add note' } );
 
 			// The button only appears once a selection has held for a short
