@@ -152,7 +152,7 @@
 	}
 
 	button {
-		opacity: 0;
+		opacity: 1;
 		border: none;
 		background-color: rgb(90 90 90 / 25%);
 		backdrop-filter: blur($grid-unit-20) saturate(180%);
@@ -163,9 +163,9 @@
 		width: 20px;
 		height: 20px;
 		position: absolute;
+		position-area: top right;
+		left: -36px;
 		z-index: 100;
-		top: 16px;
-		right: 16px;
 		text-align: center;
 		padding: 0;
 		border-radius: 4px;

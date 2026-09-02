@@ -172,8 +172,14 @@ const { state, actions, callbacks } = store(
 					`${ state.selectedImage.imgStyles?.replace(
 						/;$/,
 						''
-					) }; object-fit:cover;`
+					) }; object-fit:cover; anchor-name: --wp-image-${
+						state.selectedImageId
+					};`
 				);
+			},
+			get imageButtonAnchor() {
+				const { imageId } = getContext();
+				return `--wp-image-${ imageId }`;
 			},
 			get isContentHidden() {
 				const ctx = getContext();
@@ -605,82 +611,11 @@ const { state, actions, callbacks } = store(
 				state.metadata[ imageId ].imageRef = ref;
 				state.metadata[ imageId ].currentSrc = ref.currentSrc;
 
-				const {
-					naturalWidth,
-					naturalHeight,
-					offsetWidth,
-					offsetHeight,
-				} = ref;
+				const imgHeight = ref.getAttribute( 'height' );
 
-				// If the image isn't loaded yet, it can't calculate where the button
-				// should be.
-				if ( naturalWidth === 0 || naturalHeight === 0 ) {
-					return;
-				}
-
-				const figure = ref.parentElement;
-				const figureWidth = ref.parentElement.clientWidth;
-
-				// It needs special handling for the height because a caption will cause
-				// the figure to be taller than the image, which means it needs to
-				// account for that when calculating the placement of the button in the
-				// top right corner of the image.
-				let figureHeight = ref.parentElement.clientHeight;
-				const caption = figure.querySelector( 'figcaption' );
-				if ( caption ) {
-					const captionComputedStyle =
-						window.getComputedStyle( caption );
-					if (
-						! [ 'absolute', 'fixed' ].includes(
-							captionComputedStyle.position
-						)
-					) {
-						figureHeight =
-							figureHeight -
-							caption.offsetHeight -
-							parseFloat( captionComputedStyle.marginTop ) -
-							parseFloat( captionComputedStyle.marginBottom );
-					}
-				}
-
-				const buttonOffsetTop = figureHeight - offsetHeight;
-				const buttonOffsetRight = figureWidth - offsetWidth;
-
-				let buttonTop = buttonOffsetTop + 16;
-				let buttonRight = buttonOffsetRight + 16;
-
-				// In the case of an image with object-fit: contain, the size of the
-				// <img> element can be larger than the image itself, so it needs to
-				// calculate where to place the button.
-				if ( state.metadata[ imageId ].scaleAttr === 'contain' ) {
-					// Natural ratio of the image.
-					const naturalRatio = naturalWidth / naturalHeight;
-					// Offset ratio of the image.
-					const offsetRatio = offsetWidth / offsetHeight;
-
-					if ( naturalRatio >= offsetRatio ) {
-						// If it reaches the width first, it keeps the width and compute the
-						// height.
-						const referenceHeight = offsetWidth / naturalRatio;
-						buttonTop =
-							( offsetHeight - referenceHeight ) / 2 +
-							buttonOffsetTop +
-							16;
-						buttonRight = buttonOffsetRight + 16;
-					} else {
-						// If it reaches the height first, it keeps the height and compute
-						// the width.
-						const referenceWidth = offsetHeight * naturalRatio;
-						buttonTop = buttonOffsetTop + 16;
-						buttonRight =
-							( offsetWidth - referenceWidth ) / 2 +
-							buttonOffsetRight +
-							16;
-					}
-				}
-
-				state.metadata[ imageId ].buttonTop = buttonTop;
-				state.metadata[ imageId ].buttonRight = buttonRight;
+				state.metadata[ imageId ].buttonBottom = imgHeight
+					? `calc((anchor-size(height) - ${ imgHeight }px) / -2 - 20px - 16px)`
+					: '-36px';
 			},
 			setOverlayFocus() {
 				if ( state.overlayEnabled ) {
