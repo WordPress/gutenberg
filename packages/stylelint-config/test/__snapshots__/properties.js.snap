@@ -45,7 +45,7 @@ exports[`flags warnings with invalid properties css > snapshot matches warnings 
     "line": 5,
     "rule": "declaration-block-no-shorthand-property-overrides",
     "severity": "error",
-    "text": "Unexpected shorthand "margin" after "margin-left" (declaration-block-no-shorthand-property-overrides)",
+    "text": "Overridden property "margin-left" by shorthand "margin" (declaration-block-no-shorthand-property-overrides)",
   },
   {
     "column": 2,
@@ -54,7 +54,7 @@ exports[`flags warnings with invalid properties css > snapshot matches warnings 
     "line": 6,
     "rule": "property-no-unknown",
     "severity": "error",
-    "text": "Unexpected unknown property "argin" (property-no-unknown)",
+    "text": "Unknown property "argin" (property-no-unknown)",
   },
   {
     "column": 11,
