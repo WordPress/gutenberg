@@ -13,6 +13,7 @@
 ### Bug Fixes
 
 -   Apply test-only DOM global exceptions to both JavaScript and JSX test files ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+-   Fix `no-unused-vars-before-return` false positive on variables used only in JSX ([#82144](https://github.com/WordPress/gutenberg/pull/82144)).
 
 ### Internal
 
