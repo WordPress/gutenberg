@@ -31,6 +31,7 @@ import DataViewsViewConfig, {
 import normalizeFields from '../field-types';
 import useData from '../hooks/use-data';
 import { useInfiniteScroll } from '../hooks/use-infinite-scroll';
+import usePageClamp from '../hooks/use-page-clamp';
 import type { ActionButton, Field, View, SupportedLayouts } from '../types';
 import type { SelectionOrUpdater } from '../types/private';
 type ItemWithId = { id: string };
@@ -293,6 +294,13 @@ function DataViewsPicker< Item >( {
 		paginationInfo,
 		containerRef,
 		setVisibleEntries,
+	} );
+
+	usePageClamp( {
+		view,
+		onChangeView,
+		isLoading,
+		totalPages: paginationInfo.totalPages,
 	} );
 
 	useEffect( () => {
