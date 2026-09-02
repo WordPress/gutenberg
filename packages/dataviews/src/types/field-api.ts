@@ -521,9 +521,11 @@ export type FormatInteger = {
 };
 
 /**
- * A field after normalization: every optional `Field` property has been
+ * A field after normalization: the properties listed below have been
  * resolved to a value, either from the consumer-provided field or from the
- * defaults of the field's type. This is the shape received by field callbacks
+ * defaults of the field's type. Properties without a default (`description`,
+ * `placeholder`, `elements`, `getElements`, `isVisible`) stay optional and
+ * may be `undefined`. This is the shape received by field callbacks
  * (`render`, `Edit`, validators, etc.).
  */
 export type NormalizedField< Item > = Omit<
