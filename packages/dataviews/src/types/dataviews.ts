@@ -170,9 +170,11 @@ export type DataViewsProps< Item > = {
 	empty?: ReactNode;
 
 	/**
-	 * Callback to reset the view to its initial state, wired to the "Reset"
-	 * action shown when filters or search are active. Pass `false` to hide
-	 * the reset action.
+	 * Callback to reset the view to its initial state, wired to the
+	 * "Reset view" button in the view options popover. When provided, the
+	 * view options toggle also shows a "modified" indicator. Pass `false` to
+	 * render the button disabled (the view is not modified); omit the prop
+	 * to hide the button altogether (no reset support).
 	 */
 	onReset?: ( () => void ) | false;
 } & ( Item extends ItemWithId
