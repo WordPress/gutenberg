@@ -2,8 +2,13 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Keep a query's `totalItems` in sync when records are removed from it, so the page count is correct after a deletion instead of only after the next fetch ([#82244](https://github.com/WordPress/gutenberg/pull/82244)).
+
 ### Internal
 
+-   Remove the template activation (`active_templates`) experiment: drop the `registeredTemplate` entity and the experiment-only `wp_template` endpoint rewrites and query params ([#82241](https://github.com/WordPress/gutenberg/pull/82241)).
 -   Remove unused dependency `@wordpress/is-shallow-equal` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
 -   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).

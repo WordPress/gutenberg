@@ -37,7 +37,8 @@
 		"ajv": "^8.20.0",
 		"fast-glob": "^3.2.7",
 		"react": "^18.3.1",
-		"rimraf": "^5.0.10"
+		"rimraf": "^5.0.10",
+		"vitest": "^4.1.10"
 	},
 	"publishConfig": {
 		"access": "public"

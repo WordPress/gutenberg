@@ -84,7 +84,8 @@
 		"@types/jest": "^30.0.0",
 		"@types/node": "^20.19.39",
 		"esbuild": "^0.27.2",
-		"storybook": "^10.5.3"
+		"storybook": "^10.5.3",
+		"vitest": "^4.1.10"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",
