@@ -37,7 +37,7 @@ Committers apply the `Require PR update` label to a pull request whose change in
 
 ## Maintainer runbook
 
-The `Required changes from trunk` workflow exposes two `workflow_dispatch` switches. `move-baseline` moves the baseline tag to the current `trunk` HEAD and then sweeps open pull requests. `sweep` sweeps against the baseline where it stands, which is the retry path after an interrupted run and the way to clear stale statuses if the tag is ever deleted.
+The `Required changes from trunk` workflow exposes two `workflow_dispatch` switches. `move-baseline` moves the baseline tag to the current `trunk` HEAD and then sweeps open pull requests. `sweep` sweeps against the baseline where it stands, which is the retry path after an interrupted run and the way to bring every open pull request back to passing if the tag is ever deleted.
 
 ### Initial setup
 

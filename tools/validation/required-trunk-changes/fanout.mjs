@@ -146,11 +146,6 @@ export async function fanout( { dryRun } ) {
 			skipped++;
 			continue;
 		}
-		/* With no baseline nothing is required, so only clear stale verdicts. */
-		if ( baseline === null && ! pr.status ) {
-			skipped++;
-			continue;
-		}
 		/* Probed first so an unwritable PR costs no ancestry request. */
 		if ( ! hasWriteBudget() ) {
 			budgetExhausted = true;
