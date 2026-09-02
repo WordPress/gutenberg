@@ -1,20 +1,8 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
-import { Button, Icon, Tooltip } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { sprintf, _x } from '@wordpress/i18n';
-import { error as errorIcon, pencil } from '@wordpress/icons';
+import { pencil } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
-import { useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type {
 	FieldValidity,
 	NormalizedField,
@@ -22,7 +10,7 @@ import type {
 	NormalizedPanelLayout,
 } from '../../../types';
 import getLabelClassName from './utils/get-label-classname';
-import getLabelContent from './utils/get-label-content';
+import FieldLabelContent from './field-label-content';
 import getFirstValidationError from './utils/get-first-validation-error';
 
 export default function SummaryButton< Item >( {
@@ -33,8 +21,8 @@ export default function SummaryButton< Item >( {
 	validity,
 	touched,
 	disabled,
+	isOpen,
 	onClick,
-	'aria-expanded': ariaExpanded,
 }: {
 	data: Item;
 	field: NormalizedFormField;
@@ -43,15 +31,15 @@ export default function SummaryButton< Item >( {
 	validity?: FieldValidity;
 	touched: boolean;
 	disabled?: boolean;
+	isOpen: boolean;
 	onClick: () => void;
-	'aria-expanded'?: boolean;
 } ) {
 	const { labelPosition, editVisibility } =
 		field.layout as NormalizedPanelLayout;
 	const errorMessage = getFirstValidationError( validity );
 	const showError = touched && !! errorMessage;
 	const labelClassName = getLabelClassName( labelPosition, showError );
-	const labelContent = getLabelContent( showError, errorMessage, fieldLabel );
+
 	const className = clsx(
 		'dataforms-layouts-panel__field-trigger',
 		`dataforms-layouts-panel__field-trigger--label-${ labelPosition }`,
@@ -66,6 +54,7 @@ export default function SummaryButton< Item >( {
 		SummaryButton,
 		'dataforms-layouts-panel__field-control'
 	);
+	const errorId = `${ controlId }-error`;
 
 	const ariaLabel = showError
 		? sprintf(
@@ -79,43 +68,24 @@ export default function SummaryButton< Item >( {
 				fieldLabel || ''
 		  );
 
-	const rowRef = useRef< HTMLDivElement >( null );
-
-	const handleRowClick = () => {
-		const selection =
-			rowRef.current?.ownerDocument.defaultView?.getSelection();
-		if ( selection && selection.toString().length > 0 ) {
-			return;
-		}
-		onClick();
-	};
-
-	const handleKeyDown = ( event: React.KeyboardEvent ) => {
-		if (
-			event.target === event.currentTarget &&
-			( event.key === 'Enter' || event.key === ' ' )
-		) {
-			event.preventDefault();
-			onClick();
-		}
-	};
-
 	return (
-		<div
-			ref={ rowRef }
-			className={ className }
-			onClick={ ! disabled ? handleRowClick : undefined }
-			onKeyDown={ ! disabled ? handleKeyDown : undefined }
-		>
+		<div className={ className }>
 			{ labelPosition !== 'none' && (
-				<span className={ labelClassName }>{ labelContent }</span>
+				<span className={ labelClassName }>
+					<FieldLabelContent
+						showError={ showError }
+						errorMessage={ errorMessage }
+						fieldLabel={ fieldLabel }
+						errorId={ errorId }
+					/>
+				</span>
 			) }
 			{ labelPosition === 'none' && showError && (
-				<Tooltip text={ errorMessage } placement="top">
-					<span className="dataforms-layouts-panel__field-label-error-content">
-						<Icon icon={ errorIcon } size={ 16 } />
-					</span>
-				</Tooltip>
+				<FieldLabelContent
+					showError
+					errorMessage={ errorMessage }
+					errorId={ errorId }
+				/>
 			) }
 			<span
 				id={ `${ controlId }` }
@@ -159,9 +129,12 @@ export default function SummaryButton< Item >( {
 					label={ ariaLabel }
 					icon={ pencil }
 					size="small"
-					aria-expanded={ ariaExpanded }
+					aria-expanded={ isOpen }
 					aria-haspopup="dialog"
-					aria-describedby={ `${ controlId }` }
+					aria-describedby={
+						showError ? `${ controlId } ${ errorId }` : controlId
+					}
+					onClick={ onClick }
 				/>
 			) }
 		</div>

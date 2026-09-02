@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { privateApis as patternPrivateApis } from '@wordpress/patterns';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 
 // Attachments / media

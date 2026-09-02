@@ -1,7 +1,3 @@
-/**
- * Internal dependencies
- */
-
 import { getActiveFormats } from './get-active-formats';
 import { getFormatType } from './get-format-type';
 import { OBJECT_REPLACEMENT_CHARACTER, ZWNBSP } from './special-characters';

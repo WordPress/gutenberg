@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type {
 	Context,
 	ContextualField,
@@ -11,7 +8,6 @@ import type {
 	CommentingStatus,
 	PingStatus,
 } from './helpers';
-
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
 interface MediaDetails {

@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { trash, image, Icon, category } from '@wordpress/icons';
-import { Button, __experimentalText as Text } from '@wordpress/components';
+import { Button, __experimentalText as WCText } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type { Field, Action } from '../../types';
 
 export type SpaceObject = {
@@ -626,8 +619,7 @@ export const data: SpaceObject[] = [
 export const actions: Action< SpaceObject >[] = [
 	{
 		id: 'delete',
-		label: 'Delete item',
-		isPrimary: true,
+		label: 'Delete',
 		icon: trash,
 		modalHeader: ( items ) =>
 			items.length > 1
@@ -642,7 +634,7 @@ export const actions: Action< SpaceObject >[] = [
 					: `Are you sure you want to delete "${ items[ 0 ].name.title }"?`;
 			return (
 				<Stack direction="column" gap="xl">
-					<Text>{ label }</Text>
+					<WCText>{ label }</WCText>
 					<Stack direction="row" gap="sm" justify="right">
 						<Button
 							__next40pxDefaultSize
@@ -664,11 +656,15 @@ export const actions: Action< SpaceObject >[] = [
 		},
 	},
 	{
-		id: 'secondary',
-		label: 'Secondary action',
-		callback() {
-			// eslint-disable-next-line no-console
-			console.log( 'Perform secondary action.' );
+		id: 'view',
+		label: 'View',
+		isPrimary: true,
+		callback: ( items ) => {
+			const item = items[ 0 ];
+			// eslint-disable-next-line no-alert
+			alert(
+				`View item: "${ item.name.title }"\n\n${ item.name.description }`
+			);
 		},
 	},
 ];

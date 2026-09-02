@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { useStyle } from './hooks';
 
 interface TypographyPreviewProps {
