@@ -463,6 +463,64 @@ test.describe( 'Gallery', () => {
 			} )
 			.toBeLessThanOrEqual( 1 );
 	} );
+
+	test( 'does not crop images to a uniform height when cropping is disabled', async ( {
+		admin,
+		editor,
+		requestUtils,
+	} ) => {
+		const landscapeMedia = await requestUtils.uploadMedia(
+			'./assets/200x150_e2e_test_image_opaque.png'
+		);
+		const squareMedia = await requestUtils.uploadMedia(
+			'./assets/10x10_e2e_test_image_z9T8jK.png'
+		);
+
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/gallery',
+			attributes: {
+				imageCrop: false,
+			},
+			innerBlocks: [
+				{
+					name: 'core/image',
+					attributes: {
+						id: landscapeMedia.id,
+						url: landscapeMedia.source_url,
+						sizeSlug: 'full',
+					},
+				},
+				{
+					name: 'core/image',
+					attributes: {
+						id: squareMedia.id,
+						url: squareMedia.source_url,
+						sizeSlug: 'full',
+					},
+				},
+			],
+		} );
+
+		const images = editor.canvas.locator(
+			'role=document[name="Block: Gallery"i] >> role=img'
+		);
+		await expect( images ).toHaveCount( 2 );
+
+		// With cropping disabled, each image renders at its natural aspect
+		// ratio, so the two images have different heights. Poll so the
+		// assertion waits for both images to finish loading.
+		await expect
+			.poll( async () => {
+				const landscapeBox = await images.nth( 0 ).boundingBox();
+				const squareBox = await images.nth( 1 ).boundingBox();
+				if ( ! landscapeBox || ! squareBox ) {
+					return 0;
+				}
+				return Math.abs( landscapeBox.height - squareBox.height );
+			} )
+			.toBeGreaterThan( 10 );
+	} );
 } );
 
 class GalleryBlockUtils {

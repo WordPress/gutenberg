@@ -317,6 +317,10 @@ export default function Image( {
 	}, [ imageElement ] );
 	const setRefs = useMergeRefs( [ setImageElement, setResizeObserved ] );
 	const { allowResize = true, imageCrop = false } = context;
+	// Only a cropped gallery (flex layout) controls the image height via its
+	// own CSS. Grid galleries and standalone images keep the baseline
+	// `height: auto` so a theme can't squish them.
+	const isCroppedGalleryImage = imageCrop && parentLayoutType === 'flex';
 
 	const { image, attachmentResolutionError } = useSelect(
 		( select ) => {
@@ -1232,7 +1236,7 @@ export default function Image( {
 												typeof height === 'number'
 													? `${ height }px`
 													: height;
-										} else if ( ! imageCrop ) {
+										} else if ( ! isCroppedGalleryImage ) {
 											// Default to `height: auto` so a
 											// theme that sets an explicit height
 											// on images can't squish them. Inside

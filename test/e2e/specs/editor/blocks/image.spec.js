@@ -1068,9 +1068,10 @@ test.describe( 'Image - dimensions forced by global styles', () => {
 			'./assets/200x150_e2e_test_image_opaque.png'
 		);
 
-		// Mimic a theme that forces a fixed height on image blocks. The
-		// top-level custom CSS is prefixed with `:root :where(body)`, giving
-		// it higher specificity than the block's own `height: auto` rule.
+		// Mimic a theme that forces a fixed height on image blocks. User
+		// global styles load after the block's own stylesheet, so this rule
+		// wins the equal-specificity cascade against the block's `height: auto`
+		// unless the block sets an inline `height: auto` (which always wins).
 		const stylesPostId =
 			await requestUtils.getCurrentThemeGlobalStylesPostId();
 		await requestUtils.rest( {
@@ -1116,6 +1117,46 @@ test.describe( 'Image - dimensions forced by global styles', () => {
 		// ratio (150px tall) instead of being squished to the 100px height
 		// forced by global styles.
 		expect( box.width / box.height ).toBeCloseTo( 4 / 3, 1 );
+	} );
+
+	test( 'preserves the aspect ratio for images in a grid gallery', async ( {
+		admin,
+		editor,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/gallery',
+			attributes: {
+				layout: { type: 'grid' },
+			},
+			innerBlocks: [
+				{
+					name: 'core/image',
+					attributes: {
+						id: uploadedMedia.id,
+						url: uploadedMedia.source_url,
+						sizeSlug: 'full',
+					},
+				},
+			],
+		} );
+
+		// The grid variation relabels the block to "Gallery Grid", so select
+		// by data-type rather than by the block's accessible name.
+		const image = editor.canvas.locator(
+			'[data-type="core/gallery"] [data-type="core/image"] img'
+		);
+		await expect( image ).toBeVisible();
+
+		// Grid galleries do not crop images, so the image keeps its baseline
+		// `height: auto` and is not squished by the global styles. Poll so the
+		// assertion waits for the image to load and the layout to settle.
+		await expect
+			.poll( async () => {
+				const box = await image.boundingBox();
+				return box ? box.width / box.height : 0;
+			} )
+			.toBeCloseTo( 4 / 3, 1 );
 	} );
 } );
 
