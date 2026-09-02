@@ -53,7 +53,7 @@ jobs:
     unit-js-routing:
         name: JavaScript test routing
         runs-on: 'ubuntu-24.04'
-        needs: [ detect-relevant-changes ]
+        needs: [detect-relevant-changes]
         permissions:
             contents: read
         if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
@@ -76,7 +76,7 @@ jobs:
     unit-js:
         name: JavaScript (Node.js ${{ matrix.node }}) ${{ matrix.shard }}
         runs-on: 'ubuntu-24.04'
-        needs: [ detect-relevant-changes ]
+        needs: [detect-relevant-changes]
         permissions:
             contents: read
             id-token: write
@@ -154,7 +154,7 @@ jobs:
     unit-js-date:
         name: JavaScript Date Tests (Node.js ${{ matrix.node }})
         runs-on: 'ubuntu-24.04'
-        needs: [ detect-relevant-changes ]
+        needs: [detect-relevant-changes]
         permissions:
             contents: read
             id-token: write
@@ -200,7 +200,7 @@ jobs:
     compute-previous-wordpress-version:
         name: Compute previous WordPress version
         runs-on: 'ubuntu-24.04'
-        needs: [ detect-relevant-changes ]
+        needs: [detect-relevant-changes]
         if: ${{ github.event_name != 'pull_request' || needs.detect-relevant-changes.outputs.relevant == 'true' }}
         permissions: {}
         outputs:
@@ -229,7 +229,7 @@ jobs:
     build-assets:
         name: Build JavaScript assets for PHP unit tests
         runs-on: 'ubuntu-24.04'
-        needs: [ detect-relevant-changes ]
+        needs: [detect-relevant-changes]
         if: ${{ github.event_name != 'pull_request' || needs.detect-relevant-changes.outputs.relevant == 'true' }}
         permissions:
             contents: read
