@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add an `addEditedImage` action that applies flip, rotate and crop edits to an image with vips and uploads the result as a new attachment through the regular pipeline, the client-side counterpart of the REST `media/<id>/edit` endpoint ([#82362](https://github.com/WordPress/gutenberg/pull/82362)).
+
 ### Internal
 
 -   Add a private `getFailureCount` selector, a running tally of top-level items cancelled because they failed. Failed items leave the queue just like successful ones, so this is the only record that an upload did not make it ([#81132](https://github.com/WordPress/gutenberg/issues/81132)).

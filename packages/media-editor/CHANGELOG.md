@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Apply crop, rotate and flip edits in the browser with client-side media processing when it is available, uploading the result through the upload queue so an UltraHDR gain map survives the edit, and fall back to the REST `media/<id>/edit` endpoint otherwise ([#82362](https://github.com/WordPress/gutenberg/pull/82362))).
+
 ### Internal
 
 -   Remove unused dependency `@wordpress/date` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).

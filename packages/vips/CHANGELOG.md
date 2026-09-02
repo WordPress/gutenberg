@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `editImage`, which applies the REST `media/<id>/edit` endpoint's flip, rotate and crop modifiers to an image. Any pending EXIF orientation is applied first, and an UltraHDR gain map is transformed in step with the base image instead of being dropped ([#82362](https://github.com/WordPress/gutenberg/pull/82362)).
+
 ### Bug Fixes
 
 -   Keep indexed (palette) PNGs indexed when resizing, compressing, converting, or rotating them, instead of re-encoding them as truecolour, which made sub-sizes several times larger than the original. The image quality setting is not applied to the resulting palette, since PNG output stays lossless. Reported against core as https://core.trac.wordpress.org/ticket/65922 ([#81895](https://github.com/WordPress/gutenberg/issues/81895)).
