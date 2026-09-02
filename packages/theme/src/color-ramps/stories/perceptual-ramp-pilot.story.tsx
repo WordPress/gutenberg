@@ -9,10 +9,20 @@ import {
 	EXPERIMENTAL_RAMP_METHODS,
 	buildExperimentalThemeRamps,
 	getExperimentalChroma,
-	type ExperimentalRampMethod,
 	type ExperimentalThemeRamps,
 } from './perceptual-ramp-experiment';
 import styles from './perceptual-ramp-pilot.module.css';
+import {
+	TRUNK_PRODUCTION_COMMIT,
+	getTrunkProductionThemeRamps,
+} from './trunk-production-fixtures';
+
+const COMPARISON_RAMP_METHODS = [
+	'trunk-production',
+	...EXPERIMENTAL_RAMP_METHODS,
+] as const;
+
+type ComparisonRampMethod = ( typeof COMPARISON_RAMP_METHODS )[ number ];
 
 const SAMPLE_COMBINATIONS = [
 	{
@@ -63,13 +73,25 @@ const SAMPLE_COMBINATIONS = [
 ] as const;
 
 const METHOD_DETAILS: Record<
-	ExperimentalRampMethod,
+	ComparisonRampMethod,
 	{ label: string; description: string }
 > = {
+	'trunk-production': {
+		label: 'Trunk production',
+		description: `Exact fixed-sample output from trunk at ${ TRUNK_PRODUCTION_COMMIT.slice(
+			0,
+			11
+		) }. Trunk has four foreground steps.`,
+	},
 	anchored: {
-		label: 'Anchored production candidate',
+		label: 'Current production candidate',
 		description:
 			'Current draft algorithm. APCA shapes the five foreground steps and WCAG ratios shape the other lanes.',
+	},
+	'constrained-perceptual': {
+		label: 'Constrained perceptual surfaces and strokes',
+		description:
+			'Uses Oklr lightness and OKLab color difference to space surfaces and strokes while retaining the production chroma policy and WCAG gates.',
 	},
 	'apca-all': {
 		label: 'APCA for every lane',
@@ -120,7 +142,7 @@ const SCALE_DETAILS = [
 ] as const;
 
 type PilotArgs = {
-	approaches: ExperimentalRampMethod[];
+	approaches: ComparisonRampMethod[];
 };
 
 const meta = {
@@ -134,14 +156,14 @@ const meta = {
 			control: {
 				type: 'inline-check',
 				labels: Object.fromEntries(
-					EXPERIMENTAL_RAMP_METHODS.map( ( method ) => [
+					COMPARISON_RAMP_METHODS.map( ( method ) => [
 						method,
 						METHOD_DETAILS[ method ].label,
 					] )
 				),
 			},
 			description: 'Approaches shown in each comparison table.',
-			options: EXPERIMENTAL_RAMP_METHODS,
+			options: COMPARISON_RAMP_METHODS,
 		},
 	},
 } satisfies Meta< PilotArgs >;
@@ -154,7 +176,7 @@ type ScaleName = ( typeof SCALE_DETAILS )[ number ][ 'name' ];
 const rampCache = new Map< string, ExperimentalThemeRamps >();
 
 function getRamps(
-	method: ExperimentalRampMethod,
+	method: ComparisonRampMethod,
 	background: string,
 	primary: string
 ) {
@@ -164,12 +186,15 @@ function getRamps(
 		return cached;
 	}
 
-	const ramps = buildExperimentalThemeRamps( {
-		method,
-		background,
-		primary,
-		error: DEFAULT_SEED_COLORS.error,
-	} );
+	const ramps =
+		method === 'trunk-production'
+			? getTrunkProductionThemeRamps( background, primary )
+			: buildExperimentalThemeRamps( {
+					method,
+					background,
+					primary,
+					error: DEFAULT_SEED_COLORS.error,
+			  } );
 	rampCache.set( key, ramps );
 	return ramps;
 }
@@ -273,7 +298,7 @@ function MethodSummary( {
 	isAccent,
 	seed,
 }: {
-	method: ExperimentalRampMethod;
+	method: ComparisonRampMethod;
 	ramp: RampResult;
 	backgroundRamp: RampResult;
 	isAccent: boolean;
@@ -308,10 +333,19 @@ function MethodSummary( {
 				{ ramp.direction === 'lighter' ? 'light' : 'dark' }
 			</span>
 			<span>Fill ΔE { metrics.fillDifference.toFixed( 3 ) }</span>
-			<span>FGS4→5 ΔE { metrics.foregroundDifference.toFixed( 3 ) }</span>
-			<span>
-				FGS4→5 ΔLc { metrics.foregroundApcaInterval.toFixed( 1 ) }
-			</span>
+			{ method === 'trunk-production' ? (
+				<span>FGS5 not present on trunk</span>
+			) : (
+				<>
+					<span>
+						FGS4→5 ΔE { metrics.foregroundDifference.toFixed( 3 ) }
+					</span>
+					<span>
+						FGS4→5 ΔLc{ ' ' }
+						{ metrics.foregroundApcaInterval.toFixed( 1 ) }
+					</span>
+				</>
+			) }
 			{ metrics.chromaDrift === undefined ? null : (
 				<span>
 					Mean relative chroma drift{ ' ' }
@@ -332,8 +366,8 @@ function ScaleTable( {
 	label: string;
 	seed: string;
 	scaleName: ScaleName;
-	methods: ExperimentalRampMethod[];
-	rampsByMethod: Map< ExperimentalRampMethod, ExperimentalThemeRamps >;
+	methods: ComparisonRampMethod[];
+	rampsByMethod: Map< ComparisonRampMethod, ExperimentalThemeRamps >;
 } ) {
 	const groups = Array.from(
 		new Set( RAMP_STEPS.map( ( step ) => step.group ) )
@@ -427,6 +461,9 @@ function ScaleTable( {
 									</th>
 									{ RAMP_STEPS.map( ( step ) => {
 										const color = ramp.ramp[ step.name ];
+										const unavailableOnTrunk =
+											method === 'trunk-production' &&
+											step.name === 'fgSurface5';
 										return (
 											<td
 												key={ step.name }
@@ -438,6 +475,17 @@ function ScaleTable( {
 												} }
 												title={ `${ step.name }: ${ color }` }
 											>
+												{ unavailableOnTrunk ? (
+													<span
+														className={
+															styles[
+																'unavailable-step'
+															]
+														}
+													>
+														Not on trunk
+													</span>
+												) : null }
 												{ step.name === anchorStep ? (
 													<span
 														className={
@@ -474,8 +522,8 @@ function ComponentComparison( {
 	rampsByMethod,
 	label,
 }: {
-	methods: ExperimentalRampMethod[];
-	rampsByMethod: Map< ExperimentalRampMethod, ExperimentalThemeRamps >;
+	methods: ComparisonRampMethod[];
+	rampsByMethod: Map< ComparisonRampMethod, ExperimentalThemeRamps >;
 	label: string;
 } ) {
 	return (
@@ -678,7 +726,7 @@ function SeedCombination( {
 	label: string;
 	background: string;
 	primary: string;
-	methods: ExperimentalRampMethod[];
+	methods: ComparisonRampMethod[];
 } ) {
 	const rampsByMethod = new Map(
 		methods.map( ( method ) => [
@@ -723,10 +771,14 @@ function SeedCombination( {
 
 export const Comparison: Story = {
 	args: {
-		approaches: [ 'anchored', 'role-hybrid', 'pinned-role-hybrid' ],
+		approaches: [
+			'trunk-production',
+			'anchored',
+			'constrained-perceptual',
+		],
 	},
 	render: ( { approaches } ) => {
-		const methods = EXPERIMENTAL_RAMP_METHODS.filter( ( method ) =>
+		const methods = COMPARISON_RAMP_METHODS.filter( ( method ) =>
 			approaches.includes( method )
 		);
 
@@ -736,8 +788,12 @@ export const Comparison: Story = {
 					<h1>Perceptual ramp comparison</h1>
 					<p>
 						Compare each complete neutral, brand, and error ramp by
-						step. WCAG ratios remain hard gates in every approach.
-						Use the Approaches control to hide or show table rows.
+						step. The default rows show trunk at{ ' ' }
+						{ TRUNK_PRODUCTION_COMMIT.slice( 0, 11 ) }, the current
+						branch, and the new constrained-perceptual experiment.
+						WCAG ratios remain hard gates for the current and
+						experimental algorithms. Use the Approaches control to
+						show older experiments.
 					</p>
 				</header>
 				{ methods.length === 0 ? (
@@ -756,7 +812,7 @@ export const Comparison: Story = {
 				<details className={ styles.details }>
 					<summary>Approach definitions</summary>
 					<dl>
-						{ EXPERIMENTAL_RAMP_METHODS.map( ( method ) => (
+						{ COMPARISON_RAMP_METHODS.map( ( method ) => (
 							<div key={ method }>
 								<dt>{ METHOD_DETAILS[ method ].label }</dt>
 								<dd>

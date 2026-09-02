@@ -7,6 +7,7 @@ import {
 	OKLab,
 	OKLCH,
 	OKLCH_sRGB as OklchSrgb,
+	OKLrab,
 	sRGB,
 } from 'colorjs.io/fn';
 import { describe, expect, it } from 'vitest';
@@ -17,11 +18,16 @@ import {
 	EXPERIMENTAL_RAMP_METHODS,
 	buildExperimentalThemeRamps,
 } from '../perceptual-ramp-experiment';
+import {
+	TRUNK_PRODUCTION_COMMIT,
+	getTrunkProductionThemeRamps,
+} from '../trunk-production-fixtures';
 
 ColorSpace.register( sRGB );
 ColorSpace.register( OKLab );
 ColorSpace.register( OKLCH );
 ColorSpace.register( OklchSrgb );
+ColorSpace.register( OKLrab );
 
 const SAMPLE_COMBINATIONS = [
 	{ background: '#fcfcfc', primary: '#3858e9' },
@@ -62,6 +68,44 @@ function getForegroundContrasts(
 }
 
 describe( 'perceptual ramp experiment', () => {
+	it( 'exposes the exact pinned trunk ramps for every Storybook seed pair', () => {
+		for ( const seeds of [
+			{ background: '#fcfcfc', primary: '#3858e9' },
+			{ background: '#1e1e1e', primary: '#3858e9' },
+			{ background: '#413256', primary: '#a3b745' },
+			{ background: '#3876a8', primary: '#437aa8' },
+			{ background: '#5f787f', primary: '#567958' },
+			{ background: '#cc4541', primary: '#ad631e' },
+			{ background: '#777777', primary: '#d63638' },
+			{ background: '#fcfcfc', primary: '#ffd700' },
+			{ background: '#1e1e1e', primary: '#00ffff' },
+		] as const ) {
+			const ramps = getTrunkProductionThemeRamps(
+				seeds.background,
+				seeds.primary
+			);
+
+			for ( const ramp of Object.values( ramps ) ) {
+				expect( Object.keys( ramp.ramp ) ).toHaveLength( 23 );
+				expect( ramp.ramp.fgSurface5 ).toBe( ramp.ramp.fgSurface4 );
+			}
+		}
+
+		expect( TRUNK_PRODUCTION_COMMIT ).toBe(
+			'0b466a172502fa0d103ad4102dd5f24e22175049'
+		);
+		expect(
+			getTrunkProductionThemeRamps( '#fcfcfc', '#3858e9' ).background.ramp
+		).toMatchObject( {
+			surface2: '#fcfcfc',
+			stroke3: '#8d8d8d',
+			fgSurface4: '#1e1e1e',
+		} );
+		expect( () =>
+			getTrunkProductionThemeRamps( '#123456', '#abcdef' )
+		).toThrow( 'No trunk production fixture exists' );
+	} );
+
 	it.each( EXPERIMENTAL_RAMP_METHODS )(
 		'builds complete %s ramps for every representative seed pair',
 		( method ) => {
@@ -80,6 +124,73 @@ describe( 'perceptual ramp experiment', () => {
 			}
 		}
 	);
+
+	it( 'keeps constrained surfaces ordered and perceptually progressive', () => {
+		for ( const seeds of SAMPLE_COMBINATIONS ) {
+			const ramps = buildExperimentalThemeRamps( {
+				method: 'constrained-perceptual',
+				...seeds,
+			} );
+
+			for ( const ramp of Object.values( ramps ) ) {
+				const lightness = ( step: keyof typeof ramp.ramp ) =>
+					get( ramp.ramp[ step ], [ OKLrab, 'l' ] );
+				expect( lightness( 'surface1' ) ).toBeLessThan(
+					lightness( 'surface2' )
+				);
+				expect( lightness( 'surface3' ) ).toBeGreaterThan(
+					lightness( 'surface2' )
+				);
+
+				const emphasisLightness = [
+					lightness( 'surface2' ),
+					lightness( 'surface4' ),
+					lightness( 'surface5' ),
+					lightness( 'surface6' ),
+				];
+				const orderedLightness = [ ...emphasisLightness ].sort(
+					ramp.direction === 'lighter'
+						? ( first, second ) => first - second
+						: ( first, second ) => second - first
+				);
+				expect( emphasisLightness ).toEqual( orderedLightness );
+
+				const distances = [ 'surface4', 'surface5', 'surface6' ].map(
+					( step ) =>
+						deltaEOK2(
+							ramp.ramp.surface2,
+							ramp.ramp[ step as keyof typeof ramp.ramp ]
+						)
+				);
+				expect( distances[ 0 ] ).toBeLessThan( distances[ 1 ] );
+				expect( distances[ 1 ] ).toBeLessThan( distances[ 2 ] );
+			}
+		}
+	} );
+
+	it( 'keeps constrained ST3 accessible and ST4 perceptually stronger', () => {
+		for ( const seeds of SAMPLE_COMBINATIONS ) {
+			const ramps = buildExperimentalThemeRamps( {
+				method: 'constrained-perceptual',
+				...seeds,
+			} );
+
+			for ( const ramp of Object.values( ramps ) ) {
+				const stroke3Contrast = Math.abs(
+					contrastAPCA( ramp.ramp.surface3, ramp.ramp.stroke3 )
+				);
+				const stroke4Contrast = Math.abs(
+					contrastAPCA( ramp.ramp.surface3, ramp.ramp.stroke4 )
+				);
+				expect( stroke4Contrast ).toBeGreaterThanOrEqual(
+					stroke3Contrast
+				);
+				expect(
+					getContrast( ramp.ramp.surface3, ramp.ramp.stroke3 )
+				).toBeGreaterThanOrEqual( 3 );
+			}
+		}
+	} );
 
 	it.each( EXPERIMENTAL_RAMP_METHODS )(
 		'keeps every configured WCAG pair accessible in the %s ramps',

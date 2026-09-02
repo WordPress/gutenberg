@@ -6,6 +6,7 @@ import {
 	OKLab,
 	OKLCH,
 	OKLCH_sRGB as OklchSrgb,
+	OKLrab,
 	sRGB,
 	to,
 	type PlainColorObject,
@@ -30,9 +31,11 @@ ColorSpace.register( sRGB );
 ColorSpace.register( OKLab );
 ColorSpace.register( OKLCH );
 ColorSpace.register( OklchSrgb );
+ColorSpace.register( OKLrab );
 
 export const EXPERIMENTAL_RAMP_METHODS = [
 	'anchored',
+	'constrained-perceptual',
 	'apca-all',
 	'role-hybrid',
 	'pinned-role-hybrid',
@@ -141,6 +144,82 @@ function createColorAtLightness(
 			],
 			alpha: parsedSeed.alpha,
 		} );
+}
+
+function getPerceptualLightness( color: string | PlainColorObject ) {
+	return get( color, [ OKLrab, 'l' ] );
+}
+
+function createColorAtPerceptualLightness(
+	seed: string | PlainColorObject,
+	mode: ChromaMode,
+	taperOptions?: Parameters< typeof taperChroma >[ 2 ]
+): GetColorAtLightness {
+	const getColorAtLightness = createColorAtLightness(
+		seed,
+		mode,
+		taperOptions
+	);
+
+	return ( perceptualLightness ) => {
+		const oklab = to(
+			{
+				space: OKLrab,
+				coords: [ perceptualLightness, 0, 0 ],
+				alpha: 1,
+			},
+			OKLab
+		);
+		return getColorAtLightness( get( oklab, [ OKLab, 'l' ] ) );
+	};
+}
+
+function createAnchoredColorForStepAtPerceptualLightness( {
+	ramp,
+	step,
+	anchor,
+	startLightness,
+	endLightness,
+}: {
+	ramp: Record< keyof Ramp, string >;
+	step: keyof Ramp;
+	anchor: string;
+	startLightness: number;
+	endLightness: number;
+} ) {
+	const stepColor = to( clampToGamut( ramp[ step ] ), OKLCH );
+	const getTargetColor = createColorAtPerceptualLightness(
+		stepColor,
+		'absolute'
+	);
+	const anchorColor = to( clampToGamut( anchor ), OKLCH );
+	const anchorChroma = get( anchorColor, [ OKLCH, 'c' ] );
+	const stepChroma = get( stepColor, [ OKLCH, 'c' ] );
+	const distance = endLightness - startLightness;
+
+	return ( perceptualLightness: number ) => {
+		const targetColor = to( getTargetColor( perceptualLightness ), OKLCH );
+		const progress =
+			distance === 0
+				? 1
+				: Math.min(
+						1,
+						Math.max(
+							0,
+							( perceptualLightness - startLightness ) / distance
+						)
+				  );
+
+		return clampToGamut( {
+			space: OKLCH,
+			coords: [
+				get( targetColor, [ OKLCH, 'l' ] ),
+				anchorChroma + ( stepChroma - anchorChroma ) * progress,
+				get( stepColor, [ OKLCH, 'h' ] ),
+			],
+			alpha: targetColor.alpha,
+		} );
+	};
 }
 
 function getClosestBoundary(
@@ -336,6 +415,186 @@ function findColorMeetingWcag( {
 			strongest.margin
 		)
 	);
+}
+
+function rebuildConstrainedSurfaces( { ramp }: { ramp: RampResult } ) {
+	const nextRamp = { ...ramp.ramp };
+	const surfaceReference = prepareMetricReference(
+		'delta-e',
+		ramp.ramp.surface2
+	);
+	const elevationTarget = Math.max(
+		getMetric( 'delta-e', surfaceReference, ramp.ramp.surface1 ),
+		getMetric( 'delta-e', surfaceReference, ramp.ramp.surface3 )
+	);
+	const surface2Lightness = getPerceptualLightness( ramp.ramp.surface2 );
+
+	for ( const step of [ 'surface1', 'surface3' ] as const ) {
+		const endLightness = step === 'surface1' ? 0 : 1;
+		const getColorAtLightness = createColorAtPerceptualLightness(
+			ramp.ramp[ step ],
+			'absolute'
+		);
+		nextRamp[ step ] = getColorString(
+			findColorAtMetric( {
+				metric: 'delta-e',
+				reference: surfaceReference,
+				getColorAtLightness,
+				startLightness: surface2Lightness,
+				endLightness,
+				target: elevationTarget,
+			} )
+		);
+	}
+
+	const surface6Difference = getMetric(
+		'delta-e',
+		surfaceReference,
+		ramp.ramp.surface6
+	);
+	const surface6Lightness = getPerceptualLightness( ramp.ramp.surface6 );
+	for ( const [ index, step ] of SURFACE_STEPS.entries() ) {
+		if ( step === 'surface6' ) {
+			continue;
+		}
+		const getColorAtLightness = createColorAtPerceptualLightness(
+			ramp.ramp[ step ],
+			'absolute'
+		);
+		const minimumDifference = getMetric(
+			'delta-e',
+			surfaceReference,
+			getColorAtLightness( surface2Lightness )
+		);
+		nextRamp[ step ] = getColorString(
+			findColorAtMetric( {
+				metric: 'delta-e',
+				reference: surfaceReference,
+				getColorAtLightness,
+				startLightness: surface2Lightness,
+				endLightness: surface6Lightness,
+				target:
+					minimumDifference +
+					( surface6Difference - minimumDifference ) *
+						SURFACE_PROGRESS[ index ],
+			} )
+		);
+	}
+
+	return nextRamp;
+}
+
+function rebuildConstrainedStrokes( {
+	ramp,
+	backgroundRamp,
+}: {
+	ramp: RampResult;
+	backgroundRamp: RampResult;
+} ) {
+	const nextRamp = { ...ramp.ramp };
+	const references = getStrokeReferences( nextRamp, backgroundRamp );
+
+	// ST3 is the accessibility boundary. Preserve the production color whenever
+	// it meets every required 3:1 contrast pair.
+	nextRamp.stroke3 = findColorMeetingWcag( {
+		color: nextRamp.stroke3,
+		references,
+		target: SERIALIZED_STROKE_WCAG_TARGET,
+		seed: nextRamp.stroke3,
+		mode: 'absolute',
+	} );
+
+	const stroke1Reference = prepareMetricReference(
+		'delta-e',
+		nextRamp.stroke1
+	);
+	const stroke1To3Difference = getMetric(
+		'delta-e',
+		stroke1Reference,
+		nextRamp.stroke3
+	);
+	const authoredStroke2Difference = getMetric(
+		'delta-e',
+		stroke1Reference,
+		ramp.ramp.stroke2
+	);
+	const stroke1Lightness = getPerceptualLightness( nextRamp.stroke1 );
+	const stroke3Lightness = getPerceptualLightness( nextRamp.stroke3 );
+	const getStroke2AtLightness =
+		createAnchoredColorForStepAtPerceptualLightness( {
+			ramp: nextRamp,
+			step: 'stroke2',
+			anchor: nextRamp.stroke1,
+			startLightness: stroke1Lightness,
+			endLightness: stroke3Lightness,
+		} );
+	nextRamp.stroke2 = getColorString(
+		findColorAtMetric( {
+			metric: 'delta-e',
+			reference: stroke1Reference,
+			getColorAtLightness: getStroke2AtLightness,
+			startLightness: stroke1Lightness,
+			endLightness: stroke3Lightness,
+			target: Math.min(
+				authoredStroke2Difference,
+				stroke1To3Difference * 0.95
+			),
+		} )
+	);
+	const stroke3Contrast = Math.abs(
+		contrastAPCA( nextRamp.surface3, nextRamp.stroke3 )
+	);
+	const stroke4Contrast = Math.abs(
+		contrastAPCA( nextRamp.surface3, nextRamp.stroke4 )
+	);
+	if (
+		stroke4Contrast >= stroke3Contrast &&
+		references.every(
+			( reference ) =>
+				getContrast( reference, nextRamp.stroke4 ) >=
+				SERIALIZED_STROKE_WCAG_TARGET
+		)
+	) {
+		return nextRamp;
+	}
+
+	const stroke3Reference = prepareMetricReference(
+		'delta-e',
+		nextRamp.stroke3
+	);
+	const minimumActiveDifference = getMetric(
+		'delta-e',
+		stroke3Reference,
+		ramp.ramp.stroke4
+	);
+	const stroke4EndLightness = ramp.direction === 'lighter' ? 1 : 0;
+	const getStroke4AtLightness =
+		createAnchoredColorForStepAtPerceptualLightness( {
+			ramp: nextRamp,
+			step: 'stroke4',
+			anchor: nextRamp.stroke3,
+			startLightness: stroke3Lightness,
+			endLightness: stroke4EndLightness,
+		} );
+	const stroke4Candidate = getColorString(
+		findColorAtMetric( {
+			metric: 'delta-e',
+			reference: stroke3Reference,
+			getColorAtLightness: getStroke4AtLightness,
+			startLightness: stroke3Lightness,
+			endLightness: stroke4EndLightness,
+			target: minimumActiveDifference,
+		} )
+	);
+	nextRamp.stroke4 = findColorMeetingWcag( {
+		color: stroke4Candidate,
+		references,
+		target: SERIALIZED_STROKE_WCAG_TARGET,
+		seed: stroke4Candidate,
+		mode: 'absolute',
+	} );
+
+	return nextRamp;
 }
 
 function darkenUntilContrast( {
@@ -636,6 +895,39 @@ function rebuildRamp( {
 	family: RampFamily;
 	seed: string;
 } ) {
+	const config = family === 'neutral' ? BG_RAMP_CONFIG : ACCENT_RAMP_CONFIG;
+
+	if ( method === 'constrained-perceptual' ) {
+		let nextRamp = rebuildConstrainedSurfaces( {
+			ramp,
+		} );
+		const surfaceResult: RampResult = {
+			...ramp,
+			ramp: nextRamp,
+			warnings: undefined,
+		};
+		nextRamp = rebuildConstrainedStrokes( {
+			ramp: surfaceResult,
+			backgroundRamp,
+		} );
+		nextRamp = rebuildActiveFill( {
+			ramp: nextRamp,
+			method,
+			seed,
+			mode: getRampChromaMode( method, family ),
+		} );
+
+		return buildForegroundScale(
+			{
+				...ramp,
+				ramp: nextRamp,
+				warnings: undefined,
+			},
+			backgroundRamp,
+			config.foregroundScale
+		);
+	}
+
 	const metric: PerceptualMetric = method === 'apca-all' ? 'apca' : 'delta-e';
 	const mode = getRampChromaMode( method, family );
 	let nextRamp = rebuildElevationPair( {
@@ -706,8 +998,6 @@ function rebuildRamp( {
 		ramp: nextRamp,
 		warnings: undefined,
 	};
-	const config = family === 'neutral' ? BG_RAMP_CONFIG : ACCENT_RAMP_CONFIG;
-
 	return buildForegroundScale(
 		intermediateResult,
 		backgroundRamp,
