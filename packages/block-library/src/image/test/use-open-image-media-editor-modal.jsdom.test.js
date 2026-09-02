@@ -120,40 +120,33 @@ const CROPPED_ATTACHMENT = {
 	},
 };
 
+// What the media editor reports after a crop, rotate or flip: it saved to a
+// new attachment, and reports that attachment's full-size file.
+const CROP_UPDATE = {
+	id: CROPPED_ATTACHMENT.id,
+	url: CROPPED_ATTACHMENT.source_url,
+};
+
 /**
- * Runs an edit that saved to a new attachment, as a crop, rotate or flip does.
+ * Registry options for an edit that saved to a new attachment: the pre-edit
+ * record is cached, and the edited one is only reachable by resolving it.
  *
  * @param {Object}  options             Options.
- * @param {Object}  options.attributes  Block attributes, merged over an image
- *                                      pointing at the original attachment.
  * @param {boolean} options.hasOriginal Whether the pre-edit attachment is
- *                                      known; without it there is no metadata
- *                                      baseline.
+ *                                      known at all; without it there is no
+ *                                      metadata baseline.
  */
-function runCropUpdate( { attributes, hasOriginal = true, ...options } ) {
-	return runModalUpdate( {
-		attributes: {
-			id: ORIGINAL_ATTACHMENT.id,
-			alt: '',
-			caption: '',
-			...attributes,
-		},
-		registryOptions: {
-			getEditedEntityRecord: ( kind, name, attachmentId ) =>
-				hasOriginal && attachmentId === ORIGINAL_ATTACHMENT.id
-					? ORIGINAL_ATTACHMENT
-					: undefined,
-			resolveGetEntityRecord: ( kind, name, attachmentId ) =>
-				attachmentId === CROPPED_ATTACHMENT.id
-					? CROPPED_ATTACHMENT
-					: undefined,
-		},
-		updatePayload: {
-			id: CROPPED_ATTACHMENT.id,
-			url: CROPPED_ATTACHMENT.source_url,
-		},
-		...options,
-	} );
+function croppedAttachmentRecords( { hasOriginal = true } = {} ) {
+	return {
+		getEditedEntityRecord: ( kind, name, attachmentId ) =>
+			hasOriginal && attachmentId === ORIGINAL_ATTACHMENT.id
+				? ORIGINAL_ATTACHMENT
+				: undefined,
+		resolveGetEntityRecord: ( kind, name, attachmentId ) =>
+			attachmentId === CROPPED_ATTACHMENT.id
+				? CROPPED_ATTACHMENT
+				: undefined,
+	};
 }
 
 describe( 'useOpenImageMediaEditorModal', () => {
@@ -456,8 +449,16 @@ describe( 'useOpenImageMediaEditorModal', () => {
 
 	it( 'keeps the selected image size when the edit created a new attachment', async () => {
 		const onUrlChange = jest.fn();
-		const { setAttributes } = await runCropUpdate( {
-			attributes: { url: 'original-300x200.jpg', sizeSlug: 'medium' },
+		const { setAttributes } = await runModalUpdate( {
+			attributes: {
+				id: 1,
+				url: 'original-300x200.jpg',
+				alt: '',
+				caption: '',
+				sizeSlug: 'medium',
+			},
+			registryOptions: croppedAttachmentRecords(),
+			updatePayload: CROP_UPDATE,
 			hookOptions: { onUrlChange },
 		} );
 
@@ -474,16 +475,18 @@ describe( 'useOpenImageMediaEditorModal', () => {
 	} );
 
 	it( 'derives the size of the edited image without a metadata baseline', async () => {
-		const { setAttributes, registry } = await runCropUpdate( {
+		const { setAttributes, registry } = await runModalUpdate( {
 			// Custom metadata leaves the block with no fallback baseline, and
 			// the original attachment is unknown, so no metadata is synced.
 			attributes: {
+				id: 1,
 				url: 'original-300x200.jpg',
 				alt: 'Custom alt',
 				caption: 'Custom caption',
 				sizeSlug: 'medium',
 			},
-			hasOriginal: false,
+			registryOptions: croppedAttachmentRecords( { hasOriginal: false } ),
+			updatePayload: CROP_UPDATE,
 		} );
 
 		expect( setAttributes ).toHaveBeenCalledTimes( 1 );
@@ -500,12 +503,17 @@ describe( 'useOpenImageMediaEditorModal', () => {
 	} );
 
 	it( 'points a media file link at the edited image', async () => {
-		const { setAttributes } = await runCropUpdate( {
+		const { setAttributes } = await runModalUpdate( {
 			attributes: {
+				id: 1,
 				url: 'original.jpg',
+				alt: '',
+				caption: '',
 				href: 'original.jpg',
 				linkDestination: 'media',
 			},
+			registryOptions: croppedAttachmentRecords(),
+			updatePayload: CROP_UPDATE,
 		} );
 
 		expect( setAttributes ).toHaveBeenCalledTimes( 1 );
