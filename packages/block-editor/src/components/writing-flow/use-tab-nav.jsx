@@ -18,6 +18,7 @@ const PREVENT_SCROLL_ON_FOCUS = {
 	position: 'absolute',
 	inset: 0,
 	pointerEvents: 'none',
+	outline: 'none',
 };
 
 // Keys that move focus from the canvas stop into the canvas.
@@ -164,7 +165,6 @@ export default function useTabNav() {
 		<div
 			ref={ focusCaptureAfterRef }
 			tabIndex="0"
-			className="block-editor-writing-flow__canvas-stop-redirect"
 			style={ PREVENT_SCROLL_ON_FOCUS }
 			onFocus={ onFocusCapture }
 		/>
