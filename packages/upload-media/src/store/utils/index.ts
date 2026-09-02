@@ -1,3 +1,4 @@
+import type { ImageEditModifier } from '@wordpress/vips/worker';
 import { ImageFile } from '../../image-file';
 import { getFileBasename } from '../../utils';
 import type { ImageSizeCrop, QueueItemId } from '../types';
@@ -314,6 +315,62 @@ export async function vipsRotateImage(
 	);
 
 	return resultFile;
+}
+
+/**
+ * Applies a list of edits (flip, rotate, crop) to an image using vips in a
+ * web worker.
+ *
+ * The result is named like the file WordPress core's `/edit` endpoint
+ * writes: the original basename with an `-edited` suffix, which is not
+ * repeated when a previously edited image is edited again.
+ *
+ * @param id              Queue item ID.
+ * @param file            File object.
+ * @param modifiers       Edits to apply, in order.
+ * @param options         Edit options.
+ * @param options.quality Desired quality (0-1) for lossy output formats.
+ * @param options.signal  Optional abort signal to cancel the operation.
+ * @return Edited ImageFile with dimension metadata.
+ */
+export async function vipsEditImage(
+	id: QueueItemId,
+	file: File,
+	modifiers: ImageEditModifier[],
+	options: { quality?: number; signal?: AbortSignal } = {}
+) {
+	const { quality, signal } = options;
+
+	if ( signal?.aborted ) {
+		throw new Error( 'Operation aborted' );
+	}
+
+	const { vipsEditImage: editImage } = await loadVipsModule();
+	const { buffer, width, height } = await editImage(
+		id,
+		await file.arrayBuffer(),
+		file.type,
+		modifiers,
+		{ quality }
+	);
+
+	const basename = getFileBasename( file.name );
+	const editedBasename = /-edited(-\d+)?$/.test( basename )
+		? basename.replace( /-edited(-\d+)?$/, '-edited' )
+		: `${ basename }-edited`;
+	const fileName = file.name.replace( basename, editedBasename );
+
+	return new ImageFile(
+		new File(
+			[ new Blob( [ buffer as ArrayBuffer ], { type: file.type } ) ],
+			fileName,
+			{
+				type: file.type,
+			}
+		),
+		width,
+		height
+	);
 }
 
 /**

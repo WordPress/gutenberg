@@ -39,6 +39,7 @@ vi.mock(
 				)
 			),
 			vipsRotateImage: vi.fn(),
+			vipsEditImage: vi.fn(),
 			vipsHasTransparency: vi.fn( () => Promise.resolve( false ) ),
 			vipsConvertImageFormat: vi.fn(),
 			terminateVipsWorker: vi.fn(),
@@ -148,6 +149,60 @@ describe( 'actions', () => {
 						url: expect.stringMatching( /^blob:/ ),
 					},
 				} )
+			);
+		} );
+	} );
+
+	describe( 'addEditedImage', () => {
+		const modifiers = [ { type: 'rotate' as const, args: { angle: 90 } } ];
+
+		it( 'queues the edit ahead of the regular pipeline', () => {
+			const onError = vi.fn();
+			registry.dispatch( uploadStore ).addEditedImage( {
+				file: jpegFile,
+				modifiers,
+				sourceAttachmentId: 42,
+				additionalData: { post: 7, title: 'Photo' },
+				onError,
+			} );
+
+			expect( onError ).not.toHaveBeenCalled();
+			const items = registry.select( uploadStore ).getItems();
+			expect( items ).toHaveLength( 1 );
+			expect( items[ 0 ] ).toStrictEqual(
+				expect.objectContaining( {
+					file: jpegFile,
+					sourceAttachmentId: 42,
+					status: ItemStatus.Processing,
+					// The edit runs first so the pipeline is prepared for
+					// the edited file, not the original.
+					operations: [
+						[ OperationType.EditImage, { modifiers } ],
+						OperationType.Prepare,
+					],
+					additionalData: expect.objectContaining( {
+						post: 7,
+						title: 'Photo',
+					} ),
+				} )
+			);
+		} );
+
+		it( 'rejects files that are not images', () => {
+			const onError = vi.fn();
+			registry.dispatch( uploadStore ).addEditedImage( {
+				file: mp4File,
+				modifiers,
+				onError,
+			} );
+
+			expect( onError ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					code: 'MIME_TYPE_NOT_SUPPORTED',
+				} )
+			);
+			expect( registry.select( uploadStore ).getItems() ).toHaveLength(
+				0
 			);
 		} );
 	} );
