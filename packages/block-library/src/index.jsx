@@ -12,6 +12,7 @@ import { useBlockProps } from '@wordpress/block-editor';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { __, sprintf } from '@wordpress/i18n';
 import HtmlRenderer from './utils/html-renderer';
+import { useCanEditPostContext } from './utils/hooks';
 // Experimental blocks are only registered in the Gutenberg plugin (see
 // `__experimentalRegisterExperimentalCoreBlocks`). `registerCoreBlocks`
 // filters them out via `isBlockMetadataExperimental`, so they are never
@@ -340,16 +341,38 @@ export const registerCoreBlocks = (
 					new Set( [
 						...( bootstrappedBlockType?.usesContext ?? [] ),
 						'postId',
+						'postType',
 					] )
 				),
 				// Inspector controls are rendered by the auto-register hook in block-editor
 				edit: function Edit( { attributes, context } ) {
 					const disabledRef = useDisabled();
 					const blockProps = useBlockProps( { ref: disabledRef } );
+					const canEditPost = useCanEditPostContext(
+						context?.postType,
+						context?.postId
+					);
 					const { content, status, error } = useServerSideRender( {
 						block: blockName,
 						attributes,
-						urlQueryArgs: { post_id: context?.postId },
+						urlQueryArgs: {
+							// The block-renderer endpoint requires `edit_post`
+							// permissions for the post referenced by
+							// `post_id`, and the `postId` block context can
+							// reference a post the current user can't edit
+							// (e.g. another author's post in a query-like
+							// block), which failed with a 403 error. Withhold
+							// `post_id` only when the post is confirmed
+							// non-editable; when that can't be determined
+							// (e.g. `postId` and `postType` coming from
+							// different providers don't designate a readable
+							// post), forward it and let the server decide,
+							// as before.
+							post_id:
+								canEditPost === false
+									? undefined
+									: context?.postId,
+						},
 					} );
 
 					if ( status === 'loading' ) {
