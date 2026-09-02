@@ -108,8 +108,7 @@
 	&.is-synced:not(.is-selected) .block-editor-list-view-block__menu:focus {
 		--focus-color: var(--wp-block-synced-color);
 		@include outset-ring__focus();
-		// Clear older Button component's default focus box-shadow so only the outline
-		// shows in mixed-version setups.
+		// Hide legacy Button focus box-shadow from older WordPress versions to avoid a double ring.
 		box-shadow: none;
 	}
 	&.is-selected .block-editor-list-view-block-contents,
@@ -124,8 +123,7 @@
 		--focus-color: #{ $white };
 		@include outset-ring__focus();
 		outline-offset: -2px;
-		// Clear older Button component's default focus box-shadow so only the outline
-		// shows in mixed-version setups.
+		// Hide legacy Button focus box-shadow from older WordPress versions to avoid a double ring.
 		box-shadow: none;
 	}
 
