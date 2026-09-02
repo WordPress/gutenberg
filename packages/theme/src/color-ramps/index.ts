@@ -1,6 +1,17 @@
-import { get, OKLCH } from 'colorjs.io/fn';
+import {
+	ColorSpace,
+	contrastAPCA,
+	deltaEOK2,
+	get,
+	OKLab,
+	OKLCH,
+	sRGB,
+} from 'colorjs.io/fn';
 import { buildRamp } from './lib/index.ts';
-import { clampAccentScaleReferenceLightness } from './lib/utils.ts';
+import {
+	clampAccentScaleReferenceLightness,
+	computeBetterFgColorDirection,
+} from './lib/utils.ts';
 import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from './lib/ramp-configs.ts';
 import type {
 	RampResult as InternalRampResult,
@@ -8,8 +19,90 @@ import type {
 	Ramp,
 } from './lib/types.ts';
 import { getContrast } from './lib/color-utils.ts';
-import { CONTRAST_COMBINATIONS } from './lib/constants.ts';
+import { BLACK, CONTRAST_COMBINATIONS, WHITE } from './lib/constants.ts';
 export { DEFAULT_SEED_COLORS } from './lib/constants.ts';
+
+ColorSpace.register( sRGB );
+ColorSpace.register( OKLab );
+ColorSpace.register( OKLCH );
+
+// Only solve both polarities near the black/white WCAG crossover. This keeps
+// the extra work and possible direction change away from decisive seeds.
+const MAXIMUM_AMBIGUOUS_ENDPOINT_CONTRAST_DIFFERENCE = 1;
+// Allow the alternate direction only when its semantic anchor remains nearly
+// as faithful to the supplied seed as the initially preferred direction.
+const MAXIMUM_ALTERNATE_POLARITY_DELTA_E_DRIFT = 0.02;
+// Do not switch direction for APCA rounding noise when neither candidate can
+// fit the full interaction-state interval.
+const MINIMUM_ALTERNATE_POLARITY_APCA_IMPROVEMENT = 1;
+
+function getInteractionStateInterval( ramp: InternalRampResult ) {
+	const background =
+		ramp.ramp[ BG_RAMP_CONFIG.foregroundScale.perceptualReference ];
+	return (
+		Math.abs( contrastAPCA( background, ramp.ramp.fgSurface5 ) ) -
+		Math.abs( contrastAPCA( background, ramp.ramp.fgSurface4 ) )
+	);
+}
+
+function passesBackgroundWcagGates( ramp: InternalRampResult ) {
+	return (
+		ramp.warnings === undefined &&
+		checkAccessibleCombinations( { bgRamp: ramp } ).length === 0
+	);
+}
+
+function hasAmbiguousEndpointContrast( seed: string ) {
+	return (
+		Math.abs( getContrast( seed, BLACK ) - getContrast( seed, WHITE ) ) <=
+		MAXIMUM_AMBIGUOUS_ENDPOINT_CONTRAST_DIFFERENCE
+	);
+}
+
+function selectBackgroundRampPolarity(
+	seed: string,
+	preferred: InternalRampResult
+) {
+	const target =
+		BG_RAMP_CONFIG.foregroundScale.perceptualTargets.normalToActive;
+	const preferredInterval = getInteractionStateInterval( preferred );
+	const preferredPasses = passesBackgroundWcagGates( preferred );
+	if (
+		( preferredPasses && preferredInterval >= target ) ||
+		! hasAmbiguousEndpointContrast( seed )
+	) {
+		return preferred;
+	}
+
+	const alternateDirection = computeBetterFgColorDirection( seed ).worse;
+	const alternate = buildRamp( seed, BG_RAMP_CONFIG, {
+		mainDirection: alternateDirection,
+	} );
+	if ( ! passesBackgroundWcagGates( alternate ) ) {
+		return preferred;
+	}
+
+	const preferredDrift = deltaEOK2( seed, preferred.ramp.surface2 );
+	const alternateDrift = deltaEOK2( seed, alternate.ramp.surface2 );
+	if (
+		alternateDrift >
+		preferredDrift + MAXIMUM_ALTERNATE_POLARITY_DELTA_E_DRIFT
+	) {
+		return preferred;
+	}
+
+	const alternateInterval = getInteractionStateInterval( alternate );
+	if (
+		! preferredPasses ||
+		( preferredInterval < target && alternateInterval >= target ) ||
+		alternateInterval >=
+			preferredInterval + MINIMUM_ALTERNATE_POLARITY_APCA_IMPROVEMENT
+	) {
+		return alternate;
+	}
+
+	return preferred;
+}
 
 /**
  * Creates a background ramp.
@@ -20,7 +113,10 @@ export function buildBgRamp( seed: string ) {
 		throw new Error( 'Seed color must be a non-empty string' );
 	}
 
-	return buildRamp( seed, BG_RAMP_CONFIG );
+	return selectBackgroundRampPolarity(
+		seed,
+		buildRamp( seed, BG_RAMP_CONFIG )
+	);
 }
 
 const STEP_TO_PIN = 'surface2';

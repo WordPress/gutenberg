@@ -94,6 +94,16 @@ export type ForegroundScaleConfig = {
 	seed: keyof Ramp;
 	/** Background step used to measure the APCA contrast range. */
 	perceptualReference: keyof Ramp;
+	perceptualTargets: {
+		/** Preferred APCA contrast for normal content and resting controls. */
+		normalContrast: number;
+		/** APCA contrast left unused unless the foreground intervals need it. */
+		endpointReserve: number;
+		/** Minimum APCA interval from weak to normal emphasis. */
+		weakToNormal: number;
+		/** Minimum APCA interval from a resting control to its active state. */
+		normalToActive: number;
+	};
 	chroma:
 		| {
 				mode: 'tapered';
@@ -104,8 +114,6 @@ export type ForegroundScaleConfig = {
 		  };
 	steps: readonly {
 		name: ForegroundRampStep;
-		/** Position in the APCA contrast range from the first to last step. */
-		progress: number;
 		/** Preserve the base solver's color when it meets every WCAG floor. */
 		preserveAnchor?: boolean;
 		contrast: {

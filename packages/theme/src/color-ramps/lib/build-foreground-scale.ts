@@ -26,6 +26,8 @@ ColorSpace.register( OklchSrgb );
 
 type GetColorForLightness = ( lightness: number ) => PlainColorObject;
 
+const PERCEPTUAL_INTERVAL_SERIALIZATION_TOPUP = 0.25;
+
 function getChromaPreservingColorForLightness(
 	seed: PlainColorObject,
 	lightness: number
@@ -262,6 +264,77 @@ function serializeColorMeetingContrast( {
 	return getColorString( strongColor );
 }
 
+function serializeColorMeetingPerceptualInterval( {
+	background,
+	normalColor,
+	strongColor,
+	strongEndpoint,
+	getColorAtLightness,
+	references,
+	wcagTarget,
+	perceptualTarget,
+}: {
+	background: PlainColorObject;
+	normalColor: string;
+	strongColor: string;
+	strongEndpoint: PlainColorObject;
+	getColorAtLightness: GetColorForLightness;
+	references: readonly string[];
+	wcagTarget: number;
+	perceptualTarget: number;
+} ) {
+	const normalContrast = getPerceptualContrastMagnitude(
+		background,
+		normalColor
+	);
+	const requiredStrongContrast = normalContrast + perceptualTarget;
+	const strongContrast = getPerceptualContrastMagnitude(
+		background,
+		strongColor
+	);
+	if ( strongContrast >= requiredStrongContrast ) {
+		return strongColor;
+	}
+
+	const serializedEndpoint = getColorString( strongEndpoint );
+	if (
+		getPerceptualContrastMagnitude( background, serializedEndpoint ) <
+			requiredStrongContrast ||
+		references.some(
+			( reference ) =>
+				getContrast( reference, serializedEndpoint ) < wcagTarget
+		)
+	) {
+		return strongColor;
+	}
+
+	const strongLightness = get( clampToGamut( strongColor ), [ OKLCH, 'l' ] );
+	const endpointLightness = get( strongEndpoint, [ OKLCH, 'l' ] );
+	const direction = Math.sign( endpointLightness - strongLightness );
+	if ( direction === 0 ) {
+		return strongColor;
+	}
+	const maximumOffset = Math.abs( endpointLightness - strongLightness );
+
+	for ( let offset = 0.00025; offset <= maximumOffset; offset += 0.00025 ) {
+		const strengthened = getColorString(
+			getColorAtLightness( strongLightness + direction * offset )
+		);
+		if (
+			getPerceptualContrastMagnitude( background, strengthened ) >=
+				requiredStrongContrast &&
+			references.every(
+				( reference ) =>
+					getContrast( reference, strengthened ) >= wcagTarget
+			)
+		) {
+			return strengthened;
+		}
+	}
+
+	return serializedEndpoint;
+}
+
 /**
  * Rebuild the foreground part of an otherwise complete ramp. APCA positions
  * the intermediate steps within the visible contrast range, while WCAG ratios
@@ -269,7 +342,7 @@ function serializeColorMeetingContrast( {
  *
  * @param ramp           Ramp whose foreground steps will be rebuilt.
  * @param backgroundRamp Background ramp on which the colors will appear.
- * @param config         Foreground scale anchors, positions, and constraints.
+ * @param config         Foreground scale anchors, targets, and constraints.
  */
 export function buildForegroundScale(
 	ramp: RampResult,
@@ -284,39 +357,21 @@ export function buildForegroundScale(
 		clampToGamut( backgroundRamp.ramp[ config.perceptualReference ] ),
 		sRGB
 	);
-	const strongStep = config.steps.at( -1 )!;
-	const currentStrongColor = clampToGamut( ramp.ramp[ strongStep.name ] );
+	const steps = Object.fromEntries(
+		config.steps.map( ( step ) => [ step.name, step ] )
+	) as Record<
+		ForegroundRampStep,
+		ForegroundScaleConfig[ 'steps' ][ number ]
+	>;
+	const strongStep = steps.fgSurface5;
 	const strongEndpoint = getColorAtLightness(
 		ramp.direction === 'lighter' ? 1 : 0
 	);
-	const strongColor = meetsContrastTarget(
-		currentStrongColor,
-		strongStep,
-		ramp,
-		backgroundRamp
-	)
-		? currentStrongColor
-		: findColorAtContrastTarget( {
-				getColorAtLightness,
-				weakColor: currentStrongColor,
-				strongColor: strongEndpoint,
-				references: getConstraintReferences(
-					strongStep,
-					ramp,
-					backgroundRamp
-				),
-				target: strongStep.contrast.target,
-		  } );
 	const colors = new Map< ForegroundRampStep, PlainColorObject >();
 
 	for ( const step of config.steps.filter(
 		( { preserveAnchor } ) => preserveAnchor
 	) ) {
-		if ( step === strongStep ) {
-			colors.set( step.name, strongColor );
-			continue;
-		}
-
 		const currentColor = clampToGamut( ramp.ramp[ step.name ] );
 		colors.set(
 			step.name,
@@ -329,7 +384,7 @@ export function buildForegroundScale(
 								lightness
 							),
 						weakColor: currentColor,
-						strongColor,
+						strongColor: strongEndpoint,
 						references: getConstraintReferences(
 							step,
 							ramp,
@@ -340,59 +395,144 @@ export function buildForegroundScale(
 		);
 	}
 
-	const firstStep = config.steps[ 0 ];
-	const firstColor = colors.get( firstStep.name )!;
-	const weakContrast = getPerceptualContrastMagnitude(
+	const fgSurface2 = colors.get( 'fgSurface2' )!;
+	const fgSurface3 = findColorAtContrastTarget( {
+		getColorAtLightness,
+		weakColor: getColorAtLightness( get( fgSurface2, [ OKLCH, 'l' ] ) ),
+		strongColor: strongEndpoint,
+		references: getConstraintReferences(
+			steps.fgSurface3,
+			ramp,
+			backgroundRamp
+		),
+		target: steps.fgSurface3.contrast.target,
+	} );
+	const fgSurface3Contrast = getPerceptualContrastMagnitude(
 		displayBackground,
-		firstColor
+		fgSurface3
 	);
-	const strongContrast = getPerceptualContrastMagnitude(
+	const minimumFgSurface4 = findColorAtContrastTarget( {
+		getColorAtLightness,
+		weakColor: fgSurface3,
+		strongColor: strongEndpoint,
+		references: getConstraintReferences(
+			steps.fgSurface4,
+			ramp,
+			backgroundRamp
+		),
+		target: steps.fgSurface4.contrast.target,
+	} );
+	const minimumFgSurface4Contrast = getPerceptualContrastMagnitude(
 		displayBackground,
-		strongColor
+		minimumFgSurface4
 	);
-
-	for ( const step of config.steps.filter(
-		( { preserveAnchor } ) => ! preserveAnchor
-	) ) {
-		const stepIndex = config.steps.indexOf( step );
-		const previousStep = config.steps[ stepIndex - 1 ];
-		const previousColor = colors.get( previousStep.name )!;
-		const target =
-			weakContrast + ( strongContrast - weakContrast ) * step.progress;
-		const previousContrast = getPerceptualContrastMagnitude(
-			displayBackground,
-			previousColor
+	const maximumStrongContrast = getPerceptualContrastMagnitude(
+		displayBackground,
+		strongEndpoint
+	);
+	const {
+		normalContrast: preferredNormalContrast,
+		endpointReserve,
+		weakToNormal,
+		normalToActive,
+	} = config.perceptualTargets;
+	const weakToNormalTarget =
+		weakToNormal + PERCEPTUAL_INTERVAL_SERIALIZATION_TOPUP;
+	const normalToActiveTarget =
+		normalToActive + PERCEPTUAL_INTERVAL_SERIALIZATION_TOPUP;
+	const minimumNormalContrast = Math.max(
+		minimumFgSurface4Contrast,
+		fgSurface3Contrast + weakToNormalTarget
+	);
+	const preferredActiveContrast = Math.max(
+		fgSurface3Contrast,
+		maximumStrongContrast - endpointReserve
+	);
+	const maximumPreferredNormalContrast =
+		preferredActiveContrast - normalToActiveTarget;
+	const maximumAbsoluteNormalContrast =
+		maximumStrongContrast - normalToActiveTarget;
+	let requestedNormalContrast: number;
+	if ( minimumNormalContrast <= maximumPreferredNormalContrast ) {
+		requestedNormalContrast = Math.max(
+			minimumNormalContrast,
+			Math.min( preferredNormalContrast, maximumPreferredNormalContrast )
 		);
-		const candidate =
-			target <= previousContrast
-				? previousColor
-				: findColorAtPerceptualContrast( {
-						background: displayBackground,
-						getColorAtLightness,
-						weakColor: getColorAtLightness(
-							get( previousColor, [ OKLCH, 'l' ] )
-						),
-						strongColor,
-						target,
-				  } );
-
-		colors.set(
-			step.name,
-			meetsContrastTarget( candidate, step, ramp, backgroundRamp )
-				? candidate
-				: findColorAtContrastTarget( {
-						getColorAtLightness,
-						weakColor: candidate,
-						strongColor,
-						references: getConstraintReferences(
-							step,
-							ramp,
-							backgroundRamp
-						),
-						target: step.contrast.target,
-				  } )
+	} else if ( minimumNormalContrast <= maximumAbsoluteNormalContrast ) {
+		// Spend the endpoint reserve only when the semantic intervals need it.
+		requestedNormalContrast = minimumNormalContrast;
+	} else {
+		// Both preferred intervals do not fit. Keep FGS4 at its WCAG floor so
+		// every remaining bit of perceptual range belongs to FGS5.
+		requestedNormalContrast = Math.min(
+			maximumStrongContrast,
+			minimumFgSurface4Contrast
 		);
 	}
+	let normalColor = findColorAtPerceptualContrast( {
+		background: displayBackground,
+		getColorAtLightness,
+		weakColor: minimumFgSurface4,
+		strongColor: strongEndpoint,
+		target: requestedNormalContrast,
+	} );
+	if (
+		! meetsContrastTarget(
+			normalColor,
+			steps.fgSurface4,
+			ramp,
+			backgroundRamp
+		)
+	) {
+		normalColor = findColorAtContrastTarget( {
+			getColorAtLightness,
+			weakColor: normalColor,
+			strongColor: strongEndpoint,
+			references: getConstraintReferences(
+				steps.fgSurface4,
+				ramp,
+				backgroundRamp
+			),
+			target: steps.fgSurface4.contrast.target,
+		} );
+	}
+	const normalContrast = getPerceptualContrastMagnitude(
+		displayBackground,
+		normalColor
+	);
+	const requestedStrongContrast = Math.min(
+		maximumStrongContrast,
+		Math.max(
+			normalContrast + normalToActiveTarget,
+			preferredActiveContrast
+		)
+	);
+	let strongColor = findColorAtPerceptualContrast( {
+		background: displayBackground,
+		getColorAtLightness,
+		weakColor: normalColor,
+		strongColor: strongEndpoint,
+		target: requestedStrongContrast,
+	} );
+	if (
+		! meetsContrastTarget( strongColor, strongStep, ramp, backgroundRamp )
+	) {
+		strongColor = findColorAtContrastTarget( {
+			getColorAtLightness,
+			weakColor: strongColor,
+			strongColor: strongEndpoint,
+			references: getConstraintReferences(
+				strongStep,
+				ramp,
+				backgroundRamp
+			),
+			target: strongStep.contrast.target,
+		} );
+	}
+
+	colors.set( 'fgSurface3', fgSurface3 );
+	colors.set( 'fgSurface4', normalColor );
+	colors.set( 'fgSurface5', strongColor );
 
 	const nextRamp = { ...ramp.ramp };
 	for ( const step of config.steps ) {
@@ -412,6 +552,16 @@ export function buildForegroundScale(
 			target: step.contrast.target,
 		} );
 	}
+	nextRamp.fgSurface5 = serializeColorMeetingPerceptualInterval( {
+		background: displayBackground,
+		normalColor: nextRamp.fgSurface4,
+		strongColor: nextRamp.fgSurface5,
+		strongEndpoint,
+		getColorAtLightness,
+		references: getConstraintReferences( strongStep, ramp, backgroundRamp ),
+		wcagTarget: strongStep.contrast.target,
+		perceptualTarget: normalToActive,
+	} );
 
 	const foregroundStepNames = new Set< keyof typeof ramp.ramp >(
 		config.steps.map( ( { name } ) => name )
