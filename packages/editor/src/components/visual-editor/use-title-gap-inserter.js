@@ -7,8 +7,7 @@ const TITLE_WRAPPER_SELECTOR = '.editor-visual-editor__post-title-wrapper';
 const BLOCK_LIST_LAYOUT_SELECTOR =
 	'.block-editor-block-list__layout.is-root-container';
 const QUICK_INSERTER_SELECTOR = '.block-editor-inserter__quick-inserter';
-const INSERTION_POINT_SELECTOR =
-	'.block-editor-block-list__insertion-point';
+const INSERTION_POINT_SELECTOR = '.block-editor-block-list__insertion-point';
 
 /**
  * Whether the quick inserter menu from the title-gap control is open.
