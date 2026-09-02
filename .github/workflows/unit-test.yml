@@ -23,7 +23,7 @@ permissions: {}
 
 jobs:
     detect-relevant-changes:
-        name: Detect changes relevant to the unit tests
+        name: Detect changes relevant to unit tests
         runs-on: 'ubuntu-24.04'
         timeout-minutes: 5
         permissions:
@@ -33,10 +33,10 @@ jobs:
         steps:
             # `predicate-quantifier: every` makes this true as soon as one changed file
             # matches no pattern, so an unrecognised path always runs the suite.
-            - name: Check whether the diff can change a test result
+            - name: Check for changes that may impact unit test results
               id: filter
               if: ${{ github.event_name == 'pull_request' }}
-              uses: dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706 # v4.0.2
+              uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
               with:
                   predicate-quantifier: 'every'
                   filters: |
@@ -53,7 +53,7 @@ jobs:
     unit-js-routing:
         name: JavaScript test routing
         runs-on: 'ubuntu-24.04'
-        needs: [detect-relevant-changes]
+        needs: [ detect-relevant-changes ]
         permissions:
             contents: read
         if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
@@ -76,7 +76,7 @@ jobs:
     unit-js:
         name: JavaScript (Node.js ${{ matrix.node }}) ${{ matrix.shard }}
         runs-on: 'ubuntu-24.04'
-        needs: [detect-relevant-changes]
+        needs: [ detect-relevant-changes ]
         permissions:
             contents: read
             id-token: write
@@ -154,7 +154,7 @@ jobs:
     unit-js-date:
         name: JavaScript Date Tests (Node.js ${{ matrix.node }})
         runs-on: 'ubuntu-24.04'
-        needs: [detect-relevant-changes]
+        needs: [ detect-relevant-changes ]
         permissions:
             contents: read
             id-token: write
@@ -200,7 +200,7 @@ jobs:
     compute-previous-wordpress-version:
         name: Compute previous WordPress version
         runs-on: 'ubuntu-24.04'
-        needs: [detect-relevant-changes]
+        needs: [ detect-relevant-changes ]
         if: ${{ github.event_name != 'pull_request' || needs.detect-relevant-changes.outputs.relevant == 'true' }}
         permissions: {}
         outputs:
@@ -229,7 +229,7 @@ jobs:
     build-assets:
         name: Build JavaScript assets for PHP unit tests
         runs-on: 'ubuntu-24.04'
-        needs: [detect-relevant-changes]
+        needs: [ detect-relevant-changes ]
         if: ${{ github.event_name != 'pull_request' || needs.detect-relevant-changes.outputs.relevant == 'true' }}
         permissions:
             contents: read
@@ -477,7 +477,7 @@ jobs:
                 test-php,
                 phpcs,
             ]
-        if: ${{ !cancelled() && ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) }}
+        if: ${{ ! cancelled() && ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) }}
         steps:
             - name: Checkout repository
               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

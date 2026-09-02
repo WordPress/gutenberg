@@ -21,7 +21,7 @@ permissions: {}
 
 jobs:
     detect-relevant-changes:
-        name: Detect changes relevant to the end-to-end tests
+        name: Detect changes relevant to E2E tests
         runs-on: 'ubuntu-24.04'
         timeout-minutes: 5
         permissions:
@@ -31,10 +31,10 @@ jobs:
         steps:
             # `predicate-quantifier: every` makes this true as soon as one changed file
             # matches no pattern, so an unrecognised path always runs the suite.
-            - name: Check whether the diff can change a test result
+            - name: Check for changes that may impact E2E test results
               id: filter
               if: ${{ github.event_name == 'pull_request' }}
-              uses: dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706 # v4.0.2
+              uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
               with:
                   predicate-quantifier: 'every'
                   filters: |
@@ -55,7 +55,7 @@ jobs:
     build:
         name: Build
         runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
-        needs: [detect-relevant-changes]
+        needs: [ detect-relevant-changes ]
         permissions:
             contents: read
         if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
@@ -244,13 +244,8 @@ jobs:
 
     merge-artifacts:
         name: Merge Artifacts
-        if: ${{ !cancelled() && ( github.event_name != 'pull_request' || needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
-        needs:
-            [
-                detect-relevant-changes,
-                e2e-playwright,
-                e2e-playwright-rtc-websocket,
-            ]
+        if: ${{ ! cancelled() && ( github.event_name != 'pull_request' || needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
+        needs: [ detect-relevant-changes, e2e-playwright, e2e-playwright-rtc-websocket ]
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
@@ -383,9 +378,10 @@ jobs:
                 e2e-playwright,
                 e2e-playwright-rtc-websocket,
             ]
-        if: ${{ !cancelled() && ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) }}
+        if: ${{ ! cancelled() && ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) }}
         steps:
-            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+            - name: Checkout repository
+               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   sparse-checkout: .github/workflows/scripts
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
@@ -395,7 +391,7 @@ jobs:
             # `Merge Artifacts` runs alongside it and is housekeeping, not test signal — it
             # also cannot comment with a fork pull request's read-only token, as is the
             # case for `Update PR meta comment`.
-            - name: Fail if any required job did not pass
+            - name: Check for any failures of required jobs
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: node .github/workflows/scripts/ci-gate.js --ignore 'End-to-End Tests Gate,Merge Artifacts,Update PR meta comment'
