@@ -15,6 +15,12 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 	z-index: z-index(".components-popover");
 	will-change: transform;
 
+	// Once placed, drop the compositing hint so the browser doesn't
+	// render the content on a blurry layer (Chrome on certain GPUs).
+	&.is-positioned {
+		will-change: auto;
+	}
+
 	&.is-expanded {
 		position: fixed;
 		top: 0;
@@ -47,7 +53,7 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 
 	.components-popover.is-expanded & {
 		position: static;
-		height: calc(100% - #{ $panel-header-height });
+		height: calc(100% - #{$panel-header-height});
 		overflow-y: visible;
 		width: auto;
 		box-shadow: $shadow-popover-border-top-only;
