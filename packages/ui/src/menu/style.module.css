@@ -202,9 +202,10 @@
 			}
 		}
 
-		.item:has(.item-description) .item-selection-indicator {
+		.item:has(.item-description)
+		:is(.item-selection-indicator, .item-prefix) {
 			align-self: start;
-			/* Center the indicator on the first label line. */
+			/* Center leading visuals on the first label line. */
 			height: 1lh;
 		}
 
