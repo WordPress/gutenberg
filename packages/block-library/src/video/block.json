@@ -60,6 +60,10 @@
 			"type": "string",
 			"role": "local"
 		},
+		"isGif": {
+			"type": "boolean",
+			"default": false
+		},
 		"src": {
 			"type": "string",
 			"source": "attribute",
@@ -103,6 +107,7 @@
 			"clientNavigation": true
 		}
 	},
+	"viewScriptModule": "@wordpress/block-library/video/view",
 	"editorStyle": "wp-block-video-editor",
 	"style": "wp-block-video"
 }

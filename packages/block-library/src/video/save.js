@@ -31,6 +31,8 @@ export default function save( { attributes } ) {
 		<figure { ...useBlockProps.save() }>
 			{ src && (
 				<video
+					data-wp-interactive="core/video"
+					data-wp-init="callbacks.honorReducedMotion"
 					autoPlay={ autoplay }
 					controls={ controls }
 					loop={ loop }
