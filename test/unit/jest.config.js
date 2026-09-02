@@ -46,8 +46,9 @@ const dependenciesToTransform = [
 	'yaml',
 ];
 
-// Make sure the tests run in UTC timezone, regardless of the system timezone.
-process.env.TZ = 'UTC';
+// Make sure the tests run in UTC timezone, unless some other
+// timezone is set explicitly.
+process.env.TZ ??= 'UTC';
 
 /*
  * Resolved rather than hardcoded to `<rootDir>/node_modules`,
