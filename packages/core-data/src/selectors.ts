@@ -29,14 +29,14 @@ export interface State {
 	autosaves: Record< string | number, Array< unknown > >;
 	blockPatterns: Array< unknown >;
 	blockPatternCategories: Array< unknown >;
-	currentGlobalStylesId: string;
+	currentGlobalStylesId: number;
 	currentTheme: string;
 	currentUser: ET.User< 'view' >;
 	embedPreviews: Record< string, { html: string } >;
 	entities: EntitiesState;
 	themeBaseGlobalStyles: Record< string, Object >;
 	themeGlobalStyleVariations: Record< string, string >;
-	themeGlobalStyleRevisions: Record< number, Object >;
+	themeGlobalStyleRevisions: Record< number, Array< object > >;
 	undoManager: UndoManager;
 	syncUndoManagerState: {
 		hasRedo: boolean;
@@ -1301,7 +1301,7 @@ export function getCurrentTheme( state: State ): any {
  *
  * @return The current global styles ID.
  */
-export function __experimentalGetCurrentGlobalStylesId( state: State ): string {
+export function __experimentalGetCurrentGlobalStylesId( state: State ): number {
 	return state.currentGlobalStylesId;
 }
 

@@ -96,7 +96,7 @@ declare module './base-entity-records' {
 					/**
 					 * Whether the content is protected with a password.
 					 */
-					protected: boolean;
+					protected: ContextualField< boolean, 'view' | 'edit', C >;
 					/**
 					 * Version of the content block format used by the menu.
 					 */

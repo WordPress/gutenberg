@@ -3,7 +3,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 
-export function useUserGlobalStyles( id: string ) {
+export function useUserGlobalStyles( id: string | number ) {
 	const { userGlobalStyles } = useSelect(
 		( select ) => {
 			const { getEntityRecord, getEditedEntityRecord, canUser } =

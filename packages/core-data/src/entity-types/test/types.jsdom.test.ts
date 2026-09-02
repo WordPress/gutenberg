@@ -444,6 +444,13 @@ describe( 'Entity record types', () => {
 			globalStyles?.author;
 
 			const actions = dispatch( coreStore );
+			const currentGlobalStylesId =
+				select( coreStore ).__experimentalGetCurrentGlobalStylesId();
+			true satisfies Expect< typeof currentGlobalStylesId, number >;
+			actions.saveGlobalStyles( {
+				id: currentGlobalStylesId,
+				title: 'My variation',
+			} );
 			true satisfies Expect<
 				Parameters< typeof actions.saveGlobalStyles >[ 0 ],
 				Pick< GlobalStyles< 'edit' >, 'id' > &
@@ -457,6 +464,22 @@ describe( 'Entity record types', () => {
 			actions.saveGlobalStyles( { id: 1, title: 'My variation' } );
 			// @ts-expect-error -- the update route requires the record ID.
 			actions.saveGlobalStyles( { title: 'My variation' } );
+		};
+	} );
+
+	it( 'navigation embed fields follow the REST schema', () => {
+		() => {
+			const navigation = select( coreStore ).getEntityRecord(
+				'postType',
+				'wp_navigation',
+				1,
+				{ context: 'embed' }
+			);
+			navigation?.content.raw satisfies string | undefined;
+			navigation?.content.rendered satisfies string | undefined;
+			navigation?.content.block_version satisfies number | undefined;
+			// @ts-expect-error -- the fallback does not add embed to this field.
+			navigation?.content.protected;
 		};
 	} );
 
