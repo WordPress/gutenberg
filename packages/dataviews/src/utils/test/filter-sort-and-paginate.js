@@ -170,7 +170,7 @@ describe( 'filters', () => {
 		expect( result[ 14 ].name.title ).toBe( 'Jupiter' );
 		expect( result[ 15 ].name.title ).toBe( 'Saturn' );
 		expect( result[ 16 ].name.title ).toBe(
-			'Thessalonikopolymnianebuchodonossarinacharybdis'
+			'TheRoguePlanetWithAVeryLongNameToTestTitleOverflow'
 		);
 	} );
 
@@ -219,7 +219,7 @@ describe( 'filters', () => {
 		expect( result[ 8 ].name.title ).toBe( 'Nereid' );
 		expect( result[ 9 ].name.title ).toBe( 'Proteus' );
 		expect( result[ 10 ].name.title ).toBe(
-			'Thessalonikopolymnianebuchodonossarinacharybdis'
+			'TheRoguePlanetWithAVeryLongNameToTestTitleOverflow'
 		);
 	} );
 
@@ -272,7 +272,7 @@ describe( 'filters', () => {
 		expect( result[ 12 ].name.title ).toBe( 'Saturn' );
 		expect( result[ 13 ].name.title ).toBe( 'Uranus' );
 		expect( result[ 14 ].name.title ).toBe(
-			'Thessalonikopolymnianebuchodonossarinacharybdis'
+			'TheRoguePlanetWithAVeryLongNameToTestTitleOverflow'
 		);
 	} );
 
@@ -363,7 +363,7 @@ describe( 'filters', () => {
 		expect( result[ 16 ].name.title ).toBe( 'Saturn' );
 		expect( result[ 17 ].name.title ).toBe( 'Uranus' );
 		expect( result[ 18 ].name.title ).toBe(
-			'Thessalonikopolymnianebuchodonossarinacharybdis'
+			'TheRoguePlanetWithAVeryLongNameToTestTitleOverflow'
 		);
 	} );
 
@@ -502,7 +502,7 @@ describe( 'filters', () => {
 			'Proteus',
 			'Rhea',
 			'Tethys',
-			'Thessalonikopolymnianebuchodonossarinacharybdis',
+			'TheRoguePlanetWithAVeryLongNameToTestTitleOverflow',
 			'Titan',
 			'Titania',
 			'Triton',

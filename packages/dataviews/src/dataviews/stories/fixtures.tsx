@@ -358,8 +358,9 @@ export const data: SpaceObject[] = [
 	{
 		id: 19,
 		name: {
-			title: 'Thessalonikopolymnianebuchodonossarinacharybdis',
-			description: 'Takes longer to say than to orbit.',
+			title: 'TheRoguePlanetWithAVeryLongNameToTestTitleOverflow',
+			description:
+				'A long unbroken title, used to check that layouts overflow instead of breaking.',
 		},
 		image: 'https://live.staticflickr.com/1357/935805705_119635028c_b.jpg',
 		type: 'Rogue planet',
@@ -368,8 +369,8 @@ export const data: SpaceObject[] = [
 		satellites: 0,
 		date: '2020-03-01',
 		datetime: '2020-03-01T10:15:20Z',
-		email: 'thessalonikopolymnianebuchodonossarinacharybdis@example.com',
-		author: 'interstellar_nomadic_planetary_body_tracking_specialist',
+		email: 'longunbrokentitle@example.com',
+		author: 'author_handle_long_enough_to_test_overflow',
 		parent: null,
 		level: 0,
 	},
@@ -994,8 +995,8 @@ export const fields: Field< SpaceObject >[] = [
 			{ value: 'ring_system_analyst', label: 'ring_system_analyst' },
 			{ value: 'axial_tilt_researcher', label: 'axial_tilt_researcher' },
 			{
-				value: 'interstellar_nomadic_planetary_body_tracking_specialist',
-				label: 'interstellar_nomadic_planetary_body_tracking_specialist',
+				value: 'author_handle_long_enough_to_test_overflow',
+				label: 'author_handle_long_enough_to_test_overflow',
 			},
 		],
 		filterBy: {
