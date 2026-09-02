@@ -125,6 +125,14 @@ nvm use "$(cat test/ai-development/.nvmrc)"
 # Validate configuration without model calls.
 npm --prefix test/ai-development run validate
 
+# Unit-test the harness and the read assertions. No model calls.
+npm --prefix test/ai-development run test:utils
+
+# Also prove the sandbox's filesystem shape live: two small model calls that
+# check denying regions confines reads to the workspace, and that denying `/`
+# never yields a working boundary.
+AI_EVAL_LIVE=1 npm --prefix test/ai-development run test:utils
+
 # Run every spec, each on its own.
 npm run test:agent-evals
 
