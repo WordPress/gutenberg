@@ -788,10 +788,6 @@ export const actions: Action< SpaceObject >[] = [
 	},
 ];
 
-const titleById = new Map(
-	data.map( ( item ) => [ item.id, item.name.title ] )
-);
-
 export const fields: Field< SpaceObject >[] = [
 	{
 		label: 'Image',
@@ -888,8 +884,14 @@ export const fields: Field< SpaceObject >[] = [
 		label: 'Parent',
 		id: 'parent',
 		type: 'text',
-		getValue: ( { item } ) =>
-			item.parent === null ? '' : titleById.get( item.parent ) ?? '',
+		elements: data
+			.filter( ( { id } ) =>
+				data.some( ( { parent } ) => parent === id )
+			)
+			.map( ( { id, name } ) => ( { value: id, label: name.title } ) ),
+		filterBy: {
+			operators: [ 'is', 'isNot' ],
+		},
 	},
 	{
 		label: 'Description',
