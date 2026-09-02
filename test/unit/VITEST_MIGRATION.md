@@ -1,20 +1,25 @@
 # Vitest migration routing
 
-The migration manifest in `test-migration.json` keeps every JavaScript unit and
-integration test assigned to exactly one runner while the repository moves from
-Jest to Vitest.
+Every new JavaScript unit and integration test runs in Vitest. The migration
+manifest in `test-migration.json` contains the exact list of remaining legacy
+Jest tests while the repository finishes moving them to Vitest.
 
 The routing validator derives the current test inventory from both runners and
 the repository's static test-file patterns. It does not depend on a fixed test
 count, so unrelated test additions and removals do not require migration
 metadata updates.
 
-When changing test ownership:
+When writing or migrating a test:
 
--   Node tests run in Vitest automatically. They do not need migration metadata.
--   Add migrated JSDOM and Browser Mode tests to `vitest.files`, or use
-    `vitest.directories` when an entire directory can move as one independently
-    revertible unit.
+-   New Node, JSDOM, and Browser Mode tests run in Vitest automatically. They do
+    not need migration metadata.
+-   When migrating a legacy Jest test, remove its exact path from `jest.files`.
+-   When renaming or moving a directory that contains legacy Jest tests, migrate
+    those tests to Vitest in the same pull request. The validator treats their
+    new paths as additions to the Jest allowlist.
+-   Do not add directories, glob patterns, or new files to `jest.files`. The
+    routing validator compares it with the pull request base and accepts only
+    removals.
 -   Name tests `*.jsdom.test.*` to use JSDOM or `*.browser.test.*` to use Browser
     Mode.
 -   Use Node for pure JavaScript, data, stores, schemas, build tooling, and
@@ -30,9 +35,6 @@ When changing test ownership:
 -   Before running Browser Mode tests locally for the first time, install
     Chromium with
     `npm exec --workspace @wordpress/unit-tests -- playwright install chromium`.
--   New Node tests run in Vitest without migration metadata. A new
-    `*.jsdom.test.*` runs in Jest until it is assigned to Vitest, and a new
-    `*.browser.test.*` must be assigned to Vitest so it can run in Browser Mode.
 -   Do not use per-file Jest or Vitest environment overrides. The filename is
     the single source of truth.
 -   Run `npm test` for the complete lint and unit-test suite. For focused
@@ -40,7 +42,11 @@ When changing test ownership:
     `npm run test:unit:conventions`, `npm run test:unit`, and
     `npm run test:unit:vitest` together.
 
-The routing validator fails when a test is missing, owned by both runners, or
-not assigned to the expected Vitest migration entry. It also rejects per-file
-environment overrides, invalid manifest entries, and static/executable
-discovery mismatches.
+The required `All` CI check runs the routing validator. It fails when a test is
+missing, owned by both runners, or does not match the exact legacy Jest
+allowlist. It also rejects per-file environment overrides, invalid manifest
+entries, and static/executable discovery mismatches. The convention validator
+also rejects Vitest isolation opt-outs and global Vitest APIs.
+
+`wpVitest` remains an explicit opt-in for jsdom suites that need hoist-safe
+helpers inside `vi.hoisted()`.

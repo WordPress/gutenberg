@@ -1,12 +1,17 @@
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
-import { RichTextToolbarButton, useSettings } from '@wordpress/block-editor';
+import {
+	RichTextToolbarButton,
+	useSettings,
+	// @ts-expect-error Block Editor not fully typed yet.
+} from '@wordpress/block-editor';
 import {
 	Icon,
 	color as colorIcon,
 	textColor as textColorIcon,
 } from '@wordpress/icons';
 import { removeFormat } from '@wordpress/rich-text';
+import type { ColorObject, TextColorEditProps } from '../types';
 import { default as InlineColorUI, getActiveColors } from './inline';
 
 export const transparentValue = 'rgba(0, 0, 0, 0)';
@@ -14,17 +19,13 @@ export const transparentValue = 'rgba(0, 0, 0, 0)';
 const name = 'core/text-color';
 const title = __( 'Highlight' );
 
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY: ColorObject[] = [];
 
-function getComputedStyleProperty( element, property ) {
-	if ( ! element ) {
-		return;
-	}
-
+function getComputedStyleProperty( element: HTMLElement, property: string ) {
 	const { ownerDocument } = element;
 	const { defaultView } = ownerDocument;
-	const style = defaultView.getComputedStyle( element );
-	const value = style.getPropertyValue( property );
+	const style = defaultView?.getComputedStyle( element );
+	const value = style?.getPropertyValue( property );
 
 	if (
 		property === 'background-color' &&
@@ -37,8 +38,13 @@ function getComputedStyleProperty( element, property ) {
 	return value;
 }
 
-function fillComputedColors( element, { color, backgroundColor } ) {
-	if ( ! color && ! backgroundColor ) {
+function fillComputedColors(
+	element: HTMLElement | null,
+	{ color, backgroundColor }: { color?: string; backgroundColor?: string }
+) {
+	// `element` is the editable content element, which is null before the
+	// rich text mounts. There are no computed styles to read without it.
+	if ( ! element || ( ! color && ! backgroundColor ) ) {
 		return;
 	}
 
@@ -57,7 +63,7 @@ function TextColorEdit( {
 	isActive,
 	activeAttributes,
 	contentRef,
-} ) {
+}: TextColorEditProps ) {
 	const [ allowCustomControl, colors = EMPTY_ARRAY ] = useSettings(
 		'color.custom',
 		'color.palette'
@@ -105,7 +111,6 @@ function TextColorEdit( {
 				<InlineColorUI
 					name={ name }
 					onClose={ () => setIsAddingColor( false ) }
-					activeAttributes={ activeAttributes }
 					value={ value }
 					onChange={ onChange }
 					contentRef={ contentRef }

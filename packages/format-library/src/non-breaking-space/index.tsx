@@ -1,13 +1,20 @@
 import { __ } from '@wordpress/i18n';
 import { applyFormat, insert, useAnchor } from '@wordpress/rich-text';
+import type { RichTextValue } from '@wordpress/rich-text';
+// @ts-expect-error Block Editor not fully typed yet.
 import { RichTextShortcut } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
+import type {
+	NonBreakingSpaceEditProps,
+	NonBreakingSpacePopoverAnchorProps,
+} from '../types';
 
 const name = 'core/non-breaking-space';
 const title = __( 'Non breaking space' );
 
-function PopoverAnchor( { contentRef } ) {
+function PopoverAnchor( { contentRef }: NonBreakingSpacePopoverAnchorProps ) {
 	const popoverAnchor = useAnchor( {
+		// eslint-disable-next-line react-hooks/refs
 		editableContentElement: contentRef.current,
 		settings: nonBreakingSpace,
 	} );
@@ -26,7 +33,7 @@ export const nonBreakingSpace = {
 	title,
 	tagName: 'span',
 	className: 'non-breaking-space',
-	edit( { value, onChange, contentRef } ) {
+	edit( { value, onChange, contentRef }: NonBreakingSpaceEditProps ) {
 		function addNonBreakingSpace() {
 			onChange( insert( value, '\u00a0' ) );
 		}
@@ -49,10 +56,18 @@ export const nonBreakingSpace = {
 			</>
 		);
 	},
-	__experimentalCreatePrepareEditableTree() {
+	__experimentalCreatePrepareEditableTree(): (
+		formats: RichTextValue[ 'formats' ],
+		text: string
+	) => RichTextValue[ 'formats' ] {
 		return ( formats, text ) => {
 			const NBSP = '\u00a0';
-			let record = { formats, text };
+			// Not a complete `RichTextValue`: the callback only receives
+			// `formats` and `text`. The assertion is safe because `applyFormat`
+			// is passed explicit indices (so it never falls back to `start`/
+			// `end`), reads only `formats`, and spreads the rest through
+			// untouched — and only `formats` is read back out below.
+			let record = { formats, text } as RichTextValue;
 			let index = -1;
 
 			do {

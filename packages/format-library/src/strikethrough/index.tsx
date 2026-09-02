@@ -3,8 +3,10 @@ import { toggleFormat } from '@wordpress/rich-text';
 import {
 	RichTextToolbarButton,
 	RichTextShortcut,
+	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
 import { formatStrikethrough } from '@wordpress/icons';
+import type { FormatEditProps } from '../types';
 
 const name = 'core/strikethrough';
 const title = __( 'Strikethrough' );
@@ -14,7 +16,7 @@ export const strikethrough = {
 	title,
 	tagName: 's',
 	className: null,
-	edit( { isActive, value, onChange, onFocus } ) {
+	edit( { isActive, value, onChange, onFocus }: FormatEditProps ) {
 		function onClick() {
 			onChange( toggleFormat( value, { type: name, title } ) );
 			onFocus();
