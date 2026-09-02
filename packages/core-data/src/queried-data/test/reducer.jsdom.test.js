@@ -336,7 +336,7 @@ describe( 'reducer', () => {
 			default: {
 				'': {
 					itemIds: [ 1, 2 ],
-					meta: { totalItems: 2, totalPages: 2 },
+					meta: { totalItems: 2, totalPages: null },
 				},
 				's=a': {
 					itemIds: [ 1, 2 ],

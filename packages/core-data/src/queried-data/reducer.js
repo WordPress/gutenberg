@@ -263,6 +263,12 @@ const receiveQueries = compose( [
  * totals until the next fetch, and a consumer whose page has just emptied
  * would otherwise keep requesting a page that no longer exists.
  *
+ * `totalPages` can't be recomputed here — the page size that produced the
+ * `X-WP-TotalPages` header isn't known to the reducer — so it is reset to
+ * `null` ("unknown") rather than left next to a fresh `totalItems` it no
+ * longer matches. Queries that set `per_page` are unaffected: the selectors
+ * derive their page count from `totalItems` and never read the header value.
+ *
  * @param {Object} queryItems   Query state, with `itemIds` and optional `meta`.
  * @param {Object} removedItems Removed item IDs, as object keys.
  *
@@ -285,6 +291,7 @@ function removeQueryItems( queryItems, removedItems ) {
 				0,
 				queryItems.meta.totalItems - removedCount
 			),
+			totalPages: null,
 		};
 	}
 
