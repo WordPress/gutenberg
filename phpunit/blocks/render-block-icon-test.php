@@ -12,9 +12,21 @@
  * @covers ::gutenberg_render_block_core_icon
  */
 class Block_Core_Icon_Render_Test extends WP_UnitTestCase {
+	/**
+	 * The block supports state before each test.
+	 *
+	 * @var array|null
+	 */
+	private $original_block_to_render;
 
 	public function set_up() {
 		parent::set_up();
+
+		$this->original_block_to_render     = WP_Block_Supports::$block_to_render;
+		WP_Block_Supports::$block_to_render = array(
+			'blockName' => 'core/icon',
+			'attrs'     => array(),
+		);
 
 		if ( ! WP_Icon_Collections_Registry::get_instance()->is_registered( 'core' ) ) {
 			gutenberg_register_default_icon_collections();
@@ -22,6 +34,12 @@ class Block_Core_Icon_Render_Test extends WP_UnitTestCase {
 		if ( empty( WP_Icons_Registry::get_instance()->get_registered_icons() ) ) {
 			gutenberg_register_default_icons();
 		}
+	}
+
+	public function tear_down() {
+		WP_Block_Supports::$block_to_render = $this->original_block_to_render;
+
+		parent::tear_down();
 	}
 
 	public function test_preserves_intrinsic_svg_style_when_applying_block_styles() {

@@ -49,6 +49,8 @@
 
 			/* Don't show focus ring when the focus is in the prefix or suffix slots */
 			&:has(.input-layout-slot:focus-within) {
+				--_gcd-div-outline: none;
+
 				outline: none;
 			}
 

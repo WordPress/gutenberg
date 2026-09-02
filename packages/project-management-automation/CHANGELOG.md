@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The first-time contributor welcome message is no longer posted as a comment. The action now exposes it as the `welcome-prompt` output ([#82249](https://github.com/WordPress/gutenberg/pull/82249)).
+-   The first-time contributor account link prompt is no longer posted as a comment. The action now exposes it as the `first-time-contributor-prompt` output, alongside `first-time-contributor-pr-number` for the pull request it belongs to, so the prompt can join the single automation comment maintained by `tools/pr-meta` ([#82249](https://github.com/WordPress/gutenberg/pull/82249)).
+
 ### Internal
 
 -   Remove unused dependency `@octokit/types` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
@@ -9,7 +14,6 @@
 ## 2.54.0 (2026-08-26)
 
 ## 2.53.0 (2026-08-12)
-
 
 ## 2.52.0 (2026-07-29)
 

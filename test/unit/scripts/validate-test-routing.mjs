@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, statSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -20,6 +21,7 @@ const ROOT_DIR = path.resolve(
 );
 const JEST_CONFIG = 'test/unit/jest.config.js';
 const VITEST_CONFIG = 'test/unit/vitest.config.mjs';
+const require = createRequire( import.meta.url );
 const manifest = JSON.parse(
 	readFileSync(
 		path.join( ROOT_DIR, 'test/unit/test-migration.json' ),
@@ -127,15 +129,23 @@ const expectedVitestTestsByProject = getVitestTestsByProject(
 );
 const expectedVitestTests = getVitestTests( staticInventory, manifest );
 const expectedVitestTestSet = new Set( expectedVitestTests );
-const expectedJestTestsByProject = Object.fromEntries(
-	[ 'node', 'jsdom' ].map( ( projectName ) => [
-		projectName,
-		staticInventory.filter(
-			( testPath ) =>
-				! expectedVitestTestSet.has( testPath ) &&
-				getTestEnvironmentName( testPath ) === projectName
-		),
-	] )
+const expectedJestTestsByProject = {
+	jsdom: staticInventory.filter(
+		( testPath ) =>
+			! expectedVitestTestSet.has( testPath ) &&
+			getTestEnvironmentName( testPath ) === 'jsdom'
+	),
+};
+const jestConfig = require( path.join( ROOT_DIR, JEST_CONFIG ) );
+const jestProjectNames = jestConfig.projects.map( ( project ) =>
+	typeof project.displayName === 'string'
+		? project.displayName
+		: project.displayName?.name
+);
+assert.deepEqual(
+	jestProjectNames.sort(),
+	Object.keys( expectedJestTestsByProject ).sort(),
+	'Jest must only define projects for tests that have not migrated to Vitest.'
 );
 const jestTestsByProject = Object.fromEntries(
 	Object.keys( expectedJestTestsByProject ).map( ( projectName ) => [

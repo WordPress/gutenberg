@@ -368,19 +368,7 @@ export const deleteEntityRecord =
 			} );
 
 			let hasError = false;
-			let { baseURL } = entityConfig;
-			if (
-				kind === 'postType' &&
-				name === 'wp_template' &&
-				( ( recordId &&
-					typeof recordId === 'string' &&
-					! /^\d+$/.test( recordId ) ) ||
-					! window?.__experimentalTemplateActivate )
-			) {
-				baseURL =
-					baseURL.slice( 0, baseURL.lastIndexOf( '/' ) ) +
-					'/templates';
-			}
+			const { baseURL } = entityConfig;
 			try {
 				let path = `${ baseURL }/${ recordId }`;
 
@@ -701,20 +689,7 @@ export const saveEntityRecord =
 			let updatedRecord;
 			let error;
 			let hasError = false;
-			let { baseURL } = entityConfig;
-			// For "string" IDs, use the old templates endpoint.
-			if (
-				kind === 'postType' &&
-				name === 'wp_template' &&
-				( ( recordId &&
-					typeof recordId === 'string' &&
-					! /^\d+$/.test( recordId ) ) ||
-					! window?.__experimentalTemplateActivate )
-			) {
-				baseURL =
-					baseURL.slice( 0, baseURL.lastIndexOf( '/' ) ) +
-					'/templates';
-			}
+			const { baseURL } = entityConfig;
 			try {
 				const path = `${ baseURL }${ recordId ? '/' + recordId : '' }`;
 				// Skip the raw values check when creating a new record; they don't exist yet.

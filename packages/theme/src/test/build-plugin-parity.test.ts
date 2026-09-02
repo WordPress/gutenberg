@@ -1,5 +1,6 @@
 import { readFile } from 'fs/promises';
 import { join } from 'path';
+import { describe, expect, it } from 'vitest';
 import type {
 	OnLoadArgs,
 	OnLoadOptions,
