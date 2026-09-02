@@ -63,15 +63,26 @@ const UnconnectedBorderBoxControl = (
 		toggleLinked,
 		wrapperClassName,
 		__experimentalIsRenderedInSidebar,
+		'aria-label': ariaLabel,
+		'aria-labelledby': ariaLabelledBy,
 		...otherProps
 	} = useBorderBoxControl( props );
 
 	// The label names the group of border controls rather than a single input,
 	// so it is associated via `aria-labelledby` instead of `htmlFor`.
-	const labelId = useInstanceId(
+	const generatedLabelId = useInstanceId(
 		BorderBoxControl,
 		'border-box-control-label'
 	);
+
+	// A consumer-provided accessible name takes precedence, so the generated
+	// relationship is only used as a fallback. Where an external name wins,
+	// the unused ID is left off the internal label. Empty values are treated
+	// as absent, matching the accessible name computation, which skips an
+	// empty `aria-label` or `aria-labelledby` rather than resolving a name
+	// from it.
+	const labelId =
+		label && ! ariaLabel && ! ariaLabelledBy ? generatedLabelId : undefined;
 
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
@@ -99,10 +110,12 @@ const UnconnectedBorderBoxControl = (
 	return (
 		<View
 			className={ className }
-			// The label describes the group of border controls as a whole, so
-			// the group needs a role for the accessible name to attach to.
-			role={ label ? 'group' : undefined }
-			aria-labelledby={ label ? labelId : undefined }
+			// Whichever naming source wins, it describes the border controls
+			// as a whole, so the wrapper needs a role for that accessible
+			// name to attach to. Without a name there is no group to expose.
+			role={ label || ariaLabel || ariaLabelledBy ? 'group' : undefined }
+			aria-label={ ariaLabel }
+			aria-labelledby={ ariaLabelledBy ?? labelId }
 			{ ...otherProps }
 			ref={ mergedRef }
 		>
@@ -186,6 +199,10 @@ const UnconnectedBorderBoxControl = (
 /**
  * An input control for the color, style, and width of the border of a box. The
  * border can be customized as a whole, or individually for each side of the box.
+ *
+ * The controls are exposed as a group named by the `label` prop. Passing
+ * `aria-labelledby` or `aria-label` names the group instead, taking precedence
+ * over `label`; with none of the three, the wrapper is not exposed as a group.
  *
  * ```jsx
  * import { BorderBoxControl } from '@wordpress/components';
