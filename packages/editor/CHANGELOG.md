@@ -8,7 +8,7 @@
 
 ### Deprecations
 
--   `PluginMoreMenuItem`, `PluginSidebarMoreMenuItem`, `PluginPreviewMenuItem`: Deprecate the `as` prop. It was never a documented part of these components, and the menu now renders the item itself. The prop is ignored ([#82319](https://github.com/WordPress/gutenberg/pull/82319)).
+-   `PluginMoreMenuItem`, `PluginSidebarMoreMenuItem`, `PluginPreviewMenuItem`: Deprecate the `as` prop, which reached the item only because these components forward every extra prop. The menu now renders the item itself, so the prop is ignored ([#82319](https://github.com/WordPress/gutenberg/pull/82319)).
 
 ### Bug Fixes
 

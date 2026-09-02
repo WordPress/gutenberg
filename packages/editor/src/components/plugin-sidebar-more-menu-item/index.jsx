@@ -50,15 +50,14 @@ import { ComplementaryAreaMoreMenuItem } from '@wordpress/interface';
  * @return {React.ReactNode} The rendered component.
  */
 export default function PluginSidebarMoreMenuItem( props ) {
-	// `as` was never part of the contract. It is dropped so that it does not
-	// reach the item the menu renders.
+	// The menu renders the item itself, so `as` is dropped rather than
+	// forwarded.
 	const { as, ...itemProps } = props;
 
 	if ( as ) {
 		deprecated( 'The `as` prop of wp.editor.PluginSidebarMoreMenuItem', {
 			since: '7.2',
-			version: '7.4',
-			hint: 'The menu renders the item itself.',
+			hint: 'The menu renders the item itself. The prop is ignored.',
 		} );
 	}
 
