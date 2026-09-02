@@ -82,7 +82,8 @@
 		"@types/jest": "^30.0.0",
 		"@types/node": "^20.19.39",
 		"@wordpress/block-library": "file:../block-library",
-		"deep-freeze": "^0.0.1"
+		"deep-freeze": "^0.0.1",
+		"vitest": "^4.1.10"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

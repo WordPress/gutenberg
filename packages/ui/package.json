@@ -72,7 +72,8 @@
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/jest-console": "file:../jest-console",
 		"fast-glob": "^3.2.7",
-		"storybook": "^10.5.3"
+		"storybook": "^10.5.3",
+		"vitest": "^4.1.10"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",
