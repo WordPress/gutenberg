@@ -1,5 +1,35 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .block-editor-writing-flow__canvas-stop {
 	outline: none;
+}
+
+/* Styled like a tooltip; shown while the stop is focused. Positioned against
+   the shared parent (made relative below), so both badges show in the same
+   place at the top of the canvas. */
+.block-editor-writing-flow__canvas-stop-hint {
+	display: none;
+	position: absolute;
+	top: $grid-unit-20;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 2;
+	background: $black;
+	font-family: $default-font;
+	border-radius: var(--wpds-border-radius-md);
+	color: $gray-100;
+	text-align: center;
+	line-height: 1.4;
+	font-size: 12px;
+	padding: $grid-unit-05 $grid-unit-10;
+	box-shadow: $elevation-small;
+	white-space: nowrap;
+	pointer-events: none;
+}
+
+.block-editor-writing-flow__canvas-stop:focus > .block-editor-writing-flow__canvas-stop-hint {
+	display: block;
 }
 
 /* The stop elements are zero-size, so the focus indication is drawn around
