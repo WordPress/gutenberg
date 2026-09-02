@@ -439,6 +439,26 @@ describe( 'Entity record types', () => {
 			// `rendered` is serialised in every context.
 			inline?.title.rendered satisfies string | undefined;
 
+			/*
+			 * The promised list, which nothing else reaches:
+			 * `PromiseCurriedSignature` is declared separately from
+			 * `CurriedSignature`, so it can regress to the edit context on its
+			 * own while every other assertion here stays green.
+			 */
+			const promisedList = await resolveSelect(
+				coreStore
+			).getEntityRecords( 'postType', 'post', { context: 'view' } );
+			true satisfies Expect<
+				typeof promisedList,
+				Post< 'view' >[] | null
+			>;
+			// @ts-expect-error -- `password` is edit-only.
+			promisedList?.[ 0 ].password;
+			// @ts-expect-error -- `raw` is edit-only, so a view record omits it.
+			promisedList?.[ 0 ].title.raw;
+			// `rendered` is serialised in every context.
+			promisedList?.[ 0 ].title.rendered satisfies string | undefined;
+
 			// The reusable-object case, which is what regressed before.
 			const query = { context: 'view' };
 			const reused = select( coreStore ).getEntityRecord(
@@ -480,6 +500,16 @@ describe( 'Entity record types', () => {
 				typeof promised,
 				PostInAnyContext | undefined
 			>;
+
+			const promisedReused = await resolveSelect(
+				coreStore
+			).getEntityRecords( 'postType', 'post', query );
+			true satisfies Expect<
+				typeof promisedReused,
+				PostInAnyContext[] | null
+			>;
+			// @ts-expect-error -- the request may be `view`, which omits `raw`.
+			promisedReused?.[ 0 ].title.raw;
 		};
 	} );
 
