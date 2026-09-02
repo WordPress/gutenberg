@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { render } from '@testing-library/react';
 import { RadioGroup } from '@base-ui/react/radio-group';
 import { createRef } from '@wordpress/element';
