@@ -57,6 +57,7 @@
 -   Client-side media processing: Refuse a batch of more than one file when the caller only takes one, such as a Cover block placeholder, matching what the server-side upload path already did. Every dropped file was uploaded instead, and the block kept whichever one finished last ([#82041](https://github.com/WordPress/gutenberg/issues/82041)).
 -   `BlockVariationPicker`: Set icon colors with `color` so stroke-based variation icons retain their intended unfilled appearance, while keeping a non-important `fill` fallback for third-party icons that do not use `currentColor`. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 -   `BlockIcon`, List View: Remove the obsolete `fill: CanvasText` override for forced colors mode. ([#82481](https://github.com/WordPress/gutenberg/pull/82481))
+-   Block Settings Menu: The `Copy` and `Cut` items now write the same `text/plain` and `text/html` clipboard data as the keyboard shortcuts, so blocks copied from the menu paste as formatted content in rich text targets instead of raw block markup ([#80603](https://github.com/WordPress/gutenberg/pull/80603)).
 
 ### Internal
 
