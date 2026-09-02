@@ -9,7 +9,12 @@ import {
 	to,
 	type PlainColorObject,
 } from 'colorjs.io/fn';
-import { clampToGamut, getColorString, getContrast } from './color-utils.ts';
+import {
+	clampToGamut,
+	getColorString,
+	getContrastFromLuminances,
+	getRelativeLuminance,
+} from './color-utils.ts';
 import { UNIVERSAL_CONTRAST_TOPUP } from './constants.ts';
 import { taperChroma } from './taper-chroma.ts';
 import type {
@@ -98,7 +103,7 @@ function getPerceptualContrastMagnitude(
 	return Math.abs( contrastAPCA( background, foreground ) );
 }
 
-function getConstraintReferences(
+function getConstraintReferenceLuminances(
 	step: ForegroundScaleConfig[ 'steps' ][ number ],
 	ramp: RampResult,
 	backgroundRamp: RampResult
@@ -109,59 +114,76 @@ function getConstraintReferences(
 			...step.contrast.references.map(
 				( name ) => backgroundRamp.ramp[ name ]
 			),
-		] )
+		] ),
+		( reference ) => getRelativeLuminance( reference )
+	);
+}
+
+function meetsContrastFloor(
+	color: string | PlainColorObject,
+	referenceLuminances: readonly number[],
+	target: number
+) {
+	const luminance = getRelativeLuminance( color );
+	return referenceLuminances.every(
+		( referenceLuminance ) =>
+			getContrastFromLuminances( referenceLuminance, luminance ) >= target
 	);
 }
 
 function getContrastTargetMargin(
 	color: PlainColorObject,
-	references: readonly string[],
+	referenceLuminances: readonly number[],
 	target: number
 ) {
 	const adjustedTarget = target + UNIVERSAL_CONTRAST_TOPUP;
-	return Math.min(
-		...references.map( ( reference ) =>
-			Math.log( getContrast( reference, color ) / adjustedTarget )
-		)
-	);
+	const luminance = getRelativeLuminance( color );
+	let minimumMargin = Infinity;
+	for ( const referenceLuminance of referenceLuminances ) {
+		minimumMargin = Math.min(
+			minimumMargin,
+			Math.log(
+				getContrastFromLuminances( referenceLuminance, luminance ) /
+					adjustedTarget
+			)
+		);
+	}
+	return minimumMargin;
 }
 
 function meetsContrastTarget(
 	color: PlainColorObject,
-	step: ForegroundScaleConfig[ 'steps' ][ number ],
-	ramp: RampResult,
-	backgroundRamp: RampResult
+	referenceLuminances: readonly number[],
+	target: number
 ) {
-	return (
-		getContrastTargetMargin(
-			color,
-			getConstraintReferences( step, ramp, backgroundRamp ),
-			step.contrast.target
-		) >= 0
-	);
+	return getContrastTargetMargin( color, referenceLuminances, target ) >= 0;
 }
 
 function findColorAtContrastTarget( {
 	getColorAtLightness,
 	weakColor,
 	strongColor,
-	references,
+	referenceLuminances,
 	target,
 }: {
 	getColorAtLightness: GetColorForLightness;
 	weakColor: PlainColorObject;
 	strongColor: PlainColorObject;
-	references: readonly string[];
+	referenceLuminances: readonly number[];
 	target: number;
 } ) {
-	const weakMargin = getContrastTargetMargin( weakColor, references, target );
+	const weakMargin = getContrastTargetMargin(
+		weakColor,
+		referenceLuminances,
+		target
+	);
 	if ( weakMargin >= 0 ) {
 		return weakColor;
 	}
 
 	const strongMargin = getContrastTargetMargin(
 		strongColor,
-		references,
+		referenceLuminances,
 		target
 	);
 	if ( strongMargin < 0 ) {
@@ -170,7 +192,8 @@ function findColorAtContrastTarget( {
 
 	return solveWithBisect(
 		getColorAtLightness,
-		( color ) => getContrastTargetMargin( color, references, target ),
+		( color ) =>
+			getContrastTargetMargin( color, referenceLuminances, target ),
 		get( weakColor, [ OKLCH, 'l' ] ),
 		weakMargin,
 		get( strongColor, [ OKLCH, 'l' ] ),
@@ -224,21 +247,17 @@ function serializeColorMeetingContrast( {
 	color,
 	getColorAtLightness,
 	strongColor,
-	references,
+	referenceLuminances,
 	target,
 }: {
 	color: PlainColorObject;
 	getColorAtLightness: GetColorForLightness;
 	strongColor: PlainColorObject;
-	references: readonly string[];
+	referenceLuminances: readonly number[];
 	target: number;
 } ) {
 	const serializedColor = getColorString( color );
-	if (
-		references.every(
-			( reference ) => getContrast( reference, serializedColor ) >= target
-		)
-	) {
+	if ( meetsContrastFloor( serializedColor, referenceLuminances, target ) ) {
 		return serializedColor;
 	}
 
@@ -251,12 +270,7 @@ function serializeColorMeetingContrast( {
 		const strengthened = getColorString(
 			getColorAtLightness( colorLightness + direction * offset )
 		);
-		if (
-			references.every(
-				( reference ) =>
-					getContrast( reference, strengthened ) >= target
-			)
-		) {
+		if ( meetsContrastFloor( strengthened, referenceLuminances, target ) ) {
 			return strengthened;
 		}
 	}
@@ -270,7 +284,7 @@ function serializeColorMeetingPerceptualInterval( {
 	strongColor,
 	strongEndpoint,
 	getColorAtLightness,
-	references,
+	referenceLuminances,
 	wcagTarget,
 	perceptualTarget,
 }: {
@@ -279,7 +293,7 @@ function serializeColorMeetingPerceptualInterval( {
 	strongColor: string;
 	strongEndpoint: PlainColorObject;
 	getColorAtLightness: GetColorForLightness;
-	references: readonly string[];
+	referenceLuminances: readonly number[];
 	wcagTarget: number;
 	perceptualTarget: number;
 } ) {
@@ -300,9 +314,10 @@ function serializeColorMeetingPerceptualInterval( {
 	if (
 		getPerceptualContrastMagnitude( background, serializedEndpoint ) <
 			requiredStrongContrast ||
-		references.some(
-			( reference ) =>
-				getContrast( reference, serializedEndpoint ) < wcagTarget
+		! meetsContrastFloor(
+			serializedEndpoint,
+			referenceLuminances,
+			wcagTarget
 		)
 	) {
 		return strongColor;
@@ -323,10 +338,7 @@ function serializeColorMeetingPerceptualInterval( {
 		if (
 			getPerceptualContrastMagnitude( background, strengthened ) >=
 				requiredStrongContrast &&
-			references.every(
-				( reference ) =>
-					getContrast( reference, strengthened ) >= wcagTarget
-			)
+			meetsContrastFloor( strengthened, referenceLuminances, wcagTarget )
 		) {
 			return strengthened;
 		}
@@ -363,6 +375,12 @@ export function buildForegroundScale(
 		ForegroundRampStep,
 		ForegroundScaleConfig[ 'steps' ][ number ]
 	>;
+	const referenceLuminances = Object.fromEntries(
+		config.steps.map( ( step ) => [
+			step.name,
+			getConstraintReferenceLuminances( step, ramp, backgroundRamp ),
+		] )
+	) as Record< ForegroundRampStep, number[] >;
 	const strongStep = steps.fgSurface5;
 	const strongEndpoint = getColorAtLightness(
 		ramp.direction === 'lighter' ? 1 : 0
@@ -375,7 +393,11 @@ export function buildForegroundScale(
 		const currentColor = clampToGamut( ramp.ramp[ step.name ] );
 		colors.set(
 			step.name,
-			meetsContrastTarget( currentColor, step, ramp, backgroundRamp )
+			meetsContrastTarget(
+				currentColor,
+				referenceLuminances[ step.name ],
+				step.contrast.target
+			)
 				? currentColor
 				: findColorAtContrastTarget( {
 						getColorAtLightness: ( lightness ) =>
@@ -385,11 +407,7 @@ export function buildForegroundScale(
 							),
 						weakColor: currentColor,
 						strongColor: strongEndpoint,
-						references: getConstraintReferences(
-							step,
-							ramp,
-							backgroundRamp
-						),
+						referenceLuminances: referenceLuminances[ step.name ],
 						target: step.contrast.target,
 				  } )
 		);
@@ -400,11 +418,7 @@ export function buildForegroundScale(
 		getColorAtLightness,
 		weakColor: getColorAtLightness( get( fgSurface2, [ OKLCH, 'l' ] ) ),
 		strongColor: strongEndpoint,
-		references: getConstraintReferences(
-			steps.fgSurface3,
-			ramp,
-			backgroundRamp
-		),
+		referenceLuminances: referenceLuminances.fgSurface3,
 		target: steps.fgSurface3.contrast.target,
 	} );
 	const fgSurface3Contrast = getPerceptualContrastMagnitude(
@@ -415,11 +429,7 @@ export function buildForegroundScale(
 		getColorAtLightness,
 		weakColor: fgSurface3,
 		strongColor: strongEndpoint,
-		references: getConstraintReferences(
-			steps.fgSurface4,
-			ramp,
-			backgroundRamp
-		),
+		referenceLuminances: referenceLuminances.fgSurface4,
 		target: steps.fgSurface4.contrast.target,
 	} );
 	const minimumFgSurface4Contrast = getPerceptualContrastMagnitude(
@@ -479,20 +489,15 @@ export function buildForegroundScale(
 	if (
 		! meetsContrastTarget(
 			normalColor,
-			steps.fgSurface4,
-			ramp,
-			backgroundRamp
+			referenceLuminances.fgSurface4,
+			steps.fgSurface4.contrast.target
 		)
 	) {
 		normalColor = findColorAtContrastTarget( {
 			getColorAtLightness,
 			weakColor: normalColor,
 			strongColor: strongEndpoint,
-			references: getConstraintReferences(
-				steps.fgSurface4,
-				ramp,
-				backgroundRamp
-			),
+			referenceLuminances: referenceLuminances.fgSurface4,
 			target: steps.fgSurface4.contrast.target,
 		} );
 	}
@@ -515,17 +520,17 @@ export function buildForegroundScale(
 		target: requestedStrongContrast,
 	} );
 	if (
-		! meetsContrastTarget( strongColor, strongStep, ramp, backgroundRamp )
+		! meetsContrastTarget(
+			strongColor,
+			referenceLuminances.fgSurface5,
+			strongStep.contrast.target
+		)
 	) {
 		strongColor = findColorAtContrastTarget( {
 			getColorAtLightness,
 			weakColor: strongColor,
 			strongColor: strongEndpoint,
-			references: getConstraintReferences(
-				strongStep,
-				ramp,
-				backgroundRamp
-			),
+			referenceLuminances: referenceLuminances.fgSurface5,
 			target: strongStep.contrast.target,
 		} );
 	}
@@ -548,7 +553,7 @@ export function buildForegroundScale(
 							)
 					: getColorAtLightness,
 			strongColor,
-			references: getConstraintReferences( step, ramp, backgroundRamp ),
+			referenceLuminances: referenceLuminances[ step.name ],
 			target: step.contrast.target,
 		} );
 	}
@@ -558,7 +563,7 @@ export function buildForegroundScale(
 		strongColor: nextRamp.fgSurface5,
 		strongEndpoint,
 		getColorAtLightness,
-		references: getConstraintReferences( strongStep, ramp, backgroundRamp ),
+		referenceLuminances: referenceLuminances.fgSurface5,
 		wcagTarget: strongStep.contrast.target,
 		perceptualTarget: normalToActive,
 	} );
@@ -571,10 +576,10 @@ export function buildForegroundScale(
 	);
 	for ( const step of config.steps ) {
 		if (
-			getConstraintReferences( step, ramp, backgroundRamp ).some(
-				( reference ) =>
-					getContrast( reference, nextRamp[ step.name ] ) <
-					step.contrast.target
+			! meetsContrastFloor(
+				nextRamp[ step.name ],
+				referenceLuminances[ step.name ],
+				step.contrast.target
 			)
 		) {
 			warnings.push( step.name );

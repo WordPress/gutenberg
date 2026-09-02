@@ -1,10 +1,11 @@
 # Color ramp benchmark
 
-This benchmark measures uncached color-ramp calculation. It covers one
-background ramp, one accent ramp against a precomputed background, and the full
-`ThemeProvider` ramp workload of one background plus six accent ramps. Each case
-cycles through the default light seed, a dark `#1e1e1e` background, and the
-Ectoplasm admin color scheme.
+This benchmark calls the color-ramp builders directly, bypassing the
+`ThemeProvider` whole-ramp memoization while retaining internal algorithm
+caches. It covers one background ramp, one accent ramp against a precomputed
+background, and the full `ThemeProvider` ramp workload of one background plus
+six accent ramps. Each case cycles through the default light seed, a dark
+`#1e1e1e` background, and the Ectoplasm admin color scheme.
 
 Run it from the repository root:
 
@@ -23,6 +24,7 @@ npm run benchmark:color-ramps --workspace @wordpress/theme -- \
 ```
 
 Both worktrees need their dependencies installed. Add `--json` for
-machine-readable output. Compare runs made with the same Node.js version and
-similar system load. The benchmark reports measurements but does not enforce a
-timing threshold because local and CI timings vary.
+machine-readable output. The checksum covers every generated ramp token so an
+optimization can be checked for output drift. Compare runs made with the same
+Node.js version and similar system load. The benchmark reports measurements but
+does not enforce a timing threshold because local and CI timings vary.
