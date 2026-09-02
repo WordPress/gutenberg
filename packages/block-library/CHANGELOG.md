@@ -9,6 +9,7 @@
 ### Enhancements
 
 -   Columns: Add transforms between Columns and the Row variation that preserve column widths through flex child sizing controls.
+-   Icon: Match an icon's keywords as well as its name and label when searching the icon library.
 
 ### Bug Fixes
 

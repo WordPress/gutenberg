@@ -65,7 +65,11 @@ export default function CustomInserterModal( { onClose, value, onChange } ) {
 				const iconLabel = normalizeSearchInput( icon.label );
 
 				return (
-					iconName.includes( input ) || iconLabel.includes( input )
+					iconName.includes( input ) ||
+					iconLabel.includes( input ) ||
+					( icon.keywords ?? [] ).some( ( keyword ) =>
+						normalizeSearchInput( keyword ).includes( input )
+					)
 				);
 			} );
 		}
