@@ -102,7 +102,7 @@ describe( 'LinkPicker', () => {
 					preview={ {
 						title: 'My Page',
 						url: 'example.com',
-						badges: [ { label: 'Page', intent: 'default' } ],
+						badges: [ { label: 'Page', intent: 'draft' } ],
 					} }
 					onSelect={ jest.fn() }
 					label="Link"
@@ -122,7 +122,7 @@ describe( 'LinkPicker', () => {
 						title: 'My Page',
 						url: 'example.com',
 						image: 'https://example.com/image.jpg',
-						badges: [ { label: 'Page', intent: 'default' } ],
+						badges: [ { label: 'Page', intent: 'draft' } ],
 					} }
 					onSelect={ jest.fn() }
 					label="Link"

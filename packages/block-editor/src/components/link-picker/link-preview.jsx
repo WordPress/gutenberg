@@ -3,23 +3,24 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	FlexItem,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { Badge } from '@wordpress/ui';
 import { Icon, chevronDown } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { unlock } from '../../lock-unlock';
 
-const { Badge: WCBadge } = unlock( componentsPrivateApis );
+/**
+ * @typedef {import('@wordpress/ui').BadgeProps['intent']} LinkPreviewBadgeIntent
+ */
 
 /**
  * Link preview component that displays the current link information.
  * This is a presentational component meant to be wrapped in a button.
  *
- * @param {Object}        props        - Component props
- * @param {string}        props.title  - Display title for the link
- * @param {string}        props.url    - Display URL for the link
- * @param {string}        props.image  - Optional image URL for the link preview
- * @param {Array<Object>} props.badges - Optional array of badge objects with label and intent
+ * @param {Object}                      props        - Component props
+ * @param {string}                      props.title  - Display title for the link
+ * @param {string}                      props.url    - Display URL for the link
+ * @param {string}                      props.image  - Optional image URL for the link preview
+ * @param {Array<{ label: string, intent?: LinkPreviewBadgeIntent }>} props.badges - Optional badge labels
  */
 export function LinkPreview( { title, url, image, badges } ) {
 	return (
@@ -60,12 +61,12 @@ export function LinkPreview( { title, url, image, badges } ) {
 								alignment="left"
 							>
 								{ badges.map( ( badge ) => (
-									<WCBadge
+									<Badge
 										key={ `${ badge.label }|${ badge.intent }` }
 										intent={ badge.intent }
 									>
 										{ badge.label }
-									</WCBadge>
+									</Badge>
 								) ) }
 							</HStack>
 						) }

@@ -17,7 +17,7 @@ import { LinkPreview } from './link-preview';
  * @property {string}        [image]         - Optional image URL for the link preview
  * @property {Array<Object>} [badges]        - Optional array of badge objects with label and intent
  * @property {string}        badges[].label  - Badge label text
- * @property {string}        badges[].intent - Badge intent/style
+ * @property {import('@wordpress/ui').BadgeProps['intent']} [badges[].intent] - Badge intent
  */
 
 /**

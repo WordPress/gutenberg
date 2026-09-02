@@ -113,7 +113,7 @@ export function computeDisplayUrl( { linkUrl, homeUrl } = {} ) {
  * @param {string}  options.entityStatus      - Entity status (publish, draft, etc.)
  * @param {boolean} options.hasBinding        - Whether link has entity binding
  * @param {boolean} options.isEntityAvailable - Whether bound entity exists
- * @return {Array} Array of badge objects with label and intent
+ * @return {Array<{ label: string, intent: import('@wordpress/ui').BadgeProps['intent'] }>} Badge labels and intents.
  */
 export function computeBadges( {
 	url,
@@ -130,29 +130,29 @@ export function computeBadges( {
 		if ( isExternal ) {
 			badges.push( {
 				label: __( 'External link' ),
-				intent: 'default',
+				intent: 'draft',
 			} );
 		} else if ( isHashLink( url ) ) {
 			// Hash links should be detected before type check
 			// because they're not entity links even if type is set
 			badges.push( {
 				label: __( 'Internal link' ),
-				intent: 'default',
+				intent: 'draft',
 			} );
 		} else if ( isHomepage( url, homeUrl ) ) {
 			badges.push( {
 				label: __( 'Homepage' ),
-				intent: 'default',
+				intent: 'draft',
 			} );
 		} else if ( type && type !== 'custom' ) {
 			// Show entity type badge (page, post, category, etc.)
 			// but not 'custom' since that's just a manual link
-			badges.push( { label: capitalize( type ), intent: 'default' } );
+			badges.push( { label: capitalize( type ), intent: 'draft' } );
 		} else {
 			// Internal link (not external, not hash, not entity)
 			badges.push( {
 				label: __( 'Page' ),
-				intent: 'default',
+				intent: 'draft',
 			} );
 		}
 	}
@@ -165,18 +165,18 @@ export function computeBadges( {
 				__( 'Missing %s' ),
 				type
 			),
-			intent: 'error',
+			intent: 'high',
 		} );
 	} else if ( ! url ) {
-		badges.push( { label: __( 'No link selected' ), intent: 'error' } );
+		badges.push( { label: __( 'No link selected' ), intent: 'high' } );
 	} else if ( entityStatus ) {
 		const statusMap = {
-			publish: { label: __( 'Published' ), intent: 'success' },
-			future: { label: __( 'Scheduled' ), intent: 'warning' },
-			draft: { label: __( 'Draft' ), intent: 'warning' },
-			pending: { label: __( 'Pending' ), intent: 'warning' },
-			private: { label: __( 'Private' ), intent: 'default' },
-			trash: { label: __( 'Trash' ), intent: 'error' },
+			publish: { label: __( 'Published' ), intent: 'stable' },
+			future: { label: __( 'Scheduled' ), intent: 'informational' },
+			draft: { label: __( 'Draft' ), intent: 'draft' },
+			pending: { label: __( 'Pending' ), intent: 'low' },
+			private: { label: __( 'Private' ), intent: 'draft' },
+			trash: { label: __( 'Trash' ), intent: 'high' },
 		};
 		const badge = statusMap[ entityStatus ];
 		if ( badge ) {

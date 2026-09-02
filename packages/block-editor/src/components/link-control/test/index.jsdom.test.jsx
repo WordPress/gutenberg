@@ -3670,8 +3670,8 @@ describe( 'Link preview with entity data from navigation blocks', () => {
 				url: 'https://example.com/my-page',
 				title: 'My Test Page',
 				badges: [
-					{ label: 'Draft', intent: 'warning' },
-					{ label: 'Page', intent: 'default' },
+					{ label: 'Draft', intent: 'draft' },
+					{ label: 'Page', intent: 'draft' },
 				],
 			};
 

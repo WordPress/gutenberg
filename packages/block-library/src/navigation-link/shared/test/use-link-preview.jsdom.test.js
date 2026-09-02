@@ -205,7 +205,7 @@ describe( 'computeBadges', () => {
 
 			expect( badges ).toContainEqual( {
 				label: 'External link',
-				intent: 'default',
+				intent: 'draft',
 			} );
 		} );
 
@@ -218,7 +218,7 @@ describe( 'computeBadges', () => {
 
 			expect( badges ).toContainEqual( {
 				label: 'Page',
-				intent: 'default',
+				intent: 'draft',
 			} );
 		} );
 
@@ -230,7 +230,7 @@ describe( 'computeBadges', () => {
 
 			expect( badges ).toContainEqual( {
 				label: 'Internal link',
-				intent: 'default',
+				intent: 'draft',
 			} );
 		} );
 
@@ -242,7 +242,7 @@ describe( 'computeBadges', () => {
 
 			expect( badges ).toContainEqual( {
 				label: 'Homepage',
-				intent: 'default',
+				intent: 'draft',
 			} );
 		} );
 
@@ -259,7 +259,7 @@ describe( 'computeBadges', () => {
 			} );
 			expect( badges ).toContainEqual( {
 				label: 'Homepage',
-				intent: 'default',
+				intent: 'draft',
 			} );
 		} );
 
@@ -273,7 +273,7 @@ describe( 'computeBadges', () => {
 				} );
 				expect( badges ).not.toContainEqual( {
 					label: 'Homepage',
-					intent: 'default',
+					intent: 'draft',
 				} );
 			}
 		);
@@ -290,7 +290,7 @@ describe( 'computeBadges', () => {
 				} );
 				expect( badges ).toContainEqual( {
 					label: 'Homepage',
-					intent: 'default',
+					intent: 'draft',
 				} );
 			}
 		);
@@ -303,7 +303,7 @@ describe( 'computeBadges', () => {
 
 			expect( badges ).toContainEqual( {
 				label: 'Page',
-				intent: 'default',
+				intent: 'draft',
 			} );
 		} );
 	} );
@@ -316,7 +316,7 @@ describe( 'computeBadges', () => {
 
 			expect( badges ).toContainEqual( {
 				label: 'No link selected',
-				intent: 'error',
+				intent: 'high',
 			} );
 		} );
 
@@ -330,7 +330,7 @@ describe( 'computeBadges', () => {
 
 			expect( badges ).toContainEqual( {
 				label: 'Missing page',
-				intent: 'error',
+				intent: 'high',
 			} );
 		} );
 
@@ -343,7 +343,7 @@ describe( 'computeBadges', () => {
 
 			expect( badges ).toContainEqual( {
 				label: 'Published',
-				intent: 'success',
+				intent: 'stable',
 			} );
 		} );
 
@@ -356,7 +356,7 @@ describe( 'computeBadges', () => {
 
 			expect( badges ).toContainEqual( {
 				label: 'Draft',
-				intent: 'warning',
+				intent: 'draft',
 			} );
 		} );
 	} );
@@ -372,12 +372,12 @@ it( 'should show "Internal link" badge for hash links even when type is present'
 	// Should prioritize hash link detection over type
 	expect( badges ).toContainEqual( {
 		label: 'Internal link',
-		intent: 'default',
+		intent: 'draft',
 	} );
 	// Should NOT show Page badge
 	expect( badges ).not.toContainEqual( {
 		label: 'Page',
-		intent: 'default',
+		intent: 'draft',
 	} );
 } );
 
@@ -391,12 +391,12 @@ it( 'should show "Homepage" badge for root path even when type is present', () =
 	// Should prioritize homepage detection over type
 	expect( badges ).toContainEqual( {
 		label: 'Homepage',
-		intent: 'default',
+		intent: 'draft',
 	} );
 	// Should NOT show Page badge
 	expect( badges ).not.toContainEqual( {
 		label: 'Page',
-		intent: 'default',
+		intent: 'draft',
 	} );
 } );
 
@@ -417,12 +417,12 @@ test.each( [
 		// Should prioritize external link detection over type
 		expect( badges ).toContainEqual( {
 			label: 'External link',
-			intent: 'default',
+			intent: 'draft',
 		} );
 		// Should NOT show Page badge
 		expect( badges ).not.toContainEqual( {
 			label: 'Page',
-			intent: 'default',
+			intent: 'draft',
 		} );
 	}
 );
@@ -437,12 +437,12 @@ it( 'should show "Page" badge for internal custom links', () => {
 	// Should show Page badge for internal custom links
 	expect( badges ).toContainEqual( {
 		label: 'Page',
-		intent: 'default',
+		intent: 'draft',
 	} );
 	// Should NOT show Custom badge
 	expect( badges ).not.toContainEqual( {
 		label: 'Custom',
-		intent: 'default',
+		intent: 'draft',
 	} );
 } );
 
@@ -641,7 +641,7 @@ describe( 'useLinkPreview', () => {
 
 			expect( result.current.badges ).toContainEqual( {
 				label: 'No link selected',
-				intent: 'error',
+				intent: 'high',
 			} );
 		} );
 
@@ -673,7 +673,7 @@ describe( 'useLinkPreview', () => {
 
 			expect( result.current.badges ).toContainEqual( {
 				label: 'Missing page',
-				intent: 'error',
+				intent: 'high',
 			} );
 		} );
 
