@@ -54,8 +54,10 @@ export interface FilterByConfig {
  *
  * - `is` / `isNot`: exact (in)equality against a single value.
  * - `isAny` / `isNone`: membership in a list of values (any / none of them).
- * - `isAll` / `isNotAll`: for multi-value fields, whether the item contains
- *   all / not all of the selected values.
+ * - `isAll`: for multi-value fields, whether the item contains all of the
+ *   selected values.
+ * - `isNotAll`: deprecated alias of `isNone` (matches items containing none
+ *   of the selected values, not items merely missing one of them).
  * - `lessThan` / `greaterThan` / `lessThanOrEqual` / `greaterThanOrEqual`: numeric comparisons.
  * - `before` / `after` / `beforeInc` / `afterInc`: date comparisons, exclusive and inclusive.
  * - `on` / `notOn`: date (in)equality.
