@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import normalizeFields from '../index';
 import type { Field } from '../../types';
 

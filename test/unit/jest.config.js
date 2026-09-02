@@ -139,15 +139,6 @@ module.exports = {
 	projects: [
 		{
 			...commonProjectConfig,
-			displayName: 'node',
-			testEnvironment: 'node',
-			testPathIgnorePatterns: [
-				...commonProjectConfig.testPathIgnorePatterns,
-				'\\.(?:browser|jsdom)\\.test\\.[jt]sx?$',
-			],
-		},
-		{
-			...commonProjectConfig,
 			displayName: 'jsdom',
 			testEnvironment: require.resolve( 'jest-environment-jsdom' ),
 			testEnvironmentOptions: {

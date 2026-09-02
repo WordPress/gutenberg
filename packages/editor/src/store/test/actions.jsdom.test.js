@@ -1,6 +1,7 @@
 import { speak } from '@wordpress/a11y';
 import apiFetch from '@wordpress/api-fetch';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { createRegistry } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -392,6 +393,317 @@ describe( 'Post actions', () => {
 				expect( notice.content ).not.toContain( 'Show details' );
 				expect( notice.__unstableHTML ).toBeUndefined();
 			} );
+		} );
+	} );
+
+	describe( 'savePost() attaching media', () => {
+		// `getEditorBlocks` parses the post's content when there is no `blocks`
+		// edit, so the block type has to exist for an image to be recognisable.
+		beforeEach( () => {
+			registerBlockType( 'core/image', {
+				title: 'Image',
+				category: 'media',
+				// Anything below 3 warns about iframe compatibility.
+				apiVersion: 3,
+				attributes: { id: { type: 'number' } },
+				save: () => null,
+			} );
+		} );
+
+		afterEach( () => {
+			unregisterBlockType( 'core/image' );
+		} );
+
+		const imagePost = {
+			id: postId,
+			type: 'post',
+			title: 'bar',
+			// Void form, so it validates against the minimal `save` registered
+			// above — the markup is incidental, the `id` attribute is the point.
+			content: '<!-- wp:image {"id":12} /-->',
+			excerpt: 'crackers',
+			status: 'draft',
+		};
+
+		/**
+		 * Answers everything `savePost` and the attach need, recording each
+		 * request so the test can assert on what was and wasn't issued.
+		 *
+		 * @param {string[]} requests         Collects `METHOD path` for every call.
+		 * @param {Function} [duringPostSave] Run while the post's own save is in
+		 *                                    flight, to stand in for the user
+		 *                                    editing before it comes back.
+		 */
+		function setFetchHandler( requests, duringPostSave ) {
+			attachedTo = undefined;
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path, data } = options;
+				requests.push( `${ method } ${ path }` );
+
+				if ( method === 'DELETE' ) {
+					return { ...imagePost, status: 'trash' };
+				}
+				if ( method === 'PUT' && path.startsWith( '/wp/v2/media/' ) ) {
+					attachedTo = data.post;
+					return { id: 12, post: data.post };
+				}
+				if ( method === 'GET' && path.startsWith( '/wp/v2/media' ) ) {
+					// Answer what was actually asked for. Returning a fixed
+					// record instead would mask the whole bug: a request that
+					// wrongly includes the template's image would still come
+					// back with only the post's.
+					const requested = [
+						...path.matchAll( /include(?:%5B\d+%5D)?=(\d+)/g ),
+					].map( ( match ) => Number( match[ 1 ] ) );
+
+					// Also resolved with `parse: false`, so the totals headers
+					// can be read. `link` must be absent or the fetch-all
+					// middleware follows a next page.
+					return {
+						json: async () =>
+							requested.map( ( id ) => ( { id, post: null } ) ),
+						headers: {
+							get: ( name ) =>
+								name.toLowerCase() === 'link' ? null : '1',
+						},
+					};
+				}
+				if (
+					method === 'PUT' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					duringPostSave?.();
+					return { ...imagePost, ...data };
+				}
+				if (
+					method === 'GET' &&
+					path.startsWith( '/wp/v2/types/post' )
+				) {
+					// Resolved with `parse: false`, so this has to look like a
+					// Response rather than the record itself.
+					return {
+						json: async () => ( {
+							...postTypeEntity,
+							viewable: true,
+						} ),
+					};
+				}
+
+				throw {
+					code: 'unknown_path',
+					message: `Unknown path: ${ method } ${ path }`,
+				};
+			} );
+		}
+
+		const hasAttached = ( requests ) =>
+			requests.some( ( request ) =>
+				request.startsWith( 'PUT /wp/v2/media/12' )
+			);
+
+		// What was written, not just that something was.
+		let attachedTo;
+
+		/**
+		 * The attach is deliberately not awaited by `savePost`, so give its
+		 * requests a chance to land before asserting they did not.
+		 */
+		async function flush() {
+			for ( let i = 0; i < 20; i++ ) {
+				await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+			}
+		}
+
+		function setUpEditor( registry ) {
+			// Only the `post` entity is registered by default, and without a
+			// config for attachments the records lookup cannot resolve.
+			registry.dispatch( coreStore ).addEntities( [
+				{
+					kind: 'postType',
+					name: 'attachment',
+					baseURL: '/wp/v2/media',
+					rawAttributes: [ 'title', 'excerpt', 'content' ],
+					// As `loadPostTypeEntities` configures it. Without this the
+					// resolver takes its unpaginated branch, which isn't the one
+					// that runs in the editor.
+					supportsPagination: true,
+				},
+			] );
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', imagePost );
+			registry.dispatch( editorStore ).setupEditor( imagePost, {
+				content: imagePost.content,
+			} );
+			// The block editor store is populated by the editor provider, which
+			// isn't mounted here — and without blocks there is no media to find,
+			// so every assertion below would pass whether the guards work or not.
+			registry.dispatch( blockEditorStore ).resetBlocks( [
+				{
+					clientId: 'image-1',
+					name: 'core/image',
+					isValid: true,
+					attributes: { id: 12 },
+					innerBlocks: [],
+				},
+			] );
+		}
+
+		/**
+		 * `savePost` reads the post's blocks up front, next to the content it
+		 * sends. An image added while the request is in flight was not part of
+		 * this save, so it waits for the next one.
+		 */
+		it( 'attaches what was saved, not media added mid-save', async () => {
+			const requests = [];
+			const registry = createRegistryWithStores();
+			setFetchHandler( requests, () => {
+				registry.dispatch( editorStore ).editPost( {
+					blocks: [
+						{
+							clientId: 'image-1',
+							name: 'core/image',
+							isValid: true,
+							attributes: { id: 12 },
+							innerBlocks: [],
+						},
+						{
+							clientId: 'image-2',
+							name: 'core/image',
+							isValid: true,
+							attributes: { id: 77 },
+							innerBlocks: [],
+						},
+					],
+				} );
+			} );
+			setUpEditor( registry );
+
+			await registry.dispatch( editorStore ).savePost();
+			await flush();
+
+			expect( hasAttached( requests ) ).toBe( true );
+			expect(
+				requests.some( ( request ) =>
+					request.startsWith( 'PUT /wp/v2/media/77' )
+				)
+			).toBe( false );
+		} );
+
+		it( 'attaches media the post displays', async () => {
+			const requests = [];
+			setFetchHandler( requests );
+
+			const registry = createRegistryWithStores();
+			setUpEditor( registry );
+
+			await registry.dispatch( editorStore ).savePost();
+			await flush();
+
+			expect( hasAttached( requests ) ).toBe( true );
+			expect( attachedTo ).toBe( postId );
+		} );
+
+		/**
+		 * The bug a contributor found: with "Show template" on, the block editor
+		 * holds the *template's* tree with the post nested inside a
+		 * `core/post-content` block, so reading the canvas picked up the
+		 * template's media and attached it to the post.
+		 */
+		it( "ignores media in the canvas that is not the post's own", async () => {
+			const requests = [];
+			setFetchHandler( requests );
+
+			const registry = createRegistryWithStores();
+			setUpEditor( registry );
+
+			// The canvas as template mode leaves it: an image belonging to the
+			// template, alongside the post's content.
+			registry.dispatch( blockEditorStore ).resetBlocks( [
+				{
+					clientId: 'template-image',
+					name: 'core/image',
+					isValid: true,
+					attributes: { id: 99 },
+					innerBlocks: [],
+				},
+				{
+					clientId: 'post-content',
+					name: 'core/post-content',
+					isValid: true,
+					attributes: {},
+					innerBlocks: [
+						{
+							clientId: 'image-1',
+							name: 'core/image',
+							isValid: true,
+							attributes: { id: 12 },
+							innerBlocks: [],
+						},
+					],
+				},
+			] );
+
+			await registry.dispatch( editorStore ).savePost();
+			await flush();
+
+			// The post's own image, and only that.
+			expect( hasAttached( requests ) ).toBe( true );
+			expect(
+				requests.some( ( request ) =>
+					request.startsWith( 'PUT /wp/v2/media/99' )
+				)
+			).toBe( false );
+		} );
+
+		it( 'attaches nothing when the editor setting is off', async () => {
+			const requests = [];
+			setFetchHandler( requests );
+
+			const registry = createRegistryWithStores();
+			registry
+				.dispatch( editorStore )
+				.updateEditorSettings( { autoAttachMediaEnabled: false } );
+			setUpEditor( registry );
+
+			await registry.dispatch( editorStore ).savePost();
+			await flush();
+
+			expect( hasAttached( requests ) ).toBe( false );
+		} );
+
+		/**
+		 * `trashPost` deletes the post and then calls `savePost`, and
+		 * `isEditedPostSaveable` has no status check to stop it — so without a
+		 * guard a post on its way to the bin would claim media on the way out.
+		 */
+		it( 'attaches nothing while the post is being trashed', async () => {
+			const requests = [];
+			setFetchHandler( requests );
+
+			const registry = createRegistryWithStores();
+			setUpEditor( registry );
+
+			await registry.dispatch( editorStore ).trashPost();
+			await flush();
+
+			expect( hasAttached( requests ) ).toBe( false );
+		} );
+
+		it( 'attaches nothing on an autosave', async () => {
+			const requests = [];
+			setFetchHandler( requests );
+
+			const registry = createRegistryWithStores();
+			setUpEditor( registry );
+
+			await registry
+				.dispatch( editorStore )
+				.savePost( { isAutosave: true } );
+			await flush();
+
+			expect( hasAttached( requests ) ).toBe( false );
 		} );
 	} );
 

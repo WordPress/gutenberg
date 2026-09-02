@@ -2,25 +2,28 @@
 @use "@wordpress/base-styles/variables" as *;
 
 %red-focus-ring {
-	--focus-color: #{ $alert-red };
+	--focus-color: #{$alert-red};
 }
 
 .dataviews-validated-control {
 	// For components based on InputBase
-	&:has(:is(input, select):invalid[data-validity-visible])
-	.components-input-control__backdrop {
-		@extend %red-focus-ring;
+	&:has(:is(input, select):invalid[data-validity-visible]) {
+		.components-input-control__backdrop {
+			@extend %red-focus-ring;
 
-		border-color: $alert-red;
+			border-color: $alert-red;
+		}
 	}
 
 	// For ComboboxControl
-	.components-combobox-control__suggestions-container:has(
-	input:invalid[data-validity-visible]
-):not(:has([aria-expanded="true"])) {
-		@extend %red-focus-ring;
+	.components-combobox-control__suggestions-container {
+		&:has(input:invalid[data-validity-visible]) {
+			&:not(:has([aria-expanded="true"])) {
+				@extend %red-focus-ring;
 
-		border-color: $alert-red;
+				border-color: $alert-red;
+			}
+		}
 	}
 }
 
@@ -28,7 +31,10 @@
 	position: relative;
 
 	// For FormTokenField
-	&:has(input:invalid[data-validity-visible]) .components-form-token-field__input-container:not(:has([aria-expanded="true"])) {
+	&:has(input:invalid[data-validity-visible])
+		.components-form-token-field__input-container:not(
+			:has([aria-expanded="true"])
+		) {
 		@extend %red-focus-ring;
 
 		border-color: $alert-red;
@@ -48,4 +54,3 @@
 	opacity: 0;
 	pointer-events: none;
 }
-
