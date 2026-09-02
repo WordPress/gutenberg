@@ -4672,7 +4672,7 @@
 	},
 	"packages/components/src/autocomplete/autocompleter-ui.tsx": {
 		"react-hooks/refs": {
-			"count": 6
+			"count": 4
 		}
 	},
 	"packages/components/src/autocomplete/index.tsx": {
@@ -7462,9 +7462,6 @@
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		},
-		"react-hooks/refs": {
-			"count": 2
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -7482,9 +7479,6 @@
 	"packages/format-library/src/language/index.jsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
-		},
-		"react-hooks/refs": {
-			"count": 2
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -7504,9 +7498,6 @@
 		}
 	},
 	"packages/format-library/src/link/inline.jsx": {
-		"react-hooks/refs": {
-			"count": 2
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -7517,17 +7508,11 @@
 		}
 	},
 	"packages/format-library/src/math/index.jsx": {
-		"react-hooks/refs": {
-			"count": 2
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
 	"packages/format-library/src/non-breaking-space/index.jsx": {
-		"react-hooks/refs": {
-			"count": 2
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -7553,9 +7538,6 @@
 		}
 	},
 	"packages/format-library/src/text-color/inline.jsx": {
-		"react-hooks/refs": {
-			"count": 2
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}

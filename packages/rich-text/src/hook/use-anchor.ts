@@ -1,6 +1,8 @@
 import { usePrevious } from '@wordpress/compose';
-import { useState, useLayoutEffect } from '@wordpress/element';
+import { useState, useLayoutEffect, useRef, useMemo } from '@wordpress/element';
 import { getRectangleFromRange } from '@wordpress/dom';
+import deprecated from '@wordpress/deprecated';
+import type { RefObject } from 'react';
 import type { WPFormat } from '../register-format-type';
 import { ownsSelection } from '../owns-selection';
 
@@ -172,18 +174,38 @@ const DEFAULT_SETTINGS = {
  * UI, e.g. by passing it to the `Popover` component via the `anchor` prop.
  *
  * @param obj                        Named parameters.
- * @param obj.editableContentElement The element containing the editable content.
+ * @param obj.editableContentRef     Ref to the element containing the editable
+ *                                   content.
+ * @param obj.editableContentElement The element containing the editable
+ *                                   content. Deprecated since 7.2: pass
+ *                                   `editableContentRef` instead.
  * @param obj.settings               The format type's settings.
  * @return                           The active element or selection range.
  */
 export function useAnchor( {
+	editableContentRef,
 	editableContentElement,
 	settings,
 }: {
-	editableContentElement: HTMLElement | null;
+	editableContentRef?: RefObject< HTMLElement | null >;
+	editableContentElement?: HTMLElement | null;
 	settings?: WPFormat;
 } ): Element | VirtualAnchorElement | undefined | null {
 	const { tagName, className } = settings ?? DEFAULT_SETTINGS;
+
+	if ( editableContentElement !== undefined ) {
+		deprecated( '`editableContentElement` option in `useAnchor`', {
+			since: '7.2',
+			alternative: '`editableContentRef` option',
+		} );
+	}
+
+	// Normalise the deprecated element option into the ref shape, so the rest
+	// of the hook has a single code path.
+	const contentRef = useMemo(
+		() => editableContentRef ?? { current: editableContentElement ?? null },
+		[ editableContentRef, editableContentElement ]
+	);
 
 	// `isActive` is not a property of `WPFormat`, but it has made its way into
 	// `settings` in certain cases (see `core/link` format). Avoid making this
@@ -195,20 +217,25 @@ export function useAnchor( {
 		settings.isActive
 	);
 
-	const [ anchor, setAnchor ] = useState( () =>
-		getAnchor( editableContentElement, tagName, className ?? '' )
-	);
+	// The anchor is initialized in the `useLayoutEffect` below (before the
+	// browser paints) to avoid reading the ref during render.
+	const [ anchor, setAnchor ] = useState<
+		HTMLElement | VirtualAnchorElement | undefined
+	>();
 	const wasActive = usePrevious( isActive );
+	// The element the current `anchor` was computed for, so that the effect can
+	// tell a first run for an element from a re-run for the same element.
+	const anchoredElementRef = useRef< HTMLElement | null >( null );
 
 	useLayoutEffect( () => {
-		if ( ! editableContentElement ) {
+		const element = contentRef.current;
+
+		if ( ! element ) {
 			return;
 		}
 
 		function callback() {
-			setAnchor(
-				getAnchor( editableContentElement, tagName, className ?? '' )
-			);
+			setAnchor( getAnchor( element, tagName, className ?? '' ) );
 		}
 
 		function attach() {
@@ -219,33 +246,40 @@ export function useAnchor( {
 			ownerDocument.removeEventListener( 'selectionchange', callback );
 		}
 
-		const { ownerDocument } = editableContentElement;
+		const { ownerDocument } = element;
 
-		if (
-			ownsSelection( editableContentElement ) ||
+		const isNewElement = anchoredElementRef.current !== element;
+		anchoredElementRef.current = element;
+
+		const shouldAttach =
+			ownsSelection( element ) ||
 			// When a link is created, we need to attach the popover to the newly created anchor.
 			( ! wasActive && isActive ) ||
 			// Sometimes we're _removing_ an active anchor, such as the inline color popover.
 			// When we add the color, it switches from a virtual anchor to a `<mark>` element.
 			// When we _remove_ the color, it switches from a `<mark>` element to a virtual anchor.
-			( wasActive && ! isActive )
-		) {
-			setAnchor(
-				getAnchor( editableContentElement, tagName, className ?? '' )
-			);
+			( wasActive && ! isActive );
+
+		// Seed the anchor on the first run for this element, since it could not
+		// be seeded during render.
+		if ( shouldAttach || isNewElement ) {
+			callback();
+		}
+
+		if ( shouldAttach ) {
 			attach();
 		}
 
-		editableContentElement.addEventListener( 'focusin', attach );
-		editableContentElement.addEventListener( 'focusout', detach );
+		element.addEventListener( 'focusin', attach );
+		element.addEventListener( 'focusout', detach );
 
 		return () => {
 			detach();
 
-			editableContentElement.removeEventListener( 'focusin', attach );
-			editableContentElement.removeEventListener( 'focusout', detach );
+			element.removeEventListener( 'focusin', attach );
+			element.removeEventListener( 'focusout', detach );
 		};
-	}, [ editableContentElement, tagName, className, isActive, wasActive ] );
+	}, [ contentRef, tagName, className, isActive, wasActive ] );
 
 	return anchor;
 }

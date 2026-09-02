@@ -8,7 +8,7 @@ const title = __( 'Non breaking space' );
 
 function PopoverAnchor( { contentRef } ) {
 	const popoverAnchor = useAnchor( {
-		editableContentElement: contentRef.current,
+		editableContentRef: contentRef,
 		settings: nonBreakingSpace,
 	} );
 

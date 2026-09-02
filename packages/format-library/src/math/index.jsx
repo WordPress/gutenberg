@@ -29,7 +29,7 @@ function InlineUI( {
 	const formRef = useRef();
 
 	const popoverAnchor = useAnchor( {
-		editableContentElement: contentRef.current,
+		editableContentRef: contentRef,
 		settings: math,
 	} );
 

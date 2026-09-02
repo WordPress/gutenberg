@@ -146,7 +146,7 @@ export default function InlineColorUI( {
 	isActive,
 } ) {
 	const popoverAnchor = useAnchor( {
-		editableContentElement: contentRef.current,
+		editableContentRef: contentRef,
 		settings: { ...settings, isActive },
 	} );
 
