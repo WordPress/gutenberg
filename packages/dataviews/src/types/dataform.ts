@@ -444,7 +444,7 @@ export type FormField = {
 
 	/**
 	 * Child fields, for layouts that group fields together
-	 * (card, row, details). Each child is a form field
+	 * (panel, card, row, details). Each child is a form field
 	 * or a plain field id.
 	 */
 	children?: Array< FormField | string >;
