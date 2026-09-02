@@ -43,8 +43,6 @@ changelog policy for production code changes.
 
 If a published package can run with a dependency supplied separately by WordPress, apply the [`package-runtime-compatibility`](../package-runtime-compatibility/SKILL.md) skill before implementation.
 
-When adding or changing `--wp-ui-*` CSS custom properties in `@wordpress/ui`, apply [`wordpress-ui-css-variable-fallbacks`](../wordpress-ui-css-variable-fallbacks/SKILL.md).
-
 ## Finish
 
 Use the public guide's
