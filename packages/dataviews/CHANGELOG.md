@@ -4,6 +4,7 @@
 
 ### Breaking Changes
 
+-   Removed the rich text options (`className`, `clientId`, `allowedFormats`, `disableFormats`, `withoutInteractiveFormatting`, `preserveWhiteSpace`, `disableLineBreaks`) from the `config` prop of `DataFormControlProps`. They were added for the built-in `richtext` control ([#78471](https://github.com/WordPress/gutenberg/pull/78471)), which has since moved to `@wordpress/editor` ([#81430](https://github.com/WordPress/gutenberg/pull/81430)), so nothing in this package sets or reads them ([#82330](https://github.com/WordPress/gutenberg/pull/82330)).
 -   DataForm: a combined form field (one with `children`) is now treated purely as a layout container. Its `id` is no longer resolved against the field definitions: a field sharing that `id` no longer contributes validation rules to the group, and the `panel` layout no longer uses it for the collapsed summary or `readOnly` state, falling back to the group's first leaf child instead ([#82175](https://github.com/WordPress/gutenberg/pull/82175)).
 
     If a combined field relied on sharing its `id` with a field to pick the panel summary, declare it through `layout.summary` instead. For example, a `discussion` field whose `render` summarizes `comment_status` and `ping_status` together:
