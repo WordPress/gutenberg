@@ -29,7 +29,10 @@ test.describe( 'Region navigation (@firefox, @webkit)', () => {
 			.poll( () => editor.ownsSelection( dummyParagraph ) )
 			.toBe( true );
 
-		// Navigate to first region and check that we made it. Must navigate forward 4 times as initial focus is placed in post title field.
+		// Navigate to the top bar region and check that we made it. Focus
+		// starts in the selected paragraph, so five stops lie ahead: the
+		// block toolbar, settings, publish, footer, then the top bar.
+		await page.keyboard.press( 'Control+`' );
 		await page.keyboard.press( 'Control+`' );
 		await page.keyboard.press( 'Control+`' );
 		await page.keyboard.press( 'Control+`' );
@@ -39,19 +42,19 @@ test.describe( 'Region navigation (@firefox, @webkit)', () => {
 		);
 		await expect( editorTopBar ).toBeFocused();
 
-		// Navigate to the next region: the selected block's toolbar floats
-		// over the content, so it comes before it.
-		await page.keyboard.press( 'Control+`' );
-		await expect(
-			page.locator( 'role=region[name="Block toolbar"i]' )
-		).toBeFocused();
-
-		// Navigate on to the content region and check that we made it.
+		// Navigate to the content region and check that we made it.
 		await page.keyboard.press( 'Control+`' );
 		const editorContent = page.locator(
 			'role=region[name="Editor content"i]'
 		);
 		await expect( editorContent ).toBeFocused();
+
+		// Navigate to the next region: the selected block's toolbar floats
+		// within the content region, so it comes right after it.
+		await page.keyboard.press( 'Control+`' );
+		await expect(
+			page.locator( 'role=region[name="Block toolbar"i]' )
+		).toBeFocused();
 
 		// Navigate two regions back and check that we made it.
 		// Make sure navigating backwards works also with the tilde character,

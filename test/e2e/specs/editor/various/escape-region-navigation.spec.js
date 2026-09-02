@@ -52,13 +52,13 @@ test.describe( 'Escape region navigation', () => {
 		await expect( editorContent ).toBeFocused();
 
 		// On a region, Tab moves to the next region and Shift+Tab back. The
-		// toolbar of the selected block floats over the content, so it comes
-		// right before it.
-		await page.keyboard.press( 'Shift+Tab' );
+		// toolbar of the selected block floats within the content region, so
+		// it comes right after it.
+		await page.keyboard.press( 'Tab' );
 		await expect(
 			page.locator( 'role=region[name="Block toolbar"i]' )
 		).toBeFocused();
-		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Shift+Tab' );
 		await expect( editorContent ).toBeFocused();
 
 		// Enter goes back into the content, restoring the selection where it

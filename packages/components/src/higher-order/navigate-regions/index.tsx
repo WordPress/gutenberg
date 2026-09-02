@@ -86,7 +86,9 @@ export function useNavigateRegions( shortcuts: Shortcuts = defaultShortcuts ) {
 	}
 
 	function focusRegion( offset: number ) {
-		const found = Array.from(
+		// Document order puts a region nested in another, like the block
+		// toolbar floating over the content, right after its container.
+		const regions = Array.from(
 			ref.current?.querySelectorAll< HTMLElement >(
 				'[role="region"][tabindex="-1"]'
 			) ?? []
@@ -100,22 +102,6 @@ export function useNavigateRegions( shortcuts: Shortcuts = defaultShortcuts ) {
 				width > 0 && height > 0 && region.checkVisibility?.() !== false;
 			return hasVisibleBox || focus.tabbable.find( region ).length > 0;
 		} );
-
-		// A region nested in another, like the block toolbar floating over
-		// the content, comes before its container: it also precedes it
-		// visually. Document order puts containers first, so each nested
-		// region is moved up in a single pass.
-		const regions: HTMLElement[] = [];
-		for ( const region of found ) {
-			const containerIndex = regions.findIndex( ( placed ) =>
-				placed.contains( region )
-			);
-			if ( containerIndex === -1 ) {
-				regions.push( region );
-			} else {
-				regions.splice( containerIndex, 0, region );
-			}
-		}
 		if ( ! regions.length ) {
 			return;
 		}
