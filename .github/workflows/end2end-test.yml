@@ -373,9 +373,9 @@ jobs:
     #
     # `needs` lists every preceding job that should be checked. `--ignore` names the rest:
     # this job itself, and the housekeeping that runs alongside it. A job in neither list
-    # fails the gate if it has not finished, rather than pass unevaluated.
-    e2e-gate:
-        name: End-to-End Tests Gate
+    # fails the status check if it has not finished, rather than pass unevaluated.
+    e2e-status-check:
+        name: End-to-End Tests - Status Check
         runs-on: 'ubuntu-24.04'
         timeout-minutes: 5
         permissions:
@@ -404,4 +404,4 @@ jobs:
             - name: Check for any failures of required jobs
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: node .github/workflows/scripts/ci-gate.js --ignore 'End-to-End Tests Gate,Merge Artifacts,Update PR meta comment'
+              run: node .github/workflows/scripts/ci-status-check.js --ignore 'End-to-End Tests - Status Check,Merge Artifacts,Update PR meta comment'

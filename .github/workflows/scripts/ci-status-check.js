@@ -8,12 +8,12 @@
  *
  * Usage:
  *
- *     node ci-gate.js --ignore '<job name>[,<job name>]...'
+ *     node ci-status-check.js --ignore '<job name>[,<job name>]...'
  *
  * `--ignore` exempts a job, and must name the job running this script plus any
  * job still running alongside it; repeat the flag for a name containing a
- * comma. Anything else left unfinished fails the gate rather than pass
- * unevaluated.
+ * comma. Anything else left unfinished fails the status check rather than
+ * pass unevaluated.
  */
 
 const { parseArgs } = require( 'node:util' );

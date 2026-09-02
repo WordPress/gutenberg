@@ -455,10 +455,10 @@ jobs:
                   run-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
     # Always runs, so it can be the required check while the comparison above is path-filtered
-    # away. `needs` must list every job that would otherwise still be running: the gate fails
+    # away. `needs` must list every job that would otherwise still be running: the status check fails
     # rather than pass a job it never evaluated.
-    performance-gate:
-        name: Performance Tests Gate
+    performance-status-check:
+        name: Performance Tests - Status Check
         runs-on: 'ubuntu-24.04'
         timeout-minutes: 5
         permissions:
@@ -478,4 +478,4 @@ jobs:
             - name: Fail if any required job did not pass
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: node .github/workflows/scripts/ci-gate.js --ignore 'Performance Tests Gate,Update PR meta comment'
+              run: node .github/workflows/scripts/ci-status-check.js --ignore 'Performance Tests - Status Check,Update PR meta comment'
