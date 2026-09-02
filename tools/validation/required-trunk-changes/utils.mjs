@@ -36,6 +36,39 @@ export function fail( message ) {
 	process.exit( 1 );
 }
 
+export const RATE_LIMIT_ERROR = 'RateLimitError';
+
+/**
+ * Detects a primary or secondary rate limit response. A secondary limit can
+ * arrive with neither header set, leaving the body as the only signal.
+ *
+ * @param {Response} response Fetch response.
+ * @param {string}   body     Response body.
+ * @return {boolean} Whether the request was rate limited.
+ */
+function isRateLimited( response, body ) {
+	if ( response.status !== 403 && response.status !== 429 ) {
+		return false;
+	}
+	return (
+		response.headers.get( 'x-ratelimit-remaining' ) === '0' ||
+		response.headers.has( 'retry-after' ) ||
+		/rate limit/i.test( body )
+	);
+}
+
+/**
+ * Builds a rate limit error the sweep can recognize and stop on.
+ *
+ * @param {string} path Request path.
+ * @return {Error} Named rate limit error.
+ */
+function rateLimitError( path ) {
+	const error = new Error( `GitHub API rate limit reached on ${ path }.` );
+	error.name = RATE_LIMIT_ERROR;
+	return error;
+}
+
 /**
  * Performs an authenticated GitHub API request.
  *
@@ -43,24 +76,6 @@ export function fail( message ) {
  * @param {{ method?: string, body?: string, headers?: Record<string, string>, allow404?: boolean }} [options] Fetch options.
  * @return {Promise<unknown>} Parsed JSON response.
  */
-export const RATE_LIMIT_ERROR = 'RateLimitError';
-
-/**
- * Detects a primary or secondary rate limit response.
- *
- * @param {Response} response Fetch response.
- * @return {boolean} Whether the request was rate limited.
- */
-function isRateLimited( response ) {
-	if ( response.status !== 403 && response.status !== 429 ) {
-		return false;
-	}
-	return (
-		response.headers.get( 'x-ratelimit-remaining' ) === '0' ||
-		response.headers.has( 'retry-after' )
-	);
-}
-
 async function api( path, options = {} ) {
 	const RETRYABLE_STATUS = [ 502, 503, 504 ];
 	const MAX_ATTEMPTS = 3;
@@ -79,23 +94,18 @@ async function api( path, options = {} ) {
 				if ( response.status === 404 && options.allow404 ) {
 					return null;
 				}
-				if ( isRateLimited( response ) ) {
-					const error = new Error(
-						`GitHub API rate limit reached on ${ path }.`
-					);
-					error.name = RATE_LIMIT_ERROR;
-					throw error;
-				}
 				if (
 					RETRYABLE_STATUS.includes( response.status ) &&
 					attempt < MAX_ATTEMPTS
 				) {
 					throw new TypeError( `retryable ${ response.status }` );
 				}
+				const body = await response.text();
+				if ( isRateLimited( response, body ) ) {
+					throw rateLimitError( path );
+				}
 				throw new Error(
-					`GitHub API ${ path } failed: ${
-						response.status
-					} ${ await response.text() }`
+					`GitHub API ${ path } failed: ${ response.status } ${ body }`
 				);
 			}
 			return response.json();
@@ -126,6 +136,14 @@ export async function graphql( query, variables ) {
 		} )
 	);
 	if ( result.errors ) {
+		/* A GraphQL rate limit is a 200 carrying a RATE_LIMITED error. */
+		if (
+			result.errors.some(
+				( /** @type {any} */ error ) => error?.type === 'RATE_LIMITED'
+			)
+		) {
+			throw rateLimitError( 'the GraphQL endpoint' );
+		}
 		throw new Error(
 			`GraphQL request failed: ${ JSON.stringify( result.errors ) }`
 		);
@@ -296,7 +314,8 @@ export function hasWriteBudget() {
  * @param {string}  state       Status state: success or failure.
  * @param {string}  description Status description embedding the baseline.
  * @param {boolean} dryRun      Log the write instead of performing it.
- * @return {Promise<boolean>} False when the per-run budget is exhausted.
+ * @return {Promise<boolean>} False when the per-run budget is exhausted. Callers
+ *                            preflight with `hasWriteBudget`; this is a backstop.
  */
 export async function postStatus( sha, state, description, dryRun ) {
 	/* Budgeted before the dry-run exit, so a dry run models one real run. */

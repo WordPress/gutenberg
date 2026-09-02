@@ -21,6 +21,9 @@ import {
 /** @typedef {import('./types.mjs').PullRequest} PullRequest */
 /** @typedef {import('./types.mjs').ContextStatus} ContextStatus */
 
+const RETRY_HINT =
+	'Dispatch the workflow with sweep: true in about an hour to continue.';
+
 const PAGE_QUERY = `
 	query (
 		$owner: String!
@@ -101,7 +104,21 @@ async function listOpenPRs() {
  * @param {CommandOptions} options Command options.
  */
 export async function fanout( { dryRun } ) {
-	const baseline = await getBaseline();
+	/* A limit hit while reading still owes the operator the retry guidance. */
+	let baseline;
+	let prs;
+	try {
+		baseline = await getBaseline();
+		prs = await listOpenPRs();
+	} catch ( error ) {
+		if ( error instanceof Error && error.name === RATE_LIMIT_ERROR ) {
+			console.error( `${ error.message } ${ RETRY_HINT }` );
+			process.exitCode = 1;
+			return;
+		}
+		throw error;
+	}
+
 	/* A description names its baseline, so it identifies the current verdict. */
 	const current =
 		baseline === null
@@ -114,7 +131,6 @@ export async function fanout( { dryRun } ) {
 				payload.description === status.description
 		);
 
-	const prs = await listOpenPRs();
 	console.log(
 		`Baseline ${ baseline ?? 'none' }; ${ prs.length } open PRs.`
 	);
@@ -169,9 +185,7 @@ export async function fanout( { dryRun } ) {
 		`Sweep done: ${ written } written, ${ skipped } skipped, ${ failed } failed.` +
 			( rateLimited ? ' Rate limited.' : '' ) +
 			( budgetExhausted ? ' Write budget exhausted.' : '' ) +
-			( incomplete
-				? ' Dispatch the workflow with sweep: true in about an hour to continue.'
-				: '' )
+			( incomplete ? ` ${ RETRY_HINT }` : '' )
 	);
 	// Nonzero exit makes an incomplete or lossy sweep visible in the run list.
 	if ( failed > 0 || incomplete ) {
