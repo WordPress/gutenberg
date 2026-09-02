@@ -50,6 +50,7 @@
 
 ### Internal
 
+-   Add a `HierarchicalLevels` story that demonstrates `getItemLevel` and `view.showLevels` in the table layout ([#82344](https://github.com/WordPress/gutenberg/pull/82344)).
 -   Remove unused dependency `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
 -   Note in the `/wp` bundle build script that its singleton externals list must stay in sync with the transitive private API usage check ([#82027](https://github.com/WordPress/gutenberg/pull/82027)).
