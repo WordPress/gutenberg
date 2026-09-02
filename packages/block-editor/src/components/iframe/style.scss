@@ -12,7 +12,8 @@
 
 .block-editor-iframe__scale-container {
 	height: 100%;
-	/* The anchor for the focus ring and hint of the canvas stop inside. */
+	/* The canvas stop inside stretches over the nearest positioned ancestor,
+	   and this box is the one that hugs the frame in every mode. */
 	position: relative;
 }
 
