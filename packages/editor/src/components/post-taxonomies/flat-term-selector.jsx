@@ -1,14 +1,20 @@
 import { __, _x, sprintf } from '@wordpress/i18n';
-import { useEffect, useMemo, useState } from '@wordpress/element';
-import { FormTokenField, withFilters } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
-import { useSelect, useDispatch } from '@wordpress/data';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
+import { withFilters } from '@wordpress/components';
+import { Field, SearchableChipSelect, Stack } from '@wordpress/ui';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as editorStore } from '../../store';
-import { unescapeString, unescapeTerm } from '../../utils/terms';
+import { unescapeString } from '../../utils/terms';
 import MostUsedTerms from './most-used-terms';
 
 /**
@@ -22,8 +28,7 @@ const EMPTY_ARRAY = [];
 /**
  * How the max suggestions limit was chosen:
  *  - Matches the `per_page` range set by the REST API.
- *  - Can't use "unbound" query. The `FormTokenField` needs a fixed number.
- *  - Matches default for `FormTokenField`.
+ *  - Can't use "unbound" query. The search needs a fixed number.
  */
 const MAX_TERMS_SUGGESTIONS = 100;
 const DEFAULT_QUERY = {
@@ -32,19 +37,27 @@ const DEFAULT_QUERY = {
 	context: 'view',
 };
 
-const isSameTermName = ( termA, termB ) =>
-	unescapeString( termA ).toLowerCase() ===
-	unescapeString( termB ).toLowerCase();
+/**
+ * Maps a term record to the `{ value, label }` shape the select works with.
+ *
+ * @param {Object} term The term record.
+ *
+ * @return {{value: string, label: string}} The select item.
+ */
+const termToItem = ( term ) => ( {
+	value: String( term.id ),
+	label: unescapeString( term.name ),
+} );
+const itemToTermId = ( item ) => Number( item.value );
+const isSameTerm = ( termA, termB ) => termA.value === termB.value;
+const isSameTermName = ( nameA, nameB ) =>
+	nameA.toLowerCase() === nameB.toLowerCase();
 
-const termNamesToIds = ( names, terms ) => {
-	return names
-		.map(
-			( termName ) =>
-				terms.find( ( term ) => isSameTermName( term.name, termName ) )
-					?.id
-		)
-		.filter( ( id ) => id !== undefined );
-};
+/**
+ * Value of the item that creates a term out of the typed name. Terms are
+ * otherwise keyed by their id.
+ */
+const CREATE_TERM_VALUE = '__create__';
 
 /**
  * Renders a flat term selector component.
@@ -56,9 +69,14 @@ const termNamesToIds = ( names, terms ) => {
  */
 export function FlatTermSelector( { slug } ) {
 	const [ values, setValues ] = useState( [] );
-	const [ search, setSearch ] = useState( '' );
-	const debouncedSearch = useDebounce( setSearch, 500 );
+	const [ inputValue, setInputValue ] = useState( '' );
+	const [ suggestions, setSuggestions ] = useState( EMPTY_ARRAY );
+	const lastSearchRef = useRef( '' );
+	const registry = useRegistry();
 
+	const { editPost } = useDispatch( editorStore );
+	const { saveEntityRecord } = useDispatch( coreStore );
+	const { createErrorNotice } = useDispatch( noticesStore );
 	const {
 		terms,
 		termIds,
@@ -113,64 +131,81 @@ export function FlatTermSelector( { slug } ) {
 		[ slug ]
 	);
 
-	const { searchResults } = useSelect(
-		( select ) => {
-			const { getEntityRecords } = select( coreStore );
-
-			return {
-				searchResults: !! search
-					? getEntityRecords( 'taxonomy', slug, {
-							...DEFAULT_QUERY,
-							search,
-					  } )
-					: EMPTY_ARRAY,
-			};
-		},
-		[ search, slug ]
-	);
-
 	// Update terms state only after the selectors are resolved.
 	// We're using this to avoid terms temporarily disappearing on slow networks
 	// while core data makes REST API requests.
 	useEffect( () => {
 		if ( hasResolvedTerms ) {
-			const newValues = ( terms ?? [] ).map( ( term ) =>
-				unescapeString( term.name )
-			);
-
-			setValues( newValues );
+			setValues( ( terms ?? [] ).map( termToItem ) );
 		}
 	}, [ terms, hasResolvedTerms ] );
 
-	const suggestions = useMemo( () => {
-		return ( searchResults ?? [] ).map( ( term ) =>
-			unescapeString( term.name )
-		);
-	}, [ searchResults ] );
+	const searchTerms = useCallback(
+		async ( search ) => {
+			lastSearchRef.current = search;
 
-	const { editPost } = useDispatch( editorStore );
-	const { saveEntityRecord } = useDispatch( coreStore );
-	const { createErrorNotice } = useDispatch( noticesStore );
+			const records = await registry
+				.resolveSelect( coreStore )
+				.getEntityRecords( 'taxonomy', slug, {
+					...DEFAULT_QUERY,
+					search,
+				} );
+
+			// Ignore requests that resolved out of order.
+			if ( lastSearchRef.current === search ) {
+				setSuggestions( ( records ?? [] ).map( termToItem ) );
+			}
+		},
+		[ registry, slug ]
+	);
+	const debouncedSearch = useDebounce( searchTerms, 500 );
+
+	// The typed term can be created when it doesn't match a suggestion or an
+	// already selected term.
+	const newTermName = inputValue.trim();
+	const hasExactMatch = [ ...suggestions, ...values ].some( ( term ) =>
+		isSameTermName( term.label, newTermName )
+	);
+	const creatableItem = useMemo(
+		() =>
+			hasCreateAction && !! newTermName && ! hasExactMatch
+				? {
+						value: CREATE_TERM_VALUE,
+						label: sprintf(
+							/* translators: %s: term name. */
+							_x( 'Create: %s', 'term' ),
+							newTermName
+						),
+						creatable: true,
+				  }
+				: undefined,
+		[ hasCreateAction, hasExactMatch, newTermName ]
+	);
+	const items = useMemo(
+		() =>
+			creatableItem ? [ ...suggestions, creatableItem ] : suggestions,
+		[ suggestions, creatableItem ]
+	);
 
 	if ( ! hasAssignAction ) {
 		return null;
 	}
 
-	async function findOrCreateTerm( term ) {
+	async function findOrCreateTerm( name ) {
 		try {
-			const newTerm = await saveEntityRecord( 'taxonomy', slug, term, {
-				throwOnError: true,
-			} );
-			return unescapeTerm( newTerm );
+			const newTerm = await saveEntityRecord(
+				'taxonomy',
+				slug,
+				{ name },
+				{ throwOnError: true }
+			);
+			return termToItem( newTerm );
 		} catch ( error ) {
 			if ( error.code !== 'term_exists' ) {
 				throw error;
 			}
 
-			return {
-				id: error.data.term_id,
-				name: term.name,
-			};
+			return { value: String( error.data.term_id ), label: name };
 		}
 	}
 
@@ -178,59 +213,47 @@ export function FlatTermSelector( { slug } ) {
 		editPost( { [ taxonomy.rest_base ]: newTermIds } );
 	}
 
-	function onChange( termNames ) {
-		const availableTerms = [
-			...( terms ?? [] ),
-			...( searchResults ?? [] ),
-		];
-		const uniqueTerms = termNames.reduce( ( acc, name ) => {
-			if (
-				! acc.some( ( n ) => n.toLowerCase() === name.toLowerCase() )
-			) {
-				acc.push( name );
-			}
-			return acc;
-		}, [] );
-
-		const newTermNames = uniqueTerms.filter(
-			( termName ) =>
-				! availableTerms.find( ( term ) =>
-					isSameTermName( term.name, termName )
-				)
+	function onChange( newValues ) {
+		const hasCreatableItem = newValues.some(
+			( item ) => item.value === CREATE_TERM_VALUE
 		);
+		const selectedTerms = newValues.filter(
+			( item ) => item.value !== CREATE_TERM_VALUE
+		);
+		const selectedTermIds = selectedTerms.map( itemToTermId );
 
 		// Optimistically update term values.
 		// The selector will always re-fetch terms later.
-		setValues( uniqueTerms );
-		setSearch( '' );
+		setValues( selectedTerms );
 
-		if ( newTermNames.length === 0 ) {
-			onUpdateTerms( termNamesToIds( uniqueTerms, availableTerms ) );
+		if ( newValues.length !== values.length ) {
+			speak(
+				newValues.length > values.length
+					? termAddedLabel
+					: termRemovedLabel,
+				'assertive'
+			);
+		}
+
+		if ( ! hasCreatableItem ) {
+			onUpdateTerms( selectedTermIds );
 			return;
 		}
 
-		if ( ! hasCreateAction ) {
-			return;
-		}
-
-		Promise.all(
-			newTermNames.map( ( termName ) =>
-				findOrCreateTerm( { name: termName } )
-			)
-		)
-			.then( ( newTerms ) => {
-				const newAvailableTerms = availableTerms.concat( newTerms );
-				onUpdateTerms(
-					termNamesToIds( uniqueTerms, newAvailableTerms )
-				);
+		findOrCreateTerm( newTermName )
+			.then( ( savedTerm ) => {
+				setValues( [ ...selectedTerms, savedTerm ] );
+				onUpdateTerms( [
+					...selectedTermIds,
+					itemToTermId( savedTerm ),
+				] );
 			} )
 			.catch( ( error ) => {
 				createErrorNotice( error.message, {
 					type: 'snackbar',
 				} );
-				// In case of a failure, try assigning available terms.
-				// This will invalidate the optimistic update.
-				onUpdateTerms( termNamesToIds( uniqueTerms, availableTerms ) );
+				// In case of a failure, only assign the existing terms.
+				onUpdateTerms( selectedTermIds );
 			} );
 	}
 
@@ -240,14 +263,7 @@ export function FlatTermSelector( { slug } ) {
 		}
 
 		const newTermIds = [ ...termIds, newTerm.id ];
-		const defaultName = slug === 'post_tag' ? __( 'Tag' ) : __( 'Term' );
-		const termAddedMessage = sprintf(
-			/* translators: %s: term name. */
-			_x( '%s added', 'term' ),
-			taxonomy?.labels?.singular_name ?? defaultName
-		);
-
-		speak( termAddedMessage, 'assertive' );
+		speak( termAddedLabel, 'assertive' );
 		onUpdateTerms( newTermIds );
 	}
 
@@ -267,27 +283,53 @@ export function FlatTermSelector( { slug } ) {
 		_x( '%s removed', 'term' ),
 		singularName
 	);
-	const removeTermLabel = sprintf(
-		/* translators: %s: term name. */
-		_x( 'Remove %s', 'term' ),
-		singularName
-	);
+	const notFoundLabel =
+		taxonomy?.labels?.not_found ?? __( 'No results found.' );
+
+	function onInputValueChange( nextInputValue ) {
+		setInputValue( nextInputValue );
+
+		// Nothing to search for when the input is cleared, either by the user or
+		// after a selection.
+		if ( nextInputValue ) {
+			debouncedSearch( nextInputValue );
+		}
+	}
 
 	return (
 		<Stack direction="column" gap="lg">
-			<FormTokenField
-				value={ values }
-				suggestions={ suggestions }
-				onChange={ onChange }
-				onInputChange={ debouncedSearch }
-				maxSuggestions={ MAX_TERMS_SUGGESTIONS }
-				label={ newTermLabel }
-				messages={ {
-					added: termAddedLabel,
-					removed: termRemovedLabel,
-					remove: removeTermLabel,
-				} }
-			/>
+			<Field.Root>
+				<Field.Label>{ newTermLabel }</Field.Label>
+				<SearchableChipSelect
+					autoHighlight
+					openOnInputClick={ false }
+					// Terms are searched through the REST API.
+					filter={ null }
+					items={ items }
+					value={ values }
+					onValueChange={ onChange }
+					isItemEqualToValue={ isSameTerm }
+					inputValue={ inputValue }
+					onInputValueChange={ onInputValueChange }
+					emptyContent={ notFoundLabel }
+					searchPlaceholder=""
+					showClearButton={ false }
+					chipsContent={ ( selectedTerms ) =>
+						selectedTerms.map( ( term ) => (
+							<SearchableChipSelect.ChipWithRemove
+								key={ term.value }
+								removeLabel={ sprintf(
+									/* translators: %s: term name. */
+									_x( 'Remove %s', 'term' ),
+									term.label
+								) }
+							>
+								{ term.label }
+							</SearchableChipSelect.ChipWithRemove>
+						) )
+					}
+				/>
+			</Field.Root>
 			<MostUsedTerms taxonomy={ taxonomy } onSelect={ appendTerm } />
 		</Stack>
 	);

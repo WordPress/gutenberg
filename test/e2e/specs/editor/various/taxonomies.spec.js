@@ -74,13 +74,17 @@ test.describe( 'Taxonomies', () => {
 		}
 
 		const tagName = 'tag-' + generateRandomNumber();
-		const tags = page.locator( '.components-form-token-field__token-text' );
+		// Selected tags are rendered as chips, each with a remove button.
+		const tagChip = page.getByRole( 'button', {
+			name: `Remove ${ tagName }`,
+		} );
 
 		await page.getByRole( 'combobox', { name: 'Add tag' } ).fill( tagName );
-		await page.keyboard.press( 'Enter' );
+		await page
+			.getByRole( 'option', { name: `Create: ${ tagName }` } )
+			.click();
 
-		await expect( tags ).toHaveCount( 1 );
-		await expect( tags ).toContainText( tagName );
+		await expect( tagChip ).toBeVisible();
 
 		await editor.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
@@ -88,8 +92,7 @@ test.describe( 'Taxonomies', () => {
 		await editor.publishPost();
 		await page.reload();
 
-		await expect( tags ).toHaveCount( 1 );
-		await expect( tags ).toContainText( tagName );
+		await expect( tagChip ).toBeVisible();
 	} );
 
 	// See: https://github.com/WordPress/gutenberg/pull/21693.
@@ -109,13 +112,17 @@ test.describe( 'Taxonomies', () => {
 		}
 
 		const tagName = "tag'-" + generateRandomNumber();
-		const tags = page.locator( '.components-form-token-field__token-text' );
+		// The chip label is unescaped, so it matches the typed name.
+		const tagChip = page.getByRole( 'button', {
+			name: `Remove ${ tagName }`,
+		} );
 
 		await page.getByRole( 'combobox', { name: 'Add tag' } ).fill( tagName );
-		await page.keyboard.press( 'Enter' );
+		await page
+			.getByRole( 'option', { name: `Create: ${ tagName }` } )
+			.click();
 
-		await expect( tags ).toHaveCount( 1 );
-		await expect( tags ).toContainText( tagName );
+		await expect( tagChip ).toBeVisible();
 
 		await editor.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
@@ -123,7 +130,6 @@ test.describe( 'Taxonomies', () => {
 		await editor.publishPost();
 		await page.reload();
 
-		await expect( tags ).toHaveCount( 1 );
-		await expect( tags ).toContainText( tagName );
+		await expect( tagChip ).toBeVisible();
 	} );
 } );
