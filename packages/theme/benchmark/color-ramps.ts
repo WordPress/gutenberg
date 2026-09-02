@@ -6,6 +6,7 @@ import { parseArgs } from 'node:util';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 type RampModule = typeof import('../src/color-ramps/index.ts');
+type RampOutput = ReturnType< RampModule[ 'buildBgRamp' ] >;
 
 type BenchmarkResult = {
 	name: string;
@@ -31,7 +32,7 @@ type BenchmarkReport = {
 type BenchmarkCase = {
 	name: string;
 	iterationsPerSample: number;
-	run: () => string;
+	run: () => RampOutput | RampOutput[];
 };
 
 const WARMUP_SAMPLES = 8;
@@ -103,7 +104,7 @@ function createCases( rampModule: RampModule ): BenchmarkCase[] {
 			iterationsPerSample: 20,
 			run: () => {
 				const fixture = FIXTURES[ backgroundIndex++ % FIXTURES.length ];
-				return buildBgRamp( fixture.background ).ramp.fgFill;
+				return buildBgRamp( fixture.background );
 			},
 		},
 		{
@@ -114,7 +115,7 @@ function createCases( rampModule: RampModule ): BenchmarkCase[] {
 				return buildAccentRamp(
 					FIXTURES[ fixtureIndex ].primary,
 					accentBackgroundRamps[ fixtureIndex ]
-				).ramp.fgFill;
+				);
 			},
 		},
 		{
@@ -131,11 +132,10 @@ function createCases( rampModule: RampModule ): BenchmarkCase[] {
 					DEFAULT_SEED_COLORS.warning,
 					DEFAULT_SEED_COLORS.error,
 				];
-				let result = '';
+				const result = [ backgroundRamp ];
 
 				for ( const seed of accentSeeds ) {
-					result = buildAccentRamp( seed, backgroundRamp ).ramp
-						.fgFill;
+					result.push( buildAccentRamp( seed, backgroundRamp ) );
 				}
 				return result;
 			},
@@ -143,10 +143,24 @@ function createCases( rampModule: RampModule ): BenchmarkCase[] {
 	];
 }
 
+function updateChecksum( checksum: number, output: RampOutput | RampOutput[] ) {
+	const ramps = Array.isArray( output ) ? output : [ output ];
+	for ( const { ramp } of ramps ) {
+		for ( const color of Object.values( ramp ) ) {
+			for ( const character of color ) {
+				checksum =
+					( checksum * 31 + ( character.codePointAt( 0 ) ?? 0 ) ) %
+					2_147_483_647;
+			}
+		}
+	}
+	return checksum;
+}
+
 function measure( benchmarkCase: BenchmarkCase ): BenchmarkResult {
 	let checksum = 0;
 	const runSample = () => {
-		let result = '';
+		let result: RampOutput | RampOutput[] | undefined;
 		const start = performance.now();
 		for (
 			let iteration = 0;
@@ -157,10 +171,8 @@ function measure( benchmarkCase: BenchmarkCase ): BenchmarkResult {
 		}
 		const duration = performance.now() - start;
 
-		for ( const character of result ) {
-			checksum =
-				( checksum * 31 + ( character.codePointAt( 0 ) ?? 0 ) ) %
-				2_147_483_647;
+		if ( result ) {
+			checksum = updateChecksum( checksum, result );
 		}
 		return duration / benchmarkCase.iterationsPerSample;
 	};
