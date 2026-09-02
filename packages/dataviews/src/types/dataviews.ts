@@ -840,7 +840,9 @@ export interface ViewBaseProps< Item > {
 
 /**
  * The props passed to every picker layout component. Same as
- * `ViewBaseProps`, minus the item-click props pickers don't support.
+ * `ViewBaseProps`, minus the props pickers don't support: the item-click
+ * ones (`onClickItem`, `renderItemLink`, `isItemClickable`) and the
+ * hierarchy one (`getItemLevel`).
  */
 export type ViewPickerBaseProps< Item > = Omit<
 	ViewBaseProps< Item >,
