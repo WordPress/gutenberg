@@ -125,6 +125,7 @@
 }
 
 .scale-table td {
+	position: relative;
 	box-sizing: border-box;
 	height: 88px;
 	padding: 6px;
@@ -160,6 +161,26 @@
 .status[data-pass="false"] {
 	background: #fcf0f1;
 	color: #8a2424;
+}
+
+.anchor-status {
+	justify-self: start;
+	font-weight: 600;
+}
+
+.anchor-status[data-preserved="true"] {
+	color: #1d5f1d;
+}
+
+.seed-anchor {
+	position: absolute;
+	inset-block-start: 0;
+	inset-inline: 0;
+	box-sizing: border-box;
+	padding: 3px 5px;
+	border-block-end: 1px dashed currentColor;
+	font-size: 8px;
+	font-weight: 600;
 }
 
 .component-grid {

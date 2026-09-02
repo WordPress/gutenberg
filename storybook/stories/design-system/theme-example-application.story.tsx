@@ -35,7 +35,7 @@ const SIDEBAR_THEME_PRESETS = [
 	{
 		id: 'ectoplasm',
 		title: 'Ectoplasm',
-		colors: { primary: '#646c3e', background: '#4f386e' },
+		colors: { primary: '#a3b745', background: '#413256' },
 	},
 ] as const;
 
