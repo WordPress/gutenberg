@@ -73,6 +73,14 @@ When --baseline-root is set, each checkout runs in a separate Node.js process
 before the script reports the percentage difference.`;
 
 async function loadRampModule( sourceRoot: string ): Promise< RampModule > {
+	// Historical revisions relied on the full Color.js entry point to register
+	// these spaces. Register them here so the same benchmark can execute both
+	// sides without changing the measured ramp calls.
+	const { ColorSpace, OKLab, OKLCH, sRGB } = await import( 'colorjs.io/fn' );
+	ColorSpace.register( sRGB );
+	ColorSpace.register( OKLab );
+	ColorSpace.register( OKLCH );
+
 	const modulePath = resolve(
 		sourceRoot,
 		'packages/theme/src/color-ramps/index.ts'

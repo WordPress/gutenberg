@@ -18,7 +18,7 @@
 
 ### Enhancements
 
--   Generate foreground scales with five perception-aware steps, separate resting and active interactive colors, and keep active fills darker while preserving WCAG contrast floors. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
+-   Generate perception-aware color ramps with ordered surface and stroke progressions, five foreground steps, stronger active interactive colors, and unchanged WCAG contrast floors. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 -   Add a Lightning CSS visitor plugin that injects design system token fallbacks, available as `@wordpress/theme/lightningcss-plugins/lightningcss-ds-token-fallbacks`, with an optional peer range of `>=1.33.0 <2.0.0`. ([#80401](https://github.com/WordPress/gutenberg/pull/80401))
 
 ### Bug Fixes
@@ -35,6 +35,7 @@
 -   Reuse seed-dependent calculations during color-ramp constraint searches. ([#82545](https://github.com/WordPress/gutenberg/pull/82545))
 -   Generate the default ramps before derived token artifacts so one build uses the current ramp algorithm throughout. ([#82525](https://github.com/WordPress/gutenberg/pull/82525))
 -   Cache relative luminance calculations used by color-ramp contrast checks. ([#82445](https://github.com/WordPress/gutenberg/pull/82445))
+-   Generate the default ramps before derived token artifacts so one build uses the current ramp algorithm throughout. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 -   Enforce NodeNext module resolution in the build project so future declaration imports are checked against the package's published ESM resolution rules. ([#82088](https://github.com/WordPress/gutenberg/pull/82088))
 -   Update the `@types/node` development dependency to v24, matching the Node.js version the repository builds and tests against ([#82616](https://github.com/WordPress/gutenberg/pull/82616)).
 -   Declare the `@storybook/addon-docs` development dependency used by the package's story documentation ([#82676](https://github.com/WordPress/gutenberg/pull/82676)).
