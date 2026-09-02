@@ -10,6 +10,7 @@ import {
 	graphql,
 	getBaseline,
 	isAncestor,
+	NO_BASELINE_STATUS,
 	statusFor,
 	postStatus,
 } from './utils.mjs';
@@ -42,7 +43,6 @@ const PAGE_QUERY = `
 					commits(last: 1) {
 						nodes {
 							commit {
-								committedDate
 								status {
 									context(name: $context) {
 										state
@@ -81,7 +81,6 @@ async function listOpenPRs() {
 			prs.push( {
 				number: node.number,
 				headRefOid: node.headRefOid,
-				committedDate: commit?.committedDate ?? null,
 				status: commit?.status?.context ?? null,
 			} );
 		}
@@ -94,46 +93,25 @@ async function listOpenPRs() {
 }
 
 /**
- * Reads a commit's date, used as a cheap ancestry bound.
- *
- * @param {string} oid Commit SHA.
- * @return {Promise<string>} Commit date, ISO 8601.
- */
-async function commitDate( oid ) {
-	const [ owner, name ] = REPO.split( '/' );
-	const data = await graphql(
-		`
-			query ($owner: String!, $name: String!, $oid: GitObjectID!) {
-				repository(owner: $owner, name: $name) {
-					object(oid: $oid) {
-						... on Commit {
-							committedDate
-						}
-					}
-				}
-			}
-		`,
-		{ owner, name, oid }
-	);
-	return data.repository.object.committedDate;
-}
-
-/**
  * Brings every open PR's status in line with the current baseline.
  *
  * @param {CommandOptions} options Command options.
  */
 export async function fanout( { dryRun } ) {
 	const baseline = await getBaseline();
-	if ( baseline === null ) {
-		console.log( 'No baseline tag; nothing to fan out.' );
-		return;
-	}
-	const short = baseline.slice( 0, 7 );
-	const baselineDate = await commitDate( baseline );
+	/* A description names its baseline, so it identifies the current verdict. */
+	const current =
+		baseline === null
+			? [ NO_BASELINE_STATUS.description ]
+			: [
+					statusFor( true, baseline ).description,
+					statusFor( false, baseline ).description,
+			  ];
 
 	const prs = await listOpenPRs();
-	console.log( `Baseline ${ baseline }; ${ prs.length } open PRs.` );
+	console.log(
+		`Baseline ${ baseline ?? 'none' }; ${ prs.length } open PRs.`
+	);
 
 	let written = 0;
 	let skipped = 0;
@@ -141,20 +119,22 @@ export async function fanout( { dryRun } ) {
 	let budgetExhausted = false;
 
 	for ( const pr of prs ) {
-		/* Both descriptions embed the baseline; anything else needs a stamp. */
-		if ( pr.status?.description?.includes( short ) ) {
+		if ( pr.status && current.includes( pr.status.description ) ) {
 			skipped++;
 			continue;
 		}
-		/*
-		 * A head committed before the baseline cannot contain it, which spares
-		 * a compare call for all but the PRs updated since the baseline moved.
-		 */
-		const includesBaseline =
-			pr.committedDate && pr.committedDate < baselineDate
-				? false
-				: await isAncestor( baseline, pr.headRefOid );
-		const { state, description } = statusFor( includesBaseline, baseline );
+		/* With no baseline nothing is required, so only clear stale verdicts. */
+		if ( baseline === null && ! pr.status ) {
+			skipped++;
+			continue;
+		}
+		const { state, description } =
+			baseline === null
+				? NO_BASELINE_STATUS
+				: statusFor(
+						await isAncestor( baseline, pr.headRefOid ),
+						baseline
+				  );
 		try {
 			if (
 				! ( await postStatus(

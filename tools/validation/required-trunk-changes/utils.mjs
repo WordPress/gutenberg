@@ -162,6 +162,18 @@ export async function getTrunkHead() {
 	return commit.sha;
 }
 
+/** @type {StatusPayload} */
+export const NO_BASELINE_STATUS = {
+	state: 'success',
+	description: 'No required trunk changes.',
+};
+
+/*
+ * A sweep recognizes its own verdict by the abbreviated baseline in the
+ * description; this history has dozens of colliding 7-character prefixes.
+ */
+const SHORT_SHA_LENGTH = 12;
+
 /**
  * Builds the status payload for a required changes result.
  *
@@ -170,7 +182,7 @@ export async function getTrunkHead() {
  * @return {StatusPayload} Status state and description.
  */
 export function statusFor( includesBaseline, baseline ) {
-	const short = baseline.slice( 0, 7 );
+	const short = baseline.slice( 0, SHORT_SHA_LENGTH );
 	return includesBaseline
 		? {
 				state: 'success',
@@ -252,12 +264,14 @@ let minuteWindowStart = Date.now();
  * @return {Promise<boolean>} False when the per-run budget is exhausted.
  */
 export async function postStatus( sha, state, description, dryRun ) {
-	if ( dryRun ) {
-		console.log( `[dry-run] ${ sha }: ${ state } (${ description })` );
-		return true;
-	}
+	/* Budgeted before the dry-run exit, so a dry run models one real run. */
 	if ( writesThisRun >= MAX_WRITES_PER_RUN ) {
 		return false;
+	}
+	if ( dryRun ) {
+		console.log( `[dry-run] ${ sha }: ${ state } (${ description })` );
+		writesThisRun++;
+		return true;
 	}
 	if ( writesThisMinute >= MAX_WRITES_PER_MINUTE ) {
 		const waitMs = 60_000 - ( Date.now() - minuteWindowStart );

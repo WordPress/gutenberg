@@ -7,6 +7,7 @@ import {
 	fail,
 	getBaseline,
 	isAncestor,
+	NO_BASELINE_STATUS,
 	statusFor,
 	latestStatus,
 	postStatus,
@@ -25,7 +26,7 @@ import {
 async function evaluate( baseline, headSha ) {
 	/* No baseline means nothing is required of open PRs yet. */
 	if ( baseline === null ) {
-		return { state: 'success', description: 'No required trunk changes.' };
+		return NO_BASELINE_STATUS;
 	}
 	return statusFor( await isAncestor( baseline, headSha ), baseline );
 }
