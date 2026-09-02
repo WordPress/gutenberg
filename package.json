@@ -15,17 +15,17 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=20.19.0",
-		"npm": ">=10.2.3"
+		"node": ">=24.18.0",
+		"npm": ">=11.16.0"
 	},
 	"devEngines": {
 		"runtime": {
 			"name": "node",
-			"version": ">=20.19.0"
+			"version": ">=24.18.0"
 		},
 		"packageManager": {
 			"name": "npm",
-			"version": ">=10.2.3",
+			"version": ">=11.16.0",
 			"onFail": "error"
 		}
 	},
