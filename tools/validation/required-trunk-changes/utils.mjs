@@ -43,6 +43,24 @@ export function fail( message ) {
  * @param {{ method?: string, body?: string, headers?: Record<string, string>, allow404?: boolean }} [options] Fetch options.
  * @return {Promise<unknown>} Parsed JSON response.
  */
+export const RATE_LIMIT_ERROR = 'RateLimitError';
+
+/**
+ * Detects a primary or secondary rate limit response.
+ *
+ * @param {Response} response Fetch response.
+ * @return {boolean} Whether the request was rate limited.
+ */
+function isRateLimited( response ) {
+	if ( response.status !== 403 && response.status !== 429 ) {
+		return false;
+	}
+	return (
+		response.headers.get( 'x-ratelimit-remaining' ) === '0' ||
+		response.headers.has( 'retry-after' )
+	);
+}
+
 async function api( path, options = {} ) {
 	const RETRYABLE_STATUS = [ 502, 503, 504 ];
 	const MAX_ATTEMPTS = 3;
@@ -60,6 +78,13 @@ async function api( path, options = {} ) {
 			if ( ! response.ok ) {
 				if ( response.status === 404 && options.allow404 ) {
 					return null;
+				}
+				if ( isRateLimited( response ) ) {
+					const error = new Error(
+						`GitHub API rate limit reached on ${ path }.`
+					);
+					error.name = RATE_LIMIT_ERROR;
+					throw error;
 				}
 				if (
 					RETRYABLE_STATUS.includes( response.status ) &&
@@ -253,6 +278,16 @@ export async function updateTagRef( sha, create ) {
 let writesThisRun = 0;
 let writesThisMinute = 0;
 let minuteWindowStart = Date.now();
+
+/**
+ * Reports whether the run can still write, so a caller can stop before
+ * spending an ancestry request it cannot act on.
+ *
+ * @return {boolean} Whether the per-run budget has room.
+ */
+export function hasWriteBudget() {
+	return writesThisRun < MAX_WRITES_PER_RUN;
+}
 
 /**
  * Posts a commit status, honoring the per-minute and per-run write budgets.

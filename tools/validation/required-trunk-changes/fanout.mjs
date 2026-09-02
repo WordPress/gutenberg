@@ -9,14 +9,17 @@ import {
 	REPO,
 	graphql,
 	getBaseline,
+	hasWriteBudget,
 	isAncestor,
 	NO_BASELINE_STATUS,
+	RATE_LIMIT_ERROR,
 	statusFor,
 	postStatus,
 } from './utils.mjs';
 
 /** @typedef {import('./types.mjs').CommandOptions} CommandOptions */
 /** @typedef {import('./types.mjs').PullRequest} PullRequest */
+/** @typedef {import('./types.mjs').ContextStatus} ContextStatus */
 
 const PAGE_QUERY = `
 	query (
@@ -102,11 +105,14 @@ export async function fanout( { dryRun } ) {
 	/* A description names its baseline, so it identifies the current verdict. */
 	const current =
 		baseline === null
-			? [ NO_BASELINE_STATUS.description ]
-			: [
-					statusFor( true, baseline ).description,
-					statusFor( false, baseline ).description,
-			  ];
+			? [ NO_BASELINE_STATUS ]
+			: [ statusFor( true, baseline ), statusFor( false, baseline ) ];
+	const isCurrent = ( /** @type {ContextStatus} */ status ) =>
+		current.some(
+			( payload ) =>
+				payload.state.toUpperCase() === status.state &&
+				payload.description === status.description
+		);
 
 	const prs = await listOpenPRs();
 	console.log(
@@ -117,9 +123,10 @@ export async function fanout( { dryRun } ) {
 	let skipped = 0;
 	let failed = 0;
 	let budgetExhausted = false;
+	let rateLimited = false;
 
 	for ( const pr of prs ) {
-		if ( pr.status && current.includes( pr.status.description ) ) {
+		if ( pr.status && isCurrent( pr.status ) ) {
 			skipped++;
 			continue;
 		}
@@ -128,25 +135,20 @@ export async function fanout( { dryRun } ) {
 			skipped++;
 			continue;
 		}
-		const { state, description } =
-			baseline === null
-				? NO_BASELINE_STATUS
-				: statusFor(
-						await isAncestor( baseline, pr.headRefOid ),
-						baseline
-				  );
+		/* Probed first so an unwritable PR costs no ancestry request. */
+		if ( ! hasWriteBudget() ) {
+			budgetExhausted = true;
+			break;
+		}
 		try {
-			if (
-				! ( await postStatus(
-					pr.headRefOid,
-					state,
-					description,
-					dryRun
-				) )
-			) {
-				budgetExhausted = true;
-				break;
-			}
+			const { state, description } =
+				baseline === null
+					? NO_BASELINE_STATUS
+					: statusFor(
+							await isAncestor( baseline, pr.headRefOid ),
+							baseline
+					  );
+			await postStatus( pr.headRefOid, state, description, dryRun );
 			written++;
 		} catch ( error ) {
 			failed++;
@@ -155,17 +157,24 @@ export async function fanout( { dryRun } ) {
 					error instanceof Error ? error.message : error
 				}`
 			);
+			if ( error instanceof Error && error.name === RATE_LIMIT_ERROR ) {
+				rateLimited = true;
+				break;
+			}
 		}
 	}
 
+	const incomplete = budgetExhausted || rateLimited;
 	console.log(
-		`Fan-out done: ${ written } written, ${ skipped } skipped, ${ failed } failed.` +
-			( budgetExhausted
-				? ' Write budget exhausted; dispatch the workflow again to continue.'
+		`Sweep done: ${ written } written, ${ skipped } skipped, ${ failed } failed.` +
+			( rateLimited ? ' Rate limited.' : '' ) +
+			( budgetExhausted ? ' Write budget exhausted.' : '' ) +
+			( incomplete
+				? ' Dispatch the workflow with sweep: true in about an hour to continue.'
 				: '' )
 	);
 	// Nonzero exit makes an incomplete or lossy sweep visible in the run list.
-	if ( failed > 0 || budgetExhausted ) {
+	if ( failed > 0 || incomplete ) {
 		process.exitCode = 1;
 	}
 }

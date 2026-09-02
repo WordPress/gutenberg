@@ -9,7 +9,11 @@ on:
     workflow_dispatch:
         inputs:
             move-baseline:
-                description: 'Move the baseline tag to current trunk HEAD and flip stale statuses'
+                description: 'Move the baseline tag to current trunk HEAD, then sweep open PRs'
+                type: boolean
+                default: false
+            sweep:
+                description: 'Sweep open PRs against the current baseline, without moving it'
                 type: boolean
                 default: false
 
@@ -54,16 +58,15 @@ jobs:
               run: npm run --workspace @wordpress/validation-tools required-trunk-changes -- check --head-sha "$HEAD_SHA"
 
     move-baseline:
-        name: Move required trunk baseline
+        name: Move the required trunk baseline or sweep
         # The baseline moves only through explicit intent: a dispatch with
         # move-baseline, or a merged PR carrying the required-update label
-        # (detected cumulatively on every trunk push). Re-dispatching when the
-        # tag is already current re-runs the fan-out, which is the retry path
-        # after an interrupted sweep.
+        # (detected cumulatively on every trunk push). An interrupted sweep is
+        # resumed with sweep, which leaves the baseline where it is.
         if: >
             github.repository == 'WordPress/gutenberg' && (
                 github.event_name == 'push' ||
-                (github.event_name == 'workflow_dispatch' && inputs.move-baseline)
+                (github.event_name == 'workflow_dispatch' && (inputs.move-baseline || inputs.sweep))
             )
         runs-on: ubuntu-latest
         timeout-minutes: 30
@@ -84,5 +87,12 @@ jobs:
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
 
-            - name: Move the baseline tag and fan out
+            - name: Move the baseline tag and sweep open PRs
+              if: github.event_name == 'push' || inputs.move-baseline
               run: npm run --workspace @wordpress/validation-tools required-trunk-changes -- move-baseline --force="$FORCE" --then-fanout
+
+            # Retries sweep without moving, so a baseline is not chased by
+            # trunk while a multi-run sweep is still catching up.
+            - name: Sweep open PRs against the current baseline
+              if: github.event_name == 'workflow_dispatch' && inputs.sweep && ! inputs.move-baseline
+              run: npm run --workspace @wordpress/validation-tools required-trunk-changes -- fanout
