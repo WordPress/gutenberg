@@ -140,11 +140,17 @@ $block-editor-link-control-number-of-actions: 1;
 	&.components-button.components-menu-item__button {
 		height: auto;
 		text-align: left;
+		// Keep icon, title, and post type aligned to the first line when titles wrap.
+		// See https://github.com/WordPress/gutenberg/issues/21343
+		align-items: flex-start;
 	}
 
 	.components-menu-item__item {
-		overflow: hidden;
-		text-overflow: ellipsis;
+		// Show the full title instead of truncating similar suggestions.
+		overflow: visible;
+		text-overflow: unset;
+		white-space: normal;
+		overflow-wrap: break-word;
 		// Inline block required to preserve white space
 		// between `<mark>` elements and text nodes.
 		display: inline-block;
@@ -160,6 +166,7 @@ $block-editor-link-control-number-of-actions: 1;
 	.components-menu-item__shortcut {
 		color: $gray-700;
 		white-space: nowrap; // tags shouldn't go over two lines.
+		align-self: flex-start;
 	}
 
 	&[aria-selected] {
