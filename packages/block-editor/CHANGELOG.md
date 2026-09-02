@@ -23,6 +23,7 @@
 -   Element styles: Register each block's element-style CSS override with the block's `clientId`, so the editor orders them by block position instead of registration order. A parent's link color re-registered after a child's (e.g. by resetting and re-picking it) no longer overrides the child's own link color in the canvas ([#77833](https://github.com/WordPress/gutenberg/pull/77833)).
 -   Client-side media processing: Refuse a batch of more than one file when the caller only takes one, such as a Cover block placeholder, matching what the server-side upload path already did. Every dropped file was uploaded instead, and the block kept whichever one finished last ([#82041](https://github.com/WordPress/gutenberg/issues/82041)).
 -   `BlockVariationPicker`: Set icon colors with `color` so stroke-based variation icons retain their intended unfilled appearance, while keeping a non-important `fill` fallback for third-party icons that do not use `currentColor`. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+-   Block Settings Menu: The `Copy` and `Cut` items now write the same `text/plain` and `text/html` clipboard data as the keyboard shortcuts, so blocks copied from the menu paste as formatted content in rich text targets instead of raw block markup ([#80603](https://github.com/WordPress/gutenberg/pull/80603)).
 
 ### Internal
 
