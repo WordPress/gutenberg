@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import type { WidgetType } from '@wordpress/widget-primitives';
 import { enforceLayoutPolicy } from '../utils/enforce-layout-policy';
 import type {
@@ -53,7 +54,7 @@ describe( 'enforceLayoutPolicy', () => {
 	} );
 
 	it( 'asks with the previous instance and its resolved type', () => {
-		const canPerform = jest.fn( allowAll );
+		const canPerform = vi.fn( allowAll );
 		const previous = [ widget( 'a', { attributes: { label: 'one' } } ) ];
 		const next = [ { ...previous[ 0 ], attributes: { label: 'two' } } ];
 
@@ -112,7 +113,7 @@ describe( 'enforceLayoutPolicy', () => {
 
 	describe( 'unregistered type', () => {
 		it( 'asks instance operations with widgetType absent', () => {
-			const canPerform = jest.fn( allowAll );
+			const canPerform = vi.fn( allowAll );
 			const previous = [ widget( 'a', { type: 'test/gone' } ) ];
 			const next = [ { ...previous[ 0 ], attributes: { label: 'x' } } ];
 
