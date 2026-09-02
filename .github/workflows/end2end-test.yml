@@ -40,7 +40,7 @@ jobs:
                   predicate-quantifier: 'every'
                   filters: |
                       relevant:
-                          # Start from every file, then subtract what cannot change a test result.
+                          # Start from every file, then exclude what cannot change a test result.
                           - '**'
                           # Documentation.
                           - '!**/*.md'

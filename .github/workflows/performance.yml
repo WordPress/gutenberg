@@ -48,12 +48,12 @@ jobs:
                   predicate-quantifier: 'every'
                   filters: |
                       relevant:
-                          # Start from every file, then subtract what cannot move a metric.
+                          # Start from every file, then exclude what cannot change a performance result.
                           - '**'
                           # Documentation and schemas.
                           - '!**/*.md'
                           - '!{backport-changelog,docs,phpunit,schemas,storybook,typings}/**'
-                          # Test suites, which the plugin build does not ship.
+                          # Other test suites, which cannot affect the measurements.
                           - '!test/{integration,php,storybook-playwright,unit}/**'
                           - '!test/e2e/{*,!(assets)/**}'
                           - '!{packages,tools}/**/{test,tests}/**'
