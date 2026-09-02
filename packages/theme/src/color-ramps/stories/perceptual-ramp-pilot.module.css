@@ -172,7 +172,8 @@
 	color: #1d5f1d;
 }
 
-.seed-anchor {
+.seed-anchor,
+.unavailable-step {
 	position: absolute;
 	inset-block-start: 0;
 	inset-inline: 0;
@@ -181,6 +182,11 @@
 	border-block-end: 1px dashed currentColor;
 	font-size: 8px;
 	font-weight: 600;
+}
+
+.unavailable-step {
+	background: rgb(0 0 0 / 72%);
+	color: #fff;
 }
 
 .component-grid {
