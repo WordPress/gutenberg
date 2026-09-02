@@ -295,6 +295,108 @@ export type EntityRecordOf<
 	keyof EntityRecordTypes< C >[ Kind ] ];
 
 /**
+ * The context a `root` entity is fetched in when the call names none.
+ *
+ * Mirrors the `baseURLParams` each entity is registered with in
+ * `entities.js`. An entity registered without a `context` sends no such
+ * parameter, so the REST API applies its own default of `view`.
+ *
+ * @see EntityContextDefaults
+ */
+export interface RootEntityContexts {
+	// Registered with `_fields` but no `context`, so the server default applies.
+	__unstableBase: 'view';
+	comment: 'edit';
+	fontCollection: 'view';
+	globalStyles: 'edit';
+	icon: 'view';
+	media: 'edit';
+	menu: 'edit';
+	menuItem: 'edit';
+	menuLocation: 'edit';
+	plugin: 'edit';
+	postType: 'edit';
+	sidebar: 'edit';
+	site: 'edit';
+	status: 'edit';
+	taxonomy: 'edit';
+	theme: 'edit';
+	user: 'edit';
+	widget: 'edit';
+	widgetType: 'edit';
+}
+
+/**
+ * The context a post type is fetched in when the call names none.
+ *
+ * `loadPostTypeEntities` registers every post type with `context: 'edit'`.
+ *
+ * @see EntityContextDefaults
+ */
+export interface PostTypeEntityContexts {
+	attachment: 'edit';
+	page: 'edit';
+	post: 'edit';
+	wp_block: 'edit';
+	wp_font_family: 'edit';
+	wp_navigation: 'edit';
+	wp_template: 'edit';
+	wp_template_part: 'edit';
+}
+
+/**
+ * The context a taxonomy is fetched in when the call names none.
+ *
+ * `loadTaxonomyEntities` registers every taxonomy with `context: 'edit'`.
+ *
+ * @see EntityContextDefaults
+ */
+export interface TaxonomyEntityContexts {
+	category: 'edit';
+	post_tag: 'edit';
+}
+
+/**
+ * Maps a `kind`/`name` pair to the context it is fetched in when the call
+ * names none.
+ *
+ * A call passes no `context` far more often than it passes one, so the type it
+ * gets back in that case is decided here rather than assumed. `addEntities()`
+ * takes a `baseURLParams`, and an entity registered with `context: 'view'`
+ * serialises the view fields however the call is written -- typing those
+ * results as `edit` would offer fields the response does not carry.
+ *
+ * A pair with no entry resolves to every context, so the fields common to all
+ * three stay readable and the edit-only ones do not. A plugin narrows that by
+ * merging its own pairs in, the same way it extends `EntityRecordTypes`.
+ *
+ * @see DefaultContextOf
+ */
+export interface EntityContextDefaults {
+	root: RootEntityContexts;
+	postType: PostTypeEntityContexts;
+	taxonomy: TaxonomyEntityContexts;
+}
+
+/**
+ * The context a `kind`/`name` pair is fetched in when the call names none.
+ *
+ * Falls back to every context for a pair the map does not cover, which is the
+ * conservative answer: the entity is registered at runtime, so its
+ * `baseURLParams` are not knowable here.
+ */
+export type DefaultContextOf<
+	Kind extends EntityKind,
+	Name extends EntityNameOf< Kind >,
+> = Kind extends keyof EntityContextDefaults
+	? Name extends keyof EntityContextDefaults[ Kind ]
+		? EntityContextDefaults[ Kind ][ Name ] extends Context
+			? EntityContextDefaults[ Kind ][ Name ]
+			: Context
+		: Context
+	: Context;
+
+/**
  * The contexts a query's `context` property can hold.
  *
  * A literal, or a union of them, is the context the request will use. Anything
@@ -312,17 +414,18 @@ type ContextsOf< Requested > = Context extends Requested
  *
  * Only an inline object keeps `context` as a literal: assigning that same
  * object to a variable widens the property to `string` at the declaration,
- * before the call is made. A query with no `context` keeps the default.
+ * before the call is made. A query with no `context` falls back to `Default`,
+ * the context the entity is registered to be fetched in.
  *
  * Each member of a union query is resolved on its own, because `keyof` over a
  * union is the intersection of its keys -- a `{ context: 'view' } | { per_page:
  * number }` query would otherwise look like it carries no `context` at all and
- * fall back to `edit`.
+ * fall back to the default.
  */
-type ContextOfQuery< Query > = Query extends unknown
+type ContextOfQuery< Query, Default extends Context > = Query extends unknown
 	? 'context' extends keyof Query
 		? ContextsOf< Query[ 'context' & keyof Query ] >
-		: 'edit'
+		: Default
 	: never;
 
 /**
@@ -355,4 +458,8 @@ export type EntityRecordOfQuery<
 	Kind extends EntityKind,
 	Name extends EntityNameOf< Kind >,
 	Query,
-> = EntityRecordInContexts< Kind, Name, ContextOfQuery< Query > >;
+> = EntityRecordInContexts<
+	Kind,
+	Name,
+	ContextOfQuery< Query, DefaultContextOf< Kind, Name > >
+>;

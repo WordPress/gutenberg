@@ -14,7 +14,7 @@
 
 ### Enhancements
 
--   `getEntityRecord` and `getEntityRecords` now infer the record type from their `kind` and `name` arguments and resolve its context from the query, so `getEntityRecord( 'postType', 'post', id ).title` type checks without naming `Post` by hand, and a `context: 'view'` request is not typed with the edit-context fields. Pairs the map does not cover still resolve to the previous union, and a plugin opts in by merging into `EntityRecordTypes` or a per-kind interface. Adds `Block`, `Navigation` and `GlobalStyles` records, and drops the call-site type assertions -- two were hiding nullable values. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
+-   `getEntityRecord` and `getEntityRecords` now infer the record type from their `kind` and `name` arguments and resolve its context from the query, so `getEntityRecord( 'postType', 'post', id ).title` type checks without naming `Post` by hand, and a `context: 'view'` request is not typed with the edit-context fields. Pairs the map does not cover still resolve to the previous union, and a plugin opts in by merging into `EntityRecordTypes` or a per-kind interface. A call that names no context resolves the one its entity is registered to be fetched in, declared in `EntityContextDefaults` and extended the same way, so the few entities fetched in the `view` context are not typed with the edit record; a pair that declares none resolves to every context. Adds `Block`, `Navigation` and `GlobalStyles` records, and drops the call-site type assertions -- two were hiding nullable values. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
 
 ### Internal
 

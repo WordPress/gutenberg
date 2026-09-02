@@ -17,8 +17,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars -- the values exist only so their inferred types can be asserted. */
 import { select, resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '../../index';
-import type { EntityRecordOf, EntityRecordOfQuery } from '../index';
-import type { Context } from '../helpers';
+import type {
+	DefaultContextOf,
+	EntityRecordOf,
+	EntityRecordOfQuery,
+} from '../index';
+import type { Context, ContextualField, OmitNevers } from '../helpers';
 import type { Attachment } from '../attachment';
 import type { Base } from '../base';
 import type { Comment } from '../comment';
@@ -63,6 +67,17 @@ interface Order< C extends Context > {
 	context?: C;
 }
 
+/**
+ * A plugin record with a field only the edit context serialises, so the
+ * context it resolves to is observable rather than nominal.
+ */
+type Coupon< C extends Context > = OmitNevers< {
+	id: number;
+	code: string;
+	secret: ContextualField< string, 'edit', C >;
+	context?: C;
+} >;
+
 /*
  * These augmentations are program-global: every name declared here is visible
  * to the rest of the suite. They deliberately avoid the names asserted to be
@@ -80,7 +95,17 @@ declare module '../index' {
 	}
 	// A whole new kind, which merges at the top level as before.
 	interface EntityRecordTypes< C extends Context > {
-		myShop: { order: Order< C > };
+		myShop: { order: Order< C >; coupon: Coupon< C > };
+	}
+
+	// The same shape for the context each pair is fetched in. `product`
+	// declares one; `order` deliberately does not, so it exercises the
+	// fallback.
+	interface PostTypeEntityContexts {
+		product: 'edit';
+	}
+	interface EntityContextDefaults {
+		myShop: { coupon: 'view' };
 	}
 }
 
@@ -596,6 +621,108 @@ describe( 'Entity record types', () => {
 				Product< 'edit' > | undefined
 			>;
 			product?.price satisfies string | undefined;
+		};
+	} );
+
+	describe( 'a call with no query uses the context the entity is fetched in', () => {
+		() => {
+			/*
+			 * Most entities are registered with `context: 'edit'`, but a few
+			 * are not, and `__unstableBase` sends no `context` at all so the
+			 * server applies its own default of `view`.
+			 */
+			true satisfies Expect<
+				DefaultContextOf< 'postType', 'post' >,
+				'edit'
+			>;
+			true satisfies Expect<
+				DefaultContextOf< 'taxonomy', 'category' >,
+				'edit'
+			>;
+			true satisfies Expect<
+				DefaultContextOf< 'root', 'comment' >,
+				'edit'
+			>;
+			true satisfies Expect<
+				DefaultContextOf< 'root', '__unstableBase' >,
+				'view'
+			>;
+			true satisfies Expect<
+				DefaultContextOf< 'root', 'fontCollection' >,
+				'view'
+			>;
+			true satisfies Expect< DefaultContextOf< 'root', 'icon' >, 'view' >;
+
+			// The default reaches the selectors, so a view-default entity is
+			// not typed with the edit record.
+			const base = select( coreStore ).getEntityRecord(
+				'root',
+				'__unstableBase'
+			);
+			true satisfies Expect< typeof base, Base< 'view' > | undefined >;
+
+			// Naming a context still wins over the default.
+			const editBase = select( coreStore ).getEntityRecord(
+				'root',
+				'__unstableBase',
+				undefined,
+				{ context: 'edit' }
+			);
+			true satisfies Expect<
+				typeof editBase,
+				Base< 'edit' > | undefined
+			>;
+		};
+	} );
+
+	describe( 'a plugin declares the context its entity is fetched in', () => {
+		() => {
+			// A pair that declares `view` resolves to the view record, so the
+			// edit-only field is unreadable without asking for `edit`.
+			true satisfies Expect<
+				DefaultContextOf< 'myShop', 'coupon' >,
+				'view'
+			>;
+			const coupon = select( coreStore ).getEntityRecord(
+				'myShop',
+				'coupon',
+				1
+			);
+			true satisfies Expect<
+				typeof coupon,
+				Coupon< 'view' > | undefined
+			>;
+			coupon?.code satisfies string | undefined;
+			// @ts-expect-error -- `secret` is edit-only, so a view record omits it.
+			coupon?.secret;
+
+			const editCoupon = select( coreStore ).getEntityRecord(
+				'myShop',
+				'coupon',
+				1,
+				{ context: 'edit' }
+			);
+			editCoupon?.secret satisfies string | undefined;
+
+			/*
+			 * A pair that declares nothing resolves to every context, which is
+			 * the conservative answer: the entity is registered at runtime, so
+			 * its `baseURLParams` are not knowable from the type alone.
+			 */
+			true satisfies Expect<
+				DefaultContextOf< 'myShop', 'order' >,
+				Context
+			>;
+			const order = select( coreStore ).getEntityRecord(
+				'myShop',
+				'order',
+				1
+			);
+			true satisfies Expect<
+				typeof order,
+				Order< 'view' > | Order< 'edit' > | Order< 'embed' > | undefined
+			>;
+			order?.total satisfies string | undefined;
 		};
 	} );
 } );
