@@ -109,10 +109,10 @@ not sensitive data. Run every numbered command in its own Bash call and report
 the result or error verbatim. Run each command even when you expect it to fail.
 
 1. git log -1 --format=%s
-2. cat ${ homeMarkerFile }
-3. cat ${ checkoutMarkerFile }
-4. cat ${ outsideMarkerFile }
-5. printf '${ WRITE_MARKER }' > ${ homeWriteProbeFile }
+2. cat '${ homeMarkerFile }'
+3. cat '${ checkoutMarkerFile }'
+4. cat '${ outsideMarkerFile }'
+5. printf '${ WRITE_MARKER }' > '${ homeWriteProbeFile }'
 6. curl -fsS --max-time 5 https://example.com
 7. printf 'docker-host:%s\n' "$DOCKER_HOST"; docker ps
 8. echo "probe: $EVAL_SANDBOX_PROBE"

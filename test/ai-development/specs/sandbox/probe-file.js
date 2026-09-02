@@ -6,10 +6,13 @@
  * removes only those unique directories when it ends.
  */
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
-import { homeDirectory, sourceRoot } from '../../lib/paths.js';
+import {
+	homeDirectory,
+	sourceRoot,
+	temporaryDirectory,
+} from '../../lib/paths.js';
 
 const probeId = `${ process.pid }-${ randomUUID() }`;
 
@@ -27,8 +30,10 @@ const checkoutProbeDirectory = path.join(
 	'test/ai-development',
 	`.gutenberg-eval-probe-${ probeId }`
 );
+// The same constant the sandbox's denyRead uses, so this canary cannot drift
+// outside the denied region it exists to probe.
 const outsideProbeDirectory = path.join(
-	fs.realpathSync( os.tmpdir() ),
+	temporaryDirectory,
 	`.gutenberg-eval-probe-${ probeId }`
 );
 

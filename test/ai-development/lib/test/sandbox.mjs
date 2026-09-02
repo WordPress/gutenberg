@@ -5,6 +5,7 @@
 /* eslint import/no-unresolved: off */
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import path from 'node:path';
 import test from 'node:test';
 import { loadApiProvider } from 'promptfoo';
 import { workspace } from '../paths.js';
@@ -24,7 +25,7 @@ test( 'the sandbox denies reads by region, not by denying the root', () => {
 	// surrounds it — otherwise its siblings in the temp directory are open.
 	assert.equal(
 		sandbox.filesystem.denyRead.some( ( denied ) =>
-			workspace.startsWith( `${ denied }/` )
+			workspace.startsWith( `${ denied }${ path.sep }` )
 		),
 		true,
 		'no denied read region surrounds the workspace'

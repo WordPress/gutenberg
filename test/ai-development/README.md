@@ -56,7 +56,7 @@ Promptfoo does not implement sandboxing. It passes the `sandbox` and `settings` 
 
 |                           | Covers                                               | Path syntax  | Default                                           |
 | ------------------------- | ---------------------------------------------------- | ------------ | ------------------------------------------------- |
-| `sandbox.filesystem`      | Bash and every process it starts, enforced by the OS | `/absolute`  | reads: everywhere; writes: working directory only |
+| `sandbox.filesystem`      | Bash and every process it starts, enforced by the OS | `/absolute`  | reads: everywhere; writes: working directory and session temp only |
 | `Read()` / `Edit()` rules | every tool, checked before it runs                   | `//absolute` | a path outside `working_dir` is refused           |
 
 So:

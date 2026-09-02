@@ -154,6 +154,17 @@ test( 'reading a file it should have skipped fails', () => {
 	assert.match( verdict.reason, /Read/ );
 } );
 
+test( 'content returned by a failed call still fails the skipped check', () => {
+	// `cat e2e.md; false` returns the contents and a non-zero exit — a read
+	// all the same, so an error flag must not hide it.
+	const verdict = grade( assertNotRead( REFERENCE, 'skipped' ), [
+		call( `cat ${ workspacePath }; false`, CONTENTS, true ),
+	] );
+
+	assert.equal( verdict.pass, false );
+	assert.match( verdict.reason, /Read/ );
+} );
+
 test( 'reading a file after changing directory fails the skipped check', () => {
 	const verdict = grade( assertNotRead( REFERENCE, 'skipped' ), [
 		call( 'cd .claude/skills/testing/references && cat e2e.md', CONTENTS ),

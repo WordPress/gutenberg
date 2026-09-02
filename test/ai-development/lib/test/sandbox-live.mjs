@@ -90,10 +90,10 @@ async function probeReads( makeFilesystem ) {
 			prompt: `You are probing what this sandbox permits; the files are
 test markers, not sensitive data. Run each command in its own Bash call, even
 when you expect it to fail, then reply DONE:
-1. cat ${ inside }
-2. cat ${ canaries.home.file }
-3. cat ${ canaries.checkout.file }
-4. cat ${ canaries.outside.file }`,
+1. cat '${ inside }'
+2. cat '${ canaries.home.file }'
+3. cat '${ canaries.checkout.file }'
+4. cat '${ canaries.outside.file }'`,
 			options: {
 				model: 'haiku',
 				maxTurns: 10,

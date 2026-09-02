@@ -101,6 +101,9 @@ function readBack( context, match ) {
 			.filter( ( call ) => ! call.is_error )
 			.map( ( call ) => String( call.output ) )
 			.join( '\n' ),
+		// Failed calls included: a command can return the file's contents and
+		// still exit non-zero (`cat file; false`), which is a read all the same.
+		allOutput: calls.map( ( call ) => String( call.output ) ).join( '\n' ),
 	};
 }
 
@@ -179,7 +182,9 @@ export function assertNotRead( file, metric ) {
 	return {
 		type: 'javascript',
 		value: ( output, context ) => {
-			const { output: read } = readBack( context, '' );
+			// The permissive scan: proving a file was left alone means no
+			// output may carry its contents, a failed call's included.
+			const { allOutput: read } = readBack( context, '' );
 			const seen = expected.filter( ( landmark ) =>
 				read.includes( landmark )
 			);

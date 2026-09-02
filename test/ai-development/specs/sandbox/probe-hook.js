@@ -47,7 +47,10 @@ const settings = {
 				hooks: [
 					{
 						type: 'command',
-						command: `echo ${ HOOK_MARKER } > ${ hookMarkerFile }`,
+						// Quoted so a path with whitespace still writes the
+						// marker — an unwritten marker reads as the hook
+						// having been stopped.
+						command: `echo ${ HOOK_MARKER } > '${ hookMarkerFile }'`,
 					},
 				],
 			},
