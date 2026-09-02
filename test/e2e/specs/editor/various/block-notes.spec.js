@@ -1703,6 +1703,65 @@ test.describe( 'Block Notes', () => {
 			);
 		} );
 
+		test( 'floats an "Add note" button next to a text selection', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Hello brave new world.' },
+			} );
+
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			const floatingButton = page
+				.getByRole( 'toolbar', { name: 'Notes' } )
+				.getByRole( 'button', { name: 'Add note' } );
+
+			// The button only appears once a selection has held for a short
+			// delay, so a plain `toBeHidden()` would pass before it had a
+			// chance to show. Waiting for it and expecting that wait to time
+			// out proves it stays hidden.
+			const expectToStayHidden = () =>
+				expect(
+					floatingButton.waitFor( {
+						state: 'visible',
+						timeout: 1000,
+					} )
+				).rejects.toThrow();
+
+			// A collapsed caret gets no button.
+			await paragraph.click();
+			await expectToStayHidden();
+
+			// Selecting "brave" (offsets 6-11) surfaces it.
+			await blockNoteUtils.selectBlockText( { start: 6, length: 5 } );
+			await expect( floatingButton ).toBeVisible();
+
+			// Clicking it opens the new-note form, and saving wraps only the
+			// selected text: the click must not disturb the selection.
+			await floatingButton.click();
+			await page
+				.getByRole( 'textbox', { name: 'New note', exact: true } )
+				.fill( 'Just this word' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+
+			const mark = editor.canvas.locator( 'mark.wp-note' );
+			await expect( mark ).toHaveCount( 1 );
+			await expect( mark ).toHaveText( 'brave' );
+
+			// Re-selecting text that already carries a note keeps the button
+			// hidden; the note format syncs the sidebar to that note instead.
+			await paragraph.click();
+			await blockNoteUtils.selectBlockText( { start: 6, length: 5 } );
+			await expectToStayHidden();
+		} );
+
 		test.describe( 'Floating alignment', () => {
 			// Tall enough that the floating form/thread anchored at the last
 			// line still fits fully within the viewport: a thread extending
