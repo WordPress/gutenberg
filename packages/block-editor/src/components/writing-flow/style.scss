@@ -3,10 +3,19 @@
 }
 
 /* The stop elements are zero-size, so the focus indication is drawn around
-   the canvas they stand for. The class is toggled from the stops' focus and
-   blur handlers; Safari does not reliably recompute `:has(:focus)`. */
-.has-canvas-stop-focus > iframe[name="editor-canvas"],
-.has-canvas-stop-focus > .block-editor-writing-flow {
-	outline: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
-	outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
+   the canvas they stand for. It is an overlay rather than an outline on the
+   frame, which Safari can paint underneath the frame's content, and the class
+   is toggled from the stops' focus and blur handlers, because Safari does not
+   reliably recompute `:has(:focus)`. */
+.has-canvas-stop-focus {
+	position: relative;
+}
+
+.has-canvas-stop-focus::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	pointer-events: none;
+	border: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
 }
