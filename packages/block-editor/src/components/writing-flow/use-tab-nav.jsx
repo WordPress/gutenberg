@@ -22,8 +22,7 @@ const PREVENT_SCROLL_ON_FOCUS = {
 
 export default function useTabNav() {
 	const containerRef = /** @type {typeof useRef<HTMLElement>} */ ( useRef )();
-	const focusCaptureBeforeRef = useRef();
-	const focusCaptureAfterRef = useRef();
+	const canvasStopRef = useRef();
 	const hintId = useInstanceId(
 		useTabNav,
 		'block-editor-writing-flow__canvas-stop-hint'
@@ -99,7 +98,7 @@ export default function useTabNav() {
 		}
 	}
 
-	function onStopKeyDown( event, isAfter ) {
+	function onStopKeyDown( event ) {
 		if (
 			event.defaultPrevented ||
 			event.ctrlKey ||
@@ -121,78 +120,59 @@ export default function useTabNav() {
 				key === 'ArrowUp' )
 		) {
 			event.preventDefault();
-			enterCanvas( key === 'ArrowUp' ? true : isAfter );
+			enterCanvas( key === 'ArrowUp' );
 			return;
 		}
 
-		// The whole canvas is one stop: Tab moves past it, so from the stop
-		// before it, skip over the contents and the stop after it, and the
-		// other way around backwards.
-		if ( key === 'Tab' && ! event.shiftKey && ! isAfter ) {
-			event.preventDefault();
-			focus.tabbable.findNext( focusCaptureAfterRef.current )?.focus();
-			return;
-		}
-		if ( key === 'Tab' && event.shiftKey && isAfter ) {
+		// Tab forwards leaves the wrapper naturally: the stop is its last
+		// element. Backwards, sequential order would walk into the content,
+		// so move focus to the last tabbable before the wrapper instead.
+		if ( key === 'Tab' && event.shiftKey ) {
 			event.preventDefault();
 			focus.tabbable
-				.findPrevious( focusCaptureBeforeRef.current )
+				.findPrevious( event.currentTarget.parentElement )
 				?.focus();
 		}
 	}
 
-	// The badge doubles as the stop's description for assistive
-	// technologies; hidden content still counts for `aria-describedby`.
-	const stopHint = ( id ) => (
-		<div className="block-editor-writing-flow__canvas-stop-hint" id={ id }>
-			{ __( 'Press Enter to edit the document' ) }
-		</div>
-	);
-
-	// The focus ring is drawn around the canvas the stops stand for, through
-	// a class on their shared parent. Safari does not reliably recompute
-	// `:has(:focus)`, so the class is toggled here instead.
-	function onStopFocus( event ) {
-		event.currentTarget.parentElement?.classList.add(
-			'has-canvas-stop-focus'
-		);
+	// The wrapper is not a stop of its own: focus arriving from outside,
+	// which sequential navigation only delivers travelling forwards, is
+	// forwarded to the stop after the content. Backwards, the stop is the
+	// wrapper's last tabbable and catches focus by itself.
+	function onWrapperFocus( event ) {
+		if (
+			event.target === event.currentTarget &&
+			! event.currentTarget.contains( event.relatedTarget )
+		) {
+			canvasStopRef.current?.focus();
+		}
 	}
 
-	function onStopBlur( event ) {
-		event.currentTarget.parentElement?.classList.remove(
-			'has-canvas-stop-focus'
-		);
-	}
+	const wrapperProps = {
+		className: 'block-editor-writing-flow__canvas-wrapper',
+		tabIndex: '0',
+		onFocus: onWrapperFocus,
+	};
 
-	const before = (
+	const stop = (
 		<div
-			ref={ focusCaptureBeforeRef }
+			ref={ canvasStopRef }
 			tabIndex="0"
 			role="button"
 			aria-label={ __( 'Editor canvas' ) }
-			aria-describedby={ `${ hintId }-before` }
+			aria-describedby={ hintId }
 			className="block-editor-writing-flow__canvas-stop"
-			onKeyDown={ ( event ) => onStopKeyDown( event, false ) }
-			onFocus={ onStopFocus }
-			onBlur={ onStopBlur }
+			onKeyDown={ onStopKeyDown }
 		>
-			{ stopHint( `${ hintId }-before` ) }
-		</div>
-	);
-
-	const after = (
-		<div
-			ref={ focusCaptureAfterRef }
-			tabIndex="0"
-			role="button"
-			aria-label={ __( 'Editor canvas' ) }
-			aria-describedby={ `${ hintId }-after` }
-			className="block-editor-writing-flow__canvas-stop"
-			onKeyDown={ ( event ) => onStopKeyDown( event, true ) }
-			onFocus={ onStopFocus }
-			onBlur={ onStopBlur }
-		>
-			{ stopHint( `${ hintId }-after` ) }
+			{ /* The badge doubles as the stop's description for assistive
+			     technologies; hidden content still counts for
+			     `aria-describedby`. */ }
+			<div
+				className="block-editor-writing-flow__canvas-stop-hint"
+				id={ hintId }
+			>
+				{ __( 'Press Enter to edit the document' ) }
+			</div>
 		</div>
 	);
 
@@ -214,20 +194,20 @@ export default function useTabNav() {
 				}
 			}
 
-			// Escape steps out of the canvas onto the stop before it. Every
-			// handler with a stronger claim on the key runs earlier, either
-			// deeper in the tree or in the capture phase, so an unclaimed
-			// key here means the key is free.
+			// Escape steps out of the canvas onto its stop. Every handler
+			// with a stronger claim on the key runs earlier, either deeper
+			// in the tree or in the capture phase, so an unclaimed key here
+			// means the key is free.
 			if (
 				event.key === 'Escape' &&
 				! event.ctrlKey &&
 				! event.metaKey &&
 				! event.altKey
 			) {
-				event.preventDefault();
-				focusCaptureBeforeRef.current?.focus( {
-					preventScroll: true,
-				} );
+				if ( canvasStopRef.current ) {
+					event.preventDefault();
+					canvasStopRef.current.focus( { preventScroll: true } );
+				}
 				return;
 			}
 
@@ -240,13 +220,10 @@ export default function useTabNav() {
 				return;
 			}
 
-			if (
-				// Bails in case the focus capture elements aren’t present. They
-				// may be omitted to avoid silent tab stops in preview mode.
-				// See: https://github.com/WordPress/gutenberg/pull/59317
-				! focusCaptureAfterRef.current ||
-				! focusCaptureBeforeRef.current
-			) {
+			// Bails in case the stop isn’t present. It may be omitted to
+			// avoid a silent tab stop in preview mode.
+			// See: https://github.com/WordPress/gutenberg/pull/59317
+			if ( ! canvasStopRef.current ) {
 				return;
 			}
 
@@ -279,12 +256,14 @@ export default function useTabNav() {
 				return;
 			}
 
-			// Tab out of the canvas: move focus past the stop on the side
-			// being tabbed towards, without stopping on it.
+			// Tab out of the canvas: forwards past the stop, backwards past
+			// the wrapper, without stopping on either.
 			event.preventDefault();
 			const outside = isShift
-				? focus.tabbable.findPrevious( focusCaptureBeforeRef.current )
-				: focus.tabbable.findNext( focusCaptureAfterRef.current );
+				? focus.tabbable.findPrevious(
+						canvasStopRef.current.parentElement
+				  )
+				: focus.tabbable.findNext( canvasStopRef.current );
 			outside?.focus();
 		}
 
@@ -321,5 +300,5 @@ export default function useTabNav() {
 
 	const mergedRefs = useMergeRefs( [ containerRef, ref ] );
 
-	return [ before, mergedRefs, after ];
+	return [ wrapperProps, mergedRefs, stop ];
 }

@@ -19,14 +19,14 @@ import useClipboardHandler from './use-clipboard-handler';
 import { store as blockEditorStore } from '../../store';
 
 export function useWritingFlow() {
-	const [ before, ref, after ] = useTabNav();
+	const [ wrapperProps, ref, canvasStop ] = useTabNav();
 	const hasMultiSelection = useSelect(
 		( select ) => select( blockEditorStore ).hasMultiSelection(),
 		[]
 	);
 
 	return [
-		before,
+		wrapperProps,
 		useMergeRefs( [
 			ref,
 			useEditableRootEventHandlers(),
@@ -75,15 +75,14 @@ export function useWritingFlow() {
 				[ hasMultiSelection ]
 			),
 		] ),
-		after,
+		canvasStop,
 	];
 }
 
 function WritingFlow( { children, ...props }, forwardedRef ) {
-	const [ before, ref, after ] = useWritingFlow();
+	const [ wrapperProps, ref, canvasStop ] = useWritingFlow();
 	return (
-		<>
-			{ before }
+		<div { ...wrapperProps }>
 			<div
 				{ ...props }
 				ref={ useMergeRefs( [ ref, forwardedRef ] ) }
@@ -94,8 +93,8 @@ function WritingFlow( { children, ...props }, forwardedRef ) {
 			>
 				{ children }
 			</div>
-			{ after }
-		</>
+			{ canvasStop }
+		</div>
 	);
 }
 
