@@ -3,7 +3,7 @@ import type * as ET from './entity-types';
 
 export type WPEntityTypes< C extends ET.Context = 'edit' > = {
 	Comment: ET.Comment< C >;
-	GlobalStyles: ET.GlobalStylesRevision< C >;
+	GlobalStyles: ET.GlobalStyles< C >;
 	Media: ET.Attachment< C >;
 	Menu: ET.NavMenu< C >;
 	MenuItem: ET.NavMenuItem< C >;

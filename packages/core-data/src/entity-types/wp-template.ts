@@ -81,7 +81,7 @@ declare module './base-entity-records' {
 			/**
 			 * Theme file exists.
 			 */
-			has_theme_file: Record< string, string >;
+			has_theme_file: boolean;
 			/**
 			 * The ID for the author of the template.
 			 */
@@ -93,7 +93,7 @@ declare module './base-entity-records' {
 			/**
 			 * Whether a template is a custom template.
 			 */
-			is_custom: Record< string, string >;
+			is_custom: boolean;
 			/**
 			 * The date the template was last modified, in the site's timezone.
 			 */

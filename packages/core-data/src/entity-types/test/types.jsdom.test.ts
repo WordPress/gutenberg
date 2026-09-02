@@ -15,7 +15,7 @@
 
 /* eslint-disable no-unused-expressions -- the assertions below are expression statements. */
 /* eslint-disable @typescript-eslint/no-unused-vars -- the values exist only so their inferred types can be asserted. */
-import { select, resolveSelect } from '@wordpress/data';
+import { dispatch, select, resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '../../index';
 import type {
 	DefaultContextOf,
@@ -374,6 +374,77 @@ describe( 'Entity record types', () => {
 			// @ts-expect-error -- `block_version` is edit-only, so a view
 			// record drops it.
 			viewPost?.content.block_version;
+		};
+	} );
+
+	describe( 'the inferred status accepts values registered with the REST API', () => {
+		() => {
+			const post = select( coreStore ).getEntityRecord(
+				'postType',
+				'post',
+				1
+			);
+			const autoDraft: NonNullable< typeof post >[ 'status' ] =
+				'auto-draft';
+			const pluginStatus: NonNullable< typeof post >[ 'status' ] =
+				'needs-legal-review';
+			autoDraft satisfies string;
+			pluginStatus satisfies string;
+		};
+	} );
+
+	describe( 'the inferred post type supports match the REST schema', () => {
+		() => {
+			const postType = select( coreStore ).getEntityRecord(
+				'root',
+				'postType',
+				'post'
+			);
+			postType?.supports.editor satisfies true | unknown[] | undefined;
+			// @ts-expect-error -- support values are not strings.
+			postType?.supports.editor.toUpperCase();
+		};
+	} );
+
+	describe( 'the inferred template flags match the REST schema', () => {
+		() => {
+			const template = select( coreStore ).getEntityRecord(
+				'postType',
+				'wp_template',
+				'theme//index'
+			);
+			template?.has_theme_file satisfies boolean | undefined;
+			template?.is_custom satisfies boolean | undefined;
+			// @ts-expect-error -- the REST API returns a boolean, not a record.
+			template?.has_theme_file.anyKey;
+
+			const templatePart = select( coreStore ).getEntityRecord(
+				'postType',
+				'wp_template_part',
+				'theme//header'
+			);
+			templatePart?.has_theme_file satisfies boolean | undefined;
+			// @ts-expect-error -- the REST API returns a boolean, not a record.
+			templatePart?.has_theme_file.anyKey;
+		};
+	} );
+
+	describe( 'the global styles shortcuts use the entity record shape', () => {
+		() => {
+			const globalStyles = select( coreStore ).getGlobalStyles( 1 );
+			true satisfies Expect<
+				typeof globalStyles,
+				GlobalStyles< 'edit' > | undefined
+			>;
+			globalStyles?.title.raw satisfies string | undefined;
+			// @ts-expect-error -- the entity record has no revision author.
+			globalStyles?.author;
+
+			const actions = dispatch( coreStore );
+			true satisfies Expect<
+				Parameters< typeof actions.saveGlobalStyles >[ 0 ],
+				Partial< GlobalStyles< 'edit' > >
+			>;
 		};
 	} );
 
