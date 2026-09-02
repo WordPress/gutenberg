@@ -37,13 +37,13 @@
 
 -   DataForm: Communicate the timezone a `datetime` value is edited in. When the site timezone differs from the visitor's, the control renders help text under the input naming the site timezone: the zone name (e.g. `(CEST) Europe/Madrid`) or the UTC offset for sites pinned to one ([#82291](https://github.com/WordPress/gutenberg/pull/82291)).
 -   Export the `DataViewsProps` and `ItemWithId` types ([#82326](https://github.com/WordPress/gutenberg/pull/82326)).
+-   Export the `DataViewsProps` and `ItemWithId` types and document every type property ([#82326](https://github.com/WordPress/gutenberg/pull/82326)).
 
 ### Internal
 
 -   Remove unused dependency `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
 -   Note in the `/wp` bundle build script that its singleton externals list must stay in sync with the transitive private API usage check ([#82027](https://github.com/WordPress/gutenberg/pull/82027)).
--   Document every type property ([#82326](https://github.com/WordPress/gutenberg/pull/82326)).
 
 ### Bug Fix
 
