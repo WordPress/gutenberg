@@ -44,6 +44,8 @@ The vocabulary grows with what the engine enforces. Return `true` for operations
 
 The staging layer enforces the same answers. Every mutation is diffed per instance on arrival, whichever trigger staged it, and each change the policy denies is re-asserted before it lands: a removed locked instance returns at its index, a denied move holds its index, a denied resize keeps its spans, a denied edit keeps its attributes, and a new instance of a rejected type is dropped. What the interface hides, the staging layer rejects.
 
+Instance operations carry `widgetType` only while that type is still in `widgetTypes`. A plugin that is gone, or a render module that failed to load, leaves the field absent: the engine still asks, because the instance is still on the board, but a policy that keys its locks on the type has nothing to match. Locks that must survive that case belong on the instance itself. The same absence is why a new instance of an unregistered type is not dropped: there is no type to ask about.
+
 ## Composition
 
 The provider mounts around `<WidgetDashboard>`, not inside it.

@@ -82,11 +82,13 @@ interface EnforceLayoutPolicyArgs {
  * interface: what the UI hides, the staging layer rejects.
  *
  * Per instance: a new instance whose type the policy rejects for
- * `insert` is dropped (an unregistered type passes: there is no type
- * to ask about); denied `edit` keeps the staged `attributes`; denied
- * `resize` keeps the placement spans; denied `move` keeps the masonry
- * `lane` and holds the instance's canonical position, adjusted for
- * allowed membership changes: the same hold `remove` uses, and the
+ * `insert` is dropped. An unregistered type has no type to ask about,
+ * so a new instance of one passes, and instance operations on a
+ * surviving tile still ask with `widgetType` absent: a lock keyed on
+ * the type does not fire. Denied `edit` keeps the staged `attributes`;
+ * denied `resize` keeps the placement spans; denied `move` keeps the
+ * masonry `lane` and holds the instance's canonical position, adjusted
+ * for allowed membership changes: the same hold `remove` uses, and the
  * position the grid's pinned items keep.
  *
  * Both layouts are canonicalized before the diff (sorted by

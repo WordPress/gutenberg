@@ -110,6 +110,72 @@ describe( 'enforceLayoutPolicy', () => {
 		} );
 	} );
 
+	describe( 'unregistered type', () => {
+		it( 'asks instance operations with widgetType absent', () => {
+			const canPerform = jest.fn( allowAll );
+			const previous = [ widget( 'a', { type: 'test/gone' } ) ];
+			const next = [ { ...previous[ 0 ], attributes: { label: 'x' } } ];
+
+			enforceLayoutPolicy( {
+				previous,
+				next,
+				canPerform,
+				widgetTypes,
+			} );
+
+			expect( canPerform ).toHaveBeenCalledWith( {
+				operation: 'edit',
+				widget: previous[ 0 ],
+				widgetType: undefined,
+			} );
+		} );
+
+		it( 'does not fire a lock keyed on the type', () => {
+			const previous = [
+				widget( 'a', { type: 'test/gone' } ),
+				widget( 'b' ),
+			];
+			const next = [ previous[ 1 ], previous[ 0 ] ];
+			const denyGoneMoves: CanPerformDashboardOperation = ( request ) =>
+				! (
+					request.operation === 'move' &&
+					request.widgetType?.name === 'test/gone'
+				);
+
+			const result = enforceLayoutPolicy( {
+				previous,
+				next,
+				canPerform: denyGoneMoves,
+				widgetTypes,
+			} );
+
+			expect( uuids( result ) ).toEqual( [ 'b', 'a' ] );
+		} );
+
+		it( 'still holds a lock decided from the instance', () => {
+			const previous = [
+				widget( 'a', { type: 'test/gone' } ),
+				widget( 'b' ),
+			];
+			const next = [ previous[ 1 ], previous[ 0 ] ];
+			const pinA: CanPerformDashboardOperation = ( request ) =>
+				! (
+					request.operation === 'move' &&
+					'widget' in request &&
+					request.widget.uuid === 'a'
+				);
+
+			const result = enforceLayoutPolicy( {
+				previous,
+				next,
+				canPerform: pinA,
+				widgetTypes,
+			} );
+
+			expect( uuids( result ) ).toEqual( [ 'a', 'b' ] );
+		} );
+	} );
+
 	describe( 'edit', () => {
 		it( 're-asserts the staged attributes when edit is denied', () => {
 			const previous = [

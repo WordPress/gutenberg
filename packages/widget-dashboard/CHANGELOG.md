@@ -36,6 +36,13 @@
     keeps its attributes, and a new instance of a rejected type is
     dropped ([#82256](https://github.com/WordPress/gutenberg/pull/82256)).
 
+### Documentation
+
+-   Policy contract: instance operations carry `widgetType` only while
+    the type is registered; a gone plugin or a failed load leaves it
+    absent, so locks keyed on the type do not fire
+    ([#82256](https://github.com/WordPress/gutenberg/pull/82256)).
+
 ### Internal
 
 -   Remove unused dependency `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
