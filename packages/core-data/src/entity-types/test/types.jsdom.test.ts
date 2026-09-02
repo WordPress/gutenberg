@@ -32,6 +32,7 @@ import type { Base } from '../base';
 import type { Comment } from '../comment';
 import type { GlobalStyles } from '../global-styles';
 import type { Block } from '../block';
+import type { IconCollection } from '../icon-collection';
 import type { Navigation } from '../navigation';
 import type { Page } from '../page';
 import type { Post } from '../post';
@@ -792,6 +793,10 @@ describe( 'Entity record types', () => {
 				'view'
 			>;
 			true satisfies Expect< DefaultContextOf< 'root', 'icon' >, 'view' >;
+			true satisfies Expect<
+				DefaultContextOf< 'root', 'iconCollection' >,
+				'view'
+			>;
 			true satisfies Expect< DefaultContextOf< 'root', 'site' >, 'view' >;
 
 			// The default reaches the selectors, so a view-default entity is
@@ -801,6 +806,15 @@ describe( 'Entity record types', () => {
 				'__unstableBase'
 			);
 			true satisfies Expect< typeof base, Base< 'view' > | undefined >;
+
+			const iconCollections = select( coreStore ).getEntityRecords(
+				'root',
+				'iconCollection'
+			);
+			true satisfies Expect<
+				typeof iconCollections,
+				IconCollection< 'view' >[] | null
+			>;
 
 			// Naming a context still wins over the default.
 			const editBase = select( coreStore ).getEntityRecord(

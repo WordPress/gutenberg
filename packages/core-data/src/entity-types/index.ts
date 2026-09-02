@@ -18,6 +18,7 @@ import type { FontFamily, FontFace, WpFontFamily } from './font-family';
 import type { GlobalStyles, GlobalStylesUpdate } from './global-styles';
 import type { GlobalStylesRevision } from './global-styles-revision';
 import type { Icon } from './icon';
+import type { IconCollection } from './icon-collection';
 import type { MenuLocation } from './menu-location';
 import type { NavMenu } from './nav-menu';
 import type { NavMenuItem } from './nav-menu-item';
@@ -58,6 +59,7 @@ export type {
 	GlobalStylesUpdate,
 	GlobalStylesRevision,
 	Icon,
+	IconCollection,
 	MenuLocation,
 	NavMenu,
 	NavMenuItem,
@@ -128,6 +130,7 @@ export interface PerPackageEntityRecords< C extends Context > {
 		| GlobalStyles< C >
 		| GlobalStylesRevision< C >
 		| Icon< C >
+		| IconCollection< C >
 		| MenuLocation< C >
 		| NavMenu< C >
 		| NavMenuItem< C >
@@ -172,6 +175,7 @@ export interface RootEntityRecordTypes< C extends Context > {
 	fontCollection: FontCollection< C >;
 	globalStyles: GlobalStyles< C >;
 	icon: Icon< C >;
+	iconCollection: IconCollection< C >;
 	media: Attachment< C >;
 	menu: NavMenu< C >;
 	menuItem: NavMenuItem< C >;
@@ -312,6 +316,7 @@ export interface RootEntityContexts {
 	fontCollection: 'view';
 	globalStyles: 'edit';
 	icon: 'view';
+	iconCollection: 'view';
 	media: 'edit';
 	menu: 'edit';
 	menuItem: 'edit';
