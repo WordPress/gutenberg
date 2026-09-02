@@ -60,6 +60,9 @@ const foregroundSteps = [
 	'fgSurface5',
 ] as const;
 
+const MINIMUM_INTERACTION_STATE_APCA_INTERVAL = 14;
+const MAXIMUM_ALTERNATE_POLARITY_DELTA_E_DRIFT = 0.02;
+
 const perceptualSampleCombinations = [
 	{
 		background: DEFAULT_SEED_COLORS.background,

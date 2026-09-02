@@ -22,19 +22,7 @@ npm run benchmark:color-ramps --workspace @wordpress/theme -- \
 	--label candidate
 ```
 
-Both worktrees need their dependencies installed. Add `--json` to save
-machine-readable results. Compare runs made with the same Node.js version and
+Both worktrees need their dependencies installed. Add `--json` for
+machine-readable output. Compare runs made with the same Node.js version and
 similar system load. The benchmark reports measurements but does not enforce a
 timing threshold because local and CI timings vary.
-
-## Perceptual ramp experiments
-
-The Storybook pilot also has a benchmark that compares the anchored production
-candidate, the all-APCA experiment, and the role-specific hybrid. Each sample
-builds the neutral, brand, and error ramps for all six pilot seed combinations.
-
-```sh
-npm run benchmark:perceptual-ramps --workspace @wordpress/theme
-```
-
-Add `-- --json` for machine-readable output.
