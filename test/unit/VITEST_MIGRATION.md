@@ -14,6 +14,9 @@ When writing or migrating a test:
 -   New Node, JSDOM, and Browser Mode tests run in Vitest automatically. They do
     not need migration metadata.
 -   When migrating a legacy Jest test, remove its exact path from `jest.files`.
+-   When renaming or moving a directory that contains legacy Jest tests, migrate
+    those tests to Vitest in the same pull request. The validator treats their
+    new paths as additions to the Jest allowlist.
 -   Do not add directories, glob patterns, or new files to `jest.files`. The
     routing validator compares it with the pull request base and accepts only
     removals.

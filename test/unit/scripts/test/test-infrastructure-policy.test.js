@@ -175,12 +175,6 @@ describe( 'non-hoisted Vitest infrastructure', () => {
 				path.join( sourceConfigDir, filename ),
 				path.join( configDir, filename )
 			);
-			if ( filename.includes( '/matchers/' ) ) {
-				copyFileSync(
-					path.join( sourceConfigDir, filename ),
-					path.join( configDir, filename.slice( 0, -3 ) )
-				);
-			}
 		}
 
 		const vitestStore = path.join( storeDir, 'vitest' );
@@ -311,7 +305,7 @@ export const beforeAll = () => {};
 		} );
 		writeFileSync(
 			path.join( vitestDir, 'index.d.ts' ),
-			'export interface Matchers<T = any> { toBe(value: unknown): void; }\nexport declare const vi: unknown;\nexport declare function expect<T>(value: T): Matchers<T>;\n'
+			'export interface AsymmetricMatcher { asymmetricMatch(value: unknown): boolean; }\nexport interface Matchers<T = any> { toBe(value: unknown): void; }\nexport declare const vi: unknown;\nexport declare function expect<T>(value: T): Matchers<T>;\nexport declare namespace expect { function stringContaining(value: string): AsymmetricMatcher; }\n'
 		);
 		writeJson( path.join( jestDomDir, 'package.json' ), {
 			name: '@testing-library/jest-dom',
@@ -324,7 +318,7 @@ export const beforeAll = () => {};
 		} );
 		writeFileSync(
 			path.join( jestDomDir, 'matchers.d.ts' ),
-			'export interface TestingLibraryMatchers<E, R> { toBeVisible(): R; }\n'
+			'export interface TestingLibraryMatchers<E, R> { toBeVisible(): R; toHaveAccessibleName(expected?: E | RegExp | string): R; }\n'
 		);
 		copyFileSync(
 			path.resolve(
@@ -335,7 +329,7 @@ export const beforeAll = () => {};
 		);
 		writeFileSync(
 			path.join( workspaceDir, 'matcher.test.ts' ),
-			"import { expect } from 'vitest';\nexpect( {} ).toHaveWarned();\nexpect( document.body ).toBeVisible();\n"
+			"import { expect } from 'vitest';\nexpect( {} ).toHaveWarned();\nexpect( document.body ).toBeVisible();\nexpect( document.body ).toHaveAccessibleName( expect.stringContaining( 'body' ) );\n"
 		);
 		writeJson( path.join( workspaceDir, 'tsconfig.json' ), {
 			compilerOptions: {

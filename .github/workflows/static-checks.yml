@@ -120,9 +120,7 @@ jobs:
 
             - name: Validate JavaScript test routing
               if: ${{ matrix.node == '20' && matrix.os == 'ubuntu-24.04' }}
-              env:
-                  ROUTING_BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || 'HEAD^1' }}
-              run: npm run test:unit:routing -- --base="$ROUTING_BASE"
+              run: npm run test:unit:routing -- --base="$(git rev-parse HEAD^1)"
 
             - name: Build packages
               run: npm run build

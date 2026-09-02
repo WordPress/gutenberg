@@ -30,7 +30,8 @@ declare global {
 }
 
 declare module 'vitest' {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars -- Keep Vitest's canonical generic matcher interface.
 	interface Matchers< T = any >
 		extends GutenbergVitestMatchers,
-			TestingLibraryMatchers< T, void > {}
+			TestingLibraryMatchers< any, void > {}
 }
