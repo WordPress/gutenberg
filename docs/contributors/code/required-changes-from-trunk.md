@@ -4,23 +4,22 @@ The `Required changes from trunk` status check ensures open pull requests contai
 
 ## How it works
 
-A movable lightweight git tag, `required-trunk-baseline`, points at the last `trunk` commit that every open pull request must contain. The check passes when the tagged commit is an ancestor of the pull request head, and fails otherwise.
+A movable lightweight git tag, `required-trunk-baseline`, points at the last `trunk` commit that every open pull request must contain. The check passes when the tagged commit is an ancestor of the pull request head, and fails otherwise. While the tag does not exist, nothing is required and the check passes.
 
 The tag moves only through explicit maintainer intent, in one of two ways:
 
 -   Dispatching the `Required changes from trunk` workflow with `move-baseline: true`, or
 -   Merging a pull request that carries the `Require PR update` label.
 
-When the tag moves, open pull requests holding a now-outdated passing status are switched to failing, subject to the limits below.
+When the tag moves, the workflow sweeps every open pull request and posts the status each one now warrants, subject to the limits below. Pull requests already carrying the current verdict are left alone, so a repeated sweep is cheap. Drafts are swept too, so a draft is accurate the moment it is marked ready for review.
 
 ## Limits
 
 The sweep that follows a baseline move is intentionally bounded:
 
--   Draft pull requests are skipped; they cannot merge anyway and are re-checked when marked ready for review.
 -   Each run writes at most 400 statuses to stay inside API rate limits. A run that hits the cap (or any write failure) exits nonzero; dispatch the workflow again with `move-baseline: true` until a run finishes cleanly.
--   Pull requests that never received a status show as "Expected", which also blocks merging; they get a real status on their next update.
 -   A pull request checked at the exact moment the baseline moves can briefly keep an outdated status; it converges on the pull request's next event or the next dispatch.
+-   A pull request opened while the workflow is broken carries no status at all, and shows as "Expected", which also blocks merging. The next sweep or its own next update gives it a real one.
 
 ## My pull request has a red "Required changes from trunk" status. What do I do?
 
@@ -37,16 +36,16 @@ Committers apply the `Require PR update` label to a pull request whose change in
 
 ## Maintainer runbook
 
-The `Required changes from trunk` workflow exposes one `workflow_dispatch` switch, `move-baseline`: it moves the baseline tag to the current `trunk` HEAD and flips stale passing statuses. Re-dispatching when the baseline is already current re-runs only the flip sweep, which is the retry path after an interrupted run.
+The `Required changes from trunk` workflow exposes one `workflow_dispatch` switch, `move-baseline`: it moves the baseline tag to the current `trunk` HEAD and sweeps open pull requests. Re-dispatching when the baseline is already current re-runs only the sweep, which is the retry path after an interrupted run.
 
 ### Initial setup
 
 The workflow blocks nothing until these one-time steps are completed, in order:
 
 1. Create the `Require PR update` label.
-2. Seed the baseline: dispatch the workflow with `move-baseline: true`.
-3. Let the check run unenforced for a while; active pull requests get stamped by their own events.
-4. Ask a repository admin to add `Required changes from trunk` (source: GitHub Actions) to the trunk ruleset's required status checks, and to add a tag ruleset for `required-trunk-baseline` restricting creation, update, and deletion to the GitHub Actions app.
+2. Seed the baseline: dispatch the workflow with `move-baseline: true`. Every open pull request is stamped in the same run, or across repeated dispatches when the write cap is hit.
+3. Re-dispatch until a run reports no writes, so that no pull request is left unstamped.
+4. Ask a repository admin to add the `Required changes from trunk` commit status to the trunk ruleset's required status checks, not the `Report required trunk changes status` job that posts it, and to add a tag ruleset for `required-trunk-baseline` restricting creation, update, and deletion to the GitHub Actions app.
 
 To roll the check back, remove `Required changes from trunk` from the required status checks; existing statuses become informational immediately. The tag can stay for a later re-enable.
 
