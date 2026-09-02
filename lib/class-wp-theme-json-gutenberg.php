@@ -418,6 +418,8 @@ class WP_Theme_JSON_Gutenberg {
 			'custom'           => null,
 			'customDuotone'    => null,
 			'customGradient'   => null,
+			'dark'             => null,
+			'light'            => null,
 			'defaultDuotone'   => null,
 			'defaultGradients' => null,
 			'defaultPalette'   => null,
@@ -2540,9 +2542,158 @@ class WP_Theme_JSON_Gutenberg {
 			foreach ( $vars_by_selector as $rule_selector => $declarations ) {
 				$stylesheet .= static::to_ruleset( $rule_selector, $declarations );
 			}
+
+			/*
+			 * Emit theme-authored per-scheme preset overrides (palette, gradients),
+			 * mirroring the CSS `prefers-color-scheme` model: the base presets are
+			 * the default, and `color.light` / `color.dark` override the other
+			 * scheme. A theme can therefore be light by default with a dark override,
+			 * or dark by default with a light override. Because these override the
+			 * existing `--wp--preset--*` custom properties, any value referencing a
+			 * preset flips automatically.
+			 *
+			 * The overrides respond to a root `data-scheme` attribute so a visitor
+			 * control can override the automatic behavior. For each scheme:
+			 *   - no attribute / `system`: follow the OS via `prefers-color-scheme`,
+			 *     unless the visitor forced the opposite scheme,
+			 *   - `data-scheme="<scheme>"`: always apply that scheme's values.
+			 */
+			foreach ( array( 'light', 'dark' ) as $scheme ) {
+				$scheme_declarations = static::compute_scheme_preset_vars( $node, $scheme );
+				if ( empty( $scheme_declarations ) ) {
+					continue;
+				}
+				$opposite        = 'dark' === $scheme ? 'light' : 'dark';
+				$auto_selector   = static::get_scheme_scoped_selector( $selector, ':not([data-scheme="' . $opposite . '"])' );
+				$forced_selector = static::get_scheme_scoped_selector( $selector, '[data-scheme="' . $scheme . '"]' );
+				$stylesheet     .= '@media (prefers-color-scheme: ' . $scheme . '){' . static::to_ruleset( $auto_selector, $scheme_declarations ) . '}';
+				$stylesheet     .= static::to_ruleset( $forced_selector, $scheme_declarations );
+			}
 		}
 
 		return $stylesheet;
+	}
+
+	/**
+	 * Attaches a `data-scheme` condition to the root element of a selector so
+	 * dark-scheme overrides can respond to a visitor's chosen color scheme.
+	 *
+	 * The `data-scheme` attribute lives on the root (`<html>`) element, so the
+	 * condition is inserted directly after the leading `:root` token. Selectors
+	 * that do not start with `:root` are scoped under an `html` root carrying the
+	 * condition.
+	 *
+	 * @param string $selector  The base selector (e.g. `:root` or `:root :where(...)`).
+	 * @param string $condition The attribute condition (e.g. `[data-scheme="dark"]`).
+	 * @return string The scheme-scoped selector.
+	 */
+	protected static function get_scheme_scoped_selector( $selector, $condition ) {
+		$root = static::ROOT_CSS_PROPERTIES_SELECTOR; // ':root'.
+		if ( 0 === strpos( $selector, $root ) ) {
+			return $root . $condition . substr( $selector, strlen( $root ) );
+		}
+		return 'html' . $condition . ' ' . $selector;
+	}
+
+	/**
+	 * Given a settings node, extracts theme-authored per-scheme preset overrides
+	 * and returns them as CSS Custom Property declarations.
+	 *
+	 * Reads `color.<scheme>.palette` and `color.<scheme>.gradients`, where
+	 * `<scheme>` is `light` or `dark`. The overrides are matched by slug to the
+	 * base presets, so only overridden slugs emit a value; base slugs without a
+	 * counterpart keep their single value in every scheme, and a scheme preset
+	 * whose slug has no base preset is ignored. This is fully opt-in: absent the
+	 * key, no declarations are produced and output is unchanged.
+	 *
+	 * @param array  $node   Settings node (global or block-level).
+	 * @param string $scheme The scheme to read: `light` or `dark`.
+	 * @return array List of `array( 'name' => ..., 'value' => ... )` declarations.
+	 */
+	protected static function compute_scheme_preset_vars( $node, $scheme ) {
+		$overrides = $node['color'][ $scheme ] ?? array();
+		if ( empty( $overrides ) || ! is_array( $overrides ) ) {
+			return array();
+		}
+
+		$preset_css_vars = array(
+			'palette'   => array(
+				'css_var'   => '--wp--preset--color--$slug',
+				'value_key' => 'color',
+			),
+			'gradients' => array(
+				'css_var'   => '--wp--preset--gradient--$slug',
+				'value_key' => 'gradient',
+			),
+		);
+
+		$declarations = array();
+		foreach ( $preset_css_vars as $preset_key => $meta ) {
+			if ( empty( $overrides[ $preset_key ] ) || ! is_array( $overrides[ $preset_key ] ) ) {
+				continue;
+			}
+
+			/*
+			 * A scheme section overrides the base presets; it does not introduce
+			 * new ones. A slug with no base preset has no class, no editor entry
+			 * and nothing referencing its custom property, so emitting a value for
+			 * it would only produce a declaration that exists in one scheme.
+			 */
+			$base_slugs = array();
+			if ( ! empty( $node['color'][ $preset_key ] ) && is_array( $node['color'][ $preset_key ] ) ) {
+				foreach ( static::flatten_scheme_presets( $node['color'][ $preset_key ] ) as $base_preset ) {
+					if ( isset( $base_preset['slug'] ) ) {
+						$base_slugs[ _wp_to_kebab_case( $base_preset['slug'] ) ] = true;
+					}
+				}
+			}
+			if ( empty( $base_slugs ) ) {
+				continue;
+			}
+
+			foreach ( static::flatten_scheme_presets( $overrides[ $preset_key ] ) as $preset ) {
+				if ( ! isset( $preset['slug'], $preset[ $meta['value_key'] ] ) ) {
+					continue;
+				}
+				$slug = _wp_to_kebab_case( $preset['slug'] );
+				if ( ! isset( $base_slugs[ $slug ] ) ) {
+					continue;
+				}
+				$declarations[] = array(
+					'name'  => static::replace_slug_in_string( $meta['css_var'], $slug ),
+					'value' => $preset[ $meta['value_key'] ],
+				);
+			}
+		}
+
+		return $declarations;
+	}
+
+	/**
+	 * Normalizes a preset list to a flat, numerically indexed array.
+	 *
+	 * Accepts both a flat list (as a scheme section is authored inline in
+	 * `settings.color.<scheme>`) and the origin-keyed structure the base presets
+	 * use once they have been merged per origin.
+	 *
+	 * @param array $presets A flat or origin-keyed list of presets.
+	 * @return array A flat list of presets.
+	 */
+	protected static function flatten_scheme_presets( $presets ) {
+		if ( ! is_array( $presets ) ) {
+			return array();
+		}
+		if ( wp_is_numeric_array( $presets ) ) {
+			return $presets;
+		}
+
+		$flattened = array();
+		foreach ( static::VALID_ORIGINS as $origin ) {
+			if ( ! empty( $presets[ $origin ] ) && is_array( $presets[ $origin ] ) ) {
+				$flattened = array_merge( $flattened, $presets[ $origin ] );
+			}
+		}
+		return $flattened;
 	}
 
 	/**
