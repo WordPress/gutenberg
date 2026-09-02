@@ -37,6 +37,61 @@ function getFocusableElements( ref ) {
 	} );
 }
 
+// Matches the `min-width` the stylesheet gives a submenu once it is shown.
+const SUBMENU_MIN_WIDTH = '200px';
+
+/**
+ * Measures how far a submenu tree would extend if every level were open.
+ *
+ * Closed submenus are collapsed to `width: 0`, so they cannot be measured as
+ * they are. Each level is given its open dimensions, read, and restored within
+ * the same synchronous block, so nothing is painted in between.
+ *
+ * @param {HTMLElement}   item       The `has-child` item that owns the tree.
+ * @param {HTMLElement[]} containers Every submenu container in the tree.
+ * @param {string}        direction  Direction to lay the tree out in.
+ *
+ * @return {{left: number, right: number}} Bounds of the widest chain.
+ */
+function measureSubmenuTree( item, containers, direction ) {
+	const previousStyles = containers.map( ( el ) => el.getAttribute( 'style' ) );
+	const wasOpenOnLeft = item.classList.contains( 'open-on-left' );
+	const wasOpenOnRight = item.classList.contains( 'open-on-right' );
+
+	item.classList.toggle( 'open-on-left', direction === 'left' );
+	item.classList.toggle( 'open-on-right', direction === 'right' );
+
+	containers.forEach( ( el ) => {
+		// `important` so these survive whatever the stylesheet sets while the
+		// submenu is closed.
+		el.style.setProperty( 'visibility', 'hidden', 'important' );
+		el.style.setProperty( 'width', 'auto', 'important' );
+		el.style.setProperty( 'height', 'auto', 'important' );
+		el.style.setProperty( 'overflow', 'visible', 'important' );
+		el.style.setProperty( 'min-width', SUBMENU_MIN_WIDTH, 'important' );
+	} );
+
+	let left = Infinity;
+	let right = -Infinity;
+	containers.forEach( ( el ) => {
+		const rect = el.getBoundingClientRect();
+		left = Math.min( left, rect.left );
+		right = Math.max( right, rect.right );
+	} );
+
+	containers.forEach( ( el, index ) => {
+		if ( previousStyles[ index ] === null ) {
+			el.removeAttribute( 'style' );
+		} else {
+			el.setAttribute( 'style', previousStyles[ index ] );
+		}
+	} );
+	item.classList.toggle( 'open-on-left', wasOpenOnLeft );
+	item.classList.toggle( 'open-on-right', wasOpenOnRight );
+
+	return { left, right };
+}
+
 // This is a fix for Safari in iOS/iPadOS. Without it, Safari doesn't focus out
 // when the user taps in the body. It can be removed once we add an overlay to
 // capture the clicks, instead of relying on the focusout event.
@@ -258,7 +313,12 @@ const { state, actions } = store(
 
 				const { ref } = getElement();
 
-				// Find the submenu container within this navigation item
+				// Only the outermost submenu picks a direction. Nested submenus
+				// inherit it, so the whole tree opens the same way.
+				if ( ref.closest( '.wp-block-navigation__submenu-container' ) ) {
+					return;
+				}
+
 				const submenuContainer = ref.querySelector(
 					':scope > .wp-block-navigation__submenu-container'
 				);
@@ -267,33 +327,40 @@ const { state, actions } = store(
 					return;
 				}
 
-				// Measure based on parent item position, not submenu position
-				// This prevents issues when the submenu is already repositioned
-				const parentRect = ref.getBoundingClientRect();
-				const viewportWidth = window.innerWidth;
+				// Every level in the tree, not just the one being opened. A
+				// submenu that fits on its own can still have a child that does
+				// not, and each level is offset further along than its parent.
+				const containers = [
+					submenuContainer,
+					...submenuContainer.querySelectorAll(
+						'.wp-block-navigation__submenu-container'
+					),
+				];
 
-				// Get actual submenu width, fallback to 200px minimum if not measurable
-				const submenuRect = submenuContainer.getBoundingClientRect();
-				const submenuWidth = submenuRect.width || 200;
+				// `clientWidth` rather than `innerWidth`, which counts the
+				// scrollbar as usable space.
+				const viewportWidth = document.documentElement.clientWidth;
+				const openedRight = measureSubmenuTree( ref, containers, 'right' );
+				const openedLeft = measureSubmenuTree( ref, containers, 'left' );
 
-				// Check if opening in either direction would overflow
-				const wouldOverflowRight =
-					parentRect.right + submenuWidth > viewportWidth;
-				const wouldOverflowLeft = parentRect.left - submenuWidth < 0;
+				const rightOverflow = openedRight.right - viewportWidth;
+				const leftOverflow = -openedLeft.left;
 
 				// Determine optimal positioning
-				if ( wouldOverflowRight && ! wouldOverflowLeft ) {
-					// Open left to avoid right overflow
+				if ( rightOverflow <= 0 && leftOverflow <= 0 ) {
+					// Fits either way - use default positioning
+					ref.classList.remove( 'open-on-left' );
+					ref.classList.remove( 'open-on-right' );
+				} else if ( leftOverflow < rightOverflow ) {
+					// Open left, either because opening right overflows or -
+					// when a tree is too deep to fit either way - because it
+					// spills less than opening right would.
 					ref.classList.add( 'open-on-left' );
 					ref.classList.remove( 'open-on-right' );
-				} else if ( wouldOverflowLeft && ! wouldOverflowRight ) {
-					// Open right to avoid left overflow
+				} else {
+					// Open right, on the same terms.
 					ref.classList.add( 'open-on-right' );
 					ref.classList.remove( 'open-on-left' );
-				} else {
-					// No overflow or both would overflow - use default positioning
-					ref.classList.remove( 'open-on-left' );
-					ref.classList.remove( 'open-on-right' );
 				}
 			},
 		},

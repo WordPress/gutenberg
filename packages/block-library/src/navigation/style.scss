@@ -490,8 +490,10 @@ button.wp-block-navigation-item__content {
 // When a submenu would overflow the viewport, open it leftward.
 // This class is dynamically added by JavaScript when overflow is detected.
 .wp-block-navigation .open-on-left {
-	// First submenu.
-	> .wp-block-navigation__submenu-container {
+	// First submenu - force leftward opening.
+	// Repeat class name to increase specificity and override justification and
+	// background rules.
+	> .wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container {
 		@include submenu-open-left;
 	}
 }
