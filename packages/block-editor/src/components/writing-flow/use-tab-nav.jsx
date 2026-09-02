@@ -22,7 +22,7 @@ const PREVENT_SCROLL_ON_FOCUS = {
 };
 
 // Keys that move focus from the canvas stop into the canvas.
-const ENTRY_KEYS = [ 'Enter', ' ', 'F2', 'Escape', 'ArrowDown', 'ArrowUp' ];
+const ENTRY_KEYS = [ 'Enter', ' ', 'F2', 'Escape' ];
 
 export default function useTabNav() {
 	const containerRef = /** @type {typeof useRef<HTMLElement>} */ ( useRef )();
@@ -47,7 +47,7 @@ export default function useTabNav() {
 	// The canvas is a single stop in the page's tab order, and going in is
 	// an explicit action on it. Focus returns to the place it last left the
 	// canvas from.
-	function enterCanvas( fromAfter ) {
+	function enterCanvas() {
 		// Focus the canvas window before any element in it: entering starts
 		// from the stop in the parent document, and Firefox does not move
 		// window focus for a cross-document `element.focus()`, leaving the
@@ -56,10 +56,7 @@ export default function useTabNav() {
 
 		if ( hasMultiSelection() ) {
 			containerRef.current.focus();
-			return;
-		}
-
-		if ( getSelectedBlockClientId() ) {
+		} else if ( getSelectedBlockClientId() ) {
 			if ( getLastFocus()?.current ) {
 				getLastFocus().current.focus();
 			} else {
@@ -70,11 +67,9 @@ export default function useTabNav() {
 					)
 					.focus();
 			}
-			return;
 		}
-
 		// In "compose" mode without a selected ID, we want to place focus on the section root when tabbing to the canvas.
-		if ( isZoomOut() ) {
+		else if ( isZoomOut() ) {
 			const sectionRootClientId = getSectionRootClientId();
 			const sectionBlocks = getBlockOrder( sectionRootClientId );
 
@@ -93,15 +88,11 @@ export default function useTabNav() {
 				// If we don't have any section root, focus the canvas.
 				containerRef.current.focus();
 			}
-			return;
-		}
-
-		const tabbables = focus.tabbable.find( containerRef.current );
-		if ( tabbables.length ) {
-			const next = fromAfter
-				? tabbables[ tabbables.length - 1 ]
-				: tabbables[ 0 ];
-			next.focus();
+		} else {
+			const tabbables = focus.tabbable.find( containerRef.current );
+			if ( tabbables.length ) {
+				tabbables[ 0 ].focus();
+			}
 		}
 	}
 
@@ -119,7 +110,7 @@ export default function useTabNav() {
 
 		if ( ! event.shiftKey && ENTRY_KEYS.includes( key ) ) {
 			event.preventDefault();
-			enterCanvas( key === 'ArrowUp' );
+			enterCanvas();
 			return;
 		}
 
