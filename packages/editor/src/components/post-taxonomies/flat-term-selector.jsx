@@ -69,6 +69,7 @@ export function FlatTermSelector( { slug } ) {
 	const [ values, setValues ] = useState( EMPTY_ARRAY );
 	const [ inputValue, setInputValue ] = useState( '' );
 	const [ suggestions, setSuggestions ] = useState( EMPTY_ARRAY );
+	const [ isSearching, setIsSearching ] = useState( false );
 	const lastSearchRef = useRef( '' );
 	// Terms being created, so that a request that resolves can tell whether its
 	// term is still shown by the time it does.
@@ -159,6 +160,7 @@ export function FlatTermSelector( { slug } ) {
 			// Ignore requests that resolved out of order.
 			if ( lastSearchRef.current === search ) {
 				setSuggestions( ( records ?? [] ).map( termToItem ) );
+				setIsSearching( false );
 			}
 		},
 		[ registry, slug ]
@@ -346,12 +348,21 @@ export function FlatTermSelector( { slug } ) {
 
 	function onInputValueChange( nextInputValue ) {
 		setInputValue( nextInputValue );
+		// The suggestions are searched through the REST API and nothing filters
+		// them on the client, so the ones for the previous input have to go
+		// before they can be picked by mistake.
+		setSuggestions( EMPTY_ARRAY );
 
 		// Nothing to search for when the input is cleared, either by the user or
 		// after a selection.
-		if ( nextInputValue ) {
-			debouncedSearch( nextInputValue );
+		if ( ! nextInputValue ) {
+			debouncedSearch.cancel();
+			setIsSearching( false );
+			return;
 		}
+
+		setIsSearching( true );
+		debouncedSearch( nextInputValue );
 	}
 
 	return (
@@ -369,7 +380,9 @@ export function FlatTermSelector( { slug } ) {
 					isItemEqualToValue={ isSameTerm }
 					inputValue={ inputValue }
 					onInputValueChange={ onInputValueChange }
-					emptyContent={ notFoundLabel }
+					emptyContent={
+						isSearching ? __( 'Searching…' ) : notFoundLabel
+					}
 					searchPlaceholder=""
 					showClearButton={ false }
 					chipsContent={ ( selectedTerms ) =>
