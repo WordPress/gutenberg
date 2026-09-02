@@ -37,6 +37,9 @@ const DEFAULT_QUERY = {
 	context: 'view',
 };
 
+const CREATE_TERM_VALUE = '__create__';
+const PENDING_TERM_PREFIX = '__pending__:';
+
 /**
  * Maps a term record to the `{ value, label }` shape the select works with.
  *
@@ -52,12 +55,7 @@ const itemToTermId = ( item ) => Number( item.value );
 const isSameTerm = ( termA, termB ) => termA.value === termB.value;
 const isSameTermName = ( nameA, nameB ) =>
 	nameA.toLowerCase() === nameB.toLowerCase();
-
-/**
- * Value of the item that creates a term out of the typed name. Terms are
- * otherwise keyed by their id.
- */
-const CREATE_TERM_VALUE = '__create__';
+const isPendingTerm = ( item ) => item.value.startsWith( PENDING_TERM_PREFIX );
 
 /**
  * Renders a flat term selector component.
@@ -68,10 +66,13 @@ const CREATE_TERM_VALUE = '__create__';
  * @return {React.ReactNode} The rendered flat term selector component.
  */
 export function FlatTermSelector( { slug } ) {
-	const [ values, setValues ] = useState( [] );
+	const [ values, setValues ] = useState( EMPTY_ARRAY );
 	const [ inputValue, setInputValue ] = useState( '' );
 	const [ suggestions, setSuggestions ] = useState( EMPTY_ARRAY );
 	const lastSearchRef = useRef( '' );
+	// Terms being created, so that a request that resolves can tell whether its
+	// term is still shown by the time it does.
+	const pendingTermsRef = useRef( new Set() );
 	const registry = useRegistry();
 
 	const { editPost } = useDispatch( editorStore );
@@ -136,7 +137,11 @@ export function FlatTermSelector( { slug } ) {
 	// while core data makes REST API requests.
 	useEffect( () => {
 		if ( hasResolvedTerms ) {
-			setValues( ( terms ?? [] ).map( termToItem ) );
+			setValues( ( currentValues ) => [
+				...( terms ?? [] ).map( termToItem ),
+				// Terms that are still being created aren't in the store yet.
+				...currentValues.filter( isPendingTerm ),
+			] );
 		}
 	}, [ terms, hasResolvedTerms ] );
 
@@ -213,18 +218,79 @@ export function FlatTermSelector( { slug } ) {
 		editPost( { [ taxonomy.rest_base ]: newTermIds } );
 	}
 
-	function onChange( newValues ) {
-		const hasCreatableItem = newValues.some(
+	// Assigns a term on top of the terms assigned at that moment, rather than
+	// the ones a request closed over: a term created in parallel, or picked
+	// from the most used ones, may have been assigned in the meantime.
+	function assignTerm( termId ) {
+		const assignedTermIds = registry
+			.select( editorStore )
+			.getEditedPostAttribute( taxonomy.rest_base );
+
+		if ( ! assignedTermIds?.includes( termId ) ) {
+			onUpdateTerms( [ ...( assignedTermIds ?? EMPTY_ARRAY ), termId ] );
+		}
+	}
+
+	async function createTerm( name ) {
+		const pendingTerm = {
+			value: PENDING_TERM_PREFIX + name,
+			label: name,
+		};
+		// Show the term right away, it is assigned once it exists.
+		pendingTermsRef.current.add( pendingTerm.value );
+		setValues( ( currentValues ) => [ ...currentValues, pendingTerm ] );
+
+		let savedTerm;
+		try {
+			savedTerm = await findOrCreateTerm( name );
+		} catch ( error ) {
+			createErrorNotice( error.message, {
+				type: 'snackbar',
+			} );
+			// Nothing was assigned, so only the shown term has to go.
+			pendingTermsRef.current.delete( pendingTerm.value );
+			setValues( ( currentValues ) =>
+				currentValues.filter(
+					( item ) => ! isSameTerm( item, pendingTerm )
+				)
+			);
+			speak( termRemovedLabel, 'assertive' );
+			return;
+		}
+
+		// The term was removed while it was being created.
+		if ( ! pendingTermsRef.current.has( pendingTerm.value ) ) {
+			return;
+		}
+
+		pendingTermsRef.current.delete( pendingTerm.value );
+		setValues( ( currentValues ) =>
+			currentValues
+				// An existing term can come back for a name that only differs
+				// by case or accent, and it may already be shown.
+				.filter(
+					( item ) =>
+						isSameTerm( item, pendingTerm ) ||
+						! isSameTerm( item, savedTerm )
+				)
+				.map( ( item ) =>
+					isSameTerm( item, pendingTerm ) ? savedTerm : item
+				)
+		);
+		assignTerm( itemToTermId( savedTerm ) );
+		speak( termAddedLabel, 'assertive' );
+	}
+
+	async function onChange( newValues ) {
+		const isCreatingTerm = newValues.some(
 			( item ) => item.value === CREATE_TERM_VALUE
 		);
-		const selectedTerms = newValues.filter(
-			( item ) => item.value !== CREATE_TERM_VALUE
-		);
-		const selectedTermIds = selectedTerms.map( itemToTermId );
-
-		// Optimistically update term values.
-		// The selector will always re-fetch terms later.
-		setValues( selectedTerms );
+		if ( isCreatingTerm ) {
+			// Picking the create item leaves the assigned terms untouched, and
+			// the term is only announced once it exists.
+			await createTerm( newTermName );
+			return;
+		}
 
 		if ( newValues.length !== values.length ) {
 			speak(
@@ -235,26 +301,19 @@ export function FlatTermSelector( { slug } ) {
 			);
 		}
 
-		if ( ! hasCreatableItem ) {
-			onUpdateTerms( selectedTermIds );
-			return;
-		}
+		pendingTermsRef.current = new Set(
+			newValues.filter( isPendingTerm ).map( ( item ) => item.value )
+		);
 
-		findOrCreateTerm( newTermName )
-			.then( ( savedTerm ) => {
-				setValues( [ ...selectedTerms, savedTerm ] );
-				onUpdateTerms( [
-					...selectedTermIds,
-					itemToTermId( savedTerm ),
-				] );
-			} )
-			.catch( ( error ) => {
-				createErrorNotice( error.message, {
-					type: 'snackbar',
-				} );
-				// In case of a failure, only assign the existing terms.
-				onUpdateTerms( selectedTermIds );
-			} );
+		// Optimistically update term values.
+		// The selector will always re-fetch terms later.
+		setValues( newValues );
+		onUpdateTerms(
+			// Terms that are still being created have no id to assign yet.
+			newValues
+				.filter( ( item ) => ! isPendingTerm( item ) )
+				.map( itemToTermId )
+		);
 	}
 
 	function appendTerm( newTerm ) {
@@ -262,9 +321,8 @@ export function FlatTermSelector( { slug } ) {
 			return;
 		}
 
-		const newTermIds = [ ...termIds, newTerm.id ];
 		speak( termAddedLabel, 'assertive' );
-		onUpdateTerms( newTermIds );
+		assignTerm( newTerm.id );
 	}
 
 	const newTermLabel =
