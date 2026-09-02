@@ -1802,6 +1802,37 @@ test.describe( 'Block Notes', () => {
 				.click( { position: { x: 4, y: 4 } } );
 			await expect( floatingButton ).toBeVisible();
 
+			// A nested block floats the button beside its top-level ancestor,
+			// not beside itself, so it never covers a sibling in a row.
+			await editor.insertBlock( {
+				name: 'core/group',
+				attributes: { layout: { type: 'flex', flexWrap: 'nowrap' } },
+				innerBlocks: [
+					{ name: 'core/paragraph', attributes: { content: '1' } },
+					{ name: 'core/paragraph', attributes: { content: '2' } },
+				],
+			} );
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.filter( { hasText: '1' } )
+				.click();
+			await expect( floatingButton ).toBeVisible();
+			const rowRight = await editor.canvas
+				.getByRole( 'document', { name: 'Block: Row' } )
+				.boundingBox()
+				.then( ( box ) => box.x + box.width );
+			await expect
+				.poll( () =>
+					floatingButton.boundingBox().then( ( box ) => box.x )
+				)
+				.toBeGreaterThanOrEqual( rowRight );
+
+			// Back to the image for the rest of the flow.
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Image' } )
+				.click( { position: { x: 4, y: 4 } } );
+			await expect( floatingButton ).toBeVisible();
+
 			await floatingButton.click();
 			await expect( floatingButton ).toBeHidden();
 			await page

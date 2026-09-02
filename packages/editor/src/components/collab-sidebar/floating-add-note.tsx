@@ -36,6 +36,12 @@ const BLOCK_ANCHOR_HEIGHT = 32;
 type FloatingTarget = {
 	clientId: string;
 	/**
+	 * The top-level block containing `clientId` (itself when not nested). Its
+	 * right edge is the margin the button floats in: a nested block's own
+	 * edge would land on a sibling in a row, columns or a navigation menu.
+	 */
+	anchorClientId: string;
+	/**
 	 * The rich-text range a note would wrap, or null when the note attaches to
 	 * the block as a whole (a collapsed caret, or a block with no text).
 	 */
@@ -67,6 +73,7 @@ function useFloatingButtonTarget(): FloatingTarget | null {
 			getSelectionStart,
 			getSelectionEnd,
 			getBlock,
+			getBlockParents,
 		} = select( blockEditorStore );
 
 		const clientId = getSelectedBlockClientId();
@@ -91,12 +98,19 @@ function useFloatingButtonTarget(): FloatingTarget | null {
 			return null;
 		}
 
+		const anchorClientId = getBlockParents( clientId )[ 0 ] ?? clientId;
 		const inlineSelection = readInlineSelection(
 			getSelectionStart(),
 			getSelectionEnd()
 		);
 		if ( ! inlineSelection ) {
-			return { clientId, attributeKey: null, start: null, end: null };
+			return {
+				clientId,
+				anchorClientId,
+				attributeKey: null,
+				start: null,
+				end: null,
+			};
 		}
 
 		const { attributeKey, start, end } = inlineSelection;
@@ -106,7 +120,7 @@ function useFloatingButtonTarget(): FloatingTarget | null {
 			return null;
 		}
 
-		return { clientId, attributeKey, start, end };
+		return { clientId, anchorClientId, attributeKey, start, end };
 	}, [] );
 }
 
@@ -144,16 +158,24 @@ export function FloatingAddNote( { onClick }: FloatingAddNoteProps ) {
 	const blockElement: HTMLElement | null = useBlockElement(
 		target?.clientId
 	);
+	const anchorBlockElement: HTMLElement | null = useBlockElement(
+		target?.anchorClientId
+	);
 	const selectionAnchor = useAnchor( {
 		editableContentElement: blockElement,
 	} );
 
-	// Anchor in the margin beside the block: on the selected line for an
-	// inline note (the Google Docs placement), at the block's top for a
-	// block-level one. Anywhere inside the content column either covers
-	// neighbouring text or, on a first line, lands on the block toolbar.
+	// Anchor in the margin beside the top-level block: on the selected line
+	// for an inline note (the Google Docs placement), at the selected block's
+	// top for a block-level one. Anywhere inside the content column either
+	// covers neighbouring text or, on a first line, lands on the block
+	// toolbar.
 	const marginAnchor = useMemo( () => {
-		if ( ! blockElement || ( isInline && ! selectionAnchor ) ) {
+		if (
+			! blockElement ||
+			! anchorBlockElement ||
+			( isInline && ! selectionAnchor )
+		) {
 			return null;
 		}
 		const { ownerDocument } = blockElement;
@@ -162,6 +184,7 @@ export function FloatingAddNote( { onClick }: FloatingAddNoteProps ) {
 			contextElement: blockElement,
 			getBoundingClientRect() {
 				const blockRect = blockElement.getBoundingClientRect();
+				const { right } = anchorBlockElement.getBoundingClientRect();
 				const { top, height } =
 					isInline && selectionAnchor
 						? selectionAnchor.getBoundingClientRect()
@@ -174,10 +197,10 @@ export function FloatingAddNote( { onClick }: FloatingAddNoteProps ) {
 						  };
 				const DOMRect =
 					ownerDocument.defaultView?.DOMRect ?? window.DOMRect;
-				return new DOMRect( blockRect.right, top, 0, height );
+				return new DOMRect( right, top, 0, height );
 			},
 		};
-	}, [ selectionAnchor, blockElement, isInline ] );
+	}, [ selectionAnchor, blockElement, anchorBlockElement, isInline ] );
 
 	if ( ! isReady || ! target || ! marginAnchor ) {
 		return null;
