@@ -48,7 +48,7 @@ Whether to show a tooltip when hovering over the option. The tooltip will attemp
 
 ### `disabled`: `boolean`
 
-If true, this option is unselectable. Also unselectable when the group is disabled.
+If true, this option is unselectable.
 
 -   Required: No
 -   Default: `false`

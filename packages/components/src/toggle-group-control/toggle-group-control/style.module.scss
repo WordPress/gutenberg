@@ -43,10 +43,6 @@
 		&::before {
 			opacity: calc(min(1, max(0, var(--selected-width, 0), var(--selected-height, 0))) * 0.4);
 		}
-
-		button {
-			pointer-events: none;
-		}
 	}
 }
 

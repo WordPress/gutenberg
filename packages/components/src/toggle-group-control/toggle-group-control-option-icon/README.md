@@ -53,7 +53,7 @@ The text to accessibly label the icon option. Will also be shown in a tooltip.
 
 ### `disabled`: `boolean`
 
-If true, this option is unselectable. Also unselectable when the group is disabled.
+If true, this option is unselectable.
 
 -   Required: No
 -   Default: `false`

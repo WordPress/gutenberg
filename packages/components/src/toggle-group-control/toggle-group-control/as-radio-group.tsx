@@ -101,7 +101,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 				{ ...otherProps }
 				id={ baseId }
 				ref={ forwardedRef }
-				aria-disabled={ disabled || undefined }
+				disabled={ disabled || undefined }
 			>
 				{ children }
 			</Ariakit.RadioGroup>

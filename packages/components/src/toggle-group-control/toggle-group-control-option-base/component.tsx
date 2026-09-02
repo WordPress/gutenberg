@@ -123,7 +123,7 @@ function ToggleGroupControlOptionBase(
 					</button>
 				) : (
 					<Ariakit.Radio
-						disabled={ isOptionDisabled }
+						disabled={ disabled }
 						onFocusVisible={ () => {
 							const selectedValueIsEmpty =
 								toggleGroupControlContext.value === null ||

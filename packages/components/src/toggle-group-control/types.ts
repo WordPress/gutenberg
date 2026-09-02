@@ -12,8 +12,7 @@ export type ToggleGroupControlOptionBaseProps = {
 	isIcon?: boolean;
 	value: string | number;
 	/**
-	 * Whether this option is unselectable. Also unselectable when the group is
-	 * disabled.
+	 * Whether this option is unselectable.
 	 *
 	 * @default false
 	 */
