@@ -293,9 +293,9 @@ function Iframe( {
 
 	const src = getIframeSrc( resolvedAssets );
 
-	// Make sure to not render the canvas wrapper and stop in view mode.
-	// They're only needed to catch focus in edit mode.
-	const shouldRenderFocusCaptureElements = tabIndex >= 0 && ! isPreviewMode;
+	// The stop is only rendered in edit mode; view mode should not grow a
+	// silent tab stop.
+	const isInteractiveCanvas = tabIndex >= 0 && ! isPreviewMode;
 
 	const iframe = (
 		// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
@@ -307,7 +307,12 @@ function Iframe( {
 				border: 0,
 			} }
 			ref={ useMergeRefs( [ ref, setRef ] ) }
-			tabIndex={ tabIndex }
+			// A frame with a negative tabindex keeps its whole document out
+			// of the page's sequential focus order, which is what makes the
+			// canvas a single stop: the stop after the frame is the only
+			// thing Tab finds, in either direction. Focus still enters the
+			// canvas by click, script, and Enter on the stop.
+			tabIndex={ isInteractiveCanvas ? -1 : tabIndex }
 			src={ src }
 			title={ title }
 			onKeyDown={ ( event ) => {
@@ -372,13 +377,12 @@ function Iframe( {
 						isZoomedOut && `${ scaleContainerWidth }px`,
 				} }
 			>
-				<div
-					{ ...( shouldRenderFocusCaptureElements
-						? wrapperProps
-						: { className: wrapperProps.className } ) }
-				>
+				{ /* With the frame's document out of sequential order, the
+				     wrapper needs no focus catching here: the stop is the
+				     only tabbable inside it, from both directions. */ }
+				<div className={ wrapperProps.className }>
 					{ iframe }
-					{ shouldRenderFocusCaptureElements && canvasStop }
+					{ isInteractiveCanvas && canvasStop }
 				</div>
 			</div>
 		</div>
