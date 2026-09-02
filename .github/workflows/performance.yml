@@ -468,7 +468,7 @@ jobs:
     # GitHub Actions can only be configured as required status checks on a per job basis using the
     # job's `name`. When the `name` changes PRs are temporarily blocked from being merged until
     # a privileged user can update the status checks, a process which is also error prone.
-    # 
+    #
     # The script reads every job in the run, so `needs` is only about waiting: it must cover
     # every job that would otherwise still be running when the script looks. `--ignore` then
     # names the jobs whose results do not count. Here that is this job itself, and the
