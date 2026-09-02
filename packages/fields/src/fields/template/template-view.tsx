@@ -1,4 +1,5 @@
 import { useSelect } from '@wordpress/data';
+import type { WpTemplate } from '@wordpress/core-data';
 import { store as coreStore } from '@wordpress/core-data';
 import type { DataViewRenderFieldProps } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
@@ -43,14 +44,12 @@ function BlockThemeTemplateView( {
 				return;
 			}
 
-			const allTemplates = select( coreStore ).getEntityRecords(
-				'postType',
-				'wp_template',
-				{
-					per_page: -1,
-					post_type: postType,
-				}
-			);
+			const allTemplates = select(
+				coreStore
+			).getEntityRecords< WpTemplate >( 'postType', 'wp_template', {
+				per_page: -1,
+				post_type: postType,
+			} );
 			const match = allTemplates?.find(
 				( t ) => t.slug === templateSlug
 			);

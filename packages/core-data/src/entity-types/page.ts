@@ -131,6 +131,10 @@ declare module './base-entity-records' {
 			 * The theme file to use to display the post.
 			 */
 			template: ContextualField< string, 'view' | 'edit', C >;
+			/**
+			 * Class names for the post container element.
+			 */
+			class_list: ContextualField< string[], 'view' | 'edit', C >;
 		}
 	}
 }

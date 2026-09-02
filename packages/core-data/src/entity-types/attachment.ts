@@ -220,7 +220,7 @@ declare module './base-entity-records' {
 			/**
 			 * An array of class names for the post.
 			 */
-			class_list: string[];
+			class_list: ContextualField< string[], 'view' | 'edit', C >;
 			/**
 			 * Links to related resources.
 			 */
@@ -229,6 +229,16 @@ declare module './base-entity-records' {
 	}
 }
 
+type AttachmentFileDetails< C extends Context > = C extends 'view' | 'edit'
+	? {
+			/** Original attachment file name. */
+			filename?: string;
+			/** Attachment file size in bytes, or null when unavailable. */
+			filesize?: number | null;
+	  }
+	: Record< never, never >;
+
 export type Attachment< C extends Context = 'edit' > = OmitNevers<
 	_BaseEntityRecords.Attachment< C >
->;
+> &
+	AttachmentFileDetails< C >;

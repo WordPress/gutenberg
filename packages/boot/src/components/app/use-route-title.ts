@@ -1,6 +1,6 @@
 import { useEffect, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
+import { store as coreStore, type UnstableBase } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -25,8 +25,10 @@ export default function useRouteTitle() {
 
 	const siteTitle = useSelect(
 		( select ) =>
-			select( coreStore ).getEntityRecord( 'root', '__unstableBase' )
-				?.name,
+			select( coreStore ).getEntityRecord< UnstableBase >(
+				'root',
+				'__unstableBase'
+			)?.name,
 		[]
 	);
 

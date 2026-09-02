@@ -28,19 +28,13 @@ import type {
 	OmitNevers,
 } from '../index';
 import type { Attachment } from '../attachment';
-import type { Base } from '../base';
-import type { Comment } from '../comment';
 import type { GlobalStyles } from '../global-styles';
 import type { Block } from '../block';
 import type { IconCollection } from '../icon-collection';
 import type { Navigation } from '../navigation';
 import type { Page } from '../page';
 import type { Post } from '../post';
-import type { Settings } from '../settings';
 import type { Term } from '../term';
-import type { Type } from '../type';
-import type { WpTemplate } from '../wp-template';
-import type { WpTemplatePart } from '../wp-template-part';
 
 /**
  * Resolves to `true` only when `A` and `B` are mutually assignable, so a
@@ -118,22 +112,6 @@ declare module '@wordpress/core-data' {
 describe( 'Entity record types', () => {
 	it( 'the map resolves root entities to their record type', () => {
 		() => {
-			true satisfies Expect<
-				EntityRecordOf< 'root', '__unstableBase' >,
-				Base< 'edit' >
-			>;
-			true satisfies Expect<
-				EntityRecordOf< 'root', 'comment' >,
-				Comment< 'edit' >
-			>;
-			true satisfies Expect<
-				EntityRecordOf< 'root', 'postType' >,
-				Type< 'edit' >
-			>;
-			true satisfies Expect<
-				EntityRecordOf< 'root', 'site' >,
-				Settings< 'edit' >
-			>;
 			// `root`/`globalStyles` returns a styles config, not the
 			// `GlobalStylesRevision` it was previously paired with.
 			true satisfies Expect<
@@ -164,18 +142,6 @@ describe( 'Entity record types', () => {
 			true satisfies Expect<
 				EntityRecordOf< 'postType', 'wp_navigation' >,
 				Navigation< 'edit' >
-			>;
-			true satisfies Expect<
-				EntityRecordOf< 'postType', 'wp_template' >,
-				WpTemplate< 'edit' >
-			>;
-			true satisfies Expect<
-				EntityRecordOf< 'postType', 'wp_template_part' >,
-				WpTemplatePart< 'edit' >
-			>;
-			true satisfies Expect<
-				EntityRecordOf< 'taxonomy', 'category' >,
-				Term< 'edit' >
 			>;
 		};
 	} );
@@ -322,18 +288,6 @@ describe( 'Entity record types', () => {
 			true satisfies Expect< typeof post, Post< 'edit' > | undefined >;
 			post?.title.raw satisfies string | undefined;
 			post?.password satisfies string | undefined;
-
-			const comment = select( coreStore ).getEntityRecord(
-				'root',
-				'comment',
-				1
-			);
-			true satisfies Expect<
-				typeof comment,
-				Comment< 'edit' > | undefined
-			>;
-			// @ts-expect-error -- a comment has no `password`.
-			comment?.password;
 		};
 	} );
 
@@ -353,6 +307,7 @@ describe( 'Entity record types', () => {
 			);
 			post?.content.protected satisfies boolean | undefined;
 			post?.content.block_version satisfies number | undefined;
+			post?.class_list satisfies string[] | undefined;
 			// @ts-expect-error -- Core serialises `protected`, not `is_protected`.
 			post?.content.is_protected;
 
@@ -363,6 +318,7 @@ describe( 'Entity record types', () => {
 			);
 			page?.content.protected satisfies boolean | undefined;
 			page?.content.block_version satisfies number | undefined;
+			page?.class_list satisfies string[] | undefined;
 			// @ts-expect-error -- Core serialises `protected`, not `is_protected`.
 			page?.content.is_protected;
 
@@ -374,9 +330,19 @@ describe( 'Entity record types', () => {
 				{ context: 'view' }
 			);
 			viewPost?.content.protected satisfies boolean | undefined;
+			viewPost?.class_list satisfies string[] | undefined;
 			// @ts-expect-error -- `block_version` is edit-only, so a view
 			// record drops it.
 			viewPost?.content.block_version;
+
+			const embedPost = select( coreStore ).getEntityRecord(
+				'postType',
+				'post',
+				1,
+				{ context: 'embed' }
+			);
+			// @ts-expect-error -- `class_list` is view- and edit-only.
+			embedPost?.class_list;
 		};
 	} );
 
@@ -393,115 +359,6 @@ describe( 'Entity record types', () => {
 				'needs-legal-review';
 			autoDraft satisfies string;
 			pluginStatus satisfies string;
-		};
-	} );
-
-	it( 'the inferred post type supports match the REST schema', () => {
-		() => {
-			const postType = select( coreStore ).getEntityRecord(
-				'root',
-				'postType',
-				'post'
-			);
-			postType?.supports.editor satisfies true | unknown[] | undefined;
-			// @ts-expect-error -- support values are not strings.
-			postType?.supports.editor.toUpperCase();
-		};
-	} );
-
-	it( 'the inferred template flags match the REST schema', () => {
-		() => {
-			const template = select( coreStore ).getEntityRecord(
-				'postType',
-				'wp_template',
-				'theme//index'
-			);
-			template?.has_theme_file satisfies boolean | undefined;
-			template?.is_custom satisfies boolean | undefined;
-			// @ts-expect-error -- the REST API returns a boolean, not a record.
-			template?.has_theme_file.anyKey;
-
-			const templatePart = select( coreStore ).getEntityRecord(
-				'postType',
-				'wp_template_part',
-				'theme//header'
-			);
-			templatePart?.has_theme_file satisfies boolean | undefined;
-			// @ts-expect-error -- the REST API returns a boolean, not a record.
-			templatePart?.has_theme_file.anyKey;
-		};
-	} );
-
-	it( 'the inferred root records match their REST schemas', () => {
-		() => {
-			const plugin = select( coreStore ).getEntityRecord(
-				'root',
-				'plugin',
-				'gutenberg/gutenberg'
-			);
-			plugin?.author satisfies string | undefined;
-			// @ts-expect-error -- Core serialises the author as a string.
-			plugin?.author.name;
-
-			const viewStatus = select( coreStore ).getEntityRecord(
-				'root',
-				'status',
-				'publish',
-				{ context: 'view' }
-			);
-			viewStatus?.public satisfies boolean | undefined;
-			viewStatus?.queryable satisfies boolean | undefined;
-			viewStatus?.date_floating satisfies boolean | undefined;
-			// @ts-expect-error -- these status fields are edit-only.
-			viewStatus?.private;
-			// @ts-expect-error -- these status fields are edit-only.
-			viewStatus?.protected;
-			// @ts-expect-error -- these status fields are edit-only.
-			viewStatus?.show_in_list;
-
-			const embedStatus = select( coreStore ).getEntityRecord(
-				'root',
-				'status',
-				'publish',
-				{ context: 'embed' }
-			);
-			embedStatus?.name satisfies string | undefined;
-			embedStatus?.slug satisfies string | undefined;
-			// @ts-expect-error -- `public` is limited to view and edit.
-			embedStatus?.public;
-			// @ts-expect-error -- `queryable` is limited to view and edit.
-			embedStatus?.queryable;
-			// @ts-expect-error -- `date_floating` is limited to view and edit.
-			embedStatus?.date_floating;
-
-			const viewTaxonomy = select( coreStore ).getEntityRecord(
-				'root',
-				'taxonomy',
-				'category',
-				{ context: 'view' }
-			);
-			viewTaxonomy?.name satisfies string | undefined;
-			// @ts-expect-error -- taxonomy visibility is edit-only.
-			viewTaxonomy?.visibility;
-
-			const theme = select( coreStore ).getEntityRecord(
-				'root',
-				'theme',
-				'twentytwentysix'
-			);
-			theme?.tags.raw satisfies string[] | undefined;
-			theme?.tags.rendered satisfies string | undefined;
-			theme?.theme_supports?.formats satisfies string[] | undefined;
-			// @ts-expect-error -- inactive themes omit `theme_supports`.
-			theme?.theme_supports.formats;
-
-			const menu = select( coreStore ).getEntityRecord(
-				'root',
-				'menu',
-				1
-			);
-			// @ts-expect-error -- menus do not expose the menu-item `object_id`.
-			menu?.object_id;
 		};
 	} );
 
@@ -569,8 +426,24 @@ describe( 'Entity record types', () => {
 				{ context: 'view' }
 			);
 			attachment?.caption.rendered satisfies string | undefined;
+			attachment?.filename satisfies string | undefined;
+			attachment?.filesize satisfies number | null | undefined;
+			attachment?.class_list satisfies string[] | undefined;
 			// @ts-expect-error -- only edit responses contain the raw caption.
 			attachment?.caption.raw;
+
+			const embedded = select( coreStore ).getEntityRecord(
+				'postType',
+				'attachment',
+				1,
+				{ context: 'embed' }
+			);
+			// @ts-expect-error -- `filename` is view- and edit-only.
+			embedded?.filename;
+			// @ts-expect-error -- `filesize` is view- and edit-only.
+			embedded?.filesize;
+			// @ts-expect-error -- `class_list` is view- and edit-only.
+			embedded?.class_list;
 		};
 	} );
 
@@ -795,6 +668,18 @@ describe( 'Entity record types', () => {
 				UnknownEntityRecord[] | null
 			>;
 
+			// Built-in pairs stay on the same safe fallback until their legacy
+			// declarations have been verified against the current REST schema.
+			const comment = select( coreStore ).getEntityRecord(
+				'root',
+				'comment',
+				1
+			);
+			true satisfies Expect<
+				typeof comment,
+				UnknownEntityRecord | undefined
+			>;
+
 			const promisedRecord = await resolveSelect(
 				coreStore
 			).getEntityRecord( 'myPlugin', 'order', 1 );
@@ -867,46 +752,15 @@ describe( 'Entity record types', () => {
 
 	it( 'a call with no query uses the context the entity is fetched in', () => {
 		() => {
-			/*
-			 * Most entities are registered with `context: 'edit'`, but a few
-			 * are not, and `__unstableBase` sends no `context` at all so the
-			 * server applies its own default of `view`.
-			 */
 			true satisfies Expect<
 				DefaultContextOf< 'postType', 'post' >,
 				'edit'
-			>;
-			true satisfies Expect<
-				DefaultContextOf< 'taxonomy', 'category' >,
-				'edit'
-			>;
-			true satisfies Expect<
-				DefaultContextOf< 'root', 'comment' >,
-				'edit'
-			>;
-			true satisfies Expect<
-				DefaultContextOf< 'root', '__unstableBase' >,
-				'view'
-			>;
-			true satisfies Expect<
-				DefaultContextOf< 'root', 'fontCollection' >,
-				'view'
 			>;
 			true satisfies Expect< DefaultContextOf< 'root', 'icon' >, 'view' >;
 			true satisfies Expect<
 				DefaultContextOf< 'root', 'iconCollection' >,
 				'view'
 			>;
-			true satisfies Expect< DefaultContextOf< 'root', 'site' >, 'view' >;
-
-			// The default reaches the selectors, so a view-default entity is
-			// not typed with the edit record.
-			const base = select( coreStore ).getEntityRecord(
-				'root',
-				'__unstableBase'
-			);
-			true satisfies Expect< typeof base, Base< 'view' > | undefined >;
-
 			const iconCollections = select( coreStore ).getEntityRecords(
 				'root',
 				'iconCollection'
@@ -921,18 +775,6 @@ describe( 'Entity record types', () => {
 				'icon'
 			);
 			icons?.[ 0 ].collection satisfies string | undefined;
-
-			// Naming a context still wins over the default.
-			const editBase = select( coreStore ).getEntityRecord(
-				'root',
-				'__unstableBase',
-				undefined,
-				{ context: 'edit' }
-			);
-			true satisfies Expect<
-				typeof editBase,
-				Base< 'edit' > | undefined
-			>;
 		};
 	} );
 

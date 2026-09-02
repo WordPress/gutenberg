@@ -9,6 +9,7 @@ import { Icon, comment, postList } from '@wordpress/icons';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { EmptyState, Link, Stack } from '@wordpress/ui';
 import type { View, Field } from '@wordpress/dataviews';
+import type { Post, Comment } from '@wordpress/core-data';
 
 type ActivityKind = 'post-future' | 'post-published' | 'comment';
 
@@ -187,17 +188,17 @@ export default function Activity( { attributes }: ActivityProps ) {
 			const coreData = select( coreStore );
 
 			return {
-				futurePosts: coreData.getEntityRecords(
+				futurePosts: coreData.getEntityRecords< Post >(
 					'postType',
 					'post',
 					queries.future
 				),
-				recentPosts: coreData.getEntityRecords(
+				recentPosts: coreData.getEntityRecords< Post >(
 					'postType',
 					'post',
 					queries.recent
 				),
-				comments: coreData.getEntityRecords(
+				comments: coreData.getEntityRecords< Comment >(
 					'root',
 					'comment',
 					queries.comments

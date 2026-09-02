@@ -170,26 +170,9 @@ export type EntityRecord< C extends Context = 'edit' > =
  * types.
  */
 export interface RootEntityRecordTypes< C extends Context > {
-	__unstableBase: Base< C >;
-	comment: Comment< C >;
-	fontCollection: FontCollection< C >;
 	globalStyles: GlobalStyles< C >;
 	icon: Icon< C >;
 	iconCollection: IconCollection< C >;
-	media: Attachment< C >;
-	menu: NavMenu< C >;
-	menuItem: NavMenuItem< C >;
-	menuLocation: MenuLocation< C >;
-	plugin: Plugin< C >;
-	postType: Type< C >;
-	sidebar: Sidebar< C >;
-	site: Settings< C >;
-	status: PostStatusObject< C >;
-	taxonomy: Taxonomy< C >;
-	theme: Theme< C >;
-	user: User< C >;
-	widget: Widget< C >;
-	widgetType: WidgetType< C >;
 }
 
 /**
@@ -205,8 +188,6 @@ export interface PostTypeEntityRecordTypes< C extends Context > {
 	post: Post< C >;
 	wp_block: Block< C >;
 	wp_navigation: Navigation< C >;
-	wp_template: WpTemplate< C >;
-	wp_template_part: WpTemplatePart< C >;
 }
 
 /**
@@ -216,10 +197,10 @@ export interface PostTypeEntityRecordTypes< C extends Context > {
  *
  * @see RootEntityRecordTypes
  */
-export interface TaxonomyEntityRecordTypes< C extends Context > {
-	category: Term< C >;
-	post_tag: Term< C >;
-}
+export interface TaxonomyEntityRecordTypes<
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	C extends Context,
+> {}
 
 /**
  * Maps an entity's `kind` and `name` to the record type it returns.
@@ -310,27 +291,9 @@ export type EntityRecordOf<
  * @see EntityContextDefaults
  */
 export interface RootEntityContexts {
-	// Registered with `_fields` but no `context`, so the server default applies.
-	__unstableBase: 'view';
-	comment: 'edit';
-	fontCollection: 'view';
 	globalStyles: 'edit';
 	icon: 'view';
 	iconCollection: 'view';
-	media: 'edit';
-	menu: 'edit';
-	menuItem: 'edit';
-	menuLocation: 'edit';
-	plugin: 'edit';
-	postType: 'edit';
-	sidebar: 'edit';
-	site: 'view';
-	status: 'edit';
-	taxonomy: 'edit';
-	theme: 'edit';
-	user: 'edit';
-	widget: 'edit';
-	widgetType: 'edit';
 }
 
 /**
@@ -346,8 +309,6 @@ export interface PostTypeEntityContexts {
 	post: 'edit';
 	wp_block: 'edit';
 	wp_navigation: 'edit';
-	wp_template: 'edit';
-	wp_template_part: 'edit';
 }
 
 /**
@@ -357,10 +318,7 @@ export interface PostTypeEntityContexts {
  *
  * @see EntityContextDefaults
  */
-export interface TaxonomyEntityContexts {
-	category: 'edit';
-	post_tag: 'edit';
-}
+export interface TaxonomyEntityContexts {}
 
 /**
  * Maps a `kind`/`name` pair to the context it is fetched in when the call

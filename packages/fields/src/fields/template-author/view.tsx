@@ -38,19 +38,16 @@ export default function TemplateAuthorView( {
 	const imageUrl = useSelect(
 		( select ) => {
 			if ( originalSource === 'site' ) {
-				const siteData = select( coreStore ).getEntityRecord(
-					'root',
-					'__unstableBase'
-				);
+				const siteData = select( coreStore ).getEntityRecord< {
+					site_logo?: number;
+				} >( 'root', '__unstableBase' );
 				const logoId = siteData?.site_logo;
 				if ( ! logoId ) {
 					return undefined;
 				}
-				return select( coreStore ).getEntityRecord(
-					'postType',
-					'attachment',
-					logoId
-				)?.source_url;
+				return select( coreStore ).getEntityRecord< {
+					source_url: string;
+				} >( 'postType', 'attachment', logoId )?.source_url;
 			}
 
 			if ( originalSource !== 'user' || ! authorId ) {

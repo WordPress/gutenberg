@@ -127,12 +127,12 @@ export function useConnectorPlugin( {
 					canManagePlugins: undefined as boolean | undefined,
 				};
 			}
-			// eslint-disable-next-line @wordpress/no-unused-vars-before-return -- the call triggers resolution and must precede the early return
+
 			const plugin = store.getEntityRecord(
 				'root',
 				'plugin',
 				pluginBasename
-			);
+			) as { plugin: string; status: string } | undefined;
 
 			const hasFinished = store.hasFinishedResolution(
 				'getEntityRecord',

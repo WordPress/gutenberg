@@ -271,8 +271,9 @@ export const ParentEdit = ( {
 	const { id } = field;
 
 	const homeUrl = useSelect( ( select ) => {
-		return select( coreStore ).getEntityRecord( 'root', '__unstableBase' )
-			?.home;
+		return select( coreStore ).getEntityRecord< {
+			home: string;
+		} >( 'root', '__unstableBase' )?.home as string;
 	}, [] );
 
 	const onChangeControl = useCallback(
@@ -292,7 +293,7 @@ export const ParentEdit = ( {
 						__(
 							'Child pages inherit characteristics from their parent, such as URL structure. For instance, if "Pricing" is a child of "Services", its URL would be %1$s<wbr />/services<wbr />/pricing.'
 						),
-						filterURLForDisplay( homeUrl ?? '' ).replace(
+						filterURLForDisplay( homeUrl ).replace(
 							/([/.])/g,
 							'<wbr />$1'
 						)

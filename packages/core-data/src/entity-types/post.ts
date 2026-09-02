@@ -140,6 +140,10 @@ declare module './base-entity-records' {
 			 * The terms assigned to the post in the post_tag taxonomy.
 			 */
 			tags: ContextualField< number[], 'view' | 'edit', C >;
+			/**
+			 * Class names for the post container element.
+			 */
+			class_list: ContextualField< string[], 'view' | 'edit', C >;
 		}
 	}
 }
