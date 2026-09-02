@@ -3,8 +3,11 @@ import { toggleFormat, remove, applyFormat } from '@wordpress/rich-text';
 import {
 	RichTextToolbarButton,
 	RichTextShortcut,
+	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
 import { code as codeIcon } from '@wordpress/icons';
+import type { RichTextValue } from '@wordpress/rich-text';
+import type { FormatEditProps } from '../types';
 
 const name = 'core/code';
 const title = __( 'Inline code' );
@@ -14,7 +17,7 @@ export const code = {
 	title,
 	tagName: 'code',
 	className: null,
-	__unstableInputRule( value ) {
+	__unstableInputRule( value: RichTextValue ): RichTextValue {
 		const BACKTICK = '`';
 		const { start, text } = value;
 		const characterBefore = text[ start - 1 ];
@@ -46,7 +49,12 @@ export const code = {
 
 		return value;
 	},
-	edit( { value, onChange, onFocus, isActive } ) {
+	edit( {
+		value,
+		onChange,
+		onFocus,
+		isActive,
+	}: FormatEditProps ): React.ReactNode {
 		function onClick() {
 			onChange( toggleFormat( value, { type: name, title } ) );
 			onFocus();

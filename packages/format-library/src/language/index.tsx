@@ -1,4 +1,5 @@
 import { __ } from '@wordpress/i18n';
+// @ts-expect-error Block Editor not fully typed yet.
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import {
 	TextControl,
@@ -10,6 +11,11 @@ import { Stack } from '@wordpress/ui';
 import { useState } from '@wordpress/element';
 import { applyFormat, removeFormat, useAnchor } from '@wordpress/rich-text';
 import { language as languageIcon } from '@wordpress/icons';
+import type {
+	LanguageEditProps,
+	InlineLanguageUIProps,
+	LanguageFormat,
+} from '../types';
 
 const name = 'core/language';
 const title = __( 'Language' );
@@ -24,9 +30,9 @@ export const language = {
 		dir: 'dir',
 	},
 	edit: Edit,
-};
+} satisfies LanguageFormat;
 
-function Edit( { isActive, value, onChange, contentRef } ) {
+function Edit( { isActive, value, onChange, contentRef }: LanguageEditProps ) {
 	const [ isPopoverVisible, setIsPopoverVisible ] = useState( false );
 	const togglePopover = () => {
 		setIsPopoverVisible( ( state ) => ! state );
@@ -60,14 +66,20 @@ function Edit( { isActive, value, onChange, contentRef } ) {
 	);
 }
 
-function InlineLanguageUI( { value, contentRef, onChange, onClose } ) {
+function InlineLanguageUI( {
+	value,
+	contentRef,
+	onChange,
+	onClose,
+}: InlineLanguageUIProps ) {
 	const popoverAnchor = useAnchor( {
+		// eslint-disable-next-line react-hooks/refs
 		editableContentElement: contentRef.current,
 		settings: language,
 	} );
 
 	const [ lang, setLang ] = useState( '' );
-	const [ dir, setDir ] = useState( 'ltr' );
+	const [ dir, setDir ] = useState< 'ltr' | 'rtl' >( 'ltr' );
 
 	return (
 		<Popover
