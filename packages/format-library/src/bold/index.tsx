@@ -4,8 +4,10 @@ import {
 	RichTextToolbarButton,
 	RichTextShortcut,
 	__unstableRichTextInputEvent,
+	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
 import { formatBold } from '@wordpress/icons';
+import type { FormatEditWithVisibilityProps } from '../types';
 
 const name = 'core/bold';
 const title = __( 'Bold' );
@@ -15,13 +17,19 @@ export const bold = {
 	title,
 	tagName: 'strong',
 	className: null,
-	edit( { isActive, value, onChange, onFocus, isVisible = true } ) {
+	edit( {
+		isActive,
+		value,
+		onChange,
+		onFocus,
+		isVisible = true,
+	}: FormatEditWithVisibilityProps ): React.ReactNode {
 		function onToggle() {
 			onChange( toggleFormat( value, { type: name, title } ) );
 		}
 
 		function onClick() {
-			onChange( toggleFormat( value, { type: name } ) );
+			onChange( toggleFormat( value, { type: name, title } ) );
 			onFocus();
 		}
 

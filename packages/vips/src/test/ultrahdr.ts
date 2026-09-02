@@ -34,6 +34,9 @@ const {
 		crop = cropMock.mockImplementation( () => this );
 		copy = vi.fn( () => this );
 		setImage = setImageMock;
+		// These sources are never indexed: libvips reports GType 0 for a field the
+		// image does not carry.
+		getTypeof = vi.fn( () => 0 );
 	}
 
 	class VipsImageMock {

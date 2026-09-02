@@ -1,12 +1,15 @@
 import { __ } from '@wordpress/i18n';
 import { removeFormat, slice, isCollapsed } from '@wordpress/rich-text';
+// @ts-expect-error Block Editor not fully typed yet.
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { help } from '@wordpress/icons';
+import type { RichTextValue } from '@wordpress/rich-text';
+import type { FormatEditProps } from '../types';
 
 const name = 'core/unknown';
 const title = __( 'Clear Unknown Formatting' );
 
-function selectionContainsUnknownFormats( value ) {
+function selectionContainsUnknownFormats( value: RichTextValue ) {
 	if ( isCollapsed( value ) ) {
 		return false;
 	}
@@ -22,7 +25,7 @@ export const unknown = {
 	title,
 	tagName: '*',
 	className: null,
-	edit( { isActive, value, onChange, onFocus } ) {
+	edit( { isActive, value, onChange, onFocus }: FormatEditProps ) {
 		if ( ! isActive && ! selectionContainsUnknownFormats( value ) ) {
 			return null;
 		}

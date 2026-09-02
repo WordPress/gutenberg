@@ -13,8 +13,9 @@ import {
 	MediaUpload,
 	RichTextToolbarButton,
 	MediaUploadCheck,
+	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
-
+import type { EditImageProps, InlineImageUIProps } from '../types';
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 const name = 'core/image';
@@ -23,10 +24,12 @@ const title = __( 'Inline image' );
 /**
  * Extracts the image ID from the className attribute.
  *
- * @param {Object} activeObjectAttributes The attributes of the active object.
- * @return {number|undefined} The extracted image ID or undefined if not found.
+ * @param activeObjectAttributes The attributes of the active object.
+ * @return The extracted image ID or undefined if not found.
  */
-function getCurrentImageId( activeObjectAttributes ) {
+function getCurrentImageId(
+	activeObjectAttributes: EditImageProps[ 'activeObjectAttributes' ]
+): number | undefined {
 	if ( ! activeObjectAttributes?.className ) {
 		return undefined;
 	}
@@ -53,13 +56,21 @@ export const image = {
 	edit: Edit,
 };
 
-function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
-	const { style, alt } = activeObjectAttributes;
+function InlineUI( {
+	value,
+	onChange,
+	activeObjectAttributes,
+	contentRef,
+}: InlineImageUIProps ) {
+	const style = activeObjectAttributes?.style;
+	const alt = activeObjectAttributes?.alt;
+
 	const width = style?.replace( /\D/g, '' );
 	const [ editedWidth, setEditedWidth ] = useState( width );
 	const [ editedAlt, setEditedAlt ] = useState( alt );
 	const hasChanged = editedWidth !== width || editedAlt !== alt;
 	const popoverAnchor = useAnchor( {
+		// eslint-disable-next-line react-hooks/refs
 		editableContentElement: contentRef.current,
 		settings: image,
 	} );
@@ -82,7 +93,7 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 							style: editedWidth
 								? `width: ${ editedWidth }px;`
 								: '',
-							alt: editedAlt,
+							alt: editedAlt ?? '',
 						},
 					};
 
@@ -105,7 +116,7 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 					/>
 					<WCTextareaControl
 						label={ __( 'Alternative text' ) }
-						value={ editedAlt }
+						value={ editedAlt ?? '' }
 						onChange={ ( newAlt ) => {
 							setEditedAlt( newAlt );
 						} }
@@ -153,13 +164,23 @@ function Edit( {
 	isObjectActive,
 	activeObjectAttributes,
 	contentRef,
-} ) {
+}: EditImageProps ) {
 	return (
 		<MediaUploadCheck>
 			<MediaUpload
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				value={ getCurrentImageId( activeObjectAttributes ) }
-				onSelect={ ( { id, url, alt, width: imgWidth } ) => {
+				onSelect={ ( {
+					id,
+					url,
+					alt,
+					width: imgWidth,
+				}: {
+					id: number;
+					url: string;
+					alt: string;
+					width: number;
+				} ) => {
 					onChange(
 						insertObject( value, {
 							type: name,
@@ -176,7 +197,7 @@ function Edit( {
 					);
 					onFocus();
 				} }
-				render={ ( { open } ) => (
+				render={ ( { open }: { open: () => void } ) => (
 					<RichTextToolbarButton
 						icon={ inlineImage }
 						title={ isObjectActive ? __( 'Replace image' ) : title }

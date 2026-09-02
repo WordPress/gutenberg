@@ -4,8 +4,10 @@ import {
 	RichTextToolbarButton,
 	RichTextShortcut,
 	__unstableRichTextInputEvent,
+	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
 import { formatItalic } from '@wordpress/icons';
+import type { FormatEditWithVisibilityProps } from '../types';
 
 const name = 'core/italic';
 const title = __( 'Italic' );
@@ -15,13 +17,19 @@ export const italic = {
 	title,
 	tagName: 'em',
 	className: null,
-	edit( { isActive, value, onChange, onFocus, isVisible = true } ) {
+	edit( {
+		isActive,
+		value,
+		onChange,
+		onFocus,
+		isVisible = true,
+	}: FormatEditWithVisibilityProps ) {
 		function onToggle() {
 			onChange( toggleFormat( value, { type: name, title } ) );
 		}
 
 		function onClick() {
-			onChange( toggleFormat( value, { type: name } ) );
+			onChange( toggleFormat( value, { type: name, title } ) );
 			onFocus();
 		}
 
