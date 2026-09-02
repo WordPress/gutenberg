@@ -206,7 +206,7 @@
 
 		.item:has(.item-description) .item-selection-indicator {
 			align-self: start;
-			margin-block-start: calc((var(--_wp-ui-menu-item-label-line-height) - var(--wp-ui-menu-selection-indicator-size)) / 2);
+			height: var(--_wp-ui-menu-item-label-line-height);
 		}
 
 		.item:has(.item-description) :is(.item-prefix, .item-content, .item-children) {
