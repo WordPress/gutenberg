@@ -374,7 +374,7 @@ test.describe( 'Preview with private custom post type', () => {
 		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
 
 		await expect(
-			page.locator( 'role=menuitem[name="Preview in new tab"i]' )
+			page.getByRole( 'menuitem', { name: 'Preview in new tab' } )
 		).toBeHidden();
 	} );
 } );
