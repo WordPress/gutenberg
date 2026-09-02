@@ -144,6 +144,7 @@ export default function useTabNav() {
 			aria-label={ __( 'Editor canvas' ) }
 			aria-describedby={ hintId }
 			className="block-editor-writing-flow__canvas-stop"
+			style={ PREVENT_SCROLL_ON_FOCUS }
 			onKeyDown={ onStopKeyDown }
 		>
 			{ /* The badge doubles as the stop's description for assistive
@@ -165,11 +166,8 @@ export default function useTabNav() {
 			ref={ focusCaptureAfterRef }
 			tabIndex="0"
 			className="block-editor-writing-flow__canvas-stop-redirect"
-			onFocus={ () =>
-				focusCaptureBeforeRef.current?.focus( {
-					preventScroll: true,
-				} )
-			}
+			style={ PREVENT_SCROLL_ON_FOCUS }
+			onFocus={ () => focusCaptureBeforeRef.current?.focus() }
 		/>
 	);
 
@@ -191,9 +189,7 @@ export default function useTabNav() {
 			) {
 				if ( focusCaptureBeforeRef.current ) {
 					event.preventDefault();
-					focusCaptureBeforeRef.current.focus( {
-						preventScroll: true,
-					} );
+					focusCaptureBeforeRef.current.focus();
 				}
 				return;
 			}
@@ -278,52 +274,9 @@ export default function useTabNav() {
 			}
 		}
 
-		// When tabbing back to an element in block list, this event handler prevents scrolling if the
-		// focus capture divs (before/after) are outside of the viewport. (For example shift+tab back to a paragraph
-		// when focus is on a sidebar element. This prevents the scrollable writing area from jumping either to the
-		// top or bottom of the document.
-		//
-		// Note that it isn't possible to disable scrolling in the onFocus event. We need to intercept this
-		// earlier in the keypress handler, and call focus( { preventScroll: true } ) instead.
-		// https://developer.mozilla.org/en-US/docs/Web/API/HTMLOrForeignElement/focus#parameters
-		function preventScrollOnTab( event ) {
-			// The canvas skip in `onKeyDown` may have already moved focus.
-			if ( event.defaultPrevented ) {
-				return;
-			}
-
-			if ( event.keyCode !== TAB ) {
-				return;
-			}
-
-			if ( event.target?.getAttribute( 'role' ) === 'region' ) {
-				return;
-			}
-
-			if ( containerRef.current === event.target ) {
-				return;
-			}
-
-			const isShift = event.shiftKey;
-			const direction = isShift ? 'findPrevious' : 'findNext';
-			const target = focus.tabbable[ direction ]( event.target );
-			// Only do something when the next tabbable is a focus capture div (before/after)
-			if (
-				target === focusCaptureBeforeRef.current ||
-				target === focusCaptureAfterRef.current
-			) {
-				event.preventDefault();
-				target.focus( { preventScroll: true } );
-			}
-		}
-
-		const { ownerDocument } = node;
-		const { defaultView } = ownerDocument;
-		defaultView.addEventListener( 'keydown', preventScrollOnTab );
 		node.addEventListener( 'keydown', onKeyDown );
 		node.addEventListener( 'focusout', onFocusOut );
 		return () => {
-			defaultView.removeEventListener( 'keydown', preventScrollOnTab );
 			node.removeEventListener( 'keydown', onKeyDown );
 			node.removeEventListener( 'focusout', onFocusOut );
 		};
