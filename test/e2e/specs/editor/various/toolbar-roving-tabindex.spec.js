@@ -156,6 +156,9 @@ class ToolbarRovingTabindexUtils {
 		await this.page.keyboard.press( 'ArrowRight' );
 		await this.expectLabelToHaveFocus( 'Move up' );
 		await this.pageUtils.pressKeys( 'Tab' );
+		// The canvas is a single tab stop; Enter goes back to the block.
+		await this.expectLabelToHaveFocus( 'Editor canvas' );
+		await this.page.keyboard.press( 'Enter' );
 		await this.expectLabelToHaveFocus( currentBlockLabel );
 		await this.pageUtils.pressKeys( 'shift+Tab' );
 		await this.expectLabelToHaveFocus( 'Move up' );

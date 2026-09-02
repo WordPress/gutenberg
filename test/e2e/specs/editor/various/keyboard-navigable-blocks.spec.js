@@ -30,6 +30,9 @@ test.describe( 'Order of block keyboard navigation', () => {
 		await pageUtils.pressKeys( 'shift+Tab' );
 		await KeyboardNavigableBlocks.navigateThroughBlockToolbar();
 		await page.keyboard.press( 'Tab' );
+		// The canvas is a single tab stop; Enter goes back to the block.
+		await KeyboardNavigableBlocks.expectLabelToHaveFocus( 'Editor canvas' );
+		await page.keyboard.press( 'Enter' );
 		await KeyboardNavigableBlocks.expectLabelToHaveFocus(
 			'Block: Paragraph'
 		);
@@ -58,7 +61,11 @@ test.describe( 'Order of block keyboard navigation', () => {
 		await page.keyboard.press( 'Tab' );
 		await KeyboardNavigableBlocks.expectLabelToHaveFocus( 'Block' );
 
+		// The canvas is a single tab stop; Enter goes back to the multi
+		// selection.
 		await pageUtils.pressKeys( 'shift+Tab' );
+		await KeyboardNavigableBlocks.expectLabelToHaveFocus( 'Editor canvas' );
+		await page.keyboard.press( 'Enter' );
 		await KeyboardNavigableBlocks.expectLabelToHaveFocus(
 			'Multiple selected blocks'
 		);
