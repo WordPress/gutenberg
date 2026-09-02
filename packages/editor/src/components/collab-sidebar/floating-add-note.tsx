@@ -138,19 +138,27 @@ export function FloatingAddNote( { onClick }: FloatingAddNoteProps ) {
 
 	// Re-keying on the target restarts the delay whenever it changes (e.g.
 	// while the user is still dragging), and hides the button the moment the
-	// block is deselected.
+	// block is deselected. Readiness records the key that completed the delay
+	// rather than a boolean, so a target that changes straight to another one
+	// can't paint the button at its new position before the effect resets it.
 	const targetKey = target
 		? `${ target.clientId }:${ target.attributeKey }:${ target.start }:${ target.end }`
 		: null;
-	const [ isReady, setIsReady ] = useState( false );
+	const [ readyTargetKey, setReadyTargetKey ] = useState< string | null >(
+		null
+	);
 	useEffect( () => {
-		setIsReady( false );
+		setReadyTargetKey( null );
 		if ( ! targetKey ) {
 			return;
 		}
-		const timer = setTimeout( () => setIsReady( true ), SHOW_DELAY_MS );
+		const timer = setTimeout(
+			() => setReadyTargetKey( targetKey ),
+			SHOW_DELAY_MS
+		);
 		return () => clearTimeout( timer );
 	}, [ targetKey ] );
+	const isReady = !! targetKey && readyTargetKey === targetKey;
 
 	// `useAnchor` derives a virtual anchor from the block element's live DOM
 	// range, reading `ownerDocument.defaultView.getSelection()`, so an iframed

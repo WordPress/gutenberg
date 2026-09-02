@@ -736,6 +736,12 @@ describe( 'readInlineSelection', () => {
 		expect( readInlineSelection( start, end ) ).toBeNull();
 	} );
 
+	it( 'returns null when start and end are in different attributes', () => {
+		const start = { clientId: 'a', attributeKey: 'value', offset: 2 };
+		const end = { clientId: 'a', attributeKey: 'citation', offset: 5 };
+		expect( readInlineSelection( start, end ) ).toBeNull();
+	} );
+
 	it( 'returns null when there is no attributeKey (block-level)', () => {
 		const start = { clientId: 'a', offset: 0 };
 		const end = { clientId: 'a', offset: 5 };

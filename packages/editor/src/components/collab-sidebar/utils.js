@@ -238,6 +238,7 @@ export function readInlineSelection( start, end ) {
 		! start?.clientId ||
 		start.clientId !== end?.clientId ||
 		! start.attributeKey ||
+		start.attributeKey !== end.attributeKey ||
 		start.offset === undefined ||
 		end.offset === undefined ||
 		start.offset === end.offset
