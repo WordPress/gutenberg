@@ -42,13 +42,18 @@ jobs:
                   predicate-quantifier: 'every'
                   filters: |
                       relevant:
+                          # Start from every file, then subtract what cannot change a test result.
                           - '**'
+                          # Documentation.
                           - '!**/*.md'
                           - '!{backport-changelog,docs,storybook}/**'
+                          # Development tooling and its configuration.
                           - '!tools/{docs,eslint,stylelint}/**'
                           - '!{eslint,lint-staged,prettier,syncpack}.config*'
+                          # Repository metadata.
                           - '!{changelog,readme}.txt'
                           - '!.{editorconfig,gitignore,prettierrc*,stylelintrc*}'
+                          # Other workflows, and everything under .github that this one does not use.
                           - '!.github/{*,!(workflows|setup-node)/**,workflows/!(unit-test.yml)}'
 
     unit-js-routing:
