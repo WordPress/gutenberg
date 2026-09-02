@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
 	mergeBlockTransforms,
 	normalizeMetadataTransforms,
@@ -271,8 +272,8 @@ describe( 'a configuration passed as metadata', () => {
 		// `registerBlockType( config, config )` has always worked; the
 		// transforms of such a config are runnable exactly as written, so
 		// normalizing must not swap them for generated stand-ins.
-		const transform = jest.fn( () => null );
-		const isMatch = jest.fn( () => true );
+		const transform = vi.fn( () => null );
+		const isMatch = vi.fn( () => true );
 		const config = {
 			name,
 			apiVersion: 3,

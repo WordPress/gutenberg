@@ -6,17 +6,6 @@
 
 -   Math: Declare `interactivity.clientNavigation` support. The block's front end output is static markup, and without the declaration a Math block inside a Query block forced full page reloads on pagination ([#82248](https://github.com/WordPress/gutenberg/pull/82248)).
 -   Query: Show a snackbar notice instead of a blocking modal when "Reload full page" is turned on automatically because a block inside the Query block doesn't support client-side navigation ([#82246](https://github.com/WordPress/gutenberg/pull/82246)).
-
-### Bug Fixes
-
--   Tabs: Activate the tab that a URL hash points into, so an anchor set on a block inside a tab panel can be reached. Anchor links followed after the page has loaded are handled too, matching the Accordion block ([#81744](https://github.com/WordPress/gutenberg/pull/81744)).
--   Accordion Panel: Reset padding-block when panel is hidden ([#81782](https://github.com/WordPress/gutenberg/pull/81782)).
--   Query: Stop writing `excludeCurrent: null` into the `query` attribute of blocks that never had the key. The mount effect that clears a stale exclusion treated the absent key as stale, changing the serialized markup of every pre-existing Query block as soon as the editor opened it ([#82147](https://github.com/WordPress/gutenberg/pull/82147)).
--   Icon: Preserve intrinsic SVG styles when applying block styles or rotation, and keep stroke widths scaling with the block's size for compatibility ([#78808](https://github.com/WordPress/gutenberg/pull/78808)).
--   Image: Keep the selected image size, and re-point a media file or attachment page link, when an edit in the media editor saves to a new attachment. Cropping, rotating or flipping left the block rendering the full-size file while the size control still reported the size the user had chosen, and left the link pointing at the pre-edit image ([#82316](https://github.com/WordPress/gutenberg/pull/82316)).
-
-### Enhancements
-
 -   Declare block transforms in `block.json` rather than only in JavaScript, so the editor and PHP read the same definition and HTML can be converted to blocks on the server ([#82013](https://github.com/WordPress/gutenberg/pull/82013)). Covers the `raw` transforms of the Paragraph, Heading, List, List Item, Quote, Code, Preformatted, Separator, Image, Table, More and Page Break blocks, and the block-to-block transforms of the Calendar and Tag Cloud blocks. A transform that cannot be written as data keeps its JavaScript definition and shares the declared transform's `name`.
 -   Image: Convert on the server the media whose markup the block can save back unchanged, and leave the rest as it was. Markup carrying more than the block reads — an attachment ID or alignment in a class name, declared dimensions, a legacy `wp-caption` paragraph — would not survive being saved again, so it stays as Custom HTML rather than becoming a block the editor flags ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
 -   Shortcode: Declare the block's `shortcode` transform in `block.json`, so a shortcode standing on its own becomes a Shortcode block on the server as well as in the editor rather than staying inside a paragraph. A shortcode reading as part of a sentence is left where it is, as before ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
@@ -28,6 +17,14 @@
 -   Image: Keep a JavaScript `isMatch` beside the declared `figure:has(img)` selector, because selector engines disagree about `:has()`; and decline server conversion for a `<figure>` carrying class names, which the editor's transform reads meaning into ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
 -   List: Declare `reversed` with its `false` default and the `type` attribute's keyword mapping, so both runtimes read the same values out of list markup ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
 -   Embed: Declare the provider variations in `block.json` — each with the URL `patterns` that attribute an address to it and, where the provider serves one kind of media, the oEmbed `type` among its attributes — so the editor and the server-side conversion match URLs against the same list, and a provider variation registered from PHP through the `get_block_type_variations` filter is matched like a declared one. The JavaScript entries keep only what data cannot hold: the icons and the `isActive` callbacks ([#82013](https://github.com/WordPress/gutenberg/pull/82013)).
+
+### Bug Fixes
+
+-   Tabs: Activate the tab that a URL hash points into, so an anchor set on a block inside a tab panel can be reached. Anchor links followed after the page has loaded are handled too, matching the Accordion block ([#81744](https://github.com/WordPress/gutenberg/pull/81744)).
+-   Accordion Panel: Reset padding-block when panel is hidden ([#81782](https://github.com/WordPress/gutenberg/pull/81782)).
+-   Query: Stop writing `excludeCurrent: null` into the `query` attribute of blocks that never had the key. The mount effect that clears a stale exclusion treated the absent key as stale, changing the serialized markup of every pre-existing Query block as soon as the editor opened it ([#82147](https://github.com/WordPress/gutenberg/pull/82147)).
+-   Icon: Preserve intrinsic SVG styles when applying block styles or rotation, and keep stroke widths scaling with the block's size for compatibility ([#78808](https://github.com/WordPress/gutenberg/pull/78808)).
+-   Image: Keep the selected image size, and re-point a media file or attachment page link, when an edit in the media editor saves to a new attachment. Cropping, rotating or flipping left the block rendering the full-size file while the size control still reported the size the user had chosen, and left the link pointing at the pre-edit image ([#82316](https://github.com/WordPress/gutenberg/pull/82316)).
 
 ### Internal
 

@@ -5,6 +5,7 @@
  */
 import fs from 'fs';
 import path from 'path';
+import { describe, expect, it } from 'vitest';
 import {
 	getPhrasingContentSchema,
 	isPhrasingContent,
