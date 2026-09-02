@@ -1,11 +1,11 @@
 import { renderToString } from '@wordpress/element';
-import { Button, MenuItem, Path, SVG } from '@wordpress/components';
+import { Button, Path, SVG } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { applyFilters } from '@wordpress/hooks';
 import { store as coreStore } from '@wordpress/core-data';
-import { external } from '@wordpress/icons';
-import { VisuallyHidden } from '@wordpress/ui';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Menu, VisuallyHidden } from '@wordpress/ui';
 import { store as editorStore } from '../../store';
 
 function buildInterstitialMarkup() {
@@ -248,10 +248,33 @@ export function PostPreviewMenuItem( { forceIsAutosaveable, onPreview } ) {
 		return null;
 	}
 
+	const { disabled, href, onClick, target } = previewProps;
+	const label = (
+		<Menu.ItemLabel>{ __( 'Preview in new tab' ) }</Menu.ItemLabel>
+	);
+
+	// A link item has no disabled state, and a link that cannot be followed is
+	// not a link. An unsaveable post falls back to a disabled plain item.
+	if ( disabled ) {
+		return <Menu.Item disabled>{ label }</Menu.Item>;
+	}
+
 	return (
-		<MenuItem icon={ external } { ...previewProps }>
-			{ __( 'Preview in new tab' ) }
-		</MenuItem>
+		<Menu.LinkItem
+			href={ href }
+			onClick={ onClick }
+			closeOnClick
+			// The click handler opens, and reuses, a preview window named after
+			// the post, which the link item drops along with any other target.
+			// `openInNewTab` would replace it with `_blank`, and append an
+			// "(opens in a new tab)" that only repeats the label.
+			render={
+				/* eslint-disable-next-line jsx-a11y/anchor-has-content, jsx-a11y/anchor-is-valid -- Menu.LinkItem clones this template with the required href and accessible content. */
+				<a target={ target } />
+			}
+		>
+			{ label }
+		</Menu.LinkItem>
 	);
 }
 

@@ -1,7 +1,23 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useSelect, useDispatch } from '@wordpress/data';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Menu } from '@wordpress/ui';
 import PostPreviewButton, { PostPreviewMenuItem } from '..';
+
+function renderMenu( children ) {
+	return render(
+		<Menu.Root>
+			<Menu.Trigger>Options</Menu.Trigger>
+			<Menu.Popup>{ children }</Menu.Popup>
+		</Menu.Root>
+	);
+}
+
+async function openMenu( user ) {
+	await user.click( screen.getByRole( 'button', { name: 'Options' } ) );
+	await screen.findByRole( 'menu' );
+}
 
 jest.useRealTimers();
 
@@ -128,21 +144,39 @@ describe( 'PostPreviewButton', () => {
 		).toBeInTheDocument();
 	} );
 
-	it( 'should render the menu variant as a link with the shared menu item pattern.', () => {
+	it( 'should render the menu variant as a link with the shared menu item pattern.', async () => {
+		const user = userEvent.setup();
 		const url = 'https://wordpress.org';
 		mockUseSelect( {
 			getEditedPostPreviewLink: () => url,
 			isEditedPostSaveable: () => true,
 		} );
 
-		render( <PostPreviewMenuItem /> );
+		renderMenu( <PostPreviewMenuItem /> );
+		await openMenu( user );
 
 		const menuItem = screen.getByRole( 'menuitem', {
 			name: 'Preview in new tab',
 		} );
 		expect( menuItem.tagName ).toBe( 'A' );
 		expect( menuItem ).toHaveAttribute( 'href', url );
+		// The named window the click handler reuses, rather than the `_blank`
+		// of a link that opens in a new tab.
 		expect( menuItem ).toHaveAttribute( 'target', 'wp-preview-123' );
+	} );
+
+	it( 'should render the menu variant as a disabled item if post is not saveable.', async () => {
+		const user = userEvent.setup();
+		mockUseSelect( { isEditedPostSaveable: () => false } );
+
+		renderMenu( <PostPreviewMenuItem /> );
+		await openMenu( user );
+
+		const menuItem = screen.getByRole( 'menuitem', {
+			name: 'Preview in new tab',
+		} );
+		expect( menuItem.tagName ).not.toBe( 'A' );
+		expect( menuItem ).toHaveAttribute( 'aria-disabled', 'true' );
 	} );
 
 	it( 'should be accessibly disabled if post is not saveable.', () => {

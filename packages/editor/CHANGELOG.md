@@ -5,6 +5,11 @@
 ### Breaking Changes
 
 -   `PluginMoreMenuItem`, `PluginSidebarMoreMenuItem`: Items render with the `Menu` component of `@wordpress/ui` instead of `MenuItem`. A link item honors only `target="_blank"` ([#81564](https://github.com/WordPress/gutenberg/pull/81564)).
+-   `PluginPreviewMenuItem`: Items render with the `Menu` component of `@wordpress/ui` instead of `MenuItem`. A link item honors only `target="_blank"` ([#81226](https://github.com/WordPress/gutenberg/issues/81226)).
+
+### Enhancements
+
+-   View menu: Offer the viewport to preview as radio menu items rather than a list of checkmarks, so the menu shows that only one viewport can be selected at a time, and reads differently from the "Responsive styles" checkbox below it. The menu is rebuilt with the `Menu` component of `@wordpress/ui`; it is now named "View" after its trigger rather than "View options", and "Preview in new tab" carries the menu's own link styling rather than an external-link icon ([#81226](https://github.com/WordPress/gutenberg/issues/81226)).
 
 ### Deprecations
 

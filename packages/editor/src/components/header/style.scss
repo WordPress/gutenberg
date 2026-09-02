@@ -165,10 +165,6 @@
 		}
 	}
 
-	// Don't hide MenuItemsChoice check icons
-	.components-menu-items-choice .components-menu-items__item-icon.components-menu-items__item-icon {
-		display: block;
-	}
 	.editor-document-tools__inserter-toggle.editor-document-tools__inserter-toggle,
 	.interface-pinned-items .components-button {
 		padding-left: $grid-unit;
@@ -268,7 +264,7 @@
 		}
 
 		& > .editor-header__toolbar .editor-document-tools__document-overview-toggle,
-		& > .editor-header__settings > .editor-preview-dropdown,
+		& > .editor-header__settings > .editor-preview-dropdown__toggle,
 		& > .editor-header__settings > .interface-pinned-items,
 		& > .editor-header__settings > .editor-zoom-out-toggle {
 			display: none;

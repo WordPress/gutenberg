@@ -1,22 +1,19 @@
 import clsx from 'clsx';
 import { useViewportMatch } from '@wordpress/compose';
-import {
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
-	MenuItemsChoice,
-} from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { desktop, mobile, tablet, external, check } from '@wordpress/icons';
+import { desktop, mobile, tablet } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { ActionItem, store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
-import { VisuallyHidden } from '@wordpress/ui';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Menu } from '@wordpress/ui';
 import { store as editorStore } from '../../store';
 import { PostPreviewMenuItem } from '../post-preview-button';
+import MoreMenuItem from '../more-menu/more-menu-item';
 import { sidebars } from '../sidebar/constants';
 import { VIEWPORT_STATE_BY_DEVICE_TYPE } from '../../utils/device-type';
 import { unlock } from '../../lock-unlock';
@@ -111,21 +108,6 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		return null;
 	}
 
-	const popoverProps = {
-		placement: 'bottom-end',
-	};
-	const toggleProps = {
-		className: 'editor-preview-dropdown__toggle',
-		iconPosition: 'right',
-		size: 'compact',
-		showTooltip: ! showIconLabels,
-		disabled,
-		accessibleWhenDisabled: disabled,
-	};
-	const menuProps = {
-		'aria-label': __( 'View options' ),
-	};
-
 	const deviceIcons = {
 		desktop,
 		mobile,
@@ -143,7 +125,6 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		{
 			value: 'Desktop',
 			label: __( 'Desktop' ),
-			icon: desktop,
 			info: isResponsiveEditing
 				? __( 'Style all viewports.' )
 				: __( 'Preview desktop viewport.' ),
@@ -153,7 +134,6 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 					{
 						value: 'Tablet',
 						label: __( 'Tablet' ),
-						icon: tablet,
 						info: isResponsiveEditing
 							? __( 'Style tablet only.' )
 							: __( 'Preview tablet viewport.' ),
@@ -165,7 +145,6 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 					{
 						value: 'Mobile',
 						label: __( 'Mobile' ),
-						icon: mobile,
 						info: isResponsiveEditing
 							? __( 'Style mobile only.' )
 							: __( 'Preview mobile viewport.' ),
@@ -175,94 +154,123 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	];
 
 	return (
-		<DropdownMenu
-			className={ clsx(
-				'editor-preview-dropdown',
-				`editor-preview-dropdown--${ deviceType.toLowerCase() }`,
-				{ 'is-responsive-editing': isResponsiveEditing }
-			) }
-			popoverProps={ popoverProps }
-			toggleProps={ toggleProps }
-			menuProps={ menuProps }
-			icon={ deviceIcons[ deviceType.toLowerCase() ] }
-			label={ __( 'View' ) }
-			disableOpenOnArrowDown={ disabled }
-		>
-			{ ( { onClose } ) => (
-				<>
-					<MenuGroup>
-						<MenuItemsChoice
-							choices={ choices }
-							value={ deviceType }
-							onSelect={ handleDevicePreviewChange }
-						/>
-					</MenuGroup>
-					{ isResponsiveEditingEnabled && (
-						<MenuGroup>
-							<MenuItem
-								icon={ isResponsiveEditing ? check : undefined }
-								isSelected={ isResponsiveEditing }
-								role="menuitemcheckbox"
-								onClick={ handleResponsiveEditingChange }
-								info={ __(
+		// The `disabled` prop on `Menu.Root` (rather than on the trigger) keeps
+		// the menu from opening while letting the trigger button stay focusable
+		// via its own `accessibleWhenDisabled`.
+		<Menu.Root modal={ false } disabled={ disabled }>
+			<Menu.Trigger
+				render={
+					<Button
+						className={ clsx( 'editor-preview-dropdown__toggle', {
+							'is-responsive-editing': isResponsiveEditing,
+						} ) }
+						size="compact"
+						icon={ deviceIcons[ deviceType.toLowerCase() ] }
+						label={ __( 'View' ) }
+						showTooltip={ ! showIconLabels }
+						disabled={ disabled }
+						accessibleWhenDisabled={ disabled }
+					/>
+				}
+			/>
+			{ /* The menu is named "View" after its trigger. An `aria-label` of
+			its own would be ignored, the trigger naming it takes precedence. */ }
+			<Menu.Popup
+				className="editor-preview-dropdown__popup"
+				positioner={ <Menu.Positioner align="end" /> }
+			>
+				<Menu.RadioGroup
+					value={ deviceType }
+					onValueChange={ handleDevicePreviewChange }
+				>
+					<Menu.Group>
+						{ choices.map( ( choice ) => (
+							<Menu.RadioItem
+								key={ choice.value }
+								value={ choice.value }
+							>
+								<Menu.ItemLabel>
+									{ choice.label }
+								</Menu.ItemLabel>
+								<Menu.ItemDescription>
+									{ choice.info }
+								</Menu.ItemDescription>
+							</Menu.RadioItem>
+						) ) }
+					</Menu.Group>
+				</Menu.RadioGroup>
+				{ isResponsiveEditingEnabled && (
+					<>
+						<Menu.Separator />
+						<Menu.CheckboxItem
+							checked={ isResponsiveEditing }
+							onClick={ handleResponsiveEditingChange }
+						>
+							<Menu.ItemLabel>
+								{ __( 'Responsive styles' ) }
+							</Menu.ItemLabel>
+							<Menu.ItemDescription>
+								{ __(
 									'Style changes apply only to the selected viewport.'
 								) }
-							>
-								{ __( 'Responsive styles' ) }
-							</MenuItem>
-						</MenuGroup>
-					) }
-					{ isTemplate && (
-						<MenuGroup>
-							<MenuItem
-								href={ homeUrl }
-								target="_blank"
-								icon={ external }
-								onClick={ onClose }
-							>
+							</Menu.ItemDescription>
+						</Menu.CheckboxItem>
+					</>
+				) }
+				{ isTemplate && (
+					<>
+						<Menu.Separator />
+						<Menu.LinkItem
+							href={ homeUrl }
+							openInNewTab
+							closeOnClick
+						>
+							<Menu.ItemLabel>
 								{ __( 'View site' ) }
-								<VisuallyHidden render={ <span /> }>
-									{
-										/* translators: accessibility text */
-										__( '(opens in a new tab)' )
-									}
-								</VisuallyHidden>
-							</MenuItem>
-						</MenuGroup>
-					) }
-					{ ! isTemplate && !! templateId && (
-						<MenuGroup>
-							<MenuItem
-								icon={ ! isTemplateHidden ? check : undefined }
-								isSelected={ ! isTemplateHidden }
-								role="menuitemcheckbox"
-								onClick={ () => {
-									const newRenderingMode = isTemplateHidden
-										? 'template-locked'
-										: 'post-only';
-									setRenderingMode( newRenderingMode );
-									setDefaultRenderingMode( newRenderingMode );
-									resetZoomLevel();
-								} }
-							>
+							</Menu.ItemLabel>
+						</Menu.LinkItem>
+					</>
+				) }
+				{ ! isTemplate && !! templateId && (
+					<>
+						<Menu.Separator />
+						<Menu.CheckboxItem
+							checked={ ! isTemplateHidden }
+							onClick={ () => {
+								const newRenderingMode = isTemplateHidden
+									? 'template-locked'
+									: 'post-only';
+								setRenderingMode( newRenderingMode );
+								setDefaultRenderingMode( newRenderingMode );
+								resetZoomLevel();
+							} }
+						>
+							<Menu.ItemLabel>
 								{ __( 'Show template' ) }
-							</MenuItem>
-						</MenuGroup>
+							</Menu.ItemLabel>
+						</Menu.CheckboxItem>
+					</>
+				) }
+				{ isViewable && (
+					<>
+						<Menu.Separator />
+						<PostPreviewMenuItem
+							forceIsAutosaveable={ forceIsAutosaveable }
+						/>
+					</>
+				) }
+				<ActionItem.Slot
+					name="core/plugin-preview-menu"
+					fillProps={ { as: MoreMenuItem } }
+				>
+					{ ( items ) => (
+						<>
+							<Menu.Separator />
+							<Menu.Group>{ items }</Menu.Group>
+						</>
 					) }
-					{ isViewable && (
-						<MenuGroup>
-							<PostPreviewMenuItem
-								forceIsAutosaveable={ forceIsAutosaveable }
-								onPreview={ onClose }
-							/>
-						</MenuGroup>
-					) }
-					<ActionItem.Slot
-						name="core/plugin-preview-menu"
-						fillProps={ { onClick: onClose } }
-					/>
-				</>
-			) }
-		</DropdownMenu>
+				</ActionItem.Slot>
+			</Menu.Popup>
+		</Menu.Root>
 	);
 }

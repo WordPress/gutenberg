@@ -1,4 +1,4 @@
-.editor-preview-dropdown .editor-preview-dropdown__toggle.has-icon.has-text {
+.editor-preview-dropdown__toggle.has-icon.has-text {
 	padding-right: 4px;
 	padding-left: 6px;
 }
@@ -7,6 +7,12 @@
 // synced-pattern color for a consistent "special state" cue. Coloring the
 // button (rather than just the icon) also tints the "View" text label when the
 // "Show button text labels" preference is on; the icon follows via currentColor.
-.editor-preview-dropdown.is-responsive-editing .editor-preview-dropdown__toggle {
+.editor-preview-dropdown__toggle.is-responsive-editing {
 	color: var(--wp-block-synced-color);
+}
+
+.editor-preview-dropdown__popup {
+	// Narrower than the default of the menu, closer to the previous menu, which
+	// sized itself to its longest label.
+	--wp-ui-menu-max-width: var(--wpds-dimension-surface-width-sm);
 }

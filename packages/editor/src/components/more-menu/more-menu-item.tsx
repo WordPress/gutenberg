@@ -199,7 +199,8 @@ function UnforwardedMoreMenuItem(
 }
 
 /**
- * Renders an item of the more menu. Fills use it instead of the menu parts,
- * which only share their context within the package they are bundled into.
+ * Renders an item of the more menu, or of the View menu. Fills use it instead
+ * of the menu parts, which only share their context within the package they
+ * are bundled into.
  */
 export default forwardRef( UnforwardedMoreMenuItem );
