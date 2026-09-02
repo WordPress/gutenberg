@@ -26,8 +26,8 @@ const FIXTURES = [
 		primary: '#3858e9',
 	},
 	{
-		background: '#4f386e',
-		primary: '#608010',
+		background: '#413256',
+		primary: '#a3b745',
 	},
 	{
 		background: '#777777',
