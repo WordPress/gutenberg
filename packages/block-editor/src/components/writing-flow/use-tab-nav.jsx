@@ -20,6 +20,9 @@ const PREVENT_SCROLL_ON_FOCUS = {
 	pointerEvents: 'none',
 };
 
+// Keys that move focus from the canvas stop into the canvas.
+const ENTRY_KEYS = [ 'Enter', ' ', 'F2', 'Escape', 'ArrowDown', 'ArrowUp' ];
+
 export default function useTabNav() {
 	const containerRef = /** @type {typeof useRef<HTMLElement>} */ ( useRef )();
 	const focusCaptureBeforeRef = useRef();
@@ -113,15 +116,7 @@ export default function useTabNav() {
 
 		const { key } = event;
 
-		if (
-			! event.shiftKey &&
-			( key === 'Enter' ||
-				key === ' ' ||
-				key === 'F2' ||
-				key === 'Escape' ||
-				key === 'ArrowDown' ||
-				key === 'ArrowUp' )
-		) {
+		if ( ! event.shiftKey && ENTRY_KEYS.includes( key ) ) {
 			event.preventDefault();
 			enterCanvas( key === 'ArrowUp' );
 			return;
@@ -161,13 +156,17 @@ export default function useTabNav() {
 
 	// Focus arriving behind the canvas is forwarded to the stop before it,
 	// so the canvas has one stop, reached from either direction.
+	function onFocusCapture() {
+		focusCaptureBeforeRef.current?.focus();
+	}
+
 	const after = (
 		<div
 			ref={ focusCaptureAfterRef }
 			tabIndex="0"
 			className="block-editor-writing-flow__canvas-stop-redirect"
 			style={ PREVENT_SCROLL_ON_FOCUS }
-			onFocus={ () => focusCaptureBeforeRef.current?.focus() }
+			onFocus={ onFocusCapture }
 		/>
 	);
 
@@ -245,10 +244,10 @@ export default function useTabNav() {
 			// Tab out of the canvas: move focus past the element on the side
 			// being tabbed towards, without stopping on it.
 			event.preventDefault();
-			const outside = isShift
+			const next = isShift
 				? focus.tabbable.findPrevious( focusCaptureBeforeRef.current )
 				: focus.tabbable.findNext( focusCaptureAfterRef.current );
-			outside?.focus();
+			next?.focus();
 		}
 
 		function onFocusOut( event ) {

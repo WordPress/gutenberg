@@ -2,25 +2,17 @@
 @use "@wordpress/base-styles/variables" as *;
 
 .block-editor-writing-flow__canvas-stop {
-	/* The anchor for the focus ring and the hint. In the iframed editor the
-	   positioned scale container is the anchor instead, so both stretch over
-	   the canvas box rather than this zero-size element. */
-	position: relative;
 	outline: none;
-}
-
-.block-editor-iframe__scale-container > .block-editor-writing-flow__canvas-stop {
-	position: static;
 }
 
 .block-editor-writing-flow__canvas-stop-redirect {
 	outline: none;
 }
 
-/* The stop element is zero-size, so its focus indication is drawn around the
-   canvas it stands for, right after it. For the frame it is an overlay
-   stretched over the positioned scale container: Safari paints an outline on
-   a frame element underneath the frame's content. */
+/* The stop element is invisible, so its focus indication is drawn around the
+   canvas it stands for. For the frame it is an overlay stretched over the
+   positioned scale container: Safari paints an outline on a frame element
+   underneath the frame's content. */
 .block-editor-iframe__scale-container > .block-editor-writing-flow__canvas-stop:focus::after {
 	content: "";
 	position: absolute;
