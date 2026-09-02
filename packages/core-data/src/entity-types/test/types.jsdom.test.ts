@@ -4,9 +4,8 @@
  *
  * The assertions here are types, not behaviour: each one lives in a function
  * that is never called, so a regression surfaces as a type error rather than a
- * failing run. Jest still needs one real test for the suite to report, which is
- * what `dummy test` is for -- the same shape `@wordpress/interactivity` uses in
- * `src/test/types.ts`.
+ * failing run. Each group is registered as an inert Vitest test so repository
+ * test discovery accepts the file without executing selector calls.
  *
  * The selector cases go through `select()` and `resolveSelect()` rather than
  * instantiating `EntityRecordOfQuery` directly, so they exercise the overload
@@ -15,7 +14,9 @@
 
 /* eslint-disable no-unused-expressions -- the assertions below are expression statements. */
 /* eslint-disable @typescript-eslint/no-unused-vars -- the values exist only so their inferred types can be asserted. */
+/* eslint-disable jest/expect-expect -- these tests contain compile-time assertions only. */
 import { dispatch, select, resolveSelect } from '@wordpress/data';
+import { describe, it } from 'vitest';
 import { store as coreStore } from '../../index';
 import type {
 	Context,
@@ -114,11 +115,7 @@ declare module '@wordpress/core-data' {
 }
 
 describe( 'Entity record types', () => {
-	it( 'dummy test', () => {
-		expect( true ).toBe( true );
-	} );
-
-	describe( 'the map resolves root entities to their record type', () => {
+	it( 'the map resolves root entities to their record type', () => {
 		() => {
 			true satisfies Expect<
 				EntityRecordOf< 'root', '__unstableBase' >,
@@ -145,7 +142,7 @@ describe( 'Entity record types', () => {
 		};
 	} );
 
-	describe( 'the map resolves post types and taxonomies', () => {
+	it( 'the map resolves post types and taxonomies', () => {
 		() => {
 			true satisfies Expect<
 				EntityRecordOf< 'postType', 'post' >,
@@ -182,7 +179,7 @@ describe( 'Entity record types', () => {
 		};
 	} );
 
-	describe( 'the map rejects pairs it does not know', () => {
+	it( 'the map rejects pairs it does not know', () => {
 		() => {
 			type UnknownName = EntityRecordOf<
 				'postType',
@@ -199,7 +196,7 @@ describe( 'Entity record types', () => {
 		};
 	} );
 
-	describe( 'a query resolves the record context', () => {
+	it( 'a query resolves the record context', () => {
 		() => {
 			true satisfies Expect<
 				EntityRecordOfQuery< 'postType', 'post', { context: 'view' } >,
@@ -221,7 +218,7 @@ describe( 'Entity record types', () => {
 		};
 	} );
 
-	describe( 'a query that does not pin the context down resolves to all of them', () => {
+	it( 'a query that does not pin the context down resolves to all of them', () => {
 		() => {
 			// A reusable object widens `context` to `string` at the
 			// declaration. The request still goes out with the context the
@@ -262,7 +259,7 @@ describe( 'Entity record types', () => {
 		};
 	} );
 
-	describe( 'a union of query shapes resolves each member separately', () => {
+	it( 'a union of query shapes resolves each member separately', () => {
 		/*
 		 * `keyof` over a union is the intersection of its keys, so a query
 		 * that only carries `context` on one member would otherwise look as
@@ -314,7 +311,7 @@ describe( 'Entity record types', () => {
 		};
 	} );
 
-	describe( 'getEntityRecord infers the record through select()', () => {
+	it( 'getEntityRecord infers the record through select()', () => {
 		() => {
 			const post = select( coreStore ).getEntityRecord(
 				'postType',
@@ -339,7 +336,7 @@ describe( 'Entity record types', () => {
 		};
 	} );
 
-	describe( 'the inferred content field matches the REST schema', () => {
+	it( 'the inferred content field matches the REST schema', () => {
 		() => {
 			/*
 			 * The map makes `Post` and `Page` the default result for these
@@ -382,7 +379,7 @@ describe( 'Entity record types', () => {
 		};
 	} );
 
-	describe( 'the inferred status accepts values registered with the REST API', () => {
+	it( 'the inferred status accepts values registered with the REST API', () => {
 		() => {
 			const post = select( coreStore ).getEntityRecord(
 				'postType',
@@ -398,7 +395,7 @@ describe( 'Entity record types', () => {
 		};
 	} );
 
-	describe( 'the inferred post type supports match the REST schema', () => {
+	it( 'the inferred post type supports match the REST schema', () => {
 		() => {
 			const postType = select( coreStore ).getEntityRecord(
 				'root',
@@ -411,7 +408,7 @@ describe( 'Entity record types', () => {
 		};
 	} );
 
-	describe( 'the inferred template flags match the REST schema', () => {
+	it( 'the inferred template flags match the REST schema', () => {
 		() => {
 			const template = select( coreStore ).getEntityRecord(
 				'postType',
@@ -434,7 +431,7 @@ describe( 'Entity record types', () => {
 		};
 	} );
 
-	describe( 'the global styles shortcuts use the entity record shape', () => {
+	it( 'the global styles shortcuts use the entity record shape', () => {
 		() => {
 			const globalStyles = select( coreStore ).getGlobalStyles( 1 );
 			true satisfies Expect<
@@ -462,7 +459,7 @@ describe( 'Entity record types', () => {
 		};
 	} );
 
-	describe( 'the attachment caption follows the REST schema', () => {
+	it( 'the attachment caption follows the REST schema', () => {
 		() => {
 			const attachment = select( coreStore ).getEntityRecord(
 				'postType',
@@ -476,7 +473,7 @@ describe( 'Entity record types', () => {
 		};
 	} );
 
-	describe( 'the template field follows the REST schema', () => {
+	it( 'the template field follows the REST schema', () => {
 		() => {
 			/*
 			 * The posts controller registers `template` outside the supports
@@ -519,7 +516,7 @@ describe( 'Entity record types', () => {
 		};
 	} );
 
-	describe( 'getEntityRecords infers the record list through select()', () => {
+	it( 'getEntityRecords infers the record list through select()', () => {
 		() => {
 			const posts = select( coreStore ).getEntityRecords(
 				'postType',
@@ -530,7 +527,7 @@ describe( 'Entity record types', () => {
 		};
 	} );
 
-	describe( 'resolveSelect promises the same record', () => {
+	it( 'resolveSelect promises the same record', () => {
 		async () => {
 			const post = await resolveSelect( coreStore ).getEntityRecord(
 				'postType',
@@ -547,7 +544,7 @@ describe( 'Entity record types', () => {
 		};
 	} );
 
-	describe( 'the selectors resolve the context from the query', () => {
+	it( 'the selectors resolve the context from the query', () => {
 		async () => {
 			const inline = select( coreStore ).getEntityRecord(
 				'postType',
@@ -637,7 +634,7 @@ describe( 'Entity record types', () => {
 		};
 	} );
 
-	describe( '`_fields` returns a partial record', () => {
+	it( '`_fields` returns a partial record', () => {
 		() => {
 			const post = select( coreStore ).getEntityRecord(
 				'postType',
@@ -672,7 +669,7 @@ describe( 'Entity record types', () => {
 		};
 	} );
 
-	describe( 'an unknown pair falls back to the wider overload', () => {
+	it( 'an unknown pair falls back to the wider overload', () => {
 		async () => {
 			// Entities registered at runtime are not in the map, so the
 			// selector keeps resolving to the broad union rather than erroring.
@@ -731,7 +728,7 @@ describe( 'Entity record types', () => {
 		};
 	} );
 
-	describe( 'a plugin can extend the map', () => {
+	it( 'a plugin can extend the map', () => {
 		() => {
 			// A name added to a kind that already exists.
 			true satisfies Expect<
@@ -767,7 +764,7 @@ describe( 'Entity record types', () => {
 		};
 	} );
 
-	describe( 'a call with no query uses the context the entity is fetched in', () => {
+	it( 'a call with no query uses the context the entity is fetched in', () => {
 		() => {
 			/*
 			 * Most entities are registered with `context: 'edit'`, but a few
@@ -818,7 +815,7 @@ describe( 'Entity record types', () => {
 		};
 	} );
 
-	describe( 'a plugin declares the context its entity is fetched in', () => {
+	it( 'a plugin declares the context its entity is fetched in', () => {
 		() => {
 			// A pair that declares `view` resolves to the view record, so the
 			// edit-only field is unreadable without asking for `edit`.
@@ -870,5 +867,6 @@ describe( 'Entity record types', () => {
 	} );
 } );
 
+/* eslint-enable jest/expect-expect */
 /* eslint-enable no-unused-expressions */
 /* eslint-enable @typescript-eslint/no-unused-vars */
