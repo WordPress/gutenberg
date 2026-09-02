@@ -794,7 +794,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			 * override that switches a vertical base layout to horizontal has to declare
 			 * it explicitly, otherwise the base `flex-direction: column` keeps applying.
 			 */
-			if ( $should_output_flex_orientation && null !== $viewport_overrides ) {
+			if ( null !== $viewport_overrides && $has_viewport_property_override( 'orientation' ) ) {
 				$layout_styles[] = array(
 					'selector'     => $selector,
 					'declarations' => array( 'flex-direction' => 'row' ),
