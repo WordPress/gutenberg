@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Experiments
-
--   The editor canvas is a single stop in the tab order: tabbing towards it lands on a labelled stop with a visible hint, Enter and a few forgiving alternatives go in, Escape steps out, and Tab moves past the whole canvas ([#82314](https://github.com/WordPress/gutenberg/pull/82314)).
-
 ### New Features
 
 -   `BackgroundImageControl`: Support setting the background image from a URL, through the URL field in the media replace popover ([#82230](https://github.com/WordPress/gutenberg/pull/82230)).
