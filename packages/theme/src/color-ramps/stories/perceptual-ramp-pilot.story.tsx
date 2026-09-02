@@ -487,6 +487,53 @@ function ComponentComparison( {
 					const neutral = ramps.background.ramp;
 					const brand = ramps.primary.ramp;
 					const error = ramps.error.ramp;
+					const buttonExamples = [
+						{
+							label: 'Brand button',
+							restingBackground: brand.bgFill1,
+							activeBackground: brand.bgFill2,
+							foreground: brand.fgFill,
+						},
+						{
+							label: 'Neutral button',
+							restingBackground: neutral.bgFillInverted1,
+							activeBackground: neutral.bgFillInverted2,
+							foreground: neutral.fgFillInverted,
+						},
+						{
+							label: 'Error button',
+							restingBackground: error.bgFill1,
+							activeBackground: error.bgFill2,
+							foreground: error.fgFill,
+						},
+					] as const;
+					const tabExamples = [
+						{
+							label: 'Resting',
+							state: 'resting',
+							foreground: neutral.fgSurface4,
+						},
+						{
+							label: 'Hover',
+							state: 'hover',
+							foreground: neutral.fgSurface5,
+						},
+						{
+							label: 'Focus',
+							state: 'focus',
+							foreground: neutral.fgSurface5,
+						},
+						{
+							label: 'Active',
+							state: 'active',
+							foreground: neutral.fgSurface5,
+						},
+						{
+							label: 'Disabled',
+							state: 'disabled',
+							foreground: neutral.fgSurface2,
+						},
+					] as const;
 					return (
 						<div
 							className={ styles[ 'component-panel' ] }
@@ -497,7 +544,7 @@ function ComponentComparison( {
 									'--pilot-fg': neutral.fgSurface5,
 									'--pilot-fg-weak': neutral.fgSurface3,
 									'--pilot-border': neutral.stroke3,
-									'--pilot-focus': brand.fgSurface5,
+									'--pilot-focus': brand.stroke3,
 								} as React.CSSProperties
 							}
 						>
@@ -505,54 +552,118 @@ function ComponentComparison( {
 							<p className={ styles[ 'weak-text' ] }>
 								Supporting text and hierarchy
 							</p>
-							<div className={ styles[ 'button-row' ] }>
-								<button
-									style={ {
-										background: brand.bgFill1,
-										color: brand.fgFill,
-									} }
-									type="button"
-								>
-									Brand
-								</button>
-								<button
-									aria-pressed="true"
-									style={ {
-										background: brand.bgFill2,
-										color: brand.fgFill,
-									} }
-									type="button"
-								>
-									Brand active
-								</button>
-							</div>
-							<div className={ styles[ 'button-row' ] }>
-								<button
-									style={ {
-										background: error.bgFill1,
-										color: error.fgFill,
-									} }
-									type="button"
-								>
-									Delete
-								</button>
-								<button
-									aria-pressed="true"
-									style={ {
-										background: error.bgFill2,
-										color: error.fgFill,
-									} }
-									type="button"
-								>
-									Delete active
-								</button>
+							<div className={ styles[ 'state-list' ] }>
+								{ buttonExamples.map( ( example ) => (
+									<div
+										className={ styles[ 'state-sample' ] }
+										key={ example.label }
+									>
+										<span
+											className={
+												styles[ 'state-label' ]
+											}
+										>
+											{ example.label }
+										</span>
+										<div
+											className={ styles[ 'button-row' ] }
+										>
+											{ [
+												{
+													label: 'Resting',
+													state: 'resting',
+													background:
+														example.restingBackground,
+													foreground:
+														example.foreground,
+												},
+												{
+													label: 'Hover',
+													state: 'hover',
+													background:
+														example.activeBackground,
+													foreground:
+														example.foreground,
+												},
+												{
+													label: 'Focus',
+													state: 'focus',
+													background:
+														example.activeBackground,
+													foreground:
+														example.foreground,
+												},
+												{
+													label: 'Active',
+													state: 'active',
+													background:
+														example.activeBackground,
+													foreground:
+														example.foreground,
+												},
+												{
+													label: 'Disabled',
+													state: 'disabled',
+													background:
+														neutral.surface5,
+													foreground:
+														neutral.fgSurface2,
+												},
+											].map( ( state ) => (
+												<span
+													className={
+														styles[ 'state-button' ]
+													}
+													data-state={ state.state }
+													key={ state.state }
+													style={ {
+														background:
+															state.background,
+														color: state.foreground,
+													} }
+												>
+													{ state.label }
+												</span>
+											) ) }
+										</div>
+									</div>
+								) ) }
+								<div className={ styles[ 'state-sample' ] }>
+									<span className={ styles[ 'state-label' ] }>
+										Neutral tabs
+									</span>
+									<div className={ styles[ 'tabs-row' ] }>
+										{ tabExamples.map( ( example ) => (
+											<span
+												className={
+													styles[ 'tab-state' ]
+												}
+												data-state={ example.state }
+												key={ example.state }
+												style={ {
+													borderBlockEndColor:
+														example.state ===
+														'active'
+															? neutral.stroke4
+															: 'transparent',
+													color: example.foreground,
+												} }
+											>
+												{ example.label }
+											</span>
+										) ) }
+									</div>
+								</div>
 							</div>
 						</div>
 					);
 				} ) }
 			</div>
 			<p className={ styles[ 'component-note' ] }>
-				{ label } uses the same generated values as the tables above.
+				These static samples map the generated ramps for { label } to
+				the semantic tokens used by WordPress UI. Focus also includes
+				the generated focus stroke. Identical hover and active samples
+				mean those states use the same semantic token.
 			</p>
 		</section>
 	);
@@ -612,7 +723,7 @@ function SeedCombination( {
 
 export const Comparison: Story = {
 	args: {
-		approaches: [ ...EXPERIMENTAL_RAMP_METHODS ],
+		approaches: [ 'anchored', 'pinned-role-hybrid' ],
 	},
 	render: ( { approaches } ) => {
 		const methods = EXPERIMENTAL_RAMP_METHODS.filter( ( method ) =>
