@@ -24,6 +24,30 @@ function isQuickInserterOpen( doc ) {
 }
 
 /**
+ * Hides the title-gap insertion point when it is the visible cue.
+ *
+ * @param {Object} registry Data registry.
+ */
+function hideTitleGapInsertionPoint( registry ) {
+	const blockEditorSelect = registry.select( blockEditorStore );
+	const insertionPoint = blockEditorSelect.isBlockInsertionPointVisible()
+		? blockEditorSelect.getBlockInsertionPoint()
+		: null;
+
+	// Hide only the title-gap insertion point so we don't dismiss
+	// unrelated in-between inserters. Leaving it visible lets the
+	// pointer-events overlay steal clicks on the first block
+	// (e.g. shift+click multi-selection inside a Group).
+	if (
+		insertionPoint?.__unstableWithInserter &&
+		insertionPoint.rootClientId === '' &&
+		insertionPoint.index === 0
+	) {
+		registry.dispatch( blockEditorStore ).hideInsertionPoint();
+	}
+}
+
+/**
  * Shows the block inserter when hovering the gap between the post title
  * and the first block in the post editor.
  *
@@ -116,28 +140,16 @@ export function useTitleGapInserter( enabled ) {
 					return;
 				}
 
-				const insertionPoint =
-					blockEditorSelect.isBlockInsertionPointVisible()
-						? blockEditorSelect.getBlockInsertionPoint()
-						: null;
-
-				// Hide only the title-gap insertion point so we don't dismiss
-				// unrelated in-between inserters. Leaving it visible lets the
-				// pointer-events overlay steal clicks on the first block
-				// (e.g. shift+click multi-selection inside a Group).
-				if (
-					insertionPoint?.__unstableWithInserter &&
-					insertionPoint.rootClientId === '' &&
-					insertionPoint.index === 0
-				) {
-					hideInsertionPoint();
-				}
+				hideTitleGapInsertionPoint( registry );
 			}
 
 			node.addEventListener( 'mousemove', onMouseMove );
 
 			return () => {
 				node.removeEventListener( 'mousemove', onMouseMove );
+				// Clear a stuck title-gap cue when the hook disables (e.g.
+				// distraction-free / zoom-out) or the effect re-runs.
+				hideTitleGapInsertionPoint( registry );
 			};
 		},
 		[ enabled, isDisabled, registry ]
