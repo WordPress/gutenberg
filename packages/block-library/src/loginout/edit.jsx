@@ -1,10 +1,10 @@
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
-	TextControl,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import { InputControl } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
@@ -72,16 +72,16 @@ export default function LoginOutEdit( { attributes, setAttributes } ) {
 							setAttributes( { loginText: 'Log in' } )
 						}
 					>
-						<TextControl
+						<InputControl
 							label={ __( 'Login Text' ) }
 							value={ loginText }
-							onChange={ ( value ) =>
+							onValueChange={ ( value ) =>
 								setAttributes( { loginText: value } )
 							}
 							placeholder={ __( 'Enter login text' ) }
-							help={ __( 'Customize the text for the login.' ) }
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
+							description={ __(
+								'Customize the text for the login.'
+							) }
 						/>
 					</ToolsPanelItem>
 					<ToolsPanelItem
@@ -92,16 +92,16 @@ export default function LoginOutEdit( { attributes, setAttributes } ) {
 							setAttributes( { logoutText: 'Log out' } )
 						}
 					>
-						<TextControl
+						<InputControl
 							label={ __( 'Logout Text' ) }
 							value={ logoutText }
-							onChange={ ( value ) =>
+							onValueChange={ ( value ) =>
 								setAttributes( { logoutText: value } )
 							}
 							placeholder={ __( 'Enter logout text' ) }
-							help={ __( 'Customize the text for the logout.' ) }
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
+							description={ __(
+								'Customize the text for the logout.'
+							) }
 						/>
 					</ToolsPanelItem>
 				</ToolsPanel>
