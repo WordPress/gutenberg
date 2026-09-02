@@ -1,3 +1,5 @@
+import { describe, expect, it, vi } from 'vitest';
+
 /**
  * Loads the entry point against a fresh set of mocks.
  *
@@ -7,12 +9,12 @@
  * @return The mocked core module, to assert against.
  */
 async function loadEntryPoint( result: () => Promise< void > ) {
-	jest.resetModules();
-	jest.doMock( '@actions/core', () => ( { setFailed: jest.fn() } ) );
-	jest.doMock( '../run.ts', () => ( { run: result } ) );
+	vi.resetModules();
+	vi.doMock( '@actions/core', () => ( { setFailed: vi.fn() } ) );
+	vi.doMock( '../run.ts', () => ( { run: result } ) );
 
-	const core = require( '@actions/core' );
-	require( '../index.ts' );
+	const core = await import( '@actions/core' );
+	await import( '../index.ts' );
 	await new Promise( process.nextTick );
 
 	return core;

@@ -10,6 +10,9 @@
 
 ### Bug Fixes
 
+-   `ColorPalette`: Apply the computed contrast color to the selected checkmark now that the icon is stroke-based. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
+-   `CheckboxControl`: Color the checked and indeterminate icons with `color` rather than `fill`, so they stay visible now that those icons are stroke-based. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
+-   `BorderBoxControl`: Give the group of border controls an accessible name from the `label` prop, by rendering the wrapper as a `role="group"` associated with the label through `aria-labelledby`. A consumer-supplied `aria-labelledby` or `aria-label` takes precedence over `label` and names the group instead; the wrapper is only given the `group` role when one of the three provides a name. A hidden label (`hideLabelFromVision`) now renders as a `span` rather than a `label` element, matching the visible one ([#82279](https://github.com/WordPress/gutenberg/pull/82279)).
 -   `Snackbar`: Restart the auto-dismiss timer when a notice is recreated with the same ID during removal ([#81764](https://github.com/WordPress/gutenberg/pull/81764)).
 -   `ToolsPanel`: Stop a panel item whose `panelId` doesn't match the panel from writing its value into that panel's menu, which could leave an orphaned entry in the dropdown ([#82127](https://github.com/WordPress/gutenberg/pull/82127)).
 -   `Icon`: Merge a consumer-supplied `style` prop with the icon's intrinsic styles instead of replacing them, so styles like `fill: none` on stroke-based icons survive unless the consumer overrides the same property explicitly. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))

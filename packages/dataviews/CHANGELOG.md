@@ -2,6 +2,44 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Removed the rich text options (`className`, `clientId`, `allowedFormats`, `disableFormats`, `withoutInteractiveFormatting`, `preserveWhiteSpace`, `disableLineBreaks`) from the `config` prop of `DataFormControlProps`. They were added for the built-in `richtext` control ([#78471](https://github.com/WordPress/gutenberg/pull/78471)), which has since moved to `@wordpress/editor` ([#81430](https://github.com/WordPress/gutenberg/pull/81430)), so nothing in this package sets or reads them ([#82330](https://github.com/WordPress/gutenberg/pull/82330)).
+-   DataForm: a combined form field (one with `children`) is now treated purely as a layout container. Its `id` is no longer resolved against the field definitions: a field sharing that `id` no longer contributes validation rules to the group, and the `panel` layout no longer uses it for the collapsed summary or `readOnly` state, falling back to the group's first leaf child instead ([#82175](https://github.com/WordPress/gutenberg/pull/82175)).
+
+    If a combined field relied on sharing its `id` with a field to pick the panel summary, declare it through `layout.summary` instead. For example, a `discussion` field whose `render` summarizes `comment_status` and `ping_status` together:
+
+    ```js
+    // Before: the summary came from the `discussion` field because the group shares its id.
+    const form = {
+    	layout: { type: 'panel' },
+    	fields: [
+    		{ id: 'discussion', children: [ 'comment_status', 'ping_status' ] },
+    	],
+    };
+
+    // After: the summary field is explicit. Without it, the group would
+    // now be summarized by its first child, `comment_status`.
+    const form = {
+    	layout: { type: 'panel' },
+    	fields: [
+    		{
+    			id: 'discussion',
+    			layout: { type: 'panel', summary: 'discussion' },
+    			children: [ 'comment_status', 'ping_status' ],
+    		},
+    	],
+    };
+    ```
+
+    If a combined field relied on a same-id field's `isValid` rules being applied to the group, move those rules to the child fields.
+
+### Enhancements
+
+-   DataForm: Communicate the timezone a `datetime` value is edited in. When the site timezone differs from the visitor's, the control renders help text under the input naming the site timezone: the zone name (e.g. `(CEST) Europe/Madrid`) or the UTC offset for sites pinned to one ([#82291](https://github.com/WordPress/gutenberg/pull/82291)).
+-   Export the `DataViewsProps` and `ItemWithId` types ([#82326](https://github.com/WordPress/gutenberg/pull/82326)).
+-   Export the `DataViewsProps` and `ItemWithId` types and document every type property ([#82326](https://github.com/WordPress/gutenberg/pull/82326)).
+
 ### Internal
 
 -   Remove unused dependency `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
@@ -10,6 +48,7 @@
 
 ### Bug Fix
 
+-   Color filter and selected-option icons with `color` rather than `fill`, so they stay visible now that those icons are stroke-based. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
 -   DataViews: Scope the search field's fixed width to the default UI search row ([#82128](https://github.com/WordPress/gutenberg/pull/82128)).
 
 ## 18.1.0 (2026-08-26)

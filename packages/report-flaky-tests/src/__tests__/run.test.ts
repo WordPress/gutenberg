@@ -1,21 +1,40 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as core from '@actions/core';
 import { run } from '../run';
 
-jest.mock( '@actions/core', () => ( {
-	error: jest.fn(),
-	info: jest.fn(),
-	getInput: jest.fn(),
+const { mockMkdir, mockReadFile, mockReaddir, mockWriteFile } = vi.hoisted(
+	() => ( {
+		mockMkdir: vi.fn(),
+		mockReadFile:
+			vi.fn< ( path: string, encoding: string ) => Promise< string > >(),
+		mockReaddir: vi.fn< ( path: string ) => Promise< string[] > >(),
+		mockWriteFile: vi.fn(),
+	} )
+);
+
+vi.mock( import( '@actions/core' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	error: vi.fn(),
+	info: vi.fn(),
+	getInput: vi.fn(),
 } ) );
 
-jest.mock( 'fs/promises', () => ( {
-	readdir: jest.fn(),
-	readFile: jest.fn(),
-	writeFile: jest.fn(),
-	mkdir: jest.fn(),
-} ) );
+vi.mock( import( 'fs/promises' ), async ( importOriginal ) => {
+	const original = await importOriginal();
+
+	return {
+		...original,
+		mkdir: mockMkdir as unknown as typeof original.mkdir,
+		readFile: mockReadFile as unknown as typeof original.readFile,
+		readdir: mockReaddir as unknown as typeof original.readdir,
+		writeFile: mockWriteFile as unknown as typeof original.writeFile,
+	};
+} );
+
+const mockedGetInput = vi.mocked( core.getInput );
 
 function mockInputs() {
-	( core.getInput as jest.Mock )
+	mockedGetInput
 		// artifact-path
 		.mockReturnValueOnce( 'flaky-tests' )
 		// output-path
@@ -38,14 +57,13 @@ async function mockFlakyTestsArtifact() {
 		process.cwd()
 	);
 
-	const mockedFs = require( 'fs/promises' );
-	mockedFs.readdir.mockImplementationOnce( () =>
+	mockReaddir.mockImplementationOnce( () =>
 		Promise.resolve( [
 			`${ playwrightFlakyTest.title }.json`,
 			`${ jestFlakyTest.title }.json`,
 		] )
 	);
-	mockedFs.readFile
+	mockReadFile
 		.mockImplementationOnce( () =>
 			Promise.resolve( JSON.stringify( playwrightFlakyTest ) )
 		)
@@ -55,8 +73,8 @@ async function mockFlakyTestsArtifact() {
 }
 
 describe( 'Report flaky tests', () => {
-	afterEach( () => {
-		jest.clearAllMocks();
+	beforeEach( () => {
+		vi.resetAllMocks();
 	} );
 
 	it( 'should write the report', async () => {
@@ -64,23 +82,18 @@ describe( 'Report flaky tests', () => {
 
 		await run();
 
-		const mockedFs = require( 'fs/promises' );
-		expect( mockedFs.writeFile ).toHaveBeenCalledTimes( 1 );
-		expect( mockedFs.writeFile.mock.calls[ 0 ][ 0 ] ).toBe(
-			'pr-meta/body.md'
-		);
-		expect( mockedFs.writeFile.mock.calls[ 0 ][ 1 ] ).toMatchSnapshot();
+		expect( mockWriteFile ).toHaveBeenCalledTimes( 1 );
+		expect( mockWriteFile.mock.calls[ 0 ][ 0 ] ).toBe( 'pr-meta/body.md' );
+		expect( mockWriteFile.mock.calls[ 0 ][ 1 ] ).toMatchSnapshot();
 	} );
 
 	it( 'should write nothing when there are no flaky tests', async () => {
 		mockInputs();
-
-		const mockedFs = require( 'fs/promises' );
-		mockedFs.readdir.mockImplementationOnce( () => Promise.resolve( [] ) );
+		mockReaddir.mockImplementationOnce( () => Promise.resolve( [] ) );
 
 		await run();
 
-		expect( mockedFs.writeFile ).not.toHaveBeenCalled();
+		expect( mockWriteFile ).not.toHaveBeenCalled();
 	} );
 
 	/*
@@ -93,14 +106,11 @@ describe( 'Report flaky tests', () => {
 		const missing = Object.assign( new Error( 'ENOENT' ), {
 			code: 'ENOENT',
 		} );
-		const mockedFs = require( 'fs/promises' );
-		mockedFs.readdir.mockImplementationOnce( () =>
-			Promise.reject( missing )
-		);
+		mockReaddir.mockImplementationOnce( () => Promise.reject( missing ) );
 
 		await run();
 
-		expect( mockedFs.writeFile ).not.toHaveBeenCalled();
+		expect( mockWriteFile ).not.toHaveBeenCalled();
 	} );
 
 	/* Anything else would clear a report that nothing had disproved. */
@@ -110,12 +120,9 @@ describe( 'Report flaky tests', () => {
 		const denied = Object.assign( new Error( 'EACCES' ), {
 			code: 'EACCES',
 		} );
-		const mockedFs = require( 'fs/promises' );
-		mockedFs.readdir.mockImplementationOnce( () =>
-			Promise.reject( denied )
-		);
+		mockReaddir.mockImplementationOnce( () => Promise.reject( denied ) );
 
 		await expect( run() ).rejects.toThrow( 'EACCES' );
-		expect( mockedFs.writeFile ).not.toHaveBeenCalled();
+		expect( mockWriteFile ).not.toHaveBeenCalled();
 	} );
 } );

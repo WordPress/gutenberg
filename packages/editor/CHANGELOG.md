@@ -2,9 +2,14 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `PluginMoreMenuItem`, `PluginSidebarMoreMenuItem`: Items render with the `Menu` component of `@wordpress/ui` instead of `MenuItem`. A link item honors only `target="_blank"`, and a custom `as` has to forward its ref ([#81564](https://github.com/WordPress/gutenberg/pull/81564)).
+
 ### Bug Fixes
 
 -   Attach media an Image or Gallery block displays to the post on save, when it is not already attached to another post, matching what uploading into that post has always done ([#81977](https://github.com/WordPress/gutenberg/pull/81977)).
+-   Color the welcome guide's hovered button icon with `color` rather than `fill`, so stroke-based icons follow it. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
 -   `EditorInterface`: Apply the `showListViewByDefault` preference when the editor enters edit mode, so every editor built on the package honors it — including the extensible site editor, which previously ignored it. The logic moves here from `edit-post` and `edit-site`.
 -   `StylesCanvas`: In preview mode, render edge to edge without the close button and Escape handler. There the canvas is the whole surface rather than a frame opened over an editing session, and whatever opened it owns closing it.
 -   Upload progress snackbar: Stop announcing "Upload complete" for a batch in which everything failed. The snackbar treated the queue draining as success, so a failed upload showed a completion checkmark right next to its own error. A batch that fails outright now just takes the progress snackbar down, and a partly failed one reports "Uploaded 3 of 5" ([#81132](https://github.com/WordPress/gutenberg/issues/81132)).

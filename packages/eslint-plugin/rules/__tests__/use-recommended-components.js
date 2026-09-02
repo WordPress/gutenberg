@@ -1,5 +1,8 @@
-import { RuleTester } from 'eslint';
+import { describe, expect, it } from 'vitest';
+import configureRuleTester from '../../test-utils/configure-rule-tester';
 import rule, { ALLOWLIST, DENYLIST } from '../use-recommended-components';
+
+const RuleTester = configureRuleTester( { describe, it } );
 
 const ruleTester = new RuleTester( {
 	languageOptions: {
