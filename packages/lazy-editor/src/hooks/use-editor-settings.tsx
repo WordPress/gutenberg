@@ -16,7 +16,7 @@ import { unlock } from '../lock-unlock';
 export function useEditorSettings( {
 	stylesId,
 }: {
-	stylesId: string | number;
+	stylesId: string | number | undefined;
 } ) {
 	const { editorSettings, blockTypes } = useSelect(
 		( select ) => ( {

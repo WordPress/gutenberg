@@ -446,11 +446,16 @@ describe( 'Entity record types', () => {
 			const actions = dispatch( coreStore );
 			const currentGlobalStylesId =
 				select( coreStore ).__experimentalGetCurrentGlobalStylesId();
-			true satisfies Expect< typeof currentGlobalStylesId, number >;
-			actions.saveGlobalStyles( {
-				id: currentGlobalStylesId,
-				title: 'My variation',
-			} );
+			true satisfies Expect<
+				typeof currentGlobalStylesId,
+				number | undefined
+			>;
+			if ( currentGlobalStylesId !== undefined ) {
+				actions.saveGlobalStyles( {
+					id: currentGlobalStylesId,
+					title: 'My variation',
+				} );
+			}
 			true satisfies Expect<
 				Parameters< typeof actions.saveGlobalStyles >[ 0 ],
 				Pick< GlobalStyles< 'edit' >, 'id' > &
@@ -478,8 +483,7 @@ describe( 'Entity record types', () => {
 			navigation?.content.raw satisfies string | undefined;
 			navigation?.content.rendered satisfies string | undefined;
 			navigation?.content.block_version satisfies number | undefined;
-			// @ts-expect-error -- the fallback does not add embed to this field.
-			navigation?.content.protected;
+			navigation?.content.protected satisfies boolean | undefined;
 		};
 	} );
 
@@ -838,6 +842,12 @@ describe( 'Entity record types', () => {
 				typeof iconCollections,
 				IconCollection< 'view' >[] | null
 			>;
+
+			const icons = select( coreStore ).getEntityRecords(
+				'root',
+				'icon'
+			);
+			icons?.[ 0 ].collection satisfies string | undefined;
 
 			// Naming a context still wins over the default.
 			const editBase = select( coreStore ).getEntityRecord(

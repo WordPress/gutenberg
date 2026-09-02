@@ -29,7 +29,7 @@ export interface State {
 	autosaves: Record< string | number, Array< unknown > >;
 	blockPatterns: Array< unknown >;
 	blockPatternCategories: Array< unknown >;
-	currentGlobalStylesId: number;
+	currentGlobalStylesId: number | undefined;
 	currentTheme: string;
 	currentUser: ET.User< 'view' >;
 	embedPreviews: Record< string, { html: string } >;
@@ -1301,7 +1301,9 @@ export function getCurrentTheme( state: State ): any {
  *
  * @return The current global styles ID.
  */
-export function __experimentalGetCurrentGlobalStylesId( state: State ): number {
+export function __experimentalGetCurrentGlobalStylesId(
+	state: State
+): number | undefined {
 	return state.currentGlobalStylesId;
 }
 
