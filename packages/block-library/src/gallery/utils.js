@@ -31,10 +31,11 @@ export function getHrefAndDestination(
 	attributes,
 	lightboxSetting
 ) {
-	// Gutenberg and WordPress use different constants so if image_default_link_type
-	// option is set we need to map from the WP Core values.
-	switch ( imageDestination ? imageDestination : galleryDestination ) {
-		case LINK_DESTINATION_MEDIA_WP_CORE:
+	switch (
+		normalizeLinkTo(
+			imageDestination ? imageDestination : galleryDestination
+		)
+	) {
 		case LINK_DESTINATION_MEDIA:
 			return {
 				href: image?.source_url || image?.url,
@@ -43,7 +44,6 @@ export function getHrefAndDestination(
 					? { ...attributes?.lightbox, enabled: false }
 					: undefined,
 			};
-		case LINK_DESTINATION_ATTACHMENT_WP_CORE:
 		case LINK_DESTINATION_ATTACHMENT:
 			return {
 				href: image?.link,
@@ -69,4 +69,26 @@ export function getHrefAndDestination(
 	}
 
 	return {};
+}
+
+/**
+ * Normalizes a link destination stored by WordPress into the value the Gallery
+ * block uses. WordPress records the site-wide default in the
+ * `image_default_link_type` option as `file` or `post`; the block calls the
+ * same two destinations `media` and `attachment`. Any other value, including
+ * one the block already understands, is returned unchanged.
+ *
+ * @param {string|undefined} linkTo Link destination to translate.
+ *
+ * @return {string|undefined} Link destination in the block's own vocabulary.
+ */
+export function normalizeLinkTo( linkTo ) {
+	switch ( linkTo ) {
+		case LINK_DESTINATION_MEDIA_WP_CORE:
+			return LINK_DESTINATION_MEDIA;
+		case LINK_DESTINATION_ATTACHMENT_WP_CORE:
+			return LINK_DESTINATION_ATTACHMENT;
+		default:
+			return linkTo;
+	}
 }
