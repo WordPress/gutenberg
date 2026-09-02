@@ -29,8 +29,13 @@ test.describe( 'Canvas as a single tab stop', () => {
 			.getByRole( 'button', { name: 'Editor canvas' } )
 			.first();
 		await expect( stopBefore ).toBeFocused();
+		// The hint shows as a tooltip on the focused stop. Both the popup and
+		// its positioner carry `data-open`; the popup is the inner one.
 		await expect(
-			page.getByText( 'Press Enter to edit the document' ).first()
+			page
+				.locator( '[data-open]' )
+				.filter( { hasText: 'Press Enter to edit the document' } )
+				.last()
 		).toBeVisible();
 
 		// The block selection is left as it is.

@@ -2,6 +2,7 @@ import { focus, isFormElement } from '@wordpress/dom';
 import { TAB } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { Tooltip, VisuallyHidden } from '@wordpress/ui';
 import { useRefEffect, useMergeRefs, useInstanceId } from '@wordpress/compose';
 import { useRef } from '@wordpress/element';
 import { store as blockEditorStore } from '../../store';
@@ -24,7 +25,10 @@ export default function useTabNav() {
 	const containerRef = /** @type {typeof useRef<HTMLElement>} */ ( useRef )();
 	const focusCaptureBeforeRef = useRef();
 	const focusCaptureAfterRef = useRef();
-	const hintId = useInstanceId( useTabNav, 'block-editor-canvas-stop-hint' );
+	const hintId = useInstanceId(
+		useTabNav,
+		'block-editor-writing-flow__canvas-stop-hint'
+	);
 
 	const {
 		hasMultiSelection,
@@ -136,38 +140,72 @@ export default function useTabNav() {
 		}
 	}
 
-	const stopHint = ( id ) => (
-		<div className="block-editor-writing-flow__canvas-stop-hint" id={ id }>
-			{ __( 'Press Enter to edit the document' ) }
-		</div>
-	);
+	// The tooltip is visual-only, so the same hint is wired up as a
+	// description for assistive technologies.
+	const hint = __( 'Press Enter to edit the document' );
+
+	// The Escape press that steps focus out of the canvas is re-dispatched on
+	// the frame element for keyboard shortcuts. That copy arrives after focus
+	// has landed on the stop, so it would dismiss the tooltip it just
+	// revealed. A press on the stop itself is trusted and still dismisses.
+	function keepTooltipOnStepOut( open, details ) {
+		if (
+			! open &&
+			details.reason === 'escape-key' &&
+			details.event?.isTrusted === false
+		) {
+			details.cancel();
+		}
+	}
 
 	const before = (
-		<div
-			ref={ focusCaptureBeforeRef }
-			tabIndex="0"
-			role="button"
-			aria-label={ __( 'Editor canvas' ) }
-			aria-describedby={ `${ hintId }-before` }
-			className="block-editor-writing-flow__canvas-stop is-before"
-			onKeyDown={ ( event ) => onStopKeyDown( event, false ) }
-		>
-			{ stopHint( `${ hintId }-before` ) }
-		</div>
+		<Tooltip.Root onOpenChange={ keepTooltipOnStepOut }>
+			<Tooltip.Trigger
+				render={
+					<div
+						ref={ focusCaptureBeforeRef }
+						tabIndex="0"
+						role="button"
+						aria-label={ __( 'Editor canvas' ) }
+						aria-describedby={ `${ hintId }-before` }
+						className="block-editor-writing-flow__canvas-stop"
+						onKeyDown={ ( event ) => onStopKeyDown( event, false ) }
+					>
+						<VisuallyHidden id={ `${ hintId }-before` }>
+							{ hint }
+						</VisuallyHidden>
+					</div>
+				}
+			/>
+			<Tooltip.Popup positioner={ <Tooltip.Positioner side="bottom" /> }>
+				{ hint }
+			</Tooltip.Popup>
+		</Tooltip.Root>
 	);
 
 	const after = (
-		<div
-			ref={ focusCaptureAfterRef }
-			tabIndex="0"
-			role="button"
-			aria-label={ __( 'Editor canvas' ) }
-			aria-describedby={ `${ hintId }-after` }
-			className="block-editor-writing-flow__canvas-stop is-after"
-			onKeyDown={ ( event ) => onStopKeyDown( event, true ) }
-		>
-			{ stopHint( `${ hintId }-after` ) }
-		</div>
+		<Tooltip.Root onOpenChange={ keepTooltipOnStepOut }>
+			<Tooltip.Trigger
+				render={
+					<div
+						ref={ focusCaptureAfterRef }
+						tabIndex="0"
+						role="button"
+						aria-label={ __( 'Editor canvas' ) }
+						aria-describedby={ `${ hintId }-after` }
+						className="block-editor-writing-flow__canvas-stop"
+						onKeyDown={ ( event ) => onStopKeyDown( event, true ) }
+					>
+						<VisuallyHidden id={ `${ hintId }-after` }>
+							{ hint }
+						</VisuallyHidden>
+					</div>
+				}
+			/>
+			<Tooltip.Popup positioner={ <Tooltip.Positioner side="top" /> }>
+				{ hint }
+			</Tooltip.Popup>
+		</Tooltip.Root>
 	);
 
 	const ref = useRefEffect( ( node ) => {

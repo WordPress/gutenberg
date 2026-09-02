@@ -1,37 +1,5 @@
-@use "@wordpress/base-styles/variables" as *;
-@use "@wordpress/base-styles/colors" as *;
-@use "@wordpress/base-styles/z-index" as *;
-
 .block-editor-writing-flow__canvas-stop {
-	position: relative;
 	outline: none;
-}
-
-.block-editor-writing-flow__canvas-stop-hint {
-	display: none;
-	position: absolute;
-	left: 50%;
-	transform: translateX(-50%);
-	z-index: z-index(".block-editor-writing-flow__canvas-stop-hint");
-	padding: $grid-unit-10 $grid-unit-20;
-	border-radius: $radius-small;
-	background: $gray-900;
-	color: $white;
-	font-size: $default-font-size;
-	white-space: nowrap;
-	pointer-events: none;
-
-	.block-editor-writing-flow__canvas-stop.is-before > & {
-		top: $grid-unit-20;
-	}
-
-	.block-editor-writing-flow__canvas-stop.is-after > & {
-		bottom: $grid-unit-20;
-	}
-}
-
-.block-editor-writing-flow__canvas-stop:focus > .block-editor-writing-flow__canvas-stop-hint {
-	display: block;
 }
 
 /* The stop elements are zero-size, so the focus indication is drawn around
