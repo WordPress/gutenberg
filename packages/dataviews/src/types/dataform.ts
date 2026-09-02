@@ -535,8 +535,11 @@ export interface DataFormProps< Item > {
 	form: Form;
 
 	/**
-	 * Callback invoked when the user edits a field, receiving an object
-	 * with the updated field values, keyed by field id.
+	 * Callback invoked when the user edits a field, receiving the partial
+	 * item returned by the field's `setValue`. By default that is an object
+	 * keyed by field id, nested for dotted ids (e.g. `{ a: { b: value } }`
+	 * for the field `a.b`); a custom `setValue` may return any other partial
+	 * shape of the item.
 	 */
 	onChange: ( value: Record< string, any > ) => void;
 
@@ -567,8 +570,10 @@ export interface FieldLayoutProps< Item > {
 	field: NormalizedFormField;
 
 	/**
-	 * Callback invoked when the user edits the field, receiving an object
-	 * with the updated field values, keyed by field id.
+	 * Callback invoked when the user edits the field, receiving the partial
+	 * item returned by the field's `setValue`. By default that is an object
+	 * keyed by field id, nested for dotted ids; a custom `setValue` may
+	 * return any other partial shape of the item.
 	 */
 	onChange: ( value: any ) => void;
 
