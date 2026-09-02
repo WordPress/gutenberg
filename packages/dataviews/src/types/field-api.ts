@@ -589,7 +589,8 @@ export type NormalizedField< Item > = Omit<
 	enableHiding: boolean;
 
 	/**
-	 * Whether the field is sortable. Defaults to true.
+	 * Whether the field is sortable. Defaults to the field type's setting:
+	 * `true` for every type except `media` and `password`.
 	 */
 	enableSorting: boolean;
 
