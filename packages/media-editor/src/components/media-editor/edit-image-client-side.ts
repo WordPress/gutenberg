@@ -120,6 +120,11 @@ export function getEditedAttachmentData(
 	if ( post !== undefined ) {
 		data.post = post;
 	}
+	// Relates the new attachment to its source, as the `/edit` endpoint's
+	// `parent_image` metadata does.
+	if ( media.id ) {
+		data.parent_image = media.id;
+	}
 	return data;
 }
 

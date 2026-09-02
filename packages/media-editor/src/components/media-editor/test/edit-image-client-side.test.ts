@@ -77,6 +77,7 @@ describe( 'getEditedAttachmentData', () => {
 			description: 'Desc',
 			alt_text: 'Alt',
 			post: 3,
+			parent_image: 10,
 		} );
 	} );
 
@@ -92,6 +93,7 @@ describe( 'getEditedAttachmentData', () => {
 			description: 'Desc',
 			alt_text: '',
 			post: 0,
+			parent_image: 10,
 		} );
 	} );
 
@@ -101,7 +103,7 @@ describe( 'getEditedAttachmentData', () => {
 				id: 10,
 				title: 'Plain',
 			} )
-		).toEqual( { title: 'Plain' } );
+		).toEqual( { title: 'Plain', parent_image: 10 } );
 	} );
 } );
 

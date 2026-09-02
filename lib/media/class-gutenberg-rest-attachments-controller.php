@@ -330,6 +330,28 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 					return true;
 				},
 			);
+			$args['parent_image']       = array(
+				'type'              => 'integer',
+				'minimum'           => 1,
+				'description'       => __( 'ID of the attachment the uploaded image was edited from. Recorded in the new attachment\'s metadata, as the edit endpoint does.', 'gutenberg' ),
+				'validate_callback' => static function ( $value, $request, $param ) {
+					// Re-apply the schema checks a custom validate_callback replaces.
+					$valid = rest_validate_request_arg( $value, $request, $param );
+					if ( is_wp_error( $valid ) ) {
+						return $valid;
+					}
+
+					if ( ! wp_attachment_is_image( (int) $value ) ) {
+						return new WP_Error(
+							'rest_invalid_param',
+							__( 'Invalid parent image.', 'gutenberg' ),
+							array( 'status' => 400 )
+						);
+					}
+
+					return true;
+				},
+			);
 		}
 
 		return $args;
@@ -347,6 +369,15 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 * @return true|WP_Error True if the request has access to create items, WP_Error object otherwise.
 	 */
 	public function create_item_permissions_check( $request ) {
+		// Recording an edit relation requires being allowed to edit the source, as the edit endpoint requires.
+		if ( ! empty( $request['parent_image'] ) && ! current_user_can( 'edit_post', (int) $request['parent_image'] ) ) {
+			return new WP_Error(
+				'rest_cannot_edit_image',
+				__( 'Sorry, you are not allowed to edit this image.', 'gutenberg' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
 		$bypass_mime_check = false === $request['generate_sub_sizes'];
 
 		/*
@@ -429,6 +460,16 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		if ( ! is_wp_error( $response ) ) {
 			$data = $response->get_data();
 			if ( ! empty( $data['id'] ) && wp_attachment_is_image( $data['id'] ) ) {
+				if ( ! empty( $request['parent_image'] ) ) {
+					$metadata = $this->record_parent_image( $data['id'], (int) $request['parent_image'] );
+					if ( isset( $data['media_details'] ) && is_array( $data['media_details'] ) ) {
+						$data['media_details']['parent_image'] = $metadata['parent_image'];
+						if ( isset( $metadata['image_meta'] ) ) {
+							$data['media_details']['image_meta'] = $metadata['image_meta'];
+						}
+					}
+				}
+
 				$mime_type = get_post_mime_type( $data['id'] );
 				$filename  = get_attached_file( $data['id'] );
 
@@ -455,6 +496,54 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		}
 
 		return $response;
+	}
+
+	/**
+	 * Records the attachment an uploaded image was edited from.
+	 *
+	 * Mirrors what the edit endpoint stores for the attachment it creates, so an
+	 * image edited in the browser relates to its source the same way: the
+	 * `parent_image` entry, the source's EXIF data for any field the new file
+	 * lacks, and an upright orientation, since the edited pixels are upright.
+	 *
+	 * @param int $attachment_id ID of the new attachment.
+	 * @param int $parent_id     ID of the attachment it was edited from.
+	 * @return array The updated attachment metadata.
+	 */
+	private function record_parent_image( int $attachment_id, int $parent_id ): array {
+		$metadata = wp_get_attachment_metadata( $attachment_id );
+		if ( ! is_array( $metadata ) ) {
+			$metadata = array();
+		}
+
+		$parent_metadata = wp_get_attachment_metadata( $parent_id );
+		if ( isset( $parent_metadata['image_meta'] ) && is_array( $parent_metadata['image_meta'] ) ) {
+			if ( ! isset( $metadata['image_meta'] ) || ! is_array( $metadata['image_meta'] ) ) {
+				$metadata['image_meta'] = array();
+			}
+			// Merge but skip empty values, as the edit endpoint does.
+			foreach ( $parent_metadata['image_meta'] as $key => $value ) {
+				if ( empty( $metadata['image_meta'][ $key ] ) && ! empty( $value ) ) {
+					$metadata['image_meta'][ $key ] = $value;
+				}
+			}
+		}
+
+		if ( ! empty( $metadata['image_meta']['orientation'] ) ) {
+			$metadata['image_meta']['orientation'] = 1;
+		}
+
+		$parent_file = wp_get_original_image_path( $parent_id );
+
+		$metadata['parent_image'] = array(
+			'attachment_id' => $parent_id,
+			// Path to the originally uploaded image file relative to the uploads directory.
+			'file'          => $parent_file ? _wp_relative_upload_path( $parent_file ) : '',
+		);
+
+		wp_update_attachment_metadata( $attachment_id, $metadata );
+
+		return $metadata;
 	}
 
 	/**
