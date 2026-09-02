@@ -18,6 +18,15 @@ export type SpaceObject = {
 	datetime: string;
 	email: string;
 	author: string;
+	/**
+	 * The id of the item this one orbits, or `null` for a root of the tree.
+	 */
+	parent: number | null;
+	/**
+	 * How deep the item sits in the tree: `0` for a root, `1` for its
+	 * children, and so on.
+	 */
+	level: number;
 };
 
 export const data: SpaceObject[] = [
@@ -37,6 +46,8 @@ export const data: SpaceObject[] = [
 		datetime: '2021-01-01T14:30:00Z',
 		email: 'moon@example.com',
 		author: 'lunarian_observer',
+		parent: 14,
+		level: 2,
 	},
 	{
 		id: 2,
@@ -53,6 +64,8 @@ export const data: SpaceObject[] = [
 		datetime: '2019-01-02T09:15:00Z',
 		email: 'io@example.com',
 		author: 'galilean_moon_enthusiast_supreme',
+		parent: 16,
+		level: 2,
 	},
 	{
 		id: 3,
@@ -69,6 +82,8 @@ export const data: SpaceObject[] = [
 		datetime: '2025-01-03T16:45:30Z',
 		email: 'europa@example.com',
 		author: 'icy_ocean_explorer',
+		parent: 16,
+		level: 2,
 	},
 	{
 		id: 4,
@@ -85,6 +100,8 @@ export const data: SpaceObject[] = [
 		datetime: '2022-01-04T12:30:00Z',
 		email: 'ganymede@example.com',
 		author: 'jovian_satellite_researcher',
+		parent: 16,
+		level: 2,
 	},
 	{
 		id: 5,
@@ -101,6 +118,8 @@ export const data: SpaceObject[] = [
 		datetime: '2021-01-05T14:15:30Z',
 		email: 'callisto@example.com',
 		author: 'crater_cartography_specialist',
+		parent: 16,
+		level: 2,
 	},
 	{
 		id: 6,
@@ -117,6 +136,8 @@ export const data: SpaceObject[] = [
 		datetime: '2020-01-06T10:45:15Z',
 		email: 'amalthea@example.com',
 		author: 'astro_photographer',
+		parent: 16,
+		level: 2,
 	},
 	{
 		id: 7,
@@ -133,6 +154,8 @@ export const data: SpaceObject[] = [
 		datetime: '2019-01-07T16:20:45Z',
 		email: 'himalia@example.com',
 		author: 'irregular_orbit_analyst',
+		parent: 16,
+		level: 2,
 	},
 	{
 		id: 8,
@@ -149,6 +172,8 @@ export const data: SpaceObject[] = [
 		datetime: '2020-01-01T11:22:15Z',
 		email: 'neptune@example.com',
 		author: 'neptunian_dynamics_professor',
+		parent: 38,
+		level: 1,
 	},
 	{
 		id: 9,
@@ -165,6 +190,8 @@ export const data: SpaceObject[] = [
 		datetime: '2021-02-01T11:30:00Z',
 		email: 'triton@example.com',
 		author: 'retrograde_orbit_specialist',
+		parent: 8,
+		level: 2,
 	},
 	{
 		id: 10,
@@ -181,6 +208,8 @@ export const data: SpaceObject[] = [
 		datetime: '2020-02-02T15:45:30Z',
 		email: 'nereid@example.com',
 		author: 'outer_solar_system_voyager_mission_director',
+		parent: 8,
+		level: 2,
 	},
 	{
 		id: 11,
@@ -197,6 +226,8 @@ export const data: SpaceObject[] = [
 		datetime: '2019-02-03T09:20:15Z',
 		email: 'proteus@example.com',
 		author: 'space_observer',
+		parent: 8,
+		level: 2,
 	},
 	{
 		id: 12,
@@ -213,6 +244,8 @@ export const data: SpaceObject[] = [
 		datetime: '2020-01-02T13:05:45Z',
 		email: 'mercury@example.com',
 		author: 'solar_wind_scientist',
+		parent: 38,
+		level: 1,
 	},
 	{
 		id: 13,
@@ -229,6 +262,8 @@ export const data: SpaceObject[] = [
 		datetime: '2020-01-02T08:30:12Z',
 		email: 'venus@example.com',
 		author: 'atmospheric_chemistry_expert',
+		parent: 38,
+		level: 1,
 	},
 	{
 		id: 14,
@@ -245,6 +280,8 @@ export const data: SpaceObject[] = [
 		datetime: '2023-01-03T18:15:30Z',
 		email: 'earth@example.com',
 		author: 'planetary_geologist',
+		parent: 38,
+		level: 1,
 	},
 	{
 		id: 15,
@@ -261,6 +298,8 @@ export const data: SpaceObject[] = [
 		datetime: '2020-01-01T20:45:00Z',
 		email: 'mars@example.com',
 		author: 'red_planet_explorer',
+		parent: 38,
+		level: 1,
 	},
 	{
 		id: 16,
@@ -277,6 +316,8 @@ export const data: SpaceObject[] = [
 		datetime: '2017-01-01T00:01:00Z',
 		email: 'jupiter@example.com',
 		author: 'gas_giant_meteorologist',
+		parent: 38,
+		level: 1,
 	},
 	{
 		id: 17,
@@ -293,6 +334,8 @@ export const data: SpaceObject[] = [
 		datetime: '2020-02-01T00:02:00Z',
 		email: 'saturn@example.com',
 		author: 'ring_system_analyst',
+		parent: 38,
+		level: 1,
 	},
 	{
 		id: 18,
@@ -309,6 +352,8 @@ export const data: SpaceObject[] = [
 		datetime: '2020-03-01T10:15:20Z',
 		email: 'uranus@example.com',
 		author: 'axial_tilt_researcher',
+		parent: 38,
+		level: 1,
 	},
 	{
 		id: 19,
@@ -325,6 +370,8 @@ export const data: SpaceObject[] = [
 		datetime: '2020-03-01T10:15:20Z',
 		email: 'thessalonikopolymnianebuchodonossarinacharybdis@example.com',
 		author: 'interstellar_nomadic_planetary_body_tracking_specialist',
+		parent: null,
+		level: 0,
 	},
 	{
 		id: 20,
@@ -341,6 +388,8 @@ export const data: SpaceObject[] = [
 		datetime: '2022-02-15T08:30:00Z',
 		email: 'titan@example.com',
 		author: 'saturn_system_researcher',
+		parent: 17,
+		level: 2,
 	},
 	{
 		id: 21,
@@ -357,6 +406,8 @@ export const data: SpaceObject[] = [
 		datetime: '2023-03-20T11:45:00Z',
 		email: 'enceladus@example.com',
 		author: 'cryovolcanism_observer',
+		parent: 17,
+		level: 2,
 	},
 	{
 		id: 22,
@@ -373,6 +424,8 @@ export const data: SpaceObject[] = [
 		datetime: '2021-07-12T15:20:00Z',
 		email: 'mimas@example.com',
 		author: 'impact_crater_analyst',
+		parent: 17,
+		level: 2,
 	},
 	{
 		id: 23,
@@ -389,6 +442,8 @@ export const data: SpaceObject[] = [
 		datetime: '2020-09-25T13:15:00Z',
 		email: 'charon@example.com',
 		author: 'pluto_system_mapper',
+		parent: 39,
+		level: 2,
 	},
 	{
 		id: 24,
@@ -405,6 +460,8 @@ export const data: SpaceObject[] = [
 		datetime: '2019-06-14T07:45:00Z',
 		email: 'phobos@example.com',
 		author: 'martian_surface_cartographer',
+		parent: 15,
+		level: 2,
 	},
 	{
 		id: 25,
@@ -421,6 +478,8 @@ export const data: SpaceObject[] = [
 		datetime: '2018-11-30T16:00:00Z',
 		email: 'deimos@example.com',
 		author: 'small_moon_surveyor',
+		parent: 15,
+		level: 2,
 	},
 	{
 		id: 26,
@@ -437,6 +496,8 @@ export const data: SpaceObject[] = [
 		datetime: '2022-08-19T10:30:00Z',
 		email: 'rhea@example.com',
 		author: 'saturn_geology_specialist',
+		parent: 17,
+		level: 2,
 	},
 	{
 		id: 27,
@@ -453,6 +514,8 @@ export const data: SpaceObject[] = [
 		datetime: '2023-01-22T14:20:00Z',
 		email: 'iapetus@example.com',
 		author: 'two_tone_surface_expert',
+		parent: 17,
+		level: 2,
 	},
 	{
 		id: 28,
@@ -469,6 +532,8 @@ export const data: SpaceObject[] = [
 		datetime: '2021-04-17T12:00:00Z',
 		email: 'dione@example.com',
 		author: 'icy_surface_geochemist',
+		parent: 17,
+		level: 2,
 	},
 	{
 		id: 29,
@@ -485,6 +550,8 @@ export const data: SpaceObject[] = [
 		datetime: '2020-12-05T09:40:00Z',
 		email: 'tethys@example.com',
 		author: 'middle_satellite_researcher',
+		parent: 17,
+		level: 2,
 	},
 	{
 		id: 30,
@@ -501,6 +568,8 @@ export const data: SpaceObject[] = [
 		datetime: '2024-02-28T11:15:00Z',
 		email: 'miranda@example.com',
 		author: 'uranian_moon_geologist',
+		parent: 18,
+		level: 2,
 	},
 	{
 		id: 31,
@@ -517,6 +586,8 @@ export const data: SpaceObject[] = [
 		datetime: '2023-09-10T08:25:00Z',
 		email: 'ariel@example.com',
 		author: 'planetary_reflectance_specialist',
+		parent: 18,
+		level: 2,
 	},
 	{
 		id: 32,
@@ -533,6 +604,8 @@ export const data: SpaceObject[] = [
 		datetime: '2022-05-03T15:50:00Z',
 		email: 'umbriel@example.com',
 		author: 'dark_surface_researcher',
+		parent: 18,
+		level: 2,
 	},
 	{
 		id: 33,
@@ -549,6 +622,8 @@ export const data: SpaceObject[] = [
 		datetime: '2021-10-18T13:35:00Z',
 		email: 'titania@example.com',
 		author: 'uranian_system_surveyor',
+		parent: 18,
+		level: 2,
 	},
 	{
 		id: 34,
@@ -565,6 +640,8 @@ export const data: SpaceObject[] = [
 		datetime: '2020-07-22T10:05:00Z',
 		email: 'oberon@example.com',
 		author: 'outer_uranian_orbitalist',
+		parent: 18,
+		level: 2,
 	},
 	{
 		id: 35,
@@ -581,6 +658,8 @@ export const data: SpaceObject[] = [
 		datetime: '2024-08-14T16:40:00Z',
 		email: 'ceres@example.com',
 		author: 'asteroid_belt_specialist',
+		parent: 38,
+		level: 1,
 	},
 	{
 		id: 36,
@@ -597,6 +676,8 @@ export const data: SpaceObject[] = [
 		datetime: '2022-03-29T12:55:00Z',
 		email: 'makemake@example.com',
 		author: 'trans_neptunian_researcher',
+		parent: 38,
+		level: 1,
 	},
 	{
 		id: 37,
@@ -613,6 +694,44 @@ export const data: SpaceObject[] = [
 		datetime: '2021-11-11T09:10:00Z',
 		email: 'haumea@example.com',
 		author: 'dwarf_planet_dynamics_specialist',
+		parent: 38,
+		level: 1,
+	},
+	{
+		id: 38,
+		name: {
+			title: 'Sun',
+			description: 'The star at the center of the Solar system',
+		},
+		image: 'https://upload.wikimedia.org/wikipedia/commons/b/b4/The_Sun_by_the_Atmospheric_Imaging_Assembly_of_NASA%27s_Solar_Dynamics_Observatory_-_20100819.jpg',
+		type: 'Star',
+		isPlanet: false,
+		categories: [ 'Solar system', 'Star' ],
+		satellites: 8,
+		date: '2018-05-20',
+		datetime: '2018-05-20T06:00:00Z',
+		email: 'sun@example.com',
+		author: 'solar_wind_scientist',
+		parent: null,
+		level: 0,
+	},
+	{
+		id: 39,
+		name: {
+			title: 'Pluto',
+			description: 'Dwarf planet in the Kuiper belt',
+		},
+		image: 'https://upload.wikimedia.org/wikipedia/commons/e/ef/Pluto_in_True_Color_-_High-Res.jpg',
+		type: 'Dwarf planet',
+		isPlanet: false,
+		categories: [ 'Solar system', 'Dwarf planet', 'Trans-Neptunian' ],
+		satellites: 5,
+		date: '2019-07-14',
+		datetime: '2019-07-14T11:50:00Z',
+		email: 'pluto@example.com',
+		author: 'pluto_system_mapper',
+		parent: 38,
+		level: 1,
 	},
 ];
 
@@ -669,6 +788,10 @@ export const actions: Action< SpaceObject >[] = [
 	},
 ];
 
+const titleById = new Map(
+	data.map( ( item ) => [ item.id, item.name.title ] )
+);
+
 export const fields: Field< SpaceObject >[] = [
 	{
 		label: 'Image',
@@ -718,6 +841,7 @@ export const fields: Field< SpaceObject >[] = [
 		id: 'type',
 		enableHiding: false,
 		elements: [
+			{ value: 'Star', label: 'Star' },
 			{ value: 'Satellite', label: 'Satellite' },
 			{ value: 'Ice giant', label: 'Ice giant' },
 			{ value: 'Terrestrial', label: 'Terrestrial' },
@@ -759,6 +883,13 @@ export const fields: Field< SpaceObject >[] = [
 		id: 'satellites',
 		type: 'integer',
 		enableSorting: true,
+	},
+	{
+		label: 'Parent',
+		id: 'parent',
+		type: 'text',
+		getValue: ( { item } ) =>
+			item.parent === null ? '' : titleById.get( item.parent ) ?? '',
 	},
 	{
 		label: 'Description',

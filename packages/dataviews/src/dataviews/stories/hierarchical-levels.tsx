@@ -3,11 +3,7 @@ import DataViews from '../index';
 import { LAYOUT_TABLE } from '../../constants';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import type { View } from '../../types';
-import {
-	hierarchicalData,
-	hierarchicalFields,
-	type CelestialBody,
-} from './fixtures-hierarchy';
+import { data as allData, fields, type SpaceObject } from './fixtures';
 
 /**
  * Orders a flat list depth-first so that each item sits right below its
@@ -18,9 +14,9 @@ import {
  *
  * This is what the WordPress REST API does for `orderby_hierarchy`.
  */
-function sortByHierarchy( items: CelestialBody[] ): CelestialBody[] {
+function sortByHierarchy( items: SpaceObject[] ): SpaceObject[] {
 	const ids = new Set( items.map( ( item ) => item.id ) );
-	const childrenByParent = new Map< string | null, CelestialBody[] >();
+	const childrenByParent = new Map< number | null, SpaceObject[] >();
 	items.forEach( ( item ) => {
 		const parent =
 			item.parent !== null && ids.has( item.parent ) ? item.parent : null;
@@ -30,8 +26,8 @@ function sortByHierarchy( items: CelestialBody[] ): CelestialBody[] {
 		] );
 	} );
 
-	const result: CelestialBody[] = [];
-	const visit = ( parent: string | null ) => {
+	const result: SpaceObject[] = [];
+	const visit = ( parent: number | null ) => {
 		( childrenByParent.get( parent ) ?? [] ).forEach( ( item ) => {
 			result.push( item );
 			visit( item.id );
@@ -50,7 +46,7 @@ const HierarchicalLevelsComponent = ( {
 		type: LAYOUT_TABLE,
 		search: '',
 		page: 1,
-		perPage: 25,
+		perPage: 50,
 		layout: {},
 		filters: [],
 		fields: [ 'type', 'parent' ],
@@ -75,9 +71,9 @@ const HierarchicalLevelsComponent = ( {
 		// The sort decides the order of siblings; the hierarchy places each
 		// item below its parent.
 		const { data: sortedData } = filterSortAndPaginate(
-			hierarchicalData,
+			allData,
 			{ ...view, page: undefined, perPage: undefined },
-			hierarchicalFields
+			fields
 		);
 		const orderedData = view.showLevels
 			? sortByHierarchy( sortedData )
@@ -101,7 +97,7 @@ const HierarchicalLevelsComponent = ( {
 			paginationInfo={ paginationInfo }
 			view={ view }
 			onChangeView={ setView }
-			fields={ hierarchicalFields }
+			fields={ fields }
 		/>
 	);
 };
