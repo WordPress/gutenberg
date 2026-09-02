@@ -202,7 +202,17 @@ export default function useTabNav() {
 					</div>
 				}
 			/>
-			<Tooltip.Popup positioner={ <Tooltip.Positioner side="top" /> }>
+			<Tooltip.Popup
+				positioner={
+					// Anchored to the stop before the canvas, so the hint
+					// shows in the same place no matter which stop is
+					// focused.
+					<Tooltip.Positioner
+						side="bottom"
+						anchor={ focusCaptureBeforeRef }
+					/>
+				}
+			>
 				{ hint }
 			</Tooltip.Popup>
 		</Tooltip.Root>
