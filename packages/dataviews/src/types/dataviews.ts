@@ -1,6 +1,7 @@
 import type { ReactElement, ReactNode, ComponentProps } from 'react';
 import type { useFocusOnMount } from '@wordpress/compose';
 import type {
+	Field,
 	NormalizedField,
 	Operator,
 	Option,
@@ -8,6 +9,182 @@ import type {
 } from './field-api';
 import type { SetSelection } from './private';
 import type { MEDIA_ASPECT_RATIOS } from '../constants';
+
+export type ItemWithId = { id: string };
+
+export type DataViewsProps< Item > = {
+	/**
+	 * The current view configuration: layout type, filters, sorting,
+	 * pagination, search term, and visible fields.
+	 */
+	view: View;
+
+	/**
+	 * Callback invoked with the new view whenever the user changes it
+	 * (filtering, sorting, switching layout, changing page, etc.).
+	 * Consumers own the view state and must store the new value.
+	 */
+	onChangeView: ( view: View ) => void;
+
+	/**
+	 * The fields describing each item's data: how to get and render a value,
+	 * plus its sorting and filtering capabilities.
+	 */
+	fields: Field< Item >[];
+
+	/**
+	 * Whether the global search input is displayed.
+	 *
+	 * @default true
+	 */
+	search?: boolean;
+
+	/**
+	 * The accessible label and placeholder for the search input.
+	 *
+	 * @default 'Search'
+	 */
+	searchLabel?: string;
+
+	/**
+	 * The actions that can be performed on items, shown per item and, for
+	 * actions supporting bulk, on multi-selections.
+	 */
+	actions?: Action< Item >[];
+
+	/**
+	 * The dataset to render, already filtered, sorted, and paginated
+	 * according to the current view.
+	 */
+	data: Item[];
+
+	/**
+	 * Whether the data is loading, in which case a loading state is shown.
+	 *
+	 * @default false
+	 */
+	isLoading?: boolean;
+
+	/**
+	 * Pagination totals for the full dataset (not just the current page).
+	 */
+	paginationInfo: {
+		/**
+		 * The total number of items in the dataset.
+		 */
+		totalItems: number;
+
+		/**
+		 * The total number of pages, given the current items per page.
+		 */
+		totalPages: number;
+	};
+
+	/**
+	 * The layouts the user can switch between, mapping each supported layout
+	 * type to view settings applied when switching to it (or `true` for
+	 * defaults).
+	 */
+	defaultLayouts?: SupportedLayouts;
+
+	/**
+	 * The currently selected items, as a list of item ids. When provided
+	 * (together with `onChangeSelection`), selection is controlled.
+	 */
+	selection?: string[];
+
+	/**
+	 * Callback invoked with the new list of selected item ids whenever the
+	 * selection changes.
+	 */
+	onChangeSelection?: ( items: string[] ) => void;
+
+	/**
+	 * Callback invoked when the user clicks an item's title or media.
+	 * Ignored when `renderItemLink` is provided.
+	 */
+	onClickItem?: ( item: Item ) => void;
+
+	/**
+	 * Renders the item's title and media as a link. Receives the item along
+	 * with anchor props to spread onto the link element. Takes precedence
+	 * over `onClickItem`.
+	 */
+	renderItemLink?: (
+		props: {
+			item: Item;
+		} & ComponentProps< 'a' >
+	) => ReactElement;
+
+	/**
+	 * Whether an item is clickable, i.e. whether `onClickItem` or
+	 * `renderItemLink` applies to it.
+	 *
+	 * @default () => true
+	 */
+	isItemClickable?: ( item: Item ) => boolean;
+
+	/**
+	 * Extra content rendered in the toolbar area, next to the view
+	 * configuration controls.
+	 */
+	header?: ReactNode;
+
+	/**
+	 * Returns the hierarchical depth of an item, used to indent items when
+	 * the view's `showLevels` option is enabled.
+	 */
+	getItemLevel?: ( item: Item ) => number;
+
+	/**
+	 * Custom component tree rendered instead of the default layout
+	 * composition, using the internal `DataViews.*` sub-components.
+	 */
+	children?: ReactNode;
+
+	/**
+	 * Static configuration of the component's UI.
+	 */
+	config?: {
+		/**
+		 * The options offered in the "items per page" control.
+		 */
+		perPageSizes: number[];
+		/**
+		 * Whether the view config popover offers the "Original aspect ratio"
+		 * control for grid layouts, letting users switch item previews
+		 * between cropped (`cover`) and fitted (`contain`).
+		 */
+		mediaFitControl?: boolean;
+	};
+
+	/**
+	 * Content rendered when the dataset is empty (no items match the
+	 * current view).
+	 */
+	empty?: ReactNode;
+
+	/**
+	 * Callback to reset the view to its initial state, wired to the "Reset"
+	 * action shown when filters or search are active. Pass `false` to hide
+	 * the reset action.
+	 */
+	onReset?: ( () => void ) | false;
+} & ( Item extends ItemWithId
+	? {
+			/**
+			 * Returns a unique id for an item. Optional when items already
+			 * have a string `id` property, which is used by default.
+			 */
+			getItemId?: ( item: Item ) => string;
+	  }
+	: {
+			/**
+			 * Returns a unique id for an item. Required when items have no
+			 * string `id` property.
+			 */
+			getItemId: ( item: Item ) => string;
+	  } );
 
 /**
  * The filters applied to the dataset.
