@@ -4,27 +4,23 @@ import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-reco
 declare module './base-entity-records' {
 	export namespace BaseEntityRecords {
 		/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-		export interface Icon< C extends Context > {
+		export interface IconCollection< C extends Context > {
 			/**
-			 * The icon name.
+			 * The icon collection slug.
 			 */
-			name: string;
+			slug: string;
 			/**
-			 * The icon content (SVG markup).
-			 */
-			content: string;
-			/**
-			 * The icon label.
+			 * The icon collection label.
 			 */
 			label: string;
 			/**
-			 * The slug of the collection this icon belongs to.
+			 * The icon collection description.
 			 */
-			collection?: string;
+			description: string;
 		}
 	}
 }
 
-export type Icon< C extends Context = 'edit' > = OmitNevers<
-	_BaseEntityRecords.Icon< C >
+export type IconCollection< C extends Context = 'view' > = OmitNevers<
+	_BaseEntityRecords.IconCollection< C >
 >;
