@@ -293,7 +293,7 @@ describe( 'DataViews component', () => {
 
 	describe( 'page clamping', () => {
 		it( 'moves the view to the last page when it points past the end of the collection', async () => {
-			const onChangeView = jest.fn();
+			const onChangeView = vi.fn();
 			// Three items, one per page: page 5 doesn't exist.
 			render(
 				<DataViewWrapper
@@ -310,7 +310,7 @@ describe( 'DataViews component', () => {
 		} );
 
 		it( 'falls back to the first page when the collection is empty', async () => {
-			const onChangeView = jest.fn();
+			const onChangeView = vi.fn();
 			render(
 				<DataViewWrapper
 					view={ { type: LAYOUT_TABLE, page: 2 } }
@@ -328,7 +328,7 @@ describe( 'DataViews component', () => {
 		} );
 
 		it( 'leaves the page alone while loading', () => {
-			const onChangeView = jest.fn();
+			const onChangeView = vi.fn();
 			render(
 				<DataViewWrapper
 					view={ { type: LAYOUT_TABLE, page: 5, perPage: 1 } }
@@ -341,7 +341,7 @@ describe( 'DataViews component', () => {
 		} );
 
 		it( 'leaves the page alone when the total is unknown', () => {
-			const onChangeView = jest.fn();
+			const onChangeView = vi.fn();
 			render(
 				<DataViewWrapper
 					view={ { type: LAYOUT_TABLE, page: 5, perPage: 1 } }
@@ -356,7 +356,7 @@ describe( 'DataViews component', () => {
 		} );
 
 		it( 'leaves a valid page alone', () => {
-			const onChangeView = jest.fn();
+			const onChangeView = vi.fn();
 			render(
 				<DataViewWrapper
 					view={ { type: LAYOUT_TABLE, page: 3, perPage: 1 } }

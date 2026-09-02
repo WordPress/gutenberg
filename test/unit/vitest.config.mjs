@@ -232,7 +232,6 @@ export default defineConfig( {
 				},
 			},
 		],
-		clearMocks: true,
 		globals: false,
 		includeTaskLocation: true,
 		isolate: true,

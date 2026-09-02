@@ -345,7 +345,6 @@ export function findVitestIsolationOptOuts( rootDir ) {
 export function validateVitestCleanupConfig( vitestConfig ) {
 	const violations = [];
 	const requiredOptions = [
-		'clearMocks',
 		'isolate',
 		'mockReset',
 		'restoreMocks',

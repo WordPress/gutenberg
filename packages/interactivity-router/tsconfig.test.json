@@ -9,9 +9,9 @@
 	},
 	"files": [
 		"global.d.ts",
-		"src/assets/test/script-modules.test.ts",
+		"src/assets/test/script-modules.jsdom.test.ts",
 		"src/assets/test/scs.test.ts",
-		"src/assets/test/styles.test.ts"
+		"src/assets/test/styles.jsdom.test.ts"
 	],
 	"include": [],
 	"exclude": []

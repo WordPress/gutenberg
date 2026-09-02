@@ -357,9 +357,9 @@ describe( 'DateTime control', () => {
 					abbr: 'UTC',
 				},
 			} );
-			// Jest pins the browser to UTC, so this mismatch is created from
-			// the browser side: UTC+1, i.e. an offset of -60 minutes.
-			const offsetSpy = jest
+			// The test environment pins the browser to UTC. Create the mismatch
+			// from the browser side: UTC+1, i.e. an offset of -60 minutes.
+			const offsetSpy = vi
 				.spyOn( Date.prototype, 'getTimezoneOffset' )
 				.mockReturnValue( -60 );
 
