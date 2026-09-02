@@ -57,7 +57,7 @@ npm install @wordpress/block-editor@wp-5.8
 It’s also possible to update all existing WordPress packages in the project with a single command:
 
 ```bash
-npm exec --no -- wp-scripts packages-update --dist-tag=wp-5.8
+npx @wordpress/scripts packages-update --dist-tag=wp-5.8
 ```
 
 All major WordPress versions starting from `5.7.x` are supported (e.g., `wp-5.7` or `wp-6.0`). Each individual dist-tag always points to the latest bug fix release for that major version line.
