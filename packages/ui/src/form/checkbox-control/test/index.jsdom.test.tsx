@@ -4,6 +4,10 @@ import { createRef } from '@wordpress/element';
 import { describe, expect, it, vi } from 'vitest';
 import { CheckboxControl } from '../index';
 
+declare const wpVitest: {
+	mockPointerEvent: () => void;
+};
+
 wpVitest.mockPointerEvent();
 
 describe( 'CheckboxControl', () => {
