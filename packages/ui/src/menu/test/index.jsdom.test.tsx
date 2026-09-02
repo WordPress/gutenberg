@@ -847,6 +847,93 @@ describe( 'Menu', () => {
 		expect( screen.getByText( 'separate' ).tagName ).toBe( 'STRONG' );
 	} );
 
+	it( 'combines multiple item descriptions in DOM order', async () => {
+		const user = userEvent.setup();
+
+		function MenuWithMultipleDescriptions() {
+			const externalDescriptionId = useId();
+			const firstDescriptionId = useId();
+
+			return (
+				<Menu.Root>
+					<Menu.Trigger>Actions</Menu.Trigger>
+					<Menu.Popup>
+						<span id={ externalDescriptionId }>
+							Available offline.
+						</span>
+						<Menu.Item
+							aria-describedby={ externalDescriptionId }
+							shortcut={ {
+								displayShortcut: '⌘S',
+								ariaKeyShortcut: 'Meta+S',
+								label: 'Command S',
+							} }
+						>
+							<Menu.ItemLabel>Save</Menu.ItemLabel>
+							<Menu.ItemDescription id={ firstDescriptionId }>
+								Save to this device.
+							</Menu.ItemDescription>
+							<Menu.ItemDescription>
+								Keeps the current version.
+							</Menu.ItemDescription>
+						</Menu.Item>
+					</Menu.Popup>
+				</Menu.Root>
+			);
+		}
+
+		render( <MenuWithMultipleDescriptions /> );
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+
+		const item = await screen.findByRole( 'menuitem', { name: 'Save' } );
+		const externalDescription = screen.getByText( 'Available offline.' );
+		const firstDescription = screen.getByText( 'Save to this device.' );
+		const secondDescription = screen.getByText(
+			'Keeps the current version.'
+		);
+		const shortcutDescription = screen.getByText(
+			'Keyboard shortcut: Command S'
+		);
+
+		expect( item ).toHaveAccessibleDescription(
+			'Available offline. Save to this device. Keeps the current version. Keyboard shortcut: Command S'
+		);
+		expect( firstDescription.id ).not.toBe( '' );
+		expect( secondDescription.id ).not.toBe( '' );
+		expect( secondDescription.id ).not.toBe( firstDescription.id );
+		expect( item ).toHaveAttribute(
+			'aria-describedby',
+			`${ externalDescription.id } ${ firstDescription.id } ${ secondDescription.id } ${ shortcutDescription.id }`
+		);
+	} );
+
+	it( 'deduplicates explicit and item description IDs', async () => {
+		const user = userEvent.setup();
+		const descriptionId = 'save-description';
+
+		render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.Item aria-describedby={ descriptionId }>
+						<Menu.ItemLabel>Save</Menu.ItemLabel>
+						<Menu.ItemDescription id={ descriptionId }>
+							Save the current file.
+						</Menu.ItemDescription>
+					</Menu.Item>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+
+		const item = await screen.findByRole( 'menuitem', { name: 'Save' } );
+
+		expect( item ).toHaveAccessibleDescription( 'Save the current file.' );
+		expect( item ).toHaveAttribute( 'aria-describedby', descriptionId );
+	} );
+
 	it( 'requires an ItemLabel as a direct child of every item', () => {
 		expect( () =>
 			render(

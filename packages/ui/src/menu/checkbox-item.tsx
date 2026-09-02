@@ -28,14 +28,18 @@ const CheckboxItem = forwardRef< HTMLDivElement, CheckboxItemProps >(
 		},
 		ref
 	) {
-		const { contentContextValue, itemAriaProps, shortcutDescriptionId } =
-			useItemContent( children, {
-				'aria-describedby': ariaDescribedBy,
-				'aria-keyshortcuts': ariaKeyShortcuts,
-				'aria-label': ariaLabel,
-				'aria-labelledby': ariaLabelledBy,
-				shortcut,
-			} );
+		const {
+			contentChildren,
+			contentContextValue,
+			itemAriaProps,
+			shortcutDescriptionId,
+		} = useItemContent( children, {
+			'aria-describedby': ariaDescribedBy,
+			'aria-keyshortcuts': ariaKeyShortcuts,
+			'aria-label': ariaLabel,
+			'aria-labelledby': ariaLabelledBy,
+			shortcut,
+		} );
 
 		return (
 			<_Menu.CheckboxItem
@@ -61,7 +65,7 @@ const CheckboxItem = forwardRef< HTMLDivElement, CheckboxItemProps >(
 						shortcutDescriptionId={ shortcutDescriptionId }
 						suffix={ suffix }
 					>
-						{ children }
+						{ contentChildren }
 					</ItemContent>
 				</MenuItemContentContext.Provider>
 			</_Menu.CheckboxItem>

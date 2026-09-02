@@ -45,6 +45,9 @@ export function discoverTestFiles( rootDir ) {
 }
 
 export function getVitestTests( discoveredTests, manifest ) {
+	const nodeTests = discoveredTests.filter(
+		( testPath ) => getTestEnvironmentName( testPath ) === 'node'
+	);
 	const directoryTests = discoveredTests.filter( ( testPath ) =>
 		manifest.vitest.directories.some(
 			( directoryPath ) =>
@@ -54,7 +57,11 @@ export function getVitestTests( discoveredTests, manifest ) {
 	);
 
 	return [
-		...new Set( [ ...manifest.vitest.files, ...directoryTests ] ),
+		...new Set( [
+			...nodeTests,
+			...manifest.vitest.files,
+			...directoryTests,
+		] ),
 	].sort();
 }
 
