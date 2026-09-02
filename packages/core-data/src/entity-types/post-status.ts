@@ -1,8 +1,9 @@
-import type { Context, ContextualField, OmitNevers } from './helpers';
+import type { Context, OmitNevers } from './helpers';
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
 declare module './base-entity-records' {
 	export namespace BaseEntityRecords {
+		/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 		export interface PostStatusObject< C extends Context > {
 			/**
 			 * The title for the status.
@@ -12,27 +13,27 @@ declare module './base-entity-records' {
 			/**
 			 * Whether posts with this status should be private.
 			 */
-			private: ContextualField< boolean, 'edit', C >;
+			private: boolean;
 
 			/**
 			 * Whether posts with this status should be protected.
 			 */
-			protected: ContextualField< boolean, 'edit', C >;
+			protected: boolean;
 
 			/**
 			 * Whether posts of this status should be shown in the front end of the site.
 			 */
-			public: ContextualField< boolean, 'view' | 'edit', C >;
+			public: boolean;
 
 			/**
 			 * Whether posts with this status should be publicly-queryable.
 			 */
-			queryable: ContextualField< boolean, 'view' | 'edit', C >;
+			queryable: boolean;
 
 			/**
 			 * Whether to include posts in the edit listing for their post type.
 			 */
-			show_in_list: ContextualField< boolean, 'edit', C >;
+			show_in_list: boolean;
 
 			/**
 			 * An alphanumeric identifier for the status.
@@ -42,7 +43,7 @@ declare module './base-entity-records' {
 			/**
 			 * Whether posts of this status may have floating published dates.
 			 */
-			date_floating: ContextualField< boolean, 'view' | 'edit', C >;
+			date_floating: boolean;
 		}
 	}
 }

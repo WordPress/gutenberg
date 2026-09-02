@@ -125,13 +125,19 @@ function normalizePageId( value: number | string | undefined ): string | null {
 	return value.toString();
 }
 
+interface SiteData {
+	show_on_front?: string;
+	page_on_front?: string | number;
+	page_for_posts?: string | number;
+}
+
 export const getHomePage = createRegistrySelector( ( select ) =>
 	createSelector(
 		() => {
 			const siteData = select( STORE_NAME ).getEntityRecord(
 				'root',
 				'__unstableBase'
-			);
+			) as SiteData | undefined;
 			// Still resolving getEntityRecord.
 			if ( ! siteData ) {
 				return null;
@@ -177,7 +183,7 @@ export const getPostsPageId = createRegistrySelector( ( select ) => () => {
 	const siteData = select( STORE_NAME ).getEntityRecord(
 		'root',
 		'__unstableBase'
-	);
+	) as SiteData | undefined;
 	return siteData?.show_on_front === 'page'
 		? normalizePageId( siteData.page_for_posts )
 		: null;

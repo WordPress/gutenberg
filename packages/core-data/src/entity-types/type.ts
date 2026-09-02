@@ -39,11 +39,7 @@ declare module './base-entity-records' {
 			/**
 			 * All features, supported by the post type.
 			 */
-			supports: ContextualField<
-				Record< string, true | unknown[] >,
-				'edit',
-				C
-			>;
+			supports: ContextualField< Record< string, string >, 'edit', C >;
 			/**
 			 * Taxonomies associated with post type.
 			 */

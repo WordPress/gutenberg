@@ -44,7 +44,7 @@ declare module './base-entity-records' {
 			/**
 			 * Tags indicating styles and features of the theme.
 			 */
-			tags: ThemeTags;
+			tags: RenderedText< 'edit' >;
 			/**
 			 * The theme's text domain.
 			 */
@@ -52,7 +52,7 @@ declare module './base-entity-records' {
 			/**
 			 * Features supported by this theme.
 			 */
-			theme_supports?: ThemeSupports;
+			theme_supports: ThemeSupports;
 			/**
 			 * The URI of the theme's webpage.
 			 */
@@ -68,17 +68,6 @@ declare module './base-entity-records' {
 		}
 
 		export type ThemeStatus = 'active' | 'inactive';
-
-		export interface ThemeTags {
-			/**
-			 * The theme tags, as found in the theme header.
-			 */
-			raw: string[];
-			/**
-			 * The theme tags, transformed for display.
-			 */
-			rendered: string;
-		}
 
 		export interface ThemeSupports {
 			/**

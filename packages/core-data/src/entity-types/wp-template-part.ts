@@ -77,7 +77,7 @@ declare module './base-entity-records' {
 			/**
 			 * Theme file exists.
 			 */
-			has_theme_file: boolean;
+			has_theme_file: Record< string, string >;
 			/**
 			 * The ID for the author of the template.
 			 */

@@ -426,11 +426,29 @@ describe( 'Entity record types', () => {
 				{ context: 'view' }
 			);
 			attachment?.caption.rendered satisfies string | undefined;
-			attachment?.filename satisfies string | undefined;
+			attachment?.filename satisfies string | null | undefined;
 			attachment?.filesize satisfies number | null | undefined;
 			attachment?.class_list satisfies string[] | undefined;
+			attachment?.media_details.sizes?.full?.source_url satisfies
+				| string
+				| undefined;
 			// @ts-expect-error -- only edit responses contain the raw caption.
 			attachment?.caption.raw;
+			// @ts-expect-error -- Gutenberg's image-processing fields are edit-only.
+			attachment?.exif_orientation;
+
+			const editable = select( coreStore ).getEntityRecord(
+				'postType',
+				'attachment',
+				1
+			);
+			editable?.exif_orientation satisfies number | undefined;
+			editable?.image_output_format satisfies string | null | undefined;
+			editable?.image_save_progressive satisfies boolean | undefined;
+			editable?.image_quality?.default satisfies number | undefined;
+			editable?.image_quality?.sizes.thumbnail satisfies
+				| number
+				| undefined;
 
 			const embedded = select( coreStore ).getEntityRecord(
 				'postType',
@@ -618,6 +636,9 @@ describe( 'Entity record types', () => {
 			);
 			post?.id satisfies number | undefined;
 			post?.title?.raw satisfies string | undefined;
+			// The runtime treats an array as one projected value, so its element
+			// type stays intact while the array field itself becomes optional.
+			post?.categories?.[ 0 ] satisfies number | undefined;
 			// @ts-expect-error -- `_fields` can omit `title` entirely.
 			post?.title.raw;
 
@@ -640,6 +661,16 @@ describe( 'Entity record types', () => {
 			view?.title?.rendered satisfies string | undefined;
 			// @ts-expect-error -- `_fields` can omit `title` entirely.
 			view?.title.rendered;
+
+			const styles = select( coreStore ).getEntityRecord(
+				'root',
+				'globalStyles',
+				1,
+				{ _fields: 'id,_links.version-history.href' }
+			);
+			// Nested `_fields` filtering never returns partially projected array
+			// elements: the array is either complete or empty.
+			styles?._links?.[ 'version-history' ]?.[ 0 ]?.count.toFixed();
 		};
 	} );
 

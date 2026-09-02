@@ -8,7 +8,6 @@
 
 ### Internal
 
--   Drop the type assertions at `getEntityRecord` and `getEntityRecords` call sites, now that the selectors infer the record type from `kind` and `name` ([#81863](https://github.com/WordPress/gutenberg/pull/81863)).
 -   Remove the template activation (`active_templates`) experiment checks from the rename, reset, and duplicate actions ([#82241](https://github.com/WordPress/gutenberg/pull/82241)).
 -   Remove unused dependencies `@wordpress/hooks`, `@wordpress/primitives`, `@wordpress/router`, etc. ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Update a source reference after its JSX file moved to the `.jsx` extension ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).

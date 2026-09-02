@@ -28,7 +28,11 @@ declare module './base-entity-records' {
 			/**
 			 * The plugin author.
 			 */
-			author: ContextualField< string, 'view' | 'edit', C >;
+			author: ContextualField<
+				Record< string, string >,
+				'view' | 'edit',
+				C
+			>;
 			/**
 			 * Plugin author's website address.
 			 */
