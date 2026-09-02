@@ -1440,11 +1440,13 @@
   subcomponents:
       - name: ToggleGroupControlOption
         props:
+            - disabled
             - label
             - showTooltip
             - value
       - name: ToggleGroupControlOptionIcon
         props:
+            - disabled
             - icon
             - label
             - value
