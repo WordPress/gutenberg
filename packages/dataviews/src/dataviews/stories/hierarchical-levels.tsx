@@ -91,7 +91,7 @@ const HierarchicalLevelsComponent = ( {
 
 	return (
 		<DataViews
-			getItemId={ ( item ) => item.id }
+			getItemId={ ( item ) => item.id.toString() }
 			getItemLevel={ ( item ) => item.level }
 			data={ data }
 			paginationInfo={ paginationInfo }
