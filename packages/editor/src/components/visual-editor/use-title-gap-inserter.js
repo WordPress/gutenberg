@@ -30,8 +30,10 @@ export function useTitleGapInserter( enabled ) {
 			}
 
 			function onMouseMove( event ) {
+				const blockEditorSelect =
+					registry.select( blockEditorStore );
 				const { getBlockOrder, isMultiSelecting, getTemplateLock } =
-					unlock( registry.select( blockEditorStore ) );
+					unlock( blockEditorSelect );
 				const { showInsertionPoint, hideInsertionPoint } =
 					registry.dispatch( blockEditorStore );
 
@@ -93,6 +95,15 @@ export function useTitleGapInserter( enabled ) {
 						'block-editor-block-list__layout'
 					)
 				) {
+					const insertionPoint =
+						blockEditorSelect.isBlockInsertionPointVisible()
+							? blockEditorSelect.getBlockInsertionPoint()
+							: null;
+
+					if ( insertionPoint?.__unstableWithInserter ) {
+						return;
+					}
+
 					hideInsertionPoint();
 				}
 			}

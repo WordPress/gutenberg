@@ -576,25 +576,41 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Second paragraph' );
 
-		const boundingBox = await editor.canvas
-			.getByRole( 'document', { name: 'Block: Paragraph' } )
-			.filter( { hasText: 'First paragraph' } )
+		const titleWrapperBoundingBox = await editor.canvas
+			.locator( '.editor-visual-editor__post-title-wrapper' )
+			.boundingBox();
+		const blockListLayoutBoundingBox = await editor.canvas
+			.locator( '.block-editor-block-list__layout.is-root-container' )
+			.boundingBox();
+		const firstBlockBoundingBox = await editor.canvas
+			.locator(
+				'.block-editor-block-list__layout.is-root-container > .wp-block'
+			)
+			.first()
 			.boundingBox();
 
-		// Using the between inserter above the first block.
+		const titleGapBottom = titleWrapperBoundingBox.y +
+			titleWrapperBoundingBox.height;
+		const titleGapTop = firstBlockBoundingBox.y;
+		const titleGapMidpoint =
+			titleGapBottom +
+			Math.max( 1, ( titleGapTop - titleGapBottom ) / 2 );
+
+		// Hover the gap between the post title and the first block.
 		await page.mouse.move(
-			boundingBox.x + boundingBox.width / 2,
-			boundingBox.y - 10,
+			blockListLayoutBoundingBox.x +
+				blockListLayoutBoundingBox.width / 2,
+			titleGapMidpoint,
 			// An arbitrary number of `steps` imitates cursor movement in the test environment,
-			// activating the in-between inserter.
+			// activating the title gap inserter.
 			{ steps: 10 }
 		);
 
-		await page
-			.getByRole( 'button', {
-				name: 'Add block',
-			} )
-			.click();
+		const addBlockButton = page.getByRole( 'button', {
+			name: 'Add block',
+		} );
+		await expect( addBlockButton ).toBeVisible();
+		await addBlockButton.click();
 		await page.getByRole( 'button', { name: 'Browse All' } ).click();
 		await page
 			.getByRole( 'listbox', { name: 'Media' } )
