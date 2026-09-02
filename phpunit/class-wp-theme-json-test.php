@@ -1972,6 +1972,58 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
 	}
 
+	public function test_get_stylesheet_renders_variation_responsive_text_input_pseudo_selectors() {
+		register_block_style(
+			'core/group',
+			array(
+				'name'  => 'section-1',
+				'label' => 'Section 1',
+			)
+		);
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/group' => array(
+							'variations' => array(
+								'section-1' => array(
+									'@mobile' => array(
+										'elements' => array(
+											'textInput' => array(
+												':focus' => array(
+													'color' => array(
+														'text' => 'blue',
+													),
+												),
+												'::placeholder' => array(
+													'color' => array(
+														'text' => 'green',
+													),
+												),
+											),
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$actual = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+
+		unregister_block_style( 'core/group', 'section-1' );
+
+		$focus       = '@media (width <= 480px){:root :where(.wp-block-group.is-style-section-1 textarea:focus, .wp-block-group.is-style-section-1 input:where([type=email],[type=number],[type=password],[type=search],[type=text],[type=tel],[type=url]):focus){color: blue;}}';
+		$placeholder = '@media (width <= 480px){.wp-block-group.is-style-section-1 textarea::placeholder, .wp-block-group.is-style-section-1 input:where([type=email],[type=number],[type=password],[type=search],[type=text],[type=tel],[type=url])::placeholder{color: green;}}';
+
+		$this->assertStringContainsString( $focus, $actual );
+		$this->assertStringContainsString( $placeholder, $actual );
+	}
+
 	/**
 	 * Tests that element pseudo selectors are output before block element pseudo selectors, and that whitelisted
 	 * block element pseudo selectors are output correctly.

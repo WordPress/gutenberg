@@ -1671,6 +1671,75 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'keeps responsive style variation pseudo-element selectors outside the :where() wrapper', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/group': {
+							variations: {
+								'section-1': {
+									'@mobile': {
+										elements: {
+											textInput: {
+												':focus': {
+													color: { text: 'blue' },
+												},
+												'::placeholder': {
+													color: { text: 'green' },
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/group': {
+					selector: '.wp-block-group',
+					styleVariationSelectors: {
+						'section-1': '.wp-block-group.is-style-section-1',
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				{
+					...minimalStyleOptions,
+					variationStyles: true,
+				}
+			);
+
+			const scoped = ( pseudoSelector: string ) =>
+				textInputSelectorWith( pseudoSelector )
+					.split( ', ' )
+					.map(
+						( part ) =>
+							`.wp-block-group.is-style-section-1 ${ part }`
+					)
+					.join( ', ' );
+
+			expect( result ).toContain(
+				`@media (width <= 480px){:root :where(${ scoped(
+					':focus'
+				) }){color: blue;}}`
+			);
+			expect( result ).toContain(
+				`@media (width <= 480px){${ scoped(
+					'::placeholder'
+				) }{color: green;}}`
+			);
+		} );
+
 		it( 'should handle duotone filter', () => {
 			const tree = {
 				styles: {

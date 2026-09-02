@@ -1436,6 +1436,21 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
+	 * Determines whether a pseudo selector is a pseudo-element, e.g. '::placeholder'.
+	 *
+	 * Pseudo-elements are not valid inside `:where()`, so rules that target them
+	 * cannot use the `:root :where()` specificity wrapper.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param string|null $pseudo_selector Pseudo selector to check, e.g. ':hover' or '::placeholder'.
+	 * @return bool True if the pseudo selector is a pseudo-element.
+	 */
+	protected static function is_pseudo_element( $pseudo_selector ) {
+		return is_string( $pseudo_selector ) && str_starts_with( $pseudo_selector, '::' );
+	}
+
+	/**
 	 * Appends a sub-selector to an existing one.
 	 *
 	 * Given the compounded $selector "h1, h2, h3"
@@ -3977,7 +3992,10 @@ class WP_Theme_JSON_Gutenberg {
 										continue;
 									}
 
-									$pseudo_selector_ruleset          = static::to_ruleset( ':root :where(' . static::append_to_selector( $variation_element_selector, $pseudo_selector ) . ')', $pseudo_declarations );
+									// Pseudo-elements are not valid inside :where(), so output their selectors directly.
+									$pseudo_combined_selector         = static::append_to_selector( $variation_element_selector, $pseudo_selector );
+									$pseudo_rule_selector             = static::is_pseudo_element( $pseudo_selector ) ? $pseudo_combined_selector : ':root :where(' . $pseudo_combined_selector . ')';
+									$pseudo_selector_ruleset          = static::to_ruleset( $pseudo_rule_selector, $pseudo_declarations );
 									$variation_responsive_pseudo_css .= $breakpoint_media . '{' . $pseudo_selector_ruleset . '}';
 								}
 							}
@@ -4125,7 +4143,7 @@ class WP_Theme_JSON_Gutenberg {
 			);
 
 		// Pseudo-elements are not valid inside :where(), so output their selectors directly.
-		$is_pseudo_element = $pseudo_selector && str_starts_with( $pseudo_selector, '::' );
+		$is_pseudo_element = static::is_pseudo_element( $pseudo_selector );
 		$general_selector  = $element_only_selector || $is_pseudo_element ? $selector : ":root :where($selector)";
 		$block_rules      .= static::to_ruleset( $general_selector, $declarations );
 
