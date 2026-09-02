@@ -261,7 +261,6 @@ export default {
 		expect(
 			validateVitestCleanupConfig( {
 				test: {
-					clearMocks: true,
 					globals: false,
 					isolate: true,
 					mockReset: true,

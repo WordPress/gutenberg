@@ -449,7 +449,7 @@ describe( 'useOpenImageMediaEditorModal', () => {
 	} );
 
 	it( 'keeps the selected image size when the edit created a new attachment', async () => {
-		const onUrlChange = jest.fn();
+		const onUrlChange = vi.fn();
 		const { setAttributes } = await runModalUpdate( {
 			attributes: {
 				id: 1,
