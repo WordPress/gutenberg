@@ -7,11 +7,46 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
 import { loadApiProvider } from 'promptfoo';
+import { workspace } from '../paths.js';
+import { permissions, sandbox } from '../sandbox.js';
 import {
 	checkoutMarkerFile,
 	homeMarkerFile,
 	outsideMarkerFile,
 } from '../../specs/sandbox/probe-file.js';
+
+test( 'the sandbox denies reads by region, not by denying the root', () => {
+	// Denying `/` takes the system libraries with it; a profile no command can
+	// run under is discarded rather than enforced, leaving reads open.
+	assert.equal( sandbox.filesystem.denyRead.includes( '/' ), false );
+	assert.equal( sandbox.filesystem.allowRead.includes( workspace ), true );
+	// The re-allowed workspace only means something if a denied region
+	// surrounds it — otherwise its siblings in the temp directory are open.
+	assert.equal(
+		sandbox.filesystem.denyRead.some( ( denied ) =>
+			workspace.startsWith( `${ denied }/` )
+		),
+		true,
+		'no denied read region surrounds the workspace'
+	);
+} );
+
+test( 'an empty network allowlist is a deterministic denial', () => {
+	// Without `strictAllowlist` a host outside the list prompts instead, and a
+	// headless run resolves that prompt as an allow.
+	assert.deepEqual( sandbox.network, {
+		allowedDomains: [],
+		strictAllowlist: true,
+	} );
+} );
+
+test( 'permission rules are anchored as absolute paths', () => {
+	// `//` means an absolute path; one slash anchors to the settings source
+	// and three parse as a settings-relative pattern that matches nothing.
+	for ( const rule of permissions.deny ) {
+		assert.match( rule, /^(Read|Edit)\(\/\/[^/]/ );
+	}
+} );
 
 test( 'loading the sandbox config does not create host canaries', () => {
 	assert.equal( fs.existsSync( homeMarkerFile ), false );

@@ -23,18 +23,27 @@ export const homeDirectory = fs.realpathSync( os.homedir() );
 export const sourceRoot = path.resolve( libraryDirectory, '../../..' );
 
 /**
+ * Where the workspace lives, and a denied read region around it. `realpath`
+ * for the same reason as the home directory: on macOS `os.tmpdir()` is a
+ * symlink into `/private`.
+ */
+export const temporaryDirectory = fs.realpathSync( os.tmpdir() );
+
+/**
  * The disposable copy the agents run against.
  *
  * Deliberately outside both the checkout and the home directory. Permission
  * rules resolve deny before allow and ignore specificity, so a workspace inside
  * a denied directory could not be re-allowed — the rules meant to keep the
  * agent out of the checkout would keep it out of its own working directory too.
+ * (Sandbox paths are the opposite: the narrower rule wins, which is how the
+ * workspace is re-allowed inside the denied temp directory.)
  *
  * Keeping it out of the checkout also stops the repository's own lint and test
  * tooling walking into a second copy of the repository.
  */
 export const workspace = path.join(
-	fs.realpathSync( os.tmpdir() ),
+	temporaryDirectory,
 	`gutenberg-agent-eval-${ process.pid }`
 );
 

@@ -62,10 +62,10 @@ Promptfoo does not implement sandboxing. It passes the `sandbox` and `settings` 
 So:
 
 -   **Writes** need no rules. A sandboxed command can write to the working directory and the session temp directory and nowhere else, and the working directory is the workspace.
--   **Reads** are allowed everywhere by default, so the host root is denied and `allowRead` re-opens only the workspace. For sandbox paths the narrower rule wins.
+-   **Reads** are allowed everywhere by default, so the home directory, the checkout, and the temp directory are denied, and `allowRead` re-opens only the workspace inside it — for sandbox paths the narrower rule wins. Denying `/` outright does not work: it takes the system libraries with it, and a profile no command can run under does not survive to enforce anything.
 -   **Bash is the gap the sandbox exists to close.** The in-process file tools are already bounded: the SDK tests a path against `working_dir` before the tool runs, and one outside it is refused. Bash gets no such check, and its children none either, which is what the OS layer is for.
 -   **Permission rules run the opposite way round** to sandbox paths: deny is resolved before allow and specificity is ignored, so a deny rule cannot carry an exception. That is why the workspace lives outside every denied path — in the system temp directory rather than inside the checkout, where the rules keeping the agent out of the source would have locked it out of its own working directory.
--   **The network** is unreachable, so the agent cannot look up the answer.
+-   **The network** is unreachable: the allowlist is empty and `strictAllowlist` makes that a deterministic denial rather than a prompt a headless run would resolve as an allow.
 -   **Hooks go around both layers**, so both providers disable them. Claude Code runs a hook itself rather than through the Bash tool, before the session starts and with the inherited environment — and a workspace is built from the tree under evaluation, so a branch adding `.claude/settings.json` would otherwise run commands on the host.
 -   **The environment** is bounded by `lib/environment.js` and the sandbox's credential rules. The provider copies the whole of `process.env` into the agent and `config.env` can only override a name, never remove one, so inherited variables are blanked there. Promptfoo restores `ANTHROPIC_API_KEY` after that step, so the Bash sandbox denies that name explicitly.
 

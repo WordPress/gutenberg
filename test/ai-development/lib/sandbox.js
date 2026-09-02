@@ -8,7 +8,12 @@
  * @see https://code.claude.com/docs/en/sandboxing
  * @see https://code.claude.com/docs/en/permissions
  */
-import { homeDirectory, sourceRoot, workspace } from './paths.js';
+import {
+	homeDirectory,
+	sourceRoot,
+	temporaryDirectory,
+	workspace,
+} from './paths.js';
 
 /**
  * Enforced by the operating system, and covers Bash and every process it
@@ -20,8 +25,10 @@ export const sandbox = {
 	// No command may opt out of the sandbox. With this set, Claude cannot offer
 	// to retry a blocked command outside it either.
 	allowUnsandboxedCommands: false,
-	// Prevent the agent from reaching the internet.
-	network: { allowedDomains: [] },
+	// Prevent the agent from reaching the internet. `strictAllowlist` makes an
+	// empty list a deterministic denial; without it, a host outside the list
+	// prompts instead, and a headless run resolves that prompt as an allow.
+	network: { allowedDomains: [], strictAllowlist: true },
 	credentials: {
 		// Promptfoo captures this key before applying `config.env`, then adds it
 		// back to the SDK child. Deny it at the Bash sandbox boundary as well.
@@ -31,9 +38,13 @@ export const sandbox = {
 	// directory and the session temp directory and nowhere else, and the
 	// working directory is the workspace.
 	filesystem: {
-		// Reads are allowed everywhere by default. Deny the host root, then
-		// re-open only the workspace. For sandbox paths the narrower rule wins.
-		denyRead: [ '/' ],
+		// Reads are allowed everywhere by default, so they are confined by
+		// denying: the home directory, the checkout, and the temp directory
+		// around the workspace, which `allowRead` then re-opens because for
+		// sandbox paths the narrower rule wins. Denying `/` instead does not
+		// work: it takes the system libraries with it, and a profile no
+		// command can run under does not survive to enforce anything.
+		denyRead: [ homeDirectory, sourceRoot, temporaryDirectory ],
 		allowRead: [ workspace ],
 	},
 };
