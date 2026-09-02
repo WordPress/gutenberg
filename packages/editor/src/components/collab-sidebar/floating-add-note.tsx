@@ -8,6 +8,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 	// @ts-expect-error `@wordpress/block-editor` has no type declarations.
 } from '@wordpress/block-editor';
+import { getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 import { useAnchor } from '@wordpress/rich-text';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
@@ -22,45 +23,70 @@ const { useBlockElement } = unlock( blockEditorPrivateApis );
  */
 const SHOW_DELAY_MS = 300;
 
-type InlineSelection = {
+/**
+ * Height of the virtual anchor for a block-level note, so the button sits
+ * beside the block's first line rather than centred on its top edge.
+ */
+const BLOCK_ANCHOR_HEIGHT = 32;
+
+/**
+ * What the floating button would attach a note to. Kept flat so `useSelect`
+ * can shallow-compare it and skip re-renders while the target is unchanged.
+ */
+type FloatingTarget = {
 	clientId: string;
-	attributeKey: string;
-	start: number;
-	end: number;
+	/**
+	 * The rich-text range a note would wrap, or null when the note attaches to
+	 * the block as a whole (a collapsed caret, or a block with no text).
+	 */
+	attributeKey: string | null;
+	start: number | null;
+	end: number | null;
 };
 
 type FloatingAddNoteProps = {
 	/**
-	 * Opens the new-note form for the block holding the selection. The inline
-	 * range itself is read back from the block-editor store when the note is
-	 * saved, so the selection must survive the click (see `onMouseDown`).
+	 * Opens the new-note form for the target block. The inline range itself is
+	 * read back from the block-editor store when the note is saved, so the
+	 * selection must survive the click (see `onMouseDown`).
 	 */
 	onClick: ( clientId: string ) => void;
 };
 
 /**
- * The inline range the floating button would attach a note to, or null when
- * the button should stay hidden: the selection is collapsed, spans blocks,
- * isn't inside a rich-text attribute, already overlaps a `core/note` marker
- * (the note format syncs the sidebar to that note on its own), or the new-note
- * form is already open for it.
+ * The target the floating button would attach a note to, or null when the
+ * button should stay hidden: nothing is selected, the selection spans blocks,
+ * the block can't take notes (invalid, unregistered, or classic), the selected
+ * text already overlaps a `core/note` marker (the note format syncs the sidebar
+ * to that note on its own), or the new-note form is already open.
  */
-function useFloatingButtonSelection(): InlineSelection | null {
+function useFloatingButtonTarget(): FloatingTarget | null {
 	return useSelect( ( select ) => {
 		const {
+			getSelectedBlockClientId,
 			getSelectionStart,
 			getSelectionEnd,
-			getBlockAttributes,
-			hasMultiSelection,
+			getBlock,
 		} = select( blockEditorStore );
 
-		if ( hasMultiSelection() ) {
+		const clientId = getSelectedBlockClientId();
+		if ( ! clientId ) {
+			return null;
+		}
+
+		// Mirrors the block toolbar's "Add note" item.
+		const block = getBlock( clientId );
+		if (
+			! block?.isValid ||
+			block.name === 'core/freeform' ||
+			block.name === getUnregisteredTypeHandlerName()
+		) {
 			return null;
 		}
 
 		// The selection persists while the user types in the sidebar form, so
-		// without this the button would keep floating over the text after it
-		// has done its job.
+		// without this the button would keep floating beside the block after
+		// it has done its job.
 		if ( unlock( select( editorStore ) ).getSelectedNote() === 'new' ) {
 			return null;
 		}
@@ -70,64 +96,64 @@ function useFloatingButtonSelection(): InlineSelection | null {
 			getSelectionEnd()
 		);
 		if ( ! inlineSelection ) {
-			return null;
+			return { clientId, attributeKey: null, start: null, end: null };
 		}
 
-		const attributes = getBlockAttributes( inlineSelection.clientId );
+		const { attributeKey, start, end } = inlineSelection;
 		if (
-			! attributes ||
-			hasNoteFormatInRange(
-				attributes[ inlineSelection.attributeKey ],
-				inlineSelection.start,
-				inlineSelection.end
-			)
+			hasNoteFormatInRange( block.attributes[ attributeKey ], start, end )
 		) {
 			return null;
 		}
 
-		return inlineSelection;
+		return { clientId, attributeKey, start, end };
 	}, [] );
 }
 
 /**
- * A floating "Add note" button surfaced next to a live text selection in the
- * canvas, the on-select entry point familiar from Medium and Google Docs. It
- * complements the block toolbar entry rather than replacing it.
+ * A floating "Add note" button surfaced in the margin beside the selected
+ * block: on the selected line when text is highlighted, the on-select entry
+ * point familiar from Medium and Google Docs, and at the block's first line
+ * otherwise, so a click on an image or a heading is enough to leave a
+ * block-level note. It complements the block toolbar entry rather than
+ * replacing it.
  */
 export function FloatingAddNote( { onClick }: FloatingAddNoteProps ) {
-	const inlineSelection = useFloatingButtonSelection();
+	const target = useFloatingButtonTarget();
+	const isInline = target?.attributeKey !== null;
 
-	// Re-keying on the captured range restarts the delay whenever the selection
-	// changes (e.g. while the user is still dragging), and hides the button the
-	// moment the selection collapses.
-	const selectionKey = inlineSelection
-		? `${ inlineSelection.clientId }:${ inlineSelection.attributeKey }:${ inlineSelection.start }:${ inlineSelection.end }`
+	// Re-keying on the target restarts the delay whenever it changes (e.g.
+	// while the user is still dragging), and hides the button the moment the
+	// block is deselected.
+	const targetKey = target
+		? `${ target.clientId }:${ target.attributeKey }:${ target.start }:${ target.end }`
 		: null;
 	const [ isReady, setIsReady ] = useState( false );
 	useEffect( () => {
 		setIsReady( false );
-		if ( ! selectionKey ) {
+		if ( ! targetKey ) {
 			return;
 		}
 		const timer = setTimeout( () => setIsReady( true ), SHOW_DELAY_MS );
 		return () => clearTimeout( timer );
-	}, [ selectionKey ] );
+	}, [ targetKey ] );
 
 	// `useAnchor` derives a virtual anchor from the block element's live DOM
 	// range, reading `ownerDocument.defaultView.getSelection()`, so an iframed
 	// canvas resolves its own selection without any special casing here.
 	const blockElement: HTMLElement | null = useBlockElement(
-		inlineSelection?.clientId
+		target?.clientId
 	);
 	const selectionAnchor = useAnchor( {
 		editableContentElement: blockElement,
 	} );
 
-	// Anchor in the margin beside the block, on the selected line: the
-	// Google Docs placement. Anywhere inside the content column either covers
+	// Anchor in the margin beside the block: on the selected line for an
+	// inline note (the Google Docs placement), at the block's top for a
+	// block-level one. Anywhere inside the content column either covers
 	// neighbouring text or, on a first line, lands on the block toolbar.
 	const marginAnchor = useMemo( () => {
-		if ( ! selectionAnchor || ! blockElement ) {
+		if ( ! blockElement || ( isInline && ! selectionAnchor ) ) {
 			return null;
 		}
 		const { ownerDocument } = blockElement;
@@ -135,16 +161,25 @@ export function FloatingAddNote( { onClick }: FloatingAddNoteProps ) {
 			ownerDocument,
 			contextElement: blockElement,
 			getBoundingClientRect() {
-				const { top, height } = selectionAnchor.getBoundingClientRect();
-				const { right } = blockElement.getBoundingClientRect();
+				const blockRect = blockElement.getBoundingClientRect();
+				const { top, height } =
+					isInline && selectionAnchor
+						? selectionAnchor.getBoundingClientRect()
+						: {
+								top: blockRect.top,
+								height: Math.min(
+									blockRect.height,
+									BLOCK_ANCHOR_HEIGHT
+								),
+						  };
 				const DOMRect =
 					ownerDocument.defaultView?.DOMRect ?? window.DOMRect;
-				return new DOMRect( right, top, 0, height );
+				return new DOMRect( blockRect.right, top, 0, height );
 			},
 		};
-	}, [ selectionAnchor, blockElement ] );
+	}, [ selectionAnchor, blockElement, isInline ] );
 
-	if ( ! isReady || ! inlineSelection || ! marginAnchor ) {
+	if ( ! isReady || ! target || ! marginAnchor ) {
 		return null;
 	}
 
@@ -172,7 +207,7 @@ export function FloatingAddNote( { onClick }: FloatingAddNoteProps ) {
 				onMouseDown={ ( event: React.MouseEvent ) =>
 					event.preventDefault()
 				}
-				onClick={ () => onClick( inlineSelection.clientId ) }
+				onClick={ () => onClick( target.clientId ) }
 			/>
 		</Popover>
 	);

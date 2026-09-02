@@ -1732,11 +1732,8 @@ test.describe( 'Block Notes', () => {
 					} )
 				).rejects.toThrow();
 
-			// A collapsed caret gets no button.
+			// Selecting "brave" (offsets 6-11) surfaces it beside that line.
 			await paragraph.click();
-			await expectToStayHidden();
-
-			// Selecting "brave" (offsets 6-11) surfaces it.
 			await blockNoteUtils.selectBlockText( { start: 6, length: 5 } );
 			await expect( floatingButton ).toBeVisible();
 
@@ -1758,11 +1755,67 @@ test.describe( 'Block Notes', () => {
 			await expect( mark ).toHaveCount( 1 );
 			await expect( mark ).toHaveText( 'brave' );
 
-			// Re-selecting text that already carries a note keeps the button
-			// hidden; the note format syncs the sidebar to that note instead.
+			// Re-selecting text that already carries a note hides the button;
+			// the note format syncs the sidebar to that note instead. Waiting
+			// for the block-level button first rules out a stale one from the
+			// click being what the hidden check sees.
 			await paragraph.click();
+			await expect( floatingButton ).toBeVisible();
 			await blockNoteUtils.selectBlockText( { start: 6, length: 5 } );
+			await expect( floatingButton ).toBeHidden();
 			await expectToStayHidden();
+		} );
+
+		test( 'floats an "Add note" button beside a selected block', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/heading',
+				attributes: { content: 'Section title' },
+			} );
+			await editor.insertBlock( { name: 'core/image' } );
+
+			const floatingButton = page
+				.locator( '.editor-collab-sidebar__floating-add-note' )
+				.getByRole( 'button', { name: 'Add note' } );
+
+			// A click that only places a caret, selecting no text, is enough
+			// to surface the button: the note attaches to the whole block.
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Heading' } )
+				.click();
+			await expect( floatingButton ).toBeVisible();
+
+			// A block with no text at all gets it too.
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Image' } )
+				.click( { position: { x: 4, y: 4 } } );
+			await expect( floatingButton ).toBeVisible();
+
+			await floatingButton.click();
+			await expect( floatingButton ).toBeHidden();
+			await page
+				.getByRole( 'textbox', { name: 'New note', exact: true } )
+				.fill( 'Needs a caption' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+
+			// The note lands in the image block's metadata, with no inline
+			// marker anywhere in the canvas.
+			await expect
+				.poll( async () => {
+					const blocks = await editor.getBlocks();
+					return blocks.find(
+						( block ) => block.name === 'core/image'
+					)?.attributes?.metadata?.noteId?.length;
+				} )
+				.toBe( 1 );
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				0
+			);
 		} );
 
 		test.describe( 'Floating alignment', () => {
