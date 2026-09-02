@@ -18,11 +18,18 @@ import {
 import {
 	LinkControl,
 	store as blockEditorStore,
+	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
+import type { RichTextValue } from '@wordpress/rich-text';
 import { createLinkFormat, isValidHref, getFormatBoundary } from './utils';
 import { link as settings } from './index';
 import CSSClassesSettingComponent from './css-classes-setting';
+import type {
+	InlineLinkUIProps,
+	LinkValue,
+	CSSClassesSettingProps,
+} from '../types';
 
 const LINK_SETTINGS = [
 	...LinkControl.DEFAULT_LINK_SETTINGS,
@@ -33,15 +40,17 @@ const LINK_SETTINGS = [
 	{
 		id: 'cssClasses',
 		title: __( 'Additional CSS class(es)' ),
-		render: ( setting, value, onChange ) => {
-			return (
-				<CSSClassesSettingComponent
-					setting={ setting }
-					value={ value }
-					onChange={ onChange }
-				/>
-			);
-		},
+		render: (
+			setting: CSSClassesSettingProps[ 'setting' ],
+			value: CSSClassesSettingProps[ 'value' ],
+			onChange: CSSClassesSettingProps[ 'onChange' ]
+		) => (
+			<CSSClassesSettingComponent
+				setting={ setting }
+				value={ value }
+				onChange={ onChange }
+			/>
+		),
 	},
 ];
 
@@ -54,7 +63,7 @@ function InlineLinkUI( {
 	stopAddingLink,
 	contentRef,
 	focusOnMount,
-} ) {
+}: InlineLinkUIProps ) {
 	const richLinkTextValue = getRichTextValueFromSelection( value, isActive );
 
 	// Get the text content minus any HTML tags.
@@ -105,7 +114,7 @@ function InlineLinkUI( {
 		speak( __( 'Link removed.' ), 'assertive' );
 	}
 
-	function onChangeLink( nextValue ) {
+	function onChangeLink( nextValue: LinkValue ) {
 		const hasLink = linkValue?.url;
 		const isNewLink = ! hasLink;
 
@@ -115,7 +124,7 @@ function InlineLinkUI( {
 			...nextValue,
 		};
 
-		const newUrl = prependHTTPS( nextValue.url );
+		const newUrl = prependHTTPS( nextValue?.url ?? '' );
 		const linkFormat = createLinkFormat( {
 			url: newUrl,
 			type: nextValue.type,
@@ -131,7 +140,7 @@ function InlineLinkUI( {
 		const newText = nextValue.title || newUrl;
 
 		// Scenario: we have any active text selection or an active format.
-		let newValue;
+		let newValue: RichTextValue;
 		if ( isCollapsed( value ) && ! isActive ) {
 			// Scenario: we don't have any actively selected text or formats.
 			const inserted = insert( value, newText );
@@ -189,11 +198,30 @@ function InlineLinkUI( {
 			// the second half of the split value is split at the format's
 			// start boundary and avoids relying on the value's "end" property
 			// which may not correspond correctly.
-			const [ valBefore, valAfter ] = split(
-				value,
-				boundary.start,
-				boundary.start
-			);
+			// `split`'s exported TS signature only declares (value, string), but at
+			// runtime it forwards extra args to `splitAtSelection`, which supports the
+			// (value, startIndex, endIndex) form used here. Cast to reflect that.
+			// The indices are deliberately `number | undefined`: `getFormatBoundary`
+			// returns `EMPTY_BOUNDARIES` when the format is not found, and
+			// `splitAtSelection` treats an undefined index as "split at the
+			// selection", which is not the same as splitting at index 0.
+			const splitValue = (
+				split as (
+					value: RichTextValue,
+					startIndex?: number | undefined,
+					endIndex?: number | undefined
+				) => RichTextValue[] | undefined
+			 )( value, boundary.start, boundary.start );
+
+			// `splitAtSelection` returns `undefined` when the value carries no
+			// selection of its own, which leaves nothing to split on. Bail out
+			// rather than replacing within the full value: `replace` rewrites
+			// the first match only, so two links sharing the same text would
+			// silently edit the wrong one — the bug the split below exists to
+			// prevent.
+			if ( ! splitValue ) {
+				return;
+			}
 
 			// Update the original (full) RichTextValue replacing the
 			// target text with the *new* RichTextValue containing:
@@ -207,6 +235,7 @@ function InlineLinkUI( {
 			// Note original formats will be lost when applying this change.
 			// That is expected behaviour.
 			// See: https://github.com/WordPress/gutenberg/pull/33849#issuecomment-936134179.
+			const [ valBefore, valAfter ] = splitValue;
 			const newValAfter = replace( valAfter, richTextText, newValue );
 
 			newValue = concat( valBefore, newValAfter );
@@ -236,15 +265,19 @@ function InlineLinkUI( {
 		}
 	}
 
+	/*
+	 * `isActive` is not part of `WPFormat`, but `useAnchor` reads it
+	 * dynamically. Hoisting the object out of the call avoids excess property
+	 * checking, which only applies to object literals passed inline.
+	 */
+	const anchorSettings = { ...settings, isActive };
 	const popoverAnchor = useAnchor( {
+		// eslint-disable-next-line react-hooks/refs
 		editableContentElement: contentRef.current,
-		settings: {
-			...settings,
-			isActive,
-		},
+		settings: anchorSettings,
 	} );
 
-	async function handleCreate( pageTitle ) {
+	async function handleCreate( pageTitle: string ) {
 		const page = await createPageEntity( {
 			title: pageTitle,
 			status: 'draft',
@@ -259,7 +292,7 @@ function InlineLinkUI( {
 		};
 	}
 
-	function createButtonText( searchTerm ) {
+	function createButtonText( searchTerm: string ) {
 		return createInterpolateElement(
 			sprintf(
 				/* translators: %s: search term. */
@@ -306,7 +339,10 @@ function InlineLinkUI( {
 	);
 }
 
-function getRichTextValueFromSelection( value, isActive ) {
+function getRichTextValueFromSelection(
+	value: RichTextValue,
+	isActive: boolean
+): RichTextValue {
 	// Default to the selection ranges on the RichTextValue object.
 	let textStart = value.start;
 	let textEnd = value.end;
@@ -319,8 +355,8 @@ function getRichTextValueFromSelection( value, isActive ) {
 			type: 'core/link',
 		} );
 
-		textStart = boundary.start;
-		textEnd = boundary.end;
+		textStart = boundary.start ?? value.start;
+		textEnd = boundary.end ?? value.end;
 	}
 
 	// Get a RichTextValue containing the selected text content.

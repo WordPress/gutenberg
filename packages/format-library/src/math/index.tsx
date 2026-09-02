@@ -7,10 +7,12 @@ import {
 	getTextContent,
 	useAnchor,
 } from '@wordpress/rich-text';
+// @ts-expect-error Block Editor not fully typed yet.
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
 import { ValidatedInputControl } from '@wordpress/ui';
 import { math as icon } from '@wordpress/icons';
+import type { InlineMathUIProps, EditMathProps } from '../types';
 
 const name = 'core/math';
 const title = __( 'Math' );
@@ -21,20 +23,21 @@ function InlineUI( {
 	activeAttributes,
 	contentRef,
 	latexToMathML,
-} ) {
+}: InlineMathUIProps ) {
 	const [ latex, setLatex ] = useState(
 		activeAttributes?.[ 'data-latex' ] || ''
 	);
-	const [ error, setError ] = useState( null );
-	const formRef = useRef();
+	const [ error, setError ] = useState< string | null >( null );
+	const formRef = useRef< HTMLFormElement >( null );
 
 	const popoverAnchor = useAnchor( {
+		// eslint-disable-next-line react-hooks/refs
 		editableContentElement: contentRef.current,
 		settings: math,
 	} );
 
 	// Update the math object in real-time as the user types
-	const handleLatexChange = ( newLatex ) => {
+	const handleLatexChange = ( newLatex: string ) => {
 		setLatex( newLatex );
 
 		let mathML = '';
@@ -43,7 +46,11 @@ function InlineUI( {
 				mathML = latexToMathML( newLatex, { displayMode: false } );
 				setError( null );
 			} catch ( err ) {
-				setError( err.message );
+				setError(
+					err instanceof Error
+						? err.message
+						: __( 'Could not parse the LaTeX math syntax.' )
+				);
 			}
 		} else {
 			setError( null );
@@ -104,8 +111,11 @@ function Edit( {
 	isObjectActive,
 	activeObjectAttributes,
 	contentRef,
-} ) {
-	const [ latexToMathML, setLatexToMathML ] = useState();
+}: EditMathProps ) {
+	const [ latexToMathML, setLatexToMathML ] =
+		useState<
+			( latex: string, options?: { displayMode?: boolean } ) => string
+		>();
 
 	useEffect( () => {
 		import( '@wordpress/latex-to-mathml' ).then( ( module ) => {

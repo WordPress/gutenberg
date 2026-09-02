@@ -6,17 +6,17 @@ let id = -1;
 
 const prefix = 'link-control-instance';
 
-function getKey( _id ) {
+function getKey( _id: number ): string {
 	return `${ prefix }-${ _id }`;
 }
 
 /**
  * Builds a unique link control key for the given object reference.
  *
- * @param {Object} instance an unique object reference specific to this link control instance.
- * @return {string | undefined} the unique key to use for this link control.
+ * @param instance an unique object reference specific to this link control instance.
+ * @return the unique key to use for this link control.
  */
-function useLinkInstanceKey( instance ) {
+function useLinkInstanceKey( instance: object ): string | undefined {
 	if ( ! instance ) {
 		return;
 	}

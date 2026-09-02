@@ -1,17 +1,19 @@
 import { __ } from '@wordpress/i18n';
 import { toggleFormat } from '@wordpress/rich-text';
+// @ts-expect-error Block Editor not fully typed yet.
 import { RichTextToolbarButton } from '@wordpress/block-editor';
-import { subscript as subscriptIcon } from '@wordpress/icons';
+import { superscript as superscriptIcon } from '@wordpress/icons';
+import type { FormatEditProps } from '../types';
 
-const name = 'core/subscript';
-const title = __( 'Subscript' );
+const name = 'core/superscript';
+const title = __( 'Superscript' );
 
-export const subscript = {
+export const superscript = {
 	name,
 	title,
-	tagName: 'sub',
+	tagName: 'sup',
 	className: null,
-	edit( { isActive, value, onChange, onFocus } ) {
+	edit( { isActive, value, onChange, onFocus }: FormatEditProps ) {
 		function onToggle() {
 			onChange( toggleFormat( value, { type: name, title } ) );
 		}
@@ -23,7 +25,7 @@ export const subscript = {
 
 		return (
 			<RichTextToolbarButton
-				icon={ subscriptIcon }
+				icon={ superscriptIcon }
 				title={ title }
 				onClick={ onClick }
 				isActive={ isActive }
