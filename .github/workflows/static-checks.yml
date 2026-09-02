@@ -68,10 +68,8 @@ jobs:
                   node-version: ${{ matrix.node }}
                   cache: npm
 
-            - name: Pin npm version for consistency
-              run: |
-                  npm install --global npm@10
-                  npm --version
+            - name: Set up npm
+              uses: ./.github/setup-npm
 
             - name: npm install
               # A "full" install is executed, since `npm ci` does not always exit
@@ -107,7 +105,7 @@ jobs:
               run: npm run lint:js -- --format compact --quiet --prune-suppressions
 
             - name: Test agent skill setup
-              run: npm run test:unit -- tools/agents/test/setup-skills.test.js --runInBand
+              run: npm run test:unit:vitest -- --project=node tools/agents/test/setup-skills.test.js
 
             - name: Lint Styles
               if: ${{ matrix.annotations }}
@@ -169,10 +167,8 @@ jobs:
                   # and the job doesn't need the install speed.
                   package-manager-cache: false
 
-            - name: Pin npm version for consistency
-              run: |
-                  npm install --global npm@10
-                  npm --version
+            - name: Set up npm
+              uses: ./.github/setup-npm
 
             - name: npm install
               # Not the setup-node composite action: its cached node_modules

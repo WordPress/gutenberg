@@ -11,10 +11,12 @@ metadata updates.
 
 When changing test ownership:
 
--   Add individual tests to `vitest.files`, or use `vitest.directories` when an
-    entire directory can move as one independently revertible unit.
--   Vitest tests run in Node by default. Name tests `*.jsdom.test.*` to opt into
-    JSDOM or `*.browser.test.*` to opt into Browser Mode.
+-   Node tests run in Vitest automatically. They do not need migration metadata.
+-   Add migrated JSDOM and Browser Mode tests to `vitest.files`, or use
+    `vitest.directories` when an entire directory can move as one independently
+    revertible unit.
+-   Name tests `*.jsdom.test.*` to use JSDOM or `*.browser.test.*` to use Browser
+    Mode.
 -   Use Node for pure JavaScript, data, stores, schemas, build tooling, and
     server-side logic.
 -   Use Browser Mode for real CSS, layout, geometry, viewport behavior, media
@@ -28,10 +30,9 @@ When changing test ownership:
 -   Before running Browser Mode tests locally for the first time, install
     Chromium with
     `npm exec --workspace @wordpress/unit-tests -- playwright install chromium`.
--   New Jest tests require no migration metadata; runner discovery picks them up
-    automatically. Their filenames still select the environment: Node by
-    default or JSDOM through `*.jsdom.test.*`. A new `*.browser.test.*` must be
-    assigned to Vitest so it can run in Browser Mode.
+-   New Node tests run in Vitest without migration metadata. A new
+    `*.jsdom.test.*` runs in Jest until it is assigned to Vitest, and a new
+    `*.browser.test.*` must be assigned to Vitest so it can run in Browser Mode.
 -   Do not use per-file Jest or Vitest environment overrides. The filename is
     the single source of truth.
 -   Run `npm test` for the complete lint and unit-test suite. For focused

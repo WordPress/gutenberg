@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `WelcomeGuide`: Keep the modal close icon white now that it is stroke-based. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
+
 ### Internal
 
 -   Remove the `showListViewByDefault` handling from `initializeEditor`; the `editor` package now applies the preference itself.
