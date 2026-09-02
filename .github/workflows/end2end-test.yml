@@ -397,10 +397,6 @@ jobs:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
 
-            # This job is still running while it evaluates the rest, so it exempts itself.
-            # `Merge Artifacts` runs alongside it and is housekeeping, not test signal — it
-            # also cannot comment with a fork pull request's read-only token, as is the
-            # case for `Update PR meta comment`.
             - name: Check for any failures of required jobs
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
