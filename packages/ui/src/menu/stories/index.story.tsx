@@ -222,7 +222,7 @@ export const LinkItem: Story = {
 			<>
 				<Menu.Trigger>Open menu</Menu.Trigger>
 				<Menu.Popup>
-					<Menu.LinkItem href="https://wordpress.org" openInNewTab>
+					<Menu.LinkItem href="https://wordpress.org" target="_blank">
 						<Menu.ItemLabel>WordPress.org</Menu.ItemLabel>
 						<Menu.ItemDescription>
 							Open the WordPress project website.
@@ -231,6 +231,7 @@ export const LinkItem: Story = {
 					<Menu.LinkItem
 						href="https://developer.wordpress.org"
 						openInNewTab
+						target="wordpress-developer-resources"
 						shortcut={ SHORTCUTS.developerResources }
 						suffix="Docs"
 					>

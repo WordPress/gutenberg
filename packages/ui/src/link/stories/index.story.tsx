@@ -25,6 +25,14 @@ export const Default: Story = {
 	},
 };
 
+export const OpenInNewTab: Story = {
+	args: {
+		children: 'Visit WordPress.org',
+		href: 'https://wordpress.org',
+		target: '_blank',
+	},
+};
+
 /**
  * Note: `tone` has no effect on `unstyled` variant
  */

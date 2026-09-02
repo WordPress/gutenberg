@@ -3,6 +3,15 @@ import { type ComponentProps } from '../utils/types';
 
 export interface LinkProps extends Omit< ComponentProps< 'a' >, 'target' > {
 	/**
+	 * Where to open the linked document. `"_blank"` also adds the visual
+	 * indicator and accessible new-tab notice.
+	 *
+	 * When both `target` and `openInNewTab` are set, `target` determines the
+	 * browsing context.
+	 */
+	target?: ComponentProps< 'a' >[ 'target' ];
+
+	/**
 	 * The visual treatment of the link.
 	 *
 	 * - `default`: Applies tone-based color and underline styles.
@@ -21,8 +30,9 @@ export interface LinkProps extends Omit< ComponentProps< 'a' >, 'target' > {
 	tone?: 'brand' | 'neutral';
 
 	/**
-	 * Whether to open the link in a new browser tab.
-	 * When true, sets `target="_blank"` and appends a visual arrow indicator.
+	 * Whether the link opens in a new browser tab. Adds a visual indicator and
+	 * accessible notice, and defaults `target` to `"_blank"` when no explicit
+	 * target is set.
 	 *
 	 * @default false
 	 */
