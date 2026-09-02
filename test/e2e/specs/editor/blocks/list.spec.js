@@ -210,6 +210,11 @@ test.describe( 'List (@firefox)', () => {
 <p>* </p>
 <!-- /wp:paragraph -->`
 		);
+		// The undo claims the Escape; it must not also step out of the
+		// canvas onto its stop.
+		await expect(
+			page.getByRole( 'button', { name: 'Editor canvas' } ).first()
+		).not.toBeFocused();
 	} );
 
 	test( 'should not undo asterisk transform with backspace after typing', async ( {

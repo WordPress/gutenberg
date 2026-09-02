@@ -118,28 +118,4 @@ test.describe( 'Canvas as a single tab stop', () => {
 			)
 			.toBe( true );
 	} );
-
-	test( 'still undoes an automatic change first', async ( {
-		editor,
-		page,
-	} ) => {
-		await editor.canvas
-			.locator( 'role=document[name="Add default block"i]' )
-			.click();
-		await page.keyboard.type( '* ' );
-		await expect
-			.poll( editor.getBlocks )
-			.toMatchObject( [ { name: 'core/list' } ] );
-
-		await page.keyboard.press( 'Escape' );
-		await expect
-			.poll( editor.getBlocks )
-			.toMatchObject( [
-				{ name: 'core/paragraph', attributes: { content: '* ' } },
-			] );
-		await expect.poll( () => hasTextSelection( page ) ).toBe( true );
-		await expect(
-			page.getByRole( 'button', { name: 'Editor canvas' } ).first()
-		).not.toBeFocused();
-	} );
 } );
