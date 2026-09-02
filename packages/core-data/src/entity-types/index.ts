@@ -476,8 +476,13 @@ export type EntityRecordOfQuery<
 		  >
 	: never;
 
+/**
+ * Makes projected object fields optional. Arrays stay intact because the
+ * runtime `_fields` projection treats them as terminal values rather than
+ * projecting fields within each element.
+ */
 type DeepPartial< T > = T extends readonly unknown[]
-	? { [ K in keyof T ]: DeepPartial< T[ K ] > }
+	? T
 	: T extends object
 	? { [ K in keyof T ]?: DeepPartial< T[ K ] > }
 	: T;
