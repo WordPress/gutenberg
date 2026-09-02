@@ -1,7 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
+import { describe, expect, it, vi } from 'vitest';
 import { CheckboxControl } from '../index';
+
+wpVitest.mockPointerEvent();
 
 describe( 'CheckboxControl', () => {
 	it( 'forwards ref', () => {
@@ -76,7 +79,7 @@ describe( 'CheckboxControl', () => {
 	describe( 'Form data behavior', () => {
 		it( 'submits correct form data when checked with custom name and value', async () => {
 			const user = userEvent.setup();
-			const handleSubmit = jest.fn( ( event ) => {
+			const handleSubmit = vi.fn( ( event ) => {
 				event.preventDefault();
 				return new FormData( event.currentTarget );
 			} );
@@ -110,7 +113,7 @@ describe( 'CheckboxControl', () => {
 
 		it( 'does not include unchecked checkbox in form data', async () => {
 			const user = userEvent.setup();
-			const handleSubmit = jest.fn( ( event ) => {
+			const handleSubmit = vi.fn( ( event ) => {
 				event.preventDefault();
 				return new FormData( event.currentTarget );
 			} );
@@ -138,7 +141,7 @@ describe( 'CheckboxControl', () => {
 
 		it( 'uses "on" as default value when no value prop is provided', async () => {
 			const user = userEvent.setup();
-			const handleSubmit = jest.fn( ( event ) => {
+			const handleSubmit = vi.fn( ( event ) => {
 				event.preventDefault();
 				return new FormData( event.currentTarget );
 			} );
@@ -168,7 +171,7 @@ describe( 'CheckboxControl', () => {
 
 		it( 'handles multiple checkboxes with same name correctly', async () => {
 			const user = userEvent.setup();
-			const handleSubmit = jest.fn( ( event ) => {
+			const handleSubmit = vi.fn( ( event ) => {
 				event.preventDefault();
 				return new FormData( event.currentTarget );
 			} );
