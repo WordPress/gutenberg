@@ -347,46 +347,31 @@ export function useOpenImageMediaEditorModal( {
 			const nextAttributes = {};
 
 			const currentBlockAttributes = blockAttributesRef.current;
-
 			const isNewAttachment = newId !== currentBlockAttributes.id;
-			// Whether the attachment-derived attributes were re-resolved from
-			// the cached record; when they weren't, the freshly resolved
-			// record below gets a second chance.
-			let hasResolvedNewAttachment = false;
 
 			if ( isNewAttachment ) {
-				const fullUrl = newUrl ?? currentBlockAttributes.url;
-
 				nextAttributes.id = newId;
-				nextAttributes.url = fullUrl;
-
-				const derivedAttributes = getNewAttachmentImageBlockAttributes(
-					currentBlockAttributes,
-					getCachedAttachmentRecord( newId ),
-					fullUrl
-				);
-
-				if ( derivedAttributes ) {
-					Object.assign( nextAttributes, derivedAttributes );
-					hasResolvedNewAttachment = true;
-				}
-
+				nextAttributes.url = newUrl ?? currentBlockAttributes.url;
 				if ( nextAttributes.url !== currentBlockAttributes.url ) {
 					// The block is about to point at a freshly generated file
 					// the browser hasn't loaded yet; let the caller show a
-					// loading state until its <img> fires load/error.
+					// loading state until its <img> fires load/error. Raising
+					// it here, before anything is awaited, keeps the rest of
+					// this update behind that loading state: the attributes
+					// land in a single `setAttributes` at the end, so the
+					// image never renders against half-updated settings.
 					onUrlChange?.( nextAttributes.url );
 				}
 				blockAttributesRef.current = {
 					...blockAttributesRef.current,
-					...nextAttributes,
+					id: nextAttributes.id,
+					url: nextAttributes.url,
 				};
 			}
 
-			if ( originalAttachment ) {
-				// Fetch fresh server state so the comparison reflects what
-				// the media editor actually saved, not a potentially stale
-				// cache.
+			if ( originalAttachment || isNewAttachment ) {
+				// Fetch fresh server state so this reflects what the media
+				// editor actually saved, not a potentially stale cache.
 				const resolvedAttachment =
 					await resolveFreshAttachmentRecord( newId );
 
@@ -398,26 +383,31 @@ export function useOpenImageMediaEditorModal( {
 					return;
 				}
 
+				const latestBlockAttributes = blockAttributesRef.current;
+
 				// Sync alt text and caption back to the block only when
 				// they were changed in the media editor. Fields the user
 				// has independently customised on the block (i.e. values
 				// that don't match the pre-session attachment metadata)
-				// are left untouched.
-				const latestBlockAttributes = blockAttributesRef.current;
-				const resolvedMetadataAttributes =
-					getSyncedImageBlockAttributes(
-						latestBlockAttributes,
-						originalAttachment,
-						resolvedAttachment
-					);
+				// are left untouched. Without a baseline there's no way to
+				// tell the two apart, so nothing is synced.
+				if ( originalAttachment ) {
+					const resolvedMetadataAttributes =
+						getSyncedImageBlockAttributes(
+							latestBlockAttributes,
+							originalAttachment,
+							resolvedAttachment
+						);
 
-				if ( Object.keys( resolvedMetadataAttributes ).length ) {
-					Object.assign( nextAttributes, resolvedMetadataAttributes );
+					if ( Object.keys( resolvedMetadataAttributes ).length ) {
+						Object.assign(
+							nextAttributes,
+							resolvedMetadataAttributes
+						);
+					}
 				}
 
-				// The new attachment wasn't cached yet when the update came
-				// in, so its size and link couldn't be derived from it then.
-				if ( isNewAttachment && ! hasResolvedNewAttachment ) {
+				if ( isNewAttachment ) {
 					const derivedAttributes =
 						getNewAttachmentImageBlockAttributes(
 							latestBlockAttributes,
@@ -428,6 +418,9 @@ export function useOpenImageMediaEditorModal( {
 					if ( derivedAttributes ) {
 						Object.assign( nextAttributes, derivedAttributes );
 
+						// Point the pending swap at the file the block will
+						// actually render, so the loading state settles
+						// against the right URL.
 						if (
 							derivedAttributes.url &&
 							derivedAttributes.url !== latestBlockAttributes.url
@@ -446,12 +439,7 @@ export function useOpenImageMediaEditorModal( {
 				setAttributes( nextAttributes );
 			}
 		},
-		[
-			getCachedAttachmentRecord,
-			onUrlChange,
-			resolveFreshAttachmentRecord,
-			setAttributes,
-		]
+		[ onUrlChange, resolveFreshAttachmentRecord, setAttributes ]
 	);
 
 	const openImageMediaEditorModal = useCallback( async () => {

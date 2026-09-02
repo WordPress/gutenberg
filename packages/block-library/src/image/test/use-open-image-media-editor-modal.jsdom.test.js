@@ -517,6 +517,49 @@ describe( 'useOpenImageMediaEditorModal', () => {
 		} );
 	} );
 
+	it( 'resolves the selected image size without an attachment metadata baseline', async () => {
+		const croppedAttachment = {
+			id: 2,
+			media_details: {
+				sizes: {
+					medium: { source_url: 'cropped-300x200.jpg' },
+					full: { source_url: 'cropped.jpg' },
+				},
+			},
+		};
+		const { setAttributes, registry } = await runModalUpdate( {
+			attributes: {
+				id: 1,
+				url: 'original-300x200.jpg',
+				alt: 'Custom alt',
+				caption: 'Custom caption',
+				sizeSlug: 'medium',
+			},
+			registryOptions: {
+				// Nothing is cached, and the original attachment never
+				// resolves, so there is no baseline to sync metadata against.
+				resolveGetEntityRecord: ( kind, name, attachmentId ) =>
+					attachmentId === 2 ? croppedAttachment : undefined,
+			},
+			updatePayload: { id: 2, url: 'cropped.jpg' },
+		} );
+
+		expect( setAttributes ).toHaveBeenCalledTimes( 1 );
+		expect( setAttributes ).toHaveBeenCalledWith( {
+			id: 2,
+			url: 'cropped-300x200.jpg',
+		} );
+		// The size is derived from a freshly resolved record for the edited
+		// attachment, not a stale cached one.
+		expect( registry.actions.invalidateResolution ).toHaveBeenCalledTimes(
+			1
+		);
+		expect( registry.actions.invalidateResolution ).toHaveBeenCalledWith(
+			'getEntityRecord',
+			[ 'postType', 'attachment', 2 ]
+		);
+	} );
+
 	it( 'points a media file link at the edited image', async () => {
 		const originalAttachment = {
 			id: 1,
