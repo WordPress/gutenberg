@@ -176,6 +176,7 @@ function TemplateList() {
 			// Clean up URL when delete actions are performed
 			if (
 				actionId === 'move-to-trash' ||
+				actionId === 'move-draft-to-trash' ||
 				actionId === 'permanently-delete'
 			) {
 				cleanupDeletedPostIdsFromUrl( items );

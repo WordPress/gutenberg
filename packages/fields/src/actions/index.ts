@@ -8,6 +8,7 @@ export { default as exportPattern } from './export-pattern';
 export { default as viewPostRevisions } from './view-post-revisions';
 export { default as permanentlyDeletePost } from './permanently-delete-post';
 export { default as restorePost } from './restore-post';
+export { default as trashDraft } from './trash-draft';
 export { default as trashPost } from './trash-post';
 export { default as deletePost } from './delete-post';
 export { default as duplicateTemplatePart } from './duplicate-template-part';

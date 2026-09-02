@@ -290,6 +290,10 @@ Title for the template entity.
 
 Title for the any entity with a `title` property. For patterns, pages or templates you should use the respective field because there are some differences in the rendering, labels, etc.
 
+### trashDraft
+
+Trash action for drafts: moves the draft to the trash without asking for confirmation and offers to undo it from the notice.
+
 ### trashPost
 
 Trash action for PostWithPermissions.
