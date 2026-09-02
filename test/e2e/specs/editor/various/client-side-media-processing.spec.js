@@ -349,6 +349,171 @@ test.describe( 'Client-side media processing', () => {
 		}
 	} );
 
+	test.describe( 'image edits', () => {
+		/**
+		 * Opens the media editor modal for the selected image block, applies
+		 * the given edits and saves, returning the edited attachment's REST
+		 * record along with any requests sent to the server-side `/edit`
+		 * endpoint. Client-side editing must never call that endpoint.
+		 *
+		 * @param {Object}   editor       The editor fixture.
+		 * @param {Object}   page         The page fixture.
+		 * @param {Object}   requestUtils The requestUtils fixture.
+		 * @param {Object}   utils        The mediaProcessingUtils fixture.
+		 * @param {number}   originalId   ID of the attachment being edited.
+		 * @param {Function} applyEdits   Applies edits within the modal.
+		 * @return {Promise<{ edited: Object, editRequests: string[] }>} Result.
+		 */
+		async function editSelectedImage(
+			editor,
+			page,
+			requestUtils,
+			utils,
+			originalId,
+			applyEdits
+		) {
+			const editRequests = [];
+			page.on( 'request', ( request ) => {
+				if ( /\/wp\/v2\/media\/\d+\/edit/.test( request.url() ) ) {
+					editRequests.push( request.url() );
+				}
+			} );
+
+			await editor.clickBlockToolbarButton( 'Edit image' );
+			const modal = page.locator( 'role=dialog[name="Edit media"i]' );
+			await expect( modal ).toBeVisible();
+			// The cropper is inert until its image has loaded; an edit
+			// applied before that is lost when it initializes.
+			await expect(
+				modal.locator( '.media-editor-canvas__cropper.is-loaded' )
+			).toBeVisible();
+			await expect(
+				modal.locator( '.wp-media-editor-image-editor__image' )
+			).toHaveJSProperty( 'complete', true );
+
+			await applyEdits( modal );
+			// Every edit here makes the editor dirty, which enables Reset.
+			await expect(
+				modal.locator( 'role=button[name="Reset"i]' )
+			).toBeEnabled();
+			await modal.locator( 'role=button[name="Save"i]' ).click();
+			await expect( modal ).toBeHidden( { timeout: 60_000 } );
+
+			// The edit produces a new attachment which the block switches to.
+			await expect
+				.poll( () => utils.getSelectedBlockImageId(), {
+					timeout: 60_000,
+				} )
+				.not.toBe( originalId );
+			await utils.waitForUploadQueueEmpty();
+
+			const editedId = await utils.getSelectedBlockImageId();
+			const edited = await utils.getMediaDetails(
+				requestUtils,
+				editedId
+			);
+			return { edited, editRequests };
+		}
+
+		test( 'rotates an UltraHDR image client-side and keeps its gain map', async ( {
+			editor,
+			page,
+			mediaProcessingUtils,
+			requestUtils,
+		} ) => {
+			const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+				editor,
+				requestUtils,
+				'1024x768_e2e_test_image_ultrahdr.jpeg'
+			);
+
+			const { edited, editRequests } = await editSelectedImage(
+				editor,
+				page,
+				requestUtils,
+				mediaProcessingUtils,
+				media.id,
+				async ( modal ) => {
+					await modal
+						.locator( 'role=button[name="Rotate 90° clockwise"i]' )
+						.click();
+				}
+			);
+
+			// The whole edit happened in the browser.
+			expect( editRequests ).toEqual( [] );
+
+			// A new attachment, named like the server's `/edit` endpoint
+			// names its output, attached to the same post and carrying the
+			// source attachment's details.
+			expect( edited.id ).not.toBe( media.id );
+			expect( edited.source_url ).toMatch( /-edited(-\d+)?\.jpe?g$/ );
+			expect( edited.post ).toBe( media.post );
+			expect( edited.title.raw ).toBe( media.title.raw );
+			expect( edited.media_details.parent_image.attachment_id ).toBe(
+				media.id
+			);
+			expect( edited.mime_type ).toBe( 'image/jpeg' );
+			expect( edited.media_details.width ).toBe( 768 );
+			expect( edited.media_details.height ).toBe( 1024 );
+
+			// The server-side editors strip the gain map when they rotate
+			// (see gutenberg#82295). The client-side edit must keep it, on
+			// the full-size file and on every sub-size generated from it.
+			const full = await probeUltraHdrUrl( edited.source_url );
+			expect( full.hasGainmap ).toBe( true );
+			expect( full.width ).toBe( 768 );
+			expect( full.height ).toBe( 1024 );
+
+			const sizes = edited.media_details.sizes;
+			for ( const sizeName of [ 'thumbnail', 'medium' ] ) {
+				const size = sizes[ sizeName ];
+				expect( size ).toBeDefined();
+				const probed = await probeUltraHdrUrl( size.source_url );
+				expect( probed.hasGainmap ).toBe( true );
+				expect( probed.width ).toBe( size.width );
+				expect( probed.height ).toBe( size.height );
+			}
+		} );
+
+		test( 'crops an image client-side', async ( {
+			editor,
+			page,
+			mediaProcessingUtils,
+			requestUtils,
+		} ) => {
+			const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+				editor,
+				requestUtils,
+				'1024x768_e2e_test_image_ultrahdr.jpeg'
+			);
+
+			const { edited, editRequests } = await editSelectedImage(
+				editor,
+				page,
+				requestUtils,
+				mediaProcessingUtils,
+				media.id,
+				async ( modal ) => {
+					// Square (1:1) preset, keyed by its ratio.
+					await modal
+						.getByRole( 'combobox', { name: 'Aspect ratio' } )
+						.selectOption( '1' );
+				}
+			);
+
+			expect( editRequests ).toEqual( [] );
+			expect( edited.id ).not.toBe( media.id );
+			expect( edited.media_details.width ).toBe( 768 );
+			expect( edited.media_details.height ).toBe( 768 );
+
+			const full = await probeUltraHdrUrl( edited.source_url );
+			expect( full.hasGainmap ).toBe( true );
+			expect( full.width ).toBe( 768 );
+			expect( full.height ).toBe( 768 );
+		} );
+	} );
+
 	test( 'keeps sub-sizes of an indexed PNG indexed', async ( {
 		editor,
 		mediaProcessingUtils,
