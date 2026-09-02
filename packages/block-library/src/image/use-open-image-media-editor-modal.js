@@ -418,9 +418,14 @@ export function useOpenImageMediaEditorModal( {
 					if ( derivedAttributes ) {
 						Object.assign( nextAttributes, derivedAttributes );
 
-						// Point the pending swap at the file the block will
-						// actually render, so the loading state settles
-						// against the right URL.
+						// The URL announced before the resolve was the
+						// full-size file the media editor reported, and
+						// deriving the selected size can change it.
+						// Re-announce so the pending swap names the file
+						// that actually lands: an update that is undone or
+						// superseded never changes the <img> src, and the
+						// block then clears its loading state by matching
+						// the pending URL against the rendered one.
 						if (
 							derivedAttributes.url &&
 							derivedAttributes.url !== latestBlockAttributes.url
