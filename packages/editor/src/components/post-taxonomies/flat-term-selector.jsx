@@ -7,7 +7,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { withFilters } from '@wordpress/components';
-import { Field, SearchableChipSelect, Stack } from '@wordpress/ui';
+import { SearchableChipSelectControl, Stack } from '@wordpress/ui';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDebounce } from '@wordpress/compose';
@@ -334,12 +334,12 @@ export function FlatTermSelector( { slug } ) {
 		taxonomy?.labels?.singular_name ??
 		( slug === 'post_tag' ? __( 'Tag' ) : __( 'Term' ) );
 	const termAddedLabel = sprintf(
-		/* translators: %s: term name. */
+		/* translators: %s: taxonomy singular name, e.g. "Tag". */
 		_x( '%s added', 'term' ),
 		singularName
 	);
 	const termRemovedLabel = sprintf(
-		/* translators: %s: term name. */
+		/* translators: %s: taxonomy singular name, e.g. "Tag". */
 		_x( '%s removed', 'term' ),
 		singularName
 	);
@@ -367,40 +367,38 @@ export function FlatTermSelector( { slug } ) {
 
 	return (
 		<Stack direction="column" gap="lg">
-			<Field.Root>
-				<Field.Label>{ newTermLabel }</Field.Label>
-				<SearchableChipSelect
-					autoHighlight
-					openOnInputClick={ false }
-					// Terms are searched through the REST API.
-					filter={ null }
-					items={ items }
-					value={ values }
-					onValueChange={ onChange }
-					isItemEqualToValue={ isSameTerm }
-					inputValue={ inputValue }
-					onInputValueChange={ onInputValueChange }
-					emptyContent={
-						isSearching ? __( 'Searching…' ) : notFoundLabel
-					}
-					searchPlaceholder=""
-					showClearButton={ false }
-					chipsContent={ ( selectedTerms ) =>
-						selectedTerms.map( ( term ) => (
-							<SearchableChipSelect.ChipWithRemove
-								key={ term.value }
-								removeLabel={ sprintf(
-									/* translators: %s: term name. */
-									_x( 'Remove %s', 'term' ),
-									term.label
-								) }
-							>
-								{ term.label }
-							</SearchableChipSelect.ChipWithRemove>
-						) )
-					}
-				/>
-			</Field.Root>
+			<SearchableChipSelectControl
+				autoHighlight
+				openOnInputClick={ false }
+				// Terms are searched through the REST API.
+				filter={ null }
+				label={ newTermLabel }
+				items={ items }
+				value={ values }
+				onValueChange={ onChange }
+				isItemEqualToValue={ isSameTerm }
+				inputValue={ inputValue }
+				onInputValueChange={ onInputValueChange }
+				emptyContent={
+					isSearching ? __( 'Searching…' ) : notFoundLabel
+				}
+				searchPlaceholder=""
+				showClearButton={ false }
+				chipsContent={ ( selectedTerms ) =>
+					selectedTerms.map( ( term ) => (
+						<SearchableChipSelectControl.ChipWithRemove
+							key={ term.value }
+							removeLabel={ sprintf(
+								/* translators: %s: term name. */
+								_x( 'Remove %s', 'term' ),
+								term.label
+							) }
+						>
+							{ term.label }
+						</SearchableChipSelectControl.ChipWithRemove>
+					) )
+				}
+			/>
 			<MostUsedTerms taxonomy={ taxonomy } onSelect={ appendTerm } />
 		</Stack>
 	);
