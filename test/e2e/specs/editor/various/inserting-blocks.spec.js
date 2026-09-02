@@ -589,8 +589,8 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			.first()
 			.boundingBox();
 
-		const titleGapBottom = titleWrapperBoundingBox.y +
-			titleWrapperBoundingBox.height;
+		const titleGapBottom =
+			titleWrapperBoundingBox.y + titleWrapperBoundingBox.height;
 		const titleGapTop = firstBlockBoundingBox.y;
 		const titleGapMidpoint =
 			titleGapBottom +
@@ -598,8 +598,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		// Hover the gap between the post title and the first block.
 		await page.mouse.move(
-			blockListLayoutBoundingBox.x +
-				blockListLayoutBoundingBox.width / 2,
+			blockListLayoutBoundingBox.x + blockListLayoutBoundingBox.width / 2,
 			titleGapMidpoint,
 			// An arbitrary number of `steps` imitates cursor movement in the test environment,
 			// activating the title gap inserter.

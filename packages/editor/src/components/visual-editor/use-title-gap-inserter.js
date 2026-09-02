@@ -30,8 +30,7 @@ export function useTitleGapInserter( enabled ) {
 			}
 
 			function onMouseMove( event ) {
-				const blockEditorSelect =
-					registry.select( blockEditorStore );
+				const blockEditorSelect = registry.select( blockEditorStore );
 				const { getBlockOrder, isMultiSelecting, getTemplateLock } =
 					unlock( blockEditorSelect );
 				const { showInsertionPoint, hideInsertionPoint } =
