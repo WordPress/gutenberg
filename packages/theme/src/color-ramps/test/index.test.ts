@@ -8,6 +8,7 @@ import {
 	to,
 	HSL,
 	OKLCH_sRGB as OklchSrgb,
+	OKLrab,
 	sRGB,
 } from 'colorjs.io/fn';
 import { buildAccentRamp, buildBgRamp, checkAccessibleCombinations } from '..';
@@ -27,6 +28,9 @@ const foregroundSteps = [
 	'fgSurface4',
 	'fgSurface5',
 ] as const;
+
+const MINIMUM_INTERACTION_STATE_APCA_INTERVAL = 14;
+const MAXIMUM_ALTERNATE_POLARITY_DELTA_E_DRIFT = 0.02;
 
 const perceptualSampleCombinations = [
 	{
@@ -117,10 +121,14 @@ describe( 'buildRamps', () => {
 
 		expect(
 			allBgColors.map( ( bg ) => {
-				const ramp = buildRamp( bg, BG_RAMP_CONFIG );
+				const ramp = buildBgRamp( bg );
 				const seedOriginal = getColorString( bg );
 				const seedComputed = getColorString( ramp.ramp.surface2 );
 				expectAccessibleFillStates( ramp );
+				expect(
+					checkAccessibleCombinations( { bgRamp: ramp } )
+				).toEqual( [] );
+				expect( ramp.ramp.fgSurface4 ).not.toBe( ramp.ramp.fgSurface5 );
 
 				return {
 					input: {
@@ -210,19 +218,189 @@ describe( 'buildRamps', () => {
 		expect( result.warnings ).toBeUndefined();
 	} );
 
-	it( 'adds a fifth foreground step while preserving compliant anchors and the strong endpoint', () => {
-		const backgroundRamp = buildBgRamp( DEFAULT_SEED_COLORS.background );
-		const primaryRamp = buildAccentRamp(
-			DEFAULT_SEED_COLORS.primary,
-			backgroundRamp
-		);
+	it( 'keeps the serialized Blue stroke contrast at 3:1', () => {
+		const result = buildBgRamp( '#3876a8' );
 
 		expect(
-			foregroundSteps.map( ( step ) => backgroundRamp.ramp[ step ] )
-		).toEqual( [ '#aeaeae', '#8d8d8d', '#707070', '#646464', '#1e1e1e' ] );
+			getContrast( result.ramp.surface3, result.ramp.stroke3 )
+		).toBeGreaterThanOrEqual( 3 );
+	} );
+
+	it( 'keeps a feasible interaction-state interval after color serialization', () => {
 		expect(
-			foregroundSteps.map( ( step ) => primaryRamp.ramp[ step ] )
-		).toEqual( [ '#86a9ff', '#5a82ff', '#3e60ea', '#3351e8', '#0b0070' ] );
+			BG_RAMP_CONFIG.foregroundScale.perceptualTargets.normalToActive
+		).toBe( MINIMUM_INTERACTION_STATE_APCA_INTERVAL );
+
+		const backgroundRamp = buildBgRamp( '#cc4541' );
+		const primaryRamp = buildAccentRamp( '#1a1a1a', backgroundRamp );
+		const normalContrast = getPerceptualContrastMagnitude(
+			backgroundRamp.ramp.surface2,
+			primaryRamp.ramp.fgSurface4
+		);
+		const activeContrast = getPerceptualContrastMagnitude(
+			backgroundRamp.ramp.surface2,
+			primaryRamp.ramp.fgSurface5
+		);
+
+		expect( activeContrast - normalContrast ).toBeGreaterThanOrEqual(
+			MINIMUM_INTERACTION_STATE_APCA_INTERVAL
+		);
+		expect( primaryRamp.ramp.fgSurface5 ).toBe( '#fefefe' );
+		expect(
+			getPerceptualContrastMagnitude(
+				backgroundRamp.ramp.surface2,
+				'#fdfdfd'
+			) - normalContrast
+		).toBeLessThan( MINIMUM_INTERACTION_STATE_APCA_INTERVAL );
+	} );
+
+	it( 'preserves the largest legal interaction-state interval when both targets cannot fit', () => {
+		const backgroundRamp = buildRamp( '#777777', BG_RAMP_CONFIG, {
+			mainDirection: 'darker',
+		} );
+		const normal = backgroundRamp.ramp.fgSurface4;
+		const active = backgroundRamp.ramp.fgSurface5;
+
+		expect( normal ).not.toBe( active );
+		expect(
+			getPerceptualContrastMagnitude(
+				backgroundRamp.ramp.surface2,
+				active
+			) -
+				getPerceptualContrastMagnitude(
+					backgroundRamp.ramp.surface2,
+					normal
+				)
+		).toBeGreaterThan( 0 );
+
+		for ( const reference of getForegroundConstraintReferences(
+			3,
+			backgroundRamp,
+			backgroundRamp
+		) ) {
+			expect( getContrast( reference, normal ) ).toBeGreaterThanOrEqual(
+				4.5
+			);
+		}
+	} );
+
+	it( 'uses the alternate middle-gray polarity when it improves interaction spacing within the seed drift bound', () => {
+		const seed = '#777777';
+		const preferredRamp = buildRamp( seed, BG_RAMP_CONFIG, {
+			mainDirection: 'darker',
+		} );
+		const selectedRamp = buildBgRamp( seed );
+
+		expect( selectedRamp.direction ).toBe( 'lighter' );
+		expect( selectedRamp.warnings ).toBeUndefined();
+		expect(
+			checkAccessibleCombinations( { bgRamp: selectedRamp } )
+		).toEqual( [] );
+		expect(
+			deltaEOK2( seed, selectedRamp.ramp.surface2 )
+		).toBeLessThanOrEqual(
+			deltaEOK2( seed, preferredRamp.ramp.surface2 ) +
+				MAXIMUM_ALTERNATE_POLARITY_DELTA_E_DRIFT
+		);
+		expect(
+			getPerceptualContrastMagnitude(
+				selectedRamp.ramp.surface2,
+				selectedRamp.ramp.fgSurface5
+			) -
+				getPerceptualContrastMagnitude(
+					selectedRamp.ramp.surface2,
+					selectedRamp.ramp.fgSurface4
+				)
+		).toBeGreaterThanOrEqual( MINIMUM_INTERACTION_STATE_APCA_INTERVAL );
+	} );
+
+	it( 'keeps the preferred polarity when the alternate would distort the seed', () => {
+		const seed = '#a0a0a0';
+		const preferredRamp = buildRamp( seed, BG_RAMP_CONFIG, {
+			mainDirection: 'darker',
+		} );
+		const alternateRamp = buildRamp( seed, BG_RAMP_CONFIG, {
+			mainDirection: 'lighter',
+		} );
+		const selectedRamp = buildBgRamp( seed );
+
+		expect(
+			deltaEOK2( seed, alternateRamp.ramp.surface2 ) -
+				deltaEOK2( seed, preferredRamp.ramp.surface2 )
+		).toBeGreaterThan( MAXIMUM_ALTERNATE_POLARITY_DELTA_E_DRIFT );
+		expect( selectedRamp.direction ).toBe( 'darker' );
+		expect( selectedRamp.ramp.surface2 ).toBe(
+			preferredRamp.ramp.surface2
+		);
+	} );
+
+	it( 'derives the strongest foreground without consuming the gamut endpoint', () => {
+		const backgroundRamp = buildBgRamp( DEFAULT_SEED_COLORS.background );
+		const ramps = [
+			backgroundRamp,
+			buildAccentRamp( DEFAULT_SEED_COLORS.primary, backgroundRamp ),
+			buildAccentRamp( DEFAULT_SEED_COLORS.error, backgroundRamp ),
+		];
+		const endpointContrast = getPerceptualContrastMagnitude(
+			backgroundRamp.ramp.surface2,
+			'#000'
+		);
+
+		for ( const ramp of ramps ) {
+			const foregroundContrast = getPerceptualContrastMagnitude(
+				backgroundRamp.ramp.surface2,
+				ramp.ramp.fgSurface5
+			);
+
+			expect( ramp.ramp.fgSurface5 ).not.toBe( '#000' );
+			expect( endpointContrast - foregroundContrast ).toBeGreaterThan(
+				0
+			);
+			expect( endpointContrast - foregroundContrast ).toBeLessThan( 4.5 );
+		}
+	} );
+
+	it( 'separates weak, normal, and active semantic foregrounds', () => {
+		const backgroundRamp = buildBgRamp( DEFAULT_SEED_COLORS.background );
+		const ramps = [
+			backgroundRamp,
+			buildAccentRamp( DEFAULT_SEED_COLORS.primary, backgroundRamp ),
+			buildAccentRamp( DEFAULT_SEED_COLORS.error, backgroundRamp ),
+		];
+
+		for ( const ramp of ramps ) {
+			const contrasts = [
+				getPerceptualContrastMagnitude(
+					backgroundRamp.ramp.surface2,
+					ramp.ramp.fgSurface3
+				),
+				getPerceptualContrastMagnitude(
+					backgroundRamp.ramp.surface2,
+					ramp.ramp.fgSurface4
+				),
+				getPerceptualContrastMagnitude(
+					backgroundRamp.ramp.surface2,
+					ramp.ramp.fgSurface5
+				),
+			];
+			const normalInterval = contrasts[ 1 ] - contrasts[ 0 ];
+			const activeInterval = contrasts[ 2 ] - contrasts[ 1 ];
+
+			expect( normalInterval ).toBeGreaterThanOrEqual( 12 );
+			expect( activeInterval ).toBeGreaterThanOrEqual(
+				MINIMUM_INTERACTION_STATE_APCA_INTERVAL
+			);
+		}
+
+		const normalContrasts = ramps.map( ( ramp ) =>
+			getPerceptualContrastMagnitude(
+				backgroundRamp.ramp.surface2,
+				ramp.ramp.fgSurface4
+			)
+		);
+		expect(
+			Math.max( ...normalContrasts ) - Math.min( ...normalContrasts )
+		).toBeLessThan( 1 );
 	} );
 
 	it.each( perceptualSampleCombinations )(
@@ -265,30 +443,101 @@ describe( 'buildRamps', () => {
 		}
 	);
 
-	it( 'reserves at least 35 percent of the default-light perceptual range for the active step', () => {
-		const backgroundRamp = buildBgRamp( DEFAULT_SEED_COLORS.background );
-		const ramps = [
-			backgroundRamp,
-			buildAccentRamp( DEFAULT_SEED_COLORS.primary, backgroundRamp ),
-			buildAccentRamp( DEFAULT_SEED_COLORS.error, backgroundRamp ),
-		];
+	it.each( perceptualSampleCombinations )(
+		'keeps elevation and emphasis surfaces in semantic order for $background and $primary',
+		( { background, primary } ) => {
+			const backgroundRamp = buildBgRamp( background );
+			const ramps = [
+				backgroundRamp,
+				buildAccentRamp( primary, backgroundRamp ),
+				buildAccentRamp( DEFAULT_SEED_COLORS.error, backgroundRamp ),
+			];
 
-		for ( const ramp of ramps ) {
-			const contrasts = foregroundSteps.map( ( step ) =>
-				getPerceptualContrastMagnitude(
-					backgroundRamp.ramp.surface2,
-					ramp.ramp[ step ]
-				)
-			);
-			const finalInterval = contrasts[ 4 ] - contrasts[ 3 ];
-			const totalRange = contrasts[ 4 ] - contrasts[ 0 ];
+			for ( const ramp of ramps ) {
+				const lightness = ( step: keyof typeof ramp.ramp ) =>
+					get( ramp.ramp[ step ], [ OKLrab, 'l' ] );
+				const orderedSteps =
+					ramp.direction === 'lighter'
+						? [
+								'surface1',
+								'surface2',
+								'surface3',
+								'surface4',
+								'surface5',
+								'surface6',
+						  ]
+						: [
+								'surface6',
+								'surface5',
+								'surface4',
+								'surface1',
+								'surface2',
+								'surface3',
+						  ];
+				const lightnesses = orderedSteps.map( ( step ) =>
+					lightness( step as keyof typeof ramp.ramp )
+				);
 
-			expect( finalInterval / totalRange ).toBeGreaterThanOrEqual( 0.35 );
-			expect(
-				deltaEOK2( ramp.ramp.fgSurface4, ramp.ramp.fgSurface5 )
-			).toBeGreaterThan( 0 );
+				for ( let index = 1; index < lightnesses.length; index++ ) {
+					expect( lightnesses[ index ] ).toBeGreaterThan(
+						lightnesses[ index - 1 ]
+					);
+				}
+
+				expect(
+					Math.abs(
+						lightness( 'surface2' ) - lightness( 'surface1' )
+					) -
+						Math.abs(
+							lightness( 'surface3' ) - lightness( 'surface2' )
+						)
+				).toBeLessThan( 0.004 );
+				expect(
+					Math.abs(
+						lightness( 'surface5' ) -
+							( lightness( 'surface4' ) +
+								lightness( 'surface6' ) ) /
+								2
+					)
+				).toBeLessThan( 0.004 );
+			}
 		}
-	} );
+	);
+
+	it.each( perceptualSampleCombinations )(
+		'keeps stroke strength ordered and ST3 accessible for $background and $primary',
+		( { background, primary } ) => {
+			const backgroundRamp = buildBgRamp( background );
+			const ramps = [
+				backgroundRamp,
+				buildAccentRamp( primary, backgroundRamp ),
+				buildAccentRamp( DEFAULT_SEED_COLORS.error, backgroundRamp ),
+			];
+
+			for ( const ramp of ramps ) {
+				const strokeContrasts = [
+					'stroke1',
+					'stroke2',
+					'stroke3',
+					'stroke4',
+				].map( ( step ) =>
+					Math.abs(
+						contrastAPCA(
+							ramp.ramp.surface3,
+							ramp.ramp[ step as keyof typeof ramp.ramp ]
+						)
+					)
+				);
+
+				expect( strokeContrasts ).toEqual(
+					[ ...strokeContrasts ].sort( ( a, b ) => a - b )
+				);
+				expect(
+					getContrast( ramp.ramp.surface3, ramp.ramp.stroke3 )
+				).toBeGreaterThanOrEqual( 3 );
+			}
+		}
+	);
 
 	it.each( [
 		{ background: '#4f386e', primary: '#608010' },
@@ -304,13 +553,20 @@ describe( 'buildRamps', () => {
 				'c',
 			] );
 
-			for ( const step of [ 'fgSurface3', 'fgSurface4' ] as const ) {
+			for ( const step of [
+				'fgSurface3',
+				'fgSurface4',
+				'fgSurface5',
+			] as const ) {
+				// FGS5 can approach a gamut boundary when both WCAG floors and
+				// the active-state APCA interval require the remaining headroom.
+				const maximumDifference = step === 'fgSurface5' ? 0.05 : 0.04;
 				expect(
 					Math.abs(
 						get( primaryRamp.ramp[ step ], [ OklchSrgb, 'c' ] ) -
 							seedRelativeChroma
 					)
-				).toBeLessThan( 0.04 );
+				).toBeLessThan( maximumDifference );
 			}
 		}
 	);

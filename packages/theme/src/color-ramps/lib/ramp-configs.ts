@@ -39,9 +39,9 @@ const ACCENT_SURFACE_TAPER_CHROMA: TaperChromaOptions = {
 	radiusLight: 0.01,
 };
 
-const fgSurface5Config: RampStepConfig = {
-	// Keep the former fgSurface4 endpoint in the base solver. The foreground
-	// scale pass exposes it as fgSurface5 and inserts a new state step before it.
+// Keep the existing inverted active-fill behavior independent from the new
+// foreground endpoint policy.
+const highContrastInvertedFillConfig: RampStepConfig = {
 	contrast: {
 		reference: 'surface3',
 		followDirection: 'main',
@@ -52,24 +52,46 @@ const fgSurface5Config: RampStepConfig = {
 	taperChromaOptions: FG_TAPER_CHROMA,
 };
 
+const fgSurface5Config: RampStepConfig = {
+	// The foreground scale pass derives the strong endpoint from APCA targets.
+	// The base solver only needs to establish the WCAG floor and direction.
+	contrast: {
+		reference: 'surface3',
+		followDirection: 'main',
+		target: 4.5,
+		preferLighter: true,
+	},
+	taperChromaOptions: FG_TAPER_CHROMA,
+};
+
+const FOREGROUND_PERCEPTUAL_TARGETS = {
+	// These are design targets, not accessibility thresholds. WCAG ratios remain
+	// the hard gates for every surface on which a foreground can appear.
+	// Prefer strong normal text, but lower it when that is necessary to preserve
+	// a visible active state before the gamut endpoint.
+	normalContrast: 86,
+	// Let the interaction-state endpoint approach black or white when that makes
+	// the state change more visible. WCAG remains a hard floor.
+	endpointReserve: 1,
+	// Keep weak supporting content visibly separate from normal content, then
+	// reserve a larger interval for the interaction-state-only endpoint.
+	weakToNormal: 12,
+	normalToActive: 14,
+} as const;
+
 const FOREGROUND_SCALE_STEPS = [
 	{
 		name: 'fgSurface1',
-		progress: 0,
 		preserveAnchor: true,
 		contrast: { references: [ 'surface3' ], target: 2 },
 	},
 	{
 		name: 'fgSurface2',
-		progress: 0.2,
 		preserveAnchor: true,
 		contrast: { references: [ 'surface3' ], target: 3 },
 	},
 	{
 		name: 'fgSurface3',
-		// APCA positions this step at 40% of the visible contrast range. WCAG
-		// contrast remains the hard minimum against every listed surface.
-		progress: 0.4,
 		contrast: {
 			references: [ 'surface1', 'surface2', 'surface3' ],
 			target: 4.5,
@@ -77,8 +99,6 @@ const FOREGROUND_SCALE_STEPS = [
 	},
 	{
 		name: 'fgSurface4',
-		// Leave the final 40% of the visible contrast range for the active state.
-		progress: 0.6,
 		contrast: {
 			references: [
 				'surface1',
@@ -92,8 +112,6 @@ const FOREGROUND_SCALE_STEPS = [
 	},
 	{
 		name: 'fgSurface5',
-		progress: 1,
-		preserveAnchor: true,
 		contrast: {
 			references: [
 				'surface1',
@@ -180,7 +198,7 @@ const BG_RAMP_STEPS: RampConfig[ 'steps' ] = {
 			target: 1.2,
 		},
 	},
-	bgFillInverted2: fgSurface5Config,
+	bgFillInverted2: highContrastInvertedFillConfig,
 	bgFillDark: {
 		contrast: {
 			reference: 'surface3',
@@ -302,6 +320,7 @@ export const BG_RAMP_CONFIG: RampConfig = {
 	foregroundScale: {
 		seed: 'surface2',
 		perceptualReference: 'surface2',
+		perceptualTargets: FOREGROUND_PERCEPTUAL_TARGETS,
 		chroma: {
 			mode: 'tapered',
 			options: FG_TAPER_CHROMA,
@@ -392,6 +411,7 @@ export const ACCENT_RAMP_CONFIG: RampConfig = {
 	foregroundScale: {
 		seed: 'bgFill1',
 		perceptualReference: 'surface2',
+		perceptualTargets: FOREGROUND_PERCEPTUAL_TARGETS,
 		chroma: { mode: 'gamut-relative' },
 		steps: FOREGROUND_SCALE_STEPS,
 	},
