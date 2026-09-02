@@ -22,7 +22,7 @@ permissions: {}
 jobs:
     # Analyzes the list of files modified in a pull request to detect any changes that could
     # potentially impact E2E tests. A series of ignore patterns are used in place of an include
-    # list to ensure tests run even if the list of filters happen to become stale.
+    # list to ensure tests run even if the list of filters happens to become stale.
     detect-relevant-changes:
         name: Detect changes relevant to E2E tests
         runs-on: 'ubuntu-24.04'
@@ -374,9 +374,13 @@ jobs:
                   commit-sha: ${{ github.event.pull_request.head.sha }}
                   run-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
-    # Runs on every event, so it can be the workflow's only required status check while the
-    # jobs above are path-filtered away.
+    # Runs on every event so it can serve as the workflow's only required status check while the
+    # preceding jobs are path-filtered away.
     #
+    # GitHub Actions can only be configured as required status checks on a per job basis using the
+    # job's `name`. When the `name` changes PRs are temporarily blocked from being merged until
+    # a privileged user can update the status checks, a process which is also error prone.
+    # 
     # The script reads every job in the run, so `needs` is only about waiting: it must cover
     # every job that would otherwise still be running when the script looks. `--ignore` then
     # names the jobs whose results do not count. Here that is this job itself, and the
