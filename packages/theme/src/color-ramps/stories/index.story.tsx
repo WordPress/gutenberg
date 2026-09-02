@@ -241,9 +241,9 @@ const SAMPLE_COMBINATIONS = [
 	},
 	{
 		label: 'Ectoplasm',
-		source: 'WordPress admin scheme',
-		background: '#4f386e',
-		primary: '#646c3e',
+		source: 'Theme exploration',
+		background: '#413256',
+		primary: '#a3b745',
 	},
 	{
 		label: 'Ocean',

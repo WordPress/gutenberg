@@ -24,12 +24,20 @@ ColorSpace.register( OKLCH );
 ColorSpace.register( OklchSrgb );
 
 const SAMPLE_COMBINATIONS = [
-	{
-		background: DEFAULT_SEED_COLORS.background,
-		primary: DEFAULT_SEED_COLORS.primary,
-	},
-	{ background: '#1e1e1e', primary: DEFAULT_SEED_COLORS.primary },
+	{ background: '#fcfcfc', primary: '#3858e9' },
+	{ background: '#1e1e1e', primary: '#3858e9' },
+	{ background: '#222524', primary: '#3858e9' },
 	{ background: '#4f386e', primary: '#608010' },
+	{ background: '#f8f8f8', primary: '#3858e9' },
+	{ background: '#25292b', primary: '#3858e9' },
+	{ background: '#eaeeed', primary: '#007cba' },
+	{ background: '#3876a8', primary: '#437aa8' },
+	{ background: '#5b534d', primary: '#916745' },
+	{ background: '#413256', primary: '#a3b745' },
+	{ background: '#5f787f', primary: '#567958' },
+	{ background: '#3d4042', primary: '#cf4339' },
+	{ background: '#cc4541', primary: '#ad631e' },
+	// Synthetic stress cases for the polarity boundary and high-chroma gamut edges.
 	{ background: '#777777', primary: '#d63638' },
 	{ background: '#fcfcfc', primary: '#ffd700' },
 	{ background: '#1e1e1e', primary: '#00ffff' },
@@ -116,6 +124,25 @@ describe( 'perceptual ramp experiment', () => {
 		}
 	);
 
+	it( 'keeps supplied seeds at their anchors in the pinned-seed role hybrid', () => {
+		for ( const seeds of SAMPLE_COMBINATIONS ) {
+			const ramps = buildExperimentalThemeRamps( {
+				method: 'pinned-role-hybrid',
+				...seeds,
+			} );
+
+			expect(
+				deltaEOK2( seeds.background, ramps.background.ramp.surface2 )
+			).toBeLessThanOrEqual( 0.002 );
+			expect(
+				deltaEOK2( seeds.primary, ramps.primary.ramp.bgFill1 )
+			).toBeLessThanOrEqual( 0.002 );
+			expect(
+				deltaEOK2( DEFAULT_SEED_COLORS.error, ramps.error.ramp.bgFill1 )
+			).toBeLessThanOrEqual( 0.002 );
+		}
+	} );
+
 	it.each( EXPERIMENTAL_RAMP_METHODS )(
 		'orders foreground and stroke strength and keeps active fills darker in the %s ramps',
 		( method ) => {
@@ -189,20 +216,23 @@ describe( 'perceptual ramp experiment', () => {
 		}
 	} );
 
-	it( 'gives the hybrid a measurable active-state difference', () => {
-		for ( const seeds of SAMPLE_COMBINATIONS ) {
-			const ramps = buildExperimentalThemeRamps( {
-				method: 'role-hybrid',
-				...seeds,
-			} );
+	it.each( [ 'role-hybrid', 'pinned-role-hybrid' ] as const )(
+		'gives the %s a measurable active-state difference',
+		( method ) => {
+			for ( const seeds of SAMPLE_COMBINATIONS ) {
+				const ramps = buildExperimentalThemeRamps( {
+					method,
+					...seeds,
+				} );
 
-			for ( const ramp of Object.values( ramps ) ) {
-				expect(
-					deltaEOK2( ramp.ramp.bgFill1, ramp.ramp.bgFill2 )
-				).toBeGreaterThanOrEqual( 0.045 );
+				for ( const ramp of Object.values( ramps ) ) {
+					expect(
+						deltaEOK2( ramp.ramp.bgFill1, ramp.ramp.bgFill2 )
+					).toBeGreaterThanOrEqual( 0.045 );
+				}
 			}
 		}
-	} );
+	);
 
 	it.each( EXPERIMENTAL_RAMP_METHODS )(
 		'returns deterministic output for the %s method',
