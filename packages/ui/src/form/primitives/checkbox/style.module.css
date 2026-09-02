@@ -7,7 +7,7 @@
 			display: inline-block;
 			flex-shrink: 0;
 			width: var(--wp-ui-checkbox-input-size, 16px);
-			height: var(--wp-ui-checkbox-input-size, 16px);
+			aspect-ratio: 1;
 			border-radius: var(--wpds-border-radius-sm);
 			border:
 				var(--wpds-border-width-xs) solid

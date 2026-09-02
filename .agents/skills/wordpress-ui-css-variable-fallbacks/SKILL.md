@@ -23,7 +23,7 @@ Put the default in the `var()` fallback. Do not assign `--wp-ui-*` on the consum
 /* Right */
 .root {
 	width: var( --wp-ui-checkbox-input-size, 16px );
-	height: var( --wp-ui-checkbox-input-size, 16px );
+	aspect-ratio: 1;
 }
 ```
 
@@ -38,20 +38,16 @@ Private `--_*` and `--_gcd-*` assignments are allowed. Bridge public vars into t
 );
 ```
 
-If one public var is read many times, a private alias is allowed:
+If the two uses are width and height of a square, set one axis and `aspect-ratio: 1`. Do not copy the fallback, and do not add a private `--_*` alias.
 
-```css
---_checkbox-size: var( --wp-ui-checkbox-input-size, 16px );
-width: var( --_checkbox-size );
-height: var( --_checkbox-size );
-```
+If one public var is read in unrelated properties, a private `--_*` alias is allowed. Prefer deleting a use (for example `aspect-ratio`) before adding that alias.
 
 ## Rewrite
 
 1. Find `--wp-ui-*` assignments with the checker.
 2. For each assignment that encodes a **default**, delete it.
 3. At every `var(--wp-ui-x)` use site, pass the former value as the fallback.
-4. Repeat fallbacks. Do not reintroduce an assignment to "share" the default.
+4. If width and height share the value, use `aspect-ratio: 1` instead of a second fallback. Do not add a private `--_*` alias to share a default.
 5. Leave `--wpds-*` tokens as they are. Change only how `--wp-ui-*` defaults are supplied.
 
 Same-element **overrides** (a composition or variant that must win over the default, such as `IconButton` setting `--wp-ui-button-aspect-ratio`) still assign the public var today. Do not invent a new pattern for those in a drive-by. Convert defaults first. Stop and ask if a file is only variant/composition reassignments.

@@ -361,7 +361,7 @@ Put the default in the `var()` fallback. Do not assign the public custom propert
 /* Right: an ancestor `--wp-ui-checkbox-input-size` is used when set. */
 .root {
 	width: var( --wp-ui-checkbox-input-size, 16px );
-	height: var( --wp-ui-checkbox-input-size, 16px );
+	aspect-ratio: 1;
 }
 ```
 
