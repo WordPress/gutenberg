@@ -1,4 +1,10 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+	act,
+	fireEvent,
+	render,
+	screen,
+	waitFor,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { speak } from '@wordpress/a11y';
 import { useState } from '@wordpress/element';
@@ -37,8 +43,8 @@ const KEY_EVENTS = {
  * Waits long enough for the suggestions request debounce to elapse, so that
  * assertions about a request _not_ being made are meaningful.
  */
-function flushDebounce() {
-	return new Promise( ( resolve ) => setTimeout( resolve, 250 ) );
+async function flushDebounce() {
+	await act( () => new Promise( ( resolve ) => setTimeout( resolve, 250 ) ) );
 }
 
 /**

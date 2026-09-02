@@ -263,6 +263,9 @@ export const RichItems: Story = {
 					<Menu.Item>
 						<Menu.ItemLabel>Label</Menu.ItemLabel>
 						<Menu.ItemDescription>Help text</Menu.ItemDescription>
+						<Menu.ItemDescription>
+							Additional context
+						</Menu.ItemDescription>
 					</Menu.Item>
 					<Menu.Item>
 						<Menu.ItemLabel>

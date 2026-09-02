@@ -35,6 +35,7 @@
 		{ "path": "packages/escape-html/tsconfig.build.json" },
 		{ "path": "packages/eslint-plugin" },
 		{ "path": "packages/fields/tsconfig.build.json" },
+		{ "path": "packages/format-library" },
 		{ "path": "packages/global-styles-engine/tsconfig.build.json" },
 		{ "path": "packages/global-styles-ui" },
 		{ "path": "packages/grid/tsconfig.build.json" },
