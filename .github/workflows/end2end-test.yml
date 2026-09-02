@@ -377,9 +377,10 @@ jobs:
     # Runs on every event, so it can be the workflow's only required status check while the
     # jobs above are path-filtered away.
     #
-    # `needs` lists every preceding job that should be checked. `--ignore` names the rest:
-    # this job itself, and the housekeeping that runs alongside it. A job in neither list
-    # fails the status check if it has not finished, rather than pass unevaluated.
+    # The script reads every job in the run, so `needs` is only about waiting: it must cover
+    # every job that would otherwise still be running when the script looks. `--ignore` then
+    # names the jobs whose results do not count. Here that is this job itself, and the
+    # housekeeping that runs alongside it.
     e2e-status-check:
         name: End-to-End Tests - Status Check
         runs-on: 'ubuntu-24.04'
@@ -390,7 +391,6 @@ jobs:
         needs:
             [
                 detect-relevant-changes,
-                build,
                 e2e-playwright,
                 e2e-playwright-rtc-websocket,
             ]

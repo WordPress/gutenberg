@@ -466,9 +466,10 @@ jobs:
     # Runs on every event, so it can be the workflow's only required status check while the
     # jobs above are path-filtered away.
     #
-    # `needs` lists every preceding job that should be checked. `--ignore` names the rest,
-    # which here is only this job, still running while it looks. A job in neither list
-    # fails the status check if it has not finished, rather than pass unevaluated.
+    # The script reads every job in the run, so `needs` is only about waiting: it must cover
+    # every job that would otherwise still be running when the script looks. `--ignore` then
+    # names the jobs whose results do not count. Here that is only this job, still running
+    # while it looks.
     unit-status-check:
         name: Unit Tests - Status Check
         runs-on: 'ubuntu-24.04'
@@ -482,8 +483,6 @@ jobs:
                 unit-js-routing,
                 unit-js,
                 unit-js-date,
-                compute-previous-wordpress-version,
-                build-assets,
                 test-php,
                 phpcs,
             ]

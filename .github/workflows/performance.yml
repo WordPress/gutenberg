@@ -465,9 +465,10 @@ jobs:
     # Runs on every event, so it can be the workflow's only required status check while the
     # comparison above is path-filtered away.
     #
-    # `needs` lists every preceding job that should be checked. `--ignore` names the rest:
-    # this job itself, and the housekeeping that runs alongside it. A job in neither list
-    # fails the status check if it has not finished, rather than pass unevaluated.
+    # The script reads every job in the run, so `needs` is only about waiting: it must cover
+    # every job that would otherwise still be running when the script looks. `--ignore` then
+    # names the jobs whose results do not count. Here that is this job itself, and the
+    # housekeeping that runs alongside it.
     performance-status-check:
         name: Performance Tests - Status Check
         runs-on: 'ubuntu-24.04'
@@ -475,7 +476,7 @@ jobs:
         permissions:
             contents: read
             actions: read
-        needs: [detect-relevant-changes, prepare, build, performance, results]
+        needs: [detect-relevant-changes, results]
         if: ${{ ! cancelled() && github.repository == 'WordPress/gutenberg' }}
         steps:
             - name: Checkout repository
