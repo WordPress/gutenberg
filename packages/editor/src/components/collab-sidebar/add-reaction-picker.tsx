@@ -129,12 +129,6 @@ class PickerErrorBoundary extends Component< PickerErrorBoundaryProps > {
 interface AddReactionButtonProps {
 	noteId: number;
 	disabled?: boolean;
-	/**
-	 * Chrome for the trigger. `outline` reads as a control of its own beside
-	 * the reaction pills; `minimal` lets it sit quietly among the note's other
-	 * icon actions.
-	 */
-	variant?: 'outline' | 'minimal';
 	onToggleReaction: ( slug: string ) => void;
 }
 
@@ -150,15 +144,11 @@ interface AddReactionButtonProps {
  * @param props.noteId           The parent note comment ID.
  * @param props.disabled         Whether the button is disabled (e.g. on a
  *                               resolved note thread).
- * @param props.variant          Trigger chrome: `outline` to read as a control
- *                               of its own, `minimal` to sit among the note's
- *                               other icon actions.
  * @param props.onToggleReaction Callback to toggle a reaction.
  */
 export function AddReactionButton( {
 	noteId,
 	disabled = false,
-	variant = 'outline',
 	onToggleReaction,
 }: AddReactionButtonProps ) {
 	const { recordUse } = useFrequentEmojis();
@@ -218,7 +208,7 @@ export function AddReactionButton( {
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<IconButton
 					size="small"
-					variant={ variant }
+					variant="outline"
 					tone="neutral"
 					className="editor-collab-sidebar-panel__add-reaction-button"
 					icon={ smileyIcon }

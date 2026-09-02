@@ -269,8 +269,42 @@ mark.wp-note {
 	display: flex;
 }
 
-// The trigger sits among the note's other icon actions and stays out of the
-// way until the note is hovered, so reacting costs no standing real estate.
+// The note's text and, below it, the reaction row. Anchors the trigger while
+// it floats, so it lands on the end of the note itself rather than on
+// whatever else the card carries underneath.
+.editor-collab-sidebar-panel__note-body {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: $grid-unit-10;
+}
+
+.editor-collab-sidebar-panel__reactions {
+	display: flex;
+	align-items: flex-start;
+	gap: $grid-unit-10;
+
+	// Until the note has a reaction to show, the trigger is the whole row, and
+	// it floats over the note's last line rather than making every note taller
+	// for an option nobody has taken up. Once a reaction lands, the row drops
+	// into the flow and the trigger keeps its place at the head of it.
+	&.is-floating {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+
+		// It sits on top of the note's own text, so it needs its own ground.
+		// On the trigger rather than the row: the row is always opaque, and a
+		// white patch would blank out the text under a trigger at rest.
+		.editor-collab-sidebar-panel__add-reaction {
+			background-color: $white;
+			border-radius: $radius-full;
+		}
+	}
+}
+
+// The trigger stays out of the way until the note is hovered, so reacting
+// costs no standing real estate.
 //
 // Only where a pointer can hover: a touch device would otherwise be left
 // with a control it has no way to reveal.

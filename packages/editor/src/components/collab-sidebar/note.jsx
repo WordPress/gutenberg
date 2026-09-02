@@ -87,6 +87,10 @@ export function Note( {
 
 	const canResolve = note.parent === 0;
 	const hasReactions = getReactedSlugs( reactions ).length > 0;
+	// Not while editing: the trigger floats over the end of the note, which
+	// during an edit is the form's own buttons.
+	const canReact =
+		isSelected && !! onToggleReaction && actionState !== 'edit';
 	const isResolutionNote =
 		note.type === 'note' &&
 		note.meta &&
@@ -194,25 +198,6 @@ export function Note( {
 
 	const actions = isSelected ? (
 		<>
-			{ /*
-			 * The trigger joins the note's other icon actions rather than
-			 * sitting on a row of its own, so a note nobody has reacted to
-			 * costs no vertical space at all. The stylesheet then keeps it
-			 * faded until the thread is hovered or reached by keyboard.
-			 */ }
-			{ onToggleReaction && (
-				<AddReactionButton
-					noteId={ note.id }
-					disabled={ isThreadResolved }
-					variant="minimal"
-					onToggleReaction={ ( emoji ) =>
-						onToggleReaction( {
-							commentId: note.id,
-							emoji,
-						} )
-					}
-				/>
-			) }
 			{ canResolve && onResolve && (
 				<Button
 					label={ _x( 'Resolve', 'Mark note as resolved' ) }
@@ -236,29 +221,58 @@ export function Note( {
 			actions={ actions }
 			role={ note.parent !== 0 ? 'treeitem' : undefined }
 		>
-			{ body }
-			{ hasReactions && (
-				// The editor sets `cornerRadius="none"`, but reactions read
-				// as badges rather than controls, so the row opts into the
-				// pill shape the Design System's `pronounced` preset gives a
-				// small Button.
-				//
-				// Reactions are information about the note, so unlike the
-				// other actions they stay visible on an unselected thread.
-				<ThemeProvider cornerRadius="pronounced">
-					<ReactionDisplay
-						noteId={ note.id }
-						reactions={ reactions }
-						disabled={ isThreadResolved }
-						onToggleReaction={ ( emoji ) =>
-							onToggleReaction?.( {
-								commentId: note.id,
-								emoji,
-							} )
-						}
-					/>
-				</ThemeProvider>
-			) }
+			<div className="editor-collab-sidebar-panel__note-body">
+				{ body }
+				{ ( hasReactions || canReact ) && (
+					// The editor sets `cornerRadius="none"`, but reactions
+					// read as badges rather than controls, so the row opts
+					// into the pill shape the Design System's `pronounced`
+					// preset gives a small Button.
+					<ThemeProvider cornerRadius="pronounced">
+						<div
+							className={ clsx(
+								'editor-collab-sidebar-panel__reactions',
+								{
+									// Nothing to sit beside yet, so the
+									// trigger floats over the end of the note
+									// rather than making the card taller for
+									// an option nobody has taken up.
+									'is-floating': ! hasReactions,
+								}
+							) }
+						>
+							{ canReact && (
+								<AddReactionButton
+									noteId={ note.id }
+									disabled={ isThreadResolved }
+									onToggleReaction={ ( emoji ) =>
+										onToggleReaction( {
+											commentId: note.id,
+											emoji,
+										} )
+									}
+								/>
+							) }
+							{ /*
+							 * Reactions are information about the note, so
+							 * unlike its actions they stay visible once the
+							 * thread is deselected.
+							 */ }
+							<ReactionDisplay
+								noteId={ note.id }
+								reactions={ reactions }
+								disabled={ isThreadResolved }
+								onToggleReaction={ ( emoji ) =>
+									onToggleReaction?.( {
+										commentId: note.id,
+										emoji,
+									} )
+								}
+							/>
+						</div>
+					</ThemeProvider>
+				) }
+			</div>
 			{ actionState === 'delete' && (
 				<ConfirmDialog
 					isOpen

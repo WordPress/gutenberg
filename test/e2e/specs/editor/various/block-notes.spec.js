@@ -1220,16 +1220,26 @@ test.describe( 'Block Notes', () => {
 				'.editor-collab-sidebar-panel__thread'
 			);
 
-			// The trigger lives among the note's other icon actions, so a
-			// note nobody has reacted to has no reaction row at all.
-			await expect(
-				page
-					.locator( '.editor-collab-sidebar-panel__note-actions' )
-					.getByRole( 'button', { name: 'Add reaction' } )
-			).toHaveCount( 1 );
+			// The trigger sits where the reactions will, at the end of the
+			// note, and floats over it rather than claiming a row: the note
+			// is no taller for carrying it.
+			const reactionRow = page.locator(
+				'.editor-collab-sidebar-panel__reactions'
+			);
+			await expect( reactionRow ).toHaveClass( /is-floating/ );
 			await expect(
 				page.locator( '.editor-collab-sidebar-panel__reaction-button' )
 			).toHaveCount( 0 );
+
+			const noteBody = page.locator(
+				'.editor-collab-sidebar-panel__note-body'
+			);
+			const noteText = page.locator(
+				'.editor-collab-sidebar-panel__note-content'
+			);
+			expect( ( await noteBody.boundingBox() ).height ).toBe(
+				( await noteText.boundingBox() ).height
+			);
 
 			// Park the pointer outside the sidebar: adding the note leaves it
 			// over the thread, which would hold the trigger open.
