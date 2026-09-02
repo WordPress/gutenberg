@@ -8,15 +8,17 @@ import PostPreviewButton, { PostPreviewMenuItem } from '..';
 function renderMenu( children ) {
 	return render(
 		<Menu.Root>
-			<Menu.Trigger>View</Menu.Trigger>
+			<Menu.Trigger>View test menu</Menu.Trigger>
 			<Menu.Popup>{ children }</Menu.Popup>
 		</Menu.Root>
 	);
 }
 
 async function openMenu( user ) {
-	await user.click( screen.getByRole( 'button', { name: 'View' } ) );
-	await screen.findByRole( 'menu' );
+	await user.click(
+		screen.getByRole( 'button', { name: 'View test menu' } )
+	);
+	await screen.findByRole( 'menu', { name: 'View test menu' } );
 }
 
 jest.useRealTimers();

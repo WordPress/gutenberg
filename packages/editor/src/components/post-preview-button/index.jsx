@@ -260,15 +260,12 @@ export function PostPreviewMenuItem( { forceIsAutosaveable, onPreview } ) {
 	}
 
 	return (
-		// The preview reuses a window of its own rather than the anonymous tab
-		// `openInNewTab` targets, so the address of that window overrides it.
 		<Menu.LinkItem
 			href={ href }
 			onClick={ onClick }
 			openInNewTab
 			closeOnClick
-			/* eslint-disable-next-line jsx-a11y/anchor-is-valid, jsx-a11y/anchor-has-content -- The item supplies the address and the content. */
-			render={ <a target={ target } /> }
+			target={ target }
 		>
 			{ label }
 		</Menu.LinkItem>
