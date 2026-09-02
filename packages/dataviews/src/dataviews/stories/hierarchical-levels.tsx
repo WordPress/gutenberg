@@ -9,19 +9,20 @@ import { data as allData, fields, type SpaceObject } from './fixtures';
  * Orders a flat list depth-first so that each item sits right below its
  * parent. Siblings keep the relative order they had in the input, so the
  * list should already be sorted the way the consumer wants siblings sorted.
- * Items whose parent is not in the list (filtered out, for example) are
- * treated as roots.
  *
- * This is what the WordPress REST API does for `orderby_hierarchy`.
+ * Items whose parent is not in the list (filtered out, for example) come
+ * after all the root trees, grouped by parent. They keep their own level,
+ * so they stay indented as deep as they really are.
+ *
+ * This is what the WordPress REST API does for `orderby_hierarchy`. See
+ * Gutenberg_Hierarchical_Sort in lib/experimental.
  */
 function sortByHierarchy( items: SpaceObject[] ): SpaceObject[] {
-	const ids = new Set( items.map( ( item ) => item.id ) );
+	// Children grouped by parent, in the order the parents first appear.
 	const childrenByParent = new Map< number | null, SpaceObject[] >();
 	items.forEach( ( item ) => {
-		const parent =
-			item.parent !== null && ids.has( item.parent ) ? item.parent : null;
-		childrenByParent.set( parent, [
-			...( childrenByParent.get( parent ) ?? [] ),
+		childrenByParent.set( item.parent, [
+			...( childrenByParent.get( item.parent ) ?? [] ),
 			item,
 		] );
 	} );
@@ -32,8 +33,14 @@ function sortByHierarchy( items: SpaceObject[] ): SpaceObject[] {
 			result.push( item );
 			visit( item.id );
 		} );
+		// Once visited, a group must not be emitted again as an orphan group.
+		childrenByParent.delete( parent );
 	};
+
+	// Roots and their descendants first.
 	visit( null );
+	// Then the items whose parent is not in the list, grouped by parent.
+	Array.from( childrenByParent.keys() ).forEach( visit );
 	return result;
 }
 
