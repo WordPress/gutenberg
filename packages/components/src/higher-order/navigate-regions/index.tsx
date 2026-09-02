@@ -199,7 +199,7 @@ export function useNavigateRegions( shortcuts: Shortcuts = defaultShortcuts ) {
 
 			if (
 				isOnRegion &&
-				event.key === 'Enter' &&
+				( event.key === 'Enter' || event.key === 'Escape' ) &&
 				! event.ctrlKey &&
 				! event.metaKey &&
 				! event.altKey &&
@@ -207,8 +207,9 @@ export function useNavigateRegions( shortcuts: Shortcuts = defaultShortcuts ) {
 			) {
 				event.preventDefault();
 
-				// Enter goes back to where focus was when Escape stepped out
-				// of this region, when that place still exists.
+				// Enter, or Escape pressed again, goes back to where focus
+				// was when Escape stepped out of this region, when that
+				// place still exists.
 				const remembered =
 					lastFocusPerRegion.current.get( activeElement );
 				if (

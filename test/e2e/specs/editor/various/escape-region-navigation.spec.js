@@ -47,7 +47,13 @@ test.describe( 'Escape region navigation', () => {
 			)
 			.toBe( 1 );
 
-		// On a region, Escape does nothing further: there is nowhere higher.
+		// On a region, Escape goes back in, like Enter: a toggle.
+		await page.keyboard.press( 'Escape' );
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} )
+		).toBeFocused();
 		await page.keyboard.press( 'Escape' );
 		await expect( editorContent ).toBeFocused();
 
