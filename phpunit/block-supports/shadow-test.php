@@ -55,9 +55,9 @@ class WP_Block_Supports_Shadow_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_generate_shadow_fixtures
 	 *
-	 * @param boolean|array $support Shadow block support configuration.
-	 * @param string        $value   Shadow style value for style attribute object.
-	 * @param array         $expected       Expected shadow block support styles.
+	 * @param boolean|array $support  Shadow block support configuration.
+	 * @param string        $value    Shadow style value for style attribute object.
+	 * @param array         $expected Expected shadow block support styles.
 	 */
 	public function test_gutenberg_apply_shadow_support( $support, $value, $expected ) {
 		$block_type  = self::register_shadow_block_with_support(

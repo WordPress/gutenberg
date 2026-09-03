@@ -63,8 +63,8 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	 * to produce the unique scoped class name for a given map of state => style arrays.
 	 * CSS is now registered with the style engine store rather than injected inline.
 	 *
-	 * @param array $state_styles Map of state to style array (e.g. `[':hover' => ['color' => [...]]]`).
-	 * @param string $block_name  Block name.
+	 * @param array  $state_styles Map of state to style array (e.g. `[':hover' => ['color' => [...]]]`).
+	 * @param string $block_name   Block name.
 	 * @return array { unique_class: string }
 	 */
 	private function build_expected_state_output( $state_styles, $block_name = 'core/navigation-link' ) {
