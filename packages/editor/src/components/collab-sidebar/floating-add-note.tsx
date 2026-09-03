@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import { Button, Popover } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { comment as commentIcon } from '@wordpress/icons';
 import {
 	store as blockEditorStore,
@@ -13,6 +13,7 @@ import { useAnchor } from '@wordpress/rich-text';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { hasNoteFormatInRange, readInlineSelection } from './utils';
+import { useSettledKey } from './use-settled-key';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
@@ -144,21 +145,8 @@ export function FloatingAddNote( { onClick }: FloatingAddNoteProps ) {
 	const targetKey = target
 		? `${ target.clientId }:${ target.attributeKey }:${ target.start }:${ target.end }`
 		: null;
-	const [ readyTargetKey, setReadyTargetKey ] = useState< string | null >(
-		null
-	);
-	useEffect( () => {
-		setReadyTargetKey( null );
-		if ( ! targetKey ) {
-			return;
-		}
-		const timer = setTimeout(
-			() => setReadyTargetKey( targetKey ),
-			SHOW_DELAY_MS
-		);
-		return () => clearTimeout( timer );
-	}, [ targetKey ] );
-	const isReady = !! targetKey && readyTargetKey === targetKey;
+	const settledKey = useSettledKey( targetKey, SHOW_DELAY_MS );
+	const isReady = !! targetKey && settledKey === targetKey;
 
 	// `useAnchor` derives a virtual anchor from the block element's live DOM
 	// range, reading `ownerDocument.defaultView.getSelection()`, so an iframed
