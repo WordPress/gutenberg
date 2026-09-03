@@ -24,7 +24,10 @@
 		"packageNamespace": "wordpress",
 		"handlePrefix": "wp",
 		"pages": [
-			"font-library",
+			{
+				"id": "font-library",
+				"capability": "edit_theme_options"
+			},
 			"options-connectors",
 			{
 				"id": "content-types",
@@ -50,6 +53,7 @@
 				"init": [
 					"@wordpress/edit-site-init"
 				],
+				"capability": "upload_files",
 				"experimental": true
 			},
 			{
@@ -57,6 +61,7 @@
 				"init": [
 					"@wordpress/edit-site-init"
 				],
+				"capability": "edit_theme_options",
 				"experimental": true
 			}
 		]
