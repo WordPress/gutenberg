@@ -289,8 +289,7 @@ export function MediaUploadModal( {
 	// preference like author or mime type is worth carrying between posts, but
 	// scoping the library to the post being edited, or to unattached media, is a
 	// choice about the task at hand — one that is easy to set, easy to forget,
-	// and hides most of the library once it follows the user somewhere else. It
-	// lives here instead, for as long as the picker is on screen.
+	// and hides most of the library once it follows the user somewhere else.
 	const [ attachedToFilter, setAttachedToFilter ] = useState<
 		Filter | undefined
 	>();
