@@ -17,6 +17,7 @@ test.describe( 'Canvas as a single tab stop', () => {
 		editor,
 		page,
 	} ) => {
+		await editor.openDocumentSettingsSidebar();
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'First' },
@@ -41,7 +42,41 @@ test.describe( 'Canvas as a single tab stop', () => {
 				{ name: 'core/paragraph', attributes: { content: 'First' } },
 			] );
 
-		// Enter goes back to where focus left the canvas.
+		// Tab from the stop skips the whole canvas onwards.
+		await page.keyboard.press( 'Tab' );
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					Boolean(
+						document.activeElement.closest(
+							'[aria-label="Editor settings"]'
+						)
+					)
+				)
+			)
+			.toBe( true );
+
+		// Shift+Tab from the sidebar lands back on the stop, and another
+		// Shift+Tab skips the whole canvas backwards, onto the block toolbar
+		// floating over it.
+		await page.keyboard.press( 'Shift+Tab' );
+		await expect( stopBefore ).toBeFocused();
+		await page.keyboard.press( 'Shift+Tab' );
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					Boolean(
+						document.activeElement.closest(
+							'[aria-label="Block tools"]'
+						)
+					)
+				)
+			)
+			.toBe( true );
+
+		// Enter on the stop goes back to where focus left the canvas.
+		await page.keyboard.press( 'Tab' );
+		await expect( stopBefore ).toBeFocused();
 		await page.keyboard.press( 'Enter' );
 		await expect(
 			editor.canvas.getByRole( 'document', {
@@ -69,53 +104,5 @@ test.describe( 'Canvas as a single tab stop', () => {
 				name: 'Block: Paragraph',
 			} )
 		).toBeFocused();
-	} );
-
-	test( 'Tab moves past the canvas in both directions', async ( {
-		editor,
-		page,
-	} ) => {
-		await editor.openDocumentSettingsSidebar();
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-			attributes: { content: 'First' },
-		} );
-		await editor.canvas.getByText( 'First' ).click();
-
-		// Out onto the stop, then Tab skips the whole canvas onwards.
-		await page.keyboard.press( 'Escape' );
-		await page.keyboard.press( 'Tab' );
-		await expect
-			.poll( () =>
-				page.evaluate( () =>
-					Boolean(
-						document.activeElement.closest(
-							'[aria-label="Editor settings"]'
-						)
-					)
-				)
-			)
-			.toBe( true );
-
-		// Shift+Tab from the sidebar lands on the stop after the canvas.
-		await page.keyboard.press( 'Shift+Tab' );
-		await expect(
-			page.getByRole( 'button', { name: 'Editor canvas' } ).last()
-		).toBeFocused();
-
-		// Shift+Tab again skips the whole canvas backwards, onto the block
-		// toolbar floating over it.
-		await page.keyboard.press( 'Shift+Tab' );
-		await expect
-			.poll( () =>
-				page.evaluate( () =>
-					Boolean(
-						document.activeElement.closest(
-							'[aria-label="Block tools"]'
-						)
-					)
-				)
-			)
-			.toBe( true );
 	} );
 } );
