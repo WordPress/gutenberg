@@ -777,35 +777,6 @@ export type DataFormControlProps< Item > = {
 		 * (datetime control).
 		 */
 		compact?: boolean;
-		/**
-		 * CSS class name applied to the rich text control.
-		 * Rich text control options.
-		 */
-		className?: string;
-		/**
-		 * Client id of the block the rich text control belongs to.
-		 */
-		clientId?: string;
-		/**
-		 * The formats allowed in the rich text control.
-		 */
-		allowedFormats?: string[];
-		/**
-		 * Whether to disable all rich text formats.
-		 */
-		disableFormats?: boolean;
-		/**
-		 * Whether to disallow interactive formats (e.g. links).
-		 */
-		withoutInteractiveFormatting?: boolean;
-		/**
-		 * Whether to preserve white space in the rich text value.
-		 */
-		preserveWhiteSpace?: boolean;
-		/**
-		 * Whether to prevent line breaks in the rich text control.
-		 */
-		disableLineBreaks?: boolean;
 	};
 };
 

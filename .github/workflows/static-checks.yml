@@ -48,14 +48,13 @@ jobs:
                       os: 'macos-15'
 
         steps:
-            # The BASE branch commit must be present for the check-root-dependencies script to read the package.json and
-            # compare with the HEAD branch. Fetching a depth of 2 ensures that's present.
-            # All other jobs only require a depth of 1.
+            # The parent commit must be present for dependency and test-routing
+            # checks that compare the current change with its baseline.
             - name: Checkout repository
               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
-                  fetch-depth: ${{ matrix.annotations && github.event_name == 'pull_request' && 2 || 1 }}
+                  fetch-depth: 2
                   persist-credentials: false
 
             - name: Validate labeler config
@@ -118,6 +117,10 @@ jobs:
 
             - name: Type checking
               run: npm run typecheck
+
+            - name: Validate JavaScript test routing
+              if: ${{ matrix.node == '20' && matrix.os == 'ubuntu-24.04' }}
+              run: npm run test:unit:routing -- --base="$(git rev-parse HEAD^1)"
 
             - name: Build packages
               run: npm run build
