@@ -8,6 +8,17 @@ import { useControlledValue } from '../utils/hooks';
 import Popover from '../popover';
 import type { DropdownProps, DropdownInternalContext } from './types';
 
+const OVERLAY_SELECTOR = [
+	'dialog',
+	'[role~="dialog" i]',
+	'[role~="alertdialog" i]',
+	'[aria-modal="true" i]',
+	'[popover]',
+].join( ',' );
+
+const getActiveOverlay = ( ownerDocument: Document ) =>
+	ownerDocument.activeElement?.closest( OVERLAY_SELECTOR ) ?? null;
+
 const UnconnectedDropdown = (
 	props: DropdownProps,
 	forwardedRef: ForwardedRef< any >
@@ -51,6 +62,8 @@ const UnconnectedDropdown = (
 	const [ fallbackPopoverAnchor, setFallbackPopoverAnchor ] =
 		useState< HTMLDivElement | null >( null );
 	const containerRef = useRef< HTMLDivElement >( null );
+	const overlayOpenedByActivationRef = useRef< Element | null >( null );
+	const activationSequenceRef = useRef( 0 );
 
 	const [ isOpen, setIsOpen ] = useControlledValue( {
 		defaultValue: defaultOpen,
@@ -58,11 +71,65 @@ const UnconnectedDropdown = (
 		onChange: onToggle,
 	} );
 
+	function recordActivationInside(
+		event: React.SyntheticEvent< HTMLDivElement >
+	) {
+		if ( ! containerRef.current ) {
+			return;
+		}
+
+		const containerDocument = containerRef.current.ownerDocument;
+		const eventDocument = ( event.target as Node | null )?.ownerDocument;
+		const ownerDocuments = [ containerDocument ];
+		if ( eventDocument && eventDocument !== containerDocument ) {
+			ownerDocuments.push( eventDocument );
+		}
+		const overlaysBefore = ownerDocuments.map( getActiveOverlay );
+
+		const sequence = ++activationSequenceRef.current;
+		const recordOpenedOverlay = () => {
+			if ( sequence !== activationSequenceRef.current ) {
+				return false;
+			}
+
+			for ( const [ index, ownerDocument ] of ownerDocuments.entries() ) {
+				const overlay = getActiveOverlay( ownerDocument );
+				if ( overlay && overlay !== overlaysBefore[ index ] ) {
+					overlayOpenedByActivationRef.current = overlay;
+					return true;
+				}
+			}
+
+			return false;
+		};
+
+		// An overlay can move focus in a timer. Check once after the activation
+		// and once more after a deferred focus handoff. An unrelated overlay
+		// focused during this bounded window is indistinguishable and treated as
+		// related.
+		containerDocument.defaultView?.setTimeout( () => {
+			if ( ! recordOpenedOverlay() ) {
+				containerDocument.defaultView?.setTimeout(
+					recordOpenedOverlay,
+					0
+				);
+			}
+		}, 0 );
+	}
+
+	function recordKeyboardActivationInside(
+		event: React.KeyboardEvent< HTMLDivElement >
+	) {
+		if ( event.key === 'Enter' || event.key === ' ' ) {
+			recordActivationInside( event );
+		}
+	}
+
 	/**
 	 * Closes the popover when focus leaves it unless the toggle was pressed or
-	 * focus has moved to a separate dialog. The former is to let the toggle
-	 * handle closing the popover and the latter is to preserve presence in
-	 * case a dialog has opened, allowing focus to return when it's dismissed.
+	 * focus has moved to a dialog-like overlay opened from the dropdown. The
+	 * former lets the toggle handle closing the popover. The latter preserves
+	 * presence so focus can return when the overlay is dismissed.
 	 */
 	function closeIfFocusOutside() {
 		if ( ! containerRef.current ) {
@@ -70,11 +137,19 @@ const UnconnectedDropdown = (
 		}
 
 		const { ownerDocument } = containerRef.current;
-		const dialog =
-			ownerDocument?.activeElement?.closest( '[role="dialog"]' );
+		const activeElement = ownerDocument?.activeElement;
+		const overlay = activeElement?.closest( OVERLAY_SELECTOR );
+		const isParentOverlay = overlay?.contains( containerRef.current );
+		const overlayOpenedByActivation = overlayOpenedByActivationRef.current;
+		overlayOpenedByActivationRef.current = null;
+		activationSequenceRef.current += 1;
+		const relatedOverlayIsActive =
+			!! overlayOpenedByActivation &&
+			getActiveOverlay( overlayOpenedByActivation.ownerDocument ) ===
+				overlayOpenedByActivation;
 		if (
-			! containerRef.current.contains( ownerDocument.activeElement ) &&
-			( ! dialog || dialog.contains( containerRef.current ) )
+			! containerRef.current.contains( activeElement ) &&
+			( isParentOverlay || ! relatedOverlayIsActive )
 		) {
 			close();
 		}
@@ -101,6 +176,9 @@ const UnconnectedDropdown = (
 	return (
 		<div
 			className={ className }
+			onClickCapture={ recordActivationInside }
+			onPointerDownCapture={ recordActivationInside }
+			onKeyDownCapture={ recordKeyboardActivationInside }
 			ref={ useMergeRefs( [
 				containerRef,
 				forwardedRef,
