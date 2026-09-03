@@ -1,7 +1,7 @@
 import type { TaperChromaOptions } from './taper-chroma.ts';
 
 export type Ramp = {
-	// Backgrounds for surfaces (nuanced, slight variations compared to bg)
+	// Surface backgrounds: elevation (1–3) and emphasis (4–6).
 	surface1: string;
 	surface2: string;
 	surface3: string;
@@ -18,7 +18,7 @@ export type Ramp = {
 	bgFill2: string;
 	bgFillInverted1: string;
 	bgFillInverted2: string;
-	// Foreground (text, icon) colors
+	// Surface foregrounds: disabled (2), weak (3), normal (4), interaction (5).
 	fgSurface2: string;
 	fgSurface3: string;
 	fgSurface4: string;
@@ -37,7 +37,7 @@ export type BaseRampStep = keyof BaseRamp;
 export type AccentRampPurpose = 'full' | 'interactive' | 'status';
 export type FollowDirection = 'main' | 'opposite' | 'best' | RampDirection;
 export type ContrastRequirement = {
-	/** The reference color against which to calculate the contrast */
+	/** Color against which to calculate the WCAG contrast ratio. */
 	reference: BaseRampStep | 'seed';
 	/**
 	 * Other colors against which the generated color must meet the same target.
@@ -46,39 +46,32 @@ export type ContrastRequirement = {
 	 */
 	additionalReferences?: readonly ( BaseRampStep | 'seed' )[];
 	/**
-	 * Which direction should the algorithm search a matching color in:
-	 * - main: follow the same direction as the ramp's main direction
-	 * - opposite: follow the opposite direction of the ramp
-	 * - best: pick the direction that has the most contrast headroom
-	 * - hardcoded ramp direction (useful for generating colors that always
-	 *   light/dark regardless of the ramp direction)
+	 * Search direction: follow the ramp (`main`), reverse it (`opposite`),
+	 * choose by endpoint contrast (`best`), or always use `lighter` / `darker`.
 	 */
 	followDirection: FollowDirection;
 	/**
-	 *  Prefer "lighter" direction when searching for a contrasting color.
-	 * Especially useful for foreground color to counter the poor results that the
-	 * WCAG algo gives when contrasting white text over mid-lightness backgrounds.
+	 * Bias `best` toward white text. This affects direction selection, not the
+	 * required contrast ratio, and does not force the lighter direction.
 	 */
 	preferLighter?: boolean;
 	/**
-	 * The contrast target to meet.
+	 * Required WCAG contrast ratio. A target of 1 copies the reference color.
 	 */
 	target: number;
 	/**
-	 * When true, the algorithm won't count a failure in meeting the contrast
-	 * target as a reason to recalculate the ramp.
+	 * Exclude this target from seed adjustment and base-pass warnings.
 	 */
 	ignoreWhenAdjustingSeed?: boolean;
 };
 
 export type RampStepConfig = {
 	contrast: ContrastRequirement;
+	/** Preferred OKLCH lightness, used only when it meets the contrast target. */
 	lightness?: ( direction: RampDirection ) => number;
 	taperChromaOptions?: TaperChromaOptions;
 	/**
-	 * If specified, try to reuse the color from this step if it meets
-	 * the contrast requirements. This reduces the number of unique colors
-	 * in the ramp and improves consistency.
+	 * Reuse this base step's color if it meets all contrast requirements.
 	 */
 	sameAsIfPossible?: BaseRampStep;
 };
@@ -94,16 +87,17 @@ export type ForegroundRampStep =
 export type ForegroundScaleConfig = {
 	/** Ramp step whose hue and chroma define the foreground scale. */
 	seed: BaseRampStep;
-	/** Background step used to measure the APCA contrast range. */
+	/** Step in the background ramp used to measure the APCA contrast range. */
 	perceptualReference: BaseRampStep;
+	/** Preferred APCA magnitudes and gaps in Lc, not accessibility thresholds. */
 	perceptualTargets: {
 		/** Preferred APCA contrast for normal content and resting controls. */
 		normalContrast: number;
-		/** APCA contrast left unused unless the foreground intervals need it. */
+		/** Preferred gap below black/white; spent if the foreground gaps need it. */
 		endpointReserve: number;
-		/** Minimum APCA interval from weak to normal emphasis. */
+		/** Preferred gap from weak to normal emphasis; compresses if necessary. */
 		weakToNormal: number;
-		/** Minimum APCA interval from a resting control to its active state. */
+		/** Preferred gap from resting to interaction-state foreground. */
 		normalToActive: number;
 	};
 	chroma:
@@ -116,7 +110,9 @@ export type ForegroundScaleConfig = {
 		  };
 	steps: readonly ( {
 		contrast: {
+			/** Check these steps in both the current and background ramps. */
 			references: readonly BaseRampStep[];
+			/** Required WCAG contrast ratio, including after hex serialization. */
 			target: number;
 		};
 	} & (
@@ -130,12 +126,15 @@ export type ForegroundScaleConfig = {
 };
 
 export type RampConfig = {
+	/** Dependency-based WCAG solve, before perceptual reconstruction. */
 	steps: RampStepsConfig;
+	/** Foreground placement after surfaces and strokes have been rebuilt. */
 	foregroundScale: ForegroundScaleConfig;
 };
 
 export type RampResult< Colors = Ramp > = {
 	ramp: Colors;
+	/** Steps still failing their checked constraints; not all possible pairs. */
 	warnings?: ( keyof Ramp )[];
 	direction: RampDirection;
 };

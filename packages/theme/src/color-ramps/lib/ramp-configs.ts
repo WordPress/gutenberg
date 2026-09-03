@@ -39,8 +39,7 @@ const ACCENT_SURFACE_TAPER_CHROMA: TaperChromaOptions = {
 	radiusLight: 0.01,
 };
 
-// Keep the existing inverted active-fill behavior independent from the new
-// foreground endpoint policy.
+// Inverted fills retain their own high-contrast policy, separate from FGS5.
 const highContrastInvertedFillConfig: RampStepConfig = {
 	contrast: {
 		reference: 'surface3',
@@ -53,10 +52,8 @@ const highContrastInvertedFillConfig: RampStepConfig = {
 };
 
 const FOREGROUND_PERCEPTUAL_TARGETS = {
-	// These are design targets, not accessibility thresholds. WCAG ratios remain
-	// the hard gates for every surface on which a foreground can appear.
-	// Prefer strong normal text, but lower it when that is necessary to preserve
-	// a visible active state before the gamut endpoint.
+	// APCA design targets, not accessibility thresholds. Lower normal text when
+	// needed to leave a visible interaction state; keep the configured WCAG floors.
 	normalContrast: 86,
 	// Let the interaction-state endpoint approach black or white when that makes
 	// the state change more visible. WCAG remains a hard floor.
@@ -272,8 +269,8 @@ export const BG_RAMP_CONFIG: RampConfig = {
 	},
 };
 
-// BG_RAMP: seed => surface2 => {bgFill, surface3 => all other tokens}
-// ACCENT_RAMP: seed => bgFill1 => surface2 => surface3 => all other tokens
+// Unlike the background ramp's SF2 anchor, accents start from the strong fill.
+// The subsequent perceptual passes are shared; see ../README.md for the flow.
 export const ACCENT_RAMP_CONFIG: RampConfig = {
 	steps: {
 		...BG_RAMP_CONFIG.steps,
@@ -328,7 +325,7 @@ export const ACCENT_RAMP_CONFIG: RampConfig = {
 			...BG_RAMP_CONFIG.steps.stroke4,
 			taperChromaOptions: undefined,
 		},
-		// fgSurface: do not de-saturate
+		// Preserve chroma in the base foreground anchors.
 		fgSurface2: {
 			...BG_RAMP_CONFIG.steps.fgSurface2,
 			taperChromaOptions: undefined,
