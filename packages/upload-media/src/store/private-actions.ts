@@ -1337,6 +1337,9 @@ export function editImageItem( id: QueueItemId, args?: EditImageItemArgs ) {
 
 			dispatch.finishOperation( id, {
 				file,
+				// Sub-sizes and the sideloaded original are generated from
+				// the source file, which from here on is the edited image.
+				sourceFile: file,
 				attachment: {
 					url: blobUrl,
 				},

@@ -1525,7 +1525,7 @@ describe( 'private actions', () => {
 			vi.clearAllMocks();
 		} );
 
-		it( 'replaces the item file with the edited one', async () => {
+		it( 'replaces the item file and source file with the edited one', async () => {
 			const edited = new File( [ 'edited' ], 'photo-edited.jpg', {
 				type: 'image/jpeg',
 			} );
@@ -1549,6 +1549,7 @@ describe( 'private actions', () => {
 			);
 			expect( dispatch.finishOperation ).toHaveBeenCalledWith( 'item-1', {
 				file: edited,
+				sourceFile: edited,
 				attachment: { url: 'blob:mock-url' },
 			} );
 			expect( dispatch.cancelItem ).not.toHaveBeenCalled();
