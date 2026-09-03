@@ -133,6 +133,18 @@ export default function useTabNav() {
 		}
 	}
 
+	// Focus arriving on the stop engages the canvas right away, like a
+	// text field that starts editing when focused. Only Escape parks
+	// focus on the stop, giving Tab traction again: from a parked stop,
+	// Tab moves to the interface around the canvas, not the content.
+	function onStopFocus() {
+		if ( noCaptureRef.current ) {
+			noCaptureRef.current = null;
+			return;
+		}
+		enterCanvas();
+	}
+
 	const before = (
 		<div
 			ref={ focusCaptureBeforeRef }
@@ -142,6 +154,7 @@ export default function useTabNav() {
 			aria-describedby={ hintId }
 			className="block-editor-writing-flow__canvas-stop"
 			style={ PREVENT_SCROLL_ON_FOCUS }
+			onFocus={ onStopFocus }
 			onKeyDown={ onStopKeyDown }
 			// Assistive technology activates a button with a click event,
 			// not a key press. Pointer clicks pass through the element, so
@@ -160,18 +173,17 @@ export default function useTabNav() {
 		</div>
 	);
 
-	// Focus landing on the element after the canvas is forwarded to the
-	// stop before it, so there is one stop no matter which direction it is
-	// reached from.
+	// Focus landing on the element after the canvas enters it, the same
+	// as focus landing on the stop before it.
 	function onFocusCapture() {
-		// Do not forward focus set by the tab handler below, which moves
+		// Do not act on focus set by the tab handler below, which moves
 		// focus here so that the default behaviour (moving focus to the
 		// next tabbable element) continues from this element.
 		if ( noCaptureRef.current ) {
 			noCaptureRef.current = null;
 			return;
 		}
-		focusCaptureBeforeRef.current?.focus();
+		enterCanvas();
 	}
 
 	const after = (
@@ -209,6 +221,9 @@ export default function useTabNav() {
 				}
 				if ( focusCaptureBeforeRef.current ) {
 					event.preventDefault();
+					// Park on the stop instead of engaging the canvas,
+					// which is what focus arriving on it normally does.
+					noCaptureRef.current = true;
 					focusCaptureBeforeRef.current.focus();
 				}
 				return;
@@ -267,7 +282,7 @@ export default function useTabNav() {
 			// Disable the focus forwarding on the focus capture element, so
 			// it allows default behaviour (moving focus to the next tabbable
 			// element).
-			noCaptureRef.current = ! isShift;
+			noCaptureRef.current = true;
 
 			next.current.focus();
 		}
