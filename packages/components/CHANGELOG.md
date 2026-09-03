@@ -11,7 +11,7 @@
 
 ### Deprecations
 
--   Deprecate `Badge` in the private APIs; use `Badge` from `@wordpress/ui` instead.
+-   Deprecate `Badge` in the private APIs; use `Badge` from `@wordpress/ui` instead. ([#82379](https://github.com/WordPress/gutenberg/pull/82379)).
 
 ### Enhancements
 
