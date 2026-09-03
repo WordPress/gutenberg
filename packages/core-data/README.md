@@ -14,6 +14,10 @@ npm install @wordpress/core-data --save
 
 _This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
+## Requirements
+
+TypeScript consumers require TypeScript 5 or newer.
+
 ## Example
 
 Below is an example of a component which simply renders a list of authors:
@@ -182,7 +186,7 @@ _Parameters_
 
 -   _kind_ `string`: Kind of the entity.
 -   _name_ `string`: Name of the entity.
--   _recordId_ `number|string`: Record ID of the entity record.
+-   _recordId_ `[number|string]`: Is omitted for keyless entities.
 
 _Returns_
 
@@ -210,10 +214,11 @@ _Parameters_
 
 -   _kind_ `string`: Kind of the edited entity record.
 -   _name_ `string`: Name of the edited entity record.
--   _recordId_ `number|string`: Record ID of the edited entity record.
+-   _recordId_ `number|string|undefined`: Pass `undefined` for keyless entities.
 -   _edits_ `Object`: The edits.
 -   _options_ `Object`: Options for the edit.
 -   _options.undoIgnore_ `[boolean]`: Whether to ignore the edit in undo history or not.
+-   _options.isCached_ `[boolean]`: Whether the edit is transient (e.g. typing). Transient edits are staged and eventually merged into the preceding undo level instead of creating a new one.
 
 _Returns_
 
@@ -312,8 +317,8 @@ _Parameters_
 
 -   _kind_ `string`: Kind of the entity.
 -   _name_ `string`: Name of the entity.
--   _recordId_ `Object`: ID of the record.
--   _options_ `Object=`: Saving options.
+-   _recordId_ `[number|string]`: Is omitted for keyless entities.
+-   _options_ `[Object]`: Saving options.
 
 ### saveEntityRecord
 
@@ -328,21 +333,6 @@ _Parameters_
 -   _options.isAutosave_ `[boolean]`: Whether this is an autosave.
 -   _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a promise.
 -   _options.throwOnError_ `[boolean]`: If false, this action suppresses all the exceptions. Defaults to false.
-
-### setSyncConnectionStatus
-
-Returns an action object used to set the sync connection status for an entity or collection.
-
-_Parameters_
-
--   _kind_ `string`: Kind of the entity.
--   _name_ `string`: Name of the entity.
--   _key_ `number|string|null`: The entity key, or null for collections.
--   _status_ `Object|null`: The connection state object or null on unload.
-
-_Returns_
-
--   `Object`: Action object.
 
 ### undo
 
@@ -524,7 +514,7 @@ _Parameters_
 -   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `EntityRecordKey`: Record ID.
+-   _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
 
 _Returns_
 
@@ -610,7 +600,7 @@ _Parameters_
 -   _state_ `State`: State tree
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _key_ `EntityRecordKey`: Optional record's key. If requesting a global record (e.g. site settings), the key can be omitted. If requesting a specific item, the key must always be included.
+-   _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
 -   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available "Retrieve a [Entity kind]".
 
 _Returns_
@@ -626,7 +616,7 @@ _Parameters_
 -   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `EntityRecordKey`: Record ID.
+-   _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
 
 _Returns_
 
@@ -643,7 +633,7 @@ _Parameters_
 -   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `EntityRecordKey`: Record ID.
+-   _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
 
 _Returns_
 
@@ -718,7 +708,7 @@ _Parameters_
 -   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `EntityRecordKey`: Record ID.
+-   _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
 
 _Returns_
 
@@ -733,7 +723,7 @@ _Parameters_
 -   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _key_ `EntityRecordKey`: Record's key.
+-   _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
 
 _Returns_
 
@@ -805,18 +795,6 @@ _Returns_
 
 -   `RevisionRecord[] | null`: Record.
 
-### getSyncConnectionStatus
-
-Returns the current sync connection status across all entities. Prioritizes disconnected states, then connecting, then connected.
-
-_Parameters_
-
--   _state_ `State`: Data state.
-
-_Returns_
-
--   `ConnectionStatus | undefined`: The current sync connection state, prioritized by importance.
-
 ### getThemeSupports
 
 Return theme supports data in the index.
@@ -877,7 +855,7 @@ _Parameters_
 -   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `EntityRecordKey`: Record ID.
+-   _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
 
 _Returns_
 
@@ -894,7 +872,7 @@ _Parameters_
 -   _state_ `State`: State tree
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _key_ `EntityRecordKey`: Record's key.
+-   _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
 -   _query_ `GetRecordsHttpQuery`: Optional query.
 
 _Returns_
@@ -1040,7 +1018,7 @@ _Parameters_
 -   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `EntityRecordKey`: Record ID.
+-   _recordId_ `EntityRecordKey`: Is omitted for keyless entities.
 
 _Returns_
 
@@ -1161,7 +1139,6 @@ function PageRenameForm( { id } ) {
 	return (
 		<form onSubmit={ onRename }>
 			<TextControl
-				__next40pxDefaultSize
 				label={ __( 'Name' ) }
 				value={ page.editedRecord.title }
 				onChange={ setTitle }

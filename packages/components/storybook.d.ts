@@ -4,7 +4,7 @@ declare module 'storybook/internal/types' {
 	interface Parameters {
 		componentStatus?: {
 			status:
-				| 'stable'
+				| 'recommended'
 				| 'use-with-caution'
 				| 'not-recommended'
 				| 'unaudited';

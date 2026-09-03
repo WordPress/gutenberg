@@ -1,0 +1,36 @@
+.root {
+	position: absolute;
+	inset: 0;
+	inline-size: 100%;
+	block-size: 100%;
+	z-index: 0;
+	pointer-events: none;
+}
+
+/* Specular sweep across the version digits: a slow gleam that grazes the
+   bevel. It rests off-screen, so reduced-motion users see the static glyphs. */
+.glint {
+	transform: translateX(-360px);
+}
+
+@media not ( prefers-reduced-motion ) {
+	.glint {
+		animation:
+			welcomeVersionGlint 10s
+			var(--wpds-motion-easing-expressive) 3s 3;
+	}
+}
+
+@keyframes welcomeVersionGlint {
+	0% {
+		transform: translateX(-360px);
+	}
+
+	50% {
+		transform: translateX(1040px);
+	}
+
+	100% {
+		transform: translateX(1040px);
+	}
+}

@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type {
 	DataViewRenderFieldProps,
 	NormalizedField,
@@ -40,10 +33,12 @@ function render( { item, field }: DataViewRenderFieldProps< any > ) {
 function isValidCustom< Item >( item: Item, field: NormalizedField< Item > ) {
 	const value = field.getValue( { item } );
 
-	if (
-		! [ undefined, '', null ].includes( value ) &&
-		! Array.isArray( value )
-	) {
+	// Allow empty values; use the `required` rule to enforce non-empty ones.
+	if ( [ undefined, '', null ].includes( value ) ) {
+		return null;
+	}
+
+	if ( ! Array.isArray( value ) ) {
 		return __( 'Value must be an array.' );
 	}
 

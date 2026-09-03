@@ -1,13 +1,8 @@
-/**
- * Internal dependencies
- */
-import fetchUrlData from '../__experimental-fetch-url-data';
-/**
- * WordPress dependencies
- */
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
+import fetchUrlData from '../__experimental-fetch-url-data';
 
-jest.mock( '@wordpress/api-fetch' );
+vi.mock( '@wordpress/api-fetch' );
 
 describe( 'fetchUrlData', () => {
 	afterEach( () => {

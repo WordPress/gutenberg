@@ -35,7 +35,6 @@ fieldset.fields__media-edit {
 		line-height: 1.5;
 	}
 
-	/* stylelint-disable-next-line property-no-unknown -- '@container' not globally permitted */
 	container-type: inline-size;
 
 	.fields__media-edit-compact-group {
@@ -103,7 +102,7 @@ fieldset.fields__media-edit {
 		border-radius: $radius-small;
 		padding: $grid-unit-05 $grid-unit-10;
 		min-height: $grid-unit-50;
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 		min-width: 0;
 
 		&:not(.has-attachment) {
@@ -264,7 +263,6 @@ fieldset.fields__media-edit {
 			// Auto-fill columns based on minimum item width
 			grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
 
-			/* stylelint-disable-next-line property-no-unknown -- '@container' not globally permitted */
 			@container (max-width: 500px) {
 				grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
 			}

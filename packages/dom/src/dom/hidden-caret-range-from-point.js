@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import caretRangeFromPoint from './caret-range-from-point';
 import getComputedStyle from './get-computed-style';
 
