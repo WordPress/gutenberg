@@ -393,43 +393,20 @@ describe( 'MediaUploadModal', () => {
 			} );
 		} );
 
-		it( 'queries unattached media as `parent: [ 0 ]`', async () => {
-			renderModal(
-				{ postId: 42 },
-				{
-					filters: [
-						{
-							field: 'attached_to',
-							operator: 'isAny',
-							value: [ 'unattached' ],
-						},
-					],
-				}
+		it( 'queries media uploaded to the post as its `parent`', async () => {
+			const user = userEvent.setup();
+			renderModal( { postId: 42 } );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add filter' } )
 			);
-
-			await waitFor( () => {
-				expect(
-					mockUseEntityRecordsWithPermissions
-				).toHaveBeenLastCalledWith(
-					'postType',
-					'attachment',
-					expect.objectContaining( { parent: [ 0 ] } )
-				);
-			} );
-		} );
-
-		it( 'resolves the persisted `current` sentinel against the post it is opened from', async () => {
-			renderModal(
-				{ postId: 42 },
-				{
-					filters: [
-						{
-							field: 'attached_to',
-							operator: 'isAny',
-							value: [ 'current' ],
-						},
-					],
-				}
+			await user.click(
+				await screen.findByRole( 'menuitem', { name: 'Attached to' } )
+			);
+			await user.click(
+				await screen.findByRole( 'option', {
+					name: 'Uploaded to this post',
+				} )
 			);
 
 			await waitFor( () => {
@@ -443,9 +420,72 @@ describe( 'MediaUploadModal', () => {
 			} );
 		} );
 
-		it( 'ignores a persisted `current` sentinel when there is no post context', async () => {
+		it( 'does not persist the filter', async () => {
+			// Unlike author or mime type, scoping the library to a post — or to
+			// unattached media — is about the task at hand, not a standing
+			// preference. Carrying it into the next post would quietly hide most
+			// of the library.
+			const user = userEvent.setup();
+			const { registry } = renderModal( { postId: 42 } );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add filter' } )
+			);
+			await user.click(
+				await screen.findByRole( 'menuitem', { name: 'Attached to' } )
+			);
+			await user.click(
+				await screen.findByRole( 'option', { name: 'Unattached' } )
+			);
+
+			await waitFor( () => {
+				expect(
+					mockUseEntityRecordsWithPermissions
+				).toHaveBeenLastCalledWith(
+					'postType',
+					'attachment',
+					expect.objectContaining( { parent: [ 0 ] } )
+				);
+			} );
+			expect(
+				registry
+					.select( preferencesStore )
+					.get( 'core/views', preferenceKey )
+			).toBeUndefined();
+		} );
+
+		it( 'keeps the filter while the picker stays on screen', async () => {
+			const user = userEvent.setup();
+			const { rerender } = renderModal( { postId: 42 } );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add filter' } )
+			);
+			await user.click(
+				await screen.findByRole( 'menuitem', { name: 'Attached to' } )
+			);
+			await user.click(
+				await screen.findByRole( 'option', { name: 'Unattached' } )
+			);
+
+			// Closing and reopening is the same instance: the choice stands.
+			rerender( { isOpen: false, postId: 42 } );
+			rerender( { isOpen: true, postId: 42 } );
+
+			await waitFor( () => {
+				expect(
+					mockUseEntityRecordsWithPermissions
+				).toHaveBeenLastCalledWith(
+					'postType',
+					'attachment',
+					expect.objectContaining( { parent: [ 0 ] } )
+				);
+			} );
+		} );
+
+		it( 'ignores an `attached_to` filter left in the persisted view', async () => {
 			renderModal(
-				{},
+				{ postId: 42 },
 				{
 					filters: [
 						{
@@ -469,6 +509,9 @@ describe( 'MediaUploadModal', () => {
 				'attachment',
 				expect.not.objectContaining( { parent: expect.anything() } )
 			);
+			expect(
+				screen.queryByRole( 'button', { name: /Attached to/ } )
+			).not.toBeInTheDocument();
 		} );
 	} );
 
