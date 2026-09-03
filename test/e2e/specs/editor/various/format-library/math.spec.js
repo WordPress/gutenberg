@@ -41,8 +41,10 @@ test.describe( 'Format Library - Math', () => {
 			},
 		] );
 
-		// Test typing before.
+		// Test typing before. Focus lands on the canvas stop, and Enter
+		// moves it back to the text.
 		await pageUtils.pressKeys( 'shift+Tab' );
+		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.type( 'a' );
 

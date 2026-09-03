@@ -40,9 +40,14 @@ export default function useTabNav() {
 		getBlockOrder,
 		getLastFocus,
 		getSectionRootClientId,
+		getEditedContentOnlySection,
 		isZoomOut,
 	} = unlock( useSelect( blockEditorStore ) );
 	const { setLastFocus } = unlock( useDispatch( blockEditorStore ) );
+
+	// Reference that holds the a flag for enabling or disabling
+	// capturing on the focus capture elements.
+	const noCaptureRef = useRef();
 
 	// The canvas is a single stop in the page's tab order, and going in is
 	// an explicit action on it. Focus returns to the place it last left the
@@ -154,6 +159,13 @@ export default function useTabNav() {
 	// stop before it, so there is one stop no matter which direction it is
 	// reached from.
 	function onFocusCapture() {
+		// Do not forward focus set by the tab handler below, which moves
+		// focus here so that the default behaviour (moving focus to the
+		// next tabbable element) continues from this element.
+		if ( noCaptureRef.current ) {
+			noCaptureRef.current = null;
+			return;
+		}
 		focusCaptureBeforeRef.current?.focus();
 	}
 
@@ -184,6 +196,14 @@ export default function useTabNav() {
 				! event.metaKey &&
 				! event.altKey
 			) {
+				// When multiple blocks are selected, Escape first collapses
+				// the selection to a single block, and when a content-only
+				// section is being edited, Escape first stops editing it.
+				// Those handlers live in the parent document and run after
+				// this one, so leave the key to them.
+				if ( hasMultiSelection() || getEditedContentOnlySection() ) {
+					return;
+				}
 				if ( focusCaptureBeforeRef.current ) {
 					event.preventDefault();
 					focusCaptureBeforeRef.current.focus();
@@ -239,13 +259,14 @@ export default function useTabNav() {
 				return;
 			}
 
-			// Tab out of the canvas: move focus past the element on the side
-			// being tabbed towards, without stopping on it.
-			event.preventDefault();
-			const next = isShift
-				? focus.tabbable.findPrevious( focusCaptureBeforeRef.current )
-				: focus.tabbable.findNext( focusCaptureAfterRef.current );
-			next?.focus();
+			const next = isShift ? focusCaptureBeforeRef : focusCaptureAfterRef;
+
+			// Disable the focus forwarding on the focus capture element, so
+			// it allows default behaviour (moving focus to the next tabbable
+			// element).
+			noCaptureRef.current = ! isShift;
+
+			next.current.focus();
 		}
 
 		function onFocusOut( event ) {
