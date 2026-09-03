@@ -6,6 +6,13 @@ import { Text } from '../../text';
 const meta: Meta< typeof Link > = {
 	title: 'Design System/Components/Link',
 	component: Link,
+	tags: [ 'manifest' ],
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
+	},
 };
 export default meta;
 
@@ -66,9 +73,8 @@ export const Inline: Story = {
 };
 
 /**
- * When composing `Text` and `Link` via the `render` prop, the order matters:
- * - `<Text render={ <Link /> } />` renders an `<a>` element (Link's default tag wins).
- * - `<Link render={ <Text /> } />` renders a `<span>` element (Text's default tag wins).
+ * When composing `Text` and `Link` via the `render` prop, keep `Text` as the
+ * host and pass `Link` via `render` so the resulting element stays an `<a>`.
  */
 export const Standalone: Story = {
 	args: {
@@ -80,13 +86,8 @@ export const Standalone: Story = {
 		},
 	},
 	render: ( args ) => (
-		<Stack direction="column" gap="md">
-			<Text variant="body-md" render={ <Link { ...args } /> }>
-				A standalone link with body-md typography
-			</Text>
-			<Text variant="body-sm" render={ <Link { ...args } /> }>
-				A standalone link with body-sm typography
-			</Text>
-		</Stack>
+		<Text variant="body-md" render={ <Link { ...args } /> }>
+			A standalone link with body-md typography
+		</Text>
 	),
 };

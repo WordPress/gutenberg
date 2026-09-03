@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Site editor block removal prompt', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
-	} );
-
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
@@ -18,6 +11,10 @@ test.describe( 'Site editor block removal prompt', () => {
 			postType: 'wp_template',
 			canvas: 'edit',
 		} );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test( 'should appear when attempting to remove Query Block', async ( {

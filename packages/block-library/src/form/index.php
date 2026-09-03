@@ -20,12 +20,13 @@ function render_block_core_form( $attributes, $content ) {
 	$processed_content->next_tag( 'form' );
 
 	// Get the action for this form.
-	$action = '';
-	if ( isset( $attributes['action'] ) ) {
+	$action      = '';
+	$form_action = $attributes['action'] ?? null;
+	if ( is_string( $form_action ) ) {
 		$action = str_replace(
 			array( '{SITE_URL}', '{ADMIN_URL}' ),
 			array( site_url(), admin_url() ),
-			$attributes['action']
+			$form_action
 		);
 	}
 	$processed_content->set_attribute( 'action', esc_attr( $action ) );
@@ -55,7 +56,8 @@ function render_block_core_form( $attributes, $content ) {
  * @return string The extra fields.
  */
 function block_core_form_extra_fields_comment_form( $extra_fields, $attributes ) {
-	if ( ! empty( $attributes['action'] ) && str_ends_with( $attributes['action'], '/wp-comments-post.php' ) ) {
+	$form_action = $attributes['action'] ?? null;
+	if ( ! empty( $form_action ) && is_string( $form_action ) && str_ends_with( $form_action, '/wp-comments-post.php' ) ) {
 		$extra_fields .= '<input type="hidden" name="comment_post_ID" value="' . get_the_ID() . '" id="comment_post_ID">';
 	}
 	return $extra_fields;

@@ -1,0 +1,88 @@
+name: Required changes from trunk
+
+on:
+    pull_request_target:
+        types: [opened, synchronize, reopened, ready_for_review, edited]
+        branches: [trunk]
+    push:
+        branches: [trunk]
+    workflow_dispatch:
+        inputs:
+            move-baseline:
+                description: 'Move the baseline tag to current trunk HEAD and flip stale statuses'
+                type: boolean
+                default: false
+
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
+concurrency:
+    # Serialize per PR, and serialize all baseline moves in one group. Replaced
+    # pending runs are safe: labeled merges are scanned cumulatively from the
+    # tag, so the next run in the group recovers them.
+    group: required-trunk-changes-${{ github.event_name == 'pull_request_target' && github.event.pull_request.number || 'baseline' }}
+    cancel-in-progress: false
+    # The default queue keeps a single pending run, so a trunk push could
+    # replace (cancel) a pending forced dispatch; queue: max keeps them all.
+    queue: max
+
+jobs:
+    check-pr:
+        name: Check required changes from trunk
+        if: github.repository == 'WordPress/gutenberg' && github.event_name == 'pull_request_target'
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+        permissions:
+            contents: read
+            statuses: write
+        env:
+            HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        steps:
+            # Trunk only. PR code is never checked out, built, or executed.
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  ref: trunk
+                  persist-credentials: false
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
+            - name: Check required changes from trunk and post status
+              run: npm run --workspace @wordpress/validation-tools required-trunk-changes -- check --head-sha "$HEAD_SHA"
+
+    move-baseline:
+        name: Move required trunk baseline
+        # The baseline moves only through explicit intent: a dispatch with
+        # move-baseline, or a merged PR carrying the required-update label
+        # (detected cumulatively on every trunk push). Re-dispatching when the
+        # tag is already current re-runs the fan-out, which is the retry path
+        # after an interrupted sweep.
+        if: >
+            github.repository == 'WordPress/gutenberg' && (
+                github.event_name == 'push' ||
+                (github.event_name == 'workflow_dispatch' && inputs.move-baseline)
+            )
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+        permissions:
+            contents: write
+            statuses: write
+            pull-requests: read
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            FORCE: ${{ github.event_name == 'workflow_dispatch' && inputs.move-baseline }}
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  ref: trunk
+                  persist-credentials: false
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
+            - name: Move the baseline tag and fan out
+              run: npm run --workspace @wordpress/validation-tools required-trunk-changes -- move-baseline --force="$FORCE" --then-fanout

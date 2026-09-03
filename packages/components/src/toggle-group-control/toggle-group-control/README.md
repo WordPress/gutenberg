@@ -1,8 +1,6 @@
 # `ToggleGroupControl`
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
+<p class="callout callout-alert">This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.</p>
 
 `ToggleGroupControl` is a form component that lets users choose options represented in horizontal segments. To render options for this control use [`ToggleGroupControlOption`](/packages/components/src/toggle-group-control/toggle-group-control-option/README.md) component.
 
@@ -24,7 +22,6 @@ function Example() {
 			label="my label"
 			value="vertical"
 			isBlock
-			__next40pxDefaultSize
 		>
 			<ToggleGroupControlOption value="horizontal" label="Horizontal" />
 			<ToggleGroupControlOption value="vertical" label="Vertical" />
@@ -87,10 +84,3 @@ Callback when a segment is selected.
 The value of the `ToggleGroupControl`.
 
 -   Required: No
-
-### `__next40pxDefaultSize`: `boolean`
-
-Start opting into the larger default height that will become the default size in a future version.
-
--   Required: No
--   Default: `false`

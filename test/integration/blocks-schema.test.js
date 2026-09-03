@@ -1,17 +1,16 @@
-/**
- * External dependencies
- */
+import { readFileSync } from 'node:fs';
 import Ajv from 'ajv';
 import glob from 'fast-glob';
-
-/**
- * Internal dependencies
- */
+import { describe, expect, test } from 'vitest';
 import blockSchema from '../../schemas/json/block.json';
 
 describe( 'block.json schema', () => {
 	const jsonFiles = glob.sync(
 		[ 'packages/*/src/**/block.json', '{lib,phpunit,test}/**/block.json' ],
+		{ onlyFiles: true, ignore: [ '**/node_modules/**' ] }
+	);
+	const invalidFiles = glob.sync(
+		[ 'test/integration/fixtures/block-schemas/*.json' ],
 		{ onlyFiles: true }
 	);
 	const ajv = new Ajv();
@@ -32,7 +31,9 @@ describe( 'block.json schema', () => {
 
 	test.each( jsonFiles )( 'validates schema for `%s`', ( filepath ) => {
 		// We want to validate the block.json file using the local schema.
-		const { $schema, ...blockMetadata } = require( filepath );
+		const { $schema, ...blockMetadata } = JSON.parse(
+			readFileSync( filepath, 'utf8' )
+		);
 
 		expect( $schema ).toBe( 'https://schemas.wp.org/trunk/block.json' );
 
@@ -40,4 +41,17 @@ describe( 'block.json schema', () => {
 
 		expect( result ).toBe( true );
 	} );
+
+	test.each( invalidFiles )(
+		'rejects invalid block metadata in `%s`',
+		( filepath ) => {
+			const { $schema, ...blockMetadata } = JSON.parse(
+				readFileSync( filepath, 'utf8' )
+			);
+
+			const result = ajv.validate( blockSchema, blockMetadata );
+
+			expect( result ).toBe( false );
+		}
+	);
 } );

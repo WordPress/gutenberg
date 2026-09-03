@@ -11,21 +11,16 @@
 	}
 }
 
+.editor-global-styles-sidebar .editor-global-styles-sidebar__header {
+	flex-grow: 1;
+}
+
 .editor-global-styles-sidebar .editor-global-styles-sidebar__header-title {
 	margin: 0;
 }
 
 .editor-global-styles-sidebar .editor-global-styles-sidebar__header-actions {
 	flex: 1;
-}
-
-.editor-global-styles-sidebar .components-navigation__menu-title-heading {
-	font-size: $default-font-size * 1.2;
-	font-weight: $font-weight-medium;
-}
-
-.editor-global-styles-sidebar .components-navigation__item > button span {
-	font-weight: $font-weight-medium;
 }
 
 .editor-global-styles-sidebar .block-editor-panel-color-gradient-settings {
@@ -115,7 +110,7 @@
 	.components-button {
 		&:hover {
 			svg {
-				fill: $white;
+				color: $white;
 			}
 		}
 	}

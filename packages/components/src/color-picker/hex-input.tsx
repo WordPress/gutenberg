@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { colord } from 'colord';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { InputControl } from '../input-control';
 import { Text } from '../text';
 import { COLORS } from '../utils/colors-values';
@@ -20,7 +9,7 @@ import InputControlPrefixWrapper from '../input-control/input-prefix-wrapper';
 
 export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 	const handleChange = ( nextValue: string | undefined ) => {
-		if ( ! nextValue ) {
+		if ( nextValue === undefined ) {
 			return;
 		}
 		const hexValue = nextValue.startsWith( '#' )
@@ -58,7 +47,6 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 			maxLength={ enableAlpha ? 9 : 7 }
 			label={ __( 'Hex color' ) }
 			hideLabelFromVision
-			size="__unstable-large"
 			__unstableStateReducer={ stateReducer }
 			__unstableInputWidth="9em"
 		/>

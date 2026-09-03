@@ -1,18 +1,9 @@
-/**
- * WordPress dependencies
- */
-import { privateApis, Spinner } from '@wordpress/components';
+import { Spinner } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { DataFormControlProps } from '../../types';
-import { unlock } from '../../lock-unlock';
+import { ValidatedFormTokenField } from '../validated-form-controls';
 import getCustomValidity from './utils/get-custom-validity';
 import useElements from '../../hooks/use-elements';
-
-const { ValidatedFormTokenField } = unlock( privateApis );
 
 export default function ArrayControl< Item >( {
 	data,
@@ -22,7 +13,8 @@ export default function ArrayControl< Item >( {
 	markWhenOptional,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { label, placeholder, getValue, setValue, isValid } = field;
+	const { label, placeholder, description, getValue, setValue, isValid } =
+		field;
 	const value = getValue( { item: data } );
 	const disabled = field.isDisabled( { item: data, field } );
 
@@ -88,7 +80,7 @@ export default function ArrayControl< Item >( {
 				return true;
 			} }
 			__experimentalExpandOnFocus={ elements && elements.length > 0 }
-			__experimentalShowHowTo={ ! field.isValid?.elements }
+			help={ description ?? ( field.isValid?.elements ? '' : undefined ) }
 			displayTransform={ ( token: any ) => {
 				// For existing tokens (element objects), display their label
 				if ( typeof token === 'object' && 'label' in token ) {
