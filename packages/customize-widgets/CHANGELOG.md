@@ -8,6 +8,10 @@
 
 -   Error boundary: Surface debugging details ([#82099](https://github.com/WordPress/gutenberg/pull/82099)).
 
+### Bug Fixes
+
+-   Open the Welcome Guide from a plain menu item instead of a preference toggle, so the Options menu no longer announces "Preference activated - Welcome Guide" ([#82395](https://github.com/WordPress/gutenberg/pull/82395)).
+
 ### Internal
 
 -   Stop passing the unused `editorTool` block editor setting; the selector that read it was removed with the Write/Design tool in [#72193](https://github.com/WordPress/gutenberg/pull/72193) ([#82677](https://github.com/WordPress/gutenberg/pull/82677)).
