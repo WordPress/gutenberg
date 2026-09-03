@@ -2136,6 +2136,13 @@ test.describe( 'Block Notes', () => {
 				.getByRole( 'region', { name: 'Editor settings' } )
 				.getByRole( 'button', { name: 'Add note', exact: true } )
 				.click();
+			// Wait for the saved thread before returning: callers follow with key
+			// presses, which Playwright does not retry.
+			await expect(
+				page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'treeitem', { name: `Note: ${ content }` } )
+			).toBeVisible();
 		}
 
 		test( 'anchors one note to every block the selection spans', async ( {

@@ -30,7 +30,7 @@ collab-sidebar/
 ├── constants.js                    sidebar identifier strings
 ├── style.scss
 └── test/
-    └── utils.ts
+    └── utils.jsdom.test.ts
 ```
 
 ## Component hierarchy

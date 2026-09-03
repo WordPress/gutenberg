@@ -1929,9 +1929,11 @@ export function highlightedBlocks( state = EMPTY_HIGHLIGHT, action ) {
 					? state
 					: [ ...state, clientId ];
 			}
-			return state.includes( clientId )
-				? state.filter( ( id ) => id !== clientId )
-				: state;
+			if ( ! state.includes( clientId ) ) {
+				return state;
+			}
+			const next = state.filter( ( id ) => id !== clientId );
+			return next.length ? next : EMPTY_HIGHLIGHT;
 		}
 		case 'SELECT_BLOCK':
 			// Selecting a block that is not itself highlighted drops the

@@ -410,13 +410,6 @@ export function useNoteActions() {
 			const segments: NoteSegment[] = ! parent
 				? captured ?? readNoteSegments()
 				: [];
-			// Consume the stashed segments so a later single-block or inline note
-			// can't inherit this note's cross-block anchor.
-			if ( ! parent && captured ) {
-				unlock(
-					registry.dispatch( editorStore )
-				).setPendingNoteSegments( null );
-			}
 
 			const savedRecord = await saveEntityRecord(
 				'root',
@@ -500,6 +493,16 @@ export function useNoteActions() {
 						uniqueByBlock: true,
 					} );
 				}
+			}
+
+			// Consume the stashed segments so a later single-block or inline note
+			// can't inherit this note's cross-block anchor. Only once the note is
+			// anchored: a failed save leaves the form open for a retry, which still
+			// needs the captured span the collapsed selection can no longer give.
+			if ( ! parent && captured ) {
+				unlock(
+					registry.dispatch( editorStore )
+				).setPendingNoteSegments( null );
 			}
 
 			createNotice(
