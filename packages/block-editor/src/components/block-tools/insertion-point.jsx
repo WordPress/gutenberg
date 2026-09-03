@@ -26,7 +26,7 @@ InsertionPointOpenRef.displayName = 'InsertionPointOpenRefContext';
  * @param {Object} props.__unstableContentRef  Ref to the scrollable canvas content.
  * @param {string} props.operation             Insertion operation type.
  * @param {string} props.nearestSide           Preferred side for group operations.
- * @return {JSX.Element|null} Insertion point UI, or null when hidden.
+ * @return {import('react').ReactElement|null} Insertion point UI, or null when hidden.
  */
 function InbetweenInsertionPointPopover( {
 	__unstablePopoverSlot,
