@@ -22,7 +22,6 @@ const sStops = [ 100, 80, 60, 40, 20, 0 ];
 const hStops = [ 0, 60, 120, 180, 240, 300 ];
 
 const foregroundSteps = [
-	'fgSurface1',
 	'fgSurface2',
 	'fgSurface3',
 	'fgSurface4',
@@ -52,9 +51,13 @@ function getPerceptualContrastMagnitude(
 }
 
 function expectAccessibleFillStates( ramp: ReturnType< typeof buildRamp > ) {
-	expect( getLuminance( ramp.ramp.bgFill2 ) ).toBeLessThan(
-		getLuminance( ramp.ramp.bgFill1 )
-	);
+	const restingLuminance = getLuminance( ramp.ramp.bgFill1 );
+	const activeLuminance = getLuminance( ramp.ramp.bgFill2 );
+	if ( ramp.direction === 'darker' ) {
+		expect( activeLuminance ).toBeLessThan( restingLuminance );
+	} else {
+		expect( activeLuminance ).toBeGreaterThan( restingLuminance );
+	}
 	expect(
 		getContrast( ramp.ramp.bgFill1, ramp.ramp.bgFill2 )
 	).toBeGreaterThanOrEqual( 1.2 );
@@ -72,9 +75,9 @@ function getForegroundConstraintReferences(
 	backgroundRamp: ReturnType< typeof buildBgRamp >
 ) {
 	let surfaceNames: readonly ( keyof typeof ramp.ramp )[];
-	if ( stepIndex < 2 ) {
+	if ( stepIndex === 0 ) {
 		surfaceNames = [ 'surface3' ];
-	} else if ( stepIndex < 3 ) {
+	} else if ( stepIndex === 1 ) {
 		surfaceNames = [ 'surface1', 'surface2', 'surface3' ];
 	} else {
 		surfaceNames = [
@@ -404,7 +407,7 @@ describe( 'buildRamps', () => {
 	} );
 
 	it.each( perceptualSampleCombinations )(
-		'orders five foreground steps and keeps their WCAG floors for $background and $primary',
+		'orders retained foreground steps and keeps their WCAG floors for $background and $primary',
 		( { background, primary } ) => {
 			const backgroundRamp = buildBgRamp( background );
 			const ramps = [
@@ -412,7 +415,7 @@ describe( 'buildRamps', () => {
 				buildAccentRamp( primary, backgroundRamp ),
 				buildAccentRamp( DEFAULT_SEED_COLORS.error, backgroundRamp ),
 			];
-			const contrastTargets = [ 2, 3, 4.5, 4.5, 4.5 ];
+			const contrastTargets = [ 3, 4.5, 4.5, 4.5 ];
 
 			for ( const ramp of ramps ) {
 				const perceptualContrasts = foregroundSteps.map( ( step ) =>
@@ -572,11 +575,12 @@ describe( 'buildRamps', () => {
 	);
 
 	it.each( [
+		{ background: '#fcfcfc', primary: '#3858e9' },
 		{ background: '#1e1e1e', primary: '#3858e9' },
 		{ background: '#4f386e', primary: '#608010' },
 		{ background: '#5b534d', primary: '#916745' },
 	] )(
-		'keeps active fills darker and both foreground pairs accessible for $background and $primary',
+		'moves active fills in the ramp direction and keeps both foreground pairs accessible for $background and $primary',
 		( { background, primary } ) => {
 			const backgroundRamp = buildBgRamp( background );
 			const ramps = [
