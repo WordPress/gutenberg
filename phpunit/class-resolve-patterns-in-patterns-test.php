@@ -5,7 +5,7 @@
  * @package gutenberg
  *
  * @group rest-api
- * @covers Gutenberg_REST_Block_Patterns_Controller_7_0::prepare_item_for_response
+ * @covers WP_REST_Block_Patterns_Controller::prepare_item_for_response
  */
 class Tests_Resolve_Patterns_In_Patterns extends WP_Test_REST_Controller_Testcase {
 

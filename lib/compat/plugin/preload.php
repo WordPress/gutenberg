@@ -1,4 +1,9 @@
 <?php
+/**
+ * Gutenberg-only adjustments to the block editor preload paths.
+ *
+ * @package gutenberg
+ */
 
 /**
  * Preload necessary resources for the editors.
