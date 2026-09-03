@@ -33,7 +33,12 @@ import {
 	chevronLeft,
 	chevronRight,
 } from '@wordpress/icons';
-import { VisuallyHidden, Tooltip, ValidityIndicator } from '@wordpress/ui';
+import {
+	Stack,
+	Tooltip,
+	ValidityIndicator,
+	VisuallyHidden,
+} from '@wordpress/ui';
 import { speak } from '@wordpress/a11y';
 import {
 	MediaUpload,
@@ -852,7 +857,7 @@ export default function MediaEdit< Item >( {
 		[ isTouched ]
 	);
 	return (
-		<div onBlur={ onBlur }>
+		<Stack direction="column" gap="sm" onBlur={ onBlur }>
 			<fieldset className="fields__media-edit" data-field-id={ field.id }>
 				<ConditionalMediaUpload
 					onSelect={ ( selectedMedia: any ) => {
@@ -965,6 +970,6 @@ export default function MediaEdit< Item >( {
 					message={ customValidity.message }
 				/>
 			) }
-		</div>
+		</Stack>
 	);
 }
