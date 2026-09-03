@@ -40,7 +40,7 @@ $fallbacks: (
 	"--wpds-color-background-interactive-neutral-weak-active": "#efefef",
 	"--wpds-color-background-interactive-neutral-weak-disabled": "#0000",
 	"--wpds-color-background-surface-brand":
-		"color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 9%, white)",
+		"color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 8%, white)",
 	"--wpds-color-background-surface-caution": "#ffea96",
 	"--wpds-color-background-surface-caution-weak": "#fff9ca",
 	"--wpds-color-background-surface-error": "#fae5e1",
@@ -96,7 +96,7 @@ $fallbacks: (
 	"--wpds-color-foreground-interactive-neutral-strong": "#f0f0f0",
 	"--wpds-color-foreground-interactive-neutral-strong-active": "#f0f0f0",
 	"--wpds-color-foreground-interactive-neutral-strong-disabled": "#8d8d8d",
-	"--wpds-color-foreground-interactive-neutral-weak": "#737373",
+	"--wpds-color-foreground-interactive-neutral-weak": "#717171",
 	"--wpds-color-foreground-interactive-neutral-weak-active": "#141414",
 	"--wpds-color-foreground-interactive-neutral-weak-disabled": "#8d8d8d",
 	"--wpds-color-stroke-focus": "var(--wp-admin-theme-color, #3858e9)",

@@ -130,7 +130,7 @@
 	/* Foreground color for content like text with normal emphasis. */
 	--wpds-color-foreground-content-neutral: #505050;
 	/* Foreground color for content like text with weak emphasis. */
-	--wpds-color-foreground-content-neutral-weak: #737373;
+	--wpds-color-foreground-content-neutral-weak: #717171;
 	/* Foreground color for content like text with success tone and normal emphasis. */
 	--wpds-color-foreground-content-success: #215b2f;
 	/* Foreground color for content like text with success tone and weak emphasis. */
