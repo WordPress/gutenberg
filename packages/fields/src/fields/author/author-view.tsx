@@ -11,13 +11,21 @@ import { store as coreStore } from '@wordpress/core-data';
 import type { BasePostWithEmbeddedAuthor } from '../../types';
 
 function AuthorView( { item }: { item: BasePostWithEmbeddedAuthor } ) {
-	// Fetch the author record from the store when _embedded data is unavailable
+	// Prefer author details supplied on the record itself. Revisions include
+	// them, which avoids a follow-up request the viewer may not be permitted to
+	// make: the `root/user` entity is fixed to `context=edit`, and
+	// WP_REST_Users_Controller only allows that context for users who can
+	// `edit_user` the target, so everyone else receives a 403 and no name.
+	const authorId = item?.author;
+	const inlineAuthorName = item?.author_name;
+	const embeddedAuthorId = item?._embedded?.author?.[ 0 ]?.id;
+	// Otherwise fetch the author record when _embedded data is unavailable
 	// (e.g. in the post editor inspector) or when the author has been changed
 	// during editing (item.author differs from _embedded.author).
-	const authorId = item?.author;
-	const embeddedAuthorId = item?._embedded?.author?.[ 0 ]?.id;
 	const shouldFetch = Boolean(
-		authorId && ( ! embeddedAuthorId || authorId !== embeddedAuthorId )
+		! inlineAuthorName &&
+			authorId &&
+			( ! embeddedAuthorId || authorId !== embeddedAuthorId )
 	);
 	const author = useSelect(
 		( select ) => {
@@ -25,17 +33,19 @@ function AuthorView( { item }: { item: BasePostWithEmbeddedAuthor } ) {
 				return null;
 			}
 			const { getEntityRecord } = select( coreStore );
-			// This doesn't make extra REST requests because the records are
-			// already in the store from the field's getElements function.
 			return authorId
 				? getEntityRecord( 'root', 'user', authorId )
 				: null;
 		},
 		[ authorId, shouldFetch ]
 	);
-	// Use fetched author if available, otherwise use _embedded.
-	const text = author?.name || item?._embedded?.author?.[ 0 ]?.name;
+	// Use inline author details if present, then the fetched author, then _embedded.
+	const text =
+		inlineAuthorName ||
+		author?.name ||
+		item?._embedded?.author?.[ 0 ]?.name;
 	const imageUrl =
+		item?.author_avatar_urls?.[ 48 ] ||
 		author?.avatar_urls?.[ 48 ] ||
 		item?._embedded?.author?.[ 0 ]?.avatar_urls?.[ 48 ];
 	const [ isImageLoaded, setIsImageLoaded ] = useState( false );

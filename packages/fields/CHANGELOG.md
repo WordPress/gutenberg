@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   `AuthorView`: Prefer author details supplied on the record itself over a separate user fetch. The `root/user` entity is fixed to `context=edit`, which `WP_REST_Users_Controller` refuses for anyone who cannot `edit_user` the target, so the author's name and avatar were missing for every non-administrator.
 -   Normalize special characters in exported pattern filenames to prevent broken or unreadable files. ([#77033](https://github.com/WordPress/gutenberg/pull/77033))
 
 ### Internal

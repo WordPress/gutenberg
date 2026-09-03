@@ -72,6 +72,8 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.1/block-comments.php';
 
 	// WordPress 7.2 compat.
+	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-revisions-controller-7-2.php';
+	require __DIR__ . '/compat/wordpress-7.2/rest-api.php';
 	require __DIR__ . '/compat/wordpress-7.2/view-config-api.php';
 
 	// Real-time collaboration.
