@@ -840,7 +840,7 @@
 		"parent": "core-blocks-design"
 	},
 	{
-		"title": "Custom Link",
+		"title": "Navigation Link",
 		"slug": "core-block-navigation-link",
 		"markdown_source": "../packages/block-library/src/navigation-link/README.md",
 		"parent": "core-blocks-design"
