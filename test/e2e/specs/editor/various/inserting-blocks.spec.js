@@ -576,12 +576,6 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Second paragraph' );
 
-		const titleWrapperBoundingBox = await editor.canvas
-			.locator( '.editor-visual-editor__post-title-wrapper' )
-			.boundingBox();
-		const blockListLayoutBoundingBox = await editor.canvas
-			.locator( '.block-editor-block-list__layout.is-root-container' )
-			.boundingBox();
 		const firstBlockBoundingBox = await editor.canvas
 			.locator(
 				'.block-editor-block-list__layout.is-root-container > .wp-block'
@@ -589,28 +583,27 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			.first()
 			.boundingBox();
 
-		const titleGapBottom =
-			titleWrapperBoundingBox.y + titleWrapperBoundingBox.height;
-		const titleGapTop = firstBlockBoundingBox.y;
-		const titleGapMidpoint =
-			titleGapBottom +
-			Math.max( 1, ( titleGapTop - titleGapBottom ) / 2 );
-
-		// Hover the gap between the post title and the first block.
+		// Hover just above the first block (title–block gap), matching the
+		// pattern used by other inline-inserter tests.
 		await page.mouse.move(
-			blockListLayoutBoundingBox.x + blockListLayoutBoundingBox.width / 2,
-			titleGapMidpoint,
+			firstBlockBoundingBox.x + firstBlockBoundingBox.width / 2,
+			firstBlockBoundingBox.y - 10,
 			// An arbitrary number of `steps` imitates cursor movement in the test environment,
 			// activating the title gap inserter.
 			{ steps: 10 }
 		);
 
-		const addBlockButton = page.getByRole( 'button', {
-			name: 'Add block',
-		} );
+		const addBlockButton = page
+			.locator( '.block-editor-block-list__insertion-point-inserter' )
+			.getByRole( 'button', { name: 'Add block' } );
 		await expect( addBlockButton ).toBeVisible();
 		await addBlockButton.click();
-		await page.getByRole( 'button', { name: 'Browse All' } ).click();
+
+		const quickInserter = page.locator(
+			'.block-editor-inserter__quick-inserter'
+		);
+		await expect( quickInserter ).toBeVisible();
+		await page.getByRole( 'button', { name: 'Browse all' } ).click();
 		await page
 			.getByRole( 'listbox', { name: 'Media' } )
 			.getByRole( 'option', { name: 'Image' } )

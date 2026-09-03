@@ -7,26 +7,34 @@ const TITLE_WRAPPER_SELECTOR = '.editor-visual-editor__post-title-wrapper';
 const BLOCK_LIST_LAYOUT_SELECTOR =
 	'.block-editor-block-list__layout.is-root-container';
 const QUICK_INSERTER_SELECTOR = '.block-editor-inserter__quick-inserter';
-const INSERTION_POINT_SELECTOR = '.block-editor-block-list__insertion-point';
+const EXPANDED_INSERTER_TOGGLE_SELECTOR =
+	'.block-editor-block-list__insertion-point-inserter .block-editor-inserter__toggle[aria-expanded="true"]';
 
 /**
- * Whether the quick inserter menu from the title-gap control is open.
- * The menu may render in the canvas document or the parent document.
+ * Whether the title-gap inserter menu is open or opening.
+ * The insertion point and quick inserter render in the parent document
+ * (outside the canvas iframe); the toggle's aria-expanded covers the
+ * brief gap before the menu mounts.
  *
  * @param {Document} doc Canvas document.
+ * @return {boolean} True when the quick inserter is open or opening.
  */
-function isQuickInserterOpen( doc ) {
-	if ( doc.querySelector( QUICK_INSERTER_SELECTOR ) ) {
-		return true;
-	}
+function isTitleGapInserterMenuActive( doc ) {
 	const parentDoc = doc.defaultView?.frameElement?.ownerDocument;
-	return !! parentDoc?.querySelector( QUICK_INSERTER_SELECTOR );
+	const docs = parentDoc ? [ doc, parentDoc ] : [ doc ];
+
+	return docs.some(
+		( checkDoc ) =>
+			!! checkDoc.querySelector( QUICK_INSERTER_SELECTOR ) ||
+			!! checkDoc.querySelector( EXPANDED_INSERTER_TOGGLE_SELECTOR )
+	);
 }
 
 /**
  * Hides the title-gap insertion point when it is the visible cue.
  *
  * @param {Object} registry Data registry.
+ * @return {void}
  */
 function hideTitleGapInsertionPoint( registry ) {
 	const blockEditorSelect = registry.select( blockEditorStore );
@@ -52,6 +60,7 @@ function hideTitleGapInsertionPoint( registry ) {
  * and the first block in the post editor.
  *
  * @param {boolean} enabled Whether the hook is enabled.
+ * @return {import('react').RefCallback} Ref callback that attaches the hover listener.
  */
 export function useTitleGapInserter( enabled ) {
 	const registry = useRegistry();
@@ -69,6 +78,12 @@ export function useTitleGapInserter( enabled ) {
 				return;
 			}
 
+			/**
+			 * Shows or hides the title-gap insertion point from pointer position.
+			 *
+			 * @param {MouseEvent} event Pointer move event from the canvas.
+			 * @return {void}
+			 */
 			function onMouseMove( event ) {
 				const blockEditorSelect = registry.select( blockEditorStore );
 				const { getBlockOrder, isMultiSelecting, getTemplateLock } =
@@ -128,15 +143,9 @@ export function useTitleGapInserter( enabled ) {
 					return;
 				}
 
-				// Keep the inserter while the pointer is over its own UI. The
-				// "+" sits on the first-block edge, slightly outside the gap.
-				if ( event.target?.closest?.( INSERTION_POINT_SELECTOR ) ) {
-					return;
-				}
-
 				// Keep the insertion point mounted while the quick inserter
-				// menu is open; hiding it would unmount the menu.
-				if ( isQuickInserterOpen( ownerDocument ) ) {
+				// menu is open or opening; hiding it would unmount the menu.
+				if ( isTitleGapInserterMenuActive( ownerDocument ) ) {
 					return;
 				}
 

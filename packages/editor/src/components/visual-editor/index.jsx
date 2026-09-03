@@ -118,6 +118,17 @@ export function getCanvasHeight( width, containerSize ) {
 	return Math.min( Math.round( width / aspectRatio ), containerSize.height );
 }
 
+/**
+ * Renders the post or site editor visual canvas, including the iframe,
+ * block list, and post title when in post-only mode.
+ *
+ * @param {Object} props             Component props.
+ * @param {boolean} props.autoFocus  Whether the canvas should take focus on mount.
+ * @param {Object} props.iframeProps Props forwarded to the editor canvas iframe.
+ * @param {Object} props.contentRef  Ref merged onto the canvas content node.
+ * @param {string} props.className   Optional extra class name for the wrapper.
+ * @return {JSX.Element} Visual editor canvas.
+ */
 function VisualEditor( {
 	// Ideally as we unify post and site editors, we won't need these props.
 	autoFocus,
