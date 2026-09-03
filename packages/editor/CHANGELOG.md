@@ -16,7 +16,7 @@
 
 ### Enhancements
 
--   Media Library modal: Pass the current post to the modal so its "Attached to" filter can offer media uploaded to that post. Only a viewable post type is passed on: a template has no front end of its own, so media can't be uploaded to one ([#81974](https://github.com/WordPress/gutenberg/pull/81974)).
+-   Media Library modal: Pass the current post and its post type to the modal so its "Attached to" filter can offer media uploaded to that post, under the post type's own wording. Only a viewable post type is passed on: a template has no front end of its own, so media can't be uploaded to one ([#81974](https://github.com/WordPress/gutenberg/pull/81974)).
 -   Post actions: Append an ellipsis (`…`) to the "Set as homepage" and "Set as posts page" action labels, which open a confirmation dialog, following the menu ellipsis guideline. The dialog titles keep the ellipsis-free wording. ([#81994](https://github.com/WordPress/gutenberg/pull/81994))
 
 ### Bug Fixes

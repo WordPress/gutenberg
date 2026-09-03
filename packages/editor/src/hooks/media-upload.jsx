@@ -16,8 +16,9 @@ const { MediaUploadModal: MediaUploadModalComponent } = unlock(
 
 /**
  * Supplies the modal with the post it was opened from, so that its "Attached to"
- * filter can offer media uploaded to that post. `media-utils` has no editor
- * dependency, so the post is injected here.
+ * filter can offer media uploaded to that post, labelled with the post type's
+ * own wording. `media-utils` has no editor dependency, so the post is injected
+ * here.
  *
  * The post is only passed on when media can actually belong to it. Templates and
  * the like have no front end of their own, so an image can't be uploaded to one —
@@ -28,7 +29,7 @@ const { MediaUploadModal: MediaUploadModalComponent } = unlock(
  * @param {Object} props Props passed through to the modal.
  */
 function MediaUploadModalWithPostContext( props ) {
-	const postId = useSelect( ( select ) => {
+	const { postId, postType } = useSelect( ( select ) => {
 		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
 		const currentPostId = getCurrentPostId();
 		const currentPostType = getCurrentPostType();
@@ -37,13 +38,19 @@ function MediaUploadModalWithPostContext( props ) {
 			: undefined;
 
 		if ( typeof currentPostId !== 'number' || ! postTypeObject?.viewable ) {
-			return undefined;
+			return {};
 		}
 
-		return currentPostId;
+		return { postId: currentPostId, postType: currentPostType };
 	}, [] );
 
-	return <MediaUploadModalComponent { ...props } postId={ postId } />;
+	return (
+		<MediaUploadModalComponent
+			{ ...props }
+			postId={ postId }
+			postType={ postType }
+		/>
+	);
 }
 
 /**
