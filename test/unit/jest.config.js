@@ -1,5 +1,5 @@
 const path = require( 'path' );
-const glob = require( 'glob' ).sync;
+const { globSync } = require( 'glob' );
 const testMigration = require( './test-migration.json' );
 
 /**
@@ -7,28 +7,20 @@ const testMigration = require( './test-migration.json' );
  */
 const ROOT_DIR = path.resolve( __dirname, '../..' );
 
-const escapeRegExp = ( value ) =>
-	value.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' );
-const vitestTestPathIgnorePatterns = [
-	...testMigration.vitest.files.map(
-		( testPath ) => `<rootDir>/${ escapeRegExp( testPath ) }$`
-	),
-	...testMigration.vitest.directories.map(
-		( directoryPath ) => `<rootDir>/${ escapeRegExp( directoryPath ) }/`
-	),
-];
-
 // Ensure Babel config resolution works from the repo root,
 // even when Jest runs from the workspace directory.
 process.chdir( ROOT_DIR );
 
 // Finds all packages which are transpiled with Babel to force Jest to use their source code.
-const transpiledPackageNames = glob(
-	path.join( ROOT_DIR, 'packages/*/src/index.{js,jsx,ts,tsx}' )
-).map( ( fileName ) => {
-	const relative = path.relative( ROOT_DIR, fileName );
-	return relative.split( path.sep )[ 1 ];
-} );
+const transpiledPackageNames = globSync(
+	'packages/*/src/index.{js,jsx,ts,tsx}',
+	{ cwd: ROOT_DIR, absolute: true }
+)
+	.sort()
+	.map( ( fileName ) => {
+		const relative = path.relative( ROOT_DIR, fileName );
+		return relative.split( path.sep )[ 1 ];
+	} );
 
 const dependenciesToTransform = [
 	'@ariakit/test',
@@ -61,7 +53,7 @@ const ariakitUtilsDir = path.dirname(
 	} )
 );
 
-module.exports = {
+const commonProjectConfig = {
 	rootDir: ROOT_DIR,
 	moduleNameMapper: {
 		/**
@@ -93,7 +85,6 @@ module.exports = {
 			'packages/$1/src',
 	},
 	preset: require.resolve( '@wordpress/jest-preset-default' ),
-	testEnvironment: require.resolve( 'jest-environment-jsdom' ),
 	setupFiles: [
 		'<rootDir>/test/unit/config/global-mocks.js',
 		'<rootDir>/test/unit/config/gutenberg-env.js',
@@ -102,9 +93,6 @@ module.exports = {
 		'<rootDir>/test/unit/config/testing-library.js',
 		'<rootDir>/test/unit/mocks/match-media.js',
 	],
-	testEnvironmentOptions: {
-		url: 'http://localhost/',
-	},
 	testLocationInResults: true,
 	testPathIgnorePatterns: [
 		'/\\.git($|/)',
@@ -115,7 +103,6 @@ module.exports = {
 		'<rootDir>/.*/build-module/',
 		'<rootDir>/.*/build-types/',
 		'<rootDir>/.+\\.d\\.ts$',
-		...vitestTestPathIgnorePatterns,
 	],
 	resolver: '<rootDir>/test/unit/scripts/resolver.js',
 	transform: {
@@ -133,6 +120,23 @@ module.exports = {
 		escapeString: false,
 		printBasicPrototype: false,
 	},
+};
+
+module.exports = {
+	rootDir: ROOT_DIR,
+	projects: [
+		{
+			...commonProjectConfig,
+			displayName: 'jsdom',
+			testEnvironment: require.resolve( 'jest-environment-jsdom' ),
+			testEnvironmentOptions: {
+				url: 'http://localhost/',
+			},
+			testMatch: testMigration.jest.files.map(
+				( testPath ) => `<rootDir>/${ testPath }`
+			),
+		},
+	],
 	watchPlugins: [
 		require.resolve( 'jest-watch-typeahead/filename' ),
 		require.resolve( 'jest-watch-typeahead/testname' ),

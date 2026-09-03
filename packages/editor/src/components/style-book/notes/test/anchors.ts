@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import {
 	NOTE_ANCHOR_META,
 	UNKNOWN_ANCHOR,

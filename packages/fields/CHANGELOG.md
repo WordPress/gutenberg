@@ -8,8 +8,11 @@
 
 ### Internal
 
+-   `MediaEdit`: Space `ValidityIndicator` with `Stack` now that the indicator has no outer margin. ([#82267](https://github.com/WordPress/gutenberg/pull/82267))
+-   Remove the template activation (`active_templates`) experiment checks from the rename, reset, and duplicate actions ([#82241](https://github.com/WordPress/gutenberg/pull/82241)).
 -   Remove unused dependencies `@wordpress/hooks`, `@wordpress/primitives`, `@wordpress/router`, etc. ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Update a source reference after its JSX file moved to the `.jsx` extension ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+-   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
 
 ## 0.46.0 (2026-08-26)
 
@@ -99,7 +102,7 @@
 
 ### Enhancements
 
-- Update the base `titleField` to enable hiding. [#71369](https://github.com/WordPress/gutenberg/pull/71369)
+-   Update the base `titleField` to enable hiding. [#71369](https://github.com/WordPress/gutenberg/pull/71369)
 
 ## 0.21.0 (2025-08-20)
 
