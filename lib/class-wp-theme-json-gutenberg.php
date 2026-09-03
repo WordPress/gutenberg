@@ -1288,10 +1288,12 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 
-			// Add responsive breakpoint states for elements.
-			foreach ( array_keys( $responsive_media_queries ) as $breakpoint_state ) {
-				$schema_styles_elements[ $element ][ $breakpoint_state ] = $styles_non_top_level;
-			}
+			/*
+			 * Breakpoint states are not added here. A responsive element is
+			 * written as a block breakpoint containing elements, the third
+			 * structure listed above, which is assembled further down from
+			 * this same element schema.
+			 */
 		}
 
 		$schema_styles_blocks   = array();
