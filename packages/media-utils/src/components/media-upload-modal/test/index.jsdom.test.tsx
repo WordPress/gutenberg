@@ -296,6 +296,31 @@ describe( 'MediaUploadModal', () => {
 			).toBeVisible();
 		} );
 
+		it( 'ignores a post ID that is not a number', async () => {
+			const user = userEvent.setup();
+			// A template's entity ID is a slug rather than a post ID, and media
+			// can't be uploaded to one.
+			renderModal( {
+				postId: 'twentytwentyfive//index' as unknown as number,
+			} );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add filter' } )
+			);
+			await user.click(
+				await screen.findByRole( 'menuitem', { name: 'Attached to' } )
+			);
+
+			expect(
+				await screen.findByRole( 'option', { name: 'Unattached' } )
+			).toBeVisible();
+			expect(
+				screen.queryByRole( 'option', {
+					name: 'Uploaded to this post',
+				} )
+			).not.toBeInTheDocument();
+		} );
+
 		it( 'stops constraining the query when the chosen option is clicked again', async () => {
 			const user = userEvent.setup();
 			renderModal( { postId: 42 } );
