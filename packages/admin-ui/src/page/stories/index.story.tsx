@@ -296,3 +296,48 @@ export const FullHeader: Story = {
 		children: <Text>Page content here</Text>,
 	},
 };
+
+/**
+ * `Page.FullBleed` neutralizes the page's inline padding for its children,
+ * so content such as a full-width table can align with the page's outer
+ * edges. Only has an effect when `hasPadding` is set.
+ */
+export const WithFullBleedContent: Story = {
+	args: {
+		title: 'Page title',
+		showSidebarToggle: false,
+		hasPadding: true,
+		children: (
+			<>
+				<Text>Regular, padded content.</Text>
+				<Page.FullBleed
+					style={ {
+						background:
+							'var(--wpds-color-background-surface-neutral-strong)',
+						padding: 16,
+					} }
+				>
+					<Text>Full-bleed content, edge-to-edge.</Text>
+				</Page.FullBleed>
+				<Text>Regular, padded content.</Text>
+			</>
+		),
+	},
+};
+
+/**
+ * `Page.Narrow` centers and constrains the width of content, such as a
+ * settings form, that should not span the full width of the page.
+ */
+export const WithNarrowContent: Story = {
+	args: {
+		title: 'Page title',
+		showSidebarToggle: false,
+		hasPadding: true,
+		children: (
+			<Page.Narrow>
+				<Text>Narrow, centered content.</Text>
+			</Page.Narrow>
+		),
+	},
+};
