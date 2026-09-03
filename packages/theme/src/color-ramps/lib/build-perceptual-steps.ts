@@ -225,16 +225,15 @@ function rebuildSurfaces( ramp: BaseRampResult, purpose: AccentRampPurpose ) {
 			surface3Lightness -
 			surface2Lightness ) /
 		2;
-	const elevationGap = Math.max(
-		0.001,
-		Math.min(
-			authoredElevationGap,
-			surface2Lightness - 0.001,
-			1 - surface2Lightness - 0.001
-		)
+	const elevationGap = Math.max( 0.001, authoredElevationGap );
+	// Clip each side independently. Requiring equal gaps at black or white
+	// would also collapse the side that still has room.
+	const targetSurface1Lightness = clampUnitInterval(
+		surface2Lightness - elevationGap
 	);
-	const targetSurface1Lightness = surface2Lightness - elevationGap;
-	const targetSurface3Lightness = surface2Lightness + elevationGap;
+	const targetSurface3Lightness = clampUnitInterval(
+		surface2Lightness + elevationGap
+	);
 	const emphasisDirection = ramp.direction === 'lighter' ? 1 : -1;
 	const sameDirectionElevationLightness =
 		ramp.direction === 'lighter'
