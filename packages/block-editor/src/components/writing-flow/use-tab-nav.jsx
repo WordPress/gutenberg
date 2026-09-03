@@ -1,5 +1,5 @@
 import { focus, isFormElement } from '@wordpress/dom';
-import { TAB } from '@wordpress/keycodes';
+import { TAB, withIgnoreIMEEvents } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect, useMergeRefs, useInstanceId } from '@wordpress/compose';
@@ -290,10 +290,14 @@ export default function useTabNav() {
 			}
 		}
 
-		node.addEventListener( 'keydown', onKeyDown );
+		// During an IME composition, Escape and Tab control the input
+		// method, not the editor.
+		const onKeyDownOutsideIME = withIgnoreIMEEvents( onKeyDown );
+
+		node.addEventListener( 'keydown', onKeyDownOutsideIME );
 		node.addEventListener( 'focusout', onFocusOut );
 		return () => {
-			node.removeEventListener( 'keydown', onKeyDown );
+			node.removeEventListener( 'keydown', onKeyDownOutsideIME );
 			node.removeEventListener( 'focusout', onFocusOut );
 		};
 	}, [] );
