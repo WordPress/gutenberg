@@ -18,8 +18,8 @@ import type {
 	NormalizedRect,
 } from '../../core/types';
 import type { CropperController } from '../hooks/use-cropper-reducer';
-import { getImageFit, getRotatedBBox, getViewScale } from '../../core/camera';
-import { getImageCropBounds, getMinZoom } from '../../core/containment';
+import { getRotatedBBox, getViewScale } from '../../core/camera';
+import { getMinZoom } from '../../core/containment';
 import {
 	MAX_VIEW_SCALE,
 	PIXEL_SNAP_DISPLAY_SCALE,
@@ -30,6 +30,7 @@ import { getMinCropPixels } from '../../core/stencil-math';
 import { useInteraction } from '../hooks/use-interaction';
 import { useTransformStyle } from '../hooks/use-transform-style';
 import { useAriaAnnouncer } from '../hooks/use-aria-announcer';
+import { useDerivedCropperMeasurements } from '../hooks/use-derived-cropper-measurements';
 import { RectangleStencil } from './stencils/rectangle-stencil';
 import { DimmingOverlay } from './overlays/dimming-overlay';
 import { GridOverlay } from './overlays/grid-overlay';
@@ -39,8 +40,13 @@ import {
 	snapCropRectToSourcePixelGrid,
 	snapCropRectToSourcePixels,
 } from '../../core/source-region';
+import { CropPreviewOverlay } from './overlays/crop-preview-overlay';
 import { ViewportProvider, useViewport } from './viewport-provider';
 import { VISUALLY_HIDDEN_STYLE } from '../visually-hidden-style';
+import {
+	useOptionalCropperPreviewRect,
+	useOptionalSetCropperCanvasSize,
+} from './cropper-provider';
 
 /** Threshold for comparing normalized crop rect values. */
 const CROP_RECT_EPSILON = 1e-6;
@@ -178,6 +184,8 @@ function CropperInner(
 		setViewportPan,
 		resetViewport,
 	} = useViewport();
+	const setCropperCanvasSize = useOptionalSetCropperCanvasSize();
+	const previewCropRect = useOptionalCropperPreviewRect();
 	// Canvas measurement via ResizeObserver. The canvas is the inner
 	// positioning context for image/stencil/handles — inset from the root
 	// by the handle gutter, so crop math operates on the reduced box.
@@ -268,18 +276,29 @@ function CropperInner(
 	// via the centralized @wordpress/a11y speak() API called inside the hook.
 	useAriaAnnouncer( state );
 
-	// Compute fitted image dimensions and visual bounds from camera math.
 	const naturalWidth = state.image?.naturalWidth ?? 0;
 	const naturalHeight = state.image?.naturalHeight ?? 0;
-	const { elementSize, visualSize } = useMemo(
-		() =>
-			getImageFit(
-				canvasSize,
-				{ width: naturalWidth, height: naturalHeight },
-				state.rotation
-			),
-		[ canvasSize, naturalWidth, naturalHeight, state.rotation ]
-	);
+
+	// Local derivation of fitted dimensions, visual bounds, and normalized
+	// crop bounds. The same hook runs inside `<CropperProvider>` when present,
+	// so sibling consumers (advanced panel, automation) see the same numbers
+	// without a separate derived-state write-back.
+	const { elementSize, visualSize, cropBounds } =
+		useDerivedCropperMeasurements( state, canvasSize );
+
+	// Publish raw `canvasSize` so the Provider's central derivation stays in
+	// sync. Silently noops outside a Provider.
+	useEffect( () => {
+		setCropperCanvasSize( canvasSize );
+	}, [ canvasSize, setCropperCanvasSize ] );
+
+	// The Provider can outlive this canvas if the cropper is hidden
+	// conditionally; clear the measurement so consumers become unready.
+	useEffect( () => {
+		return () => {
+			setCropperCanvasSize( { width: 0, height: 0 } );
+		};
+	}, [ setCropperCanvasSize ] );
 
 	// Report the rendered image size to the controller. Composite
 	// controllers need it to compute aspect-ratio reshapes from the
@@ -365,17 +384,6 @@ function CropperInner(
 		state.cropRect,
 	] );
 
-	// Compute the crop handle bounds from the actual image footprint.
-	// Depends on the full state object because getImageCropBounds reads
-	// crop, zoom, rotation, flip, and image. React Compiler requires
-	// the complete dependency; the computation is lightweight (a few
-	// trig ops + 4 corner transforms).
-	const cropBounds = useMemo( () => {
-		if ( ! state.image || elementSize.width === 0 ) {
-			return undefined;
-		}
-		return getImageCropBounds( state, elementSize, visualSize );
-	}, [ state, elementSize, visualSize ] );
 	const effectiveMinZoom =
 		minZoom !== undefined ? minZoom : getMinZoom( state );
 	const [ isResizing, setIsResizing ] = useState( false );
@@ -996,6 +1004,8 @@ function CropperInner(
 						'wp-media-editor-image-editor__canvas--show-grid',
 					settling &&
 						'wp-media-editor-image-editor__canvas--settling',
+					previewCropRect &&
+						'wp-media-editor-image-editor__canvas--previewing',
 					// Marks the cropper as in keyboard-interaction mode.
 					// CSS uses :focus on the canvas to show the stencil
 					// outline and :focus on a handle to show its ring,
@@ -1046,10 +1056,13 @@ function CropperInner(
 						draggable={ false }
 					/>
 
-					{ /* Dimming overlay outside the crop area */ }
+					{ /* Dimming overlay outside the crop area. Follows the
+					     preview rect when one is active so the framed area
+					     reads as "the crop moved" rather than a separate
+					     overlay on top of the still-framed original. */ }
 					{ showDimming && (
 						<DimmingOverlay
-							cropRect={ state.cropRect }
+							cropRect={ previewCropRect ?? state.cropRect }
 							containerSize={ canvasSize }
 							imageSize={ scaledVisualSize }
 							transition={ settleStencilTransition }
@@ -1066,7 +1079,7 @@ function CropperInner(
 						onResizeEnd={ handleResizeEnd }
 						onEscape={ handleEscape }
 						aspectRatio={ aspectRatio }
-						freeformCrop={ freeformCrop }
+						freeformCrop={ previewCropRect ? false : freeformCrop }
 						isResizeDisabled={ isTouchPinching }
 						stencilTransition={ settleStencilTransition }
 						cropBounds={ cropBounds }
@@ -1075,10 +1088,12 @@ function CropperInner(
 						keyboardResizeStep={ keyboardResizeStep }
 					/>
 
-					{ /* Rule-of-thirds grid */ }
+					{ /* Rule-of-thirds grid. Follows the preview rect when
+					     one is active so the framing reads as "the crop
+					     moved" together with the dimming overlay. */ }
 					{ ( showGrid === true || isInteractiveGrid ) && (
 						<GridOverlay
-							cropRect={ state.cropRect }
+							cropRect={ previewCropRect ?? state.cropRect }
 							containerSize={ canvasSize }
 							imageSize={ scaledVisualSize }
 						/>
@@ -1093,6 +1108,14 @@ function CropperInner(
 							activeHandle={ activeHandle }
 							outputWidth={ outputSize.width }
 							outputHeight={ outputSize.height }
+						/>
+					) }
+
+					{ previewCropRect && (
+						<CropPreviewOverlay
+							cropRect={ previewCropRect }
+							containerSize={ canvasSize }
+							imageSize={ scaledVisualSize }
 						/>
 					) }
 				</div>

@@ -118,6 +118,38 @@ const percent = getSourceRegionPercent( controller.state, imageSize );
 
 `getSourceRegionPercent()` matches the crop data shape used by the WordPress attachments `/edit` endpoint.
 
+## Validate Pixel Crop Edits
+
+Use pixel geometry helpers when manual controls or automation need to validate a crop rectangle before committing it.
+`useCropGeometry()` reads from `CropperProvider`, so call it from a component
+rendered inside that provider.
+
+```ts
+import {
+	applyCropEdit,
+	cropPixelRectToNormalizedRect,
+	useCropGeometry,
+} from '../image-editor';
+
+const geometry = useCropGeometry();
+
+if ( geometry.isReady ) {
+	const next = applyCropEdit( geometry.rect, 'width', 640, {
+		aspectRatio,
+		bounds: geometry.imageBounds,
+	} );
+
+	controller.setCropRect(
+		cropPixelRectToNormalizedRect( next, controller.state, {
+			width: controller.state.image.naturalWidth,
+			height: controller.state.image.naturalHeight,
+		} )
+	);
+}
+```
+
+The pixel helpers use the current image-bound constraints, so callers can reject, clamp, or preview generated crop values before mutating cropper state.
+
 ## Export a Cropped Image
 
 ```ts

@@ -4,6 +4,11 @@ import type { MediaEditorCropPanelProps } from '..';
 import { MediaEditorStateProvider } from '../../../state';
 import type { CropperState } from '../../../image-editor';
 
+jest.mock( '../crop-advanced-panel', () => ( {
+	__esModule: true,
+	default: () => <div data-testid="crop-advanced-panel" />,
+} ) );
+
 function setupCropPanel(
 	overrides: Partial< MediaEditorCropPanelProps > = {},
 	initialCropperState?: Partial< CropperState >
