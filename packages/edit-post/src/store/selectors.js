@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as coreStore } from '@wordpress/core-data';
@@ -9,10 +6,6 @@ import {
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 const { interfaceStore } = unlock( editorPrivateApis );
 const EMPTY_ARRAY = [];
@@ -423,18 +416,6 @@ export const getAllMetaBoxes = createSelector(
 	},
 	( state ) => [ state.metaBoxes.locations ]
 );
-
-/**
- * Returns the list of meta box IDs marked as compatible with real-time
- * collaboration via the add_meta_box() __rtc_compatible_meta_box compatibility flag.
- *
- * @param {Object} state Global application state.
- *
- * @return {string[]} List of RTC-compatible meta box IDs.
- */
-export function getRtcCompatibleMetaBoxIds( state ) {
-	return state.metaBoxes.rtcCompatibleIds;
-}
 
 /**
  * Returns true if the post is using Meta Boxes

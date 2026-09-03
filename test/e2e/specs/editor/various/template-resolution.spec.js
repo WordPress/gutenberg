@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 async function updateSiteSettings( { pageId, requestUtils } ) {
@@ -15,6 +12,7 @@ test.describe( 'Template resolution', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
+
 	test.afterEach( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.deleteAllPages(),
@@ -25,9 +23,11 @@ test.describe( 'Template resolution', () => {
 			} ),
 		] );
 	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
+
 	test( 'Site editor proper front page template resolution when we have only set posts page in settings', async ( {
 		page,
 		admin,
@@ -43,6 +43,7 @@ test.describe( 'Template resolution', () => {
 			0
 		);
 	} );
+
 	test.describe( '`page_for_posts` setting', () => {
 		test( 'Post editor proper template resolution', async ( {
 			page,
@@ -65,6 +66,7 @@ test.describe( 'Template resolution', () => {
 				page.getByRole( 'button', { name: 'Template options' } )
 			).toHaveText( 'Index' );
 		} );
+
 		test( 'Site editor proper template resolution', async ( {
 			page,
 			editor,

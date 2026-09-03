@@ -2,6 +2,23 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"compilerOptions": {
 		"allowJs": true,
+		"paths": {
+			"@wordpress/commands": [
+				"./typings/untyped-packages/wordpress-commands.d.ts"
+			],
+			"@wordpress/block-editor": [
+				"./typings/untyped-packages/any-module.d.ts"
+			],
+			"@wordpress/block-library": [
+				"./typings/untyped-packages/any-module.d.ts"
+			],
+			"@wordpress/patterns": [
+				"./typings/untyped-packages/any-module.d.ts"
+			],
+			"@wordpress/interface": [
+				"./typings/untyped-packages/any-module.d.ts"
+			]
+		},
 		"checkJs": true,
 		"allowSyntheticDefaultImports": true,
 		"jsx": "preserve",
@@ -36,13 +53,13 @@
 	},
 	"include": [ "${configDir}/src" ],
 	"exclude": [
-		"**/*.android.js",
-		"**/*.ios.js",
-		"**/*.native.js",
 		"**/benchmark",
 		"packages/*/build-*/**",
 		"packages/*/build/**",
 		"**/test/**",
-		"packages/**/react-native-*/**"
+		"**/tests/**",
+		"**/__tests__/**",
+		"**/stories/**",
+		"**/*.story.*"
 	]
 }

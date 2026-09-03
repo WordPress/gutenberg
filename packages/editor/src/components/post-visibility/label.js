@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { VISIBILITY_OPTIONS } from './utils';
 import { store as editorStore } from '../../store';
 

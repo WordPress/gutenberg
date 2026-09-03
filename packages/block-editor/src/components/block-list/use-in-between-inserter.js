@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useRefEffect } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useContext } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { InsertionPointOpenRef } from '../block-tools/insertion-point';
 import { unlock } from '../../lock-unlock';
