@@ -28,6 +28,7 @@ export default function save( { attributes } ) {
 		title,
 		isDecorative,
 		metadata: { bindings = {} } = {},
+		showCaption,
 	} = attributes;
 
 	const newRel = ! rel ? undefined : rel;
@@ -116,7 +117,7 @@ export default function save( { attributes } ) {
 			) : (
 				image
 			) }
-			{ displayCaption && (
+			{ showCaption && displayCaption && (
 				<RichText.Content
 					className={ __experimentalGetElementClassName( 'caption' ) }
 					tagName="figcaption"
