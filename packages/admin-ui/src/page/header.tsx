@@ -1,9 +1,9 @@
 import clsx from 'clsx';
-import { Stack, Text } from '@wordpress/ui';
+import { Badge, Stack, Text } from '@wordpress/ui';
 import Navigation from '../navigation';
 import type { NavigationConfig } from '../navigation/types';
 import { SidebarToggleSlot } from './sidebar-toggle-slot';
-import type { PageComponents } from './types';
+import type { PageBadge, PageComponents } from './types';
 import styles from './style.module.css';
 
 export default function Header( {
@@ -20,7 +20,7 @@ export default function Header( {
 }: {
 	headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
 	breadcrumbs?: React.ReactNode;
-	badges?: React.ReactNode;
+	badges?: PageBadge[];
 	visual?: React.ReactNode;
 	title?: React.ReactNode;
 	subTitle: React.ReactNode;
@@ -77,7 +77,11 @@ export default function Header( {
 						</Text>
 					) }
 					{ breadcrumbs }
-					{ badges }
+					{ badges?.map( ( badge, index ) => (
+						<Badge key={ index } intent={ badge.intent }>
+							{ badge.label }
+						</Badge>
+					) ) }
 				</Stack>
 				{ actions && (
 					<Stack
