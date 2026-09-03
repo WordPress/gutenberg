@@ -33,18 +33,39 @@
 	border: none;
 	width: 100%;
 	align-items: center;
+	gap: $grid-unit-10;
+	// Keep the outset focus ring of the first and last buttons within the
+	// customizer sidebar, which clips its overflow.
+	padding: 0 $grid-unit-15;
+
+	// The Toolbar component adds different styles to buttons, so we reset them
+	// here to the original button styles, consistent with the document tools
+	// of the other editors.
+	// Specificity bump needed to offset https://github.com/WordPress/gutenberg/blob/8ea29cb04412c80c9adf7c1db0e816d6a0ac1232/packages/components/src/toolbar/style.scss#L76
+	> .components-button.has-icon.has-icon.has-icon,
+	> .components-dropdown > .components-button.has-icon.has-icon {
+		height: $button-size-compact;
+		min-width: $button-size-compact;
+		padding: 4px;
+
+		&.is-pressed {
+			background: $gray-900;
+		}
+
+		&:focus:not(:active) {
+			@include outset-ring__focus();
+		}
+
+		&::before {
+			display: none;
+		}
+	}
 
 	.customize-widgets-header-toolbar__inserter-toggle.components-button.has-icon {
 		border-radius: $radius-small;
 		color: $white;
-		padding: 0;
-		min-width: $grid-unit-40;
-		height: $grid-unit-40;
+		// Push the inserter toggle and the buttons after it to the end.
 		margin: $grid-unit-15 0 $grid-unit-15 auto;
-
-		&::before {
-			content: none;
-		}
 
 		svg {
 			@media not (prefers-reduced-motion) {
@@ -53,16 +74,9 @@
 		}
 
 		&.is-pressed {
-			background: $gray-900;
-
 			svg {
 				transform: rotate(45deg);
 			}
 		}
-	}
-
-	// Move it more closely to he left visually.
-	.components-button.has-icon.customize-widgets-editor-history-button.redo-button {
-		margin-left: -12px;
 	}
 }
