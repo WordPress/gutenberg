@@ -46,6 +46,13 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	private static $property_core_orig_value;
 
 	/**
+	 * WP_Theme_JSON_Resolver_Gutenberg::$merged property.
+	 *
+	 * @var ReflectionProperty
+	 */
+	private static $property_merged;
+
+	/**
 	 * Theme root directory.
 	 *
 	 * @var string|null
@@ -85,6 +92,11 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 			static::$property_core->setAccessible( true );
 		}
 		static::$property_core_orig_value = static::$property_core->getValue();
+
+		static::$property_merged = new ReflectionProperty( WP_Theme_JSON_Resolver_Gutenberg::class, 'merged' );
+		if ( PHP_VERSION_ID < 80100 ) {
+			static::$property_merged->setAccessible( true );
+		}
 	}
 
 	public static function tear_down_after_class() {
@@ -1465,6 +1477,23 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @covers WP_Theme_JSON_Resolver_Gutenberg::get_merged_data
+	 */
+	public function test_get_merged_data_returns_the_memoized_data() {
+		WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
+
+		$sentinel = $this->replace_merged_data_with_sentinel( 'custom' );
+		$result   = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
+
+		$this->assertSame(
+			'sentinel',
+			$result->get_raw_data()['styles']['color']['text'] ?? null,
+			'The second call should return the data memoized by the first.'
+		);
+		$this->assertNotSame( $sentinel, $result, 'A copy of the memoized data should be returned, not the memoized instance.' );
+	}
+
+	/**
 	 * Callers are free to modify the returned data. WP_Theme_JSON_Gutenberg::resolve_variables()
 	 * does exactly that, so a modification must not be observable by the next caller.
 	 *
@@ -1498,6 +1527,8 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	 * @covers WP_Theme_JSON_Resolver_Gutenberg::get_merged_data
 	 */
 	public function test_get_merged_data_reflects_blocks_registered_after_a_previous_call() {
+		// The first call records the registered blocks and stores the data; the second returns it.
+		WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
 		WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
 
 		register_block_type(
@@ -1533,5 +1564,27 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$after = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_raw_data();
 
 		$this->assertNotEquals( $before, $after, 'Switching themes should refresh the merged data.' );
+	}
+
+	/**
+	 * Replaces the memoized merged data for an origin with a recognizable instance.
+	 *
+	 * @param string $origin Origin to replace the data for.
+	 * @return WP_Theme_JSON_Gutenberg The instance now memoized for the origin.
+	 */
+	private function replace_merged_data_with_sentinel( $origin ) {
+		$sentinel = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array( 'color' => array( 'text' => 'sentinel' ) ),
+			)
+		);
+
+		$merged = static::$property_merged->getValue();
+		$this->assertArrayHasKey( $origin, $merged, 'The merged data should be stored for the origin before it is replaced.' );
+		$merged[ $origin ] = $sentinel;
+		static::$property_merged->setValue( null, $merged );
+
+		return $sentinel;
 	}
 }

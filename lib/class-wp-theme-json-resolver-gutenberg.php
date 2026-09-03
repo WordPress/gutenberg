@@ -621,10 +621,24 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		 * The merged result is memoized per origin and refreshed when the set
 		 * of registered blocks changes, the same way each of the origins it
 		 * merges already is.
+		 *
+		 * has_same_registered_blocks() runs before the isset() on purpose. It
+		 * records the registered blocks whenever it finds new ones, so running
+		 * it on the first call seeds that record while the data is built and
+		 * the second call hits. Checked the other way round, the record would
+		 * stay empty until the second call, and the first hit would be the
+		 * third.
+		 *
+		 * The guard tracks block registration only. get_theme_data() reads the
+		 * theme supports (palette, gradients, font sizes and the custom flags)
+		 * on every call, so a support added after the first call here stays
+		 * out of the merged data until the registered blocks change or
+		 * clean_cached_data() runs. gutenberg_get_global_settings() already
+		 * freezes them per request the same way.
 		 */
 		if (
-			isset( static::$merged[ $origin ] ) &&
-			static::has_same_registered_blocks( 'merged_' . $origin )
+			static::has_same_registered_blocks( 'merged_' . $origin ) &&
+			isset( static::$merged[ $origin ] )
 		) {
 			return clone static::$merged[ $origin ];
 		}
