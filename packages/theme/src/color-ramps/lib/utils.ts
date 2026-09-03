@@ -12,8 +12,9 @@ import type { BaseRampStep, RampStepsConfig, RampDirection } from './types.ts';
 import { getContrast } from './color-utils.ts';
 
 /**
- * Build a dependency graph from the steps configuration
- * @param config - The steps configuration object
+ * Track contrast and reuse dependencies between base steps.
+ *
+ * @param config Base step configuration.
  */
 function buildDependencyGraph( config: RampStepsConfig ): {
 	dependencies: Map< BaseRampStep, ( BaseRampStep | 'seed' )[] >;
@@ -22,7 +23,6 @@ function buildDependencyGraph( config: RampStepsConfig ): {
 	const dependencies = new Map< BaseRampStep, ( BaseRampStep | 'seed' )[] >();
 	const dependents = new Map< BaseRampStep | 'seed', BaseRampStep[] >();
 
-	// Initialize maps
 	Object.keys( config ).forEach( ( step ) => {
 		dependencies.set( step as BaseRampStep, [] );
 	} );
@@ -31,7 +31,6 @@ function buildDependencyGraph( config: RampStepsConfig ): {
 		dependents.set( step as BaseRampStep, [] );
 	} );
 
-	// Build the graph
 	Object.entries( config ).forEach( ( [ stepName, stepConfig ] ) => {
 		const step = stepName as BaseRampStep;
 		const references = [
@@ -44,7 +43,6 @@ function buildDependencyGraph( config: RampStepsConfig ): {
 			dependents.get( reference )!.push( step );
 		}
 
-		// Add dependency for sameAsIfPossible
 		if ( stepConfig.sameAsIfPossible ) {
 			dependencies.get( step )!.push( stepConfig.sameAsIfPossible );
 			dependents.get( stepConfig.sameAsIfPossible )!.push( step );
@@ -55,8 +53,9 @@ function buildDependencyGraph( config: RampStepsConfig ): {
 }
 
 /**
- * Topologically sort steps based on their dependencies
- * @param config - The steps configuration object
+ * Order base steps so their references are built first. Reject cycles.
+ *
+ * @param config Base step configuration.
  */
 export function sortByDependency( config: RampStepsConfig ): BaseRampStep[] {
 	const { dependents } = buildDependencyGraph( config );
@@ -99,10 +98,10 @@ export function sortByDependency( config: RampStepsConfig ): BaseRampStep[] {
 	return result;
 }
 /**
- * Return minimal set of steps that are needed to calculate `stepName` from the seed.
+ * Return the requested step and its dependencies, in build order.
+ *
  * @param stepName Name of the step.
  * @param config   Configuration of the ramp.
- * @return Array of steps that `stepName` depends on.
  */
 export function stepsForStep(
 	stepName: BaseRampStep,
@@ -132,12 +131,11 @@ export function stepsForStep(
 }
 
 /**
- * Finds out whether a lighter or a darker foreground color achieves a better
- * contrast against every reference color
- * @param references
- * @param preferLighter Whether the check should favor white foreground color
- * @return An object with "better" and "worse" properties, each holding a
- * ramp direction value.
+ * Choose black or white by its weakest WCAG contrast across the references.
+ * This selects a direction; it does not prove a contrast target is reachable.
+ *
+ * @param references    Colors the foreground must contrast against.
+ * @param preferLighter Bias the comparison toward white.
  */
 export function computeBetterFgColorDirection(
 	references: string | PlainColorObject | readonly PlainColorObject[],
@@ -167,22 +165,24 @@ export function computeBetterFgColorDirection(
 		: { better: 'lighter', worse: 'darker' };
 }
 
+/**
+ * Pad a WCAG target for rounding, except 1, which means reuse the reference.
+ *
+ * @param target Unpadded WCAG ratio.
+ */
 export function adjustContrastTarget( target: number ) {
 	if ( target === 1 ) {
 		return 1;
 	}
 
-	// Add a little top up to take into account any rounding error and algo imprecisions.
 	return target + UNIVERSAL_CONTRAST_TOPUP;
 }
 
 /**
- * Prevent the accent scale from referencing a lightness value that
- * would prevent the algorithm from complying with the requirements
- * and cause it to generate unexpected results.
- * @param rawLightness
- * @param direction
- * @return The clamped lightness value
+ * Bound the accent surface anchor to leave room for contrasting foregrounds.
+ *
+ * @param rawLightness Background SF2 lightness in OKLCH.
+ * @param direction    Ramp's foreground direction.
  */
 export function clampAccentScaleReferenceLightness(
 	rawLightness: number,
@@ -193,15 +193,17 @@ export function clampAccentScaleReferenceLightness(
 }
 
 /**
- * Find the value of `L` (luminance) that produces a `C` (color) that has a
- * `value` (contrast delta) equal to zero.
- * @param calculateC     Calculate `C` from a given `L`.
- * @param calculateValue Calculate value (delta) for a given `C`.
- * @param initLowerL     Initial lower value of `L`.
- * @param initLowerValue Initial lower delta (negative).
- * @param initUpperL     Initial upper value of `L`.
- * @param initUpperValue Initial upper delta (positive).
- * @return Resulting value of type `C`.
+ * Search for zero signed error between two bounds. "Lower" and "upper" refer
+ * to error signs, not numeric lightness order. Stops at the tolerance or
+ * iteration limit; callers must check any strict output requirements.
+ *
+ * @param calculateC     Build a candidate from the search parameter (usually lightness).
+ * @param calculateValue Signed error for a candidate.
+ * @param initLowerL     Parameter at the negative-error bound.
+ * @param initLowerValue Initial negative error.
+ * @param initUpperL     Parameter at the positive-error bound.
+ * @param initUpperValue Initial positive error.
+ * @return Last sampled candidate.
  */
 export function solveWithBisect< C >(
 	calculateC: ( l: number ) => C,
