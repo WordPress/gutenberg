@@ -13,7 +13,6 @@
 	},
 	"files": [ "global.d.ts" ],
 	"include": [
-		"benchmark",
 		"bin",
 		"terrazzo.config.ts",
 		"*-plugins/test/**/*",
