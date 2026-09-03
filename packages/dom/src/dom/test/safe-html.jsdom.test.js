@@ -36,13 +36,14 @@ describe( 'safeHTML', () => {
 	it( 'should strip javascript: and vbscript: URIs from href attributes', () => {
 		const input =
 			'<a href="javascript:alert(1)">Link 1</a><a href="vbscript:msgbox(1)">Link 2</a><a href="https://example.com">Safe Link</a>';
-		const output = '<a>Link 1</a><a>Link 2</a><a href="https://example.com">Safe Link</a>';
+		const output =
+			'<a>Link 1</a><a>Link 2</a><a href="https://example.com">Safe Link</a>';
 		expect( safeHTML( input ) ).toBe( output );
 	} );
 
 	it( 'should strip javascript: URIs with leading whitespace and control characters', () => {
 		const input =
-			'<a href="   javascript:alert(1)">Link 1</a><a href="javascript:alert(2)">Link 2</a>';
+			'<a href="   javascript:alert(1)">Link 1</a><a href="\x01javascript:alert(2)">Link 2</a>';
 		const output = '<a>Link 1</a><a>Link 2</a>';
 		expect( safeHTML( input ) ).toBe( output );
 	} );
@@ -50,8 +51,7 @@ describe( 'safeHTML', () => {
 	it( 'should strip javascript: URIs from src, action, and formaction attributes', () => {
 		const input =
 			'<form action="javascript:alert(1)"><button formaction="javascript:alert(2)">Submit</button></form><iframe src="javascript:alert(3)"></iframe>';
-		const output =
-			'<form><button>Submit</button></form><iframe></iframe>';
+		const output = '<form><button>Submit</button></form><iframe></iframe>';
 		expect( safeHTML( input ) ).toBe( output );
 	} );
 

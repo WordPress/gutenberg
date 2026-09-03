@@ -10,7 +10,7 @@ const DANGEROUS_URI_ATTRS = new Set( [
 	'data',
 ] );
 const DANGEROUS_URI_PATTERN =
-	/^\s*(?:javascript|vbscript|data(?:\/|\:text\/html|\:image\/svg\+xml)):/i;
+	/^[\s\x00-\x20]*(?:javascript:|vbscript:|data:\s*(?:text\/html|image\/svg\+xml)(?:[;,]|$))/i;
 
 /**
  * Strips scripts, embedding elements, on* attributes, and executable URIs from HTML.
