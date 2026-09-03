@@ -97,7 +97,9 @@ test.describe( 'Patterns', () => {
 		).toContainText( 'Pattern updated' );
 
 		if ( isSiteEditorV2 ) {
-			await page.getByRole( 'button', { name: 'Go back' } ).click();
+			await page
+				.getByRole( 'button', { name: 'Back', exact: true } )
+				.click();
 
 			// The extensible editor's Patterns page filters through view tabs
 			// without per-category counts.

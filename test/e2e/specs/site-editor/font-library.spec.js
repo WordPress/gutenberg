@@ -142,6 +142,7 @@ test.describe( 'Font Library', () => {
 
 			// Click "Back" button
 			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
 				.getByRole( 'button', { name: 'Back', exact: true } )
 				.click();
 
@@ -167,6 +168,7 @@ test.describe( 'Font Library', () => {
 
 			// Click "Back"
 			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
 				.getByRole( 'button', { name: 'Back', exact: true } )
 				.click();
 
@@ -178,6 +180,7 @@ test.describe( 'Font Library', () => {
 
 			// Click "Back" button
 			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
 				.getByRole( 'button', { name: 'Back', exact: true } )
 				.click();
 

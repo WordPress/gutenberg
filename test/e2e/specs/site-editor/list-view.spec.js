@@ -58,7 +58,7 @@ test.describe( 'Site Editor List View', () => {
 		// "Open Navigation" in the classic site editor, "Go back" in the
 		// extensible one.
 		const openNavigationButton = page.getByRole( 'button', {
-			name: isSiteEditorV2 ? 'Go back' : 'Open Navigation',
+			name: isSiteEditorV2 ? 'Back' : 'Open Navigation',
 			exact: true,
 		} );
 		await openNavigationButton.focus();

@@ -238,7 +238,10 @@ test.describe( 'Style Revisions', () => {
 			.last()
 			.click();
 
-		await page.getByRole( 'button', { name: 'Back', exact: true } ).click();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Back', exact: true } )
+			.click();
 
 		await expect(
 			page.getByLabel( 'Global styles revisions list' )
@@ -289,7 +292,10 @@ test.describe( 'Style Revisions', () => {
 			page.getByLabel( 'Global styles revisions list' )
 		).toBeVisible();
 
-		await page.getByRole( 'button', { name: 'Back', exact: true } ).click();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Back', exact: true } )
+			.click();
 
 		await expect(
 			page.getByLabel( 'Global styles revisions list' )

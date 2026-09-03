@@ -104,8 +104,14 @@ test.describe( 'Style Book', () => {
 			} )
 			.click();
 
-		await page.getByRole( 'button', { name: 'Back', exact: true } ).click();
-		await page.getByRole( 'button', { name: 'Back', exact: true } ).click();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Back', exact: true } )
+			.click();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Back', exact: true } )
+			.click();
 
 		await expect(
 			page.locator( 'role=button[name="Blocks"]' )
@@ -158,7 +164,10 @@ test.describe( 'Style Book', () => {
 			'style book should be visible'
 		).toBeVisible();
 
-		await page.getByRole( 'button', { name: 'Back', exact: true } ).click();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Back', exact: true } )
+			.click();
 
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
