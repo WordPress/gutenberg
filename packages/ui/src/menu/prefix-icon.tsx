@@ -7,8 +7,7 @@ import styles from './style.module.css';
 
 /**
  * Renders an icon in a menu item's prefix slot, aligned with the first label
- * line when the item includes a description. The prefix slot hides the icon
- * from assistive technology.
+ * line. The prefix slot hides the icon from assistive technology.
  */
 export const PrefixIcon = forwardRef< SVGSVGElement, PrefixIconProps >(
 	function MenuPrefixIcon( { className, size = 24, style, ...props }, ref ) {

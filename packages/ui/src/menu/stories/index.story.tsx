@@ -409,66 +409,6 @@ export const Submenu: Story = {
 	},
 };
 
-export const PrefixIcons: Story = {
-	args: {
-		children: (
-			<>
-				<Menu.Trigger>Prefix icons</Menu.Trigger>
-				<Menu.Popup>
-					<Menu.Item prefix={ <Menu.PrefixIcon icon={ archive } /> }>
-						<Menu.ItemLabel>Single-line item</Menu.ItemLabel>
-					</Menu.Item>
-					{ [ 16, 24, 32 ].map( ( size ) => (
-						<Menu.Item
-							key={ size }
-							prefix={
-								<Menu.PrefixIcon
-									icon={ archive }
-									size={ size }
-								/>
-							}
-						>
-							<Menu.ItemLabel>{ size }px icon</Menu.ItemLabel>
-							<Menu.ItemDescription>
-								Aligned with the first label line.
-							</Menu.ItemDescription>
-						</Menu.Item>
-					) ) }
-					<Menu.Item
-						prefix={
-							<>
-								<Menu.PrefixIcon icon={ archive } size={ 16 } />
-								<Menu.PrefixIcon icon={ archive } size={ 32 } />
-							</>
-						}
-					>
-						<Menu.ItemLabel>Mixed icon sizes</Menu.ItemLabel>
-						<Menu.ItemDescription>
-							Each icon aligns with the first label line.
-						</Menu.ItemDescription>
-					</Menu.Item>
-					<Menu.Item
-						prefix={
-							<span
-								style={ {
-									width: 48,
-									height: 64,
-									background: 'currentColor',
-								} }
-							/>
-						}
-					>
-						<Menu.ItemLabel>Custom prefix</Menu.ItemLabel>
-						<Menu.ItemDescription>
-							Natural height, aligned with the top of the label.
-						</Menu.ItemDescription>
-					</Menu.Item>
-				</Menu.Popup>
-			</>
-		),
-	},
-};
-
 export const CheckboxItems: Story = {
 	render: function Render() {
 		const [ bookmarks, setBookmarks ] = useState( true );

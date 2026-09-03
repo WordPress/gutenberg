@@ -57,7 +57,7 @@ Do not use checked menu items only to recreate a Select. If choosing a value is 
 
 ## Add prefix icons
 
-Use `Menu.PrefixIcon` in an item's `prefix` prop for an SVG icon. It defaults to 24px and accepts the same props as `Icon`, including `size`. When the item has a description, the icon aligns with the first label line.
+Use `Menu.PrefixIcon` in an item's `prefix` prop for an SVG icon. It defaults to 24px and aligns with the first label line, whether or not the item has a description or selection indicator. Prefer the default size for consistent menu icons.
 
 ```tsx
 import { archive } from '@wordpress/icons';
@@ -71,7 +71,7 @@ import { Menu } from '@wordpress/ui';
 
 The prefix slot already hides its contents from assistive technology. Keep meaningful text in `Menu.ItemLabel` or `Menu.ItemDescription`.
 
-Other non-interactive React content can still be passed directly to `prefix`. It retains its natural height and aligns with the top of the label when the item has a description. `Menu.PrefixIcon` is optional; it does not change the sizing of other prefix content.
+Other non-interactive React content can still be passed directly to `prefix`. It retains its natural height and aligns with the top of the label. `Menu.PrefixIcon` does not change the sizing of other prefix content.
 
 ## Use an ellipsis for actions that need more input
 
