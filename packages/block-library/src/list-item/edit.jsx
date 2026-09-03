@@ -26,7 +26,7 @@ import {
 
 export function IndentUI( { clientId } ) {
 	const indentListItem = useIndentListItem( clientId );
-	const outdentListItem = useOutdentListItem();
+	const outdentListItem = useOutdentListItem( clientId );
 	const { canIndent, canOutdent } = useSelect(
 		( select ) => {
 			const { getBlockIndex, getBlockRootClientId, getBlockName } =

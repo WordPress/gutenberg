@@ -1,72 +1,82 @@
-import { useCallback } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
-import { createBlock, cloneBlock } from '@wordpress/blocks';
+import { useCallback, useRef, useEffect } from '@wordpress/element';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import {
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
+import { createBlock } from '@wordpress/blocks';
+import { unlock } from '../../lock-unlock';
+import { restoreSelection } from './restore-selection';
+
+const { useBlockElement } = unlock( blockEditorPrivateApis );
 
 export default function useIndentListItem( clientId ) {
-	const { replaceBlocks, selectionChange, multiSelect } =
-		useDispatch( blockEditorStore );
+	const registry = useRegistry();
 	const {
-		getBlock,
+		insertBlock,
+		moveBlocksToPosition,
+		removeBlock,
+		updateBlockListSettings,
+	} = useDispatch( blockEditorStore );
+	const {
 		getPreviousBlockClientId,
+		getBlockRootClientId,
+		getBlockListSettings,
+		getSelectedBlockClientIds,
+		getBlockOrder,
+		getBlockAttributes,
 		getSelectionStart,
 		getSelectionEnd,
-		hasMultiSelection,
-		getMultiSelectedBlockClientIds,
-		getBlockRootClientId,
-		getBlockAttributes,
 	} = useSelect( blockEditorStore );
-	return useCallback( () => {
-		const _hasMultiSelection = hasMultiSelection();
-		const clientIds = _hasMultiSelection
-			? getMultiSelectedBlockClientIds()
-			: [ clientId ];
-		const clonedBlocks = clientIds.map( ( _clientId ) =>
-			cloneBlock( getBlock( _clientId ) )
-		);
-		const previousSiblingId = getPreviousBlockClientId( clientId );
-		const newListItem = cloneBlock( getBlock( previousSiblingId ) );
-		// Get the parent list's attributes to inherit the ordered property
-		const parentListId = getBlockRootClientId( clientId );
-		const parentListAttributes = getBlockAttributes( parentListId );
-		// If the sibling has no innerBlocks, create a new `list` block.
-		if ( ! newListItem.innerBlocks?.length ) {
-			newListItem.innerBlocks = [
-				createBlock( 'core/list', {
-					ordered: parentListAttributes.ordered,
-				} ),
-			];
-		}
-		// A list item usually has one `list`, but it's possible to have
-		// more. So we need to preserve the previous `list` blocks and
-		// merge the new blocks to the last `list`.
-		newListItem.innerBlocks[
-			newListItem.innerBlocks.length - 1
-		].innerBlocks.push( ...clonedBlocks );
 
-		// We get the selection start/end here, because when
-		// we replace blocks, the selection is updated too.
+	// Indenting moves the items, which remounts them and drops the native
+	// selection. Keep the document to rebuild the selection afterwards.
+	const element = useBlockElement( clientId );
+	const ownerDocumentRef = useRef();
+	useEffect( () => {
+		ownerDocumentRef.current = element?.ownerDocument;
+	}, [ element ] );
+
+	return useCallback( () => {
+		const clientIds = getSelectedBlockClientIds();
+		const previousSiblingId = getPreviousBlockClientId( clientId );
+		const rootClientId = getBlockRootClientId( clientId );
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
-		// Replace the previous sibling of the block being indented and the indented blocks,
-		// with a new block whose attributes are equal to the ones of the previous sibling and
-		// whose descendants are the children of the previous sibling, followed by the indented blocks.
-		replaceBlocks( [ previousSiblingId, ...clientIds ], [ newListItem ] );
-		if ( ! _hasMultiSelection ) {
-			selectionChange(
-				clonedBlocks[ 0 ].clientId,
-				selectionEnd.attributeKey,
-				selectionEnd.clientId === selectionStart.clientId
-					? selectionStart.offset
-					: selectionEnd.offset,
-				selectionEnd.offset
-			);
-		} else {
-			multiSelect(
-				clonedBlocks[ 0 ].clientId,
-				clonedBlocks[ clonedBlocks.length - 1 ].clientId
-			);
-		}
+
+		registry.batch( () => {
+			let nestedListId = getBlockOrder( previousSiblingId )[ 0 ];
+			if ( ! nestedListId ) {
+				// The list is inserted with a placeholder item already inside,
+				// otherwise the empty list would scaffold its own item through
+				// the block type's direct insert. The real items are then moved
+				// in, keeping their client IDs, and the placeholder is removed.
+				const placeholder = createBlock( 'core/list-item' );
+				const indentedList = createBlock(
+					'core/list',
+					{ ordered: getBlockAttributes( rootClientId ).ordered },
+					[ placeholder ]
+				);
+				nestedListId = indentedList.clientId;
+				insertBlock( indentedList, 0, previousSiblingId, false );
+				// Immediately update the block list settings, otherwise blocks
+				// can't be moved here due to canInsert checks.
+				updateBlockListSettings(
+					nestedListId,
+					getBlockListSettings( rootClientId )
+				);
+				moveBlocksToPosition( clientIds, rootClientId, nestedListId );
+				removeBlock( placeholder.clientId, false );
+			} else {
+				moveBlocksToPosition( clientIds, rootClientId, nestedListId );
+			}
+		} );
+
+		restoreSelection(
+			ownerDocumentRef.current,
+			selectionStart,
+			selectionEnd
+		);
 
 		return true;
 	}, [ clientId ] );

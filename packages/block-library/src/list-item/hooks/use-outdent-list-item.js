@@ -1,9 +1,16 @@
-import { useCallback } from '@wordpress/element';
+import { useCallback, useRef, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import { cloneBlock } from '@wordpress/blocks';
+import { unlock } from '../../lock-unlock';
+import { restoreSelection } from './restore-selection';
 
-export default function useOutdentListItem() {
+const { useBlockElement } = unlock( blockEditorPrivateApis );
+
+export default function useOutdentListItem( clientId ) {
 	const registry = useRegistry();
 	const { moveBlocksToPosition, removeBlock, removeBlocks, insertBlock } =
 		useDispatch( blockEditorStore );
@@ -14,7 +21,17 @@ export default function useOutdentListItem() {
 		getBlockIndex,
 		getSelectedBlockClientIds,
 		getBlock,
+		getSelectionStart,
+		getSelectionEnd,
 	} = useSelect( blockEditorStore );
+
+	// Outdenting moves the items, which remounts them and drops the native
+	// selection. Keep the document to rebuild the selection afterwards.
+	const element = useBlockElement( clientId );
+	const ownerDocumentRef = useRef();
+	useEffect( () => {
+		ownerDocumentRef.current = element?.ownerDocument;
+	}, [ element ] );
 
 	function getParentListItemId( id ) {
 		const listId = getBlockRootClientId( id );
@@ -57,6 +74,8 @@ export default function useOutdentListItem() {
 		const followingListItems = order.slice(
 			getBlockIndex( lastClientId ) + 1
 		);
+		const selectionStart = getSelectionStart();
+		const selectionEnd = getSelectionEnd();
 
 		registry.batch( () => {
 			if ( followingListItems.length ) {
@@ -94,6 +113,12 @@ export default function useOutdentListItem() {
 				removeBlock( parentListId, shouldSelectParent );
 			}
 		} );
+
+		restoreSelection(
+			ownerDocumentRef.current,
+			selectionStart,
+			selectionEnd
+		);
 
 		return true;
 	}, [] );

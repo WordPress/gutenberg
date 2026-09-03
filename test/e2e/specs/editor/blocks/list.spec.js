@@ -894,6 +894,112 @@ test.describe( 'List (@firefox)', () => {
 		);
 	} );
 
+	test( 'should keep a partial selection when indenting and outdenting with the toolbar', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/list' } );
+		await page.keyboard.type( 'one' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'two' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'three' );
+
+		// Build a partial selection across the last two items. From the end
+		// of "three", move left to sit after "th", then extend up a line so
+		// the selection runs from after "tw" to after "th".
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 3 } );
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
+
+		const getNativeSelection = () =>
+			page
+				.frame( { name: 'editor-canvas' } )
+				.evaluate( () => document.getSelection().toString() );
+
+		expect( await getNativeSelection() ).toBe( 'o\nth' );
+
+		// Indenting moves both items into a nested list, but keeps their
+		// client IDs, so the exact native selection survives instead of
+		// collapsing or turning into a whole-block selection.
+		await editor.clickBlockToolbarButton( 'Indent' );
+		await expect.poll( getNativeSelection ).toBe( 'o\nth' );
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>one<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>two</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>three</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
+		);
+
+		// Outdenting moves them back and again keeps the selection.
+		await editor.clickBlockToolbarButton( 'Outdent' );
+		await expect.poll( getNativeSelection ).toBe( 'o\nth' );
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>one</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>two</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>three</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
+		);
+	} );
+
+	test( 'should keep the caret when indenting a single item with the toolbar', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/list' } );
+		await page.keyboard.type( 'one' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'two' );
+		// Place the caret between "t" and "wo".
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 2 } );
+
+		await editor.clickBlockToolbarButton( 'Indent' );
+
+		// The caret keeps its place inside the moved item.
+		await page.keyboard.type( '‸' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'one' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 't‸wo' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+		] );
+	} );
+
 	test( 'should outdent with children', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/list' } );
 		await page.keyboard.type( 'a' );
