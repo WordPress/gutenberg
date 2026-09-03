@@ -26,7 +26,8 @@ const { PATTERN_TYPES } = unlock( patternsPrivateApis );
 
 const renamePost: Action< PostWithPermissions > = {
 	id: 'rename-post',
-	label: __( 'Rename' ),
+	label: __( 'Rename…' ),
+	modalHeader: __( 'Rename' ),
 	modalFocusOnMount: 'firstContentElement',
 	isEligible( post ) {
 		if ( post.status === 'trash' ) {

@@ -5,10 +5,12 @@
 ### Enhancements
 
 -   Math: Declare `interactivity.clientNavigation` support. The block's front end output is static markup, and without the declaration a Math block inside a Query block forced full page reloads on pagination ([#82248](https://github.com/WordPress/gutenberg/pull/82248)).
+-   Paragraph, List, Heading, Preformatted, Columns, Group, Template Part: Read the default padding these blocks add when they have a background color from the `--wp--style--block-background-padding` custom property, so themes can change or remove it ([#82024](https://github.com/WordPress/gutenberg/pull/82024)).
 -   Query: Show a snackbar notice instead of a blocking modal when "Reload full page" is turned on automatically because a block inside the Query block doesn't support client-side navigation ([#82246](https://github.com/WordPress/gutenberg/pull/82246)).
 
 ### Bug Fixes
 
+-   Navigation: Restore `flex-grow` on the menu container in the editor, where the visually hidden menu description breaks the `:only-child` selector the front end relies on, so the "Space between" and other justification settings apply in the canvas as they do on the front end ([#78447](https://github.com/WordPress/gutenberg/pull/78447)).
 -   Image: Fix cropped galleries rendering images at their natural height in the editor canvas. The baseline inline `height: auto` is no longer emitted for images inside a cropped gallery, so the gallery's own cropping CSS applies ([#82318](https://github.com/WordPress/gutenberg/pull/82318)).
 -   Tabs: Activate the tab that a URL hash points into, so an anchor set on a block inside a tab panel can be reached. Anchor links followed after the page has loaded are handled too, matching the Accordion block ([#81744](https://github.com/WordPress/gutenberg/pull/81744)).
 -   Accordion Panel: Reset padding-block when panel is hidden ([#81782](https://github.com/WordPress/gutenberg/pull/81782)).
@@ -18,6 +20,7 @@
 
 ### Internal
 
+-   Search: Keep the editor's button icon fill-based and separate from `@wordpress/icons` so it matches the PHP renderer and existing theme `fill` styles. ([#82338](https://github.com/WordPress/gutenberg/pull/82338))
 -   Remove unused dependencies `@wordpress/keyboard-shortcuts`, `@wordpress/reusable-blocks` and `@wordpress/viewport` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
 -   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
