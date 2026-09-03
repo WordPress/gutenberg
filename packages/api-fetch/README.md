@@ -115,6 +115,26 @@ apiFetch.use( ( options, next ) => {
 } );
 ```
 
+### Removing middlewares
+
+`apiFetch.unregister` removes a middleware by reference, and returns whether it
+was registered. Built-in middlewares can be removed too, as long as they are
+exposed on `apiFetch`.
+
+```js
+import apiFetch from '@wordpress/api-fetch';
+
+// Send `DELETE` as `DELETE`, rather than as a `POST` carrying an
+// `X-HTTP-Method-Override` header.
+apiFetch.unregister( apiFetch.httpV1Middleware );
+```
+
+Removal is global. Every `apiFetch` call on the page loses the middleware, so
+only remove a middleware you registered yourself, or a built-in whose behavior
+the whole page can do without. `httpV1Middleware` in particular exists so that
+requests keep working on servers and firewalls that reject `PATCH`, `PUT` and
+`DELETE`; removing it can break saving on those sites.
+
 ### Built-in middlewares
 
 The `api-fetch` package provides built-in middlewares you can use to provide a `nonce` and a custom `rootURL`.
