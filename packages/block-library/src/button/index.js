@@ -59,7 +59,13 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			id: 'link',
 			label: __( 'Link' ),
 			type: 'url',
-			Edit: 'link', // TODO: replace with custom component
+			// TODO: replace with custom component
+			Edit: {
+				control: 'link',
+				// Match the settings offered by the block's toolbar link
+				// popover.
+				settings: [ 'opensInNewTab', 'nofollow' ],
+			},
 			getValue: ( { item } ) => ( {
 				url: item.url,
 				rel: item.rel,
