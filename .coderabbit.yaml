@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+
+# CodeRabbit discovers AGENTS.md files automatically. Skills need an explicit
+# mapping because their directory does not match the source files they govern.
+inheritance: true
+knowledge_base:
+    code_guidelines:
+        filePatterns:
+            - files: '.agents/skills/**/SKILL.md'
+              applyTo: '**'
