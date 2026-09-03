@@ -432,16 +432,16 @@ export default function QueryInspectorControls( props ) {
 					{ showSearchControl && (
 						<ToolsPanelItem
 							hasValue={ () => !! querySearch }
-							label={ __( 'Keyword' ) }
+							label={ __( 'Search terms' ) }
 							onDeselect={ () => {
 								setQuery( { search: '' } );
 								setQuerySearch( '' );
 							} }
 						>
 							<TextControl
-								label={ __( 'Keyword' ) }
+								label={ __( 'Search terms' ) }
 								help={ __(
-									'Filter the query by keywords in the title, excerpt, or content.'
+									'Filter the query by keywords that appear in the content, title, or excerpt.'
 								) }
 								value={ querySearch }
 								onChange={ ( newQuerySearch ) => {
