@@ -19,6 +19,7 @@ import { DataViewsPicker } from '@wordpress/dataviews';
 import type {
 	Field,
 	ActionButton,
+	Filter,
 	SupportedLayouts,
 	View,
 } from '@wordpress/dataviews';
@@ -58,6 +59,9 @@ const NOTICES_CONTEXT = 'media-modal';
 
 // Notice ID - reused for all upload-related notices to prevent flooding
 const NOTICE_ID_UPLOAD_PROGRESS = 'media-modal-upload-progress';
+
+// The one filter the modal keeps out of the persisted view.
+const ATTACHED_TO_FIELD = 'attached_to';
 
 type ViewQueryParams = Pick< View, 'page' | 'search' >;
 
@@ -267,7 +271,12 @@ export function MediaUploadModal( {
 	);
 
 	// Persist view configuration across sessions via the preferences store.
-	const { view, updateView, isModified, resetToDefault } = useView( {
+	const {
+		view: persistedView,
+		updateView,
+		isModified,
+		resetToDefault,
+	} = useView( {
 		kind: 'postType',
 		name: 'attachment',
 		slug: 'media-modal',
@@ -276,6 +285,28 @@ export function MediaUploadModal( {
 		onChangeQueryParams: setQueryParams,
 	} );
 
+	// The "Attached to" filter is deliberately not persisted. A standing
+	// preference like author or mime type is worth carrying between posts, but
+	// scoping the library to the post being edited, or to unattached media, is a
+	// choice about the task at hand — one that is easy to set, easy to forget,
+	// and hides most of the library once it follows the user somewhere else. It
+	// lives here instead, for as long as the picker is on screen.
+	const [ attachedToFilter, setAttachedToFilter ] = useState<
+		Filter | undefined
+	>();
+
+	const view = useMemo( () => {
+		const filters = ( persistedView.filters ?? [] ).filter(
+			( { field } ) => field !== ATTACHED_TO_FIELD
+		);
+		return {
+			...persistedView,
+			filters: attachedToFilter
+				? [ ...filters, attachedToFilter ]
+				: filters,
+		};
+	}, [ persistedView, attachedToFilter ] );
+
 	// Normalize undefined transient DataViews values so they do not persist as modified modal preferences.
 	const handleChangeView = useCallback(
 		( nextView: View ) => {
@@ -283,10 +314,25 @@ export function MediaUploadModal( {
 			if ( normalizedView.startPosition === undefined ) {
 				delete normalizedView.startPosition;
 			}
-			updateView( normalizedView );
+			setAttachedToFilter(
+				normalizedView.filters?.find(
+					( { field } ) => field === ATTACHED_TO_FIELD
+				)
+			);
+			updateView( {
+				...normalizedView,
+				filters: normalizedView.filters?.filter(
+					( { field } ) => field !== ATTACHED_TO_FIELD
+				),
+			} );
 		},
 		[ updateView ]
 	);
+
+	const handleReset = useCallback( () => {
+		setAttachedToFilter( undefined );
+		resetToDefault();
+	}, [ resetToDefault ] );
 
 	// Build query args based on view properties, similar to PostList
 	const queryArgs = useMemo( () => {
@@ -318,11 +364,10 @@ export function MediaUploadModal( {
 				filters.mime_type = filter.value;
 			}
 			// Handle attachment parent filters. The filter stores context-free
-			// sentinels rather than post IDs, because the view — filters included —
-			// is persisted across sessions and would otherwise carry a stale post
-			// ID into the modal opened from a different post.
+			// sentinels rather than post IDs, so that an option is never tied to
+			// a post the modal is no longer looking at.
 			if (
-				filter.field === 'attached_to' &&
+				filter.field === ATTACHED_TO_FIELD &&
 				filter.operator === 'isAny'
 			) {
 				const parents = (
@@ -705,7 +750,7 @@ export function MediaUploadModal( {
 				config={ dataViewsConfig }
 				getItemId={ ( item: RestAttachment ) => String( item.id ) }
 				itemListLabel={ __( 'Media items' ) }
-				onReset={ isModified ? resetToDefault : false }
+				onReset={ isModified || attachedToFilter ? handleReset : false }
 			>
 				<Stack
 					direction="row"
