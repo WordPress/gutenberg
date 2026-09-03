@@ -14,6 +14,9 @@
 	}
 
 	.wp-block-search__resizer {
+		top: 0;
+		left: 0;
+
 		// The overlay only carries handles, so it must not intercept clicks
 		// meant for the field or the button.
 		pointer-events: none;

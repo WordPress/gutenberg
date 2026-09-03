@@ -38,14 +38,44 @@ test.describe( 'Search', () => {
 		editor,
 	} ) => {
 		// An inline width of `auto` would override anything coming from
-		// Global Styles or the stylesheet.
-		await editor.insertBlock( { name: 'core/search' } );
+		// Global Styles or the stylesheet. The border puts a `border-width`
+		// declaration on the same element, so the assertion below has to tell
+		// the two apart.
+		await editor.insertBlock( {
+			name: 'core/search',
+			attributes: {
+				buttonPosition: 'button-inside',
+				style: { border: { width: '2px', style: 'solid' } },
+			},
+		} );
 
 		const wrapper = editor.canvas.locator(
 			'.wp-block-search__inside-wrapper'
 		);
 
-		await expect( wrapper ).not.toHaveAttribute( 'style', /width:/ );
+		await expect( wrapper ).toHaveAttribute( 'style', /border-width/ );
+		await expect( wrapper ).not.toHaveAttribute(
+			'style',
+			/(?:^|;)\s*width:/
+		);
+	} );
+
+	test( 'survives a width that is not a string', async ( { editor } ) => {
+		// Hand-written or generated content can put a number here. The server
+		// ignores it, and the editor has to do the same rather than throw.
+		await editor.insertBlock( {
+			name: 'core/search',
+			attributes: { style: { dimensions: { width: 350 } } },
+		} );
+
+		const searchBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Search',
+		} );
+
+		await expect( searchBlock ).toBeVisible();
+		await expect(
+			editor.canvas.locator( '.wp-block-search__inside-wrapper' )
+		).not.toHaveAttribute( 'style', /(?:^|;)\s*width:/ );
 	} );
 
 	test( 'stores a pixel width after dragging the resize handle', async ( {

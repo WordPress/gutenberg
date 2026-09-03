@@ -151,8 +151,11 @@ export default function SearchEdit( {
 	// in the editor the way they do on the front end.
 	const width = style?.dimensions?.width;
 	const widthStyle = useMemo( () => {
-		// '0' is the Width control's "None" step, not a zero-width field.
-		if ( ! width || '0' === width ) {
+		// The attribute is free-form, so hand-written content can put anything
+		// here. `styles_for_block_core_search()` ignores a non-string width,
+		// and so does this. '0' is the Width control's "None" step rather than
+		// a zero-width field.
+		if ( typeof width !== 'string' || ! width || '0' === width ) {
 			return undefined;
 		}
 		if ( width.startsWith( DIMENSION_PRESET_PREFIX ) ) {
@@ -585,13 +588,11 @@ export default function SearchEdit( {
 						<ResizableBox
 							className="wp-block-search__resizer"
 							size={ wrapperSize }
-							// The wrapper is the positioned ancestor, so the
-							// overlay lines up with it exactly.
-							style={ {
-								position: 'absolute',
-								top: 0,
-								left: 0,
-							} }
+							// re-resizable writes `position: relative` inline, so
+							// only an inline style can override it. Placement
+							// lives in the stylesheet, where it gets flipped
+							// for RTL.
+							style={ { position: 'absolute' } }
 							enable={ getResizableSides() }
 							onResizeStart={ () => toggleSelection( false ) }
 							onResize={ ( event, direction, elt ) =>
