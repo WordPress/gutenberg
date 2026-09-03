@@ -11,7 +11,6 @@ import {
 	exportPattern,
 	permanentlyDeletePost,
 	restorePost,
-	trashDraft,
 	trashPost,
 	renamePost,
 	resetPost,
@@ -233,7 +232,6 @@ export const registerPostTypeSchema =
 			restorePost,
 			resetPost,
 			deletePost,
-			trashDraft,
 			trashPost,
 			permanentlyDeletePost,
 		].filter( Boolean );
