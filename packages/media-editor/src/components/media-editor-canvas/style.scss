@@ -1,0 +1,50 @@
+@use "@wordpress/base-styles/animations" as *;
+@use "@wordpress/base-styles/colors" as *;
+
+// The canvas wrapper fills the modal's canvas area so the cropper has a
+// sized parent (the cropper uses 100% width/height of its container).
+// `position: relative` establishes a stacking context for any future
+// overlays rendered inside the canvas.
+.media-editor-canvas {
+	position: relative;
+	width: 100%;
+	height: 100%;
+
+	// The cropper stays mounted while loading so the image decodes behind the
+	// spinner and reveals in one paint. It's hidden and non-interactive until
+	// the image has loaded, then fades in.
+	&__cropper {
+		width: 100%;
+		height: 100%;
+		opacity: 0;
+		pointer-events: none;
+
+		// Explicit `opacity: 1` (not just the animation's fill mode) keeps the
+		// cropper visible for reduced-motion users, since `animation__fade-in`
+		// is gated behind `@media not (prefers-reduced-motion)`.
+		&.is-loaded {
+			opacity: 1;
+			pointer-events: auto;
+			@include animation__fade-in( 0.2s );
+		}
+	}
+
+	&__spinner {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+	}
+
+	// Centered fallback shown in place of the cropper when the image
+	// fails to load.
+	&__error {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		height: 100%;
+		color: $gray-700;
+		text-align: center;
+	}
+}

@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { readdirSync } from 'fs';
 import path from 'path';
-
-/**
- * Internal dependencies
- */
 import { getPackageInfoFromFile } from './package-utils.mjs';
 
 /**

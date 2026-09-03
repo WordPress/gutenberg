@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type {
 	ComponentPropsWithoutRef,
@@ -8,18 +5,16 @@ import type {
 	HTMLAttributes,
 	MouseEvent,
 	ReactElement,
+	ReactNode,
 } from 'react';
-
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
-import { forwardRef } from '@wordpress/element';
+import {
+	Children,
+	Fragment,
+	forwardRef,
+	isValidElement,
+} from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import Tooltip from '../tooltip';
 import Icon from '../icon';
 import { VisuallyHidden } from '../visually-hidden';
@@ -27,6 +22,30 @@ import type { ButtonProps, DeprecatedButtonProps } from './types';
 import { positionToPlacement } from '../popover/utils';
 
 const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ] as const;
+
+/**
+ * Whether `children` will render any content, to differentiate an icon-only
+ * button or an icon-with-text button.
+ *
+ * `Children.toArray` discards the children that render nothing (`null`,
+ * `undefined`, and booleans), which is what conditionally rendered content
+ * evaluates to when its condition is unmet.
+ *
+ * @param children The children passed to the button.
+ */
+const hasRenderableChildren = ( children: ReactNode ): boolean =>
+	Children.toArray( children ).some( ( child ) => {
+		if ( ! isValidElement( child ) ) {
+			return child !== '';
+		}
+
+		if ( child.type === Fragment ) {
+			return hasRenderableChildren( child.props.children );
+		}
+
+		// A tooltip should not be considered as a child.
+		return child.props.className !== 'components-tooltip';
+	} );
 
 function useDeprecatedProps( {
 	__experimentalIsFocusable,
@@ -104,7 +123,7 @@ function useDeprecatedProps( {
  * );
  * ```
  */
-export function UnforwardedButton(
+export const Button = forwardRef( function UnforwardedButton(
 	props: ButtonProps & DeprecatedButtonProps,
 	ref: ForwardedRef< any >
 ) {
@@ -146,14 +165,6 @@ export function UnforwardedButton(
 		'components-button__description'
 	);
 
-	const hasChildren =
-		( 'string' === typeof children && !! children ) ||
-		( Array.isArray( children ) &&
-			children?.[ 0 ] &&
-			children[ 0 ] !== null &&
-			// Tooltip should not considered as a child
-			children?.[ 0 ]?.props?.className !== 'components-tooltip' );
-
 	const truthyAriaPressedValues: ( typeof ariaPressed )[] = [
 		true,
 		'true',
@@ -174,7 +185,7 @@ export function UnforwardedButton(
 		'is-busy': isBusy,
 		'is-link': variant === 'link',
 		'is-destructive': isDestructive,
-		'has-text': !! icon && ( hasChildren || text ),
+		'has-text': !! icon && ( text || hasRenderableChildren( children ) ),
 		'has-icon': !! icon,
 		'has-icon-right': iconPosition === 'right',
 	} );
@@ -301,8 +312,6 @@ export function UnforwardedButton(
 			) }
 		</>
 	);
-}
+} );
 
-export const Button = forwardRef( UnforwardedButton );
-Button.displayName = 'Button';
 export default Button;

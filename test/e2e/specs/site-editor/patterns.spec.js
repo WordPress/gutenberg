@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const {
 	test: base,
 	expect,
@@ -19,12 +16,12 @@ test.describe( 'Patterns', () => {
 		await requestUtils.deleteAllBlocks();
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-	} );
-
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllBlocks();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test( 'create a new pattern', async ( {
@@ -72,7 +69,7 @@ test.describe( 'Patterns', () => {
 		).toBeVisible();
 
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'My pattern' );
 
