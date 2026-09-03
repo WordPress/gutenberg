@@ -15,8 +15,6 @@ const MAX_CACHED_LUMINANCES = 2_048;
 const luminanceCache = new Map< string, number >();
 const objectLuminanceCache = new WeakMap< PlainColorObject, number >();
 
-ColorSpace.register( sRGB );
-
 /**
  * Serialize a color as rounded sRGB hex.
  *
@@ -24,6 +22,7 @@ ColorSpace.register( sRGB );
  *              hex value, e.g. `#3858e9`).
  */
 export function getColorString( color: string | PlainColorObject ): string {
+	ColorSpace.register( sRGB );
 	const rgbRounded = serialize( to( color, sRGB ) );
 	return serialize( rgbRounded, { format: 'hex' } );
 }
@@ -69,6 +68,7 @@ export function getRelativeLuminance(
 		return cachedLuminance;
 	}
 
+	ColorSpace.register( sRGB );
 	const luminance = Math.max( getLuminance( color ), 0 );
 	if ( luminanceCache.size >= MAX_CACHED_LUMINANCES ) {
 		const oldestKey = luminanceCache.keys().next().value;
@@ -106,6 +106,7 @@ export function getContrastFromLuminances(
  * @throws If `seed` is not an sRGB-parseable, fully opaque string.
  */
 export function assertValidSeedColor( seed: string ): void {
+	ColorSpace.register( sRGB );
 	let parsedColor: ReturnType< typeof parse >;
 	try {
 		parsedColor = parse( seed );
@@ -138,5 +139,8 @@ export function assertValidSeedColor( seed: string ): void {
  * @param c A `PlainColorObject`, or an sRGB-parseable string.
  */
 export function clampToGamut( c: string | PlainColorObject ) {
+	if ( typeof c === 'string' ) {
+		ColorSpace.register( sRGB );
+	}
 	return to( toGamut( c, { space: sRGB, method: 'css' } ), OKLCH );
 }

@@ -1,14 +1,11 @@
 import { forwardRef } from '@wordpress/element';
-import { ColorSpace, deltaEOK2, OKLab, sRGB } from 'colorjs.io/fn';
+import { ColorSpace, deltaEOK2, sRGB } from 'colorjs.io/fn';
 import type {
 	ThemeProviderColorRampName,
 	ThemeProviderColorWarning,
 } from '../../theme-provider-color-warnings';
 import colorTokenAliases from '../../prebuilt/ts/color-tokens';
 import type { Ramp } from '../lib/types';
-
-ColorSpace.register( sRGB );
-ColorSpace.register( OKLab );
 
 const MEANINGFUL_SEED_DELTA_E = 0.002;
 
@@ -114,6 +111,7 @@ export function hasColorWarningForRamp(
 }
 
 function isSeedAdjusted( seed: string, generatedAnchor: string ) {
+	ColorSpace.register( sRGB );
 	return deltaEOK2( seed, generatedAnchor ) > MEANINGFUL_SEED_DELTA_E;
 }
 

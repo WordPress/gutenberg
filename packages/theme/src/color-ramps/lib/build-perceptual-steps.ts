@@ -15,11 +15,6 @@ import { UNIVERSAL_CONTRAST_TOPUP } from './constants.ts';
 import type { AccentRampPurpose, BaseRamp, BaseRampResult } from './types.ts';
 import { solveWithBisect } from './utils.ts';
 
-ColorSpace.register( sRGB );
-ColorSpace.register( OKLab );
-ColorSpace.register( OKLCH );
-ColorSpace.register( OKLrab );
-
 type GetColorAtLightness = ( lightness: number ) => PlainColorObject;
 
 const MINIMUM_CROSS_LANE_LIGHTNESS_GAP = 0.005;
@@ -487,6 +482,7 @@ export function buildPerceptualSteps(
 	backgroundRamp?: BaseRampResult,
 	purpose: AccentRampPurpose = 'full'
 ): BaseRampResult {
+	ColorSpace.register( sRGB );
 	const surfaceResult = {
 		...ramp,
 		ramp: rebuildSurfaces( ramp, purpose ),

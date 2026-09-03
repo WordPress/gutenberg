@@ -13,6 +13,7 @@
 
 ### Internal
 
+-   Register color spaces only when calculating colors, avoiding module-import side effects. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 -   Skip unused ramp outputs and redundant base foreground solves, and calculate status interaction colors only when contrast correction needs them. Preserve semantic colors and contrast checks. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 -   Generate the default ramps before derived token artifacts so one build uses the current ramp algorithm throughout. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 -   Enforce NodeNext module resolution in the build project so future declaration imports are checked against the package's published ESM resolution rules. ([#82088](https://github.com/WordPress/gutenberg/pull/82088))
