@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 10.0.1-next.0 (2026-09-03)
+
 ### Internal
 
 -   `ComplementaryAreaMoreMenuItem`: Stop passing a `selectedIcon`. The component the item renders as shows the selection ([#81564](https://github.com/WordPress/gutenberg/pull/81564)).

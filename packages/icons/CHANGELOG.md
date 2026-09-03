@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 16.0.0-next.0 (2026-09-03)
+
 ### Breaking Changes
 
 -   The `search` icon is now stroke-based. Use CSS `color` rather than `fill` to recolor it. ([#82338](https://github.com/WordPress/gutenberg/pull/82338))

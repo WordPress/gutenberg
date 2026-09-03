@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.55.0-next.0 (2026-09-03)
+
 ### New Features
 
 -   Export the `RichTextFormat` type, describing a single format applied to a range of characters within a `RichTextValue` ([#79486](https://github.com/WordPress/gutenberg/pull/79486)).

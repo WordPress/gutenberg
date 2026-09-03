@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.55.0-next.0 (2026-09-03)
+
 ### Enhancements
 
 -   Error boundary: Surface debugging details ([#{TODO}](https://github.com/WordPress/gutenberg/pull/{TODO})).

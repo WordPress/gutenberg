@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 35.0.0-next.0 (2026-09-03)
+
 ### Breaking Changes
 
 -   Require Node.js `^20.19.0 || >=22.13.0` and upgrade the bundled Stylelint to `^17.14.1` ([#80738](https://github.com/WordPress/gutenberg/pull/80738)).

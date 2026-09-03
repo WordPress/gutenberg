@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 14.1.1-next.0 (2026-09-03)
+
 ### Internal
 
 -   Update `babel-jest` to 30.5.0 ([#82181](https://github.com/WordPress/gutenberg/pull/82181)).

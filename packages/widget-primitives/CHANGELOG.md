@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.6.1-next.0 (2026-09-03)
+
 ### Documentation
 
 -   `WidgetHostLinks.match`: the in-app route it returns carries the

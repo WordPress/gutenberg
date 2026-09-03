@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 40.1.0-next.0 (2026-09-03)
+
 ### Enhancements
 
 -   `Popover`: Widen `offset` to also accept an object with separate main and cross axis offsets. The same applies to `BorderBoxControl`'s `popoverOffset` prop ([#82060](https://github.com/WordPress/gutenberg/pull/82060)).

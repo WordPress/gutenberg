@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 15.0.0-next.0 (2026-09-03)
+
 ### Breaking Changes
 
 -   `PluginMoreMenuItem`, `PluginSidebarMoreMenuItem`: Items render with the `Menu` component of `@wordpress/ui` instead of `MenuItem`. A link item honors only `target="_blank"` ([#81564](https://github.com/WordPress/gutenberg/pull/81564)).

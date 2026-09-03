@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.54.1-next.0 (2026-09-03)
+
 ### Bug Fixes
 
 -   Prevent Highlight format toolbar from crashing when switching to Edit as HTML with background-only formatting active. ([#82215](https://github.com/WordPress/gutenberg/pull/82215))

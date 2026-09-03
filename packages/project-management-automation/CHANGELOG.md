@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.0.0-next.0 (2026-09-03)
+
 ### Breaking Changes
 
 -   The first-time contributor welcome message is no longer posted as a comment. The action now exposes it as the `welcome-prompt` output ([#82249](https://github.com/WordPress/gutenberg/pull/82249)).

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 8.0.0-next.0 (2026-09-03)
+
 ### Breaking Changes
 
 -   The entity record selectors infer the record from their `kind` and `name` arguments with a `const` type parameter. TypeScript consumers now require TypeScript 5 or newer. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))

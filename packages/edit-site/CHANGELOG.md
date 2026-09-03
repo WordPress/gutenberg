@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.4.0-next.0 (2026-09-03)
+
 ### Enhancements
 
 -   Add New Template: Use the Button component's focus ring instead of the legacy `box-shadow` ones ([#80138](https://github.com/WordPress/gutenberg/issues/80138)).

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 17.1.0-next.0 (2026-09-03)
+
 ### New Features
 
 -   `BackgroundImageControl`: Support setting the background image from a URL, through the URL field in the media replace popover ([#82230](https://github.com/WordPress/gutenberg/pull/82230)).

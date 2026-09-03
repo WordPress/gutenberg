@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 13.1.0-next.0 (2026-09-03)
+
 ### Enhancements
 
 -   Add a `$block-bg-padding` variable that resolves the default background padding through the `--wp--style--block-background-padding` custom property, keeping the existing values as its fallback ([#82024](https://github.com/WordPress/gutenberg/pull/82024)).

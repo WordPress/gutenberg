@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 26.0.0-next.0 (2026-09-03)
+
 ### Breaking Changes
 
 -   The `esnext` ruleset no longer configures a parser, so JavaScript and JSX files are parsed by ESLint's default parser instead of `@babel/eslint-parser` ([#82144](https://github.com/WordPress/gutenberg/pull/82144)).

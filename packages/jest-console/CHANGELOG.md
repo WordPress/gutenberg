@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 9.2.1-next.0 (2026-09-03)
+
 ### Bug Fixes
 
 -   Keep console spies active when Jest restores its own mocks ([#82211](https://github.com/WordPress/gutenberg/pull/82211)).

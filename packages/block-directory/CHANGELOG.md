@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.54.1-next.0 (2026-09-03)
+
 ### Bug Fixes
 
 -   `BlockRatings`: Preserve full, half, and empty star colors after the icons became stroke-based. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))

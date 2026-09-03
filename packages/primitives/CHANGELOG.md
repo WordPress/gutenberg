@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.54.1-next.0 (2026-09-03)
+
 ### Internal
 
 -   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).

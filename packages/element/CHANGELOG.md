@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 8.6.1-next.0 (2026-09-03)
+
 ### Internal
 
 -   Remove unused dependency `@wordpress/deprecated` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).

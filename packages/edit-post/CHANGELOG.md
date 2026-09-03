@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 8.54.1-next.0 (2026-09-03)
+
 ### Bug Fixes
 
 -   `WelcomeGuide`: Keep the modal close icon white now that it is stroke-based ([#78812](https://github.com/WordPress/gutenberg/pull/78812)).

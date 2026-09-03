@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.21.1-next.0 (2026-09-03)
+
 ### Bug Fixes
 
 -   Font Library: Wait for the current global styles ID before loading its entity record. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))

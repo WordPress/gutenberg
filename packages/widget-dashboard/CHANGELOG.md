@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.7.0-next.0 (2026-09-03)
+
 ### New Features
 
 -   `WidgetDashboard.Policy`: a provider that governs the dashboards below

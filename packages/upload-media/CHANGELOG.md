@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.39.1-next.0 (2026-09-03)
+
 ### Internal
 
 -   Add a private `getFailureCount` selector, a running tally of top-level items cancelled because they failed. Failed items leave the queue just like successful ones, so this is the only record that an upload did not make it ([#81132](https://github.com/WordPress/gutenberg/issues/81132)).
