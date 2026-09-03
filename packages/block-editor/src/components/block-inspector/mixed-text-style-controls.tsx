@@ -142,55 +142,74 @@ function MixedTextStylePanels( {
 }
 
 export default function MixedTextStyleControls( { clientIds, panels } ) {
-	const {
-		blockTypes,
-		commonSupportedStyles,
-		settingsByTarget,
-		sourceClientId,
-		sourceName,
-		targetClientIds,
-	} = useSelect(
+	const targetClientIds = useSelect(
 		( select ) => {
 			const blockEditorSelect = select( blockEditorStore );
 			const blocksSelect = select( blocksStore );
-			const targetIds = getTextStyleTargetClientIds(
+
+			return getTextStyleTargetClientIds(
 				clientIds,
 				blockEditorSelect.getBlockName,
 				blocksSelect.getBlockType
 			);
-			const blockNames = targetIds.map( ( clientId ) =>
-				blockEditorSelect.getBlockName( clientId )
-			);
-			const types = blockNames.map( ( blockName ) =>
-				blocksSelect.getBlockType( blockName )
-			);
-			const { getSupportedStyles } = unlock( blocksSelect );
-			const { getBlockSettings } = unlock( blockEditorSelect );
-			const supportedStylesByBlock = blockNames.map( ( blockName ) =>
-				getSupportedStyles( blockName )
-			);
-
-			return {
-				blockTypes: types,
-				commonSupportedStyles: getCommonSupportedStyles(
-					supportedStylesByBlock
-				),
-				settingsByTarget: targetIds.map( ( clientId ) =>
-					createBlockStyleSettings(
-						BLOCK_STYLE_SETTINGS_PATHS,
-						getBlockSettings(
-							clientId,
-							...BLOCK_STYLE_SETTINGS_PATHS
-						)
-					)
-				),
-				sourceClientId: targetIds[ 0 ],
-				sourceName: blockNames[ 0 ],
-				targetClientIds: targetIds,
-			};
 		},
 		[ clientIds ]
 	);
+	const blockNames = useSelect(
+		( select ) =>
+			targetClientIds.map( ( clientId ) =>
+				select( blockEditorStore ).getBlockName( clientId )
+			),
+		[ targetClientIds ]
+	);
+	const blockTypes = useSelect(
+		( select ) =>
+			blockNames.map( ( blockName ) =>
+				select( blocksStore ).getBlockType( blockName )
+			),
+		[ blockNames ]
+	);
+	const supportedStylesByBlock = useSelect(
+		( select ) => {
+			const { getSupportedStyles } = unlock( select( blocksStore ) );
+
+			return blockNames.map( ( blockName ) =>
+				getSupportedStyles( blockName )
+			);
+		},
+		[ blockNames ]
+	);
+	const settingValues = useSelect(
+		( select ) => {
+			const { getBlockSettings } = unlock( select( blockEditorStore ) );
+
+			return targetClientIds.flatMap( ( clientId ) =>
+				getBlockSettings( clientId, ...BLOCK_STYLE_SETTINGS_PATHS )
+			);
+		},
+		[ targetClientIds ]
+	);
+	const commonSupportedStyles = useMemo(
+		() => getCommonSupportedStyles( supportedStylesByBlock ),
+		[ supportedStylesByBlock ]
+	);
+	const settingsByTarget = useMemo(
+		() =>
+			targetClientIds.map( ( _, index ) => {
+				const start = index * BLOCK_STYLE_SETTINGS_PATHS.length;
+
+				return createBlockStyleSettings(
+					BLOCK_STYLE_SETTINGS_PATHS,
+					settingValues.slice(
+						start,
+						start + BLOCK_STYLE_SETTINGS_PATHS.length
+					)
+				);
+			} ),
+		[ settingValues, targetClientIds ]
+	);
+	const sourceClientId = targetClientIds[ 0 ];
+	const sourceName = blockNames[ 0 ];
 
 	const blockEditContext = useMemo(
 		() => ( {

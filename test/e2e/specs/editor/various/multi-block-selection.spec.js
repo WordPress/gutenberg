@@ -1088,10 +1088,12 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		);
 		await editor.openDocumentSettingsSidebar();
 
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await editorSettings.getByRole( 'tab', { name: 'Styles' } ).click();
 		await expect(
-			page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'heading', { name: 'Typography' } )
+			editorSettings.getByRole( 'heading', { name: 'Typography' } )
 		).toBeHidden();
 	} );
 

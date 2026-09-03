@@ -39,7 +39,9 @@ import {
 	hasViewportBlockStyleState,
 	isDefaultBlockStyleState,
 } from '../../hooks/block-style-state';
-import MixedTextStyleControls from './mixed-text-style-controls';
+import MixedTextStyleControls, {
+	SECTION_TEXT_STYLE_PANELS,
+} from './mixed-text-style-controls';
 import {
 	getContentOnlySectionClientIds,
 	getExpandedTextStyleTargetClientIds,
@@ -382,6 +384,7 @@ function BlockInspector() {
 				<MultiSelectionInspector />
 				<MixedTextStyleControls
 					clientIds={ mixedSelectionTextStyleClientIds }
+					panels={ SECTION_TEXT_STYLE_PANELS }
 				/>
 			</div>
 		);
@@ -605,6 +608,7 @@ const BlockInspectorSingleBlock = ( {
 					{ isSectionBlock && (
 						<MixedTextStyleControls
 							clientIds={ textStyleClientIds }
+							panels={ SECTION_TEXT_STYLE_PANELS }
 						/>
 					) }
 					{ ! isSectionBlock && <StyleInspectorSlots /> }

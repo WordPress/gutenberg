@@ -1,3 +1,4 @@
+import { useMemo } from '@wordpress/element';
 import { BackgroundImagePanel } from '../../hooks/background';
 import { BorderPanel } from '../../hooks/border';
 import { DimensionsPanel } from '../../hooks/dimensions';
@@ -20,15 +21,18 @@ export default function BlockStylePanels( {
 	panelWrappers = {},
 	panels = DEFAULT_PANELS,
 } ) {
-	const panelSettings = {
-		...settings,
-		typography: {
-			...settings.typography,
-			// The text alignment UI for individual blocks is rendered in
-			// the block toolbar, so disable it here.
-			textAlign: false,
-		},
-	};
+	const panelSettings = useMemo(
+		() => ( {
+			...settings,
+			typography: {
+				...settings.typography,
+				// The text alignment UI for individual blocks is rendered in
+				// the block toolbar, so disable it here.
+				textAlign: false,
+			},
+		} ),
+		[ settings ]
+	);
 
 	const passedProps = {
 		clientId,
