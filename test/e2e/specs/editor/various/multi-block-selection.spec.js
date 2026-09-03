@@ -257,7 +257,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			.toEqual( [ 3 ] );
 	} );
 
-	test( 'should deselect with Escape', async ( {
+	test( 'should keep the selection when stepping out with Escape', async ( {
 		page,
 		editor,
 		pageUtils,
@@ -276,11 +276,23 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
 			.toEqual( [ 1, 2, 3 ] );
 
+		// Escape steps out of the canvas onto its stop without removing the
+		// selection.
 		await page.keyboard.press( 'Escape' );
+
+		await expect(
+			page.getByRole( 'button', { name: 'Editor canvas' } )
+		).toBeFocused();
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 1, 2, 3 ] );
+
+		// Enter returns to the selection.
+		await page.keyboard.press( 'Enter' );
 
 		await expect
 			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
-			.toEqual( [ 1 ] );
+			.toEqual( [ 1, 2, 3 ] );
 	} );
 
 	test( 'should present the editing host semantics during a cross-block selection', async ( {

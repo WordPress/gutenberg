@@ -196,12 +196,10 @@ export default function useTabNav() {
 				! event.metaKey &&
 				! event.altKey
 			) {
-				// When multiple blocks are selected, Escape first collapses
-				// the selection to a single block, and when a content-only
-				// section is being edited, Escape first stops editing it.
-				// Those handlers live in the parent document and run after
-				// this one, so leave the key to them.
-				if ( hasMultiSelection() || getEditedContentOnlySection() ) {
+				// While a content-only section is being edited, Escape first
+				// stops editing it. That handler lives in the parent
+				// document and runs after this one, so leave the key to it.
+				if ( getEditedContentOnlySection() ) {
 					return;
 				}
 				if ( focusCaptureBeforeRef.current ) {
