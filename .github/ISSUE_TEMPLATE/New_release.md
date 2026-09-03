@@ -22,6 +22,9 @@ This issue is to provide visibility on the progress of the release process of Gu
 
 ## Checklist
 
+### Before RC Day
+- [ ] Is the "Tested up to" WordPress Version in [`readme.txt`](https://github.com/WordPress/gutenberg/blob/trunk/readme.txt#L3) accurate?
+
 ### RC Day - {WEEKDAY}, {MONTH}, {DATE}
 
 -   [ ] Post a message in `#core-editor` channel to let folks know you are starting the RC release process
