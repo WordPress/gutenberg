@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-site",
-	"version": "7.3.1-prerelease",
+	"version": "7.3.0",
 	"description": "Edit Site Page module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -85,6 +85,9 @@
 		"@wordpress/widgets": "file:../widgets",
 		"change-case": "^4.1.2",
 		"clsx": "^2.1.1"
+	},
+	"devDependencies": {
+		"vitest": "^4.1.10"
 	},
 	"peerDependencies": {
 		"react": "^18 || ^19",

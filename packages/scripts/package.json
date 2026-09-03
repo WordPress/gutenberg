@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/scripts",
-	"version": "34.3.0-prerelease",
+	"version": "34.2.0",
 	"description": "Collection of reusable scripts for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,7 +19,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0",
+		"node": "^20.19.0 || >=22.13.0",
 		"npm": ">=8.19.2"
 	},
 	"files": [
@@ -48,7 +48,7 @@
 		"@wordpress/prettier-config": "file:../prettier-config",
 		"@wordpress/stylelint-config": "file:../stylelint-config",
 		"adm-zip": "^0.6.0",
-		"babel-jest": "^30.4.1",
+		"babel-jest": "^30.5.0",
 		"babel-loader": "^9.2.1",
 		"browserslist": "^4.28.4",
 		"chalk": "^4.1.1",
@@ -60,8 +60,8 @@
 		"dir-glob": "^3.0.1",
 		"eslint": "^10.0.0",
 		"fast-glob": "^3.2.7",
-		"jest": "^30.4.1",
-		"jest-environment-jsdom": "^30.4.1",
+		"jest": "^30.5.0",
+		"jest-environment-jsdom": "^30.5.0",
 		"json2php": "^0.0.9",
 		"markdownlint-cli": "^0.31.1",
 		"mini-css-extract-plugin": "^2.9.2",
@@ -79,7 +79,7 @@
 		"sass-loader": "^16.0.3",
 		"schema-utils": "^4.2.0",
 		"source-map-loader": "^3.0.0",
-		"stylelint": "^16.26.1",
+		"stylelint": "^17.14.1",
 		"terser-webpack-plugin": "^5.3.10",
 		"url-loader": "^4.1.1",
 		"webpack": "^5.108.1",
@@ -88,7 +88,8 @@
 		"webpack-dev-server": "^5.2.1"
 	},
 	"devDependencies": {
-		"rimraf": "^5.0.10"
+		"rimraf": "^5.0.10",
+		"vitest": "^4.1.10"
 	},
 	"peerDependencies": {
 		"@playwright/test": ">=1",

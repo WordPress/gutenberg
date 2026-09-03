@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 2.55.0-next.0 (2026-08-28)
-
 ### Enhancements
 
 -   Resolve `.jsx` modules when generating package documentation ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).

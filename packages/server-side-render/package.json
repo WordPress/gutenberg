@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/server-side-render",
-	"version": "6.30.1-prerelease",
+	"version": "6.30.0",
 	"description": "The component used with WordPress to server-side render a preview of dynamic blocks to display in the editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -54,7 +54,7 @@
 		"@wordpress/url": "file:../url"
 	},
 	"devDependencies": {
-		"@types/jest": "^30.0.0"
+		"vitest": "^4.1.10"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

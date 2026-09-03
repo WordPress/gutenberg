@@ -1,5 +1,6 @@
 import { once } from 'node:events';
 import path from 'node:path';
+import { afterEach, expect, test } from 'vitest';
 import { spawnWatchProcess, stopWatchProcess } from '../process.mjs';
 
 let watcher;

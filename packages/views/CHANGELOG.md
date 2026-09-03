@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `useViewConfig`: request the full configuration under the same cache key as `getViewConfig( kind, name )`, so a route loader that preloads it no longer triggers a second request. ([#82141](https://github.com/WordPress/gutenberg/pull/82141))
+
 ## 1.21.0 (2026-08-26)
 
 ### Internal

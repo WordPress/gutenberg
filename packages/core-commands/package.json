@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/core-commands",
-	"version": "1.54.1-prerelease",
+	"version": "1.54.0",
 	"description": "WordPress core reusable commands.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -52,6 +52,9 @@
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/router": "file:../router",
 		"@wordpress/url": "file:../url"
+	},
+	"devDependencies": {
+		"vitest": "^4.1.10"
 	},
 	"peerDependencies": {
 		"react": "^18 || ^19",

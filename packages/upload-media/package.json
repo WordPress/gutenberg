@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/upload-media",
-	"version": "0.39.1-prerelease",
+	"version": "0.39.0",
 	"description": "Core media upload logic.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -62,7 +62,8 @@
 	},
 	"devDependencies": {
 		"@types/jest": "^30.0.0",
-		"@types/node": "^20.19.39"
+		"@types/node": "^20.19.39",
+		"vitest": "^4.1.10"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

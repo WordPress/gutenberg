@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 6.0.0-next.0 (2026-08-28)
-
 ### Breaking Changes
 
 -   Turn `@wordpress/reusable-blocks` into a deprecated no-op compatibility package. `ReusableBlocksMenuItems` renders nothing, the store selectors and actions no longer have runtime effects, and the convert/delete utilities are now no-ops. The `core/reusable-blocks` store remains registered for backward compatibility.

@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 2.1.0-next.0 (2026-08-28)
-
 ### Documentation
 
 -   Explain how consumers define light and dark themes through `ThemeProvider` color seeds ([#82039](https://github.com/WordPress/gutenberg/pull/82039)).

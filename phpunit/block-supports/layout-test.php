@@ -459,6 +459,40 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => '.wp-layout{flex-wrap:nowrap;flex-direction:column;align-items:flex-start;justify-content:flex-end;}',
 			),
+			'vertical flex layout switched to horizontal in a viewport' => array(
+				'args'            => array(
+					'selector' => '.wp-layout',
+					'layout'   => array(
+						'type'           => 'flex',
+						'orientation'    => 'vertical',
+						'flexWrap'       => 'nowrap',
+						'justifyContent' => 'center',
+					),
+					'options'  => array(
+						'viewport_overrides' => array(
+							'orientation'    => 'horizontal',
+							'justifyContent' => 'left',
+						),
+					),
+				),
+				'expected_output' => '.wp-layout{flex-direction:row;justify-content:flex-start;}',
+			),
+			'horizontal flex layout keeps flex-direction implicit in a viewport' => array(
+				'args'            => array(
+					'selector' => '.wp-layout',
+					'layout'   => array(
+						'type'           => 'flex',
+						'orientation'    => 'horizontal',
+						'justifyContent' => 'left',
+					),
+					'options'  => array(
+						'viewport_overrides' => array(
+							'justifyContent' => 'right',
+						),
+					),
+				),
+				'expected_output' => '.wp-layout{justify-content:flex-end;}',
+			),
 			'default grid layout'                          => array(
 				'args'            => array(
 					'selector' => '.wp-layout',

@@ -41,11 +41,13 @@
 	},
 	"types": "declarations.d.ts",
 	"dependencies": {
-		"jest-matcher-utils": "^30.4.1",
-		"jest-mock": "^30.4.1"
+		"jest-matcher-utils": "^30.5.0",
+		"jest-mock": "^30.5.0"
 	},
 	"devDependencies": {
-		"@types/jest": "^30.0.0"
+		"@types/jest": "^30.0.0",
+		"@types/node": "^20.19.39",
+		"vitest": "^4.1.10"
 	},
 	"peerDependencies": {
 		"jest": ">=30"
