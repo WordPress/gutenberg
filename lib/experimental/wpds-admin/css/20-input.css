@@ -10,7 +10,7 @@
  * Selector list mirrors Core's own in wp-admin/css/forms.css so the same set of
  * controls is covered — no more, no less.
  *
- * NO `!important` IN THIS FILE. See overrides.css for the one exception and why.
+ * NO `!important` IN THIS FILE. See 99-overrides.css for the one exception and why.
  */
 
 @layer wpds-overrides, wp-legacy, wpds;
@@ -83,7 +83,7 @@
 	input[type="time"],
 	input[type="url"],
 	input[type="week"] {
-		/* No height — see the note in button.css. Core's default is already 40px
+		/* No height — see the note in 10-button.css. Core's default is already 40px
 		   and its contextual rules must keep winning. */
 		padding: 0 var(--wpds-dimension-padding-md);
 	}
@@ -119,7 +119,7 @@
 		 * one side leaves Core's contextual value on the other intact, and the
 		 * arrow still gets its gutter in every context.
 		 *
-		 * No height, for the reason given in button.css.
+		 * No height, for the reason given in 10-button.css.
 		 */
 		padding-inline-end: calc(var(--wpds-dimension-padding-md) + 18px);
 	}

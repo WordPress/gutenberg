@@ -33,7 +33,7 @@ export default {
 			 * `!important` and must record what would let us delete it. Do not
 			 * widen this exception to any other file.
 			 */
-			files: [ 'lib/experimental/wpds-admin/css/overrides.css' ],
+			files: [ 'lib/experimental/wpds-admin/css/99-overrides.css' ],
 			rules: {
 				'declaration-no-important': null,
 			},

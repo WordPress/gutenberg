@@ -17,7 +17,7 @@
  * Geometry (size, margins) is deliberately left to Core: it is layout, not
  * style, and touching it would shift every checkbox on every screen.
  *
- * NO `!important` IN THIS FILE. See overrides.css for the one exception.
+ * NO `!important` IN THIS FILE. See 99-overrides.css for the one exception.
  */
 
 @layer wpds-overrides, wp-legacy, wpds;
@@ -35,7 +35,7 @@
 		border-radius: var(--wpds-border-radius-sm);
 		/*
 		 * White rather than the design system's transparent field background,
-		 * for the same reason as input.css: classic controls sit on the grey page
+		 * for the same reason as 20-input.css: classic controls sit on the grey page
 		 * background as often as on white, and a transparent control would read as
 		 * grey.
 		 */
@@ -50,7 +50,7 @@
 	}
 
 	/* -----------------------------------------------------------------------
-	   Hover — excluded from disabled, as in input.css
+	   Hover — excluded from disabled, as in 20-input.css
 	   ----------------------------------------------------------------------- */
 
 	input[type="checkbox"]:hover,

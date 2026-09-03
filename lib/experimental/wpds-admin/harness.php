@@ -165,7 +165,7 @@ function gutenberg_wpds_admin_render_harness() {
 	echo '</p>';
 
 	echo '<h2>' . esc_html__( 'Fields — invalid', 'gutenberg' ) . '</h2>';
-	echo '<p>' . esc_html__( 'Core marks the invalid border with !important, so this is driven from the wpds-overrides layer rather than input.css.', 'gutenberg' ) . '</p>';
+	echo '<p>' . esc_html__( 'Core marks the invalid border with !important, so this is driven from the wpds-overrides layer rather than 20-input.css.', 'gutenberg' ) . '</p>';
 	echo '<p class="form-invalid form-required"><input type="text" value="" placeholder="' . esc_attr__( 'Invalid field', 'gutenberg' ) . '"></p>';
 
 	echo '<h2>' . esc_html__( 'Checkboxes and radios', 'gutenberg' ) . '</h2>';
