@@ -12,7 +12,7 @@
  * `.button-small` and `.button-large` as classic-only sizes missing from the
  * design system. That is not accurate as of this branch: the React Button has
  * `is-compact` (32px) and `is-small` (24px), matching classic's heights exactly,
- * so those need no exception and are handled by button.css. `.button-large` is
+ * so those need no exception and are handled by 10-button.css. `.button-large` is
  * defined by Core as an explicit 40px, identical to the default, so it also
  * needs nothing. Only `.button-hero` is genuinely unmatched.
  */
@@ -52,7 +52,7 @@
 	/*
 	 * Hero — 48px. GENUINE EXCEPTION: no React equivalent exists.
 	 * DELETE WHEN: either a 48px size lands on the React Button (at which point
-	 * this becomes parity and moves to button.css), or Core deprecates
+	 * this becomes parity and moves to 10-button.css), or Core deprecates
 	 * `.button-hero`. Until one of those happens this rule is load-bearing.
 	 * Used by the installer and a handful of onboarding screens.
 	 */
