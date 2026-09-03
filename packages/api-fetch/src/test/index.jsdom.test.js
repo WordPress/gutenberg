@@ -359,4 +359,64 @@ describe( 'apiFetch', () => {
 
 		await apiFetch( expectedOptions );
 	} );
+
+	describe( 'unregister', () => {
+		it( 'should stop calling a middleware once it is unregistered', async () => {
+			const middleware = jest.fn( ( options, next ) => next( options ) );
+			const fetchHandler = jest
+				.fn()
+				.mockResolvedValue( DEFAULT_FETCH_MOCK_RETURN );
+			apiFetch.setFetchHandler( fetchHandler );
+
+			apiFetch.use( middleware );
+
+			await apiFetch( { path: '/random' } );
+			expect( middleware ).toHaveBeenCalledTimes( 1 );
+
+			apiFetch.unregister( middleware );
+
+			await apiFetch( { path: '/random' } );
+			expect( middleware ).toHaveBeenCalledTimes( 1 );
+			expect( fetchHandler ).toHaveBeenCalledTimes( 2 );
+		} );
+
+		it( 'should report whether the middleware was registered', () => {
+			const middleware = ( options, next ) => next( options );
+
+			expect( apiFetch.unregister( middleware ) ).toBe( false );
+
+			apiFetch.use( middleware );
+
+			expect( apiFetch.unregister( middleware ) ).toBe( true );
+			expect( apiFetch.unregister( middleware ) ).toBe( false );
+		} );
+
+		it( 'should stop overriding the method once httpV1Middleware is removed', async () => {
+			globalThis.fetch.mockResolvedValue( DEFAULT_FETCH_MOCK_RETURN );
+
+			await apiFetch( { path: '/random', method: 'DELETE' } );
+
+			expect( globalThis.fetch ).toHaveBeenCalledWith(
+				'/random?_locale=user',
+				expect.objectContaining( {
+					method: 'POST',
+					headers: expect.objectContaining( {
+						'X-HTTP-Method-Override': 'DELETE',
+					} ),
+				} )
+			);
+
+			expect( apiFetch.unregister( apiFetch.httpV1Middleware ) ).toBe(
+				true
+			);
+
+			await apiFetch( { path: '/random', method: 'DELETE' } );
+
+			const [ , options ] = globalThis.fetch.mock.lastCall;
+			expect( options.method ).toBe( 'DELETE' );
+			expect( options.headers ).not.toHaveProperty(
+				'X-HTTP-Method-Override'
+			);
+		} );
+	} );
 } );
