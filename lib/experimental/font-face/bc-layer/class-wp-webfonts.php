@@ -7,7 +7,7 @@
  * using the previous API, it exists to prevent breakages, giving
  * developers time to upgrade their code.
  *
- * @package    Gutenberg
+ * @package    gutenberg
  * @subpackage Fonts API's BC Layer
  * @since      X.X.X
  */

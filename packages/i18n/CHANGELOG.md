@@ -2,6 +2,34 @@
 
 ## Unreleased
 
+## 6.27.0 (2026-08-26)
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 6.26.0 (2026-08-12)
+
+## 6.25.0 (2026-07-29)
+
+## 6.24.0 (2026-07-14)
+
+## 6.23.0 (2026-07-01)
+
+## 6.22.0 (2026-06-24)
+
+## 6.21.1 (2026-06-16)
+
+## 6.21.0 (2026-06-10)
+
+## 6.20.0 (2026-05-27)
+
+## 6.19.0 (2026-05-14)
+
+## 6.18.0 (2026-04-29)
+
+## 6.17.0 (2026-04-15)
+
 ### Enhancement
 
 -   `sprintf` now returns `TransformedText<T>` instead of `string`, preserving the format string literal type for downstream type inference (e.g., `createInterpolateElement`). ([76974](https://github.com/WordPress/gutenberg/pull/76974))

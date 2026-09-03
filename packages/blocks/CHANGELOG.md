@@ -2,6 +2,75 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `BlockTransform` is now a discriminated union over its `type`, so that each kind of transform declares its own fields: `shortcode` transforms accept `tag` and `attributes` with `shortcode` matchers, `enter` transforms `regExp`, `prefix` transforms `prefix`, and `raw` transforms `selector` and `schema`. `blocks`, `variationName` and `shortcuts` now belong to `block` transforms only, and `blocks` is required there. This fixes type errors when registering blocks with documented shortcode transforms, but reading a variant field off a `BlockTransform` that has not been narrowed on its `type` no longer compiles — including the result of `findTransform` ([#81811](https://github.com/WordPress/gutenberg/issues/81811)).
+-   Removed the `transforms.supportedMobileTransforms` block type property, along with the `supportedMobileTransforms` and `usingMobileTransformations` properties of a block transform. They were only meaningful to the React Native implementation, removed in [#78747](https://github.com/WordPress/gutenberg/pull/78747), and nothing reads them any more. Note that the filter they drove was not platform-gated: a block type still declaring `supportedMobileTransforms` had its transforms filtered everywhere, and `getBlockTransforms` no longer filters them at all ([#81831](https://github.com/WordPress/gutenberg/pull/81831)).
+
+### Bug Fixes
+
+-   `getBlockAttributes` no longer breaks when a block has no content to parse, such as a self-closing shortcode: missing content is treated as empty markup instead of reaching the attribute matchers ([#81831](https://github.com/WordPress/gutenberg/pull/81831)).
+
+## 15.27.0 (2026-08-26)
+
+### New Features
+
+-   Block variations and `block` type block transforms accept a `shortcut` property, declaring a keyboard shortcut that applies the variation or transform to the selected block. See the [block variations](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-variations/) and [block transforms](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-transforms/) documentation ([#81588](https://github.com/WordPress/gutenberg/pull/81588)).
+
+## 15.26.0 (2026-08-12)
+
+### Internal
+
+-   Update `hpq` to 1.4.0 for its bundled TypeScript types ([#81199](https://github.com/WordPress/gutenberg/pull/81199)).
+
+## 15.25.0 (2026-07-29)
+
+### Internal
+
+-   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).
+
+## 15.24.0 (2026-07-14)
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 15.23.0 (2026-07-01)
+
+## 15.22.0 (2026-06-24)
+
+### Internal
+
+- Replace `showdown` with `marked` for Markdown paste handling. Smaller bundle, modern maintenance, native types.
+
+## 15.21.1 (2026-06-16)
+
+## 15.21.0 (2026-06-10)
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+### Internal
+
+-   Dependency updates ([#77954](https://github.com/WordPress/gutenberg/pull/77954)).
+
+## 15.20.0 (2026-05-27)
+
+### Bug Fix
+
+- Fix `mergeSchemas` in `getBlockContentSchemaFromTransforms` to preserve array values (e.g. `classes`) instead of converting them to objects with numeric string keys when merging schemas ([#70615](https://github.com/WordPress/gutenberg/pull/70615)).
+- Paste: Move leading and trailing spaces out of inline formatting elements (such as links) so the formatting wraps only its meaningful content. This corrects markup from editors like Google Docs that place the separating space inside the link.
+
+## 15.19.0 (2026-05-14)
+
+## 15.18.0 (2026-04-29)
+
+- Update `registerBlockType` to accept the attributes type as a generic.
+- Update `registerBlockVariation`, `unregisterBlockVariation` type signature to match the dispatch call.
+
+## 15.17.0 (2026-04-15)
+
 ## 15.16.0 (2026-04-01)
 
 ## 15.15.0 (2026-03-18)

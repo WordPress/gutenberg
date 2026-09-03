@@ -16,7 +16,7 @@ The `@wordpress/interactivity-router` package was [introduced in WordPress Core 
 
 ## Usage
 
-The package is intended to be imported dynamically in the `view.js` files of interactive blocks. This is done in in order to reduce the JS bundle size on the initial page load.
+The package is intended to be imported dynamically in the `view.js` files of interactive blocks. This is done in order to reduce the JS bundle size on the initial page load.
 
 ```js
 /* view.js */

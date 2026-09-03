@@ -7,7 +7,8 @@ $blocks-block__margin: 0.5em;
 	cursor: pointer;
 	display: inline-block;
 	text-align: center;
-	word-break: break-word; // overflow-wrap doesn't work well if a link is wrapped in the div, so use word-break here.
+	// stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- overflow-wrap doesn't work well if a link is wrapped in the div, so use word-break here.
+	word-break: break-word;
 	box-sizing: border-box;
 	height: 100%;
 	align-content: center;
@@ -141,24 +142,24 @@ $blocks-block__margin: 0.5em;
 	}
 
 	:where(
-	.wp-block-button.is-style-outline
-	> .wp-block-button__link:not(.has-text-color)
-),
-	:where(
-	.wp-block-button
-	.wp-block-button__link.is-style-outline:not(.has-text-color)
-) {
+		.wp-block-button.is-style-outline
+		> .wp-block-button__link:not(.has-text-color)
+	),
+		:where(
+		.wp-block-button
+		.wp-block-button__link.is-style-outline:not(.has-text-color)
+	) {
 		color: currentColor;
 	}
 
 	:where(
-	.wp-block-button.is-style-outline
-	> .wp-block-button__link:not(.has-background)
-),
-	:where(
-	.wp-block-button
-	.wp-block-button__link.is-style-outline:not(.has-background)
-) {
+		.wp-block-button.is-style-outline
+		> .wp-block-button__link:not(.has-background)
+	),
+		:where(
+		.wp-block-button
+		.wp-block-button__link.is-style-outline:not(.has-background)
+	) {
 		background-color: transparent;
 		// background-image is required to overwrite a gradient background
 		background-image: none;

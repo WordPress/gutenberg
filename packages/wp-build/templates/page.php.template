@@ -88,9 +88,10 @@ function {{PREFIX}}_get_{{PAGE_SLUG_UNDERSCORE}}_menu_items() {
  */
 function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_preload_data() {
 	// Define paths to preload - same for all pages
-	// Please also change packages/core-data/src/entities.js when changing this.
+	// This must exactly match the _fields list in packages/core-data/src/entities.js,
+	// same fields in the same order, or the preload is never consumed.
 	$preload_paths = array(
-		'/?_fields=description,gmt_offset,home,image_sizes,image_size_threshold,image_output_formats,jpeg_interlaced,png_interlaced,gif_interlaced,name,site_icon,site_icon_url,site_logo,timezone_string,url,page_for_posts,page_on_front,show_on_front',
+		'/?_fields=description,gmt_offset,home,image_max_bit_depth,image_sizes,image_size_threshold,image_strip_meta,name,site_icon,site_icon_url,site_logo,timezone_string,url,page_for_posts,page_on_front,show_on_front',
 		array( '/wp/v2/settings', 'OPTIONS' ),
 	);
 
@@ -134,7 +135,9 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 		wp_dequeue_style( $style );
 	}
 
-	// Fire init action for extensions to register routes and menu items
+	/**
+	 * Fires when the {{PAGE_SLUG}} page is initialized so extensions can register routes and menu items.
+	 */
 	do_action( '{{PAGE_SLUG}}_init' );
 
 	// Enqueue command palette assets for boot-based pages
@@ -149,8 +152,12 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 	$menu_items = {{PREFIX}}_get_{{PAGE_SLUG_UNDERSCORE}}_menu_items();
 	$routes = {{PREFIX}}_get_{{PAGE_SLUG_UNDERSCORE}}_routes();
 
-	// Get boot module asset file for dependencies
+	// Get boot module asset file for dependencies. Plugins that build their own
+	// boot module use it; everyone else falls back to the copy bundled with Core.
 	$asset_file = __DIR__ . '/../../modules/boot/index.min.asset.php';
+	if ( ! file_exists( $asset_file ) ) {
+		$asset_file = ABSPATH . WPINC . '/js/dist/script-modules/boot/index.min.asset.php';
+	}
 	if ( file_exists( $asset_file ) ) {
 		$asset = require $asset_file;
 
@@ -209,6 +216,21 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 			}
 		}
 
+		/**
+		 * Filters the boot script-module dependencies for the
+		 * {{PAGE_SLUG}} page.
+		 *
+		 * Surfaces extending this page can append entries to the boot
+		 * dependency list. Each entry is an array with 'import' (string
+		 * 'static' or 'dynamic') and 'id' (script-module handle) keys.
+		 *
+		 * @param array $boot_dependencies Boot dependencies for the page.
+		 */
+		$boot_dependencies = apply_filters(
+			'{{PAGE_SLUG}}_boot_dependencies',
+			$boot_dependencies
+		);
+
 		// Dummy script module to ensure dependencies are loaded
 		wp_register_script_module(
 			'{{PAGE_SLUG}}',
@@ -234,7 +256,7 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 			html {
 				background: #f1f1f1;
 				color: #444;
-				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+				font-family: -apple-system, system-ui, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 				font-size: 13px;
 				line-height: 1.4em;
 			}
@@ -252,33 +274,39 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 	print_admin_styles();
 	print_head_scripts();
 
-	/**
-	 * Fires in head section for a specific admin page.
-	 *
-	 * @since 2.1.0
-	 */
+	/** This action is documented in wp-admin/admin-header.php */
 	do_action( "admin_head-{$hook_suffix}" ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 
-	/**
-	 * Fires in head section for all admin pages.
-	 *
-	 * @since 2.1.0
-	 */
+	/** This action is documented in wp-admin/admin-header.php */
 	do_action( 'admin_head' );
 	// END see wp-admin/admin-header.php
 	?>
 	</head>
-	<body class="{{PAGE_SLUG}}">
+	<body class="{{PAGE_SLUG}} no-js">
+	<?php
+	// BEGIN see wp-admin/admin-header.php
+	?>
+	<script type="text/javascript">
+		document.body.className = document.body.className.replace( 'no-js', 'js' );
+	</script>
+	<?php
+	// END see wp-admin/admin-header.php
+	?>
+		<div class="wrap hide-if-js" style="margin: 20px;">
+			<h1 class="wp-heading-inline"><?php echo esc_html( get_admin_page_title() ); ?></h1>
+			<?php
+			wp_admin_notice(
+				__( 'This screen requires JavaScript. Enable JavaScript in your browser settings and reload the page.' ),
+				array( 'type' => 'error' )
+			);
+			?>
+		</div>
 		<div id="{{PAGE_SLUG}}-app" style="height: 100vh; box-sizing: border-box;"></div>
 	<?php
 	// BEGIN see wp-admin/admin-footer.php
 
-	/**
-	 * Prints scripts or data before the default footer scripts.
-	 *
-	 * @since 1.2.0
-	 */
-	do_action( 'admin_footer', '' );
+	/** This action is documented in wp-admin/admin-footer.php */
+	do_action( 'admin_footer', $hook_suffix );
 
 	// Print import map first so it's available for inline scripts
 	wp_script_modules()->print_import_map();
@@ -287,11 +315,7 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 	wp_script_modules()->print_script_module_preloads();
 	wp_script_modules()->print_script_module_data();
 
-	/**
-	 * Prints scripts or data after the default footer scripts.
-	 *
-	 * @since 2.8.0
-	 */
+	/** This action is documented in wp-admin/admin-footer.php */
 	do_action( "admin_footer-{$hook_suffix}" ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 	// END see wp-admin/admin-footer.php
 	?>
@@ -308,6 +332,22 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_intercept_render() {
 	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	if ( isset( $_GET['page'] ) && '{{PAGE_SLUG}}' === $_GET['page'] ) {
+		// The page renders outside the menu page callback flow, so it must
+		// enforce authentication and capability checks itself. Without this,
+		// any admin entry point firing `admin_init` (such as admin-post.php,
+		// which serves logged-out requests) would render the page for
+		// unauthenticated visitors.
+		if ( ! is_user_logged_in() ) {
+			auth_redirect();
+		}
+
+		if ( ! current_user_can( '{{CAPABILITY}}' ) ) {
+			wp_die(
+				__( 'Sorry, you are not allowed to access this page.' ),
+				403
+			);
+		}
+
 		{{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page();
 		exit;
 	}

@@ -1,7 +1,4 @@
-/**
- * Internal dependencies
- */
-
+import { describe, expect, it } from 'vitest';
 import { getActiveFormat } from '../get-active-format';
 
 describe( 'getActiveFormat', () => {

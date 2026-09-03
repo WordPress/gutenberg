@@ -1,12 +1,4 @@
-/**
- * External dependencies
- */
-import type { ReactNode, ComponentProps, ReactElement } from 'react';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	useContext,
 	useEffect,
@@ -16,10 +8,6 @@ import {
 } from '@wordpress/element';
 import { useResizeObserver } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import DataViewsContext from '../components/dataviews-context';
 import { VIEW_LAYOUTS } from '../components/dataviews-layouts';
 import {
@@ -40,44 +28,9 @@ import DataViewsViewConfig, {
 import normalizeFields from '../field-types';
 import useData from '../hooks/use-data';
 import { useInfiniteScroll } from '../hooks/use-infinite-scroll';
-import type { Action, Field, View, SupportedLayouts } from '../types';
+import usePageClamp from '../hooks/use-page-clamp';
+import type { SupportedLayouts, DataViewsProps, ItemWithId } from '../types';
 import type { SelectionOrUpdater } from '../types/private';
-type ItemWithId = { id: string };
-
-type DataViewsProps< Item > = {
-	view: View;
-	onChangeView: ( view: View ) => void;
-	fields: Field< Item >[];
-	search?: boolean;
-	searchLabel?: string;
-	actions?: Action< Item >[];
-	data: Item[];
-	isLoading?: boolean;
-	paginationInfo: {
-		totalItems: number;
-		totalPages: number;
-	};
-	defaultLayouts?: SupportedLayouts;
-	selection?: string[];
-	onChangeSelection?: ( items: string[] ) => void;
-	onClickItem?: ( item: Item ) => void;
-	renderItemLink?: (
-		props: {
-			item: Item;
-		} & ComponentProps< 'a' >
-	) => ReactElement;
-	isItemClickable?: ( item: Item ) => boolean;
-	header?: ReactNode;
-	getItemLevel?: ( item: Item ) => number;
-	children?: ReactNode;
-	config?: {
-		perPageSizes: number[];
-	};
-	empty?: ReactNode;
-	onReset?: ( () => void ) | false;
-} & ( Item extends ItemWithId
-	? { getItemId?: ( item: Item ) => string }
-	: { getItemId: ( item: Item ) => string } );
 
 const defaultGetItemId = ( item: ItemWithId ) => item.id;
 const defaultIsItemClickable = () => true;
@@ -236,6 +189,13 @@ function DataViews< Item >( {
 		setVisibleEntries,
 	} );
 
+	usePageClamp( {
+		view,
+		onChangeView,
+		isLoading,
+		totalPages: paginationInfo.totalPages,
+	} );
+
 	useEffect( () => {
 		if ( hasPrimaryOrLockedFilters && ! isShowingFilter ) {
 			setIsShowingFilter( true );
@@ -310,6 +270,11 @@ function DataViews< Item >( {
 	);
 }
 
+/**
+ * `DataViews` renders a dataset using configurable layouts (table, grid, list)
+ * with built-in search, filtering, sorting, pagination, and actions. Use it to
+ * display and manage a collection of records.
+ */
 // Populate the DataViews sub components
 const DataViewsSubComponents = DataViews as typeof DataViews & {
 	BulkActionToolbar: typeof BulkActionsFooter;

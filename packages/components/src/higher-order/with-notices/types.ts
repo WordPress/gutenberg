@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { NoticeListProps } from '../../notice/types';
 
 export type WithNoticeProps = {

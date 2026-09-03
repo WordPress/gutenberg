@@ -1,7 +1,4 @@
 'use strict';
-/**
- * External dependencies
- */
 const fs = require( 'fs' );
 const path = require( 'path' );
 const SimpleGit = require( 'simple-git' );
@@ -111,6 +108,7 @@ async function downloadTestSuite(
 			directory,
 			{
 				'--depth': '1',
+				'--filter': 'blob:none',
 				'--no-checkout': null,
 			}
 		);

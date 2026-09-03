@@ -1,13 +1,7 @@
-/**
- * External dependencies
- */
 import { request } from '@playwright/test';
 import type { FullConfig } from '@playwright/test';
-
-/**
- * WordPress dependencies
- */
 import { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
+import { setupRtcWebSocketProvider } from './rtc-websocket-setup';
 
 async function globalSetup( config: FullConfig ) {
 	const { storageState, baseURL } = config.projects[ 0 ].use;
@@ -34,8 +28,10 @@ async function globalSetup( config: FullConfig ) {
 			'gutenberg-test-plugin-disables-the-css-animations'
 		),
 		requestUtils.deleteAllPosts(),
+		requestUtils.deleteAllPages(),
 		requestUtils.deleteAllBlocks(),
 		requestUtils.resetPreferences(),
+		setupRtcWebSocketProvider( requestUtils ),
 	] );
 
 	await requestContext.dispose();
