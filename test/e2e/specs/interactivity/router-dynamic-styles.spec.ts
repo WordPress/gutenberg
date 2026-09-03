@@ -40,6 +40,10 @@ import { test, expect } from './fixtures';
 /**
  * Builds a RegExp matching the given URL's pathname, ignoring any query
  * string — see the note above on why the two differ here.
+ *
+ * @param url URL whose pathname is used to build the RegExp.
+ *
+ * @return RegExp matching the URL's pathname, ignoring the query string.
  */
 function toPathRegExp( url: string ): RegExp {
 	const { pathname } = new URL( url );
