@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `--wpds-color-background-interactive-neutral` for solid, themed input backgrounds. ([#82391](https://github.com/WordPress/gutenberg/pull/82391))
+
 ### Documentation
 
 -   Explain how consumers define light and dark themes through `ThemeProvider` color seeds ([#82039](https://github.com/WordPress/gutenberg/pull/82039)).
