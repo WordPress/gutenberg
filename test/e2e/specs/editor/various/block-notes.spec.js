@@ -1703,6 +1703,161 @@ test.describe( 'Block Notes', () => {
 			);
 		} );
 
+		test( 'floats an "Add note" button next to a text selection', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Hello brave new world.' },
+			} );
+
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			const floatingButton = page
+				.locator( '.editor-collab-sidebar__floating-add-note' )
+				.getByRole( 'button', { name: 'Add note' } );
+
+			// The button only appears once a selection has held for a short
+			// delay, so a plain `toBeHidden()` would pass before it had a
+			// chance to show. Waiting for it and expecting that wait to time
+			// out proves it stays hidden.
+			const expectToStayHidden = () =>
+				expect(
+					floatingButton.waitFor( {
+						state: 'visible',
+						timeout: 1000,
+					} )
+				).rejects.toThrow();
+
+			// Selecting "brave" (offsets 6-11) surfaces it beside that line.
+			await paragraph.click();
+			await blockNoteUtils.selectBlockText( { start: 6, length: 5 } );
+			await expect( floatingButton ).toBeVisible();
+
+			// Clicking it opens the new-note form, and saving wraps only the
+			// selected text: the click must not disturb the selection.
+			await floatingButton.click();
+			// Once the form is open the button has done its job and goes away,
+			// even though the selection it captured is still in the store.
+			await expect( floatingButton ).toBeHidden();
+			await page
+				.getByRole( 'textbox', { name: 'New note', exact: true } )
+				.fill( 'Just this word' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+
+			const mark = editor.canvas.locator( 'mark.wp-note' );
+			await expect( mark ).toHaveCount( 1 );
+			await expect( mark ).toHaveText( 'brave' );
+
+			// Saving moves focus to the new thread once it renders. Wait for
+			// that before clicking back into the canvas, or the late focus
+			// move would steal the keystrokes that make the next selection.
+			await expect(
+				page
+					.getByRole( 'treeitem' )
+					.filter( { hasText: 'Just this word' } )
+			).toBeFocused();
+
+			// Re-selecting text that already carries a note hides the button;
+			// the note format syncs the sidebar to that note instead. Waiting
+			// for the block-level button first rules out a stale one from the
+			// click being what the hidden check sees.
+			await paragraph.click();
+			await expect( floatingButton ).toBeVisible();
+			await blockNoteUtils.selectBlockText( { start: 6, length: 5 } );
+			await expect( floatingButton ).toBeHidden();
+			await expectToStayHidden();
+		} );
+
+		test( 'floats an "Add note" button beside a selected block', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/heading',
+				attributes: { content: 'Section title' },
+			} );
+			await editor.insertBlock( { name: 'core/image' } );
+
+			const floatingButton = page
+				.locator( '.editor-collab-sidebar__floating-add-note' )
+				.getByRole( 'button', { name: 'Add note' } );
+
+			// A click that only places a caret, selecting no text, is enough
+			// to surface the button: the note attaches to the whole block.
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Heading' } )
+				.click();
+			await expect( floatingButton ).toBeVisible();
+
+			// A block with no text at all gets it too.
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Image' } )
+				.click( { position: { x: 4, y: 4 } } );
+			await expect( floatingButton ).toBeVisible();
+
+			// A nested block floats the button beside its top-level ancestor,
+			// not beside itself, so it never covers a sibling in a row.
+			await editor.insertBlock( {
+				name: 'core/group',
+				attributes: { layout: { type: 'flex', flexWrap: 'nowrap' } },
+				innerBlocks: [
+					{ name: 'core/paragraph', attributes: { content: '1' } },
+					{ name: 'core/paragraph', attributes: { content: '2' } },
+				],
+			} );
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.filter( { hasText: '1' } )
+				.click();
+			await expect( floatingButton ).toBeVisible();
+			const rowRight = await editor.canvas
+				.getByRole( 'document', { name: 'Block: Row' } )
+				.boundingBox()
+				.then( ( box ) => box.x + box.width );
+			await expect
+				.poll( () =>
+					floatingButton.boundingBox().then( ( box ) => box.x )
+				)
+				.toBeGreaterThanOrEqual( rowRight );
+
+			// Back to the image for the rest of the flow.
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Image' } )
+				.click( { position: { x: 4, y: 4 } } );
+			await expect( floatingButton ).toBeVisible();
+
+			await floatingButton.click();
+			await expect( floatingButton ).toBeHidden();
+			await page
+				.getByRole( 'textbox', { name: 'New note', exact: true } )
+				.fill( 'Needs a caption' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+
+			// The note lands in the image block's metadata, with no inline
+			// marker anywhere in the canvas.
+			await expect
+				.poll( async () => {
+					const blocks = await editor.getBlocks();
+					return blocks.find(
+						( block ) => block.name === 'core/image'
+					)?.attributes?.metadata?.noteId?.length;
+				} )
+				.toBe( 1 );
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				0
+			);
+		} );
+
 		test.describe( 'Floating alignment', () => {
 			// Tall enough that the floating form/thread anchored at the last
 			// line still fits fully within the viewport: a thread extending

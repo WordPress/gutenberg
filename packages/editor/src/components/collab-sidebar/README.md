@@ -21,6 +21,7 @@ collab-sidebar/
 ├── note-form.jsx                    NoteForm - rich text input + submit/cancel
 ├── add-note.jsx                     AddNote - new-note surface (floating + template-locked cases)
 ├── add-note-menu-item.jsx           AddNoteMenuItem - block-toolbar "Add note" trigger
+├── floating-add-note.tsx            FloatingAddNote - "Add note" button floated beside the selected block or text selection
 ├── note-indicator-toolbar.jsx       NoteAvatarIndicator - toolbar participants avatars
 ├── floating-container.jsx           FloatingContainer - stack wrapper that applies `top` in floating mode
 │
@@ -39,6 +40,7 @@ collab-sidebar/
 NotesSidebarContainer (index.jsx)         - gates on post type support
  └── NotesSidebar (index.jsx)             - owns sidebarRef + useNoteThreads + sidebar registration
       ├── AddNoteMenuItem                - slot fill in the block toolbar
+      ├── FloatingAddNote                - popover beside the selected block or text selection
       ├── NoteAvatarIndicator            - slot fill in the block toolbar (per-thread avatars)
       ├── PluginSidebar (all-notes)      - full sidebar
       │    └── Notes (notes.jsx)          - owns outer Stack + aria-label + useNoteActions + keyboard nav
