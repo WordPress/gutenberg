@@ -2,6 +2,7 @@ import { Component } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import deprecated from '@wordpress/deprecated';
 import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import {
 	MediaUpload,
 	privateApis as mediaUtilsPrivateApis,
@@ -18,13 +19,30 @@ const { MediaUploadModal: MediaUploadModalComponent } = unlock(
  * filter can offer media uploaded to that post. `media-utils` has no editor
  * dependency, so the post is injected here.
  *
+ * The post is only passed on when media can actually belong to it. Templates and
+ * the like have no front end of their own, so an image can't be uploaded to one —
+ * the same reasoning, and the same `viewable` check, as attaching media on save.
+ * Their entity ID is a slug rather than a number besides, which the media query
+ * has no use for.
+ *
  * @param {Object} props Props passed through to the modal.
  */
 function MediaUploadModalWithPostContext( props ) {
-	const postId = useSelect(
-		( select ) => select( editorStore ).getCurrentPostId(),
-		[]
-	);
+	const postId = useSelect( ( select ) => {
+		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
+		const currentPostId = getCurrentPostId();
+		const currentPostType = getCurrentPostType();
+		const postTypeObject = currentPostType
+			? select( coreStore ).getPostType( currentPostType )
+			: undefined;
+
+		if ( typeof currentPostId !== 'number' || ! postTypeObject?.viewable ) {
+			return undefined;
+		}
+
+		return currentPostId;
+	}, [] );
+
 	return <MediaUploadModalComponent { ...props } postId={ postId } />;
 }
 

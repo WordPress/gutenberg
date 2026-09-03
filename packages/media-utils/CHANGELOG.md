@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Media Library modal: Add an "Attached to" filter offering "Uploaded to this post" and "Unattached", along with a `postId` prop supplying the post the modal was opened from.
+-   Media Library modal: Add an "Attached to" filter offering "Uploaded to this post" and "Unattached", along with a `postId` prop supplying the post the modal was opened from ([#81974](https://github.com/WordPress/gutenberg/pull/81974)).
 
 ## 5.54.0 (2026-08-26)
 

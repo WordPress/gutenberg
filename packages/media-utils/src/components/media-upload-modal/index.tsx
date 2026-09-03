@@ -208,7 +208,7 @@ interface MediaUploadModalProps {
 	/**
 	 * ID of the post the modal was opened from. When set, the "Attached to"
 	 * filter offers an option for media uploaded to that post. Omit outside of
-	 * a post context.
+	 * a post context, and for a post media can't be uploaded to.
 	 */
 	postId?: number;
 }
@@ -250,6 +250,10 @@ export function MediaUploadModal( {
 	searchLabel = __( 'Search media' ),
 	postId,
 }: MediaUploadModalProps ) {
+	// The filter resolves its sentinel to this ID, and the media query has no use
+	// for anything else — a template's entity ID, for instance, is a slug.
+	const attachedToPostId = Number.isInteger( postId ) ? postId : undefined;
+
 	const [ selection, setSelection ] = useState< string[] >( () =>
 		getSelectionFromValue( value )
 	);
@@ -328,7 +332,9 @@ export function MediaUploadModal( {
 						if ( sentinel === 'unattached' ) {
 							return 0;
 						}
-						return sentinel === 'current' ? postId : undefined;
+						return sentinel === 'current'
+							? attachedToPostId
+							: undefined;
 					} )
 					.filter( ( parent ) => parent !== undefined );
 
@@ -380,7 +386,7 @@ export function MediaUploadModal( {
 			_embed: 'author,wp:attached-to',
 			...filters,
 		};
-	}, [ view, allowedTypes, postId ] );
+	}, [ view, allowedTypes, attachedToPostId ] );
 
 	// Per-batch completion handler: auto-select uploaded items and refresh the grid.
 	const handleBatchComplete = useCallback(
@@ -468,7 +474,7 @@ export function MediaUploadModal( {
 				// "Uploaded to this post" option only makes sense with the modal's
 				// post context. Values are sentinels resolved in `queryArgs` above.
 				elements: [
-					...( postId
+					...( attachedToPostId
 						? [
 								{
 									value: 'current',
@@ -481,7 +487,7 @@ export function MediaUploadModal( {
 				filterBy: { operators: [ 'isAny' ] },
 			},
 		],
-		[ postId ]
+		[ attachedToPostId ]
 	);
 
 	const actions: ActionButton< RestAttachment >[] = useMemo(
