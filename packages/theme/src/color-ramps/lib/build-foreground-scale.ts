@@ -297,20 +297,20 @@ function findColorAtPerceptualContrast( {
  * @param options                     Serialization inputs.
  * @param options.color               Foreground before serialization.
  * @param options.getColorAtLightness Color path indexed by OKLCH lightness.
- * @param options.strongColor         Strongest allowed fallback.
+ * @param options.getStrongColor      Resolve the strongest allowed fallback.
  * @param options.referenceLuminances Background luminances to check together.
  * @param options.target              Unpadded WCAG contrast floor.
  */
 function serializeColorMeetingContrast( {
 	color,
 	getColorAtLightness,
-	strongColor,
+	getStrongColor,
 	referenceLuminances,
 	target,
 }: {
 	color: PlainColorObject;
 	getColorAtLightness: GetColorForLightness;
-	strongColor: PlainColorObject;
+	getStrongColor: () => PlainColorObject;
 	referenceLuminances: readonly number[];
 	target: number;
 } ) {
@@ -319,6 +319,7 @@ function serializeColorMeetingContrast( {
 		return serializedColor;
 	}
 
+	const strongColor = getStrongColor();
 	const colorLightness = get( color, [ OKLCH, 'l' ] );
 	const strongLightness = get( strongColor, [ OKLCH, 'l' ] );
 	const direction = Math.sign( strongLightness - colorLightness );
@@ -588,46 +589,56 @@ export function buildForegroundScale(
 			target: steps.fgSurface4.contrast.target,
 		} );
 	}
-	const normalContrast = getPerceptualContrastMagnitude(
-		displayBackground,
-		normalColor
-	);
-	const requestedStrongContrast = Math.min(
-		maximumStrongContrast,
-		Math.max(
-			normalContrast + normalToActiveTarget,
-			preferredActiveContrast
-		)
-	);
-	let strongColor = findColorAtPerceptualContrast( {
-		background: displayBackground,
-		getColorAtLightness,
-		weakColor: normalColor,
-		strongColor: strongEndpoint,
-		target: requestedStrongContrast,
-	} );
-	if (
-		! meetsContrastTarget(
-			strongColor,
-			referenceLuminances.fgSurface5,
-			strongStep.contrast.target
-		)
-	) {
-		strongColor = findColorAtContrastTarget( {
+	// Status ramps need the spacing budget above, but only need this color as
+	// a bound when serialization requires correction. Reuse it across corrections.
+	let strongColor: PlainColorObject | undefined;
+	function getStrongColor(): PlainColorObject {
+		if ( strongColor ) {
+			return strongColor;
+		}
+
+		const normalContrast = getPerceptualContrastMagnitude(
+			displayBackground,
+			normalColor
+		);
+		const requestedStrongContrast = Math.min(
+			maximumStrongContrast,
+			Math.max(
+				normalContrast + normalToActiveTarget,
+				preferredActiveContrast
+			)
+		);
+		strongColor = findColorAtPerceptualContrast( {
+			background: displayBackground,
 			getColorAtLightness,
-			weakColor: strongColor,
+			weakColor: normalColor,
 			strongColor: strongEndpoint,
-			referenceLuminances: referenceLuminances.fgSurface5,
-			target: strongStep.contrast.target,
+			target: requestedStrongContrast,
 		} );
+		if (
+			! meetsContrastTarget(
+				strongColor,
+				referenceLuminances.fgSurface5,
+				strongStep.contrast.target
+			)
+		) {
+			strongColor = findColorAtContrastTarget( {
+				getColorAtLightness,
+				weakColor: strongColor,
+				strongColor: strongEndpoint,
+				referenceLuminances: referenceLuminances.fgSurface5,
+				target: strongStep.contrast.target,
+			} );
+		}
+		return strongColor;
 	}
 
 	colors.set( 'fgSurface3', fgSurface3 );
 	colors.set( 'fgSurface4', normalColor );
-	colors.set( 'fgSurface5', strongColor );
+	if ( includeInteractionState ) {
+		colors.set( 'fgSurface5', getStrongColor() );
+	}
 
-	// Keep the strong color and its budget above: even status ramps use them
-	// when positioning and serializing FGS3/FGS4. Only its own output is unused.
 	const outputSteps = includeInteractionState
 		? config.steps
 		: config.steps.filter( ( step ) => step.name !== 'fgSurface5' );
@@ -643,7 +654,7 @@ export function buildForegroundScale(
 								lightness
 							)
 					: getColorAtLightness,
-			strongColor,
+			getStrongColor,
 			referenceLuminances: referenceLuminances[ step.name ],
 			target: step.contrast.target,
 		} );
