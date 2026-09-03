@@ -1,0 +1,95 @@
+/**
+ * The admin bar, on the front end, coloured from WordPress Design System
+ * tokens.
+ *
+ * NOT LAYERED, deliberately, and this file must stay that way. On the front end
+ * Core's `admin-bar.css` is unlayered, and an unlayered declaration beats a
+ * layered one whatever the source order or specificity. Measured: a
+ * `@layer wpds` rule for `#wpadminbar`, loaded after `admin-bar.css`, loses to
+ * it outright. Two unlayered sheets of equal specificity are decided by source
+ * order instead, and the loader depends this one on `admin-bar` so ours is
+ * second.
+ *
+ * WHAT THIS FIXES. `admin-bar.css` writes `#wpadminbar { background: #1d2327 }`
+ * — the pre-7.0 colour — into the file that always loads. In wp-admin the
+ * active colour scheme overrides it by loading afterwards. On the front end no
+ * scheme loads at all, so that stale value is what every visitor sees,
+ * whichever scheme they chose. This replaces the stale default with the current
+ * one; a user on a non-default scheme still does not get their scheme's colours
+ * out here, exactly as they do not today.
+ *
+ * The values duplicate the admin bar half of `../70-chrome-colour.css`, which
+ * cannot be shared: that file has to be layered to sit correctly against
+ * demoted Core CSS in wp-admin, and this one must not be layered at all. The
+ * duplication is a symptom of reaching Core from outside and disappears with
+ * the rest of the layer machinery.
+ *
+ * SCOPE: colour only, and only the bar. No geometry, and nothing that could
+ * match theme markup — every selector is rooted at `#wpadminbar`.
+ *
+ * NO `!important` IN THIS FILE.
+ */
+
+/* -----------------------------------------------------------------------
+   Surfaces
+   ----------------------------------------------------------------------- */
+
+#wpadminbar {
+	background: var(--wpds-color-background-interactive-neutral-strong-active);
+	color: var(--wpds-color-foreground-interactive-neutral-strong);
+}
+
+#wpadminbar .menupop .ab-sub-wrapper {
+	background: var(--wpds-color-background-interactive-neutral-strong);
+}
+
+/*
+ * The secondary block of a dropdown drops back to the bar's own colour, so the
+ * two sections stay distinguishable now that both submenu levels would
+ * otherwise share one token.
+ */
+#wpadminbar .quicklinks .menupop ul.ab-sub-secondary,
+#wpadminbar .quicklinks .menupop ul.ab-sub-secondary .ab-submenu {
+	background: var(--wpds-color-background-interactive-neutral-strong-active);
+}
+
+/* -----------------------------------------------------------------------
+   Text and icons
+
+   Core derives icon colour from the scheme base colour's hue, which lands on a
+   faintly warm off-white. Icons and labels take the same neutral foreground.
+   ----------------------------------------------------------------------- */
+
+#wpadminbar .ab-item,
+#wpadminbar a.ab-item,
+#wpadminbar > #wp-toolbar span.ab-label,
+#wpadminbar > #wp-toolbar span.noticon,
+#wpadminbar .ab-icon,
+#wpadminbar .ab-icon::before,
+#wpadminbar .ab-item::before,
+#wpadminbar .ab-item::after,
+#wpadminbar .ab-submenu .ab-item,
+#wpadminbar .quicklinks .menupop ul li a,
+#wpadminbar .quicklinks .menupop.hover ul li a,
+#wpadminbar.nojs .quicklinks .menupop:hover ul li a,
+#wpadminbar .quicklinks li .blavatar,
+#wpadminbar .menupop .menupop > .ab-item::before,
+#wpadminbar.mobile .quicklinks .ab-icon::before,
+#wpadminbar.mobile .quicklinks .ab-item::before {
+	color: var(--wpds-color-foreground-interactive-neutral-strong);
+}
+
+/* -----------------------------------------------------------------------
+   Hover
+
+   Only the surface moves. Core's hover text is a lightened accent that the
+   design system has no equivalent for, so it is left alone.
+   ----------------------------------------------------------------------- */
+
+#wpadminbar:not(.mobile) .ab-top-menu > li:hover > .ab-item,
+#wpadminbar:not(.mobile) .ab-top-menu > li > .ab-item:focus,
+#wpadminbar.nojq .quicklinks .ab-top-menu > li > .ab-item:focus,
+#wpadminbar.nojs .ab-top-menu > li.menupop:hover > .ab-item,
+#wpadminbar .ab-top-menu > li.menupop.hover > .ab-item {
+	background: var(--wpds-color-background-interactive-neutral-strong);
+}
