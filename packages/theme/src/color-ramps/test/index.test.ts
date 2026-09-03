@@ -487,13 +487,26 @@ describe( 'buildRamps', () => {
 					);
 				}
 
+				const lowerGap =
+					lightness( 'surface2' ) - lightness( 'surface1' );
+				const upperGap =
+					lightness( 'surface3' ) - lightness( 'surface2' );
+				const elevationGap = Math.max( lowerGap, upperGap );
+				// Gaps stay balanced unless black or white clips one side.
 				expect(
 					Math.abs(
-						lightness( 'surface2' ) - lightness( 'surface1' )
-					) -
-						Math.abs(
-							lightness( 'surface3' ) - lightness( 'surface2' )
-						)
+						lowerGap -
+							Math.min( elevationGap, lightness( 'surface2' ) )
+					)
+				).toBeLessThan( 0.004 );
+				expect(
+					Math.abs(
+						upperGap -
+							Math.min(
+								elevationGap,
+								1 - lightness( 'surface2' )
+							)
+					)
 				).toBeLessThan( 0.004 );
 				expect(
 					Math.abs(
