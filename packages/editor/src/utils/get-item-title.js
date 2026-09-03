@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { decodeEntities } from '@wordpress/html-entities';
 
 /**
