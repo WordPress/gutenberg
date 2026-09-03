@@ -1501,24 +1501,29 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	 */
 	public function test_get_merged_data_is_not_affected_by_modifying_the_result() {
 		/*
-		 * A theme with presets is required: resolving variables is a no-op when
-		 * the active theme's styles contain no variable references, which would
-		 * leave this test asserting nothing.
+		 * A theme whose styles reference a preset is required: resolving
+		 * variables changes nothing otherwise, which would leave this test
+		 * asserting nothing. The fonts-block-theme fixture sets the root font
+		 * family to one of its font family presets.
 		 */
-		switch_theme( 'twentytwentyfour' );
+		switch_theme( 'fonts-block-theme' );
+		$path = array( 'typography', 'fontFamily' );
 
-		$before   = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_raw_data();
-		$resolved = WP_Theme_JSON_Gutenberg::resolve_variables( WP_Theme_JSON_Resolver_Gutenberg::get_merged_data() )->get_raw_data();
-
-		$this->assertNotEquals(
-			$before['styles'],
-			$resolved['styles'],
-			'Resolving variables should change the styles, otherwise this test asserts nothing.'
+		$before   = _wp_array_get( WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_raw_data()['styles'], $path );
+		$resolved = _wp_array_get(
+			WP_Theme_JSON_Gutenberg::resolve_variables( WP_Theme_JSON_Resolver_Gutenberg::get_merged_data() )->get_raw_data()['styles'],
+			$path
 		);
 
-		$this->assertSameSetsWithIndex(
+		$this->assertSame( 'var(--wp--preset--font-family--system-font)', $before, 'The fixture should reference a preset.' );
+		$this->assertNotSame(
 			$before,
-			WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_raw_data(),
+			$resolved,
+			'Resolving variables should change the value, otherwise this test asserts nothing.'
+		);
+		$this->assertSame(
+			$before,
+			_wp_array_get( WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_raw_data()['styles'], $path ),
 			'Resolving variables should not affect subsequent calls.'
 		);
 	}
@@ -1557,6 +1562,22 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	 * @covers WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data
 	 */
 	public function test_clean_cached_data_refreshes_merged_data() {
+		WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
+		$this->replace_merged_data_with_sentinel( 'custom' );
+
+		WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+
+		$this->assertNotSame(
+			'sentinel',
+			WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_raw_data()['styles']['color']['text'] ?? null,
+			'Cleaning the cached data should discard the memoized merged data.'
+		);
+	}
+
+	/**
+	 * @covers WP_Theme_JSON_Resolver_Gutenberg::get_merged_data
+	 */
+	public function test_switching_theme_refreshes_merged_data() {
 		switch_theme( 'block-theme' );
 		$before = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_raw_data();
 
