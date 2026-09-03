@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -11,12 +8,9 @@ import {
 	type PostSaveEvent,
 } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
+import { getCollaboratorDisplayName } from '../../utils/get-collaborator-display-name';
 
 const { useOnCollaboratorJoin, useOnCollaboratorLeave, useOnPostSave } =
 	unlock( privateApis );
@@ -68,43 +62,75 @@ export function useCollaboratorNotifications(
 	postId: number | null,
 	postType: string | null
 ): void {
-	const { postStatus, isCollaborationEnabled, showNotifications } = useSelect(
-		( select ) => {
-			const {
-				getCurrentPostAttribute,
-				isCollaborationEnabledForCurrentPost,
-			} = unlock( select( editorStore ) );
-			return {
-				postStatus: getCurrentPostAttribute( 'status' ) as
-					| string
-					| undefined,
-				isCollaborationEnabled: isCollaborationEnabledForCurrentPost(),
-				showNotifications:
-					select( preferencesStore ).get(
-						'core',
-						'showCollaborationNotifications'
-					) ?? true,
-			};
-		},
-		[]
-	);
+	const {
+		postStatus,
+		isCollaborationEnabled,
+		showJoinNotifications,
+		showLeaveNotifications,
+		showPostSaveNotifications,
+	} = useSelect( ( select ) => {
+		const {
+			getCurrentPostAttribute,
+			isCollaborationEnabledForCurrentPost,
+		} = unlock( select( editorStore ) );
+		// Notification preferences default to enabled when unset.
+		const getNotificationPreference = ( name: string ) =>
+			select( preferencesStore ).get( 'core', name ) ?? true;
+		return {
+			postStatus: getCurrentPostAttribute( 'status' ) as
+				| string
+				| undefined,
+			isCollaborationEnabled: isCollaborationEnabledForCurrentPost(),
+			showJoinNotifications: getNotificationPreference(
+				'showCollaborationJoinNotifications'
+			),
+			showLeaveNotifications: getNotificationPreference(
+				'showCollaborationLeaveNotifications'
+			),
+			showPostSaveNotifications: getNotificationPreference(
+				'showCollaborationPostSaveNotifications'
+			),
+		};
+	}, [] );
 
 	const { createNotice } = useDispatch( noticesStore );
 
-	// Pass null when collaboration is disabled or notifications are
+	// Pass null when collaboration is disabled or a notification type is
 	// turned off to prevent the hooks from subscribing to awareness state.
-	const shouldSubscribe = isCollaborationEnabled && showNotifications;
-	const effectivePostId = shouldSubscribe ? postId : null;
-	const effectivePostType = shouldSubscribe ? postType : null;
+	const shouldShowJoinNotifications =
+		isCollaborationEnabled && showJoinNotifications;
+	const shouldShowLeaveNotifications =
+		isCollaborationEnabled && showLeaveNotifications;
+	const shouldShowPostSaveNotifications =
+		isCollaborationEnabled && showPostSaveNotifications;
+	// A disabled notification type passes null, which unsubscribes its hook;
+	// callback guards handle any events already queued before then.
+	const effectiveTarget = (
+		shouldShow: boolean
+	): [ number | null, string | null ] =>
+		shouldShow ? [ postId, postType ] : [ null, null ];
+	const [ joinPostId, joinPostType ] = effectiveTarget(
+		shouldShowJoinNotifications
+	);
+	const [ leavePostId, leavePostType ] = effectiveTarget(
+		shouldShowLeaveNotifications
+	);
+	const [ postSavePostId, postSavePostType ] = effectiveTarget(
+		shouldShowPostSaveNotifications
+	);
 
 	useOnCollaboratorJoin(
-		effectivePostId,
-		effectivePostType,
+		joinPostId,
+		joinPostType,
 		useCallback(
 			(
 				collaborator: PostEditorAwarenessState,
 				me?: PostEditorAwarenessState
 			) => {
+				if ( ! shouldShowJoinNotifications ) {
+					return;
+				}
+
 				/*
 				 * Skip collaborators who were present before the current user
 				 * joined. Their enteredAt is earlier than ours, meaning we're
@@ -123,52 +149,66 @@ export function useCollaboratorNotifications(
 					sprintf(
 						/* translators: %s: collaborator display name */
 						__( '%s has joined the post.' ),
-						collaborator.collaboratorInfo.name
+						getCollaboratorDisplayName(
+							collaborator.collaboratorInfo
+						)
 					),
 					{
-						id: `${ NOTIFICATION_TYPE.COLLAB_USER_ENTERED }-${ collaborator.collaboratorInfo.id }`,
+						id: `${ NOTIFICATION_TYPE.COLLAB_USER_ENTERED }-${
+							collaborator.collaboratorInfo.id ??
+							collaborator.clientId
+						}`,
 						type: 'snackbar',
 						isDismissible: false,
 					}
 				);
 			},
-			[ createNotice ]
+			[ createNotice, shouldShowJoinNotifications ]
 		)
 	);
 
 	useOnCollaboratorLeave(
-		effectivePostId,
-		effectivePostType,
+		leavePostId,
+		leavePostType,
 		useCallback(
 			( collaborator: PostEditorAwarenessState ) => {
+				if ( ! shouldShowLeaveNotifications ) {
+					return;
+				}
+
 				void createNotice(
 					'info',
 					sprintf(
 						/* translators: %s: collaborator display name */
 						__( '%s has left the post.' ),
-						collaborator.collaboratorInfo.name
+						getCollaboratorDisplayName(
+							collaborator.collaboratorInfo
+						)
 					),
 					{
-						id: `${ NOTIFICATION_TYPE.COLLAB_USER_EXITED }-${ collaborator.collaboratorInfo.id }`,
+						id: `${ NOTIFICATION_TYPE.COLLAB_USER_EXITED }-${
+							collaborator.collaboratorInfo.id ??
+							collaborator.clientId
+						}`,
 						type: 'snackbar',
 						isDismissible: false,
 					}
 				);
 			},
-			[ createNotice ]
+			[ createNotice, shouldShowLeaveNotifications ]
 		)
 	);
 
 	useOnPostSave(
-		effectivePostId,
-		effectivePostType,
+		postSavePostId,
+		postSavePostType,
 		useCallback(
 			(
 				saveEvent: PostSaveEvent,
 				saver: PostEditorAwarenessState,
 				prevEvent: PostSaveEvent | null
 			) => {
-				if ( ! postStatus ) {
+				if ( ! shouldShowPostSaveNotifications || ! postStatus ) {
 					return;
 				}
 
@@ -186,18 +226,20 @@ export function useCollaboratorNotifications(
 					) && PUBLISHED_STATUSES.includes( effectiveStatus );
 
 				const message = getPostUpdatedMessage(
-					saver.collaboratorInfo.name,
+					getCollaboratorDisplayName( saver.collaboratorInfo ),
 					effectiveStatus,
 					isFirstPublish
 				);
 
 				void createNotice( 'info', message, {
-					id: `${ NOTIFICATION_TYPE.COLLAB_POST_UPDATED }-${ saver.collaboratorInfo.id }`,
+					id: `${ NOTIFICATION_TYPE.COLLAB_POST_UPDATED }-${
+						saver.collaboratorInfo.id ?? saver.clientId
+					}`,
 					type: 'snackbar',
 					isDismissible: false,
 				} );
 			},
-			[ createNotice, postStatus ]
+			[ createNotice, postStatus, shouldShowPostSaveNotifications ]
 		)
 	);
 }

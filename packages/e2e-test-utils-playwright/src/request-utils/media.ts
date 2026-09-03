@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import * as fs from 'fs';
-
-/**
- * Internal dependencies
- */
 import type { RequestUtils } from './index';
 
 export interface Media {

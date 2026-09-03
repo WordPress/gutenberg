@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	createPortal,
 	useState,
@@ -46,10 +39,6 @@ import {
 	mimeTypeField,
 } from '@wordpress/media-fields';
 import { store as noticesStore, SnackbarNotices } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import type { Attachment, RestAttachment } from '../../utils/types';
 import { transformAttachment } from '../../utils/transform-attachment';
 import { uploadMedia } from '../../utils/upload-media';
@@ -77,6 +66,21 @@ const defaultQueryParams: ViewQueryParams = {
 	search: '',
 };
 
+/**
+ * Derives the selection (attachment IDs as strings) from the `value` prop, which
+ * may be a single id, an array of ids, or undefined.
+ *
+ * @param value The currently selected media item(s).
+ */
+function getSelectionFromValue(
+	value: number | number[] | undefined
+): string[] {
+	if ( ! value ) {
+		return [];
+	}
+	return Array.isArray( value ) ? value.map( String ) : [ String( value ) ];
+}
+
 const defaultView: View = {
 	type: LAYOUT_PICKER_GRID,
 	fields: [],
@@ -88,6 +92,10 @@ const defaultView: View = {
 	layout: {
 		previewSize: 170,
 		density: 'compact',
+		// Fit each thumbnail inside its square cell rather than cropping it,
+		// so the media's own orientation is visible before it's inserted.
+		// Users can switch back to cropped in the view options.
+		mediaFit: 'contain',
 	},
 };
 
@@ -98,6 +106,7 @@ const defaultLayouts: SupportedLayouts = {
 		layout: {
 			previewSize: 170,
 			density: 'compact',
+			mediaFit: 'contain',
 		},
 	},
 	[ LAYOUT_PICKER_TABLE ]: {
@@ -110,6 +119,15 @@ const defaultLayouts: SupportedLayouts = {
 		],
 		showTitle: true,
 	},
+};
+
+const dataViewsConfig = {
+	// Repeats `DataViewsPicker`'s own default, which passing `config` at all
+	// would otherwise replace.
+	perPageSizes: [ 10, 20, 50, 100 ],
+	// Seeing whether a media item is portrait or landscape before inserting
+	// it matters here, so offer the crop/fit switch in the view options.
+	mediaFitControl: true,
 };
 
 interface MediaUploadModalProps {
@@ -125,8 +143,9 @@ interface MediaUploadModalProps {
 	multiple?: boolean;
 
 	/**
-	 * The currently selected media item(s).
-	 * Can be a single ID number or array of IDs for multiple selection.
+	 * Media item(s) to pre-select — a single ID or an array of IDs. Seeds the
+	 * selection each time the modal opens (so an external change is picked up on
+	 * the next open); changes while the modal is open are not tracked.
 	 */
 	value?: number | number[];
 
@@ -222,14 +241,9 @@ export function MediaUploadModal( {
 	search = true,
 	searchLabel = __( 'Search media' ),
 }: MediaUploadModalProps ) {
-	const [ selection, setSelection ] = useState< string[] >( () => {
-		if ( ! value ) {
-			return [];
-		}
-		return Array.isArray( value )
-			? value.map( String )
-			: [ String( value ) ];
-	} );
+	const [ selection, setSelection ] = useState< string[] >( () =>
+		getSelectionFromValue( value )
+	);
 
 	const { createSuccessNotice, removeAllNotices } =
 		useDispatch( noticesStore );
@@ -466,8 +480,24 @@ export function MediaUploadModal( {
 		onClose?.();
 	}, [ removeAllNotices, onClose ] );
 
+	// Keep the latest `value` in a ref so the open effect can read it without
+	// depending on it. Not depending on `value` means a change while the modal is
+	// open won't discard the user's in-progress selection, and an unstable array
+	// prop can't retrigger the effect.
+	const valueRef = useRef( value );
 	useEffect( () => {
-		if ( ! isOpen ) {
+		valueRef.current = value;
+	}, [ value ] );
+
+	useEffect( () => {
+		if ( isOpen ) {
+			// The modal instance stays mounted between opens, so re-seed the
+			// selection from the current `value` each time it opens. This clears
+			// a previous session's selection and picks up any change to `value`
+			// made while the modal was closed.
+			setSelection( getSelectionFromValue( valueRef.current ) );
+		} else {
+			// Reset the view (page/search) on close, as before.
 			setQueryParams( defaultQueryParams );
 		}
 	}, [ isOpen ] );
@@ -561,7 +591,6 @@ export function MediaUploadModal( {
 					accept={ acceptTypes }
 					multiple
 					onChange={ handleFileSelect }
-					__next40pxDefaultSize
 					render={ ( { openFileDialog } ) => (
 						<Button
 							onClick={ openFileDialog }
@@ -616,6 +645,7 @@ export function MediaUploadModal( {
 				isLoading={ isLoading }
 				paginationInfo={ paginationInfo }
 				defaultLayouts={ defaultLayouts }
+				config={ dataViewsConfig }
 				getItemId={ ( item: RestAttachment ) => String( item.id ) }
 				itemListLabel={ __( 'Media items' ) }
 				onReset={ isModified ? resetToDefault : false }
@@ -655,7 +685,7 @@ export function MediaUploadModal( {
 						onDismissError={ dismissError }
 						onOpenChange={ handlePopoverOpenChange }
 					/>
-					<DataViewsPicker.BulkActionToolbar />
+					<DataViewsPicker.Footer />
 				</div>
 			</DataViewsPicker>
 			{ createPortal(

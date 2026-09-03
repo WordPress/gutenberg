@@ -6,8 +6,8 @@
 			"url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
 			"alt": "",
 			"caption": "",
-			"sizeSlug": "large",
-			"width": "200px"
+			"width": "200px",
+			"sizeSlug": "large"
 		},
 		"innerBlocks": []
 	}

@@ -20,7 +20,7 @@ For each Gutenberg plugin release, we also publish to npm an updated version of 
 
 We deliberately update the `wp/latest` branch within the Gutenberg repo with the content from the Gutenberg release `release/X.Y` (example `release/12.7`) branch at the time of the Gutenberg RC1 release. This is done to ensure that the `wp/latest` branch is as close as possible to the latest version of the Gutenberg plugin. It also practically removes the chances of conflicts while backporting to `trunk` commits with updates applied during publishing to `package.json` and `CHANGELOG.md` files. In the past, we had many issues in that aspect when doing npm publishing after the regular Gutenberg release a week later. When publishing the new package versions to npm, we pick at least the `minor` version bump to account for future bugfix or security releases.
 
-Behind the scenes, all steps are automated via `npm exec release-cli -- npm-latest`. For the record, the manual process would look very close to the following steps:
+Behind the scenes, all steps are automated via `npm exec --no release-cli -- npm-latest`. For the record, the manual process would look very close to the following steps:
 
 1. Ensure the WordPress `trunk` branch is open for enhancements.
 2. Get the last published Gutenberg release branch with `git fetch`.
@@ -31,11 +31,42 @@ Behind the scenes, all steps are automated via `npm exec release-cli -- npm-late
 7. Update the `CHANGELOG.md` files of the packages with the new publish version calculated and commit to the `wp/latest` branch. Assuming the package versions are written using this format `major.minor.patch`, make sure to bump at least the `minor` version bumps gets applied. For example, if the CHANGELOG of the package to be released indicates that the next unreleased version is `5.6.1`, choose `5.7.0` as a version in case of `minor` version. This is important as the patch version numbers should be reserved in case bug fixes are needed for a minor WordPress release (see below).
 8. Log-in to npm via the console: `npm login`. Note that you should have 2FA enabled.
 9. From the `wp/latest` branch, install npm dependencies with `npm ci`.
-10. Run the script `npx lerna publish --no-private`.
+10. Run the script `npm exec --no -- lerna publish --no-private`.
     - When asked for the version numbers to choose for each package pick the values of the updated CHANGELOG files.
     - You'll be asked for your One-Time Password (OTP) a couple of times. This is the code from the 2FA authenticator app you use. Depending on how many packages are to be released you may be asked for more than one OTP, as they tend to expire before all packages are released.
-    - If the publishing process ends up incomplete (perhaps because it timed-out or a bad OTP was introduced) you can resume it via [`npx lerna publish from-package`](https://lerna.js.org/docs/features/version-and-publish#from-package).
+    - If the publishing process ends up incomplete (perhaps because it timed-out or a bad OTP was introduced), inspect npm state before resuming with [`npm exec --no -- lerna publish from-package`](https://lerna.js.org/docs/features/version-and-publish#from-package). See [Recovering from a partial npm publish](#recovering-from-a-partial-npm-publish).
 11. Finally, now that the npm packages are published, cherry-pick the commits created by lerna ("Publish" and the CHANGELOG update) into the `trunk` branch of Gutenberg.
+
+### Recovering from a partial npm publish
+
+If npm publishing fails part-way through, do not assume every target package version is still unpublished. Some expected versions may already exist on npm while the release branch, package tags, or dist-tags still need recovery.
+
+Before restarting any mutating step, inspect the npm registry state for the packages listed in the failed job. Do not infer the remaining work from the package where the job stopped; retries or manual recovery attempts can leave a non-contiguous set of package versions published.
+
+For one package:
+
+```sh
+git rev-parse HEAD
+npm view @wordpress/components@X.Y.Z version gitHead --json
+npm dist-tag ls @wordpress/components
+```
+
+To inspect all package versions from the current release branch:
+
+```sh
+git rev-parse HEAD
+npm exec --no -- lerna list --json --no-private | jq -r '.[] | "\(.name)@\(.version)"' | while read package_version; do
+	package="${package_version%@*}"
+	version="${package_version##*@}"
+	echo "$package@$version"
+	npm view "$package@$version" version gitHead --json || true
+	npm dist-tag ls "$package"
+done
+```
+
+Resume only when each target already on npm reports the expected version, its registry `gitHead` matches the prepared release commit printed by `git rev-parse HEAD`, and the expected dist-tag points to it. Then continue either with [`npm exec --no -- lerna publish from-package`](https://lerna.js.org/docs/features/version-and-publish#from-package), which publishes local package versions that are not yet on npm and skips the ones that already made it, or the workflow's generated recovery command when one is printed.
+
+When a workflow run prints branch or package-tag recovery commands after npm publishing succeeds but Git metadata publication fails, prefer those run-specific commands over starting a fresh release.
 
 ## WordPress releases
 
@@ -59,7 +90,8 @@ For the record, the manual process would look like the following:
 
 1. Check out the WordPress branch used before (example `wp/5.2`).
 2. `git pull`.
-3. Run the `npx lerna publish patch --no-private --dist-tag wp-5.2` command (see more in [package release process]) but when asked for the version numbers to choose for each package, (assuming the package versions are written using this format `major.minor.patch`) make sure to bump only the `patch` version number. For example, if the last published package version for this WordPress branch was `5.6.0`, choose `5.6.1` as a version.
+3. Install npm dependencies with `npm ci`.
+4. Run the `npm exec --no -- lerna publish patch --no-private --dist-tag wp-5.2` command (see more in [package release process]) but when asked for the version numbers to choose for each package, (assuming the package versions are written using this format `major.minor.patch`) make sure to bump only the `patch` version number. For example, if the last published package version for this WordPress branch was `5.6.0`, choose `5.6.1` as a version.
 
 **Note:** For WordPress `5.0` and WordPress `5.1`, a different release process was used. This means that when choosing npm package versions targeting these two releases, you won't be able to use the next `patch` version number as it may have been already used. You should use the "metadata" modifier for these. For example, if the last published package version for this WordPress branch was `5.6.1`, choose `5.6.1+patch.1` as a version.
 
@@ -88,7 +120,8 @@ Open a terminal and perform the following steps:
 Before porting commits check that the `wp/latest` branch does not have any outstanding packages waiting to be published:
 
 1. `git checkout wp/latest`
-2. `npx lerna updated`
+2. `npm ci`
+3. `npm exec --no -- lerna updated`
 
 Now _cherry-pick_ the commits from `trunk` to `wp/latest`, use `-m 1 commithash` if the commit was a pull request merge commit:
 
@@ -98,10 +131,12 @@ Now _cherry-pick_ the commits from `trunk` to `wp/latest`, use `-m 1 commithash`
 Whilst waiting for the GitHub actions build for `wp/latest`[branch to pass](https://github.com/WordPress/gutenberg/actions?query=branch%3Awp%2Ftrunk), identify and begin updating the `CHANGELOG.md` files:
 
 1. `git checkout wp/latest`
-2. `npx lerna updated`
+2. `npm ci`
+3. `npm exec --no -- lerna updated`
    Example:
+
    ```shell
-   npx lerna updated
+   npm exec --no -- lerna updated
    @wordpress/e2e-tests
    @wordpress/jest-preset-default
    @wordpress/scripts
@@ -124,10 +159,10 @@ Behind the scenes, the rest of the process is automated with `npm exec --no rele
 2. Update the `CHANGELOG.md` files of the packages with the new publish version calculated and commit to the `wp/latest` branch.
 3. Log-in to npm via the console: `npm login`. Note that you should have 2FA enabled.
 4. From the `wp/latest` branch, install npm dependencies with `npm ci`.
-5. Run the script `npx lerna publish --no-private`.
+5. Run the script `npm exec --no -- lerna publish --no-private`.
     - When asked for the version numbers to choose for each package pick the values of the updated CHANGELOG files.
     - You'll be asked for your One-Time Password (OTP) a couple of times. This is the code from the 2FA authenticator app you use. Depending on how many packages are to be released you may be asked for more than one OTP, as they tend to expire before all packages are released.
-    - If the publishing process ends up incomplete (perhaps because it timed-out or a bad OTP was introduced) you can resume it via [`npx lerna publish from-package`](https://lerna.js.org/docs/features/version-and-publish#from-package).
+    - If the publishing process ends up incomplete (perhaps because it timed-out or a bad OTP was introduced), inspect npm state before resuming with [`npm exec --no -- lerna publish from-package`](https://lerna.js.org/docs/features/version-and-publish#from-package). See [Recovering from a partial npm publish](#recovering-from-a-partial-npm-publish).
 6. Finally, now that the npm packages are published, cherry-pick the commits created by lerna ("Publish" and the CHANGELOG update) into the `trunk` branch of Gutenberg.
 
 ## Development releases
@@ -149,7 +184,7 @@ In order to start the publishing process for development version of npm packages
 To publish development packages to npm, select `development` from the "Release type" dropdown and leave empty "WordPress major release" input field. Finally, press the green "Run workflow" button. It triggers the npm publishing job, and this needs to be approved by a Gutenberg Core team member. Locate the ["Publish npm packages" action](https://github.com/WordPress/gutenberg/actions/workflows/publish-npm-packages.yml) for the current publishing, and have it [approved](https://docs.github.com/en/actions/how-tos/managing-workflow-runs-and-deployments/managing-deployments/reviewing-deployments#approving-or-rejecting-a-job).
 
 Behind the scenes, the release process is fully automated via `npm exec --no release-cli -- npm-next` command. It ensures
-the `wp/next` branch is synchronized with the latest release branch (`release/X.Y`) created for the Gutenberg plugin. To avoid collisions in the versioning of packages, we always include the newest commit's `sha`, for example, `@wordpress/block-editor@5.2.10-next.645224df70.0`.
+the `wp/next` branch is synchronized with the latest release branch (`release/X.Y`) created for the Gutenberg plugin. To avoid version collisions, development releases include a timestamp, for example, `@wordpress/block-editor@5.2.10-next.v.202607130915.0`.
 
 [plugin repository]: https://plugins.trac.wordpress.org/browser/gutenberg/
 [package release process]: https://github.com/WordPress/gutenberg/blob/HEAD/packages/README.md#releasing-packages

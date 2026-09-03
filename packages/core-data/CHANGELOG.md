@@ -2,6 +2,84 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The entity record selectors infer the record from their `kind` and `name` arguments with a `const` type parameter. TypeScript consumers now require TypeScript 5 or newer. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
+-   `Post` and `Page` now match the REST schema: `content.is_protected` is replaced by `content.protected`, and `content.block_version` is typed as a `number` rather than a `string`. Rename any read of `content.is_protected`, and drop annotations or casts that treated `block_version` as a string. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
+-   The `getGlobalStyles` and `saveGlobalStyles` shortcuts now use `GlobalStyles` instead of the unrelated `GlobalStylesRevision` record. `saveGlobalStyles` requires the record ID and accepts a plain string title, matching the REST API update route and schema. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
+-   `RenderedText` omits `raw` outside the edit context instead of typing it as `never`, so a record requested with `context: 'view'` or `context: 'embed'` no longer exposes `title.raw` or `content.raw`. Read `rendered` in those contexts, or request the record with `context: 'edit'`. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
+
+### Bug Fixes
+
+-   Keep a query's `totalItems` in sync when records are removed from it, so the page count is correct after a deletion instead of only after the next fetch ([#82244](https://github.com/WordPress/gutenberg/pull/82244)).
+
+### Enhancements
+
+-   `getEntityRecord` and `getEntityRecords` now infer verified post, page, media, block, navigation, global styles, icon, and icon collection records from their `kind` and `name` arguments and resolve their context from the query, so `getEntityRecord( 'postType', 'post', id ).title` type checks without naming `Post` by hand, and a `context: 'view'` request is not typed with the edit-context fields. Pairs the map does not cover still resolve to the previous union, and a plugin opts in by merging into `EntityRecordTypes` or a per-kind interface. A call that names no context resolves the one its entity is registered to be fetched in, declared in `EntityContextDefaults` and extended the same way; a pair that declares none resolves to every context. Adds `Block`, `Navigation`, `GlobalStyles`, and `IconCollection` records, and drops assertions only from mapped call sites; one assertion was hiding a nullable draft date. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
+-   Add the REST `class_list` field to inferred posts, pages, and media, and add media `filename` and `filesize` fields. Embed records omit these view/edit-only fields. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
+-   Queries that use `_fields` infer a recursively partial entity record, so TypeScript requires callers to account for omitted top-level and nested object fields. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
+-   Keep `Attachment.caption.rendered` available in view and embed contexts while limiting `caption.raw` to edit responses, matching the REST schema. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
+-   Match the Navigation embed record and current global styles ID types to their REST responses. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
+-   Export `ContextualField` so plugins can describe context-sensitive fields when extending the entity record map. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
+-   `PostStatus` accepts statuses registered by WordPress or plugins while preserving autocomplete for the built-in values. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
+
+### Internal
+
+-   Remove the template activation (`active_templates`) experiment: drop the `registeredTemplate` entity and the experiment-only `wp_template` endpoint rewrites and query params ([#82241](https://github.com/WordPress/gutenberg/pull/82241)).
+-   Remove unused dependency `@wordpress/is-shallow-equal` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+-   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
+
+## 7.54.0 (2026-08-26)
+
+### Bug Fixes
+
+-   Validate the shared parsed-blocks cache against the registered block types as well as the content, so a record resolved before the block types register — as happens when the editor's assets load lazily — is re-parsed instead of rendering, and one save later persisting, an empty block list ([#81809](https://github.com/WordPress/gutenberg/pull/81809)).
+-   Allow keyless entities to be addressed without a record ID in the entity record selectors and actions ([#81857](https://github.com/WordPress/gutenberg/pull/81857)).
+-   Fix `getEntityRecordsTotalItems` and `getEntityRecordsTotalPages` returning `NaN` for endpoints that send no pagination headers.
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+-   Gate entity sync configuration and sync manager creation on the `window.__experimentalEnableRealTimeCollaboration` flag set by the Real-Time Collaboration experiment, replacing the `window._wpCollaborationEnabled` option flag ([#80658](https://github.com/WordPress/gutenberg/pull/80658)).
+
+## 7.53.0 (2026-08-12)
+
+### Enhancements
+
+-   Improve error reporting in private action `saveDirtyEntities` ([#81151](https://github.com/WordPress/gutenberg/pull/81151)).
+-   Add the `block-templates` and `block-template-parts` theme features to the `ThemeSupports` type. Both are registered with `show_in_rest`, so they were already present in the response ([#81581](https://github.com/WordPress/gutenberg/pull/81581)).
+
+### Bug Fixes
+
+-   Footnotes: Treat unreadable `footnotes` post meta as no footnotes instead of throwing. Malformed JSON, or valid JSON that is not an array, threw inside a store subscriber where no error boundary catches it, so the edit was dropped and the post silently stopped saving ([#81201](https://github.com/WordPress/gutenberg/pull/81201)).
+-   `saveEntityRecord`: Reset persisted edits using the original edits instead of the `__unstablePrePersist`-augmented request payload. With collaborative editing enabled, the injected CRDT snapshot made the post-save comparison against the state edits fail, leaving the record dirty after a successful save whenever `meta` was edited.
+-   Ensure revision resolvers finish after fetched revisions are stored.
+
+### Internal
+
+-   Add missing `@wordpress/base-styles` dependency ([#81012](https://github.com/WordPress/gutenberg/pull/81012)).
+
+## 7.52.0 (2026-07-29)
+
+### Internal
+
+-   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).
+
+## 7.51.0 (2026-07-14)
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 7.50.0 (2026-07-01)
+
+## 7.49.0 (2026-06-24)
+
+## 7.48.1 (2026-06-16)
+
+## 7.48.0 (2026-06-10)
+
 ### Code Quality
 
 -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).

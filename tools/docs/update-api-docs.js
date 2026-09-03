@@ -1,7 +1,4 @@
-/**
- * External dependencies
- */
-const { join, relative, resolve, sep, dirname } = require( 'path' );
+const { relative, resolve, sep, dirname } = require( 'path' );
 const { Transform } = require( 'stream' );
 const { readFile } = require( 'fs' ).promises;
 const glob = require( 'fast-glob' );
@@ -18,6 +15,20 @@ const execa = require( 'execa' );
  *
  * @typedef {[string,WPReadmeFileTokens]} WPReadmeFileData
  */
+
+/**
+ * Absolute path to the `docgen` bin. Resolved via module resolution rather than
+ * a `node_modules/.bin` path, whose location depends on the install layout.
+ *
+ * @type {string}
+ */
+const DOCGEN_BIN = ( () => {
+	const packageJsonPath = require.resolve( '@wordpress/docgen/package.json' );
+	return resolve(
+		dirname( packageJsonPath ),
+		require( packageJsonPath ).bin.docgen
+	);
+} )();
 
 /**
  * Path to root project directory.
@@ -175,19 +186,18 @@ const filterTokenTransform = new Transform( {
 } );
 
 /**
- * Find default source file (`src/index.{js,ts,tsx}`) in a specified package directory
+ * Find default source file (`src/index.{js,jsx,ts,tsx}`) in a specified package directory
  *
  * @param {string} dir Package directory to search in
  * @return {string} Name of matching file
  */
 function findDefaultSourcePath( dir ) {
-	const defaultPathMatches = glob.sync( 'src/index.{js,ts,tsx}', {
+	const defaultPathMatches = glob.sync( 'src/index.{js,jsx,ts,tsx}', {
 		cwd: dir,
 	} );
 	if ( ! defaultPathMatches.length ) {
 		throw new Error( `Cannot find default source file in ${ dir }` );
 	}
-	// @ts-ignore
 	return defaultPathMatches[ 0 ];
 }
 
@@ -221,14 +231,7 @@ glob.stream( [
 					resolve( dirname( file ), path )
 				);
 				await execa(
-					join(
-						__dirname,
-						'..',
-						'..',
-						'node_modules',
-						'.bin',
-						'docgen'
-					),
+					DOCGEN_BIN,
 					[
 						sourcePath,
 						'--output',

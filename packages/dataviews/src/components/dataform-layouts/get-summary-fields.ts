@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { NormalizedField, NormalizedSummaryField } from '../../types';
 
 /**

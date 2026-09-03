@@ -2,8 +2,101 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `@wordpress/build` no longer parses JSX syntax in `.js` source files. Rename these files to `.jsx` or `.tsx` before building ([#82189](https://github.com/WordPress/gutenberg/pull/82189)).
+
+### Enhancements
+
+-   Target `@wordpress/browserslist-config` for JavaScript and CSS when the project has no Browserslist config, instead of Browserslist's implicit defaults ([#82179](https://github.com/WordPress/gutenberg/pull/82179)).
+-   Transpile `.jsx` package, route, and widget source files alongside the existing JavaScript and TypeScript extensions, and ignore JSX tests during watch rebuilds ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
 ### Bug Fixes
 
+-   Pages: require authentication and a configurable capability (new `capability` page setting, default `manage_options`) before rendering generated standalone pages, so `admin_init` entry points such as `admin-post.php` no longer serve them to logged-out visitors ([#82254](https://github.com/WordPress/gutenberg/pull/82254)).
+-   Widen the optional `@wordpress/theme` peer dependency range to allow 2.x releases. ([#82139](https://github.com/WordPress/gutenberg/pull/82139))
+-   Pages: preserve the Core Boot layout compatibility class in generated wp-admin page templates so short pages fill the viewport when using Core's bundled Boot module ([#82112](https://github.com/WordPress/gutenberg/pull/82112)).
+
+## 0.22.0 (2026-08-26)
+
+### Internal
+
+-   Identify generated wp-admin page mount elements by their page-specific ID instead of a Boot class ([#81756](https://github.com/WordPress/gutenberg/pull/81756)).
+
+### Bug Fixes
+
+-   Register the content module for routes that only export a `canvas`, so a route without a stage or inspector can render a custom canvas ([#81578](https://github.com/WordPress/gutenberg/pull/81578)).
+-   Pages: use the boot module that ships with Core when the plugin has no local one, so plugin pages are no longer empty ([#81761](https://github.com/WordPress/gutenberg/pull/81761)).
+
+### Documentation
+
+-   Widget attributes: the `relevance` hint documents the `'medium'` tier
+    ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
+
+## 0.21.0 (2026-08-12)
+
+### Enhancements
+
+-   Widgets: carry an action's `icon` and `relevance` from `widget.json`
+    into the generated PHP registry ([#81275](https://github.com/WordPress/gutenberg/pull/81275)).
+-   Widgets: carry a widget's declarative `icon` reference from `widget.json`
+    into the generated PHP registry ([#80969](https://github.com/WordPress/gutenberg/pull/80969)).
+-   Render a no-JavaScript heading and notice from the generated page templates ([#81365](https://github.com/WordPress/gutenberg/pull/81365)).
+
+### Bug Fixes
+
+-   Scope the generated page template's critical styles to `body.js` so the no-JS notice stays visible ([#80628](https://github.com/WordPress/gutenberg/pull/80628)).
+-   Wrap script bundles in an IIFE to avoid `use strict` affecting external code in concatenated JavaScript files ([#79792](https://github.com/WordPress/gutenberg/pull/79792).
+
+### Internal
+
+-   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
+
+## 0.20.0 (2026-07-29)
+
+### Enhancements
+
+-   Widgets: carry a widget's declarative `actions` from `widget.json` into
+    the generated PHP registry ([#80363](https://github.com/WordPress/gutenberg/pull/80363)).
+
+### Bug Fixes
+
+-   Ignore generated `src/worker-code.ts` in watch mode to stop rebuild loops for worker packages like `@wordpress/vips` ([#80361](https://github.com/WordPress/gutenberg/pull/80361)).
+-   Pass the current `$hook_suffix` to the `admin_footer` action in the generated single-page admin template instead of an empty string ([#75985](https://github.com/WordPress/gutenberg/pull/75985)).
+-   Sync the page template `/?_fields=` preload path with the `_fields` list in `@wordpress/core-data` so the preload is consumed instead of the page issuing a duplicate request ([#80648](https://github.com/WordPress/gutenberg/pull/80648)).
+
+## 0.19.0 (2026-07-14)
+
+### Enhancements
+
+-   Align the generated single-page admin font-family stack with the `@wordpress/theme` body token ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
+-   Widgets: carry the optional metadata fields from `widget.json` into
+    the generated PHP registry: `title`, `description`, `category`,
+    `keywords`, `textdomain`, and the `help` note, so hosts can translate
+    the user-facing fields server-side
+    ([#79638](https://github.com/WordPress/gutenberg/pull/79638),
+    [#79701](https://github.com/WordPress/gutenberg/pull/79701),
+    [#79830](https://github.com/WordPress/gutenberg/pull/79830)).
+
+### Bug Fixes
+
+-   Widen the optional `@wordpress/theme` peer dependency range to allow 1.x releases and preserve automatic design token fallback plugin loading ([#80089](https://github.com/WordPress/gutenberg/pull/80089)).
+
+## 0.18.0 (2026-07-01)
+
+## 0.17.0 (2026-06-24)
+
+### Documentation
+
+-   Fix `genereated` typo to `generated` in README. ([#79331](https://github.com/WordPress/gutenberg/pull/79331))
+
+## 0.16.1 (2026-06-16)
+
+## 0.16.0 (2026-06-10)
+
+### Bug Fixes
+
+-   Stop the build from crashing when a namespaced import resolves to a package that is not an installed dependency. `getPackageInfo` now returns `null` (honoring its documented contract) instead of throwing, letting the externals plugin fall through to esbuild's own resolution ([#78715](https://github.com/WordPress/gutenberg/pull/78715)).
 -   Remove the incorrect `#wpwrap` background from wp-admin critical CSS to prevent a black flash before hydration; rely on the existing `body` background instead ([#78493](https://github.com/WordPress/gutenberg/pull/78493)).
 -   Revert the getter-based export replacement in `@wordpress/build` to restore compatibility for affected Gutenberg 23.0 builds ([#78917](https://github.com/WordPress/gutenberg/pull/78917)).
 
@@ -42,12 +135,12 @@
 
 ### Breaking Changes
 
-- `@wordpress/boot`, `@wordpress/route`, `@wordpress/theme`, and `@wordpress/private-apis` are no longer bundled. They are now expected to be provided by WordPress Core (7.0+) or the Gutenberg plugin.
+-   `@wordpress/boot`, `@wordpress/route`, `@wordpress/theme`, and `@wordpress/private-apis` are no longer bundled. They are now expected to be provided by WordPress Core (7.0+) or the Gutenberg plugin.
 
 ### Enhancements
 
-- Avoid unexpected results when typecasting `IS_GUTENBERG_PLUGIN` and `IS_WORDPRESS_CORE` values to Booleans ([#75844](https://github.com/WordPress/gutenberg/pull/75844)).
-- Skip PHP transforms during builds when building for WordPress Core ([#75844](https://github.com/WordPress/gutenberg/pull/75844)).
+-   Avoid unexpected results when typecasting `IS_GUTENBERG_PLUGIN` and `IS_WORDPRESS_CORE` values to Booleans ([#75844](https://github.com/WordPress/gutenberg/pull/75844)).
+-   Skip PHP transforms during builds when building for WordPress Core ([#75844](https://github.com/WordPress/gutenberg/pull/75844)).
 
 ## 0.9.0 (2026-03-04)
 
@@ -55,25 +148,25 @@
 
 ## 0.7.0 (2026-01-29)
 
-- Update documentation to describe `wpPlugin.name`
-- Add `wpWorkers` field support for automatic worker bundling ([#74785](https://github.com/WordPress/gutenberg/pull/74785)).
-- Add WASM inlining plugin for bundling WebAssembly modules.
+-   Update documentation to describe `wpPlugin.name`
+-   Add `wpWorkers` field support for automatic worker bundling ([#74785](https://github.com/WordPress/gutenberg/pull/74785)).
+-   Add WASM inlining plugin for bundling WebAssembly modules.
 
 ## 0.6.0 (2026-01-16)
 
 ### Breaking Changes
 
-- Renamed generated PHP files to avoid `index.php` naming conflicts:
-  - `build/index.php` → `build/build.php`
-  - `build/modules/index.php` → `build/modules/registry.php`
-  - `build/scripts/index.php` → `build/scripts/registry.php`
-  - `build/styles/index.php` → `build/styles/registry.php`
-  - `build/routes/index.php` → `build/routes/registry.php`
-- All generated page functions now include the `{{PREFIX}}` (from `wpPlugin.name`) at the beginning:
-  - `register_my_page_route()` → `my_plugin_register_my_page_route()`
-  - `my_page_render_page()` → `my_plugin_my_page_render_page()`
-  - And similarly for all other page functions
-- Route registration now uses named functions instead of anonymous closures, allowing third-party developers to unhook them
+-   Renamed generated PHP files to avoid `index.php` naming conflicts:
+    -   `build/index.php` → `build/build.php`
+    -   `build/modules/index.php` → `build/modules/registry.php`
+    -   `build/scripts/index.php` → `build/scripts/registry.php`
+    -   `build/styles/index.php` → `build/styles/registry.php`
+    -   `build/routes/index.php` → `build/routes/registry.php`
+-   All generated page functions now include the `{{PREFIX}}` (from `wpPlugin.name`) at the beginning:
+    -   `register_my_page_route()` → `my_plugin_register_my_page_route()`
+    -   `my_page_render_page()` → `my_plugin_my_page_render_page()`
+    -   And similarly for all other page functions
+-   Route registration now uses named functions instead of anonymous closures, allowing third-party developers to unhook them
 
 ## 0.4.0 (2025-11-26)
 
@@ -83,9 +176,9 @@
 
 ### New Features
 
-- Initial release of `@wordpress/build` package
-- Transpilation support for TypeScript/JSX to CommonJS and ESM formats
-- SCSS and CSS modules compilation with LTR and RTL support
-- WordPress script and module bundling
-- Automatic PHP registration file generation
-- Watch mode for development
+-   Initial release of `@wordpress/build` package
+-   Transpilation support for TypeScript/JSX to CommonJS and ESM formats
+-   SCSS and CSS modules compilation with LTR and RTL support
+-   WordPress script and module bundling
+-   Automatic PHP registration file generation
+-   Watch mode for development

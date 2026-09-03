@@ -1,7 +1,7 @@
-/**
- * Internal dependencies
- */
-import { calculateVersionBumpFromChangelog } from '../common';
+import { createRequire } from 'node:module';
+import { describe, expect, it } from 'vitest';
+const require = createRequire( import.meta.url );
+const { calculateVersionBumpFromChangelog } = require( '../common' );
 
 describe( 'calculateVersionBumpFromChangelog', () => {
 	it( 'should return null when no lines provided', () => {

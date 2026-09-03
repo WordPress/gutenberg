@@ -32,8 +32,11 @@
 		"node-fetch": "^2.7.0",
 		"rimraf": "^5.0.10",
 		"semver": "^7.5.4",
-		"simple-git": "^3.24.0",
+		"simple-git": "^3.32.3",
 		"sprintf-js": "^1.1.1"
+	},
+	"devDependencies": {
+		"vitest": "^4.1.10"
 	},
 	"publishConfig": {
 		"access": "public"

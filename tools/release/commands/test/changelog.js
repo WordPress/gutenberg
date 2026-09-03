@@ -1,7 +1,45 @@
-/**
- * Internal dependencies
- */
-import {
+import { createRequire } from 'node:module';
+import { beforeEach, describe, expect, it, test, vi } from 'vitest';
+import _pullRequests from './fixtures/pull-requests.json';
+import botPullRequestFixture from './fixtures/bot-pull-requests.json';
+const require = createRequire( import.meta.url );
+const octokitPath = require.resolve( '@octokit/rest' );
+const octokitModule = require( '@octokit/rest' );
+const Octokit = vi.fn();
+const milestonePath = require.resolve( '../../lib/milestone' );
+const milestoneModule = require( '../../lib/milestone' );
+const getMilestoneByTitle = vi.fn();
+const getIssuesByMilestone = vi.fn();
+const loggerPath = require.resolve( '../../lib/logger' );
+const loggerModule = require( '../../lib/logger' );
+const log = vi.fn();
+const warn = vi.fn();
+const changelogPath = require.resolve( '../changelog' );
+let changelog;
+try {
+	require.cache[ octokitPath ].exports = { ...octokitModule, Octokit };
+	require.cache[ milestonePath ].exports = {
+		getMilestoneByTitle,
+		getIssuesByMilestone,
+	};
+	require.cache[ loggerPath ].exports = {
+		log,
+		warn,
+		formats: {
+			title: vi.fn( ( message ) => message ),
+			error: vi.fn( ( message ) => message ),
+			warning: vi.fn( ( message ) => message ),
+			success: vi.fn( ( message ) => message ),
+		},
+	};
+	changelog = require( changelogPath );
+} finally {
+	require.cache[ octokitPath ].exports = octokitModule;
+	require.cache[ milestonePath ].exports = milestoneModule;
+	require.cache[ loggerPath ].exports = loggerModule;
+	delete require.cache[ changelogPath ];
+}
+const {
 	getNormalizedTitle,
 	reword,
 	addTrailingPeriod,
@@ -20,9 +58,10 @@ import {
 	getContributorProps,
 	getContributorsList,
 	mapLabelsToFeatures,
-} from '../changelog';
-import _pullRequests from './fixtures/pull-requests.json';
-import botPullRequestFixture from './fixtures/bot-pull-requests.json';
+	createChangelog,
+	fetchAllPullRequests,
+	getManualChangelogInstructions,
+} = changelog;
 
 /**
  * pull-requests.json is a static snapshot of real data from the GitHub API.
@@ -33,6 +72,149 @@ import botPullRequestFixture from './fixtures/bot-pull-requests.json';
  */
 const pullRequests = _pullRequests.concat( botPullRequestFixture );
 
+/**
+ * Returns an Octokit stub for a repository without any release, so that
+ * `--unreleased` runs find no previous release in the series.
+ *
+ * @return {Object} Octokit stub.
+ */
+function createOctokitWithoutReleases() {
+	return {
+		repos: {
+			listReleases: {
+				endpoint: {
+					merge: vi.fn().mockReturnValue( {} ),
+				},
+			},
+		},
+		paginate: {
+			iterator: vi.fn().mockReturnValue(
+				( async function* () {
+					yield { data: [] };
+				} )()
+			),
+		},
+	};
+}
+
+describe( 'createChangelog', () => {
+	const settings = {
+		owner: 'WordPress',
+		repo: 'gutenberg',
+		milestone: 'Gutenberg 23.5',
+		unreleased: false,
+	};
+
+	beforeEach( () => {
+		vi.clearAllMocks();
+		Octokit.mockImplementation( function () {
+			return {};
+		} );
+	} );
+
+	it( 'keeps successful changelog output unchanged', async () => {
+		getMilestoneByTitle.mockResolvedValue( {
+			number: 235,
+			title: settings.milestone,
+		} );
+		getIssuesByMilestone.mockResolvedValue( pullRequests );
+
+		await createChangelog( settings );
+
+		expect( log ).toHaveBeenCalledTimes( 2 );
+		expect( log ).toHaveBeenNthCalledWith(
+			2,
+			getChangelog( pullRequests ) +
+				getContributorProps( pullRequests ) +
+				getContributorsList( pullRequests )
+		);
+	} );
+
+	it( 'does not swallow operational errors', async () => {
+		getMilestoneByTitle.mockRejectedValue(
+			new Error( 'GitHub request failed.' )
+		);
+
+		await expect( createChangelog( settings ) ).rejects.toThrow(
+			'GitHub request failed.'
+		);
+		expect( log ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'explains how to fill the notes in by hand when there are no unreleased pull requests', async () => {
+		Octokit.mockImplementation( createOctokitWithoutReleases );
+		getMilestoneByTitle.mockResolvedValue( {
+			number: 235,
+			title: settings.milestone,
+		} );
+		// An issue that is not a pull request, so no pull request is found.
+		getIssuesByMilestone.mockResolvedValue( [ { number: 123 } ] );
+
+		await createChangelog( { ...settings, unreleased: true } );
+
+		expect( warn ).toHaveBeenCalledTimes( 1 );
+		expect( log ).toHaveBeenCalledTimes( 2 );
+		expect( log ).toHaveBeenNthCalledWith(
+			2,
+			getManualChangelogInstructions( settings.milestone )
+		);
+	} );
+} );
+
+describe( 'getManualChangelogInstructions', () => {
+	it( 'includes the command that regenerates the notes for the milestone', () => {
+		expect( getManualChangelogInstructions( 'Gutenberg 23.5' ) ).toContain(
+			'npm run other:changelog -- --milestone="Gutenberg 23.5" --unreleased'
+		);
+	} );
+} );
+
+describe( 'fetchAllPullRequests', () => {
+	it( 'resolves to an empty list when a milestone has no unreleased pull requests', async () => {
+		const milestone = 'Gutenberg 23.5';
+
+		getMilestoneByTitle.mockResolvedValue( {
+			number: 235,
+			title: milestone,
+		} );
+		getIssuesByMilestone.mockResolvedValue( [ { number: 123 } ] );
+
+		await expect(
+			fetchAllPullRequests( createOctokitWithoutReleases(), {
+				owner: 'WordPress',
+				repo: 'gutenberg',
+				milestone,
+				unreleased: true,
+			} )
+		).resolves.toEqual( [] );
+	} );
+
+	it( 'fails when a milestone has no pull requests at all', async () => {
+		const milestone = 'Gutenberg 23.5';
+
+		getMilestoneByTitle.mockResolvedValue( {
+			number: 235,
+			title: milestone,
+		} );
+		getIssuesByMilestone.mockResolvedValue( [ { number: 123 } ] );
+
+		await expect(
+			// Without `unreleased`, no release is looked up.
+			fetchAllPullRequests(
+				{},
+				{
+					owner: 'WordPress',
+					repo: 'gutenberg',
+					milestone,
+					unreleased: false,
+				}
+			)
+		).rejects.toThrow(
+			'There are no pull requests associated with milestone "Gutenberg 23.5".'
+		);
+	} );
+} );
+
 describe( 'getNormalizedTitle', () => {
 	const DEFAULT_ISSUE = {
 		labels: [],
@@ -41,20 +223,6 @@ describe( 'getNormalizedTitle', () => {
 	it.each( [
 		[ 'adds period', 'Fixes a bug', 'Fixes a bug.' ],
 		[ 'keeps period', 'Fixes a bug.', 'Fixes a bug.' ],
-		[
-			'omits mobile by title',
-			'[RNMoBILe] Address mobile concern',
-			undefined,
-		],
-		[
-			'omits mobile by issue',
-			'Address mobile concern',
-			undefined,
-			{
-				...DEFAULT_ISSUE,
-				labels: [ { name: 'Mobile App - i.e. Android or iOS' } ],
-			},
-		],
 		[
 			'avoids reword of joined terms',
 			'e2e-tests: Improve test stability',
@@ -200,32 +368,47 @@ describe( 'getIssueType', () => {
 
 		expect( result ).toBe( 'Tools' );
 	} );
+
+	it( 'returns the testing type for flaky test fixes', () => {
+		const result = getIssueType( {
+			labels: [ { name: '[Type] Flaky Test' } ],
+		} );
+
+		expect( result ).toBe( 'Tools' );
+	} );
 } );
 
 describe( 'getIssueFeature', () => {
-	it( 'returns "Unknown" as feature if there are no labels', () => {
+	it( 'returns "Uncategorized" as feature if there are no labels', () => {
 		const result = getIssueFeature( { labels: [] } );
 
 		expect( result ).toBe( 'Uncategorized' );
 	} );
 
-	it( 'falls by to "Unknown" as the feature if unable to classify by other means', () => {
+	it( 'falls back to "Uncategorized" when no label can classify the issue', () => {
 		const result = getIssueFeature( {
-			labels: [
-				{
-					name: 'Some Label',
-				},
-				{
-					name: '[Package] Example Package', // 1. has explicit mapping.
-				},
-				{
-					name: '[Package] Another One',
-				},
-			],
+			labels: [ { name: 'Some Label' } ],
 		} );
 
-		expect( result ).toEqual( 'Uncategorized' );
+		expect( result ).toBe( 'Uncategorized' );
 	} );
+
+	it.each( [
+		[ '[Package] Element', 'Element' ],
+		[ '[Package] Widget Dashboard', 'Widget Dashboard' ],
+		[ '[Package] Boot', 'Boot' ],
+		[ '[Tool] WP Scripts', 'WP Scripts' ],
+		[ '[Package] Interface', 'Interface' ],
+	] )(
+		'uses an otherwise-unmapped %s label as a fallback category',
+		( label, expected ) => {
+			const result = getIssueFeature( {
+				labels: [ { name: 'Some Label' }, { name: label } ],
+			} );
+
+			expect( result ).toEqual( expected );
+		}
+	);
 
 	it( 'gives precedence to manual feature mapping', () => {
 		const result = getIssueFeature( {
@@ -326,18 +509,20 @@ describe( 'getTypesByLabels', () => {
 } );
 
 describe( 'mapLabelsToFeatures', () => {
-	it( 'returns all normalized feature candidates by feature prefix. it is case insensitive', () => {
+	it( 'returns all normalized feature candidates case-insensitively', () => {
 		const result = mapLabelsToFeatures( [
 			'[Package] Commands',
 			'[Package] Block Library',
 			'[Feature] Link Editing',
 			'[Feature] block Multi Selection',
+			'[Type] Flaky Test',
 		] );
 
 		expect( result ).toEqual( [
 			'Commands',
 			'Block Library',
 			'Block Editor',
+			'Testing',
 		] );
 	} );
 } );

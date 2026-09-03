@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { SetIsMatchingAction, ViewportState } from '../types';
 
 /**

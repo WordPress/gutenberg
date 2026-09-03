@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { batch, signal, type Signal } from '@preact/signals';
-
-/**
- * Internal dependencies
- */
 import {
 	createProxy,
 	getProxyFromObject,

@@ -7,6 +7,24 @@
 		justify-content: center;
 		height: 100%;
 		width: 100%;
+
+		// Render block icons exactly as the editor does. Mirrors
+		// `.block-editor-block-icon` (packages/block-editor/src/components/
+		// block-icon/style.scss): `fill: currentColor` paints icons whose root
+		// <svg> sets `fill="none"` (those editor styles aren't loaded on this
+		// wp-admin page), and the 20-24px clamp normalizes icon sizes.
+		svg {
+			fill: currentColor;
+			min-width: 20px;
+			min-height: 20px;
+			max-width: 24px;
+			max-height: 24px;
+
+			// Optimize for high contrast modes.
+			@media (forced-colors: active) {
+				fill: CanvasText;
+			}
+		}
 	}
 
 	.dataviews-view-list__field-wrapper {

@@ -25,6 +25,8 @@ $handle-touch-target-size: 44px;
 	&__canvas {
 		position: absolute;
 		inset: $grid-unit-30;
+		min-height: 100px;
+		min-width: 100px;
 
 		// Suppress the browser's default focus ring — the crop rectangle
 		// border provides the custom keyboard-focus indicator instead.

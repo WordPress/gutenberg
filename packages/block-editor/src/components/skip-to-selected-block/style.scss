@@ -6,7 +6,7 @@
 
 	&:focus {
 		font-size: 14px;
-		font-weight: 600;
+		font-weight: var(--wpds-typography-font-weight-emphasis);
 		background: #f1f1f1;
 		z-index: z-index(".skip-to-selected-block");
 	}

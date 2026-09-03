@@ -7,7 +7,9 @@
 
 	// Constrain checkbox column to fixed width while other columns share remaining space.
 	.dataviews-view-table__checkbox-column {
-		width: calc(var(--wpds-dimension-base) * 12);
+		// TODO: Replace with a `--wpds-dimension-size-*` token if 48px is added
+		// to the WPDS element size scale.
+		width: 48px;
 	}
 
 	tbody:focus-visible {
@@ -18,7 +20,7 @@
 		}
 
 		[data-active-item="true"] {
-			outline: 2px solid var(--wpds-color-stroke-focus-brand);
+			outline: 2px solid var(--wpds-color-stroke-focus);
 		}
 	}
 
@@ -37,15 +39,15 @@
 		cursor: var(--wpds-cursor-control);
 
 		&.is-selected {
-			background-color: var(--wpds-color-bg-interactive-brand-weak-active);
+			background-color: var(--wpds-color-background-interactive-brand-weak-active);
 		}
 
 		&.is-hovered {
-			background-color: var(--wpds-color-bg-interactive-brand-weak-active);
+			background-color: var(--wpds-color-background-interactive-brand-weak-active);
 		}
 
 		&.is-selected.is-hovered {
-			background-color: var(--wpds-color-bg-interactive-brand-weak-active);
+			background-color: var(--wpds-color-background-interactive-brand-weak-active);
 		}
 	}
 }

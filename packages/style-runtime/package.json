@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/style-runtime",
-	"version": "0.3.0",
+	"version": "0.10.0",
 	"description": "Runtime helpers for injecting WordPress package styles.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -41,6 +41,11 @@
 	},
 	"types": "build-types",
 	"sideEffects": false,
+	"devDependencies": {
+		"@testing-library/jest-dom": "^6.9.1",
+		"@types/jest": "^30.0.0",
+		"vitest": "^4.1.10"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

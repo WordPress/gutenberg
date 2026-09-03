@@ -1,0 +1,8 @@
+.editor-more-menu__popup {
+	// The menu is long, but scrolling it is a last resort: take all the room
+	// the popup has instead of the shorter default of the menu.
+	max-height: var(--available-height);
+	// Narrower than the default of the menu, closer to the previous menu,
+	// which sized itself to its longest label.
+	--wp-ui-menu-max-width: var(--wpds-dimension-surface-width-sm);
+}
