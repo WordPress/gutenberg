@@ -43,6 +43,7 @@ class WP_Theme_Json_Test extends WP_UnitTestCase {
 		$GLOBALS['wp_theme_directories'] = $this->orig_theme_dir;
 		wp_clean_themes_cache();
 		unset( $GLOBALS['wp_themes'] );
+		_gutenberg_clean_theme_json_caches();
 		parent::tear_down();
 	}
 
@@ -130,5 +131,39 @@ class WP_Theme_Json_Test extends WP_UnitTestCase {
 
 		$this->assertFalse( $default );
 		$this->assertTrue( $block_theme );
+	}
+
+	/**
+	 * The theme.json data for a block is available once the block is registered,
+	 * so styles read before that must not hide it from the styles read after.
+	 *
+	 * The test suite runs with WP_DEBUG on. A cache that skips itself under
+	 * WP_DEBUG would pass this test and still hide late registrations elsewhere.
+	 *
+	 * @covers gutenberg_get_global_styles
+	 */
+	public function test_gutenberg_get_global_styles_reflects_blocks_registered_after_a_previous_call() {
+		gutenberg_get_global_styles();
+
+		register_block_type(
+			'test/block-gap',
+			array(
+				'supports' => array(
+					'__experimentalStyle' => array(
+						'spacing' => array( 'blockGap' => '77px' ),
+					),
+				),
+			)
+		);
+
+		$styles = gutenberg_get_global_styles();
+
+		unregister_block_type( 'test/block-gap' );
+
+		$this->assertSame(
+			'77px',
+			$styles['blocks']['test/block-gap']['spacing']['blockGap'] ?? null,
+			'Styles for a block registered after a previous call should be present.'
+		);
 	}
 }
