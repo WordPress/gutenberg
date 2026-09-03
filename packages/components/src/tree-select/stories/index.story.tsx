@@ -1,5 +1,4 @@
 import type { Meta, StoryFn } from '@storybook/react-vite';
-import type { ComponentProps } from 'react';
 import { useState } from '@wordpress/element';
 import TreeSelect from '../';
 
@@ -30,14 +29,25 @@ const meta: Meta< typeof TreeSelect > = {
 export default meta;
 
 const TreeSelectWithState: StoryFn< typeof TreeSelect > = ( props ) => {
-	const [ selection, setSelection ] =
-		useState< ComponentProps< typeof TreeSelect >[ 'selectedId' ] >();
+	const [ selectedId, setSelectedId ] = useState< string >();
+	const [ selectedIds, setSelectedIds ] = useState< string[] >();
+
+	if ( props.multiple ) {
+		return (
+			<TreeSelect
+				{ ...props }
+				multiple
+				onChange={ setSelectedIds }
+				selectedId={ selectedIds }
+			/>
+		);
+	}
 
 	return (
 		<TreeSelect
 			{ ...props }
-			onChange={ setSelection }
-			selectedId={ selection }
+			onChange={ setSelectedId }
+			selectedId={ selectedId }
 		/>
 	);
 };
@@ -73,4 +83,13 @@ Default.args = {
 			],
 		},
 	],
+};
+
+/**
+ * Native multi-select is a listbox. Hold Shift or Ctrl (Command on macOS) to select more than one option.
+ */
+export const Multiple = TreeSelectWithState.bind( {} );
+Multiple.args = {
+	...Default.args,
+	multiple: true,
 };

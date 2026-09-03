@@ -100,19 +100,22 @@ If this property is added, a label will be generated using label property as the
 
 The position of the label.
 
+### `multiple`
+
+ - Type: `false`
+ - Required: No
+ - Default: `false`
+
+If this property is added, multiple values can be selected. The `selectedId` passed should be an array.
+
+In most cases, it is preferable to use the `FormTokenField` or `CheckboxControl` components instead.
+
 ### `noOptionLabel`
 
  - Type: `string`
  - Required: No
 
 If this property is added, an option will be added with this label to represent empty selection.
-
-### `onChange`
-
- - Type: `((value: string, extra?: { event?: ChangeEvent<HTMLSelectElement>; }) => void) | undefined`
- - Required: No
-
-A function that receives the value of the new option that is being selected as input.
 
 ### `options`
 
@@ -122,6 +125,16 @@ A function that receives the value of the new option that is being selected as i
 An array of option property objects to be rendered,
 each with a `label` and `value` property, as well as any other
 `<option>` attributes.
+
+### `onChange`
+
+ - Type: `((value: string, extra?: { event?: ChangeEvent<HTMLSelectElement>; }) => void) | undefined`
+ - Required: No
+
+A function that receives the value of the new option that is being selected as input.
+
+If `multiple` is `true`, the value received is an array of the selected value.
+Otherwise, the value received is a single value with the new selected value.
 
 ### `prefix`
 
@@ -144,13 +157,6 @@ import {
   prefix={<InputControlPrefixWrapper>@</InputControlPrefixWrapper>}
 />
 ```
-
-### `selectedId`
-
- - Type: `string`
- - Required: No
-
-The id of the currently selected node.
 
 ### `size`
 
@@ -181,6 +187,15 @@ import {
   suffix={<InputControlSuffixWrapper>%</InputControlSuffixWrapper>}
 />
 ```
+
+### `selectedId`
+
+ - Type: `string`
+ - Required: No
+
+The id of the currently selected node.
+
+If `multiple` is true, the `selectedId` should be an array of selected node ids.
 
 ### `tree`
 

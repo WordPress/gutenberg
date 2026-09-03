@@ -1,12 +1,19 @@
 import { useMemo } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { SelectControl } from '../select-control';
-import type { TreeSelectProps, Tree, Truthy } from './types';
+import type { SelectControlSingleSelectionProps } from '../select-control/types';
+import type {
+	TreeSelectMultipleSelectionProps,
+	TreeSelectProps,
+	TreeSelectSingleSelectionProps,
+	Tree,
+	Truthy,
+} from './types';
 
 function getSelectOptions(
 	tree: Tree[],
 	level = 0
-): NonNullable< TreeSelectProps[ 'options' ] > {
+): NonNullable< SelectControlSingleSelectionProps[ 'options' ] > {
 	return tree.flatMap( ( treeNode ) => [
 		{
 			value: treeNode.id,
@@ -64,6 +71,12 @@ function getSelectOptions(
  * }
  * ```
  */
+export function TreeSelect(
+	props: TreeSelectSingleSelectionProps
+): JSX.Element;
+export function TreeSelect(
+	props: TreeSelectMultipleSelectionProps
+): JSX.Element;
 export function TreeSelect( props: TreeSelectProps ) {
 	const {
 		// Prevent passing legacy props to internal component.
@@ -71,9 +84,9 @@ export function TreeSelect( props: TreeSelectProps ) {
 		__next40pxDefaultSize: _next40pxDefaultSize,
 		label,
 		noOptionLabel,
-		onChange,
-		selectedId,
 		tree = [],
+		selectedId: _selectedId,
+		onChange: _onChange,
 		...restProps
 	} = props;
 
@@ -84,11 +97,26 @@ export function TreeSelect( props: TreeSelectProps ) {
 		].filter( < T, >( option: T ): option is Truthy< T > => !! option );
 	}, [ noOptionLabel, tree ] );
 
+	if ( props.multiple ) {
+		return (
+			<SelectControl
+				{ ...restProps }
+				label={ label }
+				multiple
+				options={ options }
+				onChange={ props.onChange }
+				value={ props.selectedId }
+			/>
+		);
+	}
+
 	return (
 		<SelectControl
-			{ ...{ label, options, onChange } }
-			value={ selectedId }
 			{ ...restProps }
+			label={ label }
+			options={ options }
+			onChange={ props.onChange }
+			value={ props.selectedId }
 		/>
 	);
 }

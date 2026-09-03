@@ -1,4 +1,7 @@
-import type { SelectControlSingleSelectionProps } from '../select-control/types';
+import type {
+	SelectControlMultipleSelectionProps,
+	SelectControlSingleSelectionProps,
+} from '../select-control/types';
 
 export type Truthy< T > = T extends false | '' | 0 | null | undefined
 	? never
@@ -10,27 +13,59 @@ export interface Tree {
 	children?: Tree[];
 }
 
-// `TreeSelect` inherits props from `SelectControl`, but only
-// in single selection mode (ie. when the `multiple` prop is not defined).
-export interface TreeSelectProps
-	extends Omit<
-		SelectControlSingleSelectionProps,
-		'value' | 'multiple' | 'onChange'
-	> {
+type TreeSelectOwnProps = {
 	/**
 	 * If this property is added, an option will be added with this label to represent empty selection.
 	 */
 	noOptionLabel?: string;
 	/**
-	 * A function that receives the value of the new option that is being selected as input.
-	 */
-	onChange?: SelectControlSingleSelectionProps[ 'onChange' ];
-	/**
 	 * An array containing the tree objects with the possible nodes the user can select.
 	 */
 	tree?: Tree[];
-	/**
-	 * The id of the currently selected node.
-	 */
-	selectedId?: SelectControlSingleSelectionProps[ 'value' ];
-}
+};
+
+export type TreeSelectSingleSelectionProps = Omit<
+	SelectControlSingleSelectionProps,
+	'value' | 'multiple'
+> &
+	TreeSelectOwnProps & {
+		/**
+		 * If this property is added, multiple values can be selected. The `selectedId` passed should be an array.
+		 *
+		 * In most cases, it is preferable to use the `FormTokenField` or `CheckboxControl` components instead.
+		 *
+		 * @default false
+		 */
+		multiple?: false;
+		/**
+		 * The id of the currently selected node.
+		 *
+		 * If `multiple` is true, the `selectedId` should be an array of selected node ids.
+		 */
+		selectedId?: SelectControlSingleSelectionProps[ 'value' ];
+	};
+
+export type TreeSelectMultipleSelectionProps = Omit<
+	SelectControlMultipleSelectionProps,
+	'value' | 'multiple'
+> &
+	TreeSelectOwnProps & {
+		/**
+		 * If this property is added, multiple values can be selected. The `selectedId` passed should be an array.
+		 *
+		 * In most cases, it is preferable to use the `FormTokenField` or `CheckboxControl` components instead.
+		 *
+		 * @default false
+		 */
+		multiple: true;
+		/**
+		 * The id of the currently selected node.
+		 *
+		 * If `multiple` is true, the `selectedId` should be an array of selected node ids.
+		 */
+		selectedId?: SelectControlMultipleSelectionProps[ 'value' ];
+	};
+
+export type TreeSelectProps =
+	| TreeSelectSingleSelectionProps
+	| TreeSelectMultipleSelectionProps;

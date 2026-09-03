@@ -282,6 +282,7 @@
 			"packages/components/src/tree-grid/test/roving-tab-index-item.jsdom.test.tsx",
 			"packages/components/src/tree-grid/test/roving-tab-index.jsdom.test.tsx",
 			"packages/components/src/tree-grid/test/row.jsdom.test.tsx",
+			"packages/components/src/tree-select/test/index.jsdom.test.tsx",
 			"packages/components/src/truncate/test/index.jsdom.test.tsx",
 			"packages/components/src/unit-control/test/index.jsdom.test.tsx",
 			"packages/components/src/utils/hooks/test/use-controlled-state.jsdom.test.tsx",
