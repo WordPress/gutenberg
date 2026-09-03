@@ -249,9 +249,11 @@ test.describe( 'Image', () => {
 		await modal.locator( 'role=button[name="Save"i]' ).click();
 
 		// Modal closes and the block now points at a child attachment whose
-		// URL matches the rendered <img>. The `/edit` endpoint creates a new
-		// attachment rather than mutating the original, so id must change.
-		await expect( modal ).toBeHidden();
+		// URL matches the rendered <img>. The edit creates a new attachment
+		// rather than mutating the original, so id must change. Saving
+		// applies the edit and generates sub-sizes in the browser when
+		// client-side media processing is available, so allow for that.
+		await expect( modal ).toBeHidden( { timeout: 60_000 } );
 		await expect( image ).not.toHaveAttribute( 'src', initialUrl );
 		const [
 			{
