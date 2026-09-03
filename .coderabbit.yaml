@@ -7,4 +7,5 @@ knowledge_base:
     code_guidelines:
         filePatterns:
             - files: '.agents/skills/**/SKILL.md'
-              applyTo: '**'
+              # Include ordinary paths, dotfiles, and files in dot-directories.
+              applyTo: '**,**/.*,**/.*/**'
