@@ -1,16 +1,16 @@
 <?php
 /**
- * Tests for the gutenberg_resolve_pattern_blocks function.
+ * Tests for the resolve_pattern_blocks function.
  *
  * @package WordPress
  * @subpackage Blocks
  */
 
 /**
- * Test the gutenberg_resolve_pattern_blocks function.
+ * Test the resolve_pattern_blocks function.
  *
  * @group blocks
- * @covers ::gutenberg_resolve_pattern_blocks
+ * @covers ::resolve_pattern_blocks
  */
 class Gutenberg_Resolve_Pattern_Blocks_Test extends WP_UnitTestCase {
 
@@ -94,7 +94,7 @@ class Gutenberg_Resolve_Pattern_Blocks_Test extends WP_UnitTestCase {
 	 * @param string $expected Expected result.
 	 */
 	public function test_should_resolve_pattern_blocks_as_expected( $blocks, $expected ) {
-		$actual = gutenberg_resolve_pattern_blocks( parse_blocks( $blocks ) );
+		$actual = resolve_pattern_blocks( parse_blocks( $blocks ) );
 		$this->assertSame( $expected, serialize_blocks( $actual ) );
 	}
 
