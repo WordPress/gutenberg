@@ -5,10 +5,10 @@
  *
  * This class extension exists to prevent a fatal error when a `null` template
  * reaches `prepare_item_for_response`, which reads and assigns properties on
- * it. Core's `update_item` can pass `null` there: its "revert to theme" path
- * deletes the template's post before checking that a theme or plugin version
- * of the template exists, so reverting a template that only exists in the
- * database deletes it and then refetches `null`.
+ * it. Core's `update_item` can pass `null` there from either of its two
+ * unchecked `get_block_template()` refetches: after writing an update, and on
+ * its "revert to theme" path, which force-deletes the template's post before
+ * checking that a theme or plugin version of the template exists.
  *
  * Note: this change needs to be backported to WordPress core.
  * See `WP_REST_Templates_Controller::prepare_item_for_response()`.
@@ -32,9 +32,10 @@ class Gutenberg_REST_Templates_Controller_7_2 extends Gutenberg_REST_Templates_C
 		// START CORE MODIFICATIONS //
 		//////////////////////////////
 		/*
-		 * Core can pass `null` here, e.g. when `update_item` refetches a
-		 * template after deleting its post. Reading `$item->content` on
-		 * `null` is a fatal error, so answer with an error response instead.
+		 * Core's `update_item` passes its `get_block_template()` refetches
+		 * here unchecked, both after writing an update and after deleting
+		 * the post on its revert path. Reading `$item->content` on `null`
+		 * is a fatal error, so answer with an error response instead.
 		 */
 		if ( ! $item ) {
 			return new WP_Error( 'rest_template_not_found', __( 'No templates exist with that id.' ), array( 'status' => 404 ) );
