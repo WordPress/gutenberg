@@ -108,8 +108,6 @@
 	&.is-synced:not(.is-selected) .block-editor-list-view-block__menu:focus {
 		--focus-color: var(--wp-block-synced-color);
 		@include outset-ring__focus();
-		// Hide legacy Button focus box-shadow from older WordPress versions to avoid a double ring.
-		box-shadow: none;
 	}
 	&.is-selected .block-editor-list-view-block-contents,
 	&.is-selected .components-button.has-icon {
@@ -123,8 +121,6 @@
 		--focus-color: #{ $white };
 		@include outset-ring__focus();
 		outline-offset: -2px;
-		// Hide legacy Button focus box-shadow from older WordPress versions to avoid a double ring.
-		box-shadow: none;
 	}
 
 	// Border radius for corners of the selected item.
