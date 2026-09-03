@@ -322,14 +322,15 @@ export function processItem( id: QueueItemId ) {
 		}
 
 		/*
-		 * If the next operation is image processing (resize/crop/rotate),
+		 * If the next operation is image processing (resize/crop/rotate/edit),
 		 * check the image processing concurrency limit.
 		 * If at capacity, the item remains queued and will be processed
 		 * when another image processing operation completes.
 		 */
 		if (
 			operation === OperationType.ResizeCrop ||
-			operation === OperationType.Rotate
+			operation === OperationType.Rotate ||
+			operation === OperationType.EditImage
 		) {
 			const settings = select.getSettings();
 			const activeCount = select.getActiveImageProcessingCount();
@@ -632,7 +633,8 @@ export function finishOperation(
 		 */
 		if (
 			previousOperation === OperationType.ResizeCrop ||
-			previousOperation === OperationType.Rotate
+			previousOperation === OperationType.Rotate ||
+			previousOperation === OperationType.EditImage
 		) {
 			const pendingItems = select.getPendingImageProcessing();
 			for ( const pendingItem of pendingItems ) {
@@ -657,6 +659,7 @@ export function finishOperation(
 		if (
 			previousOperation === OperationType.ResizeCrop ||
 			previousOperation === OperationType.Rotate ||
+			previousOperation === OperationType.EditImage ||
 			previousOperation === OperationType.TranscodeImage
 		) {
 			maybeRecycleVipsWorker( select.getActiveImageProcessingCount() );

@@ -316,7 +316,8 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 		// waiting in the queue, mirroring finishOperation's behavior.
 		if (
 			currentOperation === OperationType.ResizeCrop ||
-			currentOperation === OperationType.Rotate
+			currentOperation === OperationType.Rotate ||
+			currentOperation === OperationType.EditImage
 		) {
 			for ( const pending of select.getPendingImageProcessing() ) {
 				dispatch.processItem( pending.id );
@@ -339,6 +340,7 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 		if (
 			currentOperation === OperationType.ResizeCrop ||
 			currentOperation === OperationType.Rotate ||
+			currentOperation === OperationType.EditImage ||
 			currentOperation === OperationType.TranscodeImage
 		) {
 			maybeRecycleVipsWorker( select.getActiveImageProcessingCount() );
