@@ -35,7 +35,8 @@
 	"devDependencies": {
 		"@types/node": "^20.19.39",
 		"@types/prettier": "^2.4.4",
-		"prettier": "npm:wp-prettier@^3.0.3"
+		"prettier": "npm:wp-prettier@^3.0.3",
+		"vitest": "^4.1.10"
 	},
 	"peerDependencies": {
 		"prettier": ">=3"

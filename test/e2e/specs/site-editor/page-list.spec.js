@@ -69,6 +69,13 @@ test.describe( 'Page List', () => {
 					const TEST_IMAGE_FILE_PATH =
 						'./assets/10x10_e2e_test_image_z9T8jK.png';
 
+					// The media modal opens on the "Media Library" tab once
+					// the library has items (e.g. after a previous upload),
+					// so make sure the upload tab is the active one.
+					await mediaLibrary
+						.getByRole( 'tab', { name: 'Upload files' } )
+						.click();
+
 					const fileChooserPromise =
 						page.waitForEvent( 'filechooser' );
 					await mediaLibrary.getByText( 'Select files' ).click();

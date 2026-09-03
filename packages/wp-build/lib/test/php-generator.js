@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { renderTemplateToString as generateTemplate } from '../php-generator.mjs';
 
 describe( 'page-wp-admin.php template', () => {

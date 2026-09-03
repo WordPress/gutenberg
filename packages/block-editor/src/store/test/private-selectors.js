@@ -1,4 +1,14 @@
 import {
+	afterAll,
+	afterEach,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
+import {
 	registerBlockType,
 	unregisterBlockType,
 	privateApis as blocksPrivateApis,
@@ -430,10 +440,10 @@ describe( 'private selectors', () => {
 			derivedBlockEditingModes: new Map(),
 		};
 
-		const hasContentRoleAttribute = jest.fn( () => false );
-		const get = jest.fn( () => 'edit' );
+		const hasContentRoleAttribute = vi.fn( () => false );
+		const get = vi.fn( () => 'edit' );
 		getBlockEditingMode.registry = {
-			select: jest.fn( () => ( {
+			select: vi.fn( () => ( {
 				hasContentRoleAttribute,
 				get,
 			} ) ),
