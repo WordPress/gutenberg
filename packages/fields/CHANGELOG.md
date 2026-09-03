@@ -4,10 +4,12 @@
 
 ### Bug Fixes
 
+-   Hide the slug field for posts without a permalink, such as posts of non-public post types, matching the classic post URL panel ([#82341](https://github.com/WordPress/gutenberg/pull/82341)).
 -   Normalize special characters in exported pattern filenames to prevent broken or unreadable files. ([#77033](https://github.com/WordPress/gutenberg/pull/77033))
 
 ### Internal
 
+-   `MediaEdit`: Space `ValidityIndicator` with `Stack` now that the indicator has no outer margin. ([#82267](https://github.com/WordPress/gutenberg/pull/82267))
 -   Remove the template activation (`active_templates`) experiment checks from the rename, reset, and duplicate actions ([#82241](https://github.com/WordPress/gutenberg/pull/82241)).
 -   Remove unused dependencies `@wordpress/hooks`, `@wordpress/primitives`, `@wordpress/router`, etc. ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Update a source reference after its JSX file moved to the `.jsx` extension ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
@@ -101,7 +103,7 @@
 
 ### Enhancements
 
-- Update the base `titleField` to enable hiding. [#71369](https://github.com/WordPress/gutenberg/pull/71369)
+-   Update the base `titleField` to enable hiding. [#71369](https://github.com/WordPress/gutenberg/pull/71369)
 
 ## 0.21.0 (2025-08-20)
 
