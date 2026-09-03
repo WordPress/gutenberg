@@ -65,7 +65,7 @@ const observeAndResizeJS = function () {
 		}
 
 		const observer = new MutationObserver( sendResize );
-		observer.observe( document.body, {
+		observer.observe( body, {
 			attributes: true,
 			attributeOldValue: false,
 			characterData: true,
@@ -73,8 +73,6 @@ const observeAndResizeJS = function () {
 			childList: true,
 			subtree: true,
 		} );
-
-		window.addEventListener( 'load', sendResize, true );
 
 		// Hack: Remove viewport unit styles, as these are relative
 		// the iframe root and interfere with our mechanism for
