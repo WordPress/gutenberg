@@ -615,8 +615,8 @@ function BackgroundSizeControls( {
 					backgroundRepeat: nextRepeat,
 					backgroundSize: 'auto',
 					backgroundPosition: isUploadedImage
-					? '50% 0'
-					: style?.background?.backgroundPosition,
+						? '50% 0'
+						: style?.background?.backgroundPosition,
 				} )
 			);
 			return;
