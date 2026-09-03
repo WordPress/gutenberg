@@ -16,6 +16,10 @@ import {
 	solveWithBisect,
 } from './utils.ts';
 import type {
+	AccentRampPurpose,
+	AccentRampResult,
+	BaseRamp,
+	BaseRampStep,
 	FollowDirection,
 	Ramp,
 	RampDirection,
@@ -48,16 +52,16 @@ function calculateRamp( {
 	pinLightness,
 }: {
 	seed: PlainColorObject;
-	sortedSteps: ( keyof Ramp )[];
+	sortedSteps: BaseRampStep[];
 	config: RampStepsConfig;
 	mainDir: RampDirection;
 	oppDir: RampDirection;
 	pinLightness?: {
-		stepName: keyof Ramp;
+		stepName: BaseRampStep;
 		value: number;
 	};
 } ) {
-	const rampResults = {} as Record< keyof Ramp, string >;
+	const rampResults = {} as BaseRamp;
 	let warnings: ( keyof Ramp )[] | undefined;
 	let maxDeficit = -Infinity;
 	let maxDeficitDirection: RampDirection = 'lighter';
@@ -209,6 +213,24 @@ function calculateRamp( {
 	};
 }
 
+type BuildRampOptions = {
+	mainDirection?: RampDirection;
+	pinLightness?: { stepName: BaseRampStep; value: number };
+	backgroundRamp?: RampResult;
+	rescaleToFitContrastTargets?: boolean;
+	purpose?: AccentRampPurpose;
+};
+
+export function buildRamp(
+	seedArg: string,
+	config: RampConfig,
+	options?: BuildRampOptions & { purpose?: 'full' }
+): RampResult;
+export function buildRamp(
+	seedArg: string,
+	config: RampConfig,
+	options: BuildRampOptions
+): AccentRampResult;
 export function buildRamp(
 	seedArg: string,
 	config: RampConfig,
@@ -345,12 +367,34 @@ export function buildRamp(
 			warnings: bestWarnings,
 			direction: mainDir,
 		},
-		backgroundRamp
+		backgroundRamp,
+		purpose
 	);
 
-	return buildForegroundScale(
+	if ( purpose === 'full' ) {
+		return buildForegroundScale(
+			rampResult,
+			backgroundRamp ?? rampResult,
+			config.foregroundScale
+		);
+	}
+	const foregroundResult = buildForegroundScale(
 		rampResult,
 		backgroundRamp ?? rampResult,
-		config.foregroundScale
+		config.foregroundScale,
+		purpose !== 'status'
 	);
+	// Do not expose base colors whose final reconstruction was intentionally
+	// skipped. Their base constraints and spacing contributions remain intact.
+	const pruned: AccentRampResult = {
+		...foregroundResult,
+		ramp: { ...foregroundResult.ramp },
+	};
+	delete pruned.ramp.surface6;
+	delete pruned.ramp.stroke2;
+	if ( purpose === 'status' ) {
+		delete pruned.ramp.stroke4;
+		delete pruned.ramp.fgSurface5;
+	}
+	return pruned;
 }

@@ -6,7 +6,7 @@ import { parseArgs } from 'node:util';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 type RampModule = typeof import('../src/color-ramps/index.ts');
-type RampOutput = ReturnType< RampModule[ 'buildBgRamp' ] >;
+type RampOutput = ReturnType< RampModule[ 'buildAccentRamp' ] >;
 
 type BenchmarkResult = {
 	name: string;
@@ -52,8 +52,8 @@ const FIXTURES = [
 	},
 	{
 		name: 'ectoplasm',
-		background: '#4f386e',
-		primary: '#646c3e',
+		background: '#413256',
+		primary: '#a3b745',
 	},
 ] as const;
 
@@ -114,7 +114,8 @@ function createCases( rampModule: RampModule ): BenchmarkCase[] {
 				const fixtureIndex = accentIndex++ % FIXTURES.length;
 				return buildAccentRamp(
 					FIXTURES[ fixtureIndex ].primary,
-					accentBackgroundRamps[ fixtureIndex ]
+					accentBackgroundRamps[ fixtureIndex ],
+					'interactive'
 				);
 			},
 		},
@@ -124,18 +125,26 @@ function createCases( rampModule: RampModule ): BenchmarkCase[] {
 			run: () => {
 				const fixture = FIXTURES[ themeIndex++ % FIXTURES.length ];
 				const backgroundRamp = buildBgRamp( fixture.background );
-				const accentSeeds = [
-					fixture.primary,
-					DEFAULT_SEED_COLORS.info,
-					DEFAULT_SEED_COLORS.success,
-					DEFAULT_SEED_COLORS.caution,
-					DEFAULT_SEED_COLORS.warning,
-					DEFAULT_SEED_COLORS.error,
-				];
-				const result = [ backgroundRamp ];
+				const accentSeeds = {
+					primary: fixture.primary,
+					info: DEFAULT_SEED_COLORS.info,
+					success: DEFAULT_SEED_COLORS.success,
+					caution: DEFAULT_SEED_COLORS.caution,
+					warning: DEFAULT_SEED_COLORS.warning,
+					error: DEFAULT_SEED_COLORS.error,
+				};
+				const result: RampOutput[] = [ backgroundRamp ];
 
-				for ( const seed of accentSeeds ) {
-					result.push( buildAccentRamp( seed, backgroundRamp ) );
+				for ( const [ role, seed ] of Object.entries( accentSeeds ) ) {
+					result.push(
+						buildAccentRamp(
+							seed,
+							backgroundRamp,
+							role === 'primary' || role === 'error'
+								? 'interactive'
+								: 'status'
+						)
+					);
 				}
 				return result;
 			},

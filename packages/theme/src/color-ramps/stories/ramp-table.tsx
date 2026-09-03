@@ -25,19 +25,16 @@ const RAMP_TOKENS_ORDER: { tokenName: keyof Ramp; abbr: string }[] = [
 	{ tokenName: 'bgFill2', abbr: 'BGF2' },
 	{ tokenName: 'bgFillInverted1', abbr: 'BGFI1' },
 	{ tokenName: 'bgFillInverted2', abbr: 'BGFI2' },
-	{ tokenName: 'bgFillDark', abbr: 'BGFD' },
 	{ tokenName: 'stroke1', abbr: 'ST1' },
 	{ tokenName: 'stroke2', abbr: 'ST2' },
 	{ tokenName: 'stroke3', abbr: 'ST3' },
 	{ tokenName: 'stroke4', abbr: 'ST4' },
-	{ tokenName: 'fgSurface1', abbr: 'FGS1' },
 	{ tokenName: 'fgSurface2', abbr: 'FGS2' },
 	{ tokenName: 'fgSurface3', abbr: 'FGS3' },
 	{ tokenName: 'fgSurface4', abbr: 'FGS4' },
 	{ tokenName: 'fgSurface5', abbr: 'FGS5' },
 	{ tokenName: 'fgFill', abbr: 'FGF' },
 	{ tokenName: 'fgFillInverted', abbr: 'FGFI' },
-	{ tokenName: 'fgFillDark', abbr: 'FGFD' },
 ];
 
 type RampTableProps = {
@@ -308,7 +305,6 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 									'surface3',
 									'bgFill1',
 									'bgFillInverted1',
-									'bgFillDark',
 								].includes( tokenName ) ? (
 									<span
 										style={ {
@@ -323,11 +319,6 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 									>
 										{ tokenName === 'surface3' ? (
 											<>
-												<ColorSample
-													foreground="fgSurface1"
-													background={ tokenName }
-													ramp={ ramp }
-												/>
 												<ColorSample
 													foreground="fgSurface2"
 													background={ tokenName }
@@ -360,13 +351,6 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 										{ tokenName === 'bgFillInverted1' ? (
 											<ColorSample
 												foreground="fgFillInverted"
-												background={ tokenName }
-												ramp={ ramp }
-											/>
-										) : null }
-										{ tokenName === 'bgFillDark' ? (
-											<ColorSample
-												foreground="fgFillDark"
 												background={ tokenName }
 												ramp={ ramp }
 											/>

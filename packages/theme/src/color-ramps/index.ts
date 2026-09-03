@@ -14,6 +14,8 @@ import {
 } from './lib/utils.ts';
 import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from './lib/ramp-configs.ts';
 import type {
+	AccentRampPurpose,
+	AccentRampResult,
 	RampResult as InternalRampResult,
 	RampDirection,
 	Ramp,
@@ -124,7 +126,7 @@ function getBgRampInfo( ramp: InternalRampResult ): {
 	mainDirection: RampDirection;
 	backgroundRamp: InternalRampResult;
 	pinLightness: {
-		stepName: keyof Ramp;
+		stepName: typeof STEP_TO_PIN;
 		value: number;
 	};
 } {
@@ -144,19 +146,34 @@ function getBgRampInfo( ramp: InternalRampResult ): {
 /**
  * Creates an accent ramp (ie used by primary, success, info, warning and error
  * ramps).
- * @param seed   The seed color for the accent ramp.
- * @param bgRamp The ramp of the background on which the accent is shown.
+ * @param seed    The seed color for the accent ramp.
+ * @param bgRamp  The ramp of the background on which the accent is shown.
+ * @param purpose Internal profile selected by the caller's semantic usage.
  */
 export function buildAccentRamp(
 	seed: string,
-	bgRamp?: InternalRampResult
-): InternalRampResult {
+	bgRamp?: InternalRampResult,
+	purpose?: 'full'
+): InternalRampResult;
+export function buildAccentRamp(
+	seed: string,
+	bgRamp: InternalRampResult | undefined,
+	purpose: AccentRampPurpose
+): AccentRampResult;
+export function buildAccentRamp(
+	seed: string,
+	bgRamp?: InternalRampResult,
+	purpose: AccentRampPurpose = 'full'
+): AccentRampResult {
 	if ( typeof seed !== 'string' || seed.trim() === '' ) {
 		throw new Error( 'Seed color must be a non-empty string' );
 	}
 
 	const bgRampInfo = bgRamp ? getBgRampInfo( bgRamp ) : undefined;
-	return buildRamp( seed, ACCENT_RAMP_CONFIG, bgRampInfo );
+	return buildRamp( seed, ACCENT_RAMP_CONFIG, {
+		...bgRampInfo,
+		purpose,
+	} );
 }
 
 /**
