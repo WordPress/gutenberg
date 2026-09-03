@@ -1129,6 +1129,27 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 						),
 					),
 					array(
+						'blockTypes' => array( 'core/preformatted' ),
+						'version'    => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+						'slug'       => 'responsive-variation',
+						'title'      => 'Responsive Variation',
+						'styles'     => array(
+							'typography' => array(
+								'fontSize' => '40px',
+							),
+							'@tablet'    => array(
+								'typography' => array(
+									'fontSize' => '28px',
+								),
+							),
+							'@mobile'    => array(
+								'typography' => array(
+									'fontSize' => '16px',
+								),
+							),
+						),
+					),
+					array(
 						'blockTypes' => array( 'core/group', 'core/columns' ),
 						'version'    => 3,
 						'slug'       => 'WithSlug',

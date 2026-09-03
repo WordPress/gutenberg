@@ -276,6 +276,76 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that responsive breakpoint styles defined in a standalone block style
+	 * variation partial within a theme's `styles` directory are preserved when
+	 * the partial is sanitized.
+	 *
+	 * @covers WP_Theme_JSON_Resolver_Gutenberg::get_style_variations
+	 */
+	public function test_block_style_variation_partial_retains_responsive_styles() {
+		switch_theme( 'block-theme' );
+
+		$variations = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations( 'block' );
+		$actual     = null;
+
+		foreach ( $variations as $variation ) {
+			if ( isset( $variation['slug'] ) && 'responsive-variation' === $variation['slug'] ) {
+				$actual = $variation;
+				break;
+			}
+		}
+
+		$this->assertNotNull( $actual, 'The responsive block style variation partial was not found.' );
+		$this->assertSame(
+			array( 'fontSize' => '28px' ),
+			$actual['styles']['@tablet']['typography'] ?? null,
+			'Tablet styles should be preserved when reading a block style variation partial.'
+		);
+		$this->assertSame(
+			array( 'fontSize' => '16px' ),
+			$actual['styles']['@mobile']['typography'] ?? null,
+			'Mobile styles should be preserved when reading a block style variation partial.'
+		);
+	}
+
+	/**
+	 * Tests that responsive breakpoint styles defined in a standalone block style
+	 * variation partial generate the expected media query CSS.
+	 *
+	 * @covers ::gutenberg_render_block_style_variation_support_styles
+	 */
+	public function test_block_style_variation_partial_responsive_styles_generate_css() {
+		switch_theme( 'block-theme' );
+
+		try {
+			$parsed_block = array(
+				'blockName' => 'core/preformatted',
+				'attrs'     => array(
+					'className' => 'wp-block-preformatted is-style-responsive-variation',
+				),
+			);
+
+			gutenberg_render_block_style_variation_support_styles( $parsed_block );
+			$inline_styles     = wp_styles()->get_data( 'block-style-variation-styles', 'after' );
+			$actual_stylesheet = is_array( $inline_styles ) ? implode( '', $inline_styles ) : '';
+
+			$this->assertStringContainsString(
+				'@media (480px < width <= 782px)',
+				$actual_stylesheet,
+				'CSS should contain the tablet viewport media query.'
+			);
+			$this->assertStringContainsString(
+				'@media (width <= 480px)',
+				$actual_stylesheet,
+				'CSS should contain the mobile viewport media query.'
+			);
+		} finally {
+			wp_deregister_style( 'block-style-variation-styles' );
+			WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+		}
+	}
+
+	/**
 	 * Tests that block style variations resolve any `ref` values when generating styles.
 	 */
 	public function test_block_style_variation_ref_values() {
