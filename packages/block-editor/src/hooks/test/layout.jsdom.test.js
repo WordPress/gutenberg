@@ -1,12 +1,51 @@
+import { renderHook } from '@testing-library/react';
 import {
 	getLayoutStateOverrides,
 	getResetLayout,
 	getResponsiveLayoutStyles,
 	hasLayoutPanelControls,
+	useLayoutStyles,
 } from '../layout';
 import { getLayoutType } from '../../layouts';
+import { useSettings } from '../../components/use-settings';
+
+jest.mock( '../../components/use-settings', () => ( {
+	useSettings: jest.fn(),
+} ) );
 
 describe( 'layout', () => {
+	describe( 'useLayoutStyles()', () => {
+		const attributes = {
+			layout: { type: 'flex' },
+			style: { spacing: { blockGap: '10px' } },
+		};
+
+		it.each( [ null, undefined ] )(
+			'omits block gap styles when the block gap setting is %s',
+			( blockGapSetting ) => {
+				useSettings.mockReturnValue( [ blockGapSetting ] );
+
+				const { result } = renderHook( () =>
+					useLayoutStyles( attributes, 'test/block', '.my-container' )
+				);
+
+				expect( result.current ).not.toContain( 'gap' );
+			}
+		);
+
+		it( 'outputs block gap styles when the theme opts into block gap', () => {
+			useSettings.mockReturnValue( [ true ] );
+
+			const { result } = renderHook( () =>
+				useLayoutStyles( attributes, 'test/block', '.my-container' )
+			);
+
+			expect( result.current ).toContain(
+				'.my-container { gap: 10px; }'
+			);
+		} );
+	} );
+
 	describe( 'hasLayoutPanelControls()', () => {
 		it( 'does not show the layout panel when every flex layout control is disabled', () => {
 			expect(

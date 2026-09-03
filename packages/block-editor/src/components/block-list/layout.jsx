@@ -22,7 +22,10 @@ export function useLayout() {
 export function LayoutStyle( { layout = {}, css, ...props } ) {
 	const layoutType = getLayoutType( layout.type );
 	const [ blockGapSupport ] = useSettings( 'spacing.blockGap' );
-	const hasBlockGapSupport = blockGapSupport !== null;
+	// Like the server's `isset()` check, an unset or `null` setting means the
+	// theme has not opted into block gap.
+	const hasBlockGapSupport =
+		blockGapSupport !== null && blockGapSupport !== undefined;
 
 	if ( layoutType ) {
 		if ( css ) {
