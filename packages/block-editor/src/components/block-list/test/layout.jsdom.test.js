@@ -18,13 +18,13 @@ describe( 'LayoutStyle', () => {
 	};
 
 	it.each( [ null, undefined ] )(
-		'omits block gap styles when the block gap setting is %s',
+		'outputs no layout styles when the block gap setting is %s',
 		( blockGapSetting ) => {
 			useSettings.mockReturnValue( [ blockGapSetting ] );
 
 			const { container } = render( createElement( LayoutStyle, props ) );
 
-			expect( container.innerHTML ).not.toContain( 'gap' );
+			expect( container ).toBeEmptyDOMElement();
 		}
 	);
 
