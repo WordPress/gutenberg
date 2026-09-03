@@ -3883,12 +3883,13 @@ class WP_Theme_JSON_Gutenberg {
 					$variation_metadata_with_selector['selector'] = $style_variation['selector'] . $block_metadata['css'];
 
 					/*
-					 * `get_layout_styles()` reads `name` as a block name and returns early when
-					 * that block has no layout support. A variation node's `name` is the variation
-					 * slug, which is never a registered block, so leaving it here discards every
-					 * variation gap rule.
+					 * `get_layout_styles()` reads `name` as a block name, to check that the block
+					 * supports layout at all. A variation node's `name` is the variation slug,
+					 * which is never a registered block, so the check fails and every variation
+					 * gap rule is discarded. Pass the block the variation belongs to, so the
+					 * support check answers the question it is actually asking.
 					 */
-					unset( $variation_metadata_with_selector['name'] );
+					$variation_metadata_with_selector['name'] = $block_name;
 
 					$style_variation_layout_metadata[ $style_variation['selector'] ] = array(
 						'metadata' => $variation_metadata_with_selector,
@@ -3945,7 +3946,11 @@ class WP_Theme_JSON_Gutenberg {
 					if ( isset( $breakpoint_node['spacing']['blockGap'] ) ) {
 						$variation_layout_metadata             = $style_variation;
 						$variation_layout_metadata['selector'] = $style_variation['selector'] . $block_metadata['css'];
-						$variation_responsive_css             .= $this->get_layout_styles(
+
+						// The variation slug is not a block name here either. See above.
+						$variation_layout_metadata['name'] = $block_name;
+
+						$variation_responsive_css .= $this->get_layout_styles(
 							$variation_layout_metadata,
 							array(
 								'node'        => $breakpoint_node,
