@@ -53,10 +53,16 @@ function getCropModifiers( cropper: MediaEditorController ): Modifier[] {
 	if ( ! cropper.isCropperDirty || ! cropper.state.image ) {
 		return [];
 	}
-	return buildModifiers( cropper.state, {
+	const modifiers = buildModifiers( cropper.state, {
 		width: cropper.state.image.naturalWidth,
 		height: cropper.state.image.naturalHeight,
 	} );
+
+	if ( cropper.cropOptions.cropShape === 'circle' ) {
+		modifiers.push( { type: 'mask', args: { shape: 'circle' } } );
+	}
+
+	return modifiers;
 }
 
 function getMetadataEdits(

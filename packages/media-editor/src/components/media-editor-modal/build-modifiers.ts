@@ -26,7 +26,8 @@ export type Modifier =
 	| {
 			type: 'crop';
 			args: { left: number; top: number; width: number; height: number };
-	  };
+	  }
+	| { type: 'mask'; args: { shape: 'circle' } };
 
 /**
  * Tolerance (percent) used to decide whether a crop rect is effectively

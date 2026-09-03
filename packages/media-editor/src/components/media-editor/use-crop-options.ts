@@ -2,6 +2,7 @@ import { useMemo } from '@wordpress/element';
 import { DEFAULT_ASPECT_RATIOS } from '../../image-editor/core/constants';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
 import { useMediaEditor, resolveAspectRatio } from '../../state';
+import type { CropShape } from '../../state';
 
 interface UseCropOptionsArgs {
 	aspectRatioPresets?: AspectRatioPreset[];
@@ -10,6 +11,8 @@ interface UseCropOptionsArgs {
 interface UseCropOptionsReturn {
 	aspectRatioValue: string;
 	setAspectRatioValue: ( value: string ) => void;
+	cropShape: CropShape;
+	setCropShape: ( shape: CropShape ) => void;
 	aspectRatioOptions: AspectRatioPreset[];
 	resolvedAspectRatio: number | undefined;
 	resetCropOptions: () => void;
@@ -49,7 +52,7 @@ export function useCropOptions( {
 	aspectRatioPresets,
 }: UseCropOptionsArgs = {} ): UseCropOptionsReturn {
 	const controller = useMediaEditor();
-	const { aspectRatioValue } = controller.cropOptions;
+	const { aspectRatioValue, cropShape } = controller.cropOptions;
 	const cropperImage = controller.state.image;
 
 	const aspectRatioOptions = useMemo(
@@ -58,13 +61,18 @@ export function useCropOptions( {
 	);
 
 	const resolvedAspectRatio = useMemo(
-		() => resolveAspectRatio( aspectRatioValue, cropperImage ),
-		[ aspectRatioValue, cropperImage ]
+		() =>
+			cropShape === 'circle'
+				? 1
+				: resolveAspectRatio( aspectRatioValue, cropperImage ),
+		[ aspectRatioValue, cropShape, cropperImage ]
 	);
 
 	return {
 		aspectRatioValue,
 		setAspectRatioValue: controller.setAspectRatioValue,
+		cropShape,
+		setCropShape: controller.setCropShape,
 		aspectRatioOptions,
 		resolvedAspectRatio,
 		resetCropOptions: controller.resetCropOptions,

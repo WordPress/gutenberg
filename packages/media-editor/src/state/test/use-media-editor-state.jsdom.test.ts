@@ -36,6 +36,7 @@ describe( 'useMediaEditorState', () => {
 			expect( result.current.state.image ).toEqual( IMAGE );
 			expect( result.current.cropOptions ).toEqual( {
 				aspectRatioValue: '1',
+				cropShape: 'rectangle',
 			} );
 		} );
 
@@ -115,6 +116,40 @@ describe( 'useMediaEditorState', () => {
 				initialPreset
 			);
 			expect( result.current.state.cropRect ).toEqual( initialCropRect );
+		} );
+
+		it( 'a single undo restores crop shape and cropRect after switching to circle', () => {
+			const { result } = setupHook( { width: 600, height: 400 } );
+			const initialCropRect = result.current.state.cropRect;
+
+			act( () => result.current.setCropShape( 'circle' ) );
+
+			expect( result.current.cropOptions.cropShape ).toBe( 'circle' );
+			expect( result.current.state.cropRect.width ).toBeCloseTo(
+				2 / 3,
+				5
+			);
+			expect( result.current.state.cropRect.height ).toBeCloseTo( 1, 5 );
+			expect( result.current.isCropperDirty ).toBe( true );
+
+			act( () => result.current.undo() );
+
+			expect( result.current.cropOptions.cropShape ).toBe( 'rectangle' );
+			expect( result.current.state.cropRect ).toEqual( initialCropRect );
+		} );
+
+		it( 'marks circle shape as cropper dirty even when crop geometry is unchanged', () => {
+			const { result } = setupHook( { width: 400, height: 400 } );
+
+			act( () => result.current.setCropShape( 'circle' ) );
+
+			expect( result.current.state.cropRect ).toEqual( {
+				x: 0,
+				y: 0,
+				width: 1,
+				height: 1,
+			} );
+			expect( result.current.isCropperDirty ).toBe( true );
 		} );
 	} );
 
@@ -258,6 +293,7 @@ describe( 'useMediaEditorState', () => {
 			expect( result.current.state.rotation ).toBe( 0 );
 			expect( result.current.cropOptions ).toEqual( {
 				aspectRatioValue: '0',
+				cropShape: 'rectangle',
 			} );
 
 			act( () => result.current.undo() );
@@ -265,6 +301,7 @@ describe( 'useMediaEditorState', () => {
 			expect( result.current.state.rotation ).toBe( 45 );
 			expect( result.current.cropOptions ).toEqual( {
 				aspectRatioValue: '1',
+				cropShape: 'rectangle',
 			} );
 		} );
 	} );

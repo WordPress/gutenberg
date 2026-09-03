@@ -77,6 +77,11 @@ const KEYBOARD_SETTLE_DELAY = 500;
  * Props for the RectangleStencil component.
  */
 type RectangleStencilProps = StencilProps;
+type RectangleStencilInternalProps = RectangleStencilProps & {
+	className?: string;
+	lockedHandlePositions?: HandlePosition[];
+	stencilRectClassName?: string;
+};
 
 /**
  * A rectangular crop stencil with resize handles.
@@ -85,22 +90,25 @@ type RectangleStencilProps = StencilProps;
  * crop pass through to the container for image panning. The crop
  * auto-centers after resize via SETTLE_CROP.
  *
- * @param props                    Component props implementing StencilProps.
- * @param props.cropRect           The crop rectangle in normalized coordinates.
- * @param props.containerSize      The container element dimensions in pixels.
- * @param props.imageSize          The rendered image dimensions in pixels.
- * @param props.onCropChange       Callback fired when the crop rect changes.
- * @param props.onResizeStart      Callback fired when a resize drag starts.
- * @param props.onResizeEnd        Callback fired when a resize drag ends (mouseup).
- * @param props.aspectRatio        Optional fixed aspect ratio (width / height).
- * @param props.freeformCrop       Whether resize handles are shown.
- * @param props.isResizeDisabled   Whether resize handles should ignore pointer and keyboard input.
- * @param props.stencilTransition  CSS transition string for settle animation.
- * @param props.cropBounds         Maximum crop rect bounds from camera (zoom/rotation-aware).
- * @param props.onEscape           Called when Escape is pressed on a resize handle.
- * @param props.minCropSize        Minimum crop rect dimension in normalized space, per axis.
- * @param props.snapCropRect       Optional post-processor for freeform resize output.
- * @param props.keyboardResizeStep Optional keyboard resize step in normalized space, per axis.
+ * @param props                       Component props implementing StencilProps.
+ * @param props.cropRect              The crop rectangle in normalized coordinates.
+ * @param props.containerSize         The container element dimensions in pixels.
+ * @param props.imageSize             The rendered image dimensions in pixels.
+ * @param props.onCropChange          Callback fired when the crop rect changes.
+ * @param props.onResizeStart         Callback fired when a resize drag starts.
+ * @param props.onResizeEnd           Callback fired when a resize drag ends (mouseup).
+ * @param props.aspectRatio           Optional fixed aspect ratio (width / height).
+ * @param props.freeformCrop          Whether resize handles are shown.
+ * @param props.isResizeDisabled      Whether resize handles should ignore pointer and keyboard input.
+ * @param props.stencilTransition     CSS transition string for settle animation.
+ * @param props.cropBounds            Maximum crop rect bounds from camera (zoom/rotation-aware).
+ * @param props.onEscape              Called when Escape is pressed on a resize handle.
+ * @param props.minCropSize           Minimum crop rect dimension in normalized space, per axis.
+ * @param props.snapCropRect          Optional post-processor for freeform resize output.
+ * @param props.keyboardResizeStep    Optional keyboard resize step in normalized space, per axis.
+ * @param props.className             Optional class name added to the stencil root.
+ * @param props.lockedHandlePositions Handle positions to render when aspect ratio is locked.
+ * @param props.stencilRectClassName  Optional class name added to the visible stencil rect.
  * @return The rectangle stencil element.
  */
 export function RectangleStencil( {
@@ -119,7 +127,10 @@ export function RectangleStencil( {
 	minCropSize,
 	snapCropRect,
 	keyboardResizeStep,
-}: RectangleStencilProps ) {
+	className,
+	lockedHandlePositions,
+	stencilRectClassName,
+}: RectangleStencilInternalProps ) {
 	// Use cropBounds from the camera if available, otherwise default to [0,1].
 	const boundsMinX = cropBounds?.minX ?? 0;
 	const boundsMinY = cropBounds?.minY ?? 0;
@@ -540,11 +551,15 @@ export function RectangleStencil( {
 		return null;
 	}
 
-	const handles = hasLockedRatio ? CORNER_POSITIONS : ALL_POSITIONS;
+	const handles = hasLockedRatio
+		? lockedHandlePositions ?? CORNER_POSITIONS
+		: ALL_POSITIONS;
 
 	return (
 		<div
-			className="wp-media-editor-image-editor__stencil"
+			className={ [ 'wp-media-editor-image-editor__stencil', className ]
+				.filter( Boolean )
+				.join( ' ' ) }
 			data-testid="cropper-stencil"
 			style={ {
 				left,
@@ -567,7 +582,12 @@ export function RectangleStencil( {
 			{ /* The crop rectangle border. pointer-events: none is set in
 				   CSS so clicks pass through to the container for panning. */ }
 			<div
-				className="wp-media-editor-image-editor__stencil-rect"
+				className={ [
+					'wp-media-editor-image-editor__stencil-rect',
+					stencilRectClassName,
+				]
+					.filter( Boolean )
+					.join( ' ' ) }
 				style={ {
 					width: '100%',
 					height: '100%',

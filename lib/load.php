@@ -81,6 +81,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/experimental/collaboration/rest-api.php';
 	require __DIR__ . '/experimental/collaboration/collaboration.php';
 
+	// WordPress 7.2 compat.
+	require __DIR__ . '/compat/wordpress-7.2/image-editor-mask.php';
+
 	// Plugin specific code.
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
 	require_once __DIR__ . '/class-wp-rest-edit-site-export-controller-gutenberg.php';

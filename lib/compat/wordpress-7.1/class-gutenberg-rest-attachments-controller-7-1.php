@@ -5,6 +5,8 @@
  * @package gutenberg
  */
 
+require_once __DIR__ . '/../wordpress-7.2/class-gutenberg-rest-attachments-controller-7-2.php';
+
 /**
  * Controller which provides REST endpoint for retrieving attachments.
  * This overrides the core WP_REST_Attachments_Controller to provide
@@ -14,7 +16,7 @@
  *
  * @see WP_REST_Attachments_Controller
  */
-class Gutenberg_REST_Attachments_Controller_7_1 extends WP_REST_Attachments_Controller {
+class Gutenberg_REST_Attachments_Controller_7_1 extends Gutenberg_REST_Attachments_Controller_7_2 {
 
 	/**
 	 * Determines the allowed query_vars for a get_items() response and

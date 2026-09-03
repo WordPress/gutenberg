@@ -70,6 +70,10 @@ $handle-touch-target-size: 44px;
 		transition: box-shadow 0.15s ease;
 	}
 
+	&--circle-stencil &__dimming {
+		border-radius: 50%;
+	}
+
 	&--dragging &__dimming {
 		box-shadow: 0 0 0 9999px rgba($gray-200, 0.4);
 	}
@@ -79,6 +83,10 @@ $handle-touch-target-size: 44px;
 		pointer-events: none;
 		overflow: hidden;
 		transition: opacity 0.15s ease;
+	}
+
+	&--circle-stencil &__grid {
+		border-radius: 50%;
 	}
 
 	&__canvas--grid-interactive &__grid {
@@ -135,6 +143,10 @@ $handle-touch-target-size: 44px;
 		box-sizing: border-box;
 		pointer-events: none;
 		transition: border-color 0.15s ease, box-shadow 0.15s ease;
+	}
+
+	&__stencil-rect--circle {
+		border-radius: 50%;
 	}
 
 	// Blue border on the crop rectangle when the canvas has keyboard focus.

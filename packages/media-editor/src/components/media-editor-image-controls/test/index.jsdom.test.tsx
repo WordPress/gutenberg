@@ -1,16 +1,24 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import MediaEditorImageControls from '..';
 import type { MediaEditorImageControlsProps } from '..';
-import { MediaEditorStateProvider, useMediaEditor } from '../../../state';
+import {
+	MediaEditorStateProvider,
+	useMediaEditor,
+	type CropOptionsSlice,
+} from '../../../state';
 import type { CropperState } from '../../../image-editor';
 import { MAX_ZOOM } from '../../../image-editor/core/constants';
 
 function setup(
 	props: MediaEditorImageControlsProps = {},
-	initialCropperState?: Partial< CropperState >
+	initialCropperState?: Partial< CropperState >,
+	initialCropOptions?: Partial< CropOptionsSlice >
 ) {
 	render(
-		<MediaEditorStateProvider initialCropperState={ initialCropperState }>
+		<MediaEditorStateProvider
+			initialCropperState={ initialCropperState }
+			initialCropOptions={ initialCropOptions }
+		>
 			<MediaEditorImageControls { ...props } />
 			<CurrentState />
 		</MediaEditorStateProvider>
@@ -24,6 +32,9 @@ function CurrentState() {
 		<>
 			<output data-testid="current-aspect-ratio">
 				{ cropOptions.aspectRatioValue }
+			</output>
+			<output data-testid="current-crop-shape">
+				{ cropOptions.cropShape }
 			</output>
 			<output data-testid="current-zoom">{ state.zoom }</output>
 		</>
@@ -130,6 +141,23 @@ describe( 'MediaEditorImageControls', () => {
 		);
 	} );
 
+	it( 'renders a crop shape dropdown in the flat toolbar when enabled', async () => {
+		setup( {
+			showCropShapeControl: true,
+		} );
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'Crop shape' } ) );
+		fireEvent.click(
+			screen.getByRole( 'menuitemradio', { name: 'Circle' } )
+		);
+
+		await waitFor( () =>
+			expect(
+				screen.getByTestId( 'current-crop-shape' )
+			).toHaveTextContent( 'circle' )
+		);
+	} );
+
 	it( 'omits the aspect ratio dropdown from the labelled panel layout', () => {
 		setup( {
 			withLabels: true,
@@ -139,5 +167,28 @@ describe( 'MediaEditorImageControls', () => {
 		expect(
 			screen.queryByRole( 'button', { name: 'Aspect ratio' } )
 		).not.toBeInTheDocument();
+	} );
+
+	it( 'omits the crop shape dropdown from the labelled panel layout', () => {
+		setup( {
+			withLabels: true,
+			showCropShapeControl: true,
+		} );
+
+		expect(
+			screen.queryByRole( 'button', { name: 'Crop shape' } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'disables the aspect ratio dropdown for circle crops', () => {
+		setup( { showAspectRatioControl: true }, undefined, {
+			cropShape: 'circle',
+		} );
+
+		// The toggle uses `accessibleWhenDisabled`, so it stays in the toolbar
+		// (greyed out) with its disabled state expressed via aria-disabled.
+		expect(
+			screen.getByRole( 'button', { name: 'Aspect ratio' } )
+		).toHaveAttribute( 'aria-disabled', 'true' );
 	} );
 } );
