@@ -1,23 +1,22 @@
 import type { ReactElement } from 'react';
 
 /**
- * This type is used by @wordpress/i18n to make sprintf type-safe.
- *
- * We don't want to import from there directly to avoid a circular dependency.
+ * Mirrors `TransformedText` from @wordpress/i18n.
+ * We don't import directly to avoid a circular dependency.
  */
-type TranslatableText< T extends string > = string & {
-	readonly __translatableText: T;
+type TransformedText< T extends string > = string & {
+	readonly __transformedText: T;
 };
 
 /**
  * The input that can be passed to `createInterpolateElement`.
  */
-export type InterpolationInput = string | TranslatableText< string >;
+export type InterpolationInput = string | TransformedText< string >;
 
 /**
  * The literal string extracted from the input.
  */
-export type InterpolationString< Input > = Input extends TranslatableText<
+export type InterpolationString< Input > = Input extends TransformedText<
 	infer Text
 >
 	? Text

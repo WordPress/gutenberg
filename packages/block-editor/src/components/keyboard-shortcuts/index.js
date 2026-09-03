@@ -1,10 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
+import { useSettings } from '../use-settings';
 
 function KeyboardShortcuts() {
 	return null;
@@ -12,7 +10,10 @@ function KeyboardShortcuts() {
 
 function KeyboardShortcutsRegister() {
 	// Registering the shortcuts.
-	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
+	const { registerShortcut, unregisterShortcut } = useDispatch(
+		keyboardShortcutsStore
+	);
+	const [ blockVisibility ] = useSettings( 'blockVisibility.allowEditing' );
 	useEffect( () => {
 		registerShortcut( {
 			name: 'core/block-editor/copy',
@@ -208,15 +209,24 @@ function KeyboardShortcutsRegister() {
 			},
 		} );
 
-		registerShortcut( {
-			name: 'core/block-editor/toggle-block-visibility',
-			category: 'block',
-			description: __( 'Show or hide the selected block(s).' ),
-			keyCombination: {
-				modifier: 'primaryShift',
-				character: 'h',
-			},
-		} );
+		// Keep the block visibility shortcut in sync with the theme.json
+		// setting. The setting resolves asynchronously, so the shortcut may be
+		// registered before its value arrives; it must be removed once the
+		// value is known to be `false`, otherwise it lingers in the keyboard
+		// shortcut help list while doing nothing.
+		if ( blockVisibility === false ) {
+			unregisterShortcut( 'core/block-editor/toggle-block-visibility' );
+		} else {
+			registerShortcut( {
+				name: 'core/block-editor/toggle-block-visibility',
+				category: 'block',
+				description: __( 'Show or hide the selected block(s).' ),
+				keyCombination: {
+					modifier: 'primaryShift',
+					character: 'h',
+				},
+			} );
+		}
 
 		registerShortcut( {
 			name: 'core/block-editor/rename',
@@ -227,7 +237,7 @@ function KeyboardShortcutsRegister() {
 				character: 'r',
 			},
 		} );
-	}, [ registerShortcut ] );
+	}, [ registerShortcut, unregisterShortcut, blockVisibility ] );
 
 	return null;
 }

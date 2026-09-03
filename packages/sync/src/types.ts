@@ -1,23 +1,12 @@
-/**
- * WordPress dependencies
- */
 import type { UndoManager as WPUndoManager } from '@wordpress/undo-manager';
-
-/**
- * External dependencies
- */
 import type * as Y from 'yjs';
 import type { Awareness } from 'y-protocols/awareness';
-
-/**
- * Internal dependencies
- */
 import type { ConnectionError } from './errors';
 
 /* globalThis */
 declare global {
 	interface Window {
-		_wpCollaborationEnabled?: string;
+		__experimentalEnableRealTimeCollaboration?: boolean;
 	}
 }
 
@@ -80,6 +69,12 @@ export interface ConnectionStatusDisconnected {
 	/** Whether the error condition is retryable via user action. */
 	canManuallyRetry?: boolean;
 
+	/** Number of consecutive poll failures since the last successful connection. */
+	consecutiveFailures?: number;
+
+	/** Whether the background retry schedule has been exhausted without a successful connection. */
+	backgroundRetriesFailed?: boolean;
+
 	/** Milliseconds until the next automatic retry attempt (triggered by the provider). */
 	willAutoRetryInMs?: number;
 }
@@ -113,8 +108,14 @@ export interface CollectionHandlers {
 }
 
 export interface SyncManagerUpdateOptions {
+	// Whether this update represents a user-facing entity save.
 	isSave?: boolean;
 	isNewUndoLevel?: boolean;
+}
+
+export interface SyncUndoStackState {
+	hasRedo: boolean;
+	hasUndo: boolean;
 }
 
 export interface RecordHandlers {
@@ -128,6 +129,7 @@ export interface RecordHandlers {
 	persistCRDTDoc: () => void;
 	refetchRecord: () => Promise< void >;
 	restoreUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
+	onUndoStackChange?: ( state: SyncUndoStackState ) => void;
 }
 
 export interface SyncConfig {
@@ -144,6 +146,11 @@ export interface SyncConfig {
 		editedRecord: ObjectData
 	) => ObjectData;
 	getPersistedCRDTDoc?: ( record: ObjectData ) => string | null;
+	shouldSync?: (
+		objectType: ObjectType,
+		objectId: ObjectID | null
+	) => boolean;
+	supportsPersistence?: boolean;
 }
 
 export interface SyncManager {
@@ -153,8 +160,17 @@ export interface SyncManager {
 	) => Promise< string | null >;
 	getAwareness: < State extends Awareness >(
 		objectType: ObjectType,
-		objectId: ObjectID
+		objectId: ObjectID | null
 	) => State | undefined;
+	getEntitySnapshot: (
+		objectType: ObjectType,
+		objectId: ObjectID
+	) => string | undefined;
+	entityContainsSnapshot: (
+		objectType: ObjectType,
+		objectId: ObjectID,
+		encodedSnapshot: string
+	) => boolean;
 	load: (
 		syncConfig: SyncConfig,
 		objectType: ObjectType,
@@ -170,6 +186,7 @@ export interface SyncManager {
 	// undoManager is undefined until the first entity is loaded.
 	undoManager: SyncUndoManager | undefined;
 	unload: ( objectType: ObjectType, objectId: ObjectID ) => void;
+	unloadAll: () => void;
 	update: (
 		objectType: ObjectType,
 		objectId: ObjectID | null,
@@ -182,7 +199,10 @@ export interface SyncManager {
 export interface SyncUndoManager extends WPUndoManager< ObjectData > {
 	addToScope: (
 		ymap: Y.Map< any >,
-		handlers: Pick< RecordHandlers, 'addUndoMeta' | 'restoreUndoMeta' >
+		handlers: Pick<
+			RecordHandlers,
+			'addUndoMeta' | 'restoreUndoMeta' | 'onUndoStackChange'
+		>
 	) => void;
 	stopCapturing: () => void;
 }

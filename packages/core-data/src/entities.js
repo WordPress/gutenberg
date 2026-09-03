@@ -1,22 +1,12 @@
-/**
- * External dependencies
- */
 import { capitalCase, pascalCase } from 'change-case';
-
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 import { __unstableSerializeAndClean, parse } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { PostEditorAwareness } from './awareness/post-editor-awareness';
 import { getSyncManager } from './sync';
 import {
 	applyPostChangesToCRDTDoc,
+	defaultCollectionSyncConfig,
 	defaultSyncConfig,
 	getPostChangesFromCRDTDoc,
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
@@ -43,17 +33,15 @@ export const rootEntitiesConfig = [
 		baseURL: '/',
 		baseURLParams: {
 			// Please also change the preload path when changing this.
-			// @see lib/compat/wordpress-7.0/preload.php
+			// @see lib/compat/wordpress-7.1/preload.php
 			_fields: [
 				'description',
 				'gmt_offset',
 				'home',
+				'image_max_bit_depth',
 				'image_sizes',
 				'image_size_threshold',
-				'image_output_formats',
-				'jpeg_interlaced',
-				'png_interlaced',
-				'gif_interlaced',
+				'image_strip_meta',
 				'name',
 				'site_icon',
 				'site_icon_url',
@@ -147,6 +135,9 @@ export const rootEntitiesConfig = [
 		plural: 'comments',
 		label: __( 'Comment' ),
 		supportsPagination: true,
+		...( globalThis.window?.__experimentalEnableRealTimeCollaboration
+			? { syncConfig: defaultCollectionSyncConfig }
+			: {} ),
 	},
 	{
 		name: 'menu',
@@ -222,14 +213,6 @@ export const rootEntitiesConfig = [
 		supportsPagination: false,
 	},
 	{
-		label: __( 'Registered Templates' ),
-		name: 'registeredTemplate',
-		kind: 'root',
-		baseURL: '/wp/v2/registered-templates',
-		key: 'id',
-		supportsPagination: false,
-	},
-	{
 		label: __( 'Font Collections' ),
 		name: 'fontCollection',
 		kind: 'root',
@@ -249,14 +232,17 @@ export const rootEntitiesConfig = [
 		key: 'name',
 		supportsPagination: false,
 	},
-].map( ( entity ) => {
-	const syncEnabledRootEntities = new Set( [ 'comment' ] );
-
-	if ( syncEnabledRootEntities.has( entity.name ) ) {
-		entity.syncConfig = defaultSyncConfig;
-	}
-	return entity;
-} );
+	{
+		label: __( 'Icon Collections' ),
+		name: 'iconCollection',
+		kind: 'root',
+		baseURL: '/wp/v2/icon-collections',
+		baseURLParams: { context: 'view' },
+		plural: 'iconCollections',
+		key: 'slug',
+		supportsPagination: false,
+	},
+];
 
 export const deprecatedEntities = {
 	root: {
@@ -315,8 +301,11 @@ export const prePersistPostType = async (
 		}
 	}
 
-	// Add meta for persisted CRDT document.
-	if ( persistedRecord ) {
+	// Add meta for the persisted CRDT document during real post saves so the
+	// saved post and CRDT snapshot are committed in the same request. We don't
+	// want a post save to fail but a CRDT update to succeed or vice versa.
+	// CRDT repair uses /wp-sync/v1/save to avoid post-save side effects.
+	if ( window.__experimentalEnableRealTimeCollaboration && persistedRecord ) {
 		const objectType = `postType/${ name }`;
 		const objectId = persistedRecord.id;
 		const serializedDoc = await getSyncManager()?.createPersistedCRDTDoc(
@@ -342,7 +331,7 @@ export const prePersistPostType = async (
  */
 async function loadPostTypeEntities() {
 	const postTypesPromise = apiFetch( { path: '/wp/v2/types?context=view' } );
-	const taxonomiesPromise = window._wpCollaborationEnabled
+	const taxonomiesPromise = window.__experimentalEnableRealTimeCollaboration
 		? apiFetch( { path: '/wp/v2/taxonomies?context=view' } )
 		: Promise.resolve( {} );
 	const [ postTypes, taxonomies ] = await Promise.all( [
@@ -398,23 +387,29 @@ async function loadPostTypeEntities() {
 			__unstablePrePersist: ( persistedRecord, edits ) =>
 				prePersistPostType( persistedRecord, edits, name, isTemplate ),
 			__unstable_rest_base: postType.rest_base,
-			supportsPagination: true,
+			// The templates controller returns the whole collection and never
+			// paginates.
+			supportsPagination: ! isTemplate,
 			getRevisionsUrl: ( parentId, revisionId ) =>
 				`/${ namespace }/${
 					postType.rest_base
 				}/${ parentId }/revisions${
 					revisionId ? '/' + revisionId : ''
 				}`,
-			revisionKey:
-				isTemplate && ! window?.__experimentalTemplateActivate
-					? 'wp_id'
-					: DEFAULT_ENTITY_KEY,
+			revisionKey: isTemplate ? 'wp_id' : DEFAULT_ENTITY_KEY,
 		};
+
+		if ( ! window.__experimentalEnableRealTimeCollaboration ) {
+			return entity;
+		}
 
 		/**
 		 * @type {import('@wordpress/sync').SyncConfig}
 		 */
 		entity.syncConfig = {
+			// Save a CRDT document with this entity
+			supportsPersistence: true,
+
 			/**
 			 * Apply changes from the local editor to the local CRDT document so
 			 * that those changes can be synced to other peers (via the provider).
@@ -467,6 +462,11 @@ async function loadPostTypeEntities() {
 					null
 				);
 			},
+			shouldSync: () =>
+				! (
+					Array.isArray( window._wpCollaborationDisabledPostTypes ) &&
+					window._wpCollaborationDisabledPostTypes.includes( name )
+				),
 		};
 
 		return entity;
@@ -494,7 +494,9 @@ async function loadTaxonomyEntities() {
 			supportsPagination: true,
 		};
 
-		entity.syncConfig = defaultSyncConfig;
+		if ( window.__experimentalEnableRealTimeCollaboration ) {
+			entity.syncConfig = defaultSyncConfig;
+		}
 
 		return entity;
 	} );

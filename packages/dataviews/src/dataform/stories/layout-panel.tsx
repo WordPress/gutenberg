@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import DataForm from '../index';
 import type {
 	Field,
@@ -133,7 +126,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'filesize',
-		label: 'File Size',
+		label: 'File size',
 		type: 'integer',
 		readOnly: true,
 	},
@@ -180,7 +173,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'longDescription',
-		label: 'Long Description',
+		label: 'Long description',
 		type: 'text',
 		Edit: {
 			control: 'textarea',
@@ -189,7 +182,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'comment_status',
-		label: 'Comment Status',
+		label: 'Comment status',
 		type: 'text',
 		Edit: 'radio',
 		elements: [
@@ -199,7 +192,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'ping_status',
-		label: 'Allow Pings/Trackbacks',
+		label: 'Allow pings/trackbacks',
 		type: 'boolean',
 	},
 	{
@@ -233,7 +226,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'flight_status',
-		label: 'Flight Status',
+		label: 'Flight status',
 		type: 'text',
 		Edit: 'radio',
 		elements: [
@@ -360,8 +353,14 @@ const LayoutPanelComponent = ( {
 				'title',
 				{
 					id: 'status',
-					label: 'Status & Visibility',
+					label: 'Status & visibility',
 					children: [ 'status', 'password' ],
+					layout: getPanelLayoutFromStoryArgs( {
+						summary: [ 'status' ],
+						labelPosition,
+						openAs,
+						editVisibility,
+					} ),
 				},
 				'order',
 				'author',
@@ -372,15 +371,27 @@ const LayoutPanelComponent = ( {
 					id: 'discussion',
 					label: 'Discussion',
 					children: [ 'comment_status', 'ping_status' ],
+					layout: getPanelLayoutFromStoryArgs( {
+						summary: [ 'discussion' ],
+						labelPosition,
+						openAs,
+						editVisibility,
+					} ),
 				},
 				{
 					id: 'address1',
-					label: 'Combined Address',
+					label: 'Combined address',
 					children: [ 'address1', 'address2', 'city' ],
+					layout: getPanelLayoutFromStoryArgs( {
+						summary: [ 'address1' ],
+						labelPosition,
+						openAs,
+						editVisibility,
+					} ),
 				},
 				{
 					id: 'flight_info',
-					label: 'Flight Information',
+					label: 'Flight information',
 					children: [
 						'origin',
 						'destination',
@@ -396,7 +407,7 @@ const LayoutPanelComponent = ( {
 				},
 				{
 					id: 'passenger_details',
-					label: 'Passenger Details',
+					label: 'Passenger details',
 					children: [ 'author', 'seat' ],
 					layout: getPanelLayoutFromStoryArgs( {
 						summary: [ 'author', 'seat' ],

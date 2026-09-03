@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useContext,
 	useEffect,
@@ -10,7 +7,7 @@ import {
 } from '@wordpress/element';
 import {
 	__experimentalSpacer as Spacer,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	Navigator,
@@ -40,10 +37,6 @@ import type {
 	FontFamily,
 	CollectionFontFamily,
 } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { FontLibraryContext } from './context';
 import FontCard from './font-card';
 import filterFonts from './utils/filter-fonts';
@@ -76,6 +69,9 @@ function FontCollection( { slug }: { slug: string } ) {
 	const [ selectedFont, setSelectedFont ] = useState< FontFamily | null >(
 		null
 	);
+	const [ lastSelectedFontSlug, setLastSelectedFontSlug ] = useState<
+		string | undefined
+	>( undefined );
 	const [ notice, setNotice ] = useState< {
 		type: 'success' | 'error' | 'info';
 		message: string;
@@ -155,8 +151,11 @@ function FontCollection( { slug }: { slug: string } ) {
 		setPage( 1 );
 	};
 
-	// @ts-expect-error
-	const debouncedUpdateSearchInput = debounce( handleUpdateSearchInput, 300 );
+	const debouncedUpdateSearchInput = debounce(
+		// @ts-expect-error `debounce` expects a `(...args: unknown[]) => unknown` callback.
+		handleUpdateSearchInput,
+		300
+	);
 
 	const handleToggleVariant = ( font: FontFamily, face?: FontFace ) => {
 		const newFontsToInstall = toggleFont( font, face, fontsToInstall );
@@ -257,26 +256,8 @@ function FontCollection( { slug }: { slug: string } ) {
 		return <GoogleFontsConfirmDialog />;
 	}
 
-	const ActionsComponent = () => {
-		if ( slug !== 'google-fonts' || renderConfirmDialog || selectedFont ) {
-			return null;
-		}
-		return (
-			<DropdownMenu
-				icon={ moreVertical }
-				label={ __( 'Actions' ) }
-				popoverProps={ {
-					position: 'bottom left',
-				} }
-				controls={ [
-					{
-						title: __( 'Revoke access to Google Fonts' ),
-						onClick: revokeAccess,
-					},
-				] }
-			/>
-		);
-	};
+	const showActions =
+		slug === 'google-fonts' && ! renderConfirmDialog && ! selectedFont;
 
 	return (
 		<div className="font-library__tabpanel-layout">
@@ -285,7 +266,6 @@ function FontCollection( { slug }: { slug: string } ) {
 					<ProgressBar />
 				</div>
 			) }
-
 			{ ! isLoading && selectedCollection && (
 				<>
 					<Navigator
@@ -298,15 +278,32 @@ function FontCollection( { slug }: { slug: string } ) {
 									<Heading level={ 2 } size={ 13 }>
 										{ selectedCollection.name }
 									</Heading>
-									<Text>
+									<WCText>
 										{ selectedCollection.description }
-									</Text>
+									</WCText>
 								</VStack>
-								<ActionsComponent />
+								{ showActions && (
+									<DropdownMenu
+										icon={ moreVertical }
+										label={ __( 'Actions' ) }
+										popoverProps={ {
+											position: 'bottom left',
+										} }
+										controls={ [
+											{
+												title: __(
+													'Revoke access to Google Fonts'
+												),
+												onClick: revokeAccess,
+											},
+										] }
+									/>
+								) }
 							</HStack>
 							<Spacer margin={ 4 } />
 							<HStack spacing={ 4 } justify="space-between">
 								<SearchControl
+									className="font-library__search"
 									value={ filters.search }
 									placeholder={ __( 'Font name…' ) }
 									label={ __( 'Search' ) }
@@ -314,7 +311,6 @@ function FontCollection( { slug }: { slug: string } ) {
 									hideLabelFromVision={ false }
 								/>
 								<SelectControl
-									__next40pxDefaultSize
 									label={ __( 'Category' ) }
 									value={ filters.category }
 									onChange={ handleCategoryFilter }
@@ -335,11 +331,11 @@ function FontCollection( { slug }: { slug: string } ) {
 
 							{ !! selectedCollection?.font_families?.length &&
 								! fonts.length && (
-									<Text>
+									<WCText>
 										{ __(
 											'No fonts found. Try with a different search term.'
 										) }
-									</Text>
+									</WCText>
 								) }
 
 							<div className="font-library__fonts-grid__main">
@@ -364,6 +360,11 @@ function FontCollection( { slug }: { slug: string } ) {
 													font.font_family_settings
 												}
 												navigatorPath="/fontFamily"
+												shouldFocus={
+													font.font_family_settings
+														.slug ===
+													lastSelectedFontSlug
+												}
 												onClick={ () => {
 													setSelectedFont(
 														font.font_family_settings
@@ -385,6 +386,9 @@ function FontCollection( { slug }: { slug: string } ) {
 									}
 									size="small"
 									onClick={ () => {
+										setLastSelectedFontSlug(
+											selectedFont?.slug
+										);
 										setSelectedFont( null );
 										setNotice( null );
 									} }
@@ -411,9 +415,9 @@ function FontCollection( { slug }: { slug: string } ) {
 								</>
 							) }
 							<Spacer margin={ 4 } />
-							<Text>
+							<WCText>
 								{ __( 'Select font variants to install.' ) }
-							</Text>
+							</WCText>
 							<Spacer margin={ 4 } />
 							<CheckboxControl
 								className="font-library__select-all"
@@ -508,6 +512,7 @@ function FontCollection( { slug }: { slug: string } ) {
 									),
 									{
 										div: <div aria-hidden />,
+										// @ts-expect-error — Tag injected via sprintf argument, not visible in format string.
 										CurrentPage: (
 											<SelectControl
 												aria-label={ __(

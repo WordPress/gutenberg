@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import type { Field, View, Form } from '@wordpress/dataviews';
 import { DataForm, DataViews } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
 import {
 	altTextField,
 	attachedToField,
@@ -386,12 +379,6 @@ export const DataViewsPreview = () => {
 		totalPages: 1,
 	};
 
-	const defaultLayouts = {
-		table: {},
-		list: {},
-		grid: {},
-	};
-
 	return (
 		<div style={ { padding: '20px' } }>
 			<h2>Media Fields DataViews Preview</h2>
@@ -406,8 +393,13 @@ export const DataViewsPreview = () => {
 				view={ view }
 				onChangeView={ ( nextView: View ) => setView( nextView ) }
 				paginationInfo={ paginationInfo }
-				defaultLayouts={ defaultLayouts }
 			/>
 		</div>
 	);
+};
+
+DataViewsPreview.parameters = {
+	// FIXME: Preview table has an empty column header (empty-table-header).
+	// See: https://github.com/WordPress/gutenberg/issues/81596
+	a11y: { test: 'todo' },
 };

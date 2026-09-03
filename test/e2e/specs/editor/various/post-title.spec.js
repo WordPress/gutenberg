@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Post title', () => {
@@ -18,12 +15,20 @@ test.describe( 'Post title', () => {
 
 			await expect( pageTitleField ).toBeFocused();
 			await page.keyboard.press( 'Enter' );
-			await expect(
-				editor.canvas.getByRole( 'document', {
-					name: 'Empty block',
-				} ),
-				'should move focus to an empty paragraph block when the Enter key is pressed'
-			).toBeFocused();
+			await expect
+				.poll(
+					() =>
+						editor.ownsSelection(
+							editor.canvas.getByRole( 'document', {
+								name: 'Empty block',
+							} )
+						),
+					{
+						message:
+							'should move the selection to an empty paragraph block when the Enter key is pressed',
+					}
+				)
+				.toBe( true );
 		} );
 
 		test( 'should focus on the post title field when creating a new post in code editor mode', async ( {
@@ -52,9 +57,9 @@ test.describe( 'Post title', () => {
 			await expect( pageTitleField ).toBeFocused();
 		} );
 	} );
+
 	test.describe( 'HTML handling', () => {
 		test( `should (visually) render any HTML in Post Editor's post title field when in Visual editing mode`, async ( {
-			page,
 			editor,
 			admin,
 			requestUtils,
@@ -65,20 +70,7 @@ test.describe( 'Post title', () => {
 				status: 'publish',
 			} );
 
-			await admin.visitAdminPage(
-				'post.php',
-				`post=${ postId }&action=edit`
-			);
-
-			await page.evaluate( () => {
-				window.wp.data
-					.dispatch( 'core/preferences' )
-					.set( 'core/edit-post', 'welcomeGuide', false );
-
-				window.wp.data
-					.dispatch( 'core/preferences' )
-					.set( 'core/edit-post', 'fullscreenMode', false );
-			}, false );
+			await admin.editPost( postId );
 
 			const pageTitleField = editor.canvas.getByRole( 'textbox', {
 				name: 'Add title',
@@ -115,20 +107,7 @@ test.describe( 'Post title', () => {
 				status: 'publish',
 			} );
 
-			await admin.visitAdminPage(
-				'post.php',
-				`post=${ postId }&action=edit`
-			);
-
-			await page.evaluate( () => {
-				window.wp.data
-					.dispatch( 'core/preferences' )
-					.set( 'core/edit-post', 'welcomeGuide', false );
-
-				window.wp.data
-					.dispatch( 'core/preferences' )
-					.set( 'core/edit-post', 'fullscreenMode', false );
-			}, false );
+			await admin.editPost( postId );
 
 			// switch Editor to code editor mode
 			// Open code editor
@@ -202,7 +181,7 @@ test.describe( 'Post title', () => {
 				} )
 			).toBeVisible();
 
-			const pageTitleField = page.getByRole( 'textbox', {
+			const titleField = page.getByRole( 'textbox', {
 				name: 'Add title',
 			} );
 
@@ -213,11 +192,11 @@ test.describe( 'Post title', () => {
 			} );
 
 			// focus on the title field
-			await pageTitleField.focus();
+			await titleField.focus();
 
 			await pageUtils.pressKeys( 'primary+v' );
 
-			await expect( pageTitleField ).toHaveText(
+			await expect( titleField ).toHaveText(
 				'I am <em>emphasis</em> I am <strong>bold</strong> I am <a href="#">anchor</a>'
 			);
 		} );

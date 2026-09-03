@@ -1,8 +1,5 @@
-/**
- * WordPress dependencies
- */
 import {
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __, _x, _n, sprintf } from '@wordpress/i18n';
@@ -10,20 +7,22 @@ import { count as wordCount } from '@wordpress/wordcount';
 import type { Strategy } from '@wordpress/wordcount';
 import { humanTimeDiff } from '@wordpress/date';
 import { useMemo } from '@wordpress/element';
+import type { BasePostWithEditedEntity } from '../../types';
 
-/**
- * Internal dependencies
- */
-import type { BasePost } from '../../types';
-
-// Taken from packages/editor/src/components/time-to-read/index.js.
+// Taken from packages/editor/src/components/time-to-read/index.jsx.
 const AVERAGE_READING_RATE = 189;
 
-export default function PostContentInfoView( { item }: { item: BasePost } ) {
-	const content =
-		typeof item.content === 'string'
-			? item.content
-			: item.content?.raw || '';
+export default function PostContentInfoView( {
+	item,
+}: {
+	item: BasePostWithEditedEntity;
+} ) {
+	let content = '';
+	if ( typeof item.content === 'string' ) {
+		content = item.content;
+	} else if ( typeof item.content === 'function' ) {
+		content = item.content( item );
+	}
 
 	/*
 	 * translators: If your word count is based on single characters (e.g. East Asian characters),
@@ -72,16 +71,16 @@ export default function PostContentInfoView( { item }: { item: BasePost } ) {
 	return (
 		<VStack spacing={ 1 }>
 			{ contentInfoText && (
-				<Text variant="muted">{ contentInfoText }</Text>
+				<WCText variant="muted">{ contentInfoText }</WCText>
 			) }
 			{ modified && (
-				<Text variant="muted">
+				<WCText variant="muted">
 					{ sprintf(
 						// translators: %s: Human-readable time difference, e.g. "2 days ago".
 						__( 'Last edited %s.' ),
 						humanTimeDiff( modified )
 					) }
-				</Text>
+				</WCText>
 			) }
 		</VStack>
 	);

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { sideloadMedia } from './utils/sideload-media';
 import { MediaUploadModal } from './components/media-upload-modal';
 import { lock } from './lock-unlock';

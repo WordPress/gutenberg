@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { ReactElement } from 'react';
-
-/**
- * WordPress dependencies
- */
 import type { RichTextValue } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import type { useAutocomplete } from '.';
 
 // Insert the `value` into the text.
@@ -110,6 +99,10 @@ type ContentRef = React.RefObject< HTMLElement | null >;
 
 export type AutocompleterUIProps = {
 	/**
+	 * The autocompleter configuration object.
+	 */
+	autocompleter: WPCompleter;
+	/**
 	 * The value to filter the options by.
 	 */
 	filterValue: string;
@@ -139,19 +132,9 @@ export type AutocompleterUIProps = {
 	 */
 	onSelect: ( option: KeyedOption ) => void;
 	/**
-	 * A function to be called when the completer is reset
-	 * (e.g. when the user hits the escape key).
-	 */
-	onReset?: () => void;
-	/**
 	 * A function that defines the behavior of the completer when it is reset
 	 */
 	reset: ( event: Event ) => void;
-	// This is optional because it's still needed for mobile/native.
-	/**
-	 * The rich text value object the autocompleter is being applied to.
-	 */
-	value?: RichTextValue;
 	/**
 	 * A ref containing the editable element that will serve as the anchor for
 	 * `Autocomplete`'s `Popover`.

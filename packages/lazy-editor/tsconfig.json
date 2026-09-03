@@ -7,14 +7,15 @@
 	},
 	"references": [
 		{ "path": "../asset-loader" },
-		{ "path": "../block-editor" },
-		{ "path": "../components" },
-		{ "path": "../core-data" },
+		{ "path": "../block-editor/tsconfig.build.json" },
+		{ "path": "../blocks" },
+		{ "path": "../components/tsconfig.build.json" },
+		{ "path": "../core-data/tsconfig.build.json" },
 		{ "path": "../data" },
-		{ "path": "../element" },
-		{ "path": "../editor" },
-		{ "path": "../global-styles-engine" },
-		{ "path": "../i18n" },
+		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../editor/tsconfig.build.json" },
+		{ "path": "../global-styles-engine/tsconfig.build.json" },
+		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../private-apis" }
 	]
 }

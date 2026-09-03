@@ -1,18 +1,6 @@
-/**
- * WordPress dependencies
- */
-import { combineReducers } from '@wordpress/data';
+import { combineReducers, keyedReducer } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
-import {
-	conservativeMapItem,
-	ifMatchingAction,
-	replaceAction,
-	onSubKey,
-} from '../utils';
+import { conservativeMapItem, ifMatchingAction, replaceAction } from '../utils';
 import { DEFAULT_ENTITY_KEY } from '../entities';
 import getQueryParts from './get-query-parts';
 
@@ -51,6 +39,7 @@ export function getMergedItemIds(
 	}
 
 	const nextItemIdsStartIndex = offset ?? ( page - 1 ) * perPage;
+	const nextItemIdsRange = Math.max( perPage, nextItemIds.length );
 
 	// If later page has already been received, default to the larger known
 	// size of the existing array, else calculate as extending the existing.
@@ -67,7 +56,8 @@ export function getMergedItemIds(
 		// We need to check against the possible maximum upper boundary because
 		// a page could receive fewer than what was previously stored.
 		const isInNextItemsRange =
-			i >= nextItemIdsStartIndex && i < nextItemIdsStartIndex + perPage;
+			i >= nextItemIdsStartIndex &&
+			i < nextItemIdsStartIndex + nextItemIdsRange;
 		if ( isInNextItemsRange ) {
 			mergedItemIds[ i ] = nextItemIds[ i - nextItemIdsStartIndex ];
 		} else {
@@ -219,11 +209,11 @@ const receiveQueries = compose( [
 	// an unhandled action.
 	ifMatchingAction( ( action ) => 'query' in action ),
 
-	// Inject query parts into action for use both in `onSubKey` and reducer.
+	// Inject query parts into action for use both in `keyedReducer` and reducer.
 	replaceAction( ( action ) => {
 		// `ifMatchingAction` still passes on initialization, where state is
 		// undefined and a query is not assigned. Avoid attempting to parse
-		// parts. `onSubKey` will omit by lack of `stableKey`.
+		// parts. `keyedReducer` will omit by lack of `stableKey`.
 		if ( action.query ) {
 			return {
 				...action,
@@ -234,11 +224,11 @@ const receiveQueries = compose( [
 		return action;
 	} ),
 
-	onSubKey( 'context' ),
+	keyedReducer( 'context' ),
 
 	// Queries shape is shared, but keyed by query `stableKey` part. Original
 	// reducer tracks only a single query object.
-	onSubKey( 'stableKey' ),
+	keyedReducer( 'stableKey' ),
 ] )( ( state = {}, action ) => {
 	if ( action.type !== 'RECEIVE_ITEMS' ) {
 		return state;
@@ -267,6 +257,48 @@ const receiveQueries = compose( [
 } );
 
 /**
+ * Removes items from a query's item IDs, keeping the pagination metadata in
+ * sync. Every removed item the query listed was counted by the endpoint in
+ * `totalItems`, so the total shrinks by that many. Nothing else refreshes the
+ * totals until the next fetch, and a consumer whose page has just emptied
+ * would otherwise keep requesting a page that no longer exists.
+ *
+ * `totalPages` can't be recomputed here — the page size that produced the
+ * `X-WP-TotalPages` header isn't known to the reducer — so it is reset to
+ * `null` ("unknown") rather than left next to a fresh `totalItems` it no
+ * longer matches. Queries that set `per_page` are unaffected: the selectors
+ * derive their page count from `totalItems` and never read the header value.
+ *
+ * @param {Object} queryItems   Query state, with `itemIds` and optional `meta`.
+ * @param {Object} removedItems Removed item IDs, as object keys.
+ *
+ * @return {Object} Updated query state.
+ */
+function removeQueryItems( queryItems, removedItems ) {
+	const itemIds = queryItems.itemIds.filter(
+		( itemId ) => ! removedItems[ itemId ]
+	);
+	const removedCount = queryItems.itemIds.length - itemIds.length;
+	if ( removedCount === 0 ) {
+		return queryItems;
+	}
+
+	const nextQueryItems = { ...queryItems, itemIds };
+	if ( Number.isFinite( queryItems.meta?.totalItems ) ) {
+		nextQueryItems.meta = {
+			...queryItems.meta,
+			totalItems: Math.max(
+				0,
+				queryItems.meta.totalItems - removedCount
+			),
+			totalPages: null,
+		};
+	}
+
+	return nextQueryItems;
+}
+
+/**
  * Reducer tracking queries state.
  *
  * @param {Object} state  Current state.
@@ -292,13 +324,10 @@ const queries = ( state = {}, action ) => {
 							Object.entries( contextQueries ).map(
 								( [ query, queryItems ] ) => [
 									query,
-									{
-										...queryItems,
-										itemIds: queryItems.itemIds.filter(
-											( queryId ) =>
-												! removedItems[ queryId ]
-										),
-									},
+									removeQueryItems(
+										queryItems,
+										removedItems
+									),
 								]
 							)
 						),
