@@ -7339,11 +7339,6 @@
 			"count": 3
 		}
 	},
-	"packages/fields/src/actions/trash-post.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
 	"packages/fields/src/components/create-template-part-modal/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
