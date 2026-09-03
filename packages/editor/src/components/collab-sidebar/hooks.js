@@ -29,6 +29,8 @@ import {
 	getInlineMarkerStart,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
+	materializeNoteThreads,
+	partitionNoteThreadsByStatus,
 	removeNoteFormat,
 	removeNoteIdFromMetadata,
 } from './utils';
@@ -82,30 +84,15 @@ export function useNoteThreads( postId ) {
 			}
 		}
 
-		// Materialize threads; collect roots; replies linked in a second pass
-		// via unshift to invert order (matches prior reverse semantics).
-		const threadsById = new Map();
-		const rootThreads = [];
-		for ( const item of threads ) {
-			const thread = {
-				...item,
-				reply: [],
-				blockClientId:
-					item.parent === 0
-						? clientIdByNoteId.get( item.id ) ?? null
-						: null,
-			};
-			threadsById.set( item.id, thread );
-			if ( item.parent === 0 ) {
-				rootThreads.push( thread );
-			}
-		}
-		for ( const item of threads ) {
-			if ( item.parent !== 0 ) {
-				threadsById
-					.get( item.parent )
-					?.reply.unshift( threadsById.get( item.id ) );
-			}
+		const { threadsById, rootThreads } = materializeNoteThreads( threads );
+
+		// Anchor each root to the block that carries its id. Replies are read
+		// through their root, so only roots need one.
+		for ( const thread of threadsById.values() ) {
+			thread.blockClientId =
+				thread.parent === 0
+					? clientIdByNoteId.get( thread.id ) ?? null
+					: null;
 		}
 
 		if ( rootThreads.length === 0 ) {
@@ -117,8 +104,7 @@ export function useNoteThreads( postId ) {
 		// marker start offset. Ties (rare; two markers at the same offset)
 		// fall back to creation order via thread id. Blocks themselves are
 		// already iterated in document order above.
-		const unresolved = [];
-		const resolved = [];
+		const orderedThreadsInDocumentOrder = [];
 		for ( const [ clientId, noteIds ] of Object.entries(
 			blocksWithNotes
 		) ) {
@@ -142,13 +128,13 @@ export function useNoteThreads( postId ) {
 					return a.thread.id - b.thread.id;
 				} );
 			for ( const { thread } of orderedThreads ) {
-				if ( thread.status === 'hold' ) {
-					unresolved.push( thread );
-				} else if ( thread.status === 'approved' ) {
-					resolved.push( thread );
-				}
+				orderedThreadsInDocumentOrder.push( thread );
 			}
 		}
+
+		const { unresolved, resolved } = partitionNoteThreadsByStatus(
+			orderedThreadsInDocumentOrder
+		);
 
 		// Orphans: root threads without a linked block. They stay with the
 		// active notes (above the "Resolved" separator) since they may still
@@ -267,10 +253,39 @@ function clearInlineNoteMarker(
 	}
 }
 
-export function useNoteActions() {
+/**
+ * Note create/edit/delete actions, shared by every notes surface so they agree
+ * on snackbars, error normalization and the `_wp_note_status` resolution flow.
+ *
+ * The post editor uses the defaults: notes go on the post being edited and
+ * anchor to a block through its `metadata.noteId` attribute. Surfaces with no
+ * edited post and no persisted blocks - the Style Book, which stores notes on
+ * the user `wp_global_styles` post and anchors them to an example name - pass
+ * `postId` and `getCreateExtra` instead. Block-attribute wiring is skipped in
+ * that case because there is no block to write to.
+ *
+ * @param {Object}        [options]
+ * @param {number|string} [options.postId]         Post to store notes
+ *                                                 against. Defaults to the
+ *                                                 edited post.
+ * @param {Function}      [options.getCreateExtra] Returns extra fields to
+ *                                                 merge into the create
+ *                                                 payload, e.g. anchor meta.
+ * @return {{ onCreate: Function, onEdit: Function, onDelete: Function }} Actions.
+ */
+export function useNoteActions( { postId, getCreateExtra } = {} ) {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { getCurrentPostId } = useSelect( editorStore );
+	const getPostId = () => postId ?? getCurrentPostId();
+	/*
+	 * Notes stored against some other post than the one this editor has open
+	 * cannot anchor to blocks in its canvas. Skipping the block wiring is not
+	 * just an optimization: the canvas usually *does* have a selected block -
+	 * a template block, in the site editor - and writing `metadata.noteId` onto
+	 * it would attach a Style Book note to unrelated content.
+	 */
+	const anchorsToBlocks = postId === undefined;
 	const {
 		getBlockAttributes,
 		getClientIdsWithDescendants,
@@ -296,22 +311,25 @@ export function useNoteActions() {
 			// Capture the target block and inline selection *before* the async
 			// save: selection may shift during the round-trip, attaching the
 			// note to the wrong block or collapsing its inline anchor.
-			const inlineSelection = ! parent
-				? readInlineSelection( getSelectionStart, getSelectionEnd )
-				: null;
-			const clientId = ! parent
-				? inlineSelection?.clientId || getSelectedBlockClientId()
-				: null;
+			const inlineSelection =
+				anchorsToBlocks && ! parent
+					? readInlineSelection( getSelectionStart, getSelectionEnd )
+					: null;
+			const clientId =
+				anchorsToBlocks && ! parent
+					? inlineSelection?.clientId || getSelectedBlockClientId()
+					: null;
 
 			const savedRecord = await saveEntityRecord(
 				'root',
 				'comment',
 				{
-					post: getCurrentPostId(),
+					post: getPostId(),
 					content,
 					status: 'hold',
 					type: 'note',
 					parent: parent || 0,
+					...( parent ? {} : getCreateExtra?.() ),
 				},
 				{ throwOnError: true }
 			);
@@ -385,7 +403,7 @@ export function useNoteActions() {
 
 				// Then create a new note with the metadata.
 				const newNoteData = {
-					post: getCurrentPostId(),
+					post: getPostId(),
 					content: content || '', // Empty content for resolve, content for reopen.
 					type: 'note',
 					status,
@@ -407,7 +425,7 @@ export function useNoteActions() {
 
 				// Resolving a note drops its inline highlight: strip the marker
 				// so the note falls back to a block-level note in the content.
-				if ( status === 'approved' ) {
+				if ( status === 'approved' && anchorsToBlocks ) {
 					clearInlineNoteMarker(
 						id,
 						getClientIdsWithDescendants,
@@ -458,9 +476,10 @@ export function useNoteActions() {
 			// Capture the target block *before* the async delete: selection may
 			// shift during the round-trip, pointing the attribute cleanup at the
 			// wrong block.
-			const clientId = ! note.parent
-				? note.blockClientId || getSelectedBlockClientId()
-				: null;
+			const clientId =
+				anchorsToBlocks && ! note.parent
+					? note.blockClientId || getSelectedBlockClientId()
+					: null;
 
 			await deleteEntityRecord( 'root', 'comment', note.id, undefined, {
 				throwOnError: true,

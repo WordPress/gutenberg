@@ -417,6 +417,70 @@ export function removeNoteFormat( value, noteId ) {
 }
 
 /**
+ * Turns the flat comment list the REST endpoint returns into threads: one
+ * object per comment, with replies nested under their root.
+ *
+ * Anchoring is deliberately left to the caller. Notes in the post editor anchor
+ * to a block through the block's `metadata.noteId` attribute, while Style Book
+ * notes anchor to an example name held in comment meta; only the roots/replies
+ * shape is common to both.
+ *
+ * Replies are unshifted rather than pushed because the comments endpoint
+ * returns newest first and threads read oldest first.
+ *
+ * @param {Array} comments Flat list of note comments.
+ * @return {{ threadsById: Map<number, Object>, rootThreads: Array }} Threads
+ * indexed by comment id, and the top-level threads in source order.
+ */
+export function materializeNoteThreads( comments ) {
+	const threadsById = new Map();
+	const rootThreads = [];
+
+	for ( const item of comments ) {
+		const thread = { ...item, reply: [] };
+		threadsById.set( item.id, thread );
+		if ( item.parent === 0 ) {
+			rootThreads.push( thread );
+		}
+	}
+
+	for ( const item of comments ) {
+		if ( item.parent !== 0 ) {
+			// A reply whose root is gone from the response is dropped rather
+			// than surfaced parentless.
+			threadsById
+				.get( item.parent )
+				?.reply.unshift( threadsById.get( item.id ) );
+		}
+	}
+
+	return { threadsById, rootThreads };
+}
+
+/**
+ * Splits threads into unresolved and resolved buckets, preserving the incoming
+ * order within each. Threads in any other status (spam, trash) belong to
+ * neither and are dropped.
+ *
+ * @param {Array} threads Ordered list of thread objects.
+ * @return {{ unresolved: Array, resolved: Array }} Partitioned threads.
+ */
+export function partitionNoteThreadsByStatus( threads ) {
+	const unresolved = [];
+	const resolved = [];
+
+	for ( const thread of threads ) {
+		if ( thread.status === 'hold' ) {
+			unresolved.push( thread );
+		} else if ( thread.status === 'approved' ) {
+			resolved.push( thread );
+		}
+	}
+
+	return { unresolved, resolved };
+}
+
+/**
  * Picks the most relevant thread from a list: first unresolved, else first.
  *
  * @param {Array} threads Ordered list of thread objects.
@@ -618,9 +682,9 @@ function findNoteThread( noteId, container, additionalSelector ) {
 /**
  * Focus a note thread (or a descendant) and scroll it into view.
  *
- * @param {string}       noteId             Note thread ID.
- * @param {?HTMLElement} container          Container to search within.
- * @param {string}       additionalSelector Optional descendant selector.
+ * @param {number|string} noteId               Note thread ID.
+ * @param {?HTMLElement}  container            Container to search within.
+ * @param {string}        [additionalSelector] Optional descendant selector.
  */
 export function focusNoteThread( noteId, container, additionalSelector ) {
 	return findNoteThread( noteId, container, additionalSelector ).then(

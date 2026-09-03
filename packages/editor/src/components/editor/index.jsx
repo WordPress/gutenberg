@@ -8,6 +8,8 @@ import EditorInterface from '../editor-interface';
 import { ExperimentalEditorProvider } from '../provider';
 import Sidebar from '../sidebar';
 import NotesSidebar from '../collab-sidebar';
+import StyleBookNotes from '../style-book/notes';
+import { StyleBookNotesProvider } from '../style-book/notes/context';
 import GlobalStylesSidebar from '../global-styles-sidebar';
 import { GlobalStylesRenderer } from '../global-styles-renderer';
 
@@ -111,15 +113,24 @@ function Editor( {
 					initialViewport={ initialViewport }
 					useSubRegistry={ false }
 				>
-					<EditorInterface { ...props }>
-						{ extraContent }
-					</EditorInterface>
-					{ children }
-					<Sidebar
-						onActionPerformed={ onActionPerformed }
-						extraPanels={ extraSidebarPanels }
-					/>
-					<NotesSidebar />
+					{ /*
+					 * The Style Book canvas lives inside the editor interface
+					 * and its notes sidebar in a complementary-area fill, so
+					 * the provider has to sit above both for them to share the
+					 * anchor being added or looked at.
+					 */ }
+					<StyleBookNotesProvider>
+						<EditorInterface { ...props }>
+							{ extraContent }
+						</EditorInterface>
+						{ children }
+						<Sidebar
+							onActionPerformed={ onActionPerformed }
+							extraPanels={ extraSidebarPanels }
+						/>
+						<NotesSidebar />
+						<StyleBookNotes />
+					</StyleBookNotesProvider>
 					{ isBlockTheme && <GlobalStylesRenderer /> }
 					{ showGlobalStyles && <GlobalStylesSidebar /> }
 				</ExperimentalEditorProvider>

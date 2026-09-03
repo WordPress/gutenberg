@@ -240,6 +240,42 @@ export const STYLE_BOOK_IFRAME_STYLES = `
 		pointer-events: none;
 	}
 
+	/*
+	 * Rows only become a flex container once they carry a notes button, so the
+	 * Style Book lays out exactly as before wherever notes are unavailable.
+	 * The example keeps its own max-width and the row takes over the centering
+	 * the example's auto margins used to do.
+	 */
+	.editor-style-book__example-row.has-note-actions {
+		display: flex;
+		align-items: flex-start;
+		gap: 8px;
+		max-width: 940px;
+		margin: 0 auto;
+	}
+
+	.editor-style-book__example-row.has-note-actions > [role="gridcell"]:first-child {
+		flex-grow: 1;
+		min-width: 0;
+	}
+
+	.editor-style-book__example-row.has-note-actions .editor-style-book__example {
+		margin-left: 0;
+		margin-right: 0;
+	}
+
+	.editor-style-book__example-note-button {
+		margin-top: 16px;
+	}
+
+	/*
+	 * Matches the outline a selected example gets, so a note-driven jump and a
+	 * Styles-panel selection read as the same kind of emphasis.
+	 */
+	.editor-style-book__example.is-note-anchor-highlighted {
+		box-shadow: 0 0 0 1px var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+	}
+
 	.editor-style-book__example:focus:not(:disabled) {
 		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
 		outline: 3px solid transparent;
