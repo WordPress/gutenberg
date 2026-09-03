@@ -4,6 +4,7 @@ import { useSelect } from '@wordpress/data';
 import PostStatus, { STATUS_OPTIONS } from '../';
 
 const mockEditEntityRecord = jest.fn();
+const mockUseSelect = useSelect as jest.Mock;
 
 jest.mock( '@wordpress/data/src/components/use-dispatch', () => {
 	return {
@@ -40,7 +41,7 @@ describe( 'PostStatus', () => {
 	} );
 
 	it( 'renders default status label when post has draft status', () => {
-		useSelect.mockImplementation( () => ( {
+		mockUseSelect.mockImplementation( () => ( {
 			status: 'draft',
 			date: null,
 			password: '',
@@ -58,7 +59,7 @@ describe( 'PostStatus', () => {
 	} );
 
 	it( 'renders custom status name on toggle button when post has a custom status', () => {
-		useSelect.mockImplementation( () => ( {
+		mockUseSelect.mockImplementation( () => ( {
 			status: 'closed',
 			date: null,
 			password: '',
@@ -84,7 +85,7 @@ describe( 'PostStatus', () => {
 	it( 'renders custom statuses in the dropdown options when show_in_admin_status_list is true', async () => {
 		const user = userEvent.setup();
 
-		useSelect.mockImplementation( () => ( {
+		mockUseSelect.mockImplementation( () => ( {
 			status: 'draft',
 			date: null,
 			password: '',
@@ -146,7 +147,7 @@ describe( 'PostStatus', () => {
 	it( 'updates post status when a custom status option is selected', async () => {
 		const user = userEvent.setup();
 
-		useSelect.mockImplementation( () => ( {
+		mockUseSelect.mockImplementation( () => ( {
 			status: 'draft',
 			date: null,
 			password: '',
@@ -185,7 +186,7 @@ describe( 'PostStatus', () => {
 	} );
 
 	it( 'renders read-only custom status when user cannot edit', () => {
-		useSelect.mockImplementation( () => ( {
+		mockUseSelect.mockImplementation( () => ( {
 			status: 'closed',
 			date: null,
 			password: '',
