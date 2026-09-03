@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import {
 	forwardRef,
 	useCallback,
+	useEffect,
 	useId,
 	useRef,
 	useState,
@@ -558,6 +559,75 @@ describe( 'ControlWithError', () => {
 			await waitFor( () => {
 				expect( input ).not.toHaveAttribute( 'aria-describedby' );
 			} );
+		} );
+	} );
+
+	describe( 'Controls that commit their value on blur', () => {
+		it( 'should clear a stale native error once the control commits a valid value on blur', async () => {
+			const user = userEvent.setup();
+
+			// Mimics controls like `NumberControl`: the value is clamped on
+			// blur, and the committed value is synced into the control's own
+			// state (and the DOM) a render later.
+			const ClampedNumberInput = forwardRef<
+				HTMLInputElement,
+				{
+					label?: string;
+					value: string;
+					onChange: ( value: string ) => void;
+				}
+			>( function ClampedNumberInput( { label, value, onChange }, ref ) {
+				const [ innerValue, setInnerValue ] = useState( value );
+				useEffect( () => {
+					setInnerValue( value );
+				}, [ value ] );
+				return (
+					<input
+						ref={ ref }
+						type="number"
+						min={ 1 }
+						aria-label={ label }
+						value={ innerValue }
+						onChange={ ( event ) =>
+							setInnerValue( event.target.value )
+						}
+						onBlur={ () =>
+							onChange(
+								String( Math.max( 1, Number( innerValue ) ) )
+							)
+						}
+					/>
+				);
+			} );
+
+			function Harness() {
+				const [ value, setValue ] = useState( '10' );
+				const ref = useRef< HTMLInputElement >( null );
+				return (
+					<ControlWithError getValidityTarget={ () => ref.current }>
+						<ClampedNumberInput
+							ref={ ref }
+							label="Number"
+							value={ value }
+							onChange={ setValue }
+						/>
+					</ControlWithError>
+				);
+			}
+
+			render( <Harness /> );
+
+			const input = screen.getByRole( 'spinbutton', { name: 'Number' } );
+			await user.clear( input );
+			await user.type( input, '0' );
+			await user.tab();
+
+			await waitFor( () => {
+				expect( input ).toHaveValue( 1 );
+			} );
+			expect(
+				screen.queryByText( 'Constraints not satisfied' )
+			).not.toBeInTheDocument();
 		} );
 	} );
 
