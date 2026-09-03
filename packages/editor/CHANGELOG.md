@@ -10,6 +10,10 @@
 
 -   `PluginMoreMenuItem`, `PluginSidebarMoreMenuItem`, `PluginPreviewMenuItem`: Deprecate the `as` prop, which reached the item only because these components forward every extra prop. The menu now renders the item itself, so the prop is ignored ([#82319](https://github.com/WordPress/gutenberg/pull/82319)).
 
+### Enhancements
+
+-   Media Library modal: Pass the current post and its post type to the modal so its "Attached to" filter can offer media uploaded to that post, under the post type's own wording. Only a viewable post type is passed on: a template has no front end of its own, so media can't be uploaded to one ([#81974](https://github.com/WordPress/gutenberg/pull/81974)).
+
 ### Bug Fixes
 
 -   Attach media an Image or Gallery block displays to the post on save, when it is not already attached to another post, matching what uploading into that post has always done ([#81977](https://github.com/WordPress/gutenberg/pull/81977)).

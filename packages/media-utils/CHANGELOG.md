@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Media Library modal: Add an "Attached to" filter offering "Unattached" and an option for the post the modal was opened from, labelled with that post type's `uploaded_to_this_item` label as the classic media frame does. Adds `postId` and `postType` props supplying the post. The filter is not persisted with the rest of the view: it describes the task at hand rather than a standing preference ([#81974](https://github.com/WordPress/gutenberg/pull/81974)).
+
 ## 5.54.0 (2026-08-26)
 
 ### Enhancements

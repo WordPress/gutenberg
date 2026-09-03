@@ -7,18 +7,19 @@ import {
 	useRef,
 	useEffect,
 } from '@wordpress/element';
-import { __, sprintf, _n } from '@wordpress/i18n';
+import { __, _x, sprintf, _n } from '@wordpress/i18n';
 import {
 	privateApis as coreDataPrivateApis,
 	store as coreStore,
 } from '@wordpress/core-data';
-import { resolveSelect, useDispatch } from '@wordpress/data';
+import { resolveSelect, useDispatch, useSelect } from '@wordpress/data';
 import { Modal, DropZone, FormFileUpload, Button } from '@wordpress/components';
 import { upload as uploadIcon } from '@wordpress/icons';
 import { DataViewsPicker } from '@wordpress/dataviews';
 import type {
 	Field,
 	ActionButton,
+	Filter,
 	SupportedLayouts,
 	View,
 } from '@wordpress/dataviews';
@@ -58,6 +59,9 @@ const NOTICES_CONTEXT = 'media-modal';
 
 // Notice ID - reused for all upload-related notices to prevent flooding
 const NOTICE_ID_UPLOAD_PROGRESS = 'media-modal-upload-progress';
+
+// The one filter the modal keeps out of the persisted view.
+const ATTACHED_TO_FIELD = 'attached_to';
 
 type ViewQueryParams = Pick< View, 'page' | 'search' >;
 
@@ -204,6 +208,20 @@ interface MediaUploadModalProps {
 	 * Label for the search input.
 	 */
 	searchLabel?: string;
+
+	/**
+	 * ID of the post the modal was opened from. When set, the "Attached to"
+	 * filter offers an option for media uploaded to that post. Omit outside of
+	 * a post context, and for a post media can't be uploaded to.
+	 */
+	postId?: number;
+
+	/**
+	 * Slug of the post type `postId` belongs to. Labels that option with the
+	 * post type's own wording — "Uploaded to this page", "Uploaded to this
+	 * template" — falling back to a generic label when it is absent.
+	 */
+	postType?: string;
 }
 
 /**
@@ -225,6 +243,8 @@ interface MediaUploadModalProps {
  * @param props.modalClass    Additional CSS class for modal
  * @param props.search        Whether to show search input
  * @param props.searchLabel   Label for search input
+ * @param props.postId        ID of the post the modal was opened from
+ * @param props.postType      Slug of that post's type
  * @return JSX element or null
  */
 export function MediaUploadModal( {
@@ -240,7 +260,27 @@ export function MediaUploadModal( {
 	modalClass,
 	search = true,
 	searchLabel = __( 'Search media' ),
+	postId,
+	postType,
 }: MediaUploadModalProps ) {
+	// The "uploaded to this post" option resolves to this ID, and the media query
+	// has no use for anything else — a template's entity ID, for instance, is a
+	// slug.
+	const attachedToPostId = Number.isInteger( postId ) ? postId : undefined;
+
+	// Every post type carries its own wording for this — "Uploaded to this
+	// page", "Uploaded to this template" — and core's own media frame labels the
+	// same filter with it. Only looked up when the option is on offer, so that a
+	// caller passing no post type never triggers the resolver.
+	const uploadedToLabel = useSelect(
+		( select ) =>
+			attachedToPostId && postType
+				? select( coreStore ).getPostType( postType )?.labels
+						?.uploaded_to_this_item
+				: undefined,
+		[ attachedToPostId, postType ]
+	);
+
 	const [ selection, setSelection ] = useState< string[] >( () =>
 		getSelectionFromValue( value )
 	);
@@ -254,7 +294,12 @@ export function MediaUploadModal( {
 	);
 
 	// Persist view configuration across sessions via the preferences store.
-	const { view, updateView, isModified, resetToDefault } = useView( {
+	const {
+		view: persistedView,
+		updateView,
+		isModified,
+		resetToDefault,
+	} = useView( {
 		kind: 'postType',
 		name: 'attachment',
 		slug: 'media-modal',
@@ -263,6 +308,27 @@ export function MediaUploadModal( {
 		onChangeQueryParams: setQueryParams,
 	} );
 
+	// The "Attached to" filter is deliberately not persisted. A standing
+	// preference like author or mime type is worth carrying between posts, but
+	// scoping the library to the post being edited, or to unattached media, is a
+	// choice about the task at hand — one that is easy to set, easy to forget,
+	// and hides most of the library once it follows the user somewhere else.
+	const [ attachedToFilter, setAttachedToFilter ] = useState<
+		Filter | undefined
+	>();
+
+	const view = useMemo( () => {
+		const filters = ( persistedView.filters ?? [] ).filter(
+			( { field } ) => field !== ATTACHED_TO_FIELD
+		);
+		return {
+			...persistedView,
+			filters: attachedToFilter
+				? [ ...filters, attachedToFilter ]
+				: filters,
+		};
+	}, [ persistedView, attachedToFilter ] );
+
 	// Normalize undefined transient DataViews values so they do not persist as modified modal preferences.
 	const handleChangeView = useCallback(
 		( nextView: View ) => {
@@ -270,10 +336,25 @@ export function MediaUploadModal( {
 			if ( normalizedView.startPosition === undefined ) {
 				delete normalizedView.startPosition;
 			}
-			updateView( normalizedView );
+			setAttachedToFilter(
+				normalizedView.filters?.find(
+					( { field } ) => field === ATTACHED_TO_FIELD
+				)
+			);
+			updateView( {
+				...normalizedView,
+				filters: normalizedView.filters?.filter(
+					( { field } ) => field !== ATTACHED_TO_FIELD
+				),
+			} );
 		},
 		[ updateView ]
 	);
+
+	const handleReset = useCallback( () => {
+		setAttachedToFilter( undefined );
+		resetToDefault();
+	}, [ resetToDefault ] );
 
 	// Build query args based on view properties, similar to PostList
 	const queryArgs = useMemo( () => {
@@ -303,6 +384,32 @@ export function MediaUploadModal( {
 			// Handle mime type filters
 			if ( filter.field === 'mime_type' ) {
 				filters.mime_type = filter.value;
+			}
+			// Handle attachment parent filters. The filter's values name the
+			// option the user picked rather than a post ID, so a stored choice
+			// can't end up pointing at a post the modal is no longer looking at.
+			if (
+				filter.field === ATTACHED_TO_FIELD &&
+				filter.operator === 'isAny'
+			) {
+				const parents = (
+					Array.isArray( filter.value ) ? filter.value : []
+				)
+					.map( ( optionValue ) => {
+						if ( optionValue === 'unattached' ) {
+							return 0;
+						}
+						return optionValue === 'current'
+							? attachedToPostId
+							: undefined;
+					} )
+					.filter( ( parent ) => parent !== undefined );
+
+				// A newly added filter has no value yet, and deselecting every
+				// option leaves an empty one: both mean "no constraint".
+				if ( parents.length ) {
+					filters.parent = parents;
+				}
 			}
 		} );
 
@@ -346,7 +453,7 @@ export function MediaUploadModal( {
 			_embed: 'author,wp:attached-to',
 			...filters,
 		};
-	}, [ view, allowedTypes ] );
+	}, [ view, allowedTypes, attachedToPostId ] );
 
 	// Per-batch completion handler: auto-select uploaded items and refresh the grid.
 	const handleBatchComplete = useCallback(
@@ -428,9 +535,32 @@ export function MediaUploadModal( {
 			filesizeField as Field< RestAttachment >,
 			mediaDimensionsField as Field< RestAttachment >,
 			mimeTypeField as Field< RestAttachment >,
-			attachedToField as Field< RestAttachment >,
+			{
+				...( attachedToField as Field< RestAttachment > ),
+				// The shared field definition is not filterable, because the
+				// "Uploaded to this post" option only makes sense with the modal's
+				// post context. Values name options, and `queryArgs` above
+				// translates them to `parent`.
+				elements: [
+					...( attachedToPostId
+						? [
+								{
+									value: 'current',
+									label:
+										uploadedToLabel ??
+										__( 'Uploaded to this item' ),
+								},
+						  ]
+						: [] ),
+					{
+						value: 'unattached',
+						label: _x( 'Unattached', 'media items' ),
+					},
+				],
+				filterBy: { operators: [ 'isAny' ] },
+			},
 		],
-		[]
+		[ attachedToPostId, uploadedToLabel ]
 	);
 
 	const actions: ActionButton< RestAttachment >[] = useMemo(
@@ -648,7 +778,7 @@ export function MediaUploadModal( {
 				config={ dataViewsConfig }
 				getItemId={ ( item: RestAttachment ) => String( item.id ) }
 				itemListLabel={ __( 'Media items' ) }
-				onReset={ isModified ? resetToDefault : false }
+				onReset={ isModified || attachedToFilter ? handleReset : false }
 			>
 				<Stack
 					direction="row"
