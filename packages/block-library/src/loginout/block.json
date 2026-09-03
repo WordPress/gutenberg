@@ -17,12 +17,10 @@
 			"default": true
 		},
 		"loginText": {
-			"type": "string",
-			"default": "Log in"
+			"type": "string"
 		},
 		"logoutText": {
-			"type": "string",
-			"default": "Log out"
+			"type": "string"
 		}
 	},
 	"example": {

@@ -29,10 +29,13 @@ function render_block_core_loginout( $attributes ) {
 
 	$redirect = isset( $attributes['redirectToCurrent'] ) && $attributes['redirectToCurrent'] ? $current_url : '';
 
-	if ( ! is_user_logged_in() ) {
-		$link = '<a href="' . esc_url( wp_login_url( $redirect ) ) . '">' . $attributes['loginText'] . '</a>';
+	$login_text  = ! empty( $attributes['loginText'] ) ? esc_html( $attributes['loginText'] ) : __( 'Log in' );
+	$logout_text = ! empty( $attributes['logoutText'] ) ? esc_html( $attributes['logoutText'] ) : __( 'Log out' );
+
+	if ( ! $user_logged_in ) {
+		$link = '<a href="' . esc_url( wp_login_url( $redirect ) ) . '">' . $login_text . '</a>';
 	} else {
-		$link = '<a href="' . esc_url( wp_logout_url( $redirect ) ) . '">' . $attributes['logoutText'] . '</a>';
+		$link = '<a href="' . esc_url( wp_logout_url( $redirect ) ) . '">' . $logout_text . '</a>';
 	}
 
 	/**
@@ -53,7 +56,7 @@ function render_block_core_loginout( $attributes ) {
 		$contents = wp_login_form(
 			array(
 				'echo'         => false,
-				'label_log_in' => $attributes['loginText'],
+				'label_log_in' => $login_text,
 			)
 		);
 

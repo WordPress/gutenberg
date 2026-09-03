@@ -22,8 +22,8 @@ export default function LoginOutEdit( { attributes, setAttributes } ) {
 						setAttributes( {
 							displayLoginAsForm: false,
 							redirectToCurrent: true,
-							loginText: 'Log in',
-							logoutText: 'Log out',
+							loginText: undefined,
+							logoutText: undefined,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -67,9 +67,9 @@ export default function LoginOutEdit( { attributes, setAttributes } ) {
 					<ToolsPanelItem
 						label={ __( 'Login Text' ) }
 						isShownByDefault
-						hasValue={ () => loginText !== 'Log in' }
+						hasValue={ () => !! loginText }
 						onDeselect={ () =>
-							setAttributes( { loginText: 'Log in' } )
+							setAttributes( { loginText: undefined } )
 						}
 					>
 						<InputControl
@@ -87,9 +87,9 @@ export default function LoginOutEdit( { attributes, setAttributes } ) {
 					<ToolsPanelItem
 						label={ __( 'Logout Text' ) }
 						isShownByDefault
-						hasValue={ () => logoutText !== 'Log out' }
+						hasValue={ () => !! logoutText }
 						onDeselect={ () =>
-							setAttributes( { logoutText: 'Log out' } )
+							setAttributes( { logoutText: undefined } )
 						}
 					>
 						<InputControl
@@ -111,7 +111,7 @@ export default function LoginOutEdit( { attributes, setAttributes } ) {
 					className: 'logged-in',
 				} ) }
 			>
-				<a href="#login-pseudo-link">{ logoutText }</a>
+				<a href="#login-pseudo-link">{ logoutText || __( 'Log out' ) }</a>
 			</div>
 		</>
 	);
