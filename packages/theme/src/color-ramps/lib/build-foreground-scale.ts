@@ -52,6 +52,15 @@ function getChromaPreservingColorForLightness(
 	} );
 }
 
+/**
+ * Create an OKLCH-lightness path using the configured chroma policy. Relative
+ * chroma keeps the seed's proportion of the available sRGB chroma; tapering
+ * retains the configured neutral treatment. The relative-chroma cache belongs
+ * to this path, so its colors must be treated as read-only.
+ *
+ * @param seed   Color supplying hue and chroma.
+ * @param config Foreground chroma policy.
+ */
 function createColorForLightness(
 	seed: PlainColorObject,
 	config: ForegroundScaleConfig
@@ -135,6 +144,15 @@ function meetsContrastFloor(
 	);
 }
 
+/**
+ * Return the smallest log contrast ratio against the padded WCAG target.
+ * Zero marks the search boundary; negative values mean at least one reference
+ * fails. Final output checks use the unpadded floor instead.
+ *
+ * @param color               Candidate foreground.
+ * @param referenceLuminances Precomputed luminances of its backgrounds.
+ * @param target              Unpadded WCAG contrast ratio.
+ */
 function getContrastTargetMargin(
 	color: PlainColorObject,
 	referenceLuminances: readonly number[],
@@ -163,6 +181,18 @@ function meetsContrastTarget(
 	return getContrastTargetMargin( color, referenceLuminances, target ) >= 0;
 }
 
+/**
+ * Search toward the stronger endpoint for the padded WCAG target. The caller
+ * supplies a path whose contrast increases in that direction. If the endpoint
+ * cannot meet the target, return it for the final warning check to assess.
+ *
+ * @param options                     Search inputs.
+ * @param options.getColorAtLightness Color path indexed by OKLCH lightness.
+ * @param options.weakColor           Starting foreground.
+ * @param options.strongColor         Strongest allowed foreground.
+ * @param options.referenceLuminances Background luminances to check together.
+ * @param options.target              Unpadded WCAG contrast ratio.
+ */
 function findColorAtContrastTarget( {
 	getColorAtLightness,
 	weakColor,
@@ -205,6 +235,18 @@ function findColorAtContrastTarget( {
 	);
 }
 
+/**
+ * Position a foreground by APCA magnitude on a single-polarity lightness path.
+ * Targets outside the endpoint range use the corresponding endpoint. This
+ * search does not enforce WCAG; the caller checks those constraints separately.
+ *
+ * @param options                     Search inputs.
+ * @param options.background          Fixed background for APCA comparisons.
+ * @param options.getColorAtLightness Color path indexed by OKLCH lightness.
+ * @param options.weakColor           Starting foreground.
+ * @param options.strongColor         Color defining the strong lightness limit.
+ * @param options.target              Requested APCA magnitude in Lc.
+ */
 function findColorAtPerceptualContrast( {
 	background,
 	getColorAtLightness,
@@ -247,6 +289,18 @@ function findColorAtPerceptualContrast( {
 	);
 }
 
+/**
+ * Correct a WCAG shortfall introduced by color serialization. Search only
+ * toward the supplied strong color, then fall back to it if no sampled color
+ * passes. The caller must still validate the returned color for warnings.
+ *
+ * @param options                     Serialization inputs.
+ * @param options.color               Foreground before serialization.
+ * @param options.getColorAtLightness Color path indexed by OKLCH lightness.
+ * @param options.strongColor         Strongest allowed fallback.
+ * @param options.referenceLuminances Background luminances to check together.
+ * @param options.target              Unpadded WCAG contrast floor.
+ */
 function serializeColorMeetingContrast( {
 	color,
 	getColorAtLightness,
@@ -282,6 +336,21 @@ function serializeColorMeetingContrast( {
 	return getColorString( strongColor );
 }
 
+/**
+ * Restore the preferred FGS4-to-FGS5 APCA gap after serialization, without
+ * moving FGS4. Only extend FGS5 when the endpoint can meet both the gap and
+ * WCAG floor; otherwise retain the already compressed interaction color.
+ *
+ * @param options                     Serialization inputs.
+ * @param options.background          Fixed background for APCA comparisons.
+ * @param options.normalColor         Serialized FGS4.
+ * @param options.strongColor         Serialized FGS5, already checked for WCAG.
+ * @param options.strongEndpoint      Endpoint allowed by the foreground path.
+ * @param options.getColorAtLightness Color path indexed by OKLCH lightness.
+ * @param options.referenceLuminances Background luminances to check together.
+ * @param options.wcagTarget          Unpadded WCAG contrast floor.
+ * @param options.perceptualTarget    Preferred APCA gap in Lc.
+ */
 function serializeColorMeetingPerceptualInterval( {
 	background,
 	normalColor,
