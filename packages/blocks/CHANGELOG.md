@@ -9,6 +9,7 @@
 
 ### Bug Fixes
 
+-   Types: allow `justify` in the `typography.textAlign` support array ([#79775](https://github.com/WordPress/gutenberg/issues/79775)).
 -   `getBlockAttributes` no longer breaks when a block has no content to parse, such as a self-closing shortcode: missing content is treated as empty markup instead of reaching the attribute matchers ([#81831](https://github.com/WordPress/gutenberg/pull/81831)).
 
 ## 15.27.0 (2026-08-26)

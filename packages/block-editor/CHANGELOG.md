@@ -17,6 +17,7 @@
 
 ### Bug Fixes
 
+-   Text alignment: allow `justify` in the typography `textAlign` support so justified alignment is serialized as `has-text-align-justify` and offered on the block toolbar ([#79775](https://github.com/WordPress/gutenberg/issues/79775)).
 -   `BlockManager`: Color library block icons with `color` while retaining a `fill` fallback for custom icons that do not use `currentColor`. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
 -   Block List Appender: Show the appender button as a drop target when dragging a block over an empty container such as a Column, restoring the reveal that the `visibility`-to-`opacity` migration left behind ([#77852](https://github.com/WordPress/gutenberg/pull/77852)).
 -   Inserter: Keep the hovered block preview inside the viewport, so a tall preview in a short window is no longer clipped ([#82060](https://github.com/WordPress/gutenberg/pull/82060)).
