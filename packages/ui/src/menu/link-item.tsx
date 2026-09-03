@@ -17,6 +17,7 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 		children,
 		className,
 		openInNewTab = false,
+		target,
 		prefix,
 		shortcut,
 		suffix,
@@ -29,7 +30,8 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 	},
 	ref
 ) {
-	const externalLinkIndicator = openInNewTab ? (
+	const shouldShowNewTabIndicator = openInNewTab || target === '_blank';
+	const externalLinkIndicator = shouldShowNewTabIndicator ? (
 		<span
 			className={ styles[ 'external-link-indicator' ] }
 			role="img"
@@ -59,7 +61,7 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 			{ ...props }
 			{ ...itemAriaProps }
 			rel={ rel }
-			target={ openInNewTab ? '_blank' : undefined }
+			target={ target ?? ( openInNewTab ? '_blank' : undefined ) }
 			className={ clsx(
 				defenseStyles.a,
 				resetStyles[ 'box-sizing' ],
