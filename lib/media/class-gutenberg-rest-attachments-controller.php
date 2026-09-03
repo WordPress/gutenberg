@@ -541,6 +541,9 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			'file'          => $parent_file ? _wp_relative_upload_path( $parent_file ) : '',
 		);
 
+		/** This filter is documented in wp-includes/rest-api/endpoints/class-wp-rest-attachments-controller.php */
+		$metadata = apply_filters( 'wp_edited_image_metadata', $metadata, $attachment_id, $parent_id ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
 		wp_update_attachment_metadata( $attachment_id, $metadata );
 
 		return $metadata;
