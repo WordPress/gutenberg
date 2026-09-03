@@ -20,13 +20,15 @@
 }
 
 /* Looks like a tooltip. Shown at the top of the canvas while the stop is
-   focused. */
+   focused. Sticky, because on the widgets screen the stop spans scrolling
+   content and the hint must stay in view; anywhere else there is nothing
+   to scroll and it stays at the top of the canvas. */
 .block-editor-writing-flow__canvas-stop-hint {
 	display: none;
-	position: absolute;
+	position: sticky;
 	top: $grid-unit-20;
-	left: 50%;
-	transform: translateX(-50%);
+	margin-inline: auto;
+	width: fit-content;
 	z-index: 2;
 	background: $black;
 	font-family: $default-font;
