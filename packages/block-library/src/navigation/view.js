@@ -412,29 +412,24 @@ const { state, actions } = store(
 
 				const { ref } = getElement();
 
-				// Only the outermost item of a tree carries a direction. Nested
-				// levels inherit it, so the whole tree opens the same way.
-				let item = ref;
-				let parent = item.parentElement?.closest( 'li.has-child' );
-				while ( parent ) {
-					item = parent;
-					parent = item.parentElement?.closest( 'li.has-child' );
-				}
-
-				if ( ! state.isMenuOpen ) {
-					// A nested level closing leaves the tree itself open.
-					if ( ref === item ) {
-						openSubmenuTrees.delete( item );
-					}
+				// Only the outermost item of a tree carries a direction, and
+				// the measurement already spans every level below it, so a
+				// nested level opening cannot change the answer its tree root
+				// already picked.
+				if ( ref.parentElement?.closest( 'li.has-child' ) ) {
 					return;
 				}
 
-				openSubmenuTrees.add( item );
+				if ( ! state.isMenuOpen ) {
+					openSubmenuTrees.delete( ref );
+					return;
+				}
 
-				// Measured again whenever a level opens, rather than trusting a
-				// direction that may have been picked at a different viewport
-				// width.
-				applySubmenuDirection( item );
+				openSubmenuTrees.add( ref );
+
+				// Measured on every open, rather than trusting a direction
+				// that may have been picked at a different viewport width.
+				applySubmenuDirection( ref );
 			},
 		},
 	},
