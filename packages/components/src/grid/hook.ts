@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { css } from '@emotion/react';
-
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import { useContextSystem } from '../context';
 import { getAlignmentProps } from './utils';

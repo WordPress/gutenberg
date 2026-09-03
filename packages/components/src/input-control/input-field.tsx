@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { useDrag } from '@use-gesture/react';
 import type {
 	SyntheticEvent,
@@ -10,20 +7,13 @@ import type {
 	FocusEvent,
 	ForwardedRef,
 } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef, useRef } from '@wordpress/element';
-/**
- * Internal dependencies
- */
+import { withIgnoreIMEEvents } from '@wordpress/keycodes';
 import type { WordPressComponentProps } from '../context';
 import { useDragCursor } from './utils';
 import { Input } from './styles/input-control-styles';
 import { useInputControlStateReducer } from './reducer/reducer';
 import type { InputFieldProps } from './types';
-import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 
 const noop = () => {};
 
@@ -192,6 +182,7 @@ function InputField(
 			{ ...props }
 			{ ...dragProps }
 			className="components-input-control__input"
+			data-empty-value={ value ? undefined : '' }
 			disabled={ disabled }
 			dragCursor={ dragCursor }
 			isDragging={ isDragging }

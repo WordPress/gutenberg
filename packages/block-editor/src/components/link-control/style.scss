@@ -151,7 +151,7 @@ $block-editor-link-control-number-of-actions: 1;
 		width: 100%;
 
 		mark {
-			font-weight: 600;
+			font-weight: var(--wpds-typography-font-weight-emphasis);
 			color: inherit;
 			background-color: transparent;
 		}
@@ -215,7 +215,7 @@ $block-editor-link-control-number-of-actions: 1;
 	}
 
 	.block-editor-link-control__preview-title {
-		line-height: 1.1;
+		line-height: var(--wpds-typography-line-height-sm);
 
 		&:focus {
 			box-shadow: none;
@@ -227,7 +227,7 @@ $block-editor-link-control-number-of-actions: 1;
 		}
 
 		mark {
-			font-weight: 600;
+			font-weight: var(--wpds-typography-font-weight-emphasis);
 			color: inherit;
 			background-color: transparent;
 		}
@@ -243,7 +243,7 @@ $block-editor-link-control-number-of-actions: 1;
 			padding: 0;
 			margin: -1px;
 			overflow: hidden;
-			clip: rect(0, 0, 0, 0); // specifically requested to be removed visually as well.
+			clip-path: inset(50%);
 			border: 0;
 		}
 	}

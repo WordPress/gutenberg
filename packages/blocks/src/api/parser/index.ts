@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { parse as grammarParse } from '@wordpress/block-serialization-default-parser';
 import { autop } from '@wordpress/autop';
-
-/**
- * Internal dependencies
- */
 import {
 	getFreeformContentHandlerName,
 	getUnregisteredTypeHandlerName,
@@ -214,6 +207,19 @@ export function parseRawBlock(
 		parsedInnerBlocks
 	);
 	parsedBlock.originalContent = normalizedBlock.innerHTML;
+
+	// The Custom HTML block keeps the interleaved static HTML fragments as
+	// the canonical source of its own markup, so the `save`-based validation
+	// and deprecation flows don't apply: serializing the parsed content
+	// reproduces the input by construction.
+	if ( blockType.name === 'core/html' ) {
+		parsedBlock.innerContent = normalizedBlock.innerContent ?? [
+			normalizedBlock.innerHTML,
+		];
+		parsedBlock.isValid = true;
+		parsedBlock.validationIssues = [];
+		return parsedBlock;
+	}
 
 	const validatedBlock = applyBlockValidation( parsedBlock, blockType );
 	const { validationIssues } = validatedBlock;
