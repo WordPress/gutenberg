@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import {
+	SelectControl,
 	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
@@ -41,6 +42,29 @@ import {
 } from '../../store/private-keys';
 
 const IMAGE_BACKGROUND_TYPE = 'image';
+
+const BACKGROUND_REPEAT_OPTIONS = [
+	{
+		label: _x( 'None', 'Background image repeat option' ),
+		value: '',
+	},
+	{
+		label: _x( 'No repeat', 'Background image repeat option' ),
+		value: 'no-repeat',
+	},
+	{
+		label: _x( 'Repeat', 'Background image repeat option' ),
+		value: 'repeat',
+	},
+	{
+		label: _x( 'Repeat X', 'Background image repeat option' ),
+		value: 'repeat-x',
+	},
+	{
+		label: _x( 'Repeat Y', 'Background image repeat option' ),
+		value: 'repeat-y',
+	},
+];
 
 const BACKGROUND_POPOVER_PROPS = {
 	placement: 'left-start',
@@ -515,16 +539,6 @@ function BackgroundSizeControls( {
 	)
 		? 'auto'
 		: currentValueForToggle;
-	/*
-	 * If the current value is `cover` and the repeat value is `undefined`, then
-	 * the toggle should be unchecked as the default state. Otherwise, the toggle
-	 * should reflect the current repeat value.
-	 */
-	const repeatCheckedValue = ! (
-		repeatValue === 'no-repeat' ||
-		( currentValueForToggle === 'cover' && repeatValue === undefined )
-	);
-
 	const updateBackgroundSize = ( next ) => {
 		// When switching to 'contain' toggle the repeat off.
 		let nextRepeat = repeatValue;
@@ -586,14 +600,48 @@ function BackgroundSizeControls( {
 		);
 	};
 
-	const toggleIsRepeated = () =>
+	const updateBackgroundRepeat = ( next ) => {
+		const nextRepeat = next || undefined;
+		const shouldUseTileSize =
+			nextRepeat &&
+			nextRepeat !== 'no-repeat' &&
+			( currentValueForToggle === 'cover' ||
+				currentValueForToggle === 'contain' );
+
+		if ( shouldUseTileSize ) {
+			onChange(
+				setImmutably( style, [ 'background' ], {
+					...style?.background,
+					backgroundRepeat: nextRepeat,
+					backgroundSize: 'auto',
+					backgroundPosition:
+						!! style?.background?.backgroundImage?.id
+							? '50% 0'
+							: style?.background?.backgroundPosition,
+				} )
+			);
+			return;
+		}
+
 		onChange(
 			setImmutably(
 				style,
 				[ 'background', 'backgroundRepeat' ],
-				repeatCheckedValue === true ? 'no-repeat' : 'repeat'
+				nextRepeat
 			)
 		);
+	};
+
+	const repeatHelpText =
+		repeatValue === 'repeat-y'
+			? __(
+					'Repeat Y tiles vertically. Give the block enough height to see multiple tiles.'
+			  )
+			: repeatValue === 'repeat-x'
+			? __(
+					'Repeat X tiles horizontally. Give the block enough width to see multiple tiles.'
+			  )
+			: undefined;
 
 	const toggleScrollWithPage = () =>
 		onChange(
@@ -670,13 +718,15 @@ function BackgroundSizeControls( {
 						currentValueForToggle === undefined
 					}
 				/>
-				<ToggleControl
-					label={ __( 'Repeat' ) }
-					checked={ repeatCheckedValue }
-					onChange={ toggleIsRepeated }
-					disabled={ currentValueForToggle === 'cover' }
-				/>
 			</HStack>
+			<SelectControl
+				label={ __( 'Repeat' ) }
+				value={ repeatValue || '' }
+				options={ BACKGROUND_REPEAT_OPTIONS }
+				onChange={ updateBackgroundRepeat }
+				disabled={ currentValueForToggle === 'cover' }
+				help={ repeatHelpText }
+			/>
 		</VStack>
 	);
 }
