@@ -28,7 +28,25 @@ import { test, expect } from './fixtures';
  * checking the text alone right after a click can pass before the SPA
  * navigation actually completes — it proves nothing about post-navigation
  * state without first confirming the navigation landed.
+ *
+ * Post-navigation URL checks match on pathname only, via toPathRegExp().
+ * utils.getLink() appends `?disable_server_directive_processing=true` for
+ * the initial page.goto() load, but the SPA navigation follows the raw
+ * <a href> from render.php's get_permalink() calls, which never carries
+ * that query param — an exact-string toHaveURL() against utils.getLink()'s
+ * output fails deterministically after every click for this reason.
  */
+
+/**
+ * Builds a RegExp matching the given URL's pathname, ignoring any query
+ * string — see the note above on why the two differ here.
+ */
+function toPathRegExp( url: string ): RegExp {
+	const { pathname } = new URL( url );
+	const escaped = pathname.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' );
+	return new RegExp( `${ escaped }/?(?:\\?.*)?$` );
+}
+
 test.describe( 'Interactivity API router dynamic styles', () => {
 	test.beforeAll( async ( { interactivityUtils: utils } ) => {
 		await utils.activatePlugins();
@@ -87,7 +105,7 @@ test.describe( 'Interactivity API router dynamic styles', () => {
 		// Navigate to page B via the iAPI router — the router region
 		// intercepts the click and performs a SPA navigation.
 		await page.getByTestId( 'nav-to-b' ).click();
-		await expect( page ).toHaveURL( linkB );
+		await expect( page ).toHaveURL( toPathRegExp( linkB ) );
 
 		// The activated sheet must remain enabled after navigation.
 		await expect( page.getByTestId( 'deferred-style-active' ) ).toHaveText(
@@ -123,7 +141,7 @@ test.describe( 'Interactivity API router dynamic styles', () => {
 
 		// Navigate to page B.
 		await page.getByTestId( 'nav-to-b' ).click();
-		await expect( page ).toHaveURL( linkB );
+		await expect( page ).toHaveURL( toPathRegExp( linkB ) );
 
 		// Plugin sheet must still be active after navigation.
 		await expect( page.getByTestId( 'plugin-style-active' ) ).toHaveText(
@@ -158,13 +176,13 @@ test.describe( 'Interactivity API router dynamic styles', () => {
 		);
 
 		await page.getByTestId( 'nav-to-b' ).click();
-		await expect( page ).toHaveURL( linkB );
+		await expect( page ).toHaveURL( toPathRegExp( linkB ) );
 		await expect( page.getByTestId( 'plugin-style-active' ) ).toHaveText(
 			'active'
 		);
 
 		await page.getByTestId( 'nav-to-c' ).click();
-		await expect( page ).toHaveURL( linkC );
+		await expect( page ).toHaveURL( toPathRegExp( linkC ) );
 		await expect( page.getByTestId( 'plugin-style-active' ) ).toHaveText(
 			'active'
 		);
@@ -175,14 +193,14 @@ test.describe( 'Interactivity API router dynamic styles', () => {
 		// via evaluate() returns about:blank because SPA pushState entries
 		// are not tracked by Playwright as navigation events.
 		await page.getByTestId( 'nav-to-a' ).click();
-		await expect( page ).toHaveURL( linkA );
+		await expect( page ).toHaveURL( toPathRegExp( linkA ) );
 		await expect( page.getByTestId( 'plugin-style-active' ) ).toHaveText(
 			'active'
 		);
 
 		// Navigate away from A once more — plugin sheet must survive.
 		await page.getByTestId( 'nav-to-b' ).click();
-		await expect( page ).toHaveURL( linkB );
+		await expect( page ).toHaveURL( toPathRegExp( linkB ) );
 		await expect( page.getByTestId( 'plugin-style-active' ) ).toHaveText(
 			'active'
 		);
