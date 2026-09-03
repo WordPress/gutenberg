@@ -106,7 +106,9 @@ The `color` prop accepts an object with the following optional properties:
 -   `primary`: The primary/accent seed color (default: `'#3858e9'`).
 -   `background`: The background seed color (default: `'#fcfcfc'`).
 
-Both properties accept a fully opaque sRGB-parseable string: a hex value (e.g. `#3858e9`), an `rgb()`/`rgba()` string, or a CSS named color (e.g. `'blue'`). Non-opaque alpha values, `transparent`, and other CSS color spaces (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted and will throw an error. The theme system automatically generates appropriate color ramps from these seed colors.
+Both properties accept a fully opaque sRGB-parseable string: a hex value (e.g. `#3858e9`), an `rgb()`/`rgba()` string, or a CSS named color (e.g. `'blue'`). Non-opaque alpha values, `transparent`, and other CSS color spaces (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted and will throw an error.
+
+Seeds guide the generated colors, but are not guaranteed to appear unchanged. Their lightness may shift to make contrast requirements fit. Use `onColorWarnings` to check for remaining failures.
 
 Use `onColorWarnings` to receive structured warnings after the provider calculates its colors. Warnings identify generated ramp steps or semantic foreground/background pairs that do not meet their contrast targets:
 
@@ -218,18 +220,15 @@ The public token surface is the semantic `--wpds-*` custom properties documented
 
 ### Building
 
-This package is built in two steps. When `npm run build` is run at the root of the repo, it will first run the "prebuild" step of this package, which is defined in the `build` script of this package's package.json.
+For the color algorithm's goals, configuration, and build stages, see [Building color ramps](./src/color-ramps/README.md). For token source files and aliases, see the [Design Tokens Maintainer's Guide](./tokens/README.md).
 
-This step will:
+Run `npm run build --workspace @wordpress/theme` from the repository root to regenerate:
 
-1. Generate primitive tokens.
-2. Build CSS and JavaScript token files.
-3. Update the design tokens documentation.
-4. Format all generated files.
+1. Default color ramps.
+2. Primitive colors and derived CSS, JavaScript, and TypeScript token files.
+3. Token fallbacks and the design tokens reference.
 
-The files generated in this step will all be committed to the repo.
-
-After the prebuild step, the package will be built into its final form via the repo's standard package build script.
+Commit the generated changes. The root `npm run build` runs this generation step before compiling the packages.
 
 ## Stylelint Plugins
 
@@ -264,7 +263,7 @@ Reports manual fallbacks that can drift from the generated values.
 
 ## Build Plugins
 
-The build plugins inject generated fallbacks into bare `var(--wpds-*)` references so components still render when the design tokens stylesheet is unavailable. For example, `var(--wpds-color-foreground-content-neutral)` becomes `var(--wpds-color-foreground-content-neutral, #1e1e1e)`.
+The build plugins inject generated fallbacks into bare `var(--wpds-*)` references so components still render when the design tokens stylesheet is unavailable. For example, `var(--wpds-color-foreground-content-neutral)` becomes `var(--wpds-color-foreground-content-neutral, #505050)` with the default theme.
 
 `@wordpress/build` already applies these plugins automatically when `@wordpress/theme` is installed. You only need to configure them manually for custom build setups.
 

@@ -12,13 +12,10 @@ import { getColorString } from '../../src/color-ramps/lib/color-utils';
 const __filename = fileURLToPath( import.meta.url );
 const __dirname = path.dirname( __filename );
 
-// Path to the color.json file
 const colorJsonPath = path.join( __dirname, '../../tokens/color.json' );
 
-// 3 decimal places is the minimum precision for lossless hex serialization.
-// With 3 decimal places rounding to the nearest 0.001, the maximum rounding
-// error is 0.0005. With 256 possible hex values, 0.0005 × 256 = 0.128,
-// guaranteeing the rounded value stays within 0.5 of the original value.
+// Three decimals preserve 8-bit sRGB channels on round-trip to hex:
+// the maximum rounding error is 0.0005 × 255, below half a channel step.
 const HEX_ROUNDING_PRECISION = 3;
 
 const transformColorStringToDTCGValue = ( color: string ) => {
@@ -33,18 +30,16 @@ const transformColorStringToDTCGValue = ( color: string ) => {
 	};
 };
 
-// Main function
+// Replace primitive colors only; semantic aliases remain hand-authored.
 function generatePrimitiveColorTokens() {
 	const startTime = performance.now();
 	console.log( '🎨 Starting primitive color tokens generation...' );
 
 	try {
-		// Read the color.json file
 		const colorJson = JSON.parse(
 			fs.readFileSync( colorJsonPath, 'utf8' )
 		);
 
-		// Build the ramps
 		const bgRamp = buildBgRamp( DEFAULT_SEED_COLORS.background );
 		const accentRamps = [ ...Object.entries( DEFAULT_SEED_COLORS ) ]
 			.filter( ( [ scaleName ] ) => scaleName !== 'background' )
@@ -53,10 +48,8 @@ function generatePrimitiveColorTokens() {
 				ramp: buildAccentRamp( seed, bgRamp ),
 			} ) );
 
-		// Convert the ramp values in a DTCG compatible format.
-		// Note: the background seed maps to the `bg` primitive ramp group,
-		// whose name is kept abbreviated even though the semantic tokens it
-		// feeds are exposed under the spelled-out `background` group.
+		// The background seed uses the abbreviated `bg` primitive group.
+		// Public semantic tokens use the spelled-out `background` group.
 		[
 			{
 				scaleName: 'bg',
@@ -75,7 +68,6 @@ function generatePrimitiveColorTokens() {
 			}
 		} );
 
-		// Write the updated JSON back to the file with proper formatting
 		fs.writeFileSync(
 			colorJsonPath,
 			JSON.stringify( colorJson, null, '\t' )

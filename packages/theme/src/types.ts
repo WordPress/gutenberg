@@ -5,7 +5,8 @@ export type CornerRadiusPreset = 'none' | 'subtle' | 'moderate' | 'pronounced';
 
 export interface ThemeProviderSettings {
 	/**
-	 * The set of color options to apply to the theme.
+	 * Seeds for the generated theme colors. Their lightness may shift to meet
+	 * contrast requirements; an exact seed match is not guaranteed.
 	 */
 	color?: {
 		/**
@@ -76,7 +77,7 @@ export interface ThemeProviderProps extends ThemeProviderSettings {
 
 	/**
 	 * Called after the provider calculates its colors. Receives an empty array
-	 * when all contrast targets are met.
+	 * when all checked ramp and semantic contrast targets are met.
 	 * The callback may run more than once in development under React Strict Mode.
 	 */
 	onColorWarnings?: (
