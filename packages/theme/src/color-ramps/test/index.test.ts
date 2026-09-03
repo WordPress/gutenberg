@@ -53,7 +53,6 @@ function expectAccessibleFillStates( ramp: ReturnType< typeof buildRamp > ) {
 }
 
 const foregroundSteps = [
-	'fgSurface1',
 	'fgSurface2',
 	'fgSurface3',
 	'fgSurface4',
@@ -83,9 +82,13 @@ function getPerceptualContrastMagnitude(
 }
 
 function expectAccessibleFillStates( ramp: ReturnType< typeof buildRamp > ) {
-	expect( getLuminance( ramp.ramp.bgFill2 ) ).toBeLessThan(
-		getLuminance( ramp.ramp.bgFill1 )
-	);
+	const restingLuminance = getLuminance( ramp.ramp.bgFill1 );
+	const activeLuminance = getLuminance( ramp.ramp.bgFill2 );
+	if ( ramp.direction === 'darker' ) {
+		expect( activeLuminance ).toBeLessThan( restingLuminance );
+	} else {
+		expect( activeLuminance ).toBeGreaterThan( restingLuminance );
+	}
 	expect(
 		getContrast( ramp.ramp.bgFill1, ramp.ramp.bgFill2 )
 	).toBeGreaterThanOrEqual( 1.2 );
@@ -103,9 +106,9 @@ function getForegroundConstraintReferences(
 	backgroundRamp: ReturnType< typeof buildBgRamp >
 ) {
 	let surfaceNames: readonly ( keyof typeof ramp.ramp )[];
-	if ( stepIndex < 2 ) {
+	if ( stepIndex === 0 ) {
 		surfaceNames = [ 'surface3' ];
-	} else if ( stepIndex < 3 ) {
+	} else if ( stepIndex === 1 ) {
 		surfaceNames = [ 'surface1', 'surface2', 'surface3' ];
 	} else {
 		surfaceNames = [

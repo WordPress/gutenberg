@@ -19,6 +19,7 @@ import {
 	type RampResult,
 } from './color-ramps/index.ts';
 import { getColorString } from './color-ramps/lib/color-utils.ts';
+import type { AccentRampResult } from './color-ramps/lib/types.ts';
 import type { ThemeProviderProps } from './types.ts';
 import {
 	collectThemeProviderColorWarnings,
@@ -130,7 +131,10 @@ function legacyWpAdminThemeOverridesCSS( accent: string ): Entry[] {
 }
 
 function colorTokensCSS(
-	computedColorRamps: Map< ThemeProviderColorRampName, RampResult >
+	computedColorRamps: Map<
+		ThemeProviderColorRampName,
+		RampResult | AccentRampResult
+	>
 ): Entry[] {
 	const entries: Entry[] = [];
 
@@ -181,7 +185,7 @@ function generateThemeProviderColors(
 	};
 	const computedColorRamps = new Map<
 		ThemeProviderColorRampName,
-		RampResult
+		RampResult | AccentRampResult
 	>();
 	const bgRamp = getCachedBgRamp( seeds.background );
 
@@ -191,7 +195,13 @@ function generateThemeProviderColors(
 			rampName,
 			rampName === 'background'
 				? bgRamp
-				: getCachedAccentRamp( seed, bgRamp )
+				: getCachedAccentRamp(
+						seed,
+						bgRamp,
+						rampName === 'primary' || rampName === 'error'
+							? 'interactive'
+							: 'status'
+				  )
 		);
 	}
 	const colorEntries = colorTokensCSS( computedColorRamps );

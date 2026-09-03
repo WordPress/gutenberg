@@ -18,6 +18,10 @@ import {
 import { UNIVERSAL_CONTRAST_TOPUP } from './constants.ts';
 import { taperChroma } from './taper-chroma.ts';
 import type {
+	AccentRampResult,
+	BaseRamp,
+	BaseRampResult,
+	Ramp,
 	ForegroundScaleConfig,
 	ForegroundRampStep,
 	RampResult,
@@ -105,8 +109,8 @@ function getPerceptualContrastMagnitude(
 
 function getConstraintReferenceLuminances(
 	step: ForegroundScaleConfig[ 'steps' ][ number ],
-	ramp: RampResult,
-	backgroundRamp: RampResult
+	ramp: BaseRampResult,
+	backgroundRamp: BaseRampResult
 ) {
 	return Array.from(
 		new Set( [
@@ -352,15 +356,29 @@ function serializeColorMeetingPerceptualInterval( {
  * the intermediate steps within the visible contrast range, while WCAG ratios
  * remain hard floors across the surfaces where each step is used.
  *
- * @param ramp           Ramp whose foreground steps will be rebuilt.
- * @param backgroundRamp Background ramp on which the colors will appear.
- * @param config         Foreground scale anchors, targets, and constraints.
+ * @param ramp                    Ramp whose foreground steps will be rebuilt.
+ * @param backgroundRamp          Background ramp on which the colors will appear.
+ * @param config                  Foreground scale anchors, targets, and constraints.
+ * @param includeInteractionState Whether FGS5 is needed as an output color.
  */
 export function buildForegroundScale(
-	ramp: RampResult,
-	backgroundRamp: RampResult,
-	config: ForegroundScaleConfig
-): RampResult {
+	ramp: BaseRampResult,
+	backgroundRamp: BaseRampResult,
+	config: ForegroundScaleConfig,
+	includeInteractionState?: true
+): RampResult;
+export function buildForegroundScale(
+	ramp: BaseRampResult,
+	backgroundRamp: BaseRampResult,
+	config: ForegroundScaleConfig,
+	includeInteractionState: boolean
+): AccentRampResult;
+export function buildForegroundScale(
+	ramp: BaseRampResult,
+	backgroundRamp: BaseRampResult,
+	config: ForegroundScaleConfig,
+	includeInteractionState = true
+): AccentRampResult {
 	const seed = clampToGamut( ramp.ramp[ config.seed ] );
 	const getColorAtLightness = createColorForLightness( seed, config );
 	// Parse and convert this once. APCA evaluates it for every intermediate
@@ -388,7 +406,7 @@ export function buildForegroundScale(
 	const colors = new Map< ForegroundRampStep, PlainColorObject >();
 
 	for ( const step of config.steps.filter(
-		( { preserveAnchor } ) => preserveAnchor
+		( stepConfig ) => stepConfig.preserveAnchor === true
 	) ) {
 		const currentColor = clampToGamut( ramp.ramp[ step.name ] );
 		colors.set(
@@ -539,10 +557,14 @@ export function buildForegroundScale(
 	colors.set( 'fgSurface4', normalColor );
 	colors.set( 'fgSurface5', strongColor );
 
-	const nextRamp = { ...ramp.ramp };
-	for ( const step of config.steps ) {
+	// Keep the strong color and its budget above: even status ramps use them
+	// when positioning and serializing FGS3/FGS4. Only its own output is unused.
+	const outputSteps = includeInteractionState
+		? config.steps
+		: config.steps.filter( ( step ) => step.name !== 'fgSurface5' );
+	function serializeStep( step: ForegroundScaleConfig[ 'steps' ][ number ] ) {
 		const color = colors.get( step.name )!;
-		nextRamp[ step.name ] = serializeColorMeetingContrast( {
+		return serializeColorMeetingContrast( {
 			color,
 			getColorAtLightness:
 				step.preserveAnchor && step !== strongStep
@@ -557,27 +579,38 @@ export function buildForegroundScale(
 			target: step.contrast.target,
 		} );
 	}
-	nextRamp.fgSurface5 = serializeColorMeetingPerceptualInterval( {
-		background: displayBackground,
-		normalColor: nextRamp.fgSurface4,
-		strongColor: nextRamp.fgSurface5,
-		strongEndpoint,
-		getColorAtLightness,
-		referenceLuminances: referenceLuminances.fgSurface5,
-		wcagTarget: strongStep.contrast.target,
-		perceptualTarget: normalToActive,
-	} );
+	const nextRamp: BaseRamp & { fgSurface4: string; fgSurface5?: string } = {
+		...ramp.ramp,
+		fgSurface4: serializeStep( steps.fgSurface4 ),
+	};
+	for ( const step of outputSteps ) {
+		if ( step.name !== 'fgSurface4' ) {
+			nextRamp[ step.name ] = serializeStep( step );
+		}
+	}
+	if ( includeInteractionState ) {
+		nextRamp.fgSurface5 = serializeColorMeetingPerceptualInterval( {
+			background: displayBackground,
+			normalColor: nextRamp.fgSurface4,
+			strongColor: nextRamp.fgSurface5!,
+			strongEndpoint,
+			getColorAtLightness,
+			referenceLuminances: referenceLuminances.fgSurface5,
+			wcagTarget: strongStep.contrast.target,
+			perceptualTarget: normalToActive,
+		} );
+	}
 
-	const foregroundStepNames = new Set< keyof typeof ramp.ramp >(
+	const foregroundStepNames = new Set< keyof Ramp >(
 		config.steps.map( ( { name } ) => name )
 	);
 	const warnings = ( ramp.warnings ?? [] ).filter(
 		( step ) => ! foregroundStepNames.has( step )
 	);
-	for ( const step of config.steps ) {
+	for ( const step of outputSteps ) {
 		if (
 			! meetsContrastFloor(
-				nextRamp[ step.name ],
+				nextRamp[ step.name ]!,
 				referenceLuminances[ step.name ],
 				step.contrast.target
 			)
