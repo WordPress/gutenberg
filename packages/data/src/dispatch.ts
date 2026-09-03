@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { AnyConfig, StoreDescriptor, DispatchReturn } from './types';
 import defaultRegistry from './default-registry';
 

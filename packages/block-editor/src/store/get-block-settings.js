@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import {
 	__EXPERIMENTAL_PATHS_WITH_OVERRIDE as PATHS_WITH_OVERRIDE,
 	hasBlockSupport,
 } from '@wordpress/blocks';
 import { applyFilters } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
 import { getValueFromObjectPath } from '../utils/object';
 import { getBlockName, getSettings, getBlockAttributes } from './selectors';
 

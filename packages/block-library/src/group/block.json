@@ -19,7 +19,6 @@
 	},
 	"supports": {
 		"__experimentalOnEnter": true,
-		"__experimentalOnMerge": true,
 		"__experimentalSettings": true,
 		"align": [ "wide", "full" ],
 		"anchor": true,
@@ -48,14 +47,15 @@
 		"spacing": {
 			"margin": [ "top", "bottom" ],
 			"padding": true,
-			"blockGap": true,
+			"blockGap": [ "horizontal", "vertical" ],
 			"__experimentalDefaultControls": {
 				"padding": true,
 				"blockGap": true
 			}
 		},
 		"dimensions": {
-			"minHeight": true
+			"minHeight": true,
+			"minWidth": true
 		},
 		"__experimentalBorder": {
 			"color": true,

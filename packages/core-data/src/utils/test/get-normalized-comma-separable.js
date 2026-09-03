@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import getNormalizedCommaSeparable from '../get-normalized-comma-separable';
 
 describe( 'getNormalizedCommaSeparable', () => {

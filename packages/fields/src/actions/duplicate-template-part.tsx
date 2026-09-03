@@ -1,17 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch } from '@wordpress/data';
 import { _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useMemo } from '@wordpress/element';
-// @ts-ignore
 import { parse } from '@wordpress/blocks';
 import type { Action } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
 import type { Post, TemplatePart } from '../types';
 import { CreateTemplatePartModalContents } from '../components/create-template-part-modal';
 import { getItemTitle } from './utils';
@@ -21,7 +13,7 @@ import { getItemTitle } from './utils';
  */
 const duplicateTemplatePart: Action< TemplatePart > = {
 	id: 'duplicate-template-part',
-	label: _x( 'Duplicate', 'action label' ),
+	label: _x( 'Duplicate…', 'action label' ),
 	isEligible: ( item ) => item.type === 'wp_template_part',
 	modalHeader: _x( 'Duplicate template part', 'action label' ),
 	modalFocusOnMount: 'firstContentElement',
