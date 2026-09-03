@@ -2065,15 +2065,21 @@ test.describe( 'List (@firefox)', () => {
 				)
 		).toBe( 'bc' );
 
-		// A partial selection across a nesting boundary is not
-		// mergeable; the press removes the fully selected item as a
-		// whole, together with its nested list; the unrelated sibling
-		// remains.
+		// A partial selection across a nesting boundary is presented as a
+		// full selection of the outer item, but Backspace merges
+		// the rich text range (keeps "a" + "d") instead of deleting the
+		// whole item. The unrelated top-level sibling remains.
 		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( '‸' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/list',
 				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'a‸d' },
+						innerBlocks: [],
+					},
 					{
 						name: 'core/list-item',
 						attributes: { content: 'zz' },
@@ -2089,6 +2095,16 @@ test.describe( 'List (@firefox)', () => {
 		page,
 		pageUtils,
 	} ) => {
+		const getCanvasSelectedText = async () => {
+			const frame = page.frame( { name: 'editor-canvas' } );
+			if ( ! frame ) {
+				return '';
+			}
+			return frame.evaluate( () =>
+				document.getSelection().toString().replace( /\s/g, '' )
+			);
+		};
+
 		await editor.canvas
 			.locator( 'role=document[name="Add default block"i]' )
 			.click();
@@ -2132,10 +2148,20 @@ test.describe( 'List (@firefox)', () => {
 		] );
 		await page.keyboard.press( 'Backspace' );
 
-		// Extend the selection forward past the nesting boundary into
-		// "cd", then yield so the selection observer can process it.
+		// Extend until the native range covers "bc". Browsers often stop at
+		// the nesting boundary before "c" on the second Shift+ArrowRight.
 		await pageUtils.pressKeys( 'shift+ArrowRight', { times: 2 } );
 		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+		for ( let i = 0; i < 3; i++ ) {
+			if ( ( await getCanvasSelectedText() ) === 'bc' ) {
+				break;
+			}
+			await page.keyboard.press( 'Shift+ArrowRight' );
+			await page.evaluate(
+				() => new Promise( window.requestIdleCallback )
+			);
+		}
+		await expect.poll( getCanvasSelectedText ).toBe( 'bc' );
 
 		// The outer "ab" item is presented as fully selected, like a
 		// block multi-selection.
@@ -2146,15 +2172,21 @@ test.describe( 'List (@firefox)', () => {
 			editor.canvas.locator( '.is-multi-selected' )
 		).toHaveText( 'abcd' );
 
-		// A partial selection across a nesting boundary is not
-		// mergeable; the press removes the fully selected item as a
-		// whole, together with its nested list; the unrelated sibling
-		// remains.
+		// A partial selection across a nesting boundary is presented as a
+		// full selection of the outer item, but Delete merges the
+		// rich text range (keeps "a" + "d") instead of deleting the whole
+		// item. The unrelated top-level sibling remains.
 		await page.keyboard.press( 'Delete' );
+		await page.keyboard.type( '‸' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/list',
 				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'a‸d' },
+						innerBlocks: [],
+					},
 					{
 						name: 'core/list-item',
 						attributes: { content: 'zz' },
@@ -2165,63 +2197,149 @@ test.describe( 'List (@firefox)', () => {
 		] );
 	} );
 
-	test( 'should select the outer item fully when dragging a selection across the nesting boundary', async ( {
+	test( 'should keep nested children and following siblings when merging across a nesting boundary', async ( {
 		editor,
 		page,
+		pageUtils,
 	} ) => {
-		await editor.canvas
-			.locator( 'role=document[name="Add default block"i]' )
-			.click();
-		await page.keyboard.type( '* ab' );
-		await page.keyboard.press( 'Enter' );
-		// Leading space at the start of an empty item triggers indent.
-		await page.keyboard.type( ' cd' );
-		// Enter on an empty nested item outdents back to the top level.
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'zz' );
+		const getCanvasSelectedText = async () => {
+			const frame = page.frame( { name: 'editor-canvas' } );
+			if ( ! frame ) {
+				return '';
+			}
+			return frame.evaluate( () =>
+				document.getSelection().toString().replace( /\s/g, '' )
+			);
+		};
 
-		// Drag from the middle of "ab" to the middle of "cd".
-		const outer = await editor.canvas
-			.getByText( 'ab', { exact: true } )
-			.boundingBox();
-		const nested = await editor.canvas
-			.getByText( 'cd', { exact: true } )
-			.boundingBox();
-		await page.mouse.move(
-			outer.x + outer.width / 2,
-			outer.y + outer.height / 2
-		);
-		await page.mouse.down();
-		await page.mouse.move(
-			nested.x + nested.width / 2,
-			nested.y + nested.height / 2,
-			{ steps: 10 }
-		);
+		await editor.insertBlock( {
+			name: 'core/list',
+			innerBlocks: [
+				{
+					name: 'core/list-item',
+					attributes: { content: 'ab' },
+					innerBlocks: [
+						{
+							name: 'core/list',
+							innerBlocks: [
+								{
+									name: 'core/list-item',
+									attributes: { content: 'cd' },
+									innerBlocks: [
+										{
+											name: 'core/list',
+											innerBlocks: [
+												{
+													name: 'core/list-item',
+													attributes: {
+														content: 'ef',
+													},
+												},
+											],
+										},
+									],
+								},
+								{
+									name: 'core/list-item',
+									attributes: { content: 'xy' },
+								},
+							],
+						},
+					],
+				},
+			],
+		} );
 
-		await page.mouse.up();
-		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
-
-		// The outer "ab" item is presented as fully selected, like a
-		// block multi-selection.
-		await expect(
-			editor.canvas.locator( '.is-multi-selected' )
-		).toHaveCount( 1 );
-		await expect(
-			editor.canvas.locator( '.is-multi-selected' )
-		).toHaveText( 'abcd' );
-
-		// The press removes the fully selected item as a whole, together
-		// with its nested list; the unrelated sibling remains.
-		await page.keyboard.press( 'Backspace' );
+		// Place the caret at offset 1 of "cd" (Home/ArrowRight is more
+		// stable across browsers than arrowing up from "xy").
+		await editor.canvas.getByText( 'cd', { exact: true } ).click();
+		await page.keyboard.press( 'Home' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( '‸' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/list',
 				innerBlocks: [
 					{
 						name: 'core/list-item',
-						attributes: { content: 'zz' },
-						innerBlocks: [],
+						attributes: { content: 'ab' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'c‸d' },
+										innerBlocks: [
+											{
+												name: 'core/list',
+												innerBlocks: [
+													{
+														name: 'core/list-item',
+														attributes: {
+															content: 'ef',
+														},
+													},
+												],
+											},
+										],
+									},
+									{
+										name: 'core/list-item',
+										attributes: { content: 'xy' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+		] );
+		await page.keyboard.press( 'Backspace' );
+
+		// Extend into "ab" until the native range covers "bc".
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 3 } );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+		for ( let i = 0; i < 3; i++ ) {
+			if ( ( await getCanvasSelectedText() ) === 'bc' ) {
+				break;
+			}
+			await page.keyboard.press( 'Shift+ArrowLeft' );
+			await page.evaluate(
+				() => new Promise( window.requestIdleCallback )
+			);
+		}
+		await expect.poll( getCanvasSelectedText ).toBe( 'bc' );
+
+		await expect(
+			editor.canvas.locator( '.is-multi-selected' )
+		).toHaveCount( 1 );
+
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( '‸' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'a‸d' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'ef' },
+									},
+									{
+										name: 'core/list-item',
+										attributes: { content: 'xy' },
+									},
+								],
+							},
+						],
 					},
 				],
 			},
@@ -2313,13 +2431,19 @@ test.describe( 'List (@firefox)', () => {
 			focusOffset: 0,
 		} );
 
-		// The press removes the fully selected item as a whole, together
-		// with its nested list; the unrelated sibling remains.
+		// Selection ends at the start of "cd", so merge keeps "a" + "cd".
+		// The unrelated top-level sibling remains.
 		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( '‸' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/list',
 				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'a‸cd' },
+						innerBlocks: [],
+					},
 					{
 						name: 'core/list-item',
 						attributes: { content: 'zz' },
