@@ -2,7 +2,6 @@ import {
 	ColorSpace,
 	contrastAPCA,
 	get,
-	OKLab,
 	OKLCH,
 	OKLCH_sRGB as OklchSrgb,
 	sRGB,
@@ -27,11 +26,6 @@ import type {
 	RampResult,
 } from './types.ts';
 import { solveWithBisect } from './utils.ts';
-
-ColorSpace.register( sRGB );
-ColorSpace.register( OKLab );
-ColorSpace.register( OKLCH );
-ColorSpace.register( OklchSrgb );
 
 type GetColorForLightness = ( lightness: number ) => PlainColorObject;
 
@@ -85,6 +79,8 @@ function createColorForLightness(
 		};
 	}
 
+	// Relative-chroma gamut searches resolve "oklch.c" by name internally.
+	ColorSpace.register( OKLCH );
 	const relativeSeed = to( seed, OklchSrgb );
 	const relativeChroma = get( relativeSeed, [ OklchSrgb, 'c' ] );
 	const hue = get( relativeSeed, [ OklchSrgb, 'h' ] );
@@ -449,6 +445,8 @@ export function buildForegroundScale(
 	config: ForegroundScaleConfig,
 	includeInteractionState = true
 ): AccentRampResult {
+	// APCA resolves sRGB by name, even for color objects.
+	ColorSpace.register( sRGB );
 	const seed = clampToGamut( ramp.ramp[ config.seed ] );
 	const getColorAtLightness = createColorForLightness( seed, config );
 	// Parse and convert this once. APCA evaluates it for every intermediate
