@@ -12,6 +12,8 @@ import {
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
 import { useSelect, dispatch } from '@wordpress/data';
+import { useRefEffect } from '@wordpress/compose';
+import { focus } from '@wordpress/dom';
 import { mergeGlobalStyles } from '@wordpress/global-styles-engine';
 import {
 	useMemo,
@@ -557,6 +559,27 @@ export const StyleBookBody = ( {
 	const [ isFocused, setIsFocused ] = useState( false );
 	const [ hasIframeLoaded, setHasIframeLoaded ] = useState( false );
 	const iframeRef = useRef( null );
+	const contentRef = useRefEffect(
+		( node ) => {
+			if ( ! onSelect || onClick ) {
+				return;
+			}
+
+			const { ownerDocument } = node;
+			const onFocus = ( event ) => {
+				// Firefox focuses the iframe document before its contents, even
+				// when neither the iframe nor its body has a tabindex.
+				if ( event.target === ownerDocument ) {
+					focus.tabbable.find( node )[ 0 ]?.focus();
+				}
+			};
+			ownerDocument.addEventListener( 'focus', onFocus, true );
+			return () => {
+				ownerDocument.removeEventListener( 'focus', onFocus, true );
+			};
+		},
+		[ onSelect, onClick ]
+	);
 	// The presence of an `onClick` prop indicates that the Style Book is being used as a button.
 	// In this case, add additional props to the iframe to make it behave like a button.
 	const buttonModeProps = {
@@ -596,6 +619,7 @@ export const StyleBookBody = ( {
 		<Iframe
 			onLoad={ handleLoad }
 			ref={ iframeRef }
+			contentRef={ contentRef }
 			className={ clsx( 'editor-style-book__iframe', {
 				'is-focused': isFocused && !! onClick,
 				'is-button': !! onClick,

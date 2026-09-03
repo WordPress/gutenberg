@@ -70,6 +70,72 @@ test.describe( 'Style Book', () => {
 		).toBeVisible();
 	} );
 
+	test( 'should tab directly from the selected category to its first example @firefox @webkit', async ( {
+		page,
+	} ) => {
+		for ( const category of [ 'Overview', 'Text' ] ) {
+			const tab = page.getByRole( 'tab', {
+				name: category,
+				exact: true,
+			} );
+			await tab.focus();
+			await expect( tab ).toHaveAttribute( 'aria-selected', 'true' );
+
+			const firstExample = page
+				.getByRole( 'tabpanel', { name: category, exact: true } )
+				.frameLocator( '[name="style-book-canvas"]' )
+				.getByRole( 'button' )
+				.first();
+			await expect( firstExample ).toBeVisible();
+			await page.keyboard.press( 'Tab' );
+			await expect( firstExample ).toBeFocused();
+
+			await tab.focus();
+			await page.keyboard.press( 'ArrowRight' );
+			await page.keyboard.press( 'Enter' );
+		}
+	} );
+
+	test( 'should shift-tab directly from the first example to the selected category @firefox @webkit', async ( {
+		page,
+	} ) => {
+		for ( const category of [ 'Overview', 'Text' ] ) {
+			const tab = page.getByRole( 'tab', {
+				name: category,
+				exact: true,
+			} );
+			await tab.click();
+
+			await page
+				.getByRole( 'tabpanel', { name: category, exact: true } )
+				.frameLocator( '[name="style-book-canvas"]' )
+				.getByRole( 'button' )
+				.first()
+				.focus();
+			await page.keyboard.press( 'Shift+Tab' );
+			await expect( tab ).toBeFocused();
+		}
+	} );
+
+	test( 'should navigate examples with arrow keys @firefox @webkit', async ( {
+		page,
+	} ) => {
+		await page.getByRole( 'tab', { name: 'Media', exact: true } ).click();
+		const examples = page
+			.getByRole( 'tabpanel', { name: 'Media', exact: true } )
+			.frameLocator( '[name="style-book-canvas"]' )
+			.getByRole( 'button' );
+		await examples.first().focus();
+		await page.keyboard.press( 'ArrowDown' );
+		await expect( examples.nth( 1 ) ).toBeFocused();
+		await page.keyboard.press( 'Tab' );
+		await expect( examples.nth( 1 ) ).not.toBeFocused();
+		await page.keyboard.press( 'Shift+Tab' );
+		await expect( examples.nth( 1 ) ).toBeFocused();
+		await page.keyboard.press( 'ArrowUp' );
+		await expect( examples.first() ).toBeFocused();
+	} );
+
 	test( 'should open correct Global Styles panel when example is clicked', async ( {
 		page,
 	} ) => {
