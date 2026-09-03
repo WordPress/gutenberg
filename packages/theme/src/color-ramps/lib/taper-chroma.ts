@@ -9,35 +9,35 @@ import {
 
 export interface TaperChromaOptions {
 	gamut?: ColorSpace; // target gamut (default `sRGB`)
-	alpha?: number; // base fraction of Cmax at target (default 0.62)
+	alpha?: number; // base fraction of Cmax at target (default 0.65)
 	carry?: number; // seed vividness carry exponent β in [0..1] (default 0.5)
 	cUpperBound?: number; // hard search cap for C (default 0.45)
-	// Continuous taper around the seed (desaturate both sides slightly)
+	// Chroma reduction with distance from the seed on each side.
 	radiusLight?: number; // distance in L where kLight is reached (default 0.20)
 	radiusDark?: number; // distance in L where kDark is reached (default 0.20)
 	kLight?: number; // floor multiplier near lighter side (default 0.85)
 	kDark?: number; // floor multiplier near darker side (default 0.85)
-	// Achromatic handling
+	// Handling for seeds with little or no chroma.
 	hueFallback?: number; // degrees: if seed is achromatic and you still want color
-	achromaEpsilon?: number; // ≤ this chroma → treat as achromatic (default 0.005)
+	achromaEpsilon?: number; // below this chroma, treat as achromatic (default 0.005)
 }
 
 /**
- * Given the seed and the target lightness, tapers the chroma smoothly.
- * - C_intended = Cmax(Lt,H0) * alpha * (seedRelative^carry)
- * - Continuous taper vs |Lt - Ls| to softly reduce chroma for neighbors
- * - Downward-only clamp on C (preserve L & H)
- * @param seed
- * @param lTarget
- * @param options
+ * Scale chroma by the seed's relative vividness and the target gamut capacity,
+ * then taper with distance from the seed. This is not a cap at seed chroma.
+ * Near-gray seeds stay gray unless a fallback hue is supplied.
+ *
+ * @param seed    Seed already converted to OKLCH.
+ * @param lTarget Target OKLCH lightness, clamped to [0, 1].
+ * @param options Chroma strength, taper shape, and gamut settings.
  */
 export function taperChroma(
-	seed: PlainColorObject, // already OKLCH
-	lTarget: number, // [0..1]
+	seed: PlainColorObject,
+	lTarget: number,
 	options: TaperChromaOptions = {}
 ): { l: number; c: number } | PlainColorObject {
 	const gamut = options.gamut ?? sRGB;
-	const alpha = options.alpha ?? 0.65; // 0.7-0.8 works well for accent surface
+	const alpha = options.alpha ?? 0.65;
 	const carry = options.carry ?? 0.5;
 	const cUpperBound = options.cUpperBound ?? 0.45;
 	const radiusLight = options.radiusLight ?? 0.2;
@@ -81,7 +81,7 @@ export function taperChroma(
 		cUpperBound
 	);
 
-	// Seed vividness ratio (hue-fair normalization)
+	// Express seed chroma as a fraction of the capacity at its lightness and hue.
 	let seedRelative = 0;
 	const denom = cmaxSeed > 0 ? cmaxSeed : 1e-6;
 	seedRelative = clamp01( cSeed / denom );
@@ -91,7 +91,7 @@ export function taperChroma(
 	const cWithCarry =
 		cIntendedBase * Math.pow( seedRelative, clamp01( carry ) );
 
-	// Gentle, symmetric desaturation vs distance in L
+	// The light and dark sides can have different taper shapes.
 	const t = continuousTaper( lSeed, lTarget, {
 		radiusLight,
 		radiusDark,
@@ -100,13 +100,10 @@ export function taperChroma(
 	} );
 	const cPlanned = cWithCarry * t;
 
-	// Downward-only clamp (preserve L & H)
 	const lOut = clamp01( lTarget );
 
 	return { l: lOut, c: cPlanned };
 }
-
-/* ---------------- helpers & caches ---------------- */
 
 const MAX_CACHED_CHROMA_CAPACITIES = 2_048;
 // Exact keys preserve deterministic output. Rounded buckets can return a
@@ -135,14 +132,15 @@ function raisedCosine( u: number ): number {
 }
 
 /**
- * smooth, distance-from-seed chroma taper (raised-cosine per side)
- * @param seedL
- * @param targetL
- * @param opts
- * @param opts.radiusLight
- * @param opts.radiusDark
- * @param opts.kLight
- * @param opts.kDark
+ * Smoothly reduce chroma with distance from the seed, using a cosine per side.
+ *
+ * @param seedL            Seed OKLCH lightness.
+ * @param targetL          Target OKLCH lightness.
+ * @param opts             Taper shape on each side.
+ * @param opts.radiusLight Lightness distance at which the light-side floor is reached.
+ * @param opts.radiusDark  Lightness distance at which the dark-side floor is reached.
+ * @param opts.kLight      Light-side floor multiplier.
+ * @param opts.kDark       Dark-side floor multiplier.
  */
 function continuousTaper(
 	seedL: number,
@@ -166,11 +164,12 @@ function continuousTaper(
 }
 
 /**
- * Find the max in-gamut chroma at fixed (L,H) in the target gamut
- * @param l
- * @param h
- * @param gamutSpace
- * @param cap
+ * Estimate usable chroma at a lightness and hue through CSS gamut mapping.
+ *
+ * @param l          OKLCH lightness.
+ * @param h          Hue in degrees.
+ * @param gamutSpace Output gamut.
+ * @param cap        Chroma of the probe to map into gamut.
  */
 function maxInGamutChromaAtLH(
 	l: number,
@@ -189,14 +188,12 @@ function maxInGamutChromaAtLH(
 		return cachedChroma;
 	}
 
-	// Construct a color with maximum chroma.
 	const probe: PlainColorObject = {
 		space: OKLCH,
 		coords: [ l, cap, h ],
 		alpha: 1,
 	};
 
-	// Let `toGamut` reduce the chroma to the gamut maximum.
 	const clamped = toGamutCSS( probe, { space: gamutSpace } );
 	const chroma = get( clamped, [ OKLCH, 'c' ] );
 

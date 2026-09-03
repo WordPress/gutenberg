@@ -423,8 +423,8 @@ function serializeColorMeetingPerceptualInterval( {
 
 /**
  * Rebuild the foreground part of an otherwise complete ramp. APCA positions
- * the intermediate steps within the visible contrast range, while WCAG ratios
- * remain hard floors across the surfaces where each step is used.
+ * the intermediate steps within the available contrast range. WCAG floors
+ * take priority across the configured surfaces; unresolved failures warn.
  *
  * @param ramp                    Ramp whose foreground steps will be rebuilt.
  * @param backgroundRamp          Background ramp on which the colors will appear.

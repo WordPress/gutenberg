@@ -12,34 +12,27 @@ export const BLACK: PlainColorObject = {
 	alpha: 1,
 };
 
-// Margin added to target contrasts to counter for algorithm approximations and rounding errors.
-// - the `CONTRAST_EPSILON` value is 0.004, so the real contrast can be lower by this amount.
-// - the max contrast between adjacent RGB values is 1.016, so 0.016 is the maximum total rounding error between two values.
-// - the sum is 0.02: the margin we add to ensure that the target contrast is met after all the rounding.
+// Empirical WCAG ratio margin for search and rounding error. Final serialized
+// colors still need contrast checks; this margin alone is not a guarantee.
 export const UNIVERSAL_CONTRAST_TOPUP = 0.02;
 
-// When enabling "lighter direction" bias, this is the amount by which
-// black text contrast needs to be greater than white text contrast.
-// The higher the value, the stronger the preference for white text.
-// The current value has been determined empirically as the highest value
-// that won't cause the algo not to be able to correctly solve all contrasts.
+// With preferLighter, choose black only when its minimum contrast exceeds
+// white's by this amount. This changes the choice, not the required contrast.
 export const WHITE_TEXT_CONTRAST_MARGIN = 3.1;
 
-// These values are used as thresholds when trying to match the background
-// ramp's lightness while calculating an accent ramp. They prevent the accent
-// scale from being pinned to lightness values in the middle of the range,
-// which would cause the algorithm to struggle to satisfy the accent scale
-// constraints and therefore produce unexpected results.
+// Keep the accent SF2 anchor out of the middle-lightness range, where there
+// is little contrast room for either foreground direction.
 export const ACCENT_SCALE_BASE_LIGHTNESS_THRESHOLDS = {
 	lighter: { min: 0.2, max: 0.4 },
 	darker: { min: 0.75, max: 0.98 },
 } as const;
 
-// Contrast precision we aim for. Approximately 1/256, resolution of an 8-bit number.
+// Signed search-error tolerance. Its units depend on the caller's metric.
 export const CONTRAST_EPSILON = 4e-3;
 
 export const MAX_BISECTION_ITERATIONS = 10;
 
+// Full-ramp diagnostic pairs, broader than the semantic token pair checks.
 export const CONTRAST_COMBINATIONS: {
 	bgs: ( keyof Ramp )[];
 	fgs: ( keyof Ramp )[];
@@ -72,7 +65,7 @@ export const CONTRAST_COMBINATIONS: {
 	},
 ];
 
-// Used when generating the DTCG tokens and the static color ramps.
+// Shared defaults for token generation and runtime ThemeProvider calculations.
 export const DEFAULT_SEED_COLORS = {
 	background: '#fcfcfc',
 	primary: '#3858e9',

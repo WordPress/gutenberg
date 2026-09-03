@@ -18,10 +18,10 @@ const objectLuminanceCache = new WeakMap< PlainColorObject, number >();
 ColorSpace.register( sRGB );
 
 /**
- * Get string representation of a color.
+ * Serialize a color as rounded sRGB hex.
+ *
  * @param color A `PlainColorObject`, or an sRGB-parseable string (typically a
  *              hex value, e.g. `#3858e9`).
- * @return String representation
  */
 export function getColorString( color: string | PlainColorObject ): string {
 	const rgbRounded = serialize( to( color, sRGB ) );
@@ -46,8 +46,8 @@ export function getContrast(
 
 /**
  * Return a color's non-negative relative luminance. Serialized colors use a
- * bounded cache because every accent ramp references the same surfaces. Ramp
- * color objects are immutable and use a weak cache so they can be collected.
+ * bounded cache because accent ramps share surface references. Color objects
+ * use a weak cache and must not be mutated after measurement.
  *
  * @param color Color to measure.
  */
@@ -133,7 +133,8 @@ export function assertValidSeedColor( seed: string ): void {
 }
 
 /**
- * Make sure that a color is valid in the sRGB gamut and convert it to OKLCH.
+ * Map a color into sRGB gamut, then return its OKLCH representation.
+ *
  * @param c A `PlainColorObject`, or an sRGB-parseable string.
  */
 export function clampToGamut( c: string | PlainColorObject ) {
