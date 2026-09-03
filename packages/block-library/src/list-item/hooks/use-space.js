@@ -13,7 +13,7 @@ export default function useSpace( clientId ) {
 	const { getSelectionStart, getSelectionEnd, getBlockIndex } =
 		useSelect( blockEditorStore );
 	const indentListItem = useIndentListItem( clientId );
-	const outdentListItem = useOutdentListItem();
+	const outdentListItem = useOutdentListItem( clientId );
 
 	return useRefEffect(
 		( element ) => {
