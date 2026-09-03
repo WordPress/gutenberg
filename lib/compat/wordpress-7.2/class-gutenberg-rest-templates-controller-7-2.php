@@ -64,7 +64,15 @@ class Gutenberg_REST_Templates_Controller_7_2 extends Gutenberg_REST_Templates_C
 		//////////////////////////////
 		// START CORE MODIFICATIONS //
 		//////////////////////////////
-		if ( isset( $request['source'] ) && 'theme' === $request['source'] && ! get_block_file_template( $request['id'], $this->post_type ) ) {
+		/*
+		 * Refuse the revert only when the template exists (for an unknown id,
+		 * core answers 404 below) but no theme or plugin version of it does.
+		 */
+		if (
+			isset( $request['source'] ) && 'theme' === $request['source']
+			&& get_block_template( $request['id'], $this->post_type )
+			&& ! get_block_file_template( $request['id'], $this->post_type )
+		) {
 			return new WP_Error(
 				'rest_invalid_template',
 				__( 'This template cannot be reverted because the active theme and plugins do not provide a version of it.' ),

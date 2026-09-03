@@ -210,6 +210,21 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 	}
 
 	/**
+	 * A revert for a template id that does not exist at all must keep core's
+	 * 404 response rather than the guard's 400.
+	 *
+	 * @covers Gutenberg_REST_Templates_Controller_7_2::update_item
+	 */
+	public function test_update_item_returns_404_for_unknown_template() {
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/templates/' . get_stylesheet() . '//does-not-exist' );
+		$request->set_body_params( array( 'source' => 'theme' ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_template_not_found', $response, 404 );
+	}
+
+	/**
 	 * Reverting a customized template to its theme version must still work
 	 * when the active theme provides the template.
 	 *
