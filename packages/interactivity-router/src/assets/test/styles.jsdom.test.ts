@@ -311,6 +311,8 @@ describe( 'Router styles management', () => {
 
 			// Different integrity — treated as different resources, linkB inserted.
 			expect( promises.length ).toBe( 1 );
+			expect( parent.childNodes.length ).toBe( 2 );
+			expect( parent.contains( linkB ) ).toBe( true );
 		} );
 
 		it( 'should treat style elements as already loaded', async () => {

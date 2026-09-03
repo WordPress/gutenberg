@@ -25,8 +25,9 @@ const { state } = store( 'test/router-dynamic-styles', {
 		/**
 		 * Bug A fixture — activates the deferred stylesheet.
 		 *
-		 * Mutates media from "not all" to "all" on the inline style element, then
-		 * writes the reactive signal so data-wp-text re-renders immediately.
+		 * Mutates media from "not all" to "all" on the deferred stylesheet
+		 * element, then writes the reactive signal so data-wp-text re-renders
+		 * immediately.
 		 */
 		activateDeferredStyle() {
 			const el = document.getElementById( 'test-router-deferred-style' );
@@ -87,7 +88,15 @@ const { state } = store( 'test/router-dynamic-styles', {
 				style.textContent = 'body { --test-plugin-style: 1; }';
 				document.head.appendChild( style );
 			}
-			state.pluginStyleStatus = 'active';
+
+			// Re-derive from the live sheet, same as deferredStyleStatus below —
+			// setting this unconditionally would mask a router failure that
+			// disabled the plugin sheet after navigation.
+			const pluginEl = document.getElementById( PLUGIN_STYLE_ID );
+			state.pluginStyleStatus =
+				pluginEl?.sheet && ! pluginEl.sheet.disabled
+					? 'active'
+					: 'inactive';
 
 			// Bug A — re-sync deferred status after applyStyles().
 			const el = document.getElementById( 'test-router-deferred-style' );

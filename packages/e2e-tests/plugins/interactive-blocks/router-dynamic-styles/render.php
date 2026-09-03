@@ -5,8 +5,8 @@
  * Provides deterministic style-scenario fixtures for two router bugs:
  *
  * Bug A — runtime-activated deferred stylesheets:
- *   A <style id="test-router-deferred-style" media="not all"> element is
- *   output server-side on every page request.
+ *   A <link id="test-router-deferred-style" rel="stylesheet" media="not all">
+ *   element is output server-side on every page request.
  *   This mirrors the real WordPress pattern of wp_enqueue_style() with
  *   media="not all". view.js finds it by id and the activateDeferredStyle
  *   action sets element.media = "all".
@@ -17,7 +17,10 @@
  *   against the server-returned element (media="not all"), keeps it in
  *   page.styles, and applyStyles() leaves it enabled.
  *
- *   No external CSS file is required — the declaration is inlined.
+ *   Rendered as a real <link rel="stylesheet"> loading deferred-style.css,
+ *   mirroring the wp_enqueue_style( ..., 'not all' ) pattern used in
+ *   production rather than an inline <style> block — this exercises the
+ *   same <link> code path the original bug report was about.
  *
  * Bug B — dynamically-injected plugin stylesheets:
  *   view.js init() appends a <style> element with a stable id attribute,
@@ -59,7 +62,12 @@ $link_c = $find_url( $base_alias . '-c' );
 ?>
 
 <!-- Bug A fixture: deferred style outside router region, survives navigation. -->
-<style id="test-router-deferred-style" media="not all">body { --test-deferred-active: 1; }</style>
+<link
+	rel="stylesheet"
+	id="test-router-deferred-style"
+	href="<?php echo esc_url( plugins_url( 'deferred-style.css', __FILE__ ) ); ?>"
+	media="not all"
+>
 
 <div
 	data-wp-interactive="test/router-dynamic-styles"

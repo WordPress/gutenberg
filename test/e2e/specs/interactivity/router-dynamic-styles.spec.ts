@@ -22,6 +22,12 @@ import { test, expect } from './fixtures';
  *
  * The test/router-dynamic-styles block provides both fixtures so the behaviour
  * is deterministic across all browsers and navigation paths.
+ *
+ * Every assertion below waits for the destination URL before checking
+ * stylesheet status. Both status spans start "active" on a fresh mount, so
+ * checking the text alone right after a click can pass before the SPA
+ * navigation actually completes — it proves nothing about post-navigation
+ * state without first confirming the navigation landed.
  */
 test.describe( 'Interactivity API router dynamic styles', () => {
 	test.beforeAll( async ( { interactivityUtils: utils } ) => {
@@ -47,12 +53,12 @@ test.describe( 'Interactivity API router dynamic styles', () => {
 	 * remain active after a forward SPA navigation.
 	 *
 	 * Flow:
-	 * 1. Page A loads — view.js init() injects
-	 *    <style id="test-deferred-style" media="not all">.
+	 * 1. Page A loads — the render.php fixture outputs
+	 *    <link id="test-router-deferred-style" media="not all">.
 	 * 2. User clicks "Activate deferred style" — action sets
 	 *    link.media = "all" and deferredStyleStatus = "active".
 	 * 3. User navigates to page B via the iAPI router.
-	 * 4. applyStyles() runs — with the areNodesEqual change the activated
+	 * 4. applyStyles() runs — with the normalizeMedia change the activated
 	 *    sheet is recognised as part of the new page's styles and remains
 	 *    enabled (sheet.disabled === false).
 	 * 5. init() re-checks sheet.disabled and updates deferredStyleStatus.
@@ -63,6 +69,8 @@ test.describe( 'Interactivity API router dynamic styles', () => {
 		interactivityUtils: utils,
 		page,
 	} ) => {
+		const linkB = utils.getLink( 'router-dynamic-styles-b' );
+
 		await page.goto( utils.getLink( 'router-dynamic-styles-a' ) );
 
 		// Deferred style starts inactive (media="not all").
@@ -79,6 +87,7 @@ test.describe( 'Interactivity API router dynamic styles', () => {
 		// Navigate to page B via the iAPI router — the router region
 		// intercepts the click and performs a SPA navigation.
 		await page.getByTestId( 'nav-to-b' ).click();
+		await expect( page ).toHaveURL( linkB );
 
 		// The activated sheet must remain enabled after navigation.
 		await expect( page.getByTestId( 'deferred-style-active' ) ).toHaveText(
@@ -103,6 +112,8 @@ test.describe( 'Interactivity API router dynamic styles', () => {
 		interactivityUtils: utils,
 		page,
 	} ) => {
+		const linkB = utils.getLink( 'router-dynamic-styles-b' );
+
 		await page.goto( utils.getLink( 'router-dynamic-styles-a' ) );
 
 		// Plugin sheet is active on the initial page.
@@ -112,6 +123,7 @@ test.describe( 'Interactivity API router dynamic styles', () => {
 
 		// Navigate to page B.
 		await page.getByTestId( 'nav-to-b' ).click();
+		await expect( page ).toHaveURL( linkB );
 
 		// Plugin sheet must still be active after navigation.
 		await expect( page.getByTestId( 'plugin-style-active' ) ).toHaveText(
@@ -136,17 +148,23 @@ test.describe( 'Interactivity API router dynamic styles', () => {
 		interactivityUtils: utils,
 		page,
 	} ) => {
-		await page.goto( utils.getLink( 'router-dynamic-styles-a' ) );
+		const linkA = utils.getLink( 'router-dynamic-styles-a' );
+		const linkB = utils.getLink( 'router-dynamic-styles-b' );
+		const linkC = utils.getLink( 'router-dynamic-styles-c' );
+
+		await page.goto( linkA );
 		await expect( page.getByTestId( 'plugin-style-active' ) ).toHaveText(
 			'active'
 		);
 
 		await page.getByTestId( 'nav-to-b' ).click();
+		await expect( page ).toHaveURL( linkB );
 		await expect( page.getByTestId( 'plugin-style-active' ) ).toHaveText(
 			'active'
 		);
 
 		await page.getByTestId( 'nav-to-c' ).click();
+		await expect( page ).toHaveURL( linkC );
 		await expect( page.getByTestId( 'plugin-style-active' ) ).toHaveText(
 			'active'
 		);
@@ -157,12 +175,14 @@ test.describe( 'Interactivity API router dynamic styles', () => {
 		// via evaluate() returns about:blank because SPA pushState entries
 		// are not tracked by Playwright as navigation events.
 		await page.getByTestId( 'nav-to-a' ).click();
+		await expect( page ).toHaveURL( linkA );
 		await expect( page.getByTestId( 'plugin-style-active' ) ).toHaveText(
 			'active'
 		);
 
 		// Navigate away from A once more — plugin sheet must survive.
 		await page.getByTestId( 'nav-to-b' ).click();
+		await expect( page ).toHaveURL( linkB );
 		await expect( page.getByTestId( 'plugin-style-active' ) ).toHaveText(
 			'active'
 		);
