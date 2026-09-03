@@ -3,7 +3,6 @@ import {
 	contrastAPCA,
 	deltaEOK2,
 	get,
-	OKLab,
 	OKLCH,
 	sRGB,
 } from 'colorjs.io/fn';
@@ -24,10 +23,6 @@ import { getContrast } from './lib/color-utils.ts';
 import { BLACK, CONTRAST_COMBINATIONS, WHITE } from './lib/constants.ts';
 export { DEFAULT_SEED_COLORS } from './lib/constants.ts';
 
-ColorSpace.register( sRGB );
-ColorSpace.register( OKLab );
-ColorSpace.register( OKLCH );
-
 // Only solve both polarities near the black/white WCAG crossover. This keeps
 // light and dark seeds keep their initial direction without a second solve.
 const MAXIMUM_AMBIGUOUS_ENDPOINT_CONTRAST_DIFFERENCE = 1;
@@ -39,6 +34,7 @@ const MAXIMUM_ALTERNATE_POLARITY_DELTA_E_DRIFT = 0.02;
 const MINIMUM_ALTERNATE_POLARITY_APCA_IMPROVEMENT = 1;
 
 function getInteractionStateInterval( ramp: InternalRampResult ) {
+	ColorSpace.register( sRGB );
 	const background =
 		ramp.ramp[ BG_RAMP_CONFIG.foregroundScale.perceptualReference ];
 	return (
@@ -141,6 +137,7 @@ function getBgRampInfo( ramp: InternalRampResult ): {
 		value: number;
 	};
 } {
+	ColorSpace.register( sRGB );
 	return {
 		mainDirection: ramp.direction,
 		backgroundRamp: ramp,

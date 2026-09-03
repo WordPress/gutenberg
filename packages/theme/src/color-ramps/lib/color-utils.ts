@@ -137,6 +137,8 @@ export function assertValidSeedColor( seed: string ): void {
  * @param c A `PlainColorObject`, or an sRGB-parseable string.
  */
 export function clampToGamut( c: string | PlainColorObject ) {
-	ColorSpace.register( sRGB );
+	if ( typeof c === 'string' ) {
+		ColorSpace.register( sRGB );
+	}
 	return to( toGamut( c, { space: sRGB, method: 'css' } ), OKLCH );
 }
