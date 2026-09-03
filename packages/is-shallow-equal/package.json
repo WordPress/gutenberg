@@ -47,7 +47,8 @@
 	"devDependencies": {
 		"@types/jest": "^30.0.0",
 		"@wordpress/lazy-import": "file:../lazy-import",
-		"benchmark": "^2.1.4"
+		"benchmark": "^2.1.4",
+		"vitest": "^4.1.10"
 	},
 	"publishConfig": {
 		"access": "public"

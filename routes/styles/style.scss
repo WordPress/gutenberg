@@ -17,3 +17,9 @@
 	}
 }
 
+.routes-styles__content {
+	flex-grow: 1;
+	min-height: 0;
+	background-color: var(--wpds-color-background-surface-neutral-strong);
+}
+

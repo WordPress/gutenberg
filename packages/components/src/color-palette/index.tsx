@@ -65,7 +65,7 @@ function SinglePalette( {
 					selectedIconProps={
 						isSelected
 							? {
-									fill:
+									color:
 										colordColor.contrast() >
 										colordColor.contrast( '#000' )
 											? '#fff'
