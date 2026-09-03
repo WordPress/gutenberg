@@ -156,6 +156,27 @@
 			flex-shrink: 0;
 		}
 
+		.item-text {
+			display: flex;
+			flex-direction: column;
+			gap: 2px;
+			min-width: 0;
+			flex: 1;
+		}
+
+		.item-label {
+			min-width: 0;
+		}
+
+		.item-description {
+			color: var(--wpds-color-foreground-content-neutral-weak);
+		}
+
+		.item[data-highlighted]:not([aria-disabled="true"]) .item-description,
+		.item[aria-disabled="true"] .item-description {
+			color: inherit;
+		}
+
 		.status {
 			grid-area: status;
 		}

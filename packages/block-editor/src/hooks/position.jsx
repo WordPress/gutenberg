@@ -3,7 +3,7 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { useId, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Use the portal-based popup to avoid inspector clipping.
 import { SelectControl } from '@wordpress/ui';
 import { useSettings } from '../components/use-settings';
@@ -252,7 +252,6 @@ export function PositionPanelPure( {
 	const selectedOption = value
 		? options.find( ( option ) => option.value === value ) || DEFAULT_OPTION
 		: DEFAULT_OPTION;
-	const hintIdPrefix = useId();
 
 	// Only display position controls if there is at least one option to choose from.
 	return options.length > 1 ? (
@@ -268,31 +267,22 @@ export function PositionPanelPure( {
 					onChangeType( selectedItem.value );
 				} }
 			>
-				{ options.map( ( option ) => {
-					const hintId = option.hint
-						? `${ hintIdPrefix }-${ option.key }`
-						: undefined;
-
-					return (
-						<SelectControl.Item
-							key={ option.key }
-							value={ option }
-							label={ option.label }
-							aria-describedby={ hintId }
-						>
-							<div>{ option.label }</div>
-							{ option.hint && (
-								<div
-									id={ hintId }
-									className="block-editor-hooks__position-control-item-hint"
-									aria-hidden="true"
-								>
-									{ option.hint }
-								</div>
-							) }
-						</SelectControl.Item>
-					);
-				} ) }
+				{ options.map( ( option ) => (
+					<SelectControl.Item
+						key={ option.key }
+						value={ option }
+						label={ option.label }
+					>
+						<SelectControl.ItemLabel>
+							{ option.label }
+						</SelectControl.ItemLabel>
+						{ option.hint && (
+							<SelectControl.ItemDescription>
+								{ option.hint }
+							</SelectControl.ItemDescription>
+						) }
+					</SelectControl.Item>
+				) ) }
 			</SelectControl>
 		</InspectorControls>
 	) : null;
