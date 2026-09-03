@@ -440,6 +440,9 @@ export default function QueryInspectorControls( props ) {
 						>
 							<TextControl
 								label={ __( 'Keyword' ) }
+								help={ __(
+									'Filter the query by keywords in the title, excerpt, or content.'
+								) }
 								value={ querySearch }
 								onChange={ ( newQuerySearch ) => {
 									debouncedQuerySearch( newQuerySearch );
