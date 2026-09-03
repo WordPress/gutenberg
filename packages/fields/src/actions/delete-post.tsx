@@ -29,7 +29,6 @@ const { PATTERN_TYPES } = unlock( patternsPrivateApis );
 const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 	id: 'delete-post',
 	label: __( 'Delete…' ),
-	modalHeader: __( 'Delete' ),
 	isPrimary: true,
 	icon: trash,
 	isEligible( post ) {

@@ -18,7 +18,6 @@ import type { CoreDataError, PostWithPermissions } from '../types';
 const permanentlyDeletePost: Action< PostWithPermissions > = {
 	id: 'permanently-delete',
 	label: __( 'Permanently delete…' ),
-	modalHeader: __( 'Permanently delete' ),
 	supportsBulk: true,
 	icon: trash,
 	isEligible( item ) {
