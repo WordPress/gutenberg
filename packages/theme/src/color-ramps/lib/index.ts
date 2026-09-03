@@ -30,18 +30,18 @@ import type {
 import { BLACK, WHITE, CONTRAST_EPSILON } from './constants.ts';
 
 /**
- * Calculate a complete color ramp based on the provided configuration.
+ * Solve the base steps and track the largest constraint deficit for seed
+ * adjustment. Perceptual reconstruction happens after this pass.
  *
- * @param params                       - The calculation parameters
- * @param params.seed                  - The base color to build the ramp from
- * @param params.sortedSteps           - Steps sorted in dependency order
- * @param params.config                - Ramp configuration defining contrast requirements
- * @param params.mainDir               - Primary direction for the ramp (lighter/darker)
- * @param params.oppDir                - Opposite direction from mainDir
- * @param params.pinLightness          - Optional lightness override for a given step
- * @param params.pinLightness.stepName
- * @param params.pinLightness.value
- * @return Object containing ramp results and satisfaction status
+ * @param params                       Base-pass inputs.
+ * @param params.seed                  OKLCH seed, possibly adjusted by a prior search.
+ * @param params.sortedSteps           Steps to build, with dependencies first.
+ * @param params.config                Base contrast and chroma settings.
+ * @param params.mainDir               Ramp's foreground direction.
+ * @param params.oppDir                Opposite of mainDir.
+ * @param params.pinLightness          Lightness override, even if contrast fails.
+ * @param params.pinLightness.stepName Step to pin.
+ * @param params.pinLightness.value    Pinned OKLCH lightness.
  */
 function calculateRamp( {
 	seed,
@@ -66,8 +66,7 @@ function calculateRamp( {
 	let maxDeficitDirection: RampDirection = 'lighter';
 	let maxDeficitStep;
 
-	// Keep track of the calculated colors, as they are going to be useful
-	// when other colors reference them.
+	// Dependencies use unrounded colors; only the output ramp is serialized.
 	const calculatedColors = new Map< keyof Ramp | 'seed', PlainColorObject >();
 	calculatedColors.set( 'seed', seed );
 
@@ -93,7 +92,6 @@ function calculateRamp( {
 			return referenceColor;
 		} );
 
-		// Check if we can reuse color from the `sameAsIfPossible` config option
 		if ( sameAsIfPossible ) {
 			const candidateColor = calculatedColors.get( sameAsIfPossible );
 			if ( ! candidateColor ) {
@@ -108,13 +106,11 @@ function calculateRamp( {
 					getContrast( referenceColor, candidateColor ) >=
 					adjustedTarget
 			);
-			// If the candidate meets every contrast requirement, use it.
 			if ( candidateMeetsTarget ) {
-				// Store the reused color
 				calculatedColors.set( stepName, candidateColor );
 				rampResults[ stepName ] = getColorString( candidateColor );
 
-				continue; // Skip to next step
+				continue;
 			}
 		}
 
@@ -153,7 +149,6 @@ function calculateRamp( {
 
 		const adjustedTarget = adjustContrastTarget( contrast.target );
 
-		// Define the lightness constraint, if needed.
 		let lightnessConstraint;
 		if ( pinLightness?.stepName === stepName ) {
 			lightnessConstraint = {
@@ -167,7 +162,6 @@ function calculateRamp( {
 			} as const;
 		}
 
-		// Calculate the color meeting the requirements
 		const searchResults = findColorMeetingRequirements(
 			referenceColor,
 			seed,
@@ -179,8 +173,8 @@ function calculateRamp( {
 			}
 		);
 
-		// When the target contrast is not met, take note of it and use
-		// that information to guide the ramp calculation bisection.
+		// The tightest constraint guides seed adjustment; negative deficits
+		// describe unused contrast room.
 		if (
 			! contrast.ignoreWhenAdjustingSeed &&
 			searchResults.deficit &&
@@ -191,10 +185,8 @@ function calculateRamp( {
 			maxDeficitStep = stepName;
 		}
 
-		// Store calculated color for future dependencies
 		calculatedColors.set( stepName, searchResults.color );
 
-		// Add to results
 		rampResults[ stepName ] = getColorString( searchResults.color );
 	}
 
@@ -279,10 +271,8 @@ export function buildRamp(
 		oppDir = worse;
 	}
 
-	// Get the correct calculation order based on dependencies
 	const sortedSteps = sortByDependency( config.steps );
 
-	// Calculate the ramp with the initial seed.
 	const {
 		rampResults,
 		maxDeficit,
@@ -316,10 +306,8 @@ export function buildRamp(
 				pinLightness,
 			} );
 
-			// If the constraints start failing in the opposite direction to the original
-			// iteration's direction, that means we've moved too far away from the target.
-			// Don't use the `maxDeficit` value because it's not related to our search,
-			// and might even be positive, which would confuse the bisection algorithm.
+			// Opposing failures mean the search has gone too far. Reverse the
+			// error sign instead of treating that unrelated deficit as progress.
 			return iterationResults.maxDeficitDirection === maxDeficitDirection
 				? iterationResults.maxDeficit
 				: -maxDeficit;
