@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { RequestUtils } from './index';
 
 /**
@@ -13,27 +10,20 @@ async function setGutenbergExperiments(
 	this: RequestUtils,
 	experiments: string[]
 ) {
-	const response = await this.request.get(
-		'/wp-admin/admin.php?page=gutenberg-experiments'
-	);
-	const html = await response.text();
-	const nonce = html.match( /name="_wpnonce" value="([^"]+)"/ )![ 1 ];
+	// Build the experiments object with boolean values.
+	// When empty array is passed, we send an empty object to disable all experiments.
+	const experimentsData: Record< string, boolean > = {};
 
-	await this.request.post( '/wp-admin/options.php', {
-		form: {
-			option_page: 'gutenberg-experiments',
-			action: 'update',
-			_wpnonce: nonce,
-			_wp_http_referer: '/wp-admin/admin.php?page=gutenberg-experiments',
-			...Object.fromEntries(
-				experiments.map( ( experiment ) => [
-					`gutenberg-experiments[${ experiment }]`,
-					1,
-				] )
-			),
-			submit: 'Save Changes',
+	for ( const experiment of experiments ) {
+		experimentsData[ experiment ] = true;
+	}
+
+	await this.rest( {
+		path: '/wp/v2/settings',
+		method: 'POST',
+		data: {
+			'gutenberg-experiments': experimentsData,
 		},
-		failOnStatusCode: true,
 	} );
 }
 

@@ -2,18 +2,9 @@
  * Provides sidebar configuration options.
  * See https://storybook.js.org/docs/configure/features-and-behavior
  */
-
-/**
- * External dependencies
- */
-// eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import { createElement, useMemo } from 'react';
-import { useStorybookApi } from '@storybook/manager-api';
-import { styled } from '@storybook/theming';
-
-/**
- * Internal dependencies
- */
+import { useStorybookApi } from 'storybook/manager-api';
+import { styled } from 'storybook/theming';
 import badges from './badges';
 
 const Wrapper = styled.span( {
@@ -61,7 +52,7 @@ function useIcons( item ) {
 					  )
 					: null
 			);
-	}, [ api, item.children, item.isComponent ] );
+	}, [ api, item.children, item.type ] );
 }
 
 /**
@@ -78,4 +69,7 @@ function Label( { item } ) {
 export default {
 	// Renders status icons for items tagged with `status-*`
 	renderLabel: ( item ) => createElement( Label, { item } ),
+
+	// Renders sections as collapsed by default
+	showRoots: false,
 };

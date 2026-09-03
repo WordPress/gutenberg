@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Site Editor List View', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
-	} );
-
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
@@ -19,6 +12,10 @@ test.describe( 'Site Editor List View', () => {
 			postType: 'wp_template_part',
 			canvas: 'edit',
 		} );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test( 'should open by default when preference is enabled', async ( {

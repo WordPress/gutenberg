@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useRef, useInsertionEffect } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import beforeInputRules from './before-input-rules';
 import inputRules from './input-rules';
 import insertReplacementText from './insert-replacement-text';

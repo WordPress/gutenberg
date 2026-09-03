@@ -1,10 +1,7 @@
 /* eslint no-console: [ 'error', { allow: [ 'error', 'warn' ] } ] */
-/**
- * WordPress dependencies
- */
 import {
 	cloneBlock,
-	__experimentalCloneSanitizedBlock,
+	cloneSanitizedBlock,
 	createBlock,
 	doBlocksMatchTemplate,
 	getBlockType,
@@ -22,10 +19,6 @@ import { store as noticesStore } from '@wordpress/notices';
 import { create, insert, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import {
 	retrieveSelectedAttribute,
 	findRichTextAttributeKey,
@@ -34,7 +27,9 @@ import {
 import {
 	__experimentalUpdateSettings,
 	privateRemoveBlocks,
+	editContentOnlySection,
 } from './private-actions';
+import { getSiblingBlockAttributes } from '../utils/sibling-block-attributes';
 
 /** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
 
@@ -87,6 +82,12 @@ export const validateBlocksToTemplate =
 /**
  * A block selection object.
  *
+ * This type is duplicated to avoid creating circular dependencies.
+ *
+ * @see {import("@wordpress/block-editor/src/store/selectors").WPBlockSelection}
+ * @see {import("@wordpress/core-data/src/types").WPBlockSelection}
+ * @see {import("@wordpress/editor/src/store/selectors").WPBlockSelection}
+ *
  * @typedef {Object} WPBlockSelection
  *
  * @property {string} clientId     A block client ID.
@@ -104,7 +105,6 @@ export const validateBlocksToTemplate =
  * @property {WPBlockSelection} end   The selection end.
  */
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Returns an action object used in signalling that selection state should be
  * reset to the specified selection.
@@ -120,7 +120,6 @@ export function resetSelection(
 	selectionEnd,
 	initialPosition
 ) {
-	/* eslint-enable jsdoc/valid-types */
 	return {
 		type: 'RESET_SELECTION',
 		selectionStart,
@@ -155,22 +154,26 @@ export function receiveBlocks( blocks ) {
 /**
  * Action that updates attributes of multiple blocks with the specified client IDs.
  *
- * @param {string|string[]} clientIds     Block client IDs.
- * @param {Object}          attributes    Block attributes to be merged. Should be keyed by clientIds if
- *                                        uniqueByBlock is true.
- * @param {boolean}         uniqueByBlock true if each block in clientIds array has a unique set of attributes
+ * @param {string|string[]} clientIds                     Block client IDs.
+ * @param {Object}          attributes                    Block attributes to be merged. Should be keyed by clientIds if `options.uniqueByBlock` is true.
+ * @param {Object}          options                       Updating options.
+ * @param {boolean}         [options.uniqueByBlock=false] Whether each block in clientIds array has a unique set of attributes.
  * @return {Object} Action object.
  */
 export function updateBlockAttributes(
 	clientIds,
 	attributes,
-	uniqueByBlock = false
+	options = { uniqueByBlock: false }
 ) {
+	if ( typeof options === 'boolean' ) {
+		options = { uniqueByBlock: options };
+	}
+
 	return {
 		type: 'UPDATE_BLOCK_ATTRIBUTES',
 		clientIds: castArray( clientIds ),
 		attributes,
-		uniqueByBlock,
+		options,
 	};
 }
 
@@ -190,7 +193,6 @@ export function updateBlock( clientId, updates ) {
 	};
 }
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Returns an action object used in signalling that the block with the
  * specified client ID has been selected, optionally accepting a position
@@ -198,13 +200,12 @@ export function updateBlock( clientId, updates ) {
  * reflects a reverse selection.
  *
  * @param {string}    clientId        Block client ID.
- * @param {0|-1|null} initialPosition Optional initial position. Pass as -1 to
- *                                    reflect reverse selection.
+ * @param {0|-1|null} initialPosition Optional initial position. Pass -1 to reflect reverse selection
+ *                                    or `null` to prevent focusing the block.
  *
  * @return {Object} Action object.
  */
 export function selectBlock( clientId, initialPosition = 0 ) {
-	/* eslint-enable jsdoc/valid-types */
 	return {
 		type: 'SELECT_BLOCK',
 		initialPosition,
@@ -216,14 +217,15 @@ export function selectBlock( clientId, initialPosition = 0 ) {
  * Returns an action object used in signalling that the block with the
  * specified client ID has been hovered.
  *
- * @param {string} clientId Block client ID.
- *
- * @return {Object} Action object.
+ * @deprecated
  */
-export function hoverBlock( clientId ) {
+export function hoverBlock() {
+	deprecated( 'wp.data.dispatch( "core/block-editor" ).hoverBlock', {
+		since: '6.9',
+		version: '7.1',
+	} );
 	return {
-		type: 'HOVER_BLOCK',
-		clientId,
+		type: 'DO_NOTHING',
 	};
 }
 
@@ -246,6 +248,13 @@ export const selectPreviousBlock =
 			const firstParentClientId = select.getBlockRootClientId( clientId );
 			if ( firstParentClientId ) {
 				dispatch.selectBlock( firstParentClientId, -1 );
+			} else {
+				// Fallback to next block when no previous block and no parent
+				const nextBlockClientId =
+					select.getNextBlockClientId( clientId );
+				if ( nextBlockClientId ) {
+					dispatch.selectBlock( nextBlockClientId, 0 );
+				}
 			}
 		}
 	};
@@ -313,13 +322,31 @@ export const multiSelect =
 		} );
 
 		const blockCount = select.getSelectedBlockCount();
+		const nestedBlockCount = select.getClientIdsOfDescendants(
+			select.getMultiSelectedBlockClientIds()
+		).length;
 
 		speak(
-			sprintf(
-				/* translators: %s: number of selected blocks */
-				_n( '%s block selected.', '%s blocks selected.', blockCount ),
-				blockCount
-			),
+			nestedBlockCount
+				? sprintf(
+						/* translators: 1: number of selected blocks. 2: number of blocks including nested blocks. */
+						_n(
+							'%1$s block selected, %2$s including nested blocks.',
+							'%1$s blocks selected, %2$s including nested blocks.',
+							blockCount
+						),
+						blockCount,
+						blockCount + nestedBlockCount
+				  )
+				: sprintf(
+						/* translators: %s: number of selected blocks */
+						_n(
+							'%s block selected.',
+							'%s blocks selected.',
+							blockCount
+						),
+						blockCount
+				  ),
 			'assertive'
 		);
 	};
@@ -350,7 +377,6 @@ export function toggleSelection( isSelectionEnabled = true ) {
 	};
 }
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Action that replaces given blocks with one or more replacement blocks.
  *
@@ -365,7 +391,6 @@ export function toggleSelection( isSelectionEnabled = true ) {
 export const replaceBlocks =
 	( clientIds, blocks, indexToSelect, initialPosition = 0, meta ) =>
 	( { select, dispatch, registry } ) => {
-		/* eslint-enable jsdoc/valid-types */
 		clientIds = castArray( clientIds );
 		blocks = castArray( blocks );
 		const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
@@ -380,18 +405,26 @@ export const replaceBlocks =
 				return;
 			}
 		}
+		const blocksWithTemplates = applyBlockTypeTemplates( blocks );
 		// We're batching these two actions because an extra `undo/redo` step can
 		// be created, based on whether we insert a default block or not.
 		registry.batch( () => {
 			dispatch( {
 				type: 'REPLACE_BLOCKS',
 				clientIds,
-				blocks,
+				blocks: blocksWithTemplates,
 				time: Date.now(),
 				indexToSelect,
 				initialPosition,
 				meta,
 			} );
+			selectBlockTypeTemplate(
+				select,
+				dispatch,
+				blocks,
+				blocksWithTemplates,
+				initialPosition
+			);
 			// To avoid a focus loss when removing the last block, assure there is
 			// always a default block if the last of the blocks have been removed.
 			dispatch.ensureDefaultBlock();
@@ -510,11 +543,12 @@ export function moveBlockToPosition(
  * Only allowed blocks are inserted. The action may fail silently for blocks that are not allowed or if
  * a templateLock is active on the block list.
  *
- * @param {Object}   block           Block object to insert.
- * @param {?number}  index           Index at which block should be inserted.
- * @param {?string}  rootClientId    Optional root client ID of block list on which to insert.
- * @param {?boolean} updateSelection If true block selection will be updated. If false, block selection will not change. Defaults to true.
- * @param {?Object}  meta            Optional Meta values to be passed to the action object.
+ * @param {Object}    block           Block object to insert.
+ * @param {?number}   index           Index at which block should be inserted.
+ * @param {?string}   rootClientId    Optional root client ID of block list on which to insert.
+ * @param {?boolean}  updateSelection If true block selection will be updated. If false, block selection will not change. Defaults to true.
+ * @param {0|-1|null} initialPosition Initial focus position. Setting it to null prevent focusing the inserted block.
+ * @param {?Object}   meta            Optional Meta values to be passed to the action object.
  *
  * @return {Object} Action object.
  */
@@ -523,6 +557,7 @@ export function insertBlock(
 	index,
 	rootClientId,
 	updateSelection,
+	initialPosition,
 	meta
 ) {
 	return insertBlocks(
@@ -530,12 +565,94 @@ export function insertBlock(
 		index,
 		rootClientId,
 		updateSelection,
-		0,
+		initialPosition,
 		meta
 	);
 }
 
-/* eslint-disable jsdoc/valid-types */
+/**
+ * Applies block type templates to empty blocks. When a block type declares a
+ * `template` in its settings, an empty block of that type receives the
+ * template's child blocks at creation, so insertion needs no follow-up
+ * template synchronization.
+ *
+ * @param {Object[]} blocks        Block objects.
+ * @param {Set}      expandedTypes Block names whose templates are already
+ *                                 being expanded higher up the tree. A
+ *                                 template that transitively contains its
+ *                                 own block type would otherwise expand
+ *                                 forever; the nested occurrence stays
+ *                                 empty instead.
+ *
+ * @return {Object[]} Block objects with templates applied.
+ */
+function applyBlockTypeTemplates( blocks, expandedTypes = new Set() ) {
+	let hasChanges = false;
+	const result = blocks.map( ( block ) => {
+		let { innerBlocks } = block;
+		if ( innerBlocks?.length ) {
+			innerBlocks = applyBlockTypeTemplates( innerBlocks, expandedTypes );
+		} else if ( ! expandedTypes.has( block.name ) ) {
+			const { template } = getBlockType( block.name ) ?? {};
+			if ( template?.length ) {
+				innerBlocks = applyBlockTypeTemplates(
+					synchronizeBlocksWithTemplate( [], template ),
+					new Set( expandedTypes ).add( block.name )
+				);
+			}
+		}
+		if ( innerBlocks === block.innerBlocks ) {
+			return block;
+		}
+		hasChanges = true;
+		return { ...block, innerBlocks };
+	} );
+	return hasChanges ? result : blocks;
+}
+
+/**
+ * Moves the selection into the first inner leaf block of a freshly
+ * scaffolded block, when the block ended up selected and its block type
+ * opts in with `templateInsertUpdatesSelection`. Expects the state to
+ * reflect the insertion, and applies the same selection a template
+ * insertion updates the selection to.
+ *
+ * @param {Function}  select              Store select function.
+ * @param {Function}  dispatch            Store dispatch function.
+ * @param {Object[]}  originalBlocks      Block objects before templates were applied.
+ * @param {Object[]}  blocksWithTemplates Block objects after templates were applied.
+ * @param {0|-1|null} initialPosition     Initial focus position.
+ */
+function selectBlockTypeTemplate(
+	select,
+	dispatch,
+	originalBlocks,
+	blocksWithTemplates,
+	initialPosition
+) {
+	const selectedClientId = select.getSelectedBlockClientId();
+	if ( ! selectedClientId ) {
+		return;
+	}
+	const index = blocksWithTemplates.findIndex(
+		( block ) => block.clientId === selectedClientId
+	);
+	if (
+		index === -1 ||
+		blocksWithTemplates[ index ] === originalBlocks[ index ] ||
+		! blocksWithTemplates[ index ].innerBlocks.length ||
+		! getBlockType( blocksWithTemplates[ index ].name )
+			?.templateInsertUpdatesSelection
+	) {
+		return;
+	}
+	let block = blocksWithTemplates[ index ];
+	while ( block.innerBlocks[ 0 ] ) {
+		block = block.innerBlocks[ 0 ];
+	}
+	dispatch.selectBlock( block.clientId, initialPosition );
+}
+
 /**
  * Action that inserts an array of blocks, optionally at a specific index respective a root block list.
  *
@@ -560,8 +677,7 @@ export const insertBlocks =
 		initialPosition = 0,
 		meta
 	) =>
-	( { select, dispatch } ) => {
-		/* eslint-enable jsdoc/valid-types */
+	( { select, dispatch, registry } ) => {
 		if ( initialPosition !== null && typeof initialPosition === 'object' ) {
 			meta = initialPosition;
 			initialPosition = 0;
@@ -586,15 +702,26 @@ export const insertBlocks =
 			}
 		}
 		if ( allowedBlocks.length ) {
-			dispatch( {
-				type: 'INSERT_BLOCKS',
-				blocks: allowedBlocks,
-				index,
-				rootClientId,
-				time: Date.now(),
-				updateSelection,
-				initialPosition: updateSelection ? initialPosition : null,
-				meta,
+			const blocksWithTemplates =
+				applyBlockTypeTemplates( allowedBlocks );
+			registry.batch( () => {
+				dispatch( {
+					type: 'INSERT_BLOCKS',
+					blocks: blocksWithTemplates,
+					index,
+					rootClientId,
+					time: Date.now(),
+					updateSelection,
+					initialPosition: updateSelection ? initialPosition : null,
+					meta,
+				} );
+				selectBlockTypeTemplate(
+					select,
+					dispatch,
+					allowedBlocks,
+					blocksWithTemplates,
+					initialPosition
+				);
 			} );
 		}
 	};
@@ -809,6 +936,8 @@ export const __unstableDeleteSelection =
 					...targetBlock.attributes,
 					...updatedAttributes,
 				},
+				// Block A's inner blocks sit inside the selection; only B's survive.
+				innerBlocks: blockB.innerBlocks,
 			},
 			...( isForward ? [] : blocksWithTheSameType ),
 		];
@@ -925,7 +1054,7 @@ export const __unstableSplitSelection =
 			// If an unmodified default block is selected, replace it. We don't
 			// want to be converting into a default block.
 			if ( blocks.length ) {
-				if ( isUnmodifiedDefaultBlock( blockA ) ) {
+				if ( isUnmodifiedDefaultBlock( blockA, 'content' ) ) {
 					dispatch.replaceBlocks(
 						[ selectionA.clientId ],
 						blocks,
@@ -941,14 +1070,19 @@ export const __unstableSplitSelection =
 			else if ( ! select.getBlockOrder( selectionA.clientId ).length ) {
 				function createEmpty() {
 					const defaultBlockName = getDefaultBlockName();
-					return select.canInsertBlockType(
-						defaultBlockName,
-						anchorRootClientId
-					)
-						? createBlock( defaultBlockName )
-						: createBlock(
-								select.getBlockName( selectionA.clientId )
-						  );
+					if (
+						select.canInsertBlockType(
+							defaultBlockName,
+							anchorRootClientId
+						)
+					) {
+						return createBlock( defaultBlockName );
+					}
+					const name = select.getBlockName( selectionA.clientId );
+					return createBlock(
+						name,
+						getSiblingBlockAttributes( name, blockAttributes )
+					);
 				}
 
 				const length = blockAttributes[ attributeKeyA ].length;
@@ -1237,11 +1371,30 @@ export const mergeBlocks =
 			return;
 		}
 
-		if ( isUnmodifiedDefaultBlock( blockA ) ) {
-			dispatch.removeBlock(
-				clientIdA,
-				select.isBlockSelected( clientIdA )
-			);
+		// An unmodified default block adds nothing to the merge. Neither
+		// does an empty text block of a different type, where merging would
+		// transform blockB into blockA's type instead (a paragraph deleted
+		// into an empty heading became a heading), so remove blockA in both
+		// cases. The merge function requirement keeps containers out: a
+		// columns block has no content attributes, so it would otherwise
+		// always count as empty and be removed on Backspace instead of
+		// selected.
+		if (
+			isUnmodifiedDefaultBlock( blockA ) ||
+			( !! blockAType.merge &&
+				blockA.name !== blockB.name &&
+				isUnmodifiedBlock( blockA, 'content' ) )
+		) {
+			const isASelected = select.isBlockSelected( clientIdA );
+
+			if ( isASelected ) {
+				registry.batch( () => {
+					dispatch.removeBlock( clientIdA, false );
+					dispatch.selectBlock( clientIdB, 0 );
+				} );
+			} else {
+				dispatch.removeBlock( clientIdA, false );
+			}
 			return;
 		}
 
@@ -1254,7 +1407,14 @@ export const mergeBlocks =
 		}
 
 		if ( ! blockAType.merge ) {
-			dispatch.selectBlock( blockA.clientId );
+			if ( isUnmodifiedBlock( blockB, 'content' ) ) {
+				dispatch.removeBlock(
+					clientIdB,
+					select.isBlockSelected( clientIdB )
+				);
+			} else {
+				dispatch.selectBlock( blockA.clientId );
+			}
 			return;
 		}
 
@@ -1388,7 +1548,6 @@ export function removeBlock( clientId, selectPrevious ) {
 	return removeBlocks( [ clientId ], selectPrevious );
 }
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Returns an action object used in signalling that the inner blocks with the
  * specified client ID should be replaced.
@@ -1405,7 +1564,6 @@ export function replaceInnerBlocks(
 	updateSelection = false,
 	initialPosition = 0
 ) {
-	/* eslint-enable jsdoc/valid-types */
 	return {
 		type: 'REPLACE_INNER_BLOCKS',
 		rootClientId,
@@ -1604,16 +1762,17 @@ export function updateSettings( settings ) {
  * Action that signals that a temporary reusable block has been saved
  * in order to switch its temporary id with the real id.
  *
- * @param {string} id        Reusable block's id.
- * @param {string} updatedId Updated block's id.
- *
- * @return {Object} Action object.
+ * @deprecated
  */
-export function __unstableSaveReusableBlock( id, updatedId ) {
+export function __unstableSaveReusableBlock() {
+	deprecated(
+		'wp.data.dispatch( "core/block-editor" ).__unstableSaveReusableBlock',
+		{
+			since: '7.1',
+		}
+	);
 	return {
-		type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
-		id,
-		updatedId,
+		type: 'DO_NOTHING',
 	};
 }
 
@@ -1627,12 +1786,20 @@ export function __unstableMarkLastChangeAsPersistent() {
 }
 
 /**
- * Action that signals that the next block change should be marked explicitly as not persistent.
+ * Action that signals that the next block change should be marked explicitly
+ * as not persistent.
  *
+ * By default, non-persistent changes may still merge into undo history. Use
+ * `history: 'ignore'` for derived changes that should never be captured by undo.
+ *
+ * @param {Object} options         Options object.
+ * @param {string} options.history How the change should interact with history.
  * @return {Object} Action object.
  */
-export function __unstableMarkNextChangeAsNotPersistent() {
-	return { type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT' };
+export function __unstableMarkNextChangeAsNotPersistent( {
+	history = 'merge',
+} = {} ) {
+	return { type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT', history };
 }
 
 /**
@@ -1651,19 +1818,6 @@ export const __unstableMarkAutomaticChange =
 		requestIdleCallback( () => {
 			dispatch( { type: 'MARK_AUTOMATIC_CHANGE_FINAL' } );
 		} );
-	};
-
-/**
- * Action that enables or disables the navigation mode.
- *
- * @param {boolean} isNavigationMode Enable/Disable navigation mode.
- */
-export const setNavigationMode =
-	( isNavigationMode = true ) =>
-	( { dispatch } ) => {
-		dispatch.__unstableSetEditorMode(
-			isNavigationMode ? 'navigation' : 'edit'
-		);
 	};
 
 /**
@@ -1739,7 +1893,7 @@ export const duplicateBlocks =
 			clientIdsArray[ clientIdsArray.length - 1 ]
 		);
 		const clonedBlocks = blocks.map( ( block ) =>
-			__experimentalCloneSanitizedBlock( block )
+			cloneSanitizedBlock( block )
 		);
 		dispatch.insertBlocks(
 			clonedBlocks,
@@ -1768,33 +1922,24 @@ export const insertBeforeBlock =
 			return;
 		}
 		const rootClientId = select.getBlockRootClientId( clientId );
-		const isLocked = select.getTemplateLock( rootClientId );
-		if ( isLocked ) {
-			return;
-		}
 
 		const blockIndex = select.getBlockIndex( clientId );
-		const directInsertBlock = rootClientId
-			? select.getDirectInsertBlock( rootClientId )
-			: null;
+		const { defaultBlock: directInsertBlock } = rootClientId
+			? select.getBlockListSettings( rootClientId ) ?? {}
+			: {};
 
 		if ( ! directInsertBlock ) {
 			return dispatch.insertDefaultBlock( {}, rootClientId, blockIndex );
 		}
 
-		const copiedAttributes = {};
-		if ( directInsertBlock.attributesToCopy ) {
-			const attributes = select.getBlockAttributes( clientId );
-			directInsertBlock.attributesToCopy.forEach( ( key ) => {
-				if ( attributes[ key ] ) {
-					copiedAttributes[ key ] = attributes[ key ];
-				}
-			} );
-		}
-
 		const block = createBlock( directInsertBlock.name, {
 			...directInsertBlock.attributes,
-			...copiedAttributes,
+			...( select.getBlockName( clientId ) === directInsertBlock.name
+				? getSiblingBlockAttributes(
+						directInsertBlock.name,
+						select.getBlockAttributes( clientId )
+				  )
+				: {} ),
 		} );
 		return dispatch.insertBlock( block, blockIndex, rootClientId );
 	};
@@ -1811,15 +1956,11 @@ export const insertAfterBlock =
 			return;
 		}
 		const rootClientId = select.getBlockRootClientId( clientId );
-		const isLocked = select.getTemplateLock( rootClientId );
-		if ( isLocked ) {
-			return;
-		}
 
 		const blockIndex = select.getBlockIndex( clientId );
-		const directInsertBlock = rootClientId
-			? select.getDirectInsertBlock( rootClientId )
-			: null;
+		const { defaultBlock: directInsertBlock } = rootClientId
+			? select.getBlockListSettings( rootClientId ) ?? {}
+			: {};
 
 		if ( ! directInsertBlock ) {
 			return dispatch.insertDefaultBlock(
@@ -1829,19 +1970,14 @@ export const insertAfterBlock =
 			);
 		}
 
-		const copiedAttributes = {};
-		if ( directInsertBlock.attributesToCopy ) {
-			const attributes = select.getBlockAttributes( clientId );
-			directInsertBlock.attributesToCopy.forEach( ( key ) => {
-				if ( attributes[ key ] ) {
-					copiedAttributes[ key ] = attributes[ key ];
-				}
-			} );
-		}
-
 		const block = createBlock( directInsertBlock.name, {
 			...directInsertBlock.attributes,
-			...copiedAttributes,
+			...( select.getBlockName( clientId ) === directInsertBlock.name
+				? getSiblingBlockAttributes(
+						directInsertBlock.name,
+						select.getBlockAttributes( clientId )
+				  )
+				: {} ),
 		} );
 		return dispatch.insertBlock( block, blockIndex + 1, rootClientId );
 	};
@@ -1864,12 +2000,13 @@ export function toggleBlockHighlight( clientId, isHighlighted ) {
  * Action that "flashes" the block with a given `clientId` by rhythmically highlighting it.
  *
  * @param {string} clientId Target block client ID.
+ * @param {number} timeout  Duration in milliseconds to keep the highlight. Defaults to 150ms.
  */
 export const flashBlock =
-	( clientId ) =>
+	( clientId, timeout = 150 ) =>
 	async ( { dispatch } ) => {
 		dispatch( toggleBlockHighlight( clientId, true ) );
-		await new Promise( ( resolve ) => setTimeout( resolve, 150 ) );
+		await new Promise( ( resolve ) => setTimeout( resolve, timeout ) );
 		dispatch( toggleBlockHighlight( clientId, false ) );
 	};
 
@@ -1909,18 +2046,16 @@ export function setBlockVisibility( updates ) {
  * This action is created for internal/experimental only usage and may be
  * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
  *
- * @param {?string} temporarilyEditingAsBlocks The block's clientId being temporarily edited as blocks.
- * @param {?string} focusModeToRevert          The focus mode to revert after temporarily edit as blocks finishes.
+ * @param {?string} clientId The clientId of the block being temporarily edited.
  */
-export function __unstableSetTemporarilyEditingAsBlocks(
-	temporarilyEditingAsBlocks,
-	focusModeToRevert
-) {
-	return {
-		type: 'SET_TEMPORARILY_EDITING_AS_BLOCKS',
-		temporarilyEditingAsBlocks,
-		focusModeToRevert,
-	};
+export function __unstableSetTemporarilyEditingAsBlocks( clientId ) {
+	deprecated(
+		"wp.data.dispatch( 'core/block-editor' ).__unstableSetTemporarilyEditingAsBlocks",
+		{
+			since: '7.0',
+		}
+	);
+	return editContentOnlySection( clientId );
 }
 
 /**
@@ -1928,6 +2063,7 @@ export function __unstableSetTemporarilyEditingAsBlocks(
  *
  * @typedef {Object} InserterMediaRequest
  * @property {number} per_page How many items to fetch per page.
+ * @property {number} [page]   Which page of results to fetch. Defaults to the first page.
  * @property {string} search   The search term to use for filtering the results.
  */
 
@@ -1947,6 +2083,17 @@ export function __unstableSetTemporarilyEditingAsBlocks(
  */
 
 /**
+ * Interface for paginated inserter media responses. A media category's `fetch`
+ * may return this instead of a plain array to opt into pagination, in which case
+ * the media tab renders paging controls for the category.
+ *
+ * @typedef {Object} InserterMediaResponse
+ * @property {InserterMediaItem[]} mediaItems The media items for the requested page.
+ * @property {number}              totalItems The total number of items across all pages.
+ * @property {number}              totalPages The total number of pages available.
+ */
+
+/**
  * Registers a new inserter media category. Once registered, the media category is
  * available in the inserter's media tab.
  *
@@ -1959,6 +2106,7 @@ export function __unstableSetTemporarilyEditingAsBlocks(
  * _Properties_
  *
  * - _per_page_ `number`: How many items to fetch per page.
+ * - _page_ `[number]`: Which page of results to fetch. Defaults to the first page.
  * - _search_ `string`: The search term to use for filtering the results.
  *
  * _Type Definition_
@@ -1977,7 +2125,19 @@ export function __unstableSetTemporarilyEditingAsBlocks(
  * - _alt_ `[string]`: The alt text of the media item.
  * - _caption_ `[string]`: The caption of the media item.
  *
- * @param    {InserterMediaCategory}                                  category                       The inserter media category to register.
+ * _Type Definition_
+ *
+ * - _InserterMediaResponse_ `Object`: Interface for paginated inserter media responses. A media
+ * category's `fetch` may return this instead of a plain array to opt into pagination, in which
+ * case the media tab renders paging controls for the category.
+ *
+ * _Properties_
+ *
+ * - _mediaItems_ `InserterMediaItem[]`: The media items for the requested page.
+ * - _totalItems_ `number`: The total number of items across all pages.
+ * - _totalPages_ `number`: The total number of pages available.
+ *
+ * @param    {InserterMediaCategory}                                                        category                       The inserter media category to register.
  *
  * @example
  * ```js
@@ -2034,16 +2194,20 @@ export function __unstableSetTemporarilyEditingAsBlocks(
  * ```
  *
  * @typedef {Object} InserterMediaCategory Interface for inserter media category.
- * @property {string}                                                 name                           The name of the media category, that should be unique among all media categories.
- * @property {Object}                                                 labels                         Labels for the media category.
- * @property {string}                                                 labels.name                    General name of the media category. It's used in the inserter media items list.
- * @property {string}                                                 [labels.search_items='Search'] Label for searching items. Default is ‘Search Posts’ / ‘Search Pages’.
- * @property {('image'|'audio'|'video')}                              mediaType                      The media type of the media category.
- * @property {(InserterMediaRequest) => Promise<InserterMediaItem[]>} fetch                          The function to fetch media items for the category.
- * @property {(InserterMediaItem) => string}                          [getReportUrl]                 If the media category supports reporting media items, this function should return
- *                                                                                                   the report url for the media item. It accepts the `InserterMediaItem` as an argument.
- * @property {boolean}                                                [isExternalResource]           If the media category is an external resource, this should be set to true.
- *                                                                                                   This is used to avoid making a request to the external resource when the user
+ * @property {string}                                                                       name                           The name of the media category, that should be unique among all media categories.
+ * @property {Object}                                                                       labels                         Labels for the media category.
+ * @property {string}                                                                       labels.name                    General name of the media category. It's used in the inserter media items list.
+ * @property {string}                                                                       [labels.search_items='Search'] Label for searching items. Default is ‘Search Posts’ / ‘Search Pages’.
+ * @property {('image'|'audio'|'video')}                                                    mediaType                      The media type of the media category.
+ * @property {(InserterMediaRequest) => Promise<InserterMediaItem[]|InserterMediaResponse>} fetch                          The function to fetch media items for the category. Returning an
+ *                                                                                                                         `InserterMediaResponse` instead of a plain array opts the category into
+ *                                                                                                                         pagination.
+ * @property {(InserterMediaItem) => string}                                                [getReportUrl]                 If the media category supports reporting media items, this function should return
+ *                                                                                                                         the report url for the media item. It accepts the `InserterMediaItem` as an argument.
+ * @property {boolean}                                                                      [isExternalResource]           If the media category is an external resource, this should be set to true.
+ *                                                                                                                         This is used to avoid making a request to the external resource when checking
+ *                                                                                                                         whether the category has any media items to display in the media tab.
+ * @property {string}                                                                       [emptyMessage]                 Optional message shown in place of the generic "No results found." when the source has no items and there is no active search. Providing it also keeps the source in the tab list while empty, so the message stays reachable.
  */
 export const registerInserterMediaCategory =
 	( category ) =>
@@ -2072,7 +2236,7 @@ export const registerInserterMediaCategory =
 		}
 		if ( ! category.fetch || typeof category.fetch !== 'function' ) {
 			console.error(
-				'Category should have a `fetch` function defined with the following signature `(InserterMediaRequest) => Promise<InserterMediaItem[]>`.'
+				'Category should have a `fetch` function defined with the following signature `(InserterMediaRequest) => Promise<InserterMediaItem[]|InserterMediaResponse>`.'
 			);
 			return;
 		}
@@ -2144,5 +2308,60 @@ export function unsetBlockEditingMode( clientId = '' ) {
 	return {
 		type: 'UNSET_BLOCK_EDITING_MODE',
 		clientId,
+	};
+}
+
+/**
+ * Sets which List View panel should be opened.
+ *
+ * @param {string|null} clientId The client ID of the panel to open, or null to close all.
+ * @return {Object} Action object.
+ */
+export function __unstableSetOpenListViewPanel( clientId ) {
+	return {
+		type: 'SET_OPEN_LIST_VIEW_PANEL',
+		clientId,
+	};
+}
+
+/**
+ * Sets all List View panels to be opened.
+ *
+ * @return {Object} Action object.
+ */
+export function __unstableSetAllListViewPanelsOpen() {
+	return {
+		type: 'SET_ALL_LIST_VIEW_PANELS_OPEN',
+	};
+}
+
+/**
+ * Toggles a List View panel open/closed state.
+ *
+ * @param {string}  clientId The client ID of the panel to toggle.
+ * @param {boolean} isOpen   Whether the panel should be open.
+ * @return {Object} Action object.
+ */
+export function __unstableToggleListViewPanel( clientId, isOpen ) {
+	return {
+		type: 'TOGGLE_LIST_VIEW_PANEL',
+		clientId,
+		isOpen,
+	};
+}
+
+/**
+ * Increments the List View expand revision to force re-render.
+ *
+ * This action increments a counter that is used in the ListView component's key prop.
+ * When the key changes, the component will remount with a fresh expanded state,
+ * ensuring parent blocks show their children. For example, after click-through
+ * navigation.
+ *
+ * @return {Object} Action object.
+ */
+export function __unstableIncrementListViewExpandRevision() {
+	return {
+		type: 'INCREMENT_LIST_VIEW_EXPAND_REVISION',
 	};
 }

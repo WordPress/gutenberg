@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useRef, useEffect } from '@wordpress/element';
 import { useCopyToClipboard } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import Button from '../button';
 import type { ClipboardButtonProps } from './types';
 import type { WordPressComponentProps } from '../context';
@@ -32,7 +21,7 @@ export default function ClipboardButton( {
 		alternative: 'wp.compose.useCopyToClipboard',
 	} );
 
-	const timeoutIdRef = useRef< NodeJS.Timeout >();
+	const timeoutIdRef = useRef< ReturnType< typeof setTimeout > >( undefined );
 	const ref = useCopyToClipboard( text, () => {
 		onCopy();
 		if ( timeoutIdRef.current ) {
@@ -65,6 +54,8 @@ export default function ClipboardButton( {
 	};
 
 	return (
+		// Disable reasons: the parent component takes care of the __next40pxDefaultSize prop.
+		// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
 		<Button
 			{ ...buttonProps }
 			className={ classes }

@@ -1,7 +1,6 @@
-'use strict';
-/**
- * Internal dependencies
- */
+import { createRequire } from 'node:module';
+import { describe, expect, it } from 'vitest';
+const require = createRequire( import.meta.url );
 const {
 	ValidationError,
 	checkString,
@@ -330,10 +329,10 @@ describe( 'validate-config', () => {
 
 		it( 'passes for valid URLs', () => {
 			expect( () =>
-				checkValidURL( 'test.json', 'test', 'http://test.com' )
+				checkValidURL( 'test.json', 'test', 'http://example.com' )
 			).not.toThrow();
 			expect( () =>
-				checkValidURL( 'test.json', 'test', 'https://test.com' )
+				checkValidURL( 'test.json', 'test', 'https://example.com' )
 			).not.toThrow();
 			expect( () =>
 				checkValidURL( 'test.json', 'test', 'http://test' )
@@ -346,16 +345,13 @@ describe( 'validate-config', () => {
 				)
 			).not.toThrow();
 			expect( () =>
-				checkValidURL( 'test.json', 'test', 'http://test.co.uk' )
-			).not.toThrow();
-			expect( () =>
-				checkValidURL( 'test.json', 'test', 'https://test.co.uk:8888' )
+				checkValidURL( 'test.json', 'test', 'https://example.org:8888' )
 			).not.toThrow();
 			expect( () =>
 				checkValidURL(
 					'test.json',
 					'test',
-					'http://test.co.uk:8888/test?test=test#test'
+					'http://example.org:8888/test?test=test#test'
 				)
 			).not.toThrow();
 		} );

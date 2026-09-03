@@ -1,17 +1,10 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
-import {
-	cloneBlock,
-	getBlockSupport,
-	store as blocksStore,
-} from '@wordpress/blocks';
+import { cloneBlock, store as blocksStore } from '@wordpress/blocks';
 
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
 /** @typedef {import('@wordpress/components/build-types/query-controls/types').OrderByOption} OrderByOption */
@@ -189,7 +182,7 @@ export function useIsPostTypeHierarchical( postType ) {
 }
 
 /**
- * List of avaiable options to order by.
+ * List of available options to order by.
  *
  * @param {string} postType The post type to check.
  * @return {OrderByOption[]} List of order options.
@@ -434,30 +427,19 @@ export const usePatterns = ( clientId, name ) => {
 };
 
 /**
- * The object returned by useUnsupportedBlocks with info about the type of
- * unsupported blocks present inside the Query block.
- *
- * @typedef  {Object}  UnsupportedBlocksInfo
- * @property {boolean} hasBlocksFromPlugins True if blocks from plugins are present.
- * @property {boolean} hasPostContentBlock  True if a 'core/post-content' block is present.
- * @property {boolean} hasUnsupportedBlocks True if there are any unsupported blocks.
- */
-
-/**
- * Hook that returns an object with information about the unsupported blocks
- * present inside a Query Loop with the given `clientId`. The returned object
- * contains props that are true when a certain type of unsupported block is
- * present.
+ * Hook that, given a block clientId, returns the titles of the unsupported
+ * blocks it contains, without duplicates.
  *
  * @param {string} clientId The block's client ID.
- * @return {UnsupportedBlocksInfo} The object containing the information.
+ * @return {string[]} The titles of the unsupported blocks.
  */
 export const useUnsupportedBlocks = ( clientId ) => {
 	return useSelect(
 		( select ) => {
 			const { getClientIdsOfDescendants, getBlockName } =
 				select( blockEditorStore );
-			const blocks = {};
+			const { getBlockSupport, getBlockType } = select( blocksStore );
+			const blockTitles = new Set();
 			getClientIdsOfDescendants( clientId ).forEach(
 				( descendantClientId ) => {
 					const blockName = getBlockName( descendantClientId );
@@ -475,19 +457,18 @@ export const useUnsupportedBlocks = ( clientId ) => {
 							blockName,
 							'interactivity.clientNavigation'
 						);
-					const blockInteractivity =
-						blockSupportsInteractivity ||
-						blockSupportsInteractivityClientNavigation;
-					if ( ! blockInteractivity ) {
-						blocks.hasBlocksFromPlugins = true;
-					} else if ( blockName === 'core/post-content' ) {
-						blocks.hasPostContentBlock = true;
+
+					if (
+						! blockSupportsInteractivity &&
+						! blockSupportsInteractivityClientNavigation
+					) {
+						blockTitles.add(
+							getBlockType( blockName )?.title || blockName
+						);
 					}
 				}
 			);
-			blocks.hasUnsupportedBlocks =
-				blocks.hasBlocksFromPlugins || blocks.hasPostContentBlock;
-			return blocks;
+			return [ ...blockTitles ];
 		},
 		[ clientId ]
 	);

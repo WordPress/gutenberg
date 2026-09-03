@@ -1,18 +1,12 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-import { edit } from '@wordpress/icons';
+import { pencil, drawerRight } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-
-/**
- * Internal dependencies
- */
+import { addQueryArgs } from '@wordpress/url';
 import { PATTERN_TYPES } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 
-const { useHistory } = unlock( routerPrivateApis );
+const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 export const useEditPostAction = () => {
 	const history = useHistory();
@@ -20,8 +14,7 @@ export const useEditPostAction = () => {
 		() => ( {
 			id: 'edit-post',
 			label: __( 'Edit' ),
-			isPrimary: true,
-			icon: edit,
+			icon: pencil,
 			isEligible( post ) {
 				if ( post.status === 'trash' ) {
 					return false;
@@ -35,5 +28,36 @@ export const useEditPostAction = () => {
 			},
 		} ),
 		[ history ]
+	);
+};
+
+export const useQuickEditPostAction = () => {
+	const history = useHistory();
+	const { path, query } = useLocation();
+	return useMemo(
+		() => ( {
+			id: 'quick-edit',
+			label: __( 'Quick Edit' ),
+			icon: drawerRight,
+			isPrimary: true,
+			supportsBulk: true,
+			isEligible( post ) {
+				if ( post.status === 'trash' ) {
+					return false;
+				}
+
+				return post.type === 'page';
+			},
+			callback( items ) {
+				history.navigate(
+					addQueryArgs( path, {
+						...query,
+						quickEdit: true,
+						postId: items.map( ( item ) => item.id ).join( ',' ),
+					} )
+				);
+			},
+		} ),
+		[ history, path, query ]
 	);
 };

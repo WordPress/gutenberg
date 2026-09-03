@@ -2,6 +2,90 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Prevent Highlight format toolbar from crashing when switching to Edit as HTML with background-only formatting active. ([#82215](https://github.com/WordPress/gutenberg/pull/82215))
+
+### Internal
+
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+-   Migrate the package to TypeScript ([#79486](https://github.com/WordPress/gutenberg/pull/79486)).
+
+## 5.54.0 (2026-08-26)
+
+### Internal
+
+-   Math format: Use `ValidatedInputControl` from `@wordpress/ui` in the LaTeX popover instead of unlocking `ValidatedInputControl` from the `@wordpress/components` private APIs ([#81627](https://github.com/WordPress/gutenberg/pull/81627)).
+
+## 5.53.0 (2026-08-12)
+
+
+## 5.52.0 (2026-07-29)
+
+## 5.51.0 (2026-07-14)
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 5.50.0 (2026-07-01)
+
+## 5.49.0 (2026-06-24)
+
+### Enhancements
+
+-   Math format: seed the LaTeX input from the current selection when marking text as math, and toggle an active math object back to its LaTeX source when the button is clicked again. ([79052](https://github.com/WordPress/gutenberg/pull/79052))
+
+## 5.48.1 (2026-06-16)
+
+## 5.48.0 (2026-06-10)
+
+## 5.47.0 (2026-05-27)
+
+## 5.46.0 (2026-05-14)
+
+## 5.45.0 (2026-04-29)
+
+## 5.44.0 (2026-04-15)
+
+## 5.43.0 (2026-04-01)
+
+## 5.42.0 (2026-03-18)
+
+## 5.41.0 (2026-03-04)
+
+## 5.40.0 (2026-02-18)
+
+## 5.39.0 (2026-01-29)
+
+## 5.38.0 (2026-01-16)
+
+## 5.36.0 (2025-11-26)
+
+## 5.35.0 (2025-11-12)
+
+## 5.34.0 (2025-10-29)
+
+## 5.33.0 (2025-10-17)
+
+## 5.32.0 (2025-10-01)
+
+## 5.31.0 (2025-09-17)
+
+## 5.30.0 (2025-09-03)
+
+## 5.29.0 (2025-08-20)
+
+## 5.28.0 (2025-08-07)
+
+## 5.27.0 (2025-07-23)
+
+## 5.26.0 (2025-06-25)
+
+## 5.25.0 (2025-06-04)
+
+## 5.24.0 (2025-05-22)
+
 ## 5.23.0 (2025-05-07)
 
 ## 5.22.0 (2025-04-11)

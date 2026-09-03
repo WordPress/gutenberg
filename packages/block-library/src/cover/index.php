@@ -16,12 +16,133 @@
  * @return string Returns the cover block markup, if useFeaturedImage is true.
  */
 function render_block_core_cover( $attributes, $content ) {
+	// Handle embed video background.
+	if (
+		isset( $attributes['backgroundType'] ) &&
+		'embed-video' === $attributes['backgroundType'] &&
+		isset( $attributes['url'] ) &&
+		! empty( $attributes['url'] ) &&
+		is_string( $attributes['url'] )
+	) {
+		$url = $attributes['url'];
+
+		// Use WordPress's native oEmbed processing (includes caching).
+		$oembed_html = wp_oembed_get( $url );
+
+		if ( $oembed_html ) {
+			// Extract iframe src from the oEmbed HTML.
+			preg_match( '/src=["\']([^"\']+)["\']/', $oembed_html, $src_matches );
+			if ( ! empty( $src_matches[1] ) ) {
+				$iframe_src = $src_matches[1];
+
+				// Detect provider from iframe src URL.
+				$lower_src = strtolower( $iframe_src );
+				$provider  = null;
+
+				if ( str_contains( $lower_src, 'youtube.com' ) || str_contains( $lower_src, 'youtu.be' ) ) {
+					$provider = 'youtube';
+				} elseif ( str_contains( $lower_src, 'vimeo.com' ) ) {
+					$provider = 'vimeo';
+				} elseif ( str_contains( $lower_src, 'videopress.com' ) ) {
+					$provider = 'videopress';
+				} elseif ( str_contains( $lower_src, 'wordpress.tv' ) ) {
+					$provider = 'wordpress-tv';
+				}
+
+				// Modify iframe src to add background video parameters based on provider.
+				$parsed_url = wp_parse_url( $iframe_src );
+				if ( $parsed_url && isset( $parsed_url['host'] ) ) {
+					// Parse existing query parameters.
+					$query_params = array();
+					if ( isset( $parsed_url['query'] ) ) {
+						parse_str( $parsed_url['query'], $query_params );
+					}
+
+					// Add background video parameters based on provider.
+					if ( 'youtube' === $provider ) {
+						$query_params['autoplay']       = '1';
+						$query_params['mute']           = '1';
+						$query_params['loop']           = '1';
+						$query_params['controls']       = '0';
+						$query_params['modestbranding'] = '1';
+						$query_params['playsinline']    = '1';
+
+						// For loop to work, we need the playlist parameter.
+						$path          = $parsed_url['path'] ?? '';
+						$path_segments = explode( '/', $path );
+						$video_id      = end( $path_segments );
+						if ( $video_id ) {
+								$query_params['playlist'] = $video_id;
+						}
+					} elseif ( 'vimeo' === $provider ) {
+						$query_params['autoplay']    = '1';
+						$query_params['muted']       = '1';
+						$query_params['loop']        = '1';
+						$query_params['background']  = '1';
+						$query_params['controls']    = '0';
+						$query_params['transparent'] = '0';
+					} elseif ( 'videopress' === $provider || 'wordpress-tv' === $provider ) {
+						$query_params['autoplay'] = '1';
+						$query_params['loop']     = '1';
+						$query_params['muted']    = '1';
+					}
+
+					// Rebuild the URL with new parameters.
+					$iframe_src = $parsed_url['scheme'] . '://' . $parsed_url['host'];
+					if ( isset( $parsed_url['path'] ) ) {
+						$iframe_src .= $parsed_url['path'];
+					}
+					if ( ! empty( $query_params ) ) {
+						$iframe_src .= '?' . http_build_query( $query_params );
+					}
+				}
+
+				// Build the iframe HTML that will replace the figure.
+				$iframe_html = sprintf(
+					'<div class="wp-block-cover__video-background wp-block-cover__embed-background"><iframe src="%s" title="Background video" frameborder="0" allow="autoplay; fullscreen"></iframe></div>',
+					esc_url( $iframe_src )
+				);
+
+				// Use the HTML API to find and replace the figure.wp-block-embed element.
+				$processor = new WP_HTML_Tag_Processor( $content );
+
+				if ( $processor->next_tag(
+					array(
+						'tag_name'   => 'FIGURE',
+						'class_name' => 'wp-block-embed',
+					)
+				) ) {
+					// Use regex with PREG_OFFSET_CAPTURE to find the position of the figure element.
+					// This follows the same pattern used for featured image insertion below.
+					$figure_pattern = '/<figure\s+[^>]*\bwp-block-embed\b[^>]*>.*?<\/figure>/is';
+					if ( 1 === preg_match( $figure_pattern, $content, $matches, PREG_OFFSET_CAPTURE ) ) {
+						$figure_start  = $matches[0][1];
+						$figure_length = strlen( $matches[0][0] );
+						$figure_end    = $figure_start + $figure_length;
+
+						// Replace the figure element with the iframe HTML.
+						$content = substr( $content, 0, $figure_start ) . $iframe_html . substr( $content, $figure_end );
+					}
+				}
+			}
+		}
+
+		return $content;
+	}
+
 	if ( 'image' !== $attributes['backgroundType'] || false === $attributes['useFeaturedImage'] ) {
 		return $content;
 	}
 
-	$object_position = isset( $attributes['focalPoint'] )
-		? round( $attributes['focalPoint']['x'] * 100 ) . '% ' . round( $attributes['focalPoint']['y'] * 100 ) . '%'
+	$cover_focal_point = $attributes['focalPoint'] ?? null;
+	$focal_point_x     = null;
+	$focal_point_y     = null;
+	if ( is_array( $cover_focal_point ) ) {
+		$focal_point_x = isset( $cover_focal_point['x'] ) && is_numeric( $cover_focal_point['x'] ) ? $cover_focal_point['x'] : null;
+		$focal_point_y = isset( $cover_focal_point['y'] ) && is_numeric( $cover_focal_point['y'] ) ? $cover_focal_point['y'] : null;
+	}
+	$object_position = null !== $focal_point_x && null !== $focal_point_y
+		? round( $focal_point_x * 100 ) . '% ' . round( $focal_point_y * 100 ) . '%'
 		: null;
 
 	if ( ! ( $attributes['hasParallax'] || $attributes['isRepeated'] ) ) {
@@ -40,7 +161,7 @@ function render_block_core_cover( $attributes, $content ) {
 		if ( in_the_loop() ) {
 			update_post_thumbnail_cache();
 		}
-		$current_featured_image = get_the_post_thumbnail_url( null, $attributes['sizeSlug'] ?? null );
+		$current_featured_image = get_the_post_thumbnail_url( null, $attributes['sizeSlug'] ?? 'full' );
 		if ( ! $current_featured_image ) {
 			return $content;
 		}

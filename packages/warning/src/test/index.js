@@ -1,10 +1,8 @@
-/**
- * Internal dependencies
- */
+import { afterEach, describe, expect, it } from 'vitest';
 import warning from '..';
 import { logged } from '../utils';
 
-// eslint-disable-next-line eslint-comments/disable-enable-pair
+// eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair
 /* eslint-disable @wordpress/wp-global-usage */
 
 describe( 'warning', () => {

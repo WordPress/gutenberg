@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { _n, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { useCallback } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
@@ -74,7 +67,7 @@ function useInsertionPoint( {
 	const {
 		getSelectedBlock,
 		getClosestAllowedInsertionPoint,
-		isBlockInsertionPointVisible,
+		getBlockInsertionPoint,
 	} = unlock( useSelect( blockEditorStore ) );
 	const { destinationRootClientId, destinationIndex } = useSelect(
 		( select ) => {
@@ -151,7 +144,7 @@ function useInsertionPoint( {
 			if (
 				! isAppender &&
 				selectedBlock &&
-				isUnmodifiedDefaultBlock( selectedBlock )
+				isUnmodifiedDefaultBlock( selectedBlock, 'content' )
 			) {
 				replaceBlocks(
 					selectedBlock.clientId,
@@ -201,12 +194,14 @@ function useInsertionPoint( {
 			onSelect,
 			shouldFocusBlock,
 			selectBlockOnInsert,
+			setLastFocus,
+			registry,
 		]
 	);
 
 	const onToggleInsertionPoint = useCallback(
 		( item ) => {
-			if ( item && ! isBlockInsertionPointVisible() ) {
+			if ( item ) {
 				const allowedDestinationRootClientId =
 					getClosestAllowedInsertionPoint(
 						item.name,
@@ -223,17 +218,23 @@ function useInsertionPoint( {
 						} )
 					);
 				}
-			} else {
+			} else if ( ! getBlockInsertionPoint()?.__unstableWithInserter ) {
+				// The insertion cue is shared state. The in-between inserter
+				// marks its own cue with `__unstableWithInserter` and mounts an
+				// inserter inside that cue's popover, so hiding that cue here
+				// would unmount a UI this inserter does not own.
+				// See https://github.com/WordPress/gutenberg/issues/72297.
 				hideInsertionPoint();
 			}
 		},
 		[
 			getClosestAllowedInsertionPoint,
-			isBlockInsertionPointVisible,
+			getBlockInsertionPoint,
 			showInsertionPoint,
 			hideInsertionPoint,
 			destinationRootClientId,
 			destinationIndex,
+			registry,
 		]
 	);
 

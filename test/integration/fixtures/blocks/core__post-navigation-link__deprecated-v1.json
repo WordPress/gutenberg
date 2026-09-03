@@ -1,0 +1,53 @@
+[
+	{
+		"name": "core/post-navigation-link",
+		"isValid": true,
+		"attributes": {
+			"type": "previous",
+			"showTitle": false,
+			"linkLabel": false,
+			"arrow": "none",
+			"taxonomy": "",
+			"style": {
+				"typography": {
+					"textAlign": "left"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/post-navigation-link",
+		"isValid": true,
+		"attributes": {
+			"type": "previous",
+			"showTitle": false,
+			"linkLabel": false,
+			"arrow": "none",
+			"taxonomy": "",
+			"style": {
+				"typography": {
+					"textAlign": "center"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/post-navigation-link",
+		"isValid": true,
+		"attributes": {
+			"type": "previous",
+			"showTitle": false,
+			"linkLabel": false,
+			"arrow": "none",
+			"taxonomy": "",
+			"style": {
+				"typography": {
+					"textAlign": "right"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

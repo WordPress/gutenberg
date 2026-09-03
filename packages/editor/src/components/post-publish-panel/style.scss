@@ -1,3 +1,8 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
 .editor-post-publish-panel__content {
 	// Ensure the post-publish panel accounts for the header and footer height.
 	min-height: calc(100% - #{$header-height + 84px});
@@ -55,6 +60,7 @@
 	display: block;
 	color: $gray-700;
 	font-size: $helptext-font-size;
+	// stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- Pending review of overflow-wrap alternative.
 	word-break: break-word;
 }
 
@@ -74,10 +80,6 @@
 
 .editor-post-publish-panel__header-cancel-button {
 	padding-right: $grid-unit-05;
-}
-
-.editor-post-publish-panel__header-published {
-	flex-grow: 1;
 }
 
 .editor-post-publish-panel__footer {
@@ -115,10 +117,6 @@
 		margin-right: -$grid-unit-20;
 	}
 
-	.editor-post-visibility__dialog-legend {
-		display: none;
-	}
-
 	.components-panel__body-title .components-button {
 		align-items: flex-start;
 		text-wrap: balance; // Fallback for Safari.
@@ -129,6 +127,7 @@
 .post-publish-panel__postpublish .components-panel__body {
 	border-bottom: $border-width solid $gray-200;
 	border-top: none;
+	// stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- Pending review of overflow-wrap alternative.
 	word-break: break-word;
 }
 
@@ -138,9 +137,11 @@
 	flex-wrap: wrap;
 	gap: $grid-unit-20;
 
-	.components-button {
+	.components-button,
+	.components-button.has-icon {
 		justify-content: center;
 		flex: 1;
+		min-width: unset;
 	}
 
 	.components-clipboard-button {
@@ -175,27 +176,15 @@
 }
 
 .post-publish-panel__postpublish-header {
-	font-weight: 500;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 }
 
 .post-publish-panel__postpublish-subheader {
 	margin: 0 0 $grid-unit-10;
 }
 
-.post-publish-panel__tip {
-	color: $alert-yellow;
-}
-
-@media screen and (max-width: 782px) {
-	.post-publish-panel__postpublish-post-address__button-wrap {
-		// match copy button height to the address field height in smaller screens
-		.components-button {
-			height: 40px;
-		}
-	}
-}
-
 .editor-post-publish-panel {
+	@include reset;
 	position: fixed;
 	z-index: z-index(".editor-post-publish-panel");
 	background: $white;
@@ -218,7 +207,7 @@
 		}
 
 		body.is-fullscreen-mode & {
-			top: 0;
+			top: var(--wp-admin--admin-bar--height, 0);
 		}
 
 		// Keep it open on focus to avoid conflict with navigate-regions animation.

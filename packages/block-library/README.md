@@ -66,10 +66,10 @@ To find out more about contributing to this package or Gutenberg as a whole, ple
 
 ⚠️ Adding new blocks to this package **requires** additional steps!
 
-1.  Do not forget to register a new core block in the [`index.js`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/index.js) file of this package. For example, if you were to add the new core block called `core/blinking-paragraph`, you would have to add something like:
+1.  Do not forget to register a new core block in the [`index.jsx`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/index.jsx) file of this package. For example, if you were to add the new core block called `core/blinking-paragraph`, you would have to add something like:
 
     ```js
-    // packages/block-library/src/index.js
+    // packages/block-library/src/index.jsx
     import * as blinkingParagraph from './blinking-paragraph';
     ```
 
@@ -88,9 +88,6 @@ To find out more about contributing to this package or Gutenberg as a whole, ple
 3.  Add `init.js` file to the directory of the new block:
 
     ```js
-    /**
-     * Internal dependencies
-     */
     import { init } from './';
 
     export default init();
@@ -149,7 +146,7 @@ Unlike in [PHP code in the /lib directory](https://github.com/WordPress/gutenber
 
 There are times, however, when blocks may need to use Gutenberg functions even when a Core-equivalent exists, for example, where a Gutenberg function relies on code that is only available in the plugin.
 
-In such cases, you can use the corresponding Core `wp_` function in the block PHP code, and add its name to [a list of prefixed functions in the Webpack configuration file](https://github.com/WordPress/gutenberg/blob/trunk/tools/webpack/blocks.js#L30).
+In such cases, you can use the corresponding Core `wp_` function in the block PHP code, and add its name to a list of prefixed functions in the package.json.
 
 At build time, Webpack will search for `wp_` functions in that list and replace them with their `gutenberg_` equivalents. This process ensures that the plugin calls the `gutenberg_` functions, but the block will still call the Core `wp_` function when updates are back ported.
 

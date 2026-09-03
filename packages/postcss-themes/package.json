@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/postcss-themes",
-	"version": "6.23.0",
+	"version": "6.54.0",
 	"description": "PostCSS plugin to generate theme colors.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -31,6 +31,13 @@
 		"index.js"
 	],
 	"main": "index.js",
+	"exports": {
+		".": "./index.js",
+		"./package.json": "./package.json"
+	},
+	"devDependencies": {
+		"vitest": "^4.1.10"
+	},
 	"peerDependencies": {
 		"postcss": "^8.0.0"
 	},
