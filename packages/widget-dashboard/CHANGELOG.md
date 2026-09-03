@@ -30,6 +30,18 @@
     nothing, and the wp-admin dashboard pins it where it reads its stored
     settings, so preferences persisted by the removed Columns control stay
     inert ([#82204](https://github.com/WordPress/gutenberg/pull/82204)).
+-   The staging layer enforces the policy on every instance operation,
+    whichever trigger staged the mutation: a denied `move` holds the
+    instance's index, a denied `resize` keeps its spans, a denied `edit`
+    keeps its attributes, and a new instance of a rejected type is
+    dropped ([#82256](https://github.com/WordPress/gutenberg/pull/82256)).
+
+### Documentation
+
+-   Policy contract: instance operations carry `widgetType` only while
+    the type is registered; a gone plugin or a failed load leaves it
+    absent, so locks keyed on the type do not fire
+    ([#82256](https://github.com/WordPress/gutenberg/pull/82256)).
 
 ### Internal
 

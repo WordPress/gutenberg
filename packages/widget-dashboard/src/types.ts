@@ -195,7 +195,10 @@ export type DashboardInstanceOperation = 'remove' | 'move' | 'resize' | 'edit';
 
 /**
  * A request for an instance operation: the placed widget, and its type
- * when registered.
+ * when registered. The type is absent when it is not in `widgetTypes`
+ * (a plugin gone, a module that failed to load): the engine still asks,
+ * because the instance is still on the board, but a policy that keys
+ * locks on the type has nothing to match.
  */
 export interface DashboardInstanceOperationRequest {
 	operation: DashboardInstanceOperation;
