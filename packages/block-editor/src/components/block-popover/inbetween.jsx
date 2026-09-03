@@ -17,6 +17,10 @@ function BlockPopoverInbetween( {
 	__unstableContentRef,
 	operation = 'insert',
 	nearestSide = 'right',
+	// When true and there is no previous block, place the popover in the gap
+	// above the first block (title-gap inserter). Leave false for drag-and-drop
+	// and other index-0 indicators that expect a zero-height line.
+	placeBeforeFirstBlock = false,
 	...props
 } ) {
 	// This is a temporary hack to get the inbetween inserter to recompute properly.
@@ -113,6 +117,29 @@ function BlockPopoverInbetween( {
 						nextRect && previousRect
 							? ( previousRect.left + nextRect.left ) / 2
 							: ( previousRect || nextRect ).left;
+
+					// Title-gap inserter only: lift the popover into the gap
+					// above the first block so the "+" does not overlap it.
+					if (
+						placeBeforeFirstBlock &&
+						! previousRect &&
+						nextRect &&
+						nextElement
+					) {
+						const { defaultView } = nextElement.ownerDocument;
+						const marginTop = defaultView
+							? parseFloat(
+									defaultView.getComputedStyle( nextElement )
+										.marginTop
+							  ) || 0
+							: 0;
+						// Match $button-size-small so a centered "+" sits fully
+						// above the block when margin is 0.
+						const minInserterGap = 24;
+						const gapHeight = Math.max( marginTop, minInserterGap );
+						top = nextRect.top - gapHeight;
+						height = gapHeight;
+					}
 				} else {
 					top = previousRect ? previousRect.top : nextRect.top;
 					height = previousRect
@@ -153,6 +180,7 @@ function BlockPopoverInbetween( {
 		isVisible,
 		operation,
 		nearestSide,
+		placeBeforeFirstBlock,
 	] );
 
 	const popoverScrollRef = usePopoverScroll( __unstableContentRef );

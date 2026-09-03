@@ -559,6 +559,65 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			] );
 	} );
 
+	// Check for https://github.com/WordPress/gutenberg/issues/27540.
+	test( 'inserts a block before the first block using the inline inserter', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Post title' );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'First paragraph' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Second paragraph' );
+
+		const firstBlockBoundingBox = await editor.canvas
+			.locator(
+				'.block-editor-block-list__layout.is-root-container > .wp-block'
+			)
+			.first()
+			.boundingBox();
+
+		// Hover just above the first block (title–block gap), matching the
+		// pattern used by other inline-inserter tests.
+		await page.mouse.move(
+			firstBlockBoundingBox.x + firstBlockBoundingBox.width / 2,
+			firstBlockBoundingBox.y - 10,
+			// An arbitrary number of `steps` imitates cursor movement in the test environment,
+			// activating the title gap inserter.
+			{ steps: 10 }
+		);
+
+		const addBlockButton = page
+			.locator( '.block-editor-block-list__insertion-point-inserter' )
+			.getByRole( 'button', { name: 'Add block' } );
+		await expect( addBlockButton ).toBeVisible();
+		await addBlockButton.click();
+
+		const quickInserter = page.locator(
+			'.block-editor-inserter__quick-inserter'
+		);
+		await expect( quickInserter ).toBeVisible();
+		await page.getByRole( 'button', { name: 'Browse all' } ).click();
+		await page
+			.getByRole( 'listbox', { name: 'Media' } )
+			.getByRole( 'option', { name: 'Image' } )
+			.click();
+
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/image' },
+				{ name: 'core/paragraph' },
+				{ name: 'core/paragraph' },
+			] );
+	} );
+
 	// Check for regression of https://github.com/WordPress/gutenberg/issues/72297.
 	test( 'keeps the inline inserter open when the Block Library panel closes', async ( {
 		admin,
