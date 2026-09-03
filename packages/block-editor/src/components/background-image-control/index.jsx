@@ -567,7 +567,7 @@ function BackgroundSizeControls( {
 			 * the image's focus point is visible.
 			 * This is in-editor only to assist with the user experience.
 			 */
-			if ( !! style?.background?.backgroundImage?.id ) {
+			if ( isUploadedImage ) {
 				nextPosition = '50% 0';
 			}
 		}
@@ -614,10 +614,9 @@ function BackgroundSizeControls( {
 					...style?.background,
 					backgroundRepeat: nextRepeat,
 					backgroundSize: 'auto',
-					backgroundPosition:
-						!! style?.background?.backgroundImage?.id
-							? '50% 0'
-							: style?.background?.backgroundPosition,
+					backgroundPosition: isUploadedImage
+					? '50% 0'
+					: style?.background?.backgroundPosition,
 				} )
 			);
 			return;
@@ -632,16 +631,16 @@ function BackgroundSizeControls( {
 		);
 	};
 
-	const repeatHelpText =
-		repeatValue === 'repeat-y'
-			? __(
-					'Repeat Y tiles vertically. Give the block enough height to see multiple tiles.'
-			  )
-			: repeatValue === 'repeat-x'
-			? __(
-					'Repeat X tiles horizontally. Give the block enough width to see multiple tiles.'
-			  )
-			: undefined;
+	let repeatHelpText;
+	if ( repeatValue === 'repeat-y' ) {
+		repeatHelpText = __(
+			'Repeat Y tiles vertically. Give the block enough height to see multiple tiles.'
+		);
+	} else if ( repeatValue === 'repeat-x' ) {
+		repeatHelpText = __(
+			'Repeat X tiles horizontally. Give the block enough width to see multiple tiles.'
+		);
+	}
 
 	const toggleScrollWithPage = () =>
 		onChange(
