@@ -30,9 +30,8 @@ export interface LinkProps extends Omit< ComponentProps< 'a' >, 'target' > {
 	tone?: 'brand' | 'neutral';
 
 	/**
-	 * Whether the link opens in a new browser tab. Adds a visual indicator and
-	 * accessible notice, and defaults `target` to `"_blank"` when no explicit
-	 * target is set.
+	 * Adds a visual indicator and accessible notice for opening in a new tab.
+	 * Defaults `target` to `"_blank"` when no explicit target is set.
 	 *
 	 * @default false
 	 */
