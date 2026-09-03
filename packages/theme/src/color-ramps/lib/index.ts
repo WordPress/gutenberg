@@ -221,6 +221,17 @@ type BuildRampOptions = {
 	purpose?: AccentRampPurpose;
 };
 
+/**
+ * Solve base constraints, rebuild surfaces and strokes, then position the
+ * foreground scale. Seed lightness may shift to make the base constraints fit.
+ * Purpose-specific outputs omit unused steps only after preserving their
+ * constraint dependencies and spacing contributions.
+ *
+ * @param seedArg Original opaque sRGB seed string.
+ * @param config  Base constraints and foreground policy.
+ * @param options Direction, seed adjustment, background, and output profile.
+ * @return Generated colors, direction, and any remaining ramp warnings.
+ */
 export function buildRamp(
 	seedArg: string,
 	config: RampConfig,

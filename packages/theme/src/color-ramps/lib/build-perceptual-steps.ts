@@ -35,6 +35,12 @@ function getPerceptualLightness( color: string | PlainColorObject ) {
 	return get( color, [ OKLrab, 'l' ] );
 }
 
+/**
+ * Create a path indexed by OKLr lightness, not OKLCH lightness. Preserve the
+ * seed's authored chroma and hue before gamut mapping, which may reduce chroma.
+ *
+ * @param seed Color supplying the authored chroma and hue.
+ */
 function createColorAtPerceptualLightness(
 	seed: string | PlainColorObject
 ): GetColorAtLightness {
@@ -71,6 +77,18 @@ function getColorForPerceptualLightness(
 	);
 }
 
+/**
+ * Blend from the anchor's chroma to the step's authored chroma as OKLr lightness
+ * advances. This lets a stroke move while retaining its configured taper.
+ * The step supplies the hue; chroma progress is clamped to the given interval.
+ *
+ * @param options                Path inputs.
+ * @param options.ramp           Ramp containing the authored stroke colors.
+ * @param options.step           Stroke whose hue and final chroma are retained.
+ * @param options.anchor         Color supplying the starting chroma.
+ * @param options.startLightness Starting OKLr lightness.
+ * @param options.endLightness   Ending OKLr lightness.
+ */
 function createAnchoredColorForStepAtPerceptualLightness( {
 	ramp,
 	step,
@@ -112,6 +130,18 @@ function createAnchoredColorForStepAtPerceptualLightness( {
 	};
 }
 
+/**
+ * Search a lightness interval for an OKLab color difference in DeltaEOK2 units.
+ * The path is expected to progress away from the reference. If the endpoint
+ * differences do not bracket the target, use the closer endpoint instead.
+ *
+ * @param options                     Search inputs.
+ * @param options.reference           Color from which differences are measured.
+ * @param options.getColorAtLightness Color path indexed by OKLr lightness.
+ * @param options.startLightness      Starting OKLr lightness.
+ * @param options.endLightness        Ending OKLr lightness.
+ * @param options.target              Requested DeltaEOK2 difference.
+ */
 function findColorAtDeltaE( {
 	reference,
 	getColorAtLightness,
@@ -148,6 +178,16 @@ function findColorAtDeltaE( {
 	);
 }
 
+/**
+ * Keep a passing stroke or move it toward the endpoint with the best minimum
+ * contrast across all references. If neither endpoint passes, return the
+ * stronger fallback; this function alone does not guarantee a passing result.
+ *
+ * @param options            Search inputs.
+ * @param options.color      Authored stroke color.
+ * @param options.references Surfaces the stroke must contrast with.
+ * @param options.target     WCAG ratio, including the caller's safety margin.
+ */
 function findColorMeetingWcag( {
 	color,
 	references,
@@ -214,6 +254,14 @@ function findColorMeetingWcag( {
 	);
 }
 
+/**
+ * Balance SF1/SF3 around SF2 in OKLr lightness, clipping each endpoint
+ * independently. Space SF4-SF6 beyond the elevation steps in the ramp direction
+ * where room remains. SF6 still sets that range when its output is not needed.
+ *
+ * @param ramp    Base ramp with SF1-SF3 already ordered by elevation.
+ * @param purpose Which surface outputs need reconstruction.
+ */
 function rebuildSurfaces( ramp: BaseRampResult, purpose: AccentRampPurpose ) {
 	const nextRamp = { ...ramp.ramp };
 	const surface1Lightness = getPerceptualLightness( ramp.ramp.surface1 );
@@ -318,6 +366,15 @@ function getStrokeReferences(
 	);
 }
 
+/**
+ * Repair ST3 against the rebuilt surfaces, then reposition ST2 and ST4 only
+ * when their purpose needs them. Preserve authored stroke differences where
+ * possible; WCAG correction takes precedence over perceptual spacing.
+ *
+ * @param ramp           Ramp with its surfaces already rebuilt.
+ * @param backgroundRamp Additional surfaces behind accent strokes.
+ * @param purpose        Which stroke outputs need reconstruction.
+ */
 function rebuildStrokes(
 	ramp: BaseRampResult,
 	backgroundRamp: BaseRampResult,

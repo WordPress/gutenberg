@@ -61,6 +61,15 @@ function hasAmbiguousEndpointContrast( seed: string ) {
 	);
 }
 
+/**
+ * Try the opposite direction only near the black/white contrast crossover
+ * when the preferred ramp fails WCAG or lacks interaction-state spacing.
+ * Switching requires a passing alternate within the seed-drift allowance and
+ * either repaired WCAG failures or a useful improvement in the APCA gap.
+ *
+ * @param seed      Original background seed used to compare color drift.
+ * @param preferred Ramp built in the initially preferred direction.
+ */
 function selectBackgroundRampPolarity(
 	seed: string,
 	preferred: InternalRampResult
