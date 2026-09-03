@@ -17,7 +17,7 @@
  * nothing else, and why each block records what would let us delete it.
  *
  * Every entry here should eventually disappear: when Core drops the matching
- * `!important`, the plain rules in button.css take over on their own and the
+ * `!important`, the plain rules in 10-button.css take over on their own and the
  * block below can be removed with no other change.
  */
 
@@ -55,7 +55,7 @@
 	 * Cancels: wp-admin/css/forms.css — the `.form-invalid` rules set
 	 *          `border-color: #d63638 !important` on required fields and their
 	 *          focus state. Only `border-color` carries the flag; the companion
-	 *          `box-shadow` does not, so input.css handles that normally.
+	 *          `box-shadow` does not, so 20-input.css handles that normally.
 	 * DELETE WHEN: that `!important` is removed from Core.
 	 */
 	.form-invalid .form-required,

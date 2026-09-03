@@ -231,49 +231,38 @@ function gutenberg_wpds_admin_enqueue_styles() {
 	}
 
 	/*
-	 * Depending on `buttons` keeps document order sane (our sheet prints after
-	 * the demoted one). The cascade no longer relies on that ordering — layer
-	 * order decides — but it keeps the generated HTML readable.
+	 * Stylesheets load in filename order, which is what the numeric prefixes are
+	 * for. Each area of the restyle owns one file and registers itself by being
+	 * present, so adding one is a single new file and no edit here.
+	 *
+	 * The first sheet depends on `buttons` so ours prints after the demoted Core
+	 * sheet and the generated HTML reads in order; the cascade itself no longer
+	 * relies on that, since layer order decides. Each subsequent sheet depends on
+	 * the one before it to keep that document order.
 	 */
-	wp_enqueue_style(
-		'gutenberg-wpds-admin-button',
-		$base_url . 'button.css',
-		array_merge( $token_deps, array( 'buttons' ) ),
-		$version
-	);
+	$files = glob( __DIR__ . '/css/*.css' );
 
-	wp_enqueue_style(
-		'gutenberg-wpds-admin-input',
-		$base_url . 'input.css',
-		array( 'gutenberg-wpds-admin-button' ),
-		$version
-	);
+	if ( empty( $files ) ) {
+		return;
+	}
 
-	wp_enqueue_style(
-		'gutenberg-wpds-admin-checkbox-radio',
-		$base_url . 'checkbox-radio.css',
-		array( 'gutenberg-wpds-admin-input' ),
-		$version
-	);
+	sort( $files );
 
-	wp_enqueue_style(
-		'gutenberg-wpds-admin-exceptions',
-		$base_url . 'exceptions.css',
-		array( 'gutenberg-wpds-admin-button' ),
-		$version
-	);
+	$previous = null;
 
-	/*
-	 * Cancels Core `!important` declarations that survive demotion. Lives in the
-	 * `wpds-overrides` layer; see the file header for why that layer is declared
-	 * first rather than last.
-	 */
-	wp_enqueue_style(
-		'gutenberg-wpds-admin-overrides',
-		$base_url . 'overrides.css',
-		array( 'gutenberg-wpds-admin-button' ),
-		$version
-	);
+	foreach ( $files as $file ) {
+		$name   = basename( $file, '.css' );
+		$handle = 'gutenberg-wpds-admin-' . $name;
+
+		wp_enqueue_style(
+			$handle,
+			$base_url . basename( $file ),
+			null === $previous ? array_merge( $token_deps, array( 'buttons' ) ) : array( $previous ),
+			$version
+		);
+
+		$previous = $handle;
+	}
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_wpds_admin_enqueue_styles' );
 
