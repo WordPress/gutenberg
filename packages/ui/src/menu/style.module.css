@@ -229,6 +229,16 @@
 			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
 
+		.prefix-icon {
+			flex-shrink: 0;
+		}
+
+		.item:has(.item-description) > .item-prefix > .prefix-icon {
+			/* Center a known-size icon on the first label line. */
+			align-self: flex-start;
+			margin-block-start: calc((var(--_wp-ui-menu-item-label-line-height) - var(--_wp-ui-menu-prefix-icon-size)) / 2);
+		}
+
 		.item-content {
 			grid-column: content-start / content-end;
 			/* Everything after the prefix is laid out independently per item. */

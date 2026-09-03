@@ -5,6 +5,7 @@
 ### New Features
 
 -   Add a responsive `Breadcrumb` navigation component. ([#80425](https://github.com/WordPress/gutenberg/pull/80425))
+-   `Menu`: Add `PrefixIcon` for label-aligned prefix icons, with a default size of 24px. ([#82346](https://github.com/WordPress/gutenberg/pull/82346))
 
 ### Breaking Changes
 

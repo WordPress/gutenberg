@@ -70,6 +70,69 @@ function queryExternalLinkIndicator( item: HTMLElement ) {
 }
 
 describe( 'Menu', () => {
+	it( 'renders prefix icons at 24px by default', () => {
+		render( <Menu.PrefixIcon icon={ <svg /> } role="img" /> );
+
+		const icon = screen.getByRole( 'img', { hidden: true } );
+		expect( icon ).toHaveAttribute( 'width', '24' );
+		expect( icon ).toHaveAttribute( 'height', '24' );
+	} );
+
+	it( 'supports custom icon sizes and forwards SVG props and refs', () => {
+		const ref = createRef< SVGSVGElement >();
+		render(
+			<Menu.PrefixIcon
+				ref={ ref }
+				icon={ <svg viewBox="0 0 24 24" style={ { fill: 'none' } } /> }
+				size={ 32 }
+				role="img"
+				className="custom-icon"
+				stroke="currentColor"
+				style={ { opacity: 0.5 } }
+			/>
+		);
+
+		const icon = screen.getByRole( 'img', { hidden: true } );
+		expect( ref.current ).toBe( icon );
+		expect( icon ).toHaveAttribute( 'width', '32' );
+		expect( icon ).toHaveAttribute( 'height', '32' );
+		expect( icon ).toHaveAttribute( 'viewBox', '0 0 24 24' );
+		expect( icon ).toHaveAttribute( 'stroke', 'currentColor' );
+		expect( icon ).toHaveClass( 'custom-icon' );
+		expect( icon ).toHaveStyle( { fill: 'none', opacity: '0.5' } );
+	} );
+
+	it( 'keeps prefix icons hidden from assistive technology', async () => {
+		const user = userEvent.setup();
+		render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.Item
+						prefix={
+							<Menu.PrefixIcon
+								icon={ <svg /> }
+								role="img"
+								aria-label="Decorative icon"
+							/>
+						}
+					>
+						<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+					</Menu.Item>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+		const item = await screen.findByRole( 'menuitem', {
+			name: 'Duplicate',
+		} );
+		expect(
+			within( item ).getByRole( 'img', { hidden: true } )
+		).toBeVisible();
+		expect( within( item ).queryByRole( 'img' ) ).not.toBeInTheDocument();
+	} );
+
 	it( 'opens from the trigger and exposes menu semantics', async () => {
 		const user = userEvent.setup();
 
