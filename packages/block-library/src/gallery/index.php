@@ -392,8 +392,6 @@ function block_core_gallery_render_dynamic_image( $attachment_id, $attributes, $
  * @return string The content of the block being rendered.
  */
 function block_core_gallery_render( $attributes, $content, $block ) {
-	static $global_styles = null;
-
 	// Gallery blocks created before layout variations existed do not have an
 	// explicit layout attribute. Missing and malformed layout data therefore
 	// falls back to Flex so existing galleries retain their current appearance.
@@ -496,8 +494,12 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 		// gap on the gallery.
 		$fallback_gap = 'var( --wp--style--gallery-gap-default, var( --gallery-block--gutter-size, var( --wp--style--block-gap, 0.5em ) ) )';
 
-		if ( null === $global_styles ) {
-			$global_styles = function_exists( 'wp_get_global_styles' ) ? wp_get_global_styles() : array();
+		if ( function_exists( 'gutenberg_get_global_styles' ) ) {
+			$global_styles = gutenberg_get_global_styles();
+		} elseif ( function_exists( 'wp_get_global_styles' ) ) {
+			$global_styles = wp_get_global_styles();
+		} else {
+			$global_styles = array();
 		}
 
 		$global_gallery_styles = $global_styles['blocks']['core/gallery'] ?? array();

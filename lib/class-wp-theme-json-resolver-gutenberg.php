@@ -27,11 +27,22 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @var array
 	 */
 	protected static $blocks_cache = array(
-		'core'   => array(),
-		'blocks' => array(),
-		'theme'  => array(),
-		'user'   => array(),
+		'core'           => array(),
+		'blocks'         => array(),
+		'theme'          => array(),
+		'user'           => array(),
+		'merged_default' => array(),
+		'merged_blocks'  => array(),
+		'merged_theme'   => array(),
+		'merged_custom'  => array(),
 	);
+
+	/**
+	 * Container for the data merged from multiple origins, keyed by origin.
+	 *
+	 * @var array
+	 */
+	protected static $merged = array();
 
 	/**
 	 * Container for data coming from core.
@@ -602,24 +613,72 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			_deprecated_argument( __FUNCTION__, '5.9.0' );
 		}
 
+		if ( ! in_array( $origin, array( 'default', 'blocks', 'theme', 'custom' ), true ) ) {
+			$origin = 'custom';
+		}
+
+		/*
+		 * The merged result is memoized per origin and refreshed when the set
+		 * of registered blocks changes, the same way each of the origins it
+		 * merges already is.
+		 *
+		 * has_same_registered_blocks() runs before the isset() on purpose. It
+		 * records the registered blocks whenever it finds new ones, so running
+		 * it on the first call seeds that record while the data is built and
+		 * the second call hits. Checked the other way round, the record would
+		 * stay empty until the second call, and the first hit would be the
+		 * third.
+		 *
+		 * The guard tracks block registration only. get_theme_data() reads the
+		 * theme supports (palette, gradients, font sizes and the custom flags)
+		 * on every call, so a support added after the first call here stays
+		 * out of the merged data until the registered blocks change or
+		 * clean_cached_data() runs. gutenberg_get_global_settings() already
+		 * freezes them per request the same way.
+		 */
+		if (
+			static::has_same_registered_blocks( 'merged_' . $origin ) &&
+			isset( static::$merged[ $origin ] )
+		) {
+			return clone static::$merged[ $origin ];
+		}
+
 		$result = new WP_Theme_JSON_Gutenberg();
 		$result->merge( static::get_core_data() );
 		if ( 'default' === $origin ) {
-			return $result;
+			return static::cache_merged_data( $origin, $result );
 		}
 
 		$result->merge( static::get_block_data() );
 		if ( 'blocks' === $origin ) {
-			return $result;
+			return static::cache_merged_data( $origin, $result );
 		}
 
 		$result->merge( static::get_theme_data() );
 		if ( 'theme' === $origin ) {
-			return $result;
+			return static::cache_merged_data( $origin, $result );
 		}
 
 		$result->merge( static::get_user_data() );
-		return $result;
+		return static::cache_merged_data( $origin, $result );
+	}
+
+	/**
+	 * Stores the merged data for an origin and returns a copy of it.
+	 *
+	 * A copy is returned because callers are free to modify the result. In
+	 * particular {@see WP_Theme_JSON_Gutenberg::resolve_variables()} modifies
+	 * the object it is passed, and before this data was memoized every call
+	 * returned its own instance.
+	 *
+	 * @param string                 $origin     Origin the data was merged for.
+	 * @param WP_Theme_JSON_Gutenberg $theme_json Merged data.
+	 * @return WP_Theme_JSON_Gutenberg Copy of the merged data.
+	 */
+	protected static function cache_merged_data( $origin, $theme_json ) {
+		static::$merged[ $origin ] = $theme_json;
+
+		return clone $theme_json;
 	}
 
 	/**
@@ -693,11 +752,16 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		static::$core                     = null;
 		static::$blocks                   = null;
 		static::$blocks_cache             = array(
-			'core'   => array(),
-			'blocks' => array(),
-			'theme'  => array(),
-			'user'   => array(),
+			'core'           => array(),
+			'blocks'         => array(),
+			'theme'          => array(),
+			'user'           => array(),
+			'merged_default' => array(),
+			'merged_blocks'  => array(),
+			'merged_theme'   => array(),
+			'merged_custom'  => array(),
 		);
+		static::$merged                   = array();
 		static::$theme                    = null;
 		static::$user                     = null;
 		static::$user_custom_post_type_id = null;

@@ -373,4 +373,49 @@ class Tests_Blocks_Render_Gallery extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'object-fit:fill', $stylesheet );
 		$this->assertStringContainsString( 'display:block', $stylesheet );
 	}
+
+	/**
+	 * The gap read from global styles must follow the theme.json data for the
+	 * rest of the request, so a change made after one render shows in the next.
+	 */
+	public function test_static_gallery_reads_the_current_global_gap_on_every_render() {
+		$markup  = '<!-- wp:gallery --><figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image --><figure class="wp-block-image"><img alt=""/></figure><!-- /wp:image --></figure><!-- /wp:gallery -->';
+		$gap_var = '--wp--style--unstable-gallery-gap:37px';
+
+		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
+		do_blocks( $markup );
+		$this->assertStringNotContainsString(
+			$gap_var,
+			gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) ),
+			'The gap should not be set before global styles define it, otherwise this test asserts nothing.'
+		);
+
+		$filter = static function ( $theme_json ) {
+			return $theme_json->update_with(
+				array(
+					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'styles'  => array(
+						'blocks' => array(
+							'core/gallery' => array(
+								'spacing' => array( 'blockGap' => '37px' ),
+							),
+						),
+					),
+				)
+			);
+		};
+		add_filter( 'wp_theme_json_data_theme', $filter );
+		_gutenberg_clean_theme_json_caches();
+
+		try {
+			WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
+			do_blocks( $markup );
+			$stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+		} finally {
+			remove_filter( 'wp_theme_json_data_theme', $filter );
+			_gutenberg_clean_theme_json_caches();
+		}
+
+		$this->assertStringContainsString( $gap_var, $stylesheet, 'A gap set in global styles after a previous render should be used.' );
+	}
 }

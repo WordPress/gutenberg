@@ -43,6 +43,7 @@ class WP_Theme_Json_Test extends WP_UnitTestCase {
 		$GLOBALS['wp_theme_directories'] = $this->orig_theme_dir;
 		wp_clean_themes_cache();
 		unset( $GLOBALS['wp_themes'] );
+		_gutenberg_clean_theme_json_caches();
 		parent::tear_down();
 	}
 
@@ -130,5 +131,64 @@ class WP_Theme_Json_Test extends WP_UnitTestCase {
 
 		$this->assertFalse( $default );
 		$this->assertTrue( $block_theme );
+	}
+
+	/**
+	 * gutenberg_get_global_styles() must read the merged data through
+	 * WP_Theme_JSON_Resolver_Gutenberg::get_merged_data() on every call instead of
+	 * keeping a copy of its own. The resolver rebuilds its data when the registered
+	 * blocks change; a cache in front of it does not, so a block registered after
+	 * the first call would stay invisible to this accessor for the rest of the
+	 * request while every other consumer of the merged data sees it.
+	 *
+	 * The suite runs with WP_DEBUG on, and the object cache this replaced
+	 * (WordPress/gutenberg#81889) recomputed under WP_DEBUG, so the late
+	 * registration on its own cannot see that cache. The cache was written on every
+	 * call whatever WP_DEBUG said, so the assertions on its four keys can.
+	 *
+	 * @covers gutenberg_get_global_styles
+	 */
+	public function test_gutenberg_get_global_styles_reads_through_to_the_resolver() {
+		$contexts = array(
+			'gutenberg_get_global_styles_custom'          => array(),
+			'gutenberg_get_global_styles_custom_resolved' => array( 'transforms' => array( 'resolve-variables' ) ),
+			'gutenberg_get_global_styles_theme'           => array( 'origin' => 'base' ),
+			'gutenberg_get_global_styles_theme_resolved'  => array(
+				'origin'     => 'base',
+				'transforms' => array( 'resolve-variables' ),
+			),
+		);
+
+		foreach ( $contexts as $context ) {
+			gutenberg_get_global_styles( array(), $context );
+		}
+
+		foreach ( array_keys( $contexts ) as $cache_key ) {
+			$this->assertFalse(
+				wp_cache_get( $cache_key, 'theme_json' ),
+				"The merged styles should not be cached under $cache_key."
+			);
+		}
+
+		register_block_type(
+			'test/block-gap',
+			array(
+				'supports' => array(
+					'__experimentalStyle' => array(
+						'spacing' => array( 'blockGap' => '77px' ),
+					),
+				),
+			)
+		);
+
+		$styles = gutenberg_get_global_styles();
+
+		unregister_block_type( 'test/block-gap' );
+
+		$this->assertSame(
+			'77px',
+			$styles['blocks']['test/block-gap']['spacing']['blockGap'] ?? null,
+			'Styles for a block registered after a previous call should be present.'
+		);
 	}
 }
