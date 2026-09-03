@@ -254,8 +254,9 @@ export function MediaUploadModal( {
 	searchLabel = __( 'Search media' ),
 	postId,
 }: MediaUploadModalProps ) {
-	// The filter resolves its sentinel to this ID, and the media query has no use
-	// for anything else — a template's entity ID, for instance, is a slug.
+	// The "uploaded to this post" option resolves to this ID, and the media query
+	// has no use for anything else — a template's entity ID, for instance, is a
+	// slug.
 	const attachedToPostId = Number.isInteger( postId ) ? postId : undefined;
 
 	const [ selection, setSelection ] = useState< string[] >( () =>
@@ -362,9 +363,9 @@ export function MediaUploadModal( {
 			if ( filter.field === 'mime_type' ) {
 				filters.mime_type = filter.value;
 			}
-			// Handle attachment parent filters. The filter stores context-free
-			// sentinels rather than post IDs, so that an option is never tied to
-			// a post the modal is no longer looking at.
+			// Handle attachment parent filters. The filter's values name the
+			// option the user picked rather than a post ID, so a stored choice
+			// can't end up pointing at a post the modal is no longer looking at.
 			if (
 				filter.field === ATTACHED_TO_FIELD &&
 				filter.operator === 'isAny'
@@ -372,11 +373,11 @@ export function MediaUploadModal( {
 				const parents = (
 					Array.isArray( filter.value ) ? filter.value : []
 				)
-					.map( ( sentinel ) => {
-						if ( sentinel === 'unattached' ) {
+					.map( ( optionValue ) => {
+						if ( optionValue === 'unattached' ) {
 							return 0;
 						}
-						return sentinel === 'current'
+						return optionValue === 'current'
 							? attachedToPostId
 							: undefined;
 					} )
@@ -516,7 +517,8 @@ export function MediaUploadModal( {
 				...( attachedToField as Field< RestAttachment > ),
 				// The shared field definition is not filterable, because the
 				// "Uploaded to this post" option only makes sense with the modal's
-				// post context. Values are sentinels resolved in `queryArgs` above.
+				// post context. Values name options, and `queryArgs` above
+				// translates them to `parent`.
 				elements: [
 					...( attachedToPostId
 						? [
