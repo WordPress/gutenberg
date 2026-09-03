@@ -183,10 +183,54 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 	}
 
 	/**
-	 * @doesNotPerformAssertions
+	 * Reverting a template to its theme version must be refused when neither
+	 * the active theme nor a plugin provides the template, since deleting the
+	 * database copy would destroy the only version.
+	 *
+	 * @covers Gutenberg_REST_Templates_Controller_7_2::update_item
 	 */
 	public function test_update_item() {
-		// Not testing item update.
+		wp_set_current_user( self::$admin_id );
+		$post_id = self::factory()->post->create(
+			array(
+				'post_type'    => 'wp_template',
+				'post_name'    => 'db-only-template',
+				'post_title'   => 'Database-only template',
+				'post_content' => '<!-- wp:paragraph --><p>Custom</p><!-- /wp:paragraph -->',
+			)
+		);
+		wp_set_post_terms( $post_id, get_stylesheet(), 'wp_theme' );
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/templates/' . get_stylesheet() . '//db-only-template' );
+		$request->set_body_params( array( 'source' => 'theme' ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_invalid_template', $response, 400 );
+		$this->assertInstanceOf( 'WP_Post', get_post( $post_id ), 'The database copy of the template should not be deleted.' );
+	}
+
+	/**
+	 * Reverting a customized template to its theme version must still work
+	 * when the active theme provides the template.
+	 *
+	 * @covers Gutenberg_REST_Templates_Controller_7_2::update_item
+	 */
+	public function test_update_item_reverts_to_theme_when_theme_file_exists() {
+		wp_set_current_user( self::$admin_id );
+		switch_theme( 'block-theme' );
+
+		// Customizing the theme's template creates a database copy of it.
+		$customize = new WP_REST_Request( 'PUT', '/wp/v2/templates/block-theme//page-home' );
+		$customize->set_body_params( array( 'content' => '<!-- wp:paragraph --><p>Customized</p><!-- /wp:paragraph -->' ) );
+		$response = rest_get_server()->dispatch( $customize );
+		$this->assertSame( 200, $response->get_status(), 'Customizing a theme template should succeed.' );
+		$this->assertSame( 'custom', $response->get_data()['source'], 'The customized template should come from the database.' );
+
+		$revert = new WP_REST_Request( 'PUT', '/wp/v2/templates/block-theme//page-home' );
+		$revert->set_body_params( array( 'source' => 'theme' ) );
+		$response = rest_get_server()->dispatch( $revert );
+		$this->assertSame( 200, $response->get_status(), 'Reverting a customized theme template should succeed.' );
+		$this->assertSame( 'theme', $response->get_data()['source'], 'The reverted template should come from the theme file again.' );
 	}
 
 	/**
