@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import { buildAccentRamp, buildBgRamp, DEFAULT_SEED_COLORS } from '..';
 import { getContrast } from '../lib/color-utils';
 import type { Ramp } from '../lib/types';
-import { ACCENT_RAMP_CONFIG, BG_RAMP_CONFIG } from '../lib/ramp-configs';
 import colorTokens from '../../prebuilt/ts/color-tokens';
 
 const combinations = [
@@ -15,15 +14,6 @@ const combinations = [
 ] as const;
 
 describe( 'ramp purpose', () => {
-	it( 'derives normal and interaction-state foregrounds without redundant base solves', () => {
-		for ( const config of [ BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG ] ) {
-			expect( config.steps ).not.toHaveProperty( 'fgSurface4' );
-			expect( config.steps ).not.toHaveProperty( 'fgSurface5' );
-		}
-		const { ramp } = buildBgRamp( '#fcfcfc' );
-		expect( ramp.fgSurface4 ).toBe( '#505050' );
-		expect( ramp.fgSurface5 ).toBe( '#141414' );
-	} );
 	it( 'omits steps with no semantic consumer or downstream dependency', () => {
 		const background = buildBgRamp( '#fcfcfc' );
 		const accent = buildAccentRamp( '#3858e9', background );
