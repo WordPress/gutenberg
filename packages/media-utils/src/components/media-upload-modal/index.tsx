@@ -7,12 +7,12 @@ import {
 	useRef,
 	useEffect,
 } from '@wordpress/element';
-import { __, sprintf, _n } from '@wordpress/i18n';
+import { __, _x, sprintf, _n } from '@wordpress/i18n';
 import {
 	privateApis as coreDataPrivateApis,
 	store as coreStore,
 } from '@wordpress/core-data';
-import { resolveSelect, useDispatch } from '@wordpress/data';
+import { resolveSelect, useDispatch, useSelect } from '@wordpress/data';
 import { Modal, DropZone, FormFileUpload, Button } from '@wordpress/components';
 import { upload as uploadIcon } from '@wordpress/icons';
 import { DataViewsPicker } from '@wordpress/dataviews';
@@ -215,6 +215,13 @@ interface MediaUploadModalProps {
 	 * a post context, and for a post media can't be uploaded to.
 	 */
 	postId?: number;
+
+	/**
+	 * Slug of the post type `postId` belongs to. Labels that option with the
+	 * post type's own wording — "Uploaded to this page", "Uploaded to this
+	 * template" — falling back to a generic label when it is absent.
+	 */
+	postType?: string;
 }
 
 /**
@@ -237,6 +244,7 @@ interface MediaUploadModalProps {
  * @param props.search        Whether to show search input
  * @param props.searchLabel   Label for search input
  * @param props.postId        ID of the post the modal was opened from
+ * @param props.postType      Slug of that post's type
  * @return JSX element or null
  */
 export function MediaUploadModal( {
@@ -253,11 +261,25 @@ export function MediaUploadModal( {
 	search = true,
 	searchLabel = __( 'Search media' ),
 	postId,
+	postType,
 }: MediaUploadModalProps ) {
 	// The "uploaded to this post" option resolves to this ID, and the media query
 	// has no use for anything else — a template's entity ID, for instance, is a
 	// slug.
 	const attachedToPostId = Number.isInteger( postId ) ? postId : undefined;
+
+	// Every post type carries its own wording for this — "Uploaded to this
+	// page", "Uploaded to this template" — and core's own media frame labels the
+	// same filter with it. Only looked up when the option is on offer, so that a
+	// caller passing no post type never triggers the resolver.
+	const uploadedToLabel = useSelect(
+		( select ) =>
+			attachedToPostId && postType
+				? select( coreStore ).getPostType( postType )?.labels
+						?.uploaded_to_this_item
+				: undefined,
+		[ attachedToPostId, postType ]
+	);
 
 	const [ selection, setSelection ] = useState< string[] >( () =>
 		getSelectionFromValue( value )
@@ -524,16 +546,21 @@ export function MediaUploadModal( {
 						? [
 								{
 									value: 'current',
-									label: __( 'Uploaded to this post' ),
+									label:
+										uploadedToLabel ??
+										__( 'Uploaded to this item' ),
 								},
 						  ]
 						: [] ),
-					{ value: 'unattached', label: __( 'Unattached' ) },
+					{
+						value: 'unattached',
+						label: _x( 'Unattached', 'media items' ),
+					},
 				],
 				filterBy: { operators: [ 'isAny' ] },
 			},
 		],
-		[ attachedToPostId ]
+		[ attachedToPostId, uploadedToLabel ]
 	);
 
 	const actions: ActionButton< RestAttachment >[] = useMemo(

@@ -9,6 +9,15 @@ import { unlock } from '../../../lock-unlock';
 
 const preferenceKey = 'dataviews-postType-attachment-media-modal';
 
+// Only the labels the modal reads. `getPostType` is resolved through core-data
+// in the real editor; here a minimal store named `core` stands in for it.
+const POST_TYPES: Record< string, unknown > = {
+	post: { labels: { uploaded_to_this_item: 'Uploaded to this post' } },
+	page: { labels: { uploaded_to_this_item: 'Uploaded to this page' } },
+	// A post type that never set the label.
+	cpt: { labels: {} },
+};
+
 jest.mock( '@wordpress/core-data', () => {
 	const { __dangerousOptInToUnstableAPIsOnlyForCoreModules } =
 		jest.requireActual( '@wordpress/private-apis' );
@@ -65,15 +74,22 @@ type ModalProps = {
 	isOpen?: boolean;
 	value?: number | number[];
 	postId?: number;
+	postType?: string;
 };
 
 function renderModal(
-	{ isOpen = true, value, postId }: ModalProps = {},
+	{ isOpen = true, value, postId, postType }: ModalProps = {},
 	persistedView?: Record< string, unknown >
 ) {
 	const registry = createRegistry();
 	registry.register( noticesStore );
 	registry.register( preferencesStore );
+	registry.registerStore( 'core', {
+		reducer: ( state = {} ) => state,
+		selectors: {
+			getPostType: ( state: unknown, slug: string ) => POST_TYPES[ slug ],
+		},
+	} );
 
 	if ( persistedView ) {
 		registry
@@ -90,6 +106,7 @@ function renderModal(
 				isOpen={ isOpen }
 				value={ value }
 				postId={ postId }
+				postType={ postType }
 				onSelect={ onSelect }
 				onClose={ onClose }
 			/>
@@ -263,7 +280,10 @@ describe( 'MediaUploadModal', () => {
 	describe( 'the "Attached to" filter', () => {
 		it( 'offers the current post only when the modal knows one', async () => {
 			const user = userEvent.setup();
-			const { rerender } = renderModal( { postId: 42 } );
+			const { rerender } = renderModal( {
+				postId: 42,
+				postType: 'post',
+			} );
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Add filter' } )
@@ -296,12 +316,49 @@ describe( 'MediaUploadModal', () => {
 			).toBeVisible();
 		} );
 
+		it( "labels the option with the post type's own wording", async () => {
+			const user = userEvent.setup();
+			renderModal( { postId: 42, postType: 'page' } );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add filter' } )
+			);
+			await user.click(
+				await screen.findByRole( 'menuitem', { name: 'Attached to' } )
+			);
+
+			expect(
+				await screen.findByRole( 'option', {
+					name: 'Uploaded to this page',
+				} )
+			).toBeVisible();
+		} );
+
+		it( 'falls back to a generic label when the post type has none', async () => {
+			const user = userEvent.setup();
+			renderModal( { postId: 42, postType: 'cpt' } );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add filter' } )
+			);
+			await user.click(
+				await screen.findByRole( 'menuitem', { name: 'Attached to' } )
+			);
+
+			expect(
+				await screen.findByRole( 'option', {
+					name: 'Uploaded to this item',
+				} )
+			).toBeVisible();
+		} );
+
 		it( 'ignores a post ID that is not a number', async () => {
 			const user = userEvent.setup();
 			// A template's entity ID is a slug rather than a post ID, and media
 			// can't be uploaded to one.
 			renderModal( {
 				postId: 'twentytwentyfive//index' as unknown as number,
+				postType: 'wp_template',
 			} );
 
 			await user.click(
@@ -323,7 +380,7 @@ describe( 'MediaUploadModal', () => {
 
 		it( 'stops constraining the query when the chosen option is clicked again', async () => {
 			const user = userEvent.setup();
-			renderModal( { postId: 42 } );
+			renderModal( { postId: 42, postType: 'post' } );
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Add filter' } )
@@ -365,7 +422,7 @@ describe( 'MediaUploadModal', () => {
 
 		it( 'queries both options together as a single `parent` list', async () => {
 			const user = userEvent.setup();
-			renderModal( { postId: 42 } );
+			renderModal( { postId: 42, postType: 'post' } );
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Add filter' } )
@@ -395,7 +452,7 @@ describe( 'MediaUploadModal', () => {
 
 		it( 'queries media uploaded to the post as its `parent`', async () => {
 			const user = userEvent.setup();
-			renderModal( { postId: 42 } );
+			renderModal( { postId: 42, postType: 'post' } );
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Add filter' } )
@@ -426,7 +483,10 @@ describe( 'MediaUploadModal', () => {
 			// preference. Carrying it into the next post would quietly hide most
 			// of the library.
 			const user = userEvent.setup();
-			const { registry } = renderModal( { postId: 42 } );
+			const { registry } = renderModal( {
+				postId: 42,
+				postType: 'post',
+			} );
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Add filter' } )
@@ -456,7 +516,10 @@ describe( 'MediaUploadModal', () => {
 
 		it( 'keeps the filter while the picker stays on screen', async () => {
 			const user = userEvent.setup();
-			const { rerender } = renderModal( { postId: 42 } );
+			const { rerender } = renderModal( {
+				postId: 42,
+				postType: 'post',
+			} );
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Add filter' } )
@@ -469,8 +532,8 @@ describe( 'MediaUploadModal', () => {
 			);
 
 			// Closing and reopening is the same instance: the choice stands.
-			rerender( { isOpen: false, postId: 42 } );
-			rerender( { isOpen: true, postId: 42 } );
+			rerender( { isOpen: false, postId: 42, postType: 'post' } );
+			rerender( { isOpen: true, postId: 42, postType: 'post' } );
 
 			await waitFor( () => {
 				expect(
@@ -485,7 +548,7 @@ describe( 'MediaUploadModal', () => {
 
 		it( 'ignores an `attached_to` filter left in the persisted view', async () => {
 			renderModal(
-				{ postId: 42 },
+				{ postId: 42, postType: 'post' },
 				{
 					filters: [
 						{
