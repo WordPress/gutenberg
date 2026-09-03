@@ -9,7 +9,7 @@ const noop = () => {};
 
 /**
  * @typedef SchemaItem
- * @property {string[]}                            [attributes] Attributes.
+ * @property {string[] | '*'}                      [attributes] Attributes. Use '*' to keep all attributes.
  * @property {(string | RegExp)[]}                 [classes]    Classnames or RegExp to test against. Use '*' to keep all classes.
  * @property {'*' | { [tag: string]: SchemaItem }} [children]   Child schemas.
  * @property {string[]}                            [require]    Selectors to test required children against. Leave empty or undefined if there are no requirements.
@@ -65,15 +65,19 @@ export default function cleanNodeList( nodeList, doc, schema, inline ) {
 					}
 
 					if ( node.hasAttributes() ) {
-						// Strip invalid attributes.
-						Array.from( node.attributes ).forEach( ( { name } ) => {
-							if (
-								name !== 'class' &&
-								! attributes.includes( name )
-							) {
-								node.removeAttribute( name );
-							}
-						} );
+						// Strip invalid attributes. `'*'` keeps them all.
+						if ( attributes !== '*' ) {
+							Array.from( node.attributes ).forEach(
+								( { name } ) => {
+									if (
+										name !== 'class' &&
+										! attributes.includes( name )
+									) {
+										node.removeAttribute( name );
+									}
+								}
+							);
+						}
 
 						// Strip invalid classes.
 						// In jsdom-jscore, 'node.classList' can be undefined.

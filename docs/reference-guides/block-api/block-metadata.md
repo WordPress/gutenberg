@@ -498,6 +498,109 @@ return array(
 
 See [the variations documentation](/docs/reference-guides/block-api/block-variations.md) for more details.
 
+### Transforms
+
+-   Type: `object`
+-   Optional
+-   Localized: No
+-   Property: `transforms`
+-   Since: `Experimental`
+
+```json
+{
+	"transforms": {
+		"from": [
+			{
+				"name": "from-raw",
+				"type": "raw",
+				"selector": "h1,h2,h3,h4,h5,h6"
+			}
+		],
+		"to": [
+			{
+				"name": "to-paragraph",
+				"type": "block",
+				"blocks": [ "core/paragraph" ],
+				"attributes": { "content": "content" }
+			}
+		]
+	}
+}
+```
+
+Transforms describe how a block converts to and from other content. They have always been declared in JavaScript, where the editor uses them for pasting, for the "Convert to blocks" command, and for switching one block into another.
+
+Declaring them here instead means the editor and PHP read the same definition. That makes server-side conversion possible — during an import, in WP-CLI, or from any code holding HTML that wants block markup — and it works for every registered block, including third-party ones, without their shipping any conversion code.
+
+The editor reads a declared transform wherever `@wordpress/blocks` is new enough. Reading one in PHP, and the server-side conversion built on it, currently need the Gutenberg plugin: WordPress does not yet copy `transforms` onto a block type registered from `block.json`, nor send it to the editor.
+
+Three kinds of transform are read: `raw`, which matches markup, `block`, which matches another block type, and `shortcode`, which matches a shortcode.
+
+Common keys:
+
+-   `name` (`string`): identifies the transform. A transform registered in JavaScript under the same name is merged over the one declared here, which is how a block declares what PHP needs while keeping behaviour that can only be written as a function.
+-   `type` (`string`, required): `raw`, `block` or `shortcode`.
+-   `priority` (`integer`, default `10`): match order, lowest first. A block that should only match when nothing more specific does, such as the Paragraph block, uses a higher number.
+-   `attributes`: attribute values for the resulting block. For a `raw` transform, an object applied over any sourced attributes; for a `block` transform, either `"all"` to carry every attribute across, or an object mapping each new attribute name to the name it takes its value from.
+
+Keys for a `raw` transform:
+
+-   `selector` (`string`): a CSS selector matched against each top-level element of the source markup, or a comma-separated list of them. Type, universal, class, ID and attribute selectors are supported — attribute presence and the `=`, `~=`, `^=`, `$=`, `*=` and `|=` operators — along with the descendant and child combinators and the `:has()`, `:not()` and `:only-child` pseudo-classes.
+-   `schema` (`object`): the content schema describing which markup survives conversion. Write `"phrasing"` where the phrasing content schema belongs, `{ "default": [], "paste": [] }` where the allowed attributes differ when pasting, and `"attributes": "*"` where they do not matter — which is what a `serverConversion` schema writes for an element whose attributes the transform strips anyway.
+-   `sourceAttributes` (`boolean`, default `true`): whether to derive the block's attributes from the matched markup using the block's own attribute sources.
+-   `innerBlocks` (`boolean|string`, default `false`): which of the matched element's content becomes inner blocks. `true` converts all of it; a CSS selector converts only the matching child elements and leaves the rest with the block.
+-   `serverConversion` (`false|object`): what the server may build from the matched markup. A block whose `save` rebuilds its markup rather than wrapping the source cannot be produced outside the editor at all and declares `false`. One that can reproduce some shapes and not others declares `{ "requires": <content schema> }`, naming the content it is able to save back; markup carrying anything else is left alone instead of converted into a block the editor would flag. The schema names the wrapper's attributes as well as its content, so a List block that can save `start` and `reversed` back but not `type` leaves `<ol type="A">` alone rather than converting it and losing the numbering. `id` never has to be named, because the `anchor` support writes it; nor does `class`, unless the schema entry lists `classes` — the class names the block can write back — in which case markup carrying any other class is left alone, the way the Image block leaves markup whose class names carry an alignment or an attachment ID. A block whose `save` writes a class the server cannot derive, such as the Separator's `has-alpha-channel-opacity` standing for a default attribute value, declares it under `serverConversion.classes` so converted markup matches what `save` produces.
+
+An `attributes` value is used as given, unless it is an object declaring a `source`, in which case it is read from the matched markup the way a block attribute would be. Such a value may also carry a `map` of sourced value to attribute value, which is how the Heading block turns a tag name into a level:
+
+```json
+{
+	"attributes": {
+		"level": {
+			"type": "number",
+			"source": "tag",
+			"selector": "h1,h2,h3,h4,h5,h6",
+			"map": { "h1": 1, "h2": 2, "h3": 3, "h4": 4, "h5": 5, "h6": 6 }
+		}
+	}
+}
+```
+
+Besides the sources a block attribute may use, a transform may read one declaration out of the element's inline styles with `{ "source": "style", "property": "text-align" }`.
+
+An attribute name may be a dotted path, which writes into a nested attribute rather than replacing it. That is how the Paragraph and Heading blocks read an alignment written as inline CSS into the `style` attribute they share with the rest of the block supports:
+
+```json
+{
+	"attributes": {
+		"style.typography.textAlign": {
+			"type": "string",
+			"source": "style",
+			"property": "text-align",
+			"enum": [ "left", "center", "right" ]
+		}
+	}
+}
+```
+
+A declared value is checked against its `type` and `enum` before it is used, so markup carrying something the block does not accept — `text-align: justify`, above — leaves the attribute unset rather than storing a value the block cannot render.
+
+Keys for a `block` transform:
+
+-   `blocks` (`string[]`): the block types the transform converts from (under `from`) or to (under `to`). Under `from`, `"*"` matches any block; under `to` it does not, because a declared transform builds the block it names and `"*"` names none.
+
+A declared `block` transform converts one block at a time. Combining a multi-block selection means deciding how several blocks' attributes merge, which only a JavaScript transform can express.
+
+Keys for a `shortcode` transform:
+
+-   `tag` (`string`, required): the shortcode tag to match, or a pattern matching a family of tags.
+
+Its `attributes` are read from the matched shortcode: `{ "source": "shortcodeText" }` takes the shortcode's own text, and `{ "source": "shortcodeAttribute", "attribute": "id" }` takes one of its attributes. `attribute` may be a list, naming the attributes a shortcode might carry the value under in the order they win.
+
+Markup that no block claims becomes a Custom HTML block rather than being guessed at.
+
+A transform that has to match or build attributes imperatively cannot be written as data. Those keep their JavaScript definitions and share the `name` of the entry declared here, and PHP can additionally register `isMatch` and `transform` callbacks through the `register_block_type_args` filter.
+
 ### Block Hooks
 
 -   Type: `object`

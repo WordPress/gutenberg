@@ -24,13 +24,6 @@ const transforms = {
 				];
 			},
 		},
-		{
-			type: 'raw',
-			selector: 'hr',
-			schema: {
-				hr: {},
-			},
-		},
 	],
 	to: [
 		{

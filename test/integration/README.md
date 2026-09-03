@@ -7,16 +7,19 @@ These tests live in the internal `@wordpress/integration-tests` workspace packag
 
 Unlike unit tests that test individual functions in isolation, these tests exercise multiple packages working together. They cover:
 
-| Test file | What it tests |
-|---|---|
-| `blocks-schema.test.js` | Validates all `block.json` files in the repo against the JSON schema |
-| `theme-schema.test.js` | Validates all `theme.json` files in the repo against the JSON schema |
-| `wp-env-schema.test.js` | Validates `.wp-env.json` against the JSON schema |
-| `blocks-raw-handling.jsdom.test.js` | Tests raw paste/HTML handling across the full block pipeline |
-| `full-content/full-content.jsdom.test.js` | Tests full block serialization round-trips using fixtures |
-| `is-valid-block.jsdom.test.js` | Tests block validation with editor hooks applied |
-| `shortcode-converter.jsdom.test.js` | Tests shortcode-to-block conversion |
-| `non-matched-tags-handling.jsdom.test.js` | Tests handling of unrecognized HTML tags during paste |
+| Test file                                  | What it tests                                                                        |
+| ------------------------------------------ | ------------------------------------------------------------------------------------ |
+| `blocks-schema.test.js`                    | Validates all `block.json` files in the repo against the JSON schema                 |
+| `theme-schema.test.js`                     | Validates all `theme.json` files in the repo against the JSON schema                 |
+| `wp-env-schema.test.js`                    | Validates `.wp-env.json` against the JSON schema                                     |
+| `blocks-raw-handling.jsdom.test.js`        | Tests raw paste/HTML handling across the full block pipeline                         |
+| `full-content/full-content.jsdom.test.js`  | Tests full block serialization round-trips using fixtures                            |
+| `is-valid-block.jsdom.test.js`             | Tests block validation with editor hooks applied                                     |
+| `shortcode-converter.jsdom.test.js`        | Tests shortcode-to-block conversion                                                  |
+| `non-matched-tags-handling.jsdom.test.js`  | Tests handling of unrecognized HTML tags during paste                                |
+| `blocks-transforms-metadata.jsdom.test.js` | Tests raw handling driven by transforms declared in `block.json`                     |
+| `embed-providers.test.js`                  | Keeps the embed provider list declared in `embed/block.json` usable by both runtimes |
+| `phrasing-content-schema.test.js`          | Keeps the PHP phrasing content list in sync with `@wordpress/dom`                    |
 
 ## Running the Tests
 
@@ -60,10 +63,10 @@ npm run fixtures:regenerate
 
 `theme-schema.test.js` decides what to expect from where a file sits, so adding a case means adding a file and nothing else.
 
-| Location | Expectation |
-|---|---|
+| Location                                                                 | Expectation                           |
+| ------------------------------------------------------------------------ | ------------------------------------- |
 | any `theme.json` under `lib/`, `phpunit/`, `test/`, or `packages/*/src/` | must validate, and must set `$schema` |
-| any `.json` file directly in `fixtures/schemas/` | must fail validation |
+| any `.json` file directly in `fixtures/schemas/`                         | must fail validation                  |
 
 Name an invalid fixture after the schema definition that rejects it, adding a `_suffix` when one definition needs several cases, as in `stylesPropertiesAndElementsComplete_pseudo.json`. Nothing enforces the name, so check the failure comes from the definition you meant to test.
 

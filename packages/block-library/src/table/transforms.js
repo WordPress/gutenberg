@@ -41,8 +41,9 @@ const tablePasteSchema = ( args ) => ( {
 const transforms = {
 	from: [
 		{
-			type: 'raw',
-			selector: 'table',
+			// Matching is declared in `block.json`; building the cell matrix
+			// cannot be.
+			name: 'from-raw',
 			schema: tablePasteSchema,
 			transform: ( node ) => {
 				const attributes = Array.from( node.children ).reduce(

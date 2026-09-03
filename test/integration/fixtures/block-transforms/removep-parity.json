@@ -1,0 +1,78 @@
+[
+	{
+		"input": "Hello world",
+		"expected": "Hello world"
+	},
+	{
+		"input": "First paragraph.\n\nSecond paragraph.",
+		"expected": "First paragraph.\n\nSecond paragraph."
+	},
+	{
+		"input": "One line\nAnother line",
+		"expected": "One line\nAnother line"
+	},
+	{
+		"input": "Text with <strong>bold</strong> and <em>emphasis</em>",
+		"expected": "Text with <strong>bold</strong> and <em>emphasis</em>"
+	},
+	{
+		"input": "<ul>\n<li>One</li>\n<li>Two</li>\n</ul>",
+		"expected": "<ul>\n \t<li>One</li>\n \t<li>Two</li>\n</ul>"
+	},
+	{
+		"input": "<pre>line one\nline two</pre>",
+		"expected": "<pre>line one\nline two</pre>"
+	},
+	{
+		"input": "<blockquote>Quoted text</blockquote>",
+		"expected": "<blockquote>Quoted text</blockquote>"
+	},
+	{
+		"input": "[caption id=\"attachment_7\" width=\"300\"]<img src=\"image.jpg\" alt=\"\" /> The caption[/caption]",
+		"expected": "[caption id=\"attachment_7\" width=\"300\"]<img src=\"image.jpg\" alt=\"\" /> The caption[/caption]"
+	},
+	{
+		"input": "<div>Inside a division</div>",
+		"expected": "<div>Inside a division</div>"
+	},
+	{
+		"input": "<p class=\"styled\">Kept paragraph</p>",
+		"expected": "<p class=\"styled\">Kept paragraph</p>"
+	},
+	{
+		"input": "Before\n\n<hr />\n\nAfter",
+		"expected": "Before\n\n<hr />\n\nAfter"
+	},
+	{
+		"input": "Ends with a no-break space ",
+		"expected": "Ends with a no-break space"
+	},
+	{
+		"input": "<h2>Heading</h2>\nText after",
+		"expected": "<h2>Heading</h2>\nText after"
+	},
+	{
+		"input": "<table><tbody><tr><td>Cell</td></tr></tbody></table>",
+		"expected": "<table>\n<tbody>\n<tr>\n<td>Cell</td>\n</tr>\n</tbody>\n</table>"
+	},
+	{
+		"input": "<select><option>A</option><option>B</option></select>",
+		"expected": "<select>\n<option>A</option>\n<option>B</option>\n</select>"
+	},
+	{
+		"input": "<style>p { color: red; }</style>\nStyled text",
+		"expected": "<style>p { color: red; }</style>Styled text"
+	},
+	{
+		"input": "",
+		"expected": ""
+	},
+	{
+		"input": "[vc_column]\nColumn text\n[/vc_column]",
+		"expected": "[vc_column]\nColumn text\n[/vc_column]"
+	},
+	{
+		"input": "https://example.com/video",
+		"expected": "https://example.com/video"
+	}
+]

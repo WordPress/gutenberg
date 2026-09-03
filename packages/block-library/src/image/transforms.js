@@ -166,7 +166,14 @@ const schema = ( { phrasingContentSchema } ) => ( {
 const transforms = {
 	from: [
 		{
-			type: 'raw',
+			// Matching is declared in `block.json`. The content schema matches
+			// class names by pattern, so it stays here, as does reading the
+			// alignment and attachment ID out of those class names. The
+			// `isMatch` mirrors the declared `figure:has(img)` selector
+			// because selector engines disagree about `:has()` — jsdom's
+			// throws on it for elements with a colon in a class name — and a
+			// selector that throws reads as "no match".
+			name: 'from-raw',
 			isMatch: ( node ) =>
 				node.nodeName === 'FIGURE' && !! node.querySelector( 'img' ),
 			schema,

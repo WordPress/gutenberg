@@ -82,7 +82,7 @@ function segmentHTMLToShortcodeBlock(
 	// that one `isMatch` fail in an HTML fragment doesn't prevent any
 	// valid matches in subsequent fragments.
 	if (
-		transformation.isMatch &&
+		typeof transformation.isMatch === 'function' &&
 		! transformation.isMatch( match.shortcode.attrs )
 	) {
 		return segmentHTMLToShortcodeBlock( HTML, previousIndex, [
@@ -124,7 +124,11 @@ function segmentHTMLToShortcodeBlock(
 
 		const attributes = Object.fromEntries(
 			Object.entries( transformAttributes )
-				.filter( ( [ , schema ] ) => schema.shortcode )
+				// Only a function can read a shortcode; anything else is
+				// data that has no business being called.
+				.filter(
+					( [ , schema ] ) => typeof schema.shortcode === 'function'
+				)
 				// Passing all of `match` as second argument is intentionally broad
 				// but shouldn't be too relied upon.
 				//
