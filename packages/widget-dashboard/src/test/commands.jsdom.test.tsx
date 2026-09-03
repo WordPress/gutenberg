@@ -101,6 +101,9 @@ function Harness( {
 const denyCustomize: CanPerformDashboardOperation = ( request ) =>
 	request.operation !== 'customize';
 
+const denyReset: CanPerformDashboardOperation = ( request ) =>
+	request.operation !== 'reset';
+
 function getRegistered( probe: HTMLElement ): Record< string, boolean > {
 	return JSON.parse( probe.getAttribute( 'data-registered' ) ?? '{}' );
 }
@@ -147,6 +150,17 @@ describe( 'WidgetDashboard.Commands', () => {
 		const registered = getRegistered(
 			screen.getByTestId( 'commands-probe' )
 		);
+		expect( registered[ 'core/dashboard/add-widgets' ] ).toBe( true );
+	} );
+
+	it( 'unregisters Reset to default when the policy denies reset', () => {
+		render( <Harness withLayoutReset canPerform={ denyReset } /> );
+
+		const registered = getRegistered(
+			screen.getByTestId( 'commands-probe' )
+		);
+		expect( registered[ 'core/dashboard/reset-to-default' ] ).toBe( false );
+		expect( registered[ 'core/dashboard/customize' ] ).toBe( true );
 		expect( registered[ 'core/dashboard/add-widgets' ] ).toBe( true );
 	} );
 

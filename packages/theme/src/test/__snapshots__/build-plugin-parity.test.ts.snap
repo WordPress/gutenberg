@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`design token fallback build plugin parity keeps esbuild and Vite source-text transforms aligned 1`] = `
+exports[`design token fallback build plugin parity > keeps esbuild and Vite source-text transforms aligned 1`] = `
 "// Source text is transformed consistently: var(--wpds-border-radius-sm, 2px).
 export const templateStyles = \`color: var(--wpds-color-foreground-content-neutral, #1e1e1e);\`;
 export const doubleQuotedStyles =
@@ -10,7 +10,7 @@ export const manualFallback = 'radius: var(--wpds-border-radius-sm, 99px);';
 "
 `;
 
-exports[`design token fallback build plugin parity transforms supported CSS in styles.css 1`] = `
+exports[`design token fallback build plugin parity > transforms supported CSS in styles.css 1`] = `
 "/* Token references in CSS comments are not transformed: var(--wpds-border-radius-sm). */
 .fixture {
 	color: var(--wpds-color-foreground-content-neutral, #1e1e1e);
@@ -19,14 +19,14 @@ exports[`design token fallback build plugin parity transforms supported CSS in s
 "
 `;
 
-exports[`design token fallback build plugin parity transforms supported CSS in styles.module.css 1`] = `
+exports[`design token fallback build plugin parity > transforms supported CSS in styles.module.css 1`] = `
 ".fixture {
 	gap: var(--wpds-dimension-gap-sm, 8px);
 }
 "
 `;
 
-exports[`design token fallback build plugin parity transforms supported CSS with Lightning CSS in styles.css 1`] = `
+exports[`design token fallback build plugin parity > transforms supported CSS with Lightning CSS in styles.css 1`] = `
 ".fixture {
   color: var(--wpds-color-foreground-content-neutral, #1e1e1e);
   content: "var(--wpds-border-radius-sm)";
@@ -34,7 +34,7 @@ exports[`design token fallback build plugin parity transforms supported CSS with
 "
 `;
 
-exports[`design token fallback build plugin parity transforms supported CSS with Lightning CSS in styles.module.css 1`] = `
+exports[`design token fallback build plugin parity > transforms supported CSS with Lightning CSS in styles.module.css 1`] = `
 ".fixture {
   gap: var(--wpds-dimension-gap-sm, 8px);
 }
