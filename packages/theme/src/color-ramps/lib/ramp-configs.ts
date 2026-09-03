@@ -52,18 +52,6 @@ const highContrastInvertedFillConfig: RampStepConfig = {
 	taperChromaOptions: FG_TAPER_CHROMA,
 };
 
-const fgSurface5Config: RampStepConfig = {
-	// The foreground scale pass derives the strong endpoint from APCA targets.
-	// The base solver only needs to establish the WCAG floor and direction.
-	contrast: {
-		reference: 'surface3',
-		followDirection: 'main',
-		target: 4.5,
-		preferLighter: true,
-	},
-	taperChromaOptions: FG_TAPER_CHROMA,
-};
-
 const FOREGROUND_PERCEPTUAL_TARGETS = {
 	// These are design targets, not accessibility thresholds. WCAG ratios remain
 	// the hard gates for every surface on which a foreground can appear.
@@ -80,11 +68,6 @@ const FOREGROUND_PERCEPTUAL_TARGETS = {
 } as const;
 
 const FOREGROUND_SCALE_STEPS = [
-	{
-		name: 'fgSurface1',
-		preserveAnchor: true,
-		contrast: { references: [ 'surface3' ], target: 2 },
-	},
 	{
 		name: 'fgSurface2',
 		preserveAnchor: true,
@@ -187,7 +170,7 @@ const BG_RAMP_STEPS: RampConfig[ 'steps' ] = {
 	bgFill2: {
 		contrast: {
 			reference: 'bgFill1',
-			followDirection: 'darker',
+			followDirection: 'main',
 			target: 1.2,
 		},
 	},
@@ -199,16 +182,6 @@ const BG_RAMP_STEPS: RampConfig[ 'steps' ] = {
 		},
 	},
 	bgFillInverted2: highContrastInvertedFillConfig,
-	bgFillDark: {
-		contrast: {
-			reference: 'surface3',
-			followDirection: 'darker', // This is what causes the token to be always dark
-			target: 7,
-			ignoreWhenAdjustingSeed: true,
-		},
-		lightness: lightnessConstraintForegroundHighContrast,
-		taperChromaOptions: FG_TAPER_CHROMA,
-	},
 	// Stroke
 	stroke1: {
 		contrast: {
@@ -243,15 +216,6 @@ const BG_RAMP_STEPS: RampConfig[ 'steps' ] = {
 		taperChromaOptions: STROKE_TAPER_CHROMA,
 	},
 	// fgSurface
-	fgSurface1: {
-		contrast: {
-			reference: 'surface3',
-			followDirection: 'main',
-			target: 2,
-			preferLighter: true,
-		},
-		taperChromaOptions: FG_TAPER_CHROMA,
-	},
 	fgSurface2: {
 		contrast: {
 			reference: 'surface3',
@@ -271,17 +235,6 @@ const BG_RAMP_STEPS: RampConfig[ 'steps' ] = {
 		lightness: lightnessConstraintForegroundMediumContrast,
 		taperChromaOptions: FG_TAPER_CHROMA,
 	},
-	fgSurface4: {
-		contrast: {
-			reference: 'surface3',
-			followDirection: 'main',
-			target: 4.5,
-			preferLighter: true,
-		},
-		taperChromaOptions: FG_TAPER_CHROMA,
-		sameAsIfPossible: 'fgSurface5',
-	},
-	fgSurface5: fgSurface5Config,
 	// fgFill
 	fgFill: {
 		contrast: {
@@ -296,16 +249,6 @@ const BG_RAMP_STEPS: RampConfig[ 'steps' ] = {
 	fgFillInverted: {
 		contrast: {
 			reference: 'bgFillInverted1',
-			followDirection: 'best',
-			target: 4.5,
-			preferLighter: true,
-		},
-		lightness: lightnessConstraintForegroundHighContrast,
-		taperChromaOptions: FG_TAPER_CHROMA,
-	},
-	fgFillDark: {
-		contrast: {
-			reference: 'bgFillDark',
 			followDirection: 'best',
 			target: 4.5,
 			preferLighter: true,
@@ -386,10 +329,6 @@ export const ACCENT_RAMP_CONFIG: RampConfig = {
 			taperChromaOptions: undefined,
 		},
 		// fgSurface: do not de-saturate
-		fgSurface1: {
-			...BG_RAMP_CONFIG.steps.fgSurface1,
-			taperChromaOptions: undefined,
-		},
 		fgSurface2: {
 			...BG_RAMP_CONFIG.steps.fgSurface2,
 			taperChromaOptions: undefined,
@@ -398,14 +337,6 @@ export const ACCENT_RAMP_CONFIG: RampConfig = {
 			...BG_RAMP_CONFIG.steps.fgSurface3,
 			taperChromaOptions: undefined,
 			sameAsIfPossible: 'bgFill1',
-		},
-		fgSurface4: {
-			...BG_RAMP_CONFIG.steps.fgSurface4,
-			taperChromaOptions: undefined,
-		},
-		fgSurface5: {
-			...BG_RAMP_CONFIG.steps.fgSurface5,
-			taperChromaOptions: undefined,
 		},
 	},
 	foregroundScale: {
