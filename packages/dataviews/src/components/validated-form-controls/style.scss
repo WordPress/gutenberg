@@ -2,7 +2,7 @@
 @use "@wordpress/base-styles/variables" as *;
 
 %red-focus-ring {
-	--focus-color: #{$alert-red};
+	--focus-color: var(--wpds-color-stroke-interactive-error);
 }
 
 .dataviews-validated-control {

@@ -1,7 +1,7 @@
 @use "@wordpress/base-styles/colors" as *;
 
 %red-focus-ring {
-	--focus-color: #{ $alert-red };
+	--focus-color: var(--wpds-color-stroke-interactive-error);
 }
 
 .components-validated-control {
