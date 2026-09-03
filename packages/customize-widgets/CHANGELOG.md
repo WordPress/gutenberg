@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Error boundary: Surface debugging details ([#{TODO}](https://github.com/WordPress/gutenberg/pull/{TODO})).
+
 ### Internal
 
 -   Remove unused dependency `@wordpress/interface` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).

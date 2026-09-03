@@ -1,7 +1,5 @@
+import { describe, expect, it } from 'vitest';
 import createLocks from '../engine';
-
-// We correctly await all promises with expect calls, but the rule doesn't detect that.
-/* eslint-disable jest/valid-expect-in-promise */
 
 describe( 'Locks engine', () => {
 	it( 'does not grant two exclusive locks at once', async () => {
@@ -126,5 +124,3 @@ describe( 'Locks engine', () => {
 		expect( l2 ).not.toBeUndefined();
 	} );
 } );
-
-/* eslint-enable jest/valid-expect-in-promise */

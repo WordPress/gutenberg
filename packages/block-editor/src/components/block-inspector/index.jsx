@@ -29,7 +29,6 @@ import InspectorControlsLastItem from '../inspector-controls/last-item';
 import AdvancedControls from '../inspector-controls-tabs/advanced-controls-panel';
 import PositionControls from '../inspector-controls-tabs/position-controls-panel';
 import useBlockInspectorAnimationSettings from './useBlockInspectorAnimationSettings';
-import { useBorderPanelLabel } from '../../hooks/border';
 import { BlockStateBadges, BlockStatesControl } from '../../hooks/states';
 import ContentTab from '../inspector-controls-tabs/content-tab';
 import ViewportVisibilityInfo from '../block-visibility/viewport-visibility-info';
@@ -42,12 +41,10 @@ import {
 } from '../../hooks/block-style-state';
 
 function StyleInspectorSlots( {
-	clientId,
 	showAdvancedControls = true,
 	showPositionControls = true,
 	showBindingsControls = true,
 } ) {
-	const borderPanelLabel = useBorderPanelLabel( { clientId } );
 	return (
 		<>
 			<InspectorControls.Slot />
@@ -70,7 +67,7 @@ function StyleInspectorSlots( {
 				group="dimensions"
 				label={ __( 'Dimensions' ) }
 			/>
-			<InspectorControls.Slot group="border" label={ borderPanelLabel } />
+			<InspectorControls.Slot group="border" label={ __( 'Borders' ) } />
 			<InspectorControls.Slot
 				group="elements"
 				label={ __( 'Elements' ) }
@@ -97,8 +94,7 @@ function StyleStateInspectorSlots( {
 	isSectionBlock,
 	selectedBlockStyleState,
 } ) {
-	const borderPanelLabel = useBorderPanelLabel( { clientId } );
-	const showLayoutControls =
+	const isViewportStyleState =
 		hasViewportBlockStyleState( selectedBlockStyleState ) &&
 		! hasPseudoBlockStyleState( selectedBlockStyleState );
 	const showSectionStyleControls =
@@ -130,7 +126,7 @@ function StyleStateInspectorSlots( {
 						label={ __( 'Background' ) }
 						className="background-block-support-panel__inner-wrapper"
 					/>
-					{ showLayoutControls && (
+					{ isViewportStyleState && (
 						<InspectorControls.Slot
 							group="layout"
 							label={ __( 'Layout' ) }
@@ -142,7 +138,7 @@ function StyleStateInspectorSlots( {
 					/>
 					<InspectorControls.Slot
 						group="border"
-						label={ borderPanelLabel }
+						label={ __( 'Borders' ) }
 					/>
 					<InspectorControls.Slot
 						group="elements"
@@ -150,6 +146,9 @@ function StyleStateInspectorSlots( {
 						className="elements-block-support-panel__inner-wrapper"
 					/>
 				</>
+			) }
+			{ isViewportStyleState && (
+				<InspectorControls.Slot group="viewport" />
 			) }
 		</>
 	);
@@ -527,11 +526,7 @@ const BlockInspectorSingleBlock = ( {
 					<InspectorControls.Slot group="content" />
 					<InspectorControls.Slot group="list" ref={ listViewRef } />
 					<ListViewContentPopover listViewRef={ listViewRef } />
-					{ ! isSectionBlock && (
-						<StyleInspectorSlots
-							clientId={ renderedBlockClientId }
-						/>
-					) }
+					{ ! isSectionBlock && <StyleInspectorSlots /> }
 				</>
 			) }
 			{ ! isEditingStyleState && <InspectorControlsLastItem.Slot /> }

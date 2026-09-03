@@ -74,17 +74,15 @@ export default function SidebarIdentity() {
 	};
 
 	return (
-		<Page
-			title={ _x( 'Identity', 'site identity' ) }
-			headingLevel={ 2 }
-			hasPadding
-		>
-			<DataForm
-				data={ data }
-				fields={ fields }
-				form={ form }
-				onChange={ onChange }
-			/>
+		<Page title={ _x( 'Identity', 'site identity' ) } headingLevel={ 2 }>
+			<div className="edit-site-sidebar-identity__form">
+				<DataForm
+					data={ data }
+					fields={ fields }
+					form={ form }
+					onChange={ onChange }
+				/>
+			</div>
 		</Page>
 	);
 }

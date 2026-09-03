@@ -635,7 +635,7 @@ test.describe( 'Widgets Customizer', () => {
 		await page
 			.locator( 'role=document[name="Block: Custom HTML"i]' )
 			.click();
-		await page.getByRole( 'button', { name: 'Edit' } ).click();
+		await page.getByRole( 'button', { name: 'Edit code' } ).click();
 		await expect(
 			page.getByRole( 'dialog' ).getByRole( 'textbox' )
 		).toHaveText( 'hello' );
