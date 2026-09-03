@@ -117,6 +117,64 @@ test.describe( 'Search', () => {
 		).toBeLessThan( 300 );
 	} );
 
+	test( 'stops dragging at the minimum width', async ( { page, editor } ) => {
+		await editor.insertBlock( {
+			name: 'core/search',
+			attributes: { style: { dimensions: { width: '400px' } } },
+		} );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Search' } )
+			.click();
+
+		const handle = editor.canvas.locator(
+			'.components-resizable-box__handle-right'
+		);
+		const box = await handle.boundingBox();
+		await page.mouse.move( box.x + box.width / 2, box.y + box.height / 2 );
+		await page.mouse.down();
+		// Well past the 220px floor.
+		await page.mouse.move(
+			box.x + box.width / 2 - 300,
+			box.y + box.height / 2,
+			{ steps: 10 }
+		);
+		await page.mouse.up();
+
+		const [ block ] = await editor.getBlocks();
+		expect( parseInt( block.attributes.style.dimensions.width, 10 ) ).toBe(
+			220
+		);
+	} );
+
+	test( 'keeps the handles on the block when it is narrower than the minimum', async ( {
+		editor,
+	} ) => {
+		// The floor must not make the overlay wider than the block, or the
+		// handles end up hanging past its edge.
+		await editor.insertBlock( {
+			name: 'core/search',
+			attributes: { style: { dimensions: { width: '120px' } } },
+		} );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Search' } )
+			.click();
+
+		const wrapper = editor.canvas.locator(
+			'.wp-block-search__inside-wrapper'
+		);
+		const overlay = editor.canvas.locator( '.wp-block-search__resizer' );
+
+		const wrapperBox = await wrapper.boundingBox();
+		const overlayBox = await overlay.boundingBox();
+
+		expect( Math.round( wrapperBox.width ) ).toBe( 120 );
+		expect( Math.round( overlayBox.width ) ).toBe(
+			Math.round( wrapperBox.width )
+		);
+	} );
+
 	test( 'should auto-configure itself to sensible defaults when inserted into a Navigation block', async ( {
 		page,
 		editor,

@@ -49,6 +49,11 @@ const DEFAULT_INNER_PADDING = '4px';
 // Dimension presets are stored by reference, e.g. `var:preset|dimension|50`.
 const DIMENSION_PRESET_PREFIX = 'var:preset|dimension|';
 
+// Narrower than this and the field stops being usable, so dragging stops here.
+// Only dragging: a smaller value typed into the Width control is left alone,
+// and nothing constrains the width on the front end.
+const MIN_WIDTH = 220;
+
 // Keep this block-specific icon aligned with the PHP renderer. Unlike the
 // Search icon from @wordpress/icons, it remains fill-based so existing theme
 // styles continue to work in both the editor and the front end.
@@ -593,6 +598,15 @@ export default function SearchEdit( {
 							// lives in the stylesheet, where it gets flipped
 							// for RTL.
 							style={ { position: 'absolute' } }
+							// Applied only when the block is already at least
+							// this wide. Otherwise the overlay would be wider
+							// than the block it sits on and the handles would
+							// hang past its edge.
+							minWidth={
+								wrapperSize.width >= MIN_WIDTH
+									? MIN_WIDTH
+									: undefined
+							}
 							enable={ getResizableSides() }
 							onResizeStart={ () => toggleSelection( false ) }
 							onResize={ ( event, direction, elt ) =>
