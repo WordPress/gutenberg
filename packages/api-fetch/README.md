@@ -70,9 +70,9 @@ Sent on `POST` or `PUT` requests only. Shorthand to be used in place of `body`, 
 
 ### Requests to other sites
 
-`apiFetch` is meant for the REST API of the WordPress site the script runs on. Whenever WordPress loads the package it registers the root URL and nonce middlewares, so every request, including one made with a full `url`, is sent with the current user's `X-WP-Nonce` header and with cookies (`credentials: 'include'`). A WordPress site on another origin cannot validate that nonce and rejects the request with a `403` `rest_cookie_invalid_nonce` error, even for public endpoints, and other origins may refuse a credentialed cross-origin request altogether.
+`apiFetch` is meant for the REST API of the WordPress site the script runs on. Whenever WordPress loads the package it registers the root URL and nonce middlewares, so with the default fetch handler every request, including one made with a full `url`, is sent with the current user's `X-WP-Nonce` header and with cookies (`credentials: 'include'`). A WordPress site on another origin cannot validate that nonce and rejects the request with a `403` `rest_cookie_invalid_nonce` error, even for public endpoints, and other origins may refuse a credentialed cross-origin request altogether.
 
-Use `window.fetch` for requests to other sites, or make them from the server.
+Use `window.fetch` for requests to other sites, or make them from the server. A browser request to another site still needs that site to allow the cross-origin request; a WordPress site does so through the CORS headers its REST API sends by default.
 
 ```js
 import apiFetch from '@wordpress/api-fetch';
