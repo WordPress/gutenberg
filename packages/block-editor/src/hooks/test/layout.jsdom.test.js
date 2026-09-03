@@ -11,6 +11,7 @@ import { getLayoutType } from '../../layouts';
 import { useSettings } from '../../components/use-settings';
 
 jest.mock( '../../components/use-settings', () => ( {
+	...jest.requireActual( '../../components/use-settings' ),
 	useSettings: jest.fn(),
 } ) );
 
@@ -22,7 +23,7 @@ describe( 'layout', () => {
 		};
 
 		it.each( [ null, undefined ] )(
-			'omits block gap styles when the block gap setting is %s',
+			'outputs no layout styles when the block gap setting is %s',
 			( blockGapSetting ) => {
 				useSettings.mockReturnValue( [ blockGapSetting ] );
 
@@ -30,7 +31,7 @@ describe( 'layout', () => {
 					useLayoutStyles( attributes, 'test/block', '.my-container' )
 				);
 
-				expect( result.current ).not.toContain( 'gap' );
+				expect( result.current ).toBe( '' );
 			}
 		);
 
