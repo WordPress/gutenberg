@@ -3222,6 +3222,12 @@
 		"parent": "code"
 	},
 	{
+		"title": "Required changes from trunk",
+		"slug": "required-changes-from-trunk",
+		"markdown_source": "../docs/contributors/code/required-changes-from-trunk.md",
+		"parent": "code"
+	},
+	{
 		"title": "Agents and Skills",
 		"slug": "agents-and-skills",
 		"markdown_source": "../docs/contributors/code/agents-and-skills.md",

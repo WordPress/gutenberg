@@ -16,7 +16,7 @@ import type { CoreDataError, PostWithPermissions } from '../types';
 
 const trashPost: Action< PostWithPermissions > = {
 	id: 'move-to-trash',
-	label: _x( 'Trash', 'verb' ),
+	label: _x( 'Trash…', 'verb' ),
 	isPrimary: true,
 	icon: trash,
 	isEligible( item ) {

@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
-import { useMenuItemContentContext } from './context';
 import styles from './style.module.css';
 import type { ItemDescriptionProps } from './types';
 import { Text } from '../text';
@@ -11,14 +10,12 @@ import { Text } from '../text';
  */
 const ItemDescription = forwardRef< HTMLSpanElement, ItemDescriptionProps >(
 	function MenuItemDescription( { className, id, ...props }, ref ) {
-		const itemContentContext = useMenuItemContentContext();
-
 		return (
 			<Text
 				ref={ ref }
 				variant="body-sm"
 				{ ...props }
-				id={ id ?? itemContentContext?.descriptionId }
+				id={ id }
 				className={ clsx( styles[ 'item-description' ], className ) }
 			/>
 		);
