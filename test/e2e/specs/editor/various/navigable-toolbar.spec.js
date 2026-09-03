@@ -162,10 +162,6 @@ test.describe( 'Block Toolbar', () => {
 			).toBeFocused();
 
 			await pageUtils.pressKeys( 'Tab' );
-			await expect
-				.poll( editor.getFocusOwnerLabel )
-				.toBe( 'Editor canvas' );
-			await pageUtils.pressKeys( 'Enter' );
 			await expect.poll( editor.getFocusOwnerLabel ).toBe( 'Upload' );
 		} );
 
@@ -295,9 +291,7 @@ test.describe( 'Block Toolbar', () => {
 		} );
 		await expect( blockToolbarParagraphButton ).toBeFocused();
 		await pageUtils.pressKeys( 'Tab' );
-		// Focus lands on the canvas stop, and Enter moves it to the block.
-		await expect.poll( editor.getFocusOwnerLabel ).toBe( 'Editor canvas' );
-		await pageUtils.pressKeys( 'Enter' );
+		// check focus is on the block
 		await expect
 			.poll( editor.getFocusOwnerLabel )
 			.toBe( 'Block: Paragraph' );
@@ -313,9 +307,7 @@ test.describe( 'Block Toolbar', () => {
 		// check focus is within the block toolbar
 		await expect( blockToolbarParagraphButton ).toBeFocused();
 		await pageUtils.pressKeys( 'Tab' );
-		// Focus lands on the canvas stop, and Enter moves it to the block.
-		await expect.poll( editor.getFocusOwnerLabel ).toBe( 'Editor canvas' );
-		await pageUtils.pressKeys( 'Enter' );
+		// check focus is on the block
 		await expect
 			.poll( editor.getFocusOwnerLabel )
 			.toBe( 'Block: Paragraph' );
@@ -330,9 +322,7 @@ test.describe( 'Block Toolbar', () => {
 		await expect.poll( editor.getFocusOwnerLabel ).toBe( 'Options' );
 
 		await pageUtils.pressKeys( 'Tab' );
-		// Focus lands on the canvas stop, and Enter moves it to the block.
-		await expect.poll( editor.getFocusOwnerLabel ).toBe( 'Editor canvas' );
-		await pageUtils.pressKeys( 'Enter' );
+		// check focus is on the block
 		await expect
 			.poll( editor.getFocusOwnerLabel )
 			.toBe( 'Block: Paragraph' );
@@ -353,9 +343,7 @@ test.describe( 'Block Toolbar', () => {
 		// check focus is within the block toolbar
 		await expect( blockToolbarParagraphButton ).toBeFocused();
 		await pageUtils.pressKeys( 'Tab' );
-		// Focus lands on the canvas stop, and Enter moves it to the block.
-		await expect.poll( editor.getFocusOwnerLabel ).toBe( 'Editor canvas' );
-		await pageUtils.pressKeys( 'Enter' );
+		// check focus is on the block
 		await expect
 			.poll( editor.getFocusOwnerLabel )
 			.toBe( 'Block: Paragraph' );
@@ -407,8 +395,6 @@ test.describe( 'Block Toolbar', () => {
 
 		// Check to make sure focus returns to the Move Up button roving index after all of this
 		await pageUtils.pressKeys( 'Tab' );
-		// Focus lands on the canvas stop, and Enter moves it to the block.
-		await pageUtils.pressKeys( 'Enter' );
 		// Hide the block toolbar
 		await pageUtils.pressKeys( 'ArrowRight' );
 		// Check the block toolbar is hidden

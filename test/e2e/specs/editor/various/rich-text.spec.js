@@ -460,9 +460,6 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Tab' );
 		await pageUtils.pressKeys( 'shift+Tab' );
-		// Focus lands on the canvas stop, and Enter moves it back to the
-		// text.
-		await page.keyboard.press( 'Enter' );
 		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( '2' );
 		await pageUtils.pressKeys( 'primary+b' );
@@ -676,10 +673,8 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		// Dismiss color picker popover.
 		await page.keyboard.press( 'Escape' );
 
-		// Navigate to the block. Tab moves focus to the canvas stop, and
-		// Enter moves it back to the text.
+		// Navigate to the block.
 		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Enter' );
 
 		// Copy the colored text.
 		await pageUtils.pressKeys( 'primary+c' );

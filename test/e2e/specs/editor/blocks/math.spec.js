@@ -25,10 +25,8 @@ test.describe( 'Math Block', () => {
 			},
 		] );
 
-		// Can escape the popover. Focus lands on the canvas stop, and Enter
-		// moves it back to the block.
+		// Can escape the popover.
 		await pageUtils.pressKeys( 'shift+Tab' );
-		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'b' );
 
@@ -77,10 +75,8 @@ test.describe( 'Math Block', () => {
 
 		// Fix syntax error.
 		await page.keyboard.press( 'Backspace' );
-		// Can delete the math block. Focus lands on the canvas stop, and
-		// Enter moves it back to the block.
+		// Can delete the math block.
 		await pageUtils.pressKeys( 'shift+Tab' );
-		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Backspace' );
 
 		expect( await editor.getBlocks() ).toMatchObject( [

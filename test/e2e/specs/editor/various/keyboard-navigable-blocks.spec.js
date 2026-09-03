@@ -30,9 +30,6 @@ test.describe( 'Order of block keyboard navigation', () => {
 		await pageUtils.pressKeys( 'shift+Tab' );
 		await KeyboardNavigableBlocks.navigateThroughBlockToolbar();
 		await page.keyboard.press( 'Tab' );
-		// The canvas is a single tab stop; Enter goes back to the block.
-		await KeyboardNavigableBlocks.expectLabelToHaveFocus( 'Editor canvas' );
-		await page.keyboard.press( 'Enter' );
 		await KeyboardNavigableBlocks.expectLabelToHaveFocus(
 			'Block: Paragraph'
 		);
@@ -61,11 +58,7 @@ test.describe( 'Order of block keyboard navigation', () => {
 		await page.keyboard.press( 'Tab' );
 		await KeyboardNavigableBlocks.expectLabelToHaveFocus( 'Block' );
 
-		// The canvas is a single tab stop; Enter goes back to the multi
-		// selection.
 		await pageUtils.pressKeys( 'shift+Tab' );
-		await KeyboardNavigableBlocks.expectLabelToHaveFocus( 'Editor canvas' );
-		await page.keyboard.press( 'Enter' );
 		await KeyboardNavigableBlocks.expectLabelToHaveFocus(
 			'Multiple selected blocks'
 		);
@@ -165,10 +158,19 @@ test.describe( 'Canvas as a single tab stop', () => {
 			)
 			.toBe( true );
 
-		// Shift+Tab from the sidebar lands back on the stop, and another
-		// Shift+Tab skips the whole canvas backwards, onto the block toolbar
-		// floating over it.
+		// Shift+Tab from the sidebar enters the canvas directly: focus
+		// arriving on the stop engages it.
 		await page.keyboard.press( 'Shift+Tab' );
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} )
+		).toBeFocused();
+		await expect.poll( () => hasTextSelection( page ) ).toBe( true );
+
+		// From a parked stop, Shift+Tab reaches the block toolbar floating
+		// over the canvas.
+		await page.keyboard.press( 'Escape' );
 		await expect( stopBefore ).toBeFocused();
 		await page.keyboard.press( 'Shift+Tab' );
 		await expect
@@ -183,8 +185,16 @@ test.describe( 'Canvas as a single tab stop', () => {
 			)
 			.toBe( true );
 
-		// Enter on the stop goes back to where focus left the canvas.
+		// Tab from the toolbar enters the canvas directly too.
 		await page.keyboard.press( 'Tab' );
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} )
+		).toBeFocused();
+
+		// Enter on the stop goes back to where focus left the canvas.
+		await page.keyboard.press( 'Escape' );
 		await expect( stopBefore ).toBeFocused();
 		await page.keyboard.press( 'Enter' );
 		await expect(
