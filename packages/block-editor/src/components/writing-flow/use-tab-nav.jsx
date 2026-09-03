@@ -97,6 +97,12 @@ export default function useTabNav() {
 			const tabbables = focus.tabbable.find( containerRef.current );
 			if ( tabbables.length ) {
 				tabbables[ 0 ].focus();
+			} else {
+				// A locked canvas with nothing selected can be without
+				// tabbable elements entirely. Entering still enters: keys go
+				// to the canvas, and a block can be selected with the arrow
+				// keys or a click.
+				containerRef.current.focus();
 			}
 		}
 	}
