@@ -213,7 +213,7 @@ test.describe( 'List (@firefox)', () => {
 		// The undo claims the Escape; it must not also step out of the
 		// canvas onto its stop.
 		await expect(
-			page.getByRole( 'button', { name: 'Editor canvas' } ).first()
+			page.getByRole( 'button', { name: 'Editor canvas' } )
 		).not.toBeFocused();
 	} );
 

@@ -2,9 +2,9 @@
 @use "@wordpress/base-styles/variables" as *;
 
 /* The stop element is invisible, so its focus indication is drawn around the
-   canvas it stands for. For the frame it is an overlay stretched over the
-   positioned scale container: Safari paints an outline on a frame element
-   underneath the frame's content. */
+   canvas it stands for. For the iframed canvas it is an overlay instead of
+   an outline, because Safari paints an outline on an iframe element
+   underneath the iframe's content. */
 .block-editor-iframe__scale-container > .block-editor-writing-flow__canvas-stop:focus::after {
 	content: "";
 	position: absolute;
@@ -19,8 +19,8 @@
 	outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
 }
 
-/* Styled like a tooltip; shown while the stop is focused, at the top of the
-   canvas. Doubles as the stop's description for assistive technologies. */
+/* Looks like a tooltip. Shown at the top of the canvas while the stop is
+   focused. */
 .block-editor-writing-flow__canvas-stop-hint {
 	display: none;
 	position: absolute;
@@ -30,7 +30,7 @@
 	z-index: 2;
 	background: $black;
 	font-family: $default-font;
-	border-radius: var(--wpds-border-radius-md);
+	border-radius: $radius-medium;
 	color: $gray-100;
 	text-align: center;
 	line-height: 1.4;

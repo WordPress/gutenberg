@@ -135,13 +135,13 @@ test.describe( 'Canvas as a single tab stop', () => {
 		await expect.poll( () => hasTextSelection( page ) ).toBe( true );
 
 		await page.keyboard.press( 'Escape' );
-		const stopBefore = page
-			.getByRole( 'button', { name: 'Editor canvas' } )
-			.first();
+		const stopBefore = page.getByRole( 'button', {
+			name: 'Editor canvas',
+		} );
 		await expect( stopBefore ).toBeFocused();
 		// The focused stop shows its hint badge.
 		await expect(
-			page.getByText( 'Press Enter to edit the document' ).first()
+			page.getByText( 'Press Enter to edit the document' )
 		).toBeVisible();
 
 		// The block selection is left as it is.
@@ -204,7 +204,7 @@ test.describe( 'Canvas as a single tab stop', () => {
 
 		await page.keyboard.press( 'Escape' );
 		await expect(
-			page.getByRole( 'button', { name: 'Editor canvas' } ).first()
+			page.getByRole( 'button', { name: 'Editor canvas' } )
 		).toBeFocused();
 
 		await page.keyboard.press( 'Escape' );

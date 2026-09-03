@@ -48,10 +48,10 @@ export default function useTabNav() {
 	// an explicit action on it. Focus returns to the place it last left the
 	// canvas from.
 	function enterCanvas() {
-		// Focus the canvas window before any element in it: entering starts
-		// from the stop in the parent document, and Firefox does not move
-		// window focus for a cross-document `element.focus()`, leaving the
-		// caret restored but every key stranded in the parent.
+		// Focus the canvas window first. The stop is in the parent document,
+		// and when Firefox focuses an element in another document, it does
+		// not move window focus, so the caret would be restored but key
+		// presses would keep going to the parent page.
 		containerRef.current.ownerDocument.defaultView.focus();
 
 		if ( hasMultiSelection() ) {
@@ -114,9 +114,9 @@ export default function useTabNav() {
 			return;
 		}
 
-		// Backwards, Tab leaves the canvas naturally: the stop is the first
-		// element before it. Forwards, sequential order would walk into the
-		// content, so move focus to the first tabbable past the canvas.
+		// Shift+Tab leaves the canvas on its own, because the stop is the
+		// first element before it. Plain Tab would move into the content,
+		// so move focus to the first tabbable element past the canvas.
 		if ( key === 'Tab' && ! event.shiftKey ) {
 			event.preventDefault();
 			focus.tabbable.findNext( focusCaptureAfterRef.current )?.focus();
@@ -133,10 +133,14 @@ export default function useTabNav() {
 			className="block-editor-writing-flow__canvas-stop"
 			style={ PREVENT_SCROLL_ON_FOCUS }
 			onKeyDown={ onStopKeyDown }
+			// Assistive technology activates a button with a click event,
+			// not a key press. Pointer clicks pass through the element, so
+			// a click can only come from such an activation.
+			onClick={ enterCanvas }
 		>
-			{ /* The badge doubles as the stop's description for assistive
-			     technologies; hidden content still counts for
-			     `aria-describedby`. */ }
+			{ /* The hint is also the button's description for assistive
+			     technology. Content hidden with `display: none` still
+			     works for `aria-describedby`. */ }
 			<div
 				className="block-editor-writing-flow__canvas-stop-hint"
 				id={ hintId }
@@ -146,8 +150,9 @@ export default function useTabNav() {
 		</div>
 	);
 
-	// Focus arriving behind the canvas is forwarded to the stop before it,
-	// so the canvas has one stop, reached from either direction.
+	// Focus landing on the element after the canvas is forwarded to the
+	// stop before it, so there is one stop no matter which direction it is
+	// reached from.
 	function onFocusCapture() {
 		focusCaptureBeforeRef.current?.focus();
 	}
@@ -167,12 +172,14 @@ export default function useTabNav() {
 				return;
 			}
 
-			// Escape steps out of the canvas onto its stop. Every handler
-			// with a stronger claim on the key runs earlier, either deeper
-			// in the tree or in the capture phase, so an unclaimed key here
-			// means the key is free.
+			// Escape steps out of the canvas onto its stop. Everything with
+			// a stronger claim on the key runs first: handlers deeper in
+			// the tree, capture handlers, and listeners registered earlier
+			// on this node, like the automatic change undo. If the key is
+			// still unclaimed here, nothing else wants it.
 			if (
 				event.key === 'Escape' &&
+				! event.shiftKey &&
 				! event.ctrlKey &&
 				! event.metaKey &&
 				! event.altKey
