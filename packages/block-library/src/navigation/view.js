@@ -37,6 +37,19 @@ function getFocusableElements( ref ) {
 	} );
 }
 
+/**
+ * Whether the overlay menu the given context belongs to is open.
+ *
+ * The overlay context is inherited by every submenu inside it, so this answers
+ * the same question from a submenu's context as from the overlay's own.
+ *
+ * @param {Object} ctx - An overlay or submenu context
+ * @return {boolean} True when the overlay menu is open
+ */
+function isOverlayOpen( ctx ) {
+	return Object.values( ctx.overlayOpenedBy || {} ).some( Boolean );
+}
+
 // This is a fix for Safari in iOS/iPadOS. Without it, Safari doesn't focus out
 // when the user taps in the body. It can be removed once we add an overlay to
 // capture the clicks, instead of relying on the focusout event.
@@ -79,14 +92,17 @@ const { state, actions } = store(
 			},
 			get isSubmenuOpen() {
 				const ctx = getContext();
-				// Once the overlay itself is open, its styles always expand
-				// every submenu regardless of hover/click/focus state, so the
-				// toggle's `aria-expanded` should reflect that immediately
-				// instead of waiting for a hover/click/focus interaction.
-				const isOverlayOpen =
-					Object.values( ctx.overlayOpenedBy || {} ).filter( Boolean )
-						.length > 0;
-				return isOverlayOpen || state.isMenuOpen;
+				// Submenus set to open on click stay collapsed inside the
+				// overlay menu, where they behave as an accordion, so the
+				// toggle reports their own click/focus state.
+				if ( ctx.openOnClick ) {
+					return state.isMenuOpen;
+				}
+				// Otherwise, once the overlay itself is open, its styles always
+				// expand every submenu regardless of hover/click/focus state,
+				// so the toggle's `aria-expanded` should reflect that
+				// immediately instead of waiting for an interaction.
+				return isOverlayOpen( ctx ) || state.isMenuOpen;
 			},
 		},
 		actions: {
@@ -144,8 +160,7 @@ const { state, actions } = store(
 				}
 			},
 			handleMenuKeydown: withSyncEvent( ( event ) => {
-				const { type, firstFocusableElement, lastFocusableElement } =
-					getContext();
+				const { type, modal } = getContext();
 				if ( state.menuOpenedBy.click ) {
 					// If Escape close the menu.
 					if ( event.key === 'Escape' ) {
@@ -156,7 +171,16 @@ const { state, actions } = store(
 					}
 
 					// Trap focus if it is an overlay (main menu).
-					if ( type === 'overlay' && event.key === 'Tab' ) {
+					if ( type === 'overlay' && event.key === 'Tab' && modal ) {
+						// Collected on every Tab rather than cached: submenus
+						// that open on click can be expanded and collapsed
+						// while the overlay is open, which changes what is
+						// focusable inside it.
+						const focusableElements = getFocusableElements( modal );
+						const firstFocusableElement = focusableElements[ 0 ];
+						const lastFocusableElement =
+							focusableElements[ focusableElements.length - 1 ];
+
 						// If shift + tab it change the direction.
 						if (
 							event.shiftKey &&
@@ -177,7 +201,21 @@ const { state, actions } = store(
 				}
 			} ),
 			handleMenuFocusout: withSyncEvent( ( event ) => {
-				const { modal, type } = getContext();
+				const ctx = getContext();
+				const { modal, type } = ctx;
+
+				// Inside an open overlay, submenus that open on click are an
+				// accordion rather than a flyout: they are part of the page
+				// flow and nothing is obscured while one is expanded, so they
+				// stay open until the toggle or Escape closes them.
+				if (
+					type === 'submenu' &&
+					ctx.openOnClick &&
+					isOverlayOpen( ctx )
+				) {
+					return;
+				}
+
 				// If focus is outside modal, and in the document, close menu
 				// event.target === The element losing focus
 				// event.relatedTarget === The element receiving focus (if any)
@@ -230,11 +268,7 @@ const { state, actions } = store(
 				const ctx = getContext();
 				const { ref } = getElement();
 				if ( state.isMenuOpen ) {
-					const focusableElements = getFocusableElements( ref );
 					ctx.modal = ref;
-					ctx.firstFocusableElement = focusableElements[ 0 ];
-					ctx.lastFocusableElement =
-						focusableElements[ focusableElements.length - 1 ];
 				}
 			},
 			focusFirstElement() {
