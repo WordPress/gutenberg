@@ -8,17 +8,6 @@ import { unlock } from '../lock-unlock';
 import { STORE_NAME } from './constants';
 
 /**
- * Media upload data store configuration.
- *
- * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#registerStore
- */
-export const storeConfig = {
-	reducer,
-	selectors,
-	actions,
-};
-
-/**
  * Store definition for the media upload namespace.
  *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore

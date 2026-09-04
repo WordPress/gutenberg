@@ -206,8 +206,9 @@ describe( 'actions', () => {
 			).getAllItems()[ 0 ];
 
 			// Manually call prepareItem to determine operations.
-			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
-				item.id
+			await unlock( registry.dispatch( uploadStore ) ).runOperation(
+				item.id,
+				OperationType.Prepare
 			);
 
 			const updatedItem = unlock(
@@ -236,8 +237,9 @@ describe( 'actions', () => {
 				registry.select( uploadStore )
 			).getAllItems()[ 0 ];
 
-			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
-				item.id
+			await unlock( registry.dispatch( uploadStore ) ).runOperation(
+				item.id,
+				OperationType.Prepare
 			);
 
 			const updatedItem = unlock(
@@ -272,8 +274,9 @@ describe( 'actions', () => {
 				registry.select( uploadStore )
 			).getAllItems()[ 0 ];
 
-			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
-				item.id
+			await unlock( registry.dispatch( uploadStore ) ).runOperation(
+				item.id,
+				OperationType.Prepare
 			);
 
 			const updatedItem = unlock(
@@ -306,8 +309,9 @@ describe( 'actions', () => {
 				registry.select( uploadStore )
 			).getAllItems()[ 0 ];
 
-			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
-				item.id
+			await unlock( registry.dispatch( uploadStore ) ).runOperation(
+				item.id,
+				OperationType.Prepare
 			);
 
 			const updatedItem = unlock(
@@ -340,8 +344,9 @@ describe( 'actions', () => {
 				registry.select( uploadStore )
 			).getAllItems()[ 0 ];
 
-			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
-				item.id
+			await unlock( registry.dispatch( uploadStore ) ).runOperation(
+				item.id,
+				OperationType.Prepare
 			);
 
 			const updatedItem = unlock(
@@ -393,8 +398,9 @@ describe( 'actions', () => {
 				registry.select( uploadStore )
 			).getAllItems()[ 0 ];
 
-			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
-				item.id
+			await unlock( registry.dispatch( uploadStore ) ).runOperation(
+				item.id,
+				OperationType.Prepare
 			);
 
 			const updatedItem = unlock(
@@ -2256,8 +2262,9 @@ describe( 'actions', () => {
 				registry.select( uploadStore )
 			).getAllItems()[ 0 ];
 
-			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
-				item.id
+			await unlock( registry.dispatch( uploadStore ) ).runOperation(
+				item.id,
+				OperationType.Prepare
 			);
 
 			const updatedItem = unlock(

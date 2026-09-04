@@ -19,6 +19,8 @@ import {
 	type State,
 	Type,
 	type UnknownAction,
+	type RegisterOperationAction,
+	type UnregisterOperationAction,
 	type UpdateProgressAction,
 	type UpdateSettingsAction,
 } from './types';
@@ -27,6 +29,7 @@ import {
 	DEFAULT_MAX_CONCURRENT_IMAGE_PROCESSING,
 	DEFAULT_RETRY_SETTINGS,
 } from './constants';
+import { CORE_OPERATIONS } from './operations';
 
 const noop = () => {};
 
@@ -41,6 +44,9 @@ const DEFAULT_STATE: State = {
 		retry: { ...DEFAULT_RETRY_SETTINGS },
 	},
 	failureCount: 0,
+	operations: Object.fromEntries(
+		CORE_OPERATIONS.map( ( operation ) => [ operation.name, operation ] )
+	),
 };
 
 type Action =
@@ -61,6 +67,8 @@ type Action =
 	| RevokeBlobUrlsAction
 	| UpdateProgressAction
 	| UpdateSettingsAction
+	| RegisterOperationAction
+	| UnregisterOperationAction
 	| UnknownAction;
 
 function reducer(
@@ -312,6 +320,25 @@ function reducer(
 					...state.settings,
 					...action.settings,
 				},
+			};
+		}
+
+		case Type.RegisterOperation: {
+			return {
+				...state,
+				operations: {
+					...state.operations,
+					[ action.operation.name ]: action.operation,
+				},
+			};
+		}
+
+		case Type.UnregisterOperation: {
+			const operations = { ...state.operations };
+			delete operations[ action.name ];
+			return {
+				...state,
+				operations,
 			};
 		}
 	}
