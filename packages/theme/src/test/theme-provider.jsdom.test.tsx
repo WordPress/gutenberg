@@ -23,13 +23,19 @@ jest.mock( '../style.module.css', () => ( {
 // round-trip. Ramp generation itself is covered by the color-ramps tests.)
 const BRAND_BG = '--wpds-color-background-interactive-brand-strong';
 const SURFACE_BG = '--wpds-color-background-surface-neutral';
+const FOREGROUND_CONTENT_NEUTRAL = '--wpds-color-foreground-content-neutral';
+const FOREGROUND_NEUTRAL = '--wpds-color-foreground-interactive-neutral';
+const FOREGROUND_NEUTRAL_ACTIVE =
+	'--wpds-color-foreground-interactive-neutral-active';
+const FOREGROUND_NEUTRAL_WEAK_ACTIVE =
+	'--wpds-color-foreground-interactive-neutral-weak-active';
 const CURSOR_CONTROL = '--wpds-cursor-control';
 const BORDER_RADIUS_SM = '--wpds-border-radius-sm';
 const PRIMARY = '#1e90ff';
 const OTHER_PRIMARY = '#8e44ad';
 const BACKGROUND = '#f8f8f8';
-const INACCESSIBLE_PRIMARY = '#608010';
-const INACCESSIBLE_BACKGROUND = '#4f386e';
+const FORMER_WARNING_PRIMARY = '#608010';
+const FORMER_WARNING_BACKGROUND = '#4f386e';
 const ACCESSIBLE_PRIMARY = '#3858e9';
 const ACCESSIBLE_BACKGROUND = '#fcfcfc';
 
@@ -118,6 +124,29 @@ describe( 'ThemeProvider', () => {
 		expect( readProp( provider, SURFACE_BG ) ).toBe( BACKGROUND );
 	} );
 
+	it( 'maps normal content and resting neutral foregrounds to the same scale step', () => {
+		render(
+			<ThemeProvider color={ { background: BACKGROUND } }>
+				<div data-testid="child">x</div>
+			</ThemeProvider>
+		);
+
+		const provider = getScopingProvider( screen.getByTestId( 'child' ) );
+		const restingForeground = readProp( provider, FOREGROUND_NEUTRAL );
+		const activeForeground = readProp(
+			provider,
+			FOREGROUND_NEUTRAL_ACTIVE
+		);
+
+		expect( restingForeground ).toBe(
+			readProp( provider, FOREGROUND_CONTENT_NEUTRAL )
+		);
+		expect( activeForeground ).toBe(
+			readProp( provider, FOREGROUND_NEUTRAL_WEAK_ACTIVE )
+		);
+		expect( restingForeground ).not.toBe( activeForeground );
+	} );
+
 	it( 'does not define color tokens if neither customized nor inherited', () => {
 		render(
 			<ThemeProvider>
@@ -139,7 +168,7 @@ describe( 'ThemeProvider', () => {
 		expect( onColorWarnings ).not.toHaveBeenCalled();
 	} );
 
-	it( 'reports color warnings through the callback', () => {
+	it( 'does not report warnings for accessible active fill pairs', () => {
 		const onColorWarnings = jest.fn<
 			void,
 			[ readonly ThemeProviderColorWarning[] ]
@@ -147,33 +176,14 @@ describe( 'ThemeProvider', () => {
 		const { rerender } = render(
 			<ThemeProvider
 				color={ {
-					primary: INACCESSIBLE_PRIMARY,
-					background: INACCESSIBLE_BACKGROUND,
+					primary: FORMER_WARNING_PRIMARY,
+					background: FORMER_WARNING_BACKGROUND,
 				} }
 				onColorWarnings={ onColorWarnings }
 			/>
 		);
 
-		const warning = onColorWarnings.mock.calls[ 0 ][ 0 ].find(
-			( item ) =>
-				item.type === 'contrast' &&
-				item.backgroundToken ===
-					'background.interactive.brand-strong-active'
-		);
-
-		expect( warning ).toEqual(
-			expect.objectContaining( {
-				type: 'contrast',
-				backgroundToken: 'background.interactive.brand-strong-active',
-				foregroundToken: 'foreground.interactive.brand-strong-active',
-				requiredContrast: 4.5,
-			} )
-		);
-		expect(
-			warning?.type === 'contrast'
-				? warning.achievedContrast
-				: Number.POSITIVE_INFINITY
-		).toBeLessThan( 4.5 );
+		expect( onColorWarnings ).toHaveBeenCalledWith( [] );
 
 		onColorWarnings.mockClear();
 		rerender(

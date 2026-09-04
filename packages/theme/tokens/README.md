@@ -17,7 +17,9 @@ The design system follows the [Design Tokens Format Module](https://www.designto
 | `motion.json`     | Animation durations and easing curves                                                                                            |
 | `cursor.json`     | Cursor values for interactive controls                                                                                           |
 
-Each JSON file contains both primitive and semantic token definitions in a hierarchical structure. These files are the source of truth for the design system and are processed during the build step to generate published assets in `/prebuilt` and internal TypeScript sources in `/src/prebuilt`.
+Each JSON file contains primitive values and semantic aliases. The build generates published assets in `/prebuilt` and internal TypeScript sources in `/src/prebuilt` from these definitions.
+
+The primitive colors in `color.json` are generated, not hand-authored. To change them, edit the ramp configuration or algorithm and rebuild. The semantic aliases in that file are hand-authored and connect ramp steps to their UI roles. See [Building color ramps](../src/color-ramps/README.md) for the configuration, build flow, and checks.
 
 ## Token Naming
 
@@ -25,11 +27,9 @@ Semantic tokens follow a consistent naming pattern that encodes the token's purp
 
 ## Primitive and Semantic Tokens
 
-**Primitive tokens** are internal, reusable, raw values emitted by the design system's theming. They are not part of the public API, but instead are referenced by semantic tokens, which use the underlying values and provide purpose and meaning to how those values are used.
+**Primitive tokens** are internal raw values, such as a color or spacing size. They are not part of the public API.
 
-**Semantic tokens** are the public API of the design system's tokens. They map to primitive token values, but the values are incidental, and a consumer is expected to choose a semantic token based on their specific use-case. The design system provides semantic tokens to cover a breadth of use-cases that are standardized at a design systems level.
-
-This structure is meant to **shift the emphasis away from the values themselves and toward the meaning and purpose that the tokens represent**. Ultimately, the tokens still map to raw values that affect how a component is styled and those values should be internally consistent, but the primitive layer is an incidental concern of the theming internals and not a consideration of the end-user of the design system.
+**Semantic tokens** are the public names that reference those values and describe their intended use. Choose a token by its purpose, not by the value it happens to have in the default theme.
 
 Example:
 
@@ -64,7 +64,7 @@ In the example above, the CSS properties generated from these tokens would inclu
 --wpds-dimension-size-lg: 40px;
 ```
 
-Someone using the design system should never see or concern themselves with either the `primitive.space.80` token or the underlying 4 pixel base unit, and instead focus on the semantics of how element size tokens apply to their component. In this example, a large token being used for a component that follows the size of buttons and inputs in the system.
+Consumers use `--wpds-dimension-size-lg` for elements that follow the large button and input size, without depending on the internal `primitive.space.80` name or its value.
 
 ## Custom Extensions
 

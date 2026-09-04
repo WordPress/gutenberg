@@ -13,10 +13,10 @@ import {
 const ALLOWED_SEED_COLOR_SPACES = [ sRGB ];
 
 /**
- * Get string representation of a color.
+ * Serialize a color as rounded sRGB hex.
+ *
  * @param color A `PlainColorObject`, or an sRGB-parseable string (typically a
  *              hex value, e.g. `#3858e9`).
- * @return String representation
  */
 export function getColorString( color: string | PlainColorObject ): string {
 	ColorSpace.register( sRGB );
@@ -49,10 +49,7 @@ export function getContrast(
  * @throws If `seed` is not an sRGB-parseable, fully opaque string.
  */
 export function assertValidSeedColor( seed: string ): void {
-	ALLOWED_SEED_COLOR_SPACES.forEach( ( space ) =>
-		ColorSpace.register( space )
-	);
-
+	ColorSpace.register( sRGB );
 	let parsedColor: ReturnType< typeof parse >;
 	try {
 		parsedColor = parse( seed );
@@ -80,10 +77,13 @@ export function assertValidSeedColor( seed: string ): void {
 }
 
 /**
- * Make sure that a color is valid in the sRGB gamut and convert it to OKLCH.
+ * Map a color into sRGB gamut, then return its OKLCH representation.
+ *
  * @param c A `PlainColorObject`, or an sRGB-parseable string.
  */
 export function clampToGamut( c: string | PlainColorObject ) {
-	ColorSpace.register( sRGB );
+	if ( typeof c === 'string' ) {
+		ColorSpace.register( sRGB );
+	}
 	return to( toGamut( c, { space: sRGB, method: 'css' } ), OKLCH );
 }

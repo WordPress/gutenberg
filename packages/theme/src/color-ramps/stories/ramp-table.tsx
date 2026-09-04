@@ -1,11 +1,13 @@
 import { forwardRef } from '@wordpress/element';
+import { ColorSpace, deltaEOK2, sRGB } from 'colorjs.io/fn';
 import type {
 	ThemeProviderColorRampName,
 	ThemeProviderColorWarning,
 } from '../../theme-provider-color-warnings';
 import colorTokenAliases from '../../prebuilt/ts/color-tokens';
-import { getColorString } from '../lib/color-utils';
 import type { Ramp } from '../lib/types';
+
+const MEANINGFUL_SEED_DELTA_E = 0.002;
 
 // TODO: show token groups better
 const RAMP_TOKENS_ORDER: { tokenName: keyof Ramp; abbr: string }[] = [
@@ -19,18 +21,16 @@ const RAMP_TOKENS_ORDER: { tokenName: keyof Ramp; abbr: string }[] = [
 	{ tokenName: 'bgFill2', abbr: 'BGF2' },
 	{ tokenName: 'bgFillInverted1', abbr: 'BGFI1' },
 	{ tokenName: 'bgFillInverted2', abbr: 'BGFI2' },
-	{ tokenName: 'bgFillDark', abbr: 'BGFD' },
 	{ tokenName: 'stroke1', abbr: 'ST1' },
 	{ tokenName: 'stroke2', abbr: 'ST2' },
 	{ tokenName: 'stroke3', abbr: 'ST3' },
 	{ tokenName: 'stroke4', abbr: 'ST4' },
-	{ tokenName: 'fgSurface1', abbr: 'FGS1' },
 	{ tokenName: 'fgSurface2', abbr: 'FGS2' },
 	{ tokenName: 'fgSurface3', abbr: 'FGS3' },
 	{ tokenName: 'fgSurface4', abbr: 'FGS4' },
+	{ tokenName: 'fgSurface5', abbr: 'FGS5' },
 	{ tokenName: 'fgFill', abbr: 'FGF' },
 	{ tokenName: 'fgFillInverted', abbr: 'FGFI' },
-	{ tokenName: 'fgFillDark', abbr: 'FGFD' },
 ];
 
 type RampTableProps = {
@@ -111,7 +111,8 @@ export function hasColorWarningForRamp(
 }
 
 function isSeedAdjusted( seed: string, generatedAnchor: string ) {
-	return getColorString( seed ) !== getColorString( generatedAnchor );
+	ColorSpace.register( sRGB );
+	return deltaEOK2( seed, generatedAnchor ) > MEANINGFUL_SEED_DELTA_E;
 }
 
 export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
@@ -151,7 +152,7 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 								fontSize: 11,
 								fontWeight:
 									'var(--wpds-typography-font-weight-emphasis)',
-								color: ramps[ 0 ].ramp.fgSurface4,
+								color: ramps[ 0 ].ramp.fgSurface5,
 							} }
 						>
 							{ abbr }
@@ -248,7 +249,7 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 											outlineOffset: '-3px',
 											color:
 												tokenName === 'surface2'
-													? ramp.fgSurface4
+													? ramp.fgSurface5
 													: ramp.fgFill,
 										} }
 									>
@@ -264,7 +265,6 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 									'surface3',
 									'bgFill1',
 									'bgFillInverted1',
-									'bgFillDark',
 								].includes( tokenName ) ? (
 									<span
 										style={ {
@@ -279,13 +279,6 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 									>
 										{ tokenName === 'surface3' ? (
 											<>
-												<span
-													style={ {
-														color: ramp.fgSurface1,
-													} }
-												>
-													Aa
-												</span>
 												<span
 													style={ {
 														color: ramp.fgSurface2,
@@ -307,6 +300,13 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 												>
 													Aa
 												</span>
+												<span
+													style={ {
+														color: ramp.fgSurface5,
+													} }
+												>
+													Aa
+												</span>
 											</>
 										) : null }
 										{ tokenName === 'bgFill1' ? (
@@ -322,15 +322,6 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 											<span
 												style={ {
 													color: ramp.fgFillInverted,
-												} }
-											>
-												Aa
-											</span>
-										) : null }
-										{ tokenName === 'bgFillDark' ? (
-											<span
-												style={ {
-													color: ramp.fgFillDark,
 												} }
 											>
 												Aa

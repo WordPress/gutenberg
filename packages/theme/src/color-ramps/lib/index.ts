@@ -6,6 +6,8 @@ import {
 	getColorString,
 } from './color-utils.ts';
 import { findColorMeetingRequirements } from './find-color-with-constraints.ts';
+import { buildForegroundScale } from './build-foreground-scale.ts';
+import { buildPerceptualSteps } from './build-perceptual-steps.ts';
 import {
 	sortByDependency,
 	computeBetterFgColorDirection,
@@ -14,27 +16,32 @@ import {
 	solveWithBisect,
 } from './utils.ts';
 import type {
+	AccentRampPurpose,
+	AccentRampResult,
+	BaseRamp,
+	BaseRampStep,
 	FollowDirection,
 	Ramp,
 	RampDirection,
 	RampConfig,
 	RampResult,
+	RampStepsConfig,
 } from './types.ts';
-import { CONTRAST_EPSILON } from './constants.ts';
+import { BLACK, WHITE, CONTRAST_EPSILON } from './constants.ts';
 
 /**
- * Calculate a complete color ramp based on the provided configuration.
+ * Solve the base steps and track the largest constraint deficit for seed
+ * adjustment. Perceptual reconstruction happens after this pass.
  *
- * @param params                       - The calculation parameters
- * @param params.seed                  - The base color to build the ramp from
- * @param params.sortedSteps           - Steps sorted in dependency order
- * @param params.config                - Ramp configuration defining contrast requirements
- * @param params.mainDir               - Primary direction for the ramp (lighter/darker)
- * @param params.oppDir                - Opposite direction from mainDir
- * @param params.pinLightness          - Optional lightness override for a given step
- * @param params.pinLightness.stepName
- * @param params.pinLightness.value
- * @return Object containing ramp results and satisfaction status
+ * @param params                       Base-pass inputs.
+ * @param params.seed                  OKLCH seed, possibly adjusted by a prior search.
+ * @param params.sortedSteps           Steps to build, with dependencies first.
+ * @param params.config                Base contrast and chroma settings.
+ * @param params.mainDir               Ramp's foreground direction.
+ * @param params.oppDir                Opposite of mainDir.
+ * @param params.pinLightness          Lightness override, even if contrast fails.
+ * @param params.pinLightness.stepName Step to pin.
+ * @param params.pinLightness.value    Pinned OKLCH lightness.
  */
 function calculateRamp( {
 	seed,
@@ -45,23 +52,22 @@ function calculateRamp( {
 	pinLightness,
 }: {
 	seed: PlainColorObject;
-	sortedSteps: ( keyof Ramp )[];
-	config: RampConfig;
+	sortedSteps: BaseRampStep[];
+	config: RampStepsConfig;
 	mainDir: RampDirection;
 	oppDir: RampDirection;
 	pinLightness?: {
-		stepName: keyof Ramp;
+		stepName: BaseRampStep;
 		value: number;
 	};
 } ) {
-	const rampResults = {} as Record< keyof Ramp, string >;
+	const rampResults = {} as BaseRamp;
 	let warnings: ( keyof Ramp )[] | undefined;
 	let maxDeficit = -Infinity;
 	let maxDeficitDirection: RampDirection = 'lighter';
 	let maxDeficitStep;
 
-	// Keep track of the calculated colors, as they are going to be useful
-	// when other colors reference them.
+	// Dependencies use unrounded colors; only the output ramp is serialized.
 	const calculatedColors = new Map< keyof Ramp | 'seed', PlainColorObject >();
 	calculatedColors.set( 'seed', seed );
 
@@ -73,14 +79,20 @@ function calculateRamp( {
 			sameAsIfPossible,
 		} = config[ stepName ];
 
-		const referenceColor = calculatedColors.get( contrast.reference );
-		if ( ! referenceColor ) {
-			throw new Error(
-				`Reference color for step ${ stepName } not found: ${ contrast.reference }`
-			);
-		}
+		const referenceNames = [
+			contrast.reference,
+			...( contrast.additionalReferences ?? [] ),
+		];
+		const referenceColors = referenceNames.map( ( referenceName ) => {
+			const referenceColor = calculatedColors.get( referenceName );
+			if ( ! referenceColor ) {
+				throw new Error(
+					`Reference color for step ${ stepName } not found: ${ referenceName }`
+				);
+			}
+			return referenceColor;
+		} );
 
-		// Check if we can reuse color from the `sameAsIfPossible` config option
 		if ( sameAsIfPossible ) {
 			const candidateColor = calculatedColors.get( sameAsIfPossible );
 			if ( ! candidateColor ) {
@@ -89,23 +101,22 @@ function calculateRamp( {
 				);
 			}
 
-			const candidateContrast = getContrast(
-				referenceColor,
-				candidateColor
-			);
 			const adjustedTarget = adjustContrastTarget( contrast.target );
-			// If the candidate meets the contrast requirement, use it
-			if ( candidateContrast >= adjustedTarget ) {
-				// Store the reused color
+			const candidateMeetsTarget = referenceColors.every(
+				( referenceColor ) =>
+					getContrast( referenceColor, candidateColor ) >=
+					adjustedTarget
+			);
+			if ( candidateMeetsTarget ) {
 				calculatedColors.set( stepName, candidateColor );
 				rampResults[ stepName ] = getColorString( candidateColor );
 
-				continue; // Skip to next step
+				continue;
 			}
 		}
 
 		function computeDirection(
-			color: string | PlainColorObject,
+			colors: readonly PlainColorObject[],
 			followDirection: FollowDirection
 		): RampDirection {
 			if ( followDirection === 'main' ) {
@@ -118,7 +129,7 @@ function calculateRamp( {
 
 			if ( followDirection === 'best' ) {
 				return computeBetterFgColorDirection(
-					color,
+					colors,
 					contrast.preferLighter
 				).better;
 			}
@@ -127,13 +138,18 @@ function calculateRamp( {
 		}
 
 		const computedDir = computeDirection(
-			referenceColor,
+			referenceColors,
 			contrast.followDirection
+		);
+		const endpoint = computedDir === 'lighter' ? WHITE : BLACK;
+		const referenceColor = referenceColors.reduce( ( tightest, current ) =>
+			getContrast( current, endpoint ) < getContrast( tightest, endpoint )
+				? current
+				: tightest
 		);
 
 		const adjustedTarget = adjustContrastTarget( contrast.target );
 
-		// Define the lightness constraint, if needed.
 		let lightnessConstraint;
 		if ( pinLightness?.stepName === stepName ) {
 			lightnessConstraint = {
@@ -147,7 +163,6 @@ function calculateRamp( {
 			} as const;
 		}
 
-		// Calculate the color meeting the requirements
 		const searchResults = findColorMeetingRequirements(
 			referenceColor,
 			seed,
@@ -159,8 +174,8 @@ function calculateRamp( {
 			}
 		);
 
-		// When the target contrast is not met, take note of it and use
-		// that information to guide the ramp calculation bisection.
+		// The tightest constraint guides seed adjustment; negative deficits
+		// describe unused contrast room.
 		if (
 			! contrast.ignoreWhenAdjustingSeed &&
 			searchResults.deficit &&
@@ -171,10 +186,8 @@ function calculateRamp( {
 			maxDeficitStep = stepName;
 		}
 
-		// Store calculated color for future dependencies
 		calculatedColors.set( stepName, searchResults.color );
 
-		// Add to results
 		rampResults[ stepName ] = getColorString( searchResults.color );
 
 		if ( ! searchResults.reached && ! contrast.ignoreWhenAdjustingSeed ) {
@@ -192,24 +205,48 @@ function calculateRamp( {
 	};
 }
 
+type BuildRampOptions = {
+	mainDirection?: RampDirection;
+	pinLightness?: { stepName: BaseRampStep; value: number };
+	backgroundRamp?: RampResult;
+	rescaleToFitContrastTargets?: boolean;
+	purpose?: AccentRampPurpose;
+};
+
+/**
+ * Solve base constraints, rebuild surfaces and strokes, then position the
+ * foreground scale. Seed lightness may shift to make the base constraints fit.
+ * Purpose-specific outputs omit unused steps only after preserving their
+ * constraint dependencies and spacing contributions.
+ *
+ * @param seedArg Original opaque sRGB seed string.
+ * @param config  Base constraints and foreground policy.
+ * @param options Direction, seed adjustment, background, and output profile.
+ * @return Generated colors, direction, and any remaining ramp warnings.
+ */
+export function buildRamp(
+	seedArg: string,
+	config: RampConfig,
+	options?: BuildRampOptions & { purpose?: 'full' }
+): RampResult;
+export function buildRamp(
+	seedArg: string,
+	config: RampConfig,
+	options: BuildRampOptions
+): AccentRampResult;
 export function buildRamp(
 	seedArg: string,
 	config: RampConfig,
 	{
 		mainDirection,
 		pinLightness,
+		backgroundRamp,
 		rescaleToFitContrastTargets = true,
-	}: {
-		mainDirection?: RampDirection;
-		pinLightness?: {
-			stepName: keyof Ramp;
-			value: number;
-		};
-		rescaleToFitContrastTargets?: boolean;
-	} = {}
-): RampResult {
+		purpose = 'full',
+	}: BuildRampOptions = {}
+): AccentRampResult {
 	// Validate here: the single point where user-supplied color strings enter.
-	// Internal recursive callers pass color objects to `clampToGamut` instead.
+	// Internal seed-adjustment passes use already validated color objects.
 	assertValidSeedColor( seedArg );
 
 	let seed: PlainColorObject;
@@ -235,10 +272,8 @@ export function buildRamp(
 		oppDir = worse;
 	}
 
-	// Get the correct calculation order based on dependencies
-	const sortedSteps = sortByDependency( config );
+	const sortedSteps = sortByDependency( config.steps );
 
-	// Calculate the ramp with the initial seed.
 	const {
 		rampResults,
 		warnings,
@@ -248,7 +283,7 @@ export function buildRamp(
 	} = calculateRamp( {
 		seed,
 		sortedSteps,
-		config,
+		config: config.steps,
 		mainDir,
 		oppDir,
 		pinLightness,
@@ -258,7 +293,7 @@ export function buildRamp(
 	let bestWarnings = warnings;
 
 	if ( maxDeficit > CONTRAST_EPSILON && rescaleToFitContrastTargets ) {
-		const iterSteps = stepsForStep( maxDeficitStep!, config );
+		const iterSteps = stepsForStep( maxDeficitStep!, config.steps );
 
 		function getSeedForL( l: number ): PlainColorObject {
 			return clampToGamut( set( clone( seed ), [ OKLCH, 'l' ], l ) );
@@ -268,16 +303,14 @@ export function buildRamp(
 			const iterationResults = calculateRamp( {
 				seed: s,
 				sortedSteps: iterSteps,
-				config,
+				config: config.steps,
 				mainDir,
 				oppDir,
 				pinLightness,
 			} );
 
-			// If the constraints start failing in the opposite direction to the original
-			// iteration's direction, that means we've moved too far away from the target.
-			// Don't use the `maxDeficit` value because it's not related to our search,
-			// and might even be positive, which would confuse the bisection algorithm.
+			// Opposing failures mean the search has gone too far. Reverse the
+			// error sign instead of treating that unrelated deficit as progress.
 			return iterationResults.maxDeficitDirection === maxDeficitDirection
 				? iterationResults.maxDeficit
 				: -maxDeficit;
@@ -303,7 +336,7 @@ export function buildRamp(
 		const finalResult = calculateRamp( {
 			seed: bestSeed,
 			sortedSteps,
-			config,
+			config: config.steps,
 			mainDir,
 			oppDir,
 			pinLightness,
@@ -312,18 +345,48 @@ export function buildRamp(
 		bestWarnings = finalResult.warnings;
 	}
 
-	// Swap surface1 and surface3 for darker ramps to maintain visual elevation hierarchy.
-	// This ensures surface1 appears "behind" surface2, and surface3 appears "in front",
-	// regardless of the ramp's main direction.
+	// Elevation always runs from darker SF1 to lighter SF3, independent of the
+	// foreground direction used to solve the base constraints.
 	if ( mainDir === 'darker' ) {
 		const tmpSurface1 = bestRamp.surface1;
 		bestRamp.surface1 = bestRamp.surface3;
 		bestRamp.surface3 = tmpSurface1;
 	}
 
-	return {
-		ramp: bestRamp,
-		warnings: bestWarnings,
-		direction: mainDir,
+	const rampResult = buildPerceptualSteps(
+		{
+			ramp: bestRamp,
+			warnings: bestWarnings,
+			direction: mainDir,
+		},
+		backgroundRamp,
+		purpose
+	);
+
+	if ( purpose === 'full' ) {
+		return buildForegroundScale(
+			rampResult,
+			backgroundRamp ?? rampResult,
+			config.foregroundScale
+		);
+	}
+	const foregroundResult = buildForegroundScale(
+		rampResult,
+		backgroundRamp ?? rampResult,
+		config.foregroundScale,
+		purpose !== 'status'
+	);
+	// Do not expose base colors whose final reconstruction was intentionally
+	// skipped. Their base constraints and spacing contributions remain intact.
+	const pruned: AccentRampResult = {
+		...foregroundResult,
+		ramp: { ...foregroundResult.ramp },
 	};
+	delete pruned.ramp.surface6;
+	delete pruned.ramp.stroke2;
+	if ( purpose === 'status' ) {
+		delete pruned.ramp.stroke4;
+		delete pruned.ramp.fgSurface5;
+	}
+	return pruned;
 }

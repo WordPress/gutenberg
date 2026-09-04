@@ -5,30 +5,29 @@ import { clampToGamut, getContrast } from './color-utils.ts';
 import { type TaperChromaOptions, taperChroma } from './taper-chroma.ts';
 
 /**
- * Difference of contrast values that grows linearly with the Y luminance.
- * We get more precise linear interpolations when we use this.
- * @param c1 First contrast.
- * @param c2 Second contrast.
- * @return Difference of logarithms.
+ * Signed log contrast ratio used as search error. Zero meets the target.
+ *
+ * @param c1 Achieved contrast.
+ * @param c2 Target contrast.
  */
 function cdiff( c1: number, c2: number ) {
 	return Math.log( c1 / c2 );
 }
 
 /**
- * Solve for L such that:
- *  - the L applied to the seed meets the contrast target against the reference
- *  - the search is performed in one direction (ie lighter / darker)
- *  - more constraints can be applied around lightness
- * @param reference
- * @param seed
- * @param target
- * @param direction
- * @param options
- * @param options.lightnessConstraint
- * @param options.lightnessConstraint.type
- * @param options.lightnessConstraint.value
- * @param options.taperChromaOptions
+ * Search OKLCH lightness toward black or white for a WCAG target, using the
+ * seed's hue and optional chroma taper. If the endpoint cannot reach the target,
+ * return it with a deficit. Results use search tolerance, not final hex checks.
+ *
+ * @param reference                         Color to contrast against.
+ * @param seed                              OKLCH seed supplying hue and chroma.
+ * @param target                            WCAG contrast ratio, already padded by the caller.
+ * @param direction                         Endpoint to search toward.
+ * @param options                           Optional lightness and chroma settings.
+ * @param options.lightnessConstraint       Exact lightness to try before searching.
+ * @param options.lightnessConstraint.type  Whether to force lightness even if contrast fails.
+ * @param options.lightnessConstraint.value OKLCH lightness to try.
+ * @param options.taperChromaOptions        Chroma taper; omitted to retain seed chroma before gamut mapping.
  */
 export function findColorMeetingRequirements(
 	reference: PlainColorObject,
@@ -51,8 +50,7 @@ export function findColorMeetingRequirements(
 	achieved: number;
 	deficit?: number;
 } {
-	// A target of 1 means same color.
-	// A target lower than 1 doesn't make sense.
+	// A target of 1 means reuse, not a lightness search.
 	if ( target <= 1 ) {
 		return {
 			color: reference,
@@ -60,39 +58,35 @@ export function findColorMeetingRequirements(
 			achieved: 1,
 		};
 	}
+	const seedChroma = get( seed, [ OKLCH, 'c' ] );
+	const seedHue = get( seed, [ OKLCH, 'h' ] );
 
 	function getColorForL( l: number ): PlainColorObject {
 		let newL = l;
-		let newC = get( seed, [ OKLCH, 'c' ] );
+		let newC = seedChroma;
 
 		if ( taperChromaOptions ) {
 			const tapered = taperChroma( seed, newL, taperChromaOptions );
-			// taperChroma returns either { l, c } or a ColorObject
 			if ( 'l' in tapered && 'c' in tapered ) {
 				newL = tapered.l;
 				newC = tapered.c;
 			} else {
-				// It's already a ColorObject, return it directly
 				return tapered;
 			}
 		}
 
 		return clampToGamut( {
 			space: OKLCH,
-			coords: [ newL, newC, get( seed, [ OKLCH, 'h' ] ) ],
+			coords: [ newL, newC, seedHue ],
 			alpha: seed.alpha,
 		} );
 	}
 
-	// Set the boundary based on the direction.
 	const mostContrastingL = direction === 'lighter' ? 1 : 0;
 	const mostContrastingColor = direction === 'lighter' ? WHITE : BLACK;
 	const highestContrast = getContrast( reference, mostContrastingColor );
 
 	if ( lightnessConstraint ) {
-		// Apply a specific L value.
-		// Useful when pinning a step to a specific lightness, of to specify
-		// min/max L values.
 		const colorWithExactL = getColorForL( lightnessConstraint.value );
 		const exactLContrast = getContrast( reference, colorWithExactL );
 		const exactLContrastMeetsTarget =
@@ -126,10 +120,7 @@ export function findColorMeetingRequirements(
 		};
 	}
 
-	// Bracket: low fails, high meets.
-	// Originally this was seed.oklch.l — although it's an assumption that works
-	// only when we know for sure the direction of the search.
-	// TODO: can we bring this back to seed.oklch.l ?
+	// Search from the reference lightness toward the selected endpoint.
 	const lowerL = get( reference, [ OKLCH, 'l' ] );
 	const lowerContrast = cdiff( 1, target );
 	const upperL = mostContrastingL;
