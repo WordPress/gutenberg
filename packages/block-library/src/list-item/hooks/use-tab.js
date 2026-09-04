@@ -34,15 +34,16 @@ export default function useTab() {
 					getSelectionStart().offset === 0 &&
 					getSelectionEnd().offset === 0;
 
-				// A leading space at the start of an item indents it. Anywhere
-				// else it just types a space (backspace outdents, see onMerge).
+				// At the start of an item, Space indents and Shift+Space
+				// outdents. Anywhere else it just types a space.
 				if ( keyCode === SPACE ) {
-					if (
-						! shiftKey &&
-						isAtStart &&
-						indentListItems( registry )
-					) {
-						event.preventDefault();
+					if ( isAtStart ) {
+						const move = shiftKey
+							? outdentListItems
+							: indentListItems;
+						if ( move( registry ) ) {
+							event.preventDefault();
+						}
 					}
 					return;
 				}
