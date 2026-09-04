@@ -79,10 +79,10 @@ export function currentTheme( state = undefined, action ) {
 /**
  * Reducer managing the current global styles id.
  *
- * @param {string|undefined} state  Current state.
+ * @param {number|undefined} state  Current state.
  * @param {Object}           action Dispatched action.
  *
- * @return {string|undefined} Updated state.
+ * @return {number|undefined} Updated state.
  */
 export function currentGlobalStylesId( state = undefined, action ) {
 	switch ( action.type ) {
@@ -585,10 +585,10 @@ export function navigationFallbackId( state = null, action ) {
 /**
  * Reducer managing the theme global styles revisions.
  *
- * @param {Record<string, object>} state  Current state.
- * @param {Object}                 action Dispatched action.
+ * @param {Record<number, Array<object>>} state  Current state.
+ * @param {Object}                        action Dispatched action.
  *
- * @return {Record<string, object>} Updated state.
+ * @return {Record<number, Array<object>>} Updated state.
  */
 export function themeGlobalStyleRevisions( state = {}, action ) {
 	switch ( action.type ) {

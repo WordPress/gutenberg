@@ -1,3 +1,12 @@
+import {
+	afterAll,
+	afterEach,
+	beforeAll,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
 import { render, act } from '@testing-library/react';
 import {
 	RegistryProvider,
@@ -34,6 +43,12 @@ import {
 } from '../overlay-context';
 import { store as editorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
+
+// The editor store pulls in `@wordpress/viewport`, which reads
+// `window.matchMedia` while loading.
+vi.hoisted( () => {
+	globalThis.wpVitest.mockMatchMedia();
+} );
 
 describe( 'shallowAttributeEquals', () => {
 	it( 'treats reference-equal values as equal', () => {

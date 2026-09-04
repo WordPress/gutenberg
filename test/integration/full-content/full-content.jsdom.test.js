@@ -53,9 +53,6 @@ describe( 'full post content fixture', () => {
 			} )
 		);
 		unstable__bootstrapServerSideBlockDefinitions( blockDefinitions );
-		// Form-related blocks will not be registered unless they are opted
-		// in on the experimental settings page.
-		window.__experimentalEnableFormBlocks = true;
 		registerCoreBlocks();
 
 		if ( globalThis.IS_GUTENBERG_PLUGIN ) {

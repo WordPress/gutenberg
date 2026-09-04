@@ -1,7 +1,8 @@
+import type { ComponentProps } from 'react';
 import { __ } from '@wordpress/i18n';
-import { MenuItemsChoice, MenuGroup } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { displayShortcut } from '@wordpress/keycodes';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Menu } from '@wordpress/ui';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import {
@@ -9,6 +10,7 @@ import {
 	EDITOR_INTENT_SUGGEST,
 	EDITOR_INTENT_VIEW,
 } from '../../store/constants';
+import { getKeyboardShortcut } from '../../utils/keyboard-shortcut';
 import PostTypeSupportCheck from '../post-type-support-check';
 
 /**
@@ -26,29 +28,42 @@ import PostTypeSupportCheck from '../post-type-support-check';
  * `setEditorIntent` action validates against `EDITOR_INTENTS` and silently
  * ignores unknown values.
  */
+type KeyboardShortcut = NonNullable<
+	ComponentProps< typeof Menu.RadioItem >[ 'shortcut' ]
+>;
+
+// `getKeyboardShortcut` is untyped JavaScript; its result is the `Menu`
+// component's shortcut shape.
+function intentShortcut( character: string ): KeyboardShortcut {
+	return getKeyboardShortcut( {
+		character,
+		modifier: 'secondary',
+	} ) as KeyboardShortcut;
+}
+
 const INTENTS: Array< {
 	value: string;
 	label: string;
 	info: string;
-	shortcut: string;
+	shortcut: KeyboardShortcut | null;
 } > = [
 	{
 		value: EDITOR_INTENT_EDIT,
 		label: __( 'Editing' ),
 		info: __( 'Edit content directly.' ),
-		shortcut: displayShortcut.secondary( 'z' ),
+		shortcut: intentShortcut( 'z' ),
 	},
 	{
 		value: EDITOR_INTENT_SUGGEST,
 		label: __( 'Suggesting' ),
 		info: __( 'Propose changes the author can apply or reject.' ),
-		shortcut: displayShortcut.secondary( 'x' ),
+		shortcut: intentShortcut( 'x' ),
 	},
 	{
 		value: EDITOR_INTENT_VIEW,
 		label: __( 'Viewing' ),
 		info: __( 'Read-only preview of the content.' ),
-		shortcut: displayShortcut.secondary( 'c' ),
+		shortcut: intentShortcut( 'c' ),
 	},
 ];
 
@@ -73,10 +88,10 @@ function IntentSwitcher() {
 	/*
 	 * Two adjustments per choice.
 	 *
-	 * The active choice hides its shortcut. `MenuItemsChoice` renders the
-	 * selection as a checked radio with the label; a key hint next to it
-	 * reads as "press this to get where you already are". `ModeSwitcher`
-	 * drops the shortcut from the selected mode for the same reason.
+	 * The active choice hides its shortcut. The menu renders the selection as
+	 * a checked radio with the label; a key hint next to it reads as "press
+	 * this to get where you already are". `ModeSwitcher` drops the shortcut
+	 * from the selected mode for the same reason.
 	 *
 	 * Suggesting is visual-only - a suggestion is an inline marker in block
 	 * content, which the code editor cannot render - so it is unavailable to
@@ -86,13 +101,7 @@ function IntentSwitcher() {
 	 */
 	const choices = INTENTS.map( ( choice ) => {
 		const base =
-			choice.value === intent
-				? {
-						value: choice.value,
-						label: choice.label,
-						info: choice.info,
-				  }
-				: choice;
+			choice.value === intent ? { ...choice, shortcut: null } : choice;
 
 		if (
 			choice.value === EDITOR_INTENT_SUGGEST &&
@@ -107,18 +116,33 @@ function IntentSwitcher() {
 			};
 		}
 
-		return base;
+		return { ...base, disabled: false };
 	} );
 
 	return (
 		<PostTypeSupportCheck supportKeys="editor.notes">
-			<MenuGroup label={ __( 'Mode' ) }>
-				<MenuItemsChoice
-					choices={ choices }
-					value={ intent }
-					onSelect={ setEditorIntent }
-				/>
-			</MenuGroup>
+			<Menu.RadioGroup
+				value={ intent }
+				onValueChange={ ( value ) => setEditorIntent( value ) }
+			>
+				<Menu.Group>
+					<Menu.GroupLabel>{ __( 'Mode' ) }</Menu.GroupLabel>
+					{ choices.map( ( choice ) => (
+						<Menu.RadioItem
+							key={ choice.value }
+							value={ choice.value }
+							disabled={ choice.disabled }
+							shortcut={ choice.shortcut ?? undefined }
+						>
+							<Menu.ItemLabel>{ choice.label }</Menu.ItemLabel>
+							<Menu.ItemDescription>
+								{ choice.info }
+							</Menu.ItemDescription>
+						</Menu.RadioItem>
+					) ) }
+				</Menu.Group>
+			</Menu.RadioGroup>
+			<Menu.Separator />
 		</PostTypeSupportCheck>
 	);
 }

@@ -39,6 +39,29 @@ function parseMarkerValue(
 }
 
 /**
+ * Whether a character's format stack carries the marker with the given id.
+ *
+ * @param stack       Formats applied to one character.
+ * @param formatType  Rich-text format type to match.
+ * @param idAttribute Marker attribute holding the id.
+ * @param target      Marker id, as a string.
+ * @return True when the stack holds the marker.
+ */
+function carriesId(
+	stack: any[] | undefined,
+	formatType: string,
+	idAttribute: string,
+	target: string
+): boolean {
+	return !! stack?.some(
+		( f: any ) =>
+			f.type === formatType &&
+			f.attributes &&
+			f.attributes[ idAttribute ] === target
+	);
+}
+
+/**
  * Find the character range of the marker matching `id` within an already-parsed
  * rich-text record.
  *
@@ -46,8 +69,10 @@ function parseMarkerValue(
  * marker that rich-text split into non-contiguous runs for the same id (an edit
  * inside the run, a nested-format grow, a serialization quirk) still resolves as
  * one range. Returning only the first contiguous run — as an earlier version did
- * — truncated accept/reject to a fragment of the marker. Any short gap between
- * fragments is the suggester's own run and belongs to the suggestion.
+ * — truncated accept/reject to a fragment of the marker. The gap between
+ * fragments may hold unmarked text or another marker, so consumers that act on
+ * characters rather than on the span (`findMarkerText`, `removeMarkedRange` in
+ * inline-suggestions) test each character with `carriesId`.
  *
  * @param record      Rich-text record.
  * @param formatType  Rich-text format type to match.
@@ -66,14 +91,7 @@ function rangeInRecord(
 	let start = -1;
 	let end = -1;
 	for ( let i = 0; i < formats.length; i++ ) {
-		const stack = formats[ i ];
-		const hit = stack?.find(
-			( f: any ) =>
-				f.type === formatType &&
-				f.attributes &&
-				f.attributes[ idAttribute ] === target
-		);
-		if ( hit ) {
+		if ( carriesId( formats[ i ], formatType, idAttribute, target ) ) {
 			if ( start === -1 ) {
 				start = i;
 			}
@@ -161,5 +179,17 @@ export function findMarkerText(
 	if ( ! range ) {
 		return '';
 	}
-	return record.text.slice( range.start, range.end );
+	// A fragmented marker's span can hold unmarked text or another marker's
+	// text; quote only the characters this marker owns, as accept and reject
+	// act on those.
+	const target = String( id );
+	let text = '';
+	for ( let i = range.start; i < range.end; i++ ) {
+		if (
+			carriesId( record.formats[ i ], formatType, idAttribute, target )
+		) {
+			text += record.text[ i ];
+		}
+	}
+	return text;
 }

@@ -1,3 +1,4 @@
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
 	RichTextData,
 	registerFormatType,
@@ -621,6 +622,20 @@ describe( 'formatsAdditionRunToExtend / valueAdditionRunToExtend', () => {
 			`${ mine( 41, 'ADD' ) }${ add( 42, 'XX' ) }${ mine( 41, 'ED' ) }`
 		);
 		expect( valueAdditionRunToExtend( value, 2, '2' ) ).toBeNull();
+	} );
+
+	it( 'does not match an own addition with another marker nested inside it', () => {
+		// A collaborator proposed deleting part of this author's addition.
+		// Growing would re-apply the outer marker over the run and strip the
+		// nested one, orphaning its note.
+		const value = RichTextData.fromHTMLString(
+			`<mark class="wp-suggestion" data-suggestion-id="41" data-suggestion-type="add" data-author="2">out${ del(
+				42,
+				'in'
+			) }</mark>`
+		);
+		expect( valueAdditionRunToExtend( value, 5, '2' ) ).toBeNull();
+		expect( valueAdditionRunToExtend( value, 3, '2' ) ).toBeNull();
 	} );
 
 	it( 'returns null for unmarked text and non-rich values', () => {

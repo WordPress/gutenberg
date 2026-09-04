@@ -19,7 +19,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0",
+		"node": "^20.19.0 || >=22.13.0",
 		"npm": ">=8.19.2"
 	},
 	"files": [
@@ -79,7 +79,7 @@
 		"sass-loader": "^16.0.3",
 		"schema-utils": "^4.2.0",
 		"source-map-loader": "^3.0.0",
-		"stylelint": "^16.26.1",
+		"stylelint": "^17.14.1",
 		"terser-webpack-plugin": "^5.3.10",
 		"url-loader": "^4.1.1",
 		"webpack": "^5.108.1",
@@ -88,7 +88,8 @@
 		"webpack-dev-server": "^5.2.1"
 	},
 	"devDependencies": {
-		"rimraf": "^5.0.10"
+		"rimraf": "^5.0.10",
+		"vitest": "^4.1.10"
 	},
 	"peerDependencies": {
 		"@playwright/test": ">=1",
