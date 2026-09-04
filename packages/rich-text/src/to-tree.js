@@ -146,13 +146,9 @@ export function toTree( {
 
 	for ( let i = 0; i < formatsLength; i++ ) {
 		const character = text.charAt( i );
-		const shouldInsertPadding =
-			isEditableTree &&
-			// Pad the line if the line is empty.
-			( ! lastCharacter ||
-				// Pad the line if the previous character is a line break, otherwise
-				// the line break won't be visible.
-				lastCharacter === '\n' );
+		// Pad the line if the previous character is a line break, otherwise
+		// the line break won't be visible.
+		const shouldInsertPadding = isEditableTree && lastCharacter === '\n';
 
 		const characterFormats = formats[ i ];
 		let pointer = getLastChild( tree );
@@ -322,20 +318,43 @@ export function toTree( {
 
 		if ( shouldInsertPadding && i === text.length ) {
 			append( getParent( pointer ), ZWNBSP );
+		}
 
+		// Insert a <br> for empty fields so browsers can place the caret and
+		// extend selection into them, it can't be empty. We also can't use
+		// ZWNBSP or other characters because it causes iOS auto-capitalize
+		// issues.
+		if ( isEditableTree && text.length === 0 ) {
 			// We CANNOT use CSS to add a placeholder with pseudo elements on
-			// the main block wrappers because that could clash with theme CSS.
-			if ( placeholder && text.length === 0 ) {
+			// the main block wrappers because:
+			// - that could clash with theme CSS using ::before or ::after to
+			//   style the elements (e.g. heading styling)
+			// - a <br> element is present and needed to allow multi-selection
+			//   into empty fields.
+			//
+			// Note that also shouldn't relatively position the rich text
+			// container because again that could clash with theme CSS. Instead,
+			// we relatively position the span and absolutely position the
+			// pseudo content. `display:contents` is used to make sure it
+			// doesn't affect the placeholder width.
+			if ( placeholder ) {
 				append( getParent( pointer ), {
 					type: 'span',
 					attributes: {
 						'data-rich-text-placeholder': placeholder,
 						// Necessary to prevent the placeholder from catching
 						// selection and being editable.
-						style: 'pointer-events:none;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;',
+						style: 'pointer-events:none;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;display:contents;position:relative;',
 					},
 				} );
 			}
+			append( getParent( pointer ), {
+				type: 'br',
+				attributes: {
+					'data-rich-text-padding': 'true',
+				},
+				object: true,
+			} );
 		}
 
 		lastCharacterFormats = characterFormats;
