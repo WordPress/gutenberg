@@ -151,6 +151,11 @@ test.describe( 'Cover', () => {
 				'rgb(0, 0, 255)'
 			);
 
+			// Dismiss the custom color picker, then the Overlay toolbar popover,
+			// so they don't intercept clicks on Replace.
+			await page.keyboard.press( 'Escape' );
+			await page.keyboard.press( 'Escape' );
+
 			// Replace the image again with the original black-and-white one.
 			// Because the user explicitly set the overlay color, it should NOT
 			// be auto-detected from the new image.
