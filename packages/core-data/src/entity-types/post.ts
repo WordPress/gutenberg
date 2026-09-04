@@ -77,11 +77,11 @@ declare module './base-entity-records' {
 					/**
 					 * Whether the content is protected with a password.
 					 */
-					is_protected: boolean;
+					protected: boolean;
 					/**
-					 * Version of the content block format used by the page.
+					 * Version of the content block format used by the post.
 					 */
-					block_version: ContextualField< string, 'edit', C >;
+					block_version: ContextualField< number, 'edit', C >;
 				},
 				'view' | 'edit',
 				C
@@ -140,6 +140,10 @@ declare module './base-entity-records' {
 			 * The terms assigned to the post in the post_tag taxonomy.
 			 */
 			tags: ContextualField< number[], 'view' | 'edit', C >;
+			/**
+			 * Class names for the post container element.
+			 */
+			class_list: ContextualField< string[], 'view' | 'edit', C >;
 		}
 	}
 }

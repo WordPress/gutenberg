@@ -114,6 +114,7 @@
             - positioner
             - render
             - style
+            - width
       - name: Autocomplete.Portal
         props:
             - className
@@ -122,15 +123,37 @@
             - render
             - style
       - name: Autocomplete.Positioner
-        props: []
+        props:
+            - align
+            - alignOffset
+            - anchor
+            - arrowPadding
+            - className
+            - collisionAvoidance
+            - collisionBoundary
+            - collisionPadding
+            - disableAnchorTracking
+            - positionMethod
+            - render
+            - side
+            - sideOffset
+            - sticky
+            - style
       - name: Autocomplete.Row
         props:
             - children
             - className
             - render
             - style
+      - name: Autocomplete.Status
+        props:
+            - children
+            - className
+            - render
+            - style
       - name: Autocomplete.Value
-        props: []
+        props:
+            - children
 - name: Badge
   props:
       - children
@@ -201,6 +224,7 @@
       - onValueChange
       - render
       - required
+      - role
       - showOutsideDays
       - startMonth
       - style
@@ -319,7 +343,6 @@
       - aria-label
       - aria-labelledby
       - as
-      - asButtons
       - clearable
       - colors
       - disableCustomColors
@@ -327,6 +350,7 @@
       - headingLevel
       - loop
       - onChange
+      - presentation
       - selectedSlug
       - value
 - name: ColorPicker
@@ -403,6 +427,7 @@
             - render
 - name: ConfirmDialog
   props:
+      - __experimentalHideHeader
       - cancelButtonText
       - children
       - confirmButtonText
@@ -411,6 +436,7 @@
       - onCancel
       - onConfirm
       - size
+      - title
 - name: CustomSelectControl
   props:
       - __experimentalShowSelectedHint
@@ -584,13 +610,25 @@
             - render
             - style
       - name: Field.Item
-        props: []
+        props:
+            - children
+            - className
+            - disabled
+            - render
+            - style
       - name: Field.Label
         props:
             - children
             - className
             - hideFromVision
             - nativeLabel
+            - render
+            - style
+            - variant
+      - name: Field.VisualLabel
+        props:
+            - children
+            - className
             - render
             - style
             - variant
@@ -671,7 +709,6 @@
       - __nextHasNoMargin
       - aria-label
       - aria-labelledby
-      - asButtons
       - className
       - clearable
       - disableCustomGradients
@@ -680,6 +717,7 @@
       - headingLevel
       - loop
       - onChange
+      - presentation
       - selectedSlug
       - value
 - name: Icon
@@ -754,6 +792,7 @@
       - openInNewTab
       - render
       - style
+      - target
       - tone
       - variant
 - name: MenuGroup
@@ -907,7 +946,10 @@
       - variant
   subcomponents:
       - name: Popover.Slot
-        props: []
+        props:
+            - key
+            - name
+            - ref
 - name: ProgressBar
   props:
       - className
@@ -942,6 +984,7 @@
       - onValueChange
       - render
       - required
+      - role
       - showOutsideDays
       - startMonth
       - style
@@ -1032,6 +1075,185 @@
       - type
 - name: ScrollLock
   props: []
+- name: SearchableChipSelect
+  props:
+      - actionsRef
+      - aria-describedby
+      - aria-label
+      - aria-labelledby
+      - autoComplete
+      - autoHighlight
+      - children
+      - chipsContent
+      - clearButtonLabel
+      - defaultInputValue
+      - defaultOpen
+      - defaultValue
+      - disabled
+      - emptyContent
+      - filter
+      - filteredItems
+      - form
+      - grid
+      - highlightItemOnHover
+      - id
+      - inline
+      - inputRef
+      - inputValue
+      - isItemEqualToValue
+      - items
+      - itemToStringLabel
+      - itemToStringValue
+      - key
+      - limit
+      - locale
+      - loopFocus
+      - modal
+      - name
+      - onInputValueChange
+      - onItemHighlighted
+      - onOpenChange
+      - onOpenChangeComplete
+      - onValueChange
+      - open
+      - openOnInputClick
+      - popupWidth
+      - readOnly
+      - ref
+      - required
+      - searchPlaceholder
+      - showClearButton
+      - value
+      - virtualized
+  subcomponents:
+      - name: SearchableChipSelect.ChipWithRemove
+        props:
+            - children
+            - className
+            - prefix
+            - removeLabel
+            - render
+            - style
+      - name: SearchableChipSelect.Collection
+        props:
+            - children
+      - name: SearchableChipSelect.Group
+        props:
+            - children
+            - className
+            - items
+            - render
+            - style
+      - name: SearchableChipSelect.GroupLabel
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SearchableChipSelect.Item
+        props:
+            - children
+            - className
+            - disabled
+            - index
+            - nativeButton
+            - onClick
+            - render
+            - style
+            - value
+            - variant
+- name: SearchableChipSelectControl
+  props:
+      - actionsRef
+      - aria-describedby
+      - aria-label
+      - aria-labelledby
+      - autoComplete
+      - autoHighlight
+      - children
+      - chipsContent
+      - className
+      - clearButtonLabel
+      - defaultInputValue
+      - defaultOpen
+      - defaultValue
+      - description
+      - details
+      - disabled
+      - emptyContent
+      - filter
+      - filteredItems
+      - form
+      - grid
+      - hideLabelFromVision
+      - highlightItemOnHover
+      - id
+      - inline
+      - inputRef
+      - inputValue
+      - isItemEqualToValue
+      - items
+      - itemToStringLabel
+      - itemToStringValue
+      - key
+      - label
+      - limit
+      - locale
+      - loopFocus
+      - modal
+      - name
+      - onInputValueChange
+      - onItemHighlighted
+      - onOpenChange
+      - onOpenChangeComplete
+      - onValueChange
+      - open
+      - openOnInputClick
+      - popupWidth
+      - readOnly
+      - ref
+      - required
+      - searchPlaceholder
+      - showClearButton
+      - value
+      - virtualized
+  subcomponents:
+      - name: SearchableChipSelectControl.ChipWithRemove
+        props:
+            - children
+            - className
+            - prefix
+            - removeLabel
+            - render
+            - style
+      - name: SearchableChipSelectControl.Collection
+        props:
+            - children
+      - name: SearchableChipSelectControl.Group
+        props:
+            - children
+            - className
+            - items
+            - render
+            - style
+      - name: SearchableChipSelectControl.GroupLabel
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SearchableChipSelectControl.Item
+        props:
+            - children
+            - className
+            - disabled
+            - index
+            - nativeButton
+            - onClick
+            - render
+            - style
+            - value
+            - variant
 - name: SearchControl
   props:
       - __next40pxDefaultSize
@@ -1274,6 +1496,10 @@
         props:
             - children
             - className
+            - closeDelay
+            - closeOnClick
+            - delay
+            - disabled
             - render
             - style
 - name: TreeGrid
@@ -1362,6 +1588,11 @@
       - unit
       - units
       - value
+- name: ValidityIndicator
+  props:
+      - id
+      - message
+      - type
 - name: VisuallyHidden
   props:
       - children

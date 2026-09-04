@@ -19,6 +19,7 @@ import Sidebar from '../sidebar';
 import SavePanel from '../save-panel';
 import CanvasRenderer from '../canvas-renderer';
 import ErrorBoundary from '../error-boundary';
+import PluginArea from '../plugin-area';
 import useRouteTitle from '../app/use-route-title';
 import { unlock } from '../../lock-unlock';
 import type { CanvasData } from '../../store/types';
@@ -57,6 +58,7 @@ export default function Root() {
 	return (
 		<SlotFillProvider>
 			<Tooltip.Provider>
+				<PluginArea />
 				<ThemeProvider
 					isRoot
 					color={ { ...themeColors, background: '#f8f8f8' } }
@@ -159,7 +161,8 @@ export default function Root() {
 								<ThemeProvider
 									color={ {
 										...themeColors,
-										background: '#ffffff',
+										// Reset to the default background color.
+										background: '#fcfcfc',
 									} }
 								>
 									<Outlet />

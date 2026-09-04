@@ -1,6 +1,5 @@
+import { describe, expect, it } from 'vitest';
 import { computeBrandFallback, formatDesignTokenFallbacksScss } from '../index';
-
-jest.mock( '@terrazzo/plugin-css', () => ( { FORMAT_ID: 'css/value' } ) );
 
 describe( 'computeBrandFallback', () => {
 	it( 'throws on colors with alpha (8-digit hex)', () => {

@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Prevent Highlight format toolbar from crashing when switching to Edit as HTML with background-only formatting active. ([#82215](https://github.com/WordPress/gutenberg/pull/82215))
+
+### Internal
+
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+-   Migrate the package to TypeScript ([#79486](https://github.com/WordPress/gutenberg/pull/79486)).
+
+## 5.54.0 (2026-08-26)
+
+### Internal
+
+-   Math format: Use `ValidatedInputControl` from `@wordpress/ui` in the LaTeX popover instead of unlocking `ValidatedInputControl` from the `@wordpress/components` private APIs ([#81627](https://github.com/WordPress/gutenberg/pull/81627)).
+
 ## 5.53.0 (2026-08-12)
 
 
