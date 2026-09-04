@@ -17,6 +17,8 @@ import ScreenBlock from './screen-block';
 import ScreenTypography from './screen-typography';
 import ScreenTypographyElement from './screen-typography-element';
 import ScreenColors from './screen-colors';
+import ScreenElements from './screen-elements';
+import ScreenForms from './screen-forms';
 import ScreenColorPalette from './screen-color-palette';
 import ScreenBackground from './screen-background';
 import { ScreenShadows, ScreenShadowsEdit } from './screen-shadows';
@@ -204,6 +206,12 @@ export function GlobalStylesUI( {
 					<GlobalStylesNavigationScreen path="/typography">
 						<ScreenTypography />
 					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/elements">
+						<ScreenElements />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/elements/form-controls">
+						<ScreenForms />
+					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/typography/font-sizes">
 						<FontSizes />
 					</GlobalStylesNavigationScreen>
@@ -234,29 +242,35 @@ export function GlobalStylesUI( {
 					<GlobalStylesNavigationScreen path="/background">
 						<ScreenBackground />
 					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/typography/text">
+					<GlobalStylesNavigationScreen path="/elements/text">
 						<ScreenTypographyElement element="text" />
 					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/typography/link">
+					<GlobalStylesNavigationScreen path="/elements/link">
 						<ScreenTypographyElement element="link" />
 					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/typography/heading">
+					<GlobalStylesNavigationScreen path="/elements/heading">
 						<ScreenTypographyElement element="heading" />
 					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/typography/caption">
+					<GlobalStylesNavigationScreen path="/elements/caption">
 						<ScreenTypographyElement element="caption" />
 					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/typography/cite">
+					<GlobalStylesNavigationScreen path="/elements/cite">
 						<ScreenTypographyElement element="cite" />
 					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/typography/button">
+					<GlobalStylesNavigationScreen path="/elements/button">
 						<ScreenTypographyElement element="button" />
 					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/typography/textInput">
-						<ScreenTypographyElement element="textInput" />
+					<GlobalStylesNavigationScreen path="/elements/form-controls/typography/textInput">
+						<ScreenTypographyElement
+							element="textInput"
+							showColorControls={ false }
+						/>
 					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/typography/select">
-						<ScreenTypographyElement element="select" />
+					<GlobalStylesNavigationScreen path="/elements/form-controls/typography/select">
+						<ScreenTypographyElement
+							element="select"
+							showColorControls={ false }
+						/>
 					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/blocks">
 						<ScreenBlockList />

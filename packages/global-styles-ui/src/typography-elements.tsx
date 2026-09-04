@@ -15,6 +15,12 @@ interface ElementItemProps {
 	label: string;
 }
 
+interface TypographyElementsProps {
+	elements: Omit< ElementItemProps, 'parentMenu' >[];
+	parentMenu: string;
+	title?: string;
+}
+
 function ElementItem( { parentMenu, element, label }: ElementItemProps ) {
 	const prefix =
 		element === 'text' || ! element ? '' : `elements.${ element }.`;
@@ -66,53 +72,23 @@ function ElementItem( { parentMenu, element, label }: ElementItemProps ) {
 	);
 }
 
-function TypographyElements() {
-	const parentMenu = '';
-
+function TypographyElements( {
+	elements,
+	parentMenu,
+	title,
+}: TypographyElementsProps ) {
 	return (
 		<VStack spacing={ 3 }>
-			<Subtitle level={ 3 }>{ __( 'Elements' ) }</Subtitle>
+			{ title && <Subtitle level={ 3 }>{ title }</Subtitle> }
 			<ItemGroup isBordered isSeparated>
-				<ElementItem
-					parentMenu={ parentMenu }
-					element="text"
-					label={ __( 'Text' ) }
-				/>
-				<ElementItem
-					parentMenu={ parentMenu }
-					element="link"
-					label={ __( 'Links' ) }
-				/>
-				<ElementItem
-					parentMenu={ parentMenu }
-					element="heading"
-					label={ __( 'Headings' ) }
-				/>
-				<ElementItem
-					parentMenu={ parentMenu }
-					element="caption"
-					label={ __( 'Captions' ) }
-				/>
-				<ElementItem
-					parentMenu={ parentMenu }
-					element="cite"
-					label={ __( 'Citations' ) }
-				/>
-				<ElementItem
-					parentMenu={ parentMenu }
-					element="button"
-					label={ __( 'Buttons' ) }
-				/>
-				<ElementItem
-					parentMenu={ parentMenu }
-					element="textInput"
-					label={ __( 'Inputs' ) }
-				/>
-				<ElementItem
-					parentMenu={ parentMenu }
-					element="select"
-					label={ __( 'Selects' ) }
-				/>
+				{ elements.map( ( { element, label } ) => (
+					<ElementItem
+						key={ element }
+						parentMenu={ parentMenu }
+						element={ element }
+						label={ label }
+					/>
+				) ) }
 			</ItemGroup>
 		</VStack>
 	);

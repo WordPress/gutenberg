@@ -69,6 +69,31 @@ function ScreenRoot() {
 					marginBottom={ 4 }
 				>
 					{ __(
+						'Customize the appearance of text, buttons, links, and form controls for the whole site.'
+					) }
+				</Spacer>
+				<ItemGroup>
+					<NavigationButtonAsItem path="/elements">
+						<HStack justify="space-between">
+							<FlexItem>{ __( 'Elements' ) }</FlexItem>
+							<IconWithCurrentColor
+								icon={ isRTL() ? chevronLeft : chevronRight }
+							/>
+						</HStack>
+					</NavigationButtonAsItem>
+				</ItemGroup>
+			</CardBody>
+
+			<CardDivider />
+
+			<CardBody>
+				<Spacer
+					as="p"
+					paddingTop={ 2 }
+					paddingX="13px"
+					marginBottom={ 4 }
+				>
+					{ __(
 						'Customize the appearance of specific blocks for the whole site.'
 					) }
 				</Spacer>
