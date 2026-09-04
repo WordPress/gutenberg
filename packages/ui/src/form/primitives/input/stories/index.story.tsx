@@ -5,7 +5,8 @@ import { WithSuffixControl as InputLayoutWithSuffixControl } from '../../input-l
 
 const meta: Meta< typeof Input > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Form/Primitives/Input',
+	title: 'Components/@wordpress-ui/Form/Primitives/Input',
+	id: 'design-system-components-form-primitives-input',
 	component: Input,
 	// Temporary: Due to an upstream bug, render the root explicitly so the
 	// components manifest extractor can resolve props from the JSX.

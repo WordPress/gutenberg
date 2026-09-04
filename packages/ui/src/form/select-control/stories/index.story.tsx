@@ -9,7 +9,8 @@ import {
 
 const meta: Meta< typeof SelectControl > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Form/SelectControl',
+	title: 'Components/@wordpress-ui/Form/SelectControl',
+	id: 'design-system-components-form-selectcontrol',
 	component: SelectControl,
 	// Temporary: Due to an upstream bug, render the root explicitly so the
 	// components manifest extractor can resolve props from the JSX.

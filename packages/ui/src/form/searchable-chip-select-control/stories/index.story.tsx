@@ -21,7 +21,8 @@ import {
 
 const meta: Meta< typeof SearchableChipSelectControl > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Form/SearchableChipSelectControl',
+	title: 'Components/@wordpress-ui/Form/SearchableChipSelectControl',
+	id: 'design-system-components-form-searchablechipselectcontrol',
 	component: SearchableChipSelectControl,
 	// Temporary: Due to an upstream bug, render the root explicitly so the
 	// components manifest extractor can resolve props from the JSX.

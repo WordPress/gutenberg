@@ -3,7 +3,8 @@ import { Textarea } from '../index';
 
 const meta: Meta< typeof Textarea > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Form/Primitives/Textarea',
+	title: 'Components/@wordpress-ui/Form/Primitives/Textarea',
+	id: 'design-system-components-form-primitives-textarea',
 	component: Textarea,
 	// Temporary: Due to an upstream bug, render the root explicitly so the
 	// components manifest extractor can resolve props from the JSX.
