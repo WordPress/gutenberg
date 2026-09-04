@@ -34,7 +34,7 @@ When writing or migrating a test:
     exception is no longer needed.
 -   Before running Browser Mode tests locally for the first time, install
     Chromium with
-    `npm exec --workspace @wordpress/unit-tests -- playwright install chromium`.
+    `npm exec --no --workspace @wordpress/unit-tests -- playwright install chromium`.
 -   Do not use per-file Jest or Vitest environment overrides. The filename is
     the single source of truth.
 -   Run `npm test` for the complete lint and unit-test suite. For focused

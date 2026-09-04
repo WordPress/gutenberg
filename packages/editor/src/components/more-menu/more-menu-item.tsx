@@ -33,6 +33,11 @@ type MoreMenuItemProps = Omit<
 	children?: ReactNode;
 
 	/**
+	 * Whether the item is disabled.
+	 */
+	disabled?: boolean;
+
+	/**
 	 * Address the item navigates to, which turns it into a link.
 	 */
 	href?: string;
@@ -110,6 +115,7 @@ function UnforwardedMoreMenuItem(
 		'aria-checked': ariaChecked,
 		'aria-label': ariaLabel,
 		children,
+		disabled,
 		href,
 		icon,
 		info,
@@ -157,6 +163,7 @@ function UnforwardedMoreMenuItem(
 				aria-label={ itemAriaLabel }
 				checked={ checked }
 				closeOnClick
+				disabled={ disabled }
 				onClick={ onClick }
 				prefix={ prefix }
 				shortcut={ itemShortcut }
@@ -168,15 +175,19 @@ function UnforwardedMoreMenuItem(
 		);
 	}
 
-	if ( href !== undefined ) {
+	// A link item has no disabled state: it would still render an active
+	// anchor. A disabled one falls through to an inert `Menu.Item`, the way
+	// `PostPreviewMenuItem` renders it.
+	if ( href !== undefined && ! disabled ) {
 		return (
 			<Menu.LinkItem
 				ref={ ref }
 				aria-label={ itemAriaLabel }
+				closeOnClick
 				href={ href }
 				prefix={ prefix }
 				shortcut={ itemShortcut }
-				openInNewTab={ target === '_blank' }
+				target={ target }
 				onClick={ onClick }
 				{ ...props }
 			>
@@ -198,6 +209,7 @@ function UnforwardedMoreMenuItem(
 		<Menu.Item
 			ref={ ref }
 			aria-label={ itemAriaLabel }
+			disabled={ disabled }
 			prefix={ prefix }
 			shortcut={ itemShortcut }
 			onClick={ onClick }

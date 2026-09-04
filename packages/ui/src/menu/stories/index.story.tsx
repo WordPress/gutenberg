@@ -235,6 +235,7 @@ export const LinkItem: Story = {
 					<Menu.LinkItem
 						href="https://developer.wordpress.org"
 						openInNewTab
+						target="wordpress-developer-resources"
 						shortcut={ SHORTCUTS.developerResources }
 						suffix="Docs"
 					>

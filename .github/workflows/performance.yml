@@ -28,14 +28,57 @@ concurrency:
 permissions: {}
 
 jobs:
+    # Analyzes the list of files modified in a pull request to detect any changes that could
+    # potentially impact performance metrics. A series of ignore patterns are used in place of
+    # an include list to ensure tests run even if the list of filters happens to become stale.
+    detect-relevant-changes:
+        name: Detect changes relevant to performance testing
+        runs-on: 'ubuntu-24.04'
+        timeout-minutes: 5
+        permissions:
+            pull-requests: read
+        outputs:
+            relevant: ${{ steps.filter.outputs.relevant }}
+        steps:
+            - name: Check for changes that may impact performance metrics
+              id: filter
+              if: ${{ github.event_name == 'pull_request' }}
+              uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+              with:
+                  predicate-quantifier: 'every'
+                  filters: |
+                      relevant:
+                          # Start from every file, then exclude what cannot change a performance result.
+                          - '**'
+                          # Documentation and schemas.
+                          - '!**/*.md'
+                          - '!{backport-changelog,docs,phpunit,schemas,storybook,typings}/**'
+                          # Other test suites, which cannot affect the measurements.
+                          - '!test/{integration,php,storybook-playwright,unit}/**'
+                          - '!test/e2e/{*,!(assets)/**}'
+                          - '!{packages,tools}/**/{test,tests}/**'
+                          # Development tooling and its configuration.
+                          - '!packages/{create-block,docgen,eslint-plugin,jest-*,npm-package-json-lint-config,prettier-config,project-management-automation,stylelint-config}/**'
+                          # The mu-plugins and plugins below it load at run time, so they still count.
+                          - '!packages/e2e-tests/{*,!(mu-plugins|plugins)/**}'
+                          - '!tools/{docs,eslint,stylelint,validation}/**'
+                          - '!{eslint,lint-staged,prettier,syncpack}.config*'
+                          - '!{phpcs,phpunit}*'
+                          # Repository metadata.
+                          - '!{changelog,readme}.txt'
+                          - '!.{editorconfig,gitignore,prettierrc*,stylelintrc*}'
+                          # Other workflows, and everything under .github that this one does not use.
+                          - '!.github/{*,!(workflows|setup-node)/**,workflows/!(performance.yml)}'
+
     prepare:
         timeout-minutes: 5
         name: Resolve branches to compare
         runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
+        needs: [detect-relevant-changes]
         permissions:
             contents: read
             actions: read
-        if: ${{ github.repository == 'WordPress/gutenberg' }}
+        if: ${{ github.repository == 'WordPress/gutenberg' && ( github.event_name != 'pull_request' || needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
         outputs:
             # See tools/release/resolve-performance-branches.mjs for the shapes.
             # Falls back to the unresolved branches when the reuse lookup fails.
@@ -418,3 +461,36 @@ jobs:
                   body-path: pr-meta/body.md
                   commit-sha: ${{ github.event.pull_request.head.sha }}
                   run-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+    # Runs on every event so it can serve as the workflow's only required status check while the
+    # preceding jobs are path-filtered away.
+    #
+    # GitHub Actions can only be configured as required status checks on a per job basis using the
+    # job's `name`. When the `name` changes PRs are temporarily blocked from being merged until
+    # a privileged user can update the status checks, a process which is also error prone.
+    #
+    # The script reads every job in the run, so `needs` is only about waiting: it must cover
+    # every job that would otherwise still be running when the script looks. `--ignore` then
+    # names the jobs whose results do not count. Here that is this job itself, and the
+    # housekeeping that runs alongside it.
+    performance-status-check:
+        name: Performance Tests - Status Check
+        runs-on: 'ubuntu-24.04'
+        timeout-minutes: 5
+        permissions:
+            contents: read
+            actions: read
+        needs: [detect-relevant-changes, results]
+        if: ${{ ! cancelled() && github.repository == 'WordPress/gutenberg' }}
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  sparse-checkout: .github/workflows/scripts
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Check for any failures of required jobs
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: node .github/workflows/scripts/ci-status-check.js --ignore 'Performance Tests - Status Check,Update PR meta comment'
