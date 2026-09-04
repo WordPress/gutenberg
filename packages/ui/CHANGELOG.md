@@ -17,6 +17,7 @@
 
 ### Enhancements
 
+-   Give input fields and checkboxes solid, state-aware themed backgrounds while keeping minimal Select triggers transparent. ([#82391](https://github.com/WordPress/gutenberg/pull/82391))
 -   `AlertDialog`, `Dialog`, `Drawer`, `Popover`, and `Tooltip`: Derive Trigger props from the corresponding Base UI components. ([#81824](https://github.com/WordPress/gutenberg/pull/81824))
 -   `Autocomplete.Status`, `Combobox.Status`: Add a `Status` subcomponent that announces async list status to screen readers. Item popups give Status its own collapsing grid row so a visible result count sits above the list without overlaying items ([#82195](https://github.com/WordPress/gutenberg/pull/82195)).
 -   `Autocomplete.Popup`, `Combobox.Popup`, `SearchableChipSelect`, `SearchableChipSelectControl`, `Select.Popup`, and `SelectControl`: Add `width` on Popups and `popupWidth` on composites, with preset width constraints (`anchor`, `content`, `sm`, `md`, `lg`, and `available`) for the item popup. `SelectControl` defaults to `content` to preserve prior popup sizing ([#82087](https://github.com/WordPress/gutenberg/pull/82087), [#82193](https://github.com/WordPress/gutenberg/pull/82193)).
@@ -27,11 +28,13 @@
 
 ### Bug Fixes
 
+-   `Link`: Show the new-tab indicator and accessible notice when `target` is an ASCII case-insensitive match for `"_blank"`. ([#82447](https://github.com/WordPress/gutenberg/pull/82447))
 -   `AlertDialog`, `Dialog`, `Drawer`: Keep descendant focus rings visible at pinned header and footer edges. ([#82443](https://github.com/WordPress/gutenberg/pull/82443))
 -   `Menu.LinkItem`: Show the new-tab indicator and accessible notice when `target` is an ASCII case-insensitive match for `"_blank"`. ([#82442](https://github.com/WordPress/gutenberg/pull/82442))
 -   `Input`, `Textarea`, `InputControl`, `TextareaControl`: Use `--wpds-color-foreground-interactive-neutral-weak` for enabled placeholder text so it meets the 4.5:1 contrast minimum ([#82304](https://github.com/WordPress/gutenberg/pull/82304)).
 -   `SearchableChipSelect`, `SearchableChipSelectControl`: Fix the gray background on disabled search fields in WordPress admin ([#82304](https://github.com/WordPress/gutenberg/pull/82304)).
 -   `ValidityIndicator`: Remove the built-in outer margin. Spacing belongs on the consumer. `ControlWithError` now uses `Stack` with `gap="sm"` so validated controls keep the same gap. ([#82267](https://github.com/WordPress/gutenberg/pull/82267))
+-   `ControlWithError`: Re-read the native validity after the control blurs, so a control that commits an adjusted value on blur (e.g. a number control clamping to its `min`) doesn't keep showing a stale error message ([#82376](https://github.com/WordPress/gutenberg/pull/82376)).
 -   `AlertDialog`: Use a neutral tone for the cancel button. ([#82261](https://github.com/WordPress/gutenberg/pull/82261))
 -   `Input`: Hide the field focus ring when a prefix or suffix slot control is focused. ([#82257](https://github.com/WordPress/gutenberg/pull/82257))
 -   `Icon`: Merge a consumer-supplied `style` prop with the icon's intrinsic styles instead of replacing them, so styles like `fill: none` on stroke-based icons survive unless the consumer overrides the same property explicitly. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))

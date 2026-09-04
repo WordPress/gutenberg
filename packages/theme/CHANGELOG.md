@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add neutral interactive background tokens for resting, active, and disabled input and selection control states. ([#82391](https://github.com/WordPress/gutenberg/pull/82391))
+
 ### Documentation
 
 -   Explain how consumers define light and dark themes through `ThemeProvider` color seeds ([#82039](https://github.com/WordPress/gutenberg/pull/82039)).
