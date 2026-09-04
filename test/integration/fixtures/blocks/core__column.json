@@ -2,7 +2,13 @@
 	{
 		"name": "core/column",
 		"isValid": true,
-		"attributes": {},
+		"attributes": {
+			"style": {
+				"dimensions": {
+					"width": "50%"
+				}
+			}
+		},
 		"innerBlocks": [
 			{
 				"name": "core/paragraph",
