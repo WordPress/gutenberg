@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Add optional `keywords` to the icon manifest, giving each public icon extra search terms, and emit them from the generated `manifest.php`.
+-   Add optional `keywords` to the icon manifest, giving each public icon extra search terms, and emit them from the generated `manifest.php`. ([#82367](https://github.com/WordPress/gutenberg/pull/82367))
 
 ### Internal
 
