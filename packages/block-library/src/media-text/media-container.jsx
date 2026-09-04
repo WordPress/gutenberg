@@ -53,6 +53,7 @@ function ToolbarEditButton( {
 				onSelect={ onSelectMedia }
 				onToggleFeaturedImage={ toggleUseFeaturedImage }
 				useFeaturedImage={ useFeaturedImage }
+				name={ mediaUrl ? __( 'Replace' ) : __( 'Add media' ) }
 				onReset={ () => onSelectMedia( undefined ) }
 			/>
 		</BlockControls>
@@ -210,7 +211,18 @@ function MediaContainer( props, ref ) {
 		);
 	}
 
-	return <PlaceholderContainer { ...props } />;
+	return (
+		<>
+			<ToolbarEditButton
+				onSelectMedia={ onSelectMedia }
+				mediaId={ mediaId }
+				mediaUrl={ mediaUrl }
+				toggleUseFeaturedImage={ toggleUseFeaturedImage }
+				useFeaturedImage={ useFeaturedImage }
+			/>
+			<PlaceholderContainer { ...props } />
+		</>
+	);
 }
 
 export default forwardRef( MediaContainer );
