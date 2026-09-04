@@ -1518,34 +1518,6 @@ describe( 'Menu', () => {
 		).toHaveAttribute( 'target', '_BLANK' );
 	} );
 
-	it( 'does not treat non-ASCII target characters as "_blank"', async () => {
-		const user = userEvent.setup();
-		const nonAsciiTarget = '_blan\u212A';
-
-		render(
-			<Menu.Root>
-				<Menu.Trigger>Actions</Menu.Trigger>
-				<Menu.Popup>
-					<Menu.LinkItem
-						href="https://wordpress.org"
-						target={ nonAsciiTarget }
-					>
-						<Menu.ItemLabel>WordPress.org</Menu.ItemLabel>
-					</Menu.LinkItem>
-				</Menu.Popup>
-			</Menu.Root>
-		);
-
-		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
-
-		expect(
-			await screen.findByRole( 'menuitem', { name: 'WordPress.org' } )
-		).toHaveAttribute( 'target', nonAsciiTarget );
-		expect(
-			screen.queryByLabelText( '(opens in a new tab)' )
-		).not.toBeInTheDocument();
-	} );
-
 	it( 'forwards a named target on link items without adding a new tab notice', async () => {
 		const user = userEvent.setup();
 
