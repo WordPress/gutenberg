@@ -8,6 +8,8 @@ import focusStyles from '../utils/css/focus.module.scss';
 import styles from './style.module.css';
 import defenseStyles from '../utils/css/global-css-defense.module.css';
 
+const BLANK_TARGET_PATTERN = /^_[bB][lL][aA][nN][kK]$/;
+
 /**
  * A styled anchor element with support for semantic color tones and an
  * unstyled escape hatch.
@@ -28,7 +30,8 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
 	},
 	ref
 ) {
-	const shouldShowNewTabIndicator = openInNewTab || target === '_blank';
+	const shouldShowNewTabIndicator =
+		openInNewTab || BLANK_TARGET_PATTERN.test( target ?? '' );
 	const element = useRender( {
 		render,
 		defaultTagName: 'a',
