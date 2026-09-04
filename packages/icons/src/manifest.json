@@ -123,7 +123,7 @@
 	{
 		"slug": "at-symbol",
 		"label": "At Symbol (@)",
-		"keywords": [ "mention", "username" ],
+		"keywords": [ "email", "mention", "username" ],
 		"filePath": "library/at-symbol.svg",
 		"public": true
 	},
