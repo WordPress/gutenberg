@@ -6,17 +6,39 @@ import useIndentListItem from './use-indent-list-item';
 import useOutdentListItem from './use-outdent-list-item';
 
 export default function useMultiSelectTab( clientId ) {
-	const {
-		getBlockIndex,
-		hasMultiSelection,
-		getMultiSelectedBlockClientIds,
-		getBlockName,
-	} = useSelect( blockEditorStore );
+	const { getBlockIndex } = useSelect( blockEditorStore );
+	// Only the first item of an all-list-item multi selection attaches the
+	// listener, so there is a single handler regardless of how many list items
+	// are rendered, and only while such a selection exists.
+	const isActive = useSelect(
+		( select ) => {
+			const {
+				hasMultiSelection,
+				getMultiSelectedBlockClientIds,
+				getBlockName,
+			} = select( blockEditorStore );
+			if ( ! hasMultiSelection() ) {
+				return false;
+			}
+			const clientIds = getMultiSelectedBlockClientIds();
+			return (
+				clientIds[ 0 ] === clientId &&
+				clientIds.every(
+					( id ) => getBlockName( id ) === 'core/list-item'
+				)
+			);
+		},
+		[ clientId ]
+	);
 	const indentListItem = useIndentListItem( clientId );
 	const outdentListItem = useOutdentListItem();
 
 	return useRefEffect(
 		( element ) => {
+			if ( ! isActive ) {
+				return;
+			}
+
 			function onKeyDown( event ) {
 				const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
 
@@ -25,18 +47,7 @@ export default function useMultiSelectTab( clientId ) {
 					event.defaultPrevented ||
 					altKey ||
 					metaKey ||
-					ctrlKey ||
-					! hasMultiSelection()
-				) {
-					return;
-				}
-
-				const clientIds = getMultiSelectedBlockClientIds();
-				if (
-					clientIds[ 0 ] !== clientId ||
-					! clientIds.every(
-						( id ) => getBlockName( id ) === 'core/list-item'
-					)
+					ctrlKey
 				) {
 					return;
 				}
@@ -55,16 +66,15 @@ export default function useMultiSelectTab( clientId ) {
 
 			// During a multi selection focus sits on the writing flow
 			// container, not inside any item, so an element listener never sees
-			// the key. Listen on the document instead; only the first selected
-			// item acts, on the whole selection, the same set the toolbar
-			// buttons work on. Capture phase so we run before writing-flow's
-			// keydown handlers, which gate on `event.defaultPrevented`.
+			// the key. Listen on the document. Capture phase so we run before
+			// writing-flow's keydown handlers, which gate on
+			// `event.defaultPrevented`.
 			const { ownerDocument } = element;
 			ownerDocument.addEventListener( 'keydown', onKeyDown, true );
 			return () => {
 				ownerDocument.removeEventListener( 'keydown', onKeyDown, true );
 			};
 		},
-		[ clientId, indentListItem ]
+		[ isActive, clientId, getBlockIndex, indentListItem, outdentListItem ]
 	);
 }
