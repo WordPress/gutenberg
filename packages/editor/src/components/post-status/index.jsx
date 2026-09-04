@@ -63,8 +63,8 @@ export const STATUS_OPTIONS = [
 ];
 
 export default function PostStatus() {
-	const { status, date, password, postId, postType, canEdit } = useSelect(
-		( select ) => {
+	const { status, date, password, postId, postType, canEdit, postStatuses } =
+		useSelect( ( select ) => {
 			const {
 				getEditedPostAttribute,
 				getCurrentPostId,
@@ -79,10 +79,12 @@ export default function PostStatus() {
 				postType: getCurrentPostType(),
 				canEdit:
 					getCurrentPost()._links?.[ 'wp:action-publish' ] ?? false,
+				postStatuses: select( coreStore ).getEntityRecords(
+					'root',
+					'status'
+				),
 			};
-		},
-		[]
-	);
+		}, [] );
 	const [ showPassword, setShowPassword ] = useState( !! password );
 	const passwordInputId = useInstanceId(
 		PostStatus,
@@ -104,6 +106,78 @@ export default function PostStatus() {
 		} ),
 		[ popoverAnchor ]
 	);
+
+	const statusOptions = useMemo( () => {
+		if ( ! postStatuses?.length ) {
+			return STATUS_OPTIONS;
+		}
+
+		const staticOptionsBySlug = new Map(
+			STATUS_OPTIONS.map( ( option ) => [ option.value, option ] )
+		);
+
+		const options = STATUS_OPTIONS.map( ( option ) => {
+			const apiStatus = postStatuses.find(
+				( s ) => s.slug === option.value
+			);
+			if ( apiStatus ) {
+				return {
+					...option,
+					label: apiStatus.name || option.label,
+					description: apiStatus.description || option.description,
+				};
+			}
+			return option;
+		} );
+
+		postStatuses.forEach( ( apiStatus ) => {
+			if (
+				! staticOptionsBySlug.has( apiStatus.slug ) &&
+				apiStatus.slug !== 'trash' &&
+				apiStatus.slug !== 'auto-draft' &&
+				apiStatus.slug !== 'inherit' &&
+				( apiStatus.show_in_admin_status_list ??
+					apiStatus.show_in_list )
+			) {
+				options.push( {
+					label: apiStatus.name,
+					value: apiStatus.slug,
+					description: apiStatus.description || '',
+				} );
+			}
+		} );
+
+		return options;
+	}, [ postStatuses ] );
+
+	const currentStatusInfo = useMemo( () => {
+		if ( postStatusesInfo[ status ] ) {
+			const info = postStatusesInfo[ status ];
+			const apiStatus = postStatuses?.find?.(
+				( s ) => s.slug === status
+			);
+			if ( apiStatus?.name ) {
+				return {
+					...info,
+					label: apiStatus.name,
+				};
+			}
+			return info;
+		}
+		const matchingStatus = postStatuses?.find?.(
+			( s ) => s.slug === status
+		);
+		if ( matchingStatus ) {
+			return {
+				label: matchingStatus.name,
+				icon: undefined,
+			};
+		}
+		return {
+			label: status,
+			icon: undefined,
+		};
+	}, [ status, postStatuses ] );
 
 	if ( DESIGN_POST_TYPES.includes( postType ) ) {
 		return null;
@@ -158,15 +232,15 @@ export default function PostStatus() {
 							variant="tertiary"
 							size="compact"
 							onClick={ onToggle }
-							icon={ postStatusesInfo[ status ]?.icon }
+							icon={ currentStatusInfo?.icon }
 							aria-label={ sprintf(
 								// translators: %s: Current post status.
 								__( 'Change status: %s' ),
-								postStatusesInfo[ status ]?.label
+								currentStatusInfo?.label
 							) }
 							aria-expanded={ isOpen }
 						>
-							{ postStatusesInfo[ status ]?.label }
+							{ currentStatusInfo?.label }
 						</Button>
 					) }
 					renderContent={ ( { onClose } ) => (
@@ -186,7 +260,7 @@ export default function PostStatus() {
 										className="editor-change-status__options"
 										hideLabelFromVision
 										label={ __( 'Status' ) }
-										options={ STATUS_OPTIONS }
+										options={ statusOptions }
 										onChange={ handleStatus }
 										selected={
 											status === 'auto-draft'
@@ -253,7 +327,7 @@ export default function PostStatus() {
 				/>
 			) : (
 				<div className="editor-post-status is-read-only">
-					{ postStatusesInfo[ status ]?.label }
+					{ currentStatusInfo?.label }
 				</div>
 			) }
 		</PostPanelRow>
