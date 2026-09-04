@@ -8,6 +8,10 @@ View online at: https://wordpress.github.io/gutenberg/
 
 Run locally in your development environment running: `npm run storybook:dev` from the top-level Gutenberg directory.
 
+## Component status in the sidebar
+
+Component pages declare their recommendation status with `parameters.componentStatus` (`recommended`, `use-with-caution`, `not-recommended` or `unaudited`). Parameters never reach the story index, so `status-indexer.ts` reads that value from the source at index time and tags every entry of the file with `status-<value>`. The sidebar shows the matching icon next to the component name, and the tag filter next to the search box can include or exclude any status. The `status-private`, `status-experimental` and `status-wip` tags are still declared by hand in each story's `tags` array; all badge definitions live in `badges.js`.
+
 ## Manifest snapshot regression testing
 
 Storybook upgrades and inocuous code refactoring have been a frequent source of accidental documentation regressions, resulting in component or prop descriptions being accidentally removed.
