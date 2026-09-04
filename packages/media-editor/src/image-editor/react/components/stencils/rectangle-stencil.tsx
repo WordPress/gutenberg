@@ -153,9 +153,22 @@ export function RectangleStencil( {
 	}, [] );
 
 	useEffect( () => {
-		if ( isResizeDisabled ) {
-			activePointerResizeRef.current?.cancel();
+		if ( ! isResizeDisabled ) {
+			return;
 		}
+		activePointerResizeRef.current?.cancel();
+		// A keyboard resize settles on a timer rather than a pointer
+		// release, so close it here too: otherwise the pending timer
+		// fires `onResizeEnd` after the resize was already cancelled.
+		if ( keyboardResizeActiveRef.current ) {
+			clearTimeout( keyboardSettleTimerRef.current );
+			keyboardResizeActiveRef.current = false;
+			onResizeEnd?.();
+		}
+		// Keyed on the disabled flag alone; `onResizeEnd` is only read
+		// when it fires, and re-running on a new callback identity would
+		// close the gesture twice.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ isResizeDisabled ] );
 
 	// Latest callbacks for the drag listeners. The drag closure in
@@ -596,6 +609,10 @@ export function RectangleStencil( {
 							}
 						} }
 						onKeyDown={ ( event ) => handleKeyDown( pos, event ) }
+						// The handlers already refuse input, but the
+						// button must say so too, or assistive technology
+						// announces a control that does nothing.
+						disabled={ isResizeDisabled }
 						aria-label={ getHandleLabel( pos ) }
 						aria-describedby={ resizeHandleDescriptionId }
 					/>
