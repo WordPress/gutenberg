@@ -67,6 +67,26 @@
 	}
 }
 
+// On the front end, submenus set to open on click stay collapsed inside the
+// overlay menu until their toggle is activated. The editor renders no toggle, so
+// keep them unfolded in the overlay preview, like every other submenu, to leave
+// their items editable. The selector mirrors the front-end one so it can override
+// it, plus one repeated class to win regardless of stylesheet order.
+.wp-block-navigation__responsive-container.is-menu-open.is-menu-open:where(:not(.disable-default-overlay)) .wp-block-navigation__responsive-container-content {
+	.has-child.open-on-click > .wp-block-navigation__submenu-container {
+		display: flex;
+		flex-basis: 100%;
+
+		// Unset the CSS that hides dropdown menus, as the front end does for
+		// every other submenu in the overlay.
+		opacity: 1;
+		visibility: visible;
+		height: auto;
+		width: auto;
+		overflow: initial;
+	}
+}
+
 // Show a submenu when generally dragging (is-dragging-components-draggable) if that
 // submenu has children (has-child) and is being dragged within (is-dragging-within).
 .is-dragging-components-draggable .has-child.is-dragging-within {

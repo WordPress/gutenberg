@@ -615,18 +615,51 @@ button.wp-block-navigation-item__content {
 					justify-content: flex-start;
 				}
 
+				// Submenus unfold in place inside the modal, so the indicator is
+				// redundant. The exception is submenus set to open on click: there
+				// the indicator is the affordance that says the item can be expanded.
 				.wp-block-navigation__submenu-icon {
 					display: none;
 				}
 
-				// Always expand/unfold submenus inside the modal.
+				.open-on-click > .wp-block-navigation__submenu-icon {
+					display: flex;
+
+					// Submenus stack instead of flying out to the side, so the
+					// indicator points down, and up once expanded, at every level.
+					svg {
+						transform: none;
+					}
+				}
+
+				.open-on-click > .wp-block-navigation-submenu__toggle[aria-expanded="true"] + .wp-block-navigation__submenu-icon > svg {
+					transform: rotate(180deg);
+				}
+
+				// The indicator is pulled back over the toggle's trailing padding so
+				// that clicking it activates the toggle. Restore that padding, which
+				// the modal's padding reset below would otherwise collapse, leaving
+				// the indicator sitting on top of the label.
+				.has-child.open-on-click > .wp-block-navigation-submenu__toggle {
+					padding-right: 0.6em + 0.25em;
+
+					// Items inside a flyout stretch their content so the indicator
+					// right-aligns. Stacked in the modal that would strand it far
+					// from its label, and out of line with the level above.
+					flex-grow: 0;
+				}
+
+				// Keep the label and its indicator on one line and let the submenu
+				// wrap below them, so the item reads as an accordion row.
+				.has-child.open-on-click {
+					flex-direction: row;
+					flex-wrap: wrap;
+					align-items: center;
+					justify-content: var(--navigation-layout-justification-setting, initial);
+				}
+
+				// Lay submenus out as stacked lists rather than flyouts.
 				.has-child .wp-block-navigation__submenu-container {
-					// Unset CSS that hides dropdown menus.
-					opacity: 1;
-					visibility: visible;
-					height: auto;
-					width: auto;
-					overflow: initial;
 					min-width: 200px;
 
 					// Position and style.
@@ -634,6 +667,30 @@ button.wp-block-navigation-item__content {
 					border: none;
 					padding-left: 2rem;
 					padding-right: 2rem;
+				}
+
+				// Always expand/unfold submenus inside the modal.
+				.has-child:not(.open-on-click) > .wp-block-navigation__submenu-container {
+					// Unset CSS that hides dropdown menus.
+					opacity: 1;
+					visibility: visible;
+					height: auto;
+					width: auto;
+					overflow: initial;
+				}
+
+				// Submenus set to open on click keep their collapsed state inside the
+				// modal, where they behave as an accordion. `display` is what hides
+				// them: unlike a flyout, a collapsed submenu here is in the flow, so
+				// zero width and height would still leave its padding and the
+				// container gap taking up space in the stack.
+				.has-child.open-on-click > .wp-block-navigation__submenu-container {
+					display: none;
+				}
+
+				.has-child.open-on-click > .wp-block-navigation-submenu__toggle[aria-expanded="true"] ~ .wp-block-navigation__submenu-container {
+					display: flex;
+					flex-basis: 100%;
 				}
 
 				// Space unfolded items using gap and padding for submenus.
