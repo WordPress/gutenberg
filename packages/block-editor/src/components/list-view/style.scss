@@ -119,14 +119,18 @@
 
 		&.is-selected .block-editor-list-view-block-contents,
 		&.is-selected .components-button.has-icon {
-			// Prevent backplate with same color as text in dark mode.
-			forced-color-adjust: none;
 			color: SelectedItemText;
 		}
 
 		&.is-selected svg,
 		&.is-selected.is-synced svg {
 			fill: SelectedItemText;
+		}
+
+		// Prevent backplate with same color as text in dark mode.
+		// Opt-out scoped to only the row title.
+		&.is-selected .block-editor-list-view-block-select-button__title {
+			forced-color-adjust: none;
 		}
 
 		&.is-selected.is-synced .block-editor-list-view-block-contents:focus::after,
