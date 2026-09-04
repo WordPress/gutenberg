@@ -48,7 +48,7 @@ export default function ColorPalettePanel( { name }: ColorPalettePanelProps ) {
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const popoverProps = isMobileViewport ? mobilePopoverProps : undefined;
 
-	const [ randomizeThemeColors ] = useColorRandomizer( name );
+	const randomizeThemeColors = useColorRandomizer( name );
 
 	return (
 		<VStack className="global-styles-ui-color-palette-panel" spacing={ 8 }>
@@ -65,17 +65,14 @@ export default function ColorPalettePanel( { name }: ColorPalettePanelProps ) {
 						paletteLabelHeadingLevel={ 3 }
 						popoverProps={ popoverProps }
 					/>
-					{ ( window as any ).__experimentalEnableColorRandomizer &&
-						randomizeThemeColors && (
-							<Button
-								__next40pxDefaultSize
-								variant="secondary"
-								icon={ shuffle }
-								onClick={ randomizeThemeColors }
-							>
-								{ __( 'Randomize colors' ) }
-							</Button>
-						) }
+					<Button
+						__next40pxDefaultSize
+						variant="secondary"
+						icon={ shuffle }
+						onClick={ randomizeThemeColors }
+					>
+						{ __( 'Randomize colors' ) }
+					</Button>
 				</VStack>
 			) }
 			{ !! defaultColors &&

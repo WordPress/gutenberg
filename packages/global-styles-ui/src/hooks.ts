@@ -255,9 +255,9 @@ export function useColorVariations(): StyleVariation[] {
  * Hook to randomize theme colors using color rotation.
  *
  * @param blockName The name of the block, if applicable.
- * @return Array containing the randomize function if feature is enabled, empty array otherwise.
+ * @return A function that rotates the hue of every theme palette color by the same random amount.
  */
-export function useColorRandomizer( blockName?: string ): [ () => void ] | [] {
+export function useColorRandomizer( blockName?: string ): () => void {
 	const [ themeColors, setThemeColors ] = useSetting< Color[] >(
 		'color.palette.theme',
 		blockName
@@ -285,9 +285,7 @@ export function useColorRandomizer( blockName?: string ): [ () => void ] | [] {
 		setThemeColors( newColors );
 	}, [ themeColors, setThemeColors ] );
 
-	return ( window as any ).__experimentalEnableColorRandomizer
-		? [ randomizeColors ]
-		: [];
+	return randomizeColors;
 }
 
 /**

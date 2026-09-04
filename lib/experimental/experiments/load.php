@@ -100,11 +100,6 @@ function gutenberg_initialize_experiments_settings() {
 			'label' => _x( 'Other', 'experiments group name', 'gutenberg' ),
 			'items' => array(
 				array(
-					'id'          => 'gutenberg-color-randomizer',
-					'label'       => __( 'Color randomizer', 'gutenberg' ),
-					'description' => __( 'Enables the Global Styles color randomizer in the Site Editor; a utility that lets you mix the current color palette pseudo-randomly.', 'gutenberg' ),
-				),
-				array(
 					'id'          => 'gutenberg-workflow-palette',
 					'label'       => __( 'Workflow Palette', 'gutenberg' ),
 					'description' => __( 'Enables the Workflow Palette for running workflows composed of abilities, from a unified interface.', 'gutenberg' ),
