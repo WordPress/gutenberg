@@ -1228,7 +1228,8 @@ describe( 'grouped structural decisions (block replacement)', () => {
 	 */
 	function createStubCoreStore(
 		comments: Record< string, any >,
-		saves: any[]
+		saves: any[],
+		control: { failNextSave: boolean }
 	) {
 		return createReduxStore( 'core', {
 			reducer: ( state = {} ) => state,
@@ -1236,6 +1237,10 @@ describe( 'grouped structural decisions (block replacement)', () => {
 				saveEntityRecord:
 					( kind: any, name: any, record: any ) =>
 					( { dispatch }: { dispatch: any } ) => {
+						if ( control.failNextSave ) {
+							control.failNextSave = false;
+							throw new Error( 'Server rejected the update.' );
+						}
 						saves.push( record );
 						dispatch( { type: 'SAVE_ENTITY_RECORD' } );
 						return record;
@@ -1300,11 +1305,12 @@ describe( 'grouped structural decisions (block replacement)', () => {
 			},
 		};
 		const saves: any[] = [];
+		const control = { failNextSave: false };
 
 		const registry = createRegistry();
 		registry.register( noticesStore );
 		registry.register( blockEditorStore );
-		registry.register( createStubCoreStore( comments, saves ) );
+		registry.register( createStubCoreStore( comments, saves, control ) );
 		registry.register( createStubInterfaceStore() );
 		registry
 			.dispatch( blockEditorStore )
@@ -1324,6 +1330,7 @@ describe( 'grouped structural decisions (block replacement)', () => {
 		return {
 			registry,
 			saves,
+			control,
 			removed,
 			inserted,
 			removeOp,
@@ -1397,6 +1404,38 @@ describe( 'grouped structural decisions (block replacement)', () => {
 				( record ) => record.meta?._wp_suggestion_status === 'rejected'
 			)
 		).toBe( true );
+	} );
+
+	it( 'stops the group when the first half fails to save', async () => {
+		const {
+			registry,
+			saves,
+			control,
+			removed,
+			inserted,
+			insertOp,
+			getProvider,
+		} = setup();
+		control.failNextSave = true;
+
+		await act( async () => {
+			await getProvider().applySuggestion( {
+				commentId: 12,
+				clientId: inserted.clientId,
+				payload: payloadFor( insertOp ),
+			} );
+		} );
+
+		const blockEditor = registry.select( blockEditorStore );
+		// Neither half moved: the insertion keeps its pending treatment...
+		expect(
+			blockEditor.getBlockAttributes( inserted.clientId )?.metadata
+				?.suggestion?.type
+		).toBe( 'pending-insert' );
+		// ...and the removal was never attempted, so the block is still
+		// there for the user to decide on again.
+		expect( blockEditor.getBlock( removed.clientId ) ).toBeTruthy();
+		expect( saves ).toEqual( [] );
 	} );
 
 	it( 'leaves an ungrouped structural suggestion alone', async () => {
