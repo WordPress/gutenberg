@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
@@ -30,9 +31,16 @@ const GROUPED_ITEMS: ItemGroup[] = [
 	},
 ];
 
-jest.mock( '@wordpress/warning', () => jest.fn() );
+vi.mock( import( '@wordpress/warning' ), async ( importOriginal ) => {
+	const original = await importOriginal();
 
-const mockedWarning = warning as jest.MockedFunction< typeof warning >;
+	return {
+		...original,
+		default: vi.fn(),
+	} as unknown as typeof original;
+} );
+
+const mockedWarning = vi.mocked( warning );
 
 describe( 'SearchableSelect', () => {
 	beforeEach( () => {
@@ -221,7 +229,7 @@ describe( 'SearchableSelect', () => {
 
 	it( 'selects a grouped item', async () => {
 		const user = userEvent.setup();
-		const onValueChange = jest.fn();
+		const onValueChange = vi.fn();
 
 		render(
 			<SearchableSelect
@@ -377,7 +385,7 @@ describe( 'SearchableSelect', () => {
 
 		it( 'selects the creatable item by keyboard when grouped children are used', async () => {
 			const user = userEvent.setup();
-			const onValueChange = jest.fn();
+			const onValueChange = vi.fn();
 			const groupedCreatableItem = {
 				value: '__create__',
 				label: 'Create new item: zzzzz',
