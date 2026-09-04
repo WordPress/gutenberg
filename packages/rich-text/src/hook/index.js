@@ -90,15 +90,22 @@ function useRichTextBase( {
 	}
 
 	const hadSelectionUpdateRef = useRef( false );
+	const selectionUpdateTickRef = useRef( 0 );
 
 	if ( ! recordRef.current ) {
 		hadSelectionUpdateRef.current = isSelected;
+		if ( isSelected ) {
+			selectionUpdateTickRef.current += 1;
+		}
 		setRecordFromProps();
 	} else if (
 		selectionStart !== recordRef.current.start ||
 		selectionEnd !== recordRef.current.end
 	) {
 		hadSelectionUpdateRef.current = isSelected;
+		if ( isSelected ) {
+			selectionUpdateTickRef.current += 1;
+		}
 		recordRef.current = {
 			...recordRef.current,
 			start: selectionStart,
@@ -203,7 +210,8 @@ function useRichTextBase( {
 
 		applyRecord( recordRef.current );
 		hadSelectionUpdateRef.current = false;
-	}, [ hadSelectionUpdateRef.current ] );
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ selectionUpdateTickRef.current ] );
 
 	const mergedRefs = useMergeRefs( [
 		ref,

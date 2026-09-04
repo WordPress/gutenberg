@@ -391,12 +391,13 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 							}
 						}
 
+						// Moving the last block out can already have removed
+						// the emptied wrapper.
+						const wrapperBlock = getBlock( _clientId );
 						if (
+							wrapperBlock &&
 							! getBlockOrder( _clientId ).length &&
-							isUnmodifiedBlock(
-								getBlock( _clientId ),
-								'content'
-							)
+							isUnmodifiedBlock( wrapperBlock, 'content' )
 						) {
 							removeBlock( _clientId, false );
 						}

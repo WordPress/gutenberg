@@ -1,41 +1,14 @@
 import { useRefEffect } from '@wordpress/compose';
 import { TAB } from '@wordpress/keycodes';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { useSelect, useRegistry } from '@wordpress/data';
+import { useRegistry } from '@wordpress/data';
 import { indentListItems, outdentListItems } from '../utils';
 
-export default function useMultiSelectTab( clientId ) {
+export default function useMultiSelectTab() {
 	const registry = useRegistry();
-	// Only the first item of an all-list-item multi selection attaches the
-	// listener, so there is a single handler regardless of how many list items
-	// are rendered, and only while such a selection exists.
-	const isActive = useSelect(
-		( select ) => {
-			const {
-				hasMultiSelection,
-				getMultiSelectedBlockClientIds,
-				getBlockName,
-			} = select( blockEditorStore );
-			if ( ! hasMultiSelection() ) {
-				return false;
-			}
-			const clientIds = getMultiSelectedBlockClientIds();
-			return (
-				clientIds[ 0 ] === clientId &&
-				clientIds.every(
-					( id ) => getBlockName( id ) === 'core/list-item'
-				)
-			);
-		},
-		[ clientId ]
-	);
 
 	return useRefEffect(
 		( element ) => {
-			if ( ! isActive ) {
-				return;
-			}
-
 			function onKeyDown( event ) {
 				const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
 
@@ -45,6 +18,24 @@ export default function useMultiSelectTab( clientId ) {
 					altKey ||
 					metaKey ||
 					ctrlKey
+				) {
+					return;
+				}
+
+				const {
+					hasMultiSelection,
+					getMultiSelectedBlockClientIds,
+					getBlockName,
+				} = registry.select( blockEditorStore );
+
+				if ( ! hasMultiSelection() ) {
+					return;
+				}
+
+				if (
+					! getMultiSelectedBlockClientIds().every(
+						( id ) => getBlockName( id ) === 'core/list-item'
+					)
 				) {
 					return;
 				}
@@ -67,10 +58,12 @@ export default function useMultiSelectTab( clientId ) {
 				}
 			}
 
-			// During a multi selection focus sits on the writing flow
-			// container, not inside any item, so an element listener never sees
-			// the key. Listen on the document. Capture phase so we run before
-			// writing-flow's keydown handlers, which gate on
+			// During a multi selection focus sits on the writing flow container,
+			// not inside any item, so an element listener never sees the key.
+			// Listen on the document, and always: a multi selection made in an
+			// editing host reaches the store outside React, so a Tab can arrive
+			// before a render that would attach the listener. Capture phase so
+			// we run before writing-flow's keydown handlers, which gate on
 			// `event.defaultPrevented`.
 			const { ownerDocument } = element;
 			ownerDocument.addEventListener( 'keydown', onKeyDown, true );
@@ -78,6 +71,6 @@ export default function useMultiSelectTab( clientId ) {
 				ownerDocument.removeEventListener( 'keydown', onKeyDown, true );
 			};
 		},
-		[ isActive, registry ]
+		[ registry ]
 	);
 }

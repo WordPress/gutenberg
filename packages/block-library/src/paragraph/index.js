@@ -9,7 +9,7 @@ import save from './save';
 import transforms from './transforms';
 import { unlock } from '../lock-unlock';
 
-const { fieldsKey, formKey } = unlock( blocksPrivateApis );
+const { fieldsKey, formKey, editableRootKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -17,6 +17,9 @@ export { metadata, name };
 
 export const settings = {
 	icon,
+	// Opt into the editing host behaviour privately. It's a Symbol setting
+	// rather than a public `supports` key so it stays an internal detail.
+	[ editableRootKey ]: true,
 	example: {
 		attributes: {
 			content: __(

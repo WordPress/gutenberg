@@ -73,7 +73,7 @@ export default function ListItemEdit( {
 	} );
 	const useEnterRef = useEnter( clientId );
 	const useTabRef = useTab();
-	const useMultiSelectTabRef = useMultiSelectTab( clientId );
+	const useMultiSelectTabRef = useMultiSelectTab();
 	const onMerge = useMerge( clientId, mergeBlocks );
 	return (
 		<>

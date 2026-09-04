@@ -14,7 +14,7 @@ import transforms from './transforms';
 import variations from './variations';
 import { unlock } from '../lock-unlock';
 
-const { fieldsKey, formKey } = unlock( blocksPrivateApis );
+const { fieldsKey, formKey, editableRootKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -22,6 +22,7 @@ export { metadata, name };
 
 export const settings = {
 	icon,
+	[ editableRootKey ]: true,
 	example: {
 		attributes: {
 			content: __( 'Code is Poetry' ),
