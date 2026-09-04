@@ -6,6 +6,7 @@ import type { StorybookConfig } from '@storybook/react-vite';
 import dsTokenFallbacks from '@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks';
 import dsTokenFallbacksJs from '@wordpress/theme/vite-plugins/vite-ds-token-fallbacks';
 import babel from './vite-babel-plugin.js';
+import { statusIndexer } from './status-indexer.js';
 
 /**
  * @see https://storybook.js.org/docs/faq#how-do-i-fix-module-resolution-in-special-environments
@@ -51,6 +52,8 @@ const config: StorybookConfig = {
 		disableTelemetry: true,
 	},
 	stories,
+	// Tags stories with their `componentStatus` so the sidebar can show it.
+	experimental_indexers: ( existing = [] ) => [ statusIndexer, ...existing ],
 	staticDirs: [ './static' ],
 	addons: [
 		{
