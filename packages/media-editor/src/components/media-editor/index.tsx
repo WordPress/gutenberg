@@ -1,6 +1,9 @@
 import clsx from 'clsx';
 import {
 	Button,
+	DropdownMenu,
+	MenuGroup,
+	MenuItem,
 	Spinner,
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
@@ -19,7 +22,15 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { close, drawerRight, keyboard, redo, undo } from '@wordpress/icons';
+import {
+	backup,
+	close,
+	drawerRight,
+	keyboard,
+	moreVertical,
+	redo,
+	undo,
+} from '@wordpress/icons';
 import {
 	displayShortcut,
 	isAppleOS,
@@ -197,6 +208,18 @@ interface MediaEditorFrameContextValue {
 	onCancel: () => void;
 	onSave: () => void;
 	onReset: () => void;
+	/**
+	 * When `true`, the media has a lineage root to restore to, so the
+	 * "Restore original image" menu item is shown.
+	 */
+	canRestoreOriginal: boolean;
+	/**
+	 * When `true`, the original has already been loaded into the cropper this
+	 * session, so the menu item is disabled.
+	 */
+	isOriginalRestored: boolean;
+	/** Load the lineage root into the cropper as a dirty preview. */
+	onRestoreOriginal: () => void;
 }
 
 const MediaEditorFrameContext =
@@ -230,8 +253,17 @@ export interface HeaderActionsProps {
 }
 
 function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
-	const { isImage, isSaving, onCancel, isWide, activePanel, onTogglePanel } =
-		useMediaEditorFrameContext();
+	const {
+		isImage,
+		isSaving,
+		onCancel,
+		isWide,
+		activePanel,
+		onTogglePanel,
+		canRestoreOriginal,
+		isOriginalRestored,
+		onRestoreOriginal,
+	} = useMediaEditorFrameContext();
 	const isPanelOpen = !! activePanel;
 	const [ isShortcutsModalOpen, setIsShortcutsModalOpen ] = useState( false );
 	return (
@@ -241,14 +273,6 @@ function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
 			align="center"
 			gap="sm"
 		>
-			{ isImage && (
-				<Button
-					size="compact"
-					icon={ keyboard }
-					label={ __( 'Keyboard shortcuts' ) }
-					onClick={ () => setIsShortcutsModalOpen( true ) }
-				/>
-			) }
 			{ /* The sidebar holds more than one panel, so this opens and
 			     closes the sidebar rather than naming a panel: reopening
 			     returns to whichever tab was last showing, and the tab strip
@@ -264,6 +288,48 @@ function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
 				aria-expanded={ isWide ? isPanelOpen : undefined }
 				onClick={ onTogglePanel }
 			/>
+			{ isImage && (
+				<DropdownMenu
+					icon={ moreVertical }
+					label={ __( 'More options' ) }
+					toggleProps={ { size: 'compact' } }
+				>
+					{ ( { onClose: closeMenu } ) => (
+						<>
+							{ canRestoreOriginal && (
+								<MenuGroup>
+									<MenuItem
+										icon={ backup }
+										iconPosition="left"
+										disabled={ isOriginalRestored }
+										info={ __(
+											'Discards all edits and loads the unedited file.'
+										) }
+										onClick={ () => {
+											onRestoreOriginal();
+											closeMenu();
+										} }
+									>
+										{ __( 'Restore original image' ) }
+									</MenuItem>
+								</MenuGroup>
+							) }
+							<MenuGroup>
+								<MenuItem
+									icon={ keyboard }
+									iconPosition="left"
+									onClick={ () => {
+										setIsShortcutsModalOpen( true );
+										closeMenu();
+									} }
+								>
+									{ __( 'Keyboard shortcuts' ) }
+								</MenuItem>
+							</MenuGroup>
+						</>
+					) }
+				</DropdownMenu>
+			) }
 			{ showCloseButton && (
 				<Button
 					size="compact"
@@ -761,9 +827,6 @@ function MediaEditorContent( {
 								aspectRatioValue={ aspectRatioValue }
 								onAspectRatioChange={ setAspectRatioValue }
 								aspectRatioOptions={ aspectRatioOptions }
-								canRestoreOriginal={ canRestoreOriginal }
-								isOriginalRestored={ isOriginalRestored }
-								onRestoreOriginal={ handleRestoreOriginal }
 							/>
 						),
 					},
@@ -884,6 +947,9 @@ function MediaEditorContent( {
 		onCancel: handleRequestClose,
 		onSave: saveMediaEditor,
 		onReset: resetCropOptions,
+		canRestoreOriginal,
+		isOriginalRestored,
+		onRestoreOriginal: handleRestoreOriginal,
 	};
 
 	return (

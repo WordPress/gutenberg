@@ -1,6 +1,5 @@
-import { Button, SelectControl } from '@wordpress/components';
-import { Stack, Text, VisuallyHidden } from '@wordpress/ui';
-import { useInstanceId } from '@wordpress/compose';
+import { SelectControl } from '@wordpress/components';
+import { Stack, VisuallyHidden } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
 import MediaEditorImageControls from '../media-editor-image-controls';
@@ -17,18 +16,6 @@ export interface MediaEditorCropPanelProps {
 	onAspectRatioChange: ( value: string ) => void;
 	/** Aspect-ratio presets to display in the selector. */
 	aspectRatioOptions: AspectRatioPreset[];
-	/**
-	 * When `true`, the media has a lineage root to restore to, so the
-	 * "Restore original image" button is shown. Requires `onRestoreOriginal`.
-	 */
-	canRestoreOriginal?: boolean;
-	/**
-	 * When `true`, the original has already been loaded into the cropper this
-	 * session, so the button is disabled.
-	 */
-	isOriginalRestored?: boolean;
-	/** Load the lineage root into the cropper as a dirty preview. */
-	onRestoreOriginal?: () => void;
 }
 
 /**
@@ -39,22 +26,12 @@ export interface MediaEditorCropPanelProps {
  * @param props.aspectRatioValue
  * @param props.onAspectRatioChange
  * @param props.aspectRatioOptions
- * @param props.canRestoreOriginal
- * @param props.isOriginalRestored
- * @param props.onRestoreOriginal
  */
 export default function MediaEditorCropPanel( {
 	aspectRatioValue,
 	onAspectRatioChange,
 	aspectRatioOptions,
-	canRestoreOriginal = false,
-	isOriginalRestored = false,
-	onRestoreOriginal,
 }: MediaEditorCropPanelProps ) {
-	const restoreHelpId = useInstanceId(
-		MediaEditorCropPanel,
-		'media-editor-crop-panel__restore-help'
-	);
 	return (
 		// Tag the whole panel as a crop-control region so the modal's
 		// Cmd+Z handler doesn't mistake the SelectControl input for a
@@ -77,28 +54,6 @@ export default function MediaEditorCropPanel( {
 					value: preset.value.toString(),
 				} ) ) }
 			/>
-			{ canRestoreOriginal && onRestoreOriginal && (
-				<Stack direction="column" gap="sm">
-					<Button
-						__next40pxDefaultSize
-						className="media-editor-crop-panel__restore-button"
-						variant="secondary"
-						onClick={ onRestoreOriginal }
-						disabled={ isOriginalRestored }
-						accessibleWhenDisabled
-						aria-describedby={ restoreHelpId }
-					>
-						{ __( 'Restore original image' ) }
-					</Button>
-					<Text
-						id={ restoreHelpId }
-						className="media-editor-crop-panel__restore-help"
-						variant="body-sm"
-					>
-						{ __( 'Loads the original, unedited image.' ) }
-					</Text>
-				</Stack>
-			) }
 		</Stack>
 	);
 }

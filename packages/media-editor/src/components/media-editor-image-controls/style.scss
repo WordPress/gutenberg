@@ -46,15 +46,3 @@
 		padding-inline: 2px 0;
 	}
 }
-
-// Restore-original cluster in the Crop panel, below the aspect-ratio select.
-// The panel's column stack stretches children to its full width, and the base
-// button has no `justify-content` of its own, which parks the label at the
-// start edge. Center it.
-.media-editor-crop-panel__restore-button {
-	justify-content: center;
-}
-
-.media-editor-crop-panel__restore-help {
-	color: var(--wpds-color-foreground-content-neutral-weak);
-}
