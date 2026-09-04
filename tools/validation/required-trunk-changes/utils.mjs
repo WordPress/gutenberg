@@ -36,6 +36,39 @@ export function fail( message ) {
 	process.exit( 1 );
 }
 
+export const RATE_LIMIT_ERROR = 'RateLimitError';
+
+/**
+ * Detects a primary or secondary rate limit response. A secondary limit can
+ * arrive with neither header set, leaving the body as the only signal.
+ *
+ * @param {Response} response Fetch response.
+ * @param {string}   body     Response body.
+ * @return {boolean} Whether the request was rate limited.
+ */
+function isRateLimited( response, body ) {
+	if ( response.status !== 403 && response.status !== 429 ) {
+		return false;
+	}
+	return (
+		response.headers.get( 'x-ratelimit-remaining' ) === '0' ||
+		response.headers.has( 'retry-after' ) ||
+		/rate limit/i.test( body )
+	);
+}
+
+/**
+ * Builds a rate limit error the sweep can recognize and stop on.
+ *
+ * @param {string} path Request path.
+ * @return {Error} Named rate limit error.
+ */
+function rateLimitError( path ) {
+	const error = new Error( `GitHub API rate limit reached on ${ path }.` );
+	error.name = RATE_LIMIT_ERROR;
+	return error;
+}
+
 /**
  * Performs an authenticated GitHub API request.
  *
@@ -67,10 +100,12 @@ async function api( path, options = {} ) {
 				) {
 					throw new TypeError( `retryable ${ response.status }` );
 				}
+				const body = await response.text();
+				if ( isRateLimited( response, body ) ) {
+					throw rateLimitError( path );
+				}
 				throw new Error(
-					`GitHub API ${ path } failed: ${
-						response.status
-					} ${ await response.text() }`
+					`GitHub API ${ path } failed: ${ response.status } ${ body }`
 				);
 			}
 			return response.json();
@@ -101,6 +136,14 @@ export async function graphql( query, variables ) {
 		} )
 	);
 	if ( result.errors ) {
+		/* A GraphQL rate limit is a 200 carrying a RATE_LIMITED error. */
+		if (
+			result.errors.some(
+				( /** @type {any} */ error ) => error?.type === 'RATE_LIMITED'
+			)
+		) {
+			throw rateLimitError( 'the GraphQL endpoint' );
+		}
 		throw new Error(
 			`GraphQL request failed: ${ JSON.stringify( result.errors ) }`
 		);
@@ -109,23 +152,18 @@ export async function graphql( query, variables ) {
 }
 
 /**
- * Resolves the baseline commit SHA from the tag ref via the API.
+ * Resolves the baseline commit SHA from the tag ref via the API. A missing tag
+ * is not an error: it means nothing is required of open PRs yet.
  *
- * @param {boolean} [required] Throw when the tag does not exist.
  * @return {Promise<string | null>} Baseline commit SHA, or null when absent.
  */
-export async function getBaseline( required = true ) {
+export async function getBaseline() {
 	const ref = /** @type {any} */ (
 		await api( `/repos/${ REPO }/git/ref/tags/${ TAG }`, {
 			allow404: true,
 		} )
 	);
 	if ( ! ref ) {
-		if ( required ) {
-			throw new Error(
-				`The ${ TAG } tag does not exist; seed it via workflow dispatch.`
-			);
-		}
 		return null;
 	}
 	// Peel defensively; the tag should always be lightweight.
@@ -167,6 +205,18 @@ export async function getTrunkHead() {
 	return commit.sha;
 }
 
+/** @type {StatusPayload} */
+export const NO_BASELINE_STATUS = {
+	state: 'success',
+	description: 'No required trunk changes.',
+};
+
+/*
+ * A sweep recognizes its own verdict by the abbreviated baseline in the
+ * description; this history has dozens of colliding 7-character prefixes.
+ */
+const SHORT_SHA_LENGTH = 12;
+
 /**
  * Builds the status payload for a required changes result.
  *
@@ -175,7 +225,7 @@ export async function getTrunkHead() {
  * @return {StatusPayload} Status state and description.
  */
 export function statusFor( includesBaseline, baseline ) {
-	const short = baseline.slice( 0, 7 );
+	const short = baseline.slice( 0, SHORT_SHA_LENGTH );
 	return includesBaseline
 		? {
 				state: 'success',
@@ -248,21 +298,34 @@ let writesThisMinute = 0;
 let minuteWindowStart = Date.now();
 
 /**
+ * Reports whether the run can still write, so a caller can stop before
+ * spending an ancestry request it cannot act on.
+ *
+ * @return {boolean} Whether the per-run budget has room.
+ */
+export function hasWriteBudget() {
+	return writesThisRun < MAX_WRITES_PER_RUN;
+}
+
+/**
  * Posts a commit status, honoring the per-minute and per-run write budgets.
  *
  * @param {string}  sha         Commit SHA in the base repository.
  * @param {string}  state       Status state: success or failure.
  * @param {string}  description Status description embedding the baseline.
  * @param {boolean} dryRun      Log the write instead of performing it.
- * @return {Promise<boolean>} False when the per-run budget is exhausted.
+ * @return {Promise<boolean>} False when the per-run budget is exhausted. Callers
+ *                            preflight with `hasWriteBudget`; this is a backstop.
  */
 export async function postStatus( sha, state, description, dryRun ) {
-	if ( dryRun ) {
-		console.log( `[dry-run] ${ sha }: ${ state } (${ description })` );
-		return true;
-	}
+	/* Budgeted before the dry-run exit, so a dry run models one real run. */
 	if ( writesThisRun >= MAX_WRITES_PER_RUN ) {
 		return false;
+	}
+	if ( dryRun ) {
+		console.log( `[dry-run] ${ sha }: ${ state } (${ description })` );
+		writesThisRun++;
+		return true;
 	}
 	if ( writesThisMinute >= MAX_WRITES_PER_MINUTE ) {
 		const waitMs = 60_000 - ( Date.now() - minuteWindowStart );

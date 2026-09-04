@@ -89,7 +89,7 @@ async function hasLabeledMergeSince( baseline, head ) {
  */
 export async function moveBaseline( options ) {
 	const { force, thenFanout, dryRun } = options;
-	const baseline = await getBaseline( false );
+	const baseline = await getBaseline();
 
 	if ( baseline === null ) {
 		if ( force !== 'true' ) {
