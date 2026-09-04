@@ -681,7 +681,7 @@ describe.each( [
 
 	describe( 'disabled', () => {
 		it( 'should not select another option when the control is disabled', async () => {
-			const mockOnChange = jest.fn();
+			const mockOnChange = vi.fn();
 
 			render(
 				<Component
@@ -756,7 +756,7 @@ describe.each( [
 		} );
 
 		it( 'should not call onChange when a disabled control is clicked', async () => {
-			const mockOnChange = jest.fn();
+			const mockOnChange = vi.fn();
 
 			render(
 				<Component
@@ -798,7 +798,7 @@ describe.each( [
 		} );
 
 		it( 'should not deselect the pressed option when the control is disabled', async () => {
-			const mockOnChange = jest.fn();
+			const mockOnChange = vi.fn();
 
 			render(
 				<Component
@@ -870,7 +870,7 @@ describe.each( [
 		} );
 
 		it( 'should not call onChange when a deselectable disabled control is clicked', async () => {
-			const mockOnChange = jest.fn();
+			const mockOnChange = vi.fn();
 
 			render(
 				<Component

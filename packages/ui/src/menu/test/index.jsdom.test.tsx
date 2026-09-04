@@ -111,7 +111,10 @@ describe( 'Menu', () => {
 		expect( icon ).toHaveAttribute( 'viewBox', '0 0 24 24' );
 		expect( icon ).toHaveAttribute( 'stroke', 'currentColor' );
 		expect( icon ).toHaveClass( 'custom-icon' );
-		expect( icon ).toHaveStyle( { fill: 'none', opacity: '0.5' } );
+		// eslint-disable-next-line jest-dom/prefer-to-have-attribute
+		expect( icon.getAttribute( 'style' ) ).toContain( 'fill: none;' );
+		// eslint-disable-next-line jest-dom/prefer-to-have-attribute
+		expect( icon.getAttribute( 'style' ) ).toContain( 'opacity: 0.5;' );
 	} );
 
 	it( 'keeps prefix icons hidden from assistive technology', async () => {
