@@ -4,22 +4,21 @@ import {
 	useSearch,
 	useInvalidate,
 } from '@wordpress/route';
-import { useView } from '@wordpress/views';
+import { useView, useViewConfig } from '@wordpress/views';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { Page } from '@wordpress/admin-ui';
-import type { View, Action } from '@wordpress/dataviews';
+import type { View, Action, SupportedLayouts } from '@wordpress/dataviews';
 import { store as coreStore } from '@wordpress/core-data';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useMemo, useCallback } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
-import { layout } from '@wordpress/icons';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import {
-	DEFAULT_VIEW,
-	getActiveViewOverridesForTab,
-	DEFAULT_LAYOUTS,
+	getActiveViewOverrides,
+	type ViewListEntry,
+	type ViewOverrides,
 } from './view-utils';
 import { previewField } from './fields/preview';
 import { useTemplates } from './use-templates';
@@ -34,25 +33,65 @@ import './style.scss';
 import './add-new-template/style.scss';
 import type { Template } from './types';
 
+const TEMPLATE_POST_TYPE = 'wp_template';
+
 function getItemId( item: Template ) {
 	return item.id.toString();
 }
 
 function TemplateList() {
-	const invalidate = useInvalidate();
 	const { activeView = 'all' } = useParams( {
 		from: '/templates/list/$activeView',
 	} );
+	const {
+		default_view: defaultView,
+		default_layouts: defaultLayouts,
+		view_list: viewList,
+	} = useViewConfig( {
+		kind: 'postType',
+		name: TEMPLATE_POST_TYPE,
+	} );
+	const activeViewOverrides = useMemo(
+		() => getActiveViewOverrides( viewList, activeView ),
+		[ viewList, activeView ]
+	);
+
+	if ( ! defaultView ) {
+		// The route canvas resolves the view configuration before the stage
+		// mounts, so this only guards against the store being reset.
+		return null;
+	}
+
+	return (
+		<TemplateListView
+			activeView={ activeView }
+			defaultView={ defaultView }
+			defaultLayouts={ defaultLayouts }
+			viewList={ viewList }
+			activeViewOverrides={ activeViewOverrides }
+		/>
+	);
+}
+
+function TemplateListView( {
+	activeView,
+	defaultView,
+	defaultLayouts,
+	viewList,
+	activeViewOverrides,
+}: {
+	activeView: string;
+	defaultView: View;
+	defaultLayouts: SupportedLayouts | undefined;
+	viewList: ViewListEntry[] | undefined;
+	activeViewOverrides: ViewOverrides;
+} ) {
+	const invalidate = useInvalidate();
 	const navigate = useNavigate();
 	const searchParams = useSearch( { from: '/templates/list/$activeView' } );
 	const postTypeObject = useSelect(
-		( select ) => select( coreStore ).getPostType( 'wp_template' ),
+		( select ) => select( coreStore ).getPostType( TEMPLATE_POST_TYPE ),
 		[]
-	);
-	const defaultView = DEFAULT_VIEW;
-	const activeViewOverrides = useMemo(
-		() => getActiveViewOverridesForTab( activeView ),
-		[ activeView ]
 	);
 
 	// Callback to handle URL query parameter changes
@@ -71,9 +110,10 @@ function TemplateList() {
 	// Use the new view persistence hook
 	const { view, isModified, updateView, resetToDefault } = useView( {
 		kind: 'postType',
-		name: 'wp_template',
+		name: TEMPLATE_POST_TYPE,
 		slug: 'default-new',
 		defaultView,
+		defaultLayouts,
 		activeViewOverrides,
 		queryParams: searchParams,
 		onChangeQueryParams: handleQueryParamsChange,
@@ -93,9 +133,9 @@ function TemplateList() {
 	};
 
 	// Fetch templates using our custom hook
-	const { records, isLoading, allRecords } = useTemplates( activeView );
+	const { records, isLoading } = useTemplates();
 
-	const postFields = usePostFields( { postType: 'wp_template' } );
+	const postFields = usePostFields( { postType: TEMPLATE_POST_TYPE } );
 	const fields = useMemo(
 		() => [ previewField, ...postFields ],
 		[ postFields ]
@@ -149,7 +189,7 @@ function TemplateList() {
 	);
 
 	const postTypeActions: Action< Template >[] = usePostActions( {
-		postType: 'wp_template',
+		postType: TEMPLATE_POST_TYPE,
 		context: 'list',
 		onActionPerformed,
 	} );
@@ -164,32 +204,6 @@ function TemplateList() {
 			return [ action ];
 		} );
 	}, [ postTypeActions ] );
-
-	// Build tabs array dynamically
-	const tabs = useMemo( () => {
-		const baseTabs = [
-			{
-				slug: 'all',
-				label: __( 'All templates' ),
-				icon: layout,
-			},
-		];
-
-		// Extract unique authors from all records
-		const authorMap = new Map();
-		allRecords.forEach( ( record: Template ) => {
-			if ( record.author_text && ! authorMap.has( record.author_text ) ) {
-				authorMap.set( record.author_text, {
-					slug: record.author_text,
-					label: record.author_text,
-				} );
-			}
-		} );
-
-		const authorTabs = Array.from( authorMap.values() );
-
-		return [ ...baseTabs, ...authorTabs ];
-	}, [ allRecords ] );
 
 	const handleTabChange = useCallback(
 		( viewSlug: string ) => {
@@ -223,16 +237,19 @@ function TemplateList() {
 			actions={ <AddNewTemplate /> }
 			hasPadding={ false }
 		>
-			{ tabs.length > 1 && (
+			{ viewList && viewList.length > 1 && (
 				<div className="routes-template-list__tabs-wrapper">
 					<Tabs
 						onSelect={ handleTabChange }
-						selectedTabId={ activeView ?? 'all' }
+						selectedTabId={ activeView }
 					>
 						<Tabs.TabList>
-							{ tabs.map( ( tab ) => (
-								<Tabs.Tab tabId={ tab.slug } key={ tab.slug }>
-									{ tab.label }
+							{ viewList.map( ( entry ) => (
+								<Tabs.Tab
+									tabId={ entry.slug }
+									key={ entry.slug }
+								>
+									{ entry.title }
 								</Tabs.Tab>
 							) ) }
 						</Tabs.TabList>
@@ -247,7 +264,7 @@ function TemplateList() {
 				actions={ actions }
 				isLoading={ isLoading }
 				paginationInfo={ paginationInfo }
-				defaultLayouts={ DEFAULT_LAYOUTS }
+				defaultLayouts={ defaultLayouts }
 				getItemId={ getItemId }
 				selection={ selection }
 				onReset={ isModified ? onReset : false }

@@ -1,21 +1,20 @@
-import { useMemo } from '@wordpress/element';
-import {
-	privateApis as corePrivateApis,
-	type WpTemplate,
-} from '@wordpress/core-data';
+import { privateApis as corePrivateApis } from '@wordpress/core-data';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import type { Template } from './types';
 
 const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
 
+const EMPTY_ARRAY: Template[] = [];
+
 /**
- * Hook to fetch and return templates.
+ * Hook to fetch and return every template.
  *
- * @param {string} activeView - The active view type ('all' or author name).
- * @return {Object} Object containing records, loading state, and all records for building tabs.
+ * Filtering by author happens client-side through the view: the active
+ * view's locked `author` filter is applied by `filterSortAndPaginate`.
+ *
+ * @return {Object} Object containing the records and the loading state.
  */
-export function useTemplates( activeView: string = 'all' ) {
-	// Fetch all user templates
+export function useTemplates() {
 	const { records, isResolving } = useEntityRecordsWithPermissions(
 		'postType',
 		'wp_template',
@@ -24,26 +23,8 @@ export function useTemplates( activeView: string = 'all' ) {
 		}
 	);
 
-	// Filter records based on active view
-	const filteredRecords: Template[] = useMemo( () => {
-		if ( ! records ) {
-			return [];
-		}
-
-		// If 'all' view, return all records
-		if ( activeView === 'all' ) {
-			return records;
-		}
-
-		// Otherwise, filter by author_text
-		return records.filter(
-			( record: WpTemplate ) => record.author_text === activeView
-		);
-	}, [ records, activeView ] );
-
 	return {
-		records: filteredRecords,
+		records: ( records ?? EMPTY_ARRAY ) as Template[],
 		isLoading: isResolving,
-		allRecords: records || [], // For building author tabs
 	};
 }
