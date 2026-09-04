@@ -17,7 +17,6 @@
 	height: $grid-unit-60 !important; // https://github.com/WordPress/gutenberg/pull/65075#discussion_r1746282734
 	background: transparent;
 	border: none;
-	box-shadow: none;
 	cursor: var(--wpds-cursor-control);
 	padding: 3px var(--wpds-dimension-padding-lg); // Use padding to offset the is-active border, this benefits Windows High Contrast mode
 	margin-left: 0;
@@ -35,7 +34,6 @@
 
 	&:focus:not(:disabled) {
 		position: relative;
-		box-shadow: none;
 		outline: none;
 	}
 
