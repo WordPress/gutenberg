@@ -33,4 +33,23 @@ describe( 'getContrast', () => {
 		expect( actual ).toBe( expected );
 		expect( getContrast( first, second ) ).toBe( expected );
 	} );
+
+	it( 'recalculates contrast after a color object is mutated', () => {
+		const mutableColor: PlainColorObject = {
+			space: sRGB,
+			coords: [ 0, 0, 0 ],
+			alpha: 1,
+		};
+		const white: PlainColorObject = {
+			space: sRGB,
+			coords: [ 1, 1, 1 ],
+			alpha: 1,
+		};
+
+		expect( getContrast( mutableColor, white ) ).toBe( 21 );
+		mutableColor.coords[ 0 ] = 1;
+		mutableColor.coords[ 1 ] = 1;
+		mutableColor.coords[ 2 ] = 1;
+		expect( getContrast( mutableColor, white ) ).toBe( 1 );
+	} );
 } );

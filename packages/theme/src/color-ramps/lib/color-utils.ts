@@ -13,7 +13,14 @@ import {
 const ALLOWED_SEED_COLOR_SPACES = [ sRGB ];
 const MAX_CACHED_LUMINANCES = 2_048;
 const luminanceCache = new Map< string, number >();
-const objectLuminanceCache = new WeakMap< PlainColorObject, number >();
+const objectLuminanceCache = new WeakMap<
+	PlainColorObject,
+	{
+		space: PlainColorObject[ 'space' ];
+		coords: PlainColorObject[ 'coords' ];
+		luminance: number;
+	}
+>();
 
 /**
  * Get string representation of a color.
@@ -46,18 +53,27 @@ export function getContrast(
 /**
  * Return a color's non-negative relative luminance. Serialized colors use a
  * bounded cache because ramp calculations often reuse the same colors. Color
- * objects use a weak cache and must not be mutated after measurement.
+ * objects use a weak cache with coordinate snapshots to detect mutations.
  *
  * @param color Color to measure.
  */
 function getRelativeLuminance( color: string | PlainColorObject ): number {
 	if ( typeof color !== 'string' ) {
 		const cachedLuminance = objectLuminanceCache.get( color );
-		if ( cachedLuminance !== undefined ) {
-			return cachedLuminance;
+		if (
+			cachedLuminance?.space === color.space &&
+			cachedLuminance.coords.every( ( coordinate, index ) =>
+				Object.is( coordinate, color.coords[ index ] )
+			)
+		) {
+			return cachedLuminance.luminance;
 		}
 		const luminance = Math.max( getLuminance( color ), 0 );
-		objectLuminanceCache.set( color, luminance );
+		objectLuminanceCache.set( color, {
+			space: color.space,
+			coords: [ ...color.coords ],
+			luminance,
+		} );
 		return luminance;
 	}
 
