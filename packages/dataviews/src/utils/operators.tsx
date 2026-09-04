@@ -200,9 +200,18 @@ const OPERATORS: {
 				return true;
 			}
 
-			return filterValue.every( ( value: any ) => {
-				return field.getValue( { item } )?.includes( value );
-			} );
+			const fieldValue = field.getValue( { item } );
+
+			// Only an array can include every filter value. Fields with no
+			// type accept any operator, so a scalar can still get here: exclude
+			// it rather than calling a method it may not have.
+			if ( ! Array.isArray( fieldValue ) ) {
+				return false;
+			}
+
+			return filterValue.every( ( value: any ) =>
+				fieldValue.includes( value )
+			);
 		},
 		selection: 'multi',
 	},

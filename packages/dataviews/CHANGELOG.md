@@ -44,6 +44,7 @@
 ### Bug Fixes
 
 -   Operators: Support the `isAny` and `isNone` filter operators for numeric field values, which previously matched nothing ([#77942](https://github.com/WordPress/gutenberg/pull/77942)).
+-   Operators: The `isAll` filter operator only matches array values. A scalar value is excluded instead of being substring-matched (strings) or throwing (anything else) ([#82463](https://github.com/WordPress/gutenberg/pull/82463)).
 -   `DataViews` and `DataViewsPicker`: move the view back to the last available page when it points past the end of the collection, for instance after deleting the only item of the last page ([#82244](https://github.com/WordPress/gutenberg/pull/82244)).
 
 ### Documentation
