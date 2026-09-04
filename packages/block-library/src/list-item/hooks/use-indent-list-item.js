@@ -28,28 +28,35 @@ export default function useIndentListItem( clientId ) {
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
 
-		moveBlocksToNestedList(
-			registry,
-			clientIds,
-			rootClientId,
-			previousSiblingId
-		);
-
-		// The blocks keep their client IDs through the move, so the selection
-		// is put back on the same blocks: the caret for a single item, a whole
+		// The move and the selection are batched together: creating a nested
+		// list removes and re-inserts the items, which drops the selection, so
+		// it is put back in the same pass. The blocks keep their client IDs, so
+		// it lands on the same blocks: the caret for a single item, a whole
 		// block selection for several.
-		if ( ! _hasMultiSelection ) {
-			selectionChange(
-				clientIds[ 0 ],
-				selectionEnd.attributeKey,
-				selectionEnd.clientId === selectionStart.clientId
-					? selectionStart.offset
-					: selectionEnd.offset,
-				selectionEnd.offset
+		registry.batch( () => {
+			moveBlocksToNestedList(
+				registry,
+				clientIds,
+				rootClientId,
+				previousSiblingId
 			);
-		} else {
-			multiSelect( clientIds[ 0 ], clientIds[ clientIds.length - 1 ] );
-		}
+
+			if ( ! _hasMultiSelection ) {
+				selectionChange(
+					clientIds[ 0 ],
+					selectionEnd.attributeKey,
+					selectionEnd.clientId === selectionStart.clientId
+						? selectionStart.offset
+						: selectionEnd.offset,
+					selectionEnd.offset
+				);
+			} else {
+				multiSelect(
+					clientIds[ 0 ],
+					clientIds[ clientIds.length - 1 ]
+				);
+			}
+		} );
 
 		return true;
 	}, [ clientId ] );
