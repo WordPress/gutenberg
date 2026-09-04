@@ -232,16 +232,18 @@ class WP_Test_REST_Icons_Controller extends WP_Test_REST_TestCase {
 			)
 		);
 
-		$request = new WP_REST_Request( 'GET', '/wp/v2/icons' );
-		$request->set_param( 'search', 'core/no-keywords' );
-		$response = rest_get_server()->dispatch( $request );
-		$data     = $response->get_data();
+		try {
+			$request = new WP_REST_Request( 'GET', '/wp/v2/icons' );
+			$request->set_param( 'search', 'core/no-keywords' );
+			$response = rest_get_server()->dispatch( $request );
+			$data     = $response->get_data();
 
-		$this->assertSame( 200, $response->get_status() );
-		$this->assertCount( 1, $data );
-		$this->assertSame( array(), $data[0]['keywords'] );
-
-		wp_unregister_icon( 'core/no-keywords' );
+			$this->assertSame( 200, $response->get_status() );
+			$this->assertCount( 1, $data );
+			$this->assertSame( array(), $data[0]['keywords'] );
+		} finally {
+			wp_unregister_icon( 'core/no-keywords' );
+		}
 	}
 
 	/**

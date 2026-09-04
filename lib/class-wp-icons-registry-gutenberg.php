@@ -103,7 +103,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			return false;
 		}
 
-		if ( isset( $icon_properties['keywords'] ) ) {
+		if ( array_key_exists( 'keywords', $icon_properties ) ) {
 			if ( ! is_array( $icon_properties['keywords'] ) ) {
 				_doing_it_wrong(
 					__METHOD__,
@@ -271,6 +271,30 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	}
 
 	/**
+	 * Determines whether a string contains a search term, ignoring case.
+	 *
+	 * Labels and keywords are translated, so the comparison is made with
+	 * `mb_stripos()` where mbstring is available, which case-folds multibyte
+	 * characters that `stripos()` only matches byte for byte. `stripos()` is
+	 * the fallback, since mbstring is not guaranteed to be loaded.
+	 *
+	 * @param string $haystack String to search in.
+	 * @param string $needle   Search term.
+	 * @return bool True if the haystack contains the search term, false otherwise.
+	 */
+	private function contains_search_term( $haystack, $needle ) {
+		if ( '' === $needle ) {
+			return true;
+		}
+
+		if ( function_exists( 'mb_stripos' ) ) {
+			return false !== mb_stripos( $haystack, $needle, 0, 'UTF-8' );
+		}
+
+		return false !== stripos( $haystack, $needle );
+	}
+
+	/**
 	 * Determines whether an icon matches a search term.
 	 *
 	 * The term is matched case-insensitively against the icon's name, its label,
@@ -281,16 +305,16 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	 * @return bool True if the icon matches the search term, false otherwise.
 	 */
 	protected function icon_matches_search( $icon, $search ) {
-		if ( false !== stripos( $icon['name'], $search ) ) {
+		if ( $this->contains_search_term( $icon['name'], $search ) ) {
 			return true;
 		}
 
-		if ( false !== stripos( $icon['label'], $search ) ) {
+		if ( $this->contains_search_term( $icon['label'], $search ) ) {
 			return true;
 		}
 
 		foreach ( $icon['keywords'] ?? array() as $keyword ) {
-			if ( false !== stripos( $keyword, $search ) ) {
+			if ( $this->contains_search_term( $keyword, $search ) ) {
 				return true;
 			}
 		}

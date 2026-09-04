@@ -550,6 +550,7 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	 */
 	public function data_invalid_keywords() {
 		return array(
+			'null'                 => array( null ),
 			'a string'             => array( 'alpha' ),
 			'an integer'           => array( 5 ),
 			'an array of integers' => array( array( 1, 2 ) ),
@@ -641,6 +642,29 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 		$names = array_column( $this->registry->get_registered_icons( 'PEACE' ), 'name' );
 
 		$this->assertContains( 'test-collection/dove', $names );
+	}
+
+	/**
+	 * Should match a keyword whose case differs outside of ASCII, as keywords are
+	 * translated and so may hold any script.
+	 */
+	public function test_get_registered_icons_matches_non_ascii_keywords_case_insensitively() {
+		if ( ! function_exists( 'mb_stripos' ) ) {
+			$this->markTestSkipped( 'The mbstring extension is required to case-fold multibyte characters.' );
+		}
+
+		$this->register(
+			'test-collection/apple',
+			array(
+				'label'    => 'Apple',
+				'content'  => '<svg></svg>',
+				'keywords' => array( 'Äpfel' ),
+			)
+		);
+
+		$names = array_column( $this->registry->get_registered_icons( 'äpfel' ), 'name' );
+
+		$this->assertContains( 'test-collection/apple', $names );
 	}
 
 	/**
