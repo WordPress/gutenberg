@@ -27,6 +27,7 @@
 -   Mark blocks that have user styles in the block list, and add a filter to show only those blocks ([#81373](https://github.com/WordPress/gutenberg/pull/81373)).
 -   Add a Duotone tab to the Edit palette screen, so theme and default duotones can be edited and custom duotones added, alongside Color and Gradient. Replaces the read-only duotone list previously shown at the bottom of the Gradient tab ([#81605](https://github.com/WordPress/gutenberg/pull/81605)).
 -   Font Library: Add a skeleton loader for the font preview images ([#81047](https://github.com/WordPress/gutenberg/pull/81047)).
+-   Stabilize the color randomizer: the "Randomize colors" button in the theme palette editor no longer requires the `gutenberg-color-randomizer` experiment ([#82452](https://github.com/WordPress/gutenberg/pull/82452)).
 
 ### Bug Fixes
 
