@@ -4,8 +4,8 @@
 
 ### Enhancements
 
--   Add an Elements section to Global Styles for the elements already available in Typography and Colors.
--   Group input and select typography and color controls in a dedicated Forms section in Global Styles.
+-   Move the elements already available in Typography and Colors into the Blocks & Elements section of Global Styles.
+-   Group inputs, selects, and buttons under Form controls, and offer every element the background, dimensions, border, shadow, and custom CSS controls that `theme.json` already accepts.
 -   Blocks screen: add the hover, focus, focus-visible and active state controls for the Navigation Link block, which already supports those states in `theme.json` and in the block inspector ([#83451](https://github.com/WordPress/gutenberg/pull/83451)).
 
 ### Internal
