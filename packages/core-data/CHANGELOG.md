@@ -11,7 +11,7 @@
 
 ### Enhancements
 
--   Add `page_for_privacy_policy` to the `Settings` entity type, exposed by the Gutenberg plugin from the `wp_page_for_privacy_policy` option ([#67517](https://github.com/WordPress/gutenberg/issues/67517)).
+-   Add `page_for_privacy_policy` to the `Settings` entity type, exposed by the Gutenberg plugin from the `wp_page_for_privacy_policy` option ([#82422](https://github.com/WordPress/gutenberg/pull/82422)).
 
 ### Bug Fixes
 

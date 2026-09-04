@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Show a "Privacy Policy Page" badge in the document bar and the post card panel for the page assigned in Settings > Privacy, alongside the existing "Homepage" and "Posts Page" badges ([#67517](https://github.com/WordPress/gutenberg/issues/67517)).
+-   Show a "Privacy Policy Page" badge in the document bar and the post card panel for the page assigned in Settings > Privacy, alongside the existing "Homepage" and "Posts Page" badges ([#82422](https://github.com/WordPress/gutenberg/pull/82422)).
 
 ### Breaking Changes
 
