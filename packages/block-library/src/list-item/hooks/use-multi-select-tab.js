@@ -49,6 +49,15 @@ export default function useMultiSelectTab( clientId ) {
 					return;
 				}
 
+				// The listener is on the document, so it also sees a Tab from
+				// other editor UI while the multi selection lingers (moving
+				// focus does not clear it). A multi selection keeps focus on the
+				// canvas host that wraps the blocks, so only act when the key
+				// comes from an ancestor of them, not from a toolbar or panel.
+				if ( ! event.target.contains( element ) ) {
+					return;
+				}
+
 				if ( shiftKey ) {
 					if ( outdentListItems( registry ) ) {
 						event.preventDefault();
