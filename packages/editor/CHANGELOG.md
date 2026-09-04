@@ -13,6 +13,7 @@
 ### Enhancements
 
 -   Post actions: Append an ellipsis (`…`) to the "Set as homepage" and "Set as posts page" action labels, which open a confirmation dialog, following the menu ellipsis guideline. The dialog titles keep the ellipsis-free wording. ([#81994](https://github.com/WordPress/gutenberg/pull/81994))
+-   `PostTaxonomiesFlatTermSelector`: The field renders with the `SearchableChipSelectControl` component of `@wordpress/ui` instead of `FormTokenField` ([#80967](https://github.com/WordPress/gutenberg/pull/80967)).
 
 ### Bug Fixes
 
