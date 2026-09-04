@@ -41,10 +41,8 @@
 		"./package.json": "./package.json"
 	},
 	"dependencies": {
-		"@babel/eslint-parser": "^7.28.6",
 		"@eslint-community/eslint-plugin-eslint-comments": "^4.7.0",
 		"@eslint/compat": "^2.0.0",
-		"@wordpress/babel-preset-default": "file:../babel-preset-default",
 		"@wordpress/prettier-config": "file:../prettier-config",
 		"@wordpress/theme": "file:../theme",
 		"cosmiconfig": "^7.0.0",
@@ -71,7 +69,6 @@
 		"vitest": "^4.1.10"
 	},
 	"peerDependencies": {
-		"@babel/core": ">=7",
 		"eslint": "^9.0.0 || ^10.0.0",
 		"prettier": ">=3",
 		"typescript": ">=5"

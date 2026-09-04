@@ -9,7 +9,12 @@ import {
 	useState,
 } from '@wordpress/element';
 import type { ControlWithErrorProps, ValidityTarget } from './types';
+import { Stack } from '../../../stack';
 import { ValidityIndicator } from '../validity-indicator';
+
+const DEFAULT_RENDER = ( props: React.ComponentProps< typeof Stack > ) => (
+	<Stack { ...props } direction="column" gap="sm" />
+);
 
 function appendRequiredIndicator(
 	label: React.ReactNode,
@@ -60,7 +65,7 @@ export const ControlWithError = forwardRef<
 		customValidity,
 		getValidityTarget,
 		children,
-		render,
+		render = DEFAULT_RENDER,
 		...restProps
 	},
 	forwardedRef
@@ -290,7 +295,6 @@ export const ControlWithError = forwardRef<
 
 	return useRender( {
 		render,
-		defaultTagName: 'div',
 		ref: [ forwardedRef, wrapperRef ],
 		props: mergeProps< 'div' >( restProps, {
 			onBlur,

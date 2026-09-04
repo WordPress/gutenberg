@@ -792,6 +792,7 @@
       - openInNewTab
       - render
       - style
+      - target
       - tone
       - variant
 - name: MenuGroup
@@ -1495,6 +1496,10 @@
         props:
             - children
             - className
+            - closeDelay
+            - closeOnClick
+            - delay
+            - disabled
             - render
             - style
 - name: TreeGrid
