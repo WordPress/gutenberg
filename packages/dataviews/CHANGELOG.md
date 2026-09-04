@@ -36,7 +36,7 @@
 
 ### Enhancements
 
--   Give unselected multi-selection filter indicators solid, state-aware themed backgrounds. ([#82391](https://github.com/WordPress/gutenberg/pull/82391))
+-   Give unselected multi-selection filter indicators solid, themed backgrounds. ([#82391](https://github.com/WordPress/gutenberg/pull/82391))
 -   Validated form controls: Use `--wpds-color-stroke-interactive-error` for the invalid-state focus ring and border ([#82410](https://github.com/WordPress/gutenberg/pull/82410)).
 -   DataForm: Communicate the timezone a `datetime` value is edited in. When the site timezone differs from the visitor's, the control renders help text under the input naming the site timezone: the zone name (e.g. `(CEST) Europe/Madrid`) or the UTC offset for sites pinned to one ([#82291](https://github.com/WordPress/gutenberg/pull/82291)).
 -   Export the `DataViewsProps` and `ItemWithId` types ([#82326](https://github.com/WordPress/gutenberg/pull/82326)).
