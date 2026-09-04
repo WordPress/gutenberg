@@ -6,18 +6,24 @@ import { indentListItems, outdentListItems } from '../utils';
 
 export default function useMultiSelectTab( clientId ) {
 	const registry = useRegistry();
-	// Only the first item of an all-list-item multi selection attaches the
-	// listener, so there is a single handler regardless of how many list items
-	// are rendered, and only while such a selection exists.
+	// Only one item attaches the listener, so there is a single handler
+	// regardless of how many list items are rendered: the first item of an
+	// all-list-item multi selection, or the selected item. The selected item
+	// listens because a multi selection made from it can receive a Tab before
+	// the selection is rendered: a native selection in an editing host syncs
+	// to the store outside React, so the handler of the first selected item
+	// may not be attached yet when the key arrives. The handler reads the
+	// selection from the store at event time.
 	const isActive = useSelect(
 		( select ) => {
 			const {
 				hasMultiSelection,
 				getMultiSelectedBlockClientIds,
+				getSelectedBlockClientId,
 				getBlockName,
 			} = select( blockEditorStore );
 			if ( ! hasMultiSelection() ) {
-				return false;
+				return getSelectedBlockClientId() === clientId;
 			}
 			const clientIds = getMultiSelectedBlockClientIds();
 			return (
@@ -45,6 +51,21 @@ export default function useMultiSelectTab( clientId ) {
 					altKey ||
 					metaKey ||
 					ctrlKey
+				) {
+					return;
+				}
+
+				const {
+					hasMultiSelection,
+					getMultiSelectedBlockClientIds,
+					getBlockName,
+				} = registry.select( blockEditorStore );
+
+				if (
+					! hasMultiSelection() ||
+					! getMultiSelectedBlockClientIds().every(
+						( id ) => getBlockName( id ) === 'core/list-item'
+					)
 				) {
 					return;
 				}
