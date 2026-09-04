@@ -8,8 +8,10 @@
 	"references": [
 		{ "path": "./tsconfig.build.json" },
 		{ "path": "../components/tsconfig.build.json" },
+		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
+		{ "path": "../icons/tsconfig.build.json" },
 		{ "path": "../private-apis" },
 		{ "path": "../route" },
 		{ "path": "../style-runtime/tsconfig.build.json" },
