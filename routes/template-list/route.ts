@@ -2,7 +2,8 @@ import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { notFound } from '@wordpress/route';
-import { ensureView, viewToQuery } from './view-utils';
+import { ensureView, getFirstTemplateInView } from './view-utils';
+import type { Template } from './types';
 
 /**
  * Route configuration for template list.
@@ -51,20 +52,21 @@ export const route = {
 			};
 		}
 
-		// Otherwise, fetch the first template from the filtered query
-		const query = viewToQuery( view );
-		const posts = await resolveSelect( coreStore ).getEntityRecords(
+		// Otherwise, preview the template the stage selects by default. The
+		// templates endpoint ignores search, ordering and pagination, so
+		// fetch every template (the same query the stage uses, so the
+		// records are shared) and apply the view client-side.
+		const templates = ( await resolveSelect( coreStore ).getEntityRecords(
 			'postType',
 			'wp_template',
-			{ ...query, per_page: 1 }
-		);
+			{ per_page: -1 }
+		) ) as Template[] | null;
+		const template = getFirstTemplateInView( templates ?? [], view );
 
-		// Return first template if available
-		if ( posts && posts.length > 0 ) {
-			const postId = ( posts[ 0 ] as any ).id.toString();
+		if ( template ) {
 			return {
 				postType: 'wp_template',
-				postId,
+				postId: template.id.toString(),
 				isPreview: true,
 			};
 		}
