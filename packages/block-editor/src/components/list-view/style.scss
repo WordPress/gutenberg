@@ -89,10 +89,9 @@
 		.block-editor-block-icon {
 			color: var(--wp-block-synced-color);
 		}
-
-		&:focus::after {
-			--focus-color: var(--wp-block-synced-color);
-		}
+	}
+	&.is-synced .block-editor-list-view-block-contents:focus::after {
+		--focus-color: var(--wp-block-synced-color);
 	}
 	&.is-synced:not(.is-selected) .block-editor-list-view-block__menu:focus {
 		--focus-color: var(--wp-block-synced-color);
@@ -102,11 +101,7 @@
 	&.is-selected .components-button.has-icon {
 		color: $white;
 	}
-	&.is-selected.is-synced .block-editor-list-view-block-contents:focus::after {
-		--focus-color: var(--wp-block-synced-color);
-	}
-	&.is-selected .block-editor-list-view-block__menu:focus,
-	&.is-selected.is-synced .block-editor-list-view-block__menu:focus {
+	&.is-selected .block-editor-list-view-block__menu:focus {
 		--focus-color: var(--wpds-color-foreground-interactive-brand-strong);
 		@include outset-ring__focus();
 		outline-offset: -2px;
@@ -123,7 +118,6 @@
 		}
 
 		&.is-selected svg,
-		&.is-selected.is-synced svg,
 		&.is-selected .block-editor-block-icon.has-colors svg {
 			fill: SelectedItemText;
 		}
@@ -134,10 +128,13 @@
 			forced-color-adjust: none;
 		}
 
-		&.is-selected .block-editor-list-view-block-contents:focus::after,
-		&.is-selected.is-synced .block-editor-list-view-block-contents:focus::after,
-		&.is-selected .block-editor-list-view-block__menu:focus,
-		&.is-selected.is-synced .block-editor-list-view-block__menu:focus {
+		// The row-wide ring sits outside the selected background.
+		&.is-selected .block-editor-list-view-block-contents:focus::after {
+			--focus-color: CanvasText;
+		}
+
+		// The menu ring is inset over the selected background.
+		&.is-selected .block-editor-list-view-block__menu:focus {
 			--focus-color: SelectedItemText;
 		}
 	}
