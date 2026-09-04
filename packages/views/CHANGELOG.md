@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   `useViewConfig`: request the full configuration under the same cache key as `getViewConfig( kind, name )`, so a route loader that preloads it no longer triggers a second request. ([#82141](https://github.com/WordPress/gutenberg/pull/82141))
+-   `useView`, `loadView`: ignore a persisted layout `type` that `defaultLayouts` does not offer, resolving the type out of the layers below instead. DataViews renders nothing for a layout it is not given, so a preference saved when a screen still offered that layout used to leave the screen empty, with no way to reset it. Such a type does not count as a modification and is written out of the preference on the next update. ([#82457](https://github.com/WordPress/gutenberg/pull/82457))
 
 ## 1.21.0 (2026-08-26)
 
