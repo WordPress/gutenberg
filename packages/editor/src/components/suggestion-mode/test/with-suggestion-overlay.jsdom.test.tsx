@@ -10,6 +10,7 @@
  *    overlapping overlay keys, including the `style`/`metadata` deep merge
  *    that keeps untouched fields alive.
  */
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { render, screen, act, fireEvent } from '@testing-library/react';
 import type { ReactElement, ReactNode } from 'react';
 import {
@@ -35,6 +36,12 @@ import {
 } from '../overlay-context';
 import { store as editorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
+
+// The editor store pulls in `@wordpress/viewport`, which reads
+// `window.matchMedia` while loading.
+vi.hoisted( () => {
+	globalThis.wpVitest.mockMatchMedia();
+} );
 
 /*
  * `setEditorIntent( 'suggest' )` reads the current post so it can discard a
@@ -114,7 +121,7 @@ const Wrapped = withSuggestionOverlay( FakeBlock );
 
 describe( 'withSuggestionOverlay', () => {
 	it( 'passes through unchanged in Edit intent', () => {
-		const setAttributes = jest.fn();
+		const setAttributes = vi.fn();
 		renderWithProviders(
 			<Wrapped
 				clientId="a"
@@ -134,7 +141,7 @@ describe( 'withSuggestionOverlay', () => {
 	} );
 
 	it( 'diverts setAttributes into the overlay in Suggest intent', () => {
-		const setAttributes = jest.fn();
+		const setAttributes = vi.fn();
 		renderWithProviders(
 			<Wrapped
 				clientId="a"
@@ -178,7 +185,7 @@ describe( 'withSuggestionOverlay', () => {
 			metadata: { suggestion: { type: 'pending-insert' } },
 		} );
 
-		const setAttributes = jest.fn();
+		const setAttributes = vi.fn();
 		renderWithProviders(
 			<Wrapped
 				clientId={ block.clientId }
@@ -225,7 +232,7 @@ describe( 'withSuggestionOverlay', () => {
 			[ child ]
 		);
 
-		const setAttributes = jest.fn();
+		const setAttributes = vi.fn();
 		renderWithProviders(
 			<Wrapped
 				clientId={ child.clientId }
@@ -260,7 +267,7 @@ describe( 'withSuggestionOverlay', () => {
 			return null;
 		}
 
-		const setAttributes = jest.fn();
+		const setAttributes = vi.fn();
 		renderWithProviders(
 			<>
 				<CaptureOverlay />
@@ -296,7 +303,7 @@ describe( 'withSuggestionOverlay', () => {
 	} );
 
 	it( 'merges overlay on top of real attributes for rendering', () => {
-		const setAttributes = jest.fn();
+		const setAttributes = vi.fn();
 		const { rerender } = renderWithProviders(
 			<Wrapped
 				clientId="a"
@@ -328,7 +335,7 @@ describe( 'withSuggestionOverlay', () => {
 	} );
 
 	it( 'passes through in View intent — no overlay, no diversion', () => {
-		const setAttributes = jest.fn();
+		const setAttributes = vi.fn();
 		renderWithProviders(
 			<Wrapped
 				clientId="a"
@@ -367,7 +374,7 @@ describe( 'withSuggestionOverlay', () => {
 			return null;
 		}
 
-		const setAttributes = jest.fn();
+		const setAttributes = vi.fn();
 		renderWithProviders(
 			<>
 				<Harness />
