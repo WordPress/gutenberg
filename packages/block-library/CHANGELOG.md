@@ -45,6 +45,7 @@
 
 ### Bug Fixes
 
+-   Audio: Explain in the Autoplay help text that browsers block audio until a visitor interacts with the page ([#69978](https://github.com/WordPress/gutenberg/pull/69978)).
 -   Cover: Use the new toggle-button presentation for the placeholder overlay color palette ([#82023](https://github.com/WordPress/gutenberg/pull/82023)).
 -   Columns: Preserve individual Column attributes supported by Group, including styles and layouts, when transforming to Row or Grid.
 -   Gallery: Don't offer the Image and Grid transforms while the block is in dynamic mode, where it has no inner blocks to convert ([#82009](https://github.com/WordPress/gutenberg/pull/82009)).
