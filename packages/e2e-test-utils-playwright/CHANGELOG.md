@@ -2,6 +2,49 @@
 
 ## Unreleased
 
+### Internal
+
+-   `setGutenbergExperiments`: Remove the special handling for the removed `active_templates` experiment ([#82241](https://github.com/WordPress/gutenberg/pull/82241)).
+
+## 1.54.0 (2026-08-26)
+
+## 1.53.0 (2026-08-12)
+
+### Bug Fixes
+
+-   `Metrics.startTracing()`: Run a trivial script in every frame once tracing is on, to absorb the isolate interrupt that enabling the V8 sampling profiler queues. Its cost otherwise lands in the first thing the test does, usually the interaction being measured, and grows through a spec's iterations: a stable 220ms interaction reported anywhere from 200ms to 650ms ([#81264](https://github.com/WordPress/gutenberg/pull/81264)).
+-   `Metrics.getSelectionEventDurations()`: Dispatches that nest inside another dispatch now contribute only the time not already covered by it, so summing the returned durations no longer counts the nested work twice.
+
+## 1.52.0 (2026-07-29)
+
+### Bug Fixes
+
+-   `Metrics.getSelectionEventDurations()`: Also collect `pointerup` and `selectionchange` durations, and omit event types that did not fire. Selecting a block within an editing host no longer fires `focus`/`focusin`, which made the metric report zero.
+
+## 1.51.0 (2026-07-14)
+
+## 1.50.0 (2026-07-01)
+
+## 1.49.0 (2026-06-24)
+
+### Enhancements
+
+-   Added `RequestUtils.resetThemeGlobalStyles()` to reset the current theme's user global styles to an empty config for test isolation.
+
+### Bug Fixes
+
+-   Resolve root-relative `page.goto()` URLs against the full `baseURL`, including any subdirectory path, so tests work against WordPress installs served from a subdirectory.
+
+## 1.48.1 (2026-06-16)
+
+## 1.48.0 (2026-06-10)
+
+## 1.47.0 (2026-05-27)
+
+## 1.46.0 (2026-05-14)
+
+## 1.45.0 (2026-04-29)
+
 ## 1.44.0 (2026-04-15)
 
 ## 1.43.0 (2026-04-01)

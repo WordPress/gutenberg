@@ -6,6 +6,13 @@ import { Text } from '../../text';
 const meta: Meta< typeof Link > = {
 	title: 'Design System/Components/Link',
 	component: Link,
+	tags: [ 'manifest' ],
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
+	},
 };
 export default meta;
 
@@ -15,6 +22,14 @@ export const Default: Story = {
 	args: {
 		children: 'Learn more',
 		href: '#',
+	},
+};
+
+export const OpenInNewTab: Story = {
+	args: {
+		children: 'Visit WordPress.org',
+		href: 'https://wordpress.org',
+		openInNewTab: true,
 	},
 };
 

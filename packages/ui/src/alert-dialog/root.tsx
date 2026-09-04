@@ -7,7 +7,6 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-
 import { AlertDialogContext } from './context';
 import type { Phase } from './context';
 import type { RootProps } from './types';

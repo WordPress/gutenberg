@@ -1,10 +1,4 @@
-/**
- * External dependencies
- */
 import styled from '@emotion/styled';
-/**
- * Internal dependencies
- */
 import { FlexBlock } from '../../flex';
 
 export const SelectWrapper = styled( FlexBlock )`

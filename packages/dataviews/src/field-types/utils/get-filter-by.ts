@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { Field, FilterByConfig, Operator } from '../../types';
 
 function getFilterBy< Item >(

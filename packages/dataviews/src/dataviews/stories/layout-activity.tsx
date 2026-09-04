@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useState, useMemo, useEffect } from '@wordpress/element';
 import {
 	trash,
@@ -15,12 +12,8 @@ import {
 	pin,
 	link,
 } from '@wordpress/icons';
-import { Button, __experimentalText as Text } from '@wordpress/components';
+import { Button, __experimentalText as WCText } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import DataViews from '../index';
 import { LAYOUT_ACTIVITY } from '../../constants';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
@@ -516,7 +509,7 @@ export const orderEventFields: Field< OrderEvent >[] = [
 export const orderEventActions: Action< OrderEvent >[] = [
 	{
 		id: 'view-note',
-		label: 'View Item',
+		label: 'View',
 		isPrimary: true,
 		icon: link,
 		isEligible: ( item ) => item.type === 'note',
@@ -530,8 +523,7 @@ export const orderEventActions: Action< OrderEvent >[] = [
 	},
 	{
 		id: 'delete-note',
-		label: 'Delete Note',
-		isPrimary: false,
+		label: 'Delete…',
 		icon: trash,
 		isEligible: ( item ) => item.type === 'note',
 		modalHeader: ( items ) =>
@@ -555,7 +547,7 @@ export const orderEventActions: Action< OrderEvent >[] = [
 			};
 			return (
 				<Stack direction="column" gap="xl">
-					<Text>{ label }</Text>
+					<WCText>{ label }</WCText>
 					<Stack direction="row" gap="sm" justify="right">
 						<Button
 							__next40pxDefaultSize

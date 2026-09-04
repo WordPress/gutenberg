@@ -1,8 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
+import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 import { ENTER } from '@wordpress/keycodes';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -12,6 +10,9 @@ import {
 	cloneBlock,
 	getDefaultBlockName,
 } from '@wordpress/blocks';
+import { unlock } from '../lock-unlock';
+
+const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
 export function useOnEnter( props ) {
 	const { batch } = useRegistry();
@@ -119,9 +120,8 @@ export function useOnEnter( props ) {
 			} );
 		}
 
-		element.addEventListener( 'keydown', onKeyDown );
-		return () => {
-			element.removeEventListener( 'keydown', onKeyDown );
-		};
+		// Capture phase so we run before writing-flow's ancestor-bubble
+		// keydown handlers that gate on `event.defaultPrevented`.
+		return subscribeOwnedListener( element, 'keydown', onKeyDown, true );
 	}, [] );
 }

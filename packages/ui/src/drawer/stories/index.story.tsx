@@ -14,6 +14,7 @@ const meta: Meta< typeof Drawer.Root > = {
 		'Drawer.Header': Drawer.Header,
 		'Drawer.Title': Drawer.Title,
 		'Drawer.Description': Drawer.Description,
+		'Drawer.Content': Drawer.Content,
 		'Drawer.CloseIcon': Drawer.CloseIcon,
 		'Drawer.Action': Drawer.Action,
 		'Drawer.Footer': Drawer.Footer,
@@ -22,6 +23,13 @@ const meta: Meta< typeof Drawer.Root > = {
 		modal: {
 			control: 'inline-radio',
 			options: [ true, false, 'trap-focus' ],
+		},
+	},
+	parameters: {
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of overlays compatibility. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };
@@ -35,23 +43,23 @@ type Story = StoryObj< typeof Drawer.Root >;
  */
 export const _Default: Story = {
 	args: {
-		children: (
-			<>
-				<Drawer.Trigger>Open Drawer</Drawer.Trigger>
-				<Drawer.Popup>
-					<Drawer.Header>
-						<Drawer.Title>Navigation</Drawer.Title>
-						<Drawer.CloseIcon />
-					</Drawer.Header>
+		children: [
+			<Drawer.Trigger key="trigger">Open Drawer</Drawer.Trigger>,
+			<Drawer.Popup key="popup">
+				<Drawer.Header>
+					<Drawer.Title>Navigation</Drawer.Title>
+					<Drawer.CloseIcon />
+				</Drawer.Header>
+				<Drawer.Content>
 					<Drawer.Description>
 						Browse through the available sections below.
 					</Drawer.Description>
-					<Drawer.Footer>
-						<Drawer.Action>Done</Drawer.Action>
-					</Drawer.Footer>
-				</Drawer.Popup>
-			</>
-		),
+				</Drawer.Content>
+				<Drawer.Footer>
+					<Drawer.Action>Done</Drawer.Action>
+				</Drawer.Footer>
+			</Drawer.Popup>,
+		],
 	},
 };
 
@@ -89,10 +97,12 @@ export const AllSides: Story = {
 								<Drawer.Title>{ title }</Drawer.Title>
 								<Drawer.CloseIcon />
 							</Drawer.Header>
-							<Drawer.Description>
-								Slides in from the { label.toLowerCase() } edge.
-								Swipe to dismiss.
-							</Drawer.Description>
+							<Drawer.Content>
+								<Drawer.Description>
+									Slides in from the { label.toLowerCase() }{ ' ' }
+									edge. Swipe to dismiss.
+								</Drawer.Description>
+							</Drawer.Content>
 							<Drawer.Footer>
 								<Drawer.Action>Close</Drawer.Action>
 							</Drawer.Footer>
@@ -121,24 +131,26 @@ export const Controlled: Story = {
 		);
 	},
 	args: {
-		children: (
-			<>
-				<Drawer.Trigger>Open Controlled Drawer</Drawer.Trigger>
-				<Drawer.Popup>
-					<Drawer.Header>
-						<Drawer.Title>Controlled Drawer</Drawer.Title>
-						<Drawer.CloseIcon />
-					</Drawer.Header>
+		children: [
+			<Drawer.Trigger key="trigger">
+				Open Controlled Drawer
+			</Drawer.Trigger>,
+			<Drawer.Popup key="popup">
+				<Drawer.Header>
+					<Drawer.Title>Controlled Drawer</Drawer.Title>
+					<Drawer.CloseIcon />
+				</Drawer.Header>
+				<Drawer.Content>
 					<Drawer.Description>
 						The open state is managed externally via{ ' ' }
 						<code>open</code> and <code>onOpenChange</code>.
 					</Drawer.Description>
-					<Drawer.Footer>
-						<Drawer.Action>Close</Drawer.Action>
-					</Drawer.Footer>
-				</Drawer.Popup>
-			</>
-		),
+				</Drawer.Content>
+				<Drawer.Footer>
+					<Drawer.Action>Close</Drawer.Action>
+				</Drawer.Footer>
+			</Drawer.Popup>,
+		],
 	},
 	argTypes: {
 		open: { control: false },
@@ -156,24 +168,26 @@ export const NonModal: Story = {
 	args: {
 		swipeDirection: 'right',
 		modal: false,
-		children: (
-			<>
-				<Drawer.Trigger>Open Non-Modal Drawer</Drawer.Trigger>
-				<Drawer.Popup>
-					<Drawer.Header>
-						<Drawer.Title>Non-Modal</Drawer.Title>
-						<Drawer.CloseIcon />
-					</Drawer.Header>
+		children: [
+			<Drawer.Trigger key="trigger">
+				Open Non-Modal Drawer
+			</Drawer.Trigger>,
+			<Drawer.Popup key="popup">
+				<Drawer.Header>
+					<Drawer.Title>Non-Modal</Drawer.Title>
+					<Drawer.CloseIcon />
+				</Drawer.Header>
+				<Drawer.Content>
 					<Drawer.Description>
 						This drawer does not trap focus and allows interaction
 						with the rest of the page while open.
 					</Drawer.Description>
-					<Drawer.Footer>
-						<Drawer.Action>Close</Drawer.Action>
-					</Drawer.Footer>
-				</Drawer.Popup>
-			</>
-		),
+				</Drawer.Content>
+				<Drawer.Footer>
+					<Drawer.Action>Close</Drawer.Action>
+				</Drawer.Footer>
+			</Drawer.Popup>,
+		],
 	},
 	render: function NonModalRender( args ) {
 		return <Drawer.Root { ...args }>{ args.children }</Drawer.Root>;
@@ -263,40 +277,40 @@ function DirectionSelector( {
  *   drawer in the page), or
  * - **Per instance**, by passing a `Drawer.Portal` with a `style` (or
  *   `className`) to `Drawer.Popup`'s `portal` prop. The variable cascades
- *   from the portal wrapper to everything rendered inside it (backdrop,
- *   viewport, and popup).
+ *   from the portal wrapper to everything rendered inside it.
  *
  * This story demonstrates the per-instance approach.
  */
 export const WithCustomZIndex: Story = {
 	name: 'With Custom z-index',
 	args: {
-		children: (
-			<>
-				<Drawer.Trigger>Open Drawer</Drawer.Trigger>
-				<Drawer.Popup
-					portal={
-						<Drawer.Portal
-							style={ { '--wp-ui-drawer-z-index': '9999' } }
-						/>
-					}
-				>
-					<Drawer.Header>
-						<Drawer.Title>Custom z-index</Drawer.Title>
-						<Drawer.CloseIcon />
-					</Drawer.Header>
+		children: [
+			<Drawer.Trigger key="trigger">Open Drawer</Drawer.Trigger>,
+			<Drawer.Popup
+				portal={
+					<Drawer.Portal
+						style={ { '--wp-ui-drawer-z-index': '9999' } }
+					/>
+				}
+				key="popup"
+			>
+				<Drawer.Header>
+					<Drawer.Title>Custom z-index</Drawer.Title>
+					<Drawer.CloseIcon />
+				</Drawer.Header>
+				<Drawer.Content>
 					<Drawer.Description>
 						The backdrop, viewport, and popup render at `z-index:
 						9999` via the `--wp-ui-drawer-z-index` CSS custom
 						property, set on `Drawer.Portal` through the `portal`
 						prop.
 					</Drawer.Description>
-					<Drawer.Footer>
-						<Drawer.Action>Got it</Drawer.Action>
-					</Drawer.Footer>
-				</Drawer.Popup>
-			</>
-		),
+				</Drawer.Content>
+				<Drawer.Footer>
+					<Drawer.Action>Got it</Drawer.Action>
+				</Drawer.Footer>
+			</Drawer.Popup>,
+		],
 	},
 };
 
@@ -325,6 +339,7 @@ export const SizePlayground: Story = {
 						value={ direction }
 						onChange={ setDirection }
 					/>
+
 					<SizeSelector value={ size } onChange={ setSize } />
 					<Drawer.Trigger>Open Drawer</Drawer.Trigger>
 				</div>
@@ -333,27 +348,200 @@ export const SizePlayground: Story = {
 						<Drawer.Title>Size Playground</Drawer.Title>
 						<Drawer.CloseIcon />
 					</Drawer.Header>
-					<Stack direction="column" gap="lg">
-						<div
-							style={ {
-								display: 'grid',
-								gap: 8,
-							} }
-						>
-							<SizeSelector value={ size } onChange={ setSize } />
-							<DirectionSelector
-								value={ direction }
-								onChange={ setDirection }
-							/>
-						</div>
-						<Drawer.Description>
-							Use the dropdowns to change the size and direction.
-							Both inside and outside controls stay in sync.
-						</Drawer.Description>
-					</Stack>
+					<Drawer.Content>
+						<Stack direction="column" gap="lg">
+							<div
+								style={ {
+									display: 'grid',
+									gap: 8,
+								} }
+							>
+								<SizeSelector
+									value={ size }
+									onChange={ setSize }
+								/>
+
+								<DirectionSelector
+									value={ direction }
+									onChange={ setDirection }
+								/>
+							</div>
+							<Drawer.Description>
+								Use the dropdowns to change the size and
+								direction. Both inside and outside controls stay
+								in sync.
+							</Drawer.Description>
+						</Stack>
+					</Drawer.Content>
 					<Drawer.Footer>
 						<Drawer.Action>Got it</Drawer.Action>
 					</Drawer.Footer>
+				</Drawer.Popup>
+			</Drawer.Root>
+		);
+	},
+	argTypes: {
+		swipeDirection: { control: false },
+	},
+};
+
+type ScrollableControlProps = {
+	size: ComponentProps< typeof Drawer.Popup >[ 'size' ];
+	setSize: ( size: ComponentProps< typeof Drawer.Popup >[ 'size' ] ) => void;
+	direction: ComponentProps< typeof Drawer.Root >[ 'swipeDirection' ];
+	setDirection: (
+		dir: ComponentProps< typeof Drawer.Root >[ 'swipeDirection' ]
+	) => void;
+	stickyHeader: boolean;
+	setStickyHeader: ( value: boolean ) => void;
+	stickyFooter: boolean;
+	setStickyFooter: ( value: boolean ) => void;
+};
+
+function StickyToggle( {
+	stickyHeader,
+	stickyFooter,
+	setStickyHeader,
+	setStickyFooter,
+}: Pick<
+	ScrollableControlProps,
+	'stickyHeader' | 'stickyFooter' | 'setStickyHeader' | 'setStickyFooter'
+> ) {
+	const headerId = useId();
+	const footerId = useId();
+	return (
+		<Stack direction="row" gap="md" align="center">
+			<Stack direction="row" gap="xs" align="center">
+				<input
+					id={ headerId }
+					type="checkbox"
+					checked={ stickyHeader }
+					onChange={ ( e ) => setStickyHeader( e.target.checked ) }
+				/>
+
+				<label htmlFor={ headerId }>Sticky header</label>
+			</Stack>
+			<Stack direction="row" gap="xs" align="center">
+				<input
+					id={ footerId }
+					type="checkbox"
+					checked={ stickyFooter }
+					onChange={ ( e ) => setStickyFooter( e.target.checked ) }
+				/>
+
+				<label htmlFor={ footerId }>Sticky footer</label>
+			</Stack>
+		</Stack>
+	);
+}
+
+function ScrollableControls( {
+	size,
+	setSize,
+	direction,
+	setDirection,
+	stickyHeader,
+	setStickyHeader,
+	stickyFooter,
+	setStickyFooter,
+}: ScrollableControlProps ) {
+	return (
+		<Stack direction="column" gap="sm" align="start">
+			<Stack direction="row" gap="lg" align="center">
+				<SizeSelector value={ size } onChange={ setSize } />
+				<DirectionSelector
+					value={ direction }
+					onChange={ setDirection }
+				/>
+			</Stack>
+			<StickyToggle
+				stickyHeader={ stickyHeader }
+				stickyFooter={ stickyFooter }
+				setStickyHeader={ setStickyHeader }
+				setStickyFooter={ setStickyFooter }
+			/>
+		</Stack>
+	);
+}
+
+/**
+ * When drawer content overflows the available space, `Drawer.Content`
+ * scrolls while `Drawer.Header` and `Drawer.Footer` stay pinned to the
+ * popup's edges. Separator lines appear only when there is off-screen
+ * content above the header or below the footer.
+ *
+ * To let the header or footer scroll with the body instead of staying
+ * pinned, render it *inside* `Drawer.Content` rather than as a sibling.
+ * The inline "Sticky header / Sticky footer" checkboxes toggle exactly
+ * that placement at runtime.
+ *
+ * Use the inline controls to change the popup `size`, `swipeDirection`,
+ * and sticky placement. The same controls render both outside and inside
+ * the drawer and stay in sync.
+ */
+export const Scrollable: Story = {
+	render: function ScrollableRender( args ) {
+		const [ size, setSize ] =
+			useState< ComponentProps< typeof Drawer.Popup >[ 'size' ] >();
+		const [ direction, setDirection ] = useState<
+			ComponentProps< typeof Drawer.Root >[ 'swipeDirection' ]
+		>( args.swipeDirection ?? 'left' );
+		const [ stickyHeader, setStickyHeader ] = useState( true );
+		const [ stickyFooter, setStickyFooter ] = useState( true );
+		const controlProps: ScrollableControlProps = {
+			size,
+			setSize,
+			direction,
+			setDirection,
+			stickyHeader,
+			setStickyHeader,
+			stickyFooter,
+			setStickyFooter,
+		};
+
+		const header = (
+			<Drawer.Header>
+				<Drawer.Title>Terms of service</Drawer.Title>
+				<Drawer.CloseIcon />
+			</Drawer.Header>
+		);
+
+		const footer = (
+			<Drawer.Footer>
+				<Drawer.Action variant="outline">Decline</Drawer.Action>
+				<Drawer.Action>Accept</Drawer.Action>
+			</Drawer.Footer>
+		);
+
+		return (
+			<Drawer.Root { ...args } swipeDirection={ direction }>
+				<Stack direction="column" gap="lg" align="start">
+					<ScrollableControls { ...controlProps } />
+					<Drawer.Trigger>Open Drawer</Drawer.Trigger>
+				</Stack>
+				<Drawer.Popup size={ size }>
+					{ stickyHeader && header }
+					<Drawer.Content>
+						{ ! stickyHeader && header }
+						<Stack direction="column" gap="lg">
+							<ScrollableControls { ...controlProps } />
+							{ Array.from( { length: 20 } ).map(
+								( _, index ) => (
+									<p key={ index } style={ { margin: 0 } }>
+										Paragraph { index + 1 }: Lorem ipsum
+										dolor sit amet, consectetur adipiscing
+										elit. Sed do eiusmod tempor incididunt
+										ut labore et dolore magna aliqua. Ut
+										enim ad minim veniam, quis nostrud
+										exercitation ullamco laboris nisi ut
+										aliquip ex ea commodo consequat.
+									</p>
+								)
+							) }
+						</Stack>
+						{ ! stickyFooter && footer }
+					</Drawer.Content>
+					{ stickyFooter && footer }
 				</Drawer.Popup>
 			</Drawer.Root>
 		);
