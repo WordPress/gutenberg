@@ -257,12 +257,14 @@ describe( 'filters', () => {
 			},
 			fields
 		);
-		expect( result ).toHaveLength( 5 );
+		expect( result ).toHaveLength( 7 );
 		expect( result[ 0 ].name.title ).toBe( 'Earth' );
 		expect( result[ 1 ].name.title ).toBe( 'Jupiter' );
 		expect( result[ 2 ].name.title ).toBe( 'Saturn' );
 		expect( result[ 3 ].name.title ).toBe( 'Uranus' );
 		expect( result[ 4 ].name.title ).toBe( 'Makemake' );
+		expect( result[ 5 ].name.title ).toBe( 'Sun' );
+		expect( result[ 6 ].name.title ).toBe( 'Pluto' );
 	} );
 
 	it( 'should search using IS ANY filter for ARRAY values', () => {
