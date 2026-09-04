@@ -130,6 +130,12 @@ When hiding the URLInput using CSS (as is sometimes done for accessibility purpo
 
 This prop allows the suggestions list to be programmatically not rendered by passing a boolean—it can be `true` to make sure suggestions aren't rendered, or `false`/`undefined` to fall back to the default behaviour of showing suggestions when matching autocompletion items are found.
 
+### `closeSuggestionsOnNavigateOutside: Boolean`
+
+_Optional._ Closes the suggestions list when the user navigates away from the field: when focus moves outside the input and its suggestions — for example into another field — or when Escape is pressed. The Escape key event does not propagate any further in that case, so a popover the component is rendered within stays open. While this prop is set, the list also only opens when the input has focus, so a field that mounts with a value doesn't show its suggestions until it's interacted with.
+
+Defaults to `false`, which preserves the historical behavior: the list stays open regardless of focus, and Escape is left to enclosing components — such as the popovers that core UIs usually render `URLInput` within.
+
 ## Example
 
 

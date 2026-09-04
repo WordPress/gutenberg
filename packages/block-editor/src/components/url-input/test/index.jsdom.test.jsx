@@ -9,7 +9,7 @@ import userEvent from '@testing-library/user-event';
 import { speak } from '@wordpress/a11y';
 import { useState } from '@wordpress/element';
 import { dispatch } from '@wordpress/data';
-import { UP, DOWN, ENTER, TAB } from '@wordpress/keycodes';
+import { UP, DOWN, ENTER, TAB, ESCAPE } from '@wordpress/keycodes';
 import URLInput from '../';
 import { store as blockEditorStore } from '../../../store';
 import { expectValidatedInputControlDeprecationIfCalled } from './fixtures/validated-input-control-deprecation';
@@ -37,6 +37,7 @@ const KEY_EVENTS = {
 	down: { key: 'ArrowDown', keyCode: DOWN },
 	enter: { key: 'Enter', keyCode: ENTER },
 	tab: { key: 'Tab', keyCode: TAB },
+	esc: { key: 'Escape', keyCode: ESCAPE },
 };
 
 /**
@@ -639,6 +640,206 @@ describe( 'URLInput', () => {
 					currentInputValue: 'hello',
 				} )
 			);
+		} );
+	} );
+
+	describe( 'closeSuggestionsOnNavigateOutside', () => {
+		let hasFocusSpy;
+
+		beforeEach( () => {
+			// `useFocusOutside` treats a document without focus as the window
+			// losing focus and bails, and jsdom's `document.hasFocus()`
+			// returns false.
+			hasFocusSpy = jest
+				.spyOn( document, 'hasFocus' )
+				.mockReturnValue( true );
+		} );
+
+		afterEach( () => {
+			hasFocusSpy.mockRestore();
+		} );
+
+		// With the prop set, the list only opens while the input has focus,
+		// so unlike `renderWithSuggestions` the field is typed in.
+		async function renderFocusedWithSuggestions( props = {} ) {
+			const utils = renderURLInput( {
+				closeSuggestionsOnNavigateOutside: true,
+				...props,
+			} );
+			await utils.user.click( utils.input );
+			await utils.user.keyboard( 'hello' );
+			await screen.findByRole( 'listbox' );
+			return utils;
+		}
+
+		it( 'should close the suggestions when focus moves outside the component', async () => {
+			const { user, input } = await renderFocusedWithSuggestions();
+
+			await user.tab();
+
+			await waitFor( () =>
+				expect(
+					screen.queryByRole( 'listbox' )
+				).not.toBeInTheDocument()
+			);
+			expect( input ).toHaveAttribute( 'aria-expanded', 'false' );
+		} );
+
+		it( 'should keep the suggestions open when focus moves outside without the prop', async () => {
+			const { user, input } = await renderWithSuggestions();
+
+			await user.click( input );
+			await user.tab();
+			await flushDebounce();
+
+			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+		} );
+
+		it( 'should close the suggestions when pressing Escape, without the event propagating', async () => {
+			const onParentKeyDown = jest.fn();
+			const user = userEvent.setup();
+
+			render(
+				// A stand-in for an ancestor listening for keydown, the way
+				// a popover implementation would.
+				// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+				<div onKeyDown={ onParentKeyDown }>
+					<ControlledURLInput
+						onChange={ () => {} }
+						__experimentalFetchLinkSuggestions={
+							fetchLinkSuggestions
+						}
+						closeSuggestionsOnNavigateOutside
+					/>
+				</div>
+			);
+			const input = screen.getByRole( 'combobox' );
+			await user.click( input );
+			await user.keyboard( 'hello' );
+			await screen.findByRole( 'listbox' );
+			// The parent saw the typing; only the Escape presses matter below.
+			onParentKeyDown.mockClear();
+
+			fireEvent.keyDown( input, KEY_EVENTS.esc );
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+			expect( input ).toHaveAttribute( 'aria-expanded', 'false' );
+			expect( input ).toHaveFocus();
+			expect( onParentKeyDown ).not.toHaveBeenCalled();
+
+			// Once the list is closed, Escape propagates again.
+			fireEvent.keyDown( input, KEY_EVENTS.esc );
+			expect( onParentKeyDown ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'should leave Escape to the parent without the prop', async () => {
+			const onParentKeyDown = jest.fn();
+
+			render(
+				// A stand-in for an ancestor listening for keydown, the way
+				// a popover implementation would.
+				// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+				<div onKeyDown={ onParentKeyDown }>
+					<ControlledURLInput
+						value="hello"
+						onChange={ () => {} }
+						__experimentalFetchLinkSuggestions={
+							fetchLinkSuggestions
+						}
+					/>
+				</div>
+			);
+			const input = screen.getByRole( 'combobox' );
+			await screen.findByRole( 'listbox' );
+
+			fireEvent.keyDown( input, KEY_EVENTS.esc );
+
+			expect( onParentKeyDown ).toHaveBeenCalledTimes( 1 );
+			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+		} );
+
+		it( 'should ignore an Escape that is part of an IME composition', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<ControlledURLInput
+					__experimentalFetchLinkSuggestions={ fetchLinkSuggestions }
+					closeSuggestionsOnNavigateOutside
+					// The default control filters IME keystrokes out by
+					// itself, so the component's own handling is only
+					// reachable through a custom control.
+					__experimentalRenderControl={ (
+						controlProps,
+						{ onChange, suffix, help, ...inputProps }
+					) => (
+						<input
+							{ ...inputProps }
+							onChange={ ( event ) =>
+								onChange( event.target.value )
+							}
+						/>
+					) }
+				/>
+			);
+			const input = screen.getByRole( 'combobox' );
+			await user.click( input );
+			await user.keyboard( 'hello' );
+			await screen.findByRole( 'listbox' );
+
+			// While composing, macOS browsers report the real key along with
+			// the `isComposing` flag…
+			fireEvent.keyDown( input, {
+				...KEY_EVENTS.esc,
+				isComposing: true,
+			} );
+
+			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+
+			// …and Safari marks the end of a composition by key code alone.
+			fireEvent.keyDown( input, { key: 'Escape', keyCode: 229 } );
+
+			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+
+			// A plain Escape still dismisses the list.
+			fireEvent.keyDown( input, KEY_EVENTS.esc );
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'should not open the suggestions while the field is not focused', async () => {
+			const { user, input } = renderURLInput( {
+				value: 'hello',
+				closeSuggestionsOnNavigateOutside: true,
+			} );
+
+			await waitFor( () =>
+				expect( fetchLinkSuggestions ).toHaveBeenCalledTimes( 1 )
+			);
+			await flushDebounce();
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+
+			// Typing in the field opens the list again.
+			await user.click( input );
+			await user.keyboard( ' world' );
+
+			expect( await screen.findByRole( 'listbox' ) ).toBeVisible();
+		} );
+
+		it( 'should still select a suggestion on click', async () => {
+			const { user, input, onChange } =
+				await renderFocusedWithSuggestions();
+
+			await user.click(
+				screen.getByRole( 'option', { name: 'Sample page' } )
+			);
+
+			expect( onChange ).toHaveBeenLastCalledWith(
+				SUGGESTIONS[ 1 ].url,
+				SUGGESTIONS[ 1 ]
+			);
+			expect( input ).toHaveFocus();
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 		} );
 	} );
 
