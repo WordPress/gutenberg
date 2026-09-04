@@ -148,8 +148,6 @@ export function FlatTermSelector( { slug } ) {
 
 	const searchTerms = useCallback(
 		async ( search ) => {
-			lastSearchRef.current = search;
-
 			const records = await registry
 				.resolveSelect( coreStore )
 				.getEntityRecords( 'taxonomy', slug, {
@@ -157,7 +155,7 @@ export function FlatTermSelector( { slug } ) {
 					search,
 				} );
 
-			// Ignore requests that resolved out of order.
+			// Ignore a request whose search no longer matches the input.
 			if ( lastSearchRef.current === search ) {
 				setSuggestions( ( records ?? [] ).map( termToItem ) );
 				setIsSearching( false );
@@ -173,9 +171,11 @@ export function FlatTermSelector( { slug } ) {
 	const hasExactMatch = [ ...suggestions, ...values ].some( ( term ) =>
 		isSameTermName( term.label, newTermName )
 	);
+	const showCreatableItem =
+		hasCreateAction && !! newTermName && ! hasExactMatch && ! isSearching;
 	const creatableItem = useMemo(
 		() =>
-			hasCreateAction && !! newTermName && ! hasExactMatch
+			showCreatableItem
 				? {
 						value: CREATE_TERM_VALUE,
 						label: sprintf(
@@ -186,7 +186,7 @@ export function FlatTermSelector( { slug } ) {
 						creatable: true,
 				  }
 				: undefined,
-		[ hasCreateAction, hasExactMatch, newTermName ]
+		[ newTermName, showCreatableItem ]
 	);
 	const items = useMemo(
 		() =>
@@ -256,7 +256,6 @@ export function FlatTermSelector( { slug } ) {
 					( item ) => ! isSameTerm( item, pendingTerm )
 				)
 			);
-			speak( termRemovedLabel, 'assertive' );
 			return;
 		}
 
@@ -348,6 +347,9 @@ export function FlatTermSelector( { slug } ) {
 
 	function onInputValueChange( nextInputValue ) {
 		setInputValue( nextInputValue );
+		// Tracked here rather than in the search, so that a request already in
+		// flight is discarded once it resolves.
+		lastSearchRef.current = nextInputValue;
 		// The suggestions are searched through the REST API and nothing filters
 		// them on the client, so the ones for the previous input have to go
 		// before they can be picked by mistake.

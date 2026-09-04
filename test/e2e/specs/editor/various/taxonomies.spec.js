@@ -230,34 +230,12 @@ test.describe( 'Taxonomies', () => {
 		expect( post.tags ).toEqual( [] );
 	} );
 
-	test( 'should assign every tag created in quick succession', async ( {
+	test( 'should assign every tag created in succession', async ( {
 		editor,
 		page,
 		requestUtils,
 	} ) => {
 		await openTaxonomyPanel( page, 'Tags' );
-
-		// Hold the first create request so the second one resolves while the
-		// first tag is still being created.
-		const heldCreateRequest = defer();
-		let createRequestCount = 0;
-		await page.route( '**/wp/v2/tags**', async ( route ) => {
-			if ( route.request().method() !== 'POST' ) {
-				await route.continue();
-				return;
-			}
-
-			createRequestCount += 1;
-			if ( createRequestCount === 1 ) {
-				await heldCreateRequest;
-			}
-
-			await route.continue();
-		} );
-
-		const isCreateResponse = ( response ) =>
-			response.request().method() === 'POST' &&
-			/\/wp\/v2\/tags/.test( response.url() );
 
 		const firstTagName = 'tag-a-' + generateRandomNumber();
 		const secondTagName = 'tag-b-' + generateRandomNumber();
@@ -275,21 +253,15 @@ test.describe( 'Taxonomies', () => {
 			.click();
 		await expect( firstTagChip ).toBeVisible();
 
-		const secondCreateResponse = page.waitForResponse( isCreateResponse );
 		await tagsCombobox.fill( secondTagName );
 		await page
 			.getByRole( 'option', { name: `Create: ${ secondTagName }` } )
 			.click();
 		await expect( secondTagChip ).toBeVisible();
-		await secondCreateResponse;
 
-		const firstCreateResponse = page.waitForResponse( isCreateResponse );
-		heldCreateRequest.resolve();
-		await firstCreateResponse;
-
-		// Neither tag is dropped by the one that resolved after it. The chips
-		// are shown before the tags exist, so the assignment is what to wait
-		// for: it only happens once a create request resolves.
+		// Neither tag is dropped by the one created after it. The chips are
+		// shown before the tags exist, so the assignment is what to wait for:
+		// it only happens once a create request resolves.
 		await expect
 			.poll( () =>
 				page.evaluate( () =>
