@@ -14,6 +14,8 @@ const meta: Meta< typeof SelectControl > = {
 		'SelectControl.Group': SelectControl.Group,
 		'SelectControl.GroupLabel': SelectControl.GroupLabel,
 		'SelectControl.Item': SelectControl.Item,
+		'SelectControl.ItemLabel': SelectControl.ItemLabel,
+		'SelectControl.ItemDescription': SelectControl.ItemDescription,
 	},
 	argTypes: {
 		onValueChange: { action: 'onValueChange' },
@@ -176,7 +178,9 @@ export const Grouped: Story = {
 							value={ item }
 							label={ item.label }
 						>
-							{ item.label }
+							<SelectControl.ItemLabel>
+								{ item.label }
+							</SelectControl.ItemLabel>
 						</SelectControl.Item>
 					) ) }
 				</SelectControl.Group>
@@ -245,7 +249,9 @@ export const WithCustomTriggerAndItems: Story = {
 					value={ item }
 					label={ item.label }
 				>
-					<User user={ item } />
+					<SelectControl.ItemLabel>
+						<User user={ item } />
+					</SelectControl.ItemLabel>
 				</SelectControl.Item>
 			) ),
 		],
@@ -272,9 +278,47 @@ export const WithItemsArrayAndPartialCustomization: Story = {
 					label={ item.label }
 					disabled={ item.disabled }
 				>
-					✨ { item.label }
+					<SelectControl.ItemLabel>
+						✨ { item.label }
+					</SelectControl.ItemLabel>
 				</SelectControl.Item>
 			) ),
+		],
+	},
+};
+
+/**
+ * Use `SelectControl.ItemDescription` for supplementary text that should be
+ * announced as a description rather than part of the item name.
+ */
+export const WithItemDescription: Story = {
+	args: {
+		label: 'Fruit',
+		items: [
+			{ value: 'apple', label: 'Apple' },
+			{ value: 'banana', label: 'Banana' },
+		],
+		children: [
+			<SelectControl.Item
+				key="apple"
+				value={ { value: 'apple', label: 'Apple' } }
+				label="Apple"
+			>
+				<SelectControl.ItemLabel>Apple</SelectControl.ItemLabel>
+				<SelectControl.ItemDescription>
+					99 in stock
+				</SelectControl.ItemDescription>
+			</SelectControl.Item>,
+			<SelectControl.Item
+				key="banana"
+				value={ { value: 'banana', label: 'Banana' } }
+				label="Banana"
+			>
+				<SelectControl.ItemLabel>Banana</SelectControl.ItemLabel>
+				<SelectControl.ItemDescription>
+					12 in stock
+				</SelectControl.ItemDescription>
+			</SelectControl.Item>,
 		],
 	},
 };

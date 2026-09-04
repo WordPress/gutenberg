@@ -1,5 +1,5 @@
 import type { Select as _Select } from '@base-ui/react/select';
-import type { ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import type { ComponentProps } from '../../../utils/types';
 import type { ItemPopupWidthProps } from '../../../utils/css/item-popup';
 import type { InputLayoutProps } from '../input-layout/types';
@@ -77,9 +77,39 @@ export type SelectPopupProps = ComponentProps< typeof _Select.Popup > &
 		positioner?: ReactElement< Omit< PositionerProps, 'children' > >;
 	};
 
+export interface SelectItemLabelProps extends ComponentProps< 'span' > {
+	/**
+	 * The primary label for a select item. Use as the first direct child of
+	 * every select item. The trigger label still comes from the selected
+	 * item's `label` or from `Select.Trigger` children.
+	 */
+	children: ReactNode;
+}
+
+export interface SelectItemDescriptionProps extends ComponentProps< 'span' > {
+	/**
+	 * Supplementary content displayed below a select item label. Use as a
+	 * direct child after `Select.ItemLabel`. Content should be text or
+	 * non-interactive inline markup.
+	 */
+	children: ReactNode;
+}
+
+type SelectItemChildren =
+	| ReactElement< SelectItemLabelProps >
+	| [
+			ReactElement< SelectItemLabelProps >,
+			...(
+				| ReactElement< SelectItemDescriptionProps >
+				| false
+				| null
+				| undefined
+			)[],
+	  ];
+
 export type SelectItemProps = Omit<
 	ComponentProps< typeof _Select.Item >,
-	'value'
+	'value' | 'children'
 > & {
 	/**
 	 * A unique value that identifies this select item.
@@ -92,7 +122,8 @@ export type SelectItemProps = Omit<
 	 */
 	size?: 'default' | 'small';
 	/**
-	 * The content of the item.
+	 * One direct `Select.ItemLabel`, followed by zero or more direct
+	 * `Select.ItemDescription` components.
 	 */
-	children?: _Select.Item.Props[ 'children' ];
+	children: SelectItemChildren;
 };
