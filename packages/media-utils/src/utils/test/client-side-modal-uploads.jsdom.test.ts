@@ -2,9 +2,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const addItems = vi.fn();
 const getSettings = vi.fn( () => ( { mediaUpload: () => {} } ) );
-const getItems = vi.fn( () => [] );
+const getItems = vi.fn( (): any[] => [] );
 const detectClientSideMediaSupport = vi.fn( () => ( { supported: true } ) );
 const isHeicCanvasSupported = vi.fn( () => false );
+const unsubscribe = vi.fn();
+let notifyStoreChange: () => void = () => {};
 
 vi.mock(
 	import( '@wordpress/data' ),
@@ -12,17 +14,10 @@ vi.mock(
 		( {
 			dispatch: () => ( { addItems } ),
 			select: () => ( { getSettings, getItems } ),
-			subscribe: () => () => {},
-		} ) as any
-);
-
-vi.mock(
-	import( '@wordpress/upload-media' ),
-	() =>
-		( {
-			store: { name: 'core/upload-media' },
-			detectClientSideMediaSupport: () => detectClientSideMediaSupport(),
-			isHeicCanvasSupported: () => isHeicCanvasSupported(),
+			subscribe: ( listener: () => void ) => {
+				notifyStoreChange = listener;
+				return unsubscribe;
+			},
 		} ) as any
 );
 
@@ -75,6 +70,10 @@ function setUpGlobals() {
 	( window as any ).plupload = { FAILED: 4 };
 	( window as any ).wp = {
 		Uploader,
+		uploadMedia: {
+			detectClientSideMediaSupport: () => detectClientSideMediaSupport(),
+			isHeicCanvasSupported: () => isHeicCanvasSupported(),
+		},
 		media: {
 			model: {
 				settings: { post: { id: 42 } },
@@ -163,6 +162,8 @@ describe( 'installClientSideModalUploads', () => {
 
 	afterEach( () => {
 		vi.clearAllMocks();
+		getItems.mockReturnValue( [] );
+		notifyStoreChange = () => {};
 		delete ( window as any ).wp;
 		delete ( window as any ).plupload;
 		delete ( window as any ).__clientSideMediaProcessing;
@@ -291,6 +292,99 @@ describe( 'installClientSideModalUploads', () => {
 		} );
 		expect( model.attributes.percent ).toBeUndefined();
 		expect( wpUploader.success ).toHaveBeenCalledWith( model );
+
+		// The id must not be set silently: Attachments re-keys the model from
+		// its cid to its id on the change event, and a silent set skips it.
+		expect( model.set ).toHaveBeenCalledWith( { id: 99 } );
+	} );
+
+	it( 'reports the outcome of an upload only once', async () => {
+		const { Uploader, created } = setUpGlobals();
+		const { installClientSideModalUploads } = await loadModule();
+
+		installClientSideModalUploads();
+		const { up, wpUploader, bindings } = createUploader( Uploader );
+
+		bindings[ 0 ].handler( up, [ createPluploadFile() ] );
+		const { onSuccess, onError } = addItems.mock.calls[ 0 ][ 0 ];
+
+		onError( new Error( 'Upload cancelled' ) );
+		// The store can report a parent item twice, and a cancel can be
+		// followed by a late success. Neither may revive a destroyed tile.
+		onSuccess( [ { id: 99 } ] );
+		onSuccess( [ { id: 99 } ] );
+
+		expect( created[ 0 ].destroy ).toHaveBeenCalledTimes( 1 );
+		expect( created[ 0 ].fetch ).not.toHaveBeenCalled();
+		expect( wpUploader.success ).not.toHaveBeenCalled();
+	} );
+
+	it( 'tracks progress for its own queue item only', async () => {
+		const { Uploader, created } = setUpGlobals();
+		const { installClientSideModalUploads } = await loadModule();
+
+		installClientSideModalUploads();
+		const { up, bindings } = createUploader( Uploader );
+
+		bindings[ 0 ].handler( up, [ createPluploadFile() ] );
+		const { onSuccess } = addItems.mock.calls[ 0 ][ 0 ];
+
+		// An item the block editor queued for the very same file must not
+		// claim this upload's tile.
+		getItems.mockReturnValue( [
+			{ id: 'other', onSuccess: () => {}, operations: [ 'a', 'b' ] },
+			{ id: 'mine', onSuccess, operations: [ 'a', 'b', 'c', 'd' ] },
+		] );
+		notifyStoreChange();
+
+		expect( created[ 0 ].attributes.percent ).toBe( 0 );
+
+		getItems.mockReturnValue( [
+			{ id: 'other', onSuccess: () => {}, operations: [] },
+			{ id: 'mine', onSuccess, operations: [ 'c', 'd' ] },
+		] );
+		notifyStoreChange();
+
+		expect( created[ 0 ].attributes.percent ).toBe( 50 );
+	} );
+
+	it( 'fails a tile whose queue item disappears without reporting', async () => {
+		const { Uploader, errors, created } = setUpGlobals();
+		const { installClientSideModalUploads } = await loadModule();
+
+		installClientSideModalUploads();
+		const { up, bindings } = createUploader( Uploader );
+
+		bindings[ 0 ].handler( up, [ createPluploadFile() ] );
+		const { onSuccess } = addItems.mock.calls[ 0 ][ 0 ];
+
+		getItems.mockReturnValue( [
+			{ id: 'mine', onSuccess, operations: [] },
+		] );
+		notifyStoreChange();
+
+		// cancelItem() can remove an item silently, without calling back.
+		getItems.mockReturnValue( [] );
+		notifyStoreChange();
+
+		expect( created[ 0 ].destroy ).toHaveBeenCalled();
+		expect( errors.unshift ).toHaveBeenCalled();
+		// Nothing left to watch.
+		expect( unsubscribe ).toHaveBeenCalled();
+	} );
+
+	it( 'leaves a batch of files plupload already failed alone', async () => {
+		const { Uploader } = setUpGlobals();
+		const { installClientSideModalUploads } = await loadModule();
+
+		installClientSideModalUploads();
+		const { up, bindings } = createUploader( Uploader );
+		const failed = { ...createPluploadFile(), status: 4 };
+
+		// Suppressing the built-in handler here would leave plupload's queue
+		// unstarted, because that handler is the only caller of up.start().
+		expect( bindings[ 0 ].handler( up, [ failed ] ) ).toBeUndefined();
+		expect( addItems ).not.toHaveBeenCalled();
 	} );
 
 	it( 'reports a failure through wp.Uploader.errors', async () => {

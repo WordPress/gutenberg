@@ -1,9 +1,5 @@
 import { __ } from '@wordpress/i18n';
 import { dispatch, select, subscribe } from '@wordpress/data';
-import {
-	detectClientSideMediaSupport,
-	isHeicCanvasSupported,
-} from '@wordpress/upload-media';
 
 /**
  * Routes uploads started from the editor's media modal through the client-side
@@ -25,6 +21,12 @@ import {
  * placeholder attachments, progress, and `wp.Uploader.errors` are mirrored, so
  * the modal's UI works unchanged.
  *
+ * The pipeline is reached through the globals WordPress already prints - the
+ * `core/upload-media` store and `wp.uploadMedia` - rather than by importing
+ * `@wordpress/upload-media`. This module only does anything where `wp.media`
+ * exists at all, and a static import would put the whole processing stack
+ * behind the `wp-media-utils` handle on every screen that enqueues it.
+ *
  * @see https://github.com/WordPress/gutenberg/issues/82409
  */
 
@@ -37,13 +39,16 @@ declare global {
 
 /**
  * Name of the upload-media store.
- *
- * The store is addressed by name rather than through the `store` descriptor
- * `@wordpress/upload-media` exports: importing that descriptor would pull the
- * store - and with it `@wordpress/private-apis` - into the module graph of
- * every bundled package that imports `@wordpress/media-utils`.
  */
 const UPLOAD_STORE = 'core/upload-media';
+
+/**
+ * The parts of `@wordpress/upload-media` this module reads off `wp`.
+ */
+type UploadMediaGlobal = {
+	detectClientSideMediaSupport?: () => { supported?: boolean } | undefined;
+	isHeicCanvasSupported?: () => boolean;
+};
 
 /**
  * HEIC MIME types, the only ones routed through the pipeline when the browser
@@ -73,12 +78,14 @@ type PluploadFile = {
  * The bookkeeping kept for one queued upload.
  */
 type UploadEntry = {
-	/** Identity key of the file being uploaded. */
-	key: string;
 	/** ID of the queue item it matched, once one is known. */
 	itemId: string | null;
+	/** The `onSuccess` handed to the store, which identifies its queue item. */
+	token: ( attachments: any[] ) => void;
 	/** Called with an integer percentage whenever it changes. */
 	onProgress: ( percent: number ) => void;
+	/** Called when the upload fails or is dropped from the queue. */
+	onError: ( error: unknown ) => void;
 	/** Last percentage reported. */
 	lastPercent: number;
 	/** Operation counts the progress estimate is derived from. */
@@ -87,32 +94,22 @@ type UploadEntry = {
 	released: boolean;
 };
 
-// Uploads waiting to be matched to a queue item, keyed by file identity
-// (concurrent uploads of an identical file share a key and are matched in
-// order), and uploads already matched, keyed by queue item id. Items are
-// matched by id from then on because the store swaps `sourceFile` for HEIC
-// files once they are converted.
-const pending = new Map< string, UploadEntry[] >();
-const active = new Map< string, UploadEntry >();
-
-// Number of queued files that have not succeeded or failed yet.
-let inFlight = 0;
+// Uploads that have not succeeded or failed yet. A queue item is matched to
+// its entry by the identity of the `onSuccess` callback the entry handed the
+// store, so two uploads of the same file - or an upload the block editor
+// queued into the same store - can never be mistaken for one another.
+const entries = new Set< UploadEntry >();
 
 let isInstalled = false;
 let unsubscribe: ( () => void ) | undefined;
 
 /**
- * Builds a stable identity key for a file.
+ * The upload-media package, where WordPress has printed it.
  *
- * The queue item's `sourceFile` is a clone of the original file, so it cannot
- * be matched by reference. The clone preserves name, size, and last-modified
- * time, which together identify a file within one session.
- *
- * @param file The file to key.
- * @return Identity key.
+ * @return The package's exports, or undefined where it is not loaded.
  */
-function fileKey( file: File ): string {
-	return `${ file.name }::${ file.size }::${ file.lastModified }`;
+function getUploadMedia(): UploadMediaGlobal | undefined {
+	return ( window as any ).wp?.uploadMedia;
 }
 
 /**
@@ -123,7 +120,7 @@ function fileKey( file: File ): string {
 function isFullPipelineActive(): boolean {
 	return Boolean(
 		window.__clientSideMediaProcessing &&
-			detectClientSideMediaSupport?.()?.supported
+			getUploadMedia()?.detectClientSideMediaSupport?.()?.supported
 	);
 }
 
@@ -137,7 +134,7 @@ function isHeicOnlyPipelineActive(): boolean {
 	return Boolean(
 		window.__clientSideMediaProcessing &&
 			! isFullPipelineActive() &&
-			isHeicCanvasSupported?.()
+			getUploadMedia()?.isHeicCanvasSupported?.()
 	);
 }
 
@@ -148,6 +145,12 @@ function isHeicOnlyPipelineActive(): boolean {
  * added before that - or on a screen where `@wordpress/upload-media` never
  * registered its store - has to stay on the classic path: a degradation, never
  * data loss.
+ *
+ * The store is read from the default registry, which is the one the block
+ * editor provider writes to unless it was given a registry of its own. Under a
+ * custom `RegistryProvider` this check simply fails and the modal keeps
+ * uploading server-side - the same trade-off `invalidateAttachmentResolutions`
+ * documents.
  *
  * @return True when the store is ready to accept files.
  */
@@ -161,18 +164,25 @@ function isPipelineReady(): boolean {
  * Suppressing plupload's built-in handler is all-or-nothing, so the whole batch
  * stays on the classic path when any file cannot be handled: plupload exposes
  * no native `File` for sources it cannot represent as one, and in HEIC-only
- * mode everything but a HEIC file is still processed server-side.
+ * mode everything but a HEIC file is still processed server-side. A batch with
+ * nothing to take - only files plupload has already failed - is left alone too,
+ * so the built-in handler still gets to start whatever it has queued.
  *
  * @param files Files added to the plupload queue.
  * @return True when every file can go through the pipeline.
  */
 function canHandleBatch( files: PluploadFile[] ): boolean {
+	const uploadable = files.filter(
+		( file ) => window.plupload?.FAILED !== file.status
+	);
+
+	if ( ! uploadable.length ) {
+		return false;
+	}
+
 	const heicOnly = isHeicOnlyPipelineActive();
 
-	return files.every( ( file ) => {
-		if ( window.plupload?.FAILED === file.status ) {
-			return true;
-		}
+	return uploadable.every( ( file ) => {
 		if ( ! file.getNative?.() ) {
 			return false;
 		}
@@ -248,7 +258,7 @@ function estimateProgress( item: any, entry: UploadEntry ): number {
 	}
 
 	const imageSizeCount = Object.keys(
-		select( UPLOAD_STORE ).getSettings()?.allImageSizes || {}
+		select( UPLOAD_STORE )?.getSettings()?.allImageSizes || {}
 	).length;
 	const completed = totals.total - remaining;
 	let fraction = 0;
@@ -266,74 +276,85 @@ function estimateProgress( item: any, entry: UploadEntry ): number {
  * Matches queue items to queued uploads and reports their progress.
  *
  * Runs on every change to the upload-media store. Sub-size children carry the
- * parent's file and are skipped; only top-level items drive the modal's
+ * parent's callbacks and are skipped; only top-level items drive the modal's
  * progress bars. Progress holds at 99 until the upload's success callback has
  * run, so no tile looks finished before the modal has synced the result.
+ *
+ * An item that leaves the queue without reporting anything - `cancelItem()`
+ * can remove one silently, and a finished item that produced no attachment is
+ * dropped the same way - would otherwise strand its tile at 99% and keep the
+ * modal from returning to browse mode, so its entry is failed here instead.
  */
 function onStoreChange(): void {
-	if ( inFlight === 0 ) {
+	if ( ! entries.size ) {
 		return;
 	}
 
-	select( UPLOAD_STORE )
-		.getItems()
-		.forEach( ( item: any ) => {
-			if ( item.parentId || ! item.sourceFile ) {
-				return;
-			}
+	const items: any[] = select( UPLOAD_STORE )?.getItems() ?? [];
+	const liveIds = new Set< string >();
+	const current = [ ...entries ];
 
-			let entry = active.get( item.id );
-			if ( ! entry ) {
-				const key = fileKey( item.sourceFile );
-				const list = pending.get( key );
-				if ( ! list?.length ) {
-					return;
-				}
-				entry = list.shift() as UploadEntry;
-				if ( ! list.length ) {
-					pending.delete( key );
-				}
-				entry.itemId = item.id;
-				active.set( item.id, entry );
-			}
+	items.forEach( ( item ) => {
+		if ( item.parentId ) {
+			return;
+		}
 
-			const percent = Math.min(
-				99,
-				Math.round( estimateProgress( item, entry ) )
+		liveIds.add( item.id );
+
+		const entry =
+			current.find( ( candidate ) => candidate.itemId === item.id ) ??
+			current.find(
+				( candidate ) =>
+					! candidate.itemId && candidate.token === item.onSuccess
 			);
-			if ( percent !== entry.lastPercent ) {
-				entry.lastPercent = percent;
-				entry.onProgress( percent );
-			}
-		} );
+		if ( ! entry ) {
+			return;
+		}
+		entry.itemId = item.id;
+
+		const percent = Math.min(
+			99,
+			Math.round( estimateProgress( item, entry ) )
+		);
+		if ( percent !== entry.lastPercent ) {
+			entry.lastPercent = percent;
+			entry.onProgress( percent );
+		}
+	} );
+
+	current.forEach( ( entry ) => {
+		if ( entry.itemId && ! liveIds.has( entry.itemId ) ) {
+			entry.onError(
+				new Error(
+					__(
+						'The upload stopped before it finished. Please try again.'
+					)
+				)
+			);
+		}
+	} );
 }
 
 /**
  * Stops tracking an upload once it has succeeded or failed.
  *
  * @param entry The bookkeeping for the upload.
+ * @return True when the caller still owns the outcome, false when something
+ *         else has already reported it.
  */
-function release( entry: UploadEntry ): void {
+function release( entry: UploadEntry ): boolean {
 	if ( entry.released ) {
-		return;
+		return false;
 	}
 	entry.released = true;
-	inFlight--;
+	entries.delete( entry );
 
-	const list = pending.get( entry.key );
-	if ( list ) {
-		const index = list.indexOf( entry );
-		if ( index !== -1 ) {
-			list.splice( index, 1 );
-		}
-		if ( ! list.length ) {
-			pending.delete( entry.key );
-		}
+	if ( ! entries.size ) {
+		unsubscribe?.();
+		unsubscribe = undefined;
 	}
 
-	if ( entry.itemId ) {
-		active.delete( entry.itemId );
-	}
+	return true;
 }
 
 /**
@@ -355,36 +376,39 @@ function queueFile(
 		onProgress: ( percent: number ) => void;
 	}
 ): void {
+	// The store keeps this function on the queue item it creates, which is how
+	// `onStoreChange` tells this upload's item apart from every other one. The
+	// store can report an outcome more than once, so `release()` decides which
+	// call owns it.
+	const token = ( attachments: any[] ) => {
+		if ( release( entry ) ) {
+			callbacks.onSuccess( attachments[ 0 ] );
+		}
+	};
+
 	const entry: UploadEntry = {
-		key: fileKey( file ),
 		itemId: null,
+		token,
 		onProgress: callbacks.onProgress,
+		onError: ( error: unknown ) => {
+			if ( release( entry ) ) {
+				callbacks.onError( error );
+			}
+		},
 		lastPercent: -1,
 		totals: null,
 		released: false,
 	};
 
-	const list = pending.get( entry.key );
-	if ( list ) {
-		list.push( entry );
-	} else {
-		pending.set( entry.key, [ entry ] );
-	}
-	inFlight++;
+	entries.add( entry );
 
 	unsubscribe = unsubscribe ?? subscribe( onStoreChange, UPLOAD_STORE );
 
 	void dispatch( UPLOAD_STORE ).addItems( {
 		files: [ file ],
 		additionalData,
-		onSuccess: ( attachments: any[] ) => {
-			release( entry );
-			callbacks.onSuccess( attachments[ 0 ] );
-		},
-		onError: ( error: unknown ) => {
-			release( entry );
-			callbacks.onError( error );
-		},
+		onSuccess: token,
+		onError: ( error: unknown ) => entry.onError( error ),
 	} );
 }
 
@@ -408,6 +432,54 @@ function getErrorText( error: unknown ): string {
 }
 
 /**
+ * Translates a REST attachment into the attributes a `wp.media` attachment
+ * model expects.
+ *
+ * The two shapes disagree on nearly every field a tile renders: `source_url`
+ * against `url`, `media_details.sizes` against `sizes`, and a raw/rendered
+ * object against a plain string title. Only used as a fallback, so it fills in
+ * what the grid reads and leaves the rest to the next refetch.
+ *
+ * @param attachment The finalized REST attachment.
+ * @return Attributes for a `wp.media` attachment model.
+ */
+function toModelAttributes( attachment: any ): Record< string, unknown > {
+	const [ type, subtype ] = String( attachment.mime_type || '' ).split( '/' );
+	const details = attachment.media_details;
+	const sizes = details?.sizes;
+
+	return {
+		id: attachment.id,
+		title: attachment.title?.raw ?? attachment.title?.rendered ?? '',
+		filename: details?.file?.split( '/' ).pop() ?? '',
+		url: attachment.source_url,
+		link: attachment.link,
+		alt: attachment.alt_text,
+		mime: attachment.mime_type,
+		type,
+		subtype,
+		width: details?.width,
+		height: details?.height,
+		sizes: sizes
+			? Object.fromEntries(
+					Object.entries< any >( sizes ).map( ( [ name, size ] ) => [
+						name,
+						{
+							url: size.source_url,
+							width: size.width,
+							height: size.height,
+							orientation:
+								size.height > size.width
+									? 'portrait'
+									: 'landscape',
+						},
+					] )
+			  )
+			: undefined,
+	};
+}
+
+/**
  * Handles a finished upload by syncing the modal's tile with the server data.
  *
  * The pipeline returns a REST attachment, while the modal's tile is a
@@ -426,7 +498,10 @@ function handleSuccess(
 ): void {
 	const { wp } = window as any;
 
-	model.set( { id: attachment.id }, { silent: true } );
+	// Not silent: `Attachments` re-keys a model from its cid to its id when it
+	// sees the `change` event, and without that the collection cannot find the
+	// attachment by id, so refetching the library duplicates its tile.
+	model.set( { id: attachment.id } );
 
 	// Register the model in Attachments.all (parity with wp-plupload.js).
 	wp.media.model.Attachment.get( attachment.id, model );
@@ -444,7 +519,7 @@ function handleSuccess(
 		.fail( () => {
 			// The fetch failed but the upload did not: clear the uploading
 			// state with what the pipeline returned so no tile is stuck.
-			model.set( attachment, { silent: true } );
+			model.set( toModelAttributes( attachment ), { silent: true } );
 			clearUploadingState();
 		} )
 		.always( () => {
