@@ -183,6 +183,70 @@ class WP_Test_REST_Icons_Controller extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Test that GET /wp/v2/icons/?search=%s searches icon keywords too.
+	 */
+	public function test_get_items_search_includes_keywords() {
+		wp_set_current_user( self::$editor_id );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/icons' );
+
+		// 'hamburger' is only found in the *keywords* for core/menu.
+		$request->set_param( 'search', 'hamburger' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertEquals( array( 'core/menu' ), array_column( $data, 'name' ) );
+	}
+
+	/**
+	 * Test that the response exposes an icon's keywords, so that clients which
+	 * filter icons locally can match against them.
+	 */
+	public function test_get_items_response_includes_keywords() {
+		wp_set_current_user( self::$editor_id );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/icons' );
+		$request->set_param( 'search', 'core/menu' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertCount( 1, $data );
+		$this->assertArrayHasKey( 'keywords', $data[0] );
+		$this->assertContains( 'hamburger', $data[0]['keywords'] );
+	}
+
+	/**
+	 * Test that icons registered without keywords still expose an empty array,
+	 * so consumers do not have to handle a missing field.
+	 */
+	public function test_get_items_response_keywords_defaults_to_empty_array() {
+		wp_set_current_user( self::$editor_id );
+
+		wp_register_icon(
+			'core/no-keywords',
+			array(
+				'label'   => 'No Keywords',
+				'content' => '<svg></svg>',
+			)
+		);
+
+		try {
+			$request = new WP_REST_Request( 'GET', '/wp/v2/icons' );
+			$request->set_param( 'search', 'core/no-keywords' );
+			$response = rest_get_server()->dispatch( $request );
+			$data     = $response->get_data();
+
+			$this->assertSame( 200, $response->get_status() );
+			$this->assertCount( 1, $data );
+			$this->assertSame( array(), $data[0]['keywords'] );
+		} finally {
+			wp_unregister_icon( 'core/no-keywords' );
+		}
+	}
+
+	/**
 	 * Test that search is case-insensitive.
 	 */
 	public function test_get_items_search_case_insensitive() {

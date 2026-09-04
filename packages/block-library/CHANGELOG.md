@@ -46,6 +46,7 @@
 ### Enhancements
 
 -   Columns: Add transforms between Columns and the Row variation that preserve column widths through flex child sizing controls.
+-   Icon: Match an icon's keywords as well as its name and label when searching the icon library. ([#82367](https://github.com/WordPress/gutenberg/pull/82367))
 -   Gallery: Add an opt-in Grid layout while preserving the existing Flex layout for current galleries.([#81909](https://github.com/WordPress/gutenberg/pull/81909)).
 
 ### Bug Fixes

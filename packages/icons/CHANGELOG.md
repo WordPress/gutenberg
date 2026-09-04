@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add optional `keywords` to the icon manifest, giving each public icon extra search terms, and emit them from the generated `manifest.php`. The manifest is now the single source of these terms: the Storybook icon library reads them from it instead of keeping its own list, and the icons it had keywords for carry them in the manifest. ([#82367](https://github.com/WordPress/gutenberg/pull/82367))
+
 ### Breaking Changes
 
 -   The `search` icon is now stroke-based. Use CSS `color` rather than `fill` to recolor it. ([#82338](https://github.com/WordPress/gutenberg/pull/82338))
@@ -78,7 +82,7 @@
 
 ### Breaking Changes
 
-- Rename Tabs-related icons: `tabs-menu` to `tab-list`, `tabs-menu-item` to `tab`, and `tab` to `tab-panel`. ([#77418](https://github.com/WordPress/gutenberg/pull/77418))
+-   Rename Tabs-related icons: `tabs-menu` to `tab-list`, `tabs-menu-item` to `tab`, and `tab` to `tab-panel`. ([#77418](https://github.com/WordPress/gutenberg/pull/77418))
 
 ## 12.2.0 (2026-04-15)
 
