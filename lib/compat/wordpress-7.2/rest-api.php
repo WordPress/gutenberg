@@ -35,3 +35,39 @@ function gutenberg_modify_template_post_type_args_7_2( $args ) {
 }
 add_filter( 'register_wp_template_post_type_args', 'gutenberg_modify_template_post_type_args_7_2' );
 add_filter( 'register_wp_template_part_post_type_args', 'gutenberg_modify_template_post_type_args_7_2' );
+
+/**
+ * Exposes the privacy policy page setting in the REST API.
+ *
+ * WordPress stores the page assigned in Settings > Privacy in the
+ * `wp_page_for_privacy_policy` option, but does not register it with
+ * `show_in_rest`, so the settings endpoint cannot report it. Registering it
+ * lets the editor label the privacy policy page, alongside the homepage and
+ * the posts page.
+ *
+ * Runs after `register_initial_settings`, and skips registration when
+ * WordPress Core already exposes the option.
+ */
+function gutenberg_register_privacy_policy_page_setting() {
+	$registered = get_registered_settings();
+	if (
+		isset( $registered['wp_page_for_privacy_policy'] ) &&
+		! empty( $registered['wp_page_for_privacy_policy']['show_in_rest'] )
+	) {
+		return;
+	}
+
+	register_setting(
+		'reading',
+		'wp_page_for_privacy_policy',
+		array(
+			'show_in_rest' => array(
+				'name' => 'page_for_privacy_policy',
+			),
+			'type'         => 'integer',
+			'description'  => __( 'The ID of the page that should be displayed as the privacy policy page', 'gutenberg' ),
+			'default'      => 0,
+		)
+	);
+}
+add_action( 'init', 'gutenberg_register_privacy_policy_page_setting', 11 );
