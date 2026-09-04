@@ -767,4 +767,467 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			} );
 		} );
 	} );
+
+	// Submenu overflow scenarios are anchored to a viewport edge rather than
+	// tuned to a viewport width. A submenu is at least 200px wide, so the item
+	// at the start of a menu is always narrower than its own submenu and the
+	// item at the end of a right-justified menu always has its trailing edge on
+	// the viewport edge. Both hold whatever width the theme's font renders the
+	// labels at.
+	//
+	// The widths are also at or above the 782px breakpoint where nested
+	// submenus fly out sideways. Below it they stack vertically, so a deep tree
+	// is no wider than a single level and there is nothing to correct.
+	const FLYOUT_VIEWPORT = { width: 800, height: 800 };
+
+	/**
+	 * The horizontal extent of every level of a submenu tree.
+	 *
+	 * @param {Object} navigationItem Locator for the item that owns the tree.
+	 */
+	async function submenuTreeBounds( navigationItem ) {
+		const edges = await navigationItem
+			.locator( '.wp-block-navigation__submenu-container' )
+			.evaluateAll( ( elements ) =>
+				elements.map( ( element ) => {
+					const { left, right } = element.getBoundingClientRect();
+					return [ left, right ];
+				} )
+			);
+		return {
+			left: Math.min( ...edges.map( ( [ left ] ) => left ) ),
+			right: Math.max( ...edges.map( ( [ , right ] ) => right ) ),
+		};
+	}
+
+	test.describe( 'Submenu overflow positioning (@firefox, @webkit)', () => {
+		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
+			await admin.visitSiteEditor( {
+				postId: 'emptytheme//header',
+				postType: 'wp_template_part',
+				canvas: 'edit',
+			} );
+			await requestUtils.createNavigationMenu( {
+				title: 'Start edge menu',
+				content: `
+					<!-- wp:navigation-submenu {"label":"Edge Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+						<!-- wp:navigation-link {"label":"Submenu Link 1","type":"custom","url":"http://www.wordpress.org/"} /-->
+						<!-- wp:navigation-link {"label":"Submenu Link 2","type":"custom","url":"http://www.wordpress.org/"} /-->
+					<!-- /wp:navigation-submenu -->
+					<!-- wp:navigation-link {"label":"Item 1","type":"custom","url":"http://www.wordpress.org/"} /-->
+					<!-- wp:navigation-link {"label":"Item 2","type":"custom","url":"http://www.wordpress.org/"} /-->
+					`,
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { overlayMenu: 'off', submenuVisibility: 'click' },
+			} );
+			await editor.saveSiteEditorEntities( {
+				isOnlyCurrentEntityDirty: true,
+			} );
+		} );
+
+		test( 'submenu opens on right when it would overflow the left edge', async ( {
+			page,
+		} ) => {
+			await page.setViewportSize( FLYOUT_VIEWPORT );
+			await page.goto( '/' );
+
+			const submenuButton = page.getByRole( 'button', {
+				name: 'Edge Submenu',
+			} );
+			await submenuButton.click();
+
+			const navigationItem = page.locator(
+				'.wp-block-navigation-item.has-child',
+				{ has: submenuButton }
+			);
+			await expect(
+				navigationItem.locator(
+					'.wp-block-navigation__submenu-container'
+				)
+			).toBeVisible();
+			await expect( navigationItem ).toHaveClass( /open-on-right/ );
+
+			// A pixel of slack for the submenu borders.
+			const bounds = await submenuTreeBounds( navigationItem );
+			expect( bounds.left ).toBeGreaterThanOrEqual( -1 );
+		} );
+	} );
+
+	test.describe( 'Submenu overflow positioning with right-justified navigation (@firefox, @webkit)', () => {
+		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
+			await admin.visitSiteEditor( {
+				postId: 'emptytheme//header',
+				postType: 'wp_template_part',
+				canvas: 'edit',
+			} );
+			await requestUtils.createNavigationMenu( {
+				title: 'End edge menu',
+				content: `
+						<!-- wp:navigation-link {"label":"Item 1","type":"custom","url":"http://www.wordpress.org/"} /-->
+						<!-- wp:navigation-link {"label":"Item 2","type":"custom","url":"http://www.wordpress.org/"} /-->
+						<!-- wp:navigation-submenu {"label":"Edge Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+							<!-- wp:navigation-link {"label":"Submenu Link 1","type":"custom","url":"http://www.wordpress.org/"} /-->
+							<!-- wp:navigation-link {"label":"Submenu Link 2","type":"custom","url":"http://www.wordpress.org/"} /-->
+						<!-- /wp:navigation-submenu -->
+						`,
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: {
+					overlayMenu: 'off',
+					submenuVisibility: 'click',
+					layout: {
+						type: 'flex',
+						justifyContent: 'right',
+					},
+				},
+			} );
+			await editor.saveSiteEditorEntities( {
+				isOnlyCurrentEntityDirty: true,
+			} );
+		} );
+
+		test( 'submenu opens on left when it would overflow the right edge', async ( {
+			page,
+		} ) => {
+			await page.setViewportSize( FLYOUT_VIEWPORT );
+			await page.goto( '/' );
+
+			const submenuButton = page.getByRole( 'button', {
+				name: 'Edge Submenu',
+			} );
+			await submenuButton.click();
+
+			const navigationItem = page.locator(
+				'.wp-block-navigation-item.has-child',
+				{ has: submenuButton }
+			);
+			await expect(
+				navigationItem.locator(
+					'.wp-block-navigation__submenu-container'
+				)
+			).toBeVisible();
+			await expect( navigationItem ).toHaveClass( /open-on-left/ );
+
+			const bounds = await submenuTreeBounds( navigationItem );
+			expect( bounds.right ).toBeLessThanOrEqual(
+				FLYOUT_VIEWPORT.width + 1
+			);
+		} );
+	} );
+
+	test.describe( 'Submenu with room on both sides (@firefox, @webkit)', () => {
+		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
+			await admin.visitSiteEditor( {
+				postId: 'emptytheme//header',
+				postType: 'wp_template_part',
+				canvas: 'edit',
+			} );
+			await requestUtils.createNavigationMenu( {
+				title: 'Roomy menu',
+				content: `
+					<!-- wp:navigation-link {"label":"Navigation Item One","type":"custom","url":"http://www.wordpress.org/"} /-->
+					<!-- wp:navigation-link {"label":"Navigation Item Two","type":"custom","url":"http://www.wordpress.org/"} /-->
+					<!-- wp:navigation-link {"label":"Navigation Item Three","type":"custom","url":"http://www.wordpress.org/"} /-->
+					<!-- wp:navigation-submenu {"label":"Roomy Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+						<!-- wp:navigation-link {"label":"Submenu Link 1","type":"custom","url":"http://www.wordpress.org/"} /-->
+						<!-- wp:navigation-link {"label":"Submenu Link 2","type":"custom","url":"http://www.wordpress.org/"} /-->
+					<!-- /wp:navigation-submenu -->
+					`,
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { overlayMenu: 'off', submenuVisibility: 'click' },
+			} );
+			await editor.saveSiteEditorEntities( {
+				isOnlyCurrentEntityDirty: true,
+			} );
+		} );
+
+		test( 'submenu keeps the default positioning when it fits either way', async ( {
+			page,
+		} ) => {
+			await page.setViewportSize( { width: 1920, height: 1080 } );
+			await page.goto( '/' );
+
+			const submenuButton = page.getByRole( 'button', {
+				name: 'Roomy Submenu',
+			} );
+			await submenuButton.click();
+
+			const navigationItem = page.locator(
+				'.wp-block-navigation-item.has-child',
+				{ has: submenuButton }
+			);
+			await expect(
+				navigationItem.locator(
+					'.wp-block-navigation__submenu-container'
+				)
+			).toBeVisible();
+			await expect( navigationItem ).not.toHaveClass(
+				/open-on-left|open-on-right/
+			);
+		} );
+	} );
+
+	test.describe( 'Nested submenu overflow positioning (@firefox, @webkit)', () => {
+		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
+			await admin.visitSiteEditor( {
+				postId: 'emptytheme//header',
+				postType: 'wp_template_part',
+				canvas: 'edit',
+			} );
+			await requestUtils.createNavigationMenu( {
+				title: 'Nested overflow menu',
+				content: `
+					<!-- wp:navigation-link {"label":"Item 1","type":"custom","url":"http://www.wordpress.org/"} /-->
+					<!-- wp:navigation-link {"label":"Item 2","type":"custom","url":"http://www.wordpress.org/"} /-->
+					<!-- wp:navigation-submenu {"label":"Top Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+						<!-- wp:navigation-link {"label":"Child Link","type":"custom","url":"http://www.wordpress.org/"} /-->
+						<!-- wp:navigation-submenu {"label":"Nested Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+							<!-- wp:navigation-link {"label":"Deep Link","type":"custom","url":"http://www.wordpress.org/"} /-->
+						<!-- /wp:navigation-submenu -->
+					<!-- /wp:navigation-submenu -->
+					`,
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { overlayMenu: 'off', submenuVisibility: 'click' },
+			} );
+			await editor.saveSiteEditorEntities( {
+				isOnlyCurrentEntityDirty: true,
+			} );
+		} );
+
+		// The direction is picked from the whole tree, so a nested submenu
+		// should never spill out of the viewport - including at widths where
+		// the first level on its own would have fitted. One width just above
+		// the flyout breakpoint and one with room to spare.
+		for ( const width of [ 800, 1200 ] ) {
+			test( `nested submenu stays within a ${ width }px viewport`, async ( {
+				page,
+			} ) => {
+				await page.setViewportSize( { width, height: 800 } );
+				await page.goto( '/' );
+
+				await page
+					.getByRole( 'button', { name: 'Top Submenu' } )
+					.click();
+				await page
+					.getByRole( 'button', { name: 'Nested Submenu' } )
+					.click();
+
+				const nestedContainer = page.locator(
+					'.wp-block-navigation__submenu-container .wp-block-navigation__submenu-container'
+				);
+				await expect( nestedContainer ).toBeVisible();
+
+				// A pixel of slack for the submenu borders.
+				const box = await nestedContainer.boundingBox();
+				expect( box.x ).toBeGreaterThanOrEqual( -1 );
+				expect( box.x + box.width ).toBeLessThanOrEqual( width + 1 );
+			} );
+		}
+
+		test( 'the whole submenu tree opens in a single direction', async ( {
+			page,
+		} ) => {
+			await page.setViewportSize( FLYOUT_VIEWPORT );
+			await page.goto( '/' );
+
+			await page.getByRole( 'button', { name: 'Top Submenu' } ).click();
+			await page
+				.getByRole( 'button', { name: 'Nested Submenu' } )
+				.click();
+
+			// Only the outermost item carries a direction; nested items
+			// inherit it rather than choosing their own.
+			const nestedWithDirection = page.locator(
+				'.wp-block-navigation__submenu-container .has-child.open-on-left, .wp-block-navigation__submenu-container .has-child.open-on-right'
+			);
+			await expect( nestedWithDirection ).toHaveCount( 0 );
+		} );
+	} );
+
+	test.describe( 'Nested submenu overflow with right-justified navigation (@firefox, @webkit)', () => {
+		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
+			await admin.visitSiteEditor( {
+				postId: 'emptytheme//header',
+				postType: 'wp_template_part',
+				canvas: 'edit',
+			} );
+			await requestUtils.createNavigationMenu( {
+				title: 'Nested right-justified menu',
+				content: `
+						<!-- wp:navigation-submenu {"label":"Edge Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+							<!-- wp:navigation-link {"label":"Child Link","type":"custom","url":"http://www.wordpress.org/"} /-->
+							<!-- wp:navigation-submenu {"label":"Nested Left Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+								<!-- wp:navigation-link {"label":"Deep Link","type":"custom","url":"http://www.wordpress.org/"} /-->
+							<!-- /wp:navigation-submenu -->
+						<!-- /wp:navigation-submenu -->
+						<!-- wp:navigation-link {"label":"Item 1","type":"custom","url":"http://www.wordpress.org/"} /-->
+						<!-- wp:navigation-link {"label":"Item 2","type":"custom","url":"http://www.wordpress.org/"} /-->
+						`,
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: {
+					overlayMenu: 'off',
+					submenuVisibility: 'click',
+					layout: {
+						type: 'flex',
+						justifyContent: 'right',
+					},
+				},
+			} );
+			await editor.saveSiteEditorEntities( {
+				isOnlyCurrentEntityDirty: true,
+			} );
+		} );
+
+		// A right-justified submenu opens leftward by default, so a nested
+		// level can run past the left edge even when the first level fits.
+		test( 'nested submenu stays within the viewport', async ( {
+			page,
+		} ) => {
+			await page.setViewportSize( FLYOUT_VIEWPORT );
+			await page.goto( '/' );
+
+			await page.getByRole( 'button', { name: 'Edge Submenu' } ).click();
+			await page
+				.getByRole( 'button', { name: 'Nested Left Submenu' } )
+				.click();
+
+			const nestedContainer = page.locator(
+				'.wp-block-navigation__submenu-container .wp-block-navigation__submenu-container'
+			);
+			await expect( nestedContainer ).toBeVisible();
+
+			// A pixel of slack for the submenu borders.
+			const box = await nestedContainer.boundingBox();
+			expect( box.x ).toBeGreaterThanOrEqual( -1 );
+			expect( box.x + box.width ).toBeLessThanOrEqual(
+				FLYOUT_VIEWPORT.width + 1
+			);
+		} );
+	} );
+
+	test.describe( 'Deeply nested submenu overflow (@firefox, @webkit)', () => {
+		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
+			await admin.visitSiteEditor( {
+				postId: 'emptytheme//header',
+				postType: 'wp_template_part',
+				canvas: 'edit',
+			} );
+			await requestUtils.createNavigationMenu( {
+				title: 'Deep menu',
+				content: `
+					<!-- wp:navigation-submenu {"label":"Level 1","type":"internal","url":"#heading","kind":"custom"} -->
+						<!-- wp:navigation-submenu {"label":"Level 2","type":"internal","url":"#heading","kind":"custom"} -->
+							<!-- wp:navigation-submenu {"label":"Level 3","type":"internal","url":"#heading","kind":"custom"} -->
+								<!-- wp:navigation-submenu {"label":"Level 4","type":"internal","url":"#heading","kind":"custom"} -->
+									<!-- wp:navigation-submenu {"label":"Level 5","type":"internal","url":"#heading","kind":"custom"} -->
+										<!-- wp:navigation-link {"label":"Deep Link","type":"custom","url":"http://www.wordpress.org/"} /-->
+									<!-- /wp:navigation-submenu -->
+								<!-- /wp:navigation-submenu -->
+							<!-- /wp:navigation-submenu -->
+						<!-- /wp:navigation-submenu -->
+					<!-- /wp:navigation-submenu -->
+					`,
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { overlayMenu: 'off', submenuVisibility: 'click' },
+			} );
+			await editor.saveSiteEditorEntities( {
+				isOnlyCurrentEntityDirty: true,
+			} );
+		} );
+
+		// Five levels are at least 1000px wide, so the tree cannot fit in an
+		// 800px viewport whichever way it opens. It should still commit to the
+		// side that spills less - here rightward, since the item sits at the
+		// start of the menu and opening leftward would spill the full width of
+		// the tree - rather than giving up and leaving the default in place.
+		test( 'still picks a direction when neither side fits', async ( {
+			page,
+		} ) => {
+			await page.setViewportSize( FLYOUT_VIEWPORT );
+			await page.goto( '/' );
+
+			const submenuButton = page.getByRole( 'button', {
+				name: 'Level 1',
+			} );
+			await submenuButton.click();
+
+			const navigationItem = page.locator(
+				'.wp-block-navigation-item.has-child',
+				{ has: submenuButton }
+			);
+			await expect( navigationItem ).toHaveClass( /open-on-right/ );
+		} );
+	} );
+
+	test.describe( 'Submenu direction overrides the justification rules (@firefox, @webkit)', () => {
+		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
+			await admin.visitSiteEditor( {
+				postId: 'emptytheme//header',
+				postType: 'wp_template_part',
+				canvas: 'edit',
+			} );
+			await requestUtils.createNavigationMenu( {
+				title: 'Space between menu',
+				content: `
+						<!-- wp:navigation-submenu {"label":"Only Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+							<!-- wp:navigation-link {"label":"Submenu Link 1","type":"custom","url":"http://www.wordpress.org/"} /-->
+							<!-- wp:navigation-link {"label":"Submenu Link 2","type":"custom","url":"http://www.wordpress.org/"} /-->
+						<!-- /wp:navigation-submenu -->
+						`,
+			} );
+			// `never` keeps the container a direct child of the nav, which
+			// is what the space-between justification rule selects on.
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: {
+					overlayMenu: 'never',
+					submenuVisibility: 'click',
+					layout: {
+						type: 'flex',
+						justifyContent: 'space-between',
+					},
+				},
+			} );
+			await editor.saveSiteEditorEntities( {
+				isOnlyCurrentEntityDirty: true,
+			} );
+		} );
+
+		// The last item of a space-between menu opens leftward by default.
+		// It is also the only item here, so it sits at the start of the
+		// menu and opening leftward leaves the viewport: the measured
+		// direction has to win over the justification rule.
+		test( 'the measured direction beats the justification default', async ( {
+			page,
+		} ) => {
+			await page.setViewportSize( FLYOUT_VIEWPORT );
+			await page.goto( '/' );
+
+			const submenuButton = page.getByRole( 'button', {
+				name: 'Only Submenu',
+			} );
+			await submenuButton.click();
+
+			const navigationItem = page.locator(
+				'.wp-block-navigation-item.has-child',
+				{ has: submenuButton }
+			);
+			await expect( navigationItem ).toHaveClass( /open-on-right/ );
+
+			// A pixel of slack for the submenu borders.
+			const bounds = await submenuTreeBounds( navigationItem );
+			expect( bounds.left ).toBeGreaterThanOrEqual( -1 );
+		} );
+	} );
 } );

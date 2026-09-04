@@ -13,6 +13,44 @@
 // Size of burger and close icons.
 $navigation-icon-size: 24px;
 
+// Mixin for positioning submenus to open leftward
+@mixin submenu-open-left {
+	left: auto;
+	right: 0;
+
+	// Nested submenus.
+	// On smaller breakpoints, nested menus open downwards.
+	.wp-block-navigation__submenu-container {
+		left: -1px; // Border width.
+		right: -1px;
+	}
+	@include break-medium {
+		.wp-block-navigation__submenu-container {
+			left: auto;
+			right: 100%;
+		}
+	}
+}
+
+// Mixin for positioning submenus to open rightward
+@mixin submenu-open-right {
+	left: 0;
+	right: auto;
+
+	// Nested submenus.
+	// On smaller breakpoints, nested menus open downwards.
+	.wp-block-navigation__submenu-container {
+		left: -1px; // Border width.
+		right: -1px;
+	}
+	@include break-medium {
+		.wp-block-navigation__submenu-container {
+			left: 100%;
+			right: auto;
+		}
+	}
+}
+
 .wp-block-navigation {
 	position: relative;
 
@@ -439,27 +477,38 @@ button.wp-block-navigation-item__content {
 // When justified space-between, open submenus leftward for last menu item.
 // When justified right, open all submenus leftwards.
 // This needs high specificity.
-.wp-block-navigation.items-justified-space-between .wp-block-page-list > .has-child:last-child,
-.wp-block-navigation.items-justified-space-between > .wp-block-navigation__container > .has-child:last-child,
-.wp-block-navigation.items-justified-right .wp-block-page-list > .has-child,
-.wp-block-navigation.items-justified-right .wp-block-navigation__container .has-child {
+// Skipped once JavaScript has measured a direction for the item, so that the
+// measured direction wins outright rather than by out-specifying these. The
+// test sits in :where() so it adds no specificity of its own, which would
+// otherwise let these rules outrank the direction rules for nested levels.
+.wp-block-navigation.items-justified-space-between .wp-block-page-list > .has-child:where(:not(.open-on-left):not(.open-on-right)):last-child,
+.wp-block-navigation.items-justified-space-between > .wp-block-navigation__container > .has-child:where(:not(.open-on-left):not(.open-on-right)):last-child,
+.wp-block-navigation.items-justified-right .wp-block-page-list > .has-child:where(:not(.open-on-left):not(.open-on-right)),
+.wp-block-navigation.items-justified-right .wp-block-navigation__container .has-child:where(:not(.open-on-left):not(.open-on-right)) {
 	// First submenu.
 	.wp-block-navigation__submenu-container {
-		left: auto;
-		right: 0;
+		@include submenu-open-left;
+	}
+}
 
-		// Nested submenus.
-		// On smaller breakpoints, nested menus open downwards.
-		.wp-block-navigation__submenu-container {
-			left: -1px; // Border width.
-			right: -1px;
-		}
-		@include break-medium {
-			.wp-block-navigation__submenu-container {
-				left: auto;
-				right: 100%;
-			}
-		}
+// When a submenu would overflow the viewport, open it leftward.
+// This class is dynamically added by JavaScript when overflow is detected.
+.wp-block-navigation .open-on-left {
+	// First submenu - force leftward opening.
+	// Repeat class name to increase specificity and override background rules.
+	> .wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container {
+		@include submenu-open-left;
+	}
+}
+
+// When a submenu would overflow the viewport on the left, open it rightward.
+// This class is dynamically added by JavaScript when left overflow is detected
+// (e.g., for right-justified navigation items near the left edge).
+.wp-block-navigation .open-on-right {
+	// First submenu - force rightward opening.
+	// Repeat class name to increase specificity and override background rules.
+	> .wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container {
+		@include submenu-open-right;
 	}
 }
 
