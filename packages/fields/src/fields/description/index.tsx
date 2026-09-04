@@ -26,7 +26,7 @@ const descriptionField: Field< Template > = {
 	render,
 	Edit: {
 		control: 'textarea',
-		rows: 4,
+		rows: 2,
 	},
 	isVisible: isCustomTemplate,
 	enableSorting: false,

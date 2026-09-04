@@ -89,7 +89,8 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 
 	/**
 	 * The `status` and `discussion` groups of the default post type form declare
-	 * their panel summary explicitly, for built-in and custom post types alike.
+	 * their panel summary explicitly, and the `excerpt` field renders inline with
+	 * the regular layout, for built-in and custom post types alike.
 	 *
 	 * @dataProvider data_default_form_post_types
 	 *
@@ -115,6 +116,16 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 				"The `{$group}` group summary is explicit."
 			);
 		}
+
+		$excerpt = $this->get_form_field( $config, 'excerpt' );
+		$this->assertSame(
+			array(
+				'type'          => 'regular',
+				'labelPosition' => 'top',
+			),
+			$excerpt['layout'],
+			'The `excerpt` field renders inline with the regular layout.'
+		);
 
 		if ( 'page' !== $post_type && 'post' !== $post_type ) {
 			unregister_post_type( $post_type );

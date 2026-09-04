@@ -52,24 +52,12 @@ test.describe( 'Post Summary', () => {
 					page,
 					tab: 'Pattern',
 				} );
-				const fields = getPatternSummaryFields( { page, summary } );
+				const fields = getPatternSummaryFields( { summary } );
 
-				await expect(
-					fields.description.row.getByText( INITIAL_DESCRIPTION, {
-						exact: true,
-					} )
-				).toBeVisible();
-				await expect( fields.description.textbox ).toHaveCount( 0 );
-
-				await fields.description.editButton.click();
-				await expect( fields.description.textbox ).toBeVisible();
+				await expect( fields.description.textbox ).toHaveValue(
+					INITIAL_DESCRIPTION
+				);
 				await fields.description.textbox.fill( UPDATED_DESCRIPTION );
-				await page.keyboard.press( 'Escape' );
-				await expect(
-					fields.description.row.getByText( UPDATED_DESCRIPTION, {
-						exact: true,
-					} )
-				).toBeVisible();
 
 				await expect( fields.revisions.row ).toBeVisible();
 				await expect(
@@ -90,13 +78,9 @@ test.describe( 'Post Summary', () => {
 					tab: 'Pattern',
 				} );
 				await expect(
-					getPatternSummaryFields( {
-						page,
-						summary: reloadedSummary,
-					} ).description.row.getByText( UPDATED_DESCRIPTION, {
-						exact: true,
-					} )
-				).toBeVisible();
+					getPatternSummaryFields( { summary: reloadedSummary } )
+						.description.textbox
+				).toHaveValue( UPDATED_DESCRIPTION );
 			} );
 		}
 
@@ -113,7 +97,7 @@ test.describe( 'Post Summary', () => {
 				page,
 				tab: 'Pattern',
 			} );
-			const fields = getPatternSummaryFields( { page, summary } );
+			const fields = getPatternSummaryFields( { summary } );
 
 			await expect( fields.title ).toHaveText( title );
 			await expect(
@@ -139,7 +123,7 @@ test.describe( 'Post Summary', () => {
 				page,
 				tab: 'Pattern',
 			} );
-			const fields = getPatternSummaryFields( { page, summary } );
+			const fields = getPatternSummaryFields( { summary } );
 
 			await expect( fields.title ).toHaveText( title );
 			await expect(
@@ -200,27 +184,16 @@ test.describe( 'Post Summary', () => {
 			await expect( modal ).toBeHidden();
 		}
 
-		function getPatternSummaryFields( { page, summary } ) {
+		function getPatternSummaryFields( { summary } ) {
 			return {
 				title: summary.locator( '.editor-post-card-panel__title-name' ),
-				description: getDescriptionField( { page, summary } ),
+				description: {
+					textbox: summary.getByRole( 'textbox', {
+						name: 'Description',
+					} ),
+				},
 				revisions: getRevisionsField( { summary } ),
 				syncStatus: getSyncStatusField( { summary } ),
-			};
-		}
-
-		function getDescriptionField( { page, summary } ) {
-			const editButton = summary.getByRole( 'button', {
-				name: 'Edit Description',
-			} );
-
-			return {
-				// The field row also renders the current value next to the edit button.
-				row: editButton.locator( '..' ),
-				editButton,
-				// The edit popover is portaled outside the summary, so query it
-				// from the page by the textarea's accessible label.
-				textbox: page.getByRole( 'textbox', { name: 'Description' } ),
 			};
 		}
 
@@ -408,22 +381,16 @@ test.describe( 'Post Summary', () => {
 		} ) => {
 			await admin.createNewPost();
 			const summary = await openPostSummary( { editor, page } );
+			const excerpt = summary.getByRole( 'textbox', { name: 'Excerpt' } );
 
-			await expect(
-				summary.getByText( 'Add an excerpt', { exact: true } )
-			).toBeVisible();
+			await expect( excerpt ).toHaveValue( '' );
+			await expect( excerpt ).toHaveAttribute(
+				'placeholder',
+				'Add an excerpt'
+			);
 
-			await summary
-				.getByRole( 'button', { name: 'Edit Excerpt' } )
-				.click();
-			await page
-				.getByRole( 'textbox', { name: 'Excerpt' } )
-				.fill( 'A DataForm excerpt.' );
-			await page.keyboard.press( 'Escape' );
+			await excerpt.fill( 'A DataForm excerpt.' );
 
-			await expect(
-				summary.getByText( 'A DataForm excerpt.', { exact: true } )
-			).toBeVisible();
 			await expect
 				.poll( () =>
 					page.evaluate( () =>
@@ -574,13 +541,13 @@ test.describe( 'Post Summary', () => {
 		} ) => {
 			await admin.createNewPost();
 			const summary = await openPostSummary( { editor, page } );
-			const excerptButton = summary.getByRole( 'button', {
-				name: 'Edit Excerpt',
+			const excerptField = summary.getByRole( 'textbox', {
+				name: 'Excerpt',
 			} );
 			const discussionButton = summary.getByRole( 'button', {
 				name: 'Edit Discussion',
 			} );
-			await expect( excerptButton ).toBeVisible();
+			await expect( excerptField ).toBeVisible();
 			await expect( discussionButton ).toBeVisible();
 
 			await page
@@ -599,7 +566,7 @@ test.describe( 'Post Summary', () => {
 				.uncheck();
 			await preferences.getByRole( 'button', { name: 'Close' } ).click();
 
-			await expect( excerptButton ).toBeHidden();
+			await expect( excerptField ).toBeHidden();
 			await expect( discussionButton ).toBeHidden();
 		} );
 	} );
