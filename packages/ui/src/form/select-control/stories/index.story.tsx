@@ -288,37 +288,30 @@ export const WithItemsArrayAndPartialCustomization: Story = {
 };
 
 /**
- * Use `SelectControl.ItemDescription` for supplementary text that should be
- * announced as a description rather than part of the item name.
+ * Pass `description` on an `items` entry for supplementary text in the
+ * standard layout. It is announced as a description rather than part of
+ * the item name. Compose `SelectControl.Item` children when you need
+ * multiple descriptions or custom markup.
+ *
+ * With the default `popupWidth="content"`, labels and descriptions sit
+ * on one row and the popup grows. A constrained `popupWidth` such as
+ * `"anchor"` or `"sm"` wraps both at that size.
  */
 export const WithItemDescription: Story = {
 	args: {
 		label: 'Fruit',
 		items: [
-			{ value: 'apple', label: 'Apple' },
-			{ value: 'banana', label: 'Banana' },
-		],
-		children: [
-			<SelectControl.Item
-				key="apple"
-				value={ { value: 'apple', label: 'Apple' } }
-				label="Apple"
-			>
-				<SelectControl.ItemLabel>Apple</SelectControl.ItemLabel>
-				<SelectControl.ItemDescription>
-					99 in stock
-				</SelectControl.ItemDescription>
-			</SelectControl.Item>,
-			<SelectControl.Item
-				key="banana"
-				value={ { value: 'banana', label: 'Banana' } }
-				label="Banana"
-			>
-				<SelectControl.ItemLabel>Banana</SelectControl.ItemLabel>
-				<SelectControl.ItemDescription>
-					12 in stock
-				</SelectControl.ItemDescription>
-			</SelectControl.Item>,
+			{
+				value: 'apple',
+				label: 'Apple',
+				description:
+					'99 in stock. Ships in two to three business days.',
+			},
+			{
+				value: 'banana',
+				label: 'Banana',
+				description: '12 in stock. Restock expected next week.',
+			},
 		],
 	},
 };

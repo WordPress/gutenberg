@@ -62,6 +62,42 @@ describe( 'SelectControl', () => {
 		).toHaveTextContent( 'Choose a country' );
 	} );
 
+	it( 'shows an item description from the items array in the popup, not the trigger', async () => {
+		const user = userEvent.setup();
+		const items = [
+			{
+				value: 'apple',
+				label: 'Apple',
+				description:
+					'99 in stock. Ships in two to three business days.',
+			},
+		];
+
+		render(
+			<SelectControl
+				label="Fruit"
+				items={ items }
+				defaultValue={ items[ 0 ] }
+			/>
+		);
+
+		const trigger = screen.getByRole( 'combobox', { name: 'Fruit' } );
+
+		expect( trigger ).toHaveTextContent( 'Apple' );
+		expect( trigger ).not.toHaveTextContent( '99 in stock' );
+
+		await user.click( trigger );
+
+		const option = await screen.findByRole( 'option', { name: 'Apple' } );
+
+		expect( option ).toHaveAccessibleDescription(
+			'99 in stock. Ships in two to three business days.'
+		);
+		expect( option ).toHaveTextContent(
+			'99 in stock. Ships in two to three business days.'
+		);
+	} );
+
 	it( 'renders with a visually hidden label', () => {
 		render(
 			<SelectControl

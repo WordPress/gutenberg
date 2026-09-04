@@ -366,8 +366,16 @@ export const WithCustomTriggerAndItem: Story = {
 };
 
 const stockItems = [
-	{ value: 'apple', label: 'Apple' },
-	{ value: 'banana', label: 'Banana' },
+	{
+		value: 'apple',
+		label: 'Apple',
+		description: '99 in stock. Ships in two to three business days.',
+	},
+	{
+		value: 'banana',
+		label: 'Banana',
+		description: '12 in stock. Restock expected next week.',
+	},
 ];
 
 /**
@@ -384,7 +392,7 @@ export const WithItemDescription: Story = {
 					<Select.Item key={ item.value } value={ item }>
 						<Select.ItemLabel>{ item.label }</Select.ItemLabel>
 						<Select.ItemDescription>
-							99 in stock
+							{ item.description }
 						</Select.ItemDescription>
 					</Select.Item>
 				) ) }
