@@ -10,7 +10,8 @@ registerCoreBlocks();
 const blocks = [ createBlock( 'core/paragraph' ) ];
 
 const meta = {
-	title: 'BlockEditor/BlockTitle',
+	id: 'blockeditor-blocktitle',
+	title: 'Editor/Block Editor/BlockTitle',
 	component: BlockTitle,
 	parameters: {
 		docs: {

@@ -2,7 +2,8 @@ import { useState } from '@wordpress/element';
 import LetterSpacingControl from '../';
 
 const meta = {
-	title: 'BlockEditor/LetterSpacingControl',
+	id: 'blockeditor-letterspacingcontrol',
+	title: 'Editor/Block Editor/LetterSpacingControl',
 	component: LetterSpacingControl,
 	parameters: {
 		docs: {
