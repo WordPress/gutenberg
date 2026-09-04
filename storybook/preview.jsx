@@ -145,7 +145,6 @@ export const parameters = {
 						'Deprecated',
 					],
 				],
-				'Tokens',
 				'Editor',
 				[
 					'Block Editor',
