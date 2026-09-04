@@ -4,8 +4,7 @@
 
 ### Enhancements
 
--   Move the elements already available in Typography and Colors into the Blocks & Elements section of Global Styles.
--   Group inputs, selects, and buttons under Form controls, and offer every element the background, dimensions, border, shadow, and custom CSS controls that `theme.json` already accepts.
+-   Preview an element as a sample of the markup it applies to, rendered with the site's own styles, so the preview reflects every panel rather than typography and color alone.
 -   Add a text shadow presets screen under Typography ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
 
 ### Bug Fixes
