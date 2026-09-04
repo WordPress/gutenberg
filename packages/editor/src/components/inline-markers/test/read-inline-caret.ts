@@ -1,4 +1,4 @@
-import { readInlineSelection } from '../read-inline-selection';
+import { readInlineCaret } from '../read-inline-caret';
 
 /**
  * Build the two block-editor selection selectors from a single pair of points.
@@ -11,10 +11,10 @@ function selectors( start: any, end: any ) {
 	return [ () => start, () => end ];
 }
 
-describe( 'readInlineSelection', () => {
+describe( 'readInlineCaret', () => {
 	it( 'returns null when there is no clientId', () => {
 		const [ s, e ] = selectors( {}, {} );
-		expect( readInlineSelection( s, e ) ).toBeNull();
+		expect( readInlineCaret( s, e ) ).toBeNull();
 	} );
 
 	it( 'returns null when start and end are in different blocks', () => {
@@ -22,7 +22,7 @@ describe( 'readInlineSelection', () => {
 			{ clientId: 'a', attributeKey: 'content', offset: 0 },
 			{ clientId: 'b', attributeKey: 'content', offset: 5 }
 		);
-		expect( readInlineSelection( s, e ) ).toBeNull();
+		expect( readInlineCaret( s, e ) ).toBeNull();
 	} );
 
 	it( 'returns null without an attributeKey (block-level selection)', () => {
@@ -30,7 +30,7 @@ describe( 'readInlineSelection', () => {
 			{ clientId: 'a', offset: 0 },
 			{ clientId: 'a', offset: 5 }
 		);
-		expect( readInlineSelection( s, e ) ).toBeNull();
+		expect( readInlineCaret( s, e ) ).toBeNull();
 	} );
 
 	it( 'returns null when start and end are in different attributes of the same block', () => {
@@ -38,29 +38,21 @@ describe( 'readInlineSelection', () => {
 		// `citation`: their offsets are not comparable.
 		const [ s, e ] = selectors(
 			{ clientId: 'a', attributeKey: 'value', offset: 2 },
-			{ clientId: 'a', attributeKey: 'citation', offset: 5 }
+			{ clientId: 'a', attributeKey: 'citation', offset: 1 }
 		);
-		expect( readInlineSelection( s, e ) ).toBeNull();
+		expect( readInlineCaret( s, e ) ).toBeNull();
 	} );
 
-	it( 'returns null for a collapsed selection', () => {
+	it( 'accepts a collapsed caret', () => {
 		const [ s, e ] = selectors(
 			{ clientId: 'a', attributeKey: 'content', offset: 3 },
 			{ clientId: 'a', attributeKey: 'content', offset: 3 }
 		);
-		expect( readInlineSelection( s, e ) ).toBeNull();
-	} );
-
-	it( 'returns normalized anchor data for a forward selection', () => {
-		const [ s, e ] = selectors(
-			{ clientId: 'a', attributeKey: 'content', offset: 2 },
-			{ clientId: 'a', attributeKey: 'content', offset: 8 }
-		);
-		expect( readInlineSelection( s, e ) ).toEqual( {
+		expect( readInlineCaret( s, e ) ).toEqual( {
 			clientId: 'a',
 			attributeKey: 'content',
-			start: 2,
-			end: 8,
+			start: 3,
+			end: 3,
 		} );
 	} );
 
@@ -69,7 +61,7 @@ describe( 'readInlineSelection', () => {
 			{ clientId: 'a', attributeKey: 'content', offset: 8 },
 			{ clientId: 'a', attributeKey: 'content', offset: 2 }
 		);
-		expect( readInlineSelection( s, e ) ).toEqual( {
+		expect( readInlineCaret( s, e ) ).toEqual( {
 			clientId: 'a',
 			attributeKey: 'content',
 			start: 2,
