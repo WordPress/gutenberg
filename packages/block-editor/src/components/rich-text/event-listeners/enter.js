@@ -41,10 +41,10 @@ export default ( props ) => ( element ) => {
 		} else if ( onSplitAtEnd && start === end && end === text.length ) {
 			event.preventDefault();
 			onSplitAtEnd();
-		} else if ( onReplace && onSplit ) {
-			event.__deprecatedOnSplit = true;
 		} else if (
 			! supportsSplitting &&
+			// The deprecated onSplit is flagged on the beforeinput event.
+			! ( onReplace && onSplit ) &&
 			! disableLineBreaks &&
 			! event.defaultPrevented
 		) {
@@ -70,8 +70,22 @@ export default ( props ) => ( element ) => {
 		}
 	}
 
-	function onDefaultKeyDown( event ) {
-		if ( event.defaultPrevented ) {
+	function onBeforeInput( event ) {
+		if ( event.inputType !== 'insertParagraph' ) {
+			return;
+		}
+		const { onReplace, onSplit } = props.current;
+		if ( onReplace && onSplit ) {
+			event.__deprecatedOnSplit = true;
+		}
+	}
+
+	function onDefaultBeforeInput( event ) {
+		if (
+			event.defaultPrevented ||
+			( event.inputType !== 'insertParagraph' &&
+				event.inputType !== 'insertLineBreak' )
+		) {
 			return;
 		}
 
@@ -82,25 +96,6 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
-		if ( event.keyCode !== ENTER ) {
-			return;
-		}
-
-		// A plain Enter is cancelled in the beforeinput phase instead (see
-		// onDefaultBeforeInput): cancelling it at keydown leaves the iOS
-		// keyboard's auto-capitalization stale when focus moves.
-		if ( event.shiftKey ) {
-			event.preventDefault();
-		}
-	}
-
-	function onDefaultBeforeInput( event ) {
-		if ( event.defaultPrevented || event.inputType !== 'insertParagraph' ) {
-			return;
-		}
-		if ( event.target !== element && ! ownsSelection( element ) ) {
-			return;
-		}
 		event.preventDefault();
 	}
 
@@ -108,11 +103,6 @@ export default ( props ) => ( element ) => {
 
 	// Attach the listener to the window so parent elements have the chance to
 	// prevent the default behavior.
-	const unsubscribeDefaultKeyDown = subscribeDelegatedListener(
-		defaultView,
-		'keydown',
-		onDefaultKeyDown
-	);
 	const unsubscribeDefaultBeforeInput = subscribeDelegatedListener(
 		defaultView,
 		'beforeinput',
@@ -126,9 +116,15 @@ export default ( props ) => ( element ) => {
 		onKeyDown,
 		true
 	);
+	const unsubscribeBeforeInput = subscribeOwnedListener(
+		element,
+		'beforeinput',
+		onBeforeInput,
+		true
+	);
 	return () => {
-		unsubscribeDefaultKeyDown();
 		unsubscribeDefaultBeforeInput();
 		unsubscribeKeyDown();
+		unsubscribeBeforeInput();
 	};
 };
