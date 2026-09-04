@@ -133,6 +133,7 @@
 			forced-color-adjust: none;
 		}
 
+		&.is-selected .block-editor-list-view-block-contents:focus::after,
 		&.is-selected.is-synced .block-editor-list-view-block-contents:focus::after,
 		&.is-selected .block-editor-list-view-block__menu:focus,
 		&.is-selected.is-synced .block-editor-list-view-block__menu:focus {
