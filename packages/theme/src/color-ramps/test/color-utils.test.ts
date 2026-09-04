@@ -12,7 +12,6 @@ describe( 'getContrast', () => {
 		const expected = contrastWCAG21( first, second );
 
 		expect( actual ).toBe( expected );
-		expect( getContrast( first, second ) ).toBe( expected );
 	} );
 
 	it( 'matches Color.js for color objects', () => {

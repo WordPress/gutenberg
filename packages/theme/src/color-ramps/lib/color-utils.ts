@@ -4,6 +4,8 @@ import {
 	to,
 	toGamut,
 	serialize,
+	clone,
+	equals,
 	getLuminance,
 	sRGB,
 	OKLCH,
@@ -11,13 +13,10 @@ import {
 } from 'colorjs.io/fn';
 
 const ALLOWED_SEED_COLOR_SPACES = [ sRGB ];
-const MAX_CACHED_LUMINANCES = 2_048;
-const luminanceCache = new Map< string, number >();
 const objectLuminanceCache = new WeakMap<
 	PlainColorObject,
 	{
-		space: PlainColorObject[ 'space' ];
-		coords: PlainColorObject[ 'coords' ];
+		color: PlainColorObject;
 		luminance: number;
 	}
 >();
@@ -51,46 +50,27 @@ export function getContrast(
 }
 
 /**
- * Return a color's non-negative relative luminance. Serialized colors use a
- * bounded cache because ramp calculations often reuse the same colors. Color
- * objects use a weak cache with coordinate snapshots to detect mutations.
+ * Return a color's non-negative relative luminance. Color objects use a weak
+ * cache with snapshots to detect mutations.
  *
  * @param color Color to measure.
  */
 function getRelativeLuminance( color: string | PlainColorObject ): number {
-	if ( typeof color !== 'string' ) {
-		const cachedLuminance = objectLuminanceCache.get( color );
-		if (
-			cachedLuminance?.space === color.space &&
-			cachedLuminance.coords.every( ( coordinate, index ) =>
-				Object.is( coordinate, color.coords[ index ] )
-			)
-		) {
-			return cachedLuminance.luminance;
-		}
-		const luminance = Math.max( getLuminance( color ), 0 );
-		objectLuminanceCache.set( color, {
-			space: color.space,
-			coords: [ ...color.coords ],
-			luminance,
-		} );
-		return luminance;
+	if ( typeof color === 'string' ) {
+		ColorSpace.register( sRGB );
+		return Math.max( getLuminance( color ), 0 );
 	}
 
-	const cachedLuminance = luminanceCache.get( color );
-	if ( cachedLuminance !== undefined ) {
-		return cachedLuminance;
+	const cachedLuminance = objectLuminanceCache.get( color );
+	if ( cachedLuminance && equals( cachedLuminance.color, color ) ) {
+		return cachedLuminance.luminance;
 	}
 
-	ColorSpace.register( sRGB );
 	const luminance = Math.max( getLuminance( color ), 0 );
-	if ( luminanceCache.size >= MAX_CACHED_LUMINANCES ) {
-		const oldestKey = luminanceCache.keys().next().value;
-		if ( oldestKey !== undefined ) {
-			luminanceCache.delete( oldestKey );
-		}
-	}
-	luminanceCache.set( color, luminance );
+	objectLuminanceCache.set( color, {
+		color: clone( color ),
+		luminance,
+	} );
 	return luminance;
 }
 
