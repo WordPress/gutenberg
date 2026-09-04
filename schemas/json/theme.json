@@ -2165,6 +2165,39 @@
 				":visited"
 			]
 		},
+		"stylesTextInputPseudoSelectorsProperties": {
+			"type": "object",
+			"properties": {
+				":focus": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":focus-visible": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":required": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":valid": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":invalid": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				"::placeholder": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				}
+			}
+		},
+		"stylesTextInputPseudoSelectorsPropertyNames": {
+			"enum": [
+				":focus",
+				":focus-visible",
+				":required",
+				":valid",
+				":invalid",
+				"::placeholder"
+			]
+		},
 		"stylesElementsPropertiesComplete": {
 			"description": "Styles defined on a per-element basis using the element's selector.",
 			"type": "object",
@@ -2394,11 +2427,17 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
+							"$ref": "#/definitions/stylesTextInputPseudoSelectorsProperties"
+						},
+						{
 							"type": "object",
 							"propertyNames": {
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
+									},
+									{
+										"$ref": "#/definitions/stylesTextInputPseudoSelectorsPropertyNames"
 									}
 								]
 							}
