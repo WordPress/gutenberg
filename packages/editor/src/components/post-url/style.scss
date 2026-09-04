@@ -14,8 +14,7 @@
 .editor-post-url__link,
 .editor-post-url__front-page-link {
 	direction: ltr;
-	// stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- Pending review of overflow-wrap alternative.
-	word-break: break-word;
+	overflow-wrap: break-word;
 }
 /* rtl:end:ignore */
 
