@@ -3,7 +3,6 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
-// @ts-expect-error No exported types
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as editorStore } from '../../store';
 import { checkSupport } from '../post-type-support-check';

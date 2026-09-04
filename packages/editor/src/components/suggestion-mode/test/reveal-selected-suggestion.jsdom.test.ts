@@ -1,4 +1,11 @@
+import { describe, expect, it, vi } from 'vitest';
 import { buildSelectedSuggestionCss } from '../reveal-selected-suggestion';
+
+// The editor store pulls in `@wordpress/viewport`, which reads
+// `window.matchMedia` while loading.
+vi.hoisted( () => {
+	globalThis.wpVitest.mockMatchMedia();
+} );
 
 describe( 'buildSelectedSuggestionCss', () => {
 	it( 'emits nothing when no note is selected', () => {

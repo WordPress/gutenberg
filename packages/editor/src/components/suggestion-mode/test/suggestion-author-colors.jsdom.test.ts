@@ -1,3 +1,4 @@
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { create, toHTMLString } from '@wordpress/rich-text';
 import {
 	buildSuggestionAuthorColorCss,
@@ -7,6 +8,12 @@ import {
 	registerSuggestionFormat,
 	addSuggestionRoleFormats,
 } from '../../inline-suggestions/format';
+
+// The editor store pulls in `@wordpress/viewport`, which reads
+// `window.matchMedia` while loading.
+vi.hoisted( () => {
+	globalThis.wpVitest.mockMatchMedia();
+} );
 
 const inlineThread = ( id: number, author: number, authorName?: string ) => ( {
 	id,

@@ -1,10 +1,9 @@
 /*
  * `@wordpress/interface` ships untyped JavaScript resolved through gitignored
  * build artifacts; the base tsconfig maps the package here so type checking
- * never depends on those artifacts existing.
+ * never depends on those artifacts existing. The store is left untyped, as
+ * an `any` import would be, so its selectors and actions stay unchecked.
  */
 declare module '@wordpress/interface' {
-	import type { StoreDescriptor } from '@wordpress/data';
-
-	export const store: StoreDescriptor;
+	export const store: any;
 }

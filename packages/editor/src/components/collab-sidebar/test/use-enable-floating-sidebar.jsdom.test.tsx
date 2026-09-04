@@ -1,10 +1,16 @@
+import { describe, expect, it, vi } from 'vitest';
 import { act, render } from '@testing-library/react';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
-// @ts-expect-error No exported types
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useEnableFloatingSidebar } from '../hooks';
 import { FLOATING_NOTES_SIDEBAR } from '../constants';
+
+// The editor store pulls in `@wordpress/viewport`, which reads
+// `window.matchMedia` while loading.
+vi.hoisted( () => {
+	globalThis.wpVitest.mockMatchMedia();
+} );
 
 const DOCUMENT_SIDEBAR = 'edit-post/document';
 
@@ -18,11 +24,12 @@ function setup( {
 	const registry = createRegistry();
 	registry.register( preferencesStore );
 	registry.register( interfaceStore );
+	// The interface package is untyped; its store resolves to `any`.
+	const { enableComplementaryArea, disableComplementaryArea } =
+		registry.dispatch( interfaceStore ) as any;
 
 	if ( activeArea ) {
-		registry
-			.dispatch( interfaceStore )
-			.enableComplementaryArea( 'core', activeArea );
+		enableComplementaryArea( 'core', activeArea );
 	} else if ( activeArea === null ) {
 		/*
 		 * `disableComplementaryArea` is a no-op while the preference is
@@ -30,10 +37,8 @@ function setup( {
 		 * Only then does the selector report `null` - the user hid it - which
 		 * is what the hook keys off.
 		 */
-		registry
-			.dispatch( interfaceStore )
-			.enableComplementaryArea( 'core', DOCUMENT_SIDEBAR );
-		registry.dispatch( interfaceStore ).disableComplementaryArea( 'core' );
+		enableComplementaryArea( 'core', DOCUMENT_SIDEBAR );
+		disableComplementaryArea( 'core' );
 	}
 
 	function TestComponent( { isEnabled }: { isEnabled: boolean } ) {
@@ -48,7 +53,9 @@ function setup( {
 	);
 
 	const getActiveArea = () =>
-		registry.select( interfaceStore ).getActiveComplementaryArea( 'core' );
+		( registry.select( interfaceStore ) as any ).getActiveComplementaryArea(
+			'core'
+		);
 
 	return { registry, view, getActiveArea };
 }
@@ -86,9 +93,9 @@ describe( 'useEnableFloatingSidebar', () => {
 		expect( getActiveArea() ).toBe( DOCUMENT_SIDEBAR );
 
 		act( () => {
-			registry
-				.dispatch( interfaceStore )
-				.disableComplementaryArea( 'core' );
+			(
+				registry.dispatch( interfaceStore ) as any
+			 ).disableComplementaryArea( 'core' );
 		} );
 
 		expect( getActiveArea() ).toBe( FLOATING_NOTES_SIDEBAR );
@@ -103,14 +110,14 @@ describe( 'useEnableFloatingSidebar', () => {
 		// Opening any area is the user re-engaging with the slot, so the
 		// board may fill it again when they next close one.
 		act( () => {
-			registry
-				.dispatch( interfaceStore )
-				.enableComplementaryArea( 'core', DOCUMENT_SIDEBAR );
+			(
+				registry.dispatch( interfaceStore ) as any
+			 ).enableComplementaryArea( 'core', DOCUMENT_SIDEBAR );
 		} );
 		act( () => {
-			registry
-				.dispatch( interfaceStore )
-				.disableComplementaryArea( 'core' );
+			(
+				registry.dispatch( interfaceStore ) as any
+			 ).disableComplementaryArea( 'core' );
 		} );
 
 		expect( getActiveArea() ).toBe( FLOATING_NOTES_SIDEBAR );
@@ -123,9 +130,9 @@ describe( 'useEnableFloatingSidebar', () => {
 		} );
 
 		act( () => {
-			registry
-				.dispatch( interfaceStore )
-				.disableComplementaryArea( 'core' );
+			(
+				registry.dispatch( interfaceStore ) as any
+			 ).disableComplementaryArea( 'core' );
 		} );
 
 		expect( getActiveArea() ).toBeNull();
@@ -137,9 +144,9 @@ describe( 'useEnableFloatingSidebar', () => {
 		} );
 
 		act( () => {
-			registry
-				.dispatch( interfaceStore )
-				.disableComplementaryArea( 'core' );
+			(
+				registry.dispatch( interfaceStore ) as any
+			 ).disableComplementaryArea( 'core' );
 		} );
 		expect( getActiveArea() ).toBe( FLOATING_NOTES_SIDEBAR );
 

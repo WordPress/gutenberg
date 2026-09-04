@@ -1,3 +1,4 @@
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import {
 	unregisterFormatType,
 	store as richTextStore,

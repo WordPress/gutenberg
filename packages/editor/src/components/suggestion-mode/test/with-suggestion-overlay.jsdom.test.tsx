@@ -175,8 +175,8 @@ describe( 'withSuggestionOverlay', () => {
 	} );
 
 	it( 'hands a text edit off to the content reconciler instead of the overlay', () => {
-		const setAttributes = jest.fn();
-		const handler = jest.fn();
+		const setAttributes = vi.fn();
+		const handler = vi.fn();
 
 		// Registers a content handler so `requestContentSuggestion` takes
 		// ownership of the edit, standing in for the mounted reconciler.
@@ -246,7 +246,7 @@ describe( 'withSuggestionOverlay', () => {
 				return null;
 			}
 
-			const setAttributes = jest.fn();
+			const setAttributes = vi.fn();
 			const { registry } = renderWithProviders(
 				<>
 					<CaptureOverlay />
@@ -308,7 +308,7 @@ describe( 'withSuggestionOverlay', () => {
 						clientId="a"
 						name="core/heading"
 						attributes={ { content: marked, level: 2 } }
-						setAttributes={ jest.fn() }
+						setAttributes={ vi.fn() }
 					/>
 				</>,
 				{ intent: 'suggest' }

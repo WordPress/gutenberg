@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
 	getCandidateDocuments,
 	isEventTargetSelectedRichText,
@@ -170,7 +171,7 @@ describe( 'isEventTargetSelectedRichText', () => {
 	 */
 	describe( 'with an editableRoot editing host', () => {
 		afterEach( () => {
-			jest.restoreAllMocks();
+			vi.restoreAllMocks();
 		} );
 
 		function createEditableRootCanvas() {
@@ -234,7 +235,7 @@ describe( 'isEventTargetSelectedRichText', () => {
 		it( 'accepts a clipboard event via the live selection', () => {
 			const { wrapper, first } = createEditableRootCanvas();
 			const text = first.editable.firstChild;
-			jest.spyOn( window, 'getSelection' ).mockReturnValue( {
+			vi.spyOn( window, 'getSelection' ).mockReturnValue( {
 				rangeCount: 1,
 				getRangeAt: () => ( {
 					startContainer: text,
@@ -254,7 +255,7 @@ describe( 'isEventTargetSelectedRichText', () => {
 describe( 'readEventRange', () => {
 	afterEach( () => {
 		document.body.innerHTML = '';
-		jest.restoreAllMocks();
+		vi.restoreAllMocks();
 	} );
 
 	/**
@@ -324,7 +325,7 @@ describe( 'readEventRange', () => {
 	it( 'falls back to the live DOM selection when there are no target ranges', () => {
 		const { editable, helloText } = createEditableWithMark();
 		const range = staticRange( helloText, 2, helloText, 4 );
-		jest.spyOn( window, 'getSelection' ).mockReturnValue( {
+		vi.spyOn( window, 'getSelection' ).mockReturnValue( {
 			rangeCount: 1,
 			getRangeAt: () => range,
 		} as any );
@@ -344,7 +345,7 @@ describe( 'readEventRange', () => {
 
 	it( 'ignores target ranges when preferTargetRanges is false', () => {
 		const { editable, helloText, worldText } = createEditableWithMark();
-		jest.spyOn( window, 'getSelection' ).mockReturnValue( {
+		vi.spyOn( window, 'getSelection' ).mockReturnValue( {
 			rangeCount: 1,
 			getRangeAt: () => staticRange( worldText, 5, worldText, 5 ),
 		} as any );
@@ -363,7 +364,7 @@ describe( 'readEventRange', () => {
 
 	it( 'returns null when no range is available (store fallback)', () => {
 		const { editable } = createEditableWithMark();
-		jest.spyOn( window, 'getSelection' ).mockReturnValue( {
+		vi.spyOn( window, 'getSelection' ).mockReturnValue( {
 			rangeCount: 0,
 			getRangeAt: () => null,
 		} as any );
@@ -423,7 +424,7 @@ describe( 'readEventRange', () => {
 describe( 'readLiveInlineSelection', () => {
 	afterEach( () => {
 		document.body.innerHTML = '';
-		jest.restoreAllMocks();
+		vi.restoreAllMocks();
 	} );
 
 	/**
@@ -452,7 +453,7 @@ describe( 'readLiveInlineSelection', () => {
 	}
 
 	function mockSelection( range: any ) {
-		jest.spyOn( window, 'getSelection' ).mockReturnValue(
+		vi.spyOn( window, 'getSelection' ).mockReturnValue(
 			( range
 				? { rangeCount: 1, getRangeAt: () => range }
 				: { rangeCount: 0, getRangeAt: () => null } ) as any

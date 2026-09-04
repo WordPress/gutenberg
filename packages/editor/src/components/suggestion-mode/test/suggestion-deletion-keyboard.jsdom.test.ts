@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { RichTextData } from '@wordpress/rich-text';
 import { SUGGESTION_FORMAT_NAME } from '../../inline-suggestions';
 import {
@@ -6,6 +7,12 @@ import {
 	isContiguousDeleteRun,
 	sliceValueToHTML,
 } from '../suggestion-deletion-keyboard';
+
+// The editor store pulls in `@wordpress/viewport`, which reads
+// `window.matchMedia` while loading.
+vi.hoisted( () => {
+	globalThis.wpVitest.mockMatchMedia();
+} );
 
 describe( 'sliceValueToHTML', () => {
 	it( 'serializes a plain slice', () => {

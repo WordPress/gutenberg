@@ -1,3 +1,4 @@
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { render, act } from '@testing-library/react';
 import { createRegistry, RegistryProvider, select } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -17,6 +18,12 @@ import {
 	forgetResolvedSuggestion,
 } from '../provider';
 import { store as editorStore } from '../../../store';
+
+// The editor store pulls in `@wordpress/viewport`, which reads
+// `window.matchMedia` while loading.
+vi.hoisted( () => {
+	globalThis.wpVitest.mockMatchMedia();
+} );
 
 const POST_ID = 77;
 const NOTE_ID = 9;
@@ -95,7 +102,7 @@ function setup( { content, threads }: { content: string; threads: any[] } ) {
 		.dispatch( coreStore )
 		.receiveEntityRecords( 'root', 'comment', threads, THREADS_QUERY );
 
-	const saveEntityRecord = jest
+	const saveEntityRecord = vi
 		.spyOn( registry.dispatch( coreStore ), 'saveEntityRecord' )
 		.mockResolvedValue( {} );
 
@@ -112,7 +119,7 @@ function setup( { content, threads }: { content: string; threads: any[] } ) {
 
 afterEach( () => {
 	forgetResolvedSuggestion( NOTE_ID );
-	jest.restoreAllMocks();
+	vi.restoreAllMocks();
 } );
 
 describe( 'SuggestionNoteGC reopening an undone decision', () => {
