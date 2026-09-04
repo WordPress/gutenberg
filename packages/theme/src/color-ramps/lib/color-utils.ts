@@ -50,9 +50,7 @@ export function getContrast(
  *
  * @param color Color to measure.
  */
-export function getRelativeLuminance(
-	color: string | PlainColorObject
-): number {
+function getRelativeLuminance( color: string | PlainColorObject ): number {
 	if ( typeof color !== 'string' ) {
 		const cachedLuminance = objectLuminanceCache.get( color );
 		if ( cachedLuminance !== undefined ) {
@@ -86,10 +84,7 @@ export function getRelativeLuminance(
  * @param first  First relative luminance.
  * @param second Second relative luminance.
  */
-export function getContrastFromLuminances(
-	first: number,
-	second: number
-): number {
+function getContrastFromLuminances( first: number, second: number ): number {
 	return first > second
 		? ( first + 0.05 ) / ( second + 0.05 )
 		: ( second + 0.05 ) / ( first + 0.05 );

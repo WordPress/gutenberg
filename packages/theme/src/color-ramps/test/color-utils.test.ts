@@ -1,23 +1,17 @@
-import {
-	ColorSpace,
-	contrastWCAG21,
-	sRGB,
-	type PlainColorObject,
-} from 'colorjs.io/fn';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { contrastWCAG21, sRGB, type PlainColorObject } from 'colorjs.io/fn';
+import { describe, expect, it } from 'vitest';
 import { getContrast } from '../lib/color-utils';
 
 describe( 'getContrast', () => {
-	beforeAll( () => ColorSpace.register( sRGB ) );
-
 	it.each( [
 		[ '#000000', '#ffffff' ],
 		[ '#3858e9', '#f6f7f7' ],
 		[ '#1e1e1e', '#1e1e1e' ],
 	] )( 'matches Color.js for string colors %s and %s', ( first, second ) => {
+		const actual = getContrast( first, second );
 		const expected = contrastWCAG21( first, second );
 
-		expect( getContrast( first, second ) ).toBe( expected );
+		expect( actual ).toBe( expected );
 		expect( getContrast( first, second ) ).toBe( expected );
 	} );
 
@@ -33,9 +27,10 @@ describe( 'getContrast', () => {
 			alpha: 1,
 		};
 
+		const actual = getContrast( first, second );
 		const expected = contrastWCAG21( first, second );
 
-		expect( getContrast( first, second ) ).toBe( expected );
+		expect( actual ).toBe( expected );
 		expect( getContrast( first, second ) ).toBe( expected );
 	} );
 } );
