@@ -1,12 +1,10 @@
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalHStack as HStack,
-	__experimentalSpacer as Spacer,
 	__experimentalVStack as VStack,
 	FlexItem,
 	CardBody,
 	Card,
-	CardDivider,
 	CardMedia,
 } from '@wordpress/components';
 import { isRTL, __ } from '@wordpress/i18n';
@@ -57,56 +55,6 @@ function ScreenRoot() {
 					) }
 					<RootMenu />
 				</VStack>
-			</CardBody>
-
-			<CardDivider />
-
-			<CardBody>
-				<Spacer
-					as="p"
-					paddingTop={ 2 }
-					paddingX="13px"
-					marginBottom={ 4 }
-				>
-					{ __(
-						'Customize the appearance of text, buttons, links, and form controls for the whole site.'
-					) }
-				</Spacer>
-				<ItemGroup>
-					<NavigationButtonAsItem path="/elements">
-						<HStack justify="space-between">
-							<FlexItem>{ __( 'Elements' ) }</FlexItem>
-							<IconWithCurrentColor
-								icon={ isRTL() ? chevronLeft : chevronRight }
-							/>
-						</HStack>
-					</NavigationButtonAsItem>
-				</ItemGroup>
-			</CardBody>
-
-			<CardDivider />
-
-			<CardBody>
-				<Spacer
-					as="p"
-					paddingTop={ 2 }
-					paddingX="13px"
-					marginBottom={ 4 }
-				>
-					{ __(
-						'Customize the appearance of specific blocks for the whole site.'
-					) }
-				</Spacer>
-				<ItemGroup>
-					<NavigationButtonAsItem path="/blocks">
-						<HStack justify="space-between">
-							<FlexItem>{ __( 'Blocks' ) }</FlexItem>
-							<IconWithCurrentColor
-								icon={ isRTL() ? chevronLeft : chevronRight }
-							/>
-						</HStack>
-					</NavigationButtonAsItem>
-				</ItemGroup>
 			</CardBody>
 		</Card>
 	);

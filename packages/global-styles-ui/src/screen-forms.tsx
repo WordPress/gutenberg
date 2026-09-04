@@ -1,41 +1,26 @@
 import { __ } from '@wordpress/i18n';
-import type { GlobalStylesSettings } from '@wordpress/global-styles-engine';
+import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
+import { button, chevronUpDown, formInput } from '@wordpress/icons';
 import { ScreenHeader } from './screen-header';
-import { ScreenBody } from './screen-body';
-import TypographyElements from './typography-elements';
-import { ElementColors } from './element-colors';
+import { NavigationButtonAsItem } from './navigation-button';
 
 const FORM_ELEMENTS = [
-	{ element: 'textInput', label: __( 'Inputs' ) },
-	{ element: 'select', label: __( 'Selects' ) },
+	{
+		icon: formInput,
+		label: __( 'Inputs' ),
+		path: '/blocks/elements/form-controls/textInput',
+	},
+	{
+		icon: chevronUpDown,
+		label: __( 'Selects' ),
+		path: '/blocks/elements/form-controls/select',
+	},
+	{
+		icon: button,
+		label: __( 'Buttons' ),
+		path: '/blocks/elements/form-controls/button',
+	},
 ];
-
-const COLOR_ELEMENTS = [
-	{ name: 'textInput', label: __( 'Inputs' ) },
-	{ name: 'select', label: __( 'Selects' ) },
-];
-
-const DEFAULT_COLOR_CONTROLS = {
-	link: false,
-	heading: false,
-	button: false,
-	caption: false,
-	textInput: true,
-	select: true,
-};
-
-function getFormColorSettings( settings: GlobalStylesSettings ) {
-	return {
-		...settings,
-		color: {
-			...settings.color,
-			link: false,
-			heading: false,
-			button: false,
-			caption: false,
-		},
-	};
-}
 
 function ScreenForms() {
 	return (
@@ -43,22 +28,20 @@ function ScreenForms() {
 			<ScreenHeader
 				title={ __( 'Form controls' ) }
 				description={ __(
-					'Customize the typography and colors of inputs and selects.'
+					'Customize the appearance of the inputs, selects, and buttons used across the site.'
 				) }
 			/>
-			<ScreenBody>
-				<TypographyElements
-					elements={ FORM_ELEMENTS }
-					parentMenu="/elements/form-controls"
-					title={ __( 'Typography' ) }
-				/>
-			</ScreenBody>
-			<ElementColors
-				additionalElements={ COLOR_ELEMENTS }
-				defaultControls={ DEFAULT_COLOR_CONTROLS }
-				settingsTransform={ getFormColorSettings }
-				label={ __( 'Colors' ) }
-			/>
+			<ItemGroup>
+				{ FORM_ELEMENTS.map( ( { icon, label, path } ) => (
+					<NavigationButtonAsItem
+						key={ path }
+						icon={ icon }
+						path={ path }
+					>
+						{ label }
+					</NavigationButtonAsItem>
+				) ) }
+			</ItemGroup>
 		</>
 	);
 }

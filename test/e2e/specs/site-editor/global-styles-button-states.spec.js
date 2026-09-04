@@ -30,7 +30,7 @@ test.describe( 'Global Styles - Button States', () => {
 
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Blocks' } )
+			.getByRole( 'button', { name: 'Blocks & Elements' } )
 			.click();
 
 		// The extensible site editor appends the "Has custom styles" badge to
