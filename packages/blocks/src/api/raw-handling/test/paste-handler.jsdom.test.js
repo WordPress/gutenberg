@@ -1,4 +1,5 @@
 import { pasteHandler, serialize } from '@wordpress/blocks';
+import { init as initAndRegisterEmbedBlock } from '../../../../../block-library/src/embed';
 import { init as initAndRegisterImageBlock } from '../../../../../block-library/src/image';
 import { init as initAndRegisterTableBlock } from '../../../../../block-library/src/table';
 import { init as initAndRegisterVideoBlock } from '../../../../../block-library/src/video';
@@ -316,6 +317,7 @@ describe( 'pasteHandler', () => {
 describe( 'pasteHandler — core/image', () => {
 	beforeAll( () => {
 		initAndRegisterImageBlock();
+		initAndRegisterEmbedBlock();
 	} );
 
 	it( 'pins the width and lets the height follow the aspect ratio for a bare <img>', () => {
@@ -447,5 +449,36 @@ describe( 'pasteHandler — core/image', () => {
 		expect( result.name ).toBe( 'core/image' );
 		expect( result.attributes.width ).toBeUndefined();
 		expect( result.attributes.height ).toBeUndefined();
+	} );
+
+	it( 'creates an image block for various image extensions and query parameters', () => {
+		const extensions = [ 'jpg', 'jpeg', 'png', 'gif', 'webp', 'avif' ];
+		const extensionsWithQuery = [ 'jpg?size=large&quality=80' ];
+		const allExtensions = [ ...extensions, ...extensionsWithQuery ];
+
+		for ( const ext of allExtensions ) {
+			const url = `https://example.com/image.${ ext }`;
+			const [ result ] = pasteHandler( {
+				HTML: `<p>${ url }</p>`,
+				plainText: url,
+				mode: 'BLOCKS',
+			} );
+
+			expect( result.name ).toEqual( 'core/image' );
+			expect( result.attributes.url ).toEqual( url );
+		}
+
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'creates an embed block for non-image URLs', () => {
+		const [ result ] = pasteHandler( {
+			HTML: '<p>https://www.youtube.com/watch?v=dQw4w9WgXcQ</p>',
+			plainText: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+			mode: 'BLOCKS',
+		} );
+
+		expect( console ).toHaveLogged();
+		expect( result.name ).toEqual( 'core/embed' );
 	} );
 } );
