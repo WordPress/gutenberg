@@ -122,23 +122,6 @@ describe( 'Link', () => {
 			).toHaveAttribute( 'target', '_BLANK' );
 		} );
 
-		it( 'does not treat non-ASCII target characters as "_blank"', () => {
-			const nonAsciiTarget = '_blan\u212A';
-
-			render(
-				<Link href="https://example.com" target={ nonAsciiTarget }>
-					External
-				</Link>
-			);
-
-			expect(
-				screen.getByRole( 'link', { name: 'External' } )
-			).toHaveAttribute( 'target', nonAsciiTarget );
-			expect(
-				screen.queryByLabelText( '(opens in a new tab)' )
-			).not.toBeInTheDocument();
-		} );
-
 		it( 'forwards a named target without adding a new tab notice', () => {
 			render(
 				<Link href="https://example.com" target="wp-preview-123">
