@@ -3478,6 +3478,44 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
+	 * Converts `width` declarations to `flex-basis` for column blocks.
+	 *
+	 * The column block sizes itself with `flex-basis` rather than `width`
+	 * because it lives in a flex container. This post-processes the computed
+	 * style declarations so the correct CSS property is output.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param array $declarations An array of CSS declarations.
+	 * @return array The updated declarations.
+	 */
+	private static function update_column_width_declarations( $declarations ) {
+		$has_width = false;
+
+		foreach ( $declarations as &$declaration ) {
+			if ( 'width' === $declaration['name'] ) {
+				$declaration['name'] = 'flex-basis';
+				$has_width           = true;
+			}
+		}
+		unset( $declaration );
+
+		/*
+		 * Columns without a width divide the remaining space between them via
+		 * `flex-grow`. A column given a width should keep it instead, matching
+		 * the behaviour of a width set on the block itself.
+		 */
+		if ( $has_width ) {
+			$declarations[] = array(
+				'name'  => 'flex-grow',
+				'value' => '0',
+			);
+		}
+
+		return $declarations;
+	}
+
+	/**
 	 * Updates the text indent selector for paragraph blocks based on the textIndent setting.
 	 *
 	 * The textIndent setting can be 'subsequent' (default), 'all', or false.
@@ -3879,6 +3917,10 @@ class WP_Theme_JSON_Gutenberg {
 				// Compute declarations for remaining styles not covered by feature level selectors.
 				$style_variation_declarations[ $style_variation['selector'] ] = static::compute_style_properties( $style_variation_node, $settings, null, $this->theme_json );
 
+				if ( 'core/column' === ( $block_metadata['name'] ?? null ) ) {
+					$style_variation_declarations[ $style_variation['selector'] ] = static::update_column_width_declarations( $style_variation_declarations[ $style_variation['selector'] ] );
+				}
+
 				// Process pseudo-selectors for this variation (e.g., :hover, :focus).
 				$block_name                    = $block_metadata['name'] ?? ( in_array( 'blocks', $block_metadata['path'], true ) && count( $block_metadata['path'] ) >= 3 ? static::get_block_name_from_metadata_path( $block_metadata ) : null );
 				$variation_pseudo_declarations = $this->process_pseudo_selectors( $style_variation_node, $style_variation['selector'], $settings, $block_name, $block_metadata, $style_variation );
@@ -4093,6 +4135,10 @@ class WP_Theme_JSON_Gutenberg {
 			if ( $is_root_selector && ( 'background-image' === $declaration['name'] || 'background' === $declaration['name'] ) ) {
 				$should_set_root_min_height = true;
 			}
+		}
+
+		if ( 'core/column' === $block_name ) {
+			$declarations = static::update_column_width_declarations( $declarations );
 		}
 
 		/*

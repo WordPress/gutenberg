@@ -344,6 +344,11 @@
 					]
 				}
 			},
+			"core/column": {
+				"dimensions": {
+					"width": true
+				}
+			},
 			"core/image": {
 				"lightbox": {
 					"allowEditing": true
