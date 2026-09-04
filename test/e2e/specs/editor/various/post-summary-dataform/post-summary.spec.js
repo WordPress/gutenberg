@@ -409,13 +409,13 @@ test.describe( 'Post Summary', () => {
 			await admin.createNewPost();
 			const summary = await openPostSummary( { editor, page } );
 
-			await expect(
-				summary.getByText( 'Add an excerpt', { exact: true } )
-			).toBeVisible();
+			const editButton = summary.getByRole( 'button', {
+				name: 'Edit Excerpt',
+			} );
+			// An empty excerpt renders only the label next to the edit button.
+			await expect( editButton.locator( '..' ) ).toHaveText( 'Excerpt' );
 
-			await summary
-				.getByRole( 'button', { name: 'Edit Excerpt' } )
-				.click();
+			await editButton.click();
 			await page
 				.getByRole( 'textbox', { name: 'Excerpt' } )
 				.fill( 'A DataForm excerpt.' );

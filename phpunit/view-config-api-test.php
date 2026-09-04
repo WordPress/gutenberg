@@ -89,7 +89,8 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 
 	/**
 	 * The `status` and `discussion` groups of the default post type form declare
-	 * their panel summary explicitly, for built-in and custom post types alike.
+	 * their panel summary explicitly, and the `excerpt` field keeps its edit
+	 * trigger visible at rest, for built-in and custom post types alike.
 	 *
 	 * @dataProvider data_default_form_post_types
 	 *
@@ -115,6 +116,17 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 				"The `{$group}` group summary is explicit."
 			);
 		}
+
+		$excerpt = $this->get_form_field( $config, 'excerpt' );
+		$this->assertSame(
+			array(
+				'type'           => 'panel',
+				'labelPosition'  => 'top',
+				'editVisibility' => 'always',
+			),
+			$excerpt['layout'],
+			'The `excerpt` edit trigger is always visible.'
+		);
 
 		if ( 'page' !== $post_type && 'post' !== $post_type ) {
 			unregister_post_type( $post_type );

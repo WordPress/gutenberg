@@ -25,8 +25,10 @@ function _gutenberg_add_reading_settings_to_wp_template_view_config( $data ) {
 					array(
 						'id'     => 'description',
 						'layout' => array(
-							'type'          => 'panel',
-							'labelPosition' => 'top',
+							'type'           => 'panel',
+							'labelPosition'  => 'top',
+							// An empty description renders nothing, so the trigger is the only cue to edit.
+							'editVisibility' => 'always',
 						),
 					),
 					array(
@@ -152,17 +154,46 @@ function _gutenberg_add_group_summaries_to_default_posttype_form( $data ) {
 }
 
 /**
- * Layers the group summaries on top of the view configuration of every post
- * type that uses the default form, including custom post types registered at
- * any point.
+ * Keeps the edit trigger of the `excerpt` field visible at rest.
  *
- * The callback merges by member id, and a member that is absent would be
+ * An empty excerpt renders nothing in the panel summary, so the trigger is the
+ * only cue that the field can be edited. The patch merges into the existing
+ * member by id, leaving the rest of its layout untouched.
+ *
+ * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
+ * @return Gutenberg_View_Config_Data The updated view configuration container.
+ */
+function _gutenberg_always_show_excerpt_edit_trigger( $data ) {
+	return $data->merge(
+		array(
+			'form' => array(
+				'fields' => array(
+					array(
+						'id'     => 'excerpt',
+						'layout' => array(
+							'type'           => 'panel',
+							'editVisibility' => 'always',
+						),
+					),
+				),
+			),
+		),
+		1
+	);
+}
+
+/**
+ * Layers the group summaries and the always-visible excerpt edit trigger on
+ * top of the view configuration of every post type that uses the default form,
+ * including custom post types registered at any point.
+ *
+ * The callbacks merge by member id, and a member that is absent would be
  * appended instead, so post types whose base definition provides its own form
  * are skipped.
  *
  * @param string $post_type The post type being registered.
  */
-function gutenberg_register_default_posttype_form_summaries_7_2( $post_type ) {
+function gutenberg_register_default_posttype_form_layers_7_2( $post_type ) {
 	if ( in_array( $post_type, GUTENBERG_VIEW_CONFIG_POST_TYPES_WITH_OWN_FORM, true ) ) {
 		return;
 	}
@@ -173,8 +204,14 @@ function gutenberg_register_default_posttype_form_summaries_7_2( $post_type ) {
 		6,
 		1
 	);
+	add_filter(
+		gutenberg_get_entity_view_config_hook_name( 'postType', $post_type ),
+		'_gutenberg_always_show_excerpt_edit_trigger',
+		6,
+		1
+	);
 }
-add_action( 'registered_post_type', 'gutenberg_register_default_posttype_form_summaries_7_2' );
+add_action( 'registered_post_type', 'gutenberg_register_default_posttype_form_layers_7_2' );
 
 /**
  * Registers the entity view configuration filters that layer on top of the base
@@ -187,6 +224,12 @@ function gutenberg_register_entity_view_config_filters_7_2() {
 		gutenberg_get_entity_view_config_hook_name( 'postType', 'wp_navigation' ),
 		'_gutenberg_get_entity_view_config_posttype_wp_navigation',
 		5,
+		1
+	);
+	add_filter(
+		gutenberg_get_entity_view_config_hook_name( 'postType', 'wp_block' ),
+		'_gutenberg_always_show_excerpt_edit_trigger',
+		6,
 		1
 	);
 	add_filter(
