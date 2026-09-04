@@ -7,6 +7,7 @@ import { renderSlotWithChildren } from '../../../utils/render-slot-with-children
 import itemPopupStyles from '../../../utils/css/item-popup.module.css';
 import { getItemPopupWidthClassName } from '../../../utils/css/item-popup';
 import type { SelectPopupProps } from './types';
+import styles from './style.module.css';
 
 export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
 	function Popup(
@@ -23,14 +24,8 @@ export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
 				) }
 				{ ...restProps }
 			>
-				<_Select.List className={ itemPopupStyles.list }>
-					<div
-						className={
-							itemPopupStyles[ 'list-scrollable-container' ]
-						}
-					>
-						{ children }
-					</div>
+				<_Select.List className={ styles.list }>
+					{ children }
 				</_Select.List>
 			</_Select.Popup>
 		);
