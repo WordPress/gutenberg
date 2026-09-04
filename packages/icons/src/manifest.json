@@ -594,7 +594,7 @@
 	{
 		"slug": "file",
 		"label": "File",
-		"keywords": [ "document", "attachment" ],
+		"keywords": [ "attachment", "document", "folder" ],
 		"filePath": "library/file.svg",
 		"public": true
 	},
