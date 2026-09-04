@@ -24,6 +24,12 @@ const { extractWords, getNormalizedSearchTerms, normalizeString } = unlock(
 );
 
 /**
+ * Slug of the "Uncategorized" entry in the server view list, which lists the
+ * patterns that have no category.
+ */
+const PATTERN_UNCATEGORIZED_CATEGORY = 'uncategorized';
+
+/**
  * Type for theme patterns from the pattern registry.
  */
 interface ThemePattern {
@@ -383,7 +389,13 @@ const selectPatterns = createSelector(
 			);
 		}
 
-		if ( categoryId && categoryId !== PATTERN_DEFAULT_CATEGORY ) {
+		if ( categoryId === PATTERN_UNCATEGORIZED_CATEGORY ) {
+			patterns = searchItems( patterns, search, {
+				categoryId,
+				hasCategory: ( item: NormalizedPattern ) =>
+					item.categories.length === 0,
+			} );
+		} else if ( categoryId && categoryId !== PATTERN_DEFAULT_CATEGORY ) {
 			patterns = searchItems( patterns, search, {
 				categoryId,
 				hasCategory: (
