@@ -23,6 +23,8 @@ import {
 	useIndentListItem,
 	useOutdentListItem,
 	useMerge,
+	getIndentTarget,
+	getOutdentTarget,
 } from './hooks';
 
 export function IndentUI( { clientId } ) {
@@ -30,14 +32,10 @@ export function IndentUI( { clientId } ) {
 	const outdentListItem = useOutdentListItem();
 	const { canIndent, canOutdent } = useSelect(
 		( select ) => {
-			const { getBlockIndex, getBlockRootClientId, getBlockName } =
-				select( blockEditorStore );
+			const storeSelect = select( blockEditorStore );
 			return {
-				canIndent: getBlockIndex( clientId ) > 0,
-				canOutdent:
-					getBlockName(
-						getBlockRootClientId( getBlockRootClientId( clientId ) )
-					) === 'core/list-item',
+				canIndent: !! getIndentTarget( storeSelect, clientId ),
+				canOutdent: !! getOutdentTarget( storeSelect, clientId ),
 			};
 		},
 		[ clientId ]
