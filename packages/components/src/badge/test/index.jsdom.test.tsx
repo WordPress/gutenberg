@@ -6,6 +6,16 @@ const Badge = ( props: React.ComponentProps< typeof _Badge > ) => (
 	<_Badge data-testid={ testid } { ...props } />
 );
 
+describe( 'Shows a deprecation warning', () => {
+	it( 'Badge', () => {
+		render( <Badge>Code is Poetry</Badge> );
+
+		expect( console ).toHaveWarnedWith(
+			'wp.components.privateApis.Badge is deprecated since version 7.2. Please use Badge from @wordpress/ui instead. Note: This private API will be completely removed within a few Gutenberg plugin releases.'
+		);
+	} );
+} );
+
 describe( 'Badge', () => {
 	it( 'should render correctly with default props', () => {
 		render( <Badge>Code is Poetry</Badge> );
