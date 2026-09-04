@@ -148,6 +148,53 @@ export function isCellSelected( cellLocation, selection ) {
 }
 
 /**
+ * Calculates the effective column count in a row, accounting for colspan values.
+ *
+ * @param {Object} row The row object containing cells.
+ *
+ * @return {number} The effective column count.
+ */
+function getRowColumnCount( row ) {
+	if ( ! row?.cells?.length ) {
+		return 0;
+	}
+
+	return row.cells.reduce( ( columnCount, cell ) => {
+		const colspan = cell.colspan ? parseInt( cell.colspan, 10 ) : 1;
+		return columnCount + colspan;
+	}, 0 );
+}
+
+/**
+ * Gets the cell that covers a specific logical column in a row.
+ *
+ * @param {Object} row         The row object containing cells.
+ * @param {number} columnIndex The logical column index.
+ *
+ * @return {Object} The cell that covers the specified column, or an empty object.
+ */
+function getCellAtColumnIndex( row, columnIndex ) {
+	if ( ! row?.cells?.length ) {
+		return {};
+	}
+
+	let currentColumn = 0;
+
+	for ( const cell of row.cells ) {
+		const colspan = cell.colspan ? parseInt( cell.colspan, 10 ) : 1;
+		const columnEnd = currentColumn + colspan;
+
+		if ( columnIndex < columnEnd ) {
+			return cell;
+		}
+
+		currentColumn = columnEnd;
+	}
+
+	return {};
+}
+
+/**
  * Inserts a row in the table state.
  *
  * @param {Object} state               Current table state.
@@ -161,7 +208,7 @@ export function isCellSelected( cellLocation, selection ) {
 export function insertRow( state, { sectionName, rowIndex, columnCount } ) {
 	const firstRow = getFirstRow( state );
 	const cellCount =
-		columnCount === undefined ? firstRow?.cells?.length : columnCount;
+		columnCount === undefined ? getRowColumnCount( firstRow ) : columnCount;
 
 	// Bail early if the function cannot determine how many cells to add.
 	if ( ! cellCount ) {
@@ -175,7 +222,7 @@ export function insertRow( state, { sectionName, rowIndex, columnCount } ) {
 				cells: Array.from( { length: cellCount } ).map(
 					( _, index ) => {
 						const firstCellInColumn =
-							firstRow?.cells?.[ index ] ?? {};
+							getCellAtColumnIndex( firstRow, index ) ?? {};
 
 						const inheritedAttributes = Object.fromEntries(
 							Object.entries( firstCellInColumn ).filter(

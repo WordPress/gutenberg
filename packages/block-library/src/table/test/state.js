@@ -338,6 +338,125 @@ describe( 'insertRow', () => {
 		} );
 	} );
 
+	it( 'uses the logical column count when the first row contains colspan', () => {
+		const tableWithColspan = {
+			head: [
+				{
+					cells: [
+						{
+							content: 'A',
+							tag: 'th',
+							rowspan: '2',
+						},
+						{
+							content: 'B',
+							tag: 'th',
+							rowspan: '2',
+						},
+						{
+							content: 'Grouped',
+							tag: 'th',
+							colspan: '2',
+						},
+						{
+							content: 'E',
+							tag: 'th',
+							rowspan: '2',
+						},
+					],
+				},
+			],
+			body: [
+				{
+					cells: [
+						{
+							content: 'A1',
+							tag: 'td',
+						},
+						{
+							content: 'B1',
+							tag: 'td',
+						},
+						{
+							content: 'C1',
+							tag: 'td',
+						},
+						{
+							content: 'D1',
+							tag: 'td',
+						},
+						{
+							content: 'E1',
+							tag: 'td',
+						},
+					],
+				},
+			],
+		};
+
+		const state = insertRow( tableWithColspan, {
+			sectionName: 'body',
+			rowIndex: 1,
+		} );
+
+		expect( state.body[ 1 ].cells ).toHaveLength( 5 );
+	} );
+
+	it( 'inherits align from the correct spanning source cell when the first row contains colspan', () => {
+		const tableWithAlignmentAndColspan = {
+			body: [
+				{
+					cells: [
+						{
+							align: 'left',
+							content: 'A',
+							tag: 'th',
+						},
+						{
+							align: 'center',
+							content: 'Grouped',
+							tag: 'th',
+							colspan: '2',
+						},
+						{
+							align: 'right',
+							content: 'D',
+							tag: 'th',
+						},
+					],
+				},
+			],
+		};
+
+		const state = insertRow( tableWithAlignmentAndColspan, {
+			sectionName: 'body',
+			rowIndex: 1,
+		} );
+
+		expect( state.body[ 1 ].cells ).toEqual( [
+			{
+				align: 'left',
+				content: '',
+				tag: 'td',
+			},
+			{
+				align: 'center',
+				content: '',
+				tag: 'td',
+			},
+			{
+				align: 'center',
+				content: '',
+				tag: 'td',
+			},
+			{
+				align: 'right',
+				content: '',
+				tag: 'td',
+			},
+		] );
+	} );
+
 	it( 'adds `th` cells to the head', () => {
 		const state = insertRow( tableWithHead, {
 			sectionName: 'head',
