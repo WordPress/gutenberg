@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { readInlineSelection } from '../read-inline-selection';
 
 /**
