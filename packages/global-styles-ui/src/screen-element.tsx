@@ -16,10 +16,9 @@ import type {
 	GlobalStylesSettings,
 	GlobalStylesStyles,
 } from '@wordpress/global-styles-engine';
-import { ElementColors } from './element-colors';
 import TypographyPanel from './typography-panel';
 import { ScreenHeader } from './screen-header';
-import TypographyPreview from './typography-preview';
+import ElementPreview from './element-preview';
 import { useSetting, useStyle } from './hooks';
 import { unlock } from './lock-unlock';
 
@@ -73,10 +72,7 @@ type ElementName = keyof typeof elements;
 
 interface ScreenElementProps {
 	element: ElementName;
-	showColorControls?: boolean;
 }
-
-const ADDITIONAL_COLOR_ELEMENTS = [ 'cite', 'textInput', 'select' ];
 
 function applyFallbackStyle( border: any ) {
 	if ( ! border ) {
@@ -111,28 +107,6 @@ function applyAllFallbackStyles( border: any ) {
 	}
 
 	return applyFallbackStyle( border );
-}
-
-function getColorSettingsForElement(
-	settings: GlobalStylesSettings,
-	element: ElementName
-) {
-	const colorSettings = settings.color as typeof settings.color & {
-		heading?: boolean;
-		button?: boolean;
-		caption?: boolean;
-	};
-
-	return {
-		...settings,
-		color: {
-			...colorSettings,
-			link: element === 'link' && colorSettings?.link,
-			heading: element === 'heading' && colorSettings?.heading,
-			button: element === 'button' && colorSettings?.button,
-			caption: element === 'caption' && colorSettings?.caption,
-		},
-	};
 }
 
 /**
@@ -269,24 +243,8 @@ function ElementStylePanels( {
 	);
 }
 
-function ScreenElement( {
-	element,
-	showColorControls = true,
-}: ScreenElementProps ) {
+function ScreenElement( { element }: ScreenElementProps ) {
 	const [ headingLevel, setHeadingLevel ] = useState( 'heading' );
-	const hasColorPanel = showColorControls && element !== 'text';
-	const additionalElements = ADDITIONAL_COLOR_ELEMENTS.includes( element )
-		? [ { name: element, label: elements[ element ].title } ]
-		: [];
-	const defaultColorControls = {
-		link: element === 'link',
-		heading: element === 'heading',
-		button: element === 'button',
-		caption: element === 'caption',
-		cite: element === 'cite',
-		textInput: element === 'textInput',
-		select: element === 'select',
-	};
 	const usedElement = element === 'heading' ? headingLevel : element;
 
 	return (
@@ -296,7 +254,7 @@ function ScreenElement( {
 				description={ elements[ element ].description }
 			/>
 			<Spacer marginX={ 4 }>
-				<TypographyPreview
+				<ElementPreview
 					element={ element }
 					headingLevel={ headingLevel }
 				/>
@@ -360,18 +318,7 @@ function ScreenElement( {
 			<TypographyPanel
 				element={ element }
 				headingLevel={ headingLevel }
-				showTextColor={ element === 'text' || ! hasColorPanel }
 			/>
-			{ hasColorPanel && (
-				<ElementColors
-					additionalElements={ additionalElements }
-					defaultControls={ defaultColorControls }
-					settingsTransform={ ( settings ) =>
-						getColorSettingsForElement( settings, element )
-					}
-					label={ __( 'Colors' ) }
-				/>
-			) }
 			{ /*
 			   "Text" is the root rather than an element, so there is no
 			   `styles.elements.text` node for these panels to write into.
