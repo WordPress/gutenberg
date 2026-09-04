@@ -1431,7 +1431,7 @@ class WP_Theme_JSON_Gutenberg {
 		 * schema, so it needs to allow the same responsive breakpoint states
 		 * that are allowed for variations declared inline in theme.json.
 		 */
-		foreach ( array_keys( $responsive_media_queries ) as $breakpoint_state ) {
+		foreach ( $breakpoint_states as $breakpoint_state ) {
 			$schema['styles'][ $breakpoint_state ]             = $styles_non_top_level;
 			$schema['styles'][ $breakpoint_state ]['elements'] = $schema_styles_elements;
 			$schema['styles'][ $breakpoint_state ]['blocks']   = $schema_styles_blocks;
