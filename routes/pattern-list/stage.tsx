@@ -5,10 +5,10 @@ import {
 	Link,
 	useInvalidate,
 } from '@wordpress/route';
-import { useView } from '@wordpress/views';
+import { useView, useViewConfig } from '@wordpress/views';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { Page } from '@wordpress/admin-ui';
-import type { View, Action } from '@wordpress/dataviews';
+import type { View, Action, SupportedLayouts } from '@wordpress/dataviews';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	Button,
@@ -23,7 +23,11 @@ import {
 } from '@wordpress/patterns';
 import { __ } from '@wordpress/i18n';
 import { unlock } from '@wordpress/routes-lock-unlock';
-import { DEFAULT_VIEW, DEFAULT_VIEWS, DEFAULT_LAYOUTS } from './view-utils';
+import {
+	getActiveViewOverrides,
+	type ViewListEntry,
+	type ViewOverrides,
+} from './view-utils';
 import { previewField } from './fields/preview';
 import { patternStatusField } from './fields/sync-status';
 import { usePatternCategoryField } from './fields/category';
@@ -39,16 +43,63 @@ const { PATTERN_TYPES, CreatePatternModal } = unlock( patternPrivateApis );
  */
 import './style.scss';
 
+const PATTERN_POST_TYPE = 'wp_block';
+
 function PatternList() {
-	const invalidate = useInvalidate();
-	const { type = 'all' } = useParams( {
+	// The `type` param is the slug of the active view: the "all" or "my
+	// patterns" entries of the view list, or a pattern category.
+	const { type } = useParams( {
 		from: '/patterns/list/$type',
 	} );
+	const {
+		default_view: defaultView,
+		default_layouts: defaultLayouts,
+		view_list: viewList,
+	} = useViewConfig( {
+		kind: 'postType',
+		name: PATTERN_POST_TYPE,
+	} );
+	const activeViewOverrides = useMemo(
+		() => getActiveViewOverrides( viewList, type ),
+		[ viewList, type ]
+	);
+
+	if ( ! defaultView ) {
+		// The route loader resolves the view configuration before the stage
+		// mounts, so this only guards against the store being reset.
+		return null;
+	}
+
+	return (
+		<PatternListView
+			activeView={ type }
+			defaultView={ defaultView }
+			defaultLayouts={ defaultLayouts }
+			viewList={ viewList }
+			activeViewOverrides={ activeViewOverrides }
+		/>
+	);
+}
+
+function PatternListView( {
+	activeView,
+	defaultView,
+	defaultLayouts,
+	viewList,
+	activeViewOverrides,
+}: {
+	activeView: string;
+	defaultView: View;
+	defaultLayouts: SupportedLayouts | undefined;
+	viewList: ViewListEntry[] | undefined;
+	activeViewOverrides: ViewOverrides;
+} ) {
+	const invalidate = useInvalidate();
 	const navigate = useNavigate();
 	const searchParams = useSearch( { from: '/patterns/list/$type' } );
 
 	const postTypeObject = useSelect(
-		( select ) => select( coreStore ).getPostType( 'wp_block' ),
+		( select ) => select( coreStore ).getPostType( PATTERN_POST_TYPE ),
 		[]
 	);
 
@@ -57,7 +108,7 @@ function PatternList() {
 		( select ) =>
 			select( coreStore ).canUser( 'create', {
 				kind: 'postType',
-				name: 'wp_block',
+				name: PATTERN_POST_TYPE,
 			} ),
 		[]
 	);
@@ -80,9 +131,11 @@ function PatternList() {
 	// Use the new view persistence hook
 	const { view, isModified, updateView, resetToDefault } = useView( {
 		kind: 'postType',
-		name: 'wp_block',
+		name: PATTERN_POST_TYPE,
 		slug: 'default-new',
-		defaultView: DEFAULT_VIEW,
+		defaultView,
+		defaultLayouts,
+		activeViewOverrides,
 		queryParams: searchParams,
 		onChangeQueryParams: handleQueryParamsChange,
 	} );
@@ -102,36 +155,18 @@ function PatternList() {
 	};
 
 	// Extract filter values from view
-	const categoryFilter = useMemo( () => {
-		const filter = view.filters?.find( ( f ) => f.field === 'category' );
-		// Default to PATTERN_DEFAULT_CATEGORY if no category filter is set
-		return filter?.value || 'all-patterns';
-	}, [ view.filters ] );
-
 	const syncStatusFilter = useMemo( () => {
 		const filter = view.filters?.find( ( f ) => f.field === 'sync-status' );
 		return filter?.value;
 	}, [ view.filters ] );
 
-	// Determine which pattern type(s) to fetch based on current tab
-	const patternType = useMemo( () => {
-		if ( type === 'my-patterns' ) {
-			return PATTERN_TYPES.user;
-		} else if ( type === 'registered' ) {
-			return PATTERN_TYPES.theme;
-		}
-		return null; // null means fetch all types
-	}, [ type ] );
-
-	// Use the usePatterns hook to fetch and filter patterns
-	const { patterns, isResolving } = usePatterns(
-		patternType,
-		categoryFilter,
-		{
-			search: view.search,
-			syncStatus: syncStatusFilter,
-		}
-	);
+	// Use the usePatterns hook to fetch and filter patterns. The active view
+	// slug is the category to list: the server view list is made of the
+	// "all" and "my patterns" entries plus the pattern categories.
+	const { patterns, isResolving } = usePatterns( null, activeView, {
+		search: view.search,
+		syncStatus: syncStatusFilter,
+	} );
 
 	// Augment patterns with permissions
 	const patternsWithPermissions =
@@ -139,21 +174,15 @@ function PatternList() {
 
 	// Add pattern-specific fields
 	const patternCategoryField = usePatternCategoryField();
-	const fields = useMemo( () => {
-		const patternFields = [
+	const fields = useMemo(
+		() => [
 			previewField,
 			patternTitleField,
 			patternCategoryField,
-		];
-
-		// Add sync status field for user patterns
-		if ( type === 'my-patterns' || type === 'all' ) {
-			patternFields.push( patternStatusField );
-		}
-
-		// Filter and add other fields
-		return patternFields;
-	}, [ type, patternCategoryField ] );
+			patternStatusField,
+		],
+		[ patternCategoryField ]
+	);
 
 	// Apply client-side sorting and pagination, but NOT filtering
 	// Filtering is done server-side in usePatterns hook
@@ -199,7 +228,7 @@ function PatternList() {
 	);
 
 	const postTypeActions: Action< any >[] = usePostActions( {
-		postType: 'wp_block',
+		postType: PATTERN_POST_TYPE,
 		context: 'list',
 		onActionPerformed: ( actionId: string, items: NormalizedPattern[] ) => {
 			// Clean up URL when delete actions are performed
@@ -226,9 +255,9 @@ function PatternList() {
 	}, [ postTypeActions ] );
 
 	const handleTabChange = useCallback(
-		( typeSlug: string ) => {
+		( viewSlug: string ) => {
 			navigate( {
-				to: `/patterns/list/${ typeSlug }`,
+				to: `/patterns/list/${ viewSlug }`,
 			} );
 		},
 		[ navigate ]
@@ -275,23 +304,21 @@ function PatternList() {
 			}
 			hasPadding={ false }
 		>
-			{ DEFAULT_VIEWS.length > 1 && (
+			{ viewList && viewList.length > 1 && (
 				<div className="routes-pattern-list__tabs-wrapper">
 					<Tabs
 						onSelect={ handleTabChange }
-						selectedTabId={ type ?? 'all' }
+						selectedTabId={ activeView }
 					>
 						<Tabs.TabList>
-							{ DEFAULT_VIEWS.map(
-								( filter: { slug: string; label: string } ) => (
-									<Tabs.Tab
-										tabId={ filter.slug }
-										key={ filter.slug }
-									>
-										{ filter.label }
-									</Tabs.Tab>
-								)
-							) }
+							{ viewList.map( ( entry ) => (
+								<Tabs.Tab
+									tabId={ entry.slug }
+									key={ entry.slug }
+								>
+									{ entry.title }
+								</Tabs.Tab>
+							) ) }
 						</Tabs.TabList>
 					</Tabs>
 				</div>
@@ -307,7 +334,7 @@ function PatternList() {
 					totalItems,
 					totalPages,
 				} }
-				defaultLayouts={ DEFAULT_LAYOUTS }
+				defaultLayouts={ defaultLayouts }
 				selection={ selection }
 				onReset={ isModified ? onReset : false }
 				onChangeSelection={ ( items: string[] ) => {
