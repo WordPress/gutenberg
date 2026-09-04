@@ -141,9 +141,9 @@ export interface ItemLabelProps extends ComponentProps< 'span' > {
 
 export interface ItemDescriptionProps extends ComponentProps< 'span' > {
 	/**
-	 * Optional supplementary content displayed below a menu item label. Use as
-	 * the second direct child, after `Menu.ItemLabel`. Content should be text or
-	 * non-interactive inline markup.
+	 * Supplementary content displayed below a menu item label. Use as a direct
+	 * child after `Menu.ItemLabel`. Content should be text or non-interactive
+	 * inline markup.
 	 */
 	children: ReactNode;
 }
@@ -152,7 +152,12 @@ type MenuItemChildren =
 	| ReactElement< ItemLabelProps >
 	| [
 			ReactElement< ItemLabelProps >,
-			ReactElement< ItemDescriptionProps > | false | null | undefined,
+			...(
+				| ReactElement< ItemDescriptionProps >
+				| false
+				| null
+				| undefined
+			)[],
 	  ];
 
 type MenuItemComponentProps< T extends ElementType > = Omit<
@@ -163,8 +168,8 @@ type MenuItemComponentProps< T extends ElementType > = Omit<
 export type ItemProps = MenuItemComponentProps< typeof _Menu.Item > &
 	MenuItemLayoutProps & {
 		/**
-		 * One direct `Menu.ItemLabel`, followed by an optional direct
-		 * `Menu.ItemDescription`.
+		 * One direct `Menu.ItemLabel`, followed by zero or more direct
+		 * `Menu.ItemDescription` components.
 		 */
 		children: MenuItemChildren;
 	};
@@ -175,16 +180,25 @@ export type LinkItemProps = Omit<
 > &
 	MenuItemLayoutProps & {
 		/**
-		 * Whether to open the link in a new browser tab.
-		 * When true, sets `target="_blank"` and appends a visual arrow indicator.
+		 * Where to open the linked document. `"_blank"` also adds the visual
+		 * indicator and accessible new-tab notice.
+		 *
+		 * When both `target` and `openInNewTab` are set, `target` determines the
+		 * browsing context.
+		 */
+		target?: ComponentProps< 'a' >[ 'target' ];
+
+		/**
+		 * Adds a visual indicator and accessible notice for opening in a new tab.
+		 * Defaults `target` to `"_blank"` when no explicit target is set.
 		 *
 		 * @default false
 		 */
 		openInNewTab?: boolean;
 
 		/**
-		 * One direct `Menu.ItemLabel`, followed by an optional direct
-		 * `Menu.ItemDescription`.
+		 * One direct `Menu.ItemLabel`, followed by zero or more direct
+		 * `Menu.ItemDescription` components.
 		 */
 		children: MenuItemChildren;
 	};
@@ -194,8 +208,8 @@ export type CheckboxItemProps = MenuItemComponentProps<
 > &
 	MenuItemLayoutProps & {
 		/**
-		 * One direct `Menu.ItemLabel`, followed by an optional direct
-		 * `Menu.ItemDescription`.
+		 * One direct `Menu.ItemLabel`, followed by zero or more direct
+		 * `Menu.ItemDescription` components.
 		 */
 		children: MenuItemChildren;
 	};
@@ -203,8 +217,8 @@ export type CheckboxItemProps = MenuItemComponentProps<
 export type RadioItemProps = MenuItemComponentProps< typeof _Menu.RadioItem > &
 	MenuItemLayoutProps & {
 		/**
-		 * One direct `Menu.ItemLabel`, followed by an optional direct
-		 * `Menu.ItemDescription`.
+		 * One direct `Menu.ItemLabel`, followed by zero or more direct
+		 * `Menu.ItemDescription` components.
 		 */
 		children: MenuItemChildren;
 	};
@@ -214,8 +228,8 @@ export type SubmenuTriggerProps = MenuItemComponentProps<
 > &
 	MenuItemLayoutProps & {
 		/**
-		 * One direct `Menu.ItemLabel`, followed by an optional direct
-		 * `Menu.ItemDescription`.
+		 * One direct `Menu.ItemLabel`, followed by zero or more direct
+		 * `Menu.ItemDescription` components.
 		 */
 		children: MenuItemChildren;
 	};

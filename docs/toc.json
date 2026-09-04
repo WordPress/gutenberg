@@ -400,6 +400,9 @@
 						"docs/contributors/code/package-runtime-compatibility.md": []
 					},
 					{ "docs/contributors/code/workspace-development.md": [] },
+					{
+						"docs/contributors/code/required-changes-from-trunk.md": []
+					},
 					{ "docs/contributors/code/agents-and-skills.md": [] },
 					{
 						"docs/contributors/code/release/README.md": [

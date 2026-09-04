@@ -656,7 +656,7 @@ describe( 'publishVersionedPackagesToNpm', () => {
 			],
 		} );
 		expect( commandFn ).toHaveBeenCalledWith(
-			'npx lerna publish from-package --dist-tag latest --git-head publish-sha --yes --no-verify-access',
+			'npm exec --no -- lerna publish from-package --dist-tag latest --git-head publish-sha --yes --no-verify-access',
 			{ cwd: '/repo', stdio: 'inherit' }
 		);
 		expect( pushNpmReleaseGitMetadataFn ).toHaveBeenCalledWith( {
@@ -865,25 +865,25 @@ describe( 'publishPackagesToNpm', () => {
 	it.each( [
 		[
 			'latest',
-			'npx lerna version patch --no-private --no-push --yes',
+			'npm exec --no -- lerna version patch --no-private --no-push --yes',
 			'latest',
 			'wp/latest',
 		],
 		[
 			'next',
-			'npx lerna version prepatch --preid next.v.',
+			'npm exec --no -- lerna version prepatch --preid next.v.',
 			'next',
 			'wp/next',
 		],
 		[
 			'bugfix',
-			'npx lerna version patch --no-private --no-push --yes',
+			'npm exec --no -- lerna version patch --no-private --no-push --yes',
 			'latest',
 			'wp/latest',
 		],
 		[
 			'wp',
-			'npx lerna version patch --no-private --no-push --yes',
+			'npm exec --no -- lerna version patch --no-private --no-push --yes',
 			'wp-6.9',
 			'wp/6.9',
 		],
