@@ -23,7 +23,11 @@
 							{
 								"blockName": "core/column",
 								"attrs": {
-									"width": "40px"
+									"style": {
+										"dimensions": {
+											"width": "40px"
+										}
+									}
 								},
 								"innerBlocks": [
 									{
