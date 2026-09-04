@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Excerpt field: render nothing for an empty excerpt instead of the `Add an excerpt` placeholder text. Start the textarea of the excerpt, description, and pattern description fields at two rows instead of four. ([#82444](https://github.com/WordPress/gutenberg/pull/82444))
 -   Append an ellipsis (`…`) to the labels of the actions that open a dialog requiring further input or confirmation (`Delete…`, `Trash…`, `Permanently delete…`, `Rename…`, `Duplicate…`, `Reset…`, `Order…`), following the menu ellipsis guideline. The dialog titles keep the ellipsis-free wording. ([#81994](https://github.com/WordPress/gutenberg/pull/81994))
 
 ### Bug Fixes
