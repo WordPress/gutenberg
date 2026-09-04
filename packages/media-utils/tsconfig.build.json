@@ -19,6 +19,7 @@
 		{ "path": "../notices/tsconfig.build.json" },
 		{ "path": "../private-apis" },
 		{ "path": "../ui/tsconfig.build.json" },
+		{ "path": "../upload-media/tsconfig.build.json" },
 		{ "path": "../views/tsconfig.build.json" }
 	]
 }

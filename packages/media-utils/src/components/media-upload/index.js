@@ -2,6 +2,7 @@ import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { select, dispatch } from '@wordpress/data';
 import { invalidateAttachmentResolutions } from '../../utils/invalidate-attachment-resolutions';
+import { installClientSideModalUploads } from '../../utils/client-side-modal-uploads';
 
 const DEFAULT_EMPTY_GALLERY = [];
 
@@ -563,6 +564,13 @@ class MediaUpload extends Component {
 	}
 
 	openModal() {
+		// Route the modal's own uploads through the client-side media
+		// pipeline when it is available, so a file uploaded here is processed
+		// the same way as one dropped on a block. Installed here rather than
+		// at import time because it patches `wp.Uploader`, which the media
+		// scripts only define once they have run.
+		installClientSideModalUploads();
+
 		const {
 			gallery = false,
 			unstableFeaturedImageFlow = false,
