@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
 	COMMENT_MARKER,
+	demoteHeadings,
 	isParseable,
 	isPrMetaComment,
 	mergeSection,
@@ -561,5 +562,251 @@ describe( 'rendering other sections', () => {
 		);
 
 		expect( merged ).toContain( 'not the current head' );
+	} );
+} );
+
+describe( 'demoteHeadings', () => {
+	it( 'pushes a props body below its own section heading', () => {
+		const props =
+			'## Unlinked Accounts\n\nSome text.\n\n## Core SVN\n\nMore text.';
+
+		const merged = bodyOf(
+			mergeSection( undefined, { id: 'props', body: props } )
+		);
+
+		expect( merged ).toContain( '##### Unlinked Accounts' );
+		expect( merged ).toContain( '##### Core SVN' );
+		expect( merged ).not.toMatch( /^## Unlinked/m );
+	} );
+
+	it( 'keeps the hierarchy between headings', () => {
+		const body = '## Title\n\nText.\n\n### Deep\n\nText.';
+
+		expect( demoteHeadings( body ) ).toBe(
+			'##### Title\n\nText.\n\n###### Deep\n\nText.'
+		);
+	} );
+
+	/*
+	 * Markdown has no seventh level, so a body deep enough to need one loses
+	 * the distinction rather than the demotion.
+	 */
+	it( 'flattens levels a demotion pushes past the sixth', () => {
+		const body = '# One\n\n## Two\n\n### Three';
+
+		expect( demoteHeadings( body ) ).toBe(
+			'##### One\n\n###### Two\n\n###### Three'
+		);
+	} );
+
+	it( 'leaves a body that has no headings alone', () => {
+		const body = 'Just text, and a # that is not a heading.';
+
+		expect( demoteHeadings( body ) ).toBe( body );
+	} );
+
+	/* A stack trace can hold anything, including lines that look like headings. */
+	it.each( [
+		[ 'a plain fence', '```', '```' ],
+		[ 'a fence with a language', '```js', '```' ],
+		[ 'a tilde fence', '~~~', '~~~' ],
+	] )( 'ignores what looks like a heading inside %s', ( _, open, close ) => {
+		const body = `## Real\n\n${ open }\n# Not a heading\n${ close }`;
+
+		expect( demoteHeadings( body ) ).toBe(
+			`##### Real\n\n${ open }\n# Not a heading\n${ close }`
+		);
+	} );
+
+	/* Reading the level by hunting for a space loses the first word. */
+	it( 'keeps the text of a heading separated by a tab', () => {
+		expect( demoteHeadings( '#\tTabbed' ) ).toBe( '#####\tTabbed' );
+	} );
+
+	/*
+	 * A `.` stops at a carriage return, so a CRLF body would match on its last
+	 * line only, demoting that one and leaving every fence untracked.
+	 */
+	it( 'handles a body with carriage returns', () => {
+		const body = '## Real\r\n\r\n```\r\n# inner\r\n```\r\n\r\n## After';
+
+		expect( demoteHeadings( body ) ).toBe(
+			'##### Real\r\n\r\n```\r\n# inner\r\n```\r\n\r\n##### After'
+		);
+	} );
+
+	it( 'demotes a heading indented up to three spaces, keeping the indent', () => {
+		expect( demoteHeadings( '   ## Indented' ) ).toBe(
+			'   ##### Indented'
+		);
+	} );
+
+	/* Four spaces makes it indented code rather than a heading. */
+	it( 'leaves a heading indented four spaces alone', () => {
+		expect( demoteHeadings( '    ## Code\n\n## Plain' ) ).toBe(
+			'    ## Code\n\n##### Plain'
+		);
+	} );
+
+	it( 'demotes a heading with no text', () => {
+		expect( demoteHeadings( '#\n\n## Plain' ) ).toBe(
+			'#####\n\n###### Plain'
+		);
+	} );
+
+	it( 'leaves a hash that opens no heading alone', () => {
+		expect( demoteHeadings( '## Real\n\n#hashtag' ) ).toBe(
+			'##### Real\n\n#hashtag'
+		);
+	} );
+
+	it( 'caps the demotion at the deepest heading level', () => {
+		expect( demoteHeadings( '# One\n\n###### Six' ) ).toBe(
+			'##### One\n\n###### Six'
+		);
+	} );
+} );
+
+describe( 'ordering a section with no commit', () => {
+	/*
+	 * The list is gathered before its writer takes the lock, so two runs can
+	 * reach the lock in the opposite order to the views they hold.
+	 */
+	it( 'rejects a list gathered by an older run', () => {
+		const comment = bodyOf(
+			mergeSection( undefined, {
+				id: 'props',
+				body: 'Newer list.',
+				generation: 200,
+			} )
+		);
+
+		const result = mergeSection( comment, {
+			id: 'props',
+			body: 'Older list.',
+			generation: 100,
+		} );
+
+		expect( result.body ).toBeUndefined();
+		expect( result.rejected ).toContain( '100' );
+	} );
+
+	it( 'accepts a newer run, and a rerun of the same one', () => {
+		let comment = bodyOf(
+			mergeSection( undefined, {
+				id: 'props',
+				body: 'First.',
+				generation: 100,
+			} )
+		);
+		comment = bodyOf(
+			mergeSection( comment, {
+				id: 'props',
+				body: 'Retry of the same run.',
+				generation: 100,
+			} )
+		);
+		comment = bodyOf(
+			mergeSection( comment, {
+				id: 'props',
+				body: 'Newer run.',
+				generation: 200,
+			} )
+		);
+
+		expect( comment ).toContain( 'Newer run.' );
+	} );
+
+	it( 'does not order a section that a commit already orders', () => {
+		const comment = bodyOf(
+			mergeSection(
+				undefined,
+				{
+					id: 'bundle-size',
+					body: 'Size.',
+					sha: HEAD,
+					generation: 200,
+				},
+				HEAD
+			)
+		);
+
+		expect( parseSections( comment )[ 0 ].generation ).toBeUndefined();
+	} );
+} );
+
+describe( 'clearing a section that has an order', () => {
+	/*
+	 * Dropping the entry on clear would drop its generation with it, letting a
+	 * run gathered earlier put the old content back.
+	 */
+	it( 'still rejects an older run after the section was cleared', () => {
+		let comment = bodyOf(
+			mergeSection( undefined, { id: 'labels', body: 'Warning.' } )
+		);
+		comment = bodyOf(
+			mergeSection( comment, {
+				id: 'props',
+				body: 'Newer list.',
+				generation: 200,
+			} )
+		);
+		comment = bodyOf(
+			mergeSection( comment, {
+				id: 'props',
+				body: '',
+				generation: 200,
+			} )
+		);
+
+		expect( comment ).not.toContain( 'Newer list.' );
+
+		const result = mergeSection( comment, {
+			id: 'props',
+			body: 'Older list.',
+			generation: 100,
+		} );
+
+		expect( result.body ).toBeUndefined();
+		expect( result.rejected ).toContain( '100' );
+	} );
+
+	it( 'renders a cleared section as nothing at all', () => {
+		let comment = bodyOf(
+			mergeSection( undefined, { id: 'labels', body: 'Warning.' } )
+		);
+		comment = bodyOf(
+			mergeSection( comment, {
+				id: 'props',
+				body: 'A list.',
+				generation: 200,
+			} )
+		);
+		comment = bodyOf(
+			mergeSection( comment, { id: 'props', body: '', generation: 200 } )
+		);
+
+		expect( comment ).not.toContain( getSection( 'props' )!.heading );
+
+		// Invisible, but still present and still carrying its generation.
+		const props = parseSections( comment ).find(
+			( section ) => section.id === 'props'
+		);
+		expect( props ).toBeDefined();
+		expect( props?.generation ).toBe( 200 );
+	} );
+
+	it( 'removes the comment once nothing visible is left', () => {
+		const comment = bodyOf(
+			mergeSection( undefined, {
+				id: 'props',
+				body: 'A list.',
+				generation: 200,
+			} )
+		);
+
+		expect(
+			mergeSection( comment, { id: 'props', body: '', generation: 200 } )
+		).toEqual( { remove: true } );
 	} );
 } );
