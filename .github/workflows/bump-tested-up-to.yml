@@ -20,38 +20,37 @@ jobs:
     bump-tested-up-to:
         name: Open a pull request when a new WordPress version is stable
         runs-on: 'ubuntu-24.04'
+        # Forks have no app credentials, so a scheduled run there fails daily.
+        if: ${{ github.repository == 'WordPress/gutenberg' }}
         environment: 'GitHub Releases'
-        permissions: {}
+        permissions:
+            contents: read
+            # The check step lists pull requests with the default token.
+            pull-requests: read
 
         steps:
-            - name: Generate application token
-              uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
-              id: app-token
-              with:
-                  client-id: ${{ vars.APP_CLIENT_ID }}
-                  private-key: ${{ secrets.APP_PRIVATE_KEY }}
-                  permission-contents: write
-                  permission-pull-requests: write
-
-            # The app token lets the push and the pull request trigger CI, which
-            # the default GITHUB_TOKEN would not.
-            - name: Checkout code
+            # Only readme.txt is inspected and edited. The push and the pull
+            # request authenticate with the app token generated further down,
+            # not with this checkout's credentials.
+            - name: Checkout readme.txt
               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
-                  token: ${{ steps.app-token.outputs.token }}
+                  sparse-checkout: readme.txt
+                  sparse-checkout-cone-mode: false
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
-                  persist-credentials: true
+                  persist-credentials: false
 
             - name: Check whether readme.txt trails the latest WordPress release
               id: check
+              env:
+                  GH_TOKEN: ${{ github.token }}
               run: |
-                  curl \
-                    --fail --silent --show-error \
-                    -H "Accept: application/json" \
-                    -o versions.json \
-                    "https://api.wordpress.org/core/stable-check/1.0/"
-                  LATEST="$(jq --raw-output 'with_entries(select(.value=="latest"))|keys[]' versions.json | cut -d. -f1,2)"
-                  rm versions.json
+                  # The query must stay in sync with the "Compute previous WordPress
+                  # version" step in unit-test.yml, which reads the same API.
+                  LATEST="$(curl --fail --silent --show-error -H "Accept: application/json" "https://api.wordpress.org/core/stable-check/1.0/" | jq --raw-output 'with_entries(select(.value=="latest"))|keys[]' | cut -d. -f1,2)"
+                  # The pattern must stay in sync with getTestedUpToMajor() in
+                  # tools/release/resolve-performance-branches.mjs, which parses the
+                  # same readme.txt line.
                   TESTED="$(sed -n 's/^Tested up to: \([0-9]*\.[0-9]*\).*/\1/p' readme.txt)"
                   if [[ -z "$LATEST" || -z "$TESTED" ]]; then
                     echo "Could not determine the latest stable version ('${LATEST}') or the readme.txt value ('${TESTED}')."
@@ -63,46 +62,75 @@ jobs:
                     echo "readme.txt lists ${TESTED} and the latest stable version is ${LATEST}. Nothing to do."
                     exit 0
                   fi
-                  # The readme should not claim a WordPress version the plugin has no
-                  # wp/X.Y branch for yet; the branch is cut by the release process.
-                  if ! git ls-remote --exit-code --heads origin "wp/${LATEST}" > /dev/null; then
+                  # The readme should not claim a WordPress version the plugin has
+                  # no wp/X.Y branch for. `--exit-code` reports a missing ref as 2;
+                  # any other failure is an infrastructure problem that must not be
+                  # mistaken for a missing branch.
+                  set +e
+                  git ls-remote --exit-code --heads origin "wp/${LATEST}" > /dev/null
+                  WP_BRANCH_STATUS=$?
+                  set -e
+                  if [[ "$WP_BRANCH_STATUS" -eq 2 ]]; then
                     echo "WordPress ${LATEST} is stable but the wp/${LATEST} branch does not exist yet. Trying again on the next scheduled run."
                     exit 0
+                  elif [[ "$WP_BRANCH_STATUS" -ne 0 ]]; then
+                    echo "Could not determine whether the wp/${LATEST} branch exists (git exited with ${WP_BRANCH_STATUS})."
+                    exit 1
                   fi
-                  if git ls-remote --exit-code --heads origin "update/tested-up-to-${LATEST}" > /dev/null; then
-                    echo "The update/tested-up-to-${LATEST} branch already exists, so a bump was already proposed."
+                  # Deduplicate on the pull request record, not the branch: a closed
+                  # pull request is a human decision this workflow must not repeat,
+                  # while a leftover branch without any pull request is debris from
+                  # an interrupted run that the push below overwrites.
+                  if [[ "$(gh pr list --head "update/tested-up-to-${LATEST}" --state all --json number --jq 'length')" -gt 0 ]]; then
+                    echo "A pull request for the ${LATEST} bump already exists (open, merged, or declined)."
                     exit 0
                   fi
                   echo "version=${LATEST}" >> "$GITHUB_OUTPUT"
 
-            - name: Configure Git user name
+            # The app token lets the push and the pull request trigger CI, which
+            # the default GITHUB_TOKEN would not. It is only minted when the check
+            # found something to push.
+            - name: Generate application token
               if: steps.check.outputs.version
-              run: git config user.name '${{ steps.app-token.outputs.app-slug }}[bot]'
-
-            - name: Configure Git user email
-              if: steps.check.outputs.version
-              env:
-                  APP_USER_ID: ${{ vars.APP_USER_ID }}
-              run: git config user.email "${APP_USER_ID}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com"
+              uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+              id: app-token
+              with:
+                  client-id: ${{ vars.APP_CLIENT_ID }}
+                  private-key: ${{ secrets.APP_PRIVATE_KEY }}
+                  permission-contents: write
+                  permission-pull-requests: write
 
             - name: Create the pull request
               if: steps.check.outputs.version
               env:
                   GH_TOKEN: ${{ steps.app-token.outputs.token }}
                   VERSION: ${{ steps.check.outputs.version }}
+                  APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
+                  APP_USER_ID: ${{ vars.APP_USER_ID }}
               run: |
+                  git config user.name "${APP_SLUG}[bot]"
+                  git config user.email "${APP_USER_ID}+${APP_SLUG}[bot]@users.noreply.github.com"
+                  git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
                   BRANCH="update/tested-up-to-${VERSION}"
                   git checkout -b "$BRANCH"
                   sed -i "s/^Tested up to: .*/Tested up to: ${VERSION}/" readme.txt
                   git add readme.txt
                   git commit -m "Plugin: Bump \"Tested up to\" to WordPress ${VERSION}"
-                  git push --set-upstream origin "$BRANCH"
+                  # --force overwrites debris from a run that pushed the branch but
+                  # failed before creating the pull request; the check step already
+                  # proved no pull request exists for this branch.
+                  git push --force --set-upstream origin "$BRANCH"
                   gh pr create \
                     --base trunk \
                     --head "$BRANCH" \
+                    --label 'Gutenberg Plugin' \
+                    --label '[Type] Enhancement' \
                     --title "Plugin: Bump \"Tested up to\" to WordPress ${VERSION}" \
-                    --body "WordPress ${VERSION} is now the latest stable release according to [the version check API](https://api.wordpress.org/core/stable-check/1.0/), and the \`wp/${VERSION}\` branch exists, so the plugin's \`readme.txt\` should say it is tested up to ${VERSION}.
+                    --body "WordPress ${VERSION} is now the latest stable release according to [the version check API](https://api.wordpress.org/core/stable-check/1.0/), and \`readme.txt\` still names an older version.
 
-                  This pull request was opened automatically by the \`bump-tested-up-to.yml\` workflow. It only changes \`readme.txt\`; the larger follow-up chore of raising the minimum required WordPress version and removing old compatibility code is a separate, manual pull request."
-                  gh pr edit "$BRANCH" --add-label 'Gutenberg Plugin' --add-label '[Type] Enhancement' ||
-                    echo "Could not add labels to the pull request; add them manually."
+                  Merging this pull request is the compatibility attestation, so before merging:
+
+                  - Confirm trunk's CI runs against WordPress ${VERSION} (the unit test workflow tests against the latest stable release).
+                  - Update \`REFERENCE_COMMIT\` in \`tools/release/resolve-performance-branches.mjs\`, here or in a paired pull request. \`docs/explanations/architecture/performance.md\` requires it for every \"Tested up to\" change.
+
+                  This pull request was opened automatically by the \`bump-tested-up-to.yml\` workflow. The larger chore of raising the minimum required WordPress version and removing old compatibility code is a separate, manual pull request."
