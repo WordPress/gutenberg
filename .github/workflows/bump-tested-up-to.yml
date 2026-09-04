@@ -1,0 +1,108 @@
+name: Bump "Tested up to" version
+
+on:
+    schedule:
+        # Once a day. WordPress releases are not announced on a fixed schedule,
+        # so the job polls and exits quietly when there is nothing to do.
+        - cron: '15 4 * * *'
+    workflow_dispatch:
+
+# Queues overlapping runs instead of cancelling one that may be mid-push.
+concurrency:
+    group: ${{ github.workflow }}
+    cancel-in-progress: false
+
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
+jobs:
+    bump-tested-up-to:
+        name: Open a pull request when a new WordPress version is stable
+        runs-on: 'ubuntu-24.04'
+        environment: 'GitHub Releases'
+        permissions: {}
+
+        steps:
+            - name: Generate application token
+              uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+              id: app-token
+              with:
+                  client-id: ${{ vars.APP_CLIENT_ID }}
+                  private-key: ${{ secrets.APP_PRIVATE_KEY }}
+                  permission-contents: write
+                  permission-pull-requests: write
+
+            # The app token lets the push and the pull request trigger CI, which
+            # the default GITHUB_TOKEN would not.
+            - name: Checkout code
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  token: ${{ steps.app-token.outputs.token }}
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: true
+
+            - name: Check whether readme.txt trails the latest WordPress release
+              id: check
+              run: |
+                  curl \
+                    --fail --silent --show-error \
+                    -H "Accept: application/json" \
+                    -o versions.json \
+                    "https://api.wordpress.org/core/stable-check/1.0/"
+                  LATEST="$(jq --raw-output 'with_entries(select(.value=="latest"))|keys[]' versions.json | cut -d. -f1,2)"
+                  rm versions.json
+                  TESTED="$(sed -n 's/^Tested up to: \([0-9]*\.[0-9]*\).*/\1/p' readme.txt)"
+                  if [[ -z "$LATEST" || -z "$TESTED" ]]; then
+                    echo "Could not determine the latest stable version ('${LATEST}') or the readme.txt value ('${TESTED}')."
+                    exit 1
+                  fi
+                  # readme.txt may legitimately run ahead of the API when it already
+                  # names an upcoming release; only an older value needs a bump.
+                  if [[ "$(printf '%s\n' "$TESTED" "$LATEST" | sort --version-sort | tail -n 1)" == "$TESTED" ]]; then
+                    echo "readme.txt lists ${TESTED} and the latest stable version is ${LATEST}. Nothing to do."
+                    exit 0
+                  fi
+                  # The readme should not claim a WordPress version the plugin has no
+                  # wp/X.Y branch for yet; the branch is cut by the release process.
+                  if ! git ls-remote --exit-code --heads origin "wp/${LATEST}" > /dev/null; then
+                    echo "WordPress ${LATEST} is stable but the wp/${LATEST} branch does not exist yet. Trying again on the next scheduled run."
+                    exit 0
+                  fi
+                  if git ls-remote --exit-code --heads origin "update/tested-up-to-${LATEST}" > /dev/null; then
+                    echo "The update/tested-up-to-${LATEST} branch already exists, so a bump was already proposed."
+                    exit 0
+                  fi
+                  echo "version=${LATEST}" >> "$GITHUB_OUTPUT"
+
+            - name: Configure Git user name
+              if: steps.check.outputs.version
+              run: git config user.name '${{ steps.app-token.outputs.app-slug }}[bot]'
+
+            - name: Configure Git user email
+              if: steps.check.outputs.version
+              env:
+                  APP_USER_ID: ${{ vars.APP_USER_ID }}
+              run: git config user.email "${APP_USER_ID}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com"
+
+            - name: Create the pull request
+              if: steps.check.outputs.version
+              env:
+                  GH_TOKEN: ${{ steps.app-token.outputs.token }}
+                  VERSION: ${{ steps.check.outputs.version }}
+              run: |
+                  BRANCH="update/tested-up-to-${VERSION}"
+                  git checkout -b "$BRANCH"
+                  sed -i "s/^Tested up to: .*/Tested up to: ${VERSION}/" readme.txt
+                  git add readme.txt
+                  git commit -m "Plugin: Bump \"Tested up to\" to WordPress ${VERSION}"
+                  git push --set-upstream origin "$BRANCH"
+                  gh pr create \
+                    --base trunk \
+                    --head "$BRANCH" \
+                    --title "Plugin: Bump \"Tested up to\" to WordPress ${VERSION}" \
+                    --body "WordPress ${VERSION} is now the latest stable release according to [the version check API](https://api.wordpress.org/core/stable-check/1.0/), and the \`wp/${VERSION}\` branch exists, so the plugin's \`readme.txt\` should say it is tested up to ${VERSION}.
+
+                  This pull request was opened automatically by the \`bump-tested-up-to.yml\` workflow. It only changes \`readme.txt\`; the larger follow-up chore of raising the minimum required WordPress version and removing old compatibility code is a separate, manual pull request."
+                  gh pr edit "$BRANCH" --add-label 'Gutenberg Plugin' --add-label '[Type] Enhancement' ||
+                    echo "Could not add labels to the pull request; add them manually."
