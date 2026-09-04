@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### New Features
-
--   Add a responsive `Breadcrumb` navigation component. ([#80425](https://github.com/WordPress/gutenberg/pull/80425))
-
 ### Breaking Changes
 
 -   `Autocomplete.Popup`, `Combobox.Popup`, `Select.Popup`, `SearchableChipSelect`, and `SearchableChipSelectControl`: The popup now defaults to a fixed anchor width. Use `width="content"` on Popups, or `popupWidth="content"` on composites, to restore content-sized width between the anchor and available viewport bounds ([#82087](https://github.com/WordPress/gutenberg/pull/82087), [#82193](https://github.com/WordPress/gutenberg/pull/82193)).
@@ -13,7 +9,11 @@
 
 ### New Features
 
+-   Add a responsive `Breadcrumb` navigation component. ([#80425](https://github.com/WordPress/gutenberg/pull/80425))
+-   Add `SearchableSelect` form primitive ([#80961](https://github.com/WordPress/gutenberg/pull/80961)).
 -   Add `Field.VisualLabel` for a purely visual label outside `Field.Root` ([#82095](https://github.com/WordPress/gutenberg/pull/82095)).
+-   Add a responsive `Breadcrumb` navigation component. ([#80425](https://github.com/WordPress/gutenberg/pull/80425))
+-   `Menu`: Add `PrefixIcon` for label-aligned prefix icons, with a default size of 24px. ([#82346](https://github.com/WordPress/gutenberg/pull/82346))
 
 ### Enhancements
 
@@ -27,16 +27,23 @@
 
 ### Bug Fixes
 
+-   `Menu.LinkItem`: Show the new-tab indicator and accessible notice when `target` is an ASCII case-insensitive match for `"_blank"`. ([#82442](https://github.com/WordPress/gutenberg/pull/82442))
 -   `Input`, `Textarea`, `InputControl`, `TextareaControl`: Use `--wpds-color-foreground-interactive-neutral-weak` for enabled placeholder text so it meets the 4.5:1 contrast minimum ([#82304](https://github.com/WordPress/gutenberg/pull/82304)).
 -   `SearchableChipSelect`, `SearchableChipSelectControl`: Fix the gray background on disabled search fields in WordPress admin ([#82304](https://github.com/WordPress/gutenberg/pull/82304)).
 -   `ValidityIndicator`: Remove the built-in outer margin. Spacing belongs on the consumer. `ControlWithError` now uses `Stack` with `gap="sm"` so validated controls keep the same gap. ([#82267](https://github.com/WordPress/gutenberg/pull/82267))
 -   `AlertDialog`: Use a neutral tone for the cancel button. ([#82261](https://github.com/WordPress/gutenberg/pull/82261))
 -   `Input`: Hide the field focus ring when a prefix or suffix slot control is focused. ([#82257](https://github.com/WordPress/gutenberg/pull/82257))
 -   `Icon`: Merge a consumer-supplied `style` prop with the icon's intrinsic styles instead of replacing them, so styles like `fill: none` on stroke-based icons survive unless the consumer overrides the same property explicitly. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+-   `Menu`: Align selection indicators and prefix icons with the first label line, including wrapped labels and items with descriptions, and improve checkbox checkmarks' optical alignment. ([#82346](https://github.com/WordPress/gutenberg/pull/82346))
 
 ### Documentation
 
 -   Add a Form best practices Storybook page for labeling composed controls ([#82197](https://github.com/WordPress/gutenberg/pull/82197)).
+
+### Internal
+
+-   `AlertDialog`: Move confirmation lifecycle state to a private external store so event handlers and React renders read the same synchronous snapshot. ([#82131](https://github.com/WordPress/gutenberg/pull/82131))
+-   Use stable event callbacks and remove the remaining `react-hooks/refs` ESLint suppressions. ([#82131](https://github.com/WordPress/gutenberg/pull/82131))
 
 ## 0.21.0 (2026-08-26)
 

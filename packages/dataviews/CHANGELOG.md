@@ -36,6 +36,7 @@
 
 ### Enhancements
 
+-   Validated form controls: Use `--wpds-color-stroke-interactive-error` for the invalid-state focus ring and border ([#82410](https://github.com/WordPress/gutenberg/pull/82410)).
 -   DataForm: Communicate the timezone a `datetime` value is edited in. When the site timezone differs from the visitor's, the control renders help text under the input naming the site timezone: the zone name (e.g. `(CEST) Europe/Madrid`) or the UTC offset for sites pinned to one ([#82291](https://github.com/WordPress/gutenberg/pull/82291)).
 -   Export the `DataViewsProps` and `ItemWithId` types ([#82326](https://github.com/WordPress/gutenberg/pull/82326)).
 -   Export the `DataViewsProps` and `ItemWithId` types and document every type property ([#82326](https://github.com/WordPress/gutenberg/pull/82326)).
@@ -50,6 +51,7 @@
 
 ### Internal
 
+-   DataViews: Use `Menu.PrefixIcon` for table column menu icons. ([#82346](https://github.com/WordPress/gutenberg/pull/82346))
 -   DataForm date control: Space `ValidityIndicator` with `Stack` now that the indicator has no outer margin. ([#82267](https://github.com/WordPress/gutenberg/pull/82267))
 -   Add a `HierarchicalLevels` story that demonstrates `getItemLevel` and `view.showLevels` in the table layout ([#82344](https://github.com/WordPress/gutenberg/pull/82344)).
 -   Remove unused dependency `@wordpress/primitives` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
