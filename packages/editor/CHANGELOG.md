@@ -16,6 +16,7 @@
 
 ### Enhancements
 
+-   Pattern editor: The summary panel reports where a synced pattern is used, listing the entries that would lose it if it were deleted. The counts come from the `wp/v2/blocks/<id>/usage` route the Gutenberg plugin registers, so the section is left out on a plain WordPress install ([#58990](https://github.com/WordPress/gutenberg/issues/58990)).
 -   Post actions: Append an ellipsis (`…`) to the "Set as homepage" and "Set as posts page" action labels, which open a confirmation dialog, following the menu ellipsis guideline. The dialog titles keep the ellipsis-free wording. ([#81994](https://github.com/WordPress/gutenberg/pull/81994))
 
 ### Bug Fixes

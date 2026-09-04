@@ -1,0 +1,33 @@
+.editor-post-pattern-usage {
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
+.editor-post-pattern-usage__trigger {
+	align-items: center;
+	background: none;
+	border: none;
+	color: inherit;
+	cursor: var(--wpds-cursor-control);
+	display: flex;
+	font: inherit;
+	gap: var(--wpds-dimension-gap-xs);
+	padding: 0;
+	text-align: start;
+}
+
+.editor-post-pattern-usage__chevron {
+	fill: currentColor;
+	flex-shrink: 0;
+
+	@media not (prefers-reduced-motion) {
+		transition: rotate 0.15s ease-out;
+	}
+
+	.editor-post-pattern-usage__trigger[data-panel-open] & {
+		rotate: 180deg;
+	}
+}
+
+.editor-post-pattern-usage__list {
+	padding-top: var(--wpds-dimension-gap-xs);
+}
