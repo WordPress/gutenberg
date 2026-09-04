@@ -52,8 +52,10 @@ class Tests_Icons_WpGetIcon extends WP_UnitTestCase {
 
 	public function test_wp_get_icon_size_null_leaves_dimensions_untouched() {
 		$output = wp_get_icon( 'core/plus', array( 'size' => null ) );
-		$this->assertStringNotContainsString( 'width=', $output );
-		$this->assertStringNotContainsString( 'height=', $output );
+		// Match the attributes themselves: a bare `width=` substring also
+		// appears inside `stroke-width=` on stroke-based icons such as Plus.
+		$this->assertDoesNotMatchRegularExpression( '/\swidth=/', $output );
+		$this->assertDoesNotMatchRegularExpression( '/\sheight=/', $output );
 	}
 
 	public function test_wp_get_icon_size_zero_outputs_zero_dimensions() {
