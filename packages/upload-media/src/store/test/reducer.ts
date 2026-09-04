@@ -681,6 +681,7 @@ describe( 'reducer', () => {
 				queueStatus: 'active',
 				failureCount: 0,
 				blobUrls: { '1': [ 'blob:foo' ] },
+				operations: {},
 				settings: {
 					mediaUpload: vi.fn(),
 					maxConcurrentUploads: 5,
