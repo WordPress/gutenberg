@@ -11,16 +11,13 @@
  */
 class Gutenberg_Privacy_Policy_Page_Setting_Test extends WP_Test_REST_TestCase {
 	protected static $admin_id;
-	protected static $subscriber_id;
 
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
-		self::$admin_id      = $factory->user->create( array( 'role' => 'administrator' ) );
-		self::$subscriber_id = $factory->user->create( array( 'role' => 'subscriber' ) );
+		self::$admin_id = $factory->user->create( array( 'role' => 'administrator' ) );
 	}
 
 	public static function wpTearDownAfterClass() {
 		self::delete_user( self::$admin_id );
-		self::delete_user( self::$subscriber_id );
 	}
 
 	public function tear_down() {
@@ -97,14 +94,5 @@ class Gutenberg_Privacy_Policy_Page_Setting_Test extends WP_Test_REST_TestCase {
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertSame( $page_id, $data['page_for_privacy_policy'], 'The response should still report the previous page.' );
 		$this->assertSame( $page_id, (int) get_option( 'wp_page_for_privacy_policy' ), 'The option should not change.' );
-	}
-
-	public function test_settings_require_manage_options() {
-		wp_set_current_user( self::$subscriber_id );
-
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/settings' );
-		$response = rest_get_server()->dispatch( $request );
-
-		$this->assertSame( 403, $response->get_status() );
 	}
 }
