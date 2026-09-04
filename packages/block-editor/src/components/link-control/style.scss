@@ -160,10 +160,8 @@ $block-editor-link-control-number-of-actions: 1;
 		white-space: nowrap; // tags shouldn't go over two lines.
 	}
 
-	&:has(.components-menu-item__info-wrapper) {
-		&.components-button.components-menu-item__button {
-			align-items: flex-start;
-		}
+	&:has(.block-editor-link-control__search-item-icon) {
+		align-items: flex-start;
 
 		.components-menu-item__item {
 			white-space: normal;
