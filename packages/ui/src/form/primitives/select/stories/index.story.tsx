@@ -267,7 +267,7 @@ export const WithLongList: Story = {
 		items: longListItems,
 		defaultValue: longListItems[ 17 ],
 		children: [
-			<Select.Trigger key="trigger" />,
+			<Select.Trigger aria-label="Item" key="trigger" />,
 			<Select.Popup key="popup">
 				{ longListItems.map( ( item ) => (
 					<Select.Item key={ item.value } value={ item }>
