@@ -894,6 +894,62 @@ test.describe( 'List (@firefox)', () => {
 		);
 	} );
 
+	test( 'should indent into the last nested list when an item has several', async ( {
+		editor,
+	} ) => {
+		// A list item can hold more than one nested list. Indenting a sibling
+		// into it should append to the last nested list, not the first.
+		await editor.setContent(
+			`<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>A<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>x</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>y</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>B</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
+		);
+
+		await editor.canvas.getByText( 'B', { exact: true } ).click();
+		await editor.clickBlockToolbarButton( 'Indent' );
+
+		// "B" joins "y" in the last nested list, after it.
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>A
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>x</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>y</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>B</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
+		);
+	} );
+
 	test( 'should outdent with children', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/list' } );
 		await page.keyboard.type( 'a' );
