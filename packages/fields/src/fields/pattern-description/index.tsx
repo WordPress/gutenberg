@@ -23,7 +23,7 @@ const patternDescriptionField: Field< Pattern > = {
 	},
 	Edit: {
 		control: 'textarea',
-		rows: 4,
+		rows: 2,
 	},
 	enableSorting: false,
 	enableHiding: false,

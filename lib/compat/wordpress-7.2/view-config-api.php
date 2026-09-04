@@ -25,7 +25,7 @@ function _gutenberg_add_reading_settings_to_wp_template_view_config( $data ) {
 					array(
 						'id'     => 'description',
 						'layout' => array(
-							'type'          => 'panel',
+							'type'          => 'regular',
 							'labelPosition' => 'top',
 						),
 					),
@@ -152,17 +152,48 @@ function _gutenberg_add_group_summaries_to_default_posttype_form( $data ) {
 }
 
 /**
- * Layers the group summaries on top of the view configuration of every post
- * type that uses the default form, including custom post types registered at
- * any point.
+ * Renders the `excerpt` field inline with the regular layout instead of the
+ * panel summary and its edit popover.
  *
- * The callback merges by member id, and a member that is absent would be
+ * The textarea and its placeholder show that the field is editable even when
+ * the excerpt is empty, which the panel summary cannot without a rendered
+ * value. The patch merges into the existing member by id, leaving its position
+ * in the form untouched.
+ *
+ * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
+ * @return Gutenberg_View_Config_Data The updated view configuration container.
+ */
+function _gutenberg_use_regular_layout_for_excerpt( $data ) {
+	return $data->merge(
+		array(
+			'form' => array(
+				'fields' => array(
+					array(
+						'id'     => 'excerpt',
+						'layout' => array(
+							'type'          => 'regular',
+							'labelPosition' => 'top',
+						),
+					),
+				),
+			),
+		),
+		1
+	);
+}
+
+/**
+ * Layers the group summaries and the regular excerpt layout on top of the view
+ * configuration of every post type that uses the default form, including
+ * custom post types registered at any point.
+ *
+ * The callbacks merge by member id, and a member that is absent would be
  * appended instead, so post types whose base definition provides its own form
  * are skipped.
  *
  * @param string $post_type The post type being registered.
  */
-function gutenberg_register_default_posttype_form_summaries_7_2( $post_type ) {
+function gutenberg_register_default_posttype_form_layers_7_2( $post_type ) {
 	if ( in_array( $post_type, GUTENBERG_VIEW_CONFIG_POST_TYPES_WITH_OWN_FORM, true ) ) {
 		return;
 	}
@@ -173,8 +204,14 @@ function gutenberg_register_default_posttype_form_summaries_7_2( $post_type ) {
 		6,
 		1
 	);
+	add_filter(
+		gutenberg_get_entity_view_config_hook_name( 'postType', $post_type ),
+		'_gutenberg_use_regular_layout_for_excerpt',
+		6,
+		1
+	);
 }
-add_action( 'registered_post_type', 'gutenberg_register_default_posttype_form_summaries_7_2' );
+add_action( 'registered_post_type', 'gutenberg_register_default_posttype_form_layers_7_2' );
 
 /**
  * Registers the entity view configuration filters that layer on top of the base
@@ -187,6 +224,12 @@ function gutenberg_register_entity_view_config_filters_7_2() {
 		gutenberg_get_entity_view_config_hook_name( 'postType', 'wp_navigation' ),
 		'_gutenberg_get_entity_view_config_posttype_wp_navigation',
 		5,
+		1
+	);
+	add_filter(
+		gutenberg_get_entity_view_config_hook_name( 'postType', 'wp_block' ),
+		'_gutenberg_use_regular_layout_for_excerpt',
+		6,
 		1
 	);
 	add_filter(

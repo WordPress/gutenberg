@@ -36,8 +36,8 @@ test.describe( 'Sidebar (DataForm inspector)', () => {
 			'Tags',
 		] );
 		// Also check 'panels' that are not rendered as TabPanels.
-		const postExcerptPanel = page.getByRole( 'button', {
-			name: 'Edit Excerpt',
+		const postExcerptPanel = page.getByRole( 'textbox', {
+			name: 'Excerpt',
 		} );
 		const postFeaturedImagePanel = page.getByRole( 'button', {
 			name: 'Set featured image',
