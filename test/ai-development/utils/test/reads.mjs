@@ -116,6 +116,16 @@ test( 'a refused read does not count as read', () => {
 	assert.match( verdict.reason, /failed/ );
 } );
 
+test( 'a successful relative read recovers from a refused full-path read', () => {
+	const verdict = grade( assertRead( REFERENCE, 'read' ), [
+		call( `cat ${ workspacePath }`, 'Operation not permitted', true ),
+		call( 'cd .claude/skills/testing/references && cat e2e.md', CONTENTS ),
+	] );
+
+	assert.equal( verdict.pass, true, verdict.reason );
+	assert.equal( verdict.score, 1 );
+} );
+
 test( 'never opening the file does not count as read', () => {
 	const verdict = grade( assertRead( REFERENCE, 'read' ), [
 		call( 'ls test/e2e/specs', 'paragraph.spec.js' ),

@@ -71,6 +71,43 @@ async function resolveTree() {
 }
 
 /**
+ * Removes settings that can weaken an evaluation and generates Claude's skill
+ * catalog without following a repository-supplied `.claude` symlink.
+ *
+ * @param {string} repositoryRoot Repository whose Claude directory to prepare.
+ */
+export async function prepareClaudeDirectory( repositoryRoot ) {
+	const claudeDirectory = path.join( repositoryRoot, '.claude' );
+
+	try {
+		if ( ( await fs.lstat( claudeDirectory ) ).isSymbolicLink() ) {
+			await fs.unlink( claudeDirectory );
+		}
+	} catch ( error ) {
+		if ( error.code !== 'ENOENT' ) {
+			throw error;
+		}
+	}
+
+	// A project settings file merges into the sandbox configuration:
+	// `filesystem.allowRead` and `network.allowedDomains` are honored from
+	// every settings source, so a branch under evaluation that force-added
+	// `.claude/settings.json` could re-open reads and the network for its own
+	// evaluation. Hooks have a programmatic off switch (`disableAllHooks`);
+	// sandbox weakening does not, so the files are removed before the base
+	// commit is made, which also keeps them out of every rollback.
+	for ( const file of [ 'settings.json', 'settings.local.json' ] ) {
+		await fs.rm( path.join( claudeDirectory, file ), { force: true } );
+	}
+
+	// A real checkout gets `.claude/skills` from `npm run agents:setup`. It is
+	// ignored by Git, so it is absent from the archive, and the workspace never
+	// runs npm — without it the repository's skills are inert files that
+	// nothing announces to the agent.
+	await setupSkills( { repositoryRoot } );
+}
+
+/**
  * Builds the workspace, replacing anything a previous run left behind.
  */
 async function createWorkspace() {
@@ -97,25 +134,7 @@ async function createWorkspace() {
 		force: true,
 	} );
 
-	// A project settings file merges into the sandbox configuration:
-	// `filesystem.allowRead` and `network.allowedDomains` are honored from
-	// every settings source, so a branch under evaluation that force-added
-	// `.claude/settings.json` could re-open reads and the network for its own
-	// evaluation. Hooks have a programmatic off switch (`disableAllHooks`);
-	// sandbox weakening does not, so the files are removed before the base
-	// commit is made, which also keeps them out of every rollback.
-	for ( const file of [
-		'.claude/settings.json',
-		'.claude/settings.local.json',
-	] ) {
-		await fs.rm( path.join( workspace, file ), { force: true } );
-	}
-
-	// A real checkout gets `.claude/skills` from `npm run agents:setup`. It is
-	// ignored by Git, so it is absent from the archive, and the workspace never
-	// runs npm — without it the repository's skills are inert files that
-	// nothing announces to the agent.
-	await setupSkills( { repositoryRoot: workspace } );
+	await prepareClaudeDirectory( workspace );
 
 	// A repository, not just files: the agent is expected to inspect history,
 	// the suites grade what ends up in the working tree, and `afterEach` needs
@@ -145,7 +164,7 @@ async function resetWorkspace() {
 	await restoreTrustedGitMetadata();
 	await git( workspace, [ 'reset', '--quiet', '--hard', baseTag ] );
 	await git( workspace, [ 'clean', '--quiet', '-fdx' ] );
-	await setupSkills( { repositoryRoot: workspace } );
+	await prepareClaudeDirectory( workspace );
 }
 
 async function removeWorkspace() {

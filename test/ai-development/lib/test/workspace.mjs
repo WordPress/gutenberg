@@ -7,7 +7,59 @@ import { randomUUID } from 'node:crypto';
 import withWorkspaceChanges from '../diff.js';
 import { git } from '../git.mjs';
 import { workspace } from '../paths.js';
-import { extensionHook } from '../workspace.mjs';
+import { extensionHook, prepareClaudeDirectory } from '../workspace.mjs';
+
+test( 'replaces a .claude symlink without changing its target', async ( t ) => {
+	const fixtureRoot = fs.mkdtempSync(
+		path.join( os.tmpdir(), 'gutenberg-eval-symlink-' )
+	);
+	const repositoryRoot = path.join( fixtureRoot, 'repository' );
+	const outsideClaudeDirectory = path.join( fixtureRoot, 'outside-claude' );
+	const outsideSettings = path.join(
+		outsideClaudeDirectory,
+		'settings.json'
+	);
+	const outsideSkill = path.join(
+		outsideClaudeDirectory,
+		'skills/original/SKILL.md'
+	);
+	const repositorySkill = path.join(
+		repositoryRoot,
+		'.agents/skills/testing/SKILL.md'
+	);
+
+	t.after( () => fs.rmSync( fixtureRoot, { recursive: true, force: true } ) );
+
+	fs.mkdirSync( path.dirname( outsideSkill ), { recursive: true } );
+	fs.mkdirSync( path.dirname( repositorySkill ), { recursive: true } );
+	fs.writeFileSync( outsideSettings, '{ "outside": true }' );
+	fs.writeFileSync( outsideSkill, 'outside skill' );
+	fs.writeFileSync( repositorySkill, 'repository skill' );
+	fs.symlinkSync(
+		outsideClaudeDirectory,
+		path.join( repositoryRoot, '.claude' ),
+		process.platform === 'win32' ? 'junction' : 'dir'
+	);
+
+	await prepareClaudeDirectory( repositoryRoot );
+
+	assert.equal(
+		fs.readFileSync( outsideSettings, 'utf8' ),
+		'{ "outside": true }'
+	);
+	assert.equal( fs.readFileSync( outsideSkill, 'utf8' ), 'outside skill' );
+	assert.equal(
+		fs.readFileSync(
+			path.join( repositoryRoot, '.claude/skills/testing/SKILL.md' ),
+			'utf8'
+		),
+		'repository skill'
+	);
+	assert.equal(
+		fs.lstatSync( path.join( repositoryRoot, '.claude' ) ).isDirectory(),
+		true
+	);
+} );
 
 test( 'restores trusted Git metadata and ignored state between rows', async ( t ) => {
 	const filterMarker = path.join(

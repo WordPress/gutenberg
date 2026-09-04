@@ -1,5 +1,5 @@
 /**
- * Runs each evaluation config separately on every supported platform.
+ * Runs each evaluation config separately and opens their shared result viewer.
  */
 import { spawn } from 'node:child_process';
 import fs from 'node:fs/promises';
@@ -67,6 +67,11 @@ function runPromptfoo( args ) {
 
 async function main() {
 	const [ mode, ...args ] = process.argv.slice( 2 );
+
+	if ( mode === 'view' ) {
+		await runPromptfoo( [ 'view', ...args ] );
+		return;
+	}
 
 	if ( mode === 'eval' && args.includes( '--config' ) ) {
 		await runPromptfoo( [ 'eval', ...args ] );

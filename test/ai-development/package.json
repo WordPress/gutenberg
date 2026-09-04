@@ -46,6 +46,6 @@
 		"test:utils": "node --test \"lib/test/*.mjs\" \"utils/test/*.mjs\"",
 		"preeval": "npm run check:node",
 		"eval": "node lib/run-configs.mjs eval",
-		"view": "promptfoo view"
+		"view": "node lib/run-configs.mjs view"
 	}
 }

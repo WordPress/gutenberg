@@ -138,7 +138,7 @@ export function assertRead( file, metric ) {
 				};
 			}
 
-			if ( attempts && ! successfulAttempts ) {
+			if ( attempts && ! successfulAttempts && ! found ) {
 				return {
 					pass: false,
 					score: 0,
