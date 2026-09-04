@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { ToolbarButton } from '@wordpress/components';
+import { Button, ToolbarItem } from '@wordpress/components';
 import { NavigableToolbar } from '@wordpress/block-editor';
 import { createPortal, useEffect, useState } from '@wordpress/element';
 import { displayShortcut, isAppleOS } from '@wordpress/keycodes';
@@ -41,26 +41,37 @@ function Header( {
 					className="customize-widgets-header-toolbar"
 					aria-label={ __( 'Document tools' ) }
 				>
-					<ToolbarButton
+					<ToolbarItem
+						as={ Button }
 						icon={ ! isRTL() ? undoIcon : redoIcon }
 						/* translators: button label text should, if possible, be under 16 characters. */
 						label={ __( 'Undo' ) }
 						shortcut={ displayShortcut.primary( 'z' ) }
-						disabled={ ! hasUndo }
-						onClick={ sidebar.undo }
+						// If there are no undo levels we don't want to actually disable this
+						// button, because it will remove focus for keyboard users.
+						// See: https://github.com/WordPress/gutenberg/issues/3486
+						aria-disabled={ ! hasUndo }
+						onClick={ hasUndo ? sidebar.undo : undefined }
+						size="compact"
 						className="customize-widgets-editor-history-button undo-button"
 					/>
-					<ToolbarButton
+					<ToolbarItem
+						as={ Button }
 						icon={ ! isRTL() ? redoIcon : undoIcon }
 						/* translators: button label text should, if possible, be under 16 characters. */
 						label={ __( 'Redo' ) }
 						shortcut={ shortcut }
-						disabled={ ! hasRedo }
-						onClick={ sidebar.redo }
+						// If there are no redo levels we don't want to actually disable this
+						// button, because it will remove focus for keyboard users.
+						// See: https://github.com/WordPress/gutenberg/issues/3486
+						aria-disabled={ ! hasRedo }
+						onClick={ hasRedo ? sidebar.redo : undefined }
+						size="compact"
 						className="customize-widgets-editor-history-button redo-button"
 					/>
 
-					<ToolbarButton
+					<ToolbarItem
+						as={ Button }
 						className="customize-widgets-header-toolbar__inserter-toggle"
 						isPressed={ isInserterOpened }
 						variant="primary"
@@ -72,6 +83,7 @@ function Header( {
 						onClick={ () => {
 							setIsInserterOpened( ( isOpen ) => ! isOpen );
 						} }
+						size="compact"
 					/>
 					<MoreMenu />
 				</NavigableToolbar>

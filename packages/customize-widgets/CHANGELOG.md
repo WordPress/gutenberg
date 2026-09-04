@@ -6,6 +6,10 @@
 
 -   Error boundary: Surface debugging details ([#{TODO}](https://github.com/WordPress/gutenberg/pull/{TODO})).
 
+### Bug Fixes
+
+-   Use `aria-disabled` for the Undo and Redo buttons of the document tools so they stay focusable when there is nothing to undo or redo, and make the focus style of all the document tools buttons visible ([#82412](https://github.com/WordPress/gutenberg/pull/82412)).
+
 ### Internal
 
 -   Remove unused dependency `@wordpress/interface` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
