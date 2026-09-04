@@ -1,11 +1,23 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { click } from '@ariakit/test';
 import { speak } from '@wordpress/a11y';
+import { createContext, useContext, useState } from '@wordpress/element';
 import { SVG, Path } from '@wordpress/primitives';
 import Snackbar from '../index';
 
 jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
 const mockedSpeak = jest.mocked( speak );
+
+const TestContext = createContext( 'context-value' );
+
+// A child using hooks, like any `contextConnect`-ed or Emotion-styled
+// component. Regression case for
+// https://github.com/WordPress/gutenberg/issues/61199.
+function ChildWithHooks() {
+	const value = useContext( TestContext );
+	const [ text ] = useState( 'stateful' );
+	return <span>{ value + ':' + text }</span>;
+}
 
 describe( 'Snackbar', () => {
 	const testId = 'snackbar';
@@ -277,6 +289,66 @@ describe( 'Snackbar', () => {
 			);
 
 			expect( speak ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'should speak a spokenMessage element that is distinct from children', () => {
+			render(
+				<Snackbar spokenMessage={ <em>Custom message</em> }>
+					Visible content
+				</Snackbar>
+			);
+
+			expect( speak ).toHaveBeenCalledWith(
+				'<em>Custom message</em>',
+				'polite'
+			);
+		} );
+
+		it( 'should not speak when spokenMessage is null', () => {
+			render( <Snackbar spokenMessage={ null }>FYI</Snackbar> );
+
+			expect( speak ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should speak the same message again after an empty message', () => {
+			const { rerender } = render(
+				<Snackbar spokenMessage="Saved">Content</Snackbar>
+			);
+			rerender( <Snackbar spokenMessage="">Content</Snackbar> );
+			rerender( <Snackbar spokenMessage="Saved">Content</Snackbar> );
+
+			expect( speak ).toHaveBeenCalledTimes( 2 );
+			expect( speak ).toHaveBeenNthCalledWith( 1, 'Saved', 'polite' );
+			expect( speak ).toHaveBeenNthCalledWith( 2, 'Saved', 'polite' );
+		} );
+
+		it( 'should speak a message containing components that use hooks', () => {
+			render(
+				<Snackbar>
+					Saving
+					<ChildWithHooks />
+				</Snackbar>
+			);
+
+			expect( speak ).toHaveBeenCalledWith(
+				'Saving<span>context-value:stateful</span>',
+				'polite'
+			);
+		} );
+
+		// Regression test for https://github.com/WordPress/gutenberg/issues/61199.
+		it( 'should not crash when a child using hooks is conditionally rendered', () => {
+			const { rerender } = render(
+				<Snackbar>
+					Saving
+					<ChildWithHooks />
+				</Snackbar>
+			);
+
+			expect( () =>
+				rerender( <Snackbar>Saved</Snackbar> )
+			).not.toThrow();
+			expect( speak ).toHaveBeenLastCalledWith( 'Saved', 'polite' );
 		} );
 	} );
 } );

@@ -1,5 +1,5 @@
 import { speak } from '@wordpress/a11y';
-import { forwardRef, renderToString, useEffect } from '@wordpress/element';
+import { forwardRef, useEffect, useRef } from '@wordpress/element';
 import { info, published, error, caution } from '@wordpress/icons';
 import { useRender, mergeProps } from '@base-ui/react';
 import clsx from 'clsx';
@@ -26,39 +26,54 @@ function getDefaultPoliteness( intent: NoticeIntent ): 'polite' | 'assertive' {
 }
 
 /**
- * Safely converts a message to a string for screen reader announcement.
- * Returns undefined if the message can't be safely serialized.
- */
-function safeRenderToString( message: RootProps[ 'spokenMessage' ] ) {
-	if ( ! message ) {
-		return undefined;
-	}
-	if ( typeof message === 'string' ) {
-		return message;
-	}
-	try {
-		return renderToString( message );
-	} catch {
-		// If renderToString fails (e.g., due to complex components like Tooltip),
-		// return undefined and skip the announcement
-		return undefined;
-	}
-}
-
-/**
- * Custom hook which announces the message with the given politeness.
+ * Custom hook which announces the message with the given politeness. Passing
+ * `null` or `undefined` as the message skips the announcement.
+ *
+ * A non-string message is read from the DOM node the returned ref is attached
+ * to, rather than serialized with `renderToString`. Serializing during render
+ * invokes the message components as plain functions, so any hooks they use
+ * would be registered against the component rendering the notice, crashing it
+ * when the message changes shape. See
+ * https://github.com/WordPress/gutenberg/issues/61199.
  */
 function useSpokenMessage(
 	message: RootProps[ 'spokenMessage' ],
 	politeness: 'polite' | 'assertive'
 ) {
-	const spokenMessage = safeRenderToString( message );
+	const messageContainerRef = useRef< HTMLDivElement >( null );
+	const previouslySpokenRef = useRef< {
+		message: string;
+		politeness: 'polite' | 'assertive';
+	} >();
 
 	useEffect( () => {
-		if ( spokenMessage ) {
+		let spokenMessage;
+		if ( typeof message === 'string' ) {
+			spokenMessage = message;
+		} else if ( message !== null && message !== undefined ) {
+			spokenMessage = messageContainerRef.current?.innerHTML;
+		}
+
+		if ( ! spokenMessage ) {
+			// An empty message resets the deduplication, so that a
+			// subsequent identical message is announced again.
+			previouslySpokenRef.current = undefined;
+			return;
+		}
+
+		if (
+			spokenMessage !== previouslySpokenRef.current?.message ||
+			politeness !== previouslySpokenRef.current?.politeness
+		) {
+			previouslySpokenRef.current = {
+				message: spokenMessage,
+				politeness,
+			};
 			speak( spokenMessage, politeness );
 		}
-	}, [ spokenMessage, politeness ] );
+	} );
+
+	return messageContainerRef;
 }
 
 /**
@@ -95,7 +110,18 @@ export const Root = forwardRef< HTMLDivElement, RootProps >( function Notice(
 ) {
 	// Announce to screen readers via speak() API - no role attribute needed
 	// as it would cause double announcements
-	useSpokenMessage( spokenMessage, politeness );
+	const spokenMessageRef = useSpokenMessage( spokenMessage, politeness );
+
+	// When `spokenMessage` is a distinct element (not the default `children`
+	// and not a string), it has no place in the rendered output to read the
+	// announcement from, so render it in a hidden container. Otherwise the
+	// message is read from a wrapper around the children, so that the
+	// generated icon is not part of it.
+	const isSpokenMessageDistinctElement =
+		typeof spokenMessage !== 'string' &&
+		spokenMessage !== children &&
+		spokenMessage !== null &&
+		spokenMessage !== undefined;
 
 	const iconElement = icon === null ? null : icon ?? icons[ intent ];
 
@@ -114,12 +140,30 @@ export const Root = forwardRef< HTMLDivElement, RootProps >( function Notice(
 				className: mergedClassName,
 				children: (
 					<>
-						{ children }
+						{ /* `display: contents` keeps the wrapper out of the
+						grid layout while providing a node scoped to the
+						default spoken message (the children) for
+						`useSpokenMessage` to read. */ }
+						<div
+							ref={
+								isSpokenMessageDistinctElement
+									? undefined
+									: spokenMessageRef
+							}
+							style={ { display: 'contents' } }
+						>
+							{ children }
+						</div>
 						{ iconElement && (
 							<Icon
 								className={ styles.icon }
 								icon={ iconElement }
 							/>
+						) }
+						{ isSpokenMessageDistinctElement && (
+							<div hidden ref={ spokenMessageRef }>
+								{ spokenMessage }
+							</div>
 						) }
 					</>
 				),

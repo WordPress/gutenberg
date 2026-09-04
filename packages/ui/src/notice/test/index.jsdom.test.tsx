@@ -1,7 +1,22 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createRef } from '@wordpress/element';
+import {
+	createContext,
+	createRef,
+	useContext,
+	useState,
+} from '@wordpress/element';
 import * as Notice from '../index';
+
+const TestContext = createContext( 'context-value' );
+
+// A child using hooks. Regression case for
+// https://github.com/WordPress/gutenberg/issues/61199.
+function ChildWithHooks() {
+	const value = useContext( TestContext );
+	const [ text ] = useState( 'stateful' );
+	return <span>{ value + ':' + text }</span>;
+}
 
 describe( 'Notice', () => {
 	describe( 'basic behaviour', () => {
@@ -199,6 +214,39 @@ describe( 'Notice', () => {
 			expect(
 				screen.getByText( 'Something failed.', {
 					selector: '[aria-live="assertive"]',
+				} )
+			).toBeInTheDocument();
+		} );
+
+		it( 'announces a spokenMessage element distinct from children', () => {
+			render(
+				<Notice.Root spokenMessage={ <em>Custom message</em> }>
+					<Notice.Description>Visible content</Notice.Description>
+				</Notice.Root>
+			);
+			expect(
+				screen.getByText( 'Custom message', {
+					selector: '[aria-live="polite"]',
+				} )
+			).toBeInTheDocument();
+		} );
+
+		// Regression test for
+		// https://github.com/WordPress/gutenberg/issues/61199.
+		it( 'does not crash when a child using hooks is conditionally rendered', () => {
+			const { rerender } = render(
+				<Notice.Root>
+					Saving
+					<ChildWithHooks />
+				</Notice.Root>
+			);
+
+			expect( () =>
+				rerender( <Notice.Root>Saved</Notice.Root> )
+			).not.toThrow();
+			expect(
+				screen.getByText( 'Saved', {
+					selector: '[aria-live="polite"]',
 				} )
 			).toBeInTheDocument();
 		} );
