@@ -286,6 +286,73 @@ describe( 'SearchableChipSelect', () => {
 			).toHaveLength( 1 );
 		} );
 
+		it( 'selects the creatable item by keyboard when the query matches no item label', async () => {
+			const user = userEvent.setup();
+			const onValueChange = jest.fn();
+
+			render(
+				<SearchableChipSelect
+					items={ [ ...ITEMS, creatableItem ] }
+					onValueChange={ onValueChange }
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+			await user.click( input );
+			await user.type( input, 'xyzzy' );
+
+			await waitFor( () => {
+				expect(
+					screen.getByRole( 'option', { name: 'Create new item' } )
+				).toBeVisible();
+			} );
+			expect(
+				screen.queryByRole( 'option', { name: 'Apple' } )
+			).not.toBeInTheDocument();
+
+			await user.keyboard( '{ArrowDown}{Enter}' );
+
+			expect( onValueChange ).toHaveBeenCalledWith(
+				expect.arrayContaining( [
+					expect.objectContaining( { value: '__create__' } ),
+				] ),
+				expect.anything()
+			);
+		} );
+
+		it( 'selects the creatable item by keyboard when limit hides later items', async () => {
+			const user = userEvent.setup();
+			const onValueChange = jest.fn();
+
+			render(
+				<SearchableChipSelect
+					items={ [ ...ITEMS, creatableItem ] }
+					limit={ 1 }
+					onValueChange={ onValueChange }
+				/>
+			);
+
+			await user.click( screen.getByRole( 'combobox' ) );
+
+			await waitFor( () => {
+				expect(
+					screen.getByRole( 'option', { name: 'Apple' } )
+				).toBeVisible();
+			} );
+			expect(
+				screen.getByRole( 'option', { name: 'Create new item' } )
+			).toBeVisible();
+
+			await user.keyboard( '{ArrowDown}{ArrowDown}{Enter}' );
+
+			expect( onValueChange ).toHaveBeenCalledWith(
+				expect.arrayContaining( [
+					expect.objectContaining( { value: '__create__' } ),
+				] ),
+				expect.anything()
+			);
+		} );
+
 		it( 'selects the creatable item by keyboard when grouped children are used', async () => {
 			const user = userEvent.setup();
 			const onValueChange = jest.fn();
