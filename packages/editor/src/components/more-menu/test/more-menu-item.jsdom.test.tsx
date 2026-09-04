@@ -185,6 +185,21 @@ describe( 'MoreMenuItem', () => {
 				'_blank'
 			);
 		} );
+
+		it( 'renders a disabled link as an inert item', async () => {
+			const user = userEvent.setup();
+			renderMenu(
+				<MoreMenuItem href="/help" disabled>
+					Help
+				</MoreMenuItem>
+			);
+			await openMenu( user );
+
+			const item = screen.getByRole( 'menuitem', { name: 'Help' } );
+
+			expect( item ).not.toHaveAttribute( 'href' );
+			expect( item ).toHaveAttribute( 'aria-disabled', 'true' );
+		} );
 	} );
 
 	describe( 'the legacy label', () => {

@@ -56,7 +56,7 @@ jobs:
                           # Other test suites, which cannot affect the measurements.
                           - '!test/{integration,php,storybook-playwright,unit}/**'
                           - '!test/e2e/{*,!(assets)/**}'
-                          - '!{packages,tools}/**/{test,tests}/**'
+                          - '!{packages,tools}/**/{test,tests,stories}/**'
                           # Development tooling and its configuration.
                           - '!packages/{create-block,docgen,eslint-plugin,jest-*,npm-package-json-lint-config,prettier-config,project-management-automation,stylelint-config}/**'
                           # The mu-plugins and plugins below it load at run time, so they still count.
