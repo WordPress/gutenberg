@@ -71,14 +71,14 @@
 				"fontSize": true
 			}
 		},
-		"__experimentalSelector": "p",
+		"__experimentalSelector": "p.wp-block-paragraph",
 		"__unstablePasteTextInline": true,
 		"interactivity": {
 			"clientNavigation": true
 		}
 	},
 	"selectors": {
-		"root": "p",
+		"root": "p.wp-block-paragraph",
 		"typography": {
 			"textIndent": ".wp-block-paragraph + .wp-block-paragraph"
 		}
