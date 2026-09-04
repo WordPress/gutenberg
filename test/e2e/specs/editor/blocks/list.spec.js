@@ -1055,6 +1055,51 @@ test.describe( 'List (@firefox)', () => {
 		);
 	} );
 
+	test( 'should keep a full selection when outdenting nested items with Shift+Tab', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// "a" with "b" and "c" nested beneath it.
+		await editor.insertBlock( { name: 'core/list' } );
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'b' );
+		await editor.clickBlockToolbarButton( 'Indent' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'c' );
+
+		// Select across "b" and "c".
+		await pageUtils.pressKeys( 'ArrowLeft' );
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
+
+		await page.keyboard.press( 'Shift+Tab' );
+
+		// The two items come back to the top level and stay selected as whole
+		// blocks, rather than leaving a hidden partial selection with nothing
+		// highlighted.
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>a</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>b</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>c</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
+		);
+		await expect(
+			editor.canvas.locator(
+				'.is-multi-selected:not(.is-partially-selected)'
+			)
+		).toHaveCount( 2 );
+	} );
+
 	test( 'should insert a line break on shift+enter', async ( {
 		editor,
 		page,

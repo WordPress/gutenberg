@@ -5,7 +5,7 @@ import { moveBlocksToNestedList } from './move-blocks-to-nested-list';
 
 export default function useOutdentListItem() {
 	const registry = useRegistry();
-	const { moveBlocksToPosition, removeBlock } =
+	const { moveBlocksToPosition, removeBlock, selectionChange, multiSelect } =
 		useDispatch( blockEditorStore );
 	const {
 		getBlockRootClientId,
@@ -13,6 +13,8 @@ export default function useOutdentListItem() {
 		getBlockOrder,
 		getBlockIndex,
 		getSelectedBlockClientIds,
+		getSelectionStart,
+		getSelectionEnd,
 	} = useSelect( blockEditorStore );
 
 	function getParentListItemId( id ) {
@@ -56,6 +58,10 @@ export default function useOutdentListItem() {
 		const followingListItems = order.slice(
 			getBlockIndex( lastClientId ) + 1
 		);
+		// The selection is read before the move because moving the blocks
+		// updates it.
+		const selectionStart = getSelectionStart();
+		const selectionEnd = getSelectionEnd();
 
 		registry.batch( () => {
 			if ( followingListItems.length ) {
@@ -77,6 +83,24 @@ export default function useOutdentListItem() {
 			if ( ! getBlockOrder( parentListId ).length ) {
 				const shouldSelectParent = false;
 				removeBlock( parentListId, shouldSelectParent );
+			}
+
+			// The blocks keep their client IDs through the move, so the
+			// selection is put back on the same blocks: the caret for a single
+			// item, a whole block selection for several. Setting it also clears
+			// any lingering partial cross-block selection, so the items render
+			// as fully selected instead of a hidden partial range.
+			if ( clientIds.length > 1 ) {
+				multiSelect( firstClientId, lastClientId );
+			} else {
+				selectionChange(
+					firstClientId,
+					selectionEnd.attributeKey,
+					selectionEnd.clientId === selectionStart.clientId
+						? selectionStart.offset
+						: selectionEnd.offset,
+					selectionEnd.offset
+				);
 			}
 		} );
 
