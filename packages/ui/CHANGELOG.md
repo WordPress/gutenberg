@@ -20,12 +20,15 @@
 -   `AlertDialog`, `Dialog`, `Drawer`, `Popover`, and `Tooltip`: Derive Trigger props from the corresponding Base UI components. ([#81824](https://github.com/WordPress/gutenberg/pull/81824))
 -   `Autocomplete.Status`, `Combobox.Status`: Add a `Status` subcomponent that announces async list status to screen readers. Item popups give Status its own collapsing grid row so a visible result count sits above the list without overlaying items ([#82195](https://github.com/WordPress/gutenberg/pull/82195)).
 -   `Autocomplete.Popup`, `Combobox.Popup`, `SearchableChipSelect`, `SearchableChipSelectControl`, `Select.Popup`, and `SelectControl`: Add `width` on Popups and `popupWidth` on composites, with preset width constraints (`anchor`, `content`, `sm`, `md`, `lg`, and `available`) for the item popup. `SelectControl` defaults to `content` to preserve prior popup sizing ([#82087](https://github.com/WordPress/gutenberg/pull/82087), [#82193](https://github.com/WordPress/gutenberg/pull/82193)).
+-   `Link`, `Menu.LinkItem`: Accept `target`, apply the new-tab indicator and accessible notice for `_blank`, and preserve explicit targets when `openInNewTab` is set. ([#82347](https://github.com/WordPress/gutenberg/pull/82347))
 -   `Menu`: Support multiple item descriptions. ([#81825](https://github.com/WordPress/gutenberg/pull/81825))
 -   `Menu`: Use `Text` for item labels and descriptions to share typography and apply `text-wrap: pretty`. ([#82237](https://github.com/WordPress/gutenberg/pull/82237))
 -   `Text`: Apply `text-wrap: pretty` by default to improve line wrapping. ([#82133](https://github.com/WordPress/gutenberg/pull/82133))
 
 ### Bug Fixes
 
+-   `Input`, `Textarea`, `InputControl`, `TextareaControl`: Use `--wpds-color-foreground-interactive-neutral-weak` for enabled placeholder text so it meets the 4.5:1 contrast minimum ([#82304](https://github.com/WordPress/gutenberg/pull/82304)).
+-   `SearchableChipSelect`, `SearchableChipSelectControl`: Fix the gray background on disabled search fields in WordPress admin ([#82304](https://github.com/WordPress/gutenberg/pull/82304)).
 -   `ValidityIndicator`: Remove the built-in outer margin. Spacing belongs on the consumer. `ControlWithError` now uses `Stack` with `gap="sm"` so validated controls keep the same gap. ([#82267](https://github.com/WordPress/gutenberg/pull/82267))
 -   `AlertDialog`: Use a neutral tone for the cancel button. ([#82261](https://github.com/WordPress/gutenberg/pull/82261))
 -   `Input`: Hide the field focus ring when a prefix or suffix slot control is focused. ([#82257](https://github.com/WordPress/gutenberg/pull/82257))

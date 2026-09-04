@@ -792,6 +792,7 @@
       - openInNewTab
       - render
       - style
+      - target
       - tone
       - variant
 - name: MenuGroup

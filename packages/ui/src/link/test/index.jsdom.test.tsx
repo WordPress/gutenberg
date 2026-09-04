@@ -93,5 +93,52 @@ describe( 'Link', () => {
 				} )
 			).toBeVisible();
 		} );
+
+		it( 'treats target="_blank" as opening in a new tab', () => {
+			render(
+				<Link href="https://example.com" target="_blank">
+					External
+				</Link>
+			);
+
+			expect(
+				screen.getByRole( 'link', {
+					name: 'External (opens in a new tab)',
+				} )
+			).toHaveAttribute( 'target', '_blank' );
+		} );
+
+		it( 'forwards a named target without adding a new tab notice', () => {
+			render(
+				<Link href="https://example.com" target="wp-preview-123">
+					Preview
+				</Link>
+			);
+
+			expect(
+				screen.getByRole( 'link', { name: 'Preview' } )
+			).toHaveAttribute( 'target', 'wp-preview-123' );
+			expect(
+				screen.queryByLabelText( '(opens in a new tab)' )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'preserves an explicit target when openInNewTab is true', () => {
+			render(
+				<Link
+					href="https://example.com"
+					target="wp-preview-123"
+					openInNewTab
+				>
+					Preview
+				</Link>
+			);
+
+			expect(
+				screen.getByRole( 'link', {
+					name: 'Preview (opens in a new tab)',
+				} )
+			).toHaveAttribute( 'target', 'wp-preview-123' );
+		} );
 	} );
 } );
