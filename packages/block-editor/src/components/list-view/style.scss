@@ -123,7 +123,8 @@
 		}
 
 		&.is-selected svg,
-		&.is-selected.is-synced svg {
+		&.is-selected.is-synced svg,
+		&.is-selected .block-editor-block-icon.has-colors svg {
 			fill: SelectedItemText;
 		}
 
