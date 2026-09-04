@@ -3,12 +3,11 @@ import userEvent from '@testing-library/user-event';
 import {
 	forwardRef,
 	useCallback,
-	useEffect,
 	useId,
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { useMergeRefs } from '@wordpress/compose';
+import { useIsomorphicLayoutEffect, useMergeRefs } from '@wordpress/compose';
 import { ControlWithError } from '../index';
 
 const ValidatedInput = forwardRef<
@@ -568,7 +567,7 @@ describe( 'ControlWithError', () => {
 
 			// Mimics controls like `NumberControl`: the value is clamped on
 			// blur, and the committed value is synced into the control's own
-			// state (and the DOM) a render later.
+			// state (and the DOM) in a layout effect, a render later.
 			const ClampedNumberInput = forwardRef<
 				HTMLInputElement,
 				{
@@ -578,7 +577,7 @@ describe( 'ControlWithError', () => {
 				}
 			>( function ClampedNumberInput( { label, value, onChange }, ref ) {
 				const [ innerValue, setInnerValue ] = useState( value );
-				useEffect( () => {
+				useIsomorphicLayoutEffect( () => {
 					setInnerValue( value );
 				}, [ value ] );
 				return (
@@ -603,8 +602,9 @@ describe( 'ControlWithError', () => {
 			function Harness() {
 				const [ value, setValue ] = useState( '10' );
 				const ref = useRef< HTMLInputElement >( null );
+				const getValidityTarget = useCallback( () => ref.current, [] );
 				return (
-					<ControlWithError getValidityTarget={ () => ref.current }>
+					<ControlWithError getValidityTarget={ getValidityTarget }>
 						<ClampedNumberInput
 							ref={ ref }
 							label="Number"
@@ -617,9 +617,21 @@ describe( 'ControlWithError', () => {
 
 			render( <Harness /> );
 
-			const input = screen.getByRole( 'spinbutton', { name: 'Number' } );
+			const input = screen.getByRole< HTMLInputElement >( 'spinbutton', {
+				name: 'Number',
+			} );
 			await user.clear( input );
 			await user.type( input, '0' );
+			// The message has to be showing before the blur for the assertion below
+			// to mean anything. Surface it the way a save action would, by validating
+			// the form while the field is still focused.
+			act( () => {
+				input.reportValidity();
+			} );
+			expect(
+				screen.getByText( 'Constraints not satisfied' )
+			).toBeVisible();
+
 			await user.tab();
 
 			await waitFor( () => {
