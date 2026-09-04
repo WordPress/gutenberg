@@ -180,8 +180,17 @@ export type LinkItemProps = Omit<
 > &
 	MenuItemLayoutProps & {
 		/**
-		 * Whether to open the link in a new browser tab.
-		 * When true, sets `target="_blank"` and appends a visual arrow indicator.
+		 * Where to open the linked document. `"_blank"` also adds the visual
+		 * indicator and accessible new-tab notice.
+		 *
+		 * When both `target` and `openInNewTab` are set, `target` determines the
+		 * browsing context.
+		 */
+		target?: ComponentProps< 'a' >[ 'target' ];
+
+		/**
+		 * Adds a visual indicator and accessible notice for opening in a new tab.
+		 * Defaults `target` to `"_blank"` when no explicit target is set.
 		 *
 		 * @default false
 		 */

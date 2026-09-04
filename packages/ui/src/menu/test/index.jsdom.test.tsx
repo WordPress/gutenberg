@@ -1363,6 +1363,179 @@ describe( 'Menu', () => {
 		).not.toHaveAttribute( 'aria-labelledby' );
 	} );
 
+	it( 'closes after activating a link item when closeOnClick is true', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.LinkItem href="#destination" closeOnClick>
+						<Menu.ItemLabel>Destination</Menu.ItemLabel>
+					</Menu.LinkItem>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+		await user.click(
+			await screen.findByRole( 'menuitem', { name: 'Destination' } )
+		);
+
+		await waitFor( () => {
+			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+		} );
+	} );
+
+	it( 'stays open after activating a link item by default', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.LinkItem href="#destination">
+						<Menu.ItemLabel>Destination</Menu.ItemLabel>
+					</Menu.LinkItem>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+		await user.click(
+			await screen.findByRole( 'menuitem', { name: 'Destination' } )
+		);
+
+		expect( screen.getByRole( 'menu' ) ).toBeVisible();
+	} );
+
+	it( 'treats target="_blank" on link items as opening in a new tab', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.LinkItem href="https://wordpress.org" target="_blank">
+						<Menu.ItemLabel>WordPress.org</Menu.ItemLabel>
+					</Menu.LinkItem>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+
+		expect(
+			await screen.findByRole( 'menuitem', {
+				name: 'WordPress.org (opens in a new tab)',
+			} )
+		).toHaveAttribute( 'target', '_blank' );
+	} );
+
+	it( 'treats target="_BLANK" on link items as opening in a new tab', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.LinkItem href="https://wordpress.org" target="_BLANK">
+						<Menu.ItemLabel>WordPress.org</Menu.ItemLabel>
+					</Menu.LinkItem>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+
+		expect(
+			await screen.findByRole( 'menuitem', {
+				name: 'WordPress.org (opens in a new tab)',
+			} )
+		).toHaveAttribute( 'target', '_BLANK' );
+	} );
+
+	it( 'does not treat non-ASCII target characters as "_blank"', async () => {
+		const user = userEvent.setup();
+		const nonAsciiTarget = '_blan\u212A';
+
+		render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.LinkItem
+						href="https://wordpress.org"
+						target={ nonAsciiTarget }
+					>
+						<Menu.ItemLabel>WordPress.org</Menu.ItemLabel>
+					</Menu.LinkItem>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+
+		expect(
+			await screen.findByRole( 'menuitem', { name: 'WordPress.org' } )
+		).toHaveAttribute( 'target', nonAsciiTarget );
+		expect(
+			screen.queryByLabelText( '(opens in a new tab)' )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'forwards a named target on link items without adding a new tab notice', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.LinkItem
+						href="https://wordpress.org"
+						target="wp-preview-123"
+					>
+						<Menu.ItemLabel>Preview</Menu.ItemLabel>
+					</Menu.LinkItem>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+
+		const item = await screen.findByRole( 'menuitem', { name: 'Preview' } );
+		expect( item ).toHaveAttribute( 'target', 'wp-preview-123' );
+		expect(
+			screen.queryByLabelText( '(opens in a new tab)' )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'preserves an explicit link item target when openInNewTab is true', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.LinkItem
+						href="https://wordpress.org"
+						target="wp-preview-123"
+						openInNewTab
+					>
+						<Menu.ItemLabel>Preview</Menu.ItemLabel>
+					</Menu.LinkItem>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+
+		expect(
+			await screen.findByRole( 'menuitem', {
+				name: 'Preview (opens in a new tab)',
+			} )
+		).toHaveAttribute( 'target', 'wp-preview-123' );
+	} );
+
 	it( 'uses custom item label and description ids for generated aria relationships', async () => {
 		const user = userEvent.setup();
 
