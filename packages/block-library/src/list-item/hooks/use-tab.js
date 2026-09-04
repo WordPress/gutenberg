@@ -48,7 +48,8 @@ export default function useTab() {
 				}
 			}
 
-			// Capture phase to run before writing-flow's keydown handler.
+			// Capture phase so we run before writing-flow's ancestor-bubble
+			// keydown handlers that gate on `event.defaultPrevented`.
 			return subscribeOwnedListener(
 				element,
 				'keydown',
