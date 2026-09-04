@@ -61,6 +61,10 @@ return array(
 		'label'    => _x( 'Block Table', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/block-table.svg',
 	),
+	'brush'               => array(
+		'label'    => _x( 'Brush', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/brush.svg',
+	),
 	'calendar'            => array(
 		'label'    => _x( 'Calendar', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/calendar.svg',
@@ -141,6 +145,10 @@ return array(
 		'label'    => _x( 'Create', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/create.svg',
 	),
+	'dashboard'           => array(
+		'label'    => _x( 'Dashboard', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/dashboard.svg',
+	),
 	'desktop'             => array(
 		'label'    => _x( 'Desktop', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/desktop.svg',
@@ -177,6 +185,10 @@ return array(
 		'label'    => _x( 'Gallery', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/gallery.svg',
 	),
+	'grid'                => array(
+		'label'    => _x( 'Grid', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/grid.svg',
+	),
 	'group'               => array(
 		'label'    => _x( 'Group', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/group.svg',
@@ -209,9 +221,17 @@ return array(
 		'label'    => _x( 'Language', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/language.svg',
 	),
+	'link'                => array(
+		'label'    => _x( 'Link', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/link.svg',
+	),
 	'map-marker'          => array(
 		'label'    => _x( 'Map Marker', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/map-marker.svg',
+	),
+	'media'               => array(
+		'label'    => _x( 'Media', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/media.svg',
 	),
 	'menu'                => array(
 		'label'    => _x( 'Menu', 'icon label', 'gutenberg' ),
@@ -233,6 +253,10 @@ return array(
 		'label'    => _x( 'Next', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/next.svg',
 	),
+	'page'                => array(
+		'label'    => _x( 'Page', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/page.svg',
+	),
 	'paragraph'           => array(
 		'label'    => _x( 'Paragraph', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/paragraph.svg',
@@ -249,6 +273,10 @@ return array(
 		'label'    => _x( 'People', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/people.svg',
 	),
+	'plugins'             => array(
+		'label'    => _x( 'Plugins', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/plugins.svg',
+	),
 	'plus'                => array(
 		'label'    => _x( 'Plus', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/plus.svg',
@@ -256,6 +284,10 @@ return array(
 	'plus-circle'         => array(
 		'label'    => _x( 'Plus Circle', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/plus-circle.svg',
+	),
+	'post'                => array(
+		'label'    => _x( 'Post', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/post.svg',
 	),
 	'previous'            => array(
 		'label'    => _x( 'Previous', 'icon label', 'gutenberg' ),
@@ -349,6 +381,14 @@ return array(
 		'label'    => _x( 'Tip', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/tip.svg',
 	),
+	'tool'                => array(
+		'label'    => _x( 'Tool', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/tool.svg',
+	),
+	'update'              => array(
+		'label'    => _x( 'Update', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/update.svg',
+	),
 	'upload'              => array(
 		'label'    => _x( 'Upload', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/upload.svg',
@@ -356,5 +396,9 @@ return array(
 	'verse'               => array(
 		'label'    => _x( 'Verse', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/verse.svg',
+	),
+	'wordpress'           => array(
+		'label'    => _x( 'WordPress', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/wordpress.svg',
 	),
 );
