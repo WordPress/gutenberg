@@ -7,7 +7,8 @@ import { HStack } from '../../h-stack';
 import type { AlignmentMatrixControlProps } from '../types';
 
 const meta: Meta< typeof AlignmentMatrixControl > = {
-	title: 'Components/AlignmentMatrixControl',
+	id: 'components-alignmentmatrixcontrol',
+	title: 'Classic Components/AlignmentMatrixControl',
 	component: AlignmentMatrixControl,
 	subcomponents: {
 		'AlignmentMatrixControl.Icon': AlignmentMatrixControl.Icon,

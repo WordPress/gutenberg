@@ -4,7 +4,7 @@ import { useState } from '@wordpress/element';
 import CustomGradientPicker from '../';
 
 const meta: Meta< typeof CustomGradientPicker > = {
-	title: 'Components/Selection & Input/Color/CustomGradientPicker',
+	title: 'Classic Components/Selection & Input/Color/CustomGradientPicker',
 	id: 'components-customgradientpicker',
 	component: CustomGradientPicker,
 	args: {

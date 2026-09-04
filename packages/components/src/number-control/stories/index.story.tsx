@@ -3,7 +3,7 @@ import { useState } from '@wordpress/element';
 import NumberControl from '..';
 
 const meta: Meta< typeof NumberControl > = {
-	title: 'Components/Selection & Input/Common/NumberControl',
+	title: 'Classic Components/Selection & Input/Common/NumberControl',
 	id: 'components-numbercontrol',
 	component: NumberControl,
 	argTypes: {

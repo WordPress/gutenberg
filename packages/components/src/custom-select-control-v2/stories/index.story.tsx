@@ -4,7 +4,7 @@ import { useState } from '@wordpress/element';
 import CustomSelectControlV2 from '..';
 
 const meta: Meta< typeof CustomSelectControlV2 > = {
-	title: 'Components/Selection & Input/Common/CustomSelectControl v2',
+	title: 'Classic Components/Selection & Input/Common/CustomSelectControl v2',
 	id: 'components-customselectcontrol-v2',
 	component: CustomSelectControlV2,
 	subcomponents: {

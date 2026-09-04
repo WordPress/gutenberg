@@ -3,7 +3,7 @@ import { useState } from '@wordpress/element';
 import SnackbarList from '../list';
 
 const meta: Meta< typeof SnackbarList > = {
-	title: 'Components/Feedback/SnackbarList',
+	title: 'Classic Components/Feedback/SnackbarList',
 	id: 'components-snackbarlist',
 	component: SnackbarList,
 	argTypes: {

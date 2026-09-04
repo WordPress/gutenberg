@@ -18,7 +18,7 @@ const ALIGNMENTS = {
 
 const meta: Meta< typeof VStack > = {
 	component: VStack,
-	title: 'Components/Layout/VStack',
+	title: 'Classic Components/Layout/VStack',
 	id: 'components-vstack',
 	argTypes: {
 		alignment: {

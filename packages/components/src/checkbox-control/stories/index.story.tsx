@@ -9,7 +9,7 @@ import { HStack } from '../../h-stack';
 const meta: Meta< typeof CheckboxControl > = {
 	tags: [ 'manifest' ],
 	component: CheckboxControl,
-	title: 'Components/Selection & Input/Common/CheckboxControl',
+	title: 'Classic Components/Selection & Input/Common/CheckboxControl',
 	id: 'components-checkboxcontrol',
 	argTypes: {
 		onChange: {

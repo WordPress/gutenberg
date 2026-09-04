@@ -3,7 +3,7 @@ import Tip from '..';
 
 const meta: Meta< typeof Tip > = {
 	component: Tip,
-	title: 'Components/Feedback/Tip',
+	title: 'Classic Components/Feedback/Tip',
 	id: 'components-tip',
 	argTypes: {
 		children: { control: { type: 'text' } },

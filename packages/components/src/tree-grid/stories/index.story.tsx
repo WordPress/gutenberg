@@ -6,7 +6,7 @@ import { Button } from '../../button';
 import InputControl from '../../input-control';
 
 const meta: Meta< typeof TreeGrid > = {
-	title: 'Components/Navigation/TreeGrid',
+	title: 'Classic Components/Navigation/TreeGrid',
 	id: 'components-treegrid',
 	component: TreeGrid,
 	subcomponents: { TreeGridRow, TreeGridCell },
