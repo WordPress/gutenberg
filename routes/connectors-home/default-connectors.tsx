@@ -129,6 +129,8 @@ interface ConnectorActionAreaProps {
 	};
 	handleButtonClick: () => void;
 	getButtonLabel: () => string;
+	showDeactivateButton?: boolean;
+	onDeactivate?: () => void;
 }
 
 function ConnectorActionArea( {
@@ -141,6 +143,8 @@ function ConnectorActionArea( {
 	actionButtonRef,
 	handleButtonClick,
 	getButtonLabel,
+	showDeactivateButton,
+	onDeactivate,
 }: ConnectorActionAreaProps ) {
 	return (
 		<HStack spacing={ 3 } expanded={ false }>
@@ -151,6 +155,19 @@ function ConnectorActionArea( {
 				) : (
 					<UnavailableActionBadge />
 				) ) }
+			{ showDeactivateButton && (
+				<Button
+					variant="tertiary"
+					size="compact"
+					onClick={ onDeactivate }
+					disabled={ isBusy }
+					isBusy={ isBusy }
+					accessibleWhenDisabled
+					isDestructive
+				>
+					{ __( 'Deactivate' ) }
+				</Button>
+			) }
 			{ ! showUnavailableBadge && (
 				<Button
 					ref={ actionButtonRef }
@@ -194,6 +211,7 @@ function ApiKeyConnector( {
 		pluginStatus,
 		canInstallPlugins,
 		canActivatePlugins,
+		canDeactivatePlugins,
 		isExpanded,
 		setIsExpanded,
 		isBusy,
@@ -203,6 +221,7 @@ function ApiKeyConnector( {
 		keySource,
 		handleButtonClick,
 		getButtonLabel,
+		deactivatePlugin,
 		saveApiKey,
 		removeApiKey,
 	} = useConnectorPlugin( {
@@ -219,6 +238,10 @@ function ApiKeyConnector( {
 	const showUnavailableBadge =
 		( pluginStatus === 'not-installed' && canInstallPlugins === false ) ||
 		( pluginStatus === 'inactive' && canActivatePlugins === false );
+	const showDeactivateButton =
+		pluginStatus === 'active' &&
+		!! plugin?.file &&
+		canDeactivatePlugins !== false;
 
 	const actionButtonRef = useRef< HTMLButtonElement >( null );
 
@@ -241,6 +264,8 @@ function ApiKeyConnector( {
 					actionButtonRef={ actionButtonRef }
 					handleButtonClick={ handleButtonClick }
 					getButtonLabel={ getButtonLabel }
+					showDeactivateButton={ showDeactivateButton }
+					onDeactivate={ deactivatePlugin }
 				/>
 			}
 		>
