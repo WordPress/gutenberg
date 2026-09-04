@@ -184,3 +184,64 @@ describe( 'SuggestionNoteGC reopening an undone decision', () => {
 		expect( saveEntityRecord ).not.toHaveBeenCalled();
 	} );
 } );
+
+describe( 'SuggestionNoteGC collecting a withdrawn marker', () => {
+	afterEach( () => {
+		vi.useRealTimers();
+	} );
+
+	it( 'retries a trash request that failed while the marker stays gone', async () => {
+		vi.useFakeTimers( { toFake: [ 'setTimeout', 'clearTimeout' ] } );
+
+		let registry: any;
+		let saveEntityRecord: any;
+		// The marker is on screen first, so the collector observes the anchor
+		// before it disappears; it never collects an anchor it has not seen.
+		await act( async () => {
+			( { registry, saveEntityRecord } = setup( {
+				content: MARKED,
+				threads: [ note( { status: 'hold', lifecycle: 'pending' } ) ],
+			} ) );
+		} );
+		expect( saveEntityRecord ).not.toHaveBeenCalled();
+
+		// The server refuses the first trash.
+		saveEntityRecord.mockRejectedValueOnce( new Error( 'Offline' ) );
+
+		// Undo withdraws the marker: the note's anchor is gone.
+		const [ clientId ] = registry
+			.select( blockEditorStore )
+			.getClientIdsWithDescendants();
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( clientId, {
+					content: RichTextData.fromHTMLString( 'Hello world' ),
+				} );
+		} );
+
+		// The grace period runs out and the first trash is attempted.
+		await act( async () => {
+			vi.advanceTimersByTime( 600 );
+		} );
+		expect( saveEntityRecord ).toHaveBeenCalledTimes( 1 );
+		expect( saveEntityRecord ).toHaveBeenLastCalledWith(
+			'root',
+			'comment',
+			{ id: NOTE_ID, status: 'trash' },
+			expect.anything()
+		);
+
+		// Nothing else changed, so only the retry can collect the note.
+		await act( async () => {
+			vi.advanceTimersByTime( 5000 );
+		} );
+		expect( saveEntityRecord ).toHaveBeenCalledTimes( 2 );
+		expect( saveEntityRecord ).toHaveBeenLastCalledWith(
+			'root',
+			'comment',
+			{ id: NOTE_ID, status: 'trash' },
+			expect.anything()
+		);
+	} );
+} );
