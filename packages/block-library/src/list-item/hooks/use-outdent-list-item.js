@@ -1,11 +1,11 @@
 import { useCallback } from '@wordpress/element';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { cloneBlock } from '@wordpress/blocks';
+import { moveBlocksToNestedList } from './move-blocks-to-nested-list';
 
 export default function useOutdentListItem() {
 	const registry = useRegistry();
-	const { moveBlocksToPosition, removeBlock, removeBlocks, insertBlock } =
+	const { moveBlocksToPosition, removeBlock } =
 		useDispatch( blockEditorStore );
 	const {
 		getBlockRootClientId,
@@ -13,7 +13,6 @@ export default function useOutdentListItem() {
 		getBlockOrder,
 		getBlockIndex,
 		getSelectedBlockClientIds,
-		getBlock,
 	} = useSelect( blockEditorStore );
 
 	function getParentListItemId( id ) {
@@ -60,28 +59,14 @@ export default function useOutdentListItem() {
 
 		registry.batch( () => {
 			if ( followingListItems.length ) {
-				const nestedListId = getBlockOrder( firstClientId )[ 0 ];
-
-				if ( nestedListId ) {
-					moveBlocksToPosition(
-						followingListItems,
-						parentListId,
-						nestedListId
-					);
-				} else {
-					// Insert the list with the items already inside: an
-					// empty list would be scaffolded with the list block
-					// type's template at insertion. Removing the items
-					// first frees them to be reinserted with their client
-					// IDs kept.
-					const nestedListBlock = cloneBlock(
-						getBlock( parentListId ),
-						{},
-						followingListItems.map( ( id ) => getBlock( id ) )
-					);
-					removeBlocks( followingListItems, false );
-					insertBlock( nestedListBlock, 0, firstClientId, false );
-				}
+				// Nest the items that follow under the outdented item so they
+				// keep their place below it.
+				moveBlocksToNestedList(
+					registry,
+					followingListItems,
+					parentListId,
+					firstClientId
+				);
 			}
 			moveBlocksToPosition(
 				clientIds,
