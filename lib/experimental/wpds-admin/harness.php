@@ -83,8 +83,8 @@ function gutenberg_wpds_admin_render_harness() {
 	);
 
 	echo '<div class="wrap">';
-	echo '<h1>' . esc_html__( 'WPDS Parity — classic buttons', 'gutenberg' ) . '</h1>';
-	echo '<p>' . esc_html__( 'Classic button markup rendered under the real admin cascade. Compare against the React Button. Pseudo-class states (:hover, :focus, :active) must be checked interactively; the class-driven equivalents legacy admin JS toggles are shown below.', 'gutenberg' ) . '</p>';
+	echo '<h1>' . esc_html__( 'WPDS Parity — admin controls', 'gutenberg' ) . '</h1>';
+	echo '<p>' . esc_html__( 'Admin control markup rendered under the real admin cascade, so each state can be compared against its design system counterpart. Pseudo-class states (:hover, :focus, :active) must be checked interactively; the class-driven equivalents admin JS toggles are shown below.', 'gutenberg' ) . '</p>';
 
 	echo '<h2>' . esc_html__( 'Variants and states', 'gutenberg' ) . '</h2>';
 	echo '<table class="widefat striped" style="max-width:1100px"><thead><tr><th>' . esc_html__( 'State', 'gutenberg' ) . '</th>';
