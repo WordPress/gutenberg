@@ -75,6 +75,7 @@ export async function git( cwd, args, maxBuffer = 10 * 1024 * 1024 ) {
 
 export async function saveTrustedGitMetadata() {
 	await fs.rm( trustedGitDirectory, { recursive: true, force: true } );
+	await fs.mkdir( path.dirname( trustedGitDirectory ), { recursive: true } );
 	await fs.cp( path.join( workspace, '.git' ), trustedGitDirectory, {
 		recursive: true,
 	} );

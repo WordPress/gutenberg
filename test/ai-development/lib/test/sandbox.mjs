@@ -8,8 +8,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import { loadApiProvider } from 'promptfoo';
-import { workspace } from '../paths.js';
-import { pathRule, permissions, sandbox } from '../sandbox.js';
+import { sourceRoot, trustedGitDirectory, workspace } from '../paths.js';
+import { pathRule, permissionRules, permissions, sandbox } from '../sandbox.js';
 import {
 	checkoutMarkerFile,
 	homeMarkerFile,
@@ -61,6 +61,32 @@ test( 'a rule renders the path the way Claude Code matches it', () => {
 	assert.equal(
 		pathRule( 'Edit', '/Users/alice' ),
 		'Edit(//Users/alice/**)'
+	);
+} );
+
+test( 'permission rules do not deny a workspace inside the home directory', () => {
+	const home = 'C:\\Users\\runneradmin';
+	const source = 'D:\\a\\gutenberg';
+	const workingDirectory = `${ home }\\AppData\\Local\\Temp\\gutenberg-agent-eval-1`;
+
+	assert.deepEqual(
+		permissionRules( [ home, source ], workingDirectory, path.win32 ),
+		[ 'Read(//d/a/gutenberg/**)', 'Edit(//d/a/gutenberg/**)' ]
+	);
+} );
+
+test( 'trusted Git metadata is inside an Edit-denied directory', () => {
+	const relative = path.relative( sourceRoot, trustedGitDirectory );
+	const isInsideSourceRoot =
+		relative === '' ||
+		( relative !== '..' &&
+			! relative.startsWith( `..${ path.sep }` ) &&
+			! path.isAbsolute( relative ) );
+
+	assert.equal( isInsideSourceRoot, true );
+	assert.equal(
+		permissions.deny.includes( pathRule( 'Edit', sourceRoot ) ),
+		true
 	);
 } );
 

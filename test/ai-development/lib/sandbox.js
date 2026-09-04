@@ -8,6 +8,7 @@
  * @see https://code.claude.com/docs/en/sandboxing
  * @see https://code.claude.com/docs/en/permissions
  */
+import path from 'node:path';
 import {
 	homeDirectory,
 	sourceRoot,
@@ -74,21 +75,52 @@ export function pathRule( tool, directory ) {
 }
 
 /**
+ * Builds deny rules without enclosing the agent's own working directory.
+ *
+ * The system temporary directory normally sits inside the home directory on
+ * Windows. Permission denies take precedence over allows, so denying that home
+ * directory would also deny the workspace inside it.
+ *
+ * @param {string[]} directories      Host directories the agent must not read.
+ * @param {string}   workingDirectory The agent's working directory.
+ * @param {Object}   pathApi          Platform path implementation.
+ * @return {string[]} Permission rules for directories outside the workspace.
+ */
+export function permissionRules(
+	directories,
+	workingDirectory,
+	pathApi = path
+) {
+	const outsideWorkspace = directories.filter( ( directory ) => {
+		const relative = pathApi.relative( directory, workingDirectory );
+		return (
+			relative === '..' ||
+			relative.startsWith( `..${ pathApi.sep }` ) ||
+			pathApi.isAbsolute( relative )
+		);
+	} );
+
+	return [
+		...outsideWorkspace.map( ( directory ) =>
+			pathRule( 'Read', directory )
+		),
+		...outsideWorkspace.map( ( directory ) =>
+			pathRule( 'Edit', directory )
+		),
+	];
+}
+
+/**
  * Covers the tools the sandbox does not: `Edit`, `Write`, and the file-reading
  * commands Claude Code recognises in Bash.
  */
 export const permissions = {
 	// Deny is resolved before allow and specificity is ignored, so a deny rule
-	// cannot carry an exception. That is why the workspace lives outside every
-	// path denied here; see `paths.js`.
+	// cannot carry an exception. Omit any region that contains the workspace;
+	// the SDK's working-directory boundary still refuses paths outside it.
 	//
 	// A `Read` deny also blocks `Edit` and `Write` on the same path, but only on
 	// recent Claude Code, so the `Edit` rules are not redundant. Rules written
 	// against `Write` itself are accepted and never consulted.
-	deny: [
-		pathRule( 'Read', homeDirectory ),
-		pathRule( 'Read', sourceRoot ),
-		pathRule( 'Edit', homeDirectory ),
-		pathRule( 'Edit', sourceRoot ),
-	],
+	deny: permissionRules( [ homeDirectory, sourceRoot ], workspace ),
 };

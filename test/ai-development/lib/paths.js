@@ -32,12 +32,10 @@ export const temporaryDirectory = fs.realpathSync( os.tmpdir() );
 /**
  * The disposable copy the agents run against.
  *
- * Deliberately outside both the checkout and the home directory. Permission
- * rules resolve deny before allow and ignore specificity, so a workspace inside
- * a denied directory could not be re-allowed — the rules meant to keep the
- * agent out of the checkout would keep it out of its own working directory too.
- * (Sandbox paths are the opposite: the narrower rule wins, which is how the
- * workspace is re-allowed inside the denied temp directory.)
+ * Deliberately outside the checkout. The system temp directory can sit inside
+ * the home directory on Windows, so the permission rules omit any denied region
+ * that contains this workspace. Sandbox paths are the opposite: the narrower
+ * rule wins, which is how the workspace is re-allowed inside denied regions.
  *
  * Keeping it out of the checkout also stops the repository's own lint and test
  * tooling walking into a second copy of the repository.
@@ -51,10 +49,15 @@ export const workspace = path.join(
  * A trusted copy of the workspace's Git metadata.
  *
  * The evaluated agent can change `.git`, so host-side Git restores this copy
- * before it stages, inspects, or resets the workspace. It sits outside the
- * working directory, where the sandbox prevents the agent from changing it.
+ * before it stages, inspects, or resets the workspace. Keep it in the denied
+ * source checkout rather than beside the workspace: Bash can write to the
+ * system temp directory even outside its working directory.
  */
-export const trustedGitDirectory = `${ workspace }.git`;
+export const trustedGitDirectory = path.join(
+	sourceRoot,
+	'test/ai-development/results',
+	`.trusted-git-${ process.pid }`
+);
 
 /**
  * Names the workspace's first commit.

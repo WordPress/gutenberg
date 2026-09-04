@@ -179,6 +179,8 @@ jobs:
                   package-manager-cache: false
 
             - name: Install AI development test dependencies
+              env:
+                  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
               run: npm ci --prefix test/ai-development
 
             - name: Audit AI development test dependencies

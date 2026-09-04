@@ -54,17 +54,17 @@ See Promptfoo's [coding-agent guide](https://www.promptfoo.dev/docs/guides/evalu
 
 Promptfoo does not implement sandboxing. It passes the `sandbox` and `settings` blocks to the Claude Agent SDK without interpreting them, so what `lib/sandbox.js` declares is exactly what the agents run under. Two layers, because neither covers the other's ground:
 
-|                           | Covers                                               | Path syntax  | Default                                           |
-| ------------------------- | ---------------------------------------------------- | ------------ | ------------------------------------------------- |
+|                           | Covers                                               | Path syntax  | Default                                                            |
+| ------------------------- | ---------------------------------------------------- | ------------ | ------------------------------------------------------------------ |
 | `sandbox.filesystem`      | Bash and every process it starts, enforced by the OS | `/absolute`  | reads: everywhere; writes: working directory and session temp only |
-| `Read()` / `Edit()` rules | every tool, checked before it runs                   | `//absolute` | a path outside `working_dir` is refused           |
+| `Read()` / `Edit()` rules | every tool, checked before it runs                   | `//absolute` | a path outside `working_dir` is refused                            |
 
 So:
 
 -   **Writes** need no rules. A sandboxed command can write to the working directory and the session temp directory and nowhere else, and the working directory is the workspace.
 -   **Reads** are allowed everywhere by default, so the home directory, the checkout, and the temp directory are denied, and `allowRead` re-opens only the workspace inside it — for sandbox paths the narrower rule wins. Denying `/` outright does not work: it takes the system libraries with it, and a profile no command can run under does not survive to enforce anything.
 -   **Bash is the gap the sandbox exists to close.** The in-process file tools are already bounded: the SDK tests a path against `working_dir` before the tool runs, and one outside it is refused. Bash gets no such check, and its children none either, which is what the OS layer is for.
--   **Permission rules run the opposite way round** to sandbox paths: deny is resolved before allow and specificity is ignored, so a deny rule cannot carry an exception. That is why the workspace lives outside every denied path — in the system temp directory rather than inside the checkout, where the rules keeping the agent out of the source would have locked it out of its own working directory.
+-   **Permission rules run the opposite way round** to sandbox paths: deny is resolved before allow and specificity is ignored, so a deny rule cannot carry an exception. The harness omits any deny region that contains the workspace. This matters on Windows, where the system temp directory normally sits inside the home directory. The checkout stays denied, and the SDK's working-directory boundary refuses other paths outside the workspace.
 -   **The network** is unreachable: the allowlist is empty and `strictAllowlist` makes that a deterministic denial rather than a prompt a headless run would resolve as an allow.
 -   **Hooks go around both layers**, so both providers disable them. Claude Code runs a hook itself rather than through the Bash tool, before the session starts and with the inherited environment — and a workspace is built from the tree under evaluation, so a branch adding `.claude/settings.json` would otherwise run commands on the host.
 -   **Project settings could weaken the sandbox** — `filesystem.allowRead` and `network.allowedDomains` merge from every settings source, so a branch under evaluation that force-added `.claude/settings.json` could re-open reads and the network for its own run. Unlike hooks there is no switch that ignores them, so the workspace build strips `.claude/settings.json` and `.claude/settings.local.json` before the base commit is made.
@@ -80,7 +80,7 @@ An agent's response is its account of what it did, not what it did. Promptfoo's 
 
 So the harness reads them. `lib/diff.js` is a Promptfoo transform that stages the workspace and appends `git status` and the diff to the response before any assertion runs. Rubrics then judge that diff, and are told to prefer it wherever it contradicts the agent's summary.
 
-Taking the diff here rather than having a grading agent go and find it matters for two reasons. A model-graded assertion defers grading onto a queue, and a grader that inspects the workspace itself is then correct only because Promptfoo happens to run that queue before the `afterEach` rollback — an ordering nothing documents, and the first thing that would break on raising `maxConcurrency`. A transform runs before any assertion is graded or queued, so it depends on no such ordering. Before the host stages or resets anything, the harness replaces the agent-controlled `.git` directory with a trusted copy and disables global and system Git configuration. That prevents repository-local clean filters and other agent-supplied Git settings from escaping the sandbox.
+Taking the diff here rather than having a grading agent go and find it matters for two reasons. A model-graded assertion defers grading onto a queue, and a grader that inspects the workspace itself is then correct only because Promptfoo happens to run that queue before the `afterEach` rollback — an ordering nothing documents, and the first thing that would break on raising `maxConcurrency`. A transform runs before any assertion is graded or queued, so it depends on no such ordering. Before the host stages or resets anything, the harness replaces the agent-controlled `.git` directory with a trusted copy and disables global and system Git configuration. The trusted copy lives in the source checkout, which is explicitly denied for edits, rather than beside the workspace in the writable system temp directory. That prevents repository-local clean filters and other agent-supplied Git settings from escaping the sandbox.
 
 Judgement that the diff alone cannot support — whether a change follows the repository's own references — stays with `agent-rubric`, which Promptfoo documents for exactly this: verifying a claimed code change against the artifact rather than the response.
 
@@ -107,7 +107,7 @@ It also needs a newer Node than the repository — see `.nvmrc`.
 
 ```bash
 nvm use "$(cat test/ai-development/.nvmrc)"
-npm ci --prefix test/ai-development
+PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm ci --prefix test/ai-development
 ```
 
 Runs go through [Claude Code](https://claude.com/claude-code), so it has to be
