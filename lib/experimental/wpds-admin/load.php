@@ -104,6 +104,18 @@ const GUTENBERG_WPDS_ADMIN_LAYER_ORDER = '@layer wpds-overrides, wp-legacy, wpds
  * stays unlayered, and it does not need demoting — those styles are already
  * design-system aligned.
  *
+ * ALSO EXCLUDED: `media`. Demotion turns a `<link>` into an `@import`, which the
+ * browser fetches only after it has parsed the importing element, so the
+ * stylesheet lands later than a link would. The media grid measures its frame in
+ * JavaScript as the page initialises, and with `media-views.css` still in flight
+ * it measures an unstyled frame, computes a collapsed height and never
+ * recalculates: upload.php?mode=grid renders as an empty strip. Verified by
+ * removing this one handle. Any screen that sizes itself from measured CSS is
+ * exposed the same way, which is one more thing that only Core owning its own
+ * layers can fix. The cost of leaving it out is that `media-views.css` outranks
+ * the demoted colour scheme's media rules; a wrongly-coloured modal is a better
+ * failure than an unusable Media Library.
+ *
  * Trade-off worth naming: everything listed here now sits below unlayered
  * plugin CSS. Plugin rules that currently lose to Core on specificity or source
  * order will start winning. That is a real behaviour change for the ecosystem
@@ -125,7 +137,6 @@ function gutenberg_wpds_admin_demoted_handles() {
 		'edit',
 		'dashboard',
 		'revisions',
-		'media',
 		'themes',
 		'about',
 		'nav-menus',
