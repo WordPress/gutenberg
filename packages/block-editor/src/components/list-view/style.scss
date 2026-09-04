@@ -88,11 +88,6 @@
 		&.is-selected.is-synced td {
 			background: SelectedItem;
 		}
-
-		&.is-selected .block-editor-list-view-block-contents,
-		&.is-selected .components-button.has-icon {
-			color: SelectedItemText;
-		}
 	}
 	&.is-synced:not(.is-selected) .block-editor-list-view-block-contents {
 		&:hover,
