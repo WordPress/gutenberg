@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove the experimental Form, Input Field, Form Submit Button, and Form Submission Notification blocks, along with the "Form and input blocks" experiment that gated them.
+
 ### Enhancements
 
 -   Math: Declare `interactivity.clientNavigation` support. The block's front end output is static markup, and without the declaration a Math block inside a Query block forced full page reloads on pagination ([#82248](https://github.com/WordPress/gutenberg/pull/82248)).
