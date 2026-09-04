@@ -2096,6 +2096,113 @@ test.describe( 'Block Notes', () => {
 			await expect( textbox ).toBeFocused();
 		} );
 	} );
+
+	test.describe( 'Collapsing long notes', () => {
+		// Long enough to overflow the three visible lines in the sidebar.
+		const LONG_NOTE =
+			'This note is deliberately long so that it runs past the three ' +
+			'lines the sidebar shows before it collapses, which is what puts ' +
+			'the show more toggle on screen in the first place.';
+
+		/*
+		 * `BlockNoteUtils.addNote` waits on the thread's accessible name, which
+		 * is an excerpt for notes this long, so wait on the rendered content
+		 * instead.
+		 */
+		async function addLongNote( { editor, page }, comment ) {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Collapse host' },
+			} );
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await page
+				.getByRole( 'textbox', { name: 'New note', exact: true } )
+				.pressSequentially( comment );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+
+			const noteContent = page
+				.locator( '.editor-collab-sidebar-panel__note-content' )
+				.first();
+			await expect( noteContent ).toBeVisible();
+			return noteContent;
+		}
+
+		test( 'the show more toggle reports its state and what it controls', async ( {
+			editor,
+			page,
+		} ) => {
+			const noteContent = await addLongNote(
+				{ editor, page },
+				LONG_NOTE
+			);
+			const toggle = page.getByRole( 'button', { name: 'Show more' } );
+
+			await expect( toggle ).toHaveAttribute( 'aria-expanded', 'false' );
+			// The toggle must point at the element it collapses.
+			await expect( toggle ).toHaveAttribute(
+				'aria-controls',
+				await noteContent.getAttribute( 'id' )
+			);
+			await expect( noteContent ).toHaveClass( /is-collapsed/ );
+
+			await toggle.click();
+
+			const expandedToggle = page.getByRole( 'button', {
+				name: 'Show less',
+			} );
+			await expect( expandedToggle ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
+			await expect( noteContent ).not.toHaveClass( /is-collapsed/ );
+		} );
+
+		test( 'keeps the hidden part of the note out of the document', async ( {
+			editor,
+			page,
+		} ) => {
+			const noteContent = await addLongNote(
+				{ editor, page },
+				`${ LONG_NOTE } https://wordpress.org `
+			);
+			const link = noteContent.getByRole( 'link' );
+
+			await expect( noteContent ).toHaveClass( /is-collapsed/ );
+			/*
+			 * The collapse truncates rather than clips, so the link past the
+			 * cut is not in the tab order and not in the accessibility tree.
+			 */
+			await expect( link ).toBeHidden();
+			await expect( noteContent ).toContainText( '…' );
+
+			await page.getByRole( 'button', { name: 'Show more' } ).click();
+
+			await expect( link ).toBeVisible();
+			await expect( noteContent ).toContainText( 'wordpress.org' );
+		} );
+
+		test( 'moves focus to the note text when it is expanded', async ( {
+			editor,
+			page,
+		} ) => {
+			const noteContent = await addLongNote(
+				{ editor, page },
+				LONG_NOTE
+			);
+
+			/*
+			 * The toggle sits below the text it reveals, so leaving focus on
+			 * it would make a screen reader read the note backwards.
+			 */
+			await page.getByRole( 'button', { name: 'Show more' } ).click();
+
+			await expect( noteContent ).toBeFocused();
+			await expect( noteContent ).toContainText( LONG_NOTE );
+		} );
+	} );
 } );
 
 class BlockNoteUtils {
