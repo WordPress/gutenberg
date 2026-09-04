@@ -3,11 +3,9 @@ import {
 	Button,
 	Modal,
 	__experimentalGrid as Grid,
-	__experimentalText as WCText,
-	__experimentalVStack as VStack,
-	Flex,
 	Icon as WCIcon,
 } from '@wordpress/components';
+import { Stack, Text } from '@wordpress/ui';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState, memo, useRef, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -84,7 +82,6 @@ const TEMPLATE_ICONS = {
 
 function TemplateListItem( {
 	title,
-	direction,
 	className,
 	description,
 	icon,
@@ -99,32 +96,22 @@ function TemplateListItem( {
 			label={ description }
 			showTooltip={ !! description }
 		>
-			<Flex
-				as="span"
-				spacing={ 2 }
-				align="center"
-				justify="center"
-				style={ { width: '100%' } }
-				direction={ direction }
-			>
-				<div className="edit-site-add-new-template__template-icon">
-					<WCIcon icon={ icon } />
-				</div>
-				<VStack
-					className="edit-site-add-new-template__template-name"
-					alignment="center"
-					spacing={ 0 }
-				>
-					<WCText
+			<Stack direction="column" gap="sm" style={ { width: '100%' } }>
+				<Stack direction="row" gap="sm" align="center">
+					<Stack
+						className="edit-site-add-new-template__template-icon"
+						direction="row"
 						align="center"
-						weight="var(--wpds-typography-font-weight-emphasis)"
-						lineHeight={ 1.53846153846 } // 20px
+						justify="center"
 					>
+						<WCIcon icon={ icon } />
+					</Stack>
+					<Text className="edit-site-add-new-template__template-name">
 						{ title }
-					</WCText>
-					{ children }
-				</VStack>
-			</Flex>
+					</Text>
+				</Stack>
+				{ children }
+			</Stack>
 		</Button>
 	);
 }
@@ -265,58 +252,63 @@ function NewTemplateModal( { onClose } ) {
 			ref={ containerRef }
 		>
 			{ modalContent === modalContentMap.templatesList && (
-				<Grid
-					columns={ isMobile ? 2 : 3 }
-					gap={ 4 }
-					align="flex-start"
-					justify="center"
-					className="edit-site-add-new-template__template-list__contents"
-				>
-					<Flex className="edit-site-add-new-template__template-list__prompt">
+				<Stack direction="column" gap="lg">
+					<Text>
 						{ __(
 							'Select what the new template should apply to:'
 						) }
-					</Flex>
-					{ missingTemplates.map( ( template ) => {
-						const { title, slug, onClick } = template;
-						return (
-							<TemplateListItem
-								key={ slug }
-								title={ title }
-								direction="column"
-								className="edit-site-add-new-template__template-button"
-								description={
-									TEMPLATE_SHORT_DESCRIPTIONS[ slug ]
-								}
-								icon={ TEMPLATE_ICONS[ slug ] || layout }
-								onClick={ () =>
-									onClick
-										? onClick( template )
-										: createTemplate( template )
-								}
-							/>
-						);
-					} ) }
-					<TemplateListItem
-						title={ __( 'Custom template' ) }
-						direction="row"
-						className="edit-site-add-new-template__custom-template-button"
-						icon={ pencil }
-						onClick={ () =>
-							setModalContent(
-								modalContentMap.customGenericTemplate
-							)
-						}
+					</Text>
+					<Grid
+						columns={ isMobile ? 2 : 3 }
+						gap={ 4 }
+						align="flex-start"
+						justify="center"
+						className="edit-site-add-new-template__template-list__contents"
 					>
-						<WCText
-							lineHeight={ 1.53846153846 } // 20px
+						{ missingTemplates.map( ( template ) => {
+							const { title, description, slug, onClick } =
+								template;
+							return (
+								<TemplateListItem
+									key={ slug }
+									title={ title }
+									className="edit-site-add-new-template__template-button"
+									description={
+										TEMPLATE_SHORT_DESCRIPTIONS[ slug ]
+									}
+									icon={ TEMPLATE_ICONS[ slug ] || layout }
+									onClick={ () =>
+										onClick
+											? onClick( template )
+											: createTemplate( template )
+									}
+								>
+									{ description && (
+										<Text>
+											{ decodeEntities( description ) }
+										</Text>
+									) }
+								</TemplateListItem>
+							);
+						} ) }
+						<TemplateListItem
+							title={ __( 'Custom template' ) }
+							className="edit-site-add-new-template__custom-template-button"
+							icon={ pencil }
+							onClick={ () =>
+								setModalContent(
+									modalContentMap.customGenericTemplate
+								)
+							}
 						>
-							{ __(
-								'A custom template can be manually applied to any post or page.'
-							) }
-						</WCText>
-					</TemplateListItem>
-				</Grid>
+							<Text>
+								{ __(
+									'A custom template can be manually applied to any post or page.'
+								) }
+							</Text>
+						</TemplateListItem>
+					</Grid>
+				</Stack>
 			) }
 			{ modalContent === modalContentMap.customTemplate && (
 				<AddCustomTemplateModalContent
