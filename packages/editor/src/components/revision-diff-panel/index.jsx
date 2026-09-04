@@ -7,12 +7,14 @@ import PostPanelRow from '../post-panel-row';
  * @param {Object}  props
  * @param {string}  props.title       Panel title.
  * @param {Object}  props.entries     Map of key → diffWords parts arrays.
+ * @param {Object}  [props.labels]    Map of key → the name to show for it.
  * @param {boolean} props.initialOpen Whether the panel starts open.
  * @param {string}  [props.className] Optional class for the content wrapper.
  */
 export default function RevisionDiffPanel( {
 	title,
 	entries,
+	labels,
 	initialOpen,
 	className,
 } ) {
@@ -21,7 +23,7 @@ export default function RevisionDiffPanel( {
 	}
 
 	const fields = Object.entries( entries ).map( ( [ key, parts ] ) => (
-		<PostPanelRow key={ key } label={ key }>
+		<PostPanelRow key={ key } label={ labels?.[ key ] ?? key }>
 			<span className="editor-revision-fields-diff__value">
 				{ parts.map( ( part, index ) => {
 					if ( part.added ) {

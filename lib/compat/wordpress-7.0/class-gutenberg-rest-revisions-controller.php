@@ -14,6 +14,9 @@
  * (e.g. content.raw without content.rendered) via the _fields parameter,
  * avoiding expensive rendering when only raw data is needed.
  *
+ * It also adds a `revision_fields` field, holding the fields plugins add to
+ * revisions through the `_wp_post_revision_fields` filter.
+ *
  * @see WP_REST_Revisions_Controller
  */
 class Gutenberg_REST_Revisions_Controller extends WP_REST_Revisions_Controller {
@@ -120,7 +123,12 @@ class Gutenberg_REST_Revisions_Controller extends WP_REST_Revisions_Controller {
 			$data['meta'] = $this->meta->get_value( $post->ID, $request );
 		}
 
-		$context  = ! empty( $request['context'] ) ? $request['context'] : 'view';
+		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
+
+		if ( 'edit' === $context && rest_is_field_included( 'revision_fields', $fields ) ) {
+			$data['revision_fields'] = $this->get_revision_fields( $post );
+		}
+
 		$data     = $this->add_additional_fields_to_object( $data, $request );
 		$data     = $this->filter_response_by_context( $data, $context );
 		$response = rest_ensure_response( $data );
@@ -139,5 +147,79 @@ class Gutenberg_REST_Revisions_Controller extends WP_REST_Revisions_Controller {
 		 * @param WP_REST_Request  $request  Request used to generate the response.
 		 */
 		return apply_filters( 'rest_prepare_revision', $response, $post, $request );
+	}
+
+	/**
+	 * Returns the fields plugins add to a revision through the
+	 * `_wp_post_revision_fields` filter, the same list the classic revisions
+	 * screen shows, without the fields already in the response.
+	 *
+	 * @param WP_Post $revision Post revision object.
+	 * @return array Map of field name to its label and value.
+	 */
+	protected function get_revision_fields( $revision ) {
+		$core_fields = array( 'post_title', 'post_content', 'post_excerpt' );
+		$fields      = array();
+
+		foreach ( _wp_post_revision_fields( $revision->post_parent ) as $field => $label ) {
+			if ( in_array( $field, $core_fields, true ) ) {
+				continue;
+			}
+
+			/*
+			 * WP_Post reads an unknown property from post meta, so a field
+			 * backed by meta needs no filter of its own. This is the same
+			 * call the classic screen makes for the newer of the two
+			 * revisions it compares.
+			 */
+			/** This filter is documented in wp-admin/includes/revision.php */
+			$value = apply_filters( "_wp_post_revision_field_{$field}", $revision->$field, $field, $revision, 'to' );
+
+			if ( ! is_scalar( $value ) || '' === (string) $value ) {
+				continue;
+			}
+
+			$fields[ $field ] = array(
+				'label' => (string) $label,
+				'value' => (string) $value,
+			);
+		}
+
+		return $fields;
+	}
+
+	/**
+	 * Adds the plugin revision fields to the schema.
+	 *
+	 * @return array Item schema data.
+	 */
+	public function get_item_schema() {
+		$schema = parent::get_item_schema();
+
+		$schema['properties']['revision_fields'] = array(
+			'description'          => __( 'Fields added to revisions by plugins, as shown on the classic revisions screen.' ),
+			'type'                 => 'object',
+			'context'              => array( 'edit' ),
+			'readonly'             => true,
+			'additionalProperties' => array(
+				'type'       => 'object',
+				'properties' => array(
+					'label' => array(
+						'description' => __( 'Human readable name for the field.' ),
+						'type'        => 'string',
+						'context'     => array( 'edit' ),
+						'readonly'    => true,
+					),
+					'value' => array(
+						'description' => __( 'Value of the field in this revision.' ),
+						'type'        => 'string',
+						'context'     => array( 'edit' ),
+						'readonly'    => true,
+					),
+				),
+			),
+		);
+
+		return $schema;
 	}
 }
