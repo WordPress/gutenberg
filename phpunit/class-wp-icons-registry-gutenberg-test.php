@@ -98,6 +98,20 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Invokes the WP_Icons_Registry_Gutenberg::sanitize_inline_svg method on the registry instance.
+	 *
+	 * @param string $html_containing_svg HTML fragment containing the SVG to sanitize.
+	 * @return string The sanitized SVG content.
+	 */
+	private function sanitize_inline_svg( $html_containing_svg ) {
+		$method = new ReflectionMethod( $this->registry, 'sanitize_inline_svg' );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
+		return $method->invoke( $this->registry, $html_containing_svg );
+	}
+
+	/**
 	 * Provides valid namespaced icon names, including names that contain,
 	 * start or end with digits, as well as underscores and hyphens.
 	 *
@@ -500,5 +514,214 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 		$result = $this->register( $name, $settings );
 		$this->assertFalse( $result );
 		$this->assertFalse( $this->registry->is_registered( $name ) );
+	}
+
+	/**
+	 * @dataProvider data_sanitize_inline_svg
+	 * @covers WP_Icons_Registry_Gutenberg::sanitize_inline_svg
+	 *
+	 * @param string $input    The icon content to sanitize.
+	 * @param string $expected The expected sanitized output.
+	 */
+	public function test_sanitize_inline_svg( $input, $expected ) {
+		$sanitized = $this->sanitize_inline_svg( $input );
+		$this->assertSame( $expected, $sanitized );
+	}
+
+	/**
+	 * Data provider for test_sanitize_inline_svg.
+	 *
+	 * @return array[] Array of arrays with input and expected sanitized output.
+	 */
+	public function data_sanitize_inline_svg() {
+		/*
+		 * WordPress 7.1 preserves the `xmlns:xlink` namespace attribute when
+		 * serializing inline SVG through WP_HTML_Processor; WordPress 7.0 strips
+		 * it. Branch the expectation so the test passes on both the current and
+		 * the previous WordPress version exercised in CI.
+		 *
+		 * @link https://core.trac.wordpress.org/changeset/62492
+		 *
+		 * TODO: Remove this conditional once WordPress 7.0 support is dropped.
+		 */
+		$xlink = is_wp_version_compatible( '7.1' )
+			? ' xmlns:xlink="http://www.w3.org/1999/xlink"'
+			: '';
+
+		return array(
+			// Root selection: exactly one SVG element in the SVG namespace.
+			'rejects multiple top-level svg elements'     => array(
+				'<svg xmlns="http://www.w3.org/2000/svg"><path d="first"/></svg><svg xmlns="http://www.w3.org/2000/svg"><path d="second"/></svg>',
+				'',
+			),
+			'allows nested svg'                           => array(
+				'<svg xmlns="http://www.w3.org/2000/svg"><svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0" /></svg></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0" /></svg></svg>',
+			),
+			'rejects svg in a foreign namespace'          => array(
+				'<math><svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0"/></svg></math>',
+				'',
+			),
+			'allows a self-closing svg root'              => array(
+				'<svg xmlns="http://www.w3.org/2000/svg" />',
+				'<svg xmlns="http://www.w3.org/2000/svg" />',
+			),
+			'rejects a sibling after a self-closing root' => array(
+				'<svg xmlns="http://www.w3.org/2000/svg" /><svg xmlns="http://www.w3.org/2000/svg"><path d="second" /></svg>',
+				'',
+			),
+			'ignores markup after a self-closing root'    => array(
+				'<svg xmlns="http://www.w3.org/2000/svg" /><path d="orphan" />',
+				'<svg xmlns="http://www.w3.org/2000/svg" />',
+			),
+
+			// Content surrounding the SVG root is ignored.
+			'ignores content preceding the svg'           => array(
+				'<p>before</p><svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0" /></svg>',
+			),
+			'ignores content following the svg'           => array(
+				'<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0" /></svg><p>after</p>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0" /></svg>',
+			),
+			'ignores an xml declaration before the svg'   => array(
+				'<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0" /></svg>',
+			),
+			'ignores a comment before the svg'            => array(
+				'<!-- Generator: some editor --><svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0" /></svg>',
+			),
+			'ignores whitespace before the svg'           => array(
+				"  \n\t<svg xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M0 0\" /></svg>",
+				'<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0" /></svg>',
+			),
+
+			// Non-SVG or unparseable input returns an empty string.
+			'returns empty for empty string'              => array(
+				'',
+				'',
+			),
+			'returns empty for whitespace only'           => array(
+				"   \n\t  ",
+				'',
+			),
+			'returns empty for plain text'                => array(
+				'plain text without svg',
+				'',
+			),
+			'returns empty for html without an svg'       => array(
+				'<div>not svg</div><p>content</p>',
+				'',
+			),
+			'returns empty for incomplete markup'         => array(
+				'<svg><path d="M0 0"',
+				'',
+			),
+			'returns empty for unsupported markup'        => array(
+				'<svg><foreignObject><table>TEXT NOT SUPPORTED HERE!',
+				'',
+			),
+
+			// Disallowed or dangerous content is stripped (wp_kses).
+			'strips html-like tags inside svg'            => array(
+				'<svg xmlns="http://www.w3.org/2000/svg"><p>paragraph content</p><path d="M0 0h24v24H0z" /><div>div content</div></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"></svg>',
+			),
+			'strips foreignObject but keeps text content' => array(
+				'<svg xmlns="http://www.w3.org/2000/svg"><foreignObject><p>paragraph content</p><script>alert(1)</script></foreignObject><path d="M0 0h24v24H0z" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg">paragraph contentalert(1)<path d="M0 0h24v24H0z" /></svg>',
+			),
+			'strips script tags'                          => array(
+				'<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script><path d="M0 0h24v24H0z" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg">alert(1)<path d="M0 0h24v24H0z" /></svg>',
+			),
+			'strips event handler attributes'             => array(
+				'<svg xmlns="http://www.w3.org/2000/svg" onclick="alert(1)"><path d="M0 0h24v24H0z" onload="evil()" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" /></svg>',
+			),
+			'strips javascript protocol in href'          => array(
+				'<svg xmlns="http://www.w3.org/2000/svg"><use href="javascript:alert(1)" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><use href="alert(1)" /></svg>',
+			),
+			'strips data protocol in href'                => array(
+				'<svg xmlns="http://www.w3.org/2000/svg"><use href="data:text/html,<script>alert(1)</script>" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><use href="text/html,&lt;script&gt;alert(1)&lt;/script&gt;" /></svg>',
+			),
+			'strips javascript protocol in xlink:href'    => array(
+				'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><a xlink:href="javascript:alert(1)"><path d="M0 0" /></a></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"' . $xlink . '><a xlink:href="alert(1)"><path d="M0 0" /></a></svg>',
+			),
+			'strips animate and set elements'             => array(
+				'<svg xmlns="http://www.w3.org/2000/svg"><a href="#icon"><animate attributeName="href" to="javascript:alert(1)" dur="1s" /><set attributeName="href" to="javascript:alert(1)" begin="1s" /><path d="M0 0" /></a></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><a href="#icon"><path d="M0 0" /></a></svg>',
+			),
+			'strips disallowed tags'                      => array(
+				'<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0"/><iframe src="evil"></iframe><object data="x" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0" /></svg>',
+			),
+
+			// Allowed SVG elements and attributes are preserved.
+			'preserves the root svg element'              => array(
+				'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" width="24" height="24" class="icon" aria-hidden="true"><path d="M0 0" fill="currentColor" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"' . $xlink . ' viewbox="0 0 24 24" preserveaspectratio="xMidYMid meet" width="24" height="24" class="icon" aria-hidden="true"><path d="M0 0" fill="currentColor" /></svg>',
+			),
+			'preserves xmlns:xlink attribute'             => array(
+				'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M0 0h24v24H0z" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"' . $xlink . '><path d="M0 0h24v24H0z" /></svg>',
+			),
+			'preserves basic shape elements'              => array(
+				'<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" /><circle cx="12" cy="12" r="10" /><ellipse cx="12" cy="12" rx="10" ry="8" /><line x1="0" y1="0" x2="24" y2="24" /><polygon points="0,0 24,0 12,24" /><polyline points="0,0 12,12 24,0" /><rect x="2" y="2" width="20" height="20" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" /><circle cx="12" cy="12" r="10" /><ellipse cx="12" cy="12" rx="10" ry="8" /><line x1="0" y1="0" x2="24" y2="24" /><polygon points="0,0 24,0 12,24" /><polyline points="0,0 12,12 24,0" /><rect x="2" y="2" width="20" height="20" /></svg>',
+			),
+			'preserves grouping and structural elements'  => array(
+				'<svg xmlns="http://www.w3.org/2000/svg"><defs><symbol id="icon" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" /></symbol><clipPath id="clip"><circle cx="12" cy="12" r="10" /></clipPath><mask id="m"><rect fill="white" width="24" height="24" /></mask></defs><g><use href="#icon" /><use href="https://example.com/icon.svg#symbol" /><use href="#symbol" /></g></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><defs><symbol id="icon" viewbox="0 0 24 24"><path d="M0 0h24v24H0z" /></symbol><clipPath id="clip"><circle cx="12" cy="12" r="10" /></clipPath><mask id="m"><rect fill="white" width="24" height="24" /></mask></defs><g><use href="#icon" /><use href="https://example.com/icon.svg#symbol" /><use href="#symbol" /></g></svg>',
+			),
+			'preserves switch element'                    => array(
+				'<svg xmlns="http://www.w3.org/2000/svg"><switch><path d="M0 0h24v24H0z" /></switch></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><switch><path d="M0 0h24v24H0z" /></switch></svg>',
+			),
+			'preserves view element'                      => array(
+				'<svg xmlns="http://www.w3.org/2000/svg"><view id="v" viewBox="0 0 24 24" /><path d="M0 0h24v24H0z" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><view id="v" viewbox="0 0 24 24" /><path d="M0 0h24v24H0z" /></svg>',
+			),
+			'preserves linking element'                   => array(
+				'<svg xmlns="http://www.w3.org/2000/svg"><a href="https://example.com"><path d="M0 0h24v24H0z" /></a></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><a href="https://example.com"><path d="M0 0h24v24H0z" /></a></svg>',
+			),
+			'preserves gradient elements'                 => array(
+				'<svg xmlns="http://www.w3.org/2000/svg"><linearGradient id="lin"><stop offset="0%" stop-color="red" /><stop offset="100%" stop-color="blue" /></linearGradient><radialGradient id="rad"><stop offset="0%" stop-color="red" /><stop offset="100%" stop-color="blue" /></radialGradient><rect fill="url(#lin)" width="24" height="24" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><linearGradient id="lin"><stop offset="0%" stop-color="red" /><stop offset="100%" stop-color="blue" /></linearGradient><radialGradient id="rad"><stop offset="0%" stop-color="red" /><stop offset="100%" stop-color="blue" /></radialGradient><rect fill="url(#lin)" width="24" height="24" /></svg>',
+			),
+			'preserves pattern element'                   => array(
+				'<svg xmlns="http://www.w3.org/2000/svg"><pattern id="pat" width="4" height="4"><rect width="4" height="4" fill="currentColor" /></pattern><rect fill="url(#pat)" width="24" height="24" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><pattern id="pat" width="4" height="4"><rect width="4" height="4" fill="currentColor" /></pattern><rect fill="url(#pat)" width="24" height="24" /></svg>',
+			),
+			'preserves filter elements'                   => array(
+				'<svg xmlns="http://www.w3.org/2000/svg"><filter id="blur"><feGaussianBlur in="SourceGraphic" stdDeviation="1" /></filter><rect filter="url(#blur)" width="24" height="24" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><filter id="blur"><feGaussianBlur in="SourceGraphic" stddeviation="1" /></filter><rect filter="url(#blur)" width="24" height="24" /></svg>',
+			),
+			'preserves text elements'                     => array(
+				'<svg xmlns="http://www.w3.org/2000/svg"><path id="p" d="M0,20 Q12,0 24,20" /><text x="12" y="16" text-anchor="middle">A<tspan font-weight="bold">B</tspan></text><text><textPath href="#p">path</textPath></text></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><path id="p" d="M0,20 Q12,0 24,20" /><text x="12" y="16" text-anchor="middle">A<tspan font-weight="bold">B</tspan></text><text><textPath href="#p">path</textPath></text></svg>',
+			),
+			'preserves descriptive elements'              => array(
+				'<svg xmlns="http://www.w3.org/2000/svg"><title>Icon title</title><desc>Description</desc><metadata></metadata><path d="M0 0h24v24H0z" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><title>Icon title</title><desc>Description</desc><metadata></metadata><path d="M0 0h24v24H0z" /></svg>',
+			),
+			'preserves image element'                     => array(
+				'<svg xmlns="http://www.w3.org/2000/svg"><image href="https://example.com/icon.png" width="24" height="24" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><image href="https://example.com/icon.png" width="24" height="24" /></svg>',
+			),
+			'preserves marker element'                    => array(
+				'<svg xmlns="http://www.w3.org/2000/svg"><marker id="arrow" refX="10" refY="5"><path d="M0,0 L10,5 L0,10" /></marker><path d="M0,12 L24,12" marker-start="url(#arrow)" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><marker id="arrow" refx="10" refy="5"><path d="M0,0 L10,5 L0,10" /></marker><path d="M0,12 L24,12" marker-start="url(#arrow)" /></svg>',
+			),
+			'preserves animation elements'                => array(
+				'<svg xmlns="http://www.w3.org/2000/svg"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="2s" /><path d="M0,0 L10,10"><animateMotion path="M0,0 L24,24" dur="1s" /></path></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"><animateTransform attributename="transform" type="rotate" from="0 12 12" to="360 12 12" dur="2s" /><path d="M0,0 L10,10"><animateMotion path="M0,0 L24,24" dur="1s" /></path></svg>',
+			),
+		);
 	}
 }
