@@ -1,3 +1,4 @@
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { render, act } from '@testing-library/react';
 import {
 	createRegistry,
@@ -24,6 +25,12 @@ import {
 	clearSuggestionMarkerAttributes,
 	useSuggestionsProvider,
 } from '../provider';
+
+// The editor store pulls in `@wordpress/viewport`, which reads
+// `window.matchMedia` while loading.
+vi.hoisted( () => {
+	globalThis.wpVitest.mockMatchMedia();
+} );
 
 describe( 'operationsFromOverlay', () => {
 	it( 'emits one attribute-set op per changed key', () => {
