@@ -93,13 +93,9 @@ require_once __DIR__ . '/experimental/rest-api-overrides.php';
 // Gutenberg plugin compat.
 require __DIR__ . '/compat/plugin/edit-site-routes-backwards-compat.php';
 require __DIR__ . '/compat/plugin/fonts.php';
+require __DIR__ . '/compat/plugin/connectors.php';
 require __DIR__ . '/compat/plugin/style-state-aliases.php';
 
-
-
-if ( class_exists( '\WordPress\AiClient\AiClient' ) ) {
-	require __DIR__ . '/compat/plugin/connectors.php';
-}
 
 // WordPress 7.1 compat.
 require __DIR__ . '/compat/wordpress-7.1/admin-bar.php';
