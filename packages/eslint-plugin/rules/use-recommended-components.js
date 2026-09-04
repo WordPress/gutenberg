@@ -85,6 +85,7 @@ const DENYLIST = {
 			'{{ name }} is planned for deprecation. Write your own CSS instead.',
 		Animate:
 			'Write your own CSS animations instead, preferably using the motion tokens available in `@wordpress/theme`.',
+		Badge: 'Use `{{ name }}` from `@wordpress/ui` instead.',
 		BaseControl:
 			'Use `Field` from `@wordpress/ui` instead. For a purely visual label, use `Field.VisualLabel`. For a group legend, use `Fieldset` and `Fieldset.Legend`.',
 		Card: 'Use `Card.Root` from `@wordpress/ui` instead.',
