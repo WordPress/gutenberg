@@ -10,9 +10,48 @@ import {
 } from '@wordpress/components';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { loadEditorAssets } from '@wordpress/lazy-editor';
 import { unlock } from '@wordpress/routes-lock-unlock';
 
 const { usePostFields, PostCardPanel } = unlock( editorPrivateApis );
+
+/*
+ * The featured image field opens the WordPress media modal, which needs the
+ * media assets (`wp.media` and friends) that the editor canvas loads but this
+ * screen never does — without them, opening the field crashes the route.
+ * Wrap the field's edit component so the shared editor assets are loaded
+ * first.
+ *
+ * This is a stopgap owned by the route because the route is what knows the
+ * screen is asset-less. Ultimately a field should be able to declare this
+ * kind of asset dependency itself so every DataForm consumer gets it for
+ * free; once that exists, remove this wrapper.
+ */
+function withEditorAssets( FieldEdit: any ) {
+	return function EditWithEditorAssets( props: any ) {
+		const [ isReady, setIsReady ] = useState(
+			() => !! ( window as any ).wp?.media
+		);
+		useEffect( () => {
+			if ( ! isReady ) {
+				loadEditorAssets().then( () => setIsReady( true ) );
+			}
+		}, [ isReady ] );
+
+		// Render the field right away — only opening the modal needs the
+		// assets — and keep it inert until they have loaded.
+		return (
+			<div
+				aria-busy={ ! isReady || undefined }
+				style={ ! isReady ? { opacity: 0.6 } : undefined }
+				// @ts-expect-error inert not typed properly
+				inert={ ! isReady ? 'true' : undefined }
+			>
+				<FieldEdit { ...props } />
+			</div>
+		);
+	};
+}
 
 const fieldsWithBulkEditSupport = [ 'status', 'date', 'author', 'discussion' ];
 
@@ -91,6 +130,12 @@ export function QuickEditModal( {
 						readOnly: ! canSwitchTemplate,
 					};
 				}
+				if ( field.id === 'featured_media' && field.Edit ) {
+					return {
+						...field,
+						Edit: withEditorAssets( field.Edit ),
+					};
+				}
 
 				return field;
 			} ),
@@ -109,6 +154,10 @@ export function QuickEditModal( {
 			{
 				id: 'status',
 				label: __( 'Status' ),
+				layout: {
+					type: 'panel',
+					summary: 'status',
+				},
 				children: [
 					{
 						id: 'status',
@@ -125,6 +174,10 @@ export function QuickEditModal( {
 			{
 				id: 'discussion',
 				label: __( 'Discussion' ),
+				layout: {
+					type: 'panel',
+					summary: 'discussion',
+				},
 				children: [
 					{
 						id: 'comment_status',

@@ -2,8 +2,32 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The `esnext` ruleset no longer configures a parser, so JavaScript and JSX files are parsed by ESLint's default parser instead of `@babel/eslint-parser` ([#82144](https://github.com/WordPress/gutenberg/pull/82144)).
+
 ### Enhancements
 
+-   Update `use-recommended-components` rule to prefer `@wordpress/ui` `Field` and `Fieldset` over legacy `@wordpress/components` `BaseControl` ([#82095](https://github.com/WordPress/gutenberg/pull/82095)).
+
+### Bug Fixes
+
+-   Apply test-only DOM global exceptions to both JavaScript and JSX test files ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+-   Fix `no-unused-vars-before-return` false positive on variables used only in JSX ([#82144](https://github.com/WordPress/gutenberg/pull/82144)).
+
+### Internal
+
+-   Update `eslint-plugin-jest` to 29.16.5 ([#82181](https://github.com/WordPress/gutenberg/pull/82181)).
+
+## 25.10.0 (2026-08-26)
+
+### Bug Fixes
+
+-   Remove `fixable` option from `i18n-no-flanking-whitespace` rule [#70279](https://github.com/WordPress/gutenberg/pull/70279).
+
+### Enhancements
+
+-   Update `use-recommended-components` rule to mark `SearchableChipSelect` and `SearchableChipSelectControl` from `@wordpress/ui` as recommended ([#80980](https://github.com/WordPress/gutenberg/pull/80980)).
 -   Update `use-recommended-components` rule to mark `Autocomplete`, `Field`, and `Fieldset` from `@wordpress/ui` as recommended ([#80636](https://github.com/WordPress/gutenberg/pull/80636)).
 -   Allow the public `@wordpress/ui` keyboard shortcut utilities in the `use-recommended-components` rule. ([#81826](https://github.com/WordPress/gutenberg/pull/81826))
 -   Update `use-recommended-components` rule to mark `Input`, `InputControl`, and `InputLayout` from `@wordpress/ui` as recommended, and to prefer `@wordpress/ui` `InputControl` over legacy `@wordpress/components` `InputControl` and `TextControl` ([#81658](https://github.com/WordPress/gutenberg/pull/81658)).

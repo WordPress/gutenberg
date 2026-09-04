@@ -4,22 +4,63 @@
 
 ### New Features
 
+-   Add a responsive `Breadcrumb` navigation component. ([#80425](https://github.com/WordPress/gutenberg/pull/80425))
+
+### Breaking Changes
+
+-   `Autocomplete.Popup`, `Combobox.Popup`, `Select.Popup`, `SearchableChipSelect`, and `SearchableChipSelectControl`: The popup now defaults to a fixed anchor width. Use `width="content"` on Popups, or `popupWidth="content"` on composites, to restore content-sized width between the anchor and available viewport bounds ([#82087](https://github.com/WordPress/gutenberg/pull/82087), [#82193](https://github.com/WordPress/gutenberg/pull/82193)).
+-   Portaled overlays (`AlertDialog`, `Autocomplete`, `Combobox`, `Dialog`, `Drawer`, `Menu`, `Popover`, and `Select`) now inherit the theme from their portal destination instead of re-emitting the trigger's nearest contextual theme. Default portals use the document root theme; custom portal containers use their DOM ancestry ([#82038](https://github.com/WordPress/gutenberg/pull/82038)).
+
+### New Features
+
+-   Add `Field.VisualLabel` for a purely visual label outside `Field.Root` ([#82095](https://github.com/WordPress/gutenberg/pull/82095)).
+
+### Enhancements
+
+-   `AlertDialog`, `Dialog`, `Drawer`, `Popover`, and `Tooltip`: Derive Trigger props from the corresponding Base UI components. ([#81824](https://github.com/WordPress/gutenberg/pull/81824))
+-   `Autocomplete.Status`, `Combobox.Status`: Add a `Status` subcomponent that announces async list status to screen readers. Item popups give Status its own collapsing grid row so a visible result count sits above the list without overlaying items ([#82195](https://github.com/WordPress/gutenberg/pull/82195)).
+-   `Autocomplete.Popup`, `Combobox.Popup`, `SearchableChipSelect`, `SearchableChipSelectControl`, `Select.Popup`, and `SelectControl`: Add `width` on Popups and `popupWidth` on composites, with preset width constraints (`anchor`, `content`, `sm`, `md`, `lg`, and `available`) for the item popup. `SelectControl` defaults to `content` to preserve prior popup sizing ([#82087](https://github.com/WordPress/gutenberg/pull/82087), [#82193](https://github.com/WordPress/gutenberg/pull/82193)).
+-   `Link`, `Menu.LinkItem`: Accept `target`, apply the new-tab indicator and accessible notice for `_blank`, and preserve explicit targets when `openInNewTab` is set. ([#82347](https://github.com/WordPress/gutenberg/pull/82347))
+-   `Menu`: Support multiple item descriptions. ([#81825](https://github.com/WordPress/gutenberg/pull/81825))
+-   `Menu`: Use `Text` for item labels and descriptions to share typography and apply `text-wrap: pretty`. ([#82237](https://github.com/WordPress/gutenberg/pull/82237))
+-   `Text`: Apply `text-wrap: pretty` by default to improve line wrapping. ([#82133](https://github.com/WordPress/gutenberg/pull/82133))
+
+### Bug Fixes
+
+-   `Input`, `Textarea`, `InputControl`, `TextareaControl`: Use `--wpds-color-foreground-interactive-neutral-weak` for enabled placeholder text so it meets the 4.5:1 contrast minimum ([#82304](https://github.com/WordPress/gutenberg/pull/82304)).
+-   `SearchableChipSelect`, `SearchableChipSelectControl`: Fix the gray background on disabled search fields in WordPress admin ([#82304](https://github.com/WordPress/gutenberg/pull/82304)).
+-   `ValidityIndicator`: Remove the built-in outer margin. Spacing belongs on the consumer. `ControlWithError` now uses `Stack` with `gap="sm"` so validated controls keep the same gap. ([#82267](https://github.com/WordPress/gutenberg/pull/82267))
+-   `AlertDialog`: Use a neutral tone for the cancel button. ([#82261](https://github.com/WordPress/gutenberg/pull/82261))
+-   `Input`: Hide the field focus ring when a prefix or suffix slot control is focused. ([#82257](https://github.com/WordPress/gutenberg/pull/82257))
+-   `Icon`: Merge a consumer-supplied `style` prop with the icon's intrinsic styles instead of replacing them, so styles like `fill: none` on stroke-based icons survive unless the consumer overrides the same property explicitly. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+
+### Documentation
+
+-   Add a Form best practices Storybook page for labeling composed controls ([#82197](https://github.com/WordPress/gutenberg/pull/82197)).
+
+## 0.21.0 (2026-08-26)
+
+### New Features
+
 -   Add `Spinner` component ([#81358](https://github.com/WordPress/gutenberg/pull/81358)).
 -   `Calendar`, `RangeCalendar`: Accept BCP 47 locale codes in the `locale` prop and keep localized date text aligned with the Gregorian date grid. ([#81814](https://github.com/WordPress/gutenberg/pull/81814))
 -   Add a `Menu` component. ([#79560](https://github.com/WordPress/gutenberg/pull/79560))
 -   Add `ControlWithError` component, ported from `@wordpress/components` and `@wordpress/dataviews` ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574)).
 -   Export `ValidityIndicator`, so custom validated controls can render the same validity message as `ControlWithError` ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574)).
+-   Add `SearchableChipSelectControl` component ([#80980](https://github.com/WordPress/gutenberg/pull/80980)).
 -   Add `ValidatedInputControl` component, an `InputControl` wrapped in `ControlWithError` ([#81627](https://github.com/WordPress/gutenberg/pull/81627)).
 -   Add `ValidatedTextareaControl` component, a `TextareaControl` wrapped in `ControlWithError` ([#81984](https://github.com/WordPress/gutenberg/pull/81984)).
 
 ### Breaking Changes
 
+-   `Calendar`, `RangeCalendar`: Remove the `--wp-ui-calendar-range-middle-background-color` and `--wp-ui-calendar-preview-border-color` CSS custom properties. ([#81438](https://github.com/WordPress/gutenberg/pull/81438))
 -   `SearchableChipSelect`: Remove the `creatableItem` prop. Mark a creatable action with `creatable: true` on an item in `items` instead. The item renders in the list footer and is excluded from the main list automatically. Handle selection in `onValueChange`. See the `Creatable` and `GroupedCreatable` stories for examples ([#80989](https://github.com/WordPress/gutenberg/pull/80989)).
 -   `Select.Item`: Remove `'compact'` from the `size` prop. Use `'default'` instead ([#81354](https://github.com/WordPress/gutenberg/pull/81354)).
 -   `Combobox.Item`, `SelectControl.Item`: The `size` prop is removed ([#81354](https://github.com/WordPress/gutenberg/pull/81354)).
 
 ### Enhancements
 
+-   `Calendar`, `RangeCalendar`: Add custom root roles and month-aware application labels. ([#81443](https://github.com/WordPress/gutenberg/pull/81443))
 -   `CollapsibleCard`: Support multiple `CollapsibleCard.HeaderDescription` components ([#81227](https://github.com/WordPress/gutenberg/pull/81227)).
 -   Add `TextareaControl` component ([#81359](https://github.com/WordPress/gutenberg/pull/81359)).
 -   Export shared keyboard shortcut presentation and accessibility utilities. ([#81826](https://github.com/WordPress/gutenberg/pull/81826))
@@ -32,12 +73,18 @@
 ### Bug Fixes
 
 -   `Calendar`, `RangeCalendar`: Use the WordPress text direction when no supported formatting locale is provided, while preserving explicit locale and `dir` precedence. ([#81982](https://github.com/WordPress/gutenberg/pull/81982))
+-   `Calendar`, `RangeCalendar`: Align day states with neutral WPDS color tokens. ([#81438](https://github.com/WordPress/gutenberg/pull/81438))
 -   `Calendar`, `RangeCalendar`: Show tooltips for the previous and next month buttons. ([#81983](https://github.com/WordPress/gutenberg/pull/81983))
 -   `Calendar`, `RangeCalendar`: Make the navigation label translatable and use the same locale-derived default first day of the week for locale strings and date-fns locale objects. Existing object-based calendars may use a different default; pass `weekStartsOn` to preserve it. ([#81814](https://github.com/WordPress/gutenberg/pull/81814))
 -   `Autocomplete.Input`, `Combobox.Input`: Omit the `type` prop, since the combobox role is only valid on `input type="text"` ([#80636](https://github.com/WordPress/gutenberg/pull/80636)).
 -   `Card`: Use the normal neutral surface stroke for the default border. ([#81746](https://github.com/WordPress/gutenberg/pull/81746))
 -   `Calendar`, `RangeCalendar`: Preserve day focus when a controlled month change removes the focused day. ([#81635](https://github.com/WordPress/gutenberg/pull/81635))
 -   `Button`: Fix the loading spinner being off-center in RTL ([#81901](https://github.com/WordPress/gutenberg/pull/81901)).
+-   `Select`, `Combobox`, `SelectControl`: Fix the trigger placeholder failing the 4.5:1 text contrast minimum ([#81853](https://github.com/WordPress/gutenberg/pull/81853)).
+-   `Autocomplete.List`: Stop rendering `aria-orientation` in grid mode, where `role="grid"` disallows it ([#81853](https://github.com/WordPress/gutenberg/pull/81853)).
+-   `SearchableChipSelect`, `SearchableChipSelectControl`: Forward ref to the search input instead of the chips container ([#80980](https://github.com/WordPress/gutenberg/pull/80980)).
+-   `InputControl`: Hide the value-like placeholder Safari renders in empty date and time inputs (e.g. `12:30`), which was indistinguishable from a committed value ([#81991](https://github.com/WordPress/gutenberg/pull/81991)).
+-   `Menu`: Close non-modal menus when the user presses inside a same-origin iframe. ([#81952](https://github.com/WordPress/gutenberg/pull/81952))
 
 ### Documentation
 
@@ -45,9 +92,11 @@
 
 ### Internal
 
+-   Restrict `@wordpress/private-apis` imports via lint, with the `ThemeProvider` compatibility fallback as the only exemption. ([#82015](https://github.com/WordPress/gutenberg/pull/82015))
 -   Update `@base-ui/react` from `1.6.0` to `1.7.0`. ([#81390](https://github.com/WordPress/gutenberg/pull/81390))
 -   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509), [#81514](https://github.com/WordPress/gutenberg/pull/81514), [#81516](https://github.com/WordPress/gutenberg/pull/81516), [#81518](https://github.com/WordPress/gutenberg/pull/81518))
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81515](https://github.com/WordPress/gutenberg/pull/81515))
+-   Remove unused `outset-ring--focus-within-visible` CSS module class. ([#82077](https://github.com/WordPress/gutenberg/pull/82077))
 
 ## 0.20.0 (2026-08-12)
 

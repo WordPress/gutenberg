@@ -8,16 +8,11 @@ export const DEFAULT_VIEW: View = {
 		field: 'title',
 		direction: 'asc' as const,
 	},
-	fields: [ 'author', 'active', 'slug' ],
+	fields: [ 'author' ],
 	titleField: 'title',
 	descriptionField: 'description',
 	mediaField: 'preview',
 	filters: [],
-};
-
-export const DEFAULT_VIEW_LEGACY: View = {
-	...DEFAULT_VIEW,
-	fields: [ 'author' ],
 };
 
 export const DEFAULT_LAYOUTS = {
@@ -40,17 +35,10 @@ type ActiveViewOverrides = {
 export function getActiveViewOverridesForTab(
 	activeView: string
 ): ActiveViewOverrides {
-	// User view: sort by date, newest first
-	if ( activeView === 'user' ) {
-		return {
-			sort: { field: 'date', direction: 'desc' as const },
-		};
-	}
-	// Active view: no overrides
-	if ( activeView === 'active' ) {
+	if ( activeView === 'all' ) {
 		return {};
 	}
-	// Author-based view: filter by author
+	// Author-based view
 	return {
 		filters: [
 			{
@@ -72,40 +60,6 @@ export async function ensureView(
 		slug: 'default-new',
 		defaultView: DEFAULT_VIEW,
 		activeViewOverrides: getActiveViewOverridesForTab(
-			activeView ?? 'active'
-		),
-		queryParams: search,
-	} );
-}
-
-export function getActiveViewOverridesForTabLegacy(
-	activeView: string
-): ActiveViewOverrides {
-	if ( activeView === 'all' ) {
-		return {};
-	}
-	// Author-based view
-	return {
-		filters: [
-			{
-				field: 'author',
-				operator: 'isAny',
-				value: [ activeView ],
-			},
-		],
-	};
-}
-
-export async function ensureViewLegacy(
-	activeView?: string,
-	search?: { page?: number; search?: string }
-) {
-	return loadView( {
-		kind: 'postType',
-		name: 'wp_template',
-		slug: 'default-new',
-		defaultView: DEFAULT_VIEW_LEGACY,
-		activeViewOverrides: getActiveViewOverridesForTabLegacy(
 			activeView ?? 'all'
 		),
 		queryParams: search,

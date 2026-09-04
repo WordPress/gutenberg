@@ -1,24 +1,18 @@
 import { useCallback } from '@wordpress/element';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { cloneBlock } from '@wordpress/blocks';
+import { moveBlocksToNestedList } from './move-blocks-to-nested-list';
 
 export default function useOutdentListItem() {
 	const registry = useRegistry();
-	const {
-		moveBlocksToPosition,
-		removeBlock,
-		insertBlock,
-		updateBlockListSettings,
-	} = useDispatch( blockEditorStore );
+	const { moveBlocksToPosition, removeBlock } =
+		useDispatch( blockEditorStore );
 	const {
 		getBlockRootClientId,
 		getBlockName,
 		getBlockOrder,
 		getBlockIndex,
 		getSelectedBlockClientIds,
-		getBlock,
-		getBlockListSettings,
 	} = useSelect( blockEditorStore );
 
 	function getParentListItemId( id ) {
@@ -65,28 +59,13 @@ export default function useOutdentListItem() {
 
 		registry.batch( () => {
 			if ( followingListItems.length ) {
-				let nestedListId = getBlockOrder( firstClientId )[ 0 ];
-
-				if ( ! nestedListId ) {
-					const nestedListBlock = cloneBlock(
-						getBlock( parentListId ),
-						{},
-						[]
-					);
-					nestedListId = nestedListBlock.clientId;
-					insertBlock( nestedListBlock, 0, firstClientId, false );
-					// Immediately update the block list settings, otherwise
-					// blocks can't be moved here due to canInsert checks.
-					updateBlockListSettings(
-						nestedListId,
-						getBlockListSettings( parentListId )
-					);
-				}
-
-				moveBlocksToPosition(
+				// Nest the items that follow under the outdented item so they
+				// keep their place below it.
+				moveBlocksToNestedList(
+					registry,
 					followingListItems,
 					parentListId,
-					nestedListId
+					firstClientId
 				);
 			}
 			moveBlocksToPosition(

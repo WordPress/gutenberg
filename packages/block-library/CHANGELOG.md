@@ -4,7 +4,35 @@
 
 ### Enhancements
 
-- `List`: Add wide and full alignment support ([#68002](https://github.com/WordPress/gutenberg/pull/68002)).
+-   Math: Declare `interactivity.clientNavigation` support. The block's front end output is static markup, and without the declaration a Math block inside a Query block forced full page reloads on pagination ([#82248](https://github.com/WordPress/gutenberg/pull/82248)).
+-   Paragraph, List, Heading, Preformatted, Columns, Group, Template Part: Read the default padding these blocks add when they have a background color from the `--wp--style--block-background-padding` custom property, so themes can change or remove it ([#82024](https://github.com/WordPress/gutenberg/pull/82024)).
+-   Query: Show a snackbar notice instead of a blocking modal when "Reload full page" is turned on automatically because a block inside the Query block doesn't support client-side navigation ([#82246](https://github.com/WordPress/gutenberg/pull/82246)).
+
+### Bug Fixes
+
+-   Footnotes: Prefix newly created footnote IDs with `fn-` so they always start with a letter. A bare UUID often starts with a digit, and an ID that does is not a valid CSS identifier, so `querySelector( '#' + id )` threw and `#id` style rules never matched. Existing footnotes keep their IDs ([#82398](https://github.com/WordPress/gutenberg/pull/82398)).
+-   Navigation: Restore `flex-grow` on the menu container in the editor, where the visually hidden menu description breaks the `:only-child` selector the front end relies on, so the "Space between" and other justification settings apply in the canvas as they do on the front end ([#78447](https://github.com/WordPress/gutenberg/pull/78447)).
+-   Image: Fix cropped galleries rendering images at their natural height in the editor canvas. The baseline inline `height: auto` is no longer emitted for images inside a cropped gallery, so the gallery's own cropping CSS applies ([#82318](https://github.com/WordPress/gutenberg/pull/82318)).
+-   Tabs: Activate the tab that a URL hash points into, so an anchor set on a block inside a tab panel can be reached. Anchor links followed after the page has loaded are handled too, matching the Accordion block ([#81744](https://github.com/WordPress/gutenberg/pull/81744)).
+-   Accordion Panel: Reset padding-block when panel is hidden ([#81782](https://github.com/WordPress/gutenberg/pull/81782)).
+-   Query: Stop writing `excludeCurrent: null` into the `query` attribute of blocks that never had the key. The mount effect that clears a stale exclusion treated the absent key as stale, changing the serialized markup of every pre-existing Query block as soon as the editor opened it ([#82147](https://github.com/WordPress/gutenberg/pull/82147)).
+-   Icon: Preserve intrinsic SVG styles when applying block styles or rotation, and keep stroke widths scaling with the block's size for compatibility ([#78808](https://github.com/WordPress/gutenberg/pull/78808)).
+-   Image: Keep the selected image size, and re-point a media file or attachment page link, when an edit in the media editor saves to a new attachment. Cropping, rotating or flipping left the block rendering the full-size file while the size control still reported the size the user had chosen, and left the link pointing at the pre-edit image ([#82316](https://github.com/WordPress/gutenberg/pull/82316)).
+
+### Internal
+
+-   Search: Keep the editor's button icon fill-based and separate from `@wordpress/icons` so it matches the PHP renderer and existing theme `fill` styles. ([#82338](https://github.com/WordPress/gutenberg/pull/82338))
+-   Remove unused dependencies `@wordpress/keyboard-shortcuts`, `@wordpress/reusable-blocks` and `@wordpress/viewport` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+-   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
+
+## 10.5.0 (2026-08-26)
+
+### Enhancements
+
+-   Gallery: Support viewport-specific column counts and image cropping in the Flex layout.
+-   `List`: Add wide and full alignment support ([#68002](https://github.com/WordPress/gutenberg/pull/68002)).
+-   Site Title: Add Fit text support, so the title can resize to fill its container as it already can in the Heading and Paragraph blocks ([#82074](https://github.com/WordPress/gutenberg/pull/82074)).
 
 ### Internal
 
@@ -14,19 +42,25 @@
 ### Enhancements
 
 -   Columns: Add transforms between Columns and the Row variation that preserve column widths through flex child sizing controls.
+-   Gallery: Add an opt-in Grid layout while preserving the existing Flex layout for current galleries.([#81909](https://github.com/WordPress/gutenberg/pull/81909)).
 
 ### Bug Fixes
 
+-   Audio: Explain in the Autoplay help text that browsers block audio until a visitor interacts with the page ([#69978](https://github.com/WordPress/gutenberg/pull/69978)).
+-   Cover: Use the new toggle-button presentation for the placeholder overlay color palette ([#82023](https://github.com/WordPress/gutenberg/pull/82023)).
 -   Columns: Preserve individual Column attributes supported by Group, including styles and layouts, when transforming to Row or Grid.
+-   Gallery: Don't offer the Image and Grid transforms while the block is in dynamic mode, where it has no inner blocks to convert ([#82009](https://github.com/WordPress/gutenberg/pull/82009)).
 -   Icon: Apply only padding to the inner SVG in the editor, so margin is no longer applied twice compared to the front end ([#81292](https://github.com/WordPress/gutenberg/pull/81292)).
 -   Playlist: Attach the inner block drop zone to the track list, so Playlist Track blocks show insertion markers while being reordered.
 -   Playlist Track: Hide the Title and Replace audio controls when multiple tracks are selected.
 -   Playlist Track: Mark track media fields as content so toolbar inserters add an empty track instead of duplicating the selected track.
 -   Tabs: Number the generated tab IDs from 1 and keep them sequential, so IDs generated by other blocks on the page no longer shift the numbering ([#81781](https://github.com/WordPress/gutenberg/pull/81781)).
 -   Playlist: Stop sharing the parent "Add track" toolbar control with selected Playlist Track child blocks ([#81432](https://github.com/WordPress/gutenberg/pull/81432)).
+-   Tabs: Hide inactive tab panels with `until-found` so the browser's find-in-page can reach their content, and activate the matching tab when the browser reveals a panel. Panels are also taken out of the tab sequence while hidden, since a panel hidden with `until-found` keeps a layout box ([#81712](https://github.com/WordPress/gutenberg/issues/81712)).
 -   Term Description: Apply the term description display filters when rendering with term context inside a Terms Query loop, so multi-paragraph descriptions keep their paragraphs and match the taxonomy archive rendering ([#81290](https://github.com/WordPress/gutenberg/pull/81290)).
 -   Accordion: Resolve the URL fragment with the `:target` pseudo-class instead of decoding `window.location.hash`, so a hash containing malformed percent-encoding no longer throws a `URIError` when a panel is opened ([#81780](https://github.com/WordPress/gutenberg/pull/81780)).
 -   Post Template: Pass an explicit default layout to the inner blocks of the Post Template and Term Template blocks, so the movers, inserters, and child controls of the template's blocks no longer follow the grid used to arrange the post/term items ([#81120](https://github.com/WordPress/gutenberg/pull/81120)).
+-   Accordion Heading: Declare the spacing selector in the block's `selectors` map, so padding set in `theme.json` or Global Styles applies to the toggle button the block writes its own padding to, rather than to the heading wrapper where it could not lower the default ([#81976](https://github.com/WordPress/gutenberg/pull/81976)).
 
 ## 10.4.0 (2026-08-12)
 

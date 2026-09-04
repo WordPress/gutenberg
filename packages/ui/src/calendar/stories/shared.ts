@@ -95,6 +95,9 @@ export const SHARED_ARG_TYPES = {
 	onMonthChange: {
 		control: false,
 	},
+	role: {
+		control: 'text',
+	},
 	endMonth: { control: 'date' },
 	startMonth: { control: 'date' },
 	render: { control: false },

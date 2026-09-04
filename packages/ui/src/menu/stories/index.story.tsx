@@ -231,6 +231,7 @@ export const LinkItem: Story = {
 					<Menu.LinkItem
 						href="https://developer.wordpress.org"
 						openInNewTab
+						target="wordpress-developer-resources"
 						shortcut={ SHORTCUTS.developerResources }
 						suffix="Docs"
 					>
@@ -263,6 +264,9 @@ export const RichItems: Story = {
 					<Menu.Item>
 						<Menu.ItemLabel>Label</Menu.ItemLabel>
 						<Menu.ItemDescription>Help text</Menu.ItemDescription>
+						<Menu.ItemDescription>
+							Additional context
+						</Menu.ItemDescription>
 					</Menu.Item>
 					<Menu.Item>
 						<Menu.ItemLabel>

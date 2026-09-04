@@ -48,15 +48,18 @@ jobs:
                       os: 'macos-15'
 
         steps:
-            # The BASE branch commit must be present for the check-root-dependencies script to read the package.json and
-            # compare with the HEAD branch. Fetching a depth of 2 ensures that's present.
-            # All other jobs only require a depth of 1.
+            # The parent commit must be present for dependency and test-routing
+            # checks that compare the current change with its baseline.
             - name: Checkout repository
               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
-                  fetch-depth: ${{ matrix.annotations && github.event_name == 'pull_request' && 2 || 1 }}
+                  fetch-depth: 2
                   persist-credentials: false
+
+            - name: Validate labeler config
+              if: ${{ matrix.annotations }}
+              run: .github/scripts/validate-labeler-config.sh
 
             - name: Use desired version of Node.js
               uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
@@ -64,10 +67,8 @@ jobs:
                   node-version: ${{ matrix.node }}
                   cache: npm
 
-            - name: Pin npm version for consistency
-              run: |
-                  npm install --global npm@10
-                  npm --version
+            - name: Set up npm
+              uses: ./.github/setup-npm
 
             - name: npm install
               # A "full" install is executed, since `npm ci` does not always exit
@@ -103,7 +104,7 @@ jobs:
               run: npm run lint:js -- --format compact --quiet --prune-suppressions
 
             - name: Test agent skill setup
-              run: npm run test:unit -- tools/agents/test/setup-skills.test.js --runInBand
+              run: npm run test:unit:vitest -- --project=node tools/agents/test/setup-skills.test.js
 
             - name: Lint Styles
               if: ${{ matrix.annotations }}
@@ -117,13 +118,20 @@ jobs:
             - name: Type checking
               run: npm run typecheck
 
-            - name: Check type declaration files
-              # Runs against the declarations the type check just emitted;
-              # the bundle build below skips types and with them this check.
-              run: npm run check:type-declarations
+            - name: Validate JavaScript test routing
+              if: ${{ matrix.node == '20' && matrix.os == 'ubuntu-24.04' }}
+              run: npm run test:unit:routing -- --base="$(git rev-parse HEAD^1)"
 
             - name: Build packages
               run: npm run build
+
+            - name: Validate Vitest conventions and TypeScript test graph
+              run: npm run test:unit:conventions
+
+            - name: Check type declaration files
+              # Runs against the final package output, including the built
+              # declarations and runtime files.
+              run: npm run check:type-declarations
 
             - name: Validate package contents
               run: npm run lint:package-contents
@@ -137,3 +145,39 @@ jobs:
 
             - name: License compatibility
               run: npm run other:check-licenses
+
+    # Fails when a bundled package pulls @wordpress/private-apis into its
+    # module graph, including transitively through another package.
+    check-private-apis:
+        name: Check private API usage in bundled packages
+        runs-on: ubuntu-24.04
+        permissions:
+            contents: read
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        timeout-minutes: 10
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Use desired version of Node.js
+              uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+              with:
+                  node-version-file: '.nvmrc'
+                  # No cache restoration: this workflow also runs on push,
+                  # and the job doesn't need the install speed.
+                  package-manager-cache: false
+
+            - name: Set up npm
+              uses: ./.github/setup-npm
+
+            - name: npm install
+              # Not the setup-node composite action: its cached node_modules
+              # path skips `prepare` scripts, and bundling from source needs
+              # what they generate (e.g. the icons `src/library`).
+              run: npm install
+
+            - name: Check private API usage in bundled packages
+              run: npm run --workspace @wordpress/validation-tools check-private-apis

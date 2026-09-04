@@ -1,72 +1,62 @@
 import { useCallback } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { createBlock, cloneBlock } from '@wordpress/blocks';
+import { moveBlocksToNestedList } from './move-blocks-to-nested-list';
 
 export default function useIndentListItem( clientId ) {
-	const { replaceBlocks, selectionChange, multiSelect } =
-		useDispatch( blockEditorStore );
+	const registry = useRegistry();
+	const { selectionChange, multiSelect } = useDispatch( blockEditorStore );
 	const {
-		getBlock,
 		getPreviousBlockClientId,
+		getBlockRootClientId,
+		getSelectedBlockClientIds,
 		getSelectionStart,
 		getSelectionEnd,
 		hasMultiSelection,
 		getMultiSelectedBlockClientIds,
-		getBlockRootClientId,
-		getBlockAttributes,
 	} = useSelect( blockEditorStore );
+
 	return useCallback( () => {
 		const _hasMultiSelection = hasMultiSelection();
 		const clientIds = _hasMultiSelection
 			? getMultiSelectedBlockClientIds()
-			: [ clientId ];
-		const clonedBlocks = clientIds.map( ( _clientId ) =>
-			cloneBlock( getBlock( _clientId ) )
-		);
+			: getSelectedBlockClientIds();
 		const previousSiblingId = getPreviousBlockClientId( clientId );
-		const newListItem = cloneBlock( getBlock( previousSiblingId ) );
-		// Get the parent list's attributes to inherit the ordered property
-		const parentListId = getBlockRootClientId( clientId );
-		const parentListAttributes = getBlockAttributes( parentListId );
-		// If the sibling has no innerBlocks, create a new `list` block.
-		if ( ! newListItem.innerBlocks?.length ) {
-			newListItem.innerBlocks = [
-				createBlock( 'core/list', {
-					ordered: parentListAttributes.ordered,
-				} ),
-			];
-		}
-		// A list item usually has one `list`, but it's possible to have
-		// more. So we need to preserve the previous `list` blocks and
-		// merge the new blocks to the last `list`.
-		newListItem.innerBlocks[
-			newListItem.innerBlocks.length - 1
-		].innerBlocks.push( ...clonedBlocks );
-
-		// We get the selection start/end here, because when
-		// we replace blocks, the selection is updated too.
+		const rootClientId = getBlockRootClientId( clientId );
+		// The selection is read before the move because moving the blocks
+		// updates it.
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
-		// Replace the previous sibling of the block being indented and the indented blocks,
-		// with a new block whose attributes are equal to the ones of the previous sibling and
-		// whose descendants are the children of the previous sibling, followed by the indented blocks.
-		replaceBlocks( [ previousSiblingId, ...clientIds ], [ newListItem ] );
-		if ( ! _hasMultiSelection ) {
-			selectionChange(
-				clonedBlocks[ 0 ].clientId,
-				selectionEnd.attributeKey,
-				selectionEnd.clientId === selectionStart.clientId
-					? selectionStart.offset
-					: selectionEnd.offset,
-				selectionEnd.offset
+
+		// The move and the selection are batched together: creating a nested
+		// list removes and re-inserts the items, which drops the selection, so
+		// it is put back in the same pass. The blocks keep their client IDs, so
+		// it lands on the same blocks: the caret for a single item, a whole
+		// block selection for several.
+		registry.batch( () => {
+			moveBlocksToNestedList(
+				registry,
+				clientIds,
+				rootClientId,
+				previousSiblingId
 			);
-		} else {
-			multiSelect(
-				clonedBlocks[ 0 ].clientId,
-				clonedBlocks[ clonedBlocks.length - 1 ].clientId
-			);
-		}
+
+			if ( ! _hasMultiSelection ) {
+				selectionChange(
+					clientIds[ 0 ],
+					selectionEnd.attributeKey,
+					selectionEnd.clientId === selectionStart.clientId
+						? selectionStart.offset
+						: selectionEnd.offset,
+					selectionEnd.offset
+				);
+			} else {
+				multiSelect(
+					clientIds[ 0 ],
+					clientIds[ clientIds.length - 1 ]
+				);
+			}
+		} );
 
 		return true;
 	}, [ clientId ] );

@@ -11,6 +11,7 @@
 			padding: 0;
 			position: absolute;
 			width: 1px;
+			/* stylelint-disable-next-line property-no-deprecated -- Pending review of overflow-wrap alternative. */
 			word-wrap: normal;
 			word-break: normal;
 		}

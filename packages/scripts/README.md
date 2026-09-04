@@ -20,7 +20,7 @@ npm install @wordpress/scripts --save-dev
 
 ## Setup
 
-This package offers a command-line interface and exposes a binary called `wp-scripts` so you can call it directly with `npx` – an npm package runner. However, this module is designed to be configured using the `scripts` section in the `package.json` file of your project. This comprehensive example demonstrates the most of the capabilities included.
+This package offers a command-line interface and exposes a binary called `wp-scripts` so you can call it directly with `npm exec --no -- wp-scripts`. However, this module is designed to be configured using the `scripts` section in the `package.json` file of your project. This comprehensive example demonstrates the most of the capabilities included.
 
 _Example:_
 
