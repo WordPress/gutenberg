@@ -18,7 +18,8 @@ import {
 } from '../index';
 
 export default {
-	title: 'Fields/Media Fields',
+	id: 'fields-media-fields',
+	title: 'Design System/DataViews/Fields/Media Fields',
 	component: DataForm,
 };
 
