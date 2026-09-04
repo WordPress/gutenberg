@@ -67,6 +67,15 @@
 	padding-top: variables.$grid-unit-20;
 }
 
+.global-styles-ui-block-types-group + .global-styles-ui-block-types-group {
+	margin-top: 16px;
+}
+
+.global-styles-ui-block-types-group__title {
+	margin-bottom: 8px;
+	padding: 0 16px;
+}
+
 .global-styles-ui-screen-typography__font-variants-count {
 	color: colors.$gray-700;
 }
