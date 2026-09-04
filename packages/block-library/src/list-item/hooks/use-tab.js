@@ -34,9 +34,8 @@ export default function useTab() {
 					getSelectionStart().offset === 0 &&
 					getSelectionEnd().offset === 0;
 
-				// Indent, or outdent when Shift is held. Both Space and Tab
-				// act at the start of an item; Tab also acts when its content
-				// is fully selected. Otherwise the key just types a space.
+				// Both keys act at the start of an item; Tab also acts on a
+				// full selection.
 				if (
 					! isAtStart &&
 					! ( keyCode === TAB && isEntirelySelected( element ) )
@@ -49,8 +48,7 @@ export default function useTab() {
 				}
 			}
 
-			// Capture phase so we run before writing-flow's ancestor-bubble
-			// keydown handlers that gate on `event.defaultPrevented`.
+			// Capture phase to run before writing-flow's keydown handler.
 			return subscribeOwnedListener(
 				element,
 				'keydown',
