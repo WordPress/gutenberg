@@ -1,4 +1,5 @@
 @use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/mixins" as *;
 
 .components-tab-panel__tabs {
 	display: flex;
@@ -73,24 +74,11 @@
 		position: absolute;
 		inset: var(--wpds-dimension-padding-md);
 		pointer-events: none;
-
-		// Draw the indicator.
-		box-shadow: 0 0 0 0 transparent;
 		border-radius: var(--wpds-border-radius-sm);
-
-		// Animation
-		@media not (prefers-reduced-motion) {
-			transition: box-shadow 0.1s linear;
-		}
 	}
 
 	&:focus-visible::before {
-		box-shadow:
-			0 0 0 var(--wpds-border-width-focus)
-			var(--wpds-color-stroke-focus);
-
-		// Windows high contrast mode.
-		outline: 2px solid transparent;
+		@include outset-ring__focus();
 	}
 
 	.components-tab-panel__tabs[aria-orientation="vertical"] & {
@@ -108,17 +96,10 @@
 
 .components-tab-panel__tab-content {
 	&:focus {
-		box-shadow: none;
 		outline: none;
 	}
 
 	&:focus-visible {
-		box-shadow:
-			0 0 0 var(--wpds-border-width-focus)
-			var(--wpds-color-stroke-focus);
-
-		// Windows high contrast mode.
-		outline: 2px solid transparent;
-		outline-offset: 0;
+		@include outset-ring__focus();
 	}
 }
