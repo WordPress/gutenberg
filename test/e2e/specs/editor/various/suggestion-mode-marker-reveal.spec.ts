@@ -149,7 +149,8 @@ test.describe( 'Suggestion marker reveal', () => {
 		 */
 		await page.evaluate( () => {
 			( window as any ).__f31Overlaps = [];
-			const deadline = Date.now() + 4000;
+			( window as any ).__f31MaxCards = 0;
+			( window as any ).__f31Stop = false;
 			const tick = () => {
 				const boxes = Array.from(
 					document.querySelectorAll(
@@ -163,6 +164,10 @@ test.describe( 'Suggestion marker reveal', () => {
 					)
 					.map( ( el ) => el.getBoundingClientRect() )
 					.sort( ( a, b ) => a.top - b.top );
+				( window as any ).__f31MaxCards = Math.max(
+					( window as any ).__f31MaxCards,
+					boxes.length
+				);
 				for ( let i = 1; i < boxes.length; i++ ) {
 					if ( boxes[ i ].top < boxes[ i - 1 ].bottom ) {
 						( window as any ).__f31Overlaps.push(
@@ -176,7 +181,10 @@ test.describe( 'Suggestion marker reveal', () => {
 						);
 					}
 				}
-				if ( Date.now() < deadline ) {
+				// Sampled until the test has seen the board mount; a fixed
+				// deadline could run out first on a slow worker and pass with
+				// nothing observed.
+				if ( ! ( window as any ).__f31Stop ) {
 					window.requestAnimationFrame( tick );
 				}
 			};
@@ -197,9 +205,15 @@ test.describe( 'Suggestion marker reveal', () => {
 			page.getByRole( 'button', { name: 'Accept suggestion' } )
 		).toHaveCount( 3 );
 
-		const overlaps = await page.evaluate(
-			() => ( window as any ).__f31Overlaps
-		);
+		const { overlaps, maxCards } = await page.evaluate( () => {
+			( window as any ).__f31Stop = true;
+			return {
+				overlaps: ( window as any ).__f31Overlaps,
+				maxCards: ( window as any ).__f31MaxCards,
+			};
+		} );
+		// The sampler saw the cards it was guarding, and none overlapped.
+		expect( maxCards ).toBeGreaterThanOrEqual( 3 );
 		expect( overlaps ).toEqual( [] );
 	} );
 } );

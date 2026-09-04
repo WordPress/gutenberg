@@ -1253,6 +1253,11 @@ test.describe( 'Suggestion mode review flows', () => {
 		const suggestionSaved = suggestionSavedPromise( page );
 		await transformParagraphToQuote( page, editor );
 		await suggestionSaved;
+		// The transform saves two notes; the promise resolved on the first.
+		// Both must exist before the decision, which resolves them together.
+		await expect
+			.poll( () => suggestionStatuses( page ) )
+			.toEqual( [ 'pending', 'pending' ] );
 
 		await switchIntent( page, 'Editing' );
 		const sidebar = await openNotesSidebar( page );
@@ -1298,6 +1303,11 @@ test.describe( 'Suggestion mode review flows', () => {
 		const suggestionSaved = suggestionSavedPromise( page );
 		await transformParagraphToQuote( page, editor );
 		await suggestionSaved;
+		// The transform saves two notes; the promise resolved on the first.
+		// Both must exist before the decision, which resolves them together.
+		await expect
+			.poll( () => suggestionStatuses( page ) )
+			.toEqual( [ 'pending', 'pending' ] );
 
 		await switchIntent( page, 'Editing' );
 		const sidebar = await openNotesSidebar( page );

@@ -345,7 +345,9 @@ test.describe( 'Suggestion mode persistence', () => {
 		 * already shifted. Replaying both would publish an order that existed
 		 * in no version of the document - here [Bravo, Alpha, Charlie], which
 		 * is neither the baseline [Alpha, Bravo, Charlie] nor the proposal.
-		 * The renderer declines the whole list instead.
+		 * The renderer declines the whole list instead. Documented under
+		 * "Only one pending move per sibling list is restored" in
+		 * docs/explanations/architecture/suggestions.md.
 		 */
 		for ( const content of [
 			'Alpha the first',
@@ -425,7 +427,9 @@ test.describe( 'Suggestion mode persistence', () => {
 		 * alone: it is a non-empty ID either way. Applying its `fromIndex`
 		 * inside the destination Group would drop the block at an offset of a
 		 * list it never belonged to, so the marker records `crossedParents`
-		 * and the renderer leaves the block alone.
+		 * and the renderer leaves the block alone. Documented under
+		 * "Cross-parent moves on the front end" in
+		 * docs/explanations/architecture/suggestions.md.
 		 */
 		await editor.insertBlock( {
 			name: 'core/group',
