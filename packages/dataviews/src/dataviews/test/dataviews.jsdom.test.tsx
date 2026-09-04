@@ -282,6 +282,83 @@ describe( 'DataViews component', () => {
 		} );
 	} );
 
+	describe( 'page clamping', () => {
+		it( 'moves the view to the last page when it points past the end of the collection', async () => {
+			const onChangeView = jest.fn();
+			// Three items, one per page: page 5 doesn't exist.
+			render(
+				<DataViewWrapper
+					view={ { type: LAYOUT_TABLE, page: 5, perPage: 1 } }
+					onChangeView={ onChangeView }
+				/>
+			);
+
+			await waitFor( () => {
+				expect( onChangeView ).toHaveBeenCalledWith(
+					expect.objectContaining( { page: 3, perPage: 1 } )
+				);
+			} );
+		} );
+
+		it( 'falls back to the first page when the collection is empty', async () => {
+			const onChangeView = jest.fn();
+			render(
+				<DataViewWrapper
+					view={ { type: LAYOUT_TABLE, page: 2 } }
+					data={ [] }
+					paginationInfo={ { totalItems: 0, totalPages: 0 } }
+					onChangeView={ onChangeView }
+				/>
+			);
+
+			await waitFor( () => {
+				expect( onChangeView ).toHaveBeenCalledWith(
+					expect.objectContaining( { page: 1 } )
+				);
+			} );
+		} );
+
+		it( 'leaves the page alone while loading', () => {
+			const onChangeView = jest.fn();
+			render(
+				<DataViewWrapper
+					view={ { type: LAYOUT_TABLE, page: 5, perPage: 1 } }
+					isLoading
+					onChangeView={ onChangeView }
+				/>
+			);
+
+			expect( onChangeView ).not.toHaveBeenCalled();
+		} );
+
+		it( 'leaves the page alone when the total is unknown', () => {
+			const onChangeView = jest.fn();
+			render(
+				<DataViewWrapper
+					view={ { type: LAYOUT_TABLE, page: 5, perPage: 1 } }
+					paginationInfo={
+						{ totalItems: null, totalPages: null } as any
+					}
+					onChangeView={ onChangeView }
+				/>
+			);
+
+			expect( onChangeView ).not.toHaveBeenCalled();
+		} );
+
+		it( 'leaves a valid page alone', () => {
+			const onChangeView = jest.fn();
+			render(
+				<DataViewWrapper
+					view={ { type: LAYOUT_TABLE, page: 3, perPage: 1 } }
+					onChangeView={ onChangeView }
+				/>
+			);
+
+			expect( onChangeView ).not.toHaveBeenCalled();
+		} );
+	} );
+
 	describe( 'in table view', () => {
 		it( 'should display columns for each field', () => {
 			render( <DataViewWrapper /> );

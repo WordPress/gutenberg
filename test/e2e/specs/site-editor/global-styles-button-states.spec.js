@@ -33,8 +33,11 @@ test.describe( 'Global Styles - Button States', () => {
 			.getByRole( 'button', { name: 'Blocks' } )
 			.click();
 
+		// The extensible site editor appends the "Has custom styles" badge to
+		// the item's accessible name, so match both shapes without matching
+		// the "Buttons" block.
 		await page
-			.getByRole( 'button', { name: 'Button', exact: true } )
+			.getByRole( 'button', { name: /^Button(Has custom styles)?$/ } )
 			.click();
 
 		const stateDropdown = page

@@ -8,6 +8,7 @@ import { LinkItem } from './link-item';
 import { Popup } from './popup';
 import { Portal } from './portal';
 import { Positioner } from './positioner';
+import { PrefixIcon } from './prefix-icon';
 import { RadioGroup } from './radio-group';
 import { RadioItem } from './radio-item';
 import { Root } from './root';
@@ -27,6 +28,7 @@ export {
 	Popup,
 	Portal,
 	Positioner,
+	PrefixIcon,
 	RadioGroup,
 	RadioItem,
 	Root,

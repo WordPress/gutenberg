@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { getAssociatedGuide, isTipVisible, areTipsEnabled } from '../selectors';
 
 describe( 'selectors', () => {

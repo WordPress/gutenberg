@@ -190,6 +190,17 @@ export function formatsAdditionRunToExtend(
 			return null;
 		}
 	}
+	// Growing re-applies the marker over the run, which strips any other
+	// suggestion format nested inside it (a collaborator's marker over part
+	// of this addition) and orphans that note. Such a run is not extendable.
+	for ( let i = start; i < end; i++ ) {
+		const markers = formats[ i ]?.filter(
+			( f: any ) => f?.type === SUGGESTION_FORMAT_NAME
+		);
+		if ( markers && markers.length > 1 ) {
+			return null;
+		}
+	}
 	return { id, start, end };
 }
 

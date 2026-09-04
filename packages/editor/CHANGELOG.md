@@ -2,25 +2,51 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Show a "Privacy Policy Page" badge in the document bar and the post card panel for the page assigned in Settings > Privacy, alongside the existing "Homepage" and "Posts Page" badges ([#82422](https://github.com/WordPress/gutenberg/pull/82422)).
+
+### Breaking Changes
+
+-   `PluginMoreMenuItem`, `PluginSidebarMoreMenuItem`, `PluginPreviewMenuItem`: Items render with the `Menu` component of `@wordpress/ui` instead of `MenuItem` ([#81564](https://github.com/WordPress/gutenberg/pull/81564), [#82321](https://github.com/WordPress/gutenberg/pull/82321), [#82428](https://github.com/WordPress/gutenberg/pull/82428)).
+
+### Deprecations
+
+-   `PluginMoreMenuItem`, `PluginSidebarMoreMenuItem`, `PluginPreviewMenuItem`: Deprecate the `as` prop, which reached the item only because these components forward every extra prop. The menu now renders the item itself, so the prop is ignored ([#82319](https://github.com/WordPress/gutenberg/pull/82319)).
+
+### Enhancements
+
+-   Post actions: Append an ellipsis (`…`) to the "Set as homepage" and "Set as posts page" action labels, which open a confirmation dialog, following the menu ellipsis guideline. The dialog titles keep the ellipsis-free wording. ([#81994](https://github.com/WordPress/gutenberg/pull/81994))
+
 ### Bug Fixes
 
+-   More menu: Align SVG prefix icons with item labels using `Menu.PrefixIcon`, preserving Dashicon and custom component support. ([#82346](https://github.com/WordPress/gutenberg/pull/82346))
+-   Attach media an Image or Gallery block displays to the post on save, when it is not already attached to another post, matching what uploading into that post has always done ([#81977](https://github.com/WordPress/gutenberg/pull/81977)).
+-   Color the welcome guide's hovered button icon with `color` rather than `fill`, so stroke-based icons follow it. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
 -   `EditorInterface`: Apply the `showListViewByDefault` preference when the editor enters edit mode, so every editor built on the package honors it — including the extensible site editor, which previously ignored it. The logic moves here from `edit-post` and `edit-site`.
 -   `StylesCanvas`: In preview mode, render edge to edge without the close button and Escape handler. There the canvas is the whole surface rather than a frame opened over an editing session, and whatever opened it owns closing it.
 -   Upload progress snackbar: Stop announcing "Upload complete" for a batch in which everything failed. The snackbar treated the queue draining as success, so a failed upload showed a completion checkmark right next to its own error. A batch that fails outright now just takes the progress snackbar down, and a partly failed one reports "Uploaded 3 of 5" ([#81132](https://github.com/WordPress/gutenberg/issues/81132)).
 -   `mediaUpload`: Refuse a batch of more than one file before registering it with the upload progress snackbar when the caller only takes one, such as a Cover block placeholder. `uploadMedia()` reported the refusal as a single error, leaving the rest of the batch counted as uploading forever - and every later upload in the session was folded into that stuck notice ([#82041](https://github.com/WordPress/gutenberg/issues/82041)).
+-   `DocumentTools`: Disable the Block Inserter toggle while the canvas is a preview, and close an inserter left open when the editor enters the `view` intent, so the control that adds blocks does not open onto a library the editor will refuse ([#80427](https://github.com/WordPress/gutenberg/pull/80427), [#81661](https://github.com/WordPress/gutenberg/pull/81661)).
+-   Close the editor-level mutation paths the read-only canvas does not cover while the editor is in the `view` intent: the code editor - a raw `post_content` textarea preview rendering leaves writable - is refused from the Options menu, the toggle-mode shortcut and the command palette, and undo and redo are declined by the store and stop advertising themselves in the header ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
+-   Register the editor intent keyboard shortcuts only where they can be used - the Suggestion Mode experiment and `editor.notes` support on the current post type - so the Keyboard Shortcuts help modal no longer advertises them on screens that cannot act on them ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
+-   Hide the keyboard shortcut on the selected choice in the editor intent menu, matching `ModeSwitcher` ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
 
 ### Internal
 
 -   Remove the template activation (`active_templates`) experiment: the post-save activation notice, the "Edit template" auto-activation, and template duplication in the actions list ([#82241](https://github.com/WordPress/gutenberg/pull/82241)).
 -   Remove unused dependencies `@wordpress/reusable-blocks`, `client-zip` and `fast-deep-equal` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+### New Features
+
+-   Add a session-scoped editor intent (`edit`, `suggest`, `view`), with a private `setEditorIntent` action and `getEditorIntent` selector - the intent API stays private while Suggest mode is experimental. It is surfaced as an Edit / Suggest / View menu in the editor options for post types that support notes, and announced on change with a snackbar. Keyboard shortcuts follow the Google Docs convention: Ctrl+Alt+Shift+Z (Edit), +X (Suggest), +C (View) on Windows, ⌘⌥⇧Z/X/C on macOS ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
+
 
 ## 14.54.0 (2026-08-26)
 
 ### New Features
 
 -   Add a private `SiteExport` menu item, moved from `edit-site`. It offers downloading the theme with the user's changes, only while editing a template or a template part — the entities the exported theme is made of ([#81992](https://github.com/WordPress/gutenberg/pull/81992)).
--   Add a session-scoped editor intent (`edit`, `suggest`, `view`), with a private `setEditorIntent` action and `getEditorIntent` selector - the intent API stays private while Suggest mode is experimental. It is surfaced as an Edit / Suggest / View menu in the editor options for post types that support notes, and announced on change with a snackbar. Keyboard shortcuts follow the Google Docs convention: Ctrl+Alt+Shift+Z (Edit), +X (Suggest), +C (View) on Windows, ⌘⌥⇧Z/X/C on macOS ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
 
 ### Enhancements
 
@@ -29,10 +55,6 @@
 
 ### Bug Fixes
 
--   `DocumentTools`: Disable the Block Inserter toggle while the canvas is a preview, and close an inserter left open when the editor enters the `view` intent, so the control that adds blocks does not open onto a library the editor will refuse ([#80427](https://github.com/WordPress/gutenberg/pull/80427), [#81661](https://github.com/WordPress/gutenberg/pull/81661)).
--   Close the editor-level mutation paths the read-only canvas does not cover while the editor is in the `view` intent: the code editor - a raw `post_content` textarea preview rendering leaves writable - is refused from the Options menu, the toggle-mode shortcut and the command palette, and undo and redo are declined by the store and stop advertising themselves in the header ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
--   Register the editor intent keyboard shortcuts only where they can be used - the Suggestion Mode experiment and `editor.notes` support on the current post type - so the Keyboard Shortcuts help modal no longer advertises them on screens that cannot act on them ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
--   Hide the keyboard shortcut on the selected choice in the editor intent menu, matching `ModeSwitcher` ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
 -   `__unstableSaveForPreview`: Mark the options object and its `forceIsAutosaveable` flag as optional, matching the neighbouring `autosave` action. Both defaulted at runtime but the published types required them ([#81858](https://github.com/WordPress/gutenberg/pull/81858)).
 -   Register the editor and block editor keyboard shortcuts from the editor provider, so shortcuts work for consumers that mount the editor without rendering `EditorKeyboardShortcutsRegister` themselves ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).
 -   Header: Allow the Back button column to grow when "Show button text labels" is enabled so the label is not obscured by the following controls ([#81701](https://github.com/WordPress/gutenberg/pull/81701)).

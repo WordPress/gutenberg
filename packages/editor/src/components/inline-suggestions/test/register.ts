@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it } from 'vitest';
 import { select } from '@wordpress/data';
 import {
 	store as richTextStore,
