@@ -4,7 +4,6 @@ import {
 	RangeControl,
 	ToolbarButton,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
-	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import {
 	__experimentalColorGradientControl as ColorGradientControl,
@@ -16,9 +15,25 @@ import {
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { DOWN } from '@wordpress/keycodes';
+import { Stack } from '@wordpress/ui';
+import type { KeyboardEvent, ReactElement } from 'react';
 import { unlock } from '../../lock-unlock';
 
 const { isDefaultBlockStyleState } = unlock( blockEditorPrivateApis );
+
+type OverlayColor = {
+	color?: string;
+	class?: string;
+	slug?: string;
+};
+
+type CoverOverlayColorToolbarControlProps = {
+	clientId: string;
+	overlayColor: OverlayColor;
+	setOverlayColor: ( color: string | undefined ) => void;
+	dimRatio: number;
+	updateDimRatio: ( dimRatio?: number ) => void;
+};
 
 export default function CoverOverlayColorToolbarControl( {
 	clientId,
@@ -26,7 +41,7 @@ export default function CoverOverlayColorToolbarControl( {
 	setOverlayColor,
 	dimRatio,
 	updateDimRatio,
-} ) {
+}: CoverOverlayColorToolbarControlProps ): ReactElement | null {
 	const { gradientValue, setGradient } = useGradient();
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 
@@ -65,7 +80,7 @@ export default function CoverOverlayColorToolbarControl( {
 				headerTitle: __( 'Overlay' ),
 			} }
 			renderToggle={ ( { isOpen, onToggle } ) => {
-				const openOnArrowDown = ( event ) => {
+				const openOnArrowDown = ( event: KeyboardEvent ) => {
 					if ( ! isOpen && event.keyCode === DOWN ) {
 						event.preventDefault();
 						onToggle();
@@ -86,7 +101,7 @@ export default function CoverOverlayColorToolbarControl( {
 			} }
 			renderContent={ () => (
 				<DropdownContentWrapper paddingSize="medium">
-					<VStack spacing={ 4 }>
+					<Stack direction="column" gap="md">
 						<div className="block-editor-panel-color-gradient-settings__dropdown-content">
 							<ColorGradientControl
 								colorValue={ overlayColor.color }
@@ -110,7 +125,7 @@ export default function CoverOverlayColorToolbarControl( {
 							step={ 10 }
 							required
 						/>
-					</VStack>
+					</Stack>
 				</DropdownContentWrapper>
 			) }
 		/>

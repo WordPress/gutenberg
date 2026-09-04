@@ -18,6 +18,14 @@ async function openStylesTabIfAvailable( editorSettings ) {
 	}
 }
 
+async function openOverlayToolbarControl( page, editor ) {
+	await editor.showBlockToolbar();
+	await page
+		.getByRole( 'toolbar', { name: 'Block tools' } )
+		.getByRole( 'button', { name: 'Overlay' } )
+		.click();
+}
+
 test.describe( 'Cover', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
@@ -127,16 +135,9 @@ test.describe( 'Cover', () => {
 		} );
 
 		await test.step( 'should not auto-update a manually set overlay color when replacing image after save and reload', async () => {
-			// Manually change the overlay color to blue.
+			// Manually change the overlay color to blue via the toolbar.
 			await editor.selectBlocks( coverBlock );
-			await editor.openDocumentSettingsSidebar();
-			const editorSettings = page.getByRole( 'region', {
-				name: 'Editor settings',
-			} );
-			await openStylesTabIfAvailable( editorSettings );
-			await editorSettings
-				.getByRole( 'button', { name: 'Overlay' } )
-				.click();
+			await openOverlayToolbarControl( page, editor );
 			await page
 				.getByRole( 'button', { name: 'Custom color picker' } )
 				.click();
@@ -458,17 +459,11 @@ test.describe( 'Cover', () => {
 		// Black overlay at default 100% opacity → dark theme.
 		await expect( coverBlock ).toHaveClass( /is-dark-theme/ );
 
-		// Select the Cover block (not the inner Paragraph) before opening sidebar.
+		// Select the Cover block (not the inner Paragraph) before opening toolbar.
 		await editor.selectBlocks( coverBlock );
+		await openOverlayToolbarControl( page, editor );
 
-		// Open sidebar and set overlay opacity to 0.
-		await editor.openDocumentSettingsSidebar();
-		const editorSettings = page.getByRole( 'region', {
-			name: 'Editor settings',
-		} );
-		await openStylesTabIfAvailable( editorSettings );
-
-		const opacitySlider = editorSettings.getByRole( 'slider', {
+		const opacitySlider = page.getByRole( 'slider', {
 			name: 'Overlay opacity',
 		} );
 
@@ -501,17 +496,13 @@ test.describe( 'Cover', () => {
 		// Wait for the image to load.
 		await expect( coverBlock.locator( 'img' ) ).toBeVisible();
 
-		// Select the Cover block (not the inner Paragraph) before opening sidebar.
+		// Select the Cover block (not the inner Paragraph) before opening toolbar.
 		await editor.selectBlocks( coverBlock );
 
-		// Open the sidebar and set overlay opacity to 100.
-		await editor.openDocumentSettingsSidebar();
-		const editorSettings = page.getByRole( 'region', {
-			name: 'Editor settings',
-		} );
-		await openStylesTabIfAvailable( editorSettings );
+		// Open the toolbar overlay popover and set overlay opacity to 100.
+		await openOverlayToolbarControl( page, editor );
 
-		const opacitySlider = editorSettings.getByRole( 'slider', {
+		const opacitySlider = page.getByRole( 'slider', {
 			name: 'Overlay opacity',
 		} );
 		await opacitySlider.fill( '100' );
@@ -580,15 +571,11 @@ test.describe( 'Cover', () => {
 		await coverBlock.getByRole( 'button', { name: 'Black' } ).click();
 
 		await editor.selectBlocks( coverBlock );
-		await editor.openDocumentSettingsSidebar();
-		const editorSettings = page.getByRole( 'region', {
-			name: 'Editor settings',
-		} );
-		await openStylesTabIfAvailable( editorSettings );
+		await editor.showBlockToolbar();
 
-		const overlayControl = editorSettings.getByRole( 'button', {
-			name: 'Overlay',
-		} );
+		const overlayControl = page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Overlay' } );
 		await expect( overlayControl ).toBeVisible();
 
 		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
@@ -598,10 +585,8 @@ test.describe( 'Cover', () => {
 		await page.getByRole( 'menuitemradio', { name: 'Tablet' } ).click();
 		await page.keyboard.press( 'Escape' );
 
+		await editor.showBlockToolbar();
 		await expect( overlayControl ).toBeHidden();
-		await expect(
-			editorSettings.getByRole( 'slider', { name: 'Overlay opacity' } )
-		).toBeHidden();
 	} );
 } );
 

@@ -107,12 +107,8 @@ export default function CoverInspectorControls( {
 		tagName,
 		poster,
 	} = attributes;
-	const {
-		isVideoBackground,
-		isImageBackground,
-		mediaElement,
-		url,
-	} = currentSettings;
+	const { isVideoBackground, isImageBackground, mediaElement, url } =
+		currentSettings;
 
 	const sizeSlug = attributes.sizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 
