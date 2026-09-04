@@ -285,15 +285,16 @@ export function useMediaEditorState(
 		if ( areCropperImagesEqual( stateRef.current.cropper.image, image ) ) {
 			return;
 		}
-		// New image = fresh canvas: clear history, refresh the
-		// initial snapshot so isDirty starts at false.
-		const action = {
-			type: 'CROPPER' as const,
-			action: { type: 'SET_IMAGE' as const, payload: image },
-		};
-		const next = mediaEditorReducer( stateRef.current, action );
+		// New image = fresh canvas: default geometry and crop options, a clean
+		// baseline, and no history. Built from defaults rather than dispatching
+		// SET_IMAGE, which keeps the current pan / zoom / rotation / flip /
+		// cropRect — a crop drawn on the previous image must not survive onto
+		// the new one (visible when "Restore original image" swaps the source).
+		const next = buildInitialMediaEditorState(
+			enforceContainment( { ...DEFAULT_STATE, image } )
+		);
 		stateRef.current = next;
-		dispatch( action );
+		dispatch( { type: 'RESTORE_SNAPSHOT', payload: next } );
 		setInitialBaseline( next );
 		isGestureOpenRef.current = false;
 		gestureSnapshotRef.current = null;
