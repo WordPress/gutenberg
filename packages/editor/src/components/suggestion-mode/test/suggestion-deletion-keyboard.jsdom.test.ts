@@ -1,10 +1,20 @@
-import { describe, expect, it, vi } from 'vitest';
-import { RichTextData } from '@wordpress/rich-text';
-import { SUGGESTION_FORMAT_NAME } from '../../inline-suggestions';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import {
+	RichTextData,
+	store as richTextStore,
+	unregisterFormatType,
+} from '@wordpress/rich-text';
+import { select } from '@wordpress/data';
+import {
+	SUGGESTION_FORMAT_NAME,
+	registerSuggestionFormat,
+} from '../../inline-suggestions';
 import {
 	collapsedDeleteDisposition,
 	collapsedDeleteTarget,
+	isBufferedDeleteRepeat,
 	isContiguousDeleteRun,
+	isDeletionTargetUnchanged,
 	sliceValueToHTML,
 } from '../suggestion-deletion-keyboard';
 
@@ -14,7 +24,22 @@ vi.hoisted( () => {
 	globalThis.wpVitest.mockMatchMedia();
 } );
 
+const getFormatType = ( name: string ) =>
+	( select( richTextStore as any ) as any ).getFormatType( name );
+
 describe( 'sliceValueToHTML', () => {
+	beforeAll( () => {
+		if ( ! getFormatType( SUGGESTION_FORMAT_NAME ) ) {
+			registerSuggestionFormat();
+		}
+	} );
+
+	afterAll( () => {
+		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
+			unregisterFormatType( SUGGESTION_FORMAT_NAME );
+		}
+	} );
+
 	it( 'serializes a plain slice', () => {
 		expect( sliceValueToHTML( 'Hello world', 6, 11 ) ).toBe( 'world' );
 	} );
@@ -44,6 +69,17 @@ describe( 'sliceValueToHTML', () => {
 		);
 		expect( sliceValueToHTML( value, 3, 7 ) ).toBe(
 			'<a href="https://w.org">here</a>'
+		);
+	} );
+
+	it( 'unwraps suggestion markers inside the slice', () => {
+		// The marker points at this post's note; a pasted copy would bind a
+		// second run to the same suggestion.
+		const value = RichTextData.fromHTMLString(
+			`ab <mark class="wp-suggestion" data-suggestion-id="4" data-suggestion-type="add"><strong>cd</strong></mark> ef`
+		);
+		expect( sliceValueToHTML( value, 0, value.text.length ) ).toBe(
+			'ab <strong>cd</strong> ef'
 		);
 	} );
 
@@ -103,6 +139,73 @@ describe( 'isContiguousDeleteRun', () => {
 		expect(
 			isContiguousDeleteRun( run, at( { attributeKey: 'citation' } ) )
 		).toBe( false );
+	} );
+} );
+
+describe( 'isBufferedDeleteRepeat', () => {
+	const inFlight = {
+		clientId: 'a',
+		attributeKey: 'content',
+		id: null,
+		start: 4,
+		end: 5,
+		caret: 4,
+		dir: 'backward',
+		steps: 1,
+	};
+	const key = { clientId: 'a', attributeKey: 'content', isBackward: true };
+
+	it( 'counts a repeat in the same field and direction', () => {
+		expect( isBufferedDeleteRepeat( inFlight, key ) ).toBe( true );
+	} );
+
+	it( 'does not count a keystroke once the run has its id', () => {
+		expect( isBufferedDeleteRepeat( { ...inFlight, id: 9 }, key ) ).toBe(
+			false
+		);
+		expect( isBufferedDeleteRepeat( null, key ) ).toBe( false );
+	} );
+
+	it( 'does not count a delete in the opposite direction', () => {
+		expect(
+			isBufferedDeleteRepeat( inFlight, { ...key, isBackward: false } )
+		).toBe( false );
+	} );
+
+	it( 'does not count a delete in another block or attribute', () => {
+		expect(
+			isBufferedDeleteRepeat( inFlight, { ...key, clientId: 'b' } )
+		).toBe( false );
+		expect(
+			isBufferedDeleteRepeat( inFlight, {
+				...key,
+				attributeKey: 'citation',
+			} )
+		).toBe( false );
+	} );
+} );
+
+describe( 'isDeletionTargetUnchanged', () => {
+	it( 'accepts a value whose text still matches', () => {
+		const value = RichTextData.fromHTMLString( 'Hello <em>world</em>' );
+		expect( isDeletionTargetUnchanged( 'Hello world', value ) ).toBe(
+			true
+		);
+		expect(
+			isDeletionTargetUnchanged( 'Hello world', 'Hello world' )
+		).toBe( true );
+	} );
+
+	it( 'rejects a value whose text moved under the resolved offsets', () => {
+		expect(
+			isDeletionTargetUnchanged(
+				'Hello world',
+				RichTextData.fromHTMLString( 'Hello big world' )
+			)
+		).toBe( false );
+		expect( isDeletionTargetUnchanged( 'Hello world', undefined ) ).toBe(
+			false
+		);
 	} );
 } );
 
