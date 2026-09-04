@@ -1,7 +1,5 @@
 name: Unit Tests
 
-# Since Unit Tests are required to pass for each PR,
-# we cannot disable them for documentation-only changes.
 on:
     pull_request:
     push:
@@ -24,13 +22,48 @@ concurrency:
 permissions: {}
 
 jobs:
+    # Analyzes the list of files modified in a pull request to detect any changes that could
+    # potentially impact unit tests. A series of ignore patterns are used in place of an include
+    # list to ensure tests run even if the list of filters happens to become stale.
+    detect-relevant-changes:
+        name: Detect changes relevant to unit tests
+        runs-on: 'ubuntu-24.04'
+        timeout-minutes: 5
+        permissions:
+            pull-requests: read
+        outputs:
+            relevant: ${{ steps.filter.outputs.relevant }}
+        steps:
+            - name: Check for changes that may impact unit test results
+              id: filter
+              if: ${{ github.event_name == 'pull_request' }}
+              uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+              with:
+                  predicate-quantifier: 'every'
+                  filters: |
+                      relevant:
+                          # Start from every file, then exclude what cannot change a test result.
+                          - '**'
+                          # Documentation.
+                          - '!**/*.md'
+                          - '!{backport-changelog,docs,storybook}/**'
+                          # Development tooling and its configuration.
+                          - '!tools/{docs,eslint,stylelint}/**'
+                          - '!{eslint,lint-staged,prettier,syncpack}.config*'
+                          # Repository metadata.
+                          - '!{changelog,readme}.txt'
+                          - '!.{editorconfig,gitignore,prettierrc*,stylelintrc*}'
+                          # Other workflows, and everything under .github that this one does not use.
+                          - '!.github/{*,!(workflows|setup-node|setup-playwright)/**,workflows/!(unit-test.yml)}'
+
     unit-js:
         name: JavaScript (Node.js ${{ matrix.node }}) ${{ matrix.shard }}
         runs-on: 'ubuntu-24.04'
+        needs: [detect-relevant-changes]
         permissions:
             contents: read
             id-token: write
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
         strategy:
             fail-fast: false
             matrix:
@@ -73,7 +106,7 @@ jobs:
               # It's not necessary to run the full build, since Jest can interpret
               # source files with `babel-jest`. Some packages have their own custom
               # build tasks, however. These must be run.
-              run: npx lerna run build
+              run: npm exec --no -- lerna run build
 
             - name: Run the remaining Jest partition
               env:
@@ -104,10 +137,11 @@ jobs:
     unit-js-date:
         name: JavaScript Date Tests (Node.js ${{ matrix.node }})
         runs-on: 'ubuntu-24.04'
+        needs: [detect-relevant-changes]
         permissions:
             contents: read
             id-token: write
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
         strategy:
             fail-fast: false
             matrix:
@@ -136,7 +170,7 @@ jobs:
               # It's not necessary to run the full build, since Jest can interpret
               # source files with `babel-jest`. Some packages have their own custom
               # build tasks, however. These must be run.
-              run: npx lerna run build
+              run: npm exec --no -- lerna run build
 
             - name: Run the date tests
               env:
@@ -149,6 +183,8 @@ jobs:
     compute-previous-wordpress-version:
         name: Compute previous WordPress version
         runs-on: 'ubuntu-24.04'
+        needs: [detect-relevant-changes]
+        if: ${{ github.event_name != 'pull_request' || needs.detect-relevant-changes.outputs.relevant == 'true' }}
         permissions: {}
         outputs:
             previous-wordpress-version: ${{ steps.get-previous-wordpress-version.outputs.previous-wordpress-version }}
@@ -176,6 +212,8 @@ jobs:
     build-assets:
         name: Build JavaScript assets for PHP unit tests
         runs-on: 'ubuntu-24.04'
+        needs: [detect-relevant-changes]
+        if: ${{ github.event_name != 'pull_request' || needs.detect-relevant-changes.outputs.relevant == 'true' }}
         permissions:
             contents: read
         steps:
@@ -199,12 +237,17 @@ jobs:
 
     test-php:
         name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }}${{ matrix.wordpress != '' && format( ' (WP {0}) ', matrix.wordpress ) || '' }} on Linux
-        needs: [compute-previous-wordpress-version, build-assets]
+        needs:
+            [
+                detect-relevant-changes,
+                compute-previous-wordpress-version,
+                build-assets,
+            ]
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
         timeout-minutes: 20
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
         strategy:
             fail-fast: true
             matrix:
@@ -344,10 +387,11 @@ jobs:
     phpcs:
         name: PHP coding standards
         runs-on: 'ubuntu-24.04'
+        needs: [detect-relevant-changes]
         permissions:
             contents: read
         timeout-minutes: 20
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && github.event_name != 'pull_request' ) || ( github.event_name == 'pull_request' && needs.detect-relevant-changes.outputs.relevant == 'true' ) }}
 
         steps:
             - name: Checkout repository
@@ -396,22 +440,35 @@ jobs:
             - name: Ensure version-controlled files are not modified during the tests
               run: git diff --exit-code
 
-    # This job is deprecated but be present for compatibility reasons.
-    unit-php:
-        name: PHP
+    # Runs on every event so it can serve as the workflow's only required status check while the
+    # preceding jobs are path-filtered away.
+    #
+    # GitHub Actions can only be configured as required status checks on a per job basis using the
+    # job's `name`. When the `name` changes PRs are temporarily blocked from being merged until
+    # a privileged user can update the status checks, a process which is also error prone.
+    #
+    # The script reads every job in the run, so `needs` is only about waiting: it must cover
+    # every job that would otherwise still be running when the script looks. `--ignore` then
+    # names the jobs whose results do not count. Here that is this job itself, and the
+    # housekeeping that runs alongside it.
+    unit-status-check:
+        name: Unit Tests - Status Check
         runs-on: 'ubuntu-24.04'
-        permissions: {}
-        needs: [test-php, phpcs]
-        if: ${{ always() }}
+        timeout-minutes: 5
+        permissions:
+            contents: read
+            actions: read
+        needs: [detect-relevant-changes, unit-js, unit-js-date, test-php, phpcs]
+        if: ${{ ! cancelled() && ( github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' ) }}
         steps:
-            - name: Fail the job if the PHPUnit tests fail
-              if: ${{ needs.test-php.result != 'success' }}
-              run: exit 1
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  sparse-checkout: .github/workflows/scripts
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
 
-            - name: "Fail the job if the code doesn't conform to the coding standards"
-              if: ${{ needs.phpcs.result != 'success' }}
-              run: exit 1
-
-            - name: Mark the job as passed if all the checks pass
-              if: ${{ needs.test-php.result == 'success' && needs.phpcs.result == 'success' }}
-              run: exit 0
+            - name: Check for any failures of required jobs
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: node .github/workflows/scripts/ci-status-check.js --ignore 'Unit Tests - Status Check'
