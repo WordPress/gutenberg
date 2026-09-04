@@ -171,6 +171,42 @@ test.describe( 'Columns', () => {
 		] );
 	} );
 
+	test( 'sets a column width from the Dimensions panel', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/columns',
+			innerBlocks: [ { name: 'core/column' }, { name: 'core/column' } ],
+		} );
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Column (1 of 2)' } )
+		);
+		await editor.openDocumentSettingsSidebar();
+
+		const widthInput = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'spinbutton', { name: 'Width' } );
+		await widthInput.fill( '40' );
+		await widthInput.press( 'Enter' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/columns',
+				innerBlocks: [
+					{
+						name: 'core/column',
+						attributes: {
+							style: { dimensions: { width: '40px' } },
+						},
+					},
+					{ name: 'core/column' },
+				],
+			},
+		] );
+	} );
+
 	test.describe( 'should update the column widths correctly', () => {
 		const initialColumnWidths = [ '10%', '20%', '30%', '40%' ];
 
@@ -212,7 +248,9 @@ test.describe( 'Columns', () => {
 					},
 					innerBlocks: initialColumnWidths.map( ( width ) => ( {
 						name: 'core/column',
-						attributes: { width },
+						attributes: {
+							style: { dimensions: { width } },
+						},
 					} ) ),
 				} );
 
@@ -232,7 +270,9 @@ test.describe( 'Columns', () => {
 						name: 'core/columns',
 						innerBlocks: newColumnWidths.map( ( width ) => ( {
 							name: 'core/column',
-							attributes: { width },
+							attributes: {
+								style: { dimensions: { width } },
+							},
 						} ) ),
 					},
 				] );
