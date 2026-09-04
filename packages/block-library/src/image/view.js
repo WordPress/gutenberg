@@ -411,6 +411,13 @@ const { state, actions, callbacks } = store(
 					state.preloadTimers.delete( imageId );
 				}
 			},
+			handleCaptionClick: withSyncEvent( ( event ) => {
+				// Keeps clicks inside the caption (selecting text, following a
+				// link) from bubbling to the overlay, which would otherwise
+				// close the lightbox. Clicks on the image or surrounding area
+				// still close it.
+				event.stopPropagation();
+			} ),
 		},
 		callbacks: {
 			setOverlayStyles() {
@@ -542,6 +549,15 @@ const { state, actions, callbacks } = store(
 					horizontalPadding = state.hasNavigation ? 320 : 80;
 					verticalPadding = 80;
 				}
+
+				// Adds extra breathing room on every side of the enlarged image
+				// so a caption has room to sit below it without covering it.
+				// Applied to every image (not only captioned ones) so navigating
+				// a gallery never resizes the image. `padding` here is the total
+				// removed from each axis, so the per-side inset is half of it.
+				const imageSafeArea = 24;
+				horizontalPadding += imageSafeArea * 2;
+				verticalPadding += imageSafeArea * 2;
 
 				const targetMaxWidth = Math.min(
 					window.innerWidth - horizontalPadding,
@@ -705,6 +721,25 @@ const { state, actions, callbacks } = store(
 				const { imageId } = getContext();
 				const { ref } = getElement();
 				state.metadata[ imageId ].buttonRef = ref;
+			},
+			setCaption() {
+				// The caption is injected imperatively rather than through a
+				// `data-wp-bind--innerHTML` binding: Preact reconciles the
+				// element's children and won't apply a plain `innerHTML` prop,
+				// so a binding leaves the node empty. This runs in a
+				// `data-wp-watch`, so it re-applies whenever the selected image
+				// (and therefore its caption) changes while navigating a
+				// gallery. The value was sanitized with `wp_kses_post()` on the
+				// server and is the same markup already shown as the on-page
+				// caption.
+				const { ref } = getElement();
+				if ( ! ref ) {
+					return;
+				}
+				const caption = state.selectedImage?.caption || '';
+				if ( ref.innerHTML !== caption ) {
+					ref.innerHTML = caption;
+				}
 			},
 		},
 	},
