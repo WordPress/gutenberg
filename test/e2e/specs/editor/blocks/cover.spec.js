@@ -329,15 +329,18 @@ test.describe( 'Cover', () => {
 			} )
 			.click();
 
-		// Insert a Navigation block inside the Cover block
-		await editor.selectBlocks( coverBlock );
-		await coverBlock.getByRole( 'button', { name: 'Add block' } ).click();
-		await page.keyboard.type( 'Navigation' );
-		const blockResults = page.getByRole( 'listbox', {
-			name: 'Blocks',
-		} );
-		const blockResultOptions = blockResults.getByRole( 'option' );
-		await blockResultOptions.nth( 0 ).click();
+		// Insert a Navigation block inside the Cover block, replacing
+		// the empty paragraph through the slash inserter.
+		await coverBlock
+			.getByRole( 'document', {
+				name: 'Empty block; start writing or type forward slash to choose a block',
+			} )
+			.click();
+		await page.keyboard.type( '/Navigation' );
+		await expect(
+			page.getByRole( 'option', { name: 'Navigation', exact: true } )
+		).toBeVisible();
+		await page.keyboard.press( 'Enter' );
 
 		// Insert a second Cover block.
 		await editor.insertBlock( { name: 'core/cover' } );

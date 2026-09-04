@@ -47,11 +47,36 @@ test.describe( 'Parent selector inserter', () => {
 		] );
 	} );
 
-	test( 'hides the parent selector inserter only inside text flow wrappers', async ( {
+	test( 'shows the parent selector inserter only for containers of items', async ( {
 		admin,
 		editor,
 		page,
 	} ) => {
+		// A row arranges items side by side, so its children get an
+		// inserter in the parent selector.
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: {
+				layout: { type: 'flex', flexWrap: 'nowrap' },
+			},
+			innerBlocks: [
+				{ name: 'core/paragraph', attributes: { content: 'Text' } },
+			],
+		} );
+		await editor.canvas.locator( '[data-type="core/paragraph"]' ).click();
+
+		await editor.showBlockToolbar();
+		const toolbar = page.locator( 'role=toolbar[name="Block tools"i]' );
+		await expect(
+			toolbar.locator( 'role=button[name="Select parent block: Row"]' )
+		).toBeVisible();
+		await expect(
+			toolbar.locator( 'role=button[name="Add block"]' )
+		).toBeVisible();
+
+		// A vertical group is a writing surface and grows by typing,
+		// so it shows none.
 		await admin.createNewPost();
 		await editor.insertBlock( {
 			name: 'core/group',
@@ -63,13 +88,12 @@ test.describe( 'Parent selector inserter', () => {
 		await editor.canvas.locator( '[data-type="core/paragraph"]' ).click();
 
 		await editor.showBlockToolbar();
-		const toolbar = page.locator( 'role=toolbar[name="Block tools"i]' );
 		await expect(
 			toolbar.locator( 'role=button[name="Select parent block: Group"]' )
 		).toBeVisible();
 		await expect(
-			toolbar.locator( 'role=button[name="Add block"]' )
-		).toBeVisible();
+			toolbar.locator( 'role=button[name^="Add "]' )
+		).toBeHidden();
 
 		// A list merges with the text flow: Enter continues it, so its
 		// items get no inserter.
