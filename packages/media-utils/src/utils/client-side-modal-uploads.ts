@@ -1,7 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { dispatch, select, subscribe } from '@wordpress/data';
 import {
-	store as uploadStore,
 	detectClientSideMediaSupport,
 	isHeicCanvasSupported,
 } from '@wordpress/upload-media';
@@ -35,6 +34,16 @@ declare global {
 		plupload?: { FAILED: number };
 	}
 }
+
+/**
+ * Name of the upload-media store.
+ *
+ * The store is addressed by name rather than through the `store` descriptor
+ * `@wordpress/upload-media` exports: importing that descriptor would pull the
+ * store - and with it `@wordpress/private-apis` - into the module graph of
+ * every bundled package that imports `@wordpress/media-utils`.
+ */
+const UPLOAD_STORE = 'core/upload-media';
 
 /**
  * HEIC MIME types, the only ones routed through the pipeline when the browser
@@ -136,13 +145,14 @@ function isHeicOnlyPipelineActive(): boolean {
  * Whether the pipeline has the settings it needs to accept files.
  *
  * The block editor provider writes them into the store as it mounts, so a file
- * added before that has to stay on the classic path - a degradation, never
+ * added before that - or on a screen where `@wordpress/upload-media` never
+ * registered its store - has to stay on the classic path: a degradation, never
  * data loss.
  *
  * @return True when the store is ready to accept files.
  */
 function isPipelineReady(): boolean {
-	return Boolean( select( uploadStore ).getSettings()?.mediaUpload );
+	return Boolean( select( UPLOAD_STORE )?.getSettings()?.mediaUpload );
 }
 
 /**
@@ -238,7 +248,7 @@ function estimateProgress( item: any, entry: UploadEntry ): number {
 	}
 
 	const imageSizeCount = Object.keys(
-		select( uploadStore ).getSettings()?.allImageSizes || {}
+		select( UPLOAD_STORE ).getSettings()?.allImageSizes || {}
 	).length;
 	const completed = totals.total - remaining;
 	let fraction = 0;
@@ -265,7 +275,7 @@ function onStoreChange(): void {
 		return;
 	}
 
-	select( uploadStore )
+	select( UPLOAD_STORE )
 		.getItems()
 		.forEach( ( item: any ) => {
 			if ( item.parentId || ! item.sourceFile ) {
@@ -362,9 +372,9 @@ function queueFile(
 	}
 	inFlight++;
 
-	unsubscribe = unsubscribe ?? subscribe( onStoreChange, uploadStore );
+	unsubscribe = unsubscribe ?? subscribe( onStoreChange, UPLOAD_STORE );
 
-	void dispatch( uploadStore ).addItems( {
+	void dispatch( UPLOAD_STORE ).addItems( {
 		files: [ file ],
 		additionalData,
 		onSuccess: ( attachments: any[] ) => {
