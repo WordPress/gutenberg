@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Show a "Privacy Policy Page" badge next to the title of the page assigned in Settings > Privacy, alongside the existing "Homepage" and "Posts Page" badges ([#82422](https://github.com/WordPress/gutenberg/pull/82422)).
+-   Excerpt field: render nothing for an empty excerpt instead of the `Add an excerpt` placeholder text. ([#82423](https://github.com/WordPress/gutenberg/pull/82423))
 -   Append an ellipsis (`…`) to the labels of the actions that open a dialog requiring further input or confirmation (`Delete…`, `Trash…`, `Permanently delete…`, `Rename…`, `Duplicate…`, `Reset…`, `Order…`), following the menu ellipsis guideline. The dialog titles keep the ellipsis-free wording. ([#81994](https://github.com/WordPress/gutenberg/pull/81994))
 
 ### Bug Fixes
