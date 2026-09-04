@@ -3,6 +3,7 @@
 @use "@wordpress/base-styles/variables" as *;
 
 $actions-height: 72px;
+$pattern-min-width: 220px;
 
 .editor-start-page-options__modal {
 	.editor-start-page-options__modal__actions {
@@ -28,19 +29,38 @@ $actions-height: 72px;
 		// bar without causing the wrapper to show a scrollbar.
 		padding-bottom: $actions-height;
 	}
+
+	.editor-start-page-options__sidebar {
+		display: none;
+
+		@include break-medium() {
+			display: flex;
+			position: absolute;
+			top: $header-height + $grid-unit-10;
+			left: 0;
+			// Unlike the pattern explorer, this modal has a footer actions bar
+			// the sidebar must not run under.
+			bottom: $actions-height;
+			width: $sidebar-width;
+			padding: $grid-unit-30;
+			overflow-x: visible;
+			overflow-y: auto;
+		}
+	}
 }
 
-// 2 column masonry layout.
+.editor-start-page-options__modal-content.has-pattern-categories {
+	@include break-medium() {
+		margin-left: $sidebar-width;
+	}
+}
+
 .editor-start-page-options__modal-content .block-editor-block-patterns-list {
 	column-count: 2;
 	column-gap: $grid-unit-30;
 
 	@include break-medium() {
-		column-count: 3;
-	}
-
-	@include break-wide() {
-		column-count: 4;
+		columns: 4 $pattern-min-width;
 	}
 
 	.block-editor-block-patterns-list__list-item {
