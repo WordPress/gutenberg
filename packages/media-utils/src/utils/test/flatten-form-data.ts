@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { flattenFormData } from '../flatten-form-data';
 
 describe( 'flattenFormData', () => {

@@ -1,8 +1,11 @@
-import { MenuItem } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
+import { unlock } from '../../lock-unlock';
+
+const { MoreMenuItem } = unlock( editorPrivateApis );
 
 function ManagePatternsMenuItem() {
 	const url = useSelect( ( select ) => {
@@ -26,9 +29,7 @@ function ManagePatternsMenuItem() {
 	}, [] );
 
 	return (
-		<MenuItem role="menuitem" href={ url }>
-			{ __( 'Manage patterns' ) }
-		</MenuItem>
+		<MoreMenuItem href={ url }>{ __( 'Manage patterns' ) }</MoreMenuItem>
 	);
 }
 
