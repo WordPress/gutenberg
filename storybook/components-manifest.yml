@@ -114,6 +114,7 @@
             - positioner
             - render
             - style
+            - width
       - name: Autocomplete.Portal
         props:
             - className
@@ -139,6 +140,12 @@
             - sticky
             - style
       - name: Autocomplete.Row
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Autocomplete.Status
         props:
             - children
             - className
@@ -618,6 +625,13 @@
             - render
             - style
             - variant
+      - name: Field.VisualLabel
+        props:
+            - children
+            - className
+            - render
+            - style
+            - variant
 - name: Fieldset.Root
   props:
       - children
@@ -778,6 +792,7 @@
       - openInNewTab
       - render
       - style
+      - target
       - tone
       - variant
 - name: MenuGroup
@@ -1102,6 +1117,7 @@
       - onValueChange
       - open
       - openOnInputClick
+      - popupWidth
       - readOnly
       - ref
       - required
@@ -1193,6 +1209,7 @@
       - onValueChange
       - open
       - openOnInputClick
+      - popupWidth
       - readOnly
       - ref
       - required
@@ -1479,6 +1496,10 @@
         props:
             - children
             - className
+            - closeDelay
+            - closeOnClick
+            - delay
+            - disabled
             - render
             - style
 - name: TreeGrid

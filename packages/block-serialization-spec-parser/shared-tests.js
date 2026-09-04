@@ -1,4 +1,8 @@
-export const jsTester = ( parse ) => () => {
+import { spawnSync } from 'node:child_process';
+
+export const jsTester = ( parse, runner ) => () => {
+	runner ??= globalThis;
+	const { describe, expect, test } = runner;
 	describe( 'output structure', () => {
 		test( 'output is an array', () => {
 			expect( parse( '' ) ).toEqual( expect.any( Array ) );
@@ -196,7 +200,9 @@ export const jsTester = ( parse ) => () => {
 				'<p>Break me</p><!-- wp:block --><!-- /wp:block -->',
 			].forEach( ( input ) =>
 				expect( parse( input ) ).toEqual( [
-					expect.objectContaining( { innerHTML: '<p>Break me</p>' } ),
+					expect.objectContaining( {
+						innerHTML: '<p>Break me</p>',
+					} ),
 					expect.objectContaining( {
 						blockName: 'core/block',
 						innerHTML: '',
@@ -233,7 +239,9 @@ export const jsTester = ( parse ) => () => {
 						blockName: 'core/block',
 						innerHTML: '',
 					} ),
-					expect.objectContaining( { innerHTML: '<p>Break me</p>' } ),
+					expect.objectContaining( {
+						innerHTML: '<p>Break me</p>',
+					} ),
 				] )
 			) );
 	} );
@@ -319,44 +327,39 @@ export const jsTester = ( parse ) => () => {
 const hasPHP =
 	'test' === process.env.NODE_ENV
 		? ( () => {
-				const process = require( 'child_process' ).spawnSync(
-					'php',
-					[ '-r', 'echo 1;' ],
-					{
-						encoding: 'utf8',
-					}
-				);
+				const phpProcess = spawnSync( 'php', [ '-r', 'echo 1;' ], {
+					encoding: 'utf8',
+				} );
 
-				return process.status === 0 && process.stdout === '1';
+				return phpProcess.status === 0 && phpProcess.stdout === '1';
 		  } )()
 		: false;
 
 // Skipping if `php` isn't available to us, such as in local dev without it
 // skipping preserves snapshots while commenting out or simply
-// not injecting the tests prompts `jest` to remove "obsolete snapshots"
-const makeTest = hasPHP
-	? // eslint-disable-next-line jest/valid-describe-callback, jest/valid-title
-	  ( ...args ) => describe( ...args )
-	: // eslint-disable-next-line jest/no-disabled-tests, jest/valid-describe-callback, jest/valid-title
-	  ( ...args ) => describe.skip( ...args );
+// not injecting the tests can prompt snapshot-aware runners to remove
+// "obsolete snapshots"
+const makeTest = ( describe ) =>
+	hasPHP
+		? ( ...args ) => describe( ...args )
+		: ( ...args ) => describe.skip( ...args );
 
-export const phpTester = ( name, filename ) =>
-	makeTest(
+export const phpTester = ( name, filename, testRunner = globalThis ) => {
+	const { describe } = testRunner;
+	return makeTest( describe )(
 		name,
 		'test' === process.env.NODE_ENV
 			? jsTester( ( doc ) => {
-					const process = require( 'child_process' ).spawnSync(
-						'php',
-						[ '-f', filename ],
-						{
-							input: doc,
-							encoding: 'utf8',
-							timeout: 30 * 1000, // Abort after 30 seconds, that's too long anyway.
-						}
-					);
+					const phpProcess = spawnSync( 'php', [ '-f', filename ], {
+						input: doc,
+						encoding: 'utf8',
+						timeout: 30 * 1000, // Abort after 30 seconds, that's too long anyway.
+					} );
 
-					if ( process.status !== 0 ) {
-						throw new Error( process.stderr || process.stdout );
+					if ( phpProcess.status !== 0 ) {
+						throw new Error(
+							phpProcess.stderr || phpProcess.stdout
+						);
 					}
 
 					try {
@@ -367,16 +370,17 @@ export const phpTester = ( name, filename ) =>
 						 * This is an issue with the test runner, not with the parser.
 						 */
 						return JSON.parse(
-							process.stdout.replace(
+							phpProcess.stdout.replace(
 								/"attrs":\s*\[\]/g,
 								'"attrs":{}'
 							)
 						);
 					} catch {
 						throw new Error(
-							'failed to parse JSON:\n' + process.stdout
+							'failed to parse JSON:\n' + phpProcess.stdout
 						);
 					}
-			  } )
+			  }, testRunner )
 			: () => {}
 	);
+};

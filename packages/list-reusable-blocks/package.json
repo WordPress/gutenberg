@@ -24,7 +24,6 @@
 		"npm": ">=8.19.2"
 	},
 	"files": [
-		"src",
 		"build",
 		"build-module",
 		"build-style",
@@ -53,7 +52,8 @@
 		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
-		"change-case": "^4.1.2"
+		"change-case": "^4.1.2",
+		"remove-accents": "^0.5.0"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",
