@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { combineReducers } from '../combine-reducers';
 
 function counterReducer( count = 0, action ) {

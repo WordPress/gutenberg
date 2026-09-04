@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Page, Response } from '@playwright/test';
-
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 import { SECOND_USER } from './fixtures/collaboration-utils';
 
@@ -64,7 +57,6 @@ test.describe( 'Collaboration - auto-draft collaborator autosave retention', () 
 	test( 'keeps a new post discoverable when a collaborator makes the first autosaved edit', async ( {
 		admin,
 		collaborationUtils,
-		editor,
 		page,
 		requestUtils,
 	} ) => {
@@ -73,11 +65,7 @@ test.describe( 'Collaboration - auto-draft collaborator autosave retention', () 
 		const title = 'RTC collaborator first autosave title';
 		const marker = 'rtc-collaborator-first-autosave-content';
 
-		await admin.visitAdminPage( 'post-new.php' );
-		await editor.setPreferences( 'core/edit-post', {
-			welcomeGuide: false,
-			fullscreenMode: false,
-		} );
+		await admin.createNewPost();
 		await collaborationUtils.waitForEntityReady( page, {
 			requireCollaboration: false,
 			timeout: 30_000,
@@ -100,7 +88,7 @@ test.describe( 'Collaboration - auto-draft collaborator autosave retention', () 
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( title );
 		await collaboratorEditor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await collaboratorPage.keyboard.type( marker );
 

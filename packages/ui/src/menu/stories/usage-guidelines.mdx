@@ -1,0 +1,87 @@
+import { Canvas, Markdown, Meta } from '@storybook/addon-docs/blocks';
+import * as UsageGuidelinesStories from './usage-guidelines.story';
+
+<Meta of={ UsageGuidelinesStories } />
+
+# Menu usage guidelines
+
+Choose between Menu, Select, and Autocomplete based on what the options represent and whether users need to search them.
+
+> If the trigger represents a current value and opens choices for replacing that value, use Select. If the trigger opens commands, actions, or navigation destinations, use Menu. If users need to type to filter a menu-like list of commands or suggestions, use Autocomplete.
+
+## Quick reference
+
+<Markdown>{ `
+| Goal | Component | Expected behavior |
+| --- | --- | --- |
+| Choose one predefined value | [SelectControl](?path=/docs/design-system-components-form-selectcontrol--docs) | The trigger represents the current value. Choosing an option replaces it. |
+| Build a custom value-selection control | [Select](?path=/docs/design-system-components-form-primitives-select--docs) | The primitives provide a custom composition while preserving Select semantics. |
+| Offer commands, actions, or destinations | [Menu](?path=/docs/design-system-components-menu--docs) | Activating an item runs a command, opens a submenu, or navigates to a destination. |
+| Search commands or suggestions with free-form input | [Autocomplete](?path=/docs/design-system-components-form-primitives-autocomplete--docs) | Typing filters the suggestions while focus remains in the input. |
+| Change settings within a broader command menu | [Menu](?path=/docs/design-system-components-menu--docs) | Checkbox items toggle independent states. Radio items choose one state within a group. |
+` }</Markdown>
+
+## Use `SelectControl` to choose a value
+
+Use [SelectControl](?path=/docs/design-system-components-form-selectcontrol--docs) when choosing one predefined value is the control's primary purpose. The selected value is often submitted as part of a form, but form submission does not define Select semantics.
+
+The trigger should represent the current value. The popup options should represent the available replacement values, not commands or navigation destinations.
+
+Use the lower-level [Select](?path=/docs/design-system-components-form-primitives-select--docs) primitives only when a custom composition cannot be expressed with `SelectControl`.
+
+<Canvas of={ UsageGuidelinesStories.SelectForValues } />
+
+## Use `Menu` for commands and destinations
+
+Use `Menu.Item` for commands or actions. Use `Menu.LinkItem` for navigation destinations. Activating a regular item usually performs its command and closes the menu.
+
+<Canvas of={ UsageGuidelinesStories.MenuForCommands } />
+
+## Use `Autocomplete` when users need to search
+
+Use [Autocomplete](?path=/docs/design-system-components-form-primitives-autocomplete--docs) for a menu-like list of commands or suggestions that users filter by typing. Unlike `Menu`, focus remains in a text input while users navigate the suggestions.
+
+Autocomplete accepts free-form text. If the control must contain one predefined value, use `SelectControl` or the lower-level `Select` primitives instead.
+
+<Canvas of={ UsageGuidelinesStories.AutocompleteForSearchableCommands } />
+
+## Use checked items for settings within a menu
+
+Use `Menu.CheckboxItem` for independent states, such as showing or hiding individual table columns.
+
+Use `Menu.RadioItem` within `Menu.RadioGroup` for mutually exclusive states, such as choosing one density or view mode within a broader command menu.
+
+<Canvas of={ UsageGuidelinesStories.CheckedOptionsWithinACommandMenu } />
+
+Do not use checked menu items only to recreate a Select. If choosing a value is the whole purpose of the control, use `SelectControl`, even when the options could look like radio menu items.
+
+## Use an ellipsis for actions that need more input
+
+Append an ellipsis (`…`) when activating an item opens another interface that requires more user input before the command can finish, such as a dialog.
+
+-   Use **Rename…** when activation opens a dialog where the user enters a new name.
+-   Use **Delete…** when activation opens a confirmation dialog that requires a decision.
+-   Use **Preferences** without an ellipsis when activation completes the command by opening the preferences interface.
+-   Use **Duplicate** when activation completes the command immediately.
+-   Use **Move to** without an ellipsis when the item opens a submenu.
+
+The consumer must add the ellipsis because `Menu.Item` cannot infer what happens after activation. See the [WAI-ARIA APG Menu and Menubar Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menubar/) and the [WordPress ellipsis guidance](https://github.com/WordPress/gutenberg/issues/64555#issuecomment-5244971187).
+
+## Common mistakes
+
+-   **Using Menu to choose the control's only value.** Use `SelectControl` so the trigger and options communicate value selection.
+-   **Putting commands or links in Select.** Use `Menu.Item` for commands and `Menu.LinkItem` for destinations.
+-   **Using Menu for a large set of searchable commands.** Use `Autocomplete` when users need to filter commands or suggestions by typing.
+-   **Using radio items to recreate a Select.** Use `Menu.RadioItem` only when the state belongs inside a broader command menu.
+-   **Adding an ellipsis to every item that opens another interface.** Reserve it for commands that require more input before completion. Do not add it when opening the interface completes the command, as with **Preferences**.
+
+## References
+
+-   [WAI-ARIA APG: Menu and Menubar Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menubar/)
+-   [WAI-ARIA APG: Listbox Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/)
+-   [WAI-ARIA: `menuitemcheckbox` role](https://www.w3.org/TR/wai-aria-1.2/#menuitemcheckbox)
+-   [WAI-ARIA: `menuitemradio` role](https://www.w3.org/TR/wai-aria-1.2/#menuitemradio)
+-   [HTML Standard: The `select` element](https://html.spec.whatwg.org/dev/form-elements.html#the-select-element)
+-   [Base UI: Menu](https://base-ui.com/react/components/menu)
+-   [Base UI: Select](https://base-ui.com/react/components/select)
+-   [Base UI: Autocomplete](https://base-ui.com/react/components/autocomplete)

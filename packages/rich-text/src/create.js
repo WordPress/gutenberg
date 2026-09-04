@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { select } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as richTextStore } from './store';
 import { createElement } from './create-element';
 import { mergePair } from './concat';
@@ -89,13 +82,24 @@ function toFormat( { tagName, attributes } ) {
 		delete unregisteredAttributes.contenteditable;
 	}
 
-	return {
+	// Omit empty attribute objects so that parsed formats have the same shape
+	// as manually applied formats (`{ type, attributes? }`), which is required
+	// for format equality checks.
+	const format = {
 		formatType,
 		type: formatType.name,
 		tagName,
-		attributes: registeredAttributes,
-		unregisteredAttributes,
 	};
+
+	if ( Object.keys( registeredAttributes ).length ) {
+		format.attributes = registeredAttributes;
+	}
+
+	if ( Object.keys( unregisteredAttributes ).length ) {
+		format.unregisteredAttributes = unregisteredAttributes;
+	}
+
+	return format;
 }
 
 /**

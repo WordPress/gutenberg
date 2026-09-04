@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Button, ExternalLink } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -13,13 +10,8 @@ import {
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { addQueryArgs } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { getConnectorData } from './default-connectors';
 import { WpLogoDecoration } from './wp-logo-decoration';
-
 import type { PluginStatus } from './use-connector-plugin';
 
 const AI_PLUGIN_SLUG = 'ai';
@@ -197,11 +189,6 @@ export function AiPluginCallout() {
 		return null;
 	}
 
-	// Not installed and no permissions to install.
-	if ( pluginStatus === 'not-installed' && canInstallPlugins === false ) {
-		return null;
-	}
-
 	// Installed but can't activate (no manage permissions).
 	if ( pluginStatus === 'inactive' && canManagePlugins === false ) {
 		return null;
@@ -215,6 +202,8 @@ export function AiPluginCallout() {
 		( ! initialHasConnectedProvider || justActivated );
 	const showInstallActivate =
 		pluginStatus === 'not-installed' || pluginStatus === 'inactive';
+	const hideButtons =
+		pluginStatus === 'not-installed' && canInstallPlugins === false;
 
 	const getMessage = () => {
 		if ( isJustConnected ) {
@@ -258,33 +247,34 @@ export function AiPluginCallout() {
 				<p>
 					{ createInterpolateElement( getMessage(), {
 						strong: <strong />,
-						// @ts-ignore children are injected by createInterpolateElement at runtime.
+						// @ts-expect-error `children` is injected by `createInterpolateElement` at runtime.
 						a: <ExternalLink href={ AI_PLUGIN_URL } />,
 					} ) }
 				</p>
-				{ showInstallActivate ? (
-					<Button
-						variant="primary"
-						size="compact"
-						isBusy={ isBusy }
-						disabled={ getPrimaryButtonProps().disabled }
-						accessibleWhenDisabled
-						onClick={ getPrimaryButtonProps().onClick }
-					>
-						{ getPrimaryButtonProps().label }
-					</Button>
-				) : (
-					<Button
-						ref={ actionButtonRef }
-						variant="secondary"
-						size="compact"
-						href={ addQueryArgs( 'options-general.php', {
-							page: AI_PLUGIN_PAGE_SLUG,
-						} ) }
-					>
-						{ __( 'Control features in the AI plugin' ) }
-					</Button>
-				) }
+				{ ! hideButtons &&
+					( showInstallActivate ? (
+						<Button
+							variant="primary"
+							size="compact"
+							isBusy={ isBusy }
+							disabled={ getPrimaryButtonProps().disabled }
+							accessibleWhenDisabled
+							onClick={ getPrimaryButtonProps().onClick }
+						>
+							{ getPrimaryButtonProps().label }
+						</Button>
+					) : (
+						<Button
+							ref={ actionButtonRef }
+							variant="secondary"
+							size="compact"
+							href={ addQueryArgs( 'options-general.php', {
+								page: AI_PLUGIN_PAGE_SLUG,
+							} ) }
+						>
+							{ __( 'Control features in the AI plugin' ) }
+						</Button>
+					) ) }
 			</div>
 			<WpLogoDecoration />
 		</div>

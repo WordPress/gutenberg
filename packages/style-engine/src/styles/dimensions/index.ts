@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { Style, StyleOptions } from '../../types';
 import { generateRule } from '../utils';
 
@@ -64,4 +61,16 @@ const width = {
 	},
 };
 
-export default [ height, minHeight, minWidth, aspectRatio, width ];
+const objectFit = {
+	name: 'objectFit',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'dimensions', 'objectFit' ],
+			'objectFit'
+		);
+	},
+};
+
+export default [ height, minHeight, minWidth, aspectRatio, width, objectFit ];

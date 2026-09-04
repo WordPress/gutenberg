@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Page, Response } from '@playwright/test';
-
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 
 type RestPost = {
@@ -72,11 +65,7 @@ test.describe( 'Collaboration - auto-draft autosave retention', () => {
 		const title = 'RTC automatic auto-draft autosave title';
 		const marker = 'rtc-automatic-auto-draft-autosave-content';
 
-		await admin.visitAdminPage( 'post-new.php' );
-		await editor.setPreferences( 'core/edit-post', {
-			welcomeGuide: false,
-			fullscreenMode: false,
-		} );
+		await admin.createNewPost();
 		await collaborationUtils.waitForEntityReady( page, {
 			requireCollaboration: false,
 			timeout: 30_000,
@@ -89,7 +78,7 @@ test.describe( 'Collaboration - auto-draft autosave retention', () => {
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( title );
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( marker );
 

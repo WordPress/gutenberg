@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/escape-html",
-	"version": "3.45.0",
+	"version": "3.54.0",
 	"description": "Escape HTML utils.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -23,7 +23,6 @@
 		"npm": ">=8.19.2"
 	},
 	"files": [
-		"src",
 		"build",
 		"build-module",
 		"build-types",
@@ -39,10 +38,13 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": false,
+	"devDependencies": {
+		"@types/jest": "^30.0.0",
+		"vitest": "^4.1.10"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

@@ -1,24 +1,125 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from '@wordpress/element';
-import { privateApis as themeApis } from '@wordpress/theme';
-import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
+import { useArgs, useState } from 'storybook/preview-api';
+import { Breadcrumbs, Page } from '@wordpress/admin-ui';
+import { wordpress } from '@wordpress/icons';
+import { ThemeProvider } from '@wordpress/theme';
 import {
 	Badge,
 	Button,
 	Card,
+	Dialog,
+	Icon,
+	InputControl,
 	Link,
+	Menu,
 	Notice,
+	SelectControl,
 	Stack,
 	Tabs,
 	Text,
 } from '@wordpress/ui';
+import { withRouter } from '../../decorators/with-router';
+import { getDesignSystemThemeSettings } from '../../decorators/with-design-system-theme';
 
-const { unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
-	'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
-	'@wordpress/theme'
-);
+const SIDEBAR_THEME_PRESETS = [
+	{
+		id: 'fresh',
+		title: 'Fresh',
+		colors: { primary: '#3858e9', background: '#25292b' },
+	},
+	{
+		id: 'blue',
+		title: 'Blue',
+		colors: { primary: '#437aa8', background: '#3876a8' },
+	},
+	{
+		id: 'ectoplasm',
+		title: 'Ectoplasm',
+		colors: { primary: '#646c3e', background: '#4f386e' },
+	},
+] as const;
 
-const { ThemeProvider } = unlock( themeApis );
+type SidebarThemeId = ( typeof SIDEBAR_THEME_PRESETS )[ number ][ 'id' ];
+type ExampleApplicationArgs = React.ComponentProps< typeof ThemeProvider > & {
+	sidebarTheme: SidebarThemeId;
+};
+
+function getSidebarThemePreset( value: unknown ) {
+	return (
+		SIDEBAR_THEME_PRESETS.find( ( preset ) => preset.id === value ) ??
+		SIDEBAR_THEME_PRESETS[ 0 ]
+	);
+}
+
+function SidebarThemeControls( {
+	selectedTheme,
+	onSelectTheme,
+}: {
+	selectedTheme: SidebarThemeId;
+	onSelectTheme: ( theme: SidebarThemeId ) => void;
+} ) {
+	return (
+		<Stack
+			direction="row"
+			gap="sm"
+			align="center"
+			justify="space-between"
+			style={ {
+				flexWrap: 'wrap',
+				marginBlockEnd: 'var(--wpds-dimension-gap-md)',
+			} }
+		>
+			<Text variant="heading-sm">Sidebar theme</Text>
+			<Stack
+				direction="row"
+				gap="xs"
+				render={ <div role="group" aria-label="Sidebar theme" /> }
+			>
+				{ SIDEBAR_THEME_PRESETS.map( ( preset ) => (
+					<Button
+						key={ preset.id }
+						size="compact"
+						variant={
+							selectedTheme === preset.id ? 'solid' : 'outline'
+						}
+						aria-pressed={ selectedTheme === preset.id }
+						onClick={ () => onSelectTheme( preset.id ) }
+						style={ { gap: 'var(--wpds-dimension-gap-xs)' } }
+					>
+						<span
+							aria-hidden="true"
+							style={ {
+								display: 'flex',
+								isolation: 'isolate',
+							} }
+						>
+							{ Object.values( preset.colors ).map(
+								( color, index ) => (
+									<span
+										key={ color }
+										style={ {
+											backgroundColor: color,
+											border: 'var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral)',
+											borderRadius: '50%',
+											boxSizing: 'border-box',
+											display: 'block',
+											height: 'var(--wpds-dimension-size-xs)',
+											marginInlineStart:
+												index === 0 ? 0 : '-4px',
+											width: 'var(--wpds-dimension-size-xs)',
+											zIndex: -index,
+										} }
+									/>
+								)
+							) }
+						</span>
+						{ preset.title }
+					</Button>
+				) ) }
+			</Stack>
+		</Stack>
+	);
+}
 
 const sidebarNavItems = [
 	'Dashboard',
@@ -29,7 +130,15 @@ const sidebarNavItems = [
 	'Settings',
 ];
 
-const meta: Meta< typeof ThemeProvider > = {
+const siteLanguageOptions = [
+	{ value: 'en-US', label: 'English (United States)' },
+	{ value: 'en-GB', label: 'English (United Kingdom)' },
+	{ value: 'fr-FR', label: 'Français' },
+	{ value: 'de-DE', label: 'Deutsch' },
+	{ value: 'ja', label: '日本語' },
+];
+
+const meta: Meta< ExampleApplicationArgs > = {
 	title: 'Design System/Theme/Theme Provider/Example Application',
 	component: ThemeProvider,
 	parameters: {
@@ -40,120 +149,59 @@ const meta: Meta< typeof ThemeProvider > = {
 export default meta;
 
 /**
- * A mock application page demonstrating how `ThemeProvider` affects multiple
- * `@wordpress/ui` components in concert. Use the inline controls to adjust
- * the `primary` seed color, `bg` seed color, and `density`, and observe how
- * every surface, text element, and interactive control adapts accordingly.
+ * A mock application demonstrating nested `ThemeProvider` components. The
+ * application shell uses its own color preset, while the main content
+ * explicitly reapplies the root settings from the Storybook Theme toolbar.
  */
-export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
-	render: () => {
-		const [ primary, setPrimary ] = useState< string | undefined >();
-		const [ bg, setBg ] = useState< string | undefined >();
-		const [ density, setDensity ] = useState<
-			'default' | 'compact' | 'comfortable' | undefined
-		>();
+export const ExampleApplication: StoryObj< typeof meta > = {
+	args: {
+		sidebarTheme: SIDEBAR_THEME_PRESETS[ 0 ].id,
+	},
+	render: function Render( _, context ) {
+		const [ { sidebarTheme }, updateArgs ] =
+			useArgs< ExampleApplicationArgs >();
+		const [ isSiteDetailsOpen, setIsSiteDetailsOpen ] = useState( false );
+		const rootThemeSettings = getDesignSystemThemeSettings(
+			context.globals
+		);
+		const sidebarThemePreset = getSidebarThemePreset( sidebarTheme );
+		const generalSettingsId = `${ context.id }-general-settings`;
+		const displaySettingsId = `${ context.id }-display-settings`;
 
 		return (
 			<div>
-				<div
-					style={ {
-						display: 'flex',
-						alignItems: 'center',
-						gap: '16px',
-						padding: '12px 16px',
-						marginBlockEnd: '16px',
-						borderRadius: '8px',
-						background: '#f0f0f0',
-						fontSize: '13px',
-						flexWrap: 'wrap',
-					} }
-				>
-					{ /* eslint-disable jsx-a11y/label-has-associated-control */ }
-					<label
-						style={ {
-							display: 'inline-flex',
-							alignItems: 'center',
-							gap: '6px',
-						} }
-					>
-						Primary
-						<input
-							type="color"
-							value={ primary ?? '#3858e9' }
-							onChange={ ( e ) => setPrimary( e.target.value ) }
-						/>
-					</label>
-					<label
-						style={ {
-							display: 'inline-flex',
-							alignItems: 'center',
-							gap: '6px',
-						} }
-					>
-						Background
-						<input
-							type="color"
-							value={ bg ?? '#ffffff' }
-							onChange={ ( e ) => setBg( e.target.value ) }
-						/>
-					</label>
-					<label
-						style={ {
-							display: 'inline-flex',
-							alignItems: 'center',
-							gap: '6px',
-						} }
-					>
-						Density
-						<select
-							value={ density ?? '' }
-							onChange={ ( e ) =>
-								setDensity(
-									( e.target.value || undefined ) as
-										| 'default'
-										| 'compact'
-										| 'comfortable'
-										| undefined
-								)
-							}
-						>
-							<option value="">Default</option>
-							<option value="compact">Compact</option>
-							<option value="comfortable">Comfortable</option>
-						</select>
-					</label>
-					{ /* eslint-enable jsx-a11y/label-has-associated-control */ }
-				</div>
-				<ThemeProvider
-					color={ { primary, bg } }
-					density={ density }
-					isRoot
-				>
+				<SidebarThemeControls
+					selectedTheme={ sidebarThemePreset.id }
+					onSelectTheme={ ( selectedSidebarTheme ) =>
+						updateArgs( { sidebarTheme: selectedSidebarTheme } )
+					}
+				/>
+				<ThemeProvider color={ sidebarThemePreset.colors }>
 					<div
 						style={ {
 							display: 'grid',
 							gridTemplateColumns: '200px 1fr',
 							minHeight: '500px',
-							color: 'var(--wpds-color-fg-content-neutral)',
+							color: 'var(--wpds-color-foreground-content-neutral)',
+							borderRadius: 'var(--wpds-border-radius-xl)',
+							border: 'var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak)',
+							overflow: 'hidden',
 						} }
 					>
 						{ /* Sidebar */ }
-						<div
+						<Stack
+							direction="column"
+							gap="xl"
 							style={ {
 								backgroundColor:
-									'var(--wpds-color-bg-surface-neutral-weak)',
+									'var(--wpds-color-background-surface-neutral-weak)',
 								padding:
 									'var(--wpds-dimension-padding-xl) var(--wpds-dimension-padding-lg)',
+								borderInlineEnd:
+									'var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak)',
 							} }
 						>
-							<Text
-								variant="heading-sm"
-								render={ <h2 /> }
-								style={ {
-									marginBlockEnd:
-										'var(--wpds-dimension-gap-xl)',
-								} }
-							>
+							<Text variant="heading-sm" render={ <h2 /> }>
 								My App
 							</Text>
 							<nav>
@@ -176,221 +224,326 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 									) ) }
 								</Stack>
 							</nav>
-						</div>
+							<div>
+								<Dialog.Root
+									open={ isSiteDetailsOpen }
+									onOpenChange={ setIsSiteDetailsOpen }
+								>
+									<Menu.Root>
+										<Menu.Trigger
+											render={
+												<Button
+													size="compact"
+													variant="outline"
+													tone="neutral"
+													style={ {
+														justifyContent:
+															'flex-start',
+														width: '100%',
+													} }
+												/>
+											}
+										>
+											Site actions
+										</Menu.Trigger>
+										<Menu.Popup>
+											<Menu.LinkItem
+												href={ `#${ generalSettingsId }` }
+											>
+												<Menu.ItemLabel>
+													General settings
+												</Menu.ItemLabel>
+											</Menu.LinkItem>
+											<Menu.LinkItem
+												href={ `#${ displaySettingsId }` }
+											>
+												<Menu.ItemLabel>
+													Display settings
+												</Menu.ItemLabel>
+											</Menu.LinkItem>
+											<Menu.Separator />
+											<Menu.Item
+												onClick={ () =>
+													setIsSiteDetailsOpen( true )
+												}
+											>
+												<Menu.ItemLabel>
+													View site details…
+												</Menu.ItemLabel>
+											</Menu.Item>
+										</Menu.Popup>
+									</Menu.Root>
+									<Dialog.Popup size="small">
+										<Dialog.Header>
+											<Dialog.Title>
+												Site details
+											</Dialog.Title>
+											<Dialog.CloseIcon />
+										</Dialog.Header>
+										<Dialog.Content>
+											<Stack direction="column" gap="sm">
+												<Dialog.Description>
+													This sample dialog shows
+													information about the
+													current site.
+												</Dialog.Description>
+												<Text>
+													<strong>Site title:</strong>{ ' ' }
+													My WordPress site
+												</Text>
+												<Text>
+													<strong>Language:</strong>{ ' ' }
+													English (United States)
+												</Text>
+											</Stack>
+										</Dialog.Content>
+										<Dialog.Footer>
+											<Dialog.Action>Done</Dialog.Action>
+										</Dialog.Footer>
+									</Dialog.Popup>
+								</Dialog.Root>
+							</div>
+						</Stack>
 
-						{ /* Page content (header + content area) */ }
-						<div
-							style={ {
-								backgroundColor:
-									'var(--wpds-color-bg-surface-neutral-weak)',
-								padding: 'var(--wpds-dimension-padding-lg)',
-							} }
+						<Page
+							ariaLabel="Level 1 breadcrumb"
+							visual={ <Icon icon={ wordpress } size={ 24 } /> }
+							subTitle="All of the subtitle text you need goes here."
+							breadcrumbs={
+								<Breadcrumbs
+									items={ [
+										{
+											label: 'Root breadcrumb',
+											to: '/connectors',
+										},
+										{ label: 'Level 1 breadcrumb' },
+									] }
+								/>
+							}
+							badges={
+								<Badge intent="informational">Status</Badge>
+							}
+							actions={
+								<>
+									<Button size="compact" variant="solid">
+										Save
+									</Button>
+								</>
+							}
+							showSidebarToggle={ false }
 						>
 							<div
 								style={ {
-									display: 'flex',
-									flexDirection: 'column',
-									borderRadius:
-										'var(--wpds-border-radius-lg)',
-									border: '1px solid var(--wpds-color-stroke-surface-neutral-weak)',
-									overflow: 'hidden',
-									height: '100%',
+									display: 'grid',
+									flex: 1,
 								} }
 							>
-								{ /* Header */ }
-								<div
-									style={ {
-										backgroundColor:
-											'var(--wpds-color-bg-surface-neutral-strong)',
-										padding:
-											'var(--wpds-dimension-padding-xl)',
-										display: 'flex',
-										alignItems: 'center',
-										justifyContent: 'space-between',
-										gap: 'var(--wpds-dimension-gap-lg)',
-										borderBlockEnd:
-											'1px solid var(--wpds-color-stroke-surface-neutral-weak)',
-									} }
-								>
+								<ThemeProvider { ...rootThemeSettings }>
 									<div
 										style={ {
-											display: 'flex',
-											alignItems: 'center',
-											gap: 'var(--wpds-dimension-gap-md)',
+											boxSizing: 'border-box',
+											backgroundColor:
+												'var(--wpds-color-background-surface-neutral)',
+											color: 'var(--wpds-color-foreground-content-neutral)',
+											height: '100%',
+											padding:
+												'var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-2xl)',
 										} }
 									>
-										<Text
-											variant="heading-lg"
-											render={ <h1 /> }
+										<Stack
+											direction="column"
+											gap="lg"
 											style={ {
-												margin: 0,
+												width: '100%',
+												maxWidth: '640px',
+												marginInline: 'auto',
 											} }
 										>
-											Settings
-										</Text>
-										<Badge intent="informational">
-											Beta
-										</Badge>
+											<Notice.Root intent="info">
+												<Notice.Title>
+													Welcome to your new site
+												</Notice.Title>
+												<Notice.Description>
+													Complete the steps below to
+													finish setting up.
+												</Notice.Description>
+											</Notice.Root>
+
+											{ /* Card 1: General */ }
+											<Card.Root id={ generalSettingsId }>
+												<Card.Header>
+													<Card.Title>
+														General
+													</Card.Title>
+												</Card.Header>
+												<Card.Content>
+													<Stack
+														direction="column"
+														gap="md"
+													>
+														<Text>
+															Configure the basic
+															settings for your
+															site. The fields
+															below adopt the
+															corner radius preset
+															alongside cards,
+															buttons, and other
+															surfaces.
+														</Text>
+														<InputControl
+															label="Site title"
+															placeholder="My WordPress site"
+															defaultValue="My WordPress site"
+														/>
+														<InputControl
+															label="Tagline"
+															description="A short phrase shown below the site title."
+															placeholder="Just another WordPress site"
+														/>
+														<InputControl
+															label="Admin email address"
+															type="email"
+															placeholder="you@example.com"
+															defaultValue="admin@example.com"
+														/>
+														<SelectControl
+															label="Site language"
+															description="The default language for the site interface."
+															items={
+																siteLanguageOptions
+															}
+															defaultValue={
+																siteLanguageOptions[ 0 ]
+															}
+														/>
+														<Stack
+															direction="row"
+															style={ {
+																justifyContent:
+																	'flex-end',
+															} }
+														>
+															<Button>
+																Save
+															</Button>
+														</Stack>
+													</Stack>
+												</Card.Content>
+											</Card.Root>
+
+											{ /* Card 2: Display */ }
+											<Card.Root id={ displaySettingsId }>
+												<Card.Header>
+													<Card.Title>
+														Display
+													</Card.Title>
+												</Card.Header>
+												<Card.Content>
+													<Tabs.Root defaultValue="appearance">
+														<Tabs.List variant="minimal">
+															<Tabs.Tab value="appearance">
+																Appearance
+															</Tabs.Tab>
+															<Tabs.Tab value="layout">
+																Layout
+															</Tabs.Tab>
+															<Tabs.Tab value="accessibility">
+																Accessibility
+															</Tabs.Tab>
+														</Tabs.List>
+														<Tabs.Panel value="appearance">
+															<Stack
+																direction="column"
+																gap="md"
+																style={ {
+																	paddingBlockStart:
+																		'var(--wpds-dimension-padding-md)',
+																} }
+															>
+																<Text>
+																	Control how
+																	your site
+																	looks to
+																	visitors.
+																	Adjust{ ' ' }
+																	<Link href="#">
+																		typography
+																	</Link>
+																	,{ ' ' }
+																	<Link href="#">
+																		colors
+																	</Link>
+																	, and
+																	spacing to
+																	match your
+																	brand.
+																</Text>
+															</Stack>
+														</Tabs.Panel>
+														<Tabs.Panel value="layout">
+															<Stack
+																direction="column"
+																gap="md"
+																style={ {
+																	paddingBlockStart:
+																		'var(--wpds-dimension-padding-md)',
+																} }
+															>
+																<Text>
+																	Choose a
+																	layout
+																	structure
+																	for your
+																	pages.
+																	Options
+																	include
+																	full-width,
+																	boxed, and{ ' ' }
+																	<Link href="#">
+																		custom
+																		layouts
+																	</Link>
+																	.
+																</Text>
+															</Stack>
+														</Tabs.Panel>
+														<Tabs.Panel value="accessibility">
+															<Stack
+																direction="column"
+																gap="md"
+																style={ {
+																	paddingBlockStart:
+																		'var(--wpds-dimension-padding-md)',
+																} }
+															>
+																<Text>
+																	Review your
+																	site&apos;s{ ' ' }
+																	<Link href="#">
+																		accessibility
+																		settings
+																	</Link>{ ' ' }
+																	to ensure it
+																	meets WCAG
+																	guidelines.
+																</Text>
+															</Stack>
+														</Tabs.Panel>
+													</Tabs.Root>
+												</Card.Content>
+											</Card.Root>
+										</Stack>
 									</div>
-									<Button
-										variant="solid"
-										tone="brand"
-										size="compact"
-									>
-										Save changes
-									</Button>
-								</div>
-
-								{ /* Content area */ }
-								<div
-									style={ {
-										backgroundColor:
-											'var(--wpds-color-bg-surface-neutral)',
-										padding:
-											'var(--wpds-dimension-padding-xl)',
-										flexGrow: 1,
-									} }
-								>
-									<Stack
-										direction="column"
-										gap="xl"
-										style={ {
-											maxWidth: '640px',
-											marginInline: 'auto',
-										} }
-									>
-										<Notice.Root intent="info">
-											<Notice.Title>
-												Welcome to your new site
-											</Notice.Title>
-											<Notice.Description>
-												Complete the steps below to
-												finish setting up.
-											</Notice.Description>
-										</Notice.Root>
-
-										{ /* Card 1: General */ }
-										<Card.Root>
-											<Card.Header>
-												<Card.Title>General</Card.Title>
-											</Card.Header>
-											<Card.Content>
-												<Stack
-													direction="column"
-													gap="md"
-												>
-													<Text>
-														Configure the basic
-														settings for your site.
-														You can update your{ ' ' }
-														<Link href="#">
-															site title
-														</Link>
-														, tagline, and{ ' ' }
-														<Link href="#">
-															admin email address
-														</Link>{ ' ' }
-														at any time.
-													</Text>
-													<Text>
-														For more advanced
-														options, visit the{ ' ' }
-														<Link href="#">
-															developer
-															documentation
-														</Link>
-														.
-													</Text>
-												</Stack>
-											</Card.Content>
-										</Card.Root>
-
-										{ /* Card 2: Display */ }
-										<Card.Root>
-											<Card.Header>
-												<Card.Title>Display</Card.Title>
-											</Card.Header>
-											<Card.Content>
-												<Tabs.Root defaultValue="appearance">
-													<Tabs.List variant="minimal">
-														<Tabs.Tab value="appearance">
-															Appearance
-														</Tabs.Tab>
-														<Tabs.Tab value="layout">
-															Layout
-														</Tabs.Tab>
-														<Tabs.Tab value="accessibility">
-															Accessibility
-														</Tabs.Tab>
-													</Tabs.List>
-													<Tabs.Panel value="appearance">
-														<Text
-															style={ {
-																paddingBlockStart:
-																	'var(--wpds-dimension-padding-lg)',
-															} }
-														>
-															Control how your
-															site looks to
-															visitors. Adjust{ ' ' }
-															<Link href="#">
-																typography
-															</Link>
-															,{ ' ' }
-															<Link href="#">
-																colors
-															</Link>
-															, and spacing to
-															match your brand.
-														</Text>
-													</Tabs.Panel>
-													<Tabs.Panel value="layout">
-														<Text
-															style={ {
-																paddingBlockStart:
-																	'var(--wpds-dimension-padding-lg)',
-															} }
-														>
-															Choose a layout
-															structure for your
-															pages. Options
-															include full-width,
-															boxed, and{ ' ' }
-															<Link href="#">
-																custom layouts
-															</Link>
-															.
-														</Text>
-													</Tabs.Panel>
-													<Tabs.Panel value="accessibility">
-														<Text
-															style={ {
-																paddingBlockStart:
-																	'var(--wpds-dimension-padding-lg)',
-															} }
-														>
-															Review your
-															site&apos;s{ ' ' }
-															<Link href="#">
-																accessibility
-																settings
-															</Link>{ ' ' }
-															to ensure it meets
-															WCAG guidelines.
-														</Text>
-													</Tabs.Panel>
-												</Tabs.Root>
-											</Card.Content>
-										</Card.Root>
-									</Stack>
-								</div>
+								</ThemeProvider>
 							</div>
-						</div>
+						</Page>
 					</div>
 				</ThemeProvider>
 			</div>
 		);
 	},
+	decorators: [ withRouter ],
 	parameters: {
 		controls: { disable: true },
 	},
