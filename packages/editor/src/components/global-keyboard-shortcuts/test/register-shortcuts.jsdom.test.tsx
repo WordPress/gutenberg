@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { act, render } from '@testing-library/react';
 import {
 	createRegistry,
@@ -7,15 +8,26 @@ import {
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import EditorKeyboardShortcutsRegister from '../register-shortcuts';
 
+// The editor store pulls in `@wordpress/viewport`, which reads
+// `window.matchMedia` while loading.
+vi.hoisted( () => {
+	globalThis.wpVitest.mockMatchMedia();
+} );
+
 /*
  * The block-editor half of the registration reads block editor settings,
  * which would drag the whole block editor store into a test about the
  * editor-level shortcut list.
  */
-jest.mock( '@wordpress/block-editor', () => ( {
-	...jest.requireActual( '@wordpress/block-editor' ),
-	BlockEditorKeyboardShortcuts: { Register: () => null },
-} ) );
+// @ts-expect-error The block editor package is untyped.
+vi.mock( import( '@wordpress/block-editor' ), async ( importOriginal ) => {
+	const original = await importOriginal();
+
+	return {
+		...original,
+		BlockEditorKeyboardShortcuts: { Register: () => null },
+	};
+} );
 
 const INTENT_SHORTCUTS = [
 	'core/editor/intent-edit',

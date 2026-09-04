@@ -12,12 +12,16 @@ test.use( {
 
 test.describe( 'Gallery', () => {
 	let uploadedMedia;
+	let landscapeMedia;
 
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
 
 		uploadedMedia = await requestUtils.uploadMedia(
 			'./assets/10x10_e2e_test_image_z9T8jK.png'
+		);
+		landscapeMedia = await requestUtils.uploadMedia(
+			'./assets/200x150_e2e_test_image_opaque.png'
 		);
 	} );
 
@@ -399,6 +403,167 @@ test.describe( 'Gallery', () => {
 			imgs.map( ( img ) => parseInt( img.alt, 10 ) )
 		);
 		expect( numbers ).not.toEqual( imageAltTexts );
+	} );
+
+	// Regression test for https://github.com/WordPress/gutenberg/issues/82252.
+	test( 'crops linked images to a uniform height in the editor canvas', async ( {
+		admin,
+		editor,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/gallery',
+			attributes: {
+				linkTo: 'media',
+			},
+			innerBlocks: [
+				{
+					name: 'core/image',
+					attributes: {
+						id: landscapeMedia.id,
+						url: landscapeMedia.source_url,
+						sizeSlug: 'full',
+						linkDestination: 'media',
+						href: landscapeMedia.source_url,
+					},
+				},
+				{
+					name: 'core/image',
+					attributes: {
+						id: uploadedMedia.id,
+						url: uploadedMedia.source_url,
+						sizeSlug: 'full',
+						linkDestination: 'media',
+						href: uploadedMedia.source_url,
+					},
+				},
+			],
+		} );
+
+		const images = editor.canvas.locator(
+			'role=document[name="Block: Gallery"i] >> role=img'
+		);
+		await expect( images ).toHaveCount( 2 );
+
+		// With cropping enabled, both images in the row render at the same
+		// height. Poll so the assertion waits for both images to finish
+		// loading and for the layout to settle.
+		await expect
+			.poll( async () => {
+				const landscapeBox = await images.nth( 0 ).boundingBox();
+				const squareBox = await images.nth( 1 ).boundingBox();
+				if ( ! landscapeBox || ! squareBox ) {
+					return Number.POSITIVE_INFINITY;
+				}
+				return Math.abs( landscapeBox.height - squareBox.height );
+			} )
+			.toBeLessThanOrEqual( 1 );
+	} );
+
+	test( 'does not crop images to a uniform height when cropping is disabled', async ( {
+		admin,
+		editor,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/gallery',
+			attributes: {
+				imageCrop: false,
+			},
+			innerBlocks: [
+				{
+					name: 'core/image',
+					attributes: {
+						id: landscapeMedia.id,
+						url: landscapeMedia.source_url,
+						sizeSlug: 'full',
+					},
+				},
+				{
+					name: 'core/image',
+					attributes: {
+						id: uploadedMedia.id,
+						url: uploadedMedia.source_url,
+						sizeSlug: 'full',
+					},
+				},
+			],
+		} );
+
+		const images = editor.canvas.locator(
+			'role=document[name="Block: Gallery"i] >> role=img'
+		);
+		await expect( images ).toHaveCount( 2 );
+
+		// With cropping disabled, each image renders at its natural aspect
+		// ratio, so the two images have different heights. Poll so the
+		// assertion waits for both images to finish loading.
+		await expect
+			.poll( async () => {
+				const landscapeBox = await images.nth( 0 ).boundingBox();
+				const squareBox = await images.nth( 1 ).boundingBox();
+				if ( ! landscapeBox || ! squareBox ) {
+					return 0;
+				}
+				return Math.abs( landscapeBox.height - squareBox.height );
+			} )
+			.toBeGreaterThan( 10 );
+	} );
+
+	// Regression test for the dynamic gallery preview, where the gallery's
+	// layout must be passed to `useBlockPreview` for the crop to apply.
+	test( 'crops images to a uniform height in a dynamic gallery', async ( {
+		admin,
+		editor,
+		requestUtils,
+	} ) => {
+		// A dynamic gallery resolves the images attached to the post being
+		// edited, so create a post and attach two different-aspect-ratio
+		// images to it.
+		const post = await requestUtils.createPost( {
+			title: 'Dynamic gallery',
+			status: 'draft',
+		} );
+		for ( const file of [
+			'./assets/200x150_e2e_test_image_opaque.png',
+			'./assets/10x10_e2e_test_image_z9T8jK.png',
+		] ) {
+			const media = await requestUtils.uploadMedia( file );
+			await requestUtils.rest( {
+				method: 'POST',
+				path: `/wp/v2/media/${ media.id }`,
+				data: { post: post.id },
+			} );
+		}
+
+		await admin.editPost( post.id );
+		await editor.insertBlock( {
+			name: 'core/gallery',
+			attributes: {
+				dynamicContent: { source: 'core/attached-media' },
+				linkTo: 'media',
+			},
+		} );
+
+		const images = editor.canvas.locator(
+			'[data-type="core/gallery"] img'
+		);
+		// Wait for the dynamic source to resolve and preview both images.
+		await expect( images ).toHaveCount( 2 );
+
+		// With cropping enabled, both previewed images render at the same
+		// height. Poll so the assertion waits for the images to load and the
+		// layout to settle.
+		await expect
+			.poll( async () => {
+				const firstBox = await images.nth( 0 ).boundingBox();
+				const secondBox = await images.nth( 1 ).boundingBox();
+				if ( ! firstBox || ! secondBox ) {
+					return Number.POSITIVE_INFINITY;
+				}
+				return Math.abs( firstBox.height - secondBox.height );
+			} )
+			.toBeLessThanOrEqual( 1 );
 	} );
 } );
 

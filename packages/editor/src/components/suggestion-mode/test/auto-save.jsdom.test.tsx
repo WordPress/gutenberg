@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, act } from '@testing-library/react';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -11,36 +12,46 @@ import {
 import { store as editorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
-// jest.mock factories may only reference variables prefixed with `mock`.
-const mockCreateSuggestion = jest.fn();
-const mockUpdateSuggestion = jest.fn();
-const mockDeleteSuggestion = jest.fn();
-
-jest.mock( '../provider', () => {
-	const actual = jest.requireActual( '../provider' );
-	return {
-		...actual,
-		useSuggestionsProvider: () => ( {
-			createSuggestion: mockCreateSuggestion,
-			updateSuggestion: mockUpdateSuggestion,
-			deleteSuggestion: mockDeleteSuggestion,
-		} ),
-	};
+// The editor store pulls in `@wordpress/viewport`, which reads
+// `window.matchMedia` while loading.
+vi.hoisted( () => {
+	globalThis.wpVitest.mockMatchMedia();
 } );
 
-const createSuggestion = mockCreateSuggestion;
-const updateSuggestion = mockUpdateSuggestion;
-const deleteSuggestion = mockDeleteSuggestion;
+// The mock factory is hoisted above the imports, so the functions it hands
+// out have to be created there too.
+const { createSuggestion, updateSuggestion, deleteSuggestion } = vi.hoisted(
+	() => ( {
+		createSuggestion: vi.fn(),
+		updateSuggestion: vi.fn(),
+		deleteSuggestion: vi.fn(),
+	} )
+);
+
+vi.mock( import( '../provider' ), async ( importOriginal ) => {
+	const actual = await importOriginal();
+	return {
+		...actual,
+		useSuggestionsProvider: () =>
+			( {
+				createSuggestion,
+				updateSuggestion,
+				deleteSuggestion,
+			} ) as unknown as ReturnType<
+				typeof actual.useSuggestionsProvider
+			>,
+	};
+} );
 
 beforeEach( () => {
 	createSuggestion.mockReset();
 	updateSuggestion.mockReset();
 	deleteSuggestion.mockReset();
-	jest.useFakeTimers();
+	vi.useFakeTimers();
 } );
 
 afterEach( () => {
-	jest.useRealTimers();
+	vi.useRealTimers();
 } );
 
 function renderInSuggestMode( ui: React.ReactElement ) {
@@ -108,7 +119,7 @@ describe( 'SuggestionAutoSave', () => {
 		expect( createSuggestion ).not.toHaveBeenCalled();
 
 		await act( async () => {
-			jest.advanceTimersByTime( 1500 );
+			vi.advanceTimersByTime( 1500 );
 		} );
 		await flushPromises();
 		await flushPromises();
@@ -144,7 +155,7 @@ describe( 'SuggestionAutoSave', () => {
 		} );
 
 		await act( async () => {
-			jest.advanceTimersByTime( 1500 );
+			vi.advanceTimersByTime( 1500 );
 		} );
 		await flushPromises();
 		await flushPromises();
@@ -159,7 +170,7 @@ describe( 'SuggestionAutoSave', () => {
 		} );
 
 		await act( async () => {
-			jest.advanceTimersByTime( 1500 );
+			vi.advanceTimersByTime( 1500 );
 		} );
 		await flushPromises();
 		await flushPromises();
@@ -197,7 +208,7 @@ describe( 'SuggestionAutoSave', () => {
 		} );
 
 		await act( async () => {
-			jest.advanceTimersByTime( 1500 );
+			vi.advanceTimersByTime( 1500 );
 		} );
 		await flushPromises();
 		await flushPromises();
@@ -208,7 +219,7 @@ describe( 'SuggestionAutoSave', () => {
 		} );
 
 		await act( async () => {
-			jest.advanceTimersByTime( 1500 );
+			vi.advanceTimersByTime( 1500 );
 		} );
 		await flushPromises();
 		await flushPromises();
@@ -243,7 +254,7 @@ describe( 'SuggestionAutoSave', () => {
 		} );
 
 		await act( async () => {
-			jest.advanceTimersByTime( 1500 );
+			vi.advanceTimersByTime( 1500 );
 		} );
 		await flushPromises();
 
@@ -255,7 +266,7 @@ describe( 'SuggestionAutoSave', () => {
 		} );
 
 		await act( async () => {
-			jest.advanceTimersByTime( 1500 );
+			vi.advanceTimersByTime( 1500 );
 		} );
 		await flushPromises();
 
@@ -310,7 +321,7 @@ describe( 'SuggestionAutoSave', () => {
 		} );
 
 		await act( async () => {
-			jest.advanceTimersByTime( 1500 );
+			vi.advanceTimersByTime( 1500 );
 		} );
 		await flushPromises();
 		await flushPromises();
@@ -329,7 +340,7 @@ describe( 'SuggestionAutoSave', () => {
 		} );
 
 		await act( async () => {
-			jest.advanceTimersByTime( 1500 );
+			vi.advanceTimersByTime( 1500 );
 		} );
 		await flushPromises();
 		await flushPromises();
@@ -370,7 +381,7 @@ describe( 'SuggestionAutoSave', () => {
 		} );
 
 		await act( async () => {
-			jest.advanceTimersByTime( 1500 );
+			vi.advanceTimersByTime( 1500 );
 		} );
 		await flushPromises();
 		await flushPromises();
@@ -387,7 +398,7 @@ describe( 'SuggestionAutoSave', () => {
 		} );
 
 		await act( async () => {
-			jest.advanceTimersByTime( 1500 );
+			vi.advanceTimersByTime( 1500 );
 		} );
 		await flushPromises();
 		await flushPromises();
@@ -430,7 +441,7 @@ describe( 'SuggestionAutoSave', () => {
 		} );
 
 		await act( async () => {
-			jest.advanceTimersByTime( 5000 );
+			vi.advanceTimersByTime( 5000 );
 		} );
 		await flushPromises();
 
@@ -456,7 +467,7 @@ describe( 'SuggestionAutoSave', () => {
 
 		// Leave Suggest mode mid-debounce.
 		await act( async () => {
-			jest.advanceTimersByTime( 500 );
+			vi.advanceTimersByTime( 500 );
 		} );
 		act( () => {
 			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
@@ -465,7 +476,7 @@ describe( 'SuggestionAutoSave', () => {
 		} );
 
 		await act( async () => {
-			jest.advanceTimersByTime( 5000 );
+			vi.advanceTimersByTime( 5000 );
 		} );
 		await flushPromises();
 
@@ -479,7 +490,7 @@ describe( 'SuggestionAutoSave', () => {
 		} );
 
 		await act( async () => {
-			jest.advanceTimersByTime( 1500 );
+			vi.advanceTimersByTime( 1500 );
 		} );
 		await flushPromises();
 		await flushPromises();

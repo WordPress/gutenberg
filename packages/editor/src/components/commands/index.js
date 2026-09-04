@@ -561,7 +561,7 @@ const getPageContentFocusCommands = () =>
 		if ( !! goBack ) {
 			commands.push( {
 				name: 'core/switch-to-previous-entity',
-				label: __( 'Go back' ),
+				label: __( 'Back' ),
 				category: 'view',
 				callback: ( { close } ) => {
 					goBack();

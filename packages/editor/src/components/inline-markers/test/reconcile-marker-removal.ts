@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { reconcileMarkerRemoval } from '../reconcile-marker-removal';
 
 describe( 'reconcileMarkerRemoval', () => {

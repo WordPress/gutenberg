@@ -1,10 +1,11 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import deprecated from '@wordpress/deprecated';
 import logEntityDeprecation from '../log-entity-deprecation';
 
-jest.useFakeTimers();
+vi.useFakeTimers();
 
 // Mock the deprecatedEntities import
-jest.mock( '../../entities', () => ( {
+vi.mock( '../../entities', () => ( {
 	deprecatedEntities: {
 		root: {
 			media: {
@@ -19,14 +20,14 @@ jest.mock( '../../entities', () => ( {
 } ) );
 
 // Mock the deprecated function
-jest.mock( '@wordpress/deprecated' );
+vi.mock( '@wordpress/deprecated' );
 
 describe( 'logEntityDeprecation', () => {
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 
 		// Ensure the timeout that prevents spurious logging is cleared.
-		jest.runAllTimers();
+		vi.advanceTimersByTime( 0 );
 	} );
 
 	it( 'should call deprecated when entity is deprecated', () => {

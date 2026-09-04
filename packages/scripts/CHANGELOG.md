@@ -2,8 +2,13 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Require Node.js `^20.19.0 || >=22.13.0` and upgrade the bundled Stylelint to `^17.14.1` ([#80738](https://github.com/WordPress/gutenberg/pull/80738)).
+
 ### Bug Fixes
 
+-   `test-playwright`: Install browsers with the bundled `@playwright/test` CLI, so they match the Playwright that runs the tests. A bare `npx playwright` could resolve another version, or download one ([#82331](https://github.com/WordPress/gutenberg/pull/82331)).
 -   `build`: Strip JavaScript and TypeScript source extensions from legacy positional entry names so generated output uses names such as `index.js` instead of `index.tsx.js` or `index.jsx.js` ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
 
 ### Enhancements
@@ -31,7 +36,7 @@
 
 ### Enhancements
 
-- 	`format`: Detect `prettier.config.mjs` so the bundled default config is not used when one is present ([#80422](https://github.com/WordPress/gutenberg/pull/80422)).
+-   `format`: Detect `prettier.config.mjs` so the bundled default config is not used when one is present ([#80422](https://github.com/WordPress/gutenberg/pull/80422)).
 
 ## 33.0.0 (2026-07-14)
 

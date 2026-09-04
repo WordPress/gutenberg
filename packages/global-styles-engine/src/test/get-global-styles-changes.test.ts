@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
 	registerBlockType,
 	unregisterBlockType,
@@ -201,6 +202,7 @@ describe( 'getGlobalStylesChanges and utils', () => {
 	beforeEach( () => {
 		registerBlockType( 'core/test-fiori-di-zucca', {
 			apiVersion: 3,
+			attributes: {},
 			save: () => {},
 			category: 'text',
 			title: 'Test pumpkin flowers',
