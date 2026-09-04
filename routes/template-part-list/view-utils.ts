@@ -63,7 +63,12 @@ export function getActiveViewOverrides(
 
 /**
  * Returns the template part area the given view overrides lock the list to,
- * or `undefined` when they list every area.
+ * or `undefined` when they do not.
+ *
+ * Only a locked `area` filter counts: it is the one the user cannot change,
+ * so the list can hide the area column and preselect the area for a new
+ * template part. An editable area filter is a starting point the user may
+ * clear or change, not a lock.
  *
  * @param viewOverrides The view overrides of the active view.
  * @return The template part area, if any.
@@ -72,7 +77,7 @@ export function getAreaFromViewOverrides(
 	viewOverrides: ViewOverrides
 ): string | undefined {
 	const areaFilter = viewOverrides.filters?.find(
-		( filter ) => filter.field === 'area'
+		( filter ) => filter.field === 'area' && filter.isLocked
 	);
 	return typeof areaFilter?.value === 'string' ? areaFilter.value : undefined;
 }
