@@ -1,6 +1,6 @@
 <?php
 /**
- * Parity harness for the classic admin restyle.
+ * Parity harness for the admin design tokens experiment.
  *
  * Renders classic control markup — buttons, fields, checkboxes and radios —
  * across every variant, size and state on a real wp-admin screen, so the

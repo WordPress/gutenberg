@@ -1,9 +1,9 @@
 <?php
 /**
- * Classic admin restyle: loader and cascade layer setup.
+ * Admin design tokens: loader and cascade layer setup.
  *
- * Restyles classic wp-admin from WordPress Design System tokens, so classic
- * screens and React screens read as one product. Gated by the
+ * Styles wp-admin from WordPress Design System tokens, so every admin screen
+ * reads as one product regardless of how it is rendered. Gated by the
  * `gutenberg-wpds-admin-restyle` experiment; when it is off this file is never
  * loaded and nothing changes.
  *
