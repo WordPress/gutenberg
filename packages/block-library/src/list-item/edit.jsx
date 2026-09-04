@@ -16,7 +16,7 @@ import {
 import { useMergeRefs } from '@wordpress/compose';
 import { useSelect, useRegistry } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
-import { useEnter, useSpace, useMultiSelectTab, useMerge } from './hooks';
+import { useEnter, useTab, useMultiSelectTab, useMerge } from './hooks';
 import {
 	indentListItems,
 	outdentListItems,
@@ -72,7 +72,7 @@ export default function ListItemEdit( {
 		__unstableDisableDropZone: true,
 	} );
 	const useEnterRef = useEnter( clientId );
-	const useSpaceRef = useSpace();
+	const useTabRef = useTab();
 	const useMultiSelectTabRef = useMultiSelectTab( clientId );
 	const onMerge = useMerge( clientId, mergeBlocks );
 	return (
@@ -81,7 +81,7 @@ export default function ListItemEdit( {
 				<RichText
 					ref={ useMergeRefs( [
 						useEnterRef,
-						useSpaceRef,
+						useTabRef,
 						useMultiSelectTabRef,
 					] ) }
 					identifier="content"

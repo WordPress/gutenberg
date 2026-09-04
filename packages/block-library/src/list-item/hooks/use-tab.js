@@ -3,12 +3,13 @@ import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 import { SPACE, TAB } from '@wordpress/keycodes';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useRegistry } from '@wordpress/data';
+import { isEntirelySelected } from '@wordpress/dom';
 import { indentListItems, outdentListItems } from '../utils';
 import { unlock } from '../../lock-unlock';
 
 const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
-export default function useSpace() {
+export default function useTab() {
 	const registry = useRegistry();
 
 	return useRefEffect(
@@ -29,22 +30,31 @@ export default function useSpace() {
 
 				const { getSelectionStart, getSelectionEnd } =
 					registry.select( blockEditorStore );
-				const selectionStart = getSelectionStart();
-				const selectionEnd = getSelectionEnd();
-				if (
-					selectionStart.offset === 0 &&
-					selectionEnd.offset === 0
-				) {
-					if ( shiftKey ) {
-						// Note that backspace behaviour in defined in onMerge.
-						if ( keyCode === TAB ) {
-							if ( outdentListItems( registry ) ) {
-								event.preventDefault();
-							}
-						}
-					} else if ( indentListItems( registry ) ) {
+				const isAtStart =
+					getSelectionStart().offset === 0 &&
+					getSelectionEnd().offset === 0;
+
+				// A leading space at the start of an item indents it. Anywhere
+				// else it just types a space (backspace outdents, see onMerge).
+				if ( keyCode === SPACE ) {
+					if (
+						! shiftKey &&
+						isAtStart &&
+						indentListItems( registry )
+					) {
 						event.preventDefault();
 					}
+					return;
+				}
+
+				// Tab indents and Shift+Tab outdents, both when the caret is at
+				// the start of the item and when its content is fully selected.
+				if ( ! isAtStart && ! isEntirelySelected( element ) ) {
+					return;
+				}
+				const move = shiftKey ? outdentListItems : indentListItems;
+				if ( move( registry ) ) {
+					event.preventDefault();
 				}
 			}
 

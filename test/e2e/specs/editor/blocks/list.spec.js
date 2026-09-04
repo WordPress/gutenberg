@@ -802,6 +802,63 @@ test.describe( 'List (@firefox)', () => {
 		);
 	} );
 
+	test( 'should indent and outdent a list item when its content is fully selected', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/list' } );
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'b' );
+
+		// Select the whole item and Tab to indent it.
+		await pageUtils.pressKeys( 'primary+a' );
+		await page.keyboard.press( 'Tab' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>a<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>b</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
+		);
+
+		// The item stays fully selected, so typing replaces its content.
+		await page.keyboard.type( 'c' );
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>a<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>c</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
+		);
+
+		// Select the whole item again and Shift+Tab to outdent it.
+		await pageUtils.pressKeys( 'primary+a' );
+		await page.keyboard.press( 'Shift+Tab' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>a</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>c</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
+		);
+	} );
+
 	test( 'should keep the list type when indenting an ordered list item', async ( {
 		editor,
 		page,
