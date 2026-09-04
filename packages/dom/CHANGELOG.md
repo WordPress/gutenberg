@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Bug Fixes
-
--   `placeCaretAtEdge`: Place the caret before the zero width no-break space that pads an empty line instead of after it, so the iOS keyboard capitalizes the first letter.
-
 ## 4.54.0 (2026-08-26)
 
 ### Bug Fixes

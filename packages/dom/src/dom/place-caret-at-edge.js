@@ -81,36 +81,6 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 	}
 
 	const { ownerDocument } = container;
-
-	// The browser may resolve the edge to the position after the zero width
-	// no-break space that pads an empty line, or inside the placeholder that
-	// follows it. Keep the caret before the padding, or the iOS keyboard sees
-	// a character before the caret and does not capitalize.
-	if ( container.contains( range.startContainer ) ) {
-		const before = ownerDocument.createRange();
-		before.setStart( container, 0 );
-		before.setEnd( range.startContainer, range.startOffset );
-		const text = before.toString();
-
-		if ( text && ! /[^\ufeff]/.test( text ) ) {
-			const walker = ownerDocument.createTreeWalker(
-				container,
-				4 /* NodeFilter.SHOW_TEXT */
-			);
-			let node;
-
-			while ( ( node = walker.nextNode() ) ) {
-				const index = node.data.indexOf( '\ufeff' );
-
-				if ( index !== -1 ) {
-					range.setStart( node, index );
-					range.collapse( true );
-					break;
-				}
-			}
-		}
-	}
-
 	const { defaultView } = ownerDocument;
 	assertIsDefined( defaultView, 'defaultView' );
 	const selection = defaultView.getSelection();
