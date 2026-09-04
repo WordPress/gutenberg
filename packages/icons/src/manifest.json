@@ -483,7 +483,7 @@
 	{
 		"slug": "create",
 		"label": "Create",
-		"keywords": [ "new", "add", "compose" ],
+		"keywords": [ "new", "add", "compose", "plus" ],
 		"filePath": "library/create.svg",
 		"public": true
 	},
