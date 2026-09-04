@@ -1,4 +1,4 @@
-import { afterEach, beforeAll, beforeEach, expect, vi } from 'vitest';
+import { aroundEach, beforeAll, beforeEach, expect, vi } from 'vitest';
 
 const supportedMatchers = {
 	error: 'toHaveErrored',
@@ -113,7 +113,13 @@ function setConsoleMethodSpy( [ methodName, matcherName ] ) {
 		assertExpectedCalls();
 		resetSpy();
 	} );
-	afterEach( assertExpectedCalls );
+	aroundEach( async ( runTest ) => {
+		try {
+			await runTest();
+		} finally {
+			assertExpectedCalls();
+		}
+	} );
 }
 
 Object.entries( supportedMatchers ).forEach( setConsoleMethodSpy );

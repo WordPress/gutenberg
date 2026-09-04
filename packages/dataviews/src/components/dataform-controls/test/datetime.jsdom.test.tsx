@@ -229,11 +229,9 @@ describe( 'DateTime control', () => {
 			setSiteOffset( -8 );
 			// Freeze the clock: with no value the calendar opens on the
 			// current month, and the day clicked below must be in it.
-			vi.useFakeTimers();
+			vi.useFakeTimers( { toFake: [ 'Date' ] } );
 			vi.setSystemTime( new Date( '2026-08-15T12:00:00.000Z' ) );
-			const user = userEvent.setup( {
-				advanceTimers: vi.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <DateTimeHarness initialValue="" /> );
 
