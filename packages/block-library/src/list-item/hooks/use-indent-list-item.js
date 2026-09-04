@@ -1,25 +1,23 @@
 import { useCallback } from '@wordpress/element';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { createBlock } from '@wordpress/blocks';
+import { cloneBlock } from '@wordpress/blocks';
 
 export default function useIndentListItem( clientId ) {
 	const registry = useRegistry();
 	const {
 		insertBlock,
 		moveBlocksToPosition,
-		removeBlock,
-		updateBlockListSettings,
+		removeBlocks,
 		selectionChange,
 		multiSelect,
 	} = useDispatch( blockEditorStore );
 	const {
 		getPreviousBlockClientId,
 		getBlockRootClientId,
-		getBlockListSettings,
 		getSelectedBlockClientIds,
 		getBlockOrder,
-		getBlockAttributes,
+		getBlock,
 		getSelectionStart,
 		getSelectionEnd,
 		hasMultiSelection,
@@ -39,30 +37,23 @@ export default function useIndentListItem( clientId ) {
 		const selectionEnd = getSelectionEnd();
 
 		registry.batch( () => {
-			let nestedListId = getBlockOrder( previousSiblingId )[ 0 ];
-			if ( ! nestedListId ) {
-				// The list is inserted with a placeholder item already inside,
-				// otherwise the empty list would scaffold its own item through
-				// the block type's direct insert. The real items are then moved
-				// in, keeping their client IDs, and the placeholder is removed.
-				const placeholder = createBlock( 'core/list-item' );
-				const indentedList = createBlock(
-					'core/list',
-					{ ordered: getBlockAttributes( rootClientId ).ordered },
-					[ placeholder ]
-				);
-				nestedListId = indentedList.clientId;
-				insertBlock( indentedList, 0, previousSiblingId, false );
-				// Immediately update the block list settings, otherwise blocks
-				// can't be moved here due to canInsert checks.
-				updateBlockListSettings(
-					nestedListId,
-					getBlockListSettings( rootClientId )
-				);
+			const nestedListId = getBlockOrder( previousSiblingId )[ 0 ];
+			if ( nestedListId ) {
 				moveBlocksToPosition( clientIds, rootClientId, nestedListId );
-				removeBlock( placeholder.clientId, false );
 			} else {
-				moveBlocksToPosition( clientIds, rootClientId, nestedListId );
+				// Insert the list with the items already inside: an empty
+				// list would be scaffolded with the list block type's
+				// template, and moving into a freshly created list would
+				// fail its canInsert check. Cloning the parent list keeps
+				// its attributes; passing the items as inner blocks keeps
+				// their client IDs.
+				const indentedList = cloneBlock(
+					getBlock( rootClientId ),
+					{},
+					clientIds.map( ( id ) => getBlock( id ) )
+				);
+				removeBlocks( clientIds, false );
+				insertBlock( indentedList, 0, previousSiblingId, false );
 			}
 		} );
 
