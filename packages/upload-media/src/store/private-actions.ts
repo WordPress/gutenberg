@@ -582,18 +582,14 @@ export function runOperation(
 		try {
 			result = await definition.handler( item, args, context );
 		} catch ( error ) {
+			// Hand the rejection to cancelItem as is. Upload transports do
+			// not always reject with an Error: the editor's media-upload
+			// wrapper forwards only the message string, and a REST failure
+			// can be a plain object. cancelItem, the retry classifier and
+			// the `onError` callbacks all handle those, and wrapping them
+			// here would replace the message the user is meant to see.
 			const silent = error instanceof UploadError && error.silent;
-			dispatch.cancelItem(
-				id,
-				error instanceof Error
-					? error
-					: new UploadError( {
-							code: ErrorCode.GENERAL,
-							message: __( 'The file could not be processed.' ),
-							file: item.file,
-					  } ),
-				silent
-			);
+			dispatch.cancelItem( id, error as Error, silent );
 			return;
 		}
 

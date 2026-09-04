@@ -326,15 +326,23 @@ describe( 'operation registry', () => {
 			expect( select.getAllItems() ).toHaveLength( 0 );
 		} );
 
-		it( 'wraps a non-Error rejection so the item still fails', async () => {
+		it( 'passes a rejection that is not an Error through unchanged', async () => {
+			// The editor's media-upload wrapper rejects with the message
+			// string, and a REST failure with a plain object. Both must
+			// reach onError as they are, so the user sees the real message.
 			const onError = vi.fn();
+			const restError = { code: 'rest_error', message: 'Nope' };
 			dispatch.registerOperation(
 				operation( 'my-plugin/rest', {
+					handler: () => Promise.reject( restError ),
+				} )
+			);
+			dispatch.registerOperation(
+				operation( 'my-plugin/string', {
 					handler: () =>
-						Promise.reject( {
-							code: 'rest_error',
-							message: 'Nope',
-						} ),
+						Promise.reject(
+							'Sorry, you are not allowed to upload this file type.'
+						),
 				} )
 			);
 
@@ -343,12 +351,18 @@ describe( 'operation registry', () => {
 				onError,
 				operations: [ 'my-plugin/rest' ],
 			} );
+			dispatch.addItem( {
+				file: jpegFile,
+				onError,
+				operations: [ 'my-plugin/string' ],
+			} );
 			await flush();
 
-			expect( onError ).toHaveBeenCalledWith( expect.any( UploadError ) );
-			expect( onError.mock.calls[ 0 ][ 0 ].code ).toBe(
-				ErrorCode.GENERAL
+			expect( onError ).toHaveBeenCalledWith( restError );
+			expect( onError ).toHaveBeenCalledWith(
+				'Sorry, you are not allowed to upload this file type.'
 			);
+			expect( select.getAllItems() ).toHaveLength( 0 );
 		} );
 
 		it( 'cancels an item whose next step is not registered', async () => {
