@@ -51,6 +51,47 @@ type UploadMediaGlobal = {
 };
 
 /**
+ * The parts of the upload-media store this module uses. Addressing a store by
+ * name gives `unknown`, so the shape is declared here instead.
+ */
+type UploadStoreSelectors = {
+	getSettings: () => {
+		mediaUpload?: unknown;
+		allImageSizes?: Record< string, unknown >;
+	};
+	getItems: () => any[];
+};
+
+type UploadStoreActions = {
+	addItems: ( args: {
+		files: File[];
+		additionalData: Record< string, unknown >;
+		onSuccess: ( attachments: any[] ) => void;
+		onError: ( error: unknown ) => void;
+	} ) => void;
+};
+
+/**
+ * The upload-media store's selectors, where its store is registered.
+ *
+ * @return The selectors, or undefined when the store is not registered.
+ */
+function selectUploadStore(): UploadStoreSelectors | undefined {
+	return select( UPLOAD_STORE ) as unknown as
+		| UploadStoreSelectors
+		| undefined;
+}
+
+/**
+ * The upload-media store's action creators.
+ *
+ * @return The action creators.
+ */
+function dispatchUploadStore(): UploadStoreActions {
+	return dispatch( UPLOAD_STORE ) as unknown as UploadStoreActions;
+}
+
+/**
  * HEIC MIME types, the only ones routed through the pipeline when the browser
  * supports canvas conversion but not full client-side processing.
  */
@@ -155,7 +196,7 @@ function isHeicOnlyPipelineActive(): boolean {
  * @return True when the store is ready to accept files.
  */
 function isPipelineReady(): boolean {
-	return Boolean( select( UPLOAD_STORE )?.getSettings()?.mediaUpload );
+	return Boolean( selectUploadStore()?.getSettings()?.mediaUpload );
 }
 
 /**
@@ -258,7 +299,7 @@ function estimateProgress( item: any, entry: UploadEntry ): number {
 	}
 
 	const imageSizeCount = Object.keys(
-		select( UPLOAD_STORE )?.getSettings()?.allImageSizes || {}
+		selectUploadStore()?.getSettings()?.allImageSizes || {}
 	).length;
 	const completed = totals.total - remaining;
 	let fraction = 0;
@@ -290,7 +331,7 @@ function onStoreChange(): void {
 		return;
 	}
 
-	const items: any[] = select( UPLOAD_STORE )?.getItems() ?? [];
+	const items: any[] = selectUploadStore()?.getItems() ?? [];
 	const liveIds = new Set< string >();
 	const current = [ ...entries ];
 
@@ -404,7 +445,7 @@ function queueFile(
 
 	unsubscribe = unsubscribe ?? subscribe( onStoreChange, UPLOAD_STORE );
 
-	void dispatch( UPLOAD_STORE ).addItems( {
+	dispatchUploadStore().addItems( {
 		files: [ file ],
 		additionalData,
 		onSuccess: token,
