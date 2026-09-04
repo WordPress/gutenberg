@@ -32,6 +32,7 @@
 ### Bug Fixes
 
 -   Wrap block-level preset class selectors in `:where()` so they keep the same `0-1-0` specificity as root-level presets, preventing block-level palettes (e.g. via the `wp_theme_json_data_theme` filter) from overriding responsive state styles ([#80580](https://github.com/WordPress/gutenberg/issues/80580)).
+-   Coerce numeric `typography.fontSizes` preset sizes to pixels so they no longer emit a unitless custom property (e.g. `--wp--preset--font-size--large: 22`), which is invalid for `font-size` and left the preset with no visual effect ([#44857](https://github.com/WordPress/gutenberg/issues/44857)).
 
 ### New Features
 

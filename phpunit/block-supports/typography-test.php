@@ -302,7 +302,11 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	 * @param bool   $settings        Theme JSON settings array that overrides any global theme settings.
 	 * @param string $expected_output Expected output of gutenberg_get_typography_font_size_value().
 	 */
-	public function test_gutenberg_get_typography_font_size_value( $font_size, $settings, $expected_output ) {
+	public function test_gutenberg_get_typography_font_size_value( $font_size, $settings, $expected_output, $expect_doing_it_wrong = false ) {
+		if ( $expect_doing_it_wrong ) {
+			$this->setExpectedIncorrectUsage( 'gutenberg_get_typography_font_size_value' );
+		}
+
 		$actual = gutenberg_get_typography_font_size_value( $font_size, $settings );
 
 		$this->assertSame( $expected_output, $actual );
@@ -321,6 +325,24 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				),
 				'settings'        => null,
 				'expected_output' => '28px',
+			),
+
+			'coerces integer to `px` when fluid typography is deactivated' => array(
+				'font_size'             => array(
+					'size' => 22,
+				),
+				'settings'              => null,
+				'expected_output'       => '22px',
+				'expect_doing_it_wrong' => true,
+			),
+
+			'coerces numeric string to `px` when fluid typography is deactivated' => array(
+				'font_size'             => array(
+					'size' => '22',
+				),
+				'settings'              => null,
+				'expected_output'       => '22px',
+				'expect_doing_it_wrong' => true,
 			),
 
 			'returns value where font size is 0'         => array(
@@ -488,27 +510,29 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 			),
 
 			'coerces integer to `px` and returns clamp value' => array(
-				'font_size'       => array(
+				'font_size'             => array(
 					'size' => 33,
 				),
-				'settings'        => array(
+				'settings'              => array(
 					'typography' => array(
 						'fluid' => true,
 					),
 				),
-				'expected_output' => 'clamp(20.515px, 1.282rem + ((1vw - 3.2px) * 0.975), 33px)',
+				'expected_output'       => 'clamp(20.515px, 1.282rem + ((1vw - 3.2px) * 0.975), 33px)',
+				'expect_doing_it_wrong' => true,
 			),
 
 			'coerces float to `px` and returns clamp value' => array(
-				'font_size'       => array(
+				'font_size'             => array(
 					'size' => 70.175,
 				),
-				'settings'        => array(
+				'settings'              => array(
 					'typography' => array(
 						'fluid' => true,
 					),
 				),
-				'expected_output' => 'clamp(37.897px, 2.369rem + ((1vw - 3.2px) * 2.522), 70.175px)',
+				'expected_output'       => 'clamp(37.897px, 2.369rem + ((1vw - 3.2px) * 2.522), 70.175px)',
+				'expect_doing_it_wrong' => true,
 			),
 
 			'returns clamp value when `fluid` is empty array' => array(

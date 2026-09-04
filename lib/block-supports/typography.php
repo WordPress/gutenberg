@@ -498,6 +498,27 @@ function gutenberg_get_typography_font_size_value( $preset, $settings = array() 
 	}
 
 	/*
+	 * The theme.json schema requires `size` to be a string including a unit,
+	 * e.g., "12px". A bare number would otherwise be emitted verbatim as a
+	 * preset custom property (`--wp--preset--font-size--large: 22`), which is
+	 * invalid for `font-size`, so the browser drops the declaration and the
+	 * preset has no effect.
+	 *
+	 * Coerce numeric values to pixels, mirroring how fluid font sizes are
+	 * handled in gutenberg_get_typography_value_and_unit(). This runs before
+	 * the early returns below so that every code path returns a value with a
+	 * unit. `0` is left alone: it is falsy, handled below, and valid unitless.
+	 */
+	if ( is_numeric( $preset['size'] ) && ! empty( $preset['size'] ) ) {
+		_doing_it_wrong(
+			__FUNCTION__,
+			__( 'Font size presets must include a unit, e.g., "12px". The value was assumed to be in pixels.', 'gutenberg' ),
+			'7.1.0'
+		);
+		$preset['size'] = $preset['size'] . 'px';
+	}
+
+	/*
 	 * Catch falsy values and 0/'0'. Fluid calculations cannot be performed on `0`.
 	 * Also return early when a preset font size explicitly disables fluid typography with `false`.
 	 */
