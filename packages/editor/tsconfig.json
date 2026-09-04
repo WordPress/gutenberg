@@ -2,7 +2,13 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.dev.base.json",
 	"compilerOptions": {
-		"types": [ "jest", "style-imports", "react-css-custom-properties", "gutenberg-env" ]
+		"types": [
+			"jest",
+			"style-imports",
+			"react-css-custom-properties",
+			"gutenberg-env",
+			"gutenberg-vitest-test-env"
+		]
 	},
 	"files": [ "global.d.ts" ],
 	"references": [
