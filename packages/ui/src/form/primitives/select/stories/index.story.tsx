@@ -78,7 +78,7 @@ export const Minimal: Story = {
 	args: {
 		children: [
 			<Select.Trigger size="small" variant="minimal" key="trigger" />,
-			<Select.Popup key="popup">
+			<Select.Popup width="content" key="popup">
 				{ Array.from( { length: 6 }, ( _, index ) => (
 					<Select.Item
 						key={ index }
