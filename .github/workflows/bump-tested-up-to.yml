@@ -29,13 +29,16 @@ jobs:
             pull-requests: read
 
         steps:
-            # Only readme.txt is inspected and edited. The push and the pull
-            # request authenticate with the app token generated further down,
-            # not with this checkout's credentials.
-            - name: Checkout readme.txt
+            # Only readme.txt (inspected and edited) and the release tooling
+            # that parses it are needed. The push and the pull request
+            # authenticate with the app token generated further down, not with
+            # this checkout's credentials.
+            - name: Checkout readme.txt and the release tooling
               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
-                  sparse-checkout: readme.txt
+                  sparse-checkout: |
+                      /readme.txt
+                      /tools/release/
                   sparse-checkout-cone-mode: false
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -48,14 +51,13 @@ jobs:
                   # The query must stay in sync with the "Compute previous WordPress
                   # version" step in unit-test.yml, which reads the same API.
                   LATEST="$(curl --fail --silent --show-error -H "Accept: application/json" "https://api.wordpress.org/core/stable-check/1.0/" | jq --raw-output 'with_entries(select(.value=="latest"))|keys[]' | cut -d. -f1,2)"
-                  # The pattern must stay in sync with getTestedUpToMajor() in
-                  # tools/release/resolve-performance-branches.mjs, which parses the
-                  # same readme.txt line.
-                  TESTED="$(sed -n 's/^Tested up to: \([0-9]*\.[0-9]*\).*/\1/p' readme.txt)"
-                  if [[ -z "$LATEST" || -z "$TESTED" ]]; then
-                    echo "Could not determine the latest stable version ('${LATEST}') or the readme.txt value ('${TESTED}')."
+                  if [[ -z "$LATEST" ]]; then
+                    echo "Could not determine the latest stable version from the API."
                     exit 1
                   fi
+                  # The same parser the performance workflow relies on; it throws,
+                  # failing this step, when the readme.txt line changes shape.
+                  TESTED="$(node -e 'import("./tools/release/resolve-performance-branches.mjs").then(({ getTestedUpToMajor }) => console.log(getTestedUpToMajor(require("fs").readFileSync("readme.txt", "utf8"))))')"
                   # readme.txt may legitimately run ahead of the API when it already
                   # names an upcoming release; only an older value needs a bump.
                   if [[ "$(printf '%s\n' "$TESTED" "$LATEST" | sort --version-sort | tail -n 1)" == "$TESTED" ]]; then
