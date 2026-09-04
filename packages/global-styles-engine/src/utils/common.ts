@@ -3,10 +3,12 @@ import type {
 	GlobalStylesSettings,
 	ThemeFileLink,
 	TypographyPreset,
+	SpacingSizePreset,
 	UnresolvedValue,
 	GlobalStylesConfig,
 } from '../types';
 import { getTypographyFontSizeValue } from './typography';
+import { getSpacingSizeValue } from './spacing';
 import { getValueFromObjectPath } from './object';
 
 export const ROOT_BLOCK_SELECTOR = 'body';
@@ -104,7 +106,10 @@ export const PRESET_METADATA = [
 		path: [ 'spacing', 'spacingSizes' ],
 		valueKey: 'size',
 		cssVarInfix: 'spacing',
-		valueFunc: ( { size }: { size: string } ) => size,
+		valueFunc: (
+			preset: SpacingSizePreset,
+			settings: GlobalStylesSettings
+		) => getSpacingSizeValue( preset, settings ),
 		classes: [],
 	},
 	{

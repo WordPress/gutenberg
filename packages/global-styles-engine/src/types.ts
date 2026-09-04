@@ -176,12 +176,38 @@ export interface LayoutSettings {
 }
 
 /**
+ * Fluid spacing settings for responsive spacing sizes
+ */
+export interface FluidSpacingConfig {
+	min?: string;
+	max?: string;
+}
+
+/**
+ * Global fluid spacing settings
+ */
+export interface FluidSpacingSettings {
+	maxViewportWidth?: string;
+	minViewportWidth?: string;
+}
+
+/**
+ * Spacing size preset definition as found in theme.json
+ */
+export interface SpacingSizePreset extends BasePreset {
+	size: string | number | null;
+	fluid?: boolean | FluidSpacingConfig;
+}
+
+/**
  * Spacing settings
  */
 export interface SpacingSettings {
 	padding?: string | Record< string, string >;
 	margin?: string | Record< string, string >;
 	blockGap?: string;
+	fluid?: boolean | FluidSpacingSettings;
+	spacingSizes?: SpacingSizePreset[] | Record< string, SpacingSizePreset[] >;
 }
 
 // =============================================================================

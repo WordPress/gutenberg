@@ -190,7 +190,7 @@ class WP_Theme_JSON_Gutenberg {
 			'path'              => array( 'spacing', 'spacingSizes' ),
 			'prevent_override'  => array( 'spacing', 'defaultSpacingSizes' ),
 			'use_default_names' => true,
-			'value_key'         => 'size',
+			'value_func'        => 'gutenberg_get_spacing_size_value',
 			'css_vars'          => '--wp--preset--spacing--$slug',
 			'classes'           => array(),
 			'properties'        => array( 'padding', 'margin' ),
@@ -458,6 +458,7 @@ class WP_Theme_JSON_Gutenberg {
 		'spacing'                       => array(
 			'customSpacingSize'   => null,
 			'defaultSpacingSizes' => null,
+			'fluid'               => null,
 			'spacingSizes'        => null,
 			'spacingScale'        => null,
 			'blockGap'            => null,
