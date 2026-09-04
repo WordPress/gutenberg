@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Error boundary: Surface debugging details ([#{TODO}](https://github.com/WordPress/gutenberg/pull/{TODO})).
+-   Widget areas: Use the `layout` icon instead of the default block icon ([#61028](https://github.com/WordPress/gutenberg/issues/61028)).
 
 ### Bug Fixes
 
