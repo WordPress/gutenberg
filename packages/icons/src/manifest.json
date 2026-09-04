@@ -580,7 +580,7 @@
 	{
 		"slug": "error",
 		"label": "Error",
-		"keywords": [ "failure", "problem", "alert" ],
+		"keywords": [ "failure", "problem", "alert", "caution", "warning" ],
 		"filePath": "library/error.svg",
 		"public": true
 	},
