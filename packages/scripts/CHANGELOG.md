@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+-   `test-playwright`: Install browsers with the bundled `@playwright/test` CLI, so they match the Playwright that runs the tests. A bare `npx playwright` could resolve another version, or download one ([#82331](https://github.com/WordPress/gutenberg/pull/82331)).
 -   `build`: Strip JavaScript and TypeScript source extensions from legacy positional entry names so generated output uses names such as `index.js` instead of `index.tsx.js` or `index.jsx.js` ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
 
 ### Enhancements

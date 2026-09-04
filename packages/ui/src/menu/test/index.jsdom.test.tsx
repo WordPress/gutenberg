@@ -1363,6 +1363,82 @@ describe( 'Menu', () => {
 		).not.toHaveAttribute( 'aria-labelledby' );
 	} );
 
+	it( 'treats target="_blank" on link items as opening in a new tab', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.LinkItem href="https://wordpress.org" target="_blank">
+						<Menu.ItemLabel>WordPress.org</Menu.ItemLabel>
+					</Menu.LinkItem>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+
+		expect(
+			await screen.findByRole( 'menuitem', {
+				name: 'WordPress.org (opens in a new tab)',
+			} )
+		).toHaveAttribute( 'target', '_blank' );
+	} );
+
+	it( 'forwards a named target on link items without adding a new tab notice', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.LinkItem
+						href="https://wordpress.org"
+						target="wp-preview-123"
+					>
+						<Menu.ItemLabel>Preview</Menu.ItemLabel>
+					</Menu.LinkItem>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+
+		const item = await screen.findByRole( 'menuitem', { name: 'Preview' } );
+		expect( item ).toHaveAttribute( 'target', 'wp-preview-123' );
+		expect(
+			screen.queryByLabelText( '(opens in a new tab)' )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'preserves an explicit link item target when openInNewTab is true', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.LinkItem
+						href="https://wordpress.org"
+						target="wp-preview-123"
+						openInNewTab
+					>
+						<Menu.ItemLabel>Preview</Menu.ItemLabel>
+					</Menu.LinkItem>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+
+		expect(
+			await screen.findByRole( 'menuitem', {
+				name: 'Preview (opens in a new tab)',
+			} )
+		).toHaveAttribute( 'target', 'wp-preview-123' );
+	} );
+
 	it( 'uses custom item label and description ids for generated aria relationships', async () => {
 		const user = userEvent.setup();
 

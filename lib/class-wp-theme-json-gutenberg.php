@@ -1296,6 +1296,14 @@ class WP_Theme_JSON_Gutenberg {
 
 		$schema_styles_blocks   = array();
 		$schema_settings_blocks = array();
+		$breakpoint_states      = array_keys( $responsive_media_queries );
+
+		$common_block_settings = static::VALID_SETTINGS;
+		// `viewport` and `blockVisibility` are global-only settings and cannot be set per block for now.
+		unset(
+			$common_block_settings['viewport'],
+			$common_block_settings['blockVisibility']
+		);
 
 		/*
 		 * Generate a schema for blocks.
@@ -1306,21 +1314,27 @@ class WP_Theme_JSON_Gutenberg {
 		 *
 		 * As each variation needs both a `blocks` schema and responsive `blocks` schemas
 		 * for further nested inner `blocks`, the overall schema is generated in multiple passes.
+		 *
+		 * All blocks start with the same style schema. Build that common schema
+		 * once, then add block-specific pseudo and custom states below.
 		 */
+		$responsive_block_schema             = $styles_non_top_level;
+		$responsive_block_schema['elements'] = $schema_styles_elements;
+
+		$common_block_schema             = $styles_non_top_level;
+		$common_block_schema['elements'] = $schema_styles_elements;
+
+		foreach ( $breakpoint_states as $breakpoint_state ) {
+			$common_block_schema[ $breakpoint_state ] = $responsive_block_schema;
+		}
+
 		foreach ( $valid_block_names as $block ) {
-			$schema_settings_blocks[ $block ] = static::VALID_SETTINGS;
-			// `viewport` and `blockVisibility` are global-only settings and cannot be set per block for now.
-			unset( $schema_settings_blocks[ $block ]['viewport'] );
-			unset( $schema_settings_blocks[ $block ]['blockVisibility'] );
-			$schema_styles_blocks[ $block ]             = $styles_non_top_level;
-			$schema_styles_blocks[ $block ]['elements'] = $schema_styles_elements;
+			$schema_settings_blocks[ $block ] = $common_block_settings;
+			$schema_styles_blocks[ $block ]   = $common_block_schema;
 
-			// Add responsive breakpoint states for all blocks.
-			foreach ( array_keys( $responsive_media_queries ) as $breakpoint_state ) {
-				$schema_styles_blocks[ $block ][ $breakpoint_state ]             = $styles_non_top_level;
-				$schema_styles_blocks[ $block ][ $breakpoint_state ]['elements'] = $schema_styles_elements;
-
-				if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] ) ) {
+			// Add responsive pseudo-selectors only to blocks that support them.
+			if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] ) ) {
+				foreach ( $breakpoint_states as $breakpoint_state ) {
 					foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] as $pseudo_selector ) {
 						$schema_styles_blocks[ $block ][ $breakpoint_state ][ $pseudo_selector ] = $styles_non_top_level;
 					}
