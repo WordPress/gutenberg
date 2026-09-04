@@ -122,12 +122,17 @@
 			// Prevent backplate with same color as text in dark mode.
 			forced-color-adjust: none;
 			color: SelectedItemText;
-			--focus-color: SelectedItemText;
 		}
 
 		&.is-selected svg,
 		&.is-selected.is-synced svg {
 			fill: SelectedItemText;
+		}
+
+		&.is-selected.is-synced .block-editor-list-view-block-contents:focus::after,
+		&.is-selected .block-editor-list-view-block__menu:focus,
+		&.is-selected.is-synced .block-editor-list-view-block__menu:focus {
+			--focus-color: SelectedItemText;
 		}
 	}
 
