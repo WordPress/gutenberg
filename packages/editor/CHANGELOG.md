@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Show a "Privacy Policy Page" badge in the document bar and the post card panel for the page assigned in Settings > Privacy, alongside the existing "Homepage" and "Posts Page" badges ([#67517](https://github.com/WordPress/gutenberg/issues/67517)).
+
 ### Breaking Changes
 
 -   `PluginMoreMenuItem`, `PluginSidebarMoreMenuItem`: Items render with the `Menu` component of `@wordpress/ui` instead of `MenuItem`. A link item honors only `target="_blank"` ([#81564](https://github.com/WordPress/gutenberg/pull/81564)).
