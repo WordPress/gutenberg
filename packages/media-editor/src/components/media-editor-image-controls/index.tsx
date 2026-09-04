@@ -191,7 +191,11 @@ export default function MediaEditorImageControls( {
 								role="menuitemradio"
 								isSelected={ isSelected }
 								icon={ isSelected ? check : undefined }
+								disabled={ disabled }
 								onClick={ () => {
+									if ( disabled ) {
+										return;
+									}
 									setAspectRatioValue( value );
 									onClose();
 								} }

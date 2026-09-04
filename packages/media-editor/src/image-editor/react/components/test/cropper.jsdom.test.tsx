@@ -781,6 +781,38 @@ describe( 'Cropper', () => {
 		expect( onGestureEnd ).not.toHaveBeenCalled();
 	} );
 
+	it( 'signals a fresh gesture on wheel zoom after a save interrupted one', async () => {
+		const controller = createController();
+		const onGestureStart = jest.fn();
+		const props = {
+			src: 'test.jpg',
+			controller,
+			showDimming: true,
+			showGrid: 'interactive' as const,
+			freeformCrop: true,
+			onGestureStart,
+		};
+		const { rerender } = render( <Cropper { ...props } /> );
+
+		await screen.findByRole( 'button', {
+			name: 'Resize from top-left corner',
+		} );
+		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
+
+		// A wheel zoom opens a debounced gesture.
+		fireEvent.wheel( canvas, { deltaY: -120, clientX: 100, clientY: 100 } );
+		await waitFor( () => expect( onGestureStart ).toHaveBeenCalled() );
+
+		// Saving cancels it, then the save fails and tools come back.
+		rerender( <Cropper { ...props } disabled /> );
+		rerender( <Cropper { ...props } /> );
+		onGestureStart.mockClear();
+
+		// The next wheel zoom must open a gesture of its own.
+		fireEvent.wheel( canvas, { deltaY: -120, clientX: 100, clientY: 100 } );
+		await waitFor( () => expect( onGestureStart ).toHaveBeenCalled() );
+	} );
+
 	it( 'ignores wheel zoom while disabled', async () => {
 		const controller = createController();
 		render(
