@@ -27,6 +27,7 @@
 
 ### Bug Fixes
 
+-   `Link`: Show the new-tab indicator and accessible notice when `target` is an ASCII case-insensitive match for `"_blank"`. ([#82447](https://github.com/WordPress/gutenberg/pull/82447))
 -   `Menu.LinkItem`: Show the new-tab indicator and accessible notice when `target` is an ASCII case-insensitive match for `"_blank"`. ([#82442](https://github.com/WordPress/gutenberg/pull/82442))
 -   `Input`, `Textarea`, `InputControl`, `TextareaControl`: Use `--wpds-color-foreground-interactive-neutral-weak` for enabled placeholder text so it meets the 4.5:1 contrast minimum ([#82304](https://github.com/WordPress/gutenberg/pull/82304)).
 -   `SearchableChipSelect`, `SearchableChipSelectControl`: Fix the gray background on disabled search fields in WordPress admin ([#82304](https://github.com/WordPress/gutenberg/pull/82304)).
