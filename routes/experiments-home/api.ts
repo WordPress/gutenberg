@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 
 export interface Experiment {
@@ -22,8 +19,6 @@ interface SettingsSchema {
 						description?: string;
 						group?: string;
 						group_label?: string;
-						separate_option?: boolean;
-						option_name?: string;
 					}
 				>;
 			};

@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { select, dispatch } from '@wordpress/data';
 import { _x } from '@wordpress/i18n';
 import warning from '@wordpress/warning';
-
-/**
- * Internal dependencies
- */
 import i18nBlockSchema from './i18n-block.json';
 import { store as blocksStore } from '../store';
 import { unlock } from '../lock-unlock';
@@ -101,6 +94,14 @@ function getBlockSettingsFromMetadata( {
 }
 
 /**
+ * This acts as an intermediate type to explicitly note that the "name" property
+ * will be ignored if passed into the settings argument
+ */
+type SettingsBlockConfiguration<
+	Attributes extends Record< string, unknown > = Record< string, unknown >,
+> = Omit< BlockConfiguration< Attributes >, 'name' > & { name?: unknown };
+
+/**
  * Registers a new block provided a unique name and an object defining its
  * behavior. Once registered, the block is made available as an option to any
  * editor interface where blocks are implemented.
@@ -130,19 +131,19 @@ export function registerBlockType<
 	Attributes extends Record< string, unknown > = Record< string, unknown >,
 >(
 	blockNameOrMetadata: BlockConfiguration< Attributes >,
-	settings?: Partial< BlockConfiguration< Attributes > >
+	settings?: Partial< SettingsBlockConfiguration< Attributes > >
 ): BlockType | undefined;
 export function registerBlockType<
 	Attributes extends Record< string, unknown > = Record< string, unknown >,
 >(
 	blockNameOrMetadata: string,
-	settings: BlockConfiguration< Attributes >
+	settings: SettingsBlockConfiguration< Attributes >
 ): BlockType | undefined;
 export function registerBlockType<
 	Attributes extends Record< string, unknown > = Record< string, unknown >,
 >(
 	blockNameOrMetadata: string | BlockConfiguration< Attributes >,
-	settings?: Partial< BlockConfiguration< Attributes > >
+	settings?: Partial< SettingsBlockConfiguration< Attributes > >
 ): BlockType | undefined {
 	const name = isObject( blockNameOrMetadata )
 		? blockNameOrMetadata.name

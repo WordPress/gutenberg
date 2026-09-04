@@ -10,11 +10,11 @@
 	background: $white;
 	display: grid;
 	grid-auto-flow: row;
-	grid-template: auto / $header-height minmax(0, max-content) minmax(min-content, 1fr) $header-height;
+	grid-template: auto / auto minmax(0, max-content) minmax(min-content, 1fr) $header-height;
 	&:has(> .editor-header__center) {
-		grid-template: auto / $header-height min-content 1fr min-content $header-height;
+		grid-template: auto / auto min-content 1fr min-content $header-height;
 		@include break-medium {
-			grid-template: auto / $header-height minmax(min-content, 2fr) 2.5fr minmax(min-content, 2fr) $header-height;
+			grid-template: auto / auto minmax(min-content, 2fr) 2.5fr minmax(min-content, 2fr) $header-height;
 		}
 	}
 	@include break-mobile {
@@ -28,6 +28,14 @@
 	// Make toolbar sticky on larger breakpoints
 	@include break-zoomed-in {
 		flex-wrap: nowrap;
+	}
+}
+
+.editor-header__back-button {
+	margin: 0 (-$grid-unit) 0 $grid-unit;
+
+	.show-icon-labels & {
+		margin-right: 0;
 	}
 }
 
@@ -85,8 +93,6 @@
 	align-items: center;
 	// To enable shrinking and truncating of child text, apply an explicit min-width.
 	min-width: 0;
-	// Clip the box while leaving room for focus rings.
-	clip-path: inset(-2px);
 	// At less than mobile the header’s `gap` is zero so margins are added to create a smaller
 	// gap around the center’s contents.
 	@media (max-width: #{$break-mobile - 1}) {
@@ -96,10 +102,6 @@
 		> :last-child {
 			margin-inline-end: $grid-unit;
 		}
-	}
-
-	.editor-revisions-header & {
-		clip-path: none;
 	}
 }
 
@@ -288,8 +290,4 @@
 		position: absolute;
 		z-index: 35;
 	}
-}
-
-.components-popover.more-menu-dropdown__content {
-	z-index: z-index(".components-popover.more-menu__content");
 }

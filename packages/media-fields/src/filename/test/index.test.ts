@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import filenameField from '../index';
 import type { MediaItem } from '../../types';
 

@@ -2,17 +2,9 @@
  * Provides sidebar configuration options.
  * See https://storybook.js.org/docs/configure/features-and-behavior
  */
-
-/**
- * External dependencies
- */
 import { createElement, useMemo } from 'react';
 import { useStorybookApi } from 'storybook/manager-api';
 import { styled } from 'storybook/theming';
-
-/**
- * Internal dependencies
- */
 import badges from './badges';
 
 const Wrapper = styled.span( {

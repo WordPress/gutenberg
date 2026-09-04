@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { find as findFocusable } from './focusable';
 
 /**
@@ -127,7 +124,7 @@ function compareObjectTabbables( a, b ) {
 }
 
 /**
- * Givin focusable elements, filters out tabbable element.
+ * Given focusable elements, filters out tabbable element.
  *
  * @param {HTMLElement[]} focusables Focusable elements to filter.
  *

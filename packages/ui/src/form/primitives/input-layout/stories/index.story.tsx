@@ -4,10 +4,22 @@ import { InputLayout } from '../';
 import { IconButton } from '../../../../icon-button';
 
 const meta: Meta< typeof InputLayout > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/Primitives/InputLayout',
 	component: InputLayout,
 	subcomponents: {
-		Slot: InputLayout.Slot,
+		'InputLayout.Slot': InputLayout.Slot,
+	},
+	// Temporary: Due to an upstream bug, render the component explicitly so the
+	// components manifest extractor can resolve props from the JSX.
+	//
+	// See: https://github.com/storybookjs/storybook/issues/34877
+	render: ( args ) => <InputLayout { ...args } />,
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;

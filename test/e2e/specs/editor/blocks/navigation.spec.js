@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Navigation block', () => {
@@ -450,7 +447,7 @@ test.describe( 'Navigation block', () => {
 			await test.step( 'focus returns to the submenu appender when exiting the submenu link creation without creating a link', async () => {
 				// Move focus to the submenu navigation appender
 				await pageUtils.pressKeys( 'ArrowDown' );
-				await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
+				await pageUtils.pressKeys( 'ArrowRight' );
 
 				await pageUtils.pressKeys( 'ArrowDown' );
 
@@ -571,7 +568,7 @@ test.describe( 'Navigation block', () => {
 			 */
 			// Add a link back so we can delete the first submenu link.
 			await pageUtils.pressKeys( 'ArrowDown' );
-			await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
+			await pageUtils.pressKeys( 'ArrowRight' );
 			await navigation.useBlockInserter();
 			await navigation.addCustomURL( 'https://wordpress.org' );
 			await navigation.expectToHaveTextSelected( 'wordpress.org' );
@@ -1088,10 +1085,10 @@ test.describe( 'Navigation block', () => {
 			await admin.visitAdminPage( 'options-permalink.php' );
 
 			// Select the Post name permalink structure (/%postname%/)
-			await page.click( '#permalink-input-post-name' );
+			await page.locator( '#permalink-input-post-name' ).click();
 
 			// Click Save Changes
-			await page.click( '#submit' );
+			await page.locator( '#submit' ).click();
 
 			// Wait for settings to be saved
 			await page.waitForSelector( '.notice-success' );
@@ -1122,26 +1119,100 @@ test.describe( 'Navigation block', () => {
 		test.afterEach( async ( { admin, page, requestUtils } ) => {
 			await requestUtils.deleteAllPages();
 
-			// Restore plain permalinks
-			// TODO: Encapsulate permalink teardown in an admin.setPermalinks( '' ) style util
+			// Restore the "Day and name" permalink structure
+			// (/%year%/%monthnum%/%day%/%postname%/) that wp-env configures at
+			// install time. Restoring "Plain" instead would leave the shared
+			// site without pretty permalinks for every spec that runs after
+			// this one in the same shard (e.g. the preload specs assert
+			// /wp-json/-style request URLs).
+			// TODO: Encapsulate permalink teardown in an admin.setPermalinks() style util
 			// We need to run this in afterEach instead of afterAll since we don't have page context
 			// in afterAll
 			await admin.visitAdminPage( 'options-permalink.php' );
 
-			// Select Plain permalinks
-			await page.click( '#permalink-input-plain' );
+			// Select the Day and name permalink structure
+			await page.locator( '#permalink-input-day-name' ).click();
 
 			// Click Save Changes
-			await page.click( '#submit' );
+			await page.locator( '#submit' ).click();
 
 			// Wait for settings to be saved
 			await page.waitForSelector( '.notice-success' );
 
-			// Force re-discovery of REST API root URL after disabling pretty permalinks.
-			// When permalinks change from pretty to plain, the REST API URL changes
-			// from /wp-json/ back to /?rest_route=/. We need to refresh the cached URL
-			// to prevent 404 errors.
+			// Force re-discovery of the REST API root URL after changing the
+			// permalink structure, so the cached URL cannot go stale.
 			await requestUtils.setupRest();
+		} );
+
+		test( 'can update a bound page link label from the inline Link UI', async ( {
+			editor,
+			admin,
+			navigation,
+			requestUtils,
+			pageUtils,
+		} ) => {
+			await admin.createNewPost();
+
+			const linkAttributes = JSON.stringify( {
+				id: testPage1.id,
+				label: 'Test Page 1',
+				kind: 'post-type',
+				type: 'page',
+				url: testPage1.link,
+				metadata: {
+					bindings: {
+						url: {
+							source: 'core/post-data',
+							args: {
+								field: 'link',
+							},
+						},
+					},
+				},
+			} );
+
+			const menu = await requestUtils.createNavigationMenu( {
+				title: 'Test Menu',
+				content: `<!-- wp:navigation-link ${ linkAttributes } /-->`,
+			} );
+
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: {
+					ref: menu.id,
+				},
+			} );
+
+			const navLinkBlock = navigation
+				.getNavBlock()
+				.getByRole( 'document', {
+					name: 'Block: Page Link',
+				} )
+				.first();
+			await expect( navLinkBlock ).toBeVisible( { timeout: 10000 } );
+			await editor.selectBlocks( navLinkBlock );
+			await pageUtils.pressKeys( 'primary+k' );
+
+			const linkPopover = navigation.getLinkPopover();
+			await expect( linkPopover ).toBeVisible();
+			await expect(
+				linkPopover.getByRole( 'link', { name: /Test Page 1/ } )
+			).toBeVisible();
+			await linkPopover
+				.getByRole( 'button', { name: 'Edit link' } )
+				.click();
+
+			const textInput = linkPopover.getByRole( 'textbox', {
+				name: 'Text',
+			} );
+			await expect( textInput ).toHaveValue( 'Test Page 1' );
+
+			await textInput.fill( 'Updated Page Label' );
+			await linkPopover.getByRole( 'button', { name: 'Apply' } ).click();
+
+			await expect(
+				navigation.getNavBlock().getByText( 'Updated Page Label' )
+			).toBeVisible();
 		} );
 
 		test( 'can bind to a page', async ( {
@@ -1470,24 +1541,27 @@ test.describe( 'Navigation block', () => {
 			const itemCount = await pageItems.count();
 			expect( itemCount ).toBeGreaterThan( 0 );
 
-			// Step 4: Convert Page List using Edit button
+			// Step 4: Convert Page List using the Detach button
 			// Select the Page List block
 			await editor.selectBlocks( pageListBlock );
 
-			// Try using the toolbar Edit button instead
-			const editButton = page
-				.getByRole( 'button', { name: 'Edit' } )
+			// Try using the toolbar Detach button instead
+			const detachButton = page
+				.getByRole( 'button', { name: 'Detach' } )
 				.first();
-			await expect( editButton ).toBeVisible();
+			await expect( detachButton ).toBeVisible();
 
-			await editButton.click();
+			await detachButton.click();
 
-			// Wait for modal and approve conversion
-			await expect(
-				page.getByRole( 'dialog', { name: 'Edit Page List' } )
-			).toBeVisible();
+			// Wait for the confirmation dialog and approve conversion
+			const detachDialog = page.getByRole( 'dialog', {
+				name: 'Detach Page List',
+			} );
+			await expect( detachDialog ).toBeVisible();
 
-			await page.getByRole( 'button', { name: 'Edit' } ).last().click();
+			await detachDialog
+				.getByRole( 'button', { name: 'Detach' } )
+				.click();
 
 			// Wait for conversion - check that Page List is gone
 			await expect( pageListBlock ).toBeHidden();
@@ -1792,7 +1866,7 @@ test.describe( 'Navigation block', () => {
 
 				// Verify validation error is shown
 				await expect(
-					page.getByText( 'Please enter a valid URL.' )
+					linkPopover.getByText( 'Please enter a valid URL.' )
 				).toBeVisible();
 			} );
 
@@ -1813,7 +1887,7 @@ test.describe( 'Navigation block', () => {
 
 				// Verify validation error is gone now
 				await expect(
-					page.getByText( 'Please enter a valid URL.' )
+					linkPopover.getByText( 'Please enter a valid URL.' )
 				).toBeHidden();
 
 				await expect( linkInput ).toHaveValue(
@@ -2236,7 +2310,7 @@ class Navigation {
 
 		// Check appender has focus
 		if ( submenu ) {
-			// chec for the submenu appender
+			// check for the submenu appender
 			await expect( this.getSubmenuBlockInserter() ).toBeFocused();
 		} else {
 			await expect( this.getNavBlockInserter() ).toBeFocused();

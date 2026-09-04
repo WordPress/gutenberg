@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import TextHighlight from '..';
 
 const meta: Meta< typeof TextHighlight > = {
@@ -19,7 +12,7 @@ const meta: Meta< typeof TextHighlight > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},
