@@ -233,7 +233,7 @@ function block_core_calendar_normalize_gap_value( $gap ) {
 	// Skip if gap value contains unsupported characters.
 	// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
 	// because we only want to match against the value, not the CSS attribute.
-	$gap = $gap && preg_match( '%[\\\(&=}]|/\*%', $gap ) ? '' : $gap;
+	$gap = $gap && preg_match( '%[;\\\(&=}]|/\*%', $gap ) ? '' : $gap;
 
 	if ( '' === $gap ) {
 		return '';

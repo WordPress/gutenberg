@@ -52,51 +52,45 @@
 	}
 
 	table[style*="border-top-color"] {
-		> *,
-		tr:first-child {
+		> thead,
+		> thead > tr:first-child,
+		> thead > tr:first-child > * {
 			border-top-color: inherit;
-
-			th,
-			td {
-				border-top-color: inherit;
-			}
-		}
-
-		tr:not(:first-child) {
-			border-top-color: currentColor;
 		}
 	}
 
 	table[style*="border-right-color"] {
-		> *,
-		tr,
-		th,
-		td:last-child {
+		> thead,
+		> tbody,
+		> tfoot,
+		> thead > tr,
+		> tbody > tr,
+		> tfoot > tr,
+		> thead > tr > :last-child,
+		> tbody > tr > :last-child,
+		> tfoot > tr > :last-child {
 			border-right-color: inherit;
 		}
 	}
 
 	table[style*="border-bottom-color"] {
-		> *,
-		tr:last-child {
+		> tbody:last-child,
+		> tbody:last-child > tr:last-child,
+		> tbody:last-child > tr:last-child > * {
 			border-bottom-color: inherit;
-
-			th,
-			td {
-				border-bottom-color: inherit;
-			}
-		}
-
-		tr:not(:last-child) {
-			border-bottom-color: currentColor;
 		}
 	}
 
 	table[style*="border-left-color"] {
-		> *,
-		tr,
-		th,
-		td:first-child {
+		> thead,
+		> tbody,
+		> tfoot,
+		> thead > tr,
+		> tbody > tr,
+		> tfoot > tr,
+		> thead > tr > :first-child,
+		> tbody > tr > :first-child,
+		> tfoot > tr > :first-child {
 			border-left-color: inherit;
 		}
 	}
@@ -110,6 +104,50 @@
 		}
 	}
 
+	table[style*="border-top-style"] {
+		> thead,
+		> thead > tr:first-child,
+		> thead > tr:first-child > * {
+			border-top-style: inherit;
+		}
+	}
+
+	table[style*="border-right-style"] {
+		> thead,
+		> tbody,
+		> tfoot,
+		> thead > tr,
+		> tbody > tr,
+		> tfoot > tr,
+		> thead > tr > :last-child,
+		> tbody > tr > :last-child,
+		> tfoot > tr > :last-child {
+			border-right-style: inherit;
+		}
+	}
+
+	table[style*="border-bottom-style"] {
+		> tbody:last-child,
+		> tbody:last-child > tr:last-child,
+		> tbody:last-child > tr:last-child > * {
+			border-bottom-style: inherit;
+		}
+	}
+
+	table[style*="border-left-style"] {
+		> thead,
+		> tbody,
+		> tfoot,
+		> thead > tr,
+		> tbody > tr,
+		> tfoot > tr,
+		> thead > tr > :first-child,
+		> tbody > tr > :first-child,
+		> tfoot > tr > :first-child {
+			border-left-style: inherit;
+		}
+	}
+
 	table[style*="border-width"] {
 		> *,
 		tr,
@@ -117,6 +155,54 @@
 		td {
 			border-width: inherit;
 			border-style: inherit;
+		}
+	}
+
+	table[style*="border-top-width"] {
+		> thead,
+		> thead > tr:first-child,
+		> thead > tr:first-child > * {
+			border-top-width: inherit;
+			border-top-style: inherit;
+		}
+	}
+
+	table[style*="border-right-width"] {
+		> thead,
+		> tbody,
+		> tfoot,
+		> thead > tr,
+		> tbody > tr,
+		> tfoot > tr,
+		> thead > tr > :last-child,
+		> tbody > tr > :last-child,
+		> tfoot > tr > :last-child {
+			border-right-width: inherit;
+			border-right-style: inherit;
+		}
+	}
+
+	table[style*="border-bottom-width"] {
+		> tbody:last-child,
+		> tbody:last-child > tr:last-child,
+		> tbody:last-child > tr:last-child > * {
+			border-bottom-width: inherit;
+			border-bottom-style: inherit;
+		}
+	}
+
+	table[style*="border-left-width"] {
+		> thead,
+		> tbody,
+		> tfoot,
+		> thead > tr,
+		> tbody > tr,
+		> tfoot > tr,
+		> thead > tr > :first-child,
+		> tbody > tr > :first-child,
+		> tfoot > tr > :first-child {
+			border-left-width: inherit;
+			border-left-style: inherit;
 		}
 	}
 }

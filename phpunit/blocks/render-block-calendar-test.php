@@ -101,6 +101,15 @@ class Tests_Blocks_Render_Calendar extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @covers ::gutenberg_block_core_calendar_normalize_gap_value
+	 */
+	public function test_normalize_gap_value_rejects_semicolon_delimited_declarations() {
+		$css = gutenberg_block_core_calendar_normalize_gap_value( '1px;color:red' );
+
+		$this->assertSame( '', $css );
+	}
+
+	/**
 	 * @covers ::gutenberg_block_core_calendar_get_block_gap_css
 	 */
 	public function test_get_block_gap_css_returns_instance_value() {
