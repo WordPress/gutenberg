@@ -12,7 +12,11 @@ import { CATEGORY_SLUG } from './components/category-selector';
  * @return {Object} The merged categories map and the callback function to find or create a category.
  */
 export function useAddPatternCategory() {
-	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
+	const {
+		saveEntityRecord,
+		invalidateResolution,
+		invalidateResolutionForStoreSelector,
+	} = useDispatch( coreStore );
 	const { corePatternCategories, userPatternCategories } = useSelect(
 		( select ) => {
 			const { getUserPatternCategories, getBlockPatternCategories } =
@@ -71,6 +75,12 @@ export function useAddPatternCategory() {
 				{ throwOnError: true }
 			);
 			invalidateResolution( 'getUserPatternCategories' );
+			// The pattern view configuration lists a view per category, so
+			// the screens built from it (the site editor sidebar, the pattern
+			// list tabs) would show a stale category list. `getViewConfig` is
+			// resolved with several argument lists (with or without `fields`),
+			// so invalidate every resolution rather than a single one.
+			invalidateResolutionForStoreSelector( 'getViewConfig' );
 			return newTerm.id;
 		} catch ( error ) {
 			if ( error.code !== 'term_exists' ) {

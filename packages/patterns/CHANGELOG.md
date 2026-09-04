@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Refresh the pattern view configuration after creating or renaming a pattern category, so the category lists built from it (the site editor sidebar and the pattern list tabs) do not go stale ([#82458](https://github.com/WordPress/gutenberg/pull/82458)).
+
 ### Internal
 
 -   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
