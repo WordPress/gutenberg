@@ -133,8 +133,8 @@ function gutenberg_initialize_experiments_settings() {
 				),
 				array(
 					'id'          => 'gutenberg-wpds-admin-restyle',
-					'label'       => __( 'Classic admin restyle', 'gutenberg' ),
-					'description' => __( 'Restyles classic wp-admin screens from WordPress Design System tokens, so classic and React screens read as one product. Visual only; no markup changes.', 'gutenberg' ),
+					'label'       => __( 'Admin design tokens', 'gutenberg' ),
+					'description' => __( 'Styles wp-admin from WordPress Design System tokens, so every admin screen reads as one product regardless of how it is rendered. Visual only; no markup changes.', 'gutenberg' ),
 				),
 				array(
 					'id'          => 'gutenberg-dashboard-widgets',
