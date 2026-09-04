@@ -23,7 +23,6 @@ describe( 'color-space registration', () => {
 		'clampToGamut',
 		'getColorString',
 		'getContrast',
-		'getRelativeLuminance',
 	] as const )( '%s works without prior registration', async ( name ) => {
 		const utils = await import( '../lib/color-utils' );
 		// Do not let an import-time registration satisfy the utility's needs.
@@ -46,11 +45,6 @@ describe( 'color-space registration', () => {
 			case 'getContrast':
 				expect( utils.getContrast( '#000000', '#ffffff' ) ).toBeCloseTo(
 					21
-				);
-				break;
-			case 'getRelativeLuminance':
-				expect( utils.getRelativeLuminance( '#ffffff' ) ).toBeCloseTo(
-					1
 				);
 				break;
 		}

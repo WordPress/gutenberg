@@ -8,12 +8,7 @@ import {
 	to,
 	type PlainColorObject,
 } from 'colorjs.io/fn';
-import {
-	clampToGamut,
-	getColorString,
-	getContrastFromLuminances,
-	getRelativeLuminance,
-} from './color-utils.ts';
+import { clampToGamut, getColorString, getContrast } from './color-utils.ts';
 import { UNIVERSAL_CONTRAST_TOPUP } from './constants.ts';
 import { taperChroma } from './taper-chroma.ts';
 import type {
@@ -112,7 +107,7 @@ function getPerceptualContrastMagnitude(
 	return Math.abs( contrastAPCA( background, foreground ) );
 }
 
-function getConstraintReferenceLuminances(
+function getConstraintReferences(
 	step: ForegroundScaleConfig[ 'steps' ][ number ],
 	ramp: BaseRampResult,
 	backgroundRamp: BaseRampResult
@@ -123,20 +118,17 @@ function getConstraintReferenceLuminances(
 			...step.contrast.references.map(
 				( name ) => backgroundRamp.ramp[ name ]
 			),
-		] ),
-		( reference ) => getRelativeLuminance( reference )
+		] )
 	);
 }
 
 function meetsContrastFloor(
 	color: string | PlainColorObject,
-	referenceLuminances: readonly number[],
+	references: readonly string[],
 	target: number
 ) {
-	const luminance = getRelativeLuminance( color );
-	return referenceLuminances.every(
-		( referenceLuminance ) =>
-			getContrastFromLuminances( referenceLuminance, luminance ) >= target
+	return references.every(
+		( reference ) => getContrast( reference, color ) >= target
 	);
 }
 
@@ -145,36 +137,29 @@ function meetsContrastFloor(
  * Zero marks the search boundary; negative values mean at least one reference
  * fails. Final output checks use the unpadded floor instead.
  *
- * @param color               Candidate foreground.
- * @param referenceLuminances Precomputed luminances of its backgrounds.
- * @param target              Unpadded WCAG contrast ratio.
+ * @param color      Candidate foreground.
+ * @param references Background colors to check together.
+ * @param target     Unpadded WCAG contrast ratio.
  */
 function getContrastTargetMargin(
 	color: PlainColorObject,
-	referenceLuminances: readonly number[],
+	references: readonly string[],
 	target: number
 ) {
 	const adjustedTarget = target + UNIVERSAL_CONTRAST_TOPUP;
-	const luminance = getRelativeLuminance( color );
-	let minimumMargin = Infinity;
-	for ( const referenceLuminance of referenceLuminances ) {
-		minimumMargin = Math.min(
-			minimumMargin,
-			Math.log(
-				getContrastFromLuminances( referenceLuminance, luminance ) /
-					adjustedTarget
-			)
-		);
-	}
-	return minimumMargin;
+	return Math.min(
+		...references.map( ( reference ) =>
+			Math.log( getContrast( reference, color ) / adjustedTarget )
+		)
+	);
 }
 
 function meetsContrastTarget(
 	color: PlainColorObject,
-	referenceLuminances: readonly number[],
+	references: readonly string[],
 	target: number
 ) {
-	return getContrastTargetMargin( color, referenceLuminances, target ) >= 0;
+	return getContrastTargetMargin( color, references, target ) >= 0;
 }
 
 /**
@@ -186,34 +171,30 @@ function meetsContrastTarget(
  * @param options.getColorAtLightness Color path indexed by OKLCH lightness.
  * @param options.weakColor           Starting foreground.
  * @param options.strongColor         Strongest allowed foreground.
- * @param options.referenceLuminances Background luminances to check together.
+ * @param options.references          Background colors to check together.
  * @param options.target              Unpadded WCAG contrast ratio.
  */
 function findColorAtContrastTarget( {
 	getColorAtLightness,
 	weakColor,
 	strongColor,
-	referenceLuminances,
+	references,
 	target,
 }: {
 	getColorAtLightness: GetColorForLightness;
 	weakColor: PlainColorObject;
 	strongColor: PlainColorObject;
-	referenceLuminances: readonly number[];
+	references: readonly string[];
 	target: number;
 } ) {
-	const weakMargin = getContrastTargetMargin(
-		weakColor,
-		referenceLuminances,
-		target
-	);
+	const weakMargin = getContrastTargetMargin( weakColor, references, target );
 	if ( weakMargin >= 0 ) {
 		return weakColor;
 	}
 
 	const strongMargin = getContrastTargetMargin(
 		strongColor,
-		referenceLuminances,
+		references,
 		target
 	);
 	if ( strongMargin < 0 ) {
@@ -222,8 +203,7 @@ function findColorAtContrastTarget( {
 
 	return solveWithBisect(
 		getColorAtLightness,
-		( color ) =>
-			getContrastTargetMargin( color, referenceLuminances, target ),
+		( color ) => getContrastTargetMargin( color, references, target ),
 		get( weakColor, [ OKLCH, 'l' ] ),
 		weakMargin,
 		get( strongColor, [ OKLCH, 'l' ] ),
@@ -294,24 +274,24 @@ function findColorAtPerceptualContrast( {
  * @param options.color               Foreground before serialization.
  * @param options.getColorAtLightness Color path indexed by OKLCH lightness.
  * @param options.getStrongColor      Resolve the strongest allowed fallback.
- * @param options.referenceLuminances Background luminances to check together.
+ * @param options.references          Background colors to check together.
  * @param options.target              Unpadded WCAG contrast floor.
  */
 function serializeColorMeetingContrast( {
 	color,
 	getColorAtLightness,
 	getStrongColor,
-	referenceLuminances,
+	references,
 	target,
 }: {
 	color: PlainColorObject;
 	getColorAtLightness: GetColorForLightness;
 	getStrongColor: () => PlainColorObject;
-	referenceLuminances: readonly number[];
+	references: readonly string[];
 	target: number;
 } ) {
 	const serializedColor = getColorString( color );
-	if ( meetsContrastFloor( serializedColor, referenceLuminances, target ) ) {
+	if ( meetsContrastFloor( serializedColor, references, target ) ) {
 		return serializedColor;
 	}
 
@@ -325,7 +305,7 @@ function serializeColorMeetingContrast( {
 		const strengthened = getColorString(
 			getColorAtLightness( colorLightness + direction * offset )
 		);
-		if ( meetsContrastFloor( strengthened, referenceLuminances, target ) ) {
+		if ( meetsContrastFloor( strengthened, references, target ) ) {
 			return strengthened;
 		}
 	}
@@ -344,7 +324,7 @@ function serializeColorMeetingContrast( {
  * @param options.strongColor         Serialized FGS5, already checked for WCAG.
  * @param options.strongEndpoint      Endpoint allowed by the foreground path.
  * @param options.getColorAtLightness Color path indexed by OKLCH lightness.
- * @param options.referenceLuminances Background luminances to check together.
+ * @param options.references          Background colors to check together.
  * @param options.wcagTarget          Unpadded WCAG contrast floor.
  * @param options.perceptualTarget    Preferred APCA gap in Lc.
  */
@@ -354,7 +334,7 @@ function serializeColorMeetingPerceptualInterval( {
 	strongColor,
 	strongEndpoint,
 	getColorAtLightness,
-	referenceLuminances,
+	references,
 	wcagTarget,
 	perceptualTarget,
 }: {
@@ -363,7 +343,7 @@ function serializeColorMeetingPerceptualInterval( {
 	strongColor: string;
 	strongEndpoint: PlainColorObject;
 	getColorAtLightness: GetColorForLightness;
-	referenceLuminances: readonly number[];
+	references: readonly string[];
 	wcagTarget: number;
 	perceptualTarget: number;
 } ) {
@@ -384,11 +364,7 @@ function serializeColorMeetingPerceptualInterval( {
 	if (
 		getPerceptualContrastMagnitude( background, serializedEndpoint ) <
 			requiredStrongContrast ||
-		! meetsContrastFloor(
-			serializedEndpoint,
-			referenceLuminances,
-			wcagTarget
-		)
+		! meetsContrastFloor( serializedEndpoint, references, wcagTarget )
 	) {
 		return strongColor;
 	}
@@ -408,7 +384,7 @@ function serializeColorMeetingPerceptualInterval( {
 		if (
 			getPerceptualContrastMagnitude( background, strengthened ) >=
 				requiredStrongContrast &&
-			meetsContrastFloor( strengthened, referenceLuminances, wcagTarget )
+			meetsContrastFloor( strengthened, references, wcagTarget )
 		) {
 			return strengthened;
 		}
@@ -461,12 +437,12 @@ export function buildForegroundScale(
 		ForegroundRampStep,
 		ForegroundScaleConfig[ 'steps' ][ number ]
 	>;
-	const referenceLuminances = Object.fromEntries(
+	const references = Object.fromEntries(
 		config.steps.map( ( step ) => [
 			step.name,
-			getConstraintReferenceLuminances( step, ramp, backgroundRamp ),
+			getConstraintReferences( step, ramp, backgroundRamp ),
 		] )
-	) as Record< ForegroundRampStep, number[] >;
+	) as Record< ForegroundRampStep, string[] >;
 	const strongStep = steps.fgSurface5;
 	const strongEndpoint = getColorAtLightness(
 		ramp.direction === 'lighter' ? 1 : 0
@@ -481,7 +457,7 @@ export function buildForegroundScale(
 			step.name,
 			meetsContrastTarget(
 				currentColor,
-				referenceLuminances[ step.name ],
+				references[ step.name ],
 				step.contrast.target
 			)
 				? currentColor
@@ -493,7 +469,7 @@ export function buildForegroundScale(
 							),
 						weakColor: currentColor,
 						strongColor: strongEndpoint,
-						referenceLuminances: referenceLuminances[ step.name ],
+						references: references[ step.name ],
 						target: step.contrast.target,
 				  } )
 		);
@@ -504,7 +480,7 @@ export function buildForegroundScale(
 		getColorAtLightness,
 		weakColor: getColorAtLightness( get( fgSurface2, [ OKLCH, 'l' ] ) ),
 		strongColor: strongEndpoint,
-		referenceLuminances: referenceLuminances.fgSurface3,
+		references: references.fgSurface3,
 		target: steps.fgSurface3.contrast.target,
 	} );
 	const fgSurface3Contrast = getPerceptualContrastMagnitude(
@@ -515,7 +491,7 @@ export function buildForegroundScale(
 		getColorAtLightness,
 		weakColor: fgSurface3,
 		strongColor: strongEndpoint,
-		referenceLuminances: referenceLuminances.fgSurface4,
+		references: references.fgSurface4,
 		target: steps.fgSurface4.contrast.target,
 	} );
 	const minimumFgSurface4Contrast = getPerceptualContrastMagnitude(
@@ -575,7 +551,7 @@ export function buildForegroundScale(
 	if (
 		! meetsContrastTarget(
 			normalColor,
-			referenceLuminances.fgSurface4,
+			references.fgSurface4,
 			steps.fgSurface4.contrast.target
 		)
 	) {
@@ -583,7 +559,7 @@ export function buildForegroundScale(
 			getColorAtLightness,
 			weakColor: normalColor,
 			strongColor: strongEndpoint,
-			referenceLuminances: referenceLuminances.fgSurface4,
+			references: references.fgSurface4,
 			target: steps.fgSurface4.contrast.target,
 		} );
 	}
@@ -616,7 +592,7 @@ export function buildForegroundScale(
 		if (
 			! meetsContrastTarget(
 				strongColor,
-				referenceLuminances.fgSurface5,
+				references.fgSurface5,
 				strongStep.contrast.target
 			)
 		) {
@@ -624,7 +600,7 @@ export function buildForegroundScale(
 				getColorAtLightness,
 				weakColor: strongColor,
 				strongColor: strongEndpoint,
-				referenceLuminances: referenceLuminances.fgSurface5,
+				references: references.fgSurface5,
 				target: strongStep.contrast.target,
 			} );
 		}
@@ -653,7 +629,7 @@ export function buildForegroundScale(
 							)
 					: getColorAtLightness,
 			getStrongColor,
-			referenceLuminances: referenceLuminances[ step.name ],
+			references: references[ step.name ],
 			target: step.contrast.target,
 		} );
 	}
@@ -673,7 +649,7 @@ export function buildForegroundScale(
 			strongColor: nextRamp.fgSurface5!,
 			strongEndpoint,
 			getColorAtLightness,
-			referenceLuminances: referenceLuminances.fgSurface5,
+			references: references.fgSurface5,
 			wcagTarget: strongStep.contrast.target,
 			perceptualTarget: normalToActive,
 		} );
@@ -689,7 +665,7 @@ export function buildForegroundScale(
 		if (
 			! meetsContrastFloor(
 				nextRamp[ step.name ]!,
-				referenceLuminances[ step.name ],
+				references[ step.name ],
 				step.contrast.target
 			)
 		) {
