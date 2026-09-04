@@ -10,7 +10,7 @@ const TEMPLATE = [
 				[
 					[
 						'core/column',
-						{ width: '40px' },
+						{ style: { dimensions: { width: '40px' } } },
 						[
 							[
 								'core/avatar',

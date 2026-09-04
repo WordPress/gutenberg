@@ -11,9 +11,6 @@
 		"verticalAlignment": {
 			"type": "string"
 		},
-		"width": {
-			"type": "string"
-		},
 		"templateLock": {
 			"type": [ "string", "boolean" ],
 			"enum": [ "all", "insert", "contentOnly", false ]
@@ -71,6 +68,13 @@
 		"layout": true,
 		"interactivity": {
 			"clientNavigation": true
+		},
+		"dimensions": {
+			"width": true,
+			"__experimentalSkipSerialization": [ "width" ],
+			"__experimentalDefaultControls": {
+				"width": true
+			}
 		},
 		"allowedBlocks": true
 	}

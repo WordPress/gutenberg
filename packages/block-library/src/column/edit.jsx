@@ -3,57 +3,13 @@ import {
 	InnerBlocks,
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
-	InspectorControls,
 	useBlockProps,
-	useSettings,
 	useInnerBlocksProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import {
-	__experimentalUseCustomUnits as useCustomUnits,
-	__experimentalUnitControl as UnitControl,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-} from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { sprintf, __ } from '@wordpress/i18n';
-import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-
-function ColumnInspectorControls( { width, setAttributes } ) {
-	const [ availableUnits ] = useSettings( 'spacing.units' );
-	const units = useCustomUnits( {
-		availableUnits: availableUnits || [ '%', 'px', 'em', 'rem', 'vw' ],
-	} );
-	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-	return (
-		<ToolsPanel
-			label={ __( 'Settings' ) }
-			resetAll={ () => {
-				setAttributes( { width: undefined } );
-			} }
-			dropdownMenuProps={ dropdownMenuProps }
-		>
-			<ToolsPanelItem
-				hasValue={ () => width !== undefined }
-				label={ __( 'Width' ) }
-				onDeselect={ () => setAttributes( { width: undefined } ) }
-				isShownByDefault
-			>
-				<UnitControl
-					label={ __( 'Width' ) }
-					__unstableInputWidth="calc(50% - 8px)"
-					value={ width || '' }
-					onChange={ ( nextWidth ) => {
-						nextWidth =
-							0 > parseFloat( nextWidth ) ? '0' : nextWidth;
-						setAttributes( { width: nextWidth } );
-					} }
-					units={ units }
-				/>
-			</ToolsPanelItem>
-		</ToolsPanel>
-	);
-}
+import { getColumnFlexBasis } from './utils';
 
 /**
  * Renders the `core/column` block in the editor.
@@ -61,7 +17,7 @@ function ColumnInspectorControls( { width, setAttributes } ) {
  * @param {Object}         props                                Component props.
  * @param {Object}         props.attributes                     Block attributes.
  * @param {string}         [props.attributes.verticalAlignment] Vertical alignment of the column, one of `top`, `center`, `bottom` or `stretch`. Setting it resets the alignment on the parent Columns block.
- * @param {string|number}  [props.attributes.width]             Column width, used as its `flex-basis`. A number is treated as a percentage, for content saved before the attribute became a CSS length.
+ * @param {Object}         [props.attributes.style]             Block style attribute. Its `dimensions.width` value is applied as the column's `flex-basis`.
  * @param {string|boolean} [props.attributes.templateLock]      Template lock applied to the inner blocks, one of `all`, `insert`, `contentOnly` or `false`.
  * @param {string[]}       [props.attributes.allowedBlocks]     Names of the blocks allowed as inner blocks, added by the `allowedBlocks` block support.
  * @param {Function}       props.setAttributes                  Callback for updating block attributes.
@@ -70,7 +26,7 @@ function ColumnInspectorControls( { width, setAttributes } ) {
  * @return {React.JSX.Element} React element.
  */
 function ColumnEdit( {
-	attributes: { verticalAlignment, width, templateLock, allowedBlocks },
+	attributes: { verticalAlignment, style, templateLock, allowedBlocks },
 	setAttributes,
 	clientId,
 } ) {
@@ -104,10 +60,10 @@ function ColumnEdit( {
 		} );
 	};
 
-	const widthWithUnit = Number.isFinite( width ) ? width + '%' : width;
+	const flexBasis = getColumnFlexBasis( style?.dimensions?.width );
 	const blockProps = useBlockProps( {
 		className: classes,
-		style: widthWithUnit ? { flexBasis: widthWithUnit } : undefined,
+		style: flexBasis ? { flexBasis } : undefined,
 	} );
 
 	const columnsCount = columnsIds.length;
@@ -141,12 +97,6 @@ function ColumnEdit( {
 					controls={ [ 'top', 'center', 'bottom', 'stretch' ] }
 				/>
 			</BlockControls>
-			<InspectorControls>
-				<ColumnInspectorControls
-					width={ width }
-					setAttributes={ setAttributes }
-				/>
-			</InspectorControls>
 			<div { ...innerBlocksProps } />
 		</>
 	);

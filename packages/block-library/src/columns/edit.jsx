@@ -105,7 +105,11 @@ function ColumnInspectorControls( {
 					length: newlyAddedColumns,
 				} ).map( () => {
 					return createBlock( 'core/column', {
-						width: `${ newColumnWidth }%`,
+						style: {
+							dimensions: {
+								width: `${ newColumnWidth }%`,
+							},
+						},
 					} );
 				} ),
 			];

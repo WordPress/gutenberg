@@ -3,7 +3,11 @@
 		"name": "core/column",
 		"isValid": true,
 		"attributes": {
-			"width": "33.33%"
+			"style": {
+				"dimensions": {
+					"width": "33.33%"
+				}
+			}
 		},
 		"innerBlocks": [
 			{
