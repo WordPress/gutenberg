@@ -48,6 +48,7 @@ test.describe( 'Site editor navigation', () => {
 		} );
 		const editorCanvasButton = editorCanvasRegion.getByRole( 'button', {
 			name: 'Edit',
+			exact: true,
 		} );
 
 		await expect( editorCanvasButton ).toBeVisible();
