@@ -1,10 +1,10 @@
+import { formInput as icon } from '@wordpress/icons';
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 import variations from './variations';
-import { icon } from './icons';
 
 const { name } = metadata;
 

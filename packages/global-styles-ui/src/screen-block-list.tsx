@@ -4,6 +4,7 @@ import {
 	FlexItem,
 	SearchControl,
 	__experimentalHStack as HStack,
+	__experimentalItemGroup as ItemGroup,
 	__experimentalText as WCText,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -19,11 +20,20 @@ import {
 	privateApis as blockEditorPrivateApis,
 	// @ts-expect-error: Not typed yet.
 } from '@wordpress/block-editor';
+import {
+	caption,
+	heading,
+	link,
+	quote,
+	settings as settingsIcon,
+	typography,
+} from '@wordpress/icons';
 import { useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { useBlockVariations } from './variations/variations-panel';
 import { ScreenHeader } from './screen-header';
 import { NavigationButtonAsItem } from './navigation-button';
+import { Subtitle } from './subtitle';
 import { useSetting } from './hooks';
 import { unlock } from './lock-unlock';
 
@@ -35,6 +45,27 @@ const {
 	useHasColorPanel,
 	useHasBackgroundPanel,
 } = unlock( blockEditorPrivateApis );
+
+const ELEMENTS = [
+	{ icon: typography, label: __( 'Text' ), path: '/blocks/elements/text' },
+	{ icon: link, label: __( 'Links' ), path: '/blocks/elements/link' },
+	{
+		icon: heading,
+		label: __( 'Headings' ),
+		path: '/blocks/elements/heading',
+	},
+	{
+		icon: caption,
+		label: __( 'Captions' ),
+		path: '/blocks/elements/caption',
+	},
+	{ icon: quote, label: __( 'Citations' ), path: '/blocks/elements/cite' },
+	{
+		icon: settingsIcon,
+		label: __( 'Form controls' ),
+		path: '/blocks/elements/form-controls',
+	},
+];
 
 function useSortedBlockTypes() {
 	const blockItems = useSelect(
@@ -100,15 +131,42 @@ function BlockMenuItem( { block }: BlockMenuItemProps ) {
 	);
 }
 
-interface BlockListProps {
+interface ListGroupProps {
+	title: string;
+	children: React.ReactNode;
+}
+
+function ListGroup( { title, children }: ListGroupProps ) {
+	return (
+		<div className="global-styles-ui-block-types-group">
+			<div className="global-styles-ui-block-types-group__title">
+				<Subtitle level={ 3 }>{ title }</Subtitle>
+			</div>
+			{ children }
+		</div>
+	);
+}
+
+interface ListProps {
 	filterValue: string;
 }
 
-function BlockList( { filterValue }: BlockListProps ) {
+function getFilteredElements( filterValue: string ) {
+	const search = filterValue.trim().toLowerCase();
+	if ( ! search ) {
+		return ELEMENTS;
+	}
+	return ELEMENTS.filter( ( { label } ) =>
+		label.toLowerCase().includes( search )
+	);
+}
+
+function BlockAndElementList( { filterValue }: ListProps ) {
 	const sortedBlockTypes = useSortedBlockTypes();
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const { isMatchingSearchTerm } = useSelect( blocksStore );
 
+	const filteredElements = getFilteredElements( filterValue );
 	const filteredBlockTypes = ! filterValue
 		? sortedBlockTypes
 		: sortedBlockTypes.filter( ( blockType ) =>
@@ -116,6 +174,7 @@ function BlockList( { filterValue }: BlockListProps ) {
 		  );
 
 	const blockTypesListRef = useRef< HTMLDivElement >( null );
+	const elementCount = filteredElements.length;
 
 	// Announce search results on change
 	useEffect( () => {
@@ -130,39 +189,64 @@ function BlockList( { filterValue }: BlockListProps ) {
 		// fragile and depends on the number of rendered elements of `BlockMenuItem`,
 		// which is now one.
 		// @see https://github.com/WordPress/gutenberg/pull/39117#discussion_r816022116
-		const count = blockTypesListRef.current?.childElementCount || 0;
+		const count =
+			elementCount +
+			( blockTypesListRef.current?.childElementCount || 0 );
 		const resultsFoundMessage = sprintf(
 			/* translators: %d: number of results. */
 			_n( '%d result found.', '%d results found.', count ),
 			count
 		);
 		debouncedSpeak( resultsFoundMessage, 'polite' );
-	}, [ filterValue, debouncedSpeak ] );
+	}, [ filterValue, elementCount, debouncedSpeak ] );
+
+	if ( ! elementCount && ! filteredBlockTypes.length ) {
+		return (
+			<WCText align="center" as="p">
+				{ __( 'No results found.' ) }
+			</WCText>
+		);
+	}
 
 	return (
-		<div
-			ref={ blockTypesListRef }
-			className="global-styles-ui-block-types-item-list"
-			// By default, BlockMenuItem has a role=listitem so this div must have a list role.
-			role="list"
-		>
-			{ filteredBlockTypes.length === 0 ? (
-				<WCText align="center" as="p">
-					{ __( 'No blocks found.' ) }
-				</WCText>
-			) : (
-				filteredBlockTypes.map( ( block ) => (
-					<BlockMenuItem
-						block={ block }
-						key={ 'menu-itemblock-' + block.name }
-					/>
-				) )
+		<>
+			{ elementCount > 0 && (
+				<ListGroup title={ __( 'Elements' ) }>
+					<ItemGroup>
+						{ filteredElements.map( ( { icon, label, path } ) => (
+							<NavigationButtonAsItem
+								key={ path }
+								icon={ icon }
+								path={ path }
+							>
+								{ label }
+							</NavigationButtonAsItem>
+						) ) }
+					</ItemGroup>
+				</ListGroup>
 			) }
-		</div>
+			{ filteredBlockTypes.length > 0 && (
+				<ListGroup title={ __( 'Blocks' ) }>
+					<div
+						ref={ blockTypesListRef }
+						className="global-styles-ui-block-types-item-list"
+						// By default, BlockMenuItem has a role=listitem so this div must have a list role.
+						role="list"
+					>
+						{ filteredBlockTypes.map( ( block ) => (
+							<BlockMenuItem
+								block={ block }
+								key={ 'menu-itemblock-' + block.name }
+							/>
+						) ) }
+					</div>
+				</ListGroup>
+			) }
+		</>
 	);
 }
 
-const MemoizedBlockList = memo( BlockList );
+const MemoizedBlockAndElementList = memo( BlockAndElementList );
 
 function ScreenBlockList() {
 	const [ filterValue, setFilterValue ] = useState( '' );
@@ -171,9 +255,9 @@ function ScreenBlockList() {
 	return (
 		<>
 			<ScreenHeader
-				title={ __( 'Blocks' ) }
+				title={ __( 'Blocks & Elements' ) }
 				description={ __(
-					'Customize the appearance of specific blocks and for the whole site.'
+					'Customize the appearance of specific blocks and elements for the whole site.'
 				) }
 			/>
 			<SearchControl
@@ -183,7 +267,7 @@ function ScreenBlockList() {
 				label={ __( 'Search' ) }
 				placeholder={ __( 'Search' ) }
 			/>
-			<MemoizedBlockList filterValue={ deferredFilterValue } />
+			<MemoizedBlockAndElementList filterValue={ deferredFilterValue } />
 		</>
 	);
 }

@@ -4,7 +4,8 @@
 
 ### Enhancements
 
--   Add an Elements section to Global Styles for the elements already available in Typography and Colors.
+-   Move the elements already available in Typography and Colors into the Blocks & Elements section of Global Styles.
+-   Group inputs, selects, and buttons under Form controls, and offer every element the background, dimensions, border, shadow, and custom CSS controls that `theme.json` already accepts.
 -   Expose typography and color controls for citations, inputs, and selects in Global Styles ([#80852](https://github.com/WordPress/gutenberg/pull/80852)).
 
 ## 1.20.0 (2026-08-12)

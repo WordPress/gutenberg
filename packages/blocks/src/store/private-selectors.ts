@@ -2,7 +2,10 @@ import { createSelector, createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { getBlockType } from './selectors';
 import { getValueFromObjectPath } from './utils';
-import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '../api/constants';
+import {
+	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
+	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
+} from '../api/constants';
 import type { BlockStoreState } from './types';
 import type {
 	BlockAttribute,
@@ -57,6 +60,30 @@ const ROOT_BLOCK_SUPPORTS: string[] = [
 	'textIndent',
 	'textTransform',
 	'letterSpacing',
+];
+
+/*
+ * theme.json accepts the complete style set on every element, and the styles
+ * engine emits all of it, so Global Styles offers elements the same controls it
+ * offers blocks. These are the supports missing from the root list above.
+ *
+ * `filter` is deliberately absent: theme.json validates a duotone on an element
+ * but the engine emits no CSS for it, so the control would do nothing. Sizing
+ * is left out entirely (aspect ratio, height, width and their minimums)
+ * because an element is sized by the block that contains it.
+ */
+const ELEMENT_BLOCK_SUPPORTS: string[] = [
+	...ROOT_BLOCK_SUPPORTS,
+	'backgroundGradient',
+	'backgroundImage',
+	'backgroundSize',
+	'borderColor',
+	'borderRadius',
+	'borderStyle',
+	'borderWidth',
+	'margin',
+	'shadow',
+	'writingMode',
 ];
 
 /**
@@ -125,6 +152,20 @@ function filterElementBlockSupports(
 			return false;
 		}
 
+		const isElement = ! name && !! element && element in ELEMENTS;
+
+		// Block gap is emitted for blocks and for the root, but not for an
+		// element's own selector, so the control would have no effect there.
+		if ( support === 'blockGap' && isElement ) {
+			return false;
+		}
+
+		// Text alignment is set on the container an element sits in, so it is
+		// offered for blocks and the root rather than per element.
+		if ( support === 'textAlign' && isElement ) {
+			return false;
+		}
+
 		return true;
 	} );
 }
@@ -139,8 +180,11 @@ export const getSupportedStyles = createSelector(
 		element: string | undefined
 	): string[] => {
 		if ( ! name ) {
+			// `element` also carries UI-only names such as 'text', which mean
+			// the root rather than an element, and keep the root supports.
+			const isElement = !! element && element in ELEMENTS;
 			return filterElementBlockSupports(
-				ROOT_BLOCK_SUPPORTS,
+				isElement ? ELEMENT_BLOCK_SUPPORTS : ROOT_BLOCK_SUPPORTS,
 				name,
 				element
 			);
