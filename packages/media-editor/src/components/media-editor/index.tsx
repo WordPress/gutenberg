@@ -610,6 +610,14 @@ function MediaEditorContent( {
 	} );
 
 	const handleChange = ( updates: Partial< Media > ) => {
+		// A save reads the pending edits once and then waits. An edit
+		// arriving after that read misses the request, and a crop save
+		// then clears the edits for this id, so it would be lost rather
+		// than merely late. It would also land on the attachment being
+		// replaced, not the new one the modal moves to.
+		if ( isSaving ) {
+			return;
+		}
 		editEntityRecord( 'postType', 'attachment', id, updates );
 	};
 
@@ -729,7 +737,16 @@ function MediaEditorContent( {
 		<MediaEditorProvider
 			value={ media ?? undefined }
 			onChange={ handleChange }
-			settings={ { fields } }
+			settings={ {
+				// Show the fields as read-only while saving, so the guard
+				// in `handleChange` is not silently swallowing typing.
+				fields: isSaving
+					? fields.map( ( field ) => ( {
+							...field,
+							readOnly: true,
+					  } ) )
+					: fields,
+			} }
 		>
 			<div className="media-editor">
 				{ ! media ? (
