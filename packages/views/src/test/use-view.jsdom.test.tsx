@@ -152,7 +152,10 @@ describe( 'useView', () => {
 			const { result } = renderUseView( registry, {
 				...BASE_PROPS,
 				defaultView: { type: 'list', perPage: 20 },
-				defaultLayouts: { table: { perPage: 50 } },
+				defaultLayouts: {
+					table: { perPage: 50 },
+					grid: { perPage: 40 },
+				},
 				activeViewOverrides: {
 					type: 'table',
 					perPage: 10,
@@ -256,6 +259,62 @@ describe( 'useView', () => {
 				defaultLayouts: { table: true },
 			} as unknown as Parameters< typeof useView >[ 0 ] );
 			expect( result.current.view.perPage ).toBe( 20 );
+		} );
+
+		// DataViews renders nothing for a type it is not given, and the
+		// preference may predate the current layouts.
+		describe( 'a persisted type the default layouts do not offer', () => {
+			const props = {
+				...BASE_PROPS,
+				defaultView: { type: 'table', perPage: 20 },
+				defaultLayouts: { table: { perPage: 50 }, grid: true },
+			} as unknown as Parameters< typeof useView >[ 0 ];
+
+			it( 'should be ignored in favor of the layers below', () => {
+				const registry = createTestRegistry();
+				setPreference( registry, { type: 'list', perPage: 10 } );
+				const { result } = renderUseView( registry, props );
+				expect( result.current.view ).toMatchObject( {
+					type: 'table',
+					perPage: 10,
+				} );
+			} );
+
+			it( 'should not count as a modification', () => {
+				const registry = createTestRegistry();
+				setPreference( registry, { type: 'list' } );
+				const { result } = renderUseView( registry, props );
+				expect( result.current.isModified ).toBe( false );
+			} );
+
+			it( 'should be written out of the preference on the next update', () => {
+				const registry = createTestRegistry();
+				setPreference( registry, { type: 'list' } );
+				const { result, rerender } = renderUseView( registry, props );
+				act( () => {
+					result.current.updateView( {
+						...result.current.view,
+						perPage: 10,
+					} );
+				} );
+				rerender( props );
+
+				expect( getPreference( registry ) ).toEqual( { perPage: 10 } );
+				expect( result.current.isModified ).toBe( true );
+			} );
+
+			it( 'should be cleared from the preference by an update that changes nothing', () => {
+				const registry = createTestRegistry();
+				setPreference( registry, { type: 'list' } );
+				const { result, rerender } = renderUseView( registry, props );
+				act( () => {
+					result.current.updateView( result.current.view );
+				} );
+				rerender( props );
+
+				expect( getPreference( registry ) ).toBeUndefined();
+				expect( result.current.isModified ).toBe( false );
+			} );
 		} );
 
 		it( 'should ignore a missing layout entry for the effective type', () => {
