@@ -5,10 +5,10 @@ import {
 	Link,
 	useInvalidate,
 } from '@wordpress/route';
-import { useView } from '@wordpress/views';
+import { useView, useViewConfig } from '@wordpress/views';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { Page } from '@wordpress/admin-ui';
-import type { View, Action } from '@wordpress/dataviews';
+import type { View, Action, SupportedLayouts } from '@wordpress/dataviews';
 import {
 	store as coreStore,
 	privateApis as coreDataPrivateApis,
@@ -24,10 +24,11 @@ import type { WpTemplatePart } from '@wordpress/core-data';
 import { CreateTemplatePartModal } from '@wordpress/fields';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import {
-	DEFAULT_VIEW,
-	getActiveViewOverridesForTab,
-	DEFAULT_VIEWS,
+	getActiveViewOverrides,
+	getAreaFromViewOverrides,
 	viewToQuery,
+	type ViewListEntry,
+	type ViewOverrides,
 } from './view-utils';
 import { previewField } from './fields/preview';
 // Unlock WordPress private APIs
@@ -39,20 +40,73 @@ const { Tabs } = unlock( componentsPrivateApis );
  */
 import './style.scss';
 
+const TEMPLATE_PART_POST_TYPE = 'wp_template_part';
+
 function getItemId( item: WpTemplatePart ) {
 	return item.id.toString();
 }
 
 function TemplatePartList() {
-	const invalidate = useInvalidate();
-	const { area = 'all' } = useParams( {
+	// The `area` param is the slug of the active view: either the "all"
+	// entry of the view list or one of the template part areas.
+	const { area } = useParams( {
 		from: '/template-parts/list/$area',
 	} );
+	const {
+		default_view: defaultView,
+		default_layouts: defaultLayouts,
+		view_list: viewList,
+	} = useViewConfig( {
+		kind: 'postType',
+		name: TEMPLATE_PART_POST_TYPE,
+	} );
+	const activeViewOverrides = useMemo(
+		() => getActiveViewOverrides( viewList, area ),
+		[ viewList, area ]
+	);
+
+	if ( ! defaultView ) {
+		// The route canvas resolves the view configuration before the stage
+		// mounts, so this only guards against the store being reset.
+		return null;
+	}
+
+	return (
+		<TemplatePartListView
+			activeView={ area }
+			defaultView={ defaultView }
+			defaultLayouts={ defaultLayouts }
+			viewList={ viewList }
+			activeViewOverrides={ activeViewOverrides }
+		/>
+	);
+}
+
+function TemplatePartListView( {
+	activeView,
+	defaultView,
+	defaultLayouts,
+	viewList,
+	activeViewOverrides,
+}: {
+	activeView: string;
+	defaultView: View;
+	defaultLayouts: SupportedLayouts | undefined;
+	viewList: ViewListEntry[] | undefined;
+	activeViewOverrides: ViewOverrides;
+} ) {
+	const invalidate = useInvalidate();
 	const navigate = useNavigate();
 	const searchParams = useSearch( { from: '/template-parts/list/$area' } );
 	const postTypeObject = useSelect(
-		( select ) => select( coreStore ).getPostType( 'wp_template_part' ),
+		( select ) =>
+			select( coreStore ).getPostType( TEMPLATE_PART_POST_TYPE ),
 		[]
+	);
+	// The area the active view is locked to, if any.
+	const area = useMemo(
+		() => getAreaFromViewOverrides( activeViewOverrides ),
+		[ activeViewOverrides ]
 	);
 
 	const labels = postTypeObject?.labels;
@@ -60,20 +114,13 @@ function TemplatePartList() {
 		( select ) =>
 			select( coreStore ).canUser( 'create', {
 				kind: 'postType',
-				name: 'wp_template_part',
+				name: TEMPLATE_PART_POST_TYPE,
 			} ),
 		[]
 	);
 
 	const [ showTemplatePartModal, setShowTemplatePartModal ] =
 		useState( false );
-
-	const defaultView = DEFAULT_VIEW;
-
-	const activeViewOverrides = useMemo(
-		() => getActiveViewOverridesForTab( area ),
-		[ area ]
-	);
 
 	// Callback to handle URL query parameter changes
 	const handleQueryParamsChange = useCallback(
@@ -91,9 +138,10 @@ function TemplatePartList() {
 	// Use the new view persistence hook
 	const { view, isModified, updateView, resetToDefault } = useView( {
 		kind: 'postType',
-		name: 'wp_template_part',
+		name: TEMPLATE_PART_POST_TYPE,
 		slug: 'default-new',
 		defaultView,
+		defaultLayouts,
 		activeViewOverrides,
 		queryParams: searchParams,
 		onChangeQueryParams: handleQueryParamsChange,
@@ -116,12 +164,12 @@ function TemplatePartList() {
 	const postTypeQuery = useMemo( () => viewToQuery( view ), [ view ] );
 	const { records, isResolving } = useEntityRecordsWithPermissions(
 		'postType',
-		'wp_template_part',
+		TEMPLATE_PART_POST_TYPE,
 		postTypeQuery
 	);
 
 	const allFields = usePostFields( {
-		postType: 'wp_template_part',
+		postType: TEMPLATE_PART_POST_TYPE,
 	} );
 
 	// Hide area column except in 'All' tab, hide status, and disable area filtering
@@ -130,7 +178,7 @@ function TemplatePartList() {
 			allFields
 				.filter( ( field: { id: string } ) => {
 					// Hide area column in specific area tabs
-					if ( field.id === 'area' && area !== 'all' ) {
+					if ( field.id === 'area' && area ) {
 						return false;
 					}
 					// Hide status - template parts don't use status
@@ -183,7 +231,7 @@ function TemplatePartList() {
 	);
 
 	const postTypeActions: Action< WpTemplatePart >[] = usePostActions( {
-		postType: 'wp_template_part',
+		postType: TEMPLATE_PART_POST_TYPE,
 		context: 'list',
 		onActionPerformed: ( actionId: string, items: WpTemplatePart[] ) => {
 			// Clean up URL when delete actions are performed
@@ -212,9 +260,9 @@ function TemplatePartList() {
 	}, [ postTypeActions ] );
 
 	const handleTabChange = useCallback(
-		( areaSlug: string ) => {
+		( viewSlug: string ) => {
 			navigate( {
-				to: `/template-parts/list/${ areaSlug }`,
+				to: `/template-parts/list/${ viewSlug }`,
 			} );
 		},
 		[ navigate ]
@@ -256,23 +304,21 @@ function TemplatePartList() {
 			}
 			hasPadding={ false }
 		>
-			{ DEFAULT_VIEWS.length > 1 && (
+			{ viewList && viewList.length > 1 && (
 				<div className="routes-template-part-list__tabs-wrapper">
 					<Tabs
 						onSelect={ handleTabChange }
-						selectedTabId={ area ?? 'all' }
+						selectedTabId={ activeView }
 					>
 						<Tabs.TabList>
-							{ DEFAULT_VIEWS.map(
-								( filter: { slug: string; label: string } ) => (
-									<Tabs.Tab
-										tabId={ filter.slug }
-										key={ filter.slug }
-									>
-										{ filter.label }
-									</Tabs.Tab>
-								)
-							) }
+							{ viewList.map( ( entry ) => (
+								<Tabs.Tab
+									tabId={ entry.slug }
+									key={ entry.slug }
+								>
+									{ entry.title }
+								</Tabs.Tab>
+							) ) }
 						</Tabs.TabList>
 					</Tabs>
 				</div>
@@ -285,6 +331,7 @@ function TemplatePartList() {
 				actions={ actions }
 				isLoading={ isResolving }
 				paginationInfo={ paginationInfo }
+				defaultLayouts={ defaultLayouts }
 				getItemId={ getItemId }
 				selection={ selection }
 				onReset={ isModified ? onReset : false }
@@ -332,7 +379,7 @@ function TemplatePartList() {
 						} );
 					} }
 					onError={ () => setShowTemplatePartModal( false ) }
-					defaultArea={ area !== 'all' ? area : 'uncategorized' }
+					defaultArea={ area ?? 'uncategorized' }
 				/>
 			) }
 		</Page>
