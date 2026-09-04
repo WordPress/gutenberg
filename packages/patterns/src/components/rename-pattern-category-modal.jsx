@@ -26,7 +26,11 @@ export default function RenamePatternCategoryModal( {
 		? `patterns-rename-pattern-category-modal__validation-message-${ id }`
 		: undefined;
 
-	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
+	const {
+		saveEntityRecord,
+		invalidateResolution,
+		invalidateResolutionForStoreSelector,
+	} = useDispatch( coreStore );
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 
@@ -90,6 +94,9 @@ export default function RenamePatternCategoryModal( {
 			);
 
 			invalidateResolution( 'getUserPatternCategories' );
+			// The pattern view configuration lists a view per category, so
+			// refresh it too or the category keeps its old name there.
+			invalidateResolutionForStoreSelector( 'getViewConfig' );
 			onSuccess?.( savedRecord );
 			onClose();
 
