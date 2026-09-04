@@ -15,25 +15,22 @@ import { store as blockEditorStore } from '../store';
 const POSITION_SUPPORT_KEY = 'position';
 
 const DEFAULT_OPTION = {
-	key: 'default',
 	value: '',
 	label: __( 'Default' ),
 };
 
 const STICKY_OPTION = {
-	key: 'sticky',
 	value: 'sticky',
 	label: _x( 'Sticky', 'Name for the value of the CSS position property' ),
-	hint: __(
+	description: __(
 		'The block will stick to the top of the window instead of scrolling.'
 	),
 };
 
 const FIXED_OPTION = {
-	key: 'fixed',
 	value: 'fixed',
 	label: _x( 'Fixed', 'Name for the value of the CSS position property' ),
-	hint: __( 'The block will not move when the page is scrolled.' ),
+	description: __( 'The block will not move when the page is scrolled.' ),
 };
 
 const POSITION_SIDES = [ 'top', 'right', 'bottom', 'left' ];
@@ -266,24 +263,7 @@ export function PositionPanelPure( {
 				onValueChange={ ( selectedItem ) => {
 					onChangeType( selectedItem.value );
 				} }
-			>
-				{ options.map( ( option ) => (
-					<SelectControl.Item
-						key={ option.key }
-						value={ option }
-						label={ option.label }
-					>
-						<SelectControl.ItemLabel>
-							{ option.label }
-						</SelectControl.ItemLabel>
-						{ option.hint && (
-							<SelectControl.ItemDescription>
-								{ option.hint }
-							</SelectControl.ItemDescription>
-						) }
-					</SelectControl.Item>
-				) ) }
-			</SelectControl>
+			/>
 		</InspectorControls>
 	) : null;
 }
