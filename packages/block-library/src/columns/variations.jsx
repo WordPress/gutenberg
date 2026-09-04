@@ -59,8 +59,8 @@ const variations = [
 			</SVG>
 		),
 		innerBlocks: [
-			[ 'core/column', { width: '33.33%' } ],
-			[ 'core/column', { width: '66.66%' } ],
+			[ 'core/column', { style: { dimensions: { width: '33.33%' } } } ],
+			[ 'core/column', { style: { dimensions: { width: '66.66%' } } } ],
 		],
 		scope: [ 'block' ],
 	},
@@ -79,8 +79,8 @@ const variations = [
 			</SVG>
 		),
 		innerBlocks: [
-			[ 'core/column', { width: '66.66%' } ],
-			[ 'core/column', { width: '33.33%' } ],
+			[ 'core/column', { style: { dimensions: { width: '66.66%' } } } ],
+			[ 'core/column', { style: { dimensions: { width: '33.33%' } } } ],
 		],
 		scope: [ 'block' ],
 	},
@@ -120,9 +120,9 @@ const variations = [
 			</SVG>
 		),
 		innerBlocks: [
-			[ 'core/column', { width: '25%' } ],
-			[ 'core/column', { width: '50%' } ],
-			[ 'core/column', { width: '25%' } ],
+			[ 'core/column', { style: { dimensions: { width: '25%' } } } ],
+			[ 'core/column', { style: { dimensions: { width: '50%' } } } ],
+			[ 'core/column', { style: { dimensions: { width: '25%' } } } ],
 		],
 		scope: [ 'block' ],
 	},
