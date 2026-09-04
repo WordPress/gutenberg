@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Preserve array-valued fields in multipart form data so grouped image-size sideload requests reach the REST API as arrays ([#82353](https://github.com/WordPress/gutenberg/pull/82353)).
+
 ### Internal
 
 -   Remove the `window.__heicUploadSupport` type declaration, following the removal of the redundant flag ([#80452](https://github.com/WordPress/gutenberg/pull/80452)).

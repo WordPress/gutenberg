@@ -23,6 +23,9 @@ class MockImage {
 	crop = mockCrop.mockImplementation( () => this );
 	copy = jest.fn( () => this );
 	setImage = mockSetImage;
+	// These sources are never indexed: libvips reports GType 0 for a field the
+	// image does not carry.
+	getTypeof = jest.fn( () => 0 );
 }
 
 class MockVipsImage {

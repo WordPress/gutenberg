@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Add a private `getFailureCount` selector, a running tally of top-level items cancelled because they failed. Failed items leave the queue just like successful ones, so this is the only record that an upload did not make it ([#81132](https://github.com/WordPress/gutenberg/issues/81132)).
+
 ### Breaking Changes
 
 -   `vipsResizeImage`, `vipsCompressImage`, and `vipsConvertImageFormat` now accept their optional parameters (`smartCrop`, `addSuffix`, `signal`, `scaledSuffix`, `quality`, `interlaced`, `stripMeta`, `maxBitdepth`) as a single trailing `options` object instead of positional arguments ([#80328](https://github.com/WordPress/gutenberg/issues/80328)).
