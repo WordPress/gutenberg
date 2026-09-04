@@ -57,6 +57,7 @@
 	{
 		"slug": "archive",
 		"label": "Archive",
+		"keywords": [ "folder" ],
 		"filePath": "library/archive.svg"
 	},
 	{
@@ -222,6 +223,7 @@
 	{
 		"slug": "cancel-circle-filled",
 		"label": "Cancel Circle Filled",
+		"keywords": [ "close" ],
 		"filePath": "library/cancel-circle-filled.svg"
 	},
 	{
@@ -267,6 +269,7 @@
 	{
 		"slug": "caution-filled",
 		"label": "Caution Filled",
+		"keywords": [ "alert", "warning" ],
 		"filePath": "library/caution-filled.svg"
 	},
 	{
@@ -954,6 +957,7 @@
 	{
 		"slug": "lifesaver",
 		"label": "Lifesaver",
+		"keywords": [ "buoy" ],
 		"filePath": "library/lifesaver.svg"
 	},
 	{
@@ -1462,6 +1466,7 @@
 	{
 		"slug": "seen",
 		"label": "Seen",
+		"keywords": [ "show", "visible", "eye" ],
 		"filePath": "library/seen.svg"
 	},
 	{
@@ -1772,16 +1777,19 @@
 	{
 		"slug": "thumbs-down",
 		"label": "Thumbs Down",
+		"keywords": [ "dislike" ],
 		"filePath": "library/thumbs-down.svg"
 	},
 	{
 		"slug": "thumbs-up",
 		"label": "Thumbs Up",
+		"keywords": [ "like" ],
 		"filePath": "library/thumbs-up.svg"
 	},
 	{
 		"slug": "time",
 		"label": "Time",
+		"keywords": [ "clock", "duration", "hour", "minute", "second" ],
 		"filePath": "library/time.svg"
 	},
 	{
@@ -1804,6 +1812,7 @@
 	{
 		"slug": "trash",
 		"label": "Trash",
+		"keywords": [ "delete" ],
 		"filePath": "library/trash.svg"
 	},
 	{
@@ -1839,6 +1848,7 @@
 	{
 		"slug": "unseen",
 		"label": "Unseen",
+		"keywords": [ "hide" ],
 		"filePath": "library/unseen.svg"
 	},
 	{

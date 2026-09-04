@@ -47,7 +47,7 @@ return array(
 	),
 	'at-symbol'           => array(
 		'label'    => _x( 'At Symbol (@)', 'icon label', 'gutenberg' ),
-		'keywords' => array( _x( 'mention', 'icon keyword', 'gutenberg' ), _x( 'username', 'icon keyword', 'gutenberg' ) ),
+		'keywords' => array( _x( 'email', 'icon keyword', 'gutenberg' ), _x( 'mention', 'icon keyword', 'gutenberg' ), _x( 'username', 'icon keyword', 'gutenberg' ) ),
 		'filePath' => 'library/at-symbol.svg',
 	),
 	'audio'               => array(
@@ -172,7 +172,7 @@ return array(
 	),
 	'create'              => array(
 		'label'    => _x( 'Create', 'icon label', 'gutenberg' ),
-		'keywords' => array( _x( 'new', 'icon keyword', 'gutenberg' ), _x( 'add', 'icon keyword', 'gutenberg' ), _x( 'compose', 'icon keyword', 'gutenberg' ) ),
+		'keywords' => array( _x( 'new', 'icon keyword', 'gutenberg' ), _x( 'add', 'icon keyword', 'gutenberg' ), _x( 'compose', 'icon keyword', 'gutenberg' ), _x( 'plus', 'icon keyword', 'gutenberg' ) ),
 		'filePath' => 'library/create.svg',
 	),
 	'desktop'             => array(
@@ -202,7 +202,7 @@ return array(
 	),
 	'error'               => array(
 		'label'    => _x( 'Error', 'icon label', 'gutenberg' ),
-		'keywords' => array( _x( 'failure', 'icon keyword', 'gutenberg' ), _x( 'problem', 'icon keyword', 'gutenberg' ), _x( 'alert', 'icon keyword', 'gutenberg' ) ),
+		'keywords' => array( _x( 'failure', 'icon keyword', 'gutenberg' ), _x( 'problem', 'icon keyword', 'gutenberg' ), _x( 'alert', 'icon keyword', 'gutenberg' ), _x( 'caution', 'icon keyword', 'gutenberg' ), _x( 'warning', 'icon keyword', 'gutenberg' ) ),
 		'filePath' => 'library/error.svg',
 	),
 	'external'            => array(
@@ -212,7 +212,7 @@ return array(
 	),
 	'file'                => array(
 		'label'    => _x( 'File', 'icon label', 'gutenberg' ),
-		'keywords' => array( _x( 'document', 'icon keyword', 'gutenberg' ), _x( 'attachment', 'icon keyword', 'gutenberg' ) ),
+		'keywords' => array( _x( 'attachment', 'icon keyword', 'gutenberg' ), _x( 'document', 'icon keyword', 'gutenberg' ), _x( 'folder', 'icon keyword', 'gutenberg' ) ),
 		'filePath' => 'library/file.svg',
 	),
 	'gallery'             => array(

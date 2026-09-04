@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Add optional `keywords` to the icon manifest, giving each public icon extra search terms, and emit them from the generated `manifest.php`. ([#82367](https://github.com/WordPress/gutenberg/pull/82367))
+-   Add optional `keywords` to the icon manifest, giving each public icon extra search terms, and emit them from the generated `manifest.php`. The manifest is now the single source of these terms: the Storybook icon library reads them from it instead of keeping its own list, and the icons it had keywords for carry them in the manifest. ([#82367](https://github.com/WordPress/gutenberg/pull/82367))
 
 ### Breaking Changes
 
