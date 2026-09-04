@@ -1,31 +1,41 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import SuggestionMoveGhost from '../suggestion-move-ghost';
 
 // Fully isolate this presentational unit: stub the store read, the block
 // registry, and the icon so the test doesn't pull the real data/blocks
 // module graph.
-jest.mock( '@wordpress/data', () => ( {
-	useSelect: ( fn: any ) =>
-		fn( () => ( {
-			getBlockAttributes: () => ( {
-				content: '<strong>Hello</strong> world',
-			} ),
-		} ) ),
-} ) );
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => {
+	const original = await importOriginal();
+	return {
+		...original,
+		useSelect: ( fn: any ) =>
+			fn( () => ( {
+				getBlockAttributes: () => ( {
+					content: '<strong>Hello</strong> world',
+				} ),
+			} ) ),
+	} as unknown as typeof original;
+} );
 
-jest.mock( '@wordpress/block-editor', () => ( {
+// @ts-expect-error The block editor package is untyped.
+vi.mock( import( '@wordpress/block-editor' ), () => ( {
 	BlockIcon: () => null,
 	store: 'core/block-editor',
 } ) );
 
-jest.mock( '@wordpress/blocks', () => ( {
-	getBlockType: ( name: string ) =>
-		name === 'core/paragraph'
-			? { title: 'Paragraph', icon: undefined }
-			: undefined,
-} ) );
+vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => {
+	const original = await importOriginal();
+	return {
+		...original,
+		getBlockType: ( name: string ) =>
+			name === 'core/paragraph'
+				? { title: 'Paragraph', icon: undefined }
+				: undefined,
+	} as unknown as typeof original;
+} );
 
-jest.mock( '../../collab-sidebar/utils', () => ( {
+vi.mock( import( '../../collab-sidebar/utils' ), () => ( {
 	getAvatarBorderColor: ( id: any ) => `#color${ id }`,
 } ) );
 

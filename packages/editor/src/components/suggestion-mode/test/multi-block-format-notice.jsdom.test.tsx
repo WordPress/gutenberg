@@ -1,3 +1,4 @@
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import {
 	RegistryProvider,
@@ -12,6 +13,12 @@ import { createBlock, registerBlockType } from '@wordpress/blocks';
 import SuggestionMultiBlockFormatNotice from '../multi-block-format-notice';
 import { store as editorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
+
+// The editor store pulls in `@wordpress/viewport`, which reads
+// `window.matchMedia` while loading.
+vi.hoisted( () => {
+	globalThis.wpVitest.mockMatchMedia();
+} );
 
 const TEST_BLOCK_NAME = 'core/test-multi-block-format';
 

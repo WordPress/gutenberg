@@ -13,6 +13,7 @@
 
 ### Bug Fixes
 
+-   Pages: require authentication and a configurable capability (new `capability` page setting, default `manage_options`) before rendering generated standalone pages, so `admin_init` entry points such as `admin-post.php` no longer serve them to logged-out visitors ([#82254](https://github.com/WordPress/gutenberg/pull/82254)).
 -   Widen the optional `@wordpress/theme` peer dependency range to allow 2.x releases. ([#82139](https://github.com/WordPress/gutenberg/pull/82139))
 -   Pages: preserve the Core Boot layout compatibility class in generated wp-admin page templates so short pages fill the viewport when using Core's bundled Boot module ([#82112](https://github.com/WordPress/gutenberg/pull/82112)).
 

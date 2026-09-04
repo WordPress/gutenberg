@@ -1,3 +1,4 @@
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
 	RichTextData,
 	registerFormatType,
@@ -230,6 +231,29 @@ describe( 'findMarkerText', () => {
 		const html = 'a <mark class="wp-marker" data-id="7">marked</mark> b';
 		expect( findMarkerText( html, { ...options, id: 7 } ) ).toBe(
 			'marked'
+		);
+	} );
+
+	it( 'quotes only the characters carrying the id in a fragmented marker', () => {
+		// The span of a fragmented marker can hold unmarked text (a gap)...
+		const gap = RichTextData.fromHTMLString(
+			'<mark class="wp-marker" data-id="7">AB</mark>XY' +
+				'<mark class="wp-marker" data-id="7">CD</mark>'
+		);
+		expect( findMarkerText( gap, { ...options, id: 7 } ) ).toBe( 'ABCD' );
+
+		// ...or another marker. Neither belongs to the suggestion the summary
+		// describes; accept and reject act on the owned characters only.
+		const interleaved = RichTextData.fromHTMLString(
+			'<mark class="wp-marker" data-id="7">AB</mark>' +
+				'<mark class="wp-marker" data-id="8">IN</mark>' +
+				'<mark class="wp-marker" data-id="7">CD</mark>'
+		);
+		expect( findMarkerText( interleaved, { ...options, id: 7 } ) ).toBe(
+			'ABCD'
+		);
+		expect( findMarkerText( interleaved, { ...options, id: 8 } ) ).toBe(
+			'IN'
 		);
 	} );
 

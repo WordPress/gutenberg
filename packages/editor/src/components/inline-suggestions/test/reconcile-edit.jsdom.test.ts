@@ -1,3 +1,4 @@
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
 	RichTextData,
 	store as richTextStore,
@@ -228,6 +229,20 @@ describe( 'planEditMarkers', () => {
 		expect( planEditMarkers( prev, next, { authorId: 2 } ) ).toEqual( {
 			kind: 'delete',
 			actions: [ { type: 'remove-add', id: '8' } ],
+		} );
+	} );
+
+	it( 'does not remove another author pending addition', () => {
+		const prev = rtd( add( 8, 'abc', 2 ) );
+		const next = rtd( '' );
+		expect( planEditMarkers( prev, next, { authorId: 9 } ) ).toEqual( {
+			kind: 'delete',
+			actions: [],
+		} );
+		// An authored marker is not the unknown editor's either.
+		expect( planEditMarkers( prev, next ) ).toEqual( {
+			kind: 'delete',
+			actions: [],
 		} );
 	} );
 

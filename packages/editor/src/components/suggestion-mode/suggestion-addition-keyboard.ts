@@ -9,6 +9,7 @@ import { unlock } from '../../lock-unlock';
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { INLINE_OP_TYPE, useSuggestionsProvider } from './provider';
 import { useSuggestionOverlay } from './overlay-context';
+import useAbandonedNoteCleanup from './use-abandoned-note-cleanup';
 import { readInlineCaret, wrapInlineMarker } from '../inline-markers';
 import {
 	SUGGESTION_FORMAT_NAME,
@@ -24,6 +25,7 @@ import {
 	getCandidateDocuments,
 	isEventTargetSelectedRichText,
 	readEventRange,
+	readLiveInlineSelection,
 } from './keyboard-target';
 import { isPartOfPendingInsertion } from './store-interceptor';
 import { notifyEditRefused } from './refuse-edit';
@@ -191,6 +193,7 @@ export default function SuggestionAdditionKeyboard() {
 	const { requestInterceptorBypass, isDeferredInsertion } =
 		useSuggestionOverlay();
 	const registry = useRegistry();
+	const cleanupAbandonedNotes = useAbandonedNoteCleanup();
 
 	// The in-progress addition run. `id` is null while the suggestion note is
 	// being created; characters entered in that window queue in `pending` and
@@ -270,26 +273,51 @@ export default function SuggestionAdditionKeyboard() {
 			};
 			runRef.current = run;
 			/*
-			 * Whether the live caret still reads the run's block and
-			 * attribute. Checked after every await: if the user relocated
+			 * Whether the live caret still reads the run's block, attribute
+			 * and selection. Checked after every await: if the user relocated
 			 * during the note round trip the run is abandoned — writing the
 			 * buffered characters into the old location would materialize
-			 * text where the user no longer is. (The already-created note is
-			 * left behind; see the orphaned-note known limitation.)
+			 * text where the user no longer is. The offsets come from the DOM
+			 * selection, as `start` / `end` did: the store's offsets lag the
+			 * DOM under fast typing, so they only identify the field. Every
+			 * keystroke of the run was cancelled, so an unchanged selection
+			 * still reads exactly `start` / `end`.
 			 */
 			const caretStillAnchored = () => {
 				const live = readInlineCaret(
 					getSelectionStart,
 					getSelectionEnd
 				);
+				if (
+					! live ||
+					live.clientId !== clientId ||
+					live.attributeKey !== attributeKey
+				) {
+					return false;
+				}
+				const domRange = readLiveInlineSelection(
+					clientId,
+					attributeKey
+				);
 				return (
-					!! live &&
-					live.clientId === clientId &&
-					live.attributeKey === attributeKey
+					! domRange ||
+					( domRange.start === start && domRange.end === end )
 				);
 			};
+			/*
+			 * A note opened for a gesture that never wrote its marker has
+			 * nothing to accept or reject, and the garbage collector never
+			 * trashes an anchor it has not observed: trash it here.
+			 */
+			const abandon = ( ...ids: any[] ) => {
+				if ( runRef.current === run ) {
+					resetRun();
+				}
+				cleanupAbandonedNotes( clientId, ids );
+			};
+			let delId: any = null;
+			let addId: any = null;
 			try {
-				let delId = null;
 				if ( isTypeOver ) {
 					delId = await openInlineNote(
 						clientId,
@@ -297,15 +325,16 @@ export default function SuggestionAdditionKeyboard() {
 						SUGGESTION_TYPE_DELETION
 					);
 					if ( runRef.current !== run ) {
+						abandon( delId );
 						return;
 					}
 					if ( ! delId || ! caretStillAnchored() ) {
-						resetRun();
+						abandon( delId );
 						return;
 					}
 				}
 
-				const addId = await openInlineNote(
+				addId = await openInlineNote(
 					clientId,
 					attributeKey,
 					SUGGESTION_TYPE_ADDITION
@@ -313,10 +342,11 @@ export default function SuggestionAdditionKeyboard() {
 				// The run may have been abandoned (mode change) or the caret
 				// may have relocated while the request was in flight.
 				if ( runRef.current !== run ) {
+					abandon( delId, addId );
 					return;
 				}
 				if ( ! addId || ! caretStillAnchored() ) {
-					resetRun();
+					abandon( delId, addId );
 					return;
 				}
 				const buffered = mergeRunSegments( run.pending );
@@ -365,10 +395,9 @@ export default function SuggestionAdditionKeyboard() {
 				commit( clientId, attributeKey, inserted, run.caret );
 			} catch {
 				// `createSuggestion` already surfaces a notice on failure; drop
-				// the run so the next edit starts clean.
-				if ( runRef.current === run ) {
-					resetRun();
-				}
+				// the run so the next edit starts clean, and trash whichever
+				// half of a type-over did get its note.
+				abandon( delId, addId );
 			}
 		},
 		[
@@ -378,6 +407,7 @@ export default function SuggestionAdditionKeyboard() {
 			openInlineNote,
 			commit,
 			resetRun,
+			cleanupAbandonedNotes,
 			authorId,
 		]
 	);

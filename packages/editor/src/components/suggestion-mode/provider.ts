@@ -3,7 +3,6 @@ import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 // @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
-// @ts-expect-error No exported types
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
@@ -798,7 +797,7 @@ export function useSuggestionsProvider() {
 					type: 'snackbar',
 					isDismissible: true,
 				} );
-				return;
+				return false;
 			}
 
 			// `thread.blockClientId` is derived by matching `metadata.noteId`
@@ -838,7 +837,7 @@ export function useSuggestionsProvider() {
 					),
 					{ type: 'snackbar', isDismissible: true }
 				);
-				return;
+				return false;
 			}
 
 			// Inline suggestions live as a `core/suggestion` marker in a
@@ -919,8 +918,9 @@ export function useSuggestionsProvider() {
 							__( 'Failed to save suggestion status.' ),
 						{ type: 'snackbar', isDismissible: true }
 					);
+					return false;
 				}
-				return;
+				return true;
 			}
 
 			// Structural ops (block-remove, block-insert-after; block-move
@@ -1026,8 +1026,9 @@ export function useSuggestionsProvider() {
 							__( 'Failed to save suggestion status.' ),
 						{ type: 'snackbar', isDismissible: true }
 					);
+					return false;
 				}
-				return;
+				return true;
 			}
 
 			const currentAttributes = selectBlockAttributes( targetClientId );
@@ -1101,7 +1102,9 @@ export function useSuggestionsProvider() {
 					error?.message || __( 'Failed to save suggestion status.' ),
 					{ type: 'snackbar', isDismissible: true }
 				);
+				return false;
 			}
+			return true;
 		},
 		[
 			saveEntityRecord,
@@ -1246,8 +1249,9 @@ export function useSuggestionsProvider() {
 								__( 'Failed to reject suggestion.' ),
 							{ type: 'snackbar', isDismissible: true }
 						);
+						return false;
 					}
-					return;
+					return true;
 				}
 			}
 
@@ -1352,7 +1356,9 @@ export function useSuggestionsProvider() {
 					error?.message || __( 'Failed to reject suggestion.' ),
 					{ type: 'snackbar', isDismissible: true }
 				);
+				return false;
 			}
+			return true;
 		},
 		[
 			saveEntityRecord,
@@ -1451,7 +1457,9 @@ export function useSuggestionsProvider() {
 	 * Public apply / reject. Partners are resolved BEFORE the decision runs:
 	 * applying a removal takes its block out of the tree, and the scan reads
 	 * the group off the live blocks. Only the first decision reports through a
-	 * snackbar — the group is one change and one gesture.
+	 * snackbar — the group is one change and one gesture, so a half that
+	 * fails to save stops the group: the remaining halves stay pending, with
+	 * their blocks intact, for the user to decide again.
 	 */
 	const applySuggestion = useCallback(
 		async ( args: {
@@ -1461,9 +1469,15 @@ export function useSuggestionsProvider() {
 			silent?: boolean;
 		} ) => {
 			const partners = findGroupPartners( args );
-			await applyOneSuggestion( args );
+			let resolved = await applyOneSuggestion( args );
 			for ( const partner of partners ) {
-				await applyOneSuggestion( { ...partner, silent: true } );
+				if ( ! resolved ) {
+					break;
+				}
+				resolved = await applyOneSuggestion( {
+					...partner,
+					silent: true,
+				} );
 			}
 		},
 		[ applyOneSuggestion, findGroupPartners ]
@@ -1477,9 +1491,15 @@ export function useSuggestionsProvider() {
 			silent?: boolean;
 		} ) => {
 			const partners = findGroupPartners( args );
-			await rejectOneSuggestion( args );
+			let resolved = await rejectOneSuggestion( args );
 			for ( const partner of partners ) {
-				await rejectOneSuggestion( { ...partner, silent: true } );
+				if ( ! resolved ) {
+					break;
+				}
+				resolved = await rejectOneSuggestion( {
+					...partner,
+					silent: true,
+				} );
 			}
 		},
 		[ rejectOneSuggestion, findGroupPartners ]

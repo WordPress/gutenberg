@@ -21,9 +21,71 @@
  * is unchanged text, and an `add` run is text the author can see and select
  * on screen; dropping any of it would make copy return less than what was
  * highlighted. Only the proposal *about* that text is removed.
+ *
+ * Plain notes share the `metadata.noteId` link and are post-scoped the same
+ * way, so their inline `<mark class="wp-note">` markers come off with it.
  */
 import { addFilter } from '@wordpress/hooks';
+import { RichTextData, create, removeFormat } from '@wordpress/rich-text';
 import { stripSuggestionMarkersFromAttributes } from '../inline-suggestions';
+
+/*
+ * The inline note format and the class it serializes to, as registered by
+ * `collab-sidebar/format.js`. Named here rather than imported: that module
+ * brings the whole sidebar with it, and this strip runs at editor load.
+ */
+const NOTE_FORMAT_NAME = 'core/note';
+const NOTE_CLASS = 'wp-note';
+
+/**
+ * Unwrap inline note markers from a string-like attribute value. The
+ * `metadata.noteId` link is dropped below for plain notes too, since a note
+ * is as post-scoped as a suggestion; a marker left behind without its link
+ * would highlight the pasted run for a note the destination does not have.
+ *
+ * @param value Attribute value.
+ * @return The value without note markers, by reference when there were none.
+ */
+function stripNoteMarkers( value: any ): any {
+	const isRich = value instanceof RichTextData;
+	if ( ! isRich && typeof value !== 'string' ) {
+		return value;
+	}
+	const html = isRich ? value.toHTMLString() : value;
+	if ( ! html.includes( NOTE_CLASS ) ) {
+		return value;
+	}
+	const record = create( { html } );
+	const stripped = new RichTextData(
+		removeFormat( record, NOTE_FORMAT_NAME, 0, record.text.length ) as any
+	);
+	return isRich ? stripped : stripped.toHTMLString();
+}
+
+/**
+ * Unwrap inline note markers from every string-like attribute value.
+ *
+ * @param attributes Block attributes.
+ * @return Attributes without note markers, by reference when there were none.
+ */
+function stripNoteMarkersFromAttributes(
+	attributes: Record< string, any > | undefined
+): Record< string, any > | undefined {
+	if ( ! attributes || typeof attributes !== 'object' ) {
+		return attributes;
+	}
+	let next = attributes;
+	for ( const [ key, value ] of Object.entries( attributes ) ) {
+		const stripped = stripNoteMarkers( value );
+		if ( stripped !== value ) {
+			if ( next === attributes ) {
+				next = { ...attributes };
+			}
+			next[ key ] = stripped;
+		}
+	}
+	return next;
+}
 
 /**
  * Drop the post-scoped `metadata` keys a suggestion writes: the note link and
@@ -73,7 +135,9 @@ export function stripSuggestionDataFromBlock( block: any ): any {
 		return block;
 	}
 	const attributes = stripSuggestionMetadata(
-		stripSuggestionMarkersFromAttributes( block.attributes )
+		stripNoteMarkersFromAttributes(
+			stripSuggestionMarkersFromAttributes( block.attributes )
+		)
 	);
 	const innerBlocks = stripSuggestionDataFromBlocks( block.innerBlocks );
 	if (

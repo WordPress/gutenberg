@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createElement } from '@wordpress/element';
 import {
 	registerIconResolver,
@@ -18,7 +19,7 @@ describe( 'icon resolver registry', () => {
 	} );
 
 	it( 'resolves references through the registered resolver', async () => {
-		const resolver = jest.fn( async () => icon );
+		const resolver = vi.fn( async () => icon );
 		expect( registerIconResolver( resolver ) ).toBe( resolver );
 
 		await expect( resolveIcon( 'core/calendar' ) ).resolves.toBe( icon );
@@ -26,8 +27,8 @@ describe( 'icon resolver registry', () => {
 	} );
 
 	it( 'keeps the first registered resolver', async () => {
-		const first = jest.fn( async () => icon );
-		const second = jest.fn( async () => null );
+		const first = vi.fn( async () => icon );
+		const second = vi.fn( async () => null );
 
 		registerIconResolver( first );
 		expect( registerIconResolver( second ) ).toBeUndefined();
@@ -43,7 +44,7 @@ describe( 'icon resolver registry', () => {
 	} );
 
 	it( 'unregisters the resolver', async () => {
-		const resolver = jest.fn( async () => icon );
+		const resolver = vi.fn( async () => icon );
 		registerIconResolver( resolver );
 
 		expect( unregisterIconResolver() ).toBe( resolver );

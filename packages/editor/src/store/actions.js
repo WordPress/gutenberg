@@ -27,6 +27,7 @@ import {
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
 import { EDITOR_INTENT_SUGGEST, SUGGEST_LOCKED_POST_FIELDS } from './constants';
+import attachMediaInPost from './utils/attach-media-in-post';
 import { unlock } from '../lock-unlock';
 import { setCanvasWidth } from './private-actions';
 import { getCanvasWidthByDeviceType } from '../utils/device-type';
@@ -270,6 +271,10 @@ export const savePost =
 		dispatch.editPost( { content }, { undoIgnore: true } );
 
 		const previousRecord = select.getCurrentPost();
+		// Snapshotted alongside the content above, so that attaching media once
+		// the save finishes works from what was saved for the post itself.
+		const savedBlocks = select.getEditorBlocks();
+
 		let edits = {
 			id: previousRecord.id,
 			...registry
@@ -347,6 +352,28 @@ export const savePost =
 			}
 		}
 		dispatch( { type: 'REQUEST_POST_UPDATE_FINISH', options } );
+
+		// Attach any images in the post that aren't attached to a post yet. Not
+		// awaited: it shouldn't hold up the editor showing "Saved", and it
+		// handles its own errors.
+		//
+		// `isDeletingPost` is what catches trashing. `trashPost` deletes the post
+		// and then calls this, and the record still says what it did before the
+		// delete, so checking the status alone would miss it.
+		if (
+			! error &&
+			! options.isAutosave &&
+			! options.isPreview &&
+			! select.isDeletingPost() &&
+			previousRecord.status !== 'trash' &&
+			select.getEditorSettings().autoAttachMediaEnabled
+		) {
+			attachMediaInPost( registry, {
+				id: previousRecord.id,
+				type: previousRecord.type,
+				blocks: savedBlocks,
+			} );
+		}
 
 		if ( error ) {
 			const args = getNotificationArgumentsForSaveFail( {

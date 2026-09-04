@@ -1,3 +1,10 @@
+/*
+ * The card's placement is carried by inline styles the component sets, so
+ * this reads `element.style` directly: `toHaveStyle` computes styles, which
+ * the unit test conventions reserve for Browser Mode.
+ */
+/* eslint-disable jest-dom/prefer-to-have-style */
+import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { FloatingContainer } from '../floating-container';
 
@@ -19,8 +26,8 @@ describe( 'FloatingContainer', () => {
 			/>
 		);
 		const card = screen.getByTestId( 'card' );
-		expect( card ).toHaveStyle( { opacity: '0' } );
-		expect( card ).toHaveStyle( { pointerEvents: 'none' } );
+		expect( card.style.opacity ).toBe( '0' );
+		expect( card.style.pointerEvents ).toBe( 'none' );
 	} );
 
 	it( 'is visible and clickable once the board reports a position', () => {
@@ -28,15 +35,16 @@ describe( 'FloatingContainer', () => {
 			<AnyFloatingContainer floating={ { y: 120 } } data-testid="card" />
 		);
 		const card = screen.getByTestId( 'card' );
-		expect( card ).toHaveStyle( { top: '120px' } );
-		expect( card ).not.toHaveStyle( { opacity: '0' } );
-		expect( card ).not.toHaveStyle( { pointerEvents: 'none' } );
+		expect( card.style.top ).toBe( '120px' );
+		expect( card.style.opacity ).not.toBe( '0' );
+		expect( card.style.pointerEvents ).not.toBe( 'none' );
 	} );
 
 	it( 'leaves a non-floating card alone', () => {
 		render( <AnyFloatingContainer data-testid="card" /> );
 		const card = screen.getByTestId( 'card' );
-		expect( card ).not.toHaveStyle( { opacity: '0' } );
+		expect( card.style.opacity ).not.toBe( '0' );
 		expect( card ).not.toHaveClass( 'is-floating' );
 	} );
 } );
+/* eslint-enable jest-dom/prefer-to-have-style */

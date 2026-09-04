@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { createRegistry, controls } from '..';
 
 describe( 'controls', () => {
