@@ -15,11 +15,9 @@ const { subscribeDelegatedListener } = unlock( composePrivateApis );
 const registries = new WeakMap();
 
 /**
- * Subscribes a callback for editing and selection events the given editable
- * element owns, meaning it owns the document selection. This covers the case
- * where a focused editing host (e.g. an editable block editor canvas wrapper)
- * owns the selection: the event targets the host, never the element, so an
- * element-bound listener would not fire.
+ * Listens for events on the element. Unlike an element listener, it also
+ * fires when the selection is inside the element but a focused editing host
+ * around it (e.g. the editable canvas wrapper) is the event target.
  *
  * @param {HTMLElement} element   The editable element.
  * @param {string}      eventType DOM event name.
