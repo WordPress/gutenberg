@@ -9,6 +9,8 @@ import { MenuItemContentContext } from './context';
 import { ItemContent, useItemContent } from './item';
 import type { LinkItemProps } from './types';
 
+const BLANK_TARGET_PATTERN = /^_[bB][lL][aA][nN][kK]$/;
+
 /**
  * Renders a menu item that navigates to a link target.
  */
@@ -17,6 +19,7 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 		children,
 		className,
 		openInNewTab = false,
+		target,
 		prefix,
 		shortcut,
 		suffix,
@@ -29,7 +32,9 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 	},
 	ref
 ) {
-	const externalLinkIndicator = openInNewTab ? (
+	const shouldShowNewTabIndicator =
+		openInNewTab || BLANK_TARGET_PATTERN.test( target ?? '' );
+	const externalLinkIndicator = shouldShowNewTabIndicator ? (
 		<span
 			className={ styles[ 'external-link-indicator' ] }
 			role="img"
@@ -39,15 +44,19 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 			}
 		/>
 	) : null;
-	const { contentContextValue, itemAriaProps, shortcutDescriptionId } =
-		useItemContent( children, {
-			'aria-describedby': ariaDescribedBy,
-			'aria-keyshortcuts': ariaKeyShortcuts,
-			'aria-label': ariaLabel,
-			'aria-labelledby': ariaLabelledBy,
-			labelTrailing: externalLinkIndicator,
-			shortcut,
-		} );
+	const {
+		contentChildren,
+		contentContextValue,
+		itemAriaProps,
+		shortcutDescriptionId,
+	} = useItemContent( children, {
+		'aria-describedby': ariaDescribedBy,
+		'aria-keyshortcuts': ariaKeyShortcuts,
+		'aria-label': ariaLabel,
+		'aria-labelledby': ariaLabelledBy,
+		labelTrailing: externalLinkIndicator,
+		shortcut,
+	} );
 
 	return (
 		<_Menu.LinkItem
@@ -55,7 +64,7 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 			{ ...props }
 			{ ...itemAriaProps }
 			rel={ rel }
-			target={ openInNewTab ? '_blank' : undefined }
+			target={ target ?? ( openInNewTab ? '_blank' : undefined ) }
 			className={ clsx(
 				defenseStyles.a,
 				resetStyles[ 'box-sizing' ],
@@ -70,7 +79,7 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 					shortcutDescriptionId={ shortcutDescriptionId }
 					suffix={ suffix }
 				>
-					{ children }
+					{ contentChildren }
 				</ItemContent>
 			</MenuItemContentContext.Provider>
 		</_Menu.LinkItem>

@@ -48,14 +48,13 @@ jobs:
                       os: 'macos-15'
 
         steps:
-            # The BASE branch commit must be present for the check-root-dependencies script to read the package.json and
-            # compare with the HEAD branch. Fetching a depth of 2 ensures that's present.
-            # All other jobs only require a depth of 1.
+            # The parent commit must be present for dependency and test-routing
+            # checks that compare the current change with its baseline.
             - name: Checkout repository
               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
-                  fetch-depth: ${{ matrix.annotations && github.event_name == 'pull_request' && 2 || 1 }}
+                  fetch-depth: 2
                   persist-credentials: false
 
             - name: Validate labeler config
@@ -68,10 +67,8 @@ jobs:
                   node-version: ${{ matrix.node }}
                   cache: npm
 
-            - name: Pin npm version for consistency
-              run: |
-                  npm install --global npm@10
-                  npm --version
+            - name: Set up npm
+              uses: ./.github/setup-npm
 
             - name: npm install
               # A "full" install is executed, since `npm ci` does not always exit
@@ -107,7 +104,7 @@ jobs:
               run: npm run lint:js -- --format compact --quiet --prune-suppressions
 
             - name: Test agent skill setup
-              run: npm run test:unit -- tools/agents/test/setup-skills.test.js --runInBand
+              run: npm run test:unit:vitest -- --project=node tools/agents/test/setup-skills.test.js
 
             - name: Lint Styles
               if: ${{ matrix.annotations }}
@@ -120,6 +117,10 @@ jobs:
 
             - name: Type checking
               run: npm run typecheck
+
+            - name: Validate JavaScript test routing
+              if: ${{ matrix.node == '20' && matrix.os == 'ubuntu-24.04' }}
+              run: npm run test:unit:routing -- --base="$(git rev-parse HEAD^1)"
 
             - name: Build packages
               run: npm run build
@@ -168,6 +169,9 @@ jobs:
                   # No cache restoration: this workflow also runs on push,
                   # and the job doesn't need the install speed.
                   package-manager-cache: false
+
+            - name: Set up npm
+              uses: ./.github/setup-npm
 
             - name: npm install
               # Not the setup-node composite action: its cached node_modules

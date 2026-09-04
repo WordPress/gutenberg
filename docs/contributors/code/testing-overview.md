@@ -39,7 +39,7 @@ During the Jest-to-Vitest migration, run both `npm run test:unit` and `npm run t
 
 Keep your tests in a `test` folder in your working directory. The test file should have the same name as the test subject file.
 
-Use `*.jsdom.test.*` for tests that only require a virtual DOM. Use `*.browser.test.*` for tests that require Vitest Browser Mode. Leave Node-compatible test names without an environment suffix. The filename selects the test environment in both Jest and Vitest. During the migration, the manifest only selects the runner. Do not use per-file environment overrides.
+Use `*.jsdom.test.*` for tests that only require a virtual DOM. Use `*.browser.test.*` for tests that require Vitest Browser Mode. Leave Node-compatible test names without an environment suffix. Every new test runs in Vitest automatically. The filename selects its environment. During the remaining migration, the manifest lists only legacy JSDOM tests that still run in Jest. Do not use per-file environment overrides.
 
 ```
 +-- test
@@ -325,8 +325,12 @@ When a snapshot test fails, it just means that a component's rendering has chang
 However, if the change was intentional, follow these steps to update the snapshot. Run the following to update the snapshots:
 
 ```sh
-# --testPathPatterns is optional but will be much faster by only running matching tests
-npm run test:unit -- --updateSnapshot --testPathPatterns path/to/tests
+# Update snapshots for Node or Vitest-owned DOM tests
+npm run test:unit:vitest:update -- path/to/tests
+
+# Update snapshots for Jest-owned JSDOM tests
+# --testPathPatterns is optional but runs only matching tests
+npm run test:unit:update -- --testPathPatterns path/to/tests
 
 # Update snapshot for e2e tests
 npm run test:e2e -- --update-snapshots path/to/spec
@@ -402,15 +406,29 @@ Reducer tests are also a great fit for snapshots. They are often large, complex 
 
 #### Working with snapshots
 
-You might be blindsided by CI tests failing when snapshots don't match. You'll need to [update snapshots] if the changes are expected. The quick and dirty solution is to invoke Jest with `--updateSnapshot`. That can be done as follows:
+You might be blindsided by CI tests failing when snapshots don't match. You'll need to [update snapshots] if the changes are expected. Use the command for the test's runner:
 
 ```sh
-npm run test:unit -- --updateSnapshot --testPathPatterns path/to/tests
+# Node or Vitest-owned DOM tests
+npm run test:unit:vitest:update -- path/to/tests
+
+# Jest-owned JSDOM tests
+npm run test:unit:update -- --testPathPatterns path/to/tests
 ```
 
-`--testPathPatterns` is not required, but specifying a path will speed things up by running a subset of tests.
+The path is not required, but specifying one runs only matching tests and is faster.
 
-It's a great idea to keep `npm run test:unit:watch` running in the background as you work. Jest will run only the relevant tests for changed files, and when snapshot tests fail, just hit `u` to update a snapshot!
+Keep the applicable watch command running in the background as you work:
+
+```sh
+# Node or Vitest-owned DOM tests
+npm run test:unit:vitest:watch -- path/to/tests
+
+# Jest-owned JSDOM tests
+npm run test:unit:watch -- --testPathPatterns path/to/tests
+```
+
+When a snapshot test fails in either runner, press `u` to update the snapshot.
 
 #### Pain points
 
@@ -616,16 +634,16 @@ npm run test:performance
 
 This gives you the result for the current branch/code on the running environment.
 
-In addition to that, you can also compare the metrics across branches (or tags or commits) by running the following command `npm exec release-cli -- perf [branches]`, example:
+In addition to that, you can also compare the metrics across branches (or tags or commits) by running the following command `npm exec --no release-cli -- perf [branches]`, example:
 
-```
-npm exec release-cli -- perf trunk v8.1.0 v8.0.0
+```sh
+npm exec --no release-cli -- perf trunk v8.1.0 v8.0.0
 ```
 
 Finally, you can pass an additional `--tests-branch` argument to specify which branch's performance test files you'd like to run. This is particularly useful when modifying/extending the perf tests:
 
-```
-npm exec release-cli -- perf trunk v8.1.0 v8.0.0 --tests-branch add/perf-tests-coverage
+```sh
+npm exec --no release-cli -- perf trunk v8.1.0 v8.0.0 --tests-branch add/perf-tests-coverage
 ```
 
 **Note** This command needs may take some time to perform the benchmark. While running make sure to avoid using your computer or have a lot of background process to minimize external factors that can impact the results across branches.

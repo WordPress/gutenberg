@@ -1,9 +1,9 @@
+import { describe, it } from 'vitest';
 import type { ForwardedRef } from 'react';
 import { contextConnect, contextConnectWithoutRef } from '../context-connect';
 import type { WordPressComponentProps } from '../wordpress-component';
 
 // Static TypeScript tests
-/* eslint-disable jest/expect-expect */
 describe( 'ref forwarding', () => {
 	const ComponentWithRef = (
 		props: WordPressComponentProps< {}, 'div' >,
@@ -47,4 +47,3 @@ describe( 'ref forwarding', () => {
 		<NoRef foo={ null } />;
 	} );
 } );
-/* eslint-enable jest/expect-expect */
