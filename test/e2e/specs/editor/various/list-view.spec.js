@@ -341,11 +341,27 @@ test.describe( 'List View', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Paragraph text' },
 		} );
-		await expect(
-			editor.canvas.getByRole( 'document', {
-				name: 'Block: Paragraph',
-			} )
-		).toBeFocused();
+		// The block owns the caret: it is focused itself, or the engaged
+		// editing host holds focus with the selection inside the block.
+		await expect
+			.poll( () =>
+				editor.canvas
+					.getByRole( 'document', {
+						name: 'Block: Paragraph',
+					} )
+					.evaluate( ( el ) => {
+						const { activeElement } = el.ownerDocument;
+						const { anchorNode } =
+							el.ownerDocument.defaultView.getSelection();
+						return (
+							el === activeElement ||
+							( activeElement?.contentEditable === 'true' &&
+								activeElement.contains( el ) &&
+								el.contains( anchorNode ) )
+						);
+					} )
+			)
+			.toBe( true );
 
 		// Open List View.
 		await pageUtils.pressKeys( 'access+o' );
