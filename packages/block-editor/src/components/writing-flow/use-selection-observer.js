@@ -445,9 +445,9 @@ export default function useSelectionObserver() {
 			}
 
 			// Native `selectionchange` events are asynchronous: a clipboard
-			// event may fire before the store has been updated with a cross
-			// block selection that was just made. Sync it before the clipboard
-			// handlers (bubble phase) read the store.
+			// event or a keydown may fire before the store has been updated
+			// with a cross block selection that was just made. Sync it before
+			// the handlers that read the store run.
 			function ensureMultiBlockSelectionSync( event ) {
 				const selection = defaultView.getSelection();
 
@@ -464,9 +464,22 @@ export default function useSelectionObserver() {
 					extractSelectionEndNode( selection, isTripleClick )
 				);
 
-				if ( startClientId !== endClientId ) {
-					onSelectionChange( event );
+				if ( startClientId === endClientId ) {
+					return;
 				}
+
+				// Skip when the store already reflects the block range. The
+				// sync runs on every keydown, and a `multiSelect` dispatch
+				// announces itself to screen readers, so an unchanged range
+				// must not be dispatched again.
+				if (
+					getSelectionStart().clientId === startClientId &&
+					getSelectionEnd().clientId === endClientId
+				) {
+					return;
+				}
+
+				onSelectionChange( event );
 			}
 
 			ownerDocument.addEventListener(
@@ -481,6 +494,11 @@ export default function useSelectionObserver() {
 			defaultView.addEventListener( 'mouseup', onMouseUp );
 			node.addEventListener( 'mousedown', onMouseDown );
 			node.addEventListener( 'keydown', onKeyDown );
+			ownerDocument.addEventListener(
+				'keydown',
+				ensureMultiBlockSelectionSync,
+				true
+			);
 			ownerDocument.addEventListener(
 				'copy',
 				ensureMultiBlockSelectionSync,
@@ -504,6 +522,11 @@ export default function useSelectionObserver() {
 				defaultView.removeEventListener( 'mouseup', onMouseUp );
 				node.removeEventListener( 'mousedown', onMouseDown );
 				node.removeEventListener( 'keydown', onKeyDown );
+				ownerDocument.removeEventListener(
+					'keydown',
+					ensureMultiBlockSelectionSync,
+					true
+				);
 				ownerDocument.removeEventListener(
 					'copy',
 					ensureMultiBlockSelectionSync,
