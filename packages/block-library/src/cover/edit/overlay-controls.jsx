@@ -16,24 +16,9 @@ import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { DOWN } from '@wordpress/keycodes';
 import { Stack } from '@wordpress/ui';
-import type { KeyboardEvent, ReactElement } from 'react';
 import { unlock } from '../../lock-unlock';
 
 const { isDefaultBlockStyleState } = unlock( blockEditorPrivateApis );
-
-type OverlayColor = {
-	color?: string;
-	class?: string;
-	slug?: string;
-};
-
-type CoverOverlayColorToolbarControlProps = {
-	clientId: string;
-	overlayColor: OverlayColor;
-	setOverlayColor: ( color: string | undefined ) => void;
-	dimRatio: number;
-	updateDimRatio: ( dimRatio?: number ) => void;
-};
 
 export default function CoverOverlayColorToolbarControl( {
 	clientId,
@@ -41,7 +26,7 @@ export default function CoverOverlayColorToolbarControl( {
 	setOverlayColor,
 	dimRatio,
 	updateDimRatio,
-}: CoverOverlayColorToolbarControlProps ): ReactElement | null {
+} ) {
 	const { gradientValue, setGradient } = useGradient();
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 
@@ -80,7 +65,7 @@ export default function CoverOverlayColorToolbarControl( {
 				headerTitle: __( 'Overlay' ),
 			} }
 			renderToggle={ ( { isOpen, onToggle } ) => {
-				const openOnArrowDown = ( event: KeyboardEvent ) => {
+				const openOnArrowDown = ( event ) => {
 					if ( ! isOpen && event.keyCode === DOWN ) {
 						event.preventDefault();
 						onToggle();
