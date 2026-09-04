@@ -83,12 +83,6 @@
 	&.is-selected.is-synced td {
 		background: var(--wp-block-synced-color);
 	}
-	@media (forced-colors: active) {
-		&.is-selected td,
-		&.is-selected.is-synced td {
-			background: SelectedItem;
-		}
-	}
 	&.is-synced:not(.is-selected) .block-editor-list-view-block-contents {
 		&:hover,
 		&:focus,
@@ -116,6 +110,25 @@
 		--focus-color: var(--wpds-color-foreground-interactive-brand-strong);
 		@include outset-ring__focus();
 		outline-offset: -2px;
+	}
+	@media (forced-colors: active) {
+		&.is-selected td,
+		&.is-selected.is-synced td {
+			background: SelectedItem;
+		}
+
+		&.is-selected .block-editor-list-view-block-contents,
+		&.is-selected .components-button.has-icon {
+			// Prevent backplate with same color as text in dark mode.
+			forced-color-adjust: none;
+			color: SelectedItemText;
+			--focus-color: SelectedItemText;
+		}
+
+		&.is-selected svg,
+		&.is-selected.is-synced svg {
+			fill: SelectedItemText;
+		}
 	}
 
 	// Border radius for corners of the selected item.
