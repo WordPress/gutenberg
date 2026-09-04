@@ -12,7 +12,7 @@ import type { Props } from '../types';
 
 const meta: Meta< typeof Menu > = {
 	id: 'components-menu',
-	title: 'Components/Actions/Menu',
+	title: 'Classic Components/Actions/Menu',
 	component: Menu,
 	subcomponents: {
 		Item: Menu.Item,

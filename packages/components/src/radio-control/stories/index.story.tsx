@@ -5,7 +5,7 @@ import RadioControl from '..';
 const meta: Meta< typeof RadioControl > = {
 	tags: [ 'manifest' ],
 	component: RadioControl,
-	title: 'Components/Selection & Input/Common/RadioControl',
+	title: 'Classic Components/Selection & Input/Common/RadioControl',
 	id: 'components-radiocontrol',
 	argTypes: {
 		onChange: {

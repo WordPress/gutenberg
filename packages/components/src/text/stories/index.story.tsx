@@ -3,7 +3,7 @@ import { Text } from '../component';
 
 const meta: Meta< typeof Text > = {
 	component: Text,
-	title: 'Components/Typography/Text',
+	title: 'Classic Components/Typography/Text',
 	id: 'components-text',
 	argTypes: {
 		as: { control: { type: 'text' } },

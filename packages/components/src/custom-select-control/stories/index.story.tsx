@@ -5,7 +5,7 @@ import CustomSelectControl from '..';
 
 const meta: Meta< typeof CustomSelectControl > = {
 	tags: [ 'manifest' ],
-	title: 'Components/Selection & Input/Common/CustomSelectControl',
+	title: 'Classic Components/Selection & Input/Common/CustomSelectControl',
 	component: CustomSelectControl,
 	id: 'components-customselectcontrol',
 	argTypes: {

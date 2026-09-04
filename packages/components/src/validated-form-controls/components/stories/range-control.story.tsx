@@ -4,7 +4,7 @@ import { formDecorator } from './story-utils';
 import { ValidatedRangeControl } from '../range-control';
 
 const meta: Meta< typeof ValidatedRangeControl > = {
-	title: 'Components/Selection & Input/Validated Form Controls/ValidatedRangeControl',
+	title: 'Classic Components/Selection & Input/Validated Form Controls/ValidatedRangeControl',
 	id: 'components-validatedrangecontrol',
 	component: ValidatedRangeControl,
 	tags: [ 'status-private' ],

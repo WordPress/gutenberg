@@ -4,7 +4,7 @@ import { ProgressBar } from '..';
 const meta: Meta< typeof ProgressBar > = {
 	tags: [ 'manifest' ],
 	component: ProgressBar,
-	title: 'Components/Feedback/ProgressBar',
+	title: 'Classic Components/Feedback/ProgressBar',
 	id: 'components-progressbar',
 	argTypes: {
 		value: { control: { type: 'number', min: 0, max: 100, step: 1 } },

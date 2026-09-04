@@ -9,7 +9,8 @@ import type {
 } from '../types';
 
 const meta: Meta< typeof QueryControls > = {
-	title: 'Components/QueryControls',
+	id: 'components-querycontrols',
+	title: 'Classic Components/QueryControls',
 	component: QueryControls,
 	argTypes: {
 		numberOfItems: { control: false },

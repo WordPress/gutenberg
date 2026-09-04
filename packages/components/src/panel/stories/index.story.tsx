@@ -6,7 +6,7 @@ import PanelBody from '../body';
 import InputControl from '../../input-control';
 
 const meta: Meta< typeof Panel > = {
-	title: 'Components/Containers/Panel',
+	title: 'Classic Components/Containers/Panel',
 	id: 'components-panel',
 	component: Panel,
 	subcomponents: { PanelRow, PanelBody },

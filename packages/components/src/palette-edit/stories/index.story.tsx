@@ -5,7 +5,8 @@ import PaletteEdit from '..';
 import type { Color, Duotone, Gradient, PaletteElement } from '../types';
 
 const meta: Meta< typeof PaletteEdit > = {
-	title: 'Components/PaletteEdit',
+	id: 'components-paletteedit',
+	title: 'Classic Components/PaletteEdit',
 	component: PaletteEdit,
 	args: {
 		onChange: fn(),

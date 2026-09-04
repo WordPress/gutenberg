@@ -7,7 +7,7 @@ import { NavigableMenu } from '../../navigable-container';
 
 const meta: Meta< typeof MenuGroup > = {
 	tags: [ 'manifest' ],
-	title: 'Components/Actions/MenuGroup',
+	title: 'Classic Components/Actions/MenuGroup',
 	component: MenuGroup,
 	id: 'components-menugroup',
 	argTypes: {

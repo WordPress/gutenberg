@@ -4,7 +4,7 @@ import KeyboardShortcuts from '..';
 const meta: Meta< typeof KeyboardShortcuts > = {
 	tags: [ 'manifest' ],
 	component: KeyboardShortcuts,
-	title: 'Components/Utilities/KeyboardShortcuts',
+	title: 'Classic Components/Utilities/KeyboardShortcuts',
 	id: 'components-keyboardshortcuts',
 	parameters: {
 		controls: { expanded: true },

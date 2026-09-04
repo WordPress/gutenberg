@@ -4,7 +4,7 @@ import TextControl from '..';
 
 const meta: Meta< typeof TextControl > = {
 	component: TextControl,
-	title: 'Components/Selection & Input/Common/TextControl',
+	title: 'Classic Components/Selection & Input/Common/TextControl',
 	id: 'components-textcontrol',
 	argTypes: {
 		help: { control: { type: 'text' } },
