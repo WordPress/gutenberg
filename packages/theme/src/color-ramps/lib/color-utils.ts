@@ -4,16 +4,13 @@ import {
 	to,
 	toGamut,
 	serialize,
-	getLuminance,
+	contrastWCAG21,
 	sRGB,
 	OKLCH,
 	type PlainColorObject,
 } from 'colorjs.io/fn';
 
 const ALLOWED_SEED_COLOR_SPACES = [ sRGB ];
-const MAX_CACHED_LUMINANCES = 2_048;
-const luminanceCache = new Map< string, number >();
-const objectLuminanceCache = new WeakMap< PlainColorObject, number >();
 
 /**
  * Serialize a color as rounded sRGB hex.
@@ -37,62 +34,8 @@ export function getContrast(
 	colorA: string | PlainColorObject,
 	colorB: string | PlainColorObject
 ): number {
-	return getContrastFromLuminances(
-		getRelativeLuminance( colorA ),
-		getRelativeLuminance( colorB )
-	);
-}
-
-/**
- * Return a color's non-negative relative luminance. Serialized colors use a
- * bounded cache because accent ramps share surface references. Color objects
- * use a weak cache and must not be mutated after measurement.
- *
- * @param color Color to measure.
- */
-export function getRelativeLuminance(
-	color: string | PlainColorObject
-): number {
-	if ( typeof color !== 'string' ) {
-		const cachedLuminance = objectLuminanceCache.get( color );
-		if ( cachedLuminance !== undefined ) {
-			return cachedLuminance;
-		}
-		const luminance = Math.max( getLuminance( color ), 0 );
-		objectLuminanceCache.set( color, luminance );
-		return luminance;
-	}
-
-	const cachedLuminance = luminanceCache.get( color );
-	if ( cachedLuminance !== undefined ) {
-		return cachedLuminance;
-	}
-
 	ColorSpace.register( sRGB );
-	const luminance = Math.max( getLuminance( color ), 0 );
-	if ( luminanceCache.size >= MAX_CACHED_LUMINANCES ) {
-		const oldestKey = luminanceCache.keys().next().value;
-		if ( oldestKey !== undefined ) {
-			luminanceCache.delete( oldestKey );
-		}
-	}
-	luminanceCache.set( color, luminance );
-	return luminance;
-}
-
-/**
- * Calculate a WCAG 2.1 contrast ratio from precomputed relative luminances.
- *
- * @param first  First relative luminance.
- * @param second Second relative luminance.
- */
-export function getContrastFromLuminances(
-	first: number,
-	second: number
-): number {
-	return first > second
-		? ( first + 0.05 ) / ( second + 0.05 )
-		: ( second + 0.05 ) / ( first + 0.05 );
+	return contrastWCAG21( colorA, colorB );
 }
 
 /**
