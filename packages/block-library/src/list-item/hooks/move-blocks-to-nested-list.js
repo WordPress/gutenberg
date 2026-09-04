@@ -21,7 +21,10 @@ export function moveBlocksToNestedList(
 	const { getBlockOrder, getBlock } = registry.select( blockEditorStore );
 	const { moveBlocksToPosition, removeBlocks, insertBlock } =
 		registry.dispatch( blockEditorStore );
-	const [ nestedListId ] = getBlockOrder( listItemId );
+	// A list item can hold more than one nested list; append to the last one,
+	// the same subtree a reader sees at the end of the item.
+	const nestedLists = getBlockOrder( listItemId );
+	const nestedListId = nestedLists[ nestedLists.length - 1 ];
 
 	if ( nestedListId ) {
 		moveBlocksToPosition( clientIds, sourceListId, nestedListId );
