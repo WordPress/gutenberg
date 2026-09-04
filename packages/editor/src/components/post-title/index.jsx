@@ -4,7 +4,6 @@ import { forwardRef, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { ENTER } from '@wordpress/keycodes';
 import { pasteHandler } from '@wordpress/blocks';
 import {
 	privateApis as richTextPrivateApis,
@@ -97,8 +96,14 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 		insertDefaultBlock( undefined, undefined, 0 );
 	}
 
-	function onKeyDown( event ) {
-		if ( event.keyCode === ENTER ) {
+	function onBeforeInput( event ) {
+		// Handled on beforeinput rather than keydown: moving focus to the new
+		// block while the keydown is still being handled leaves the iOS
+		// keyboard's auto-capitalization stale.
+		if (
+			event.nativeEvent.inputType === 'insertParagraph' ||
+			event.nativeEvent.inputType === 'insertLineBreak'
+		) {
 			event.preventDefault();
 			onEnterPress();
 		}
@@ -180,7 +185,7 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 			aria-multiline="true"
 			onFocus={ onSelect }
 			onBlur={ onUnselect }
-			onKeyDown={ onKeyDown }
+			onBeforeInput={ onBeforeInput }
 			onPaste={ onPaste }
 			style={ style }
 		/>
