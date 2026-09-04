@@ -16,7 +16,7 @@ function optionsButton( page: Page ) {
 }
 
 /*
- * `MenuItemsChoice` keeps its dropdown open after a selection, so the menu
+ * A radio item keeps the Options menu open after a selection, so the menu
  * may already be showing. Options is a toggle: clicking it in that state
  * would close the menu rather than open it.
  */
@@ -42,9 +42,9 @@ async function switchIntent( page: Page, intentLabel: string ) {
 	} );
 
 	/*
-	 * `MenuItemsChoice` keeps its dropdown open after a selection, and Escape
+	 * A radio item keeps the Options menu open after a selection, and Escape
 	 * does not reliably dismiss it. Since Options is a toggle, clicking it
-	 * while the dropdown is still mounted would close the menu rather than
+	 * while the menu is still mounted would close the menu rather than
 	 * reopen it, so only click when the menu is not already showing.
 	 */
 	if ( ! ( await menuItem.isVisible() ) ) {

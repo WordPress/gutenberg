@@ -180,7 +180,7 @@ function PostTemplateDropdownContent( { onClose } ) {
 									type: 'snackbar',
 									actions: [
 										{
-											label: __( 'Go back' ),
+											label: __( 'Back' ),
 											onClick: () =>
 												getEditorSettings().onNavigateToPreviousEntityRecord(),
 										},

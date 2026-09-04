@@ -8,11 +8,11 @@ function optionsButton( page: Page ) {
 }
 
 /*
- * `MenuItemsChoice` keeps its dropdown open after a selection, and Escape does
- * not reliably dismiss it. Since Options is a toggle, clicking it while the
- * dropdown is still mounted closes the menu rather than reopening it, and the
- * assertion that follows fails with "element not found". Only click when the
- * menu is not already showing, so the helper is safe to call either way.
+ * A radio item keeps the Options menu open after a selection. Since Options
+ * is a toggle, clicking it while the menu is still mounted closes the menu
+ * rather than reopening it, and the assertion that follows fails with
+ * "element not found". Only click when the menu is not already showing, so
+ * the helper is safe to call either way.
  */
 async function openIntentSwitcher( page: Page ) {
 	const suggestChoice = page.getByRole( 'menuitemradio', {
@@ -47,17 +47,18 @@ test.describe( 'Editor intent switcher', () => {
 	} ) => {
 		await openIntentSwitcher( page );
 
-		// Use full accessible names (label + info) to disambiguate from the
-		// sibling Visual/Code editor menuitemradios which would otherwise
-		// match 'Editing' via Playwright's substring search.
+		// Match the labels exactly: the sibling Visual/Code editor radio items
+		// would otherwise match 'Editing' via Playwright's substring search.
 		const editChoice = page.getByRole( 'menuitemradio', {
-			name: /^Editing\s+Edit content directly/,
+			name: 'Editing',
+			exact: true,
 		} );
 		const suggestChoice = page.getByRole( 'menuitemradio', {
 			name: /^Suggesting/,
 		} );
 		const viewChoice = page.getByRole( 'menuitemradio', {
-			name: /^Viewing\s+Read-only/,
+			name: 'Viewing',
+			exact: true,
 		} );
 
 		await expect( editChoice ).toBeVisible();
@@ -73,7 +74,8 @@ test.describe( 'Editor intent switcher', () => {
 		await openIntentSwitcher( page );
 		await expect(
 			page.getByRole( 'menuitemradio', {
-				name: /^Editing\s+Edit content directly/,
+				name: 'Editing',
+				exact: true,
 			} )
 		).toHaveAttribute( 'aria-checked', 'true' );
 	} );
@@ -82,9 +84,11 @@ test.describe( 'Editor intent switcher', () => {
 		page,
 		pageUtils,
 	} ) => {
-		const shortcut = '.components-menu-item__shortcut';
+		// The menu exposes an item's shortcut through `aria-keyshortcuts`.
+		const shortcut = 'aria-keyshortcuts';
 		const editChoice = page.getByRole( 'menuitemradio', {
-			name: /^Editing\s+Edit content directly/,
+			name: 'Editing',
+			exact: true,
 		} );
 		const suggestChoice = page.getByRole( 'menuitemradio', {
 			name: /^Suggesting/,
@@ -98,15 +102,15 @@ test.describe( 'Editor intent switcher', () => {
 		 * is what makes the hint useful. `ModeSwitcher` behaves the same way.
 		 */
 		await expect( editChoice ).toHaveAttribute( 'aria-checked', 'true' );
-		await expect( editChoice.locator( shortcut ) ).toHaveCount( 0 );
-		await expect( suggestChoice.locator( shortcut ) ).toHaveCount( 1 );
+		await expect( editChoice ).not.toHaveAttribute( shortcut );
+		await expect( suggestChoice ).toHaveAttribute( shortcut, /.+/ );
 
 		// The hint follows the selection rather than being dropped for good.
 		await pageUtils.pressKeys( 'secondary+X' );
 		await openIntentSwitcher( page );
 		await expect( suggestChoice ).toHaveAttribute( 'aria-checked', 'true' );
-		await expect( suggestChoice.locator( shortcut ) ).toHaveCount( 0 );
-		await expect( editChoice.locator( shortcut ) ).toHaveCount( 1 );
+		await expect( suggestChoice ).not.toHaveAttribute( shortcut );
+		await expect( editChoice ).toHaveAttribute( shortcut, /.+/ );
 	} );
 
 	test( 'keyboard shortcut cycles between intents', async ( {
@@ -130,7 +134,7 @@ test.describe( 'Editor intent switcher', () => {
 		await pageUtils.pressKeys( 'secondary+C' );
 		await openIntentSwitcher( page );
 		await expect(
-			page.getByRole( 'menuitemradio', { name: /^Viewing\s+Read-only/ } )
+			page.getByRole( 'menuitemradio', { name: 'Viewing', exact: true } )
 		).toHaveAttribute( 'aria-checked', 'true' );
 
 		// Back to Edit.
@@ -138,7 +142,8 @@ test.describe( 'Editor intent switcher', () => {
 		await openIntentSwitcher( page );
 		await expect(
 			page.getByRole( 'menuitemradio', {
-				name: /^Editing\s+Edit content directly/,
+				name: 'Editing',
+				exact: true,
 			} )
 		).toHaveAttribute( 'aria-checked', 'true' );
 	} );

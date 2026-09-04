@@ -110,11 +110,11 @@
             - className
             - finalFocus
             - initialFocus
-            - popupWidth
             - portal
             - positioner
             - render
             - style
+            - width
       - name: Autocomplete.Portal
         props:
             - className
@@ -140,6 +140,12 @@
             - sticky
             - style
       - name: Autocomplete.Row
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Autocomplete.Status
         props:
             - children
             - className
@@ -619,6 +625,13 @@
             - render
             - style
             - variant
+      - name: Field.VisualLabel
+        props:
+            - children
+            - className
+            - render
+            - style
+            - variant
 - name: Fieldset.Root
   props:
       - children
@@ -779,6 +792,7 @@
       - openInNewTab
       - render
       - style
+      - target
       - tone
       - variant
 - name: MenuGroup
@@ -1427,11 +1441,13 @@
   subcomponents:
       - name: ToggleGroupControlOption
         props:
+            - disabled
             - label
             - showTooltip
             - value
       - name: ToggleGroupControlOptionIcon
         props:
+            - disabled
             - icon
             - label
             - value
@@ -1482,6 +1498,10 @@
         props:
             - children
             - className
+            - closeDelay
+            - closeOnClick
+            - delay
+            - disabled
             - render
             - style
 - name: TreeGrid
