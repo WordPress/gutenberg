@@ -15,7 +15,11 @@ test.describe( 'Site editor navigation', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test( 'Can use keyboard to navigate the site editor', async ( {
+	// The extensible site editor has its own navigation shell (sidebar links
+	// without the drilldown frames, Saved button, or focusable view-mode
+	// iframe this test drives), so this scenario only applies to the classic
+	// site editor.
+	test( 'Can use keyboard to navigate the site editor @site-editor-v1-only', async ( {
 		admin,
 		editorNavigationUtils,
 		page,
