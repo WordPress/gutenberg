@@ -12,6 +12,8 @@
 -   Add a responsive `Breadcrumb` navigation component. ([#80425](https://github.com/WordPress/gutenberg/pull/80425))
 -   Add `SearchableSelect` form primitive ([#80961](https://github.com/WordPress/gutenberg/pull/80961)).
 -   Add `Field.VisualLabel` for a purely visual label outside `Field.Root` ([#82095](https://github.com/WordPress/gutenberg/pull/82095)).
+-   Add a responsive `Breadcrumb` navigation component. ([#80425](https://github.com/WordPress/gutenberg/pull/80425))
+-   `Menu`: Add `PrefixIcon` for label-aligned prefix icons, with a default size of 24px. ([#82346](https://github.com/WordPress/gutenberg/pull/82346))
 
 ### Enhancements
 
@@ -32,6 +34,7 @@
 -   `AlertDialog`: Use a neutral tone for the cancel button. ([#82261](https://github.com/WordPress/gutenberg/pull/82261))
 -   `Input`: Hide the field focus ring when a prefix or suffix slot control is focused. ([#82257](https://github.com/WordPress/gutenberg/pull/82257))
 -   `Icon`: Merge a consumer-supplied `style` prop with the icon's intrinsic styles instead of replacing them, so styles like `fill: none` on stroke-based icons survive unless the consumer overrides the same property explicitly. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+-   `Menu`: Align selection indicators and prefix icons with the first label line, including wrapped labels and items with descriptions, and improve checkbox checkmarks' optical alignment. ([#82346](https://github.com/WordPress/gutenberg/pull/82346))
 
 ### Documentation
 
