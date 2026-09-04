@@ -20,8 +20,11 @@ export default function DeleteCategoryMenuItem( { category, onClose } ) {
 
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
-	const { deleteEntityRecord, invalidateResolution } =
-		useDispatch( coreStore );
+	const {
+		deleteEntityRecord,
+		invalidateResolution,
+		invalidateResolutionForStoreSelector,
+	} = useDispatch( coreStore );
 
 	const onDelete = async () => {
 		try {
@@ -41,6 +44,9 @@ export default function DeleteCategoryMenuItem( { category, onClose } ) {
 				PATTERN_TYPES.user,
 				{ per_page: -1 },
 			] );
+			// The pattern view configuration lists a view per category, so
+			// refresh it too or the sidebar keeps listing the deleted one.
+			invalidateResolutionForStoreSelector( 'getViewConfig' );
 
 			createSuccessNotice(
 				sprintf(
