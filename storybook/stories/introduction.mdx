@@ -1,4 +1,4 @@
-import { Meta } from '@storybook/addon-docs/blocks';
+import { Markdown, Meta } from '@storybook/addon-docs/blocks';
 import { JumpToIcon } from '@storybook/icons';
 import { InlineIcon } from './docs/inline-icon';
 
@@ -44,15 +44,17 @@ The sidebar lists everything on this site. Use the search box (⌘K / Ctrl+K) to
 
 Component names carry an icon with their status. The same statuses are available as tags in the filter, so you can, for example, show recommended components only.
 
+<Markdown>{ `
 | Icon | Tag                       | Meaning                                                                          |
 | ---- | ------------------------- | -------------------------------------------------------------------------------- |
-| ✅   | `status-recommended`      | Use this component for new UI.                                                   |
-| ⚠️   | `status-use-with-caution` | Use with care; check the notes on the component page.                            |
-| 🚫   | `status-not-recommended`  | Do not use for new UI. The component page points at the recommended alternative. |
-| ❓   | `status-unaudited`        | Not audited yet against the design system.                                       |
-| 🧪   | `status-experimental`     | Under active development, may change in future releases.                         |
-| 🔒   | `status-private`          | Locked as a private API, not for use outside Gutenberg.                          |
-| 🚧   | `status-wip`              | Work in progress, not ready for production.                                      |
+| ✅   | \`status-recommended\`      | Use this component for new UI.                                                   |
+| ⚠️   | \`status-use-with-caution\` | Use with care; check the notes on the component page.                            |
+| 🚫   | \`status-not-recommended\`  | Do not use for new UI. The component page points at the recommended alternative. |
+| ❓   | \`status-unaudited\`        | Not audited yet against the design system.                                       |
+| 🧪   | \`status-experimental\`     | Under active development, may change in future releases.                         |
+| 🔒   | \`status-private\`          | Locked as a private API, not for use outside Gutenberg.                          |
+| 🚧   | \`status-wip\`              | Work in progress, not ready for production.                                      |
+` }</Markdown>
 
 Hover an icon in the sidebar for the same description. Each component page also shows its status at the top.
 
