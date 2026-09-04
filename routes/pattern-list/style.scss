@@ -5,6 +5,16 @@
 .routes-pattern-list__tabs-wrapper {
 	border-bottom: 1px solid $gray-100;
 	padding: 0 $grid-unit-30;
+
+	// The tab list sizes to its content, and there is one tab per pattern
+	// category, so it can be wider than the page. Keep its width out of the
+	// page's intrinsic size and cap it at the wrapper's, so the tab list
+	// scrolls instead of widening the page.
+	contain: inline-size;
+
+	[role="tablist"] {
+		max-width: 100%;
+	}
 }
 
 // Colorize synced pattern badges in grid view
