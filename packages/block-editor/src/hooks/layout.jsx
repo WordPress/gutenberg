@@ -238,7 +238,10 @@ export function useLayoutStyles( blockAttributes = {}, blockName, selector ) {
 			: layout || {};
 	const fullLayoutType = getLayoutType( usedLayout?.type || 'default' );
 	const [ blockGapSupport ] = useSettings( 'spacing.blockGap' );
-	const hasBlockGapSupport = blockGapSupport !== null;
+	// Like the server's `isset()` check, an unset or `null` setting means the
+	// theme has not opted into block gap.
+	const hasBlockGapSupport =
+		blockGapSupport !== null && blockGapSupport !== undefined;
 	return fullLayoutType?.getLayoutStyle?.( {
 		blockName,
 		selector,
@@ -703,7 +706,10 @@ function BlockWithLayoutStyles( {
 	const selectorPrefix = `wp-container-${ kebabCase( name ) }-is-layout-`;
 	// Higher specificity to override defaults from theme.json.
 	const selector = `.${ selectorPrefix }${ id }`;
-	const hasBlockGapSupport = blockGapSupport !== null;
+	// Like the server's `isset()` check, an unset or `null` setting means the
+	// theme has not opted into block gap.
+	const hasBlockGapSupport =
+		blockGapSupport !== null && blockGapSupport !== undefined;
 
 	// Get CSS string for the current layout type.
 	// The CSS and `style` element is only output if it is not empty.
