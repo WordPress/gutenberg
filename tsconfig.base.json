@@ -16,7 +16,7 @@
 				"./typings/untyped-packages/any-module.d.ts"
 			],
 			"@wordpress/interface": [
-				"./typings/untyped-packages/any-module.d.ts"
+				"./typings/untyped-packages/wordpress-interface.d.ts"
 			]
 		},
 		"checkJs": true,

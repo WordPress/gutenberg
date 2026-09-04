@@ -1,11 +1,12 @@
+import { describe, expect, it, vi } from 'vitest';
 import {
 	default as fetchLinkSuggestions,
 	sortResults,
 	tokenize,
 } from '../__experimental-fetch-link-suggestions';
 
-jest.mock( '@wordpress/api-fetch', () =>
-	jest.fn( ( { path } ) => {
+vi.mock( '@wordpress/api-fetch', () => ( {
+	default: vi.fn( ( { path } ) => {
 		switch ( path ) {
 			case '/wp/v2/search?search=&per_page=20&type=post':
 			case '/wp/v2/search?search=Contact&per_page=20&type=post&subtype=page':
@@ -93,8 +94,8 @@ jest.mock( '@wordpress/api-fetch', () =>
 					},
 				] );
 		}
-	} )
-);
+	} ),
+} ) );
 
 describe( 'fetchLinkSuggestions', () => {
 	it( 'filters suggestions by post-type', () => {

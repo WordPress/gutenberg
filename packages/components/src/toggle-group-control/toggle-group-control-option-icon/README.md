@@ -50,3 +50,10 @@ Icon displayed as the content of the option. Usually one of the icons from the `
 The text to accessibly label the icon option. Will also be shown in a tooltip.
 
 -   Required: Yes
+
+### `disabled`: `boolean`
+
+If true, this option is unselectable.
+
+-   Required: No
+-   Default: `false`

@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import {
 	createRegistry,
@@ -5,6 +6,12 @@ import {
 	RegistryProvider,
 } from '@wordpress/data';
 import { isSuggestionModeEnabled, useCanSuggest } from '../gate';
+
+// The editor store pulls in `@wordpress/viewport`, which reads
+// `window.matchMedia` while loading.
+vi.hoisted( () => {
+	globalThis.wpVitest.mockMatchMedia();
+} );
 
 /*
  * Stub stores expose exactly the selectors the gate reads. Registering

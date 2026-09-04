@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it } from 'vitest';
 import deepFreeze from 'deep-freeze';
 import { getPendingLockRequests, isLockAvailable } from '../selectors';
 import { deepCopyLocksTreePath, getNode } from '../utils';

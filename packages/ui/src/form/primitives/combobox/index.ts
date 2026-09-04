@@ -15,5 +15,6 @@ export { Portal } from './portal';
 export { Positioner } from './positioner';
 export { Popup } from './popup';
 export { Root } from './root';
+export { Status } from './status';
 export { Trigger } from './trigger';
 export { Value } from './value';
