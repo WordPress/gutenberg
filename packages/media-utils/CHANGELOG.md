@@ -2,6 +2,52 @@
 
 ## Unreleased
 
+## 5.54.0 (2026-08-26)
+
+### Enhancements
+
+-   Media upload modal: Show thumbnails at their original aspect ratio inside the grid cell rather than cropping them to a square, so a media item's orientation is visible before it is inserted. Adds an "Original aspect ratio" toggle to the view options for switching back to cropped previews ([#81604](https://github.com/WordPress/gutenberg/pull/81604)).
+
+### Bug Fixes
+
+-   Report a server-side upload failure in plain language instead of passing on the REST client's `invalid_json` and `unknown_error` messages ([#81735](https://github.com/WordPress/gutenberg/pull/81735)).
+-   Prevent editor block removal by stopping undo/redo event propagation when the Media Library modal is open ([#79898](https://github.com/WordPress/gutenberg/pull/79898)).
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 5.53.0 (2026-08-12)
+
+## 5.52.0 (2026-07-29)
+
+### Internal
+
+-   Remove the `window.__heicUploadSupport` type declaration, following the removal of the redundant flag ([#80452](https://github.com/WordPress/gutenberg/pull/80452)).
+
+## 5.51.0 (2026-07-14)
+
+### Enhancements
+
+-   Use the emphasis font-weight token for UI emphasis ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 5.50.0 (2026-07-01)
+
+## 5.49.0 (2026-06-24)
+
+## 5.48.1 (2026-06-16)
+
+## 5.48.0 (2026-06-10)
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+## 5.47.0 (2026-05-27)
+
+## 5.46.0 (2026-05-14)
+
 ## 5.45.0 (2026-04-29)
 
 ## 5.44.0 (2026-04-15)

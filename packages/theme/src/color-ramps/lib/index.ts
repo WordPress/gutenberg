@@ -1,37 +1,26 @@
-/**
- * External dependencies
- */
+import { clone, get, OKLCH, set, type PlainColorObject } from 'colorjs.io/fn';
 import {
-	clone,
-	get,
-	OKLCH,
-	set,
-	type ColorTypes,
-	type PlainColorObject,
-} from 'colorjs.io/fn';
-
-/**
- * Internal dependencies
- */
-import './register-color-spaces';
-import { clampToGamut, getContrast, getColorString } from './color-utils';
-import { findColorMeetingRequirements } from './find-color-with-constraints';
+	assertValidSeedColor,
+	clampToGamut,
+	getContrast,
+	getColorString,
+} from './color-utils.ts';
+import { findColorMeetingRequirements } from './find-color-with-constraints.ts';
 import {
 	sortByDependency,
 	computeBetterFgColorDirection,
 	adjustContrastTarget,
 	stepsForStep,
 	solveWithBisect,
-} from './utils';
-
+} from './utils.ts';
 import type {
 	FollowDirection,
 	Ramp,
 	RampDirection,
 	RampConfig,
 	RampResult,
-} from './types';
-import { CONTRAST_EPSILON } from './constants';
+} from './types.ts';
+import { CONTRAST_EPSILON } from './constants.ts';
 
 /**
  * Calculate a complete color ramp based on the provided configuration.
@@ -66,7 +55,7 @@ function calculateRamp( {
 	};
 } ) {
 	const rampResults = {} as Record< keyof Ramp, string >;
-	let warnings: string[] | undefined;
+	let warnings: ( keyof Ramp )[] | undefined;
 	let maxDeficit = -Infinity;
 	let maxDeficitDirection: RampDirection = 'lighter';
 	let maxDeficitStep;
@@ -116,7 +105,7 @@ function calculateRamp( {
 		}
 
 		function computeDirection(
-			color: ColorTypes,
+			color: string | PlainColorObject,
 			followDirection: FollowDirection
 		): RampDirection {
 			if ( followDirection === 'main' ) {
@@ -219,6 +208,10 @@ export function buildRamp(
 		rescaleToFitContrastTargets?: boolean;
 	} = {}
 ): RampResult {
+	// Validate here: the single point where user-supplied color strings enter.
+	// Internal recursive callers pass color objects to `clampToGamut` instead.
+	assertValidSeedColor( seedArg );
+
 	let seed: PlainColorObject;
 	try {
 		seed = clampToGamut( seedArg );
@@ -262,6 +255,7 @@ export function buildRamp(
 	} );
 
 	let bestRamp = rampResults;
+	let bestWarnings = warnings;
 
 	if ( maxDeficit > CONTRAST_EPSILON && rescaleToFitContrastTargets ) {
 		const iterSteps = stepsForStep( maxDeficitStep!, config );
@@ -306,14 +300,16 @@ export function buildRamp(
 		);
 
 		// Calculate the final ramp with adjusted seed.
-		bestRamp = calculateRamp( {
+		const finalResult = calculateRamp( {
 			seed: bestSeed,
 			sortedSteps,
 			config,
 			mainDir,
 			oppDir,
 			pinLightness,
-		} ).rampResults;
+		} );
+		bestRamp = finalResult.rampResults;
+		bestWarnings = finalResult.warnings;
 	}
 
 	// Swap surface1 and surface3 for darker ramps to maintain visual elevation hierarchy.
@@ -327,7 +323,7 @@ export function buildRamp(
 
 	return {
 		ramp: bestRamp,
-		warnings,
+		warnings: bestWarnings,
 		direction: mainDir,
 	};
 }

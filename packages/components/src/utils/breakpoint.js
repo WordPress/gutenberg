@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import breakpoints from './breakpoint-values';
 
 /**

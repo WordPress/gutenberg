@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { unwrap } from '@wordpress/dom';
 
 function isList( node: Node ): boolean {

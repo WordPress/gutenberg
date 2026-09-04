@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Modal } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -9,11 +6,6 @@ import {
 	shortcutAriaLabel,
 	type WPKeycodeModifier,
 } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
-import './style.scss';
 
 interface KeyCombination {
 	/** Modifier for cross-platform display (e.g. 'primary', 'primaryShift', 'shift'). */

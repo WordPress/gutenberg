@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
@@ -10,12 +7,8 @@ import {
 	Button,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
-	__experimentalInputControl as InputControl,
+	__experimentalInputControl as WCInputControl,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import type { CoreDataError, BasePost } from '../types';
 
 interface RenderModalProps< Item > {
@@ -27,6 +20,7 @@ interface RenderModalProps< Item > {
 interface Action< Item > {
 	id: string;
 	label: string;
+	modalHeader?: string;
 	isEligible?: ( item: Item ) => boolean;
 	modalFocusOnMount?: string;
 	RenderModal: ( props: RenderModalProps< Item > ) => React.JSX.Element;
@@ -92,8 +86,7 @@ function ReorderModal( {
 						'Determines the order of pages. Pages with the same order value are sorted alphabetically. Negative order values are supported.'
 					) }
 				</div>
-				<InputControl
-					__next40pxDefaultSize
+				<WCInputControl
 					label={ __( 'Order' ) }
 					type="number"
 					value={
@@ -137,7 +130,8 @@ function ReorderModal( {
 
 const reorderPage: Action< BasePost > = {
 	id: 'order-pages',
-	label: __( 'Order' ),
+	label: __( 'Order…' ),
+	modalHeader: __( 'Order' ),
 	isEligible( { status } ) {
 		return status !== 'trash';
 	},

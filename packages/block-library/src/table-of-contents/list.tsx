@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { MouseEvent, ReactElement } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { NestedHeadingData } from './utils';
 
 const ENTRY_CLASS_NAME = 'wp-block-table-of-contents__entry';

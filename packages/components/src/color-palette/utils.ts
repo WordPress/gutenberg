@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { ColorObject, ColorPaletteProps, PaletteObject } from './types';
 
 extend( [ namesPlugin, a11yPlugin ] );
@@ -32,7 +21,8 @@ const isSimpleCSSColor = ( value: string ): boolean => {
 export const extractColorNameFromCurrentValue = (
 	currentValue?: ColorPaletteProps[ 'value' ],
 	colors: ColorPaletteProps[ 'colors' ] = [],
-	showMultiplePalettes: boolean = false
+	showMultiplePalettes: boolean = false,
+	selectedSlug?: ColorPaletteProps[ 'selectedSlug' ]
 ) => {
 	if ( ! currentValue ) {
 		return '';
@@ -50,7 +40,18 @@ export const extractColorNameFromCurrentValue = (
 		? ( colors as PaletteObject[] )
 		: [ { colors: colors as ColorObject[] } ];
 	for ( const { colors: paletteColors } of colorPalettes ) {
-		for ( const { name: colorName, color: colorValue } of paletteColors ) {
+		for ( const {
+			name: colorName,
+			color: colorValue,
+			slug,
+		} of paletteColors ) {
+			if ( selectedSlug ) {
+				if ( slug === selectedSlug ) {
+					return colorName;
+				}
+				continue;
+			}
+
 			const normalizedColorValue = currentValueIsSimpleColor
 				? colord( colorValue ).toHex()
 				: colorValue;
