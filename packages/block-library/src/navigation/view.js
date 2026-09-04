@@ -146,16 +146,21 @@ const { state, actions } = store(
 			handleMenuKeydown: withSyncEvent( ( event ) => {
 				const { type, firstFocusableElement, lastFocusableElement } =
 					getContext();
-				if ( state.menuOpenedBy.click ) {
-					// If Escape close the menu.
-					if ( event.key === 'Escape' ) {
-						event.stopPropagation(); // Keeps ancestor menus open.
-						actions.closeMenu( 'click' );
-						actions.closeMenu( 'focus' );
-						return;
-					}
 
-					// Trap focus if it is an overlay (main menu).
+				// Close the menu on Escape regardless of how it was opened.
+				// This satisfies WCAG 1.4.13 (Content on Hover or Focus):
+				// hover-triggered content must be dismissible without moving
+				// the pointer.
+				if ( event.key === 'Escape' ) {
+					event.stopPropagation(); // Keeps ancestor menus open.
+					actions.closeMenu( 'click' );
+					actions.closeMenu( 'hover' );
+					actions.closeMenu( 'focus' );
+					return;
+				}
+
+				// Trap focus if the overlay (main menu) was opened via click.
+				if ( state.menuOpenedBy.click ) {
 					if ( type === 'overlay' && event.key === 'Tab' ) {
 						// If shift + tab it change the direction.
 						if (
