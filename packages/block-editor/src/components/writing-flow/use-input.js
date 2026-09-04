@@ -46,7 +46,17 @@ export default function useInput() {
 	} = useDispatch( blockEditorStore );
 
 	return useRefEffect( ( node ) => {
+		let pendingSplit = false;
+
 		function onBeforeInput( event ) {
+			if ( pendingSplit ) {
+				pendingSplit = false;
+				if ( event.inputType === 'insertParagraph' ) {
+					event.preventDefault();
+					__unstableSplitSelection();
+					return;
+				}
+			}
 			// If writing flow is editable, never allow the browser to alter
 			// the DOM outside of an editable element within a block. This
 			// will cause React errors (and the DOM should only be altered in
@@ -132,8 +142,11 @@ export default function useInput() {
 						( hasBlockSupport( blockName, 'splitting', false ) ||
 							event.__deprecatedOnSplit )
 					) {
-						event.preventDefault();
-						__unstableSplitSelection();
+						// Split on beforeinput: moving focus to the new
+						// block while the keydown is still being handled
+						// leaves the iOS keyboard's auto-capitalization
+						// stale.
+						pendingSplit = true;
 					} else if (
 						// Handle Enter only on the block wrapper itself or
 						// an editable element within the block, which may be

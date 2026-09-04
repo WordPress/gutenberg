@@ -86,8 +86,21 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
-		// On ENTER, we ALWAYS want to prevent the default browser behaviour
-		// at this last interception point.
+		// A plain Enter is cancelled in the beforeinput phase instead (see
+		// onDefaultBeforeInput): cancelling it at keydown leaves the iOS
+		// keyboard's auto-capitalization stale when focus moves.
+		if ( event.shiftKey ) {
+			event.preventDefault();
+		}
+	}
+
+	function onDefaultBeforeInput( event ) {
+		if ( event.defaultPrevented || event.inputType !== 'insertParagraph' ) {
+			return;
+		}
+		if ( event.target !== element && ! ownsSelection( element ) ) {
+			return;
+		}
 		event.preventDefault();
 	}
 
@@ -100,6 +113,11 @@ export default ( props ) => ( element ) => {
 		'keydown',
 		onDefaultKeyDown
 	);
+	const unsubscribeDefaultBeforeInput = subscribeDelegatedListener(
+		defaultView,
+		'beforeinput',
+		onDefaultBeforeInput
+	);
 	// Capture phase so this runs before ancestor (writing flow) bubble
 	// handlers, matching the timing of the previous raw element listener.
 	const unsubscribeKeyDown = subscribeOwnedListener(
@@ -110,6 +128,7 @@ export default ( props ) => ( element ) => {
 	);
 	return () => {
 		unsubscribeDefaultKeyDown();
+		unsubscribeDefaultBeforeInput();
 		unsubscribeKeyDown();
 	};
 };
