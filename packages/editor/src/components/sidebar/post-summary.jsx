@@ -11,6 +11,7 @@ import PostFeaturedImagePanel from '../post-featured-image/panel';
 import PostFormatPanel from '../post-format/panel';
 import PostLastEditedPanel from '../post-last-edited-panel';
 import PostPanelSection from '../post-panel-section';
+import PostPatternUsage from '../post-pattern-usage';
 import ReadingSettingsLink from '../reading-settings-link';
 import PostSchedulePanel from '../post-schedule/panel';
 import PostStatusPanel from '../post-status';
@@ -64,6 +65,7 @@ export default function PostSummary( { onActionPerformed } ) {
 							<Stack direction="column" gap="xs">
 								<PostContentInformation />
 								<PostLastEditedPanel />
+								<PostPatternUsage />
 							</Stack>
 							{ ! isRemovedPostStatusPanel && (
 								<Stack direction="column" gap="lg">
