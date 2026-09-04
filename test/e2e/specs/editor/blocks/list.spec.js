@@ -210,6 +210,11 @@ test.describe( 'List (@firefox)', () => {
 <p>* </p>
 <!-- /wp:paragraph -->`
 		);
+		// The undo claims the Escape; it must not also step out of the
+		// canvas onto its stop.
+		await expect(
+			page.getByRole( 'button', { name: 'Editor canvas' } )
+		).not.toBeFocused();
 	} );
 
 	test( 'should not undo asterisk transform with backspace after typing', async ( {
@@ -884,6 +889,62 @@ test.describe( 'List (@firefox)', () => {
 
 <!-- wp:list-item -->
 <li>i</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
+		);
+	} );
+
+	test( 'should indent into the last nested list when an item has several', async ( {
+		editor,
+	} ) => {
+		// A list item can hold more than one nested list. Indenting a sibling
+		// into it should append to the last nested list, not the first.
+		await editor.setContent(
+			`<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>A<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>x</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>y</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>B</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
+		);
+
+		await editor.canvas.getByText( 'B', { exact: true } ).click();
+		await editor.clickBlockToolbarButton( 'Indent' );
+
+		// "B" joins "y" in the last nested list, after it.
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>A
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>x</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>y</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>B</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
 		);
