@@ -47,16 +47,20 @@ export default function useInput() {
 
 	return useRefEffect( ( node ) => {
 		function onBeforeInput( event ) {
+			// Enter in an editable is handled here instead of on keydown:
+			// moving focus while the keydown is still being handled leaves
+			// the iOS keyboard's auto-capitalization stale.
 			if (
 				event.inputType === 'insertParagraph' &&
 				! event.defaultPrevented &&
 				! hasMultiSelection()
 			) {
-				onEnter( event );
+				onKeyDown( event );
 				if ( event.defaultPrevented ) {
 					return;
 				}
 			}
+
 			// If writing flow is editable, never allow the browser to alter
 			// the DOM outside of an editable element within a block. This
 			// will cause React errors (and the DOM should only be altered in
@@ -80,148 +84,167 @@ export default function useInput() {
 			}
 		}
 
-		function onEnter( event ) {
-			const clientId = getSelectedBlockClientId();
-			const selectionStart = getSelectionStart();
-			const selectionEnd = getSelectionEnd();
-
-			if ( selectionStart.attributeKey === selectionEnd.attributeKey ) {
-				const selectedAttributeValue =
-					getBlockAttributes( clientId )[
-						selectionStart.attributeKey
-					];
-				const transforms = getBlockTransforms( 'from' ).filter(
-					( { type } ) => type === 'enter'
-				);
-				const transformation = findTransform( transforms, ( item ) => {
-					return item.regExp.test( selectedAttributeValue );
-				} );
-
-				if ( transformation ) {
-					event.preventDefault();
-					replaceBlocks(
-						clientId,
-						transformation.transform( {
-							content: selectedAttributeValue,
-						} )
-					);
-					__unstableMarkAutomaticChange();
-					return;
-				}
-			}
-
-			const blockName = getBlockName( clientId );
-			const rootClientId = getBlockRootClientId( clientId );
-			const { activeElement } = event.target.ownerDocument;
-
-			// Ensure template is not locked.
-			if (
-				! __unstableIsFullySelected() &&
-				( canInsertBlockType( getDefaultBlockName(), rootClientId ) ||
-					canInsertBlockType( blockName, rootClientId ) ) &&
-				( hasBlockSupport( blockName, 'splitting', false ) ||
-					event.__deprecatedOnSplit )
-			) {
-				event.preventDefault();
-				__unstableSplitSelection();
-			} else if (
-				// Handle Enter only on the block wrapper itself or
-				// an editable element within the block, which may be
-				// nested within the wrapper (e.g. Site Title). Other
-				// focusable elements (an embed's URL field, an
-				// appender button) keep their native Enter behavior.
-				( activeElement.getAttribute( 'data-block' ) === clientId ||
-					activeElement.isContentEditable ) &&
-				getBlockClientId( activeElement ) === clientId
-			) {
-				// The default block depends on context: containers
-				// such as the gallery define their own default
-				// block, which is what insertAfterBlock inserts.
-				const { defaultBlock: directInsertBlock } =
-					( rootClientId && getBlockListSettings( rootClientId ) ) ||
-					{};
-
-				if (
-					canInsertBlockType(
-						directInsertBlock?.name ?? getDefaultBlockName(),
-						rootClientId
-					)
-				) {
-					event.preventDefault();
-					insertAfterBlock( clientId );
-				} else {
-					// Descend into an empty container by inserting
-					// its default block, the same block an appender
-					// or ghost would insert.
-					if ( ! getBlockOrder( clientId ).length ) {
-						const { defaultBlock } =
-							getBlockListSettings( clientId ) ?? {};
-						const name =
-							defaultBlock?.name ?? getDefaultBlockName();
-
-						if ( canInsertBlockType( name, clientId ) ) {
-							event.preventDefault();
-							insertBlock(
-								createBlock( name, defaultBlock?.attributes ),
-								0,
-								clientId
-							);
-							return;
-						}
-					}
-
-					function getNextClientId( id ) {
-						let nextClientId = null;
-
-						while (
-							typeof id === 'string' &&
-							! ( nextClientId = getNextBlockClientId( id ) )
-						) {
-							id = getBlockRootClientId( id );
-						}
-
-						return nextClientId;
-					}
-
-					let nextClientId =
-						getBlockOrder( clientId )[ 0 ] ??
-						getNextClientId( clientId );
-
-					while (
-						nextClientId &&
-						getBlockEditingMode( nextClientId ) === 'disabled'
-					) {
-						nextClientId = getNextClientId( nextClientId );
-					}
-
-					if ( nextClientId ) {
-						event.preventDefault();
-						// An initial position of `true` is an
-						// internal sentinel: it focuses the block
-						// wrapper instead of a text field within
-						// it. See useFocusFirstElement.
-						selectBlock( nextClientId, true );
-					}
-				}
-			}
-		}
-
 		function onKeyDown( event ) {
 			if ( event.defaultPrevented ) {
 				return;
 			}
 
 			if ( ! hasMultiSelection() ) {
-				// Editables produce an insertParagraph beforeinput instead,
-				// handled in onBeforeInput. Moving focus while the keydown
-				// is still being handled leaves the iOS keyboard's
-				// auto-capitalization stale.
 				if (
-					event.keyCode === ENTER &&
-					! event.shiftKey &&
-					! event.target.ownerDocument.activeElement.isContentEditable
+					event.keyCode === ENTER ||
+					event.inputType === 'insertParagraph'
 				) {
-					onEnter( event );
+					if (
+						event.shiftKey ||
+						// Editables are handled on beforeinput.
+						( event.type === 'keydown' &&
+							event.target.ownerDocument.activeElement
+								.isContentEditable )
+					) {
+						return;
+					}
+
+					const clientId = getSelectedBlockClientId();
+					const blockName = getBlockName( clientId );
+					const selectionStart = getSelectionStart();
+					const selectionEnd = getSelectionEnd();
+
+					if (
+						selectionStart.attributeKey ===
+						selectionEnd.attributeKey
+					) {
+						const selectedAttributeValue =
+							getBlockAttributes( clientId )[
+								selectionStart.attributeKey
+							];
+						const transforms = getBlockTransforms( 'from' ).filter(
+							( { type } ) => type === 'enter'
+						);
+						const transformation = findTransform(
+							transforms,
+							( item ) => {
+								return item.regExp.test(
+									selectedAttributeValue
+								);
+							}
+						);
+
+						if ( transformation ) {
+							replaceBlocks(
+								clientId,
+								transformation.transform( {
+									content: selectedAttributeValue,
+								} )
+							);
+							__unstableMarkAutomaticChange();
+							return;
+						}
+					}
+
+					const rootClientId = getBlockRootClientId( clientId );
+					const { activeElement } = event.target.ownerDocument;
+
+					// Ensure template is not locked.
+					if (
+						! __unstableIsFullySelected() &&
+						( canInsertBlockType(
+							getDefaultBlockName(),
+							rootClientId
+						) ||
+							canInsertBlockType( blockName, rootClientId ) ) &&
+						( hasBlockSupport( blockName, 'splitting', false ) ||
+							event.__deprecatedOnSplit )
+					) {
+						event.preventDefault();
+						__unstableSplitSelection();
+					} else if (
+						// Handle Enter only on the block wrapper itself or
+						// an editable element within the block, which may be
+						// nested within the wrapper (e.g. Site Title). Other
+						// focusable elements (an embed's URL field, an
+						// appender button) keep their native Enter behavior.
+						( activeElement.getAttribute( 'data-block' ) ===
+							clientId ||
+							activeElement.isContentEditable ) &&
+						getBlockClientId( activeElement ) === clientId
+					) {
+						// The default block depends on context: containers
+						// such as the gallery define their own default
+						// block, which is what insertAfterBlock inserts.
+						const { defaultBlock: directInsertBlock } =
+							( rootClientId &&
+								getBlockListSettings( rootClientId ) ) ||
+							{};
+
+						if (
+							canInsertBlockType(
+								directInsertBlock?.name ??
+									getDefaultBlockName(),
+								rootClientId
+							)
+						) {
+							event.preventDefault();
+							insertAfterBlock( clientId );
+						} else {
+							// Descend into an empty container by inserting
+							// its default block, the same block an appender
+							// or ghost would insert.
+							if ( ! getBlockOrder( clientId ).length ) {
+								const { defaultBlock } =
+									getBlockListSettings( clientId ) ?? {};
+								const name =
+									defaultBlock?.name ?? getDefaultBlockName();
+
+								if ( canInsertBlockType( name, clientId ) ) {
+									event.preventDefault();
+									insertBlock(
+										createBlock(
+											name,
+											defaultBlock?.attributes
+										),
+										0,
+										clientId
+									);
+									return;
+								}
+							}
+
+							function getNextClientId( id ) {
+								let nextClientId = null;
+
+								while (
+									typeof id === 'string' &&
+									! ( nextClientId =
+										getNextBlockClientId( id ) )
+								) {
+									id = getBlockRootClientId( id );
+								}
+
+								return nextClientId;
+							}
+
+							let nextClientId =
+								getBlockOrder( clientId )[ 0 ] ??
+								getNextClientId( clientId );
+
+							while (
+								nextClientId &&
+								getBlockEditingMode( nextClientId ) ===
+									'disabled'
+							) {
+								nextClientId = getNextClientId( nextClientId );
+							}
+
+							if ( nextClientId ) {
+								event.preventDefault();
+								// An initial position of `true` is an
+								// internal sentinel: it focuses the block
+								// wrapper instead of a text field within
+								// it. See useFocusFirstElement.
+								selectBlock( nextClientId, true );
+							}
+						}
+					}
 				}
 				return;
 			}

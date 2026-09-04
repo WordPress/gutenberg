@@ -27,33 +27,6 @@ const EMPTY_ACTIVE_FORMATS = [];
 
 const PLACEHOLDER_ATTR_NAME = 'data-rich-text-placeholder';
 
-/**
- * If the selection is set on the placeholder element, collapse the selection to
- * the start (before the placeholder).
- *
- * @param {Window} defaultView
- */
-function fixPlaceholderSelection( defaultView ) {
-	const selection = defaultView.getSelection();
-	const { anchorNode, anchorOffset } = selection;
-
-	if ( anchorNode.nodeType !== anchorNode.ELEMENT_NODE ) {
-		return;
-	}
-
-	const targetNode = anchorNode.childNodes[ anchorOffset ];
-
-	if (
-		! targetNode ||
-		targetNode.nodeType !== targetNode.ELEMENT_NODE ||
-		! targetNode.hasAttribute( PLACEHOLDER_ATTR_NAME )
-	) {
-		return;
-	}
-
-	selection.collapseToStart();
-}
-
 export default ( props ) => ( element ) => {
 	const { ownerDocument } = element;
 	const { defaultView } = ownerDocument;
@@ -184,12 +157,16 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
+		// An empty field has one caret position: before the padding. The
+		// browser or a caret placement helper may put the caret after it, or
+		// inside the placeholder: the caret is then not visible and the iOS
+		// keyboard sees a character before it. Applying the record puts it
+		// back.
+		const isEmpty = text.length === 0;
+
 		if ( start === oldRecord.start && end === oldRecord.end ) {
-			// Sometimes the browser may set the selection on the placeholder
-			// element, in which case the caret is not visible. We need to set
-			// the caret before the placeholder if that's the case.
-			if ( oldRecord.text.length === 0 && start === 0 ) {
-				fixPlaceholderSelection( defaultView );
+			if ( isEmpty ) {
+				applyRecord( oldRecord );
 			}
 
 			return;
@@ -217,7 +194,7 @@ export default ( props ) => ( element ) => {
 		// It is important that the internal value is updated first,
 		// otherwise the value will be wrong on render!
 		record.current = newValue;
-		applyRecord( newValue, { domOnly: true } );
+		applyRecord( newValue, { domOnly: ! isEmpty } );
 		onSelectionChange( start, end );
 	}
 
