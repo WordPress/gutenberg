@@ -141,17 +141,20 @@ test.describe( 'Suggestion marker reveal', () => {
 		}
 
 		/*
-		 * Sample every frame while the floating board mounts, counting only
-		 * the cards that can take a click. A card the board has not placed
-		 * yet used to fall back to the panel's origin, where it covered
-		 * whichever card legitimately sat at the top — and being later in
-		 * tree order, it took that card's clicks with it.
+		 * Sample the floating board as it mounts, counting only the cards
+		 * that can take a click. A card the board has not placed yet used to
+		 * fall back to the panel's origin, where it covered whichever card
+		 * legitimately sat at the top - and being later in tree order, it
+		 * took that card's clicks with it.
+		 *
+		 * Headless Chromium only runs animation frames when something
+		 * paints, so the frame loop is best effort; the settled board is
+		 * sampled explicitly once every card has been placed.
 		 */
 		await page.evaluate( () => {
-			( window as any ).__f31Overlaps = [];
-			( window as any ).__f31MaxCards = 0;
-			( window as any ).__f31Stop = false;
-			const tick = () => {
+			const overlaps: string[] = [];
+			let maxCards = 0;
+			const sample = () => {
 				const boxes = Array.from(
 					document.querySelectorAll(
 						'.editor-collab-sidebar-panel__thread.is-floating'
@@ -164,13 +167,10 @@ test.describe( 'Suggestion marker reveal', () => {
 					)
 					.map( ( el ) => el.getBoundingClientRect() )
 					.sort( ( a, b ) => a.top - b.top );
-				( window as any ).__f31MaxCards = Math.max(
-					( window as any ).__f31MaxCards,
-					boxes.length
-				);
+				maxCards = Math.max( maxCards, boxes.length );
 				for ( let i = 1; i < boxes.length; i++ ) {
 					if ( boxes[ i ].top < boxes[ i - 1 ].bottom ) {
-						( window as any ).__f31Overlaps.push(
+						overlaps.push(
 							`${ Math.round(
 								boxes[ i - 1 ].top
 							) }-${ Math.round(
@@ -181,12 +181,18 @@ test.describe( 'Suggestion marker reveal', () => {
 						);
 					}
 				}
-				// Sampled until the test has seen the board mount; a fixed
-				// deadline could run out first on a slow worker and pass with
-				// nothing observed.
-				if ( ! ( window as any ).__f31Stop ) {
+				return { overlaps, maxCards };
+			};
+			let stopped = false;
+			const tick = () => {
+				sample();
+				if ( ! stopped ) {
 					window.requestAnimationFrame( tick );
 				}
+			};
+			( window as any ).__f31Finish = () => {
+				stopped = true;
+				return sample();
 			};
 			tick();
 		} );
@@ -199,21 +205,25 @@ test.describe( 'Suggestion marker reveal', () => {
 			'.editor-collab-sidebar-panel__thread.is-floating'
 		);
 		await expect( cards ).toHaveCount( 3 );
-		// Anchor on a positive signal: all three cards placed and visible.
-		await expect( cards.nth( 2 ) ).toBeVisible();
+		// Anchor on a positive signal: every card placed by the board. An
+		// unplaced card is transparent, which still counts as visible, so
+		// wait for the pointer events the board restores on placement.
+		for ( const index of [ 0, 1, 2 ] ) {
+			await expect( cards.nth( index ) ).not.toHaveCSS(
+				'pointer-events',
+				'none'
+			);
+		}
 		await expect(
 			page.getByRole( 'button', { name: 'Accept suggestion' } )
 		).toHaveCount( 3 );
 
-		const { overlaps, maxCards } = await page.evaluate( () => {
-			( window as any ).__f31Stop = true;
-			return {
-				overlaps: ( window as any ).__f31Overlaps,
-				maxCards: ( window as any ).__f31MaxCards,
-			};
-		} );
-		// The sampler saw the cards it was guarding, and none overlapped.
-		expect( maxCards ).toBeGreaterThanOrEqual( 3 );
+		const { overlaps, maxCards } = await page.evaluate( () =>
+			( window as any ).__f31Finish()
+		);
+		// The settled board was sampled with every card placed, and no
+		// sampled frame had two cards overlapping.
+		expect( maxCards ).toBe( 3 );
 		expect( overlaps ).toEqual( [] );
 	} );
 } );
