@@ -37,6 +37,21 @@ describe( 'hasSuggestionMarkers', () => {
 		).toBe( false );
 	} );
 
+	it( 'ignores prose and code that mention the marker names', () => {
+		expect(
+			hasSuggestionMarkers(
+				'<!-- wp:paragraph -->\n<p>The wp-suggestion class and the "pending-remove" state are how suggestions serialize.</p>\n<!-- /wp:paragraph -->'
+			)
+		).toBe( false );
+		// A code sample of the markup is escaped in content, so it cannot
+		// match the attribute syntax the real marker has.
+		expect(
+			hasSuggestionMarkers(
+				'<!-- wp:code -->\n<pre class="wp-block-code"><code>&lt;mark class="wp-suggestion" data-suggestion-id="12"&gt;&lt;/mark&gt; {"suggestion":{"type":"pending-move"}}</code></pre>\n<!-- /wp:code -->'
+			)
+		).toBe( false );
+	} );
+
 	it.each( [ 'del', 'add', 'format' ] )(
 		'detects an inline %s marker',
 		( type ) => {

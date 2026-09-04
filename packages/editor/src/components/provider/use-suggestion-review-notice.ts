@@ -15,20 +15,23 @@ import { ALL_NOTES_SIDEBAR } from '../collab-sidebar/constants';
 const NOTICE_ID = 'editor/pending-suggestions';
 
 /**
- * Marker class the `core/suggestion` format serializes to in post content.
+ * The `<mark>` element the `core/suggestion` format serializes to in post
+ * content. Matched as an element so prose or a code sample that mentions the
+ * class name does not count: in content the same markup is escaped
+ * (`&lt;mark class="wp-suggestion"`) and has no `<mark` to match.
  */
-const INLINE_MARKER_CLASS = 'wp-suggestion';
+const INLINE_MARKER_PROBE = /<mark\b[^>]*\bclass="wp-suggestion\b/;
 
 /**
- * The `metadata.suggestion.type` values a structural suggestion serializes
- * into a block comment delimiter. Matched as raw JSON fragments so the probe
- * stays a substring test on the saved content instead of a block-tree walk.
+ * The `metadata.suggestion` object a structural suggestion serializes into a
+ * block comment delimiter, matched as the raw JSON fragment inside the
+ * delimiter so the probe stays a substring test on the saved content instead
+ * of a block-tree walk. The delimiter JSON sits on the delimiter's own line
+ * and carries no whitespace; the same text in a code block sits in the block's
+ * HTML, not in a delimiter.
  */
-const STRUCTURAL_MARKER_VALUES = [
-	'"pending-remove"',
-	'"pending-insert"',
-	'"pending-move"',
-];
+const STRUCTURAL_MARKER_PROBE =
+	/<!-- wp:[a-z0-9/_-]+ \{[^\n]*"suggestion":\{[^{}\n]*"type":"pending-(?:remove|insert|move)"/;
 
 /**
  * Whether saved post content carries suggestion state of any kind.
@@ -41,8 +44,8 @@ export function hasSuggestionMarkers( content: any ): boolean {
 		return false;
 	}
 	return (
-		content.includes( INLINE_MARKER_CLASS ) ||
-		STRUCTURAL_MARKER_VALUES.some( ( value ) => content.includes( value ) )
+		INLINE_MARKER_PROBE.test( content ) ||
+		STRUCTURAL_MARKER_PROBE.test( content )
 	);
 }
 
