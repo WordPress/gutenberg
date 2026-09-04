@@ -1,5 +1,4 @@
-import { colord, extend } from 'colord';
-import a11yPlugin from 'colord/plugins/a11y';
+import { colord } from 'colord';
 import { useCallback, useContext, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -19,9 +18,6 @@ import type {
 } from '@wordpress/global-styles-engine';
 import { GlobalStylesContext } from './context';
 import { removePropertiesFromObject, isVariationWithProperties } from './utils';
-
-// Enable colord's a11y plugin.
-extend( [ a11yPlugin ] );
 
 /**
  * Hook to get and set style values with memoization.
