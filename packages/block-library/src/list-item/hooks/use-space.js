@@ -8,7 +8,7 @@ import { unlock } from '../../lock-unlock';
 
 const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
-export default function useSpace( clientId ) {
+export default function useSpace() {
 	const registry = useRegistry();
 
 	return useRefEffect(
@@ -27,7 +27,7 @@ export default function useSpace( clientId ) {
 					return;
 				}
 
-				const { getSelectionStart, getSelectionEnd, getBlockIndex } =
+				const { getSelectionStart, getSelectionEnd } =
 					registry.select( blockEditorStore );
 				const selectionStart = getSelectionStart();
 				const selectionEnd = getSelectionEnd();
@@ -42,10 +42,8 @@ export default function useSpace( clientId ) {
 								event.preventDefault();
 							}
 						}
-					} else if ( getBlockIndex( clientId ) !== 0 ) {
-						if ( indentListItems( registry, clientId ) ) {
-							event.preventDefault();
-						}
+					} else if ( indentListItems( registry ) ) {
+						event.preventDefault();
 					}
 				}
 			}
@@ -59,6 +57,6 @@ export default function useSpace( clientId ) {
 				true
 			);
 		},
-		[ clientId, registry ]
+		[ registry ]
 	);
 }

@@ -72,7 +72,7 @@ export default function ListItemEdit( {
 		__unstableDisableDropZone: true,
 	} );
 	const useEnterRef = useEnter( clientId );
-	const useSpaceRef = useSpace( clientId );
+	const useSpaceRef = useSpace();
 	const useMultiSelectTabRef = useMultiSelectTab( clientId );
 	const onMerge = useMerge( clientId, mergeBlocks );
 	return (
