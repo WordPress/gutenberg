@@ -1,0 +1,63 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.root {
+			--wp-ui-radio-input-size: 16px;
+
+			position: relative;
+			display: inline-block;
+			flex-shrink: 0;
+			width: var(--wp-ui-radio-input-size);
+			height: var(--wp-ui-radio-input-size);
+			border-radius: 50%;
+			border:
+				var(--wpds-border-width-xs) solid
+				var(--wpds-color-stroke-interactive-neutral);
+			padding: 0;
+			background-color: var(--wpds-color-background-interactive-neutral-weak);
+
+			&:not([data-disabled]) {
+				cursor: var(--wpds-cursor-control);
+			}
+
+			[data-highlighted] &,
+			&:hover {
+				border-color: var(--wpds-color-stroke-interactive-neutral-active);
+			}
+
+			&[data-checked] {
+				border-color: transparent;
+				background-color: var(--wpds-color-background-interactive-brand-strong);
+				color: var(--wpds-color-foreground-interactive-brand-strong);
+			}
+
+			&[data-disabled] {
+				background-color: var(--wpds-color-background-interactive-neutral-weak-disabled);
+				border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+				color: var(--wpds-color-foreground-interactive-neutral-disabled);
+
+				@media (forced-colors: active) {
+					color: GrayText;
+					border-color: GrayText;
+				}
+			}
+		}
+
+		.indicator {
+			/* Out of flow so mounting the disc does not shift the inline baseline. */
+			position: absolute;
+			inset: 0;
+			margin: auto;
+			width: calc(var(--wp-ui-radio-input-size) / 2);
+			height: calc(var(--wp-ui-radio-input-size) / 2);
+			border-radius: 50%;
+			background-color: currentColor;
+
+			@media (forced-colors: active) {
+				border: 4px solid currentColor;
+				background-color: transparent;
+			}
+		}
+	}
+}

@@ -6,6 +6,7 @@ export * as Field from './field';
 export * as Fieldset from './fieldset';
 export { Input } from './input';
 export { InputLayout } from './input-layout';
+export { Radio } from './radio';
 export * as Select from './select';
 export { SearchableChipSelect } from './searchable-chip-select';
 export { Textarea } from './textarea';
