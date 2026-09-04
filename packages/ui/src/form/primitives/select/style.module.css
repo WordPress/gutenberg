@@ -8,15 +8,10 @@
 
 		.list {
 			display: block;
-			grid-area: main;
 			min-block-size: 0;
 			overflow-block: auto;
 			overscroll-behavior: contain;
 			scroll-padding-block: var(--wp-ui-popup-padding);
-			font-family: var(--wpds-typography-font-family-body);
-			font-size: var(--wpds-typography-font-size-md);
-			line-height: var(--wpds-typography-line-height-sm);
-			color: var(--wpds-color-foreground-interactive-neutral);
 
 			&:not(:empty) {
 				padding-block: var(--wp-ui-popup-padding);

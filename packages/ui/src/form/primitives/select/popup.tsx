@@ -24,7 +24,12 @@ export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
 				) }
 				{ ...restProps }
 			>
-				<_Select.List className={ styles.list }>
+				<_Select.List
+					className={ clsx(
+						itemPopupStyles[ 'list-chrome' ],
+						styles.list
+					) }
+				>
 					{ children }
 				</_Select.List>
 			</_Select.Popup>
