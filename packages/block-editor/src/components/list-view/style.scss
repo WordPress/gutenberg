@@ -113,7 +113,7 @@
 	}
 	&.is-selected .block-editor-list-view-block__menu:focus,
 	&.is-selected.is-synced .block-editor-list-view-block__menu:focus {
-		--focus-color: #{ $white };
+		--focus-color: var(--wpds-color-foreground-interactive-brand-strong);
 		@include outset-ring__focus();
 		outline-offset: -2px;
 	}
@@ -281,7 +281,9 @@
 			border-radius: inherit;
 			@include outset-ring__focus();
 			outline-offset: 1px;
-			box-shadow: 0 0 0 calc(var(--wpds-border-width-focus) + 2px) $white;
+			box-shadow:
+				0 0 0 calc(var(--wpds-border-width-focus) + 2px)
+				var(--wpds-color-background-surface-neutral-strong);
 			z-index: 2;
 			pointer-events: none;
 		}
