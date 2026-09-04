@@ -14,6 +14,26 @@ const DEFAULT_COLUMN_LAYOUT = { type: 'default' };
 const getObjectValue = ( value ) =>
 	value && typeof value === 'object' && ! Array.isArray( value ) ? value : {};
 
+/*
+ * A column's width sizes it within the Columns flex container, so it must not
+ * ride along when the column's styles are copied onto a Group.
+ */
+const omitColumnWidth = ( style ) => {
+	const { width, ...dimensions } = getObjectValue( style.dimensions );
+	if ( width === undefined ) {
+		return style;
+	}
+
+	const updatedStyle = { ...style };
+	if ( Object.keys( dimensions ).length ) {
+		updatedStyle.dimensions = dimensions;
+	} else {
+		delete updatedStyle.dimensions;
+	}
+
+	return updatedStyle;
+};
+
 const getGroupAttributes = ( attributes ) => {
 	const groupAttributeDefinitions = getBlockType( 'core/group' )?.attributes;
 	if ( ! groupAttributeDefinitions ) {
@@ -28,7 +48,7 @@ const getGroupAttributes = ( attributes ) => {
 	);
 };
 
-const getColumnWidth = ( width ) => {
+const normalizeWidth = ( width ) => {
 	if ( Number.isFinite( width ) ) {
 		return `${ width }%`;
 	}
@@ -44,7 +64,7 @@ const getColumnBlocksFromGrid = ( innerBlocks, columnCount ) => {
 		{ length: columnCount },
 		( _, columnIndex ) => [
 			'core/column',
-			{ width: `${ columnWidth }%` },
+			{ style: { dimensions: { width: `${ columnWidth }%` } } },
 			innerBlocks.filter(
 				( _innerBlock, blockIndex ) =>
 					blockIndex % columnCount === columnIndex
@@ -62,7 +82,7 @@ const getColumnBlocksFromRow = ( innerBlocks ) =>
 			style.layout
 		);
 		const columnWidth = FLEX_SIZE_LAYOUT_VALUES.includes( selfStretch )
-			? getColumnWidth( flexSize )
+			? normalizeWidth( flexSize )
 			: undefined;
 
 		const updatedStyle = { ...style };
@@ -79,7 +99,9 @@ const getColumnBlocksFromRow = ( innerBlocks ) =>
 
 		return createBlock(
 			'core/column',
-			columnWidth ? { width: columnWidth } : {},
+			columnWidth
+				? { style: { dimensions: { width: columnWidth } } }
+				: {},
 			[ columnInnerBlock ]
 		);
 	} );
@@ -92,7 +114,7 @@ const getGridInnerBlocks = ( innerBlocks ) =>
 			style: styleAttribute,
 			...groupAttributes
 		} = getGroupAttributes( column?.attributes );
-		const columnStyle = getObjectValue( styleAttribute );
+		const columnStyle = omitColumnWidth( getObjectValue( styleAttribute ) );
 		const columnLayout = getObjectValue( layoutAttribute );
 		const hasGroupAttributes = Object.keys( groupAttributes ).length > 0;
 		const hasColumnStyle = Object.keys( columnStyle ).length > 0;
@@ -124,7 +146,7 @@ const getGridInnerBlocks = ( innerBlocks ) =>
 
 const getRowInnerBlocks = ( innerBlocks ) => {
 	const columnWidths = innerBlocks.map( ( column ) => {
-		return getColumnWidth( column?.attributes?.width );
+		return normalizeWidth( column?.attributes?.style?.dimensions?.width );
 	} );
 	const allColumnWidthsUnavailable = columnWidths.every(
 		( columnWidth ) => ! columnWidth
@@ -148,7 +170,7 @@ const getRowInnerBlocks = ( innerBlocks ) => {
 			style: styleAttribute,
 			...groupAttributes
 		} = getGroupAttributes( column?.attributes );
-		const columnStyle = getObjectValue( styleAttribute );
+		const columnStyle = omitColumnWidth( getObjectValue( styleAttribute ) );
 		const columnLayout = getObjectValue( layoutAttribute );
 		const hasGroupAttributes = Object.keys( groupAttributes ).length > 0;
 		const hasColumnStyle = Object.keys( columnStyle ).length > 0;
@@ -245,7 +267,11 @@ const transforms = {
 				const innerBlocksTemplate = blocks.map(
 					( { name, attributes, innerBlocks, innerContent } ) => [
 						'core/column',
-						{ width: `${ columnWidth }%` },
+						{
+							style: {
+								dimensions: { width: `${ columnWidth }%` },
+							},
+						},
 						[
 							[
 								name,
@@ -314,10 +340,26 @@ const transforms = {
 					media = [ 'core/video', { id, src: url } ];
 				}
 				const innerBlocksTemplate = [
-					[ 'core/column', { width: `${ mediaWidth }%` }, [ media ] ],
 					[
 						'core/column',
-						{ width: `${ 100 - mediaWidth }%` },
+						{
+							style: {
+								dimensions: {
+									width: `${ mediaWidth }%`,
+								},
+							},
+						},
+						[ media ],
+					],
+					[
+						'core/column',
+						{
+							style: {
+								dimensions: {
+									width: `${ 100 - mediaWidth }%`,
+								},
+							},
+						},
 						innerBlocks,
 					],
 				];
