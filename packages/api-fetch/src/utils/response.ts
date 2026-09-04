@@ -8,9 +8,18 @@ import { __ } from '@wordpress/i18n';
  * @return Parsed response.
  */
 async function parseJsonAndNormalizeError( response: Response ) {
+	// Clone the response up front so that, should `json()` fail, the body can
+	// still be read to distinguish an empty body from genuinely invalid JSON.
+	const clone = response.clone?.();
 	try {
 		return await response.json();
 	} catch {
+		// A successful response can legitimately have an empty body (for
+		// example, a `200` with no content), which is not valid JSON. Treat it
+		// the same as a `204` rather than reporting an error.
+		if ( clone && ( await clone.text() ) === '' ) {
+			return null;
+		}
 		throw {
 			code: 'invalid_json',
 			message: __( 'The response is not a valid JSON response.' ),
