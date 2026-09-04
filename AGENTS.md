@@ -38,6 +38,18 @@ Read only what your task needs, when it needs it:
 -   **User-facing copy**: before writing or changing a string a user reads, read `docs/contributors/documentation/copy-guide.md` — it covers terminology, capitalization, and how to word an error message.
 -   **Directory guides**: some directories carry their own `AGENTS.md` and `README.md` with rules for working there (e.g. `packages/components/AGENTS.md`) — read it before changing files in that directory.
 
+## Gutenberg-specific guidance
+
+Read `docs/contributors/code/building-guidance.md` for the general guidance on building in Gutenberg. There is also more focused guidance here:
+
+-   Cross-cutting lifecycle, boundary, and verification checks: `docs/contributors/code/cross-cutting-method.md`
+-   UI, interaction, accessibility, styles, i18n: `docs/contributors/code/ui-accessibility.md`
+-   React hooks, `@wordpress/data`, async lifecycle, performance: `docs/contributors/code/react-data-lifecycle.md`
+-   Packages, APIs, blocks, compatibility: `docs/contributors/code/packages-apis-compatibility.md`
+-   PHP, REST, schema, security: `docs/contributors/code/php-rest-schema.md`
+-   Tooling, dependencies, builds, generated artifacts, releases: `docs/contributors/code/tooling-ci-release.md`
+-   Tests, docs, changelogs, delivery evidence: `docs/contributors/code/testing-docs-delivery.md`
+
 ## Code quality
 
 ```bash

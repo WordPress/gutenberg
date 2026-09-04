@@ -3234,6 +3234,54 @@
 		"parent": "code"
 	},
 	{
+		"title": "Gutenberg Building Guidance",
+		"slug": "building-guidance",
+		"markdown_source": "../docs/contributors/code/building-guidance.md",
+		"parent": "code"
+	},
+	{
+		"title": "Cross-cutting Method",
+		"slug": "cross-cutting-method",
+		"markdown_source": "../docs/contributors/code/cross-cutting-method.md",
+		"parent": "building-guidance"
+	},
+	{
+		"title": "UI, interaction, accessibility, styles, and localization",
+		"slug": "ui-accessibility",
+		"markdown_source": "../docs/contributors/code/ui-accessibility.md",
+		"parent": "building-guidance"
+	},
+	{
+		"title": "React, data, runtime lifecycle, and performance",
+		"slug": "react-data-lifecycle",
+		"markdown_source": "../docs/contributors/code/react-data-lifecycle.md",
+		"parent": "building-guidance"
+	},
+	{
+		"title": "Packages, APIs, blocks, and compatibility",
+		"slug": "packages-apis-compatibility",
+		"markdown_source": "../docs/contributors/code/packages-apis-compatibility.md",
+		"parent": "building-guidance"
+	},
+	{
+		"title": "PHP, REST, schema, and security",
+		"slug": "php-rest-schema",
+		"markdown_source": "../docs/contributors/code/php-rest-schema.md",
+		"parent": "building-guidance"
+	},
+	{
+		"title": "Tooling, dependencies, CI, generated artifacts, and releases",
+		"slug": "tooling-ci-release",
+		"markdown_source": "../docs/contributors/code/tooling-ci-release.md",
+		"parent": "building-guidance"
+	},
+	{
+		"title": "Tests, documentation, changelogs, and delivery evidence",
+		"slug": "testing-docs-delivery",
+		"markdown_source": "../docs/contributors/code/testing-docs-delivery.md",
+		"parent": "building-guidance"
+	},
+	{
 		"title": "Gutenberg Release Process",
 		"slug": "release",
 		"markdown_source": "../docs/contributors/code/release/README.md",
