@@ -14,7 +14,7 @@ import type {
 	ScheduleRetryAction,
 	State,
 } from './types';
-import { ItemStatus, OperationType, Type } from './types';
+import { ItemStatus, Type } from './types';
 import {
 	calculateRetryDelay,
 	clearRetryTimer,
@@ -259,11 +259,7 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 		// Failed vips ops also leak WASM memory, so count them toward the
 		// recycle budget. Without this, a long burst of failures (e.g. a
 		// gallery of unsupported AVIFs) could grow memory unbounded.
-		if (
-			currentOperation === OperationType.ResizeCrop ||
-			currentOperation === OperationType.Rotate ||
-			currentOperation === OperationType.TranscodeImage
-		) {
+		if ( previousPool === IMAGE_PROCESSING_POOL ) {
 			maybeRecycleVipsWorker(
 				select.getActiveCountByPool( IMAGE_PROCESSING_POOL )
 			);

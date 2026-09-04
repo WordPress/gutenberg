@@ -241,7 +241,7 @@ export interface Settings {
 	maxUploadFileSize?: number;
 	// Maximum number of concurrent uploads.
 	maxConcurrentUploads: number;
-	// Maximum number of concurrent image processing operations (resize, crop, rotate).
+	// Maximum number of concurrent image processing operations (resize, crop, rotate, transcode).
 	maxConcurrentImageProcessing: number;
 	// Big image size threshold in pixels.
 	// Images larger than this will be scaled down.

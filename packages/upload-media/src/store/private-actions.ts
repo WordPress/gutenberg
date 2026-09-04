@@ -823,11 +823,7 @@ export function finishOperation(
 		// Track vips operations across success and failure paths so a
 		// burst of failures can't bypass the recycle budget; the cancel
 		// path calls the same helper.
-		if (
-			previousOperation === OperationType.ResizeCrop ||
-			previousOperation === OperationType.Rotate ||
-			previousOperation === OperationType.TranscodeImage
-		) {
+		if ( previousPool === IMAGE_PROCESSING_POOL ) {
 			maybeRecycleVipsWorker(
 				select.getActiveCountByPool( IMAGE_PROCESSING_POOL )
 			);

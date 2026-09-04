@@ -106,6 +106,10 @@ export const CORE_OPERATIONS: OperationDefinition[] = [
 	{
 		name: OperationType.TranscodeImage,
 		label: __( 'Converting image' ),
+		// Transcoding runs in the same vips worker as resizing and rotating,
+		// so it shares their memory budget and must be counted as in flight
+		// before the worker is recycled.
+		concurrency: IMAGE_PROCESSING_POOL,
 		handler: ( item, args, context ) =>
 			privileged( context ).dispatch.transcodeImageItem(
 				item.id,
