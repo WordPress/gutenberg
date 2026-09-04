@@ -9,6 +9,8 @@ import { MenuItemContentContext } from './context';
 import { ItemContent, useItemContent } from './item';
 import type { LinkItemProps } from './types';
 
+const BLANK_TARGET_PATTERN = /^_[bB][lL][aA][nN][kK]$/;
+
 /**
  * Renders a menu item that navigates to a link target.
  */
@@ -30,7 +32,8 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 	},
 	ref
 ) {
-	const shouldShowNewTabIndicator = openInNewTab || target === '_blank';
+	const shouldShowNewTabIndicator =
+		openInNewTab || BLANK_TARGET_PATTERN.test( target ?? '' );
 	const externalLinkIndicator = shouldShowNewTabIndicator ? (
 		<span
 			className={ styles[ 'external-link-indicator' ] }
