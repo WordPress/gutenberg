@@ -16,7 +16,7 @@
 	},
 	"engines": {
 		"node": ">=20.19.0",
-		"npm": ">=10.2.3"
+		"npm": ">=11.16"
 	},
 	"devEngines": {
 		"runtime": {
@@ -25,7 +25,7 @@
 		},
 		"packageManager": {
 			"name": "npm",
-			"version": ">=10.2.3",
+			"version": ">=11.16",
 			"onFail": "error"
 		}
 	},
@@ -155,7 +155,7 @@
 		"other:cherry-pick": "npm run --workspace @wordpress/release-tools cherry-pick --",
 		"other:generate-php-sync-issue": "npm run --workspace @wordpress/release-tools generate-php-sync-issue --",
 		"other:update-packages:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer update --no-interaction",
-		"postinstall": "patch-package && npm run agents:setup -- --if-safe",
+		"postinstall": "node ./patches/apply-patches.mjs && npm run agents:setup -- --if-safe",
 		"prepare": "husky install",
 		"prepublishOnly": "npm run build",
 		"rtc:http": "node ./test/e2e/bin/rtc-dev.mjs --mode=http",

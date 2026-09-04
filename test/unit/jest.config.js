@@ -109,7 +109,9 @@ const commonProjectConfig = {
 		'^.+\\.m?[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
 	},
 	transformIgnorePatterns: [
-		`/node_modules/(?!(${ dependenciesToTransform.join( '|' ) })/)`,
+		`/node_modules/(?!(\\.store/.+/node_modules/)?(${ dependenciesToTransform.join(
+			'|'
+		) })/)`,
 		'\\.pnp\\.[^\\/]+$',
 	],
 	snapshotSerializers: [
