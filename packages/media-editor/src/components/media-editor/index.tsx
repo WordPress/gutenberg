@@ -116,12 +116,15 @@ interface MediaEditorSidebarProps {
 	/** The open panel's id. Always one of `tabs`. */
 	activeTab: string;
 	onSelectTab: ( tab: string ) => void;
+	/** Freeze the open panel while the edit is saving. */
+	disabled?: boolean;
 }
 
 function MediaEditorSidebar( {
 	tabs,
 	activeTab,
 	onSelectTab,
+	disabled = false,
 }: MediaEditorSidebarProps ) {
 	return (
 		<NavigableRegion
@@ -146,7 +149,11 @@ function MediaEditorSidebar( {
 				<div className="media-editor__tablist">
 					<Tabs.List variant="minimal">
 						{ tabs.map( ( tab ) => (
-							<Tabs.Tab key={ tab.id } value={ tab.id }>
+							<Tabs.Tab
+								key={ tab.id }
+								value={ tab.id }
+								disabled={ disabled }
+							>
 								{ tab.title }
 							</Tabs.Tab>
 						) ) }
@@ -320,6 +327,9 @@ function HistoryActions() {
 		redoCrop();
 	};
 	const handleReset = () => {
+		if ( isUndoRedoDisabled ) {
+			return;
+		}
 		beginGesture();
 		reset();
 		onReset();
@@ -334,7 +344,7 @@ function HistoryActions() {
 			<Button
 				size="compact"
 				variant="tertiary"
-				disabled={ ! isDirty }
+				disabled={ isUndoRedoDisabled || ! isDirty }
 				accessibleWhenDisabled
 				onClick={ handleReset }
 			>
@@ -634,7 +644,7 @@ function MediaEditorContent( {
 				! target.closest( `[${ CROP_CONTROL_ATTR }]` );
 			if ( ! isMetadataField ) {
 				event.preventDefault();
-				if ( isCropInteractionActive ) {
+				if ( isCropInteractionActive || isSaving ) {
 					return;
 				}
 				if ( isRedoShortcut ) {
@@ -677,6 +687,7 @@ function MediaEditorContent( {
 			<MediaEditorImageControls
 				showAspectRatioControl
 				aspectRatioPresets={ aspectRatioPresets }
+				disabled={ isSaving }
 			/>
 		) : null;
 
@@ -694,6 +705,7 @@ function MediaEditorContent( {
 								aspectRatioValue={ aspectRatioValue }
 								onAspectRatioChange={ setAspectRatioValue }
 								aspectRatioOptions={ aspectRatioOptions }
+								disabled={ isSaving }
 							/>
 						),
 					},
@@ -709,6 +721,7 @@ function MediaEditorContent( {
 	const ruler = isImage ? (
 		<MediaEditorFineRotation
 			onPlacementControlInteraction={ signalPlacementControlInteraction }
+			disabled={ isSaving }
 		/>
 	) : null;
 
@@ -745,6 +758,7 @@ function MediaEditorContent( {
 											handleCanvasGestureStart
 										}
 										onGestureEnd={ handleCanvasGestureEnd }
+										disabled={ isSaving }
 									/>
 								) : (
 									<MediaPreview />
@@ -773,6 +787,7 @@ function MediaEditorContent( {
 										: DETAILS_PANEL
 								}
 								onSelectTab={ selectPanel }
+								disabled={ isSaving }
 							/>
 						) }
 					</div>
@@ -805,7 +820,10 @@ function MediaEditorContent( {
 		isSaving,
 		hasMedia: !! media,
 		hasChanges,
-		isUndoRedoDisabled: isCropInteractionActive,
+		// Saving freezes the whole edit surface: `save()` reads the
+		// modifiers once and then awaits, so anything changed after that
+		// would be silently dropped when the save resolves.
+		isUndoRedoDisabled: isCropInteractionActive || isSaving,
 		aspectRatioPresets,
 		isWide,
 		activePanel,

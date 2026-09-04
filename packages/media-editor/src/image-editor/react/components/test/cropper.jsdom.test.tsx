@@ -640,6 +640,276 @@ describe( 'Cropper', () => {
 		expect( controller.setPan ).not.toHaveBeenCalled();
 	} );
 
+	it( 'ignores pointer drags on the canvas while disabled', async () => {
+		const controller = createController();
+		render(
+			<Cropper
+				src="test.jpg"
+				controller={ controller }
+				showDimming
+				showGrid="interactive"
+				freeformCrop
+				disabled
+			/>
+		);
+
+		await screen.findByRole( 'button', {
+			name: 'Resize from top-left corner',
+		} );
+		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
+
+		fireEvent.pointerDown( canvas, {
+			button: 0,
+			clientX: 100,
+			clientY: 100,
+			pointerId: 1,
+			isPrimary: true,
+		} );
+		fireEvent.pointerMove( canvas, {
+			button: 0,
+			clientX: 150,
+			clientY: 120,
+			pointerId: 1,
+			isPrimary: true,
+		} );
+
+		await act( async () => {
+			await new Promise( ( resolve ) =>
+				requestAnimationFrame( () => resolve( undefined ) )
+			);
+		} );
+		expect( controller.setPan ).not.toHaveBeenCalled();
+	} );
+
+	it( 'pans again after disabled is lifted, as when a save fails', async () => {
+		const controller = createController();
+		const props = {
+			src: 'test.jpg',
+			controller,
+			showDimming: true,
+			showGrid: 'interactive' as const,
+			freeformCrop: true,
+		};
+		const { rerender } = render( <Cropper { ...props } disabled /> );
+
+		await screen.findByRole( 'button', {
+			name: 'Resize from top-left corner',
+		} );
+
+		rerender( <Cropper { ...props } /> );
+
+		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
+		fireEvent.pointerDown( canvas, {
+			button: 0,
+			clientX: 100,
+			clientY: 100,
+			pointerId: 1,
+			isPrimary: true,
+		} );
+		fireEvent.pointerMove( canvas, {
+			button: 0,
+			clientX: 150,
+			clientY: 120,
+			pointerId: 1,
+			isPrimary: true,
+		} );
+
+		await waitFor( () => expect( controller.setPan ).toHaveBeenCalled() );
+	} );
+
+	it( 'ends the gesture when a drag is cancelled by disabling', async () => {
+		const controller = createController();
+		const onGestureStart = jest.fn();
+		const onGestureEnd = jest.fn();
+		const props = {
+			src: 'test.jpg',
+			controller,
+			showDimming: true,
+			showGrid: 'interactive' as const,
+			freeformCrop: true,
+			onGestureStart,
+			onGestureEnd,
+		};
+		const { rerender } = render( <Cropper { ...props } /> );
+
+		await screen.findByRole( 'button', {
+			name: 'Resize from top-left corner',
+		} );
+		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
+
+		fireEvent.pointerDown( canvas, {
+			button: 0,
+			clientX: 100,
+			clientY: 100,
+			pointerId: 1,
+			isPrimary: true,
+		} );
+		fireEvent.pointerMove( canvas, {
+			button: 0,
+			clientX: 150,
+			clientY: 120,
+			pointerId: 1,
+			isPrimary: true,
+		} );
+		await waitFor( () => expect( onGestureStart ).toHaveBeenCalled() );
+
+		rerender( <Cropper { ...props } disabled /> );
+
+		// Without this the caller is left believing a gesture is still
+		// running, which keeps undo/redo disabled after a failed save.
+		expect( onGestureEnd ).toHaveBeenCalled();
+	} );
+
+	it( 'does not signal a gesture end when disabling with no gesture running', async () => {
+		const onGestureEnd = jest.fn();
+		const props = {
+			src: 'test.jpg',
+			controller: createController(),
+			showDimming: true,
+			showGrid: 'interactive' as const,
+			freeformCrop: true,
+			onGestureEnd,
+		};
+		const { rerender } = render( <Cropper { ...props } /> );
+
+		await screen.findByRole( 'button', {
+			name: 'Resize from top-left corner',
+		} );
+
+		rerender( <Cropper { ...props } disabled /> );
+
+		expect( onGestureEnd ).not.toHaveBeenCalled();
+	} );
+
+	it( 'ignores wheel zoom while disabled', async () => {
+		const controller = createController();
+		render(
+			<Cropper
+				src="test.jpg"
+				controller={ controller }
+				showDimming
+				showGrid="interactive"
+				freeformCrop
+				disabled
+			/>
+		);
+
+		await screen.findByRole( 'button', {
+			name: 'Resize from top-left corner',
+		} );
+		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
+
+		fireEvent.wheel( canvas, { deltaY: -120, clientX: 100, clientY: 100 } );
+
+		await act( async () => {
+			await new Promise( ( resolve ) =>
+				requestAnimationFrame( () => resolve( undefined ) )
+			);
+		} );
+		expect( controller.setZoomAtPoint ).not.toHaveBeenCalled();
+		expect( controller.setZoom ).not.toHaveBeenCalled();
+	} );
+
+	it( 'ignores keyboard pan while disabled', async () => {
+		const controller = createController();
+		render(
+			<Cropper
+				src="test.jpg"
+				controller={ controller }
+				showDimming
+				showGrid="interactive"
+				freeformCrop
+				disabled
+			/>
+		);
+
+		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
+		fireEvent.keyDown( canvas, { key: 'ArrowRight' } );
+
+		expect( controller.setPan ).not.toHaveBeenCalled();
+	} );
+
+	it( 'stops an in-flight canvas drag when disabled flips mid-gesture', async () => {
+		const controller = createController();
+		const props = {
+			src: 'test.jpg',
+			controller,
+			showDimming: true,
+			showGrid: 'interactive' as const,
+			freeformCrop: true,
+		};
+		const { rerender } = render( <Cropper { ...props } /> );
+
+		await screen.findByRole( 'button', {
+			name: 'Resize from top-left corner',
+		} );
+		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
+
+		fireEvent.pointerDown( canvas, {
+			button: 0,
+			clientX: 100,
+			clientY: 100,
+			pointerId: 1,
+			isPrimary: true,
+		} );
+
+		rerender( <Cropper { ...props } disabled /> );
+		( controller.setPan as jest.Mock ).mockClear();
+
+		fireEvent.pointerMove( canvas, {
+			button: 0,
+			clientX: 180,
+			clientY: 140,
+			pointerId: 1,
+			isPrimary: true,
+		} );
+
+		await act( async () => {
+			await new Promise( ( resolve ) =>
+				requestAnimationFrame( () => resolve( undefined ) )
+			);
+		} );
+		expect( controller.setPan ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does not resize the crop from a handle drag while disabled', async () => {
+		const controller = createController();
+		render(
+			<Cropper
+				src="test.jpg"
+				controller={ controller }
+				showDimming
+				showGrid="interactive"
+				freeformCrop
+				disabled
+			/>
+		);
+
+		const handle = await screen.findByRole( 'button', {
+			name: 'Resize from top-left corner',
+		} );
+
+		fireEvent.pointerDown( handle, {
+			button: 0,
+			clientX: 100,
+			clientY: 100,
+			pointerId: 1,
+		} );
+		fireEvent.pointerMove( handle, {
+			button: 0,
+			clientX: 160,
+			clientY: 150,
+			pointerId: 1,
+		} );
+
+		await act( async () => {
+			await new Promise( ( resolve ) =>
+				requestAnimationFrame( () => resolve( undefined ) )
+			);
+		} );
+		expect( controller.setCropRect ).not.toHaveBeenCalled();
+	} );
+
 	it( 'cancels handle resize when a touch gesture becomes a pinch', async () => {
 		const originalRAF = globalThis.requestAnimationFrame;
 		const originalCAF = globalThis.cancelAnimationFrame;
