@@ -25,7 +25,8 @@ export default function useInspectorControlsTabs(
 	blockName,
 	contentClientIds,
 	isSectionBlock,
-	hasBlockStyles
+	hasBlockStyles,
+	hasSharedStyleControls
 ) {
 	const tabs = [];
 	const {
@@ -114,7 +115,10 @@ export default function useInspectorControlsTabs(
 		};
 	}, [] );
 
-	if ( ! isPreviewMode && ( hasBlockStyles || hasStyleFills ) ) {
+	if (
+		! isPreviewMode &&
+		( hasBlockStyles || hasStyleFills || hasSharedStyleControls )
+	) {
 		tabs.push( TAB_STYLES );
 	}
 
