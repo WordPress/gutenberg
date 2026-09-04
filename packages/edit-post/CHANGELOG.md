@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Mark the Welcome Guide item of the Options menu with `aria-haspopup="dialog"`, since it opens a modal dialog ([#82395](https://github.com/WordPress/gutenberg/pull/82395)).
+
 ### Bug Fixes
 
 -   `WelcomeGuide`: Keep the modal close icon white now that it is stroke-based ([#78812](https://github.com/WordPress/gutenberg/pull/78812)).

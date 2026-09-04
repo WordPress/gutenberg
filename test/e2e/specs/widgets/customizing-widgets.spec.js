@@ -640,6 +640,31 @@ test.describe( 'Widgets Customizer', () => {
 			page.getByRole( 'dialog' ).getByRole( 'textbox' )
 		).toHaveText( 'hello' );
 	} );
+
+	// Check for regressions of https://github.com/WordPress/gutenberg/issues/52328.
+	test( 'should open the welcome guide from the Options menu', async ( {
+		page,
+		widgetsCustomizerPage,
+	} ) => {
+		await widgetsCustomizerPage.visitCustomizerPage();
+		await widgetsCustomizerPage.expandWidgetArea( 'Footer #1' );
+
+		const welcomeGuideHeading = page.getByRole( 'heading', {
+			name: 'Welcome to block Widgets',
+			level: 1,
+		} );
+		await expect( welcomeGuideHeading ).toBeHidden();
+
+		await page
+			.getByRole( 'toolbar', { name: 'Document tools' } )
+			.getByRole( 'button', { name: 'Options', exact: true } )
+			.click();
+		// The welcome guide is not a preference, so the item is a plain menu
+		// item rather than a `menuitemcheckbox`.
+		await page.getByRole( 'menuitem', { name: 'Welcome Guide' } ).click();
+
+		await expect( welcomeGuideHeading ).toBeVisible();
+	} );
 } );
 
 class WidgetsCustomizerPage {

@@ -25,6 +25,7 @@ export default function WelcomeGuideMenuItem() {
 					isEditingTemplate ? 'welcomeGuideTemplate' : 'welcomeGuide'
 				)
 			}
+			aria-haspopup="dialog"
 		>
 			{ __( 'Welcome Guide' ) }
 		</MoreMenuItem>

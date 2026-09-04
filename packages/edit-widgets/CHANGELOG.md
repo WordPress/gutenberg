@@ -10,6 +10,7 @@
 
 -   `WelcomeGuide`: Keep the modal close icon white on hover now that it is stroke-based. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
 -   Prevent an error in `canInsertBlockInWidgetArea` when no widget area blocks are present.
+-   Open the Welcome Guide from a plain menu item instead of a preference toggle, so the Options menu no longer announces "Preference activated - Welcome Guide" ([#82395](https://github.com/WordPress/gutenberg/pull/82395)).
 
 ### Internal
 

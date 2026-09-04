@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Add New Template: Use the Button component's focus ring instead of the legacy `box-shadow` ones ([#80138](https://github.com/WordPress/gutenberg/issues/80138)).
+-   Mark the Welcome Guide item of the Options menu with `aria-haspopup="dialog"`, since it opens a modal dialog ([#82395](https://github.com/WordPress/gutenberg/pull/82395)).
 
 ### Bug Fixes
 
