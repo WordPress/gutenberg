@@ -79,6 +79,7 @@
 
 	&:focus-visible::before {
 		@include outset-ring__focus();
+		outline-offset: 0;
 	}
 
 	.components-tab-panel__tabs[aria-orientation="vertical"] & {
@@ -101,5 +102,6 @@
 
 	&:focus-visible {
 		@include outset-ring__focus();
+		outline-offset: 0;
 	}
 }
