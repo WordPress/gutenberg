@@ -55,7 +55,8 @@
 		"sass-embedded": "^1.97.2"
 	},
 	"devDependencies": {
-		"@types/node": "^20.19.39"
+		"@types/node": "^20.19.39",
+		"vitest": "^4.1.10"
 	},
 	"peerDependencies": {
 		"@wordpress/boot": ">=0.3.0 <1.0.0",

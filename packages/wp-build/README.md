@@ -294,9 +294,10 @@ Pages can be defined as simple strings or as objects with initialization modules
 **Page Configuration:**
 
 -   **String format**: `"my-admin-page"` - Simple page with no init modules
--   **Object format**: `{ "id": "page-slug", "init": ["@scope/package"], "experimental": true }` - Page with optional init modules
+-   **Object format**: `{ "id": "page-slug", "init": ["@scope/package"], "capability": "edit_theme_options", "experimental": true }` - Page with optional init modules
     -   **`id`** (required): The page slug used in WordPress admin URLs
     -   **`init`** (optional): Array of script module IDs to execute during page initialization
+    -   **`capability`** (optional, default `manage_options`): Capability a user needs to view the page. Full-page mode enforces this itself, since it renders outside the menu page callback flow; match it to the capability used when registering the page's menu entry.
     -   **`experimental`** (optional, default `false`): When `true`, the page is excluded from WordPress Core builds (`IS_WORDPRESS_CORE=true`), along with any route that belongs only to experimental pages.
 
 **Generated Files:**

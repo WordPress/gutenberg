@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### New Features
+
+-   `BackgroundImageControl`: Support setting the background image from a URL, through the URL field in the media replace popover ([#82230](https://github.com/WordPress/gutenberg/pull/82230)).
+
+### Enhancements
+
+-   Borders: rename the "Border & Shadow" panel to "Borders", whichever of its controls are available, and always show the Border and Shadow controls' visible labels. A stable panel title is what lets the Border label render unconditionally, so its "Unlink sides" toggle lines up with the border radius one ([#82163](https://github.com/WordPress/gutenberg/pull/82163)).
+
 ### Internal
 
 -   Remove unused dependencies `@wordpress/escape-html`, `@wordpress/wordcount` and `deepmerge` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
@@ -9,11 +17,14 @@
 
 ### Bug Fixes
 
+-   Flex layout: Output `flex-direction: row` when a viewport override switches a vertical layout to horizontal, so the base `flex-direction: column` no longer keeps applying on that viewport ([#82364](https://github.com/WordPress/gutenberg/pull/82364)).
+-   `BlockManager`: Color library block icons with `color` while retaining a `fill` fallback for custom icons that do not use `currentColor`. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
 -   Block List Appender: Show the appender button as a drop target when dragging a block over an empty container such as a Column, restoring the reveal that the `visibility`-to-`opacity` migration left behind ([#77852](https://github.com/WordPress/gutenberg/pull/77852)).
 -   Inserter: Keep the hovered block preview inside the viewport, so a tall preview in a short window is no longer clipped ([#82060](https://github.com/WordPress/gutenberg/pull/82060)).
 -   Element styles: Register each block's element-style CSS override with the block's `clientId`, so the editor orders them by block position instead of registration order. A parent's link color re-registered after a child's (e.g. by resetting and re-picking it) no longer overrides the child's own link color in the canvas ([#77833](https://github.com/WordPress/gutenberg/pull/77833)).
 -   Client-side media processing: Refuse a batch of more than one file when the caller only takes one, such as a Cover block placeholder, matching what the server-side upload path already did. Every dropped file was uploaded instead, and the block kept whichever one finished last ([#82041](https://github.com/WordPress/gutenberg/issues/82041)).
 -   `BlockVariationPicker`: Set icon colors with `color` so stroke-based variation icons retain their intended unfilled appearance, while keeping a non-important `fill` fallback for third-party icons that do not use `currentColor`. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+-   Invalidate the memoized block insertion selectors when `isPreviewMode` changes, and refuse the writing flow's cross-block input handling while the canvas is a preview. Preview mode already refused insertion, but nothing recomputed when it was turned on after the editor had booted, so an editor switched into a read-only preview at runtime went on believing it could insert: Enter split a paragraph and the block library listed every type ([#80427](https://github.com/WordPress/gutenberg/pull/80427), [#81661](https://github.com/WordPress/gutenberg/pull/81661)).
 
 ### Internal
 
@@ -39,7 +50,6 @@
 
 ### Bug Fixes
 
--   Invalidate the memoized block insertion selectors when `isPreviewMode` changes, and refuse the writing flow's cross-block input handling while the canvas is a preview. Preview mode already refused insertion, but nothing recomputed when it was turned on after the editor had booted, so an editor switched into a read-only preview at runtime went on believing it could insert: Enter split a paragraph and the block library listed every type ([#80427](https://github.com/WordPress/gutenberg/pull/80427), [#81661](https://github.com/WordPress/gutenberg/pull/81661)).
 -   Retain focus and caret position when undoing a prefix transform (e.g. `## `, `- `, `> `) with Backspace or Escape ([#82116](https://github.com/WordPress/gutenberg/pull/82116)).
 -   Hide the Layout panel when a block has layout editing enabled but all controls for its layout type are disabled ([#81968](https://github.com/WordPress/gutenberg/pull/81968)).
 -   `DuotoneControl`: Keep the picked preset's identity when applying a duotone to a block. Two presets can hold the same pair of colors, and the applied preset was resolved by matching colors, so the first of any duplicate pair was saved and both appeared selected ([#81605](https://github.com/WordPress/gutenberg/pull/81605)).
