@@ -22,7 +22,11 @@ This structure controls context bloat. The root `AGENTS.md` is a fixed cost in e
 
 ## Supported agents
 
-Codex discovers the repository skill catalog natively. Claude Code uses a generated compatibility view. Installing dependencies updates that view when it contains only catalog entries; it leaves the view unchanged when it finds unmatched local entries. No other agent-specific view is currently configured.
+Codex discovers the repository skill catalog natively. Claude Code uses a generated compatibility view. Installing dependencies updates that view when it contains only catalog entries; it leaves the view unchanged when it finds unmatched local entries.
+
+CodeRabbit discovers `AGENTS.md` files without a compatibility view. The repository's [`.coderabbit.yaml`](https://github.com/WordPress/gutenberg/blob/trunk/.coderabbit.yaml) also maps the canonical skill entry points to reviewed files so automatic reviews can apply their guidance.
+
+No other agent-specific view is currently configured.
 
 ## Creating skills
 
