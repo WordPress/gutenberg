@@ -97,6 +97,19 @@ export function FlatTermSelector( { slug } ) {
 			const _termIds = _taxonomy
 				? getEditedPostAttribute( _taxonomy.rest_base )
 				: EMPTY_ARRAY;
+			const canCreate =
+				!! _taxonomy &&
+				!! post._links?.[ 'wp:action-create-' + _taxonomy.rest_base ];
+			const canAssign =
+				!! _taxonomy &&
+				!! post._links?.[ 'wp:action-assign-' + _taxonomy.rest_base ];
+
+			// If the user can't assign terms, there's no need to fetch them.
+			if ( ! canAssign ) {
+				return {
+					hasAssignAction: canAssign,
+				};
+			}
 
 			const query = {
 				...DEFAULT_QUERY,
@@ -108,16 +121,8 @@ export function FlatTermSelector( { slug } ) {
 			};
 
 			return {
-				hasCreateAction: _taxonomy
-					? post._links?.[
-							'wp:action-create-' + _taxonomy.rest_base
-					  ] ?? false
-					: false,
-				hasAssignAction: _taxonomy
-					? post._links?.[
-							'wp:action-assign-' + _taxonomy.rest_base
-					  ] ?? false
-					: false,
+				hasCreateAction: canCreate,
+				hasAssignAction: canAssign,
 				taxonomy: _taxonomy,
 				termIds: _termIds,
 				terms: _termIds?.length
@@ -148,8 +153,6 @@ export function FlatTermSelector( { slug } ) {
 
 	const searchTerms = useCallback(
 		async ( search ) => {
-			lastSearchRef.current = search;
-
 			const records = await registry
 				.resolveSelect( coreStore )
 				.getEntityRecords( 'taxonomy', slug, {
@@ -157,7 +160,7 @@ export function FlatTermSelector( { slug } ) {
 					search,
 				} );
 
-			// Ignore requests that resolved out of order.
+			// Ignore a request whose search no longer matches the input.
 			if ( lastSearchRef.current === search ) {
 				setSuggestions( ( records ?? [] ).map( termToItem ) );
 				setIsSearching( false );
@@ -173,9 +176,11 @@ export function FlatTermSelector( { slug } ) {
 	const hasExactMatch = [ ...suggestions, ...values ].some( ( term ) =>
 		isSameTermName( term.label, newTermName )
 	);
+	const showCreatableItem =
+		hasCreateAction && !! newTermName && ! hasExactMatch && ! isSearching;
 	const creatableItem = useMemo(
 		() =>
-			hasCreateAction && !! newTermName && ! hasExactMatch
+			showCreatableItem
 				? {
 						value: CREATE_TERM_VALUE,
 						label: sprintf(
@@ -186,7 +191,7 @@ export function FlatTermSelector( { slug } ) {
 						creatable: true,
 				  }
 				: undefined,
-		[ hasCreateAction, hasExactMatch, newTermName ]
+		[ newTermName, showCreatableItem ]
 	);
 	const items = useMemo(
 		() =>
@@ -256,7 +261,6 @@ export function FlatTermSelector( { slug } ) {
 					( item ) => ! isSameTerm( item, pendingTerm )
 				)
 			);
-			speak( termRemovedLabel, 'assertive' );
 			return;
 		}
 
@@ -348,6 +352,9 @@ export function FlatTermSelector( { slug } ) {
 
 	function onInputValueChange( nextInputValue ) {
 		setInputValue( nextInputValue );
+		// Tracked here rather than in the search, so that a request already in
+		// flight is discarded once it resolves.
+		lastSearchRef.current = nextInputValue;
 		// The suggestions are searched through the REST API and nothing filters
 		// them on the client, so the ones for the previous input have to go
 		// before they can be picked by mistake.
@@ -382,7 +389,6 @@ export function FlatTermSelector( { slug } ) {
 				emptyContent={
 					isSearching ? __( 'Searching…' ) : notFoundLabel
 				}
-				searchPlaceholder=""
 				showClearButton={ false }
 				chipsContent={ ( selectedTerms ) =>
 					selectedTerms.map( ( term ) => (
