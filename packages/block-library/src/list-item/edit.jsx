@@ -14,22 +14,18 @@ import {
 	formatIndent,
 } from '@wordpress/icons';
 import { useMergeRefs } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useRegistry } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
+import { useEnter, useSpace, useMultiSelectTab, useMerge } from './hooks';
 import {
-	useEnter,
-	useSpace,
-	useMultiSelectTab,
-	useIndentListItem,
-	useOutdentListItem,
-	useMerge,
+	indentListItems,
+	outdentListItems,
 	getIndentTarget,
 	getOutdentTarget,
-} from './hooks';
+} from './utils';
 
 export function IndentUI( { clientId } ) {
-	const indentListItem = useIndentListItem( clientId );
-	const outdentListItem = useOutdentListItem();
+	const registry = useRegistry();
 	const { canIndent, canOutdent } = useSelect(
 		( select ) => {
 			const storeSelect = select( blockEditorStore );
@@ -49,7 +45,7 @@ export function IndentUI( { clientId } ) {
 				shortcut={ displayShortcut.shift( 'Tab' ) }
 				description={ __( 'Outdent list item' ) }
 				disabled={ ! canOutdent }
-				onClick={ () => outdentListItem() }
+				onClick={ () => outdentListItems( registry ) }
 			/>
 			<ToolbarButton
 				icon={ isRTL() ? formatIndentRTL : formatIndent }
@@ -57,7 +53,7 @@ export function IndentUI( { clientId } ) {
 				shortcut="Tab"
 				description={ __( 'Indent list item' ) }
 				disabled={ ! canIndent }
-				onClick={ () => indentListItem() }
+				onClick={ () => indentListItems( registry, clientId ) }
 			/>
 		</>
 	);

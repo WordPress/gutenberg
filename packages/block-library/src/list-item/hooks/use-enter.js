@@ -6,23 +6,22 @@ import {
 import { useRefEffect } from '@wordpress/compose';
 import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 import { ENTER } from '@wordpress/keycodes';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import useOutdentListItem from './use-outdent-list-item';
+import { outdentListItems, getOutdentTarget } from '../utils';
 import { unlock } from '../../lock-unlock';
 
 const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
 export default function useEnter( clientId ) {
+	const registry = useRegistry();
 	const { replaceBlocks, selectionChange } = useDispatch( blockEditorStore );
 	const {
 		getBlock,
 		getBlockAttributes,
 		getBlockRootClientId,
 		getBlockIndex,
-		getBlockName,
 	} = useSelect( blockEditorStore );
-	const outdentListItem = useOutdentListItem();
 	return useRefEffect( ( element ) => {
 		function onKeyDown( event ) {
 			if ( event.defaultPrevented || event.keyCode !== ENTER ) {
@@ -33,12 +32,12 @@ export default function useEnter( clientId ) {
 				return;
 			}
 			event.preventDefault();
-			const canOutdent =
-				getBlockName(
-					getBlockRootClientId( getBlockRootClientId( clientId ) )
-				) === 'core/list-item';
+			const canOutdent = !! getOutdentTarget(
+				registry.select( blockEditorStore ),
+				clientId
+			);
 			if ( canOutdent ) {
-				outdentListItem();
+				outdentListItems( registry );
 				return;
 			}
 			// Here we are in top level list so we need to split.

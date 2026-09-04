@@ -1,12 +1,11 @@
 import { useRefEffect } from '@wordpress/compose';
 import { TAB } from '@wordpress/keycodes';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
-import useIndentListItem from './use-indent-list-item';
-import useOutdentListItem from './use-outdent-list-item';
+import { useSelect, useRegistry } from '@wordpress/data';
+import { indentListItems, outdentListItems } from '../utils';
 
 export default function useMultiSelectTab( clientId ) {
-	const { getBlockIndex } = useSelect( blockEditorStore );
+	const registry = useRegistry();
 	// Only the first item of an all-list-item multi selection attaches the
 	// listener, so there is a single handler regardless of how many list items
 	// are rendered, and only while such a selection exists.
@@ -30,8 +29,6 @@ export default function useMultiSelectTab( clientId ) {
 		},
 		[ clientId ]
 	);
-	const indentListItem = useIndentListItem( clientId );
-	const outdentListItem = useOutdentListItem();
 
 	return useRefEffect(
 		( element ) => {
@@ -53,13 +50,10 @@ export default function useMultiSelectTab( clientId ) {
 				}
 
 				if ( shiftKey ) {
-					if ( outdentListItem() ) {
+					if ( outdentListItems( registry ) ) {
 						event.preventDefault();
 					}
-				} else if (
-					getBlockIndex( clientId ) !== 0 &&
-					indentListItem()
-				) {
+				} else if ( indentListItems( registry ) ) {
 					event.preventDefault();
 				}
 			}
@@ -75,6 +69,6 @@ export default function useMultiSelectTab( clientId ) {
 				ownerDocument.removeEventListener( 'keydown', onKeyDown, true );
 			};
 		},
-		[ isActive, clientId, getBlockIndex, indentListItem, outdentListItem ]
+		[ isActive, registry ]
 	);
 }

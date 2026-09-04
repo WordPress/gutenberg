@@ -2,18 +2,14 @@ import { useRefEffect } from '@wordpress/compose';
 import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 import { SPACE, TAB } from '@wordpress/keycodes';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
-import useIndentListItem from './use-indent-list-item';
-import useOutdentListItem from './use-outdent-list-item';
+import { useRegistry } from '@wordpress/data';
+import { indentListItems, outdentListItems } from '../utils';
 import { unlock } from '../../lock-unlock';
 
 const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
 export default function useSpace( clientId ) {
-	const { getSelectionStart, getSelectionEnd, getBlockIndex } =
-		useSelect( blockEditorStore );
-	const indentListItem = useIndentListItem( clientId );
-	const outdentListItem = useOutdentListItem();
+	const registry = useRegistry();
 
 	return useRefEffect(
 		( element ) => {
@@ -31,6 +27,8 @@ export default function useSpace( clientId ) {
 					return;
 				}
 
+				const { getSelectionStart, getSelectionEnd, getBlockIndex } =
+					registry.select( blockEditorStore );
 				const selectionStart = getSelectionStart();
 				const selectionEnd = getSelectionEnd();
 				if (
@@ -40,12 +38,12 @@ export default function useSpace( clientId ) {
 					if ( shiftKey ) {
 						// Note that backspace behaviour in defined in onMerge.
 						if ( keyCode === TAB ) {
-							if ( outdentListItem() ) {
+							if ( outdentListItems( registry ) ) {
 								event.preventDefault();
 							}
 						}
 					} else if ( getBlockIndex( clientId ) !== 0 ) {
-						if ( indentListItem() ) {
+						if ( indentListItems( registry, clientId ) ) {
 							event.preventDefault();
 						}
 					}
@@ -61,6 +59,6 @@ export default function useSpace( clientId ) {
 				true
 			);
 		},
-		[ clientId, indentListItem ]
+		[ clientId, registry ]
 	);
 }

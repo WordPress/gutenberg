@@ -1,7 +1,7 @@
 import { useRegistry, useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { isUnmodifiedBlock, switchToBlockType } from '@wordpress/blocks';
-import useOutdentListItem from './use-outdent-list-item';
+import { outdentListItems } from '../utils';
 
 export default function useMerge( clientId, onMerge ) {
 	const registry = useRegistry();
@@ -16,7 +16,6 @@ export default function useMerge( clientId, onMerge ) {
 	} = useSelect( blockEditorStore );
 	const { mergeBlocks, moveBlocksToPosition, removeBlock, insertBlocks } =
 		useDispatch( blockEditorStore );
-	const outdentListItem = useOutdentListItem();
 
 	function getTrailingId( id ) {
 		const order = getBlockOrder( id );
@@ -170,7 +169,10 @@ export default function useMerge( clientId, onMerge ) {
 				blockOrder.length > 0
 			) {
 				registry.batch( () => {
-					outdentListItem( getBlockOrder( blockOrder[ 0 ] ) );
+					outdentListItems(
+						registry,
+						getBlockOrder( blockOrder[ 0 ] )
+					);
 					removeBlock( clientId, true );
 				} );
 			} else {
