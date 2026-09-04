@@ -89,6 +89,8 @@ export default {
 	'bg-surface4': [ 'background-interactive-neutral-weak-active' ],
 	'bg-surface3': [
 		'background-interactive-neutral',
+		'background-interactive-neutral-active',
+		'background-interactive-neutral-disabled',
 		'background-surface-neutral-strong',
 	],
 	'bg-fgSurface4': [

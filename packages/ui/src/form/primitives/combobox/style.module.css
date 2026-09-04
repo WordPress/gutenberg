@@ -16,8 +16,7 @@
 			min-height: var(--wpds-dimension-size-sm);
 			border: 1px solid var(--wpds-color-stroke-interactive-neutral);
 			border-radius: 12px;
-			/* stylelint-disable-next-line plugin-wpds/no-token-fallback-values -- Preserve theming when WordPress supplies an older token stylesheet. */
-			background-color: var(--wpds-color-background-interactive-neutral, var(--wpds-color-background-surface-neutral-strong));
+			background-color: var(--wpds-color-background-interactive-neutral-weak);
 			font-size: var(--wpds-typography-font-size-md);
 			line-height: var(--wpds-typography-line-height-xs);
 			color: var(--wpds-color-foreground-interactive-neutral);
@@ -36,6 +35,7 @@
 			}
 
 			&[data-disabled] {
+				background-color: var(--wpds-color-background-interactive-neutral-weak-disabled);
 				border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
 				color: var(--wpds-color-foreground-interactive-neutral-disabled);
 

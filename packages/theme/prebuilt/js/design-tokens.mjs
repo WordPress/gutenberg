@@ -29,6 +29,8 @@ export default [
 	'--wpds-color-background-surface-error',
 	'--wpds-color-background-surface-error-weak',
 	'--wpds-color-background-interactive-neutral',
+	'--wpds-color-background-interactive-neutral-active',
+	'--wpds-color-background-interactive-neutral-disabled',
 	'--wpds-color-background-interactive-neutral-strong',
 	'--wpds-color-background-interactive-neutral-strong-active',
 	'--wpds-color-background-interactive-neutral-strong-disabled',

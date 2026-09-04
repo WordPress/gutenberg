@@ -4,7 +4,7 @@
 
 ### Internal
 
--   Regenerate the WPDS fallback map with the solid neutral interactive background token. ([#82391](https://github.com/WordPress/gutenberg/pull/82391))
+-   Regenerate the WPDS fallback map with the solid neutral interactive background state tokens. ([#82391](https://github.com/WordPress/gutenberg/pull/82391))
 
 ### Enhancements
 

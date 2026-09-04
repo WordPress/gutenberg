@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Add `--wpds-color-background-interactive-neutral` for solid, themed input backgrounds. ([#82391](https://github.com/WordPress/gutenberg/pull/82391))
+-   Add neutral interactive background tokens for resting, active, and disabled input and selection control states. ([#82391](https://github.com/WordPress/gutenberg/pull/82391))
 
 ### Documentation
 

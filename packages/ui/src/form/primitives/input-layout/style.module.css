@@ -7,7 +7,7 @@
 
 			display: flex;
 			height: var(--wpds-dimension-size-lg);
-			/* stylelint-disable-next-line plugin-wpds/no-token-fallback-values -- Preserve theming when WordPress supplies an older token stylesheet. */
+			/* stylelint-disable-next-line plugin-wpds/no-token-fallback-values -- Preserve custom background theming with older @wordpress/theme runtimes that do not set this token. */
 			background-color: var(--wpds-color-background-interactive-neutral, var(--wpds-color-background-surface-neutral-strong));
 			border-width: var(--wpds-border-width-xs);
 			border-style: solid;
@@ -34,6 +34,8 @@
 
 			&.is-disabled,
 			&:has([data-can-disable-input-layout][data-disabled]) {
+				/* stylelint-disable-next-line plugin-wpds/no-token-fallback-values -- Preserve custom background theming with older @wordpress/theme runtimes that do not set this token. */
+				background-color: var(--wpds-color-background-interactive-neutral-disabled, var(--wpds-color-background-surface-neutral-strong));
 				border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
 				color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
@@ -56,6 +58,8 @@
 			}
 
 			&:hover:not(.is-disabled, :has([data-can-disable-input-layout][data-disabled]), .is-borderless) {
+				/* stylelint-disable-next-line plugin-wpds/no-token-fallback-values -- Preserve custom background theming with older @wordpress/theme runtimes that do not set this token. */
+				background-color: var(--wpds-color-background-interactive-neutral-active, var(--wpds-color-background-surface-neutral-strong));
 				border-color: var(--wpds-color-stroke-interactive-neutral-active);
 			}
 
