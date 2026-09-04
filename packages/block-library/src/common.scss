@@ -244,3 +244,10 @@ html :where(.is-position-sticky) {
 		--wp-admin--admin-bar--position-offset: 0px;
 	}
 }
+
+/**
+ * Prevent global link font sizes from overriding block level font sizes.
+ */
+html :where(.has-custom-font-size, [class*="-font-size"], [style*="font-size"]) a:where(:not(.wp-element-button)) {
+	font-size: inherit;
+}
