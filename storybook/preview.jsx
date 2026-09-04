@@ -114,12 +114,17 @@ export const parameters = {
 			const SECTION_ORDER = [
 				'Introduction',
 				'Design System',
-				[ 'Introduction', 'Tokens', 'Theme', 'Patterns', 'Components' ],
-				'Foundations',
-				'DataViews',
-				'Fields',
-				'Admin UI',
-				'Icons',
+				[
+					'Introduction',
+					'Foundations',
+					'Tokens',
+					'Theme',
+					'Patterns',
+					'Components',
+					'DataViews',
+					'Admin UI',
+					'Icons',
+				],
 				'Components',
 				[
 					'Introduction',
