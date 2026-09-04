@@ -13,7 +13,8 @@ runs:
         - name: Install npm
           run: |
               NPM_VERSION="$(jq -r '.devEngines.packageManager.version' package.json)"
-              npm install --global "npm@$NPM_VERSION"
+              # Contributors need the floor; CI stays on that major's newest release.
+              npm install --global "npm@${NPM_VERSION/>=/^}"
               echo "Required npm version: $NPM_VERSION"
               echo "Installed npm version: $(npm --version)"
           working-directory: ${{ inputs.working-directory }}

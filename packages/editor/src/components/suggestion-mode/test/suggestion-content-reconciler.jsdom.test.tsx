@@ -1,3 +1,12 @@
+import {
+	afterAll,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
 import { render, act } from '@testing-library/react';
 import { useEffect } from '@wordpress/element';
 import { createRegistry, RegistryProvider, select } from '@wordpress/data';
@@ -26,23 +35,32 @@ import {
 import { store as editorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
-// jest.mock factories may only reference variables prefixed with `mock`.
-const mockCreateSuggestion = jest.fn();
-const mockDeleteSuggestion = jest.fn();
-
-jest.mock( '../provider', () => {
-	const actual = jest.requireActual( '../provider' );
-	return {
-		...actual,
-		useSuggestionsProvider: () => ( {
-			createSuggestion: mockCreateSuggestion,
-			deleteSuggestion: mockDeleteSuggestion,
-		} ),
-	};
+// The editor store pulls in `@wordpress/viewport`, which reads
+// `window.matchMedia` while loading.
+vi.hoisted( () => {
+	globalThis.wpVitest.mockMatchMedia();
 } );
 
-const createSuggestion = mockCreateSuggestion;
-const deleteSuggestion = mockDeleteSuggestion;
+// The mock factory is hoisted above the imports, so the functions it hands
+// out have to be created there too.
+const { createSuggestion, deleteSuggestion } = vi.hoisted( () => ( {
+	createSuggestion: vi.fn(),
+	deleteSuggestion: vi.fn(),
+} ) );
+
+vi.mock( import( '../provider' ), async ( importOriginal ) => {
+	const actual = await importOriginal();
+	return {
+		...actual,
+		useSuggestionsProvider: () =>
+			( {
+				createSuggestion,
+				deleteSuggestion,
+			} ) as unknown as ReturnType<
+				typeof actual.useSuggestionsProvider
+			>,
+	};
+} );
 
 const TEST_BLOCK_NAME = 'core/test-content-reconciler';
 

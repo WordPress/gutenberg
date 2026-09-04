@@ -1,3 +1,4 @@
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import {
 	RichTextData,
 	registerFormatType,
@@ -10,6 +11,12 @@ import {
 	SUGGESTION_FORMAT_NAME,
 	suggestionFormat,
 } from '../../inline-suggestions';
+
+// The editor store pulls in `@wordpress/viewport`, which reads
+// `window.matchMedia` while loading.
+vi.hoisted( () => {
+	globalThis.wpVitest.mockMatchMedia();
+} );
 
 const isRegistered = () =>
 	!! ( select( richTextStore as any ) as any ).getFormatType(

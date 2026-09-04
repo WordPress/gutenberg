@@ -8,6 +8,7 @@ import { unlock } from '../../lock-unlock';
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { INLINE_OP_TYPE, useSuggestionsProvider } from './provider';
 import { useSuggestionOverlay } from './overlay-context';
+import useAbandonedNoteCleanup from './use-abandoned-note-cleanup';
 import { wrapInlineMarker, readInlineCaret } from '../inline-markers';
 import {
 	SUGGESTION_FORMAT_NAME,
@@ -15,6 +16,7 @@ import {
 	buildSuggestionMarkerAttributes,
 	computeDeleteRange,
 	formatsRangeHasSuggestion,
+	stripSuggestionMarkers,
 	valueRangeHasSuggestion,
 } from '../inline-suggestions';
 import {
@@ -62,7 +64,9 @@ function readValueMetrics( value: any ): {
  * Serialize a slice of a rich-text attribute value to an HTML string,
  * preserving inline formatting (bold, links, …). Used by the cut handler to
  * write a `text/html` clipboard flavor alongside `text/plain`, so pasting the
- * cut run elsewhere keeps its formatting. Exported for unit tests.
+ * cut run elsewhere keeps its formatting. Suggestion markers are unwrapped:
+ * they point at this post's notes, and a pasted copy would bind a second run
+ * to the same suggestion (see `clipboard-strip`). Exported for unit tests.
  *
  * @param value Block attribute value (RichTextData, string, other).
  * @param start Slice start (character offset).
@@ -84,9 +88,62 @@ export function sliceValueToHTML(
 		return '';
 	}
 	const record = create( { html } );
-	return new RichTextData(
-		slice( record as any, start, end ) as any
-	).toHTMLString();
+	return stripSuggestionMarkers(
+		new RichTextData(
+			slice( record as any, start, end ) as any
+		).toHTMLString()
+	);
+}
+
+/**
+ * Whether a delete keystroke that arrives while a run's note request is still
+ * in flight belongs to that run. The run has no id yet, so it cannot grow;
+ * the keystroke is counted and replayed once the id resolves. Only a repeat
+ * in the same field and direction is a repeat: a Delete after a pending
+ * Backspace, or a Backspace in another attribute, starts a run of its own.
+ *
+ * @param run                  The in-progress run, if any.
+ * @param context              The current keystroke's context.
+ * @param context.clientId     Block client id.
+ * @param context.attributeKey Rich-text attribute name.
+ * @param context.isBackward   True for Backspace, false for Delete.
+ * @return True when this keystroke is a buffered repeat of `run`.
+ */
+export function isBufferedDeleteRepeat(
+	run: any,
+	{
+		clientId,
+		attributeKey,
+		isBackward,
+	}: {
+		clientId: string;
+		attributeKey: string;
+		isBackward: boolean;
+	}
+): boolean {
+	return Boolean(
+		run &&
+			run.id === null &&
+			run.clientId === clientId &&
+			run.attributeKey === attributeKey &&
+			run.dir === ( isBackward ? 'backward' : 'forward' )
+	);
+}
+
+/**
+ * Whether a deletion range resolved against `textBefore` still describes the
+ * same characters of `value`. A note request separates resolving the range
+ * from writing its marker; an edit landing in between shifts the offsets.
+ *
+ * @param textBefore Plain text the range was resolved against.
+ * @param value      The block attribute's current value.
+ * @return True when the value's text is unchanged.
+ */
+export function isDeletionTargetUnchanged(
+	textBefore: string,
+	value: any
+): boolean {
+	return readValueMetrics( value ).text === textBefore;
 }
 
 /**
@@ -304,6 +361,7 @@ export default function SuggestionDeletionKeyboard() {
 	const { requestInterceptorBypass, isDeferredInsertion } =
 		useSuggestionOverlay();
 	const registry = useRegistry();
+	const cleanupAbandonedNotes = useAbandonedNoteCleanup();
 
 	/*
 	 * A deletion whose range overlaps an existing marker can be expressed
@@ -400,16 +458,44 @@ export default function SuggestionDeletionKeyboard() {
 		} ) => {
 			const { clientId, attributeKey, start, end } = selection;
 			resetRun();
+			const { text: textBefore } = readValueMetrics(
+				getBlockAttributes( clientId )?.[ attributeKey ]
+			);
 			try {
 				const id = await openDeletionNote( clientId, attributeKey );
-				if ( id ) {
+				/*
+				 * The offsets were resolved before the note round trip. If
+				 * the intent changed or the text moved underneath them in the
+				 * meantime, the marker would land in Editing intent or over
+				 * the wrong run: drop the gesture and its note instead.
+				 */
+				const stillSuggesting =
+					unlock(
+						registry.select( STORE_NAME )
+					).getEditorIntent() === EDITOR_INTENT_SUGGEST;
+				const stillValid =
+					stillSuggesting &&
+					isDeletionTargetUnchanged(
+						textBefore,
+						getBlockAttributes( clientId )?.[ attributeKey ]
+					);
+				if ( id && stillValid ) {
 					writeDeletion( clientId, attributeKey, id, start, end );
+				} else if ( id ) {
+					cleanupAbandonedNotes( clientId, [ id ] );
 				}
 			} catch {
 				// `createSuggestion` already surfaces a notice on failure.
 			}
 		},
-		[ openDeletionNote, writeDeletion, resetRun ]
+		[
+			getBlockAttributes,
+			openDeletionNote,
+			writeDeletion,
+			resetRun,
+			registry,
+			cleanupAbandonedNotes,
+		]
 	);
 
 	// Collapsed-cursor delete: mark one character and grow on repeats. All
@@ -464,8 +550,14 @@ export default function SuggestionDeletionKeyboard() {
 			}
 
 			// Buffer repeats that arrive while a note request is in flight.
-			if ( run && run.id === null && run.clientId === clientId ) {
-				run.steps += 1;
+			if (
+				isBufferedDeleteRepeat( run, {
+					clientId,
+					attributeKey,
+					isBackward,
+				} )
+			) {
+				run!.steps += 1;
 				return;
 			}
 
@@ -489,6 +581,10 @@ export default function SuggestionDeletionKeyboard() {
 			try {
 				const id = await openDeletionNote( clientId, attributeKey );
 				if ( runRef.current !== newRun ) {
+					// The run was reset while its note was in flight (a mode
+					// change, a keystroke that is not a delete): the note has
+					// no marker and never will, so trash it.
+					cleanupAbandonedNotes( clientId, [ id ] );
 					return;
 				}
 				if ( ! id ) {
@@ -525,7 +621,7 @@ export default function SuggestionDeletionKeyboard() {
 				}
 			}
 		},
-		[ openDeletionNote, writeDeletion, resetRun ]
+		[ openDeletionNote, writeDeletion, resetRun, cleanupAbandonedNotes ]
 	);
 
 	const onBeforeInput = useCallback(

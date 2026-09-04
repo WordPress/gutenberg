@@ -6,6 +6,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import { useSuggestionOverlay } from './overlay-context';
+import useAbandonedNoteCleanup from './use-abandoned-note-cleanup';
 import { INLINE_OP_TYPE, useSuggestionsProvider } from './provider';
 import {
 	SUGGESTION_TYPE_ADDITION,
@@ -13,7 +14,6 @@ import {
 	applyEditPlan,
 } from '../inline-suggestions';
 import type { MarkerAction } from '../inline-suggestions/reconcile-edit';
-import { removeNoteIdFromMetadata } from '../collab-sidebar/utils';
 
 /**
  * Stable comparison key for a `content` attribute value: the HTML string for
@@ -71,7 +71,7 @@ export default function SuggestionContentReconciler() {
 		( select ) => select( coreStore ).getCurrentUser()?.id ?? null,
 		[]
 	);
-	const { createSuggestion, deleteSuggestion } = useSuggestionsProvider();
+	const { createSuggestion } = useSuggestionsProvider();
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const { getBlockAttributes } = useSelect( blockEditorStore );
 	const { createNotice } = useDispatch( noticesStore );
@@ -82,34 +82,8 @@ export default function SuggestionContentReconciler() {
 	} = useSuggestionOverlay();
 
 	// Trash notes created for a plan that was abandoned, and drop their ids
-	// from the block's note linkage. Best-effort: a failed trash is already
-	// surfaced by `deleteSuggestion`'s own notice.
-	const cleanupAbandonedNotes = useCallback(
-		async ( clientId: string, ids: any[] ) => {
-			if ( ids.length === 0 ) {
-				return;
-			}
-			let metadata = getBlockAttributes( clientId )?.metadata;
-			for ( const id of ids ) {
-				metadata = removeNoteIdFromMetadata( metadata, id );
-			}
-			requestInterceptorBypass( clientId );
-			updateBlockAttributes( clientId, { metadata } );
-			for ( const id of ids ) {
-				try {
-					await deleteSuggestion( { commentId: id } );
-				} catch {
-					// `deleteSuggestion` surfaces its own notice.
-				}
-			}
-		},
-		[
-			getBlockAttributes,
-			updateBlockAttributes,
-			requestInterceptorBypass,
-			deleteSuggestion,
-		]
-	);
+	// from the block's note linkage.
+	const cleanupAbandonedNotes = useAbandonedNoteCleanup();
 
 	const notifyDropped = useCallback( () => {
 		createNotice(

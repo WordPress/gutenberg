@@ -1,4 +1,6 @@
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import {
+	registerFormatType,
 	unregisterFormatType,
 	store as richTextStore,
 } from '@wordpress/rich-text';
@@ -20,13 +22,27 @@ const getFormatType = ( name: string ) =>
 const marker = ( id: number | string, type: string, text: string ) =>
 	`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="${ type }" data-author="1">${ text }</mark>`;
 
+// The shape of the inline note format, registered by `collab-sidebar`.
+const NOTE_FORMAT_NAME = 'core/note';
+
 beforeAll( () => {
 	registerSuggestionFormat();
+	if ( ! getFormatType( NOTE_FORMAT_NAME ) ) {
+		registerFormatType( NOTE_FORMAT_NAME, {
+			title: 'Note',
+			tagName: 'mark',
+			className: 'wp-note',
+			attributes: { id: 'data-id' },
+			edit: () => null,
+		} as any );
+	}
 } );
 
 afterAll( () => {
-	if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
-		unregisterFormatType( SUGGESTION_FORMAT_NAME );
+	for ( const name of [ SUGGESTION_FORMAT_NAME, NOTE_FORMAT_NAME ] ) {
+		if ( getFormatType( name ) ) {
+			unregisterFormatType( name );
+		}
 	}
 } );
 
@@ -50,6 +66,23 @@ describe( 'stripSuggestionDataFromBlock', () => {
 			'keep doomed and COPIED and styled'
 		);
 		expect( result.attributes.content ).not.toContain( 'wp-suggestion' );
+	} );
+
+	it( 'unwraps inline note markers along with their metadata link', () => {
+		const block = {
+			name: 'core/paragraph',
+			attributes: {
+				content:
+					'A <mark class="wp-note" data-id="192">noted</mark> phrase',
+				metadata: { noteId: [ 192 ] },
+			},
+			innerBlocks: [],
+		};
+
+		const result = stripSuggestionDataFromBlock( block );
+
+		expect( result.attributes.content ).toBe( 'A noted phrase' );
+		expect( result.attributes.metadata ).toBeUndefined();
 	} );
 
 	it( 'drops metadata.noteId and metadata.suggestion but keeps other metadata', () => {

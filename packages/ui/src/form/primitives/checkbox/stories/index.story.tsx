@@ -5,9 +5,6 @@ const meta: Meta< typeof Checkbox > = {
 	title: 'Design System/Components/Form/Primitives/Checkbox',
 	component: Checkbox,
 	parameters: {
-		// FIXME: Stories show the checkbox primitive without a visible label (aria-toggle-field-name).
-		// See: https://github.com/WordPress/gutenberg/issues/81596
-		a11y: { test: 'todo' },
 		componentStatus: {
 			status: 'use-with-caution',
 			whereUsed: 'global',
@@ -21,29 +18,35 @@ export default meta;
 type Story = StoryObj< typeof Checkbox >;
 
 export const Default: Story = {
-	args: {},
+	args: {
+		'aria-label': 'Option',
+	},
 };
 
 export const Checked: Story = {
 	args: {
+		...Default.args,
 		defaultChecked: true,
 	},
 };
 
 export const Indeterminate: Story = {
 	args: {
+		...Default.args,
 		indeterminate: true,
 	},
 };
 
 export const Disabled: Story = {
 	args: {
+		...Default.args,
 		disabled: true,
 	},
 };
 
 export const DisabledChecked: Story = {
 	args: {
+		...Default.args,
 		disabled: true,
 		defaultChecked: true,
 	},

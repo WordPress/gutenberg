@@ -10,7 +10,7 @@ import type { SelectPopupProps } from './types';
 
 export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
 	function Popup(
-		{ className, portal, positioner, popupWidth, children, ...restProps },
+		{ className, portal, positioner, width, children, ...restProps },
 		ref
 	) {
 		const popupContent = (
@@ -18,7 +18,7 @@ export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
 				ref={ ref }
 				className={ clsx(
 					itemPopupStyles.popup,
-					getItemPopupWidthClassName( popupWidth ),
+					getItemPopupWidthClassName( width ),
 					className
 				) }
 				{ ...restProps }

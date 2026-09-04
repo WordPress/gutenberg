@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`buildRamps accent ramp snapshots 1`] = `
+exports[`buildRamps > accent ramp snapshots 1`] = `
 [
   [
     {
@@ -4185,7 +4185,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
 ]
 `;
 
-exports[`buildRamps background ramp snapshots 1`] = `
+exports[`buildRamps > background ramp snapshots 1`] = `
 [
   {
     "input": {
