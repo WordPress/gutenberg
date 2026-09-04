@@ -208,7 +208,7 @@ export default defineConfig( {
 			{
 				extends: true,
 				test: {
-					name: 'browser-base',
+					name: 'browser',
 					include: vitestTests.browser,
 					setupFiles: [
 						path.join(
@@ -219,7 +219,7 @@ export default defineConfig( {
 					browser: {
 						enabled: true,
 						headless: true,
-						instances: [ { browser: 'chromium', name: 'browser' } ],
+						instances: [ { browser: 'chromium' } ],
 						provider: playwright(),
 					},
 				},
