@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { getCollapsedLayout } from '../layout';
 
 const BASE_METRICS = {

@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { getCSSRules, compileCSS } from '../index';
 
 describe( 'generate', () => {

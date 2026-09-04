@@ -243,7 +243,7 @@ $block-editor-link-control-number-of-actions: 1;
 			padding: 0;
 			margin: -1px;
 			overflow: hidden;
-			clip: rect(0, 0, 0, 0); // specifically requested to be removed visually as well.
+			clip-path: inset(50%);
 			border: 0;
 		}
 	}

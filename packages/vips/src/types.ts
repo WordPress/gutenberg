@@ -191,6 +191,14 @@ export interface SaveOptions< T extends string > {
 	 * flattening them to 8-bit.
 	 */
 	bitdepth?: number;
+	/**
+	 * Quantise to an 8bpp palette. Only supported by PNG.
+	 * Do not provide for any other type!
+	 *
+	 * Used to keep indexed (palette) sources indexed instead of writing them
+	 * back out as truecolour RGB/RGBA.
+	 */
+	palette?: boolean;
 }
 
 export interface ThumbnailOptions {

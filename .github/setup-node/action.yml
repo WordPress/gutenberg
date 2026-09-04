@@ -66,5 +66,5 @@ runs:
               # Run the post-install script for the root project.
               npm run postinstall
               # Run the post-install scripts for workspaces.
-              npx lerna run postinstall
+              npm exec --no -- lerna run postinstall
           shell: bash

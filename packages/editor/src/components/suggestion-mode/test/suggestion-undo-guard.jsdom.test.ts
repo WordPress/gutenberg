@@ -1,4 +1,11 @@
+import { describe, expect, it, vi } from 'vitest';
 import { findNewestPendingSuggestion } from '../suggestion-undo-guard';
+
+// The editor store pulls in `@wordpress/viewport`, which reads
+// `window.matchMedia` while loading.
+vi.hoisted( () => {
+	globalThis.wpVitest.mockMatchMedia();
+} );
 
 describe( 'findNewestPendingSuggestion', () => {
 	it( 'returns null when nothing is pending', () => {
