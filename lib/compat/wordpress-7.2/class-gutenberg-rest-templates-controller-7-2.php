@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Core class used to access templates via the REST API for WordPress 7.2.
+ * Core class used to access templates via the REST API before WordPress 7.2.
  *
  * This class extension exists to prevent a fatal error when a `null` template
  * reaches `prepare_item_for_response`, which reads and assigns properties on
@@ -10,8 +10,6 @@
  * its "revert to theme" path, which force-deletes the template's post before
  * checking that a theme or plugin version of the template exists.
  *
- * Note: this change needs to be backported to WordPress core.
- * See `WP_REST_Templates_Controller::prepare_item_for_response()`.
  *
  * @see Gutenberg_REST_Templates_Controller_7_0
  */
