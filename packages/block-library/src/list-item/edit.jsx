@@ -19,6 +19,7 @@ import { displayShortcut } from '@wordpress/keycodes';
 import {
 	useEnter,
 	useSpace,
+	useMultiSelectTab,
 	useIndentListItem,
 	useOutdentListItem,
 	useMerge,
@@ -78,12 +79,17 @@ export default function ListItemEdit( {
 	} );
 	const useEnterRef = useEnter( clientId );
 	const useSpaceRef = useSpace( clientId );
+	const useMultiSelectTabRef = useMultiSelectTab( clientId );
 	const onMerge = useMerge( clientId, mergeBlocks );
 	return (
 		<>
 			<li { ...innerBlocksProps }>
 				<RichText
-					ref={ useMergeRefs( [ useEnterRef, useSpaceRef ] ) }
+					ref={ useMergeRefs( [
+						useEnterRef,
+						useSpaceRef,
+						useMultiSelectTabRef,
+					] ) }
 					identifier="content"
 					tagName="div"
 					onChange={ ( nextContent ) =>
