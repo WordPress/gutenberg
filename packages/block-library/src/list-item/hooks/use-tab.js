@@ -20,7 +20,7 @@ export default function useTab() {
 				if (
 					event.defaultPrevented ||
 					( keyCode !== SPACE && keyCode !== TAB ) ||
-					// Only override when no modifiers are pressed.
+					// Shift selects outdent; other modifiers pass through.
 					altKey ||
 					metaKey ||
 					ctrlKey
@@ -34,23 +34,13 @@ export default function useTab() {
 					getSelectionStart().offset === 0 &&
 					getSelectionEnd().offset === 0;
 
-				// At the start of an item, Space indents and Shift+Space
-				// outdents. Anywhere else it just types a space.
-				if ( keyCode === SPACE ) {
-					if ( isAtStart ) {
-						const move = shiftKey
-							? outdentListItems
-							: indentListItems;
-						if ( move( registry ) ) {
-							event.preventDefault();
-						}
-					}
-					return;
-				}
-
-				// Tab indents and Shift+Tab outdents, both when the caret is at
-				// the start of the item and when its content is fully selected.
-				if ( ! isAtStart && ! isEntirelySelected( element ) ) {
+				// Indent, or outdent when Shift is held. Both Space and Tab
+				// act at the start of an item; Tab also acts when its content
+				// is fully selected. Otherwise the key just types a space.
+				if (
+					! isAtStart &&
+					! ( keyCode === TAB && isEntirelySelected( element ) )
+				) {
 					return;
 				}
 				const move = shiftKey ? outdentListItems : indentListItems;
