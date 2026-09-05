@@ -1,0 +1,165 @@
+/**
+ * wp-admin checkboxes and radios, styled from WordPress Design System
+ * tokens.
+ *
+ * Parity target is the `@wordpress/ui` checkbox primitive
+ * (packages/ui/src/form/primitives/checkbox/style.module.css) for VALUES. Its
+ * STRUCTURE cannot be copied: it renders the tick as a separate icon element,
+ * and classic ships a bare `<input type="checkbox">` with no markup to hook. So
+ * the indicator stays a `::before`, as Core does it, and only the values move.
+ * That is the "specs are shared, selectors never are" split in practice.
+ *
+ * The tick is drawn with `mask-image` rather than an SVG `url()` with a baked
+ * fill, so its colour comes from `currentColor` and can respond to state. Core's
+ * version hardcodes `#ffffff` inside the data URI, which makes a disabled tick
+ * invisible against a muted box. Same technique the dashicons swap will need.
+ *
+ * Geometry (size, margins) is deliberately left to Core: it is layout, not
+ * style, and touching it would shift every checkbox on every screen.
+ *
+ * NO `!important` IN THIS FILE. See 99-overrides.css for the one exception.
+ */
+
+@layer wpds-overrides, wp-legacy, wpds;
+
+@layer wpds {
+
+	/* -----------------------------------------------------------------------
+	   Base
+	   ----------------------------------------------------------------------- */
+
+	input[type="checkbox"],
+	input[type="radio"] {
+		box-sizing: border-box;
+		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-interactive-neutral);
+		border-radius: var(--wpds-border-radius-sm);
+		/*
+		 * White rather than the design system's transparent field background,
+		 * for the same reason as 20-input.css: classic controls sit on the grey page
+		 * background as often as on white, and a transparent control would read as
+		 * grey.
+		 */
+		background: var(--wpds-color-background-surface-neutral-strong);
+		color: var(--wpds-color-foreground-interactive-brand-strong);
+		box-shadow: none;
+		cursor: var(--wpds-cursor-control);
+	}
+
+	input[type="radio"] {
+		border-radius: 50%;
+	}
+
+	/* -----------------------------------------------------------------------
+	   Hover — excluded from disabled, as in 20-input.css
+	   ----------------------------------------------------------------------- */
+
+	input[type="checkbox"]:hover,
+	input[type="radio"]:hover {
+		border-color: var(--wpds-color-stroke-interactive-neutral-active);
+	}
+
+	/* -----------------------------------------------------------------------
+	   Checked
+
+	   Accent comes from `--wp-admin-theme-color`, not from the design system's
+	   `--wpds-color-background-interactive-brand-strong`.
+
+	   React admin UI does follow the user's colour scheme: `getAdminThemeColors()`
+	   reads the `admin-color-*` body class and `ThemeProvider` derives `--wpds-*`
+	   values from it. But the prebuilt token stylesheet emits a flat `#3858e9`,
+	   and classic admin has no provider — so a CSS-only consumer is pinned to
+	   that literal with no way to accept a spot colour.
+
+	   `@wordpress/components` solves this with a fallback chain
+	   (`var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9))`).
+	   Until the prebuilt brand tokens carry the same chain, classic uses the
+	   scheme variable directly.
+	   ----------------------------------------------------------------------- */
+
+	input[type="checkbox"]:checked,
+	input[type="radio"]:checked {
+		border-color: var(--wp-admin-theme-color);
+		background: var(--wp-admin-theme-color);
+	}
+
+	/* The tick, masked so its colour follows `currentColor`. */
+	input[type="checkbox"]:checked::before {
+		content: "";
+		display: block;
+		float: none;
+		width: 100%;
+		height: 100%;
+		margin: 0;
+		background-color: currentColor;
+		mask-image: url(data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2020%2020%27%3E%3Cpath%20d%3D%27M14.83%204.89l1.34.94-5.81%208.38H9.02L5.78%209.67l1.34-1.25%202.57%202.4z%27%2F%3E%3C%2Fsvg%3E);
+		mask-size: contain;
+		mask-position: center;
+		mask-repeat: no-repeat;
+	}
+
+	/* The dot. Geometry is Core's; only the colour changes. */
+	input[type="radio"]:checked::before {
+		background-color: currentColor;
+	}
+
+	/* -----------------------------------------------------------------------
+	   Focus — outline, never box-shadow. Core uses a two-ring box-shadow here.
+	   ----------------------------------------------------------------------- */
+
+	input[type="checkbox"]:focus,
+	input[type="radio"]:focus {
+		outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+		outline-offset: var(--wpds-border-width-focus);
+		box-shadow: none;
+	}
+
+	/* -----------------------------------------------------------------------
+	   Disabled
+	   ----------------------------------------------------------------------- */
+
+	input[type="checkbox"]:disabled,
+	input[type="checkbox"].disabled,
+	input[type="checkbox"][aria-disabled="true"],
+	input[type="radio"]:disabled,
+	input[type="radio"].disabled,
+	input[type="radio"][aria-disabled="true"] {
+		border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+		background: var(--wpds-color-background-surface-neutral-weak);
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+		cursor: default;
+		opacity: 1;
+	}
+
+	/* Hover must not re-enable the border on a disabled control. */
+	input[type="checkbox"]:disabled:hover,
+	input[type="checkbox"].disabled:hover,
+	input[type="checkbox"][aria-disabled="true"]:hover,
+	input[type="radio"]:disabled:hover,
+	input[type="radio"].disabled:hover,
+	input[type="radio"][aria-disabled="true"]:hover {
+		border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+	}
+
+	/*
+	 * Disabled AND checked: the box stays muted and the mark greys out with it,
+	 * which is only legible because the mark is masked rather than a baked-white
+	 * SVG. Core instead fades the whole control with `opacity: 0.7`.
+	 */
+	input[type="checkbox"]:disabled:checked,
+	input[type="checkbox"].disabled:checked,
+	input[type="checkbox"][aria-disabled="true"]:checked,
+	input[type="radio"]:disabled:checked,
+	input[type="radio"].disabled:checked,
+	input[type="radio"][aria-disabled="true"]:checked {
+		border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+		background: var(--wpds-color-background-interactive-neutral-strong-disabled);
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+	}
+
+	input[type="checkbox"]:disabled:checked::before,
+	input[type="checkbox"].disabled:checked::before,
+	input[type="radio"]:disabled:checked::before,
+	input[type="radio"].disabled:checked::before {
+		opacity: 1;
+	}
+}

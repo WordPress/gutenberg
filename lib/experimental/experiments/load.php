@@ -115,6 +115,11 @@ function gutenberg_initialize_experiments_settings() {
 					'description' => __( 'Enables the Guidelines page under Settings and the experimental knowledge storage (wp_knowledge).', 'gutenberg' ),
 				),
 				array(
+					'id'          => 'gutenberg-wpds-admin-restyle',
+					'label'       => __( 'Admin design tokens', 'gutenberg' ),
+					'description' => __( 'Styles wp-admin from WordPress Design System tokens, so every admin screen reads as one product regardless of how it is rendered. Visual only; no markup changes.', 'gutenberg' ),
+				),
+				array(
 					'id'          => 'gutenberg-dashboard-widgets',
 					'label'       => __( 'New Dashboard experience', 'gutenberg' ),
 					'description' => __( 'Enables a new dashboard experience with resizable, reorderable widgets that plugins can register and users can personalize.', 'gutenberg' ),
