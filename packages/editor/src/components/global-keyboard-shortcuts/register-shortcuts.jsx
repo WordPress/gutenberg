@@ -1,4 +1,4 @@
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { BlockEditorKeyboardShortcuts } from '@wordpress/block-editor';
@@ -179,53 +179,53 @@ function EditorKeyboardShortcutsRegister() {
 	 * the combination is pressed.
 	 *
 	 * `editor.notes` support arrives with the post type record, so the
-	 * predicate starts false and flips once it resolves. The set is removed
-	 * again if it flips back, which is why the effect is keyed on it.
+	 * predicate starts false and flips once it resolves, which is why the
+	 * effect is keyed on it. The cleanup removes the set again when it flips
+	 * back or the editor unmounts: the shortcuts store outlives this
+	 * component, so a registration left behind would keep advertising the
+	 * set to whatever mounts next.
 	 */
 	const canSuggest = useCanSuggest();
-	const intentShortcutsRegisteredRef = useRef( false );
 	useEffect( () => {
-		if ( canSuggest ) {
-			registerShortcut( {
-				name: 'core/editor/intent-edit',
-				category: 'global',
-				description: __( 'Switch to Edit mode.' ),
-				keyCombination: {
-					modifier: 'secondary',
-					character: 'z',
-				},
-			} );
-
-			registerShortcut( {
-				name: 'core/editor/intent-suggest',
-				category: 'global',
-				description: __( 'Switch to Suggest mode.' ),
-				keyCombination: {
-					modifier: 'secondary',
-					character: 'x',
-				},
-			} );
-
-			registerShortcut( {
-				name: 'core/editor/intent-view',
-				category: 'global',
-				description: __( 'Switch to View mode.' ),
-				keyCombination: {
-					modifier: 'secondary',
-					character: 'c',
-				},
-			} );
-
-			intentShortcutsRegisteredRef.current = true;
+		if ( ! canSuggest ) {
 			return;
 		}
 
-		if ( intentShortcutsRegisteredRef.current ) {
+		registerShortcut( {
+			name: 'core/editor/intent-edit',
+			category: 'global',
+			description: __( 'Switch to Edit mode.' ),
+			keyCombination: {
+				modifier: 'secondary',
+				character: 'z',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/editor/intent-suggest',
+			category: 'global',
+			description: __( 'Switch to Suggest mode.' ),
+			keyCombination: {
+				modifier: 'secondary',
+				character: 'x',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/editor/intent-view',
+			category: 'global',
+			description: __( 'Switch to View mode.' ),
+			keyCombination: {
+				modifier: 'secondary',
+				character: 'c',
+			},
+		} );
+
+		return () => {
 			INTENT_SHORTCUT_NAMES.forEach( ( name ) =>
 				unregisterShortcut( name )
 			);
-			intentShortcutsRegisteredRef.current = false;
-		}
+		};
 	}, [ canSuggest, registerShortcut, unregisterShortcut ] );
 
 	return <BlockEditorKeyboardShortcuts.Register />;
