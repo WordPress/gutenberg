@@ -318,7 +318,7 @@ function Iframe( {
 					}
 					// If the event originates from inside the iframe, it means
 					// it bubbled through the portal, but only with React
-					// events. We need to to bubble native events as well,
+					// events. We need to bubble native events as well,
 					// though by doing so we also trigger another React event,
 					// so we need to stop the propagation of this event to avoid
 					// duplication.
@@ -389,9 +389,9 @@ function IframeIfReady( props, ref ) {
 		[]
 	);
 
-	// We shouldn't render the iframe until the editor settings are initialised.
+	// We shouldn't render the iframe until the editor settings are initialized.
 	// The initial settings are needed to get the styles for the srcDoc, which
-	// cannot be changed after the iframe is mounted. srcDoc is used to to set
+	// cannot be changed after the iframe is mounted. srcDoc is used to set
 	// the initial iframe HTML, which is required to avoid a flash of unstyled
 	// content.
 	if ( ! isInitialised ) {

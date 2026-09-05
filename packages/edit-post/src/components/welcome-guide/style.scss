@@ -37,7 +37,7 @@
 	.components-button {
 		&:hover {
 			svg {
-				fill: $white;
+				color: $white;
 			}
 		}
 	}
@@ -45,6 +45,6 @@
 
 .edit-template-welcome-guide {
 	.components-button svg {
-		fill: $white;
+		color: $white;
 	}
 }

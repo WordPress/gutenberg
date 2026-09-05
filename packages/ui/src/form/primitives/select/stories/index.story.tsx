@@ -14,10 +14,6 @@ const meta: Meta< typeof Select.Root > = {
 		'Select.Item': Select.Item,
 	},
 	parameters: {
-		// FIXME: The trigger has no visible label and relies on aria-label
-		// (button-name).
-		// See: https://github.com/WordPress/gutenberg/issues/81596
-		a11y: { test: 'todo' },
 		componentStatus: {
 			status: 'use-with-caution',
 			whereUsed: 'global',
@@ -38,7 +34,7 @@ export const Default: Story = {
 	args: {
 		items: defaultItems,
 		children: [
-			<Select.Trigger key="trigger" />,
+			<Select.Trigger aria-label="Item" key="trigger" />,
 			<Select.Popup key="popup">
 				{ defaultItems.map( ( item ) => (
 					<Select.Item key={ item.value } value={ item }>
@@ -54,7 +50,7 @@ export const Compact: Story = {
 	args: {
 		...Default.args,
 		children: [
-			<Select.Trigger size="compact" key="trigger" />,
+			<Select.Trigger size="compact" aria-label="Item" key="trigger" />,
 			<Select.Popup key="popup">
 				{ defaultItems.map( ( item ) => (
 					<Select.Item key={ item.value } value={ item }>
@@ -77,8 +73,13 @@ export const Compact: Story = {
 export const Minimal: Story = {
 	args: {
 		children: [
-			<Select.Trigger size="small" variant="minimal" key="trigger" />,
-			<Select.Popup key="popup">
+			<Select.Trigger
+				size="small"
+				variant="minimal"
+				aria-label="Item"
+				key="trigger"
+			/>,
+			<Select.Popup width="content" key="popup">
 				{ Array.from( { length: 6 }, ( _, index ) => (
 					<Select.Item
 						key={ index }
@@ -130,7 +131,7 @@ export const Grouped: Story = {
 	args: {
 		items: groupedItems.flatMap( ( group ) => group.items ),
 		children: [
-			<Select.Trigger key="trigger" />,
+			<Select.Trigger aria-label="Item" key="trigger" />,
 			<Select.Popup key="popup">
 				{ groupedItems.map( ( group ) => (
 					<Select.Group key={ group.label }>
@@ -155,7 +156,11 @@ export const WithCustomPlaceholder: Story = {
 	args: {
 		items: defaultItems,
 		children: [
-			<Select.Trigger placeholder="Choose an item" key="trigger" />,
+			<Select.Trigger
+				placeholder="Choose an item"
+				aria-label="Item"
+				key="trigger"
+			/>,
 			<Select.Popup key="popup">
 				{ defaultItems.map( ( item ) => (
 					<Select.Item key={ item.value } value={ item }>
@@ -183,7 +188,7 @@ export const WithNullValueOption: Story = {
 	args: {
 		items: nullValueOptionItems,
 		children: [
-			<Select.Trigger key="trigger" />,
+			<Select.Trigger aria-label="Item" key="trigger" />,
 			<Select.Popup key="popup">
 				{ nullValueOptionItems.map( ( item ) => (
 					<Select.Item
@@ -238,7 +243,7 @@ export const WithOverflow: Story = {
 	args: {
 		items: overflowItems,
 		children: [
-			<Select.Trigger key="trigger" />,
+			<Select.Trigger aria-label="Item" key="trigger" />,
 			<Select.Popup key="popup">
 				{ overflowItems.map( ( item ) => (
 					<Select.Item key={ item.value } value={ item }>
@@ -256,7 +261,7 @@ export const Disabled: Story = {
 	args: {
 		...Default.args,
 		children: [
-			<Select.Trigger key="trigger" />,
+			<Select.Trigger aria-label="Item" key="trigger" />,
 			<Select.Popup key="popup">
 				{ defaultItems.map( ( item ) => (
 					<Select.Item key={ item.value } value={ item }>
@@ -287,7 +292,7 @@ export const WithDisabledItem: Story = {
 	args: {
 		items: disabledItemItems,
 		children: [
-			<Select.Trigger key="trigger" />,
+			<Select.Trigger aria-label="Item" key="trigger" />,
 			<Select.Popup key="popup">
 				{ disabledItemItems.map( ( item ) => (
 					<Select.Item
@@ -324,7 +329,7 @@ export const WithCustomTriggerAndItem: Story = {
 	args: {
 		items: customOptions,
 		children: [
-			<Select.Trigger key="trigger">
+			<Select.Trigger aria-label="Item" key="trigger">
 				{ ( item ) => (
 					<span
 						style={ {
@@ -380,7 +385,7 @@ export const WithCustomZIndex: Story = {
 	args: {
 		...Default.args,
 		children: [
-			<Select.Trigger key="trigger" />,
+			<Select.Trigger aria-label="Item" key="trigger" />,
 			<Select.Popup
 				portal={
 					<Select.Portal
