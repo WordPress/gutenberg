@@ -7057,6 +7057,16 @@
 			"count": 6
 		}
 	},
+	"packages/editor/src/components/suggestion-mode/store-interceptor.ts": {
+		"react-hooks/refs": {
+			"count": 6
+		}
+	},
+	"packages/editor/src/components/suggestion-mode/suggestion-undo-guard.ts": {
+		"react-hooks/refs": {
+			"count": 4
+		}
+	},
 	"packages/editor/src/components/suggestion-mode/test/auto-save.jsdom.test.tsx": {
 		"react-hooks/globals": {
 			"count": 1
