@@ -1,0 +1,1 @@
+import{n}from"./rolldown-runtime-DiifJuVD.js";function _objectWithoutPropertiesLoose(n,t){if(null==n)return{};var i={};for(var o in n)if({}.hasOwnProperty.call(n,o)){if(-1!==t.indexOf(o))continue;i[o]=n[o]}return i}function init_chunk_242VQQM5(){return(init_chunk_242VQQM5=n(()=>{}))()}export{init_chunk_242VQQM5 as n,_objectWithoutPropertiesLoose as t};

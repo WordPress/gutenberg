@@ -1,0 +1,1 @@
+import{n}from"./rolldown-runtime-DiifJuVD.js";function isAppleOS(n){if(!n){if("undefined"==typeof window)return!1;n=window}const{platform:i}=n.navigator;return-1!==i.indexOf("Mac")||["iPad","iPhone"].includes(i)}function init_platform(){return(init_platform=n(()=>{}))()}export{isAppleOS as n,init_platform as t};

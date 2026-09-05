@@ -1,0 +1,1 @@
+import{n}from"./rolldown-runtime-DiifJuVD.js";function withIgnoreIMEEvents(n){return e=>{const{isComposing:i}="nativeEvent"in e?e.nativeEvent:e;i||229===e.keyCode||n(e)}}function init_with_ignore_ime_events(){return(init_with_ignore_ime_events=n(()=>{}))()}export{withIgnoreIMEEvents as n,init_with_ignore_ime_events as t};

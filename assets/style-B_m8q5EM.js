@@ -1,0 +1,1 @@
+import{n as t}from"./rolldown-runtime-DiifJuVD.js";function init_style(){return(init_style=t(()=>{}))()}function init_style$1(){return(init_style$1=t(()=>{}))()}export{init_style as n,init_style$1 as t};

@@ -1,0 +1,1 @@
+import{t as a}from"./iframe-CaGIF2Sq.js";a();

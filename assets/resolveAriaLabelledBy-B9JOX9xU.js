@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-DiifJuVD.js";function resolveAriaLabelledBy(e,r){return e??r}function init_resolveAriaLabelledBy(){return(init_resolveAriaLabelledBy=e(()=>{}))()}export{resolveAriaLabelledBy as n,init_resolveAriaLabelledBy as t};

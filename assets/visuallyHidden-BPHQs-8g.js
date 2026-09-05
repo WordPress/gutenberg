@@ -1,0 +1,1 @@
+import{n as i}from"./rolldown-runtime-DiifJuVD.js";var n,t,e;function init_visuallyHidden(){return(init_visuallyHidden=i(()=>{n={clipPath:"inset(50%)",overflow:"hidden",whiteSpace:"nowrap",border:0,padding:0,width:1,height:1,margin:-1},t={...n,position:"fixed",top:0,left:0},e={...n,position:"absolute"}}))()}export{t as n,e as r,init_visuallyHidden as t};

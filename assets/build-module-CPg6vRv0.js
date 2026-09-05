@@ -1,0 +1,1 @@
+import{n as i}from"./rolldown-runtime-DiifJuVD.js";function init_utils(){return(init_utils=i(()=>{0}))()}function warning(i){}function init_build_module(){return(init_build_module=i(()=>{init_utils()}))()}export{warning as n,init_build_module as t};

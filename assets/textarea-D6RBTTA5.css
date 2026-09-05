@@ -1,0 +1,1 @@
+@layer wp-ui{@layer utilities;@layer components{._wrapper_1p6nr_5{--wp-ui-textarea-min-height:var(--wpds-dimension-size-lg,40px)}._textarea_1p6nr_9{min-height:calc(var(--wp-ui-textarea-min-height) - 2px);resize:block}}@layer compositions{._wrapper_1p6nr_5{--wp-ui-input-padding-block:9.9px;height:auto;line-height:1.4}}@layer overrides;}

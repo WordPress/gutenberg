@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-DiifJuVD.js";import{f as n,p as t}from"./useRenderElement-BYFzRxTY.js";function inertValue(e){return t(19)?e:e?"true":void 0}function init_inertValue(){return(init_inertValue=e(()=>{n()}))()}export{init_inertValue as n,inertValue as t};

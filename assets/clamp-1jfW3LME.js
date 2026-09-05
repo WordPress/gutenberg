@@ -1,0 +1,1 @@
+import{n}from"./rolldown-runtime-DiifJuVD.js";function clamp(n,t=Number.MIN_SAFE_INTEGER,m=Number.MAX_SAFE_INTEGER){return Math.max(t,Math.min(n,m))}function init_clamp(){return(init_clamp=n(()=>{}))()}export{init_clamp as n,clamp as t};

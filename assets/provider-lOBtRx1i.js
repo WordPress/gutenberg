@@ -1,0 +1,1 @@
+import{n as r}from"./rolldown-runtime-DiifJuVD.js";import{t as i}from"./jsx-runtime-D57Iaoca.js";import{n as o,t}from"./TooltipProvider-CPr5Pndm.js";function Provider({...r}){return(0,n.jsx)(t,{...r})}var n;function init_provider(){return(init_provider=r(()=>{o(),n=i()}))()}export{init_provider as n,Provider as t};
