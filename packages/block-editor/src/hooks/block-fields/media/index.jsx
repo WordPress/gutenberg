@@ -132,6 +132,8 @@ export default function Media( { data, field, onChange, config = {} } ) {
 			chooseItemLabel = __( 'Image' );
 		} else if ( allowedType === 'video' ) {
 			chooseItemLabel = __( 'Video' );
+		} else if ( allowedType === 'audio' ) {
+			chooseItemLabel = __( 'Audio' );
 		} else if ( allowedType === 'application' ) {
 			chooseItemLabel = __( 'File' );
 		} else {

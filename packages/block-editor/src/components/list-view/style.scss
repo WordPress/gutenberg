@@ -31,6 +31,14 @@
 	// when rows later receive the is-displacement-up or is-displacement-down class.
 	transform: translateY(0);
 
+	// The transform above makes each row its own stacking context, so the focus
+	// ring cannot escape it. Lift the focused row above the siblings that would
+	// otherwise paint over it.
+	&:focus-within,
+	&.is-nesting {
+		z-index: 1;
+	}
+
 	&.is-draggable,
 	&.is-draggable .block-editor-list-view-block-contents {
 		cursor: grab;
@@ -49,11 +57,6 @@
 
 		svg {
 			fill: currentColor;
-			// Optimize for high contrast modes.
-			// See also https://blogs.windows.com/msedgedev/2020/09/17/styling-for-windows-high-contrast-with-new-standards-for-forced-colors/.
-			@media (forced-colors: active) {
-				fill: CanvasText;
-			}
 		}
 	}
 
@@ -81,33 +84,54 @@
 		.block-editor-block-icon {
 			color: var(--wp-block-synced-color);
 		}
-
-		&:focus::after {
-			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-synced-color);
-		}
+	}
+	&.is-synced .block-editor-list-view-block-contents:focus::after {
+		--focus-color: var(--wp-block-synced-color);
+	}
+	&.is-synced:not(.is-selected) .block-editor-list-view-block__menu:focus {
+		--focus-color: var(--wp-block-synced-color);
+		@include outset-ring__focus();
 	}
 	&.is-selected .block-editor-list-view-block-contents,
 	&.is-selected .components-button.has-icon {
 		color: $white;
 	}
-	&.is-selected .block-editor-list-view-block-contents:focus {
-		&::after {
-			box-shadow:
-				inset 0 0 0 1px $white,
-				0 0 0 var(--wp-admin-border-width-focus)
-				var(--wpds-color-stroke-focus);
-		}
-	}
-	&.is-selected.is-synced .block-editor-list-view-block-contents:focus {
-		&::after {
-			box-shadow:
-				inset 0 0 0 1px $white,
-				0 0 0 var(--wp-admin-border-width-focus)
-				var(--wp-block-synced-color);
-		}
-	}
 	&.is-selected .block-editor-list-view-block__menu:focus {
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $white;
+		--focus-color: var(--wpds-color-foreground-interactive-brand-strong);
+		@include outset-ring__focus();
+		outline-offset: calc(-1 * var(--wpds-border-width-focus));
+	}
+	@media (forced-colors: active) {
+		&.is-selected td,
+		&.is-selected.is-synced td {
+			background: SelectedItem;
+		}
+
+		&.is-selected .block-editor-list-view-block-contents,
+		&.is-selected .components-button.has-icon {
+			color: SelectedItemText;
+		}
+
+		&.is-selected svg,
+		&.is-selected .block-editor-block-icon.has-colors svg {
+			fill: SelectedItemText;
+		}
+
+		// Prevent backplate with same color as text in dark mode.
+		// Opt-out scoped to only the row title.
+		&.is-selected .block-editor-list-view-block-select-button__title {
+			forced-color-adjust: none;
+		}
+
+		// The row-wide ring sits outside the selected background.
+		&.is-selected .block-editor-list-view-block-contents:focus::after {
+			--focus-color: CanvasText;
+		}
+
+		// The menu ring is inset over the selected background.
+		&.is-selected .block-editor-list-view-block__menu:focus {
+			--focus-color: SelectedItemText;
+		}
 	}
 
 	// Border radius for corners of the selected item.
@@ -261,18 +285,21 @@
 	&.is-nesting .block-editor-list-view-block-contents,
 	.block-editor-list-view-block-contents:focus {
 		box-shadow: none;
+		outline: none;
 
 		&::after {
 			content: "";
 			position: absolute;
 			top: 0;
-			right: -(24px + 5px); // Icon size + padding.
+			right: -(24px + 4px); // Icon size + padding.
 			bottom: 0;
 			left: 0;
 			border-radius: inherit;
+			@include outset-ring__focus();
+			outline-offset: 1px;
 			box-shadow:
-				inset 0 0 0 var(--wp-admin-border-width-focus)
-				var(--wpds-color-stroke-focus);
+				0 0 0 calc(var(--wpds-border-width-focus) + 2px)
+				var(--wpds-color-background-surface-neutral-strong);
 			z-index: 2;
 			pointer-events: none;
 		}
@@ -281,13 +308,6 @@
 	// Fix focus styling width when one row has fewer cells.
 	&.has-single-cell .block-editor-list-view-block-contents:focus::after {
 		right: 0;
-	}
-
-	&.is-nesting .block-editor-list-view__menu {
-		box-shadow:
-			inset 0 0 0 var(--wp-admin-border-width-focus)
-			var(--wpds-color-stroke-focus);
-		z-index: 1;
 	}
 
 	&.is-visible .block-editor-list-view-block-contents {
