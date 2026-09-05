@@ -8,10 +8,40 @@
  * @see https://github.com/Sidnioulz/storybook-addon-tag-badges
  */
 
+import { statuses } from './components/component-status-indicator/statuses';
+
+/**
+ * Recommendation statuses, declared per story as
+ * `parameters.componentStatus`. The status indexer turns them into
+ * `status-<value>` tags at index time, so they need no `tags` entry.
+ */
+const statusDescriptions = {
+	recommended: 'Use this component for new UI.',
+	'use-with-caution': 'Use with care; check the notes on the component page.',
+	'not-recommended':
+		'Do not use for new UI. The component page points at the recommended alternative.',
+	unaudited: 'Not audited yet against the design system.',
+};
+
+const statusBadges = Object.fromEntries(
+	Object.entries( statuses ).map( ( [ key, { label, icon } ] ) => [
+		key,
+		{
+			icon,
+			title: `${ icon } ${ label }`,
+			tooltip: {
+				title: `Component status: ${ label }`,
+				desc: statusDescriptions[ key ],
+			},
+		},
+	] )
+);
+
 /**
  * Badge definitions used by sidebar.js for rendering icons.
  */
 const badges = {
+	...statusBadges,
 	private: {
 		icon: '🔒',
 		title: '🔒 Private',
