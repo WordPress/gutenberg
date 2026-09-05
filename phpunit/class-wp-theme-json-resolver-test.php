@@ -1448,4 +1448,17 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 
 		$this->assertSameSetsWithIndex( $expected, $actual, 'Merged variation styles do not match.' );
 	}
+
+	/**
+	 * Test that font face styles rendered in wp_head contain absolute URLs, not relative file:// URLs.
+	 */
+	public function test_font_face_styles_in_head_should_have_absolute_urls() {
+		switch_theme( 'fonts-block-theme' );
+
+		ob_start();
+		do_action( 'wp_head' );
+		$head_output = ob_get_clean();
+
+		$this->assertStringNotContainsString( "url('file:", $head_output, 'Font face URLs in wp_head should not contain relative file:// paths.' );
+	}
 }
