@@ -2,6 +2,9 @@ import type { Menu as _Menu } from '@base-ui/react/menu';
 import type { ElementType, ReactElement, ReactNode } from 'react';
 import type { KeyboardShortcut } from '../utils/keyboard-shortcut';
 import type { ComponentProps } from '../utils/types';
+import type { IconProps } from '../icon/types';
+
+export type PrefixIconProps = IconProps;
 
 export type PortalProps = ComponentProps< typeof _Menu.Portal >;
 
@@ -113,6 +116,7 @@ export interface PopupProps extends ComponentProps< typeof _Menu.Popup > {
 export interface MenuItemLayoutProps {
 	/**
 	 * Presentational content displayed before the item label.
+	 * Use `Menu.PrefixIcon` for an icon aligned with the label.
 	 */
 	prefix?: ReactNode;
 
@@ -180,8 +184,17 @@ export type LinkItemProps = Omit<
 > &
 	MenuItemLayoutProps & {
 		/**
-		 * Whether to open the link in a new browser tab.
-		 * When true, sets `target="_blank"` and appends a visual arrow indicator.
+		 * Where to open the linked document. `"_blank"` also adds the visual
+		 * indicator and accessible new-tab notice.
+		 *
+		 * When both `target` and `openInNewTab` are set, `target` determines the
+		 * browsing context.
+		 */
+		target?: ComponentProps< 'a' >[ 'target' ];
+
+		/**
+		 * Adds a visual indicator and accessible notice for opening in a new tab.
+		 * Defaults `target` to `"_blank"` when no explicit target is set.
 		 *
 		 * @default false
 		 */

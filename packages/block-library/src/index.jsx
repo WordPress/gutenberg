@@ -49,10 +49,6 @@ import * as cover from './cover';
 import * as details from './details';
 import * as embed from './embed';
 import * as file from './file';
-import * as form from './form';
-import * as formInput from './form-input';
-import * as formSubmitButton from './form-submit-button';
-import * as formSubmissionNotification from './form-submission-notification';
 import * as gallery from './gallery';
 import * as group from './group';
 import * as heading from './heading';
@@ -266,13 +262,6 @@ const getAllBlocks = () => {
 		postAuthorBiography,
 		breadcrumbs,
 	];
-
-	if ( window?.__experimentalEnableFormBlocks ) {
-		blocks.push( form );
-		blocks.push( formInput );
-		blocks.push( formSubmitButton );
-		blocks.push( formSubmissionNotification );
-	}
 
 	if ( window?.__experimentalEnableBlockExperiments ) {
 		// Blocks added here are only registered when the "Block experiments"

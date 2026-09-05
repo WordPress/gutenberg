@@ -9,6 +9,10 @@
 -   The `getGlobalStyles` and `saveGlobalStyles` shortcuts now use `GlobalStyles` instead of the unrelated `GlobalStylesRevision` record. `saveGlobalStyles` requires the record ID and accepts a plain string title, matching the REST API update route and schema. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
 -   `RenderedText` omits `raw` outside the edit context instead of typing it as `never`, so a record requested with `context: 'view'` or `context: 'embed'` no longer exposes `title.raw` or `content.raw`. Read `rendered` in those contexts, or request the record with `context: 'edit'`. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
 
+### Enhancements
+
+-   Add `page_for_privacy_policy` to the `Settings` entity type, exposed by the Gutenberg plugin from the `wp_page_for_privacy_policy` option ([#82422](https://github.com/WordPress/gutenberg/pull/82422)).
+
 ### Bug Fixes
 
 -   Keep a query's `totalItems` in sync when records are removed from it, so the page count is correct after a deletion instead of only after the next fetch ([#82244](https://github.com/WordPress/gutenberg/pull/82244)).
