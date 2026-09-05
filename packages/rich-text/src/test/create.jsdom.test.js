@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest';
+import '../store';
 import { create, removeReservedCharacters, RichTextData } from '../create';
 import { OBJECT_REPLACEMENT_CHARACTER, ZWNBSP } from '../special-characters';
 import { createElement } from '../create-element';
@@ -10,17 +12,11 @@ describe( 'create', () => {
 	const em = { type: 'em' };
 	const strong = { type: 'strong' };
 
-	beforeAll( () => {
-		// Initialize the rich-text store.
-		require( '../store' );
-	} );
-
 	spec.forEach( ( { description, html, createRange, record } ) => {
 		if ( html === undefined ) {
 			return;
 		}
 
-		// eslint-disable-next-line jest/valid-title
 		it( description, () => {
 			const element = createElement( document, html );
 			const range = createRange( element );
@@ -46,7 +42,6 @@ describe( 'create', () => {
 			html,
 			value: expectedValue,
 		} ) => {
-			// eslint-disable-next-line jest/valid-title
 			it( description, () => {
 				if ( formatName ) {
 					registerFormatType( formatName, formatType );

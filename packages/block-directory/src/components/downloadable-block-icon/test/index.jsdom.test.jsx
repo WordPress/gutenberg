@@ -1,4 +1,5 @@
 import { render } from '@testing-library/react';
+import { describe, expect, test } from 'vitest';
 import DownloadableBlockIcon from '../';
 
 const IMAGE_URL = 'https://ps.w.org/listicles/assets/icon-128x128.png';

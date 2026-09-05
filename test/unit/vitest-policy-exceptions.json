@@ -1,4 +1,13 @@
 {
 	"browserFireEvent": {},
-	"jsdomBrowserApis": {}
+	"jsdomBrowserApis": {
+		"test/unit/config/setup-globals.vitest.jsdom.test.js": "This infrastructure regression must exercise the opt-in matchMedia mock in the jsdom project that installs it.",
+		"packages/block-editor/src/utils/test/dom.jsdom.test.jsx": "Uses explicit DOMRect fixtures to test clipping and element-selection algorithms without relying on browser layout.",
+		"packages/components/src/snackbar/test/list.jsdom.test.tsx": "Stubs scrollTo only to satisfy focus side effects; the regression assertion covers deterministic focus transfer, not scrolling.",
+		"packages/components/src/validated-form-controls/test/range-control.jsdom.test.tsx": "Uses requestAnimationFrame only to schedule reportValidity after React state; assertions cover accessible description semantics.",
+		"packages/ui/src/form/primitives/control-with-error/test/control-with-error.jsdom.test.tsx": "Uses requestAnimationFrame only to schedule reportValidity after React state; assertions cover aria-describedby semantics.",
+		"packages/dataviews/src/dataviews/test/dataviews.jsdom.test.tsx": "Temporary until PR #80995 extracts infinite scrolling to Browser Mode; the remaining suite injects resize data for deterministic state.",
+		"packages/editor/src/components/collab-sidebar/rich-text-control/test/index.jsdom.test.tsx": "Supplies a non-empty caret rectangle only so autocomplete can mount; assertions cover contenteditable labeling and text semantics.",
+		"packages/editor/src/components/collab-sidebar/test/board-store.jsdom.test.js": "Uses supplied DOMRect fixtures to test deterministic range-to-anchor calculations without relying on rendered layout."
+	}
 }

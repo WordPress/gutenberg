@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it, vi, type Mocked } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { useInteraction } from '../use-interaction';
 import type { CropperInteractionActions } from '../../../core/interaction-controller';
@@ -20,13 +21,13 @@ function makeState( overrides: Partial< CropperState > = {} ): CropperState {
 	};
 }
 
-function createActions(): jest.Mocked< CropperInteractionActions > {
+function createActions(): Mocked< CropperInteractionActions > {
 	return {
-		setPan: jest.fn(),
-		setZoom: jest.fn(),
-		setZoomAtPoint: jest.fn(),
-		snapRotate90: jest.fn(),
-		toggleFlip: jest.fn(),
+		setPan: vi.fn(),
+		setZoom: vi.fn(),
+		setZoomAtPoint: vi.fn(),
+		snapRotate90: vi.fn(),
+		toggleFlip: vi.fn(),
 	};
 }
 
@@ -34,7 +35,7 @@ function createWheelEvent(
 	overrides: Partial< WheelEvent > & { currentTarget?: unknown } = {}
 ): WheelEvent {
 	return {
-		preventDefault: jest.fn(),
+		preventDefault: vi.fn(),
 		deltaY: -100,
 		clientX: 0,
 		clientY: 0,
@@ -48,7 +49,7 @@ function createKeyboardEvent( key: string ): React.KeyboardEvent {
 		key,
 		nativeEvent: {
 			key,
-			preventDefault: jest.fn(),
+			preventDefault: vi.fn(),
 		},
 	} as unknown as React.KeyboardEvent;
 }
@@ -57,7 +58,7 @@ function createTouchEvent(
 	touches: Array< { clientX: number; clientY: number } >
 ): TouchEvent {
 	return {
-		preventDefault: jest.fn(),
+		preventDefault: vi.fn(),
 		touches,
 	} as unknown as TouchEvent;
 }
@@ -67,13 +68,13 @@ function createTouchDocument(): Document & {
 } {
 	const listeners: Record< string, EventListener[] > = {};
 	return {
-		addEventListener: jest.fn( ( type: string, fn: EventListener ) => {
+		addEventListener: vi.fn( ( type: string, fn: EventListener ) => {
 			if ( ! listeners[ type ] ) {
 				listeners[ type ] = [];
 			}
 			listeners[ type ].push( fn );
 		} ),
-		removeEventListener: jest.fn( ( type: string, fn: EventListener ) => {
+		removeEventListener: vi.fn( ( type: string, fn: EventListener ) => {
 			if ( listeners[ type ] ) {
 				listeners[ type ] = listeners[ type ].filter(
 					( listener ) => listener !== fn
@@ -104,11 +105,11 @@ function createTouchTarget( ownerDocument: Document ) {
 
 describe( 'useInteraction grid placement signal', () => {
 	afterEach( () => {
-		jest.useRealTimers();
+		vi.useRealTimers();
 	} );
 
 	it( 'sets isPlacementActive during keyboard pan, then clears it after idle', () => {
-		jest.useFakeTimers();
+		vi.useFakeTimers();
 		const { result } = renderHook( () =>
 			useInteraction(
 				makeState(),
@@ -127,7 +128,7 @@ describe( 'useInteraction grid placement signal', () => {
 		expect( result.current.isPlacementActive ).toBe( true );
 
 		act( () => {
-			jest.advanceTimersByTime( 300 );
+			vi.advanceTimersByTime( 300 );
 		} );
 
 		expect( result.current.isPlacementActive ).toBe( false );
@@ -154,7 +155,7 @@ describe( 'useInteraction grid placement signal', () => {
 	);
 
 	it( 'sets isPlacementActive during wheel zoom, then clears it after the wheel debounce', () => {
-		jest.useFakeTimers();
+		vi.useFakeTimers();
 		const { result } = renderHook( () =>
 			useInteraction(
 				makeState(),
@@ -173,7 +174,7 @@ describe( 'useInteraction grid placement signal', () => {
 		expect( result.current.isPlacementActive ).toBe( true );
 
 		act( () => {
-			jest.advanceTimersByTime( 300 );
+			vi.advanceTimersByTime( 300 );
 		} );
 
 		expect( result.current.isPlacementActive ).toBe( false );

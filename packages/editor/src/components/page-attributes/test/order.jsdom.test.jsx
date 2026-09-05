@@ -1,11 +1,15 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useSelect, useDispatch } from '@wordpress/data';
 import PageAttributesOrder from '../order';
 
-jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
-jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
-	useDispatch: jest.fn(),
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useSelect: vi.fn(),
+	useDispatch: vi.fn(),
 } ) );
 
 function setupDataMock( order = 0 ) {
@@ -27,7 +31,7 @@ function setupDataMock( order = 0 ) {
 		} ) )
 	);
 
-	const editPost = jest.fn();
+	const editPost = vi.fn();
 	useDispatch.mockImplementation( () => ( {
 		editPost,
 	} ) );

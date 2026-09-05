@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { render } from '@testing-library/react';
 import { createElement, Fragment, Component } from '../react';
 import createInterpolateElement from '../create-interpolate-element';
@@ -90,6 +91,8 @@ describe( 'createInterpolateElement', () => {
 			JSON.stringify(
 				createInterpolateElement( partialString, {
 					em: <em />,
+					// @ts-expect-error - The unmatched closing tag is
+					// intentionally included to exercise runtime recovery.
 					strong: <strong />,
 				} )
 			)
@@ -146,7 +149,7 @@ describe( 'createInterpolateElement', () => {
 		'returns expected output for a custom component with children ' +
 			'replacement',
 		() => {
-			const TestComponent = ( props ) => {
+			const TestComponent = ( props: React.ComponentProps< 'div' > ) => {
 				return <div { ...props }>{ props.children }</div>;
 			};
 			const testString =
@@ -167,7 +170,7 @@ describe( 'createInterpolateElement', () => {
 		}
 	);
 	it( 'returns expected output for self closing custom component', () => {
-		const TestComponent = ( props ) => {
+		const TestComponent = ( props: React.ComponentProps< 'div' > ) => {
 			return <div { ...props } />;
 		};
 		const testString =
@@ -227,7 +230,7 @@ describe( 'createInterpolateElement', () => {
 		).toEqual( JSON.stringify( expectedElement ) );
 	} );
 	it( 'renders expected components across renders for keys in use', () => {
-		const TestComponent = ( { switchKey } ) => {
+		const TestComponent = ( { switchKey }: { switchKey: boolean } ) => {
 			const elementConfig = switchKey
 				? { item: <em /> }
 				: { item: <strong /> };

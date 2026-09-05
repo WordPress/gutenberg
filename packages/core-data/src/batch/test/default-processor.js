@@ -1,10 +1,18 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
-import defaultProcessor from '../default-processor';
 
 vi.mock( '@wordpress/api-fetch' );
 
 describe( 'defaultProcessor', () => {
+	let defaultProcessor;
+
+	beforeEach( async () => {
+		vi.resetModules();
+		( { default: defaultProcessor } = await import(
+			'../default-processor'
+		) );
+	} );
+
 	const preflightResponse = {
 		endpoints: [
 			{

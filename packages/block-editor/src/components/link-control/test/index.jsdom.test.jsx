@@ -1,4 +1,14 @@
 import {
+	afterAll,
+	afterEach,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
+import {
 	fireEvent,
 	render as baseRender,
 	screen,
@@ -9,6 +19,7 @@ import userEvent from '@testing-library/user-event';
 import { SlotFillProvider } from '@wordpress/components';
 import { useState, createElement } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
+import { useReducedMotion } from '@wordpress/compose';
 import LinkControl from '../';
 import {
 	fauxEntitySuggestions,
@@ -17,7 +28,12 @@ import {
 } from './fixtures';
 import { expectValidatedInputControlDeprecationIfCalled } from '../../url-input/test/fixtures/validated-input-control-deprecation';
 
-const mockFetchSearchSuggestions = jest.fn();
+globalThis.wpVitest.mockMatchMedia();
+
+globalThis.wpVitest.mockScrollIntoView();
+globalThis.wpVitest.mockVisibleElements();
+
+const mockFetchSearchSuggestions = vi.fn();
 
 function getExpectedVisualTypeName( type ) {
 	const builtInLabels = {
@@ -40,26 +56,22 @@ function getExpectedVisualTypeName( type ) {
  */
 let mockFetchRichUrlData;
 
-jest.mock( '@wordpress/data/src/components/use-select', () => {
-	// This allows us to tweak the returned value on each test.
-	const mock = jest.fn();
-	return mock;
-} );
-useSelect.mockImplementation( () => ( {
-	fetchSearchSuggestions: mockFetchSearchSuggestions,
-	fetchRichUrlData: mockFetchRichUrlData,
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useDispatch: () => ( { saveEntityRecords: vi.fn() } ),
+	useSelect: vi.fn(),
 } ) );
-
-jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
-	useDispatch: () => ( { saveEntityRecords: jest.fn() } ),
-} ) );
-
-jest.mock( '@wordpress/compose', () => ( {
-	...jest.requireActual( '@wordpress/compose' ),
-	useReducedMotion: jest.fn( () => true ),
+vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useReducedMotion: vi.fn( () => true ),
 } ) );
 
 beforeEach( () => {
+	useReducedMotion.mockReturnValue( true );
+	useSelect.mockImplementation( () => ( {
+		fetchSearchSuggestions: mockFetchSearchSuggestions,
+		fetchRichUrlData: mockFetchRichUrlData,
+	} ) );
 	// Setup a DOM element as a render target.
 	mockFetchSearchSuggestions.mockImplementation( fetchFauxEntitySuggestions );
 } );
@@ -404,7 +416,7 @@ describe( 'Basic rendering', () => {
 
 		it( 'should show "Unlink" button if a onRemove handler is provided', async () => {
 			const user = userEvent.setup();
-			const mockOnRemove = jest.fn();
+			const mockOnRemove = vi.fn();
 
 			render(
 				<LinkControl
@@ -425,7 +437,7 @@ describe( 'Basic rendering', () => {
 
 		it( 'should revert to "editing" mode when onRemove is triggered', async () => {
 			const user = userEvent.setup();
-			const mockOnRemove = jest.fn();
+			const mockOnRemove = vi.fn();
 
 			render(
 				<LinkControl
@@ -812,7 +824,7 @@ describe( 'Manual link entry', () => {
 
 	describe( 'Handling cancellation', () => {
 		it( 'should not show cancellation button during link creation', async () => {
-			const mockOnRemove = jest.fn();
+			const mockOnRemove = vi.fn();
 
 			render( <LinkControl onRemove={ mockOnRemove } /> );
 
@@ -910,7 +922,7 @@ describe( 'Manual link entry', () => {
 
 		it( 'should call onCancel callback when cancelling if provided', async () => {
 			const user = userEvent.setup();
-			const mockOnCancel = jest.fn();
+			const mockOnCancel = vi.fn();
 
 			render(
 				<LinkControl
@@ -1054,7 +1066,7 @@ describe( 'Link submission', () => {
 
 	it( 'should disable Apply button when URL is cleared', async () => {
 		const user = userEvent.setup();
-		const mockOnChange = jest.fn();
+		const mockOnChange = vi.fn();
 
 		const existingLink = { url: 'https://example.com', title: 'Example' };
 		render(
@@ -1457,7 +1469,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			render(
 				<LinkControl
 					showInitialSuggestions // Should show even if we're not showing initial suggestions.
-					createSuggestion={ jest.fn() }
+					createSuggestion={ vi.fn() }
 				/>
 			);
 
@@ -1483,7 +1495,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			'should not show option to "Create Page" when text is a form of direct entry (eg: %s)',
 			async ( inputText ) => {
 				const user = userEvent.setup();
-				render( <LinkControl createSuggestion={ jest.fn() } /> );
+				render( <LinkControl createSuggestion={ vi.fn() } /> );
 
 				// Search Input UI.
 				const searchInput = screen.getByRole( 'combobox', {
@@ -1763,7 +1775,6 @@ describe( 'Selecting links', () => {
 					} );
 
 					// We should have highlighted the first item using the keyboard
-					// eslint-disable-next-line jest/no-conditional-expect
 					expect( selectedSearchResultElement ).toBe(
 						secondSearchSuggestion
 					);
@@ -1776,7 +1787,6 @@ describe( 'Selecting links', () => {
 					} );
 
 					// We should be back to highlighting the first search result again
-					// eslint-disable-next-line jest/no-conditional-expect
 					expect( selectedSearchResultElement ).toBe(
 						firstSearchSuggestion
 					);
@@ -2032,7 +2042,7 @@ describe( 'Addition Settings UI', () => {
 	it( 'should require settings changes to be submitted/applied', async () => {
 		const user = userEvent.setup();
 
-		const mockOnChange = jest.fn();
+		const mockOnChange = vi.fn();
 
 		const selectedLink = {
 			...fauxEntitySuggestions[ 0 ],
@@ -2160,11 +2170,11 @@ describe( 'Rich link previews', () => {
 	beforeAll( () => {
 		/**
 		 * These tests require that we exercise the `fetchRichUrlData` function.
-		 * We are therefore overwriting the mock "placeholder" with a true jest mock
+		 * We are therefore overwriting the mock "placeholder" with a true vi mock
 		 * which will cause the code under test to execute the code which fetches
 		 * rich previews.
 		 */
-		mockFetchRichUrlData = jest.fn();
+		mockFetchRichUrlData = vi.fn();
 	} );
 
 	it( 'should not fetch or display rich previews by default', async () => {
@@ -2487,7 +2497,7 @@ describe( 'Controlling link title text', () => {
 
 	it( "should ensure title value matching the text input's current value is included in onChange handler value on submit", async () => {
 		const user = userEvent.setup();
-		const mockOnChange = jest.fn();
+		const mockOnChange = vi.fn();
 		const textValue = 'My new text value';
 
 		render(
@@ -2524,7 +2534,7 @@ describe( 'Controlling link title text', () => {
 	it( 'should allow `ENTER` keypress within the text field to trigger submission of value', async () => {
 		const user = userEvent.setup();
 		const newTextValue = 'My new text value';
-		const mockOnChange = jest.fn();
+		const mockOnChange = vi.fn();
 
 		render(
 			<LinkControl
@@ -2563,7 +2573,7 @@ describe( 'Controlling link title text', () => {
 	it( 'should reset state upon controlled value change', async () => {
 		const user = userEvent.setup();
 		const textValue = 'My new text value';
-		const mockOnChange = jest.fn();
+		const mockOnChange = vi.fn();
 
 		const { rerender } = render(
 			<LinkControl
@@ -2719,7 +2729,7 @@ describe( 'Entity handling', () => {
 			type: 'page',
 		};
 
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<LinkControl
@@ -2778,7 +2788,7 @@ describe( 'Entity handling', () => {
 			kind: 'post-type',
 		};
 
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<LinkControl
@@ -2842,7 +2852,7 @@ describe( 'Entity handling', () => {
 			kind: 'post-type',
 		};
 
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		// Mock search suggestions to return a custom URL
 		// URL suggestions have an id and type but no 'kind' (which indicates entity metadata)
@@ -2912,7 +2922,7 @@ describe( 'Entity handling', () => {
 
 	it( 'should clear entity metadata when pressing Enter for direct entry (without clicking suggestion)', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		const pageLink = {
 			id: 123,
@@ -3063,7 +3073,7 @@ describe( 'Entity handling', () => {
 describe( 'Custom settings rendering', () => {
 	it( 'renders custom settings with valid render functions', async () => {
 		const user = userEvent.setup();
-		const mockRender = jest.fn(
+		const mockRender = vi.fn(
 			// eslint-disable-next-line no-unused-vars
 			( setting, value, onChange ) =>
 				createElement(
@@ -3106,7 +3116,7 @@ describe( 'Custom settings rendering', () => {
 
 	it( 'renders only valid settings when mixed with invalid ones', async () => {
 		const user = userEvent.setup();
-		const validRender = jest.fn(
+		const validRender = vi.fn(
 			// eslint-disable-next-line no-unused-vars
 			( setting, value, onChange ) =>
 				createElement(
@@ -3184,9 +3194,9 @@ describe( 'Custom settings rendering', () => {
 
 	it( 'allows custom render functions to call onChange in LinkControl', async () => {
 		const user = userEvent.setup();
-		const mockOnChange = jest.fn();
+		const mockOnChange = vi.fn();
 
-		const mockRender = jest.fn( ( setting, value, onChange ) => {
+		const mockRender = vi.fn( ( setting, value, onChange ) => {
 			return createElement(
 				'button',
 				{
@@ -3250,7 +3260,7 @@ describe( 'Custom settings rendering', () => {
 
 describe( 'URL validation', () => {
 	const user = userEvent.setup();
-	const mockOnChange = jest.fn();
+	const mockOnChange = vi.fn();
 
 	beforeEach( () => {
 		mockOnChange.mockClear();
@@ -3581,7 +3591,7 @@ describe( 'inputValue prop', () => {
 
 	it( 'should call onInputChange when user types, with observable pattern', async () => {
 		const user = userEvent.setup();
-		const onInputChange = jest.fn();
+		const onInputChange = vi.fn();
 
 		render(
 			<LinkControl

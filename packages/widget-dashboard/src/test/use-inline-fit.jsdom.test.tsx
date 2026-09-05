@@ -1,16 +1,17 @@
 import { act, renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
+import { describe, expect, it, vi } from 'vitest';
 import { useInlineFit } from '../components/widget-attributes/use-inline-fit';
 import { WidgetHeaderAvailableSizeProvider } from '../components/widget-header/widget-header-fit';
 
 let notifyResize: ( entries: unknown[] ) => void = () => {};
 
-jest.mock( '@wordpress/compose', () => ( {
-	...jest.requireActual( '@wordpress/compose' ),
-	useResizeObserver: ( callback: ( entries: unknown[] ) => void ) => {
+vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useResizeObserver: ( ( callback: ( entries: unknown[] ) => void ) => {
 		notifyResize = callback;
 		return () => {};
-	},
+	} ) as typeof import('@wordpress/compose').useResizeObserver,
 } ) );
 
 let availableSize: number | null = null;

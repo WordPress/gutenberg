@@ -4,7 +4,6 @@ import { fileURLToPath } from 'node:url';
 import {
 	afterAll,
 	afterEach,
-	beforeAll,
 	beforeEach,
 	describe,
 	expect,
@@ -25,7 +24,7 @@ const fileUtils = require( '../file' );
 const hasProjectFileMock = vi.spyOn( fileUtils, 'hasProjectFile' );
 const fromProjectRootMock = vi.spyOn( fileUtils, 'fromProjectRoot' );
 const fromConfigRootMock = vi.spyOn( fileUtils, 'fromConfigRoot' );
-const crossSpawnMock = vi.spyOn( crossSpawn, 'sync' );
+let crossSpawnMock = vi.spyOn( crossSpawn, 'sync' );
 const {
 	hasArgInCLI,
 	hasProjectFile,
@@ -34,13 +33,13 @@ const {
 	spawnScript,
 } = require( '../' );
 
-afterAll( () => {
-	vi.restoreAllMocks();
+beforeEach( () => {
+	crossSpawnMock = vi.spyOn( crossSpawn, 'sync' );
 } );
 
 describe( 'utils', () => {
 	describe( 'hasArgInCLI', () => {
-		beforeAll( () => {
+		beforeEach( () => {
 			getArgsFromCLIMock.mockReturnValue( [
 				'-a',
 				'--b',
@@ -199,7 +198,7 @@ describe( 'utils', () => {
 	describe( 'spawnScript', () => {
 		const scriptName = 'test-unit-js';
 
-		beforeAll( () => {
+		beforeEach( () => {
 			exitMock.mockImplementation( ( code ) => {
 				throw new Error( `Exit code: ${ code }.` );
 			} );

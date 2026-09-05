@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
@@ -6,9 +7,9 @@ import { SearchableChipSelect } from '../index';
 import type { Item, ItemGroup } from '../types';
 import { GROUPED_ITEMS, ITEMS } from './__fixtures__';
 
-jest.mock( '@wordpress/warning', () => jest.fn() );
+vi.mock( import( '@wordpress/warning' ), () => ( { default: vi.fn() } ) );
 
-const mockedWarning = warning as jest.MockedFunction< typeof warning >;
+const mockedWarning = vi.mocked( warning );
 
 describe( 'SearchableChipSelect', () => {
 	beforeEach( () => {
@@ -131,7 +132,7 @@ describe( 'SearchableChipSelect', () => {
 
 	it( 'selects a grouped item', async () => {
 		const user = userEvent.setup();
-		const onValueChange = jest.fn();
+		const onValueChange = vi.fn();
 
 		render(
 			<SearchableChipSelect
@@ -288,7 +289,7 @@ describe( 'SearchableChipSelect', () => {
 
 		it( 'selects the creatable item by keyboard when grouped children are used', async () => {
 			const user = userEvent.setup();
-			const onValueChange = jest.fn();
+			const onValueChange = vi.fn();
 			const groupedCreatableItem = {
 				value: '__create__',
 				label: 'Create new item: zzzzz',

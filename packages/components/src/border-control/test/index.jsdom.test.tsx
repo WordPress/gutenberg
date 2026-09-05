@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import {
 	fireEvent,
 	render,
@@ -9,6 +10,10 @@ import userEvent from '@testing-library/user-event';
 import { BorderControl } from '../';
 import type { Border, BorderControlProps } from '../types';
 import { COLORS } from '../../utils';
+
+globalThis.wpVitest.mockMatchMedia();
+
+globalThis.wpVitest.mockResizeObserver();
 
 const colors = [
 	{ name: 'Gray', color: '#f6f7f7' },
@@ -30,7 +35,7 @@ function createProps(
 	const props: BorderControlProps = {
 		colors,
 		label: 'Border',
-		onChange: jest.fn().mockImplementation( ( newValue?: Border ) => {
+		onChange: vi.fn().mockImplementation( ( newValue?: Border ) => {
 			props.value = newValue;
 		} ),
 		value: defaultBorder,
@@ -149,16 +154,21 @@ describe( 'BorderControl', () => {
 				return toggleButton.firstElementChild;
 			};
 
+			/* eslint-disable jest-dom/prefer-to-have-style -- These jsdom tests check normalized inline style values without browser layout. */
 			it( 'should fall back to gray-300 when a style is set without a color', () => {
 				const indicatorWrapper = getIndicatorWrapper( {
 					style: 'solid',
 					color: '',
 				} );
+				const expectedStyle = document.createElement( 'div' ).style;
+				expectedStyle.borderColor = COLORS.gray[ 300 ];
 
-				expect( indicatorWrapper ).toHaveStyle( {
-					borderStyle: 'solid',
-					borderColor: COLORS.gray[ 300 ],
-				} );
+				expect(
+					( indicatorWrapper as HTMLElement ).style.borderStyle
+				).toBe( 'solid' );
+				expect(
+					( indicatorWrapper as HTMLElement ).style.borderColor
+				).toBe( expectedStyle.borderColor );
 			} );
 
 			it( 'should pass CSS-wide values through to border-style and border-color', () => {
@@ -167,10 +177,12 @@ describe( 'BorderControl', () => {
 					color: 'inherit',
 				} );
 
-				expect( indicatorWrapper ).toHaveStyle( {
-					borderStyle: 'inherit',
-					borderColor: 'inherit',
-				} );
+				expect(
+					( indicatorWrapper as HTMLElement ).style.borderStyle
+				).toBe( 'inherit' );
+				expect(
+					( indicatorWrapper as HTMLElement ).style.borderColor
+				).toBe( 'inherit' );
 			} );
 
 			it( 'should preview a `none` style as solid without applying a color', () => {
@@ -178,14 +190,15 @@ describe( 'BorderControl', () => {
 					style: 'none',
 				} );
 
-				expect( indicatorWrapper ).toHaveStyle( {
-					borderStyle: 'solid',
-				} );
+				expect(
+					( indicatorWrapper as HTMLElement ).style.borderStyle
+				).toBe( 'solid' );
 				expect( indicatorWrapper ).not.toHaveAttribute(
 					'style',
 					expect.stringContaining( 'border-color' )
 				);
 			} );
+			/* eslint-enable jest-dom/prefer-to-have-style */
 
 			it( 'should not apply inline styles when no style is set', () => {
 				const indicatorWrapper = getIndicatorWrapper( {

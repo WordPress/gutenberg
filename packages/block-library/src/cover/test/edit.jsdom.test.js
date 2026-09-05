@@ -1,9 +1,15 @@
+/* eslint-disable jest-dom/prefer-to-have-style -- This suite moves to Browser Mode in the next stacked PR. */
+import { describe, expect, test } from 'vitest';
 import { screen, fireEvent, act, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
 	initializeEditor,
 	selectBlock,
 } from '@wordpress/integration-tests/helpers/integration-test-editor';
+globalThis.wpVitest.mockMatchMedia();
+globalThis.wpVitest.mockCSSSupports();
+globalThis.wpVitest.mockResizeObserver();
+globalThis.wpVitest.mockVisibleElements();
 
 const defaultSettings = {
 	__experimentalFeatures: {
@@ -130,9 +136,7 @@ describe( 'Cover block', () => {
 			const overlay = container.getElementsByClassName(
 				'wp-block-cover__background'
 			);
-			expect( overlay[ 0 ] ).toHaveStyle(
-				`background-color: ${ color }`
-			);
+			expect( overlay[ 0 ].style.backgroundColor ).toBe( color );
 		} );
 
 		test( 'can have the title edited', async () => {
@@ -158,15 +162,12 @@ describe( 'Cover block', () => {
 			await setup();
 			await createAndSelectBlock();
 
-			expect( screen.getByLabelText( 'Block: Cover' ) ).not.toHaveStyle(
-				'min-height: 100vh;'
-			);
+			const cover = screen.getByLabelText( 'Block: Cover' );
+			expect( cover.style.minHeight ).not.toBe( '100vh' );
 
 			await userEvent.click( screen.getByLabelText( 'Full height' ) );
 
-			expect( screen.getByLabelText( 'Block: Cover' ) ).toHaveStyle(
-				'min-height: 100vh;'
-			);
+			expect( cover.style.minHeight ).toBe( '100vh' );
 		} );
 
 		test( 'content position button sets content position', async () => {
@@ -309,11 +310,10 @@ describe( 'Cover block', () => {
 			await userEvent.clear( await screen.findByLabelText( 'Left' ) );
 			await userEvent.type( screen.getByLabelText( 'Left' ), '100' );
 
-			expect(
-				within( screen.getByLabelText( 'Block: Cover' ) ).getByRole(
-					'presentation'
-				)
-			).toHaveStyle( 'object-position: 100% 50%;' );
+			const image = within(
+				screen.getByLabelText( 'Block: Cover' )
+			).getByRole( 'presentation' );
+			expect( image.style.objectPosition ).toBe( '100% 50%' );
 		} );
 
 		test( 'sets alt attribute if text entered in alt text box', async () => {
@@ -426,9 +426,9 @@ describe( 'Cover block', () => {
 					'300'
 				);
 
-				expect( screen.getByLabelText( 'Block: Cover' ) ).toHaveStyle(
-					'min-height: 300px;'
-				);
+				expect(
+					screen.getByLabelText( 'Block: Cover' ).style.minHeight
+				).toBe( '300px' );
 			} );
 		} );
 	} );
@@ -475,3 +475,4 @@ describe( 'Cover block', () => {
 		} );
 	} );
 } );
+/* eslint-enable jest-dom/prefer-to-have-style */

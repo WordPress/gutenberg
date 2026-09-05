@@ -1,5 +1,14 @@
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import {
+	afterAll,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
 import { compose } from '@wordpress/compose';
 import { Component, createRef, forwardRef } from '@wordpress/element';
 import withSelect from '../';
@@ -36,11 +45,11 @@ describe( 'withSelect', () => {
 		// including both `withSelect` and `select` in the same scope, which
 		// shouldn't occur for a typical component, and if it did might wrongly
 		// encourage the developer to use `select` within the component itself.
-		const mapSelectToProps = jest.fn( ( _select, ownProps ) => ( {
+		const mapSelectToProps = vi.fn( ( _select, ownProps ) => ( {
 			data: _select( 'reactReducer' ).reactSelector( ownProps.keyName ),
 		} ) );
 
-		const OriginalComponent = jest.fn( ( props ) => (
+		const OriginalComponent = vi.fn( ( props ) => (
 			<div role="status">{ props.data }</div>
 		) );
 
@@ -81,15 +90,15 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		const mapSelectToProps = jest.fn( ( _select ) => ( {
+		const mapSelectToProps = vi.fn( ( _select ) => ( {
 			count: _select( 'counter' ).getCount(),
 		} ) );
 
-		const mapDispatchToProps = jest.fn( ( _dispatch ) => ( {
+		const mapDispatchToProps = vi.fn( ( _dispatch ) => ( {
 			increment: _dispatch( 'counter' ).increment,
 		} ) );
 
-		const OriginalComponent = jest.fn( ( props ) => (
+		const OriginalComponent = vi.fn( ( props ) => (
 			<button onClick={ props.increment }>{ props.count }</button>
 		) );
 
@@ -127,23 +136,6 @@ describe( 'withSelect', () => {
 	} );
 
 	describe( 'expected behaviour when dispatching actions during mount', () => {
-		const testRegistry = createRegistry();
-		testRegistry.registerStore( 'counter', {
-			reducer: ( state = 0, action ) => {
-				if ( action.type === 'increment' ) {
-					return state + 1;
-				}
-
-				return state;
-			},
-			selectors: {
-				getCount: ( state ) => state,
-			},
-			actions: {
-				increment: () => ( { type: 'increment' } ),
-			},
-		} );
-
 		// @todo Should we allow this behaviour? Side-effects
 		// on mount are discouraged in React (breaks Suspense and React Async Mode)
 		// leaving in place for now under the assumption there's current usage
@@ -164,20 +156,41 @@ describe( 'withSelect', () => {
 			}
 		}
 
-		const renderSpy = jest.spyOn( OriginalComponent.prototype, 'render' );
+		let testRegistry;
+		let renderSpy;
+		let mapSelectToProps;
+		let DataBoundComponent;
 
-		const mapSelectToProps = jest.fn( ( _select ) => ( {
-			count: _select( 'counter' ).getCount(),
-		} ) );
+		beforeEach( () => {
+			testRegistry = createRegistry();
+			testRegistry.registerStore( 'counter', {
+				reducer: ( state = 0, action ) => {
+					if ( action.type === 'increment' ) {
+						return state + 1;
+					}
 
-		const mapDispatchToProps = jest.fn( ( _dispatch ) => ( {
-			increment: _dispatch( 'counter' ).increment,
-		} ) );
+					return state;
+				},
+				selectors: {
+					getCount: ( state ) => state,
+				},
+				actions: {
+					increment: () => ( { type: 'increment' } ),
+				},
+			} );
 
-		const DataBoundComponent = compose( [
-			withSelect( mapSelectToProps ),
-			withDispatch( mapDispatchToProps ),
-		] )( OriginalComponent );
+			renderSpy = vi.spyOn( OriginalComponent.prototype, 'render' );
+			mapSelectToProps = vi.fn( ( _select ) => ( {
+				count: _select( 'counter' ).getCount(),
+			} ) );
+			const mapDispatchToProps = vi.fn( ( _dispatch ) => ( {
+				increment: _dispatch( 'counter' ).increment,
+			} ) );
+			DataBoundComponent = compose( [
+				withSelect( mapSelectToProps ),
+				withDispatch( mapDispatchToProps ),
+			] )( OriginalComponent );
+		} );
 
 		it( 'should rerun if had dispatched action during mount', () => {
 			const { unmount } = render(
@@ -198,6 +211,12 @@ describe( 'withSelect', () => {
 		} );
 
 		it( 'should rerun on unmount and mount', () => {
+			const { unmount } = render(
+				<RegistryProvider value={ testRegistry }>
+					<DataBoundComponent />
+				</RegistryProvider>
+			);
+			unmount();
 			render(
 				<RegistryProvider value={ testRegistry }>
 					<DataBoundComponent />
@@ -205,7 +224,7 @@ describe( 'withSelect', () => {
 			);
 
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '4' );
-			// Expected an additional 3 times because of the unmount and remount:
+			// Expected 6 times across the initial mount and remount:
 			// - 1 on initial render
 			// - 1 on effect before subscription set.
 			// - once for the rerender because of the mapOutput change detected.
@@ -229,11 +248,11 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		const mapSelectToProps = jest.fn( ( _select, ownProps ) => ( {
+		const mapSelectToProps = vi.fn( ( _select, ownProps ) => ( {
 			count: _select( 'counter' ).getCount( ownProps.offset ),
 		} ) );
 
-		const OriginalComponent = jest.fn( ( props ) => (
+		const OriginalComponent = vi.fn( ( props ) => (
 			<div role="status">{ props.count }</div>
 		) );
 
@@ -269,8 +288,8 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		const mapSelectToProps = jest.fn();
-		const OriginalComponent = jest.fn( () => <div /> );
+		const mapSelectToProps = vi.fn();
+		const OriginalComponent = vi.fn( () => <div /> );
 
 		const DataBoundComponent = compose( [
 			withSelect( mapSelectToProps ),
@@ -311,11 +330,11 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		const mapSelectToProps = jest.fn( ( _select ) => ( {
+		const mapSelectToProps = vi.fn( ( _select ) => ( {
 			value: _select( 'demo' ).getUnchangingValue(),
 		} ) );
 
-		const OriginalComponent = jest.fn( () => <div /> );
+		const OriginalComponent = vi.fn( () => <div /> );
 
 		const DataBoundComponent =
 			withSelect( mapSelectToProps )( OriginalComponent );
@@ -344,8 +363,8 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		const mapSelectToProps = jest.fn();
-		const OriginalComponent = jest.fn( () => <div /> );
+		const mapSelectToProps = vi.fn();
+		const OriginalComponent = vi.fn( () => <div /> );
 
 		const DataBoundComponent = compose( [
 			withSelect( mapSelectToProps ),
@@ -379,8 +398,8 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		const mapSelectToProps = jest.fn();
-		const OriginalComponent = jest.fn( () => <div /> );
+		const mapSelectToProps = vi.fn();
+		const OriginalComponent = vi.fn( () => <div /> );
 
 		const DataBoundComponent = compose( [
 			withSelect( mapSelectToProps ),
@@ -410,13 +429,13 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		const mapSelectToProps = jest.fn( ( _select, ownProps ) => {
+		const mapSelectToProps = vi.fn( ( _select, ownProps ) => {
 			return {
 				[ ownProps.propName ]: _select( 'demo' ).getValue(),
 			};
 		} );
 
-		const OriginalComponent = jest.fn( ( props ) => (
+		const OriginalComponent = vi.fn( ( props ) => (
 			<div role="status">{ JSON.stringify( props ) }</div>
 		) );
 
@@ -464,7 +483,7 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		const mapSelectToProps = jest.fn( ( _select, ownProps ) => {
+		const mapSelectToProps = vi.fn( ( _select, ownProps ) => {
 			if ( ownProps.pass ) {
 				return {
 					count: _select( 'demo' ).getValue(),
@@ -472,7 +491,7 @@ describe( 'withSelect', () => {
 			}
 		} );
 
-		const OriginalComponent = jest.fn( ( props ) => (
+		const OriginalComponent = vi.fn( ( props ) => (
 			<div role="status">{ props.count || 'Unknown' }</div>
 		) );
 
@@ -523,13 +542,13 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		const childMapSelectToProps = jest.fn();
-		const parentMapSelectToProps = jest.fn( ( _select ) => ( {
+		const childMapSelectToProps = vi.fn();
+		const parentMapSelectToProps = vi.fn( ( _select ) => ( {
 			isRenderingChild: _select( 'childRender' ).getValue(),
 		} ) );
 
-		const ChildOriginalComponent = jest.fn( () => <div /> );
-		const ParentOriginalComponent = jest.fn( ( props ) => (
+		const ChildOriginalComponent = vi.fn( () => <div /> );
+		const ParentOriginalComponent = vi.fn( ( props ) => (
 			<div>{ props.isRenderingChild ? <Child /> : null }</div>
 		) );
 
@@ -572,11 +591,11 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		const mapSelectToProps = jest.fn( ( _select ) => ( {
+		const mapSelectToProps = vi.fn( ( _select ) => ( {
 			value: _select( 'demo' ).getValue(),
 		} ) );
 
-		const OriginalComponent = jest.fn( ( props ) => (
+		const OriginalComponent = vi.fn( ( props ) => (
 			<div role="status">{ props.value }</div>
 		) );
 

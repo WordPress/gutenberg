@@ -130,7 +130,7 @@ jobs:
                   # by the Jest partition.
                   FK_ENV_NODEJS: ${{ matrix.node }}
               run: |
-                  npm run test:unit:vitest -- \
+                  npm run test:unit:vitest:shuffled -- \
                     --shard="$SHARD" \
                     --passWithNoTests
 

@@ -1,15 +1,15 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import { useSelect, useDispatch } from '@wordpress/data';
 import AutosaveMonitor from '../';
 
-jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
-jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
-	useDispatch: jest.fn(),
-} ) );
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
-jest.useFakeTimers();
-jest.spyOn( global, 'clearInterval' );
-jest.spyOn( global, 'setInterval' );
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useSelect: vi.fn(),
+	useDispatch: vi.fn(),
+} ) );
 
 // The current edited-post state, read live by the mocked selectors so it can be
 // changed between timer ticks without re-rendering the component.
@@ -26,7 +26,18 @@ function setState( overrides = {} ) {
 	};
 }
 
+function runAutosaveTimer() {
+	const callback = setInterval.mock.calls.at( -1 )[ 0 ];
+	callback();
+}
+
 describe( 'AutosaveMonitor', () => {
+	beforeEach( () => {
+		vi.useFakeTimers();
+		vi.spyOn( global, 'clearInterval' );
+		vi.spyOn( global, 'setInterval' );
+	} );
+
 	beforeEach( () => {
 		setState();
 		// `useSelect( store )` (static mode) returns bound selectors; the
@@ -48,7 +59,7 @@ describe( 'AutosaveMonitor', () => {
 			}
 			return selectors;
 		} );
-		useDispatch.mockReturnValue( { autosave: jest.fn() } );
+		useDispatch.mockReturnValue( { autosave: vi.fn() } );
 		setInterval.mockClear();
 		clearInterval.mockClear();
 	} );
@@ -104,39 +115,39 @@ describe( 'AutosaveMonitor', () => {
 	} );
 
 	it( 'should autosave a dirty, autosaveable post on the timer tick', () => {
-		const autosave = jest.fn();
+		const autosave = vi.fn();
 		setState( { isDirty: true, isAutosaveable: true } );
 		render( <AutosaveMonitor autosave={ autosave } interval={ 5 } /> );
 
 		expect( autosave ).not.toHaveBeenCalled();
 
-		jest.advanceTimersByTime( 5000 );
+		runAutosaveTimer();
 
 		expect( autosave ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'should not autosave when the post is not dirty', () => {
-		const autosave = jest.fn();
+		const autosave = vi.fn();
 		setState( { isDirty: false, isAutosaveable: true } );
 		render( <AutosaveMonitor autosave={ autosave } interval={ 5 } /> );
 
-		jest.advanceTimersByTime( 5000 );
+		runAutosaveTimer();
 
 		expect( autosave ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should not autosave while an autosave is already in progress', () => {
-		const autosave = jest.fn();
+		const autosave = vi.fn();
 		setState( { isDirty: true, isAutosaveable: true, isAutosaving: true } );
 		render( <AutosaveMonitor autosave={ autosave } interval={ 5 } /> );
 
-		jest.advanceTimersByTime( 5000 );
+		runAutosaveTimer();
 
 		expect( autosave ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should autosave edits made during an in-progress autosave once it finishes', () => {
-		const autosave = jest.fn();
+		const autosave = vi.fn();
 		setState( { isDirty: true, isAutosaveable: true } );
 		render( <AutosaveMonitor autosave={ autosave } interval={ 5 } /> );
 
@@ -148,53 +159,53 @@ describe( 'AutosaveMonitor', () => {
 			isAutosaving: true,
 			editsReference: 2,
 		} );
-		jest.advanceTimersByTime( 5000 );
+		runAutosaveTimer();
 		expect( autosave ).not.toHaveBeenCalled();
 
 		// Once the autosave finishes, the pending edit must still be autosaved.
 		setState( { isDirty: true, isAutosaveable: true, editsReference: 2 } );
-		jest.advanceTimersByTime( 5000 );
+		runAutosaveTimer();
 		expect( autosave ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'should not autosave again until there are new edits', () => {
-		const autosave = jest.fn();
+		const autosave = vi.fn();
 		setState( { isDirty: true, isAutosaveable: true } );
 		render( <AutosaveMonitor autosave={ autosave } interval={ 5 } /> );
 
-		jest.advanceTimersByTime( 5000 );
+		runAutosaveTimer();
 		expect( autosave ).toHaveBeenCalledTimes( 1 );
 
 		// No new edits: a subsequent tick should not autosave again.
-		jest.advanceTimersByTime( 5000 );
+		runAutosaveTimer();
 		expect( autosave ).toHaveBeenCalledTimes( 1 );
 
 		// A new distinct edit triggers another autosave.
 		setState( { isDirty: true, isAutosaveable: true, editsReference: 2 } );
-		jest.advanceTimersByTime( 5000 );
+		runAutosaveTimer();
 		expect( autosave ).toHaveBeenCalledTimes( 2 );
 	} );
 
 	it( 'should keep pending edits and retry once the post becomes autosaveable', () => {
-		const autosave = jest.fn();
+		const autosave = vi.fn();
 		setState( { isDirty: true, isAutosaveable: false, editsReference: 2 } );
 		render( <AutosaveMonitor autosave={ autosave } interval={ 5 } /> );
 
-		jest.advanceTimersByTime( 5000 );
+		runAutosaveTimer();
 		expect( autosave ).not.toHaveBeenCalled();
 
 		setState( { isDirty: true, isAutosaveable: true, editsReference: 2 } );
-		jest.advanceTimersByTime( 5000 );
+		runAutosaveTimer();
 		expect( autosave ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'should fall back to the editor store autosave action', () => {
-		const autosave = jest.fn();
+		const autosave = vi.fn();
 		useDispatch.mockReturnValue( { autosave } );
 		setState( { isDirty: true, isAutosaveable: true } );
 		render( <AutosaveMonitor interval={ 5 } /> );
 
-		jest.advanceTimersByTime( 5000 );
+		vi.advanceTimersByTime( 5000 );
 
 		expect( autosave ).toHaveBeenCalledTimes( 1 );
 	} );

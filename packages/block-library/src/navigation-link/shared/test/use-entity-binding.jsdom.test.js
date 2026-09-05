@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import {
 	useBlockBindingsUtils,
@@ -10,22 +11,22 @@ import {
 } from '../use-entity-binding';
 
 // Mock the entire @wordpress/block-editor module
-jest.mock( '@wordpress/block-editor', () => ( {
-	useBlockBindingsUtils: jest.fn(),
-	useBlockEditingMode: jest.fn(),
+vi.mock( import( '@wordpress/block-editor' ), () => ( {
+	useBlockBindingsUtils: vi.fn(),
+	useBlockEditingMode: vi.fn(),
 } ) );
 
 // Mock useSelect specifically to avoid needing to set up full data store
-jest.mock( '@wordpress/data/src/components/use-select', () => {
-	const mock = jest.fn();
-	return mock;
-} );
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useSelect: vi.fn(),
+} ) );
 
 describe( 'useEntityBinding', () => {
-	const mockUpdateBlockBindings = jest.fn();
+	const mockUpdateBlockBindings = vi.fn();
 
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 		useBlockBindingsUtils.mockReturnValue( {
 			updateBlockBindings: mockUpdateBlockBindings,
 		} );
@@ -325,9 +326,9 @@ describe( 'useEntityBinding', () => {
 		} );
 
 		it( 'handles invalid kind gracefully in createBinding', () => {
-			const consoleSpy = jest
+			const consoleSpy = vi
 				.spyOn( console, 'warn' )
-				.mockImplementation();
+				.mockImplementation( () => {} );
 
 			const attributes = {
 				metadata: {},

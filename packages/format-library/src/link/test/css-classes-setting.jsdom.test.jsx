@@ -1,6 +1,9 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CSSClassesSettingComponent from '../css-classes-setting';
+
+globalThis.wpVitest.mockMatchMedia();
 
 describe( 'CSSClassesSettingComponent', () => {
 	it( 'renders checkbox and hides input by default when no value', async () => {
@@ -37,7 +40,7 @@ describe( 'CSSClassesSettingComponent', () => {
 
 	it( 'shows input when toggled on and calls onChange when typing', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<CSSClassesSettingComponent
@@ -83,7 +86,7 @@ describe( 'CSSClassesSettingComponent', () => {
 
 	it( 'hides input and clears value when toggled off with existing value', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<CSSClassesSettingComponent

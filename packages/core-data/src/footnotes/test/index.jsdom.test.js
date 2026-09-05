@@ -1,9 +1,10 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import warning from '@wordpress/warning';
 import { updateFootnotesFromMeta } from '../';
 
 // The real implementation logs once per distinct message, which would make
 // per-case assertions depend on the order the cases run in.
-jest.mock( '@wordpress/warning' );
+vi.mock( '@wordpress/warning' );
 
 describe( 'updateFootnotesFromMeta', () => {
 	const blocks = [];

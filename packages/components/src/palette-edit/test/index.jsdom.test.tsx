@@ -1,3 +1,4 @@
+import { describe, expect, it, test, vi } from 'vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import { click, type, press } from '@ariakit/test';
 import PaletteEdit, {
@@ -5,6 +6,8 @@ import PaletteEdit, {
 	deduplicateElementSlugs,
 } from '..';
 import type { PaletteElement } from '../types';
+
+globalThis.wpVitest.mockMatchMedia();
 
 const noop = () => {};
 
@@ -384,7 +387,7 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'calls the `onChange` with the new color appended', async () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<PaletteEdit
@@ -413,7 +416,7 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'calls the `onChange` with the new gradient appended', async () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<PaletteEdit
@@ -443,7 +446,7 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'calls the `onChange` with the new duotone appended, seeded from the color palette', async () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<PaletteEdit
@@ -474,7 +477,7 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'ignores palette colors a duotone cannot be built from when adding one', async () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<PaletteEdit
@@ -518,7 +521,7 @@ describe( 'PaletteEdit', () => {
 	// accepts hex, `rgb()` and `hsl()`, so a named color saved as-is would
 	// render in the editor and be dropped on the front end.
 	it( 'normalizes palette colors to hex when adding a duotone', async () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<PaletteEdit
@@ -551,7 +554,7 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'falls back to black and white when adding a duotone without a color palette', async () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<PaletteEdit
@@ -590,7 +593,7 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'can remove a color', async () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<PaletteEdit
@@ -623,7 +626,7 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'can update palette name', async () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<PaletteEdit
@@ -663,7 +666,7 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'can update color palette value', async () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<PaletteEdit
@@ -694,7 +697,7 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'can update gradient palette value', async () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<PaletteEdit
@@ -727,7 +730,7 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'can update duotone palette value', async () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<PaletteEdit
@@ -757,7 +760,7 @@ describe( 'PaletteEdit', () => {
 	// has to apply when editing one, or the shadows and highlights picker can
 	// offer a color the saved duotone cannot be built from.
 	it( 'hides unusable colors and saves named ones as hex when editing a duotone', async () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<PaletteEdit
@@ -805,7 +808,7 @@ describe( 'PaletteEdit', () => {
 	// rather than an edge one. The duotone that was clicked has to be the one
 	// that gets edited.
 	it( 'updates the clicked duotone when two share the same colors', async () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 		const twins = [
 			{ colors: [ '#000000', '#ffffff' ], name: 'First', slug: 'first' },
 			{

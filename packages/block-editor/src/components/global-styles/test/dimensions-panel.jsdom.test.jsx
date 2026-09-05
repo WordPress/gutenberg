@@ -1,7 +1,10 @@
-/* eslint jest/expect-expect: ["warn", { "assertFunctionNames": ["expect", "expectLocalOverride", "expectPlaceholderState"] }] */
-import { render, screen, within } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useState } from '@wordpress/element';
 import DimensionsPanel from '../dimensions-panel';
+
+globalThis.wpVitest.mockMatchMedia();
 
 // The inheritance treatment sits behind the
 // `gutenberg-global-styles-inheritance-ui` experiment. Turn it on so these
@@ -19,11 +22,11 @@ afterEach( () => {
 // full set of inherited and selectable ratios without spinning up a
 // store registry. Per-call resolution lets the same mock answer all
 // of the paths the tool requests on a single render.
-jest.mock( '../../use-settings', () => {
-	const actual = jest.requireActual( '../../use-settings' );
+vi.mock( import( '../../use-settings' ), async ( importOriginal ) => {
+	const actual = await importOriginal();
 	return {
 		...actual,
-		useSettings: jest.fn( ( ...paths ) =>
+		useSettings: vi.fn( ( ...paths ) =>
 			paths.map( ( path ) => {
 				switch ( path ) {
 					case 'dimensions.aspectRatios.default':
@@ -247,7 +250,7 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 
 		it( 'commits a local contentSize override on user input without copying any inherited value into other paths (strip-not-copy)', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			renderPanel( {
 				value: {},
@@ -540,7 +543,7 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 		} );
 
 		it( 'does not call `onChange` on mount of an at-rest minHeight', () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			renderPanel( {
 				value: {},
 				inheritedValue: { dimensions: { minHeight: '320px' } },
@@ -553,7 +556,7 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 
 		it( 'commits a local minHeight override on user input without copying any inherited value into other paths', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			renderPanel( {
 				value: {},
@@ -612,7 +615,7 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 		} );
 
 		it( 'does not call `onChange` on mount of an at-rest aspectRatio', () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			renderPanel( {
 				value: {},
 				inheritedValue: { dimensions: { aspectRatio: '16/9' } },
@@ -625,7 +628,7 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 
 		it( 'commits a local aspectRatio override on user selection of a different option without copying any inherited value into other paths', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 
 			renderPanel( {
 				value: {},
@@ -735,13 +738,10 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 		} );
 
 		it( '(padding) commits to local on slider activation and the displayed value follows the new local value', () => {
-			const { fireEvent } = require( '@testing-library/react' );
-
 			// Controlled wrapper so we can verify the slider follows local
 			// value updates after onChange writes through.
 			function Wrapper() {
-				const [ value, setValue ] =
-					require( '@wordpress/element' ).useState( {} );
+				const [ value, setValue ] = useState( {} );
 				return (
 					<DimensionsPanel
 						value={ value }

@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { press } from '@ariakit/test';
 import { createRef, forwardRef } from '@wordpress/element';
@@ -6,7 +7,10 @@ import _Button from '..';
 import Tooltip from '../../tooltip';
 import cleanupTooltip from '../../tooltip/test/utils';
 
-jest.mock( '../../icon', () => () => <div data-testid="test-icon" /> );
+vi.mock( import( '../../icon' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	default: () => <div data-testid="test-icon" />,
+} ) );
 
 const Button = forwardRef(
 	(
@@ -664,7 +668,7 @@ describe( 'Button', () => {
 		} );
 	} );
 
-	describe( 'static typing', () => {
+	it( 'supports the expected static types', () => {
 		<>
 			<Button href="foo" />
 			{ /* @ts-expect-error - `target` requires `href` */ }

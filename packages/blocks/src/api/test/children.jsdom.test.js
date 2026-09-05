@@ -1,4 +1,4 @@
-/* eslint-disable testing-library/render-result-naming-convention */
+import { describe, expect, it } from 'vitest';
 import { renderToString } from '@wordpress/element';
 import {
 	getSerializeCapableElement,
@@ -6,6 +6,7 @@ import {
 	toHTML,
 	fromDOM,
 } from '../children';
+/* eslint-disable testing-library/render-result-naming-convention */
 
 describe( 'getSerializeCapableElement', () => {
 	it( 'returns a serialize capable element', () => {

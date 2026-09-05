@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef, useState } from '@wordpress/element';
@@ -40,7 +41,7 @@ describe( 'ValidatedTextareaControl', () => {
 
 	it( 'shows a native constraint violation when the form is submitted', async () => {
 		const user = userEvent.setup();
-		const onSubmit = jest.fn();
+		const onSubmit = vi.fn();
 		render(
 			<form onSubmit={ onSubmit }>
 				<ValidatedTextareaControl label="Bio" required />

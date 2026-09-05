@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`hooks enhanceNavigationLinkVariations enhances variations with icon and isActive functions 1`] = `
+exports[`hooks > enhanceNavigationLinkVariations > enhances variations with icon and isActive functions 1`] = `
 {
   "extraProp": "extraProp",
   "name": "core/navigation-link",

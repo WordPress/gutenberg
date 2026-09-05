@@ -19,6 +19,8 @@ import {
 	collectJestInfrastructureEntries,
 	findVitestIsolationOptOuts,
 	validateRoutingScripts,
+	validateVitestCleanupConfig,
+	validateVitestShuffleScripts,
 } from '../test-infrastructure-policy.mjs';
 
 const temporaryDirectories = [];
@@ -146,6 +148,51 @@ describe( 'test infrastructure policy', () => {
 			'dependency:packages/example/package.json:devDependencies.test-runner',
 		] );
 	} );
+
+	it( 'requires deterministic file-order shuffling', () => {
+		const validRootPackageJson = {
+			scripts: {
+				'test:unit:vitest:shuffled':
+					'npm run --workspace @wordpress/unit-tests test:unit:vitest:shuffled --',
+			},
+		};
+		const validUnitTestPackageJson = {
+			scripts: {
+				'test:unit:vitest:shuffled':
+					'npm run test:unit:vitest -- --sequence.shuffle.files --sequence.seed=80855',
+			},
+		};
+
+		expect(
+			validateVitestShuffleScripts(
+				{
+					scripts: {
+						'test:unit:vitest:shuffled':
+							'npm run --workspace @wordpress/unit-tests test:unit:vitest:shuffled',
+					},
+				},
+				validUnitTestPackageJson
+			)
+		).toEqual( [
+			'package.json: scripts.test:unit:vitest:shuffled must be exactly `npm run --workspace @wordpress/unit-tests test:unit:vitest:shuffled --`',
+		] );
+		expect(
+			validateVitestShuffleScripts( validRootPackageJson, {
+				scripts: {
+					'test:unit:vitest:shuffled':
+						'npm run test:unit:vitest -- --sequence.shuffle --sequence.seed=80855',
+				},
+			} )
+		).toEqual( [
+			'test/unit/package.json: scripts.test:unit:vitest:shuffled must be exactly `npm run test:unit:vitest -- --sequence.shuffle.files --sequence.seed=80855`',
+		] );
+		expect(
+			validateVitestShuffleScripts(
+				validRootPackageJson,
+				validUnitTestPackageJson
+			)
+		).toEqual( [] );
+	} );
 } );
 
 describe( 'runner isolation policy', () => {
@@ -194,6 +241,38 @@ export default {
 			'vitest.config.mjs:4 must set isolate to the literal value true',
 			'vitest.config.mjs:6 must set isolate to the literal value true',
 		] );
+	} );
+
+	it( 'requires every supported Vitest cleanup default', () => {
+		expect(
+			validateVitestCleanupConfig( {
+				test: { globals: true, projects: [] },
+			} )
+		).toEqual(
+			expect.arrayContaining( [
+				'test/unit/vitest.config.mjs: test.isolate must be true',
+				'test/unit/vitest.config.mjs: test.mockReset must be true',
+				'test/unit/vitest.config.mjs: test.globals must remain false',
+			] )
+		);
+	} );
+
+	it( 'requires every Vitest project to inherit the shared defaults', () => {
+		expect(
+			validateVitestCleanupConfig( {
+				test: {
+					globals: false,
+					isolate: true,
+					mockReset: true,
+					restoreMocks: true,
+					unstubEnvs: true,
+					unstubGlobals: true,
+					projects: [ { extends: false, test: { name: 'escape' } } ],
+				},
+			} )
+		).toContain(
+			'test/unit/vitest.config.mjs: escape must set extends: true to inherit the shared isolation defaults'
+		);
 	} );
 } );
 

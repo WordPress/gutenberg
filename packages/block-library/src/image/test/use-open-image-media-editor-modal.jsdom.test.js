@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { useRegistry, useSelect } from '@wordpress/data';
 import {
@@ -9,22 +10,22 @@ import {
 
 const mockOpenMediaEditorModalKey = 'openMediaEditorModal';
 
-jest.mock( '@wordpress/core-data', () => ( {
+vi.mock( import( '@wordpress/core-data' ), () => ( {
 	store: {},
 } ) );
 
-jest.mock( '@wordpress/data', () => ( {
-	useRegistry: jest.fn(),
-	useSelect: jest.fn(),
+vi.mock( import( '@wordpress/data' ), () => ( {
+	useRegistry: vi.fn(),
+	useSelect: vi.fn(),
 } ) );
 
-jest.mock( '@wordpress/block-editor', () => ( {
+vi.mock( import( '@wordpress/block-editor' ), () => ( {
 	privateApis: {},
 	store: {},
 } ) );
 
-jest.mock( '../../lock-unlock', () => ( {
-	unlock: jest.fn( () => ( {
+vi.mock( import( '../../lock-unlock' ), () => ( {
+	unlock: vi.fn( () => ( {
 		openMediaEditorModalKey: 'openMediaEditorModal',
 	} ) ),
 } ) );
@@ -34,14 +35,14 @@ function createRegistry( {
 	resolveGetEntityRecord = () => undefined,
 } = {} ) {
 	const actions = {
-		invalidateResolution: jest.fn(),
+		invalidateResolution: vi.fn(),
 	};
 	return {
-		select: jest.fn( () => ( {
+		select: vi.fn( () => ( {
 			getEditedEntityRecord,
 		} ) ),
-		dispatch: jest.fn( () => actions ),
-		resolveSelect: jest.fn( () => ( {
+		dispatch: vi.fn( () => actions ),
+		resolveSelect: vi.fn( () => ( {
 			getEntityRecord: resolveGetEntityRecord,
 		} ) ),
 		actions,
@@ -74,8 +75,8 @@ async function runModalUpdate( {
 } ) {
 	const registry = createRegistry( registryOptions );
 	useRegistry.mockReturnValue( registry );
-	const setAttributes = jest.fn();
-	const openMediaEditorModal = jest.fn();
+	const setAttributes = vi.fn();
+	const openMediaEditorModal = vi.fn();
 	mockMediaEditorModalSetting( openMediaEditorModal );
 	const { result } = renderHook( () =>
 		useOpenImageMediaEditorModal( {
@@ -151,11 +152,11 @@ function croppedAttachmentRecords( { hasOriginal = true } = {} ) {
 
 describe( 'useOpenImageMediaEditorModal', () => {
 	beforeEach( () => {
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	it( 'notifies onUrlChange when the update switches to a new attachment URL', async () => {
-		const onUrlChange = jest.fn();
+		const onUrlChange = vi.fn();
 		await runModalUpdate( {
 			attributes: { id: 1, url: 'original.jpg', alt: '', caption: '' },
 			updatePayload: { id: 2, url: 'updated.jpg' },
@@ -166,7 +167,7 @@ describe( 'useOpenImageMediaEditorModal', () => {
 	} );
 
 	it( 'does not notify onUrlChange for a same-attachment update', async () => {
-		const onUrlChange = jest.fn();
+		const onUrlChange = vi.fn();
 		await runModalUpdate( {
 			attributes: { id: 1, url: 'original.jpg', alt: '', caption: '' },
 			updatePayload: { id: 1, url: 'original.jpg' },
@@ -176,7 +177,7 @@ describe( 'useOpenImageMediaEditorModal', () => {
 	} );
 
 	it( 'does not notify onUrlChange when the update carries no URL', async () => {
-		const onUrlChange = jest.fn();
+		const onUrlChange = vi.fn();
 		await runModalUpdate( {
 			attributes: { id: 1, url: 'original.jpg', alt: '', caption: '' },
 			updatePayload: { id: 2 },
@@ -197,7 +198,7 @@ describe( 'useOpenImageMediaEditorModal', () => {
 					alt: '',
 					caption: '',
 				},
-				setAttributes: jest.fn(),
+				setAttributes: vi.fn(),
 			} )
 		);
 
@@ -210,8 +211,8 @@ describe( 'useOpenImageMediaEditorModal', () => {
 		document.body.append( cropButton, otherButton );
 		const registry = createRegistry();
 		useRegistry.mockReturnValue( registry );
-		const setAttributes = jest.fn();
-		const openMediaEditorModal = jest.fn();
+		const setAttributes = vi.fn();
+		const openMediaEditorModal = vi.fn();
 		mockMediaEditorModalSetting( openMediaEditorModal );
 		const onClose = () => cropButton.focus();
 		const { result } = renderHook( () =>
@@ -294,7 +295,7 @@ describe( 'useOpenImageMediaEditorModal', () => {
 			alt_text: 'Updated alt',
 			caption: { raw: 'Updated caption' },
 		};
-		const resolveGetEntityRecord = jest
+		const resolveGetEntityRecord = vi
 			.fn()
 			.mockResolvedValueOnce( originalAttachment )
 			.mockResolvedValueOnce( updatedAttachment );
@@ -336,7 +337,7 @@ describe( 'useOpenImageMediaEditorModal', () => {
 			alt_text: '',
 			caption: { raw: 'Updated attachment caption' },
 		};
-		const resolveGetEntityRecord = jest
+		const resolveGetEntityRecord = vi
 			.fn()
 			.mockResolvedValueOnce( originalAttachment )
 			.mockResolvedValueOnce( updatedAttachment );
@@ -377,7 +378,7 @@ describe( 'useOpenImageMediaEditorModal', () => {
 			alt_text: '',
 			caption: { raw: 'Updated attachment caption' },
 		};
-		const resolveGetEntityRecord = jest
+		const resolveGetEntityRecord = vi
 			.fn()
 			.mockResolvedValueOnce( originalAttachment )
 			.mockResolvedValueOnce( updatedAttachment );
@@ -448,7 +449,7 @@ describe( 'useOpenImageMediaEditorModal', () => {
 	} );
 
 	it( 'keeps the selected image size when the edit created a new attachment', async () => {
-		const onUrlChange = jest.fn();
+		const onUrlChange = vi.fn();
 		const { setAttributes } = await runModalUpdate( {
 			attributes: {
 				id: 1,
@@ -581,8 +582,8 @@ describe( 'useOpenImageMediaEditorModal', () => {
 				attachmentId === 2 ? deferredAttachment.promise : undefined,
 		} );
 		useRegistry.mockReturnValue( registry );
-		const setAttributes = jest.fn();
-		const openMediaEditorModal = jest.fn();
+		const setAttributes = vi.fn();
+		const openMediaEditorModal = vi.fn();
 		mockMediaEditorModalSetting( openMediaEditorModal );
 		const { result } = renderHook(
 			( { attributes } ) =>
@@ -693,7 +694,7 @@ describe( 'useOpenImageMediaEditorModal', () => {
 	} );
 
 	it( 'syncs metadata from an empty block when the original attachment is not cached', async () => {
-		const resolveGetEntityRecord = jest
+		const resolveGetEntityRecord = vi
 			.fn()
 			.mockResolvedValueOnce( {
 				id: 1,
@@ -815,8 +816,8 @@ describe( 'useOpenImageMediaEditorModal', () => {
 			resolveGetEntityRecord: () => deferredAttachment.promise,
 		} );
 		useRegistry.mockReturnValue( registry );
-		const setAttributes = jest.fn();
-		const openMediaEditorModal = jest.fn();
+		const setAttributes = vi.fn();
+		const openMediaEditorModal = vi.fn();
 		mockMediaEditorModalSetting( openMediaEditorModal );
 		const { result, rerender } = renderHook(
 			( { attributes } ) =>

@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { getTrackAttributes } from '../utils';
 
 describe( 'Playlist block edit utilities', () => {
