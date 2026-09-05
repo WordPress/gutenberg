@@ -1,6 +1,6 @@
 import * as Y from 'yjs';
 import * as buffer from 'lib0/buffer';
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, it } from 'vitest';
 import { docContainsSnapshot, encodeDocSnapshot } from '../crdt-snapshot';
 import { createYjsDoc } from '../utils';
 

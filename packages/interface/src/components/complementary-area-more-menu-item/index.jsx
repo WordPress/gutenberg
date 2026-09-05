@@ -1,6 +1,5 @@
 import { observableMap, useObservableValue } from '@wordpress/compose';
 import { useLayoutEffect } from '@wordpress/element';
-import { check } from '@wordpress/icons';
 import ComplementaryAreaToggle from '../complementary-area-toggle';
 import ActionItem from '../action-item';
 
@@ -29,7 +28,6 @@ export function DefaultComplementaryAreaMoreMenuItem( {
 				/>
 			) }
 			role="menuitemcheckbox"
-			selectedIcon={ check }
 			name={ target }
 			scope={ scope }
 			{ ...props }

@@ -48,14 +48,13 @@ jobs:
                       os: 'macos-15'
 
         steps:
-            # The BASE branch commit must be present for the check-root-dependencies script to read the package.json and
-            # compare with the HEAD branch. Fetching a depth of 2 ensures that's present.
-            # All other jobs only require a depth of 1.
+            # The parent commit must be present for dependency and test-routing
+            # checks that compare the current change with its baseline.
             - name: Checkout repository
               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
-                  fetch-depth: ${{ matrix.annotations && github.event_name == 'pull_request' && 2 || 1 }}
+                  fetch-depth: 2
                   persist-credentials: false
 
             - name: Validate labeler config
@@ -68,10 +67,8 @@ jobs:
                   node-version: ${{ matrix.node }}
                   cache: npm
 
-            - name: Pin npm version for consistency
-              run: |
-                  npm install --global npm@10
-                  npm --version
+            - name: Set up npm
+              uses: ./.github/setup-npm
 
             - name: npm install
               # A "full" install is executed, since `npm ci` does not always exit
@@ -107,7 +104,7 @@ jobs:
               run: npm run lint:js -- --format compact --quiet --prune-suppressions
 
             - name: Test agent skill setup
-              run: npm run test:unit -- tools/agents/test/setup-skills.test.js --runInBand
+              run: npm run test:unit:vitest -- --project=node tools/agents/test/setup-skills.test.js
 
             - name: Lint Styles
               if: ${{ matrix.annotations }}
@@ -120,6 +117,10 @@ jobs:
 
             - name: Type checking
               run: npm run typecheck
+
+            - name: Validate JavaScript test routing
+              if: ${{ matrix.node == '20' && matrix.os == 'ubuntu-24.04' }}
+              run: npm run test:unit:routing -- --base="$(git rev-parse HEAD^1)"
 
             - name: Build packages
               run: npm run build
@@ -145,6 +146,53 @@ jobs:
             - name: License compatibility
               run: npm run other:check-licenses
 
+    agent-development:
+        name: AI development tests (Node.js ${{ matrix.node }} on ${{ contains(matrix.os, 'macos-') && 'MacOS' || contains(matrix.os, 'windows-') && 'Windows' || 'Linux' }})
+        runs-on: ${{ matrix.os }}
+        permissions:
+            contents: read
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        timeout-minutes: 15
+        strategy:
+            matrix:
+                include:
+                    - os: ubuntu-24.04
+                      node: '22'
+                    - os: macos-15
+                      node: '22'
+                    - os: windows-2025
+                      node: '22'
+                    - os: ubuntu-24.04
+                      node: '24'
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Use desired version of Node.js
+              uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+              with:
+                  node-version: ${{ matrix.node }}
+                  package-manager-cache: false
+
+            - name: Install AI development test dependencies
+              env:
+                  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+              run: npm ci --prefix test/ai-development
+
+            - name: Audit AI development test dependencies
+              if: matrix.os == 'ubuntu-24.04' && matrix.node == '22'
+              run: npm --prefix test/ai-development audit --audit-level=high
+
+            - name: Test AI development utilities
+              run: npm --prefix test/ai-development run test:utils
+
+            - name: Validate AI development configs
+              run: npm --prefix test/ai-development run validate
+
     # Fails when a bundled package pulls @wordpress/private-apis into its
     # module graph, including transitively through another package.
     check-private-apis:
@@ -169,10 +217,8 @@ jobs:
                   # and the job doesn't need the install speed.
                   package-manager-cache: false
 
-            - name: Pin npm version for consistency
-              run: |
-                  npm install --global npm@10
-                  npm --version
+            - name: Set up npm
+              uses: ./.github/setup-npm
 
             - name: npm install
               # Not the setup-node composite action: its cached node_modules

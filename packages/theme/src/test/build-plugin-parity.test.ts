@@ -1,5 +1,6 @@
 import { readFile } from 'fs/promises';
 import { join } from 'path';
+import { describe, expect, it } from 'vitest';
 import type {
 	OnLoadArgs,
 	OnLoadOptions,
@@ -116,6 +117,27 @@ describe( 'design token fallback build plugin parity', () => {
 		expect( lightningcssResult ).toContain(
 			'var(--wpds-dimension-gap-sm, 8px)'
 		);
+	} );
+
+	it( 'keeps nested token fallbacks aligned across PostCSS and Lightning CSS', async () => {
+		const filename = join( fixturesDirectory, 'nested-fallback.css' );
+		const source = `
+.fixture {
+	background: var(--wpds-color-background-interactive-neutral-active, var(--wpds-color-background-surface-neutral-strong));
+}`;
+		const postcssResult = await postcss( [ postcssPlugin ] ).process(
+			source,
+			{ from: filename }
+		);
+		const lightningcssResult = transformWithLightningcss(
+			source,
+			filename
+		);
+		const expected =
+			'var(--wpds-color-background-interactive-neutral-active, var(--wpds-color-background-surface-neutral-strong, #fff))';
+
+		expect( postcssResult.css ).toContain( expected );
+		expect( lightningcssResult ).toContain( expected );
 	} );
 
 	it( 'leaves an empty var() fallback untouched in PostCSS', async () => {
