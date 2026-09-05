@@ -533,13 +533,13 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 	 * attribute. Without it there is nothing to generate, so bail before doing
 	 * any of the lookups below — this runs for every block on every request.
 	 */
-	$style = gutenberg_resolve_style_state_aliases(
-		$block['attrs']['style'] ?? array(),
-		$block_name
-	);
-	if ( empty( $style ) || ! is_array( $style ) ) {
+	$raw_style = $block['attrs']['style'] ?? array();
+	if ( empty( $raw_style ) || ! is_array( $raw_style ) ) {
 		return $block_content;
 	}
+
+	// Keep the existing block registry lookup here.
+	$style = gutenberg_resolve_style_state_aliases( $raw_style, $block_name );
 
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
 	if ( ! $block_type ) {
