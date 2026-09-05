@@ -48,15 +48,29 @@
 			}
 		}
 
-		.list {
-			display: grid;
+		/*
+		 * Slot + type for a list in `.popup`'s `main` grid area.
+		 * Combobox and Autocomplete get this via `.list`. Select applies
+		 * it directly so Select.List can own overflow.
+		 */
+		.list-chrome {
 			grid-area: main;
-			grid-template-rows: minmax(0, 1fr) auto;
-			grid-template-areas: "scrollable" "footer";
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-md);
 			line-height: var(--wpds-typography-line-height-sm);
 			color: var(--wpds-color-foreground-interactive-neutral);
+		}
+
+		/*
+		 * Footer layout for Combobox and Autocomplete. Select does not
+		 * use this class: Select.List must be the overflow box.
+		 */
+		.list {
+			composes: list-chrome;
+
+			display: grid;
+			grid-template-rows: minmax(0, 1fr) auto;
+			grid-template-areas: "scrollable" "footer";
 		}
 
 		.list-scrollable-container {

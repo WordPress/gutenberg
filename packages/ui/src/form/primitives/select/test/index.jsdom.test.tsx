@@ -386,4 +386,32 @@ describe( 'Select', () => {
 			expect( groupLabelRef.current ).toBeInstanceOf( HTMLDivElement );
 		} );
 	} );
+
+	it( 'places options directly in the listbox', async () => {
+		const user = userEvent.setup();
+		const items = [
+			{ value: '1', label: 'Item 1' },
+			{ value: '2', label: 'Item 2' },
+		];
+
+		render(
+			<Select.Root defaultValue={ items[ 0 ] } items={ items }>
+				<Select.Trigger />
+				<Select.Popup>
+					{ items.map( ( item ) => (
+						<Select.Item key={ item.value } value={ item }>
+							{ item.label }
+						</Select.Item>
+					) ) }
+				</Select.Popup>
+			</Select.Root>
+		);
+
+		await user.click( screen.getByRole( 'combobox' ) );
+
+		const option = await screen.findByRole( 'option', { name: 'Item 1' } );
+		expect( option ).toBeVisible();
+		// eslint-disable-next-line testing-library/no-node-access -- Options must be List children so Base UI measures the listbox as the scroller.
+		expect( option.parentElement ).toHaveAttribute( 'role', 'listbox' );
+	} );
 } );
