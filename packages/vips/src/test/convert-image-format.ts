@@ -8,7 +8,10 @@ const { MockVipsImage, mockNewFromBuffer, mockState, mockWriteToBuffer } =
 		 * Controls whether the mocked source image reports the `palette` metadata
 		 * field, which libvips attaches only for indexed sources.
 		 */
-		const state = { hasPalette: false };
+		const state: { bitdepth: number | undefined; hasPalette: boolean } = {
+			bitdepth: undefined,
+			hasPalette: false,
+		};
 
 		// GType of `gint`. Only whether `getTypeof` returns non-zero matters here.
 		const G_TYPE_INT = 24;
@@ -29,6 +32,12 @@ const { MockVipsImage, mockNewFromBuffer, mockState, mockWriteToBuffer } =
 			 * never be exercised.
 			 */
 			getInt = vi.fn( ( name: string ) => {
+				if (
+					'heif-bitdepth' === name &&
+					undefined !== state.bitdepth
+				) {
+					return state.bitdepth;
+				}
 				throw new Error( `${ name }: no such field` );
 			} );
 			/*
@@ -68,6 +77,7 @@ describe( 'convertImageFormat', () => {
 	afterEach( () => {
 		vi.clearAllMocks();
 		mockState.hasPalette = false;
+		mockState.bitdepth = undefined;
 	} );
 
 	it( 'loads only the first frame when converting a GIF to JPEG', async () => {
@@ -196,6 +206,103 @@ describe( 'convertImageFormat', () => {
 			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
 				'.webp',
 				expect.not.objectContaining( { palette: expect.anything() } )
+			);
+		} );
+	} );
+
+	describe( 'image_strip_meta', () => {
+		it( 'keeps color profiles and gain maps by default', async () => {
+			const file = new File( [ '<BLOB>' ], 'example.jpeg', {
+				type: 'image/jpeg',
+			} );
+
+			await compressImage(
+				'itemId',
+				await file.arrayBuffer(),
+				'image/jpeg'
+			);
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.jpeg',
+				expect.objectContaining( { keep: 'icc|gainmap' } )
+			);
+		} );
+
+		it( 'keeps all metadata when stripping is disabled', async () => {
+			const file = new File( [ '<BLOB>' ], 'example.jpeg', {
+				type: 'image/jpeg',
+			} );
+
+			await compressImage(
+				'itemId',
+				await file.arrayBuffer(),
+				'image/jpeg',
+				{ stripMeta: false }
+			);
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.jpeg',
+				expect.objectContaining( { keep: 'all' } )
+			);
+		} );
+	} );
+
+	describe( 'image_max_bit_depth', () => {
+		it( 'writes the capped depth when the cap flattens a 12-bit source', async () => {
+			mockState.bitdepth = 12;
+			const file = new File( [ '<BLOB>' ], 'example.avif', {
+				type: 'image/avif',
+			} );
+
+			await compressImage(
+				'itemId',
+				await file.arrayBuffer(),
+				'image/avif',
+				{ maxBitdepth: 8 }
+			);
+
+			// heifsave defaults to 12-bit for 16-bit pixel data, so the depth
+			// has to be written out even when the cap resolves to 8.
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.avif',
+				expect.objectContaining( { bitdepth: 8 } )
+			);
+		} );
+
+		it( 'writes no bit depth for a standard-depth source', async () => {
+			const file = new File( [ '<BLOB>' ], 'example.avif', {
+				type: 'image/avif',
+			} );
+
+			await compressImage(
+				'itemId',
+				await file.arrayBuffer(),
+				'image/avif'
+			);
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.avif',
+				expect.not.objectContaining( { bitdepth: expect.anything() } )
+			);
+		} );
+	} );
+
+	describe( 'image_save_progressive', () => {
+		it( 'writes a progressive JPEG when interlacing is requested', async () => {
+			const file = new File( [ '<BLOB>' ], 'example.jpeg', {
+				type: 'image/jpeg',
+			} );
+
+			await compressImage(
+				'itemId',
+				await file.arrayBuffer(),
+				'image/jpeg',
+				{ interlaced: true }
+			);
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.jpeg',
+				expect.objectContaining( { interlace: true } )
 			);
 		} );
 	} );

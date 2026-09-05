@@ -119,6 +119,7 @@ _Parameters_
 -   _buffer_ `ArrayBuffer`: Original file buffer.
 -   _type_ `string`: Mime type.
 -   _orientation_ `number`: EXIF orientation value (1-8).
+-   _options_ `ConvertImageOptions`: Save options for the rotated file.
 
 _Returns_
 
@@ -225,6 +226,7 @@ _Parameters_
 -   _buffer_ `ArrayBuffer`: Original file buffer.
 -   _type_ `string`: Mime type.
 -   _orientation_ `number`: EXIF orientation value (1-8).
+-   _options_ `ConvertImageOptions`: Save options for the rotated file.
 
 _Returns_
 

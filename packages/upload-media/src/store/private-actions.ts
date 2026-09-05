@@ -1152,6 +1152,7 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 					quality: args.quality,
 					stripMeta: imageStripMeta,
 					maxBitdepth: imageMaxBitDepth,
+					interlaced: args.interlaced,
 				}
 			);
 
@@ -1223,12 +1224,23 @@ export function rotateItem( id: QueueItemId, args?: RotateItemArgs ) {
 
 		const startTime = performance.now();
 
+		// Metadata stripping, quality and bit depth cap from the
+		// `image_strip_meta`, `wp_editor_set_quality` and `image_max_bit_depth`
+		// filters, carried in the editor settings.
+		const { imageStripMeta, imageMaxBitDepth, imageQuality } =
+			select.getSettings();
+
 		try {
 			const file = await vipsRotateImage(
 				item.id,
 				item.file,
 				args.orientation,
-				item.abortController?.signal
+				item.abortController?.signal,
+				{
+					quality: imageQuality ?? DEFAULT_OUTPUT_QUALITY,
+					stripMeta: imageStripMeta,
+					maxBitdepth: imageMaxBitDepth,
+				}
 			);
 
 			measure( {
@@ -1776,7 +1788,7 @@ export function generateThumbnails( id: QueueItemId ) {
 				const thumbnailOperations: Operation[] = [
 					[
 						OperationType.ResizeCrop,
-						{ resize: imageSize, quality: sizeQuality },
+						{ resize: imageSize, quality: sizeQuality, interlaced },
 					],
 				];
 
@@ -1847,6 +1859,7 @@ export function generateThumbnails( id: QueueItemId ) {
 									},
 									isThresholdResize: true,
 									quality: defaultQuality,
+									interlaced,
 								},
 							],
 						];
