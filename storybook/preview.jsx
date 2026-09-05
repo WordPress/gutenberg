@@ -109,12 +109,20 @@ export const parameters = {
 	},
 	options: {
 		storySort: ( a, b ) => {
+			// Top-level folders in sidebar order. Every root is listed so the
+			// order is deliberate; a nested array orders the folder before it.
 			const SECTION_ORDER = [
-				'Docs',
-				'Playground',
-				'BlockEditor',
+				'Introduction',
+				'Design System',
+				[ 'Introduction', 'Tokens', 'Theme', 'Patterns', 'Components' ],
+				'Foundations',
+				'DataViews',
+				'Fields',
+				'Admin UI',
+				'Icons',
 				'Components',
 				[
+					'Introduction',
 					'Actions',
 					'Containers',
 					'Feedback',
@@ -126,12 +134,18 @@ export const parameters = {
 					'Utilities',
 					'Deprecated',
 				],
-				'Icons',
-				'Design System',
+				'Tokens',
+				'BlockEditor',
+				'GlobalStylesUI',
+				'ImageCropper',
+				'MediaEditor',
+				'Editor',
 				'Widget Primitives',
 				[ 'Introduction', 'Anatomy', 'System Architecture' ],
 				'Widget Dashboard',
 				[ 'Introduction', 'Anatomy', 'Widget Chrome', 'Playground' ],
+				'Grid',
+				'Playground',
 			];
 			const PRIORITIZED_MDX_DOCS = [ 'Introduction', 'Overview' ];
 
