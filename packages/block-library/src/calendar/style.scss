@@ -1,4 +1,5 @@
 @use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
 
 .wp-block-calendar {
 	text-align: center;
@@ -6,7 +7,7 @@
 	th,
 	td {
 		padding: 0.25em;
-		border: 1px solid;
+		border: $border-width solid;
 	}
 
 	th {
@@ -22,7 +23,7 @@
 		border-collapse: collapse;
 
 		&.has-background th {
-			background-color: inherit;
+			background-color: transparent;
 		}
 
 		&.has-text-color th {
@@ -30,18 +31,184 @@
 		}
 	}
 
+	// Default text color only. Do not pin border-color here: Global Styles
+	// text color targets the table and does not add `has-text-color`, so a
+	// `$gray-300` border would stay grey instead of following the text.
 	:where(table:not(.has-text-color)) {
 		color: #40464d;
+	}
 
-		// Keep the hard-coded border color for backward compatibility.
+	// Border Styles
+	//
+	// Allow any custom border color, style or width selections to be inherited
+	// from the table element that receives the border support props.
+	table.has-border-color {
+		> *,
+		tr,
 		th,
 		td {
-			border-color: $gray-300;
+			border-color: inherit;
+		}
+	}
+
+	table[style*="border-top-color"] {
+		> thead,
+		> thead > tr:first-child,
+		> thead > tr:first-child > * {
+			border-top-color: inherit;
+		}
+	}
+
+	table[style*="border-right-color"] {
+		> thead,
+		> tbody,
+		> tfoot,
+		> thead > tr,
+		> tbody > tr,
+		> tfoot > tr,
+		> thead > tr > :last-child,
+		> tbody > tr > :last-child,
+		> tfoot > tr > :last-child {
+			border-right-color: inherit;
+		}
+	}
+
+	table[style*="border-bottom-color"] {
+		> tbody:last-child,
+		> tbody:last-child > tr:last-child,
+		> tbody:last-child > tr:last-child > * {
+			border-bottom-color: inherit;
+		}
+	}
+
+	table[style*="border-left-color"] {
+		> thead,
+		> tbody,
+		> tfoot,
+		> thead > tr,
+		> tbody > tr,
+		> tfoot > tr,
+		> thead > tr > :first-child,
+		> tbody > tr > :first-child,
+		> tfoot > tr > :first-child {
+			border-left-color: inherit;
+		}
+	}
+
+	table[style*="border-style"] {
+		> *,
+		tr,
+		th,
+		td {
+			border-style: inherit;
+		}
+	}
+
+	table[style*="border-top-style"] {
+		> thead,
+		> thead > tr:first-child,
+		> thead > tr:first-child > * {
+			border-top-style: inherit;
+		}
+	}
+
+	table[style*="border-right-style"] {
+		> thead,
+		> tbody,
+		> tfoot,
+		> thead > tr,
+		> tbody > tr,
+		> tfoot > tr,
+		> thead > tr > :last-child,
+		> tbody > tr > :last-child,
+		> tfoot > tr > :last-child {
+			border-right-style: inherit;
+		}
+	}
+
+	table[style*="border-bottom-style"] {
+		> tbody:last-child,
+		> tbody:last-child > tr:last-child,
+		> tbody:last-child > tr:last-child > * {
+			border-bottom-style: inherit;
+		}
+	}
+
+	table[style*="border-left-style"] {
+		> thead,
+		> tbody,
+		> tfoot,
+		> thead > tr,
+		> tbody > tr,
+		> tfoot > tr,
+		> thead > tr > :first-child,
+		> tbody > tr > :first-child,
+		> tfoot > tr > :first-child {
+			border-left-style: inherit;
+		}
+	}
+
+	table[style*="border-width"] {
+		> *,
+		tr,
+		th,
+		td {
+			border-width: inherit;
+			border-style: inherit;
+		}
+	}
+
+	table[style*="border-top-width"] {
+		> thead,
+		> thead > tr:first-child,
+		> thead > tr:first-child > * {
+			border-top-width: inherit;
+			border-top-style: inherit;
+		}
+	}
+
+	table[style*="border-right-width"] {
+		> thead,
+		> tbody,
+		> tfoot,
+		> thead > tr,
+		> tbody > tr,
+		> tfoot > tr,
+		> thead > tr > :last-child,
+		> tbody > tr > :last-child,
+		> tfoot > tr > :last-child {
+			border-right-width: inherit;
+			border-right-style: inherit;
+		}
+	}
+
+	table[style*="border-bottom-width"] {
+		> tbody:last-child,
+		> tbody:last-child > tr:last-child,
+		> tbody:last-child > tr:last-child > * {
+			border-bottom-width: inherit;
+			border-bottom-style: inherit;
+		}
+	}
+
+	table[style*="border-left-width"] {
+		> thead,
+		> tbody,
+		> tfoot,
+		> thead > tr,
+		> tbody > tr,
+		> tfoot > tr,
+		> thead > tr > :first-child,
+		> tbody > tr > :first-child,
+		> tfoot > tr > :first-child {
+			border-left-width: inherit;
+			border-left-style: inherit;
 		}
 	}
 }
 
 // Keep the hard-coded header background color for backward compatibility.
+// Global Styles also targets `th` (see block.json selectors.color.background).
 :where(.wp-block-calendar table:not(.has-background) th) {
 	background: $gray-300;
 }

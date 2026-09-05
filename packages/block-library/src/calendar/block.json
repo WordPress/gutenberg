@@ -25,8 +25,18 @@
 			"__experimentalDefaultControls": {
 				"background": true,
 				"text": true
-			},
-			"__experimentalSelector": "table, th"
+			}
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true,
+			"blockGap": true,
+			"__experimentalSkipSerialization": [ "blockGap" ],
+			"__experimentalDefaultControls": {
+				"margin": false,
+				"padding": false,
+				"blockGap": true
+			}
 		},
 		"typography": {
 			"fontSize": true,
@@ -40,9 +50,23 @@
 				"fontSize": true
 			}
 		},
+		"__experimentalBorder": {
+			"color": true,
+			"width": true,
+			"style": true,
+			"__experimentalSkipSerialization": true
+		},
 		"interactivity": {
 			"clientNavigation": true
 		}
 	},
-	"style": "wp-block-calendar"
+	"style": "wp-block-calendar",
+	"selectors": {
+		"border": ".wp-block-calendar table",
+		"spacing": ".wp-block-calendar",
+		"color": {
+			"text": ".wp-block-calendar table",
+			"background": ".wp-block-calendar table, .wp-block-calendar th"
+		}
+	}
 }
