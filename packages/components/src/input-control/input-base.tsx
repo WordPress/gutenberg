@@ -96,7 +96,6 @@ function InputBase(
 			<Container
 				__unstableInputWidth={ __unstableInputWidth }
 				className="components-input-control__container"
-				disabled={ disabled }
 				hideLabel={ hideLabel }
 				labelPosition={ labelPosition }
 			>
