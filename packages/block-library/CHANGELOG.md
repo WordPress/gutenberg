@@ -21,6 +21,7 @@
 -   Accordion Panel: Reset padding-block when panel is hidden ([#81782](https://github.com/WordPress/gutenberg/pull/81782)).
 -   Query: Stop writing `excludeCurrent: null` into the `query` attribute of blocks that never had the key. The mount effect that clears a stale exclusion treated the absent key as stale, changing the serialized markup of every pre-existing Query block as soon as the editor opened it ([#82147](https://github.com/WordPress/gutenberg/pull/82147)).
 -   Icon: Preserve intrinsic SVG styles when applying block styles or rotation, and keep stroke widths scaling with the block's size for compatibility ([#78808](https://github.com/WordPress/gutenberg/pull/78808)).
+-   Post Excerpt: Trim the excerpt on the server with the REST API's `excerpt_length` parameter instead of filtering `excerpt_length` for every admin request, and keep the excerpt of each length apart so returning to a length already requested no longer shows the excerpt of another length ([#69090](https://github.com/WordPress/gutenberg/pull/69090)).
 -   Image: Keep the selected image size, and re-point a media file or attachment page link, when an edit in the media editor saves to a new attachment. Cropping, rotating or flipping left the block rendering the full-size file while the size control still reported the size the user had chosen, and left the link pointing at the pre-edit image ([#82316](https://github.com/WordPress/gutenberg/pull/82316)).
 
 ### Internal
