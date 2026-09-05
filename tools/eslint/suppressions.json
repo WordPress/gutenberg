@@ -7064,7 +7064,12 @@
 	},
 	"packages/editor/src/components/suggestion-mode/store-interceptor.ts": {
 		"react-hooks/refs": {
-			"count": 6
+			"count": 7
+		}
+	},
+	"packages/editor/src/components/suggestion-mode/suggestion-note-gc.ts": {
+		"@wordpress/react-no-unsafe-timeout": {
+			"count": 1
 		}
 	},
 	"packages/editor/src/components/suggestion-mode/suggestion-summary.tsx": {

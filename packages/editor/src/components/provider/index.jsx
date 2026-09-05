@@ -21,6 +21,7 @@ import { createBlock } from '@wordpress/blocks';
 import withRegistryProvider from './with-registry-provider';
 import { store as editorStore } from '../../store';
 import useAutosaveNotice from './use-autosave-notice';
+import useSuggestionReviewNotice from './use-suggestion-review-notice';
 import useBlockEditorSettings from './use-block-editor-settings';
 import { unlock } from '../../lock-unlock';
 import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
@@ -46,13 +47,21 @@ import {
 	SuggestionAutoSave,
 	SuggestionStoreInterceptor,
 	SuggestionUndoGuard,
+	SuggestionNoteGC,
+	SuggestionAnnotations,
+	SuggestionAuthorColors,
+	RevealSelectedSuggestion,
+	SuggestionDeletionKeyboard,
+	SuggestionAdditionKeyboard,
+	SuggestionFormatKeyboard,
+	SuggestionMultiBlockFormatNotice,
+	SuggestionContentReconciler,
 	registerSuggestionOverlayFilter,
+	registerClipboardSuggestionStrip,
 	isSuggestionModeEnabled,
 	MoveGhostsProvider,
 } from '../suggestion-mode';
-
-const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
-const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
+import { registerSuggestionFormat } from '../inline-suggestions';
 
 /*
  * Register the suggestion overlay filters once when the editor provider
@@ -64,6 +73,22 @@ const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
 if ( isSuggestionModeEnabled() ) {
 	registerSuggestionOverlayFilter();
 }
+
+// Register the `core/suggestion` inline marker format so rich-text round-trips
+// suggestion markers in block content and the annotations API can decorate
+// them. The format is inert (no toolbar entry): suggestions are created by
+// editing in Suggest mode, not from a control. Idempotent, so it's safe
+// globally.
+registerSuggestionFormat();
+
+// Keep suggestion markers, `metadata.suggestion` and `metadata.noteId` off the
+// clipboard. Registered unconditionally for the same reason as the format:
+// content that already carries markers outlives the experiment flag, and a
+// paste into another post has no way to resolve ids from this one.
+registerClipboardSuggestionStrip();
+
+const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
+const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
 
 /*
  * With the experiment off the overlay context (and its block-tree
@@ -399,6 +424,11 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		// has populated the current post.
 		useAutosaveNotice( { post, recovery, settings } );
 
+		// Explains suggestion markers to a user who does not have Suggest
+		// mode. Same ordering requirement as the autosave notice: it reads
+		// the current post, which `setupEditor` populates above.
+		useSuggestionReviewNotice();
+
 		// Synchronizes the active post with the state
 		useEffect( () => {
 			setEditedPost( post.type, post.id );
@@ -500,7 +530,16 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 												<>
 													<SuggestionStoreInterceptor />
 													<SuggestionUndoGuard />
+													<SuggestionNoteGC />
 													<SuggestionAutoSave />
+													<SuggestionAnnotations />
+													<SuggestionAuthorColors />
+													<RevealSelectedSuggestion />
+													<SuggestionDeletionKeyboard />
+													<SuggestionAdditionKeyboard />
+													<SuggestionFormatKeyboard />
+													<SuggestionMultiBlockFormatNotice />
+													<SuggestionContentReconciler />
 												</>
 											) }
 											<MediaEditorModalMount />
