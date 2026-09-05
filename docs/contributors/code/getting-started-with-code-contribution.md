@@ -239,6 +239,9 @@ You can start with this workspace settings file:
 		"editor.formatOnSave": true,
 		"editor.defaultFormatter": "obliviousharmony.vscode-php-codesniffer"
 	},
+	"eslint.bulkSuppression.enable": true,
+	"eslint.bulkSuppression.location": "tools/eslint/suppressions.json",
+	"eslint.bulkSuppression.severity": "hint",
 	"intelephense.environment.phpVersion": "7.4.0",
 	"intelephense.files.exclude": [
 		"**/.cache/**",
@@ -299,4 +302,4 @@ For other editors, see [Prettier's Editor Integration docs](https://prettier.io/
 
 ### TypeScript
 
-**TypeScript** is a typed superset of JavaScript language. The Gutenberg project uses TypeScript via JSDoc to [type check JavaScript files](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html). If you use Visual Studio Code, TypeScript support is built-in, otherwise see [TypeScript Editor Support](https://github.com/Microsoft/TypeScript/wiki/TypeScript-Editor-Support) for editor integrations.
+[**TypeScript**](https://www.typescriptlang.org/) is a typed superset of JavaScript language. The Gutenberg project uses TypeScript to detect type-based errors and improve developer experience through editor integrations. If you use Visual Studio Code, TypeScript support is built-in, otherwise see [TypeScript Editor Support](https://github.com/Microsoft/TypeScript/wiki/TypeScript-Editor-Support) for editor integrations.

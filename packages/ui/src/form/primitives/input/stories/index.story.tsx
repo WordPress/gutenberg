@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Input } from '../index';
 import { InputLayout } from '../../input-layout';
-import { WithSuffixControl } from '../../input-layout/stories/index.story';
+import { WithSuffixControl as InputLayoutWithSuffixControl } from '../../input-layout/stories/index.story';
 
 const meta: Meta< typeof Input > = {
 	tags: [ 'manifest' ],
@@ -32,6 +32,7 @@ type Story = StoryObj< typeof Input >;
 export const Default: Story = {
 	args: {
 		placeholder: 'Placeholder',
+		'aria-label': 'Value',
 	},
 };
 
@@ -42,15 +43,17 @@ export const Default: Story = {
 export const WithPrefix: Story = {
 	args: {
 		placeholder: 'username',
+		'aria-label': 'Username',
 		prefix: <InputLayout.Slot>@</InputLayout.Slot>,
 	},
 };
 
-WithSuffixControl.args = {
-	...WithSuffixControl.args,
-	children: undefined,
+export const WithSuffixControl: Story = {
+	args: {
+		'aria-label': 'Value',
+		suffix: InputLayoutWithSuffixControl.args?.suffix,
+	},
 };
-export { WithSuffixControl };
 
 export const Disabled: Story = {
 	args: {

@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { canvasConvertToJpeg } from '../canvas-utils';
 import { getHeicUnsupportedMessage } from '../heic-support';
 
@@ -42,20 +43,22 @@ describe( 'canvasConvertToJpeg', () => {
 			const mockBitmap = {
 				width: 200,
 				height: 150,
-				close: jest.fn(),
+				close: vi.fn(),
 			};
 
 			const mockCtx = {
-				drawImage: jest.fn(),
+				drawImage: vi.fn(),
 			};
 
-			global.createImageBitmap = jest
+			global.createImageBitmap = vi.fn().mockResolvedValue( mockBitmap );
+			global.OffscreenCanvas = vi
 				.fn()
-				.mockResolvedValue( mockBitmap );
-			global.OffscreenCanvas = jest.fn().mockImplementation( () => ( {
-				getContext: jest.fn().mockReturnValue( mockCtx ),
-				convertToBlob: jest.fn().mockResolvedValue( jpegBlob ),
-			} ) );
+				.mockImplementation( function OffscreenCanvas() {
+					return {
+						getContext: vi.fn().mockReturnValue( mockCtx ),
+						convertToBlob: vi.fn().mockResolvedValue( jpegBlob ),
+					};
+				} );
 
 			const file = new File( [ 'heic-data' ], 'photo.heic', {
 				type: 'image/heic',
@@ -74,18 +77,20 @@ describe( 'canvasConvertToJpeg', () => {
 				type: 'image/jpeg',
 			} );
 
-			const mockConvertToBlob = jest.fn().mockResolvedValue( jpegBlob );
-			const mockBitmap = { width: 100, height: 100, close: jest.fn() };
+			const mockConvertToBlob = vi.fn().mockResolvedValue( jpegBlob );
+			const mockBitmap = { width: 100, height: 100, close: vi.fn() };
 
-			global.createImageBitmap = jest
+			global.createImageBitmap = vi.fn().mockResolvedValue( mockBitmap );
+			global.OffscreenCanvas = vi
 				.fn()
-				.mockResolvedValue( mockBitmap );
-			global.OffscreenCanvas = jest.fn().mockImplementation( () => ( {
-				getContext: jest
-					.fn()
-					.mockReturnValue( { drawImage: jest.fn() } ),
-				convertToBlob: mockConvertToBlob,
-			} ) );
+				.mockImplementation( function OffscreenCanvas() {
+					return {
+						getContext: vi
+							.fn()
+							.mockReturnValue( { drawImage: vi.fn() } ),
+						convertToBlob: mockConvertToBlob,
+					};
+				} );
 
 			const file = new File( [ 'data' ], 'photo.heic', {
 				type: 'image/heic',
@@ -102,17 +107,19 @@ describe( 'canvasConvertToJpeg', () => {
 			const jpegBlob = new Blob( [ 'jpeg-data' ], {
 				type: 'image/jpeg',
 			} );
-			const mockBitmap = { width: 10, height: 10, close: jest.fn() };
+			const mockBitmap = { width: 10, height: 10, close: vi.fn() };
 
-			global.createImageBitmap = jest
+			global.createImageBitmap = vi.fn().mockResolvedValue( mockBitmap );
+			global.OffscreenCanvas = vi
 				.fn()
-				.mockResolvedValue( mockBitmap );
-			global.OffscreenCanvas = jest.fn().mockImplementation( () => ( {
-				getContext: jest
-					.fn()
-					.mockReturnValue( { drawImage: jest.fn() } ),
-				convertToBlob: jest.fn().mockResolvedValue( jpegBlob ),
-			} ) );
+				.mockImplementation( function OffscreenCanvas() {
+					return {
+						getContext: vi
+							.fn()
+							.mockReturnValue( { drawImage: vi.fn() } ),
+						convertToBlob: vi.fn().mockResolvedValue( jpegBlob ),
+					};
+				} );
 
 			const file = new File( [ 'data' ], 'my-photo.HEIC', {
 				type: 'image/heic',
@@ -122,15 +129,17 @@ describe( 'canvasConvertToJpeg', () => {
 		} );
 
 		it( 'should close the bitmap even if canvas context fails', async () => {
-			const mockBitmap = { width: 10, height: 10, close: jest.fn() };
+			const mockBitmap = { width: 10, height: 10, close: vi.fn() };
 
-			global.createImageBitmap = jest
+			global.createImageBitmap = vi.fn().mockResolvedValue( mockBitmap );
+			global.OffscreenCanvas = vi
 				.fn()
-				.mockResolvedValue( mockBitmap );
-			global.OffscreenCanvas = jest.fn().mockImplementation( () => ( {
-				getContext: jest.fn().mockReturnValue( null ),
-				convertToBlob: jest.fn(),
-			} ) );
+				.mockImplementation( function OffscreenCanvas() {
+					return {
+						getContext: vi.fn().mockReturnValue( null ),
+						convertToBlob: vi.fn(),
+					};
+				} );
 
 			// Remove other decoders so it falls through to the final error.
 			delete ( global as any ).ImageDecoder;
@@ -150,7 +159,7 @@ describe( 'canvasConvertToJpeg', () => {
 	describe( 'fallback behavior', () => {
 		it( 'should throw when no strategy is available', async () => {
 			// createImageBitmap throws (doesn't support HEIC).
-			global.createImageBitmap = jest
+			global.createImageBitmap = vi
 				.fn()
 				.mockRejectedValue( new Error( 'Unsupported format' ) );
 			// No ImageDecoder or VideoDecoder.
@@ -168,13 +177,13 @@ describe( 'canvasConvertToJpeg', () => {
 
 		it( 'should fall through Strategy 1 failure to subsequent strategies', async () => {
 			// Strategy 1 fails.
-			global.createImageBitmap = jest
+			global.createImageBitmap = vi
 				.fn()
 				.mockRejectedValue( new Error( 'Unsupported' ) );
 
 			// Strategy 2: ImageDecoder not supported for this type.
 			( global as any ).ImageDecoder = {
-				isTypeSupported: jest.fn().mockResolvedValue( false ),
+				isTypeSupported: vi.fn().mockResolvedValue( false ),
 			};
 
 			// No VideoDecoder.

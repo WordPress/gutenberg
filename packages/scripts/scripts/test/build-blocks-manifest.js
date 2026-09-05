@@ -1,25 +1,29 @@
-const fs = require( 'fs' );
-const path = require( 'path' );
-const { execSync } = require( 'child_process' );
-const rimraf = require( 'rimraf' ).sync;
+import { execFileSync } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { rimrafSync } from 'rimraf';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
+const currentDirectory = path.dirname( fileURLToPath( import.meta.url ) );
 const fixturesPath = path.join(
-	__dirname,
+	currentDirectory,
 	'fixtures',
 	'build-blocks-manifest'
 );
-const outputPath = path.join( __dirname, 'build', 'test-blocks-manifest' );
+const outputPath = path.join(
+	currentDirectory,
+	'build',
+	'test-blocks-manifest'
+);
 
 describe( 'build-blocks-manifest script', () => {
 	beforeAll( () => {
-		if ( ! fs.existsSync( outputPath ) ) {
-			fs.mkdirSync( outputPath, { recursive: true } );
-		}
-		rimraf( outputPath );
+		rimrafSync( outputPath );
 	} );
 
 	afterAll( () => {
-		rimraf( outputPath );
+		rimrafSync( outputPath );
 	} );
 
 	it( 'should generate expected blocks manifest', () => {
@@ -28,13 +32,15 @@ describe( 'build-blocks-manifest script', () => {
 
 		// Run the build-blocks-manifest script
 		const scriptPath = path.resolve(
-			__dirname,
+			currentDirectory,
 			'..',
 			'build-blocks-manifest.js'
 		);
-		execSync(
-			`node ${ scriptPath } --input=${ inputDir } --output=${ outputFile }`
-		);
+		execFileSync( process.execPath, [
+			scriptPath,
+			`--input=${ inputDir }`,
+			`--output=${ outputFile }`,
+		] );
 
 		const generatedContent = fs.readFileSync( outputFile, 'utf8' );
 		expect( generatedContent ).toMatchSnapshot();
@@ -45,14 +51,19 @@ describe( 'build-blocks-manifest script', () => {
 		const outputFile = path.join( outputPath, 'empty-blocks-manifest.php' );
 
 		const scriptPath = path.resolve(
-			__dirname,
+			currentDirectory,
 			'..',
 			'build-blocks-manifest.js'
 		);
 		let error;
 		try {
-			execSync(
-				`node ${ scriptPath } --input=${ emptyInputDir } --output=${ outputFile }`,
+			execFileSync(
+				process.execPath,
+				[
+					scriptPath,
+					`--input=${ emptyInputDir }`,
+					`--output=${ outputFile }`,
+				],
 				{ encoding: 'utf8' }
 			);
 		} catch ( e ) {
@@ -74,14 +85,19 @@ describe( 'build-blocks-manifest script', () => {
 		const outputFile = path.join( outputPath, 'empty-blocks-manifest.php' );
 
 		const scriptPath = path.resolve(
-			__dirname,
+			currentDirectory,
 			'..',
 			'build-blocks-manifest.js'
 		);
 		let error;
 		try {
-			execSync(
-				`node ${ scriptPath } --input=${ nonExistentInputDir } --output=${ outputFile }`,
+			execFileSync(
+				process.execPath,
+				[
+					scriptPath,
+					`--input=${ nonExistentInputDir }`,
+					`--output=${ outputFile }`,
+				],
 				{ encoding: 'utf8' }
 			);
 		} catch ( e ) {

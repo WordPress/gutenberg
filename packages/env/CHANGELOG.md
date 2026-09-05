@@ -4,6 +4,12 @@
 
 ### Bug Fixes
 
+-   Point the apt sources of the bullseye-based WordPress images (PHP 7.4 and 8.0) at `archive.debian.org`, so building them no longer fails now that Debian 11 has reached end-of-life and left the regular mirrors ([#82478](https://github.com/WordPress/gutenberg/pull/82478)).
+
+## 11.14.0 (2026-08-26)
+
+### Bug Fixes
+
 -   Update git sources to the latest commit when `--update` is passed. Previously, a source pointing at a branch (such as `"core": "WordPress/WordPress"`) stayed at the commit it was first cloned at, no matter how many times it was updated.
 -   Do not fail `wp-env start` when Docker images cannot be pulled (e.g., the Docker registry is unreachable); fall back to locally cached images and show a notice instead. ([#81631](https://github.com/WordPress/gutenberg/issues/81631))
 

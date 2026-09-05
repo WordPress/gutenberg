@@ -1,18 +1,20 @@
-'use strict';
-/* eslint-disable jest/no-conditional-expect */
-const { readFile } = require( 'fs' ).promises;
+import { createRequire } from 'node:module';
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
+const require = createRequire( import.meta.url );
+const fs = require( 'node:fs' );
+const readFile = vi
+	.spyOn( fs.promises, 'readFile' )
+	.mockImplementation( () => undefined );
 const readRawConfigFile = require( '../read-raw-config-file' );
 const { ValidationError } = require( '../validate-config' );
 
-jest.mock( 'fs', () => ( {
-	promises: {
-		readFile: jest.fn(),
-	},
-} ) );
+afterAll( () => {
+	vi.restoreAllMocks();
+} );
 
 describe( 'readRawConfigFile', () => {
-	afterEach( () => {
-		jest.clearAllMocks();
+	beforeEach( () => {
+		readFile.mockReset().mockImplementation( () => undefined );
 	} );
 
 	it( 'returns null if it cannot find a file', async () => {
@@ -36,4 +38,3 @@ describe( 'readRawConfigFile', () => {
 		}
 	} );
 } );
-/* eslint-enable jest/no-conditional-expect */

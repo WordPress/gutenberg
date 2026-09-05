@@ -4,12 +4,26 @@
 
 ### Bug Fixes
 
+-   Allow `useEditorSettings` callers to omit `stylesId` or pass an unresolved global styles ID, and defer loading user styles until the ID resolves. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
+
+## 1.20.0 (2026-08-26)
+
+### New Features
+
+-   Render the editor's Export tool, so a theme can be downloaded with the user's changes while editing a template or a template part ([#81992](https://github.com/WordPress/gutenberg/pull/81992)).
+
+### Bug Fixes
+
 -   Add the styles a host passes to the theme's and the user's instead of replacing them, so an editor canvas keeps the CSS a theme registers with `add_editor_style` ([#81747](https://github.com/WordPress/gutenberg/pull/81747)).
 -   Render the editor preferences modal, so the Preferences menu item and command open it ([#81630](https://github.com/WordPress/gutenberg/pull/81630)).
 
 ### Performance
 
 -   Memoize the generated global stylesheet, which walks every registered block, instead of rebuilding it on each render ([#81747](https://github.com/WordPress/gutenberg/pull/81747)).
+
+### Enhancements
+
+-   Pass an `initialViewport` through to the editor, so a host can open an entity at a particular width ([#81750](https://github.com/WordPress/gutenberg/pull/81750)).
 
 ## 1.19.0 (2026-08-12)
 

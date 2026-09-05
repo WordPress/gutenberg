@@ -8,6 +8,7 @@ import { ThemeProvider } from '@wordpress/theme';
 import { UnsavedChangesWarning } from '@wordpress/editor';
 import SavePanel from '../save-panel';
 import CanvasRenderer from '../canvas-renderer';
+import PluginArea from '../plugin-area';
 import { unlock } from '../../lock-unlock';
 import type { CanvasData } from '../../store/types';
 import useSyncBodyBackground from './use-sync-body-background';
@@ -39,6 +40,7 @@ export default function RootSinglePage() {
 
 	return (
 		<SlotFillProvider>
+			<PluginArea />
 			<ThemeProvider
 				isRoot
 				color={ { ...themeColors, background: '#f8f8f8' } }
@@ -65,7 +67,8 @@ export default function RootSinglePage() {
 							<ThemeProvider
 								color={ {
 									...themeColors,
-									background: '#ffffff',
+									// Reset to the default background color.
+									background: '#fcfcfc',
 								} }
 							>
 								<Outlet />

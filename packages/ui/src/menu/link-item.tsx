@@ -17,6 +17,7 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 		children,
 		className,
 		openInNewTab = false,
+		target,
 		prefix,
 		shortcut,
 		suffix,
@@ -29,7 +30,9 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 	},
 	ref
 ) {
-	const externalLinkIndicator = openInNewTab ? (
+	const shouldShowNewTabIndicator =
+		openInNewTab || /^_blank$/i.test( target ?? '' );
+	const externalLinkIndicator = shouldShowNewTabIndicator ? (
 		<span
 			className={ styles[ 'external-link-indicator' ] }
 			role="img"
@@ -39,15 +42,19 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 			}
 		/>
 	) : null;
-	const { contentContextValue, itemAriaProps, shortcutDescriptionId } =
-		useItemContent( children, {
-			'aria-describedby': ariaDescribedBy,
-			'aria-keyshortcuts': ariaKeyShortcuts,
-			'aria-label': ariaLabel,
-			'aria-labelledby': ariaLabelledBy,
-			labelTrailing: externalLinkIndicator,
-			shortcut,
-		} );
+	const {
+		contentChildren,
+		contentContextValue,
+		itemAriaProps,
+		shortcutDescriptionId,
+	} = useItemContent( children, {
+		'aria-describedby': ariaDescribedBy,
+		'aria-keyshortcuts': ariaKeyShortcuts,
+		'aria-label': ariaLabel,
+		'aria-labelledby': ariaLabelledBy,
+		labelTrailing: externalLinkIndicator,
+		shortcut,
+	} );
 
 	return (
 		<_Menu.LinkItem
@@ -55,7 +62,7 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 			{ ...props }
 			{ ...itemAriaProps }
 			rel={ rel }
-			target={ openInNewTab ? '_blank' : undefined }
+			target={ target ?? ( openInNewTab ? '_blank' : undefined ) }
 			className={ clsx(
 				defenseStyles.a,
 				resetStyles[ 'box-sizing' ],
@@ -70,7 +77,7 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 					shortcutDescriptionId={ shortcutDescriptionId }
 					suffix={ suffix }
 				>
-					{ children }
+					{ contentChildren }
 				</ItemContent>
 			</MenuItemContentContext.Provider>
 		</_Menu.LinkItem>

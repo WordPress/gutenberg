@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Keep console spies active when Jest restores its own mocks ([#82211](https://github.com/WordPress/gutenberg/pull/82211)).
+
+### Internal
+
+-   Update Jest matcher and mock dependencies to 30.5.0 ([#82181](https://github.com/WordPress/gutenberg/pull/82181)).
+
+## 9.2.0 (2026-08-26)
+
 ### Internal
 
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))

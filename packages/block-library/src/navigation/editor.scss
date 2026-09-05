@@ -76,6 +76,15 @@
 	}
 }
 
+// The AccessibleMenuDescription component renders a visually-hidden element as
+// a DOM sibling of the navigation container. This breaks the :only-child selector
+// in style.scss that grants flex-grow: 1, causing space-between layout to have
+// no room to distribute items in the editor. Restore flex-grow via the
+// editor-only class that InnerBlocks adds to the container.
+.wp-block-navigation__container.block-editor-block-list__layout {
+	flex-grow: 1;
+}
+
 // IE fix for submenu visibility on parent focus.
 .is-editing > .wp-block-navigation__container {
 	visibility: visible;
@@ -719,4 +728,8 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 
 .wp-block-navigation__overlay-help-text-wrapper {
 	margin-top: $grid-unit-10;
+}
+
+.wp-block-audio__autoplay-help-text {
+	grid-column: 1/-1;
 }
