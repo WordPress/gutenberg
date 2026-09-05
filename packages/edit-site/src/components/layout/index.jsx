@@ -322,7 +322,7 @@ export default function LayoutWithGlobalStylesProvider( props ) {
 					} }
 				>
 					<ThemeProvider color={ themeColors }>
-						<ErrorBoundary canCopyContent>
+						<ErrorBoundary>
 							<Layout { ...props } />
 						</ErrorBoundary>
 					</ThemeProvider>

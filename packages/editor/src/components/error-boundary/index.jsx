@@ -17,8 +17,6 @@ function getContent() {
 		// application.
 		return select( editorStore ).getEditedPostContent();
 	} catch {}
-	// Rather than copying the string 'undefined'.
-	return '';
 }
 
 // A boundary catches whatever was thrown, which is not always an `Error`.
