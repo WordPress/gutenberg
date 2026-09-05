@@ -2,7 +2,8 @@ import { useState } from '@wordpress/element';
 import WritingModeControl from '../';
 
 const meta = {
-	title: 'BlockEditor/WritingModeControl',
+	id: 'blockeditor-writingmodecontrol',
+	title: 'Editor/Block Editor/WritingModeControl',
 	component: WritingModeControl,
 	parameters: {
 		docs: {
