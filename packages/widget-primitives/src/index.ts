@@ -36,6 +36,7 @@ export type {
 	WidgetAction,
 	WidgetActionRecord,
 	WidgetAttributeField,
+	WidgetAttributeRecord,
 	WidgetRenderProps,
 	ResolveWidgetModule,
 	WidgetModuleRecord,

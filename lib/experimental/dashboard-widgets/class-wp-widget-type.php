@@ -130,6 +130,18 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 		public $actions = null;
 
 		/**
+		 * Attribute schema: the JSON-expressible subset of a DataViews
+		 * `Field` per entry (`id`, `type`, `label`, `elements`, ...) plus an
+		 * optional `relevance`. Labels are translated at registration time
+		 * using the widget's text domain.
+		 *
+		 * Null when the widget did not declare the field.
+		 *
+		 * @var array|null
+		 */
+		public $attributes = null;
+
+		/**
 		 * Alternative terms used to match the widget type when searching,
 		 * e.g. "calendar" for an events widget. Translated at registration
 		 * time using the widget's text domain.

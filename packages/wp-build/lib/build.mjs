@@ -2045,7 +2045,7 @@ async function buildAllWidgets() {
  * Discover all widgets and collect their registry-facing data.
  * Widgets without a valid widget.json are skipped.
  *
- * @return {Array<{ name: string, dirName: string, title: string | null, description: string | null, help: import('./widget-utils.mjs').WidgetHelpMetadata | null, icon: string | null, actions: import('./widget-utils.mjs').WidgetActionMetadata[] | null, hasRender: boolean, hasWidget: boolean, presentation: string | null, category: string | null, keywords: string[] | null, textdomain: string | null }>} Array of widget objects.
+ * @return {Array<{ name: string, dirName: string, title: string | null, description: string | null, help: import('./widget-utils.mjs').WidgetHelpMetadata | null, icon: string | null, actions: import('./widget-utils.mjs').WidgetActionMetadata[] | null, attributes: import('./widget-utils.mjs').WidgetAttributeMetadata[] | null, hasRender: boolean, hasWidget: boolean, presentation: string | null, category: string | null, keywords: string[] | null, textdomain: string | null }>} Array of widget objects.
  */
 function collectWidgets() {
 	return getAllWidgets( ROOT_DIR ).flatMap( ( widgetName ) => {
@@ -2069,6 +2069,7 @@ function collectWidgets() {
 				help: metadata.help ?? null,
 				icon: metadata.icon ?? null,
 				actions: metadata.actions ?? null,
+				attributes: metadata.attributes ?? null,
 				hasRender: widgetFiles.hasRender,
 				hasWidget: widgetFiles.hasWidget,
 				presentation: metadata.presentation ?? null,
@@ -2212,6 +2213,74 @@ function toPhpActionsLiteral( actions ) {
 }
 
 /**
+ * Format any JSON value as a PHP literal: scalars as-is, lists as
+ * `array( ... )`, objects as `array( 'key' => ... )`. Non-finite numbers
+ * and unsupported values become `null`.
+ *
+ * @param {unknown} value Source value.
+ * @return {string} PHP literal.
+ */
+function toPhpValueLiteral( value ) {
+	if ( value === null || value === undefined ) {
+		return 'null';
+	}
+	if ( typeof value === 'boolean' ) {
+		return value ? 'true' : 'false';
+	}
+	if ( typeof value === 'number' ) {
+		return Number.isFinite( value ) ? String( value ) : 'null';
+	}
+	if ( typeof value === 'string' ) {
+		const escaped = value.replace( /\\/g, '\\\\' ).replace( /'/g, "\\'" );
+		return `'${ escaped }'`;
+	}
+	if ( Array.isArray( value ) ) {
+		return `array( ${ value.map( toPhpValueLiteral ).join( ', ' ) } )`;
+	}
+	if ( typeof value === 'object' ) {
+		const entries = Object.entries( value ).map(
+			( [ key, entry ] ) =>
+				`${ toPhpValueLiteral( key ) } => ${ toPhpValueLiteral(
+					entry
+				) }`
+		);
+		return `array( ${ entries.join( ', ' ) } )`;
+	}
+	return 'null';
+}
+
+/**
+ * Format a widget's attribute schema as a PHP array literal. Returns the
+ * PHP literal `null` when there are no valid entries; entries without a
+ * string `id` are dropped. Everything else is copied as declared; the
+ * registration gate constrains the shape.
+ *
+ * @param {import('./widget-utils.mjs').WidgetAttributeMetadata[]|null|undefined} attributes Source value.
+ * @return {string} PHP array literal, or `null`.
+ */
+function toPhpAttributesLiteral( attributes ) {
+	if ( ! Array.isArray( attributes ) ) {
+		return 'null';
+	}
+
+	const entries = attributes
+		.filter(
+			( attribute ) =>
+				attribute &&
+				typeof attribute === 'object' &&
+				typeof attribute.id === 'string' &&
+				attribute.id !== ''
+		)
+		.map( toPhpValueLiteral );
+
+	if ( entries.length === 0 ) {
+		return 'null';
+	}
+
+	return `array( ${ entries.join( ', ' ) } )`;
+}
+
+/**
  * Generate global widget registry file.
  * Creates a single registry with all widgets including file availability.
  *
@@ -2238,6 +2307,7 @@ async function generateWidgetRegistry( widgets, replacements ) {
 			const helpStr = toPhpHelpLiteral( widget.help );
 			const iconStr = toPhpStringLiteral( widget.icon );
 			const actionsStr = toPhpActionsLiteral( widget.actions );
+			const attributesStr = toPhpAttributesLiteral( widget.attributes );
 			const keywordsStr = toPhpStringArrayLiteral( widget.keywords );
 			const textdomainStr = toPhpStringLiteral( widget.textdomain );
 			return `\tarray(
@@ -2248,6 +2318,7 @@ async function generateWidgetRegistry( widgets, replacements ) {
 		'help'         => ${ helpStr },
 		'icon'         => ${ iconStr },
 		'actions'      => ${ actionsStr },
+		'attributes'   => ${ attributesStr },
 		'has_render'   => ${ hasRenderStr },
 		'has_widget'   => ${ hasWidgetStr },
 		'presentation' => ${ presentationStr },

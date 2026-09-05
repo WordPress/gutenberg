@@ -9,6 +9,7 @@ import { resolveIcon } from '../icon-resolver';
 import type {
 	WidgetAction,
 	WidgetActionRecord,
+	WidgetAttributeRecord,
 	WidgetIcon,
 	WidgetModuleRecord,
 	WidgetName,
@@ -49,6 +50,43 @@ function withRenderableIcons(
 	} );
 }
 
+type WidgetAttributes = NonNullable< WidgetType[ 'attributes' ] >;
+
+/*
+ * Record entries lead, each completed by the module entry sharing its `id`
+ * (the record wins a shared key); module-only entries follow.
+ */
+function mergeAttributes(
+	recordAttributes: WidgetAttributeRecord[] | null | undefined,
+	moduleAttributes: WidgetAttributes | undefined
+): WidgetAttributes | undefined {
+	if ( ! recordAttributes ) {
+		return moduleAttributes;
+	}
+	if ( ! moduleAttributes ) {
+		return recordAttributes as WidgetAttributes;
+	}
+
+	const moduleById = new Map(
+		moduleAttributes.map(
+			( attribute ) => [ attribute.id, attribute ] as const
+		)
+	);
+	const recordIds = new Set(
+		recordAttributes.map( ( attribute ) => attribute.id )
+	);
+
+	return [
+		...recordAttributes.map( ( attribute ) => ( {
+			...moduleById.get( attribute.id ),
+			...attribute,
+		} ) ),
+		...moduleAttributes.filter(
+			( attribute ) => ! recordIds.has( attribute.id )
+		),
+	] as WidgetAttributes;
+}
+
 /* `true` while records or their metadata imports are still resolving; hosts
    must not treat a widget instance as missing until it is `false`. */
 type UseWidgetTypesResult = readonly [ WidgetType[], boolean ];
@@ -81,7 +119,8 @@ function recordOverlay( record: WidgetModuleRecord ) {
  * module's default export with the runtime fields (`name`, `renderModule`).
  * A record without a metadata module resolves from its own fields alone,
  * so a widget declared entirely by its manifest needs no module stub.
- * Attribute schemas pass through `resolveFields`, so attributes referencing
+ * A record's `attributes` lead the module's, merged by `id`; the merged
+ * schema passes through `resolveFields`, so attributes referencing
  * registered field types reach hosts as plain DataViews fields. Icon
  * references resolve through the registered icon resolver, off the loading
  * flag: widget types emit as soon as their modules land, and each resolved
@@ -129,6 +168,13 @@ export function useWidgetTypes(
 					return {
 						apiVersion: DEFAULT_API_VERSION,
 						title: record.title ?? record.name,
+						...( record.attributes
+							? {
+									attributes: resolveFields(
+										record.attributes
+									),
+							  }
+							: {} ),
 						...( record.icon ? { icon: pendingIcon } : {} ),
 						...( record.actions
 							? {
@@ -165,16 +211,16 @@ export function useWidgetTypes(
 						moduleIcon ?? ( record.icon ? pendingIcon : undefined );
 
 					const actions = record.actions ?? metadata.actions;
+					const attributes = mergeAttributes(
+						record.attributes,
+						metadata.attributes
+					);
 
 					return {
 						apiVersion: DEFAULT_API_VERSION,
 						...metadata,
-						...( metadata.attributes
-							? {
-									attributes: resolveFields(
-										metadata.attributes
-									),
-							  }
+						...( attributes
+							? { attributes: resolveFields( attributes ) }
 							: {} ),
 						icon,
 						/*
