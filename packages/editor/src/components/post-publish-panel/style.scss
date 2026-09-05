@@ -60,8 +60,7 @@
 	display: block;
 	color: $gray-700;
 	font-size: $helptext-font-size;
-	// stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- Pending review of overflow-wrap alternative.
-	word-break: break-word;
+	overflow-wrap: anywhere;
 }
 
 .editor-post-publish-panel__header-publish-button,
@@ -127,8 +126,7 @@
 .post-publish-panel__postpublish .components-panel__body {
 	border-bottom: $border-width solid $gray-200;
 	border-top: none;
-	// stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- Pending review of overflow-wrap alternative.
-	word-break: break-word;
+	overflow-wrap: break-word;
 }
 
 .post-publish-panel__postpublish-buttons {
