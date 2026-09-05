@@ -27,33 +27,6 @@ const EMPTY_ACTIVE_FORMATS = [];
 
 const PLACEHOLDER_ATTR_NAME = 'data-rich-text-placeholder';
 
-/**
- * If the selection is set on the placeholder element, collapse the selection to
- * the start (before the placeholder).
- *
- * @param {Window} defaultView
- */
-function fixPlaceholderSelection( defaultView ) {
-	const selection = defaultView.getSelection();
-	const { anchorNode, anchorOffset } = selection;
-
-	if ( anchorNode.nodeType !== anchorNode.ELEMENT_NODE ) {
-		return;
-	}
-
-	const targetNode = anchorNode.childNodes[ anchorOffset ];
-
-	if (
-		! targetNode ||
-		targetNode.nodeType !== targetNode.ELEMENT_NODE ||
-		! targetNode.hasAttribute( PLACEHOLDER_ATTR_NAME )
-	) {
-		return;
-	}
-
-	selection.collapseToStart();
-}
-
 export default ( props ) => ( element ) => {
 	const { ownerDocument } = element;
 	const { defaultView } = ownerDocument;
@@ -184,14 +157,17 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
-		if ( start === oldRecord.start && end === oldRecord.end ) {
-			// Sometimes the browser may set the selection on the placeholder
-			// element, in which case the caret is not visible. We need to set
-			// the caret before the placeholder if that's the case.
-			if ( oldRecord.text.length === 0 && start === 0 ) {
-				fixPlaceholderSelection( defaultView );
-			}
+		// An empty field has a single caret position, but browsers may
+		// resolve a caret after the padding character or on the placeholder
+		// element. The caret is then invisible, or the iOS keyboard sees a
+		// character before it and does not capitalize. Apply the record's
+		// position right away: this runs in the task that placed the caret
+		// (see the focus handler), which is what the keyboard requires.
+		if ( text.length === 0 ) {
+			applyRecord( { ...oldRecord, start, end } );
+		}
 
+		if ( start === oldRecord.start && end === oldRecord.end ) {
 			return;
 		}
 
@@ -279,6 +255,9 @@ export default ( props ) => ( element ) => {
 					selection.collapse( element, 0 );
 				}
 			}
+			// The caret placed after this focus must still be synchronized
+			// in this task (see below).
+			window.queueMicrotask( handleSelectionChange );
 			return;
 		}
 
