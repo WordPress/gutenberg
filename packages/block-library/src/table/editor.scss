@@ -15,8 +15,6 @@
 
 		td,
 		th {
-			// `anywhere` rather than `break-word`, so that break points inside long
-			// words still count towards min-content and the shrink-to-fit width.
 			overflow-wrap: anywhere;
 		}
 	}
