@@ -90,7 +90,7 @@ function block_core_navigation_link_build_css_colors( $context, $attributes, $is
  * @since 5.9.0
  * @deprecated 7.0.0
  *
- * @param  array $context Navigation block context.
+ * @param array $context Navigation block context.
  * @return array Font size CSS classes and inline styles.
  */
 function block_core_navigation_link_build_css_font_sizes( $context ) {
@@ -308,7 +308,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
  * @since 5.9.0
  *
  * @param WP_Taxonomy|WP_Post_Type $entity post type or taxonomy entity.
- * @param string                   $kind string of value 'taxonomy' or 'post-type'.
+ * @param string                   $kind   string of value 'taxonomy' or 'post-type'.
  *
  * @return array
  */

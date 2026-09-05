@@ -298,7 +298,7 @@ function block_core_breadcrumbs_get_post_title( $post_id_or_object ) {
  *
  * @since 7.0.0
  *
- * @param int    $post_id   The post ID.
+ * @param int $post_id The post ID.
  *
  * @return array Array of breadcrumb item data.
  */
@@ -524,7 +524,7 @@ function block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) {
 	 *
 	 * @since 7.0.0
 	 *
-	 * @param array  $settings {
+	 * @param array  $settings  {
 	 *     Array of breadcrumb settings. Default empty array.
 	 *
 	 *     @type string $taxonomy Optional. Taxonomy slug to use for breadcrumbs.
