@@ -145,11 +145,19 @@ export const parameters = {
 				'ImageCropper',
 				'MediaEditor',
 				'Editor',
-				'Widget Primitives',
-				[ 'Introduction', 'Anatomy', 'System Architecture' ],
-				'Widget Dashboard',
-				[ 'Introduction', 'Anatomy', 'Widget Chrome', 'Playground' ],
-				'Grid',
+				'Widgets',
+				[
+					'Primitives',
+					[ 'Introduction', 'Anatomy', 'System Architecture' ],
+					'Dashboard',
+					[
+						'Introduction',
+						'Anatomy',
+						'Widget Chrome',
+						'Playground',
+					],
+					'Grid',
+				],
 				'Playground',
 			];
 			const PRIORITIZED_MDX_DOCS = [ 'Introduction', 'Overview' ];
