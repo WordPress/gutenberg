@@ -2756,6 +2756,11 @@
 			"count": 1
 		}
 	},
+	"packages/block-library/src/cover/edit/overlay-controls.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/block-library/src/cover/edit/resizable-cover-popover.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1

@@ -91,6 +91,10 @@ async function createAndSelectBlock() {
 	await selectBlock( 'Block: Cover' );
 }
 
+async function openOverlayToolbarControl() {
+	await userEvent.click( screen.getByRole( 'button', { name: 'Overlay' } ) );
+}
+
 async function openStylesTabIfAvailable() {
 	const stylesTab = screen.queryByRole( 'tab', {
 		name: 'Styles',
@@ -229,6 +233,104 @@ describe( 'Cover block', () => {
 				)
 			).not.toBeInTheDocument();
 		} );
+
+		test( 'can set overlay color using toolbar control', async () => {
+			const { container } = await setup();
+			await createAndSelectBlock();
+
+			await openOverlayToolbarControl();
+			await userEvent.click(
+				screen.getByRole( 'option', { name: 'White' } )
+			);
+
+			// eslint-disable-next-line testing-library/no-node-access
+			const overlay = container.getElementsByClassName(
+				'wp-block-cover__background'
+			);
+			expect( overlay[ 0 ] ).toHaveStyle(
+				'background-color: rgb(255, 255, 255);'
+			);
+		} );
+
+		test( 'applies selected opacity to block when number control value changed', async () => {
+			const { container } = await setup();
+
+			await createAndSelectBlock();
+
+			// eslint-disable-next-line testing-library/no-node-access
+			const overlay = container.getElementsByClassName(
+				'wp-block-cover__background'
+			);
+
+			expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-100' );
+
+			await openOverlayToolbarControl();
+			// Need act here as the isDark method is async.
+			// eslint-disable-next-line testing-library/no-unnecessary-act
+			await act( async () => {
+				fireEvent.change(
+					screen.getByRole( 'spinbutton', {
+						name: 'Overlay opacity',
+					} ),
+					{
+						target: { value: '40' },
+					}
+				);
+			} );
+
+			expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-40' );
+		} );
+
+		test( 'applies selected opacity to block when slider moved', async () => {
+			const { container } = await setup();
+
+			await createAndSelectBlock();
+
+			// eslint-disable-next-line testing-library/no-node-access
+			const overlay = container.getElementsByClassName(
+				'wp-block-cover__background'
+			);
+
+			expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-100' );
+
+			await openOverlayToolbarControl();
+
+			// Need act here as the isDark method is async.
+			// eslint-disable-next-line testing-library/no-unnecessary-act
+			await act( async () => {
+				fireEvent.change(
+					screen.getByRole( 'slider', {
+						name: 'Overlay opacity',
+					} ),
+					{ target: { value: 30 } }
+				);
+			} );
+
+			expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-30' );
+		} );
+
+		describe( 'when colors are disabled', () => {
+			test( 'does not render overlay control in the toolbar', async () => {
+				await setup( undefined, true, disabledColorSettings );
+				await selectBlock( 'Block: Cover' );
+
+				const overlayControl = screen.queryByRole( 'button', {
+					name: 'Overlay',
+				} );
+
+				expect( overlayControl ).not.toBeInTheDocument();
+			} );
+			test( 'does not render opacity control', async () => {
+				await setup( undefined, true, disabledColorSettings );
+				await selectBlock( 'Block: Cover' );
+
+				const opacityControl = screen.queryByRole( 'slider', {
+					name: 'Overlay opacity',
+				} );
+
+				expect( opacityControl ).not.toBeInTheDocument();
+			} );
+		} );
 	} );
 
 	describe( 'Inspector controls', () => {
@@ -329,90 +431,6 @@ describe( 'Cover block', () => {
 			expect( screen.getByAltText( 'Me' ) ).toBeInTheDocument();
 		} );
 
-		describe( 'Color panel', () => {
-			test( 'applies selected opacity to block when number control value changed', async () => {
-				const { container } = await setup();
-
-				await createAndSelectBlock();
-
-				// eslint-disable-next-line testing-library/no-node-access
-				const overlay = container.getElementsByClassName(
-					'wp-block-cover__background'
-				);
-
-				expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-100' );
-
-				await openStylesTabIfAvailable();
-				// Need act here as the isDark method is async.
-				// eslint-disable-next-line testing-library/no-unnecessary-act
-				await act( async () => {
-					fireEvent.change(
-						screen.getByRole( 'spinbutton', {
-							name: 'Overlay opacity',
-						} ),
-						{
-							target: { value: '40' },
-						}
-					);
-				} );
-
-				expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-40' );
-			} );
-
-			test( 'applies selected opacity to block when slider moved', async () => {
-				const { container } = await setup();
-
-				await createAndSelectBlock();
-
-				// eslint-disable-next-line testing-library/no-node-access
-				const overlay = container.getElementsByClassName(
-					'wp-block-cover__background'
-				);
-
-				expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-100' );
-
-				await openStylesTabIfAvailable();
-
-				// Need act here as the isDark method is async.
-				// eslint-disable-next-line testing-library/no-unnecessary-act
-				await act( async () => {
-					fireEvent.change(
-						screen.getByRole( 'slider', {
-							name: 'Overlay opacity',
-						} ),
-						{ target: { value: 30 } }
-					);
-				} );
-
-				expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-30' );
-			} );
-
-			describe( 'when colors are disabled', () => {
-				test( 'does not render overlay control', async () => {
-					await setup( undefined, true, disabledColorSettings );
-					await selectBlock( 'Block: Cover' );
-					await openStylesTabIfAvailable();
-
-					const overlayControl = screen.queryByRole( 'button', {
-						name: 'Overlay',
-					} );
-
-					expect( overlayControl ).not.toBeInTheDocument();
-				} );
-				test( 'does not render opacity control', async () => {
-					await setup( undefined, true, disabledColorSettings );
-					await selectBlock( 'Block: Cover' );
-					await openStylesTabIfAvailable();
-
-					const opacityControl = screen.queryByRole( 'slider', {
-						name: 'Overlay opacity',
-					} );
-
-					expect( opacityControl ).not.toBeInTheDocument();
-				} );
-			} );
-		} );
-
 		describe( 'Dimensions panel', () => {
 			test( 'sets minHeight attribute when number control value changed', async () => {
 				await setup();
@@ -446,8 +464,7 @@ describe( 'Cover block', () => {
 			expect( coverBlock ).toHaveClass( 'is-light' );
 
 			await selectBlock( 'Block: Cover' );
-			await openStylesTabIfAvailable();
-			await userEvent.click( screen.getByText( 'Overlay' ) );
+			await openOverlayToolbarControl();
 			const popupColorPicker = screen.getByRole( 'option', {
 				name: 'Black',
 			} );
@@ -463,8 +480,7 @@ describe( 'Cover block', () => {
 			const coverBlock = screen.getByLabelText( 'Block: Cover' );
 			expect( coverBlock ).toHaveClass( 'is-light' );
 			await selectBlock( 'Block: Cover' );
-			await openStylesTabIfAvailable();
-			await userEvent.click( screen.getByText( 'Overlay' ) );
+			await openOverlayToolbarControl();
 			// The default color is black, so clicking the black color button will remove the background color,
 			// which should remove the isDark setting and assign the is-light class.
 			const popupColorPicker = screen.getByRole( 'option', {

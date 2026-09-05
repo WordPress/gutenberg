@@ -12,6 +12,7 @@ import { crop, link } from '@wordpress/icons';
 import { ALLOWED_MEDIA_TYPES, EMBED_VIDEO_BACKGROUND_TYPE } from '../shared';
 import { unlock } from '../../lock-unlock';
 import EmbedVideoUrlInput from './embed-video-url-input';
+import CoverOverlayColorToolbarControl from './overlay-controls';
 import { getAllowedVideoProviders } from '../embed-video-utils';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
@@ -19,6 +20,7 @@ const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 export default function CoverBlockControls( {
 	attributes,
 	setAttributes,
+	clientId,
 	onSelectMedia,
 	currentSettings,
 	toggleUseFeaturedImage,
@@ -29,6 +31,8 @@ export default function CoverBlockControls( {
 	showEditMediaButton,
 	isEditMediaDisabled,
 	blockEditingMode,
+	setOverlayColor,
+	updateDimRatio,
 } ) {
 	const {
 		contentPosition,
@@ -38,8 +42,9 @@ export default function CoverBlockControls( {
 		minHeightUnit,
 		backgroundType,
 		allowedVideoProviders,
+		dimRatio,
 	} = attributes;
-	const { hasInnerBlocks, url } = currentSettings;
+	const { hasInnerBlocks, url, overlayColor } = currentSettings;
 
 	const filteredVideoProviders = getAllowedVideoProviders(
 		allowedVideoProviders
@@ -125,6 +130,13 @@ export default function CoverBlockControls( {
 				</BlockControls>
 			) }
 			<BlockControls group="other">
+				<CoverOverlayColorToolbarControl
+					clientId={ clientId }
+					overlayColor={ overlayColor }
+					setOverlayColor={ setOverlayColor }
+					dimRatio={ dimRatio }
+					updateDimRatio={ updateDimRatio }
+				/>
 				<MediaReplaceFlow
 					mediaId={ id }
 					mediaURL={ url }
