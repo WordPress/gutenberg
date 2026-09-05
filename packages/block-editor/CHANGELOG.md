@@ -9,6 +9,8 @@
 ### Enhancements
 
 -   Borders: rename the "Border & Shadow" panel to "Borders", whichever of its controls are available, and always show the Border and Shadow controls' visible labels. A stable panel title is what lets the Border label render unconditionally, so its "Unlink sides" toggle lines up with the border radius one ([#82163](https://github.com/WordPress/gutenberg/pull/82163)).
+-   Block settings menu: Render the private note slot for a multi-block selection as well as a single block, passing the number of selected blocks through `fillProps` so the fill can offer an entry for the whole selection ([#80009](https://github.com/WordPress/gutenberg/pull/80009)).
+-   Block highlight: More than one block can be highlighted at a time. `toggleBlockHighlight` adds to or removes from the set instead of replacing a single id, so a note spanning several blocks can outline the whole run it covers; `isBlockHighlighted` is unchanged ([#80009](https://github.com/WordPress/gutenberg/pull/80009)).
 
 ### Internal
 

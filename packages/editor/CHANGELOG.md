@@ -14,6 +14,10 @@
 
 -   `PluginMoreMenuItem`, `PluginSidebarMoreMenuItem`, `PluginPreviewMenuItem`: Deprecate the `as` prop, which reached the item only because these components forward every extra prop. The menu now renders the item itself, so the prop is ignored ([#82319](https://github.com/WordPress/gutenberg/pull/82319)).
 
+### New Features
+
+-   Notes: Support notes that span several adjacent blocks, so feedback that runs from one block into the next can be left as a single note. The note is anchored in every block it covers, and selecting, resolving, or deleting it applies across the whole span. Opening the note - from the sidebar, from the block toolbar, or while the new-note form is open - keeps every spanned block lit under the spotlight, and hovering the thread outlines all of them ([#80009](https://github.com/WordPress/gutenberg/pull/80009)).
+
 ### Enhancements
 
 -   Post actions: Append an ellipsis (`…`) to the "Set as homepage" and "Set as posts page" action labels, which open a confirmation dialog, following the menu ellipsis guideline. The dialog titles keep the ellipsis-free wording. ([#81994](https://github.com/WordPress/gutenberg/pull/81994))

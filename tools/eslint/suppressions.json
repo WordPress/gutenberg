@@ -6005,32 +6005,7 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/components/collab-sidebar/add-note-menu-item.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/collab-sidebar/add-note.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/collab-sidebar/floating-container.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/collab-sidebar/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/editor/src/components/collab-sidebar/note-byline.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/collab-sidebar/note-card.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -6045,17 +6020,7 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/components/collab-sidebar/note-thread.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/editor/src/components/collab-sidebar/note.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/collab-sidebar/notes.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}

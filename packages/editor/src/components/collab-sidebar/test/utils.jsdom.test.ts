@@ -1,3 +1,4 @@
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import {
 	RichTextData,
 	create,
@@ -10,20 +11,49 @@ import { select } from '@wordpress/data';
 import {
 	findNoteRange,
 	findNoteInBlock,
+	findRichTextAttributeKey,
 	applyNoteFormat,
+	readMultiBlockSelection,
 	removeNoteFormat,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
 	removeNoteIdFromMetadata,
 	calculateNotePositions,
 	pickPrimaryNote,
+	getThreadsForBlock,
+	selectNoteBlocks,
 	BLOCK_LEVEL_NOTE_START,
 	getInlineMarkerStart,
 	getNoteMarkerSelector,
 } from '../utils';
+import type { BlockAttributes, Thread } from '../utils';
 import { noteFormat } from '../format';
 
-function makeRect( top ) {
+vi.hoisted( () => {
+	globalThis.wpVitest.mockMatchMedia();
+} );
+
+/*
+ * `@wordpress/rich-text` is plain JavaScript with JSDoc types: its store
+ * descriptor is declared as a bare `Object`, its `WPFormat` typedef omits the
+ * optional `attributes` map the note format relies on, and the `RichTextData`
+ * constructor is typed from its default argument. Wrap those three here so
+ * this file type checks without loosening the utilities under test.
+ */
+const getFormatType = ( name: string ): unknown =>
+	( select as ( store: unknown ) => any )( richTextStore ).getFormatType(
+		name
+	);
+
+const registerFormat = registerFormatType as (
+	name: string,
+	settings: Record< string, unknown >
+) => void;
+
+const recordToHTMLString = ( record: unknown ): string =>
+	new ( RichTextData as any )( record ).toHTMLString();
+
+function makeRect( top: number ) {
 	return { top };
 }
 
@@ -236,7 +266,7 @@ describe( 'note id order preservation', () => {
 	// See https://github.com/WordPress/gutenberg/issues/75145#issuecomment-4361104794
 
 	it( 'preserves insertion order across multiple sequential adds', () => {
-		let metadata = {};
+		let metadata: BlockAttributes = {};
 		metadata = addNoteIdToMetadata( metadata, 5 );
 		metadata = addNoteIdToMetadata( metadata, 3 );
 		metadata = addNoteIdToMetadata( metadata, 7 );
@@ -284,7 +314,7 @@ describe( 'note id order preservation', () => {
 	} );
 
 	it( 'preserves order across an interleaved sequence of adds and removes', () => {
-		let metadata = {};
+		let metadata: BlockAttributes = {};
 		metadata = addNoteIdToMetadata( metadata, 10 );
 		metadata = addNoteIdToMetadata( metadata, 20 );
 		metadata = addNoteIdToMetadata( metadata, 30 );
@@ -549,7 +579,7 @@ describe( 'calculateNotePositions', () => {
 		 * keeps the sweep's assumption true; without it note 1 is pushed to
 		 * 164 - 136px above the marker it points at.
 		 */
-		const threads = [ { id: 1 }, { id: 'new' } ];
+		const threads: Thread[] = [ { id: 1 }, { id: 'new' } ];
 		const blockRects = {
 			1: makeRect( 300 ),
 			new: makeRect( 250 ),
@@ -574,12 +604,11 @@ describe( 'calculateNotePositions', () => {
 describe( 'findNoteRange', () => {
 	const FORMAT_NAME = 'core/note';
 
-	const isRegistered = () =>
-		!! select( richTextStore ).getFormatType( FORMAT_NAME );
+	const isRegistered = () => !! getFormatType( FORMAT_NAME );
 
 	beforeAll( () => {
 		if ( ! isRegistered() ) {
-			registerFormatType( FORMAT_NAME, {
+			registerFormat( FORMAT_NAME, {
 				title: 'Note',
 				tagName: 'span',
 				className: 'wp-note',
@@ -647,12 +676,11 @@ describe( 'findNoteRange', () => {
 describe( 'findNoteInBlock', () => {
 	const FORMAT_NAME = 'core/note';
 
-	const isRegistered = () =>
-		!! select( richTextStore ).getFormatType( FORMAT_NAME );
+	const isRegistered = () => !! getFormatType( FORMAT_NAME );
 
 	beforeAll( () => {
 		if ( ! isRegistered() ) {
-			registerFormatType( FORMAT_NAME, {
+			registerFormat( FORMAT_NAME, {
 				title: 'Note',
 				tagName: 'span',
 				className: 'wp-note',
@@ -740,12 +768,11 @@ describe( 'findNoteInBlock', () => {
 describe( 'applyNoteFormat', () => {
 	const FORMAT_NAME = 'core/note';
 
-	const isRegistered = () =>
-		!! select( richTextStore ).getFormatType( FORMAT_NAME );
+	const isRegistered = () => !! getFormatType( FORMAT_NAME );
 
 	beforeAll( () => {
 		if ( ! isRegistered() ) {
-			registerFormatType( FORMAT_NAME, {
+			registerFormat( FORMAT_NAME, {
 				title: 'Note',
 				tagName: 'mark',
 				className: 'wp-note',
@@ -753,8 +780,8 @@ describe( 'applyNoteFormat', () => {
 				edit: () => null,
 			} );
 		}
-		if ( ! select( richTextStore ).getFormatType( 'core/bold' ) ) {
-			registerFormatType( 'core/bold', {
+		if ( ! getFormatType( 'core/bold' ) ) {
+			registerFormat( 'core/bold', {
 				title: 'Bold',
 				tagName: 'strong',
 				className: null,
@@ -767,26 +794,27 @@ describe( 'applyNoteFormat', () => {
 		if ( isRegistered() ) {
 			unregisterFormatType( FORMAT_NAME );
 		}
-		if ( select( richTextStore ).getFormatType( 'core/bold' ) ) {
+		if ( getFormatType( 'core/bold' ) ) {
 			unregisterFormatType( 'core/bold' );
 		}
 	} );
 
-	const note = ( id ) => ( {
+	const note = ( id: number | string ) => ( {
 		type: FORMAT_NAME,
 		attributes: { 'data-id': String( id ) },
 	} );
 
 	// Apply a sequence of [ id, start, end ] notes, then round-trip through HTML
 	// to a normalised value (matching how wrapInlineNote stores the result).
-	const applyAll = ( html, ops ) => {
+	const applyAll = (
+		html: string,
+		ops: Array< [ number, number, number ] >
+	) => {
 		let record = create( { html } );
 		for ( const [ id, start, end ] of ops ) {
 			record = applyNoteFormat( record, note( id ), start, end );
 		}
-		return RichTextData.fromHTMLString(
-			new RichTextData( record ).toHTMLString()
-		);
+		return RichTextData.fromHTMLString( recordToHTMLString( record ) );
 	};
 
 	it( 'adds a single marker over plain text', () => {
@@ -849,7 +877,7 @@ describe( 'applyNoteFormat', () => {
 		record = applyFormat( record, { type: 'core/bold' }, 4, 9 );
 		record = applyNoteFormat( record, note( 1 ), 0, 18 );
 		const value = RichTextData.fromHTMLString(
-			new RichTextData( record ).toHTMLString()
+			recordToHTMLString( record )
 		);
 		expect( findNoteRange( value, 1 ) ).toEqual( { start: 0, end: 18 } );
 	} );
@@ -861,12 +889,11 @@ describe( 'getInlineMarkerStart', () => {
 	// elements the tests construct below.
 	const FORMAT_NAME = 'core/note';
 
-	const isRegistered = () =>
-		!! select( richTextStore ).getFormatType( FORMAT_NAME );
+	const isRegistered = () => !! getFormatType( FORMAT_NAME );
 
 	beforeAll( () => {
 		if ( ! isRegistered() ) {
-			registerFormatType( FORMAT_NAME, {
+			registerFormat( FORMAT_NAME, {
 				title: 'Note',
 				tagName: 'mark',
 				className: 'wp-note',
@@ -954,12 +981,11 @@ describe( 'removeNoteFormat', () => {
 	// `core/note` format, so register it for the fixtures below.
 	const FORMAT_NAME = 'core/note';
 
-	const isRegistered = () =>
-		!! select( richTextStore ).getFormatType( FORMAT_NAME );
+	const isRegistered = () => !! getFormatType( FORMAT_NAME );
 
 	beforeAll( () => {
 		if ( ! isRegistered() ) {
-			registerFormatType( FORMAT_NAME, {
+			registerFormat( FORMAT_NAME, {
 				title: 'Note',
 				tagName: 'mark',
 				className: 'wp-note',
@@ -991,7 +1017,7 @@ describe( 'removeNoteFormat', () => {
 		const value = RichTextData.fromHTMLString(
 			'the <mark class="wp-note" data-id="7">quick</mark> brown fox'
 		);
-		expect( removeNoteFormat( value, 7 ).toHTMLString() ).toBe(
+		expect( removeNoteFormat( value, 7 )?.toHTMLString() ).toBe(
 			'the quick brown fox'
 		);
 	} );
@@ -1012,14 +1038,177 @@ describe( 'removeNoteFormat', () => {
 			removeNoteFormat(
 				RichTextData.fromHTMLString( html ),
 				5
-			).toHTMLString()
+			)?.toHTMLString()
 		).toBe( 'a b c' );
 		expect(
 			removeNoteFormat(
 				RichTextData.fromHTMLString( html ),
 				'5'
-			).toHTMLString()
+			)?.toHTMLString()
 		).toBe( 'a b c' );
+	} );
+} );
+
+describe( 'findRichTextAttributeKey', () => {
+	it( 'returns null for null/undefined attributes', () => {
+		expect( findRichTextAttributeKey( null ) ).toBe( null );
+		expect( findRichTextAttributeKey( undefined ) ).toBe( null );
+	} );
+
+	it( 'returns the first RichTextData attribute key', () => {
+		const attributes = {
+			align: 'left',
+			content: RichTextData.fromHTMLString( 'hello' ),
+		};
+		expect( findRichTextAttributeKey( attributes ) ).toBe( 'content' );
+	} );
+
+	it( 'returns null when no attribute is rich text', () => {
+		const attributes = { url: 'https://example.com', alt: 'text' };
+		expect( findRichTextAttributeKey( attributes ) ).toBe( null );
+	} );
+} );
+
+describe( 'readMultiBlockSelection', () => {
+	// Build a selectors bag from a per-block spec:
+	// blocks: [ { clientId, content } ] in document order,
+	// start/end: { clientId, attributeKey, offset }.
+	function makeSelectors( {
+		blocks,
+		start,
+		end,
+	}: {
+		blocks: Array< {
+			clientId: string;
+			content?: string;
+			attributes?: Record< string, any >;
+		} >;
+		start: { clientId: string; attributeKey: string; offset: number };
+		end: { clientId: string; attributeKey: string; offset: number };
+	} ) {
+		const attributesByClientId: Record< string, any > = {};
+		for ( const block of blocks ) {
+			attributesByClientId[ block.clientId ] = block.attributes ?? {
+				content: RichTextData.fromHTMLString( block.content ),
+			};
+		}
+		return {
+			getSelectionStart: () => start,
+			getSelectionEnd: () => end,
+			getSelectedBlockClientIds: () =>
+				blocks.map( ( block ) => block.clientId ),
+			getBlockAttributes: ( clientId: string ) =>
+				attributesByClientId[ clientId ],
+		};
+	}
+
+	it( 'returns null for a collapsed / single-block selection', () => {
+		const selectors = makeSelectors( {
+			blocks: [ { clientId: 'a', content: 'Hello world' } ],
+			start: { clientId: 'a', attributeKey: 'content', offset: 1 },
+			end: { clientId: 'a', attributeKey: 'content', offset: 5 },
+		} );
+		expect( readMultiBlockSelection( selectors ) ).toBe( null );
+	} );
+
+	it( 'returns null when fewer than two blocks are selected (cross-root)', () => {
+		const selectors = {
+			getSelectionStart: () => ( {
+				clientId: 'a',
+				attributeKey: 'content',
+				offset: 1,
+			} ),
+			getSelectionEnd: () => ( {
+				clientId: 'b',
+				attributeKey: 'content',
+				offset: 2,
+			} ),
+			// Empty across roots.
+			getSelectedBlockClientIds: (): string[] => [],
+			getBlockAttributes: () => ( {} ),
+		};
+		expect( readMultiBlockSelection( selectors ) ).toBe( null );
+	} );
+
+	it( 'splits a two-block selection into head-to-end and start-to-tail', () => {
+		const selectors = makeSelectors( {
+			blocks: [
+				{ clientId: 'a', content: 'Hello world' }, // length 11
+				{ clientId: 'b', content: 'Second' }, // length 6
+			],
+			start: { clientId: 'a', attributeKey: 'content', offset: 6 },
+			end: { clientId: 'b', attributeKey: 'content', offset: 3 },
+		} );
+		expect( readMultiBlockSelection( selectors ) ).toEqual( [
+			{ clientId: 'a', attributeKey: 'content', start: 6, end: 11 },
+			{ clientId: 'b', attributeKey: 'content', start: 0, end: 3 },
+		] );
+	} );
+
+	it( 'marks interior blocks in full', () => {
+		const selectors = makeSelectors( {
+			blocks: [
+				{ clientId: 'a', content: 'Hello world' }, // 11
+				{ clientId: 'b', content: 'Middle block' }, // 12
+				{ clientId: 'c', content: 'Last one' }, // 8
+			],
+			start: { clientId: 'a', attributeKey: 'content', offset: 6 },
+			end: { clientId: 'c', attributeKey: 'content', offset: 4 },
+		} );
+		expect( readMultiBlockSelection( selectors ) ).toEqual( [
+			{ clientId: 'a', attributeKey: 'content', start: 6, end: 11 },
+			{ clientId: 'b', attributeKey: 'content', start: 0, end: 12 },
+			{ clientId: 'c', attributeKey: 'content', start: 0, end: 4 },
+		] );
+	} );
+
+	it( 'normalizes a reversed (bottom-to-top) selection to document order', () => {
+		const selectors = makeSelectors( {
+			blocks: [
+				{ clientId: 'a', content: 'Hello world' },
+				{ clientId: 'b', content: 'Second' },
+			],
+			// Anchor in the later block, focus in the earlier block.
+			start: { clientId: 'b', attributeKey: 'content', offset: 3 },
+			end: { clientId: 'a', attributeKey: 'content', offset: 6 },
+		} );
+		expect( readMultiBlockSelection( selectors ) ).toEqual( [
+			{ clientId: 'a', attributeKey: 'content', start: 6, end: 11 },
+			{ clientId: 'b', attributeKey: 'content', start: 0, end: 3 },
+		] );
+	} );
+
+	it( 'gives an interior block with no rich-text attribute a block-level anchor', () => {
+		const selectors = makeSelectors( {
+			blocks: [
+				{ clientId: 'a', content: 'Hello world' },
+				{ clientId: 'b', attributes: { url: 'https://x.png' } },
+				{ clientId: 'c', content: 'Last one' },
+			],
+			start: { clientId: 'a', attributeKey: 'content', offset: 6 },
+			end: { clientId: 'c', attributeKey: 'content', offset: 4 },
+		} );
+		expect( readMultiBlockSelection( selectors ) ).toEqual( [
+			{ clientId: 'a', attributeKey: 'content', start: 6, end: 11 },
+			{ clientId: 'b', attributeKey: null, start: null, end: null },
+			{ clientId: 'c', attributeKey: 'content', start: 0, end: 4 },
+		] );
+	} );
+
+	it( 'anchors a boundary block at the block level when its range is empty', () => {
+		const selectors = makeSelectors( {
+			blocks: [
+				{ clientId: 'a', content: 'Hello world' }, // 11
+				{ clientId: 'b', content: 'Second' },
+			],
+			// Caret sits at the very end of block a: nothing to mark there.
+			start: { clientId: 'a', attributeKey: 'content', offset: 11 },
+			end: { clientId: 'b', attributeKey: 'content', offset: 3 },
+		} );
+		expect( readMultiBlockSelection( selectors ) ).toEqual( [
+			{ clientId: 'a', attributeKey: null, start: null, end: null },
+			{ clientId: 'b', attributeKey: 'content', start: 0, end: 3 },
+		] );
 	} );
 } );
 
@@ -1051,5 +1240,151 @@ describe( 'getNoteMarkerSelector / noteFormat', () => {
 		marker.setAttribute( noteFormat.attributes[ 'data-id' ], '7' );
 
 		expect( marker.matches( getNoteMarkerSelector( 7 ) ) ).toBe( true );
+	} );
+} );
+
+describe( 'getThreadsForBlock', () => {
+	it( 'returns an empty list when no thread touches the block', () => {
+		const threads = [
+			{ id: 1, blockClientId: 'a', blockClientIds: [ 'a' ] },
+		];
+		expect( getThreadsForBlock( threads, 'z' ) ).toEqual( [] );
+	} );
+
+	it( 'matches a single-block note on its anchor', () => {
+		const threads = [
+			{ id: 1, blockClientId: 'a', blockClientIds: [ 'a' ] },
+		];
+		expect( getThreadsForBlock( threads, 'a' ) ).toEqual( [
+			threads[ 0 ],
+		] );
+	} );
+
+	it( 'matches a multi-block note on every block it spans, not just the anchor', () => {
+		const threads = [
+			{ id: 1, blockClientId: 'a', blockClientIds: [ 'a', 'b', 'c' ] },
+		];
+		expect( getThreadsForBlock( threads, 'a' ) ).toEqual( [
+			threads[ 0 ],
+		] );
+		expect( getThreadsForBlock( threads, 'b' ) ).toEqual( [
+			threads[ 0 ],
+		] );
+		expect( getThreadsForBlock( threads, 'c' ) ).toEqual( [
+			threads[ 0 ],
+		] );
+	} );
+
+	it( 'falls back to blockClientId when blockClientIds is missing', () => {
+		const threads = [ { id: 1, blockClientId: 'a' } ];
+		expect( getThreadsForBlock( threads, 'a' ) ).toEqual( [
+			threads[ 0 ],
+		] );
+		expect( getThreadsForBlock( threads, 'b' ) ).toEqual( [] );
+	} );
+
+	it( 'ignores orphaned threads with no anchor at all', () => {
+		const threads = [ { id: 1, blockClientId: null, blockClientIds: [] } ];
+		expect( getThreadsForBlock( threads, 'a' ) ).toEqual( [] );
+	} );
+
+	it( 'returns every thread touching the block, in list order', () => {
+		const threads = [
+			{ id: 1, blockClientId: 'a', blockClientIds: [ 'a', 'b' ] },
+			{ id: 2, blockClientId: 'b', blockClientIds: [ 'b' ] },
+			{ id: 3, blockClientId: 'c', blockClientIds: [ 'c' ] },
+		];
+		expect( getThreadsForBlock( threads, 'b' ) ).toEqual( [
+			threads[ 0 ],
+			threads[ 1 ],
+		] );
+	} );
+} );
+
+describe( 'selectNoteBlocks', () => {
+	const orderSelectors = ( order: string[] ) => ( {
+		getBlockRootClientId: () => '',
+		getBlockOrder: () => order,
+	} );
+
+	it( 'does nothing when the thread has no anchor', () => {
+		const selectBlock = vi.fn();
+		const multiSelect = vi.fn();
+		selectNoteBlocks(
+			{ id: 1, blockClientId: null, blockClientIds: [] },
+			{ selectBlock, multiSelect }
+		);
+		expect( selectBlock ).not.toHaveBeenCalled();
+		expect( multiSelect ).not.toHaveBeenCalled();
+	} );
+
+	it( 'selects the single block of a single-block note', () => {
+		const selectBlock = vi.fn();
+		const multiSelect = vi.fn();
+		selectNoteBlocks(
+			{ id: 1, blockClientId: 'a', blockClientIds: [ 'a' ] },
+			{ selectBlock, multiSelect }
+		);
+		expect( selectBlock ).toHaveBeenCalledWith( 'a', null );
+		expect( multiSelect ).not.toHaveBeenCalled();
+	} );
+
+	it( 'multi-selects a contiguous run of spanned blocks', () => {
+		const selectBlock = vi.fn();
+		const multiSelect = vi.fn();
+		selectNoteBlocks(
+			{ id: 1, blockClientId: 'a', blockClientIds: [ 'a', 'b', 'c' ] },
+			{
+				selectBlock,
+				multiSelect,
+				...orderSelectors( [ 'a', 'b', 'c', 'd' ] ),
+			}
+		);
+		expect( selectBlock ).toHaveBeenCalledWith( 'a', null );
+		expect( multiSelect ).toHaveBeenCalledWith( 'a', 'c', null );
+	} );
+
+	it( 'does not multi-select across a block the note does not span', () => {
+		const selectBlock = vi.fn();
+		const multiSelect = vi.fn();
+		// 'x' was inserted between two spanned blocks; multi-selecting a..c
+		// would light it up as part of the note.
+		selectNoteBlocks(
+			{ id: 1, blockClientId: 'a', blockClientIds: [ 'a', 'c' ] },
+			{
+				selectBlock,
+				multiSelect,
+				...orderSelectors( [ 'a', 'x', 'c' ] ),
+			}
+		);
+		expect( selectBlock ).toHaveBeenCalledWith( 'a', null );
+		expect( multiSelect ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does not multi-select when the spanned blocks are not siblings', () => {
+		const selectBlock = vi.fn();
+		const multiSelect = vi.fn();
+		selectNoteBlocks(
+			{ id: 1, blockClientId: 'a', blockClientIds: [ 'a', 'b' ] },
+			{
+				selectBlock,
+				multiSelect,
+				getBlockRootClientId: ( clientId: string ) =>
+					clientId === 'a' ? '' : 'group',
+				getBlockOrder: () => [ 'a', 'b' ],
+			}
+		);
+		expect( selectBlock ).toHaveBeenCalledWith( 'a', null );
+		expect( multiSelect ).not.toHaveBeenCalled();
+	} );
+
+	it( 'multi-selects without order selectors, preserving prior behaviour', () => {
+		const selectBlock = vi.fn();
+		const multiSelect = vi.fn();
+		selectNoteBlocks(
+			{ id: 1, blockClientId: 'a', blockClientIds: [ 'a', 'c' ] },
+			{ selectBlock, multiSelect }
+		);
+		expect( multiSelect ).toHaveBeenCalledWith( 'a', 'c', null );
 	} );
 } );

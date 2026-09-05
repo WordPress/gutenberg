@@ -1,7 +1,22 @@
+import type { ReactNode } from 'react';
 import { Stack } from '@wordpress/ui';
 import { NoteByline } from './note-byline';
+import type { Thread } from './utils';
 
-export function NoteCard( { note, actions, className, children, ...props } ) {
+type NoteCardProps = {
+	note?: Thread;
+	actions?: ReactNode;
+	className?: string;
+	children?: ReactNode;
+} & Record< string, any >;
+
+export function NoteCard( {
+	note,
+	actions,
+	className,
+	children,
+	...props
+}: NoteCardProps ) {
 	return (
 		<Stack direction="column" gap="sm" className={ className } { ...props }>
 			<Stack direction="row" align="center" justify="flex-start" gap="md">

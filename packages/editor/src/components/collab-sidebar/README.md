@@ -12,36 +12,36 @@ Notes are stored as WordPress comments (`type: 'note'`) attached to the post. A 
 ```
 collab-sidebar/
 ├── README.md                       this file
-├── index.jsx                        NotesSidebarContainer → NotesSidebar (entry, toolbar slot fills)
-├── notes.jsx                        Notes - coordinator (outer Stack, actions, keyboard nav)
-├── note-thread.jsx                  NoteThread - per-thread (selection, floating registration, reply form)
+├── index.tsx                        NotesSidebarContainer → NotesSidebar (entry, toolbar slot fills)
+├── notes.tsx                        Notes - coordinator (outer Stack, actions, keyboard nav)
+├── note-thread.tsx                  NoteThread - per-thread (selection, floating registration, reply form)
 ├── note.jsx                         Note - per-card state (edit/delete mode, menu, dialog)
-├── note-card.jsx                    NoteCard - presentational shell (byline + actions slot + children)
+├── note-card.tsx                    NoteCard - presentational shell (byline + actions slot + children)
 ├── note-byline.jsx                  NoteByline - avatar + name + relative date
 ├── note-form.jsx                    NoteForm - rich text input + submit/cancel
-├── add-note.jsx                     AddNote - new-note surface (floating + template-locked cases)
-├── add-note-menu-item.jsx           AddNoteMenuItem - block-toolbar "Add note" trigger
+├── add-note.tsx                     AddNote - new-note surface (floating + template-locked cases)
+├── add-note-menu-item.tsx           AddNoteMenuItem - block-toolbar "Add note" trigger
 ├── note-indicator-toolbar.jsx       NoteAvatarIndicator - toolbar participants avatars
-├── floating-container.jsx           FloatingContainer - stack wrapper that applies `top` in floating mode
+├── floating-container.tsx           FloatingContainer - stack wrapper that applies `top` in floating mode
 │
-├── hooks.js                        useNoteThreads, useNoteActions, useFloatingBoard, useEnableFloatingSidebar
-├── utils.js                        focusNoteThread, getNoteExcerpt, sanitizeNoteContent, calculateNotePositions, getAvatarBorderColor
+├── hooks.ts                        useNoteThreads, useNoteActions, useFloatingBoard, useEnableFloatingSidebar
+├── utils.ts                        focusNoteThread, getNoteExcerpt, sanitizeNoteContent, calculateNotePositions, getAvatarBorderColor
 ├── board-store.js                  createBoardStore - ResizeObserver + ref registry for floating layout
 ├── constants.js                    sidebar identifier strings
 ├── style.scss
 └── test/
-    └── utils.js
+    └── utils.jsdom.test.ts
 ```
 
 ## Component hierarchy
 
 ```
-NotesSidebarContainer (index.jsx)         - gates on post type support
- └── NotesSidebar (index.jsx)             - owns sidebarRef + useNoteThreads + sidebar registration
+NotesSidebarContainer (index.tsx)         - gates on post type support
+ └── NotesSidebar (index.tsx)             - owns sidebarRef + useNoteThreads + sidebar registration
       ├── AddNoteMenuItem                - slot fill in the block toolbar
       ├── NoteAvatarIndicator            - slot fill in the block toolbar (per-thread avatars)
       ├── PluginSidebar (all-notes)      - full sidebar
-      │    └── Notes (notes.jsx)          - owns outer Stack + aria-label + useNoteActions + keyboard nav
+      │    └── Notes (notes.tsx)          - owns outer Stack + aria-label + useNoteActions + keyboard nav
       │         ├── AddNote              - rendered when no threads (template-locked) or selectedNote === 'new'
       │         └── NoteThread[]         - per thread
       │              └── <FloatingContainer>
@@ -90,19 +90,19 @@ API:
 
 The store owns DOM references directly, not through React - floating note height changes must update layout without re-rendering the thread list.
 
-### 2. `useFloatingBoard` - the React bridge (in `hooks.js`)
+### 2. `useFloatingBoard` - the React bridge (in `hooks.ts`)
 
 Lives inside `Notes`. Holds one store instance (`useState(createBoardStore)`) and:
 
 1. Subscribes to `heights` via `useSyncExternalStore(store.subscribe, store.getSnapshot)`.
 2. In a `useEffect` keyed on `threads + heights + selectedNoteId + isFloating + sidebarRef`:
    - Resolves the canvas scroll container by climbing from the first registered block to `.is-root-container` and calling `getScrollContainer()` on it.
-   - Schedules a single `requestAnimationFrame` that calls `calculateNotePositions({ threads, selectedNoteId, blockRects: store.getAnchorRects(), heights, scrollTop })` (pure function in `utils.js`) and stores the result in React state (`notePositions`).
+   - Schedules a single `requestAnimationFrame` that calls `calculateNotePositions({ threads, selectedNoteId, blockRects: store.getAnchorRects(), heights, scrollTop })` (pure function in `utils.ts`) and stores the result in React state (`notePositions`).
    - Observes `.is-root-container` with a `ResizeObserver` that reschedules that same frame, so editing, adding or removing any block re-anchors the threads after it. One observation covers the whole canvas, and it only exists while the board is floating.
    - Attaches a capture-phase `scroll` listener on the canvas's `defaultView` that writes a CSS variable `--canvas-scroll` to the sidebar panel. (`window` capture catches scrolls on the document root, which don't bubble.)
 3. Returns `{ notePositions, registerThread, unregisterThread }` - the positions flow down as props; the two register callbacks flow to each `NoteThread`.
 
-### 3. `calculateNotePositions` - pure layout math (in `utils.js`)
+### 3. `calculateNotePositions` - pure layout math (in `utils.ts`)
 
 Given the list of threads, the currently selected note id, the block rects, the floating heights, and the canvas scroll offset, returns `{ positions: { [noteId]: top } }` where `top` is the final canvas-space y-coordinate for each floating thread.
 

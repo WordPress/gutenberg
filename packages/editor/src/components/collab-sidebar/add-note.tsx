@@ -1,25 +1,44 @@
+import type { MutableRefObject } from 'react';
 import { __ } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
 import { __experimentalUseFocusOutside as useFocusOutside } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	store as blockEditorStore,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
+// @ts-expect-error - No type declarations available for @wordpress/block-editor
+// prettier-ignore
+import { store as blockEditorStore, privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
 import { FloatingContainer } from './floating-container';
+import type { FloatingPosition } from './floating-container';
 import { focusNoteThread } from './utils';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
-export function AddNote( { onSubmit, sidebarRef, floating } ) {
+export function AddNote( {
+	onSubmit,
+	sidebarRef,
+	floating,
+}: {
+	onSubmit: ( note: { content: string; parent?: number } ) => Promise< any >;
+	sidebarRef: MutableRefObject< HTMLElement | null >;
+	floating?: FloatingPosition;
+} ) {
+	/*
+	 * The form's anchor block. A note taken over several blocks keeps the whole
+	 * run multi-selected so the spotlight leaves every spanned block lit, and
+	 * `getSelectedBlockClientId` reports nothing while a multi-selection is
+	 * live - fall back to the first block of the run, which is the anchor.
+	 */
 	const { clientId } = useSelect( ( select ) => {
-		const { getSelectedBlockClientId } = select( blockEditorStore );
+		const { getSelectedBlockClientId, getSelectedBlockClientIds } =
+			select( blockEditorStore );
 		return {
-			clientId: getSelectedBlockClientId(),
+			clientId:
+				getSelectedBlockClientId() ??
+				getSelectedBlockClientIds()?.[ 0 ] ??
+				null,
 		};
 	}, [] );
 	const selectedNote = useSelect(
@@ -28,7 +47,9 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 	);
 	const blockElement = useBlockElement( clientId );
 	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
-	const { selectNote } = unlock( useDispatch( editorStore ) );
+	const { selectNote, setPendingNoteSegments } = unlock(
+		useDispatch( editorStore )
+	);
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
 	const isSubmittingRef = useRef( false );
 
@@ -60,11 +81,15 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 		if ( getSelectedNote() === 'new' ) {
 			toggleBlockSpotlight( clientId, false );
 			selectNote( undefined );
+			// Drop any captured multi-block segments for the abandoned note.
+			setPendingNoteSegments( null );
 		}
 	} );
 
 	const unselectNote = () => {
 		selectNote( undefined );
+		// Drop any captured multi-block segments for the abandoned note.
+		setPendingNoteSegments( null );
 		blockElement?.focus();
 		toggleBlockSpotlight( clientId, false );
 	};
@@ -88,7 +113,7 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 		>
 			<NoteCard>
 				<NoteForm
-					onSubmit={ async ( inputComment ) => {
+					onSubmit={ async ( inputComment: string ) => {
 						isSubmittingRef.current = true;
 						try {
 							/*

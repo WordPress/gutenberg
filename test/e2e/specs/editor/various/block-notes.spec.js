@@ -1254,7 +1254,7 @@ test.describe( 'Block Notes', () => {
 
 	test.describe( 'Inline notes', () => {
 		// Mirrors AVATAR_BORDER_COLORS in packages/editor/src/components/
-		// collab-sidebar/utils.js. Duplicated so the test fails loudly if the
+		// collab-sidebar/utils.ts. Duplicated so the test fails loudly if the
 		// palette is changed without updating the e2e expectation.
 		const AVATAR_BORDER_COLORS = [
 			'#6F42C1',
@@ -2094,6 +2094,477 @@ test.describe( 'Block Notes', () => {
 			await page.keyboard.press( 'Escape' );
 			await expect( page.getByRole( 'listbox' ) ).toBeHidden();
 			await expect( textbox ).toBeFocused();
+		} );
+	} );
+
+	test.describe( 'Multi-block notes', () => {
+		// Establish a cross-block text selection spanning the first `blockCount`
+		// paragraphs, then open the multi-block "Add note" entry and submit a
+		// note. The inline rich-text "Add note" button is unavailable across a
+		// multi-block selection, so the entry point lives in the block options
+		// (⋮) menu. The selection is set through the store so it deterministically
+		// carries a text range into the first and last blocks (keyboard selection
+		// across blocks is sensitive to line-wrap and block-boundary offsets); the
+		// menu, form, and submit that follow are driven through the real UI.
+		async function addMultiBlockNote(
+			{ editor, page },
+			blockCount,
+			content
+		) {
+			await page.evaluate( ( count ) => {
+				const { dispatch, select } = window.wp.data;
+				const ids = select( 'core/block-editor' ).getBlockOrder();
+				dispatch( 'core/block-editor' ).selectionChange( {
+					start: {
+						clientId: ids[ 0 ],
+						attributeKey: 'content',
+						offset: 3,
+					},
+					end: {
+						clientId: ids[ count - 1 ],
+						attributeKey: 'content',
+						offset: 3,
+					},
+				} );
+			}, blockCount );
+
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await page
+				.getByRole( 'textbox', { name: 'New note', exact: true } )
+				.fill( content );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+			// Wait for the saved thread before returning: callers follow with key
+			// presses, which Playwright does not retry.
+			await expect(
+				page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'treeitem', { name: `Note: ${ content }` } )
+			).toBeVisible();
+		}
+
+		test( 'anchors one note to every block the selection spans', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'First paragraph.' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Second paragraph.' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Third paragraph.' },
+			} );
+
+			await addMultiBlockNote(
+				{ editor, page },
+				3,
+				'Spans three blocks'
+			);
+
+			// Exactly one thread is created for the cross-block note (not one
+			// per spanned block).
+			await expect(
+				page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'treeitem', {
+						name: 'Note: Spans three blocks',
+					} )
+			).toHaveCount( 1 );
+
+			// Every spanned block carries a marker, and all share one note id.
+			const marks = editor.canvas.locator( 'mark.wp-note' );
+			await expect( marks ).toHaveCount( 3 );
+			const ids = await marks.evaluateAll( ( els ) =>
+				els.map( ( el ) => el.getAttribute( 'data-id' ) )
+			);
+			expect( ids[ 0 ] ).toBeTruthy();
+			expect( new Set( ids ).size ).toBe( 1 );
+		} );
+
+		test( 'clears every block marker when the note is deleted', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Alpha block.' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Beta block.' },
+			} );
+
+			await addMultiBlockNote(
+				{ editor, page },
+				2,
+				'Delete across blocks'
+			);
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				2
+			);
+
+			// Deleting the note strips its marker from every block it spans,
+			// leaving the text untouched.
+			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Delete' );
+			await page
+				.getByRole( 'dialog' )
+				.getByRole( 'button', { name: 'Delete' } )
+				.click();
+
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				0
+			);
+			await expect(
+				editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} )
+			).toHaveText( [ 'Alpha block.', 'Beta block.' ] );
+		} );
+
+		test( 'keeps every spanned block lit when the note is selected', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Alpha block.' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Beta block.' },
+			} );
+			await addMultiBlockNote( { editor, page }, 2, 'Light them both' );
+
+			const blocks = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			const thread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: Light them both' } );
+
+			// The new note is focused and expanded; collapse it so that
+			// clicking it below runs a fresh selection.
+			await expect( thread ).toBeFocused();
+			await page.keyboard.press( 'Escape' );
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+
+			await thread.click();
+
+			// Selecting a note spotlights the canvas, dimming every block that
+			// isn't part of the selection.
+			await expect(
+				editor.canvas.locator( '.is-root-container' )
+			).toHaveClass( /is-focus-mode/ );
+
+			// The note spans both blocks, so both are selected and neither is
+			// dimmed - not just the anchor block.
+			await expect( blocks.nth( 0 ) ).toHaveClass( /is-multi-selected/ );
+			await expect( blocks.nth( 1 ) ).toHaveClass( /is-multi-selected/ );
+			await expect( blocks.nth( 0 ) ).toHaveCSS( 'opacity', '1' );
+			await expect( blocks.nth( 1 ) ).toHaveCSS( 'opacity', '1' );
+		} );
+
+		test( 'disables "Add note" when the selection includes a classic block', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Alpha block.' },
+			} );
+			await editor.insertBlock( { name: 'core/freeform' } );
+
+			// A note anchors to every block the selection spans, so a classic
+			// block anywhere in the range disables the entry the same way it
+			// does when that block is selected on its own.
+			await page.evaluate( () => {
+				const { dispatch, select } = window.wp.data;
+				const ids = select( 'core/block-editor' ).getBlockOrder();
+				dispatch( 'core/block-editor' ).multiSelect(
+					ids[ 0 ],
+					ids[ 1 ]
+				);
+			} );
+
+			await editor.clickBlockToolbarButton( 'Options' );
+			const menuItem = page
+				.getByRole( 'menu', { name: 'Options' } )
+				.getByRole( 'menuitem', { name: 'Add note' } );
+			await expect( menuItem ).toBeDisabled();
+			await expect(
+				page.getByText( 'Convert to blocks to add notes.' )
+			).toBeVisible();
+		} );
+
+		test( 'opens the existing note from a block the note merely spans', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Alpha block.' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Beta block.' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Gamma block.' },
+			} );
+			await addMultiBlockNote( { editor, page }, 3, 'Shared thread' );
+
+			const sidebar = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			await page.keyboard.press( 'Escape' );
+
+			// Click into the *last* spanned block, which carries the note id in
+			// its metadata but is not the note's anchor.
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.nth( 2 )
+				.click();
+
+			await page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'View notes' } )
+				.click();
+
+			// The existing thread opens; a blank "new note" form must not.
+			await expect(
+				sidebar.getByRole( 'treeitem', { name: 'Note: Shared thread' } )
+			).toHaveAttribute( 'aria-expanded', 'true' );
+			await expect(
+				sidebar.getByRole( 'textbox', {
+					name: 'New note',
+					exact: true,
+				} )
+			).toBeHidden();
+		} );
+
+		test( 'undoes the whole multi-block anchor in one step', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Alpha block.' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Beta block.' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Gamma block.' },
+			} );
+			await addMultiBlockNote( { editor, page }, 3, 'One undo step' );
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				3
+			);
+
+			// Anchoring writes every spanned block in a single dispatch, so one
+			// undo removes the whole anchor rather than leaving the note
+			// half-attached to the blocks it was written to first. Guards the
+			// guarantee itself, not just the dispatch that provides it.
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.first()
+				.click();
+			await pageUtils.pressKeys( 'primary+z' );
+
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				0
+			);
+			const noteIds = await page.evaluate( () =>
+				window.wp.data
+					.select( 'core/block-editor' )
+					.getBlocks()
+					.map( ( block ) => block.attributes.metadata?.noteId )
+			);
+			expect( noteIds ).toEqual( [ undefined, undefined, undefined ] );
+		} );
+
+		test( 'keeps every spanned block lit for a note spanning three blocks', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Alpha block.' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Beta block.' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Gamma block.' },
+			} );
+			await addMultiBlockNote( { editor, page }, 3, 'Light all three' );
+
+			const blocks = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			const thread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: Light all three' } );
+
+			// The new note is focused and expanded; collapse it so that
+			// clicking it below runs a fresh selection.
+			await expect( thread ).toBeFocused();
+			await page.keyboard.press( 'Escape' );
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+
+			await thread.click();
+
+			// Selecting a note spotlights the canvas, dimming every block that
+			// isn't part of the selection.
+			await expect(
+				editor.canvas.locator( '.is-root-container' )
+			).toHaveClass( /is-focus-mode/ );
+
+			// The note spans all three blocks, so the whole range - including
+			// the interior block - is selected and stays lit.
+			await expect( blocks.nth( 0 ) ).toHaveClass( /is-multi-selected/ );
+			await expect( blocks.nth( 1 ) ).toHaveClass( /is-multi-selected/ );
+			await expect( blocks.nth( 2 ) ).toHaveClass( /is-multi-selected/ );
+			await expect( blocks.nth( 0 ) ).toHaveCSS( 'opacity', '1' );
+			await expect( blocks.nth( 1 ) ).toHaveCSS( 'opacity', '1' );
+			await expect( blocks.nth( 2 ) ).toHaveCSS( 'opacity', '1' );
+		} );
+
+		// Four paragraphs, a note over the first three: the fourth is the
+		// control that proves the spotlight is on (it dims) while every
+		// spanned block stays lit.
+		async function insertFourParagraphs( editor ) {
+			for ( const content of [
+				'Alpha block.',
+				'Beta block.',
+				'Gamma block.',
+				'Delta block.',
+			] ) {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: { content },
+				} );
+			}
+		}
+
+		async function expectSpanLitAndRestDimmed( editor ) {
+			const blocks = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await expect(
+				editor.canvas.locator( '.is-root-container' )
+			).toHaveClass( /is-focus-mode/ );
+			await expect( blocks.nth( 0 ) ).toHaveCSS( 'opacity', '1' );
+			await expect( blocks.nth( 1 ) ).toHaveCSS( 'opacity', '1' );
+			await expect( blocks.nth( 2 ) ).toHaveCSS( 'opacity', '1' );
+			await expect( blocks.nth( 3 ) ).toHaveCSS( 'opacity', '0.2' );
+		}
+
+		test( 'keeps every spanned block lit while the new note form is open', async ( {
+			editor,
+			page,
+		} ) => {
+			await insertFourParagraphs( editor );
+
+			await page.evaluate( () => {
+				const { dispatch, select } = window.wp.data;
+				const ids = select( 'core/block-editor' ).getBlockOrder();
+				dispatch( 'core/block-editor' ).selectionChange( {
+					start: {
+						clientId: ids[ 0 ],
+						attributeKey: 'content',
+						offset: 3,
+					},
+					end: {
+						clientId: ids[ 2 ],
+						attributeKey: 'content',
+						offset: 3,
+					},
+				} );
+			} );
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await expect(
+				page.getByRole( 'textbox', { name: 'New note', exact: true } )
+			).toBeFocused();
+
+			// Opening the form spotlights the canvas; the whole selection the
+			// note is being taken over must stay lit, not only its first block.
+			await expectSpanLitAndRestDimmed( editor );
+		} );
+
+		test( 'keeps every spanned block lit when the note is opened from the block toolbar', async ( {
+			editor,
+			page,
+		} ) => {
+			await insertFourParagraphs( editor );
+			await addMultiBlockNote( { editor, page }, 3, 'Toolbar span' );
+
+			const thread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: Toolbar span' } );
+			await expect( thread ).toBeFocused();
+			await page.keyboard.press( 'Escape' );
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+
+			// Click into the middle spanned block, then open the note from
+			// its toolbar indicator.
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.nth( 1 )
+				.click();
+			await page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'View notes' } )
+				.click();
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+
+			await expectSpanLitAndRestDimmed( editor );
+		} );
+
+		test( 'outlines every spanned block when the note is hovered', async ( {
+			editor,
+			page,
+		} ) => {
+			await insertFourParagraphs( editor );
+			await addMultiBlockNote( { editor, page }, 3, 'Hover span' );
+
+			const thread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: Hover span' } );
+			await expect( thread ).toBeFocused();
+			await page.keyboard.press( 'Escape' );
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+
+			const blocks = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+
+			// Hovering the thread outlines every block the note covers.
+			await thread.hover();
+			await expect( blocks.nth( 0 ) ).toHaveClass( /is-highlighted/ );
+			await expect( blocks.nth( 1 ) ).toHaveClass( /is-highlighted/ );
+			await expect( blocks.nth( 2 ) ).toHaveClass( /is-highlighted/ );
+			await expect( blocks.nth( 3 ) ).not.toHaveClass( /is-highlighted/ );
+
+			// Leaving the thread clears the outline from all of them.
+			await page.mouse.move( 0, 0 );
+			await expect( blocks.nth( 0 ) ).not.toHaveClass( /is-highlighted/ );
+			await expect( blocks.nth( 1 ) ).not.toHaveClass( /is-highlighted/ );
+			await expect( blocks.nth( 2 ) ).not.toHaveClass( /is-highlighted/ );
 		} );
 	} );
 } );
