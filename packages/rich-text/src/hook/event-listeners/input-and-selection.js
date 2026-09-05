@@ -4,6 +4,7 @@ import { isCollapsed } from '../../is-collapsed';
 import { updateFormats } from '../../update-formats';
 import { ownsSelection } from '../../owns-selection';
 import { subscribeOwnedListener } from '../../subscribe-owned-listener';
+import { ZWNBSP } from '../../special-characters';
 import { unlock } from '../../lock-unlock';
 
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
@@ -28,30 +29,30 @@ const EMPTY_ACTIVE_FORMATS = [];
 const PLACEHOLDER_ATTR_NAME = 'data-rich-text-placeholder';
 
 /**
- * If the selection is set on the placeholder element, collapse the selection to
- * the start (before the placeholder).
+ * An empty field has a single caret position: before its padding. Browsers
+ * may resolve a caret after the padding character or on the placeholder
+ * element instead. The caret is then invisible, or, on iOS, the keyboard sees
+ * a character before it and does not capitalize.
  *
- * @param {Window} defaultView
+ * @param {HTMLElement} element
+ * @param {Selection}   selection
  */
-function fixPlaceholderSelection( defaultView ) {
-	const selection = defaultView.getSelection();
+function fixEmptySelection( element, selection ) {
 	const { anchorNode, anchorOffset } = selection;
 
-	if ( anchorNode.nodeType !== anchorNode.ELEMENT_NODE ) {
+	if ( ! anchorNode || ! element.contains( anchorNode ) ) {
 		return;
 	}
 
-	const targetNode = anchorNode.childNodes[ anchorOffset ];
+	const padding = Array.from( element.childNodes ).find(
+		( node ) => node.nodeType === node.TEXT_NODE && node.data === ZWNBSP
+	);
 
-	if (
-		! targetNode ||
-		targetNode.nodeType !== targetNode.ELEMENT_NODE ||
-		! targetNode.hasAttribute( PLACEHOLDER_ATTR_NAME )
-	) {
+	if ( ! padding || ( anchorNode === padding && anchorOffset === 0 ) ) {
 		return;
 	}
 
-	selection.collapseToStart();
+	selection.collapse( padding, 0 );
 }
 
 export default ( props ) => ( element ) => {
@@ -168,6 +169,10 @@ export default ( props ) => ( element ) => {
 		const { start, end, text } = createRecord();
 		const oldRecord = record.current;
 
+		if ( text.length === 0 ) {
+			fixEmptySelection( element, selection );
+		}
+
 		selectionSnapshot = {
 			anchorNode: selection.anchorNode,
 			anchorOffset: selection.anchorOffset,
@@ -185,13 +190,6 @@ export default ( props ) => ( element ) => {
 		}
 
 		if ( start === oldRecord.start && end === oldRecord.end ) {
-			// Sometimes the browser may set the selection on the placeholder
-			// element, in which case the caret is not visible. We need to set
-			// the caret before the placeholder if that's the case.
-			if ( oldRecord.text.length === 0 && start === 0 ) {
-				fixPlaceholderSelection( defaultView );
-			}
-
 			return;
 		}
 
