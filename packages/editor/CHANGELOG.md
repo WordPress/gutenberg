@@ -21,6 +21,7 @@
 ### Bug Fixes
 
 -   More menu: Align SVG prefix icons with item labels using `Menu.PrefixIcon`, preserving Dashicon and custom component support. ([#82346](https://github.com/WordPress/gutenberg/pull/82346))
+-   Keep closed publish and save panel controls at the top of their full-height navigation regions ([#81395](https://github.com/WordPress/gutenberg/pull/81395)).
 -   Attach media an Image or Gallery block displays to the post on save, when it is not already attached to another post, matching what uploading into that post has always done ([#81977](https://github.com/WordPress/gutenberg/pull/81977)).
 -   Color the welcome guide's hovered button icon with `color` rather than `fill`, so stroke-based icons follow it. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
 -   `EditorInterface`: Apply the `showListViewByDefault` preference when the editor enters edit mode, so every editor built on the package honors it — including the extensible site editor, which previously ignored it. The logic moves here from `edit-post` and `edit-site`.

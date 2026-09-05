@@ -144,9 +144,7 @@ export default function SavePanel() {
 	const disabled = isSaving || ! activateSaveEnabled;
 	return (
 		<NavigableRegion
-			className={ clsx( 'edit-site-layout__actions', {
-				'is-entity-save-view-open': isSaveViewOpen,
-			} ) }
+			className="edit-site-layout__actions"
 			ariaLabel={ __( 'Save panel' ) }
 		>
 			<div

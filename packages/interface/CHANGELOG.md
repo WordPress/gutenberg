@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `InterfaceSkeleton`: Keep focused publish and save navigation regions at full height when their panels are closed ([#81395](https://github.com/WordPress/gutenberg/pull/81395)).
+
 ### Internal
 
 -   `ComplementaryAreaMoreMenuItem`: Stop passing a `selectedIcon`. The component the item renders as shows the selection ([#81564](https://github.com/WordPress/gutenberg/pull/81564)).
