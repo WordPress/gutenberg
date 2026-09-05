@@ -17,7 +17,7 @@ function getContent() {
 		// application.
 		return select( editorStore ).getEditedPostContent();
 	} catch {}
-	// The site editor has routes that never mount an editor.
+	// Serializing the blocks can throw too, and copying 'undefined' helps nobody.
 	return '';
 }
 
