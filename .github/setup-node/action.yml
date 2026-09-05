@@ -4,6 +4,9 @@ inputs:
     node-version:
         description: 'Optional. The Node.js version to use. When not specified, the version specified in .nvmrc will be used.'
         required: false
+    enable-caching:
+        description: 'Whether to enable and configure caching for npm.'
+        default: 'true'
 
 runs:
     using: 'composite'
@@ -13,12 +16,12 @@ runs:
           with:
               node-version-file: ${{ inputs.node-version == '' && '.nvmrc' || '' }}
               node-version: ${{ inputs.node-version }}
-              check-latest: true
-              # Caching for npm dependencies is automatically enabled when package.json contains devEngines.packageManager field set to npm
-              # cache: npm
+              package-manager-cache: ${{ inputs.enable-caching == 'true' && 'true' || 'false' }}
+              # Caching for npm dependencies is automatically enabled when package.json contains devEngines.packageManager field set to npm.
               cache-dependency-path: |
                   package-lock.json
                   patches/**
+              check-latest: true
 
         - name: Set up npm
           uses: ./.github/setup-npm
@@ -32,6 +35,7 @@ runs:
 
         - name: Cache node_modules
           id: cache-node_modules
+          if: ${{ inputs.enable-caching == 'true' }}
           uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
           with:
               # List workspace node_modules explicitly to support all kinds of layouts - hoisted and isolated.
@@ -61,7 +65,7 @@ runs:
         # On cache hit, we run the post-install script to match the native `npm ci` behavior.
         # An example of this is to patch `node_modules` using patch-package.
         - name: Post-install
-          if: ${{ steps.cache-node_modules.outputs.cache-hit == 'true' }}
+          if: ${{ inputs.enable-caching == 'true' && steps.cache-node_modules.outputs.cache-hit == 'true' }}
           run: |
               # Run the post-install script for the root project.
               npm run postinstall

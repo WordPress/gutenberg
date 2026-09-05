@@ -26,6 +26,8 @@ jobs:
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
+              with:
+                  enable-caching: 'false'
 
             - name: Build Storybook
               env:
