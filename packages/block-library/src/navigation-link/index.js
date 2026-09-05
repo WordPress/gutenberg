@@ -1,14 +1,15 @@
 import { _x, __, sprintf } from '@wordpress/i18n';
 import { customLink as linkIcon } from '@wordpress/icons';
-import { InnerBlocks } from '@wordpress/block-editor';
 import { addFilter } from '@wordpress/hooks';
 import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
+import deprecated from './deprecated';
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import edit from './edit';
 import save from './save';
 import { enhanceNavigationLinkVariations } from './hooks';
 import transforms from './transforms';
+import variations from './variations';
 import { unlock } from '../lock-unlock';
 
 const { fieldsKey, formKey } = unlock( blocksPrivateApis );
@@ -56,50 +57,9 @@ export const settings = {
 		},
 	},
 
-	deprecated: [
-		{
-			isEligible( attributes ) {
-				return attributes.nofollow;
-			},
-
-			attributes: {
-				label: {
-					type: 'string',
-				},
-				type: {
-					type: 'string',
-				},
-				nofollow: {
-					type: 'boolean',
-				},
-				description: {
-					type: 'string',
-				},
-				id: {
-					type: 'number',
-				},
-				opensInNewTab: {
-					type: 'boolean',
-					default: false,
-				},
-				url: {
-					type: 'string',
-				},
-			},
-
-			migrate( { nofollow, ...rest } ) {
-				return {
-					rel: nofollow ? 'nofollow' : '',
-					...rest,
-				};
-			},
-
-			save() {
-				return <InnerBlocks.Content />;
-			},
-		},
-	],
+	deprecated,
 	transforms,
+	variations,
 };
 
 if ( window.__experimentalContentOnlyInspectorFields ) {
