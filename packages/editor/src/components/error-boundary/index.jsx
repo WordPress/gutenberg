@@ -17,7 +17,12 @@ function getContent() {
 		// application.
 		return select( editorStore ).getEditedPostContent();
 	} catch {}
-	// Serializing the blocks can throw too, and copying 'undefined' helps nobody.
+	// Only reached when the retrieval itself throws: the selector already returns
+	// '' of its own accord when no post is loaded. Serializing the blocks can
+	// fail, and the blocks are exactly what tends to be broken once a boundary
+	// has caught something. Returning nothing here would put the string
+	// 'undefined' on the clipboard, as `useCopyToClipboard` hands the value to
+	// `writeText` unchanged.
 	return '';
 }
 
