@@ -139,7 +139,6 @@ export const parameters = {
 					'Utilities',
 					'Deprecated',
 				],
-				'Tokens',
 				'Editor',
 				[
 					'Block Editor',
