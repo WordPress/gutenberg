@@ -40,6 +40,16 @@ $indeterminate-indicator-width: 50%;
 		animation: indeterminate-slide 1.5s ease-in-out infinite;
 		transition: none;
 	}
+
+	@media (prefers-reduced-motion: reduce) {
+		transition-duration: 0.8s;
+		transition-timing-function: steps(4, end);
+
+		&.is-indeterminate {
+			animation-duration: 3s;
+			animation-timing-function: steps(4, end);
+		}
+	}
 }
 
 @keyframes indeterminate-slide {
