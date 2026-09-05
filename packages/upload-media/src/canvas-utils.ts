@@ -3,6 +3,16 @@ import { parseHeic } from './heic-parser';
 import { getHeicUnsupportedMessage } from './heic-support';
 
 /**
+ * Some platforms (e.g. Windows without the HEVC extension) have
+ * ImageDecoder.isTypeSupported() optimistically report HEIC support based on
+ * container-format detection alone. When the underlying platform codec isn't
+ * actually available, decoder.decode() doesn't reject, it just never settles.
+ * This timeout guards against that by force-closing the decoder, which per
+ * the WebCodecs spec rejects any of its pending decode() calls.
+ */
+const IMAGE_DECODER_TIMEOUT = 3000;
+
+/**
  * Converts an image file to JPEG using the browser's native decoder and canvas.
  *
  * Tries three decoding strategies:
@@ -58,15 +68,26 @@ export async function canvasConvertToJpeg(
 	// Strategy 2: WebCodecs ImageDecoder API.
 	// Uses platform codecs (e.g., macOS HEIC support) that may not be
 	// exposed through createImageBitmap or <img> elements.
-	if ( typeof ImageDecoder !== 'undefined' ) {
+	if ( file.type && typeof ImageDecoder !== 'undefined' ) {
 		const supported = await ImageDecoder.isTypeSupported( file.type );
 		if ( supported ) {
 			const decoder = new ImageDecoder( {
 				type: file.type,
 				data: file.stream(),
 			} );
+			let timeoutId: ReturnType< typeof setTimeout > | undefined;
 			try {
-				const { image: videoFrame } = await decoder.decode();
+				const { image: videoFrame } = await Promise.race( [
+					decoder.decode(),
+					new Promise< never >( ( _resolve, reject ) => {
+						timeoutId = setTimeout( () => {
+							decoder.close();
+							reject(
+								new Error( 'ImageDecoder decode timed out' )
+							);
+						}, IMAGE_DECODER_TIMEOUT );
+					} ),
+				] );
 				try {
 					const canvas = new OffscreenCanvas(
 						videoFrame.displayWidth,
@@ -91,8 +112,16 @@ export async function canvasConvertToJpeg(
 				} finally {
 					videoFrame.close();
 				}
+			} catch {
+				// decode() rejected, timed out, or the platform doesn't
+				// actually support the codec. Fall through to strategy 3.
 			} finally {
-				decoder.close();
+				clearTimeout( timeoutId );
+				try {
+					decoder.close();
+				} catch {
+					// Already closed by the timeout handler above.
+				}
 			}
 		}
 	}
