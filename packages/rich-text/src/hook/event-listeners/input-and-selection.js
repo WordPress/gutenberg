@@ -277,6 +277,9 @@ export default ( props ) => ( element ) => {
 					selection.collapse( element, 0 );
 				}
 			}
+			// The caret placed after this focus must still be synchronized
+			// in this task (see below).
+			window.queueMicrotask( handleSelectionChange );
 			return;
 		}
 
