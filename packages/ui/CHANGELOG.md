@@ -43,6 +43,7 @@
 
 ### Documentation
 
+-   `Menu`: Add guidance for migrating menus that accept items from other packages or extension APIs ([#81821](https://github.com/WordPress/gutenberg/pull/81821)).
 -   Add a Form best practices Storybook page for labeling composed controls ([#82197](https://github.com/WordPress/gutenberg/pull/82197)).
 
 ### Internal
