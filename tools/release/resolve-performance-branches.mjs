@@ -16,7 +16,7 @@ import { sanitizeBranchName } from './lib/sanitize-branch-name.js';
  * The commit trunk is compared against; must be updated on every WP major release, see
  * https://developer.wordpress.org/block-editor/explanations/architecture/performance/#update-the-reference-commit.
  */
-export const REFERENCE_COMMIT = '28d414f1327652e2b49e784ddc12098768991c62';
+export const REFERENCE_COMMIT = '601575c5de46876fad9c086b9712ed1e69919ec3';
 
 const SHA_PATTERN = /^[0-9a-f]{40}$/;
 

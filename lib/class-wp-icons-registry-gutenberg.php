@@ -1,5 +1,64 @@
 <?php
 
+/**
+ * Returns the SVG elements and attributes allowed for registered icons.
+ *
+ * @return array[] Allowed SVG elements and attributes.
+ * @phpstan-return array<non-falsy-string, array<non-falsy-string, true>>
+ */
+function gutenberg_get_allowed_icon_svg_tags(): array {
+	$stroke_attributes = array(
+		'style'             => true,
+		'stroke'            => true,
+		'stroke-width'      => true,
+		'stroke-linecap'    => true,
+		'stroke-linejoin'   => true,
+		'stroke-miterlimit' => true,
+		'vector-effect'     => true,
+	);
+
+	return array(
+		'svg'     => array_merge(
+			array(
+				'class'       => true,
+				'xmlns'       => true,
+				'width'       => true,
+				'height'      => true,
+				'viewbox'     => true,
+				'aria-hidden' => true,
+				'role'        => true,
+				'focusable'   => true,
+				'fill'        => true,
+				'fill-rule'   => true,
+				'clip-rule'   => true,
+			),
+			$stroke_attributes
+		),
+		'path'    => array_merge(
+			array(
+				'fill'      => true,
+				'fill-rule' => true,
+				'clip-rule' => true,
+				'd'         => true,
+				'transform' => true,
+			),
+			$stroke_attributes
+		),
+		'polygon' => array_merge(
+			array(
+				'fill'      => true,
+				'fill-rule' => true,
+				'clip-rule' => true,
+				'points'    => true,
+				'transform' => true,
+				'focusable' => true,
+			),
+			$stroke_attributes
+		),
+	);
+}
+
+
 class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	/**
 	 * Overridden to skip the parent's core icon registration, which uses the
