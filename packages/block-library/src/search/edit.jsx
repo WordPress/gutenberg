@@ -11,31 +11,21 @@ import {
 	useSettings,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
+import { useResizeObserver } from '@wordpress/compose';
+import { kebabCase } from '@wordpress/kebab-case';
 import {
 	SelectControl,
 	ToggleControl,
 	ResizableBox,
-	__experimentalUseCustomUnits as useCustomUnits,
-	__experimentalUnitControl as UnitControl,
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
 import { Icon } from '@wordpress/icons';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { speak } from '@wordpress/a11y';
 import { Path, SVG } from '@wordpress/primitives';
-import {
-	PC_WIDTH_DEFAULT,
-	PX_WIDTH_DEFAULT,
-	MIN_WIDTH,
-	isPercentageUnit,
-} from './utils.js';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 // Help text describing each wrapper element option. Kept local to the block
@@ -55,7 +45,14 @@ const TAG_NAME_MESSAGES = {
 // Used to calculate border radius adjustment to avoid "fat" corners when
 // button is placed inside wrapper.
 const DEFAULT_INNER_PADDING = '4px';
-const PERCENTAGE_WIDTHS = [ 25, 50, 75, 100 ];
+
+// Dimension presets are stored by reference, e.g. `var:preset|dimension|50`.
+const DIMENSION_PRESET_PREFIX = 'var:preset|dimension|';
+
+// Narrower than this and the field stops being usable, so dragging stops here.
+// Only dragging: a smaller value typed into the Width control is left alone,
+// and nothing constrains the width on the front end.
+const MIN_WIDTH = 220;
 
 // Keep this block-specific icon aligned with the PHP renderer. Unlike the
 // Search icon from @wordpress/icons, it remains fill-based so existing theme
@@ -78,8 +75,6 @@ export default function SearchEdit( {
 		label,
 		showLabel,
 		placeholder,
-		width,
-		widthUnit,
 		align,
 		buttonText,
 		buttonPosition,
@@ -147,8 +142,6 @@ export default function SearchEdit( {
 			wideSize: layout?.wideSize,
 		},
 	} );
-	const unitControlInstanceId = useInstanceId( UnitControl );
-	const unitControlInputId = `wp-block-search__width-${ unitControlInstanceId }`;
 	const isButtonPositionInside = 'button-inside' === buttonPosition;
 	const isButtonPositionOutside = 'button-outside' === buttonPosition;
 	const hasNoButton = 'no-button' === buttonPosition;
@@ -157,10 +150,57 @@ export default function SearchEdit( {
 	const searchFieldRef = useRef();
 	const buttonRef = useRef();
 
-	const units = useCustomUnits( {
-		availableUnits: [ '%', 'px' ],
-		defaultValues: { '%': PC_WIDTH_DEFAULT, px: PX_WIDTH_DEFAULT },
-	} );
+	// The width is applied to the inside wrapper as a plain CSS length, the
+	// same way `styles_for_block_core_search()` does on the server. Leaving it
+	// to CSS is what lets Global Styles, `em`, `rem` and preset values behave
+	// in the editor the way they do on the front end.
+	const width = style?.dimensions?.width;
+	const widthStyle = useMemo( () => {
+		// The attribute is free-form, so hand-written content can put anything
+		// here. `styles_for_block_core_search()` ignores a non-string width,
+		// and so does this. '0' is the Width control's "None" step rather than
+		// a zero-width field.
+		if ( typeof width !== 'string' || ! width || '0' === width ) {
+			return undefined;
+		}
+		if ( width.startsWith( DIMENSION_PRESET_PREFIX ) ) {
+			const slug = kebabCase(
+				width.slice( DIMENSION_PRESET_PREFIX.length )
+			);
+			return `var(--wp--preset--dimension--${ slug })`;
+		}
+		return width;
+	}, [ width ] );
+
+	// The resize handles sit in an overlay rather than on the wrapper itself.
+	// re-resizable always writes a width to its own element, so anything it
+	// renders in the flow would overwrite whatever CSS resolved to. Measuring
+	// the wrapper and sizing the overlay to match keeps the handles in the
+	// right place without touching the wrapper's own width.
+	const [ wrapperSize, setWrapperSize ] = useState( null );
+	const observeWrapper = useResizeObserver(
+		( [ entry ] ) => {
+			const { offsetWidth, offsetHeight } = entry.target;
+			setWrapperSize( { width: offsetWidth, height: offsetHeight } );
+		},
+		{ box: 'border-box' }
+	);
+
+	// Held while dragging so the wrapper follows the handle without writing an
+	// attribute on every pointer move.
+	const [ temporaryWidth, setTemporaryWidth ] = useState( null );
+
+	const setWidth = ( nextWidth ) => {
+		setAttributes( {
+			style: {
+				...style,
+				dimensions: {
+					...style?.dimensions,
+					width: nextWidth,
+				},
+			},
+		} );
+	};
 
 	const getBlockClassNames = () => {
 		return clsx(
@@ -334,8 +374,6 @@ export default function SearchEdit( {
 					label={ __( 'Settings' ) }
 					resetAll={ () => {
 						setAttributes( {
-							width: undefined,
-							widthUnit: undefined,
 							showLabel: true,
 							buttonUseIcon: false,
 							buttonPosition: 'button-outside',
@@ -406,87 +444,6 @@ export default function SearchEdit( {
 							/>
 						</ToolsPanelItem>
 					) }
-					<ToolsPanelItem
-						hasValue={ () => !! width }
-						label={ __( 'Width' ) }
-						onDeselect={ () => {
-							setAttributes( {
-								width: undefined,
-								widthUnit: undefined,
-							} );
-						} }
-						isShownByDefault
-					>
-						<VStack>
-							<UnitControl
-								label={ __( 'Width' ) }
-								id={ unitControlInputId } // Unused, kept for backwards compatibility
-								min={
-									isPercentageUnit( widthUnit )
-										? 0
-										: MIN_WIDTH
-								}
-								max={
-									isPercentageUnit( widthUnit )
-										? 100
-										: undefined
-								}
-								step={ 1 }
-								onChange={ ( newWidth ) => {
-									const parsedNewWidth =
-										newWidth === ''
-											? undefined
-											: parseInt( newWidth, 10 );
-									setAttributes( {
-										width: parsedNewWidth,
-									} );
-								} }
-								onUnitChange={ ( newUnit ) => {
-									setAttributes( {
-										width:
-											'%' === newUnit
-												? PC_WIDTH_DEFAULT
-												: PX_WIDTH_DEFAULT,
-										widthUnit: newUnit,
-									} );
-								} }
-								__unstableInputWidth="80px"
-								value={ `${ width }${ widthUnit }` }
-								units={ units }
-							/>
-							<ToggleGroupControl
-								label={ __( 'Percentage Width' ) }
-								value={
-									PERCENTAGE_WIDTHS.includes( width ) &&
-									widthUnit === '%'
-										? width
-										: undefined
-								}
-								hideLabelFromVision
-								onChange={ ( newWidth ) => {
-									setAttributes( {
-										width: newWidth,
-										widthUnit: '%',
-									} );
-								} }
-								isBlock
-							>
-								{ PERCENTAGE_WIDTHS.map( ( widthValue ) => {
-									return (
-										<ToggleGroupControlOption
-											key={ widthValue }
-											value={ widthValue }
-											label={ sprintf(
-												/* translators: %d: Percentage value. */
-												__( '%d%%' ),
-												widthValue
-											) }
-										/>
-									);
-								} ) }
-							</ToggleGroupControl>
-						</VStack>
-					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">
@@ -619,38 +576,54 @@ export default function SearchEdit( {
 					/>
 				) }
 
-				<ResizableBox
-					size={ {
-						width:
-							width === undefined
-								? 'auto'
-								: `${ width }${ widthUnit }`,
-						height: 'auto',
-					} }
+				<div
+					ref={ observeWrapper }
 					className={ clsx(
 						'wp-block-search__inside-wrapper',
 						isButtonPositionInside
 							? borderProps.className
 							: undefined
 					) }
-					style={ getWrapperStyles() }
-					minWidth={ MIN_WIDTH }
-					enable={ getResizableSides() }
-					onResizeStart={ ( event, direction, elt ) => {
-						setAttributes( {
-							width: parseInt( elt.offsetWidth, 10 ),
-							widthUnit: 'px',
-						} );
-						toggleSelection( false );
+					style={ {
+						...getWrapperStyles(),
+						width: temporaryWidth ?? widthStyle,
 					} }
-					onResizeStop={ ( event, direction, elt, delta ) => {
-						setAttributes( {
-							width: parseInt( width + delta.width, 10 ),
-						} );
-						toggleSelection( true );
-					} }
-					showHandle={ isSelected }
 				>
+					{ isSelected && wrapperSize && (
+						<ResizableBox
+							className="wp-block-search__resizer"
+							size={ wrapperSize }
+							// re-resizable writes `position: relative` inline, so
+							// only an inline style can override it. Placement
+							// lives in the stylesheet, where it gets flipped
+							// for RTL.
+							style={ { position: 'absolute' } }
+							// Applied only when the block is already at least
+							// this wide. Otherwise the overlay would be wider
+							// than the block it sits on and the handles would
+							// hang past its edge.
+							minWidth={
+								wrapperSize.width >= MIN_WIDTH
+									? MIN_WIDTH
+									: undefined
+							}
+							enable={ getResizableSides() }
+							onResizeStart={ () => toggleSelection( false ) }
+							onResize={ ( event, direction, elt ) =>
+								setTemporaryWidth(
+									`${ parseInt( elt.offsetWidth, 10 ) }px`
+								)
+							}
+							onResizeStop={ ( event, direction, elt ) => {
+								setWidth(
+									`${ parseInt( elt.offsetWidth, 10 ) }px`
+								);
+								setTemporaryWidth( null );
+								toggleSelection( true );
+							} }
+							showHandle
+						/>
+					) }
 					{ ( isButtonPositionInside ||
 						isButtonPositionOutside ||
 						hasOnlyButton ) && (
@@ -661,7 +634,7 @@ export default function SearchEdit( {
 					) }
 
 					{ hasNoButton && renderTextField() }
-				</ResizableBox>
+				</div>
 			</Wrapper>
 		</>
 	);
