@@ -4,7 +4,6 @@ import { isCollapsed } from '../../is-collapsed';
 import { updateFormats } from '../../update-formats';
 import { ownsSelection } from '../../owns-selection';
 import { subscribeOwnedListener } from '../../subscribe-owned-listener';
-import { ZWNBSP } from '../../special-characters';
 import { unlock } from '../../lock-unlock';
 
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
@@ -27,33 +26,6 @@ const INSERTION_INPUT_TYPES_TO_IGNORE = new Set( [
 const EMPTY_ACTIVE_FORMATS = [];
 
 const PLACEHOLDER_ATTR_NAME = 'data-rich-text-placeholder';
-
-/**
- * An empty field has a single caret position: before its padding. Browsers
- * may resolve a caret after the padding character or on the placeholder
- * element instead. The caret is then invisible, or, on iOS, the keyboard sees
- * a character before it and does not capitalize.
- *
- * @param {HTMLElement} element
- * @param {Selection}   selection
- */
-function fixEmptySelection( element, selection ) {
-	const { anchorNode, anchorOffset } = selection;
-
-	if ( ! anchorNode || ! element.contains( anchorNode ) ) {
-		return;
-	}
-
-	const padding = Array.from( element.childNodes ).find(
-		( node ) => node.nodeType === node.TEXT_NODE && node.data === ZWNBSP
-	);
-
-	if ( ! padding || ( anchorNode === padding && anchorOffset === 0 ) ) {
-		return;
-	}
-
-	selection.collapse( padding, 0 );
-}
 
 export default ( props ) => ( element ) => {
 	const { ownerDocument } = element;
@@ -169,10 +141,6 @@ export default ( props ) => ( element ) => {
 		const { start, end, text } = createRecord();
 		const oldRecord = record.current;
 
-		if ( text.length === 0 ) {
-			fixEmptySelection( element, selection );
-		}
-
 		selectionSnapshot = {
 			anchorNode: selection.anchorNode,
 			anchorOffset: selection.anchorOffset,
@@ -187,6 +155,16 @@ export default ( props ) => ( element ) => {
 		if ( text !== oldRecord.text ) {
 			onInput();
 			return;
+		}
+
+		// An empty field has a single caret position, but browsers may
+		// resolve a caret after the padding character or on the placeholder
+		// element. The caret is then invisible, or the iOS keyboard sees a
+		// character before it and does not capitalize. Apply the record's
+		// position right away: this runs in the task that placed the caret
+		// (see the focus handler), which is what the keyboard requires.
+		if ( text.length === 0 ) {
+			applyRecord( { ...oldRecord, start, end } );
 		}
 
 		if ( start === oldRecord.start && end === oldRecord.end ) {
