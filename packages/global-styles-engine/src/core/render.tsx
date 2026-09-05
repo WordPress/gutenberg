@@ -1711,6 +1711,15 @@ function renderStylesNode(
 		} );
 	}
 
+	// Column blocks size themselves with flex-basis rather than width because
+	// they live in a flex container. Extract the width before generating
+	// declarations so it can be output as flex-basis instead.
+	let columnFlexBasis: string | undefined;
+	if ( name === 'core/column' && styles?.dimensions?.width ) {
+		columnFlexBasis = getCSSValueFromRawStyle( styles.dimensions.width );
+		delete styles.dimensions.width;
+	}
+
 	// Process the remaining block styles (they use either normal block class or __experimentalSelector).
 	const styleDeclarations = getStylesDeclarations(
 		styles,
@@ -1719,6 +1728,17 @@ function renderStylesNode(
 		tree,
 		disableRootPadding
 	);
+
+	if ( columnFlexBasis ) {
+		// Columns without a width divide the remaining space between them via
+		// `flex-grow`. A column given a width should keep it instead, matching
+		// the behaviour of a width set on the block itself.
+		styleDeclarations.push(
+			`flex-basis:${ columnFlexBasis }`,
+			'flex-grow:0'
+		);
+	}
+
 	if ( styleDeclarations?.length ) {
 		const generalSelector = skipSelectorWrapper
 			? effectiveSelector

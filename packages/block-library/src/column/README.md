@@ -20,7 +20,6 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | Attribute | [Type](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
 | `verticalAlignment` | `string` | — | — |
-| `width` | `string` | — | — |
 | `templateLock` | `string \| boolean` | — | [Enum](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `all`, `insert`, `contentOnly`, `false` |
 
 ## Supports
@@ -45,6 +44,8 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`layout`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout): `true`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
+- [`dimensions`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#dimensions):
+  - `width`: `true`
 - [`allowedBlocks`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#allowedblocks): `true`
 
 ## Block Markup
@@ -52,8 +53,8 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 This is a [**static block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). The markup is saved directly in the post content.
 
 ```html
-<!-- wp:column -->
-<div class="wp-block-column">
+<!-- wp:column {"style":{"dimensions":{"width":"50%"}}} -->
+<div class="wp-block-column" style="flex-basis:50%">
 	<!-- wp:paragraph -->
 	<p>Column One, Paragraph One</p>
 	<!-- /wp:paragraph -->
