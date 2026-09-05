@@ -13,11 +13,17 @@ type InlineNoticesProps = {
 };
 
 function hasRenderableChildren( children: ReactNode ): boolean {
+	// More than one child arrives as an array, and each one is typically
+	// rendered conditionally, so the array is what has to be looked through:
+	// `[ false, false ]` is as empty as `false` is.
 	return (
-		children !== null &&
-		children !== undefined &&
-		children !== false &&
-		children !== ''
+		Array.isArray( children ) ? children.flat( Infinity ) : [ children ]
+	).some(
+		( child ) =>
+			child !== null &&
+			child !== undefined &&
+			typeof child !== 'boolean' &&
+			child !== ''
 	);
 }
 

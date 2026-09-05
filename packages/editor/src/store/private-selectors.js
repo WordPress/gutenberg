@@ -603,3 +603,14 @@ export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
 		);
 	}
 );
+
+/**
+ * Returns the notice for the last failed save, if one is showing.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {?Object} The notice, with its `message` and its `detail`, or `null`.
+ */
+export function getSaveErrorNotice( state ) {
+	return state.saveErrorNotice;
+}

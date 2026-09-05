@@ -12,6 +12,7 @@
 
 ### Enhancements
 
+-   Save failures: Offer the failure to the clipboard. A save error notice now renders as a component rather than as raw HTML in a notice string, so every failure carries a copy button, ready to paste into a search or an assistant. Where the server said more than the notice does, that detail sits behind a `Collapsible` disclosure and stays findable by the browser's find-in-page while collapsed. Markup in a server message is stripped rather than the message being dropped ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
 -   Post actions: Append an ellipsis (`…`) to the "Set as homepage" and "Set as posts page" action labels, which open a confirmation dialog, following the menu ellipsis guideline. The dialog titles keep the ellipsis-free wording. ([#81994](https://github.com/WordPress/gutenberg/pull/81994))
 
 ### Bug Fixes

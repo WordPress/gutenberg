@@ -479,6 +479,26 @@ export function selectedNote( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the notice for the last failed save, so the editor can
+ * render it as a component rather than as a notice string.
+ *
+ * The notices store only accepts plain strings as content, which leaves no way
+ * to offer the failure detail behind a disclosure or to copy it. Holding the
+ * failure here lets `SaveErrorNotice` render both.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ * @return {?Object} Updated state.
+ */
+export function saveErrorNotice( state = null, action ) {
+	switch ( action.type ) {
+		case 'SET_SAVE_ERROR_NOTICE':
+			return action.notice;
+	}
+	return state;
+}
+
 export default combineReducers( {
 	postId,
 	postType,
@@ -504,5 +524,6 @@ export default combineReducers( {
 	revisionPage,
 	showRevisionDiff,
 	selectedNote,
+	saveErrorNotice,
 	dataviews: dataviewsReducer,
 } );
