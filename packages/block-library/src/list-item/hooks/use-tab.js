@@ -3,12 +3,13 @@ import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 import { SPACE, TAB } from '@wordpress/keycodes';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useRegistry } from '@wordpress/data';
+import { isEntirelySelected } from '@wordpress/dom';
 import { indentListItems, outdentListItems } from '../utils';
 import { unlock } from '../../lock-unlock';
 
 const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
-export default function useSpace() {
+export default function useTab() {
 	const registry = useRegistry();
 
 	return useRefEffect(
@@ -19,7 +20,7 @@ export default function useSpace() {
 				if (
 					event.defaultPrevented ||
 					( keyCode !== SPACE && keyCode !== TAB ) ||
-					// Only override when no modifiers are pressed.
+					// Shift selects outdent; other modifiers pass through.
 					altKey ||
 					metaKey ||
 					ctrlKey
@@ -29,22 +30,21 @@ export default function useSpace() {
 
 				const { getSelectionStart, getSelectionEnd } =
 					registry.select( blockEditorStore );
-				const selectionStart = getSelectionStart();
-				const selectionEnd = getSelectionEnd();
+				const isAtStart =
+					getSelectionStart().offset === 0 &&
+					getSelectionEnd().offset === 0;
+
+				// Both keys act at the start of an item; Tab also acts on a
+				// full selection.
 				if (
-					selectionStart.offset === 0 &&
-					selectionEnd.offset === 0
+					! isAtStart &&
+					! ( keyCode === TAB && isEntirelySelected( element ) )
 				) {
-					if ( shiftKey ) {
-						// Note that backspace behaviour in defined in onMerge.
-						if ( keyCode === TAB ) {
-							if ( outdentListItems( registry ) ) {
-								event.preventDefault();
-							}
-						}
-					} else if ( indentListItems( registry ) ) {
-						event.preventDefault();
-					}
+					return;
+				}
+				const move = shiftKey ? outdentListItems : indentListItems;
+				if ( move( registry ) ) {
+					event.preventDefault();
 				}
 			}
 
