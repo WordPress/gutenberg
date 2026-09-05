@@ -1,3 +1,4 @@
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import {
 	RichTextData,
 	create,
@@ -27,6 +28,10 @@ import {
 } from '../utils';
 import type { BlockAttributes, Thread } from '../utils';
 import { noteFormat } from '../format';
+
+vi.hoisted( () => {
+	globalThis.wpVitest.mockMatchMedia();
+} );
 
 /*
  * `@wordpress/rich-text` is plain JavaScript with JSDoc types: its store
@@ -1303,8 +1308,8 @@ describe( 'selectNoteBlocks', () => {
 	} );
 
 	it( 'does nothing when the thread has no anchor', () => {
-		const selectBlock = jest.fn();
-		const multiSelect = jest.fn();
+		const selectBlock = vi.fn();
+		const multiSelect = vi.fn();
 		selectNoteBlocks(
 			{ id: 1, blockClientId: null, blockClientIds: [] },
 			{ selectBlock, multiSelect }
@@ -1314,8 +1319,8 @@ describe( 'selectNoteBlocks', () => {
 	} );
 
 	it( 'selects the single block of a single-block note', () => {
-		const selectBlock = jest.fn();
-		const multiSelect = jest.fn();
+		const selectBlock = vi.fn();
+		const multiSelect = vi.fn();
 		selectNoteBlocks(
 			{ id: 1, blockClientId: 'a', blockClientIds: [ 'a' ] },
 			{ selectBlock, multiSelect }
@@ -1325,8 +1330,8 @@ describe( 'selectNoteBlocks', () => {
 	} );
 
 	it( 'multi-selects a contiguous run of spanned blocks', () => {
-		const selectBlock = jest.fn();
-		const multiSelect = jest.fn();
+		const selectBlock = vi.fn();
+		const multiSelect = vi.fn();
 		selectNoteBlocks(
 			{ id: 1, blockClientId: 'a', blockClientIds: [ 'a', 'b', 'c' ] },
 			{
@@ -1340,8 +1345,8 @@ describe( 'selectNoteBlocks', () => {
 	} );
 
 	it( 'does not multi-select across a block the note does not span', () => {
-		const selectBlock = jest.fn();
-		const multiSelect = jest.fn();
+		const selectBlock = vi.fn();
+		const multiSelect = vi.fn();
 		// 'x' was inserted between two spanned blocks; multi-selecting a..c
 		// would light it up as part of the note.
 		selectNoteBlocks(
@@ -1357,8 +1362,8 @@ describe( 'selectNoteBlocks', () => {
 	} );
 
 	it( 'does not multi-select when the spanned blocks are not siblings', () => {
-		const selectBlock = jest.fn();
-		const multiSelect = jest.fn();
+		const selectBlock = vi.fn();
+		const multiSelect = vi.fn();
 		selectNoteBlocks(
 			{ id: 1, blockClientId: 'a', blockClientIds: [ 'a', 'b' ] },
 			{
@@ -1374,8 +1379,8 @@ describe( 'selectNoteBlocks', () => {
 	} );
 
 	it( 'multi-selects without order selectors, preserving prior behaviour', () => {
-		const selectBlock = jest.fn();
-		const multiSelect = jest.fn();
+		const selectBlock = vi.fn();
+		const multiSelect = vi.fn();
 		selectNoteBlocks(
 			{ id: 1, blockClientId: 'a', blockClientIds: [ 'a', 'c' ] },
 			{ selectBlock, multiSelect }

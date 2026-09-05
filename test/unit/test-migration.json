@@ -394,7 +394,6 @@
 			"packages/editor/src/components/collab-sidebar/rich-text-control/test/index.jsdom.test.tsx",
 			"packages/editor/src/components/collab-sidebar/test/board-store.jsdom.test.js",
 			"packages/editor/src/components/collab-sidebar/test/note-highlight-styles.jsdom.test.js",
-			"packages/editor/src/components/collab-sidebar/test/utils.jsdom.test.js",
 			"packages/editor/src/components/collaborators-overlay/test/cursor-dom-utils.jsdom.test.ts",
 			"packages/editor/src/components/collaborators-overlay/test/resolve-start-position.jsdom.test.ts",
 			"packages/editor/src/components/collaborators-presence/avatar-group/test/index.jsdom.test.tsx",
