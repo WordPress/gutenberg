@@ -17,6 +17,8 @@ function getContent() {
 		// application.
 		return select( editorStore ).getEditedPostContent();
 	} catch {}
+	// The site editor has routes that never mount an editor.
+	return '';
 }
 
 // A boundary catches whatever was thrown, which is not always an `Error`.
