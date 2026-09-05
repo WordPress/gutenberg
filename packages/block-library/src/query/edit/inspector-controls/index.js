@@ -49,7 +49,9 @@ export default function QueryInspectorControls( props ) {
 		orderBy,
 		author: authorIds,
 		pages,
-		postType,
+		// Match `build_query_vars_from_query_block()`, which queries posts when
+		// `query` has no post type.
+		postType = 'post',
 		perPage,
 		offset,
 		sticky,
@@ -179,7 +181,7 @@ export default function QueryInspectorControls( props ) {
 		isControlAllowed( allowedControls, 'excludeCurrent' );
 	const postTypeSingularName = useSelect(
 		( select ) =>
-			select( coreStore ).getPostType( postType )?.labels.singular_name,
+			select( coreStore ).getPostType( postType )?.labels?.singular_name,
 		[ postType ]
 	);
 
