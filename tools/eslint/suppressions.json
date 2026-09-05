@@ -6060,6 +6060,11 @@
 			"count": 1
 		}
 	},
+	"packages/editor/src/components/collab-sidebar/suggestion-actions.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
 	"packages/editor/src/components/collapsible-block-toolbar/index.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -7060,6 +7065,11 @@
 	"packages/editor/src/components/suggestion-mode/store-interceptor.ts": {
 		"react-hooks/refs": {
 			"count": 6
+		}
+	},
+	"packages/editor/src/components/suggestion-mode/suggestion-summary.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
 		}
 	},
 	"packages/editor/src/components/suggestion-mode/suggestion-undo-guard.ts": {

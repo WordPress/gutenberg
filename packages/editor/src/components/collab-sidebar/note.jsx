@@ -11,6 +11,9 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { moreVertical, published } from '@wordpress/icons';
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
+import SuggestionActions, {
+	SuggestionActionButtons,
+} from './suggestion-actions';
 import { unlock } from '../../lock-unlock';
 
 const { Menu } = unlock( componentsPrivateApis );
@@ -79,7 +82,11 @@ export function Note( {
 		}
 	}, [ rawContent ] );
 
-	const canResolve = note.parent === 0;
+	// Suggestion threads expose their own Accept/Reject affordance in the
+	// header; the generic "Resolve" button would duplicate that action with
+	// a confusingly similar checkmark icon, so hide it for suggestion notes.
+	const hasSuggestionPayload = !! note?.meta?._wp_suggestion;
+	const canResolve = note.parent === 0 && ! hasSuggestionPayload;
 	const isResolutionNote =
 		note.type === 'note' &&
 		note.meta &&
@@ -185,9 +192,13 @@ export function Note( {
 		);
 	}
 
-	const actions = isSelected ? (
+	const showActions = isSelected || hasSuggestionPayload;
+	const actions = showActions ? (
 		<>
-			{ canResolve && onResolve && (
+			{ hasSuggestionPayload && (
+				<SuggestionActionButtons thread={ note } />
+			) }
+			{ isSelected && canResolve && onResolve && (
 				<Button
 					label={ _x( 'Resolve', 'Mark note as resolved' ) }
 					size="small"
@@ -197,10 +208,12 @@ export function Note( {
 					onClick={ onResolve }
 				/>
 			) }
-			<NoteActionsMenu
-				items={ availableItems }
-				buttonRef={ actionButtonRef }
-			/>
+			{ isSelected && (
+				<NoteActionsMenu
+					items={ availableItems }
+					buttonRef={ actionButtonRef }
+				/>
+			) }
 		</>
 	) : null;
 
@@ -211,6 +224,7 @@ export function Note( {
 			role={ note.parent !== 0 ? 'treeitem' : undefined }
 		>
 			{ body }
+			{ hasSuggestionPayload && <SuggestionActions thread={ note } /> }
 			{ actionState === 'delete' && (
 				<ConfirmDialog
 					isOpen
