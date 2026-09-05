@@ -359,7 +359,8 @@
 					},
 					{
 						"docs/explanations/architecture/dashboard-widgets.md": []
-					}
+					},
+					{ "docs/explanations/architecture/suggestions.md": [] }
 				]
 			},
 			{
