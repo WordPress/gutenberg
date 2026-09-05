@@ -5,9 +5,19 @@
 		pointer-events: none;
 	}
 
-	[data-rich-text-placeholder]::after {
+	// The placeholder text precedes the padding br inside the span. The
+	// span runs in the opposite direction (the RTL build flips it) so the
+	// br, and with it the caret, paints at the start of the text. Each
+	// engine accepts one spelling of match-parent.
+	[data-rich-text-placeholder] {
+		direction: rtl;
+		text-align: match-parent;
+		text-align: -webkit-match-parent;
+	}
+
+	[data-rich-text-placeholder]::before {
 		content: attr(data-rich-text-placeholder);
-		position: absolute;
+		unicode-bidi: plaintext;
 		// Use opacity to work in various editor styles.
 		// We don't specify the color here, because blocks or editor styles might provide their own.
 		opacity: 0.62;

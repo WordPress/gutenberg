@@ -332,29 +332,32 @@ export function toTree( {
 			// - a <br> element is present and needed to allow multi-selection
 			//   into empty fields.
 			//
-			// Note that also shouldn't relatively position the rich text
-			// container because again that could clash with theme CSS. Instead,
-			// we relatively position the span and absolutely position the
-			// pseudo content. `display:contents` is used to make sure it
-			// doesn't affect the placeholder width.
-			if ( placeholder ) {
-				append( getParent( pointer ), {
-					type: 'span',
-					attributes: {
-						'data-rich-text-placeholder': placeholder,
-						// Necessary to prevent the placeholder from catching
-						// selection and being editable.
-						style: 'pointer-events:none;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;display:contents;position:relative;',
-					},
-				} );
-			}
-			append( getParent( pointer ), {
+			const padding = {
 				type: 'br',
 				attributes: {
 					'data-rich-text-padding': 'true',
 				},
 				object: true,
-			} );
+			};
+
+			if ( placeholder ) {
+				// The br sits inside the span so the placeholder text and
+				// the caret share a line (see content.scss in block editor).
+				append(
+					append( getParent( pointer ), {
+						type: 'span',
+						attributes: {
+							'data-rich-text-placeholder': placeholder,
+							// Necessary to prevent the placeholder from
+							// catching pointer events.
+							style: 'pointer-events:none;display:block;',
+						},
+					} ),
+					padding
+				);
+			} else {
+				append( getParent( pointer ), padding );
+			}
 		}
 
 		lastCharacterFormats = characterFormats;

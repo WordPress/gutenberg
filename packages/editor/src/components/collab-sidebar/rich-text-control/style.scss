@@ -3,7 +3,7 @@
 	// `<span data-rich-text-placeholder>`; `::placeholder` only applies to
 	// native form fields, so draw the text from the attribute instead. The
 	// alpha matches the components placeholder treatment.
-	[data-rich-text-placeholder]::after {
+	[data-rich-text-placeholder]::before {
 		content: attr(data-rich-text-placeholder);
 		color: color-mix(in srgb, currentColor, transparent 38%);
 	}
