@@ -135,8 +135,8 @@ class WP_Duotone_Gutenberg {
 	 * @link https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/helpers.ts#L23
 	 *
 	 * @param float $number The number to clamp.
-	 * @param float $min   The minimum value.
-	 * @param float $max   The maximum value.
+	 * @param float $min    The minimum value.
+	 * @param float $max    The maximum value.
 	 * @return float The clamped value.
 	 */
 	private static function colord_clamp( $number, $min = 0, $max = 1 ) {
@@ -967,8 +967,8 @@ class WP_Duotone_Gutenberg {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param  string $block_content Rendered block content.
-	 * @return string                Filtered block content.
+	 * @param string $block_content Rendered block content.
+	 * @return string Filtered block content.
 	 */
 	public static function restore_image_outer_container( $block_content ) {
 		if ( wp_theme_has_theme_json() ) {
@@ -1119,8 +1119,8 @@ class WP_Duotone_Gutenberg {
 	 * @since 6.3.0
 	 * @deprecated 6.3.0
 	 *
-	 * @param  array $preset Duotone preset value as seen in theme.json.
-	 * @return string        Duotone filter CSS id.
+	 * @param array $preset Duotone preset value as seen in theme.json.
+	 * @return string Duotone filter CSS id.
 	 */
 	public static function get_filter_id_from_preset( $preset ) {
 		_deprecated_function( __FUNCTION__, '6.3.0' );

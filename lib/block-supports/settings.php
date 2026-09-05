@@ -46,8 +46,8 @@ function _gutenberg_add_block_level_presets_class( $block_content, $block ) {
  *
  * @access private
  *
- * @param string|null $pre_render   The pre-rendered content. Default null.
- * @param array       $block The block being rendered.
+ * @param string|null $pre_render The pre-rendered content. Default null.
+ * @param array       $block      The block being rendered.
  *
  * @return null
  */
