@@ -7,6 +7,19 @@
 	padding: 0 $grid-unit-30;
 }
 
+// The item count trailing a tab label. It is metadata about the tab, so it
+// stays quieter than the label it follows, and takes the label's color on the
+// selected tab, where the whole tab reads as one active item.
+.routes-post-list__tab-count {
+	margin-inline-start: $grid-unit-05;
+	color: $gray-700;
+	font-variant-numeric: tabular-nums;
+
+	[aria-selected="true"] & {
+		color: inherit;
+	}
+}
+
 .dataviews-action-modal__quick-edit {
 	justify-content: flex-end;
 	align-items: stretch;
