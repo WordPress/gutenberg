@@ -21,7 +21,7 @@
 -   `Icon`: Merge a consumer-supplied `style` prop with the icon's intrinsic styles instead of replacing them, so styles like `fill: none` on stroke-based icons survive unless the consumer overrides the same property explicitly. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 -   `ItemGroup`: Drop the blanket `path { fill: currentColor }` rule that was overriding stroke-based icons' intended fill via inheritance bypass. Paths without an explicit fill still inherit `currentColor` from the surrounding SVG. Custom paths that specify a fill now retain it instead of being overridden by ItemGroup. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 -   `Tip`: Preserve the intended yellow color after its icon became stroke-based. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
--   `Button`, `Placeholder`: Remove the `fill: CanvasText` override for forced colors mode, so icons follow the forced text color again instead of being pinned to `CanvasText`. The browser bug it worked around is fixed: the UA default of `forced-color-adjust` for the SVG root changed from `none` to `preserve-parent-color`. ([#82481](https://github.com/WordPress/gutenberg/pull/82481))
+-   `Button`, `Placeholder`: Remove the obsolete `fill: CanvasText` override for forced colors mode. ([#82481](https://github.com/WordPress/gutenberg/pull/82481))
 
 ### Internal
 
