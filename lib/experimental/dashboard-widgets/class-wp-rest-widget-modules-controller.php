@@ -219,6 +219,10 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 				$data['actions'] = $widget_type->actions;
 			}
 
+			if ( rest_is_field_included( 'attributes', $fields ) ) {
+				$data['attributes'] = $widget_type->attributes;
+			}
+
 			if ( rest_is_field_included( 'keywords', $fields ) ) {
 				$data['keywords'] = $widget_type->keywords;
 			}
@@ -342,6 +346,47 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 								'href'         => array( 'type' => 'string' ),
 								'download'     => array( 'type' => array( 'string', 'boolean' ) ),
 								'openInNewTab' => array( 'type' => 'boolean' ),
+							),
+						),
+						'context'     => array( 'view', 'edit', 'embed' ),
+						'readonly'    => true,
+					),
+
+					'attributes'    => array(
+						'description' => __( 'Attribute schema hosts render settings from: the JSON-expressible subset of a DataViews field per entry. Labels are translatable.', 'gutenberg' ),
+						'type'        => array( 'array', 'null' ),
+						'items'       => array(
+							'type'       => 'object',
+							'properties' => array(
+								'id'                 => array( 'type' => 'string' ),
+								'type'               => array( 'type' => 'string' ),
+								'label'              => array( 'type' => 'string' ),
+								'header'             => array( 'type' => 'string' ),
+								'description'        => array( 'type' => 'string' ),
+								'placeholder'        => array( 'type' => 'string' ),
+								'readOnly'           => array( 'type' => 'boolean' ),
+								'enableSorting'      => array( 'type' => 'boolean' ),
+								'enableHiding'       => array( 'type' => 'boolean' ),
+								'enableGlobalSearch' => array( 'type' => 'boolean' ),
+								'elements'           => array(
+									'type'  => 'array',
+									'items' => array(
+										'type'       => 'object',
+										'properties' => array(
+											'value'       => array( 'type' => array( 'string', 'integer', 'number', 'boolean', 'null' ) ),
+											'label'       => array( 'type' => 'string' ),
+											'description' => array( 'type' => 'string' ),
+										),
+									),
+								),
+								'filterBy'           => array( 'type' => array( 'object', 'boolean' ) ),
+								'format'             => array( 'type' => 'object' ),
+								'isValid'            => array( 'type' => 'object' ),
+								'Edit'               => array( 'type' => array( 'string', 'object' ) ),
+								'relevance'          => array(
+									'type' => 'string',
+									'enum' => array( 'high', 'medium', 'low' ),
+								),
 							),
 						),
 						'context'     => array( 'view', 'edit', 'embed' ),
