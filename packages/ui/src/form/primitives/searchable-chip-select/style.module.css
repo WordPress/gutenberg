@@ -26,6 +26,15 @@
 			font-size: inherit;
 			line-height: inherit;
 			background-color: transparent;
+
+			&:disabled,
+			&[aria-disabled="true"] {
+				--_gcd-input-placeholder-color: var(--wpds-color-foreground-interactive-neutral-disabled);
+
+				&::placeholder {
+					color: var(--wpds-color-foreground-interactive-neutral-disabled);
+				}
+			}
 		}
 	}
 

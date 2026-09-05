@@ -37,10 +37,6 @@ const meta: Meta< typeof Combobox.Root > = {
 		'Combobox.Clear': Combobox.Clear,
 	},
 	parameters: {
-		// FIXME: The trigger has no visible label and relies on aria-label
-		// (button-name).
-		// See: https://github.com/WordPress/gutenberg/issues/81596
-		a11y: { test: 'todo' },
 		componentStatus: {
 			status: 'use-with-caution',
 			whereUsed: 'global',
@@ -61,10 +57,10 @@ export const Default: Story = {
 	args: {
 		items: ITEMS,
 		children: [
-			<Combobox.Trigger key="trigger" />,
+			<Combobox.Trigger aria-label="Fruit" key="trigger" />,
 			<Combobox.Popup key="popup">
 				<div style={ inputWrapperStyle }>
-					<Combobox.Input placeholder="Search" />
+					<Combobox.Input aria-label="Search" placeholder="Search" />
 				</div>
 				<Combobox.Empty>No results found.</Combobox.Empty>
 				<Combobox.List>
@@ -91,10 +87,14 @@ export const Compact: Story = {
 		defaultValue: ITEMS[ 0 ],
 		items: ITEMS,
 		children: [
-			<Combobox.Trigger size="compact" key="trigger" />,
+			<Combobox.Trigger
+				size="compact"
+				aria-label="Fruit"
+				key="trigger"
+			/>,
 			<Combobox.Popup key="popup">
 				<div style={ inputWrapperStyle }>
-					<Combobox.Input placeholder="Search" />
+					<Combobox.Input aria-label="Search" placeholder="Search" />
 				</div>
 				<Combobox.Empty>No results found.</Combobox.Empty>
 				<Combobox.List>
@@ -128,9 +128,6 @@ export const DetachedInline: Story = {
 		// The input keeps focus and arrow keys move through the options, so
 		// the scrollable list is reachable by keyboard.
 		a11y: {
-			// Storybook merges parameters, so `test` must be set here to
-			// override the warning-only default from `meta`.
-			test: 'error',
 			config: {
 				rules: [
 					{ id: 'scrollable-region-focusable', enabled: false },
@@ -210,10 +207,13 @@ export const Creatable: Story = {
 						: ITEMS
 				}
 			>
-				<Combobox.Trigger />
+				<Combobox.Trigger aria-label="Fruit" />
 				<Combobox.Popup>
 					<div style={ inputWrapperStyle }>
-						<Combobox.Input placeholder="Search" />
+						<Combobox.Input
+							aria-label="Search"
+							placeholder="Search"
+						/>
 					</div>
 					<Combobox.Empty>No results found.</Combobox.Empty>
 					<Combobox.List>
@@ -339,10 +339,10 @@ function AsyncItemsTemplate( {
 				}, 500 );
 			} }
 		>
-			<Combobox.Trigger />
+			<Combobox.Trigger aria-label="Fruit" />
 			<Combobox.Popup>
 				<div style={ inputWrapperStyle }>
-					<Combobox.Input placeholder="Search" />
+					<Combobox.Input aria-label="Search" placeholder="Search" />
 				</div>
 				<AsyncStatus
 					loading={ loading }
@@ -401,7 +401,7 @@ export const WithCustomTriggerAndItem: Story = {
 		items: ITEMS,
 		defaultValue: ITEMS[ 0 ],
 		children: [
-			<Combobox.Trigger key="trigger">
+			<Combobox.Trigger aria-label="Fruit" key="trigger">
 				{ ( item: FixtureItem ) => (
 					<span
 						style={ {
@@ -425,7 +425,7 @@ export const WithCustomTriggerAndItem: Story = {
 			</Combobox.Trigger>,
 			<Combobox.Popup key="popup">
 				<div style={ inputWrapperStyle }>
-					<Combobox.Input placeholder="Search" />
+					<Combobox.Input aria-label="Search" placeholder="Search" />
 				</div>
 				<Combobox.List>
 					<Combobox.ListBody>
@@ -470,10 +470,10 @@ export const Grouped: Story = {
 	args: {
 		items: GROUPED_ITEMS,
 		children: [
-			<Combobox.Trigger key="trigger" />,
+			<Combobox.Trigger aria-label="Fruit" key="trigger" />,
 			<Combobox.Popup key="popup">
 				<div style={ inputWrapperStyle }>
-					<Combobox.Input placeholder="Search" />
+					<Combobox.Input aria-label="Search" placeholder="Search" />
 				</div>
 				<Combobox.Empty>No results found.</Combobox.Empty>
 				<Combobox.List>
@@ -527,7 +527,7 @@ export const WithCustomZIndex: Story = {
 		defaultValue: ITEMS[ 0 ],
 		items: ITEMS,
 		children: [
-			<Combobox.Trigger key="trigger" />,
+			<Combobox.Trigger aria-label="Fruit" key="trigger" />,
 			<Combobox.Popup
 				positioner={
 					<Combobox.Positioner
@@ -539,7 +539,7 @@ export const WithCustomZIndex: Story = {
 				key="popup"
 			>
 				<div style={ inputWrapperStyle }>
-					<Combobox.Input placeholder="Search" />
+					<Combobox.Input aria-label="Search" placeholder="Search" />
 				</div>
 				<Combobox.List>
 					<Combobox.ListBody>
