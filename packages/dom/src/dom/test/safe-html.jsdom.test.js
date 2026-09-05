@@ -25,4 +25,48 @@ describe( 'safeHTML', () => {
 		const output = '';
 		expect( safeHTML( input ) ).toBe( output );
 	} );
+
+	it( 'should strip dangerous executable tags (object, embed)', () => {
+		const input =
+			'<object data="test.swf"></object><embed src="test.swf"><p>Safe</p>';
+		const output = '<p>Safe</p>';
+		expect( safeHTML( input ) ).toBe( output );
+	} );
+
+	it( 'should strip javascript: and vbscript: URIs from href attributes', () => {
+		const input =
+			'<a href="javascript:alert(1)">Link 1</a><a href="vbscript:msgbox(1)">Link 2</a><a href="https://example.com">Safe Link</a>';
+		const output =
+			'<a>Link 1</a><a>Link 2</a><a href="https://example.com">Safe Link</a>';
+		expect( safeHTML( input ) ).toBe( output );
+	} );
+
+	it( 'should strip javascript: URIs with leading whitespace and control characters', () => {
+		const input =
+			'<a href="   javascript:alert(1)">Link 1</a><a href="\x01javascript:alert(2)">Link 2</a>';
+		const output = '<a>Link 1</a><a>Link 2</a>';
+		expect( safeHTML( input ) ).toBe( output );
+	} );
+
+	it( 'should strip javascript: URIs from src, action, and formaction attributes', () => {
+		const input =
+			'<form action="javascript:alert(1)"><button formaction="javascript:alert(2)">Submit</button></form><iframe src="javascript:alert(3)"></iframe>';
+		const output = '<form><button>Submit</button></form><iframe></iframe>';
+		expect( safeHTML( input ) ).toBe( output );
+	} );
+
+	it( 'should strip executable data: URIs (HTML/SVG)', () => {
+		const input =
+			'<a href="data:text/html,<script>alert(1)</script>">Link</a><a href="data:image/svg+xml,<svg onload=alert(1)>">SVG Link</a>';
+		const output = '<a>Link</a><a>SVG Link</a>';
+		expect( safeHTML( input ) ).toBe( output );
+	} );
+
+	it( 'should preserve safe URLs, iframes, and attributes', () => {
+		const input =
+			'<a href="https://wordpress.org" target="_blank" rel="noopener noreferrer">WordPress</a><iframe src="https://example.com"></iframe><img src="/images/logo.png" alt="Logo">';
+		const output =
+			'<a href="https://wordpress.org" target="_blank" rel="noopener noreferrer">WordPress</a><iframe src="https://example.com"></iframe><img src="/images/logo.png" alt="Logo">';
+		expect( safeHTML( input ) ).toBe( output );
+	} );
 } );

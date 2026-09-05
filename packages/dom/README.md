@@ -365,7 +365,7 @@ _Returns_
 
 ### safeHTML
 
-Strips scripts and on\* attributes from HTML.
+Strips scripts, embedding elements, on\* attributes, and executable URIs from HTML.
 
 _Parameters_
 
