@@ -6,13 +6,13 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 // eslint-disable-next-line @wordpress/use-recommended-components
-import { Stack, Button as UIButton } from '@wordpress/ui';
+import { Button as UIButton } from '@wordpress/ui';
 import { ThemeProvider } from '@wordpress/theme';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { moreVertical, published } from '@wordpress/icons';
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
-import ReactionDisplay from './reaction-display';
+import ReactionDisplay, { getReactedSlugs } from './reaction-display';
 import { AddReactionButton } from './add-reaction-picker';
 import { unlock } from '../../lock-unlock';
 
@@ -86,6 +86,11 @@ export function Note( {
 	}, [ rawContent ] );
 
 	const canResolve = note.parent === 0;
+	const hasReactions = getReactedSlugs( reactions ).length > 0;
+	// Not while editing: the trigger floats over the note's corner, which
+	// during an edit is the form's own text field.
+	const canReact =
+		isSelected && !! onToggleReaction && actionState !== 'edit';
 	const isResolutionNote =
 		note.type === 'note' &&
 		note.meta &&
@@ -216,45 +221,66 @@ export function Note( {
 			actions={ actions }
 			role={ note.parent !== 0 ? 'treeitem' : undefined }
 		>
-			{ body }
-			{ isSelected && (
-				// The editor sets `cornerRadius="none"`, but reactions read
-				// as badges rather than controls, so the row opts into the
-				// pill shape the Design System's `pronounced` preset gives a
-				// small Button.
-				<ThemeProvider cornerRadius="pronounced">
-					<Stack
-						direction="row"
-						gap="sm"
-						justify="flex-start"
-						// The pills wrap onto further rows; without this the
-						// trigger stretches to the full wrapped height.
-						align="flex-start"
-					>
-						<AddReactionButton
-							noteId={ note.id }
-							disabled={ isThreadResolved }
-							onToggleReaction={ ( emoji ) =>
-								onToggleReaction?.( {
-									commentId: note.id,
-									emoji,
-								} )
-							}
-						/>
-						<ReactionDisplay
-							noteId={ note.id }
-							reactions={ reactions }
-							disabled={ isThreadResolved }
-							onToggleReaction={ ( emoji ) =>
-								onToggleReaction?.( {
-									commentId: note.id,
-									emoji,
-								} )
-							}
-						/>
-					</Stack>
-				</ThemeProvider>
-			) }
+			<div className="editor-collab-sidebar-panel__note-body">
+				{ body }
+				{ ( hasReactions || canReact ) && (
+					// The editor sets `cornerRadius="none"`, but reactions
+					// read as badges rather than controls, so the row opts
+					// into the pill shape the Design System's `pronounced`
+					// preset gives a small Button.
+					<ThemeProvider cornerRadius="pronounced">
+						<div
+							className={ clsx(
+								'editor-collab-sidebar-panel__reactions',
+								{
+									// Nothing to sit beside yet, so the
+									// trigger floats in the note's top corner
+									// rather than making the card taller for
+									// an option nobody has taken up.
+									'is-floating': ! hasReactions,
+								}
+							) }
+						>
+							{ /*
+							 * Reactions are information about the note, so
+							 * unlike its actions they stay visible once the
+							 * thread is deselected.
+							 */ }
+							<ReactionDisplay
+								noteId={ note.id }
+								reactions={ reactions }
+								disabled={ isThreadResolved }
+								onToggleReaction={ ( emoji ) =>
+									onToggleReaction?.( {
+										commentId: note.id,
+										emoji,
+									} )
+								}
+							>
+								{ /*
+								 * Trails the pills, in the same tree position
+								 * whether or not there are any: a different
+								 * position once the first reaction lands would
+								 * remount the open picker's trigger and drop
+								 * focus to the body.
+								 */ }
+								{ canReact && (
+									<AddReactionButton
+										noteId={ note.id }
+										disabled={ isThreadResolved }
+										onToggleReaction={ ( emoji ) =>
+											onToggleReaction( {
+												commentId: note.id,
+												emoji,
+											} )
+										}
+									/>
+								) }
+							</ReactionDisplay>
+						</div>
+					</ThemeProvider>
+				) }
+			</div>
 			{ actionState === 'delete' && (
 				<ConfirmDialog
 					isOpen

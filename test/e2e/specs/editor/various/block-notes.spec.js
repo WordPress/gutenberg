@@ -1203,6 +1203,102 @@ test.describe( 'Block Notes', () => {
 			).toBeVisible();
 		} );
 
+		test( 'the add-reaction trigger stays out of the way until hovered', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing the hover trigger' },
+				comment: 'Test comment for the hover trigger',
+			} );
+
+			const trigger = page.locator(
+				'.editor-collab-sidebar-panel__add-reaction'
+			);
+			const thread = page.locator(
+				'.editor-collab-sidebar-panel__thread'
+			);
+
+			// The trigger floats in the note's top corner rather than
+			// claiming a row: the note is no taller for carrying it.
+			const reactionRow = page.locator(
+				'.editor-collab-sidebar-panel__reactions'
+			);
+			await expect( reactionRow ).toHaveClass( /is-floating/ );
+			await expect(
+				page.locator( '.editor-collab-sidebar-panel__reaction-button' )
+			).toHaveCount( 0 );
+
+			const noteBody = page.locator(
+				'.editor-collab-sidebar-panel__note-body'
+			);
+			const noteText = page.locator(
+				'.editor-collab-sidebar-panel__note-content'
+			);
+			expect( ( await noteBody.boundingBox() ).height ).toBe(
+				( await noteText.boundingBox() ).height
+			);
+
+			// It lines up under the note's other actions, and the text keeps
+			// clear of it rather than running underneath.
+			const triggerBox = await trigger.boundingBox();
+			const actionsBox = await page
+				.getByRole( 'button', { name: 'Actions' } )
+				.boundingBox();
+			expect( triggerBox.x ).toBe( actionsBox.x );
+			const textRight = await noteText.evaluate( ( element ) => {
+				const range = document.createRange();
+				range.selectNodeContents( element );
+				return range.getBoundingClientRect().right;
+			} );
+			expect( textRight ).toBeLessThanOrEqual( triggerBox.x );
+
+			// Park the pointer outside the sidebar: adding the note leaves it
+			// over the thread, which would hold the trigger open.
+			await page.mouse.move( 0, 0 );
+			await expect( trigger ).toHaveCSS( 'opacity', '0' );
+
+			await thread.hover();
+			await expect( trigger ).toHaveCSS( 'opacity', '1' );
+
+			// Keyboard reaches it too: the reveal hangs off the trigger, not
+			// the thread, which stays focused for as long as it is selected.
+			await page.mouse.move( 0, 0 );
+			await expect( trigger ).toHaveCSS( 'opacity', '0' );
+			await page.getByRole( 'button', { name: 'Add reaction' } ).focus();
+			await expect( trigger ).toHaveCSS( 'opacity', '1' );
+		} );
+
+		test( 'reactions stay visible once the thread is deselected', async ( {
+			page,
+			editor,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing deselected reactions' },
+				comment: 'Test comment for deselected reactions',
+			} );
+
+			await blockNoteUtils.addReactionToComment( 'Heart' );
+			const reactionButton = page.getByRole( 'button', {
+				name: /Heart/,
+			} );
+			await expect( reactionButton ).toBeVisible();
+
+			// Focus the title to deselect the block and the note. The pills
+			// carry information about the note, so unlike its actions they
+			// survive being deselected.
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.focus();
+			await expect(
+				page.getByRole( 'button', { name: 'Add reaction' } )
+			).toHaveCount( 0 );
+			await expect( reactionButton ).toBeVisible();
+		} );
+
 		test.describe( 'Emojibase dataset unavailable', () => {
 			test.beforeAll( async ( { requestUtils } ) => {
 				await requestUtils.activatePlugin(

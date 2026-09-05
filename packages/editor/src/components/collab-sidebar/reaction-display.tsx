@@ -1,4 +1,4 @@
-import type { MouseEvent } from 'react';
+import type { MouseEvent, ReactNode } from 'react';
 import { __, sprintf, _n } from '@wordpress/i18n';
 /*
  * `Button` is pending Design System review (WordPress/gutenberg#76135);
@@ -70,7 +70,7 @@ function hasUserReacted(
  * @param reactions The reactions summary (keyed by slug).
  * @return Array of slugs with reactions.
  */
-function getReactedSlugs(
+export function getReactedSlugs(
 	reactions: ReactionSummary | null | undefined
 ): string[] {
 	if ( ! reactions ) {
@@ -351,6 +351,7 @@ interface ReactionDisplayProps {
 	reactions: ReactionSummary | null | undefined;
 	disabled?: boolean;
 	onToggleReaction: ( slug: string ) => void;
+	children?: ReactNode;
 }
 
 /**
@@ -362,12 +363,16 @@ interface ReactionDisplayProps {
  * @param props.disabled         Whether reactions can no longer be toggled
  *                               (the thread is resolved).
  * @param props.onToggleReaction Callback to toggle a reaction.
+ * @param props.children         Rendered after the last pill, inside the same
+ *                               wrapping row, so a trailing control follows
+ *                               the pills onto whichever line they end on.
  */
 export default function ReactionDisplay( {
 	noteId,
 	reactions,
 	disabled = false,
 	onToggleReaction,
+	children,
 }: ReactionDisplayProps ) {
 	// The list is filterable server-side (and static per page load),
 	// so index it once per list identity.
@@ -378,13 +383,19 @@ export default function ReactionDisplay( {
 	);
 	const reactedSlugs = getReactedSlugs( reactions );
 
-	if ( reactedSlugs.length === 0 ) {
+	if ( reactedSlugs.length === 0 && ! children ) {
 		return null;
 	}
 
 	return (
 		// `sm`: at `xs` two adjacent pressed pills read as one solid bar.
-		<Stack direction="row" gap="sm" justify="flex-start" wrap="wrap">
+		<Stack
+			direction="row"
+			gap="sm"
+			align="flex-start"
+			justify="flex-start"
+			wrap="wrap"
+		>
 			{ reactedSlugs.map( ( slug ) => {
 				const count = getReactionCount( reactions, slug );
 				const isActive = hasUserReacted( reactions, slug );
@@ -404,6 +415,7 @@ export default function ReactionDisplay( {
 					/>
 				);
 			} ) }
+			{ children }
 		</Stack>
 	);
 }

@@ -96,6 +96,11 @@
 
 .editor-collab-sidebar-panel__note-content {
 	overflow-wrap: break-word;
+	// Keep clear of the add-reaction trigger floating in the note's top
+	// corner. Reserved on every note, selected or not, so the text does not
+	// rewrap under the reader as a note is selected or gains its first
+	// reaction.
+	padding-right: $button-size-small + $grid-unit-10;
 
 	p:last-child {
 		margin-bottom: 0;
@@ -267,6 +272,67 @@ mark.wp-note {
 	// 24px button and stretches the pills beside it to match. A flex
 	// wrapper has no line box, so the whole row stays at button height.
 	display: flex;
+}
+
+// The note's text and, below it, the reaction row. Anchors the trigger while
+// it floats, so it lands on the note itself rather than on whatever else the
+// card carries underneath.
+.editor-collab-sidebar-panel__note-body {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: $grid-unit-10;
+}
+
+.editor-collab-sidebar-panel__reactions {
+	// Until the note has a reaction to show, the trigger is the whole row, and
+	// it floats in the note's top corner rather than making every note taller
+	// for an option nobody has taken up. Once a reaction lands, the row drops
+	// into the flow and the trigger trails the pills.
+	//
+	// The top corner lines up with the Resolve and Actions buttons in the
+	// header above, so the trigger reads as one more action in that column
+	// rather than a control parked wherever the text happened to end. The
+	// note's text keeps a safe area on that side (see `__note-content`), so
+	// nothing runs underneath it.
+	&.is-floating {
+		position: absolute;
+		right: 0;
+		// Centered on the first line of text, so a one-line note reads as a
+		// single row with its trigger. The row shares the text's font and
+		// line height, so its own `lh` is the text's line box.
+		top: calc((1lh - #{$button-size-small}) / 2);
+	}
+}
+
+// The trigger stays out of the way until the note is hovered, so reacting
+// costs no standing real estate.
+//
+// Only where a pointer can hover: a touch device would otherwise be left
+// with a control it has no way to reveal.
+@media (hover: hover) {
+	.editor-collab-sidebar-panel__add-reaction {
+		// Fading rather than removing keeps the button in the tab order and
+		// keeps the action row from reflowing as the pointer moves over it.
+		opacity: 0;
+		transition: opacity 0.1s ease-out;
+
+		@media (prefers-reduced-motion: reduce) {
+			transition: none;
+		}
+	}
+
+	.editor-collab-sidebar-panel__thread:hover
+	.editor-collab-sidebar-panel__add-reaction,
+	// Reveal on the trigger itself rather than on the thread: the thread is
+	// `tabIndex={ 0 }`, so a thread-level `:focus-within` would hold for as
+	// long as the note is selected and the fade would never take effect.
+	.editor-collab-sidebar-panel__add-reaction:focus-within,
+	// While the picker is open the pointer is over the popover, not the
+	// thread, and focus has moved into the popover's own portal.
+	.editor-collab-sidebar-panel__add-reaction:has([aria-expanded="true"]) {
+		opacity: 1;
+	}
 }
 
 .editor-collab-sidebar-panel__reaction-button {
