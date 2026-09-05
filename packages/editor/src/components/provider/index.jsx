@@ -1,4 +1,5 @@
 import {
+	Fragment,
 	useCallback,
 	useEffect,
 	useLayoutEffect,
@@ -40,9 +41,23 @@ import PatternDuplicateModal from '../pattern-duplicate-modal';
 import TemplatePartMenuItems from '../template-part-menu-items';
 import MediaEditorModalMount from '../media/media-editor-modal';
 import { getCanvasWidthByDeviceType } from '../../utils/device-type';
+import {
+	SuggestionOverlayProvider,
+	SuggestionAutoSave,
+	isSuggestionModeEnabled,
+} from '../suggestion-mode';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
+
+/*
+ * With the experiment off the overlay context (and its block-tree
+ * subscriptions) never mounts; consumers fall back to the context default,
+ * which is inert.
+ */
+const MaybeSuggestionOverlayProvider = isSuggestionModeEnabled()
+	? SuggestionOverlayProvider
+	: Fragment;
 
 const noop = () => {};
 
@@ -435,28 +450,33 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							settings={ blockEditorSettings }
 							useSubRegistry={ false }
 						>
-							{ children }
-							{ ! settings.isPreviewMode && (
-								<>
-									<PatternsMenuItems />
-									<TemplatePartMenuItems />
-									{ mode === 'template-locked' && (
-										<DisableNonPageContentBlocks />
-									) }
-									{ type === 'wp_navigation' && (
-										<NavigationBlockEditingMode />
-									) }
-									<EditorKeyboardShortcutsRegister />
-									<EditorKeyboardShortcuts />
-									<KeyboardShortcutHelpModal />
-									<BlockRemovalWarnings />
-									<StartPageOptions />
-									<StartTemplateOptions />
-									<PatternRenameModal />
-									<PatternDuplicateModal />
-									<MediaEditorModalMount />
-								</>
-							) }
+							<MaybeSuggestionOverlayProvider>
+								{ children }
+								{ ! settings.isPreviewMode && (
+									<>
+										<PatternsMenuItems />
+										<TemplatePartMenuItems />
+										{ mode === 'template-locked' && (
+											<DisableNonPageContentBlocks />
+										) }
+										{ type === 'wp_navigation' && (
+											<NavigationBlockEditingMode />
+										) }
+										<EditorKeyboardShortcutsRegister />
+										<EditorKeyboardShortcuts />
+										<KeyboardShortcutHelpModal />
+										<BlockRemovalWarnings />
+										<StartPageOptions />
+										<StartTemplateOptions />
+										<PatternRenameModal />
+										<PatternDuplicateModal />
+										{ isSuggestionModeEnabled() && (
+											<SuggestionAutoSave />
+										) }
+										<MediaEditorModalMount />
+									</>
+								) }
+							</MaybeSuggestionOverlayProvider>
 						</BlockEditorProviderComponent>
 					</BlockContextProvider>
 				</EntityProvider>
