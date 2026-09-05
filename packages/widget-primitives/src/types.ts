@@ -9,6 +9,7 @@
  * `example`, and `setAttributes`.
  */
 import type { ComponentProps, ComponentType, ReactElement } from 'react';
+import type { Field } from '@wordpress/dataviews';
 import type { ResolvableField } from './field-types';
 
 /**
@@ -151,6 +152,32 @@ type WidgetAttribute< Item = unknown > = ResolvableField< Item > & {
 export type WidgetAttributeField< Item > = WidgetAttribute< Item > & {
 	// `& string` drops number/symbol keys; `Field.id` is a string.
 	id: keyof Item & string;
+};
+
+/**
+ * Wire form of a widget attribute, as carried by a `WidgetModuleRecord`:
+ * the JSON-expressible subset of a DataViews `Field`. `Edit` is a control
+ * name or config, never a component; `isValid` carries no `custom` rule.
+ */
+export type WidgetAttributeRecord< Item = unknown > = Omit<
+	WidgetAttribute< Item >,
+	| 'Edit'
+	| 'isValid'
+	| 'header'
+	| 'description'
+	| 'render'
+	| 'sort'
+	| 'isVisible'
+	| 'isDisabled'
+	| 'getValue'
+	| 'setValue'
+	| 'getElements'
+	| 'getValueFormatted'
+> & {
+	header?: string;
+	description?: string;
+	Edit?: Exclude< NonNullable< Field< Item >[ 'Edit' ] >, Function >;
+	isValid?: Omit< NonNullable< Field< Item >[ 'isValid' ] >, 'custom' >;
 };
 
 /**
@@ -358,4 +385,10 @@ export interface WidgetModuleRecord extends WidgetModuleRecordOverrides {
 	 * `null`/absent means the module's actions stand.
 	 */
 	actions?: WidgetActionRecord[] | null;
+
+	/**
+	 * Attribute schema in wire form. `null`/absent means the module's
+	 * attributes stand; otherwise entries merge with the module's by `id`.
+	 */
+	attributes?: WidgetAttributeRecord[] | null;
 }

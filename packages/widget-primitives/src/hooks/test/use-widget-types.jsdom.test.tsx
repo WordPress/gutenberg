@@ -98,6 +98,30 @@ const moduleLessRecords: WidgetModuleRecord[] = [
 	},
 ];
 
+const recordAttributeRecords: WidgetModuleRecord[] = [
+	{
+		...moduleLessRecords[ 0 ],
+		attributes: [
+			{
+				id: 'location',
+				type: 'test/location',
+				label: 'Ubicación',
+				relevance: 'high',
+			},
+		],
+	},
+];
+
+const mergedAttributeRecords: WidgetModuleRecord[] = [
+	{
+		...records[ 0 ],
+		attributes: [
+			{ id: 'location', label: 'Ubicación', relevance: 'high' },
+			{ id: 'extra', type: 'text', label: 'Extra' },
+		],
+	},
+];
+
 const stringIconRecords: WidgetModuleRecord[] = [
 	{
 		name: 'test/string-icon',
@@ -190,6 +214,61 @@ describe( 'useWidgetTypes', () => {
 		await waitFor( () =>
 			expect( result.current[ 0 ][ 0 ].icon ).toBe( resolvedIcon )
 		);
+	} );
+
+	it( 'resolves record attributes without a metadata module', async () => {
+		registerFieldType( {
+			name: 'test/location',
+			baseType: 'text',
+			Edit: LocationControl,
+		} );
+
+		const { result } = renderHook( () =>
+			useWidgetTypes( recordAttributeRecords )
+		);
+
+		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
+
+		expect( result.current[ 0 ][ 0 ].attributes ).toEqual( [
+			expect.objectContaining( {
+				id: 'location',
+				type: 'text',
+				label: 'Ubicación',
+				relevance: 'high',
+				Edit: LocationControl,
+			} ),
+		] );
+	} );
+
+	it( 'merges record attributes over the module by id', async () => {
+		registerFieldType( {
+			name: 'test/location',
+			baseType: 'text',
+			Edit: LocationControl,
+		} );
+
+		const { result } = renderHook( () =>
+			useWidgetTypes( mergedAttributeRecords )
+		);
+
+		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
+
+		const attributes = result.current[ 0 ][ 0 ].attributes ?? [];
+
+		// Record entries lead and win shared keys; the module completes them
+		// (here the type, resolved through the registry) and adds its own.
+		expect( attributes.map( ( attribute ) => attribute.id ) ).toEqual( [
+			'location',
+			'extra',
+			'label',
+		] );
+		expect( attributes[ 0 ] ).toMatchObject( {
+			type: 'text',
+			label: 'Ubicación',
+			relevance: 'high',
+			Edit: LocationControl,
+		} );
+		expect( attributes[ 2 ] ).toMatchObject( { label: 'Label' } );
 	} );
 
 	it( 'drops a record with neither metadata nor render module', async () => {
