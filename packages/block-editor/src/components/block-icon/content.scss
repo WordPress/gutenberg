@@ -19,7 +19,9 @@
 			// Optimize for high contrast modes.
 			// See also https://blogs.windows.com/msedgedev/2020/09/17/styling-for-windows-high-contrast-with-new-standards-for-forced-colors/.
 			@media (forced-colors: active) {
+				// Keep `fill` as a fallback for custom block icons that do not use `currentColor`.
 				fill: CanvasText;
+				color: CanvasText;
 			}
 		}
 	}

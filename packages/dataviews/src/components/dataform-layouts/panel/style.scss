@@ -50,11 +50,10 @@
 .dataforms-layouts-panel__field-trigger--edit-always
 .dataforms-layouts-panel__field-trigger-icon {
 	opacity: 1;
-	fill: currentColor;
 
 	&:hover,
 	&:focus-visible {
-		fill: var(--wpds-color-foreground-interactive-brand);
+		color: var(--wpds-color-foreground-interactive-brand);
 	}
 }
 
