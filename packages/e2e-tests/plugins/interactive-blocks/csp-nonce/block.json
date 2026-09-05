@@ -1,0 +1,15 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "test/csp-nonce",
+	"title": "E2E Interactivity tests - CSP nonce",
+	"category": "text",
+	"icon": "heart",
+	"description": "Inline expressions under strict CSP without unsafe-eval",
+	"supports": {
+		"interactivity": true
+	},
+	"textdomain": "e2e-interactivity",
+	"viewScriptModule": "file:./view.js",
+	"render": "file:./render.php"
+}
