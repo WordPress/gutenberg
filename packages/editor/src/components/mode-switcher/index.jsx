@@ -4,6 +4,7 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Menu } from '@wordpress/ui';
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 import { getKeyboardShortcut } from '../../utils/keyboard-shortcut';
 
 /**
@@ -23,22 +24,36 @@ const MODES = [
 ];
 
 function ModeSwitcher() {
-	const { keyCombination, isRichEditingEnabled, isCodeEditingEnabled, mode } =
-		useSelect(
-			( select ) => ( {
-				keyCombination: select(
-					keyboardShortcutsStore
-				).getShortcutKeyCombination( 'core/editor/toggle-mode' ),
-				isRichEditingEnabled:
-					select( editorStore ).getEditorSettings()
-						.richEditingEnabled,
-				isCodeEditingEnabled:
-					select( editorStore ).getEditorSettings()
-						.codeEditingEnabled,
-				mode: select( editorStore ).getEditorMode(),
-			} ),
-			[]
-		);
+	const {
+		keyCombination,
+		isRichEditingEnabled,
+		isCodeEditingEnabled,
+		codeEditorUnavailableReason,
+		mode,
+	} = useSelect(
+		( select ) => ( {
+			keyCombination: select(
+				keyboardShortcutsStore
+			).getShortcutKeyCombination( 'core/editor/toggle-mode' ),
+			isRichEditingEnabled:
+				select( editorStore ).getEditorSettings().richEditingEnabled,
+			isCodeEditingEnabled:
+				select( editorStore ).getEditorSettings().codeEditingEnabled,
+			/*
+			 * Shared with the refusal in `switchEditorMode` so the disabled
+			 * item and the notice say the same thing. Left on its cheap
+			 * intent-only check: the pending-marker probe serializes the
+			 * document, which is too expensive for a render pass, so that
+			 * case is refused at dispatch with a notice instead. Private
+			 * while Suggest mode is experimental.
+			 */
+			codeEditorUnavailableReason: unlock(
+				select( editorStore )
+			).getCodeEditorUnavailableReason(),
+			mode: select( editorStore ).getEditorMode(),
+		} ),
+		[]
+	);
 	const { switchEditorMode } = useDispatch( editorStore );
 
 	let selectedMode = mode;
@@ -46,6 +61,10 @@ function ModeSwitcher() {
 		selectedMode = 'text';
 	}
 	if ( ! isCodeEditingEnabled && mode === 'text' ) {
+		selectedMode = 'visual';
+	}
+	// Suggesting and Viewing are visual-only intents: see `getEditorMode`.
+	if ( codeEditorUnavailableReason ) {
 		selectedMode = 'visual';
 	}
 
@@ -57,7 +76,26 @@ function ModeSwitcher() {
 				disabled: true,
 			};
 		}
-		if ( ! isRichEditingEnabled && choice.value === 'visual' ) {
+		if ( codeEditorUnavailableReason && choice.value === 'text' ) {
+			choice = {
+				...choice,
+				disabled: true,
+				info: codeEditorUnavailableReason,
+			};
+		}
+		/*
+		 * An intent that forces the visual editor keeps it selectable even
+		 * with rich editing turned off - disabling it alongside the code
+		 * editor would leave both choices dead and the checked one
+		 * unreachable. Entering Suggesting is refused in that configuration
+		 * (see `setEditorIntent`), so this only covers a setting flipped
+		 * mid-session.
+		 */
+		if (
+			! isRichEditingEnabled &&
+			! codeEditorUnavailableReason &&
+			choice.value === 'visual'
+		) {
 			choice = {
 				...choice,
 				disabled: true,

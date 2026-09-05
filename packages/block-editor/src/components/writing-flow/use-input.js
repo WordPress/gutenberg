@@ -28,6 +28,7 @@ export default function useInput() {
 		getSelectionStart,
 		getSelectionEnd,
 		getBlockAttributes,
+		getSettings,
 		getNextBlockClientId,
 		getBlockOrder,
 		getBlockEditingMode,
@@ -46,7 +47,23 @@ export default function useInput() {
 	} = useDispatch( blockEditorStore );
 
 	return useRefEffect( ( node ) => {
+		/*
+		 * A preview canvas is read-only, so none of the cross-block input
+		 * handling below applies: every branch of it writes to the store.
+		 * Preview mode is checked per event rather than once, because the
+		 * editor intent can turn it on and off while this effect stays
+		 * mounted.
+		 */
+		function isReadOnly() {
+			return !! getSettings().isPreviewMode;
+		}
+
 		function onBeforeInput( event ) {
+			if ( isReadOnly() ) {
+				event.preventDefault();
+				return;
+			}
+
 			// If writing flow is editable, never allow the browser to alter
 			// the DOM outside of an editable element within a block. This
 			// will cause React errors (and the DOM should only be altered in
@@ -71,7 +88,7 @@ export default function useInput() {
 		}
 
 		function onKeyDown( event ) {
-			if ( event.defaultPrevented ) {
+			if ( event.defaultPrevented || isReadOnly() ) {
 				return;
 			}
 
@@ -272,6 +289,11 @@ export default function useInput() {
 		}
 
 		function onCompositionStart( event ) {
+			if ( isReadOnly() ) {
+				event.preventDefault();
+				return;
+			}
+
 			if ( ! hasMultiSelection() ) {
 				return;
 			}

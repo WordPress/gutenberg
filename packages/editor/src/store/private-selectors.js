@@ -1,4 +1,5 @@
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { __ } from '@wordpress/i18n';
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import {
 	layout,
@@ -19,12 +20,19 @@ import {
 	getCurrentPostId,
 	getEditorSettings,
 	getCurrentPostRevisionsCount,
+	getEditedPostContent,
 } from './selectors';
 import {
 	getEntityActions as _getEntityActions,
 	getEntityFields as _getEntityFields,
 	isEntityReady as _isEntityReady,
 } from '../dataviews/store/private-selectors';
+import {
+	EDITOR_INTENT_EDIT,
+	EDITOR_INTENT_SUGGEST,
+	EDITOR_INTENT_VIEW,
+} from './constants';
+import { hasPendingSuggestionMarkers } from './utils/pending-suggestion-markers';
 import { unlock } from '../lock-unlock';
 
 const EMPTY_INSERTION_POINT = {
@@ -603,3 +611,112 @@ export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
 		);
 	}
 );
+
+/**
+ * Returns the current editor intent. The intent represents the user's
+ * editing purpose — directly editing content (`edit`), suggesting changes
+ * that the author can apply or reject (`suggest`), or viewing the post in
+ * a read-only mode (`view`).
+ *
+ * Mostly orthogonal to the `editorMode` preference (visual vs. code); the
+ * exception is `suggest`, which forces `getEditorMode` to report `visual`
+ * because the code editor cannot render an inline suggestion marker.
+ *
+ * Storage: the intent is session-scoped — it lives in the editor store's
+ * reducer, not the preferences store, so reloading the editor always
+ * returns to the default `edit` intent. When no value has been set the
+ * selector falls back to `EDITOR_INTENT_EDIT` so callers can rely on a
+ * non-null result.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string} The current editor intent. One of `edit`, `suggest`, `view`.
+ */
+export function getEditorIntent( state ) {
+	return state.editorIntent ?? EDITOR_INTENT_EDIT;
+}
+
+/**
+ * Whether the editor is in a read-only intent.
+ *
+ * The `view` intent is offered in the Mode menu as a "Read-only preview of
+ * the content", so nothing reachable from the editor may change the post
+ * while it is active. The block canvas is handled by `isPreviewMode` on the
+ * block editor settings; this selector is what the editor-level mutation
+ * paths - the code editor and the undo/redo history - gate on, so all three
+ * answer to the same intent.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the current intent forbids editing the post.
+ */
+export function isEditorIntentReadOnly( state ) {
+	return getEditorIntent( state ) === EDITOR_INTENT_VIEW;
+}
+
+/**
+ * Why the code editor cannot be opened right now, or `null` when it can.
+ *
+ * The code editor edits raw `post_content`: there is nowhere in that textarea
+ * to render an inline suggestion marker, and the document it hands back is
+ * re-parsed from scratch, so an edit made there both escapes suggestion
+ * capture and takes down the markers already in the post. It is also the one
+ * editing surface the read-only canvas does not cover - `isPreviewMode`
+ * freezes the visual editor and leaves the textarea fully writable.
+ *
+ * Three situations are refused:
+ *
+ *   - The `view` intent, a read-only preview of the post.
+ *   - The `suggest` intent, where every edit is meant to be captured as a
+ *     suggestion. Both are cheap checks, and the only ones the UI runs.
+ *   - Any intent while the document still carries pending markers - what the
+ *     author meets after leaving Suggesting with suggestions left to resolve.
+ *     Re-parsing an edited document corrupts markers whatever the intent was
+ *     when the edit was made, so the intent alone is not a sufficient guard.
+ *
+ * The marker probe serializes the whole document, so it is opt-in:
+ * `switchEditorMode` asks for it once on an explicit user action, while the
+ * menu item and the command palette gate on the intent only and let the action
+ * refuse the rarer case with a notice. `getEditorMode` runs the same probe on
+ * the render path for the routes that never dispatch an action at all - a
+ * reload, or the mask lifting as the user leaves Suggesting - but only once
+ * the stored preference is `text`, so a visual session never pays for it.
+ *
+ * Returns the user-facing reason rather than a boolean so the disabled menu
+ * item, the refused shortcut, and the announcement cannot drift apart.
+ *
+ * @param {Object}  state                             Global application state.
+ * @param {Object}  [options]                         Options.
+ * @param {boolean} [options.checkPendingSuggestions] Also probe the document
+ *                                                    for pending markers.
+ *
+ * @return {string|null} Reason the code editor is unavailable, or `null` when
+ *                       it is available.
+ */
+export function getCodeEditorUnavailableReason(
+	state,
+	{ checkPendingSuggestions = false } = {}
+) {
+	if ( isEditorIntentReadOnly( state ) ) {
+		return __(
+			'The code editor is unavailable while viewing. Switch to Editing to change the content.'
+		);
+	}
+
+	if ( getEditorIntent( state ) === EDITOR_INTENT_SUGGEST ) {
+		return __(
+			'Raw HTML edits cannot be captured as suggestions. Switch to Editing to use the code editor.'
+		);
+	}
+
+	if (
+		checkPendingSuggestions &&
+		hasPendingSuggestionMarkers( getEditedPostContent( state ) )
+	) {
+		return __(
+			'The code editor is unavailable while this post has suggestions to resolve. Accept or reject them first.'
+		);
+	}
+
+	return null;
+}
