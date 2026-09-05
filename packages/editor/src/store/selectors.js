@@ -1389,8 +1389,28 @@ export function isInserterOpened( state ) {
  *
  * @return {string} Editing mode.
  */
-export const getEditorMode = createRegistrySelector(
-	( select ) => ( state ) => {
+export const getEditorMode = createRegistrySelector( ( select ) => {
+	/*
+	 * The marker probe is memoized on the edited record rather than run per
+	 * call: this selector has a subscriber in most of the editor chrome, and
+	 * `getEditedPostContent` re-serializes the record's blocks whenever it
+	 * holds any, so probing on every call would serialize the document once
+	 * per subscriber per state change. The edited record is itself memoized
+	 * by core-data, so its identity changes exactly when the content can.
+	 */
+	const hasPendingSuggestionMarkersInPost = createSelector(
+		( state ) =>
+			hasPendingSuggestionMarkers( getEditedPostContent( state ) ),
+		( state ) => [
+			select( coreStore ).getEditedEntityRecord(
+				'postType',
+				getCurrentPostType( state ),
+				getCurrentPostId( state )
+			),
+		]
+	);
+
+	return ( state ) => {
 		/*
 		 * The `suggest` and `view` intents both report `visual` whatever the
 		 * stored preference says. The code editor is a raw `post_content`
@@ -1436,16 +1456,13 @@ export const getEditorMode = createRegistrySelector(
 		 * every session by default - never pays for it, and a code-editor
 		 * session is not re-serializing per keystroke the way the canvas is.
 		 */
-		if (
-			mode === 'text' &&
-			hasPendingSuggestionMarkers( getEditedPostContent( state ) )
-		) {
+		if ( mode === 'text' && hasPendingSuggestionMarkersInPost( state ) ) {
 			return 'visual';
 		}
 
 		return mode;
-	}
-);
+	};
+} );
 
 /*
  * Backward compatibility

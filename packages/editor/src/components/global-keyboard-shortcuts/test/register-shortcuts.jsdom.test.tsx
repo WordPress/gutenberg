@@ -161,4 +161,20 @@ describe( 'EditorKeyboardShortcutsRegister', () => {
 
 		expect( registeredIntentShortcuts( registry ) ).toEqual( [] );
 	} );
+
+	it( 'removes the intent shortcuts when the editor unmounts', () => {
+		window.__experimentalSuggestionMode = true;
+		const registry = createStubRegistry( { 'editor.notes': true } );
+
+		const { unmount } = renderRegister( registry );
+		expect( registeredIntentShortcuts( registry ) ).toEqual(
+			INTENT_SHORTCUTS
+		);
+
+		// The shortcuts store outlives the component, so a set left behind
+		// would still be advertised to whatever mounts into it next.
+		unmount();
+
+		expect( registeredIntentShortcuts( registry ) ).toEqual( [] );
+	} );
 } );
