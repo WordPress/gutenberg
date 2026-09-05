@@ -1,4 +1,4 @@
-import { Meta } from '@storybook/addon-docs/blocks';
+import { Markdown, Meta } from '@storybook/addon-docs/blocks';
 import { JumpToIcon } from '@storybook/icons';
 import { InlineIcon } from './docs/inline-icon';
 
@@ -8,34 +8,73 @@ import { InlineIcon } from './docs/inline-icon';
 
 ## Welcome!
 
-The WordPress Gutenberg project uses Storybook to view and work with the UI components developed in WordPress packages, especially [@wordpress/components](https://github.com/WordPress/gutenberg/tree/trunk/packages/components).
+The WordPress Gutenberg project uses Storybook to view and work with the UI components developed in WordPress packages, especially the [WordPress Design System](?path=/docs/design-system-introduction--docs) (`@wordpress/ui`).
 
 On this interactive site you can browse individual components, their controls, options, and settings in isolation. You can also modify controls and arguments and see the changes right away.
 
-The components displayed on this site can be used in your code to build the editor's UI for your custom blocks or other pages.
-Import them from the components root directory like in below example:
+The components displayed on this site can be used in your code to build the editor's UI for your custom blocks or other pages. Import them from `@wordpress/ui` like in the example below:
 
 ```jsx
-import { Button } from '@wordpress/components';
+import { Button } from '@wordpress/ui';
 
 export default function MyButton() {
-	return <Button>Click Me!</Button>;
+	return <Button>Click me</Button>;
 }
 ```
 
+## What you'll find here
+
+The sidebar has one folder per area:
+
+-   **Design System** is the recommended toolkit for new UI: the [components](?path=/docs/design-system-components-introduction--docs) from `@wordpress/ui`, the [tokens](?path=/docs/design-system-tokens-introduction--docs) and [theme](?path=/docs/design-system-theme-introduction--docs) from `@wordpress/theme`, the [patterns](?path=/docs/design-system-patterns-destructive-actions--docs) for composing them, and the [foundations](?path=/docs/foundations-layout--page) of layout, elevation and radius.
+-   **Classic Components** documents `@wordpress/components`, the original WordPress UI library. It is still widely used and still the place to look for what `@wordpress/ui` does not cover yet. Each component page shows its recommendation status; see [Finding your way around](#finding-your-way-around) for the icons.
+-   **Editor** documents UI of the WordPress editing experience: the block editor controls, global styles, the image cropper and the media editor.
+-   **Widgets** documents the dashboard widget system: its primitives, the dashboard shell, and the grid that lays widgets out.
+-   **Playground** runs a whole block editor inside Storybook.
+
 ## How this site works
 
-The site shows the components in the sidebar. Each component's entry point is its **Docs** page, which contains the documentation and interactive examples. You can also explore the individual stories (e.g. "Default", "Small") to view a single use case on the **Canvas**, where you can modify the **Controls** for each prop in the panel below.
+Each component's entry point is its **Docs** page, with the documentation and interactive examples. The individual stories (for example "Default" or "Small") show a single use case on the **Canvas**, where you can change the **Controls** for each prop in the panel below.
 
-To view the source code for the component and its stories on GitHub, click the <InlineIcon icon={ JumpToIcon } /> (Open source file) button in the top toolbar.
+To view the source code for a component and its stories on GitHub, click the <InlineIcon icon={ JumpToIcon } /> (Open source file) button in the top toolbar.
 
-To use it in your local development environment run the following command in the top level Gutenberg directory:
+### Finding your way around
+
+The sidebar lists everything on this site. Use the search box (⌘K / Ctrl+K) to find a component by name, or open the filter menu next to it to show only the entries with a given tag.
+
+Component names carry an icon with their status. The same statuses are available as tags in the filter, so you can, for example, show recommended components only.
+
+<Markdown>{ `
+| Icon | Tag                       | Meaning                                                                          |
+| ---- | ------------------------- | -------------------------------------------------------------------------------- |
+| ✅   | \`status-recommended\`      | Use this component for new UI.                                                   |
+| ⚠️   | \`status-use-with-caution\` | Use with care; check the notes on the component page.                            |
+| 🚫   | \`status-not-recommended\`  | Do not use for new UI. The component page points at the recommended alternative. |
+| ❓   | \`status-unaudited\`        | Not audited yet against the design system.                                       |
+| 🧪   | \`status-experimental\`     | Under active development, may change in future releases.                         |
+| 🔒   | \`status-private\`          | Locked as a private API, not for use outside Gutenberg.                          |
+| 🚧   | \`status-wip\`              | Work in progress, not ready for production.                                      |
+` }</Markdown>
+
+Hover an icon in the sidebar for the same description. Each component page also shows its status at the top.
+
+### Running it locally
+
+Use the following command in the top-level Gutenberg directory:
 
 ```bash
 npm run storybook:dev
 ```
 
-## Resources to learn more:
+## Using it with AI agents
 
--   [Storybook.js.org](https://storybook.js.org/) - Storybook is a frontend workshop for building UI components and pages in isolation.
--   [[Package] Components](https://github.com/WordPress/gutenberg/issues?q=is%3Aopen+is%3Aissue+label%3A%22%5BPackage%5D+Components%22) - Open Issue Gutenberg Repo
+AI agents cannot read this site, so the [WordPress Design System MCP Server](https://github.com/WordPress/gutenberg/tree/trunk/packages/design-system-mcp) gives them the same component documentation, examples and design tokens in a machine-readable form. With it, an agent picks recommended components and valid tokens instead of guessing from outdated sources.
+
+The [package README](https://github.com/WordPress/gutenberg/tree/trunk/packages/design-system-mcp#setup) covers installation for Claude Code, Codex, Cursor, VS Code and Claude Desktop.
+
+## Resources to learn more
+
+-   [Working with WordPress Design System packages](https://developer.wordpress.org/block-editor/contributors/design/design-system-packages/) in the Block Editor Handbook.
+-   [ESLint rules for the design system](https://github.com/WordPress/gutenberg/tree/trunk/packages/eslint-plugin/docs/rules): `@wordpress/eslint-plugin` warns when your code uses a component that is no longer recommended or a design token that does not exist.
+-   [Storybook.js.org](https://storybook.js.org/), the tool this site is built with.
+-   Open issues for the [design system](https://github.com/WordPress/gutenberg/issues?q=is%3Aopen+is%3Aissue+label%3A%22Design+System%22) and for [`@wordpress/components`](https://github.com/WordPress/gutenberg/issues?q=is%3Aopen+is%3Aissue+label%3A%22%5BPackage%5D+Components%22) in the Gutenberg repository.
