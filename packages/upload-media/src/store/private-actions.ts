@@ -22,6 +22,7 @@ import { StubFile } from '../stub-file';
 import { ErrorCode, UploadError } from '../upload-error';
 import { debug, measure } from './utils/debug-logger';
 import {
+	vipsEditImage,
 	vipsResizeImage,
 	vipsRotateImage,
 	vipsConvertImageFormat,
@@ -96,6 +97,7 @@ type ActionCreators = {
 	sideloadItem: typeof sideloadItem;
 	resizeCropItem: typeof resizeCropItem;
 	rotateItem: typeof rotateItem;
+	editImageItem: typeof editImageItem;
 	transcodeImageItem: typeof transcodeImageItem;
 	transcodeGifItem: typeof transcodeGifItem;
 	generateThumbnails: typeof generateThumbnails;
@@ -320,14 +322,15 @@ export function processItem( id: QueueItemId ) {
 		}
 
 		/*
-		 * If the next operation is image processing (resize/crop/rotate),
+		 * If the next operation is image processing (resize/crop/rotate/edit),
 		 * check the image processing concurrency limit.
 		 * If at capacity, the item remains queued and will be processed
 		 * when another image processing operation completes.
 		 */
 		if (
 			operation === OperationType.ResizeCrop ||
-			operation === OperationType.Rotate
+			operation === OperationType.Rotate ||
+			operation === OperationType.EditImage
 		) {
 			const settings = select.getSettings();
 			const activeCount = select.getActiveImageProcessingCount();
@@ -454,6 +457,13 @@ export function processItem( id: QueueItemId ) {
 				dispatch.rotateItem(
 					item.id,
 					operationArgs as OperationArgs[ OperationType.Rotate ]
+				);
+				break;
+
+			case OperationType.EditImage:
+				dispatch.editImageItem(
+					item.id,
+					operationArgs as OperationArgs[ OperationType.EditImage ]
 				);
 				break;
 
@@ -623,7 +633,8 @@ export function finishOperation(
 		 */
 		if (
 			previousOperation === OperationType.ResizeCrop ||
-			previousOperation === OperationType.Rotate
+			previousOperation === OperationType.Rotate ||
+			previousOperation === OperationType.EditImage
 		) {
 			const pendingItems = select.getPendingImageProcessing();
 			for ( const pendingItem of pendingItems ) {
@@ -648,6 +659,7 @@ export function finishOperation(
 		if (
 			previousOperation === OperationType.ResizeCrop ||
 			previousOperation === OperationType.Rotate ||
+			previousOperation === OperationType.EditImage ||
 			previousOperation === OperationType.TranscodeImage
 		) {
 			maybeRecycleVipsWorker( select.getActiveImageProcessingCount() );
@@ -1262,6 +1274,85 @@ export function rotateItem( id: QueueItemId, args?: RotateItemArgs ) {
 					message: __(
 						'The web server cannot generate responsive image sizes for this image. Convert it to JPEG or PNG before uploading.'
 					),
+					file: item.file,
+					cause: error instanceof Error ? error : undefined,
+				} )
+			);
+		}
+	};
+}
+
+type EditImageItemArgs = OperationArgs[ OperationType.EditImage ];
+
+/**
+ * Applies user edits (flip, rotate, crop) to an image item.
+ *
+ * This is the client-side counterpart of the REST `media/<id>/edit`
+ * endpoint: the edited file then goes through the regular upload pipeline
+ * as a new attachment, so sub-sizes are generated client-side as well.
+ *
+ * @param id     Item ID.
+ * @param [args] Edit arguments.
+ */
+export function editImageItem( id: QueueItemId, args?: EditImageItemArgs ) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+		if ( ! item ) {
+			return;
+		}
+
+		if ( ! args?.modifiers?.length ) {
+			dispatch.finishOperation( id, {
+				file: item.file,
+			} );
+			return;
+		}
+
+		const startTime = performance.now();
+
+		try {
+			const file = await vipsEditImage(
+				item.id,
+				item.file,
+				args.modifiers,
+				{
+					quality: select.getSettings().imageQuality,
+					signal: item.abortController?.signal,
+				}
+			);
+
+			measure( {
+				measureName: `Edit ${ item.file.name }`,
+				startTime,
+				tooltipText: item.file.name,
+				properties: [
+					[ 'Item ID', item.id ],
+					[ 'File name', item.file.name ],
+				],
+			} );
+
+			const blobUrl = createBlobURL( file );
+			dispatch< CacheBlobUrlAction >( {
+				type: Type.CacheBlobUrl,
+				id,
+				blobUrl,
+			} );
+
+			dispatch.finishOperation( id, {
+				file,
+				// Sub-sizes and the sideloaded original are generated from
+				// the source file, which from here on is the edited image.
+				sourceFile: file,
+				attachment: {
+					url: blobUrl,
+				},
+			} );
+		} catch ( error ) {
+			dispatch.cancelItem(
+				id,
+				new UploadError( {
+					code: ErrorCode.IMAGE_EDIT_ERROR,
+					message: __( 'The image could not be edited.' ),
 					file: item.file,
 					cause: error instanceof Error ? error : undefined,
 				} )

@@ -6,6 +6,7 @@ jest.mock( '@wordpress/vips/worker', () => ( {
 	vipsHasTransparency: jest.fn(),
 	vipsResizeImage: jest.fn(),
 	vipsRotateImage: jest.fn(),
+	vipsEditImage: jest.fn(),
 	vipsCancelOperations: jest.fn(),
 } ) );
 
@@ -20,6 +21,7 @@ import {
 	vipsHasTransparency,
 	vipsResizeImage,
 	vipsRotateImage,
+	vipsEditImage,
 	vipsCancelOperations,
 } from '../utils';
 
@@ -29,6 +31,7 @@ const mockCompressImage = vipsWorker.vipsCompressImage as jest.Mock;
 const mockHasTransparency = vipsWorker.vipsHasTransparency as jest.Mock;
 const mockResizeImage = vipsWorker.vipsResizeImage as jest.Mock;
 const mockRotateImage = vipsWorker.vipsRotateImage as jest.Mock;
+const mockEditImage = vipsWorker.vipsEditImage as jest.Mock;
 const mockCancelOperations = vipsWorker.vipsCancelOperations as jest.Mock;
 
 const jpegFile = new File( [ 'test-content' ], 'test.jpg', {
@@ -363,6 +366,67 @@ describe( 'vips utilities', () => {
 			// Test orientation 8 (90° CCW rotation)
 			await vipsRotateImage( 'item-2', jpegFile, 8 );
 			expect( mockRotateImage.mock.calls[ 1 ][ 3 ] ).toBe( 8 );
+		} );
+	} );
+
+	describe( 'vipsEditImage', () => {
+		const modifiers = [ { type: 'rotate' as const, args: { angle: 90 } } ];
+
+		it( 'edits the image and names the result like the /edit endpoint does', async () => {
+			mockEditImage.mockResolvedValue( {
+				buffer: new ArrayBuffer( 10 ),
+				width: 200,
+				height: 300,
+			} );
+
+			const result = await vipsEditImage( 'item-1', jpegFile, modifiers, {
+				quality: 0.9,
+			} );
+
+			expect( result ).toBeInstanceOf( ImageFile );
+			expect( result.name ).toBe( 'test-edited.jpg' );
+			expect( result.type ).toBe( 'image/jpeg' );
+			expect( result.width ).toBe( 200 );
+			expect( result.height ).toBe( 300 );
+
+			expect( mockEditImage ).toHaveBeenCalledTimes( 1 );
+			expect( mockEditImage.mock.calls[ 0 ][ 0 ] ).toBe( 'item-1' );
+			expect( mockEditImage.mock.calls[ 0 ][ 2 ] ).toBe( 'image/jpeg' );
+			expect( mockEditImage.mock.calls[ 0 ][ 3 ] ).toBe( modifiers );
+			expect( mockEditImage.mock.calls[ 0 ][ 4 ] ).toEqual( {
+				quality: 0.9,
+			} );
+		} );
+
+		it( 'does not stack -edited suffixes when editing an edited image', async () => {
+			mockEditImage.mockResolvedValue( {
+				buffer: new ArrayBuffer( 10 ),
+				width: 200,
+				height: 300,
+			} );
+			const editedFile = new File( [ 'x' ], 'photo-edited-2.jpg', {
+				type: 'image/jpeg',
+			} );
+
+			const result = await vipsEditImage(
+				'item-1',
+				editedFile,
+				modifiers
+			);
+
+			expect( result.name ).toBe( 'photo-edited.jpg' );
+		} );
+
+		it( 'throws when the operation was already aborted', async () => {
+			const controller = new AbortController();
+			controller.abort();
+
+			await expect(
+				vipsEditImage( 'item-1', jpegFile, modifiers, {
+					signal: controller.signal,
+				} )
+			).rejects.toThrow( 'Operation aborted' );
+			expect( mockEditImage ).not.toHaveBeenCalled();
 		} );
 	} );
 

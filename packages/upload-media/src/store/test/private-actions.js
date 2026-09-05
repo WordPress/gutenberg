@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createBlobURL, revokeBlobURL } from '@wordpress/blob';
 import {
+	editImageItem,
 	generateThumbnails,
 	getTranscodeImageOperation,
 	finalizeItem,
@@ -15,6 +16,7 @@ import {
 import { OperationType, Type } from '../types';
 import { ErrorCode } from '../../upload-error';
 import {
+	vipsEditImage,
 	vipsHasTransparency,
 	vipsGetUltraHdrInfo,
 	vipsRotateImage,
@@ -36,6 +38,7 @@ vi.mock( import( '@wordpress/blob' ), () => ( {
 vi.mock( import( '../utils' ), async ( importOriginal ) => {
 	const actual = await importOriginal();
 	return {
+		vipsEditImage: vi.fn(),
 		vipsHasTransparency: vi.fn(),
 		vipsGetUltraHdrInfo: vi.fn(),
 		vipsRotateImage: vi.fn(),
@@ -1502,6 +1505,95 @@ describe( 'private actions', () => {
 			} finally {
 				warnSpy.mockRestore();
 			}
+		} );
+	} );
+
+	describe( 'editImageItem', () => {
+		const modifiers = [ { type: 'rotate', args: { angle: 90 } } ];
+		const file = new File( [ 'content' ], 'photo.jpg', {
+			type: 'image/jpeg',
+		} );
+
+		function createDispatch() {
+			const dispatch = vi.fn();
+			dispatch.finishOperation = vi.fn();
+			dispatch.cancelItem = vi.fn();
+			return dispatch;
+		}
+
+		beforeEach( () => {
+			vi.clearAllMocks();
+		} );
+
+		it( 'replaces the item file and source file with the edited one', async () => {
+			const edited = new File( [ 'edited' ], 'photo-edited.jpg', {
+				type: 'image/jpeg',
+			} );
+			vipsEditImage.mockResolvedValue( edited );
+			const abortController = new AbortController();
+			const dispatch = createDispatch();
+
+			await editImageItem( 'item-1', { modifiers } )( {
+				select: {
+					getItem: () => ( { id: 'item-1', file, abortController } ),
+					getSettings: () => ( { imageQuality: 0.9 } ),
+				},
+				dispatch,
+			} );
+
+			expect( vipsEditImage ).toHaveBeenCalledWith(
+				'item-1',
+				file,
+				modifiers,
+				{ quality: 0.9, signal: abortController.signal }
+			);
+			expect( dispatch.finishOperation ).toHaveBeenCalledWith( 'item-1', {
+				file: edited,
+				sourceFile: edited,
+				attachment: { url: 'blob:mock-url' },
+			} );
+			expect( dispatch.cancelItem ).not.toHaveBeenCalled();
+		} );
+
+		it( 'passes the file through when there is nothing to apply', async () => {
+			const dispatch = createDispatch();
+
+			await editImageItem( 'item-1', { modifiers: [] } )( {
+				select: {
+					getItem: () => ( { id: 'item-1', file } ),
+					getSettings: () => ( {} ),
+				},
+				dispatch,
+			} );
+
+			expect( vipsEditImage ).not.toHaveBeenCalled();
+			expect( dispatch.finishOperation ).toHaveBeenCalledWith( 'item-1', {
+				file,
+			} );
+		} );
+
+		it( 'cancels the item with an edit error when vips fails', async () => {
+			// Nothing has reached the server at this point, so the error
+			// code lets a caller fall back to the REST `/edit` endpoint.
+			vipsEditImage.mockRejectedValue( new Error( 'unsupported' ) );
+			const dispatch = createDispatch();
+
+			await editImageItem( 'item-1', { modifiers } )( {
+				select: {
+					getItem: () => ( { id: 'item-1', file } ),
+					getSettings: () => ( {} ),
+				},
+				dispatch,
+			} );
+
+			expect( dispatch.finishOperation ).not.toHaveBeenCalled();
+			expect( dispatch.cancelItem ).toHaveBeenCalledWith(
+				'item-1',
+				expect.objectContaining( {
+					code: ErrorCode.IMAGE_EDIT_ERROR,
+					file,
+				} )
+			);
 		} );
 	} );
 

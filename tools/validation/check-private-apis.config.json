@@ -117,6 +117,11 @@
 			"via": "packages/media-editor/src/lock-unlock.ts"
 		},
 		{
+			"comment": "Depends on @wordpress/upload-media, whose store registers its private actions and selectors through its lock-unlock. Remove when upload-media no longer needs private APIs.",
+			"package": "media-editor",
+			"via": "packages/upload-media/src/lock-unlock.ts"
+		},
+		{
 			"comment": "ThemeProvider falls back to the WP 7.2 theme/ui private APIs when the public API is unavailable. Remove when the fallback is deleted (scheduled for WP 7.3; see the TODO in the file).",
 			"package": "media-fields",
 			"via": "packages/ui/src/utils/theme-provider.ts"
