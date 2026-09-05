@@ -111,7 +111,9 @@ export default function LoginOutEdit( { attributes, setAttributes } ) {
 					className: 'logged-in',
 				} ) }
 			>
-				<a href="#login-pseudo-link">{ logoutText || __( 'Log out' ) }</a>
+				<a href="#login-pseudo-link">
+					{ logoutText || __( 'Log out' ) }
+				</a>
 			</div>
 		</>
 	);
