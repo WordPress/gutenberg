@@ -2,12 +2,21 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.dev.base.json",
 	"compilerOptions": {
-		"types": [ "jest", "style-imports", "react-css-custom-properties" ]
+		"types": [
+			"jest",
+			"style-imports",
+			"react-css-custom-properties",
+			"gutenberg-env"
+		]
 	},
-	"files": [ "global.d.ts" ],
+	"files": [
+		"global.d.ts",
+		"../../test/unit/typings/gutenberg-vitest-test-env/index.d.ts"
+	],
 	"references": [
 		{ "path": "./tsconfig.build.json" },
 		{ "path": "../a11y/tsconfig.build.json" },
+		{ "path": "../annotations/tsconfig.build.json" },
 		{ "path": "../api-fetch/tsconfig.build.json" },
 		{ "path": "../blob/tsconfig.build.json" },
 		{ "path": "../block-editor/tsconfig.build.json" },

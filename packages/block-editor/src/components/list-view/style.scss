@@ -466,6 +466,55 @@
 		}
 	}
 
+	// Pending structural suggestions. On the canvas these read as an outline,
+	// a strikethrough or a "Suggested move" tab; List View showed nothing at
+	// all, which is the surface where structural change is easiest to take in.
+	// Mirror the canvas semantics — strikethrough for a proposed removal,
+	// underline for a proposed insertion, a dashed underline for a proposed
+	// move. Colour never carries this alone: the row's accessible description
+	// says the same thing in words (see `getBlockSuggestionTreatment`).
+	//
+	// The values repeat `block-list/content-suggestion.scss` rather than
+	// sharing with it, because that stylesheet is compiled into the canvas
+	// iframe and List View lives in the editor chrome.
+	&.is-suggestion-pending-insert,
+	&.is-suggestion-pending-remove,
+	&.is-suggestion-pending-move {
+		.block-editor-list-view-block-select-button__title {
+			text-decoration-thickness: 1px;
+			text-underline-offset: 2px;
+		}
+	}
+
+	&.is-suggestion-pending-remove .block-editor-list-view-block-select-button__title {
+		text-decoration-line: line-through;
+	}
+
+	&.is-suggestion-pending-insert .block-editor-list-view-block-select-button__title,
+	&.is-suggestion-pending-move .block-editor-list-view-block-select-button__title {
+		text-decoration-line: underline;
+	}
+
+	&.is-suggestion-pending-move .block-editor-list-view-block-select-button__title {
+		text-decoration-style: dashed;
+	}
+
+	// Tint only when the row isn't selected — a selected row paints its cells
+	// with the admin theme colour and its text white.
+	&:not(.is-selected) {
+		&.is-suggestion-pending-remove .block-editor-list-view-block-select-button__title {
+			color: $alert-red;
+		}
+
+		&.is-suggestion-pending-insert .block-editor-list-view-block-select-button__title {
+			color: #007017;
+		}
+
+		&.is-suggestion-pending-move .block-editor-list-view-block-select-button__title {
+			color: #188038;
+		}
+	}
+
 	&.is-disabled {
 		opacity: 0.2;
 		@media not ( prefers-reduced-motion ) {

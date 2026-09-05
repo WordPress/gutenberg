@@ -6060,6 +6060,11 @@
 			"count": 1
 		}
 	},
+	"packages/editor/src/components/collab-sidebar/suggestion-actions.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
 	"packages/editor/src/components/collapsible-block-toolbar/index.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -7049,6 +7054,36 @@
 	},
 	"packages/editor/src/components/styles-canvas/style-book.jsx": {
 		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/suggestion-mode/auto-save.ts": {
+		"react-hooks/refs": {
+			"count": 6
+		}
+	},
+	"packages/editor/src/components/suggestion-mode/store-interceptor.ts": {
+		"react-hooks/refs": {
+			"count": 7
+		}
+	},
+	"packages/editor/src/components/suggestion-mode/suggestion-note-gc.ts": {
+		"@wordpress/react-no-unsafe-timeout": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/suggestion-mode/suggestion-summary.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/suggestion-mode/suggestion-undo-guard.ts": {
+		"react-hooks/refs": {
+			"count": 4
+		}
+	},
+	"packages/editor/src/components/suggestion-mode/test/auto-save.jsdom.test.tsx": {
+		"react-hooks/globals": {
 			"count": 1
 		}
 	},

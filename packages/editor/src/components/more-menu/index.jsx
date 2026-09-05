@@ -7,6 +7,8 @@ import { store as interfaceStore, ActionItem } from '@wordpress/interface';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Menu } from '@wordpress/ui';
 import CopyContentMenuItem from './copy-content-menu-item';
+import IntentSwitcher from '../intent-switcher';
+import { isSuggestionModeEnabled } from '../suggestion-mode/gate';
 import MoreMenuItem from './more-menu-item';
 import ModeSwitcher from '../mode-switcher';
 import MoreMenuGroup from './more-menu-group';
@@ -119,6 +121,7 @@ export default function MoreMenu( { isRevisionMode = false } ) {
 					<ViewMoreMenuGroup.Slot />
 				</Menu.Group>
 				<Menu.Separator />
+				{ isSuggestionModeEnabled() && <IntentSwitcher /> }
 				<ModeSwitcher />
 				<ActionItem.Slot
 					name="core/plugin-more-menu"
