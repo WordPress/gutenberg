@@ -3,7 +3,7 @@ import { fn } from 'storybook/test';
 import { TabbableContainer } from '..';
 
 const meta: Meta< typeof TabbableContainer > = {
-	title: 'Components/Containers/TabbableContainer',
+	title: 'Classic Components/Containers/TabbableContainer',
 	id: 'components-tabbablecontainer',
 	component: TabbableContainer,
 	argTypes: {

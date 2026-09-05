@@ -3,7 +3,7 @@ import ContentEditableControl from '..';
 
 const meta: Meta< typeof ContentEditableControl > = {
 	id: 'components-contenteditablecontrol',
-	title: 'Components/Selection & Input/Common/ContentEditableControl',
+	title: 'Classic Components/Selection & Input/Common/ContentEditableControl',
 	component: ContentEditableControl,
 	tags: [ 'status-private' ],
 	parameters: {

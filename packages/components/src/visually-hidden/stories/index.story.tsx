@@ -3,7 +3,7 @@ import { VisuallyHidden } from '..';
 
 const meta: Meta< typeof VisuallyHidden > = {
 	component: VisuallyHidden,
-	title: 'Components/Typography/VisuallyHidden',
+	title: 'Classic Components/Typography/VisuallyHidden',
 	id: 'components-visuallyhidden',
 	argTypes: {
 		children: { control: false },

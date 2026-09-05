@@ -590,7 +590,11 @@ A component's story should be showcasing its different states — for example, t
 ```jsx
 import Button from '../';
 
-export default { title: 'Components/Button', component: Button };
+export default {
+	id: 'components-button',
+	title: 'Classic Components/Actions/Button',
+	component: Button,
+};
 
 const Template = ( args ) => <Button { ...args } />;
 

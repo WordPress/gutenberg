@@ -3,7 +3,7 @@ import { Animate } from '..';
 import Notice from '../../notice';
 
 const meta: Meta< typeof Animate > = {
-	title: 'Components/Deprecated/Animate',
+	title: 'Classic Components/Deprecated/Animate',
 	id: 'components-animate',
 	component: Animate,
 	parameters: {

@@ -5,7 +5,7 @@ import { ColorPicker } from '../component';
 const meta: Meta< typeof ColorPicker > = {
 	tags: [ 'manifest' ],
 	component: ColorPicker,
-	title: 'Components/Selection & Input/Color/ColorPicker',
+	title: 'Classic Components/Selection & Input/Color/ColorPicker',
 	id: 'components-colorpicker',
 	argTypes: {
 		as: { control: false },

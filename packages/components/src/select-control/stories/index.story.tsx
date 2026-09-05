@@ -6,7 +6,7 @@ import { InputControlPrefixWrapper } from '../../input-control/input-prefix-wrap
 
 const meta: Meta< typeof SelectControl > = {
 	tags: [ 'manifest' ],
-	title: 'Components/Selection & Input/Common/SelectControl',
+	title: 'Classic Components/Selection & Input/Common/SelectControl',
 	id: 'components-selectcontrol',
 	component: SelectControl,
 	argTypes: {

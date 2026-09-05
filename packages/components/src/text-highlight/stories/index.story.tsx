@@ -4,7 +4,7 @@ import TextHighlight from '..';
 const meta: Meta< typeof TextHighlight > = {
 	tags: [ 'manifest' ],
 	component: TextHighlight,
-	title: 'Components/Typography/TextHighlight',
+	title: 'Classic Components/Typography/TextHighlight',
 	id: 'components-texthighlight',
 	parameters: {
 		controls: {

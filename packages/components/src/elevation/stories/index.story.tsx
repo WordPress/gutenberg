@@ -3,7 +3,8 @@ import { Elevation } from '..';
 
 const meta: Meta< typeof Elevation > = {
 	component: Elevation,
-	title: 'Components/Elevation',
+	id: 'components-elevation',
+	title: 'Classic Components/Elevation',
 	argTypes: {
 		as: { control: { type: 'text' } },
 		borderRadius: { control: { type: 'text' } },

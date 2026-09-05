@@ -7,7 +7,7 @@ import ScrollLock from '..';
 const meta: Meta< typeof ScrollLock > = {
 	tags: [ 'manifest' ],
 	component: ScrollLock,
-	title: 'Components/Utilities/ScrollLock',
+	title: 'Classic Components/Utilities/ScrollLock',
 	id: 'components-scrolllock',
 	parameters: {
 		controls: { hideNoControlsWarning: true },

@@ -4,7 +4,7 @@ import Shortcut from '../';
 const meta: Meta< typeof Shortcut > = {
 	tags: [ 'manifest' ],
 	component: Shortcut,
-	title: 'Components/Utilities/Shortcut',
+	title: 'Classic Components/Utilities/Shortcut',
 	id: 'components-shortcut',
 	parameters: {
 		controls: {
