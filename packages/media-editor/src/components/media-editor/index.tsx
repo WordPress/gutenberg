@@ -1,6 +1,9 @@
 import clsx from 'clsx';
 import {
 	Button,
+	DropdownMenu,
+	MenuGroup,
+	MenuItem,
 	Spinner,
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
@@ -19,7 +22,15 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { close, drawerRight, keyboard, redo, undo } from '@wordpress/icons';
+import {
+	backup,
+	close,
+	drawerRight,
+	keyboard,
+	moreVertical,
+	redo,
+	undo,
+} from '@wordpress/icons';
 import {
 	displayShortcut,
 	isAppleOS,
@@ -197,6 +208,18 @@ interface MediaEditorFrameContextValue {
 	onCancel: () => void;
 	onSave: () => void;
 	onReset: () => void;
+	/**
+	 * When `true`, the media has a lineage root to restore to, so the
+	 * "Restore original image" menu item is shown.
+	 */
+	canRestoreOriginal: boolean;
+	/**
+	 * When `true`, the original has already been loaded into the cropper this
+	 * session, so the menu item is disabled.
+	 */
+	isOriginalRestored: boolean;
+	/** Load the lineage root into the cropper as a dirty preview. */
+	onRestoreOriginal: () => void;
 }
 
 const MediaEditorFrameContext =
@@ -230,8 +253,17 @@ export interface HeaderActionsProps {
 }
 
 function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
-	const { isImage, isSaving, onCancel, isWide, activePanel, onTogglePanel } =
-		useMediaEditorFrameContext();
+	const {
+		isImage,
+		isSaving,
+		onCancel,
+		isWide,
+		activePanel,
+		onTogglePanel,
+		canRestoreOriginal,
+		isOriginalRestored,
+		onRestoreOriginal,
+	} = useMediaEditorFrameContext();
 	const isPanelOpen = !! activePanel;
 	const [ isShortcutsModalOpen, setIsShortcutsModalOpen ] = useState( false );
 	return (
@@ -241,14 +273,6 @@ function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
 			align="center"
 			gap="sm"
 		>
-			{ isImage && (
-				<Button
-					size="compact"
-					icon={ keyboard }
-					label={ __( 'Keyboard shortcuts' ) }
-					onClick={ () => setIsShortcutsModalOpen( true ) }
-				/>
-			) }
 			{ /* The sidebar holds more than one panel, so this opens and
 			     closes the sidebar rather than naming a panel: reopening
 			     returns to whichever tab was last showing, and the tab strip
@@ -264,6 +288,48 @@ function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
 				aria-expanded={ isWide ? isPanelOpen : undefined }
 				onClick={ onTogglePanel }
 			/>
+			{ isImage && (
+				<DropdownMenu
+					icon={ moreVertical }
+					label={ __( 'More options' ) }
+					toggleProps={ { size: 'compact' } }
+				>
+					{ ( { onClose: closeMenu } ) => (
+						<>
+							{ canRestoreOriginal && (
+								<MenuGroup>
+									<MenuItem
+										icon={ backup }
+										iconPosition="left"
+										disabled={ isOriginalRestored }
+										info={ __(
+											'Discards all edits and loads the unedited file.'
+										) }
+										onClick={ () => {
+											onRestoreOriginal();
+											closeMenu();
+										} }
+									>
+										{ __( 'Restore original image' ) }
+									</MenuItem>
+								</MenuGroup>
+							) }
+							<MenuGroup>
+								<MenuItem
+									icon={ keyboard }
+									iconPosition="left"
+									onClick={ () => {
+										setIsShortcutsModalOpen( true );
+										closeMenu();
+									} }
+								>
+									{ __( 'Keyboard shortcuts' ) }
+								</MenuItem>
+							</MenuGroup>
+						</>
+					) }
+				</DropdownMenu>
+			) }
 			{ showCloseButton && (
 				<Button
 					size="compact"
@@ -506,8 +572,6 @@ function MediaEditorContent( {
 		[ id ]
 	);
 
-	const hasChanges = cropper.isCropperDirty || hasEdits;
-
 	const { clearEntityRecordEdits, editEntityRecord, invalidateResolution } =
 		useDispatch( coreStore );
 	const { removeAllNotices } = useDispatch( noticesStore );
@@ -516,6 +580,11 @@ function MediaEditorContent( {
 	const [ isPlacementActive, setIsPlacementActive ] = useState( false );
 	const [ isCanvasGestureActive, setIsCanvasGestureActive ] =
 		useState( false );
+	// Whether the user has loaded the lineage root into the cropper this
+	// session. Stays a distinct flag (not derived from the cropper) so a bare
+	// restore counts as a change even though swapping the source resets the
+	// cropper's own dirty baseline.
+	const [ isOriginalRestored, setIsOriginalRestored ] = useState( false );
 	const placementControlTimerRef =
 		useRef< ReturnType< typeof setTimeout > >();
 
@@ -543,6 +612,7 @@ function MediaEditorContent( {
 	useEffect( () => {
 		setIsPlacementActive( false );
 		setIsCanvasGestureActive( false );
+		setIsOriginalRestored( false );
 	}, [ id ] );
 
 	// Bust the cached `_embed` resolution each time the editor mounts (or the
@@ -556,6 +626,67 @@ function MediaEditorContent( {
 			ATTACHMENT_EMBED_QUERY,
 		] );
 	}, [ id, invalidateResolution ] );
+
+	// Restore-original: the lineage root the edited attachment descends from,
+	// exposed by the server as the root-level `original_attachment` id on the
+	// attachment (edit context, embeddable via the `wp:original-attachment`
+	// link). Fetch the original's record for the URL and natural dimensions
+	// the cropper needs to seed itself.
+	const originalId: number | undefined = media?.original_attachment;
+	const originalRecord = useSelect(
+		( select ) =>
+			originalId
+				? ( select( coreStore ).getEntityRecord(
+						'postType',
+						'attachment',
+						originalId
+				  ) as Media | undefined )
+				: undefined,
+		[ originalId ]
+	);
+	const originalWidth = Number( originalRecord?.media_details?.width );
+	const originalHeight = Number( originalRecord?.media_details?.height );
+	const originalUrl = originalRecord?.source_url;
+	const originalSource =
+		originalId &&
+		originalRecord &&
+		typeof originalUrl === 'string' &&
+		originalUrl.length > 0 &&
+		Number.isFinite( originalWidth ) &&
+		originalWidth > 0 &&
+		Number.isFinite( originalHeight ) &&
+		originalHeight > 0
+			? {
+					id: originalId,
+					url: originalUrl,
+					width: originalWidth,
+					height: originalHeight,
+					media: originalRecord,
+			  }
+			: undefined;
+	const canRestoreOriginal = !! originalSource;
+	const restoredSource =
+		isOriginalRestored && originalSource
+			? {
+					id: originalSource.id,
+					url: originalSource.url,
+					media: originalSource.media,
+			  }
+			: undefined;
+	const canvasSrcOverride =
+		isOriginalRestored && originalSource
+			? {
+					url: originalSource.url,
+					width: originalSource.width,
+					height: originalSource.height,
+			  }
+			: undefined;
+	const handleRestoreOriginal = useCallback( () => {
+		setIsOriginalRestored( true );
+	}, [] );
+
+	// A bare restore has no cropper diff, so OR the flag in explicitly.
+	const hasChanges = cropper.isCropperDirty || hasEdits || isOriginalRestored;
 
 	const mediaType = getMediaTypeFromMimeType( media?.mime_type ).type;
 	const isImage = !! media && mediaType === 'image';
@@ -597,6 +728,7 @@ function MediaEditorContent( {
 		isImage,
 		media,
 		onSaved,
+		restoredSource,
 	} );
 
 	const handleChange = ( updates: Partial< Media > ) => {
@@ -606,6 +738,7 @@ function MediaEditorContent( {
 	const discardAndClose = () => {
 		removeAllNotices( 'snackbar', MEDIA_EDITOR_NOTICES_CONTEXT );
 		clearEntityRecordEdits( 'postType', 'attachment', id );
+		setIsOriginalRestored( false );
 		onClose?.();
 	};
 
@@ -745,6 +878,7 @@ function MediaEditorContent( {
 											handleCanvasGestureStart
 										}
 										onGestureEnd={ handleCanvasGestureEnd }
+										srcOverride={ canvasSrcOverride }
 									/>
 								) : (
 									<MediaPreview />
@@ -813,6 +947,9 @@ function MediaEditorContent( {
 		onCancel: handleRequestClose,
 		onSave: saveMediaEditor,
 		onReset: resetCropOptions,
+		canRestoreOriginal,
+		isOriginalRestored,
+		onRestoreOriginal: handleRestoreOriginal,
 	};
 
 	return (
