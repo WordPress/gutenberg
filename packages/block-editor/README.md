@@ -903,6 +903,7 @@ _Properties_
 -   _hasFixedToolbar_ `boolean`: Whether or not the editor toolbar is fixed
 -   _distractionFree_ `boolean`: Whether or not the editor UI is distraction free
 -   _focusMode_ `boolean`: Whether the focus mode is enabled or not
+-   _boundaryMode_ `boolean`: Whether the boundary mode is enabled or not
 -   _styles_ `Array`: Editor Styles
 -   _keepCaretInsideBlock_ `boolean`: Whether caret should move between blocks in edit mode
 -   _bodyPlaceholder_ `string`: Empty post placeholder

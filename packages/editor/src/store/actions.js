@@ -985,6 +985,41 @@ export const toggleSpotlightMode =
 	};
 
 /**
+ * Action that toggles the Boundary Mode view option.
+ */
+export const toggleBoundaryMode =
+	() =>
+	( { registry } ) => {
+		registry.dispatch( preferencesStore ).toggle( 'core', 'boundaryMode' );
+
+		const isBoundaryMode = registry
+			.select( preferencesStore )
+			.get( 'core', 'boundaryMode' );
+
+		registry
+			.dispatch( noticesStore )
+			.createInfoNotice(
+				isBoundaryMode
+					? __( 'Boundary mode activated.' )
+					: __( 'Boundary mode deactivated.' ),
+				{
+					id: 'core/editor/toggle-boundary-mode/notice',
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Undo' ),
+							onClick: () => {
+								registry
+									.dispatch( preferencesStore )
+									.toggle( 'core', 'boundaryMode' );
+							},
+						},
+					],
+				}
+			);
+	};
+
+/**
  * Action that toggles the Top Toolbar view option.
  */
 export const toggleTopToolbar =
