@@ -228,12 +228,12 @@ function getWebpackEntryPoints( buildType ) {
 	 * @return {Object<string,string>} The list of entry points.
 	 */
 	return () => {
-		// 1. Uses the recommended command format that lists entry points as paths to JavaScript files.
+		const entryPoints = {};
+
+		// 1. Collect all entry points from from the CLI arguments.
 		//    Example: `wp-scripts build one.js two.js`.
-		if ( process.env.WP_ENTRY ) {
-			return buildType === 'script'
-				? JSON.parse( process.env.WP_ENTRY )
-				: {};
+		if ( process.env.WP_ENTRY && 'script' === buildType ) {
+			Object.assign( entryPoints, JSON.parse( process.env.WP_ENTRY ) );
 		}
 
 		// Continues only if the source directory exists. Defaults to "src" if not explicitly set in the command.
@@ -241,7 +241,7 @@ function getWebpackEntryPoints( buildType ) {
 			warn(
 				`Source directory "${ getProjectSourcePath() }" was not found. Please confirm there is a "src" directory in the root or the value passed with "--output-path" is correct.`
 			);
-			return {};
+			return entryPoints;
 		}
 
 		// 2. Checks whether any block metadata files can be detected in the defined source directory.
@@ -255,8 +255,6 @@ function getWebpackEntryPoints( buildType ) {
 			const srcDirectory = fromProjectRoot(
 				getProjectSourcePath() + sep
 			);
-
-			const entryPoints = {};
 
 			for ( const blockMetadataFile of blockMetadataFiles ) {
 				const fileContents = readFileSync( blockMetadataFile );
@@ -338,16 +336,6 @@ function getWebpackEntryPoints( buildType ) {
 					entryPoints[ entryName ] = entryFilepath;
 				}
 			}
-
-			if ( Object.keys( entryPoints ).length > 0 ) {
-				return entryPoints;
-			}
-		}
-
-		// Don't do any further processing if this is a module build.
-		// This only respects *module block.json fields.
-		if ( buildType === 'module' ) {
-			return {};
 		}
 
 		// 3. Checks whether a standard file name can be detected in the defined source directory,
@@ -357,16 +345,15 @@ function getWebpackEntryPoints( buildType ) {
 			cwd: fromProjectRoot( getProjectSourcePath() ),
 		} );
 
-		if ( ! entryFile ) {
+		if ( entryFile ) {
+			entryPoints.index = entryFile;
+		} else {
 			warn(
 				`No entry file discovered in the "${ getProjectSourcePath() }" directory.`
 			);
-			return {};
 		}
 
-		return {
-			index: entryFile,
-		};
+		return entryPoints;
 	};
 }
 
